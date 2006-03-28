@@ -1,4 +1,4 @@
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 ###############################################################################
@@ -894,7 +894,7 @@ examples-clean:
 
 # hello
 hello: test_prep examples/pasm/hello$(EXE)
-	$(CUR_DIR)/examples/pasm/hello$(EXE)
+	$(CUR_DIR)/examples/pasm/hello$(EXE) "from your friendly makefile"
 
 examples/pasm/hello.pbc: examples/pasm/hello.pasm
 	$(PARROT) -o examples/pasm/hello.pbc examples/pasm/hello.pasm

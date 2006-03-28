@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -458,7 +458,6 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
                 argc);
     }
 
-    /* XXX @ARGS should propably be a ResizableStringArray */
     userargv = pmc_new_noinit(interpreter, enum_class_ResizableStringArray);
     /* immediately anchor pmc to root set */
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
@@ -767,7 +766,7 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
         PIO_eprintf(interpreter, " ***\n");
     }
 
-    /* Set up @ARGS (or whatever this language calls it) in P5. */
+    /* Set up @ARGS (or whatever this language calls it) in userargv. */
     userargv = setup_argv(interpreter, argc, argv);
 
 #if EXEC_CAPABLE

@@ -1254,8 +1254,8 @@ Default implementation of MMD lookup. The signature contains the letters
 =item C<PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth)>
 
 Default implementation of MMD lookup. The signature contains the letters
-"INSP" for the argument types. B<PMC> arguments are taken from registers
-C<P5> and up according to calling conventions.
+"INSP" for the argument types. B<PMC> arguments are taken from 
+the argument tuple.
 
 =cut
 

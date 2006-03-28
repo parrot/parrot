@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -36,51 +36,7 @@ opcode_t* run_compiled(Interp *interpreter,
 
 /*
 
-=item C<static void
-setup_argv(Interp *interpreter, int argc, char ** argv)>
-
-Stolen from F<embed.c>.
-
-=cut
-
-*/
-
-static void
-setup_argv(Interp *interpreter, int argc, char ** argv)
-{
-    INTVAL i;
-    PMC *userargv;
-
-    if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
-        PIO_eprintf(interpreter,
-        "*** Parrot VM: Setting up ARGV array in P5.  Current argc: %d ***\n",
-                argc);
-    }
-
-    userargv = pmc_new_noinit(interpreter, enum_class_SArray);
-    /* immediately anchor pmc to root set */
-    REG_PMC(5) = userargv;
-    VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
-            (INTVAL)IGLOBALS_ARGV_LIST, userargv);
-    VTABLE_init(interpreter, userargv);
-    VTABLE_set_integer_native(interpreter, userargv, argc);
-
-    for (i = 0; i < argc; i++) {
-        /* Run through argv, adding everything to @ARGS. */
-        STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
-                                  "binary", PObj_external_FLAG);
-
-        if (Interp_debug_TEST(interpreter, PARROT_START_DEBUG_FLAG)) {
-            PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);
-        }
-
-        VTABLE_push_string(interpreter, userargv, arg);
-    }
-}
-
-/*
-
-=item C<int main(int argc, char **argv)>
+=item C<int main(int argc, char * argv[])>
 
 The run-loop.
 
@@ -89,7 +45,8 @@ The run-loop.
 */
 
 int
-main(int argc, char **argv) {
+main(int argc, char * argv[])
+{
     /* long *             opp; */
     Interp *           interpreter;
     struct PackFile *  pf;
@@ -161,7 +118,7 @@ main(int argc, char **argv) {
 =head1 SEE ALSO
 
 F<include/parrot/exec.h>, F<include/parrot/exec_save.h>, F<src/exec.c>
-and F<src/exec_start.c>.
+and F<compilers/imcc/main.c>.
 
 =head1 HISTORY
 
