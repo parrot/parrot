@@ -245,7 +245,29 @@ CODE
 AAAAAAAAAA\xd9\xa6
 OUTPUT
 
+pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes");
+.sub main
+    .local string str
+    .local string rest
+
+    str = unicode:".xyz"
+    rest = substr str, 1
+    print rest
+    print "\n"
+
+    str = unicode:".xyz"
+    $S99 = downcase str
+    rest = substr str, 1
+    print rest
+    print "\n"
+
+.end
+CODE
+xyz
+xyz
+OUTPUT
+
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 19; }
+BEGIN { plan tests => 20; }
 
