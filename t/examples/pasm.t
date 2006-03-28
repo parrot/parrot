@@ -1,5 +1,5 @@
 #! perl
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -16,7 +16,7 @@ t/examples/pasm.t - Test examples in F<examples/pasm>
 
 =head1 SYNOPSIS
 
-	% prove t/examples/pasm.t
+    % prove t/examples/pasm.t
 
 =head1 DESCRIPTION
 

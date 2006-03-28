@@ -34,9 +34,9 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 # Set up expected output for examples
 
-# can't test the exact result, just adding one method somewhere
+# cannot test the exact result, just adding one method somewhere
 # changes all. Also namespaces are hashes. While we preserve 
-# insert order, we don't gurantee any specific order.
+# insert order, we do not gurantee any specific order.
 # test the name of the 2 toplevel names,  parrot is using
 my %expected
     = (

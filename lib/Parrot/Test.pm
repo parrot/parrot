@@ -32,12 +32,15 @@ The parameter C<$expected> is the expected result.
 The parameter C<$unexpected> is the unexpected result.
 The parameter C<$description> should describe the test.
 
-Any optional parameters can follow.  For example, to mark a test as a TODO test (where you know the implementation does not yet work), pass:
+Any optional parameters can follow.  For example, to mark a test as a TODO test
+(where you know the implementation does not yet work), pass:
 
     todo => 'reason to consider this TODO'
 
 at the end of the argument list.  Valid reasons include C<bug>,
 C<unimplemented>, and so on.
+
+B<Note:> you I<must> use a C<$description> with TODO tests.
 
 =over 4
 
@@ -146,25 +149,28 @@ expected result.
 Compiles and runs the C code, passing the test if a string comparison of
 output with the unexpected result is false.
 
-=item C<example_output_is( $example_f, $expected )>
+=item C<example_output_is( $example_f, $expected, @todo )>
 
-Determine the language from the extension of C<$example_f> and
-runs language_output_is().
+Determine the language from the extension of C<$example_f> and runs
+language_output_is().  This I<does> set a description for you, so don't pass
+one.
 
-=item C<example_output_like( $example_f, $expected )>
+=item C<example_output_like( $example_f, $expected, @todo )>
 
-Determine the language from the extension of C<$example_f> and
-runs language_output_like().
+Determine the language from the extension of C<$example_f> and runs
+language_output_like().  This I<does> set a description for you, so don't pass
+one.
 
-=item C<example_output_isnt( $example_f, $expected )>
+=item C<example_output_isnt( $example_f, $expected, @todo )>
 
-Determine the language from the extension of C<$example_f> and
-runs language_output_isnt().
+Determine the language from the extension of C<$example_f> and runs
+language_output_isnt().  This I<does> set a description for you, so don't pass
+one.
 
 =item C<skip($why, $how_many)>
 
-Use within a C<SKIP: { ... }> block to indicate why and how many test
-are being skipped. Just like in Test::More.
+Use within a C<SKIP: { ... }> block to indicate why and how many tests to skip,
+just like in Test::More.
 
 =item C<run_command($command, %options)>
 
@@ -365,7 +371,8 @@ sub _generate_functions {
         no strict 'refs';
 
         *{$package.'::'.$func} = sub {
-            my ( $code, $expected, $desc, %extra ) = @_;
+            local $SIG{__WARN__} = \&report_odd_hash;
+            my( $code, $expected, $desc, %extra) = @_;
 
             # Strange Win line endings
             convert_line_endings( $expected );
@@ -585,25 +592,29 @@ sub _generate_functions {
 
             my $meth = $language_test_map{$func};
             if ( my $prefix = $builtin_language_prefix{$language} ) { 
+                my $level = $builder->level();
+                $builder->level( $level + 2 );
                 my $test_func = "${package}::${prefix}_${meth}";
                 $test_func->( @remaining );
+                $builder->level( $level );
             }
             else {
                 # TODO: $language should be the name of the test Module
                 #       that would open the door for Scheme::Test
                 $language = ucfirst($language);
 
-                # make sure TODO will work, by telling Test::Builder which package
-                # the .t file is in (one more than usual, due to the extra layer
-                # of package indirection
+                # make sure TODO will work, by telling Test::Builder which
+                # package the .t file is in (one more than usual, due to the
+                # extra layer of package indirection
                 my $level = $builder->level();
                 $builder->level(2);
 
                 # Load module that knows how to test the language implementation
                 require "Parrot/Test/$language.pm";
+                my $class = "Parrot::Test::${language}";
 
                 # set the builder object, and parrot config.
-                my $obj = eval "Parrot::Test::${language}->new()";
+                my $obj         = $class->new();
                 $obj->{builder} = $builder;
                 $obj->{relpath} = $path_to_parrot;
                 $obj->{parrot}  = $parrot;
@@ -766,6 +777,29 @@ Parrot::Test::_generate_functions();
 =back
 
 =cut
+
+sub report_odd_hash {
+    my $warning = shift;
+    if ($warning =~ /Odd number of elements in hash assignment/) {
+        require Carp;
+        my @args = DB::uplevel_args();
+        shift @args;
+        my $func = ( caller() )[2];
+
+        Carp::carp(
+            "Odd $func invocation; probably missing description for TODO test"
+        );
+    } else {
+        warn $warning;
+    }
+}
+
+package DB;
+
+sub uplevel_args {
+    my @foo = caller( 2 );
+    return @DB::args;
+}
 
 1;
 

@@ -34,7 +34,6 @@ Get the TODO JAPHs working or decide that they are not suitable for testing.
 
 =cut
 
-
 # known reasons for failure
 my %todo = ( 1  => 'opcode "pack" is gone',
              2  => 'opcode "pack" is gone',
@@ -55,18 +54,6 @@ my %todo = ( 1  => 'opcode "pack" is gone',
 foreach ( 1 .. 17 ) {
     my $pasm_fn   = "examples/japh/japh$_.pasm";
 
-    # XXX Doing this a TODO, or the 'todo' option would be much nicer,
-    # but for some reason the does not seem to work here.
-    if ( defined $todo{$_} ) {
-        # TODO:
-        SKIP:
-        {
-        #   local $TODO = $todo{$_};
-            skip $todo{$_}, 1;
-
-            example_output_is( $pasm_fn, "Just another Parrot Hacker\n" );
-        };
-    } else {
-       example_output_is($pasm_fn, "Just another Parrot Hacker\n");
-    }
+    my @todo = $todo{$_} ? ( todo => $todo{$_} ) : ();
+    example_output_is($pasm_fn, "Just another Parrot Hacker\n", @todo);
 }

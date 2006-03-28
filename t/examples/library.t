@@ -16,7 +16,7 @@ t/examples/library.t - Test examples in F<examples/library>
 
 =head1 SYNOPSIS
 
-	% prove t/examples/library.t
+    % prove t/examples/library.t
 
 =head1 DESCRIPTION
 

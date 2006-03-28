@@ -16,7 +16,7 @@ t/examples/streams.t - Test examples in F<examples/streams>
 
 =head1 SYNOPSIS
 
-	% prove t/examples/streams.t
+    % prove t/examples/streams.t
 
 =head1 DESCRIPTION
 

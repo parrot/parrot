@@ -1,5 +1,5 @@
 #! perl
-# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
@@ -15,7 +15,7 @@ t/benchmark/benchmarks.t - test scripts in examples/benchmarks
 
 =head1 SYNOPSIS
 
-    prove t/benchmarks/benchmarks.t
+    prove t/benchmark/benchmarks.t
 
 =head1 DESCRIPTION
 
@@ -208,6 +208,7 @@ SArray:\s\d+\.\d+s\n
 );
 
 # These scripts are known to be failing.
+# Heh, currently all tests are working!
 my %todo = ( 
            );
 
@@ -220,35 +221,11 @@ foreach ( sort keys %outputs ) {
 
         my @todo = $todo{$_} ? ( todo => $todo{$_} ) : ();
         
-        # XXX use example_output_is() and example_output_like()
-        #     This does not work yet WRT to TODO
-        # if ( ref $outputs{$_} eq 'Regexp' ) {
-        #     example_output_like( "examples/benchmarks/$_", $outputs{$_}, @todo );
-        # }
-        # else {
-        #     example_output_is( "examples/benchmarks/$_", $outputs{$_}, @todo );
-        # }
-        if ( ref $outputs{ $_ } eq q(Regexp) ) {
-            if ( /\.pasm$/ ) {
-                pasm_output_like( $bench, $outputs{ $_ }, $_, @todo );
-            }
-            elsif ( /\.pir$/ ) {
-                pir_output_like( $bench, $outputs{ $_ }, $_, @todo );
-            }
-            else {
-                skip( qq(Unknown file type:  $_.), 1 );
-            }
+        if ( ref $outputs{$_} eq 'Regexp' ) {
+            example_output_like( "examples/benchmarks/$_", $outputs{$_}, @todo );
         }
         else {
-            if ( /\.pasm$/ ) {
-                pasm_output_is( $bench, $outputs{ $_ }, $_, @todo );
-            }
-            elsif ( /\.pir$/ ) {
-                pir_output_is( $bench, $outputs{ $_ }, $_, @todo );
-            }
-            else {
-                skip( qq(Unknown file type:  $_.), 1 );
-            }
+            example_output_is( "examples/benchmarks/$_", $outputs{$_}, @todo );
         }
     }
 }

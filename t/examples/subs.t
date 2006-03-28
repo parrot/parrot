@@ -16,7 +16,7 @@ t/examples/subs.t - Test examples in F<examples/subs>
 
 =head1 SYNOPSIS
 
-	% prove t/examples/subs.t
+    % prove t/examples/subs.t
 
 =head1 DESCRIPTION
 

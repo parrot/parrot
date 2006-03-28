@@ -16,7 +16,7 @@ t/examples/pir.t - Test examples in F<examples/past>
 
 =head1 SYNOPSIS
 
-	% prove t/examples/past.t
+    % prove t/examples/past.t
 
 =head1 DESCRIPTION
 
