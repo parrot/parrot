@@ -874,6 +874,11 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0");
+.macro PrintIt(fmt, number)
+	c = .number
+	$S0 = sprintf .fmt, c
+	print $S0
+.endm
 .sub main :main
 	.local pmc c, c2, c3
     c = new .Complex
@@ -886,8 +891,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0");
 	c[1] = $N0
 	c2 = c.exp()
 	c2 += 1.0
-	print c2
-	print "\n"
+        .PrintIt("%.3f%+.3fi\n", c2) 
 
 	# another e^(pi * i) + 1 = 0
 	c = new .Complex
@@ -901,12 +905,11 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0");
 	c2[1] = $N0
 	c3 = pow c, c2
 	c3 += 1.0
-	print c3
-	print "\n"
+        .PrintIt("%.3f%+.3fi\n", c3) 
 .end
 CODE
-0+0i
-0+0i
+0.000+0.000i
+0.000+0.000i
 OUTPUT
 
 # This code is used to generate the below tests
