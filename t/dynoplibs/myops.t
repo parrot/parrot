@@ -16,7 +16,7 @@ t/dynoplibs/myops.t - Test for the ops in src/dynoplibs/myops.ops
 
 =head1 SYNOPSIS
 
-	% prove t/dynoplibs/myops.t
+    % prove t/dynoplibs/myops.t
 
 =head1 DESCRIPTION
 
@@ -24,6 +24,8 @@ Tests the sample dynamic op library "myops".
 
 =cut
 
+my $is_ms_win32 = $^O =~ m!MSWin32!;
+my $is_mingw    = $is_ms_win32 && grep { $PConfig{cc} eq $_ } qw(gcc gcc.exe);
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "load");
 .sub main :main
@@ -39,7 +41,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "fortytwo");
 .sub main :main
     loadlib P1, "myops_ops"
     $I0 = fortytwo
-	print $I0
+    print $I0
     print "\n"
 .end
 CODE
@@ -50,7 +52,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "what_do_you_get_if_you_multiply_six_by_ni
 .sub main :main
     loadlib P1, "myops_ops"
     $S0 = what_do_you_get_if_you_multiply_six_by_nine
-	print $S0
+    print $S0
     print "\n"
 .end
 CODE
@@ -105,7 +107,10 @@ alarm
 done.
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "three alarm");
+SKIP: {
+    skip "three alarms, infinite loop under mingw32", 1 if $is_mingw;
+
+    pir_output_is(<< 'CODE', << 'OUTPUT', "three alarm");
 
 .sub main :main
     P1 = loadlib "myops_ops"
@@ -154,6 +159,7 @@ alarm3
 5
 done.
 OUTPUT
+}
 
 # bxand boolean op
 pasm_output_is(<<'CODE', <<'OUTPUT', 'bxand - A AND B, but not BOTH');
