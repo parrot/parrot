@@ -267,7 +267,19 @@ xyz
 xyz
 OUTPUT
 
+pir_output_is( <<'CODE', <<OUTPUT, "downcase asciish");
+.sub main
+    .local string str
+    .local string rest
+    str = unicode:".XYZ"
+    $S0 = downcase str
+    print $S0
+    print "\n"
+.end
+CODE
+.xyz
+OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 20; }
+BEGIN { plan tests => 21; }
 

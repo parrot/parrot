@@ -164,8 +164,6 @@ upcase(Interp *interpreter, STRING *source_string)
         return;
     }
 
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     for (offset = 0; offset < source_string->strlen; offset++) {
         buffer[offset] = toupper(buffer[offset]);
@@ -180,8 +178,6 @@ downcase(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     for (offset = 0; offset < source_string->strlen; offset++) {
         buffer[offset] = tolower(buffer[offset]);
@@ -196,8 +192,6 @@ titlecase(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     buffer[0] = toupper(buffer[0]);
     for (offset = 1; offset < source_string->strlen; offset++) {
@@ -212,8 +206,6 @@ upcase_first(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     buffer[0] = toupper(buffer[0]);
 }
@@ -225,8 +217,6 @@ downcase_first(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     buffer[0] = toupper(buffer[0]);
 }
@@ -239,8 +229,6 @@ titlecase_first(Interp *interpreter, STRING *source_string)
         return;
     }
 
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     buffer[0] = toupper(buffer[0]);
 }

@@ -130,6 +130,11 @@ upcase(Interp *interpreter, STRING *src)
     UErrorCode err;
     int dest_len, src_len, needed;
 
+    if (src->bufused == src->strlen && 
+            src->encoding == Parrot_utf8_encoding_ptr) {
+        Parrot_ascii_charset_ptr->upcase(interpreter, src);
+        return;
+    }
     src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
     /*
        U_CAPI int32_t U_EXPORT2
@@ -197,6 +202,12 @@ downcase(Interp *interpreter, STRING *src)
     UErrorCode err;
     int dest_len, src_len;
 
+    if (src->bufused == src->strlen && 
+            src->encoding == Parrot_utf8_encoding_ptr) {
+        Parrot_ascii_charset_ptr->downcase(interpreter, src);
+        return;
+    }
+
     src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
@@ -238,6 +249,11 @@ titlecase(Interp *interpreter, STRING *src)
     UErrorCode err;
     int dest_len, src_len;
 
+    if (src->bufused == src->strlen && 
+            src->encoding == Parrot_utf8_encoding_ptr) {
+        Parrot_ascii_charset_ptr->titlecase(interpreter, src);
+        return;
+    }
     src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
