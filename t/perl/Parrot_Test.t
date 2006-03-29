@@ -5,7 +5,13 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::Builder::Tester;
+BEGIN {
+    eval "use Test::Builder::Tester;";
+    if ($@) {
+        print "1..0 # Skip Test::Builder::Tester not installed\n";
+        exit 0;
+    }
+} 
 use Test::More;
 
 
