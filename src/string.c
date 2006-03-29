@@ -2577,6 +2577,7 @@ string_upcase_inplace(Interp *interpreter, STRING *s)
 {
     if (!s)
         return;
+    Parrot_unmake_COW(interpreter, s);
     CHARSET_UPCASE(interpreter, s);
 }
 
@@ -2620,6 +2621,13 @@ string_downcase_inplace(Interp *interpreter, STRING *s)
 {
     if (!s)
         return;
+    /*
+     * TODO get rid of all the inplace variants. We have for utf8:
+     * * 1 string_copy from the non-incase variant
+     * * conversion to utf16, with doubling the buffer
+     * * possibly one more reallocation in downcase
+     */
+    Parrot_unmake_COW(interpreter, s);
     CHARSET_DOWNCASE(interpreter, s);
 }
 
@@ -2663,6 +2671,7 @@ string_titlecase_inplace(Interp *interpreter, STRING *s)
 {
     if (!s)
         return;
+    Parrot_unmake_COW(interpreter, s);
     CHARSET_TITLECASE(interpreter, s);
 }
 
@@ -2683,6 +2692,7 @@ string_increment(Interp *interpreter, const STRING *s)
 
     if (string_length(interpreter, s) != 1)
         internal_exception(1, "increment only for length=1 done");
+
     o = string_ord(interpreter, s, 0);
     if ((o >= 'A' && o < 'Z') ||
             (o >= 'a' && o < 'z')) {
@@ -2798,6 +2808,7 @@ Parrot_string_trans_charset(Interp *interpreter, STRING *src,
         if (new_charset == src->charset) {
             return src;
         }
+        Parrot_unmake_COW(interpreter, src);
     }
     return new_charset->to_charset(interpreter, src, dest);
 }
@@ -2829,6 +2840,7 @@ Parrot_string_trans_encoding(Interp *interpreter, STRING *src,
         if (new_encoding == src->encoding) {
             return src;
         }
+        Parrot_unmake_COW(interpreter, src);
     }
     return new_encoding->to_encoding(interpreter, src, dest);
 }
