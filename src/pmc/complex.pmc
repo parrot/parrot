@@ -1098,11 +1098,11 @@ exp(a + bi) = exp(a) * (cos(b) + i * sin(b))
 */
 
     METHOD PMC* exp() {
-        FLOATVAL re, im;
+        FLOATVAL re, im, f;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         re = RE(SELF);
         im = IM(SELF);
-        FLOATVAL f = exp(re);
+        f = exp(re);
         RE(d) = f * cos(im);
         /* If only sin(pi) worked. */
         if (im == 4.0 * atan(1.0))
