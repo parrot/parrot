@@ -75,7 +75,6 @@ Use this function when you call into Parrot before entering a run loop.
 void
 Parrot_init(Interp *interpreter)
 {
-
     if (!interpreter->world_inited) {
         /* global_setup.c:init_world sets up some vtable stuff.
          * It must only be called once.

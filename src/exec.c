@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -35,7 +35,7 @@ static int symbol_list_find(Parrot_exec_objfile_t *obj, const char *func_name);
  * Parrot_exec_run must be 0 while the program runs.
  * It will be set to 2 inside eval (s. eval.pmc)
  * to switch to runops_jit (s. interpreter.c:runops_exec()).
- * Must be 1 while starting the compiled code to have make_interpreter
+ * Must be 1 while starting the compiled code to have Parrot_new()
  * return the address of the global interpreter (s. interpreter.c)
  * and PackFile_ConstTable_unpack use the global const_table (s. packfile.c).
  * Must also be 1 while generating the executable.

@@ -209,7 +209,7 @@ main(int argc, char **argv)
     if (argc < 2) {
         help();
     }
-    interpreter = make_interpreter(NULL, PARROT_NO_FLAGS);
+    interpreter = Parrot_new(NULL);
     /* init and set top of stack */
     Parrot_init_stacktop(interpreter, &status);
     while ((status = longopt_get(interpreter,

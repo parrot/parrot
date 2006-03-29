@@ -722,7 +722,7 @@ main(int argc, char **argv)
     int i;
 
     /* Create a Parrot interpreter. */
-    interpreter = make_interpreter(NULL, PARROT_NO_FLAGS);
+    interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
     Parrot_block_DOD(interpreter);
 

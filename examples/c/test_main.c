@@ -74,11 +74,9 @@ main(int argc, char *argv[])
     Parrot_PackFile pf;
 
     interpreter = Parrot_new(NULL);
-
     if (!interpreter) {
         return 1;
     }
-
     Parrot_init(interpreter);
 
     filename = parseflags(interpreter, &argc, &argv);

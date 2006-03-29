@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -120,7 +120,7 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
 
         debugger = interpreter->debugger = 
             /*
-             * using a distinc interpreter for tracing should be ok
+             * using a distinct interpreter for tracing should be ok
              * - just in case, make it easy to switch
              */
 #if 1

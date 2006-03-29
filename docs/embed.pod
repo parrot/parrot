@@ -12,18 +12,18 @@ embed.pod - Parrot embedding system
     int main(int argc, char *argv[]) {
         Parrot_Interp interp;
         Parrot_PackFile pf;
-        char *bcfile="program.pbc";
+        char * bcfile = "program.pbc";
 
         argc--; argv++; /* skip the program name */
 
-        interp=Parrot_new(0);
+        interp=Parrot_new(NULL);
         Parrot_init(interp);
 
         if(PARROT_JIT_CAPABLE) {
             Parrot_set_run_core(interp, PARROT_JIT_CORE);  /* activate JIT */
         }
 
-        pf=Parrot_readbc(interp, bcfile);
+        pf = Parrot_readbc(interp, bcfile);
         Parrot_loadbc(interp, pf);
 
         Parrot_runcode(interp, argc, argv); /* argc and argv as seen by the bytecode file */

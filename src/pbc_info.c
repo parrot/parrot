@@ -60,13 +60,13 @@ the directory using PackFile_map_segments() and iter().
 */
 
 int
-main(int argc, char **argv)
+main(int argc, char * argv[] )
 {
     struct PackFile *pf;
     Interp *interpreter;
     struct PackFile_Segment *seg;
 
-    interpreter = make_interpreter(NULL, PARROT_NO_FLAGS);
+    interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
 
     pf = Parrot_readbc(interpreter, argv[1]);
