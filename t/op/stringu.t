@@ -280,6 +280,23 @@ CODE
 .xyz
 OUTPUT
 
+# escape does not produce utf8, just a raw sequence of chars
+pir_output_is( <<"CODE", <<'OUTPUT', "escape utf16");
+.sub main
+    .local string s, t
+    .local int i
+    s = iso-8859-1:"T\xf6tsch"
+    i = find_charset "unicode"
+    s = trans_charset s, i
+    t = upcase s
+    escape t, t
+    print t
+    print "\\n"
+.end
+CODE
+T\x{d6}TSCH
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 21; }
+BEGIN { plan tests => 22; }
 
