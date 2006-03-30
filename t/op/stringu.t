@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 
 
 =head1 NAME
@@ -245,6 +246,8 @@ CODE
 AAAAAAAAAA\xd9\xa6
 OUTPUT
 
+SKIP: {
+  skip('no ICU lib', 3) unless $PConfig{has_icu};
 pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes");
 .sub main
     .local string str
@@ -296,6 +299,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "escape utf16");
 CODE
 T\x{d6}TSCH
 OUTPUT
+}
 
 ## remember to change the number of tests :-)
 BEGIN { plan tests => 22; }
