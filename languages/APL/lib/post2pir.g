@@ -115,15 +115,23 @@ POST::Var: result(.) = {
 }
 
 POST::Val: result(.) = {
-    $S1 = node.value()
     $S2 = node.valtype()
     if $S2 == 'str' goto wrap_string
     if $S2 == 'int' goto wrap_int
-    # only floats do the default return for now.
-  return_default:
+    if $S2 != 'num' goto return_default
+  wrap_float:
+    # Cheat and get the number formatted properly using sprintf.
+    # XXX eventually this will come from a PMC.
+    $N1 = node.value()
+    $P1 = new .ResizablePMCArray
+    $P1[0] = $N1
+    $S1 = sprintf "%s", $P1
+    $S1 = '"' . $S1
+    $S1 = $S1 . '"'
     .return ($S1)
   wrap_string:
     # Escape strings properly
+    $S1 = node.value()
     load_bytecode 'library/Data/Escape.pir' # XXX move into pre-amble code
     .local pmc escape
     escape = find_global 'Data::Escape', 'String'
@@ -140,4 +148,7 @@ POST::Val: result(.) = {
     $S3 .= $S4
     $S3 .= '"'
     .return ($S3)
+  return_default:
+    $S1 = node.value()
+    .return ($S1)
 }

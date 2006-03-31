@@ -18,8 +18,6 @@ __DATA__
 === number
 --- APL: print 1.44
 --- out: 1.44
---- excuse: prints extra zeros
---- skip: not implemented
 
 === negative number
 --- APL: print ⁻1.44
