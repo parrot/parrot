@@ -88,7 +88,7 @@ sub runstep
 
         my @opt_and_vers = (
             0 =>
-                "-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
+                "-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
 
             # others; ones we might like marked with ?
             # ? -Wundef for undefined idenfiers in #if
@@ -104,6 +104,10 @@ sub runstep
             #    function.  -Wlong-long
             # Ha. this is the default! with -pedantic.
             # -Wno-long-long for the nicest bit of C99
+            #
+            # -Wcast-align is now removed: it gives too many false positives
+            #    e.g. when accessing registers - this is all aligned
+     
             2.7  => "",
             2.8  => "-Wsign-compare",
             2.95 => "",
