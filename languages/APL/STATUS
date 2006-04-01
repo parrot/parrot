@@ -44,12 +44,5 @@ Things to do:
 - Add vectors (May involve re-doing how we handle strings, as from APL's
   point of views, strings are just vectors of characters)
 
-- Allow exponents in numeric constants
-
-- Fix float rendering (no extra zeros!)
-
 - Add DOMAIN ERROR exceptions when trying to use certain operators on
   strings
-
-
-
