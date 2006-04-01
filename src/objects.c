@@ -770,7 +770,7 @@ class_mro_merge(Interp* interpreter, PMC *seqs)
     while (1) {
         nseqs = not_empty(interpreter, seqs);
         if (!VTABLE_elements(interpreter, nseqs))
-            return res;
+            break;
         for (i = 0; i < VTABLE_elements(interpreter, nseqs); ++i) {
             seq = VTABLE_get_pmc_keyed_int(interpreter, nseqs, i);
             cand = VTABLE_get_pmc_keyed_int(interpreter, seq, 0);
