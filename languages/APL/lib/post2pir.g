@@ -123,11 +123,18 @@ POST::Val: result(.) = {
     # Cheat and get the number formatted properly using sprintf.
     # XXX eventually this will come from a PMC.
     $N1 = node.value()
+    if $N1 < 0 goto wrap_float_negative
     $P1 = new .ResizablePMCArray
     $P1[0] = $N1
-    $S1 = sprintf "%s", $P1
-    $S1 = '"' . $S1
-    $S1 = $S1 . '"'
+    $S1 = sprintf "\"%s\"", $P1
+    .return ($S1)
+  wrap_float_negative:
+    $N1 = abs $N1
+    $P1 = new .ResizablePMCArray
+    $P1[0] = $N1
+    # XXX can't use a utf8 sprintf format string.
+    $S1 = sprintf "%s\"", $P1
+    $S1 = unicode:"unicode:\"\u207B" . $S1
     .return ($S1)
   wrap_string:
     # Escape strings properly

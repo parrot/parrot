@@ -21,7 +21,6 @@ rule cexpr {
 
 rule term {
       <APLGrammar::number>
-    | <APLGrammar::integer>
     | <APLGrammar::stringdouble>
     | <APLGrammar::stringsingle>
 }
@@ -35,10 +34,14 @@ rule newterm {
   | <APLGrammar::variable>
 }
 
-rule integer {
- (⁻)? (\d+) ( E (⁻)? (\d+) )?
+rule number  { 
+  (⁻)?
+  (
+   \d+ \. \d+ |
+   \d+ 
+  )
+  ( E (⁻)? (\d+) )?
 }
 
-rule number  { \d+ \. \d+ }
 rule stringdouble { " ([ "" | <-["]> ]*) " }
 rule stringsingle { ' ([ '' | <-[']> ]*) ' }

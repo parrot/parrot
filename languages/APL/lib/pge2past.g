@@ -190,22 +190,7 @@ APLGrammar::oexpr: result(.) = {
     .return (result)
 }
 
-
 APLGrammar::number: result(.) = {
-    .local pmc result
-    result = new 'PAST::Val'
-
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
-
-    result.set_node($S2,$I3,$S2)
-    result.valtype('num')
-    .return (result)
-}
-
-APLGrammar::integer: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
 
@@ -215,7 +200,7 @@ APLGrammar::integer: result(.) = {
     .local int offset_position
     offset_position = node.from()
 
-    .local int value
+    .local num value
 
     # Get the component parts of the match
     $P1 = node.get_array()
@@ -230,7 +215,6 @@ get_num:
     number = $P1[1]
     value = number
 
-    # XXX do int constants with negative exponents auto-convert to floats?
     .local pmc exponent_match # a R.P.A of matches
     exponent_match = $P1[2] 
     .local int exp_value
@@ -253,16 +237,23 @@ done_exp_sign:
     exp_value = $S1
     exp_value *= exp_sign 
 integer_done:
-    # XXX is there an efficient way to avoid the numification here?
-    # convert to float first.
+    # calculate the exponent
     $N1 = pow 10.0, exp_value
-    $N2 = value
-    $N2 *= $N1
-    value = $N2
+    value *= $N1
     value *= sign_value
 
+    # Is this an int, to the best of our knowledge?
+    $N1 = cmod value, 1.0
+    if $N1 != 0.0 goto numific 
+intlike:
+    $I1 = value
+    result.set_node(original_source,offset_position,$I1)
+    result.valtype('num')
+    .return (result)
+
+numific:
     result.set_node(original_source,offset_position,value)
-    result.valtype('int')
+    result.valtype('num')
     .return (result)
 }
 
