@@ -1,5 +1,9 @@
 # $Id$
 
+2006.04.02    leo
+	* Released 0.4.3
+	See NEWS for more.
+
 2006.03.06    leo
         * Shifted argument type bits left by 2 according to r11754
 	  change of docs/pdds/pdd03_calling_conventions.pod

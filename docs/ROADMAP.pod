@@ -25,9 +25,9 @@ document, among others.
 For a high level overview of parrot milestones, please see:
 L<http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html>
 
-=head1 CURRENT RELEASE (0.4.2)
+=head1 CURRENT RELEASE (0.4.3)
 
-Parrot 0.4.2 was released on Feb. 22th, 2006. For a list of new and fixed
+Parrot 0.4.3 was released on Apr. 2nd, 2006. For a list of new and fixed
 feature see L<NEWS>.
 
 =head1 OVERVIEW
