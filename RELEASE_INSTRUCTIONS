@@ -40,15 +40,15 @@ To prepare a release:
 
     3.  svn commit.
 
-    4.  make release VERSION=<version>
+    4.  make release VERSION=a.b.c
+           where a.b.c is the version number
 
-    5.  untar parrot-<version>.tar.gz into another area
+    5.  untar parrot-a.b.c.tar.gz into another area
 
-    6.  Make sure everything works--Configure, make and
-        make fulltest.  Check the Tinderbox and make sure that
-        everything's green (or that any yellows and reds are
-        due to problems with the particular box, like a
-        botched compiler upgrade).
+    6.  Make sure everything works:
+        perl Configure.pl 
+        make world
+        make fulltest
 
     7.  tag the release as: RELEASE_a_b_c
            where a.b.c is the version number
