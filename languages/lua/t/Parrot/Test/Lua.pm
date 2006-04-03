@@ -67,7 +67,7 @@ foreach my $func ( keys %language_test_map ) {
         } else {
             @test_prog = 
                  ( "perl -Ilanguages/lua languages/lua/luac.pl languages/${lang_fn}",
-                   "$self->{parrot} languages/${pir_fn}" );
+                   "$self->{parrot} --no-gc languages/${pir_fn}" );
         }
 
         # This does not create byte code, but lua code
