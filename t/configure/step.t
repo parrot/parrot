@@ -11,6 +11,7 @@ use Test::More tests => 19;
 
 use File::Basename qw(basename dirname);
 use File::Temp 0.13 qw/tempfile/;
+use File::Spec;
 use IO::Handle;
 
 =head1 NAME
@@ -78,8 +79,7 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
     $tofile->close;
 
     # redirect STDERR to avoid warnings
-    # windows wants '>nul', most everything else wants '>/dev/null'
-    my $redir = $^O =~ /^(MSWin\d+)$/ ? q{2>nul} : q{2>/dev/null};
+    my $redir = File::Spec->devnull;
 
     # copy file descriptors
     open OLDERR, ">&STDERR";

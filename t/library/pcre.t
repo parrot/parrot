@@ -15,7 +15,7 @@ t/library/pcre.t - testing library/pcre.pir
 
 =head1 SYNOPSIS
 
-	% prove t/library/pcre.t
+    % prove t/library/pcre.t
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,9 @@ the installed PCRE library, and matches patterns successfully.
 
 # if we keep pcre, we need a config test
 my $cmd = ($^O =~ /MSWin32/) ? "pcregrep --version" : "pcre-config --version";
-my $has_pcre = Parrot::Test::run_command($cmd, STDERR => '/dev/null') == 0;
+my $has_pcre = 0 == Parrot::Test::run_command(
+    $cmd, STDERR => File::Spec->devnull,
+);
 
 SKIP: {
     skip("no pcre-config", Test::Builder->new()->expected_tests())
