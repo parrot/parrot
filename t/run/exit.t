@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 
 # Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
@@ -19,14 +19,15 @@ with combinations of STDERR and STDOUT open and closed.
 =cut
 
 use strict;
+use warnings;
 use Parrot::Test tests => 8;
 use Test::More;
 use Parrot::Config;
+use File::Spec;
+
 
 my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
-
-# windows wants '>nul', most everything else wants '>/dev/null'
-my $redir = $^O =~ /^(MSWin\d+)$/ ? q{>nul 2>&1} : q{>/dev/null 2>&1};
+my $redir = File::Spec->devnull;
 
 # copy file descriptors
 open OLDOUT, ">&STDOUT";

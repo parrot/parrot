@@ -23,6 +23,7 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
+use File::Spec;
 
 
 my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
@@ -47,8 +48,7 @@ is( `"$PARROT" "$first" "asdf"`, "first\n", 'ignore nonsense' );
 
 
 # redirect STDERR to avoid warnings
-# windows wants '>nul', most everything else wants '>/dev/null'
-my $redir = $^O =~ /^(MSWin\d+)$/ ? q{2>nul} : q{2>/dev/null};
+my $redir = '2>' . File::Spec->devnull;
 
 # Test the trace option
 is( `"$PARROT" -t "$first" $redir`, "first\n", 'option -t' );
