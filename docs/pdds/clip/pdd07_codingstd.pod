@@ -1,4 +1,4 @@
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -86,7 +86,8 @@ Uncuddled C<else>s: ie avoid  C<} else {>
 
 =item *
 
-No C++ style comments (C<//>): some C compilers may choke on them
+C-style comments only (C</* comment */>).  Not all C compilers handle
+C++-style comments.
 
 =item *
 
@@ -502,8 +503,8 @@ C<PMC_readonly_CLEAR(foo);>
 
 =item *
 
-A macro defining a mask of flag bits should be suffixed with C<_MASK>, eg C<foo
-&= ~PMC_STATUS_MASK> (but see notes on extensibility below).
+A macro defining a mask of flag bits should be suffixed with C<_MASK>, eg
+C<foo &= ~PMC_STATUS_MASK> (but see notes on extensibility below).
 
 =item *
 
@@ -565,19 +566,19 @@ Within an individual subsystem, macros are defined for each global variable of
 the form C<GLOBAL_foo> (the name being deliberately clunky). So we might for
 example have the following macros:
 
-	/* perl_core.h or similar */
+    /* perl_core.h or similar */
 
-	#ifdef HAS_THREADS
-	#  define GLOBALS_BASE (aTHX_->globals)
-	#else
-	#  define GLOBALS_BASE (Perl_globals)
-	#endif
+    #ifdef HAS_THREADS
+    #  define GLOBALS_BASE (aTHX_->globals)
+    #else
+    #  define GLOBALS_BASE (Perl_globals)
+    #endif
 
-	/* pmc_private.h */
+    /* pmc_private.h */
 
-	#define GLOBAL_foo   GLOBALS_BASE.pmc.foo
-	#define GLOBAL_bar   GLOBALS_BASE.pmc.bar
-	... etc ...
+    #define GLOBAL_foo   GLOBALS_BASE.pmc.foo
+    #define GLOBAL_bar   GLOBALS_BASE.pmc.bar
+    ... etc ...
 
 =back
 
@@ -679,7 +680,7 @@ Each comment should be of the form
 
 This inline POD documentation is parsed to HTML by running:
 
-	% perl tools/docs/write_docs.pl -s
+    % perl tools/docs/write_docs.pl -s
 
 =item Optimizations
 
@@ -699,16 +700,16 @@ else, this makes it easy to quickly locate a specific chunk of code. Such
 comments are particularly useful at the top of each major branch, eg
 
     if (FOO_bar_BAZ(**p+*q) <= (r-s[FOZ & FAZ_MASK]) || FLOP_2(z99)) {
-	/* we're in foo mode: clean up lexicals */
-	... (20 lines of gibberish) ...
+        /* we're in foo mode: clean up lexicals */
+        ... (20 lines of gibberish) ...
     }
     else if (...) {
-	/* we're in bar mode: clean up globals */
-	... (20 more lines of gibberish) ...
+        /* we're in bar mode: clean up globals */
+        ... (20 more lines of gibberish) ...
     }
     else {
-	/* we're in baz mode: self-destruct */
-	....
+        /* we're in baz mode: self-destruct */
+        ....
     }
 
 =back
@@ -759,6 +760,79 @@ Don't assume GNU C, and don't use any GNU extensions unless protected by
 
 TBC ... Any contributions welcome !!!
 
+
+=head2 Defensive programming
+
+=head3 The C<const> keyword on arguments
+
+Use the C<const> keyword as often as possible on pointers.  It lets
+the compiler know when you intend to modify the contents of something.
+For example, take this definition:
+
+    int strlen( const char *p );
+
+The C<const> qualifier tells the compiler that the argument will not be
+modified.  The compiler can then tell you that this is an uninitialized
+variable:
+
+    char *p;
+    int n = strlen(p);
+
+Without the C<const>, the compiler has to assume that C<strlen()> is
+actually initializing the contents of C<p>.
+
+=head3 The C<const> keyword on variables
+
+If you're declaring a temporary pointer, declare it C<const>, with the
+const to the right of the C<*>, to indicate that the pointer should not
+be modified.
+
+    Wango * const w = get_current_wango();
+    w->min = 0;
+    w->max = 14;
+    w->name = "Ted";
+
+This prevents you from modifying C<w> inadvertantly.
+
+    new_wango = w++; /* Error */
+
+If you're not going to modify the target of the pointer, put a C<const>
+to the left of the type, as in:
+
+    const Wango * const w = get_current_wango();
+    if ( n < wango->min || n > wango->max ) {
+        /* do something */
+    }
+
+=head3 Localizing variables
+
+Declare variables in the innermost scope possible.
+
+    if ( foo ) {
+        int i;
+        for ( i=0; i<n; i++ ) {
+            do_something(i);
+        }
+    }
+
+Don't reuse unrelated variables.  Localize as much as possible, even if
+the variables happen to have the same names.
+
+    if ( foo ) {
+        int i;
+        for ( i=0; i<n; i++ ) {
+            do_something(i);
+        }
+    }
+    else {
+        int i;
+        for ( i=14; i>0; i-- ) {
+            do_something_else(i*i);
+        }
+    }
+
+You could hoist the C<int i;> outside the test, but now you'll have an
+C<i> that's visible after it's used, which is confusing at best.
 
 =head2 Performance
 
