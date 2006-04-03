@@ -20,6 +20,7 @@
 #include "parrot/interp_guts.h"
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
+#include "parrot/builtin.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -167,8 +168,6 @@ check_op(Interp *interpreter, char *fullname,
     op = interpreter->op_lib->op_code(fullname, 1);
     return op;
 }
-
-int Parrot_is_builtin(Interp *, char *func, char *sig);
 
 static Instruction *
 maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
