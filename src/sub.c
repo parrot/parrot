@@ -444,7 +444,6 @@ parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
     parrot_context_t *ctx;
 
     clos_pmc = VTABLE_clone(interpreter, sub_pmc);
-    clos_pmc->vtable = interpreter->vtables[enum_class_Closure];
     sub = PMC_sub(sub_pmc);
     clos = PMC_sub(clos_pmc);
     /* 

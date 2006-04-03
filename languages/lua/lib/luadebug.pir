@@ -31,10 +31,10 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
 .HLL "Lua", "lua_group"
 
 
-.sub init :load, :anon
+.sub init_debug :load :anon
 
-    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode "languages/lua/lib/luaaux.pbc"
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Debug\n"
 
@@ -120,7 +120,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_debug :anon
+.sub _debug_debug :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -133,7 +133,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getfenv :anon
+.sub _debug_getfenv :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -148,7 +148,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_gethook :anon
+.sub _debug_gethook :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -176,7 +176,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getinfo :anon
+.sub _debug_getinfo :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -197,7 +197,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getlocal :anon
+.sub _debug_getlocal :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -209,7 +209,7 @@ metatable.
 
 =cut
 
-.sub _debug_getmetatable :anon
+.sub _debug_getmetatable :anon :outer(init_debug)
     .param pmc obj :optional
     .local pmc ret
     checkany(obj)
@@ -226,7 +226,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getregistry :anon
+.sub _debug_getregistry :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -241,7 +241,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getupvalue :anon
+.sub _debug_getupvalue :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -254,7 +254,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_setfenv :anon
+.sub _debug_setfenv :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -298,7 +298,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_sethook :anon
+.sub _debug_sethook :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -316,7 +316,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_setlocal :anon
+.sub _debug_setlocal :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -328,7 +328,7 @@ be B<nil>).
 
 =cut
 
-.sub _debug_setmetatable :anon
+.sub _debug_setmetatable :anon :outer(init_debug)
     .param pmc table :optional
     .param pmc metatable :optional
     checktype(table, "table")
@@ -354,7 +354,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_setupvalue :anon
+.sub _debug_setupvalue :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -369,7 +369,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_traceback :anon
+.sub _debug_traceback :anon :outer(init_debug)
     not_implemented()
 .end
 

@@ -17,7 +17,7 @@ Tests C<LuaFunction> PMC
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
@@ -44,28 +44,8 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
 CODE
 0
 1
-0
 1
-OUTPUT
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "check interface");
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
-    .local pmc pmc1
-    pmc1 = new $I0
-    .local int bool1
-    bool1 = does pmc1, "sub"
-    print bool1
-    print "\n"
-    bool1 = does pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
-.end
-CODE
 1
-0
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check name");
@@ -83,7 +63,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check name");
     print "\n"
     end
 .end
-.sub f1
+.sub f1 :outer(_main)
     print "f1()\n"
     end
 .end
@@ -121,13 +101,9 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
     bool1 = istrue pmc1
     print bool1
     print "\n"
-#    .local string str1
-#    str1 = classname pmc1
-#    print str1
-#    print "\n"
     end
 .end
-.sub f1
+.sub f1 :outer(_main)
     print "f1()\n"
     end
 .end
@@ -171,7 +147,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
     pmc1()
     end
 .end
-.sub f1
+.sub f1 :outer(_main)
     print "f1()\n"
     .return ()
 .end
@@ -190,7 +166,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL (autoboxing)");
     print bool1
     print "\n"
 .end
-.sub test
+.sub test :outer(_main)
     .const .Sub T = "test"
     .return (T)
 .end

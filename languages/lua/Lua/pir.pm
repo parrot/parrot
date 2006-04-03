@@ -13,17 +13,42 @@ sub new {
 	$self->{prologue} = q{.namespace [ "Lua" ]
 .HLL "Lua", "lua_group"
 
+.include "languages/lua/lib/luaaux.pir"
+.include "languages/lua/lib/luabasic.pir"
+.include "languages/lua/lib/luacoroutine.pir"
+.include "languages/lua/lib/luapackage.pir"
+.include "languages/lua/lib/luastring.pir"
+.include "languages/lua/lib/luatable.pir"
+.include "languages/lua/lib/luamath.pir"
+.include "languages/lua/lib/luaio.pir"
+.include "languages/lua/lib/luaos.pir"
+.include "languages/lua/lib/luadebug.pir"
+
 .sub __start :main
 #  print "start Lua\n"
-  load_bytecode "languages/lua/lib/luabasic.pbc"
-  load_bytecode "languages/lua/lib/luacoroutine.pbc"
-  load_bytecode "languages/lua/lib/luapackage.pbc"
-  load_bytecode "languages/lua/lib/luastring.pbc"
-  load_bytecode "languages/lua/lib/luatable.pbc"
-  load_bytecode "languages/lua/lib/luamath.pbc"
-  load_bytecode "languages/lua/lib/luaio.pbc"
-  load_bytecode "languages/lua/lib/luaos.pbc"
-  load_bytecode "languages/lua/lib/luadebug.pbc"
+  init_basic()
+  init_coroutine()
+  init_package()
+  init_string()
+  init_table()
+  init_math()
+  init_io()
+  init_os()
+  init_debug()
+  
+#
+#  PBC loader does not support LuaFunction
+#  
+  
+#  load_bytecode "languages/lua/lib/luabasic.pbc"
+#  load_bytecode "languages/lua/lib/luacoroutine.pbc"
+#  load_bytecode "languages/lua/lib/luapackage.pbc"
+#  load_bytecode "languages/lua/lib/luastring.pbc"
+#  load_bytecode "languages/lua/lib/luatable.pbc"
+#  load_bytecode "languages/lua/lib/luamath.pbc"
+#  load_bytecode "languages/lua/lib/luaio.pbc"
+#  load_bytecode "languages/lua/lib/luaos.pbc"
+#  load_bytecode "languages/lua/lib/luadebug.pbc"
   _main()
 .end
 

@@ -22,10 +22,10 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 .HLL "Lua", "lua_group"
 
 
-.sub init :load, :anon
+.sub init_coroutine :load :anon
 
-    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode "languages/lua/lib/luaaux.pbc"
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Coroutine\n"
 
@@ -71,7 +71,7 @@ Returns this new coroutine, an object with type C<"thread">.
 
 =cut
 
-.sub _coroutine_create :anon
+.sub _coroutine_create :anon :outer(init_coroutine)
     .param pmc f :optional
     .local pmc ret
     checktype(f, "Closure")
@@ -94,7 +94,7 @@ C<resume> returns B<false> plus the error message.
 
 =cut
 
-.sub _coroutine_resume :anon
+.sub _coroutine_resume :anon :outer(init_coroutine)
     .param pmc co :optional
     .param pmc argv :slurpy
     .local pmc ret
@@ -125,7 +125,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_running :anon
+.sub _coroutine_running :anon :outer(init_coroutine)
     not_implemented()
 .end
 
@@ -143,7 +143,7 @@ DUMMY IMPLEMENTATION.
 
 =cut
 
-.sub _coroutine_status :anon
+.sub _coroutine_status :anon :outer(init_coroutine)
     .param pmc co :optional
     .local pmc ret
     checktype(co, "Coroutine")
@@ -164,7 +164,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_wrap :anon
+.sub _coroutine_wrap :anon :outer(init_coroutine)
     .param pmc f :optional
     checktype(f, "Closure")
     not_implemented()
@@ -178,7 +178,7 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
 
 =cut
 
-.sub _coroutine_yield :anon
+.sub _coroutine_yield :anon :outer(init_coroutine)
     .param pmc argv :slurpy
     .yield(argv)
 .end

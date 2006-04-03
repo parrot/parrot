@@ -20,10 +20,10 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
 .HLL "Lua", "lua_group"
 
 
-.sub init :load, :anon
+.sub init_package :load :anon
 
-    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode "languages/lua/lib/luaaux.pbc"
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Package\n"
 
@@ -99,7 +99,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_module :anon
+.sub _lua_module :anon :outer(init_package)
     .param pmc name :optional
     $S0 = checkstring(name)
     not_implemented()
@@ -128,7 +128,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_require :anon
+.sub _lua_require :anon :outer(init_package)
     .param pmc packagename :optional
     $S0 = checkstring(packagename)
     not_implemented()
@@ -171,7 +171,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _package_loadlib :anon
+.sub _package_loadlib :anon :outer(init_package)
     not_implemented()
 .end
 
@@ -216,7 +216,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _package_seeall :anon
+.sub _package_seeall :anon :outer(init_package)
     not_implemented()
 .end
 

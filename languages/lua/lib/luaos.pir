@@ -21,10 +21,10 @@ See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
 .HLL "Lua", "lua_group"
 
 
-.sub init :load, :anon
+.sub init_os :load :anon
 
-    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode "languages/lua/lib/luaaux.pbc"
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua OS\n"
 
@@ -93,7 +93,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_clock :anon
+.sub _os_clock :anon :outer(init_os)
     .local pmc ret
     new ret, .LuaNumber
     not_implemented()
@@ -127,7 +127,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_date :anon
+.sub _os_date :anon :outer(init_os)
     .param pmc format :optional
     .param pmc time :optional
     $S0 = optstring(format, "%c")
@@ -145,7 +145,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_difftime :anon
+.sub _os_difftime :anon :outer(init_os)
     .param pmc t2 :optional
     .param pmc t1 :optional
     $I0 = checknumber(t2)
@@ -167,7 +167,7 @@ shell is available and zero otherwise.
 
 =cut
 
-.sub _os_execute :anon
+.sub _os_execute :anon :outer(init_os)
     .param pmc command :optional
     .local pmc ret
     $S0 = optstring(command, "")
@@ -191,7 +191,7 @@ program. The default value for C<code> is the success code.
 
 =cut
 
-.sub _os_exit :anon
+.sub _os_exit :anon :outer(init_os)
     .param pmc code :optional
     $I0 = optint(code, 0)
     exit $I0
@@ -205,7 +205,7 @@ if the variable is not defined.
 
 =cut
 
-.sub _os_getenv :anon
+.sub _os_getenv :anon :outer(init_os)
     .param pmc varname :optional
     .local pmc ret
     $S0 = checkstring(varname)
@@ -229,7 +229,7 @@ describing the error.
 
 =cut
 
-.sub _os_remove :anon
+.sub _os_remove :anon :outer(init_os)
     .param pmc filename :optional
     .local pmc ret
     $S0 = checkstring(filename)
@@ -262,7 +262,7 @@ fails, it returns B<nil>, plus a string describing the error.
 
 =cut
 
-.sub _os_rename :anon
+.sub _os_rename :anon :outer(init_os)
     .param pmc oldname :optional
     .param pmc newname :optional
     .local pmc ret
@@ -302,7 +302,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_setlocale :anon
+.sub _os_setlocale :anon :outer(init_os)
     .param pmc locale :optional
     .param pmc category :optional
     $S1 = optstring(category, "all")
@@ -327,7 +327,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub _os_time :anon
+.sub _os_time :anon :outer(init_os)
     .param pmc table :optional
     .local pmc ret
     if_null table, L0
@@ -354,7 +354,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_tmpname :anon
+.sub _os_tmpname :anon :outer(init_os)
     .local pmc ret
     new ret, .LuaString
     not_implemented()

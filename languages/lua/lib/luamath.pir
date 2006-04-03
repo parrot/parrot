@@ -50,10 +50,10 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .HLL "Lua", "lua_group"
 
 
-.sub init :load, :anon
+.sub init_math :load :anon
 
-    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode "languages/lua/lib/luaaux.pbc"
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua Math\n"
 
@@ -182,7 +182,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_abs :anon
+.sub _math_abs :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -193,7 +193,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_acos :anon
+.sub _math_acos :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -204,7 +204,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_asin :anon
+.sub _math_asin :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -215,7 +215,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_atan :anon
+.sub _math_atan :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -226,7 +226,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_atan2 :anon
+.sub _math_atan2 :anon :outer(init_math)
     .param pmc y :optional
     .param pmc x :optional
     .local pmc ret
@@ -239,7 +239,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_ceil :anon
+.sub _math_ceil :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -250,7 +250,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_cos :anon
+.sub _math_cos :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -261,7 +261,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_deg :anon
+.sub _math_deg :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -273,7 +273,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_exp :anon
+.sub _math_exp :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -284,7 +284,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_floor :anon
+.sub _math_floor :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -295,7 +295,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_fmod :anon
+.sub _math_fmod :anon :outer(init_math)
     .param pmc x :optional
     .param pmc y :optional
     .local pmc ret
@@ -308,7 +308,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_frexp :anon
+.sub _math_frexp :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     checknumber(x)
@@ -318,7 +318,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_ldexp :anon
+.sub _math_ldexp :anon :outer(init_math)
     .param pmc x :optional
     .param pmc nexp :optional
     .local pmc ret
@@ -330,7 +330,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_log :anon
+.sub _math_log :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -341,7 +341,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_log10 :anon
+.sub _math_log10 :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -352,7 +352,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub _math_max :anon
+.sub _math_max :anon :outer(init_math)
     .param pmc argv :slurpy
     .local int argc
     .local int i
@@ -383,7 +383,7 @@ L3:
 .end
 
 
-.sub _math_min :anon
+.sub _math_min :anon :outer(init_math)
     .param pmc argv :slurpy
     .local int argc
     .local int i
@@ -414,7 +414,7 @@ L3:
 .end
 
 
-.sub _math_modf :anon
+.sub _math_modf :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     checknumber(x)
@@ -424,7 +424,7 @@ L3:
 .end
 
 
-.sub _math_pow :anon
+.sub _math_pow :anon :outer(init_math)
     .param pmc x :optional
     .param pmc y :optional
     .local pmc ret
@@ -437,7 +437,7 @@ L3:
 .end
 
 
-.sub _math_rad :anon
+.sub _math_rad :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -449,7 +449,7 @@ L3:
 .end
 
 
-.sub _math_random :anon
+.sub _math_random :anon :outer(init_math)
     .param pmc arg1 :optional
     .param pmc arg2 :optional
     .param pmc extra :slurpy
@@ -492,7 +492,7 @@ L2:
 .end
 
 
-.sub _math_randomseed :anon
+.sub _math_randomseed :anon :outer(init_math)
     .param pmc seed :optional
     $I0 = checknumber(seed)
     new $P0, .Random
@@ -500,7 +500,7 @@ L2:
 .end
 
 
-.sub _math_sin :anon
+.sub _math_sin :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -511,7 +511,7 @@ L2:
 .end
 
 
-.sub _math_sqrt :anon
+.sub _math_sqrt :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)
@@ -522,7 +522,7 @@ L2:
 .end
 
 
-.sub _math_tan :anon
+.sub _math_tan :anon :outer(init_math)
     .param pmc x :optional
     .local pmc ret
     $N0 = checknumber(x)

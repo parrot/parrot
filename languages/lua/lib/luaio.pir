@@ -36,10 +36,10 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 .HLL "Lua", "lua_group"
 
 
-.sub init :load, :anon
+.sub init_io :load :anon
 
-    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode "languages/lua/lib/luaaux.pbc"
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua I/O\n"
 
@@ -335,7 +335,7 @@ file.
 
 =cut
 
-.sub _io_close :anon
+.sub _io_close :anon :outer(init_io)
     .param pmc file
     .local pmc ret
     unless_null file, L1
@@ -358,7 +358,7 @@ Equivalent to C<file:flush> over the default output file.
 
 =cut
 
-.sub _io_flush :anon
+.sub _io_flush :anon :outer(init_io)
     .local pmc file
     .local pmc ret
     .const .LuaString key = "flush"
@@ -381,7 +381,7 @@ error code.
 
 =cut
 
-.sub _io_input :anon
+.sub _io_input :anon :outer(init_io)
     .param pmc file :optional
     .local pmc ret
     .local pmc f
@@ -428,7 +428,7 @@ NOT YET IMPLEMENTED (see file:lines).
 
 =cut
 
-.sub _io_lines :anon
+.sub _io_lines :anon :outer(init_io)
     .param pmc filename
     .local pmc file
     .local pmc f
@@ -494,7 +494,7 @@ in the standard C function C<fopen>.
 
 =cut
 
-.sub _io_open :anon
+.sub _io_open :anon :outer(init_io)
     .param pmc filename :optional
     .param pmc mode :optional
     .local pmc f
@@ -526,7 +526,7 @@ Similar to C<io.input>, but operates over the default output file.
 
 =cut
 
-.sub _io_output :anon
+.sub _io_output :anon :outer(init_io)
     .param pmc file :optional
     .local pmc ret
     .local pmc f
@@ -564,7 +564,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_popen :anon
+.sub _io_popen :anon :outer(init_io)
     not_implemented()
 .end
 
@@ -577,7 +577,7 @@ STILL INCOMPLETE (see file:read).
 
 =cut
 
-.sub _io_read :anon
+.sub _io_read :anon :outer(init_io)
     .param pmc argv :slurpy
     .local pmc file
     .local pmc ret
@@ -598,7 +598,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_tmpfile :anon
+.sub _io_tmpfile :anon :outer(init_io)
     not_implemented()
 .end
 
@@ -611,7 +611,7 @@ handle, and B<nil> if C<obj> is not a file handle.
 
 =cut
 
-.sub _io_type :anon
+.sub _io_type :anon :outer(init_io)
     .param pmc obj :optional
     .local pmc mt
     .local pmc mt_file
@@ -645,7 +645,7 @@ Equivalent to C<io.output():write>.
 
 =cut
 
-.sub _io_write :anon
+.sub _io_write :anon :outer(init_io)
     .param pmc argv :slurpy
     .local pmc file
     .local pmc ret
@@ -671,7 +671,7 @@ Saves any written data to C<file>.
 
 =cut
 
-.sub _file_flush :anon
+.sub _file_flush :anon :outer(init_io)
     .param pmc self
     .local pmc f
     .local pmc ret
@@ -697,7 +697,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_lines :anon
+.sub _file_lines :anon :outer(init_io)
     not_implemented()
 .end
 
@@ -741,7 +741,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub _file_read :anon
+.sub _file_read :anon :outer(init_io)
     .param pmc self
     .param pmc formats :slurpy
     .local pmc ret
@@ -833,7 +833,7 @@ position to the end of the file, and returns its size.
 
 =cut
 
-.sub _file_seek :anon
+.sub _file_seek :anon :outer(init_io)
     .param pmc self
     .param pmc whence :optional
     .param pmc offset :optional
@@ -887,7 +887,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_setvbuf :anon
+.sub _file_setvbuf :anon :outer(init_io)
     .param pmc self
     .param pmc mode :optional
     .param pmc size :optional
@@ -917,7 +917,7 @@ or C<string.format> before write.
 
 =cut
 
-.sub _file_write :anon
+.sub _file_write :anon :outer(init_io)
     .param pmc self
     .param pmc argv :slurpy
     .local pmc ret
@@ -948,7 +948,7 @@ L2:
 .end
 
 
-.sub _file__tostring :anon
+.sub _file__tostring :anon :outer(init_io)
     .param pmc self
     .local pmc f
     .local pmc ret

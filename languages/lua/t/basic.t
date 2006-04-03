@@ -235,11 +235,12 @@ a = "a string!!"
 print(type(a))
 a = print
 a(type(a))
---print(type(function () end))
+print(type(function () end))
 CODE
 nil
 number
 string
+function
 function
 OUTPUT
 

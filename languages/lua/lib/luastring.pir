@@ -32,10 +32,10 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 .HLL "Lua", "lua_group"
 
 
-.sub init :load, :anon
+.sub init_string :load :anon
 
-    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode "languages/lua/lib/luaaux.pbc"
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
 
 #    print "init Lua String\n"
 
@@ -134,7 +134,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub _string_byte :anon
+.sub _string_byte :anon :outer(init_string)
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -189,7 +189,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub _string_char :anon
+.sub _string_char :anon :outer(init_string)
     .param pmc argv :slurpy
     .local pmc ret
     .local int argc
@@ -226,7 +226,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_dump :anon
+.sub _string_dump :anon :outer(init_string)
     .param pmc function :optional
     checktype(function, "function")
     not_implemented()
@@ -251,7 +251,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_find :anon
+.sub _string_find :anon :outer(init_string)
     .param pmc s :optional
     .param pmc pattern :optional
     .param pmc init :optional
@@ -293,7 +293,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_format :anon
+.sub _string_format :anon :outer(init_string)
     .param pmc formatstring :optional
     .param pmc argv :slurpy
     $S0 = checkstring(formatstring)
@@ -331,7 +331,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_gmatch :anon
+.sub _string_gmatch :anon :outer(init_string)
     .param pmc s :optional
     .param pmc pattern :optional
     $S0 = checkstring(s)
@@ -365,7 +365,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_gsub :anon
+.sub _string_gsub :anon :outer(init_string)
     .param pmc s :optional
     .param pmc pat :optional
     .param pmc repl :optional
@@ -386,7 +386,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 
 =cut
 
-.sub _string_len :anon
+.sub _string_len :anon :outer(init_string)
     .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
@@ -405,7 +405,7 @@ of what is an uppercase letter depends on the current locale.
 
 =cut
 
-.sub _string_lower :anon
+.sub _string_lower :anon :outer(init_string)
     .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
@@ -428,7 +428,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_match :anon
+.sub _string_match :anon :outer(init_string)
     .param pmc s :optional
     .param pmc pattern :optional
     .param pmc init :optional
@@ -447,7 +447,7 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 
 =cut
 
-.sub _string_rep :anon
+.sub _string_rep :anon :outer(init_string)
     .param pmc s :optional
     .param pmc n
     .local pmc ret
@@ -469,7 +469,7 @@ Returns a string that is the string C<s> reversed.
 
 =cut
 
-.sub _string_reverse :anon
+.sub _string_reverse :anon :outer(init_string)
     .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
@@ -504,7 +504,7 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
 
 =cut
 
-.sub _string_sub :anon
+.sub _string_sub :anon :outer(init_string)
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -542,7 +542,7 @@ of what is a lowercase letter depends on the current locale.
 
 =cut
 
-.sub _string_upper :anon
+.sub _string_upper :anon :outer(init_string)
     .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
