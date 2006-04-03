@@ -29,9 +29,9 @@ our @EXPORT = qw( plan skip );
 
 my $lang = 'perl6';
 my $streams = {
-    output => sub{return ( STDOUT => $_[0],       STDERR => $_[0]       )},
-    stdout => sub{return ( STDOUT => $_[0],       STDERR => '/dev/null' )},
-    stderr => sub{return ( STDOUT => '/dev/null', STDERR => $_[0]       )},
+    output => sub{return ( STDOUT => $_[0], STDERR => $_[0] )},
+    stdout => sub{return ( STDOUT => $_[0], STDERR => File::Spec->devnull )},
+    stderr => sub{return ( STDOUT => File::Spec->devnull, STDERR => $_[0] )},
 };
 my $tests = {
     is   => 'is_eq',

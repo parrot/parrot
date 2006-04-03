@@ -236,11 +236,11 @@ sub run_command {
     # To run the command in a different directory.
     my $chdir = delete $options{CD};
 
-    foreach (keys %options) {
-        m/^STD(OUT|ERR)$/ or die "I don't know how to redirect '$_' yet! ";
-    }
-    foreach (values %options) {
-        $_ = 'NUL:' if $^O eq 'MSWin32' and $_ eq '/dev/null';
+    while (my($key, $value) = each %options) {
+        $key =~ m/^STD(OUT|ERR)$/
+            or die "I don't know how to redirect '$key' yet!";
+        $value = File::Spec->devnull
+            if $value eq '/dev/null';
     }
 
     my $out = $options{'STDOUT'} || '';

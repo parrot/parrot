@@ -280,7 +280,8 @@ sub _run_command
 
     # Mostly copied from Parrot::Test.pm
     foreach ($out, $err) {
-        $_ = 'NUL:' if $_ and $^O eq 'MSWin32' and $_ eq '/dev/null';
+        $_ = File::Spec->devnull
+            if $_ and $_ eq '/dev/null';
     }
 
     if ($out and $err and $out eq $err) {
@@ -309,8 +310,7 @@ sub _run_command
     if ($verbose) {
         foreach ($out, $err) {
             if (   (defined($_))
-                && ($_ ne '/dev/null')
-                && ($_ ne 'NUL:')
+                && ($_ ne File::Spec->devnull)
                 && (!m/^&/)) {
                 open(my $out, $_);
                 print <$out>;
