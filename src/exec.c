@@ -67,8 +67,8 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     long bhs;
     Parrot_exec_objfile_t *obj;
     Parrot_jit_info_t *jit_info;
-    extern char **Parrot_exec_rel_addr;
-    extern int Parrot_exec_rel_count;
+    extern PARROT_API char **Parrot_exec_rel_addr;
+    extern PARROT_API int Parrot_exec_rel_count;
 
     obj = mem_sys_allocate_zeroed(sizeof(Parrot_exec_objfile_t));
     exec_init(obj);
@@ -297,8 +297,8 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
     int symbol_number = 0;
     char *addr;
     Parrot_exec_rellocation_t *new_relloc;
-    extern char **Parrot_exec_rel_addr;
-    extern int Parrot_exec_rel_count;
+    extern PARROT_API char **Parrot_exec_rel_addr;
+    extern PARROT_API int Parrot_exec_rel_count;
 
     new_relloc = mem_sys_realloc(obj->text_rellocation_table,
         (size_t)(obj->text_rellocation_count + 1)

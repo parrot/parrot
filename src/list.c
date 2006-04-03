@@ -196,7 +196,7 @@ static List_chunk *alloc_next_size(Interp *interpreter, List *list,
         int where, UINTVAL idx);
 static List_chunk *add_chunk(Interp *interpreter, List *list,
         int where, UINTVAL idx);
-UINTVAL ld(UINTVAL x);
+PARROT_API UINTVAL ld(UINTVAL x);
 static List_chunk *get_chunk(Interp *interpreter, List *list, UINTVAL *idx);
 static void split_chunk(Interp *interpreter, List *list,
         List_chunk *chunk, UINTVAL idx);

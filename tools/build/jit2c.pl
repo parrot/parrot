@@ -70,7 +70,7 @@ my $jit_cpu;
 
 if ($genfile =~ /jit_cpu.c/) {
     $jit_cpu = 1;
-    push @jit_funcs, "Parrot_jit_fn_info_t op_jit[$core_numops] = {\n";
+    push @jit_funcs, "Parrot_jit_fn_info_t _op_jit[$core_numops] = {\n";
     $func_end = "_jit";
     $normal_op = "Parrot_jit_normal_op";
     $cpcf_op = "Parrot_jit_cpcf_op";
@@ -116,7 +116,7 @@ sub readjit($) {
             $header .= $line;
             next;
         }
-	    # ignore comment and empty lines
+        # ignore comment and empty lines
         next if (($line =~ m/^;/) || ($line =~ m/^\s*$/));
         if (!defined($function) && !defined($template)) {
             if ($line =~ m/TEMPLATE\s+(\w+)\s*{/) { #}
@@ -166,8 +166,8 @@ sub readjit($) {
             $asm =~ s/CUR_OPCODE/jit_info->cur_op/g;
             $asm =~ s/cur_opcode/jit_info->cur_op/g;
             $asm =~ s/MAP\[(\d)\]/MAP($1)/g;
-	    # set extern if the code calls a function
-	    $extern = -1 if $asm =~ /CALL_FUNCTION/;
+            # set extern if the code calls a function
+            $extern = -1 if $asm =~ /CALL_FUNCTION/;
             unless ($jit_cpu) {
                 # no address of
                 $asm =~ s/&([INSP])REG/$1REG/g;
@@ -202,14 +202,14 @@ my $vjit = 0;
 sub vtable_num($) {
     my $meth = shift;
     unless ($vtable) {
-	$vtable = parse_vtable();
+        $vtable = parse_vtable();
     }
     my $i = 0;
     $vjit++;
     for my $entry (@{$vtable}) {
-	next if  $entry->[4] =~ /MMD_/;  # TODO all
-	return $i if ($entry->[1] eq $meth);
-	$i++;
+        next if  $entry->[4] =~ /MMD_/;  # TODO all
+        return $i if ($entry->[1] eq $meth);
+        $i++;
     }
     die("vtable not found for $meth\n");
 }
@@ -273,8 +273,8 @@ print JITCPU<<END_C;
 # define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
 #endif
 
-extern char **Parrot_exec_rel_addr;
-extern int Parrot_exec_rel_count;
+extern PARROT_API char **Parrot_exec_rel_addr;
+extern PARROT_API int Parrot_exec_rel_count;
 
 #define ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[x])
 #define ROFFS_NUM(x) REG_OFFS_NUM(jit_info->cur_op[x])
@@ -327,13 +327,13 @@ for ($i = 0; $i < $core_numops; $i++) {
         $precompiled = 1;
         $extern = 1;
         my $opbody = $op->body;
-	# retranslate VTABLE_macro to the expanded form
-	$opbody =~ s/
-	    \bVTABLE_(\w+)
-	    \s*\(
-	    interpreter,\s*
-	    {{\@(\d)}}/
-	    {{\@$2}}->vtable->$1(interpreter, {{\@$2}}/x;
+        # retranslate VTABLE_macro to the expanded form
+        $opbody =~ s/
+            \bVTABLE_(\w+)
+            \s*\(
+            interpreter,\s*
+            {{\@(\d)}}/
+            {{\@$2}}->vtable->$1(interpreter, {{\@$2}}/x;
 
         if ($op->full_name eq 'new_p_ic') {
             $jit_func = "Parrot_jit_vtable_newp_ic_op";
@@ -444,17 +444,19 @@ for ($i = 0; $i < $core_numops; $i++) {
 
     unless($precompiled){
     print JITCPU "\nstatic $jit_fn_retn\n" .$core_opfunc[$i] . $func_end .
-	$jit_fn_params . "\n{\n" .
-	$body . "}\n";
+        $jit_fn_params . "\n{\n" .
+        $body . "}\n";
     }
     push @jit_funcs, "{ $jit_func, $extern }, \t" .
-	    "/* op $i: $core_opfunc[$i] */\n";
+            "/* op $i: $core_opfunc[$i] */\n";
 }
 
 print JITCPU @jit_funcs, "};\n";
 
 if ($genfile =~ /jit_cpu.c/) {
     print JITCPU <<EOC;
+    PARROT_API Parrot_jit_fn_info_t *op_jit = &_op_jit[0];
+
     extern int jit_op_count(void);
     int jit_op_count() { return $core_numops; }
 EOC

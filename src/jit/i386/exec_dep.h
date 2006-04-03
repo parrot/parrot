@@ -24,8 +24,8 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
         jit_info->optimizer->cur_section;
     int i, j, last_is_branch = 0;
     void ** offset;
-    extern char **Parrot_exec_rel_addr;
-    extern int Parrot_exec_rel_count;
+    extern PARROT_API char **Parrot_exec_rel_addr;
+    extern PARROT_API int Parrot_exec_rel_count;
 
     assert(op_jit[*jit_info->cur_op].extcall == 1);
     if (cur_section->done == 1)

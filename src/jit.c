@@ -46,8 +46,8 @@ extern int jit_op_count(void);
 void Parrot_jit_debug(Interp* interpreter);
 #endif
 
-char **Parrot_exec_rel_addr;
-int Parrot_exec_rel_count;
+PARROT_API char **Parrot_exec_rel_addr;
+PARROT_API int Parrot_exec_rel_count;
 
 /*
 

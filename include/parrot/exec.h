@@ -94,12 +94,12 @@ typedef struct {
 
 void Parrot_exec(Interp *interpreter, opcode_t *pc,
     opcode_t *code_start, opcode_t *code_end);
-void Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj,
+PARROT_API void Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj,
     char *nptr, const char *func_name);
-int *Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj,
+PARROT_API int *Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj,
     char *nptr, const char *var, int offset, int disp);
-void Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
-    int type, const char *symbol, int disp);
+PARROT_API void Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj,
+    char *nptr, int type, const char *symbol, int disp);
 int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
     int stype);
 
