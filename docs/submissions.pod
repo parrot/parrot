@@ -20,7 +20,7 @@ simplest way to use it is to run
 in the distribution's root directory, and follow the prompts.
 
 However, if you do know how to fix the problem you encountered, then think
-about submitting a patch.
+about submitting a patch, or (see below) getting commit privileges.
 
 =head1 How To Submit A Patch
 
@@ -42,11 +42,11 @@ for whatever the distribution's parent directory is called on your machine.
         |
         +--> parrot
                 |
-                +--> LICENSE
+                +--> LICENSES
                 |
-                +--> build_tools
+                +--> src 
                 |
-                +--> charset
+                +--> tools
                 |
                 +--> ...
 
@@ -61,7 +61,7 @@ created in F<parrot>.
     cd parrot
     diff -u docs/submissions.pod docs/submissions.new > submissions.patch
 
-Win32 users will probably need C<-ub>.
+Win32 users will probably need to specify C<-ub>. 
 
 =item Recursive C<diff>
 
@@ -73,7 +73,7 @@ should be created in F<workingdir>.
     cd workingdir
     diff -ur --exclude='.svn' parrot parrot.new > docs.patch
 
-OS X users should also include C<--exclude=.DS_Store>.
+OS X users should also specify C<--exclude=.DS_Store>.
 
 =item C<svn>
 
@@ -180,7 +180,7 @@ Submit A Patch>
 
 =item 2
 
-If you have a new test script ending in .t, some mailers may become confused
+If you have a new test script ending in C<.t>, some mailers may become confused
 and consider it an application/x-troff. One way around this (for *nix users) is
 to diff the file against /dev/null like this:
 
@@ -259,6 +259,33 @@ repository. So the usual rules for Parrot patches apply for this content.
 For changes specific for parrotcode.org please send patches to    
 B<webmaster> I<at> B<perl> I<dot> B<org>, and cc
 B<perl6-internals> I<at> B<perl> I<dot> B<org>.
+
+=head1 Getting Commit Privileges
+
+If you are interested in getting commit privileges to parrot, here is
+the procedure:
+
+=over 4
+
+=item 1
+
+Submit one or more patches via the process described in this document that are
+accepted.
+
+=item 2
+
+Obtain a perl.org account at https://auth.perl.org/auth/account
+
+=item 3
+
+The pumpking or architect must put in a request to have your perl.org account 
+granted svn commit privileges.
+
+The two best ways to let us know you're interested in becoming a committer
+are via the perl6-internals mailing list, or via IRC (#parrot on irc.perl.org).
+Thanks for your help!
+
+=back
 
 =head1 HISTORY
 
