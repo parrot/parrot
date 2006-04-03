@@ -51,7 +51,7 @@ Destroys C<*vtable>.
 
 VTABLE *
 Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable) {
-    VTABLE *new_vtable = mem_sys_allocate(sizeof(VTABLE));
+    VTABLE * const new_vtable = mem_sys_allocate(sizeof(VTABLE));
     if (new_vtable) {
         memcpy(new_vtable, base_vtable, sizeof(VTABLE));
     }
@@ -79,8 +79,8 @@ parrot_realloc_vtables(Interp *interpreter)
     /* 16 bigger seems reasonable, though it's only a pointer
        table and we could get bigger without blowing much memory
        */
-    INTVAL new_max = interpreter->n_vtable_alloced + 16;
-    INTVAL new_size = new_max * sizeof(VTABLE *);
+    const INTVAL new_max = interpreter->n_vtable_alloced + 16;
+    const INTVAL new_size = new_max * sizeof(VTABLE *);
     INTVAL i;
     interpreter->vtables = mem_sys_realloc(interpreter->vtables, new_size);
     /* Should set all the empty slots to the null PMC's

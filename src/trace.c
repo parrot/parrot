@@ -42,8 +42,8 @@ trace_class_name(Interp *interpreter, PMC* pmc)
 {
     STRING *class_name;
     if (PObj_is_class_TEST(pmc)) {
-        SLOTTYPE *class_array = PMC_data(pmc);
-        PMC *class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+        SLOTTYPE * const class_array = PMC_data(pmc);
+        PMC * const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
         class_name = PMC_str_val(class_name_pmc);
     }
     else
@@ -54,8 +54,7 @@ trace_class_name(Interp *interpreter, PMC* pmc)
 void
 trace_pmc_dump(Interp *interpreter, PMC* pmc)
 {
-    char *escaped;
-    Interp *debugger = interpreter->debugger;
+    Interp * const debugger = interpreter->debugger;
 
     if (!pmc) {
         PIO_eprintf(debugger, "(null)");
@@ -73,17 +72,16 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         PIO_eprintf(debugger, "**************** PMC is on free list *****\n");
     }
     if (pmc->vtable->class == pmc) {
-        STRING *name = trace_class_name(interpreter, pmc);
+        STRING * const name = trace_class_name(interpreter, pmc);
         PIO_eprintf(debugger, "Class=%Ss:PMC(%#p)", name, pmc);
     }
-    else if (
-             pmc->vtable->base_type == enum_class_String) {
-        STRING *s = VTABLE_get_string(interpreter, pmc);
+    else if ( pmc->vtable->base_type == enum_class_String) {
+        const STRING * const s = VTABLE_get_string(interpreter, pmc);
         if (!s)
             PIO_eprintf(debugger, "%S=PMC(%#p Str:(NULL))",
                     VTABLE_name(interpreter, pmc), pmc);
         else {
-            escaped = PDB_escape(s->strstart, s->strlen);
+            char * const escaped = PDB_escape(s->strstart, s->strlen);
             PIO_eprintf(debugger, "%S=PMC(%#p Str:\"%s\")",
                     VTABLE_name(interpreter, pmc), pmc,
                     escaped ? escaped : "(null)");
@@ -143,12 +141,9 @@ Prints a key to C<stderr>, returns the length of the output.
 int
 trace_key_dump(Interp *interpreter, PMC *key)
 {
-    char *escaped;
-    STRING *s;
-    int len = 0;
-    Interp *debugger = interpreter->debugger;
+    Interp * const debugger = interpreter->debugger;
 
-    len += PIO_eprintf(debugger, "[");
+    int len = PIO_eprintf(debugger, "[");
 
     while (key) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
@@ -159,12 +154,14 @@ trace_key_dump(Interp *interpreter, PMC *key)
             len += PIO_eprintf(debugger, "%vg", PMC_num_val(key));
             break;
         case KEY_string_FLAG:
-            s = PMC_str_val(key);
+            {
+            STRING * const s = PMC_str_val(key);
             /* XXX do it w/o degrading to C string */
-            escaped = PDB_escape(PObj_bufstart(s), s->strlen);
+            char * const escaped = PDB_escape(PObj_bufstart(s), s->strlen);
             len += PIO_eprintf(debugger, "\"%s\"", escaped?escaped:"(null)");
-                if (escaped)
-                    mem_sys_free(escaped);
+            if (escaped)
+                mem_sys_free(escaped);
+            }
             break;
         case KEY_integer_FLAG|KEY_register_FLAG:
             len += PIO_eprintf(debugger, "I%vd=%vd", PMC_int_val(key),
@@ -175,12 +172,14 @@ trace_key_dump(Interp *interpreter, PMC *key)
                     REG_NUM(PMC_int_val(key)));
             break;
         case KEY_string_FLAG|KEY_register_FLAG:
-            s = REG_STR(PMC_int_val(key));
-            escaped = PDB_escape(s->strstart, s->strlen);
+            {
+            STRING * const s = REG_STR(PMC_int_val(key));
+            char * const escaped = PDB_escape(s->strstart, s->strlen);
             len += PIO_eprintf(debugger, "S%vd=\"%s\"", PMC_int_val(key),
-                    escaped ? escaped : "(null");
-                if (escaped)
-                    mem_sys_free(escaped);
+                    escaped ? escaped : "(null)");
+            if (escaped)
+                mem_sys_free(escaped);
+            }
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
             len += PIO_eprintf(debugger, "P%vd=", PMC_int_val(key));
@@ -192,12 +191,12 @@ trace_key_dump(Interp *interpreter, PMC *key)
             break;
         }
 
-        if (key)
+        if (key) {
             key = PMC_data(key);
-
-        if (key) 
-            len += PIO_eprintf(debugger, ";");
-    }
+            if (key)
+                len += PIO_eprintf(debugger, ";");
+        }
+    } /* while */
 
     len += PIO_eprintf(debugger, "]");
     return len;

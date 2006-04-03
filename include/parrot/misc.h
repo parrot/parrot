@@ -39,7 +39,7 @@ PARROT_API void *Parrot_make_la(Interp *, PMC *);
 PARROT_API void *Parrot_make_cpa(Interp *, PMC *);
 PARROT_API void Parrot_destroy_la(long *);
 PARROT_API void Parrot_destroy_cpa(char **);
-PMC* tm_to_array(Parrot_Interp interpreter, struct tm *tm);
+PMC* tm_to_array(Parrot_Interp interpreter, const struct tm *tm);
 PARROT_API INTVAL Parrot_byte_index(Interp *interpreter, const STRING *base,
         const STRING *search, UINTVAL start_offset);
 PARROT_API INTVAL Parrot_byte_rindex(Interp *interpreter, const STRING *base,

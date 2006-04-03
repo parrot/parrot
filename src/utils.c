@@ -100,7 +100,7 @@ floatval_mod(FLOATVAL n2, FLOATVAL n3)
   /* Another workaround for buggy code generation in the lcc compiler-
    * adding a temporary variable makes it pass the test.
    */
-  FLOATVAL temp = n3 * floor(n2 / n3);
+  const FLOATVAL temp = n3 * floor(n2 / n3);
 
   return n3
      ? (n2 - temp)
@@ -449,16 +449,15 @@ Used in C<src/nci.c>.
 
 void *
 Parrot_make_la(Interp *interpreter, PMC *array) {
-    INTVAL arraylen = VTABLE_elements(interpreter, array);
-    long *out_array = NULL;
-    INTVAL cur = 0;
+    const INTVAL arraylen = VTABLE_elements(interpreter, array);
+    INTVAL cur;
 
     /* Allocate the array and set the last element to 0. Since we
        always allocate one element more than we use we're guaranteed
        to actually have an array, even if the inbound array is
        completely empty
     */
-    out_array = mem_sys_allocate((sizeof(long)) * (arraylen + 1));
+    long * const out_array = mem_sys_allocate((sizeof(long)) * (arraylen + 1));
     out_array[arraylen] = 0;
     /*    printf("Long array has %i elements\n", arraylen);*/
     for (cur = 0; cur < arraylen; cur++) {
@@ -501,16 +500,15 @@ Currently unused.
 
 void *
 Parrot_make_cpa(Interp *interpreter, PMC *array) {
-    INTVAL arraylen = VTABLE_elements(interpreter, array);
-    char **out_array = NULL;
-    INTVAL cur = 0;
+    const INTVAL arraylen = VTABLE_elements(interpreter, array);
+    INTVAL cur;
 
     /* Allocate the array and set the last element to 0. Since we
        always allocate one element more than we use we're guaranteed
        to actually have an array, even if the inbound array is
        completely empty
     */
-    out_array = mem_sys_allocate((sizeof(char *)) * (arraylen + 1));
+    char ** const out_array = mem_sys_allocate((sizeof(char *)) * (arraylen + 1));
     out_array[arraylen] = 0;
 
     /*    printf("String array has %i elements\n", arraylen);*/
@@ -568,9 +566,9 @@ typedef enum {
 /* &end_gen */
 
 PMC*
-tm_to_array(Parrot_Interp interpreter, struct tm *tm)
+tm_to_array(Parrot_Interp interpreter, const struct tm *tm)
 {
-  PMC *Array = pmc_new(interpreter, enum_class_Array);
+  PMC * const Array = pmc_new(interpreter, enum_class_Array);
   VTABLE_set_integer_native(interpreter, Array, 9);
   VTABLE_set_integer_keyed_int(interpreter, Array, 0, tm->tm_sec);
   VTABLE_set_integer_keyed_int(interpreter, Array, 1, tm->tm_min);

@@ -136,8 +136,8 @@ to the current context.
 struct Parrot_cont *
 new_continuation(Interp *interp, struct Parrot_cont *to)
 {
-    struct Parrot_cont *cc = mem_sys_allocate(sizeof(struct Parrot_cont));
-    struct Parrot_Context *to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
+    struct Parrot_cont * const cc = mem_sys_allocate(sizeof(struct Parrot_cont));
+    struct Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
 
     cc->to_ctx = to_ctx;
     cc->from_ctx = CONTEXT(interp->ctx);
@@ -168,7 +168,7 @@ Returns a new C<Parrot_cont> pointing to the current context.
 struct Parrot_cont *
 new_ret_continuation(Interp *interp)
 {
-    struct Parrot_cont *cc = mem_sys_allocate(sizeof(struct Parrot_cont));
+    struct Parrot_cont * const cc = mem_sys_allocate(sizeof(struct Parrot_cont));
     cc->to_ctx = CONTEXT(interp->ctx);
     cc->from_ctx = NULL;    /* filled in during a call */
     cc->seg = interp->code;
@@ -193,7 +193,7 @@ XXX: Need to document semantics in detail.
 struct Parrot_coro *
 new_coroutine(Interp *interp)
 {
-    struct Parrot_coro *co =
+    struct Parrot_coro * const co =
         mem_sys_allocate_zeroed(sizeof(struct Parrot_coro));
 
     co->seg = interp->code;
@@ -216,8 +216,7 @@ if possible; otherwise, creates a new one.
 PMC *
 new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
 {
-    PMC* continuation;
-    continuation = pmc_new(interpreter, enum_class_RetContinuation);
+    PMC* const continuation = pmc_new(interpreter, enum_class_RetContinuation);
     VTABLE_set_pointer(interpreter, continuation, address);
     return continuation;
 }
@@ -286,7 +285,7 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
 		string_from_cstring(interpreter, " :: ", 4), 0);
 	    res =  string_concat(interpreter, ns, s->name, 0);
         } else {
-	    STRING* ns = string_from_cstring(interpreter, "??? :: ", 7);
+	    STRING* const ns = string_from_cstring(interpreter, "??? :: ", 7);
 	    res =  string_concat(interpreter, ns, s->name, 0);
 	}
         Parrot_unblock_DOD(interpreter);
@@ -378,10 +377,10 @@ STRING*
 Parrot_Context_infostr(Interp *interpreter, parrot_context_t *ctx)
 {
     struct Parrot_Context_info info;
-    const char* msg = (CONTEXT(interpreter->ctx) == ctx) ?
+    const char* const msg = (CONTEXT(interpreter->ctx) == ctx) ?
         "current instr.:":
         "called from Sub";
-    STRING *res = NULL;
+    STRING *res;
 
     Parrot_block_DOD(interpreter);
     if (Parrot_Context_info(interpreter, ctx, &info)) {
@@ -389,6 +388,8 @@ Parrot_Context_infostr(Interp *interpreter, parrot_context_t *ctx)
             "%s '%Ss' pc %d (%s:%d)", msg,
             info.fullname, info.pc, info.file, info.line);
     }
+    else
+        res = NULL;
     Parrot_unblock_DOD(interpreter);
     return res;
 }
@@ -406,12 +407,10 @@ Locate the LexPad containing the given name. Return NULL on failure.
 PMC*
 Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
 {
-    PMC *lex_pad;
-    parrot_context_t *outer;
-
     while (1) {
-        lex_pad = ctx->lex_pad;
-        outer = ctx->outer_ctx;
+        PMC * const lex_pad = ctx->lex_pad;
+        parrot_context_t * const outer = ctx->outer_ctx;
+
         if (!outer)
             return lex_pad;
         if (!PMC_IS_NULL(lex_pad)) {
