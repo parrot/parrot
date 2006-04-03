@@ -74,7 +74,8 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
     my( $fromfile, $fromfname ) = tempfile(UNLINK => 1);
     my( $tofile, $tofname ) = tempfile(UNLINK => 1);
     print $fromfile "foo" x 1000;
-    $fromfile->flush;
+    $fromfile->close;
+    $tofile->close;
 
     # redirect STDERR to avoid warnings
     # windows wants '>nul', most everything else wants '>/dev/null'

@@ -37,13 +37,13 @@ my $first = create_pir_file('first');
 my $second = create_pir_file('second');
 
 # executing a PIR file
-is( `$PARROT $first`, "first\n", 'running first.pir' );
-is( `$PARROT $second`, "second\n", 'running second.pir' );
+is( `"$PARROT" "$first"`, "first\n", 'running first.pir' );
+is( `"$PARROT" "$second"`, "second\n", 'running second.pir' );
 
 # Ignore further arguments
-is( `$PARROT $first $second`, "first\n",
+is( `"$PARROT" "$first" "$second"`, "first\n",
     'ignore a pir-file' );
-is( `$PARROT $first asdf`, "first\n", 'ignore nonsense' );
+is( `"$PARROT" "$first" "asdf"`, "first\n", 'ignore nonsense' );
 
 
 # redirect STDERR to avoid warnings
@@ -51,15 +51,15 @@ is( `$PARROT $first asdf`, "first\n", 'ignore nonsense' );
 my $redir = $^O =~ /^(MSWin\d+)$/ ? q{2>nul} : q{2>/dev/null};
 
 # Test the trace option
-is( `$PARROT -t $first $redir`, "first\n", 'option -t' );
+is( `"$PARROT" -t "$first" $redir`, "first\n", 'option -t' );
 TODO:
 {
    local $TODO = '--trace behaves not like -t';
-   is( `$PARROT --trace $first $redir`, "first\n", 'option --trace' );
+   is( `"$PARROT" --trace "$first" $redir`, "first\n", 'option --trace' );
 };
-is( `$PARROT -t $first $second $redir`, "second\n",
+is( `"$PARROT" -t "$first" "$second" $redir`, "second\n",
     'option -t with flags' );
-is( `$PARROT --trace $first $second $redir`, "second\n",
+is( `"$PARROT" --trace "$first" "$second" $redir`, "second\n",
     'option --trace with flags' );
 
 unlink $first;
