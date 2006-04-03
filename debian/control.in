@@ -44,6 +44,7 @@ Description: virtual machine to execute bytecode for interpreted languages
 
 Package: parrot-doc
 Architecture: all
+Section: doc
 Suggests: perl-doc
 Description: virtual machine to execute bytecode for interpreted languages
  Parrot is a virtual machine designed to execute bytecode for interpreted

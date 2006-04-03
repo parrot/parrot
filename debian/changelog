@@ -1,3 +1,10 @@
+parrot (0.4.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * Changed Section of parrot-doc to `docs'.
+
+ -- Florian Ragwitz <rafl@debian.org>  Mon,  3 Apr 2006 04:25:56 +0200
+
 parrot (0.4.2-1) unstable; urgency=low
 
   * New upstream release.
