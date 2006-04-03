@@ -3698,7 +3698,6 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
     int next_i = 5;
     int st = 0;
     int size = 100 + signature->bufused * 20;
-    extern char **Parrot_exec_rel_addr;
     extern PARROT_API char **Parrot_exec_rel_addr;
     extern PARROT_API int Parrot_exec_rel_count;
 
