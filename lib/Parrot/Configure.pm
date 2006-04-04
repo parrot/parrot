@@ -20,7 +20,7 @@ Parrot::Configure - Conducts the execution of Configuration Steps
 
 =head1 DESCRIPTION
 
-This module provides provides a mean for registering, executing, and
+This module provides provides a means for registering, executing, and
 coordinating one or more Configuration steps.  Please see
 F<docs/configuration.pod> for further details about the configuration
 framework.
@@ -29,7 +29,7 @@ framework.
 
 =head2 Import Parameters
 
-This module accepts no arguments to it's C<import> method and exports no
+This module accepts no arguments to its C<import> method and exports no
 I<symbols>.
 
 =cut
