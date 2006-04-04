@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20051104): "antlr_past2pir_past.g" -> "AntlrPast2PirPastTreeWalker.py"$
+### $ANTLR 2.7.6 (20060405): "antlr_past2pir_past.g" -> "AntlrPast2PirPastTreeWalker.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -118,7 +118,7 @@ class Walker(antlr.TreeParser):
             gen_pir_past_AST = currentAST.root
             pir_before = """
             .local pmc stmts_children
-            stmts_children = new PerlArray
+            stmts_children = new .ResizablePMCArray
             #"""
             pir_after = """
             .local pmc stmts
@@ -230,7 +230,7 @@ class Walker(antlr.TreeParser):
             self.reg = self.reg + 10;
             pir = """
             $P%d = new 'PAST::Stmt'
-            $P%d = new PerlArray
+            $P%d = new .ResizablePMCArray
             
             push $P%d, $P%d 
             $P%d.set_node('1', 1 ,$P%d)
@@ -303,7 +303,7 @@ class Walker(antlr.TreeParser):
                 self.reg = self.reg + 10;
                 pir = """
                          $P%d = new 'PAST::Exp'
-                         $P%d = new PerlArray
+                         $P%d = new .ResizablePMCArray
                 
                          push $P%d, $P%d 
                          $P%d.set_node('1', 1, $P%d)
@@ -333,7 +333,7 @@ class Walker(antlr.TreeParser):
                 self.reg = self.reg + 10;
                 pir = """
                          $P%d = new 'PAST::Exp'
-                         $P%d = new PerlArray
+                         $P%d = new .ResizablePMCArray
                 
                          push $P%d, $P%d 
                          $P%d.set_node('1', 1, $P%d)
@@ -363,7 +363,7 @@ class Walker(antlr.TreeParser):
                 self.reg = self.reg + 10;
                 pir = """
                          $P%d = new 'PAST::Exp'
-                         $P%d = new PerlArray
+                         $P%d = new .ResizablePMCArray
                 
                          push $P%d, $P%d 
                          $P%d.set_node('1', 1, $P%d)
@@ -433,7 +433,7 @@ class Walker(antlr.TreeParser):
             self.reg = self.reg + 10;
             pir = """
                  $P%d = new 'PAST::Op'
-                 $P%d = new PerlArray
+                 $P%d = new .ResizablePMCArray
             
                  push $P%d, $P%d 
                  $P%d.set_node('1', 1, 'print' ,$P%d)

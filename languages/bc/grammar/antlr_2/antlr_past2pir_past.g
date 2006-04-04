@@ -43,7 +43,7 @@ gen_pir_past!
     {
       pir_before = """
 .local pmc stmts_children
-stmts_children = new .PerlArray
+stmts_children = new .ResizablePMCArray
 #"""
       pir_after = """
 .local pmc stmts
@@ -68,7 +68,7 @@ stmt!
       self.reg = self.reg + 10;
       pir = """
     $P%d = new 'PAST::Stmt'
-    $P%d = new .PerlArray
+    $P%d = new .ResizablePMCArray
 
     push $P%d, $P%d 
     $P%d.set_node('1', 1 ,$P%d)
@@ -93,7 +93,7 @@ exp! returns[reg]
                     self.reg = self.reg + 10;
                     pir = """
                               $P%d = new 'PAST::Exp'
-                              $P%d = new .PerlArray
+                              $P%d = new .ResizablePMCArray
               
                               push $P%d, $P%d 
                               $P%d.set_node('1', 1, $P%d)
@@ -114,7 +114,7 @@ exp! returns[reg]
                     self.reg = self.reg + 10;
                     pir = """
                               $P%d = new 'PAST::Exp'
-                              $P%d = new .PerlArray
+                              $P%d = new .ResizablePMCArray
 
                               push $P%d, $P%d 
                               $P%d.set_node('1', 1, $P%d)
@@ -135,7 +135,7 @@ exp! returns[reg]
                     self.reg = self.reg + 10;
                     pir = """
                               $P%d = new 'PAST::Exp'
-                              $P%d = new .PerlArray
+                              $P%d = new .ResizablePMCArray
 
                               push $P%d, $P%d 
                               $P%d.set_node('1', 1, $P%d)
@@ -160,7 +160,7 @@ op! returns[reg]
       self.reg = self.reg + 10;
       pir = """
             $P%d = new 'PAST::Op'
-            $P%d = new .PerlArray
+            $P%d = new .ResizablePMCArray
 
             push $P%d, $P%d 
             $P%d.set_node('1', 1, 'print' ,$P%d)
