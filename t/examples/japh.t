@@ -38,7 +38,6 @@ Get the TODO JAPHs working or decide that they are not suitable for testing.
 my %todo = ( 1  => 'opcode "pack" is gone',
              2  => 'opcode "pack" is gone',
              4  => 'namespace has changed',
-             8  => 'works only on little endian',
              9  => 'P1 is no longer special',
              10 => 'core dump',
              11 => 'opcode "pack" is gone, other reasons',
@@ -49,6 +48,9 @@ my %todo = ( 1  => 'opcode "pack" is gone',
              16 => 'unknown reason',
              17 => 'unknown reason',
            );
+if ( $PConfig{bigendian} ) {
+    $todo{8} = 'works only on little endian';
+}
 
 # run all tests and tell about todoness
 foreach ( 1 .. 17 ) {
