@@ -1,5 +1,5 @@
 /*
-Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -263,7 +263,7 @@ C<complex> object according to 2.1. Built-in Functions.
         PMC *res = pmc_new(INTERP, enum_class_Complex);
         if (argcP == 1) {
             PMC *arg = REG_PMC(5);
-            if (arg->vtable->base_type == enum_class_PerlString) {
+            if (arg->vtable->base_type == enum_class_String) {
                 VTABLE_set_string_native(INTERP, res, PMC_str_val(arg));
             }
             else

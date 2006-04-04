@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ These are the vtable functions for the Array base class.
 
 =item C<static PMC* undef(Interp* interpreter)>
 
-Returns a C<PerlUndef> PMC.
+Returns a C<Undef> PMC.
 
 =cut
 
@@ -32,7 +32,7 @@ Returns a C<PerlUndef> PMC.
 
 static PMC* undef(Interp* interpreter)
 {
-    return pmc_new(interpreter, enum_class_PerlUndef);
+    return pmc_new(interpreter, enum_class_Undef);
 }
 
 /*
@@ -122,8 +122,7 @@ Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)>
 
 Returns a pointer to the element at index C<key> of C<*list>. If
 this element was previously empty, then this function also creates
-and assigns an "undef" PMC (currently a C<PerlUndef>, but this may
-change) to that element.
+and assigns an "undef" PMC to that element.
 
 =cut
 
@@ -1157,7 +1156,7 @@ The C<==> operation. Compares two array to hold equal elements.
     INTVAL is_equal (PMC* value) {
         INTVAL j, n;
 
-        if (value->vtable->base_type != enum_class_PerlArray) /* XXX */
+        if (value->vtable->base_type != enum_class_Array)
             return 0;
         n = SELF.elements();
         if (VTABLE_elements(INTERP, value) != n)
@@ -1278,8 +1277,6 @@ F<src/list.c>, F<include/parrot/list.h>
 =head1 TODO
 
 Create global immutable undef object.
-
-C<PerlUndef> should really be just C<Undef>.
 
 =cut
 

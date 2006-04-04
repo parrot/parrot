@@ -1,10 +1,10 @@
 /*
-Copyright (c) 2001-2003 Yet Another Society.  All rights reserved.
+Copyright (c) 2001-2006 Yet Another Society.  All rights reserved.
 $Id$
 
 =head1 NAME
 
-src/bignum.c - A decimal arithmetic library for Perl and Parrot
+src/bignum.c - A decimal arithmetic library Parrot
 
 =head1 DESCRIPTION
 

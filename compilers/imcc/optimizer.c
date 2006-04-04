@@ -1375,8 +1375,7 @@ is_invariant(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     int ok = 0;
     int what = 0;
-    if (! strcmp(ins->op, "new") &&
-            !strcmp(ins->r[1]->name, "PerlUndef")) {
+    if (! strcmp(ins->op, "new") ) {
         ok = 1;
         what = CHK_INV_NEW;
     }

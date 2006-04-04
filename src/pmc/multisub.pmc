@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/pmc/multisub.pmc - A container for Perl6 mutli subs
+src/pmc/multisub.pmc - A container for Perl6 multi subs
 
 =head1 DESCRIPTION
 

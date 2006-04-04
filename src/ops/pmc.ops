@@ -39,7 +39,7 @@ vtable types. The assembler allows you to specify PMCs by type
 name as well as by integer - you should do this for compatibility,
 to avoid problems if the base types get reassigned. For example:
 
-  new P0, .PerlScalar
+  new P0, .ResizableBooleanArray
 
 Optionally a PMC may be passed to the constructor. It's up to the
 class what to do with the intializer.
@@ -729,12 +729,9 @@ op get_mro(out PMC, in PMC) {
 
 =back
 
-
-
-
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

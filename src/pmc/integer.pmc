@@ -1,5 +1,5 @@
 /*
-Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2003-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -327,7 +327,7 @@ MMD_Integer: {
             if ((c^a) >= 0 || (c^b) >= 0) {
                 if (!dest)
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
-                /* need this for e.g. PerlUndef */
+                /* need this for e.g. Undef PMC */
                 VTABLE_set_integer_native(INTERP, dest, c);
                 return dest;
             }
