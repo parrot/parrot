@@ -205,19 +205,16 @@ again:
 PMC*
 Parrot_find_builtin(Interp *interpreter, STRING *func)
 {
-    int i;
-    PMC *m;
-    STRING *ns;
+    const int i = find_builtin_s(interpreter, func);
 
-    i = find_builtin_s(interpreter, func);
     if (i < 0) {
-        ns = CONST_STRING(interpreter, "__parrot_core");
+        STRING * const ns = CONST_STRING(interpreter, "__parrot_core");
         return Parrot_find_global(interpreter, ns, func);
     }
-    m = Parrot_find_global(interpreter,
+    return
+        Parrot_find_global(interpreter,
             builtins[i].namespace,
             builtins[i].meth_name);
-    return m;
 }
 
 const char *
