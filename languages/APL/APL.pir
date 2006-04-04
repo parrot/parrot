@@ -14,22 +14,6 @@
     .local string source
     source = _get_source(args)
 
-=for debug
-
-    print source
-    $I1 = charset source
-    $S1 = charsetname $I1
-    print "charset: "
-    print $S1
-    print "\n"
-    $I1 = encoding source
-    $S1 = encodingname $I1
-    print "encoding: "
-    print $S1
-    print "\n"
-
-=cut
-
     # Match against the source
     .local pmc match
     .local pmc start_rule
