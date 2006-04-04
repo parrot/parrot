@@ -35,12 +35,12 @@ attribute grammar rule.
 =cut
 
 .sub __init :method
-    $P0 = new PerlUndef
-    $P1 = new PerlUndef
-    $P2 = new PerlUndef
-    $P3 = new PerlUndef
-    $P4 = new PerlUndef
-    $P5 = new Sub
+    $P0 = new .Undef
+    $P1 = new .Undef
+    $P2 = new .Undef
+    $P3 = new .Undef
+    $P4 = new .Undef
+    $P5 = new .Sub
     setattribute self, "type", $P0
     setattribute self, "name", $P1
     setattribute self, "parent", $P2

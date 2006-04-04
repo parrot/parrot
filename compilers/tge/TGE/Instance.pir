@@ -28,9 +28,9 @@ constructor parameters.
 =cut
 
 .sub __init :method
-    $P0 = new PerlHash
-    $P1 = new PerlHash
-    $P2 = new PerlUndef
+    $P0 = new .Hash
+    $P1 = new .Hash
+    $P2 = new .Undef
     setattribute self, "cell", $P0
     setattribute self, "visit", $P1
     setattribute self, "data", $P2
@@ -57,9 +57,9 @@ name_set:
     .local int index
     .local pmc currule
     $P2 = getattribute self, 'visit'
-    actions = $P2[type]
-    $I2 = defined actions
+    $I2 = exists $P2[type]
     unless $I2 goto end_loop
+    actions = $P2[type]
     index = actions
 loop:
     dec index
@@ -105,16 +105,16 @@ node_exists:
 
     .local pmc cell
     $P1 = getattribute self, "cell"
-    # First check to see if cell is defined
+    # First check to see if cell exists
     $P2 = $P1[name]
-    $I1 = defined $P2
+    $I1 = exists $P1[name]
     if $I1 goto name_hash_exists
-    $P2 = new PerlHash
+    $P2 = new .Hash
     $P1[name] = $P2
     goto scan_name
 name_hash_exists:
+    $I0 = exists $P2[id]
     cell = $P2[id]
-    $I0 = defined cell
     if $I0 goto eval_cell
 scan_name:
     if got_type goto scan_with_type
@@ -125,7 +125,7 @@ scan_with_type:
 done_scan:
     # Second check to see if _scan_node defined the cell
     cell = $P2[id]
-    $I0 = defined cell
+    $I0 = exists $P2[id]
     if $I0 goto eval_cell
     # Cell still not defined, grammar is unresolvable.
     print "Cannot find the attribute '"
@@ -177,9 +177,9 @@ return_value:
     .local pmc cellattr
     name = getattribute rule, "name"
     cellattr = cell_hash[name]
-    $I1 = defined cellattr
+    $I1 = exists cell_hash[name]
     if $I1 goto name_hash_exists
-    cellattr = new PerlHash
+    cellattr = new .Hash
     cell_hash[name] = cellattr
 name_hash_exists:
 
@@ -202,7 +202,7 @@ use_child_id:
     # doesn't already exist (the grammar should only create one entry
     # for each unique node id).
     $P3 = cellattr[id]
-    $I2 = defined $P3
+    $I2 = exists cellattr[id]
     if $I2 goto error_defined
 
     # Create the entry in the "cell" tree that stores the action to
@@ -210,11 +210,11 @@ use_child_id:
     # store an empty space for the value after it has been calculated,
     # and a flag ("thunk") noting whether the action has been run.
     .local pmc thunk
-    thunk = new PerlHash
+    thunk = new .Hash
     thunk['thunk'] = 1
     $P4 = getattribute rule, "action"
     thunk['action'] = $P4
-    $P5 = new PerlUndef
+    $P5 = new .Undef
     thunk['value'] = $P5
     thunk['node'] = node
     cellattr[id] = thunk
@@ -248,7 +248,7 @@ error_defined:
     id = getprop "agid", node
     $I0 = defined id
     if $I0 goto got_id
-    id = new PerlInt
+    id = new .Integer
     id = _new_id()
     setprop node, "agid", id
 got_id:

@@ -89,15 +89,15 @@ structure.
     .param pmc tree
     .param pmc node
     .local pmc rules
-    $I0 = defined node["TGE::Parser::rule"]
+    $I0 = exists node["TGE::Parser::rule"]
     unless $I0 goto err_no_tree
     $P0 = node["TGE::Parser::rule"]
 
     # Iterate over the list of rules, and generate a processed tree for
     # each rule.  Return an array of all the processed rules.
     .local pmc iter
-    rules = new PerlArray
-    iter = new Iterator, $P0 # loop over the array
+    rules = new .ResizablePMCArray
+    iter = new .Iterator, $P0 # loop over the array
     iter = 0 # start at the beginning
 loop_start:
     unless iter goto loop_end
@@ -117,16 +117,16 @@ err_no_tree:
     .param pmc tree
     .param pmc node
     .local pmc rule
-    rule = new PerlHash
+    rule = new .Hash
 
     # Get the type name
-    $I0 = defined node["TGE::Parser::type"]
+    $I0 = exists node["TGE::Parser::type"]
     unless $I0 goto err_no_rule
     $P1 = node["TGE::Parser::type"]
     $P2 = tree.get('value', $P1, 'type')
     rule["type"] = $P2
 
-    $I0 = defined node["TGE::Parser::attrdef"]
+    $I0 = exists node["TGE::Parser::attrdef"]
     unless $I0 goto err_no_rule
     $P3 = node["TGE::Parser::attrdef"]
     $P4  = tree.get('name', $P3, 'attrdef')
@@ -148,7 +148,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc value
-    value = new PerlString
+    value = new .String
     $S2 = node
     value = $S2
     .return (value)
@@ -159,7 +159,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc name
-    name = new PerlString
+    name = new .String
     $P2 = node["TGE::Parser::name"]
     $P3 = $P2[0]
     $S1 = $P3
@@ -172,7 +172,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc name
-    name = new PerlString
+    name = new .String
     $P2 = node["TGE::Parser::parenlist"]
     $P3 = $P2[0]
     $S1 = $P3
@@ -185,7 +185,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc name
-    name = new PerlString
+    name = new .String
     $P2 = node["TGE::Parser::codeblock"]
     $P3 = $P2[0]
     $S1 = $P3

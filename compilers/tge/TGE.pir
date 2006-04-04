@@ -91,7 +91,7 @@ of TGE::Rule objects, which are the semantics defined by the grammar.
 =cut
 
 .sub __init :method
-    $P1 = new PerlArray
+    $P1 = new .ResizablePMCArray
     setattribute self, 'rules', $P1
 .end
 
@@ -138,7 +138,7 @@ Compile a grammar from a source string.
     .local pmc rule
     .local pmc code
     .local pmc iter
-    iter = new Iterator, rule_data # loop over the rule info
+    iter = new .Iterator, rule_data # loop over the rule info
     iter = 0 # start at the beginning
 loop_start:
     unless iter goto loop_end
@@ -147,7 +147,7 @@ loop_start:
         $P2 = rule["name"]
         $P3 = rule["parent"]
         $P4 = rule["action"]
-        code = new PerlString
+        code = new .String
         code = ".sub _anon_"
         code .= $P1
         code .= "_"
@@ -195,9 +195,9 @@ loop:
     currule = rules[index]
     typename = getattribute currule, 'type'
     $P2 = visit[typename]
-    $S1 = typeof $P2
-    if $S1 == 'PerlArray' goto array_exists
-    $P2 = new PerlArray
+    $I1 = does $P2, 'array'
+    if $I1 goto array_exists
+    $P2 = new .ResizablePMCArray
     visit[typename] = $P2
 array_exists:
     push $P2, currule
