@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -94,7 +94,7 @@ struct Parrot_sub *
 new_sub(Interp *interp)
 {
     /* Using system memory until I figure out GC issues */
-    struct Parrot_sub *newsub =
+    struct Parrot_sub * const newsub =
         mem_sys_allocate_zeroed(sizeof(struct Parrot_sub));
     newsub->seg = interp->code;
     return newsub;
@@ -116,7 +116,7 @@ XXX: Need to document semantics in detail.
 struct Parrot_sub *
 new_closure(Interp *interp)
 {
-    struct Parrot_sub *newsub = new_sub(interp);
+    struct Parrot_sub * const newsub = new_sub(interp);
     return newsub;
 }
 /*

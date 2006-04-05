@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -39,7 +39,7 @@ The actual thread function.
 static void*
 thread_func(void *arg)
 {
-    PMC *self = (PMC*) arg;
+    PMC * const self = (PMC*) arg;
     UINTVAL tid;
     PMC *ret_val = NULL;
 
@@ -91,7 +91,7 @@ resources are created in C<d>.
 */
 
 void
-pt_clone_code(Parrot_Interp d, Parrot_Interp s)
+pt_clone_code(Parrot_Interp d, const Parrot_Interp s)
 {
     Interp_flags_SET(d, PARROT_EXTERN_CODE_FLAG);
     d->code = s->code;
@@ -137,7 +137,7 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 {
     Parrot_Interp interpreter = PMC_data(dest_interp);
 
-    PMC *parent = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+    PMC * const parent = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                 IGLOBALS_INTERPRETER);
 
     /*

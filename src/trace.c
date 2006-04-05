@@ -221,7 +221,6 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
               opcode_t *pc)
 {
     INTVAL i, s, n;
-    char *escaped;
     int more = 0, var_args;
     Interp *debugger = interpreter->debugger;
     op_info_t *info = &interpreter->op_info_table[*pc];
@@ -264,7 +263,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
         len += PIO_eprintf(debugger, " ");
         /* pass 1 print arguments */
         for (i = s; i < n; i++) {
-            opcode_t o = *(pc + i);
+            const opcode_t o = pc[i];
             if (i < info->op_count)
                 type = info->types[i - 1];
             else
@@ -293,12 +292,14 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                         len += PIO_eprintf(debugger, "PC%d", (int)o);
                     break;
                 case PARROT_ARG_SC:
-                    escaped = PDB_escape(PCONST(o)->u.string->strstart,
+                    {
+                    char * const escaped = PDB_escape(PCONST(o)->u.string->strstart,
                             PCONST(o)->u.string->bufused);
                     len += PIO_eprintf(debugger, "\"%s\"",
                             escaped ? escaped : "(null)");
                     if (escaped)
                         mem_sys_free(escaped);
+                    }
                     break;
                 case PARROT_ARG_KC:
                     len += trace_key_dump(interpreter, PCONST(o)->u.key);
@@ -338,7 +339,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
         if (!more)
             goto done;
         if (len < ARGS_COLUMN)  {
-            STRING *fill = string_repeat(debugger, 
+            STRING * const fill = string_repeat(debugger,
                     const_string(debugger, " "),
                     ARGS_COLUMN - len, NULL);
             PIO_putps(debugger, PIO_STDERR(debugger), fill);
@@ -349,7 +350,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
 
         /* pass 2 print argument details if needed */
         for (i = 1; i < n; i++) {
-            opcode_t o = *(pc + i);
+            const opcode_t o = pc[i];
             if (i < info->op_count)
                 type = info->types[i - 1];
             else
@@ -374,8 +375,8 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     trace_pmc_dump(interpreter, REG_PMC(o));
                     break;
                 case PARROT_ARG_S:
-                    if (REG_STR(*(pc+i))) {
-                        escaped = PDB_escape(REG_STR(o)->strstart,
+                    if (REG_STR(pc[i])) {
+                        char * const escaped = PDB_escape(REG_STR(o)->strstart,
                                 REG_STR(o)->bufused);
                         PIO_eprintf(debugger, "S%vd=\"%s\"", o,
                                 escaped ? escaped : "(null)");
@@ -390,8 +391,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     trace_key_dump(interpreter, REG_PMC(*(pc + i)));
                     break;
                 case PARROT_ARG_KI:
-                    PIO_eprintf(debugger, "I%vd=[%vd]", o,
-                            REG_INT(o));
+                    PIO_eprintf(debugger, "I%vd=[%vd]", o, REG_INT(o));
                     break;
                 default:
                     break;
