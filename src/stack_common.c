@@ -73,7 +73,7 @@ register_new_stack(Interp *interpreter, const char *name, size_t item_size)
 /*
 
 =item C<Stack_Chunk_t *
-cst_new_stack_chunk(Interp *interpreter, Stack_Chunk_t *)>
+cst_new_stack_chunk(Interp *interpreter, const Stack_Chunk_t *chunk)>
 
 Get a new chunk either from the freelist or allocate one.
 
@@ -82,14 +82,11 @@ Get a new chunk either from the freelist or allocate one.
 */
 
 Stack_Chunk_t *
-cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
+cst_new_stack_chunk(Parrot_Interp interpreter, const Stack_Chunk_t *chunk)
 {
-    Stack_Chunk_t *new_chunk;
+    struct Small_Object_Pool * const pool = get_bufferlike_pool(interpreter, chunk->size);
+    Stack_Chunk_t * const new_chunk = pool->get_free_object(interpreter, pool);
 
-    struct Small_Object_Pool *pool;
-
-    pool = get_bufferlike_pool(interpreter, chunk->size);
-    new_chunk = pool->get_free_object(interpreter, pool);
     PObj_bufstart(new_chunk) = NULL;
     PObj_buflen  (new_chunk) = 0;
 
@@ -135,7 +132,7 @@ Return a pointer, where new entries are poped off.
 void*
 stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 {
-    Stack_Chunk_t *chunk = *stack_p;
+    Stack_Chunk_t * const chunk = *stack_p;
     /*
      * the first entry (initial top) refers to itself
      */

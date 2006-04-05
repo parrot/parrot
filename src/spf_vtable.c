@@ -69,7 +69,7 @@ of the integer.
 static HUGEINTVAL
 getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *)(obj->data);
+    va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
     case SIZE_REG:
@@ -93,7 +93,7 @@ getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
         return (HUGEINTVAL)(opcode_t)va_arg(*arg, opcode_t);
 
     case SIZE_PMC:{
-            PMC *pmc = (PMC *)va_arg(*arg, PMC *);
+            PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
 
             return (HUGEINTVAL)(INTVAL)
                     (VTABLE_get_integer(interpreter, pmc));
@@ -122,7 +122,7 @@ of the integer.
 static UHUGEINTVAL
 getuint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *)(obj->data);
+    va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
     case SIZE_REG:
@@ -178,7 +178,7 @@ the number.
 static HUGEFLOATVAL
 getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *)(obj->data);
+    va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
     case SIZE_SHORT:
@@ -197,7 +197,7 @@ getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
                 va_arg(*arg, FLOATVAL);
 
     case SIZE_PMC:{
-            PMC *pmc = (PMC *)va_arg(*arg, PMC *);
+            PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
 
             return (HUGEFLOATVAL)(VTABLE_get_number(interpreter, pmc));
         }
@@ -227,27 +227,27 @@ of the string.
 static STRING *
 getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *)(obj->data);
+    va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
     case SIZE_REG:
         {
-            char *cstr = (char *)va_arg(*arg, char *);
+            const char * const cstr = (char *)va_arg(*arg, char *);
 
             return cstr2pstr(cstr);
         }
 
     case SIZE_PSTR:
         {
-            STRING *s = (STRING *)va_arg(*arg, STRING *);
+            STRING * const s = (STRING *)va_arg(*arg, STRING *);
             return s ? s : CONST_STRING(interpreter, "(null)");
 
         }
 
     case SIZE_PMC:
         {
-            PMC *pmc = (PMC *)va_arg(*arg, PMC *);
-            STRING *s = VTABLE_get_string(interpreter, pmc);
+            PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
+            STRING * const s = VTABLE_get_string(interpreter, pmc);
 
             return s;
         }
@@ -276,7 +276,7 @@ C<size> is unused.
 static void *
 getptr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *)(obj->data);
+    va_list * const arg = (va_list *)(obj->data);
 
     return (void *)va_arg(*arg, void *);
 }
@@ -308,7 +308,7 @@ static STRING *
 getchr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     STRING *s;
-    PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
             (obj->index));
 
@@ -334,7 +334,7 @@ static HUGEINTVAL
 getint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     HUGEINTVAL ret;
-    PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
             (obj->index));
 
@@ -372,7 +372,7 @@ static UHUGEINTVAL
 getuint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     UHUGEINTVAL ret;
-    PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
             (obj->index));
 
@@ -409,7 +409,7 @@ static HUGEFLOATVAL
 getfloat_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     HUGEFLOATVAL ret;
-    PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
             (obj->index));
 
@@ -444,7 +444,7 @@ static STRING *
 getstring_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     STRING *s;
-    PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
             (obj->index));
 
@@ -468,7 +468,7 @@ from C<obj>.
 static void *
 getptr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
             (obj->index));
 

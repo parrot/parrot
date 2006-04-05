@@ -54,14 +54,13 @@ static STRING*
 uint_to_str(Interp *interpreter,
             char *tc, UHUGEINTVAL num, char base, int minus)
 {
-    char cur;
-    char *tail, *p;
     /* the buffer must be at least as long as this */
-    tail = p = tc + sizeof(UHUGEINTVAL)*8 + 1;
+    char *p = tc + sizeof(UHUGEINTVAL)*8 + 1;
+    const char * const tail = p;
 
     assert(base >= 2 && base <= 36);
     do {
-        cur = (char)(num % base);
+        const char cur = (char)(num % base);
         if (cur < 10) {
             *--p = (char)('0' + cur);
         }
@@ -120,18 +119,17 @@ handle_flags(Interp *interpreter,
              SpfInfo info, STRING *str, INTVAL is_int_type, STRING* prefix)
 {
     UINTVAL len = string_length(interpreter, str);
-    STRING *cs;
 
     if (is_int_type) {
         /* +, space */
         if (string_ord(interpreter, str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
-                cs = CONST_STRING(interpreter, "+");
+                STRING * const cs = CONST_STRING(interpreter, "+");
                 str = string_concat(interpreter, cs , str, 0);
                 len++;
             }
             else if (info->flags & FLAG_SPACE) {
-                cs = CONST_STRING(interpreter, " ");
+                STRING * const cs = CONST_STRING(interpreter, " ");
                 str = string_concat(interpreter, cs , str, 0);
                 len++;
             }
@@ -165,14 +163,7 @@ handle_flags(Interp *interpreter,
     }
 
     if ((info->flags & FLAG_WIDTH) && info->width > len) {
-        STRING *fill;
-
-        if (info->flags & FLAG_ZERO) {
-            fill = CONST_STRING(interpreter, "0");
-        }
-        else {
-            fill = CONST_STRING(interpreter, " ");
-        }
+        STRING *fill = CONST_STRING(interpreter, info->flags & FLAG_ZERO ? "0" : " ");
 
         fill = string_repeat(interpreter, fill, info->width - len, NULL);
 
@@ -245,7 +236,7 @@ gen_sprintf_call(Interp *interpreter, char *out,
         }
         ts = uint_to_str(interpreter, tc, info->width, 10, 0);
         {
-            char *tempstr = string_to_cstring(interpreter, ts);
+            char * const tempstr = string_to_cstring(interpreter, ts);
             strcpy(out + i, tempstr);
             string_cstring_free(tempstr);
         }
@@ -260,7 +251,7 @@ gen_sprintf_call(Interp *interpreter, char *out,
         out[i++] = '.';
         ts = uint_to_str(interpreter, tc, info->prec, 10, 0);
         {
-            char *tempstr = string_to_cstring(interpreter, ts);
+            char * const tempstr = string_to_cstring(interpreter, ts);
             strcpy(out + i, tempstr);
             string_cstring_free(tempstr);
         }
@@ -428,7 +419,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
 
                 for (i++; i < (INTVAL) string_length(interpreter, pat)
                      && info.phase != PHASE_DONE; i++) {
-                    INTVAL ch = string_ord(interpreter, pat, i);
+                    const INTVAL ch = string_ord(interpreter, pat, i);
 
                     switch (info.phase) {
                     /*@fallthrough@ */ case PHASE_FLAGS:
@@ -667,8 +658,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             /* XXX lost precision if %Hg or whatever
                                */
                             {
-                                char *tempstr = string_to_cstring(interpreter,
-                                                                  ts);
+                                char * const tempstr = string_to_cstring(interpreter, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
@@ -710,7 +700,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                              * to SPRINTF_OBJ, but for now, getstring_pmc  *
                              * is inlined and modified to call get_repr    */
                             if (obj->getstring == pmc_core.getstring) {
-                                PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
+                                PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
                                     ((PMC *)obj->data), (obj->index));
 
                                 obj->index++;

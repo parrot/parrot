@@ -54,7 +54,7 @@ PARROT_API void stack_destroy(Stack_Chunk_t * top);
  * stack_common functions
  */
 Stack_Chunk_t * register_new_stack(Parrot_Interp, const char *name, size_t);
-Stack_Chunk_t * cst_new_stack_chunk(Parrot_Interp, Stack_Chunk_t *);
+Stack_Chunk_t * cst_new_stack_chunk(Parrot_Interp, const Stack_Chunk_t *chunk);
 void* stack_prepare_push(Parrot_Interp, Stack_Chunk_t **stack_p);
 void* stack_prepare_pop(Parrot_Interp, Stack_Chunk_t **stack_p);
 void mark_stack_chunk_cache(Parrot_Interp interpreter);

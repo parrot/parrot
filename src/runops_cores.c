@@ -201,10 +201,10 @@ operations, with tracing, bounds checking and profiling enabled.
 opcode_t *
 runops_profile_core(Interp *interpreter, opcode_t *pc)
 {
-    opcode_t cur_op, old_op;
-    RunProfile *profile = interpreter->profile;
+    opcode_t cur_op;
+    RunProfile * const profile = interpreter->profile;
 
-    old_op = profile->cur_op;
+    const opcode_t old_op = profile->cur_op;
     /*
      * if we are reentering the runloop:
      * - remember old op and calc time till now
