@@ -60,13 +60,9 @@ and logic ops.
 #    $P0(match, "$/")
 
     # "Traverse" the parse tree
-    .local string tg_source
-    tg_source = _slurp_file('languages/punie/lib/pge2past.g')
-
-    load_bytecode "TGE.pbc"
+    load_bytecode "languages/punie/lib/ASTGrammar.pbc"
     .local pmc grammar
-    grammar = new 'TGE'
-    grammar.agcompile(tg_source)
+     grammar = new 'ASTGrammar'
 
     # Construct the "AST"
     load_bytecode "languages/punie/lib/PAST.pir"
@@ -83,11 +79,9 @@ and logic ops.
     # Compile the abstract syntax tree down to an opcode syntax tree
     load_bytecode "languages/punie/lib/POST.pir"
     load_bytecode 'languages/punie/lib/PunieOpLookup.pir'
-    .local string ost_tg_source
-    ost_tg_source = _slurp_file('languages/punie/lib/past2post.g')
+    load_bytecode "languages/punie/lib/OSTGrammar.pbc"
     .local pmc ostgrammar
-    ostgrammar = new 'TGE'
-    ostgrammar.agcompile(ost_tg_source)
+    ostgrammar = new 'OSTGrammar'
     .local pmc ostbuilder
     ostbuilder = ostgrammar.apply(ast)
     .local pmc ost
@@ -99,11 +93,9 @@ and logic ops.
 #    ost.dump()
 
     # Compile the OST down to PIR
-    .local string pir_tg_source
-    pir_tg_source = _slurp_file('languages/punie/lib/post2pir.g')
+    load_bytecode "languages/punie/lib/PIRGrammar.pbc"
     .local pmc pirgrammar
-    pirgrammar = new 'TGE'
-    pirgrammar.agcompile(pir_tg_source)
+    pirgrammar = new 'PIRGrammar'
     .local pmc pirbuilder
     pirbuilder = pirgrammar.apply(ost)
     .local pmc pir

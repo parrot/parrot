@@ -518,8 +518,14 @@
 # generated from svn:ignore of 'languages/punie/lib/'
 ^languages/punie/lib/punie_grammar_gen\.pir$
 ^languages/punie/lib/punie_grammar_gen\.pir/
-^languages/punie/lib/PunieGrammar\.pbc$
-^languages/punie/lib/PunieGrammar\.pbc/
+^languages/punie/lib/pge2past_gen\.pir$
+^languages/punie/lib/pge2past_gen\.pir/
+^languages/punie/lib/past2post_gen\.pir$
+^languages/punie/lib/past2post_gen\.pir/
+^languages/punie/lib/post2pir_gen\.pir$
+^languages/punie/lib/post2pir_gen\.pir/
+^languages/punie/lib/.*\.pbc$
+^languages/punie/lib/.*\.pbc/
 # generated from svn:ignore of 'languages/punie/t/'
 ^languages/punie/t/.*\.pir$
 ^languages/punie/t/.*\.pir/

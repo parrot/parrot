@@ -30,9 +30,6 @@ This is a grammar to parse Perl 1 programs. It inherits the behavior
 of the PGE::Rule class. It parses a string of source code according to
 its hierarchy of rules and returns a PGE::Match object (a parse tree).
 
-Currently, all it can parse is a single statement printing a single
-digit, in the form of 'print 1;'.
-
 =cut
 
 .namespace [ 'PunieGrammar' ]
