@@ -65,7 +65,6 @@ __DATA__
 === times scalar
 --- APL: print 2 × 3.14
 --- out: 6.28
---- skip: not implemented
 
 === times mixed
 --- APL: 1 2 3 4 * 3.14 

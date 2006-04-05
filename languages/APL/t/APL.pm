@@ -41,8 +41,18 @@ sub run_apl_is() {
     my $apl    = $block->APL;
     my $output = $block->out;
     my $skip   = $block->skip;
-    SKIP: {
-      skip($skip, 1) if $skip;
+    my $todo   = $block->todo;
+    if (defined($skip)) {
+      SKIP: {
+        skip($skip, 1) if $skip;
+        Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
+      }
+    } elsif (defined($todo)) {
+      TODO: {
+        local $TODO = $todo;
+        Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
+      }
+    } else {
       Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
     }
   }
