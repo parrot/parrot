@@ -39,7 +39,6 @@ opcode syntax tree.
 
 .include 'languages/punie/lib/past2post_gen.pir'
 
-=cut
 
 =head1 LICENSE
 

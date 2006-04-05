@@ -39,7 +39,6 @@ an abstract syntax tree.
 
 .include 'languages/punie/lib/pge2past_gen.pir'
 
-=cut
 
 =head1 LICENSE
 

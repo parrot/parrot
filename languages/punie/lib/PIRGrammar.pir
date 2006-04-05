@@ -37,7 +37,6 @@ PIRGrammar -- A grammar for transforming an opcode syntax tree to PIR.
 
 .include 'languages/punie/lib/post2pir_gen.pir'
 
-=cut
 
 =head1 LICENSE
 
