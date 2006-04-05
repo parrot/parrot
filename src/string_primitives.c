@@ -1,5 +1,5 @@
 /*
-Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+Copyright: 2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -124,7 +124,7 @@ string_fill_from_buffer(Interp *interpreter, const void *buffer,
             source_limit, NULL, TRUE, &icuError);
 
     while (icuError == U_BUFFER_OVERFLOW_ERROR) {
-        size_t consumed_length = (char *)target - (char *)(s->strstart);
+        const size_t consumed_length = (char *)target - (char *)(s->strstart);
 
         /* double size, at least */
         Parrot_reallocate_string(interpreter, s, 2 * PObj_buflen(s));
@@ -163,12 +163,11 @@ Parrot_UInt4
 string_unescape_one(Interp *interpreter, UINTVAL *offset,
         STRING *string)
 {
-    UINTVAL codepoint;
     UINTVAL workchar = 0;
     UINTVAL charcount = 0;
-    UINTVAL len = string_length(interpreter, string);
+    const UINTVAL len = string_length(interpreter, string);
     /* Well, not right now */
-    codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+    UINTVAL codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
     ++*offset;
     switch (codepoint) {
         case 'x':
@@ -330,7 +329,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             return 13;
         case 'e':
             return 27;
-        case 92:
+        case 92: /* \ */
             return 92;
         case '"':
             return '"';

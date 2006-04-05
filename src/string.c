@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -107,7 +107,7 @@ Copies the string header from the first Parrot string to the second.
 */
 
 static void
-copy_string_header(Interp *interpreter, String *dest, String *src)
+copy_string_header(Interp *interpreter, String *dest, const String *src)
 {
     memcpy(dest, src, sizeof(String));
 }
@@ -330,9 +330,7 @@ STRING *
 string_make_empty(Interp *interpreter,
     parrot_string_representation_t representation, UINTVAL capacity)
 {
-    STRING *s;
-
-    s = new_string_header(interpreter, 0);
+    STRING * const s = new_string_header(interpreter, 0);
 
     /*
      * TODO adapt string creation functions
@@ -650,13 +648,12 @@ STRING *
 string_make_direct(Interp *interpreter, const void *buffer,
         UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags)
 {
-    STRING *s;
     union {
         const void * __c_ptr;
         void * __ptr;
     } __ptr_u;
+    STRING * const s = new_string_header(interpreter, flags);
 
-    s = new_string_header(interpreter, flags);
     s->encoding = encoding;
     s->charset = charset;
 
@@ -1017,10 +1014,9 @@ STRING *
 string_repeat(Interp *interpreter, const STRING *s,
     UINTVAL num, STRING **d)
 {
-    STRING *dest;
     UINTVAL i;
 
-    dest = string_make_direct(interpreter, NULL,
+    STRING * const dest = string_make_direct(interpreter, NULL,
                         s->bufused * num,
                         s->encoding, s->charset, 0);
 
@@ -1794,9 +1790,7 @@ if it is equal to anything other than C<0>, C<""> or C<"0">.
 INTVAL
 string_bool(Interp *interpreter, const STRING *s)
 {
-    INTVAL len;
-
-    len = string_length(interpreter, s);
+    const INTVAL len = string_length(interpreter, s);
 
     if (len == 0) {
         return 0;
@@ -1804,10 +1798,10 @@ string_bool(Interp *interpreter, const STRING *s)
 
     if (len == 1) {
 
-        UINTVAL c = string_index(interpreter, s, 0);
+        const UINTVAL c = string_index(interpreter, s, 0);
 
-        /* relying on character literals being interpreted as ascii--may
-        not be correct on ebdic systems. use numeric value instead? */
+        /* relying on character literals being interpreted as ASCII--may
+        not be correct on EBCDIC systems. use numeric value instead? */
         if (c == '0') {
             /* later, accept other chars with digit value 0? or, no */
             return 0;
@@ -1920,12 +1914,12 @@ string_to_int(Interp *interpreter, const STRING *s)
 
     if (s) {
         const char *start = s->strstart;
-        const char *end = start + s->bufused;
+        const char * const end = start + s->bufused;
         int sign = 1;
         INTVAL in_number = 0;
 
         while (start < end) {
-            unsigned char c = *start;
+            const unsigned char c = *start;
 
             if (isdigit(c)) {
                 in_number = 1;
@@ -1985,9 +1979,10 @@ string_to_num(Interp *interpreter, const STRING *s)
          * XXX C99 atof interpreters 0x prefix
          * XXX would strtod() be better for detecting malformed input?
          */
-        char *cstr = string_to_cstring(interpreter, const_cast(s));
-        char *p = cstr;
-        while (isspace(*p)) p++;
+        char * const cstr = string_to_cstring(interpreter, const_cast(s));
+        const char *p = cstr;
+        while (isspace(*p))
+            p++;
         f = atof(p);
         /* Not all atof()s return -0 from "-0" */
         if (*p == '-' && f == 0.0)
@@ -2021,8 +2016,8 @@ string_to_num(Interp *interpreter, const STRING *s)
         FLOATVAL exp_log=10.0, exp_val=1.0;
 
         while (idx < length) {
-            UINTVAL c = string_index(interpreter, s, idx);
-            INTVAL df = Parrot_char_is_digit(interpreter, c);
+            const UINTVAL c = string_index(interpreter, s, idx);
+            const INTVAL df = Parrot_char_is_digit(interpreter, c);
 
             if (df && !digit_family)
                 digit_family = df;
