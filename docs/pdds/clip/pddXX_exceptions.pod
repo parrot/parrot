@@ -18,7 +18,7 @@ $Revision: $
 
 An exception system gives user-developed code control over how run-time
 error conditions are handled. Exceptions are errors or unusual
-conditions that requires special processing. An exception handler
+conditions that require special processing. An exception handler
 performs the necessary steps to appropriately respond to a particular
 kind of exception.
 
@@ -33,7 +33,7 @@ These are the opcodes relevant to exceptions and exception handlers:
 C<push_eh> creates an exception handler and pushes it onto the control
 stack. It takes a label (the location of the exception handler) as its
 only argument. [Is this right? Treating exception handlers as label
-jumps rather than full subroutines seems error-prone.]
+jumps rather than full subroutines is error-prone.]
 
 =item *
 
@@ -178,7 +178,7 @@ C<0> means a normal return; C<1> means an exception has been raised.
 
 [I'm not convinced the control stack is the right way to handle
 exceptions. Most of Parrot is based on the continuation-passing style of
-control, shouldn't exceptions be based on it too?]
+control, shouldn't exceptions be based on it too? See bug #38850.]
 
 =head2 Opcodes that Throw Exceptions
 
