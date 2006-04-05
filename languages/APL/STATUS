@@ -5,12 +5,13 @@ Only a shell of a language at this point.
 Things that work:
 
 - String parsing.
+- scalar numeric constants.
 - 2 operators.
 
 Things to do:
 
 - eliminate use of PGE::OpTable; APL doesn't have operator precedence, so
-  this is kind overkill. We can specify everything in the grammar itself.
+  this is kind of overkill. We can specify everything in the grammar itself.
 
 - Add framework to allow non-opcode operators - for example, Circular doesn't
   map directly to parrot opcodes, but requires a translation:

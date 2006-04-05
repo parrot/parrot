@@ -37,7 +37,7 @@
 
     # "Traverse" the parse tree
     .local string tg_source
-    tg_source = _slurp_file('languages/APL/lib/pge2past.g')
+    tg_source = _slurp_file('languages/APL/lib/pge2past.tge')
 
     .local pmc grammar
     grammar = new 'TGE'
@@ -58,7 +58,7 @@
     .local string ost_tg_source
     # XXX It would be *really* nice if we could do all this work once
     #     at build time, rather than every single time at runtime.
-    ost_tg_source = _slurp_file('languages/APL/lib/past2post.g')
+    ost_tg_source = _slurp_file('languages/APL/lib/past2post.tge')
     .local pmc ostgrammar
     ostgrammar = new 'TGE'
     ostgrammar.agcompile(ost_tg_source)
@@ -74,7 +74,7 @@
 
     # Compile the OST down to PIR
     .local string pir_tg_source
-    pir_tg_source = _slurp_file('languages/APL/lib/post2pir.g')
+    pir_tg_source = _slurp_file('languages/APL/lib/post2pir.tge')
     .local pmc pirgrammar
     pirgrammar = new 'TGE'
     pirgrammar.agcompile(pir_tg_source)
