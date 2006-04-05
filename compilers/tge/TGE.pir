@@ -120,6 +120,43 @@ Add a rule to the current attribute grammar.
     push $P3, rule
 .end
 
+=head2 rule_install
+
+Compile and install a rule in the current grammar.
+
+=cut
+
+.sub 'rule_install' :method
+    .param pmc rule
+    .local string code
+    .local pmc action
+
+    .local pmc compiler
+    compiler = compreg "PIR"
+    code = self.'rule_string'(rule)
+    action = compiler(code)
+
+    $P1 = rule["type"]
+    $P2 = rule["name"]
+    $P3 = rule["parent"]
+    self.agrule($P1, $P2, $P3, action)
+.end
+
+=head2 rule_emit
+
+Generate the PIR code for a rule, and emit it to a file.
+
+=cut
+
+.sub 'rule_emit' :method
+    .param pmc rule
+    .param pmc outfh
+
+    $S1 = self.'rule_string'(rule)
+    print outfh, $S1
+
+.end
+
 =head2 agcompile
 
 Compile a grammar from a source string.
@@ -128,41 +165,81 @@ Compile a grammar from a source string.
 
 .sub 'agcompile' :method
     .param string source
+    .param pmc outfh     :optional
+    .param int fileoutput :opt_flag
     .local pmc agparse
     .local pmc rule_data
+    .local string header_string
 
      agparse = find_global 'TGE::Parser', 'agparse'
      rule_data = agparse(source)
 
     # Construct grammar rules from the data structure of rule info
     .local pmc rule
-    .local pmc code
     .local pmc iter
     iter = new .Iterator, rule_data # loop over the rule info
     iter = 0 # start at the beginning
 loop_start:
     unless iter goto loop_end
         rule = shift iter
-        $P1 = rule["type"]
-        $P2 = rule["name"]
-        $P3 = rule["parent"]
-        $P4 = rule["action"]
-        code = new .String
-        code = ".sub _anon_"
-        code .= $P1
-        code .= "_"
-        code .= $P2
-        code .= " :anon\n"
-        code .= "   .param pmc tree\n"
-        code .= "   .param pmc node\n"
-        code .= $P4
-        code .= "\n.end"
-        $P5 = compreg "PIR"
-        $P6 = $P5(code)
-        self.agrule($P1, $P2, $P3, $P6)
+        # If a filehandle was passed in, write the PIR code to it,
+        # otherwise, compile the rule and install it immediately.
+        if fileoutput goto write_pir
+          self.rule_install(rule)
+          goto loop_start
+      write_pir:
+          self.rule_emit(rule, outfh)
+          $S1 = self.rule_header(rule)
+          header_string .= $S1
     goto loop_start
 loop_end:
+
+    unless fileoutput goto noheader
+       print outfh, "\n.sub __init :method\n"
+       print outfh, header_string
+       print outfh, "\n.end\n"
+  noheader:
     .return ()
+.end
+
+.sub 'rule_header' :method
+    .param pmc rule
+    .local string output
+    .local string type
+    .local string name
+    .local string parent
+    type = rule["type"]
+    name = rule["name"]
+    parent = rule["parent"]
+    output = "$P1 = find_global '_" . type
+    output .= "_"
+    output .= name
+    output .= "'\nself.agrule('"
+    output .= type
+    output .= "', '"
+    output .= name
+    output .= "', '"
+    output .= parent
+    output .= "', $P1)\n"
+    .return (output)
+.end
+
+.sub 'rule_string' :method
+    .param pmc rule
+    .local string code
+    $S1 = rule["type"]
+    $S2 = rule["name"]
+    $S3 = rule["action"]
+    code = "\n.sub '_"
+    code .= $S1
+    code .= "_"
+    code .= $S2
+    code .= "'\n"
+    code .= "   .param pmc tree\n"
+    code .= "   .param pmc node\n"
+    code .= $S3
+    code .= "\n.end\n\n"
+    .return (code)
 .end
 
 =head2 apply
