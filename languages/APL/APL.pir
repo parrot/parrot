@@ -1,14 +1,17 @@
-.include "errors.pasm"
+.include 'errors.pasm'
 
 .sub _main :main
     .param pmc args
 
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
 
-    load_bytecode "TGE.pbc"
-    load_bytecode "languages/APL/lib/APLGrammar.pbc"
-    load_bytecode "languages/APL/lib/PAST.pbc"
-    load_bytecode "languages/APL/lib/POST.pbc"
+    load_bytecode 'TGE.pbc'
+    load_bytecode 'languages/APL/lib/APLGrammar.pbc'
+    load_bytecode 'languages/APL/lib/ASTGrammar.pbc'
+    load_bytecode 'languages/APL/lib/OSTGrammar.pbc'
+    load_bytecode 'languages/APL/lib/PIRGrammar.pbc'
+    load_bytecode 'languages/APL/lib/PAST.pbc'
+    load_bytecode 'languages/APL/lib/POST.pbc'
     load_bytecode 'languages/APL/lib/APLOpLookup.pbc'
 
     .local string source
@@ -17,7 +20,7 @@
     # Match against the source
     .local pmc match
     .local pmc start_rule
-    start_rule = find_global "APLGrammar", "prog"
+    start_rule = find_global 'APLGrammar', 'prog'
     match = start_rule(source)
 
     # Verify the match
@@ -28,20 +31,16 @@
 
     print "parse succeeded\n"
     print "Match tree dump:\n"
-    load_bytecode "dumper.pir"
-    load_bytecode "PGE/Dumper.pir"
-    $P0 = find_global "_dumper"
-    $P0(match, "$/")
+    load_bytecode 'dumper.pir'
+    load_bytecode 'PGE/Dumper.pir'
+    $P0 = find_global '_dumper'
+    $P0(match, '$/')
 
 =cut
 
     # "Traverse" the parse tree
-    .local string tg_source
-    tg_source = _slurp_file('languages/APL/lib/pge2past.tge')
-
     .local pmc grammar
-    grammar = new 'TGE'
-    grammar.agcompile(tg_source)
+    grammar = new 'ASTGrammar'
 
     # Construct the "AST"
     .local pmc astbuilder
@@ -55,13 +54,8 @@
 # ast.dump()
 
     # Compile the abstract syntax tree down to an opcode syntax tree
-    .local string ost_tg_source
-    # XXX It would be *really* nice if we could do all this work once
-    #     at build time, rather than every single time at runtime.
-    ost_tg_source = _slurp_file('languages/APL/lib/past2post.tge')
     .local pmc ostgrammar
-    ostgrammar = new 'TGE'
-    ostgrammar.agcompile(ost_tg_source)
+    ostgrammar = new 'OSTGrammar'
     .local pmc ostbuilder
     ostbuilder = ostgrammar.apply(ast)
     .local pmc ost
@@ -73,11 +67,8 @@
 #    ost.dump()
 
     # Compile the OST down to PIR
-    .local string pir_tg_source
-    pir_tg_source = _slurp_file('languages/APL/lib/post2pir.tge')
     .local pmc pirgrammar
-    pirgrammar = new 'TGE'
-    pirgrammar.agcompile(pir_tg_source)
+    pirgrammar = new 'PIRGrammar'
     .local pmc pirbuilder
     pirbuilder = pirgrammar.apply(ost)
     .local pmc pir
@@ -131,9 +122,6 @@
     print "You must supply an APL file to parse.\n"
     end
 .end
-
-# XXX - Can't read in utf8 encoding files using this method.
-#     - RT #38733
 
 .sub _slurp_file
     .param string filename

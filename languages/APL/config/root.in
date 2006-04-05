@@ -14,9 +14,8 @@ GENERATED = lib@slash@generated_APL_grammar.pir
 .pir.pbc :
 	$(PARROT) -o $@ $<
 
-.tge.pbc :
+.tge.pir :
 	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=$*.pir $<
-	$(PARROT) -o $@ $*.pir
 
 # the default target
 all: $(PARROT) \
@@ -24,12 +23,20 @@ all: $(PARROT) \
   lib@slash@PAST.pbc \
   lib@slash@POST.pbc \
   lib@slash@APLGrammar.pbc \
-  lib@slash@APLOpLookup.pbc
+  lib@slash@APLOpLookup.pbc \
+  lib@slash@ASTGrammar.pbc \
+  lib@slash@OSTGrammar.pbc \
+  lib@slash@PIRGrammar.pbc
+
+
+lib@slash@ASTGrammar.pir: lib@slash@pge2past.pir
+lib@slash@OSTGrammar.pir: lib@slash@past2post.pir
+lib@slash@PIRGrammar.pir: lib@slash@post2pir.pir
 
 TGE_TARGETS = \
-  lib@slash@pge2past.pbc \
-  lib@slash@past2post.pbc \
-  lib@slash@post2pir.pbc
+  lib@slash@pge2past.pir \
+  lib@slash@past2post.pir \
+  lib@slash@post2pir.pir
 
 APL.pbc: $(TGE_TARGETS)
 
@@ -94,7 +101,10 @@ clean: testclean
   "lib@slash@POST@slash@*.pbc" \
   lib@slash@pge2past.pir \
   lib@slash@past2post.pir \
-  lib@slash@post2pir.pir
+  lib@slash@post2pir.pir \
+  lib@slash@ASTGrammar.pbc \
+  lib@slash@OSTGrammar.pbc \
+  lib@slash@PIRGrammar.pbc
 
 realclean: clean
 	$(RM_F) Makefile

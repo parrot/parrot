@@ -1,7 +1,5 @@
 Current status:
 
-Only a shell of a language at this point.
-
 Things that work:
 
 - String parsing.
@@ -26,9 +24,6 @@ Things to do:
   requires more work - there are other operators/functions that will require 
   the ability to call a generic sub or method.
 
-- TGE is slow. At least part of this is due to inability to precompile.
-  on Allison's list of things to do.
-
 - Need more tests! Add more tests to t/dyadic.t. Int * Float is alright, but
   need Int * Int and Float * Float.
 
@@ -43,7 +38,7 @@ Things to do:
 - Add function declarations.
 
 - Add vectors (May involve re-doing how we handle strings, as from APL's
-  point of views, strings are just vectors of characters)
+  point of view, strings are just vectors of characters)
 
 - Add DOMAIN ERROR exceptions when trying to use certain operators on
   strings
