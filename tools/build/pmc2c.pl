@@ -1,10 +1,10 @@
 #! perl -w
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
 
-tools/build/pmc2c.pl - PMC compiler (Version 2)
+tools/build/pmc2c.pl - PMC definition to C compiler
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ A preamble, consisting of code to be copied directly to the .c file
 
 The C<pmclass> declaration:
 
-	pmclass PMCNAME [flags] {
+    pmclass PMCNAME [flags] {
 
 where C<flags> are:
 
@@ -189,7 +189,7 @@ The High level language this PMC corresponds to.
 
 The basic parrot PMC type that this PMC correspond to for C<.HLL> usage. For example:
 
- pmcclass TclInt hll Tcl maps Integer
+    pmcclass TclInt hll Tcl maps Integer
 
 allows this PMC to automatically be used when autoboxing C<I> registers to PMCs.
 
@@ -265,15 +265,18 @@ reused.
 
 =cut
 
+use strict;
+use warnings;
+
 use FindBin;
 use lib "$FindBin::Bin/../..";
 use lib "$FindBin::Bin/../../lib";
 use Parrot::Vtable;
 use Parrot::Pmc2c qw(count_newlines);
 use Parrot::Pmc2c::Library;
-use strict;
 use Data::Dumper;
 use Getopt::Long;
+
 my %opt;
 
 main();

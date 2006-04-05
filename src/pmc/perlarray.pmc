@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -62,7 +62,12 @@ Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
     return value;
 }
 
-pmclass PerlArray extends Array need_ext does array {
+pmclass PerlArray
+    extends Array
+    need_ext
+    does array
+    hll Perl
+    maps ResizablePMCArray {
 
 /*
 

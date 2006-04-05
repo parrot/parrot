@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -22,8 +22,6 @@ These are the vtable functions for the Hash PMC.
 #include <assert.h>
 
 
-/* These are set in class_init */
-
 /*
 
 =item C<static PMC * get_integer_pmc(Interp* interpreter, INTVAL base_type )>
@@ -38,19 +36,15 @@ TODO: PMCs extending Hash should probably register themselves.
 
 static PMC* get_integer_pmc(Interp* interpreter, INTVAL base_type ) {
 
-    switch ( base_type ) {
-        case enum_class_PerlHash:
-            return pmc_new(interpreter, enum_class_PerlInt);
-        default:
-            return pmc_new(interpreter, enum_class_Integer);
-    }
+    return pmc_new(interpreter,
+                   Parrot_get_ctx_HLL_type(interpreter, enum_class_Integer) );
 }
 
 /*
 
 =item C<static PMC * get_none_pmc(Interp* interpreter, INTVAL base_type )>
 
-As C<PerlUndef> and C<None> are singleton PMCs, it is probably
+As C<None> is a singleton PMCs, it is probably
 cheap to call C<pmc_new>.
 
 TODO: PMCs extending Hash should probably register themselves.
@@ -61,12 +55,8 @@ TODO: PMCs extending Hash should probably register themselves.
 
 static PMC * get_none_pmc(Interp* interpreter, INTVAL base_type ) {
 
-    switch ( base_type ) {
-        case enum_class_PerlHash:
-            return pmc_new(interpreter, enum_class_PerlUndef);
-        default:
-            return pmc_new(interpreter, enum_class_None);
-    }
+    return pmc_new(interpreter,
+                   Parrot_get_ctx_HLL_type(interpreter, enum_class_None) );
 }
 
 /*
@@ -83,12 +73,8 @@ TODO: PMCs extending Hash should probably register themselves.
 
 static PMC * get_number_pmc(Interp* interpreter, INTVAL base_type ) {
 
-    switch ( base_type ) {
-        case enum_class_PerlHash:
-            return pmc_new(interpreter, enum_class_PerlNum);
-        default:
-            return pmc_new(interpreter, enum_class_Float);
-    }
+    return pmc_new(interpreter,
+                   Parrot_get_ctx_HLL_type(interpreter, enum_class_Float) );
 }
 
 /*
@@ -105,12 +91,8 @@ TODO: PMCs extending Hash should probably register themselves.
 
 static PMC * get_string_pmc(Interp* interpreter, INTVAL base_type ) {
 
-    switch ( base_type ) {
-        case enum_class_PerlHash:
-            return pmc_new(interpreter, enum_class_PerlString);
-        default:
-            return pmc_new(interpreter, enum_class_String);
-    }
+    return pmc_new(interpreter,
+                   Parrot_get_ctx_HLL_type(interpreter, enum_class_String) );
 }
 
 

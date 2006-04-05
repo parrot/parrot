@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/pmc/perlhash.pmc - Perl Hash
+src/pmc/perlhash.pmc - PerlHash PMC
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the PerlHash base class.
+These are the vtable functions for the PerlHash PMC.
 
 =head2 Functions
 
@@ -24,8 +24,12 @@ These are the vtable functions for the PerlHash base class.
  * We would get recursive marking of a deeply nested HoHoH...
  */
 
-pmclass PerlHash extends Hash need_ext does hash {
-
+pmclass PerlHash
+    extends Hash
+    need_ext
+    does hash
+    hll Perl
+    maps Hash {
 }
 
 /*

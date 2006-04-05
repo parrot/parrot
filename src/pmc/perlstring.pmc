@@ -24,7 +24,12 @@ not from C<String>.
 
 void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
 
-pmclass PerlString extends String does string does scalar {
+pmclass PerlString
+    extends String
+    does string
+    does scalar 
+    hll Perl
+    maps String {
 
 /*
 

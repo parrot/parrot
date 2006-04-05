@@ -1,4 +1,4 @@
-# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -23,11 +23,13 @@ file) is used by F<tools/build/pmc2c.pl> to generate C code from PMC files.
 package Parrot::Pmc2c;
 
 use strict;
-use vars qw(@EXPORT_OK @writes %writes );
+use warnings;
+
+use vars qw( @writes %writes );
 use Parrot::PMC qw(%pmc_types);
 
 use base qw( Exporter );
-@EXPORT_OK = qw(count_newlines gen_ret dont_edit dynext_load_code);
+our @EXPORT_OK = qw(count_newlines gen_ret dont_edit dynext_load_code);
 
 BEGIN {
     @writes = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);

@@ -1,9 +1,9 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 37;
@@ -505,7 +505,13 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Getting values from undefined keys");
+pir_output_is(<< 'CODE', <<'OUTPUT', "Getting values from undefined keys");
+
+# no need to load a lib, as Perl* PMCs are still static
+.HLL 'Perl', ''    
+
+.sub test :main
+
     new P2, .PerlHash
 
     set I0, P2["qwerty"]
@@ -529,7 +535,7 @@ OK3:  print "ok 3\n"
     eq S1, "PerlUndef", OK4
     print "not "
 OK4:  print "ok 4\n"
-    end
+.end
 CODE
 ok 1
 ok 2
@@ -893,8 +899,15 @@ CODE
 42value
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
+pir_output_is(<< 'CODE', <<'OUTPUT', "entry types - type_keyed");
+
+# no need to load a lib, as Perl* PMCs are still static
+.HLL 'Perl', ''    
+
 .include "pmctypes.pasm"
+
+.sub test :main
+
     new P1, .PerlHash
 
     new P2, .PerlInt
@@ -929,7 +942,7 @@ ok4:print "PerlNum\n"
     print "not "
 ok5:print "PerlString\n"
 
-    end
+.end
 CODE
 PerlInt
 Integer
@@ -978,14 +991,20 @@ ok 10
 10
 OUTPUT
 
-pasm_output_is(<<'CODE', '', "reusing the undef");
+pir_output_is(<< 'CODE', '', "entry types - type_keyed");
+
+# no need to load a lib, as Perl* PMCs are still static
+.HLL 'Perl', ''    
+
+.sub test :main
+
     new P0, .PerlHash
     set P1, P0["no"]
     print P1
     set P1, "one"
     set P2, P0["nada"]
     print P2
-    end
+.end
 CODE
 
 pasm_output_is(<<'CODE', <<OUTPUT, "exists with constant string key");
