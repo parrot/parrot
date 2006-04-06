@@ -21,10 +21,9 @@ the faster dispatch of operations.
 
 */
 
-#include "parrot/runops_cores.h"
+#include "runops_cores.h"
 #include "parrot/embed.h"
 #include "parrot/trace.h"
-
 #include "parrot/interp_guts.h"
 
 #ifdef HAVE_COMPUTED_GOTO
@@ -241,7 +240,7 @@ runops_profile_core(Interp *interpreter, opcode_t *pc)
 
 =head1 SEE ALSO
 
-F<include/parrot/runops_cores.h>.
+F<src/runops_cores.h>.
 
 =cut
 
