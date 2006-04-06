@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -83,7 +83,7 @@ no memory available.
 static PARROT_INLINE void*
 xcalloc(size_t n, size_t size)
 {
-    void *p = calloc(n, size);
+    void * const p = calloc(n, size);
     if (!p)
         do_panic(NULL, "calloc: out of mem", __FILE__, __LINE__);
     return p;
@@ -104,7 +104,7 @@ is no memory available.
 static PARROT_INLINE void*
 xrealloc(void *p, size_t size)
 {
-    void *n = realloc(p, size);
+    void * const n = realloc(p, size);
     if (!n)
         do_panic(NULL, "realloc: out of mem", __FILE__, __LINE__);
     return n;
@@ -125,9 +125,10 @@ refcounting in DOD. C<bufstart> is incremented by that C<INTVAL>.
 void *
 Parrot_reallocate(Interp *interpreter, void *from, size_t size)
 {
-    Buffer * buffer = from;
+    Buffer * const buffer = from;
+    const size_t oldlen = PObj_buflen(buffer);
     void *p;
-    size_t oldlen = PObj_buflen(buffer);
+
     if (!PObj_bufstart(buffer)) {
         p = 1 + (INTVAL *)xcalloc(1, sizeof(INTVAL) + size);
     }
@@ -159,8 +160,9 @@ bytes of memory required.
 void *
 Parrot_allocate(Interp *interpreter, void *buffer, size_t size)
 {
-    Buffer * b = buffer;
-    void *p = xmalloc(sizeof(INTVAL) + size);
+    Buffer * const b = buffer;
+    void * const p = xmalloc(sizeof(INTVAL) + size);
+
     *(INTVAL *)p = 0;
     PObj_bufstart(b) = 1 + (INTVAL *)p;
     PObj_buflen(b) = size;
@@ -170,8 +172,7 @@ Parrot_allocate(Interp *interpreter, void *buffer, size_t size)
 /*
 
 =item C<void *
-Parrot_allocate_zeroed(Interp *interpreter, void *buffer,
-        size_t size)>
+Parrot_allocate_zeroed(Interp *interpreter, void *buffer, size_t size)>
 
 Allocates, zeros and returns the required memory. C<size> is the number
 in bytes of memory required.
@@ -181,10 +182,10 @@ in bytes of memory required.
 */
 
 void *
-Parrot_allocate_zeroed(Interp *interpreter, void *buffer,
-        size_t size)
+Parrot_allocate_zeroed(Interp *interpreter, void *buffer, size_t size)
 {
-    Buffer * b = buffer;
+    Buffer * const b = buffer;
+
     PObj_bufstart(b) = 1 + (INTVAL *)xcalloc(1, sizeof(INTVAL) + size);
     PObj_buflen(b) = size;
     return b;
@@ -193,27 +194,23 @@ Parrot_allocate_zeroed(Interp *interpreter, void *buffer,
 /*
 
 =item C<void *
-Parrot_reallocate_string(Interp *interpreter, STRING *str,
-                         size_t size)>
+Parrot_reallocate_string(Interp *interpreter, STRING *str, size_t size)>
 
 Reallocates the string buffer in C<*str> and returns it. C<size> is the
 number of bytes memory required.
-
 
 =cut
 
 */
 
 void *
-Parrot_reallocate_string(Interp *interpreter, STRING *str,
-                         size_t size)
+Parrot_reallocate_string(Interp *interpreter, STRING *str, size_t size)
 {
-    void *p;
-    size_t pad;
     if (!PObj_bufstart(str))
         Parrot_allocate_string(interpreter, str, size);
     else if (size) {
-        pad = STRING_ALIGNMENT - 1;
+        const size_t pad = STRING_ALIGNMENT - 1;
+        void *p;
         size = ((size + pad + sizeof(INTVAL)) & ~pad);
         p = xrealloc((char *)((INTVAL*)PObj_bufstart(str) - 1), size);
         PObj_bufstart(str) = str->strstart = (char *)p + sizeof(INTVAL);
@@ -226,8 +223,7 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
 /*
 
 =item C<void *
-Parrot_allocate_string(Interp *interpreter, STRING *str,
-                       size_t size)>
+Parrot_allocate_string(Interp *interpreter, STRING *str, size_t size)>
 
 Allocates the string buffer in C<*str> and returns it. C<size> is the
 number bytes of memory required.
@@ -237,12 +233,11 @@ number bytes of memory required.
 */
 
 void *
-Parrot_allocate_string(Interp *interpreter, STRING *str,
-                       size_t size)
+Parrot_allocate_string(Interp *interpreter, STRING *str, size_t size)
 {
     void *p;
-    size_t pad;
-    pad = STRING_ALIGNMENT - 1;
+    const size_t pad = STRING_ALIGNMENT - 1;
+
     size = ((size + pad + sizeof(INTVAL)) & ~pad);
     p = xcalloc(1, size);
     *(INTVAL*)p = 0;

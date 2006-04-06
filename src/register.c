@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -98,12 +98,11 @@ void
 destroy_context(Interp *interpreter)
 {
     int slot;
-    void *ptr, *next;
 
     for (slot = 0; slot < interpreter->ctx_mem.n_free_slots; ++slot) {
-        ptr = interpreter->ctx_mem.free_list[slot];
+        void *ptr = interpreter->ctx_mem.free_list[slot];
         while (ptr) {
-            next = *(void **) ptr;
+            void * const next = *(void **) ptr;
             mem_sys_free(ptr);
             ptr = next;
         }
@@ -262,14 +261,12 @@ init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
 struct Parrot_Context *
 Parrot_dup_context(Interp *interpreter, struct Parrot_Context *old)
 {
-    size_t reg_alloc, diff;
-    int slot;
-    void *ptr;
+    size_t diff;
     struct Parrot_Context *ctx;
 
-    reg_alloc = old->regs_mem_size;
-    slot = reg_alloc >> 3;
-    ptr = interpreter->ctx_mem.free_list[slot];
+    const size_t reg_alloc = old->regs_mem_size;
+    const int slot = reg_alloc >> 3;
+    void * ptr = interpreter->ctx_mem.free_list[slot];
 
     if (ptr) {
         interpreter->ctx_mem.free_list[slot] = *(void **) ptr;
@@ -290,10 +287,9 @@ Parrot_dup_context(Interp *interpreter, struct Parrot_Context *old)
 struct Parrot_Context *
 Parrot_push_context(Interp *interpreter, INTVAL *n_regs_used)
 {
-    struct Parrot_Context *old, *ctx;
+    struct Parrot_Context * const old = CONTEXT(interpreter->ctx);
+    struct Parrot_Context * const ctx = Parrot_alloc_context(interpreter, n_regs_used);
 
-    old = CONTEXT(interpreter->ctx);
-    ctx = Parrot_alloc_context(interpreter, n_regs_used);
     ctx->caller_ctx = old;
     ctx->current_sub = old->current_sub;  /* doesn't change */
     /* copy more ? */
@@ -303,9 +299,8 @@ Parrot_push_context(Interp *interpreter, INTVAL *n_regs_used)
 void
 Parrot_pop_context(Interp *interpreter)
 {
-    struct Parrot_Context *old, *ctx;
-    ctx = CONTEXT(interpreter->ctx);
-    old = ctx->caller_ctx;
+    struct Parrot_Context * const ctx = CONTEXT(interpreter->ctx);
+    struct Parrot_Context * const old = ctx->caller_ctx;
 
     Parrot_free_context(interpreter, ctx, 1);
     /* restore old, set cached interpreter base pointers */
@@ -319,24 +314,25 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
 {
     struct Parrot_Context *old, *ctx;
     void *ptr, *p;
-    int i, n, slot;
-    size_t to_alloc, reg_alloc, size_n, size_nip;
 
     /*
      * TODO (OPT) if we allocate a new context due to a self-recursive call
      *      create a spezialized version that just uses caller's size
      */
-    size_n = sizeof(FLOATVAL) * n_regs_used[REGNO_NUM];
-    size_nip = size_n +
+    const size_t size_n = sizeof(FLOATVAL) * n_regs_used[REGNO_NUM];
+    const size_t size_nip = size_n +
         sizeof(INTVAL) *   n_regs_used[REGNO_INT] +
         sizeof(PMC*) *     n_regs_used[REGNO_PMC];
-    reg_alloc = size_nip +
+    size_t reg_alloc = size_nip +
         sizeof(STRING*) *  n_regs_used[REGNO_STR];
 
-    slot = (reg_alloc + 7) >> 3;
+    const int slot = (reg_alloc + 7) >> 3;
     reg_alloc = slot << 3;
+
     if (slot >= interpreter->ctx_mem.n_free_slots) {
-        n = slot + 1;
+        const int n = slot + 1;
+        int i;
+
         interpreter->ctx_mem.free_list = mem_sys_realloc(
                 interpreter->ctx_mem.free_list, n * sizeof(void*));
         for (i = interpreter->ctx_mem.n_free_slots; i < n; ++i)
@@ -350,7 +346,7 @@ Parrot_alloc_context(Interp *interpreter, INTVAL *n_regs_used)
         interpreter->ctx_mem.free_list[slot] = *(void **) ptr;
     }
     else {
-        to_alloc = reg_alloc + ALIGNED_CTX_SIZE;
+        const size_t to_alloc = reg_alloc + ALIGNED_CTX_SIZE;
         if (old)
             ptr = mem_sys_allocate(to_alloc);
         else
@@ -458,15 +454,14 @@ setup_register_stacks(Interp * interpreter)
 void
 Parrot_push_regs(Interp *interpreter)
 {
-    Stack_Chunk_t *chunk, **chunk_p;
-    save_regs_t   *save_r;
-    parrot_context_t *ctx;
+    Stack_Chunk_t *chunk;
     size_t size_nip, size_nips;
     void *ptr;
 
-    ctx = CONTEXT(interpreter->ctx);
-    chunk_p = &ctx->reg_stack;
-    save_r = stack_prepare_push(interpreter, chunk_p);
+    parrot_context_t * const ctx = CONTEXT(interpreter->ctx);
+    Stack_Chunk_t **   const chunk_p = &ctx->reg_stack;
+    save_regs_t *      const save_r = stack_prepare_push(interpreter, chunk_p);
+
     save_r->old_bp_ni.regs_i = ctx->bp.regs_i;
     save_r->old_bp_ps.regs_s = ctx->bp_ps.regs_s;
     save_r->n_regs_str = ctx->n_regs_used[REGNO_STR];
@@ -489,14 +484,10 @@ Parrot_push_regs(Interp *interpreter)
 void
 Parrot_pop_regs(Interp* interpreter)
 {
-    Stack_Chunk_t *chunk, **chunk_p;
-    save_regs_t   *save_r;
-    parrot_context_t *ctx;
-
-    ctx = CONTEXT(interpreter->ctx);
-    chunk_p = &ctx->reg_stack;
-    chunk = *chunk_p;
-    save_r = stack_prepare_pop(interpreter, chunk_p);
+    parrot_context_t * const ctx = CONTEXT(interpreter->ctx);
+    Stack_Chunk_t **   const chunk_p = &ctx->reg_stack;
+    Stack_Chunk_t *    const chunk = *chunk_p;
+    save_regs_t *      const save_r = stack_prepare_pop(interpreter, chunk_p);
 
     /* restore register base pointers */
     interpreter->ctx.bp.regs_i    = ctx->bp.regs_i    =
@@ -524,12 +515,12 @@ Marks the register stack and it's registers as live.
 void
 mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
-    int i;
-    PObj *obj;
     struct Interp_Context ctx;
     save_regs_t   *save_r;
 
     for (; ; chunk = chunk->prev) {
+        int i;
+
         pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev)
             break;
@@ -537,12 +528,12 @@ mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
         ctx.bp.regs_i    = NULL;
         ctx.bp_ps.regs_p = save_r->old_bp_ps.regs_p;
         for (i = 0; i < save_r->n_regs_pmc; ++i) {
-            obj = (PObj *)CTX_REG_PMC(&ctx, i);
+            PObj * const obj = (PObj *)CTX_REG_PMC(&ctx, i);
             if (obj)
                 pobject_lives(interpreter, obj);
         }
         for (i = 0; i < save_r->n_regs_str; ++i) {
-            obj = (PObj *)CTX_REG_STR(&ctx, i);
+            PObj * const obj = (PObj *)CTX_REG_STR(&ctx, i);
             if (obj)
                 pobject_lives(interpreter, obj);
         }
