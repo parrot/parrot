@@ -10,8 +10,9 @@ Things to do:
 
 - eliminate use of PGE::OpTable; APL doesn't have operator precedence, so
   this is kind of overkill. We can specify everything in the grammar itself.
+  [pmichaud]
 
-- Add framework to allow non-opcode operators - for example, Circular doesn't
+- Add framework to allow non-opcode operators - for example, circle doesn't
   map directly to parrot opcodes, but requires a translation:
   
   1 CIRCLE 2 ===> sin 2
@@ -32,8 +33,7 @@ Things to do:
 - Remove the punie remnant of 'print' - in APL, the default is to print if 
   The leftmost item wasn't assignment.
 
-- Any skipped tests. (Which are skipped instead of TODO'd only because of
-  the current speed of APL)
+- Any todo'd tests.
 
 - Add function declarations.
 

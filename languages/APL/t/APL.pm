@@ -8,12 +8,11 @@ BEGIN {
     import Test::Base qw/ -Base /;
   };
   if ($@) {
-    require Test::More;
-    import Test::More;
     plan(skip_all => "APL tests require Test::Base.;");
     exit 0;
   }
 }
+
 use Parrot::Config;
 use Parrot::Test;
 
@@ -36,21 +35,29 @@ filters {
 # it doesn't actually output the skipped test in the TAP output. It just
 # fails to run the test.
 
+# mark todo tests with TODO - but, unless an environment variable is set,
+# skip the tests - speed things up for end users, give developers the ability
+# to easily see if anything new is passing.
+
 sub run_apl_is() {
   foreach my $block (blocks) {
     my $apl    = $block->APL;
     my $output = $block->out;
-    my $skip   = $block->skip;
     my $todo   = $block->todo;
-    if (defined($skip)) {
-      SKIP: {
-        skip($skip, 1) if $skip;
-        Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
+    if (defined($todo)) {
+      if (! $todo) {
+        $todo = "not implemented";
       }
-    } elsif (defined($todo)) {
-      TODO: {
-        local $TODO = $todo;
-        Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
+      if ($ENV{APLDEV}) {
+        TODO: {
+          local $TODO = $todo;
+          Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
+        }
+      } else {
+        SKIP: {
+          skip("not implemented", 1);
+          Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
+        }
       }
     } else {
       Parrot::Test::language_output_is('APL', $apl, $output, $block->name);

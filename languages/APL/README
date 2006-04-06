@@ -19,3 +19,12 @@ that regard.
 
 ** This isn't APL at the moment, it's merely a test at using unicode
 operators with PGE/TGE
+
+FONT: The source code for APL uses unicode codepoints that you might
+not have a font for. If you can't read the code, try installing one
+of the fonts listed at:
+
+http://www.sigapl.org/font.htm
+
+
+

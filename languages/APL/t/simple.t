@@ -10,4 +10,4 @@ __DATA__
 === vectors
 --- APL: print 10 2 3
 --- out: 10 2 3
---- skip: basic vector support missing
+--- todo: basic vector support missing

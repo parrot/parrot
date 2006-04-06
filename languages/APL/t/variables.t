@@ -13,7 +13,7 @@ X←2
 X
 --- out
 2
---- skip: not implemented
+--- todo
 
 === assignment, character vector
 --- APL
@@ -21,7 +21,7 @@ X←'foo'
 X
 --- out
 foo
---- skip: not implemented
+--- todo
 
 === longer var names
 --- APL
@@ -29,7 +29,7 @@ SOMEVARIABLE←3.14
 SOMEVARIABLE
 --- out
 3.14
---- skip: not implemented
+--- todo
 
 === assignment, integer vector
 --- APL
@@ -37,4 +37,4 @@ X←1 2 3 4
 X
 --- out
 1 2 3 4
---- skip: not implemented
+--- todo

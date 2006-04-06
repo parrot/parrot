@@ -75,6 +75,7 @@ help:
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
+	@echo "  devtest:           Run the test suite, using TODO not SKIP"
 	@echo "  testclean:         Clean up test results."
 	@echo ""
 	@echo "Cleaning:"
@@ -88,6 +89,9 @@ help:
 
 test: all
 	$(PERL) -Ilib t@slash@harness t@slash@*.t
+
+devtest: all
+	env APLDEV=1 $(PERL) -Ilib t@slash@harness t@slash@*.t
 
 testclean:
 	$(RM_F) "t@slash@*.apl" "t@slash@*.out"
