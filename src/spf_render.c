@@ -163,7 +163,14 @@ handle_flags(Interp *interpreter,
     }
 
     if ((info->flags & FLAG_WIDTH) && info->width > len) {
-        STRING *fill = CONST_STRING(interpreter, info->flags & FLAG_ZERO ? "0" : " ");
+        STRING *fill;
+
+        if (info->flags & FLAG_ZERO) {
+            fill = CONST_STRING(interpreter, "0");
+        }
+        else {
+            fill = CONST_STRING(interpreter, " ");
+        }
 
         fill = string_repeat(interpreter, fill, info->width - len, NULL);
 
