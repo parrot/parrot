@@ -55,7 +55,7 @@ test: all
 	$(PERL) -Ilib t/harness t/*.t
 
 testclean:
-	$(RM_F) "t/*.p1" "t/*.out"
+	$(RM_F) "t/*.p1" "t/*.out" "t/*.pir"
 
 clean: testclean
 	$(RM_F) punie.pbc \
