@@ -247,30 +247,23 @@ it is.
 Exception handlers are derived from continuations. They are ordinary
 subroutines that follow the Parrot calling conventions, but are never
 explicitly called from within user code. User code pushes an exception
-handler onto the control stack with the C<set_eh> opcode. The system
+handler onto the control stack with the C<push_eh> opcode. The system
 calls the installed exception handler only when an exception is thrown.
 
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20                  # push handler on control stack
-    null P10                    # set register to null
+    push_eh _handler            # push handler on control stack
     find_global P10, "none"     # may throw exception
     clear_eh                    # pop the handler off the stack
     ...
 
   _handler:                     # if not, execution continues here
-    is_null P10, not_found      # test P10
+    get_params '(0,0)', P0, S0  # handler is called with (exception, message)
     ...
 
-This example creates a new exception handler subroutine with the
-C<newsub> opcode and installs it on the control stack with the
-C<set_eh> opcode. It sets the C<P10> register to a null value (so it
-can be checked later) and attempts to retrieve the global variable
-named C<none>. If the global variable is found, the next statement
+If the global variable is found, the next statement
 (C<clear_eh>) pops the exception handler off the control stack and
 normal execution continues. If the C<find_global> call doesn't find
-C<none> it throws an exception by pushing an exception object onto the
-control stack. When Parrot sees that it has an exception, it pops it
-off the control stack and calls the exception handler C<_handler>.
+C<none> it throws an exception by passing an exception object to the
+exception handler. 
 
 The first exception handler in the control stack sees every exception
 thrown. The handler has to examine the exception object and decide
