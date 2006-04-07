@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 
 BEGIN { use_ok('Parrot::PIR::Formatter') };
 
@@ -104,6 +104,22 @@ END_PIR
 .end
 END_FORMATTED
 
+reformat_ok(<<'END_PIR',<<'END_FORMATTED','multiple .sub blocks');
+ .sub main :main
+ $I0 = 8
+ .end
+ .sub secondary
+ $I0 = 8
+ .end
+END_PIR
+.sub main :main
+    $I0 = 8
+.end
+
+.sub secondary
+    $I0 = 8
+.end
+END_FORMATTED
 
 sub reformat_ok {
   my $code = shift;

@@ -103,10 +103,14 @@ sub get_formatted {
                 }
                 $line = ( $self->{indent} x $level ) . $line;
                 if ( $line =~ $block_begin ) {
+                    push @output, [ 1, q{} ];
                     $level++;
                 }
             }
             push @output, [ 1, $line ];
+            if ( $line =~ $block_end ) {
+                push @output, [ 1, q{} ];
+            }
         }
     }
     # Badly formatted pir might end in the middle of a verbatim chunk.
@@ -200,6 +204,7 @@ Many things to muck with line could be done here:
  o heredocs could be treated as blocks to set them off visually.
  o could remove/add explicit declarations of string type
  o could add in single quotes wrapping .sub names.
+ o could add in single quotes wrapping method names.
  o could convert double to single quotes when possible.
  o could fixup Pmc vs. .Pmc
  o could convert strings with embedded newlines to heredocs.
