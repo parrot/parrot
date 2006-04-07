@@ -181,6 +181,7 @@ end
 
 function createClass (...)
     local c = {}  -- new class
+    local arg = {...}
 
     -- class will search for each method in the list of its
     -- parents ('arg' is the list of parents)
