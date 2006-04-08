@@ -33,6 +33,9 @@ p6rule_isnt('bazaar', 'a*:a', 'basic');
 p6rule_is  ('abbabbababba', '^[a|b]*  aba', 'control');
 p6rule_isnt('abbabbababba', '^[a|b]*: aba', 'outside a group');
 
+p6rule_is  ('123abc', '\d+:', 'cut on character class shortcut');
+p6rule_isnt('abc', '\d+:', 'cut on character class shortcut');
+
 
 ## :: -- cut over surrounding group of alternations
 p6rule_is  ('verify', '[ if    not | ify ]', 'control');
@@ -61,6 +64,7 @@ p6rule_isnt('whence',
         [ _MASTER => '<subrule> | whence' ],
     ],
     "<commit> in nested subrule");
+
   
 # remember to change the number of tests :-)
-BEGIN { plan tests => 17; }
+BEGIN { plan tests => 19; }
