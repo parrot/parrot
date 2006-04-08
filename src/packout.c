@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2005 The Perl Foundation. All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation. All rights reserved.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -29,6 +29,7 @@ contiguous region of memory.
 
 #define TRACE_PACKFILE_PMC 0
 
+/* XXX This should be in an external file */
 extern struct PackFile_Directory *directory_new (Interp*, struct PackFile *pf);
 
 /*
@@ -46,13 +47,11 @@ opcode_t
 PackFile_pack_size(Interp* interpreter, struct PackFile *self)
 {
     opcode_t size;
-    struct PackFile_Directory *dir = &self->directory;
+    struct PackFile_Directory * const dir = &self->directory;
 
     size = PACKFILE_HEADER_BYTES / sizeof(opcode_t);
-    ++size;     /* magic */
-    ++size;     /* opcode type */
-    ++size;     /* directory type */
-    ++size;     /* pad */
+
+    size += 4; /* magic + opcode type + directory type + pad */
 
     dir->base.file_offset = size;
     size += PackFile_Segment_packed_size(interpreter,
@@ -86,7 +85,7 @@ PackFile_pack(Interp* interpreter, struct PackFile *self, opcode_t *cursor)
     opcode_t *ret;
 
     size_t size;
-    struct PackFile_Directory *dir = &self->directory;
+    struct PackFile_Directory * const dir = &self->directory;
     struct PackFile_Segment *seg;
 
     self->src = cursor;
@@ -126,7 +125,7 @@ size_t
 PackFile_ConstTable_pack_size(Interp *interpreter, struct PackFile_Segment *seg)
 {
     opcode_t i;
-    struct PackFile_ConstTable *self = (struct PackFile_ConstTable *) seg;
+    struct PackFile_ConstTable * const self = (struct PackFile_ConstTable *) seg;
     size_t size = 1;    /* const_count */
 
     for (i = 0; i < self->const_count; i++)
@@ -157,7 +156,7 @@ opcode_t *
 PackFile_ConstTable_pack(Interp *interpreter,
         struct PackFile_Segment *seg, opcode_t *cursor)
 {
-    struct PackFile_ConstTable *self = (struct PackFile_ConstTable *)seg;
+    struct PackFile_ConstTable * const self = (struct PackFile_ConstTable *)seg;
     opcode_t i;
 
     /* remember const_table for find_in_const */
@@ -226,7 +225,7 @@ PackFile_Constant_pack(Interp* interpreter,
 {
     struct PMC *key;
     size_t i;
-    opcode_t type, slice_bits;
+    opcode_t slice_bits;
     STRING *image;
 
     *cursor++ = self->type;
@@ -254,7 +253,7 @@ PackFile_Constant_pack(Interp* interpreter,
         *cursor++ = i;
         /* and now type / value per component */
         for (key = self->u.key; key; key = PMC_data(key)) {
-            type = PObj_get_FLAGS(key);
+            opcode_t type = PObj_get_FLAGS(key);
             slice_bits = 0;
             if ((type & (KEY_start_slice_FLAG|KEY_inf_slice_FLAG)) ==
                     (KEY_start_slice_FLAG|KEY_inf_slice_FLAG))

@@ -151,10 +151,10 @@ parrot_PIC_alloc_store(Interp *interpreter,
 void
 parrot_PIC_destroy(Interp *interpreter, struct PackFile_ByteCode *cs)
 {
-    Parrot_PIC_store *store, *prev;
+    Parrot_PIC_store *store;
 
     for (store = cs->pic_store; store; ) {
-        prev = store->prev;
+        Parrot_PIC_store * const prev = store->prev;
         mem_sys_free(store);
         store = prev;
     }
@@ -173,10 +173,11 @@ int
 parrot_PIC_op_is_cached(Interp *interpreter, int op_code)
 {
     switch (op_code) {
-        case PARROT_OP_infix_ic_p_p: return 1;
-        case PARROT_OP_get_params_pc: return 1;
-        case PARROT_OP_set_returns_pc: return 1;
-        case PARROT_OP_set_args_pc: return 1;
+        case PARROT_OP_infix_ic_p_p:
+        case PARROT_OP_get_params_pc:
+        case PARROT_OP_set_returns_pc:
+        case PARROT_OP_set_args_pc:
+            return 1;
     }
     return 0;
 }
@@ -196,9 +197,7 @@ bytecode segement.
 Parrot_MIC*
 parrot_PIC_alloc_mic(Interp*interpreter, size_t n)
 {
-    Parrot_PIC_store *store;
-
-    store = interpreter->code->pic_store;
+    Parrot_PIC_store * const store = interpreter->code->pic_store;
     assert(n < store->n_mics);
     return store->mic + n;
 }
@@ -206,12 +205,11 @@ parrot_PIC_alloc_mic(Interp*interpreter, size_t n)
 Parrot_PIC*
 parrot_PIC_alloc_pic(Interp* interpreter)
 {
-    Parrot_PIC_store *store, *new_store;
-    size_t size;
+    Parrot_PIC_store *store = interpreter->code->pic_store;
+    Parrot_PIC_store *new_store;
 
-    store = interpreter->code->pic_store;
     if (store->usable < sizeof(Parrot_PIC)) {
-        size = (size_t)(store->n_mics * POLYMORPHIC) * sizeof(Parrot_PIC);
+        size_t size = (size_t)(store->n_mics * POLYMORPHIC) * sizeof(Parrot_PIC);
         if (size == 0)
             size = 2 * sizeof(Parrot_PIC);
         new_store = mem_sys_allocate_zeroed(size + sizeof(Parrot_PIC_store));
@@ -248,7 +246,7 @@ this opcode function is available. Called from C<do_prederef>.
 void *
 parrot_pic_opcode(Interp *interpreter, INTVAL op)
 {
-    int core = interpreter->run_core;
+    const int core = interpreter->run_core;
 #ifdef HAVE_COMPUTED_GOTO
     op_lib_t *cg_lib;
 #endif
@@ -267,10 +265,9 @@ static int
 pass_int(Interp *interpreter, PMC *sig, char *src_base, void **src, 
 		char *dest_base, void **dest)
 {
-    INTVAL arg;
     int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
-        arg = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
+        const INTVAL arg = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
         *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
     return i;
@@ -280,10 +277,9 @@ static int
 pass_num(Interp *interpreter, PMC *sig, char *src_base, void **src, 
 		char *dest_base, void **dest)
 {
-    FLOATVAL arg;
     int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
-        arg = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
+        const FLOATVAL arg = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
         *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
     return i;
@@ -293,10 +289,9 @@ static int
 pass_str(Interp *interpreter, PMC *sig, char *src_base, void **src, 
 		char *dest_base, void **dest)
 {
-    STRING* arg;
     int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
-        arg = *(STRING* *)(src_base + ((opcode_t*)src)[i]);
+        STRING * const arg = *(STRING* *)(src_base + ((opcode_t*)src)[i]);
         *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
     return i;
@@ -306,10 +301,9 @@ static int
 pass_pmc(Interp *interpreter, PMC *sig, char *src_base, void **src, 
 		char *dest_base, void **dest)
 {
-    PMC* arg;
     int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
-        arg = *(PMC* *)(src_base + ((opcode_t*)src)[i]);
+        PMC * const arg = *(PMC* *)(src_base + ((opcode_t*)src)[i]);
         *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= arg;
     }
     return i;
@@ -321,7 +315,7 @@ pass_mixed(Interp *interpreter, PMC *sig, char *src_base, void **src,
 {
     PMC* argP;
     int i, n = SIG_ELEMS(sig);
-    INTVAL *bitp, bits;
+    INTVAL *bitp;
     INTVAL argI;
     FLOATVAL argN;
     STRING *argS;
@@ -329,7 +323,7 @@ pass_mixed(Interp *interpreter, PMC *sig, char *src_base, void **src,
     ASSERT_SIG_PMC(sig);
     bitp = SIG_ARRAY(sig);
     for (i = 2 ; n; ++i, --n) {
-        bits = *bitp++;
+        const INTVAL bits = *bitp++;
         switch (bits) {
             case PARROT_ARG_INTVAL:
                 argI = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
@@ -419,16 +413,17 @@ parrot_pic_check_sig(Interp *interpreter, PMC *sig1, PMC *sig2, int *type)
 static int
 is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
 {
-    PMC *sig1, *sig2;
+    PMC *sig2;
     int n, type;
-    parrot_context_t *caller_ctx, *ctx;
+    parrot_context_t *caller_ctx;
     INTVAL const_nr;
     opcode_t *args;
     PMC *ccont;
+    PMC * const sig1 = (PMC*)(pc[1]);
+    parrot_context_t * const ctx = CONTEXT(interpreter->ctx);
 
     /* check params */
-    sig1 = (PMC*)(pc[1]);
-    ctx = CONTEXT(interpreter->ctx);
+
     if (op == PARROT_OP_set_returns_pc) {
         ccont = ctx->current_cont;
         if (!PMC_cont(ccont)->address)
@@ -544,9 +539,9 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
 void
 parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
 {
-    op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
-    char * _reg_base = (char*)interpreter->ctx.bp.regs_i;
-    opcode_t *cur_opcode = (opcode_t*)pc_pred;
+    op_func_t * const prederef_op_func = interpreter->op_lib->op_func_table;
+    char * const _reg_base = (char*)interpreter->ctx.bp.regs_i;
+    opcode_t * const cur_opcode = (opcode_t*)pc_pred;
     Parrot_MIC *mic = NULL;
 
     if (parrot_PIC_op_is_cached(interpreter, op)) {
