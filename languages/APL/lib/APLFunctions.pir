@@ -2,11 +2,19 @@
 
 APL::Functions - APL built-in functions and operators
 
+=for comment
+
+Note that the sub names here are single quoted - they look
+like unicode, but they're really escaped unicode. Parrot doesn't
+allow unicode sub-names yet, so we escape them and use that instead.
+
+Eventually make these be unicode strings.
+
 =cut
 
-.namespace [ "APL::Functions" ]
+.namespace [ 'APL::Functions' ]
 
-.sub "dyadic:+"                # dyadic add
+.sub 'dyadic:+'                # dyadic add
     .param pmc op1
     .param pmc op2
     $P0 = clone op1

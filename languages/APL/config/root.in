@@ -17,7 +17,10 @@ SOURCES = APL.pir \
   lib/APLFunctions.pir
 
 APL.pbc: $(PARROT) $(SOURCES) 
-    $(PARROT) --output=APL.pbc APL.pir
+	$(PARROT) --output=APL.pbc APL.pir
+
+interactive: APL.pbc
+	$(PARROT) APL.pbc
 
 .SUFFIXES : .pir .pbc .tge .pge
 

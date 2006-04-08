@@ -1,11 +1,11 @@
 ROOT: result(.) = {
     .local pmc result
-    result = new "PAST::Stmt"
-    result."set_node"(node)
+    result = new 'PAST::Stmt'
+    result.'set_node'(node)
     
-    $P0 = node["expression"]
+    $P0 = node['expression']
     $P1 = tree.get('result', $P0, 'APL::Grammar::expression')
-    result["statement"] = $P1
+    result['statement'] = $P1
     .return (result)
 }
 
@@ -15,97 +15,97 @@ APL::Grammar::expression: result(.) = {
     .local string op
     .local pmc children
 
-    $I0 = exists node["target"]
+    $I0 = exists node['target']
     if $I0 goto assignment
-    $I0 = exists node["dyadic_identifier"]
+    $I0 = exists node['dyadic_identifier']
     if $I0 goto dyadic
-    $I0 = exists node["monadic_identifier"]
+    $I0 = exists node['monadic_identifier']
     if $I0 goto monadic
 
   subexpression:
     # A simple subexpression
-    $P0 = node["subexpression"]
+    $P0 = node['subexpression']
     .return tree.get('result', $P0, 'APL::Grammar::subexpression')
 
   assignment:
-    result = new "PAST::Assign"
+    result = new 'PAST::Assign'
     result.set_node(node)
-    $P0 = node["target"]
+    $P0 = node['target']
     $P1 = tree.get('result', $P0, 'APL::Grammar::target')
-    result["target"] = $P1
-    $P0 = node["expression"]
+    result['target'] = $P1
+    $P0 = node['expression']
     $P1 = tree.get('result', $P0, 'APL::Grammar::expression')
-    result["expression"] = $P1
+    result['expression'] = $P1
     .return (result)
 
   dyadic:
     # create a new PAST::Op node
-    result = new "PAST::Op"
+    result = new 'PAST::Op'
     result.set_node(node)
 
     # set the function name for this operator
-    op = node["dyadic_identifier";0]
-    op = concat "dyadic:", op
-    result["op"] = op
+    op = node['dyadic_identifier';0]
+    op = concat 'dyadic:', op
+    result['op'] = op
 
-    # build a "children" array of our (two) operands   
+    # build a 'children' array of our (two) operands   
     children = new .ResizablePMCArray 
-    $P0 = node["subexpression"]
+    $P0 = node['subexpression']
     $P1 = tree.get('result', $P0, 'APL::Grammar::subexpression')
     push children, $P1
-    $P0 = node["expression"]
+    $P0 = node['expression']
     $P0 = $P0[0]
     $P1 = tree.get('result', $P0, 'APL::Grammar::expression')
     push children, $P1
-    result["children"] = children
+    result['children'] = children
     .return (result)
 
   monadic:
     # create a new PAST::Op
-    result = new "PAST::Op"
+    result = new 'PAST::Op'
     result.set_node(node)
 
     # set the function name for this operator
-    op = node["monadic_identifier"]
+    op = node['monadic_identifier']
     op = op[0]
-    op = concat "monadic:", op
-    result["op"] = op
+    op = concat 'monadic:', op
+    result['op'] = op
 
     # build a "children" array of our (one) operand
     children = new .ResizablePMCArray
-    $P0 = node["expression"]
+    $P0 = node['expression']
     $P1 = tree.get('result', $P0, 'APL::Grammar::expression')
     push children, $P1
-    result["children"] = children
+    result['children'] = children
     .return (result)
 }
 
 
 APL::Grammar::subexpression: result(.) = {
-    $P0 = node["simple_expression"]
+    $P0 = node['simple_expression']
     .return tree.get('result', $P0, 'APL::Grammar::simple_expression')
 }
 
 
 APL::Grammar::simple_expression: result(.) = {
-    $P0 = node["array_identifier"]
+    $P0 = node['array_identifier']
     .return tree.get('result', $P0, 'APL::Grammar::array_identifier')
 }
 
 
 APL::Grammar::target: result(.) = {
-    $P0 = node["variable_identifier"]
+    $P0 = node['variable_identifier']
     .return tree.get('result', $P0, 'APL::Grammar::variable_identifier')
 }
 
 
 APL::Grammar::array_identifier: result(.) = {
-    $P0 = node["constant"]
+    $P0 = node['constant']
     unless $P0 goto variable_name
     .return tree.get('result', $P0, 'APL::Grammar::constant')
 
   variable_name:
-    $P0 = node["variable_identifier"]
+    $P0 = node['variable_identifier']
     .return tree.get('result', $P0, 'APL::Grammar::variable_identifier')
 }
 
@@ -115,7 +115,7 @@ APL::Grammar::constant: result(.) = {
     result = new 'PAST::Val'
     result.set_node(node)
     $N0 = node
-    result["value"] = $N0
+    result['value'] = $N0
     .return (result)
 }
 
@@ -125,7 +125,7 @@ APL::Grammar::variable_identifier: result(.) = {
     result = new 'PAST::Var'
     result.set_node(node)
     $S0 = node
-    result["name"] = $S0
+    result['name'] = $S0
     .return (result)
 }
 

@@ -22,7 +22,7 @@ node object.
 
 =cut
 
-.namespace [ "PAST" ]
+.namespace [ 'PAST' ]
 
 =item C<__onload()>
 
@@ -30,23 +30,23 @@ Creates the C<PAST::*> classes.
 
 =cut
 
-.sub "__onload" :load
+.sub '__onload' :load
     .local pmc base
-    $P0 = getclass "Hash"
-    base = subclass $P0, "PAST::Node"
-    addattribute base, "$.source"                  # original source
-    addattribute base, "$.pos"                     # offset position
+    $P0 = getclass 'Hash'
+    base = subclass $P0, 'PAST::Node'
+    addattribute base, '$.source'                  # original source
+    addattribute base, '$.pos'                     # offset position
 
-    $P0 = subclass base, "PAST::Stmts"
-    $P0 = subclass base, "PAST::Stmt"
-    $P0 = subclass base, "PAST::Exp"
-    $P0 = subclass base, "PAST::Op"
-    $P0 = subclass base, "PAST::Val"
-    $P0 = subclass base, "PAST::Var"
-    $P0 = subclass base, "PAST::Assign"
+    $P0 = subclass base, 'PAST::Stmts'
+    $P0 = subclass base, 'PAST::Stmt'
+    $P0 = subclass base, 'PAST::Exp'
+    $P0 = subclass base, 'PAST::Op'
+    $P0 = subclass base, 'PAST::Val'
+    $P0 = subclass base, 'PAST::Var'
+    $P0 = subclass base, 'PAST::Assign'
 .end
 
-.namespace [ "PAST::Node" ]
+.namespace [ 'PAST::Node' ]
 
 =head2  PAST::Node methods
 
@@ -74,7 +74,7 @@ of the parse tree).
 
 =cut
 
-.sub "set_node" :method
+.sub 'set_node' :method
     .param pmc match                               # match object of source
     $P0 = getattribute self, "PAST::Node\x0$.source"
     $S0 = match
@@ -92,7 +92,7 @@ Return the source code associated with the current node.
 
 =cut
 
-.sub "source" :method
+.sub 'source' :method
     $P0 = getattribute self, "PAST::Node\x0$.source"
     .return ($P0)
 .end
@@ -105,7 +105,7 @@ node.
 
 =cut
 
-.sub "pos" :method
+.sub 'pos' :method
     $P0 = getattribute self, "PAST::Node\x0$.pos"
     .return ($P0)
 .end
@@ -118,7 +118,7 @@ with C<Data::Dumper>.
 
 =cut
 
-.sub "__dump" :method
+.sub '__dump' :method
     .param pmc dumper
     .param string label
     .local string indent, subindent
@@ -127,12 +127,12 @@ with C<Data::Dumper>.
     .local pmc hash
     .local int hascapts
 
-    (subindent, indent) = dumper."newIndent"()
-    print "=> "
+    (subindent, indent) = dumper.'newIndent'()
+    print '=> '
     $S0 = self.source()
-    dumper."genericString"("", $S0)
+    dumper.'genericString'('', $S0)
     $I0 = self.pos()
-    print " @ "
+    print ' @ '
     print $I0
     hascapts = 0
     iter = new .Iterator, self
@@ -140,25 +140,25 @@ with C<Data::Dumper>.
   dump_hash_1:
     unless iter goto dump_end
     if hascapts goto dump_hash_2
-    print " {"
+    print ' {'
     hascapts = 1
   dump_hash_2:
     print "\n"
     print subindent
     key = shift iter
     val = iter[key]
-    print "<"
+    print '<'
     print key
-    print "> => "
-    dumper."dump"(label, val)
+    print '> => '
+    dumper.'dump'(label, val)
     goto dump_hash_1
   dump_end:
     unless hascapts goto end
     print "\n"
     print indent
-    print "}"
+    print '}'
   end:
-    dumper."deleteIndent"()
+    dumper.'deleteIndent'()
 .end
 
 =head1 LICENSE

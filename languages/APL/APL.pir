@@ -20,10 +20,10 @@ Run from another Parrot program:
 
         # get the compiler
         .local pmc apl
-        apl = compreg "APL"
+        apl = compreg 'APL'
 
         # APL source code
-        source = "FOO←1 2"
+        source = unicode:"FOO←1 2"
 
         # compile and evaluate source
         apl(source)
@@ -45,7 +45,7 @@ subroutines directly.
 
 =cut
 
-.namespace [ "APL" ]
+.namespace [ 'APL' ]
 
 
 =item C<__onload()>
@@ -55,74 +55,74 @@ Initializes the compiling subsystem.
 =cut
 
 .sub __onload :load
-    load_bytecode "PGE.pbc"
-    load_bytecode "TGE.pbc"
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'TGE.pbc'
 
     # A hash for storing APL variables
     $P0 = new .Hash
-    store_global "APL", "%var", $P0
+    store_global 'APL', '%var', $P0
 
     # parser
     .local pmc p6rule
-    p6rule = compreg "PGE::P6Rule"
-    $P2 = p6rule("^<APL::Grammar::statement>")
-    store_global "APL", "&parse", $P2
+    p6rule = compreg 'PGE::P6Rule'
+    $P2 = p6rule('^<APL::Grammar::statement>')
+    store_global 'APL', '&parse', $P2
 
     # tge transformer classes
     .local pmc tge
-    tge = getclass "TGE"
-    $P1 = subclass tge, "ASTGrammar"
-    $P1 = subclass tge, "EvalGrammar"
+    tge = getclass 'TGE'
+    $P1 = subclass tge, 'ASTGrammar'
+    $P1 = subclass tge, 'EvalGrammar'
 
     # register the compiler
-    $P0 = find_global "APL", "compile"
-    compreg "APL", $P0
+    $P0 = find_global 'APL', 'compile'
+    compreg 'APL', $P0
 .end
 
 =item C<compile(STR code [, 'target' => target])>
 
 Compile the APL program given by C<code>.  The C<target>
 named parameter allows the caller to specify the degree of
-compilation to be performed; a value of "parse" returns
-the parse tree, "PAST" returns the abstract syntax tree,
+compilation to be performed; a value of C<parse> returns
+the parse tree, C<PAST> returns the abstract syntax tree,
 and all other values evaluate the abstract syntax tree.
 (Note:  This will change in future releases, when the
 default will be to return the translated program as a 
-compiled subroutine, and "PIR" will be available to
+compiled subroutine, and C<PIR> will be available to
 return the resulting PIR code.)
 
 =cut
 
-.sub "compile"
+.sub 'compile'
     .param pmc code
     .param string target       :named('target') :optional
     .param int has_target      :opt_flag
 
     if has_target goto parse
-    target = "pbc"
+    target = 'pbc'
 
   parse:
     .local pmc parse
     .local pmc match
-    parse = find_global "APL", "&parse"
+    parse = find_global 'APL', '&parse'
     match = parse(code)
 
     unless match goto return_match
-    if target == "parse" goto return_match
+    if target == 'parse' goto return_match
 
   build_ast:
-    match = match["APL::Grammar::statement"]
+    match = match['APL::Grammar::statement']
     .local pmc astgrammar, astbuilder, ast
     astgrammar = new 'ASTGrammar'
     astbuilder = astgrammar.apply(match)
     ast = astbuilder.get('result')
 
-    if target == "PAST" goto return_ast
+    if target == 'PAST' goto return_ast
 
   eval_ast:
     .local pmc evalgrammar, evalbuilder, eval
     evalgrammar = new 'EvalGrammar'
-    evalbuilder = evalgrammar."apply"(ast)
+    evalbuilder = evalgrammar.'apply'(ast)
     eval = evalbuilder.get('eval')
     goto return_ast
 
@@ -146,32 +146,32 @@ executing program statements.
 
 =cut
 
-.sub "main" :main
+.sub 'main' :main
     .param pmc args
-    $P0 = find_global "APL", "__onload"
+    $P0 = find_global 'APL', '__onload'
     $P0()
-    $P0 = find_global "PAST", "__onload"
+    $P0 = find_global 'PAST', '__onload'
     $P0()
-    $P0 = getclass "PGE::Rule"
-    $P0 = subclass $P0, "APL::Grammar"
+    $P0 = getclass 'PGE::Rule'
+    $P0 = subclass $P0, 'APL::Grammar'
 
-    load_bytecode "dumper.pbc"
-    load_bytecode "PGE/Dumper.pbc"
-    load_bytecode "Getopt/Obj.pbc"
+    load_bytecode 'dumper.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
+    load_bytecode 'Getopt/Obj.pbc'
 
     .local pmc getopts, opts
     .local string arg0
     arg0 = shift args
-    getopts = new "Getopt::Obj"
-    getopts."notOptStop"(1)
-    push getopts, "target=s"
-    opts = getopts."get_options"(args)
+    getopts = new 'Getopt::Obj'
+    getopts.'notOptStop'(1)
+    push getopts, 'target=s'
+    opts = getopts.'get_options'(args)
 
     .local string target
-    target = opts["target"]
+    target = opts['target']
 
     .local pmc apl
-    apl = compreg "APL"
+    apl = compreg 'APL'
 
     $I0 = elements args
     if $I0 > 0 goto file_arg
@@ -186,24 +186,24 @@ executing program statements.
     unless stmt goto end
     $P0 = apl(stmt, 'target' => target)
     unless target goto stmt_loop
-    "_dumper"($P0, target)
+    '_dumper'($P0, target)
     goto stmt_loop
 
   file_arg:
     .local string filename
     filename = args[1]
-    $P0 = open filename, "<"
+    $P0 = open filename, '<'
     unless $P0 goto err_no_file
-    push $P0, "utf8"
+    push $P0, 'utf8'
     stmt = read $P0, 65535
     close $P0
     $P0 = apl(stmt, 'target' => target)
     unless target goto end
-    "_dumper"($P0, target)
+    '_dumper'($P0, target)
     goto end
 
   err_no_file:
-    print "Cannot open file "
+    print 'Cannot open file '
     print filename
     print "\n"
     end
@@ -212,7 +212,7 @@ executing program statements.
 .end
 
 # Load the APL grammar
-.include "lib/APLGrammar.pir"
+.include 'lib/APLGrammar.pir'
 
 =head2 C<APL::Grammar> namespace
 
@@ -226,16 +226,16 @@ PGE_CUT_MATCH result to abandon the parse altogether.
 
 =cut
 
-.include "cclass.pasm"
+.include 'cclass.pasm'
 
-.sub "die"
+.sub 'die'
     .param pmc mob
     .param string message      # XXX: TODO: :optional
     .local pmc newfrom
     .local string target
     .local pmc mfrom, mpos
     .local int pos, len, newline, lines
-    newfrom = find_global "PGE::Match", "newfrom"
+    newfrom = find_global 'PGE::Match', 'newfrom'
     (mob, target, mfrom, mpos) = newfrom(mob, 0)
 
     pos = mfrom
@@ -250,7 +250,7 @@ PGE_CUT_MATCH result to abandon the parse altogether.
 
   print_message:
     print message
-    print " at line "
+    print ' at line '
     print lines
     print ", near \""
     $I0 = length target
@@ -268,18 +268,18 @@ PGE_CUT_MATCH result to abandon the parse altogether.
 
 
 # include the abstract syntax tree
-.include "lib/PAST.pir"
+.include 'lib/PAST.pir'
 
 # Include the parse tree -> AST transformation rules from TGE
-.namespace [ "ASTGrammar" ]
-.include "lib/pge2past.pir"
+.namespace [ 'ASTGrammar' ]
+.include 'lib/pge2past.pir'
 
 # Include the AST evaluation rules from TGE
-.namespace [ "EvalGrammar" ]
-.include "lib/pasteval.pir"
+.namespace [ 'EvalGrammar' ]
+.include 'lib/pasteval.pir'
 
 # include the built-in functions and operators
-.include "lib/APLFunctions.pir"
+.include 'lib/APLFunctions.pir'
 
 =head1 LICENSE
 
