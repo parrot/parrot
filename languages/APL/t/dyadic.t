@@ -16,7 +16,6 @@ __DATA__
 === plus scalar (int/float)
 --- APL: 2+3.14
 --- out: 5.14
---- todo
 
 === plus mixed
 --- APL: 1 2 3 4+3.14 
@@ -84,7 +83,6 @@ __DATA__
 === divide scalar
 --- APL: 2.1÷64
 --- out: 0.0328125
---- todo
 
 === divide mixed
 --- APL: 1.1 2.2 3.3 4.4÷64
