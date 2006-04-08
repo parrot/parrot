@@ -42,7 +42,7 @@ filters {
 sub run_apl_is() {
   foreach my $block (blocks) {
     my $apl    = $block->APL;
-    my $output = $block->out;
+    my $output = $block->out . "\n"; # XXX a slight hack
     my $todo   = $block->todo;
     if (defined($todo)) {
       if (! $todo) {
