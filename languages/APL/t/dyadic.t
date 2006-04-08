@@ -33,27 +33,25 @@ __DATA__
 --- todo
 
 === minus scalar (int/int)
---- APL: 2-3
+--- APL: 2−3
 --- out: ⁻1
---- todo
 
 === minus scalar
---- APL: 2-3.14
+--- APL: 2−3.14
 --- out: ⁻1.14
---- todo
 
 === minus mixed
---- APL: 1 2 3 4-3.14 
+--- APL: 1 2 3 4−3.14 
 --- out: ⁻2.14 ⁻1.14 ⁻0.14 0.86
 --- todo
 
 === minus vector
---- APL: 1 2 3 4-1.1 2.2 3.3 4.4
+--- APL: 1 2 3 4−1.1 2.2 3.3 4.4
 --- out: ⁻0.1 ⁻0.2 ⁻0.3 ⁻0.4
 --- todo
 
 === minus domain
---- APL: 2-'TEA'
+--- APL: 2−'TEA'
 --- out: DOMAIN ERROR
 --- todo
 
