@@ -713,7 +713,7 @@
     .return (self)
   cutatom:
     $P0 = self[0]
-    $P0 = $P0.reduce(pad)
+    $P0 = $P0.p6analyze(pad)
     $P0["iscut"] = 1
     $P0["isquant"] = 1
     .return ($P0)

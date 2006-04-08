@@ -865,6 +865,8 @@ register.
     exp["max"] = $P0
     $P0 = self["min"]
     exp["min"] = $P0
+    $P0 = self["iscut"]
+    exp["iscut"] = $P0
     if $P0 > 0 goto quant1
     exp.firstchars(exp, next)
   quant1:
