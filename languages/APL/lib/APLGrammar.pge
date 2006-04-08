@@ -1,7 +1,7 @@
 grammar APL::Grammar;
 
 rule statement {
-    ^<expression> \s* [ $ | <syntax_error> ]
+    ^<expression> \s*: [ $ | <syntax_error> ]
 }
 
 rule expression { 
@@ -30,13 +30,24 @@ rule array_identifier {
 }
 
 rule constant {
-    <numeric_constant>
+      <character_constant>
+    | <numeric_constant>
 }
+
 
 rule numeric_constant { 
-    [ ⁻? \d+ \.? \d* | ⁻? \. \d+ ] [ E ⁻? \d+ ]?
+    [ ⁻? \d+: \.? \d*: | ⁻? \. \d+: ] [ E ⁻? \d+: ]?
 }
 
-rule variable_identifier { <[A..Za..z]> \w* }
+
+rule character_constant {
+      (') ( [ '' | <-[']> ]*: ) '
+    | (") ( [ "" | <-["]> ]*: ) "
+   
+}
+
+
+rule variable_identifier { <[A..Za..z]> \w*: }
+
 
 rule syntax_error { <?die: Syntax error> }

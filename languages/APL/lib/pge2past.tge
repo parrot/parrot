@@ -112,6 +112,18 @@ APL::Grammar::array_identifier: result(.) = {
 
 APL::Grammar::constant: result(.) = {
     .local pmc result
+    $P0 = node['character_constant']
+    unless $P0 goto numeric_constant
+    .return tree.get('result', $P0, 'APL::Grammar::character_constant')
+
+  numeric_constant:
+    $P0 = node['numeric_constant']
+    .return tree.get('result', $P0, 'APL::Grammar::numeric_constant')
+}
+
+
+APL::Grammar::numeric_constant: result(.) = {
+    .local pmc result
     result = new 'PAST::Val'
     result.set_node(node)
     $S0 = node
@@ -124,6 +136,28 @@ APL::Grammar::constant: result(.) = {
   set_value:
     $N0 = $S0
     result['value'] = $N0
+    .return (result)
+}
+
+
+APL::Grammar::character_constant: result(.) = {
+    .local pmc result
+    .local string delim, delim2, value
+    result = new 'PAST::Val'
+    result.set_node(node)
+    delim = node[0]
+    value = node[1]
+    delim2 = concat delim, delim
+    $I0 = 0
+    # replace any '' with '
+  remove_quotes:
+    $I0 = index value, delim2, $I0
+    if $I0 < 0 goto end
+    substr value, $I0, 2, delim
+    inc $I0
+    goto remove_quotes
+  end:
+    result['value'] = value
     .return (result)
 }
 
