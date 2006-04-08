@@ -12,21 +12,18 @@ __DATA__
 X←2
 X
 --- out: 2
---- todo
 
 === assignment, character vector
 --- APL
 X←'foo'
 X
 --- out: foo
---- todo
 
 === longer var names
 --- APL
 SOMEVARIABLE←3.14
 SOMEVARIABLE
 --- out: 3.14
---- todo
 
 === assignment, integer vector
 --- APL

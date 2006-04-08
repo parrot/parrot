@@ -1,5 +1,21 @@
 ROOT: eval(.) = {
     .local pmc eval
+    .local pmc iter
+    $P0 = node['children']
+    iter = new .Iterator, $P0
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P1 = shift iter
+    eval = tree.get('eval', $P1)
+    goto iter_loop
+  iter_end:
+    .return (eval)
+}
+
+
+PAST::Stmt: eval(.) = {
+    .local pmc eval
     $P0 = node['statement']
     eval = tree.get('eval', $P0)
     $I0 = isa $P0, 'PAST::Assign'

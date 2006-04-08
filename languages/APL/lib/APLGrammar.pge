@@ -1,8 +1,8 @@
 grammar APL::Grammar;
 
-rule statement {
-    ^<expression> \s*: [ $ | <syntax_error> ]
-}
+rule statement_list { ^<statement> [ \n <statement> ]* }
+
+rule statement { <expression> [ \s*? $$ | <syntax_error> ] }
 
 rule expression { 
       <target> ← <expression>

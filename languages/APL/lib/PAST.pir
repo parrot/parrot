@@ -8,6 +8,7 @@ This file implements the various abstract syntax tree nodes
 needed for APL.  The currently defined ast nodes:
 
     PAST::Node       - base class for all ast nodes
+    PAST::Stmts      - a block of statements
     PAST::Stmt       - a single statement
     PAST::Op         - an APL operation
     PAST::Val        - a constant value

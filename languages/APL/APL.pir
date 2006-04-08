@@ -65,7 +65,7 @@ Initializes the compiling subsystem.
     # parser
     .local pmc p6rule
     p6rule = compreg 'PGE::P6Rule'
-    $P2 = p6rule('^<APL::Grammar::statement>')
+    $P2 = p6rule('^<APL::Grammar::statement_list>')
     store_global 'APL', '&parse', $P2
 
     # tge transformer classes
@@ -111,7 +111,7 @@ return the resulting PIR code.)
     if target == 'parse' goto return_match
 
   build_ast:
-    match = match['APL::Grammar::statement']
+    match = match['APL::Grammar::statement_list']
     .local pmc astgrammar, astbuilder, ast
     astgrammar = new 'ASTGrammar'
     astbuilder = astgrammar.apply(match)

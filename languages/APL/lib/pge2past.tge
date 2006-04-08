@@ -1,5 +1,30 @@
 ROOT: result(.) = {
     .local pmc result
+    .local pmc children
+    .local pmc iter
+
+    result = new 'PAST::Stmts'
+    result.'set_node'(node)
+
+    children = new .ResizablePMCArray
+    $P0 = node['statement']
+    iter = new .Iterator, $P0
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P1 = shift iter
+    $P2 = tree.get('result', $P1, 'APL::Grammar::statement')
+    if null $P2 goto iter_loop
+    push children, $P2
+    goto iter_loop
+  iter_end:
+    result['children'] = children
+    .return(result)
+} 
+    
+
+APL::Grammar::statement: result(.) = {
+    .local pmc result
     result = new 'PAST::Stmt'
     result.'set_node'(node)
     
