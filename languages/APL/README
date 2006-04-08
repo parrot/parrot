@@ -1,4 +1,4 @@
-This is APL**
+This is APL
 
 APL is Copyright (C) 2006, The Perl Foundation.
 
@@ -10,21 +10,30 @@ Compile APL to bytecode and run its test suite:
   $ make
   $ make test
 
-Run the APL compiler via Parrot, passing it the path to an APL
-source file as the only argument: !!! At the moment, you have to run
-APL from the top level parrot directory, as we're still punie-like in
-that regard.
+Run the APL compiler via Parrot, passing it an APL source file
+to process:
 
-  $ ./parrot languages/APL/APL.pbc demo.p1
+  $ parrot APL.pbc demo.apl
+  20
 
-** This isn't APL at the moment, it's merely a test at using unicode
-operators with PGE/TGE
+Run the APL system interactively:
+
+  $ parrot APL.pbc
+  10×2+3
+  50
+
+Display parse trees instead of executing statements:
+
+  $ parrot APL.pbc --target=parse demo.apl
+
+Display abstract syntax trees instead of executing statements:
+
+  $ parrot APL.pbc --target=PAST demo.apl
 
 FONT: The source code for APL uses unicode codepoints that you might
 not have a font for. If you can't read the code, try installing one
 of the fonts listed at:
 
 http://www.sigapl.org/font.htm
-
 
 
