@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -37,7 +37,9 @@ C<STRING> with a vtable.
 /*
  * define this to 1 for testing
  */
+#ifndef FREEZE_ASCII
 #define FREEZE_ASCII 0
+#endif
 
 /*
  * normal freeze can use next_for_GC ptrs or a seen hash
@@ -83,8 +85,8 @@ No encoding of strings, no transcoding.
 static void
 str_append(Parrot_Interp interpreter, STRING *s, const void *b, size_t len)
 {
-    size_t used = s->bufused;
-    int need_free = (int)PObj_buflen(s) - used - len;
+    const size_t used = s->bufused;
+    const int need_free = (int)PObj_buflen(s) - used - len;
     /*
      * grow by factor 1.5 or such
      */
@@ -156,21 +158,16 @@ XXX no string delimiters - so no space allowed.
 
 */
 
-void *Parrot_utf8_encode(void *ptr, UINTVAL c);
-
 static void
 push_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING *s)
 {
-    UINTVAL length = string_length(interpreter, s);
-    char *buffer = malloc(4*length);
+    const UINTVAL length = string_length(interpreter, s);
+    char * const buffer = malloc(4*length);
     char *cursor = buffer;
     UINTVAL idx = 0;
-    INTVAL temp = 0;
 
     /* temporary--write out in UTF-8 */
-    for( idx = 0; idx < length; ++idx )
-    {
-        /*		cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, idx)); */
+    for ( idx = 0; idx < length; ++idx ) {
         *cursor++ = (unsigned char)string_index(interpreter, s, idx);
     }
 
@@ -193,7 +190,7 @@ Pushes an ASCII version of the PMC C<*v> onto the end of the C<*io>
 */
 
 static void
-push_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io, PMC* v)
+push_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io, const PMC* v)
 {
     char buffer[128];
     sprintf(buffer, "%p ", v);
@@ -214,11 +211,10 @@ Removes and returns an integer from the start of the C<*io> "stream".
 static INTVAL
 shift_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io)
 {
-    char *start, *p;
-    INTVAL i;
+    char * const start = (char*)io->image->strstart;
+    char *p = start;
+    const INTVAL i = strtoul(p, &p, 10);
 
-    p = start = (char*)io->image->strstart;
-    i = strtoul(p, &p, 10);
     ++p;
     assert(p <= start + io->image->bufused);
     io->image->strstart = p;
@@ -241,11 +237,10 @@ Removes and returns an number from the start of the C<*io> "stream".
 static FLOATVAL
 shift_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io)
 {
-    char *start, *p;
-    FLOATVAL f;
+    char * const start = (char*)io->image->strstart;
+    char *p = start;
+    const FLOATVAL f = (FLOATVAL) strtod(p, &p);
 
-    p = start = (char*)io->image->strstart;
-    f = (FLOATVAL) strtod(p, &p);
     ++p;
     assert(p <= start + io->image->bufused);
     io->image->strstart = p;
@@ -268,10 +263,11 @@ Removes and returns an string from the start of the C<*io> "stream".
 static STRING*
 shift_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io)
 {
-    char *start, *p;
     STRING *s;
 
-    p = start = (char*)io->image->strstart;
+    char * const start = (char*)io->image->strstart;
+    char *p = start;
+
     while (*p != ' ')
         ++p;
     ++p;
@@ -298,11 +294,9 @@ Removes and returns a PMC from the start of the C<*io> "stream".
 static PMC*
 shift_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
 {
-    char *start, *p;
-    unsigned long i;
-
-    p = start = (char*)io->image->strstart;
-    i = strtoul(p, &p, 16);
+    char * const start = (char*)io->image->strstart;
+    char *p = start;
+    const unsigned long i = strtoul(p, &p, 16);
     ++p;
     assert(p <= start + io->image->bufused);
     io->image->strstart = p;
@@ -332,8 +326,8 @@ C<len> more bytes. If not then the buffer is expanded.
 static PARROT_INLINE void
 op_check_size(Parrot_Interp interpreter, STRING *s, size_t len)
 {
-    size_t used = s->bufused;
-    int need_free = (int)PObj_buflen(s) - used - len;
+    const size_t used = s->bufused;
+    const int need_free = (int)PObj_buflen(s) - used - len;
     /*
      * grow by factor 1.5 or such
      */
@@ -403,9 +397,9 @@ Pushes the number C<v> onto the end of the C<*io> "stream".
 static void
 push_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)
 {
-    size_t len = PF_size_number() * sizeof(opcode_t);
-    STRING *s = io->image;
-    size_t used = s->bufused;
+    const size_t len = PF_size_number() * sizeof(opcode_t);
+    STRING * const s = io->image;
+    const size_t used = s->bufused;
 
     op_check_size(interpreter, s, len);
     PF_store_number( (opcode_t *)((ptrcast_t)s->strstart + used), &v);
@@ -427,9 +421,9 @@ Pushes the string C<*v> onto the end of the C<*io> "stream".
 static void
 push_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING* v)
 {
-    size_t len = PF_size_string(v) * sizeof(opcode_t);
-    STRING *s = io->image;
-    size_t used = s->bufused;
+    const size_t len = PF_size_string(v) * sizeof(opcode_t);
+    STRING * const s = io->image;
+    const size_t used = s->bufused;
 
     op_check_size(interpreter, s, len);
     PF_store_string( (opcode_t *)((ptrcast_t)s->strstart + used), v);
@@ -471,9 +465,9 @@ packfile header for wordsize and endianess.
 static INTVAL
 shift_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io)
 {
-    INTVAL i;
-    char *start = (char*)io->image->strstart;
-    i = PF_fetch_integer(io->pf, (opcode_t**) &io->image->strstart);
+    const char * const start = (char*)io->image->strstart;
+    const INTVAL i = PF_fetch_integer(io->pf, (opcode_t**) &io->image->strstart);
+
     io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
     return i;
@@ -512,9 +506,9 @@ Removes and returns an number from the start of the C<*io> "stream".
 static FLOATVAL
 shift_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io)
 {
-    FLOATVAL f;
-    char *start = (char*)io->image->strstart;
-    f = PF_fetch_number(io->pf, (opcode_t**) &io->image->strstart);
+    const char * const start = (char*)io->image->strstart;
+    const FLOATVAL f = PF_fetch_number(io->pf, (opcode_t**) &io->image->strstart);
+
     io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
     return f;
@@ -534,10 +528,9 @@ Removes and returns a string from the start of the C<*io> "stream".
 static STRING*
 shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)
 {
-    char *start;
-    STRING *s;
-    start = (char*)io->image->strstart;
-    s = PF_fetch_string(interpreter, io->pf, (opcode_t**) &io->image->strstart);
+    char * const start = (char*)io->image->strstart;
+    STRING * const s =   PF_fetch_string(interpreter, io->pf, (opcode_t**) &io->image->strstart);
+
     io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
     return s;
@@ -767,7 +760,7 @@ PARROT_INLINE static void
 freeze_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         int seen, UINTVAL id)
 {
-    IMAGE_IO *io = info->image_io;
+    IMAGE_IO * const io = info->image_io;
     INTVAL type;
 
     if (PMC_IS_NULL(pmc)) {
@@ -900,10 +893,10 @@ Called from C<do_thaw()> to attach the vtable etc. to C<*pmc>.
 */
 
 PARROT_INLINE static PMC*
-thaw_create_pmc(Parrot_Interp interpreter, visit_info *info,
+thaw_create_pmc(Parrot_Interp interpreter, const visit_info *info,
         INTVAL type)
 {
-    PMC *pmc = NULL;
+    PMC *pmc;
     switch (info->what) {
         case VISIT_THAW_NORMAL:
             pmc = pmc_new_noinit(interpreter, type);
@@ -912,6 +905,7 @@ thaw_create_pmc(Parrot_Interp interpreter, visit_info *info,
             pmc = constant_pmc_new_noinit(interpreter, type);
             break;
         default:
+            pmc = NULL;
             internal_exception(1, "Illegal visit_next type");
             break;
     }
@@ -937,10 +931,7 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info)
     UINTVAL id;
     INTVAL type;
     PMC ** pos;
-    int must_have_seen;
-   
-    type = 0; /* silence compiler uninit warning */
-    must_have_seen = thaw_pmc(interpreter, info, &id, &type);
+    int must_have_seen = thaw_pmc(interpreter, info, &id, &type);
 
     id >>= 2;
 
@@ -1197,9 +1188,9 @@ PARROT_INLINE static int
 todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         UINTVAL *id)
 {
-    HashBucket *b;
+    HashBucket * const b =
+        hash_get_bucket(interpreter, PMC_struct_val(info->seen), pmc);
 
-    b = hash_get_bucket(interpreter, PMC_struct_val(info->seen), pmc);
     if (b) {
         *id = (UINTVAL) b->value;
         return 1;
@@ -1216,7 +1207,7 @@ todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
 
 /*
 
-=item C<tatic void
+=item C<static void
 visit_next_for_GC(Parrot_Interp interpreter, PMC* pmc, visit_info* info)>
 
 C<visit_child> callbacks:
@@ -1232,7 +1223,8 @@ static void
 visit_next_for_GC(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
 {
     UINTVAL id;
-    int seen = next_for_GC_seen(interpreter, pmc, info, &id);
+    const int seen = next_for_GC_seen(interpreter, pmc, info, &id);
+
     internal_exception(1, "todo convert to depth first");
     do_action(interpreter, pmc, info, seen, id);
     /*
@@ -1309,13 +1301,14 @@ static void
 visit_loop_next_for_GC(Parrot_Interp interpreter, PMC *current,
         visit_info *info)
 {
-    PMC *prev = NULL;
-
     visit_next_for_GC(interpreter, current, info);
     if (current->pmc_ext) {
-        for ( ; current != prev; current = PMC_next_for_GC(current)) {
+        PMC *prev = NULL;
+
+        while (current != prev) {
             VTABLE_visit(interpreter, current, info);
             prev = current;
+            current = PMC_next_for_GC(current);
         }
     }
 }
@@ -1332,6 +1325,7 @@ The thaw loop.
 
 */
 
+/* XXX This should be in a header file. */
 extern void
 Parrot_default_thawfinish(Interp* interpreter, PMC* pmc, visit_info *info);
 
@@ -1343,10 +1337,9 @@ visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
     PMC *finish_list_pmc;
     int i, n;
     List *finish_list = NULL;   /* gcc -O3 warning */
-    int thawing;
     int finished_first = 0;
 
-    thawing =  info->what == VISIT_THAW_CONSTANTS ||
+    const int thawing =  info->what == VISIT_THAW_CONSTANTS ||
             info->what == VISIT_THAW_NORMAL;
     if (thawing) {
         /*
@@ -1416,17 +1409,19 @@ Allocate image to some estimated size.
 static void
 create_image(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 {
-    INTVAL len = FREEZE_BYTES_PER_ITEM;
+    INTVAL len;
     if (!PMC_IS_NULL(pmc) && (VTABLE_does(interpreter, pmc,
                 string_from_cstring(interpreter, "array", 0)) ||
         VTABLE_does(interpreter, pmc,
                 string_from_cstring(interpreter, "hash", 0)))) {
-        INTVAL items = VTABLE_elements(interpreter, pmc);
+        const INTVAL items = VTABLE_elements(interpreter, pmc);
         /*
          * TODO check e.g. first item of aggregate and estimate size
          */
         len = items * FREEZE_BYTES_PER_ITEM;
     }
+    else
+        len = FREEZE_BYTES_PER_ITEM;
 
     info->image = string_make_empty(interpreter, enum_stringrep_one, len);
 }
@@ -1457,10 +1452,9 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
 {
     visit_info info;
     int dod_block = 0;
-    UINTVAL bufused;
+    const UINTVAL bufused = image->bufused;
 
     info.image = image;
-    bufused = image->bufused;
     /*
      * if we are thawing a lot of PMCs, its cheaper to do
      * a DOD run first and then block DOD - the limit should be

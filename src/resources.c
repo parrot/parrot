@@ -47,10 +47,9 @@ static void *
 alloc_new_block(Interp *interpreter,
         size_t size, struct Memory_Pool *pool, const char *why)
 {
-    size_t alloc_size;
     struct Memory_Block *new_block;
 
-    alloc_size = (size > pool->minimum_block_size)
+    const size_t alloc_size = (size > pool->minimum_block_size)
             ? size : pool->minimum_block_size;
 #if RESOURCE_DEBUG
     fprintf(stderr, "new_block (%s) size %u -> %u\n",
@@ -186,15 +185,13 @@ mem_allocate(Interp *interpreter, size_t size, struct Memory_Pool *pool)
 static const char* 
 buffer_location(Interp *interpreter, PObj *b)
 {
-    PObj *obj;
-    parrot_context_t* ctx;
     int i;
     const char *s = "???";
     static char reg[10];
 
-    ctx = CONTEXT(interpreter->ctx);
+    parrot_context_t* const ctx = CONTEXT(interpreter->ctx);
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
-        obj = (PObj*) CTX_REG_STR(ctx, i);
+        PObj * const obj = (PObj*) CTX_REG_STR(ctx, i);
         if (obj == b) {
             sprintf(reg, "S%d", i);
             return reg;
