@@ -4,6 +4,10 @@ ROOT: eval(.) = {
     eval = tree.get('eval', $P0)
     $I0 = isa $P0, 'PAST::Assign'
     if $I0 goto end
+    if eval >= 0 goto print_eval
+    print unicode:"\u207b"
+    eval = neg eval
+  print_eval:
     print eval
     print "\n"
   end:

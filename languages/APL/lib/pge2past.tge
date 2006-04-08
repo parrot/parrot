@@ -114,7 +114,15 @@ APL::Grammar::constant: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
     result.set_node(node)
-    $N0 = node
+    $S0 = node
+    # replace any \u207b chars with "-"
+  minus_loop:
+    $I0 = index $S0, unicode:"\u207b"
+    if $I0 < 0 goto set_value
+    substr $S0, $I0, 1, "-"
+    goto minus_loop
+  set_value:
+    $N0 = $S0
     result['value'] = $N0
     .return (result)
 }

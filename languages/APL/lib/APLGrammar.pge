@@ -5,7 +5,7 @@ rule statement {
 }
 
 rule expression { 
-    <target> ← <expression>
+      <target> ← <expression>
     | <monadic_identifier> <expression>
     | <subexpression> [ <dyadic_identifier> <expression> ]?
 }
@@ -25,7 +25,7 @@ rule dyadic_identifier { <[+−×÷]> }
 rule monadic_identifier { <[+−×÷]> }
 
 rule array_identifier {
-    <constant>
+      <constant>
     | <variable_identifier>
 }
 
@@ -33,7 +33,10 @@ rule constant {
     <numeric_constant>
 }
 
-rule numeric_constant { \d+ }
+rule numeric_constant { 
+    [ ⁻? \d+ \.? \d* | ⁻? \. \d+ ] [ E ⁻? \d+ ]?
+}
+
 rule variable_identifier { <[A..Za..z]> \w* }
 
 rule syntax_error { <?die: Syntax error> }
