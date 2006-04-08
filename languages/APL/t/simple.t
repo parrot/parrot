@@ -8,6 +8,6 @@ run_apl_is();
 __DATA__
 
 === vectors
---- APL: print 10 2 3
+--- APL: 10 2 3
 --- out: 10 2 3
 --- todo: basic vector support missing

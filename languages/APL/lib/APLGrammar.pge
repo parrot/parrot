@@ -1,0 +1,39 @@
+grammar APL::Grammar;
+
+rule statement {
+    ^<expression> \s* [ $ | <syntax_error> ]
+}
+
+rule expression { 
+    <target> ← <expression>
+    | <monadic_identifier> <expression>
+    | <subexpression> [ <dyadic_identifier> <expression> ]?
+}
+
+rule subexpression {
+    <simple_expression>
+}
+
+rule simple_expression {
+    <array_identifier>
+}
+
+rule target { <variable_identifier> }
+
+rule dyadic_identifier { <[+−×÷]> }
+
+rule monadic_identifier { <[+−×÷]> }
+
+rule array_identifier {
+    <constant>
+    | <variable_identifier>
+}
+
+rule constant {
+    <numeric_constant>
+}
+
+rule numeric_constant { \d+ }
+rule variable_identifier { <[A..Za..z]> \w* }
+
+rule syntax_error { <?die: Syntax error> }

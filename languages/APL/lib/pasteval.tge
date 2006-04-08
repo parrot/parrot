@@ -1,0 +1,77 @@
+ROOT: eval(.) = {
+    .local pmc eval
+    $P0 = node["statement"]
+    eval = tree.get('eval', $P0)
+    $I0 = isa $P0, "PAST::Assign"
+    if $I0 goto end
+    print eval
+    print "\n"
+  end:
+    .return (eval)
+}
+
+
+PAST::Op: eval(.) = {
+    .local pmc children_eval
+    children_eval = new .ResizablePMCArray
+  
+    .local pmc iter 
+    $P0 = node["children"]
+    iter = new .Iterator, $P0
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P1 = tree.get('eval', $P0)
+    push children_eval, $P1
+    goto iter_loop
+  iter_end:
+
+    .local pmc eval
+    .local string op
+    op = node["op"]
+    op = escape op
+    $P0 = find_global "APL::Functions", op
+    eval = $P0(children_eval :flat)
+    .return(eval)
+}
+ 
+
+PAST::Val: eval(.) = {
+    $P0 = node["value"]
+    .return ($P0)
+}
+
+
+PAST::Var: eval(.) = {
+    .local pmc var
+    .local pmc eval
+    var = find_global "APL", "%var"
+    $S0 = node["name"]
+    eval = var[$S0]
+    $I0 = exists var[$S0]
+    if $I0 goto end
+    eval = new .Integer
+    var[$S0] = eval
+  end:
+    .return (eval)
+}
+
+
+PAST::Assign: eval(.) = {
+    .local pmc eval
+
+    # obtain rhs value
+    $P0 = node["expression"]
+    eval = tree.get('eval', $P0)
+
+    # obtain lhs target
+    .local pmc var
+    var = find_global "APL", "%var"
+    $P0 = node["target"]
+    $S0 = $P0["name"]
+    var[$S0] = eval
+    .return (eval)
+}
+    
+    
