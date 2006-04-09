@@ -1,6 +1,6 @@
 ROOT: result(.) = {
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -21,7 +21,7 @@ ROOT: result(.) = {
 
 PAST::Stmts: result(.) = {
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -73,9 +73,9 @@ PAST::Op: result(.) = {
     # Iterate through the children of the node, and generate the result
     # for each child.
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     .local pmc newops
-    newops = new PerlArray
+    newops = new .ResizablePMCArray
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -141,9 +141,9 @@ PAST::Op: infix(.) = {
     nodesource = node.source()
     nodepos = node.pos()
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     .local pmc newops
-    newops = new PerlArray
+    newops = new .ResizablePMCArray
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -164,7 +164,7 @@ PAST::Op: infix(.) = {
         push newops, $P5
         push newchildren, $P4
         # Assign the value node to the variable
-        $P6 = new PerlArray
+        $P6 = new .ResizablePMCArray
         push $P6, $P4 # the first argument is the variable
         push $P6, $P3 # the second argument is the value
         $P7 = new 'POST::Op'
@@ -231,9 +231,9 @@ PAST::Op: print_op(.) = {
     # Iterate through the children of the node, and generate the result
     # for each child.
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     .local pmc newops
-    newops = new PerlArray
+    newops = new .ResizablePMCArray
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
     iter = 0
@@ -242,7 +242,7 @@ PAST::Op: print_op(.) = {
       shift $P2, iter
       $P3 = tree.get('result', $P2)
       $S1 = typeof $P3
-      $P4 = new PerlArray
+      $P4 = new .ResizablePMCArray
       $P5 = new 'POST::Op'
       $S1 = typeof $P3
       if $S1 == 'POST::Ops' goto complex_result # the argument has setup

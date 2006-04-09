@@ -30,7 +30,7 @@ PunieGrammar::block: result(.) = {
 
 PunieGrammar::lineseq: result(.) = {
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     # Ask the child node for its result
     .local pmc child
     $I0 = defined node["PunieGrammar::line"]
@@ -62,7 +62,7 @@ PunieGrammar::lineseq: result(.) = {
 
 PunieGrammar::line: result(.) = {
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
 
     .local pmc iter
     iter = new Iterator, node    # setup iterator for node
@@ -91,7 +91,7 @@ PunieGrammar::line: result(.) = {
 PunieGrammar::expr: result(.) = {
     .local pmc result
     .local pmc children
-    children = new PerlArray
+    children = new .ResizablePMCArray
     result = new 'PAST::Exp'
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
@@ -116,7 +116,7 @@ PunieGrammar::expr: result(.) = {
 PunieGrammar::gprint: result(.) = {
     .local pmc result
     .local pmc children
-    children = new PerlArray
+    children = new .ResizablePMCArray
     result = new 'PAST::Op'
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
@@ -142,7 +142,7 @@ PunieGrammar::gprint: result(.) = {
 PunieGrammar::cond: result(.) = {
     .local pmc result
     .local pmc children
-    children = new PerlArray
+    children = new .ResizablePMCArray
     result = new 'PAST::Op'
     $P1 = node.get_hash()
     .local pmc iter
@@ -175,7 +175,7 @@ PunieGrammar::cexpr: result(.) = {
     unless $I0 goto err_no_oexpr
     $P1 = node["PunieGrammar::oexpr"]
     .local pmc children
-    children = new PerlArray
+    children = new .ResizablePMCArray
     $P0 = new Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
@@ -208,7 +208,7 @@ PunieGrammar::cexpr: result(.) = {
 
 PunieGrammar::oexpr: result(.) = {
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
 
     .local pmc iter
     $P1 = node.get_hash()
@@ -342,7 +342,7 @@ expr: op(.) = {
     .local string type
     type = node["type"]
     .local pmc newchildren
-    newchildren = new PerlArray
+    newchildren = new .ResizablePMCArray
     $P1 = node.get_array()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -369,7 +369,7 @@ expr: op(.) = {
 expr: term(.) = {
     .local pmc result
     .local pmc children
-    children = new PerlArray
+    children = new .ResizablePMCArray
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start

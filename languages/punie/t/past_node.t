@@ -35,9 +35,9 @@ pir_output_is(<<'CODE', <<'OUT', 'set attributes manually');
     $P1 = getattribute node, 'pos'
     print $P1
     print "\n"
-    $P1 = new PerlString
+    $P1 = new .String
     $P1 = "bar\n"
-    $P2 = new PerlArray
+    $P2 = new .ResizablePMCArray
     push $P2, $P1
     setattribute node, 'children', $P2
     $P2 = getattribute node, 'children'
@@ -56,9 +56,9 @@ pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
     load_bytecode 'languages/punie/lib/PAST/Node.pir'
     .local pmc node
     node = new 'PAST::Node'
-    $P0 = new PerlString
+    $P0 = new .String
     $P0 = 'bar'
-    $P1 = new PerlArray
+    $P1 = new .ResizablePMCArray
     push $P1, $P0
     node.set_node('foo', 42, $P1)
     $P1 = getattribute node, 'source'
@@ -87,7 +87,7 @@ pir_output_is(<<'CODE', <<'OUT', 'dump node structure in visual format');
     node1 = new 'PAST::Node'
     node2 = new 'PAST::Node'
     node2.set_node('b', 9, $P0)
-    $P1 = new PerlArray
+    $P1 = new .ResizablePMCArray
     push $P1, node2 
     node1.set_node('foo', 42, $P1)
     node1.dump()

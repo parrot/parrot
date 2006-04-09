@@ -27,7 +27,7 @@ PAST::Val is a subclass of PAST::Node.
     $P1 = source
     $P2 = getattribute self, "pos"
     $P2 = pos
-    $P3 = new PerlString
+    $P3 = new .String
     $P3 = value
     setattribute self, "value", $P3
     .return ()
@@ -65,7 +65,7 @@ PAST::Val is a subclass of PAST::Node.
     .param string valtype :optional
     unless valtype goto get
   set:
-    $P1 = new PerlString
+    $P1 = new .String
     $P1 = valtype
     setattribute self, "valtype", $P1
     .return ($P1)

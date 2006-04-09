@@ -26,9 +26,9 @@ pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
     load_bytecode 'languages/punie/lib/POST/Node.pir'
     .local pmc node
     node = new 'POST::Node'
-    $P0 = new PerlString
+    $P0 = new .String
     $P0 = 'bar'
-    $P1 = new PerlArray
+    $P1 = new .ResizablePMCArray
     push $P1, $P0
     node.set_node('foo', 42, $P1)
     $P1 = getattribute node, 'source'
@@ -57,7 +57,7 @@ pir_output_is(<<'CODE', <<'OUT', 'dump node structure in visual format');
     node1 = new 'POST::Node'
     node2 = new 'POST::Node'
     node2.set_node('b', 9, $P0)
-    $P1 = new PerlArray
+    $P1 = new .ResizablePMCArray
     push $P1, node2 
     node1.set_node('foo', 42, $P1)
     node1.dump()

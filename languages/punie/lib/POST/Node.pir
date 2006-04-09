@@ -21,9 +21,9 @@ All POST nodes subclass from this base type.
 
 
 .sub __init :method
-    $P1 = new PerlUndef
-    $P2 = new Integer
-    $P3 = new PerlUndef
+    $P1 = new .Undef
+    $P2 = new .Integer
+    $P3 = new .Undef
 
     setattribute self, "source", $P1
     setattribute self, "pos", $P2

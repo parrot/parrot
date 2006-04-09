@@ -34,7 +34,7 @@ data file, possibly in YAML.
 
 .sub _load :load
     .local pmc lookuptable
-    lookuptable = new PerlHash
+    lookuptable = new .Hash
     _add_entry(lookuptable, 'infix:+', 'add')
     _add_entry(lookuptable, 'infix:-', 'sub')
     _add_entry(lookuptable, 'infix:*', 'mul')
@@ -64,7 +64,7 @@ data file, possibly in YAML.
     .param pmc lookuptable
     .param string key
     .param string value
-    $P1 = new PerlString
+    $P1 = new .String
     $P1 = value
     lookuptable[ key ] = $P1
 .end

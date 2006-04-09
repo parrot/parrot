@@ -21,9 +21,9 @@ CODE
 
 $code .= "    node = new 'PAST::$module'\n";
 $code .= <<'CODE'
-    $P0 = new PerlString
+    $P0 = new .String
     $P0 = 'bar'
-    $P1 = new PerlArray
+    $P1 = new .ResizablePMCArray
     push $P1, $P0
     node.set_node('foo', 42, $P1)
     $P1 = getattribute node, 'source'
