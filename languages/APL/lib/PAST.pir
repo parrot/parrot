@@ -21,6 +21,8 @@ node object.
 
 =head1 PAST functions
 
+=over 4
+
 =cut
 
 .namespace [ 'PAST' ]
@@ -49,7 +51,11 @@ Creates the C<PAST::*> classes.
 
 .namespace [ 'PAST::Node' ]
 
+=back 
+
 =head2  PAST::Node methods
+
+=over 4
 
 =item C<__init()>
 
@@ -162,9 +168,11 @@ with C<Data::Dumper>.
     dumper.'deleteIndent'()
 .end
 
+=back
+
 =head1 LICENSE
 
-Copyright (c) 2005 The Perl Foundation
+Copyright (c) 2005-2006 The Perl Foundation
 
 This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.

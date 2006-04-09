@@ -47,6 +47,7 @@ subroutines directly.
 
 .namespace [ 'APL' ]
 
+=over 4
 
 =item C<__onload()>
 
@@ -214,7 +215,11 @@ executing program statements.
 # Load the APL grammar
 .include 'lib/APLGrammar.pir'
 
+=back
+
 =head2 C<APL::Grammar> namespace
+
+=over 4
 
 =item C<die(PMC mob, string message)>
 
@@ -280,6 +285,8 @@ PGE_CUT_MATCH result to abandon the parse altogether.
 
 # include the built-in functions and operators
 .include 'lib/APLFunctions.pir'
+
+=back
 
 =head1 LICENSE
 
