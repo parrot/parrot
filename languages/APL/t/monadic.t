@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 10;
+use t::APL tests => 16;
 
 run_apl_is();
 
@@ -46,4 +46,29 @@ __DATA__
 === factorial
 --- APL: !4
 --- out: 24
+
+=== circle
+--- APL: ○1
+--- out: 3.14159
+
+=== circle
+--- APL: ○3
+--- out: 9.42478
+
+=== ceiling positive
+--- APL: ⌈3.14
+--- out: 4
+
+=== ceiling negative
+--- APL: ⌈⁻3.14
+--- out: ⁻3
+
+=== floor positive
+--- APL: ⌊3.14
+--- out: 3
+
+=== floor negative
+--- APL: ⌊⁻3.14
+--- out: ⁻4
+
 

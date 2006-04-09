@@ -15,4 +15,5 @@ Things to do:
   point of view, strings are just vectors of characters)
 
 - Add DOMAIN ERROR exceptions when trying to use certain operators on
-  strings
+  strings - Probably by using MMD with everything, and having Strings throw
+  errors most of the time.

@@ -14,6 +14,8 @@ Eventually make these be unicode strings.
 
 .namespace [ 'APL::Functions' ]
 
+.const num PI = 3.14159265358979323846
+
 .sub 'dyadic:+'                # dyadic add
     .param pmc op1
     .param pmc op2
@@ -45,6 +47,34 @@ Eventually make these be unicode strings.
     $P0 = op1 / op2
     .return ($P0)
 .end
+
+.sub 'dyadic:\u2308'           # dyadic maximum
+    .param pmc op1
+    .param pmc op2
+    if op1 > op2 goto one
+    .return(op2)
+one:
+    .return(op1)
+.end
+
+.sub 'dyadic:\u230a'           # dyadic minimum
+    .param pmc op1
+    .param pmc op2
+    if op1 > op2 goto one
+    .return(op1)
+one:
+    .return(op2)
+.end
+
+.sub 'dyadic:*'           # dyadic power
+    .param pmc op1
+    .param pmc op2
+    $N1 = op1
+    $N2 = op2
+    $N3 = pow $N1, $N2
+    .return($N3)
+.end
+
 
 .sub 'monadic:!'               # monadic factorial
   .param pmc op1
@@ -84,6 +114,23 @@ done:
     .return ($N0)
 .end
 
+.sub 'monadic:\u25cb'          # circle
+    .param num op1
+    $N0 = PI * op1
+    .return ($N0)
+.end
+
+.sub 'monadic:\u2308'          # monadic ceiling
+    .param num op1
+    $N1 = ceil op1
+    .return($N1)
+.end
+
+.sub 'monadic:\u230a'          # monadic floor
+    .param num op1
+    $N1 = floor op1
+    .return($N1)
+.end
 
 =head1 LICENSE
 

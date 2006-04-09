@@ -64,7 +64,7 @@ __DATA__
 --- out: 6.28
 
 === times mixed
---- APL: 1 2 3 4*3.14 
+--- APL: 1 2 3 4×3.14 
 --- out: 3.14 6.28 9.42 12.56
 --- todo
 
@@ -100,7 +100,6 @@ __DATA__
 === maximum scalar
 --- APL: 2.1⌈2
 --- out: 2.1
---- todo
 
 === maximum mixed
 --- APL: 1.1 2.2 3.3 4.4⌈3.1
@@ -120,7 +119,6 @@ __DATA__
 === minimum scalar
 --- APL: 2.1⌊2
 --- out: 2
---- todo
 
 === minimum mixed
 --- APL: 1.1 2.2 3.3 4.4⌊3.1
@@ -138,27 +136,26 @@ __DATA__
 --- todo
 
 === power scalar
---- APL: 2⋆3
+--- APL: 2*3
 --- out: 8
---- todo
 
 === power mixed
---- APL: 1.1 2.2 3.3 4.4⋆2
+--- APL: 1.1 2.2 3.3 4.4*2
 --- out: 1.21 4.84 10.89 19.36
 --- todo
 
 === power vector
---- APL: 1.1 2.2 3.3 4.4⋆1 2 1 2
+--- APL: 1.1 2.2 3.3 4.4*1 2 1 2
 --- out: 1.1 4.84 3.3 19.36
 --- todo
 
 === power domain (character)
---- APL: 2⋆'TEA'
+--- APL: 2*'TEA'
 --- out: DOMAIN ERROR
 --- todo
 
 === power domain (negative sqrt)
---- APL: ⁻9⋆.5
+--- APL: ⁻9*.5
 --- out: DOMAIN ERROR
 --- todo
 
