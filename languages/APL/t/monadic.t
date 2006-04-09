@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 22;
+use t::APL tests => 25;
 
 run_apl_is();
 
@@ -94,6 +94,24 @@ __DATA__
 === magnitude zero
 --- APL: |0
 --- out: 0
+
+=== roll
+--- APL: ?1
+--- excuse: (need to add to t/APL.pm to handle code in the out)
+--- todo
+
+=== not, 0
+--- APL: ~0
+--- out: 1
+
+=== not, 1
+--- APL: ~1
+--- out: 0
+
+
+
+
+
 
 
 

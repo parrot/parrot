@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 57;
+use t::APL tests => 91;
 
 diag "need more tests to test int <op> int, float <op> float, etc.";
 
@@ -257,6 +257,143 @@ __DATA__
 === circular ⁻7
 --- APL: ⁻7○.75
 --- out: 0.972955
+
+=== and 0
+--- APL: 0∧0
+--- out: 0
+
+=== and 1
+--- APL: 0∧1
+--- out: 0
+
+=== and 2
+--- APL: 1∧0
+--- out: 0 
+
+=== and 3
+--- APL: 1∧1
+--- out: 1
+
+=== or 0
+--- APL: 0∨0
+--- out: 0
+
+=== or 1
+--- APL: 0∨1
+--- out: 1
+
+=== or 2
+--- APL: 1∨0
+--- out: 1
+
+=== or 3
+--- APL: 1∨1
+--- out: 1
+
+=== nand 0
+--- APL: 0⍲0
+--- out: 1
+
+=== nand 1
+--- APL: 0⍲1
+--- out: 1
+
+=== nand 2
+--- APL: 1⍲0
+--- out: 1 
+
+=== nand 3
+--- APL: 1⍲1
+--- out: 0
+
+=== nor 0
+--- APL: 0⍱0
+--- out: 1
+
+=== nor 1
+--- APL: 0⍱1
+--- out: 0
+
+=== nor 2
+--- APL: 1⍱0
+--- out: 0 
+
+=== nor 3
+--- APL: 1⍱1
+--- out: 0
+
+=== less 0
+--- APL: 1<2
+--- out: 1
+
+=== less 1
+--- APL: 2<1
+--- out: 0
+
+=== less 2
+--- APL: 1<1
+--- out: 0
+
+=== not greater 0
+--- APL: 1≤2
+--- out: 1
+
+=== not greater 1
+--- APL: 2≤1
+--- out: 0
+
+=== not greater 2
+--- APL: 1≤1
+--- out: 1
+
+=== equal 0
+--- APL: 1=2
+--- out: 0
+
+=== equal 1
+--- APL: 2=1
+--- out: 0
+
+=== equal 2
+--- APL: 1=1
+--- out: 1
+
+=== not less than 0
+--- APL: 1≥2
+--- out: 0
+
+=== not less than 1
+--- APL: 2≥1
+--- out: 1
+
+=== not less than 2
+--- APL: 1≥1
+--- out: 1
+
+=== greater 0
+--- APL: 1>2
+--- out: 0
+
+=== greater 1
+--- APL: 2>1
+--- out: 1
+
+=== greater 2
+--- APL: 1>1
+--- out: 0
+
+=== not equal 0
+--- APL: 1≠2
+--- out: 1
+
+=== not equal 1
+--- APL: 2≠1
+--- out: 1
+
+=== not equal 2
+--- APL: 1≠1
+--- out: 0
+
 
 === deal, and, or, nand, nor, less, not greater, equal, not less, greater, not equal
 --- excuse: need tests

@@ -217,6 +217,77 @@ neg_RHS:
     .domain_error()
 .end
 
+.sub 'dyadic:\u2227' # and
+    .param int op1
+    .param int op2
+    $I0 = and op1, op2
+    .return ($I0)
+.end
+
+.sub 'dyadic:\u2228' # or
+    .param int op1
+    .param int op2
+    $I0 = or op1, op2
+    .return ($I0)
+.end
+
+.sub 'dyadic:\u2372' # nan
+    .param int op1
+    .param int op2
+    $I0 = and op1, op2
+    $I0 = not $I0
+    .return ($I0)
+.end
+
+.sub 'dyadic:\u2371' # nor
+    .param int op1
+    .param int op2
+    $I0 = or op1, op2
+    $I0 = not $I0
+    .return ($I0)
+.end
+
+.sub 'dyadic:<' # less than
+    .param int op1
+    .param int op2
+    $I0 = islt op1, op2
+    .return ($I0)
+.end
+
+.sub 'dyadic:\u2264' # not greater than
+    .param int op1
+    .param int op2
+    $I0 = isle op1, op2
+    .return ($I0)
+.end
+
+.sub 'dyadic:=' # equal
+    .param int op1
+    .param int op2
+    $I0 = iseq op1, op2
+    .return ($I0)
+.end
+
+.sub 'dyadic:\u2265' # not less than
+    .param int op1
+    .param int op2
+    $I0 = isge op1, op2
+    .return ($I0)
+.end
+
+.sub 'dyadic:>' # greater
+    .param int op1
+    .param int op2
+    $I0 = isgt op1, op2
+    .return ($I0)
+.end
+
+.sub 'dyadic:\u2260' # not equal
+    .param int op1
+    .param int op2
+    $I0 = isne op1, op2
+    .return ($I0)
+.end
 
 .sub 'monadic:!'               # factorial
   .param pmc op1
@@ -284,6 +355,16 @@ neg_RHS:
     .param num op1
     $N1 = abs op1
     .return($N1)
+.end
+
+.sub 'monadic:~'               # not
+    .param num op1
+    # XXX is domain only 0,1?
+    $I1 = op1
+    if $I1 goto true
+    .return(1)
+true:
+    .return(0)
 .end
 
 =head1 LICENSE

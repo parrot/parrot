@@ -20,9 +20,9 @@ rule simple_expression {
 
 rule target { <variable_identifier> }
 
-rule dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷]> }
+rule dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷∧∨⍲⍱<≤=≥>≠]> }
 
-rule monadic_identifier { <[|⍟*⌈⌊○!+−×÷]> }
+rule monadic_identifier { <[|⍟*⌈⌊○!+−×÷~]> }
 
 rule array_identifier {
       <constant>
