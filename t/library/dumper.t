@@ -1,10 +1,10 @@
-#!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -15,7 +15,7 @@ t/library/dumper.t - test dumping of data
 
 =head1 SYNOPSIS
 
-	% prove t/library/dumper.t
+    % prove t/library/dumper.t
 
 =head1 DESCRIPTION
 
@@ -31,7 +31,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
 .sub test :main
     .local pmc array
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, 0
     push array, 1
     push array, 2
@@ -46,7 +46,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
     _dumper( array, "array" )
 .end
 CODE
-"array" => PerlArray (size:10) [
+"array" => ResizablePMCArray (size:10) [
     0,
     1,
     2,
@@ -67,7 +67,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
 .sub test :main
     .local pmc array
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, 6
     push array, 1
     push array, 8
@@ -82,7 +82,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
     _dumper( array, "array" )
 .end
 CODE
-"array" => PerlArray (size:10) [
+"array" => ResizablePMCArray (size:10) [
     6,
     1,
     8,
@@ -103,7 +103,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping sorted strings");
 .sub test :main
     .local pmc array
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, "alpha"
     push array, "bravo"
     push array, "charlie"
@@ -116,7 +116,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping sorted strings");
     _dumper( array, "strings" )
 .end
 CODE
-"strings" => PerlArray (size:8) [
+"strings" => ResizablePMCArray (size:8) [
     "alpha",
     "bravo",
     "charlie",
@@ -134,7 +134,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
 .sub test :main
     .local pmc array
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, "charlie"
     push array, "hotel"
     push array, "alpha"
@@ -148,7 +148,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
 .end
 .include "library/dumper.pir"
 CODE
-"strings" => PerlArray (size:8) [
+"strings" => ResizablePMCArray (size:8) [
     "charlie",
     "hotel",
     "alpha",
@@ -166,7 +166,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping different types");
 .sub test :main
     .local pmc array
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, 0.1
     push array, "charlie"
     push array, 2
@@ -192,22 +192,22 @@ pir_output_is(<<'CODE', <<'OUT', "dumping different types");
 .end
 .include "library/dumper.pir"
 CODE
-"array" => PerlArray (size:20) [
-    0.100000,
+"array" => ResizablePMCArray (size:20) [
+    0.1,
     "charlie",
     2,
     "hotel",
     5,
     "alpha",
-    0.200000,
+    0.2,
     "delta",
     4,
     "foxtrot",
-    0.500000,
-    0.400000,
+    0.5,
+    0.4,
     1,
     "golf",
-    0.300000,
+    0.3,
     3,
     "bravo",
     0,
@@ -226,11 +226,11 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data");
     .local pmc array1
     .local pmc array2
 
-    new hash1, .PerlHash
-    new hash2, .PerlHash
-    new hash3, .PerlHash
-    new array1, .PerlArray
-    new array2, .PerlArray
+    new hash1, .Hash
+    new hash2, .Hash
+    new hash3, .Hash
+    new array1, .ResizablePMCArray
+    new array2, .ResizablePMCArray
 
     _dumper( hash1,"hash1" )
 
@@ -278,36 +278,36 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data");
 .end
 .include "library/dumper.pir"
 CODE
-"hash1" => PerlHash {
+"hash1" => Hash {
 }
-"hash1" => PerlHash {
+"hash1" => Hash {
     "hello" => "world"
 }
-"hash1" => PerlHash {
+"hash1" => Hash {
     "hello" => "world",
     "hello2" => "world2"
 }
-"hash1" => PerlHash {
-    "hash2" => PerlHash {
+"hash1" => Hash {
+    "hash2" => Hash {
     },
     "hello" => "world",
     "hello2" => "world2"
 }
-"hash1" => PerlHash {
-    "hash2" => PerlHash {
+"hash1" => Hash {
+    "hash2" => Hash {
         "hello3" => "world3"
     },
     "hello" => "world",
     "hello2" => "world2"
 }
-"hash1" => PerlHash {
-    "hash2" => PerlHash {
-        "array1" => PerlArray (size:5) [
+"hash1" => Hash {
+    "hash2" => Hash {
+        "array1" => ResizablePMCArray (size:5) [
             "this",
             "is",
             "a",
             "test",
-            PerlHash {
+            Hash {
                 "is" => "cool",
                 "name" => "parrot"
             }
@@ -326,7 +326,7 @@ pir_output_is(<<'CODE', <<'OUT', "properties");
     .local pmc str
     .local pmc array
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, "test1"
     push array, "test2"
 
@@ -343,7 +343,7 @@ pir_output_is(<<'CODE', <<'OUT', "properties");
 .end
 .include "library/dumper.pir"
 CODE
-"VAR1" => PerlArray (size:2) [
+"VAR1" => ResizablePMCArray (size:2) [
     "test1",
     "test2"
 ] with-properties: Hash {
@@ -363,10 +363,10 @@ pir_output_is(<<'CODE', <<'OUT', "indent string");
     .local string name
     .local string indent
 
-    new hash1, .PerlHash
-    new hash2, .PerlHash
-    new array1, .PerlArray
-    new array2, .PerlArray
+    new hash1, .Hash
+    new hash2, .Hash
+    new array1, .ResizablePMCArray
+    new array2, .ResizablePMCArray
 
     set hash1["hash2"], hash2
     set hash2["array"], array1
@@ -388,11 +388,11 @@ pir_output_is(<<'CODE', <<'OUT', "indent string");
 .end
 .include "library/dumper.pir"
 CODE
-"hash" => PerlHash {
-|  "hash2" => PerlHash {
-|  |  "array" => PerlArray (size:2) [
+"hash" => Hash {
+|  "hash2" => Hash {
+|  |  "array" => ResizablePMCArray (size:2) [
 |  |  |  1,
-|  |  |  PerlArray (size:1) [
+|  |  |  ResizablePMCArray (size:1) [
 |  |  |  |  "test"
 |  |  |  ]
 |  |  ],
@@ -402,11 +402,11 @@ CODE
 } with-properties: Hash {
 |  "array2" => \hash["hash2"]["array"][1]
 }
-"hash" => PerlHash {
-|  "hash2" => PerlHash {
-|  |  "array" => PerlArray (size:2) [
+"hash" => Hash {
+|  "hash2" => Hash {
+|  |  "array" => ResizablePMCArray (size:2) [
 |  |  |  1,
-|  |  |  PerlArray (size:1) [
+|  |  |  ResizablePMCArray (size:1) [
 |  |  |  |  "test"
 |  |  |  ]
 |  |  ],
@@ -426,7 +426,7 @@ pir_output_is(<<'CODE', <<'OUT', "back-referencing properties");
 .sub test :main
     .local pmc hash
 
-    new hash, .PerlHash
+    new hash, .Hash
 
     set hash["hello"], "world"
     setprop hash, "backref", hash
@@ -434,7 +434,7 @@ pir_output_is(<<'CODE', <<'OUT', "back-referencing properties");
 .end
 .include "library/dumper.pir"
 CODE
-"VAR1" => PerlHash {
+"VAR1" => Hash {
     "hello" => "world"
 } with-properties: Hash {
     "backref" => \VAR1
@@ -448,7 +448,7 @@ pir_output_is(<<'CODE', <<'OUT', "self-referential properties (1)");
     .local pmc hash
     .local pmc prop
 
-    new hash, .PerlHash
+    new hash, .Hash
 
     set hash["hello"], "world"
     setprop hash, "self", hash
@@ -458,7 +458,7 @@ pir_output_is(<<'CODE', <<'OUT', "self-referential properties (1)");
 .end
 .include "library/dumper.pir"
 CODE
-"VAR1" => PerlHash {
+"VAR1" => Hash {
     "hello" => "world"
 } with-properties: Hash {
     "self" => \VAR1.properties()
@@ -474,9 +474,9 @@ pir_output_is(<<'CODE', <<'OUT', "self-referential properties (2)");
     .local pmc hash2
     .local pmc prop
 
-    new array, .PerlArray
-    new hash1, .PerlHash
-    new hash2, .PerlHash
+    new array, .ResizablePMCArray
+    new hash1, .Hash
+    new hash2, .Hash
 
     set hash1["hello1"], "world1"
     set hash2["hello2"], "world2"
@@ -493,13 +493,13 @@ pir_output_is(<<'CODE', <<'OUT', "self-referential properties (2)");
 .end
 .include "library/dumper.pir"
 CODE
-"VAR1" => PerlArray (size:4) [
-    PerlHash {
+"VAR1" => ResizablePMCArray (size:4) [
+    Hash {
         "hello1" => "world1"
     } with-properties: Hash {
         "das leben" => "ist schoen"
     },
-    PerlHash {
+    Hash {
         "hello2" => "world2"
     } with-properties: Hash {
         "hash1prop" => \VAR1[0].properties()
@@ -519,7 +519,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping objects");
     newclass temp, "TestClass"
 
     find_type I0, "TestClass"
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     new temp, I0
     push array, temp
     new temp, I0
@@ -560,7 +560,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping objects");
 .namespace [""]
 .include "library/dumper.pir"
 CODE
-"VAR1" => PerlArray (size:2) [
+"VAR1" => ResizablePMCArray (size:2) [
     PMC 'TestClass' {
         this is
         _TestClass::__dump
@@ -579,7 +579,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping 'null'");
     .local pmc array
     .local pmc temp
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
 
     push array, 0
 
@@ -600,10 +600,10 @@ pir_output_is(<<'CODE', <<'OUT', "dumping 'null'");
 .end
 .include "library/dumper.pir"
 CODE
-"array" => PerlArray (size:5) [
+"array" => ResizablePMCArray (size:5) [
     0,
     "0",
-    null,
+    undef,
     0,
     "0"
 ]
@@ -615,7 +615,7 @@ pir_output_is( << 'CODE', << 'OUT', "dumping strings");
 .include "library/dumper.pir"
 .sub _test :main
     .local pmc array
-    array = new PerlArray
+    array = new ResizablePMCArray
 
     .local pmc pmc_string, pmc_perl_string
     .local string string_1
@@ -624,8 +624,8 @@ pir_output_is( << 'CODE', << 'OUT', "dumping strings");
     pmc_string = "This is a String PMC"
     push array, pmc_string
 
-    pmc_perl_string = new .PerlString
-    pmc_perl_string = "This is a PerlString PMC"
+    pmc_perl_string = new .String
+    pmc_perl_string = "This is a String PMC"
     push array, pmc_perl_string
 
     string_1 = "This is a String"
@@ -634,9 +634,9 @@ pir_output_is( << 'CODE', << 'OUT', "dumping strings");
     _dumper( array, "array of various strings" )
 .end
 CODE
-"array of various strings" => PerlArray (size:3) [
+"array of various strings" => ResizablePMCArray (size:3) [
     "This is a String PMC",
-    "This is a PerlString PMC",
+    "This is a String PMC",
     "This is a String"
 ]
 OUT
@@ -653,7 +653,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
     new hash1, .Hash
     new hash2, .Hash
     new hash3, .Hash
-    new array1, .PerlArray
+    new array1, .ResizablePMCArray
 
     _dumper( hash1,"hash1" )
 
@@ -726,7 +726,7 @@ CODE
 }
 "hash1" => Hash {
     "hash2" => Hash {
-        "array1" => PerlArray (size:5) [
+        "array1" => ResizablePMCArray (size:5) [
             "this",
             "is",
             "a",

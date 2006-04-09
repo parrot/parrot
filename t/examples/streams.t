@@ -1,10 +1,10 @@
-#! perl
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 12;
 use Parrot::Config;
@@ -138,7 +138,7 @@ read:[   79     .local string str]
 read:[   80     .local pmc array]
 read:[   81 ]
 read:[   82     i = 0]
-read:[   83     array = new .PerlArray]
+read:[   83     array = new .ResizablePMCArray]
 read:[   84 ]
 read:[   85 LOOP:]
 read:[   86     inc i]

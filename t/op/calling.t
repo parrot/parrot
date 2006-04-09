@@ -1,10 +1,10 @@
-#!perl
 # Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -894,7 +894,7 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - PIR const");
 .const int MYCONST = -2
 .sub main :main
-    $P0 = new PerlString
+    $P0 = new String
     "foo"(MYCONST)
 .end
 .sub "foo"

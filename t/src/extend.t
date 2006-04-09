@@ -1,10 +1,10 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 use Parrot::Config;
@@ -17,7 +17,7 @@ t/src/extend.t - Parrot Extension API
 
 =head1 SYNOPSIS
 
-	% prove t/src/extend.t
+    % prove t/src/extend.t
 
 =head1 DESCRIPTION
 
@@ -190,7 +190,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 {
     Parrot_Int type, value, key, new_value;
     Parrot_PMC array;
-    type = Parrot_PMC_typenum(interpreter, "PerlArray");
+    type = Parrot_PMC_typenum(interpreter, "ResizablePMCArray");
     array = Parrot_PMC_new(interpreter, type);
 
     value = 12345;

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/benchmarks/array_access.pir - Reading from array
+examples/benchmarks/array_access.pir - benchmark reading from an array
 
 =head1 SYNOPSIS
 
@@ -46,14 +46,11 @@ use_default_arr_size:
     _bench( .FixedPMCArray, arr_size )
     _bench( .FixedStringArray, arr_size )
     _bench( .IntList, arr_size )
-    _bench( .PerlArray, arr_size )
     _bench( .ResizableFloatArray, arr_size )
     _bench( .ResizableIntegerArray, arr_size )
     _bench( .ResizablePMCArray, arr_size )
     _bench( .ResizableStringArray, arr_size )
     _bench( .SArray, arr_size )
-
-    end
 .end
 
 =head2 void bench( int arr_class, int arr_size )

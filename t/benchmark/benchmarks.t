@@ -1,10 +1,10 @@
-#! perl
 # Copyright: 2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
+
 use Parrot::Test;
 use Test::More;
 
@@ -56,10 +56,6 @@ IntList:\s\d+\.\d+s\n
 \n
 1\s\*\s1000\s=\s1000\n
 100\s\*\s1000\s=\s100000\n
-PerlArray:\s\d+\.\d+s\n
-\n
-1\s\*\s1000\s=\s1000\n
-100\s\*\s1000\s=\s100000\n
 ResizableFloatArray:\s\d+\.\d+s\n
 \n
 1\s\*\s1000\s=\s1000\n
@@ -94,7 +90,7 @@ SArray:\s\d+\.\d+s\n
         freeze\stime\s\d+\.\d+\n
         \s\sthaw\stime\s\d+\.\d+\n
         Image\slen\s\d+\n
-        PerlArray\s100000\n$/x,
+        ResizablePMCArray\s100000\n$/x,
     q{gc_alloc_new.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
         A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n

@@ -15,7 +15,7 @@ t/op/info.t - Info Ops
 
 =head1 SYNOPSIS
 
-	% prove t/op/info.t
+    % prove t/op/info.t
 
 =head1 DESCRIPTION
 
@@ -25,8 +25,8 @@ Tests the information finding operations.
 
 
 pasm_output_is(<<'CODE', 'yes', "find_type");
-	set I0, .PerlArray
-	find_type I1, "PerlArray"
+	set I0, .ResizablePMCArray
+	find_type I1, "ResizablePMCArray"
 	eq I0, I1, YES
  NO:	print "no"
 	end

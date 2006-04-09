@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -11,11 +11,11 @@ examples/benchmarks/freeze.pasm - Freeze/Thaw Benchmarks
 
 =head1 DESCRIPTION
 
-Freeze/thaw a Perl array.
+Freeze/thaw an ResizablePMCArray.
 
 =cut
 
-    new P0, .PerlArray
+    new P0, .ResizablePMCArray
     set I0, 100000
     time N0
 lp1:

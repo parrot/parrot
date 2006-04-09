@@ -80,7 +80,7 @@ line numbers followed by a space to its stream.
     .local pmc array
 
     i = 0
-    array = new .PerlArray
+    array = new .ResizablePMCArray
 
 LOOP:
     inc i

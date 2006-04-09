@@ -1,10 +1,10 @@
-#!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -15,7 +15,7 @@ t/library/json.t - test JSON library
 
 =head1 SYNOPSIS
 
-	% prove t/library/json.t
+    % prove t/library/json.t
 
 =head1 DESCRIPTION
 
@@ -336,7 +336,7 @@ CODE
 OUT
 
 # no. 13
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of nested structure including PerlArray and empties');
+pir_output_is(<<'CODE', <<'OUT', 'Create JSON of nested structure including ResizablePMCArray and empties');
 
 .sub test :main
     .local pmc street1, street2, city1, city2, country, world
@@ -348,7 +348,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of nested structure including Perl
 
     street2 = new .Hash  # empty
 
-    city1 = new .PerlArray
+    city1 = new .ResizablePMCArray
     push city1, street1
     push city1, street2
 
@@ -399,7 +399,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of nested structure');
 
     street2 = new .Hash  # empty
 
-    city1 = new .PerlArray
+    city1 = new .ResizablePMCArray
     push city1, street1
     push city1, street2
 

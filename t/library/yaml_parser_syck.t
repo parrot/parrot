@@ -1,10 +1,10 @@
-#!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -15,7 +15,7 @@ t/library/yaml_parser_syck.t - testing library/YAML/Parser/Syck.pir
 
 =head1 SYNOPSIS
 
-	% prove t/library/yaml_parser_syck.t
+    % prove t/library/yaml_parser_syck.t
 
 =head1 DESCRIPTION
 
@@ -149,7 +149,7 @@ elem123456
 elem1234567
 elem12345678
 
-"loaded" => "val1\nkey1\nval2\nkey2\nelem1\nelem12\nelem123\nelem1234\nelem12345\nelem123456\nelem1234567\nelem12345678\n" with-properties: PerlHash {
+"loaded" => "val1\nkey1\nval2\nkey2\nelem1\nelem12\nelem123\nelem1234\nelem12345\nelem123456\nelem1234567\nelem12345678\n" with-properties: Hash {
     "_interpreter" => PMC 'ParrotInterpreter' { ... },
     "_signature" => "Up",
     "_sub" => sub { ... },

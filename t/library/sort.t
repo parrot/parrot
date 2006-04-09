@@ -1,10 +1,10 @@
-#!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -15,7 +15,7 @@ t/library/sort.t - Sorting
 
 =head1 SYNOPSIS
 
-	% prove t/library/sort.t
+    % prove t/library/sort.t
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
     .local pmc tmp
     .local pmc sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, 0
     push array, 1
     push array, 2
@@ -79,7 +79,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers");
     .local int j
     .local pmc tmp, sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, 9
     push array, 8
     push array, 7
@@ -125,7 +125,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers (2)");
     .local int j
     .local pmc tmp, sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, 4
     push array, 7
     push array, 8
@@ -172,7 +172,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting sorted strings");
     .local int j
     .local pmc tmp, sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, "alpha"
     push array, "bravo"
     push array, "charlie"
@@ -215,7 +215,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
     .local int j
     .local pmc tmp, sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, "charlie"
     push array, "hotel"
     push array, "alpha"
@@ -258,7 +258,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting different types");
     .local int j
     .local pmc tmp, sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, 0.1
     push array, "charlie"
     push array, 2
@@ -297,11 +297,11 @@ LOOP:
 CODE
 0
 0
-0.100000
-0.200000
-0.300000
-0.400000
-0.500000
+0.1
+0.2
+0.3
+0.4
+0.5
 1
 2
 3
@@ -325,7 +325,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting letters");
     .local int j
     .local pmc tmp, sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     push array, "w"
     push array, "x"
     push array, "h"
@@ -360,7 +360,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting String letters");
     .local int j
     .local pmc tmp, sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     new tmp, .String
     set tmp, "w"
     push array, tmp
@@ -406,7 +406,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting strings");
     .local int j
     .local pmc tmp, sort
 
-    new array, .PerlArray
+    new array, .ResizablePMCArray
     new tmp, .String
     push array, "hello"
     push array, "hash2"

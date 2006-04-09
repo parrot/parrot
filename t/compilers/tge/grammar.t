@@ -1,21 +1,21 @@
-#!perl
-# Copyright 2005, The Perl Foundation.  All Rights Reserved.
+# Copyright 2005-2006, The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
+
 use Test::More;
 use Parrot::Test;
 
 
 =head1 NAME
 
-t/parser.t - TGE::Parser tests
+tge/grammar.t - TGE::Parser tests
 
 =head1 SYNOPSIS
 
-        $ prove t/parser.t
+    $ prove t/parser.t
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ tree of the specified type.
 =cut
 
 
-pir_output_is(<<'CODE', <<'OUT', "complete example: Branch/Leaf tree grammar");
+pir_output_is(<<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar');
 
 .sub _main :main
     .param pmc argv
@@ -63,7 +63,7 @@ pir_output_is(<<'CODE', <<'OUT', "complete example: Branch/Leaf tree grammar");
     # find the global minimum and propagate it back down the tree
     ROOT:   gmin(.) = { 
         .local pmc gmin
-        gmin = new PerlInt
+        gmin = new Integer
         gmin = tree.get('min', node)
         .return (gmin)
     }
@@ -200,7 +200,7 @@ GRAMMAR
     .param int value
     .local pmc newnode
     newnode = new 'Leaf'
-    $P1 = new PerlInt
+    $P1 = new Integer
     $P1 = value
     setattribute newnode, 'value', $P1
     .return(newnode)
@@ -217,7 +217,7 @@ GRAMMAR
 .end
 
 CODE
-the global minimum attribute value is: 1 of type: PerlInt
+the global minimum attribute value is: 1 of type: Integer
 before transform, the value of the left-most leaf is: 2
 after transform, the value of the left-most leaf is: 1
 before transform, the value of the right-most leaf is: 9

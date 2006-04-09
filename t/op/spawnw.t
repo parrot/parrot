@@ -153,7 +153,7 @@ loop:
         branch loop
 end:
         $S0 = concat $S0, "}) / 100"
-        new args, .PerlArray
+        new args, .ResizablePMCArray
         push args, "perl"
         push args, "-e"
         push args, $S0
