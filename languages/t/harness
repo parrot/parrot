@@ -90,11 +90,11 @@ my $do_gen_html = grep { $_ eq '--html' } @ARGV;
 
 
 my @unified_testable_languages = 
-   qw( HQ9plus
-       Zcode
+   qw( APL
        bc
        befunge
        bf
+       HQ9plus
        jako
        lazy-k
        lua
@@ -106,8 +106,10 @@ my @unified_testable_languages =
        scheme
        tcl
        unlambda
-       urm );
-@unified_testable_languages = qw( APL );
+       urm
+       Zcode
+     );
+# @unified_testable_languages = qw( APL );
 
 my @harnesses =
     grep {-f $_}
