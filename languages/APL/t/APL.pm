@@ -26,11 +26,6 @@ BEGIN {
   }
 }
 
-filters {
-  output => qw/ chomp /
-};
-
-
 # Note - we don't just use the special SKIP entry in the DATA stream because
 # it doesn't actually output the skipped test in the TAP output. It just
 # fails to run the test.
@@ -42,7 +37,20 @@ filters {
 sub run_apl_is() {
   foreach my $block (blocks) {
     my $apl    = $block->APL;
-    my $output = $block->out . "\n"; # XXX a slight hack
+    my $output;
+    if (defined($block->out)) {
+      $output = $block->out;
+      if ($output)  {
+        $output .= "\n"; # XXX a slight hack
+      }
+      else {
+        $output = "0\n"; # XXX MAJOR hack - Test::Base seems to be converting our 0 into the empty string. Why?
+      }
+    }
+    else {
+      $output = q{}; # this lets todo tests not bother specifying an out.
+    }
+    print "EXPECTING: '$output'\n";
     my $todo   = $block->todo;
     if (defined($todo)) {
       if (! $todo) {

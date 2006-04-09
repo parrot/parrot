@@ -46,6 +46,19 @@ Eventually make these be unicode strings.
     .return ($P0)
 .end
 
+.sub 'monadic:!'               # monadic factorial
+  .param pmc op1
+  .local int result
+  result = 1
+  $I0 = op1
+loop:
+  if $I0 == 0 goto done
+  result *= $I0
+  dec $I0
+  goto loop
+done:
+  .return(result)
+.end
 
 .sub 'monadic:+'               # monadic plus
     .param pmc op1

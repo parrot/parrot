@@ -1,12 +1,8 @@
 Current status:
 
-Work in progress. Some test failures.
+Work in progress.
 
 Things to do:
-
-- re-implement string parsing (DONE)
-
-- re-implement numeric constants (DONE)
 
 - Need more tests! Add more tests to t/dyadic.t. Int * Float is alright, but
   need Int * Int and Float * Float.
