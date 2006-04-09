@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 34;
+use t::APL tests => 57;
 
 diag "need more tests to test int <op> int, float <op> float, etc.";
 
@@ -157,12 +157,107 @@ __DATA__
 === power domain (negative sqrt)
 --- APL: ⁻9*.5
 --- out: DOMAIN ERROR
+--- excuse: can't throw exception?
 --- todo
 
-=== logarithm
---- excuse: can't find operator
+=== logarithm scalar
+--- APL: 1000⍟10
+--- out: 3
+
+=== residue 1
+--- APL: 0|0
+--- out: 0
+
+=== residue 2
+--- APL: 0|2.2
+--- out: 2.2
+
+=== residue 3
+--- APL: 3|10
+--- out: 1
+
+=== residue 4
+--- APL: ⁻3|10
+--- out: 1
+
+=== residue 4
+--- APL: ⁻3|⁻10
+--- out: 2
+
+=== residue N
+--- APL: 0|⁻9
+--- out: DOMAIN ERROR
+--- excuse: can't throw exception?
 --- todo
 
-=== residue, binomial coefficient, deal, circular, and, or, nand, nor, less, not greater, equal, not less, greater, not equal
+=== binomial coefficient 1
+--- APL: 2!5
+--- out: 10
+
+=== binomial coefficient 2
+--- APL: 3!5
+--- out: 10
+
+=== circular 0
+--- APL: 0○.75
+--- out: 0.661438 
+
+=== circular 1
+--- APL: 1○.75
+--- out: 0.681639
+
+=== circular 2
+--- APL: 2○.75
+--- out: 0.731689
+
+=== circular 3
+--- APL: 3○.75
+--- out: 0.931596
+
+=== circular 4
+--- APL: 4○.75
+--- out: 1.25
+
+=== circular 5
+--- APL: 5○.75
+--- out: 0.822317
+
+=== circular 6
+--- APL: 6○.75
+--- out: 1.29468
+
+=== circular 7
+--- APL: 7○.75
+--- out: 0.635149
+
+=== circular ⁻1
+--- APL: ⁻1○.75
+--- out: 0.848062
+
+=== circular ⁻2
+--- APL: ⁻2○.75
+--- out: 0.722734
+
+=== circular ⁻3
+--- APL: ⁻3○.75
+--- out: 0.643501
+
+=== circular ⁻4
+--- APL: ⁻4○.75
+--- out: 0.661438
+
+=== circular ⁻5
+--- APL: ⁻5○.75
+--- out: 0.693147
+
+=== circular ⁻6
+--- APL: ⁻6○3
+--- out: 1.76275
+
+=== circular ⁻7
+--- APL: ⁻7○.75
+--- out: 0.972955
+
+=== deal, and, or, nand, nor, less, not greater, equal, not less, greater, not equal
 --- excuse: need tests
 --- todo

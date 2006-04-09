@@ -50,7 +50,6 @@ sub run_apl_is() {
     else {
       $output = q{}; # this lets todo tests not bother specifying an out.
     }
-    print "EXPECTING: '$output'\n";
     my $todo   = $block->todo;
     if (defined($todo)) {
       if (! $todo) {

@@ -1,25 +1,25 @@
 #!/usr/bin/perl
 
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 16;
+use t::APL tests => 22;
 
 run_apl_is();
 
 __DATA__
 
-=== plus positive
+=== conjugate positive
 --- APL: +2
 --- out: 2
 
-=== plus negative
+=== conjugate negative
 --- APL: +⁻2
 --- out: ⁻2
 
-=== minus positive
+=== negate positive
 --- APL: −2
 --- out: ⁻2
 
-=== minus negative
+=== negate negative
 --- APL: −⁻2
 --- out: 2
 
@@ -70,5 +70,32 @@ __DATA__
 === floor negative
 --- APL: ⌊⁻3.14
 --- out: ⁻4
+
+=== exponential
+--- APL: *1
+--- out: 2.71828
+
+=== natural logarithm
+--- APL: ⍟2.718282
+--- out: 1
+
+=== inverse exp/ln
+--- APL: ⍟*1
+--- out: 1
+
+=== magnitude positive
+--- APL: |12
+--- out: 12
+
+=== magnitude negative
+--- APL: |⁻12
+--- out: 12
+
+=== magnitude zero
+--- APL: |0
+--- out: 0
+
+
+
 
 
