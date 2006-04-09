@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use lib qw(t . lib ../lib ../../lib ../../../lib);
+use lib qw(APL . lib ../lib ../../lib ../../../lib);
 use t::APL tests => 4;
 
 run_apl_is();
