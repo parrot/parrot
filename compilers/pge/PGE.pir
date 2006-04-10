@@ -12,6 +12,7 @@ unit, calling the subroutines marked with the C<:load> subpragma for each.
 
 .namespace [ "PGE" ]
 
+.include "compilers/pge/PGE/CodeString.pir"
 .include "compilers/pge/PGE/Match.pir"
 .include "compilers/pge/PGE/OPTable.pir"
 .include "compilers/pge/PGE/Exp.pir"

@@ -47,6 +47,9 @@ Creates the C<PAST::*> classes.
     $P0 = subclass base, 'PAST::Val'
     $P0 = subclass base, 'PAST::Var'
     $P0 = subclass base, 'PAST::Assign'
+
+    $P0 = new .Integer
+    store_global "APL::PAST", "$!serno", $P0
 .end
 
 .namespace [ 'PAST::Node' ]
@@ -115,6 +118,22 @@ node.
 .sub 'pos' :method
     $P0 = getattribute self, "PAST::Node\x0$.pos"
     .return ($P0)
+.end
+
+
+=item C<generate_unique(STR prefix)>
+
+Generate a unique string that begins with C<prefix>.
+
+=cut
+
+.sub "generate_unique" :method
+    .param string prefix
+    $P0 = find_global "APL::PAST", "$!serno"
+    $S0 = $P0
+    $S0 = concat prefix, $S0
+    inc $P0
+    .return ($S0)
 .end
 
 

@@ -161,6 +161,7 @@ APL::Grammar::numeric_constant: result(.) = {
   set_value:
     $N0 = $S0
     result['value'] = $N0
+    result['class'] = '.Float'
     .return (result)
 }
 
@@ -183,6 +184,7 @@ APL::Grammar::character_constant: result(.) = {
     goto remove_quotes
   end:
     result['value'] = value
+    result['class'] = '.String'
     .return (result)
 }
 

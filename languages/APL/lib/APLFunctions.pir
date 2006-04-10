@@ -18,9 +18,37 @@ Eventually make these be unicode strings.
   throwable[0] = "DOMAIN ERROR"
 .endm
 
-.namespace [ 'APL::Functions' ]
+.namespace [ 'APL' ]
 
 .const num PI = 3.14159265358979323846
+
+
+.sub "__load_pirtable" :load
+    $P0 = new .Hash
+    store_global "APL", "%pirtable", $P0
+
+    # these are the 'generic' forms of each op
+    $P0['dyadic:']        =  "    %1 = '%0'(%1, %2)"
+    $P0['monadic:']       =  "    %1 = '%0'(%1)"
+
+    # special-purpose parrot ops here
+    $P0['dyadic:+']       =  "    %1 = %1 + %2"
+    $P0['dyadic:\u2212']  =  "    %1 = %1 - %2"
+    $P0['dyadic:\x{d7}']  =  "    %1 = %1 * %2"
+    $P0['dyadic:\x{f7}']  =  "    %1 = %1 / %2"
+.end
+
+
+.sub 'aplprint'
+    .param pmc value
+    if value >= 0 goto print_value
+    print unicode:"\u207b"
+    value = abs value
+  print_value:
+    print value
+    print "\n"
+.end
+
 
 .sub 'dyadic:+'                # add
     .param pmc op1

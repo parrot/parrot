@@ -74,6 +74,7 @@ Initializes the compiling subsystem.
     tge = getclass 'TGE'
     $P1 = subclass tge, 'ASTGrammar'
     $P1 = subclass tge, 'EvalGrammar'
+    $P1 = subclass tge, 'PIRGrammar'
 
     # register the compiler
     $P0 = find_global 'APL', 'compile'
@@ -119,6 +120,20 @@ return the resulting PIR code.)
     ast = astbuilder.get('result')
 
     if target == 'PAST' goto return_ast
+    if target == 'eval' goto eval_ast
+
+  build_pir:
+    .local pmc pirgrammar, pirbuilder
+    .local string pir
+    pirgrammar = new 'PIRGrammar'
+    pirbuilder = pirgrammar.'apply'(ast)
+    pir = pirbuilder.get('pir')
+    if target == 'PIR' goto return_pir
+
+  compile_pir:
+    $P0 = compreg "PIR"
+    $P1 = $P0(pir)
+    .return ($P1)
 
   eval_ast:
     .local pmc evalgrammar, evalbuilder, eval
@@ -131,6 +146,8 @@ return the resulting PIR code.)
     .return (match)
   return_ast:
     .return (ast)
+  return_pir:
+    .return (pir)
 .end
 
 
@@ -152,6 +169,8 @@ executing program statements.
     $P0 = find_global 'APL', '__onload'
     $P0()
     $P0 = find_global 'PAST', '__onload'
+    $P0()
+    $P0 = find_global 'APL', '__load_pirtable'
     $P0()
     $P0 = getclass 'PGE::Rule'
     $P0 = subclass $P0, 'APL::Grammar'
@@ -185,9 +204,7 @@ executing program statements.
     .local string stmt
     stmt = readline stdin
     unless stmt goto end
-    $P0 = apl(stmt, 'target' => target)
-    unless target goto stmt_loop
-    '_dumper'($P0, target)
+    bsr apl_eval
     goto stmt_loop
 
   file_arg:
@@ -198,10 +215,21 @@ executing program statements.
     push $P0, 'utf8'
     stmt = read $P0, 65535
     close $P0
-    $P0 = apl(stmt, 'target' => target)
-    unless target goto end
-    '_dumper'($P0, target)
+    bsr apl_eval
     goto end
+
+  apl_eval:
+    $P0 = apl(stmt, 'target' => target)
+    if target == 'PIR' goto dump_pir
+    if target goto dump_object
+    $P0()
+    ret
+  dump_pir:
+    print $P0
+    ret
+  dump_object:
+    '_dumper'($P0, target)
+    ret
 
   err_no_file:
     print 'Cannot open file '
@@ -278,6 +306,10 @@ PGE_CUT_MATCH result to abandon the parse altogether.
 # Include the parse tree -> AST transformation rules from TGE
 .namespace [ 'ASTGrammar' ]
 .include 'lib/pge2past.pir'
+
+# Include the AST -> PIR transformation rules from TGE
+.namespace [ 'PIRGrammar' ]
+.include 'lib/past2pir.pir'
 
 # Include the AST evaluation rules from TGE
 .namespace [ 'EvalGrammar' ]

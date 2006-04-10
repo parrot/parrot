@@ -1,0 +1,154 @@
+ROOT: pir(.) = {
+    .local pmc pir
+    .local pmc iter
+    pir = new "PGE::CodeString"
+    pir.emit(".sub '_anon' :anon")
+    pir.emit("    .local pmc var")
+    pir.emit("    var = find_global 'APL', '%var'")
+    $P0 = node['children']
+    iter = new .Iterator, $P0
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P1 = shift iter
+    $P0 = tree.get('pir', $P1)
+    pir .= $P0
+    goto iter_loop
+  iter_end:
+    pir .= ".end\n"
+    .return (pir)
+}
+
+
+PAST::Stmt: pir(.) = {
+    .local pmc pir
+    pir = new "PGE::CodeString"
+
+    $P0 = node.source()
+    pir.emit("\n    # %0", $P0)
+
+    $P0 = node['statement']
+    $P1 = tree.get('pir', $P0)
+    pir .= $P1
+
+    $I0 = isa $P0, 'PAST::Assign'
+    if $I0 goto end
+    $S0 = $P0['ret']
+    pir.emit("    'aplprint'(%0)", $S0)
+  end:
+    .return (pir)
+}
+
+
+PAST::Op: pir(.) = {
+    .local pmc pirtable
+    .local pmc children
+    .local pmc childret
+    .local pmc pir
+    .local pmc iter
+    .local string opfmt
+    .local pmc ret
+
+  child_gen:    
+    pir = new "PGE::CodeString"
+    children = node['children']
+    childret = new .ResizablePMCArray
+  
+    iter = new .Iterator, children
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P1 = tree.get('pir', $P0)
+    pir .= $P1
+    $S0 = $P0['ret']
+    push childret, $S0
+    goto iter_loop
+  iter_end:
+
+    $P0 = children[0]
+    ret = childret[0]
+    $I0 = $P0['istemp']
+    if $I0 goto emit_op
+    pir.emit('    %0 = clone %0', ret)
+
+  emit_op:
+    .local string op, opquot
+    op = node['op']
+    op = escape op
+    opquot = escape op
+    opquot = concat '"', opquot
+    opquot = concat opquot, '"'
+    pirtable = find_global "APL", "%pirtable"    
+    # use the code in the pirtable if it exists
+    opfmt = pirtable[op]
+    if opfmt > "" goto emit_op_1
+    $I0 = index op, ':'
+    inc $I0
+    $S0 = substr op, 0, $I0
+    opfmt = pirtable[$S0]
+  emit_op_1:
+
+    pir.emit(opfmt, opquot, childret :flat)
+    node['ret'] = ret
+    node['istemp'] = 1
+    .return (pir)
+}
+ 
+ 
+PAST::Val: pir(.) = {
+    .local pmc pir
+    .local pmc ret
+    .local pmc class
+
+    pir = new "PGE::CodeString"
+    ret = node.generate_unique('$P')
+    class = node['class']
+    pir.emit("    %0 = new %1", ret, class)
+    $S0 = node['value']
+    if class != '.String' goto assign_val
+    $S0 = escape $S0
+    $S0 = concat '"', $S0
+    $S0 = concat $S0, '"'
+  assign_val:
+    pir.emit("    assign %0, %1", ret, $S0)
+  end:
+    node['ret'] = ret
+    node['istemp'] = 1
+    .return (pir)
+}
+
+
+PAST::Var: pir(.) = {
+    .local pmc pir
+    .local pmc ret
+    
+    ret = node.generate_unique('$P')
+    pir = new "PGE::CodeString"
+    $P0 = node['name']
+    pir.emit("    %0 = var['%1']", ret, $P0)
+    node['ret'] = ret
+    node['istemp'] = 0
+    .return (pir)
+}
+
+
+PAST::Assign: pir(.) = {
+    .local pmc pir
+    .local pmc rvalue, lvalue
+
+    # obtain rhs value
+    rvalue = node['expression']
+    pir = tree.get('pir', rvalue)
+
+    # obtain lhs target
+    lvalue = node['target']
+    $P0 = lvalue['name']
+    $P1 = rvalue['ret']
+
+    pir.emit("    var['%0'] = %1", $P0, $P1)
+    node["ret"] = $P1
+    node["istemp"] = 0
+    .return (pir)
+}
+
