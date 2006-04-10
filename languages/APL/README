@@ -31,6 +31,10 @@ Display abstract syntax trees instead of executing statements:
 
   $ parrot APL.pbc --target=PAST demo.apl
 
+Display the generated PIR code:
+
+  $ parrot APL.pbc --target=PIR demo.apl
+
 FONT: The source code for APL uses unicode codepoints that you might
 not have a font for. If you can't read the code, try installing the
 SimPL.tff font, available from:
