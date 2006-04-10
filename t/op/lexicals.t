@@ -1,10 +1,10 @@
-#!perl
 # Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -565,11 +565,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'closure 4');
      .const .Sub choose_sub = "_choose"
      .const .Sub fail_sub = "_fail"
      fail = newclosure fail_sub
-     arr1 = new PerlArray
+     arr1 = new ResizablePMCArray
      arr1[0] = 1
      arr1[1] = 3
      arr1[2] = 5
-     arr2 = new PerlArray
+     arr2 = new ResizablePMCArray
      arr2[0] = 1
      arr2[1] = 5
      arr2[2] = 9
@@ -603,7 +603,8 @@ the_end:
 .end
 
 .sub _choose :outer(main)
-     .param PerlArray choices
+     .param ResizablePMCArray choices
+
      .local pmc our_try, old_fail, cc, try
      .lex 'old_fail', old_fail
      .lex 'cc', cc
@@ -621,7 +622,8 @@ the_end:
 .end
 
 .sub _try :outer(_choose)
-     .param PerlArray choices
+     .param ResizablePMCArray choices
+
      .lex 'choices', $P0
      #print "In try\n"
      clone $P0, choices
@@ -913,9 +915,18 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 1');
 .sub '&main' :main :anon
     .local pmc sx
     .lex '$x', sx
-    sx = new .PerlUndef
+    sx = new .Integer
+    sx = 33
     '&f'()
     print sx    # no find_lex needed - 'sx' is defined here
+    print "\n"
+
+    '&f'()
+    print sx 
+    print "\n"
+
+    '&f'()
+    print sx 
     print "\n"
 .end
 
@@ -924,7 +935,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 1');
     inc $P0
 .end
 CODE
-1
+34
+35
+36
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 2');
@@ -936,10 +949,20 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 2');
 .sub '&main' :main :anon
     .local pmc sx
     .lex '$x', sx
-    sx = new .PerlUndef
+    sx = new .Integer
+    sx = -32
     '&g'()
     print sx
     print "\n"
+
+    '&g'()
+    print sx
+    print "\n"
+
+    '&g'()
+    print sx
+    print "\n"
+
 .end
 
 .sub '&f' :outer('&main') 
@@ -952,7 +975,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 2');
     '&f'()
 .end
 CODE
-2
+-30
+-28
+-26
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'package-scoped closure 3 - autoclose');

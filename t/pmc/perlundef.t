@@ -1,12 +1,12 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -350,3 +350,30 @@ CODE
 15
 240
 OUTPUT
+
+pasm_output_like(<<'CODE', <<'OUTPUT', 'interp - warnings');
+	new P0, .PerlUndef
+	set I0, P0
+	printerr "nada:"
+	warningson 1
+	new P1, .PerlUndef
+	set I0, P1
+	end
+CODE
+/^nada:Use of uninitialized value in integer context/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', 'warn on in main');
+.sub _main :main
+.include "warnings.pasm"
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+    _f1()
+.end
+.sub _f1
+    $P0 = new .PerlUndef
+    print $P0
+.end
+CODE
+/uninit/
+OUTPUT
+

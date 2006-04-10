@@ -1,10 +1,10 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 41;
 use Parrot::Config;
@@ -15,7 +15,7 @@ t/pmc/sub.t - Subroutine PMCs
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/sub.t
+    % prove t/pmc/sub.t
 
 =head1 DESCRIPTION
 
@@ -716,20 +716,19 @@ main
 back
 OUTPUT
 
-
-pir_output_like(<<'CODE', <<'OUTPUT', "warn on in main");
+# This is the behavior of Parrot 0.4.3
+# XXX Should there be a warning ?
+pir_output_is(<<'CODE', '', 'warn on in main');
 .sub _main :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f1()
 .end
 .sub _f1
-    $P0 = new .PerlUndef
+    $P0 = new .Undef
     print $P0
 .end
 CODE
-/uninit/
-OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
 .sub _main :main

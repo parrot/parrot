@@ -1,10 +1,10 @@
-#!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -15,7 +15,7 @@ t/op/interp.t - Running the Interpreter
 
 =head1 SYNOPSIS
 
-	% prove t/op/interp.t
+    % prove t/op/interp.t
 
 =head1 DESCRIPTION
 
@@ -27,6 +27,7 @@ C<interpinfo> opcode.
 
 SKIP: {
 	skip("we really shouldn't run just a label - use a sub", 1);
+
 pasm_output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
 	print "calling\n"
@@ -68,17 +69,17 @@ ok\s2\n
 ok\s3\n$/x
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
-	new P0, .PerlUndef
+# This is the behavior as of Parrot 1.4.3
+# XXX Should there be a warning?
+pasm_output_is(<<'CODE', 'nada:', 'interp - warnings');
+	new P0, .Undef
 	set I0, P0
 	printerr "nada:"
 	warningson 1
-	new P1, .PerlUndef
+	new P1, .Undef
 	set I0, P1
 	end
 CODE
-/^nada:Use of uninitialized value in integer context/
-OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "getinterp");
     .include "interpinfo.pasm"

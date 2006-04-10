@@ -1,12 +1,12 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 41;
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ t/pmc/float.t - Floating-point Numbers
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/float.t
+    % prove t/pmc/float.t
 
 =head1 DESCRIPTION
 
@@ -174,205 +174,6 @@ EQ1:	print "ok 1\\n"
 	end
 CODE
 ok 1
-OUTPUT
-
-pasm_output_is(<<"CODE", <<OUTPUT, "add number to other");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .Float
-	set P0, 123.123
-	set P1, 321.321
-	add P1, P1, P0
-	.fp_eq( P1, 444.444, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-
-	new P0, .PerlNum
-	new P1, .Float
-	set P0, 123.123
-	set P1, 321.321
-	add P0, P0, P1
-	.fp_eq( P0, 444.444, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-
-        new P2, .Integer
-        new P3, .Float
-        set P2, 100
-        set P3, 12.5
-        add P2, P2, P3
-        eq P2, 112, EQ3
-        print P2
-	print "not "
-EQ3:	print "ok 3\\n"
-
-        new P2, .Integer
-        new P3, .Float
-        set P2, 100
-        set P3, 12.5
-        add P3, P3, P2
-        .fp_eq(P3, 112.5, EQ4)
-        print P3
-	print "not "
-EQ4:	print "ok 4\\n"
-	end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is(<<"CODE", <<OUTPUT, "subtract number from other");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .Float
-	set P0, 111.222
-	set P1, 333.444
-	sub P1, P1, P0
-	.fp_eq( P1, 222.222, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-
-	new P0, .PerlNum
-	new P1, .Float
-	set P0, 123.456
-	set P1, 456.123
-	sub P0, P0, P1
-	.fp_eq( P0, -332.667, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-
-	new P2, .Integer
-	new P3, .Float
-	set P2, 21
-	set P3, 321.321
-	sub P3, P3, P2
-	.fp_eq( P3, 300.321, EQ3)
-	print P3
-	print "not "
-EQ3:	print "ok 3\\n"
-
-	new P2, .Integer
-	new P3, .Float
-	set P2, 21
-	set P3, 321.321
-	sub P2, P2, P3
-	eq P2, -300, EQ4
-	print P2
-	print "not "
-EQ4:	print "ok 4\\n"
-
-	end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is(<<"CODE", <<OUTPUT, "multiply number by other");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .Float
-	set P0, 123.123
-	set P1, 321.321
-	mul P1, P1, P0
-	.fp_eq( P1, 39562.005483, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-
-	new P0, .PerlNum
-	new P1, .Float
-	set P0, 123.123
-	set P1, 321.321
-	mul P0, P0, P1
-	.fp_eq( P0, 39562.005483, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-
-	new P2, .Integer
-	new P3, .Float
-	set P2, 5
-	set P3, 321.321
-	mul P3, P3, P2
-	.fp_eq( P3, 1606.605, EQ3)
-	print P3
-	print "not "
-EQ3:	print "ok 3\\n"
-
-	new P2, .PerlNum
-	new P3, .Float
-	set P2, 5
-	set P3, 1010.0101
-	mul P2, P2, P3
-	eq P2, 5050, EQ4
-	print P2
-	print "not "
-EQ4:	print "ok 4\\n"
-
-	end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is(<<"CODE", <<OUTPUT, "divide number by other");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .Float
-	set P0, 123.123
-	set P1, 246.246
-	div P1, P1, P0
-	.fp_eq( P1, 2.0, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-
-	new P0, .PerlNum
-	new P1, .Float
-	set P0, 123.123
-	set P1, 246.246
-	div P0, P0, P1
-	.fp_eq( P0, 0.5, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-
-	new P2, .Integer
-	new P3, .Float
-	set P2, 10
-	set P3, 246.246
-	div P3, P3, P2
-	.fp_eq( P3, 24.6246, EQ3)
-	print P3
-	print "not "
-EQ3:	print "ok 3\\n"
-	
-	new P2, .Integer
-	new P3, .Float
-	set P2, 300
-	set P3, 246.246
-	div P2, P2, P3
-	eq P2, 1, EQ4
-	print P2
-	print "not "
-EQ4:	print "ok 4\\n"
-
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive float");
@@ -1078,54 +879,6 @@ CODE
 0
 1
 -1
-OUTPUT
-
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: cmp_num");
-        new P1, .Float
-        set P1, 1.1
-        new P2, .Float
-        set P2, 1.2
-        new P3, .Float
-        set P3, 1.0
-        new P4, .PerlNum
-        set P4, 1.1
-        new P5, .PerlNum
-        set P5, 1.2
-        new P6, .PerlNum
-        set P6, 1.0
-        new P7, .Float
-        set P7, P1
-
-        cmp_num I0, P1, P1
-        print I0
-        print "\n"
-        cmp_num I0, P1, P2
-        print I0
-        print "\n"
-        cmp_num I0, P1, P3
-        print I0
-        print "\n"
-        cmp_num I0, P1, P4
-        print I0
-        print "\n"
-        cmp_num I0, P1, P5
-        print I0
-        print "\n"
-        cmp_num I0, P1, P6
-        print I0
-        print "\n"
-        cmp_num I0, P1, P7
-        print I0
-        print "\n"
-        end
-CODE
-0
--1
-1
-0
--1
-1
-0
 OUTPUT
 
 pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isgt");

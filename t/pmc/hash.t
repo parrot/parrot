@@ -1,20 +1,20 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 37;
 
 =head1 NAME
 
-t/pmc/hash.t - Test for the Hash PMC
+t/pmc/hash.t - Test the Hash PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/hash.t
+    % prove t/pmc/hash.t
 
 =head1 DESCRIPTION
 
@@ -1015,12 +1015,12 @@ pasm_output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
 .include "pmctypes.pasm"
     new P1, .Hash
 
-    new P2, .PerlInt
-    set P1["PerlInt"], P2
-    typeof I0, P1["PerlInt"]
-    eq I0, .PerlInt, ok1
+    new P2, .Integer
+    set P1["Integer"], P2
+    typeof I0, P1["Integer"]
+    eq I0, .Integer, ok1
     print "not "
-ok1:print "PerlInt\n"
+ok1:print "Integer\n"
 
     new P3, .Integer
     set P1["Integer"], P3
@@ -1049,7 +1049,7 @@ ok5:print "String\n"
 
     end
 CODE
-PerlInt
+Integer
 Integer
 Integer
 Float

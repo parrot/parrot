@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 67;
+use Parrot::Test tests => 69;
 
 =head1 NAME
 
@@ -1978,3 +1978,48 @@ CODE
 abcdef
 abcdef
 OUTPUT
+
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "enumerate class");
+   new P0, .PerlString
+   set P0, "abcdef"
+   new P1, .Enumerate, P0
+   print "ok 1\n"
+lp:unless P1, ex
+   shift P2, P1
+   set P10, P2[0]
+   print P10
+   print " "
+   set P10, P2[1]
+   print P10
+   print "\n"
+   branch lp
+ex:
+   end
+CODE
+ok 1
+0 a
+1 b
+2 c
+3 d
+4 e
+5 f
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "iter.next method");
+
+.sub main :main
+   new $P0, .PerlString
+   set $P0, "abcdef"
+   iter $P1, $P0
+lp:unless $P1, ex
+   $P2 = $P1."next"()
+   print $P2
+   goto lp
+ex:
+   print "\n"
+.end
+CODE
+abcdef
+OUTPUT
+

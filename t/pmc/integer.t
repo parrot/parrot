@@ -1,10 +1,10 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 19;
 
@@ -14,7 +14,7 @@ t/pmc/integer.t - Integer basic type
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/integer.t
+    % prove t/pmc/integer.t
 
 =head1 DESCRIPTION
 
@@ -486,10 +486,10 @@ CODE
 Integer
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate derived");
-.sub _main
+pir_output_is(<<'CODE', <<'OUTPUT', 'instantiate derived');
+.sub _main :main
     .local pmc cl, o
-    cl = getclass "PerlInt"
+    cl = getclass "Integer"
     set_args '(0)', cl
     o = instantiate
     print o
@@ -500,7 +500,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate derived");
 .end
 CODE
 0
-PerlInt
+Integer
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate w arg");

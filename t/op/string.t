@@ -1,10 +1,10 @@
-#!perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -15,7 +15,7 @@ t/op/string.t - Parrot Strings
 
 =head1 SYNOPSIS
 
-	% prove t/op/string.t
+     % prove t/op/string.t
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,7 @@ Tests Parrot string registers and operations.
 =cut
 
 
-pasm_output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'set_s_s|sc' );
 	set	S4, "JAPH\n"
 	set     S5, S4
 	print	S4
@@ -35,7 +35,7 @@ JAPH
 JAPH
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "clone" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'clone' );
         set     S0, "Foo\n"
 	clone   S1, S0
         print   S0
@@ -55,7 +55,7 @@ Bar
 Bar
 OUTPUT
 
-pasm_output_is( <<'CODE', '4', "length_i_s" );
+pasm_output_is( <<'CODE', '4', 'length_i_s' );
 	set	I4, 0
 	set	S4, "JAPH"
 	length	I4, S4
@@ -63,7 +63,7 @@ pasm_output_is( <<'CODE', '4', "length_i_s" );
 	end
 CODE
 
-pasm_output_is( <<'CODE', '0', "0 length substr" );
+pasm_output_is( <<'CODE', '0', '0 length substr' );
 	set	I4, 0
 	set	S4, "JAPH"
         substr  S3, S4, 1, 0
@@ -72,7 +72,7 @@ pasm_output_is( <<'CODE', '0', "0 length substr" );
 	end
 CODE
 
-pasm_output_is( <<'CODE', <<OUTPUT, "chopn with clone" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn with clone' );
 	set	S4, "JAPHxyzw"
 	set	S5, "japhXYZW"
         clone   S3, S4
@@ -94,7 +94,7 @@ japh
 JAPHxyzw
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "chopn with set" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn with set' );
 	set	S4, "JAPHxyzw"
 	set	S5, "japhXYZW"
         set     S3, S4
@@ -116,7 +116,7 @@ japh
 JAPH
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "chopn, OOB values");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'chopn, OOB values');
 	set	S1, "A string of length 21"
 	chopn	S1, 0
 	print	S1
@@ -139,7 +139,7 @@ A st
 ** nothing **
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Three argument chopn");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'Three argument chopn');
 	set	S1, "Parrot"
 
 	chopn	S2, S1, 0
@@ -194,7 +194,7 @@ Parrot
 Par
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Three argument chopn, OOB values");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'Three argument chopn, OOB values');
 	set	S1, "Parrot"
 
 	chopn	S2, S1, 7
@@ -217,7 +217,7 @@ Parrot
 P
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "substr_s_s|sc_i|ic_i|ic" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'substr_s_s|sc_i|ic_i|ic' );
 	set	S4, "12345JAPH01"
 	set	I4, 5
 	set	I5, 4
@@ -244,7 +244,7 @@ JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
 OUTPUT
 
 # negative offsets
-pasm_output_is(<<'CODE', <<'OUTPUT', "neg substr offset");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'neg substr offset');
 	set	S0, "A string of length 21"
 	set I0, -9
 	set I1, 6
@@ -260,7 +260,7 @@ length
 OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-pasm_output_is(<<'CODE', <<'OUTPUT', "substr OOB");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'substr OOB');
 	set	S0, "A string of length 21"
 	set I0, -99
 	set I1, 6
@@ -271,7 +271,7 @@ Cannot take substr outside string
 OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-pasm_output_is(<<'CODE', <<'OUTPUT', "substr OOB");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'substr OOB');
 	set S0, "A string of length 21"
 	set I0, 99
 	set I1, 6
@@ -282,7 +282,7 @@ Cannot take substr outside string
 OUTPUT
 
 # This asks for substring much greater than length of original string
-pasm_output_is(<<'CODE', <<'OUTPUT', "len>strlen");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'len>strlen');
 	set	S0, "A string of length 21"
 	set I0, 12
 	set I1, 1000
@@ -298,7 +298,7 @@ length 21
 OUTPUT
 
 # The same, with a negative offset
-pasm_output_is(<<'CODE', <<'OUTPUT', "len>strlen, -ve os");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'len>strlen, -ve os');
 	set	S0, "A string of length 21"
 	set I0, -9
 	set I1, 1000
@@ -313,7 +313,7 @@ A string of length 21
 length 21
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, replacement = length" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, replacement = length' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, 4, 3, S1
@@ -330,7 +330,7 @@ xyz
 efg
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, replacement > length" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, replacement > length' );
   set S0, "abcdefghijk"
   set S1, "xyz0123"
   substr S2, S0, 4, 3, S1
@@ -347,7 +347,7 @@ xyz0123
 efg
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, replacement < length" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, replacement < length' );
   set S0, "abcdefghijk"
   set S1, "x"
   substr S2, S0, 4, 3, S1
@@ -364,7 +364,7 @@ x
 efg
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, offset at end of string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, offset at end of string' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, 11, 3, S1
@@ -381,7 +381,7 @@ xyz
 
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, offset past end of string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, offset past end of string' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, 12, 3, S1
@@ -396,7 +396,7 @@ CODE
 Can only replace inside string or index after end of string
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset, repl=length" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset, repl=length' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, -3, 3, S1
@@ -413,7 +413,7 @@ xyz
 ijk
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset, repl>length" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset, repl>length' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, -6, 2, S1
@@ -430,7 +430,7 @@ xyz
 fg
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset, repl<length" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset, repl<length' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, -6, 4, S1
@@ -447,7 +447,7 @@ xyz
 fghi
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset out of string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset out of string' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, -12, 4, S1
@@ -462,7 +462,7 @@ CODE
 Can only replace inside string or index after end of string
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, length > strlen " );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, length > strlen ' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, 3, 11, S1
@@ -479,7 +479,7 @@ xyz
 defghijk
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, length > strlen, -ve offset" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, length > strlen, -ve offset' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, -3, 11, S1
@@ -496,7 +496,7 @@ xyz
 ijk
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "4-arg, replacement-only substr" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '4-arg, replacement-only substr' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S0, 3, 3, S1
@@ -510,7 +510,7 @@ abcxyzghijk
 xyz
 OUTPUT
 
-pasm_output_is( <<'CODE', 'PH', "3-arg substr" );
+pasm_output_is( <<'CODE', 'PH', '3-arg substr' );
   set S0, "JAPH"
   substr S1, S0, 2
   print S1
@@ -526,7 +526,7 @@ CODE
 /Cannot take substr outside string/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "substr, offset 0, zero-length string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'substr, offset 0, zero-length string' );
   set S0, ""
   substr S1, S0, 0, 1
   print S1
@@ -554,7 +554,7 @@ CODE
 /Cannot take substr outside string/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "zero-length substr, zero-length string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'zero-length substr, zero-length string' );
   set S0, ""
   substr S1, S0, 10, 0
   print S1
@@ -564,7 +564,7 @@ CODE
 _
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "zero-length substr, zero-length string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'zero-length substr, zero-length string' );
   set S0, ""
   substr S1, S0, -10, 0
   print S1
@@ -574,7 +574,7 @@ CODE
 _
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "3-arg substr, zero-length string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '3-arg substr, zero-length string' );
   set S0, ""
   substr S1, S0, 2
   print S1
@@ -584,7 +584,7 @@ CODE
 _
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "5 arg substr, zero-length string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, zero-length string' );
   set S0, ""
   set S1, "xyz"
   substr S2, S0, 0, 3, S1
@@ -614,7 +614,7 @@ abcde
 
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "4 arg substr replace, zero-length string" );
+pasm_output_is( <<'CODE', <<'OUTPUT', '4 arg substr replace, zero-length string' );
   set S0, ""
   set S1, "xyz"
   substr S0, 0, 3, S1
@@ -638,7 +638,7 @@ abcde
 abcde
 OUTPUT
 
-pasm_output_is( <<'CODE', '<><', "concat_s_s|sc, null onto null" );
+pasm_output_is( <<'CODE', '<><', 'concat_s_s|sc, null onto null' );
  print "<>"
  concat S0, S0
  concat S1, ""
@@ -646,7 +646,7 @@ pasm_output_is( <<'CODE', '<><', "concat_s_s|sc, null onto null" );
  end
 CODE
 
-pasm_output_is(<<'CODE', <<OUTPUT, "concat_s_sc, repeated two-arg concats" );
+pasm_output_is(<<'CODE', <<'OUTPUT', 'concat_s_sc, repeated two-arg concats' );
   set S12, ""
   set I0, 0
 WHILE:
@@ -661,7 +661,7 @@ hihihihihihihihihihi
 OUTPUT
 
 
-pasm_output_is( <<'CODE', <<OUTPUT, 'concat_s_s|sc, "foo1" onto null' );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc, "foo1" onto null' );
  concat S0, "foo1"
  set S1, "foo2"
  concat S2, S1
@@ -675,7 +675,7 @@ foo1
 foo2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "concat_s_s|sc" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc' );
 	set S1, "fish"
 	set S2, "bone"
 	concat S1, S2
@@ -687,7 +687,7 @@ CODE
 fishbonefishbone
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "concat_s_s|sc_s|sc" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc_s|sc' );
 	set S1, "japh"
 	set S2, "JAPH"
 	concat S0, "japh", "JAPH"
@@ -710,7 +710,7 @@ japhJAPH
 japhJAPH
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "concat - ensure copy is made" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'concat - ensure copy is made' );
 	set S2, "JAPH"
 	concat S0, S2, ""
 	concat S1, "", S2
@@ -724,7 +724,7 @@ JAPH
 OUTPUT
 
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "clears");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'clears');
 @{[ set_str_regs( sub {"BOO $_[0]\\n"} ) ]}
 	clears
 @{[ print_str_regs() ]}
@@ -748,7 +748,7 @@ my @strings = (
   "hElLo", "hElLo"
 );
 
-pasm_output_is(<<CODE, <<OUTPUT, "eq_s_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'eq_s_s_ic');
 @{[ compare_strings( 0, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -759,7 +759,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "eq_sc_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'eq_sc_s_ic');
 @{[ compare_strings( 1, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -770,7 +770,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "eq_s_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'eq_s_sc_ic');
 @{[ compare_strings( 2, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -781,7 +781,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "eq_sc_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'eq_sc_sc_ic');
 @{[ compare_strings( 3, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -792,7 +792,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ne_s_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'ne_s_s_ic');
 @{[ compare_strings( 0, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -803,7 +803,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ne_sc_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'ne_sc_s_ic');
 @{[ compare_strings( 1, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -814,7 +814,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ne_s_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'ne_s_sc_ic');
 @{[ compare_strings( 2, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -825,7 +825,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ne_sc_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'ne_sc_sc_ic');
 @{[ compare_strings( 3, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -836,7 +836,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "lt_s_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'lt_s_s_ic');
 @{[ compare_strings( 0, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -847,7 +847,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "lt_sc_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'lt_sc_s_ic');
 @{[ compare_strings( 1, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -858,7 +858,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "lt_s_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'lt_s_sc_ic');
 @{[ compare_strings( 2, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -869,7 +869,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "lt_sc_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'lt_sc_sc_ic');
 @{[ compare_strings( 3, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -880,7 +880,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "le_s_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'le_s_s_ic');
 @{[ compare_strings( 0, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -891,7 +891,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "le_sc_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'le_sc_s_ic');
 @{[ compare_strings( 1, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -902,7 +902,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "le_s_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'le_s_sc_ic');
 @{[ compare_strings( 2, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -913,7 +913,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "le_sc_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'le_sc_sc_ic');
 @{[ compare_strings( 3, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -924,7 +924,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "gt_s_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'gt_s_s_ic');
 @{[ compare_strings( 0, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -935,7 +935,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "gt_sc_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'gt_sc_s_ic');
 @{[ compare_strings( 1, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -946,7 +946,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "gt_s_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'gt_s_sc_ic');
 @{[ compare_strings( 2, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -957,7 +957,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "gt_sc_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'gt_sc_sc_ic');
 @{[ compare_strings( 3, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -968,7 +968,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ge_s_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'ge_s_s_ic');
 @{[ compare_strings( 0, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -979,7 +979,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ge_sc_s_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'ge_sc_s_ic');
 @{[ compare_strings( 1, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -990,7 +990,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ge_s_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'ge_s_sc_ic');
 @{[ compare_strings( 2, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -1001,7 +1001,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ge_sc_sc_ic");
+pasm_output_is(<<"CODE", <<'OUTPUT', 'ge_sc_sc_ic');
 @{[ compare_strings( 3, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -1012,7 +1012,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "same constant twice bug");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'same constant twice bug');
        set     S0, ""
        set     S1, ""
        set     S2, "foo"
@@ -1172,60 +1172,60 @@ pasm_output_is(<<'CODE',chr(122),'chr of 122 is z in ASCII');
 	end
 CODE
 
-pasm_output_is(<<CODE, <<OUTPUT, "if_s_ic");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'if_s_ic');
 	set	S0, "I've told you once, I've told you twice..."
 	if	S0, OK1
 	print	"not "
-OK1:	print	"ok 1\\n"
+OK1:	print	"ok 1\n"
 
 	set	S0, "0.0"
 	if	S0, OK2
 	print	"not "
-OK2:	print	"ok 2\\n"
+OK2:	print	"ok 2\n"
 
 	set	S0, ""
 	if	S0, BAD3
 	branch OK3
 BAD3:	print	"not "
-OK3:	print	"ok 3\\n"
+OK3:	print	"ok 3\n"
 
 	set	S0, "0"
 	if	S0, BAD4
 	branch OK4
 BAD4:	print	"not "
-OK4:	print	"ok 4\\n"
+OK4:	print	"ok 4\n"
 
 	set	S0, "0e0"
 	if	S0, OK5
 	print	"not "
-OK5:	print	"ok 5\\n"
+OK5:	print	"ok 5\n"
 
 	set	S0, "x"
 	if	S0, OK6
 	print	"not "
-OK6:	print	"ok 6\\n"
+OK6:	print	"ok 6\n"
 
 	set	S0, "\\x0"
 	if	S0, OK7
 	print	"not "
-OK7:	print	"ok 7\\n"
+OK7:	print	"ok 7\n"
 
-	set	S0, "\\n"
+	set	S0, "\n"
 	if	S0, OK8
 	print	"not "
-OK8:	print	"ok 8\\n"
+OK8:	print	"ok 8\n"
 
 	set	S0, " "
 	if	S0, OK9
 	print	"not "
-OK9:	print	"ok 9\\n"
+OK9:	print	"ok 9\n"
 
 # An empty register should be false...
         clears
         if      S1, BAD10
         branch  OK10
 BAD10:	print	"not "
-OK10:	print	"ok 10\\n"
+OK10:	print	"ok 10\n"
 
 	end
 CODE
@@ -1241,36 +1241,36 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "repeat_s_s|sc_i|ic");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'repeat_s_s|sc_i|ic');
 	set S0, "x"
 
 	repeat S1, S0, 12
 	print S0
-	print "\\n"
+	print "\n"
 	print S1
-	print "\\n"
+	print "\n"
 
 	set I0, 12
 	set S2, "X"
 
 	repeat S3, S2, I0
 	print S2
-	print "\\n"
+	print "\n"
 	print S3
-	print "\\n"
+	print "\n"
 
 	repeat S4, "~", 12
 	print S4
-	print "\\n"
+	print "\n"
 
 	repeat S5, "~", I0
 	print S5
-	print "\\n"
+	print "\n"
 
 	print ">"
 	repeat S6, "***", 0
 	print S6
-	print "< done\\n"
+	print "< done\n"
 
 	end
 CODE
@@ -1288,7 +1288,7 @@ pasm_output_is(<<'CODE',"Cannot repeat with negative arg\n",'repeat OOB');
 	end
 CODE
 
-pasm_output_is(<<'CODE',<<OUTPUT,"index, 3-arg form");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, 3-arg form');
       set S0, "Parrot"
       set S1, "Par"
       index I1, S0, S1
@@ -1312,7 +1312,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<OUTPUT,"index, 4-arg form");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, 4-arg form');
       set S0, "Barbarian"
       set S1, "ar"
       index I1, S0, S1, 0
@@ -1335,7 +1335,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<OUTPUT,"index, 4-arg form, bug 22718");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, 4-arg form, bug 22718');
 	set S1, "This is not quite right"
 	set S0, " is "
 	index I0, S1, S0, 0
@@ -1349,7 +1349,7 @@ CODE
 42
 OUTPUT
 
-pasm_output_is(<<'CODE',<<OUTPUT,"index, null strings");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, null strings');
       set S0, "Parrot"
       set S1, ""
       index I1, S0, S1
@@ -1401,7 +1401,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<OUTPUT,"index, embedded nulls");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, embedded nulls');
       set S0, "Par\0\0rot"
       set S1, "\0"
       index I1, S0, S1
@@ -1418,7 +1418,7 @@ CODE
 4
 OUTPUT
 
-pasm_output_is(<<'CODE',<<OUTPUT,"index, big strings");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, big strings');
       set S0, "a"
       repeat S0, S0, 10000
       set S1, "a"
@@ -1442,7 +1442,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<OUTPUT,"index, big, hard to match strings");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, big, hard to match strings');
 # Builds a 24th iteration fibonacci string (approx. 100K)
       set S1, "a"
       set S2, "b"
@@ -1467,7 +1467,7 @@ CODE
 -1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT',"index with different charsets");
+pir_output_is(<< 'CODE', << 'OUTPUT','index with different charsets');
 
 .sub test :main
 
@@ -1520,7 +1520,7 @@ binary - binary:
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT',"negative index #35959");
+pasm_output_is(<<'CODE',<<'OUTPUT','negative index #35959');
     index I1, "u", "t", -123456
     print I1
     print "\n"
@@ -1535,7 +1535,7 @@ OUTPUT
 
 SKIP: {
 skip("Pending rework of creating non-ascii literals",2);
-pasm_output_is(<<'CODE',<<OUTPUT,"index, multibyte matching");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, multibyte matching');
     set S0, "\xAB"
     find_chartype I0, "8859-1"
     set_chartype S0, I0
@@ -1564,7 +1564,7 @@ equal
 0
 OUTPUT
 
-pasm_output_is(<<'CODE',<<OUTPUT,"index, multibyte matching 2");
+pasm_output_is(<<'CODE',<<'OUTPUT','index, multibyte matching 2');
     set S0, "\xAB\xBA"
     set S1, "foo\xAB\xAB\xBAbar"
     find_chartype I0, "8859-1"
@@ -1589,7 +1589,7 @@ CODE
 OUTPUT
 }
 
-pasm_output_is(<<'CODE',<<OUTPUT,"num to string");
+pasm_output_is(<<'CODE',<<'OUTPUT','num to string');
     set N0, 80.43
     set S0, N0
     print S0
@@ -1605,7 +1605,7 @@ CODE
 -1.11111
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "string to int");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'string to int');
 	set	S0, "123"
 	set	I0, S0
 	print	I0
@@ -1641,7 +1641,7 @@ CODE
 OUTPUT
 
 
-pasm_output_is( <<'CODE', <<OUTPUT, "concat/substr (COW)" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'concat/substr (COW)' );
 	set S0, "<JA"
 	set S1, "PH>"
 	set S2, ""
@@ -1658,7 +1658,7 @@ CODE
 JAPH
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "constant to cstring" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'constant to cstring' );
   stringinfo I0, "\n", 2
   stringinfo I1, "\n", 2
   eq I1, I0, ok1
@@ -1677,7 +1677,7 @@ OK
 OK
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "COW with chopn leaving original untouched" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'COW with chopn leaving original untouched' );
   set S0, "ABCD"
   clone S1, S0
   chopn S0, 1
@@ -1691,7 +1691,7 @@ ABC
 ABCD
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "Check that bug #16874 was fixed" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'Check that bug #16874 was fixed' );
   set S0,  "foo     "
   set S1,  "bar     "
   set S2,  "quux    "
@@ -1707,7 +1707,7 @@ CODE
 [foo     bar     quux    ]
 OUTPUT
 
-pasm_output_is( <<'CODE', "all ok\n", "stress concat" );
+pasm_output_is( <<'CODE', "all ok\n", 'stress concat' );
  set I0, 1000
  set S0, "michael"
 LOOP:
@@ -1729,7 +1729,7 @@ BOTTOM:
  end
 CODE
 
-pasm_output_is( <<'CODE', <<OUTPUT, "ord and substring (see #17035)" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'ord and substring (see #17035)' );
   set S0, "abcdef"
   substr S1, S0, 2, 3
   ord I0, S0, 2
@@ -1754,23 +1754,23 @@ CODE
 It's all good
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "sprintf");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'sprintf');
     branch MAIN
 
 NEWARYP:
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     set P1[0], P0
     ret
 NEWARYS:
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     set P1[0], S0
     ret
 NEWARYI:
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     set P1[0], I0
     ret
 NEWARYN:
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     set P1[0], N0
     ret
 PRINTF:
@@ -1898,7 +1898,7 @@ Hello, Hello, Pa!
 That's all, folks!
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "other form of sprintf op");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'other form of sprintf op');
     branch MAIN
 
 PRINTF:
@@ -1911,13 +1911,13 @@ MAIN:
 
     new P2, .String
     set P2, "15 is %b\n"
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     set P1[0], 15
     bsr PRINTF
 
     new P2, .String
     set P2, "128 is %o\n"
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     set P1[0], 128
     bsr PRINTF
 
@@ -1927,7 +1927,7 @@ CODE
 128 is 200
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "exchange");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'exchange');
     set S0, "String #0\n"
     set S1, "String #1\n"
     exchange S0, S1
@@ -1947,7 +1947,7 @@ OUTPUT
 
 SKIP: {
 skip("Peding reimplementation of find_encoding", 1);
-pasm_output_is(<<'CODE', <<OUTPUT, "find_encoding");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'find_encoding');
       find_encoding I0, "singlebyte"
       print I0
       print "\n"
@@ -1971,7 +1971,7 @@ OUTPUT
 
 SKIP: {
 skip("no more visible encoding", 1);
-pasm_output_is(<<'CODE', <<OUTPUT, "string_encoding");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'string_encoding');
       set I0, 0
       new S0, 0, I0
       string_encoding I1, S0
@@ -2009,7 +2009,7 @@ ok 4
 OUTPUT
 }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "substr_r_s_s|sc_i|ic_i|ic" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'substr_r_s_s|sc_i|ic_i|ic' );
 	set	S4, "12345JAPH01"
 	set	I4, 5
 	set	I5, 4
@@ -2035,7 +2035,7 @@ CODE
 JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "assign" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'assign' );
 	set	S4, "JAPH\n"
 	assign  S5, S4
 	print	S4
@@ -2046,7 +2046,7 @@ JAPH
 JAPH
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "assign & globber" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'assign & globber' );
 	set	S4, "JAPH\n"
 	assign  S5, S4
 	assign  S4, "Parrot\n"
@@ -2058,7 +2058,7 @@ Parrot
 JAPH
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "assign & globber 2" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'assign & globber 2' );
 	set	S4, "JAPH\n"
 	set     S5, S4
 	assign  S4, "Parrot\n"
@@ -2070,7 +2070,7 @@ Parrot
 Parrot
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bands NULL string");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bands NULL string');
 	null S1
 	set S2, "abc"
 	bands S1, S2
@@ -2104,7 +2104,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bands 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 2');
 	set S1, "abc"
 	set S2, "EE"
 	bands S1, S2
@@ -2118,7 +2118,7 @@ A@
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bands 3");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 3');
 	set S1, "abc"
 	set S2, "EE"
 	bands S0, S1, S2
@@ -2135,7 +2135,7 @@ abc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bands COW");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bands COW');
   set S1, "foo"
   substr S2, S1, 0, 3
   bands S1, "bar"
@@ -2146,7 +2146,7 @@ CODE
 foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bors NULL string");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bors NULL string');
      null S1
      null S2
      bors S1, S2
@@ -2220,7 +2220,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bors 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 2');
 	set S1, "abc"
 	set S2, "EE"
 	bors S1, S2
@@ -2234,7 +2234,7 @@ egc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bors 3");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 3');
 	set S1, "abc"
 	set S2, "EE"
 	bors S0, S1, S2
@@ -2251,7 +2251,7 @@ abc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bors COW");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bors COW');
   set S1, "foo"
   substr S2, S1, 0, 3
   bors S1, "bar"
@@ -2262,7 +2262,7 @@ CODE
 foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bxors NULL string");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors NULL string');
      null S1
      null S2
      bxors S1, S2
@@ -2336,7 +2336,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bxors 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 2');
  set S1, "a2c"
  set S2, "Dw"
  bxors S1, S2
@@ -2359,7 +2359,7 @@ ABCX
    X
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bxors 3");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 3');
  set S1, "a2c"
  set S2, "Dw"
  bxors S0, S1, S2
@@ -2388,7 +2388,7 @@ abc
    Y
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bxors COW");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors COW');
   set S1, "foo"
   substr S2, S1, 0, 3
   bxors S1, "bar"
@@ -2399,7 +2399,7 @@ CODE
 foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bnots NULL string");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots NULL string');
      null S1
      null S2
      bnots S1, S2
@@ -2428,7 +2428,7 @@ OUTPUT
 
 SKIP: {
 skip("No unicode yet", 1);
-pasm_output_is( <<'CODE', <<OUTPUT, "bnots 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots 2');
  getstdout P0
  push P0, "utf8"
  set S1, "a2c"
@@ -2452,7 +2452,7 @@ a2c
 OUTPUT
 }
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bnots COW");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots COW');
   set S1, "foo"
   substr S2, S1, 0, 3
   bnots S1, S1
@@ -2465,7 +2465,7 @@ OUTPUT
 
 SKIP: {
 skip("no more transcode", 1);
-pasm_output_is( <<'CODE', <<OUTPUT, "transcode to utf8");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'transcode to utf8');
   set S1, "ASCII is the same as UTF8\n"
   find_encoding I1, "utf8"
   transcode S2, S1, I1
@@ -2480,7 +2480,7 @@ OUTPUT
 
 SKIP: {
 skip("no more chartype", 1);
-pasm_output_is(<<'CODE', <<OUTPUT, "string_chartype");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'string_chartype');
     set S0, "Test String"
     find_chartype I0, "usascii"
     set_chartype S0, I0
@@ -2560,7 +2560,7 @@ sub compare_strings {
   return $rt;
 }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "split on empty string");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'split on empty string');
 _main:
     split P1, "", ""
     set I1, P1
@@ -2582,7 +2582,7 @@ CODE
 ab
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "split on non-empty string");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'split on non-empty string');
 _main:
     split P0, "a", "afooabara"
     set I0, P0
@@ -2606,9 +2606,9 @@ r
 
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "join");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'join');
 _main:
-    new P0, .PerlArray
+    new P0, .ResizablePMCArray
     join S0, "--", P0
     print S0
     print "\n"
@@ -2616,7 +2616,7 @@ _main:
     join S0, "--", P0
     print S0
     print "\n"
-    new P0, .PerlArray
+    new P0, .ResizablePMCArray
     push P0, "a"
     push P0, "b"
     join S0, "--", P0
@@ -2629,12 +2629,12 @@ a
 a--b
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "join: __get_string returns a null string");
+pir_output_is( <<'CODE', <<'OUTPUT', 'join: __get_string returns a null string');
 
 .sub _main
     newclass P0, "Foo"
 
-    new P0, .PerlArray
+    new P0, .ResizablePMCArray
 
     find_type I0, "Foo"
     new P1, I0
@@ -2663,7 +2663,7 @@ CODE
 abc
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "eq_addr/ne_addr");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'eq_addr/ne_addr');
         set S0, "Test"
         set S1, S0
         eq_addr S1, S0, OK1
@@ -2691,7 +2691,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "if_null_s_ic");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'if_null_s_ic');
 	set S0, "foo"
 	if_null S0, ERROR
 	print "ok 1\n"
@@ -2706,7 +2706,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "upcase");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'upcase');
   set S0, "abCD012yz\n"
   upcase S1, S0
   print S1
@@ -2718,7 +2718,7 @@ ABCD012YZ
 ABCD012YZ
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "downcase");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'downcase');
   set S0, "ABcd012YZ\n"
   downcase S1, S0
   print S1
@@ -2730,7 +2730,7 @@ abcd012yz
 abcd012yz
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "titlecase");
+pasm_output_is( <<'CODE', <<'OUTPUT', 'titlecase');
   set S0, "aBcd012YZ\n"
   titlecase S1, S0
   print S1
