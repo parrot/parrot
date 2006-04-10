@@ -74,8 +74,8 @@ Returns this new coroutine, an object with type C<"thread">.
 .sub _coroutine_create :anon :outer(init_coroutine)
     .param pmc f :optional
     .local pmc ret
-    checktype(f, "Closure")
-    ret = new .Coroutine, f
+    checktype(f, "function")
+    ret = new .LuaThread, f
     .return (ret)
 .end
 
@@ -100,7 +100,7 @@ C<resume> returns B<false> plus the error message.
     .local pmc ret
     .local pmc status
     new status, .LuaBoolean
-    checktype(co, "Coroutine")
+    checktype(co, "thread")
     push_eh _handler
     (ret :slurpy) = co(argv :flat)
     status = 1
@@ -146,7 +146,7 @@ DUMMY IMPLEMENTATION.
 .sub _coroutine_status :anon :outer(init_coroutine)
     .param pmc co :optional
     .local pmc ret
-    checktype(co, "Coroutine")
+    checktype(co, "thread")
     new ret, .LuaString 
     ret = "suspended"
     .return (ret)
@@ -166,7 +166,7 @@ NOT YET IMPLEMENTED.
 
 .sub _coroutine_wrap :anon :outer(init_coroutine)
     .param pmc f :optional
-    checktype(f, "Closure")
+    checktype(f, "function")
     not_implemented()
 .end
 

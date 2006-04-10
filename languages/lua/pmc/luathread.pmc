@@ -1,5 +1,5 @@
 /*
-Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -29,7 +29,6 @@ static INTVAL dynpmc_LuaString;
 
 pmclass LuaThread
     extends Coroutine
-    does sub
     dynpmc
     group lua_group
     hll Lua maps Coroutine {
@@ -147,8 +146,9 @@ Return always false.
         PMC *retval;
        
         retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (SELF->vtable->base_type == value->vtable->base_type
-         && SELF == value)
+        if ( SELF->vtable->base_type == value->vtable->base_type
+         && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
+         && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg )
             PMC_int_val(retval) = 1;
         else
             PMC_int_val(retval) = 0;
