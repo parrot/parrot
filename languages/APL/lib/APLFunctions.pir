@@ -113,18 +113,21 @@ END_PIR
     %1 = $I100
 END_PIR
     $P0['monadic:\x{f7}'] =  <<"END_PIR"            # reciprocal
-    $N100 = 1.0 / %1
+    $N100 = %1
+    $N100 = 1.0 / $N100
     %1 = $N100
 END_PIR
 
     $P0['monadic:\u2212'] =  "    %1 = neg %1"      # negate
     $P0['monadic:\u2308'] =  <<"END_PIR"            # ceiling
-    $I100 = ceil %1
+    $N100 = %1
+    $I100 = ceil $N100
     %1 = $I100
 END_PIR
 
     $P0['monadic:\u230a'] =  <<"END_PIR"            # floor
-    $I100 = floor %1
+    $N100 = %1
+    $I100 = floor $N100
     %1 = $I100
 END_PIR
 
