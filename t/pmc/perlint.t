@@ -1,12 +1,12 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
-use Parrot::Test tests => 70;
+use Parrot::Test tests => 73;
 use Parrot::PMC '%pmc_types';
 
 =head1 NAME
@@ -23,7 +23,7 @@ Tests the PerlInt PMC. Checks Perl-specific integer behaviour.
 
 =cut
 
-my $perlint = $pmc_types{'PerlInt'};
+my $perlint = $pmc_types{PerlInt};
 my $ok = '"ok 1\n"';
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (    J, K, L )
@@ -69,6 +69,34 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 warn "failed to get type of PerlInt!" unless defined $perlint;
+
+pasm_output_is(<<'CODE', <<'OUTPUT', 'new pmc');
+	print "starting\n"
+	new P0, .PerlInt
+	print "ending\n"
+	end
+CODE
+starting
+ending
+OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', 'typeof');
+    new P0,.PerlInt
+    typeof S0,P0
+    eq     S0,"PerlInt",OK_1
+    print  "not "
+OK_1:
+    print  "ok 1\n"
+    typeof I0,P0
+    eq     I0,.PerlInt,OK_2
+    print  "not "
+OK_2:
+    print  "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
+OUTPUT
 
 pasm_output_is(<<"CODE", <<'OUTPUT', ".PerlInt == $perlint");
 # type
@@ -2055,3 +2083,24 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Fix for a minor problem");
 CODE
 25
 OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUT', 'get_mro');
+    new P0, .PerlInt
+    get_mro P1, P0
+    print "ok 1\n"
+    elements I1, P1
+    null I0
+loop:
+    set P2, P1[I0]
+    classname S0, P2
+    print S0
+    print "\n"
+    inc I0
+    lt I0, I1, loop
+    end
+CODE
+ok 1
+PerlInt
+Integer
+OUT
+

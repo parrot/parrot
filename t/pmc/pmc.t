@@ -1,25 +1,25 @@
-#! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 19;
 use Parrot::PMC qw(%pmc_types);
 
 =head1 NAME
 
-t/pmc/pmc.t - Perl PMCs
+t/pmc/pmc.t - PMCs
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/pmc.t
+    % prove t/pmc/pmc.t
 
 =head1 DESCRIPTION
 
-Contains a lot of Perl PMC related tests.
+Contains a lot of PMC related tests.
 
 =cut
 
@@ -70,7 +70,7 @@ ENDOFMACRO
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "newpmc");
 	print "starting\n"
-	new P0, .PerlInt
+	new P0, .Integer
 	print "ending\n"
 	end
 CODE
@@ -92,18 +92,18 @@ CODE
 Illegal PMC enum ($max_pmc) in new
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "typeof");
-    new P0,.PerlInt
+pasm_output_is(<<'CODE', <<'OUTPUT', 'typeof');
+    new P0,.Integer
     typeof S0,P0
-    eq     S0,"PerlInt",OK_1
+    eq     S0, "Integer", OK_1
     print  "not "
 OK_1:
-    print  "ok 1\\n"
+    print  "ok 1\n"
     typeof I0,P0
-    eq     I0,.PerlInt,OK_2
+    eq     I0, .Integer, OK_2
     print  "not "
 OK_2:
-    print  "ok 2\\n"
+    print  "ok 2\n"
     end
 CODE
 ok 1
@@ -123,8 +123,8 @@ while (my ($type, $id) = each %pmc_types) {
     next if $type eq "LexInfo";
     next if $type eq "LexPad";
     my $set_ro = ($type =~ /^Const\w+/) ? <<EOPASM : '';
-    new P10, .PerlInt
-    inc P10
+    new P10, .Integer
+    set P10, 1
     setprop P0, "_ro", P10
 EOPASM
     $checkTypes .= <<"CHECK";
@@ -174,136 +174,8 @@ CODE
 All names and ids ok.
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
-    new P0, .PerlInt
-    new P1, .PerlNum
-    new P2, .PerlString
-    new P3, .PerlUndef
-    set P0, 123
-    set P1, 3.14
-    set P2, "7.4x"
-    set P3, 666
-
-    new P10, .PerlInt
-    new P11, .PerlNum
-    new P12, .PerlString
-    new P13, .PerlUndef
-
-    assign P10, P0
-    assign P11, P0
-    assign P12, P0
-    assign P13, P0
-    print P10
-    print ":"
-    print P11
-    print ":"
-    print P12
-    print ":"
-    print P13
-    print "\n"
-
-    assign P10, P1
-    assign P11, P1
-    assign P12, P1
-    assign P13, P1
-    print P10
-    print ":"
-    print P11
-    print ":"
-    print P12
-    print ":"
-    print P13
-    print "\n"
-
-    assign P10, P2
-    assign P11, P2
-    assign P12, P2
-    assign P13, P2
-    print P10
-    print ":"
-    print P11
-    print ":"
-    print P12
-    print ":"
-    print P13
-    print "\n"
-
-    assign P10, P3
-    assign P11, P3
-    assign P12, P3
-    assign P13, P3
-    print P10
-    print ":"
-    print P11
-    print ":"
-    print P12
-    print ":"
-    print P13
-    print "\n"
-
-    end
-CODE
-123:123:123:123
-3.140000:3.140000:3.140000:3.140000
-7.4x:7.4x:7.4x:7.4x
-666:666:666:666
-OUTPUT
-
-pasm_output_is(<<"CODE", <<OUTPUT, "exchange");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-        new P1, .PerlInt
-	set P0, 123
-	set P1, 246
-        exchange P0, P1
-        set I0, P0
-        eq I0, 246, EQ1
-        print "not "
-EQ1:    print "ok 1\\n"
-        set I1, P1
-        eq I1, 123, EQ2
-        print "not "
-EQ2:    print "ok 2\\n"
-        new P2, .PerlNum
-        new P3, .PerlString
-        set P2, 1234.567890
-        set P3, "Themistocles"
-        exchange P2, P3
-        set S2, P2
-        eq S2, "Themistocles", EQ3
-        print "not "
-EQ3:    print "ok 3\\n"
-        set S2, "1234.567890"
-        set S3, P3
-        eq S2, S3, EQ4
-        print "not "
-EQ4:    print "ok 4\\n"
-        new P4, .PerlArray
-        new P5, .Hash
-        new P6, .PerlString
-        set P4[2], "Array"
-        set P5["2"], "Hash"
-        exchange P4, P5
-        set S0, P4["2"]
-        eq S0, "Hash", EQ5
-        print "not "
-EQ5:    print "ok 5\\n"
-        set S0, P5[2]
-        eq S0, "Array", EQ6
-        print "not "
-EQ6:    print "ok 6\\n"
-	end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-OUTPUT
-
-pasm_output_like(<<"CODE", <<'OUTPUT', "find_method");
-	new P1, .PerlInt
+pasm_output_like(<<'CODE', <<'OUTPUT', 'find_method');
+	new P1, .Integer
 	find_method P0, P1, "no_such_meth"
 	end
 CODE
@@ -316,42 +188,6 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "new with a native type");
 	end
 CODE
 /(unknown macro|unexpected DOT)/
-OUTPUT
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "bxor undef");
-    new P0, .PerlUndef
-    bxor P0, 0b00001111
-    print  P0
-    print "\n"
-
-    new P0, .PerlUndef
-    new P1, .PerlInt
-    set P1, 0b11110000
-    bxor P0, P1
-    print P0
-    print "\n"
-    end
-CODE
-15
-240
-OUTPUT
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "band undef");
-    new P0, .PerlUndef
-    band P0, 0b00001111
-    print  P0
-    print "\n"
-
-    new P0, .PerlUndef
-    new P1, .PerlInt
-    set P1, 0b11110000
-    band P0, P1
-    print P0
-    print "\n"
-    end
-CODE
-0
-0
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "eq_addr same");
@@ -391,7 +227,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "if_null");
       if_null P0, OK1
       print "not "
 OK1:  print "ok 1\n"
-      new P0, .PerlInt
+      new P0, .Integer
       if_null P0, BAD2
       branch OK2
 BAD2: print "not "
@@ -465,26 +301,6 @@ CODE
 ok 1
 ok 2
 ok 3
-OUT
-
-pasm_output_is(<<'CODE', <<'OUT', "get_mro");
-    new P0, .PerlInt
-    get_mro P1, P0
-    print "ok 1\n"
-    elements I1, P1
-    null I0
-loop:
-    set P2, P1[I0]
-    classname S0, P2
-    print S0
-    print "\n"
-    inc I0
-    lt I0, I1, loop
-    end
-CODE
-ok 1
-PerlInt
-Integer
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "pmc constant 1");

@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 14;
 
 =head1 NAME
 
@@ -375,5 +375,41 @@ pir_output_like(<<'CODE', <<'OUTPUT', 'warn on in main');
 .end
 CODE
 /uninit/
+OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "bxor undef");
+    new P0, .PerlUndef
+    bxor P0, 0b00001111
+    print  P0
+    print "\n"
+
+    new P0, .PerlUndef
+    new P1, .PerlInt
+    set P1, 0b11110000
+    bxor P0, P1
+    print P0
+    print "\n"
+    end
+CODE
+15
+240
+OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "band undef");
+    new P0, .PerlUndef
+    band P0, 0b00001111
+    print  P0
+    print "\n"
+
+    new P0, .PerlUndef
+    new P1, .PerlInt
+    set P1, 0b11110000
+    band P0, P1
+    print P0
+    print "\n"
+    end
+CODE
+0
+0
 OUTPUT
 
