@@ -106,7 +106,15 @@ PAST::Val: pir(.) = {
     class = node['class']
     pir.emit("    %0 = new %1", ret, class)
     $S0 = node['value']
-    if class != '.String' goto assign_val
+    if class == '.Float' goto assign_float
+    if class == '.String' goto assign_string
+    goto assign_val
+  assign_float:                                    
+    $I0 = index $S0, '.'                           # XXX: '.' hack due to
+    if $I0 >= 0 goto assign_val                    # parrotbug #38896
+    concat $S0, '.'
+    goto assign_val
+  assign_string:
     $S0 = escape $S0
     $S0 = concat '"', $S0
     $S0 = concat $S0, '"'
