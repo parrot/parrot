@@ -10,4 +10,3 @@ __DATA__
 === vectors
 --- APL: 10 2 3
 --- out: 10 2 3
---- todo: basic vector support missing

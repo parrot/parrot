@@ -148,6 +148,38 @@ APL::Grammar::constant: result(.) = {
 
 
 APL::Grammar::numeric_constant: result(.) = {
+
+    $P0 = node['decimal_representation']
+    $I0 = elements $P0
+    if $I0 > 1 goto vector
+    $P0 = $P0[0]
+    .return tree.get('result', $P0, 'APL::Grammar::decimal_representation')
+
+  vector:
+    .local pmc result
+    .local pmc children
+    .local pmc iter
+    result = new 'PAST::Vector'
+    result.set_node(node)
+
+    children = new .ResizablePMCArray
+    iter = new .Iterator, $P0
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P1 = tree.get('result', $P0, 'APL::Grammar::decimal_representation')
+    if null $P1 goto iter_loop
+    push children, $P1
+    goto iter_loop
+  iter_end:
+
+    result['children'] = children
+    .return (result)
+}
+
+    
+APL::Grammar::decimal_representation: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
     result.set_node(node)

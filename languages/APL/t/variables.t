@@ -30,4 +30,3 @@ SOMEVARIABLE
 X←1 2 3 4
 X
 --- out: 1 2 3 4
---- todo

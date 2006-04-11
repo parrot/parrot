@@ -137,13 +137,37 @@ END_PIR
 .end
 
 .sub 'aplprint'
-    .param pmc value
-    if value >= 0 goto print_value
+    .param pmc arg
+    .local pmc value
+    $I0 = isa arg, "ResizablePMCArray"
+    if $I0 goto print_array
+    value = arg
+    bsr print_value
+    print "\n"
+    .return ()
+
+  print_array:
+    .local pmc iter
+    iter = new .Iterator, arg
+    iter = 0
+    unless iter goto iter_end
+  iter_loop:
+    value = shift iter
+    bsr print_value
+    unless iter goto iter_end
+    print ' '
+    goto iter_loop
+  iter_end:
+    print "\n"
+    .return ()
+
+  print_value:
+    if value >= 0 goto print_value_1
     print unicode:"\u207b"
     value = abs value
-  print_value:
+  print_value_1:
     print value
-    print "\n"
+    ret
 .end
 
 .sub 'dyadic:\u2308'           # maximum

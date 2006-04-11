@@ -36,6 +36,11 @@ rule constant {
 
 
 rule numeric_constant { 
+    <decimal_representation> [ \s+ <decimal_representation> ]*
+}
+
+
+rule decimal_representation {
     [ ⁻? \d+: \.? \d*: | ⁻? \. \d+: ] [ E ⁻? \d+: ]?
 }
 

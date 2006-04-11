@@ -141,6 +141,31 @@ PAST::Var: pir(.) = {
 }
 
 
+PAST::Vector: pir(.) = {
+    .local pmc pir
+    .local pmc ret
+    .local pmc iter
+
+    ret = node.generate_unique('$P')
+    node['ret'] = ret
+    pir = new "PGE::CodeString"
+    pir.emit('    %0 = new .ResizablePMCArray', ret)
+    $P0 = node['children']
+    iter = new .Iterator, $P0
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P1 = tree.get('pir', $P0)
+    pir .= $P1
+    $S0 = $P0['ret']
+    pir.emit('    push %0, %1', ret, $S0)
+    goto iter_loop
+  iter_end:
+    .return (pir)
+}
+
+
 PAST::Assign: pir(.) = {
     .local pmc pir
     .local pmc rvalue, lvalue

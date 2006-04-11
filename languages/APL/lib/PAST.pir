@@ -13,6 +13,7 @@ needed for APL.  The currently defined ast nodes:
     PAST::Op         - an APL operation
     PAST::Val        - a constant value
     PAST::Var        - a variable
+    PAST::Vector     - a vector of values
     PAST::Assign     - an assignment operation
 
 The C<PAST::Node> class itself is derived from C<Hash>, so
@@ -46,6 +47,7 @@ Creates the C<PAST::*> classes.
     $P0 = subclass base, 'PAST::Op'
     $P0 = subclass base, 'PAST::Val'
     $P0 = subclass base, 'PAST::Var'
+    $P0 = subclass base, 'PAST::Vector'
     $P0 = subclass base, 'PAST::Assign'
 
     $P0 = new .Integer
