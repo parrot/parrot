@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -7,7 +7,7 @@ examples/benchmarks/primes.pasm - Calculate prime numbers < 50000
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/benchmarks/primes.pasm
+    % time ./parrot examples/benchmarks/primes.pasm
 
 =head1 DESCRIPTION
 
@@ -17,12 +17,12 @@ of primes, the last one found, and the time taken.
 =cut
 
 # I1 holds the number we're currently checking for primality
-	new P1, .PerlInt
+	new P1, .Integer
 	set     P1, 1
 	# I2 holds the highest number we want to check for primality
-	new P2, .PerlInt
+	new P2, .Integer
 	set     P2, 10000
-	new P6, .PerlInt
+	new P6, .Integer
 	set	P6, 0
 	print   "N primes up to "
 	print   P2
@@ -30,12 +30,12 @@ of primes, the last one found, and the time taken.
 	time	N10
 	# I1 counts up to I2
 REDO:   # I3 counts from 2 up to I4 (I1/2)
-        new P3, .PerlInt
+        new P3, .Integer
 	set     P3, 2
-        new P4, .PerlInt
+        new P4, .Integer
 	div     P4, P1, 2
 LOOP:   # Check if I3 is a factor of I1
-        new P5, .PerlInt
+        new P5, .Integer
 	cmod    P5, P1, P3
 	if      P5, OK
 	# We've found a factor, so it can't be a prime and

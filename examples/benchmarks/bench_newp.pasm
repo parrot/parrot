@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -7,11 +7,11 @@ examples/benchmarks/bench_new.pasm - PMC Creation
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/benchmarks/bench_new.pasm
+    % time ./parrot examples/benchmarks/bench_new.pasm
 
 =head1 DESCRIPTION
 
-Creates a C<PerlArray> PMC and fills it with C<PerlInt> PMCs. Then
+Creates a C<ResizablePMCArray> PMC and fills it with C<Integer> PMCs. Then
 prints out some statistics indicating:
 
 =over 4
@@ -38,10 +38,10 @@ prints out some statistics indicating:
 	set I3, 1000
 	set I0, I2
 	time N5
-loop:	new P0, .PerlArray
+loop:	new P0, .ResizablePMCArray
 	set P0, I3
 	set I1, 0
-fill:	new P1, .PerlInt
+fill:	new P1, .Integer
 	set P1, I1
 	set P0[I1], P1
 	inc I1

@@ -1,10 +1,11 @@
+# $Id$
 
-.pcc_sub _main
+.sub bench :main
     .param pmc argv
     .sym int argc
     argc = argv
     .sym pmc N
-    N = new PerlInt
+    N = new .Integer
     N = 28
     if argc <= 1 goto noarg
     $S0 = argv[1]
@@ -52,13 +53,13 @@ rec:
     .sym pmc n2
     .sym pmc r1
     .sym pmc r2
-    n1 = new PerlInt
-    n2 = new PerlInt
+    n1 = new .Integer
+    n2 = new .Integer
     n1 = n - 1
     n2 = n - 2
     r1 = self."fibA"(n1)
     r2 = self."fibB"(n2)
-    n = new PerlInt
+    n = new .Integer
     n = r1 + r2
     .pcc_begin_return
     .return n
@@ -76,13 +77,13 @@ rec:
     .sym pmc n2
     .sym pmc r1
     .sym pmc r2
-    n1 = new PerlInt
-    n2 = new PerlInt
+    n1 = new .Integer
+    n2 = new .Integer
     n1 = n - 1
     n2 = n - 2
     r1 = self."fib"(n1)
     r2 = self."fibB"(n2)
-    n = new PerlInt
+    n = new .Integer
     n = r1 + r2
     .pcc_begin_return
     .return n
@@ -102,13 +103,13 @@ rec:
     .sym pmc n2
     .sym pmc r1
     .sym pmc r2
-    n1 = new PerlInt
-    n2 = new PerlInt
+    n1 = new .Integer
+    n2 = new .Integer
     n1 = n - 1
     n2 = n - 2
     r1 = self."fib"(n1)
     r2 = self."fibA"(n2)
-    n = new PerlInt
+    n = new .Integer
     n = r1 + r2
     .pcc_begin_return
     .return n

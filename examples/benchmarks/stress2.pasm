@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -17,7 +17,7 @@ Creates 200 arrays of 10000 elements each.
 
     set I3, 20
 ol:	set I0, 10
-	new P0, .PerlArray
+	new P0, .ResizablePMCArray
 
 ol1: bsr buildarray
 	set P0[I0], P1
@@ -31,8 +31,8 @@ ol1: bsr buildarray
 
 buildarray:
 	set I1, 10000
-	new P1, .PerlArray
-loop1:	new P2, .PerlInt
+	new P1, .ResizablePMCArray
+loop1:	new P2, .Integer
 	set P2, I1
 	set P1[I1], P2
 	dec I1

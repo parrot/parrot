@@ -26,9 +26,9 @@ Called by 'make benchmark_tests'.
 # Expected output from scripts in 'examples/benchmarks'.
 # The expected out is needed for checking results with pir_output_is() and pir_output_like(). 
 my %outputs = (
-    q{addit.pir} => qq(21001097.970000\n),
+    q{addit.pir}  => qq(2.10011e+07\n),
     q{addit.pasm} => qq(21001097.970000\n),
-    q{addit2.pir} => qq(21001097.970000\n),
+    q{addit2.pir} => qq(2.10011e+07\n),
     q{array_access.pir} => qr/
 1\s\*\s1000\s=\s1000\n
 100\s\*\s1000\s=\s100000\n

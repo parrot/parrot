@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -18,7 +18,7 @@ prints the result (21001097.970000).
 =cut
 
 _main:
-        new P5, .PerlArray
+        new P5, .ResizablePMCArray
         push P5, 1000
         push P5, 7.100
         push P5, 87
@@ -36,7 +36,7 @@ FIN:
         end
 
 _varargs_adder:
-        new P2, .PerlNum
+        new P2, .Float
         set I1, P5
 LOOP:
         dec I1

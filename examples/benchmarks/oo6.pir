@@ -1,4 +1,6 @@
-.sub _main
+# $Id$
+
+.sub bench :main
     .local pmc cl
     cl = newclass "Foo"
     addattribute cl, ".i"
@@ -11,7 +13,7 @@
     .local pmc o
     o = new  typ
 loop:
-    $P4 = new PerlInt
+    $P4 = new .Integer
     $P4 = i
     o."i"($P4)
     o."j"($P4)
@@ -28,11 +30,11 @@ loop:
 .sub __init method
     .local int ofs
     ofs = classoffset self, "Foo"
-    new $P10, .PerlInt
+    new $P10, .Integer
     set $P10, 10
     setattribute self, ofs, $P10
     inc ofs
-    new $P10, .PerlInt
+    new $P10, .Integer
     set $P10, 20
     setattribute self, ofs, $P10
 .end

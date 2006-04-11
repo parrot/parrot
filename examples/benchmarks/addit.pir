@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -18,29 +18,29 @@ using Parrot calling conventions (PDD 3). It calls an "add it" function
 
 =cut
 
-.sub _main
-        .sym pmc a0
-	a0 = new PerlInt
+.sub addit :main
+        .local pmc a0
+	a0 = new .Integer
 	a0 = 1000
-        .sym pmc a1
-	a1 = new PerlNum
+        .local pmc a1
+	a1 = new .Float
 	a1 = 7.100
-        .sym pmc a2
-	a2 = new PerlInt
+        .local pmc a2
+	a2 = new .Integer
 	a2 = 87
-        .sym pmc a3
-	a3 = new PerlString
+        .local pmc a3
+	a3 = new .String
 	a3 = "3.87"
-        .sym pmc a4
-	a4 = new PerlString
+        .local pmc a4
+	a4 = new .String
         a4 = "21000000"
-	.sym pmc x
-	x = new PerlInt
+	.local pmc x
+	x = new .Integer
         x = 500000
 AGAIN:
         dec x
         lt x, 0, FIN
-	.sym pmc result
+	.local pmc result
         result = _varargs_adder(a0, a1, a2, a3, a4)
         branch AGAIN
 FIN:
@@ -55,8 +55,8 @@ FIN:
 	.param pmc a2
 	.param pmc a3
 	.param pmc a4
-        .sym pmc sum
-	sum = new PerlNum
+        .local pmc sum
+	sum = new .Float
         add sum, a0
         add sum, a1
         add sum, a2

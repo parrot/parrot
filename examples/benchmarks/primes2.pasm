@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -16,14 +16,14 @@ of primes and the last one found.
 
 =cut
 
-new P1, .PerlInt
+new P1, .Integer
 set P1, 0
-new P3, .PerlInt
+new P3, .Integer
 set P3, 0
-new P4, .PerlInt
+new P4, .Integer
 set P4, 5000
-new P6, .PerlInt
-new P7, .PerlInt
+new P6, .Integer
+new P7, .Integer
 
 LOOP:
   save P1
@@ -52,25 +52,25 @@ PRIMECHECK:
  saveall
  restore P5
  lt P5,1,ret0
-new P6, .PerlInt
+new P6, .Integer
  assign P6,P5
  dec P6
 NLOOP:
   le P6, 1, ret1
-new P7, .PerlInt
+new P7, .Integer
   cmod P7, P5, P6
   eq P7, 0, ret0
   dec P6
   branch NLOOP
   # is prime
 ret1:
-  new P0, .PerlInt
+  new P0, .Integer
   set P0, 1
   save P0
   restoreall
   ret
 ret0:
-  new P0, .PerlInt
+  new P0, .Integer
   set P0, 0
   save P0
   restoreall

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -17,7 +17,7 @@ total number of DOD runs made.
 =cut
 
 	set I0, 10
-	new P0, .PerlArray
+	new P0, .ResizablePMCArray
 
 ol:	bsr buildarray
 	set P0[I0], P1
@@ -27,7 +27,7 @@ ol:	bsr buildarray
 	if I0, ol
 
 	set I0, 20
-	new P2, .PerlArray
+	new P2, .ResizablePMCArray
 
 ol1:	bsr buildarray
 	set P2[I0], P1
@@ -37,7 +37,7 @@ ol1:	bsr buildarray
 	if I0, ol1
 
 	set I0, 20
-	new P3, .PerlArray
+	new P3, .ResizablePMCArray
 
 ol2:	bsr buildarray
 	set P3[I0], P1
@@ -57,8 +57,8 @@ ol2:	bsr buildarray
 	# Our inner loop, 10000 times
 buildarray:
 	set I1, 10000
-	new P1, .PerlArray
-loop1:	new P9, .PerlInt
+	new P1, .ResizablePMCArray
+loop1:	new P9, .Integer
 	set P9, I1
 	set P1[I1], P9
 	dec I1

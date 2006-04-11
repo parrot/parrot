@@ -1,3 +1,5 @@
+# $Id$
+
     newclass P1, "Foo"
     find_global P2, "init"
     store_global "Foo", "__init", P2
@@ -11,11 +13,11 @@
 loop:
     classoffset I0, P3, "Foo"
     getattribute P2, P3, I0
-    new P10, .PerlInt	# x = Foo.i
+    new P10, .Integer	# x = Foo.i
     assign P10, P2
     inc I0
     getattribute P2, P3, I0
-    new P11, .PerlInt	# y = Foo.j
+    new P11, .Integer	# y = Foo.j
     assign P11, P2
     inc I10
     lt I10, I11, loop
@@ -31,11 +33,11 @@ loop:
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I0, P2, "Foo"
-    new P10, .PerlInt
+    new P10, .Integer
     set P10, 10
     setattribute P2, I0, P10
     inc I0
-    new P10, .PerlInt
+    new P10, .Integer
     set P10, 20
     setattribute P2, I0, P10
     returncc
