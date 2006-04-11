@@ -21,6 +21,8 @@ Eventually make these be unicode strings.
 .namespace [ 'APL' ]
 
 
+# any registers #'d 100 or higher are used here for temporary conversions
+# to other types required by the various opcodes.
 
 .sub "__load_pirtable" :load
     $P0 = new .Hash
@@ -31,14 +33,102 @@ Eventually make these be unicode strings.
     $P0['monadic:']       =  "    %1 = '%0'(%1)"
 
     # special-purpose parrot ops here
-    $P0['dyadic:+']       =  "    %1 = %1 + %2"
-    $P0['dyadic:\x{d7}']  =  "    %1 = %1 * %2"
-    $P0['dyadic:\x{f7}']  =  "    %1 = %1 / %2"
-    $P0['dyadic:\u2212']  =  "    %1 = %1 - %2"
+    $P0['dyadic:+']        =  "    %1 = %1 + %2"    # plus
+    $P0['dyadic:<']       =  <<"END_PIR"            # less than
+    $I100 = islt %1, %2
+    %1 = $I100
+END_PIR
 
-    $P0['monadic:+']      =  "    noop"
-    $P0['monadic:|']      =  "    %1 = abs %1"
-    $P0['monadic:\u2212'] =  "    %1 = neg %1"
+    $P0['dyadic:>']       =  <<"END_PIR"            # greater than
+    $I100 = isgt %1, %2
+    %1 = $I100
+END_PIR
+
+    $P0['dyadic:=']       =  <<"END_PIR"            # equal
+    $I100 = iseq %1, %2
+    %1 = $I100
+END_PIR
+
+    $P0['dyadic:\x{d7}']  =  "    %1 = %1 * %2"     # multiply
+    $P0['dyadic:\x{f7}']  =  "    %1 = %1 / %2"     # slash
+    $P0['dyadic:\u2212']  =  "    %1 = %1 - %2"     # subtract
+    $P0['dyadic:\u2227']  =  <<"END_PIR"            # and
+    $I100 = %1
+    $I101 = %2
+    $I100 = and $I100, $I101
+    %1 = $I100
+END_PIR
+
+    $P0['dyadic:\u2228']  = <<"END_PIR"             # or
+    $I100 = %1
+    $I101 = %2
+    $I100 = or $I100, $I101
+    %1 = $I100
+END_PIR
+
+    $P0['dyadic:\u2260']  = <<"END_PIR"             # not equal
+    $I100 = isne %1, %2
+    %1 = $I100
+END_PIR
+
+    $P0['dyadic:\u2264']  = <<"END_PIR"             # not greater than
+    $I100 = isle %1, %2
+    %1 = $I100
+END_PIR
+
+    $P0['dyadic:\u2265']  = <<"END_PIR"             # not less than
+    $I100 = isge %1, %2
+    %1 = $I100
+END_PIR
+
+    $P0['dyadic:\u2371']  = <<"END_PIR"             # nor
+    $I100 = %1
+    $I101 = %2
+    $I100 = or $I100, $I101
+    $I100 = not $I100
+    %1 = $I100
+END_PIR
+
+    $P0['dyadic:\u2372']  =  <<"END_PIR"            # nand
+    $I100 = %1
+    $I101 = %2
+    $I100 = and $I100, $I101
+    $I100 = not $I100
+    %1 = $I100
+END_PIR
+
+
+    $P0['monadic:+']      =  "    noop"             # conjugate
+    $P0['monadic:|']      =  "    %1 = abs %1"      # magnitude
+    $P0['monadic:!']      =  <<"END_PIR"            # factorial
+    $I100 = %1
+    $I100 = fact $I100
+    %1 = $I100
+END_PIR
+
+    $P0['monadic:*']      =  "    %1 = exp %1"      # exp
+    $P0['monadic:\x{d7}'] =  <<"END_PIR"            # signum
+    $N100 = %1
+    $I100 = cmp_num $N100, 0.0
+    %1 = $I100
+END_PIR
+    $P0['monadic:\x{f7}'] =  <<"END_PIR"            # reciprocal
+    $N100 = 1.0 / %1
+    %1 = $N100
+END_PIR
+
+    $P0['monadic:\u2212'] =  "    %1 = neg %1"      # negate
+    $P0['monadic:\u2308'] =  <<"END_PIR"            # ceiling
+    $I100 = ceil %1
+    %1 = $I100
+END_PIR
+
+    $P0['monadic:\u230a'] =  <<"END_PIR"            # floor
+    $I100 = floor %1
+    %1 = $I100
+END_PIR
+
+    $P0['monadic:\u235f'] =  "    %1 = ln %1"
     $P0['monadic:\u25cb'] =  "    %1 *= 3.14159265358979323846"
                                       # PI
 .end
@@ -214,122 +304,6 @@ zero_LHS:
     .return(op2) 
 neg_RHS:
     .domain_error()
-.end
-
-.sub 'dyadic:\u2227' # and
-    .param int op1
-    .param int op2
-    $I0 = and op1, op2
-    .return ($I0)
-.end
-
-.sub 'dyadic:\u2228' # or
-    .param int op1
-    .param int op2
-    $I0 = or op1, op2
-    .return ($I0)
-.end
-
-.sub 'dyadic:\u2372' # nan
-    .param int op1
-    .param int op2
-    $I0 = and op1, op2
-    $I0 = not $I0
-    .return ($I0)
-.end
-
-.sub 'dyadic:\u2371' # nor
-    .param int op1
-    .param int op2
-    $I0 = or op1, op2
-    $I0 = not $I0
-    .return ($I0)
-.end
-
-.sub 'dyadic:<' # less than
-    .param int op1
-    .param int op2
-    $I0 = islt op1, op2
-    .return ($I0)
-.end
-
-.sub 'dyadic:\u2264' # not greater than
-    .param int op1
-    .param int op2
-    $I0 = isle op1, op2
-    .return ($I0)
-.end
-
-.sub 'dyadic:=' # equal
-    .param int op1
-    .param int op2
-    $I0 = iseq op1, op2
-    .return ($I0)
-.end
-
-.sub 'dyadic:\u2265' # not less than
-    .param int op1
-    .param int op2
-    $I0 = isge op1, op2
-    .return ($I0)
-.end
-
-.sub 'dyadic:>' # greater
-    .param int op1
-    .param int op2
-    $I0 = isgt op1, op2
-    .return ($I0)
-.end
-
-.sub 'dyadic:\u2260' # not equal
-    .param int op1
-    .param int op2
-    $I0 = isne op1, op2
-    .return ($I0)
-.end
-
-.sub 'monadic:!'               # factorial
-  .param pmc op1
-  .local int result
-  $I1 = op1
-  $N1 = fact $I1
-  .return($N1)
-.end
-
-.sub 'monadic:\x{d7}'          # signum
-    .param num op1
-    $I0 = cmp_num op1, 0.0
-    .return ($I0)
-.end
-
-.sub 'monadic:\x{f7}'          # reciprocal
-    .param num op1
-    $N0 = 1.0 / op1
-    .return ($N0)
-.end
-
-.sub 'monadic:\u2308'          # ceiling
-    .param num op1
-    $N1 = ceil op1
-    .return($N1)
-.end
-
-.sub 'monadic:\u230a'          # floor
-    .param num op1
-    $N1 = floor op1
-    .return($N1)
-.end
-
-.sub 'monadic:*'               # exponential
-    .param num op1
-    $N1 = exp op1
-    .return($N1)
-.end
-
-.sub 'monadic:\u235f'          # ln
-    .param num op1
-    $N1 = ln op1
-    .return($N1)
 .end
 
 .sub 'monadic:~'               # not
