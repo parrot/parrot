@@ -1,0 +1,156 @@
+# Copyright: 2001-2006 The Perl Foundation.
+# $Id: $
+
+=head1 NAME
+
+docs/pdds/clip/pddXX_events.pod - Parrot Events
+
+=head1 ABSTRACT
+
+This document defines the requirements and implementation strategy for
+Parrot's event subsystem.
+
+=head1 VERSION
+
+$Revision: $
+
+=head1 DESCRIPTION
+
+Description of the subject.
+
+=head1 DEFINITIONS
+
+Definitions of important terms. (optional)
+
+=head1 IMPLEMENTATION
+
+[Excerpt from Perl 6 and Parrot Essentials to seed discussion.]
+
+An event is a notification that something has happened: the user has
+manipulated a GUI element, an I/O request has completed, a signal has
+been triggered, or a timer has expired.  Most systems these days have an
+event handler (often two or three, which is something of a problem),
+because handling events is so fundamental to modern GUI programming.
+Unfortunately, the event handling system is not integrated, or poorly
+integrated, with the I/O system, leading to nasty code and unpleasant
+workarounds to try and make a program responsive to network, file, and
+GUI events simultaneously. Parrot presents a unified event handling
+system, integrated with its I/O system, which makes it possible to write
+cross-platform programs that work well in a complex environment.
+
+Parrot's events are fairly simple. An event has an event type, some
+event data, an event handler, and a priority. Each thread has an event
+queue, and when an event happens it's put into the right thread's
+queue (or the default thread queue in those cases where we can't tell
+which thread an event was destined for) to wait for something to
+process it.
+
+Any operation that would potentially block drains the event queue
+while it waits, as do a number of the cleanup opcodes that Parrot uses
+to tidy up on scope exit. Parrot doesn't check each opcode for an
+outstanding event for pure performance reasons, as that check gets
+expensive quickly. Still, Parrot generally ensures timely event
+handling, and events shouldn't sit in a queue for more than a few
+milliseconds unless event handling has been explicitly disabled.
+
+When Parrot does extract an event from the event queue, it calls that
+event's event handler, if it has one. If an event doesn't have a
+handler, Parrot instead looks for a generic handler for the event type
+and calls it instead. If for some reason there's no handler for the
+event type, Parrot falls back to the generic event handler, which
+throws an exception when it gets an event it doesn't know how to
+handle.  You can override the generic event handler if you want Parrot
+to do something else with unhandled events, perhaps silently
+discarding them instead.
+
+Because events are handled in mainline code, they don't have the
+restrictions commonly associated with interrupt-level code. It's safe
+and acceptable for an event handler to throw an exception, allocate
+memory, or manipulate thread or global state safely. Event handlers
+can even acquire locks if they need to, though it's not a good idea to
+have an event handler blocking on lock acquisition.
+
+Parrot uses the priority on events for two purposes. First, the
+priority is used to order the events in the event queue. Events for a
+particular priority are handled in a FIFO manner, but higher-priority
+events are always handled before lower-priority events. Parrot also
+allows a user program or event handler to set a minimum event priority
+that it will handle. If an event with a priority lower than the
+current minimum arrives, it won't be handled, instead sitting in the
+queue until the minimum priority level is dropped. This allows an
+event handler that's dealing with a high-priority event to ignore
+lower-priority events.
+
+User code generally doesn't need to deal with prioritized events, so
+programmers should adjust event priorities with care. Adjusting the
+default priority of an event, or adjusting the current minimum
+priority level, is a rare occurrence.  It's almost always a mistake to
+change them, but the capability is there for those rare occasions
+where it's the correct thing to
+do.
+
+=head2 Signals
+
+Signals are a special form of event, based on the Unix signal mechanism.
+Parrot presents them as mildly special, as a remnant of Perl's Unix
+heritage, but under the hood they're not treated any differently from
+any other event.
+
+The Unix signaling mechanism is something of a mash, having been
+extended and worked on over the years by a small legion of undergrad
+programmers. At this point, signals can be divided into two
+categories, those that are fatal, and those that aren't.
+
+Fatal signals are things like 
+SIGKILL, which unconditionally kills a process, or SIGSEGV, which
+indicates that the process has tried to access memory that isn't part
+of your process.  There's no good way for Parrot to catch these
+signals, so they remain fatal and will kill your process.  On some
+systems it's possible to catch some of the fatal signals, but
+Parrot code itself operates at too high a level for a user program to
+do anything with them--they must be handled with special-purpose code
+written in C or some other low-level language.  Parrot itself may
+catch them in special circumstances for its own use, but that's an
+implementation detail that isn't exposed to a user program.
+
+Non-fatal signals are things like SIGCHLD, indicating that a
+child process has died, or SIGINT, indicating that the user
+has hit C<^C> on the keyboard. Parrot turns these signals into events
+and puts them in the event queue.  Your program's event handler for the
+signal will be called as soon as Parrot gets to the event in the queue,
+and your code can do what it needs to with it.
+
+SIGALRM, the timer expiration signal, is treated specially by
+Parrot. Generated by an expiring alarm() system call, this signal is
+normally used to provide timeouts for system calls that would
+otherwise block forever, which is very useful. The big downside to
+this is that on most systems there can only be one outstanding
+alarm() request, and while you can get around this somewhat with the
+setitimer call (which allows up to three pending alarms) it's still
+quite limited.
+
+Since Parrot's IO system is fully asynchronous and never blocks--even
+what looks like a blocking request still drains the event queue--the
+alarm signal isn't needed for this. Parrot instead grabs SIGALRM for
+its own use, and provides a fully generic timer system which allows
+any number of timer events, each with their own callback functions
+and private data, to be outstanding.
+
+=head1 ATTACHMENTS
+
+None.
+
+=head1 FOOTNOTES
+
+None.
+
+=head1 REFERENCES
+
+None.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:

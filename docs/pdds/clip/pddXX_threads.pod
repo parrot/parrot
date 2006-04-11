@@ -1,0 +1,134 @@
+# Copyright: 2001-2006 The Perl Foundation.
+# $Id: $
+
+=head1 NAME
+
+docs/pdds/clip/pddXX_threads.pod - Parrot Threads
+
+=head1 ABSTRACT
+
+This document defines the requirements and implementation strategy for
+Parrot's threading model.
+
+=head1 VERSION
+
+$Revision: $
+
+=head1 DEFINITIONS
+
+Concurrency
+
+=head1 DESCRIPTION
+
+Description of the subject.
+
+=head1 IMPLEMENTATION
+
+[Excerpt from Perl 6 and Parrot Essentials to seed discussion.]
+
+Threads are a means of splitting a process into multiple pieces that
+execute simultaneously.  It's a relatively easy way to get some
+parallelism without too much work. Threads don't solve all the
+parallelism problems your program may have. Sometimes multiple
+processes on a single system, multiple processes on a cluster, or
+processes on multiple separate systems are better. But threads do
+present a good solution for many common cases.
+
+All the resources in a threaded process are shared between threads.
+This is simultaneously the great strength and great weakness of
+threads. Easy sharing is fast sharing, making it far faster to
+exchange data between threads or access shared global data than to
+share data between processes on a single system or on multiple
+systems. Easy sharing is dangerous, though, since without some sort of
+coordination between threads it's easy to corrupt that shared data.
+And, because all the threads are contained within a single process, if
+any one of them fails for some reason the entire process, with all its
+threads, dies.
+
+With a low-level language such as C, these issues are manageable. The
+core data types, integers, floats, and pointers are all small enough
+to be handled atomically. Composite data can be protected with
+mutexes, special structures that a thread can get exclusive access to.
+The composite data elements that need protecting can each have a mutex
+associated with them, and when a thread needs to touch the data it
+just acquires the mutex first. By default there's very little data
+that must be shared between threads, so it's relatively easy, barring
+program errors, to write thread-safe code if a little thought is given
+to the program structure.
+
+Things aren't this easy for Parrot, unfortunately. A PMC, Parrot's
+native data type, is a complex structure, so we can't count on the
+hardware to provide us atomic access. That means Parrot has to provide
+atomicity itself, which is expensive. Getting and releasing a mutex
+isn't really that expensive in itself. It has been heavily optimized by
+platform vendors because they want threaded code to run quickly. It's
+not free, though, and when you consider that running flat-out Parrot
+does one PMC operation per 100 CPU cycles, even adding an additional 10
+cycles per operation can slow Parrot down by 10%.
+
+For any threading scheme, it's important that your program isn't
+hindered by the platform and libraries it uses. This is a common
+problem with writing threaded code in C, for example. Many libraries
+you might use aren't thread-safe, and if you aren't careful with them
+your program will crash. While we can't make low-level libraries any
+safer, we can make sure that Parrot itself won't be a danger. There is
+very little data shared between Parrot interpreters and threads, and
+access to all the shared data is done with coordinating mutexes. This
+is invisible to your program, and just makes sure that Parrot itself
+is thread-safe.
+
+When you think about it, there are really three different threading
+models. In the first one, multiple threads have no interaction among
+themselves. This essentially does with threads the same thing that's
+done with processes. This works very well in Parrot, with the
+isolation between interpreters helping to reduce the overhead of this
+scheme. There's no possibility of data sharing at the user level, so
+there's no need to lock anything.
+
+In the second threading model, multiple threads run and pass messages
+back and forth between each other. Parrot supports this as well, via
+the event mechanism. The event queues are thread-safe, so one thread
+can safely inject an event into another thread's event queue. This is
+similar to a multiple-process model of programming, except that
+communication between threads is much faster, and it's easier to pass
+around structured data.
+
+In the third threading model, multiple threads run and share data
+between themselves. While Parrot can't guarantee that data at the user
+level remains consistent, it can make sure that access to shared data
+is at least safe. We do this with two mechanisms.
+
+First, Parrot presents an advisory lock system to user code. Any piece
+of user code running in a thread can lock a variable. Any attempt to
+lock a variable that another thread has locked will block until the
+lock is released. Locking a variable only blocks other lock attempts.
+It does I<not> block plain access. This may seem odd, but it's the
+same scheme used by threading systems that obey the POSIX thread
+standard, and has been well tested in practice.
+
+Secondly, Parrot forces all shared PMCs to be marked as such, and all
+access to shared PMCs must first acquire that PMC's private lock. This
+is done by installing an alternate vtable for shared PMCs, one that
+acquires locks on all its parameters. These locks are held only for
+the duration of the vtable function, but ensure that the PMCs affected
+by the operation aren't altered by another thread while the vtable
+function is in progress.
+
+=head1 ATTACHMENTS
+
+None.
+
+=head1 FOOTNOTES
+
+None.
+
+=head1 REFERENCES
+
+None.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
