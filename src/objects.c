@@ -33,17 +33,15 @@ static void parrot_class_register(Interp * , STRING *class_name,
 static PMC *
 clone_array(Interp* interpreter, PMC *source_array)
 {
-    PMC *new_array;
-    INTVAL count;
+    PMC * const new_array = pmc_new(interpreter, source_array->vtable->base_type);
+    const INTVAL count = VTABLE_elements(interpreter, source_array);
     INTVAL i;
 
-    count = VTABLE_elements(interpreter, source_array);
     /*
      * preserve type, we have OrderedHash and Array
      * XXX this doesn't preserve the keys of the ordered hash
      *     (but the keys aren't used -leo)
      */
-    new_array = pmc_new(interpreter, source_array->vtable->base_type);
     VTABLE_set_integer_native(interpreter, new_array, count);
     for (i = 0; i < count; i++) {
         VTABLE_set_pmc_keyed_int(interpreter, new_array, i,
@@ -69,7 +67,7 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
     PMC *attribs;
     INTVAL attr_count;
 #ifndef NDEBUG
-    PMC *orig_class = class;
+    PMC * const orig_class = class;
 #endif
 
     /* attrib count isn't set yet, a GC causedd by concat could
@@ -112,19 +110,16 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
                     cur_offset + POD_FIRST_ATTRIB);
         }
         if (attr_count) {
-            STRING *partial_name;
             INTVAL offset;
 
-            partial_name = string_concat(interpreter, classname,
+            STRING * const partial_name =
+                string_concat(interpreter, classname,
                     string_from_cstring(interpreter, "\0", 1),
                     0);
             for (offset = 0; offset < attr_count; offset++) {
-                STRING *attr_name;
-                STRING *full_name;
-
-                attr_name = VTABLE_get_string_keyed_int(interpreter, attribs,
+                STRING * const attr_name = VTABLE_get_string_keyed_int(interpreter, attribs,
                         offset);
-                full_name = string_concat(interpreter, partial_name,
+                STRING * const full_name = string_concat(interpreter, partial_name,
                         attr_name, 0);
                 /*
                  * store this attribute with short and full name
@@ -137,7 +132,10 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
         }
     }
 
+#ifndef NDEBUG
     assert(class == orig_class);
+#endif
+
     /* And note the totals */
     ATTRIB_COUNT(class) = cur_offset;
     Parrot_unblock_DOD(interpreter);
@@ -158,8 +156,6 @@ on the existence of the method for this class.
 static void
 create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
 {
-    PMC *vtable_pmc;
-    VTABLE *vtable, *deleg_pmc_vtable, *delegate_vtable, *object_vtable;
     int i;
     const char *meth;
     STRING meth_str;
@@ -168,12 +164,11 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
         void * __ptr;
     } __ptr_u;
 
-    vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class),
-            PCD_OBJECT_VTABLE);
-    vtable = PMC_struct_val(vtable_pmc);
-    deleg_pmc_vtable = interpreter->vtables[enum_class_deleg_pmc];
-    object_vtable = interpreter->vtables[enum_class_ParrotObject];
-    delegate_vtable = interpreter->vtables[enum_class_delegate];
+    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class), PCD_OBJECT_VTABLE);
+    VTABLE * const vtable           = PMC_struct_val(vtable_pmc);
+    VTABLE * const deleg_pmc_vtable = interpreter->vtables[enum_class_deleg_pmc];
+    VTABLE * const object_vtable    = interpreter->vtables[enum_class_ParrotObject];
+    VTABLE * const delegate_vtable  = interpreter->vtables[enum_class_delegate];
 
     memset(&meth_str, 0, sizeof(meth_str));
     meth_str.encoding = Parrot_fixed_8_encoding_ptr;
@@ -411,12 +406,12 @@ Otherwise it returns C<PMCNULL>.
 PMC *
 Parrot_class_lookup(Interp* interpreter, STRING *class_name)
 {
-    HashBucket *b;
-    b = hash_get_bucket(interpreter,
+    HashBucket * const bucket =
+        hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(interpreter->class_hash), class_name);
-    if (b) {
-        INTVAL type = PMC_int_val((PMC*)b->value);
-        PMC *pmc = interpreter->vtables[type]->class;
+    if (bucket) {
+        const INTVAL type = PMC_int_val((PMC*)bucket->value);
+        PMC * const pmc = interpreter->vtables[type]->class;
         assert(pmc);
 #if 0
         if (!pmc) {
@@ -449,15 +444,15 @@ static void
 parrot_class_register(Interp* interpreter, STRING *class_name,
         PMC *new_class, PMC *parent, PMC *mro)
 {
-    INTVAL new_type;
     VTABLE *new_vtable, *parent_vtable;
     PMC *vtable_pmc;
-    PMC *ns, *top; 
+    PMC *ns, *top;
+    INTVAL new_type = pmc_type(interpreter, class_name);
 
     /*
      * register the class in the PMCs name class_hash
      */
-    if ((new_type = pmc_type(interpreter, class_name)) > enum_type_undef) {
+    if (new_type > enum_type_undef) {
         real_exception(interpreter, NULL, INVALID_OPERATION,
                 "Class %Ss already registered!\n", class_name);
     }
@@ -496,7 +491,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     if (!ns) {
         /* XXX try HLL namespace too XXX */
         parrot_context_t *ctx = CONTEXT(interpreter->ctx);
-        INTVAL hll_id = ctx->current_HLL;
+        const INTVAL hll_id = ctx->current_HLL;
 
         top =  VTABLE_get_pmc_keyed_int(interpreter, 
                 interpreter->HLL_namespace, hll_id);
@@ -564,7 +559,7 @@ get_init_meth(Interp* interpreter, PMC *class,
 static void
 do_initcall(Interp* interpreter, PMC* class, PMC *object, PMC *init)
 {
-    PMC *classsearch_array = class->vtable->mro;
+    PMC * const classsearch_array = class->vtable->mro;
     PMC *parent_class;
     INTVAL i, nparents;
     /*
@@ -682,15 +677,13 @@ instantiate_object(Interp* interpreter, PMC *object, PMC *init)
     SLOTTYPE *new_object_array;
     INTVAL attrib_count, i;
     SLOTTYPE *class_array;
-    PMC *class;
     PMC *class_name;
-    PMC *vtable_pmc;
 
-    class = object->vtable->class;
+    PMC * const class = object->vtable->class;
     /*
      * put in the real vtable
      */
-    vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
+    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
     object->vtable = PMC_struct_val(vtable_pmc);
 
     /* Grab the attribute count from the parent */
@@ -747,11 +740,11 @@ L<http://pugs.blogs.com/pugs/2005/07/day_165_r5671_j.html>
 static PMC*
 not_empty(Interp* interpreter, PMC *seqs)
 {
-    PMC *nseqs, *list;
     INTVAL i;
-    nseqs = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    PMC * const nseqs = pmc_new(interpreter, enum_class_ResizablePMCArray);
+
     for (i = 0; i < VTABLE_elements(interpreter, seqs); ++i) {
-        list = VTABLE_get_pmc_keyed_int(interpreter, seqs, i);
+        PMC * const list = VTABLE_get_pmc_keyed_int(interpreter, seqs, i);
         if (VTABLE_elements(interpreter, list))
             VTABLE_push_pmc(interpreter, nseqs, list);
     }
@@ -806,22 +799,22 @@ class_mro_merge(Interp* interpreter, PMC *seqs)
 static PMC*
 create_class_mro(Interp* interpreter, PMC *class)
 {
-    PMC *lall, *lc, *lmap, *lparents, *bases, *base;
+    PMC *lparents, *bases;
     INTVAL i;
 
     /* list of lists
      * [ [class] [mro of bases] [bases] ]
      */
-    lall = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    PMC * const lall = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    PMC * const lc = pmc_new(interpreter, enum_class_ResizablePMCArray);
 
-    lc = pmc_new(interpreter, enum_class_ResizablePMCArray);
     VTABLE_push_pmc(interpreter, lc, class);
     VTABLE_push_pmc(interpreter, lall, lc);
 
     bases = get_attrib_num(PMC_data(class), PCD_PARENTS);
     for (i = 0; i < VTABLE_elements(interpreter, bases); ++i) {
-        base = VTABLE_get_pmc_keyed_int(interpreter, bases, i);
-        lmap = create_class_mro(interpreter, base);
+        PMC * const base = VTABLE_get_pmc_keyed_int(interpreter, bases, i);
+        PMC * const lmap = create_class_mro(interpreter, base);
         VTABLE_push_pmc(interpreter, lall, lmap);
     }
     lparents = VTABLE_clone(interpreter, bases);
@@ -949,7 +942,7 @@ the name in the global stash.
 =item C<PMC *
 Parrot_find_method_direct(Interp* interpreter, PMC *class,
                               STRING *method_name)>
-                              
+
 Find a method PMC for a named method, given the class PMC, current
 interpreter, and name of the method. Don't use a possible method cache.
 
@@ -972,9 +965,7 @@ mark_object_cache(Interp* interpreter)
 void
 init_object_cache(Interp* interpreter)
 {
-    Caches *mc;
-
-    mc = interpreter->caches = mem_sys_allocate_zeroed(sizeof(*mc));
+    Caches * const mc = interpreter->caches = mem_sys_allocate_zeroed(sizeof(*mc));
     SET_NULL(mc->idx);
 }
 
@@ -984,8 +975,7 @@ init_object_cache(Interp* interpreter)
 static void
 invalidate_type_caches(Interp *interpreter, UINTVAL type)
 {
-    Caches *mc = interpreter->caches;
-    Meth_cache_entry *e, *next;
+    Caches * const mc = interpreter->caches;
     INTVAL i;
 
     if (!mc)
@@ -994,8 +984,9 @@ invalidate_type_caches(Interp *interpreter, UINTVAL type)
     if (type >= mc->mc_size || !mc->idx[type])
         return;
     for (i = 0; i < TBL_SIZE; ++i) {
+        Meth_cache_entry *e;
         for (e = mc->idx[type][i]; e; ) {
-            next = e->next;
+            Meth_cache_entry * const next = e->next;
             mem_sys_free(e);
             e = next;
         }
@@ -1057,7 +1048,6 @@ Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
 
     UINTVAL type;
     Caches *mc;
-    PMC *found;
     int is_const;
     UINTVAL bits, i;
     Meth_cache_entry *e, *old;
@@ -1097,7 +1087,7 @@ Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
         e = e->next;
     }
     if (!e) {
-        found = find_method_direct(interpreter, class, method_name);
+        PMC * const found = find_method_direct(interpreter, class, method_name);
         /* when here no or no correct entry was at [bits] */
         e = mem_sys_allocate(sizeof(Meth_cache_entry));
         if (old)
@@ -1125,8 +1115,8 @@ debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)
     if (!Interp_trace_TEST(interpreter, PARROT_TRACE_FIND_METH_FLAG))
         return;
     if (PObj_is_class_TEST(class)) {
-        SLOTTYPE *class_array = PMC_data(class);
-        PMC *class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+        SLOTTYPE * const class_array = PMC_data(class);
+        PMC * const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
         class_name = PMC_str_val(class_name_pmc);
     }
     else
@@ -1154,11 +1144,11 @@ static PMC *
 find_method_direct_1(Interp* interpreter, PMC *class,
                               STRING *method_name)
 {
-    PMC* method, *mro, *ns;
-    INTVAL i, n;
+    PMC* method, *ns;
+    INTVAL i;
 
-    mro = class->vtable->mro;
-    n = VTABLE_elements(interpreter, mro);
+    PMC * const mro = class->vtable->mro;
+    const INTVAL n = VTABLE_elements(interpreter, mro);
     for (i = 0; i < n; ++i) {
         class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
         ns = VTABLE_namespace(interpreter, class);
@@ -1176,7 +1166,7 @@ static PMC *
 find_method_direct(Interp* interpreter, PMC *class,
                               STRING *method_name)
 {
-    PMC *found = find_method_direct_1(interpreter, class, method_name);
+    PMC * const found = find_method_direct_1(interpreter, class, method_name);
     STRING * s1, *s2;
     if (found)
         return found;
@@ -1221,20 +1211,16 @@ Adds the attribute C<attr> to the class.
 INTVAL
 Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)
 {
-    SLOTTYPE *class_array;
-    STRING *class_name;
-    INTVAL idx;
-    PMC *attr_hash = NULL;
-    PMC *attr_array;
     STRING *full_attr_name;
     char *c_error;
 
-    class_array = (SLOTTYPE *)PMC_data(class);
-    class_name = VTABLE_get_string(interpreter,
+    SLOTTYPE * const class_array = (SLOTTYPE *)PMC_data(class);
+    STRING * const class_name = VTABLE_get_string(interpreter,
             get_attrib_num(class_array, PCD_CLASS_NAME));
-    attr_array = get_attrib_num(class_array, PCD_CLASS_ATTRIBUTES);
-    attr_hash = get_attrib_num(class_array, PCD_ATTRIBUTES);
-    idx = VTABLE_elements(interpreter, attr_array);
+    PMC * const attr_array = get_attrib_num(class_array, PCD_CLASS_ATTRIBUTES);
+    PMC * const attr_hash = get_attrib_num(class_array, PCD_ATTRIBUTES);
+    INTVAL idx = VTABLE_elements(interpreter, attr_array);
+
     VTABLE_set_integer_native(interpreter, attr_array, idx + 1);
     VTABLE_set_string_keyed_int(interpreter, attr_array, idx, attr);
     full_attr_name = string_concat(interpreter, class_name,
@@ -1296,16 +1282,14 @@ Returns attribute with full qualified name C<attr> from C<object>.
 PMC *
 Parrot_get_attrib_by_num(Interp* interpreter, PMC *object, INTVAL attrib)
 {
-    SLOTTYPE *attrib_array;
-    INTVAL attrib_count;
-
     /*
      * this is called from ParrotObject's vtable now, so
      * their is no need for checking object being a valid
      * object PMC
      */
-    attrib_array = PMC_data(object);
-    attrib_count = PMC_int_val(object);
+    SLOTTYPE * const attrib_array = PMC_data(object);
+    const INTVAL attrib_count = PMC_int_val(object);
+
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
         real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute #%d", (int)attrib);
@@ -1391,11 +1375,9 @@ void
 Parrot_set_attrib_by_num(Interp* interpreter, PMC *object,
         INTVAL attrib, PMC *value)
 {
-    SLOTTYPE *attrib_array;
-    INTVAL attrib_count;
+    SLOTTYPE * const attrib_array = PMC_data(object);
+    const INTVAL attrib_count = PMC_int_val(object);
 
-    attrib_array = PMC_data(object);
-    attrib_count = PMC_int_val(object);
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
         real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute #%d", (int)attrib);
