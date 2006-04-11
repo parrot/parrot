@@ -10,12 +10,12 @@ CP       = @cp@
 all: APL.pbc
 
 SOURCES = APL.pir \
-  lib/APLGrammar.pir \
-  lib/pge2past.pir \
-  lib/past2pir.pir \
-  lib/pasteval.pir \
-  lib/PAST.pir \
-  lib/APLFunctions.pir
+  lib@slash@APLGrammar.pir \
+  lib@slash@pge2past.pir \
+  lib@slash@past2pir.pir \
+  lib@slash@pasteval.pir \
+  lib@slash@PAST.pir \
+  lib@slash@APLFunctions.pir
 
 APL.pbc: $(PARROT) $(SOURCES) 
 	$(PARROT) --output=APL.pbc APL.pir
