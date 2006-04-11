@@ -76,7 +76,7 @@ __DATA__
 --- out: 2.71828
 
 === natural logarithm
---- APL: ⍟2.718282
+--- APL: ⍟2.71828182845905
 --- out: 1
 
 === inverse exp/ln

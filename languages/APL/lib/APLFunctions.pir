@@ -20,7 +20,6 @@ Eventually make these be unicode strings.
 
 .namespace [ 'APL' ]
 
-.const num PI = 3.14159265358979323846
 
 
 .sub "__load_pirtable" :load
@@ -33,11 +32,16 @@ Eventually make these be unicode strings.
 
     # special-purpose parrot ops here
     $P0['dyadic:+']       =  "    %1 = %1 + %2"
-    $P0['dyadic:\u2212']  =  "    %1 = %1 - %2"
     $P0['dyadic:\x{d7}']  =  "    %1 = %1 * %2"
     $P0['dyadic:\x{f7}']  =  "    %1 = %1 / %2"
-.end
+    $P0['dyadic:\u2212']  =  "    %1 = %1 - %2"
 
+    $P0['monadic:+']      =  "    noop"
+    $P0['monadic:|']      =  "    %1 = abs %1"
+    $P0['monadic:\u2212'] =  "    %1 = neg %1"
+    $P0['monadic:\u25cb'] =  "    %1 *= 3.14159265358979323846"
+                                      # PI
+.end
 
 .sub 'aplprint'
     .param pmc value
@@ -47,39 +51,6 @@ Eventually make these be unicode strings.
   print_value:
     print value
     print "\n"
-.end
-
-
-.sub 'dyadic:+'                # add
-    .param pmc op1
-    .param pmc op2
-    $P0 = clone op1
-    $P0 = op1 + op2
-    .return ($P0)
-.end
-
-.sub 'dyadic:\u2212'           # subtract
-    .param pmc op1
-    .param pmc op2
-    $P0 = clone op1
-    $P0 = op1 - op2
-    .return ($P0)
-.end
-
-.sub 'dyadic:\x{d7}'           # multiply
-    .param pmc op1
-    .param pmc op2
-    $P0 = clone op1
-    $P0 = op1 * op2
-    .return ($P0)
-.end
-
-.sub 'dyadic:\x{f7}'           # divide
-    .param pmc op1
-    .param pmc op2
-    $P0 = clone op1
-    $P0 = op1 / op2
-    .return ($P0)
 .end
 
 .sub 'dyadic:\u2308'           # maximum
@@ -325,18 +296,6 @@ neg_RHS:
   .return($N1)
 .end
 
-.sub 'monadic:+'               # plus
-    .param pmc op1
-    .return (op1)
-.end
-
-.sub 'monadic:\u2212'          # negation
-    .param pmc op1
-    $P0 = clone op1
-    $P0 = neg $P0
-    .return ($P0)
-.end
-
 .sub 'monadic:\x{d7}'          # signum
     .param num op1
     $I0 = cmp_num op1, 0.0
@@ -346,12 +305,6 @@ neg_RHS:
 .sub 'monadic:\x{f7}'          # reciprocal
     .param num op1
     $N0 = 1.0 / op1
-    .return ($N0)
-.end
-
-.sub 'monadic:\u25cb'          # pi
-    .param num op1
-    $N0 = PI * op1
     .return ($N0)
 .end
 
@@ -376,12 +329,6 @@ neg_RHS:
 .sub 'monadic:\u235f'          # ln
     .param num op1
     $N1 = ln op1
-    .return($N1)
-.end
-
-.sub 'monadic:|'               # magnitude
-    .param num op1
-    $N1 = abs op1
     .return($N1)
 .end
 
