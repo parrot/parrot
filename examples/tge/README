@@ -1,0 +1,4 @@
+This directory contains a few simple examples of uses for TGE
+(compilers/tge). For more complete examples, see the Perl 1
+implementation in languages/punie or the APL implementation in
+languages/APL.
