@@ -10,7 +10,7 @@ PGE_DIR  = ..@slash@..@slash@compilers@slash@pge
 CP       = @cp@
 
 # the default target
-perl6.pbc: perl6.pir lib/grammar.g lib/parse.pir
+perl6.pbc: perl6.pir lib/grammar.g lib/parse.pir lib/main.pir
 	$(PARROT) $(PGE_DIR)@slash@rulec.pir --output=lib/grammar.pir lib/grammar.g
 	$(PARROT) -o perl6.pbc perl6.pir
 
