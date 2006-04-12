@@ -500,7 +500,7 @@ my $temp_a = "temp_a";
 my $temp_b = "temp_b";
 
 END {
-#    unlink("$temp_a.pir", "$temp_a.pbc", "$temp_b.pir", "$temp_b.pbc");
+    unlink("$temp_a.pir", "$temp_a.pbc", "$temp_b.pir", "$temp_b.pbc");
 };
 
 open S, ">$temp_a.pir" or die "Can't write $temp_a.pir";
