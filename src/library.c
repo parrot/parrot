@@ -317,7 +317,7 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
         char *ret;
 
         if (prefix_str) {
-            *prefix_str = CONST_STRING(interpreter, pwd);
+            *prefix_str = const_string(interpreter, pwd);
             return NULL;
         }
         ret = mem_sys_allocate(3);
