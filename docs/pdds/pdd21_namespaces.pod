@@ -67,6 +67,18 @@ best internal representation.
 
 =over 4
 
+=item HLL Root Namespaces
+
+Each HLL must store public items in a namespace named with the lowercased
+name of the HLL.  This is the HLL root namespace.  For instance, Tcl's user-
+created namespaces should live in the C<tcl> namespace.  This eliminates any
+accidental collisions between languages.
+
+This namespace must be stored at the first level in parrot's namespace
+hierarchy.  These top-level namespaces should also be specified in a standard
+unicode encoding.  The reasons for these restrictions is to allow compilers
+to remain completely ignorant of each other.
+
 =item HLL Implementation Namespaces
 
 Each HLL must store implementation internals (private items) in a namespace
@@ -75,18 +87,10 @@ Tcl's implementation internals should live in the C<_tcl> namespace.
 
 =item HLL User-Created Namespaces
 
-Each HLL must store all user-created namespaces under a namespace named with
-the lowercased name of the HLL.  For example, Perl 5's CGI module must be
-named "perl5::CGI".  This eliminates any accidental collisions between
-languages.
-
-These top-level namespaces should also be specified in a standard unicode
-encoding.  The reasons for these restrictions is to allow compilers to remain
-completely ignorant of each other.
-
-HLLs should use hierarchical namespaces to the extent practical.  A single
-flat namespace can be made to work, of course, but it complicates symbol
-exportation.
+Each HLL must store all user-created namespaces under the HLL root namespace.
+It is suggested that HLLs use hierarchical namespaces to the extent
+practical.  A single flat namespace can be made to work, but it complicates
+symbol exportation.
 
 =back
 
@@ -261,8 +265,8 @@ Delete the namespace $P0 (an array of names or a multidimensional hash index).
 
 =item $P0 = find_global $S0
 
-Find the variable $S0 in the current namespace, or in $P1, relative to the
-HLL namespace.
+Find $P0 as the variable $S0 in the current namespace. or in $P1, relative
+to the HLL root namespace.
 
 =item $P0 = get_namespace $P1
 
@@ -283,7 +287,7 @@ or this:
 =item store_global $S0, $P0
 
 Store $P0 as the variable $S0 in the current namespace, or in $P1, relative
-to the HLL namespace.
+to the HLL root namespace.
 
 =back
 
