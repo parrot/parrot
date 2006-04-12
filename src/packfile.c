@@ -3178,6 +3178,8 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
         if (!(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_ANON)) {
             /* PF structures aren't fully constructed yet */
             Parrot_block_DOD(interpreter);
+            /* store relative to HLL namespace */
+            CONTEXT(interpreter->ctx)->current_HLL = PMC_sub(pmc)->HLL_id;
             Parrot_store_sub_in_namespace(interpreter, pmc);
             Parrot_unblock_DOD(interpreter);
         }

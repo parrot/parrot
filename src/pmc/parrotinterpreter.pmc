@@ -568,11 +568,11 @@ Finish thawing.
         for (i = n; i < m; ++i) {
             entry = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
             lib_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, 1);
-            if (PMC_IS_NULL(lib_pmc))
-                continue;
-            lib_name = VTABLE_get_string(INTERP, lib_pmc);
-            if (lib_name->strlen)
-                Parrot_load_lib(INTERP, lib_name, NULL);
+            if (!PMC_IS_NULL(lib_pmc)) {
+                lib_name = VTABLE_get_string(INTERP, lib_pmc);
+                if (lib_name->strlen)
+                    Parrot_load_lib(INTERP, lib_name, NULL);
+            }
             hll_name = VTABLE_get_string_keyed_int(INTERP, entry, 0);
             /* create HLL namespace */
             hll_name = string_downcase(INTERP, hll_name);

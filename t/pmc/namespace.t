@@ -6,7 +6,8 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -494,3 +495,54 @@ pir_output_is(<<'CODE', <<'OUTPUT', "check parrot ns");
 CODE
 ok
 OUTPUT
+
+my $temp_a = "temp_a";
+my $temp_b = "temp_b";
+
+END {
+    unlink("$temp_a.pir", "$temp_a.pbc", "$temp_b.pir", "$temp_b.pbc");
+};
+
+open S, ">$temp_a.pir" or die "Can't write $temp_a.pir";
+print S <<'EOF';
+.HLL "Foo", ""
+.namespace ["Foo_A"]
+.sub loada :load
+    $P0 = find_global "Foo_A", "A"
+    print "ok 1\n"
+    load_bytecode "temp_b.pbc"
+.end
+
+.sub A
+.end
+EOF
+close S;
+
+open S, ">$temp_b.pir" or die "Can't write $temp_b.pir";
+print S <<'EOF';
+.namespace ["Foo_B"]
+.sub loadb :load
+    $P0 = find_global "Foo_B", "B"
+    print "ok 2\n"
+.end
+
+.sub B
+.end
+EOF
+
+close S;
+
+system(".$PConfig{slash}parrot$PConfig{exe} -o $temp_a.pbc $temp_a.pir");
+system(".$PConfig{slash}parrot$PConfig{exe} -o $temp_b.pbc $temp_b.pir");
+
+pir_output_is(<<'CODE', <<'OUTPUT', "HLL and load_bytecode - #38888");
+.sub main :main
+    load_bytecode "temp_a.pbc"
+    print "ok 3\n"
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
