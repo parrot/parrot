@@ -7,7 +7,9 @@ PGE::OPTable - PGE operator precedence table and parser
 .namespace [ "PGE::OPTable" ]
 
 .const int PGE_OPTABLE_ARITY         = 0x0003
+.const int PGE_OPTABLE_ASSOC         = 0x000c
 .const int PGE_OPTABLE_ASSOC_RIGHT   = 0x0004
+.const int PGE_OPTABLE_ASSOC_LIST    = 0x0008
 .const int PGE_OPTABLE_NOWS          = 0x1000
 .const int PGE_OPTABLE_NULLTERM      = 0x2000
 
@@ -174,14 +176,18 @@ PGE::OPTable - PGE operator precedence table and parser
     if $I0 < 0 goto mode_1
     mode = mode | PGE_OPTABLE_ASSOC_RIGHT
   mode_1:
-    $I0 = index opts, "nows"
+    $I0 = index opts, "list"
     if $I0 < 0 goto mode_2
-    mode = mode | PGE_OPTABLE_NOWS
+    mode = mode | PGE_OPTABLE_ASSOC_LIST
   mode_2:
-    $I0 = index opts, "nullterm"
+    $I0 = index opts, "nows"
     if $I0 < 0 goto mode_3
-    mode = mode | PGE_OPTABLE_NULLTERM
+    mode = mode | PGE_OPTABLE_NOWS
   mode_3:
+    $I0 = index opts, "nullterm"
+    if $I0 < 0 goto mode_4
+    mode = mode | PGE_OPTABLE_NULLTERM
+  mode_4:
     token["mode"] = mode
     .return()
 .end
@@ -378,7 +384,7 @@ PGE::OPTable - PGE operator precedence table and parser
     topmode = $P0["mode"]
     arity = topmode & PGE_OPTABLE_ARITY
   reduce_args:
-    if arity < 1 goto reduce_saveterm
+    if arity < 1 goto reduce_list
     $P2 = pop termstack
     dec arity
     unless $P2 goto reduce_backtrack
@@ -389,6 +395,16 @@ PGE::OPTable - PGE operator precedence table and parser
     if arity > 0 goto reduce_end
     push termstack, $P2
     goto reduce_end
+  reduce_list:
+    $I0 = topmode & PGE_OPTABLE_ASSOC
+    if $I0 != PGE_OPTABLE_ASSOC_LIST goto reduce_saveterm
+    $S1 = $P1['type']
+    $S2 = $P2['type']
+    if $S1 != $S2 goto reduce_saveterm
+    $P0 = $P2.get_array()
+    $P1 = $P1[1]
+    push $P0, $P1
+    $P1 = $P2
   reduce_saveterm:
     push termstack, $P1
   reduce_end:
@@ -415,7 +431,7 @@ PGE::OPTable - PGE operator precedence table and parser
   token_match_success:
     $P0 = token["name"]
     $P0 = clone $P0
-    oper["type"] = $P0
+    oper['type'] = $P0
   token_match_end:
     ret
 
