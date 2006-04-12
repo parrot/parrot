@@ -5,8 +5,9 @@ use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
 use Test::More;
-use File::Temp qw/tempdir/;
+use File::Temp qw(tempdir);
 use File::Spec;
+use Cwd qw(abs_path);
 
 language_output_is("tcl",<<'TCL',<<OUT,"cd too many args");
  cd a b
@@ -23,9 +24,9 @@ OUT
 
 
 {
-    my $testdir = tempdir( CLEANUP => 1 );
+    my $testdir = tempdir(CLEANUP => 1);
+    my $expdir = File::Spec->canonpath( abs_path($testdir) );
     $^O eq 'MSWin32' and $testdir =~ s/\\/\\\\/g;
-    my $expdir = File::Spec->canonpath( $testdir );
     language_output_is("tcl",<<"TCL",<<"OUT","cd home");
  cd $testdir
  puts [pwd]
