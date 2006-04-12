@@ -25,8 +25,15 @@ Run from another Parrot program:
         # APL source code
         source = unicode:"FOO←1 2"
 
-        # compile and evaluate source
-        apl(source)
+        # compile source
+        $P0 = apl(source)
+        # execute code
+        $P0()
+
+        # other compile options:
+        $P0 = apl(source, target=>'parse')         # get parse tree
+        $P0 = apl(source, target=>'PAST')          # get abstract syn tree
+        $P0 = apl(source, target=>'PIR')           # get PIR code
     .end
 
 =head1 Description
@@ -35,9 +42,8 @@ APL.pbc is an interpreter for the APL language.  Its
 parser is implemented using a PGE grammar (lib/APLGrammar.lib),
 and compilation is performed as a TGE tree transformation from 
 the match object returned by the grammar into an abstract syntax tree.
-At the moment, the abstract syntax tree is evaluated directly,
-but in the future the AST will be used to generate Parrot
-subroutines directly.
+Then the abstract syntax tree is converted to PIR code, and the
+PIR code is compiled to return an executable Eval PMC.
 
 =head1 Functions
 
@@ -87,11 +93,8 @@ Compile the APL program given by C<code>.  The C<target>
 named parameter allows the caller to specify the degree of
 compilation to be performed; a value of C<parse> returns
 the parse tree, C<PAST> returns the abstract syntax tree,
-and all other values evaluate the abstract syntax tree.
-(Note:  This will change in future releases, when the
-default will be to return the translated program as a 
-compiled subroutine, and C<PIR> will be available to
-return the resulting PIR code.)
+C<PIR> returns the generated PIR code, and all other values 
+cause the program or statements to be executed.
 
 =cut
 
