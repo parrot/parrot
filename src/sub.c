@@ -271,6 +271,7 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
     struct Parrot_sub * s;
     STRING *res;
 
+
     if (!sub || !VTABLE_defined(interpreter, sub))
         return NULL;
     s = PMC_sub(sub);

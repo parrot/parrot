@@ -2849,6 +2849,68 @@ string_compose(Interp * interpreter, STRING *src)
         return string_make_empty(interpreter, enum_stringrep_one, 0);
     return CHARSET_COMPOSE(interpreter, src);
 }
+
+STRING* 
+string_join(Interp *interpreter, STRING *j, PMC *ar)
+{
+    STRING *res;
+    STRING *s;
+    int i, ar_len = VTABLE_elements(interpreter, ar);
+
+    if (ar_len == 0) {
+	return string_make_empty(interpreter, enum_stringrep_one, 0);
+    }
+    s = VTABLE_get_string_keyed_int(interpreter, ar, 0);
+    res = string_copy(interpreter, s);
+    for (i = 1; i < ar_len; ++i) {
+	res = string_append(interpreter, res, j, 0);
+	s = VTABLE_get_string_keyed_int(interpreter, ar, i);
+	res = string_append(interpreter, res, s, 0);
+    }
+    return res;
+}
+
+PMC* 
+string_split(Interp *interpreter, STRING *delim, STRING *str)
+{
+    PMC *res =  pmc_new(interpreter, enum_class_ResizableStringArray);
+    int dlen = string_length(interpreter, delim);
+    int slen = string_length(interpreter, str);
+    int ps,pe;
+
+    if (!slen)
+	return res;
+
+    if (dlen == 0) {
+        int i;
+        VTABLE_set_integer_native(interpreter, res, slen);
+        for (i = 0; i < slen; ++i) {
+           STRING *p = string_substr(interpreter, str, i, 1, NULL, 0);
+           VTABLE_set_string_keyed_int(interpreter, res, i, p);
+        }
+	return res;
+    }
+
+    ps = 0;
+    pe = string_str_index(interpreter,str,delim,0);
+    if (pe < 0) {
+	VTABLE_push_string(interpreter,res,str);
+	return res;
+    }
+    while (ps <= slen) {
+        int pl = pe - ps;
+	STRING *tstr = string_substr(interpreter, str, ps, pl, NULL, 0);
+	VTABLE_push_string(interpreter,res,tstr);
+	ps = pe + string_length(interpreter,delim);
+	if (ps > slen)
+	    break;
+        pe = string_str_index(interpreter,str,delim,ps);
+	if (pe < 0)
+	    pe = slen;
+    }
+    return res;
+}
+
 /*
 
 =back

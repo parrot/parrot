@@ -478,65 +478,12 @@ delimiters at the beginning and end of $3
 =cut
 
 op join(out STR, in STR, in PMC) :base_core {
-    STRING *res;
-    PMC *ar = $3;
-    STRING *j = $2;
-    STRING *s;
-    int i, ar_len = VTABLE_elements(interpreter, ar);
-
-    if (ar_len == 0) {
-	$1 = string_make_empty(interpreter, enum_stringrep_one, 0);
-	goto NEXT();
-    }
-    s = VTABLE_get_string_keyed_int(interpreter, ar, 0);
-    res = string_copy(interpreter, s);
-    for (i = 1; i < ar_len; ++i) {
-	res = string_append(interpreter, res, j, 0);
-	s = VTABLE_get_string_keyed_int(interpreter, ar, i);
-	res = string_append(interpreter, res, s, 0);
-    }
-    $1 = res;
+    $1 = string_join(interpreter, $2, $3);
     goto NEXT();
 }
 
 op split(out PMC, in STR, in STR) :base_core {
-    PMC *res = $1 = pmc_new(interpreter, enum_class_ResizableStringArray);
-    STRING *delim = $2;
-    STRING *str = $3;
-    int dlen = string_length(interpreter, delim);
-    int slen = string_length(interpreter, str);
-    int ps,pe;
-
-    if (!slen)
-	goto NEXT();
-
-    if (dlen == 0) {
-        int i;
-        VTABLE_set_integer_native(interpreter, res, slen);
-        for (i = 0; i < slen; ++i) {
-           STRING *p = string_substr(interpreter, str, i, 1, NULL, 0);
-           VTABLE_set_string_keyed_int(interpreter, res, i, p);
-        }
-	goto NEXT();
-    }
-
-    ps = 0;
-    pe = string_str_index(interpreter,str,delim,0);
-    if (pe < 0) {
-	VTABLE_push_string(interpreter,res,str);
-	goto NEXT();
-    }
-    while (ps <= slen) {
-        int pl = pe - ps;
-	STRING *tstr = string_substr(interpreter, str, ps, pl, NULL, 0);
-	VTABLE_push_string(interpreter,res,tstr);
-	ps = pe + string_length(interpreter,delim);
-	if (ps > slen)
-	    break;
-        pe = string_str_index(interpreter,str,delim,ps);
-	if (pe < 0)
-	    pe = slen;
-    }
+    $1 = string_split(interpreter, $2, $3);
     goto NEXT();
 }
 
