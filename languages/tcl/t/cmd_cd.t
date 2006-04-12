@@ -1,9 +1,12 @@
 #!/usr/bin/perl
 
 use strict;
+use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
 use Test::More;
+use File::Temp qw/tempdir/;
+use File::Spec;
 
 language_output_is("tcl",<<'TCL',<<OUT,"cd too many args");
  cd a b
@@ -19,14 +22,14 @@ $ENV{HOME}
 OUT
 
 
-#XXX portably write a test that cd's to a safe dir and checks it...
-SKIP: {
-  skip("Too dumb to create a directory") unless -d "/usr";
-
-language_output_is("tcl",<<'TCL',<<"OUT","cd home");
- cd /usr
+{
+    my $testdir = tempdir( CLEANUP => 1 );
+    $^O eq 'MSWin32' and $testdir =~ s/\\/\\\\/g;
+    my $expdir = File::Spec->canonpath( $testdir );
+    language_output_is("tcl",<<"TCL",<<"OUT","cd home");
+ cd $testdir
  puts [pwd]
 TCL
-/usr
+$expdir
 OUT
 }
