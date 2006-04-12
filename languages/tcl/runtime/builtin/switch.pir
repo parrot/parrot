@@ -71,10 +71,10 @@ exact_loop:
   branch exact_loop
 
 glob_mode:
-  load_bytecode "PGE.pbc"
-  load_bytecode "PGE/Glob.pbc"
+  load_bytecode 'PGE.pbc'
+  load_bytecode 'PGE/Glob.pbc'
   .local pmc globber, rule
-  globber = find_global "PGE", "glob"
+  globber = compreg 'PGE::Glob'
 glob_loop:
   unless body goto body_end
   pattern = shift body

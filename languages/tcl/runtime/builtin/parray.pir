@@ -55,10 +55,10 @@ match_all:
   .local int maxsize
   maxsize = 1
 
-  load_bytecode "PGE.pbc"
-  load_bytecode "PGE/Glob.pbc"
+  load_bytecode 'PGE.pbc'
+  load_bytecode 'PGE/Glob.pbc'
   .local pmc rule
-  $P0 = find_global "PGE", "glob"
+  $P0 = compreg 'PGE::Glob'
   (rule, $P1, $P2) = $P0(match_str)
 
 

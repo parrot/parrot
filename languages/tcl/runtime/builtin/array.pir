@@ -210,10 +210,10 @@ no_args:
   .local pmc iter, val
   .local string str
 
-  load_bytecode "PGE.pbc"
-  load_bytecode "PGE/Glob.pbc"
+  load_bytecode 'PGE.pbc'
+  load_bytecode 'PGE/Glob.pbc'
   .local pmc globber
-  globber = find_global "PGE", "glob"
+  globber = compreg 'PGE::Glob'
   .local pmc rule
   rule = globber(match_str)
 
@@ -282,10 +282,10 @@ no_args:
   .local pmc iter, val
   .local string str
 
-  load_bytecode "PGE.pbc"
-  load_bytecode "PGE/Glob.pbc"
+  load_bytecode 'PGE.pbc'
+  load_bytecode 'PGE/Glob.pbc'
   .local pmc globber
-  globber = find_global "PGE", "glob"
+  globber = compreg 'PGE::Glob'
   .local pmc rule
   (rule, $P0, $P1) = globber(match_str)
 
@@ -371,10 +371,10 @@ not_array:
   .local pmc iter
   .local string name
 
-  load_bytecode "PGE.pbc"
-  load_bytecode "PGE/Glob.pbc"
+  load_bytecode 'PGE.pbc'
+  load_bytecode 'PGE/Glob.pbc'
   .local pmc globber, retval
-  globber = compreg "PGE::Glob"
+  globber = compreg 'PGE::Glob'
   .local pmc rule
   rule = globber(pattern)
 
