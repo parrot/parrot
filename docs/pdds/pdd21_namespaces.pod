@@ -261,7 +261,8 @@ Delete the namespace $P0 (an array of names or a multidimensional hash index).
 
 =item $P0 = find_global $S0
 
-Find the variable $S0 in $P1 or the current namespace.
+Find the variable $S0 in the current namespace, or in $P1, relative to the
+HLL namespace.
 
 =item $P0 = get_namespace $P1
 
@@ -281,7 +282,8 @@ or this:
 
 =item store_global $S0, $P0
 
-Store $P0 as the variable $S0 in $P1 or the current namespace.
+Store $P0 as the variable $S0 in the current namespace, or in $P1, relative
+to the HLL namespace.
 
 =back
 
