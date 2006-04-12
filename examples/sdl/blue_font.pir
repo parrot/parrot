@@ -27,7 +27,7 @@ royalty-free font file.  Maybe soon.
 
 	# arguments for the SDL::App constructor
 	.local pmc args
-	args             = new PerlHash
+	args             = new .Hash
 	args[ 'height' ] = 480
 	args[ 'width'  ] = 640
 	args[ 'bpp'    ] =   0
@@ -45,7 +45,7 @@ royalty-free font file.  Maybe soon.
 	main_screen = app.'surface'()
 
 	# arguments for the SDL::Rect constructor
-	args             = new PerlHash
+	args             = new .Hash
 	args[ 'height' ] = 100
 	args[ 'width'  ] = 100
 	args[ 'x'      ] = 194
@@ -65,14 +65,14 @@ royalty-free font file.  Maybe soon.
 
 	find_type color_type, 'SDL::Color'
 
-	args = new PerlHash
+	args = new .Hash
 	set args[ 'r' ],   0
 	set args[ 'g' ],   0
 	set args[ 'b' ], 255
 
 	new blue, color_type, args
 
-	args = new PerlHash
+	args = new .Hash
 	set args[ 'r' ], 255
 	set args[ 'g' ], 255
 	set args[ 'b' ], 255
@@ -87,7 +87,7 @@ royalty-free font file.  Maybe soon.
 	new font,  font_type, args
 
 	.local pmc full_rect
-	args = new PerlHash
+	args = new .Hash
 	args[ 'width'  ] = 640
 	args[ 'height' ] = 480
 	args[ 'x'      ] = 0

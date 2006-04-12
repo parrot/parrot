@@ -8,8 +8,8 @@ $Id$
 
 .sub main :main
     .local pmc queen_row, queen_state
-    queen_row = new ResizableIntegerArray
-    queen_state = new ResizableIntegerArray
+    queen_row = new .ResizableIntegerArray
+    queen_state = new .ResizableIntegerArray
     solve(0, queen_row, queen_state)
 .end
 

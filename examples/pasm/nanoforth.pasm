@@ -27,7 +27,7 @@ checking is disabled.
 .endm
 
 _main:
-    new P16, .PerlHash
+    new P16, .Hash
     .core("+", _add)
     .core("-", _sub)
     .core(".", _print)

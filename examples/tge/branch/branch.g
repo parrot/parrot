@@ -25,7 +25,7 @@
     # find the global minimum and propagate it back down the tree
     ROOT:   gmin(.) = { 
         .local pmc gmin
-        gmin = new PerlInt
+        gmin = new .Integer
         gmin = tree.get('min', node)
         .return (gmin)
     }

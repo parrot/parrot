@@ -65,7 +65,7 @@ it parent classes nor is it subclassed.
     addattribute $P0, "Boards"
 
     # set the BUILD method name
-    $P1 = new .PerlString
+    $P1 = new .String
     $P1 = 'BUILD'
     setprop $P0, 'BUILD', $P1
 END:
@@ -92,11 +92,11 @@ This method throws an exception if an error occurs.
 
     classoffset $I0, self, "Tetris::App"
     add $I0, tDebugFlags
-    $P0 = new PerlHash
+    $P0 = new .Hash
     setattribute self, $I0, $P0
 
     # prepare SDL's constructor arguments
-    $P0           = new PerlHash
+    $P0           = new .Hash
     $P0["height"] = 480
     $P0["width"]  = 640
     $P0["bpp"]    =  32
@@ -125,7 +125,7 @@ This method throws an exception if an error occurs.
     setattribute self, $I0, $P0
 
     # create the debug flags hash
-    $P0 = new PerlHash
+    $P0 = new .Hash
     classoffset $I0, self, "Tetris::App"
     add $I0, tDebugFlags
     setattribute self, $I0, $P0
@@ -236,13 +236,13 @@ An exeption is thrown if an error occurs.
     setattribute self, $I0, $P1
     sub $I0, tTimer
 
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = 1
     add $I0, tTimerDisableCount
     setattribute self, $I0, $P0
     sub $I0, tTimerDisableCount
 
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = 0
     add $I0, tInTimer
     setattribute self, $I0, $P0
@@ -350,8 +350,8 @@ This method returns the created palette.
     .local int color_id
 
     color_id = find_type "SDL::Color"
-    palette = new PerlArray
-    hash = new PerlHash
+    palette = new .ResizablePMCArray
+    hash = new .Hash
 
     set i, 0
 GENLOOP:
@@ -907,7 +907,7 @@ FORCE:
     .local pmc screen
     .local pmc color
 
-    rect = new PerlHash
+    rect = new .Hash
     rect["width"] = 640
     rect["height"] = 480
     rect["x"] = 0
@@ -927,7 +927,7 @@ NO_MAINBACKGROUND:
     # update the screen
     #
     # XXX: optimize screen updates
-    rect = new PerlHash
+    rect = new .Hash
     rect["width"] = 640
     rect["height"] = 480
     rect["x"] = 0
@@ -1092,7 +1092,7 @@ This method returns nothing.
 
 SET:
     # save the number of players
-    new temp, .PerlInt
+    new temp, .Integer
     set temp, players
 
     classoffset $I0, self, "Tetris::App"
@@ -1105,7 +1105,7 @@ END_SET:
     print " player game...\n"
 
     # create the boards array
-    new temp, .PerlArray
+    new temp, .ResizablePMCArray
 
     classoffset $I0, self, "Tetris::App"
     add $I0, tBoards

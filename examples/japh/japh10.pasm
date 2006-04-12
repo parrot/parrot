@@ -6,9 +6,9 @@
     new P2, .ParrotThread               # create a new thread
     find_method P0, P2, "thread3"       # a shared thread's entry
     new P7, .TQueue                     # create a Queue object
-    new P8, .PerlInt                    # and a PerlInt
-    push P7, P8                         # push the PerlInt onto queue
-    new P6, .PerlString                 # create new string
+    new P8, .Integer                    # and a Integer
+    push P7, P8                         # push the Integer onto queue
+    new P6, .String                     # create new string
     set P6, "Js nte artHce\n"
     set_args "(0,0,0)", P5, P6, P7
     get_results "()"
@@ -52,7 +52,7 @@
     set_args "(0)", P2
     callmethodcc P2, "flush"
     inc I10
-    new P8, .PerlInt                    # and put a defined entry
+    new P8, .Integer                    # and put a defined entry
     push P7, P8                         # onto the queue so that
     if S9, w2                           # the other thread will run
     set_returns "()"

@@ -41,7 +41,7 @@ is not subclassed further.
     addattribute $P0, "board"
 
     # set the BUILD method name
-    $P1 = new .PerlString
+    $P1 = new .String
     $P1 = 'BUILD'
     setprop $P0, 'BUILD', $P1
 END:
@@ -77,25 +77,25 @@ The board the new block will belong to.
     #
 
     # xpos
-    new prop, .PerlInt
+    new prop, .Integer
     set prop, 0
     setattribute self, id, prop
     inc id
     
     # xposdiff
-    new prop, .PerlInt
+    new prop, .Integer
     set prop, 0
     setattribute self, id, prop
     inc id
     
     # ypos
-    new prop, .PerlInt
+    new prop, .Integer
     set prop, 0
     setattribute self, id, prop
     inc id
 
     # fall
-    new prop, .PerlInt
+    new prop, .Integer
     set prop, 0
     setattribute self, id, prop
     inc id
@@ -454,7 +454,7 @@ This method returns nothing.
     .local pmc app
     .local pmc rect
 
-    rect = new PerlHash
+    rect = new .Hash
     
     # get the application
     app = self."application"()
@@ -468,7 +468,7 @@ This method returns nothing.
     # lookup the color value
     color = app."color"( $I0 )
     $I0 = typeof color
-    if $I0 == .PerlUndef goto END
+    if $I0 == .Undef goto END
 
     # get the x/y position in board coordinates
     (xp, yp) = self."position"()

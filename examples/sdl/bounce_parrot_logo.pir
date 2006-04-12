@@ -25,7 +25,7 @@ Use the Escape key or close the window when you've had enough.
 	load_bytecode "library/SDL/Event.pir"
 
 	.local pmc app_args
-	new app_args, .PerlHash
+	new app_args, .Hash
 	set app_args[ 'width'  ], 640
 	set app_args[ 'height' ], 480
 	set app_args[ 'bpp'    ],   0
@@ -41,7 +41,7 @@ Use the Escape key or close the window when you've had enough.
 	main_screen = app.'surface'()
 
 	.local pmc color_args
-	color_args = new PerlHash
+	color_args = new .Hash
 
 	color_args[ 'r' ] = 0
 	color_args[ 'g' ] = 0
@@ -57,14 +57,14 @@ Use the Escape key or close the window when you've had enough.
 	.local int image_type
 	.local pmc filename
 
-	new filename, .PerlString
+	new filename, .String
 	filename = 'examples/sdl/parrot_small.png'
 
 	find_type image_type, 'SDL::Image'
 	image = new image_type, filename
 
 	.local pmc sprite_args
-	sprite_args = new PerlHash
+	sprite_args = new .Hash
 	sprite_args[ 'surface'  ] = image
 	sprite_args[ 'source_x' ] =     0
 	sprite_args[ 'source_y' ] =     0
@@ -104,7 +104,7 @@ Use the Escape key or close the window when you've had enough.
 	event = new event_type
 
 	.local pmc handler_args
-	handler_args = new .PerlHash
+	handler_args = new .Hash
 	handler_args[ 'screen' ] = main_screen
 	handler_args[ 'sprite' ] = sprite
 

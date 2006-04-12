@@ -39,7 +39,7 @@ The main function.
     load_bytecode "examples/sdl/minesweeper/field.pir"
     
     # setup the screen properties
-    $P0 = new PerlHash
+    $P0 = new .Hash
     $P0["height"] = 480
     $P0["width"]  = 640
     $P0["bpp"]    =  32
@@ -54,7 +54,7 @@ The main function.
     $I0 = time
     
     # setup field properties
-    $P0 = new .PerlHash
+    $P0 = new .Hash
     $P0['width']  = 40
     $P0['height'] = 28
     $P0['mines']  = 0.1075

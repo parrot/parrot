@@ -13,7 +13,7 @@ eventhandler.pir - a tetris event handler class
     
     getclass $P0, "SDL::EventHandler"
     subclass $P0, $P0, "Tetris::EventHandler"
-    $P1 = new PerlString
+    $P1 = new .String
     $P1 = "BUILD"
     setprop $P0, "BUILD", $P1
     addattribute $P0, "app"

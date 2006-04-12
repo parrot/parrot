@@ -14,7 +14,7 @@ blocks.pir - tetris block classes
 
     getclass $P1, "Tetris::Block"
 
-    $P2 = new PerlString
+    $P2 = new .String
     $P2 = "__init"
 
     subclass $P0, $P1, "Tetris::Block::0"

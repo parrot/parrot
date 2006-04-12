@@ -17,7 +17,7 @@ especially on multiprocessor or heavily-loaded systems.
     find_method P0, P2, "thread3"
 
     # run first thread
-    new P6, .PerlString
+    new P6, .String
     set P6, "Js nte artHce\n"
     set I3, 2
     invoke

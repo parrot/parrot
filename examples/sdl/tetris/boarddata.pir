@@ -69,7 +69,7 @@ Returns the created data object.
     classoffset id, self, "Tetris::BoardData"
     
     # create the data array
-    new data, .PerlArray
+    new data, .ResizablePMCArray
     setattribute self, id, data
     
     # calculate the array size
@@ -79,13 +79,13 @@ Returns the created data object.
     set data, i
 
     # store the width
-    new temp, .PerlInt
+    new temp, .Integer
     set temp, w
     inc id
     setattribute self, id, temp
 
     # store the height
-    new temp, .PerlInt
+    new temp, .Integer
     set temp, h
     inc id
     setattribute self, id, temp

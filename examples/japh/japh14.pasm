@@ -2,10 +2,10 @@
 
 # 2 timer subs are alternately spitting out the JaPH
 .include "timer.pasm"
-    new P7, .PerlString
+    new P7, .String
     set P7, "Just another Parrot Hacker\n"
     store_global "t", P7
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     push P1, .PARROT_TIMER_NSEC
     push P1, 0.001
     push P1, .PARROT_TIMER_HANDLER

@@ -20,7 +20,7 @@ To run this file, run the following command from the Parrot root directory:
 	load_bytecode "library/SDL/Sprite.pir"
 
 	.local pmc args
-	args             = new PerlHash
+	args             = new .Hash
 	args[ 'height' ] =        480
 	args[ 'width'  ] =        640
 	args[ 'bpp'    ] =          0
@@ -76,11 +76,11 @@ To run this file, run the following command from the Parrot root directory:
 	.local pmc filename
 
 	find_type image_type, 'SDL::Image'
-	filename = new PerlString
+	filename = new .String
 	filename = 'examples/sdl/parrot_small.png'
 	image    = new image_type, filename
 
-	args = new PerlHash
+	args = new .Hash
 	args[ 'surface'  ] = image
 	args[ 'source_x' ] =     0
 	args[ 'source_y' ] =     0

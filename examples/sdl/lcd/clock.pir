@@ -32,7 +32,7 @@ The main function.
     load_bytecode "library/SDL/LCD.pir"
     
     # set some screen properties
-    $P0 = new PerlHash
+    $P0 = new .Hash
     $P0["height"] = 21
     $P0["width"]  = 94
     $P0["bpp"]    = 16

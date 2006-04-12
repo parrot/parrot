@@ -5,7 +5,7 @@ Mines::Field - A minesweeper field
 =head1 SYNOPSIS
 
     # setup field properties
-    $P0 = new .PerlHash
+    $P0 = new .Hash
     $P0['width']  = 40
     $P0['height'] = 28
     $P0['mines']  = 0.1075
@@ -128,8 +128,8 @@ SDL surface to use for drawing.
     mines  = args['mines']
     screen = args['screen']
     debug  = args['debug']
-    field  = new PerlArray
-    cache  = new PerlArray
+    field  = new .ResizablePMCArray
+    cache  = new .ResizablePMCArray
 
     $I0 = find_type 'SDL::StopWatch'
     watch = new $I0, screen
@@ -159,31 +159,31 @@ SDL surface to use for drawing.
 
     # width
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = width
     setattribute self, $I0, $P0
     
     # height
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = height
     setattribute self, $I0, $P0
 
     # mines
     inc $I0
-    $P0 = new PerlNum
+    $P0 = new .Float
     $P0 = mines
     setattribute self, $I0, $P0
 
     # markpos
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = -1
     setattribute self, $I0, $P0
 
     # debug
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = debug
     setattribute self, $I0, $P0
 
@@ -197,7 +197,7 @@ SDL surface to use for drawing.
 
     # button
     inc $I0
-    $P0 = new PerlString
+    $P0 = new .String
     $P0 = "examples/sdl/minesweeper/smiley.png"
     $I1 = find_type "SDL::Button"
     $P0 = new $I1, $P0
@@ -374,7 +374,7 @@ DEBUG:
     image = find_global "Mines::Field", "field_debug"
 IMAGE_OK:
     $I0 = find_type "SDL::Rect"
-    $P0 = new PerlHash
+    $P0 = new .Hash
     $P0['x'] = 0
     $P0['y'] = 0
     $P0['width']  = 0
@@ -1043,7 +1043,7 @@ Counts the unrevealed mines and updates the LCD.
     size = field
     field = new .Iterator, field
     field = .ITERATE_FROM_START
-    count = new PerlArray
+    count = new .ResizablePMCArray
 
 LOOP:
     unless field goto END
@@ -1103,13 +1103,13 @@ This method is called automatically when this module is loaded.
     # XXX: remove
     load_bytecode "library/Data/Dumper.pir"
 
-    $P0 = new PerlString
+    $P0 = new .String
     $P0 = "examples/sdl/minesweeper/mines.png"
     $I0 = find_type "SDL::Image"    
     image = new $I0, $P0
     store_global "Mines::Field", "field", image
 
-    $P0 = new PerlString
+    $P0 = new .String
     $P0 = "examples/sdl/minesweeper/mines_debug.png"
     image = new $I0, $P0
     store_global "Mines::Field", "field_debug", image

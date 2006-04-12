@@ -20,7 +20,7 @@ To run this file, run the following command from the Parrot directory:
 
 	# arguments for the SDL::App constructor
 	.local pmc args
-	args             = new PerlHash
+	args             = new .Hash
 	args[ 'height' ] = 480
 	args[ 'width'  ] = 640
 	args[ 'bpp'    ] =   0
@@ -44,7 +44,7 @@ To run this file, run the following command from the Parrot directory:
 	print "\n"
 
 	# arguments for the SDL::Rect constructor
-	args             = new PerlHash
+	args             = new .Hash
 	args[ 'height' ] = 100
 	args[ 'width'  ] = 100
 	args[ 'x'      ] = 270
@@ -58,7 +58,7 @@ To run this file, run the following command from the Parrot directory:
 	new rect, rect_type, args
 
 	# arguments for the SDL::Color constructor
-	new args, .PerlHash
+	new args, .Hash
 	set args[ 'r' ],   0
 	set args[ 'g' ],   0
 	set args[ 'b' ], 255

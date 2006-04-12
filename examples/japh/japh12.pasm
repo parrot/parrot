@@ -23,13 +23,13 @@
 _init:
     dlvar P0, P1, "interpreter_array"
 
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     push P1, -100
     push P1, 32
     push P1, 0
     new P2, .UnManagedStruct, P1
 
-    new P3, .PerlArray
+    new P3, .ResizablePMCArray
     push P3, -68
     set P9, P3[-1]
     setprop P9, "_struct", P2
@@ -37,7 +37,7 @@ _init:
     push P3, 0
     new P4, .UnManagedStruct, P3
 
-    new P5, .PerlArray
+    new P5, .ResizablePMCArray
     push P5, -68
     set P9, P5[-1]
     setprop P9, "_struct", P4
@@ -45,7 +45,7 @@ _init:
     push P5, 0
     new P6, .UnManagedStruct, P5
 
-    new P7, .PerlArray
+    new P7, .ResizablePMCArray
     push P7, -68
     set P10, P7[-1]
     setprop P10, "_struct", P6

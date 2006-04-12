@@ -144,7 +144,7 @@ specified type.
     .param int value
     .local pmc newnode
     newnode = new 'Leaf'
-    $P1 = new PerlInt
+    $P1 = new .Integer
     $P1 = value
     setattribute newnode, 'value', $P1
     .return(newnode)

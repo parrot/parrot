@@ -1,7 +1,7 @@
 # $Id$
 
 # Little Endian only using struct
-    new P1, .PerlArray
+    new P1, .ResizablePMCArray
     push P1, -100
     push P1, 28
     push P1, I0

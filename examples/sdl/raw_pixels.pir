@@ -21,7 +21,7 @@ To run this file, run the following command from the Parrot directory:
 
 	# arguments for the SDL::App constructor
 	.local pmc args
-	args             = new PerlHash
+	args             = new .Hash
 	args[ 'height' ] = 480
 	args[ 'width'  ] = 640
 	args[ 'bpp'    ] =   0
@@ -38,7 +38,7 @@ To run this file, run the following command from the Parrot directory:
 	.local pmc main_screen
 	main_screen = app.'surface'()
 
-	args             = new PerlHash
+	args             = new .Hash
 	args[ 'height' ] = 480
 	args[ 'width'  ] = 640
 	args[ 'x'    ]   =   0
@@ -54,7 +54,7 @@ To run this file, run the following command from the Parrot directory:
 	find_type  color_type, 'SDL::Color'
 
 	# create a white color to paint the background; make new pixels show up
-	args        = new PerlHash
+	args        = new .Hash
 	args[ 'r' ] = 255
 	args[ 'g' ] = 255
 	args[ 'b' ] = 255
