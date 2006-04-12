@@ -257,13 +257,16 @@ invalidate_retc_context(Interp *interpreter, PMC *cont)
 
 =item C<Parrot_full_sub_name>
 
-Print name and location of subroutine, This should finally use the label
-name of the frozen C<Sub> PMC image for now locate the C<Sub> name in
-the globals.
+Return namespace, name, and location of subroutine. 
 
 =cut
 
 */
+
+/* XXX use method lookup - create interface
+ *                         see also pbc.c
+ */
+extern PMC* Parrot_NameSpace_name(Interp* interpreter, PMC* pmc);
 
 STRING*
 Parrot_full_sub_name(Interp* interpreter, PMC* sub)
@@ -275,20 +278,22 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
     if (!sub || !VTABLE_defined(interpreter, sub))
         return NULL;
     s = PMC_sub(sub);
-    if (PMC_IS_NULL(s->namespace)) {
+    if (PMC_IS_NULL(s->namespace_stash)) {
         return s->name;
     } else {
-        Parrot_block_DOD(interpreter);
-        if (s->name) {
-	    STRING* ns = VTABLE_get_string(interpreter, s->namespace);
+        PMC *ns_array;
+        STRING *j;
 
-    	    ns = string_concat(interpreter, ns,
-		string_from_cstring(interpreter, " :: ", 4), 0);
-	    res =  string_concat(interpreter, ns, s->name, 0);
-        } else {
-	    STRING* const ns = string_from_cstring(interpreter, "??? :: ", 7);
-	    res =  string_concat(interpreter, ns, s->name, 0);
-	}
+        Parrot_block_DOD(interpreter);
+        ns_array = Parrot_NameSpace_name(interpreter, s->namespace_stash);
+        if (s->name) {
+            VTABLE_push_string(interpreter, ns_array, s->name);
+        }
+        j = const_string(interpreter, ";");
+        /* shift toplevel - it doesn't have a name */
+        (void)VTABLE_shift_string(interpreter, ns_array);
+
+        res =  string_join(interpreter, j, ns_array);
         Parrot_unblock_DOD(interpreter);
         return res;
     }
@@ -333,10 +338,7 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
         info->fullname = info->subname;
     } else {
         info->nsname = VTABLE_get_string(interpreter, sub->namespace);
-        info->fullname = string_concat(interpreter, info->nsname,
-        string_from_cstring(interpreter, " :: ", 4), 0);
-        info->fullname = string_concat(interpreter, info->fullname,
-        info->subname, 1);
+        info->fullname = Parrot_full_sub_name(interpreter, ctx->current_sub);
     }
 
     /* return here if there is no current pc */
