@@ -383,10 +383,14 @@ pir_output_is(<<'CODE', <<'OUTPUT', "verify root and parrot namespaces");
 # name may change though
 .sub main :main
     .include "interpinfo.pasm"
+    # root namespace
     $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
     typeof $S0, $P0
     print $S0
     print "\n"
+    print $P0
+    print "\n"
+    # parrot namespace
     $P1 = $P0["parrot"]
     print $P1
     print "\n"
@@ -396,6 +400,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "verify root and parrot namespaces");
 .end
 CODE
 NameSpace
+
 parrot
 NameSpace
 OUTPUT
