@@ -17,13 +17,10 @@ for the opcode syntax tree nodes created by the Punie compiler.
     load_bytecode "languages/punie/lib/POST/Node.pir"
     load_bytecode "languages/punie/lib/POST/Op.pir"
     load_bytecode "languages/punie/lib/POST/Ops.pir"
-#    load_bytecode "languages/punie/lib/POST/Decl.pir"
-#    load_bytecode "languages/punie/lib/POST/Stmt.pir"
-#    load_bytecode "languages/punie/lib/POST/Stmts.pir"
     load_bytecode "languages/punie/lib/POST/Sub.pir"
     load_bytecode "languages/punie/lib/POST/Val.pir"
     load_bytecode "languages/punie/lib/POST/Var.pir"
-#    load_bytecode "languages/punie/lib/POST/Code.pir"
+    load_bytecode "languages/punie/lib/POST/Label.pir"
     .local pmc base
     newclass base, "POST"
     addattribute base, "topnode" # the top node of the syntax tree

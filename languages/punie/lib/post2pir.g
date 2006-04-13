@@ -42,14 +42,6 @@ POST::Op: result(.) = {
     counter = 0
     .local string opname
     opname = node.op()
-    if opname == 'if' goto conditional
-    if opname == 'unless' goto conditional
-      goto not_conditional
-  conditional:
-      output = tree.get('conditional', node)
-      .return (output)
-    not_conditional:
-
     output = "    " . opname
     output .= " "
     $P1 = node.children()
@@ -71,47 +63,17 @@ POST::Op: result(.) = {
     .return (output)
 }
 
-POST::Op: conditional(.) = {
-    .local string output
-    .local string opname
-    opname = node.op()
-    .local string truelabel
-    .local string falselabel
-    truelabel = node.generate_label('true')
-    falselabel = node.generate_label('false')
-    output = "    " . opname
-    output .= " "
-    $P1 = node.children()
-
-    # The conditional expression
-    $P2 = $P1[0]
-    $S3 = tree.get('result', $P2)
-    output .= $S3
-    output .= " goto "
-    output .= truelabel
-    output .= "\n"
-
-    # Skipping over the statements in the conditional
-    output .= "goto "
-    output .= falselabel
-    output .= "\n"
-    
-    # The statements in the conditional
-    output .= truelabel
-    output .= ":\n"
-    $P2 = $P1[1]
-    $S3 = tree.get('result', $P2)
-    output .= $S3
-
-    # After the statements in the conditional
-    output .= "\n"
-    output .= falselabel
-    output .= ":\n"
-    .return (output)
-}
-
 POST::Var: result(.) = {
     $S1 = node.varname()
+    .return ($S1)
+}
+
+POST::Label: result(.) = {
+    $S1 = node.name()
+    $I1 = node.dest()
+    unless $I1 goto not_dest
+       $S1 .= ":\n"
+    not_dest:
     .return ($S1)
 }
 

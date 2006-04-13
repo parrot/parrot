@@ -70,6 +70,13 @@ PAST::Op: result(.) = {
       $P4 = tree.get('print_op', node)
       .return ($P4)
   not_print_op:
+    if opname == 'if' goto conditional
+    if opname == 'unless' goto conditional
+    goto not_conditional
+  conditional:
+      $P4 = tree.get('conditional', node)
+      .return ($P4)
+  not_conditional:
     # Iterate through the children of the node, and generate the result
     # for each child.
     .local pmc newchildren
@@ -198,6 +205,81 @@ PAST::Op: infix(.) = {
     $P10.set_node(nodesource,nodepos,newops)
     $P10.tmpvar(temp_var)
 
+    .return ($P10)
+}
+
+PAST::Op: conditional(.) = {
+    .local string opname
+    .local pmc oplookup
+    opname = node.op()
+    .local string nodesource
+    .local string nodepos
+    nodesource = node.source()
+    nodepos = node.pos()
+    .local pmc newchildren
+    newchildren = new .ResizablePMCArray
+    .local pmc newops
+    newops = new .ResizablePMCArray
+
+    # Set up to handle children of Op node.
+    $P1 = node.children()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    iter = 0
+
+    # First, handle the condition, which may be a series of statements
+    # resulting in a single value.
+    shift $P2, iter
+    $P3 = tree.get('result', $P2)
+    $S1 = typeof $P3
+    if $S1 == 'POST::Ops' goto complex_result # the argument has setup
+      push newchildren, $P3
+      goto end_condition
+    complex_result:
+      $P1 = $P3.'tmpvar'()
+      push newchildren, $P1
+      push newops, $P3
+  end_condition:
+
+    # Second, create the branching op. The first child is the result of
+    # the condition, the second argument is a label.
+    .local pmc truelabel
+    truelabel = new 'POST::Label'
+    truelabel.'new_dummy'('true')
+    push newchildren, truelabel
+
+    $P2 = new 'POST::Op'
+    $P2.'set_node'(nodesource,nodepos,opname,newchildren)
+    push newops, $P2
+
+    # Skip over the conditional body
+    .local pmc falselabel
+    falselabel = new 'POST::Label'
+    falselabel.'new_dummy'('false')
+    $P4 = new 'POST::Op'
+    $P5 = new .ResizablePMCArray
+    push $P5, falselabel
+    $P4.'set_node'(nodesource,nodepos,'goto',$P5)
+    push newops, $P4
+
+    # Destination for the branching op
+    $P6 = clone truelabel
+    $P6.dest(1)
+    push newops, $P6
+
+    # Next handle the conditional body
+    shift $P2, iter
+    $P3 = tree.'get'('result', $P2)
+    push newops, $P3
+
+    # Destination for the end of the conditional
+    $P6 = clone falselabel
+    $P6.dest(1)
+    push newops, $P6
+
+    # Create the node to contain all the generated ops.
+    $P10 = new 'POST::Ops'
+    $P10.'set_node'(nodesource,nodepos,newops)
     .return ($P10)
 }
 
