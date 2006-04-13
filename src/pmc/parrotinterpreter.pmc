@@ -584,13 +584,8 @@ Finish thawing.
              * XXX always try to fetch namespace first?
              */
 
-            ns_hash = VTABLE_get_pmc_keyed_str(INTERP, INTERP->stash_hash,
+            ns_hash = Parrot_global_namespace(INTERP, INTERP->stash_hash,
                     hll_name);
-            if (!ns_hash) {
-                ns_hash  = pmc_new(INTERP, enum_class_NameSpace);
-                VTABLE_set_pmc_keyed_str(INTERP, INTERP->stash_hash,
-                        hll_name, ns_hash);
-            }
             /* cache HLLs toplevel namespace */
             VTABLE_set_pmc_keyed_int(INTERP, INTERP->HLL_namespace, 
                     i, ns_hash);

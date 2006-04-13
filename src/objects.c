@@ -488,7 +488,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
     top = CONTEXT(interpreter->ctx)->current_namespace;
     ns = VTABLE_get_pmc_keyed_str(interpreter, top, class_name);
     /* XXX nested, use current as base ? */
-    if (!ns) {
+    if (PMC_IS_NULL(ns)) {
         /* XXX try HLL namespace too XXX */
         parrot_context_t *ctx = CONTEXT(interpreter->ctx);
         const INTVAL hll_id = ctx->current_HLL;
@@ -497,7 +497,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
                 interpreter->HLL_namespace, hll_id);
         ns = VTABLE_get_pmc_keyed_str(interpreter, top, class_name);
     }
-    if (!ns) {
+    if (PMC_IS_NULL(ns)) {
         ns = pmc_new(interpreter, enum_class_NameSpace);
         VTABLE_set_pmc_keyed_str(interpreter, top, class_name, ns);
     }
@@ -1154,7 +1154,7 @@ find_method_direct_1(Interp* interpreter, PMC *class,
         ns = VTABLE_namespace(interpreter, class);
         method = VTABLE_get_pmc_keyed_str(interpreter, ns, method_name);
         TRACE_FM(interpreter, class, method_name, method);
-        if (method) {
+        if (!PMC_IS_NULL(method)) {
             return method;
         }
     }

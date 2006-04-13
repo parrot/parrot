@@ -56,8 +56,8 @@ parrot_HLL_namespace(Interp *interpreter)
 PMC *
 Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 {
-    PMC *stash;
-    PMC *globals; 
+    PMC *globals, *stash, *res;
+    
 #if DEBUG_GLOBAL
     PIO_printf(interpreter, "find_global class '%Ss' meth '%Ss'\n",
             class, globalname);
@@ -65,21 +65,25 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
     if (class) {
         globals = parrot_HLL_namespace(interpreter);
         stash = VTABLE_get_pmc_keyed_str(interpreter, globals, class);
-        if (!stash)
+        if (PMC_IS_NULL(stash))
             return NULL;
     }
     else {
         stash = CONTEXT(interpreter->ctx)->current_namespace;
     }
-    return VTABLE_get_pointer_keyed_str(interpreter,
+    res = VTABLE_get_pointer_keyed_str(interpreter,
             stash, globalname);
+    if (PMC_IS_NULL(res))
+        return NULL;
+    return res;
+
 }
 
 PMC *
 Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
 {
 
-    PMC *globals;
+    PMC *globals, *res;
 
     if (PMC_IS_NULL(ns))
         return Parrot_find_global(interpreter, NULL, name);
@@ -89,11 +93,14 @@ Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
         case enum_class_Key:
             globals = parrot_HLL_namespace(interpreter);
             ns = VTABLE_get_pmc_keyed(interpreter, globals, ns);
-            if (!ns)
+            if (PMC_IS_NULL(ns))
                 return NULL;
             /* fall through */
         case enum_class_NameSpace:
-            return VTABLE_get_pointer_keyed_str(interpreter, ns, name);
+            res = VTABLE_get_pointer_keyed_str(interpreter, ns, name);
+            if (PMC_IS_NULL(res))
+                return NULL;
+            return res;
     }
     return NULL;
 }
@@ -199,7 +206,8 @@ Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *class)
     PMC *stash;
 
     stash = VTABLE_get_pmc_keyed_str(interpreter, globals, class);
-    if (!stash || stash->vtable->base_type != enum_class_NameSpace) {
+    if (PMC_IS_NULL(stash) || 
+            stash->vtable->base_type != enum_class_NameSpace) {
         stash = pmc_new(interpreter, enum_class_NameSpace);
         VTABLE_set_pmc_keyed_str(interpreter, globals, class, stash);
     }
@@ -269,7 +277,8 @@ store_sub_p(Interp *interpreter, PMC *namespace,
 
     globals = parrot_HLL_namespace(interpreter);
     stash = VTABLE_get_pmc_keyed(interpreter, globals, namespace);
-    if (!stash || stash->vtable->base_type != enum_class_NameSpace) {
+    if (PMC_IS_NULL(stash) || 
+            stash->vtable->base_type != enum_class_NameSpace) {
         stash = pmc_new(interpreter, enum_class_NameSpace);
         VTABLE_set_pmc_keyed(interpreter, globals, namespace, stash);
     }

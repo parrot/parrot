@@ -2013,7 +2013,7 @@ mmd_create_ns(Interp *interpreter)
     ns_name = CONST_STRING(interpreter, "__parrot_core");
     ns = VTABLE_get_pmc_keyed_str(interpreter, 
             interpreter->stash_hash, ns_name);
-    if (!ns) {
+    if (PMC_IS_NULL(ns)) {
         ns = pmc_new(interpreter, enum_class_NameSpace);
         VTABLE_set_pmc_keyed_str(interpreter, 
                 interpreter->stash_hash, ns_name, ns);
