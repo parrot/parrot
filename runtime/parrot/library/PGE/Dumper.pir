@@ -423,19 +423,39 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
 .sub "__dump" :method
     .param pmc dumper
     .param string label
-    ($S2, $S3) = dumper."newIndent"()
+    .local string indent, subindent
+    .local pmc iter, val
+    .local string key
+    .local pmc hash, array
+  
+    (subindent, indent) = dumper."newIndent"()
+    print " {"
+    hash = self."get_hash"()
+    if_null hash, dump_rest
+    iter = new .Iterator, hash
+    iter = 0
+  dump_hash:
+    unless iter goto dump_rest
     print "\n"
-    $P0 = getattribute self, "PGE::OPTable\x0%!token"
-    print $S2
-    dumper."dump"(label, $P0)
+    print subindent
+    key = shift iter
+    val = hash[key]
+    print "<"
+    print key
+    print "> => "
+    dumper."dump"(label, val)
+    goto dump_hash
+  dump_rest:
     print "\n"
     $P0 = getattribute self, "PGE::OPTable\x0%!key"
-    print $S2
+    print subindent
     dumper."dump"(label, $P0)
     print "\n"
     $P0 = getattribute self, "PGE::OPTable\x0%!klen"
-    print $S2
+    print subindent
     dumper."dump"(label, $P0)
+    print indent
+    print "}\n"
     dumper."deleteIndent"()
 .end
 

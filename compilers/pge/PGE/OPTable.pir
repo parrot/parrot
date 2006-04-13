@@ -37,8 +37,8 @@ PGE::OPTable - PGE operator precedence table and parser
     .local pmc base
     .local pmc sctable
     .local pmc closetoken
-    base = newclass "PGE::OPTable"
-    addattribute base, "%!token"
+    $P0 = getclass "Hash"
+    base = subclass $P0, "PGE::OPTable"
     addattribute base, "%!key"
     addattribute base, "%!klen"
     addattribute base, "&!ws"
@@ -62,10 +62,9 @@ PGE::OPTable - PGE operator precedence table and parser
 
 .sub "__init" :method
     .local pmc tokentable, keytable, klentable
-    tokentable = new .Hash
+    tokentable = self
     keytable = new .Hash
     klentable = new .Hash
-    setattribute self, "PGE::OPTable\x0%!token", tokentable
     setattribute self, "PGE::OPTable\x0%!key", keytable
     setattribute self, "PGE::OPTable\x0%!klen", klentable
 .end
@@ -81,7 +80,7 @@ PGE::OPTable - PGE operator precedence table and parser
     .param int has_match       :opt_flag
     .local pmc tokentable
     .local string equiv
-    tokentable = getattribute self, "PGE::OPTable\x0%!token"
+    tokentable = self
 
     if has_match goto args_1
     match = new .String
@@ -189,7 +188,7 @@ PGE::OPTable - PGE operator precedence table and parser
     mode = mode | PGE_OPTABLE_NULLTERM
   mode_4:
     token["mode"] = mode
-    .return()
+    .return (token)
 .end
 
 
@@ -212,7 +211,7 @@ PGE::OPTable - PGE operator precedence table and parser
     .local pmc match
     .local int lastcat
 
-    tokentable = getattribute self, "PGE::OPTable\x0%!token"
+    tokentable = self
     keytable = getattribute self, "PGE::OPTable\x0%!key"
     klentable = getattribute self, "PGE::OPTable\x0%!klen"
     ws = getattribute self, "PGE::OPTable\x0&!ws"
