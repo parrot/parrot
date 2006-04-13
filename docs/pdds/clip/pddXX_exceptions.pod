@@ -256,7 +256,7 @@ calls the installed exception handler only when an exception is thrown.
     ...
 
   _handler:                     # if not, execution continues here
-    get_params '(0,0)', P0, S0  # handler is called with (exception, message)
+    get_results '(0,0)', P0, S0  # handler is called with (exception, message)
     ...
 
 If the global variable is found, the next statement
