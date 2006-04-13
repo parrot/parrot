@@ -612,6 +612,6 @@ EOC
     print "\n"
 .end
 CODE
-foo
-bar
+parrot;foo
+parrot;bar
 OUTPUT

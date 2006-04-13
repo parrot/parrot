@@ -786,9 +786,9 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "sub names");
     interpinfo P1, .INTERPINFO_CURRENT_CONT
     returncc
 CODE
-main
-the_sub
-main
+parrot;main
+parrot;the_sub
+parrot;main
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "sub names w MAIN");
@@ -813,9 +813,9 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "sub names w MAIN");
     interpinfo P1, .INTERPINFO_CURRENT_CONT
     returncc
 CODE
-main
-the_sub
-main
+parrot;main
+parrot;the_sub
+parrot;main
 OUTPUT
 
 
@@ -863,15 +863,15 @@ tb_end:
 CODE
 main foo
 Bar bar
-subname: Bar :: bar
+subname: parrot;Bar;bar
 Bar foo
-caller 0 Bar :: foo
-caller 1 Bar :: bar
-caller 2 foo
-caller 3 main
+caller 0 parrot;Bar;foo
+caller 1 parrot;Bar;bar
+caller 2 parrot;foo
+caller 3 parrot;main
 Bar foo
-caller 0 Bar :: foo
-caller 1 main
+caller 0 parrot;Bar;foo
+caller 1 parrot;main
 ok
 OUTPUT
 

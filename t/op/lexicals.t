@@ -33,26 +33,6 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM (S0) fails', todo => 'specification unclear');
-.pcc_sub main:
-    S0 = '$a'
-    .lex S0, P0
-    print "ok\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PASM ($S0) fails', todo => 'specification unclear');
-.pcc_sub main:
-    $S0 = '$a'
-    .lex $S0, P0
-    print "ok\n"
-    end
-CODE
-ok
-OUTPUT
-
 pir_output_is(<<'CODE', <<'OUTPUT', '.lex parsing - PIR');
 .sub main
     .lex "$a", P0
@@ -393,7 +373,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer');
     print "\n"
 .end
 CODE
-main
+parrot;main
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer 2');
@@ -414,8 +394,8 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer 2');
     print "\n"
 .end
 CODE
-foo
-main
+parrot;foo
+parrot;main
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer via interp');
@@ -454,10 +434,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_outer via interp');
     pad['a'] = $P0
 .end
 CODE
-foo
-foo
-main
-main
+parrot;foo
+parrot;foo
+parrot;main
+parrot;main
 I messed with your var
 OUTPUT
 
@@ -1096,4 +1076,4 @@ CODE
 OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 42; }
+BEGIN { plan tests => 40; }
