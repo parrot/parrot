@@ -225,7 +225,9 @@ executing program statements.
     $P0 = apl(stmt, 'target' => target)
     if target == 'PIR' goto dump_pir
     if target goto dump_object
-    $P0()
+    push_eh trap
+      $P0()
+    clear_eh
     ret
   dump_pir:
     print $P0
@@ -239,6 +241,11 @@ executing program statements.
     print filename
     print "\n"
     end
+
+  trap:
+    get_results '(0,0)', $P0, $S0
+    print $S0
+    exit 1
 
   end:
 .end

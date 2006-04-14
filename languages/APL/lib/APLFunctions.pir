@@ -15,7 +15,8 @@ Eventually make these be unicode strings.
 .macro domain_error ()
   .sym pmc throwable
   throwable = new .Exception
-  throwable[0] = "DOMAIN ERROR"
+  throwable[0] = "DOMAIN ERROR\n"
+  throw throwable
 .endm
 
 .namespace [ 'APL' ]

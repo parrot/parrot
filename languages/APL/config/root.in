@@ -73,6 +73,6 @@ clean: testclean
   lib/APLGrammar.pir
 
 realclean: clean
-	$(RM_F) Makefile
+	$(RM_F) Makefile "EVAL_*"
 
 distclean: realclean

@@ -157,8 +157,6 @@ __DATA__
 === power domain (negative sqrt)
 --- APL: ⁻9*.5
 --- out: DOMAIN ERROR
---- excuse: can't throw exception?
---- todo
 
 === logarithm scalar
 --- APL: 1000⍟10
@@ -187,8 +185,6 @@ __DATA__
 === residue N
 --- APL: 0|⁻9
 --- out: DOMAIN ERROR
---- excuse: can't throw exception?
---- todo
 
 === binomial coefficient 1
 --- APL: 2!5
