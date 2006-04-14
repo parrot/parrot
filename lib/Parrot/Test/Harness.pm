@@ -1,5 +1,5 @@
 # Copyright: 2006 The Perl Foundation.  All Rights Reserved.
-# $Id: /parrotcode/trunk/lib/Parrot/Test.pm 15028 2006-04-03T20:05:44.342070Z particle  $
+# $Id$
 
 =head1 NAME
 
@@ -43,8 +43,6 @@ harness and most of that probably stolen from Test::Harness
 
 Please send patches and bug reports via Parrot's RT queue or to the mailing
 list.
-
-=back
 
 =cut
 
