@@ -4,10 +4,10 @@
 LN_S     = @lns@
 PERL     = @perl@
 RM_RF    = @rm_rf@
-PARROT   = ..@slash@..@slash@parrot@exe@
-TOOL_DIR = ..@slash@..
-PGE_DIR  = ..@slash@..@slash@compilers@slash@pge
-TGE_DIR  = ..@slash@..@slash@compilers@slash@tge
+PARROT   = ../../parrot@exe@
+TOOL_DIR = ../..
+PGE_DIR  = ../../compilers/pge
+TGE_DIR  = ../../compilers/tge
 CP       = @cp@
 
 all: perl6.pbc
@@ -19,13 +19,13 @@ SOURCES = perl6.pir \
   lib/past2pir.tge \
   lib/PAST.pir \
   lib/main.pir \
-  lib/builtins.pir 
+  lib/builtins.pir
 
 # the default target
 perl6.pbc: $(PARROT) $(SOURCES)
-	$(PARROT) $(PGE_DIR)@slash@rulec.pir --output=lib/grammar.pir lib/grammar.pge
-	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib/pge2past.pir lib/pge2past.tge
-	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib/past2pir.pir lib/past2pir.tge
+	$(PARROT) $(PGE_DIR)/rulec.pir --output=lib/grammar.pir lib/grammar.pge
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/pge2past.pir lib/pge2past.tge
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/past2pir.pir lib/past2pir.tge
 	$(PARROT) -o perl6.pbc perl6.pir
 
 # This is a listing of all targets, that are meant to be called by users
@@ -49,13 +49,13 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Ilib -I..@slash@..@slash@lib t@slash@harness t@slash@sanity.t
+	$(PERL) t/harness
 
 testclean:
 	echo "XXX: Todo - not yet implemented"
 
 clean: 
-	$(RM_RF) perl6.pbc lib@slash@grammar.pir
+	$(RM_RF) perl6.pbc lib/grammar.pir
 
 realclean: clean
 	$(RM_RF) Makefile
