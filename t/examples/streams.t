@@ -33,16 +33,17 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =cut
 
 
-# Set up expected output for examples
-my %expected
-    = ( 'Combiner.pir' => <<'END_EXPECTED',
+# map examples to expected output, organized by io type (file|stream)
+my %expected = (
+    stream => {
+        'Combiner.pir' => <<'EXP_COMBINER',
 read:[1 hello]
 read:[2 world!]
 read:[3 parrot]
 read:[4 is cool]
-END_EXPECTED
+EXP_COMBINER
 
-        'Coroutine.pir' => <<'END_EXPECTED',
+        'Coroutine.pir' => <<'EXP_COROUTINE',
 read:[0]
 read:[1]
 read:[2]
@@ -53,9 +54,71 @@ read:[6]
 read:[7]
 read:[8]
 read:[9]
-END_EXPECTED
-        
-        'FileLines.pir' => <<'END_EXPECTED',
+EXP_COROUTINE
+
+        'Filter.pir' => <<'EXP_FILTER',
+read:[0 * 2 = 0]
+read:[1 * 2 = 2]
+read:[2 * 2 = 4]
+read:[3 * 2 = 6]
+read:[5 * 2 = 10]
+read:[6 * 2 = 12]
+read:[7 * 2 = 14]
+read:[8 * 2 = 16]
+read:[9 * 2 = 18]
+EXP_FILTER
+
+        'Include.pir' => <<'EXP_INCLUDE',
+read:[0]
+read:[1]
+read:[2]
+read:[3]
+read:[4]
+read:[hello]
+read:[A]
+read:[B]
+read:[C]
+read:[D]
+read:[E]
+read:[F]
+read:[world]
+read:[5]
+read:[6]
+read:[7]
+read:[8]
+read:[9]
+EXP_INCLUDE
+
+        'Lines.pir' => <<'EXP_LINES',
+read:[this]
+read:[is a]
+read:[Stream::Lines]
+read:[testcase]
+EXP_LINES
+
+        'SubCounter.pir' => <<'EXP_SUBCOUNTER',
+read:[0]
+read:[1]
+read:[2]
+read:[3]
+read:[4]
+read:[5]
+read:[6]
+read:[7]
+read:[8]
+read:[9]
+EXP_SUBCOUNTER
+
+        'SubHello.pir' => <<'EXP_SUBHELLO',
+read:[hello]
+read:[world!]
+read:[parrot]
+read:[is cool]
+EXP_SUBHELLO
+    },
+
+    file => {
+        'FileLines.pir' => <<'EXP_FILELINES',
 read:[    1 =head1 INFORMATION]
 read:[    2 ]
 read:[    3 This is an advanced example.]
@@ -161,49 +224,9 @@ read:[  102 ]
 read:[  103 Copyright (c) 2004, the Perl Foundation.]
 read:[  104 ]
 read:[  105 =cut]
-END_EXPECTED
+EXP_FILELINES
 
-        'Filter.pir' => <<'END_EXPECTED',
-read:[0 * 2 = 0]
-read:[1 * 2 = 2]
-read:[2 * 2 = 4]
-read:[3 * 2 = 6]
-read:[5 * 2 = 10]
-read:[6 * 2 = 12]
-read:[7 * 2 = 14]
-read:[8 * 2 = 16]
-read:[9 * 2 = 18]
-END_EXPECTED
-
-        'Include.pir' => <<'END_EXPECTED',
-read:[0]
-read:[1]
-read:[2]
-read:[3]
-read:[4]
-read:[hello]
-read:[A]
-read:[B]
-read:[C]
-read:[D]
-read:[E]
-read:[F]
-read:[world]
-read:[5]
-read:[6]
-read:[7]
-read:[8]
-read:[9]
-END_EXPECTED
-
-        'Lines.pir' => <<'END_EXPECTED',
-read:[this]
-read:[is a]
-read:[Stream::Lines]
-read:[testcase]
-END_EXPECTED
-
-        'ParrotIO.pir' => <<'END_EXPECTED',
+        'ParrotIO.pir' => <<'EXP_PARROTIO',
 read:[=head1 INFORMATION\n\nThis small example shows the u]
 read:[sage of C<Stream::ParrotIO>.\n\nIt reads this file w]
 read:[ith a default block size.\n\nYou can specify another]
@@ -228,33 +251,24 @@ read:[jensbeimsurfen dot deE<gt> is the author\nand maint]
 read:[ainer.\nPlease send patches and suggestions to the ]
 read:[Perl 6 Internals mailing list.\n\n=head1 COPYRIGHT\n\n]
 read:[Copyright (c) 2004, the Perl Foundation.\n\n=cut\n]
-END_EXPECTED
+EXP_PARROTIO
+    },
+);
 
-        'SubCounter.pir' => <<'END_EXPECTED',
-read:[0]
-read:[1]
-read:[2]
-read:[3]
-read:[4]
-read:[5]
-read:[6]
-read:[7]
-read:[8]
-read:[9]
-END_EXPECTED
+#=for comment
+#        'ParrotIO.pir t/examples/test.txt' => do{
+#            local $/ = 60;
+#            my $file = 
+#            @lines=map {} <>;
+#        },
+#=cut
 
-        'SubHello.pir' => <<'END_EXPECTED',
-read:[hello]
-read:[world!]
-read:[parrot]
-read:[is cool]
-END_EXPECTED
-
-      );
-
-while ( my ( $example, $expected ) = each %expected ) {
-    example_output_is( "examples/streams/$example", $expected );
+for my $io ( keys %expected ) {
+    while ( my ( $example, $expected ) = each %{$expected{$io}} ) {
+        example_output_is( "examples/streams/$example", $expected );
+    }
 }
+
 
 TODO:
 {

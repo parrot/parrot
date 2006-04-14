@@ -20,8 +20,8 @@ with combinations of STDERR and STDOUT open and closed.
 
 use strict;
 use warnings;
-use Parrot::Test tests => 8;
 use Test::More;
+use Parrot::Test tests => 8;
 use Parrot::Config;
 use File::Spec;
 
