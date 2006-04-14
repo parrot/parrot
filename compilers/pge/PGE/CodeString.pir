@@ -44,6 +44,7 @@ PGE::CodeString - object to build (PIR) code segments
     goto emit_next
   comma_arg:
     repl = args[0]
+    repl = clone repl
     $I1 = elements args
     $I0 = 1
   comma_arg_loop:
