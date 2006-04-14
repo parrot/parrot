@@ -34,6 +34,8 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 
 # map examples to expected output, organized by io type (file|stream)
+# NOTE: examples using file io must have 'svn:eol-style' set to 'LF'
+#       to work properly on all platforms.
 my %expected = (
     stream => {
         'Combiner.pir' => <<'EXP_COMBINER',
@@ -116,6 +118,7 @@ read:[parrot]
 read:[is cool]
 EXP_SUBHELLO
     },
+
 
     file => {
         'FileLines.pir' => <<'EXP_FILELINES',
