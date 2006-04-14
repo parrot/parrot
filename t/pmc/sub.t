@@ -734,7 +734,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
 .sub _main :main
 .include "warnings.pasm"
     _f1()
-    $P0 = new .PerlUndef
+    $P0 = new .Undef
     print $P0
     print "ok\n"
 .end
@@ -745,11 +745,14 @@ CODE
 ok
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
+# XXX This is the behavior of Parrot 0.4.3
+# It looks like core PMCs never emit warning.
+# Look in perlundef.t for a more sane test of 'warningson' in subs
+pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
 .sub _main :main
 .include "warnings.pasm"
     _f1()
-    $P0 = new .PerlUndef
+    $P0 = new .Undef
     print "back\n"
     print $P0
     print "ok\n"
@@ -757,14 +760,15 @@ pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
 .sub _f1
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f2()
-    $P0 = new .PerlUndef
+    $P0 = new .Undef
     print $P0
 .end
 .sub _f2
     warningsoff .PARROT_WARNINGS_UNDEF_FLAG
 .end
 CODE
-/uninit.*\n.*\nback\nok/
+back
+ok
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "sub names");

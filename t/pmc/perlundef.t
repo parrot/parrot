@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 16;
 
 =head1 NAME
 
@@ -411,5 +411,43 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "band undef");
 CODE
 0
 0
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
+.sub _main :main
+.include "warnings.pasm"
+    _f1()
+    $P0 = new .PerlUndef
+    print $P0
+    print "ok\n"
+.end
+.sub _f1
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+.end
+CODE
+ok
+OUTPUT
+
+
+pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
+.sub _main :main
+.include "warnings.pasm"
+    _f1()
+    $P0 = new .PerlUndef
+    print "back\n"
+    print $P0
+    print "ok\n"
+.end
+.sub _f1
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+    _f2()
+    $P0 = new .PerlUndef
+    print $P0
+.end
+.sub _f2
+    warningsoff .PARROT_WARNINGS_UNDEF_FLAG
+.end
+CODE
+/uninit.*\n.*\nback\nok/
 OUTPUT
 
