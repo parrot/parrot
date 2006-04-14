@@ -264,6 +264,27 @@ and when calling the function, I will do:
 
 And C<$I0> will yield 10, and C<$I1> will yield 20, as expected.
 
+=head2 Concluding
+
+To conclude this first article on PIR and to let you test what you
+learned, let me show you how to do input on PASM (hence, also in
+PIR). There is a C<read> opcode to read from standard input. Just use
+it with a variable where the readed line should be placed, and the
+number of characters you are reading:
+
+   read $S1, 100
+
+This line will read 100 characters (or until the end of the line) and
+put the read string into C<$S1>. In case you need a number, just
+assign the string to the correct register type:
+
+   read $S1, 100
+   $I1 = $S1
+
+With the PIR syntax shown in this article you should be able to start
+writting simple programs. Next article we will look into available
+PMCs, and how they can be used.
+
 
 =head2 Thanks
 
