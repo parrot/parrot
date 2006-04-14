@@ -339,7 +339,7 @@ compute factorial.
   .sub _main :main
       .local int f, i
 
-      # We'll do factorial 0 to 1.
+      # We'll do factorial 0 to 10.
       i = 0
   loop:
       f = _fact(i)
