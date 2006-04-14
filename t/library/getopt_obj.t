@@ -297,6 +297,7 @@ pir_output_is(<<'CODE', <<'OUT', "ignored options");
 	load_bytecode "Getopt/Obj.pir"
 	.local pmc getopts
 	getopts = new "Getopt::Obj"
+	getopts."notOptStop"(1)
 
 	$P0 = getopts."add"()
 	$P0."long"("foo")
@@ -652,6 +653,29 @@ define[foobar] is 1
 argv[0] is text
 OUT
 
+# 14
+pir_output_like(<<'CODE', <<'OUT', "missing spec");
+.sub main :main 
+	.local pmc argv
+	argv = new .ResizablePMCArray
+	push argv, '--foo=file'
+	load_bytecode "Getopt/Obj.pir"
+	.local pmc getopts
+	getopts = new "Getopt::Obj"
+	$P1 = getopts."get_options"(argv)
+	$S0 = $P1["foo"]
+	print "foo is "
+	print $S0
+	print "\n"
+	$S0 = argv[0]
+	print "argv[0] is "
+	print $S0
+	print "\n"
+.end
+CODE
+/Option 'foo' not in specs/
+OUT
+
 =head1 AUTHOR
 
 Joshua Isom - C<loneowl@ritalin.shout.net>
@@ -662,5 +686,5 @@ F<runtime/parrot/library/Getopt/Obj.pir>
 
 =cut
 
-BEGIN { plan tests => 13; }
+BEGIN { plan tests => 14; }
 

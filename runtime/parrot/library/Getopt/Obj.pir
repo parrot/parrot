@@ -80,9 +80,6 @@ the attributes they'll use.
     addattribute spec, "optarg"
 .end
 
-.include "library/dumper.pir"
-.include "iterator.pasm"
-
 =back
 
 =head2 Class Getopt::Obj
@@ -122,7 +119,6 @@ wanted.
     .local string name, long, short, arg, key, val
     return = new .Hash
 
-    push_eh handler
     i = 0
 beginfor:
     argc = argv
@@ -171,6 +167,7 @@ else_2:
     null val
 endif_2:
     (name, spec) = self."getNameForKey"(key)
+    if null name goto redofor
     long = spec."long"()
     $I0 = length $S0
     unless long == key goto beginstore
@@ -196,6 +193,7 @@ shortarg:
     val = substr arg, 2
 
     (name, spec) = self."getNameForKey"(key)
+    if null name goto redofor
 
     key = name
 
@@ -215,6 +213,7 @@ beginfor_0:
     key = substr keys, jkl, 1
 
     (name, spec) = self."getNameForKey"(key)
+    if null name goto redofor
     $I0 = spec."type"()
     unless $I0 == .Boolean goto error_2
 
@@ -253,6 +252,7 @@ error_2:
 beginstore:
 
     (name, spec) = self."getNameForKey"(key)
+    if null name goto redofor
 
     # Store the value...
     $I0 = spec."type"()
@@ -328,20 +328,14 @@ redofor:
 endfor:
 
     goto finish
-handler:
-    get_results "(0,0)", $P0, $S0
-    if $S0 == "Option key not found" goto endif_6
-    rethrow $P0
 endif_6:
     $I0 = self."notOptStop"()
     if $I0 goto finish
     # This seems necessary...don't know why
-    push_eh handler
     inc i
     goto beginfor
 
 finish:
-    clear_eh
     .return(return)
 .end
 
@@ -507,9 +501,18 @@ nextfor:
     goto beginfor
 endfor:
     # Don't return anything, easier to catch an exception...
+    $I0 = self."notOptStop"()
+    if $I0 goto finish
     $P0 = new .Exception
-    $P0["_message"] = "Option key not found"
+    $S0 = "Option '"
+    $S0 .= key 
+    $S0 .= "' not in specs"
+    $P0["_message"] = $S0
     throw $P0
+finish:
+    null $S0
+    null $S0
+    .return ($S0, $P0)
 .end
 
 =item C<INT self."notOptStop"()>
