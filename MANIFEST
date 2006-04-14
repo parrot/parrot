@@ -292,6 +292,7 @@ docs/native_exec.pod                              [main]doc
 docs/overview.pod                                 [main]doc
 docs/parrot.pod                                   [main]doc
 docs/parrotbyte.pod                               [main]doc
+docs/pir-tutorial.pod                             [main]doc
 docs/pmc.pod                                      [main]doc
 docs/porting_intro.pod                            [main]doc
 docs/practical_notes.pod                          [main]doc
