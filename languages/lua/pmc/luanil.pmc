@@ -47,15 +47,6 @@ pmclass LuaNil
             string_representation = const_string(INTERP, "nil");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaBoolean", 0));
-
-            /* namespace hack */
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaNil"),
-                const_string(INTERP, "rawequal"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "nil"),
-                const_string(INTERP, "rawequal"),
-                meth);
         }
     }
 

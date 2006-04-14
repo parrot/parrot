@@ -48,22 +48,6 @@ pmclass LuaUserdata
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
-
-            /* namespace hack */
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaUserdata"),
-                const_string(INTERP, "rawequal"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "userdata"),
-                const_string(INTERP, "rawequal"),
-                meth);
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaUserdata"),
-                const_string(INTERP, "set_metatable"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "userdata"),
-                const_string(INTERP, "set_metatable"),
-                meth);
         }
     }
 

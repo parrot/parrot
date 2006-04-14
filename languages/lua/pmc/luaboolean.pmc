@@ -49,15 +49,6 @@ pmclass LuaBoolean
             luaboolean_name = const_string(INTERP, "boolean");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaBoolean", 0));
-
-            /* namespace hack */
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaBoolean"),
-                const_string(INTERP, "rawequal"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "boolean"),
-                const_string(INTERP, "rawequal"),
-                meth);
         }
     }
 

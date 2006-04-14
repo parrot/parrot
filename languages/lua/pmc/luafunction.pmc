@@ -46,43 +46,6 @@ pmclass LuaFunction
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
-
-            /* namespace hack */
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaFunction"),
-                const_string(INTERP, "get_metatable"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "function"),
-                const_string(INTERP, "get_metatable"),
-                meth);
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaFunction"),
-                const_string(INTERP, "len"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "function"),
-                const_string(INTERP, "len"),
-                meth);
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaFunction"),
-                const_string(INTERP, "rawequal"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "function"),
-                const_string(INTERP, "rawequal"),
-                meth);
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaFunction"),
-                const_string(INTERP, "tostring"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "function"),
-                const_string(INTERP, "tostring"),
-                meth);
-            meth = Parrot_find_global(INTERP,
-                const_string(INTERP, "LuaFunction"),
-                const_string(INTERP, "tonumber"));
-            Parrot_store_global(INTERP,
-                const_string(INTERP, "function"),
-                const_string(INTERP, "tonumber"),
-                meth);
         }
     }
 
