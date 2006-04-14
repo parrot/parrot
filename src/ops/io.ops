@@ -330,16 +330,10 @@ op print(in PMC, in PMC) :base_io {
 =item B<read>(out STR, in INT)
 
 Read up to N bytes from standard input stream
-If stream is linebuffered, will return at EOL, for
-files it will read MIN(MAX(avail, N), 65535) bytes.
-Warning: This is a quick hack.
 
 =item B<read>(out STR, in PMC, in INT)
 
 Read up to N bytes from IO PMC stream.
-If stream is linebuffered, will return at EOL, for
-files it will read MIN(MAX(avail, N), 65535) bytes.
-Warning: This is a quick hack.
 
 =cut
 
