@@ -381,7 +381,8 @@ the VM in a language more natural than IMC.
 
 The compiler Works, and the language and examples include subroutines and global
 constants and variables. NCI also works.
-Jako examples are tested during smoke testing.
+The Jako examples are tested during smoke testing.
+The 'queens' example currently has problems and is therefore not tested.
 
 Has a low-tech hand-coded lexer and parser, and the ability to spit out the parse
 tree as XML for debugging. Syntax is a bit rigid, but includes forms that will
@@ -389,7 +390,7 @@ be familiar to Perl programmers.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.3
 
 =item Location
 

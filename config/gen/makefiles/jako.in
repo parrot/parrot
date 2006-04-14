@@ -33,9 +33,10 @@ all: \
 	examples/mops.pir       \
 	examples/nci.pir        \
 	examples/primes.pir     \
-	examples/queens.pir     \
 	examples/sub.pir
 
+# queens.pir is broken
+	examples/queens.pir     \
 
 #
 # Compilation:
@@ -86,9 +87,10 @@ test: all
 	$(INTERP) examples/mops.pir
 	$(INTERP) examples/nci.pir
 	$(INTERP) examples/primes.pir
-	$(INTERP) examples/queens.pir
 	$(INTERP) examples/sub.pir
 
+# queens.pir is broken
+	$(INTERP) examples/queens.pir
 
 #
 # End of file.

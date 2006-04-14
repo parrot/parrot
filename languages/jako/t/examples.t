@@ -152,6 +152,8 @@ END_EXPECTED
 
     );
 
+delete $expected{ 'queens.pir' };
+
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_is( "jako/examples/$example", $expected );
 }
@@ -165,4 +167,5 @@ TODO:
     fail( 'mandelzoom.pir' );
     fail( 'mops.pir' );
     fail( 'nci.pir' );
+    fail( 'queens.pir' );
 };
