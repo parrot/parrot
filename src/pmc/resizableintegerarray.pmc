@@ -156,7 +156,51 @@ Removes and returns the last element in the array.
         DYNSELF.set_integer_native(size - 1);
         return value;
     }
+/*
 
+=item C<INTVAL shift_integer()>
+
+Removes and returns an item from the start of the array.
+
+=cut
+
+*/
+
+    INTVAL shift_integer() {
+        INTVAL size;
+        INTVAL value, *data;
+
+        size = PMC_int_val(SELF);
+        if (size == 0) {
+            real_exception(INTERP, NULL, E_IndexError,
+                    "ResizableIntegerArray: Can't shift from an empty array!");
+        }
+        data = (INTVAL *)PMC_data(SELF);
+        value = data[0];
+        PMC_int_val(SELF) = --size;
+        mem_sys_memmove(data, data + 1, size * sizeof(INTVAL));
+        return value;
+    }
+
+/*
+
+=item C<void unshift_integer(INTVAL value)>
+
+Add and integer to the start of the array.
+
+=cut
+
+*/
+
+    void unshift_integer(INTVAL value) {
+        INTVAL size, *data;
+
+        size = PMC_int_val(SELF);
+        DYNSELF.set_integer_native(size + 1);
+        data = (INTVAL *)PMC_data(SELF);
+        mem_sys_memmove(data + 1, data, size * sizeof(INTVAL));
+        data[0] = value;
+    }
 /*
 
 =item C<PMC *clone()>
