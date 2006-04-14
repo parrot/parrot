@@ -83,7 +83,7 @@ If called with no args, run the suite.
 
 =cut
 
-    if ( grep { /^--files$/ } @ARGV )
+    if ( grep { /^--files$/ } @{ $options{arguments} } )
     {
         # --files indicates the 'languages/t/harness' wants a list of test files
         my $dir   = File::Spec->catfile( $options{language}, 't' );

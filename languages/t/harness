@@ -109,7 +109,7 @@ my @unified_testable_languages =
        urm
        Zcode
      );
-@unified_testable_languages = qw( m4 );
+# @unified_testable_languages = qw( m4 punie );
 
 my @harnesses
     = grep {-f $_}
