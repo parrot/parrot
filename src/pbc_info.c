@@ -67,7 +67,6 @@ main(int argc, char * argv[] )
     struct PackFile_Segment *seg;
 
     interpreter = Parrot_new(NULL);
-    Parrot_init(interpreter);
 
     pf = Parrot_readbc(interpreter, argv[1]);
 

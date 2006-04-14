@@ -93,7 +93,6 @@ int main(int margc, char* margv[]) {
     if ( interpreter == NULL )
 	return 1;
 
-    Parrot_init(interpreter);
     /* this registers the PIR compiler */
     imcc_init(interpreter);
     /* dummy pf and segment to get things started */

@@ -55,7 +55,10 @@ extern void Parrot_initialize_core_pmcs(Interp *interp);
 =item C<void Parrot_init(Interp *interpreter)>
 
 Initializes the new interpreter. This function only has effect the first
-time it is called. Use this function when you intend to enter the run loop,
+time it is called. Therefore Parrot_init() doesn't have to be called 
+on an interpreter returned from Parrot_new().
+
+Use this function when you intend to enter the run loop,
 which automatically sets the top of stack pointer.
 
 =item C<void Parrot_init_stacktop(Interp *interpreter, void *stack_top)>

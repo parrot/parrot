@@ -43,7 +43,6 @@ int main(int argc, char* argv[])
     if (!interpreter) {
         return 1;
     }
-    Parrot_init(interpreter);
 
     PIO_eprintf(interpreter, "main\n");
 

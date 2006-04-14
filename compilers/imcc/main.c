@@ -1,5 +1,5 @@
 /*
- * main.c
+ * $Id$
  *
  * Intermediate Code Compiler for Parrot.
  *
@@ -486,15 +486,11 @@ main(int argc, char * argv[])
     int obj_file, ast_file = 0;
     char *sourcefile;
     const char *output_file;
-
     Interp *interp;
 
     Parrot_set_config_hash();
 
     interp = Parrot_new(NULL);
-
-
-    Parrot_init(interp);
 
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);

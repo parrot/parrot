@@ -137,7 +137,6 @@ main(int argc, char *argv[])
 
     /*Parrot_set_config_hash();  TODO link with cfg */
     debugger = Parrot_new(NULL);
-    Parrot_init(debugger);
     pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
     /* attach pdb structure */
     debugger->pdb = pdb;
@@ -146,7 +145,6 @@ main(int argc, char *argv[])
     interpreter->debugger = debugger; 
     pdb->debugee = interpreter;
 
-    Parrot_init(interpreter);
     Parrot_block_DOD(interpreter);
     Parrot_block_GC(interpreter);
     imcc_init(interpreter);

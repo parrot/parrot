@@ -51,7 +51,6 @@ main(int argc, char *argv[])
     }
 
     interpreter->lo_var_ptr = &interpreter;
-    Parrot_init(interpreter);
 
     if (argc != 2) {
         fprintf(stderr, "Usage: disassemble programfile \n");

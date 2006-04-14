@@ -39,7 +39,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     parrot_reg = 0;
     value = 42;
@@ -71,7 +70,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     parrot_reg = 1;
     value = 2.5;
@@ -102,7 +100,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     output = Parrot_new_string(interpreter, "Test", 4, "iso-8859-1", 0);
     PIO_eprintf(interpreter, "%S\n", output);
@@ -129,7 +126,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     parrot_reg = 2;
     value = Parrot_new_string(interpreter, "Test", 4, "iso-8859-1", 0);
@@ -159,7 +155,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "Integer");
     testpmc = Parrot_PMC_new(interpreter, type);
@@ -209,7 +204,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
     Parrot_run_native(interpreter, the_test);
     Parrot_exit(0);
     return 0;
@@ -232,7 +226,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "Integer");
     testpmc = Parrot_PMC_new(interpreter, type);
@@ -269,7 +262,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "Float");
     testpmc = Parrot_PMC_new(interpreter, type);
@@ -302,7 +294,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "String");
     testpmc = Parrot_PMC_new(interpreter, type);
@@ -335,7 +326,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "String");
     testpmc = Parrot_PMC_new(interpreter, type);
@@ -370,7 +360,6 @@ int main(int argc, char* argv[]) {
     /* Interpreter set-up */
     interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "String");
     testpmc = Parrot_PMC_new(interpreter, type);
@@ -425,7 +414,6 @@ int main(int argc, char* argv[])
     if (!interpreter) {
         return 1;
     }
-    Parrot_init(interpreter);
 
     Parrot_run_native(interpreter, the_test);
 
@@ -497,7 +485,6 @@ int main(int argc, char* argv[])
     if (!interpreter) {
         return 1;
     }
-    Parrot_init(interpreter);
 
     Parrot_run_native(interpreter, the_test);
 

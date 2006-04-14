@@ -723,7 +723,6 @@ main(int argc, char **argv)
 
     /* Create a Parrot interpreter. */
     interpreter = Parrot_new(NULL);
-    Parrot_init(interpreter);
     Parrot_block_DOD(interpreter);
 
     /* Get options, ensuring we have at least one input

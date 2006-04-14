@@ -39,7 +39,6 @@ int main(int argc, char* argv[])
     if (!interpreter) {
         return 1;
     }
-    Parrot_init(interpreter);
 
     Parrot_run_native(interpreter, the_test);
 

@@ -178,7 +178,6 @@ int main(int argc, char* argv[]) {
     Interp * interpreter;
 
     interpreter = Parrot_new(NULL);
-    Parrot_init_stacktop(interpreter, &interpreter);
     do_test(interpreter);
 
     Parrot_exit(0);
