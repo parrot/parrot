@@ -7,15 +7,18 @@
 
 =head1 Writing PIR
 
-PIR (Parrot Intermediate Representation) is a special format to
-simplify the task of writing parrot code. PASM (Parrot Assembler)
-notation is like any other Assembler-like format and can be used
-directly, but gives too power to the user. Mainly, there are some
-conventions that PASM coders should use, and that PIR masques. This
-way, I can write code without worrying about these little details.
+PIR (Parrot Intermediate Representation) is a way to program the 
+parrot virtual machine that is easier to use than PASM (Parrot
+Assembler). PASM notation is like any other assembler-like format and
+can be used directly, but it is more verbose and gives too much power 
+to the user. PIR abstracts common operations and conventions into a
+syntax that more closely resembles a high-level language. PIR allows
+the programmer to write code that more naturally expresses their
+intent without worrying about setting up the exact details that PASM
+requires to function properly.
 
-With this article I want to show just the basics on programming
-PIR. More advanced topics will appear on later articles.
+This article will show the basics on programming in PIR. More advanced
+topics will appear in later articles.
 
 =head2 Getting Parrot
 
@@ -52,6 +55,9 @@ C<.sub> keyword I use the name of the subroutine. The C<:main> means
 that this is the main body of the program. This way, Parrot knows what
 subroutine to run. By the way, I could just use C<.sub foo :main> and
 Parrot will use C<foo> as the main body as well.
+
+In the body you can use plain PASM code together with PIR
+code. Although that is not a good practice, it might be helpful.
 
 Before entering with more details about subroutines and calling
 conventions, let use some more simplified PIR syntax.
