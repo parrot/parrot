@@ -1,45 +1,48 @@
 #! perl -w
+
 # Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
+use lib qw( lib ../lib );
 
-use FindBin;
-use lib "$FindBin::Bin/../../lib";
-
-use Data::Dumper;
 use File::Spec;
-use Test::Harness();
+use Getopt::Long;
 use Parrot::Config qw/%PConfig/;
+use Test::Harness();
 
 =head1 Languages harness
 
-There are 3 ways to run a language test: 
+There are 4 ways to run a language test: 
 
 =over 4
 
 =item Overall Harness
 
-C<make languages-test> 
+  C<make languages-test> 
 
 or
 
-C<cd languages && make test>
+  C<cd languages && make test>
 
-=item * Smoke testing
+=item Smoke testing
 
-C<make languages-smoke> 
+  C<make languages-smoke>
 
 or
 
-C<cd languages && make smoke> or
+  C<cd languages && make smoke>
+
+=item Selected languages
+
+  C<cd languages && perl t/harness --languages=m4,punie>
 
 =item Per Language Harness
 
 For well behaved languages you can do something like:
 
-C<cd languages/tcl && make test>
+  C<cd languages/tcl && make test>
 
 =item Run a single test for more detailed output.
 
@@ -49,29 +52,23 @@ e.g., C<cd languages/tcl && prove t/joe_test.t>
 
 =head1 TODO
 
-There is too much overlap with ../t/harness.
-
-=head1 AUTHOR
-
-  Will "Coke" Coleda
-  Jerome Quelin
+It should be possible to use non-Perl5 test files, like for languages/perl6.
 
 =cut
 
 =for comment
 
 We are assuming that we are running out of parrot/languages; we are being
-called by languages/Makefile with an explicit perl. All languages have 
-a Makefile with a "test" target, and any prereqs required by that test
-have already been built.
+called by languages/Makefile with an explicit perl.
 
 =cut
 
 
 # Step 0: handle command line args
-
-my $do_gen_html = grep { $_ eq '--html' } @ARGV;
-@ARGV = grep { $_ ne '--html' } @ARGV;
+my $do_gen_html;       # smoke testing
+my $languages_list;    # select a subset of languages
+my $result = GetOptions( "html"          => \$do_gen_html,    
+                         "languages=s"   => \$languages_list );  
 
 # Step 1: find harness files for testable languages
 
@@ -88,28 +85,31 @@ my $do_gen_html = grep { $_ eq '--html' } @ARGV;
 # ruby                 not maintained, should be removed
 
 
-my @unified_testable_languages = 
-   qw( APL
-       bc
-       befunge
-       bf
-       HQ9plus
-       jako
-       lazy-k
-       lua
-       m4
-       ook
-       parrot_compiler
-       perl6
-       punie
-       regex
-       scheme
-       tcl
-       unlambda
-       urm
-       Zcode
-     );
 
+my @unified_testable_languages
+    = defined $languages_list ?
+          split( /\s*,\s*/, $languages_list )
+          : 
+          qw( APL
+              bc
+              befunge
+              bf
+              HQ9plus
+              jako
+              lazy-k
+              lua
+              m4
+              ook
+              parrot_compiler
+              perl6
+              punie
+              regex
+              scheme
+              tcl
+              unlambda
+              urm
+              Zcode
+            );
 my @harnesses
     = grep {-f $_}
           map { File::Spec->join($_, 't', 'harness') }
