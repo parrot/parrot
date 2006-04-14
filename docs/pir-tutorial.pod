@@ -5,7 +5,7 @@
 #  don't extend much the size of it.
 #
 
-=Head2 Writing PIR
+=head1 Writing PIR
 
 PIR (Parrot Intermediate Representation) is a special format to
 simplify the task of writing parrot code. PASM (Parrot Assembler)
@@ -36,7 +36,6 @@ Let me start with a simple and typical example:
 
   .sub main :main
        print "hello world\n"
-       end
   .end
 
 To run it, save the code in a C<hello.pir> file and pass it to the
@@ -54,15 +53,12 @@ that this is the main body of the program. This way, Parrot knows what
 subroutine to run. By the way, I could just use C<.sub foo :main> and
 Parrot will use C<foo> as the main body as well.
 
-In the case of this sample program the body of C<main> is just plain
-PASM.
-
 Before entering with more details about subroutines and calling
 conventions, let use some more simplified PIR syntax.
 
-For instance, if I want to add two integer registers I can use the
-Parrot C<set> opcode to put values into registers, and the C<add>
-opcode to add them, like this:
+For instance, if I want to add two integer registers using PASM I
+would use the Parrot C<set> opcode to put values into registers, and
+the C<add> opcode to add them, like this:
 
    set I1, 5
    set I2, 3
@@ -107,7 +103,7 @@ Another simplification of PASM are branches. Basically, when I want to
 test a condition and jump to another place in the code, I would write
 the following PASM code:
 
-   le, I1, I2, LESS_EQ
+   le I1, I2, LESS_EQ
 
 Meaning, if C<I1> is less or equal than C<I2>, jump to label
 C<LESS_EQ>. In PIR I would write it in a more legible way:
@@ -124,7 +120,6 @@ the following code:
 
   .sub main :main
      hello()
-     end
   .end
 
   .sub hello
@@ -155,6 +150,29 @@ To return values from PIR subroutines I use the C<.return> keyword,
 followed by one or more arguments, just like this:
 
   .return (10, 20, 30)
+
+=head2 Factorial Example
+
+Now, for a little more complicated example, let me show how I would
+code Factorial subroutine:
+
+  .sub main :main
+     $I1 = factorial(5)
+     print $I1
+     print "\n"
+  .end
+
+  .sub factorial
+     .param int i
+     if i > 1 goto recurse
+     .return (1)
+  recurse:
+     $I1 = i - 1
+     $I2 = factorial($I1)
+     $I2 *= i
+     .return ($I2)
+  .end
+
 
 =head2 Named Arguments
 
@@ -189,6 +207,7 @@ and when calling the function, I will do:
   ("foo" => $I0, "bar" => $I1) = func()
 
 And C<$I0> will yield 10, and C<$I1> will yield 20, as expected.
+
 
 
 =cut
