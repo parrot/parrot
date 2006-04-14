@@ -7,10 +7,10 @@
 
 =head1 Writing PIR
 
-PIR (Parrot Intermediate Representation) is a way to program the 
+PIR (Parrot Intermediate Representation) is a way to program the
 parrot virtual machine that is easier to use than PASM (Parrot
 Assembler). PASM notation is like any other assembler-like format and
-can be used directly, but it is more verbose and gives too much power 
+can be used directly, but it is more verbose and gives too much power
 to the user. PIR abstracts common operations and conventions into a
 syntax that more closely resembles a high-level language. PIR allows
 the programmer to write code that more naturally expresses their
@@ -22,16 +22,45 @@ topics will appear in later articles.
 
 =head2 Getting Parrot
 
-To test PIR (or PASM) code I need Parrot virtual machine. It is
-available from L<http://parrotcode.org>. I can just download the
-latest release, or checkout the current development version from the
-SVN tree.
+In order to test the PIR and PASM code in this article, a parrot virtual
+machine is needed (henceforth just "parrot"). Parrot is available from
+L<http://parrotcode.org>. Just download the latest release, or checkout
+the current development version from the SVN tree. The programs in this
+article were tested with Parrot 0.4.3.
 
-It is very easy to compile: I just run the C<Configure.pl> script, and
-C<make> the animal. Then, I get the C<parrot> program in the root
-directory of the Parrot package. Normally I use it directly from here,
-instead of installing it into the system, making it easier to hack the
-code.
+Parrot is very easy to compile on unix-like operating systems: just
+run C<perl Configure.pl && make> in the root directory of the parrot
+source and, if everything works correctly, a C<parrot> executable should
+appear. Normally, I use it directly from the root directory of the
+parrot source, instead of installing it into the system.
+
+=head2 Parrot Virtual Machine overview
+
+Before we get started with the examples, here's a quick overview of
+parrot's architecture.
+
+Parrot is a register-based virtual machine. It provides 4 types of
+registers and each type has 32 registers. The register types are:
+
+=over 4
+
+=item I - integer
+
+=item N - floating point
+
+=item S - string
+
+=item P - PMC (Parrot Magic Cookie)
+
+=back
+
+Registers are designated by the type of register followed by a number.
+For instance, the integer registers are C<I0>, C<I1>, C<I56> and so
+on. The PMC registers hold arbitrary data objects and are parrot's
+mechanism for implementing more complex behavior than the ones that
+can be expressed using the other 3 register types alone. PMCs will be
+covered in more detail in a future article. Examples in this article
+will focus on the first 3 register types.
 
 =head2 Simple Operators
 
@@ -49,22 +78,23 @@ parrot virtual machine:
 Note that I am using a relative path to parrot given that I didn't
 install it into the system.
 
-The keyworks starting with a dot (C<.sub> and C<.end>) are PIR
-macros. They are used together to define subroutines. After the
-C<.sub> keyword I use the name of the subroutine. The C<:main> means
-that this is the main body of the program. This way, Parrot knows what
-subroutine to run. By the way, I could just use C<.sub foo :main> and
-Parrot will use C<foo> as the main body as well.
+The keywords starting with a dot (C<.sub> and C<.end>) are PIR macros.
+They are used together to define subroutines. After the C<.sub> keyword
+I use the name of the subroutine. The keyword that starts with a colon
+(C<:main>) is a attribute (more on those later) that tells parrot that
+this is the main body of the program and that it should start by
+executing this subroutine. By the way, I could use C<.sub foo :main> and
+Parrot will use the C<foo> subroutine as the main body of the program.
+The actual name of the subroutine does not matter as long as it has the
+attribute C<:main>.
 
-In the body you can use plain PASM code together with PIR
-code. Although that is not a good practice, it might be helpful.
 
-Before entering with more details about subroutines and calling
-conventions, let use some more simplified PIR syntax.
+Before going into more details about subroutines and calling
+conventions, let's compare some PIR syntax to the equivalent PASM.
 
-For instance, if I want to add two integer registers using PASM I
-would use the Parrot C<set> opcode to put values into registers, and
-the C<add> opcode to add them, like this:
+If I want to add two integer registers using PASM I would use the
+Parrot C<set> opcode to put values into registers, and the C<add>
+opcode to add them, like this:
 
    set I1, 5
    set I2, 3
@@ -87,21 +117,22 @@ value:
 
 I can also use the short accumution-like operators, like C<+=>.
 
-Speaking of registers, whenever I can, I registers starting with a
-dollar sign, like C<$I1>. This way I let the parrot PIR compiler to
-choose and if needed, reassign another register instead of the one I
-specified, making the optimizations it needs for speed.
+Also, PIR allows an extended syntax for registers. If the register
+name is prefixed with a dollar sign, like C<$I1>, the parrot PIR
+compiler will automatically assign these "virtual registers" to actual
+registers as needed and handle whatever manipulations are needed for
+optimization.
 
-If I preffer I can declare local variables and use my own names
+Another PIR perk is that local variable names may be declared and used 
 instead of register names. For that I just need to declare the
 variable using the C<.local> keyword:
 
    .local int size
    size = 5
 
-Parrot compiler will choose one register and associate it with my
+The parrot compiler will choose one register and associate it with my
 variable name. I can declare local variables for any of the four data
-types available on PIR: int, string, num and pmc.
+types available on PIR: C<int>, C<string>, C<num> and C<pmc>.
 
 =head2 Branching
 
@@ -148,9 +179,7 @@ keyword to define the parameters C<hello> can handle:
      print "\n"
   .end
 
-If I need more parameters I just need to add more C<.param> lines. PIR
-support properties for subroutines parameters but I don't want to talk
-about them right now.
+If I need more parameters I just need to add more C<.param> lines.
 
 To return values from PIR subroutines I use the C<.return> keyword,
 followed by one or more arguments, just like this:
@@ -179,31 +208,52 @@ code Factorial subroutine:
      .return ($I2)
   .end
 
+This example also shows that PIR subroutines may be recursive just as in
+a high-level language.
 
 =head2 Named Arguments
 
 As some other languages as Python and Perl support named arguments,
 PIR support them as well.
 
-Into the subroutine I need to use a C<.param> command for each named
-argument as well, but using one of the two following syntaxes:
+As before, I need to use C<.param> for each named argument, but with one
+of the two following syntaxes:
 
    .sub func
-     .param int a :named("foo")
+     .param int a :named("foo")    # or
      .param int "bar" => b
 
-With these lines I declare that my subroutine will receive two
-integers, and that the first one is called "foo" and the second one is
-called "bar". In the subroutine I will use C<a> to reffer to C<foo>'s
-value, and C<b> to reffer to C<bar>'s value.
+Both of these lines say the exact same thing: the subroutine will
+recieve an integer named "foo", and inside of the subroutine that
+integer will be known as "a".
 
 When calling the function, I need to pass the names of the
-arguments. For that I can use two syntaxes as well:
+arguments. For that there are two syntaxes as well:
 
-  func( 10 :named("foo"), 20 :named("bar"))
-  func( "bar" => 20, "foo" => 10)
+  func( 10 :named("foo") )	  # or
+  func( "foo" => 10 )
 
-Interesting it to use this same syntax when returning values from
+Note that with named arguments, you may rearrange the order of your
+parameters at will.
+
+  .sub foo
+     .param string "name"	=> a
+     .param int    "age"	=> b
+     .param string "gender"	=> c
+     # ...
+  .end
+
+This subroutine may be called in any of the following ways:
+
+	foo( "Fred", 35, "m" )
+	foo( "gender" => "m", "name" => "Fred", "age" => 35 )
+	foo( "age" => 35, "gender" => "m", "name" => "Fred" )
+	foo( "m" :named("gender"), 35 :named("age"), "name" => "Fred" )
+
+and any other permutation you can think of as long as you use the named
+argument syntax.
+
+It's also possible to use named syntax when returning values from
 subroutines. Into the C<.return> command I'll use:
 
   .return ( "bar" => 20, "foo" => 10)
@@ -215,5 +265,13 @@ and when calling the function, I will do:
 And C<$I0> will yield 10, and C<$I1> will yield 20, as expected.
 
 
+=head2 Thanks
+
+=over 4 
+
+* Jonathan Scott Duff
 
 =cut
+
+=cut
+
