@@ -267,11 +267,11 @@ And C<$I0> will yield 10, and C<$I1> will yield 20, as expected.
 
 =head2 Thanks
 
-=over 4 
+=over 4
 
 * Jonathan Scott Duff
 
-=cut
+=back
 
 =cut
 
