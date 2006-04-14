@@ -242,11 +242,11 @@ of the array.
 */
 
     void unshift_string (STRING *value) {
-        PMC **data; 
+        STRING **data; 
         INTVAL size, i;
 
         size = PMC_int_val(SELF);
-        data = (PMC**)PMC_data(SELF);
+        data = (STRING**)PMC_data(SELF);
 
         DYNSELF.set_integer_native(size + 1);
         data = PMC_data(SELF);
@@ -266,7 +266,7 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 */
 
     void delete_keyed_int (INTVAL key) {
-        PMC **data; 
+        STRING **data; 
         INTVAL size, i;
         size = PMC_int_val(SELF);
 
@@ -287,7 +287,7 @@ Removes the element at C<*key>.
 */
 
     void delete_keyed (PMC* key) {
-        PMC **data; 
+        STRING **data; 
         INTVAL size, idx, i;
         size = PMC_int_val(SELF);
         idx = key_integer(INTERP, key);
