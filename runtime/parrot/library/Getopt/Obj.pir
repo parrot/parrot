@@ -170,16 +170,16 @@ endif_2:
     if null name goto redofor
     long = spec."long"()
     $I0 = length $S0
-    unless long == key goto beginstore
+    unless long == key goto beginstore_1
     $I0 = spec."optarg"()
     $I1 = spec."type"()
     unless $I1 == .Boolean goto endif_4
     val = 1
-    goto beginstore
+    goto beginstore_1
 endif_4:
-    if $I0 goto beginstore
+    if $I0 goto beginstore_1
     if_null val, error_0
-    goto beginstore
+    goto beginstore_1
 error_0:
     MissingRequired(long)
 
@@ -254,6 +254,7 @@ beginstore:
     (name, spec) = self."getNameForKey"(key)
     if null name goto redofor
 
+beginstore_1:
     # Store the value...
     $I0 = spec."type"()
     $S0 = typeof $I0
@@ -331,7 +332,6 @@ endfor:
 endif_6:
     $I0 = self."notOptStop"()
     if $I0 goto finish
-    # This seems necessary...don't know why
     inc i
     goto beginfor
 
@@ -547,18 +547,17 @@ endif_0:
 =item C<MissingRequired(STRING arg)>
 
 When a required argument is missing, throws an exception with the message
-"Missing a required argument".
+"Missing a required argument for option 'foo'".
 
 =cut
 
 .sub MissingRequired
     .param string arg
-    #printerr "Missing a required argument to "
-    #printerr arg
-    #printerr "\n"
-    #exit 1
     $P0 = new .Exception
-    $P0["_message"] = "Missing a required argument"
+    $S0 = "Missing a required argument for option '"
+    $S0 .= arg
+    $S0 .= "'"
+    $P0["_message"] = $S0
     throw $P0
 .end
 
@@ -662,15 +661,13 @@ string set as the long.
 .sub "long" :method
     .param string val :optional
     .param int opt :opt_flag
+    $P0 = getattribute self, "long"
     unless opt goto else_0
     # Setting
-    $P0 = new .String
     $P0 = val
-    setattribute self, "long", $P0
     goto endif_0
 else_0:
     # Getting
-    $P0 = getattribute self, "long"
     val = $P0
 endif_0:
     .return(val)
@@ -690,15 +687,13 @@ NOTE: There is no checking to ensure that short is only one character.
 .sub "short" :method
     .param string val :optional
     .param int opt :opt_flag
+    $P0 = getattribute self, "short"
     unless opt goto else_0
     # Setting
-    $P0 = new .String
     $P0 = val
-    setattribute self, "short", $P0
     goto endif_0
 else_0:
     # Getting
-    $P0 = getattribute self, "short"
     val = $P0
 endif_0:
     .return(val)
@@ -763,15 +758,13 @@ code.  There's no guarantees they won't be reassigned.
 .sub "type" :method
     .param int val :optional
     .param int opt :opt_flag
+    $P0 = getattribute self, "type"
     unless opt goto else_0
     # Setting
-    $P0 = new .Integer
     $P0 = val
-    setattribute self, "type", $P0
     goto endif_0
 else_0:
     # Getting
-    $P0 = getattribute self, "type"
     val = $P0
 endif_0:
     .return(val)
@@ -790,15 +783,13 @@ C<-fbar>, C<-f> is set to C<bar>.  In C<-f bar> it is NOT set.
 .sub "optarg" :method
     .param int val :optional
     .param int opt :opt_flag
+    $P0 = getattribute self, "optarg"
     unless opt goto else_0
     # Setting
-    $P0 = new .Boolean
     $P0 = val
-    setattribute self, "optarg", $P0
     goto endif_0
 else_0:
     # Getting
-    $P0 = getattribute self, "optarg"
     val = $P0
 endif_0:
     .return(val)
