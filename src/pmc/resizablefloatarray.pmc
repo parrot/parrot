@@ -183,6 +183,52 @@ Removes and returns the last element in the array.
         DYNSELF.set_integer_native(size - 1);
         return value;
     }
+/*
+
+=item C<INTVAL shift_float()>
+
+Removes and returns an item from the start of the array.
+
+=cut
+
+*/
+
+    FLOATVAL shift_float() {
+        INTVAL size;
+        FLOATVAL value, *data;
+
+        size = PMC_int_val(SELF);
+        if (size == 0) {
+            real_exception(INTERP, NULL, E_IndexError,
+                    "ResizableIntegerArray: Can't shift from an empty array!");
+        }
+        data = (FLOATVAL *)PMC_data(SELF);
+        value = data[0];
+        PMC_int_val(SELF) = --size;
+        mem_sys_memmove(data, data + 1, size * sizeof(FLOATVAL));
+        return value;
+    }
+
+/*
+
+=item C<void unshift_float(FLOATVAL value)>
+
+Add and integer to the start of the array.
+
+=cut
+
+*/
+
+    void unshift_float(FLOATVAL value) {
+        INTVAL size; 
+        FLOATVAL *data;
+
+        size = PMC_int_val(SELF);
+        DYNSELF.set_integer_native(size + 1);
+        data = (FLOATVAL *)PMC_data(SELF);
+        mem_sys_memmove(data + 1, data, size * sizeof(FLOATVAL));
+        data[0] = value;
+    }
 
 }
 

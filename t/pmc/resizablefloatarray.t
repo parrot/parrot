@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 19;
 
 =head1 NAME
 
@@ -455,4 +455,44 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "push float");
 CODE
 10001
 123.123
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "shift float");
+.sub test :main
+    .local pmc ar
+    ar = new ResizableFloatArray
+    ar[0] = 10.1
+    ar[1] = 20.2
+    $I0 = elements ar
+    print_item $I0
+    $N0 = shift ar
+    print_item $N0
+    $I0 = elements ar
+    print_item $I0
+    $N0 = shift ar
+    print_item $N0
+    $I0 = elements ar
+    print_item $I0
+    print_newline
+.end
+CODE
+2 10.1 1 20.2 0
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "unshift float");
+.sub test :main
+    .local pmc ar
+    ar = new ResizableFloatArray
+    unshift ar, 10.1
+    unshift ar, 20.2
+    $I0 = elements ar
+    print_item $I0
+    $N0 = ar[0]
+    print_item $N0
+    $N0 = ar[1]
+    print_item $N0
+    print_newline
+.end
+CODE
+2 20.2 10.1
 OUTPUT
