@@ -377,44 +377,32 @@ A long option of "foo" is set to C<.String>, with "optarg" set to a true value.
     $P0 = self."add"()
 
     $I0 = index format, ':'
-    if $I0 == -1 goto process
-    substr format, $I0, 1, '='
+    if $I0 == -1 goto else_0
     $P0."optarg"(1)
-process:
-    $I0 = index format, '='
-    unless $I0 == -1 goto else_0
-    # Is a boolean
-    $I0 = index format, '|'
-    unless $I0 != -1 goto else_1
-    # long then a short
-    long = substr format, 0, $I0
-    inc $I0
-    # force one character
-    short = substr format, $I0, 1
-    $P0."long"(long)
-    $P0."short"(short)
-    .return()
-else_1:
-    $I0 = length format
-    unless $I0 == 1 goto long_0
-    $P0."short"(format)
-    .return()
-long_0:
-    $P0."long"(format)
-    .return()
-#---------------------------
+    goto check
 else_0:
+    key = format
     $I0 = index format, '='
+    # .Boolean is the default
+    if $I0 == -1 goto endcase
+check:
     key = substr format, 0, $I0
     inc $I0
-    # force one character
-    type = substr format, $I0, 1
+    # get type
+    type = substr format, $I0
 
     if type == 's' goto str
     if type == '@' goto array
     if type == '%' goto hash
     if type == 'i' goto integer
     if type == 'f' goto flt
+    $P0 = new .Exception
+    $S0 = "Unknown specs option '"
+    $S0 .= type
+    $S0 .= "'"
+    $P0["_message"] = $S0
+    throw $P0
+
 str:
     $P0."type"(.String)
     goto endcase
@@ -448,7 +436,6 @@ endif_2:
     short = substr key, $I0
     $P0."long"(long)
     $P0."short"(short)
-    .return()
 .end
 
 =item C<Getopt::Obj::Spec add()>
@@ -495,7 +482,7 @@ beginfor:
     goto nextfor
 return:
     .return(name, spec)
-    goto endfor
+
 nextfor:
     inc j
     goto beginfor
@@ -511,7 +498,7 @@ endfor:
     throw $P0
 finish:
     null $S0
-    null $S0
+    null $P0
     .return ($S0, $P0)
 .end
 
@@ -530,15 +517,13 @@ later.  Or of course, it's not an argument at all and perhaps a filename.
 .sub "notOptStop" :method
     .param int val :optional
     .param int opt :opt_flag
+    $P0 = getattribute self, "notOptStop"
     unless opt goto else_0
     # Setting
-    $P0 = new .Boolean
     $P0 = val
-    setattribute self, "notOptStop", $P0
     goto endif_0
 else_0:
     # Getting
-    $P0 = getattribute self, "notOptStop"
     val = $P0
 endif_0:
     .return(val)
@@ -616,35 +601,20 @@ long/short arguments instead of one of each.
 .sub name :method
     .param string val :optional
     .param int opt :opt_flag
+    $P0 = getattribute self, "name"
     unless opt goto else
     # Setting
-    $P0 = new .String
     $P0 = val
-    setattribute self, "name", $P0
     goto endif
 else:
     # Getting
-    .local pmc tmp
-    $P0 = getattribute self, "name"
-    $S0 = $P0
-    if $S0 != '' goto case_0
-    $S0 = self."long"()
-    if $S0 != '' goto case_1
-    $S0 = self."short"()
-    if $S0 != '' goto case_2
-    # XXX This actually is an error, the program forgot to set name, long, or
-    # short
-    val = ''
-    goto endif
-case_0:
-    $P0 = getattribute self, "name"
     val = $P0
-    goto endif
-case_1:
-    val = self."long"()
-    goto endif
-case_2:
-    val = self."short"()
+    if val != '' goto endif
+    $P0 = getattribute self, "long"
+    val = $P0
+    if val != '' goto endif
+    $P0 = getattribute self, "short"
+    val = $P0
 endif:
     .return(val)
 .end
@@ -822,10 +792,6 @@ in argv in case the program wants it, such as indicating stdin or stdout.
 
 For an arg to a short arg, e.g. -C -d, will put -d as the value for -C so long
 as -C is not a C<.Boolean>.  Should it be an error?
-
-=item *
-
-Should MissingRequired exit or just throw an exception?
 
 =back
 
