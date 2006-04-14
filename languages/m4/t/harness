@@ -1,3 +1,5 @@
+#! perl
+
 # $Id$
 
 =head1 NAME
@@ -6,13 +8,13 @@ languages/m4/t/harness - A harness for Parrot m4
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib m4/t/harness --files
+  cd languages    && perl -I../lib m4/t/harness --files
 
-  cd languages && perl -I../lib m4/t/harness 
+  cd languages/m4 && perl -Ilib -I../../lib t/harness 
 
-  cd languages && perl -I../lib m4/t/harness \
-                   m4/t/basic/006_define_with_rest \
-                   m4/t/regex/003_two_compiles.t
+  cd languages/m4 && perl -Ilib -I../../lib t/harness \
+                   t/basic/006_define_with_rest \
+                   t/regex/003_two_compiles.t
 
 =head1 DESCRIPTION
 
@@ -26,58 +28,7 @@ Otherwise I run the tests that were passed on the command line.
 
 =cut
 
-use strict;
-use lib '..';
-
-use Cwd();
-use Data::Dumper;
-use File::Spec;
-use Test::Harness();
-
-my $language = 'm4';
-
-if ( grep { m/^--files$/ } @ARGV ) {
-    # Only the Makefile in 'parrot/languages' uses --files
-    my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
-    print join( "\n", @files );
-    print "\n" if scalar(@files);
-} else { 
-    my @files;
-    # TODO: use Getopt::Long or such
-    my $use_gnu_m4 = ( grep { m/^--use-gnu-m4$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--use-gnu-m4$/ } @ARGV;
-    if ( scalar(@ARGV) ) {
-        # Someone specified tests for me to run.
-        @files = grep { -f $_ } @ARGV
-    } else {
-        ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
-        if ( $current_dir eq 'languages' ) {
-            @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
-        }
-        elsif ( $current_dir eq $language ) {
-            @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
-        }
-    }
-
-    # Always test Parrot m4
-    {
-        $ENV{PARROT_M4_TEST_PROG} = '';
-        Test::Harness::runtests( @files ) if scalar( @files );
-    }
-    if ( $use_gnu_m4 ) {
-        $ENV{PARROT_M4_TEST_PROG} = 'm4';
-       Test::Harness::runtests( @files ) if scalar( @files );
-    }
-}
-
-=head1 HISTORY
-
-Mostly taken from tcl/t/harness.
-
-=head1 SEE ALSO
-
-  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+use Parrot::Test::Harness language => 'm4';
 
 =head1 AUTHOR
 

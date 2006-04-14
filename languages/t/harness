@@ -84,7 +84,6 @@ my $do_gen_html = grep { $_ eq '--html' } @ARGV;
 # lisp                 No t/harness
 # miniperl             not maintained, should be removed
 # parakeet             No t/harness
-# punie                Problems with exhaustive memory usage
 # python               not maintained
 # ruby                 not maintained, should be removed
 
@@ -101,6 +100,7 @@ my @unified_testable_languages =
        m4
        ook
        parrot_compiler
+       perl6
        punie
        regex
        scheme
@@ -109,12 +109,12 @@ my @unified_testable_languages =
        urm
        Zcode
      );
-# @unified_testable_languages = qw( APL );
+@unified_testable_languages = qw( m4 );
 
-my @harnesses =
-    grep {-f $_}
-        map { File::Spec->join($_,"t","harness") }
-            @unified_testable_languages;
+my @harnesses
+    = grep {-f $_}
+          map { File::Spec->join($_, 't', 'harness') }
+              @unified_testable_languages;
 
 # Step 2: Get a listing of files from these harnesses.
 

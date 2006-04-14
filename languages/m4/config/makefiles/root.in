@@ -25,8 +25,6 @@ LIBS        = @libs@
 
 # some constants
 M4_EVALUATE_SO = ..@slash@..@slash@runtime@slash@parrot@slash@dynext@slash@m4_evaluate@share_ext@
-#CONDITIONED_LINE(has_gnu_m4):USE_GNU_M4 = --use-gnu-m4
-#INVERSE_CONDITIONED_LINE(has_gnu_m4):USE_GNU_M4 = 
 
 default: all
 all: build 
@@ -52,7 +50,9 @@ help:
 	@echo ""
 
 test: build
-	cd .. && $(PERL) -I../lib m4/t/harness $(USE_GNU_M4)
+	$(PERL) -Ilib -I../../lib t/harness
+# TODO: reenable testing of GNU m4, by setting env 
+#CONDITIONED_LINE(has_gnu_m4):	PARROT_M4_TEST_PROG='m4' $(PERL) -Ilib -I../../lib t/harness $(USE_GNU_M4)
 
 build: $(M4_EVALUATE_SO) m4.pbc 
 

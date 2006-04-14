@@ -7,8 +7,8 @@ t/regex/002_tokens.t - Test the PGE rules used by Parrot m4
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
+use warnings;
+use lib qw( lib ../lib ../../lib m4/lib );
 
 use Parrot::Test tests => 22;
 use Parrot::Test::PGE;

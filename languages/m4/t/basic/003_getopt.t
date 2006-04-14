@@ -1,14 +1,14 @@
 # $Id$
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
+use warnings;
+use lib qw( lib ../lib ../../lib m4/lib );
 
 use Parrot::Config;
 use Test::More tests => 25; 
 
 my $real_out;
-my $parrot_m4    = "cd .. && .$PConfig{slash}parrot$PConfig{exe} languages/m4/m4.pbc";
+my $parrot_m4    = "cd ../.. && .$PConfig{slash}parrot$PConfig{exe} languages/m4/m4.pbc";
 my $examples_dir = 'languages/m4/examples'; 
 
 

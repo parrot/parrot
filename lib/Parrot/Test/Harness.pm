@@ -83,11 +83,13 @@ If called with no args, run the suite.
 
 =cut
 
-    if ( grep { /^--files$/ } @{ $options{arguments} } )
+    if ( grep { /^--files$/ } @ARGV )
     {
-        # I must be running out of languages/
+        # --files indicates the 'languages/t/harness' wants a list of test files
         my $dir   = File::Spec->catfile( $options{language}, 't' );
-        my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
+        my @files = ( glob( File::Spec->catfile( $dir, '*.t' ) ),
+                      glob( File::Spec->catfile( $dir, '*/*.t' ) )
+                    );
         print join( "\n", @files );
         print "\n" if @files;
         exit;
@@ -101,7 +103,9 @@ If called with no args, run the suite.
     {
         # I must be running out of languages/$language
         # You may want a deeper search than this.
-        return glob( File::Spec->catfile( 't', '*.t' ) );
+        return ( glob( File::Spec->catfile( 't', '*.t' ) ),
+                 glob( File::Spec->catfile( 't', '*/*.t' ) )
+               );
     }
 }
 
