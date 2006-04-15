@@ -149,12 +149,14 @@ E_NOTE
         $parent_headers = "src/pmc/pmc_perlhash.h $parent_headers"
             if ($pmc eq 'orderedhash');
         $TEMP_pmc_build .= <<END
-src/pmc/$pmc.c src/pmc/pmc_$pmc.h : src/pmc/$pmc.dump
-
-src/pmc/$pmc.dump : vtable.dump $parent_dumps lib/Parrot/Pmc2c.pm
-
-src/pmc/pmc_$pmc.h: src/pmc/$pmc.pmc
+src/pmc/$pmc.c : src/pmc/$pmc.dump
 	\$(PMC2CC) src/pmc/$pmc.pmc
+
+src/pmc/$pmc.dump : vtable.dump $parent_dumps lib/Parrot/Pmc2c.pm \\
+		src/pmc/$pmc.pmc
+	\$(PMC2CD) src/pmc/$pmc.pmc 
+
+src/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 src/pmc/$pmc\$(O): src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
         $parent_headers
