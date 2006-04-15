@@ -212,7 +212,7 @@ interpinfo_p(Interp *interpreter, INTVAL what)
             return cont;
         case CURRENT_OBJECT:
             return CONTEXT(interpreter->ctx)->current_object;
-        case NAMESPACE_ROOT: /* XXX */
+        case NAMESPACE_ROOT: 
             return interpreter->stash_hash;
         case CURRENT_LEXPAD:
             return CONTEXT(interpreter->ctx)->lex_pad;
