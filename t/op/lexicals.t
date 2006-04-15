@@ -808,10 +808,12 @@ bar: 13014
 bar: 46
 OUTPUT
 
-pir_output_is(<<'CODE', '54', 'closure 8', todo => 'unspeccced or b0rken');
+pir_output_like(<<'CODE', <<'OUT', 'closure 8');
 
 # p6 example from pmichaud
 # { my $x = 5;  { print $x; my $x = 4; print $x; } }
+
+## According to S04 this is an error
 
 .sub main :main
     .lex '$x', $P0
@@ -830,6 +832,8 @@ pir_output_is(<<'CODE', '54', 'closure 8', todo => 'unspeccced or b0rken');
     print $P1
 .end
 CODE
+/Null PMC access/
+OUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', 'get non existing');
 .sub "main" :main
