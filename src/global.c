@@ -29,7 +29,8 @@ tdb
 =item C<PMC *
 Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
-If C<class> is NULL search global stash. XXX TODO search current ns.
+Search the symbol C<globalname> in the given namespace name.
+If C<class> is NULL search search current namespace.
 
 Return NULL if the global isn't found or the global.
 
@@ -297,7 +298,6 @@ store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
      */
     if (PMC_IS_NULL(namespace)) {
 global_ns:
-        /* XXX store relative - not absolute */
         store_sub(interpreter, NULL, sub_name, sub_pmc);
     }
     else {
