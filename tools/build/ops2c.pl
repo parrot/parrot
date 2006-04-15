@@ -332,9 +332,9 @@ foreach my $op ($ops->ops) {
         $definition = "$prototype;\n$opsarraytype *\n$func_name ($args)";
     }
 
-    my $source = $op->source($trans);
-    $source    =~ s/\bop_lib\b/${bs}op_lib/;
-    $source    =~ s/\bops_addr\b/${bs}ops_addr/g;
+    my $src = $op->source($trans);
+    $src    =~ s/\bop_lib\b/${bs}op_lib/;
+    $src    =~ s/\bops_addr\b/${bs}ops_addr/g;
 
     if ($suffix =~ /cg/) {
 	push @cg_jump_table, "        &&PC_$index,\n";
@@ -343,7 +343,7 @@ foreach my $op ($ops->ops) {
         push @op_func_table, sprintf("  %-50s /* %6ld */\n",
             "$func_name,", $index);
     }
-    $one_op .= "$definition $comment {\n$source}\n\n";
+    $one_op .= "$definition $comment {\n$src}\n\n";
     push @op_funcs, $one_op;
     $index++;
 }
@@ -412,6 +412,7 @@ close(SOURCE);
 open(SOURCE, ">>$source") || die "Error appending to $source: $!\n";
 unless ($nolines_flag) {
     my $source_escaped = $source;
+    $source_escaped =~ s|\.temp||;
     $source_escaped =~ s|(\\)|$1$1|g; # escape backslashes
     print SOURCE qq{#line $line "$source_escaped"\n};
 }
