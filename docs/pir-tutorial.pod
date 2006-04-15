@@ -55,12 +55,12 @@ registers and each type has 32 registers. The register types are:
 =back
 
 Registers are designated by the type of register followed by a number.
-For instance, the integer registers are C<I0>, C<I1>, C<I56> and so
-on. The PMC registers hold arbitrary data objects and are parrot's
-mechanism for implementing more complex behavior than the ones that
-can be expressed using the other 3 register types alone. PMCs will be
-covered in more detail in a future article. Examples in this article
-will focus on the first 3 register types.
+For instance, the integer registers are C<I0>, C<I1> till C<I31>. The
+PMC registers hold arbitrary data objects and are parrot's mechanism
+for implementing more complex behavior than the ones that can be
+expressed using the other 3 register types alone. PMCs will be covered
+in more detail in a future article. Examples in this article will
+focus on the first 3 register types.
 
 =head2 Simple Operators
 
@@ -100,7 +100,7 @@ opcode to add them, like this:
    set I2, 3
    add I0, I1, I2   # I0 yields 5+3
 
-PIR includes infix operators to these common opcodes. I could write
+PIR includes infix operators for these common opcodes. I could write
 this same code as
 
    I1 = 5
@@ -219,9 +219,9 @@ PIR support them as well.
 As before, I need to use C<.param> for each named argument, but with one
 of the two following syntaxes:
 
-   .sub func
-     .param int a :named("foo")    # or
-     .param int "bar" => b
+  .sub func
+    .param int a :named("foo")    # or
+    .param int "bar" => b
 
 Both of these lines say the exact same thing: the subroutine will
 recieve an integer named "foo", and inside of the subroutine that
@@ -237,18 +237,18 @@ Note that with named arguments, you may rearrange the order of your
 parameters at will.
 
   .sub foo
-     .param string "name"	=> a
-     .param int    "age"	=> b
-     .param string "gender"	=> c
-     # ...
+    .param string "name"    => a
+    .param int    "age"	    => b
+    .param string "gender"  => c
+    # ...
   .end
 
 This subroutine may be called in any of the following ways:
 
-	foo( "Fred", 35, "m" )
-	foo( "gender" => "m", "name" => "Fred", "age" => 35 )
-	foo( "age" => 35, "gender" => "m", "name" => "Fred" )
-	foo( "m" :named("gender"), 35 :named("age"), "name" => "Fred" )
+  foo( "Fred", 35, "m" )
+  foo( "gender" => "m", "name" => "Fred", "age" => 35 )
+  foo( "age" => 35, "gender" => "m", "name" => "Fred" )
+  foo( "m" :named("gender"), 35 :named("age"), "name" => "Fred" )
 
 and any other permutation you can think of as long as you use the named
 argument syntax.
@@ -268,23 +268,22 @@ And C<$I0> will yield 10, and C<$I1> will yield 20, as expected.
 
 To conclude this first article on PIR and to let you test what you
 learned, let me show you how to do input on PASM (hence, also in
-PIR). There is a C<read> opcode to read from standard input. Just use
-it with a variable where the readed line should be placed, and the
-number of characters you are reading:
+PIR). There is a C<read> opcode to read from standard input.  Just
+pass it a string register or variable where you wish the characters
+read to be placed and the number of characters you wish to read:
 
-   read $S1, 100
+  read $S1, 100
 
 This line will read 100 characters (or until the end of the line) and
 put the read string into C<$S1>. In case you need a number, just
 assign the string to the correct register type:
 
-   read $S1, 100
-   $I1 = $S1
+  read $S1, 100
+  $I1 = $S1
 
 With the PIR syntax shown in this article you should be able to start
 writting simple programs. Next article we will look into available
 PMCs, and how they can be used.
-
 
 =head2 Thanks
 
