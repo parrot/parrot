@@ -769,17 +769,14 @@ PARROT_LIBS: \
 #CONDITIONED_LINE(has_static_linking):  $(LIBPARROT_STATIC) \
 #CONDITIONED_LINE(has_dynamic_linking): $(LIBPARROT_SHARED)
 
-
-$(LIBPARROT_STATIC) : $(O_FILES)
-	$(RM_F) $@
+@blib_dir@:
 	$(MKDIR) @blib_dir@
-	$(RM_F) $(LIBPARROT_STATIC)
+
+$(LIBPARROT_STATIC) : $(O_FILES) @blib_dir@
 	$(AR_CR) @ar_out@$@ @ar_extra@ $(O_FILES)
 	$(RANLIB) $@
 
-$(LIBPARROT_SHARED) : $(O_FILES)
-	$(MKDIR) @blib_dir@
-	$(RM_F) $(LIBPARROT_SHARED)
+$(LIBPARROT_SHARED) : $(O_FILES) @blib_dir@
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
     $(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #CONDITIONED_LINE(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
