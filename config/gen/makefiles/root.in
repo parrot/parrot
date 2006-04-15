@@ -369,6 +369,11 @@ IO_O_FILES = \
     $(IO_DIR)/io_passdown$(O)
 
 INTERP_O_FILES = \
+    $(OPS_DIR)/core_ops$(O) \
+    $(OPS_DIR)/core_ops_switch$(O) \
+    @asmfun_o@ \
+    @TEMP_cg_o@ \
+    @TEMP_exec_o@ \
     $(SRC_DIR)/charset$(O) \
     $(SRC_DIR)/encoding$(O) \
     $(SRC_DIR)/exceptions$(O) \
@@ -436,11 +441,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/extend_vtable$(O) \
     $(SRC_DIR)/revision$(O) \
     $(PF_DIR)/pf_items$(O) \
-    $(OPS_DIR)/core_ops$(O) \
-    $(OPS_DIR)/core_ops_switch$(O) \
-    @asmfun_o@ \
-    @TEMP_cg_o@ \
-    @TEMP_exec_o@ \
     @TEMP_gc_o@
 
 O_FILES = \
