@@ -1086,6 +1086,8 @@ $(SRC_DIR)/encoding$(O) : $(SRC_DIR)/encoding.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/charset$(O) : $(SRC_DIR)/charset.c $(GENERAL_H_FILES)
 
+$(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES)
+
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c
 
 #core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers

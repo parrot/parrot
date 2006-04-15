@@ -165,7 +165,9 @@ $base =~ s/\.ops$//;
 my $incdir  = "include/parrot/oplib";
 my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
-my $source  = "src/ops/${base}_ops${suffix}.c";
+# SOURCE is closed and reread, which confuses make -j
+# create a temp file and rename it
+my $source  = "src/ops/${base}_ops${suffix}.c.temp";
 
 if ($base =~ m!^src/dynoplibs/! || $dynamic_flag) {
     $source  =~ s!src/ops/!!;
@@ -705,5 +707,10 @@ $load_func(Parrot_Interp interpreter)
 END_C
 
 }
+
+close SOURCE;
+my $final = $source;
+$final =~ s/\.temp//;
+rename $source, $final;
 
 exit 0;
