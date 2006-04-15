@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::Lines - process a stream one line per read
@@ -45,7 +47,7 @@ END:
     .local pmc temp
 
     classoffset $I0, self, "Stream::Lines"
-    temp = new .PerlString
+    temp = new .String
     setattribute self, $I0, temp
 .end
 
@@ -61,7 +63,7 @@ END:
     getattribute $P0, self, $I0
     if_null $P0, NOT_CONNECTED
     typeof $I0, $P0
-    if $I0 == .PerlUndef goto NOT_CONNECTED
+    if $I0 == .Undef goto NOT_CONNECTED
     $I0 = $P0."connected"()
     .return($I0)
 NOT_CONNECTED:
@@ -133,7 +135,7 @@ BUFFER_END:
     .param string buffer
     .local pmc temp
 
-    new temp, .PerlString
+    new temp, .String
     temp = buffer
     classoffset $I0, self, "Stream::Lines"
     setattribute self, $I0, temp
@@ -188,6 +190,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2006, the Perl Foundation.
 
 =cut

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::Sub - a PIR sub as source for a Stream
@@ -116,7 +118,7 @@ END:
 
     temp = self."source"()
     typeof $I0, temp
-    if $I0 == .PerlUndef goto END
+    if $I0 == .Undef goto END
     classoffset $I0, self, "Stream::Sub"
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_CONT
@@ -153,6 +155,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2006, the Perl Foundation.
 
 =cut

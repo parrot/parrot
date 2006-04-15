@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 INFORMATION
 
 This is the parrot bytecode library.
@@ -51,7 +53,7 @@ OKAY:
     # fill the includes array
 LOOP:
     $P1 = clone $P0
-    $P2 = new .PerlString
+    $P2 = new .String
     $S0 = shift paths
     concat $S0, "/"
     $P2 = $S0
@@ -69,7 +71,7 @@ LOOP:
     .param string name
     .param string sig
 
-    $P1 = new .PerlString
+    $P1 = new .String
     $P1 = sig
     find_global $P0, "_parrotlib", name
     setprop $P0, "signature", $P1
@@ -210,6 +212,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2006, the Perl Foundation.
 
 =cut

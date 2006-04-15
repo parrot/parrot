@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Data::Replace - data replacing implemented in PIR
@@ -108,12 +110,12 @@ END:
 .end
 
 .sub __onload :load
-    $P0 = find_global "Data::Replace", "PerlArray"
+    $P0 = find_global "Data::Replace", "ResizablePMCArray"
     store_global "Data::Replace", "PMCArray", $P0
     store_global "Data::Replace", "StringArray", $P0
 .end
 
-.sub PerlArray
+.sub ResizablePMCArray
     .param pmc where
     .param pmc oldVal
     .param pmc newVal
@@ -142,7 +144,7 @@ END:
     .pcc_end_return
 .end
 
-.sub PerlHash method
+.sub Hash method
     .param pmc where
     .param pmc oldVal
     .param pmc newVal
@@ -220,6 +222,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2006, the Perl Foundation.
 
 =cut

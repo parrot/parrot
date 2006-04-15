@@ -30,7 +30,7 @@ tdb
 Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
 Search the symbol C<globalname> in the given namespace name.
-If C<class> is NULL search search current namespace.
+If C<class> is NULL search current namespace.
 
 Return NULL if the global isn't found or the global.
 

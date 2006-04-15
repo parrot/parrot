@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::Base - Stream library base class
@@ -76,7 +78,7 @@ END:
 
     # reset source
     classoffset $I0, self, "Stream::Base"
-    new temp, .PerlUndef
+    new temp, .Undef
     setattribute self, $I0, temp
 
     # reset includes
@@ -165,7 +167,7 @@ It is connected until the source sub returns.
     add $I0, aSource
     getattribute $P0, self, $I0
     typeof $I0, $P0
-    if $I0 == .PerlUndef goto NOT
+    if $I0 == .Undef goto NOT
 
     can $I0, $P0, "connected"
     unless $I0 goto SKIP
@@ -310,7 +312,7 @@ Reads the specified number of bytes from the stream.
     branch OK
 
 CREATE:
-    buffer = new .PerlString
+    buffer = new .String
 
 OK:
     ret = buffer
@@ -378,6 +380,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2006, the Perl Foundation.
 
 =cut

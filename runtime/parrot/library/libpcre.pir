@@ -1,4 +1,4 @@
-# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 TITEL
@@ -27,7 +27,7 @@ See 'library/pcre.pir' for details on the user interface.
     null NULL
 
     .local pmc errptr
-    errptr= new PerlInt
+    errptr= new .Integer
 
     ## error message string size
     error_size= 500

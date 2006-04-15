@@ -51,7 +51,7 @@ END:
     null str
     coro = self."source"()
     typeof $I0, coro
-    if $I0 == .PerlUndef goto END
+    if $I0 == .Undef goto END
 
     str = coro( self )
 END:
@@ -69,6 +69,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2006, the Perl Foundation.
 
 =cut

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Test::Builder::Tester - Parrot extension for testing test modules
@@ -78,8 +80,8 @@ This module defines the following public functions:
 
 	.local pmc output
 	.local pmc diagnostics
-	output      = new .PerlArray
-	diagnostics = new .PerlArray
+	output      = new .ResizablePMCArray
+	diagnostics = new .ResizablePMCArray
 	setattribute self, offset, output
 	inc offset
 	setattribute self, offset, diagnostics
@@ -199,8 +201,8 @@ This module defines the following public functions:
 	set args['output'], output
 	test        = tb_create( args )
 
-	expect_out  = new .PerlArray
-	expect_diag = new .PerlArray
+	expect_out  = new .ResizablePMCArray
+	expect_diag = new .ResizablePMCArray
 
 	store_global 'Test::Builder::Tester', '_test',         test
 	store_global 'Test::Builder::Tester', '_default_test', default_test
@@ -467,6 +469,6 @@ mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005, the Perl Foundation.
+Copyright (c) 2005-2006, the Perl Foundation.
 
 =cut

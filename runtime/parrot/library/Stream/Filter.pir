@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::Filter - filter and/or alter a stream

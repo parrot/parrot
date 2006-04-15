@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::Writer - a PIR sub as target for a Stream
@@ -78,7 +80,7 @@ END:
 .sub __init :method
     .local pmc status
 
-    new status, .PerlInt
+    new status, .Integer
     set status, 0
     classoffset $I0, self, "Stream::Writer"
     inc $I0
@@ -154,7 +156,7 @@ WRITE:
     source = self."source"()
     if_null source, END
     typeof $I0, source
-    if $I0 == .PerlUndef goto END
+    if $I0 == .Undef goto END
 
     source( str )
 END:
@@ -211,6 +213,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2006, the Perl Foundation.
 
 =cut

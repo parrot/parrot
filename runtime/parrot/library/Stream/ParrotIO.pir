@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::ParrotIO - a ParrotIO PMC as source for a Stream
@@ -74,7 +76,7 @@ Sets or returns the current block size.
     classoffset $I0, self, "Stream::ParrotIO"
     unless has_bs goto GET
 
-    temp = new .PerlInt
+    temp = new .Integer
     temp = bs
     setattribute self, $I0, temp
     branch RET
@@ -118,6 +120,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (c) 2004-2006, the Perl Foundation.
 
 =cut
