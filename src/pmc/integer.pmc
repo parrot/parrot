@@ -138,6 +138,19 @@ Class method to construct an Integer from the string representation C<rep>.
         return res;
     }
 
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the integer to the value in C<*value>.
+
+=cut
+
+*/
+
+    void set_pmc(PMC *value) {
+        PMC_int_val(SELF) = VTABLE_get_integer(INTERP, value);
+    }
 
 /*
 
