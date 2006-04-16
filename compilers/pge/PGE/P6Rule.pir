@@ -15,30 +15,30 @@
 
     $P0 = find_global "PGE::P6Rule", "parse_ws_lit"
     optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:::', 'equiv'=>'term:', 'nows'=>1, 'returns'=> 'PGE::Exp::Cut')
-    optable.newtok('term::::', 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Cut')
-    optable.newtok("term:\\b", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
-    optable.newtok("term:\\B", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
-    optable.newtok("term:^", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
-    optable.newtok("term:^^", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
-    optable.newtok("term:$$", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
+    optable.newtok('term:::', 'equiv'=>'term:', 'nows'=>1, 'match'=> 'PGE::Exp::Cut')
+    optable.newtok('term::::', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Cut')
+    optable.newtok("term:\\b", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok("term:\\B", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok("term:^", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok("term:^^", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok("term:$$", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
 
     $P0 = find_global "PGE::P6Rule", "parse_dollar"
     optable.newtok("term:$", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok("term:.", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
-    optable.newtok("term:\\d", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
-    optable.newtok("term:\\D", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
-    optable.newtok("term:\\s", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
-    optable.newtok("term:\\S", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
-    optable.newtok("term:\\w", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
-    optable.newtok("term:\\W", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
-    optable.newtok("term:\\n", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:.", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\d", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\D", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\s", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\S", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\w", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\W", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\n", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
 
-    optable.newtok("circumfix:[ ]", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Group')
-    optable.newtok("circumfix:( )", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Group')
+    optable.newtok("circumfix:[ ]", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Group')
+    optable.newtok("circumfix:( )", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Group')
 
-    optable.newtok("term:<commit>", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Commit')
+    optable.newtok("term:<commit>", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Commit')
 
     $P0 = find_global "PGE::P6Rule", "parse_subrule"
     optable.newtok("term:<", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
@@ -60,11 +60,11 @@
     $P0 = find_global "PGE::P6Rule", "parse_cut"
     optable.newtok("postfix::", 'equiv'=>'postfix:*', 'parsed'=>$P0)
 
-    optable.newtok("infix:", 'looser'=>'postfix:*', 'assoc'=>'right', 'nows'=>1, 'returns'=>'PGE::Exp::Concat')
-    optable.newtok("infix:&", 'looser'=>'infix:', 'nows'=>1, 'returns'=>'PGE::Exp::Conj')
-    optable.newtok("infix:|", 'looser'=>'infix:&', 'nows'=>1, 'returns'=>'PGE::Exp::Alt')
+    optable.newtok("infix:", 'looser'=>'postfix:*', 'assoc'=>'right', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
+    optable.newtok("infix:&", 'looser'=>'infix:', 'nows'=>1, 'match'=>'PGE::Exp::Conj')
+    optable.newtok("infix:|", 'looser'=>'infix:&', 'nows'=>1, 'match'=>'PGE::Exp::Alt')
 
-    optable.newtok("infix::=", 'tighter'=>'postfix:*', 'assoc'=>'right', 'returns'=>'PGE::Exp::Alias')
+    optable.newtok("infix::=", 'tighter'=>'postfix:*', 'assoc'=>'right', 'match'=>'PGE::Exp::Alias')
 
     $P0 = find_global "PGE::P6Rule", "parse_modifier"
     optable.newtok("prefix::", 'looser'=>'infix:|', 'nows'=>1, 'parsed'=>$P0)

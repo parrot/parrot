@@ -117,7 +117,7 @@ PGE::OPTable - PGE operator precedence table and parser
     if has_match == 0 goto end
     $I0 = isa match, 'Sub'
     if $I0 goto add_parsed
-    args['returns'] = match
+    args['match'] = match
     goto end
   add_parsed:
     args['parsed'] = match
@@ -147,11 +147,11 @@ PGE::OPTable - PGE operator precedence table and parser
     if $I0 goto end
     tokentable[name] = token
 
-    $S0 = args['returns']
+    $S0 = args['match']
     if $S0 > '' goto token_returns
     $S0 = 'PGE::Match'
   token_returns:
-    token['returns'] = $S0
+    token['match'] = $S0
 
   token_equiv:
     $S0 = token['equiv']
@@ -480,7 +480,7 @@ PGE::OPTable - PGE operator precedence table and parser
     if $I0 goto token_match_end
     $I0 = exists token['parsed']
     if $I0 goto token_match_sub
-    $S0 = token['returns']
+    $S0 = token['match']
     (oper, $P99, $P99, $P0) = newfrom(mob, pos, $S0)
     $I0 = length key
     $I0 += pos
