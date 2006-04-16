@@ -13,7 +13,8 @@ CP       = @cp@
 all: perl6.pbc
 
 SOURCES = perl6.pir \
-  lib/grammar.pge \
+  lib/grammar_rules.pge \
+  lib/grammar_optok.pge \
   lib/parse.pir \
   lib/pge2past.tge \
   lib/past2pir.tge \
@@ -22,8 +23,9 @@ SOURCES = perl6.pir \
   lib/builtins.pir
 
 # the default target
-perl6.pbc: $(PARROT) $(SOURCES)
-	$(PARROT) $(PGE_DIR)/rulec.pir --output=lib/grammar.pir lib/grammar.pge
+perl6.pbc: $(PARROT) $(PGE_DIR)/pgc.pir $(SOURCES)
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=lib/grammar_gen.pir \
+	    lib/grammar_rules.pge lib/grammar_optok.pge
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/pge2past.pir lib/pge2past.tge
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/past2pir.pir lib/past2pir.tge
 	$(PARROT) -o perl6.pbc perl6.pir
@@ -55,7 +57,7 @@ testclean:
 	echo "XXX: Todo - not yet implemented"
 
 clean: 
-	$(RM_RF) perl6.pbc lib/grammar.pir
+	$(RM_RF) perl6.pbc lib/grammar_gen.pir
 
 realclean: clean
 	$(RM_RF) Makefile
