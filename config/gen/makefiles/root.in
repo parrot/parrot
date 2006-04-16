@@ -104,6 +104,26 @@ LINKFLAGS  = @linkflags@ @link_debug@ @ld_debug@
 LD         = @ld@
 LDFLAGS    = @ldflags@ @ld_debug@
 
+LINT = lint
+LINTFLAGS = \
+    -b \
+    -n \
+    -p \
+    -Ncheck=%all \
+    -Nlevel=4 \
+    -errchk=parentheses \
+    -errhdr=%all \
+    -errfmt=src \
+    -errtags \
+    -erroff=E_BAD_PTR_CAST \
+    -erroff=E_BAD_PTR_CAST_ALIGN \
+    -erroff=E_FUNC_ARG_UNUSED \
+    -erroff=E_LABEL_NOT_USED \
+
+# E_FUNC_ARG_UNUSED: Because of the interpreter getting passed around.  I need to add lint protection
+# on the Interp, and then we can turn it back on.
+
+
 SPLINT     = splint
 # note: +distinctinternalnames with +externalnamelen at 8 characters
 #       (the ANSI standard) is not going to fly for us.
@@ -675,6 +695,7 @@ help :
 	@echo "  rsync:             update with rsync."
 	@echo ""
 	@echo "Development:"
+	@echo "  lint:              code checking with lint."
 	@echo "  splint:            code checking with splint."
 	@echo "  splint2:           another code checking with splint."
 	@echo ""
@@ -1607,6 +1628,10 @@ status :
 patch :
 	svn diff
 
+
+lint : $(PARROT)
+	rm -f *.ln
+	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(LINTFLAGS) src/*.c
 
 splint : $(PARROT)
 	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SPLINTFLAGS) $(SPLINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
