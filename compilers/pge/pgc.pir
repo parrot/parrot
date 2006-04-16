@@ -178,6 +178,7 @@ the output to the correct output file.
   output_onload:
     if onload == '' goto output_rulepir
     print outfh, ".sub '__onload' :load\n"
+    print outfh, "    .local pmc optable\n"
     print outfh, onload
     print outfh, "    .return ()\n.end\n"
   output_rulepir:

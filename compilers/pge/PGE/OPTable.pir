@@ -133,7 +133,7 @@ PGE::OPTable - PGE operator precedence table and parser
 
     .local pmc token
     .local string syncat, key
-    token = args
+    token = clone args
     token['name'] = name
     $I0 = index name, ':'
     inc $I0
@@ -225,7 +225,7 @@ PGE::OPTable - PGE operator precedence table and parser
   mode_nullterm:
     $I0 = token['nullterm']
     if $I0 == 0 goto mode_nows
-    mode |= PGE_OPTABLE_NOWS
+    mode |= PGE_OPTABLE_NULLTERM
 
   mode_nows:
     $I0 = token['nows']
