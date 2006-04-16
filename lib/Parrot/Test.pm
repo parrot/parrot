@@ -191,13 +191,9 @@ For example:
 
 Read the whole file $file_name and return the content as a string.
 
-=back
-
 =item C<convert_line_endings($text)>
 
 Convert Win32 style line endins with Unix style line endings.
-
-=back
 
 =item C<path_to_parrot()>
 
