@@ -2302,10 +2302,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named after slurpy array");
 .sub main :main
     foo(0, 'abc' => 1)
     foo('abc' => 2)
-    $P0 = .new ResizablePMCArray
+    $P0 = new .ResizablePMCArray
     push $P0, 1
     foo($P0 :flat, 'abc' => 3)
-    $P0 = .new ResizablePMCArray
+    $P0 = new .ResizablePMCArray
     foo($P0 :flat, 'abc' => 4)
 .end
 
