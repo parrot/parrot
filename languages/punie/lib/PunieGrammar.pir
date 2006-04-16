@@ -47,22 +47,22 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
     optable = new $I0
     store_global "PunieGrammar", "$optable", optable
 
-    optable.addtok("infix:+")
-    optable.addtok("infix:-", "infix:+")
-    optable.addtok("infix:.", "infix:+")
-    optable.addtok("infix:*", ">infix:+")
-    optable.addtok("infix:/", "infix:*")
-    optable.addtok("infix:%", "infix:*")
-    optable.addtok("infix:x", "infix:*")
+    optable.newtok('infix:+', 'precedence'=>'=')
+    optable.newtok("infix:-", 'equiv'=>"infix:+")
+    optable.newtok("infix:.", 'equiv'=>"infix:+")
+    optable.newtok("infix:*", 'tighter'=>"infix:+")
+    optable.newtok("infix:/", 'equiv'=>"infix:*")
+    optable.newtok("infix:%", 'equiv'=>"infix:*")
+    optable.newtok("infix:x", 'equiv'=>"infix:*")
 
-    optable.addtok("infix:<<", "<infix:+")
-    optable.addtok("infix:>>", "infix:<<")
-    optable.addtok("infix:&", "<infix:<<")
-    optable.addtok("infix:|", "<infix:&")
-    optable.addtok("infix:^", "infix:|")
+    optable.newtok("infix:<<", 'looser'=>"infix:+")
+    optable.newtok("infix:>>", 'equiv'=>"infix:<<")
+    optable.newtok("infix:&",  'looser'=>"infix:<<")
+    optable.newtok("infix:|",  'looser'=>"infix:&")
+    optable.newtok("infix:^",  'equiv'=>"infix:|")
 
     term = find_global "PunieGrammar", "term"
-    optable.addtok("term:", ">infix:+", "left", term)
+    optable.newtok("term:", 'tighter'=>"infix:+", 'parsed'=>term)
 
 .end
 
