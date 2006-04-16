@@ -36,12 +36,11 @@ PGE::OPTable - PGE operator precedence table and parser
 .sub "__onload" :load
     .local pmc base
     .local pmc sctable
-    .local pmc closetoken
     $P0 = getclass "Hash"
-    base = subclass $P0, "PGE::OPTable"
-    addattribute base, "%!key"
-    addattribute base, "%!klen"
-    addattribute base, "&!ws"
+    base = subclass $P0, 'PGE::OPTable'
+    addattribute base, '%!key'
+    addattribute base, '%!klen'
+    addattribute base, '&!ws'
     sctable = new .Hash
     sctable["term:"]          = 0x0110
     sctable["postfix:"]       = 0x0221
@@ -53,10 +52,6 @@ PGE::OPTable - PGE operator precedence table and parser
     sctable["postcircumfix:"] = 0x0842
     sctable["circumfix:"]     = 0x0911
     store_global "PGE::OPTable", "%!sctable", sctable
-    closetoken = new .Hash
-    closetoken["equiv"] = ""
-    closetoken["mode"] = 0x0320
-    store_global "PGE::OPTable", "%!closetoken", closetoken
     .return ()
 .end
 
@@ -72,70 +67,126 @@ PGE::OPTable - PGE operator precedence table and parser
 
 .sub "addtok" :method
     .param string name
-    .param string rel          :optional
-    .param int has_rel         :opt_flag
+    .param string rel          
     .param string opts         :optional
     .param int has_opts        :opt_flag
     .param pmc match           :optional
     .param int has_match       :opt_flag
-    .local pmc tokentable
-    .local string equiv
-    tokentable = self
 
-    if has_match goto args_1
-    match = new .String
-    match = "PGE::Match"
+    .local pmc args
+    args = new .Hash
 
-  args_1:
-    if has_opts goto set_equiv
-    opts = "left"
-
-  set_equiv:
-    equiv = "="
-    if has_rel == 0 goto add_token
-    if rel == "" goto add_token
-    $I0 = exists tokentable[rel]
-    if $I0 == 0 goto set_equiv_1
-    $P0 = tokentable[rel]
-    equiv = $P0["equiv"]
-    goto add_token
-  set_equiv_1:
-    $S0 = substr rel, 1
-    $I0 = exists tokentable[$S0]
-    if $I0 == 0 goto set_equiv_2
-    $P0 = tokentable[$S0]
-    equiv = $P0["equiv"]
-    equiv = clone equiv
+  addtok_rel:
+    if rel == '' goto no_precedence
     $S0 = substr rel, 0, 1
-    substr equiv, -1, 0, $S0
-    goto add_token
-  set_equiv_2:
-    equiv = rel
+    if $S0 == '<' goto looser
+    if $S0 == '>' goto tighter
+    args['equiv'] = rel 
+    goto addtok_opts
+  looser:
+    $S0 = substr rel, 1
+    args['looser'] = $S0
+    goto addtok_opts
+  tighter:
+    $S0 = substr rel, 1
+    args['tighter'] = $S0
+    goto addtok_opts
+  no_precedence:
+    args['precedence'] = '='
 
-  add_token:
-    .local pmc token   
-    .local string syncat, key, key_close
-    $I0 = index name, ":"
+  addtok_opts:
+    if has_opts == 0 goto addtok_match
+  addtok_right:
+    $I0 = index opts, 'right'
+    if $I0 < 0 goto addtok_list
+    args['assoc'] = 'right'
+  addtok_list:
+    $I0 = index opts, 'list'
+    if $I0 < 0 goto addtok_nows
+    args['assoc'] = 'list'
+  addtok_nows:
+    $I0 = index opts, 'nows'
+    if $I0 < 0 goto addtok_nullterm
+    args['nows'] = 1
+  addtok_nullterm:
+    $I0 = index opts, 'nullterm'
+    if $I0 < 0 goto addtok_match
+    args['nullterm'] = 1
+
+  addtok_match:
+    if has_match == 0 goto end
+    $I0 = isa match, 'Sub'
+    if $I0 goto add_parsed
+    args['returns'] = match
+    goto end
+  add_parsed:
+    args['parsed'] = match
+
+  end:
+    .return self.'newtok'(name, args :named :flat)
+.end
+    
+
+.sub 'newtok' :method
+    .param string name
+    .param pmc args            :slurpy :named
+
+    .local pmc token
+    .local string syncat, key
+    token = args
+    token['name'] = name
+    $I0 = index name, ':'
     inc $I0
     syncat = substr name, 0, $I0
     key = substr name, $I0
 
-    $I0 = exists tokentable[name]
+    # we don't replace existing tokens
+    .local pmc tokentable
+    tokentable = self
+    $I0 = exists tokentable['name']
     if $I0 goto end
-    token = new .Hash
     tokentable[name] = token
-    token["name"] = name
-    token["match"] = match
-    token["equiv"] = equiv
 
-    $I0 = index key, " "
+    $S0 = args['returns']
+    if $S0 > '' goto token_returns
+    $S0 = 'PGE::Match'
+  token_returns:
+    token['returns'] = $S0
+
+  token_equiv:
+    $S0 = token['equiv']
+    unless $S0 goto token_looser
+    $S1 = tokentable[$S0;'precedence']
+    token['precedence'] = $S1
+    $S1 = tokentable[$S0;'assoc']
+    token['assoc'] = $S1
+
+  token_looser:
+    $S0 = token['looser']
+    unless $S0 goto token_tighter
+    $S0 = tokentable[$S0;'precedence']
+    $S0 = clone $S0
+    substr $S0, -1, 0, '<'
+    token['precedence'] = $S0
+
+  token_tighter:
+    $S0 = token['tighter']
+    unless $S0 goto token_close
+    $S0 = tokentable[$S0;'precedence']
+    $S0 = clone $S0
+    substr $S0, -1, 0, '>'
+    token['precedence'] = $S0
+
+  token_close:
+    .local string keyclose
+    $I0 = index key, ' '
     if $I0 < 0 goto add_key
     $I1 = $I0 + 1
-    key_close = substr key, $I1
+    keyclose = substr key, $I1
     key = substr key, 0, $I0
-    token["key_close"] = key_close
-    $S0 = concat "close:", key_close
-    self."addtok"($S0, name)
+    token['keyclose'] = keyclose
+    $S0 = concat 'close:', keyclose
+    self.'newtok'($S0, 'equiv' => name)
 
   add_key:
     .local pmc keytable, klentable
@@ -153,7 +204,7 @@ PGE::OPTable - PGE operator precedence table and parser
     goto end
   add_key_array:
     $P0 = keytable[key]
-    $I0 = does $P0, "array"
+    $I0 = does $P0, 'array'
     if $I0 goto add_key_array_2
     $P1 = new .ResizablePMCArray
     push $P1, $P0
@@ -164,33 +215,44 @@ PGE::OPTable - PGE operator precedence table and parser
     push $P0, token
 
   end:
-    .local pmc sctable
-    .local int mode
     token = tokentable[name]
 
+    .local pmc sctable
+    .local int mode
     sctable = find_global "PGE::OPTable", "%!sctable"
     mode = sctable[syncat]
 
-    $I0 = index opts, "right"
-    if $I0 < 0 goto mode_1
-    mode = mode | PGE_OPTABLE_ASSOC_RIGHT
-  mode_1:
-    $I0 = index opts, "list"
-    if $I0 < 0 goto mode_2
-    mode = mode | PGE_OPTABLE_ASSOC_LIST
-  mode_2:
-    $I0 = index opts, "nows"
-    if $I0 < 0 goto mode_3
-    mode = mode | PGE_OPTABLE_NOWS
-  mode_3:
-    $I0 = index opts, "nullterm"
-    if $I0 < 0 goto mode_4
-    mode = mode | PGE_OPTABLE_NULLTERM
-  mode_4:
-    token["mode"] = mode
+  mode_nullterm:
+    $I0 = token['nullterm']
+    if $I0 == 0 goto mode_nows
+    mode |= PGE_OPTABLE_NOWS
+
+  mode_nows:
+    $I0 = token['nows']
+    if $I0 == 0 goto mode_assoc
+    mode |= PGE_OPTABLE_NOWS
+
+  mode_assoc:
+    .local string assoc
+    assoc = token['assoc']
+    if assoc == 'left' goto mode_done
+    if assoc == '' goto assoc_left
+    if assoc == 'right' goto assoc_right
+    if assoc == 'list' goto assoc_list
+    goto mode_done
+  assoc_left:
+    token['assoc'] = 'left'
+    goto mode_done
+  assoc_right:
+    mode |= PGE_OPTABLE_ASSOC_RIGHT
+    goto mode_done
+  assoc_list:
+    mode |= PGE_OPTABLE_ASSOC_LIST
+  mode_done:
+    token['mode'] = mode
     .return (token)
 .end
-
+    
 
 .sub "parse" :method
     .param pmc mob
@@ -208,7 +270,6 @@ PGE::OPTable - PGE operator precedence table and parser
     .local int tokenmode, topmode
     .local int tokencat, topcat
     .local int arity
-    .local pmc match
     .local int lastcat
 
     tokentable = self
@@ -335,8 +396,8 @@ PGE::OPTable - PGE operator precedence table and parser
     if tokencat == PGE_OPTABLE_CLOSE goto oper_close           # (R5, C5)
     if topcat >= PGE_OPTABLE_POSTCIRCUMFIX goto oper_shift     # (S6)
     ## Check operator precedence
-    $P0 = token["equiv"]
-    $P1 = top["equiv"]
+    $P0 = token['precedence']
+    $P1 = top['precedence']
     if $P0 > $P1 goto oper_shift                               # (P)
     if topcat != PGE_OPTABLE_TERNARY goto shift_reduce_2
     if tokencat != PGE_OPTABLE_TERNARY goto err_ternary        # (P/E)
@@ -352,7 +413,7 @@ PGE::OPTable - PGE operator precedence table and parser
 
   oper_close:
     if topcat < PGE_OPTABLE_TERNARY goto oper_reduce           # (R5)
-    $S0 = top["key_close"]
+    $S0 = top["keyclose"]
     if key != $S0 goto end                                     # (C5)
 
   oper_shift:
@@ -417,16 +478,17 @@ PGE::OPTable - PGE operator precedence table and parser
     if $I0 == 0 goto token_match_end
     $I0 = tokenmode & nows
     if $I0 goto token_match_end
-    match = token["match"]
-    $I0 = isa match, "Sub"
+    $I0 = exists token['parsed']
     if $I0 goto token_match_sub
-    (oper, $P99, $P99, $P0) = newfrom(mob, pos, match)
+    $S0 = token['returns']
+    (oper, $P99, $P99, $P0) = newfrom(mob, pos, $S0)
     $I0 = length key
     $I0 += pos
     $P0 = $I0
     goto token_match_success
   token_match_sub:
-    oper = match(mob)
+    $P0 = token['parsed']
+    oper = $P0(mob)
   token_match_success:
     $P0 = token["name"]
     $P0 = clone $P0

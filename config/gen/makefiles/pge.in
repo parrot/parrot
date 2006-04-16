@@ -14,13 +14,24 @@ PARROT_LIBRARY    = ..@slash@..@slash@runtime@slash@parrot@slash@library
 # the default target
 all: $(PARROT_LIBRARY)@slash@PGE.pbc
 
+SOURCES = PGE.pir \
+  PGE/CodeString.pir \
+  PGE/Exp.pir \
+  PGE/Match.pir \
+  PGE/Rule.pir \
+  PGE/P6Rule.pir \
+  PGE/OPTable.pir \
+  PGE/P5Regexp.pir \
+  pgc.pir \
+  library.pge
+
 $(PARROT_LIBRARY)@slash@PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
-PGE.pbc: PGE.pir PGE/CodeString.pir PGE/Exp.pir PGE/Match.pir PGE/Rule.pir PGE/P6Rule.pir PGE/OPTable.pir PGE/P5Regexp.pir rulec.pir library.pge
+PGE.pbc: $(PARROT) $(SOURCES)
 	$(PERL) -e "" >PGE/Library.pir
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
-	$(PARROT) rulec.pir  --output=PGE/Library.pir library.pge
+	$(PARROT) pgc.pir  --output=PGE/Library.pir library.pge
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
 
 # This is a listing of all targets, that are meant to be called by users

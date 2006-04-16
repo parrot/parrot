@@ -25,7 +25,7 @@ PGE::CodeString - object to build (PIR) code segments
     .param string fmt
     .param pmc args            :slurpy
     .param pmc hash            :slurpy :named
-    .local int pos
+    .local int pos, replen
     .local string key, repl
 
     fmt = clone fmt
@@ -41,6 +41,7 @@ PGE::CodeString - object to build (PIR) code segments
     if $I0 goto args_arg
     if key == ',' goto comma_arg
     if key == '%' goto percent
+    replen = 2
     goto emit_next
   comma_arg:
     repl = args[0]
@@ -65,8 +66,9 @@ PGE::CodeString - object to build (PIR) code segments
     repl = args[$I0]
   fmt_arg:
     substr fmt, pos, 2, repl
+    replen = length repl
   emit_next:
-    pos += 2
+    pos += replen
     goto emit_loop
   end:
     self .= fmt

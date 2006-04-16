@@ -14,63 +14,63 @@
     store_global "PGE::P6Rule", "$optable", optable
 
     $P0 = find_global "PGE::P6Rule", "parse_ws_lit"
-    optable.addtok("term:", "", "nows", $P0)
-    optable.addtok("term:::", "term:", "nows", "PGE::Exp::Cut")
-    optable.addtok("term::::", "term:", "nows", "PGE::Exp::Cut")
-    optable.addtok("term:\\b", "term:", "nows", "PGE::Exp::Anchor")
-    optable.addtok("term:\\B", "term:", "nows", "PGE::Exp::Anchor")
-    optable.addtok("term:^", "term:", "nows", "PGE::Exp::Anchor")
-    optable.addtok("term:^^", "term:", "nows", "PGE::Exp::Anchor")
-    optable.addtok("term:$$", "term:", "nows", "PGE::Exp::Anchor")
+    optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:::', 'equiv'=>'term:', 'nows'=>1, 'returns'=> 'PGE::Exp::Cut')
+    optable.newtok('term::::', 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Cut')
+    optable.newtok("term:\\b", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
+    optable.newtok("term:\\B", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
+    optable.newtok("term:^", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
+    optable.newtok("term:^^", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
+    optable.newtok("term:$$", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Anchor')
 
     $P0 = find_global "PGE::P6Rule", "parse_dollar"
-    optable.addtok("term:$", "term:", "nows", $P0)
+    optable.newtok("term:$", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.addtok("term:.", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\d", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\D", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\s", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\S", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\w", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\W", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\n", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.newtok("term:.", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\d", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\D", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\s", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\S", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\w", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\W", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
+    optable.newtok("term:\\n", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::CCShortcut')
 
-    optable.addtok("circumfix:[ ]", "term:", "nows", "PGE::Exp::Group")
-    optable.addtok("circumfix:( )", "term:", "nows", "PGE::Exp::Group")
+    optable.newtok("circumfix:[ ]", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Group')
+    optable.newtok("circumfix:( )", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Group')
 
-    optable.addtok("term:<commit>", "term:", "nows", "PGE::Exp::Commit")
+    optable.newtok("term:<commit>", 'equiv'=>'term:', 'nows'=>1, 'returns'=>'PGE::Exp::Commit')
 
     $P0 = find_global "PGE::P6Rule", "parse_subrule"
-    optable.addtok("term:<", "term:", "nows", $P0)
-    optable.addtok("term:<?", "term:", "nows", $P0)
+    optable.newtok("term:<", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok("term:<?", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = find_global "PGE::P6Rule", "parse_enumclass"
-    optable.addtok("term:<[", "term:", "nows", $P0)
-    optable.addtok("term:<-[", "term:", "nows", $P0)
-    optable.addtok("term:<+[", "term:", "nows", $P0)
+    optable.newtok("term:<[", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok("term:<-[", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok("term:<+[", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = find_global "PGE::P6Rule", "parse_closure"
-    optable.addtok("term:{{", "term:", "nows", $P0)
+    optable.newtok("term:{{", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = find_global "PGE::P6Rule", "parse_quant"
-    optable.addtok("postfix:*", "<term:", "left", $P0)
-    optable.addtok("postfix:+", "postfix:*", "left", $P0)
-    optable.addtok("postfix:?", "postfix:*", "left", $P0)
+    optable.newtok("postfix:*", 'looser'=>'term:', 'parsed'=>$P0)
+    optable.newtok("postfix:+", 'equiv'=>'postfix:*', 'parsed'=>$P0)
+    optable.newtok("postfix:?", 'equiv'=>'postfix:*', 'parsed'=>$P0)
 
     $P0 = find_global "PGE::P6Rule", "parse_cut"
-    optable.addtok("postfix::", "postfix:*", "left", $P0)
+    optable.newtok("postfix::", 'equiv'=>'postfix:*', 'parsed'=>$P0)
 
-    optable.addtok("infix:", "<postfix:*", "right,nows", "PGE::Exp::Concat")
-    optable.addtok("infix:&", "<infix:", "left,nows", "PGE::Exp::Conj")
-    optable.addtok("infix:|", "<infix:&", "left,nows", "PGE::Exp::Alt")
+    optable.newtok("infix:", 'looser'=>'postfix:*', 'assoc'=>'right', 'nows'=>1, 'returns'=>'PGE::Exp::Concat')
+    optable.newtok("infix:&", 'looser'=>'infix:', 'nows'=>1, 'returns'=>'PGE::Exp::Conj')
+    optable.newtok("infix:|", 'looser'=>'infix:&', 'nows'=>1, 'returns'=>'PGE::Exp::Alt')
 
-    optable.addtok("infix::=", ">postfix:*", "right", "PGE::Exp::Alias")
+    optable.newtok("infix::=", 'tighter'=>'postfix:*', 'assoc'=>'right', 'returns'=>'PGE::Exp::Alias')
 
     $P0 = find_global "PGE::P6Rule", "parse_modifier"
-    optable.addtok("prefix::", "<infix:|", "nows", $P0)
+    optable.newtok("prefix::", 'looser'=>'infix:|', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.addtok("close:>", "<prefix::", "nows")
-    optable.addtok("close:}", "<prefix::", "nows")
+    optable.newtok("close:>", 'looser'=>'prefix::', 'nows'=>1)
+    optable.newtok("close:}", 'looser'=>'prefix::', 'nows'=>1)
 
     $P0 = new Hash
     store_global "PGE::P6Rule", "%escape", $P0

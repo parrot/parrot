@@ -430,7 +430,7 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
   
     (subindent, indent) = dumper."newIndent"()
     print " {"
-    hash = self."get_hash"()
+    hash = self
     if_null hash, dump_rest
     iter = new .Iterator, hash
     iter = 0
