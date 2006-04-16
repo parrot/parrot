@@ -25,41 +25,4 @@ Otherwise I run the tests that were passed on the command line.
 
 =cut
 
-use strict;
-use FindBin;
-use lib "$FindBin::Bin/../../../lib";
-
-use Cwd();
-use File::Spec;
-use Test::Harness();
-
-my $language = 'befunge';
-
-if ( grep { m/^--files$/ } @ARGV ) {
-    # Only the Makefile in 'parrot/languages' uses --files
-    my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
-    print join( "\n", @files );
-    print "\n" if scalar(@files);
-} else { 
-    my @files;
-    if ( scalar(@ARGV) ) {
-        # Someone specified tests for me to run.
-        @files = grep { -f $_ } @ARGV
-    } else {
-        ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
-        if ( $current_dir eq 'languages' ) {
-            @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
-        }
-        elsif ( $current_dir eq $language ) {
-            @files = glob( File::Spec->catfile( 't', '*.t' ) );
-        }
-    }
-    Test::Harness::runtests( @files ) if scalar( @files );
-}
-
-=head1 SEE ALSO
-
-  F<languages/scheme/t/harness>
-
-=cut
+use Parrot::Test::Harness language => 'befunge';

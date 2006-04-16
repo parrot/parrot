@@ -20,7 +20,7 @@ help :
 	@echo "  help:              print this help message"
 
 test: build
-	cd .. && $(PERL) bf/t/harness
+	$(PERL) -Ilib -I../../lib t/harness
 
 build: bf.pbc bfc.pbc bfco.pbc
 

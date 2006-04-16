@@ -29,9 +29,3 @@ Otherwise I run the tests that were passed on the command line.
 =cut
 
 use Parrot::Test::Harness language => 'm4';
-
-=head1 AUTHOR
-
-Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
-
-=cut

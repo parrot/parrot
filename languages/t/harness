@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 
 # Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
@@ -10,7 +10,7 @@ use lib qw( lib ../lib );
 use File::Spec;
 use Getopt::Long;
 use Parrot::Config qw/%PConfig/;
-use Test::Harness();
+use Test::Harness  ();
 
 =head1 Languages harness
 
@@ -67,8 +67,8 @@ called by languages/Makefile with an explicit perl.
 # Step 0: handle command line args
 my $do_gen_html;       # smoke testing
 my $languages_list;    # select a subset of languages
-my $result = GetOptions( "html"          => \$do_gen_html,    
-                         "languages=s"   => \$languages_list );  
+my $result = GetOptions( 'html'          => \$do_gen_html,    
+                         'languages=s'   => \$languages_list );  
 
 # Step 1: find harness files for testable languages
 

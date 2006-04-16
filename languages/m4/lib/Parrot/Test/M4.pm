@@ -67,8 +67,7 @@ foreach my $func ( keys %language_test_map ) {
         #  languages/m4
 
         my $language = 'm4';
-        my $path_to_parrot = $INC{'Parrot/Config.pm'};
-        $path_to_parrot =~ s:/lib/Parrot/Config.pm$::;
+        my $path_to_parrot = Parrot::Test::path_to_parrot();
         my $dir_count = scalar(File::Spec->splitdir($path_to_parrot));
         my $path_to_language;
         if ($dir_count == 0) {
@@ -80,7 +79,6 @@ foreach my $func ( keys %language_test_map ) {
         } elsif ($dir_count >2) {
           $path_to_language = File::Spec->join(File::Spec->updir() x ($dir_count - 2));
         }
-        # die Dumper( $INC{'Parrot/Config.pm'},$path_to_parrot, $path_to_language, $dir_count, `pwd` );
 
         # flatten filenames (don't use directories)
         my $lang_fn     = Parrot::Test::per_test( '.m4', $count );

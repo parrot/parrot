@@ -188,11 +188,11 @@ bf
 
 =item Status
 
-Passes all tests.
+Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.3
 
 =item Location
 
@@ -510,7 +510,7 @@ Development is stalled. Takers are welcome.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.3
 
 =item Location
 
