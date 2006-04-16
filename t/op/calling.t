@@ -2298,6 +2298,32 @@ CODE
 /duplicate name/
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named after slurpy array");
+.sub main :main
+    foo(0, 'abc' => 1)
+    foo('abc' => 2)
+    $P0 = .new ResizablePMCArray
+    push $P0, 1
+    foo($P0 :flat, 'abc' => 3)
+    $P0 = .new ResizablePMCArray
+    foo($P0 :flat, 'abc' => 4)
+.end
+
+.sub foo
+        .param pmc array :slurpy
+        .param pmc hash :slurpy :named
+        print "ok "
+        $P0 = hash['abc']
+        print $P0
+        print "\n"
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 89 }
+BEGIN { plan tests => 90 }
 
