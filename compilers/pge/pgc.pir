@@ -31,6 +31,8 @@ can also be set to 'iso-8859-1' or 'utf8'.
 
 =head2 Functions
 
+=over 4
+
 =item C<main()>
 
 Processes command line arguments, reads input files, dispatches
