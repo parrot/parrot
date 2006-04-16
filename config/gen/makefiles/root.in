@@ -104,10 +104,10 @@ LINKFLAGS  = @linkflags@ @link_debug@ @ld_debug@
 LD         = @ld@
 LDFLAGS    = @ldflags@ @ld_debug@
 
-LINT       = splint
+SPLINT     = splint
 # note: +distinctinternalnames with +externalnamelen at 8 characters
 #       (the ANSI standard) is not going to fly for us.
-LINTFLAGS  = -weak +showscan +showsummary +posixstrictlib -abstract \
+SPLINTFLAGS  = -weak +showscan +showsummary +posixstrictlib -abstract \
     +aliasunique +ansireserved +ansireservedinternal +assignexpose \
     +bitwisesigned +boolcompare +booltype BOOLVAL +casebreak -castfcnptr \
     -charint +continuecomment +controlnestdepth 15 +cppnames +declundef \
@@ -117,11 +117,11 @@ LINTFLAGS  = -weak +showscan +showsummary +posixstrictlib -abstract \
     +nestedextern +noeffect +readonlystrings +realcompare +shadow -type
 
 # slightly weaker, more realistic variant.
-LINTFLAGS2 = $(LINTFLAGS) -ansireserved -retvalother -bitwisesigned
+SPLINTFLAGS2 = $(SPLINTFLAGS) -ansireserved -retvalother -bitwisesigned
 
-# added to lint target to simplify experimentation,
-# ex: make LINTOPTS='-posixstrictlibs +posixlibs' lint
-LINTOPTS   =
+# added to splint target to simplify experimentation,
+# ex: make SPLINTOPTS='-posixstrictlibs +posixlibs' splint
+SPLINTOPTS   =
 
 INNO_SETUP = iscc
 
@@ -675,8 +675,8 @@ help :
 	@echo "  rsync:             update with rsync."
 	@echo ""
 	@echo "Development:"
-	@echo "  lint:              code checking with lint."
-	@echo "  lint2:             another code checking with lint."
+	@echo "  splint:            code checking with splint."
+	@echo "  splint2:           another code checking with splint."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           create a TAR ball."
@@ -1608,13 +1608,13 @@ patch :
 	svn diff
 
 
-lint : $(PARROT)
-	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
-	$(LINT) $(CC_INC) $(LINTFLAGS) $(LINTOPTS) $(IMCC_DIR)/main.c
+splint : $(PARROT)
+	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SPLINTFLAGS) $(SPLINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTOPTS) $(IMCC_DIR)/main.c
 
-lint2 : $(PARROT)
-	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
-	$(LINT) $(CC_INC) $(LINTFLAGS2) $(LINTOPTS) $(IMCC_DIR)/main.c
+splint2 : $(PARROT)
+	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SPLINTFLAGS2) $(SPLINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+	$(SPLINT) $(CC_INC) $(SPLINTFLAGS2) $(SPLINTOPTS) $(IMCC_DIR)/main.c
 
 
 ###############################################################################
