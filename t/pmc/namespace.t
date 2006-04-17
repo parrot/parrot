@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Parrot::Config;
 
 =head1 NAME
@@ -327,8 +327,6 @@ baz
 ::parrot::Foo::Bar
 OUTPUT
 
-SKIP: {
-	skip("disabled class method", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "segv in get_name");
 .namespace ['pugs';'main']
 .sub 'main' :main
@@ -341,9 +339,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "segv in get_name");
 CODE
 ok
 OUTPUT
-
-}
-
 
 pir_output_is(<<'CODE', <<'OUT', "latin1 namespace, global");
 .namespace [ iso-8859-1:"François" ]
@@ -578,3 +573,45 @@ pir_output_is(<<'CODE', <<'OUTPUT', "HLL and vars");
 CODE
 3.14
 OUTPUT
+
+{
+my $temp_a = "temp_a.pir";
+
+END {
+    unlink($temp_a);
+};
+
+open S, '>', $temp_a or die "Can't write $temp_a";
+print S <<'EOF';
+.HLL 'eek', ''
+
+.sub foo :load :anon
+  $P1 = new .String
+  $P1 = "3.14\n"
+  store_global '$whee', $P1
+.end
+
+.sub bark
+  $P0 = find_global '$whee'
+  print $P0
+.end
+EOF
+close S;
+
+pir_output_is(<<'CODE', <<'OUTPUT', ":anon subs still get default namespace");
+.HLL 'cromulent', ''
+
+.sub what
+   load_bytecode 'temp_a.pir'
+  .include 'interpinfo.pasm'
+  .local pmc var
+   var = interpinfo .INTERPINFO_NAMESPACE_ROOT
+   var = var['eek']
+   var = var['bark']
+
+    var()
+.end
+CODE
+3.14
+OUTPUT
+}
