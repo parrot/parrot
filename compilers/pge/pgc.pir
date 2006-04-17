@@ -256,7 +256,7 @@ END_ARG_RULE
     $S0 = <<'END_GRAMMAR'
 :w ( $<cmd>:=(grammar) $<name>:=<arg> ;?
    | $<cmd>:=(rule) $<name>:=<arg> \{ <p6rule> \}
-   | [multi]? $<cmd>:=(sub) $<name>:=<arg>
+   | [multi]? $<cmd>:=(sub|proto) $<name>:=<arg>
       ( is $<trait>:=[\w+]<arg>? )*
       [ \{ <-[}]>*: \} | ; ]
    )*
@@ -303,7 +303,7 @@ in C<nsptable> if needed.
 .end
 
 
-=item C<rule_sub(PMC stmt, PMC namespace, PMC nsptable)>
+=item C<rule_stmt(PMC stmt, PMC namespace, PMC nsptable)>
 
 Processes a (perl 6) 'rule' statement.  This compiles the rule
 into PIR, and appends that PIR to the current namespace's
@@ -391,3 +391,9 @@ and appends an "optable.newtok" call to the current namespace's
     $P0 .= initcode
 .end
 
+.sub 'proto_stmt'
+    .param pmc stmt                                # grammar statment
+    .param pmc namespace                           # current namespace
+    .param pmc nsptable                            # nsptable
+    .return sub_stmt(stmt, namespace, nsptable)
+.end
