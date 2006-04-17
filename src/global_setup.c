@@ -191,7 +191,7 @@ parrot_global_setup_2(Interp *interpreter)
             parrot_ns);
     /* We need a class hash */
     interpreter->class_hash = classname_hash =
-        pmc_new(interpreter, enum_class_Hash);
+        pmc_new(interpreter, enum_class_NameSpace);
     Parrot_register_core_pmcs(interpreter, classname_hash);
     /* init the interpreter globals array */
     iglobals = pmc_new(interpreter, enum_class_SArray);
