@@ -681,7 +681,7 @@ locate_named_named(Interp *interpreter, struct call_state *st)
             /* if bit is set we got duplicated */
             if (st->named_done & (1 << n_named))
                 real_exception(interpreter, NULL, E_ValueError,
-                        "duplicate named argument - '%Ss' no expected",
+                        "duplicate named argument - '%Ss' not expected",
                         param);
             st->named_done |= 1 << n_named;
             return 1;
@@ -873,7 +873,7 @@ process_args(Interp *interpreter, struct call_state *st,
             case CALL_STATE_NAMED_NAMED_OPT: 
                 if (!locate_named_named(interpreter, st))
                     real_exception(interpreter, NULL, E_ValueError,
-                            "too many named arguments - '%Ss' no expected",
+                            "too many named arguments - '%Ss' not expected",
                             st->name);
                 if (st->dest.mode & CALL_STATE_SLURP)
                     state         |= CALL_STATE_SLURP;
