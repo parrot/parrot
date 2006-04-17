@@ -24,7 +24,7 @@ PunieGrammar::block: result(.) = {
     .return (child)
 
   err_no_tree:
-    print "The block node doesn't contain an 'lineseq' match.\n"
+    print "The block node doesn't contain a 'lineseq' match.\n"
     end
 }
 
@@ -101,6 +101,7 @@ PunieGrammar::expr: result(.) = {
       shift $S2, $P0             # get key for next entry
       $P2 = $P0[$S2]      # get entry at current key
       $P3 = tree.get('result', $P2, $S2)
+      if null $P3 goto iter_loop
       push children, $P3
       goto iter_loop
   iter_end:
@@ -126,6 +127,7 @@ PunieGrammar::gprint: result(.) = {
       shift $S2, $P0             # get key for next entry
       $P2 = $P0[$S2]      # get entry at current key
       $P3 = tree.get('result', $P2, $S2)
+      if null $P3 goto iter_loop
       push children, $P3
       goto iter_loop
   iter_end:
@@ -153,6 +155,7 @@ PunieGrammar::cond: result(.) = {
       shift $S2, iter             # get key for next entry
       $P2 = iter[$S2]      # get entry at current key
       $P3 = tree.get('result', $P2, $S2)
+      if null $P3 goto iter_loop
       push children, $P3
       goto iter_loop
   iter_end:
@@ -165,6 +168,40 @@ PunieGrammar::cond: result(.) = {
     result.set_node($S2,$I3,$S3,children)
     .return (result)
 }
+
+PunieGrammar::else: result(.) = {
+    .local pmc result
+    .local pmc children
+    .local pmc onechild
+    children = new PerlArray
+    result = new 'PAST::Op'
+    onechild = node[0]
+    unless onechild goto no_child
+    $P1 = onechild.get_hash()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    set iter, 0 # reset iterator, begin at start
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $S2, iter             # get key for next entry
+      $P2 = iter[$S2]      # get entry at current key
+      $P3 = tree.get('result', $P2, $S2)
+      if null $P3 goto iter_loop
+      push children, $P3
+      goto iter_loop
+  iter_end:
+
+    # get the source string and position offset from start of source
+    # code for this match node
+    $S2 = onechild
+    $S3 = onechild[0]
+    $I3 = onechild.from()
+    result.set_node($S2,$I3,$S3,children)
+    .return (result)
+  no_child:
+    .return ()
+}
+
 PunieGrammar::label: result(.) = {
     .return ()
 }
@@ -182,6 +219,7 @@ PunieGrammar::cexpr: result(.) = {
     unless $P0, iter_end         # while (entries) ...
       shift $P2, $P0             # get next entry
       $P3 = tree.get('result', $P2, 'PunieGrammar::oexpr')
+      if null $P3 goto iter_loop
       push children, $P3
       goto iter_loop
   iter_end:
@@ -380,6 +418,7 @@ expr: term(.) = {
       if $S2 == 'type' goto iter_loop 
       $P2 = $P0[$S2]      # get entry at current key
       $P3 = tree.get('result', $P2, $S2)
+      if null $P3 goto iter_loop
       push children, $P3
       goto iter_loop
   iter_end:

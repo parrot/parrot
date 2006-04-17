@@ -16,8 +16,17 @@ rule label { \s* [<PunieGrammar::word>\:]? \s* }
 
 rule word { \w[\w|\d]* }
 
+rule else {
+    (else) <PunieGrammar::block>
+    | (elsif) \s* \( \s* <PunieGrammar::expr> \s* \)
+              <PunieGrammar::block>
+              <PunieGrammar::else>?
+}
+
 rule cond {
-    (if|unless) \s* \( \s* <PunieGrammar::expr> \s* \) <PunieGrammar::block>
+    (if|unless) \s* \( \s* <PunieGrammar::expr> \s* \)
+              <PunieGrammar::block>
+              <PunieGrammar::else>?
 } 
 
 rule expr    { <PunieGrammar::gprint> | <PunieGrammar::cexpr> }

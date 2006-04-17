@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 language_output_is('punie', <<'CODE', <<'OUT', 'simple conditionals');
@@ -10,16 +10,42 @@ if (1) {
   print "ok 1\n";
 }
 if (0) {
-  print "ok 2\n";
+  print "not ok\n";
 }
 unless (0) {
-  print "ok 3\n";
+  print "ok 2\n";
 }
 unless (1) {
-  print "ok 4\n";
+  print "not ok\n";
 }
 CODE
 ok 1
+ok 2
+OUT
+
+language_output_is('punie', <<'CODE', <<'OUT', 'else/elsif conditionals');
+if (1) {
+  print "ok 1\n";
+} elsif (0) {
+  print "not ok\n";
+} else {
+  print "not ok\n";
+}
+if (0) {
+  print "not ok\n";
+} elsif (1) {
+  print "ok 2\n";
+}
+if (0) {
+  print "not ok\n";
+} elsif (0) {
+  print "not ok\n";
+} else {
+  print "ok 3\n";
+}
+CODE
+ok 1
+ok 2
 ok 3
 OUT
 

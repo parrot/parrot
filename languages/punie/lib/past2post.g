@@ -72,11 +72,18 @@ PAST::Op: result(.) = {
   not_print_op:
     if opname == 'if' goto conditional
     if opname == 'unless' goto conditional
+    if opname == 'elsif' goto conditional
     goto not_conditional
   conditional:
       $P4 = tree.get('conditional', node)
       .return ($P4)
   not_conditional:
+    if opname == 'else' goto nullop
+    goto not_nullop
+  nullop:
+      $P4 = tree.get('nullop', node)
+      .return ($P4)
+  not_nullop:
     # Iterate through the children of the node, and generate the result
     # for each child.
     .local pmc newchildren
@@ -211,7 +218,9 @@ PAST::Op: infix(.) = {
 PAST::Op: conditional(.) = {
     .local string opname
     .local pmc oplookup
-    opname = node.op()
+    oplookup = find_global 'PunieOpLookup', 'lookup'
+    $S1 = node.op()
+    opname = oplookup($S1)
     .local string nodesource
     .local string nodepos
     nodesource = node.source()
@@ -243,37 +252,44 @@ PAST::Op: conditional(.) = {
 
     # Second, create the branching op. The first child is the result of
     # the condition, the second argument is a label.
-    .local pmc truelabel
-    truelabel = new 'POST::Label'
-    truelabel.'new_dummy'('true')
-    push newchildren, truelabel
+    .local pmc falselabel
+    falselabel = new 'POST::Label'
+    falselabel.'new_dummy'('false')
+    push newchildren, falselabel
 
     $P2 = new 'POST::Op'
     $P2.'set_node'(nodesource,nodepos,opname,newchildren)
     push newops, $P2
-
-    # Skip over the conditional body
-    .local pmc falselabel
-    falselabel = new 'POST::Label'
-    falselabel.'new_dummy'('false')
-    $P4 = new 'POST::Op'
-    $P5 = new .ResizablePMCArray
-    push $P5, falselabel
-    $P4.'set_node'(nodesource,nodepos,'goto',$P5)
-    push newops, $P4
-
-    # Destination for the branching op
-    $P6 = clone truelabel
-    $P6.dest(1)
-    push newops, $P6
 
     # Next handle the conditional body
     shift $P2, iter
     $P3 = tree.'get'('result', $P2)
     push newops, $P3
 
-    # Destination for the end of the conditional
+    # When conditional body is selected, skip over any else/elsif
+    .local pmc endlabel
+    endlabel = new 'POST::Label'
+    endlabel.'new_dummy'('endcond')
+    $P4 = new 'POST::Op'
+    $P5 = new .ResizablePMCArray
+    push $P5, endlabel
+    $P4.'set_node'(nodesource,nodepos,'goto',$P5)
+    push newops, $P4
+
+    # Destination for the branching op
     $P6 = clone falselabel
+    $P6.dest(1)
+    push newops, $P6
+
+    # Finally handle the else/elsif block if it exists
+    unless iter goto no_else_elsif
+    shift $P2, iter
+    $P3 = tree.'get'('result', $P2)
+    push newops, $P3
+  no_else_elsif:
+
+    # Destination for the end of the conditional
+    $P6 = clone endlabel
     $P6.dest(1)
     push newops, $P6
 
@@ -281,6 +297,13 @@ PAST::Op: conditional(.) = {
     $P10 = new 'POST::Ops'
     $P10.'set_node'(nodesource,nodepos,newops)
     .return ($P10)
+}
+
+PAST::Op: nullop(.) = {
+    $P1 = node.children()
+    $P2 = $P1[0]
+    $P3 = tree.get('result', $P2)
+    .return ($P3)
 }
 
 PAST::Op: print_op(.) = {
