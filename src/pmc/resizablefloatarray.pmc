@@ -200,7 +200,7 @@ Removes and returns an item from the start of the array.
         size = PMC_int_val(SELF);
         if (size == 0) {
             real_exception(INTERP, NULL, E_IndexError,
-                    "ResizableIntegerArray: Can't shift from an empty array!");
+                    "ResizableFloatArray: Can't shift from an empty array!");
         }
         data = (FLOATVAL *)PMC_data(SELF);
         value = data[0];
