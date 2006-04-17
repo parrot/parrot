@@ -838,11 +838,14 @@ process_args(Interp *interpreter, struct call_state *st,
          */
         if (!(state & CALL_STATE_NAMED_x)) {
             if (!(state & CALL_STATE_SLURP) &&
-                    st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
+                (st->dest.sig & 
+                    (PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_NAME)) == 
+                    PARROT_ARG_SLURPY_ARRAY) {
                 /* create array */
                 idx = st->dest.u.op.pc[st->dest.i];
                 assert(idx >= 0);
                 create_slurpy_ar(interpreter, st, idx);
+                state = CALL_STATE_POS_POS_SLURP;
             }
             /* positional src -> named src */
             if (st->name) {
