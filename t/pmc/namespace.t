@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Parrot::Config;
 
 =head1 NAME
@@ -551,3 +551,30 @@ ok 2
 ok 3
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "HLL and vars");
+# initial storage of _tcl global variable...
+
+.HLL '_Tcl', ''
+
+.include 'interpinfo.pasm'
+
+.sub huh 
+  $P0 = new .Integer
+  $P0 = 3.14
+  store_global '$variable', $P0
+.end
+
+# start running HLL language
+.HLL 'Tcl', ''
+
+.sub foo :main
+  huh()
+  $P1 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+  $P2 = $P1['_tcl']
+  $P3 = $P2['$variable'] 
+  print $P3
+  print "\n"
+.end
+CODE
+3.14
+OUTPUT

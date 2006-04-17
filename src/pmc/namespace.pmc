@@ -326,8 +326,34 @@ XXX Should the NULL String of namespace root be included?
         }
         return ar;
     }
-}
 
+/*
+
+=item C<METHOD void export_to(PMC* dest, PMC* what)>
+
+Export items from this NameSpace into the C<dest> NameSpace. C<what>
+is an array of (string) names to be exported.
+
+=cut
+
+*/
+
+    METHOD void export_to(PMC* dest, PMC* what) {
+        INTVAL i, n;
+
+        n = VTABLE_elements(INTERP, what);
+        if (!n)
+            return;
+        for (i = 0; i < n; ++i) {
+            STRING *name;
+            PMC *el;
+
+            name = VTABLE_get_string_keyed_int(INTERP, what, i);
+            el = VTABLE_get_pmc_keyed_str(INTERP, SELF, name);
+            VTABLE_set_pmc_keyed_str(INTERP, dest, name, el);
+        }
+    }
+}
 /*
 
 =back

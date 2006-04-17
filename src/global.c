@@ -248,15 +248,22 @@ static void
 store_sub(Interp *interpreter, STRING *class,
         STRING *globalname, PMC *pmc)
 {
-    PMC *globals;
     PMC *stash;
 
-    if (class) {
-        globals = parrot_HLL_namespace(interpreter);
-        stash = Parrot_global_namespace(interpreter, globals, class);
+    if (pmc->vtable->base_type == enum_class_MultiSub) {
+        PMC *one_sub;
+
+        one_sub = VTABLE_get_pmc_keyed_int(interpreter, pmc, 0);
+        stash = VTABLE_get_pmc_keyed_int(interpreter, 
+                interpreter->HLL_namespace, PMC_sub(one_sub)->HLL_id);
     }
-    else
-        stash = CONTEXT(interpreter->ctx)->current_namespace;
+    else {
+        stash = VTABLE_get_pmc_keyed_int(interpreter, 
+                interpreter->HLL_namespace, PMC_sub(pmc)->HLL_id);
+    }
+    if (class) {
+        stash = Parrot_global_namespace(interpreter, stash, class);
+    }
     VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
     Parrot_invalidate_method_cache(interpreter, class, globalname);
     /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure 
