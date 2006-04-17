@@ -229,13 +229,15 @@ These methods don't belong to either the typed or the generic interface.
 
 =over 4
 
-=item $P0 = name()
+=item $P0 = get_name()
 
-Returns the name of the namespace as an array of strings.  So if the current
-language is Perl 5 and the current Perl 5 namespace is "Some::Module" (that's
-Perl 5 syntax), then name() returns an array of "perl5", "Some", "Module".
+Gets the name of the namespace as an array of strings.  For exmaple, if the
+current language is Perl 5 and the current Perl 5 namespace is "Some::Module"
+(that's Perl 5 syntax), then get_name() on that namespace returns an array of
+"perl5", "Some", "Module".
 
-NOTE: This is a naive method.  It does not account for any aliasing.
+NOTE: Due to aliasing, this value may be wrong, even if nobody's been playing
+around with it.
 
 =back
 
