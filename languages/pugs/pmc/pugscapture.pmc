@@ -20,7 +20,10 @@ minimize explicit structure walking at the level of assembly code.
 
 Hashes and arrays are allocated only when needed.
 
+=over 4
+
 =cut
+
 */
 
 #include "parrot/parrot.h"
@@ -516,3 +519,12 @@ pmclass PugsCapture extends PugsAny
 
 
 } 
+
+/*
+
+=back
+
+=cut
+
+*/
+
