@@ -36,9 +36,7 @@ int exit_value = 0;
 int main(int argc, char* argv[])
 {
     Parrot_Interp interpreter = Parrot_new(NULL);
-    if (!interpreter) {
-        return 1;
-    }
+    Parrot_init_stacktop(interpreter, &interpreter);
 
     Parrot_run_native(interpreter, the_test);
 
