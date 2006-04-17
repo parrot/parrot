@@ -3169,23 +3169,13 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     self->type = PFC_PMC;
     self->u.key = pmc;
 
-    _sub = const_string(interpreter, "Sub");    /* XXX */
+    _sub = const_string(interpreter, "Sub");    /* CONST_STRING */
     if (VTABLE_isa(interpreter, pmc, _sub)) {
         /*
          * finally place the sub into some namespace stash
          * XXX place this code in Sub.thaw ?
          */
-        if (!(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_ANON)) {
-            INTVAL cur_id =  CONTEXT(interpreter->ctx)->current_HLL;
-            /* PF structures aren't fully constructed yet */
-            Parrot_block_DOD(interpreter);
-            /* store relative to HLL namespace */
-            CONTEXT(interpreter->ctx)->current_HLL = PMC_sub(pmc)->HLL_id;
-            Parrot_store_sub_in_namespace(interpreter, pmc);
-            /* restore HLL_id */
-            CONTEXT(interpreter->ctx)->current_HLL = cur_id;
-            Parrot_unblock_DOD(interpreter);
-        }
+        Parrot_store_sub_in_namespace(interpreter, pmc);
     }
     /*
      * restore code

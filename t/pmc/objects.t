@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 63;
+use Parrot::Test tests => 64;
 
 =head1 NAME
 
@@ -1953,4 +1953,10 @@ ok 1
 ok 2
 OUTPUT
     
-    
+pasm_output_is(<<'CODE', <<'OUTPUT', "newclass [] parsing)");
+    newclass P0, ['Foo';'Bar']
+    print "ok\n"
+    end
+CODE
+ok
+OUTPUT

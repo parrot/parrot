@@ -376,6 +376,11 @@ op getclass(out PMC, in INT) {
     goto NEXT();
 }
 
+inline op newclass(out PMC, in KEY) :object_classes {
+  $1 = pmc_new_init(interpreter, enum_class_ParrotClass, $2);
+  goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

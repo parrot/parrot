@@ -713,9 +713,8 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     else
         sub->multi_signature = NULL;
 
-    if (!(r->pcc_sub->pragma & SUB_FLAG_PF_ANON)) {
-        Parrot_store_sub_in_namespace(interpreter, sub_pmc);
-    }
+    Parrot_store_sub_in_namespace(interpreter, sub_pmc);
+
     pfc->type = PFC_PMC;
     pfc->u.key = sub_pmc;
     unit->sub_pmc = sub_pmc;

@@ -83,8 +83,14 @@ argument is not a PMC* but the C<classname> STRING.
     }
 
     void init_pmc (PMC* name) {
-        STRING *class_name = (STRING*) name;
+        STRING *class_name;
 
+        if (name->vtable->base_type == enum_class_String)
+            class_name = VTABLE_get_string(interpreter, name);
+        else {
+            /* XXX */
+            class_name = const_string(INTERP, "not yet");
+        }
         SELF.init();
         Parrot_new_class(INTERP, SELF, class_name);
     }
@@ -236,8 +242,10 @@ Create the class from the thawed parents and attributes array.
                 info->extra_flags = EXTRA_CLASS_EXISTS;
             }
             else {
+                PMC *name = pmc_new(interpreter, enum_class_String);
                 real_class = SELF;
-                SELF.init_pmc((PMC*)class_name);
+                VTABLE_set_string_native(interpreter, name, class_name);
+                SELF.init_pmc(name);
             }
             /* make room for thawed arrays */
             if (PMC_int_val(real_class) == PCD_MAX) {

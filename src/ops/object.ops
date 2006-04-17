@@ -211,13 +211,18 @@ inline op isa(out INT, in PMC, in STR) :object_base {
 =item B<newclass>(out PMC, in STR)
 
 Creates a new Parrot-style class, named $2, and puts the new PMC for it
-into $1. (This is a real out--the contents of $1 are ignored and the
-pointer for the new PMC is put in there).
+into $1. 
+
+=item B<newclass>(out PMC, in KEY)
+
+Create a new Parrot-style class, with the hierachical name given in $2.
 
 =cut
 
 inline op newclass(out PMC, in STR) :object_classes {
-  $1 = pmc_new_init(interpreter, enum_class_ParrotClass, (PMC*)$2);
+  PMC *name = pmc_new(interpreter, enum_class_String);
+  VTABLE_set_string_native(interpreter, name, $2);
+  $1 = pmc_new_init(interpreter, enum_class_ParrotClass, name);
   goto NEXT();
 }
 

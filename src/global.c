@@ -354,8 +354,8 @@ Parrot_multi_long_name(Parrot_Interp interpreter, PMC* sub_pmc)
     return sub_name;
 }
 
-void
-Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
+static void
+store_nonanon_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
 {
     STRING* sub_name;
     PMC *multi_sig;
@@ -391,6 +391,26 @@ Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
     }
 }
 
+void
+Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* pmc)
+{
+    if (!(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_ANON)) {
+        INTVAL cur_id =  CONTEXT(interpreter->ctx)->current_HLL;
+        /* PF structures aren't fully constructed yet */
+        Parrot_block_DOD(interpreter);
+        /* store relative to HLL namespace */
+        CONTEXT(interpreter->ctx)->current_HLL = PMC_sub(pmc)->HLL_id;
+        store_nonanon_in_namespace(interpreter, pmc);
+        /* restore HLL_id */
+        CONTEXT(interpreter->ctx)->current_HLL = cur_id;
+        Parrot_unblock_DOD(interpreter);
+    }
+    else {
+        PMC *stash = VTABLE_get_pmc_keyed_int(interpreter, 
+                interpreter->HLL_namespace, PMC_sub(pmc)->HLL_id);
+        PMC_sub(pmc)->namespace_stash = stash;
+    }
+}
 /*
 
 =back
