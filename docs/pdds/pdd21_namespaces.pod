@@ -231,7 +231,7 @@ These methods don't belong to either the typed or the generic interface.
 
 =item $P0 = get_name()
 
-Gets the name of the namespace as an array of strings.  For exmaple, if the
+Gets the name of the namespace as an array of strings.  For example, if the
 current language is Perl 5 and the current Perl 5 namespace is "Some::Module"
 (that's Perl 5 syntax), then get_name() on that namespace returns an array of
 "perl5", "Some", "Module".
