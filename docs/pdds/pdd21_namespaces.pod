@@ -88,7 +88,7 @@ to remain completely ignorant of each other.
 =item True Root Namespace
 
 The true root namespace is available only via introspection with the
-C<interpinfo> opcode, e.g. C<$P0 = interpinfo .NAMESPACE_ROOT>.
+C<interpinfo> opcode, e.g. C<$P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT>.
 
 =item HLL Implementation Namespaces
 
@@ -245,6 +245,23 @@ NOTE: This is a naive method.  It does not account for any aliasing.
 
 =over 4
 
+=item get_namespace($P0)
+
+Ask this compiler to find its namespace named by the elements of the array in
+$P0.  Returns namespace PMC on success and null PMC on failure.  Note that a
+null PMC or an empty array requests the HLL's base namespace.
+
+This method allows other HLLs to know one name (the HLL) and then work with
+that HLL's modules without having to know the name it chose for its namespace
+tree.  (If you really want to know the name, the name() method should work on
+the returned namespace PMC.)
+
+Note that this method is basically a convenience and/or performance hack, as
+it does the equivalent of C<interpinfo .INTERPINFO_NAMESPACE_ROOT> followed by
+zero or more calls to <namespace>.find_namespace().  However, any compiler is
+free to cheat if it doesn't get caught, e.g. to use the untyped namespace
+interface if the language doesn't mangle namespace names.
+
 =item load_library($P0, $P1)
 
 Ask this compiler to load a library/module named by the elements of the array
@@ -279,6 +296,10 @@ that it may have been exported to.)
 =back
 
 =head2 Namespace Opcodes
+
+Note that all namespace opcodes operate from the local HLL root namespace.
+Navigating outside one's own HLL namespace requires either the C<interpinfo
+.INTERPINFO_NAMESPACE_ROOT> opcode or the get_namespace() compiler PMC method.
 
 =over 4
 
@@ -433,12 +454,15 @@ PIR:
 
   .sub main :main
     $P0 = find_name "&foo"
-    $P1 = get_namespace ["perl6"; "Foo"]
+    $P1 = get_namespace ["Foo"]
+
     # A smart perl6 compiler would emit this,
     # because it knows that Foo is a perl6 namespace:
-    #   $P1["&bar"] = $P0
-    # But a naive one would emit this:
+    $P1["&bar"] = $P0
+
+    # But a naive perl6 compiler would emit this:
     $P1.add_sub("bar", $P0)
+
     end
   .end
 
@@ -454,16 +478,22 @@ Perl5:
   use tcl:Some::Module 'w*';   # XXX - is ':' after HLL standard Perl 6?
   write("this is a tcl command");
 
-PIR:
+PIR (without error checking):
 
   .sub main :main
     .local pmc tcl
+    .local pmc ns
     tcl = compreg "tcl"
-    tcl.load_library("Some", "Module")
-    $P0 = get_namespace
-    $P1 = get_namespace ["tcl"; "Some"; "Module"]
-    $P1.export_to($P0, 'w*')
-    write("this is a tcl command")
+    ns = new .Array
+    ns = 2
+    ns[0] = "Some"
+    ns[1] = "Module"
+    null $P0
+    tcl.load_library(ns, $P0)
+    $P0 = tcl.get_namespace(ns)
+    $P1 = get_namespace
+    $P0.export_to($P1, 'w*')
+    "write"("this is a tcl command")
     end
   .end
 
