@@ -29,7 +29,7 @@ help:
 	@echo ""
 
 test: build
-	cd .. && $(PERL) -I../lib HQ9plus/t/harness 
+	$(PERL) -Ilib -I../../lib t/harness
 
 build: HQ9plus.pbc 
 

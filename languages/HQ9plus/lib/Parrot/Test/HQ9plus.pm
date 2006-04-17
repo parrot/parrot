@@ -43,19 +43,33 @@ foreach my $func ( keys %language_test_map ) {
   
         my $count = $self->{builder}->current_test + 1;
 
+        my $language = 'HQ9plus';
         # flatten filenames (don't use directories)
-        my $lang_fn   = Parrot::Test::per_test( '.HQ9plus', $count );
-        my $out_fn    = Parrot::Test::per_test( '.out', $count );
-        my @test_prog = ( "$self->{parrot} languages/HQ9plus/HQ9plus.pbc languages/${lang_fn}" );
+        my $lang_fn        = Parrot::Test::per_test( '.HQ9plus', $count );
+        my $out_fn         = Parrot::Test::per_test( '.out', $count );
+        my $path_to_parrot = Parrot::Test::path_to_parrot();
+        my $dir_count      = scalar(File::Spec->splitdir($path_to_parrot));
+        my $path_to_language;
+        if ($dir_count == 0) {
+          $path_to_language = File::Spec->join('languages', $language);
+        } elsif ($dir_count == 1) {
+          $path_to_language = $language;
+        } elsif ($dir_count == 2) {
+          $path_to_language = '.';
+        } elsif ($dir_count >2) {
+          $path_to_language = File::Spec->join(File::Spec->updir() x ($dir_count - 2));
+        }
+        my @test_prog = 
+            ( join( ' ',
+                    File::Spec->join($path_to_parrot,$self->{parrot}), 
+                    File::Spec->join($path_to_language, 'HQ9plus.pbc'),
+                    $lang_fn ) );
 
-        # This does nor create byte code, but HQ9plus code
-        my $parrotdir = dirname( $self->{parrot} );
         Parrot::Test::write_code_to_file( $code, $lang_fn );
 
         # STDERR is written into same output file
         my $exit_code = Parrot::Test::run_command( 
                             \@test_prog, 
-                            CD     => $self->{relpath}, 
                             STDOUT => $out_fn,
                             STDERR => $out_fn 
                         );

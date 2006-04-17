@@ -1,3 +1,5 @@
+#! perl
+
 # Copyright: 2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -12,8 +14,8 @@ Very basic checks, but all tests of HQ9plus are necessarily basic
 =cut
 
 use strict;
-use FindBin;
-use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
+use warnings;
+use lib qw( lib ../lib ../../lib HQ9plus/lib );
 
 use Parrot::Test tests => 6;
 
