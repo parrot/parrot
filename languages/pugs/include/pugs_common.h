@@ -1,4 +1,4 @@
-# $Id$
+/* $Id$ */
 
 #if !defined(PARROT_PUGS_COMMONL_H_GUARD)
 #define PARROT_PUGS_COMMONL_H_GUARD

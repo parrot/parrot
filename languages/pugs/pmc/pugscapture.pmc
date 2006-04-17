@@ -1,0 +1,518 @@
+/*
+Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+$Id: /mirror/trunk/languages/pugs/pmc/pugsany.pmc 11881 2006-03-12T19:50:14.576237Z bernhard  $
+
+=head1 NAME
+
+pugscapture.pmc - Pugs Capture
+
+=head1 DESCRIPTION
+
+C<PugsCapture> extends C<Siva> (currently in-lined) to provide a Perl 6 Capture object.
+
+(The following is from the original C<Siva> PMC by  Stephane Payrard)
+
+Siva is a type that acts as a hash, array , string scalar, int
+scalar. It is intended as the type for nodes of attributed trees
+These attributed trees may probably be of various kinds such as
+parse trees and XML trees. The intensive use of context should
+minimize explicit structure walking at the level of assembly code.
+
+Hashes and arrays are allocated only when needed.
+
+=cut
+*/
+
+#include "parrot/parrot.h"
+
+typedef struct siva {
+  INTVAL  uid;       /* will be accessible as an element of index ??? */
+  Hash*    hash;
+  STRING* s;
+} siva;
+
+static PMC* intret;
+// STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC * key);
+static PMC* undef_pmc;
+
+/*
+  The next four functions are copied verbatim from perlhash.pmc and array.pmc.
+  When it will be clear that I can use them without changing them
+  I need to suppress the local copy and make them global in array.pmc
+*/
+
+
+/*
+
+=item C<static STRING* make_hash_key(Interp *interpreter, PMC *key)>
+
+Returns a Parrot string for C<*key>.
+
+=cut
+
+*/
+
+static STRING* make_hash_key(Interp* interpreter, PMC * key)
+{
+    if (key == NULL) {
+        internal_exception(OUT_OF_BOUNDS,
+        "Cannot use NULL key for PerlHash!\n");
+        return NULL;
+    }
+    return key_string(interpreter, key);
+}
+
+/*
+ same routine in array.pmc should be global
+
+=item C<static PMC* undef(Interp* interpreter)>
+
+Returns a C<PerlUndef> PMC.
+
+=cut
+
+*/
+
+static PMC* undef(Interp* interpreter)
+{
+    return pmc_new(interpreter, enum_class_Undef);
+}
+
+/*
+ same routine in array.pmc should be global
+
+=item C<static PMC* retval(Interp *interp, void *ret)>
+
+Processes C<*ret>, returning the appropriate PMC, or raising an
+exception if necessary.
+
+=cut
+
+*/
+
+static PMC* retval(Interp *interp, void *ret)
+{
+    PMC *value;
+    if (ret == 0)
+    internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
+    /* XXX getting non existent value, exception or undef?
+     * current is for perlarray */
+    if (ret == (void*) -1)
+        value = undef(interp);
+    else {
+        value = *(PMC**) ret;
+        if (value == NULL)  /* XXX same here */
+            value = undef(interp);
+    }
+    return value;
+}
+
+
+static PMC*
+Parrot_Array_pop_pmc_ptr(Interp *interp, List *list)
+{
+    return retval(interp, list_pop(interp, list, enum_type_PMC));
+}
+
+
+
+/*
+
+=item C<static PMC*
+Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)>
+
+Returns a pointer to the element at index C<key> of C<*list>. If
+this element was previously empty, then this function also creates
+and assigns an "undef" PMC (currently a C<PerlUndef>, but this may
+change) to that element.
+
+=cut
+
+*/
+
+static PMC*
+Parrot_Array_get_pmc_ptr(Interp *interp, List *list, INTVAL key)
+{
+    return retval(interp, list_get(interp, list, key, enum_type_PMC));
+}
+
+
+
+static PMC*
+Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
+{
+    void * ret = list_get(interp, list, key, enum_type_PMC);
+    PMC *value;
+
+    /*   if (ret == 0)
+        internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
+    */
+    /* assign into a sparse or not yet set value */
+    if (ret == 0 || ret == (void*) -1 || *(PMC**)ret == 0) {
+        value = undef(interp);
+        list_assign(interp, list, key, value, enum_type_PMC);
+    }
+    else
+        value = *(PMC**) ret;
+    return value;
+}
+
+static size_t
+key_hash_int(Interp *interp, void *hash, size_t seed)
+{
+    UNUSED(interp);
+    UNUSED((Hash *)hash);
+    return seed;
+}
+
+
+static int
+int_compare(Parrot_Interp interp, void *a, void *b)
+{
+    UNUSED(interp);
+    return a != b;
+}
+
+
+
+/* rhs and lhs versions needed to avoid the msg "warning: use of cast expressions as lvalues is deprecated"
+   Is there a better way?
+ */
+#define siva_int(a) ((INTVAL) PMC_struct_val(a))
+#define siva_set_int(a,v)  (PMC_struct_val(a) = (DPOINTER*) v)
+#define siva_ary(a)   ((List*) PMC_data(a))
+#define siva_set_ary(a,v)   PMC_data(a) = ((List*) v)
+#define siva_hash(a)  ((siva*) PMC_pmc_val(a))->hash
+#define siva_set_hash(a,v)  (((siva*) PMC_pmc_val(a))->hash) =((Hash*) v)
+#define siva_str(a)  ((siva*) PMC_pmc_val(a))->s
+#define siva_set_str(a,v)  (((siva*) PMC_pmc_val(a))->s) =((STRING*) v)
+
+
+#define siva_siva(a)  ((PMC*) PMC_pmc_val(a))
+#define siva_set_siva(a,v)  (PMC_pmc_val(a)) = ((PMC*) v)
+#define siva_ary_create_if_void(i,a) { if (!siva_ary(a)) siva_set_ary(a, list_new(i, enum_type_PMC)); }
+#define siva_hash_create_if_void(i,a) {  \
+    if (!siva_hash(a)) new_hash_x(i, &siva_hash(a), enum_type_ptr, Hash_key_type_int, int_compare, key_hash_int); \
+}
+#define siva_str_create_if_void(i,a) { \
+}
+
+
+pmclass PugsCapture extends PugsAny
+    need_ext
+    does array
+    does hash
+    dynpmc
+    group pugs_group
+    hll Perl6 {
+
+
+  voic class_init() {
+    undef_pmc = constant_pmc_new(INTERP, enum_class_Undef);
+  }
+
+  void init() {
+      PObj_custom_mark_SET(SELF);
+      siva_set_int(SELF, 0);
+      siva_set_siva(SELF, mem_sys_allocate(sizeof(siva)));    
+      siva_set_ary(SELF, 0);
+      siva_set_hash(SELF, 0);
+      siva_set_str(SELF, 0);
+
+  }
+
+    void destroy () {
+        mem_sys_free(siva_siva(SELF));
+    }
+
+
+    STRING* get_repr() {
+        return string_from_cstring(INTERP, "toto", 0);
+    }
+
+    STRING* get_string() {
+      /*        STRING* s = siva_str(SELF); */
+        if (siva_str(SELF))
+            return string_copy(INTERP, siva_str(SELF));
+        return siva_set_str(SELF, string_make_empty(INTERP, enum_stringrep_one, 0));
+    }
+
+
+    void set_string_native(STRING* val) {
+      siva_str(SELF) = string_copy(INTERP, val);
+    }
+
+
+  void mark() {
+    if (siva_hash(SELF))
+        mark_hash(INTERP, siva_hash(SELF));
+    if (siva_ary(SELF))
+        list_mark(INTERP, siva_ary(SELF));
+    if(PMC_str_val(SELF))
+        pobject_lives(INTERP, (PObj *)siva_str(SELF));
+
+  }
+
+  INTVAL get_integer () {
+    return siva_int(SELF);
+  }
+
+  void set_integer_native (INTVAL val) {
+    siva_set_int(SELF, val);
+  }
+
+    FLOATVAL get_number () {
+      return PMC_num_val(SELF);
+    }
+
+    INTVAL elements () {
+      if (!siva_ary(SELF))
+        return 0;
+      return siva_ary(SELF)->length;
+    }
+
+    void set_pmc_keyed_int (INTVAL i, PMC* src) {
+       siva_ary_create_if_void(INTERP, SELF);
+      list_assign(INTERP, siva_ary(SELF), i, src, enum_type_PMC);
+    }
+
+    void push_integer (INTVAL value) {
+        INTVAL nextix = DYNSELF.elements();
+        DYNSELF.set_integer_keyed_int(nextix, value);
+    }
+
+
+    PMC* get_pmc_keyed_int (INTVAL i) {
+      siva_ary_create_if_void(INTERP, SELF);
+      return retval(INTERP, list_get(INTERP, siva_ary(SELF), i, enum_type_PMC));
+    }
+
+
+    PMC* get_pmc_keyed_str (STRING* key) {
+        HashBucket *b = hash_get_bucket(INTERP, siva_hash(SELF),
+                                        key);
+        if (b == NULL) {
+            /* XXX should store the undef for consistency */
+            PMC *new_undef = pmc_new(INTERP, enum_class_Undef);
+            return new_undef;
+        }
+        return b->value;
+    }
+
+
+    PMC* get_pmc_keyed (PMC* key) {
+        PMC* valpmc;
+        STRING* keystr;
+        Hash *hash = siva_hash(SELF);
+        HashBucket *b;
+        PMC* nextkey;
+
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_integer_FLAG|KEY_number_FLAG: {
+                /* called from iterator with an integer idx in key
+                 * check if we really have Hash_key_type_int
+                 */
+                if (hash->key_type == Hash_key_type_int) {
+                    INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
+                    PMC_int_val(intret) = i;
+                    return intret;
+                }
+                else {
+                    STRING *s = hash_get_idx(INTERP, hash, key);
+                    VTABLE_set_string_native(INTERP, intret, s);
+                    return intret;
+                }
+           }
+            default:
+                keystr = make_hash_key(INTERP, key);
+        }
+        b = hash_get_bucket(INTERP, siva_hash(SELF),
+                                        keystr);
+        if (b == NULL) {
+            /* XXX should store the undef for consistency */
+            PMC *new_undef = pmc_new(INTERP, enum_class_Undef);
+            return new_undef;
+        }
+        nextkey = key_next(INTERP, key);
+        if (!nextkey)
+            return b->value;
+        return VTABLE_get_pmc_keyed(INTERP, (PMC*)b->value, nextkey);
+    }
+
+
+
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        STRING* keystr;
+        PMC* nextkey;
+        PMC* box;
+        PMC* val;
+
+        if (!key) return;
+        keystr = make_hash_key(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+            hash_put(INTERP, siva_hash(SELF), keystr, value);
+            return;
+        }
+        box = SELF.get_pmc_keyed_str(keystr);
+        if (box == NULL) {
+            /* autovivify an PerlHash */
+            box = pmc_new(INTERP, DYNSELF.type());
+        }
+        VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
+    }
+
+    PMC* get_pmc_keyed_str (STRING* key) {
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) siva_hash(SELF),
+                                        key);
+        if (b == NULL) {
+            /* XXX should store the undef for consistency */
+            PMC *new_undef = pmc_new(INTERP, enum_class_Undef);
+            return new_undef;
+        }
+        return b->value;
+    }
+
+
+    STRING* get_string_keyed_str (STRING* key) {
+        HashBucket *b = hash_get_bucket(INTERP, siva_hash(SELF),
+                                        key);
+        if (b == NULL) {
+            /* XXX Warning: use of uninitialized value */
+            return VTABLE_get_string(INTERP, pmc_new(INTERP, enum_class_Undef));
+        }
+        return VTABLE_get_string(INTERP, (PMC*) b->value);
+    }
+
+
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        STRING* keystr;
+        PMC* nextkey;
+        PMC* box;
+        PMC* val;
+
+        if (!key) return;
+        keystr = make_hash_key(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+            val = pmc_new(interpreter, enum_class_String);
+            VTABLE_set_string_native(INTERP, val, value);
+            siva_hash_create_if_void(INTERP, SELF);
+            hash_put(INTERP, siva_hash(SELF), keystr, val);
+            return;
+        }
+        box = SELF.get_pmc_keyed_str(keystr);
+        if (box == NULL) {
+            /* autovivify an PerlHash */
+            box = pmc_new(INTERP, DYNSELF.type());
+        }
+        VTABLE_set_string_keyed(INTERP, box, nextkey, value);
+    }
+
+
+    STRING* get_string_keyed (PMC* key) {
+        PMC* valpmc;
+        STRING* keystr;
+        HashBucket *b;
+        Hash *hash = siva_hash(SELF);
+        PMC* nextkey;
+
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_integer_FLAG|KEY_number_FLAG:
+                /* called from iterator with an integer idx in key */
+                if (hash->key_type == Hash_key_type_int) {
+                    INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
+                    return string_from_int(interpreter, i);
+                }
+                return hash_get_idx(INTERP, hash, key);
+            default:
+                keystr = make_hash_key(INTERP, key);
+        }
+        b = hash_get_bucket(INTERP, hash, keystr);
+        if (b == NULL) {
+            /* XXX Warning: use of uninitialized value */
+            return VTABLE_get_string(INTERP, undef_pmc);
+        }
+        nextkey = key_next(INTERP, key);
+        valpmc = b->value;
+        if (!nextkey)
+            return VTABLE_get_string(INTERP, valpmc);
+        return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
+    }
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        INTVAL ix;
+        PMC* nextkey;
+        PMC* box;
+
+        if (!key) return;
+
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+            DYNSELF.set_integer_keyed_int(ix, value);
+            return;
+        }
+        box = SELF.get_pmc_keyed_int(ix);
+        if (box == NULL) {
+            /* autovivify an Array */
+            box = pmc_new(INTERP, DYNSELF.type());
+        }
+        VTABLE_set_integer_keyed(INTERP, box, nextkey, value);
+    }
+
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        PMC * ptr;
+        siva_ary_create_if_void(INTERP, SELF);
+        ptr = Parrot_Array_set_pmc_ptr(INTERP, siva_ary(SELF), key);
+        VTABLE_set_integer_native(INTERP, ptr, value);
+    }
+
+
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        PMC* value;
+
+        if (!siva_ary(SELF)) return 0;
+        value = Parrot_Array_get_pmc_ptr(INTERP, siva_ary(SELF), key);
+        return VTABLE_get_integer(INTERP, value);
+    }
+
+    INTVAL get_integer_keyed (PMC* key) {
+        INTVAL ix;
+        PMC* nextkey;
+        PMC* box;
+
+        if (!key) return 0;
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_integer_keyed_int(ix);
+
+        box = SELF.get_pmc_keyed_int(ix);
+        if (box == NULL) box = undef(INTERP);
+        return VTABLE_get_integer_keyed(INTERP, box, nextkey);
+    }
+
+    void push_pmc (PMC* value) {
+        INTVAL nextix = DYNSELF.elements();
+        DYNSELF.set_pmc_keyed_int(nextix, value);
+    }
+
+    PMC* pop_pmc () {
+        return Parrot_Array_pop_pmc_ptr(INTERP, siva_ary(SELF));
+    }
+
+    /*
+
+    void bitwise_or_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            siva_int(SELF) | value
+        );
+    }
+    */
+
+
+
+
+} 

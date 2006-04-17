@@ -15,6 +15,7 @@ PMCS = \
     pugsbit \
     pugsbool \
     pugscode \
+    pugscapture \
     pugsint \
     pugsmapping \
     pugsnum \
