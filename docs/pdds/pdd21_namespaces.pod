@@ -463,7 +463,6 @@ PIR:
     # But a naive perl6 compiler would emit this:
     $P1.add_sub("bar", $P0)
 
-    end
   .end
 
   .sub foo
@@ -494,7 +493,6 @@ PIR (without error checking):
     $P1 = get_namespace
     $P0.export_to($P1, 'w*')
     "write"("this is a tcl command")
-    end
   .end
 
 =head1 ATTACHMENTS
