@@ -250,7 +250,6 @@ Find the variable $3 in $2.
 =cut
 
 op get_namespace(out PMC) {
-    PMC *current_sub;
     $1 = CONTEXT(interpreter->ctx)->current_namespace;
     goto NEXT();
 }

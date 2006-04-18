@@ -1689,7 +1689,7 @@ Parrot_isle_i_nc_n {
 ; TODO check alignment, and maybe move 1 msk into reg
 ;
 Parrot_pow_n_n_i {
-    int e_reg, saved = 0;
+    int saved = 0;
     char *L1, *L2, *L3, *L4, *L5, *L6;
 
     emitm_fld1(NATIVECODE);              /* res = 1.0  ST(1) */

@@ -151,13 +151,13 @@ interpreter's errors setting.
 PMC *
 Parrot_get_name(Interp* interpreter, STRING *name)
 {
-    PMC *g, *lex_pad, *current_sub, *namespace;
+    PMC *g, *lex_pad, *namespace;
     parrot_context_t *ctx = CONTEXT(interpreter->ctx);
 
     lex_pad = Parrot_find_pad(interpreter, name, ctx);
     g = NULL;
     if (!PMC_IS_NULL(lex_pad)) {
-	g = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, name);
+        g = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, name);
     }
     if (!g) {
         namespace = CONTEXT(interpreter->ctx)->current_namespace;

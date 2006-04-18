@@ -292,7 +292,6 @@ Note that C<exit_code> is ignored.
 void
 Parrot_really_destroy(int exit_code, void *vinterp)
 {
-    int i;
     Interp *interpreter = (Interp*) vinterp;
 
     UNUSED(exit_code);

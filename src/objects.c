@@ -400,8 +400,7 @@ Parrot_new_class(Interp* interpreter, PMC *class, PMC *name)
 {
     SLOTTYPE *class_array;
     PMC *mro;
-    STRING *class_name;
-    
+
     /* check against duplicate newclasses */
     fail_if_exist(interpreter, name);
 
