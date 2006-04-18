@@ -171,6 +171,10 @@ a NameSpace or a var, the NameSpace is returned.
         PMC *ns = SELF, *next;
         STRING *part;
         INTVAL i, n;
+        if (key->vtable->base_type == enum_class_String) {
+            SELF.set_pmc_keyed_str(VTABLE_get_string(INTERP, key), value);
+            return;
+        }
         if (key->vtable->base_type == enum_class_Key) {
             while (1) {
                 part = key_string(INTERP, key);
@@ -229,7 +233,10 @@ a NameSpace or a var, the NameSpace is returned.
         STRING *part;
         INTVAL i, n;
         
-        if (key->vtable->base_type == enum_class_Key) {
+        if (key->vtable->base_type == enum_class_String) {
+            return SELF.get_pmc_keyed_str(VTABLE_get_string(INTERP, key));
+        }
+        else if (key->vtable->base_type == enum_class_Key) {
             while (key) {
                 part = key_string(INTERP, key);
                 ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
@@ -253,7 +260,9 @@ a NameSpace or a var, the NameSpace is returned.
 
 /*
 
-=item C<void* get_pointer_keyed_str(PMC *key)> 
+=item C<void* get_pointer_keyed_str(STRING *key)> 
+
+=item C<void* get_pointer_keyed(PMC *key)> 
 
 Return the given namespace item or PMCNULL. If the named item is either
 a NameSpace or a var, the var is returned.
@@ -270,6 +279,36 @@ a NameSpace or a var, the var is returned.
         if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
                 ns->vtable->base_type == enum_class_FixedPMCArray)
             ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
+        return ns;
+    }
+
+    void* get_pointer_keyed(PMC *key) {
+        PMC *ns = SELF;
+        STRING *part;
+        INTVAL i, n;
+        
+        if (key->vtable->base_type == enum_class_String) {
+            return SELF.get_pointer_keyed_str(VTABLE_get_string(INTERP, key));
+        }
+        else if (key->vtable->base_type == enum_class_Key) {
+            while (key) {
+                part = key_string(INTERP, key);
+                ns = VTABLE_get_pointer_keyed_str(INTERP, ns, part);
+                if (PMC_IS_NULL(ns))
+                    return PMCNULL;
+                key = key_next(INTERP, key);
+            }
+            return ns;
+        }
+        n = VTABLE_elements(INTERP, key);
+        if (!n)
+            return PMCNULL;
+        for (i = 0; i < n; ++i) {
+            part = VTABLE_get_string_keyed_int(INTERP, key, i);
+            ns = VTABLE_get_pointer_keyed_str(INTERP, ns, part);
+            if (PMC_IS_NULL(ns))
+                return PMCNULL;
+        }
         return ns;
     }
     

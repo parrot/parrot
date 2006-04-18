@@ -24,8 +24,40 @@ Handles class and object manipulation.
 
 #include "objects.str"
 
-static void parrot_class_register(Interp * , STRING *class_name,
+static void parrot_class_register(Interp * , PMC *name,
         PMC *new_class, PMC *parent, PMC *mro);
+
+static void
+fail_if_exist(Interp *interpreter, PMC *name)
+{
+    STRING *class_name;
+    INTVAL type;
+
+    if (name->vtable->base_type == enum_class_String)  {
+        class_name = VTABLE_get_string(interpreter, name);
+        type = pmc_type(interpreter, class_name);
+    }
+    else {
+        PMC * const classname_hash = interpreter->class_hash;
+        PMC * type_pmc = VTABLE_get_pointer_keyed(interpreter, 
+                classname_hash, name); 
+        if (PMC_IS_NULL(type_pmc))
+            type = 0;
+        else
+            type = VTABLE_get_integer(interpreter, type_pmc);
+        /* TODO get printable name */
+        class_name = VTABLE_get_string(interpreter, name);
+    }
+    if (type > enum_type_undef) {
+        real_exception(interpreter, NULL, INVALID_OPERATION,
+                "Class %Ss already registered!\n", class_name);
+    }
+    if (type < enum_type_undef) {
+        real_exception(interpreter, NULL, INVALID_OPERATION,
+                "native type with name '%s' already exists - "
+                "can't register Class", data_types[type].name);
+    }
+}
 
 /*
  * FIXME make array clone shallow
@@ -270,6 +302,22 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     PMC *classname_pmc;
     PMC *parents, *temp_pmc, *mro;
     int parent_is_class;
+
+    /* Set the classname, if we have one */
+    classname_pmc = pmc_new(interpreter, enum_class_String); /* XXX */
+    if (child_class_name) {
+        VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
+        fail_if_exist(interpreter, classname_pmc);
+    }
+    else {
+        /* XXX not really threadsafe but good enough for now */
+        static int anon_count;
+
+        child_class_name = Parrot_sprintf_c(interpreter, "%c%canon_%d",
+                0, 0, ++anon_count);
+        VTABLE_set_string_native(interpreter, classname_pmc,
+                child_class_name );
+    }
     /*
      * ParrotClass is the baseclass anyway, so build just a new class
      */
@@ -296,20 +344,6 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     VTABLE_set_pmc_keyed_int(interpreter, parents, 0, base_class);
     set_attrib_num(child_class, child_class_array, PCD_PARENTS, parents);
 
-    /* Set the classname, if we have one */
-    classname_pmc = pmc_new(interpreter, enum_class_String);
-    if (child_class_name) {
-        VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
-    }
-    else {
-        /* XXX not really threadsafe but good enough for now */
-        static int anon_count;
-
-        child_class_name = Parrot_sprintf_c(interpreter, "%c%canon_%d",
-                0, 0, ++anon_count);
-        VTABLE_set_string_native(interpreter, classname_pmc,
-                child_class_name );
-    }
 
     set_attrib_num(child_class, child_class_array, PCD_CLASS_NAME, classname_pmc);
 
@@ -324,7 +358,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     set_attrib_num(child_class, child_class_array, PCD_CLASS_ATTRIBUTES,
             temp_pmc);
 
-    parrot_class_register(interpreter, child_class_name, child_class,
+    parrot_class_register(interpreter, classname_pmc, child_class,
             base_class, mro);
 
     rebuild_attrib_stuff(interpreter, child_class);
@@ -360,12 +394,9 @@ Parrot_new_class(Interp* interpreter, PMC *class, PMC *name)
     PMC *mro;
     STRING *class_name;
     
-    if (name->vtable->base_type == enum_class_String)
-        class_name = VTABLE_get_string(interpreter, name);
-    else {
-        /* XXX */
-        class_name = const_string(interpreter, "not yet");
-    }
+    /* check against duplicate newclasses */
+    fail_if_exist(interpreter, name);
+
     /* Hang an array off the data pointer, empty of course */
     set_attrib_array_size(class, PCD_MAX);
     class_array = PMC_data(class);
@@ -392,7 +423,7 @@ Parrot_new_class(Interp* interpreter, PMC *class, PMC *name)
     /* Set the classname */
     set_attrib_num(class, class_array, PCD_CLASS_NAME, name);
 
-    parrot_class_register(interpreter, class_name, class, NULL, mro);
+    parrot_class_register(interpreter, name, class, NULL, mro);
 
     rebuild_attrib_stuff(interpreter, class);
 }
@@ -419,21 +450,35 @@ Parrot_class_lookup(Interp* interpreter, STRING *class_name)
         const INTVAL type = PMC_int_val((PMC*)bucket->value);
         PMC * const pmc = interpreter->vtables[type]->class;
         assert(pmc);
-#if 0
-        if (!pmc) {
-            pmc = interpreter->vtables[type]->class =
-                pmc_new_noinit(interpreter, type);
-        }
-#endif
         return pmc;
     }
     return PMCNULL;
 }
 
+static INTVAL
+register_type(Interp *interpreter, PMC *name)
+{
+    INTVAL type;
+    PMC * classname_hash, *item;
+
+    classname_hash = interpreter->class_hash;
+
+    type = interpreter->n_vtable_max++;
+    /* Have we overflowed the table? */
+    if (type >= interpreter->n_vtable_alloced) {
+        parrot_realloc_vtables(interpreter);
+    }
+    /* set entry in name->type hash */
+    item = pmc_new(interpreter, enum_class_Integer);
+    PMC_int_val(item) = type;
+    VTABLE_set_pmc_keyed(interpreter, classname_hash, name, item);
+    return type;
+}
+
 /*
 
 =item C<static void
-parrot_class_register(Interp* interpreter, STRING *class_name,
+parrot_class_register(Interp* interpreter, PMC *class_name,
         PMC *new_class, PMC *mro)>
 
 This is the way to register a new Parrot class as an instantiable
@@ -447,22 +492,15 @@ you can create a new C<foo> in PASM like this: C<new Px, foo>.
 */
 
 static void
-parrot_class_register(Interp* interpreter, STRING *class_name,
+parrot_class_register(Interp* interpreter, PMC *name,
         PMC *new_class, PMC *parent, PMC *mro)
 {
     VTABLE *new_vtable, *parent_vtable;
     PMC *vtable_pmc;
     PMC *ns, *top;
-    INTVAL new_type = pmc_type(interpreter, class_name);
+    INTVAL new_type;
 
-    /*
-     * register the class in the PMCs name class_hash
-     */
-    if (new_type > enum_type_undef) {
-        real_exception(interpreter, NULL, INVALID_OPERATION,
-                "Class %Ss already registered!\n", class_name);
-    }
-    new_type = pmc_register(interpreter, class_name);
+    new_type = register_type(interpreter, name);
     /* Build a new vtable for this class
      * The child class PMC gets the vtable of its parent class or
      * a ParrotClass vtable
@@ -492,7 +530,7 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
 
     /* check if we already have a NameSpace */
     top = CONTEXT(interpreter->ctx)->current_namespace;
-    ns = VTABLE_get_pmc_keyed_str(interpreter, top, class_name);
+    ns = VTABLE_get_pmc_keyed(interpreter, top, name);
     /* XXX nested, use current as base ? */
     if (PMC_IS_NULL(ns)) {
         /* XXX try HLL namespace too XXX */
@@ -501,11 +539,11 @@ parrot_class_register(Interp* interpreter, STRING *class_name,
 
         top =  VTABLE_get_pmc_keyed_int(interpreter, 
                 interpreter->HLL_namespace, hll_id);
-        ns = VTABLE_get_pmc_keyed_str(interpreter, top, class_name);
+        ns = VTABLE_get_pmc_keyed(interpreter, top, name);
     }
     if (PMC_IS_NULL(ns)) {
         ns = pmc_new(interpreter, enum_class_NameSpace);
-        VTABLE_set_pmc_keyed_str(interpreter, top, class_name, ns);
+        VTABLE_set_pmc_keyed(interpreter, top, name, ns);
     }
     /* attach namspace to vtable */
     new_vtable->_namespace = ns;

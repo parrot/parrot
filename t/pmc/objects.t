@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 64;
+use Parrot::Test tests => 66;
 
 =head1 NAME
 
@@ -1959,4 +1959,36 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "newclass [] parsing)");
     end
 CODE
 ok
+OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "verfiy namespace types");
+    newclass P0, ['Foo';'Bar']
+    getinterp P0
+    .include "iglobals.pasm"
+    set P1, P0[.IGLOBALS_CLASSNAME_HASH]
+    typeof S0, P1
+    print S0
+    print "\n"
+    set P2, P1['Foo']
+    typeof S0, P2
+    print S0
+    print "\n"
+    end
+CODE
+NameSpace
+NameSpace
+OUTPUT
+
+pasm_output_like(<<'CODE', <<'OUTPUT', "verfiy data type");
+    newclass P0, ['Foo';'Bar']
+    getinterp P0
+    .include "iglobals.pasm"
+    set P1, P0[.IGLOBALS_CLASSNAME_HASH]
+    set P2, P1['Foo']
+    set P3, P2['Bar']
+    print P3
+    print "\n"
+    end
+CODE
+/\d+/
 OUTPUT
