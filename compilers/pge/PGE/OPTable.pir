@@ -148,7 +148,7 @@ PGE::OPTable - PGE operator precedence table and parser
     # we don't replace existing tokens
     .local pmc tokentable
     tokentable = self
-    $I0 = exists tokentable['name']
+    $I0 = exists tokentable[name]
     if $I0 goto end
     tokentable[name] = token
 
