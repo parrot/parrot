@@ -36,7 +36,7 @@ typedef enum {
 } PARROT_OBJECT_DATA_ENUM;
 
 PARROT_API PMC *Parrot_single_subclass(Parrot_Interp, PMC *, STRING *);
-PARROT_API void Parrot_new_class(Parrot_Interp, PMC *, STRING *);
+PARROT_API void Parrot_new_class(Parrot_Interp, PMC *, PMC *);
 PARROT_API PMC *Parrot_class_lookup(Parrot_Interp, STRING *);
 PARROT_API PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
 PARROT_API PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);

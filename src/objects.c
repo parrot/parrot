@@ -345,7 +345,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
 /*
 
 =item C<void
-Parrot_new_class(Interp* interpreter, PMC *class, STRING *class_name)>
+Parrot_new_class(Interp* interpreter, PMC *class, PMC *class_name)>
 
 Creates a new class, named C<class_name>.
 
@@ -354,11 +354,18 @@ Creates a new class, named C<class_name>.
 */
 
 void
-Parrot_new_class(Interp* interpreter, PMC *class, STRING *class_name)
+Parrot_new_class(Interp* interpreter, PMC *class, PMC *name)
 {
     SLOTTYPE *class_array;
-    PMC *classname_pmc, *mro;
-
+    PMC *mro;
+    STRING *class_name;
+    
+    if (name->vtable->base_type == enum_class_String)
+        class_name = VTABLE_get_string(interpreter, name);
+    else {
+        /* XXX */
+        class_name = const_string(interpreter, "not yet");
+    }
     /* Hang an array off the data pointer, empty of course */
     set_attrib_array_size(class, PCD_MAX);
     class_array = PMC_data(class);
@@ -383,9 +390,7 @@ Parrot_new_class(Interp* interpreter, PMC *class, STRING *class_name)
             pmc_new(interpreter, enum_class_ResizablePMCArray));
 
     /* Set the classname */
-    classname_pmc = pmc_new(interpreter, enum_class_String);
-    VTABLE_set_string_native(interpreter, classname_pmc, class_name);
-    set_attrib_num(class, class_array, PCD_CLASS_NAME, classname_pmc);
+    set_attrib_num(class, class_array, PCD_CLASS_NAME, name);
 
     parrot_class_register(interpreter, class_name, class, NULL, mro);
 

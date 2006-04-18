@@ -85,14 +85,8 @@ argument is not a PMC* but the C<classname> STRING.
     void init_pmc (PMC* name) {
         STRING *class_name;
 
-        if (name->vtable->base_type == enum_class_String)
-            class_name = VTABLE_get_string(interpreter, name);
-        else {
-            /* XXX */
-            class_name = const_string(INTERP, "not yet");
-        }
         SELF.init();
-        Parrot_new_class(INTERP, SELF, class_name);
+        Parrot_new_class(INTERP, SELF, name);
     }
 
 /*
