@@ -24,7 +24,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 9;
 use Test::More;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function string.byte");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.byte' );
 print(string.byte("ABC"))
 print(string.byte("ABC", 2))
 print(string.byte("ABC", -1))
@@ -42,16 +42,14 @@ CODE
 65	66	67
 OUTPUT
 
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "method s:byte");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'method s:byte' );
 s = "ABC"
 print(s:byte(2))
 CODE
 66
 OUTPUT
 
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function string.char");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.char' );
 print(string.char(65, 66, 67))
 print(string.char())
 CODE
@@ -59,8 +57,7 @@ ABC
 
 OUTPUT
 
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function string.len");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.len' );
 print(string.len(""))
 print(string.len("test"))
 print(string.len("a\000b\000c"))
@@ -72,8 +69,7 @@ CODE
 1
 OUTPUT
 
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function string.lower");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.lower' );
 print(string.lower("Test"))
 print(string.lower("TeSt"))
 CODE
@@ -81,8 +77,7 @@ test
 test
 OUTPUT
 
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function string.rep");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.rep' );
 print(string.rep("ab", 3))
 print(string.rep("ab", 0))
 print(string.rep("ab", -1))
@@ -94,8 +89,7 @@ ababab
 
 OUTPUT
 
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function string.reverse");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.reverse' );
 print(string.reverse("abcde"))
 print(string.reverse("abcd"))
 print(string.reverse(""))
@@ -105,8 +99,7 @@ dcba
 
 OUTPUT
 
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function string.sub");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.sub' );
 print(string.sub("abcde", 1, 2))
 print(string.sub("abcde", -2))
 CODE
@@ -114,8 +107,7 @@ ab
 de
 OUTPUT
 
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function string.upper");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.upper' );
 print(string.upper("Test"))
 print(string.upper("TeSt"))
 CODE

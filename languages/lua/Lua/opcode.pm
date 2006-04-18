@@ -1,46 +1,49 @@
 use strict;
 
 package Lua::opcode;
+{
 
-sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
-	my $parser = shift;
-	my %attr = @_;
-	my $self = \%attr;
-	bless($self, $class);
-	foreach (keys %attr) {
-		unless (defined $self->{$_}) {
-			delete $self->{$_};
-		}
-	}
-	$self->{Lineno} = $parser->YYData->{lineno};
-	return $self;
-}
+    sub new {
+        my $proto  = shift;
+        my $class  = ref($proto) || $proto;
+        my $parser = shift;
+        my %attr   = @_;
+        my $self   = \%attr;
+        bless $self, $class;
+        foreach ( keys %attr ) {
+            unless ( defined $self->{$_} ) {
+                delete $self->{$_};
+            }
+        }
+        $self->{Lineno} = $parser->YYData->{lineno};
+        return $self;
+    }
 
-sub configure {
-	my $self = shift;
-	my %attr = @_;
-	my ($key, $value);
-	while ( ($key,$value) = each(%attr) ) {
-		if (defined $value) {
-			$self->{$key} = $value;
-		}
-	}
-	return $self;
-}
+    sub configure {
+        my $self = shift;
+        my %attr = @_;
+        while ( my ( $key, $value ) = each(%attr) ) {
+            if ( defined $value ) {
+                $self->{$key} = $value;
+            }
+        }
+        return $self;
+    }
 
-sub visit {
-	my $self = shift;
-	my $class = ref $self;
-	my $visitor = shift;
-	no strict "refs";
-	my $func = 'visit' . $class;
-	if ($visitor->can($func)) {
-		return $visitor->$func($self, @_);
-	}
-	warn "Please implement a function 'visit",ref $self,"' in '",ref $visitor,"'.\n";
-	return undef;
+    sub visit {
+        my $self    = shift;
+        my $class   = ref $self;
+        my $visitor = shift;
+        no strict "refs";
+        my $func = 'visit' . $class;
+        if ( $visitor->can($func) ) {
+            return $visitor->$func( $self, @_ );
+        }
+        warn "Please implement a function 'visit", ref $self, "' in '",
+            ref $visitor, "'.\n";
+        return undef;
+    }
+
 }
 
 package UnaryOp;

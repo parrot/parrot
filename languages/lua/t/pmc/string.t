@@ -20,7 +20,7 @@ Tests C<LuaString> PMC
 use Parrot::Test tests => 13;
 use Test::More;
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaString"
@@ -40,7 +40,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check interface");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaString"
@@ -64,7 +64,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check name");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaString"
@@ -84,7 +84,7 @@ string
 string
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaString"
@@ -106,7 +106,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check logical_not");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaString"
@@ -130,7 +130,7 @@ false
 boolean
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check embedded zero");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check embedded zero' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaString"
@@ -146,7 +146,7 @@ CODE
 13
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -165,7 +165,7 @@ simple string
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL (autoboxing)");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -185,7 +185,7 @@ simple string
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL & .const");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
 .HLL "Lua", "lua_group"
 .sub _main
     .const .LuaString cst1 = "simple string"
@@ -202,9 +202,9 @@ simple string
 OUTPUT
 
 TODO: {
-local $TODO = "empty string not handled by PIR.";
+local $TODO = 'empty string not handled by PIR.';
 
-pir_output_is(<< 'CODE', << 'OUTPUT', ".const & empty string");
+pir_output_is( << 'CODE', << 'OUTPUT', '.const & empty string' );
 .HLL "Lua", "lua_group"
 .sub _main
     .const .LuaString cst1 = ""
@@ -221,7 +221,7 @@ CODE
 OUTPUT
 }
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check tostring");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -242,7 +242,7 @@ value
 string
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -263,7 +263,7 @@ CODE
 number
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check tobase");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tobase' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1

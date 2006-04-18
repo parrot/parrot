@@ -26,7 +26,7 @@ use Parrot::Test tests => 8;
 use Test::More;
 
 TODO: {
-local $TODO = "coroutine";
+local $TODO = 'coroutine';
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'foo1' );
 function foo1 (a)
@@ -75,7 +75,7 @@ OUT
 
 
 TODO: {
-local $TODO = "coroutine";
+local $TODO = 'coroutine';
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()

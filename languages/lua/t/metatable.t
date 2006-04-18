@@ -35,7 +35,6 @@ CODE
 nil
 OUT
 
-
 language_output_like( 'lua', <<'CODE', <<'OUT', 'protected metatable' );
 t = {}
 mt = {}
@@ -47,14 +46,12 @@ CODE
 /cannot change a protected metatable/
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable for string' );
 assert(getmetatable("").__index == string)
 print("ok")
 CODE
 ok
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable for all types' );
 print(getmetatable(nil))
@@ -68,7 +65,6 @@ nil
 nil
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', '__tostring' );
 t = {}
 mt = { __tostring=function () return "__TABLE__" end }
@@ -77,7 +73,6 @@ print(tostring(t))
 CODE
 __TABLE__
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '__tostring no-output' );
 t = {}
@@ -90,7 +85,6 @@ return nothing
 nil
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', '__tostring too-many-output' );
 t = {}
 mt = {}
@@ -101,7 +95,6 @@ CODE
 __FIRST__
 OUT
 
-
 language_output_like( 'lua', <<'CODE', <<'OUT', '__tostring invalid' );
 t = {}
 t.mt = {}
@@ -111,7 +104,6 @@ print(tostring(t))
 CODE
 /attempt to call a string value/
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __add' );
 Cplx = {}
@@ -161,7 +153,6 @@ CODE
 (-1,3)
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __sub' );
 Cplx = {}
 Cplx.mt = {}
@@ -210,7 +201,6 @@ CODE
 (-3,-3)
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __mul' );
 Cplx = {}
 Cplx.mt = {}
@@ -258,7 +248,6 @@ CODE
 (3,9)
 (-2,-6)
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __div' );
 Cplx = {}
@@ -310,7 +299,6 @@ CODE
 (-2,0)
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __unm' );
 Cplx = {}
 Cplx.mt = {}
@@ -344,7 +332,6 @@ print(- c1)
 CODE
 (-1,-3)
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __eq' );
 Cplx = {}
@@ -389,7 +376,6 @@ true
 false
 true
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __lt __le' );
 Cplx = {}
@@ -468,7 +454,6 @@ false
 true
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __lt' );
 Cplx = {}
 Cplx.mt = {}
@@ -514,7 +499,7 @@ true
 OUT
 
 TODO: {
-local $TODO = "fix me (luabase.pmc:invoke)";
+local $TODO = 'fix me (luabase.pmc:invoke)';
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __call' );
 Cplx = {}
@@ -583,7 +568,6 @@ CODE
 nil
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'table-access' );
 -- create a namespace
 Window = {}
@@ -611,7 +595,6 @@ CODE
 nil
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'tables with default values' );
 function setDefault (t, d)
     local mt = {__index = function () return d end}
@@ -626,7 +609,6 @@ CODE
 10	nil
 10	0
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'tables with default values' );
 local mt = {__index = function (t) return t.___ end}
@@ -644,7 +626,6 @@ CODE
 10	0
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'tables with default values' );
 local key = {}
 local mt = {__index = function (t) return t[key] end}
@@ -661,7 +642,6 @@ CODE
 10	nil
 10	0
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'tracking table accesses' );
 t = {}  -- original table
@@ -691,7 +671,6 @@ CODE
 *access to element 2
 hello
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'tracking table accesses' );
 -- create private index
@@ -727,7 +706,6 @@ CODE
 hello
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'read-only tables' );
 function readOnly (t)
     local proxy = {}
@@ -748,7 +726,6 @@ print(days[1])
 CODE
 Sunday
 OUT
-
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'read-only tables' );
 function readOnly (t)
@@ -771,7 +748,6 @@ CODE
 /attempt to update a read-only table/
 OUT
 
-
 language_output_like( 'lua', <<'CODE', <<'OUT', 'declaring global variables' );
 setmetatable(_G, {
     __newindex = function (_, n)
@@ -786,7 +762,6 @@ a = 1
 CODE
 /attempt to write to undeclared variable a/
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'declaring global variables' );
 function declare (name, initval)

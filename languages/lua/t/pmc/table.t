@@ -20,7 +20,7 @@ Tests C<LuaTable> PMC
 use Parrot::Test tests => 12;
 use Test::More;
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -44,7 +44,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check interface");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -64,7 +64,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check name");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -84,7 +84,7 @@ table
 table
 OUTPUT
 
-pir_output_like(<< 'CODE', << 'OUTPUT', "check get_string");
+pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -98,7 +98,7 @@ CODE
 /table: [0-9A-Fa-f]{8}/
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -118,7 +118,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check logical_not");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -141,7 +141,7 @@ false
 boolean
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check key PMC");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check key PMC' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -174,7 +174,7 @@ value2
 nil
 OUTPUT
 
-pir_output_like(<< 'CODE', << 'OUTPUT', "check key nil");
+pir_output_like( << 'CODE', << 'OUTPUT', 'check key nil' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -194,7 +194,7 @@ CODE
 /table index is nil/
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check deletion by assignment of nil");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check deletion by assignment of nil' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaTable"
@@ -235,7 +235,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -250,7 +250,7 @@ CODE
 1
 OUTPUT
 
-pir_output_like(<< 'CODE', << 'OUTPUT', "check tostring");
+pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -268,7 +268,7 @@ CODE
 /table: [0-9A-Fa-f]{8}\ntable: [0-9A-Fa-f]{8}\nstring/
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1

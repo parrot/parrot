@@ -46,7 +46,7 @@ CODE
 OUT
 
 SKIP: {
-skip("while exp", 1);
+skip( 'while exp', 1 );
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'scope' );
 x = 10
@@ -97,7 +97,6 @@ nil
 1	10
 OUT
 
-
 #language_output_is( 'lua', <<'CODE', <<'OUT', 'scope' );
 #do
 #    local a2 = 1*a
@@ -105,7 +104,7 @@ OUT
 #    x1 = (-b + d)/a2
 #    x1 = (-b - d)/a2
 #end
-#print(x1, x2)    
+#print(x1, x2)
 #CODE
 #OUT
 

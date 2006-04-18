@@ -213,7 +213,6 @@ CODE
 /attempt to concatenate a boolean value/
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', '1.0 == 1' );
 print(1.0 == 1)
 CODE

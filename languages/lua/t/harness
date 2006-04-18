@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -45,51 +45,61 @@ use Test::Harness();
 
 my $language = 'lua';
 
-if ( grep { m/^--files$/ } @ARGV ) {
+if ( grep {m/^--files$/} @ARGV ) {
+
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
     my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
     push @files, glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
-} else {
+}
+else {
     my @files;
+
     # TODO: use Getopt::Long or such
-    my $use_orig_lua = ( grep { m/^--use-lua$/ } @ARGV ) ? 1 : 0;
-    my $use_monkey = ( grep { m/^--use-monkey$/ } @ARGV ) ? 1 : 0;
-    my $use_lua2pir = ( grep { m/^--use-lua2pir$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--use-lua$/ } @ARGV;
-    @ARGV = grep { ! m/^--use-monkey$/ } @ARGV;
-    @ARGV = grep { ! m/^--use-lua2pir$/ } @ARGV;
+    my $use_orig_lua = ( grep {m/^--use-lua$/} @ARGV )     ? 1 : 0;
+    my $use_monkey   = ( grep {m/^--use-monkey$/} @ARGV )  ? 1 : 0;
+    my $use_lua2pir  = ( grep {m/^--use-lua2pir$/} @ARGV ) ? 1 : 0;
+    @ARGV = grep { !m/^--use-lua$/ } @ARGV;
+    @ARGV = grep { !m/^--use-monkey$/ } @ARGV;
+    @ARGV = grep { !m/^--use-lua2pir$/ } @ARGV;
     if ( scalar(@ARGV) ) {
+
         # Someone specified tests for me to run.
-        @files = grep { -f $_ } @ARGV
-    } else {
-        ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+        @files = grep { -f $_ } @ARGV;
+    }
+    else {
+        ( undef, undef, my $current_dir )
+            = File::Spec->splitpath( Cwd::getcwd() );
         if ( $current_dir eq 'languages' ) {
             @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
-            push @files, glob( File::Spec->catfile( $language, 't', '*', '*.t' ) )
-                    unless ( $use_orig_lua );
+            push @files,
+                glob( File::Spec->catfile( $language, 't', '*', '*.t' ) )
+                unless ($use_orig_lua);
         }
         elsif ( $current_dir eq $language ) {
             @files = glob( File::Spec->catfile( 't', '*.t' ) );
             push @files, glob( File::Spec->catfile( 't', '*', '*.t' ) )
-                    unless ( $use_orig_lua );
+                unless ($use_orig_lua);
         }
     }
 
-    if ( $use_orig_lua ) {
+    if ($use_orig_lua) {
         $ENV{PARROT_LUA_TEST_PROG} = 'lua';
-        Test::Harness::runtests( @files ) if scalar( @files );
-    } elsif ( $use_monkey ) {
+        Test::Harness::runtests(@files) if scalar(@files);
+    }
+    elsif ($use_monkey) {
         $ENV{PARROT_LUA_TEST_PROG} = 'monkey';
-        Test::Harness::runtests( @files ) if scalar( @files );
-    } elsif ( $use_lua2pir ) {
+        Test::Harness::runtests(@files) if scalar(@files);
+    }
+    elsif ($use_lua2pir) {
         $ENV{PARROT_LUA_TEST_PROG} = 'lua2pir';
-        Test::Harness::runtests( @files ) if scalar( @files );
-    } else {
-        $ENV{PARROT_LUA_TEST_PROG} = '';
-        Test::Harness::runtests( @files ) if scalar( @files );
+        Test::Harness::runtests(@files) if scalar(@files);
+    }
+    else {
+        $ENV{PARROT_LUA_TEST_PROG} = q{};
+        Test::Harness::runtests(@files) if scalar(@files);
     }
 }
 
@@ -106,3 +116,4 @@ F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harn
 Francois Perrad
 
 =cut
+

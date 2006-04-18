@@ -40,7 +40,6 @@ CODE
 100
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'f' );
 function f(a, b) return a or b end
 
@@ -52,7 +51,6 @@ CODE
 3
 3
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'incCount' );
 count = 0
@@ -76,7 +74,6 @@ CODE
 4
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'maximum' );
 function maximum (a)
     local mi = 1		-- maximum index
@@ -94,7 +91,6 @@ print(maximum({8,10,23,12,5}))
 CODE
 23	3
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'call by value' );
 function f (n) 
@@ -114,7 +110,6 @@ CODE
 11	12
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'call by ref' );
 function f (t)
     local n = table.getn(t) 
@@ -133,7 +128,6 @@ a,b,c,end
 a,b,c,end
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
 local function g(a, b, ...)
     local arg = {...}
@@ -148,7 +142,6 @@ CODE
 3	4	0	nil	nil
 3	4	2	5	8
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
 local function g(a, b, ...)
@@ -165,7 +158,6 @@ CODE
 3	4	5	8	nil
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
 local function g(a, b, ...)
     print(a, b, ...) 
@@ -179,7 +171,6 @@ CODE
 3	4
 3	4	5	8
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
 function f() return 1, 2 end
@@ -197,7 +188,6 @@ a	1	2
 1	b
 c	1
 OUT
-
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'orphan break' );
 function f()

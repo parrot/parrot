@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/while.t - Lua C<while> statement
+t/while.t - Lua while statement
 
 =head1 SYNOPSIS
 
@@ -73,5 +73,4 @@ CODE
 4
 6
 OUT
-
 

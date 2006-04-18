@@ -20,7 +20,7 @@ Tests C<LuaNil> PMC
 use Parrot::Test tests => 10;
 use Test::More;
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaNil"
@@ -40,7 +40,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check interface");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaNil"
@@ -60,7 +60,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check name");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaNil"
@@ -80,7 +80,7 @@ nil
 nil
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check get_string");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaNil"
@@ -94,23 +94,7 @@ CODE
 nil
 OUTPUT
 
-#pir_output_is(<< 'CODE', << 'OUTPUT', "check get_repr");
-#.sub _main
-#    loadlib P1, "lua_group"
-#    find_type $I0, "LuaNil"
-#    .local pmc pmc1
-#    pmc1 = new $I0
-#    .local string str1
-#    str1 = get_repr pmc1
-#    print str1
-#    print "\n"
-#    end
-#.end
-#CODE
-#nil
-#OUTPUT
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaNil"
@@ -126,7 +110,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check logical_not");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaNil"
@@ -149,7 +133,7 @@ true
 boolean
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -167,7 +151,7 @@ nil
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL & .const");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
 .HLL "Lua", "lua_group"
 .sub _main
     .const .LuaNil cst1 = "dummy"
@@ -183,7 +167,7 @@ nil
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check tostring");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -203,7 +187,7 @@ nil
 string
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -222,3 +206,4 @@ nil
 nil
 nil
 OUTPUT
+

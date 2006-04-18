@@ -20,7 +20,7 @@ Tests C<LuaThread> PMC
 use Parrot::Test tests => 8;
 use Test::More;
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check inheritance");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaThread"
@@ -48,7 +48,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check name");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaThread"
@@ -68,7 +68,7 @@ thread
 thread
 OUTPUT
 
-pir_output_like(<< 'CODE', << 'OUTPUT', "check get_string");
+pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaThread"
@@ -82,7 +82,7 @@ CODE
 /thread: [0-9A-Fa-f]{8}/
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check get_bool");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaThread"
@@ -108,7 +108,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check logical_not");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
     loadlib P1, "lua_group"
     find_type $I0, "LuaThread"
@@ -131,7 +131,7 @@ false
 boolean
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check HLL");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL "Lua", "lua_group"
 .sub _main
     .const .Sub F1 = "f1"
@@ -151,7 +151,7 @@ CODE
 1
 OUTPUT
 
-pir_output_like(<< 'CODE', << 'OUTPUT', "check tostring");
+pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -169,7 +169,7 @@ CODE
 /thread: [0-9A-Fa-f]{8}\nthread: [0-9A-Fa-f]{8}\nstring/
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check tonumber");
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
@@ -185,3 +185,4 @@ CODE
 nil
 nil
 OUTPUT
+

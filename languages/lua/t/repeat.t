@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/repeat.t - Lua C<repeat> statement
+t/repeat.t - Lua repeat statement
 
 =head1 SYNOPSIS
 
@@ -50,5 +50,4 @@ print(a[i])
 CODE
 stop
 OUT
-
 

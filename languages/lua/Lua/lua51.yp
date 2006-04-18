@@ -1,29 +1,29 @@
 
-%token	NAME
+%token NAME
 /* Literal */
-%token	STRING
-%token	NUMBER
+%token STRING
+%token NUMBER
 /* Keyword */
-%token	AND
-%token	BREAK
-%token	DO
-%token	ELSE
-%token	ELSEIF
-%token	END
-%token	FALSE
-%token	FOR
-%token	FUNCTION
-%token	IF
-%token	IN
-%token	LOCAL
-%token	NIL
-%token	NOT
-%token	OR
-%token	REPEAT
-%token	RETURN
-%token	THEN
-%token	TRUE
-%token	WHILE
+%token AND
+%token BREAK
+%token DO
+%token ELSE
+%token ELSEIF
+%token END
+%token FALSE
+%token FOR
+%token FUNCTION
+%token IF
+%token IN
+%token LOCAL
+%token NIL
+%token NOT
+%token OR
+%token REPEAT
+%token RETURN
+%token THEN
+%token TRUE
+%token WHILE
 
 %nonassoc NONARG
 %nonassoc '(' '{' STRING
@@ -43,569 +43,569 @@
 
 program
 :	chunk
-		{
-			BuildMain($_[0], $_[1]);
-		}
+        {
+            BuildMain( $_[0], $_[1] );
+        }
 |	error
-		{
-			print "Error (program)\n";
-		}
+        {
+            print "Error (program)\n";
+        }
 ;
 
 chunk
 :	chunk	stat	_semicolon_opt
-		{
-			[@{$_[1]}, @{$_[2]}];
-		}
+        {
+            [ @{ $_[1] }, @{ $_[2] } ];
+        }
 |	/* empty */
-		{
-			[];
-		}
+        {
+            [];
+        }
 ;
 
 _semicolon_opt
 :	';'
-		#default action
+        #default action
 |	/* EMPTY */
-		#default action
+        #default action
 ;
 
 block
 :	chunk
-		{
-			PopScope($_[0]);
-			$_[1];
-		}
+        {
+            PopScope( $_[0] );
+            $_[1];
+        }
 |	chunk	laststat	_semicolon_opt
-		{
-			PopScope($_[0]);
-			[@{$_[1]}, @{$_[2]}];
-		}
+        {
+            PopScope( $_[0] );
+            [ @{ $_[1] }, @{ $_[2] } ];
+        }
 ;
 
 stat
 :	varlist1	'='	explist1
-		{
-			BuildAssigns($_[0], $_[1], $_[3])
-		}
+        {
+            BuildAssigns( $_[0], $_[1], $_[3] );
+        }
 |	functioncall	%prec	NONARG
-		{
-			BuildVoidFunctionCall($_[0], $_[1]);
-		}
+        {
+            BuildVoidFunctionCall( $_[0], $_[1] );
+        }
 |	DO
-		{
-			PushScope($_[0]);
-		}
+        {
+            PushScope( $_[0] );
+        }
 		block	END
-		{
-			$_[3];
-		}
+        {
+            $_[3];
+        }
 |	WHILE
-		{
-			PushScope($_[0]);
-		}
+        {
+            PushScope( $_[0] );
+        }
 			exp	DO	block	END
-		{
-			BuildWhile($_[0], $_[3], $_[5]);
-		}
+        {
+            BuildWhile( $_[0], $_[3], $_[5] );
+        }
 |	REPEAT
-		{
-			PushScope($_[0]);
-		}
-			block	UNTIL	exp
-		{
-			BuildRepeat($_[0], $_[3], $_[5]);
-		}
+        {
+            PushScope( $_[0] );
+        }
+            block	UNTIL	exp
+        {
+            BuildRepeat( $_[0], $_[3], $_[5] );
+        }
 |	_if_then	block	_elseif_star	ELSE
-		{
-			PushScope($_[0]);
-		}
+        {
+            PushScope( $_[0] );
+        }
 													block	END
-		{
-			BuildIf($_[0], $_[1], $_[2], $_[3], $_[6]);
-		}
+        {
+            BuildIf( $_[0], $_[1], $_[2], $_[3], $_[6] );
+        }
 |	_if_then	block	_elseif_star	END
-		{
-			BuildIf($_[0], $_[1], $_[2], $_[3], undef);
-		}
+        {
+            BuildIf( $_[0], $_[1], $_[2], $_[3], undef );
+        }
 |	FOR	NAME	'='	exp	','	exp	','	exp	DO
-		{
-			PushScope($_[0]);
-			my $var = BuildLocalVariable($_[0], $_[2]);
-			Insert($_[0], $var);
-		}
+        {
+            PushScope( $_[0] );
+            my $var = BuildLocalVariable( $_[0], $_[2] );
+            Insert( $_[0], $var );
+        }
 											block	END
-		{
-			BuildForNum($_[0], $_[10], $_[4], $_[6], $_[8], $_[11]);
-		}
+        {
+            BuildForNum( $_[0], $_[10], $_[4], $_[6], $_[8], $_[11] );
+        }
 |	FOR	NAME	'='	exp	','	exp	DO
-		{
-			PushScope($_[0]);
-			my $var = BuildLocalVariable($_[0], $_[2]);
-			Insert($_[0], $var);
-		}
+        {
+            PushScope( $_[0] );
+            my $var = BuildLocalVariable( $_[0], $_[2] );
+            Insert( $_[0], $var );
+        }
 									block	END
-		{
-			BuildForNum($_[0], $_[8], $_[4], $_[6], undef, $_[9]);
-		}
+        {
+            BuildForNum( $_[0], $_[8], $_[4], $_[6], undef, $_[9] );
+        }
 |	FOR	namelist	IN	explist1	DO
-		{
-			PushScope($_[0]);
-			InsertList($_[0], $_[2]);
-		}
+        {
+            PushScope( $_[0] );
+            InsertList( $_[0], $_[2] );
+        }
 										block	END
-		{
-			BuildForList($_[0], $_[2], $_[4], $_[7]);
-		}
+        {
+            BuildForList( $_[0], $_[2], $_[4], $_[7] );
+        }
 |	FUNCTION
-		{
-			PushScopeF($_[0]);
-			PushScope($_[0]);
-		}
+        {
+            PushScopeF( $_[0] );
+            PushScope( $_[0] );
+        }
 				funcname	funcbody
-		{
-			my $var = BuildVariable($_[0], $_[3]); 
-			BuildAssigns($_[0], [$var], [$_[4]])
-		}
+        {
+            my $var = BuildVariable( $_[0], $_[3] ); 
+            BuildAssigns( $_[0], [$var], [ $_[4] ] );
+        }
 |	LOCAL	FUNCTION
-		{
-			PushScopeF($_[0]);
-			PushScope($_[0]);
-		}
+        {
+            PushScopeF( $_[0] );
+            PushScope( $_[0] );
+        }
 						NAME	funcbody
-		{
-			my $var = BuildLocalVariable($_[0], $_[4]);
-			Insert($_[0], $var);
-			BuildAssigns($_[0], [$var], [$_[5]])
-		}
+        {
+            my $var = BuildLocalVariable( $_[0], $_[4] );
+            Insert( $_[0], $var );
+            BuildAssigns( $_[0], [$var], [ $_[5] ] );
+        }
 |	LOCAL	namelist	'='	explist1
-		{
-			InsertList($_[0], $_[2]);
-			BuildAssigns($_[0], $_[2], $_[4])
-		}
+        {
+            InsertList( $_[0], $_[2] );
+            BuildAssigns( $_[0], $_[2], $_[4] );
+        }
 |	LOCAL	namelist
-		{
-			InsertList($_[0], $_[2]);
-			BuildAssigns($_[0], $_[2], [])
-		}
+        {
+            InsertList( $_[0], $_[2] );
+            BuildAssigns( $_[0], $_[2], [] );
+        }
 ;
 
 _if_then
 :	IF	exp	THEN
-		{
-			PushScope($_[0]);
-			$_[2];
-		}
+        {
+            PushScope( $_[0] );
+            $_[2];
+        }
 ;
 
 _elseif_star
 :	_elseif_star	ELSEIF	exp	THEN
-		{
-			PushScope($_[0]);
-		}
+        {
+            PushScope( $_[0] );
+        }
 										block
-		{
-			[@{$_[1]}, [$_[3], $_[6]]];
-		}
+        {
+            [ @{ $_[1] }, [ $_[3], $_[6] ] ];
+        }
 |	/* empty */
-		{
-			[];
-		}
+        {
+            [];
+        }
 ;
 
 laststat
 :	RETURN	explist1
-		{
-			BuildReturn($_[0], $_[2]);
-		}
+        {
+            BuildReturn( $_[0], $_[2] );
+        }
 |	RETURN
-		{
-			BuildReturn($_[0], []);
-		}
+        {
+            BuildReturn( $_[0], [] );
+        }
 |	BREAK
-		{
-			BuildBreak($_[0]);
-		}
+        {
+            BuildBreak( $_[0] );
+        }
 ;
 
 funcname
 :	_funcname
-		#default action
+        #default action
 |	_funcname	':'	NAME
-		{
-			PrepareMethod($_[0]);
-			[
-				@{$_[1]},
-				BuildLiteral($_[0], $_[3], 'key'),
-			];
-		}
+        {
+            PrepareMethod( $_[0] );
+            [
+                @{ $_[1] },
+                BuildLiteral( $_[0], $_[3], 'key' ),
+            ];
+        }
 ;
 
 _funcname
 :	_funcname	'.'	NAME
-		{
-			[
-				@{$_[1]},
-				BuildLiteral($_[0], $_[3], 'key'),
-			];
-		}
+        {
+            [
+                @{ $_[1] },
+                BuildLiteral( $_[0], $_[3], 'key' ),
+            ];
+        }
 |	NAME
-		{
-			[$_[1]];
-		}
+        {
+            [ $_[1] ];
+        }
 ;
 
 varlist1
 :	varlist1	','	var
-		{
-			[
-				@{$_[1]}, 
-				BuildVariable($_[0], $_[3])
-			]
-		}
+        {
+            [
+                @{ $_[1] }, 
+                BuildVariable( $_[0], $_[3] ),
+            ];
+        }
 |	var
-		{
-			[
-				BuildVariable($_[0], $_[1])
-			]
-		}
+        {
+            [
+                BuildVariable( $_[0], $_[1] ),
+            ];
+        }
 ;
 
 var
 :	NAME
-		{
-			[$_[1]];
-		}
+        {
+            [ $_[1] ];
+        }
 |	'('	exp	')'	key
-		{
-			[$_[2], $_[4]]
-		}
+        {
+            [ $_[2], $_[4] ];
+        }
 |	functioncall	key
-		{
-			[$_[1], $_[2]]
-		}
+        {
+            [ $_[1], $_[2] ];
+        }
 |	var	key
-		{
-			[@{$_[1]}, $_[2]];
-		}
+        {
+            [ @{ $_[1] }, $_[2] ];
+        }
 ;
 
 key
 :	'['	exp	']'
-		{
-			$_[2];
-		}
+        {
+            $_[2];
+        }
 |	'.'	NAME
-		{
-			BuildLiteral($_[0], $_[2], 'key');
-		}
+        {
+            BuildLiteral( $_[0], $_[2], 'key' );
+        }
 ;
 
 namelist
 :	namelist	','	NAME
-		{
-			[
-				@{$_[1]},
-				BuildLocalVariable($_[0], $_[3])
-			];
-		}
+        {
+            [
+                @{ $_[1] },
+                BuildLocalVariable( $_[0], $_[3] ),
+            ];
+        }
 |	NAME
-		{
-			[
-				BuildLocalVariable($_[0], $_[1])
-			]
-		}
+        {
+            [
+                BuildLocalVariable( $_[0], $_[1] ),
+            ];
+        }
 ;
 
 explist1
 :	explist1	','	exp
-		{
-			[@{$_[1]}, $_[3]];
-		}
+        {
+            [ @{ $_[1] }, $_[3] ];
+        }
 |	exp
-		{
-			[$_[1]];
-		}
+        {
+            [ $_[1] ];
+        }
 ;
 
 exp
 :	primary	%prec	NONARG
-		#default action
+        #default action
 |	var	%prec	NONARG
-		{
-			BuildCallVariable($_[0], $_[1]);
-		}
+        {
+            BuildCallVariable( $_[0], $_[1] );
+        }
 |	functioncall	%prec	NONARG
-		#default action
+        #default action
 |	exp	'+'	exp
-		{
-			BuildBinop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildBinop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'-'	exp
-		{
-			BuildBinop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildBinop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'*'	exp
-		{
-			BuildBinop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildBinop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'/'	exp
-		{
-			BuildBinop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildBinop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'^'	exp
-		{
-			BuildBinop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildBinop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'%'	exp
-		{
-			BuildBinop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildBinop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'..'	exp
-		{
-			BuildBinop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildBinop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'<'	exp
-		{
-			BuildRelop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildRelop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'<='	exp
-		{
-			BuildRelop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildRelop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'>'	exp
-		{
-			BuildRelop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildRelop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'>='	exp
-		{
-			BuildRelop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildRelop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'=='	exp
-		{
-			BuildRelop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildRelop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	'~='	exp
-		{
-			BuildRelop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildRelop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	AND	exp
-		{
-			BuildLogop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildLogop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	exp	OR	exp
-		{
-			BuildLogop($_[0], $_[1], $_[2], $_[3]);
-		}
+        {
+            BuildLogop( $_[0], $_[1], $_[2], $_[3] );
+        }
 |	'-'	exp	%prec	NEG
-		{
-			BuildUnop($_[0], $_[1], $_[2]);
-		}
+        {
+            BuildUnop( $_[0], $_[1], $_[2] );
+        }
 |	'#'	exp
-		{
-			BuildUnop($_[0], $_[1], $_[2]);
-		}
+        {
+            BuildUnop( $_[0], $_[1], $_[2] );
+        }
 |	NOT	exp
-		{
-			BuildUnop($_[0], $_[1], $_[2]);
-		}
+        {
+            BuildUnop( $_[0], $_[1], $_[2] );
+        }
 ;
 
 primary
 :	NIL
-		{
-			BuildLiteral($_[0], $_[1], 'nil');
-		}
+        {
+            BuildLiteral( $_[0], $_[1], 'nil' );
+        }
 |	FALSE
-		{
-			BuildLiteral($_[0], $_[1], 'boolean');
-		}
+        {
+            BuildLiteral( $_[0], $_[1], 'boolean' );
+        }
 |	TRUE
-		{
-			BuildLiteral($_[0], $_[1], 'boolean');
-		}
+        {
+            BuildLiteral( $_[0], $_[1], 'boolean' );
+        }
 |	NUMBER
-		{
-			BuildLiteral($_[0], $_[1], 'number');
-		}
+        {
+            BuildLiteral( $_[0], $_[1], 'number' );
+        }
 |	STRING
-		{
-			BuildLiteral($_[0], $_[1], 'string');
-		}
+        {
+            BuildLiteral( $_[0], $_[1], 'string' );
+        }
 |	'...'
-		{
-			BuildCallVararg($_[0]);
-		}
+        {
+            BuildCallVararg( $_[0] );
+        }
 |	function
-		#default action
+        #default action
 |	tableconstructor
-		#default action
+        #default action
 |	'('	exp	')'
-		{
-			BuildParenthesedExpression($_[0], $_[2]);
-		}
+        {
+            BuildParenthesedExpression( $_[0], $_[2] );
+        }
 ;
 
 functioncall
 :	'('	exp	')'	args
-		{
-			BuildCallFunction($_[0], $_[2], $_[4]);
-		}
+        {
+            BuildCallFunction( $_[0], $_[2], $_[4] );
+        }
 |	'('	exp	')'	':'	NAME	args
-		{
-			BuildCallMethod($_[0], $_[2], $_[5], $_[6]);
-		}
+        {
+            BuildCallMethod( $_[0], $_[2], $_[5], $_[6] );
+        }
 |	var	args
-		{
-			my $fct = BuildCallVariable($_[0], $_[1]);
-			BuildCallFunction($_[0], $fct, $_[2]);
-		}
+        {
+            my $fct = BuildCallVariable( $_[0], $_[1] );
+            BuildCallFunction( $_[0], $fct, $_[2] );
+        }
 |	var	':'	NAME	args
-		{
-			my $obj = BuildCallVariable($_[0], $_[1]);
-			BuildCallMethod($_[0], $obj, $_[3], $_[4]);
-		}
+        {
+            my $obj = BuildCallVariable( $_[0], $_[1] );
+            BuildCallMethod( $_[0], $obj, $_[3], $_[4] );
+        }
 |	functioncall	args
-		{
-			BuildCallFunction($_[0], $_[1], $_[2]);
-		}
+        {
+            BuildCallFunction( $_[0], $_[1], $_[2] );
+        }
 |	functioncall	':'	NAME	args
-		{
-			BuildCallMethod($_[0], $_[1], $_[3], $_[4]);
-		}
+        {
+            BuildCallMethod( $_[0], $_[1], $_[3], $_[4] );
+        }
 ;
 
 args
 :	'('	explist1	')'
-		{
-			$_[2];
-		}
+        {
+            $_[2];
+        }
 |	'('	')'
-		{
-			[];
-		}
+        {
+            [];
+        }
 |	tableconstructor
-		{
-			[
-				$_[1]
-			]
-		}
+        {
+            [
+                $_[1],
+            ];
+        }
 |	STRING
-		{
-			[
-				BuildLiteral($_[0], $_[1], 'string')
-			]
-		}
+        {
+            [
+                BuildLiteral( $_[0], $_[1], 'string' ),
+            ];
+        }
 ;
 
 function
 :	FUNCTION
-		{
-			PushScopeF($_[0]);
-			PushScope($_[0]);
-		}
+        {
+            PushScopeF( $_[0] );
+            PushScope( $_[0] );
+        }
 				funcbody
-		{
-			$_[3];
-		}
+        {
+            $_[3];
+        }
 ;
 
 funcbody
 :	'('	parlist1	')'	block	END
-		{
-			PopScopeF($_[0]);
-			BuildFunctionBody($_[0], $_[2], $_[4]);
-		}
+        {
+            PopScopeF( $_[0] );
+            BuildFunctionBody( $_[0], $_[2], $_[4] );
+        }
 |	'('	')'	block	END
-		{
-			PopScopeF($_[0]);
-			BuildFunctionBody($_[0], [], $_[3]);
-		}
+        {
+            PopScopeF( $_[0] );
+            BuildFunctionBody( $_[0], [], $_[3] );
+        }
 ;
 
 parlist1
 :	parlist	','	'...'
-		{
-			[
-				@{$_[1]},
-				BuildParam($_[0], $_[3])
-			];
-		}
+        {
+            [
+                @{ $_[1] },
+                BuildParam( $_[0], $_[3] ),
+            ];
+        }
 |	parlist
-		#default action
+        #default action
 |	'...'
-		{
-			[
-				BuildParam($_[0], $_[1])
-			];
-		}
+        {
+            [
+                BuildParam( $_[0], $_[1] ),
+            ];
+        }
 ;
 
 parlist
 :	parlist	','	NAME
-		{
-			[
-				@{$_[1]},
-				BuildParam($_[0], $_[3])
-			];
-		}
+        {
+            [
+                @{ $_[1] },
+                BuildParam( $_[0], $_[3] ),
+            ];
+        }
 |	NAME
-		{
-			[
-				BuildParam($_[0], $_[1])
-			]
-		}
+        {
+            [
+                BuildParam( $_[0], $_[1] ),
+            ];
+        }
 ;
 
 tableconstructor
 :	'{'	fieldlist	'}'
-		{
-			BuildTable($_[0], $_[2]);
-		}
+        {
+            BuildTable( $_[0], $_[2] );
+        }
 |	'{'	'}'
-		{
-			BuildTable($_[0], []);
-		}
+        {
+            BuildTable( $_[0], [] );
+        }
 ;
 
 fieldlist
 :	_field_plus	fieldsep
-		#default action
+        #default action
 |	_field_plus
-		#default action
+        #default action
 ;
 
 _field_plus
 :	_field_plus	fieldsep	field
-		{
-			[@{$_[1]}, $_[3]];
-		}
+        {
+            [ @{ $_[1] }, $_[3] ];
+        }
 |	field
-		{
-			[$_[1]];
-		}
+        {
+            [ $_[1] ];
+        }
 ;
 
 field
 :	'['	exp	']'	'='	exp
-		{
-			[$_[2], $_[5]]
-		}
+        {
+            [ $_[2], $_[5] ];
+        }
 |	NAME	'='	exp
-		{
-			[BuildLiteral($_[0], $_[1], 'key'), $_[3]]
-		}
+        {
+            [ BuildLiteral( $_[0], $_[1], 'key' ), $_[3] ];
+        }
 |	exp
-		{
-			[$_[1]]
-		}
+        {
+            [ $_[1] ];
+        }
 ;
 
 fieldsep
 :	','
-		#default action
+        #default action
 |	';'
-		#default action
+        #default action
 ;
 
 %%
@@ -619,74 +619,74 @@ use Lua::build;
 use Lua::symbtab;
 use Lua::pir;
 
-
 sub Run {
-	my $parser = shift;
-	my ($srcname) = @_;
+    my $parser = shift;
+    my ($srcname) = @_;
 
-	open $parser->YYData->{fh}, $srcname
-			or die "can't open $srcname ($!).\n";
+    open $parser->YYData->{fh}, $srcname
+        or die "can't open $srcname ($!).\n";
 
-	$parser->YYData->{shebang} = 1;
-	$parser->YYData->{srcname} = $srcname;
-	my @st = stat($parser->YYData->{srcname});
-	$parser->YYData->{srcname_size} = $st[7];
-	$parser->YYData->{srcname_mtime} = $st[9];
-	$parser->_InitLexico();
-	$parser->YYData->{functs} = [];
-	$parser->YYData->{scope} = [];
-	$parser->YYData->{scopef} = [];
-	$parser->YYData->{symbtab} = new SymbTabVar($parser);
-	$parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
-	$parser->YYData->{_G} = undef;
-	$parser->YYData->{self} = undef;
-	$parser->YYData->{idx_tmp} = 0;
-	$parser->YYData->{idx_lbl} = 0;
-	$parser->YYData->{idx_fct} = 0;
-	$parser->YYParse(
-			yylex	=> \&_Lexer,
-			yyerror	=> sub { return; },
-#			yydebug	=> 0x17,
-#    Bit Value    Outputs
-#    0x01         Token reading (useful for Lexer debugging)
-#    0x02         States information
-#    0x04         Driver actions (shifts, reduces, accept...)
-#    0x08         Parse Stack dump
-#    0x10         Error Recovery tracing
-	);
+    $parser->YYData->{shebang} = 1;
+    $parser->YYData->{srcname} = $srcname;
+    my @st = stat( $parser->YYData->{srcname} );
+    $parser->YYData->{srcname_size}  = $st[7];
+    $parser->YYData->{srcname_mtime} = $st[9];
+    $parser->_InitLexico();
+    $parser->YYData->{functs}      = [];
+    $parser->YYData->{scope}       = [];
+    $parser->YYData->{scopef}      = [];
+    $parser->YYData->{symbtab}     = new SymbTabVar($parser);
+    $parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
+    $parser->YYData->{_G}          = undef;
+    $parser->YYData->{self}        = undef;
+    $parser->YYData->{idx_tmp}     = 0;
+    $parser->YYData->{idx_lbl}     = 0;
+    $parser->YYData->{idx_fct}     = 0;
+    $parser->YYParse(
+        yylex   => \&_Lexer,
+        yyerror => sub { return; },
+#        yydebug => 0x17,
+        #    Bit Value    Outputs
+        #    0x01         Token reading (useful for Lexer debugging)
+        #    0x02         States information
+        #    0x04         Driver actions (shifts, reduces, accept...)
+        #    0x08         Parse Stack dump
+        #    0x10         Error Recovery tracing
+    );
 
-	close $parser->YYData->{fh};
-	delete $parser->{RULES};
-	delete $parser->{STATES};
-	delete $parser->{STACK};
+    close $parser->YYData->{fh};
+    delete $parser->{RULES};
+    delete $parser->{STATES};
+    delete $parser->{STACK};
 }
 
 sub Generate {
-	my $parser = shift;
+    my $parser = shift;
 
-	my $filename = $parser->YYData->{srcname};
-	$filename =~ s/\.lua$/\.pir/i;
-	open FH, "> $filename"
-			or die "can't open $filename ($!).\n";
+    my $filename = $parser->YYData->{srcname};
+    $filename =~ s/\.lua$/\.pir/i;
+    open my $FH, '>', $filename
+        or die "can't open $filename ($!).\n";
 
-	my $generator = new pirVisitor(\*FH);
-#	my $generator = new pirVisitor(\*STDOUT);
-	print FH $generator->{prologue};
-	foreach my $fct (@{$parser->YYData->{functs}}) {
-		foreach (@{$fct}) {
-#			if (ref $_) {
-			if (ref($_) =~ /(Dir|Op)$/) {
-				$_->visit($generator) if (exists $_->{prolog});
-#				$_->visit($generator);
-			} else {
-				print $_,"\n";
-				die;
-			}
-		}
-		print FH "  # end of prolog\n";
-		foreach (@{$fct}) {
-			$_->visit($generator) unless (exists $_->{prolog});
-		}
-	}
+    my $generator = new pirVisitor($FH);
+#    my $generator = new pirVisitor(\*STDOUT);
+    print {$FH} $generator->{prologue};
+    foreach my $fct ( @{ $parser->YYData->{functs} } ) {
+        foreach my $op ( @{$fct} ) {
+            if ( ref($op) =~ /(Dir|Op)$/ ) {
+                $op->visit($generator) if ( exists $op->{prolog} );
+            }
+            else {
+                print $op, "\n";
+                die;
+            }
+        }
+        print {$FH} "  # end of prolog\n";
+        foreach my $op ( @{$fct} ) {
+            $op->visit($generator) unless ( exists $op->{prolog} );
+        }
+    }
+    close $FH;
 }
+
 

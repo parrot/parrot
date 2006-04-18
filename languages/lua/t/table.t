@@ -28,7 +28,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 11;
 use Test::More;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function concat");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function concat' );
 t = {"a","b","c","d","e"} 
 print(table.concat(t))
 print(table.concat(t,","))
@@ -43,28 +43,28 @@ b,c,d
 
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function concat (number)");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function concat (number)' );
 t = {"a","b",3,"d","e"} 
 print(table.concat(t,","))
 CODE
 a,b,3,d,e
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function concat (out of range)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function concat (out of range)' );
 t = {"a","b","c","d","e"} 
 print(table.concat(t,",",2,7))
 CODE
 /table contains non-strings/
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function concat (non-string)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function concat (non-string)' );
 t = {"a","b",true,"d","e"} 
 print(table.concat(t,","))
 CODE
 /table contains non-strings/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function foreach (array)");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreach (array)' );
 t = {"a","b","c"} 
 table.foreach(t, print)
 CODE
@@ -73,7 +73,7 @@ CODE
 3	c
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function foreachi");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreachi' );
 t = {"a","b","c"} 
 table.foreachi(t, print)
 CODE
@@ -82,7 +82,7 @@ CODE
 3	c
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function getn");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function getn' );
 print(table.getn{10,2,4})
 print(table.getn{10,2,nil})
 CODE
@@ -90,7 +90,7 @@ CODE
 2
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function insert");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function insert' );
 a = {10, 20, 30}
 table.insert(a, 1, 15)
 print(table.concat(a,","))
@@ -117,7 +117,7 @@ e
 f
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function maxn");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function maxn' );
 t = {}
 print(table.maxn(t))
 t[1] = "a"
@@ -130,7 +130,7 @@ CODE
 2
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function remove");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function remove' );
 t = {}
 a = table.remove(t)
 print(a)
@@ -159,7 +159,7 @@ nil
 b
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function setn");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function setn' );
 a = {}                                    
 table.setn(a, 10000)
 CODE

@@ -50,7 +50,6 @@ alo
 123"
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'number' );
 print(3)
 print(3.0)

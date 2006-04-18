@@ -24,7 +24,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 25;
 use Test::More;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function assert");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
 v, msg = assert("text", "assert string")
 print(v, msg)
 assert({}, "assert table")
@@ -32,25 +32,25 @@ CODE
 text	assert string
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, msg)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function assert(false, msg)' );
 assert(false, "ASSERTION TEST")
 CODE
 /ASSERTION TEST/
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function assert(false)' );
 assert(false)
 CODE
 /assertion failed!/
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function assert(false, nil)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function assert(false, nil)' );
 assert(false, nil)
 CODE
 /assertion failed!/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function ipairs");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function ipairs' );
 a = {"a","b","c"}
 local f, v, s = ipairs(a)
 print(type(f), type(v), s)
@@ -70,7 +70,7 @@ function	table	0
 nil	nil
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function next (array)");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function next (array)' );
 t = {"a","b","c"}
 a = next(t, nil)
 print(a)
@@ -87,7 +87,7 @@ CODE
 nil
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function pairs");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function pairs' );
 a = {"a","b","c"}
 local f, v, s = pairs(a)
 print(type(f), type(v), s)
@@ -107,7 +107,7 @@ function	table	nil
 nil
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function pcall");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function pcall' );
 r = pcall(assert, true)
 print(r)
 r, msg = pcall(assert, false, "catched")
@@ -120,14 +120,14 @@ false	catched
 false
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function pcall (incomplete)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function pcall (incomplete)' );
 r, msg = pcall(assert)
 print(msg)
 CODE
 /value expected/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function rawequal (true)");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function rawequal (true)' );
 t = {}
 a = t
 print(rawequal(nil, nil))
@@ -145,7 +145,7 @@ true
 true
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function rawequal (false)");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function rawequal (false)' );
 t = {}
 print(rawequal(nil, 2))
 print(rawequal(false, true))
@@ -172,14 +172,14 @@ false
 false
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function rawget");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function rawget' );
 t = {a = "letter a", b = "letter b"}
 print(rawget(t, "a"))
 CODE
 letter a
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function rawset");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function rawset' );
 t = {}
 rawset(t, "a", "letter a")
 print(t.a)
@@ -187,7 +187,7 @@ CODE
 letter a
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function select");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function select' );
 print(select("#"))
 print(select("#","a","b","c"))
 print(select(1,"a","b","c"))
@@ -201,13 +201,13 @@ c
 
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function select (out of range)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function select (out of range)' );
 print(select(0,"a","b","c"))
 CODE
 /index out of range/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function type' );
 print(type("Hello world"))
 print(type(10.4*3))
 print(type(print))
@@ -227,7 +227,7 @@ userdata
 string
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function type' );
 print(type(a))
 a = 10
 print(type(a))
@@ -244,13 +244,13 @@ function
 function
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function type (no arg)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function type (no arg)' );
 type()
 CODE
 /value expected/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function type");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function type' );
 a = 12.34
 t = type(a)
 print(a)
@@ -260,7 +260,7 @@ CODE
 number
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function tonumber");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function tonumber' );
 r = tonumber("text12")
 print(type(r), r)
 r = tonumber("12text")
@@ -292,26 +292,26 @@ number	7
 nil	nil
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function tonumber (no arg)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function tonumber (no arg)' );
 tonumber()
 CODE
 /value expected/
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function tonumber (bad base)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function tonumber (bad base)' );
 r = tonumber("111", 200)
 print(type(r), r)
 CODE
 /base out of range/
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', "function tostring (no arg)");
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function tostring (no arg)' );
 tostring()
 CODE
 /value expected/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function unpack");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function unpack' );
 print(unpack{})
 print(unpack{"a"})
 print(unpack{"a","b","c"})
@@ -327,7 +327,7 @@ b	c	d
 b	c	nil
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', "function xpcall");
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function xpcall' );
 r = xpcall(assert, nil)
 print(r)
 CODE

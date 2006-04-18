@@ -37,7 +37,6 @@ CODE
 3	Tuesday
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for pairs' );
 a = {"Sunday", "Monday", "Tuesday"}
 
@@ -49,7 +48,6 @@ CODE
 2
 3
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for break' );
 a = {"Sunday", "Monday", "Tuesday"}

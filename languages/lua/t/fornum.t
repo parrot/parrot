@@ -37,7 +37,6 @@ CODE
 9
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 3, 5' );
 for i = 3, 5 do
     print(i)
@@ -47,7 +46,6 @@ CODE
 4
 5
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 5, 1, -1' );
 for i = 5, 1, -1 do
@@ -61,7 +59,6 @@ CODE
 1
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 5, 5' );
 for i = 5, 5 do
     print(i)
@@ -69,7 +66,6 @@ end
 CODE
 5
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 5, 5, -1' );
 for i = 5, 5, -1 do
@@ -79,7 +75,6 @@ CODE
 5
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 5, 3' );
 for i = 5, 3 do
     print(i)
@@ -87,14 +82,12 @@ end
 CODE
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 5, 7, -1' );
 for i = 5, 7, -1 do
     print(i)
 end
 CODE
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for break' );
 for i = 1, 10, 2 do

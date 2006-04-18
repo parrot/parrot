@@ -40,7 +40,6 @@ CODE
 3
 OUT
 
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'newCounter' );
 function newCounter ()
     local i = 0
@@ -67,7 +66,7 @@ CODE
 OUT
 
 TODO: {
-local $TODO = "each execution of a local statement defines new local variables";
+local $TODO = 'each execution of a local statement defines new local variables';
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '' );
 a = {}
