@@ -22,6 +22,7 @@
     load_bytecode "PGE/Glob.pir"
     load_bytecode "PGE/Text.pir"
     load_bytecode "PGE/P6Grammar.pir"
+    load_bytecode "PGE/Util.pir"
     p6rule_compile = compreg "PGE::P6Rule"
     glob_compile = compreg "PGE::Glob"
     p5regexp_compile = compreg "PGE::P5Regexp"

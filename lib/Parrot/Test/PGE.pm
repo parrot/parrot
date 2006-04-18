@@ -190,6 +190,7 @@ sub _generate_pir_for {
             load_bytecode "PGE.pbc"
             load_bytecode "PGE/Dumper.pir"
             load_bytecode "PGE/Text.pir"
+            load_bytecode "PGE/Util.pir"
             p6rule_compile = compreg "PGE::P6Rule"
 
             .local string target
