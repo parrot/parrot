@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 69;
+use Parrot::Test tests => 70;
 
 =head1 NAME
 
@@ -1128,7 +1128,7 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "subclassing a non-existent class");
     print "Uh-oh...\n"
     end
 CODE
-/Class 'Nemo' doesn't exist/
+/Class 'Character' doesn't exist/
 OUTPUT
 # '
 pasm_output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existent class");
@@ -2063,3 +2063,34 @@ __init Baz
 __init Foo
 ok
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "subclass keyed");
+.sub main :main
+    .local pmc base, o1, o2
+    base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
+    addattribute base, '$.source'                  # original source
+    addattribute base, '$.pos'                     # offset position
+
+    $P0 = subclass base, ['Perl6'; 'PAST'; 'Sub']
+    $P0 = subclass base, ['Perl6'; 'PAST'; 'Stmt']
+    print "ok 1\n"
+
+    o1 = new   ['Perl6'; 'PAST'; 'Sub']
+    o2 = new   ['Perl6'; 'PAST'; 'Stmt']
+    print "ok 2\n"
+.end
+.namespace ['Perl6'; 'PAST'; 'Stmt']
+.sub __init :method
+    print "__init Stmt\n"
+.end
+.namespace ['Perl6'; 'PAST'; 'Sub']
+.sub __init :method
+    print "__init Sub\n"
+.end
+CODE
+ok 1
+__init Sub
+__init Stmt
+ok 2
+OUTPUT
+

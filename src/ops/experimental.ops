@@ -391,6 +391,34 @@ inline op new(out PMC, in KEY) :object_classes {
   goto NEXT();
 }
 
+op subclass(out PMC, in STR, in KEY) :object_classes {
+  PMC *class = Parrot_class_lookup(interpreter, $2);
+  opcode_t *next = expr NEXT();
+  if (PMC_IS_NULL(class)) {
+    real_exception(interpreter, next, NO_CLASS, "Class '%s' doesn't exist",
+		string_to_cstring( interpreter, $2 ));
+  }
+  $1 = VTABLE_subclass(interpreter, class, $3);
+  goto ADDRESS(next);
+}
+
+op subclass(out PMC, in KEY, in KEY) :object_classes {
+  PMC *class = Parrot_class_lookup_p(interpreter, $2);
+  opcode_t *next = expr NEXT();
+  if (PMC_IS_NULL(class)) {
+    STRING *name = key_string(interpreter, $2);  /* XXX */
+    real_exception(interpreter, next, NO_CLASS, "Class '%s' doesn't exist",
+		string_to_cstring( interpreter, name ));
+  }
+  $1 = VTABLE_subclass(interpreter, class, $3);
+  goto ADDRESS(next);
+}
+
+inline op subclass(out PMC, in PMC, in KEY) :object_base {
+  $1 = VTABLE_subclass(interpreter, $2, $3);
+  goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

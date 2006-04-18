@@ -340,7 +340,7 @@ INTVAL does(STRING* method)
 
 INTVAL isa(STRING* _class)
 
-PMC* subclass(STRING* name)
+PMC* subclass(PMC* name)
 
 PMC* get_attr(INTVAL idx)
 PMC* get_attr_str(STRING* idx)

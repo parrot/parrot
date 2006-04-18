@@ -783,7 +783,7 @@ Returns whether the PMC "isa" C<*method>.
 
 /*
 
-=item C<PMC* subclass(STRING* name)>
+=item C<PMC* subclass(PMC* name)>
 
 Creates a subclass, optionally with a given C<name>.
 
@@ -791,7 +791,7 @@ Creates a subclass, optionally with a given C<name>.
 
 */
 
-    PMC* subclass(STRING *name) {
+    PMC* subclass(PMC *name) {
         return Parrot_single_subclass(INTERP, SELF, name);
     }
 

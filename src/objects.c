@@ -181,7 +181,7 @@ on the existence of the method for this class.
 */
 
 static void
-create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
+create_deleg_pmc_vtable(Interp *interpreter, PMC *class, PMC *class_name)
 {
     int i;
     const char *meth;
@@ -206,7 +206,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
         meth_str.strstart = const_cast(meth);
         meth_str.strlen = meth_str.bufused = strlen(meth);
         meth_str.hashval = 0;
-        if (Parrot_find_global(interpreter, class_name, &meth_str)) {
+        if (Parrot_find_global_p(interpreter, class_name, &meth_str)) {
             /*
              * if the method exists, keep the ParrotObject aka delegate vtable
              * slot
@@ -277,7 +277,7 @@ Parrot_MMD_method_idx(Interp* interpreter, char *name)
 
 =item C<PMC *
 Parrot_single_subclass(Interp* ointerpreter, PMC *base_class,
-                       STRING *child_class_name)>
+                       PMC *child_class_name)>
 
 Subclass a class. Single parent class, nice and straightforward. If
 C<child_class> is C<NULL>, this is an anonymous subclass we're creating,
@@ -290,35 +290,30 @@ function.
 
 PMC *
 Parrot_single_subclass(Interp* interpreter, PMC *base_class,
-                       STRING *child_class_name)
+                       PMC *name)
 {
     PMC *child_class;
     SLOTTYPE *child_class_array;
-    PMC *classname_pmc;
     PMC *parents, *temp_pmc, *mro;
     int parent_is_class;
 
     /* Set the classname, if we have one */
-    classname_pmc = pmc_new(interpreter, enum_class_String); /* XXX */
-    if (child_class_name) {
-        VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
-        fail_if_exist(interpreter, classname_pmc);
+    if (!PMC_IS_NULL(name)) {
+        fail_if_exist(interpreter, name);
     }
     else {
         /* XXX not really threadsafe but good enough for now */
         static int anon_count;
 
-        child_class_name = Parrot_sprintf_c(interpreter, "%c%canon_%d",
-                0, 0, ++anon_count);
-        VTABLE_set_string_native(interpreter, classname_pmc,
-                child_class_name );
+        STRING *child_class_name = Parrot_sprintf_c(interpreter, 
+                "%c%canon_%d", 0, 0, ++anon_count);
+        name = pmc_new(interpreter, enum_class_String); 
+        VTABLE_set_string_native(interpreter, name, child_class_name );
     }
     /*
      * ParrotClass is the baseclass anyway, so build just a new class
      */
     if (base_class == interpreter->vtables[enum_class_ParrotClass]->class) {
-        PMC *name = pmc_new(interpreter, enum_class_String);
-        VTABLE_set_string_native(interpreter, name, child_class_name);
         return pmc_new_init(interpreter, enum_class_ParrotClass, name);
     }
     parent_is_class = PObj_is_class_TEST(base_class);
@@ -340,7 +335,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     set_attrib_num(child_class, child_class_array, PCD_PARENTS, parents);
 
 
-    set_attrib_num(child_class, child_class_array, PCD_CLASS_NAME, classname_pmc);
+    set_attrib_num(child_class, child_class_array, PCD_CLASS_NAME, name);
 
     /* Our mro list is a clone of our parent's mro
      * list, with our self unshifted onto the beginning
@@ -353,7 +348,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     set_attrib_num(child_class, child_class_array, PCD_CLASS_ATTRIBUTES,
             temp_pmc);
 
-    parrot_class_register(interpreter, classname_pmc, child_class,
+    parrot_class_register(interpreter, name, child_class,
             base_class, mro);
 
     rebuild_attrib_stuff(interpreter, child_class);
@@ -366,7 +361,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
          * then create a vtable derived from ParrotObject and
          * deleg_pmc - the ParrotObject vtable is already built
          */
-        create_deleg_pmc_vtable(interpreter, child_class, child_class_name);
+        create_deleg_pmc_vtable(interpreter, child_class, name);
     }
     return child_class;
 }
@@ -428,6 +423,9 @@ Parrot_new_class(Interp* interpreter, PMC *class, PMC *name)
 =item C<PMC *
 Parrot_class_lookup(Interp* interpreter, STRING *class_name)>
 
+=item C<PMC *
+Parrot_class_lookup_p(Interp* interpreter, PMC *class_name)>
+
 Looks for the class named C<class_name> and returns it if it exists.
 Otherwise it returns C<PMCNULL>.
 
@@ -438,11 +436,20 @@ Otherwise it returns C<PMCNULL>.
 PMC *
 Parrot_class_lookup(Interp* interpreter, STRING *class_name)
 {
-    HashBucket * const bucket =
-        hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(interpreter->class_hash), class_name);
-    if (bucket) {
-        const INTVAL type = PMC_int_val((PMC*)bucket->value);
+    const INTVAL type = pmc_type(interpreter, class_name);
+    if (type > 0) {
+        PMC * const pmc = interpreter->vtables[type]->class;
+        assert(pmc);
+        return pmc;
+    }
+    return PMCNULL;
+}
+
+PMC *
+Parrot_class_lookup_p(Interp* interpreter, PMC *class_name)
+{
+    const INTVAL type = pmc_type_p(interpreter, class_name);
+    if (type > 0) {
         PMC * const pmc = interpreter->vtables[type]->class;
         assert(pmc);
         return pmc;

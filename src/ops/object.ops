@@ -237,12 +237,22 @@ inline op newclass(out PMC, in STR) :object_classes {
 Create a new class, put in $1, that is a subclass of $2. $3, if available,
 is the name of the new class--if not, the subclass is an anonymous subclass.
 
-$1 is replaced--a new PMC for the subclass is generated and put in it.
+=item B<subclass>(out PMC, in PMC, in KEY)
+
+=item B<subclass>(out PMC, in KEY, in KEY)
+
+=item B<subclass>(out PMC, in STR, in KEY)
+
+Create a new class $1, that is a subclass of $2. If $3 isn't a NULL key,
+it's the name of the class.
 
 =cut
 
 inline op subclass(out PMC, in PMC, in STR) :object_base {
-  $1 = VTABLE_subclass(interpreter, $2, $3);
+  PMC *name;
+  name = pmc_new(interpreter, enum_class_String);
+  VTABLE_set_string_native(interpreter, name, $3);
+  $1 = VTABLE_subclass(interpreter, $2, name);
   goto NEXT();
 }
 
@@ -253,12 +263,15 @@ inline op subclass(out PMC, in PMC) :object_classes {
 
 op subclass(out PMC, in STR, in STR) :object_classes {
   PMC *class = Parrot_class_lookup(interpreter, $2);
+  PMC *name;
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
     real_exception(interpreter, next, NO_CLASS, "Class '%s' doesn't exist",
-		string_to_cstring( interpreter, $3 ));
+		string_to_cstring( interpreter, $2 ));
   }
-  $1 = VTABLE_subclass(interpreter, class, $3);
+  name = pmc_new(interpreter, enum_class_String);
+  VTABLE_set_string_native(interpreter, name, $3);
+  $1 = VTABLE_subclass(interpreter, class, name);
   goto ADDRESS(next);
 }
 
