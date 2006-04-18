@@ -266,6 +266,8 @@ PGE::OPTable - PGE operator precedence table and parser
 
 .sub "parse" :method
     .param pmc mob
+    .param pmc stoptoken       :optional
+    .param int has_stoptoken   :opt_flag
     .local pmc tokentable, keytable, klentable
     .local pmc tokenstack, operstack, termstack
     .local pmc newfrom
@@ -281,6 +283,7 @@ PGE::OPTable - PGE operator precedence table and parser
     .local int tokencat, topcat
     .local int arity
     .local int lastcat
+    .local int circumnest 
 
     tokentable = self
     keytable = getattribute self, "PGE::OPTable\x0%!key"
@@ -295,6 +298,12 @@ PGE::OPTable - PGE operator precedence table and parser
     pos = mfrom
     lastpos = length target
     lastcat = PGE_OPTABLE_EMPTY
+    circumnest = 0
+
+    ## if an empty stoptoken was sent, pretend we didn't get one
+    if has_stoptoken == 0 goto expect_term
+    if stoptoken > '' goto expect_term
+    has_stoptoken = 0
 
   expect_term:
     expect = PGE_OPTABLE_EXPECT_TERM
@@ -372,8 +381,16 @@ PGE::OPTable - PGE operator precedence table and parser
     goto expect_oper
 
   oper_found:
+    ## if we're at a stop token, end the parse here
+    if circumnest > 0 goto oper_valid
+    if has_stoptoken == 0 goto oper_valid
+    $P0 = token['name']
+    if $P0 == stoptoken goto oper_not_found
+
+  oper_valid:
     tokenmode = token["mode"]
     tokencat = tokenmode & PGE_OPTABLE_SYNCAT
+    ## this hack handles prelist term followed by postcircumfix op
     if lastcat != PGE_OPTABLE_PRELIST goto oper_found_1
     if tokencat != PGE_OPTABLE_POSTCIRCUMFIX goto oper_found_1
     $P0 = pop tokenstack
@@ -430,6 +447,9 @@ PGE::OPTable - PGE operator precedence table and parser
   oper_shift:
     push tokenstack, token
     push operstack, oper
+    if tokencat < PGE_OPTABLE_POSTCIRCUMFIX goto oper_shift_1
+    inc circumnest
+  oper_shift_1:
     pos = oper.to()
     if tokencat == PGE_OPTABLE_PRELIST goto expect_termpost
     if tokencat >= PGE_OPTABLE_PREFIX goto expect_term
@@ -479,6 +499,9 @@ PGE::OPTable - PGE operator precedence table and parser
   reduce_saveterm:
     push termstack, $P1
   reduce_end:
+    if topcat < PGE_OPTABLE_POSTCIRCUMFIX goto reduce_end_1
+    dec circumnest
+  reduce_end_1:
     ret
 
   token_match:
