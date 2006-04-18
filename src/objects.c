@@ -33,21 +33,16 @@ fail_if_exist(Interp *interpreter, PMC *name)
     STRING *class_name;
     INTVAL type;
 
-    if (name->vtable->base_type == enum_class_String)  {
-        class_name = VTABLE_get_string(interpreter, name);
-        type = pmc_type(interpreter, class_name);
-    }
-    else {
-        PMC * const classname_hash = interpreter->class_hash;
-        PMC * type_pmc = VTABLE_get_pointer_keyed(interpreter, 
-                classname_hash, name); 
-        if (PMC_IS_NULL(type_pmc))
-            type = 0;
-        else
-            type = VTABLE_get_integer(interpreter, type_pmc);
-        /* TODO get printable name */
-        class_name = VTABLE_get_string(interpreter, name);
-    }
+    PMC * const classname_hash = interpreter->class_hash;
+    PMC * type_pmc = VTABLE_get_pointer_keyed(interpreter, 
+            classname_hash, name); 
+    if (PMC_IS_NULL(type_pmc) || 
+            type_pmc->vtable->base_type == enum_class_NameSpace)
+        type = 0;
+    else
+        type = VTABLE_get_integer(interpreter, type_pmc);
+    /* TODO get printable name */
+    class_name = VTABLE_get_string(interpreter, name);
     if (type > enum_type_undef) {
         real_exception(interpreter, NULL, INVALID_OPERATION,
                 "Class %Ss already registered!\n", class_name);

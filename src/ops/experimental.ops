@@ -381,6 +381,16 @@ inline op newclass(out PMC, in KEY) :object_classes {
   goto NEXT();
 }
 
+inline op new(out PMC, in KEY) :object_classes {
+  PMC *class = $2;
+    INTVAL type = pmc_type_p(interpreter, class);
+    if (type <= 0)
+        real_exception(interpreter, NULL, NO_CLASS,
+            "Class '%Ss' not found", class);
+  $1 = pmc_new(interpreter, type);
+  goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

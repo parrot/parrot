@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 66;
+use Parrot::Test tests => 69;
 
 =head1 NAME
 
@@ -1991,4 +1991,75 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "verfiy data type");
     end
 CODE
 /\d+/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "new keyed");
+.sub main :main
+    .local pmc cl, o
+    cl = newclass ['Foo';'Bar']
+    o = new  ['Foo';'Bar']
+    print "ok\n"
+.end
+.namespace ['Foo';'Bar']
+.sub __init :method
+    print "__init\n"
+.end
+CODE
+__init
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "new keyed 2");
+.sub main :main
+    .local pmc c1, c2, o1, o2
+    c1 = newclass ['Foo';'Bar']
+    c2 = newclass ['Foo';'Baz']
+    o1 = new      ['Foo';'Bar']
+    o2 = new      ['Foo';'Baz']
+    print "ok\n"
+.end
+.namespace ['Foo';'Bar']
+.sub __init :method
+    print "__init Bar\n"
+.end
+.namespace ['Foo';'Baz']
+.sub __init :method
+    print "__init Baz\n"
+.end
+
+CODE
+__init Bar
+__init Baz
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "new keyed 3");
+.sub main :main
+    .local pmc c1, c2, c3, o1, o2, o3
+    c1 = newclass ['Foo';'Bar']
+    c2 = newclass ['Foo';'Baz']
+    c3 = newclass 'Foo'
+    o1 = new      ['Foo';'Bar']
+    o2 = new      ['Foo';'Baz']
+    o3 = new      'Foo'
+    print "ok\n"
+.end
+.namespace ['Foo';'Bar']
+.sub __init :method
+    print "__init Bar\n"
+.end
+.namespace ['Foo';'Baz']
+.sub __init :method
+    print "__init Baz\n"
+.end
+
+.namespace ['Foo']
+.sub __init :method
+    print "__init Foo\n"
+.end
+CODE
+__init Bar
+__init Baz
+__init Foo
+ok
 OUTPUT

@@ -395,12 +395,25 @@ INTVAL
 pmc_type(Interp* interpreter, STRING *name)
 {
     PMC * const classname_hash = interpreter->class_hash;
-    HashBucket * const bucket = hash_get_bucket(interpreter, PMC_struct_val(classname_hash), name);
+    PMC *item;
 
-    if (bucket)
-        return PMC_int_val((PMC*) bucket->value);
+    item = VTABLE_get_pointer_keyed_str(interpreter, classname_hash, name); 
+    if (!PMC_IS_NULL(item))
+        return PMC_int_val((PMC*) item);
     return Parrot_get_datatype_enum(interpreter, name);
 
+}
+
+INTVAL
+pmc_type_p(Interp* interpreter, PMC *name)
+{
+    PMC * const classname_hash = interpreter->class_hash;
+    PMC *item;
+
+    item = VTABLE_get_pointer_keyed(interpreter, classname_hash, name); 
+    if (!PMC_IS_NULL(item))
+        return PMC_int_val((PMC*) item);
+    return 0;
 }
 
 static PMC*

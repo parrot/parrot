@@ -32,6 +32,8 @@ type information.
 
 =item B<new>(out PMC, inconst STR)
 
+=item B<new>(out PMC, in KEY)
+
 =item B<new>(out PMC, in INT, in PMC)
 
 Create a new PMC of class $2; look in F<core_pmcs.h> for the base
@@ -78,7 +80,6 @@ op new(out PMC, inconst STR) {
             "Class '%Ss' not found", class);
   $1 = pmc_new(interpreter, type);
   goto NEXT();
-}
 }
 
 op new(out PMC, in INT, in PMC) {

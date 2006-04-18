@@ -293,10 +293,13 @@ a NameSpace or a var, the var is returned.
         else if (key->vtable->base_type == enum_class_Key) {
             while (key) {
                 part = key_string(INTERP, key);
-                ns = VTABLE_get_pointer_keyed_str(INTERP, ns, part);
+                key = key_next(INTERP, key);
+                if (key)
+                    ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
+                else
+                    ns = VTABLE_get_pointer_keyed_str(INTERP, ns, part);
                 if (PMC_IS_NULL(ns))
                     return PMCNULL;
-                key = key_next(INTERP, key);
             }
             return ns;
         }
@@ -305,7 +308,10 @@ a NameSpace or a var, the var is returned.
             return PMCNULL;
         for (i = 0; i < n; ++i) {
             part = VTABLE_get_string_keyed_int(INTERP, key, i);
-            ns = VTABLE_get_pointer_keyed_str(INTERP, ns, part);
+            if (i < n - 1)
+                ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
+            else
+                ns = VTABLE_get_pointer_keyed_str(INTERP, ns, part);
             if (PMC_IS_NULL(ns))
                 return PMCNULL;
         }

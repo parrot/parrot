@@ -33,6 +33,7 @@ PARROT_API PMC *constant_pmc_new_init(Interp *, INTVAL base_type, PMC *);
 
 PARROT_API INTVAL pmc_register(Interp *, STRING *);
 PARROT_API INTVAL pmc_type(Interp *, STRING *);
+PARROT_API INTVAL pmc_type_p(Interp *, PMC *);
 
 /*
  * DOD registry interface
