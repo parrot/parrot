@@ -467,7 +467,7 @@ sub parse_pmc {
         if ($methodname eq 'class_init') {
             $class_init = {
                 meth        => $methodname,
-                body    	=> $methodblock,
+                body        => $methodblock,
                 line        => $lineno,
                 type        => $type,
                 parameters  => $parameters,
@@ -502,10 +502,10 @@ sub parse_pmc {
     return $classname,
            {
                pre          => $pre,
-	           flags        => $flags,
-	           methods      => \@methods,
-	           post         => $post,
-	           class        => $classname,
+               flags        => $flags,
+               methods      => \@methods,
+               post         => $post,
+               class        => $classname,
                has_method   => \%meth_hash
            };
 }
@@ -530,7 +530,7 @@ sub gen_parent_list {
 
         my %parent_hash = %{$sub->{flags}{extends}};
         my @parents     = sort { $parent_hash{$a} <=> $parent_hash{$b} }
-		    keys %parent_hash;
+            keys %parent_hash;
         for my $parent (@parents) {
             next if exists $class->{has_parent}{$parent};
 
@@ -753,24 +753,24 @@ sub gen_c {
 
 #
 #   gen_def( [$dir1, $dir2], \%pmc )
-# 
+#
 # Generate a .def file for symbols to export for dynamic PMCs.
 # Currently unused, but retained for being a basis for supporting
 # platforms that need a symbol export list.
 #
 sub gen_def {
     my ($include, $pmcs) = @_;
-    
+
     my ($pmcfilename, $pmcname);
     my %groups;
     foreach $pmcfilename (keys %$pmcs) {
         # Skip for non-dynpmcs.
         next unless $pmcs->{$pmcfilename}->{flags}->{dynpmc};
-        
+
         # Get copy of name without extension.
         $pmcname = $pmcfilename;
         $pmcname =~ s/\.pmc$//;
-        
+
         # Locate .h file and add everything it exports to a list.
         my @exports = ();
         my $file = find_file($include, "pmc_$pmcname.h", 1);
@@ -778,22 +778,22 @@ sub gen_def {
         open my $fh, "<", $file or die "Can't read '$file'";
         while (<$fh>) {
             if (/^(?:extern\s+)?\w+\*?\s+\*?(\w+)\s*\([^)]+\)\s*;/) {
-			push @exports, $1;
+                push @exports, $1;
             }
         }
         close $fh;
-        
+
         # Locate .c file and add everything it exports to a list.
         $file = find_file($include, "$pmcname.c", 1);
         print "Reading $file\n" if $opt{verbose};
         open $fh, "<", $file or die "Can't read '$file'";
         while (<$fh>) {
             if (/^(?:extern\s+)?\w+\*?\s+\*?(\w+)\s*\([^)]+\)\s*;/) {
-			push @exports, $1;
+                push @exports, $1;
             }
         }
         close $fh;
-        
+
         # If it's in a group, put it in group's PMC array.
         if ($pmcs->{$pmcfilename}->{flags}->{group}) {
             for (keys %{$pmcs->{$pmcfilename}->{flags}->{group}}) {
@@ -801,7 +801,7 @@ sub gen_def {
                 push @{$groups{$_}}, @exports;
             }
         }
-        
+
         # Generate .def file for it.
         # XXX JW Needn't generate these for PMCs in a group?
         #        For now, simplifies sutff.
@@ -812,15 +812,15 @@ sub gen_def {
         print $fh "\t$_\n" foreach @exports;
         close $fh;
     }
-    
+
     # Generate .def file for groups.
     for my $group (keys %groups) {
         # Get filename of where we'll stash the .def file.
         my $deffile = "$group.def";
-        
+
         # Does the DEF file already exist?
         my $defexists = -e $deffile ? 1 : 0;
-        
+
         # Open the file to append to it.
         print "Writing $deffile\n" if $opt{verbose};
         open my $fh, ">>", $deffile or die "Can't write '$deffile'";
