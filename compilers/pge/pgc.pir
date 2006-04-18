@@ -106,7 +106,7 @@ the output to the correct output file.
     ## parse the grammar into statements
     .local pmc p6rule, stmts
     p6rule = compreg "PGE::P6Rule"
-    $P1 = p6rule('^<PGE::PGC::grammar>')
+    $P1 = p6rule('^<PGE::PGC::grammar> [ $ | <PGE::Util::die: Syntax error> ]')
     stmts = $P1(code)
     stmts = stmts['PGE::PGC::grammar']
     stmts = stmts[0]
@@ -226,6 +226,7 @@ rules needed to parse the input.
 
 .sub 'pgc_init'
     load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Util.pir'
     load_bytecode 'Getopt/Obj.pbc'
 
     .local pmc p6rule
@@ -254,11 +255,16 @@ END_ARG_RULE
 
     ## the main rule for parsing a grammar
     $S0 = <<'END_GRAMMAR'
-:w ( $<cmd>:=(grammar) $<name>:=<arg> ;?
-   | $<cmd>:=(rule) $<name>:=<arg> \{ <p6rule> \}
-   | [multi]? $<cmd>:=(sub|proto) $<name>:=<arg>
-      ( is $<trait>:=[\w+]<arg>? )*
-      [ \{ <-[}]>*: \} | ; ]
+:w ( $<cmd>:=(grammar) 
+         [ $<name>:=<arg> | <PGE::Util::die: name expected after 'grammar'> ] 
+         ;?
+   | $<cmd>:=(rule) 
+         [ $<name>:=<arg> | <PGE::Util::die: name expected after 'rule'> ] 
+         [ \{ <p6rule> \} | <PGE::Util::die: missing rule body> ]
+   | [multi]? $<cmd>:=(sub|proto) 
+         [ $<name>:=<arg> | <PGE::Util::die: name expected after 'proto/sub'> ] 
+         ( is $<trait>:=[\w+]<arg>? )*
+         [ \{ <-[}]>*: \} | ; | <PGE::Util::die: missing proto/sub body> ]
    )*
 END_GRAMMAR
     p6rule($S0, 'PGE::PGC', 'grammar')

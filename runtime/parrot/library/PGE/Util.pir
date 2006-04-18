@@ -51,10 +51,10 @@ of the match.
     .local string target
     newfrom = find_global 'PGE::Match', 'newfrom'
     (mob, target, mfrom, mpos) = newfrom(mob, 0)
-    $I0 = length target
+    $I0 = length message
     dec $I0
-    $I0 = is_cclass .CCLASS_NEWLINE, target, $I0
-    if $I0 == 1 goto throw_message
+    $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
+    if $I0 goto throw_message
 
     # count newlines to the current position of the parse
     .local int pos, npos, lines
