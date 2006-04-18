@@ -87,7 +87,7 @@ add_wrapped(<<END_PIR);
   .param pmc argv
 
   .local pmc compiler
-  compiler = find_global 'compile_dispatch'
+  .get_from_HLL(compiler, '_tcl', 'compile_dispatch')
 
   .local int argc
   .local string pir_code,temp_code
@@ -138,9 +138,9 @@ add_inlined(<<END_PIR);
 END_PIR
 add_wrapped(<<END_PIR);
   .local pmc __script_compile
-  __script_compile = find_global '_Tcl', 'compile'
+  .get_from_HLL(__script_compile, '_tcl', 'compile')
   .local pmc __expression_compile
-  __expression_compile = find_global '_Tcl', '__expression_compile'
+  .get_from_HLL(__expression_compile, '_tcl', '__expression_compile')
 END_PIR
 
 # Now, grab each arg off the list and compile it, handling defaults, etc.

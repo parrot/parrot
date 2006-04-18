@@ -1,3 +1,4 @@
+.HLL '_Tcl', ''
 .namespace [ 'builtins' ]
 
 .sub 'cd'
@@ -10,7 +11,7 @@
   directory_num = 0
 
   .local pmc compiler
-  compiler = find_global 'compile_dispatch'
+  .get_from_HLL(compiler,'_tcl', 'compile_dispatch')
 
   if argc == 0 goto noargs
   if argc == 1 goto got_dir

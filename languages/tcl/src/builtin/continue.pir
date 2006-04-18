@@ -1,3 +1,4 @@
+.HLL '_Tcl', ''
 .namespace [ 'builtins' ]
 
 .sub 'continue'

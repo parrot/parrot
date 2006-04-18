@@ -1,3 +1,4 @@
+.HLL '_Tcl', ''
 .namespace [ 'builtins' ]
 
 .sub "for"
@@ -20,9 +21,9 @@
   .local pmc start,cond,step,body
   .local pmc compiler,compile_dispatch,expr_compiler
 
-  compiler         = find_global 'compile'
-  compile_dispatch = find_global 'compile_dispatch'
-  expr_compiler    = find_global '__expression_compile'
+  .get_from_HLL(compiler ,'_tcl', 'compile')
+  .get_from_HLL(compile_dispatch, '_tcl', 'compile_dispatch')
+  .get_from_HLL(expr_compiler, '_tcl', '__expression_compile')
 
   start = argv[0]
   cond  = argv[1]
