@@ -63,6 +63,7 @@ PARROT_API void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, ST
 PARROT_API void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 PARROT_API void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 PARROT_API void Parrot_invalidate_method_cache(Interp*, STRING *class, STRING *meth);
+PARROT_API STRING *readable_name(Parrot_Interp, PMC *);
 
 /* Objects, classes and PMCarrays all use the same data scheme:
  * PMC_data() holds a malloced array, PMC_int_val() is the size of it

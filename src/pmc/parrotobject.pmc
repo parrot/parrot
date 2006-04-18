@@ -105,9 +105,8 @@ These two methods just call C<init()>. The arguments are ignored.
 
 
     STRING* name() {
-        return VTABLE_get_string(INTERP,
-                (PMC *)get_attrib_num((Buffer *)PMC_data(SELF),
-                                      POD_CLASS_NAME));
+        PMC *class = VTABLE_get_class(INTERP, SELF);
+        return VTABLE_name(INTERP, class);
     }
 
 

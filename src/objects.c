@@ -27,6 +27,24 @@ Handles class and object manipulation.
 static void parrot_class_register(Interp * , PMC *name,
         PMC *new_class, PMC *parent, PMC *mro);
 
+
+STRING*
+readable_name(Interp *interpreter, PMC *name)
+{
+    if (name->vtable->base_type == enum_class_String)
+        return VTABLE_get_string(interpreter, name);
+    else {
+        STRING *j = CONST_STRING(interpreter, ";");
+        PMC *ar = pmc_new(interpreter, enum_class_ResizableStringArray);
+        assert(name->vtable->base_type == enum_class_Key);
+        while (name) {
+            VTABLE_push_string(interpreter, ar, key_string(interpreter, name));
+            name = key_next(interpreter, name);
+        }
+        return string_join(interpreter, j, ar);
+    }
+}
+
 static void
 fail_if_exist(Interp *interpreter, PMC *name)
 {

@@ -288,11 +288,9 @@ op subclass(out PMC, in STR) :object_classes {
 
 =item B<getclass>(out PMC, in STR)
 
-Find the PMC for a class, by name. Note that this is a one-level hash, so for
-classes that have some structure you need to impose that structure externally.
+=item B<getclass>(out PMC, in KEY)
 
-Parrot's conventions are that level separators are noted with the NULL
-character, so Perl's Foo::Bar would be Foo\0Bar.
+Find the PMC for a class, by name.
 
 =cut
 

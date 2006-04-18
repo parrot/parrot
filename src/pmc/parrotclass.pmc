@@ -127,12 +127,14 @@ Return the classname.
     }
 
     STRING* name() {
-        PMC **class_data;
+        PMC **class_data, *name;
         class_data = (PMC **)PMC_data(SELF);
 
-        return class_data ? 
-            VTABLE_get_string(INTERP, class_data[PCD_CLASS_NAME]) :
-            SELF->vtable->whoami;
+        if (class_data) {
+            name = class_data[PCD_CLASS_NAME];
+            return readable_name(interpreter, name);
+        }
+        return SELF->vtable->whoami;
     }
 
 

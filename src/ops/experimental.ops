@@ -406,9 +406,9 @@ op subclass(out PMC, in KEY, in KEY) :object_classes {
   PMC *class = Parrot_class_lookup_p(interpreter, $2);
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
-    STRING *name = key_string(interpreter, $2);  /* XXX */
-    real_exception(interpreter, next, NO_CLASS, "Class '%s' doesn't exist",
-		string_to_cstring( interpreter, name ));
+    STRING *name = readable_name(interpreter, $2);
+    real_exception(interpreter, next, NO_CLASS, 
+		"Class '%Ss' doesn't exist", name);
   }
   $1 = VTABLE_subclass(interpreter, class, $3);
   goto ADDRESS(next);
@@ -419,6 +419,18 @@ inline op subclass(out PMC, in PMC, in KEY) :object_base {
   goto NEXT();
 }
 
+inline op getclass(out PMC, in KEY) :object_classes {
+  PMC *class = Parrot_class_lookup_p(interpreter, $2);
+  opcode_t *next = expr NEXT();
+  if (PMC_IS_NULL(class)) {
+    STRING *name = readable_name(interpreter, $2);
+    real_exception(interpreter, next, NO_CLASS, 
+         "Class '%Ss' doesn't exist", name);
+  }
+  else
+    $1 = class;
+  goto ADDRESS(next);
+}
 =back
 
 =head1 COPYRIGHT
