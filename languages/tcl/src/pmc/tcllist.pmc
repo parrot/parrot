@@ -72,12 +72,16 @@ Returns the list as a string
 */
 
     STRING* get_string () {
-        PMC *listToString;
-        STRING *namespace, *sub, *value;
-        
-        namespace    = string_from_const_cstring(INTERP, "_Tcl", 4);
-        sub          = string_from_const_cstring(INTERP, "__listToString", 14);
-        listToString = Parrot_get_global(INTERP, namespace, sub, NULL);
+        PMC *listToString, *namespace;
+        STRING *_tcl_namespace, *sub, *value;
+
+        _tcl_namespace = string_from_const_cstring(INTERP, "_tcl", 4);
+        sub            = string_from_const_cstring(INTERP, "__listToString", 14);
+
+        namespace = interpinfo_p(INTERP, 17); /* namespace root*/
+        namespace = VTABLE_get_pmc_keyed_str(INTERP, namespace, _tcl_namespace);
+        listToString = VTABLE_get_pmc_keyed_str(INTERP, namespace, sub);
+
         CONTEXT(INTERP->ctx)->constants =
           PMC_sub(listToString)->seg->const_table->constants;
         value        = Parrot_runops_fromc_args
