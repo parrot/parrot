@@ -90,7 +90,7 @@ wrong_args:
 .end
 
 .HLL '_Tcl', ''
-.namespace [ 'helpers'; 'sort' ]
+.namespace [ 'helpers'; 'lsort' ]
 
 .sub "sort"
   .param pmc compare
@@ -180,7 +180,7 @@ decreasing:
 
   # check that they're actually integers.
   .local pmc __number
-  __number = find_global '__number'
+  .get_from_HLL(__number, '_tcl', '__number')
   s1 = __number(s1)
   s2 = __number(s2)
 
