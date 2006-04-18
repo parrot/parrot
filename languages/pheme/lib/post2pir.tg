@@ -1,0 +1,233 @@
+ROOT: result(.) = {
+	.local string result
+	result = <<'EOT'
+.namespace [ 'Pheme' ]
+
+.sub __onload :anon :load
+	load_bytecode 'lib/PhemeSymbols.pbc'
+	main()
+.end
+
+EOT
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc iter
+	iter = new .Iterator, children
+	iter = 0
+
+	.local string output
+	.local pmc    child
+
+  iter_loop:
+	unless iter goto iter_end
+	child   = shift iter
+	output  = tree.'get'( 'emit', child )
+	result .= output
+	goto iter_loop
+	
+  iter_end:
+	.return( result )
+}
+
+POST::Sub: emit(.) = {
+	.local string result
+	.local string name
+	name = node.'name'()
+
+	result  = '.sub '
+	result .= name
+	result .= "\n"
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc iter
+	iter = new .Iterator, children
+	iter = 0
+
+	.local pmc    child
+	.local string output
+
+	# process the first kid; it might be declarations
+  iter_start:
+	unless iter goto iter_end
+	child   = shift iter
+	output  = tree.'get'( 'emit_declarations', child )
+	unless output goto inner_loop
+	result .= output
+	goto iter_loop
+
+  iter_loop:
+	unless iter goto iter_end
+	child   = shift iter
+
+  inner_loop:
+	child   = tree.'get'( 'resolve_ops', child )
+	output  = tree.'get'( 'emit', child )
+	result .= output
+	goto iter_loop
+
+  iter_end:
+	.local pmc    final_tmpvar
+	final_tmpvar = child.'tmpvar'()
+
+	.local string final_result
+	final_result = final_tmpvar.'varname'()
+	result .= "\t.return( "
+	result .= final_result
+	result .= " )\n"
+	result .= ".end\n\n"
+
+	.return( result )
+}
+
+POST::Ops: resolve_ops(.) = {
+	.local pmc result
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc first_child
+	first_child = children[0]
+
+	.local string child_type
+	child_type = typeof first_child
+
+	unless child_type == 'POST::Op' goto insert_check
+	.return( node )
+
+  insert_check:
+  	.local pmc check_node
+	check_node = new 'POST::Op'
+	check_node.'op'( '__resolve_at_runtime' )
+	unshift children, check_node
+	.return( node )
+}
+
+POST::Ops: emit(.) = {
+	.local string result
+
+	# get name for variable used to hold the results of this op
+	.local pmc    target_var
+	.local string varname
+
+	target_var = node.'tmpvar'()
+	varname    = target_var.'varname'()
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc iter
+	iter = new .Iterator, children
+	iter = 0
+
+	.local pmc op
+	op   = shift iter
+
+	.local string output
+	.local string outvar
+
+	.local string op_name
+	op_name    = op.'op'()
+	
+	.local pmc outvars
+	outvars = new .ResizableStringArray
+
+	.local pmc    child
+  iter_loop:
+	unless iter goto iter_end
+	child      = shift iter
+	output     = tree.'get'( 'emit', child )
+	push outvars, output
+	goto iter_loop
+
+  iter_end:
+
+	outvar     = join ', ', outvars
+	result    .= "\t"
+	result    .= varname
+	result    .= " = "
+	result    .= op_name
+	result    .= '( '
+	result    .= outvar
+	result    .= " )\n"
+	goto return_result
+
+  return_result:
+	.return( result )
+}
+
+POST::Ops: emit_declarations(.) = {
+	.local string result
+	result = ''
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc child
+	child = children[0]
+
+	.local string op_type
+	op_type = typeof child
+	unless op_type == 'POST::Op' goto return_result
+
+	.local string name
+	name = child.'op'()
+	unless name == 'declare' goto return_result
+
+	# the second child is a Val
+	child    = children[1]
+	name     = child.'value'()
+
+	result  .= "\t.param pmc "
+	result  .= name
+	result  .= "\n"
+
+  iter_end:
+
+  return_result:
+	.return( result )
+}
+
+PAST::Val: emit(.) = {
+	.local string result
+
+	result = node.'value'()
+
+	result  = "'" . result
+	result .= "'"
+
+	.return( result )
+}
+
+POST::Val: emit(.) = {
+	.local string result
+
+	result = node.'value'()
+
+	result  = "'" . result
+	result .= "'"
+
+	.return( result )
+}
+
+POST::Var: emit(.) = {
+	.local string varname
+	varname = node.'varname'()
+	.return( varname )
+}
+
+POST::Var: outvar(.) = {
+	.local string result
+	result = node.'varname'()
+	.return( result )
+}
+
+POST::Op: emit(.) = {
+	.local string result
+	.local string name
+	name = node.'op'()
+	.return( name )
+}

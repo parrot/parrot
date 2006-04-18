@@ -1,0 +1,40 @@
+This is Pheme, version 0.0.1
+----------------------------
+
+Copyright (c) 2006, The Perl Foundation.
+
+Pheme is a Parrot-based implementation of Scheme, in the sense that it has the
+same syntax (what syntax it has) and shares the name of some built-ins.  Please
+note the version number.
+
+PREREQUISITES
+-------------
+
+Punie depends on Parrot 0.4.3 or higher, PGE, and TGE.
+
+INSTRUCTIONS
+------------
+
+Get Parrot.  Compile Parrot.  Make sure its tests pass, particularly those of
+PGE.
+
+Compile Pheme:
+
+  $ make
+  $ make test
+
+Note that the tests are actual Pheme programs, written entirely in Pheme
+(except for the test library, which is a PIR program).
+
+Run the Pheme compiler via Parrot.  The first argument to the compiler should
+be a Pheme program to run.
+
+  $ parrot pheme.pbc some_program.pheme
+
+Read the TODO file for an idea of some ways to improve this language.
+
+Please send all patches, bug reports, and suggestions to the Parrot mailing
+list.
+
+18 April 2006
+chromatic

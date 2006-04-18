@@ -1,0 +1,414 @@
+ROOT: result(.) = {
+	.local pmc result
+	result = new 'POST::Node'
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc symbols
+	symbols = tree.'get'( 'find_sub_names', node )
+
+	store_global 'Pheme::Compiler', 'symbols', symbols
+
+	.local pmc child
+	.local pmc iter
+	iter = new Iterator, children
+	iter = 0
+
+  iter_loop:
+	unless iter, iter_end        # while (entries) ...
+	shift child, iter            # get key for next entry
+	child = tree.'get'( 'result', child )
+	result.'add_child'( child )
+	goto iter_loop
+
+  iter_end:
+	.return( result )
+}
+
+PAST::Node: find_sub_names(.) = {
+	.local pmc symbols
+	symbols = find_global 'PhemeCompiler', 'symbols'
+
+	.local pmc children
+	children = node.'children'()
+
+	.local string name
+	.local pmc    child
+	.local pmc    iter
+	iter = new Iterator, children
+	iter = 0
+
+  iter_loop:
+	unless iter, iter_end        # while (entries) ...
+	shift child, iter            # get key for next entry
+	name          = child.'name'()
+	symbols[name] = 1
+	goto iter_loop
+
+  iter_end:
+	.return( symbols )
+}
+
+PAST::Sub: result(.) = {
+	.local pmc result
+	result = new 'POST::Sub'
+
+	.local pmc declarations
+	declarations = tree.'get'( 'create_sub_declarations', node )
+
+	# add the variable declarations to the start
+	.local pmc iter
+	iter = new .Iterator, declarations
+	iter = 0
+
+	.local pmc var_op
+
+  var_iter_loop:
+	unless iter goto var_iter_end
+	var_op = shift iter
+	result.'add_child'( var_op )
+	goto var_iter_loop
+
+  var_iter_end:
+	# set the sub name
+	.local pmc name
+	name = node.'name'()
+	result.'name'( name )
+
+	.local pmc children
+	children = node.'children'()
+
+	# this should only have one child -- a PAST::Stmts node
+	.local pmc child
+	child = children[0]
+
+	.local int has_declarations
+	has_declarations = declarations
+
+	.local string tree_method
+	tree_method = 'result'
+
+	unless has_declarations goto process_children
+
+  unwrap_lambda:
+	# ignore that node; get its first child (a PAST::Op node)
+	children    = child.'children'()
+	child       = children[0]
+	tree_method = 'lambda_to_ops'
+
+  process_children:
+  	children = tree.'get'( tree_method, child )
+	iter     = new .Iterator, children
+	iter     = 0
+
+  child_iter_loop:
+	unless iter goto child_iter_end
+	child = shift iter
+	result.'add_child'( child )
+	goto child_iter_loop
+
+  child_iter_end:
+	# fixup the non-parameter type
+	children = result.'children'()
+	.local int kid_count
+	.local string kid_type
+
+	kid_count = children
+	if kid_count > 1 goto return_result
+
+	child     = children[0]
+	kid_type  = typeof child
+	unless kid_type == 'POST::Ops' goto return_result
+	children  = child.'children'()
+	result.'children'( children )
+
+  return_result:
+	.return( result )
+}
+
+PAST::Sub: create_sub_declarations(.) = {
+	.local pmc variables
+	variables = tree.'get'( 'find_sub_variables', node )
+
+	.local pmc iter
+	iter = new .Iterator, variables
+	iter = 0
+
+	.local pmc    tmpvar
+	.local pmc    var_op
+	.local pmc    var_ops
+	.local pmc    var_op_name
+	.local pmc    declarations
+	.local pmc    variable_hash
+	.local string var_name
+
+	declarations  = new .ResizablePMCArray
+	variable_hash = new .Hash
+
+  iter_loop:
+  	unless iter goto iter_end
+	var_name    = shift iter
+	var_op      = new 'POST::Op'
+	var_ops     = new 'POST::Ops'
+	var_op_name = new 'POST::Val'
+	tmpvar      = new 'POST::Var'
+	tmpvar.'new_temp'()
+	var_op_name.'value'( var_name )
+	var_op.'op'( 'declare' )
+	var_ops.'tmpvar'( tmpvar )
+	var_ops.'add_child'( var_op )
+	var_ops.'add_child'( var_op_name )
+	push declarations, var_ops
+	variable_hash[var_name] = 1
+	goto iter_loop
+
+  iter_end:
+	store_global 'Pheme::Compiler', 'bound_variables', variable_hash
+	.return( declarations )
+}
+
+PAST::Sub: find_sub_variables(.) = {
+	.local pmc result
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc stmts
+	stmts    = children[0]
+	children = stmts.'children'()
+
+  find_exp:
+	.local pmc first_exp
+	first_exp = children[0]
+	children  = first_exp.'children'()
+
+	.local pmc top_op
+	top_op = children[0]
+
+	.local string op_name
+	op_name = top_op.'op'()
+
+	if op_name == 'lambda' goto find_names
+
+	result = new .Array
+	.return( result )
+
+  find_names:
+	.local pmc lambda_vars
+	lambda_vars = children[1]
+
+	result = tree.'get'( 'get_var_names', lambda_vars )
+	.return( result )
+}
+
+PAST::Exp: get_var_names(.) = {
+	.local pmc result
+	result = new .ResizableStringArray
+
+	.local pmc children
+	children = node.'children'()
+
+	.local int child_count
+	child_count = children
+	if child_count > 0 goto find_kid_names
+
+  	.return( result )
+
+  find_kid_names:
+	.local pmc iter
+	iter = new .Iterator, children
+	iter = 0
+
+	.local pmc child
+	.local string name
+
+  iter_loop:
+	unless iter goto iter_end
+	child  = shift iter
+	name   = tree.'get'( 'get_var_name', child )
+	push result, name
+	goto iter_loop
+
+  iter_end:
+  	.return( result )
+}
+
+PAST::Op: get_var_name(.) = {
+	.local string name
+	name = node.'op'()
+	.return( name )
+}
+
+PAST::Val: get_var_name(.) = {
+	.local string name
+	name = node.'value'()
+	.return( name )
+}
+
+PAST::Stmts: result(.) = {
+	.local pmc result
+	result = new 'POST::Ops'
+
+	.local pmc tmpvar
+	tmpvar = new 'POST::Var'
+	tmpvar.'new_temp'()
+
+	result.'tmpvar'( tmpvar )
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc iter
+	iter = new .Iterator, children
+	iter = 0
+
+	.local pmc child
+	.local pmc child_iter
+
+  iter_loop:
+	unless iter goto iter_end
+	child = shift iter
+	child = tree.'get'( 'result', child )
+
+	child_iter = new .Iterator, child
+	child_iter = 0
+
+  child_iter_loop:
+	unless child_iter goto child_iter_end
+	child = shift child_iter
+	result.'add_child'( child )
+	goto child_iter_loop
+  child_iter_end:
+	goto iter_loop
+
+  iter_end:
+	.local pmc resulty
+	resulty = new .ResizablePMCArray
+	push resulty, result
+	.return( resulty )
+}
+
+PAST::Exp: result(.) = {
+	.local pmc result
+	result   = new .ResizablePMCArray
+
+	.local pmc new_ops
+	new_ops  = new 'POST::Ops'
+
+	.local pmc tmpvar
+	tmpvar   = new 'POST::Var'
+	tmpvar.'new_temp'()
+
+	new_ops.'tmpvar'( tmpvar )
+
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc iter
+	iter     = new .Iterator, children
+	iter     = 0
+	
+	.local pmc    child
+	.local string child_type
+	.local pmc    child_list
+
+  iter_loop:
+	unless iter goto iter_end
+	child      = shift iter
+	child_type = typeof child
+	if child_type == 'PAST::Exp' goto recurse
+	child      = tree.'get'( 'result', child )
+	new_ops.'add_child'( child )
+	goto iter_loop
+
+  recurse:
+	child_list = tree.'get'( 'result', child )
+
+	.local pmc child_iter
+	child_iter = new .Iterator, child_list
+	child_iter = 0
+
+  child_iter_loop:
+	unless child_iter goto child_iter_end
+	child = shift child_iter
+	push result, child
+	goto child_iter_loop
+  child_iter_end:
+	tmpvar = child.'tmpvar'()
+	new_ops.'add_child'( tmpvar )
+	goto iter_loop
+
+  iter_end:
+	push result, new_ops
+	.return( result )
+}
+
+PAST::Exp: lambda_to_ops(.) = {
+	.local pmc children
+	children = node.'children'()
+
+	# the first child is the argument list; ignore it
+	# now process the code as a normal PAST::Op
+
+	.local pmc op
+	op = children[2]
+
+	.local pmc result
+	result = tree.'get'( 'result', op )
+	.return( result )
+}
+
+PAST::Op: result(.) = {
+	.local pmc result
+
+	.local pmc symbols
+	symbols   = find_global 'Pheme::Compiler', 'symbols'
+
+	.local string op_name
+	op_name   = node.'op'()
+
+	.local int op_exists
+	op_exists = exists symbols[op_name]
+
+	unless op_exists goto is_val
+
+  is_op:
+	result = new 'POST::Op'
+	result.'op'( op_name )
+	goto return_result
+
+  is_val:
+	result = new 'POST::Val'
+	result.'value'( op_name )
+
+  return_result:
+	.return( result )
+}
+
+PAST::Val: result(.) = {
+	.local pmc result
+
+	.local string value
+	value = node.'value'()
+
+	.local pmc variables
+	variables = find_global 'Pheme::Compiler', 'bound_variables'
+
+	.local string value
+	value = node.'value'()
+
+	.local int is_variable
+	is_variable = exists variables[value]
+
+	if is_variable goto rebind_variable
+	result = new 'POST::Val'
+	result.'value'( value )
+	.return( result )
+
+  rebind_variable:
+	result = new 'POST::Var'
+	result.'varname'( value )
+
+  	.return( result )
+}

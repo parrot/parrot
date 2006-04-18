@@ -1,0 +1,45 @@
+http://schemers.org/Documents/Standards/R5RS/HTML/
+
+Compiler:
+	- merge PAST/POST improvements back to Punie
+	- share those nodes somehow
+
+Fix namespace:
+	- lowercase
+	- directly under Parrot root
+	- use nested namespaces properly
+
+Grammar:
+	- empty list does NOT work yet
+	- tighten identifiers
+		- allow ! $ % & * + - . / : < = > ? @ ^ _ ~ 
+		- start with any non-number-beginning character
+		- . + - not allowed at the start of an identifier
+		- + - themselves can be an identifier
+		- ... can be an identifier
+	- fix whitespace
+		- space, newline (also tab, carriage return)
+	- allow comments
+		- semicolon to end of line
+		- can be at start of line
+	- parse numbers
+		- . + - allowed at the start of a number
+	- add more rules
+		- ` indicates almost constant data
+		- ' indicates literal data
+		- " delimits strings
+		- \ is an escape character
+
+Predicates:
+	- boolean?
+		- everything but #f is true (conditionals, not true here)
+	- symbol?
+	- char?
+	- vector?
+	- procedure?
+	- pair?
+	- number?
+	- string?
+	- port?
+	- predicates are disjoint
+	- empty list satisfies none

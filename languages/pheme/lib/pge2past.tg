@@ -1,0 +1,162 @@
+ROOT: result(.) = {
+	.local pmc result
+	result = new 'PAST::Node'
+
+	.local pmc match
+	match = node['list']
+
+	.local pmc iter
+	iter  = new Iterator, match # setup iterator for node
+	set iter, 0                 # reset iterator, begin at start
+
+	.local pmc elem
+	.local pmc ast_elem
+
+	.local pmc main_sub
+	main_sub = new 'PAST::Sub'
+	main_sub.'name'( 'main' )
+
+	.local pmc main_statements
+	main_statements = new 'PAST::Stmts'
+
+	main_sub.'add_child'( main_statements )
+
+	.local string elem_type
+
+  iter_loop:
+	unless iter, iter_end        # while (entries) ...
+	shift elem, iter             # get key for next entry
+	ast_elem  = tree.get('result', elem, 'list')
+
+	elem_type = typeof ast_elem
+	if elem_type == 'PAST::Sub' goto save_elem
+	main_statements.'add_child'( ast_elem )
+	goto iter_loop
+
+  save_elem:
+	result.'add_child'( ast_elem )
+	goto iter_loop
+
+  iter_end:
+	result.'add_child'( main_sub )
+
+	.return( result )
+}
+
+list: result(.) = {
+	.local pmc result
+	result = new 'PAST::Exp'
+
+	.local pmc match
+	match = node['list_items']
+
+	.local pmc iter
+	iter  = new Iterator, match # setup iterator for node
+	set iter, 0                 # reset iterator, begin at start
+
+	.local pmc children
+	children = result.'children'()
+
+	.local pmc child
+	child = shift iter
+	child = tree.get( 'result', child, 'list_items' )
+
+	.local pmc op
+	op    = tree.get( 'maybe_op', child )
+	result.'add_child'( op )
+
+  iter_loop:
+	unless iter, iter_end        # while (entries) ...
+	shift child, iter            # get key for next entry
+	child = tree.get( 'result', child, 'list_items' )
+	result.'add_child'( child )
+	goto iter_loop
+
+  iter_end:
+  	result = tree.get( 'maybe_promote_sub', result )
+	.return( result )
+}
+
+PAST::Val: maybe_op(.) = {
+	.local pmc op
+	op = new 'PAST::Op'
+
+	.local string op_name
+	op_name = node.'value'()
+
+	op.'op'( op_name )
+
+	.return( op )
+}
+
+PAST::Exp: maybe_promote_sub(.) = {
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc op
+	op       = children[0]
+
+	.local string op_name
+	op_name = op.'op'()
+	if op_name == 'defun' goto return_sub
+	.return( node )
+
+  return_sub:
+	.local pmc sub_name
+	sub_name = children[1]
+
+	.local pmc exp
+	exp      = children[2]
+
+	.local pmc sub_name_string
+	sub_name_string = sub_name.'value'()
+
+	.local pmc result
+	result = new 'PAST::Sub'
+	result.'name'( sub_name_string )
+
+	.local pmc stmts
+	stmts  = new 'PAST::Stmts'
+	stmts.'add_child'( exp )
+
+	result.'add_child'( stmts )
+	.return( result )
+}
+
+# XXX: almost certainly wrong
+empty_list: result(.) = {
+	.local pmc result
+	result = new 'PAST::Exp'
+	.return( result )
+}
+
+atom: result(.) = {
+	.local pmc result
+	result   = new 'PAST::Val'
+
+	.local string value
+	value    = node
+
+	result.'value'( value )
+	.return( result )
+}
+
+list_items: result(.) = {
+	.local pmc result
+	.local pmc iter
+
+	iter  = new .Iterator, node # setup iterator for node
+	set iter, 0                 # reset iterator, begin at start
+
+	.local string key
+	.local pmc    value
+
+  iter_loop:
+	unless iter, iter_end       # while (entries) ...
+	shift key, iter             # get key for next entry
+	value  = node[key]
+	result = tree.get('result', value, key)
+
+  iter_end:
+	.return( result )
+}

@@ -1,0 +1,8 @@
+#! perl
+
+use strict;
+use warnings;
+
+use lib 'lib', '../../lib';
+
+use Parrot::Test::Harness language => 'pheme', compiler => 'pheme.pbc';

@@ -193,6 +193,11 @@ sub makefiles
         replace_slashes                 => 1
     );
     genfile(
+        'config/gen/makefiles/pheme.in' => 'languages/pheme/Makefile',
+        commentType                     => '#',
+        replace_slashes                 => 1
+    );
+    genfile(
         'config/gen/makefiles/punie.in' => 'languages/punie/Makefile',
         commentType                     => '#',
         replace_slashes                 => 1
