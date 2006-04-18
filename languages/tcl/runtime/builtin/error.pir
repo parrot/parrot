@@ -39,8 +39,8 @@ arg_2:
   errorInfo = argv[1]
 
 finish:
-  store_global 'Tcl', '$errorInfo', errorInfo
-  store_global 'Tcl', '$errorCode', errorCode
+  store_global '$errorInfo', errorInfo
+  store_global '$errorCode', errorCode
   $P0 = argv[0]
   .throw($P0)
 

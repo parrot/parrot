@@ -16,8 +16,8 @@
   argc = argv
   if argc == 0 goto wrong_args
 
-  .get_from_HLL(compare,'_tcl';'builtins';'lsort','ascii')
-  .get_from_HLL(sort,'_tcl';'builtins';'lsort','sort')
+  .get_from_HLL(compare,'_tcl';'helpers';'lsort','ascii')
+  .get_from_HLL(sort,'_tcl';'helpers';'lsort','sort')
 
   # possible options
   .local int decr, unique
@@ -44,7 +44,7 @@ c_uniq:
   unique = 1
   branch chew_flag
 c_int:
-  .get_from_HLL(compare,'_tcl';'builtins';'lsort','integer')
+  .get_from_HLL(compare,'_tcl';'helpers';'lsort','integer')
   branch chew_flag
 
 
@@ -90,7 +90,7 @@ wrong_args:
 .end
 
 .HLL '_Tcl', ''
-.namespace [ 'builtins'; 'sort' ]
+.namespace [ 'helpers'; 'sort' ]
 
 .sub "sort"
   .param pmc compare

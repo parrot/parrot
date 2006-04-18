@@ -13,10 +13,7 @@
   subcommand_name = shift argv
   .local pmc subcommand_proc
 
-  push_eh bad_args
-    .get_from_HLL(subcommand_proc, '_tcl';'builtins';'file', subcommand_name)
-  clear_eh
-
+  .get_from_HLL(subcommand_proc, '_tcl';'helpers';'file', subcommand_name)
   if_null subcommand_proc, bad_args
 
   .return subcommand_proc(argv)
@@ -32,7 +29,7 @@ few_args:
 .end
 
 .HLL '_Tcl', ''
-.namespace [ 'builtins'; 'file' ]
+.namespace [ 'helpers'; 'file' ]
 
 .sub 'join'
   .param pmc argv

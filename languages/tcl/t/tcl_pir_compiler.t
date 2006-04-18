@@ -21,13 +21,14 @@ ok 2
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler global variable interop");
+.HLL 'Tcl', 'tcl_group'
   .sub main :main
-     load_bytecode "languages/tcl/runtime/tcllib.pbc"
+     load_bytecode 'languages/tcl/runtime/tcllib.pbc'
      .local pmc tcl_compiler,compiled_sub
      $P1 = new String
-     $P1 = "ok 1" 
-     store_global "Tcl", "$a", $P1
-     tcl_compiler = compreg "TCL"
+     $P1 = 'ok 1' 
+     store_global '$a', $P1
+     tcl_compiler = compreg 'TCL'
      compiled_sub = tcl_compiler("puts $a")
      compiled_sub()
   .end 
@@ -36,18 +37,19 @@ ok 1
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
+.HLL 'Tcl', 'tcl_group'
 .sub main :main
 
-  load_bytecode "languages/tcl/runtime/tcllib.pbc"
+  load_bytecode 'languages/tcl/runtime/tcllib.pbc'
 
-  $P0 = compreg "TCL"
-  $P1 = $P0("proc _tmp {a} {puts $a}")
+  $P0 = compreg 'TCL'
+  $P1 = $P0('proc _tmp {a} {puts $a}')
   $P1()
 
-  $P2 = find_global "Tcl", "&_tmp"
+  $P2 = find_global '&_tmp'
 
   $P3 = new String
-  $P3 = "hello"
+  $P3 = 'hello'
   $P2($P3)
 .end
 CODE

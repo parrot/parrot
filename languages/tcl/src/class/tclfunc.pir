@@ -55,7 +55,7 @@ Initialize the attributes for an instance of the class
   .local pmc retval
   .local string pir_code
   .local pmc funcs,  __number, compile
-  .get_from_HLL(funcs,'_tcl',funcs)
+  .get_from_HLL(funcs,'_tcl','functions')
   .get_from_HLL(__number,'_tcl','__number')
   .get_from_HLL(compile,'_tcl','compile_dispatch')
 

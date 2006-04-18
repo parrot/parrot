@@ -183,11 +183,14 @@ TCL
 bad index "1.2": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 
+SKIP: {
+  skip("which version are we targetting, again?",1);
 language_output_is("tcl",<<TCL,<<OUT,"index, end-float");
  puts [string index abcde end-1.2]
 TCL
 bad index "end-1.2": must be integer?[+-]integer? or end?[+-]integer?
 OUT
+}
 
 language_output_is("tcl",<<TCL,<<OUT,"index, overshot, neg.");
  puts [string index abcde bogus]
@@ -195,11 +198,14 @@ TCL
 bad index "bogus": must be integer?[+-]integer? or end?[+-]integer?
 OUT
 
+SKIP: {
+  skip("which version are we targetting, again?",1);
 language_output_is("tcl",<<TCL,<<OUT,"index, bad -end");
  puts [string index abcde end-bogus]
 TCL
 bad index "end-bogus": must be integer?[+-]integer? or end?[+-]integer?
 OUT
+}
 
 language_output_is("tcl",<<TCL,<<OUT,"length, too many args");
  puts [string length a b]

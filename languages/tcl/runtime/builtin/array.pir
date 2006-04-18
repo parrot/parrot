@@ -22,9 +22,7 @@
   .local pmc subcommand_proc
   null subcommand_proc
 
-  push_eh bad_args
-    .get_from_HLL(subcommand_proc,'_tcl';'builtins';'array', subcommand_name)
-  clear_eh
+  .get_from_HLL(subcommand_proc, '_tcl'; 'helpers'; 'array', subcommand_name)
   if_null subcommand_proc, bad_args
 
   .local int is_array
@@ -78,7 +76,7 @@ few_args:
 
 .HLL '_Tcl', ''
 
-.namespace [ 'builtins' ; 'array' ]
+.namespace [ 'helpers' ; 'array' ]
 
 .sub 'exists'
   .param int is_array
@@ -131,7 +129,7 @@ bad_args:
   elems = argv[0]
 
   .local pmc __list
-  __list = find_global '__list'
+  .get_from_HLL(__list, '_tcl', '__list')
   elems = __list(elems)
 
 pre_loop:
@@ -147,7 +145,7 @@ pre_loop:
   .local pmc    val
 
   .local pmc set
-  set = find_global '__set'
+  .get_from_HLL(set, '_tcl', '__set')
 
   if_null the_array, new_array # create a new array if no var
   goto set_loop
@@ -344,7 +342,7 @@ skip_args:
   null match_proc
 
   push_eh bad_mode
-    match_proc = find_global [ 'builtins'; 'array'; 'names_helper' ], mode
+    match_proc = find_global [ 'helpers'; 'array'; 'names_helper' ], mode
   clear_eh
   if_null match_proc, bad_mode
 
@@ -365,7 +363,7 @@ not_array:
   .throw('')
 .end
 
-.namespace [ 'builtins' ; 'array'; 'names_helper' ]
+.namespace [ 'helpers' ; 'array'; 'names_helper' ]
 
 .sub '-glob'
   .param pmc the_array

@@ -25,15 +25,9 @@ real top level namespace.
   .local pmc subcommand_proc
   null subcommand_proc
 
-  push_eh catch
-    .get_from_HLL(subcommand_proc, '_tcl';'builtins';'namespace', subcommand_name)
-  clear_eh
-resume:
+  .get_from_HLL(subcommand_proc, '_tcl';'helpers';'namespace', subcommand_name)
   if_null subcommand_proc, bad_args
   .return subcommand_proc(argv)
-
-catch:
-  goto resume
 
 bad_args:
   $S0 = "bad option \""
@@ -46,8 +40,8 @@ no_args:
 
 .end
 
-.HLL 'Tcl', ''
-.namespace [ 'builtins'; 'namespace' ]
+.HLL '_Tcl', ''
+.namespace [ 'helpers'; 'namespace' ]
 
 # TODO: hey, this is cheating!
 .sub "current"
@@ -100,7 +94,7 @@ bad_args:
 
   load_bytecode "PGE.pbc"
   .local pmc p6r,match
-  p6r = find_global "PGE", "p6rule"
+  p6r = compreg "PGE::P6Rule"
   match = p6r("(.*)\\:\\:+<-[:]>*$$")
 
   $S0 = argv[0]
@@ -128,7 +122,7 @@ WHOLE:
 
   load_bytecode "PGE.pbc"
   .local pmc p6r,match
-  p6r = find_global "PGE", "p6rule"
+  p6r= compreg "PGE::P6Rule"
   match = p6r("\:\:+(<-[:]>)$$")
 
   $S0 = argv[0]

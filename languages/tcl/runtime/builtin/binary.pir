@@ -14,9 +14,8 @@
   .local pmc subcommand_proc
   null subcommand_proc
 
-  push_eh bad_args
-    .get_from_HLL(subcommand_proc,'_tcl'; 'builtins'; 'binary', subcommand_name)
-  clear_eh
+  .get_from_HLL(subcommand_proc,'_tcl'; 'helpers'; 'binary', subcommand_name)
+  if_null subcommand_proc, bad_args
   .return subcommand_proc(argv)
 
 bad_args:
@@ -32,7 +31,7 @@ no_args:
 .end
 
 .HLL '_Tcl',''
-.namespace [ 'builtins'; 'binary' ]
+.namespace [ 'helpers'; 'binary' ]
 
 .macro getBinaryArg ()
   if argvIndex == argc goto out_of_args

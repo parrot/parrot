@@ -19,15 +19,10 @@
   .local pmc subcommand_proc
   null subcommand_proc
 
-  push_eh catch
-    .get_from_HLL(subcommand_proc, '_tcl';'builtins';'info', subcommand_name)
-  clear_eh
-resume:
+  .get_from_HLL(subcommand_proc, '_tcl';'helpers';'info', subcommand_name)
+
   if_null subcommand_proc, bad_subcommand
   .return subcommand_proc(argv)
-
-catch:
-  goto resume
 
 bad_subcommand:
   $S0  = "bad option \""
@@ -41,7 +36,7 @@ bad_args:
 .end
 
 .HLL '_Tcl', ''
-.namespace [ 'builtins'; 'info' ]
+.namespace [ 'helpers'; 'info' ]
 
 .sub "args"
   .param pmc argv
@@ -54,7 +49,7 @@ bad_args:
 
   .local string procname
   procname = shift argv
-  $P1 = find_global 'proc_args'
+  .get_from_HLL($P1, '_tcl', 'proc_args')
   $P2 = $P1[procname]
   if_null $P2, no_args
   .return($P2)
@@ -80,7 +75,7 @@ bad_args:
 
   .local string procname
   procname = argv[0]
-  $P1 = find_global 'proc_body'
+  .get_from_HLL($P1, '_tcl', 'proc_body')
   $P2 = $P1[procname]
   if_null $P2, no_body
   .return($P2)
@@ -104,7 +99,7 @@ bad_args:
 
   .local pmc math_funcs,iterator,retval
 
-  math_funcs = find_global 'functions'
+  .get_from_HLL(math_funcs, '_tcl', 'functions')
   iterator = new .Iterator, math_funcs
   iterator = 0
   retval = new .TclList
@@ -150,7 +145,7 @@ bad_args:
   varname = argv[0]
 
   .local pmc find_var
-  find_var = find_global '__find_var'
+  .get_from_HLL(find_var, '_tcl', '__find_var')
   .local pmc found_var
   found_var = find_var(varname)
   if_null found_var, not_found

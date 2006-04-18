@@ -28,7 +28,7 @@
   .local pmc theSub
   # Grab the original sub
   push_eh doesnt_exist
-    theSub = find_global "Tcl", old_proc
+    theSub = find_global old_proc
   clear_eh
 
   # If newName is empty, then just delete
@@ -36,7 +36,7 @@
 
 add:
   # Create the new sub
-  store_global "Tcl", new_proc, theSub
+  store_global new_proc, theSub
 
 delete:
   null theSub

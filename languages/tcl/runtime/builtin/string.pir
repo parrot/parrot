@@ -17,9 +17,8 @@
   .local pmc subcommand_proc
   null subcommand_proc
 
-  push_eh bad_args
-    .get_from_HLL(subcommand_proc, '_tcl'; 'builtins'; 'string', subcommand_name)
-  clear_eh
+  .get_from_HLL(subcommand_proc, '_tcl'; 'helpers'; 'string', subcommand_name)
+  if_null subcommand_proc, bad_args 
   .return subcommand_proc(argv)
 
 bad_args:
@@ -36,7 +35,7 @@ no_args:
 
 .HLL '_Tcl', ''
 
-.namespace [ 'builtins'; 'string' ]
+.namespace [ 'helpers'; 'string' ]
 
 .sub 'first'
   .param pmc argv
@@ -53,7 +52,7 @@ no_args:
   if argc == 2 goto first_do
   $S3 = argv[2]
   .local pmc string_index
-  string_index = find_global '__string_index'
+  .get_from_HLL(string_index, '_tcl', '__string_index')
   $I0 = string_index($S3,$S2)
 
 first_do:
@@ -83,7 +82,7 @@ bad_args:
   
   $S3 = argv[2]
   .local pmc string_index
-  string_index = find_global '__string_index'
+  .get_from_HLL(string_index, '_tcl', '__string_index')
   $I1 = string_index($S3,$S2)
 
   if $I1 > $I0 goto last_do
@@ -123,7 +122,7 @@ bad_args:
   $S1 = argv[0]
   $S2 = argv[1]
   .local pmc string_index
-  string_index = find_global '__string_index'
+  .get_from_HLL(string_index, '_tcl', '__string_index')
   $I0 = string_index($S2,$S1)
   index_1 = length $S1
   inc index_1
@@ -162,7 +161,7 @@ done:
   if argc == 1 goto tolower_do
 
   .local pmc string_index
-  string_index = find_global '__string_index'
+  .get_from_HLL(string_index, '_tcl', '__string_index')
 
   $S2 = argv[1]
   $I2 = string_index($S2, $S1)
@@ -215,7 +214,7 @@ bad_args:
   if argc == 1 goto toupper_do
 
   .local pmc string_index
-  string_index = find_global '__string_index'
+  .get_from_HLL(string_index, '_tcl', '__string_index')
 
   $S2 = argv[1]
   $I2 = string_index($S2, $S1)
@@ -267,7 +266,7 @@ bad_args:
   if argc == 1 goto totitle_do
 
   .local pmc string_index
-  string_index = find_global '__string_index'
+  .get_from_HLL(string_index, '_tcl', '__string_index')
 
   $S2 = argv[1]
   $I2 = string_index($S2, $S1)
@@ -343,7 +342,7 @@ bad_length:
   dec $I0
 
   .local pmc string_index
-  string_index = find_global '__string_index'
+  .get_from_HLL(string_index, '_tcl', '__string_index')
 
   index_1 = string_index($S2,$S1)
 
@@ -454,7 +453,7 @@ setup:
   .local int strpos,strlen,mappos,maplen,skiplen,mapstrlen,replacementstrlen
 
   .local pmc __list
-  __list = find_global '__list'
+  .get_from_HLL(__list, '_tcl', '__list')
 
   $P0 = argv[0]
   map_list = __list($P0)
@@ -641,7 +640,7 @@ digit_check:
   the_cclass = .CCLASS_NUMERIC
   goto cclass_check
 double_check:
-  $P1 = find_global '__number'
+  .get_from_HLL($P1, '_tcl', '__number')
   push_eh nope
     $P2 = $P1(the_string)
   clear_eh
@@ -659,7 +658,7 @@ graph_check:
   the_cclass = .CCLASS_GRAPHICAL
   goto cclass_check
 integer_check:
-  $P1 = find_global '__number'
+  .get_from_HLL($P1, '_tcl', '__number')
   push_eh nope
     $P2 = $P1(the_string)
   clear_eh
@@ -728,7 +727,7 @@ bad_args:
   .local pmc retval
 
   .local pmc string_index
-  string_index = find_global '__string_index'
+  .get_from_HLL(string_index, '_tcl', '__string_index')
 
   argc = argv
   if argc > 4 goto bad_args
