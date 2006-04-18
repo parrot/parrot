@@ -171,12 +171,18 @@ PGE::OPTable - PGE operator precedence table and parser
 
   token_tighter:
     $S0 = token['tighter']
-    unless $S0 goto token_close
+    unless $S0 goto token_prec_close
     $S0 = tokentable[$S0;'precedence']
     $S0 = clone $S0
     substr $S0, -1, 0, '>'
     token['precedence'] = $S0
 
+  token_prec_close:
+    $I0 = exists token['prec_close']
+    if $I0 goto token_close
+    $P0 = token['precedence']
+    token['prec_close'] = $P0
+    
   token_close:
     .local string keyclose
     $I0 = index key, ' '
@@ -304,6 +310,7 @@ PGE::OPTable - PGE operator precedence table and parser
     if_null ws, token_next_ws
     mpos = pos
     $P0 = ws(mob)
+    unless $P0 goto token_next_1
     pos = $P0.to()
     goto token_next_1
   token_next_ws:
@@ -397,7 +404,7 @@ PGE::OPTable - PGE operator precedence table and parser
     if topcat >= PGE_OPTABLE_POSTCIRCUMFIX goto oper_shift     # (S6)
     ## Check operator precedence
     $P0 = token['precedence']
-    $P1 = top['precedence']
+    $P1 = top['prec_close']
     if $P0 > $P1 goto oper_shift                               # (P)
     if topcat != PGE_OPTABLE_TERNARY goto shift_reduce_2
     if tokencat != PGE_OPTABLE_TERNARY goto err_ternary        # (P/E)
