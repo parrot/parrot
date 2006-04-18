@@ -12,20 +12,20 @@ CP       = @cp@
 # the default target
 all: punie.pbc
 
-lib/PunieGrammar.pbc: lib/PunieGrammar.pir lib/punie.g
-	$(PARROT) $(PGE_DIR)@slash@rulec.pir --output=lib/punie_grammar_gen.pir lib/punie.g
+lib/PunieGrammar.pbc: lib/PunieGrammar.pir lib/punie.pg
+	$(PARROT) $(PGE_DIR)@slash@rulec.pir --output=lib/punie_grammar_gen.pir lib/punie.pg
 	$(PARROT) -o lib/PunieGrammar.pbc --output-pbc lib/PunieGrammar.pir 
 
-lib/ASTGrammar.pbc: lib/ASTGrammar.pir lib/pge2past.g
-	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@pge2past_gen.pir lib@slash@pge2past.g
+lib/ASTGrammar.pbc: lib/ASTGrammar.pir lib/pge2past.tg
+	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@pge2past_gen.pir lib@slash@pge2past.tg
 	$(PARROT) -o lib@slash@ASTGrammar.pbc --output-pbc lib@slash@ASTGrammar.pir 
 
-lib/OSTGrammar.pbc: lib/OSTGrammar.pir lib/past2post.g
-	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@past2post_gen.pir lib@slash@past2post.g
+lib/OSTGrammar.pbc: lib/OSTGrammar.pir lib/past2post.tg
+	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@past2post_gen.pir lib@slash@past2post.tg
 	$(PARROT) -o lib@slash@OSTGrammar.pbc --output-pbc lib@slash@OSTGrammar.pir 
 
-lib/PIRGrammar.pbc: lib/PIRGrammar.pir lib/post2pir.g
-	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@post2pir_gen.pir lib@slash@post2pir.g
+lib/PIRGrammar.pbc: lib/PIRGrammar.pir lib/post2pir.tg
+	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@post2pir_gen.pir lib@slash@post2pir.tg
 	$(PARROT) -o lib@slash@PIRGrammar.pbc --output-pbc lib@slash@PIRGrammar.pir 
 
 punie.pbc: punie.pir lib/PunieGrammar.pbc lib/ASTGrammar.pbc lib/OSTGrammar.pbc lib/PIRGrammar.pbc
