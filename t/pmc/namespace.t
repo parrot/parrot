@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Parrot::Config;
 
 =head1 NAME
@@ -613,5 +613,30 @@ pir_output_is(<<'CODE', <<'OUTPUT', ":anon subs still get default namespace");
 .end
 CODE
 3.14
+OUTPUT
+}
+
+SKIP: {
+  skip('not implemented', 1);
+pir_output_is(<<'CODE', <<'OUTPUT', "find_global should find from .HLL namespace, not current .namespace");
+.HLL 'bork', ''
+.namespace [ '' ]
+
+.sub a :immediate
+  $P1 = new .String
+  $P1 = "ok\n"
+  store_global "eek", $P1
+.end
+
+.namespace [ 'sub_namespace' ]
+
+.sub whee :main
+
+$P1 = find_global 'eek'
+print $P1
+.end
+
+CODE
+ok
 OUTPUT
 }
