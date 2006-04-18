@@ -78,7 +78,7 @@ Returns the list as a string
         _tcl_namespace = string_from_const_cstring(INTERP, "_tcl", 4);
         sub            = string_from_const_cstring(INTERP, "__listToString", 14);
 
-        namespace = interpinfo_p(INTERP, 17); /* namespace root*/
+        namespace = interpinfo_p(INTERP, NAMESPACE_ROOT);
         namespace = VTABLE_get_pmc_keyed_str(INTERP, namespace, _tcl_namespace);
         listToString = VTABLE_get_pmc_keyed_str(INTERP, namespace, sub);
 
