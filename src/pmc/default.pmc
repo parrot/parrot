@@ -755,30 +755,31 @@ Returns whether the PMC "can" perform C<*method>.
 
 /*
 
-=item C<INTVAL does(STRING *method)>
+=item C<INTVAL does(STRING *interface)>
 
-Returns whether the PMC "does" perform C<*method>.
+Returns whether the PMC "does" perform C<*interface>.
 
 =cut
 
 */
 
-    INTVAL does(STRING* method) {
-        return does_isa(INTERP, method, SELF->vtable->does_str);
+    INTVAL does(STRING* interface) {
+        return does_isa(INTERP, interface, SELF->vtable->does_str);
     }
 
 /*
 
-=item C<INTVAL isa(STRING *method)>
+=item C<INTVAL isa(STRING *class)>
 
-Returns whether the PMC "isa" C<*method>.
+Returns whether the PMC "isa" C<*class>.
 
 =cut
 
 */
 
-    INTVAL isa (STRING* method) {
-        return does_isa(INTERP, method, SELF->vtable->isa_str);
+    INTVAL isa (STRING* class) {
+        /* TODO FIXME - walk mro */
+        return does_isa(INTERP, class, SELF->vtable->isa_str);
     }
 
 /*
