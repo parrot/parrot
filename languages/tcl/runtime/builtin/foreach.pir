@@ -106,7 +106,7 @@ loop_inner:
   value = $P0[$I2]
 
   if call_level goto store_lex
-    store_global "Tcl", sigil_varname, value
+    store_global sigil_varname, value
     goto store_done
 store_lex:
     store_lex sigil_varname, value
@@ -117,7 +117,7 @@ empty_var:
   $P0 = new .TclString
   $P0 = ""
   if call_level goto store_lex2
-    store_global "Tcl", sigil_varname, $P0
+    store_global sigil_varname, $P0
     goto loop_inner
 store_lex2:
     store_lex sigil_varname, $P0
