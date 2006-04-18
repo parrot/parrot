@@ -1,4 +1,5 @@
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&open"
   .param pmc argv :slurpy
@@ -15,9 +16,9 @@
   $I0 = typeof channel
   if $I0 == .Undef goto file_error
   channel_id = "file"
-  channels = find_global "_Tcl", "channels"
+  .get_from_HLL(channels, '_tcl', 'channels')
   # get a new file channel name
-  next_channel_id = find_global "_Tcl", "next_channel_id"
+  .get_from_HLL(next_channel_id, '_tcl', 'next_channel_id')
   $S0 = next_channel_id
   channel_id .= $S0
   next_channel_id += 1

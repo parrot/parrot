@@ -1,4 +1,5 @@
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&lassign"
   .param pmc argv :slurpy
@@ -12,12 +13,12 @@
   list = shift argv
 
   .local pmc __list
-  __list = find_global "_Tcl", "__list"
+  .get_from_HLL(__list, '_tcl', '__list')
   list = __list(list)
 
   .local string varname
   .local pmc set, value
-  set = find_global "_Tcl", "__set"
+  .get_from_HLL(set, '_tcl', '__set')
 
 var_loop:
   varname = shift argv

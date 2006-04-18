@@ -1,7 +1,8 @@
 ###
 # [array]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 #
 # similar to but not exactly like [string]'s subcommand dispatch
@@ -22,7 +23,7 @@
   null subcommand_proc
 
   push_eh bad_args
-    subcommand_proc = find_global "_Tcl\0builtins\0array", subcommand_name
+    .get_from_HLL(subcommand_proc,'_tcl';'builtins';'array', subcommand_name)
   clear_eh
   if_null subcommand_proc, bad_args
 
@@ -34,13 +35,13 @@
   sigil_array_name = "$" . array_name
 
   .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
+  .get_from_HLL($P0, '_tcl', 'call_level')
   call_level = $P0
   null the_array
 
   push_eh catch_var
     if call_level goto find_lexical
-    the_array = find_global "Tcl", sigil_array_name
+    the_array = find_global sigil_array_name
     goto done_find
 find_lexical:
     the_array = find_lex sigil_array_name
@@ -75,9 +76,11 @@ few_args:
 
 .end
 
-.namespace [ "_Tcl\0builtins\0array" ]
+.HLL '_Tcl', ''
 
-.sub "exists"
+.namespace [ 'builtins' ; 'array' ]
+
+.sub 'exists'
   .param int is_array
   .param pmc the_array
   .param string array_name
@@ -93,7 +96,7 @@ bad_args:
   .throw ("wrong # args: should be \"array exists arrayName\"")
 .end
 
-.sub "size"
+.sub 'size'
   .param int is_array
   .param pmc the_array
   .param string array_name
@@ -114,7 +117,7 @@ bad_args:
   .throw ("wrong # args: should be \"array size arrayName\"")
 .end
 
-.sub "set"
+.sub 'set'
   .param int is_array
   .param pmc the_array
   .param string array_name
@@ -128,7 +131,7 @@ bad_args:
   elems = argv[0]
 
   .local pmc __list
-  __list = find_global "_Tcl", "__list"
+  __list = find_global '__list'
   elems = __list(elems)
 
 pre_loop:
@@ -144,7 +147,7 @@ pre_loop:
   .local pmc    val
 
   .local pmc set
-  set = find_global  "_Tcl", "__set"
+  set = find_global '__set'
 
   if_null the_array, new_array # create a new array if no var
   goto set_loop
@@ -164,27 +167,27 @@ set_loop:
 
   # equals creates an alias, so use assign.
   .local string subvar
-  subvar = "" # why is this necessary, if we're doing an assign ???
+  subvar = '' # why is this necessary, if we're doing an assign ???
   assign subvar, array_name
-  subvar .= "("
+  subvar .= '('
   subvar .= key
-  subvar .= ")"
+  subvar .= ')'
   set(subvar, val) 
 
   if loop < count goto set_loop
 
-  .return ("")
+  .return ('')
 
 bad_args:
- .throw ("wrong # args: should be array set arrayName list")
+ .throw ('wrong # args: should be array set arrayName list')
 
 odd_args:
- .throw ("list must have an even number of elements")
+ .throw ('list must have an even number of elements')
 .end
 
 
-.include "iterator.pasm"
-.sub "get"
+.include 'iterator.pasm'
+.sub 'get'
   .param int is_array
   .param pmc the_array
   .param string array_name
@@ -196,7 +199,7 @@ odd_args:
 
   .local string match_str
   # ?pattern? defaults to matching everything.
-  match_str = "*"
+  match_str = '*'
 
   # if it's there, get it from the arglist
   if argc == 0 goto no_args
@@ -235,11 +238,11 @@ push_loop:
 
   # if it's the first, we don't want to print a separating space
   unless count goto skip_space
-  retval .= " "
+  retval .= ' '
 skip_space:
   inc count
   retval .= str
-  retval .= " "
+  retval .= ' '
   val = the_array[str]
   retval .= val
 
@@ -252,10 +255,10 @@ bad_args:
   .throw("wrong # args: should be \"array get arrayName ?pattern?\"")
 
 not_array:
-  .throw("")
+  .throw('')
 .end
 
-.sub "unset"
+.sub 'unset'
   .param int is_array
   .param pmc the_array
   .param string array_name
@@ -268,7 +271,7 @@ not_array:
 
   .local string match_str
   # ?pattern? defaults to matching everything.
-  match_str = "*"
+  match_str = '*'
 
   # if it's there, get it from the arglist
   if argc == 0 goto no_args
@@ -304,17 +307,17 @@ push_loop:
 
   branch push_loop
 push_end:
-  .return ("")
+  .return ('')
 
 
 bad_args:
   .throw("wrong # args: should be \"array unset arrayName ?pattern?\"")
 
 not_array:
-  .throw("")
+  .throw('')
 .end
 
-.sub "names"
+.sub 'names'
   .param int is_array
   .param pmc the_array
   .param string array_name
@@ -327,8 +330,8 @@ not_array:
   if argc > 2 goto bad_args
 
   .local string mode, pattern
-  mode = "-glob"
-  pattern = "*"
+  mode = '-glob'
+  pattern = '*'
   if argc == 0 goto skip_args
   if argc == 1 goto skip_mode
 
@@ -341,7 +344,7 @@ skip_args:
   null match_proc
 
   push_eh bad_mode
-    match_proc = find_global "_Tcl\0builtins\0array\0names_helper", mode
+    match_proc = find_global [ 'builtins'; 'array'; 'names_helper' ], mode
   clear_eh
   if_null match_proc, bad_mode
 
@@ -359,12 +362,12 @@ bad_mode:
   .throw ($S0)
 
 not_array:
-  .throw("")
+  .throw('')
 .end
 
-.namespace [ "_Tcl\0builtins\0array\0names_helper" ]
+.namespace [ 'builtins' ; 'array'; 'names_helper' ]
 
-.sub "-glob"
+.sub '-glob'
   .param pmc the_array
   .param string pattern
 
@@ -393,7 +396,7 @@ check_loop:
   unless $P0 goto check_loop
 
   unless count goto skip_space
-  retval .= " "
+  retval .= ' '
 skip_space:
   inc count
   retval .= name
@@ -404,7 +407,7 @@ check_end:
   .return (retval)
 .end
 
-.sub "-exact"
+.sub '-exact'
   .param pmc the_array
   .param string match
 
@@ -415,7 +418,7 @@ check_end:
   iter = .ITERATE_FROM_START
 
   retval = new .String
-  retval = ""
+  retval = ''
 
 check_loop:
   unless iter goto check_end
@@ -431,16 +434,16 @@ found_match:
   .return (retval)
 .end
 
-.sub "-regexp"
+.sub '-regexp'
   .param pmc the_array
   .param string pattern
 
   .local pmc iter
   .local string name
 
-  load_bytecode "PGE.pbc"
+  load_bytecode 'PGE.pbc'
   .local pmc tclARE, retval
-  tclARE = compreg "PGE::P5Regexp"
+  tclARE = compreg 'PGE::P5Regexp'
   .local pmc rule
   rule = tclARE(pattern)
 
@@ -459,7 +462,7 @@ check_loop:
   unless $P0 goto check_loop
 
   unless count goto skip_space
-  retval .= " "
+  retval .= ' '
 skip_space:
   inc count
   retval .= name
@@ -469,5 +472,3 @@ check_end:
 
   .return (retval)
 .end
-
-.namespace [ "_Tcl\0builtins\0array" ]

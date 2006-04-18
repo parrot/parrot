@@ -1,4 +1,4 @@
-.namespace [ "_Tcl" ]
+.HLL '_Tcl', ''
 
 .sub __listToString
   .param pmc list

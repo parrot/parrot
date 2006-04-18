@@ -5,7 +5,8 @@
 #
 # Like eval, except that you must specify a registered compiler.
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&inline"
   .param pmc argv :slurpy

@@ -4,7 +4,7 @@
 
 # This is very similar to _Tcl::__string_index, and perhaps they could be refactored.
 
-.namespace [ "_Tcl" ]
+.HLL '_Tcl', ''
 
 .sub _list_index
   .param pmc the_list

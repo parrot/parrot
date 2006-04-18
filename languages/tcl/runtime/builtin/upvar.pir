@@ -1,14 +1,15 @@
 ###
 # [upvar]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&upvar"
   .param pmc argv :slurpy
 
   .local pmc call_level,current_call_level
   call_level = argv[0]
-  current_call_level = find_global "_Tcl", "call_level"
+  .get_from_HLL(current_call_level, '_tcl', 'call_level')
 
   .local int defaulted
   (call_level,defaulted) = __get_call_level(call_level)

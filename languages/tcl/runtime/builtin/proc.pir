@@ -4,7 +4,8 @@ Create a PIR sub on the fly for this user defined proc.
 
 =cut
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&proc"
   .param pmc argv :slurpy
@@ -24,11 +25,11 @@ Create a PIR sub on the fly for this user defined proc.
   .local pmc retval
 
   .local pmc compiler, pir_compiler
-  compiler     = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
+  .get_from_HLL(compiler, '_tcl', 'compile')
+  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
 
   .local pmc __list
-  __list = find_global "_Tcl", "__list"
+  .get_from_HLL(__list, '_tcl', '__list')
 
   args_p = __list(args_p)
   .local string args
@@ -36,7 +37,7 @@ Create a PIR sub on the fly for this user defined proc.
 
 got_args:
   # defining a proc. update the epoch.
-  $P0 = find_global '_Tcl', 'epoch'
+  .get_from_HLL($P0, '_tcl', 'epoch')
   inc $P0
 
   # Save the parsed body.
@@ -45,12 +46,12 @@ got_args:
   (body_reg,parsed_body) = compiler(0,body_p)
 
   # Save the code for the proc for [info body]
-  $P1 = find_global "_Tcl", "proc_body"
+  .get_from_HLL($P1, '_tcl', 'proc_body')
   $P1[name] = body_p
 
   # Save the args for the proc for [info body]
   # XXX When dealing with defaults, this will have to be updated.
-  $P1 = find_global "_Tcl", "proc_args"
+  .get_from_HLL($P1, '_tcl', 'proc_args')
   $P1[name] = args_p
 
   .local string proc_body, temp_code
@@ -61,15 +62,15 @@ got_args:
   P0 = loadlib 'dynlexpad' 
 .end
 .HLL_map .LexPad, .DynLexPad
-.namespace ['Tcl']
+.HLL 'Tcl', 'tcl_group'
 .sub '&%s' :lex
 .param pmc args :slurpy
 .include 'languages/tcl/src/returncodes.pir'
 .local pmc epoch
-epoch = find_global "_Tcl", "epoch"
+.get_from_HLL(epoch,'_tcl','epoch')
 
 .local pmc call_level
-call_level=find_global '_Tcl', 'call_level'
+.get_from_HLL(call_level,'_tcl','call_level')
 inc call_level
 END_PIR
 

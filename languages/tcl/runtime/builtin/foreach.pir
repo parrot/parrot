@@ -1,4 +1,5 @@
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&foreach"
   .param pmc argv :slurpy
@@ -7,7 +8,7 @@
   .local pmc compiler,pir_compiler,retval
 
   .local int call_level
-  $P0 = find_global "_Tcl", "call_level"
+  .get_from_HLL($P0, '_tcl', 'call_level')
   call_level = $P0
 
   # Were we passed the right # of arguments? (2n+1)
@@ -17,10 +18,10 @@
   if $I0 != 1 goto error
 
   .local pmc __list
-  __list = find_global "_Tcl", "__list"
+  .get_from_HLL(__list, '_tcl', '__list')
 
-  compiler = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
+  .get_from_HLL(compiler, '_tcl', 'compile')
+  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
 
   .local int argc
   argc = argv

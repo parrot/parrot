@@ -4,7 +4,8 @@
 #
 # expr arg [... arg arg]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&expr"
   .param pmc argv :slurpy
@@ -15,8 +16,8 @@
 
   .local pmc retval
   .local pmc expression_compiler,pir_compiler
-  expression_compiler = find_global "_Tcl", "__expression_compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
+  .get_from_HLL(expression_compiler, '_tcl', '__expression_compile')
+  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
 
   expr = ""
   looper = 0

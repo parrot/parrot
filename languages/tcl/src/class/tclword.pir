@@ -1,9 +1,8 @@
 .include "languages/tcl/src/returncodes.pir"
 .include "languages/tcl/src/macros.pir"
 
-.namespace [ "TclWord" ]
-
-.HLL "Tcl", "tcl_group"
+.HLL '', ''
+.namespace [ 'TclWord' ]
 
 .cloneable()
 
@@ -32,10 +31,10 @@ Define the attributes required for the class.
   .local string pir_code,temp_code
   pir_code = "# src/class/tclword.pir :: compile\n"
   .local pmc compiled_args
-  compiled_args = new .TclList
+  compiled_args = new 'TclList'
 
   .local pmc compiler
-  compiler = find_global "_Tcl", "compile_dispatch"
+  .get_from_HLL(compiler,'_tcl','compile_dispatch')
 
 loop:
   if i == len goto loop_done

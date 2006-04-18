@@ -8,7 +8,7 @@
 # (given an int or "end-1" style string, and a string,
 # return the actual index position)
 
-.namespace [ "_Tcl" ]
+.HLL '_Tcl', ''
 
 .sub __string_index 
   .param string position

@@ -8,9 +8,9 @@ providing a compreg-compatible method.
 
 =cut
 
-.include "languages/tcl/src/returncodes.pir"
-.include "languages/tcl/src/macros.pir"
-.include "cclass.pasm"
+.include 'languages/tcl/src/returncodes.pir'
+.include 'languages/tcl/src/macros.pir'
+.include 'cclass.pasm'
 
 # don't pollute the global namespaces with our utility functions.
 
@@ -75,12 +75,11 @@ providing a compreg-compatible method.
   .const int FUNCTION_TANH   = 67
   .const int FUNCTION_RAND   = 68
 
-.HLL "Tcl", "tcl_group"
-
-.namespace [ "_Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.HLL '_Tcl', ''
 
 .sub __load_macros :load :anon
-  $P0 = compreg "PIR"
+  $P0 = compreg 'PIR'
   $P0 = $P0(".sub main\n.include 'languages/tcl/src/macros.pir'\n.end")
   $P0()
 .end
@@ -88,7 +87,7 @@ providing a compreg-compatible method.
 .sub __prepare_lib :load :anon
 
   # Load any dependant libraries.
-  load_bytecode "Getopt/Obj.pir"
+  load_bytecode 'Getopt/Obj.pbc'
 
   #_load_grammar()
 
@@ -110,7 +109,7 @@ env_loop:
   goto env_loop
 
 env_loop_done:
-  store_global "Tcl", "$env", tcl_env
+  .set_in_HLL('tcl', '$env', tcl_env)
 
   # keep track of names of file types.
   .local pmc filetypes
@@ -123,7 +122,7 @@ env_loop_done:
   filetypes[0o120000] = 'link'
   filetypes[0o140000] = 'socket'
 
-   store_global '_Tcl', 'filetypes', filetypes
+   store_global 'filetypes', filetypes
 
    .local pmc binary_types
    binary_types = new .TclArray
@@ -146,7 +145,7 @@ env_loop_done:
    binary_types['X'] = 1
    binary_types['@'] = 1
 
-   store_global '_Tcl', 'binary_types', binary_types
+   store_global 'binary_types', binary_types
 
   .local pmc operators
   .local pmc math_funcs
@@ -157,20 +156,20 @@ env_loop_done:
   # Keep track of math functions
   math_funcs = new .TclArray
 
-  math_funcs["abs"]   = FUNCTION_ABS
-  math_funcs["acos"]  = FUNCTION_ACOS
-  math_funcs["asin"]  = FUNCTION_ASIN
-  math_funcs["atan"]  = FUNCTION_ATAN
-  math_funcs["cos"]   = FUNCTION_COS
-  math_funcs["cosh"]  = FUNCTION_COSH
-  math_funcs["exp"]   = FUNCTION_EXP
-  math_funcs["log"]   = FUNCTION_LOG
-  math_funcs["log10"] = FUNCTION_LOG10
-  math_funcs["sin"]   = FUNCTION_SIN
-  math_funcs["sinh"]  = FUNCTION_SINH
-  math_funcs["sqrt"]  = FUNCTION_SQRT
-  math_funcs["tan"]   = FUNCTION_TAN
-  math_funcs["tanh"]  = FUNCTION_TANH
+  math_funcs['abs']   = FUNCTION_ABS
+  math_funcs['acos']  = FUNCTION_ACOS
+  math_funcs['asin']  = FUNCTION_ASIN
+  math_funcs['atan']  = FUNCTION_ATAN
+  math_funcs['cos']   = FUNCTION_COS
+  math_funcs['cosh']  = FUNCTION_COSH
+  math_funcs['exp']   = FUNCTION_EXP
+  math_funcs['log']   = FUNCTION_LOG
+  math_funcs['log10'] = FUNCTION_LOG10
+  math_funcs['sin']   = FUNCTION_SIN
+  math_funcs['sinh']  = FUNCTION_SINH
+  math_funcs['sqrt']  = FUNCTION_SQRT
+  math_funcs['tan']   = FUNCTION_TAN
+  math_funcs['tanh']  = FUNCTION_TANH
 
   operators = new .TclArray
   precedence = new .TclArray
@@ -178,97 +177,97 @@ env_loop_done:
   # XXX This precedence check should be shoved into [expr]. There's no need
   # to make it this generic. 
 
-  operators["*"] = OPERATOR_MUL
-  precedence["*"] = 1 
-  operators["/"] = OPERATOR_DIV
-  precedence["/"] = 1 
-  operators["%"] = OPERATOR_MOD
-  precedence["%"] = 1 
-  operators["+"] = OPERATOR_PLUS
-  precedence["+"] = 2
-  operators["-"] = OPERATOR_MINUS
-  precedence["-"] = 2 
-  operators["<<"] = OPERATOR_SHL
-  precedence["<<"] = 3 
-  operators[">>"] = OPERATOR_SHR
-  precedence[">>"] = 3 
-  operators["<"] = OPERATOR_LT
-  precedence["<"] = 4
-  operators[">"] = OPERATOR_GT
-  precedence[">"] = 4
-  operators["<="] = OPERATOR_LTE
-  precedence["<="] = 4 
-  operators[">="] = OPERATOR_GTE
-  precedence[">="] = 4
-  operators["=="] = OPERATOR_EQUAL
-  precedence["=="] = 5
-  operators["!="] = OPERATOR_UNEQUAL
-  precedence["!="] = 5
-  operators["ne"] = OPERATOR_NE
-  precedence["ne"] = 6
-  operators["eq"] = OPERATOR_EQ 
-  precedence["eq"] = 6
-  operators["&"] = OPERATOR_BITAND
-  precedence["&"] = 7
-  operators["^"] = OPERATOR_BITXOR
-  precedence["^"] =  8
-  operators["|"] = OPERATOR_BITOR
-  precedence["|"] = 9
-  operators["&&"] = OPERATOR_AND
-  precedence["&&"] = 10
-  operators["||"] = OPERATOR_OR
-  precedence["||"] = 11
+  operators['*'] = OPERATOR_MUL
+  precedence['*'] = 1 
+  operators['/'] = OPERATOR_DIV
+  precedence['/'] = 1 
+  operators['%'] = OPERATOR_MOD
+  precedence['%'] = 1 
+  operators['+'] = OPERATOR_PLUS
+  precedence['+'] = 2
+  operators['-'] = OPERATOR_MINUS
+  precedence['-'] = 2 
+  operators['<<'] = OPERATOR_SHL
+  precedence['<<'] = 3 
+  operators['>>'] = OPERATOR_SHR
+  precedence['>>'] = 3 
+  operators['<'] = OPERATOR_LT
+  precedence['<'] = 4
+  operators['>'] = OPERATOR_GT
+  precedence['>'] = 4
+  operators['<='] = OPERATOR_LTE
+  precedence['<='] = 4 
+  operators['>='] = OPERATOR_GTE
+  precedence['>='] = 4
+  operators['=='] = OPERATOR_EQUAL
+  precedence['=='] = 5
+  operators['!='] = OPERATOR_UNEQUAL
+  precedence['!='] = 5
+  operators['ne'] = OPERATOR_NE
+  precedence['ne'] = 6
+  operators['eq'] = OPERATOR_EQ 
+  precedence['eq'] = 6
+  operators['&'] = OPERATOR_BITAND
+  precedence['&'] = 7
+  operators['^'] = OPERATOR_BITXOR
+  precedence['^'] =  8
+  operators['|'] = OPERATOR_BITOR
+  precedence['|'] = 9
+  operators['&&'] = OPERATOR_AND
+  precedence['&&'] = 10
+  operators['||'] = OPERATOR_OR
+  precedence['||'] = 11
 
-  store_global "_Tcl", "operators", operators
-  store_global "_Tcl", "functions", math_funcs
-  store_global "_Tcl", "precedence", precedence
+  store_global 'operators', operators
+  store_global 'functions', math_funcs
+  store_global 'precedence', precedence
 
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
 
   $P1 = new .TclArray
-  store_global "_Tcl", "proc_body", $P1
+  store_global 'proc_body', $P1
 
   $P1 = new .TclArray
-  store_global "_Tcl", "proc_args", $P1
+  store_global 'proc_args', $P1
 
   # Global variable initialization
 
    #version info
   $P0 = new .String
-  $P0 = "0.1"
-  store_global "Tcl", "$tcl_patchLevel", $P0
+  $P0 = '0.1'
+  .set_in_HLL('tcl', '$tcl_patchLevel', $P0)
   $P0 = new .String
-  $P0 = "0.1"
-  store_global "Tcl", "$tcl_version", $P0
+  $P0 = '0.1'
+  .set_in_HLL('tcl', '$tcl_version', $P0)
    
-    #error information
+  #error information
   $P0 = new .TclString
   $P0 = 'NONE'
-  store_global 'Tcl', '$errorCode', $P0
+  .set_in_HLL('tcl', '$errorCode', $P0)
   $P0 = new .TclString
   $P0 = ''
-  store_global 'Tcl', '$errorInfo', $P0
+  .set_in_HLL('tcl', '$errorInfo', $P0)
 
   # Setup the default channelIds
   $P1 = new .TclArray
   $P2 = getstdin
-  $P1["stdin"] = $P2
+  $P1['stdin'] = $P2
   $P2 = getstdout
-  $P1["stdout"] = $P2
+  $P1['stdout'] = $P2
   $P2 = getstderr
-  $P1["stderr"] = $P2
-  store_global "_Tcl", "channels", $P1
+  $P1['stderr'] = $P2
+  store_global 'channels', $P1
   
   # Setup the id # for channels..
   $P1 = new .Integer
   $P1 = 1
-  store_global "_Tcl", "next_channel_id", $P1
+  store_global 'next_channel_id', $P1
 
   # calling level (for upvar, uplevel, globals vs. lex)
   $P1 = new .Integer
   $P1 = 0
-  store_global "_Tcl", "call_level", $P1
+  store_global 'call_level', $P1
 
   # Change counter: when something is compiled, it is compared to
   # This counter: if the counter hasn't changed since it was compiled,
@@ -276,16 +275,16 @@ env_loop_done:
   # Otherwise fallback to the interpreted version.
   $P1 = new .Integer
   $P1 = 0
-  store_global "_Tcl", "epoch", $P1
+  store_global 'epoch', $P1
 
   # register the TCL compiler.
-  $P1 = find_global "_Tcl", "_tcl_compile"
-  compreg "TCL", $P1
+  $P1 = find_global '_tcl_compile'
+  compreg 'TCL', $P1
   
   # Setup a global to keep a unique id for compiled subs.
   $P1 = new .Integer
   $P1 = 0
-  store_global "_Tcl", "compiled_num", $P1
+  store_global 'compiled_num', $P1
 
 .end
 
@@ -293,19 +292,25 @@ env_loop_done:
   .param string tcl_code
 
   .local pmc compiled_num
-  compiled_num = find_global "_Tcl", "compiled_num"
+  compiled_num = find_global 'compiled_num'
   inc compiled_num
 
   .local pmc compiler,pir_compiler
-  compiler = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
+  compiler = find_global 'compile'
+  pir_compiler = find_global 'pir_compiler'
 
   ($I0,$S0) = compiler(0,tcl_code)
   .return pir_compiler($I0,$S0)
 .end
 
+.HLL '_Tcl', ''
+.namespace ['builtins']
+
 ${FALLBACKS}
 
 ${RULES}
+
+.HLL 'tcl', 'tcl_group'
+.namespace ['']
 
 ${INCLUDES}

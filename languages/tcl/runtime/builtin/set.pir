@@ -1,7 +1,8 @@
 ###
 # [set]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&set"
   .param pmc argv :slurpy
@@ -21,12 +22,12 @@
 
 getting:
   .local pmc read
-  read = find_global "_Tcl", "__read"
+  .get_from_HLL(read ,'_tcl', '__read')
   .return read(name)
 
 setting:
   .local pmc set
-  set = find_global "_Tcl", "__set"
+  .get_from_HLL(set ,'_tcl', '__set')
 
   .local pmc value
   value = argv[1]

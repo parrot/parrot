@@ -4,7 +4,8 @@
 
 =cut
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&info"
   .param pmc argv :slurpy
@@ -19,7 +20,7 @@
   null subcommand_proc
 
   push_eh catch
-    subcommand_proc = find_global "_Tcl\0builtins\0info", subcommand_name
+    .get_from_HLL(subcommand_proc, '_tcl';'builtins';'info', subcommand_name)
   clear_eh
 resume:
   if_null subcommand_proc, bad_subcommand
@@ -39,7 +40,8 @@ bad_args:
   .throw("wrong # args: should be \"info option ?arg arg ...?\"")
 .end
 
-.namespace [ "_Tcl\0builtins\0info" ]
+.HLL '_Tcl', ''
+.namespace [ 'builtins'; 'info' ]
 
 .sub "args"
   .param pmc argv
@@ -52,7 +54,7 @@ bad_args:
 
   .local string procname
   procname = shift argv
-  $P1 = find_global "_Tcl", "proc_args"
+  $P1 = find_global 'proc_args'
   $P2 = $P1[procname]
   if_null $P2, no_args
   .return($P2)
@@ -78,7 +80,7 @@ bad_args:
 
   .local string procname
   procname = argv[0]
-  $P1 = find_global "_Tcl", "proc_body"
+  $P1 = find_global 'proc_body'
   $P2 = $P1[procname]
   if_null $P2, no_body
   .return($P2)
@@ -102,7 +104,7 @@ bad_args:
 
   .local pmc math_funcs,iterator,retval
 
-  math_funcs = find_global "_Tcl", "functions"
+  math_funcs = find_global 'functions'
   iterator = new .Iterator, math_funcs
   iterator = 0
   retval = new .TclList
@@ -148,7 +150,7 @@ bad_args:
   varname = argv[0]
 
   .local pmc find_var
-  find_var = find_global "_Tcl", "__find_var"
+  find_var = find_global '__find_var'
   .local pmc found_var
   found_var = find_var(varname)
   if_null found_var, not_found
@@ -169,7 +171,7 @@ bad_args:
 
   if argc != 0 goto bad_args
 
-  $P1 = find_global "Tcl", "$tcl_version"
+  .get_from_HLL($P1,'tcl','$tcl_version')
   .return($P1)
 
 bad_args:

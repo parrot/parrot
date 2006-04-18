@@ -1,9 +1,8 @@
-.include "languages/tcl/src/returncodes.pir"
-.include "languages/tcl/src/macros.pir"
+.include 'languages/tcl/src/returncodes.pir'
+.include 'languages/tcl/src/macros.pir'
 
-.namespace [ "TclBinaryOp" ]
-
-.HLL "Tcl", "tcl_group"
+.HLL '', ''
+.namespace [ 'TclBinaryOp' ]
 
 .cloneable()
 
@@ -72,11 +71,11 @@ Initialize the attributes for an instance of the class
 =cut
 
 .sub __init :method
-  $P0 = new .TclInt
+  $P0 = new 'TclInt'
   setattribute self, "TclBinaryOp\x00type", $P0
-  $P0 = new .TclInt
+  $P0 = new 'TclInt'
   setattribute self, "TclBinaryOp\x00l_operand", $P0
-  $P0 = new .TclInt
+  $P0 = new 'TclInt'
   setattribute self, "TclBinaryOp\x00r_operand", $P0
 .end
 
@@ -87,14 +86,14 @@ Initialize the attributes for an instance of the class
   pir_code="# src/class/tclbinaryops.pir :: compile (1)\n"
 
   .local pmc retval
-  retval = new .TclInt
+  retval = new 'TclInt'
   
   .local pmc op,l_operand, r_operand, compile
   op  = getattribute self, "TclBinaryOp\x00type"
   l_operand = getattribute self, "TclBinaryOp\x00l_operand"
   r_operand = getattribute self, "TclBinaryOp\x00r_operand"
 
-  compile = find_global "_Tcl", "compile_dispatch"
+  .get_from_HLL(compile,'_tcl','compile_dispatch')
 
   .local string l_code,r_code,op_code
   .local int l_reg,r_reg
@@ -113,7 +112,7 @@ Initialize the attributes for an instance of the class
   temp_code = <<"END_PIR"
 # src/class/tclbinaryops.pir :: compile (2)
   .local pmc __number
-  __number = find_global "_Tcl", "__number"
+  .get_from_HLL(__number,'_tcl', '__number')
 push_eh l_code_check_%s
   $P%s = __number($P%s)
 clear_eh

@@ -4,7 +4,8 @@
 #
 # append var [...]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&append"
   .param pmc argv :slurpy
@@ -13,7 +14,7 @@
   argc = argv
 
   .local pmc read
-  read = find_global "_Tcl", "__read"
+  .get_from_HLL(read, '_tcl', '__read')
 
   .local string value
   .local int looper
@@ -47,7 +48,7 @@ loop:
 
 loop_done:
   .local pmc set
-  set = find_global "_Tcl", "__set"
+  .get_from_HLL(set, '_tcl', '__set')
   .return set(name, value)
 
 getter:

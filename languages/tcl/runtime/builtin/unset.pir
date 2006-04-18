@@ -1,7 +1,8 @@
 ###
 # [unset]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&unset"
   .param pmc argv :slurpy
@@ -14,7 +15,7 @@
   .local string name
   name = argv[0]
   .local pmc find_var, var
-  find_var = find_global "_Tcl", "__find_var"
+  .get_from_HLL(find_var, '_tcl', '__find_var')
   
   # is this an array?
   # ends with )
@@ -61,7 +62,7 @@ scalar:
 
   null var
   .local pmc store_var
-  store_var = find_global "_Tcl", "__store_var"
+  .get_from_HLL(store_var, '_tcl', '__store_var')
   store_var(name, var)
   .return("")
 

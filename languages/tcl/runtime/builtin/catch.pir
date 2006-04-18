@@ -1,7 +1,8 @@
 ###
 # [catch]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&catch"
   .param pmc argv :slurpy
@@ -13,8 +14,8 @@
   .local pmc code_retval,compiler,pir_compiler
   .local string varname,sigil_varname,code
 
-  compiler = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
+  .get_from_HLL(compiler, '_tcl', 'compile')
+  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
 
   if argc == 0 goto badargs
   if argc  > 2 goto badargs
@@ -44,7 +45,7 @@ got_retval:
   # Store the caught value in a 
 
   .local pmc __set
-  __set = find_global "_Tcl", "__set"
+  .get_from_HLL(__set, '_tcl', '__set')
   __set(varname,code_retval)
 
 done:

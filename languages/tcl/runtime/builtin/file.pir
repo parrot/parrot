@@ -1,4 +1,5 @@
-.namespace [ 'Tcl']
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub '&file'
   .param pmc argv :slurpy
@@ -13,7 +14,7 @@
   .local pmc subcommand_proc
 
   push_eh bad_args
-    subcommand_proc = find_global "_Tcl\0builtins\0file", subcommand_name
+    .get_from_HLL(subcommand_proc, '_tcl';'builtins';'file', subcommand_name)
   clear_eh
 
   if_null subcommand_proc, bad_args
@@ -30,7 +31,8 @@ few_args:
 
 .end
 
-.namespace [ "_Tcl\0builtins\0file" ]
+.HLL '_Tcl', ''
+.namespace [ 'builtins'; 'file' ]
 
 .sub 'join'
   .param pmc argv
@@ -92,7 +94,7 @@ bad_args:
   clear_eh
 
   .local pmc __set
-  __set = find_global "_Tcl", "__set" 
+  __set = find_global "__set" 
 
   $P3 = new .TclArray
   $P1 = $P2[8]
@@ -118,7 +120,7 @@ bad_args:
   $I2 = 0o170000   #S_IFMT
   $I3 = $I1 & $I2
 
-  $P4 = find_global "_Tcl", "filetypes"  
+  $P4 = find_global "filetypes"  
   $S1 = $P4[$I3]
   $P3['type'] = $S1
 
@@ -234,7 +236,7 @@ bad_args:
   $I2 = 0o170000   #S_IFMT
   $I3 = $I1 & $I2
 
-  $P4 = find_global "_Tcl", "filetypes"  
+  $P4 = find_global "filetypes"  
   $S1 = $P4[$I3]
   .return ($S1)
 

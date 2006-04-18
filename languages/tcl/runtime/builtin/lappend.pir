@@ -1,7 +1,8 @@
 ##
 # [list]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&lappend"
   .param pmc argv :slurpy
@@ -18,14 +19,14 @@
   cnt = 1
 
   .local pmc read
-  read = find_global "_Tcl", "__read"
+  .get_from_HLL(read, '_tcl', '__read')
   push_eh new_variable
     value = read(listname)
   clear_eh
   
   .local pmc __list
 
-  __list = find_global "_Tcl", "__list"
+  .get_from_HLL(__list, '_tcl', '__list')
   value = __list(value)
   goto loop
 
@@ -41,7 +42,7 @@ loop:
   goto loop
 loop_done:
   .local pmc set
-  set = find_global "_Tcl", "__set"
+  .get_from_HLL(set, '_tcl', '__set')
   .return set(listname, value)
 
 error:

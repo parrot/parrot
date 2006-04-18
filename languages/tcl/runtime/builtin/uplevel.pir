@@ -4,7 +4,8 @@
 # Pretty much a copy of "eval" except for the call_level...
 # needs argument checking.
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&uplevel"
   .param pmc argv :slurpy
@@ -14,12 +15,12 @@
   .local int looper
  
   .local pmc compiler,pir_compiler
-  compiler = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
+  .get_from_HLL(compiler, '_tcl', 'compile')
+  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
 
   # save the old call level
   .local pmc old_call_level
-  $P2 = find_global "_Tcl", "call_level"
+  .get_from_HLL($P2, '_tcl', 'call_level')
   old_call_level = clone $P2
 
   .local pmc call_level
@@ -49,7 +50,7 @@ loop:
 loop_done:
 
   # Set the new level 
-  store_global "_Tcl", "call_level", call_level
+  .set_in_HLL('_tcl', 'call_level', call_level)
 
   $P1 = parse(expr,0,0)
 
@@ -60,7 +61,7 @@ loop_done:
   $P0 = $P1()
 
   #restore the old level
-  store_global "_Tcl", "call_level", old_call_level
+  .set_in_HLL('_tcl', 'call_level', old_call_level)
 
 done:
   .return($P0) 

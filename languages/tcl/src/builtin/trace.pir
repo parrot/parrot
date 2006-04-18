@@ -1,7 +1,7 @@
 # XXX Stub 
 # help tcltest compile
 
-.namespace [ '_Tcl::builtins']
+.namespace [ 'builtins']
 
 .sub 'trace'
   .param int register_num

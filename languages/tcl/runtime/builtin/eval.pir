@@ -4,7 +4,8 @@
 #
 # eval arg [... arg arg]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&eval"
   .param pmc argv :slurpy
@@ -17,8 +18,8 @@
   .local int looper
  
   .local pmc compiler,pir_compiler
-  compiler = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
+  .get_from_HLL(compiler, '_tcl', 'compile')
+  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
 
   expr = ""
   looper = 0

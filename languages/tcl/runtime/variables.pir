@@ -1,4 +1,4 @@
-.namespace [ "_Tcl" ]
+.HLL '_Tcl', ''
 
 =head2 _Tcl::__read
 
@@ -178,7 +178,7 @@ Gets the actual variable from memory and returns it.
   if $S0 == "::"     goto coloned
   
   .local int call_level
-  $P1 = find_global "_Tcl", "call_level"
+  $P1 = find_global 'call_level'
   call_level = $P1
   if call_level == 0 goto global_var
 
@@ -192,7 +192,7 @@ coloned:
 
 global_var:
   push_eh notfound
-    value = find_global "Tcl", name
+    .get_from_HLL(value, 'tcl', name) 
   clear_eh
   goto found
 
@@ -220,7 +220,7 @@ Sets the actual variable from memory.
   if $S0 == "::"     goto coloned
 
   .local int call_level
-  $P1 = find_global "_Tcl", "call_level"
+  $P1 = find_global 'call_level'
   call_level = $P1
   if call_level == 0 goto global_var
 lexical_var:
@@ -230,7 +230,7 @@ lexical_var:
 coloned:
   substr name, 1, 2, ""
 global_var:
-  store_global "Tcl", name, value
+  .set_in_HLL('tcl',name,value)
 
   .return()
 .end

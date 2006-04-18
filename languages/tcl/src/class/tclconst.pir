@@ -1,9 +1,8 @@
 .include "languages/tcl/src/returncodes.pir"
 .include "languages/tcl/src/macros.pir"
 
-.namespace [ "TclConst" ]
-
-.HLL "Tcl", "tcl_group"
+.HLL '', ''
+.namespace [ 'TclConst' ]
 
 .cloneable()
 
@@ -25,8 +24,9 @@ Define the attributes required for the class.
   $P0[114] = "\r"
   $P0[116] = "\t"
   $P0[118] = "\v"
-  
-  store_global "_Tcl", "backslashes", $P0
+
+  # XXX These should probably be moved into a class attribute.
+  .set_in_HLL('_tcl', 'backslashes', $P0)
 
   $P0 = new .Hash
   $P0[ 48] =  0 # "0"
@@ -52,7 +52,7 @@ Define the attributes required for the class.
   $P0[101] = 14
   $P0[102] = 15
   
-  store_global "_Tcl", "hexadecimal", $P0
+  .set_in_HLL('_tcl', 'hexadecimal', $P0)
 
 .end
 
@@ -62,8 +62,8 @@ Define the attributes required for the class.
   .local int value_length
 
   .local pmc backslashes, hexadecimal
-  find_global backslashes, "_Tcl", "backslashes"
-  find_global hexadecimal, "_Tcl", "hexadecimal"
+  .get_from_HLL(backslashes, '_tcl', 'backslashes')
+  .get_from_HLL(hexadecimal, '_tcl', 'hexadecimal')
   
   .local int pos
   pos = 0
@@ -266,7 +266,7 @@ Generate PIR code which can be used to generate our value
    value = getattribute self, $I0
 
    .local pmc compiler
-   compiler = find_global "_Tcl", "compile_dispatch"
+  .get_from_HLL(compiler,'_tcl','compile_dispatch')
 
    .return compiler(argnum, value)
 .end

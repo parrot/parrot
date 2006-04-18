@@ -2,7 +2,8 @@
 # [lset]
 #
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&lset"
   .param pmc argv :slurpy
@@ -18,8 +19,8 @@
   name = $P0
 
   .local pmc read, set
-  read = find_global "_Tcl", "__read"
-  set  = find_global "_Tcl", "__set"
+  .get_from_HLL(read, '_tcl', '__read')
+  .get_from_HLL(set, '_tcl', '__set')
 
   retval = read(name)
 
@@ -32,7 +33,7 @@
 
 lset:
   .local pmc __list
-  __list = find_global "_Tcl", "__list"
+  .get_from_HLL(__list, '_tcl', '__list')
   retval = __list(retval)
 
   .local int i, end

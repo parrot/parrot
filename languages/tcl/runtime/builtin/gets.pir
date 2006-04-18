@@ -4,7 +4,8 @@ read a line from a channel
 
 =cut
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&gets"
   .param pmc argv :slurpy
@@ -13,7 +14,7 @@ read a line from a channel
   channelID = argv[0]
 
   .local pmc __channel
-  __channel = find_global "_Tcl", "__channel"
+  .get_from_HLL(__channel, '_tcl', '__channel')
 
   .local pmc io
   io = __channel(channelID)

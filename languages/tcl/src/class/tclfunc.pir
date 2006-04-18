@@ -1,9 +1,8 @@
 .include "languages/tcl/src/returncodes.pir"
 .include "languages/tcl/src/macros.pir"
 
-.namespace [ "TclFunc" ]
-
-.HLL "Tcl", "tcl_group"
+.HLL '', ''
+.namespace [ 'TclFunc' ]
 
 .cloneable()
 
@@ -44,9 +43,9 @@ Initialize the attributes for an instance of the class
 =cut
 
 .sub __init :method
-  $P0 = new .TclString
+  $P0 = new 'TclString'
   setattribute self, "TclFunc\x00name", $P0
-  $P0 = new .TclString
+  $P0 = new 'TclString'
   setattribute self, "TclFunc\x00argument", $P0
 .end
 
@@ -56,9 +55,9 @@ Initialize the attributes for an instance of the class
   .local pmc retval
   .local string pir_code
   .local pmc funcs,  __number, compile
-  funcs = find_global "_Tcl", "functions"
-  __number = find_global "_Tcl", "__number"
-  compile = find_global  "_Tcl", "compile_dispatch" 
+  .get_from_HLL(funcs,'_tcl',funcs)
+  .get_from_HLL(__number,'_tcl','__number')
+  .get_from_HLL(compile,'_tcl','compile_dispatch')
 
   # eventually, we'll need to deal with more than one arg.
 

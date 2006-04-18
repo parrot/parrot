@@ -1,7 +1,8 @@
 ###
 # [unknown]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&unknown"
   .param pmc argv :slurpy

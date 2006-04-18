@@ -1,4 +1,5 @@
-.namespace [ "_Tcl" ]
+.HLL '_Tcl', ''
+.namespace [ '' ]
 
 .const int MAX_PRECEDENCE =  11
 
@@ -32,7 +33,7 @@ Return register_num is the register number that contains the result of this code
   ast = __expression_ast(expr) 
 
   .local pmc compiler
-  compiler = find_global "_Tcl", "compile_dispatch"
+  compiler = find_global 'compile_dispatch'
   .return compiler(register_num, ast)
 .end
 
@@ -281,9 +282,9 @@ unary:
 
   .local pmc ops, precedences
   # Global list of available ops.
-  ops = find_global "_Tcl", "operators"
+  ops = find_global 'operators'
   # Global list of operator precedence
-  precedences = find_global "_Tcl", "precedence"
+  precedences = find_global 'precedence'
 
   .local int len
   len = length expr
@@ -549,7 +550,7 @@ loop_done:
   # the function name must be before the first (
   $I0 = paren_pos - start
   $S0 = substr expr, start, $I0
-  $P1 = find_global "_Tcl", "functions"
+  $P1 = find_global 'functions'
 
   func = $P1[$S0]
   if_null func, unknown_func

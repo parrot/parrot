@@ -1,9 +1,8 @@
 .include "languages/tcl/src/returncodes.pir"
 .include "languages/tcl/src/macros.pir"
 
-.namespace [ "TclCommandList" ]
-
-.HLL "Tcl", "tcl_group"
+.HLL '', ''
+.namespace [ 'TclCommandList' ]
 
 .cloneable()
 

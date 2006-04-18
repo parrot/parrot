@@ -1,4 +1,5 @@
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&switch"
   .param pmc argv :slurpy
@@ -46,7 +47,7 @@ skip_subj:
 
 body_from_list:
   .local pmc __list
-  __list = find_global "_Tcl", "__list"
+  .get_from_HLL(__list,'_tcl','__list')
 
   $P0 = shift argv
   body = __list($P0)
@@ -105,8 +106,8 @@ body_end:
 
 body_match:
   .local pmc compiler,pir_compiler
-  compiler = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
+  .get_from_HLL(compiler, '_tcl', 'compile') 
+  .get_from_HLL(pir_compiler, '_tcl', 'pir_compile') 
   ($I0,$S0) = compiler(0,code)
   $P1 = pir_compiler($I0,$S0)
   .return $P1()

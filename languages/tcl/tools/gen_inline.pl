@@ -27,8 +27,6 @@ variable name, integer, channel, list, string, script, and expressions.
 
 =cut
 
-my $namespace = "_Tcl::builtins";    # The namespace all these commands live in
-
 local undef $/;
 
 my $file = shift @ARGV;
@@ -81,14 +79,15 @@ die "error processing $file: $@" if ($@);
 
 add_wrapped(<<END_PIR);
 
-.namespace [ "_Tcl::builtins"]
+.HLL '_Tcl', ''
+.namespace [ 'builtins' ]
 
 .sub '$template->{command}'
   .param int register_num
   .param pmc argv
 
   .local pmc compiler
-  compiler = find_global '_Tcl', 'compile_dispatch'
+  compiler = find_global 'compile_dispatch'
 
   .local int argc
   .local string pir_code,temp_code
@@ -127,15 +126,15 @@ END_PIR
 
 add_inlined(<<END_PIR);
   .local pmc __read
-  __read     = find_global '_Tcl', '__read'
+  .get_from_HLL(__read,'_tcl','__read')
   .local pmc __set
-  __set      = find_global '_Tcl', '__set'
+  .get_from_HLL(__set,'_tcl','__set')
   .local pmc __integer
-  __integer  = find_global '_Tcl', '__integer'
+  .get_from_HLL(__integer,'_tcl','__integer')
   .local pmc __list
-  __list     = find_global '_Tcl', '__list'
+  .get_from_HLL(__list,'_tcl','__list')
   .local pmc __channel
-  __channel  = find_global '_Tcl', '__channel'
+  .get_from_HLL(__channel,'_tcl','__channel')
 END_PIR
 add_wrapped(<<END_PIR);
   .local pmc __script_compile

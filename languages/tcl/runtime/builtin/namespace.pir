@@ -9,7 +9,8 @@ real top level namespace.
 
 =cut
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&namespace"
    .param pmc argv :slurpy
@@ -25,7 +26,7 @@ real top level namespace.
   null subcommand_proc
 
   push_eh catch
-    subcommand_proc = find_global "_Tcl\0builtins\0namespace", subcommand_name
+    .get_from_HLL(subcommand_proc, '_tcl';'builtins';'namespace', subcommand_name)
   clear_eh
 resume:
   if_null subcommand_proc, bad_args
@@ -45,7 +46,8 @@ no_args:
 
 .end
 
-.namespace [ "_Tcl\0builtins\0namespace" ]
+.HLL 'Tcl', ''
+.namespace [ 'builtins'; 'namespace' ]
 
 # TODO: hey, this is cheating!
 .sub "current"

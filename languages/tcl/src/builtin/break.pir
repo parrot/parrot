@@ -1,6 +1,6 @@
-.namespace [ "_Tcl::builtins" ]
+.namespace [ 'builtins' ]
 
-.sub "break"
+.sub 'break'
   .param int register_num
   .param pmc argv
 

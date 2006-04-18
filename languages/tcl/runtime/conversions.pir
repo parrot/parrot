@@ -1,4 +1,5 @@
-.namespace [ "_Tcl" ]
+.HLL '_Tcl', ''
+.namespace [ '' ]
 
 =head2 _Tcl::__list
 
@@ -98,7 +99,7 @@ Given a string, return the appropriate channel.
   .param string channelID
 
   .local pmc channels
-  channels = find_global '_Tcl', 'channels'
+  channels = find_global 'channels'
 
   .local pmc io_obj
   io_obj = channels[channelID]

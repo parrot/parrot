@@ -1,9 +1,8 @@
 .include "languages/tcl/src/returncodes.pir"
 .include "languages/tcl/src/macros.pir"
 
-.namespace [ "TclVar" ]
-
-.HLL "Tcl", "tcl_group"
+.HLL '', ''
+.namespace [ 'TclVar' ]
 
 .cloneable()
 
@@ -26,7 +25,7 @@ Define the attributes required for the class.
     template = <<"END_PIR"
 # src/class/tclvar.pir :: compile
 .local pmc read
-read = find_global '_Tcl', '__read'
+.get_from_HLL(read,'_tcl','__read')
 $P%i = read("%s")
 END_PIR
 

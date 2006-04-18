@@ -1,9 +1,8 @@
 .include "languages/tcl/src/returncodes.pir"
 .include "languages/tcl/src/macros.pir"
 
-.namespace [ "TclCommand" ]
-
-.HLL "Tcl", "tcl_group"
+.HLL '', ''
+.namespace [ 'TclCommand' ]
 
 .cloneable()
 
@@ -29,7 +28,8 @@ Define the attributes required for the class.
    .local int inlineable
    inlineable = 0
    .local pmc compile
-   compile = find_global "_Tcl", "compile_dispatch"
+  .get_from_HLL(compile,'_tcl','compile_dispatch')
+
 
    .local string pir_code, args, inlined, dynamic, invalid, error
    pir_code = "# src/class/tclcommand.pir :: compile\n"
@@ -45,7 +45,7 @@ Define the attributes required for the class.
    num_args = self 
    ii = 0
    .local pmc compiled_args
-   compiled_args = new .TclList
+   compiled_args = new "TclList"
    $I0 = find_type "TclConst"
 arg_loop:
    if ii == num_args goto arg_loop_done
@@ -95,16 +95,15 @@ arg_loop_done:
    $I1 = find_type "TclConst"
    if $I0 != $I1 goto dynamic_command
 
-   push_eh dynamic_command
-     $S0 = name
-     $P1 = find_global "_Tcl::builtins", $S0
-   clear_eh
+   $S0 = name
+   .get_from_HLL($P1,'_tcl'; 'builtins', $S0)
+   if_null $P1, dynamic_command
 
    (result_num,retval) = $P1(register_num,self)
    register_num = result_num
 
    .local pmc epoch
-   epoch = find_global '_Tcl', 'epoch'
+   .get_from_HLL(epoch, '_tcl', 'epoch')
    $S0 = epoch
    inlined .= "if epoch != "
    inlined .= $S0
@@ -143,12 +142,9 @@ dynamic_command:
    dynamic .= $S2
    dynamic .= "\n"
 
-   dynamic .= "push_eh invalid_"
-   dynamic .= label_num
-   dynamic .= "\n"
-   dynamic .= "command = find_global \"Tcl\", "
+   dynamic .= ".get_from_HLL(command,'tcl',"
    dynamic .= $S2
-   dynamic .= "\nclear_eh\nif_null command, invalid_"
+   dynamic .= ")\nif_null command, invalid_"
    dynamic .= label_num
    dynamic .= "\n$P"
    $S0 = result_num
@@ -169,10 +165,12 @@ elem_loop_done:
    dynamic .= label_num
    dynamic .= "\n"
 
-   invalid .= ".local pmc interactive\ninteractive=find_global 'Tcl', '$tcl_interactive'\nunless interactive goto err_command"
+   invalid .= ".local pmc interactive\n"
+   invalid .= ".get_from_HLL(interactive,'tcl','$tcl_interactive')\n"
+   invalid .= "unless interactive goto err_command"
    invalid .= label_num
    invalid .= "\n"
-   invalid .= ".local pmc unk\nunk=find_global 'Tcl', '&unknown'\n"
+   invalid .= ".local pmc unk\nunk=find_global '&unknown'\n"
    invalid .= "unk($P"
    $S1 = name_register
    invalid .= $S1

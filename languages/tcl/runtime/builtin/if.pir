@@ -1,7 +1,8 @@
 ###
 # [if]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&if"
   .param pmc argv :slurpy
@@ -23,9 +24,9 @@
   .local int counter
 
   .local pmc compiler,pir_compiler,expr_compiler
-  compiler = find_global "_Tcl", "compile"
-  pir_compiler = find_global "_Tcl", "pir_compiler"
-  expr_compiler = find_global "_Tcl", "__expression_compile"
+  .get_from_HLL(compiler,'_tcl','compile')
+  .get_from_HLL(pir_compiler,'_tcl','pir_compiler')
+  .get_from_HLL(expr_compiler,'_tcl','__expression_compile')
  
   .local string temp_str
   temp_str ="" 

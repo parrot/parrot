@@ -1,9 +1,9 @@
 ###
 # [return]
 
-.namespace [ "_Tcl::builtins" ]
+.namespace [ 'builtins' ]
 
-.sub "return"
+.sub 'return'
   .param int register_num
   .param pmc argv
 
@@ -21,7 +21,7 @@ onearg:
   .local string temp_code
   .local int value_num
   .local pmc compiler
-  compiler = find_global "_Tcl", "compile_dispatch"
+  compiler = find_global 'compile_dispatch'
 
   $P0 = argv[0]
   (value_num, temp_code) = compiler(register_num, $P0)

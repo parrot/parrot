@@ -1,4 +1,6 @@
-.namespace [ "_Tcl" ] 
+.HLL '_Tcl', ''
+
+.namespace [ '' ]
 
 =head1 NAME
 
@@ -129,7 +131,7 @@ use by the generated PIR.
 done_init:
 
   .local pmc compiled_num
-  compiled_num = find_global "_Tcl", "compiled_num"
+  compiled_num = find_global 'compiled_num'
   inc compiled_num
 
   .local string stub_code
@@ -148,7 +150,7 @@ $P1=loadlib 'dynlexpad'
 load_bytecode 'languages/tcl/runtime/tcllib.pbc'
 .include "languages/tcl/src/returncodes.pir"
 .local pmc epoch
-epoch = find_global "_Tcl", "epoch"
+.get_from_HLL(epoch,'_tcl','epoch')
 %s.return ($P%i)
 .end
 END_PIR
@@ -159,12 +161,13 @@ END_PIR
   # conflicts with the parser itself.
 
   stub_code = <<"END_PIR"
+.HLL 'tcl', 'tcl_group'
 # src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon
 .include "languages/tcl/src/returncodes.pir"
 .local pmc epoch
-epoch = find_global "_Tcl", "epoch"
+.get_from_HLL(epoch,'_tcl','epoch')
 %s.return ($P%i)
 .end
 END_PIR
@@ -189,6 +192,8 @@ compile_it:
 =back
 
 =cut
+
+# XXX The TclCompiler object isn't currently used
 
 .namespace [ "TclCompiler" ]
 

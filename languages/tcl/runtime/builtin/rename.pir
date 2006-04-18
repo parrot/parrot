@@ -1,7 +1,8 @@
 ###
 # [rename]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&rename"
   .param pmc argv :slurpy
@@ -16,7 +17,7 @@
   new_s = argv[1]
 
   # Change the epoch
-  $P0 = find_global '_Tcl', 'epoch'
+  .get_from_HLL($P0, '_tcl', 'epoch')
   inc $P0
 
   .local string old_proc,new_proc
@@ -39,7 +40,7 @@ add:
 
 delete:
   null theSub
-  store_global "Tcl", old_proc, theSub
+  store_global old_proc, theSub
   .return("")
 
 doesnt_exist:

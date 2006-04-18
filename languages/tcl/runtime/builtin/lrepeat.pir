@@ -1,7 +1,8 @@
 ##
 # [lrepeat]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&lrepeat"
   .param pmc argv :slurpy

@@ -45,7 +45,7 @@ closedir(SRCDIR);
 
 my $includes;
 foreach my $file (@cmd_includes, @blt_includes, @libs, @srcs) {
-  $includes .= "  .include \"languages/tcl/$file\"\n";
+  $includes .= "  .include 'languages/tcl/$file\'\n";
 }
 
 =head1 rules
@@ -109,7 +109,9 @@ foreach my $cmd (@cmd_files) {
 foreach my $fallback (@fallbacks) {
 $fallbacks .= <<"END_PIR"
 # fallback for interpreter: call the inlined version
-.namespace [ 'Tcl' ]
+
+.namespace ['builtins']
+
 .sub "&$fallback"
   .param pmc argv :slurpy
   .local pmc inlined, pir_compiler, invokable

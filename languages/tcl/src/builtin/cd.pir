@@ -1,6 +1,6 @@
-.namespace [ "_Tcl::builtins" ]
+.namespace [ 'builtins' ]
 
-.sub "cd"
+.sub 'cd'
   .param int register_num
   .param pmc argv
 
@@ -10,7 +10,7 @@
   directory_num = 0
 
   .local pmc compiler
-  compiler = find_global "_Tcl", "compile_dispatch"
+  compiler = find_global 'compile_dispatch'
 
   if argc == 0 goto noargs
   if argc == 1 goto got_dir

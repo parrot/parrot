@@ -1,6 +1,6 @@
-.namespace [ "_Tcl::builtins" ]
+.namespace [ 'builtins' ]
 
-.sub "continue"
+.sub 'continue'
   .param int register_num
   .param pmc argv
 

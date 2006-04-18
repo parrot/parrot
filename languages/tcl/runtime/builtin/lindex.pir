@@ -1,7 +1,8 @@
 ###
 # [source]
 
-.namespace [ "Tcl" ]
+.HLL 'Tcl', 'tcl_group'
+.namespace [ '' ]
 
 .sub "&lindex"
   .param pmc argv :slurpy
@@ -11,8 +12,8 @@
   if argc < 1 goto bad_args
   
   .local pmc __list, _list_index
-  __list      = find_global "_Tcl", "__list"
-  _list_index = find_global "_Tcl", "_list_index"
+  .get_from_HLL(__list, '_tcl', '__list')
+  .get_from_HLL(_list_index, '_tcl', '_list_index')
 
   .local pmc list
   list = argv[0]

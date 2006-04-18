@@ -1,4 +1,5 @@
-.namespace [ "_Tcl" ] 
+.HLL '_Tcl', ''
+.namespace [ '' ]
 
 =head1 NAME
 
