@@ -140,12 +140,20 @@ PGE::OPTable - PGE operator precedence table and parser
     syncat = substr name, 0, $I0
     key = substr name, $I0
 
+    .local pmc sctable
+    .local int mode
+    sctable = find_global "PGE::OPTable", "%!sctable"
+    mode = sctable[syncat]
+
     # we don't replace existing tokens
     .local pmc tokentable
     tokentable = self
     $I0 = exists tokentable['name']
     if $I0 goto end
     tokentable[name] = token
+
+    ## don't process undef syntactic categories -- just store
+    if mode == 0 goto end
 
     $S0 = args['match']
     if $S0 > '' goto token_returns
@@ -207,7 +215,7 @@ PGE::OPTable - PGE operator precedence table and parser
     $I0 = exists keytable[key]
     if $I0 goto add_key_array
     keytable[key] = token
-    goto end
+    goto add_key_end
   add_key_array:
     $P0 = keytable[key]
     $I0 = does $P0, 'array'
@@ -216,18 +224,13 @@ PGE::OPTable - PGE operator precedence table and parser
     push $P1, $P0
     push $P1, token
     keytable[key] = $P1
-    goto end
+    goto add_key_end
   add_key_array_2:
     push $P0, token
+  add_key_end:
 
-  end:
+    # set the mode for the token
     token = tokentable[name]
-
-    .local pmc sctable
-    .local int mode
-    sctable = find_global "PGE::OPTable", "%!sctable"
-    mode = sctable[syncat]
-
   mode_nullterm:
     $I0 = token['nullterm']
     if $I0 == 0 goto mode_nows
@@ -255,6 +258,7 @@ PGE::OPTable - PGE operator precedence table and parser
   assoc_list:
     mode |= PGE_OPTABLE_ASSOC_LIST
   mode_done:
+  end:
     token['mode'] = mode
     .return (token)
 .end
