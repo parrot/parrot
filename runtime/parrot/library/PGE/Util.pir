@@ -22,11 +22,15 @@ parsing tasks using PGE.
     .return ()
 .end 
 
+=over 4
+
 =item C<die(PMC match, [, message [, ...]] )>
 
 Throws an exception at the current point in the match.  If message
 doesn't end with a newline, also produces the line number and offset
 of the match.
+
+=back
 
 =cut
 
