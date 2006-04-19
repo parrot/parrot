@@ -8,7 +8,7 @@ BEGIN {
     import Test::Base qw/ -Base /;
   };
   if ($@) {
-    plan(skip_all => "APL tests require Test::Base.;");
+    eval 'use Test::More skip_all => "APL tests require Test::Base.;";';
     exit 0;
   }
 }
