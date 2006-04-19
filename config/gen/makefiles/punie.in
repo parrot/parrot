@@ -52,7 +52,7 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Ilib -I..@slash@..@slash@lib t@slash@harness t@slash@*.t
+	$(PERL) -Ilib -I..@slash@..@slash@lib t@slash@harness
 
 testclean:
 	$(RM_F) "t/*.p1" "t/*.out" "t/*.pir"

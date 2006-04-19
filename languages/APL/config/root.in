@@ -56,10 +56,10 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Ilib t/harness t/*.t
+	$(PERL) -Ilib t/harness
 
 devtest: all
-	env APLDEV=1 $(PERL) -Ilib t/harness t/*.t
+	env APLDEV=1 $(PERL) -Ilib t/harness
 
 testclean:
 	$(RM_F) "t/*.apl" "t/*.out"
