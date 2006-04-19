@@ -117,9 +117,6 @@ a NameSpace or a var, the NameSpace is returned.
         HashBucket *b = hash_get_bucket(INTERP, 
                 (Hash*) PMC_struct_val(SELF), key);
         int val_is_NS = value->vtable->base_type == enum_class_NameSpace;
-        if (PMC_IS_NULL(value))
-            real_exception(INTERP, NULL, E_NameError,
-                    "Attempt to set NULL namespace (part)");
         if (!b)
             SUPER(key, value);
         else {
