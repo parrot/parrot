@@ -81,6 +81,10 @@ On windows systems, 'nmake' is used
 
 On other systems, just try 'make'
 
+NOTE: do *NOT* use the '-j' option to make. The dependencies in the generated
+Makefile work if you do them sequentially, but running with -j will almost
+certainly cause a build error. Patches welcome.
+
 Now, the interpreter should build.  If you are building the ICU library
 (this is the default on most systems), you need to use GNU make instead
 (or something compatible with it).

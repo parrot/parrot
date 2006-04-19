@@ -448,8 +448,9 @@ print <<"END";
 
 Okay, we're done!
 
-You can now use `$make' to build your Parrot. After that,
-you can use `$make test' to run the test suite.
+You can now use `$make' to build your Parrot.
+(NOTE: do not use `$make -j <n>'!)
+After that, you can use `$make test' to run the test suite.
 
 Happy Hacking,
         The Parrot Team
