@@ -3,34 +3,30 @@
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../../../lib";
+use lib qw( ../../../lib );
 
 use Test::More tests => 1;
-use Parrot::Test();
+use Parrot::Test  ();
 use Parrot::Config qw(%PConfig);
 use File::Spec;
 
 # execute hello.ook
-my $updir         = File::Spec->updir();
-my $languages_dir = File::Spec->catdir( $FindBin::Bin, $updir, $updir ); 
-my $parrot        = File::Spec->catfile( $updir, 'parrot' . $PConfig{exe} );
+my $path_to_parrot = Parrot::Test::path_to_parrot();
+my $languages_dir  = File::Spec->catdir( $path_to_parrot, 'languages' );
+my $ook            = "cd $path_to_parrot && .$PConfig{slash}parrot$PConfig{exe} languages/ook/ook.pbc";
 
 # Test running hello.ook
 
-my $out_fn = File::Spec->catfile( 'ook', 'hello.out' );
+my $out_fn = File::Spec->catfile( $languages_dir, 'ook', 'hello.out' );
 
 # STDERR is written into same output file
 my $exit_code = Parrot::Test::run_command( 
-    "$parrot ook/ook.pbc ook/hello.ook",
-    CD     => $languages_dir,
+    "$ook languages/ook/hello.ook",
     STDOUT => $out_fn,
     STDERR => $out_fn 
                                          );
   
-my $out = Parrot::Test::slurp_file(
-                    File::Spec->catfile($languages_dir, $out_fn)
-                                  );
+my $out = Parrot::Test::slurp_file( $out_fn );
 is( $out, << 'OUT', 'output from hello.ook' );
 Hello World!
 OUT

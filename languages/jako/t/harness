@@ -1,3 +1,5 @@
+#! perl
+
 # $Id$
 
 =head1 NAME
@@ -16,37 +18,4 @@ This list is one per line, and is relative to the languages dir.
 
 =cut
 
-use strict;
-use warnings;
-use lib '..';
-
-use Cwd();
-use Data::Dumper;
-use File::Spec;
-use Test::Harness();
-
-my $language = 'jako';
-
-if ( grep { m/^--files$/ } @ARGV ) {
-    # Only the Makefile in 'parrot/languages' uses --files
-    my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
-    print join( "\n", @files );
-    print "\n" if scalar(@files);
-} else {
-    die "Only '--files' is supported"; 
-}
-
-=head1 HISTORY
-
-Copied from lazy-k/t/harness.
-
-=head1 SEE ALSO
-
-  F<languages/lazy-k/t/harness>
-
-=head1 AUTHOR
-
-Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
-
-=cut
+use Parrot::Test::Harness language => 'jako';

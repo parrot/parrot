@@ -28,7 +28,7 @@ help :
 all: build
 
 test: build
-	cd .. && $(PERL) ook/t/harness
+	$(PERL) -I../../lib t/harness
 
 build: ook.pasm
 	$(PARROT) -o ook.pbc ook.pasm
