@@ -110,16 +110,14 @@ foreach my $fallback (@fallbacks) {
 $fallbacks .= <<"END_PIR"
 # fallback for interpreter: call the inlined version
 
-.namespace ['builtins']
-
 .sub "&$fallback"
   .param pmc argv :slurpy
   .local pmc inlined, pir_compiler, invokable
-  inlined = find_global '_Tcl::builtins', '$fallback'
+  .get_from_HLL(inlined, '_tcl';'builtins', '$fallback')
   .local string pir_code
   .local int register_num
   (register_num,pir_code) = inlined(0,argv)
-  pir_compiler = find_global '_Tcl', 'pir_compiler' 
+  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
   invokable = pir_compiler(register_num,pir_code)
   .return invokable()
 .end

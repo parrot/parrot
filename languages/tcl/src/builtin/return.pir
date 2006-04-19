@@ -1,6 +1,7 @@
 ###
 # [return]
 
+.HLL '_Tcl', ''
 .namespace [ 'builtins' ]
 
 .sub 'return'

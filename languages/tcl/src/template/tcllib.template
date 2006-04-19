@@ -303,8 +303,7 @@ env_loop_done:
   .return pir_compiler($I0,$S0)
 .end
 
-.HLL '_Tcl', ''
-.namespace ['builtins']
+.HLL 'Tcl', ''
 
 ${FALLBACKS}
 
