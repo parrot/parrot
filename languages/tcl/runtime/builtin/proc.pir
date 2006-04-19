@@ -62,7 +62,6 @@ got_args:
   P0 = loadlib 'dynlexpad' 
 .end
 .HLL_map .LexPad, .DynLexPad
-.HLL 'Tcl', 'tcl_group'
 .sub '&%s' :lex
 .param pmc args :slurpy
 .include 'languages/tcl/src/returncodes.pir'
