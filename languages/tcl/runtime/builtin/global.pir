@@ -28,7 +28,7 @@ loop:
   sigil_varname = "$" . varname
 
   push_eh next
-    $P1 = find_global "Tcl", sigil_varname
+    $P1 = find_global sigil_varname
   clear_eh
 
   .local pmc store_lex_pdd20
