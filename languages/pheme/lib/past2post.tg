@@ -155,6 +155,7 @@ PAST::Sub: create_sub_declarations(.) = {
 	tmpvar      = new 'POST::Var'
 	tmpvar.'new_temp'()
 	var_op_name.'value'( var_name )
+	var_op_name.'valtype'( '' )
 	var_op.'op'( 'declare' )
 	var_ops.'tmpvar'( tmpvar )
 	var_ops.'add_child'( var_op )
@@ -381,6 +382,7 @@ PAST::Op: result(.) = {
   is_val:
 	result = new 'POST::Val'
 	result.'value'( op_name )
+	result.'valtype'( '' )
 
   return_result:
 	.return( result )
@@ -398,12 +400,17 @@ PAST::Val: result(.) = {
 	.local string value
 	value = node.'value'()
 
+	.local string valtype
+	valtype = node.'valtype'()
+
 	.local int is_variable
 	is_variable = exists variables[value]
 
 	if is_variable goto rebind_variable
+
 	result = new 'POST::Val'
 	result.'value'( value )
+	result.'valtype'( valtype )
 	.return( result )
 
   rebind_variable:

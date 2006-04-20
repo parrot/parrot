@@ -8,6 +8,7 @@
 	symbols['cdr']  = 1
 	symbols['cons'] = 1
 	symbols['include_file'] = 1
+	symbols['write'] = 1
 
 	store_global 'PhemeCompiler', 'symbols', symbols
 	.return()
@@ -90,4 +91,29 @@
 	unshift r, l
 
 	.return( r )
+.end
+
+.sub 'write' :multi()
+	.param pmc messages :slurpy
+
+	.local string message
+	.local pmc iter
+	iter = new .Iterator, messages
+	iter = 0
+
+  iter_loop:
+	unless iter goto iter_end
+	message = shift iter
+	print message
+	goto iter_loop
+
+  iter_end:
+	.return()
+.end
+
+.sub 'write' :multi( string )
+	.param string message_string
+
+	print message_string
+	.return()
 .end

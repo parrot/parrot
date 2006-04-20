@@ -81,7 +81,7 @@ PAST::Val is a subclass of PAST::Node.
 	.local pmc valtype
   set:
     valtype = new .String
-    valtype = valtype
+    valtype = new_valtype
     setattribute self, 'valtype', valtype
     .return( valtype )
   get:

@@ -148,9 +148,9 @@ POST::Ops: emit(.) = {
 	outvar     = join ', ', outvars
 	result    .= "\t"
 	result    .= varname
-	result    .= " = "
+	result    .= " = '"
 	result    .= op_name
-	result    .= '( '
+	result    .= "'( "
 	result    .= outvar
 	result    .= " )\n"
 	goto return_result
@@ -191,24 +191,22 @@ POST::Ops: emit_declarations(.) = {
 	.return( result )
 }
 
-PAST::Val: emit(.) = {
-	.local string result
-
-	result = node.'value'()
-
-	result  = "'" . result
-	result .= "'"
-
-	.return( result )
-}
-
 POST::Val: emit(.) = {
 	.local string result
-
 	result = node.'value'()
 
-	result  = "'" . result
-	result .= "'"
+	.local string quote_type
+	quote_type = node.'valtype'()
+
+	.local string quote
+	quote = "'"
+
+	unless quote_type == 'double_quoted' goto build_result
+	quote = '"'
+
+  build_result:
+	result  = concat quote, result
+	result .= quote
 
 	.return( result )
 }

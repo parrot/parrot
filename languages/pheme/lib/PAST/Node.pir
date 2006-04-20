@@ -30,6 +30,10 @@ All PAST nodes subclass from this base type.
     setattribute self, "children", $P3
 .end
 
+.sub __get_bool :method
+	.return( 1 )
+.end
+
 .sub "set_node" :method
     .param string source
     .param int pos

@@ -138,6 +138,35 @@ atom: result(.) = {
 	value    = node
 
 	result.'value'( value )
+	result.'valtype'( '' )
+	.return( result )
+}
+
+quoted_string: result(.) = {
+	.local pmc result
+	result = new 'PAST::Val'
+
+	.local string value
+	value  = node
+
+	.local int string_length
+	string_length = length value
+	sub string_length, 2
+
+	.local string val_type
+	val_type = substr value, 0, 1
+	if val_type == '"' goto double_quoted
+	result.'valtype'( 'single_quoted' )
+	goto remove_quotes
+
+  double_quoted:
+	result.'valtype'( 'double_quoted' )
+
+  remove_quotes:
+	value  = substr value, 1, string_length
+
+	result.'value'( value )
+	
 	.return( result )
 }
 

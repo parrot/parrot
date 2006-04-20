@@ -14,7 +14,7 @@ all: pheme.pbc
 lib/PhemeGrammar.pbc: lib/PhemeGrammar.pir lib/pheme_grammar_gen.pir
 	$(PARROT) -o lib/PhemeGrammar.pbc --output-pbc lib/PhemeGrammar.pir 
 
-lib/pheme_grammar_gen.pir:
+lib/pheme_grammar_gen.pir: lib/pheme.g
 	$(PARROT) $(PGE_DIR)pgc.pir --output=lib/pheme_grammar_gen.pir lib/pheme.g
 
 lib/PhemeSymbols.pbc: lib/PhemeSymbols.pir
