@@ -98,7 +98,7 @@ PAST::Exp: maybe_promote_sub(.) = {
 
 	.local string op_name
 	op_name = op.'op'()
-	if op_name == 'defun' goto return_sub
+	if op_name == 'define' goto return_sub
 	.return( node )
 
   return_sub:

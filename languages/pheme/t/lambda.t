@@ -2,7 +2,7 @@
 
 (plan 3)
 
-(defun carcar
+(define carcar
 	(lambda (l)
 		(car (cdr l))))
 
