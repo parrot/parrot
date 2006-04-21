@@ -203,7 +203,7 @@ This constant contains the name of your operating system (as the JIT sees it).
 Allocates and returns a new Parrot interpreter. C<parent> is NULL for the main
 interpreter that will be destroyed last.
 
-=item C<void Parrot_setflag(Parrot_Interp, Parrot_Interp_flag, Parrot_Interp_flag_val)>
+=item C<void Parrot_setflags(Parrot_Interp, Parrot_Interp_flag, Parrot_Interp_flag_val)>
 
 Sets a flag in the Parrot interpreter.
 
