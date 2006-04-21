@@ -8,7 +8,7 @@ use Test::More;
 use Parrot::Test;
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 31; }
+BEGIN { plan tests => 32; }
 
 optable_output_is('a', 'term:a',                    'Simple term');
 optable_output_is('a+b', 'infix:+(term:a, term:b)', 'Simple infix');
@@ -53,8 +53,10 @@ optable_output_is('a=b,c,d+e',
     'list associativity');
 
 optable_output_is('a b', 'term:a (pos=1)', 'two terms in sequence');
-optable_output_is('a = = b', 'term:a (pos=2)', 'two opers in sequence');
-optable_output_is('a+', 'term:a (pos=1)', 'infix missing rhs');
+optable_output_is('a = = b', 'term:a (pos=1)', 'two opers in sequence',
+    todo => 'fix end position');
+optable_output_is('a +', 'term:a (pos=1)', 'infix missing rhs',
+    todo => 'fix end position');
 
 optable_output_is('a++', 'postfix:++(term:a)', 'postfix');
 optable_output_is('a--', 'postfix:--(term:a)', 'postfix');
@@ -67,9 +69,10 @@ optable_output_is('a*(b+c)',
 optable_output_is('a*b+c)+4',
   'infix:+(infix:*(term:a, term:b), term:c) (pos=5)',
   'extra close paren');
-optable_output_is('(a*b+c', '', 'missing close paren',
+optable_output_is('  )a*b+c)+4', 'failed', 'only close paren');
+optable_output_is('(a*b+c', 'failed', 'missing close paren',
   todo => 'fix close tokens');
-optable_output_is('(a*b+c]', '', 'mismatch close paren',
+optable_output_is('(a*b+c]', 'failed', 'mismatch close paren',
   todo => 'fix close tokens');
 
 
