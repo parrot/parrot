@@ -143,16 +143,15 @@ Parrot_register_HLL(Interp *interpreter,
 INTVAL
 Parrot_get_HLL_id(Interp* interpreter, STRING *hll_name)
 {
-    INTVAL i, n;
-    PMC *hll_info, *entry, *name_pmc;
-    STRING *name;
+    INTVAL i;
 
-    hll_info = interpreter->HLL_info;
-    n = VTABLE_elements(interpreter, hll_info);
-    for (i = 0; i < n; ++i) {
-        entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, i);
-        name_pmc = VTABLE_get_pmc_keyed_int(interpreter, entry, e_HLL_name);
-        name = VTABLE_get_string(interpreter, name_pmc);
+    PMC * const hll_info = interpreter->HLL_info;
+    const INTVAL nelements = VTABLE_elements(interpreter, hll_info);
+
+    for (i = 0; i < nelements; ++i) {
+        PMC * const entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, i);
+        PMC * const name_pmc = VTABLE_get_pmc_keyed_int(interpreter, entry, e_HLL_name);
+        STRING * const name = VTABLE_get_string(interpreter, name_pmc);
         if (!string_equal(interpreter, name, hll_name))
             return i;
     }
@@ -163,12 +162,11 @@ void
 Parrot_register_HLL_type(Interp *interpreter, INTVAL hll_id,
 	INTVAL core_type, INTVAL hll_type)
 {
-    PMC *entry, *type_hash, *hll_info;
+    PMC *entry, *type_hash;
     Hash *hash;
-    INTVAL n;
 
-    hll_info = interpreter->HLL_info;
-    n = VTABLE_elements(interpreter, hll_info);
+    PMC * const hll_info = interpreter->HLL_info;
+    const INTVAL n = VTABLE_elements(interpreter, hll_info);
     if (hll_id >= n) {
         real_exception(interpreter, NULL, E_ValueError,
                 "no such HLL id (%vd)", hll_id);
