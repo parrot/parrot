@@ -845,7 +845,7 @@ PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    STRING * const res = new_string_header(interpreter, 0);
+    STRING *res = new_string_header(interpreter, 0);
     if (!io)
         return -1;
 
