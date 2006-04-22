@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 72;
+use Parrot::Test tests => 73;
 
 =head1 NAME
 
@@ -2117,4 +2117,17 @@ pir_output_is(<<'CODE', <<'OUTPUT', "getclass");
 .end
 CODE
 Perl6;PAST;Node
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "isa");
+.sub main :main
+    .local pmc base, o1, o2
+    base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
+    $P0 = new [ 'Perl6'; 'PAST'; 'Node' ]
+    $I0 = isa $P0, [ 'Perl6'; 'PAST'; 'Node']
+    print $I0
+    print "\n"
+.end
+CODE
+0
 OUTPUT
