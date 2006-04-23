@@ -196,6 +196,35 @@ complex_locate_keyed_num(Interp* interpreter, PMC* self, STRING *key) {
     return NULL;
 }
 
+static void
+int_check_divide_zero(Interp *interpreter, INTVAL value)
+{
+    if (value == 0) {
+        real_exception(interpreter, NULL, E_ZeroDivisionError,
+                       "Divide by zero");
+    }
+}
+
+static void
+float_check_divide_zero(Interp *interpreter, FLOATVAL value)
+{
+    if (value == 0.0) {
+        real_exception(interpreter, NULL, E_ZeroDivisionError,
+                       "Divide by zero");
+    }
+}
+
+static void
+complex_check_divide_zero(Interp *interpreter, PMC *value)
+{
+    /* Throw an exception if we are dividing by zero. */
+    if (RE(value) == 0.0 && IM(value) == 0.0) {
+        real_exception(interpreter, NULL, E_ZeroDivisionError,
+                       "Divide by zero");
+    }
+}
+
+
 pmclass Complex {
 
 /*
@@ -867,7 +896,7 @@ Divide the complex number by C<value>, placing the result in C<dest>.
 
 Divide the complex number C<SELF> by C<value> inplace.
 
-TODO divide by zero exception
+Throws divide by zero exception if divisor is zero.
 
 =cut
 
@@ -883,6 +912,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
 MMD_Complex: {
             FLOATVAL mod, re, im;
 
+            complex_check_divide_zero(INTERP, value);
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
             else {
@@ -899,6 +929,7 @@ MMD_Complex: {
         }
 MMD_DEFAULT: {
             FLOATVAL d = VTABLE_get_number(INTERP, value);
+            float_check_divide_zero(INTERP, d);
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
             else {
@@ -911,6 +942,7 @@ MMD_DEFAULT: {
     }
 
     PMC* divide_int (INTVAL value, PMC* dest) {
+        int_check_divide_zero(INTERP, value);
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         else {
@@ -922,6 +954,7 @@ MMD_DEFAULT: {
     }
 
     PMC* divide_float (FLOATVAL value, PMC* dest) {
+        float_check_divide_zero(INTERP, value);
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         else {
@@ -936,6 +969,7 @@ MMD_DEFAULT: {
 MMD_Complex: {
             FLOATVAL mod, re, im;
 
+            complex_check_divide_zero(INTERP, value);
             /* a little speed optimisation: cache an intermediate number;
                 I'm not sure the compiler does this */
             mod = (RE(value) * RE(value) + IM(value) * IM(value));
@@ -946,17 +980,20 @@ MMD_Complex: {
         }
 MMD_DEFAULT: {
             FLOATVAL d = VTABLE_get_number(INTERP, value);
+            float_check_divide_zero(INTERP, d);
             RE(SELF) /= d;
             IM(SELF) /= d;
         }
     }
 
     void i_divide_int (INTVAL value) {
+        int_check_divide_zero(INTERP, value);
         RE(SELF) /= value;
         IM(SELF) /= value;
     }
 
     void i_divide_float (FLOATVAL value) {
+        float_check_divide_zero(INTERP, value);
         RE(SELF) /= value;
         IM(SELF) /= value;
     }

@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 
 =head1 NAME
 
@@ -175,6 +175,29 @@ EQ1:	print "ok 1\\n"
 CODE
 ok 1
 OUTPUT
+
+pir_output_is(<<'CODE', <<OUTPUT, "divide by zero");
+.sub _main :main
+    P0 = new Float
+    set P0, "12.0"
+    P1 = new Float
+    P2 = new Float
+    set P2, "0.0"
+    push_eh OK
+    P1 = P0 / P2
+    print "fail\n"
+    clear_eh
+OK:
+    get_results '(0,0)', $P0, $S0
+    print "ok\n"
+    print $S0
+    print "\n"
+.end
+CODE
+ok
+float division by zero
+OUTPUT
+
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive float");
 

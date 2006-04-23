@@ -24,7 +24,7 @@ Tests the BigInt PMC. Checks Perl-specific integer behaviour.
 =cut
 
 if ($PConfig{gmp}) {
-    plan tests => 26;
+    plan tests => 30;
 }
 else {
     plan skip_all => "No BigInt Lib configured";
@@ -401,6 +401,33 @@ CODE
 ok 1
 ok 2
 OUT
+
+  for my $op ("/", "%") {
+    for my $type ("BigInt", "Integer") {
+      pir_output_is(<<"CODE", <<OUTPUT, "bigint $op by zero $type");
+.sub _main :main
+    P0 = new BigInt
+    set P0, "1000000000000000000000"
+    P1 = new BigInt
+    ## divide by a zero $type
+    P2 = new $type
+    set P2, 0
+    push_eh OK
+    P1 = P0 $op P2
+    print "fail\\n"
+    clear_eh
+OK:
+    get_results '(0,0)', \$P0, \$S0
+    print "ok\\n"
+    print \$S0
+    print "\\n"
+.end
+CODE
+ok
+Divide by zero
+OUTPUT
+    }
+  }
 
 use Parrot::Config;
 

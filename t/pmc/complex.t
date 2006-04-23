@@ -6,7 +6,8 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 50;
+use Parrot::Config;
+use Parrot::Test tests => 53;
 
 =head1 NAME
 
@@ -428,6 +429,32 @@ CODE
 -1+1.5i
 4-6i
 OUTPUT
+
+
+  for my $type ("Complex", "Float", "Integer") {
+      pir_output_is(<<"CODE", <<OUTPUT, "complex divide by zero $type");
+.sub _main :main
+    P0 = new Complex
+    set P0, "4+3.5i"
+    P1 = new Complex
+    ## divide by a zero $type
+    P2 = new $type
+    set P2, 0
+    push_eh OK
+    P1 = P0 / P2
+    print "fail\\n"
+    clear_eh
+OK:
+    get_results '(0,0)', \$P0, \$S0
+    print "ok\\n"
+    print \$S0
+    print "\\n"
+.end
+CODE
+ok
+Divide by zero
+OUTPUT
+  }
 
 pasm_output_is(<<"CODE", <<'OUTPUT', "get int/num/bool");
 @{[ $fp_equality_macro ]}

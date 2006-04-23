@@ -152,14 +152,35 @@ bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
 }
 
 static void
+int_check_divide_zero(Interp *interpreter, INTVAL value)
+{
+    if (value == 0) {
+        real_exception(interpreter, NULL, E_ZeroDivisionError,
+                       "Divide by zero");
+    }
+}
+
+static void
+bigint_check_divide_zero(Interp *interpreter, PMC *value)
+{
+    /* Throw an exception if we are dividing by zero. */
+    if (mpz_cmp_si(BN(value), 0) == 0) {
+        real_exception(interpreter, NULL, E_ZeroDivisionError,
+                       "Divide by zero");
+    }
+}
+
+static void
 bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
+    bigint_check_divide_zero(interpreter, value);
     /* this is mpz_fdiv_q */
     mpz_div(BN(dest), BN(self), BN(value));
 }
 static void
 bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
+    int_check_divide_zero(interpreter, value);
     /* this is mpz_fdiv_q */
     int n = value < 0;
     if (n) {
@@ -172,11 +193,13 @@ bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 static void
 bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
+    bigint_check_divide_zero(interpreter, value);
     mpz_fdiv_q(BN(dest), BN(self), BN(value));
 }
 static void
 bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
+    int_check_divide_zero(interpreter, value);
     int n = value < 0;
     if (n) {
         mpz_fdiv_q_ui(BN(dest), BN(self), -value);
@@ -189,12 +212,14 @@ bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 static void
 bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
+    bigint_check_divide_zero(interpreter, value);
     mpz_mod(BN(dest), BN(self), BN(value));
 }
 
 static void
 bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
+    int_check_divide_zero(interpreter, value);
     int n = value < 0;
     if (n) {
         mpz_mod_ui(BN(dest), BN(self), -value);
