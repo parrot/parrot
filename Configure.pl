@@ -1,4 +1,5 @@
 #! perl -w
+
 # Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -240,7 +241,7 @@ F<lib/Parrot/Configure/Step.pm>, F<docs/configuration.pod>
 use strict;
 use warnings;
 use lib 'lib';
-use 5.008;
+use 5.006;
 
 use English qw( -no_match_vars );
 use Parrot::BuildUtil;
