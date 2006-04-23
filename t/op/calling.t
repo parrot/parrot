@@ -2324,6 +2324,60 @@ ok 3
 ok 4
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named loses :flat arg");
+.sub main :main
+    $P0 = new .Hash
+    $P0['a'] = 11
+    $P0['b'] = 22
+    $P0['c'] = 33
+    foo(0, 1, $P0 :flat :named)
+.end
+
+.sub foo
+    .param pmc array :slurpy
+    .param pmc hash :slurpy :named
+    $P0 = hash['a']
+    say $P0
+    $P0 = hash['b']
+    say $P0
+    $P0 = hash['c']
+    say $P0
+.end
+CODE
+11
+22
+33
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named loses :flat arg");
+.sub main :main
+    $P0 = new .Hash
+    $P0['a'] = 11
+    $P0['b'] = 22
+    $P0['c'] = 33
+    foo(0, 1, 'z'=>2626, $P0 :flat :named)
+.end
+
+.sub foo
+    .param pmc array :slurpy
+    .param pmc hash :slurpy :named
+    $P0 = hash['a']
+    say $P0
+    $P0 = hash['b']
+    say $P0
+    $P0 = hash['c']
+    say $P0
+    $P0 = hash['z']
+    say $P0
+.end
+CODE
+11
+22
+33
+2626
+OUTPUT
+
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 90 }
+BEGIN { plan tests => 92 }
 
