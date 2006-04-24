@@ -21,7 +21,6 @@ package main;
 
 use strict;
 use warnings;
-use 5.008;
 
 use File::Find;
 

@@ -42,7 +42,6 @@ F<docs/pdds/pdd07_codingstd.pod>.
 
 use strict;
 use warnings;
-use 5.008;
 
 use Data::Dumper;
 use Text::Wrap;
@@ -60,16 +59,15 @@ if ($files[0] eq "all_source") {
     # do a little "find" action for now.
     @files = ();
     File::Find::find({wanted => sub {
-                          if ( $File::Find::dir =~ m:(languages|examples)$: ) {
-                              $File::Find::prune = 1;	
-			      return;
-                          }
-	
-                          return if /malloc/;	
+        if ( $File::Find::dir =~ m:(languages|examples)$: ) {
+            $File::Find::prune = 1;	
+            return;
+        }
+        return if /malloc/;
 
-                          /^.*\.[ch]\z/s &&
-                            push @files, $File::Find::name;
-                      }}, '.');
+        /^.*\.[ch]\z/s &&
+            push @files, $File::Find::name;
+    }}, '.');
 }
 
 
@@ -86,10 +84,12 @@ foreach my $file (@files) {
     chomp @lines;
 
     for (@lines[0..10]) {
-	if (/DO NOT EDIT/) {
-	    print "Skipping $file (automatically generated)\n";
-	    next FILE;
-	}
+        next unless defined $_;
+
+        if (/DO NOT EDIT/) {
+            print "Skipping $file (automatically generated)\n";
+            next FILE;
+        }
     }
 
     check_source($file, \@lines);
@@ -137,8 +137,9 @@ sub check_dev {
 sub trim_whitespace {
     my ($file, $source) = @_;
 
-    shift @$source while ($source->[0] !~ /\S/);
-    pop @$source while ($source->[-1] !~ /\S/);
+    return unless @$source;
+    shift @$source while (defined $source->[0] and $source->[0] !~ /\S/);
+    pop @$source while (defined $source->[-1] and $source->[-1] !~ /\S/);
 }
 
 
@@ -148,6 +149,8 @@ sub check_returns {
     my $line = 0;
     foreach (@$source) {
         $line++;
+        next unless $_;
+
         if (/return\(/) {
             warning($file, $line, "possible use of return(foo); rather than return foo;");
         }
@@ -161,6 +164,7 @@ sub check_line_length {
     my $line = 0;
     foreach (@$source) {
         $line++;
+        next unless defined $_;
 
         # ignore the line if it looks like it's basically all string.
         next if /^\s*\".*\"(\);|,)?$/;
@@ -184,6 +188,7 @@ sub check_comments {
     my $line = 0;
     foreach (@$source) {
         $line++;
+        next unless $_;
 
         if (/\/\// && ! /http:\/\//) {
             error($file, $line, "Possible C++ comment detected.");
@@ -202,6 +207,7 @@ sub check_cuddled_else {
     my $line = 0;
     foreach (@$source) {
         $line++;
+        next unless $_;
 
         if (/\}\s*else\s*\{/) {
             error($file, $line, "Cuddled else (\"} else {\") found.");
@@ -221,6 +227,7 @@ sub check_code_indents {
     my $line = 0;
     foreach (@$source) {
         $line++;
+        next unless $_;
 
         if (/^(\s*).*\{\s*$/) {
             # note the beginning of a block, and its indent depth.
@@ -259,6 +266,7 @@ sub check_tabs {
     my $line = 0;
     foreach (@$source) {
         $line++;
+        next unless defined $_;
 
         if (/\t/) {
             s/\t/\[TAB\]/g;
@@ -282,6 +290,7 @@ sub check_cpp_indents {
     my $line = 0;
     foreach (@$source) {
         $line++;
+        next unless defined $_;
 
         if (/^\s*\#(\s*)(ifndef|ifdef|if)\s+(.*)/) {
             next if (/PARROT_IN_CORE|_GUARD/);
@@ -299,14 +308,14 @@ sub check_cpp_indents {
             # back even with the opening brace.
             my $indent = "  " x (@stack-1);
             if ($1 ne $indent) {
-                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2 $3\" because it is inside of " . (join ' > ', @stack) . ")\n")
+                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2\" because it is inside of " . (join ' > ', @stack) . ")\n")
             }
             next;
         }
         if (/^\s*\#(\s*)(endif)/) {
             my $indent = "  " x (@stack-1);
             if ($1 ne $indent) {
-                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2 $3\" because it is inside of " . (join ' > ', @stack) . ")\n")
+                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2\" because it is inside of " . (join ' > ', @stack) . ")\n")
             }
 
             pop @stack;
@@ -319,7 +328,7 @@ sub check_cpp_indents {
         if (/^\s*\#(\s*)(.*)/) {
             my $indent = "  " x (@stack);
             if ($1 ne $indent) {
-                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2 $3\" because it is inside of " . (join ' > ', @stack) . ")\n")
+                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2\" because it is inside of " . (join ' > ', @stack) . ")\n")
             }
         }
     }
@@ -344,8 +353,10 @@ sub check_mandatory_boilerplate {
 
     my $ok = 1;
     my $idx = -@end_boilerplate;
-    my $mismatch_at;
+    my $mismatch_at = 0;
     while ($idx < 0) {
+        next unless defined $source->[$idx];
+
         if ($source->[$idx] !~ /\Q$end_boilerplate[$idx]\E/) {
             if ($ok == 2) { $mismatch_at = $idx; }
             $ok = 0;
@@ -385,6 +396,7 @@ sub check_manifest {
 
         my ($filebase, $extension) = ($filename =~ /^(.*)\.(.*)/);
         $filebase ||= $filename;
+        $extension ||= '';
         if ($filebase =~ /\./) {
             error("MANIFEST", $line, "$_: more than one '.' in a filename");
         }
