@@ -24,7 +24,7 @@ package main;
 
 use strict;
 use warnings;
-use 5.008;
+use 5.006;
 
 use Test::Perl::Critic -profile => 'tools/perlcriticrc';
 

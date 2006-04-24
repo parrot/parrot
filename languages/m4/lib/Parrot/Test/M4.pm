@@ -14,7 +14,7 @@ package Parrot::Test::M4;
 
 use strict;
 use warnings;
-use 5.008;
+use 5.006;
 
 use Data::Dumper;
 use File::Basename;
