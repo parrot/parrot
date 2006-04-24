@@ -31,7 +31,6 @@ package Parrot::Distribution;
 
 use strict;
 use warnings;
-use 5.008;
 
 use Data::Dumper;
 use ExtUtils::Manifest;
