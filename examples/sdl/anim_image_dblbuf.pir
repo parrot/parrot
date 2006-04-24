@@ -12,7 +12,7 @@ To run this file, run the following command from the Parrot root directory:
 
 =cut
 
-.sub _main non_prototyped, :main
+.sub _main :main
 	load_bytecode "library/SDL/App.pir"
 	load_bytecode "library/SDL/Color.pir"
 	load_bytecode "library/SDL/Rect.pir"

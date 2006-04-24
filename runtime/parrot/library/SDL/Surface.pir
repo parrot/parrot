@@ -504,11 +504,12 @@ heart.
 	.param int x
 	.param int y
 	.param int raw_color
-	.param pmc color_pmc
+	.param pmc color_pmc     :optional
+	.param int has_color_pmc :opt_flag
 
 	.local int color
 
-	if I3 == 1 goto convert_color
+	if has_color_pmc goto convert_color
 	color = raw_color
 	goto draw
 

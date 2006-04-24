@@ -138,7 +138,8 @@ SDL surface to use for drawing.
 
     $I0 = find_type 'SDL::LCD'
     lcd = new $I0
-    lcd = 0
+    # This seems to call __init() with too many parameters
+    # lcd = 0
     lcd.'_digits'( 4 )
     lcd.'xpos'( 5 )
     lcd.'ypos'( 5 )
@@ -645,13 +646,13 @@ This method returns nothing.
 =cut
 
 .sub undo_mark method
-    .param int i
+    .param int i      :optional
+    .param int has_i  :opt_flag
+
     .local pmc markpos
     .local pmc field
     .local pmc status
-    .local int noSetStatus
     
-    noSetStatus = argcI
     
     $I0 = classoffset self, 'Mines::Field'
 
@@ -675,7 +676,7 @@ This method returns nothing.
 UNDO_DONE:
     markpos = -1
 
-    if noSetStatus goto END
+    if has_i goto END
     if status != STATUS_CHOOSING goto END
     self."setStatus"( STATUS_PLAYING )
 END:
