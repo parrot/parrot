@@ -46,29 +46,15 @@ https://rt.perl.org/rt3//Ticket/Display.html?id=36411
 
 =head2 Unfinished Opcodes
 
-=over 4
-
-=item * split
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=32544
-
-Will Coleda suggested C<s/regexp/perl 6 rule/> and using PGE.  Patrick Michaud
-suggests making C<split> work only on constant strings and using PGE for
-everything else.
-
-=back
+None at this time.
 
 =head2 Missing Vtables
 
 =over 4
 
-=item * ResizablePMCArray
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=31867  
-
 =item * ResizableIntegerArray
 
-https://rt.perl.org/rt3//Ticket/Display.html?id=32374  
+https://rt.perl.org/rt3//Ticket/Display.html?id=32374  # XXX This is the wrong ticket number.
 
 =item * splice
 
@@ -139,10 +125,6 @@ F<languages/perl[6]>).
 =item * Get name of C<parrot> executable
 
 https://rt.perl.org/rt3//Ticket/Display.html?id=33923 
-
-=item * Namespaces
-
-Matt Diephouse has prepared an email on this.  
 
 =item * Give invokable PMCs a canonical way to store their associated HLL
 source and argument information.
