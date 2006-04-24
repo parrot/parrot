@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Color - Parrot class representing colors in Parrot SDL
@@ -15,7 +18,7 @@ SDL::Color - Parrot class representing colors in Parrot SDL
 
 	# set the color values; this one's blue
 	.local pmc color_args
-	color_args = new PerlHash
+	color_args = new .Hash
 
 	color_args[ 'r' ] =   0
 	color_args[ 'g' ] =   0
@@ -62,7 +65,7 @@ SDL::Color objects have the following methods:
 	addattribute color_class, 'b'
 
 	.local pmc initializer
-	new initializer, .PerlString
+	new initializer, .String
 	initializer = '_new'
 	setprop      color_class, 'BUILD', initializer
 
@@ -71,7 +74,7 @@ SDL::Color objects have the following methods:
 =item _new( color_args )
 
 Initialize the new object with the necessary arguments,  The single argument,
-C<color_args>, should be a C<PerlHash> PMC containing the following keys:
+C<color_args>, should be a C<Hash> PMC containing the following keys:
 
 =over 4
 
@@ -108,10 +111,10 @@ p6i.
 
 	.local int offset
 
-	color     = new PerlInt
-	red       = new PerlInt
-	green     = new PerlInt
-	blue      = new PerlInt
+	color     = new .Integer
+	red       = new .Integer
+	green     = new .Integer
+	blue      = new .Integer
 
 	arg_color = args['r']
 	red       = arg_color
@@ -241,6 +244,6 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

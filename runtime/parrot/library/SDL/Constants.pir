@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Constants - constants used in Parrot SDL
@@ -300,6 +303,6 @@ Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

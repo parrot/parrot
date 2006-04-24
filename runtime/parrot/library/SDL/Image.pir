@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Image - Parrot class representing images in Parrot SDL
@@ -9,7 +12,7 @@ SDL::Image - Parrot class representing images in Parrot SDL
 
 	# set a filename in a PMC
 	.local pmc filename
-	new filename, .PerlString
+	new filename, .String
 	set filename, 'examples/sdl/parrot_small.png'
 
 	# create a new SDL::Image object
@@ -54,7 +57,7 @@ An SDL::Image object has the following methods:
 	subclass image_class, surface_type, 'SDL::Image'
 
 	.local pmc initializer
-	new initializer, .PerlString
+	new initializer, .String
 	set initializer, 'BUILD'
 	setprop image_class, 'BUILD', initializer
 END:
@@ -97,6 +100,6 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

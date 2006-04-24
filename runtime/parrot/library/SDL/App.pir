@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::App - Parrot extension for SDL Applications
@@ -16,7 +19,7 @@ SDL::App - Parrot extension for SDL Applications
 
 	# set the app's arguments
 	.local pmc app_args
-	app_args = new PerlHash
+	app_args = new .Hash
 	app_args[ 'height' ] = 480
 	app_args[ 'width'  ] = 640
 	app_args[ 'bpp'    ] =   0
@@ -76,7 +79,7 @@ The SDL::App object has the following methods:
 	addattribute app_class, 'surface'
 
 	.local pmc initializer
-	new initializer, .PerlString
+	new initializer, .String
 	initializer = '_new'
 	setprop      app_class, 'BUILD', initializer
 
@@ -85,7 +88,7 @@ The SDL::App object has the following methods:
 =item _new( app_args )
 
 Initialize the new object with the necessary arguments.  The single argument,
-C<app_args>, should be a C<PerlHash> PMC containing the following keys:
+C<app_args>, should be a C<Hash> PMC containing the following keys:
 
 =over 4
 
@@ -154,21 +157,21 @@ The name of this method I<may> change, pending better ideas discussed on p6i.
 	# set all other offsets in self
 	classoffset offset, self, 'SDL::App'
 
-	intvalue = new PerlInt
+	intvalue = new .Integer
 	set intvalue, height
 	setattribute self, offset, intvalue
 
-	intvalue = new PerlInt
+	intvalue = new .Integer
 	set intvalue, width
 	inc offset
 	setattribute self, offset, intvalue
 
-	intvalue = new PerlInt
+	intvalue = new .Integer
 	set intvalue, bpp
 	inc offset
 	setattribute self, offset, intvalue
 
-	intvalue = new PerlInt
+	intvalue = new .Integer
 	set intvalue, flags
 	inc offset
 	setattribute self, offset, intvalue
@@ -284,6 +287,6 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::StopWatch - A stopwatch using SDL::LCD
@@ -60,17 +63,17 @@ The stopwatch will be drawn onto the specified screen.
 
     $I0 = classoffset self, 'SDL::StopWatch'
     
-    $P0 = new PerlNum
+    $P0 = new .Float
     $P0 = 0
     setattribute self, $I0, $P0
 
     inc $I0
-    $P0 = new PerlNum
+    $P0 = new .Float
     $P0 = 0.1
     setattribute self, $I0, $P0
 
     inc $I0
-    $P0 = new PerlNum
+    $P0 = new .Float
     $P0 = 0
     setattribute self, $I0, $P0
 
@@ -266,7 +269,7 @@ It is drawn onto the screen consigned to the constructor.
 
 .sub __onload :load
     # XXX: an old array will be overwritten when loading this file again
-    $P0 = new PerlArray
+    $P0 = new .ResizablePMCArray
     store_global "SDL::StopWatch::Timer", "array", $P0
     
     $P0 = new SArray
@@ -347,6 +350,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

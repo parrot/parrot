@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Event - Parrot extension representing SDL Events
@@ -48,7 +51,7 @@ The SDL::Event object has the following methods:
 	addattribute event_class, 'event'
 
 	.local pmc initializer
-	new initializer, .PerlString
+	new initializer, .String
 	set initializer, 'BUILD'
 	setprop event_class, 'BUILD', initializer
 
@@ -229,7 +232,7 @@ return:
 =item process_events( event_handler, handler_args, [ check_interval ] )
 
 Given an C<event_handler> object (either subclassing C<SDL::EventHandler> or
-implementing its necessary methods) and a C<PerlHash> of arguments to pass to
+implementing its necessary methods) and a C<Hash> of arguments to pass to
 all event handlers, loops around SDL's event loop and calls appropriate methods
 in C<event_handler> corresponding to what happens.
 
@@ -292,7 +295,7 @@ dispatch:
 =item handle_event( event_handler, handler_args )
 
 Given an C<event_handler> object (either subclass L<SDL::EventHandler> or
-reimplement the appropriate methods yourself) and a C<PerlHash> PMC of data to
+reimplement the appropriate methods yourself) and a C<Hash> PMC of data to
 pass to all handler calls, handles I<one> event, if any are present.  If there
 are no events pending, this will return directly.
 
@@ -373,6 +376,6 @@ suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

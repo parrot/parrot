@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Font - Parrot class representing fonts in Parrot SDL
@@ -9,7 +12,7 @@ SDL::Font - Parrot class representing fonts in Parrot SDL
 
 	# set the font's arguments
 	.local pmc font_args
-	font_args                 = new PerlHash
+	font_args                 = new .Hash
 	font_args[ 'font_file'  ] = 'myfont.ttf'
 	font_args[ 'point_size' ] = 48
 
@@ -53,7 +56,7 @@ All SDL::Font objects have the following methods:
 	addattribute font_class, 'size'
 
 	.local pmc initializer
-	initializer = new PerlString
+	initializer = new .String
 	initializer = '_BUILD'
 
 	setprop      font_class, 'BUILD', initializer
@@ -62,7 +65,7 @@ All SDL::Font objects have the following methods:
 
 =item _BUILD( font_args )
 
-Given a Perlhash containing arguments, set the attributes of this font.  The
+Given a C<Hash> containing arguments, set the attributes of this font.  The
 keys of this hash are C<font_file> and C<point_size>, two strings containing
 the path to a TrueType font to load and the size of the font when drawn, in
 pixels.
@@ -127,7 +130,7 @@ Whew.
 	.local pmc rect
 
 	.local pmc rect_args
-	rect_args        = new PerlHash
+	rect_args        = new .Hash
 	rect_args[ 'x' ] = 0
 	rect_args[ 'y' ] = 0
 
@@ -247,6 +250,6 @@ list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

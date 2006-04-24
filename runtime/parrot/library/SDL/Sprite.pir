@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Sprite - Parrot class representing sprites in Parrot SDL
@@ -12,7 +15,7 @@ SDL::Sprite - Parrot class representing sprites in Parrot SDL
 	# set the sprite's arguments
 	.local pmc sprite_args
 
-	sprite_args = new PerlHash
+	sprite_args = new .Hash
 	sprite_args[ 'surface'  ] = image
 	sprite_args[ 'source_x' ] =     0
 	sprite_args[ 'source_y' ] =     0
@@ -69,7 +72,7 @@ A SDL::Sprite object has the following methods:
 	addattribute sprite_class, 'y_velocity'
 
 	.local pmc initializer
-	initializer = new PerlString
+	initializer = new .String
 	set initializer, '_new'
 	setprop sprite_class, 'BUILD', initializer
 
@@ -77,7 +80,7 @@ A SDL::Sprite object has the following methods:
 
 =item _new( sprite_args )
 
-Given a PerlHash full of arguments, sets the attributes of this object.  The
+Given a C<Hash> full of arguments, sets the attributes of this object.  The
 useful hash keys are as follows:
 
 =over 4
@@ -178,7 +181,7 @@ height_arg:
 
 done:
 	.local pmc rect_args
-	rect_args = new PerlHash
+	rect_args = new .Hash
 	rect_args[ 'x'      ] = x
 	rect_args[ 'y'      ] = y
 	rect_args[ 'height' ] = height
@@ -232,13 +235,13 @@ done:
 
 	# and finally the x and y velocities
 	.local pmc x_velocity
-	x_velocity = new PerlInt
+	x_velocity = new .Integer
 	x_velocity = 0
 	setattribute self, offset, x_velocity
 	inc offset
 
 	.local pmc y_velocity
-	y_velocity = new PerlInt
+	y_velocity = new .Integer
 	y_velocity = 0
 	setattribute self, offset, y_velocity
 
@@ -637,6 +640,6 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

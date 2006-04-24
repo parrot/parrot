@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Rect - Parrot class representing rectangles in Parrot SDL
@@ -17,7 +20,7 @@ SDL::Rect - Parrot class representing rectangles in Parrot SDL
 	# set some arguments for this SDL::Rect
 	.local pmc rect_args
 
-	new rect_args, .PerlHash
+	new rect_args, .Hash
 	rect_args[ 'x'      ] = 270
 	rect_args[ 'y'      ] = 190
 	rect_args[ 'height' ] = 100
@@ -54,7 +57,7 @@ An SDL::Rect object has the following methods:
 	addattribute rect_class, '_rect'
 
 	.local pmc initializer
-	new initializer, .PerlString
+	new initializer, .String
 	initializer = '_new'
 	setprop      rect_class, 'BUILD', initializer
 END:
@@ -63,7 +66,7 @@ END:
 
 =item _new( rect_args )
 
-Given a PerlHash of arguments, sets the attributes of this object.  The hash
+Given a C<Hash> of arguments, sets the attributes of this object.  The hash
 has the following keys:
 
 =over 4
@@ -273,6 +276,6 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Surface - Parrot class representing surfaces in Parrot SDL
@@ -9,7 +12,7 @@ SDL::Surface - Parrot class representing surfaces in Parrot SDL
 
 	# set the surface's arguments
 	.local pmc surface_args
-	surface_args             = new PerlHash
+	surface_args             = new .Hash
 	surface_args[ 'height' ] = 480
 	surface_args[ 'width'  ] = 640
 
@@ -54,7 +57,7 @@ END:
 
 =item _new( surface_args )
 
-Given a PerlHash of arguments, set the attributes of this surface.  The keys of
+Given a C<Hash> of arguments, set the attributes of this surface.  The keys of
 this hash are C<height> and C<width>, two integer values representing the
 height and width of this surface in pixels.
 

@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::LCD - A LCD object
@@ -43,7 +46,7 @@ An SDL::LCD object has the following methods:
     load_bytecode "library/SDL/Image.pir"
     load_bytecode "library/SDL/Rect.pir"
 
-    $P0 = new PerlString
+    $P0 = new .String
     $P0 = "runtime/parrot/library/SDL/LCD.png"
     $I0 = find_type "SDL::Image"
     $P0 = new $I0, $P0
@@ -60,21 +63,21 @@ END:
 .sub __init method
     $I0 = classoffset self, "SDL::LCD"
 
-    $P0 = new PerlString
+    $P0 = new .String
     setattribute self, $I0, $P0
 
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = -1
     setattribute self, $I0, $P0
 
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = 0
     setattribute self, $I0, $P0
 
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = 0
     setattribute self, $I0, $P0
 .end
@@ -170,7 +173,7 @@ NO_AUTOLEN:
     val = $S0
 LEN_OK:
 
-    rect = new PerlHash
+    rect = new .Hash
     rect["width"] = 10
     rect["height"] = 21
     $I0 = find_type "SDL::Rect"
@@ -292,6 +295,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

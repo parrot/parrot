@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::EventHandler - base class for application-specific SDL event handlers
@@ -34,7 +37,7 @@ SDL::EventHandler - base class for application-specific SDL event handlers
 	# create and populate some event_arguments
 	.local pmc event_args
 
-	new event_args, .PerlHash
+	new event_args, .Hash
 	event_args[ 'main_surface' ] = main_surface
 	event_args[ 'sprite_list'  ] = sprites
 
@@ -72,7 +75,7 @@ SDL::EventHandler provides the following methods:
 	addattribute handler_class, 'args'
 
 	.local pmc initializer
-	new initializer, .PerlString
+	new initializer, .String
 	set initializer, 'BUILD'
 	setprop handler_class, 'BUILD', initializer
 
@@ -364,6 +367,6 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut

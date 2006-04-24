@@ -1,3 +1,6 @@
+
+# $Id$
+
 =head1 NAME
 
 SDL::Button - A multi state SDL Button
@@ -5,7 +8,7 @@ SDL::Button - A multi state SDL Button
 =head1 SYNOPSIS
 
     # the image to use for the button
-    $P0 = new PerlString
+    $P0 = new .String
     $P0 = "filename/to/image.png"
 
     # create the button
@@ -72,13 +75,13 @@ END:
     
     # status
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = 0
     setattribute self, $I0, $P0
 
     # states
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = 1
     setattribute self, $I0, $P0
 
@@ -90,13 +93,13 @@ END:
 
     # clicked
     inc $I0
-    $P0 = new PerlInt
+    $P0 = new .Integer
     $P0 = 0
     setattribute self, $I0, $P0
 
     # actions
     inc $I0
-    $P0 = new PerlArray
+    $P0 = new .ResizablePMCArray
     setattribute self, $I0, $P0
 .end
 
@@ -330,6 +333,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (c) 2004-2006, The Perl Foundation.
 
 =cut
