@@ -22,7 +22,7 @@ package Parrot::Revision;
 
 use strict;
 use warnings;
-use 5.008;
+
 
 our $svn_entries = undef;
 

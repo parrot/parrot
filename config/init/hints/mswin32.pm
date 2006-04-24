@@ -35,7 +35,7 @@ sub runstep
         # This will prevent the 'optimization is not available in the
         # standard edition compiler' warning each time we compile.
         # The logo gets printed to STDERR; hence the redirection.
-        my $cc_output = `$cc /? 2>&1`;
+        my $cc_output = `$cc /? 2>&1` || '';
         $ccflags =~ s/-O1 // if $cc_output =~ m/Standard/ || $cc_output =~ m{/ZI};
         $ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
 
