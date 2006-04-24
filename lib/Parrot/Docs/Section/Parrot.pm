@@ -1,4 +1,4 @@
-# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -7,9 +7,9 @@ Parrot::Docs::Section::Parrot - Root documentation section
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Section::Parrot;
+    use Parrot::Docs::Section::Parrot;
 
-	Parrot::Docs::Section::Parrot->new->write_html;
+    Parrot::Docs::Section::Parrot->new->write_html;
 
 =head1 DESCRIPTION
 
@@ -42,6 +42,7 @@ use Parrot::Docs::Section::Perl;
 use Parrot::Docs::Section::Libs;
 use Parrot::Docs::Section::Tools;
 use Parrot::Docs::Section::BigNum;
+use Parrot::Docs::Section::Compilers;
 use Parrot::Docs::Section::Languages;
 use Parrot::Docs::Section::Config;
 use Parrot::Docs::Section::Tests;
@@ -55,29 +56,30 @@ Returns a new section.
 
 sub new
 {
-	my $self = shift;
-	
-	return $self->SUPER::new(
-		'Contents', 
-		'index.html', 
-		'What\'s in the Parrot distribution?',
-		Parrot::Docs::Section::Info->new,
-		Parrot::Docs::Section::Docs->new,
-		Parrot::Docs::Section::Examples->new,
-		Parrot::Docs::Section::PMCs->new,
-		Parrot::Docs::Section::DynaPMCs->new,
-		Parrot::Docs::Section::C->new,
-		Parrot::Docs::Section::Ops->new,
-		Parrot::Docs::Section::IMCC->new,
-		Parrot::Docs::Section::Perl->new,
-		Parrot::Docs::Section::Libs->new,
-		Parrot::Docs::Section::Tools->new,
-		Parrot::Docs::Section::BigNum->new,
-		Parrot::Docs::Section::Languages->new,
-		Parrot::Docs::Section::Config->new,
-		Parrot::Docs::Section::Tests->new,
-		Parrot::Docs::Section::EditorPlugins->new,
-	);
+    my $self = shift;
+
+    return $self->SUPER::new(
+        'Contents', 
+        'index.html', 
+        'What\'s in the Parrot distribution?',
+        Parrot::Docs::Section::Info->new,
+        Parrot::Docs::Section::Docs->new,
+        Parrot::Docs::Section::Examples->new,
+        Parrot::Docs::Section::PMCs->new,
+        Parrot::Docs::Section::DynaPMCs->new,
+        Parrot::Docs::Section::C->new,
+        Parrot::Docs::Section::Ops->new,
+        Parrot::Docs::Section::IMCC->new,
+        Parrot::Docs::Section::Perl->new,
+        Parrot::Docs::Section::Libs->new,
+        Parrot::Docs::Section::Tools->new,
+        Parrot::Docs::Section::BigNum->new,
+        Parrot::Docs::Section::Compilers->new,
+        Parrot::Docs::Section::Languages->new,
+        Parrot::Docs::Section::Config->new,
+        Parrot::Docs::Section::Tests->new,
+        Parrot::Docs::Section::EditorPlugins->new,
+    );
 }
 
 =back
@@ -107,7 +109,7 @@ sub write_docs
 
     $dist->delete_html_docs if $delete;
 
-	$self->write_html($dist, $dist->html_docs_directory, $silent);
+    $self->write_html($dist, $dist->html_docs_directory, $silent);
 }
 
 =back
@@ -139,6 +141,8 @@ sub write_docs
 =item C<Parrot::Docs::Section::Tools>
 
 =item C<Parrot::Docs::Section::BigNum>
+
+=item C<Parrot::Docs::Section::Compilers>
 
 =item C<Parrot::Docs::Section::Languages>
 
