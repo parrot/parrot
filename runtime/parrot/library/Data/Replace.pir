@@ -46,7 +46,7 @@ Replaces every "old" with "new" inside the aggregate "where".
     .param pmc newVal
     .local pmc cache
     
-    new cache, .PerlArray
+    new cache, .ResizablePMCArray
     __do_replace( where, oldVal, newVal, cache )
 .end
 
