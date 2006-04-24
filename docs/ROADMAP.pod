@@ -25,6 +25,20 @@ document, among others.
 For a high level overview of parrot milestones, please see:
 L<http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html>
 
+=head1 RELEASE POLICIES
+
+The following conditions must be met in order to release a new Parrot version:
+
+=over 4
+
+=item All bugs which cause Parrot to dump core must be addressed
+
+This is the B<highest> priority.
+
+=item Fix all bugs tied to the given milestone
+
+=back
+
 =head1 CURRENT RELEASE (0.4.3)
 
 Parrot 0.4.3 was released on Apr. 2nd, 2006. For a list of new and fixed
