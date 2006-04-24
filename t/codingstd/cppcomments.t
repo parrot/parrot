@@ -4,7 +4,6 @@
 
 use strict;
 use warnings;
-use 5.008;
 
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 1;
@@ -55,13 +54,13 @@ my @comments;
 
 foreach my $glob ( @globs ) {
     foreach my $file ( glob $glob ) {
-        
+
         open FILE, "<$file" or die "Can not open '$file' for reading!\n";
         foreach my $line ( <FILE> ) {
             next unless $line =~ m{//};
             next if $line =~ m{://};     # skip ftp:// http:// etc
             next if $line =~ m{"//};     # skip printf("//= ")
-            
+
             push @comments, "$file: $line"
         }
         close FILE;
