@@ -83,6 +83,8 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
 
     # copy file descriptors
     open OLDERR, ">&STDERR";
+    $fromfile->close();
+    $tofile->close();
 
     ok(move_if_diff("$fromfname", "$tofname"),
         "move_if_diff() true return status");
