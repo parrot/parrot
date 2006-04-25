@@ -742,6 +742,36 @@ C<languages/punie>
 =back
 
 
+=head2 Pheme
+
+=over 4
+
+=item Author
+
+chromatic
+
+=item Description
+
+It's not Scheme, it's Pheme!  Pheme is a cleaned-up, partially implemented
+Lisp-2 compiler inspired by Scheme and built with TGE and PGE. 
+
+=item Status
+
+Pheme handles function calls, a few built-in-PIR primitives, and atoms and
+lists.  It also runs its tests written in pure Pheme.  It is nearly to the
+point of being able to define the rest of the standard library in terms of its
+builtins. 
+
+=item Last verified with Parrot version
+
+0.4.3
+
+=item Location
+
+C<languages/pheme>
+
+=back
+
 =head2 Python
 
 =over 4

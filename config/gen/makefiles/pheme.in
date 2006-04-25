@@ -53,7 +53,7 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Ilib t/harness t/*.t
+	$(PERL) -Ilib t/harness t/*.t t/phemer/*.t
 
 testclean:
 	$(RM_F) "t/*.out"
