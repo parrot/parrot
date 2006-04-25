@@ -64,12 +64,16 @@ sub PushScopeF {
     $parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
     unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{scope};
     $parser->YYData->{scope} = [];
+    unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{lex_num};
+    $parser->YYData->{lex_num} = 0;
 ##    warn "PushScopeF\n";
 }
 
 sub PopScopeF {
     my ($parser) = @_;
 
+    my $lex_num = shift @{ $parser->YYData->{scopef} };
+    $parser->YYData->{lex_num} = $lex_num;
     my $scope = shift @{ $parser->YYData->{scopef} };
     $parser->YYData->{scope} = $scope;
     my $symbtab = shift @{ $parser->YYData->{scopef} };
@@ -85,6 +89,7 @@ sub PushScope {
 
     unshift @{ $parser->YYData->{scope} }, $parser->YYData->{symbtab};
     $parser->YYData->{symbtab} = new SymbTabVar($parser);
+    $parser->YYData->{lex_num} ++;
 ##    warn "PushScope\n";
 }
 
@@ -93,6 +98,7 @@ sub PopScope {
 
     my $symbtab = shift @{ $parser->YYData->{scope} };
     $parser->YYData->{symbtab} = $symbtab;
+    $parser->YYData->{lex_num} ++;
 ##    warn "PopScope\n";
 }
 
@@ -772,7 +778,7 @@ sub BuildLocalVariable {
     my $defn    = $parser->YYData->{symbtab}->LookupS($idf);
     unless ( defined $defn ) {
         my $name;
-        $name = 'var_' . scalar( @{ $parser->YYData->{scope} } ) . '_' . $idf;
+        $name = 'var_' . $parser->YYData->{lex_num} . '_' . $idf;
         $defn = new defn( $name, 'local', 'pmc', undef, $idf );
         push @opcodes, new LocalDir( $parser,
             'prolog' => 1,

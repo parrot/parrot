@@ -45,9 +45,6 @@ CODE
 10
 OUT
 
-SKIP: {
-skip( 'while exp', 1 );
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'scope' );
 x = 10
 local i = 1
@@ -81,7 +78,6 @@ CODE
 10
 10
 OUT
-}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'scope' );
 local a, b = 1, 10

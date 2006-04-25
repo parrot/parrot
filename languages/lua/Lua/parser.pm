@@ -3772,6 +3772,7 @@ sub Run {
     $parser->YYData->{srcname_mtime} = $st[9];
     $parser->_InitLexico();
     $parser->YYData->{functs}      = [];
+    $parser->YYData->{lex_num}     = 0;
     $parser->YYData->{scope}       = [];
     $parser->YYData->{scopef}      = [];
     $parser->YYData->{symbtab}     = new SymbTabVar($parser);
