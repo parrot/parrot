@@ -22,7 +22,7 @@
 	post_tree = get_post_tree( past_tree )
 	unless post_tree goto err_post_fail
 
- 	# dump_it( post )
+ 	# dump_it( post_tree )
 
 	.local pmc pir
 	pir = get_pir( post_tree )
@@ -144,7 +144,7 @@
 	.return( pir_compiled )
 .end
 
-.sub dump_parse
+.sub dump_parse_tree
 	.param pmc match
 	load_bytecode 'dumper.pbc'
 	load_bytecode 'PGE/Dumper.pbc'
