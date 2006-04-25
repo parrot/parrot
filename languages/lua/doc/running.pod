@@ -1,0 +1,52 @@
+
+=head1 TITLE
+
+Using Lua on Parrot
+
+=head1 In brief
+
+Currently, C<luac.pl> is a Lua 5.1 compiler written in Perl5 (with 
+Parse::Yapp). This compiler produces PIR code.
+
+=head1 Building
+
+After building C<parrot> :
+
+  cd languages/lua
+  make
+
+=head1 Running the whole test suite
+
+  make test
+
+=head1 Testing the test suite
+
+With an original C<Lua> in your path, it's possible to check the test suite.
+
+  cd languages
+  perl -I../lib -Ilua/t lua/t/harness --use-lua
+
+=head1 Running your own code
+
+  perl luac.pl example.lua
+  ../../parrot --no-gc example.pir
+
+=head1 BUGS & LIMITATIONS
+
+Lua PMC have problems with the Parrot garbage collector. So, use the option
+C<--no-gc>.
+
+All your Lua code must be in a single source file (users libraries are not
+supported).
+
+Currently, the generated code takes no argument in the command line.
+
+=head1 SEE ALSO
+
+F<languages/lua/doc/status.pod>
+
+=head1 AUTHOR
+
+Francois Perrad.
+
+=cut

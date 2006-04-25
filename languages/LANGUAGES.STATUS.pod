@@ -447,7 +447,7 @@ Early stage - but all examples and test cases are working.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.3
 
 =item Location
 

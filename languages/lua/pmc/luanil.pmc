@@ -8,8 +8,12 @@ pmc/luanil.pmc - Lua Nil
 
 =head1 DESCRIPTION
 
-C<LuaNil> provides a class with the behaviour of the Lua C<Nil> value.
-Implementation is based on the Undef PMC. LuaNil is no longer a singleton;
+C<LuaNil> extends C<LuaBase> to provide a class with the behaviour of
+the Lua C<Nil> type.
+
+=for rational
+
+LuaNil is no longer a singleton;
 this would be a problem, as all uninitialized values in Lua are LuaNil.
 If some value is assigned, the LuaNil should morph into the correct type,
 and so a new PMC is constructed anyway. Therefore, we may as well create

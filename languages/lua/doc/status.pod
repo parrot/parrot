@@ -1,0 +1,242 @@
+
+=head1 TITLE
+
+Status of Lua on Parrot
+
+=head1 Introduction
+
+Lua is an extension programming language designed to support general
+procedural programming with data description facilities. It also offers
+good support for object-oriented programming, functional programming, and
+data-driven programming. Lua is intended to be used as a powerful,
+light-weight scripting language for any program that needs one.
+
+The homepage is L<http://www.lua.org/>.
+
+The reference manual is available on L<http://www.lua.org/manual/>.
+
+This implementation is aligned with Lua 5.1 specifications.
+
+=head1 Compiler
+
+This compiler is written in Perl5 :
+
+=over 4
+
+=item lexer
+
+Implemented with Perl5 regex
+
+F<languages/lua/Lua/lexer.pm>
+
+=item parser
+
+Implemented with Parse::Yapp.
+
+It supports the full grammar described in F<languages/lua/doc/lua51.bnf>.
+
+Only one C<error> rule, so the syntax error diagnostic is minimalist.
+
+F<languages/lua/Lua/lua51.yp>
+
+=item code generation
+
+F<languages/lua/Lua/build.pm>
+
+=item symbole table
+
+F<languages/lua/Lua/symbtab.pm>
+
+=item opcode representation
+
+F<languages/lua/Lua/opcode.pm>
+
+=item opcode emission
+
+F<languages/lua/Lua/pir.pm>
+
+=back
+
+=head2 KNOWN PROBLEMS
+
+in F<languages/lua/t/closure.t> :
+
+    a = {}
+    local x = 20
+    for i=1,10 do
+        local y = 0
+        a[i] = function () y=y+1; return x+y end
+    end
+
+    print(a[1]())
+    print(a[1]())
+    print(a[2]())
+
+    --[[
+    The loop creates ten closures (that is, ten instances of the anonymous
+    function). Each of these closures uses a different y variable, while all
+    of them share the same x.
+    ]]
+
+C<y> variable is not different.
+
+=head2 TODO
+
+Handle arguments from command line.
+
+Try to use Parse::RecDescent (the original Lua uses a LL parser).
+
+=head1 Lua PMC
+
+There are eight basic types in Lua, each of them is implemented by a PMC.
+
+=over 4
+
+=item nil
+
+F<languages/lua/pmc/luanil.pmc>
+
+=item boolean
+
+F<languages/lua/pmc/luaboolean.pmc>
+
+=item number
+
+F<languages/lua/pmc/luanumber.pmc>
+
+=item string
+
+F<languages/lua/pmc/luastring.pmc>
+
+=item function
+
+F<languages/lua/pmc/luafunction.pmc>
+
+=item userdata
+
+F<languages/lua/pmc/luauserdata.pmc>
+
+This type allows OO extension.
+
+Currently, C<file> in I/O library is an C<userdata>.
+
+=item thread
+
+F<languages/lua/pmc/luathread.pmc>
+
+This type is used to implement coroutines. 
+
+=item table
+
+F<languages/lua/pmc/luatable.pmc>
+
+This type is I<the> data structure of the language.
+
+=back
+
+F<languages/lua/pmc/luabase.pmc> provides an abstract base class for some 
+Lua types (nil, boolean, number, string, table).
+
+F<languages/lua/pmc/lua.pmc> is a singleton PMC what holds some static methods.
+
+=head2 BUGS
+
+Lua PMC have problems with the Parrot garbage collector : used objects are 
+released by the GC (infant mortality ?).
+
+So, use the option C<--no-gc>.
+
+=head2 TODO
+
+Arguments passing in C<invoke> method of C<table>. Where are there ?
+
+Weak table, weak reference.
+
+=head2 IMPROVEMENT
+
+C<table> with a mixed array and hash. 
+
+=head1 Lua Standard Libraries
+
+Lua 5.1 defines the following standard libraries:
+
+=over 4
+
+=item basic library
+
+F<languages/lua/lib/luabasic.pir>
+
+=item coroutine manipulation
+
+F<languages/lua/lib/luacoroutine.pir>
+
+=item package library
+
+F<languages/lua/lib/luapackage.pir>
+
+=item string manipulation
+
+F<languages/lua/lib/luastring.pir>
+
+=item table manipulation
+
+F<languages/lua/lib/luatable.pir>
+
+=item mathematical functions
+
+F<languages/lua/lib/luamath.pir>
+
+=item input and output
+
+F<languages/lua/lib/luaio.pir>
+
+=item operating system facilities
+
+F<languages/lua/lib/luaos.pir>
+
+=item debug facilities
+
+F<languages/lua/lib/luadebug.pir>
+
+=back
+
+F<languages/lua/lib/luaaux.pir> is the equivalent of Auxiliary Library.
+
+=head2 TODO
+
+Except math library, all of these libraries are incomplete.
+
+And the coroutine library does not work. 
+
+=head2 KNOWN PROBLEMS
+
+Currently, these libraries are included as PIR file (not loaded as bytecode 
+PBC) because HLL support for Sub/Closure is incomplete with PBC.   
+
+=head1 Next Milestones
+
+Understand how work PGE & TGE and write an interpreter in PIR. 
+
+=head1 Related Projects
+
+Klaas-Jan Stol works on 2 projects :
+
+=over 4
+
+=item Monkey, an implementation of Lua on Parrot
+
+A Lua to PIR compiler implemented in C
+
+=item lua2pir
+
+A Lua bytecode to PIR compiler
+
+=back
+ 
+See L<http://members.home.nl/joeijoei/>. 
+ 
+=head1 AUTHOR
+
+Francois Perrad.
+
+=cut
