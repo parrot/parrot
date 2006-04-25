@@ -911,6 +911,7 @@ print P <<'EOF';
     .return($P0)
 .end
 EOF
+close P;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "override builtin n_add");
 .sub main
