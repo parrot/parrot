@@ -250,6 +250,79 @@ add more.
 	test.diag( diagnostic )
 .end
 
+.sub is_deeply
+	.param pmc l_array
+	.param pmc r_array
+	.param string description :optional
+
+	.local pmc test
+	find_global test, 'Test::More', '_test'
+
+	.local string diagnosis
+
+	.local int l_count
+	.local int r_count
+	l_count = l_array
+	r_count = r_array
+	if l_count == r_count goto compare_contents
+	test.'ok'( 0, description )
+
+	.local string count_string
+	diagnosis   = 'Received '
+	count_string = l_count
+	diagnosis .= count_string
+	diagnosis .= ' elements in array, expected '
+	count_string = r_count
+	diagnosis .= count_string
+
+	test.'diag'( diagnosis )
+	.return( 0 )
+
+  compare_contents:
+	.local pmc l_iter
+	.local pmc r_iter
+	.local int count
+
+	l_iter = new .Iterator, l_array
+	r_iter = new .Iterator, r_array
+	l_iter = 0
+	r_iter = 0
+	count  = 0
+
+	.local pmc l_elem
+	.local pmc r_elem
+
+  iter_start:
+	unless l_iter goto iter_end
+	l_elem = shift l_iter
+	r_elem = shift r_iter
+	unless l_elem == r_elem goto elems_not_equal
+
+	inc count
+	goto iter_start
+
+  elems_not_equal:
+	.local string count_string
+	.local string elem_string
+
+	test.'ok'( 0, description )
+	diagnosis    = "Mismatch at position "
+	count_string = count
+	diagnosis   .= count_string
+	diagnosis   .= ": received "
+	elem_string  = l_elem
+	diagnosis   .= elem_string
+	diagnosis   .= ", expected "
+	elem_string  = r_elem
+	diagnosis   .= elem_string
+	test.'diag'( diagnosis )
+	.return( 0 )
+
+  iter_end:
+	test.'ok'( 1, description )
+	.return( 1 )
+.end
+
 .sub make_diagnostic
 	.param string received
 	.param string expected
