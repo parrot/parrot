@@ -5,16 +5,19 @@
 	.local pmc is
 	.local pmc ok
 	.local pmc diag
+	.local pmc is_deeply
 
-	plan = find_global 'Test::More', 'plan'
-	is   = find_global 'Test::More', 'is'
-	ok   = find_global 'Test::More', 'ok'
-	diag = find_global 'Test::More', 'diag'
+	plan      = find_global 'Test::More', 'plan'
+	is        = find_global 'Test::More', 'is'
+	ok        = find_global 'Test::More', 'ok'
+	diag      = find_global 'Test::More', 'diag'
+	is_deeply = find_global 'Test::More', 'is_deeply'
 
 	store_global 'Pheme', 'plan', plan
 	store_global 'Pheme', 'is', is
 	store_global 'Pheme', 'ok', ok
 	store_global 'Pheme', 'diag', diag
+	store_global 'Pheme', 'is_deeply', is_deeply
 .end
 
 =cut
