@@ -73,8 +73,18 @@ list: result(.) = {
 	goto iter_loop
 
   iter_end:
-  	result = tree.get( 'maybe_promote_sub', result )
+	.local string child_type
+	child_type = typeof op
+	unless child_type == 'PAST::Op' goto return_result
+
+	result = tree.get( 'maybe_promote_sub', result )
+
+  return_result:
 	.return( result )
+}
+
+PAST::Exp: maybe_op(.) = {
+	.return( node )
 }
 
 PAST::Val: maybe_op(.) = {
@@ -96,10 +106,13 @@ PAST::Exp: maybe_promote_sub(.) = {
 	.local pmc op
 	op       = children[0]
 
+
 	.local string op_name
 	op_name = op.'op'()
 	if op_name == 'define' goto return_sub
-	.return( node )
+	.local pmc result
+	result = node
+	.return( result )
 
   return_sub:
 	.local pmc sub_name
@@ -127,6 +140,12 @@ PAST::Exp: maybe_promote_sub(.) = {
 empty_list: result(.) = {
 	.local pmc result
 	result = new 'PAST::Exp'
+
+	.local pmc cons
+	cons = new 'PAST::Op'
+	cons.'op'( '__make_empty_cons' )
+
+	result.'add_child'( cons )
 	.return( result )
 }
 

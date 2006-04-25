@@ -144,7 +144,6 @@ POST::Ops: emit(.) = {
 	goto iter_loop
 
   iter_end:
-
 	outvar     = join ', ', outvars
 	result    .= "\t"
 	result    .= varname

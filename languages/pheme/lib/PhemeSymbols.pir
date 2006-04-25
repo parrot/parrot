@@ -4,11 +4,12 @@
 	.local pmc symbols
 	symbols = new .Hash
 
-	symbols['car']  = 1
-	symbols['cdr']  = 1
-	symbols['cons'] = 1
-	symbols['include_file'] = 1
-	symbols['write'] = 1
+	symbols['car']               = 1
+	symbols['cdr']               = 1
+	symbols['cons']              = 1
+	symbols['include_file']      = 1
+	symbols['write']             = 1
+	symbols['__make_empty_cons'] = 1
 
 	store_global 'PhemeCompiler', 'symbols', symbols
 	.return()
@@ -116,4 +117,10 @@
 
 	print message_string
 	.return()
+.end
+
+.sub __make_empty_cons
+	.local pmc result
+	result = new .ResizableStringArray
+	.return( result )
 .end
