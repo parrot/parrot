@@ -1,4 +1,4 @@
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -14,15 +14,16 @@ Asks the user to select which PMC files to include.
 package inter::pmc;
 
 use strict;
-use vars qw($description @args %PMC_PARENTS);
+use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining what pmc files should be compiled in';
+our $description = 'Determining what pmc files should be compiled in';
+our @args        = qw(ask pmc);
 
-@args = qw(ask pmc);
+my %PMC_PARENTS;
 
 # Return the (lowercased) name of the immediate parent of the given
 # (lowercased) pmc name.
@@ -42,18 +43,19 @@ sub pmc_parent
     s/^.*?pmclass//s;
     s/\{.*$//s;
 
-    return $PMC_PARENTS{$pmc} = lc($1) if /extends\s+(\w+)/;
-    return $PMC_PARENTS{$pmc} = "default";
+    return $PMC_PARENTS{$pmc} = lc($1) if m/extends\s+(\w+)/;
+    return $PMC_PARENTS{$pmc} = 'default';
 }
 
 # Return an array of all
 sub pmc_parents
 {
     my ($pmc) = @_;
+
     my @parents = ($pmc);
     push @parents, pmc_parent($parents[-1]) until $parents[-1] eq 'default';
     shift(@parents);
-    push(@parents, 'perlhash') if ($pmc eq 'OrderedHash');
+  
     return @parents;
 }
 
@@ -68,6 +70,7 @@ sub get_pmc_order
         }
     }
     close IN;
+
     return \%order;
 }
 
@@ -119,7 +122,7 @@ END
     }
 
     # XXX:leo do we really need an interactive step for this
-    # user could deactivate vital PMCs like PerlHash or SArray
+    # user could deactivate vital PMCs like SArray
     # so there would be tests needed, that check for vital classes
 
     # names of class files for src/pmc/Makefile
@@ -139,15 +142,10 @@ E_NOTE
 
         # make each pmc depend upon its parent.
         my $parent = pmc_parent($pmc) . ".pmc";
-        $parent = "perlhash.pmc src/pmc/$parent" if ($pmc eq 'orderedhash');
         my $parent_dumps = '';
         $parent_dumps .= "src/pmc/$_.dump " foreach reverse((pmc_parents($pmc)));
-        $parent_dumps = "src/pmc/perlhash.dump $parent_dumps"
-            if ($pmc eq 'orderedhash');
         my $parent_headers = '';
         $parent_headers .= "src/pmc/pmc_$_.h " foreach (pmc_parents($pmc));
-        $parent_headers = "src/pmc/pmc_perlhash.h $parent_headers"
-            if ($pmc eq 'orderedhash');
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
 	\$(PMC2CC) src/pmc/$pmc.pmc
