@@ -20,6 +20,7 @@
 	.local pmc test_test
 	.local pmc ok
 	.local pmc is
+	.local pmc is_deeply
 	.local pmc diag
 	plan      = find_global 'Test::Builder::Tester', 'plan'
 	test_pass = find_global 'Test::Builder::Tester', 'test_pass'
@@ -28,9 +29,10 @@
 	test_test = find_global 'Test::Builder::Tester', 'test_test'
 	ok        = find_global 'Test::More',            'ok'
 	is        = find_global 'Test::More',            'is'
+	is_deeply = find_global 'Test::More',            'is_deeply'
 	diag      = find_global 'Test::More',            'diag'
 
-	plan( 22 )
+	plan( 26 )
 
 	test_pass()
 	ok( 1 )
@@ -158,6 +160,36 @@
 	diag( 'rum tum tugger')
 	test_diag( "foo bar baz\nrum tum tugger" )
 	test_test( 'multi line diagnostics' )
+
+	left  = new .ResizablePMCArray
+	right = new .ResizablePMCArray
+
+	push left,  7
+	push right, 7
+	push left,  'seven'
+	push right, 'seven'
+	push left,  right
+	push right, right
+
+	test_pass()
+	is_deeply( left, right )
+	test_test( 'passing test is_deeply() for pmc arrays' )
+
+	test_pass( 'comparing two pmc arrays' )
+	is_deeply( left, right, 'comparing two pmc arrays' )
+	test_test( 'passing test is_deeply() for pmc arrays with description' )
+
+	push left,  '9 - 2'
+
+	test_fail()
+	test_diag( 'Received 4 elements in array, expected 3' )
+	is_deeply( left, right )
+	test_test( 'failing test is_deeply() for pmc arrays' )
+
+	test_fail( 'comparing two pmc arrays' )
+	test_diag( 'Received 4 elements in array, expected 3' )
+	is_deeply( left, right, 'comparing two pmc arrays' )
+	test_test( 'failing test is_deeply() for pmc arrays with description' )
 
 	test.'finish'()
 .end
