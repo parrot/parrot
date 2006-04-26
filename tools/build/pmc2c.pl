@@ -645,7 +645,7 @@ sub dump_is_newer {
 #
 # Create a .dump file for each of the passed files (which can be
 # found in the given directories). A '*.pmc' glob may also be passed
-# to emulate a proper shell in the presence of a dump one.
+# to emulate a proper shell in the presence of a dumb one.
 #
 sub dump_pmc {
     my ($include, @files) = @_;
@@ -673,7 +673,7 @@ sub dump_pmc {
         if ($existing && -e $existing && dump_is_newer($existing)) {
             if ($file =~ /default\.dump$/) {
                 next; # don't overwite default.dump
-            }                                
+            }
             else {
                 $file = $existing; # XXX: overwrite anything else
             }
