@@ -21,6 +21,7 @@
 	.local pmc ok
 	.local pmc is
 	.local pmc is_deeply
+	.local pmc like
 	.local pmc diag
 	plan      = find_global 'Test::Builder::Tester', 'plan'
 	test_pass = find_global 'Test::Builder::Tester', 'test_pass'
@@ -30,9 +31,10 @@
 	ok        = find_global 'Test::More',            'ok'
 	is        = find_global 'Test::More',            'is'
 	is_deeply = find_global 'Test::More',            'is_deeply'
+	like      = find_global 'Test::More',            'like'
 	diag      = find_global 'Test::More',            'diag'
 
-	plan( 26 )
+	plan( 30 )
 
 	test_pass()
 	ok( 1 )
@@ -190,6 +192,24 @@
 	test_diag( 'Received 4 elements in array, expected 3' )
 	is_deeply( left, right, 'comparing two pmc arrays' )
 	test_test( 'failing test is_deeply() for pmc arrays with description' )
+
+	test_pass()
+	like( 'abcdef', '<[c]>' )
+	test_test( 'passing test like()' )
+
+	test_pass( 'testing like()' )
+	like( 'abcdef', '<[c]>', 'testing like()' )
+	test_test( 'passing test like() with description' )
+
+	test_fail()
+	test_diag( 'match failed' )
+	like( 'abcdef', '<[g]>' )
+	test_test( 'failing test like()' )
+
+	test_fail( 'testing like()' )
+	test_diag( 'match failed' )
+	like( 'abcdef', '<[g]>', 'testing like()' )
+	test_test( 'failing test like() with description' )
 
 	test.'finish'()
 .end

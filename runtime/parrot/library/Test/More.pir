@@ -13,15 +13,17 @@ Test::More - Parrot extension for testing modules
     .local pmc ok
     .local pmc is
     .local pmc is_deeply
+    .local pmc like
 
     plan      = find_global 'Test::More', 'plan'
     diag      = find_global 'Test::More', 'diag'
-    ok        = find_global 'Test::More',   'ok'
-    is        = find_global 'Test::More',   'is'
-    is_deeply = find_global 'Test::More',   'is_deeply'
+    ok        = find_global 'Test::More', 'ok'
+    is        = find_global 'Test::More', 'is'
+    is_deeply = find_global 'Test::More', 'is_deeply'
+    like      = find_global 'Test::More', 'like'
 
     # set a test plan
-    plan( 11 )
+    plan( 12 )
 
     # run your tests
     ok( 1 )
@@ -41,11 +43,13 @@ Test::More - Parrot extension for testing modules
     diag( 'this may take a while' )
     is_deeply( some_deep_pmc, another_deep_pmc, 'deep structure comparison' )
 
+    like( 'foo', 'f o**{2}', 'passing regex compare with diagnostic' )
+
 =head1 DESCRIPTION
 
 C<Test::More> is a pure-Parrot library for testing modules.  It provides
-the C<ok()>, C<is()>, and C<is_deeply()> comparison functions for you.  It
-also provides the C<plan()> and C<diag()> helper functions. It uses
+the C<ok()>, C<is()>, C<is_deeply()>, and C<like()> comparison functions for
+you.  It also provides the C<plan()> and C<diag()> helper functions. It uses
 C<Test::Builder>, a simple, single backend for multiple test modules
 to use within your tests.
 
@@ -350,6 +354,63 @@ hard to extend it for hash-like structures, too.
   iter_end:
     test.'ok'( 1, description )
     .return( 1 )
+.end
+
+=item C<like( target, pattern, description )>
+
+Similar to is, but using the Parrot Grammar Engine to compare the string
+passed as C<target> to the pattern passed as C<pattern>.  It passes if the
+pattern matches and fails otherwise.  This will report the results with the
+optional test description in C<description>.
+
+=cut
+
+.sub like
+    .param string target
+    .param string pattern
+    .param string description :optional
+
+    .local pmc test
+    find_global test, 'Test::More', '_test'
+
+    .local pmc p6rule_compile
+    load_bytecode "PGE.pbc"
+    load_bytecode "PGE/Dumper.pir"
+    load_bytecode "PGE/Text.pir"
+    load_bytecode "PGE/Util.pir"
+    p6rule_compile = compreg "PGE::P6Rule"
+
+    .local string diagnostic
+    .local int pass
+    pass = 0
+
+  match_pattern:
+    .local pmc rulesub
+    .local pmc match
+    .local pmc code
+    .local pmc exp
+    (rulesub, code, exp) = p6rule_compile(pattern)
+    if_null rulesub, rule_fail
+    match = rulesub(target)
+    unless match goto match_fail
+  match_success:
+    goto PASS
+  match_fail:
+    diagnostic = "match failed"
+    goto REPORT
+  rule_fail:
+    diagnostic = "rule error"
+    goto REPORT
+
+  PASS:
+    pass = 1
+
+  REPORT:
+    test.ok( pass, description )
+    if pass goto DONE
+
+    test.diag( diagnostic )
+  DONE:
 .end
 
 .sub _make_diagnostic
