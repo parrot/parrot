@@ -180,9 +180,10 @@ bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 static void
 bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
+    int n;
     int_check_divide_zero(interpreter, value);
     /* this is mpz_fdiv_q */
-    int n = value < 0;
+    n = value < 0;
     if (n) {
         mpz_div_ui(BN(dest), BN(self), -value);
         mpz_neg(BN(dest), BN(dest));
@@ -199,8 +200,9 @@ bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 static void
 bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
+    int n;
     int_check_divide_zero(interpreter, value);
-    int n = value < 0;
+    n = value < 0;
     if (n) {
         mpz_fdiv_q_ui(BN(dest), BN(self), -value);
         mpz_neg(BN(dest), BN(dest));
@@ -219,8 +221,9 @@ bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 static void
 bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
+    int n;
     int_check_divide_zero(interpreter, value);
-    int n = value < 0;
+    n = value < 0;
     if (n) {
         mpz_mod_ui(BN(dest), BN(self), -value);
     }
