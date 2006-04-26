@@ -147,7 +147,7 @@ add more.
     l_string    = left
     r_string    = right
 
-    diagnostic = make_diagnostic( l_string, r_string )
+    diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )
   DONE:
 .end
@@ -180,7 +180,7 @@ add more.
     l_string    = left
     r_string    = right
 
-    diagnostic = make_diagnostic( l_string, r_string )
+    diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )
   DONE:
 .end
@@ -213,7 +213,7 @@ add more.
     l_string    = left
     r_string    = right
 
-    diagnostic = make_diagnostic( l_string, r_string )
+    diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )
   DONE:
 .end
@@ -246,7 +246,7 @@ add more.
     l_string    = left
     r_string    = right
 
-    diagnostic = make_diagnostic( l_string, r_string )
+    diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )
   DONE:
 .end
@@ -352,7 +352,7 @@ hard to extend it for hash-like structures, too.
     .return( 1 )
 .end
 
-.sub make_diagnostic
+.sub _make_diagnostic
     .param string received
     .param string expected
     .local string diagnostic
