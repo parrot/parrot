@@ -59,8 +59,6 @@ tree as a PIR code object that can be compiled.
     if name > '' goto adverbs_1
     name = 'exp'
   adverbs_1:
-    .local int ratchet, posmod
-    ratchet = adverbs['ratchet']
 
     ##   Perform reduction/optimization on the
     ##   expression tree before generating PIR.
@@ -69,6 +67,10 @@ tree as a PIR code object that can be compiled.
     exp = self
     store_global 'PGE::Exp', '$!group', exp
     exp = exp.reduce(self)
+    .local int cutrule
+    $I0 = exp['backtrack']
+    cutrule = iseq $I0, PGE_BACKTRACK_NONE
+    
 
     ##   Generate the PIR for the expression tree.
     .local pmc expcode
@@ -78,8 +80,10 @@ tree as a PIR code object that can be compiled.
 
     .local pmc code
     code = new 'PGE::CodeString'
-    if ratchet == 1 goto code_ratchet
-    ##   Generate the initial PIR code for a backtracking rule.
+    if cutrule goto code_cutrule
+    ##   Generate the initial PIR code for a backtracking (uncut) rule.
+    .local string returnop
+    returnop = '.yield'
     code.emit(<<"        CODE", name, .INTERPINFO_CURRENT_SUB)
       .sub %0
           .param pmc mob
@@ -99,11 +103,15 @@ tree as a PIR code object that can be compiled.
           (mob, target, mfrom, mpos) = newfrom(mob, -1)
           $P0 = interpinfo %1
           setattribute mob, '&!corou', $P0
+          .local int pos, lastpos, rep, cutmark
+          lastpos = length target
+          pos = mfrom
         CODE
     goto code_body
 
-  code_ratchet:
-    ##   Initial code for a non-backtracking rule.
+  code_cutrule:
+    ##   Initial code for a rule that cannot be backtracked into.
+    returnop = '.return'
     code.emit(<<"        CODE", name)
       .sub %0
           .param pmc mob
@@ -112,6 +120,9 @@ tree as a PIR code object that can be compiled.
           .local pmc mfrom, mpos
           newfrom = find_global 'PGE::Match', 'newfrom'
           (mob, target, mfrom, mpos) = newfrom(mob, -1)
+          .local int pos, lastpos, rep, cutmark
+          lastpos = length target
+          pos = mfrom
         CODE
 
   code_body:
@@ -129,18 +140,16 @@ tree as a PIR code object that can be compiled.
     code.emit("          .local pmc gpad")
     code.emit("          gpad = new .ResizablePMCArray")
   code_body_2:
+    ##   set the captscope if we need it
+    $I0 = index expstr, 'captscope'
+    if $I0 < 0 goto code_body_3
+    code.emit("          .local pmc captscope, captob")
+    code.emit("          captscope = mob")
+  code_body_3:
 
-    code.emit(<<"        CODE")
-          .local pmc captscope, captob
-          .local int pos, lastpos, rep, cutmark
-          captscope = mob
-          lastpos = length target
-          pos = mfrom
-        CODE
     ##   If the :pos adverb is supplied, we won't do :continue semantics.
     $I0 = adverbs['pos']
     if $I0 goto code_body_pos
-
     ##   This handles :continue semantics.  XXX: It's not
     ##   exactly according to S05 spec, but close enough until
     ##   we get String $.pos semantics defined.
@@ -159,11 +168,12 @@ tree as a PIR code object that can be compiled.
           goto try_match
         try_at_pos:
         CODE
+
   code_body_pos:
     ##   This handles the case where we're only trying the match
     ##   at the current position, as well as the failure and
     ##   success modes.
-    code.emit(<<"        CODE", PGE_CUT_RULE, PGE_CUT_MATCH)
+    code.emit(<<"        CODE", PGE_CUT_RULE, returnop)
           mfrom = pos
           cutmark = 0
           bsr R
@@ -172,17 +182,26 @@ tree as a PIR code object that can be compiled.
           cutmark = %0
         fail_cut:
           mob.failcut(cutmark)
-          .yield (mob)
-          goto fail_cut
-        fail_match:
-          cutmark = %1
+          %1 (mob)
           goto fail_cut
         succeed:
           mpos = pos
-          .yield (mob)
+          %1 (mob)
         fail:
-          ret\n
+          ret
         CODE
+
+    ##   add the "fail_match" target if we need it
+    $I0 = index expstr, 'fail_match'
+    if $I0 < 0 goto add_expcode
+    code.emit(<<"        CODE", PGE_CUT_MATCH)
+        fail_match:
+          cutmark = %0
+          goto fail_cut
+        CODE
+
+  add_expcode:
+    ##   add the expression code, then close off the sub
     code .= expcode
     code.emit("      .end")
     .return (code)
@@ -390,9 +409,9 @@ tree as a PIR code object that can be compiled.
     min = self['min']
     max = self['max']
     if min != max goto reduce_exp0
-    self['backtrack'] = PGE_BACKTRACK_NONE
     if min != 1 goto reduce_exp0
-    exp0['backtrack'] = PGE_BACKTRACK_NONE
+    $I0 = self['backtrack']
+    exp0['backtrack'] = $I0
     exp0 = exp0.reduce(next)
     .return (exp0)
 
