@@ -64,6 +64,7 @@ Initializes the compiling subsystem.
 .sub __onload :load
     load_bytecode 'PGE.pbc'
     load_bytecode 'TGE.pbc'
+    load_bytecode 'PGE/Util.pbc'
 
     # A hash for storing APL variables
     $P0 = new .Hash
@@ -252,63 +253,6 @@ executing program statements.
 # Load the APL grammar
 .namespace [ 'APL::Grammar' ]
 .include 'lib/APLGrammar.pir'
-
-=back
-
-=head2 C<APL::Grammar> namespace
-
-=over 4
-
-=item C<die(PMC mob, string message)>
-
-The C<die> subroutine implements a special-purpose
-<die> subrule.  The <die> subrule outputs a C<message>
-indicating why the parse failed, displays the line
-number and context of the failure, and returns a
-PGE_CUT_MATCH result to abandon the parse altogether.
-
-=cut
-
-.include 'cclass.pasm'
-
-.sub 'die'
-    .param pmc mob
-    .param string message      # XXX: TODO: :optional
-    .local pmc newfrom
-    .local string target
-    .local pmc mfrom, mpos
-    .local int pos, len, newline, lines
-    newfrom = find_global 'PGE::Match', 'newfrom'
-    (mob, target, mfrom, mpos) = newfrom(mob, 0)
-
-    pos = mfrom
-    newline = 0
-    lines = 1
-  newline_loop:
-    $I0 = find_cclass .CCLASS_NEWLINE, target, newline, pos
-    if $I0 >= pos goto print_message
-    newline = $I0 + 1
-    inc lines
-    goto newline_loop
-
-  print_message:
-    print message
-    print ' at line '
-    print lines
-    print ", near \""
-    $I0 = length target
-    $I0 -= pos
-    if $I0 < 10 goto print_message_1
-    $I0 = 10
-  print_message_1:
-    $S0 = substr target, pos, $I0
-    $S0 = escape $S0
-    print $S0
-    print "\"\n"
-    mpos = -3
-    .return (mob)
-.end
-
 
 # include the abstract syntax tree
 .include 'lib/PAST.pir'

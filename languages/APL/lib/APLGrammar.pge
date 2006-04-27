@@ -55,4 +55,4 @@ rule character_constant {
 rule variable_identifier { <[A..Za..z]> \w*: }
 
 
-rule syntax_error { <?die: Syntax error> }
+rule syntax_error { <?PGE::Util::die: Syntax error> }
