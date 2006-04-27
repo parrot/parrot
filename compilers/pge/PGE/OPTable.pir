@@ -355,11 +355,11 @@ PGE::OPTable - PGE operator precedence table and parser
     if has_stop > 0 goto check_stop_str
     mpos = pos
     $P0 = stop(mob)
-    if $P0 goto end
+    if $P0 goto oper_not_found
     goto key_search
   check_stop_str:
     $S0 = substr target, pos, has_stop
-    if $S0 == stop_str goto end
+    if $S0 == stop_str goto oper_not_found
 
   ## look through eligible tokens to find longest match
   key_search:
