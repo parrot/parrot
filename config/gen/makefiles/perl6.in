@@ -15,6 +15,7 @@ all: perl6.pbc
 SOURCES = perl6.pir \
   lib/grammar_rules.pg \
   lib/grammar_optok.pg \
+  lib/grammar_sub.pg \
   lib/parse.pir \
   lib/pge2past.tg \
   lib/past2pir.tg \
@@ -25,7 +26,7 @@ SOURCES = perl6.pir \
 # the default target
 perl6.pbc: $(PARROT) $(PGE_DIR)/pgc.pir $(SOURCES)
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=lib/grammar_gen.pir \
-	    lib/grammar_rules.pg lib/grammar_optok.pg
+	    lib/grammar_rules.pg lib/grammar_optok.pg lib/grammar_sub.pg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/pge2past.pir lib/pge2past.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/past2pir.pir lib/past2pir.tg
 	$(PARROT) -o perl6.pbc perl6.pir
@@ -53,8 +54,8 @@ help:
 test: all
 	$(PERL) t/harness
 
+# this target has nothing to do
 testclean:
-	echo "XXX: Todo - not yet implemented"
 
 clean: 
 	$(RM_RF) perl6.pbc lib/grammar_gen.pir
