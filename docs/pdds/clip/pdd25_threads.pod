@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/pdds/clip/pddXX_threads.pod - Parrot Threads
+docs/pdds/clip/pdd25_threads.pod - Parrot Threads
 
 =head1 ABSTRACT
 

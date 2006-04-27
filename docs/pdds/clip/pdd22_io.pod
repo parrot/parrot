@@ -1,9 +1,9 @@
 # Copyright: 2001-2006 The Perl Foundation.
-# $Id $
+# $Id: $
 
 =head1 NAME
 
-docs/pdds/pddXX_io.pod - Parrot I/O
+docs/pdds/pdd22_io.pod - Parrot I/O
 
 =head1 ABSTRACT
 
@@ -11,7 +11,7 @@ Parrot's I/O subsystem.
 
 =head1 VERSION
 
-$Revision $
+$Revision: $
 
 =head1 SYNOPSIS
 

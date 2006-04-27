@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/pdds/clip/pddXX_exceptions.pod - Parrot Exceptions
+docs/pdds/clip/pdd23_exceptions.pod - Parrot Exceptions
 
 =head1 ABSTRACT
 

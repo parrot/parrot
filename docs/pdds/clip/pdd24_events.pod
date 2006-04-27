@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/pdds/clip/pddXX_events.pod - Parrot Events
+docs/pdds/clip/pdd24_events.pod - Parrot Events
 
 =head1 ABSTRACT
 
