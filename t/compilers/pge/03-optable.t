@@ -8,7 +8,7 @@ use Test::More;
 use Parrot::Test;
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 32; }
+BEGIN { plan tests => 35; }
 
 optable_output_is('a', 'term:a',                    'Simple term');
 optable_output_is('a+b', 'infix:+(term:a, term:b)', 'Simple infix');
@@ -53,10 +53,8 @@ optable_output_is('a=b,c,d+e',
     'list associativity');
 
 optable_output_is('a b', 'term:a (pos=1)', 'two terms in sequence');
-optable_output_is('a = = b', 'term:a (pos=1)', 'two opers in sequence',
-    todo => 'fix end position');
-optable_output_is('a +', 'term:a (pos=1)', 'infix missing rhs',
-    todo => 'fix end position');
+optable_output_is('a = = b', 'term:a (pos=1)', 'two opers in sequence');
+optable_output_is('a +', 'term:a (pos=1)', 'infix missing rhs');
 
 optable_output_is('a++', 'postfix:++(term:a)', 'postfix');
 optable_output_is('a--', 'postfix:--(term:a)', 'postfix');
@@ -70,10 +68,8 @@ optable_output_is('a*b+c)+4',
   'infix:+(infix:*(term:a, term:b), term:c) (pos=5)',
   'extra close paren');
 optable_output_is('  )a*b+c)+4', 'failed', 'only close paren');
-optable_output_is('(a*b+c', 'failed', 'missing close paren',
-  todo => 'fix close tokens');
-optable_output_is('(a*b+c]', 'failed', 'mismatch close paren',
-  todo => 'fix close tokens');
+optable_output_is('(a*b+c', 'failed', 'missing close paren');
+optable_output_is('(a*b+c]', 'failed', 'mismatch close paren');
 
 
 optable_output_is('a+++--b',
@@ -94,6 +90,19 @@ optable_output_is('a()', 'postcircumfix:( )(term:a, null)',
 optable_output_is('a[]', 'term:a (pos=1)',
   'nullterm disallowed');
 
+optable_output_is('(a=b;c;d)',
+    'circumfix:( )(infix:;(infix:=(term:a, term:b), term:c, term:d))',
+    'loose list associativity in circumfix');
+
+optable_output_is('(a;b);d',
+    'circumfix:( )(infix:;(term:a, term:b)) (pos=5)',
+    'top-level stop token');
+
+optable_output_is('a,b;c',
+    'infix:,(term:a, term:b) (pos=3)',
+    'top-level stop token');
+
+
 
 ################
 
@@ -101,9 +110,9 @@ sub optable_output_is {
     my($test, $output, $msg, %opt) = @_;
     my($pir) = <<'CODE';
 .sub main :main
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'dumper.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
+    load_bytecode 'compilers/pge/PGE.pir'
+    load_bytecode 'dumper.pir'
+    load_bytecode 'PGE/Dumper.pir'
 
     .local pmc optable
     optable = new 'PGE::OPTable'
@@ -116,6 +125,7 @@ sub optable_output_is {
     optable.newtok('infix:==', 'looser'=>'infix:+')
     optable.newtok('infix:=', 'looser'=>'infix:==', 'assoc'=>'right')
     optable.newtok('infix:,', 'tighter'=>'infix:=', 'assoc'=>'list')
+    optable.newtok('infix:;', 'looser'=>'infix:=', 'assoc'=>'list')
 
     optable.newtok('prefix:++', 'tighter'=>'infix:**')
     optable.newtok('prefix:--', 'equiv'=>'prefix:++')
@@ -123,7 +133,7 @@ sub optable_output_is {
     optable.newtok('postfix:--', 'equiv'=>'prefix:++')
 
     .local pmc ident
-    ident = find_global 'PGE::Rule', 'ident'
+    ident = find_global 'PGE::Regex', 'ident'
     optable.newtok('term:', 'tighter'=>'prefix:++', 'parsed'=>ident)
     optable.newtok('circumfix:( )', 'equiv'=>'term:')
     optable.newtok('circumfix:[ ]', 'equiv'=>'term:')
@@ -134,7 +144,7 @@ sub optable_output_is {
     test = "<<test>>"
 
     .local pmc match
-    match = optable.parse(test)
+    match = optable.parse(test, 'stop'=>';')
     unless match goto fail
     $P0 = match['expr']
     tree($P0)

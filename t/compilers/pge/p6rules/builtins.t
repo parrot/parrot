@@ -37,7 +37,7 @@ my $PRE = <<PRE;
     load_bytecode "PGE/Text.pir"
     .local string target, pattern
     .local pmc p6rule, rulesub, pir, exp, match
-    p6rule = compreg 'PGE::P6Rule'
+    p6rule = compreg 'PGE::P6Regex'
     null match
     null rulesub
 PRE
@@ -151,7 +151,9 @@ p6rule_like($str,  '<?dot>+',
     qr/mob: <. @ 17>/, '<?dot>+');
 
 p6rule_like("2+3 ab2", '<ident>',  
-    qr/mob<ident>: <ab2 @ 4>/, 'capturing builtin');
+    qr/mob<ident>: <ab2 @ 4>/, 'capturing builtin <ident>');
+p6rule_like("ab::cd::x3::42", '<name>',
+    qr/mob<name>: <ab::cd::x3 @ 0>/, 'capturing builtin <name>');
 
 p6rule_like("abacad", '<before .d> a.', 
     qr/mob: <ad @ 4>/,
@@ -202,6 +204,8 @@ p6rule_like($str, "abc <null> def",
     qr/mob<null>: < @ 58>/, 'null pattern (<null>)');
 p6rule_is  ($str, 'x | y | <null>', 'null pattern (<null>)');
 p6rule_is  ($str, 'x | y | <?null>', 'null pattern (<null>)');
+
+p6rule_like($str, 'a[b}', '/rule error/', 'mismatched close');
 
 
 ## <prior> -- match prior successful rule
@@ -257,4 +261,4 @@ OUTPUT
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 71; }
+BEGIN { plan tests => 73; }

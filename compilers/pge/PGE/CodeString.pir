@@ -128,7 +128,10 @@ A newline is automatically added to the end of the fmt.
     goto emit_loop
   end:
     self .= fmt
+    $S0 = substr fmt, -1, 1
+    if $S0 == "\n" goto end_1
     self .= "\n"
+  end_1:
     .return ()
 .end
 
@@ -155,6 +158,30 @@ counting at 10 (so that the values 0..9 can be considered "safe").
     $S0 = concat fmt, $S0
     inc $P0
     .return ($S0)
+.end
+
+
+=item C<escape(string str)>
+
+Returns an escaped value of C<str> suitable for including in PIR.
+If the string contains any non-ASCII characters, then it's
+prefixed with 'unicode:'.
+
+=cut
+
+.sub 'escape' :method
+    .param string str
+    str = escape str
+    str = concat '"', str
+    str = concat str, '"'
+    $I0 = index str, '\x'
+    if $I0 >= 0 goto unicode
+    $I0 = index str, '\u'
+    if $I0 >= 0 goto unicode
+    .return (str)
+  unicode:
+    str = concat 'unicode:', str
+    .return (str)
 .end
 
 

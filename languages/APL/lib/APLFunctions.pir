@@ -30,8 +30,8 @@ Eventually make these be unicode strings.
     store_global "APL", "%pirtable", $P0
 
     # these are the 'generic' forms of each op
-    $P0['dyadic:']        =  "    %1 = '%0'(%1, %2)"
-    $P0['monadic:']       =  "    %1 = '%0'(%1)"
+    $P0['dyadic:']  =  "    $P0 = find_global 'APL', %0\n    %1 = $P0(%1, %2)"
+    $P0['monadic:'] =  "    $P0 = find_global 'APL', %0\n    %1 = $P0(%1)"
 
     # special-purpose parrot ops here
     $P0['dyadic:+']        =  "    %1 = %1 + %2"    # plus

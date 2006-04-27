@@ -32,7 +32,7 @@ interactive: APL.pbc
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
 
 .pge.pir :
-	$(PARROT) $(PGE_DIR)/rulec.pir --encoding=utf8 --compiler=p6rules --output=$@ $<
+	$(PARROT) $(PGE_DIR)/pgc.pir --encoding=utf8 --output=$@ $<
 
 # This is a listing of all targets, that are meant to be called by users
 help:

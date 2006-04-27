@@ -34,7 +34,8 @@ PAST::Stmt: pir(.) = {
     $I0 = isa $P0, 'PAST::Assign'
     if $I0 goto end
     $S0 = $P0['ret']
-    pir.emit("    'aplprint'(%0)", $S0)
+    pir.emit("    $P0 = find_global 'APL', 'aplprint'")
+    pir.emit("    $P0(%0)", $S0)
   end:
     .return (pir)
 }
@@ -102,7 +103,7 @@ PAST::Val: pir(.) = {
     .local pmc class
 
     pir = new "PGE::CodeString"
-    ret = node.generate_unique('$P')
+    ret = pir.unique('$P')
     class = node['class']
     pir.emit("    %0 = new %1", ret, class)
     $S0 = node['value']
@@ -131,8 +132,8 @@ PAST::Var: pir(.) = {
     .local pmc pir
     .local pmc ret
     
-    ret = node.generate_unique('$P')
     pir = new "PGE::CodeString"
+    ret = pir.unique('$P')
     $P0 = node['name']
     pir.emit("    %0 = var['%1']", ret, $P0)
     node['ret'] = ret
@@ -146,9 +147,9 @@ PAST::Vector: pir(.) = {
     .local pmc ret
     .local pmc iter
 
-    ret = node.generate_unique('$P')
-    node['ret'] = ret
     pir = new "PGE::CodeString"
+    ret = pir.unique('$P')
+    node['ret'] = ret
     pir.emit('    %0 = new .ResizablePMCArray', ret)
     $P0 = node['children']
     iter = new .Iterator, $P0

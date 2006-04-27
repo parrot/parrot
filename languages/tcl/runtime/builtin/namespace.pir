@@ -94,7 +94,7 @@ bad_args:
 
   load_bytecode "PGE.pbc"
   .local pmc p6r,match
-  p6r = compreg "PGE::P6Rule"
+  p6r = compreg "PGE::P6Regex"
   match = p6r("(.*)\\:\\:+<-[:]>*$$")
 
   $S0 = argv[0]
@@ -122,8 +122,8 @@ WHOLE:
 
   load_bytecode "PGE.pbc"
   .local pmc p6r,match
-  p6r= compreg "PGE::P6Rule"
-  match = p6r("\:\:+(<-[:]>)$$")
+  p6r= compreg "PGE::P6Regex"
+  match = p6r("\\:\\:+(<-[:]>)$$")
 
   $S0 = argv[0]
   $P0 = match($S0)

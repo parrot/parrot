@@ -64,11 +64,11 @@ whole thing may be taken out or refactored away at any moment.
     .param string pattern
     .local pmc p6rule_compile, rulesub
 
-    find_global p6rule_compile, "PGE", "p6rule"
+    p6rule_compile = compreg 'PGE::P6Regex'
     null rulesub
     rulesub = p6rule_compile(pattern)
     ## leo XXX need namespace
-    store_global "PGE::Rule", name, rulesub
+    store_global "PGE::Regex", name, rulesub
 
     .return (name)
 .end
@@ -82,7 +82,7 @@ whole thing may be taken out or refactored away at any moment.
     .local pmc p6rule_compile
     .local pmc capt
 
-    find_global p6rule_compile, "PGE", "p6rule"
+    p6rule_compile = compreg 'PGE::P6Regex'
     null rulesub
 
     push_eh match_error

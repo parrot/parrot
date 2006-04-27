@@ -16,7 +16,7 @@ pir_output_is( << 'END_PIR', << 'END_OUT', "check whether PGE is there" );
     load_bytecode "PGE/Dumper.pbc"
 
     .local pmc p6rule
-    p6rule = compreg "PGE::P6Rule"
+    p6rule = compreg "PGE::P6Regex"
 
     .local string pattern       
     pattern = "^(<[_a..zA..Z]><[_a..zA..Z0..9]>*)"  # capture the complete id

@@ -1,6 +1,6 @@
 =head1 TITLE
 
-PGE::Rule::Text - rules for extracting delimited text sequences from strings
+PGE::Text - rules for extracting delimited text sequences from strings
 
 =head1 DESCRIPTION
 
@@ -16,8 +16,7 @@ also.)
 
 .sub "__onload" :load
     .local pmc base
-    base = getclass "PGE::Rule"
-    $P0 = subclass base, "PGE::Text"
+    $P0 = subclass 'PGE::Regex', 'PGE::Text'
 .end
 
 =head2 Available rules

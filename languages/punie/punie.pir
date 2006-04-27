@@ -9,7 +9,7 @@ punie -- A compiler for Perl 1
 =head1 DESCRIPTION
 
 Punie is a compiler for Perl version 1, running on Parrot. Its parser is
-a PGE grammar (a subclass of PGE::Rule). The compilation is a series of
+a PGE grammar (a subclass of PGE::Regex). The compilation is a series of
 tree transformations using TGE: from match tree to abstract syntax tree
 (AST), from AST to opcode syntax tree (OST), and finally from OST to
 bytecode (actually to PIR, at first). For more on the ideas behind the

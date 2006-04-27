@@ -1,6 +1,0 @@
-grammar PGE::Rule;
-
-rule ident { [ _ | <?alpha> ] \w* }
-
-rule name { <ident> [ \:\: <ident> ]* }
-

@@ -71,7 +71,7 @@ Initializes the compiling subsystem.
 
     # parser
     .local pmc p6rule
-    p6rule = compreg 'PGE::P6Rule'
+    p6rule = compreg 'PGE::P6Regex'
     $P2 = p6rule('^<APL::Grammar::statement_list>')
     store_global 'APL', '&parse', $P2
 
@@ -175,8 +175,7 @@ executing program statements.
     $P0()
     $P0 = find_global 'APL', '__load_pirtable'
     $P0()
-    $P0 = getclass 'PGE::Rule'
-    $P0 = subclass $P0, 'APL::Grammar'
+    $P0 = subclass 'PGE::Regex', 'APL::Grammar'
 
     load_bytecode 'dumper.pbc'
     load_bytecode 'PGE/Dumper.pbc'
@@ -251,6 +250,7 @@ executing program statements.
 .end
 
 # Load the APL grammar
+.namespace [ 'APL::Grammar' ]
 .include 'lib/APLGrammar.pir'
 
 =back

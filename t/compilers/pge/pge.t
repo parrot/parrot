@@ -27,10 +27,8 @@ my $ns_subs = {
 	'PGE.pir' =>
 		{ 'PGE' => [qw/ /], },
 	'PGE/Exp.pir' => {
-		'PGE::Exp' => [qw/ serno as_pir /],
+		'PGE::Exp' => [qw/ root_pir /],
 	},
-	'PGE/Library.pir' =>
-		{ 'PGE::Rule' => [qw/ ident name /], },
 	'PGE/Match.pir' => {
 		'PGE::Match' => [qw/
 			next from to __get_bool __get_integer __get_number
@@ -39,16 +37,16 @@ my $ns_subs = {
 		/],
 	},
 	'PGE/OPTable.pir' =>
-		{ 'PGE::OPTable' => [qw/ addtok parse /], },
-	'PGE/P6Rule.pir' => {
+		{ 'PGE::OPTable' => [qw/ newtok parse /], },
+	'PGE/P6Regex.pir' => {
 		'PGE' => [qw/ /],
 		'PGE::Exp' => [qw/ /],
-		'PGE::P6Rule' => [qw/ /],
-		'PGE::Rule' => [qw/ p6rule /], ## TODO deprecated
+		'PGE::P6Regex' => [qw/ /],
+		'PGE::Regex' => [qw/ regex /], ## TODO deprecated
 	},
-	'PGE/Rule.pir' => {
-		'PGE::Rule' => [qw/
-			null fail upper lower alpha digit xdigit space
+	'PGE/Regex.pir' => {
+		'PGE::Regex' => [qw/
+			ident null fail upper lower alpha digit xdigit space
 			print graph blank cntrl punct alnum sp lt gt dot ws before
 			/],
 		},
@@ -60,7 +58,7 @@ my $ns_subs = {
 ## populate_namespaces -- populate many namespaces with a subname
 ## data format like: subname => [qw/ list of namespaces /],
 ## my $p6r_subs = { p6analyze => [qw/ Literal /], };
-## populate_namespaces( $ns_subs, $p6r_subs, 'PGE/P6Rule.pir', 'PGE::Exp' );
+## populate_namespaces( $ns_subs, $p6r_subs, 'PGE/P6Regex.pir', 'PGE::Exp' );
 sub populate_namespaces
 {
 	my( $outdata_ref, $indata_ref, $filekey, $nsprefix )= @_;
@@ -105,7 +103,7 @@ OUT
 
 
 ## compiler registration
-for my $compiler (qw/ PGE::P6Rule PGE::P5Regexp PGE::Glob /)
+for my $compiler (qw/ PGE::P6Regex PGE::P5Regex PGE::Glob /)
 {
 	pir_output_is(<<"CODE".$POST, <<OUT, 'compreg "$compiler"');
 .sub 'main' :main

@@ -15,12 +15,11 @@ TGE::Parser - parser for the grammar syntax of TGE
 
     .local string classname
     classname = 'TGE::Parser'
-    $P0 = getclass 'PGE::Rule'
-    $P1 = subclass $P0, classname
+    $P1 = subclass 'PGE::Regex', classname
 
     # Construct the grammar
     .local pmc p6rule
-    find_global p6rule, 'PGE', 'p6rule'
+    p6rule = compreg 'PGE::P6Regex'
 
     p6rule('[<TGE::Parser::skip>|<TGE::Parser::rule>]*$', classname, 'input')
     p6rule('<TGE::Parser::type> \: <TGE::Parser::attrdef> \s*', classname, 'rule')

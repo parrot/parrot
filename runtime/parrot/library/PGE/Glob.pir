@@ -1,6 +1,6 @@
 =head1 TITLE
 
-PGE::Glob - Parse and compile glob notation
+Glob - Parse and compile glob notation expressions.
 
 =head1 DESCRIPTION
 
@@ -10,320 +10,341 @@ A parser for shell-stype glob notation.
 
 =over 4
 
-=cut
+=item C<compile_glob(PMC source, PMC adverbs :slurpy :named)>
 
-.namespace [ "PGE::Glob" ]
+Return the result of compiling the glob expression given by
+C<source>.   Normally this function is obtained using 
+C<compreg 'PGE::Glob'> instead of calling it directly.
 
-.const string STOPCHARS = ",*?{}[]"	# XXX: should be part of context
-.const int GLOB_INF = 2147483647	# XXX: arbitrary limit
-
-.sub "__onload" :load
-    $P0 = find_global "PGE", "glob"
-    compreg "PGE::Glob", $P0
-.end
-
-=item C<new(STR class [, PMC exp1 [, PMC exp2]])>
-
-Creates and returns  a new C<Exp> object of C<class>, initializing
-min/max/greedy/etc.  values and C<exp1> and C<exp2> objects if provided.
+Returns the compiled regular expression.  If a C<target>
+named parameter is supplied, then it will return the parse tree
+(target='parse'), the expression tree (target='exp'),
+or the resulting PIR code (target='PIR').
 
 =cut
 
-.sub "new"
-    .param pmc pattern
-    .param string expclass     :optional           # class from find_type
-    .param int has_class       :opt_flag
-    .param pmc exp1            :optional           # left expression
-    .param int has_exp1        :opt_flag
-    .param pmc exp2            :optional           # right expression
-    .param int has_exp2        :opt_flag
-    .local pmc me                                  # new expression object
+.namespace [ 'PGE::Glob' ]
 
-    if has_class goto buildme
-    expclass = "PGE::Exp"
-  buildme:
-    $P0 = find_global "PGE::Match", "newfrom"
-    (me, $P0, $P1, $P2) = $P0(pattern, 0, expclass)
-    assign $P2, $P1
+.sub 'compile_glob'
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
 
-    unless has_exp1 goto end
-    me[0] = exp1
-    unless has_exp2 goto end
-    me[1] = exp2
-  end:
-    .return (me)
-.end
+    .local string target
+    target = adverbs['target']
 
+    .local pmc match
+    $P0 = find_global 'PGE::Regex', 'glob'
+    match = $P0(source)
+    if target != 'parse' goto check
+    .return (match)
 
-=item C<glob_error(STR pattern, PMC lex, STR message)>
+  check:
+    unless match goto check_1
+    $S0 = source
+    $S1 = match
+    if $S0 == $S1 goto analyze
+  check_1:
+    null $P0
+    .return ($P0)
 
-output an error message
-
-=cut
-
-.sub "glob_error"
-    .param string pattern
-    .param pmc lex
-    .param string message
-
-    $P0 = new .Exception
-    $S0 = "PGE Parse error: "
-    $S0 .= message
-    $S0 .= " at offset "
-    $I0 = lex["pos"]
-    $S1 = $I0
-    $S0 .= $S1
-    $S0 .= " (found <<"
-    $S1 = substr pattern, $I0, 1
-    $S0 .= $S1
-    $S0 .= ">>)\n"
-    $P0["_message"] = $S0
-    throw $P0
-.end
-
-=item C<glob_parse_alt(STR pattern, PMC lex)>
-
-Parse alternations of the form {a,b,c} where a,b, and c are the alternatives.
-
-=cut
-
-.sub "glob_parse_alt"
-    .param string pattern
-    .param pmc lex
-    .local pmc exp
-
-    $I0 = lex['pos']
-    $S0 = substr pattern, $I0, 1
-    if $S0 != '{' goto alt_err1
-    inc $I0
-    lex['pos'] = $I0
-    exp = "glob_parse_literallist"(pattern,lex)
-    $I0 = lex['pos']
-    $S0 = substr pattern, $I0, 1
-    if $S0 != '}' goto alt_err2
-    inc $I0
-    lex['pos'] = $I0
-    goto alt_end
-
-  alt_err1:
-    "glob_error"(pattern,lex,"Expected '{'")
-    goto alt_end
-
-  alt_err2:
-    "glob_error"(pattern,lex,"Expected '}'")
-
-  alt_end:
-    .return (exp)
-.end
-
-.sub "glob_parse_literallist"
-    .param string pattern
-    .param pmc lex
-    .local pmc exp
-    .local pmc exp1
-    .local pmc exp2
-    .local string c
-
-    exp1 = "glob_parse_literal"(pattern,lex)
-    $I0 = lex['pos']
-    $S0 = substr pattern, $I0, 1
-    if $S0 != ',' goto lit_end
-    inc $I0
-    lex['pos'] = $I0
-    exp2 = "glob_parse_literallist"(pattern,lex)
-    exp =  "new"(pattern, "PGE::Exp::Alt", exp1, exp2)
+  analyze:
+    .local pmc exp, pad
+    exp = new 'PGE::Exp::Concat'
+    $P0 = new 'PGE::Exp::Anchor'
+    $P0.set_value('^')
+    exp[0] = $P0
+    $P0 = match['expr']
+    exp[1] = $P0
+    $P0 = new 'PGE::Exp::Anchor'
+    $P0.set_value('$')
+    exp[2] = $P0
+    if target != 'exp' goto pir
     .return (exp)
 
-  lit_end:
-    .return (exp1)
-.end
-
-.sub "glob_parse_literal"		# literal strings
-    .param string pattern
-    .param pmc lex
-    .local pmc exp
-    .local string c
-    .local string lit
-
-    lit = ''
-    $I0 = lex['pos']
-    $I1 = lex['plen']
-  next_char:
-    unless $I0 < $I1 goto lit_end
-    c = substr pattern, $I0, 1
-    if c == "\\" goto backslash
-    $I2 = index STOPCHARS, c
-    if $I2 >= 0 goto lit_end
-    inc $I0
-    concat lit,c
-    goto next_char
-  backslash:
-    inc $I0
-    c = substr pattern, $I0, 1
-    inc $I0
-    concat lit, c
-    goto next_char
-  lit_end:
-    lex['pos'] = $I0
-    exp = "new"(pattern, "PGE::Exp::Literal")
-    exp["value"] = lit
-    .return (exp)
-.end
-
-.sub "glob_parse_cc"			# character classes
-    .param string pattern
-    .param pmc lex
-    .local int pos, plen
-    .local string charclass, range
-    .local pmc exp
-    pos = lex["pos"]
-    plen = lex["plen"]
-    charclass = ""
-    exp = "new"(pattern, "PGE::Exp::EnumCharList")
-    $S0 = substr pattern, pos, 1
-    if $S0 == "!" goto negate
-    if $S0 == "^" goto negate
-    exp["isnegated"] = 0
-    goto first_bracket
-  negate:
-    exp["isnegated"] = 1
-    inc pos
-  first_bracket:
-    $S0 = substr pattern, pos, 1
-    if $S0 == "]" goto add_char
-    if $S0 == "-" goto add_char
-  scan:
-    if pos > plen goto no_close_err
-    $S0 = substr pattern, pos, 1
-    if $S0 == "]" goto end_class
-    if $S0 == "-" goto add_hyphen
-  add_char:
-    concat charclass, $S0
-    inc pos
-    goto scan
-  add_hyphen:
-    $I0 = pos + 1
-    $S1 = substr pattern, $I0, 1
-    if $S1 == "]" goto add_char
-    pos += 2
-    $I1 = ord $S1
-    $I2 = ord charclass, -1
-  add_range:
-    inc $I2
-    if $I2 > $I1 goto scan
-    $S1 = chr $I2
-    concat charclass, $S1
-    goto add_range
-  no_close_err:
-    "glob_error"(pattern, lex, "Missing close ']' of character class")
-  end_class:
-    inc pos
-    lex["pos"] = pos
-    exp["value"] = charclass
-  end:
-    .return (exp)
-.end  
-
-.sub "glob_parse_expr"
-    .param string pattern
-    .param pmc lex
-    .local pmc exp
-    .local pmc exp2
-
-    $I0 = lex['pos']
-    $I1 = lex['plen']
-    $S0 = substr pattern, $I0, 1
-    if $S0 == '?' goto dot
-    if $S0 == '*' goto star
-    if $S0 == '[' goto cc
-    if $S0 == '{' goto alt
-    exp = "glob_parse_literal"(pattern,lex)
-    goto next
-
-  dot:
-    inc $I0
-    lex['pos'] = $I0
-    exp = "new"(pattern, "PGE::Exp::CCShortcut")
-    exp["value"] = "."
-    goto next
-
-  star:
-    inc $I0
-    lex['pos'] = $I0
-    exp = "new"(pattern, "PGE::Exp::CCShortcut")
-    exp["value"] = "."
-    exp["min"] = 0
-    exp["max"] = GLOB_INF
-    exp["islazy"] = 0
-    exp["isquant"] = 1
-    goto next
-
-  cc:
-    inc $I0
-    lex['pos'] = $I0
-    exp = "glob_parse_cc"(pattern,lex)
-    goto next
-
-  alt:
-    exp = "glob_parse_alt"(pattern,lex)
-    goto next
-
-  next:
-    $I0 = lex['pos']
-    unless $I0 < $I1 goto expr_end
-    $P2 = "glob_parse_expr"(pattern,lex)
-    exp = "new"(pattern, "PGE::Exp::Concat", exp, $P2)
-
-  expr_end:
-    .return (exp)
-.end
-
-.namespace [ "PGE" ]
-
-.sub "glob"
-    .param string pattern
-    .local pmc lex
-    .local pmc exp
+  pir:
     .local pmc code
-    .local pmc glob
-    .local pmc aexp
+    code = exp.'root_pir'()
+    if target != 'PIR' goto bytecode
+    .return (code)
 
-    lex = new .Hash
-    lex["pos"] = 0
-    $I0 = length pattern
-    lex["plen"] = $I0
-    $P0 = find_global "PGE::Glob", "glob_parse_expr"
-    exp = $P0(pattern,lex)
-
-    $P1 = find_global "PGE::Glob", "new"
-
-    aexp = $P1(pattern, "PGE::Exp::Anchor")
-    aexp["value"] = "^"
-    exp = $P1(pattern, "PGE::Exp::Concat", aexp, exp)
-
-    aexp = $P1(pattern, "PGE::Exp::Anchor")
-    aexp["value"] = "$"
-    exp = $P1(pattern, "PGE::Exp::Concat", exp, aexp)
-
-    $P2 = $P1(pattern, "PGE::Exp")
-    $P2["expr"] = exp
-
-    code = $P2."as_pir"("_pge_rule")
-
-    compreg $P0, "PIR"
-    $S0 = code
-
-    glob = $P0($S0)
-    .return (glob, code, $P2)
+  bytecode:
+    $P0 = compreg 'PIR'
+    $P1 = $P0(code)
+    .return ($P1)
 .end
+
+
+.sub '__onload' :load
+    .local pmc optable
+    optable = new 'PGE::OPTable'
+    store_global '$optable', optable
+
+    $P0 = find_global 'glob_literal'
+    optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+
+    $P0 = find_global 'glob_quest'
+    optable.newtok('term:?', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
+    $P0 = find_global 'glob_star'
+    optable.newtok('term:*', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
+    $P0 = find_global 'glob_enum'
+    optable.newtok('term:[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
+    $P0 = find_global 'glob_alt'
+    optable.newtok('term:{', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
+    optable.newtok('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
+
+    $P0 = find_global 'compile_glob'
+    compreg 'PGE::Glob', $P0
+    .return ()
+.end
+
+
+=item C<glob(PMC mob, PMC adverbs :slurpy :named)>
+
+Parses a glob expression, returning the corresponding
+parse C<PGE::Match> object.   This is installed as a
+C<< <glob> >> subrule in C<PGE::Regex>, so one can call
+it from another regex in order to parse a valid glob
+expression.
+
+=cut
+
+.namespace [ 'PGE::Regex' ]
+
+.const int GLOB_INF = 2147483647 
+
+.sub 'glob'
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
+    .local pmc optable, match
+    optable = find_global 'PGE::Glob', '$optable'
+    match = optable.'parse'(mob)
+    .return (match)
+.end
+
+
+.namespace [ 'PGE::Glob' ]
+
+.sub 'scan_literal'
+    .param string target
+    .param int pos
+    .param string delim
+
+    .local int lastpos
+    lastpos = length target
+    .local string literal
+    literal = ''
+  literal_loop:
+    if pos >= lastpos goto literal_end
+    $S0 = substr target, pos, 1
+    $I0 = index delim, $S0
+    if $I0 >= 0 goto literal_end
+    if $S0 != '\' goto literal_add
+    inc pos
+    $S0 = substr target, pos, 1
+  literal_add:
+    literal .= $S0
+    inc pos
+    goto literal_loop
+  literal_end:
+    .return (literal, pos)
+.end
+
+
+=item C<glob_literal(PMC mob, PMC adverbs)>
+
+Scan a literal from a string, stopping at any metacharacters such
+as C<*> or C<[>.  Return the matched portion, with the C<value>
+set to the decoded literal.
+
+=cut
+
+.sub 'glob_literal'
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos
+    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::Literal')
+    pos = mfrom
+    ($S0, $I0) = 'scan_literal'(target, mfrom, '*?[{')
+    if $I0 <= pos goto end
+    mpos = $I0
+    mob.set_value($S0)
+  end:
+    .return (mob)
+.end
+
+
+=item C<glob_quest(PMC mob, PMC adverbs)>
+
+Process a C<?> wildcard character in a glob.  For this we just
+return a CCShortcut that is set to '.'
+
+=cut
+
+.sub 'glob_quest'
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+    .local pmc mtarget, mfrom, mpos
+    ##   The '?' is already in mob['KEY'], so we don't need to find it here.
+    (mob, mtarget, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::CCShortcut')
+    assign mpos, mfrom
+    mob.set_value('.')
+    .return (mob)
+.end
+
+
+=item C<glob_star(PMC mob, PMC adverbs)>
+
+Process a C<*> wildcard character in a glob.  This is a little
+bit more complex, as we have to return a quantified '.'.
+
+=cut
+
+.sub 'glob_star'
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+    .local pmc mtarget, mfrom, mpos
+    ##   The '*' is already in mob['KEY'], so we don't need to find it here.
+    ##   We create a Quant object, then a CCShortcut inside of it.
+    (mob, mtarget, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::Quant')
+    assign mpos, mfrom
+    mob['min'] = 0
+    mob['max'] = GLOB_INF
+    ($P0, $P1, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::CCShortcut')
+    assign $P3, $P2
+    $P0.set_value('.')
+    mob[0] = $P0
+    .return (mob)
+.end
+
+=item C<glob_enum(PMC mob, PMC adverbs)>
+
+Parse an enumerated character list, such as [abcd],
+[!abcd], and [^0-9].
+
+=cut
+
+.sub glob_enum
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
+    .local string target
+    .local pmc mfrom, mpos
+    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::EnumCharList')
+
+    .local int pos, lastpos
+    pos = mfrom
+    lastpos = length target
+    $S0 = substr target, pos, 1
+    if $S0 == '!' goto negate
+    if $S0 == '^' goto negate
+    mob['isnegated'] = 0
+    goto firstchar
+  negate:
+    mob['isnegated'] = 1
+    inc pos
+  firstchar:
+    .local string charlist
+    charlist = ''
+    $S0 = substr target, pos, 1
+    if $S0 == '-' goto addfirst
+    if $S0 == ']' goto addfirst
+    goto scan_loop
+  addfirst:
+    charlist .= $S0
+    inc pos
+  scan_loop:
+    ($S0, pos) = 'scan_literal'(target, pos, '-]')
+    if pos >= lastpos goto err_noclose
+    charlist .= $S0
+    $S0 = substr target, pos, 1
+    if $S0 == ']' goto scan_end
+    inc pos
+    $S0 = substr target, pos, 1
+    if $S0 == ']' goto scan_endhyphen
+    inc pos
+    $I1 = ord $S0
+    $I0 = ord charlist, -1
+  add_range:
+    if $I0 > $I1 goto scan_loop
+    $S1 = chr $I0
+    charlist .= $S1
+    inc $I0
+    goto add_range
+  scan_endhyphen:
+    charlist .= '-'
+  scan_end:
+    inc pos
+    mpos = pos
+    mob.set_value(charlist)
+    .return (mob)
+
+  err_noclose:
+    mpos = -1
+    .return (mob)
+.end
+
+=item C<glob_alt(PMC mob, PMC adverbs)>
+
+Parse an enumerated character list, such as [abcd],
+[!abcd], and [^0-9].
+
+=cut
+
+.sub glob_alt
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
+    .local string target
+    .local int pos, lastpos
+    (mob, target, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::Literal')
+    pos = $P2
+    lastpos = length target
+
+    ($S0, pos) = 'scan_literal'(target, pos, ',}')
+    mob.set_value($S0)
+    $P3 = pos
+  alt_loop:
+    if pos >= lastpos goto err_noclose
+    $S0 = substr target, pos, 1
+    if $S0 == '}' goto end
+    ($P0, $P1, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::Alt')
+    inc pos
+    $P3 = pos
+    $P0[0] = mob
+    mob = $P0
+    ($P0, $P1, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::Literal')
+    ($S0, pos) = 'scan_literal'(target, pos, ',}')
+    $P3 = pos
+    $P0.set_value($S0)
+    mob[1] = $P0
+    goto alt_loop
+  end:
+    inc pos
+    $P3 = mob.to()
+    $P3 = pos
+    .return (mob)
+
+  err_noclose:
+    $P3 = mob.to()
+    $P3 = -1
+    .return (mob)
+.end
+
 
 =back
 
 =head1 AUTHOR
 
- Jonathan Scott Duff
- duff@pobox.com
-
- Character class support added by Patrick R. Michaud (pmichaud@pobox.com)
+PGE::Glob was originally authored by Jonathan Scott Duff (duff@pobox.com),
+It has been updated for later versions of PGE by Patrick R. Michaud
+(pmichaud@pobox.com).
 
 =cut

@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use lib qw( t . lib ../../../../lib );
+use lib qw( t . lib ../../lib ../../../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
@@ -19,7 +19,7 @@ t/compilers/pge/p5regexp/p5rx.t - Perl 5 Regular Expression tests
 =head1 DESCRIPTION
 
 These tests are ripped from the Perl 5.9.2 distribution. The test harness
-has been modified to feed them to PGE's P5Regexp compiler. The tests are
+has been modified to feed them to PGE's P5Regex compiler. The tests are
 in a separate file in the same directory, named 're_tests'.
 
 This test harness honors a special environment variable called C<TEST_P5RX>.
@@ -190,7 +190,7 @@ sub p5rx_template
 	load_bytecode "PGE.pbc"
 	load_bytecode "PGE/Dumper.pir"
 	load_bytecode "PGE/Text.pir"
-	p5rx_compile = compreg "PGE::P5Regexp"
+	p5rx_compile = compreg "PGE::P5Regex"
 
 	.local string target
 	.local string pattern

@@ -103,6 +103,10 @@ p6rule_like('   abc def ghi', ':w (\w+) $<foo>:=(\w+) (\w+)',
 p6rule_like('   abc def ghi', ':w (\w+) $<foo>:=(\w+) (\w+)',
             qr/mob 1: <ghi @ 11>/, 'mixing named and unnamed capture');
 
+p6rule_like('   abc def ghi', '<alpha> [ - <alpha> ]?',
+            qr/mob<alpha> 0: <a @ 3>/, 
+            'multiple subrule captures in same scope');
+
 p6rule_is  ('bookkeeper', '[(.)$0]+', 'backreference');
 p6rule_like('bookkeeper', '[(.)$0]+', 
             qr/mob 0 0: <o @ 1>/, 'backref $1');
@@ -121,4 +125,4 @@ p6rule_like('123x', '(.)*x',
 ## of the same subrule, Aliasing, Capturing from repeated matches
 
 # remember to change the number of tests :-)
-BEGIN { plan tests => 44; }
+BEGIN { plan tests => 45; }

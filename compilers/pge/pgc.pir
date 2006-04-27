@@ -41,48 +41,52 @@ the output to the correct output file.
 
 =cut
 
-.namespace [ 'PGE::PGC' ]
+.namespace [ 'PGE::P6Grammar' ]
 
 .include "stat.pasm"
 
 .sub 'main' :main
     .param pmc args
-    'pgc_init'()
+    load_bytecode 'Getopt/Obj.pbc'
+    load_bytecode 'dumper.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
+    '__onload'()
 
-    ## create an option parser
+    ##   create an option parser
     .local pmc getopts
     getopts = new 'Getopt::Obj'
     getopts.'notOptStop'(1)
 
-    ## configure with cmdline options
+    ##   configure with cmdline options
     push getopts, 'output|o=s'
     push getopts, 'encoding|e=s'
+    push getopts, 'target=s'
     push getopts, 'help'
 
-    ## process cmdline options
+    ##   process cmdline options
     .local pmc arg0, opts
     arg0 = shift args
     opts = getopts.'get_options'(args)
     $I0 = elements args
     if $I0 < 1 goto usage
 
-    ## produce a help message for --help
+    ##   produce a help message for --help
     .local string help
     help = opts['help']
     if help goto usage
 
-    ## get the encoding used to read the input file(s)
+    ##   get the encoding used to read the input file(s)
     .local string encoding
     encoding = opts['encoding']
 
-    ## get the output file
+    ##   get the output file
     .local string outfile
     outfile = opts['output']
     if outfile > '' goto read_files
     outfile = '-'
 
   read_files:
-    ## read the input files into C<code>
+    ##   read the input files into C<code>
     .local pmc iter, infh
     .local string code, infile
     code = ''
@@ -103,88 +107,20 @@ the output to the correct output file.
     goto read_loop
   read_end:
 
-    ## parse the grammar into statements
-    .local pmc p6rule, stmts
-    p6rule = compreg "PGE::P6Rule"
-    $P1 = p6rule('^<PGE::PGC::grammar> [ $ | <PGE::Util::die: Syntax error> ]')
-    stmts = $P1(code)
-    stmts = stmts['PGE::PGC::grammar']
-    stmts = stmts[0]
+    .local pmc out
+    $P1 = compreg 'PGE::P6Grammar'
+    out = $P1(code)
 
-    ## iterate through each statement and
-    ## call the appropriate "_stmt" sub to generate
-    ## its pir into nsptable
-    .local pmc iter, stmt, namespace, nsptable
-    namespace = new .String
-    nsptable = new .Hash
-    $P0 = new .Hash
-    nsptable[''] = $P0
-    $P1 = new 'PGE::CodeString'
-    $P0['onload'] = $P1
-    $P1 = new 'PGE::CodeString'
-    $P0['rulepir'] = $P1
-
-    iter = new .Iterator, stmts
-    iter = 0
-  stmt_loop:
-    unless iter goto stmt_end
-    stmt = shift iter
-    $S0 = stmt['cmd']
-    concat $S0, '_stmt'
-    $P0 = find_name $S0
-    $P0(stmt, namespace, nsptable)
-    goto stmt_loop
-  stmt_end:
-
-    ## loop through nsptable and generate any onload
-    ## code needed, as well as relevant rules
-    .local pmc onload, rulepir
-    .local int nspcount
-    onload = new 'PGE::CodeString'
-    rulepir = new 'PGE::CodeString'
-    iter = new .Iterator, nsptable
-    iter = 0
-    nspcount = 0
-  nsptable_loop:
-    unless iter goto nsptable_end
-    inc nspcount
-    namespace = shift iter
-    if namespace == 'PGE::Rule' goto nsptable_optable
-    if namespace == '' goto nsptable_optable
-    onload.emit("\n    ## namespace %0", namespace)
-    onload.emit("    $I0 = find_type '%0'", namespace)
-    onload.emit("    if $I0 != 0 goto onload_%0", nspcount)
-    onload.emit("    $P0 = getclass 'PGE::Rule'")
-    onload.emit("    $P0 = subclass $P0, '%0'", namespace)
-    onload.emit("  onload_%0:", nspcount)
-  nsptable_optable:
-    $P0 = iter[namespace]
-    $P1 = $P0['optable']
-    if $P1 == '' goto nsptable_rule
-    onload.emit("    optable = new 'PGE::OPTable'")
-    onload.emit("    store_global '%0', '$optable', optable", namespace)
-    onload .= $P1
-  nsptable_rule:
-    $P1 = $P0['rulepir']
-    rulepir .= $P1
-    goto nsptable_loop
-  nsptable_end:
-
+    if out == '' goto end
     ## open the output file, output resulting PIR
     .local pmc outfh
     outfh = getstdout
-    if outfile == '-' goto output_onload
+    if outfile == '-' goto print_out
     outfh = open outfile, '>'
     unless outfh goto err_no_outfile
 
-  output_onload:
-    if onload == '' goto output_rulepir
-    print outfh, ".sub '__onload' :load\n"
-    print outfh, "    .local pmc optable\n"
-    print outfh, onload
-    print outfh, "    .return ()\n.end\n"
-  output_rulepir:
-    print outfh, rulepir
+  print_out:
+    print outfh, out
     close outfh
     goto end
 
@@ -212,158 +148,219 @@ OPTIONS
     exit 1
 
   end:
-    .return () 
+    .return ()
 .end
 
 
-=item C<pgc_init()>
-
-Initializes the parser grammar compiler.  Loads the
-needed libraries and creates the custom classes and
-rules needed to parse the input.
-
-=cut
-
-.sub 'pgc_init'
+.sub '__onload' :load
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Util.pir'
-    load_bytecode 'Getopt/Obj.pbc'
+    load_bytecode 'PGE/Text.pbc'
+    load_bytecode 'PGE/Util.pbc'
 
-    .local pmc p6rule
+    .local pmc p6regex
+    p6regex = compreg 'PGE::P6Regex'
 
-    # first, let's create the PGC class
-    $P0 = getclass 'PGE::Rule'
-    $P0 = subclass $P0, 'PGE::PGC'
+    $S0 = "<?ident> [ \:\: <?ident> ]*"
+    p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'name')
 
-    # get the p6rule compiler from PGE
-    p6rule = compreg 'PGE::P6Rule'
-
-    ## let's load up some parsing rules
-    ## first, a custom <?ws> rule  (PGE::PGC::ws)
     $S0 = '[ \# \N+ | \s+ ]* :::'
-    p6rule($S0, 'PGE::PGC', 'ws')
+    p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'ws')
 
-    ## a rule for matching arguments (PGE::PGC::arg)
-    $S0 = <<'END_ARG_RULE'
-           ' (<-[']>*:) '
-        |  " (<-["]>*:) "
-        | \( (<-[)]>*:) \)
-        | \< (<-[>]>*:) \>
-        | (\S+)
-END_ARG_RULE
-    p6rule($S0, 'PGE::PGC', 'arg')
+   $S0 = <<'      END_ARG_RULE'
+         ' (<-[']>*:) '
+      |  " (<-["]>*:) "
+      | \( (<-[)]>*:) \)
+      | \< (<-[>]>*:) \>
+      | (\S+)
+      END_ARG_RULE
+    p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'arg')
 
-    ## the main rule for parsing a grammar
-    $S0 = <<'END_GRAMMAR'
-:w ( $<cmd>:=(grammar) 
-         [ $<name>:=<arg> | <PGE::Util::die: name expected after 'grammar'> ] 
-         ;?
-   | $<cmd>:=(rule) 
-         [ $<name>:=<arg> | <PGE::Util::die: name expected after 'rule'> ] 
-         [ \{ <p6rule> \} | <PGE::Util::die: missing rule body> ]
-   | [multi]? $<cmd>:=(sub|proto) 
-         [ $<name>:=<arg> | <PGE::Util::die: name expected after 'proto/sub'> ] 
-         ( is $<trait>:=[\w+]<arg>? )*
-         [ \{ <-[}]>*: \} | ; | <PGE::Util::die: missing proto/sub body> ]
-   )*
-END_GRAMMAR
-    p6rule($S0, 'PGE::PGC', 'grammar')
+    $S0 = <<'      STMT_PARSE'
+        $<cmd>:=(grammar) $<name>:=<arg> ;?
+      | $<cmd>:=(regex|token|rule) 
+          $<name>:=<arg>
+          \{ <regex> \}
+      | [multi]? $<cmd>:=(proto)
+          $<name>:=<arg>
+          ( is $<trait>:=[\w+]<arg>? )*
+          [ \{ <-[}]>*: \} | ; | <PGE::Util::die: missing proto/sub body> ]
+      | [$|<PGE::Util::die: unrecognized statement>]
+      STMT_PARSE
+    $P0 = p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'statement', 'w'=>1)
+
+    $P0 = find_global 'compile_p6grammar'
+    compreg 'PGE::P6Grammar', $P0
 .end
 
 
-=item C<grammar_stmt(PMC stmt, PMC namespace, PMC nsptable)>
+.sub 'compile_p6grammar'
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
 
-Processes a "grammar" statement.  Essentially this just
-sets the value of C<namespace> and creates a new entry 
-in C<nsptable> if needed.
+    .local pmc nstable, namespace
+    nstable = new .Hash
+    namespace = new .String
+    $P0 = new .Hash
+    $P1 = new 'PGE::CodeString'
+    $P0['optable'] = $P1
+    $P1 = new 'PGE::CodeString'
+    $P0['rule'] = $P1
+    nstable[''] = $P0
 
-=cut
+    # get our initial match object
+    .local pmc match 
+    $P0 = find_global 'PGE::Match', 'newfrom'
+    match = $P0(source, 0, 'PGE::P6Grammar')
+
+    .local pmc stmtrule
+    stmtrule = find_global 'statement'
+
+  stmt_loop:
+    match = stmtrule(match)
+    unless match goto stmt_end
+    unless match > '' goto stmt_end
+    $S0 = match['cmd']
+    concat $S0, '_stmt'
+    $P0 = find_name $S0
+    $P0(match, namespace, nstable)
+    goto stmt_loop
+  stmt_end:
+
+    .local pmc initpir, rulepir, iter, ns
+    .local string namespace
+    initpir = new 'PGE::CodeString'
+    rulepir = new 'PGE::CodeString'
+    iter = new .Iterator, nstable
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    namespace = shift iter
+    ns = iter[namespace]
+    $P0 = ns['rule']
+    rulepir .= $P0
+    if namespace == 'PGE::Regex' goto ns_optable
+    if namespace == '' goto ns_optable
+    $S0 = initpir.unique('onload_')
+    initpir.emit(<<'        CODE', namespace, $S0)
+          ## namespace %0
+          $I0 = find_type '%0'
+          if $I0 != 0 goto %1
+          $P0 = subclass 'PGE::Regex', '%0'
+        %1:
+        CODE
+  ns_optable:
+    $P0 = ns['optable']
+    if $P0 == '' goto iter_loop
+    initpir.emit("          optable = new 'PGE::OPTable'")
+    initpir.emit("          store_global '%0', '$optable', optable", namespace)
+    initpir .= $P0
+    goto iter_loop
+  iter_end:
+
+    .local pmc out
+    out = new 'PGE::CodeString'
+    if initpir == '' goto out_rule
+    out.emit("      .sub '__onload' :load")
+    out.emit("          .local pmc optable")
+    out .= initpir
+    out.emit("          .return ()")
+    out.emit("      .end")
+  out_rule:
+    out .= rulepir
+    .return (out)
+.end
+
 
 .sub 'grammar_stmt'
-    .param pmc stmt                                # grammar statment
-    .param pmc namespace                           # current namespace
-    .param pmc nsptable                            # nsptable
+    .param pmc stmt
+    .param pmc namespace
+    .param pmc nstable
 
+    ##   get the grammar name
     .local string name
     $P0 = stmt['name']
     name = $P0[0]
 
-    ## remove any trailing ';'
+    ##   remove any trailing semicolon
     $S0 = substr name, -1
     if $S0 != ';' goto grammar_1
     chopn name, 1
 
   grammar_1:
+    ##   set the new namespace, and create any nstable entries
+    ##   if needed.
     assign namespace, name
-    $I0 = exists nsptable[name]
+    name = clone name
+    $I0 = exists nstable[name]
     if $I0 goto end
     $P0 = new .Hash
-    $S0 = namespace
-    $S0 = clone $S0
-    nsptable[$S0] = $P0
     $P1 = new 'PGE::CodeString'
     $P0['optable'] = $P1
     $P1 = new 'PGE::CodeString'
-    $P0['rulepir'] = $P1
+    $P0['rule'] = $P1
+    nstable[name] = $P0
+
   end:
+    .return ()
 .end
+   
+.sub 'regex_stmt'
+    .param pmc stmt
+    .param pmc namespace
+    .param pmc nstable
 
+    ##   get the regex name
+    .local string name
+    $P0 = stmt['name']
+    name = $P0[0]
 
-=item C<rule_stmt(PMC stmt, PMC namespace, PMC nsptable)>
+    ##   compile the rule to pir
+    .local pmc p6regex, regex, rulepir
+    p6regex = compreg 'PGE::P6Regex'
+    regex = stmt['regex']
 
-Processes a (perl 6) 'rule' statement.  This compiles the rule
-into PIR, and appends that PIR to the current namespace's
-"rulepir" entry.
+    rulepir = p6regex(regex, 'grammar'=>namespace, 'name'=>name, 'target'=>'PIR')
 
-=cut
+    ##   add to set of rules
+    .local pmc code
+    $P0 = nstable[namespace]
+    code = $P0['rule']
+    code.emit("\n## <%0::%1>\n", namespace, name)
+    code .= rulepir
+    .return ()
+.end
 
 .sub 'rule_stmt'
-    .param pmc stmt                                # grammar statment
-    .param pmc namespace                           # current namespace
-    .param pmc nsptable                            # nsptable
-
-    .local string name
-    $P0 = stmt['name']
-    name = $P0[0]
-
-    .local pmc p6rule, rule
-    p6rule = compreg "PGE::P6Rule"
-    rule = stmt['p6rule']
-    ($P0, $P1) = p6rule(rule, namespace, name)
-    $P0 = nsptable[namespace]
-    $P0 = $P0['rulepir']
-    $P0.emit("\n## <%0::%1>", namespace, name)
-    $P0 .= $P1
+    .param pmc stmt
+    .param pmc namespace
+    .param pmc nstable
+    .return 'regex_stmt'(stmt, namespace, nstable)
 .end
 
 
-=item C<sub_stmt(PMC stmt, PMC namespace, PMC nsptable)>
-
-Processes a "sub" or "multi sub" statement for the operator
-precedence parser.  Analyzes the sub for appropriate traits,
-and appends an "optable.newtok" call to the current namespace's
-"onload" entry.
-
-=cut
-
-.sub 'sub_stmt'
-    .param pmc stmt                                # grammar statment
-    .param pmc namespace                           # current namespace
-    .param pmc nsptable                            # nsptable
+.sub 'proto_stmt'
+    .param pmc stmt
+    .param pmc namespace
+    .param pmc nstable
 
     .local string name
     $P0 = stmt['name']
     name = $P0[0]
 
-    .local pmc initcode, traits, iter, t
+    .local pmc optable
+    $P0 = nstable[namespace]
+    optable = $P0['optable']
+
+    ##   build the list of traits
+    .local pmc iter
     .local string traitlist
-    initcode = new 'PGE::CodeString'
+    $P0 = stmt[0]
+    iter = new .Iterator, $P0
     traitlist = ''
-    traits = stmt[0]
-    iter = new .Iterator, traits
     iter = 0
   trait_loop:
     unless iter goto trait_end
+    .local pmc t
     t = shift iter
     .local string trait, arg
     trait = t['trait']
@@ -373,11 +370,12 @@ and appends an "optable.newtok" call to the current namespace's
     arg = $P0[0]
     if trait != 'parsed' goto trait_arg
   trait_parsed:
+    ##   handle "is parsed" specially by removing any '&'
     $S0 = substr arg, 0, 1
     if $S0 != '&' goto trait_parsed_1
     arg = substr arg, 1
   trait_parsed_1:
-    initcode.emit("    $P0 = find_global '%0', '%1'", namespace, arg)
+    optable.emit("          $P0 = find_global '%0', '%1'", namespace, arg)
     arg = '$P0'
   trait_arg:
     if arg > '' goto trait_arg_2
@@ -390,16 +388,6 @@ and appends an "optable.newtok" call to the current namespace's
     concat traitlist, arg
     goto trait_loop
   trait_end:
-    initcode.emit("    optable.newtok('%0'%1)", name, traitlist)
-
-    $P0 = nsptable[namespace]
-    $P0 = $P0['optable']
-    $P0 .= initcode
-.end
-
-.sub 'proto_stmt'
-    .param pmc stmt                                # grammar statment
-    .param pmc namespace                           # current namespace
-    .param pmc nsptable                            # nsptable
-    .return sub_stmt(stmt, namespace, nsptable)
+    optable.emit("          optable.newtok('%0'%1)", name, traitlist)
+  .return ()
 .end

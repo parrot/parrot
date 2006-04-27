@@ -6,7 +6,7 @@
 	.local pmc pge_rule_class
 	.local pmc pheme_grammar_class
 
-	pge_rule_class      = getclass 'PGE::Rule'
+	pge_rule_class      = getclass 'PGE::Regex'
 	pheme_grammar_class = subclass pge_rule_class, 'PhemeGrammar'
 .end
 

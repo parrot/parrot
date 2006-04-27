@@ -152,7 +152,7 @@ PGE::OPTable - PGE operator precedence table and parser
     if $I0 goto end
     tokentable[name] = token
 
-    ## don't process undef syntactic categories -- just store
+    ##   don't process undef syntactic categories -- just store
     if mode == 0 goto end
 
     $S0 = args['match']
@@ -264,10 +264,9 @@ PGE::OPTable - PGE operator precedence table and parser
 .end
     
 
-.sub "parse" :method
+.sub 'parse' :method
     .param pmc mob
-    .param pmc stoptoken       :optional
-    .param int has_stoptoken   :opt_flag
+    .param pmc adverbs         :slurpy :named
     .local pmc tokentable, keytable, klentable
     .local pmc tokenstack, operstack, termstack
     .local pmc newfrom
@@ -281,10 +280,27 @@ PGE::OPTable - PGE operator precedence table and parser
     .local pmc iter
     .local int tokenmode, topmode
     .local int tokencat, topcat
-    .local int arity
     .local int lastcat
-    .local int circumnest 
+    .local int circumnest
 
+    ##   see if we have a 'stop' adverb.  If so, then it is either
+    ##   a string to be matched directly or a sub(rule) to be called 
+    ##   to check for a match.
+    .local int has_stop
+    .local string stop_str
+    .local pmc stop
+    has_stop = 0
+    if null adverbs goto parse_1
+    $I0 = exists adverbs['stop']
+    if $I0 == 0 goto parse_1
+    stop = adverbs['stop']
+    has_stop = -1
+    $I0 = isa stop, 'Sub'
+    if $I0 goto parse_1
+    stop_str = stop
+    has_stop = length stop_str
+    
+  parse_1:
     tokentable = self
     keytable = getattribute self, "PGE::OPTable\x0%!key"
     klentable = getattribute self, "PGE::OPTable\x0%!klen"
@@ -300,11 +316,6 @@ PGE::OPTable - PGE operator precedence table and parser
     lastcat = PGE_OPTABLE_EMPTY
     circumnest = 0
 
-    ## if an empty stoptoken was sent, pretend we didn't get one
-    if has_stoptoken == 0 goto expect_term
-    if stoptoken > '' goto expect_term
-    has_stoptoken = 0
-
   expect_term:
     expect = PGE_OPTABLE_EXPECT_TERM
     goto token_next
@@ -317,10 +328,12 @@ PGE::OPTable - PGE operator precedence table and parser
     expect = PGE_OPTABLE_EXPECT_OPER
 
   token_next:
-    ## Figure out what we're looking for
+    ##   figure out what we're looking for
+    ##   if we're at the end of the string, end match
     wspos = pos
     if pos >= lastpos goto oper_not_found
-    if_null ws, token_next_ws
+    ##   check for leading whitespace -- it may limit token candidates
+    if null ws goto token_next_ws
     mpos = pos
     $P0 = ws(mob)
     unless $P0 goto token_next_1
@@ -330,10 +343,27 @@ PGE::OPTable - PGE operator precedence table and parser
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
   token_next_1:
     nows = 0
-    if pos == wspos goto key_search
+    ##   "nows" tokens are eligible if we don't have leading ws
+    if pos == wspos goto check_stop
     nows = PGE_OPTABLE_NOWS
 
+  check_stop:
+    ##  Check for a stop pattern or string.  But don't check
+    ##  if we're in a circumfix.
+    if circumnest > 0 goto key_search
+    if has_stop == 0 goto key_search
+    if has_stop > 0 goto check_stop_str
+    mpos = pos
+    $P0 = stop(mob)
+    if $P0 goto end
+    goto key_search
+  check_stop_str:
+    $S0 = substr target, pos, has_stop
+    if $S0 == stop_str goto end
+
+  ## look through eligible tokens to find longest match
   key_search:
+    ##   use the next character of input stream to limit search
     key = substr target, pos, 1
     $I0 = klentable[key]
     key = substr target, pos, $I0
@@ -363,34 +393,33 @@ PGE::OPTable - PGE operator precedence table and parser
     goto key_loop
   token_nows:
     if pos == wspos goto oper_not_found
+    ##   try again, with the whitespace operators this time
     pos = wspos
     nows = 0
-    goto key_search
+    goto check_stop
 
   oper_not_found:
+    ##   we were unable to find a valid token for the current expect state
+    ##   if we're not expecting a term, then end the match here
     $I0 = expect & PGE_OPTABLE_EXPECT_TERM
     if $I0 == 0 goto end
+    ##   otherwise, let's add a "dummy" term to the stack for reduction
     (oper, $S0, $P0, $P1) = newfrom(mob, pos, "PGE::Match")
     push termstack, oper
+    ##   if the current operator doesn't allow nullterm, end match
     unless tokenstack goto end
     top = tokenstack[-1]
     topmode = top["mode"]
     $I0 = topmode & PGE_OPTABLE_NULLTERM
     if $I0 == 0 goto end
+    ##   it's a nullterm operator, so we can continue parsing
     $P1 = pos
     goto expect_oper
 
   oper_found:
-    ## if we're at a stop token, end the parse here
-    if circumnest > 0 goto oper_valid
-    if has_stoptoken == 0 goto oper_valid
-    $P0 = token['name']
-    if $P0 == stoptoken goto oper_not_found
-
-  oper_valid:
     tokenmode = token["mode"]
     tokencat = tokenmode & PGE_OPTABLE_SYNCAT
-    ## this hack handles prelist term followed by postcircumfix op
+    ##   this hack handles prelist term followed by postcircumfix op
     if lastcat != PGE_OPTABLE_PRELIST goto oper_found_1
     if tokencat != PGE_OPTABLE_POSTCIRCUMFIX goto oper_found_1
     $P0 = pop tokenstack
@@ -398,32 +427,30 @@ PGE::OPTable - PGE operator precedence table and parser
     push termstack, $P0
   oper_found_1:
     lastcat = tokencat
+    ##   the remainder of this section processes according to the
+    ##   table at the end of this function
     if tokencat == PGE_OPTABLE_TERM goto term_shift
     if tokencat == PGE_OPTABLE_PREFIX goto oper_shift          # (S1)
     if tokencat == PGE_OPTABLE_CIRCUMFIX goto oper_shift       # (S2)
 
-    ## Check that we already have a term
     $I0 = elements termstack                                 
     if $I0 > 0 goto shift_reduce
     if tokencat != PGE_OPTABLE_PRELIST goto end
 
   ## The shift/reduce loop
   shift_reduce:
-    ## If the token stack is empty, shift
     $I0 = elements tokenstack
     if $I0 > 0 goto shift_reduce_1
     if tokencat == PGE_OPTABLE_CLOSE goto end                  # (E3)
     topcat = PGE_OPTABLE_EMPTY
     goto oper_shift                                            # (S3)
   shift_reduce_1:
-    ## Compare with token at top of stack
     top = tokenstack[-1]
     topmode = top["mode"]
     topcat = topmode & PGE_OPTABLE_SYNCAT
     if topcat == PGE_OPTABLE_POSTFIX goto oper_reduce          # (R4)
     if tokencat == PGE_OPTABLE_CLOSE goto oper_close           # (R5, C5)
     if topcat >= PGE_OPTABLE_POSTCIRCUMFIX goto oper_shift     # (S6)
-    ## Check operator precedence
     $P0 = token['precedence']
     $P1 = top['prec_close']
     if $P0 > $P1 goto oper_shift                               # (P)
@@ -440,17 +467,23 @@ PGE::OPTable - PGE operator precedence table and parser
     goto shift_reduce
 
   oper_close:
+    ##   if the top operator isn't a circumfix, reduce it
+    ##   if the close token doesn't match circumfix close, end here
+    ##   else shift (fall-through)
     if topcat < PGE_OPTABLE_TERNARY goto oper_reduce           # (R5)
-    $S0 = top["keyclose"]
-    if key != $S0 goto end                                     # (C5)
+    $S0 = top['keyclose']
+    if key != $S0 goto end
+    dec circumnest
 
   oper_shift:
+    ##   shift operator onto the operator stack
     push tokenstack, token
     push operstack, oper
-    if tokencat < PGE_OPTABLE_POSTCIRCUMFIX goto oper_shift_1
-    inc circumnest
-  oper_shift_1:
     pos = oper.to()
+    ##   for circumfix ops, increase the circumfix nesting level
+    $I0 = isgt tokencat, PGE_OPTABLE_POSTCIRCUMFIX
+    circumnest += $I0
+    ##   choose next expect state based on current state
     if tokencat == PGE_OPTABLE_PRELIST goto expect_termpost
     if tokencat >= PGE_OPTABLE_PREFIX goto expect_term
     if tokencat == PGE_OPTABLE_POSTFIX goto expect_oper
@@ -465,13 +498,25 @@ PGE::OPTable - PGE operator precedence table and parser
   ## reduce top operation on stack
   reduce:
     $P0 = pop tokenstack
+    $P1 = pop operstack
     topmode = $P0["mode"]
     topcat = topmode & PGE_OPTABLE_SYNCAT
-    if topcat != PGE_OPTABLE_CLOSE goto reduce_1
+    if topcat == PGE_OPTABLE_CLOSE goto reduce_close
+    if topcat < PGE_OPTABLE_POSTCIRCUMFIX goto reduce_normal
+    ##   we have an unbalanced open, so error.  remove the
+    ##   incomplete circumfixed term, and for circumfix: opers 
+    ##   put a failed nullterm onto the termstack
+    wspos = -1
+    $P0 = pop termstack
+    if topcat != PGE_OPTABLE_CIRCUMFIX goto reduce_end
+    (oper, $S0, $P0, $P1) = newfrom(mob, pos, "PGE::Match")
+    push termstack, oper
+    goto reduce_end
+  reduce_close:
     $P0 = pop tokenstack
     $P1 = pop operstack
-  reduce_1:
-    $P1 = pop operstack
+  reduce_normal:
+    .local int arity
     topmode = $P0["mode"]
     arity = topmode & PGE_OPTABLE_ARITY
   reduce_args:
@@ -482,11 +527,12 @@ PGE::OPTable - PGE operator precedence table and parser
     $P1[arity] = $P2
     goto reduce_args
   reduce_backtrack:
-    wspos = $P1.from()
-    if arity > 0 goto reduce_end
+    wspos = -1
+    if arity > 0 goto end
     push termstack, $P2
     goto reduce_end
   reduce_list:
+    ##   combine matching list associative operations
     $I0 = topmode & PGE_OPTABLE_ASSOC
     if $I0 != PGE_OPTABLE_ASSOC_LIST goto reduce_saveterm
     $S1 = $P1['type']
@@ -499,9 +545,6 @@ PGE::OPTable - PGE operator precedence table and parser
   reduce_saveterm:
     push termstack, $P1
   reduce_end:
-    if topcat < PGE_OPTABLE_POSTCIRCUMFIX goto reduce_end_1
-    dec circumnest
-  reduce_end_1:
     ret
 
   token_match:
@@ -522,7 +565,14 @@ PGE::OPTable - PGE operator precedence table and parser
     goto token_match_success
   token_match_sub:
     $P0 = token['parsed']
+    $I0 = length key
+    $I0 += pos
+    mob['KEY'] = key
+    mpos = $I0
     oper = $P0(mob)
+    delete mob['KEY']
+    $P0 = oper.from()
+    $P0 = pos
   token_match_success:
     $P0 = token["name"]
     $P0 = clone $P0
@@ -537,15 +587,29 @@ PGE::OPTable - PGE operator precedence table and parser
     bsr reduce
     goto end
   end_1:
+    mpos = -1
+    ##   if the termstack is empty, fail the match
+    ##   if the term is an invalid term, fail the match
     $I0 = elements termstack
     if $I0 < 1 goto end_2
     $P0 = pop termstack
     unless $P0 goto end_2
     mob["expr"] = $P0
     mpos = wspos
-    .return (mob)
+    if wspos > 0 goto end_2
+    ##   somewhere we encountered an error that caused us to backtrack
+    ##   find the "real" ending position here
+  end_1a:
+    $I0 = $P0.to()
+    if $I0 <= wspos goto end_1b
+    wspos = $I0
+    mpos = $I0
+  end_1b:
+    $P0 = $P0[0]
+    if null $P0 goto end_2
+    $I0 = isa $P0, 'PGE::Match'
+    if $I0 goto end_1a
   end_2:
-    mpos = -1
     .return (mob)
 
   err_ternary:
@@ -554,6 +618,12 @@ PGE::OPTable - PGE operator precedence table and parser
 .end
 
 
+### Miscellaneous Notes
+#
+# Here's the shift-reduce table used by the C<parse> method.
+# The digits in the table map each state to the corresponding
+# statement in the C<parse> method above.
+#
 #  stack                               Current token
 #  -------    -----------------------------------------------------------------
 #             postfix  close  prefix  prelist  infix  ternary  postcir  circfix
@@ -566,4 +636,29 @@ PGE::OPTable - PGE operator precedence table and parser
 #  ternary      P/E     C5      S1      P/E     P/E     P/A      P/E      S2
 #  postcir      S6      C5      S1      S6      S6      S6       S6       S2
 #  circfix      S6      C5      S1      S6      S6      S6       S6       S2
-
+#
+#    Legend:
+#       S# = shift  -- push operator onto token stack
+#       R# = reduce -- pop operator from token stack, and fill it with
+#           the appropriate number of arguments (arity) from the term stack.
+#           Then put the operator token onto the term stack.  Reducing a
+#           close token requires popping two operators from the token
+#           stack.  Reducing a lone ternary operator is a parse error
+#           (its close token must be present).
+#       P = precedence -- compare the relative precedence of the top
+#           token in the token stack with the current token.
+#           If current is tighter than top, shift.
+#           If current is looser than top, reduce.
+#       P/A = precedence with associativity -- for tokens with equal
+#           precedence, use the associativity of the top token in the
+#           token stack, shift if it's right associative, reduce otherwise.
+#       P/E = higher precedence only -- shift if the current token has
+#           higher precedence than the top token on the stack, otherwise
+#           it's a parse error.
+#       C = close -- If the current token is an appropriate closing
+#           token for the top operator on the token stack, then shift.
+#           Otherwise, it's an unbalanced closing token.
+#       X = unreachable combination
+#       E = either the end of the parse, or a parse error (probably
+#           to be determined by the caller)
+#

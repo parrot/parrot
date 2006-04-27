@@ -4,34 +4,35 @@
 LN_S     = @lns@
 PERL     = @perl@
 RM_RF    = @rm_rf@
-PARROT   = ..@slash@..@slash@parrot@exe@
-TOOL_DIR = ..@slash@..
+PARROT   = ../../parrot@exe@
+TOOL_DIR = ../..
 CP       = @cp@
 
 # Where to put things
-PARROT_LIBRARY    = ..@slash@..@slash@runtime@slash@parrot@slash@library
+PARROT_LIBRARY    = ../../runtime/parrot/library
 
 # the default target
-all: $(PARROT_LIBRARY)@slash@PGE.pbc
+all: $(PARROT_LIBRARY)/PGE.pbc
 
 SOURCES = PGE.pir \
   PGE/CodeString.pir \
   PGE/Exp.pir \
   PGE/Match.pir \
-  PGE/Rule.pir \
-  PGE/P6Rule.pir \
+  PGE/Regex.pir \
+  PGE/P6Regex.pir \
   PGE/OPTable.pir \
-  PGE/P5Regexp.pir \
+  PGE/P5Regex.pir \
+  PGE/builtins.pg \
   pgc.pir \
-  library.pge
 
-$(PARROT_LIBRARY)@slash@PGE.pbc: PGE.pbc
+$(PARROT_LIBRARY)/PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
 PGE.pbc: $(PARROT) $(SOURCES)
-	$(PERL) -e "" >PGE/Library.pir
+	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)/PGE.pbc
+	$(PERL) -e "" >PGE/builtins_gen.pir
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
-	$(PARROT) pgc.pir  --output=PGE/Library.pir library.pge
+	$(PARROT) pgc.pir  --output=PGE/builtins_gen.pir PGE/builtins.pg
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
 
 # This is a listing of all targets, that are meant to be called by users
@@ -68,7 +69,7 @@ testclean:
 	$(RM_RF) "../../t/p6rules/*.pbc"
 
 clean: testclean
-	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)@slash@PGE.pbc PGE/Library.pir
+	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)/PGE.pbc PGE/builtins_gen.pir
 
 realclean: clean
 	$(RM_RF) Makefile

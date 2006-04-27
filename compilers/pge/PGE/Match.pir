@@ -8,18 +8,18 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 =cut
 
-.namespace [ "PGE::Match" ]
+.namespace [ 'PGE::Match' ]
 
-.sub "__onload" :load
+.sub '__onload' :load
     .local pmc base
-    $P0 = getclass "Hash"
-    base = subclass $P0, "PGE::Match"
-    addattribute base, "$.target"                  # target
-    addattribute base, "$.from"                    # start of match
-    addattribute base, "$.pos"                     # current match position
-    addattribute base, "&!corou"                   # match's corou
-    addattribute base, "@!capt"                    # subpattern captures
-    addattribute base, "$!value"                   # return value
+    base = subclass 'Hash', 'PGE::Match'
+    addattribute base, '$.target'                  # target
+    addattribute base, '$.from'                    # start of match
+    addattribute base, '$.pos'                     # current match position
+    addattribute base, '&!corou'                   # match's corou
+    addattribute base, '@!capt'                    # subpattern captures
+    addattribute base, '$!value'                   # return value
+
     .return ()
 .end
 
@@ -31,15 +31,15 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 Creates a new Match object, based on C<mob>.  If C<grammar> is
 specified then the newly created object is an instance of that class,
-otherwise if C<isa mob, "PGE::Match"> then the new object is the
-same class as C<mob>, otherwise the new object is a "PGE::Match"
+otherwise if C<isa mob, 'PGE::Match'> then the new object is the
+same class as C<mob>, otherwise the new object is a 'PGE::Match'
 object.  The optional C<from> parameter says how to initialize
 the C<$.from> attribute of the new object if it can't start from
 the current position of C<mob>.
 
 =cut
 
-.sub "newfrom"
+.sub 'newfrom'
     .param pmc mob
     .param int fromd           :optional           # default from for new
     .param int has_fromd       :opt_flag
@@ -48,30 +48,30 @@ the current position of C<mob>.
     .local pmc me, target, from, pos
 
   newfrom_1:
-    $I0 = isa mob, "PGE::Match"
+    $I0 = isa mob, 'PGE::Match'
     if $I0 goto newfrom_mob
     target = new .String
     assign target, mob
     from = new .Integer
     from = -1
     if has_grammar goto new_me
-    grammar = "PGE::Rule"
+    grammar = 'PGE::Match'
     goto new_me
   newfrom_mob:
     if has_grammar goto newfrom_2
     grammar = classname mob
   newfrom_2:
-    target = getattribute mob, "PGE::Match\x0$.target"
-    from = getattribute mob, "PGE::Match\x0$.pos"
+    target = getattribute mob, '$.target'
+    from = getattribute mob, '$.pos'
     from = clone from
   new_me:
     $I0 = find_type grammar
     me = new $I0
-    setattribute me, "PGE::Match\x0$.target", target
-    setattribute me, "PGE::Match\x0$.from", from
+    setattribute me, '$.target', target
+    setattribute me, '$.from', from
     pos = new .Integer
     pos = -1
-    setattribute me, "PGE::Match\x0$.pos", pos
+    setattribute me, '$.pos', pos
     if has_fromd == 0 goto end
     if from >= 0 goto end
     from = fromd
@@ -92,14 +92,14 @@ it left off.
 
 =cut
 
-.sub "next" :method
+.sub 'next' :method
     .local pmc corou
 
-    corou = getattribute self, "PGE::Match\x0&!corou"
+    corou = getattribute self, '&!corou'
     if_null corou, next_1
     goto next_2
   next_1:
-    $P0 = getattribute self, "PGE::Match\x0$.pos"
+    $P0 = getattribute self, '$.pos'
     $P0 = -1
     goto end
   next_2:
@@ -115,9 +115,9 @@ this object matched.
 
 =cut
 
-.sub "from" :method
+.sub 'from' :method
     .local pmc from
-    from = getattribute self, "PGE::Match\x0$.from"
+    from = getattribute self, '$.from'
     .return (from)
 .end
 
@@ -127,9 +127,9 @@ Returns the offset at the end of this match.
 
 =cut
 
-.sub "to" :method
+.sub 'to' :method
     .local pmc to
-    to = getattribute self, "PGE::Match\x0$.pos"
+    to = getattribute self, '$.pos'
     .return (to)
 .end
 
@@ -139,10 +139,10 @@ Returns the portion of the target string matched by this object.
 
 =cut
 
-.sub "substr" :method
-    $P0 = getattribute self, "PGE::Match\x0$.target"
-    $P1 = getattribute self, "PGE::Match\x0$.from"
-    $P2 = getattribute self, "PGE::Match\x0$.pos"
+.sub 'substr' :method
+    $P0 = getattribute self, '$.target'
+    $P1 = getattribute self, '$.from'
+    $P2 = getattribute self, '$.pos'
     if $P2 < 0 goto false
     if $P2 <= $P1 goto false
     $I1 = $P1
@@ -151,7 +151,7 @@ Returns the portion of the target string matched by this object.
     $S1 = substr $P0, $I1, $I2
     .return ($S1)
   false:
-    .return ("")
+    .return ('')
 .end
 
 =item C<value()>
@@ -162,14 +162,58 @@ that was matched by this match object.
 
 =cut
 
-.sub "value" :method
-    $P0 = getattribute self, "PGE::Match\x0$!value"
+.sub 'value' :method
+    $P0 = getattribute self, '$!value'
     if_null $P0, value_1
     .return ($P0)
   value_1:
-    $S0 = self."substr"()
+    $S0 = self.'substr'()
     .return ($S0)
 .end
+
+
+=item C<setvalue(PMC val)>
+
+Sets the "return value" for this Match.
+
+=cut
+
+.sub 'set_value' :method
+    .param pmc value
+    setattribute self, '$!value', value
+    .return ()
+.end
+
+
+=item C<failcut(int cutvalue)>
+
+Immediately "fail" this Match object, removing any 
+captured entities and coroutine continuation.  Set
+the position of the match object to C<cutvalue>.
+
+=cut
+
+.sub failcut :method
+    .param int cutvalue
+    $P0 = getattribute self, '$.pos'
+    $P0 = cutvalue
+    null $P0
+    setattribute self, '$.target', $P0
+    setattribute self, '&!corou', $P0
+    setattribute self, '@!capt', $P0
+    setattribute self, '$!value', $P0
+    .local pmc iter
+    iter = new .Iterator, self
+    iter = 0
+  iter_loop:
+    unless iter goto iter_end
+    $S0 = shift iter
+    delete self[$S0]
+    goto iter_loop
+  iter_end:
+    .return ()
+.end
+    
 
 =item C<__get_bool()>
 
@@ -178,8 +222,8 @@ Returns 1 if this object successfully matched the target string,
 
 =cut
 
-.sub "__get_bool" :method
-    $P1 = getattribute self, "PGE::Match\x0$.pos"
+.sub '__get_bool' :method
+    $P1 = getattribute self, '$.pos'
     $I0 = $P1
     $I1 = isge $I0, 0
     .return ($I1)
@@ -191,8 +235,8 @@ Returns the integer value of this match.
 
 =cut
 
-.sub "__get_integer" :method
-    $I0 = self."value"()
+.sub '__get_integer' :method
+    $I0 = self.'value'()
     .return ($I0)
 .end
 
@@ -202,8 +246,8 @@ Returns the numeric value of this match.
 
 =cut
 
-.sub "__get_number" :method
-    $N0 = self."value"()
+.sub '__get_number' :method
+    $N0 = self.'value'()
     .return ($N0)
 .end
 
@@ -213,8 +257,8 @@ Returns the portion of the target string matched by this object.
 
 =cut
 
-.sub "__get_string" :method
-    $S0 = self."value"()
+.sub '__get_string' :method
+    $S0 = self.'value'()
     .return ($S0)
 .end
 
@@ -226,9 +270,9 @@ matches, a space seperated list of matches is returned.
 
 =cut
 
-.sub "__get_string_keyed_int" :method
+.sub '__get_string_keyed_int' :method
 	.param int key
-    $P0 = getattribute self, "PGE::Match\x0@!capt"
+    $P0 = getattribute self, '@!capt'
 	$S0 = ''
     if_null $P0, get_1
     $P0 = $P0[key]
@@ -245,39 +289,39 @@ objects depending on the rule.
 
 =cut
 
-.sub "__get_pmc_keyed_int" :method
+.sub '__get_pmc_keyed_int' :method
     .param int key
-    $P0 = getattribute self, "PGE::Match\x0@!capt"
+    $P0 = getattribute self, '@!capt'
     if_null $P0, get_1
     $P0 = $P0[key]
   get_1:
     .return ($P0)
 .end
 
-.sub "__set_pmc_keyed_int" :method
+.sub '__set_pmc_keyed_int' :method
     .param int key
     .param pmc val
     .local pmc capt
-    capt = getattribute self, "PGE::Match\x0@!capt"
+    capt = getattribute self, '@!capt'
     unless_null capt, set_1
     capt = new .ResizablePMCArray
-    setattribute self, "PGE::Match\x0@!capt", capt
+    setattribute self, '@!capt', capt
   set_1:
     capt[key] = val
 .end
 
-.sub "__delete_keyed_int" :method
+.sub '__delete_keyed_int' :method
     .param int key
     .local pmc capt
-    capt = getattribute self, "PGE::Match\x0@!capt"
+    capt = getattribute self, '@!capt'
     delete capt[key]
 .end
 
-.sub "__defined_keyed_int" :method
+.sub '__defined_keyed_int' :method
     .param int key
     .local pmc capt
     $I0 = 0
-    capt = getattribute self, "PGE::Match\x0@!capt"
+    capt = getattribute self, '@!capt'
     if_null capt, end
     $I0 = defined capt[key]
   end:
@@ -291,7 +335,7 @@ Returns the hash component of the match object.
 
 =cut
 
-.sub "get_hash" :method
+.sub 'get_hash' :method
     .return (self)
 .end
 
@@ -301,9 +345,9 @@ Returns the array component of the match object.
 
 =cut
 
-.sub "get_array" :method
+.sub 'get_array' :method
     .local pmc array
-    array = getattribute self, "PGE::Match\x0@!capt"
+    array = getattribute self, '@!capt'
     .return (array)
 .end
 

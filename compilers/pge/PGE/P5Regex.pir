@@ -1,17 +1,85 @@
+
+
+.namespace [ "PGE::P5Regex" ]
+
+.sub "compile_p5regex"
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    $I0 = exists adverbs['name']
+    if $I0 goto adverbs_1
+    adverbs['name'] = '_p5regex'
+  adverbs_1:
+    $I0 = exists adverbs['grammar']
+    if $I0 goto adverbs_2
+    adverbs['grammar'] = 'PGE::Regex'
+  adverbs_2:
+
+    .local string target
+    target = adverbs['target']
+
+    .local pmc match
+    $P0 = find_global "PGE::Regex", "p5regex"
+    match = $P0(source)
+    if target != 'parse' goto check
+    .return (match)
+
+  check:
+    unless match goto check_1
+    $S0 = source
+    $S1 = match
+    if $S0 == $S1 goto analyze
+  check_1:
+    null $P0
+    .return ($P0)
+
+  analyze:
+    .local pmc exp, pad
+    exp = match['expr']
+    pad = new .Hash
+    pad['subpats'] = 0
+    exp = exp.'p5analyze'(pad)
+    if target != 'exp' goto pir
+    .return (exp)
+
+  pir:
+    .local pmc code
+    code = exp.'root_pir'(adverbs :flat :named)
+    if target != 'PIR' goto bytecode
+    .return (code)
+
+  bytecode:
+    $P0 = compreg 'PIR'
+    $P1 = $P0(code)
+    .return ($P1)
+.end
+
+
+.namespace [ "PGE::Regex" ]
+
+.sub "p5regex"
+    .param pmc mob
+    .local pmc optable
+    optable = find_global "PGE::P5Regex", "$optable"
+    $P0 = optable."parse"(mob)
+    .return ($P0)
+.end
+
+
 .include "cclass.pasm"
 
 .const int PGE_INF = 2147483647
 
-.namespace [ "PGE::P5Regexp" ]
+.namespace [ "PGE::P5Regex" ]
 
 .sub "__onload" :load
     .local pmc optable
 
     $I0 = find_type "PGE::OPTable"
     optable = new $I0
-    store_global "PGE::P5Regexp", "$optable", optable
+    store_global "PGE::P5Regex", "$optable", optable
 
-    $P0 = find_global "PGE::P5Regexp", "parse_lit"
+    $P0 = find_global "PGE::P5Regex", "parse_lit"
     optable.addtok("term:", "", "nows", $P0)
     optable.addtok("term:\\b", "term:", "nows", "PGE::Exp::Anchor")
     optable.addtok("term:\\B", "term:", "nows", "PGE::Exp::Anchor")
@@ -25,14 +93,14 @@
     optable.addtok("term:\\w", "term:", "nows", "PGE::Exp::CCShortcut")
     optable.addtok("term:\\W", "term:", "nows", "PGE::Exp::CCShortcut")
 
-    $P0 = find_global "PGE::P5Regexp", "parse_group"
-    optable.addtok("circumfix:( )", "term:", "nows", $P0)
+    optable.addtok("circumfix:( )", "term:", "nows,nullterm", 'PGE::Exp::CGroup')
+    optable.addtok("circumfix:(?: )", "term:", "nows,nullterm", 'PGE::Exp::Group')
 
-    $P0 = find_global "PGE::P5Regexp", "parse_enumclass"
+    $P0 = find_global "PGE::P5Regex", "parse_enumclass"
     optable.addtok("term:[", "", "nows", $P0)
     optable.addtok("term:.", "", "nows", $P0)
 
-    $P0 = find_global "PGE::P5Regexp", "parse_quant"
+    $P0 = find_global "PGE::P5Regex", "parse_quant"
     optable.addtok("postfix:*", "<term:", "left,nows", $P0)
     optable.addtok("postfix:+", "postfix:*", "left,nows", $P0)
     optable.addtok("postfix:?", "postfix:*", "left,nows", $P0)
@@ -44,8 +112,8 @@
     optable.addtok("close:}", "<infix:|", "nows")            # XXX: hack
     optable.addtok("close:]", "close:}", "nows")             # XXX: hack
 
-    $P0 = find_global "PGE", "_compile_p5regexp"
-    compreg "PGE::P5Regexp", $P0
+    $P0 = find_global "PGE::P5Regex", "compile_p5regex"
+    compreg "PGE::P5Regex", $P0
 .end
 
 
@@ -57,12 +125,11 @@
     .local int litstart, litlen
     .local string initchar
     newfrom = find_global "PGE::Match", "newfrom"
-    $P0 = getattribute mob, "PGE::Match\x0$.target"
-    target = $P0
-    $P0 = getattribute mob, "PGE::Match\x0$.pos"
+    (mob, target, $P0, $P1) = newfrom(mob, 0, "PGE::Exp::Literal")
     pos = $P0
     lastpos = length target
     initchar = substr target, pos, 1
+    if initchar == ')' goto end
     inc pos
     if initchar != "\\" goto term_literal
 
@@ -74,7 +141,6 @@
     initchar = substr "\n\r\t\e\a\b", $I0, 1
     
   term_literal:
-    mob = newfrom(mob, 0, "PGE::Exp::Literal")
     litstart = pos
     litlen = 0
   term_literal_loop:
@@ -92,7 +158,7 @@
     $I0 = pos - litstart
     $S0 = substr target, litstart, $I0
     $S0 = concat initchar, $S0
-    mob["value"] = $S0
+    mob.set_value($S0)
     goto end
   end:
     $P0 = getattribute mob, "PGE::Match\x0$.pos"
@@ -103,23 +169,23 @@
 .sub "parse_quant"
     .param pmc mob
     .local string target
-    .local int min, max, islazy
+    .local int min, max, backtrack
     .local int pos, lastpos
     .local pmc mfrom, mpos
+    .local string key
+    key = mob['KEY']
     $P0 = find_global "PGE::Match", "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Quant")
     pos = mfrom
     lastpos = length target
     min = 0
     max = PGE_INF
-    islazy = 0
-    $S0 = substr target, pos, 1
-    inc pos
-    if $S0 == "{" goto quant_range
-    if $S0 != "+" goto quant_max
+    backtrack = 0
+    if key == '{' goto quant_range
+    if key != '+' goto quant_max
     min = 1
   quant_max:
-    if $S0 != "?" goto quant_lazy
+    if key != "?" goto quant_lazy
     max = 1
     goto quant_lazy
   quant_range:
@@ -146,12 +212,12 @@
   quant_lazy:
     $S0 = substr target, pos, 1
     if $S0 != "?" goto end
-    islazy = 1
+    backtrack = PGE_BACKTRACK_EAGER
     inc pos
   end:
     mob["min"] = min
     mob["max"] = max
-    mob["islazy"] = islazy
+    mob["backtrack"] = backtrack
     mpos = pos
     .return (mob)
   err_range:
@@ -165,7 +231,7 @@
     .local pmc mfrom, mpos
     .local int pos, lastpos
     $P0 = find_global "PGE::Match", "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Group")
+    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::CGroup")
     pos = mfrom
     inc pos
     $S0 = substr target, pos, 2
@@ -185,20 +251,26 @@
     .local int pos, lastpos
     .local int isrange
     .local string charlist
+    .local string key
+    key = mob['KEY']
     $P0 = find_global "PGE::Match", "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::EnumCharList")
     pos = mfrom
-    $S0 = substr target, pos, 1
-    inc pos
-    if $S0 == "." goto dot
+    if key == '.' goto dot
     lastpos = length target
     charlist = ""
     mob["isnegated"] = 0
     isrange = 0
     $S0 = substr target, pos, 1
-    if $S0 != "^" goto scan
+    if $S0 != "^" goto scan_first
     mob["isnegated"] = 1
     inc pos
+  scan_first:
+    if pos >= lastpos goto err_close
+    $S0 = substr target, pos, 1
+    inc pos
+    if $S0 == "\\" goto backslash
+    goto addchar
   scan:
     if pos >= lastpos goto err_close
     $S0 = substr target, pos, 1
@@ -227,7 +299,6 @@
     charlist .= $S1
     goto addrange_1
   hyphenrange:
-    if charlist == "" goto addchar
     if isrange goto addrange
     isrange = 1
     goto scan
@@ -240,74 +311,13 @@
     mob["isnegated"] = 1
   end:
     mpos = pos
-    mob["value"] = charlist
+    mob.set_value(charlist)
     .return (mob)
     
   err_close:
     parse_error(mob, pos, "No closing ']' for enumerated character list")
 .end
     
-
-.namespace [ "PGE::Rule" ]
-
-.sub "p5regexp"
-    .param pmc mob
-    .local pmc optable
-    optable = find_global "PGE::P5Regexp", "$optable"
-    $P0 = optable."parse"(mob)
-    .return ($P0)
-.end
-
-.namespace [ "PGE" ]
-
-.sub "_compile_p5regexp"
-    .param string pattern
-    .param string grammar      :optional
-    .param int has_gram        :opt_flag
-    .param string name         :optional
-    .param int has_name        :opt_flag
-
-    .local pmc exp
-    .local pmc newfrom
-    .local pmc code
-    .local pmc sub
-    .local pmc pad
-
-    if has_name goto p5regexp_1
-    name = "_pge_rule"
-    if has_gram goto p5regexp_1
-    grammar = "PGE::Rule"
-  p5regexp_1:
-    newfrom = find_global "PGE::Match", "newfrom"
-    (exp, $P99, $P99, $P0) = newfrom(pattern, 0, "PGE::Exp")
-    $P0 = 0
-
-    $P0 = find_global "PGE::Rule", "p5regexp"
-    exp = $P0(exp)
-
-    pad = new .Hash
-    pad["subpats"] = 0
-    $P0 = exp["expr"]
-    $P0 = $P0."p5analyze"(pad)
-    exp["expr"] = $P0
-
-    $P0 = new .String
-    $P0 = "\n.namespace [ \""
-    $P0 .= grammar
-    $P0 .= "\" ]\n\n"
-    code = exp."as_pir"(name)
-    code = concat $P0, code
-
-    $P0 = compreg "PIR"
-    sub = $P0(code)
-    if has_name == 0 goto end
-    $I0 = find_type grammar
-    if $I0 > 0 goto end
-    $P0 = getclass "PGE::Rule"
-    $P1 = subclass $P0, grammar
-  end:
-    .return (sub, code, exp)
-.end
 
 .namespace [ "PGE::Exp" ]
 
@@ -317,22 +327,17 @@
     $I0 = 0
   loop:
     $I1 = defined self[$I0]
-    if $I1 == 0 goto value
+    if $I1 == 0 goto end
     $P0 = self[$I0]
     $P0 = $P0."p5analyze"(pad)
     self[$I0] = $P0
     inc $I0
     goto loop
-  value:
-    $I0 = defined self["value"]
-    if $I0 goto end
-    $S0 = self
-    self["value"] = $S0
   end:
     .return (self)
 .end
 
-.namespace [ "PGE::Exp::Group" ]
+.namespace [ "PGE::Exp::CGroup" ]
 
 .sub "p5analyze" :method
     .param pmc pad

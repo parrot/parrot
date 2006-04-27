@@ -54,6 +54,9 @@ p6rule_isnt('xyabghij', 'ab:::cd | gh:::ij', 'rule cut at top');
 p6rule_is  ('xyabghij', '[ab::cd | gh::ij]', 'group cut in group');
 p6rule_isnt('xyabghij', '[ab:::cd | gh:::ij]', 'rule cut in group');
 
+p6rule_isnt('xyzabcde', '[ ab | abc ]: de', 'no backtrack into group');
+p6rule_isnt('xyzabcde', '( ab | abc ): de', 'no backtrack into capturing group');
+
 
 ## <commit> -- cut over entire match
 p6rule_isnt('whence', '[ when <commit> ever ] | whence', 'full backtrack failure');
@@ -67,4 +70,4 @@ p6rule_isnt('whence',
 
   
 # remember to change the number of tests :-)
-BEGIN { plan tests => 19; }
+BEGIN { plan tests => 21; }

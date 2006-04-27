@@ -13,7 +13,7 @@ CP       = @cp@
 all: punie.pbc
 
 lib/PunieGrammar.pbc: lib/PunieGrammar.pir lib/punie.pg
-	$(PARROT) $(PGE_DIR)@slash@rulec.pir --output=lib/punie_grammar_gen.pir lib/punie.pg
+	$(PARROT) $(PGE_DIR)@slash@pgc.pir --output=lib/punie_grammar_gen.pir lib/punie.pg
 	$(PARROT) -o lib/PunieGrammar.pbc --output-pbc lib/PunieGrammar.pir 
 
 lib/ASTGrammar.pbc: lib/ASTGrammar.pir lib/pge2past.tg

@@ -61,14 +61,14 @@ p6rule_isnt("0-900-04-41-59",
 p6rule_is("ab",
     [
         [ alpha => '<[aeiou]>' ],
-        [ _MASTER => '^ <alpha> <PGE::Rule::alpha>' ],
+        [ _MASTER => '^ <alpha> <PGE::Regex::alpha>' ],
     ],
     "named and lexical subrules");
 
 #p6rule_isnt("ba",
 #    [
 #        [ alpha => '<[aeiou]>' ],
-#        [ _MASTER => '^ <alpha> <PGE::Rule::alpha>' ],
+#        [ _MASTER => '^ <alpha> <PGE::Regex::alpha>' ],
 #    ],
 #    "named and lexical subrules");
 

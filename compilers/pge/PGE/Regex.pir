@@ -1,6 +1,6 @@
 =head1 NAME
 
-PGE::Rule - base class for grammars and built-in rules
+Regex - base class for grammars and built-in rules
 
 =head1 DESCRIPTION
 
@@ -9,23 +9,53 @@ a number of built-in rules.
 
 =cut
 
-.namespace [ "PGE::Rule" ]
+.namespace [ 'PGE::Regex' ]
 
-.include "cclass.pasm"
-.include "interpinfo.pasm"
+.include 'cclass.pasm'
+.include 'interpinfo.pasm'
 
-.sub "__onload" :load
+.sub '__onload' :load
     .local pmc base
-    base = getclass "PGE::Match"
-    $P0 = subclass base, "PGE::Rule"
+    $P0 = subclass 'PGE::Match', 'PGE::Regex'
     $P0 = new .Hash
-    store_global "PGE::Rule", "%!cache", $P0
+    store_global '%!cache', $P0
     .return ()
 .end
 
-=head2 Built-in rules
 
-=over 4
+=head2 Built-in regex
+
+=over4
+
+=item C<ident()>
+
+Match an identifier.
+
+=cut
+
+.sub 'ident'
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+
+    $P0 = find_global 'PGE::Match', 'newfrom'
+    (mob, target, mfrom, mpos) = $P0(mob)
+
+    pos = mfrom
+    lastpos = length target
+    $S0 = substr target, pos, 1
+    if $S0 == '_' goto ident_1
+    $I0 = is_cclass .CCLASS_ALPHABETIC, target, pos
+    if $I0 == 0 goto end
+  ident_1:
+    pos = find_not_cclass .CCLASS_WORD, target, pos, lastpos
+    mpos = pos
+  end:
+    .return (mob)
+.end
+
 
 =item C<null()>
 
@@ -458,20 +488,20 @@ success.
     mob = fail(mob)
     .return (mob)
   lookahead:
-    cache = find_global "PGE::Rule", "%!cache"
+    cache = find_global '%!cache'
     $I0 = exists cache[pattern]
     if $I0 == 0 goto new_pattern
     rule = cache[pattern]
     goto match
   new_pattern:
-    $P0 = compreg "PGE::P6Rule"
+    $P0 = compreg 'PGE::P6Regex'
     rule = $P0(pattern)
     cache[pattern] = rule
   match:
     mob = rule(mob)
     unless mob goto end
-    $P0 = getattribute mob, "PGE::Match\x0$.from"
-    $P1 = getattribute mob, "PGE::Match\x0$.pos"
+    $P0 = getattribute mob, '$.from'
+    $P1 = getattribute mob, '$.pos'
     assign $P1, $P0
     null $P0
     setattribute mob, "PGE::Match\x0&!corou", $P0
@@ -506,31 +536,31 @@ potentially very inefficient, but it "works" for now.
     mob = fail(mob)
     .return (mob)
   lookbehind:
-    pattern = concat "[", pattern
-    pattern = concat pattern, "]$"
-    cache = find_global "PGE::Rule", "%!cache"
+    pattern = concat '[', pattern
+    pattern = concat pattern, ']$'
+    cache = find_global '%!cache'
     $I0 = exists cache[pattern]
     if $I0 == 0 goto new_pattern
     rule = cache[pattern]
     goto match
   new_pattern:
-    $P0 = compreg "PGE::P6Rule"
+    $P0 = compreg 'PGE::P6Regex'
     rule = $P0(pattern)
     cache[pattern] = rule
   match:
-    $P0 = getattribute mob, "PGE::Match\x0$.target"
+    $P0 = getattribute mob, '$.target'
     $S0 = $P0
-    $P0 = getattribute mob, "PGE::Match\x0$.pos"
+    $P0 = getattribute mob, '$.pos'
     from = $P0
     $S0 = substr $S0, 0, from
     mob = rule($S0)
     unless mob goto end
-    $P0 = getattribute mob, "PGE::Match\x0$.from"
-    $P1 = getattribute mob, "PGE::Match\x0$.pos"
+    $P0 = getattribute mob, '$.from'
+    $P1 = getattribute mob, '$.pos'
     $P0 = from
     $P1 = from
     null $P0
-    setattribute mob, "PGE::Match\x0&!corou", $P0
+    setattribute mob, '&!corou', $P0
   end:
     .return (mob)
 .end
