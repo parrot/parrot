@@ -6,7 +6,7 @@ POST - A low-level opcode syntax tree for Punie.
 
 The Punie compiler progresses through two levels of syntax tree. POST
 (Parrot/Punie Opcode Syntax Tree) is a low-level tree, which closely
-corresponds to the semantics of PIR/PASM. POST::Node is the base class
+corresponds to the semantics of PIR/PASM. Node is the base class
 for the opcode syntax tree nodes created by the Punie compiler.
 
 =cut
@@ -14,7 +14,7 @@ for the opcode syntax tree nodes created by the Punie compiler.
 .namespace [ "POST" ]
 
 .sub "__onload" :load
-    load_bytecode "languages/punie/lib/POST/Node.pir"
+    load_bytecode "languages/punie/lib/Node.pir"
     load_bytecode "languages/punie/lib/POST/Op.pir"
     load_bytecode "languages/punie/lib/POST/Ops.pir"
     load_bytecode "languages/punie/lib/POST/Sub.pir"

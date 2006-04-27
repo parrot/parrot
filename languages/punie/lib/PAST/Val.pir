@@ -4,7 +4,7 @@ PAST::Val - Nodes for literal values
 
 =head1 DESCRIPTION
 
-PAST::Val is a subclass of PAST::Node.
+PAST::Val is a subclass of Node.
 
 =cut
 
@@ -12,7 +12,7 @@ PAST::Val is a subclass of PAST::Node.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass 'PAST::Node'
+    $P0 = getclass 'Node'
     base = subclass $P0, 'PAST::Val'
     addattribute base, "value"            # the value of this leaf
     addattribute base, "valtype"          # the value type of this leaf

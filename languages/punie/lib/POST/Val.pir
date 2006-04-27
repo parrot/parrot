@@ -4,7 +4,7 @@ POST::Val - Nodes for literal values
 
 =head1 DESCRIPTION
 
-POST::Val is a literal value in the OST. It is a subclass of POST::Node.
+POST::Val is a literal value in the OST. It is a subclass of Node.
 
 =cut
 
@@ -12,7 +12,7 @@ POST::Val is a literal value in the OST. It is a subclass of POST::Node.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass 'POST::Node'
+    $P0 = getclass 'Node'
     base = subclass $P0, 'POST::Val'
     addattribute base, "value"            # the value of this leaf
     addattribute base, "valtype"          # the value type of this leaf

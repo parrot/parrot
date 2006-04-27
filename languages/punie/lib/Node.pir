@@ -1,18 +1,18 @@
 =head1 NAME
 
-PAST::Node - a base class for PAST abstract syntax tree nodes
+Node - a base class for syntax tree nodes
 
 =head1 DESCRIPTION
 
-All PAST nodes subclass from this base type.
+All PAST and POST nodes subclass from this base type.
 
 =cut
 
-.namespace [ "PAST::Node" ]
+.namespace [ "Node" ]
 
 .sub "__onload" :load
     .local pmc base
-    newclass base, "PAST::Node"
+    newclass base, "Node"
     addattribute base, "source"           # the original source code
     addattribute base, "pos"              # offset position in source
     addattribute base, "children"         # child nodes

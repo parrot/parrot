@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
 .sub _main
@@ -42,4 +42,22 @@ CODE
     'pos' => '42',
     'varname' => 'bar',
 }
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', 'generate a temporary variable');
+.sub _main
+    load_bytecode 'languages/punie/lib/POST.pir'
+    .local pmc node
+    node = new 'POST::Var'
+    $S1 = node.generate_temp()
+    print $S1
+    print "\n"
+    $S2 = node.generate_temp()
+    print $S2
+    print "\n"
+    .return()
+.end
+CODE
+$P1
+$P2
 OUT

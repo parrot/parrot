@@ -5,7 +5,7 @@ POST::Sub - A subroutine declaration
 =head1 DESCRIPTION
 
 POST::Sub is a subroutine declaration in the OST. It is a subclass of
-POST::Node.
+Node.
 
 =cut
 
@@ -13,7 +13,7 @@ POST::Node.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass 'POST::Node'
+    $P0 = getclass 'Node'
     base = subclass $P0, 'POST::Sub'
     .return ()
 .end

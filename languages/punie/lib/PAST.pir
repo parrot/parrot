@@ -7,15 +7,15 @@ PAST - A high-level abstract syntax tree for Punie.
 The Punie compiler progresses through two levels of syntax tree. PAST
 (Parrot/Punie Abstract Syntax Tree) is a high-level tree, which closely
 corresponds to the semantics of the language (though in a desugared
-form). PAST::Node implements the abstract syntax tree nodes created by
-the Punie compiler.
+form). The individual subclasses of Node implement the abstract syntax
+tree nodes created by the Punie compiler.
 
 =cut
 
 .namespace [ "PAST" ]
 
 .sub "__onload" :load
-    load_bytecode "languages/punie/lib/PAST/Node.pir"
+    load_bytecode "languages/punie/lib/Node.pir"
     load_bytecode "languages/punie/lib/PAST/Code.pir"
     load_bytecode "languages/punie/lib/PAST/Exp.pir"
     load_bytecode "languages/punie/lib/PAST/Op.pir"

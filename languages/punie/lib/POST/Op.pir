@@ -5,7 +5,7 @@ POST::Op - An opcode
 =head1 DESCRIPTION
 
 POST::Op is a call to an opcode in the OST. It is a subclass of
-POST::Node.
+Node.
 
 =cut
 
@@ -13,7 +13,7 @@ POST::Node.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass 'POST::Node'
+    $P0 = getclass 'Node'
     base = subclass $P0, 'POST::Op'
     addattribute base, "op"         # the operator name
     .return ()

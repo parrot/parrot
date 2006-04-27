@@ -5,7 +5,7 @@ PAST::Sub - A subroutine declaration
 =head1 DESCRIPTION
 
 PAST::Sub is a subroutine declaration in the AST. It is a subclass of
-PAST::Node.
+Node.
 
 =cut
 
@@ -13,7 +13,7 @@ PAST::Node.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass 'PAST::Node'
+    $P0 = getclass 'Node'
     base = subclass $P0, 'PAST::Sub'
     .return ()
 .end

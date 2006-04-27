@@ -5,7 +5,7 @@ POST::Var - A variable
 =head1 DESCRIPTION
 
 POST::Var is a node containing a variable in the OST. It is a subclass
-of POST::Node.
+of Node.
 
 =cut
 
@@ -13,7 +13,7 @@ of POST::Node.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass 'POST::Node'
+    $P0 = getclass 'Node'
     base = subclass $P0, 'POST::Var'
     addattribute base, "varname"     # the PIR name of this variable
     .return ()
@@ -35,6 +35,25 @@ of POST::Node.
       setattribute self, "varname", $P3
     no_varname:
     .return ()
+.end
+
+.sub generate_temp :method
+    .local string temp
+       temp = "$P"
+     $I1 = _new_temp_id()
+     $S1 = $I1
+     temp .= $S1
+     .return (temp)
+.end
+
+# Autoincrementing id generator
+.sub _new_temp_id
+    .local int id
+    id = 0
+loop:
+    inc id 
+    .yield(id)
+    goto loop
 .end
 
 .sub new_temp :method

@@ -5,7 +5,7 @@ PAST::Stmts - A series of statements
 =head1 DESCRIPTION
 
 PAST::Stmts is the top-level of the AST and contains a series of
-statements. It is a subclass of PAST::Node.
+statements. It is a subclass of Node.
 
 =cut
 
@@ -13,7 +13,7 @@ statements. It is a subclass of PAST::Node.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass 'PAST::Node'
+    $P0 = getclass 'Node'
     base = subclass $P0, 'PAST::Stmts'
     .return ()
 .end

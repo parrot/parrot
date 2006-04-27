@@ -5,7 +5,7 @@ PAST::Op - An operation, function call, or method call
 =head1 DESCRIPTION
 
 PAST::Op is a function call (or operation or method call) in the AST. It
-is a subclass of PAST::Node.
+is a subclass of Node.
 
 =cut
 
@@ -13,7 +13,7 @@ is a subclass of PAST::Node.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = getclass 'PAST::Node'
+    $P0 = getclass 'Node'
     base = subclass $P0, 'PAST::Op'
     addattribute base, "op"         # the operator name
     .return ()
