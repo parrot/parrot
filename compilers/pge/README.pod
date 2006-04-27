@@ -4,9 +4,11 @@
 
 This is a regular expression/rules/grammar engine/parser designed to
 run in Parrot.  It's still a work in progress, but has a lot of
-nice features in it, including support for perl 6 rule expressions,
-globs, shift-reduce parsing, and ("coming soon") some support for
-perl 5 regular expressions.
+nice features in it, including support for perl 6 regexes, globs, 
+shift-reduce parsing, and some support for perl 5 regular expressions.
+It also includes the "pgc.pir" grammar compiler, which can convert
+an entire grammar specification into the appropriate PIR code
+for execution.
 
 A nice feature of PGE is that one can easily combine many
 different parsing styles into a single interface.  PGE uses 
@@ -34,23 +36,23 @@ C<parrot demo.pir>.  The demo understands the following commands:
     trace             - toggle pattern execution tracing
     next              - repeat last match on target string
 
-=head1 PGE's rule engine  (PGE::P6Rule)
+=head1 PGE's rule engine  (PGE::P6Regex)
 
 Once PGE is compiled and installed, you generally load it using
 the load_bytecode operation, as in
 
     load_bytecode "PGE.pbc"          
 
-This imports the PGE::P6Rule compiler, which can be used to compile
+This imports the PGE::P6Regex compiler, which can be used to compile
 strings of Perl 6 rules.  A sample compile sequence would be:
 
-    .local pmc p6rule_compile
-    p6rule_compile = compreg "PGE::P6Rule"         # get the compiler
+    .local pmc p6regex_compile
+    p6rule_compile = compreg "PGE::P6Regex"         # get the compiler
 
     .local string pattern       
     .local pmc rulesub                     
-    pattern = "^(From|Subject):"                   # pattern to compile
-    rulesub = p6rule_compile(pattern)              # compile it to rulesub
+    pattern = '^(From|Subject)\:'                  # pattern to compile
+    rulesub = p6regex_compile(pattern)             # compile it to rulesub
 
 Then, to match a target string we simply call the subroutine
 to get back a C<PGE::Match> object:
@@ -80,7 +82,7 @@ of the match:
 One can also get the intermediate PIR code that PGE generates for
 the rule subroutine -- just use
 
-    (rulesub, $S0) = p6rule_compiler(target)
+    $S0 = p6regex_compiler(pattern, 'target'=>'PIR')
 
 and you can print/inspect the contents of $S0 to see the generated code.
 
@@ -103,18 +105,18 @@ Parrot.
 =head1 Implementation notes
 
 Basically, PGE is a compiler just like any other, except that its
-"language" is the Perl 6 rules syntax and its output is a subroutine
+"language" is the Perl 6 regex syntax and its output is a subroutine
 that can match strings.  So, PGE consists of a series of parsers
 (for each pattern matching language), an intermediate expression
 format, and a code generator.
 
 The parsers can be written using PIR subroutines or PGE's built-in
 operator precedence (shift/reduce) parser; the parser for Perl 6
-rule expressions is built with the operator precedence parser.
-This parser produces a parse tree (in the form of a Match object)
-for a given perl 6 rule expression. the parse tree then goes through
-semantic analysis and reduction phases before being sent
-to code generation to produce a PIR subroutine.  
+regexes is built with the operator precedence parser.  This parser 
+produces a parse tree (in the form of a Match object) for a given 
+Perl 6 regex.  The parse tree then goes through semantic analysis 
+and reduction phases before being sent to code generation to 
+produce a PIR subroutine.  
 
 The generated PIR code uses bsr/ret for its internal backtracking
 (optimized for tailcalls) and uses Parrot calling conventions for 
