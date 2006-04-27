@@ -1,4 +1,4 @@
-=head1 NAME
+=head1 TITLE
 
 Regex - base class for grammars and built-in rules
 
@@ -25,7 +25,7 @@ a number of built-in rules.
 
 =head2 Built-in regex
 
-=over4
+=over 4
 
 =item C<ident()>
 

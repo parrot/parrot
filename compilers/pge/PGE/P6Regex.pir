@@ -1233,6 +1233,8 @@ Parse a modifier.
     .return (self)
 .end
 
+=back
+
 =head1 Functions
 
 =over 4

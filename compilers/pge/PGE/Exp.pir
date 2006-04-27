@@ -1,3 +1,9 @@
+=head1 TITLE
+
+PGE::Exp - base class for expressions
+
+=cut
+
 .namespace [ "PGE::Exp" ]
 
 .include "interpinfo.pasm"
@@ -35,6 +41,8 @@
     $P1 = subclass $P0, "PGE::Exp::Closure"
 .end
 
+
+=over 4
 
 =item C<root_pir(PMC adverbs)>
 
