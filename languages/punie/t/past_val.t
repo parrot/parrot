@@ -9,7 +9,9 @@ pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
     load_bytecode 'languages/punie/lib/PAST.pir'
     .local pmc node
     node = new 'PAST::Val'
-    node.set_node('foo', 42, 'bar')
+    node.'source'('foo')
+    node.'pos'(42)
+    node.'value'('bar')
     $P1 = getattribute node, 'source'
     print $P1
     print "\n"
@@ -32,7 +34,9 @@ pir_output_is(<<'CODE', <<'OUT', 'dump node structure in visual format');
     load_bytecode 'languages/punie/lib/PAST.pir'
     .local pmc node
     node = new 'PAST::Val'
-    node.set_node('foo', 42, 'bar')
+    node.'source'('foo')
+    node.'pos'(42)
+    node.'value'('bar')
     node.dump()
     .return ()
 .end

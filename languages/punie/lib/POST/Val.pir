@@ -19,20 +19,6 @@ POST::Val is a literal value in the OST. It is a subclass of Node.
     .return ()
 .end
 
-.sub "set_node" :method
-    .param string source
-    .param int pos
-    .param string value
-    $P1 = getattribute self, "source"
-    $P1 = source
-    $P2 = getattribute self, "pos"
-    $P2 = pos
-    $P3 = new .String
-    $P3 = value
-    setattribute self, "value", $P3
-    .return ()
-.end
-
 .sub "dump" :method
     .param int level :optional
     .local string indent
@@ -57,12 +43,21 @@ POST::Val is a literal value in the OST. It is a subclass of Node.
 .end
 
 .sub value :method
+    .param string value  :optional
+    .param int got_value :opt_flag
+    unless got_value goto get
+  set:
+    $P1 = new .String
+    $P1 = value
+    setattribute self, "value", $P1
+    .return ($P1)
+  get:
     $P2 = getattribute self, "value"
     .return ($P2)
 .end
 
 .sub valtype :method
-    .param string valtype :optional
+    .param string valtype  :optional
     .param int got_valtype :opt_flag
     unless got_valtype goto get
   set:

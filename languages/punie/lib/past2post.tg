@@ -1,6 +1,8 @@
 ROOT: result(.) = {
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
+    .local pmc result
+    result = new 'POST::Sub'
+    result.'clone_node'(node)
+
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -9,19 +11,18 @@ ROOT: result(.) = {
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
       $P3 = tree.get('result', $P2)
-      push newchildren, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
-    $S1 = node.source()
-    $I1 = node.pos()
-    $P4 = new 'POST::Sub'
-    $P4.set_node($S1,$I1,newchildren)
-    .return ($P4)
+
+    .return (result)
 }
 
 PAST::Stmts: result(.) = {
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
+    .local pmc result
+    result = new 'POST::Ops'
+    result.'clone_node'(node)
+
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -30,14 +31,10 @@ PAST::Stmts: result(.) = {
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
       $P3 = tree.get('result', $P2)
-      push newchildren, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
-    $S1 = node.source()
-    $I1 = node.pos()
-    $P4 = new 'POST::Ops'
-    $P4.set_node($S1,$I1,newchildren)
-    .return ($P4)
+    .return (result)
 }
 
 PAST::Stmt: result(.) = {
@@ -86,10 +83,15 @@ PAST::Op: result(.) = {
   not_nullop:
     # Iterate through the children of the node, and generate the result
     # for each child.
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
+    .local pmc childop
+    childop = new 'POST::Op'
+    childop.'clone_node'(node)
+    $S2 = node.op()
+    childop.op($S2)
+
+    # Create a node to contain the generated ops.
     .local pmc newops
-    newops = new .ResizablePMCArray
+    newops = new 'POST::Ops'
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -103,11 +105,11 @@ PAST::Op: result(.) = {
       unless $S1 == 'POST::Ops' goto simple_result
         $P1 = $P3.tmpvar()
       if null $P1 goto simple_result
-        push newchildren, $P1
-        push newops, $P3
+        childop.'add_child'($P1)
+        newops.'add_child'($P3)
         goto iter_loop
       simple_result:
-        push newchildren, $P3
+        childop.'add_child'($P3)
       goto iter_loop
   iter_end:
 
@@ -123,41 +125,45 @@ PAST::Op: result(.) = {
 #      newchildren = $P5.children()
 
   no_munge:
-    # The results for the children become the children of the new node.
-    $S1 = node.source()
-    $I1 = node.pos()
-    $S2 = node.op()
-    $P4 = new 'POST::Op'
-    $P4.set_node($S1,$I1,$S2,newchildren)
-
+    
     # Check if we had setup code for one of the children. If so, bundle
     # it up in an Ops node.
     $I0 = elements newops
     if $I0 > 0 goto bundle_ops
-      .return ($P4)
+      .return (childop)
   bundle_ops:
-    push newops, $P4
+    newops.'add_child'(childop)
 
-    # Create a node to contain the generated ops.
-    $P5 = new 'POST::Ops'
-    $P5.set_node($S1,$I1,newops)
-    .return ($P5)
+    .return (newops)
 }
 
 PAST::Op: infix(.) = {
+    # Create the node to contain all the generated ops.
+    .local pmc newops
+    newops = new 'POST::Ops'
+    newops.'clone_node'(node)
+
+    # Create the op for the current node
+    .local pmc childop
+    childop = new 'POST::Op'
+
     .local string opname
     .local pmc oplookup
     oplookup = find_global 'PunieOpLookup', 'lookup'
     $S1 = node.op()
     opname = oplookup($S1)
-    .local string nodesource
-    .local string nodepos
-    nodesource = node.source()
-    nodepos = node.pos()
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
-    .local pmc newops
-    newops = new .ResizablePMCArray
+    childop.'op'(opname)
+
+    # Create a temporary variable
+    .local pmc temp_var
+    temp_var = new 'POST::Var'
+    temp_var.'clone_node'(node)
+    $P8 = temp_var.new_dummy()
+    newops.'add_child'($P8)
+
+    # Add the temporary variable as the destination register of the op
+    childop.'add_child'(temp_var)
+
     $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -169,66 +175,52 @@ PAST::Op: infix(.) = {
       $S1 = typeof $P3
       if $S1 == 'POST::Ops' goto complex_result # the argument has setup
       if $S1 == 'POST::Val' goto create_tmp # the argument needs setup
-        push newchildren, $P3
+        childop.'add_child'($P3)
         goto iter_loop
       create_tmp:
         # Create a temp variable
         $P4 = new 'POST::Var'
-        $P5 = $P4.new_dummy(nodesource,nodepos)
-        push newops, $P5
-        push newchildren, $P4
+        $P4.'clone_node'(node)
+        $P5 = $P4.new_dummy()
+        newops.'add_child'($P5)
+        childop.'add_child'($P4)
         # Assign the value node to the variable
-        $P6 = new .ResizablePMCArray
-        push $P6, $P4 # the first argument is the variable
-        push $P6, $P3 # the second argument is the value
         $P7 = new 'POST::Op'
-        $P7.set_node(nodesource,nodepos,'set',$P6)
-        push newops, $P7
+        $P7.'clone_node'(node)
+        $P7.'op'('set')
+        $P7.'add_child'($P4) # the first argument is the variable
+        $P7.'add_child'($P3) # the second argument is the value
+        newops.'add_child'($P7)
         goto iter_loop
       complex_result:
         $P1 = $P3.tmpvar()
-        push newchildren, $P1
-        push newops, $P3
+        childop.'add_child'($P1)
+        newops.'add_child'($P3)
       goto iter_loop
   iter_end:
 
+    # The childop goes after all the setup code.
+    newops.'add_child'(childop)
 
+    newops.'tmpvar'(temp_var)
 
-    # First we create a temporary variable
-    .local pmc temp_var
-    temp_var = new 'POST::Var'
-    $P8 = temp_var.new_dummy(nodesource,nodepos)
-    push newops, $P8
-
-    # Add the temporary variable as the destination register of the op
-    unshift newchildren, temp_var
-    # Create the op for the current node
-    $P9 = new 'POST::Op'
-    $P9.set_node(nodesource,nodepos,opname,newchildren)
-    push newops, $P9
-
-    # Create the node to contain all the generated ops.
-    $P10 = new 'POST::Ops'
-    $P10.set_node(nodesource,nodepos,newops)
-    $P10.tmpvar(temp_var)
-
-    .return ($P10)
+    .return (newops)
 }
 
 PAST::Op: conditional(.) = {
+    # Create the node to contain all the generated ops.
+    .local pmc newops
+    newops = new 'POST::Ops'
+
     .local string opname
     .local pmc oplookup
     oplookup = find_global 'PunieOpLookup', 'lookup'
     $S1 = node.op()
     opname = oplookup($S1)
-    .local string nodesource
-    .local string nodepos
-    nodesource = node.source()
-    nodepos = node.pos()
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
-    .local pmc newops
-    newops = new .ResizablePMCArray
+    .local pmc childop
+    childop = new 'POST::Op'
+    childop.'clone_node'(node)
+    childop.'op'(opname)
 
     # Set up to handle children of Op node.
     $P1 = node.children()
@@ -242,12 +234,12 @@ PAST::Op: conditional(.) = {
     $P3 = tree.get('result', $P2)
     $S1 = typeof $P3
     if $S1 == 'POST::Ops' goto complex_result # the argument has setup
-      push newchildren, $P3
+      childop.'add_child'($P3)
       goto end_condition
     complex_result:
       $P1 = $P3.'tmpvar'()
-      push newchildren, $P1
-      push newops, $P3
+      childop.'add_child'($P1)
+      newops.'add_child'($P3)
   end_condition:
 
     # Second, create the branching op. The first child is the result of
@@ -255,48 +247,43 @@ PAST::Op: conditional(.) = {
     .local pmc falselabel
     falselabel = new 'POST::Label'
     falselabel.'new_dummy'('false')
-    push newchildren, falselabel
+    childop.'add_child'(falselabel)
 
-    $P2 = new 'POST::Op'
-    $P2.'set_node'(nodesource,nodepos,opname,newchildren)
-    push newops, $P2
+    newops.'add_child'(childop)
 
     # Next handle the conditional body
     shift $P2, iter
     $P3 = tree.'get'('result', $P2)
-    push newops, $P3
+    newops.'add_child'($P3)
 
     # When conditional body is selected, skip over any else/elsif
     .local pmc endlabel
     endlabel = new 'POST::Label'
     endlabel.'new_dummy'('endcond')
     $P4 = new 'POST::Op'
-    $P5 = new .ResizablePMCArray
-    push $P5, endlabel
-    $P4.'set_node'(nodesource,nodepos,'goto',$P5)
-    push newops, $P4
+    $P4.'clone_node'(node)
+    $P4.'op'('goto')
+    $P4.'add_child'(endlabel)
+    newops.'add_child'($P4)
 
     # Destination for the branching op
     $P6 = clone falselabel
     $P6.dest(1)
-    push newops, $P6
+    newops.'add_child'($P6)
 
     # Finally handle the else/elsif block if it exists
     unless iter goto no_else_elsif
     shift $P2, iter
     $P3 = tree.'get'('result', $P2)
-    push newops, $P3
+    newops.'add_child'($P3)
   no_else_elsif:
 
     # Destination for the end of the conditional
     $P6 = clone endlabel
     $P6.dest(1)
-    push newops, $P6
+    newops.'add_child'($P6)
 
-    # Create the node to contain all the generated ops.
-    $P10 = new 'POST::Ops'
-    $P10.'set_node'(nodesource,nodepos,newops)
-    .return ($P10)
+    .return (newops)
 }
 
 PAST::Op: nullop(.) = {
@@ -307,18 +294,11 @@ PAST::Op: nullop(.) = {
 }
 
 PAST::Op: print_op(.) = {
-     .local string opname
-     opname = node.op()
-    .local string nodesource
-    .local string nodepos
-    nodesource = node.source()
-    nodepos = node.pos()
-
     # This fairly lengthy bit collapses comma ops, by traversing down
     # the tree and yanking up the children of the comma op to the
     # current level.
     $P1 = node.children()
-    $I0 = elements $P1
+    $I0 = elements node 
     if $I0 > 1 goto no_munge
       $P2 = $P1[0]
       $S3 = typeof $P2
@@ -333,12 +313,17 @@ PAST::Op: print_op(.) = {
   no_munge:
      # Done collapsing comma ops
 
+    # Create a node to contain the generated ops.
+    .local pmc newops
+    newops = new 'POST::Ops'
+    newops.'clone_node'(node)
+
+    # Store the opname for later reuse
+    .local string opname
+    opname = node.op()
+
     # Iterate through the children of the node, and generate the result
     # for each child.
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
-    .local pmc newops
-    newops = new .ResizablePMCArray
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
     iter = 0
@@ -347,15 +332,15 @@ PAST::Op: print_op(.) = {
       shift $P2, iter
       $P3 = tree.get('result', $P2)
       $S1 = typeof $P3
-      $P4 = new .ResizablePMCArray
       $P5 = new 'POST::Op'
+      $P5.'clone_node'(node)
+      $P5.'op'(opname)
       $S1 = typeof $P3
       if $S1 == 'POST::Ops' goto complex_result # the argument has setup
 	# The default case, create a new 'print' op node with the child
 	# as an argument and push it on the list of new ops.
-        push $P4, $P3
-        $P5.set_node(nodesource,nodepos,opname,$P4)
-        push newops, $P5
+        $P5.'add_child'($P3)
+        newops.'add_child'($P5)
         goto iter_loop
       complex_result:
 	# The complex case, retrieve the temp variable from the Ops
@@ -363,26 +348,22 @@ PAST::Op: print_op(.) = {
 	# create a new 'print' op node with the temp variable as an
 	# argument and push it on the list of new ops.
         $P1 = $P3.tmpvar()
-        push newops, $P3
-        push $P4, $P1
-        $P5.set_node(nodesource,nodepos,opname,$P4)
-        push newops, $P5
+        newops.'add_child'($P3)
+        $P5.'add_child'($P1)
+        newops.'add_child'($P5)
       goto iter_loop
   iter_end:
 
-    # Create a node to contain the generated ops.
-    $P5 = new 'POST::Ops'
-    $P5.set_node(nodesource,nodepos,newops)
-    .return ($P5)
+    .return (newops)
 }
 
 PAST::Val: result(.) = {
-    $S1 = node.source()
-    $I1 = node.pos()
-    $P1 = node.value()
-    $P3 = node.valtype()
-    $P2 = new 'POST::Val'
-    $P2.set_node($S1,$I1,$P1)
-    $P2.valtype($P3)
-    .return ($P2)
+    .local pmc result
+    result = new 'POST::Val'
+    result.'clone_node'(node)
+    $P1 = node.'value'()
+    result.'value'($P1)
+    $P2 = node.'valtype'()
+    result.'valtype'($P2)
+    .return (result)
 }

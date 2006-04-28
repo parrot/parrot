@@ -56,11 +56,13 @@ pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
     load_bytecode 'languages/punie/lib/Node.pir'
     .local pmc node
     node = new 'Node'
+    node.'source'('foo')
+    node.'pos'(42)
+
     $P0 = new .String
     $P0 = 'bar'
-    $P1 = new .ResizablePMCArray
-    push $P1, $P0
-    node.set_node('foo', 42, $P1)
+    node.'add_child'($P0)
+
     $P1 = getattribute node, 'source'
     print $P1
     print "\n"
@@ -83,13 +85,16 @@ pir_output_is(<<'CODE', <<'OUT', 'dump node structure in visual format');
 .sub _main
     load_bytecode 'languages/punie/lib/Node.pir'
     .local pmc node1
-    .local pmc node2
     node1 = new 'Node'
+    node1.'source'('foo')
+    node1.'pos'(42)
+
+    .local pmc node2
     node2 = new 'Node'
-    node2.set_node('b', 9, $P0)
-    $P1 = new .ResizablePMCArray
-    push $P1, node2 
-    node1.set_node('foo', 42, $P1)
+    node2.'source'('b')
+    node2.'pos'(9)
+
+    node1.'add_child'(node2)
     node1.dump()
     .return ()
 .end

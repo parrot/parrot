@@ -22,25 +22,6 @@ opcode.
     .return ()
 .end
 
-.sub "set_node" :method
-    .param string source
-    .param int pos
-    .param string name :optional
-    .param int got_name :opt_flag
-    $P1 = getattribute self, "source"
-    $P1 = source
-    $P2 = getattribute self, "pos"
-    $P2 = pos
-
-    unless got_name goto no_name
-      $P3 = new .String
-      $P3 = name
-      setattribute self, "name", $P3
-    no_name:
-    .return ()
-.end
-
-
 .sub name :method
     .param string name :optional
     .param int got_name :opt_flag

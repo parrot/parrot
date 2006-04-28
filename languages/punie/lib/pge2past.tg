@@ -29,8 +29,10 @@ PunieGrammar::block: result(.) = {
 }
 
 PunieGrammar::lineseq: result(.) = {
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
+    .local pmc result
+    result = new 'PAST::Stmts'
+    result.'clone_pge'(node)
+
     # Ask the child node for its result
     .local pmc child
     $I0 = defined node["PunieGrammar::line"]
@@ -44,25 +46,20 @@ PunieGrammar::lineseq: result(.) = {
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
       $P3 = tree.get('result', $P2, 'PunieGrammar::line')
-      push newchildren, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S1 = node 
-    $I1 = node.from()
-    $P4 = new 'PAST::Stmts'
-    $P4.set_node($S1,$I1,newchildren)
-    .return ($P4)
+    .return (result)
   err_no_tree:
     print "The 'lineseq' node doesn't contain a 'line' match.\n"
     end
 }
 
 PunieGrammar::line: result(.) = {
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
+    .local pmc result
+    result = new 'PAST::Stmt'
+    result.'clone_pge'(node)
 
     .local pmc iter
     iter = new Iterator, node    # setup iterator for node
@@ -73,26 +70,18 @@ PunieGrammar::line: result(.) = {
       $P2 = iter[$S1]
       $P3 = tree.get('result', $P2, $S1)
       if null $P3 goto iter_loop
-      push newchildren, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
-
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I1 = node.from()
-    .local pmc result
-    result = new 'PAST::Stmt'
-    result.set_node($S2,$I1,newchildren)
 
     .return (result)
 }
 
 PunieGrammar::expr: result(.) = {
     .local pmc result
-    .local pmc children
-    children = new .ResizablePMCArray
     result = new 'PAST::Exp'
+    result.'clone_pge'(node)
+
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
@@ -102,23 +91,20 @@ PunieGrammar::expr: result(.) = {
       $P2 = $P0[$S2]      # get entry at current key
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
-      push children, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
-    result.set_node($S2,$I3,children)
     .return (result)
 }
 
 PunieGrammar::gprint: result(.) = {
     .local pmc result
-    .local pmc children
-    children = new .ResizablePMCArray
     result = new 'PAST::Op'
+    result.'clone_pge'(node)
+    $S1 = node[0]
+    result.'op'($S1)
+
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
@@ -128,24 +114,20 @@ PunieGrammar::gprint: result(.) = {
       $P2 = $P0[$S2]      # get entry at current key
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
-      push children, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $S3 = node[0]
-    $I3 = node.from()
-    result.set_node($S2,$I3,$S3,children)
     .return (result)
 }
 
 PunieGrammar::cond: result(.) = {
     .local pmc result
-    .local pmc children
-    children = new .ResizablePMCArray
     result = new 'PAST::Op'
+    result.'clone_pge'(node)
+    $S1 = node[0]
+    result.'op'($S1)
+
     $P1 = node.get_hash()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -156,27 +138,23 @@ PunieGrammar::cond: result(.) = {
       $P2 = iter[$S2]      # get entry at current key
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
-      push children, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $S3 = node[0]
-    $I3 = node.from()
-    result.set_node($S2,$I3,$S3,children)
     .return (result)
 }
 
 PunieGrammar::else: result(.) = {
-    .local pmc result
-    .local pmc children
     .local pmc onechild
-    children = new PerlArray
-    result = new 'PAST::Op'
     onechild = node[0]
     unless onechild goto no_child
+    .local pmc result
+    result = new 'PAST::Op'
+    result.'clone_pge'(onechild)
+    $S1 = onechild[0]
+    result.'op'($S1)
+
     $P1 = onechild.get_hash()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -187,16 +165,10 @@ PunieGrammar::else: result(.) = {
       $P2 = iter[$S2]      # get entry at current key
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
-      push children, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = onechild
-    $S3 = onechild[0]
-    $I3 = onechild.from()
-    result.set_node($S2,$I3,$S3,children)
     .return (result)
   no_child:
     .return ()
@@ -211,8 +183,10 @@ PunieGrammar::cexpr: result(.) = {
     $I0 = defined node["PunieGrammar::oexpr"]
     unless $I0 goto err_no_oexpr
     $P1 = node["PunieGrammar::oexpr"]
-    .local pmc children
-    children = new .ResizablePMCArray
+    result = new 'PAST::Op'
+    result.'clone_pge'(node)
+    result.'op'('O_COMMA')
+
     $P0 = new Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
@@ -220,21 +194,17 @@ PunieGrammar::cexpr: result(.) = {
       shift $P2, $P0             # get next entry
       $P3 = tree.get('result', $P2, 'PunieGrammar::oexpr')
       if null $P3 goto iter_loop
-      push children, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
 
     # If there's only one child node, it's a single element, not a list,
     # so just return the single element. Otherwise, we have a comma
     # separated list, so build a comma op node.
+    .local pmc children
+    children = result.'children'()
     $I0 = elements children
     unless $I0 > 1 goto no_comma
-    result = new 'PAST::Op'
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
-    result.set_node($S2,$I3,'O_COMMA',children)
     .return (result)
   no_comma:
     result = shift children # there's only one result
@@ -245,8 +215,9 @@ PunieGrammar::cexpr: result(.) = {
 }
 
 PunieGrammar::oexpr: result(.) = {
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
+    .local pmc result
+    result = new 'PAST::Exp'
+    result.'clone_pge'(node)
 
     .local pmc iter
     $P1 = node.get_hash()
@@ -258,17 +229,9 @@ PunieGrammar::oexpr: result(.) = {
       $P2 = iter[$S1]
       $P3 = tree.get('result', $P2, $S1)
       if null $P3 goto iter_loop
-      push newchildren, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
-
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I1 = node.from()
-    .local pmc result
-    result = new 'PAST::Exp'
-    result.set_node($S2,$I1,newchildren)
 
     .return (result)
 }
@@ -277,39 +240,28 @@ PunieGrammar::oexpr: result(.) = {
 PunieGrammar::number: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
-
-    # get the source string and position offset from start of source
-    # code for this match node
+    result.'clone_pge'(node)
     $S2 = node 
-    $I3 = node.from()
+    result.'value'($S2)
+    result.'valtype'('num')
 
-    result.set_node($S2,$I3,$S2)
-    result.valtype('num')
     .return (result)
 }
 
 PunieGrammar::integer: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
-
-    # get the source string and position offset from start of source
-    # code for this match node
+    result.'clone_pge'(node)
     $S2 = node 
-    $I3 = node.from()
-
-    result.set_node($S2,$I3,$S2)
-    result.valtype('int')
+    result.'value'($S2)
+    result.'valtype'('int')
     .return (result)
 }
 
 PunieGrammar::stringdouble: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
-
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
+    result.'clone_pge'(node)
 
     .local string value
     # Check if this is a string match
@@ -323,19 +275,15 @@ PunieGrammar::stringdouble: result(.) = {
     value = $P2
   no_bracketed_value:
 
-    result.set_node($S2,$I3,value)
-    result.valtype('strqq')
+    result.'value'(value)
+    result.'valtype'('strqq')
     .return (result)
 }
 
 PunieGrammar::stringsingle: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
-
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
+    result.'clone_pge'(node)
 
     .local string value
     # Check if this is a string match
@@ -349,8 +297,8 @@ PunieGrammar::stringsingle: result(.) = {
     value = $P2
   no_bracketed_value:
 
-    result.set_node($S2,$I3,value)
-    result.valtype('strq')
+    result.'value'(value)
+    result.'valtype'('strq')
     .return (result)
 }
 
@@ -377,10 +325,12 @@ expr: result(.) = {
 }
 
 expr: op(.) = {
-    .local string type
-    type = node["type"]
-    .local pmc newchildren
-    newchildren = new .ResizablePMCArray
+    .local pmc result
+    result = new 'PAST::Op'
+    result.'clone_pge'(node)
+    $S1 = node["type"]
+    result.'op'($S1)
+
     $P1 = node.get_array()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
@@ -390,17 +340,10 @@ expr: op(.) = {
       shift $P2, iter            # get entry
       $P3 = tree.get('result', $P2, 'expr')
       if null $P3 goto iter_loop
-      push newchildren, $P3
+      result.'add_child'($P3)
       goto iter_loop
   iter_end:
 
-    # get the source string and position offset from start of source
-    # code for this match node
-    $S2 = node 
-    $I3 = node.from()
-    .local pmc result
-    result = new 'PAST::Op'
-    result.set_node($S2,$I3,type,newchildren)
     .return (result)
 }
 

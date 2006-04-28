@@ -19,24 +19,6 @@ of Node.
     .return ()
 .end
 
-.sub "set_node" :method
-    .param string source
-    .param int pos
-    .param string varname :optional
-    .param int got_varname :opt_flag
-    $P1 = getattribute self, "source"
-    $P1 = source
-    $P2 = getattribute self, "pos"
-    $P2 = pos
-
-    unless got_varname goto no_varname
-      $P3 = new .String
-      $P3 = varname
-      setattribute self, "varname", $P3
-    no_varname:
-    .return ()
-.end
-
 .sub generate_temp :method
     .local string temp
        temp = "$P"
@@ -62,26 +44,23 @@ loop:
 .end
 
 .sub new_dummy :method
-    .param string nodesource
-    .param string nodepos
     # First we create a temporary variable
-    self.set_node(nodesource,nodepos)
     self.new_temp()
-    # Then we create a child array for a fabricated op to create a new
-    # pmc of type 'Undef'. It has 2 arguments: the temp variable and
-    # the type.
-    $P5 = new .ResizablePMCArray
-    push $P5, self
+    # Then we create a fabricated op to create a new pmc of type
+    # 'Undef'. It has 2 arguments: the temp variable and the type.
+    .local pmc newop
+    newop = new 'POST::Op'
+    newop.'clone_node'(self)
+    newop.'op'('new')
+
+    newop.'add_child'(self)
     $I1 = find_type 'Undef'
     $S10 = $I1
     $P6 = new 'POST::Val'
-    $P6.set_node(nodesource,nodepos,$S10)
-    $P6.valtype('int')
-    push $P5, $P6
-    # Then we create the 'new' op.
-    $P7 = new 'POST::Op'
-    $P7.set_node(nodesource,nodepos,'new',$P5)
-    .return ($P7)
+    $P6.'value'($S10)
+    $P6.'valtype'('int')
+    newop.'add_child'($P6)
+    .return (newop)
 .end
 
 .sub varname :method

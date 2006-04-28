@@ -30,24 +30,36 @@ All PAST and POST nodes subclass from this base type.
     setattribute self, "children", $P3
 .end
 
-.sub "set_node" :method
-    .param string source
-    .param int pos
-    .param pmc children
-    $P1 = getattribute self, "source"
-    $P1 = source
-    $P2 = getattribute self, "pos"
-    $P2 = pos
-    setattribute self, "children", children
-    .return ()
+.sub '__elements' :method
+    $P1 = getattribute self, 'children'
+    $I1 = elements $P1
+    .return ($I1)
 .end
 
 .sub source :method
+    .param string source :optional
+    .param int got_source :opt_flag
+    unless got_source goto get
+  set:
+    $P1 = new .String
+    $P1 = source
+    setattribute self, "source", $P1
+    .return ($P1)
+  get:
     $P2 = getattribute self, "source"
     .return ($P2)
 .end
 
 .sub pos :method
+    .param int pos :optional
+    .param int got_pos :opt_flag
+    unless got_pos goto get
+  set:
+    $P1 = new .Integer
+    $P1 = pos
+    setattribute self, "pos", $P1
+    .return ($P1)
+  get:
     $P2 = getattribute self, "pos"
     .return ($P2)
 .end
@@ -55,6 +67,28 @@ All PAST and POST nodes subclass from this base type.
 .sub children :method
     $P2 = getattribute self, "children"
     .return ($P2)
+.end
+
+# Get the source string and position offset from start of source
+# code for a PGE match node.
+.sub clone_pge :method
+    .param pmc node
+    $S1 = node
+    self."source"($S1)
+    $I1 = node.from()
+    self."pos"($I1)
+    .return ()
+.end
+
+# Get the source string and position offset from start of source
+# code for a tree node.
+.sub clone_node :method
+    .param pmc node
+    $S1 = node.'source'()
+    self.'source'($S1)
+    $I1 = node.'pos'()
+    self.'pos'($I1)
+    .return ()
 .end
 
 .sub "dump" :method
@@ -129,4 +163,17 @@ All PAST and POST nodes subclass from this base type.
   no_children:
     print "]\n"
     .return ()
+.end
+
+.sub 'add_child' :method
+    .param pmc child
+    .local pmc children
+    children = getattribute self, 'children'
+    $I0 = defined children
+    if $I0 goto children_exist
+      children = new .ResizablePMCArray
+      setattribute self, "children", children
+  children_exist:
+    push children, child
+    .return()
 .end
