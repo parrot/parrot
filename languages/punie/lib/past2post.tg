@@ -3,10 +3,8 @@ ROOT: result(.) = {
     result = new 'POST::Sub'
     result.'clone_node'(node)
 
-    $P1 = node.children()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
+    iter = node.'child_iter'()
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
@@ -23,10 +21,8 @@ PAST::Stmts: result(.) = {
     result = new 'POST::Ops'
     result.'clone_node'(node)
 
-    $P1 = node.children()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
+    iter = node.'child_iter'()
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
@@ -92,10 +88,8 @@ PAST::Op: result(.) = {
     # Create a node to contain the generated ops.
     .local pmc newops
     newops = new 'POST::Ops'
-    $P1 = node.children()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
+    iter = node.'child_iter'()
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
@@ -164,10 +158,8 @@ PAST::Op: infix(.) = {
     # Add the temporary variable as the destination register of the op
     childop.'add_child'(temp_var)
 
-    $P1 = node.children()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
+    iter = node.'child_iter'()
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
@@ -223,10 +215,8 @@ PAST::Op: conditional(.) = {
     childop.'op'(opname)
 
     # Set up to handle children of Op node.
-    $P1 = node.children()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
+    iter = node.'child_iter'()
 
     # First, handle the condition, which may be a series of statements
     # resulting in a single value.
@@ -309,7 +299,7 @@ PAST::Op: print_op(.) = {
     unless $S3 == 'PAST::Op' goto no_munge
       $S4 = $P4.op()
     unless $S4 == 'O_COMMA' goto no_munge
-      $P1 = $P4.children()
+      $P1 = $P4.'child_iter'()
   no_munge:
      # Done collapsing comma ops
 
@@ -325,10 +315,10 @@ PAST::Op: print_op(.) = {
     # Iterate through the children of the node, and generate the result
     # for each child.
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
+    iter = new Iterator, $P1
     iter = 0
   iter_loop:
-    unless iter, iter_end         # while (entries) ...
+    unless iter goto iter_end         # while (entries) ...
       shift $P2, iter
       $P3 = tree.get('result', $P2)
       $S1 = typeof $P3

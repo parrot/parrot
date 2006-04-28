@@ -23,7 +23,7 @@ All PAST and POST nodes subclass from this base type.
 .sub __init :method
     $P1 = new .Undef
     $P2 = new .Integer
-    $P3 = new .Undef
+    $P3 = new .ResizablePMCArray
 
     setattribute self, "source", $P1
     setattribute self, "pos", $P2
@@ -145,13 +145,11 @@ All PAST and POST nodes subclass from this base type.
     # print children for this node
     print indent
     print "'children' => ["
-    $P3 = getattribute self, "children"
-    $I0 = defined $P3
-    unless $I0 goto no_children
-    print "\n"
     .local pmc iter
-    iter = new Iterator, $P3 # loop over the array
-    iter = 0 # start at the beginning
+    iter = self.'child_iter'()
+    unless iter goto no_children
+    print "\n"
+
   loop_start:
     unless iter goto loop_end
     $P1 = shift iter
@@ -176,4 +174,17 @@ All PAST and POST nodes subclass from this base type.
   children_exist:
     push children, child
     .return()
+.end
+
+=head2 child_iter
+
+Return an iterator for the children of a node.
+
+=cut
+
+.sub 'child_iter' :method
+    $P1 = getattribute self, "children"
+    $P2 = new Iterator, $P1    # setup iterator for node
+    $P2 = 0
+    .return($P2)
 .end

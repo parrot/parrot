@@ -4,10 +4,8 @@
 ROOT: result(.) = {
     .local string output
     output = ".sub _main :main\n"
-    $P1 = node.children()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
+    iter = node.'child_iter'()
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
@@ -22,10 +20,8 @@ ROOT: result(.) = {
 # Flatten out the ops into a simple sequence.
 POST::Ops: result(.) = {
     .local string output
-    $P1 = node.children()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
+    iter = node.'child_iter'()
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
@@ -44,10 +40,8 @@ POST::Op: result(.) = {
     opname = node.op()
     output = "    " . opname
     output .= " "
-    $P1 = node.children()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
+    iter = node.'child_iter'()
   iter_loop:
     unless iter goto iter_end         # while (entries) ...
       shift $P2, iter
