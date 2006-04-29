@@ -42,18 +42,14 @@ gen_pir_past!
   : #(PAST_Stmts PEPN:code_blocks )
     {
       pir_before = """
-.local pmc stmts_children
-stmts_children = new .ResizablePMCArray
-#"""
-      pir_after = """
 .local pmc stmts
 stmts = new 'PAST::Stmts'
-
-stmts.set_node('1', 1, stmts_children)
+stmts.'source'('1')
+stmts.'pos'(1)
             
 #"""
 
-      #gen_pir_past = #( [ PIR_OP, pir_before ], #PEPN, [PIR_OP, pir_after] ); 
+      #gen_pir_past = #( [ PIR_OP, pir_before ], #PEPN ); 
     }
   ;
 
@@ -64,23 +60,25 @@ code_blocks
 stmt! 
   : #( PAST_Stmt reg_E=E:exp )
     {
-      reg = self.reg
+      reg = self.reg;
       self.reg = self.reg + 10;
       pir = """
     $P%d = new 'PAST::Stmt'
-    $P%d = new .ResizablePMCArray
 
-    push $P%d, $P%d 
-    $P%d.set_node('1', 1 ,$P%d)
+    $P%d.'add_child'( $P%d ) 
+    $P%d.'source'('1')
+    $P%d.'pos'(1)
 
-    push stmts_children, $P%d
+    stmts.'add_child'( $P%d )
 #""" % (
     reg,
-    reg + 1,
-    reg + 1, reg_E,
-    reg, reg + 1,
-    reg
-       )
+
+    reg, reg_E,
+    reg,
+    reg,
+
+    reg,
+       );
 
       #stmt = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, pir] ); 
     }
@@ -93,17 +91,17 @@ exp! returns[reg]
                     self.reg = self.reg + 10;
                     pir = """
                               $P%d = new 'PAST::Exp'
-                              $P%d = new .ResizablePMCArray
               
-                              push $P%d, $P%d 
-                              $P%d.set_node('1', 1, $P%d)
+                              $P%d.'add_child'( $P%d ) 
+                              $P%d.'source'('1')
+                              $P%d.'pos'(1)
               #""" % (
                               reg,
-                              reg + 1,
               
-                              reg + 1, reg_O,
-                              reg, reg + 1
-                     )
+                              reg, reg_O,
+                              reg,
+                              reg,
+                     );
 
                     #exp = #( [ PIR_NOOP, "noop" ], #O, [PIR_OP, pir] ); 
                   }
@@ -114,16 +112,16 @@ exp! returns[reg]
                     self.reg = self.reg + 10;
                     pir = """
                               $P%d = new 'PAST::Exp'
-                              $P%d = new .ResizablePMCArray
 
-                              push $P%d, $P%d 
-                              $P%d.set_node('1', 1, $P%d)
+                              $P%d.'add_child'( $P%d ) 
+                              $P%d.'source'('1')
+                              $P%d.'pos'(1)
               #""" % (
                               reg,
-                              reg + 1,
               
-                              reg + 1, reg_V_STRQQ,
-                              reg, reg + 1
+                              reg, reg_V_STRQQ,
+                              reg,
+                              reg,
                      )
 
                     #exp = #( [ PIR_NOOP, "noop" ], #V_STRQQ, [PIR_OP, pir] ); 
@@ -135,16 +133,16 @@ exp! returns[reg]
                     self.reg = self.reg + 10;
                     pir = """
                               $P%d = new 'PAST::Exp'
-                              $P%d = new .ResizablePMCArray
 
-                              push $P%d, $P%d 
-                              $P%d.set_node('1', 1, $P%d)
+                              $P%d.'add_child'( $P%d ) 
+                              $P%d.'source'('1')
+                              $P%d.'pos'(1)
               #""" % (
                               reg,
-                              reg + 1,
               
-                              reg + 1, reg_V_NUM,
-                              reg, reg + 1
+                              reg, reg_V_NUM,
+                              reg,
+                              reg,
                      )
 
                     #exp = #( [ PIR_NOOP, "noop" ], #V_NUM, [PIR_OP, pir] ); 
@@ -160,16 +158,18 @@ op! returns[reg]
       self.reg = self.reg + 10;
       pir = """
             $P%d = new 'PAST::Op'
-            $P%d = new .ResizablePMCArray
 
-            push $P%d, $P%d 
-            $P%d.set_node('1', 1, 'print' ,$P%d)
+            $P%d.'add_child'( $P%d ) 
+            $P%d.'op'('print')
+            $P%d.'source'('1')
+            $P%d.'pos'(1)
 #""" % (
             reg,
-            reg + 1,
 
-            reg + 1, reg_E,
-            reg, reg + 1
+            reg, reg_E,
+            reg,
+            reg,
+            reg,
        )
 
       #op = #( [ PIR_NOOP, "noop" ], #E, [PIR_OP, pir] ); 
@@ -183,9 +183,12 @@ val_strqq! returns[reg]
       self.reg = self.reg + 10;
       pir = """
                     $P%d = new 'PAST::Val'
-                    $P%d.set_node( '1', 0, '%s' )
-                    $P%d.valtype( 'strqq' )
-#""" % ( reg, reg, V.getText(), reg )
+                    $P%d.'value'( '%s' )
+                    $P%d.'valtype'( 'strqq' )
+#""" % (            reg,
+                    reg, V.getText(),
+                    reg,
+       )
        
       #val_strqq = #( [PIR_OP, pir] ); 
     }
@@ -198,10 +201,13 @@ val_num! returns[reg]
       self.reg = self.reg + 10;
       pir = """
                     $P%d = new 'PAST::Val'
-                    $P%d.set_node( '1', 0, '%s' )
-                    $P%d.valtype( 'num' )
-#""" % ( reg, reg, V.getText(), reg )
-       
+                    $P%d.'value'( '%s' )
+                    $P%d.'valtype'( 'num' )
+#""" % (            reg,
+                    reg, V.getText(),
+                    reg,
+       )
+
       #val_num = #( [PIR_OP, pir] ); 
     }
   ;
