@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 73;
+use Parrot::Test tests => 74;
 
 =head1 NAME
 
@@ -2131,3 +2131,26 @@ pir_output_is(<<'CODE', <<'OUTPUT', "isa");
 CODE
 0
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering");
+.sub main :main
+    .local pmc c1, c2
+    c1 = newclass ['Foo']
+    c2 = newclass ['Foo';'Baz']
+    print "ok\n"
+.end
+.namespace ['Foo']
+.sub __init :method
+    print "__init Foo\n"
+.end
+.namespace ['Foo';'Bar']
+.sub __init :method
+	print "__init Bar\n"
+.end
+CODE
+__init Foo
+__init Bar
+ok
+OUTPUT
+
+
