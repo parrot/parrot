@@ -179,6 +179,7 @@ NONGEN_HEADERS  = @TEMP_nongen_headers@
 GEN_MAKEFILES = \
     Makefile \
 #CONDITIONED_LINE(has_perldoc):    docs/Makefile \
+    compilers/past/Makefile \
     compilers/pge/Makefile \
     compilers/tge/Makefile \
     editor/Makefile \
@@ -1257,6 +1258,7 @@ dynoplibs-clean :
 compilers : compilers.dummy
 
 compilers.dummy : $(PARROT)
+	$(MAKE) compilers/past
 	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
 
@@ -1281,6 +1283,7 @@ languages-clean :
 ###############################################################################
 
 compilers-clean :
+	$(MAKE) compilers/past clean
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
 
@@ -1321,6 +1324,7 @@ RUNCORE_TEST_FILES = \
     t/native_pbc/*.t \
     t/dynpmc/*.t \
     t/dynoplibs/*.t \
+    t/compilers/past/*.t \
     t/compilers/pge/*.t \
     t/compilers/pge/p5regexp/*.t \
     t/compilers/pge/p6rules/*.t \

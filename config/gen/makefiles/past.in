@@ -77,14 +77,15 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Ilib -I../../lib t/harness
+	cd $(TOOL_DIR); prove -r t/compilers/past
 
 testclean:
-	$(RM_RF) "../../t/p6rules/*.pbc"
+	$(RM_RF) "../../t/compilers/*.pir"
 
 clean: testclean
-	$(RM_RF) PAST.pbc $(PARROT_LIBRARY)/PAST.pbc
 	$(RM_RF) Node.pbc $(PARROT_LIBRARY)/Node.pbc
+	$(RM_RF) PAST.pbc $(PARROT_LIBRARY)/PAST.pbc
+	$(RM_RF) PAST.pbc $(PARROT_LIBRARY)/PAST/*.pbc
 
 realclean: clean
 	$(RM_RF) Makefile

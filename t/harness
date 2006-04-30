@@ -143,6 +143,7 @@ my @default_tests = map {glob "t/$_/*.t"} qw( configure
                                               native_pbc
                                               dynpmc
                                               dynoplibs
+                                              compilers/past
                                               compilers/pge
                                               compilers/pge/p5regexp
                                               compilers/pge/p6rules
