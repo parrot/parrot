@@ -1,10 +1,10 @@
 /*
-Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
 
-src/pmc/perlstring.pmc - Perl String
+src/dynpmc/perlstring.pmc - Perl String
 
 =head1 DESCRIPTION
 
@@ -28,6 +28,8 @@ pmclass PerlString
     extends String
     does string
     does scalar 
+    dynpmc
+    group perl_group
     hll Perl
     maps String {
 
@@ -81,7 +83,11 @@ Morphs the string to a C<PerlInt> and sets its value to C<value>.
 */
 
     void set_integer_native (INTVAL value) {
-        DYNSELF.morph(enum_class_PerlInt);
+        INTVAL dynpmc_PerlInt;
+    
+        dynpmc_PerlInt = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlInt", 0));
+        DYNSELF.morph(dynpmc_PerlInt);
         DYNSELF.set_integer_native(value);
     }
 
@@ -96,7 +102,11 @@ Morphs the string to a C<PerlNum> and sets its value to C<value>.
 */
 
     void set_number_native (FLOATVAL value) {
-        DYNSELF.morph(enum_class_PerlNum);
+        INTVAL dynpmc_PerlNum;
+    
+        dynpmc_PerlNum = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlNum", 0));
+        DYNSELF.morph(dynpmc_PerlNum);
         DYNSELF.set_number_native(value);
     }
 
@@ -151,11 +161,15 @@ Returns the string value for C<SELF[key]>.
     PMC* get_pmc_keyed(PMC* key) {
         STRING *s = PMC_str_val(SELF);
         PMC *ret;
-
-        ret = pmc_new_noinit(INTERP, enum_class_PerlString);
+        INTVAL dynpmc_PerlString;
+    
+        dynpmc_PerlString = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlString", 0));
+        ret = pmc_new_noinit(INTERP, dynpmc_PerlString);
         PMC_str_val(ret) = string_substr(INTERP, s,
                 key_integer(INTERP,key), 1, NULL, 0);
         PObj_custom_mark_SET(ret);
+
         return ret;
     }
 

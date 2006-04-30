@@ -175,14 +175,6 @@ parrot_global_setup_2(Interp *interpreter)
             const_string(interpreter, "parrot"),
             NULL);
 
-    /* Perl* PMCs are still static,
-     * so they try to register their HLL mapping
-     * before a possible .HLL is encountered at IMCC compile time
-     * XXX remove this when Perl* PMCs have become dynamic
-     */
-    Parrot_register_HLL(interpreter,
-                        const_string(interpreter, "Perl"),
-                        NULL);
     parrot_ns = 
         VTABLE_get_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 0); 	
     CONTEXT(interpreter->ctx)->current_namespace = parrot_ns; 

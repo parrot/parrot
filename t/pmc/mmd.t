@@ -1,10 +1,11 @@
 #! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 32;
 
@@ -14,7 +15,7 @@ t/pmc/mmd.t - Multi-Method Dispatch
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/mmd.t
+    % prove t/pmc/mmd.t
 
 =head1 DESCRIPTION
 
@@ -22,26 +23,31 @@ Tests the multi-method dispatch.
 
 =cut
 
+
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
-.sub _main
+.sub 'test' :main
 
 .include "pmctypes.pasm"
 .include "mmd.pasm"
 
+    .local  pmc lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int type_perl_int
+    type_perl_int     = find_type 'PerlInt'
+
     .local pmc divide
     divide = global "Integer_divide_PerlInt"
-    mmdvtregister .MMD_DIVIDE, .Integer, .PerlInt, divide
+    mmdvtregister .MMD_DIVIDE, .Integer, type_perl_int, divide
 
-    $P0 = new PerlInt
+    $P0 = new type_perl_int
     $P1 = new Integer
-    $P2 = new PerlInt
+    $P2 = new type_perl_int
     $P1 = 10
     $P2 = 3
     $P0 = $P1 / $P2
     print $P0
     print "\n"
-    end
 .end
 
 .sub Integer_divide_PerlInt
@@ -77,7 +83,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "1+1=3");
     $P0 = $P1 + $P2
     print $P0
     print "\n"
-    end
 .end
 
 .sub add
@@ -114,7 +119,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide - override builtin");
     $P0 = $P1 / $P2
     print $P0
     print "\n"
-    end
 .end
 
 .sub Integer_divide_Integer
@@ -146,7 +150,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "INTVAL return numeq");
     $I0 = cmp $P1, $P2   # XXX cmp calls cmp_num
     print $I0
     print "\n"
-    end
 .end
 
 .sub Float_cmp_Integer
@@ -178,7 +181,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "mmdvtfind");
     end
 nok:
     print "not ok\n"
-    end
 .end
 
 .sub Float_cmp_Integer
@@ -218,7 +220,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "mmdvtfind - invoke it");
     end
 nok:
     print "not ok\n"
-    end
 .end
 .sub Float_cmp_Integer
     .param pmc left
@@ -268,7 +269,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub");
     $P0 = $P1 / $P2
     print $P0
     print "\n"
-    end
 .end
 
 CODE
@@ -453,11 +453,16 @@ ok 1
 42
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types");
-.sub main :main
+pir_output_is(<<'CODE', <<'OUT', 'MMD on PMC types');
+.sub 'test' :main
+    .local  pmc  lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int  type_perl_string
+    type_perl_string  = find_type 'PerlInt'
+
     $P0 = new String
     $P0 = "ok 1\n"
-    $P1 = new PerlString
+    $P1 = new type_perl_string
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -491,9 +496,14 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types quoted");
 .sub main :main
+    .local  pmc  lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int  type_perl_string
+    type_perl_string  = find_type 'PerlInt'
+
     $P0 = new String
     $P0 = "ok 1\n"
-    $P1 = new PerlString
+    $P1 = new type_perl_string
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -527,9 +537,14 @@ OUT
 
 pir_output_like(<<'CODE', <<'OUT', "MMD on PMC types, invalid");
 .sub main :main
+    .local  pmc  lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int  type_perl_string
+    type_perl_string  = find_type 'PerlInt'
+
     $P0 = new String
     $P0 = "ok 1\n"
-    $P1 = new PerlString
+    $P1 = new type_perl_string
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -566,9 +581,16 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");
 .sub main :main
+    .local  pmc  lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int  type_perl_string
+    type_perl_string  = find_type 'PerlInt'
+    .local  int  type_perl_int
+    type_perl_int     = find_type 'PerlInt'
+
     $P0 = new String
     $P0 = "ok 1\n"
-    $P1 = new PerlString
+    $P1 = new type_perl_string
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -580,7 +602,7 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");
     $P1 = "ok 4\n"
     p($P0)
     p($P1)
-    $P0 = new PerlInt
+    $P0 = new type_perl_int
     $P0 = 42
     p($P0)
 .end
@@ -614,9 +636,16 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, global namespace");
 .sub main :main
+    .local  pmc  lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int  type_perl_string
+    type_perl_string  = find_type 'PerlInt'
+    .local  int  type_perl_int
+    type_perl_int     = find_type 'PerlInt'
+
     $P0 = new String
     $P0 = "ok 1\n"
-    $P1 = new PerlString
+    $P1 = new type_perl_string
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -653,9 +682,16 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, package namespace");
 .namespace ["Some"]
 
 .sub main :main
+    .local  pmc  lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int  type_perl_string
+    type_perl_string  = find_type 'PerlInt'
+    .local  int  type_perl_int
+    type_perl_int     = find_type 'PerlInt'
+
     $P0 = new String
     $P0 = "ok 1\n"
-    $P1 = new PerlString
+    $P1 = new type_perl_string
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -690,16 +726,23 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types - Any");
 
 .sub main :main
+    .local  pmc  lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int  type_perl_string
+    type_perl_string  = find_type 'PerlInt'
+    .local  int  type_perl_int
+    type_perl_int     = find_type 'PerlInt'
+
     $P0 = new String
     $P0 = "ok 1\n"
-    $P1 = new PerlString
+    $P1 = new type_perl_string
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
-    $P0 = new PerlInt
+    $P0 = new type_perl_int
     $P0 = 42
     p($P0)
-    $P0 = new PerlInt
+    $P0 = new type_perl_int
     $P0 = 43
     q($P0)
 .end
@@ -776,9 +819,16 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - inherited");
 .sub main :main
+    .local  pmc  lib_perl_group
+    lib_perl_group    = loadlib 'perl_group'
+    .local  int  type_perl_string
+    type_perl_string  = find_type 'PerlInt'
+    .local  int  type_perl_int
+    type_perl_int     = find_type 'PerlInt'
+
     .local pmc d, l, r
-    l = new PerlInt
-    r = new PerlInt
+    l = new type_perl_int
+    r = new type_perl_int
     l = 3
     r = 39
     d = l."__add"(r)

@@ -1,0 +1,88 @@
+/*
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/dynpmc/perlscalar.pmc - Perl Scalar
+
+=head1 DESCRIPTION
+
+Abstract base class for perl scalars.
+
+This class implements common perl scalar functionality: e.g morphing to
+another scalar type. The morph method replaces the CHANGE_TYPE macro.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+
+pmclass perlscalar
+    abstract
+    noinit
+    dynpmc
+    group perl_group
+    extends scalar {
+
+/*
+
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+
+        switch (type) {
+            case enum_class_Integer: 
+                type = pmc_type(interpreter,
+                    string_from_const_cstring(interpreter, "PerlInt", 0));
+                break;
+            case enum_class_Float:
+                type = pmc_type(interpreter,
+                    string_from_const_cstring(interpreter, "PerlNum", 0));
+                break;
+            case enum_class_String:
+                type = pmc_type(interpreter,
+                    string_from_const_cstring(interpreter, "PerlString", 0));
+                break;
+            case enum_class_Undef:
+            case enum_class_None:
+                type = pmc_type(interpreter,
+                    string_from_const_cstring(interpreter, "PerlUndef", 0));
+                break;
+        }
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

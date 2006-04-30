@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 44;
 use Parrot::Config;
 
 =head1 NAME
@@ -26,6 +26,13 @@ C<Continuation> PMCs.
 =cut
 
 my $temp = "temp.pasm";
+my $load_perl = <<'END_PASM';
+    loadlib P20, 'perl_group'
+    find_type I24, 'PerlInt'
+    find_type I25, 'PerlNum'
+    find_type I28, 'PerlUndef'
+END_PASM
+
 
 END {
     unlink($temp, 'temp.pbc');
@@ -886,7 +893,7 @@ OUTPUT
     # actually the POSTCOMP is run and "initial" is printed, but
     # its not captured by the test system
 
-    my $code = << 'CODE';
+    my $code = <<'CODE';
 .sub optc :immediate, :postcomp
     print "initial\n"
 .end
@@ -894,7 +901,7 @@ OUTPUT
     print "main\n"
 .end
 CODE
-    my $output = << 'OUTPUT';
+    my $output = <<'OUTPUT';
 initial
 main
 OUTPUT
@@ -1075,3 +1082,64 @@ pir_output_is(<<'CODE', <<'OUTPUT', "__get_regs_used 2");
 CODE
 81101
 OUTPUT
+
+
+pir_output_like(<<"CODE", <<'OUTPUT', 'warn on in main');
+.sub 'test' :main
+.include "warnings.pasm"
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+    _f1()
+.end
+.sub _f1
+$load_perl
+
+    P0 = new I28
+    print P0
+.end
+CODE
+/uninit/
+OUTPUT
+
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'warn on in sub');
+.sub 'test' :main
+$load_perl
+.include "warnings.pasm"
+    _f1()
+    P0 = new I28
+    print P0
+    print "ok\\n"
+.end
+.sub _f1
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+.end
+CODE
+ok
+OUTPUT
+
+
+pir_output_like(<<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2');
+.sub 'test' :main
+$load_perl
+.include "warnings.pasm"
+    _f1()
+    P0 = new I28
+    print "back\\n"
+    print P0
+    print "ok\\n"
+.end
+.sub _f1
+$load_perl
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+    _f2()
+    P0 = new I28
+    print P0
+.end
+.sub _f2
+    warningsoff .PARROT_WARNINGS_UNDEF_FLAG
+.end
+CODE
+/uninit.*\n.*\nback\nok/
+OUTPUT
+
+

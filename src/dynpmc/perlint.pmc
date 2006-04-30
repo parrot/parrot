@@ -1,10 +1,10 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
 
-src/pmc/perlint.pmc - Perl Integer
+src/dynpmc/perlint.pmc - Perl Integer
 
 =head1 DESCRIPTION
 
@@ -27,6 +27,8 @@ pmclass PerlInt
     extends Integer
     does integer
     does scalar 
+    dynpmc
+    group perl_group
     hll Perl
     maps Integer {
 
@@ -41,7 +43,11 @@ Morphs the integer to a C<PerlNum> and sets the value from C<value>.
 
 */
     void set_number_native (FLOATVAL value) {
-        DYNSELF.morph(enum_class_PerlNum);
+        INTVAL dynpmc_PerlNum;
+    
+        dynpmc_PerlNum = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlNum", 0));
+        DYNSELF.morph(dynpmc_PerlNum);
         DYNSELF.set_number_native(value);
     }
 
@@ -56,7 +62,11 @@ Sets the value of the integer to C<*value>.
 
 */
     void set_string_native (STRING* value) {
-        DYNSELF.morph(enum_class_PerlString);
+        INTVAL dynpmc_PerlString;
+    
+        dynpmc_PerlString = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlString", 0));
+        DYNSELF.morph(dynpmc_PerlString);
         DYNSELF.set_string_native(value);
     }
 

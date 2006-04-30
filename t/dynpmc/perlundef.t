@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -65,10 +65,17 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-pasm_output_is(<< "CODE", <<'OUTPUT', "undef-logical");
-    new P0, .PerlInt
-    new P1, .PerlUndef
-    new P2, .PerlInt
+my $load_perl = <<'END_PASM';
+    loadlib P20, 'perl_group'
+    find_type I24, 'PerlInt'
+    find_type I25, 'PerlNum'
+    find_type I28, 'PerlUndef'
+END_PASM
+
+pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', "undef-logical");
+    new P0, I24
+    new P1, I28
+    new P2, I24
 
 # undef or undef = 0
     or P0, P1, P1
@@ -113,20 +120,20 @@ CODE
 ab0c349c910xy1z
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "undef-add");
+pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', "undef-add");
 @{[ $fp_equality_macro ]}
-    new P1, .PerlUndef
+    new P1, I28
 
 # undef + perlundef
-    new P0, .PerlUndef
+    new P0, I28
     add P0, P1, P1
     print P0
     print "\\n"
 
 # undef + perlint
 
-    new P0, .PerlUndef
-    new P2, .PerlInt
+    new P0, I28
+    new P2, I24
     set P2, 947
     add P0, P1, P2
     print P0
@@ -134,8 +141,8 @@ pasm_output_is(<<"CODE", <<'OUTPUT', "undef-add");
 
 # undef + perlnum
 
-    new P0, .PerlUndef
-    new P2, .PerlNum
+    new P0, I28
+    new P2, I25
     set P2, 385.623
     add P0, P1, P2
     .fp_eq( P0, 385.623, OK)
@@ -151,10 +158,10 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
+pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', "undef-subtract");
 @{[ $fp_equality_macro ]}
-    new P0, .PerlInt
-    new P1, .PerlUndef
+    new P0, I24
+    new P1, I28
 
 # undef - undef
     sub P0, P1, P1
@@ -162,7 +169,7 @@ pasm_output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
     print "\\n"
 
 # undef - perlint
-    new P2, .PerlInt
+    new P2, I24
     set P2, 947
     sub P0, P1, P2
     print P0
@@ -170,7 +177,7 @@ pasm_output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
 
 # undef - perlnum
 
-    new P2, .PerlNum
+    new P2, I25
     set P2, 385.623
     sub P0, P1, P2
     .fp_eq( P0, -385.623, OK2)
@@ -186,12 +193,12 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "undef-multiply");
+pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', "undef-multiply");
 @{[ $fp_equality_macro ]}
 
-    new P0, .PerlInt
-    new P1, .PerlUndef
-    new P2, .PerlInt
+    new P0, I24
+    new P1, I28
+    new P2, I24
 
 # Undef * Undef
     mul P0, P1, P1
@@ -205,7 +212,7 @@ pasm_output_is(<<"CODE", <<'OUTPUT', "undef-multiply");
     print "\\n"
 
 # Undef * PerlNum
-    new P2, .PerlNum
+    new P2, I25
     set P2, 983.3
     mul P0, P1, P2
     print P0
@@ -218,10 +225,10 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "undef-divide");
-    new P0, .PerlInt
-    new P1, .PerlUndef
-    new P2, .PerlInt
+pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', "undef-divide");
+    new P0, I24
+    new P1, I28
+    new P2, I24
 
 # Undef / PerlInt
     set P2, 19
@@ -230,7 +237,7 @@ pasm_output_is(<<"CODE", <<'OUTPUT', "undef-divide");
     print "\\n"
 
 # Undef / PerlNum
-    new P2, .PerlNum
+    new P2, I25
     set P2, 343.8
     div P0, P1, P2
     print P0
@@ -242,8 +249,8 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "undef-string");
-    new P0, .PerlUndef
+pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', "undef-string");
+    new P0, I28
     set S0, P0
     eq S0, "", OK
     print "not "
@@ -253,26 +260,26 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "arithmetic with PerlUndef and native ints");
-    new P0, .PerlUndef
+pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "arithmetic with PerlUndef and native ints");
+    new P0, I28
     add P0, 10
     set I1, P0
     print I1
     print "\n"
 
-    new P0, .PerlUndef
+    new P0, I28
     sub P0, 20
     set I1, P0
     print I1
     print "\n"
 
-    new P0, .PerlUndef
+    new P0, I28
     mul P0, 30
     set I1, P0
     print I1
     print "\n"
 
-    new P0, .PerlUndef
+    new P0, I28
     div P0, 40
     set I1, P0
     print I1
@@ -285,27 +292,27 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<"CODE", <<OUTPUT, "arithmetic with PerlUndef and native floats");
+pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "arithmetic with PerlUndef and native floats");
 @{[ $fp_equality_macro ]}
-    new P0, .PerlUndef
+    new P0, I28
     add P0, 10.0
     set N1, P0
     .fp_ne(N1, 10.0, ERROR)
     print "ok 1\\n"
 
-    new P0, .PerlUndef
+    new P0, I28
     sub P0, 2.345
     set N1, P0
     .fp_ne(N1, -2.345, ERROR)
     print "ok 2\\n"
 
-    new P0, .PerlUndef
+    new P0, I28
     mul P0, 32.5
     set N1, P0
     .fp_ne(N1, 0.000, ERROR)
     print "ok 3\\n"
 
-    new P0, .PerlUndef
+    new P0, I28
     div P0, 0.5
     set N1, P0
     .fp_ne(N1, 0.000, ERROR)
@@ -322,10 +329,10 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_like(<<"CODE", <<'OUTPUT', "undef warning");
+pasm_output_like($load_perl . <<"CODE", <<'OUTPUT', "undef warning");
     .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
-    new P0, .PerlUndef
+    new P0, I28
     print P0
     end
 CODE
@@ -333,14 +340,14 @@ CODE
 current instr\.: '\(null\)' pc (\d+|-1) /
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "bor undef");
-    new P0, .PerlUndef
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "bor undef");
+    new P0, I28
     bor P0, 0b00001111
     print  P0
     print "\n"
 
-    new P0, .PerlUndef
-    new P1, .PerlInt
+    new P0, I28
+    new P1, I24
     set P1, 0b11110000
     bor P0, P1
     print P0
@@ -351,40 +358,26 @@ CODE
 240
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', 'interp - warnings');
-	new P0, .PerlUndef
+pasm_output_like($load_perl . <<'CODE', <<'OUTPUT', 'interp - warnings');
+	new P0, I28
 	set I0, P0
 	printerr "nada:"
 	warningson 1
-	new P1, .PerlUndef
+	new P1, I28
 	set I0, P1
 	end
 CODE
 /^nada:Use of uninitialized value in integer context/
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', 'warn on in main');
-.sub _main :main
-.include "warnings.pasm"
-    warningson .PARROT_WARNINGS_UNDEF_FLAG
-    _f1()
-.end
-.sub _f1
-    $P0 = new .PerlUndef
-    print $P0
-.end
-CODE
-/uninit/
-OUTPUT
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "bxor undef");
-    new P0, .PerlUndef
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "bxor undef");
+    new P0, I28
     bxor P0, 0b00001111
     print  P0
     print "\n"
 
-    new P0, .PerlUndef
-    new P1, .PerlInt
+    new P0, I28
+    new P1, I24
     set P1, 0b11110000
     bxor P0, P1
     print P0
@@ -395,14 +388,14 @@ CODE
 240
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "band undef");
-    new P0, .PerlUndef
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "band undef");
+    new P0, I28
     band P0, 0b00001111
     print  P0
     print "\n"
 
-    new P0, .PerlUndef
-    new P1, .PerlInt
+    new P0, I28
+    new P1, I24
     set P1, 0b11110000
     band P0, P1
     print P0
@@ -411,43 +404,5 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "band undef");
 CODE
 0
 0
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
-.sub _main :main
-.include "warnings.pasm"
-    _f1()
-    $P0 = new .PerlUndef
-    print $P0
-    print "ok\n"
-.end
-.sub _f1
-    warningson .PARROT_WARNINGS_UNDEF_FLAG
-.end
-CODE
-ok
-OUTPUT
-
-
-pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
-.sub _main :main
-.include "warnings.pasm"
-    _f1()
-    $P0 = new .PerlUndef
-    print "back\n"
-    print $P0
-    print "ok\n"
-.end
-.sub _f1
-    warningson .PARROT_WARNINGS_UNDEF_FLAG
-    _f2()
-    $P0 = new .PerlUndef
-    print $P0
-.end
-.sub _f2
-    warningsoff .PARROT_WARNINGS_UNDEF_FLAG
-.end
-CODE
-/uninit.*\n.*\nback\nok/
 OUTPUT
 

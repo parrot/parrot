@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/pmc/perlarray.pmc - Perl Array
+src/dynpmc/perlarray.pmc - Perl Array
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the PerlArray base class
+These are the vtable functions for the PerlArray PMC.
 
 =head2 Functions
 
@@ -30,9 +30,13 @@ Returns the C<PerlUndef> PMC.
 
 */
 
-static PMC* undef(Interp* interpreter)
-{
-    return pmc_new(interpreter, enum_class_PerlUndef);
+static PMC* undef(Interp* interpreter) {
+    INTVAL dynpmc_PerlUndef;
+
+    dynpmc_PerlUndef = pmc_type(interpreter,
+        string_from_const_cstring(interpreter, "PerlUndef", 0));
+
+    return pmc_new(interpreter, dynpmc_PerlUndef);
 }
 
 /*
@@ -66,6 +70,8 @@ pmclass PerlArray
     extends Array
     need_ext
     does array
+    dynpmc
+    group perl_group
     hll Perl
     maps ResizablePMCArray {
 
@@ -87,7 +93,11 @@ C<key>.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        PMC *src = pmc_new_noinit(INTERP, enum_class_PerlInt);
+        INTVAL dynpmc_PerlInt;
+
+        dynpmc_PerlInt = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlInt", 0));
+        PMC *src = pmc_new_noinit(INTERP, dynpmc_PerlInt);
         PMC_int_val(src) = value;
         list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
     }

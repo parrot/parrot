@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/pmc/perlnum.pmc - Perl Floating-Point Number
+src/dynpmc/perlnum.pmc - Perl Floating-Point Number
 
 =head1 DESCRIPTION
 
@@ -26,6 +26,8 @@ pmclass PerlNum
     extends Float
     does float
     does scalar 
+    dynpmc
+    group perl_group
     hll Perl
     maps Float {
 
@@ -66,7 +68,11 @@ Returns the number as a Parrot string.
 */
 
     void set_integer_native (INTVAL value) {
-        DYNSELF.morph(enum_class_PerlInt);
+        INTVAL dynpmc_PerlInt;
+    
+        dynpmc_PerlInt = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlInt", 0));
+        DYNSELF.morph(dynpmc_PerlInt);
         DYNSELF.set_integer_native(value);
     }
 
@@ -104,7 +110,11 @@ Note that this method morphs the number into a C<PerlString>.
 */
 
     void set_string_native (STRING * value) {
-        DYNSELF.morph(enum_class_PerlString);
+        INTVAL dynpmc_PerlString;
+    
+        dynpmc_PerlString = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlString", 0));
+        DYNSELF.morph(dynpmc_PerlString);
         DYNSELF.set_string_native(value);
     }
 

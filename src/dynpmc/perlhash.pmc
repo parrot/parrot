@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/pmc/perlhash.pmc - PerlHash PMC
+src/dynpmc/perlhash.pmc - PerlHash PMC
 
 =head1 DESCRIPTION
 
@@ -28,6 +28,8 @@ pmclass PerlHash
     extends Hash
     need_ext
     does hash
+    dynpmc
+    group perl_group
     hll Perl
     maps Hash {
 }

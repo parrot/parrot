@@ -1,10 +1,11 @@
+#! perl
 # Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
-
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 38;
 
@@ -24,8 +25,18 @@ well.
 
 =cut
 
-pasm_output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
-    new    P0, .PerlHash
+my $load_perl = <<'END_PASM';
+    loadlib P20, 'perl_group'
+    find_type I21, 'PerlArray'
+    find_type I23, 'PerlHash'
+    find_type I24, 'PerlInt'
+    find_type I25, 'PerlNum'
+    find_type I27, 'PerlString'
+    find_type I28, 'PerlUndef'
+END_PASM
+
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'Initial PerlHash tests');
+    new    P0, I23
 
     set    P0["foo"], -7
     set    P0["bar"], 3.5
@@ -37,13 +48,13 @@ pasm_output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
 
     eq    I0,-7,OK_1
     print    "not "
-OK_1:    print    "ok 1\\n"
+OK_1:    print    "ok 1\n"
     eq    N0,3.500000,OK_2
     print    N0
-OK_2:    print    "ok 2\\n"
+OK_2:    print    "ok 2\n"
     eq    S0,"value",OK_3
     print    S0
-OK_3:    print    "ok 3\\n"
+OK_3:    print    "ok 3\n"
 
     set    S1, "oof"
     set    S2, "rab"
@@ -59,13 +70,13 @@ OK_3:    print    "ok 3\\n"
 
     eq    I0,7,OK_4
     print    "not "
-OK_4:    print    "ok 4\\n"
+OK_4:    print    "ok 4\n"
     eq    N0,-3.500000,OK_5
     print    N0
-OK_5:    print    "ok 5\\n"
+OK_5:    print    "ok 5\n"
     eq    S0,"VALUE",OK_6
     print    S0
-OK_6:    print    "ok 6\\n"
+OK_6:    print    "ok 6\n"
 
     end
 CODE
@@ -77,12 +88,12 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "more than one PerlHash");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'more than one PerlHash');
+    new P0, I23
     set S0, "key"
     set P0[S0], 1
 
-    new P1, .PerlHash
+    new P1, I23
     set S1, "another_key"
     set P1[S1], 2
 
@@ -99,8 +110,8 @@ CODE
 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "hash keys with nulls in them");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'hash keys with nulls in them');
+    new P0, I23
     set S0, "parp\0me"
     set S1, "parp\0you"
 
@@ -120,8 +131,8 @@ CODE
 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "nearly the same hash keys");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'nearly the same hash keys');
+    new P0, I23
     set S0, "a\0"
     set S1, "\0a"
 
@@ -142,8 +153,8 @@ CODE
 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "The same hash keys");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'The same hash keys');
+    new P0, I23
     set S0, "Happy"
     set S1, "Happy"
 
@@ -167,8 +178,8 @@ OUTPUT
 # NB Next test depends on "key2" hashing to zero, which it does with
 # the current algorithm; if the algorithm changes, change the test!
 
-pasm_output_is(<<'CODE', <<OUTPUT, "key that hashes to zero");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'key that hashes to zero');
+    new P0, I23
     set S0, "key2"
     set P0[S0], 1
     set I0, P0[S0]
@@ -179,8 +190,8 @@ CODE
 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "size of the hash");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "size of the hash");
+    new P0, I23
 
     set P0["0"], 1
     set I0, P0
@@ -204,8 +215,8 @@ CODE
 2
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "stress test: loop(set, check)");
-    new    P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "stress test: loop(set, check)");
+    new    P0, I23
 
     set I0, 200
     set S0, "mikey"
@@ -217,13 +228,13 @@ pasm_output_is(<<CODE, <<OUTPUT, "stress test: loop(set, check)");
     set P0[S1], "start"
     set S3, P0["mikey"]
     print S3
-    print "\\n"
+    print "\n"
     set S3, P0["mikeys"]
     print S3
-    print "\\n"
+    print "\n"
     set S3, P0["mikey200"]
     print S3
-    print "\\n"
+    print "\n"
 LOOP:
     eq I0, 0, DONE
     sub I0, I0, 1
@@ -235,7 +246,7 @@ LOOP:
     print S1
     print " vs "
     print S4
-    print "\\n"
+    print "\n"
 L1:
     set P0[S1], I0
     set I1, P0[S1]
@@ -244,25 +255,25 @@ L1:
     print I0
     print " vs "
     print I1
-    print "\\n"
+    print "\n"
 L2:
     branch LOOP
 DONE:
     set I0, P0["mikey199"]
     print I0
-    print "\\n"
+    print "\n"
     set I0, P0["mikey117"]
     print I0
-    print "\\n"
+    print "\n"
     set I0, P0["mikey1"]
     print I0
-    print "\\n"
+    print "\n"
     set I0, P0["mikey23"]
     print I0
-    print "\\n"
+    print "\n"
     set I0, P0["mikey832"]
     print I0
-    print "\\n"
+    print "\n"
     end
 CODE
 base
@@ -276,8 +287,8 @@ start
 OUTPUT
 
 # Check all values after setting all of them
-pasm_output_is(<<CODE, <<OUTPUT, "stress test: loop(set), loop(check)");
-    new    P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "stress test: loop(set), loop(check)");
+    new    P0, I23
 
     set I0, 200
     set S0, "mikey"
@@ -301,19 +312,19 @@ GETLOOP:
     print I0
     print " vs "
     print I1
-    print "\\n"
+    print "\n"
 L2:
     branch GETLOOP
 
 DONE:
-    print "done\\n"
+    print "done\n"
     end
 CODE
 done
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with integers at a time");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Testing two hash indices with integers at a time");
+    new P0, I23
 
     set P0["foo"],37
     set P0["bar"],-15
@@ -348,8 +359,8 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with numbers at a time");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Testing two hash indices with numbers at a time");
+    new P0, I23
 
     set P0["foo"],37.100000
     set P0["bar"],-15.100000
@@ -384,8 +395,8 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with strings at a time");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Testing two hash indices with strings at a time");
+    new P0, I23
 
     set P0["foo"],"baz"
     set P0["bar"],"qux"
@@ -421,13 +432,13 @@ ok 4
 OUTPUT
 
 
-# So far, we've only used INTVALs, FLOATVALs and STRINGs as values
+# So far, we have only used INTVALs, FLOATVALs and STRINGs as values
 # and/or keys. Now we try PMCs.
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Setting & getting scalar PMCs");
-    new P0, .PerlHash
-    new P1, .PerlInt
-    new P2, .PerlInt
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Setting & getting scalar PMCs");
+    new P0, I23
+    new P1, I24
+    new P2, I24
 
     set S0, "non-PMC key"
 
@@ -452,7 +463,7 @@ OK2:  print "ok 2\n"
     print "not "
 OK3:  print "ok 3\n"
 
-    new P1, .PerlUndef
+    new P1, I28
     set P0[S0], P1
     set P2, P0[S0]
     typeof S1, P2
@@ -468,9 +479,9 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Setting scalar PMCs & getting scalar values");
-    new P0, .PerlHash
-    new P1, .PerlInt
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Setting scalar PMCs & getting scalar values");
+    new P0, I23
+    new P1, I24
 
     set S0, "A rather large key"
 
@@ -505,14 +516,14 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is(<< 'CODE', <<'OUTPUT', "Getting values from undefined keys");
+pir_output_is(<<"CODE", <<'OUTPUT', "Getting values from undefined keys");
 
-# no need to load a lib, as Perl* PMCs are still static
-.HLL 'Perl', ''    
+.HLL 'Perl', ''
 
 .sub test :main
+$load_perl
 
-    new P2, .PerlHash
+    new P2, I23
 
     set I0, P2["qwerty"]
     set N0, P2["asdfgh"]
@@ -521,20 +532,21 @@ pir_output_is(<< 'CODE', <<'OUTPUT', "Getting values from undefined keys");
 
     eq I0, 0, OK1
     print "not "
-OK1:  print "ok 1\n"
+OK1:  print "ok 1\\n"
 
     eq N0, 0.0, OK2
     print "not "
-OK2:  print "ok 2\n"
+OK2:  print "ok 2\\n"
 
     eq S0, "", OK3
     print "not "
-OK3:  print "ok 3\n"
+OK3:  print "ok 3\\n"
 
     typeof S1, P0
     eq S1, "PerlUndef", OK4
+    print S1
     print "not "
-OK4:  print "ok 4\n"
+OK4:  print "ok 4\\n"
 .end
 CODE
 ok 1
@@ -543,26 +555,26 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "Setting & getting non-scalar PMCs");
-    new P0, .PerlHash
-    new P1, .PerlArray
-    new P2, .PerlArray
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Setting & getting non-scalar PMCs");
+    new P0, I23
+    new P1, I21
+    new P2, I21
     set P1[4],"string"
     set P0["one"],P1
     set P2,P0["one"]
     set S0,P2[4]
     print S0
-    print "\\n"
+    print "\n"
     end
 CODE
 string
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Testing clone");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Testing clone");
+    new P0, I23
     set S0, "a"
     set P0[S0], S0
-    new P2, .PerlArray
+    new P2, I21
     set P2, 2
     set P0["b"], P2
 
@@ -627,10 +639,10 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Compound keys");
-    new P0, .PerlHash
-    new P1, .PerlHash
-    new P2, .PerlArray
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Compound keys");
+    new P0, I23
+    new P1, I23
+    new P2, I21
     set P1["b"], "ab"
     set P0["a"], P1
     set S0, P0["a";"b"]
@@ -684,10 +696,10 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Getting PMCs from compound keys");
-    new P0, .PerlHash
-    new P1, .PerlHash
-    new P2, .PerlInt
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Getting PMCs from compound keys");
+    new P0, I23
+    new P1, I23
+    new P2, I24
     set P2, 12
     set P1["b"], P2
     set P0["a"], P1
@@ -699,10 +711,10 @@ CODE
 12
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "Getting PMCs from string;int compound keys");
-    new P0, .PerlHash
-    new P1, .PerlHash
-    new P2, .PerlInt
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Getting PMCs from string;int compound keys");
+    new P0, I23
+    new P1, I23
+    new P2, I24
     set P2, 4
     set P1[9], P2
     set I0, P1[9]
@@ -721,8 +733,8 @@ OUTPUT
 
 # A hash is only false if it has size 0
 
-pasm_output_is(<<'CODE', <<OUTPUT, "if (PerlHash)");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "if (PerlHash)");
+    new P0, I23
 
     if P0, BAD1
     print "ok 1\n"
@@ -740,7 +752,7 @@ OK2:  print "ok 2\n"
     print "not "
 OK3:  print "ok 3\n"
 
-    new P1, .PerlUndef
+    new P1, I28
     set P0["key"], P1
     if P0, OK4
     print "not "
@@ -754,8 +766,8 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "unless (PerlHash)");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "unless (PerlHash)");
+    new P0, I23
 
     unless P0, OK1
     print "not "
@@ -775,7 +787,7 @@ OK2:
 BAD3: print "not ok 3"
 OK3:
 
-    new P1, .PerlUndef
+    new P1, I28
     set P0["key"], P1
     unless P0, BAD4
     print "ok 4\n"
@@ -791,8 +803,8 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "defined");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "defined");
+    new P0, I23
     defined I0, P0
     print I0
     print "\n"
@@ -806,7 +818,7 @@ pasm_output_is(<<'CODE', <<OUTPUT, "defined");
     defined I0, P0["b"]
     print I0
     print "\n"
-    new P1, .PerlUndef
+    new P1, I28
     set P0["c"], P1
     defined I0, P0["c"]
     print I0
@@ -821,8 +833,8 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "exists");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "exists");
+    new P0, I23
     set P0["a"], 1
     exists I0, P0["a"]
     print I0
@@ -830,7 +842,7 @@ pasm_output_is(<<'CODE', <<OUTPUT, "exists");
     exists I0, P0["b"]
     print I0
     print "\n"
-    new P1, .PerlUndef
+    new P1, I28
     set P0["c"], P1
     exists I0, P0["c"]
     print I0
@@ -843,8 +855,8 @@ CODE
 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "delete");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "delete");
+    new P0, I23
     set P0["a"], 1
     exists I0, P0["a"]
     print I0
@@ -859,8 +871,8 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Cloning keys");
-    new P10, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Cloning keys");
+    new P10, I23
     new P1, .Key
 
     set P1, "Bar"
@@ -881,12 +893,12 @@ Food
 Sheep
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "Cloning PMC vals");
-    new P10, .PerlHash
-    new P1, .PerlUndef
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Cloning PMC vals");
+    new P10, I23
+    new P1, I28
     set P1, "value\n"
     set P10["str"], P1
-    new P1, .PerlUndef
+    new P1, I28
     set P1, 42
     set P10["int"], P1
     clone P2, P10
@@ -899,7 +911,7 @@ CODE
 42value
 OUTPUT
 
-pir_output_is(<< 'CODE', <<'OUTPUT', "entry types - type_keyed");
+pir_output_is(<<"CODE", <<'OUTPUT', "entry types - type_keyed");
 
 # no need to load a lib, as Perl* PMCs are still static
 .HLL 'Perl', ''    
@@ -907,40 +919,39 @@ pir_output_is(<< 'CODE', <<'OUTPUT', "entry types - type_keyed");
 .include "pmctypes.pasm"
 
 .sub test :main
-
-    new P1, .PerlHash
-
-    new P2, .PerlInt
+$load_perl
+    new P1, I23
+    new P2, I24
     set P1["PerlInt"], P2
     typeof I0, P1["PerlInt"]
-    eq I0, .PerlInt, ok1
+    eq I0, I24, ok1
     print "not "
-ok1:print "PerlInt\n"
+ok1:print "PerlInt\\n"
 
     new P3, .Integer
     set P1["Integer"], P3
     typeof I0, P1["Integer"]
     eq I0, .Integer, ok2
     print "not "
-ok2:print "Integer\n"
+ok2:print "Integer\\n"
 
     set P1["native int"], -123456
     typeof I0, P1["native int"]
-    eq I0, .PerlInt, ok3
+    eq I0, I24, ok3
     print "not "
-ok3:print "PerlInt\n"
+ok3:print "PerlInt\\n"
 
     set P1["native float"], -123.456
     typeof I0, P1["native float"]
-    eq I0, .PerlNum, ok4
+    eq I0, I25, ok4
     print "not "
-ok4:print "PerlNum\n"
+ok4:print "PerlNum\\n"
 
-    set P1["native string"], "hello world\n"
+    set P1["native string"], "hello world\\n"
     typeof I0, P1["native string"]
-    eq I0, .PerlString, ok5
+    eq I0, I27, ok5
     print "not "
-ok5:print "PerlString\n"
+ok5:print "PerlString\\n"
 
 .end
 CODE
@@ -951,12 +962,12 @@ PerlNum
 PerlString
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "delete and free_list");
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "delete and free_list");
     set I2, 10
     set I1, 1
     new P0, .SArray
     set P0, 1
-    new P1, .PerlHash
+    new P1, I23
 outer:
     set P0[0], I1
     sprintf S0, "ok %vd\n", P0
@@ -991,14 +1002,14 @@ ok 10
 10
 OUTPUT
 
-pir_output_is(<< 'CODE', '', "entry types - type_keyed");
+pir_output_is(<<"CODE", '', 'entry types - type_keyed');
 
-# no need to load a lib, as Perl* PMCs are still static
+# perl_group.so is loaded in 'test'
 .HLL 'Perl', ''    
 
 .sub test :main
-
-    new P0, .PerlHash
+$load_perl
+    new P0, I23
     set P1, P0["no"]
     print P1
     set P1, "one"
@@ -1007,8 +1018,8 @@ pir_output_is(<< 'CODE', '', "entry types - type_keyed");
 .end
 CODE
 
-pasm_output_is(<<'CODE', <<OUTPUT, "exists with constant string key");
-    new P16, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "exists with constant string key");
+    new P16, I23
     set P16["key1"], "value for key1\n"
     set S16, P16["key1"]
     print S16
@@ -1032,7 +1043,7 @@ OUTPUT
 
 SKIP: {
 skip("no more chartype", 1);
-pasm_output_is(<<'CODE', <<OUTPUT, "compare keys with different type");
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "compare keys with different type");
     set S0, "\xA4"    # currency/euro depending on type
     clone S1, S0
     find_chartype I0, "8859-1"
@@ -1052,7 +1063,7 @@ pasm_output_is(<<'CODE', <<OUTPUT, "compare keys with different type");
 equal:
     print "equal\n"
 
-    new P0, .PerlHash
+    new P0, I23
     set P0[S0], "currency"
     set P0[S1], "euro"
     set S2, P0[S0]
@@ -1071,31 +1082,33 @@ euro
 OUTPUT
 }
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "PerlHash in PIR");
+pir_output_is(<<"CODE", <<'OUTPUT', "PerlHash in PIR");
 
-.sub _main
+.sub 'test' :main
+$load_perl
     .local pmc hash1
-    hash1 = new PerlHash
+    hash1 = new I23
     hash1['X'] = 'U'
     .local string val1
     val1 = hash1['X']
     print val1
-    print "\n"
+    print "\\n"
     end
 .end
 CODE
 U
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
+pir_output_is(<<"CODE", <<'OUTPUT', 'Setting with compound keys');
 
-.sub test :main
+.sub 'test' :main
+$load_perl
     .local pmc outer_hash
-    outer_hash = new PerlHash
+    outer_hash = new I23
     .local pmc inner_hash
-    inner_hash = new PerlHash
+    inner_hash = new I23
     .local pmc inner_array
-    inner_array = new PerlArray
+    inner_array = new I21
     .local string elem_string
     .local int    elem_int
     .local pmc    elem_pmc
@@ -1106,59 +1119,59 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     outer_hash['inner_array'] = inner_array
     elem_string = outer_hash['inner_array';128]
     print elem_string
-    print "\n"
+    print "\\n"
     outer_hash['inner_array';128] = 'changed inner_array:128'
     elem_string = outer_hash['inner_array';128]
     print elem_string
-    print "\n"
+    print "\\n"
 
     # setting and retrieving strings in an inner PerlHash
     inner_hash['129'] = 'inner_hash:129'
     outer_hash['inner_hash'] = inner_hash
     elem_string = outer_hash['inner_hash';'129']
     print elem_string
-    print "\n"
+    print "\\n"
     outer_hash['inner_hash';'129'] = 'changed inner_hash:129'
     elem_string = outer_hash['inner_hash';'129']
     print elem_string
-    print "\n"
+    print "\\n"
 
     # setting and retrieving integer in an inner PerlArray
     inner_array[130] = 130
     outer_hash['inner_array'] = inner_array
     elem_int = outer_hash['inner_array';130]
     print elem_int
-    print "\n"
+    print "\\n"
     outer_hash['inner_array';130] = -130
     elem_int = outer_hash['inner_array';130]
     print elem_int
-    print "\n"
+    print "\\n"
 
     # setting and retrieving integer in an inner PerlHash
     inner_hash['131'] = 131
     outer_hash['inner_hash'] = inner_hash
     elem_int = outer_hash['inner_hash';'131']
     print elem_int
-    print "\n"
+    print "\\n"
     outer_hash['inner_hash';'131'] = -131
     elem_int = outer_hash['inner_hash';'131']
     print elem_int
-    print "\n"
+    print "\\n"
 
     # setting and retrieving a PMC in an inner PerlArray
     .local pmc in_pmc
-    in_pmc = new .PerlString
+    in_pmc = new I27
     in_pmc = 'inner_array:132'
     inner_array[132] = in_pmc
     outer_hash['inner_array'] = inner_array
     elem_pmc = outer_hash['inner_array';132]
     print elem_pmc
-    print "\n"
+    print "\\n"
     in_pmc = 'changed inner_array:132'
     outer_hash['inner_array';132] = in_pmc
     elem_pmc = outer_hash['inner_array';132]
     print elem_pmc
-    print "\n"
+    print "\\n"
 
     # setting and retrieving a PMC in an inner PerlHash
     in_pmc = 'inner_array:133'
@@ -1166,36 +1179,35 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     outer_hash['inner_hash'] = inner_hash
     elem_string = outer_hash['inner_hash';'133']
     print elem_string
-    print "\n"
+    print "\\n"
     in_pmc = 'changed inner_hash:133'
     outer_hash['inner_hash';'133'] = in_pmc
     elem_string = outer_hash['inner_hash';'133']
     print elem_string
-    print "\n"
+    print "\\n"
 
     # setting and retrieving a float in an inner PerlArray
     inner_array[134] = 134.134
     outer_hash['inner_array'] = inner_array
     elem_num = outer_hash['inner_array';134]
     print elem_num
-    print "\n"
+    print "\\n"
     outer_hash['inner_array';134] = -134.134
     elem_num = outer_hash['inner_array';134]
     print elem_num
-    print "\n"
+    print "\\n"
 
     # setting and retrieving a float in an inner PerlHash
     inner_hash['135'] = 135.135
     outer_hash['inner_hash'] = inner_hash
     elem_num = outer_hash['inner_hash';'135']
     print elem_num
-    print "\n"
+    print "\\n"
     outer_hash['inner_hash';'135'] = -135.135
     elem_num = outer_hash['inner_hash';'135']
     print elem_num
-    print "\n"
-
-    end
+    print "\\n"
+    
 .end
 CODE
 inner_array:128
@@ -1216,8 +1228,8 @@ changed inner_hash:133
 -135.135000
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "mutating the lookup string");
-    new P0, .PerlHash
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "mutating the lookup string");
+    new P0, I23
     set P0["a"], "one"
     set P0["ab"], "two"
     set P0["abc"], "three"
@@ -1244,21 +1256,23 @@ two
 three
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is(<<"CODE", <<'OUTPUT', 'check whether interface is done');
 
-.sub test :main
+.sub 'test' :main
+$load_perl
+
     .local pmc pmc1
-    pmc1 = new PerlHash
+    pmc1 = new I23
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
-    print "\n"
+    print "\\n"
     does bool1, pmc1, "hash"
     print bool1
-    print "\n"
+    print "\\n"
     does bool1, pmc1, "no_interface"
     print bool1
-    print "\n"
+    print "\\n"
     end
 .end
 CODE
@@ -1267,24 +1281,25 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "iter");
+pir_output_is(<<"CODE", <<'OUTPUT', 'iter');
 
-.sub test :main
-    new P0, .PerlHash
+.sub 'test' :main
+$load_perl
+    new P0, I23
     set P0['a'], 'x'
     iter P1, P0
     if P1 goto ok1
-    print "Not empty?\n"
+    print "Not empty?\\n"
     shift P2, P1
     print P2
-    print "\n"
+    print "\\n"
 ok1:
     iter P1, P0
     shift P2, P1
     print P2
-    print "\n"
+    print "\\n"
     unless P1 goto ok2
-    print "Surprise!\n"
+    print "Surprise!\\n"
 ok2:
     end
 .end
@@ -1292,10 +1307,10 @@ CODE
 a
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'PerlHash iterator');
+pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'PerlHash iterator');
     .include "iterator.pasm"
-	new P0, .PerlHash	# Hash for iteration
-	new P2, .PerlHash	# for test
+	new P0, I23	# Hash for iteration
+	new P2, I23	# for test
 
 	set I0, 65
 	set I1, 35

@@ -13,12 +13,13 @@ O           = @o@
 # There is no config probe for libquantum yet, so add 'quantumreg' manually if desired
 #
 PMCS = \
-#CONDITIONED_LINE(has_gdbm):gdbmhash \
   dynlexpad \
+  foo \
+#CONDITIONED_LINE(has_gdbm):gdbmhash \
   match \
   matchrange \
-  subproxy \
-  foo
+  perlarray perlhash perlnum perlstring perlenv perlint perlscalar perlundef \
+  subproxy 
 
 DISABLED_PMCS = \
   pybuiltin \

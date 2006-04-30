@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 
@@ -15,7 +16,7 @@ t/pmc/perlenv.t - test the PerlEnv PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/perlenv.t
+    % prove t/pmc/perlenv.t
 
 =head1 DESCRIPTION
 
@@ -23,11 +24,17 @@ Tests the PerlEnv PMC.
 
 =cut
 
+my $load_perl = <<'END_PASM';
+    loadlib P20, 'perl_group'
+    find_type I22, 'PerlEnv'
+END_PASM
 
-pir_output_is(<<'CODE', <<'OUT', 'new');
+
+pir_output_is(<<"CODE", <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .PerlEnv
-	print "ok 1\n"
+$load_perl
+    new P0, I22
+    print "ok 1\\n"
 .end
 CODE
 ok 1

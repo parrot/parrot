@@ -1,10 +1,10 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
 
-src/pmc/perlundef.pmc - Perl Undef
+src/dynpmc/perlundef.pmc - Perl Undef
 
 =head1 DESCRIPTION
 
@@ -24,6 +24,8 @@ the Perl C<undef> value.
 
 pmclass PerlUndef
     extends PerlInt 
+    dynpmc
+    group perl_group
     hll Perl
     maps None {
 
@@ -135,7 +137,11 @@ Morphs to a C<PerlInt> with value C<value>.
 */
 
     void set_integer_native (INTVAL value) {
-        DYNSELF.morph(enum_class_PerlInt);
+        INTVAL dynpmc_PerlInt;
+    
+        dynpmc_PerlInt = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlInt", 0));
+        DYNSELF.morph(dynpmc_PerlInt);
         DYNSELF.set_integer_native(value);
     }
 
@@ -164,7 +170,11 @@ Morphs to a C<PerlString> with the value of C<*value>.
 */
 
     void set_string_native (STRING* value) {
-        DYNSELF.morph(enum_class_PerlString);
+        INTVAL dynpmc_PerlString;
+    
+        dynpmc_PerlString = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlString", 0));
+        DYNSELF.morph(dynpmc_PerlString);
         DYNSELF.set_string_native(value);
     }
 
@@ -477,8 +487,13 @@ All these methods simply return undef itself.
 */
 
     PMC* logical_not (PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, enum_class_PerlInt);
+        if (!dest) {
+            INTVAL dynpmc_PerlInt;
+        
+            dynpmc_PerlInt = pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "PerlInt", 0));
+            dest = pmc_new(INTERP, dynpmc_PerlInt);
+        }
         VTABLE_set_integer_native(INTERP, dest, 1);
         return dest;
     }
@@ -511,7 +526,11 @@ Morphs to a C<PerlInt> with value C<1>.
 */
 
     void increment () {
-        DYNSELF.morph(enum_class_PerlInt);
+        INTVAL dynpmc_PerlInt;
+    
+        dynpmc_PerlInt = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlInt", 0));
+        DYNSELF.morph(dynpmc_PerlInt);
         PMC_int_val(SELF) = 1;
     }
 
@@ -526,7 +545,11 @@ Morphs to a C<PerlInt> with value C<-1>.
 */
 
     void decrement () {
-        DYNSELF.morph(enum_class_PerlInt);
+        INTVAL dynpmc_PerlInt;
+    
+        dynpmc_PerlInt = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlInt", 0));
+        DYNSELF.morph(dynpmc_PerlInt);
         PMC_int_val(SELF) = -1;
     }
 }

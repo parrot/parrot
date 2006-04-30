@@ -1,10 +1,10 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
 
-src/pmc/perlenv.pmc - Perl System Environment
+src/dynpmc/perlenv.pmc - Perl System Environment
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,11 @@ C<PerlEnv> extends C<Env> to return scalars from C<get_pmc_keyed()>.
 
 static PMC * Env_PMC;
 
-pmclass PerlEnv singleton extends Env {
+pmclass PerlEnv
+    singleton
+    dynpmc
+    group perl_group
+    extends Env {
 
 /*
 
@@ -62,9 +66,14 @@ Returns the result of C<get_string_keyed(key)> as a C<PerlString>.
 */
 
     PMC* get_pmc_keyed (PMC* key) {
+        INTVAL dynpmc_PerlString;
+    
+        dynpmc_PerlString = pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "PerlString", 0));
+        PMC * ret = pmc_new(INTERP, dynpmc_PerlString);
         STRING* string = DYNSELF.get_string_keyed(key);
-        PMC * ret = pmc_new(INTERP, enum_class_PerlString);
         VTABLE_set_string_native(INTERP, ret, string);
+
         return ret;
     }
 

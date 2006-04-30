@@ -1,25 +1,26 @@
 #! perl
-# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
 =head1 NAME
 
-t/pmc/bigint.t - BigInt
+t/pmc/bigint.t - BigInt PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/bigint.t
+    % prove t/pmc/bigint.t
 
 =head1 DESCRIPTION
 
-Tests the BigInt PMC. Checks Perl-specific integer behaviour.
+Tests the BigInt PMC.
 
 =cut
 
@@ -247,7 +248,7 @@ OUTPUT
 pasm_output_is(<<'CODE', <<'OUTPUT', "sub other int");
      new P0, .BigInt
      set P0, 12345678
-     new P1, .PerlInt
+     new P1, .Integer
      set P1, 5678
      new P2, .BigInt
      sub P2, P0, P1
@@ -379,7 +380,7 @@ pasm_output_is(<<'CODE', <<'OUT', "div other int");
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
-     new P3, .PerlInt
+     new P3, .Integer
      set P3, 10
      div P1, P0, P3
      new P2, .BigInt
@@ -402,7 +403,7 @@ ok 1
 ok 2
 OUT
 
-  for my $op ("/", "%") {
+for my $op ("/", "%") {
     for my $type ("BigInt", "Integer") {
       pir_output_is(<<"CODE", <<OUTPUT, "bigint $op by zero $type");
 .sub _main :main
@@ -427,28 +428,28 @@ ok
 Divide by zero
 OUTPUT
     }
-  }
-
-use Parrot::Config;
-
-my ($a, $b, $c, $d, $e);
-if ($PConfig{intvalsize} == 8) {
-    $a = '9223372036854775806';	# 2**63-2
-    $b =                   '1';
-    $c = '9223372036854775807'; # still PerlInt
-    $d = '9223372036854775808'; # no more PerlInt
-    $e = '9223372036854775809'; # still no more PerlInt
-} elsif ($PConfig{intvalsize} == 4) {
-    $a = '2147483646';		# 2**31-2
-    $b =          '1';
-    $c = '2147483647';		# still PerlInt
-    $d = '2147483648';		# no more PerlInt
-    $e = '2147483649';		# still no more PerlInt
-} else {
-    die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
 }
 
-pasm_output_is(<<CODE, <<OUT, "add overflow Integer");
+
+{
+    my ($a, $b, $c, $d, $e);
+    if ($PConfig{intvalsize} == 8) {
+        $a = '9223372036854775806';	# 2**63-2
+        $b =                   '1';
+        $c = '9223372036854775807'; # still Integer
+        $d = '9223372036854775808'; # no more Integer
+        $e = '9223372036854775809'; # still no more Integer
+    } elsif ($PConfig{intvalsize} == 4) {
+        $a = '2147483646';		# 2**31-2
+        $b =          '1';
+        $c = '2147483647';		# still Integer
+        $d = '2147483648';		# no more PerlInt
+        $e = '2147483649';		# still no more PerlInt
+    } else {
+        die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
+    }
+
+    pasm_output_is(<<CODE, <<OUT, "add overflow Integer");
    new P0, .Integer
    set P0, $a
    new P1, .Integer
@@ -477,12 +478,12 @@ $e BigInt
 ok
 OUT
 
-pasm_output_is(<<CODE, <<OUT, "add overflow PerlInt");
-   new P0, .PerlInt
+    pasm_output_is(<<CODE, <<OUT, "add overflow Integer");
+   new P0, .Integer
    set P0, $a
-   new P1, .PerlInt
+   new P1, .Integer
    set P1, $b
-   new P2, .PerlInt
+   new P2, .Integer
    new P3, .BigInt
    set I3, 3
 lp:
@@ -500,11 +501,12 @@ lp:
 ex:
    end
 CODE
-$c PerlInt
+$c Integer
 $d BigInt
 $e BigInt
 ok
 OUT
+}
 
 pasm_output_is(<<'CODE', <<'OUT', "abs");
    new P0, .BigInt
