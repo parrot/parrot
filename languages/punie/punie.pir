@@ -65,7 +65,7 @@ and logic ops.
      grammar = new 'ASTGrammar'
 
     # Construct the "AST"
-    load_bytecode "languages/punie/lib/PAST.pir"
+    load_bytecode "PAST.pbc"
     .local pmc astbuilder
     astbuilder = grammar.apply(match)
     .local pmc ast

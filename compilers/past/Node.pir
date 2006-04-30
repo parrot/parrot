@@ -36,6 +36,10 @@ All PAST and POST nodes subclass from this base type.
     .return ($I1)
 .end
 
+.sub '__get_bool' :method
+	.return( 1 )
+.end
+
 .sub source :method
     .param string source :optional
     .param int got_source :opt_flag

@@ -1,6 +1,6 @@
 ROOT: result(.) = {
 	.local pmc result
-	result = new 'PAST::Node'
+	result = new 'Node'
 
 	.local pmc match
 	match = node['list']

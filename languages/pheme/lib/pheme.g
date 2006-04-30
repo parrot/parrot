@@ -18,4 +18,3 @@ rule quote { ' }
 rule symbol_tag { \# }
 
 rule ws { [ ; \N+ | \s ]+ }
-

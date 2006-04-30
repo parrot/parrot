@@ -20,11 +20,8 @@ lib/pheme_grammar_gen.pir: lib/pheme.g
 lib/PhemeSymbols.pbc: lib/PhemeSymbols.pir
 	$(PARROT) -o lib/PhemeSymbols.pbc --output-pbc lib/PhemeSymbols.pir 
 
-lib/PhemeCompiler.pbc: lib/PhemeCompiler.pir lib/PAST.pbc lib/POST.pbc
+lib/PhemeCompiler.pbc: lib/PhemeCompiler.pir lib/POST.pbc
 	$(PARROT) -o lib/PhemeCompiler.pbc --output-pbc lib/PhemeCompiler.pir 
-
-lib/PAST.pbc: lib/PAST.pir
-	$(PARROT) -o lib/PAST.pbc --output-pbc lib/PAST.pir 
 
 lib/POST.pbc: lib/POST.pir
 	$(PARROT) -o lib/POST.pbc --output-pbc lib/POST.pir 

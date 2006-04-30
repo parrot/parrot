@@ -82,6 +82,11 @@ sub makefiles
         conditioned_lines                       => 1
     );
     genfile(
+        'config/gen/makefiles/past.in' => 'compilers/past/Makefile',
+        commentType                   => '#',
+        replace_slashes               => 1
+    );
+    genfile(
         'config/gen/makefiles/pge.in' => 'compilers/pge/Makefile',
         commentType                   => '#',
         replace_slashes               => 1

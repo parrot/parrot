@@ -6,14 +6,14 @@ use Parrot::Test tests => 5;
 
 pir_output_is(<<'CODE', <<'OUT', 'load the library');
 .sub _main
-    load_bytecode 'languages/punie/lib/Node.pir'
+    load_bytecode 'Node.pbc'
 .end
 CODE
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', 'construct a node');
 .sub _main
-    load_bytecode 'languages/punie/lib/Node.pir'
+    load_bytecode 'Node.pbc'
     .local pmc node
     node = new 'Node'
     .return()
@@ -23,7 +23,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', 'set attributes manually');
 .sub _main
-    load_bytecode 'languages/punie/lib/Node.pir'
+    load_bytecode 'Node.pbc'
     .local pmc node
     node = new 'Node'
     $P0 = getattribute node, 'source'
@@ -53,7 +53,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
 .sub _main
-    load_bytecode 'languages/punie/lib/Node.pir'
+    load_bytecode 'Node.pbc'
     .local pmc node
     node = new 'Node'
     node.'source'('foo')
@@ -83,7 +83,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', 'dump node structure in visual format');
 .sub _main
-    load_bytecode 'languages/punie/lib/Node.pir'
+    load_bytecode 'Node.pbc'
     .local pmc node1
     node1 = new 'Node'
     node1.'source'('foo')

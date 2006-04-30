@@ -6,7 +6,7 @@ use Parrot::Test tests => 2;
 
 pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
 .sub _main
-    load_bytecode 'languages/punie/lib/PAST.pir'
+    load_bytecode 'PAST.pbc'
     .local pmc node
     node = new 'PAST::Op'
     node.'source'('foo')
@@ -31,7 +31,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', 'dump node structure in visual format');
 .sub _main
-    load_bytecode 'languages/punie/lib/PAST.pir'
+    load_bytecode 'PAST.pbc'
     .local pmc node
     node = new 'PAST::Op'
     node.'source'('foo')

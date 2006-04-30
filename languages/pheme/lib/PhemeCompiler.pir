@@ -73,7 +73,8 @@
 	.param pmc parse_tree
 
 	load_bytecode 'TGE.pbc'
-	load_bytecode 'lib/PAST.pbc'
+	load_bytecode 'Node.pbc'
+	load_bytecode 'PAST.pbc'
 
 	.local pmc compiled_symbols
 	compiled_symbols = new .Hash

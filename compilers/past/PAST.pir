@@ -15,19 +15,17 @@ tree nodes created by the Punie compiler.
 .namespace [ "PAST" ]
 
 .sub "__onload" :load
-    load_bytecode "languages/punie/lib/Node.pir"
-    load_bytecode "languages/punie/lib/PAST/Code.pir"
-    load_bytecode "languages/punie/lib/PAST/Exp.pir"
-    load_bytecode "languages/punie/lib/PAST/Op.pir"
-    load_bytecode "languages/punie/lib/PAST/Stmt.pir"
-    load_bytecode "languages/punie/lib/PAST/Stmts.pir"
-    load_bytecode "languages/punie/lib/PAST/Sub.pir"
-    load_bytecode "languages/punie/lib/PAST/Val.pir"
-    load_bytecode "languages/punie/lib/PAST/Var.pir"
+    load_bytecode "Node.pbc"
+    load_bytecode "PAST/Code.pbc"
+    load_bytecode "PAST/Exp.pbc"
+    load_bytecode "PAST/Op.pbc"
+    load_bytecode "PAST/Stmt.pbc"
+    load_bytecode "PAST/Stmts.pbc"
+    load_bytecode "PAST/Sub.pbc"
+    load_bytecode "PAST/Val.pbc"
+    load_bytecode "PAST/Var.pbc"
     .local pmc base
     newclass base, "PAST"
     addattribute base, "topnode" # the top node of the syntax tree
     .return ()
 .end
-
-

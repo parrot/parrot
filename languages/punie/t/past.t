@@ -6,7 +6,7 @@ use Parrot::Test tests => 7;
 
 pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
 .sub _main
-    load_bytecode 'languages/punie/lib/PAST.pir'
+    load_bytecode 'PAST.pbc'
 .end
 CODE
 OUT
@@ -14,7 +14,7 @@ OUT
 foreach my $module (qw(Code Exp Stmts Stmt Sub Var)) {
 my $code = <<'CODE'
 .sub _main
-    load_bytecode 'languages/punie/lib/PAST.pir'
+    load_bytecode 'PAST.pbc'
     .local pmc node
 CODE
 ;
