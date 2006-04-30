@@ -7,12 +7,13 @@ RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
 TOOL_DIR = ../..
 CP       = @cp@
+MKDIR    = @mkdir@
 
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
 
 # the default target
-all: $(PARROT_LIBRARY)/PAST.pbc $(PARROT_LIBRARY)/Node.pbc
+all: $(PARROT_LIBRARY)/PAST $(PARROT_LIBRARY)/PAST.pbc $(PARROT_LIBRARY)/Node.pbc
 
 SOURCES = PAST.pir \
   Node.pir \
@@ -24,6 +25,9 @@ SOURCES = PAST.pir \
   PAST/Sub.pir \
   PAST/Val.pir \
   PAST/Var.pir
+
+$(PARROT_LIBRARY)/PAST:
+	$(MKDIR) $(PARROT_LIBRARY)/PAST
 
 $(PARROT_LIBRARY)/Node.pbc: Node.pbc
 	$(CP) Node.pbc $(PARROT_LIBRARY)
@@ -83,9 +87,9 @@ testclean:
 	$(RM_RF) "../../t/compilers/*.pir"
 
 clean: testclean
-	$(RM_RF) Node.pbc $(PARROT_LIBRARY)/Node.pbc
-	$(RM_RF) PAST.pbc $(PARROT_LIBRARY)/PAST.pbc
-	$(RM_RF) PAST.pbc $(PARROT_LIBRARY)/PAST/*.pbc
+	$(RM_RF) Node.pbc   $(PARROT_LIBRARY)/Node.pbc
+	$(RM_RF) PAST.pbc   $(PARROT_LIBRARY)/PAST.pbc
+	$(RM_RF) PAST/*.pbc $(PARROT_LIBRARY)/PAST/*.pbc
 
 realclean: clean
 	$(RM_RF) Makefile
