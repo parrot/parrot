@@ -1,3 +1,5 @@
+# $Id$
+
 package Regex::Parse::P6C;
 
 use strict;
@@ -59,7 +61,7 @@ sub convert_rx_atom {
     } elsif (ref($atom) eq 'ARRAY') {
         # Codeblock
         $R = op('external' => [ 'code', [ $atom, $ctx ] ]);
-    } elsif (UNIVERSAL::can($atom, 'type') && $atom->type eq 'PerlArray') {
+    } elsif (UNIVERSAL::can($atom, 'type') && $atom->type eq 'ResizablePMCArray') {
         $R = op('external' => [ 'array', [ $atom, $ctx ] ]);
     } elsif ($atom->isa('P6C::sv_literal') && is_string($atom->type)) {
         $R = $self->convert_sv_literal($atom, $ctx);
@@ -116,7 +118,7 @@ sub convert_rx_call {
 sub convert_sv_literal {
     use Data::Dumper;
     my ($self, $tree, $ctx) = @_;
-    die Dumper($tree) unless $tree->type eq 'PerlString';
+    die Dumper($tree) unless $tree->type eq 'String';
     my $literal = $tree->lval;
     die Dumper($tree) unless $literal =~ s/^\"//;
     die Dumper($tree) unless $literal =~ s/\"$//;

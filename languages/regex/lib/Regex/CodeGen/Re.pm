@@ -1,3 +1,5 @@
+# $Id$
+
 package Regex::CodeGen::Re;
 use Regex::RegexOps ();
 use base 'Regex::CodeGen';

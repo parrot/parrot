@@ -113,7 +113,7 @@ sub output_header {
     return 1 unless $self->{emit_main};
 
     print $fh <<'END';
-.sub _main :main
+.sub main :main
     .param pmc args
     .local string input_string
     input_string = args[1]
@@ -124,7 +124,7 @@ sub output_header {
     .local pmc result
     .local int matched
     .local pmc stack
-    stack = new PerlArray
+    stack = new .ResizablePMCArray
     result = _default(1, input_string, 0, stack)
     matched = result["!RESULT"]
     if matched goto printResults
