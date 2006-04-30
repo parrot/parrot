@@ -9,6 +9,7 @@ RM_F      = @rm_f@
 # add new languages here
 # remove obsolete languages here
 LANGUAGES = \
+    APL \
     BASIC \
     HQ9plus \
     Zcode \
@@ -72,6 +73,7 @@ smoke-clean :
 	$(RM_F) languages_smoke.html
 
 clean: \
+    APL.clean \
     BASIC.clean \
     HQ9plus.clean \
     Zcode.clean \
@@ -100,6 +102,14 @@ clean: \
 #
 
 # The *.dummy targets are a replacement for the target .PHONY in 'GNU make'
+
+APL : APL.dummy
+APL.dummy:
+	- $(MAKE) APL
+APL.test:
+	- $(MAKE) APL test
+APL.clean:
+	- $(MAKE) APL clean
 
 BASIC : BASIC.dummy
 BASIC.dummy:
