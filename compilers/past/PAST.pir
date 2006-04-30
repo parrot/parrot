@@ -1,6 +1,8 @@
+# $Id$
+
 =head1 NAME
 
-PAST - A high-level abstract syntax tree for Punie.
+PAST - A high-level abstract syntax tree for Punie, Pheme and Parrot bc.
 
 =head1 DESCRIPTION
 
@@ -8,7 +10,7 @@ The Punie compiler progresses through two levels of syntax tree. PAST
 (Parrot/Punie Abstract Syntax Tree) is a high-level tree, which closely
 corresponds to the semantics of the language (though in a desugared
 form). The individual subclasses of Node implement the abstract syntax
-tree nodes created by the Punie compiler.
+tree nodes created by a language compiler.
 
 =cut
 
