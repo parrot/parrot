@@ -66,12 +66,14 @@ Returns the result of C<get_string_keyed(key)> as a C<PerlString>.
 */
 
     PMC* get_pmc_keyed (PMC* key) {
-        INTVAL dynpmc_PerlString;
+        INTVAL   dynpmc_PerlString;
+        PMC     *ret;
+        STRING  *string;
     
         dynpmc_PerlString = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlString", 0));
-        PMC * ret = pmc_new(INTERP, dynpmc_PerlString);
-        STRING* string = DYNSELF.get_string_keyed(key);
+        ret = pmc_new(INTERP, dynpmc_PerlString);
+        string = DYNSELF.get_string_keyed(key);
         VTABLE_set_string_native(INTERP, ret, string);
 
         return ret;
