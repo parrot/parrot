@@ -2,9 +2,6 @@ ROOT: result(.) = {
 	.local pmc result
 	result = new 'POST::Node'
 
-	.local pmc children
-	children = node.'children'()
-
 	.local pmc symbols
 	symbols = tree.'get'( 'find_sub_names', node )
 
@@ -12,8 +9,7 @@ ROOT: result(.) = {
 
 	.local pmc child
 	.local pmc iter
-	iter = new Iterator, children
-	iter = 0
+	iter = node.'child_iter'()
 
   iter_loop:
 	unless iter, iter_end        # while (entries) ...
@@ -30,14 +26,10 @@ Node: find_sub_names(.) = {
 	.local pmc symbols
 	symbols = find_global 'PhemeCompiler', 'symbols'
 
-	.local pmc children
-	children = node.'children'()
-
 	.local string name
 	.local pmc    child
 	.local pmc    iter
-	iter = new Iterator, children
-	iter = 0
+	iter = node.'child_iter'()
 
   iter_loop:
 	unless iter, iter_end        # while (entries) ...
@@ -218,8 +210,7 @@ PAST::Exp: get_var_names(.) = {
 
   find_kid_names:
 	.local pmc iter
-	iter = new .Iterator, children
-	iter = 0
+	iter = node.'child_iter'()
 
 	.local pmc child
 	.local string name
@@ -257,12 +248,8 @@ PAST::Stmts: result(.) = {
 
 	result.'tmpvar'( tmpvar )
 
-	.local pmc children
-	children = node.'children'()
-
 	.local pmc iter
-	iter = new .Iterator, children
-	iter = 0
+	iter = node.'child_iter'()
 
 	.local pmc child
 	.local pmc child_iter
@@ -303,12 +290,8 @@ PAST::Exp: result(.) = {
 
 	new_ops.'tmpvar'( tmpvar )
 
-	.local pmc children
-	children = node.'children'()
-
 	.local pmc iter
-	iter     = new .Iterator, children
-	iter     = 0
+	iter     = node.'child_iter'()
 	
 	.local pmc    child
 	.local string child_type
