@@ -1,4 +1,4 @@
-# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 import os
@@ -199,7 +199,7 @@ visit>>
    print """
 
 .sub 'bc' :main
-    load_bytecode 'languages/punie/lib/PAST.pir'
+    load_bytecode 'PAST.pbc'
     load_bytecode 'TGE.pbc'
     load_bytecode 'languages/punie/lib/POST.pir'
 
