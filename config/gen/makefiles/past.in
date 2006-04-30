@@ -55,10 +55,10 @@ PAST.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) -o PAST/Val.pbc --output-pbc PAST/Val.pir
 	$(PARROT) -o PAST/Var.pbc --output-pbc PAST/Var.pir
 
-# This is a listing of all targets, that are meant to be called by users
+# This is a listing of all targets that users can call
 help:
 	@echo ""
-	@echo "Following targets are available for the user:"
+	@echo "The following targets are available for the user:"
 	@echo ""
 	@echo "  all:               PAST.pbc"
 	@echo "                     This is the default."
@@ -76,14 +76,15 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 
-# test: all
+test: all
+	$(PERL) -Ilib -I../../lib t/harness
 
-# testclean:
-#	$(RM_RF) "../../t/p6rules/*.pbc"
+testclean:
+	$(RM_RF) "../../t/p6rules/*.pbc"
 
-# testclean
-clean: 
+clean: testclean
 	$(RM_RF) PAST.pbc $(PARROT_LIBRARY)/PAST.pbc
+	$(RM_RF) Node.pbc $(PARROT_LIBRARY)/Node.pbc
 
 realclean: clean
 	$(RM_RF) Makefile

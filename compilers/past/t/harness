@@ -1,0 +1,3 @@
+#! perl -w
+
+use Parrot::Test::Harness language => 'past';
