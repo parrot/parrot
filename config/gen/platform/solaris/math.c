@@ -12,10 +12,14 @@
 #endif
 
 /*
- * return true if the Numval has a negative sign
+ * return true if the Numval has a negative sign.
+ * This is mostly for handling the -0.0 case.
+ *
+ * Parrot_signbit is exported because PerlNum.set_number_native() uses it.
+ * XXX: This is propably not a good reason.
  */
 #if DOUBLE_SIZE == 2 * INT_SIZE
-int
+PARROT_API extern int
 Parrot_signbit(double x)
 {
    union {

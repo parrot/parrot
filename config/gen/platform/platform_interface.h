@@ -13,7 +13,7 @@
 ** Math:
 */
 
-int Parrot_signbit(double x);
+PARROT_API extern int Parrot_signbit(double x);
 #if NUMVAL_SIZE == 12
 int Parrot_signbit_l(long double x);
 #endif
