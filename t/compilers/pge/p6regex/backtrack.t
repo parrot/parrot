@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/backtrack.t - PGE backtracking tests
+t/p6regex/backtrack.t - PGE backtracking tests
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ ver. 7, in the B<Backtracking control> section
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/backtrack.t
+	% prove t/p6regex/backtrack.t
 
 =cut
 

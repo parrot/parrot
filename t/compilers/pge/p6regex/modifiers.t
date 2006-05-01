@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/modifiers.t - PGE rule modifier tests
+t/p6regex/modifiers.t - PGE rule modifier tests
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ ver. 7, in the B<'Modifiers'> section
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/modifiers.t
+	% prove t/p6regex/modifiers.t
 
 =cut
 

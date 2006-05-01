@@ -14,7 +14,7 @@ use File::Spec::Functions qw/ catfile /;
 
 =head1 NAME
 
-t/compilers/pge/p5regexp/p5rx.t - Perl 5 Regular Expression tests
+t/compilers/pge/p5regex/p5rx.t - Perl 5 Regular Expression tests
 
 =head1 DESCRIPTION
 
@@ -61,12 +61,12 @@ This is printed with "skipped", for harness to pick up.
 
 =head1 SYNOPSIS
 
-    % prove t/compilers/pge/p5regexp/p5rx.t
+    % prove t/compilers/pge/p5regex/p5rx.t
 
 =cut
 
 
-open(TESTS, catfile($PConfig{build_dir}, 't/compilers/pge/p5regexp/re_tests'))
+open(TESTS, catfile($PConfig{build_dir}, 't/compilers/pge/p5regex/re_tests'))
     or die "Can\'t open re_tests";
 
 ## figure out how many tests there are

@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/closure.t - PGE closure tests
+t/p6regex/closure.t - PGE closure tests
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ ver. 7, in the B<'Bracket rationalization'> section
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/closure.t
+	% prove t/p6regex/closure.t
 
 =cut
 

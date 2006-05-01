@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/builtins.t - PGE tests of builtin rules
+t/p6regex/builtins.t - PGE tests of builtin rules
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ B<'Nothing is illegal'> sections
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/builtins.t
+	% prove t/p6regex/builtins.t
 
 =cut
 

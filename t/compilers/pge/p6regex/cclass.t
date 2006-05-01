@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/cclass.t - PGE capture tests
+t/p6regex/cclass.t - PGE capture tests
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ ver. 7, in the B<<'Extensible metasyntax (<...>)'>> section
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/cclass.t
+	% prove t/p6regex/cclass.t
 
 =cut
 

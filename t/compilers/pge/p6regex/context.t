@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/context.t - PGE return value tests
+t/p6regex/context.t - PGE return value tests
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ ver. 8, in the B<'Return values from matches'> section
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/context.t
+	% prove t/p6regex/context.t
 
 =cut
 

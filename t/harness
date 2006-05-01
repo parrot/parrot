@@ -145,8 +145,8 @@ my @default_tests = map {glob "t/$_/*.t"} qw( configure
                                               dynoplibs
                                               compilers/past
                                               compilers/pge
-                                              compilers/pge/p5regexp
-                                              compilers/pge/p6rules
+                                              compilers/pge/p5regex
+                                              compilers/pge/p6regex
                                               compilers/tge
                                               library
                                               examples

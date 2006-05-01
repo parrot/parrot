@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/subrules.t - PGE subrules tests
+t/p6regex/subrules.t - PGE subrules tests
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ ver. 7, in the B<'Named regexes'> section
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/subrules.t
+	% prove t/p6regex/subrules.t
 
 =cut
 

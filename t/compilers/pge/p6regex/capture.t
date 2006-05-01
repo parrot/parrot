@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/capture.t - PGE capture tests
+t/p6regex/capture.t - PGE capture tests
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ B<'Return values from matches'> sections
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/capture.t
+	% prove t/p6regex/capture.t
 
 =cut
 

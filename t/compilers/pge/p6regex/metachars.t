@@ -13,7 +13,7 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/p6rules/metachars.t - PGE metacharacter syntax tests
+t/p6regex/metachars.t - PGE metacharacter syntax tests
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ B<'Backslash Reform'> sections
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/metachars.t
+	% prove t/p6regex/metachars.t
 
 =cut
 

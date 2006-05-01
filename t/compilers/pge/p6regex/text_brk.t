@@ -12,7 +12,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6rules/text_brk.t - PGE::Text::bracketed tests
+t/p6regex/text_brk.t - PGE::Text::bracketed tests
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ These tests examine the ability of PGE to match text with brackets in it.
 
 =head1 SYNOPSIS
 
-	% prove t/p6rules/text_brk.t
+	% prove t/p6regex/text_brk.t
 
 =cut
 
