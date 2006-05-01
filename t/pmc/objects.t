@@ -2119,7 +2119,7 @@ CODE
 Perl6;PAST;Node
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "isa");
+pir_output_is(<<'CODE', <<'OUTPUT', "isa (#39045)");
 .sub main :main
     .local pmc base, o1, o2
     base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
