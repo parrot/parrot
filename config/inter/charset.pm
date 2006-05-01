@@ -53,7 +53,7 @@ END
 
     my $TEMP_charset_build = <<"E_NOTE";
 
-# the following part of the Makefile was built by 'config/inter/charset.pl'
+# the following part of the Makefile was built by 'config/inter/charset.pm'
 
 E_NOTE
 

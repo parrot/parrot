@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/cpu/i386/auto.pl
+config/gen/cpu/i386/auto.pm
 
 =head1 DESCRIPTION
 

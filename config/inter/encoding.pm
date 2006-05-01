@@ -53,7 +53,7 @@ END
 
     my $TEMP_encoding_build = <<"E_NOTE";
 
-# the following part of the Makefile was built by 'config/inter/encoding.pl'
+# the following part of the Makefile was built by 'config/inter/encoding.pm'
 
 E_NOTE
 
