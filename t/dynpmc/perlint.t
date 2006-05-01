@@ -6,8 +6,12 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 75;
+use Parrot::Test;
 use Parrot::Config;
+
+## test count varies depending on gmp installation
+plan tests => ( $PConfig{gmp} ? 75 : 72 );
+
 
 =head1 NAME
 
@@ -2097,6 +2101,9 @@ PerlInt
 Integer
 OUT
 
+SKIP: {
+    skip 3 => 'no bigint lib' unless $PConfig{gmp};
+
 pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "sub other int");
      new P0, .BigInt
      set P0, 12345678
@@ -2211,3 +2218,4 @@ $e BigInt
 ok
 OUT
 }
+} ## SKIP
