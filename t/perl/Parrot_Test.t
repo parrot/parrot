@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 BEGIN {
     eval "use Test::Builder::Tester;";
     if ($@) {
@@ -34,11 +35,14 @@ BEGIN
 {
     my $pre_env = exists $ENV{PARROT_TEST} ? $ENV{PARROT_TEST} : undef;
     use_ok('Parrot::Test') or die;
+
+    # XXX Shouldn't this be in an END block
     my $post_env = exists $ENV{PARROT_TEST} ? $ENV{PARROT_TEST} : undef;
-    if( defined $pre_env )
-    { is( $post_env, $pre_env, 'PARROT_TEST env unchanged' ); }
-    else
-    { is( $post_env, 1, 'PARROT_TEST env set' ); }
+    if ( defined $pre_env ) {
+        is( $post_env, $pre_env, 'PARROT_TEST env unchanged' );
+    } else {
+        is( $post_env, 1, 'PARROT_TEST env set' );
+    }
 }
 
 
