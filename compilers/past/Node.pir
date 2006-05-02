@@ -106,10 +106,21 @@ All PAST and POST nodes subclass from this base type.
     print $S0
     print "> => { \n"
 
-    # print source for this node
-    self.dump_attribute("source", level)
-    self.dump_attribute("pos", level)
+    # print attributes for this node
+    .local pmc iter
+    $P1 = self.'DUMPABLE'()
+    iter = new Iterator, $P1
+    iter = 0
+  iter_loop:
+    unless iter, iter_end
+    $S1 = shift iter
+    if $S1 == 'children' goto children_dump
+    self.dump_attribute($S1, level)
+    goto iter_loop
+  children_dump:
     self.dump_children(level)
+    goto iter_loop
+  iter_end:
 
     # close off current node display
     print indent
@@ -191,4 +202,24 @@ Return an iterator for the children of a node.
     $P2 = new Iterator, $P1    # setup iterator for node
     $P2 = 0
     .return($P2)
+.end
+
+=head1 Utility Methods
+
+These methods provide functionality for the Node class and its
+subclasses, but aren't part of the external interface for the class.
+
+=head2 DUMPABLE
+
+This method returns a list of attributes that should be displayed in a
+'dump' operation. Subclasses can override it to return a different list.
+
+=cut
+
+.sub 'DUMPABLE' :method
+    $P1 = new .ResizableStringArray
+    push $P1, 'source'
+    push $P1, 'pos'
+    push $P1, 'children'
+    .return($P1)
 .end

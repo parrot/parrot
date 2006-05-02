@@ -19,27 +19,13 @@ PAST::Val is a subclass of Node.
     .return ()
 .end
 
-.sub "dump" :method
-    .param int level :optional
-    .local string indent
-    indent = repeat "    ", level # tab is 4 spaces here
-    level += 1 # set level for attributes
-    $S0 = typeof self
-    print indent
-    print "<"
-    print $S0
-    print "> => { \n"
-
-    # print source for this node
-    self.dump_attribute("source", level)
-    self.dump_attribute("pos", level)
-    self.dump_attribute("value", level)
-    self.dump_attribute("valtype", level)
-
-    # close off current node display
-    print indent
-    print "}\n"
-    .return ()
+.sub 'DUMPABLE' :method
+    $P1 = new .ResizableStringArray
+    push $P1, 'source'
+    push $P1, 'pos'
+    push $P1, 'value'
+    push $P1, 'valtype'
+    .return($P1)
 .end
 
 .sub value :method
