@@ -1,4 +1,4 @@
-.namespace [ 'Pheme' ]
+.namespace [ 'PhemeCompiler' ]
 
 .sub __onload :load
 	.local pmc symbols
@@ -14,6 +14,8 @@
 	store_global 'PhemeCompiler', 'symbols', symbols
 	.return()
 .end
+
+.namespace [ 'Pheme' ]
 
 .sub __resolve_at_runtime
 	.param string symbol_name

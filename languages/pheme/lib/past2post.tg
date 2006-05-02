@@ -5,7 +5,7 @@ ROOT: result(.) = {
 	.local pmc symbols
 	symbols = tree.'get'( 'find_sub_names', node )
 
-	store_global 'Pheme::Compiler', 'symbols', symbols
+	store_global 'PhemeCompiler', 'symbols', symbols
 
 	.local pmc child
 	.local pmc iter
@@ -157,7 +157,7 @@ PAST::Sub: create_sub_declarations(.) = {
 	goto iter_loop
 
   iter_end:
-	store_global 'Pheme::Compiler', 'bound_variables', variable_hash
+	store_global 'PhemeCompiler', 'bound_variables', variable_hash
 	.return( declarations )
 }
 
@@ -347,7 +347,7 @@ PAST::Op: result(.) = {
 	.local pmc result
 
 	.local pmc symbols
-	symbols   = find_global 'Pheme::Compiler', 'symbols'
+	symbols   = find_global 'PhemeCompiler', 'symbols'
 
 	.local string op_name
 	op_name   = node.'op'()
@@ -378,7 +378,7 @@ PAST::Val: result(.) = {
 	value = node.'value'()
 
 	.local pmc variables
-	variables = find_global 'Pheme::Compiler', 'bound_variables'
+	variables = find_global 'PhemeCompiler', 'bound_variables'
 
 	.local string value
 	value = node.'value'()

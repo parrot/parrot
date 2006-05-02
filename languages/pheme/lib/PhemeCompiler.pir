@@ -1,6 +1,9 @@
+.namespace [ 'PhemeCompiler' ]
+
 .sub __onload :load
 	load_bytecode 'PGE.pbc'
 	load_bytecode 'PGE/Text.pbc'
+	.return()
 .end
 
 .sub compile_pheme
@@ -99,8 +102,7 @@
 .sub get_post_tree
 	.param pmc past_tree
 
-	load_bytecode 'lib/POST.pbc'
-	load_bytecode 'lib/PhemeSymbols.pbc'
+	load_bytecode 'lib/POST.pir'
 
 	.local string tg_source
 	tg_source = _slurp_file( 'lib/past2post.tg' )

@@ -30,7 +30,7 @@ of POST::Node.
     $P2 = pos
 
     unless got_varname goto no_varname
-      $P3 = new PerlString
+      $P3 = new .String
       $P3 = varname
       setattribute self, "varname", $P3
     no_varname:
@@ -49,11 +49,11 @@ of POST::Node.
     self.set_node(nodesource,nodepos)
     self.new_temp()
     # Then we create a child array for a fabricated op to create a new
-    # pmc of type 'PerlUndef'. It has 2 arguments: the temp variable and
+    # pmc of type 'Undef'. It has 2 arguments: the temp variable and
     # the type.
-    $P5 = new PerlArray
+    $P5 = new .ResizablePMCArray
     push $P5, self
-    $I1 = find_type 'PerlUndef'
+    $I1 = find_type 'Undef'
     $S10 = $I1
     $P6 = new 'POST::Val'
     $P6.set_node(nodesource,nodepos,$S10)
@@ -70,7 +70,7 @@ of POST::Node.
     .param int got_varname :opt_flag
     unless got_varname goto get
   set:
-    $P1 = new PerlString
+    $P1 = new .String
     $P1 = varname
     setattribute self, "varname", $P1
     .return ($P1)

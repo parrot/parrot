@@ -12,6 +12,9 @@
 	.local string source
 	source     = _get_source( args )
 
+	.local pmc compile_pheme
+	compile_pheme = find_global 'PhemeCompiler', 'compile_pheme'
+
 	.local pmc ast
 	ast = compile_pheme( source )
 	end

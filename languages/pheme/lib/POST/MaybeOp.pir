@@ -28,7 +28,7 @@ POST::MaybeOp is a literal value in the OST. It is a subclass of POST::Node.
     $P1 = source
     $P2 = getattribute self, "pos"
     $P2 = pos
-    $P3 = new PerlString
+    $P3 = new .String
     $P3 = value
     setattribute self, "value", $P3
     .return ()
@@ -68,7 +68,7 @@ POST::MaybeOp is a literal value in the OST. It is a subclass of POST::Node.
     .param int got_valtype :opt_flag
     unless got_valtype goto get
   set:
-    $P1 = new PerlString
+    $P1 = new .String
     $P1 = valtype
     setattribute self, "valtype", $P1
     .return ($P1)

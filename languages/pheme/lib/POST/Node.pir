@@ -22,7 +22,7 @@ All POST nodes subclass from this base type.
 
 
 .sub __init :method
-    $P1 = new PerlUndef
+    $P1 = new .Undef
     $P2 = new .Integer
     $P3 = new .ResizablePMCArray
 	$P4 = new .Hash

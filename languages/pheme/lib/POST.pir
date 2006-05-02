@@ -11,24 +11,20 @@ for the opcode syntax tree nodes created by the Punie compiler.
 
 =cut
 
-.namespace [ "POST" ]
+.namespace [ 'POST' ]
 
-.sub "__onload" :load
-    load_bytecode "lib/POST/Node.pir"
-    load_bytecode "lib/POST/Op.pir"
-    load_bytecode "lib/POST/Ops.pir"
-    load_bytecode "lib/POST/Label.pir"
-#    load_bytecode "lib/POST/Decl.pir"
-#    load_bytecode "lib/POST/Stmt.pir"
-#    load_bytecode "lib/POST/Stmts.pir"
-    load_bytecode "lib/POST/Sub.pir"
-    load_bytecode "lib/POST/Val.pir"
-    load_bytecode "lib/POST/Var.pir"
-#    load_bytecode "lib/POST/Code.pir"
-    .local pmc base
-    newclass base, "POST"
-    addattribute base, "topnode" # the top node of the syntax tree
-    .return ()
+.sub '__onload' :load
+	load_bytecode 'lib/POST/Node.pir'
+	load_bytecode 'lib/POST/Op.pir'
+	load_bytecode 'lib/POST/Ops.pir'
+	load_bytecode 'lib/POST/Label.pir'
+	load_bytecode 'lib/POST/Sub.pir'
+	load_bytecode 'lib/POST/Val.pir'
+	load_bytecode 'lib/POST/Var.pir'
+
+	.local pmc base
+	newclass base, 'POST'
+	addattribute base, 'topnode' # the top node of the syntax tree
+
+	.return()
 .end
-
-
