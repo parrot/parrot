@@ -2,7 +2,7 @@
 
 # Setup some commands
 LN_S     = /bin/ln -s
-PERL     = /usr/bin/perl5.8.8
+PERL     = @perl@
 RM_F     = $(PERL) -MExtUtils::Command -e rm_f
 PARROT   = ../../parrot
 PGE_DIR  = ../../compilers/pge/
