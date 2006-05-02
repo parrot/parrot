@@ -1,33 +1,32 @@
 # $Id: /parrotcode/trunk/config/gen/makefiles/pheme.in 13083 2006-03-04T20:17:22.853686Z svm  $
 
 # Setup some commands
-LN_S     = /bin/ln -s
 PERL     = @perl@
-RM_F     = $(PERL) -MExtUtils::Command -e rm_f
+RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 PGE_DIR  = ../../compilers/pge
-CP       = $(PERL) -MExtUtils::Command -e cp
+CP       = @cp@
 
 # the default target
 all: pheme.pbc
 
 lib/PhemeGrammar.pbc: lib/PhemeGrammar.pir lib/pheme_grammar_gen.pir
-	$(PARROT) -o lib/PhemeGrammar.pbc --output-pbc lib/PhemeGrammar.pir 
+	$(PARROT) -o lib/PhemeGrammar.pbc --output-pbc lib/PhemeGrammar.pir
 
 lib/pheme_grammar_gen.pir: lib/pheme.g
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pheme_grammar_gen.pir lib/pheme.g
 
 lib/PhemeSymbols.pbc: lib/PhemeSymbols.pir
-	$(PARROT) -o lib/PhemeSymbols.pbc --output-pbc lib/PhemeSymbols.pir 
+	$(PARROT) -o lib/PhemeSymbols.pbc --output-pbc lib/PhemeSymbols.pir
 
 lib/PhemeCompiler.pbc: lib/PhemeCompiler.pir lib/POST.pbc
-	$(PARROT) -o lib/PhemeCompiler.pbc --output-pbc lib/PhemeCompiler.pir 
+	$(PARROT) -o lib/PhemeCompiler.pbc --output-pbc lib/PhemeCompiler.pir
 
 lib/POST.pbc: lib/POST.pir
-	$(PARROT) -o lib/POST.pbc --output-pbc lib/POST.pir 
+	$(PARROT) -o lib/POST.pbc --output-pbc lib/POST.pir
 
 pheme.pbc: lib/PhemeGrammar.pbc pheme.pir lib/PhemeSymbols.pbc lib/PhemeCompiler.pbc
-	$(PARROT) -o pheme.pbc --output-pbc pheme.pir 
+	$(PARROT) -o pheme.pbc --output-pbc pheme.pir
 
 # This is a listing of all targets that users can call
 help:
