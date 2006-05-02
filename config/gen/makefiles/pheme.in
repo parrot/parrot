@@ -4,8 +4,8 @@
 LN_S     = /bin/ln -s
 PERL     = @perl@
 RM_F     = $(PERL) -MExtUtils::Command -e rm_f
-PARROT   = ../../parrot
-PGE_DIR  = ../../compilers/pge/
+PARROT   = ../../parrot@exe@
+PGE_DIR  = ../../compilers/pge
 CP       = $(PERL) -MExtUtils::Command -e cp
 
 # the default target
@@ -15,7 +15,7 @@ lib/PhemeGrammar.pbc: lib/PhemeGrammar.pir lib/pheme_grammar_gen.pir
 	$(PARROT) -o lib/PhemeGrammar.pbc --output-pbc lib/PhemeGrammar.pir 
 
 lib/pheme_grammar_gen.pir: lib/pheme.g
-	$(PARROT) $(PGE_DIR)pgc.pir --output=lib/pheme_grammar_gen.pir lib/pheme.g
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pheme_grammar_gen.pir lib/pheme.g
 
 lib/PhemeSymbols.pbc: lib/PhemeSymbols.pir
 	$(PARROT) -o lib/PhemeSymbols.pbc --output-pbc lib/PhemeSymbols.pir 
