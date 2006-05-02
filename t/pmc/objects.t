@@ -2153,4 +2153,28 @@ __init Bar
 ok
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)")
+.sub main :main
+    .local pmc base
+    $P0 = getclass 'Integer'
+    base = subclass $P0, 'Foo'          # create subclass 'Foo'
+    addattribute base, '@!capt'
+
+    $P0 = subclass 'Foo', 'Bar'         # create subclass 'Bar'
+    $P1 = new 'Bar'                     # create an instance of 'Bar'
+
+    $S1 = $P1                           # get its string representation
+    print $S1                           # display it
+    print "\n"
+.end
+
+.namespace [ 'Bar' ]
+
+.sub '__get_string' :method
+    $S0 = 'ok bar'
+    .return ($S0)
+.end
+CODE
+ok bar
+OUTPUT
 
