@@ -20,7 +20,6 @@ the Perl C<undef> value.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/perltypes.h"
 
 pmclass PerlUndef
     extends PerlInt 

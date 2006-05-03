@@ -666,7 +666,6 @@ include/parrot/op.h                               [main]include
 include/parrot/oplib.h                            [main]include
 include/parrot/packfile.h                         [main]include
 include/parrot/parrot.h                           [main]include
-include/parrot/perltypes.h                        [main]include
 include/parrot/pic.h                              [main]include
 include/parrot/pmc.h                              [main]include
 include/parrot/pmc_freeze.h                       [main]include
