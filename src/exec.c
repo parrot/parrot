@@ -24,8 +24,8 @@ src/exec.c - Generate an object file
 #include "parrot/jit.h"
 #define JIT_EMIT 1
 #include "parrot/jit_emit.h"
-#include "parrot/exec_dep.h"
-#include "parrot/exec_save.h"
+#include "exec_dep.h"
+#include "exec_save.h"
 
 static void exec_init(Parrot_exec_objfile_t *obj);
 static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);
@@ -359,7 +359,7 @@ symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)
 
 =head1 SEE ALSO
 
-F<include/parrot/exec.h>, F<src/exec_cpu.c>, F<include/parrot/exec_save.h>
+F<include/parrot/exec.h>, F<src/exec_cpu.c>, F<src/exec_save.h>
 and F<src/exec_start.c>.
 
 =head1 HISTORY

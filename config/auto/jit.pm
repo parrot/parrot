@@ -1,4 +1,4 @@
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -15,16 +15,15 @@ capability available.
 package auto::jit;
 
 use strict;
-use vars qw($description @args);
+use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Config;
 use Parrot::Configure::Step qw(copy_if_diff cc_gen cc_clean cc_build cc_run);
 
-$description = 'Determining architecture, OS and JIT capability';
-
-@args = qw(jitcapable miniparrot execcapable verbose);
+our $description = 'Determining architecture, OS and JIT capability';
+our @args        = qw(jitcapable miniparrot execcapable verbose);
 
 sub runstep
 {
@@ -141,7 +140,7 @@ sub runstep
         if ($execcapable) {
             $conf->data->set(
                 TEMP_exec_h =>
-                    '$(INC_DIR)/jit.h $(INC_DIR)/exec.h $(INC_DIR)/exec_dep.h $(INC_DIR)/exec_save.h',
+                    '$(INC_DIR)/jit.h $(INC_DIR)/exec.h $(SRC_DIR)/exec_dep.h $(SRC_DIR)/exec_save.h',
                 TEMP_exec_o =>
                     '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_save$(O)',
                 execcapable => 1

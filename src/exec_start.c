@@ -116,7 +116,7 @@ main(int argc, char * argv[])
 
 =head1 SEE ALSO
 
-F<include/parrot/exec.h>, F<include/parrot/exec_save.h>, F<src/exec.c>
+F<include/parrot/exec.h>, F<src/exec_save.h>, F<src/exec.c>
 and F<compilers/imcc/main.c>.
 
 =head1 HISTORY

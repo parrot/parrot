@@ -214,7 +214,7 @@ GEN_CONFIGS = \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/core_pmcs.h \
-    $(INC_DIR)/exec_dep.h \
+    $(SRC_DIR)/exec_dep.h \
     lib/Parrot/Config.pm \
     lib/Parrot/PMC.pm \
     runtime/parrot/include/config.fpmc \
@@ -1144,13 +1144,13 @@ $(INC_DIR)/vtable.h : vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/Vtabl
 
 $(INC_DIR)/jit_emit.h : $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h
 	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h $(INC_DIR)/jit_emit.h
-$(INC_DIR)/exec_dep.h : $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h
-	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h $(INC_DIR)/exec_dep.h
+$(SRC_DIR)/exec_dep.h : $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h
+	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h $(SRC_DIR)/exec_dep.h
 $(SRC_DIR)/jit_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
     $(SRC_DIR)/jit/@jitcpuarch@/core.jit $(JIT_BUILD_TOOL)
 	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ $(SRC_DIR)/jit_cpu.c
 $(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
-    $(SRC_DIR)/jit/@jitcpuarch@/core.jit @TEMP_exec_h@ $(INC_DIR)/exec_dep.h $(JIT_BUILD_TOOL)
+    $(SRC_DIR)/jit/@jitcpuarch@/core.jit @TEMP_exec_h@ $(SRC_DIR)/exec_dep.h $(JIT_BUILD_TOOL)
 	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ $(SRC_DIR)/exec_cpu.c
 
 # imcc file dependencies
