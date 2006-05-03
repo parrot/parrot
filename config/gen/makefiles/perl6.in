@@ -17,9 +17,10 @@ SOURCES = perl6.pir \
   lib/grammar_optok.pg \
   lib/grammar_sub.pg \
   lib/parse.pir \
-  lib/pge2past.tg \
-  lib/past2pir.tg \
   lib/PAST.pir \
+  lib/POST.pir \
+  lib/pge2past.tg \
+  lib/past2post.tg \
   lib/main.pir \
   lib/builtins.pir
 
@@ -27,8 +28,8 @@ SOURCES = perl6.pir \
 perl6.pbc: $(PARROT) $(PGE_DIR)/pgc.pir $(SOURCES)
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=lib/grammar_gen.pir \
 	    lib/grammar_rules.pg lib/grammar_optok.pg lib/grammar_sub.pg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/pge2past.pir lib/pge2past.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/past2pir.pir lib/past2pir.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/pge2past_gen.pir lib/pge2past.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/past2post_gen.pir lib/past2post.tg
 	$(PARROT) -o perl6.pbc perl6.pir
 
 # This is a listing of all targets, that are meant to be called by users
@@ -58,7 +59,7 @@ test: all
 testclean:
 
 clean: 
-	$(RM_RF) perl6.pbc lib/grammar_gen.pir
+	$(RM_RF) perl6.pbc lib/grammar_gen.pir lib/pge2past_gen.pir lib/past2post_gen.pir
 
 realclean: clean
 	$(RM_RF) Makefile
