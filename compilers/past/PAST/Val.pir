@@ -28,30 +28,14 @@ PAST::Val is a subclass of Node.
     .return($P1)
 .end
 
-.sub value :method
-    .param string value  :optional
-    .param int got_value :opt_flag
-    unless got_value goto get
-  set:
-    $P1 = new .String
-    $P1 = value
-    setattribute self, "value", $P1
-    .return ($P1)
-  get:
-    $P2 = getattribute self, "value"
-    .return ($P2)
+.sub 'value' :method
+    .param string value       :optional
+    .param int passed_value   :opt_flag
+    .return self.'accessor'('value', value, passed_value)
 .end
 
-.sub valtype :method
-    .param string valtype :optional
-    .param int got_valtype :opt_flag
-    unless got_valtype goto get
-  set:
-    $P1 = new .String
-    $P1 = valtype
-    setattribute self, "valtype", $P1
-    .return ($P1)
-  get:
-    $P2 = getattribute self, "valtype"
-    .return ($P2)
+.sub 'valtype' :method
+    .param string valtype       :optional
+    .param int passed_valtype   :opt_flag
+    .return self.'accessor'('valtype', valtype, passed_valtype)
 .end

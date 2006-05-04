@@ -29,15 +29,7 @@ is a subclass of Node.
 .end
 
 .sub 'op' :method
-    .param string op :optional
-    .param int got_op :opt_flag
-    unless got_op goto get
-  set:
-    $P1 = new .String
-    $P1 = op
-    setattribute self, "op", $P1
-    .return ($P1)
-  get:
-    $P2 = getattribute self, "op"
-    .return ($P2)
+    .param string op       :optional
+    .param int passed_op   :opt_flag
+    .return self.'accessor'('op', op, passed_op)
 .end
