@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -668,7 +668,7 @@ real_exception(Interp *interpreter, void *ret_addr,
         int exitcode,  const char *format, ...)
 {
     STRING *msg;
-    Parrot_exception *the_exception = interpreter->exceptions;
+    Parrot_exception * const the_exception = interpreter->exceptions;
 
     /*
      * if profiling remember end time of lastop and
@@ -676,8 +676,8 @@ real_exception(Interp *interpreter, void *ret_addr,
      */
     if (interpreter->profile &&
             Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        RunProfile *profile = interpreter->profile;
-        FLOATVAL now = Parrot_floatval_time();
+        RunProfile * const profile = interpreter->profile;
+        const FLOATVAL now = Parrot_floatval_time();
         profile->data[profile->cur_op].time += now - profile->starttime;
         profile->cur_op = PARROT_PROF_EXCEPTION;
         profile->starttime = now;
@@ -726,12 +726,11 @@ Create exception objects.
 void
 Parrot_init_exceptions(Interp *interpreter) {
     int i;
-    PMC *ex;
 
     interpreter->exception_list = mem_sys_allocate(
             sizeof(PMC*) * (E_LAST_PYTHON_E + 1));
     for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
-        ex = pmc_new(interpreter, enum_class_Exception);
+        PMC * const ex = pmc_new(interpreter, enum_class_Exception);
         interpreter->exception_list[i] = ex;
         VTABLE_set_integer_keyed_int(interpreter, ex, 1, i);
     }

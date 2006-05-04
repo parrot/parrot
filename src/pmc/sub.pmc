@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -26,10 +26,8 @@ These are the vtable functions for the Sub (subroutine) base class
 static void
 print_sub_name(Interp* interpreter, PMC* sub)
 {
-    Interp *tracer;
-
-    tracer = interpreter->debugger ? 
-        interpreter->debugger : interpreter;
+    Interp * const tracer =
+        interpreter->debugger ? interpreter->debugger : interpreter;
 
         /* sub was located via globals */
     PIO_eprintf(tracer, "# Calling sub '%Ss'\n# ",
@@ -93,7 +91,7 @@ Destroys the subroutine.
 */
 
     void destroy () {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         if (!sub)
             return;
 #if 0
@@ -126,7 +124,7 @@ Sets the name of the subroutine.
     }
 
     void set_string_native(STRING *subname) {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         sub->name = string_copy(INTERP, subname);
     }
 
@@ -159,7 +157,7 @@ Returns the address of the actual subroutine.
 */
 
     void* get_pointer () {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->seg->base.data + sub->start_offs;
     }
 
@@ -192,12 +190,12 @@ Returns True.
 */
 
     INTVAL defined () {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         return 1;
     }
 
     INTVAL get_bool () {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         return 1;
     }
 
@@ -337,7 +335,7 @@ Creates and returns a clone of the subroutine.
 
     PMC* clone () {
         struct Parrot_sub * sub;
-        PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC* const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         /*
          * we have to mark it ourselves
          */
@@ -361,7 +359,7 @@ Marks the sub as live.
 */
 
     void mark () {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         if (!sub)
             return;
         if (sub->name)
@@ -418,7 +416,7 @@ Archives the subroutine.
 */
 
     void visit(visit_info *info) {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
 
         info->thaw_ptr = &sub->namespace;
         (info->visit_pmc_now)(INTERP, sub->namespace, info);
@@ -440,8 +438,8 @@ Archives the subroutine.
     }
 
     void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        IMAGE_IO * const io = info->image_io;
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         int i;
 
         SUPER(info);
@@ -484,7 +482,7 @@ Unarchives the subroutine.
         SUPER(info);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            struct Parrot_sub * sub = PMC_sub(SELF);
+            struct Parrot_sub * const sub = PMC_sub(SELF);
             INTVAL flags;
             int i;
             /*
@@ -533,17 +531,17 @@ Return the MMD signature PMC, if any or a Null PMC.
 
 
     METHOD PMC* get_namespace() {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
 
         return sub->namespace_stash;
     }
 
     METHOD INTVAL __get_regs_used(char *kind) {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         /* TODO switch to canonical NiSP order
          * see also imcc/reg_alloc.c
          */
-        const char *types = "INSP";
+        static const char types[] = "INSP";
         char *p;
 
         assert(sub->n_regs_used);
@@ -558,17 +556,17 @@ Return the MMD signature PMC, if any or a Null PMC.
     }
 
     METHOD PMC* get_lexinfo() {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->lex_info ? sub->lex_info : PMCNULL;
     }
 
     METHOD PMC* get_outer() {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->outer_sub ? sub->outer_sub : PMCNULL;
     }
 
     METHOD PMC* get_multisig() {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->multi_signature ? sub->multi_signature : PMCNULL;
     }
 }
@@ -579,7 +577,7 @@ Return the MMD signature PMC, if any or a Null PMC.
 
 =head1 HISTORY
 
-Initial version by Melvin on 2002/06/6.
+Initial version by Melvin on 2002/06/06.
 
 =cut
 

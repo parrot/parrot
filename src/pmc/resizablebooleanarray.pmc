@@ -48,17 +48,19 @@ Returns the integer value of the element at index C<key>.
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         /* Try to make negative index into a real index */
-        if (key < 0) key = SELF.elements() + key;
+        if (key < 0) {
+            key = SELF.elements() + key;
 
-        /* If it's still negative, we have a problem */
-        if (key < 0)
-            real_exception(interpreter, NULL, E_IndexError,
-                "ResizableBooleanArray: index out of bounds!");
+            /* If it's still negative, we have a problem */
+            if (key < 0)
+                real_exception(interpreter, NULL, E_IndexError,
+                    "ResizableBooleanArray: index out of bounds!");
+        }
 
         /* Adjust key for the current head position */
         key += PMC_int_val2(SELF);
 
-        if(key >= PMC_int_val(SELF))
+        if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
         return SUPER(key);
@@ -76,12 +78,14 @@ Sets the integer value of the element at index C<key> to C<value>.
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         /* Try to make negative index into a real index */
-        if (key < 0) key = SELF.elements() + key;
+        if (key < 0) {
+            key = SELF.elements() + key;
 
-        /* If it's still negative, we have a problem */
-        if (key < 0)
-            real_exception(interpreter, NULL, E_IndexError,
-                "ResizableBooleanArray: index out of bounds!");
+            /* If it's still negative, we have a problem */
+            if (key < 0)
+                real_exception(interpreter, NULL, E_IndexError,
+                    "ResizableBooleanArray: index out of bounds!");
+        }
 
         /* Adjust key for the current head position */
         key += PMC_int_val2(SELF);
@@ -103,12 +107,12 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native (INTVAL size) {
-        Parrot_UInt1 *sd;
         INTVAL newASize;
-        INTVAL currSize = PMC_int_val(SELF) - PMC_int_val2(SELF);
+        const INTVAL currSize = PMC_int_val(SELF) - PMC_int_val2(SELF);
 
         /* We are already at the requested size. Yay */
-        if(size == currSize) return;
+        if (size == currSize)
+            return;
 
         if (size < 0)
             real_exception(interpreter, NULL, E_IndexError,
@@ -121,7 +125,7 @@ Resizes the array to C<size> elements.
             PMC_data(SELF) = mem_sys_allocate_zeroed(newASize);
         }
         else {
-            sd = PMC_data(SELF);
+            Parrot_UInt1 * const sd = PMC_data(SELF);
             PMC_data(SELF) = mem_sys_realloc(sd, newASize);
         }
 
@@ -140,7 +144,7 @@ Extends the array by adding an element of value C<value> to the end.
 */
 
     void push_integer (INTVAL value) {
-        INTVAL size = PMC_int_val(SELF) - PMC_int_val2(SELF);
+        const INTVAL size = PMC_int_val(SELF) - PMC_int_val2(SELF);
         DYNSELF.set_integer_native(size + 1);
         DYNSELF.set_integer_keyed_int(size, value);
     }
@@ -181,12 +185,10 @@ beginning.
 */
 
     void unshift_integer (INTVAL value) {
-        Parrot_UInt1 *sdOld, *sdNew;
-
         /* If int_val2 is smaller than 0, size this thing up */
-        if(PMC_int_val2(SELF) <= 0) {
-            sdOld = PMC_data(SELF);
-            sdNew = mem_sys_allocate_zeroed(
+        if (PMC_int_val2(SELF) <= 0) {
+            Parrot_UInt1 * const sdOld = PMC_data(SELF);
+            Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(
                 ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC) 
                 + PMC_int_val(SELF)
                 + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC)
@@ -218,7 +220,6 @@ Removes and returns the first element.
 
     INTVAL shift_integer () {
         INTVAL value;
-        Parrot_UInt1 *sdOld, *sdNew;
 
         if (DYNSELF.elements() < 1)
             real_exception(interpreter, NULL, E_IndexError,
@@ -232,9 +233,9 @@ Removes and returns the first element.
 
         /* If int_val2 is bigger than our allocation unit size, size
             this thing down */
-        if(PMC_int_val2(SELF) >= MIN_ALLOC) {
-            sdOld = PMC_data(SELF);
-            sdNew = mem_sys_allocate_zeroed(
+        if (PMC_int_val2(SELF) >= MIN_ALLOC) {
+            Parrot_UInt1 * const sdOld = PMC_data(SELF);
+            Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(
                 ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC) 
                 + PMC_int_val(SELF)
                 + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC)
@@ -297,9 +298,9 @@ Used to archive the string.
             and use it during thaw?
         */
 
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
         STRING *s;
-        INTVAL size = (PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC;
+        const INTVAL size = (PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC;
 
         io->vtable->push_integer(INTERP, io, PMC_int_val2(SELF));
         io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
@@ -317,10 +318,10 @@ Used to unarchive the string.
 
 */
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        INTVAL headPos = io->vtable->shift_integer(INTERP, io);
-        INTVAL tailPos = io->vtable->shift_integer(INTERP, io);
-        STRING *s = io->vtable->shift_string(INTERP, io);
+        IMAGE_IO * const io = info->image_io;
+        const INTVAL headPos = io->vtable->shift_integer(INTERP, io);
+        const INTVAL tailPos = io->vtable->shift_integer(INTERP, io);
+        STRING * const s = io->vtable->shift_string(INTERP, io);
 
         PMC_data(SELF) = mem_sys_allocate_zeroed(s->bufused);
         mem_sys_memcopy(PMC_data(SELF), s->strstart, s->bufused);
