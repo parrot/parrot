@@ -1,7 +1,7 @@
 ROOT: result(.) = {
     .local pmc result
     result = new 'POST::Sub'
-    result.'clone_node'(node)
+    result.'clone'(node)
 
     .local pmc iter
     iter = node.'child_iter'()
@@ -19,7 +19,7 @@ ROOT: result(.) = {
 PAST::Stmts: result(.) = {
     .local pmc result
     result = new 'POST::Ops'
-    result.'clone_node'(node)
+    result.'clone'(node)
 
     .local pmc iter
     iter = node.'child_iter'()
@@ -81,7 +81,7 @@ PAST::Op: result(.) = {
     # for each child.
     .local pmc childop
     childop = new 'POST::Op'
-    childop.'clone_node'(node)
+    childop.'clone'(node)
     $S2 = node.op()
     childop.op($S2)
 
@@ -135,7 +135,7 @@ PAST::Op: infix(.) = {
     # Create the node to contain all the generated ops.
     .local pmc newops
     newops = new 'POST::Ops'
-    newops.'clone_node'(node)
+    newops.'clone'(node)
 
     # Create the op for the current node
     .local pmc childop
@@ -151,7 +151,7 @@ PAST::Op: infix(.) = {
     # Create a temporary variable
     .local pmc temp_var
     temp_var = new 'POST::Var'
-    temp_var.'clone_node'(node)
+    temp_var.'clone'(node)
     $P8 = temp_var.new_dummy()
     newops.'add_child'($P8)
 
@@ -172,13 +172,13 @@ PAST::Op: infix(.) = {
       create_tmp:
         # Create a temp variable
         $P4 = new 'POST::Var'
-        $P4.'clone_node'(node)
+        $P4.'clone'(node)
         $P5 = $P4.new_dummy()
         newops.'add_child'($P5)
         childop.'add_child'($P4)
         # Assign the value node to the variable
         $P7 = new 'POST::Op'
-        $P7.'clone_node'(node)
+        $P7.'clone'(node)
         $P7.'op'('set')
         $P7.'add_child'($P4) # the first argument is the variable
         $P7.'add_child'($P3) # the second argument is the value
@@ -211,7 +211,7 @@ PAST::Op: conditional(.) = {
     opname = oplookup($S1)
     .local pmc childop
     childop = new 'POST::Op'
-    childop.'clone_node'(node)
+    childop.'clone'(node)
     childop.'op'(opname)
 
     # Set up to handle children of Op node.
@@ -251,7 +251,7 @@ PAST::Op: conditional(.) = {
     endlabel = new 'POST::Label'
     endlabel.'new_dummy'('endcond')
     $P4 = new 'POST::Op'
-    $P4.'clone_node'(node)
+    $P4.'clone'(node)
     $P4.'op'('goto')
     $P4.'add_child'(endlabel)
     newops.'add_child'($P4)
@@ -306,7 +306,7 @@ PAST::Op: print_op(.) = {
     # Create a node to contain the generated ops.
     .local pmc newops
     newops = new 'POST::Ops'
-    newops.'clone_node'(node)
+    newops.'clone'(node)
 
     # Store the opname for later reuse
     .local string opname
@@ -323,7 +323,7 @@ PAST::Op: print_op(.) = {
       $P3 = tree.get('result', $P2)
       $S1 = typeof $P3
       $P5 = new 'POST::Op'
-      $P5.'clone_node'(node)
+      $P5.'clone'(node)
       $P5.'op'(opname)
       $S1 = typeof $P3
       if $S1 == 'POST::Ops' goto complex_result # the argument has setup
@@ -350,7 +350,7 @@ PAST::Op: print_op(.) = {
 PAST::Val: result(.) = {
     .local pmc result
     result = new 'POST::Val'
-    result.'clone_node'(node)
+    result.'clone'(node)
     $P1 = node.'value'()
     result.'value'($P1)
     $P2 = node.'valtype'()

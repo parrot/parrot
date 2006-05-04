@@ -21,14 +21,8 @@ POST::Ops is a subclass of Node.
     .return ()
 .end
 
-.sub tmpvar :method
-    .param pmc tmpvar :optional
-    .param int got_tmpvar :opt_flag
-    unless got_tmpvar goto get
-  set:
-    setattribute self, "tmpvar", tmpvar
-    .return ($P1)
-  get:
-    $P2 = getattribute self, "tmpvar"
-    .return ($P2)
+.sub 'tmpvar' :method
+    .param pmc tmpvar       :optional
+    .param int passed_tmpvar   :opt_flag
+    .return self.'accessor'('tmpvar', tmpvar, passed_tmpvar)
 .end

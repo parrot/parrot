@@ -19,6 +19,12 @@ of Node.
     .return ()
 .end
 
+.sub 'varname' :method
+    .param string varname       :optional
+    .param int passed_varname   :opt_flag
+    .return self.'accessor'('varname', varname, passed_varname)
+.end
+
 .sub generate_temp :method
     .local string temp
        temp = "$P"
@@ -50,7 +56,7 @@ loop:
     # 'Undef'. It has 2 arguments: the temp variable and the type.
     .local pmc newop
     newop = new 'POST::Op'
-    newop.'clone_node'(self)
+    newop.'clone'(self)
     newop.'op'('new')
 
     newop.'add_child'(self)
@@ -63,38 +69,10 @@ loop:
     .return (newop)
 .end
 
-.sub varname :method
-    .param string varname :optional
-    .param int got_varname :opt_flag
-    unless got_varname goto get
-  set:
-    $P1 = new .String
-    $P1 = varname
-    setattribute self, "varname", $P1
+.sub 'DUMPABLE' :method
+    $P1 = new .ResizablePMCArray
+    push $P1, 'source'
+    push $P1, 'pos'
+    push $P1, 'varname'
     .return ($P1)
-  get:
-    $P2 = getattribute self, "varname"
-    .return ($P2)
-.end
-
-.sub "dump" :method
-    .param int level :optional
-    .local string indent
-    indent = repeat "    ", level # tab is 4 spaces here
-    level += 1 # set level for attributes
-    $S0 = typeof self
-    print indent
-    print "<"
-    print $S0
-    print "> => { \n"
-
-    # print source for this node
-    self.dump_attribute("source", level)
-    self.dump_attribute("pos", level)
-    self.dump_attribute("varname", level)
-
-    # close off current node display
-    print indent
-    print "}\n"
-    .return ()
 .end

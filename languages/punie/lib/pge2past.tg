@@ -31,7 +31,7 @@ PunieGrammar::block: result(.) = {
 PunieGrammar::lineseq: result(.) = {
     .local pmc result
     result = new 'PAST::Stmts'
-    result.'clone_pge'(node)
+    result.'clone'(node)
 
     # Ask the child node for its result
     .local pmc child
@@ -59,7 +59,7 @@ PunieGrammar::lineseq: result(.) = {
 PunieGrammar::line: result(.) = {
     .local pmc result
     result = new 'PAST::Stmt'
-    result.'clone_pge'(node)
+    result.'clone'(node)
 
     .local pmc iter
     iter = new Iterator, node    # setup iterator for node
@@ -80,7 +80,7 @@ PunieGrammar::line: result(.) = {
 PunieGrammar::expr: result(.) = {
     .local pmc result
     result = new 'PAST::Exp'
-    result.'clone_pge'(node)
+    result.'clone'(node)
 
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
@@ -101,7 +101,7 @@ PunieGrammar::expr: result(.) = {
 PunieGrammar::gprint: result(.) = {
     .local pmc result
     result = new 'PAST::Op'
-    result.'clone_pge'(node)
+    result.'clone'(node)
     $S1 = node[0]
     result.'op'($S1)
 
@@ -124,7 +124,7 @@ PunieGrammar::gprint: result(.) = {
 PunieGrammar::cond: result(.) = {
     .local pmc result
     result = new 'PAST::Op'
-    result.'clone_pge'(node)
+    result.'clone'(node)
     $S1 = node[0]
     result.'op'($S1)
 
@@ -151,7 +151,7 @@ PunieGrammar::else: result(.) = {
     unless onechild goto no_child
     .local pmc result
     result = new 'PAST::Op'
-    result.'clone_pge'(onechild)
+    result.'clone'(onechild)
     $S1 = onechild[0]
     result.'op'($S1)
 
@@ -184,7 +184,7 @@ PunieGrammar::cexpr: result(.) = {
     unless $I0 goto err_no_oexpr
     $P1 = node["PunieGrammar::oexpr"]
     result = new 'PAST::Op'
-    result.'clone_pge'(node)
+    result.'clone'(node)
     result.'op'('O_COMMA')
 
     $P0 = new Iterator, $P1    # setup iterator for node
@@ -217,7 +217,7 @@ PunieGrammar::cexpr: result(.) = {
 PunieGrammar::oexpr: result(.) = {
     .local pmc result
     result = new 'PAST::Exp'
-    result.'clone_pge'(node)
+    result.'clone'(node)
 
     .local pmc iter
     $P1 = node.get_hash()
@@ -240,7 +240,7 @@ PunieGrammar::oexpr: result(.) = {
 PunieGrammar::number: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
-    result.'clone_pge'(node)
+    result.'clone'(node)
     $S2 = node 
     result.'value'($S2)
     result.'valtype'('num')
@@ -251,7 +251,7 @@ PunieGrammar::number: result(.) = {
 PunieGrammar::integer: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
-    result.'clone_pge'(node)
+    result.'clone'(node)
     $S2 = node 
     result.'value'($S2)
     result.'valtype'('int')
@@ -261,7 +261,7 @@ PunieGrammar::integer: result(.) = {
 PunieGrammar::stringdouble: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
-    result.'clone_pge'(node)
+    result.'clone'(node)
 
     .local string value
     # Check if this is a string match
@@ -283,7 +283,7 @@ PunieGrammar::stringdouble: result(.) = {
 PunieGrammar::stringsingle: result(.) = {
     .local pmc result
     result = new 'PAST::Val'
-    result.'clone_pge'(node)
+    result.'clone'(node)
 
     .local string value
     # Check if this is a string match
@@ -327,7 +327,7 @@ expr: result(.) = {
 expr: op(.) = {
     .local pmc result
     result = new 'PAST::Op'
-    result.'clone_pge'(node)
+    result.'clone'(node)
     $S1 = node["type"]
     result.'op'($S1)
 

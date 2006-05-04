@@ -22,36 +22,16 @@ opcode.
     .return ()
 .end
 
-.sub name :method
-    .param string name :optional
-    .param int got_name :opt_flag
-    unless got_name goto get
-  set:
-    $P1 = new .String
-    $P1 = name
-    setattribute self, "name", $P1
-    .return ($P1)
-  get:
-    $P2 = getattribute self, "name"
-    .return ($P2)
+.sub 'name' :method
+    .param string name       :optional
+    .param int passed_name   :opt_flag
+    .return self.'accessor'('name', name, passed_name)
 .end
 
-.sub dest :method
-    .param int dest :optional
-    .param int got_dest :opt_flag
-    unless got_dest goto get
-  set:
-    $P1 = new Integer
-    $P1 = dest
-    setattribute self, "dest", $P1 
-    .return ($P1)
-  get:
-    $P2 = getattribute self, "dest"
-    unless null $P2 goto got_it
-    $P2 = new Integer
-    $P2 = 0
-  got_it:
-    .return ($P2)
+.sub 'dest' :method
+    .param int dest       :optional
+    .param int passed_dest   :opt_flag
+    .return self.'accessor'('dest', dest, passed_dest)
 .end
 
 .sub __clone :method
@@ -64,27 +44,13 @@ opcode.
     .return (result)
 .end
 
-.sub "dump" :method
-    .param int level :optional
-    .local string indent
-    indent = repeat "    ", level # tab is 4 spaces here
-    level += 1 # set level for attributes
-    $S0 = typeof self
-    print indent
-    print "<"
-    print $S0
-    print "> => { \n"
-
-    # print source for this node
-    self.dump_attribute("source", level)
-    self.dump_attribute("pos", level)
-    self.dump_attribute("name", level)
-    self.dump_attribute("dest", level)
-
-    # close off current node display
-    print indent
-    print "}\n"
-    .return ()
+.sub 'DUMPABLE' :method
+    $P1 = new .ResizablePMCArray
+    push $P1, 'source'
+    push $P1, 'pos'
+    push $P1, 'name'
+    push $P1, 'dest'
+    .return ($P1)
 .end
 
 .sub generate_label :method

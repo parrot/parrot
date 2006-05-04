@@ -19,53 +19,23 @@ POST::Val is a literal value in the OST. It is a subclass of Node.
     .return ()
 .end
 
-.sub "dump" :method
-    .param int level :optional
-    .local string indent
-    indent = repeat "    ", level # tab is 4 spaces here
-    level += 1 # set level for attributes
-    $S0 = typeof self
-    print indent
-    print "<"
-    print $S0
-    print "> => { \n"
-
-    # print source for this node
-    self.dump_attribute("source", level)
-    self.dump_attribute("pos", level)
-    self.dump_attribute("value", level)
-    self.dump_attribute("valtype", level)
-
-    # close off current node display
-    print indent
-    print "}\n"
-    .return ()
+.sub 'value' :method
+    .param string value       :optional
+    .param int passed_value   :opt_flag
+    .return self.'accessor'('value', value, passed_value)
 .end
 
-.sub value :method
-    .param string value  :optional
-    .param int got_value :opt_flag
-    unless got_value goto get
-  set:
-    $P1 = new .String
-    $P1 = value
-    setattribute self, "value", $P1
-    .return ($P1)
-  get:
-    $P2 = getattribute self, "value"
-    .return ($P2)
+.sub 'valtype' :method
+    .param string valtype       :optional
+    .param int passed_valtype   :opt_flag
+    .return self.'accessor'('valtype', valtype, passed_valtype)
 .end
 
-.sub valtype :method
-    .param string valtype  :optional
-    .param int got_valtype :opt_flag
-    unless got_valtype goto get
-  set:
-    $P1 = new .String
-    $P1 = valtype
-    setattribute self, "valtype", $P1
+.sub 'DUMPABLE' :method
+    $P1 = new .ResizablePMCArray
+    push $P1, 'source'
+    push $P1, 'pos'
+    push $P1, 'value'
+    push $P1, 'valtype'
     .return ($P1)
-  get:
-    $P2 = getattribute self, "valtype"
-    .return ($P2)
 .end
