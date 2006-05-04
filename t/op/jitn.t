@@ -183,6 +183,7 @@ set N1,1
 set N2,2
 set N3,3
 set N4,4
+set N5,0
 set N0,N1
 set N2,N3
 set N0,N1
@@ -255,6 +256,7 @@ set N1,1
 set N2,2
 set N3,3
 set N4,4
+set N6,0
 set N0,N1
 set N2,N3
 set N0,N1
