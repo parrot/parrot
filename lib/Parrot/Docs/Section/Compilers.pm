@@ -40,10 +40,17 @@ sub new
     
     return $self->SUPER::new(
         'Compilers', 'compilers.html', '',
-        $self->new_group( 'AST', '', 'compilers/ast' ),
-        $self->new_group( 'IMCC', '', 'compilers/imcc' ),
-        $self->new_group( 'PGE', '', 'compilers/pge' ),
-        $self->new_group( 'TGE', '', 'compilers/tge' ),
+        $self->new_group( 'IMCC', 'the Intermediate Code Compiler for Parrot',
+            'compilers/ast',
+            'compilers/imcc' ),
+        $self->new_group( 'PGE', 'the Parrot Grammar Engine',
+            'compilers/pge' ),
+        $self->new_group( 'TGE', 'the Tree Grammar Engine',
+            'compilers/tge' ),
+        $self->new_group( 'PAST', 'the Parrot/Punie Abstract Syntax Tree',
+            'compilers/past' ),
+        $self->new_group( 'POST', 'the Parrot/Punie Opcode Syntax Tree',
+            'compilers/post' ),
     );
 }
 
