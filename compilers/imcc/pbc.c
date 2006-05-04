@@ -189,7 +189,7 @@ make_jit_info(Interp *interpreter, IMC_Unit * unit)
 
 /* allocate a new globals.cs->subs structure */
 static void
-make_new_sub(Interp *interpreter, IMC_Unit * unit)
+make_new_sub(IMC_Unit * unit)
 {
     struct subs *s = mem_sys_allocate_zeroed(sizeof(struct subs));
 
@@ -203,13 +203,6 @@ make_new_sub(Interp *interpreter, IMC_Unit * unit)
         globals.cs->first = s;
     globals.cs->subs = s;
     create_symhash(&s->fixup);
-#ifdef HAS_JIT
-    if ((IMCC_INFO(interpreter)->optimizer_level & OPT_J)) {
-        allocate_jit(interpreter, unit);
-    }
-#else
-    UNUSED(interpreter);
-#endif
 }
 
 
@@ -1020,9 +1013,10 @@ int
 e_pbc_new_sub(Interp *interpreter, void *param, IMC_Unit * unit)
 {
     UNUSED(param);
+    UNUSED(interpreter);
     if (!unit->instructions)
         return 0;
-    make_new_sub(interpreter, unit);     /* we start a new compilation unit */
+    make_new_sub(unit);     /* we start a new compilation unit */
     return 0;
 }
 

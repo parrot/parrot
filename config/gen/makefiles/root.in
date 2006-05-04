@@ -354,7 +354,6 @@ IMCC_O_FILES = \
     $(IMCC_DIR)/optimizer$(O) \
     $(IMCC_DIR)/pbc$(O) \
     $(IMCC_DIR)/parser_util$(O) \
-    $(IMCC_DIR)/jit$(O) \
     $(IMCC_DIR)/pcc$(O)
 
 AST_H_FILES = \
