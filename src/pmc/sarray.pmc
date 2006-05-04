@@ -33,15 +33,13 @@ implemented.
 
 Currently SArray's are used for:
 
-=over4
+=over 4
 
-=item Global data per interpreter. C<interpreter->iglobals>
-
-=item For implementing lists, see F<src/list.c>. 
+=item Global data per interpreter
 
 =item For implementing lists, see F<src/list.c>. 
 
-=item Base class of the Exception PMC.
+=item Base class of the Exception PMC, see F<src/exception.pmc>
 
 =back
 
