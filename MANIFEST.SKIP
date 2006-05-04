@@ -683,9 +683,13 @@
 # generated from svn:ignore of 'languages/pheme/'
 ^languages/pheme/Makefile$
 ^languages/pheme/Makefile/
+^languages/pheme/.*\.pbc$
+^languages/pheme/.*\.pbc/
 # generated from svn:ignore of 'languages/pheme/lib/'
 ^languages/pheme/lib/.*\.pbc$
 ^languages/pheme/lib/.*\.pbc/
+^languages/pheme/lib/pheme_grammar_gen\.pir$
+^languages/pheme/lib/pheme_grammar_gen\.pir/
 # generated from svn:ignore of 'languages/pheme/lib/POST/'
 # generated from svn:ignore of 'languages/pheme/t/'
 # generated from svn:ignore of 'languages/pheme/t/phemer/'
