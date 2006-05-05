@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 75;
+use Parrot::Test tests => 76;
 
 =head1 NAME
 
@@ -2153,7 +2153,7 @@ __init Bar
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)")
+pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)");
 .sub main :main
     .local pmc base
     $P0 = getclass 'Integer'
@@ -2176,5 +2176,24 @@ pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)")
 .end
 CODE
 ok bar
+OUTPUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', "super __init called twice (#39081)");
+.sub main :main
+    $P0 = newclass 'Foo'
+    $P1 = subclass $P0, 'Bar'
+
+    $P2 = new 'Bar'
+.end
+
+.namespace [ 'Foo' ]
+
+.sub '__init' :method
+    say "foo constructor"
+    .return ()
+.end
+CODE
+foo constructor
 OUTPUT
 
