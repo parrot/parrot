@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ vtables are neat because they decouple the interface and implementation of
 various object functions. This does mean, though, that you need to either know
 what functions are available and what they do, or have some method of finding
 out. It's faster if you know which vtable entry does what, so that's the method
-parrot's using.
+parrot uses.
 
 The actual vtable structure contains pointers to functions that implement the
 methods for that particular vtable.  All pointers must point to valid functions
