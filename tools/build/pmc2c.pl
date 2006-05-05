@@ -32,8 +32,8 @@ containing the initialization function for all fooX PMCs.
 
 =head1 DESCRIPTION
 
-The job of the PMC compiler is to take .pmc files and create C files which
-can be compiled for use with the Parrot interpreter.
+The job of the PMC compiler is to take .pmc files and create C files
+that can be compiled for use with the Parrot interpreter.
 
 =head2 Command-line Options
 
@@ -76,9 +76,9 @@ To see the internal data structures please run:
 =head2 Compiling PMCs
 
 First, the program determines the names of the .c and .h files from the
-basename of the .pmc file (e.g. perlint.pmc -> perlint.c and perlint.h).
+basename of the .pmc file (e.g. F<perlint.pmc> -> F<perlint.c> and F<perlint.h>).
 
-Next, the file is searched for /pmclass \w*/ which attempts to find the
+Next, the file is searched for C</pmclass \w*/> which attempts to find the
 class being declared.
 
 Once the class is found, all of its superclasses are scanned and their
@@ -631,8 +631,11 @@ sub add_defaulted {
 # not been updated.)
 #
 sub dump_is_newer {
-    my $pmc = my $file = shift;
+    my $file = shift;
+    my $pmc = $file;
     $pmc =~ s/\.\w+$/.pmc/;
+
+    ($pmc ne $file) or die "$pmc is the same as the original name"
 
     my $pmc_dt  = (stat $pmc)[9];
     my $dump_dt = (stat $file)[9];
