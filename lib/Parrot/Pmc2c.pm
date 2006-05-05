@@ -48,7 +48,7 @@ sub does_write($$) {
     my ($meth, $section) = @_;
 
     warn "no $meth\n" unless $section;
-    exists $writes{$section} || $meth eq 'morph';
+    return exists $writes{$section} || $meth eq 'morph';
 }
 
 =item C<count_newlines($string)>
@@ -109,24 +109,22 @@ sub gen_ret {
 
 =item C<class_name($self, $class)>
 
-Returns the appropriate C<Parrot::Pmc2c> subclass for the PMC (C<<
-$self->{class} >>). C<$self> is the hash reference passed to C<new()>,
-and C<$class> is C<Parrot::Pmc2c>.
+Returns the appropriate C<Parrot::Pmc2c> subclass for the PMC
+(C<< $self->{class} >>). C<$self> is the hash reference passed to
+C<new()>, and C<$class> is C<Parrot::Pmc2c>.
 
 =cut
+
+my %special_class_name = map {($_,1)}
+    qw( REf default Null delegate SharedRef deleg_pmc );
 
 sub class_name {
     my ($self, $class) = @_;
 
-    my %special = ( 'Ref' => 1, 'default' => 1, 'Null' => 1,
-                    'delegate' => 1, 'SharedRef' => 1,
-                    'deleg_pmc' => 1,
-                );
     my $classname = $self->{class};
     my $nclass = $class;
-    # bless object into different classes inheriting from
-    # Parrot::Pmc2c
-    if ($special{$classname}) {
+    # bless object into different classes inheriting from Parrot::Pmc2c
+    if ($special_class_name{$classname}) {
         $nclass .= "::" . $classname;
     }
     else {

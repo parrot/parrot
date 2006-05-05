@@ -35,7 +35,7 @@ containing the initialization function for all fooX PMCs.
 The job of the PMC compiler is to take .pmc files and create C files
 that can be compiled for use with the Parrot interpreter.
 
-=head2 Command-line Options
+=head1 COMMAND-LINE OPTIONS
 
 =over 4
 
@@ -281,12 +281,15 @@ my %opt;
 
 main();
 
-#
-#   my $path = find_file( [$dir1, $dir2], $file, $die_unless_found_flag );
-#
-# Return the full path to $file (search in the given directories).
-# Optionally, die with an error message if that file cannot be found.
-#
+=head1 FUNCTIONS
+
+=head2 my $path = find_file( [$dir1, $dir2], $file, $die_unless_found_flag );
+
+Return the full path to $file (search in the given directories).
+Optionally, die with an error message if that file cannot be found.
+
+=cut
+
 sub find_file {
     my ($include, $file, $die_unless_found) = @_;
 
@@ -305,20 +308,19 @@ sub find_file {
     undef;
 }
 
-#
-#   dump_default();
-#
-# Create a .dump file for the default vtable (from which all PMCs
-# inherit).
-#
+=head2 dump_default()
+
+Create a .dump file for the default vtable (from which all PMCs inherit).
+
+=cut
+
 sub dump_default {
     my $file    = "$FindBin::Bin/../../vtable.tbl";
     my $default = parse_vtable($file);
     my $dump    = $file;
     $dump =~ s/\.\w+$/\.dump/;
 
-    print "Writing $dump\n" if $opt{verbose};
-    open VTD, ">", $dump or die "Can't write '$dump'";
+    my $vtd = open_file( ">", $dump );
 
     my %vtable = (
         flags   => {},
@@ -342,16 +344,17 @@ sub dump_default {
 
     my $Dumper = Data::Dumper->new([\%vtable], ['class']);
     $Dumper->Indent(3);
-    print VTD $Dumper->Dump();
-    close VTD;
+    print $vtd $Dumper->Dump();
+    close $vtd;
 }
 
-#
-#   my ($balanced, $remaining) = extract_balanced($code);
-#
-# Remove a balanced {} construct from the beginning of $code.
-# Return it and the remaining code.
-#
+=head2 my ($balanced, $remaining) = extract_balanced($code);
+
+Remove a balanced {} construct from the beginning of $code.
+Return it and the remaining code.
+
+=cut
+
 sub extract_balanced {
     my $code    = shift;
     my $balance = 0;
@@ -383,14 +386,16 @@ sub extract_balanced {
     die "Badly balanced" if $balance;
 }
 
-#
-#   my ($pre, $class_name, $flags) = parse_flags(\$code);
-#
-# Extract a class signature from the code ref and return (a) the
-# code found before the signature, (b) the name of the class, and
-# (c) a hash ref containing the flags associated with the class
-# (such as 'extends' and 'does').
-#
+
+=head2 my ($pre, $class_name, $flags) = parse_flags(\$code);
+
+Extract a class signature from the code ref and return (a) the
+code found before the signature, (b) the name of the class, and
+(c) a hash ref containing the flags associated with the class
+(such as 'extends' and 'does').
+
+=cut
+
 sub parse_flags {
     my $c = shift;
 
@@ -425,12 +430,12 @@ sub parse_flags {
     return $pre, $classname, \%flags;
 }
 
-#
-#   my ($name, $attributes) = parse_pmc($code);
-#
-# Parse PMC code and return the class name and a hash ref of
-# attributes.
-#
+=head2 my ($name, $attributes) = parse_pmc($code);
+
+Parse PMC code and return the class name and a hash ref of attributes.
+
+=cut
+
 sub parse_pmc {
     my $code = shift;
 
@@ -510,13 +515,14 @@ sub parse_pmc {
            };
 }
 
-#
-#   gen_parent_list( [$dir1, $dir2], $class, $classes );
-#
-# Generate an ordered list of parent classes to put in the
-# $classes->{class}->{parents} array, using the given directories
-# to find parents.
-#
+=head2 gen_parent_list( [$dir1, $dir2], $class, $classes );
+
+Generate an ordered list of parent classes to put in the
+I<< $classes->{class}->{parents} >> array, using the given directories
+to find parents.
+
+=cut
+
 sub gen_parent_list {
     my ($include, $this, $all) = @_;
 
@@ -544,29 +550,29 @@ sub gen_parent_list {
     }
 }
 
+=head2 dump_1_pmc($file);
 
-#
-#   my $class = dump_1_pmc($file);
-#
-# Generate the class structure from $file for a .dump file.
-#
+Returns the class structure from I<$file> for a .dump file.
+
+=cut
+
 sub dump_1_pmc {
     my $file = shift;
     $file =~ s/\.\w+$/.pmc/;
 
-    print "Reading $file\n" if $opt{verbose};
-    open my $fh, "<", $file
-        or die "Can't read '$file'";
+    my $fh = open_file( "<", $file );
     my $contents = do { local $/; <$fh> };
+    close $fh;
     return parse_pmc($contents);
 }
 
-#
-#   gen_super_meths($class, $vtable)
-#
-# Generate a list of inherited methods for $class by searching the
-# inheritence tree. The method list is found in $vtable.
-#
+=head2 gen_super_meths($class, $vtable)
+
+Generate a list of inherited methods for I<$class> by searching the
+inheritence tree. The method list is found in I<$vtable>.
+
+=cut
+
 sub gen_super_meths {
     my ($self, $vt, $all) = @_;
 
@@ -607,13 +613,15 @@ sub gen_super_meths {
     }
 }
 
-#
-#   add_defaulted($class_structure, $vtable);
-#
-# Add methods to the class structure for each method found in the
-# vtable. This is used to determine all of the 'default' methods
-# from the vtable.dump.
-#
+
+=head2 add_defaulted($class_structure, $vtable);
+
+Add methods to the class structure for each method found in the
+vtable. This is used to determine all of the 'default' methods
+from the F<vtable.dump>.
+
+=cut
+
 sub add_defaulted {
     my ($class, $vt) = @_;
 
@@ -623,13 +631,14 @@ sub add_defaulted {
     }
 }
 
-#
-#   my $newer = dump_is_newer($file);
-#
-# Return whether the dump of a file is newer than the PMC file.
-# (If it's not, then the PMC file has changed and the dump has
-# not been updated.)
-#
+=head2 dump_is_newer($file);
+
+Return whether the dump of a file is newer than the PMC file.
+(If it's not, then the PMC file has changed and the dump has
+not been updated.)
+
+=cut
+
 sub dump_is_newer {
     my $file = shift;
     my $pmc = $file;
@@ -643,13 +652,14 @@ sub dump_is_newer {
     return $dump_dt > $pmc_dt;
 }
 
-#
-#   dump_pmc( [$dir1, $dir2], $file1, $file2, ... );
-#
-# Create a .dump file for each of the passed files (which can be
-# found in the given directories). A '*.pmc' glob may also be passed
-# to emulate a proper shell in the presence of a dumb one.
-#
+=head2 dump_pmc( [$dir1, $dir2], $file1, $file2, ... );
+
+Create a .dump file for each of the passed files (which can be
+found in the given directories). A '*.pmc' glob may also be passed
+to emulate a proper shell in the presence of a dumb one.
+
+=cut
+
 sub dump_pmc {
     my ($include, @files) = @_;
     # help these dumb 'shells' that are no shells
@@ -689,27 +699,26 @@ sub dump_pmc {
         my $Dumper = Data::Dumper->new([$class], ['class']);
         $Dumper->Indent(1);
 
-        print "Writing $file\n" if $opt{verbose};
-        open my $fh, ">", $file or die "Can't write '$file': $!";
+        my $fh = open_file( ">", $file );
         print $fh $Dumper->Dump;
         close $fh;
     }
 }
 
-#
-#   my $class = read_dump( [$dir1, $dir2], $file );
-#
-# Read in the class definition found in $file (which is found in one
-# of the given directories) and recreate the data structure.
-#
+=head2 read_dump( [$dir1, $dir2], $file );
+
+Read in the class definition found in $file (which is found in one
+of the given directories) and recreate the data structure.
+
+=cut
+
 sub read_dump {
     my ($include, $file) = @_;
 
     $file =~ s/\.\w+$/.dump/;
     $file = find_file($include, $file, 1);
 
-    print "Reading $file\n" if $opt{verbose};
-    open my $fh, "<", $file or die "Can't read '$file'";
+    my $fh = open_file( "<", $file );
 
     my $class;
     eval do { local $/; <$fh> };
@@ -719,14 +728,16 @@ sub read_dump {
     $class;
 }
 
-#
-#   print_tree( [$dir1, $dir2], 0, $file1, $file2, ... );
-#
-# Print the inheritence tree for each of the files, using the
-# given directories to search for all of correct PMCs. The middle
-# argument is the display depth, which is used for the recursive
-# definition of this function.
-#
+
+=head2 print_tree( [$dir1, $dir2], 0, $file1, $file2, ... );
+
+Print the inheritence tree for each of the files, using the
+given directories to search for all of correct PMCs. The middle
+argument is the display depth, which is used for the recursive
+definition of this function.
+
+=cut
+
 sub print_tree {
     my ($include,$depth, @files) = @_;
 
@@ -739,12 +750,13 @@ sub print_tree {
     }
 }
 
-#
-#   gen_c( [$dir1, $dir2], $file1, $file2, ... );
-#
-# Generate the c source code file for each of the files passed in,
-# using the directories passed in to search for the PMC dump files.
-#
+=head2 gen_c( [$dir1, $dir2], $file1, $file2, ... )
+
+Generate the C source code file for each of the files passed in,
+using the directories passed in to search for the PMC dump files.
+
+=cut
+
 sub gen_c {
     my ($include, @files) = @_;
     my %pmcs = map { $_, read_dump($include, $_) } @files;
@@ -754,13 +766,12 @@ sub gen_c {
         ->write_all_files;
 }
 
-#
-#   gen_def( [$dir1, $dir2], \%pmc )
-#
-# Generate a .def file for symbols to export for dynamic PMCs.
-# Currently unused, but retained for being a basis for supporting
-# platforms that need a symbol export list.
-#
+=head2 gen_def( [$dir1, $dir2], \%pmc )
+
+Generate a .def file for symbols to export for dynamic PMCs.
+Currently unused, but retained for being a basis for supporting
+platforms that need a symbol export list.
+
 sub gen_def {
     my ($include, $pmcs) = @_;
 
@@ -777,8 +788,8 @@ sub gen_def {
         # Locate .h file and add everything it exports to a list.
         my @exports = ();
         my $file = find_file($include, "pmc_$pmcname.h", 1);
-        print "Reading $file\n" if $opt{verbose};
-        open my $fh, "<", $file or die "Can't read '$file'";
+
+        my $fh = open_file( "<", $file );
         while (<$fh>) {
             if (/^(?:extern\s+)?\w+\*?\s+\*?(\w+)\s*\([^)]+\)\s*;/) {
                 push @exports, $1;
@@ -788,8 +799,8 @@ sub gen_def {
 
         # Locate .c file and add everything it exports to a list.
         $file = find_file($include, "$pmcname.c", 1);
-        print "Reading $file\n" if $opt{verbose};
-        open $fh, "<", $file or die "Can't read '$file'";
+
+        $fh = open_file( "<", $file );
         while (<$fh>) {
             if (/^(?:extern\s+)?\w+\*?\s+\*?(\w+)\s*\([^)]+\)\s*;/) {
                 push @exports, $1;
@@ -800,7 +811,6 @@ sub gen_def {
         # If it's in a group, put it in group's PMC array.
         if ($pmcs->{$pmcfilename}->{flags}->{group}) {
             for (keys %{$pmcs->{$pmcfilename}->{flags}->{group}}) {
-                $groups{$_} = [] unless $groups{$_};
                 push @{$groups{$_}}, @exports;
             }
         }
@@ -809,8 +819,7 @@ sub gen_def {
         # XXX JW Needn't generate these for PMCs in a group?
         #        For now, simplifies sutff.
         $file =~ s/\.c$/.def/;
-        print "Writing $file\n" if $opt{verbose};
-        open $fh, ">", $file or die "Can't write '$file'";
+        $fh = open_file( ">", $file );
         print $fh "LIBRARY $pmcname\nEXPORTS\n";
         print $fh "\t$_\n" foreach @exports;
         close $fh;
@@ -822,15 +831,29 @@ sub gen_def {
         my $deffile = "$group.def";
 
         # Does the DEF file already exist?
-        my $defexists = -e $deffile ? 1 : 0;
+        my $defexists = -e $deffile;
 
         # Open the file to append to it.
-        print "Writing $deffile\n" if $opt{verbose};
-        open my $fh, ">>", $deffile or die "Can't write '$deffile'";
+        my $fh = open_file( ">>", $deffile );
         print $fh "LIBRARY $group\nEXPORTS\n\tParrot_lib_${group}_load\n" unless $defexists;
         print $fh "\t$_\n" foreach @{$groups{$group}};
         close $fh;
     }
+}
+
+=cut
+
+sub open_file {
+    my $direction = shift;
+    my $filename = shift;
+
+    my $action =
+        ($direction eq "<") ? "Reading" :
+        ($direction eq ">>") ? "Appending" : "Writing";
+
+    print "$action $filename\n" if $opt{verbose};
+    open my $fh, $direction, $filename or die "$action $filename: $!\n";
+    return $fh;
 }
 
 #
@@ -844,24 +867,49 @@ sub main {
     # initialization to prevent warnings
     %opt = map { $_ => 0 } qw(nobody nolines debug verbose);
 
-    my $result = GetOptions(
-        "vtable"        => \$default,
-        "dump"          => \$dump,
-        "c|gen-c"       => \$gen_c,
-        "tree"          => \$tree,
+    my %action;
+
+    GetOptions(
         "include=s"     => \@include,
+
+        "vtable"        => \$action{default},
+        "dump"          => \$action{dump},
+        "c|gen-c"       => \$action{gen_c},
+        "tree"          => \$action{tree},
+
         "no-body"       => \$opt{nobody},
         "no-lines"      => \$opt{nolines},
         "debug+"        => \$opt{debug},
         "verbose+"      => \$opt{verbose},
         "library=s"     => \$opt{library},
-    );
+    ) or exit(1);
     unshift @include, ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/pmc/";
 
-    dump_default()                  and exit if $default;
-    dump_pmc(\@include, @ARGV)      and exit if $dump;
-    print_tree(\@include, 0, @ARGV) and exit if $tree;
-    gen_c(\@include, @ARGV)         and exit if $gen_c;
+    if ( 0 == grep { $action{$_} } keys %action ) {
+        die "No action specified!\n";
+    }
+
+    if ($action{default}) {
+        dump_default();
+        exit;
+    }
+
+    # All other actions require files
+    if ( !@ARGV ) {
+        die "No files specified.\n";
+    }
+
+    if ( $action{dump} ) {
+        dump_pmc(\@include, @ARGV);
+    }
+
+    if ( $action{tree} ) {
+        print_tree(\@include, 0, @ARGV);
+    }
+
+    if ( $action{gen_c} ) {
+        gen_c(\@include, @ARGV);
+    }
 }
 
 # vim: expandtab shiftwidth=4:
