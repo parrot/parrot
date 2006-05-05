@@ -635,7 +635,7 @@ sub dump_is_newer {
     my $pmc = $file;
     $pmc =~ s/\.\w+$/.pmc/;
 
-    ($pmc ne $file) or die "$pmc is the same as the original name"
+    ($pmc ne $file) or die "$pmc is the same as the original name";
 
     my $pmc_dt  = (stat $pmc)[9];
     my $dump_dt = (stat $file)[9];
