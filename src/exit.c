@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -50,7 +50,8 @@ Parrot_on_exit(void (*function)(int , void *), void *arg) {
     /* XXX  we might want locking around the list access.   I'm sure this
      * will be the least of the threading issues. */
 
-    handler_node_t* new_node = mem_sys_allocate(sizeof(handler_node_t));
+    handler_node_t* const new_node = mem_sys_allocate(sizeof(handler_node_t));
+
     new_node->function = function;
     new_node->arg = arg;
     new_node->next = exit_handler_list;
@@ -86,7 +87,8 @@ void Parrot_exit(int status) {
      *             call would run all exit handlers
      */
     while (exit_handler_list) {
-        handler_node_t *node = exit_handler_list;
+        handler_node_t * const node = exit_handler_list;
+
         exit_handler_list = exit_handler_list->next;
         (node->function)(status, node->arg);
         mem_sys_free(node);
