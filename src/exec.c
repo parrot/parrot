@@ -26,6 +26,7 @@ src/exec.c - Generate an object file
 #include "parrot/jit_emit.h"
 #include "exec_dep.h"
 #include "exec_save.h"
+#include "parrot/compiler.h"
 
 static void exec_init(Parrot_exec_objfile_t *obj);
 static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);
@@ -65,12 +66,11 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
 #endif
     const char *output;
     long bhs;
-    Parrot_exec_objfile_t *obj;
     Parrot_jit_info_t *jit_info;
     extern PARROT_API char **Parrot_exec_rel_addr;
     extern PARROT_API int Parrot_exec_rel_count;
 
-    obj = mem_sys_allocate_zeroed(sizeof(Parrot_exec_objfile_t));
+    Parrot_exec_objfile_t * const obj = mem_sys_allocate_zeroed(sizeof(Parrot_exec_objfile_t));
     exec_init(obj);
     Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof(char *));
     obj->bytecode_header_size =
@@ -131,6 +131,9 @@ C<< obj->data_size[N] >>.
 
 static void
 add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
+                __attribute__nonnull__(1);
+static void
+add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
 {
     char *cp;
     int *nds, i = 0;
@@ -140,8 +143,7 @@ add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
         obj->data_size = (int *)mem_sys_allocate(sizeof(int));
     }
     else {
-        cp = (char *)mem_sys_realloc(obj->data.code, obj->data.size + len);
-        obj->data.code = cp;
+        obj->data.code = (char *)mem_sys_realloc(obj->data.code, obj->data.size + len);
         nds = (int *)mem_sys_realloc(obj->data_size, (obj->data_count + 2) *
             sizeof(int));
         obj->data_size = nds;
@@ -166,6 +168,9 @@ Initialize the obj structure.
 =cut
 
 */
+
+static void exec_init(Parrot_exec_objfile_t *obj)
+    __attribute__nonnull__(1);
 
 static void
 exec_init(Parrot_exec_objfile_t *obj)
@@ -211,11 +216,11 @@ int
 Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
     int stype)
 {
-    int symbol_number;
-    Parrot_exec_symbol_t *new_symbol;
 
-    symbol_number = symbol_list_find(obj, symbol);
+    int symbol_number = symbol_list_find(obj, symbol);
     if (symbol_number == -1) {
+        Parrot_exec_symbol_t *new_symbol;
+
         symbol_number = obj->symbol_count;
         new_symbol = mem_sys_realloc(obj->symbol_table,
             (size_t)(obj->symbol_count + 1) * sizeof(Parrot_exec_symbol_t));
@@ -342,6 +347,10 @@ Used by C<Parrot_exec_add_symbol()>.
 
 */
 
+static int
+symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)
+    __attribute__nonnull__(1)
+    __attribute__nonnull__(2);
 static int
 symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)
 {

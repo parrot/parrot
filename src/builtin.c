@@ -19,6 +19,7 @@ src/builtin.c - Builtin Methods
 */
 
 #include "parrot/parrot.h"
+#include "parrot/compiler.h"
 #include "builtin.str"
 #include <assert.h>
 
@@ -117,6 +118,12 @@ Parrot_init_builtins(Interp *interpreter)
      */
 }
 
+static int find_builtin(Interp *interpreter, const char *func)
+    __attribute__nonnull__(2);
+static int find_builtin_s(Interp *interpreter, STRING *func)
+    __attribute__nonnull__(2);
+static int check_builtin_sig(Interp *interpreter, size_t i, const char *sig, int pass)
+    __attribute__nonnull__(3);
 static int
 find_builtin(Interp *interpreter, const char *func)
 {

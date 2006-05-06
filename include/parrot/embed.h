@@ -15,6 +15,7 @@
 #if !defined(PARROT_EMBED_H_GUARD)
 #define PARROT_EMBED_H_GUARD
 
+#include "parrot/compiler.h"    /* compiler capabilities */
 #include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
@@ -59,7 +60,8 @@ PARROT_API Parrot_Opcode * Parrot_debug(Parrot_Interp, Parrot_Opcode* pc);
 
 PARROT_API void Parrot_disassemble(Parrot_Interp);
 
-PARROT_API void Parrot_exit(int status);
+PARROT_API void Parrot_exit(int status)
+                __attribute__noreturn__;
 
 PARROT_API void Parrot_run_native(Parrot_Interp interpreter, native_func_t func);
 

@@ -13,9 +13,14 @@
 #if !defined(PARROT_BUILTIN_H_GUARD)
 #define PARROT_BUILTIN_H_GUARD
 
+#include "parrot/compiler.h"
+
 void Parrot_init_builtins(Interp *interpreter);
-int  Parrot_is_builtin(Interp *interpreter, const char *func, const char *sig);
-PMC* Parrot_find_builtin(Interp *interpreter, STRING *func);
+int  Parrot_is_builtin(Interp *interpreter, const char *func, const char *sig)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+PMC* Parrot_find_builtin(Interp *interpreter, STRING *func)
+        __attribute__nonnull__(2);
 const char * Parrot_builtin_get_c_namespace(Interp *interpreter, int bi);
 int Parrot_builtin_is_class_method(Interp *interpreter, int bi);
 int Parrot_builtin_is_void(Interp *interpreter, int bi);

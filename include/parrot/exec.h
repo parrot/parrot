@@ -100,19 +100,16 @@ PARROT_API int *Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj,
     char *nptr, const char *var, int offset, int disp);
 PARROT_API void Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj,
     char *nptr, int type, const char *symbol, int disp);
-int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
-    int stype);
+int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol, int stype)
+    __attribute__nonnull__(1)
+    __attribute__nonnull__(2);
 
 void Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file);
 
-void Parrot_exec_emit_mov_mr(Interp * interpreter, char *mem,
-                             int reg);
-void Parrot_exec_emit_mov_mr_n(Interp * interpreter, char *mem,
-                             int reg);
-void Parrot_exec_emit_mov_rm(Interp * interpreter, int reg,
-                             char *mem);
-void Parrot_exec_emit_mov_rm_n(Interp * interpreter, int reg,
-                             char *mem);
+void Parrot_exec_emit_mov_mr(Interp * interpreter, char *mem, int reg);
+void Parrot_exec_emit_mov_mr_n(Interp * interpreter, char *mem, int reg);
+void Parrot_exec_emit_mov_rm(Interp * interpreter, int reg, char *mem);
+void Parrot_exec_emit_mov_rm_n(Interp * interpreter, int reg, char *mem);
 #  endif /* PARROT_EXEC_H_GUARD */
 #endif /* EXEC_CAPABLE */
 

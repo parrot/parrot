@@ -21,6 +21,7 @@ strings.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/compiler.h"
 #include <assert.h>
 
 /*
@@ -107,7 +108,11 @@ Copies the string header from the first Parrot string to the second.
 */
 
 static void
-copy_string_header(Interp *interpreter, String *dest, const String *src)
+copy_string_header(String *dest, const String *src)
+                    __attribute__nonnull__(1)
+                    __attribute__nonnull__(2);
+static void
+copy_string_header(String *dest, const String *src)
 {
     memcpy(dest, src, sizeof(String));
 }
@@ -134,7 +139,7 @@ Parrot_make_COW_reference(Interp *interpreter, STRING *s)
     if (PObj_constant_TEST(s)) {
         d = new_string_header(interpreter, 0);
         PObj_COW_SET(s);
-        copy_string_header(interpreter, d, s);
+        copy_string_header(d, s);
         /* we can't move the memory, because constants aren't
          * scanned in compact_pool, therefore the other end
          * would point to garbage.
@@ -144,7 +149,7 @@ Parrot_make_COW_reference(Interp *interpreter, STRING *s)
     else {
         d = new_string_header(interpreter, PObj_get_FLAGS(s));
         PObj_COW_SET(s);
-        copy_string_header(interpreter, d, s);
+        copy_string_header(d, s);
         PObj_sysmem_CLEAR(d);
     }
     return d;
@@ -170,13 +175,13 @@ Parrot_reuse_COW_reference(Interp *interpreter, STRING *s, STRING *d)
     }
     if (PObj_constant_TEST(s)) {
         PObj_COW_SET(s);
-        copy_string_header(interpreter, d, s);
+        copy_string_header(d, s);
         PObj_constant_CLEAR(d);
         PObj_external_SET(d);
     }
     else {
         PObj_COW_SET(s);
-        copy_string_header(interpreter, d, s);
+        copy_string_header(d, s);
         PObj_sysmem_CLEAR(d);
     }
     return d;
@@ -298,7 +303,7 @@ string_deinit(Parrot_Interp interpreter)
 /*
 
 =item C<UINTVAL
-string_capacity(Interp *interpreter, STRING *s)>
+string_capacity(Interp *interpreter, const STRING *s)>
 
 Returns the capacity of the specified Parrot string in bytes, that
 is how many bytes can be appended onto strstart.
@@ -308,7 +313,7 @@ is how many bytes can be appended onto strstart.
 */
 
 UINTVAL
-string_capacity(Interp *interpreter, STRING *s)
+string_capacity(Interp *interpreter, const STRING *s)
 {
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
             (ptrcast_t)s->strstart);
