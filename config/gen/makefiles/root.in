@@ -1725,7 +1725,11 @@ $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
 
 tags: tags.dummy
 	$(RM_F) tags
-	ctags -R --links=no $(CUR_DIR)
+	ctags \
+		--links=no --totals \
+		-R --exclude=blib --exclude=.svn --exclude=src/pmc/*.c \
+		--languages=c,perl --langmap=c:+.h,c:+.pmc \
+		$(CUR_DIR)
 	$(PERL) editor/addtags $(OPS_DIR)/*.ops
 
 tags.dummy:
