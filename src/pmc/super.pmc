@@ -1,5 +1,5 @@
 /*
-Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -73,7 +73,7 @@ Find the method for C<*name> in the parent class of the bound object.
     void set_pmc(PMC *obj) {
         PMC_pmc_val(SELF) = obj;
         if (!PMC_IS_NULL(obj)) {
-            PMC *mro = obj->vtable->mro;
+            PMC * const mro = obj->vtable->mro;
             if (VTABLE_elements(INTERP, mro) <= 1)
                 real_exception(INTERP, NULL, E_TypeError,
                     "object has no parent");
@@ -94,9 +94,9 @@ Find the method for C<*name> in the parent class of the bound object.
     }
 
     PMC* find_method(STRING* name) {
-        PMC *obj, *mro, *class;
+        PMC *mro, *class;
 
-        obj = PMC_pmc_val(SELF);
+        PMC * const obj = PMC_pmc_val(SELF);
         if (PMC_IS_NULL(obj)) {
             real_exception(INTERP, NULL, E_TypeError,
                 "no object bound to super");
