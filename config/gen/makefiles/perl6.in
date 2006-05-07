@@ -29,7 +29,7 @@ SOURCES = perl6.pir \
   src/past2post.tg \
   src/main.pir \
   src/builtins.pir \
-  $(PMCDIR)/perl6_group.so
+  $(PMCDIR)/perl6_group$(LOAD_EXT)
 
 PMCS = perl6str
 PMC_SOURCES = $(PMCDIR)/perl6str.pmc
@@ -42,7 +42,7 @@ perl6.pbc: $(PARROT) $(PGE_DIR)/pgc.pir $(SOURCES)
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/past2post_gen.pir src/past2post.tg
 	$(PARROT) -o perl6.pbc perl6.pir
 
-$(PMCDIR)/perl6_group.so: $(PARROT) $(PMC_SOURCES)
+$(PMCDIR)/perl6_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
 	cd $(PMCDIR) && $(BUILD) generate $(PMCS)
 	cd $(PMCDIR) && $(BUILD) compile $(PMCS)
 	cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
