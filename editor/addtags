@@ -19,24 +19,26 @@ Add src/ops/*.ops to tags file.
 
 
 my %seen;
+my @tags;
 
-open T, '>>', 'tags' or die "Can't append tags: $!";
+# Pull ops tags
 while (<>) {
 	if (/\bop \s+ (\w+) \s* \(/x) {
 		next if $seen{$1}++;
 	# tag file excmd xflags
-	print T qq{$1\t./$ARGV\t$.;"\tf\n};
+	push @tags, join( "\t", $1, $ARGV, qq{$.;"}, "f" ) . "\n";
 	}
 } continue {
 	close ARGV if eof;           # reset $.
 }
-close T;
-# Vim needs sorted tags
+
+# Pull existing tags
 open T, '<', 'tags';
-my @tags = <T>;
+push @tags, <T>;
 close T;
+
+# Spit 'em out sorted
 open T, '>', 'tags';
-@tags = sort @tags;
-print T @tags;
+print T sort @tags;
 close T;
 
