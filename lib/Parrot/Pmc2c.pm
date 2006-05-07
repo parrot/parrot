@@ -116,7 +116,7 @@ C<new()>, and C<$class> is C<Parrot::Pmc2c>.
 =cut
 
 my %special_class_name = map {($_,1)}
-    qw( REf default Null delegate SharedRef deleg_pmc );
+    qw( Ref default Null delegate SharedRef deleg_pmc );
 
 sub class_name {
     my ($self, $class) = @_;
