@@ -2119,7 +2119,7 @@ CODE
 Perl6;PAST;Node
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "isa (#39045)");
+pir_output_is(<<'CODE', <<'OUTPUT', "isa (#39045)", todo => 'rt #39045');
 .sub main :main
     .local pmc base, o1, o2
     base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
@@ -2132,7 +2132,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering");
+pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering", todo => 'awaiting fix');
 .sub main :main
     .local pmc c1, c2
     c1 = newclass ['Foo']
@@ -2153,7 +2153,7 @@ __init Bar
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)");
+pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)", todo=>'rt #39056');
 .sub main :main
     .local pmc base
     $P0 = getclass 'Integer'
@@ -2179,7 +2179,7 @@ ok bar
 OUTPUT
 
 
-pir_output_is(<<'CODE', <<'OUTPUT', "super __init called twice (#39081)");
+pir_output_is(<<'CODE', <<'OUTPUT', "super __init called twice (#39081)", todo=>'rt #39081');
 .sub main :main
     $P0 = newclass 'Foo'
     $P1 = subclass $P0, 'Bar'

@@ -2324,7 +2324,7 @@ ok 3
 ok 4
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named loses :flat arg (#39044)");
+pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named loses :flat arg (#39044)", todo => 'rt #39044');
 .sub main :main
     $P0 = new .Hash
     $P0['a'] = 11
