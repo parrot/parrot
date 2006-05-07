@@ -198,9 +198,9 @@ BITSPERMAP	src/malloc.c	2280;"	d	file:
 BITS_PER_CHAR	src/pmc/fixedbooleanarray.pmc	30;"	d	file:
 BITS_PER_CHAR	src/pmc/resizablebooleanarray.pmc	27;"	d	file:
 BITS_PER_INT	compilers/imcc/reg_alloc_bc.c	70;"	d	file:
-BITWISE_AND_STRINGS	src/string.c	1427;"	d	file:
-BITWISE_NOT_STRING	src/string.c	1700;"	d	file:
-BITWISE_OR_STRINGS	src/string.c	1512;"	d	file:
+BITWISE_AND_STRINGS	src/string.c	1432;"	d	file:
+BITWISE_NOT_STRING	src/string.c	1705;"	d	file:
+BITWISE_OR_STRINGS	src/string.c	1517;"	d	file:
 BIT_OFFSET	src/jit_debug.c	86;"	d	file:
 BIT_OFFSET	src/jit_debug_xcoff.c	54;"	d	file:
 BIT_SIZE	src/jit_debug.c	84;"	d	file:
@@ -912,9 +912,9 @@ EOM	compilers/imcc/imcparser.h	/^     EOM = 352,$/;"	e	enum:yytokentype
 EOM	compilers/imcc/imcparser.h	242;"	d
 EOR	src/jit/arm/jit_emit.h	/^    EOR = 0x02,$/;"	e
 ERROR	languages/jako/lib/Jako/Processor.pm	/^sub ERROR$/;"	s
-ERROR_BAD_STACK_TYPE	include/parrot/stacks.h	95;"	d
-ERROR_STACK_EMPTY	include/parrot/stacks.h	93;"	d
-ERROR_STACK_SHALLOW	include/parrot/stacks.h	94;"	d
+ERROR_BAD_STACK_TYPE	include/parrot/stacks.h	100;"	d
+ERROR_STACK_EMPTY	include/parrot/stacks.h	98;"	d
+ERROR_STACK_SHALLOW	include/parrot/stacks.h	99;"	d
 ERR_OVERFLOW	include/parrot/exceptions.h	/^        ERR_OVERFLOW,$/;"	e
 ESUB	compilers/imcc/imcparser.c	/^     ESUB = 327,$/;"	e	enum:yytokentype	file:
 ESUB	compilers/imcc/imcparser.c	241;"	d	file:
@@ -980,7 +980,7 @@ EXTRA_CLASS_EXISTS	include/parrot/pmc_freeze.h	/^    EXTRA_CLASS_EXISTS$/;"	e
 EXTRA_IS_COUNT	include/parrot/pmc_freeze.h	/^    EXTRA_IS_COUNT,$/;"	e
 EXTRA_IS_NULL	include/parrot/pmc_freeze.h	/^    EXTRA_IS_NULL,$/;"	e
 EXTRA_IS_PROP_HASH	include/parrot/pmc_freeze.h	/^    EXTRA_IS_PROP_HASH,$/;"	e
-EXTRA_SIZE	src/string.c	38;"	d	file:
+EXTRA_SIZE	src/string.c	39;"	d	file:
 EX_DATAERR	compilers/imcc/imc.h	12;"	d
 EX_IOERR	compilers/imcc/imc.h	15;"	d
 EX_NOINPUT	compilers/imcc/imc.h	14;"	d
@@ -1914,7 +1914,7 @@ MMB	src/jit/ia64/jit_emit.h	/^    MMB,$/;"	e
 MMBs	src/jit/ia64/jit_emit.h	/^    MMBs,$/;"	e
 MMD_ADD	include/parrot/vtable.h	/^        MMD_ADD,$/;"	e
 MMD_BAND	include/parrot/vtable.h	/^        MMD_BAND,$/;"	e
-MMD_BIG_DISTANCE	src/mmd.c	1652;"	d	file:
+MMD_BIG_DISTANCE	src/mmd.c	1654;"	d	file:
 MMD_BOR	include/parrot/vtable.h	/^        MMD_BOR,$/;"	e
 MMD_BSL	include/parrot/vtable.h	/^        MMD_BSL,$/;"	e
 MMD_BSR	include/parrot/vtable.h	/^        MMD_BSR,$/;"	e
@@ -2119,7 +2119,7 @@ NULL_REG_ACCESS	include/parrot/exceptions.h	/^        NULL_REG_ACCESS,$/;"	e
 NULLfunc	include/parrot/parrot.h	224;"	d
 NUMCONST	languages/BASIC/compiler/COMP_toker.pm	/^NUMCONST:	if ($cur =~ \/\\d\/) {$/;"	l
 NUMVAL_SIZE	include/parrot/config.h	87;"	d
-NUM_OPS	src/ops/core_ops.c	29455;"	d	file:
+NUM_OPS	src/ops/core_ops.c	29431;"	d	file:
 NUM_REGISTERS	docs/dev/nanoparrot.c	33;"	d	file:
 NUM_REGISTERS	include/parrot/parrot.h	111;"	d
 N_BCOMM	src/jit_debug.c	71;"	d	file:
@@ -2127,7 +2127,7 @@ N_BINCL	src/jit_debug.c	62;"	d	file:
 N_BROWS	src/jit_debug.c	52;"	d	file:
 N_BSLINE	src/jit_debug.c	51;"	d	file:
 N_BUCKETS	src/hash.c	35;"	d	file:
-N_BUILTINS	src/builtin.c	34;"	d	file:
+N_BUILTINS	src/builtin.c	35;"	d	file:
 N_CATCH	src/jit_debug.c	57;"	d	file:
 N_CONSTS	docs/dev/nanoparrot.c	246;"	d	file:
 N_DEFD	src/jit_debug.c	53;"	d	file:
@@ -2239,7 +2239,7 @@ OP_AS_OFFS	src/ops/core_ops_cgp.c	19;"	d	file:
 OP_AS_OFFS	src/ops/core_ops_switch.c	20;"	d	file:
 OP_AS_OFFS	src/pic.c	98;"	d	file:
 OP_FUNC_IS_ALLOCATED	include/parrot/oplib.h	/^    OP_FUNC_IS_ALLOCATED = 0x01,$/;"	e
-OP_HASH_SIZE	src/ops/core_ops.c	29457;"	d	file:
+OP_HASH_SIZE	src/ops/core_ops.c	29433;"	d	file:
 OP_INFO_IS_ALLOCATED	include/parrot/oplib.h	/^    OP_INFO_IS_ALLOCATED = 0x02$/;"	e
 OP_MAP	src/jit/skeleton/jit_emit.h	/^    OP_MAP = r14,       \/* cached op_map (persistent) *\/$/;"	e
 ORD_OUT_OF_STRING	include/parrot/exceptions.h	/^        ORD_OUT_OF_STRING,$/;"	e
@@ -2271,7 +2271,7 @@ Options	parrotbug	/^Options:$/;"	l
 Outer	src/nci_test.c	/^} Outer;$/;"	t	file:
 PACKFILE_HEADER_BYTES	include/parrot/packfile.h	32;"	d
 PAD_NOT_FOUND	include/parrot/exceptions.h	/^        PAD_NOT_FOUND,$/;"	e
-PANIC	include/parrot/exceptions.h	26;"	d
+PANIC	include/parrot/exceptions.h	34;"	d
 PARAM	compilers/imcc/imcparser.c	/^     PARAM = 259,$/;"	e	enum:yytokentype	file:
 PARAM	compilers/imcc/imcparser.c	173;"	d	file:
 PARAM	compilers/imcc/imcparser.h	/^     PARAM = 259,$/;"	e	enum:yytokentype
@@ -2338,6 +2338,7 @@ PARROT_CHARSET_ISO_8859_1_H_GUARD	src/charset/iso-8859-1.h	14;"	d
 PARROT_CHARSET_TABLES_H_GUARD	src/charset/tables.h	17;"	d
 PARROT_CHARSET_UNICODE_H_GUARD	src/charset/unicode.h	14;"	d
 PARROT_CLASS_DATA_ENUM	include/parrot/objects.h	/^} PARROT_CLASS_DATA_ENUM;$/;"	t
+PARROT_COMPILER_H_GUARD	include/parrot/compiler.h	10;"	d
 PARROT_CONFIG_DATE	include/parrot/config.h	25;"	d
 PARROT_CONFIG_H_GUARD	include/parrot/config.h	16;"	d
 PARROT_CORE_CGP_OPLIB_INIT	include/parrot/config.h	136;"	d
@@ -8383,9 +8384,9 @@ SREG	src/ops/core_ops.c	19;"	d	file:
 SREG	src/ops/core_ops_cg.c	19;"	d	file:
 STACKED_EXCEPTIONS	src/inter_run.c	36;"	d	file:
 STACK_CHUNK_COW_FLAG	include/parrot/enums.h	/^    STACK_CHUNK_COW_FLAG     = 1 << 0$/;"	e
-STACK_CHUNK_LIMIT	include/parrot/stacks.h	18;"	d
-STACK_CLEANUP_NULL	include/parrot/stacks.h	48;"	d
-STACK_DATAP	include/parrot/stacks.h	42;"	d
+STACK_CHUNK_LIMIT	include/parrot/stacks.h	19;"	d
+STACK_CLEANUP_NULL	include/parrot/stacks.h	49;"	d
+STACK_DATAP	include/parrot/stacks.h	43;"	d
 STACK_ENTRY_ACTION	include/parrot/enums.h	/^    STACK_ENTRY_ACTION      = 8$/;"	e
 STACK_ENTRY_CLEANUP_FLAG	include/parrot/enums.h	/^    STACK_ENTRY_CLEANUP_FLAG = 1 << 0$/;"	e
 STACK_ENTRY_DESTINATION	include/parrot/enums.h	/^    STACK_ENTRY_DESTINATION = 6,$/;"	e
@@ -9510,6 +9511,20 @@ __allocate_p	languages/miniperl/Miniperl/Generator.pm	/^sub __allocate_p {$/;"	s
 __allocate_s	languages/miniperl/Miniperl/Generator.pm	/^sub __allocate_s {$/;"	s
 __and__	languages/python/pmc/pyobject.pmc	/^static STRING* __and__;$/;"	v	file:
 __assign	languages/miniperl/Miniperl/Generator.pm	/^sub __assign {$/;"	s
+__attribute__format__	include/parrot/compiler.h	20;"	d
+__attribute__format__	include/parrot/compiler.h	43;"	d
+__attribute__malloc__	include/parrot/compiler.h	23;"	d
+__attribute__malloc__	include/parrot/compiler.h	46;"	d
+__attribute__nonnull__	include/parrot/compiler.h	26;"	d
+__attribute__nonnull__	include/parrot/compiler.h	49;"	d
+__attribute__noreturn__	include/parrot/compiler.h	29;"	d
+__attribute__noreturn__	include/parrot/compiler.h	52;"	d
+__attribute__pure__	include/parrot/compiler.h	32;"	d
+__attribute__pure__	include/parrot/compiler.h	55;"	d
+__attribute__unused__	include/parrot/compiler.h	35;"	d
+__attribute__unused__	include/parrot/compiler.h	58;"	d
+__attribute__warn_unused_result__	include/parrot/compiler.h	38;"	d
+__attribute__warn_unused_result__	include/parrot/compiler.h	61;"	d
 __binop	languages/miniperl/Miniperl/Generator.pm	/^sub __binop {$/;"	s
 __cplusplus	compilers/ast/astlexer.c	36;"	d	file:
 __cplusplus	compilers/imcc/imclexer.c	18;"	d	file:
@@ -9979,11 +9994,11 @@ a0	src/jit/mips/jit_emit.h	/^    a0,$/;"	e
 a1	src/jit/mips/jit_emit.h	/^    a1,$/;"	e
 a2	src/jit/mips/jit_emit.h	/^    a2,$/;"	e
 a3	src/jit/mips/jit_emit.h	/^    a3,$/;"	e
-abs	./src/ops/math.ops	159;"	f
+abs	src/ops/math.ops	159;"	f
 abs_time	include/parrot/events.h	/^    FLOATVAL                    abs_time;$/;"	m
 absolute	include/parrot/vtable.h	/^    absolute_method_t absolute;$/;"	m	struct:_vtable
 absolute_method_t	include/parrot/vtable.h	/^typedef PMC* (*absolute_method_t)(Interp* interpreter, PMC* pmc, PMC* dest);$/;"	t
-accept	./src/ops/io.ops	576;"	f
+accept	src/ops/io.ops	571;"	f
 accept_code	lib/Pod/Simple.pm	/^sub accept_code { shift->accept_codes(@_) } # alias$/;"	s
 accept_codes	lib/Pod/Simple.pm	/^sub accept_codes {  # Add some codes$/;"	s
 accept_directive_as_data	lib/Pod/Simple.pm	/^sub accept_directive_as_data      { shift->_accept_directives('Data',     @_) }$/;"	s
@@ -9999,10 +10014,10 @@ access_arg	lib/Parrot/OpTrans/CGoto.pm	/^sub access_arg$/;"	s
 access_arg	lib/Parrot/OpTrans/CPrederef.pm	/^sub access_arg$/;"	s
 access_arg	lib/Parrot/OpTrans/Compiled.pm	/^sub access_arg$/;"	s
 access_of_ident	languages/jako/lib/Jako/Construct/Block.pm	/^sub access_of_ident$/;"	s
-acos	./src/ops/math.ops	786;"	f
-add	./src/ops/math.ops	224;"	f
+acos	src/ops/math.ops	786;"	f
 add	lib/Digest/Perl/MD5.pm	/^sub add(@) {$/;"	s
 add	lib/Parrot/Configure/Data.pm	/^sub add$/;"	s
+add	src/ops/math.ops	224;"	f
 add_1_const	compilers/imcc/pbc.c	/^add_1_const(Interp *interpreter, SymReg *r)$/;"	f	file:
 add_checks	languages/regex/lib/Regex/TreeOptimize.pm	/^sub add_checks {$/;"	s
 add_chunk	src/list.c	/^add_chunk(Interp *interpreter, List *list, int where, UINTVAL idx)$/;"	f	file:
@@ -10047,14 +10062,14 @@ add_term	languages/m4/src/eval.c	/^add_term (eval_token et, eval_t *v1)$/;"	f	fi
 add_timer	src/pmc/timer.pmc	/^add_timer(Interp* interpreter, PMC *pmc)$/;"	f	file:
 add_var	languages/tcl/tools/gen_inline.pl	/^sub add_var     { push @pir_code, [ VAR    => $_ ] for @_; }$/;"	s
 add_wrapped	languages/tcl/tools/gen_inline.pl	/^sub add_wrapped { push @pir_code, [ WRAP   => $_ ] for @_; }$/;"	s
-addattribute	./src/ops/object.ops	376;"	f
+addattribute	src/ops/object.ops	376;"	f
 addautoscore	lib/Parse/RecDescent.pm	/^sub addautoscore$/;"	s
 addcall	lib/Parse/RecDescent.pm	/^sub addcall($$)$/;"	s
 adddirective	lib/Parse/RecDescent.pm	/^sub adddirective$/;"	s
-adddoes	./src/ops/object.ops	467;"	f
+adddoes	src/ops/object.ops	467;"	f
 addfile	lib/Digest/Perl/MD5.pm	/^sub addfile {$/;"	s
 additem	lib/Parse/RecDescent.pm	/^sub additem$/;"	s
-addparent	./src/ops/object.ops	354;"	f
+addparent	src/ops/object.ops	354;"	f
 addprod	lib/Parse/RecDescent.pm	/^sub addprod($$)$/;"	s
 address	include/parrot/sub.h	/^    opcode_t *address;               \/* start of bytecode, addr to continue *\/$/;"	m	struct:Parrot_cont
 address	include/parrot/sub.h	/^    opcode_t *address;        \/* next address to run - toggled each time *\/$/;"	m	struct:Parrot_coro
@@ -10096,7 +10111,7 @@ am_qNAN	src/bignum.c	157;"	d	file:
 am_sNAN	src/bignum.c	145;"	d	file:
 analyse_life_block	compilers/imcc/cfg.c	/^analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)$/;"	f	file:
 analyse_life_symbol	compilers/imcc/cfg.c	/^analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)$/;"	f	file:
-and	./src/ops/cmp.ops	669;"	f
+and	src/ops/cmp.ops	669;"	f
 and_term	languages/m4/src/eval.c	/^and_term (eval_token et, eval_t *v1)$/;"	f	file:
 annotated	languages/regex/lib/Regex/Ops/Tree.pm	/^sub annotated {$/;"	s
 anon_lbl	languages/jako/lib/Jako/Compiler.pm	/^sub anon_lbl$/;"	s
@@ -10160,8 +10175,8 @@ ascii_find_thing	src/charset/ascii.c	/^ascii_find_thing(Interp *interpreter, STR
 ascii_funcs	src/pmc_freeze.c	/^static image_funcs ascii_funcs = {$/;"	v	file:
 ascii_get_graphemes	src/charset/ascii.c	/^ascii_get_graphemes(Interp *interpreter, STRING *source_string,$/;"	f
 ascii_get_graphemes_inplace	src/charset/ascii.c	/^ascii_get_graphemes_inplace(Interp *interpreter, STRING *source_string,$/;"	f
-asec	./src/ops/math.ops	799;"	f
-asin	./src/ops/math.ops	813;"	f
+asec	src/ops/math.ops	799;"	f
+asin	src/ops/math.ops	813;"	f
 ask_for_alternative	parrotbug	/^sub ask_for_alternative {$/;"	s
 ask_for_body	parrotbug	/^sub ask_for_body {$/;"	s
 ask_for_editor	parrotbug	/^sub ask_for_editor {$/;"	s
@@ -10170,7 +10185,7 @@ ask_for_subject	parrotbug	/^sub ask_for_subject {$/;"	s
 asm_state	compilers/imcc/imc.h	/^    AsmState asm_state;$/;"	m	struct:_imc_info_t
 assert	languages/cola/sym.c	/^void assert(void * p) {$/;"	f
 assert	src/malloc.c	364;"	d	file:
-assign	./src/ops/set.ops	259;"	f
+assign	src/ops/set.ops	255;"	f
 assign_pmc	include/parrot/vtable.h	/^    assign_pmc_method_t assign_pmc;$/;"	m	struct:_vtable
 assign_pmc_method_t	include/parrot/vtable.h	/^typedef void (*assign_pmc_method_t)(Interp* interpreter, PMC* pmc, PMC* value);$/;"	t
 assign_registers	src/jit.c	/^assign_registers(Interp *interpreter,$/;"	f	file:
@@ -10185,7 +10200,7 @@ ast_start	languages/cola/parser.c	/^AST         *ast_start = NULL;$/;"	v
 asttype	languages/cola/cola.h	/^    enum ASTTYPE    asttype;    \/* Specific node type (IF|ASSIGN|...)*\/$/;"	m	struct:_AST
 at	languages/jako/lib/Jako/Processor.pm	/^sub at$/;"	s
 at	src/jit/mips/jit_emit.h	/^    at,$/;"	e
-atan	./src/ops/math.ops	832;"	f
+atan	src/ops/math.ops	832;"	f
 attr	lib/Pod/Simple/PullParserStartToken.pm	/^sub attr      {$/;"	s
 attr_hash	lib/Pod/Simple/PullParserStartToken.pm	/^sub attr_hash { $_[0][2] ||= {} }$/;"	s
 attr_str_2_num	src/objects.c	/^attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)$/;"	f	file:
@@ -10227,10 +10242,10 @@ b_PObj_is_special_PMC_FLAG	include/parrot/pobj.h	/^    b_PObj_is_special_PMC_FLA
 b_PObj_live_FLAG	include/parrot/pobj.h	/^    b_PObj_live_FLAG = 1 << 18,$/;"	e	enum:PObj_enum
 b_PObj_on_free_list_FLAG	include/parrot/pobj.h	/^    b_PObj_on_free_list_FLAG = 1 << 19,$/;"	e	enum:PObj_enum
 back	languages/jako/lib/Jako/Processor.pm	/^sub back$/;"	s
-backtrace	./src/ops/debug.ops	143;"	f
+backtrace	src/ops/debug.ops	143;"	f
 bad_args	languages/tcl/tools/gen_inline.pl	/^bad_args:$/;"	l
-band	./src/ops/bit.ops	37;"	f
-bands	./src/ops/bit.ops	57;"	f
+band	src/ops/bit.ops	37;"	f
+bands	src/ops/bit.ops	57;"	f
 barf	languages/BASIC/compiler/COMP_parser.pm	/^sub barf {$/;"	s
 barrel_shift_t	src/jit/arm/jit_emit.h	/^} barrel_shift_t;$/;"	t
 base	include/parrot/packfile.h	/^    struct PackFile_Segment      base;$/;"	m	struct:PackFile_Directory
@@ -10297,7 +10312,7 @@ bin_index	src/malloc.c	2207;"	d	file:
 bin_val	languages/conversion/Translate/ABNF.pm	/^bin_val: "b" BIT(s) (("." BIT(s))(s)$/;"	l
 binary	languages/python/pie-thon.pl	/^sub binary$/;"	s
 binary_word	languages/python/pie-thon.pl	/^sub binary_word$/;"	s
-bind	./src/ops/io.ops	566;"	f
+bind	src/ops/io.ops	561;"	f
 binmap	src/malloc.c	/^  unsigned int     binmap[BINMAPSIZE+1];$/;"	m	struct:malloc_state	file:
 binop_mmd_funcs	include/parrot/interpreter.h	/^    MMD_table *binop_mmd_funcs;               \/* Table of MMD functions *\/$/;"	m	struct:parrot_interp_t
 bins	src/malloc.c	/^  mchunkptr        bins[NBINS * 2];$/;"	m	struct:malloc_state	file:
@@ -10321,8 +10336,8 @@ block_label	languages/jako/lib/Jako/Compiler.pm	/^sub block_label$/;"	s
 blocks	languages/jako/lib/Jako/Parser.pm	/^sub blocks$/;"	s
 blocks_are_connected	compilers/imcc/cfg.c	/^blocks_are_connected(Basic_block *from, Basic_block *to)$/;"	f
 bmp	compilers/imcc/sets.h	/^   unsigned char* bmp;$/;"	m	struct:_Set
-bnot	./src/ops/bit.ops	85;"	f
-bnots	./src/ops/bit.ops	124;"	f
+bnot	src/ops/bit.ops	85;"	f
+bnots	src/ops/bit.ops	124;"	f
 body	languages/cola/cola.h	/^            struct _AST *body;$/;"	m	struct:_AST::<anonymous>::_CLASS
 body	languages/cola/cola.h	/^            struct _AST *body;$/;"	m	struct:_AST::<anonymous>::_LOOP
 body	languages/cola/cola.h	/^            struct _AST *body;$/;"	m	struct:_AST::<anonymous>::_METHOD
@@ -10333,23 +10348,23 @@ boolean_for_m4	languages/m4/src/eval.c	/^typedef int boolean_for_m4;$/;"	t	file:
 booleanarray_clear	src/pmc/fixedbooleanarray.pmc	/^booleanarray_clear(Interp *interpreter, PMC *self) {$/;"	f	file:
 booleanarray_clone	src/pmc/fixedbooleanarray.pmc	/^booleanarray_clone(Interp *interpreter, PMC *self, PMC *dest) {$/;"	f	file:
 booleanarray_init	src/pmc/fixedbooleanarray.pmc	/^booleanarray_init(Interp *interpreter, PMC *self) {$/;"	f	file:
-bor	./src/ops/bit.ops	161;"	f
-bors	./src/ops/bit.ops	181;"	f
-bounds	./src/ops/core.ops	787;"	f
+bor	src/ops/bit.ops	161;"	f
+bors	src/ops/bit.ops	181;"	f
 bounds	languages/cola/cola.h	/^    int     **bounds;           \/* N x 2 dimensional array of bounds where N = dimensions *\/        $/;"	m	struct:_Array
+bounds	src/ops/core.ops	784;"	f
 bp	docs/dev/nanoparrot.c	/^    struct Reg *bp;$/;"	m	struct:Interp	file:
 bp	include/parrot/interpreter.h	/^    Regs_ni                bp;          \/* pointers to FLOATVAL & INTVAL *\/$/;"	m	struct:Interp_Context
 bp	include/parrot/interpreter.h	/^    Regs_ni                bp;          \/* pointers to FLOATVAL & INTVAL *\/$/;"	m	struct:Parrot_Context
 bp_ps	include/parrot/interpreter.h	/^    Regs_ps                bp_ps;       \/* pointers to PMC & STR *\/$/;"	m	struct:Interp_Context
 bp_ps	include/parrot/interpreter.h	/^    Regs_ps                bp_ps;       \/* pointers to PMC & STR *\/$/;"	m	struct:Parrot_Context
 bp_ps	src/register.c	/^    Regs_ps  bp_ps;       \/* pushed regs need DOD marking *\/$/;"	m	file:
-branch	./src/ops/core.ops	170;"	f
+branch	src/ops/core.ops	170;"	f
 branch_branch	compilers/imcc/imc.h	/^	int branch_branch;$/;"	m	struct:imcc_ostat
 branch_branch	compilers/imcc/optimizer.c	/^branch_branch(Interp *interpreter, IMC_Unit * unit)$/;"	f	file:
 branch_cond_loop	compilers/imcc/imc.h	/^  int branch_cond_loop;$/;"	m	struct:imcc_ostat
 branch_cond_loop	compilers/imcc/optimizer.c	/^branch_cond_loop(Interp *interpreter, IMC_Unit * unit)$/;"	f	file:
 branch_cond_loop_swap	compilers/imcc/optimizer.c	/^branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,$/;"	f	file:
-branch_cs	./src/ops/core.ops	181;"	f
+branch_cs	src/ops/core.ops	181;"	f
 branch_list	include/parrot/jit.h	/^    opcode_t                       **branch_list;$/;"	m
 branch_reorg	compilers/imcc/optimizer.c	/^branch_reorg(Interp *interpreter, IMC_Unit * unit)$/;"	f	file:
 branch_t	src/jit/alpha/jit_emit.h	/^} branch_t;$/;"	t
@@ -10359,7 +10374,7 @@ branches	include/parrot/interpreter.h	/^    Prederef_branch *branches;          
 breakpoint	include/parrot/debug.h	/^    PDB_breakpoint_t        *breakpoint;$/;"	m	struct:PDB
 breakpoint_skip	include/parrot/debug.h	/^    long                    breakpoint_skip;$/;"	m	struct:PDB
 bs	include/parrot/hash.h	/^    HashBucket *bs;             \/* store of buckets *\/$/;"	m	struct:_hash
-bsr	./src/ops/core.ops	205;"	f
+bsr	src/ops/core.ops	205;"	f
 bss	include/parrot/exec.h	/^    Parrot_exec_section_t                               bss;$/;"	m
 buffer	compilers/imcc/imclexer.c	/^    YY_BUFFER_STATE buffer;$/;"	m	struct:macro_frame_t	file:
 buffer	include/parrot/intlist.h	/^    Buffer buffer; \/* This struct is a Buffer header subclass! *\/$/;"	m	struct:IntList_chunk_t
@@ -10402,13 +10417,13 @@ bwh_dpnt	src/jit/ia64/jit_emit.h	191;"	d
 bwh_dptk	src/jit/ia64/jit_emit.h	190;"	d
 bwh_spnt	src/jit/ia64/jit_emit.h	189;"	d
 bwh_sptk	src/jit/ia64/jit_emit.h	188;"	d
-bxor	./src/ops/bit.ops	300;"	f
-bxors	./src/ops/bit.ops	320;"	f
+bxor	src/ops/bit.ops	300;"	f
+bxors	src/ops/bit.ops	320;"	f
 byte_code	docs/dev/nanoparrot.c	/^    opcode_t *byte_code;$/;"	m	struct:pf	file:
 byte_code_destroy	src/packfile.c	/^byte_code_destroy (Interp* interpreter, struct PackFile_Segment *self)$/;"	f	file:
 byte_code_new	src/packfile.c	/^byte_code_new (Interp* interpreter, struct PackFile *pf,$/;"	f	file:
 bytecode_header_size	include/parrot/exec.h	/^    int                                                 bytecode_header_size;$/;"	m
-bytelength	./src/ops/string.ops	142;"	f
+bytelength	src/ops/string.ops	142;"	f
 byteorder	include/parrot/packfile.h	/^    unsigned char byteorder;$/;"	m	struct:PackFile_Header
 bytepos	include/parrot/string.h	/^    UINTVAL bytepos;$/;"	m	struct:string_iterator_t
 bytes	include/parrot/encoding.h	/^    encoding_bytes_t  bytes;$/;"	m	struct:_encoding
@@ -10486,14 +10501,14 @@ caller	lib/Test/Builder.pm	/^sub caller {$/;"	s
 caller	src/pmc/default.pmc	/^caller(Interp* interpreter, PMC * pmc)$/;"	f	file:
 caller_ctx	include/parrot/interpreter.h	/^    struct Parrot_Context *caller_ctx;  \/* caller context *\/$/;"	m	struct:Parrot_Context
 caller_seg	include/parrot/sub.h	/^    struct PackFile_ByteCode *caller_seg;  \/* bytecode segment *\/$/;"	m	struct:Parrot_coro
-callmethod	./src/ops/object.ops	93;"	f
-callmethodcc	./src/ops/object.ops	55;"	f
+callmethod	src/ops/object.ops	93;"	f
+callmethodcc	src/ops/object.ops	55;"	f
 calloc	src/malloc-trace.c	/^void* calloc(size_t n, size_t elem_size)$/;"	f
 calloc	src/malloc-trace.c	198;"	d	file:
 calls_a_sub	compilers/imcc/symreg.h	/^    int calls_a_sub;$/;"	m	struct:pcc_sub_t
 callsyntax	lib/Parse/RecDescent.pm	/^sub callsyntax($$)$/;"	s
-can	./src/ops/object.ops	182;"	f
 can	include/parrot/vtable.h	/^    can_method_t can;$/;"	m	struct:_vtable
+can	src/ops/object.ops	182;"	f
 can_method_t	include/parrot/vtable.h	/^typedef INTVAL (*can_method_t)(Interp* interpreter, PMC* pmc, STRING* method);$/;"	t
 can_ok	lib/Test/More.pm	/^sub can_ok ($@) {$/;"	s
 cant_do_method	src/pmc/default.pmc	/^cant_do_method(Interp* interpreter, PMC * pmc, const char *methname)$/;"	f	file:
@@ -10517,7 +10532,7 @@ cc_run	lib/Parrot/Configure/Step.pm	/^sub cc_run$/;"	s
 cc_run_capture	lib/Parrot/Configure/Step.pm	/^sub cc_run_capture$/;"	s
 cdebug	examples/compilers/japhc.c	18;"	d	file:
 cdebug	examples/compilers/japhc.c	20;"	d	file:
-ceil	./src/ops/math.ops	477;"	f
+ceil	src/ops/math.ops	477;"	f
 cfg_optimize	compilers/imcc/optimizer.c	/^cfg_optimize(Interp *interpreter, IMC_Unit * unit)$/;"	f
 cflags	config/gen/makefiles.pm	/^sub cflags$/;"	s
 cfree	src/malloc-trace.c	/^void cfree(void *mem)$/;"	f
@@ -10537,9 +10552,9 @@ char2pstr	include/parrot/misc.h	87;"	d
 char_offset_int	src/pmc/unmanagedstruct.pmc	/^char_offset_int(Interp* interpreter, PMC *pmc, INTVAL ix, int *type)$/;"	f	file:
 char_offset_key	src/pmc/unmanagedstruct.pmc	/^char_offset_key(Interp* interpreter, PMC *pmc, PMC *key, int *type)$/;"	f	file:
 charpos	include/parrot/string.h	/^    UINTVAL charpos;$/;"	m	struct:string_iterator_t
-charset	./src/ops/string.ops	515;"	f
 charset	include/parrot/pobj.h	/^    void *charset;$/;"	m	struct:parrot_string_t
 charset	src/charset.c	/^    CHARSET *charset;$/;"	m	file:
+charset	src/ops/string.ops	515;"	f
 charset_compare_t	include/parrot/charset.h	/^typedef INTVAL (*charset_compare_t)(Interp *, STRING *lhs, STRING *rhs);$/;"	t
 charset_compose_t	include/parrot/charset.h	/^typedef STRING* (*charset_compose_t)(Interp *, STRING *source_string);$/;"	t
 charset_compute_hash_t	include/parrot/charset.h	/^typedef size_t (*charset_compute_hash_t)(Interp *, STRING *, size_t seed);$/;"	t
@@ -10582,7 +10597,7 @@ charset_to_charset_t	include/parrot/charset.h	/^typedef STRING * (*charset_to_ch
 charset_upcase_first_t	include/parrot/charset.h	/^typedef void (*charset_upcase_first_t)(Interp *, STRING *source_string);$/;"	t
 charset_upcase_t	include/parrot/charset.h	/^typedef void (*charset_upcase_t)(Interp *, STRING *source_string);$/;"	t
 charset_validate_t	include/parrot/charset.h	/^typedef UINTVAL (*charset_validate_t)(Interp *, STRING *source_string);$/;"	t
-charsetname	./src/ops/string.ops	520;"	f
+charsetname	src/ops/string.ops	520;"	f
 check_branches	languages/BASIC/compiler/COMP_parser.pm	/^sub check_branches {$/;"	s
 check_builtin_sig	src/builtin.c	/^check_builtin_sig(Interp *interpreter, size_t i, const char *sig, int pass)$/;"	f	file:
 check_chunk	src/malloc.c	2531;"	d	file:
@@ -10593,8 +10608,8 @@ check_comments	tools/dev/check_source_standards.pl	/^sub check_comments {$/;"	s
 check_cpp_indents	tools/dev/check_source_standards.pl	/^sub check_cpp_indents {$/;"	s
 check_cuddled_else	tools/dev/check_source_standards.pl	/^sub check_cuddled_else {$/;"	s
 check_dev	tools/dev/check_source_standards.pl	/^sub check_dev {$/;"	s
-check_events	./src/ops/core.ops	116;"	f
-check_events__	./src/ops/core.ops	122;"	f
+check_events	src/ops/core.ops	116;"	f
+check_events__	src/ops/core.ops	122;"	f
 check_free_chunk	src/malloc.c	2532;"	d	file:
 check_free_chunk	src/malloc.c	2540;"	d	file:
 check_function_definitions	tools/dev/check_source_standards.pl	/^sub check_function_definitions {$/;"	s
@@ -10628,8 +10643,8 @@ checkleftmost	lib/Parse/RecDescent.pm	/^sub checkleftmost($)$/;"	s
 checkout_tests	languages/tcl/tools/tcl-test.pl	/^sub checkout_tests {$/;"	s
 child	compilers/ast/ast.h	/^	struct nodeType_t *child;	\/* contained node *\/$/;"	m	union:nodeType_t::<anonymous>
 choose	languages/tcl/tools/tcl-test.pl	/^sub choose {$/;"	s
-chopn	./src/ops/string.ops	77;"	f
-chr	./src/ops/string.ops	55;"	f
+chopn	src/ops/string.ops	77;"	f
+chr	src/ops/string.ops	55;"	f
 chunk2mem	src/malloc.c	1952;"	d	file:
 chunk_at_offset	src/malloc.c	2033;"	d	file:
 chunk_is_mmapped	src/malloc.c	2010;"	d	file:
@@ -10638,8 +10653,8 @@ chunk_list	include/parrot/list.h	/^    Buffer chunk_list;          \/* pointers 
 chunk_list_ptr	src/list.c	213;"	d	file:
 chunk_list_size	src/list.c	209;"	d	file:
 chunksize	src/malloc.c	2023;"	d	file:
-class	./src/ops/object.ops	328;"	f
 class	include/parrot/vtable.h	/^    PMC *class;              \/* for PMCs: a PMC of that type$/;"	m	struct:_vtable
+class	src/ops/object.ops	328;"	f
 class_CHARACTER	languages/amber/lib/kernel/pmc/amber_boolean.pmc	/^static INTVAL class_CHARACTER;$/;"	v	file:
 class_CHARACTER	languages/amber/lib/kernel/pmc/amber_integer.pmc	/^static INTVAL class_CHARACTER;$/;"	v	file:
 class_CHARACTER	languages/amber/lib/kernel/pmc/amber_string.pmc	/^static INTVAL class_CHARACTER;$/;"	v	file:
@@ -10651,8 +10666,8 @@ class_type	include/parrot/vtable.h	/^    class_type_method_t class_type;$/;"	m	s
 class_type_method_t	include/parrot/vtable.h	/^typedef INTVAL (*class_type_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
 classes	include/parrot/interpreter.h	/^    Warnings_classes classes;$/;"	m	struct:warnings_t
 classify	tools/dev/gen_charset_tables.pl	/^sub classify {$/;"	s
-classname	./src/ops/object.ops	339;"	f
-classoffset	./src/ops/object.ops	443;"	f
+classname	src/ops/object.ops	339;"	f
+classoffset	src/ops/object.ops	443;"	f
 clean	lib/Parrot/Configure/Data.pm	/^sub clean$/;"	s
 clean	tools/dev/rebuild_miniparrot.pl	/^sub clean {$/;"	s
 clean_obsolete_smokes	tools/util/smokeserv-server.pl	/^sub clean_obsolete_smokes {$/;"	s
@@ -10662,7 +10677,7 @@ cleanup_next_for_GC_pool	src/pmc_freeze.c	/^cleanup_next_for_GC_pool(Parrot_Inte
 clear_anychunks	src/malloc.c	2346;"	d	file:
 clear_basic_blocks	compilers/imcc/cfg.c	/^clear_basic_blocks(IMC_Unit * unit)$/;"	f
 clear_cow	src/dod.c	/^clear_cow(Interp *interpreter, struct Small_Object_Pool *pool,$/;"	f
-clear_eh	./src/ops/core.ops	706;"	f
+clear_eh	src/ops/core.ops	703;"	f
 clear_fastchunks	src/malloc.c	2358;"	d	file:
 clear_fixups	src/pmc/eval.pmc	/^clear_fixups(Interp* interpreter, parrot_sub_t sub_data)$/;"	f	file:
 clear_globals	compilers/imcc/symreg.c	/^clear_globals(Interp *interp)$/;"	f
@@ -10673,29 +10688,29 @@ clear_locals	compilers/imcc/symreg.c	/^clear_locals(IMC_Unit * unit)$/;"	f
 clear_regs	src/register.c	/^clear_regs(Interp *interpreter, parrot_context_t *ctx)$/;"	f	file:
 clear_state	compilers/imcc/imcparser.c	/^static void clear_state(void)$/;"	f	file:
 clear_sym_hash	compilers/imcc/symreg.c	/^clear_sym_hash(SymHash *hsh)$/;"	f
-cleari	./src/ops/set.ops	598;"	f
-clearn	./src/ops/set.ops	603;"	f
-clearp	./src/ops/set.ops	613;"	f
-clears	./src/ops/set.ops	608;"	f
+cleari	src/ops/set.ops	594;"	f
+clearn	src/ops/set.ops	599;"	f
+clearp	src/ops/set.ops	609;"	f
+clears	src/ops/set.ops	604;"	f
 clip_excess_lines	tools/dev/extract_file_descriptions.pl	/^sub clip_excess_lines {$/;"	s
-clone	./src/ops/set.ops	28;"	f
 clone	include/parrot/vtable.h	/^    clone_method_t clone;$/;"	m	struct:_vtable
+clone	src/ops/set.ops	28;"	f
 clone_array	src/objects.c	/^clone_array(Interp* interpreter, PMC *source_array)$/;"	f	file:
 clone_interpreter	src/pmc/parrotinterpreter.pmc	/^clone_interpreter(PMC* dest, PMC* self)$/;"	f
 clone_key_arg	src/inter_call.c	/^clone_key_arg(Interp *interpreter, struct call_state *st)$/;"	f	file:
 clone_method_t	include/parrot/vtable.h	/^typedef PMC* (*clone_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
 clone_remove	compilers/imcc/optimizer.c	/^clone_remove(Parrot_Interp interpreter, IMC_Unit * unit)$/;"	f	file:
-close	./src/ops/io.ops	39;"	f
 close	compilers/imcc/instructions.h	/^    int (*close)(Interp *, void *param);$/;"	m	struct:_emittert
+close	src/ops/io.ops	39;"	f
 close_template	src/jit/ia64/jit_emit.h	/^close_template(char *pc)$/;"	f
-cmod	./src/ops/math.ops	281;"	f
+cmod	src/ops/math.ops	281;"	f
 cmod_rrr	src/jit/ppc/jit_emit.h	/^cmod_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)$/;"	f
-cmp	./src/ops/cmp.ops	591;"	f
-cmp_num	./src/ops/cmp.ops	642;"	f
+cmp	src/ops/cmp.ops	591;"	f
+cmp_num	src/ops/cmp.ops	642;"	f
 cmp_ok	languages/perl6/t/01-sanity/Test.pm	/^sub cmp_ok (Str $got, Code &compare_func, Str $expected, Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
 cmp_ok	lib/Test/Builder.pm	/^sub cmp_ok {$/;"	s
 cmp_ok	lib/Test/More.pm	/^sub cmp_ok($$$;$) {$/;"	s
-cmp_str	./src/ops/cmp.ops	637;"	f
+cmp_str	src/ops/cmp.ops	637;"	f
 cmp_term	languages/m4/src/eval.c	/^cmp_term (eval_token et, eval_t *v1)$/;"	f	file:
 cmt1	compilers/imcc/imclexer.c	2930;"	d	file:
 cmt2	compilers/imcc/imclexer.c	2932;"	d	file:
@@ -10731,13 +10746,13 @@ coerce_operands	languages/cola/gen.c	/^void coerce_operands(Type ** t1, Type ** 
 col	compilers/ast/astlexer.c	/^static int line, col;$/;"	v	file:
 col	compilers/imcc/reg_alloc_bc.c	/^    int col;     \/* color assigned to this node *\/$/;"	m	file:
 col	t/op/gc.t	/^col:$/;"	l
-collect	./src/ops/core.ops	1041;"	f
+collect	src/ops/core.ops	1037;"	f
 collect_cb	src/gc_ims.c	/^collect_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,$/;"	f	file:
 collect_runs	include/parrot/intlist.h	/^    size_t  collect_runs;       \/* counter, when chunklist was built (1) *\/$/;"	m	struct:IntList_chunk_t
 collect_runs	include/parrot/list.h	/^    UINTVAL collect_runs;       \/* counter, when chunklist was built *\/$/;"	m	struct:List
 collect_runs	include/parrot/resources.h	/^    size_t  collect_runs;       \/* Number of times we've$/;"	m	struct:Arenas
-collectoff	./src/ops/core.ops	1074;"	f
-collecton	./src/ops/core.ops	1085;"	f
+collectoff	src/ops/core.ops	1070;"	f
+collecton	src/ops/core.ops	1081;"	f
 color	compilers/imcc/symreg.h	/^    INTVAL color;            \/* Color: parrot register number$/;"	m	struct:_SymReg
 color_table	lib/Pod/Simple/RTF.pm	/^sub color_table {$/;"	s
 combineLabels	languages/regex/lib/Regex/Optimize.pm	/^sub combineLabels {$/;"	s
@@ -10749,7 +10764,6 @@ compare	include/parrot/charset.h	/^    charset_compare_t compare;$/;"	m	struct:_
 compare	include/parrot/hash.h	/^    hash_comp_fn   compare;     \/* compare two keys, 0 = equal *\/$/;"	m	struct:_hash
 compare	src/charset/binary.c	/^compare(Interp *interpreter, STRING *lhs, STRING *rhs)$/;"	f	file:
 compare	src/charset/unicode.c	/^compare(Interp *interpreter, STRING *lhs, STRING *rhs)$/;"	f	file:
-compile	./src/ops/core.ops	1199;"	f
 compile	languages/jako/lib/Jako/Compiler.pm	/^sub compile$/;"	s
 compile	languages/jako/lib/Jako/Construct/Block.pm	/^sub compile$/;"	s
 compile	languages/jako/lib/Jako/Construct/Block/Bare.pm	/^sub compile$/;"	s
@@ -10781,6 +10795,7 @@ compile	languages/miniperl/Miniperl.pm	/^sub compile {$/;"	s
 compile	languages/regex/lib/Regex.pm	/^sub compile {$/;"	s
 compile	languages/regex/lib/Regex/Parse.pm	/^sub compile {$/;"	s
 compile	languages/scheme/Scheme.pm	/^sub compile {$/;"	s
+compile	src/ops/core.ops	1195;"	f
 compile	tools/build/dynoplibs.pl	/^sub compile {$/;"	s
 compile	tools/build/dynpmc.pl	/^sub compile {$/;"	s
 compile2	languages/jako/lib/Jako/Construct/Expression/Value/Identifier.pm	/^sub compile2$/;"	s
@@ -10796,13 +10811,13 @@ compile_test	languages/urm/lib/URM/Test.pm	/^sub compile_test {$/;"	s
 complex_check_divide_zero	src/pmc/complex.pmc	/^complex_check_divide_zero(Interp *interpreter, PMC *value)$/;"	f	file:
 complex_locate_keyed_num	src/pmc/complex.pmc	/^complex_locate_keyed_num(Interp* interpreter, PMC* self, STRING *key) {$/;"	f	file:
 complex_parse_string	src/pmc/complex.pmc	/^complex_parse_string(Interp* interpreter,$/;"	f	file:
-compose	./src/ops/string.ops	658;"	f
 compose	include/parrot/charset.h	/^    charset_compose_t compose;$/;"	m	struct:_charset
 compose	src/charset/ascii.c	/^compose(Interp *interpreter, STRING *src)$/;"	f	file:
 compose	src/charset/binary.c	/^compose(Interp *interpreter, STRING *source_string)$/;"	f	file:
 compose	src/charset/iso-8859-1.c	/^compose(Interp *interpreter, STRING *src)$/;"	f	file:
 compose	src/charset/unicode.c	/^compose(Interp *interpreter, STRING *src)$/;"	f	file:
-compreg	./src/ops/core.ops	1204;"	f
+compose	src/ops/string.ops	658;"	f
+compreg	src/ops/core.ops	1200;"	f
 compute_dominance_frontiers	compilers/imcc/cfg.c	/^compute_dominance_frontiers (Parrot_Interp interpreter, IMC_Unit * unit)$/;"	f
 compute_dominators	compilers/imcc/cfg.c	/^compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)$/;"	f
 compute_du_chain	compilers/imcc/reg_alloc.c	/^compute_du_chain(IMC_Unit * unit)$/;"	f	file:
@@ -10812,7 +10827,7 @@ compute_hash	src/charset/unicode.c	/^compute_hash(Interp *interpreter, STRING *s
 compute_one_du_chain	compilers/imcc/reg_alloc.c	/^compute_one_du_chain(SymReg * r, IMC_Unit * unit)$/;"	f	file:
 compute_one_du_chain	compilers/imcc/reg_alloc_bc.c	/^compute_one_du_chain(SymReg * r, IMC_Unit * unit)$/;"	f	file:
 compute_spilling_costs	compilers/imcc/reg_alloc_bc.c	/^compute_spilling_costs (Parrot_Interp interpreter, IMC_Unit * unit)$/;"	f	file:
-concat	./src/ops/string.ops	99;"	f
+concat	src/ops/string.ops	99;"	f
 concatenation	languages/conversion/Translate/ABNF.pm	/^    concatenation: repetition(s?) {$/;"	l
 cond	languages/jako/lib/Jako/Construct/Statement/Goto.pm	/^sub cond  { return shift->{COND};  }$/;"	s
 cond	languages/jako/lib/Jako/Construct/Statement/LoopControl.pm	/^sub cond  { return shift->{COND};  }$/;"	s
@@ -10839,7 +10854,7 @@ condition	languages/cola/cola.h	/^            struct _AST *condition, *end;$/;"	
 condition	languages/cola/cola.h	/^            struct _AST *condition;$/;"	m	struct:_AST::<anonymous>::_LOOP
 config_groups	lib/Parrot/Docs/Section/Config.pm	/^sub config_groups$/;"	s
 configure	languages/lua/Lua/opcode.pm	/^    sub configure {$/;"	s
-connect	./src/ops/io.ops	544;"	f
+connect	src/ops/io.ops	539;"	f
 const_cast	config/gen/platform/darwin/dl.c	115;"	d	file:
 const_cast	include/parrot/parrot.h	216;"	d
 const_count	include/parrot/packfile.h	/^    opcode_t const_count;$/;"	m	struct:PackFile_ConstTable
@@ -10883,19 +10898,19 @@ contiguous	src/malloc.c	2380;"	d	file:
 control_stack	include/parrot/interpreter.h	/^    struct Stack_Chunk *control_stack;  \/* Base of the flow control stack *\/$/;"	m	struct:Parrot_Context
 control_word	include/parrot/jit_emit.h	/^static int control_word = 0x27f;$/;"	v
 control_word	src/jit/i386/jit_emit.h	/^static int control_word = 0x27f;$/;"	v
-conv_i1	./src/ops/dotgnu.ops	61;"	f
-conv_i1_ovf	./src/ops/dotgnu.ops	66;"	f
-conv_i2	./src/ops/dotgnu.ops	91;"	f
-conv_i2_ovf	./src/ops/dotgnu.ops	96;"	f
-conv_i4	./src/ops/dotgnu.ops	123;"	f
-conv_i8	./src/ops/dotgnu.ops	143;"	f
-conv_r4	./src/ops/dotgnu.ops	158;"	f
-conv_r8	./src/ops/dotgnu.ops	168;"	f
-conv_u1	./src/ops/dotgnu.ops	76;"	f
-conv_u1_ovf	./src/ops/dotgnu.ops	81;"	f
-conv_u2	./src/ops/dotgnu.ops	107;"	f
-conv_u2_ovf	./src/ops/dotgnu.ops	112;"	f
-conv_u4	./src/ops/dotgnu.ops	133;"	f
+conv_i1	src/ops/dotgnu.ops	61;"	f
+conv_i1_ovf	src/ops/dotgnu.ops	66;"	f
+conv_i2	src/ops/dotgnu.ops	91;"	f
+conv_i2_ovf	src/ops/dotgnu.ops	96;"	f
+conv_i4	src/ops/dotgnu.ops	123;"	f
+conv_i8	src/ops/dotgnu.ops	143;"	f
+conv_r4	src/ops/dotgnu.ops	158;"	f
+conv_r8	src/ops/dotgnu.ops	168;"	f
+conv_u1	src/ops/dotgnu.ops	76;"	f
+conv_u1_ovf	src/ops/dotgnu.ops	81;"	f
+conv_u2	src/ops/dotgnu.ops	107;"	f
+conv_u2_ovf	src/ops/dotgnu.ops	112;"	f
+conv_u4	src/ops/dotgnu.ops	133;"	f
 convert	languages/regex/lib/Regex/Parse/P6C.pm	/^sub convert {$/;"	s
 convert_arg_from_int	src/inter_call.c	/^convert_arg_from_int(Interp *interpreter, struct call_state *st)$/;"	f	file:
 convert_arg_from_num	src/inter_call.c	/^convert_arg_from_num(Interp *interpreter, struct call_state *st)$/;"	f	file:
@@ -10922,7 +10937,7 @@ copy_file	tools/dev/rebuild_miniparrot.pl	/^sub copy_file {$/;"	s
 copy_if_diff	lib/Parrot/Configure/Step.pm	/^sub copy_if_diff$/;"	s
 copy_src	tools/dev/rebuild_miniparrot.pl	/^sub copy_src {$/;"	s
 copy_src_from_obj	tools/dev/rebuild_miniparrot.pl	/^sub copy_src_from_obj {$/;"	s
-copy_string_header	src/string.c	/^copy_string_header(Interp *interpreter, String *dest, const String *src)$/;"	f	file:
+copy_string_header	src/string.c	/^copy_string_header(String *dest, const String *src)$/;"	f	file:
 core_cg_op_lib	src/ops/core_ops_cg.c	/^static op_lib_t core_cg_op_lib = {$/;"	v	file:
 core_cg_op_lib	src/ops/core_ops_cg.c	/^static op_lib_t core_cg_op_lib;$/;"	v	file:
 core_cg_ops_addr	src/ops/core_ops_cg.c	/^static void *const* core_cg_ops_addr;$/;"	v	file:
@@ -10947,15 +10962,15 @@ core_type	lib/Parrot/OpTrans/CGP.pm	/^sub core_type$/;"	s
 core_type	lib/Parrot/OpTrans/CGoto.pm	/^sub core_type$/;"	s
 core_type	lib/Parrot/OpTrans/CPrederef.pm	/^sub core_type$/;"	s
 core_type	lib/Parrot/OpTrans/CSwitch.pm	/^sub core_type$/;"	s
-cos	./src/ops/math.ops	850;"	f
-cosh	./src/ops/math.ops	863;"	f
+cos	src/ops/math.ops	850;"	f
+cosh	src/ops/math.ops	863;"	f
 count	languages/cola/cola.h	/^    long            count;$/;"	m	struct:_SymbolTable
 count	languages/jako/lib/Jako/Processor.pm	/^sub count$/;"	s
 count_newlines	lib/Parrot/Pmc2c.pm	/^sub count_newlines {$/;"	s
 count_regs	include/parrot/jit_emit.h	/^count_regs(char *sig, char *sig_start)$/;"	f
 count_regs	src/jit/i386/jit_emit.h	/^count_regs(char *sig, char *sig_start)$/;"	f
-covers	./src/ops/obscure.ops	45;"	f
-cpu_ret	./src/ops/core.ops	107;"	f
+covers	src/ops/obscure.ops	45;"	f
+cpu_ret	src/ops/core.ops	107;"	f
 cpuinfo	src/malloc.c	/^static int cpuinfo (int whole, CHUNK_SIZE_T  *kernel, CHUNK_SIZE_T  *user) {$/;"	f	file:
 create	compilers/ast/node.c	/^    node_create_t create;$/;"	m	file:
 create	lib/Test/Builder.pm	/^sub create {$/;"	s
@@ -10987,7 +11002,7 @@ cs_index	src/charset/binary.c	/^cs_index(Interp *interpreter, STRING *source_str
 cs_rindex	src/charset/binary.c	/^cs_rindex(Interp *interpreter, STRING *source_string,$/;"	f	file:
 cs_rindex	src/charset/unicode.c	/^cs_rindex(Interp *interpreter, STRING *source_string,$/;"	f	file:
 cs_t	compilers/imcc/pbc.c	/^struct cs_t {$/;"	s	file:
-cst_new_stack_chunk	src/stack_common.c	/^cst_new_stack_chunk(Parrot_Interp interpreter, const Stack_Chunk_t *chunk)$/;"	f
+cst_new_stack_chunk	src/stack_common.c	/^cst_new_stack_chunk(Parrot_Interp interpreter, const Stack_Chunk_t *chunk \/*NN*\/)$/;"	f
 cstr2pstr	include/parrot/misc.h	86;"	d
 cstring_compare	src/hash.c	/^cstring_compare(Parrot_Interp interp, void *a, void *b)$/;"	f	file:
 ct	src/packout.c	/^static struct PackFile_ConstTable *ct;$/;"	v	file:
@@ -11084,38 +11099,38 @@ dbprint	languages/regex/lib/Regex/CodeGen.pm	/^sub dbprint {$/;"	s
 dbprint	languages/regex/lib/Regex/Rewrite.pm	/^sub dbprint {$/;"	s
 de_init_gc_system	include/parrot/resources.h	/^    void (*de_init_gc_system) (Interp*);$/;"	m	struct:Arenas
 dead_code_remove	compilers/imcc/optimizer.c	/^dead_code_remove(Interp *interpreter, IMC_Unit * unit)$/;"	f	file:
-debug	./src/ops/core.ops	772;"	f
 debug	compilers/imcc/imc.h	/^    int debug;$/;"	m	struct:_imc_info_t
 debug	languages/BASIC/compiler/COMP_parser.pm	/^sub debug {$/;"	s
 debug	languages/jako/lib/Jako/Processor.pm	/^sub debug$/;"	s
 debug	src/dod.c	602;"	d	file:
 debug	src/dod.c	604;"	d	file:
 debug	src/dod.c	879;"	d	file:
+debug	src/ops/core.ops	769;"	f
 debug	tools/util/smokeserv-client.pl	/^  sub debug($) {$/;"	s
 debug	tools/util/smokeserv-client.pl	/^sub debug($);$/;"	s
-debug_break	./src/ops/debug.ops	90;"	f
-debug_brk	./src/ops/experimental.ops	300;"	f
+debug_break	src/ops/debug.ops	90;"	f
+debug_brk	src/ops/experimental.ops	300;"	f
 debug_dump_sym_hash	compilers/imcc/symreg.c	/^debug_dump_sym_hash(SymHash *hsh)$/;"	f
 debug_file	src/jit_debug.c	/^debug_file(Interp *interpreter, STRING *file, const char *ext)$/;"	f	file:
 debug_file	src/jit_debug_xcoff.c	/^debug_file(Interp *interpreter, STRING *file, const char *ext)$/;"	f	file:
 debug_flags	include/parrot/interpreter.h	/^    UINTVAL debug_flags;                      \/* debug settings *\/$/;"	m	struct:parrot_interp_t
-debug_init	./src/ops/debug.ops	41;"	f
-debug_load	./src/ops/debug.ops	63;"	f
-debug_print	./src/ops/debug.ops	120;"	f
+debug_init	src/ops/debug.ops	41;"	f
+debug_load	src/ops/debug.ops	63;"	f
+debug_print	src/ops/debug.ops	120;"	f
 debug_print_buf	src/resources.c	/^debug_print_buf(Interp *interpreter, const PObj *b)$/;"	f	file:
 debug_sections	src/jit.c	/^debug_sections(Interp *interpreter,$/;"	f	file:
 debug_trace_find_meth	src/objects.c	/^debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)$/;"	f	file:
 debugee	include/parrot/debug.h	/^    Interp                  *debugee;  $/;"	m	struct:PDB
 debugger	include/parrot/interpreter.h	/^    Interp * debugger;                        \/* trace \/ debug interpreter *\/  $/;"	m	struct:parrot_interp_t
 debugs	include/parrot/packfile.h	/^    struct PackFile_Debug     * debugs;$/;"	m	struct:PackFile_ByteCode
-dec	./src/ops/math.ops	342;"	f
+dec	src/ops/math.ops	342;"	f
 dec_val	languages/conversion/Translate/ABNF.pm	/^dec_val: "d" DIGIT(s) (("." DIGIT(s))(s)$/;"	l
 decl	lib/Parrot/Pmc2c.pm	/^sub decl() {$/;"	s
 declare_field	languages/cola/sym.c	/^void declare_field(Symbol * s) {$/;"	f
 declare_local	languages/cola/sym.c	/^void declare_local(Symbol * s) {$/;"	f
 decode_line	languages/python/pie-thon.pl	/^sub decode_line {$/;"	s
-decodelocaltime	./src/ops/sys.ops	209;"	f
-decodetime	./src/ops/sys.ops	201;"	f
+decodelocaltime	src/ops/sys.ops	209;"	f
+decodetime	src/ops/sys.ops	201;"	f
 decompose	include/parrot/charset.h	/^    charset_decompose_t decompose;$/;"	m	struct:_charset
 decompose	src/charset/ascii.c	/^decompose(Interp *interpreter, STRING *src)$/;"	f	file:
 decompose	src/charset/binary.c	/^decompose(Interp *interpreter, STRING *source_string)$/;"	f	file:
@@ -11135,8 +11150,8 @@ default_packed_size	src/packfile.c	/^default_packed_size (Interp* interpreter, c
 default_pmc_type	compilers/ast/node.c	/^default_pmc_type(nodeType *p)$/;"	f	file:
 default_stack	src/io/io_private.h	/^    ParrotIOLayer *default_stack;$/;"	m	struct:_ParrotIOData
 default_unpack	src/packfile.c	/^static opcode_t * default_unpack (Interp *interpreter,$/;"	f	file:
-defined	./src/ops/pmc.ops	313;"	f
 defined	include/parrot/vtable.h	/^    defined_method_t defined;$/;"	m	struct:_vtable
+defined	src/ops/pmc.ops	313;"	f
 defined_keyed	include/parrot/vtable.h	/^    defined_keyed_method_t defined_keyed;$/;"	m	struct:_vtable
 defined_keyed_int	include/parrot/vtable.h	/^    defined_keyed_int_method_t defined_keyed_int;$/;"	m	struct:_vtable
 defined_keyed_int_method_t	include/parrot/vtable.h	/^typedef INTVAL (*defined_keyed_int_method_t)(Interp* interpreter, PMC* pmc, INTVAL key);$/;"	t
@@ -11153,10 +11168,10 @@ defines	lib/Parrot/OpTrans/Compiled.pm	/^sub defines$/;"	s
 deg	compilers/imcc/reg_alloc_bc.c	/^    int deg;     \/* degree of node (# neighbors) *\/$/;"	m	file:
 degree_comparator	compilers/imcc/reg_alloc_bc.c	/^static int degree_comparator(const void * u, const void * v) {$/;"	f	file:
 del_timer	src/pmc/timer.pmc	/^del_timer(Interp* interpreter, PMC *pmc)$/;"	f	file:
-delete	./src/ops/pmc.ops	348;"	f
 delete	lib/Parrot/IO/Directory.pm	/^sub delete$/;"	s
 delete	lib/Parrot/IO/File.pm	/^sub delete$/;"	s
 delete	lib/Parrot/IO/Path.pm	/^sub delete$/;"	s
+delete	src/ops/pmc.ops	348;"	f
 delete_contents	lib/Parrot/IO/Directory.pm	/^sub delete_contents$/;"	s
 delete_html_docs	lib/Parrot/Distribution.pm	/^sub delete_html_docs$/;"	s
 delete_ins	compilers/imcc/instructions.c	/^delete_ins(IMC_Unit *unit, Instruction *ins, int needs_freeing)$/;"	f
@@ -11168,13 +11183,13 @@ delete_keyed_str	include/parrot/vtable.h	/^    delete_keyed_str_method_t delete_
 delete_keyed_str_method_t	include/parrot/vtable.h	/^typedef void (*delete_keyed_str_method_t)(Interp* interpreter, PMC* pmc, STRING* key);$/;"	t
 deleted_ins	compilers/imcc/imc.h	/^	int deleted_ins;$/;"	m	struct:imcc_ostat
 deleted_labels	compilers/imcc/imc.h	/^	int deleted_labels;$/;"	m	struct:imcc_ostat
-delprop	./src/ops/pmc.ops	570;"	f
 delprop	include/parrot/vtable.h	/^    delprop_method_t delprop;$/;"	m	struct:_vtable
+delprop	src/ops/pmc.ops	570;"	f
 delprop_method_t	include/parrot/vtable.h	/^typedef void (*delprop_method_t)(Interp* interpreter, PMC* pmc, STRING* key);$/;"	t
 deltrigger	lib/Parrot/Configure/Data.pm	/^sub deltrigger$/;"	s
-depth	./src/ops/stack.ops	97;"	f
 depth	compilers/imcc/cfg.h	/^	int depth;		\/* depth of this loop *\/$/;"	m	struct:_loop_info
-deref	./src/ops/set.ops	289;"	f
+depth	src/ops/stack.ops	97;"	f
+deref	src/ops/set.ops	285;"	f
 describe	lib/Parse/RecDescent.pm	/^sub describe ($) { shift->{'description'} }$/;"	s
 describe	lib/Parse/RecDescent.pm	/^sub describe ($) { shift->{'description'}}$/;"	s
 describe	lib/Parse/RecDescent.pm	/^sub describe ($)$/;"	s
@@ -11222,7 +11237,7 @@ dh_none	src/jit/ia64/jit_emit.h	193;"	d
 diag	languages/perl6/t/01-sanity/Test.pm	/^sub diag (Str $diag) is export {$/;"	s
 diag	lib/Test/Builder.pm	/^sub diag {$/;"	s
 diag	lib/Test/More.pm	/^sub diag {$/;"	s
-die	./src/ops/core.ops	722;"	f
+die	src/ops/core.ops	719;"	f
 dies_ok	languages/perl6/t/01-sanity/Test.pm	/^sub dies_ok (Code &code, Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
 digest	lib/Digest/Perl/MD5.pm	/^sub digest {$/;"	s
 digits	src/bignum.h	/^    INTVAL digits;  \/* digits used *\/$/;"	m
@@ -11263,12 +11278,12 @@ disas_dump	src/pdump.c	/^disas_dump (Interp *interpreter, struct PackFile_Segmen
 discard_scope	languages/cola/sym.c	/^void discard_scope() {$/;"	f
 disjoint	languages/regex/lib/Regex/Ops/Tree.pm	/^sub disjoint {$/;"	s
 distance_cmp	src/mmd.c	/^distance_cmp(Interp *interpreter, INTVAL a, INTVAL b)$/;"	f	file:
-div	./src/ops/math.ops	375;"	f
+div	src/ops/math.ops	375;"	f
 div_rr_n	include/parrot/jit_emit.h	/^div_rr_n(Parrot_jit_info_t *jit_info, int r1)$/;"	f
 div_rr_n	src/jit/i386/jit_emit.h	/^div_rr_n(Parrot_jit_info_t *jit_info, int r1)$/;"	f
 div_rrr	src/jit/ppc/jit_emit.h	/^div_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)$/;"	f
-dlfunc	./src/ops/core.ops	1159;"	f
-dlvar	./src/ops/core.ops	1179;"	f
+dlfunc	src/ops/core.ops	1155;"	f
+dlvar	src/ops/core.ops	1175;"	f
 do_1_sub_pragma	src/packfile.c	/^do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)$/;"	f	file:
 do_action	src/pmc_freeze.c	/^do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,$/;"	f	file:
 do_beginning	lib/Parrot/Docs/POD2HTML.pm	/^sub do_beginning $/;"	s
@@ -11317,8 +11332,8 @@ dod_runs	include/parrot/resources.h	/^    size_t  dod_runs;           \/* Number
 dod_time	include/parrot/interpreter.h	/^    FLOATVAL dod_time;$/;"	m	struct:_RunProfile
 dod_trace_ptr	include/parrot/resources.h	/^    PMC* dod_trace_ptr;         \/* last PMC trace_children was called on *\/$/;"	m	struct:Arenas
 dod_unregister_pmc	src/pmc.c	/^dod_unregister_pmc(Interp* interpreter, PMC* pmc)$/;"	f
-does	./src/ops/object.ops	201;"	f
 does	include/parrot/vtable.h	/^    does_method_t does;$/;"	m	struct:_vtable
+does	src/ops/object.ops	201;"	f
 does_isa	src/pmc/default.pmc	/^does_isa (Interp* interpreter, STRING *method, STRING *what)$/;"	f	file:
 does_method_t	include/parrot/vtable.h	/^typedef INTVAL (*does_method_t)(Interp* interpreter, PMC* pmc, STRING* method);$/;"	t
 does_str	include/parrot/vtable.h	/^    STRING* does_str;        \/* space-separated list of interfaces *\/$/;"	m	struct:_vtable
@@ -11332,12 +11347,12 @@ done	t/op/gc.t	/^done:$/;"	l
 dont_edit	lib/Parrot/Pmc2c.pm	/^sub dont_edit {$/;"	s
 dont_optimize	compilers/imcc/imc.h	/^    int dont_optimize;$/;"	m	struct:_imc_info_t
 down	include/parrot/io.h	/^    ParrotIOLayer *down;$/;"	m	struct:_ParrotIOLayer
-downcase	./src/ops/string.ops	434;"	f
 downcase	include/parrot/charset.h	/^    charset_downcase_t downcase;$/;"	m	struct:_charset
 downcase	src/charset/ascii.c	/^downcase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 downcase	src/charset/binary.c	/^downcase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 downcase	src/charset/iso-8859-1.c	/^downcase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 downcase	src/charset/unicode.c	/^downcase(Interp *interpreter, STRING *src)$/;"	f	file:
+downcase	src/ops/string.ops	434;"	f
 downcase_first	include/parrot/charset.h	/^    charset_downcase_first_t downcase_first;$/;"	m	struct:_charset
 downcase_first	src/charset/ascii.c	/^downcase_first(Interp *interpreter, STRING *source_string)$/;"	f	file:
 downcase_first	src/charset/binary.c	/^downcase_first(Interp *interpreter, STRING *source_string)$/;"	f	file:
@@ -11448,8 +11463,8 @@ edge_count	compilers/imcc/cfg.c	/^edge_count(IMC_Unit * unit)$/;"	f
 edge_list	compilers/imcc/unit.h	/^    Edge * edge_list;$/;"	m	struct:_IMC_Unit
 edit_bug_report	parrotbug	/^sub edit_bug_report {$/;"	s
 edit_report	parrotbug	/^sub edit_report {$/;"	s
-elements	./src/ops/pmc.ops	366;"	f
 elements	include/parrot/vtable.h	/^    elements_method_t elements;$/;"	m	struct:_vtable
+elements	src/ops/pmc.ops	366;"	f
 elements_method_t	include/parrot/vtable.h	/^typedef INTVAL (*elements_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
 elimit	src/bignum.h	/^    INTVAL elimit;        \/* maximum exponent allowed *\/$/;"	m
 emit	compilers/imcc/imclexer.c	2924;"	d	file:
@@ -12218,9 +12233,9 @@ enc	src/encoding.c	/^    One_encoding *enc;$/;"	m	file:
 encmodver	lib/Pod/Simple/TranscodeDumb.pm	/^sub encmodver {$/;"	s
 encmodver	lib/Pod/Simple/TranscodeSmart.pm	/^sub encmodver {$/;"	s
 encode_base64	lib/Digest/Perl/MD5.pm	/^sub encode_base64 ($) {$/;"	s
-encoding	./src/ops/string.ops	570;"	f
 encoding	include/parrot/pobj.h	/^    void *encoding; \/* These should be of type ENCODING * and CHARSET *$/;"	m	struct:parrot_string_t
 encoding	src/encoding.c	/^    ENCODING *encoding;$/;"	m	file:
+encoding	src/ops/string.ops	570;"	f
 encoding_become_encoding_t	include/parrot/encoding.h	/^typedef void (*encoding_become_encoding_t)(Interp*, STRING *src);$/;"	t
 encoding_bytes_t	include/parrot/encoding.h	/^typedef UINTVAL (*encoding_bytes_t)(Interp*, STRING *src);$/;"	t
 encoding_codepoints_t	include/parrot/encoding.h	/^typedef UINTVAL (*encoding_codepoints_t)(Interp*, STRING *src);$/;"	t
@@ -12239,14 +12254,14 @@ encoding_set_bytes_t	include/parrot/encoding.h	/^typedef void (*encoding_set_byt
 encoding_set_codepoint_t	include/parrot/encoding.h	/^typedef void (*encoding_set_codepoint_t)(Interp*, STRING *src, UINTVAL offset, UINTVAL codepoint);$/;"	t
 encoding_set_codepoints_t	include/parrot/encoding.h	/^typedef void (*encoding_set_codepoints_t)(Interp*, STRING *src, UINTVAL offset, UINTVAL count, STRING *new_bytes);$/;"	t
 encoding_to_encoding_t	include/parrot/encoding.h	/^typedef STRING * (*encoding_to_encoding_t)(Interp*, STRING *src, STRING *dest);$/;"	t
-encodingname	./src/ops/string.ops	575;"	f
-end	./src/ops/core.ops	49;"	f
+encodingname	src/ops/string.ops	575;"	f
 end	compilers/imcc/cfg.h	/^    Instruction *end;           \/* Last  instruction in basic block *\/$/;"	m	struct:_basic_block
 end	include/parrot/intlist.h	/^    INTVAL end;$/;"	m	struct:IntList_chunk_t
 end	include/parrot/jit.h	/^    opcode_t                            *end;$/;"	m	struct:Parrot_jit_optimizer_section
 end	include/parrot/slice.h	/^    RUnion end;               \/* end of this range *\/$/;"	m	struct:_parrot_range_t
 end	languages/cola/cola.h	/^            struct _AST *condition, *end;$/;"	m	struct:_AST::<anonymous>::_CONDITIONAL
 end	lib/Parrot/Test/PGE.pm	/^          end:$/;"	l
+end	src/ops/core.ops	49;"	f
 end_Para	lib/Pod/Simple/Checker.pm	/^sub end_Para        { $_[0]->emit_par( 0) }$/;"	s
 end_Para	lib/Pod/Simple/Text.pm	/^sub end_Para        { $_[0]->emit_par( 0) }$/;"	s
 end_Verbatim	lib/Pod/Simple/Checker.pm	/^sub end_Verbatim  {$/;"	s
@@ -12283,13 +12298,13 @@ endb	src/io/io_private.h	/^    unsigned char *endb;        \/* End of buffer    
 enddirective	lib/Parse/RecDescent.pm	/^sub enddirective$/;"	s
 english_func	languages/BASIC/compiler/COMP_parser.pm	/^sub english_func {$/;"	s
 enter_nci_method	src/inter_misc.c	/^enter_nci_method(Parrot_Interp interpreter, int type,$/;"	f
-enternative	./src/ops/core.ops	260;"	f
+enternative	src/ops/core.ops	259;"	f
 entries	compilers/imcc/symreg.h	/^    int entries;$/;"	m	struct:_SymHash
 entries	include/parrot/hash.h	/^    UINTVAL entries;            \/* Number of values stored in hashtable *\/$/;"	m	struct:_hash
 entry	include/parrot/stacks.h	/^    UnionVal entry;$/;"	m	struct:Stack_Entry
 entry_type	include/parrot/hash.h	/^    PARROT_DATA_TYPES entry_type;   \/* type of value *\/$/;"	m	struct:_hash
 entry_type	include/parrot/stacks.h	/^    Stack_entry_type  entry_type;$/;"	m	struct:Stack_Entry
-entrytype	./src/ops/stack.ops	78;"	f
+entrytype	src/ops/stack.ops	78;"	f
 enum_add_at_end	include/parrot/list.h	/^    enum_add_at_end$/;"	e
 enum_add_at_start	include/parrot/list.h	/^    enum_add_at_start,          \/* don't swap these *\/$/;"	e
 enum_cclass_alphabetic	include/parrot/cclass.h	/^enum_cclass_alphabetic = 0x0004,	\/* a-z, A-Z *\/$/;"	e
@@ -12445,23 +12460,23 @@ enum_type_ulonglong	include/parrot/datatypes.h	/^    enum_type_ulonglong,$/;"	e
 enum_type_undef	include/parrot/datatypes.h	/^    enum_type_undef,            \/* illegal *\/$/;"	e
 enum_type_ushort	include/parrot/datatypes.h	/^    enum_type_ushort,$/;"	e
 environ	config/gen/platform/darwin/begin.c	1;"	d	file:
-eq	./src/ops/cmp.ops	69;"	f
-eq_addr	./src/ops/cmp.ops	133;"	f
+eq	src/ops/cmp.ops	69;"	f
+eq_addr	src/ops/cmp.ops	133;"	f
 eq_array	lib/Test/More.pm	/^sub eq_array {$/;"	s
 eq_hash	lib/Test/More.pm	/^sub eq_hash {$/;"	s
-eq_num	./src/ops/cmp.ops	126;"	f
+eq_num	src/ops/cmp.ops	126;"	f
 eq_set	lib/Test/More.pm	/^sub eq_set  {$/;"	s
-eq_str	./src/ops/cmp.ops	119;"	f
-err	./src/ops/sys.ops	65;"	f
+eq_str	src/ops/cmp.ops	119;"	f
+err	src/ops/sys.ops	65;"	f
 err	t/op/gc.t	/^err:$/;"	l
 error	include/parrot/exceptions.h	/^    long error;                         \/* exception_type_enum *\/$/;"	m	struct:parrot_exception_t
 error	tools/dev/check_source_standards.pl	/^sub error {$/;"	s
 errors	include/parrot/interpreter.h	/^    UINTVAL errors;            \/* fatals that can be turned off *\/$/;"	m	struct:Parrot_Context
-errorsoff	./src/ops/core.ops	966;"	f
-errorson	./src/ops/core.ops	953;"	f
+errorsoff	src/ops/core.ops	963;"	f
+errorson	src/ops/core.ops	950;"	f
 esc	lib/Parrot/Docs/POD2HTML.pm	/^sub esc $/;"	s
 esc	lib/Pod/Simple/HTML.pm	/^sub esc {$/;"	s
-escape	./src/ops/string.ops	653;"	f
+escape	src/ops/string.ops	653;"	f
 et	src/events.c	/^et(parrot_event* e)$/;"	f	file:
 ev_names	src/events.c	/^static const char *ev_names[] = {$/;"	v	file:
 eval_error	languages/m4/src/eval.c	/^eval_error;$/;"	t	file:
@@ -12495,8 +12510,8 @@ exception_list	include/parrot/interpreter.h	/^    PMC ** exception_list;        
 exception_severity	include/parrot/exceptions.h	/^} exception_severity;$/;"	t
 exception_type_enum	include/parrot/exceptions.h	/^} exception_type_enum;$/;"	t
 exceptions	include/parrot/interpreter.h	/^    struct parrot_exception_t *exceptions;    \/* internal exception stack *\/$/;"	m	struct:parrot_interp_t
-exchange	./src/ops/set.ops	49;"	f
-exec	./src/ops/experimental.ops	220;"	f
+exchange	src/ops/set.ops	49;"	f
+exec	src/ops/experimental.ops	220;"	f
 exec_const_table	src/packfile.c	/^struct PackFile_Constant *exec_const_table;$/;"	v
 exec_emit_end	include/parrot/jit_emit.h	2824;"	d
 exec_emit_end	include/parrot/jit_emit.h	2837;"	d
@@ -12508,14 +12523,14 @@ exec_init	src/exec.c	/^exec_init(Parrot_exec_objfile_t *obj)$/;"	f	file:
 exec_init_prederef	src/interpreter.c	/^exec_init_prederef(Interp *interpreter, void *prederef_arena)$/;"	f
 existing_directory_with_name	lib/Parrot/IO/Directory.pm	/^sub existing_directory_with_name$/;"	s
 existing_file_with_name	lib/Parrot/IO/Directory.pm	/^sub existing_file_with_name$/;"	s
-exists	./src/ops/pmc.ops	328;"	f
+exists	src/ops/pmc.ops	328;"	f
 exists_keyed	include/parrot/vtable.h	/^    exists_keyed_method_t exists_keyed;$/;"	m	struct:_vtable
 exists_keyed_int	include/parrot/vtable.h	/^    exists_keyed_int_method_t exists_keyed_int;$/;"	m	struct:_vtable
 exists_keyed_int_method_t	include/parrot/vtable.h	/^typedef INTVAL (*exists_keyed_int_method_t)(Interp* interpreter, PMC* pmc, INTVAL key);$/;"	t
 exists_keyed_method_t	include/parrot/vtable.h	/^typedef INTVAL (*exists_keyed_method_t)(Interp* interpreter, PMC* pmc, PMC* key);$/;"	t
 exists_keyed_str	include/parrot/vtable.h	/^    exists_keyed_str_method_t exists_keyed_str;$/;"	m	struct:_vtable
 exists_keyed_str_method_t	include/parrot/vtable.h	/^typedef INTVAL (*exists_keyed_str_method_t)(Interp* interpreter, PMC* pmc, STRING* key);$/;"	t
-exit	./src/ops/core.ops	729;"	f
+exit	src/ops/core.ops	726;"	f
 exit_handler_list	src/exit.c	/^static handler_node_t *exit_handler_list;$/;"	v	file:
 exit_value	t/src/hash_1.c	/^int exit_value = 0;$/;"	v
 exit_value	t/src/hash_10.c	/^int exit_value = 0;$/;"	v
@@ -12531,7 +12546,7 @@ exit_value	t/src/hash_9.c	/^int exit_value = 0;$/;"	v
 exit_value	t/src/list_1.c	/^int exit_value = 0;$/;"	v
 exit_value	t/src/list_2.c	/^int exit_value = 0;$/;"	v
 exits	compilers/imcc/cfg.h	/^	Set * exits;		\/* blocks that exit the loop *\/$/;"	m	struct:_loop_info
-exp	./src/ops/math.ops	876;"	f
+exp	src/ops/math.ops	876;"	f
 exp_Args	compilers/ast/node.c	/^exp_Args(Interp* interpreter, nodeType *p)$/;"	f	file:
 exp_Assign	compilers/ast/node.c	/^exp_Assign(Interp* interpreter, nodeType *p)$/;"	f	file:
 exp_Binary	compilers/ast/node.c	/^exp_Binary(Interp* interpreter, nodeType *p)$/;"	f	file:
@@ -12580,7 +12595,7 @@ expr_offset	lib/Parrot/OpTrans/Compiled.pm	/^sub expr_offset$/;"	s
 expr_pop	lib/Parrot/OpTrans/C.pm	/^sub expr_pop$/;"	s
 expr_pop	lib/Parrot/OpTrans/CPrederef.pm	/^sub expr_pop$/;"	s
 expr_to_tree	languages/regex/lib/Regex.pm	/^sub expr_to_tree {$/;"	s
-exsec	./src/ops/obscure.ops	60;"	f
+exsec	src/ops/obscure.ops	60;"	f
 extcall	include/parrot/jit.h	/^    int                            extcall;$/;"	m
 extended	src/bignum.h	/^    INTVAL extended;     \/* do we use extended or base semantics? *\/$/;"	m
 external_data	include/parrot/events.h	/^    void*                       external_data;$/;"	m
@@ -12670,7 +12685,7 @@ f9	src/jit/hppa/jit_emit.h	/^    f9,$/;"	e
 f9	src/jit/ppc/jit_emit.h	/^    f9,$/;"	e
 fREe	src/malloc.c	/^void fREe(Void_t* mem)$/;"	f
 fREe	src/malloc.c	520;"	d	file:
-fact	./src/ops/math.ops	1093;"	f
+fact	src/ops/math.ops	1093;"	f
 fail	lib/Test/More.pm	/^sub fail (;$) {$/;"	s
 fail_if_exist	src/objects.c	/^fail_if_exist(Interp *interpreter, PMC *name)$/;"	f	file:
 failed	lib/Text/Balanced.pm	/^failed:$/;"	l
@@ -12689,9 +12704,9 @@ fd_d	src/jit/ia64/jit_emit.h	168;"	d
 fd_exp	src/jit/ia64/jit_emit.h	166;"	d
 fd_s	src/jit/ia64/jit_emit.h	167;"	d
 fd_sig	src/jit/ia64/jit_emit.h	165;"	d
-fdiv	./src/ops/math.ops	427;"	f
+fdiv	src/ops/math.ops	427;"	f
 fdiv_rrr	src/jit/ppc/jit_emit.h	/^fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)$/;"	f
-fdopen	./src/ops/io.ops	55;"	f
+fdopen	src/ops/io.ops	55;"	f
 fdprint	languages/BASIC/compiler/COMP_parsefuncs.pm	/^sub fdprint {	$/;"	s
 feedme	languages/BASIC/compiler/COMP_parser.pm	/^sub feedme {$/;"	s
 fetch	languages/BASIC/compiler/COMP_toker.pm	/^sub fetch {$/;"	s
@@ -12731,7 +12746,7 @@ fetch_op_mixed_le	src/packfile/pf_items.c	/^fetch_op_mixed_le(unsigned char *b)$
 fetch_op_test	src/packfile/pf_items.c	/^fetch_op_test(unsigned char *b)$/;"	f	file:
 fetch_string	src/dynpmc/match.c	/^static STRING* fetch_string(Interp* interp, PMC* matchobj, PMC* val)$/;"	f	file:
 fetch_string	src/dynpmc/match.pmc	/^static STRING* fetch_string(Interp* interp, PMC* matchobj, PMC* val)$/;"	f	file:
-fetchmethod	./src/ops/object.ops	166;"	f
+fetchmethod	src/ops/object.ops	166;"	f
 fib	examples/benchmarks/fib.pl	/^sub fib {$/;"	s
 fib	examples/benchmarks/oofib.pl	/^sub fib {$/;"	s
 fibA	examples/benchmarks/oofib.pl	/^sub fibA {$/;"	s
@@ -12774,49 +12789,49 @@ find_basic_blocks	compilers/imcc/cfg.c	/^find_basic_blocks (Parrot_Interp interp
 find_block	languages/jako/lib/Jako/Construct/Block.pm	/^sub find_block$/;"	s
 find_builtin	src/builtin.c	/^find_builtin(Interp *interpreter, const char *func)$/;"	f	file:
 find_builtin_s	src/builtin.c	/^find_builtin_s(Interp *interpreter, STRING *func)$/;"	f	file:
-find_cclass	./src/ops/string.ops	621;"	f
 find_cclass	include/parrot/charset.h	/^    charset_find_cclass_t find_cclass;$/;"	m	struct:_charset
 find_cclass	src/charset/ascii.c	/^find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)$/;"	f	file:
 find_cclass	src/charset/binary.c	/^find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)$/;"	f	file:
 find_cclass	src/charset/iso-8859-1.c	/^find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)$/;"	f	file:
 find_cclass	src/charset/unicode.c	/^find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)$/;"	f	file:
-find_charset	./src/ops/string.ops	525;"	f
+find_cclass	src/ops/string.ops	621;"	f
+find_charset	src/ops/string.ops	525;"	f
 find_common_mask	src/dod.c	/^find_common_mask(size_t val1, size_t val2)$/;"	f	file:
 find_const_iter	src/packfile.c	/^find_const_iter(Interp* interpreter,$/;"	f	file:
-find_encoding	./src/ops/string.ops	352;"	f
+find_encoding	src/ops/string.ops	352;"	f
 find_exception_handler	src/exceptions.c	/^find_exception_handler(Interp * interpreter, PMC *exception)$/;"	f	file:
 find_file	tools/build/pmc2c.pl	/^sub find_file {$/;"	s
 find_fixup	src/packfile.c	/^find_fixup(struct PackFile_FixupTable *ft, enum_fixup_t type,$/;"	f	file:
 find_fixup_iter	src/packfile.c	/^find_fixup_iter(Interp* interpreter, struct PackFile_Segment *seg,$/;"	f	file:
-find_global	./src/ops/experimental.ops	278;"	f
+find_global	src/ops/experimental.ops	278;"	f
 find_global_label	compilers/imcc/pbc.c	/^find_global_label(char *name, struct subs *sym, int *pc)$/;"	f	file:
 find_in_const	src/packout.c	/^find_in_const(PMC *key, int type)$/;"	f	file:
-find_lex	./src/ops/var.ops	63;"	f
+find_lex	src/ops/var.ops	63;"	f
 find_loops	compilers/imcc/cfg.c	/^find_loops (Parrot_Interp interpreter, IMC_Unit * unit)$/;"	f
 find_macro	compilers/imcc/imclexer.c	/^find_macro (const char* name)$/;"	f	file:
 find_macro_param	compilers/imcc/imclexer.c	/^find_macro_param (const char *name)$/;"	f	file:
 find_meth	src/pmc/delegate.pmc	/^find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {$/;"	f	file:
 find_meth	src/pmc/parrotobject.pmc	/^find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {$/;"	f	file:
-find_method	./src/ops/pmc.ops	286;"	f
 find_method	include/parrot/vtable.h	/^    find_method_method_t find_method;$/;"	m	struct:_vtable
+find_method	src/ops/pmc.ops	286;"	f
 find_method_direct	src/objects.c	/^find_method_direct(Interp* interpreter, PMC *class,$/;"	f	file:
 find_method_direct_1	src/objects.c	/^find_method_direct_1(Interp* interpreter, PMC *class,$/;"	f	file:
 find_method_method_t	include/parrot/vtable.h	/^typedef PMC* (*find_method_method_t)(Interp* interpreter, PMC* pmc, STRING* method_name);$/;"	t
-find_name	./src/ops/var.ops	192;"	f
-find_not_cclass	./src/ops/string.ops	635;"	f
+find_name	src/ops/var.ops	193;"	f
 find_not_cclass	include/parrot/charset.h	/^    charset_find_not_cclass_t find_not_cclass;$/;"	m	struct:_charset
 find_not_cclass	src/charset/ascii.c	/^find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)$/;"	f	file:
 find_not_cclass	src/charset/binary.c	/^find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)$/;"	f	file:
 find_not_cclass	src/charset/iso-8859-1.c	/^find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)$/;"	f	file:
 find_not_cclass	src/charset/unicode.c	/^find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)$/;"	f	file:
+find_not_cclass	src/ops/string.ops	635;"	f
 find_op_number	tools/build/ops2pm.pl	/^sub find_op_number {$/;"	s
 find_or_die	src/pmc/delegate.pmc	/^find_or_die(Interp* interpreter, PMC *pmc, STRING *meth) {$/;"	f	file:
 find_outer	compilers/imcc/optimizer.c	/^find_outer(IMC_Unit * unit, Basic_block * blk)$/;"	f	file:
 find_outer	compilers/imcc/pbc.c	/^find_outer(Interp *interpreter, IMC_Unit *unit)$/;"	f	file:
 find_sym	compilers/imcc/symreg.c	/^find_sym(Interp *interp, const char * name)$/;"	f
 find_symbol	languages/jako/lib/Jako/Construct/Block.pm	/^sub find_symbol$/;"	s
-find_type	./src/ops/pmc.ops	228;"	f
 find_type	lib/Parrot/Vtable.pm	/^sub find_type$/;"	s
+find_type	src/ops/pmc.ops	228;"	f
 fingerprint	src/fingerprint.c	/^static const unsigned char fingerprint[] = {$/;"	v	file:
 first	compilers/imcc/pbc.c	/^    struct cs_t *first;                  \/* first code segment *\/$/;"	m	struct:globals	file:
 first	compilers/imcc/pbc.c	/^    struct subs *first;                 \/* first sub of code segment *\/$/;"	m	struct:cs_t	file:
@@ -12891,7 +12906,7 @@ floatval_map	src/jit/skeleton/jit_emit.h	/^static const char floatval_map[FLOAT_
 floatval_map	src/jit/sun4/jit_emit.h	/^char floatval_map[] =$/;"	v
 floatval_map_sub	src/jit/ppc/jit_emit.h	/^static const char floatval_map_sub[] =$/;"	v
 floatval_mod	src/utils.c	/^floatval_mod(FLOATVAL n2, FLOATVAL n3)$/;"	f
-floor	./src/ops/math.ops	506;"	f
+floor	src/ops/math.ops	506;"	f
 flunk	languages/perl6/t/01-sanity/Test.pm	/^sub flunk (Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
 fmt	compilers/imcc/instructions.h	/^    char * fmt;            \/* printf style format string for params   *\/$/;"	m	struct:_Instruction
 fn	include/parrot/jit.h	/^    jit_fn_t                        fn;$/;"	m
@@ -12925,8 +12940,8 @@ free_pool	src/headers.c	/^free_pool(Interp *interpreter, struct Small_Object_Poo
 free_reglist	compilers/imcc/reg_alloc.c	/^free_reglist(IMC_Unit * unit)$/;"	f
 free_reglist	compilers/imcc/reg_alloc_bc.c	/^free_reglist(IMC_Unit * unit)$/;"	f
 free_sym	compilers/imcc/symreg.c	/^free_sym(SymReg *r)$/;"	f
-freeze	./src/ops/pmc.ops	615;"	f
 freeze	include/parrot/vtable.h	/^    freeze_method_t freeze;$/;"	m	struct:_vtable
+freeze	src/ops/pmc.ops	615;"	f
 freeze_method_t	include/parrot/vtable.h	/^typedef void (*freeze_method_t)(Interp* interpreter, PMC* pmc, visit_info* info);$/;"	t
 freeze_pmc	src/pmc_freeze.c	/^freeze_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,$/;"	f	file:
 from	compilers/imcc/cfg.h	/^    struct _basic_block *from;$/;"	m	struct:_edge
@@ -12952,7 +12967,7 @@ function	src/exit.c	/^    void (*function)(int , void *);$/;"	m	struct:_handler_
 g_sl	src/malloc.c	/^static int g_sl;$/;"	v	file:
 gather	languages/regex/lib/Regex/Generate.pm	/^sub gather {$/;"	s
 gather_groups_and_libs	tools/build/dynpmc.pl	/^sub gather_groups_and_libs {$/;"	s
-gc_debug	./src/ops/core.ops	831;"	f
+gc_debug	src/ops/core.ops	828;"	f
 gc_dummy_align	include/parrot/smallobject.h	/^    void *gc_dummy_align;       \/* see above *\/$/;"	m	struct:_gc_gms_hdr
 gc_generation	include/parrot/interpreter.h	/^    UINTVAL gc_generation;                    \/* GC generation number *\/$/;"	m	struct:parrot_interp_t
 gc_gms_add_free_object	src/gc_gms.c	/^gc_gms_add_free_object(Interp *interpreter,$/;"	f	file:
@@ -12991,11 +13006,11 @@ gc_ms_pool_init	src/smallobject.c	/^gc_ms_pool_init(Interp *interpreter, struct 
 gc_off	compilers/imcc/imc.h	/^    int gc_off;$/;"	m	struct:_imc_info_t
 gc_pmc_ext_pool_init	src/smallobject.c	/^gc_pmc_ext_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)$/;"	f
 gc_private	include/parrot/resources.h	/^    void *  gc_private;         \/* gc subsystem data *\/$/;"	m	struct:Arenas
-gcd	./src/ops/experimental.ops	46;"	f
+gcd	src/ops/experimental.ops	46;"	f
 gdb_bps	src/debug.c	/^static PDB_breakpoint_t *gdb_bps;$/;"	v	file:
-ge	./src/ops/cmp.ops	508;"	f
-ge_num	./src/ops/cmp.ops	544;"	f
-ge_str	./src/ops/cmp.ops	537;"	f
+ge	src/ops/cmp.ops	508;"	f
+ge_num	src/ops/cmp.ops	544;"	f
+ge_str	src/ops/cmp.ops	537;"	f
 gen	Configure.pl	/^    gen::config_h$/;"	l
 gen	Configure.pl	/^    gen::config_pm$/;"	l
 gen	Configure.pl	/^    gen::core_pmcs$/;"	l
@@ -13068,7 +13083,7 @@ genlabel	languages/regex/lib/Regex/Rewrite.pm	/^sub genlabel {$/;"	s
 genlabel	languages/regex/lib/Regex/State.pm	/^sub genlabel {$/;"	s
 get	languages/jako/lib/Jako/Processor.pm	/^sub get$/;"	s
 get	lib/Parrot/Configure/Data.pm	/^sub get$/;"	s
-get_addr	./src/ops/core.ops	639;"	f
+get_addr	src/ops/core.ops	636;"	f
 get_and_advance	include/parrot/string.h	/^    UINTVAL (*get_and_advance)(Interp *, struct string_iterator_t *i);$/;"	m	struct:string_iterator_t
 get_anonymous_subclass	include/parrot/vtable.h	/^    get_anonymous_subclass_method_t get_anonymous_subclass;$/;"	m	struct:_vtable
 get_anonymous_subclass_method_t	include/parrot/vtable.h	/^typedef PMC* (*get_anonymous_subclass_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
@@ -13128,7 +13143,7 @@ get_cur_primary_block	languages/cola/sym.c	/^AST * get_cur_primary_block() {$/;"
 get_description	lib/Pod/Simple/PullParser.pm	/^sub get_description { shift->_get_titled_section($/;"	s
 get_dis	languages/python/pie-thon.pl	/^sub get_dis {$/;"	s
 get_entry	src/pmc/sarray.pmc	/^get_entry(PMC *self, INTVAL key)$/;"	f	file:
-get_entry_type	src/stacks.c	/^get_entry_type(Interp *interpreter, Stack_Entry_t *entry)$/;"	f
+get_entry_type	src/stacks.c	/^get_entry_type(Interp *interpreter, Stack_Entry_t *entry \/*NN*\/)$/;"	f
 get_expression	languages/BASIC/compiler/COMP_expressions.pm	/^sub get_expression {$/;"	s
 get_files	lib/Parrot/Test/Harness.pm	/^sub get_files$/;"	s
 get_formatted	lib/Parrot/PIR/Formatter.pm	/^sub get_formatted {$/;"	s
@@ -13165,8 +13180,8 @@ get_min_buffer_address	src/headers.c	/^get_min_buffer_address(Interp *interprete
 get_min_pmc_address	src/headers.c	/^get_min_pmc_address(Interp *interpreter)$/;"	f
 get_mmd_dispatch_type	src/mmd.c	/^get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,$/;"	f
 get_mmd_dispatcher	src/mmd.c	/^get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC * right,$/;"	f	file:
-get_mro	./src/ops/pmc.ops	726;"	f
-get_namespace	./src/ops/experimental.ops	252;"	f
+get_mro	src/ops/pmc.ops	726;"	f
+get_namespace	src/ops/experimental.ops	252;"	f
 get_nci_I	src/nci.c	/^get_nci_I(Interp *interpreter, struct call_state *st, int n)$/;"	f	file:
 get_nci_N	src/nci.c	/^get_nci_N(Interp *interpreter, struct call_state *st, int n)$/;"	f	file:
 get_nci_P	src/nci.c	/^get_nci_P(Interp *interpreter, struct call_state *st, int n)$/;"	f	file:
@@ -13191,7 +13206,7 @@ get_out_fn	languages/bc/lib/Parrot/Test/Bc/Antlr3.pm	/^sub get_out_fn {$/;"	s
 get_out_fn	languages/bc/lib/Parrot/Test/Bc/Posix.pm	/^sub get_out_fn {$/;"	s
 get_out_fn	languages/m4/lib/Parrot/Test/M4/Gnu.pm	/^sub get_out_fn {$/;"	s
 get_out_fn	languages/m4/lib/Parrot/Test/M4/PIR.pm	/^sub get_out_fn {$/;"	s
-get_params	./src/ops/core.ops	514;"	f
+get_params	src/ops/core.ops	511;"	f
 get_pasm_reg	compilers/imcc/pcc.c	/^get_pasm_reg(Interp* interp, char *name)$/;"	f
 get_path	src/dynext.c	/^get_path(Interp *interpreter, STRING *lib, void **handle, STRING *wo_ext, STRING *ext)$/;"	f	file:
 get_pmc	include/parrot/vtable.h	/^    get_pmc_method_t get_pmc;$/;"	m	struct:_vtable
@@ -13211,10 +13226,10 @@ get_pointer_keyed_method_t	include/parrot/vtable.h	/^typedef void* (*get_pointer
 get_pointer_keyed_str	include/parrot/vtable.h	/^    get_pointer_keyed_str_method_t get_pointer_keyed_str;$/;"	m	struct:_vtable
 get_pointer_keyed_str_method_t	include/parrot/vtable.h	/^typedef void* (*get_pointer_keyed_str_method_t)(Interp* interpreter, PMC* pmc, STRING* key);$/;"	t
 get_pointer_method_t	include/parrot/vtable.h	/^typedef void* (*get_pointer_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
-get_repr	./src/ops/pmc.ops	258;"	f
 get_repr	include/parrot/vtable.h	/^    get_repr_method_t get_repr;$/;"	m	struct:_vtable
+get_repr	src/ops/pmc.ops	258;"	f
 get_repr_method_t	include/parrot/vtable.h	/^typedef STRING* (*get_repr_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
-get_results	./src/ops/core.ops	504;"	f
+get_results	src/ops/core.ops	501;"	f
 get_search_paths	src/library.c	/^get_search_paths(Interp *interpreter, enum_lib_paths which)$/;"	f	file:
 get_short_title	lib/Pod/Simple/PullParser.pm	/^sub get_short_title {$/;"	s
 get_source	languages/python/pie-thon.pl	/^sub get_source {$/;"	s
@@ -13247,24 +13262,24 @@ get_token	lib/Pod/Simple/PullParser.pm	/^sub get_token {$/;"	s
 get_version	lib/Pod/Simple/PullParser.pm	/^sub get_version     { shift->_get_titled_section($/;"	s
 get_version	tools/dev/pbc_header.pl	/^sub get_version {$/;"	s
 get_vtable_section	lib/Parrot/Pmc2c.pm	/^sub get_vtable_section() {$/;"	s
-getattribute	./src/ops/object.ops	408;"	f
+getattribute	src/ops/object.ops	408;"	f
 getchr	include/parrot/misc.h	/^        sprintf_getchar_t getchr;$/;"	m	struct:sprintf_obj
 getchr_pmc	src/spf_vtable.c	/^getchr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
 getchr_va	src/spf_vtable.c	/^getchr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
-getclass	./src/ops/experimental.ops	369;"	f
-getfd	./src/ops/io.ops	81;"	f
-getfile	./src/ops/debug.ops	169;"	f
+getclass	src/ops/experimental.ops	369;"	f
+getfd	src/ops/io.ops	80;"	f
+getfile	src/ops/debug.ops	169;"	f
 getfloat	include/parrot/misc.h	/^        sprintf_getfloat_t getfloat;$/;"	m	struct:sprintf_obj
 getfloat_pmc	src/spf_vtable.c	/^getfloat_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
 getfloat_va	src/spf_vtable.c	/^getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
 getint	include/parrot/misc.h	/^        sprintf_getint_t getint;$/;"	m	struct:sprintf_obj
 getint_pmc	src/spf_vtable.c	/^getint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
 getint_va	src/spf_vtable.c	/^getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
-getinterp	./src/ops/core.ops	992;"	f
-getline	./src/ops/debug.ops	156;"	f
+getinterp	src/ops/core.ops	988;"	f
+getline	src/ops/debug.ops	156;"	f
 getpagesize	src/malloc.c	/^static long getpagesize (void) {$/;"	f	file:
-getprop	./src/ops/pmc.ops	557;"	f
 getprop	include/parrot/vtable.h	/^    getprop_method_t getprop;$/;"	m	struct:_vtable
+getprop	src/ops/pmc.ops	557;"	f
 getprop_method_t	include/parrot/vtable.h	/^typedef PMC* (*getprop_method_t)(Interp* interpreter, PMC* pmc, STRING* key);$/;"	t
 getprops	include/parrot/vtable.h	/^    getprops_method_t getprops;$/;"	m	struct:_vtable
 getprops_method_t	include/parrot/vtable.h	/^typedef PMC* (*getprops_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
@@ -13272,9 +13287,9 @@ getptr	include/parrot/misc.h	/^        sprintf_getptr_t getptr;$/;"	m	struct:spr
 getptr_pmc	src/spf_vtable.c	/^getptr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
 getptr_va	src/spf_vtable.c	/^getptr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
 getregionsize	src/malloc.c	/^static long getregionsize (void) {$/;"	f	file:
-getstderr	./src/ops/io.ops	113;"	f
-getstdin	./src/ops/io.ops	103;"	f
-getstdout	./src/ops/io.ops	108;"	f
+getstderr	src/ops/io.ops	112;"	f
+getstdin	src/ops/io.ops	102;"	f
+getstdout	src/ops/io.ops	107;"	f
 getstring	include/parrot/misc.h	/^        sprintf_getstring_t getstring;$/;"	m	struct:sprintf_obj
 getstring_pmc	src/spf_vtable.c	/^getstring_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
 getstring_va	src/spf_vtable.c	/^getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)$/;"	f	file:
@@ -13290,7 +13305,7 @@ global_symbol_table	languages/cola/sym.c	/^SymbolTable     *global_symbol_table;
 globals	compilers/imcc/pbc.c	/^static struct globals {$/;"	s	file:
 globals	compilers/imcc/pbc.c	/^} globals;$/;"	v	file:
 gms_debug_verify	src/gc_gms.c	/^gms_debug_verify(Interp *interpreter, struct Small_Object_Pool *pool,$/;"	f	file:
-gmtime	./src/ops/sys.ops	181;"	f
+gmtime	src/ops/sys.ops	181;"	f
 got	lib/Test/Builder.pm	/^         got: %s$/;"	l
 goto_address	lib/Parrot/OpTrans.pm	/^sub goto_address $/;"	s
 goto_address	lib/Parrot/OpTrans/CGP.pm	/^sub goto_address$/;"	s
@@ -13317,9 +13332,9 @@ graph_coloring_reg_alloc	compilers/imcc/reg_alloc.c	/^graph_coloring_reg_alloc(I
 gray	include/parrot/smallobject.h	/^    struct _gc_gms_hdr *gray;           \/* to be scanned *\/$/;"	m	struct:Small_Object_Pool
 grow_items	include/parrot/list.h	30;"	d
 grow_policy	include/parrot/list.h	/^    int grow_policy;            \/* fixed \/ variable len *\/$/;"	m	struct:List
-gt	./src/ops/cmp.ops	447;"	f
-gt_num	./src/ops/cmp.ops	483;"	f
-gt_str	./src/ops/cmp.ops	476;"	f
+gt	src/ops/cmp.ops	447;"	f
+gt_num	src/ops/cmp.ops	483;"	f
+gt_str	src/ops/cmp.ops	476;"	f
 guaranteed_reclaimable	include/parrot/resources.h	/^    size_t guaranteed_reclaimable;     \/* bytes that can definitely be reclaimed*\/$/;"	m	struct:Memory_Pool
 h	src/nci_test.c	/^    int w, h;$/;"	m	file:
 handle	compilers/imcc/imc.h	/^    FILE *handle;$/;"	m	struct:parser_state_t
@@ -13340,10 +13355,10 @@ hasback	languages/regex/lib/Regex/Ops/Tree.pm	/^sub hasback { 0 }$/;"	s
 hasback	languages/regex/lib/Regex/Ops/Tree.pm	/^sub hasback { 1 }$/;"	s
 hasback	languages/regex/lib/Regex/Ops/Tree.pm	/^sub hasback { my ($op) = @_; $op->{args}->[0]->hasback() }$/;"	s
 hasback	languages/regex/lib/Regex/Ops/Tree.pm	/^sub hasback { my ($op) = @_; $op->{args}->[1]->hasback() }$/;"	s
-hash	./src/ops/pmc.ops	714;"	f
 hash	compilers/imcc/unit.h	/^    SymHash hash;$/;"	m	struct:_IMC_Unit
 hash	include/parrot/vtable.h	/^    hash_method_t hash;$/;"	m	struct:_vtable
 hash	languages/pugs/pmc/pugscapture.pmc	/^  Hash*    hash;$/;"	m	struct:siva	file:
+hash	src/ops/pmc.ops	714;"	f
 hash_clone	src/hash.c	/^hash_clone(Interp *interp, Hash *hash, Hash **dest)$/;"	f
 hash_comp_fn	include/parrot/hash.h	/^typedef int    (*hash_comp_fn)(Parrot_Interp, void*, void*);$/;"	t
 hash_delete	src/hash.c	/^hash_delete(Interp *interpreter, Hash *hash, void *key)$/;"	f
@@ -13369,7 +13384,7 @@ hash_visit	src/hash.c	/^hash_visit(Interp *interpreter, Hash *hash, void* pinfo)
 hashval	include/parrot/pobj.h	/^    UINTVAL hashval; \/* cached hash value computation; not yet used *\/$/;"	m	struct:parrot_string_t
 hasleftmost	lib/Parse/RecDescent.pm	/^sub hasleftmost ($$)$/;"	s
 hasleftmost	lib/Parse/RecDescent.pm	/^sub hasleftmost($$)$/;"	s
-hav	./src/ops/obscure.ops	74;"	f
+hav	src/ops/obscure.ops	74;"	f
 have_anychunks	src/malloc.c	2344;"	d	file:
 have_fastchunks	src/malloc.c	2356;"	d	file:
 hblkhd	src/malloc.c	/^  int hblkhd;   \/* space in mmapped regions *\/$/;"	m	struct:mallinfo	file:
@@ -13469,10 +13484,10 @@ idoms	compilers/imcc/unit.h	/^    int* idoms;$/;"	m	struct:_IMC_Unit
 idx	include/parrot/caches.h	/^    Meth_cache_entry ***idx;    \/* bufstart idx *\/$/;"	m	struct:_Caches
 idx2bit	src/malloc.c	2284;"	d	file:
 idx2block	src/malloc.c	2283;"	d	file:
-if	./src/ops/core.ops	293;"	f
+if	src/ops/core.ops	292;"	f
 if_branch	compilers/imcc/imc.h	/^	int if_branch;$/;"	m	struct:imcc_ostat
 if_branch	compilers/imcc/optimizer.c	/^if_branch(Interp *interpreter, IMC_Unit * unit)$/;"	f	file:
-if_null	./src/ops/cmp.ops	1004;"	f
+if_null	src/ops/cmp.ops	1004;"	f
 ig_allocate	compilers/imcc/reg_alloc.c	/^static unsigned int* ig_allocate(int N)$/;"	f	file:
 ig_allocate	compilers/imcc/reg_alloc_bc.c	/^static unsigned int* ig_allocate(int N)$/;"	f	file:
 ig_clear_graph	compilers/imcc/reg_alloc_bc.c	/^ig_clear_graph(IMC_Unit* unit, graph* G)$/;"	f	file:
@@ -13549,7 +13564,7 @@ in	compilers/imcc/reg_alloc_bc.c	/^    char in;     \/* boolean, indicating if r
 in_pod	compilers/imcc/imclexer.c	/^static int in_pod;$/;"	v	file:
 in_slice	compilers/imcc/imcparser.c	/^static int nkeys, in_slice;$/;"	v	file:
 in_smallbin_range	src/malloc.c	2162;"	d	file:
-inc	./src/ops/math.ops	533;"	f
+inc	src/ops/math.ops	533;"	f
 incitempos	lib/Parse/RecDescent.pm	/^sub incitempos$/;"	s
 include_file	compilers/imcc/imclexer.c	/^include_file (Interp* interp, char *file_name)$/;"	f	file:
 includes	lib/Parrot/Pmc2c.pm	/^sub includes() {$/;"	s
@@ -13559,12 +13574,12 @@ increment_method_t	include/parrot/vtable.h	/^typedef void (*increment_method_t)(
 increments	src/gc_ims.c	/^    size_t      increments;     \/* increment count *\/$/;"	m	file:
 indent	languages/cola/parser.c	/^int         indent;$/;"	v
 indent	languages/jako/lib/Jako/Compiler.pm	/^sub indent$/;"	s
-index	./src/ops/string.ops	283;"	f
 index	compilers/imcc/cfg.h	/^    int index;                  \/*on bb_list*\/$/;"	m	struct:_basic_block
 index	compilers/imcc/instructions.h	/^    int index;             \/* index on instructions[] *\/$/;"	m	struct:_Instruction
 index	include/parrot/charset.h	/^    charset_index_t index;$/;"	m	struct:_charset
 index	include/parrot/misc.h	/^        INTVAL index;$/;"	m	struct:sprintf_obj
-infix	./src/ops/math.ops	63;"	f
+index	src/ops/string.ops	283;"	f
+infix	src/ops/math.ops	63;"	f
 info	src/ops/core_ops.c	/^    op_info_t * info;$/;"	m	struct:hop	file:
 info	tools/dev/check_source_standards.pl	/^sub info {$/;"	s
 init	Configure.pl	/^    init::defaults$/;"	l
@@ -13641,8 +13656,8 @@ inst3	src/jit/ia64/jit_emit.h	/^    unsigned long    inst3;$/;"	m
 inst_size	src/jit/ia64/jit_emit.h	/^int inst_size = 0;$/;"	v
 inst_tmp_t	src/jit/ia64/jit_emit.h	/^} inst_tmp_t;$/;"	t
 inst_tmpl	src/jit/ia64/jit_emit.h	/^int inst_tmpl = 0;$/;"	v
-instantiate	./src/ops/pmc.ops	129;"	f
 instantiate	include/parrot/vtable.h	/^    instantiate_method_t instantiate;$/;"	m	struct:_vtable
+instantiate	src/ops/pmc.ops	129;"	f
 instantiate_method_t	include/parrot/vtable.h	/^typedef PMC* (*instantiate_method_t)(Interp* interpreter, PMC* pmc, PMC* sig);$/;"	t
 instantiate_object	src/objects.c	/^instantiate_object(Interp* interpreter, PMC *object, PMC *init)$/;"	f	file:
 instruction_reads	compilers/imcc/instructions.c	/^instruction_reads(Instruction* ins, SymReg* r) {$/;"	f
@@ -13684,8 +13699,8 @@ interferes	compilers/imcc/reg_alloc_bc.c	/^interferes(Interp *interpreter, IMC_U
 internal_exception	src/exceptions.c	/^internal_exception(int exitcode, const char *format, ...)$/;"	f
 interp	include/parrot/events.h	/^    Parrot_Interp               interp;$/;"	m
 interp_lock	include/parrot/thread.h	/^    Parrot_mutex interp_lock;$/;"	m	struct:_Thread_data
-interpinfo	./src/ops/core.ops	866;"	f
 interpinfo	src/inter_misc.c	/^interpinfo(Interp *interpreter, INTVAL what)$/;"	f
+interpinfo	src/ops/core.ops	863;"	f
 interpinfo_p	src/inter_misc.c	/^interpinfo_p(Interp *interpreter, INTVAL what)$/;"	f
 interpinfo_s	src/inter_misc.c	/^interpinfo_s(Interp *interpreter, INTVAL what)$/;"	f
 interpre	src/inter_create.c	/^Interp interpre;$/;"	v
@@ -13730,10 +13745,10 @@ invalidate_retc_context	src/sub.c	/^invalidate_retc_context(Interp *interpreter,
 invalidate_type_caches	src/objects.c	/^invalidate_type_caches(Interp *interpreter, UINTVAL type)$/;"	f	file:
 invariants_moved	compilers/imcc/imc.h	/^	int invariants_moved;$/;"	m	struct:imcc_ostat
 invert_relop	languages/jako/lib/Jako/Compiler.pm	/^sub invert_relop$/;"	s
-invoke	./src/ops/core.ops	419;"	f
 invoke	include/parrot/vtable.h	/^    invoke_method_t invoke;$/;"	m	struct:_vtable
+invoke	src/ops/core.ops	418;"	f
 invoke_method_t	include/parrot/vtable.h	/^typedef void* (*invoke_method_t)(Interp* interpreter, PMC* pmc, void* next);$/;"	t
-invokecc	./src/ops/core.ops	409;"	f
+invokecc	src/ops/core.ops	408;"	f
 io_thread	src/events.c	/^io_thread(void *data)$/;"	f	file:
 is	languages/jako/lib/Jako/Token.pm	/^sub is { my $self = shift; return grep { $self->kind eq $_ } @_; }$/;"	s
 is	languages/perl6/t/01-sanity/Test.pm	/^sub is (Str $got, Str $expected, Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
@@ -13749,12 +13764,12 @@ is_bof	languages/jako/lib/Jako/Token.pm	/^sub is_bof           { return shift->i
 is_buffer_ptr	src/headers.c	/^is_buffer_ptr(Interp *interpreter, void *ptr)$/;"	f
 is_byte	src/jit/arm/jit_emit.h	/^    is_byte  	  = 0x40,$/;"	e
 is_caret	src/jit/arm/jit_emit.h	/^    is_caret  	  = 0x40, \/* assembler syntax is ^ - load sets status flags in$/;"	e
-is_cclass	./src/ops/string.ops	607;"	f
 is_cclass	include/parrot/charset.h	/^    charset_is_cclass_t is_cclass;$/;"	m	struct:_charset
 is_cclass	src/charset/ascii.c	/^is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,$/;"	f	file:
 is_cclass	src/charset/binary.c	/^is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)$/;"	f	file:
 is_cclass	src/charset/iso-8859-1.c	/^is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)$/;"	f	file:
 is_cclass	src/charset/unicode.c	/^is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)$/;"	f	file:
+is_cclass	src/ops/string.ops	607;"	f
 is_close_brace	languages/jako/lib/Jako/Token.pm	/^sub is_close_brace   { return shift->is('close-brace');   }$/;"	s
 is_close_bracket	languages/jako/lib/Jako/Token.pm	/^sub is_close_bracket { return shift->is('close-bracket'); }$/;"	s
 is_close_paren	languages/jako/lib/Jako/Token.pm	/^sub is_close_paren   { return shift->is('close-paren');   }$/;"	s
@@ -13845,8 +13860,8 @@ is_var	languages/jako/lib/Jako/Token.pm	/^sub is_var           { return shift->i
 is_variable	languages/jako/lib/Jako/Symbol.pm	/^sub is_variable { my $self = shift; return ($self->kind eq 'var') or ($self->kind eq 'arg'); }$/;"	s
 is_while	languages/jako/lib/Jako/Token.pm	/^sub is_while         { return shift->is('while');         }$/;"	s
 is_writeback	src/jit/arm/jit_emit.h	/^    is_writeback  = 0x20,$/;"	e
-isa	./src/ops/object.ops	206;"	f
 isa	include/parrot/vtable.h	/^    isa_method_t isa;$/;"	m	struct:_vtable
+isa	src/ops/object.ops	206;"	f
 isa_deleg_pmc	src/mmd.c	/^isa_deleg_pmc(Interp *interpreter, PMC *p)$/;"	f	file:
 isa_method_t	include/parrot/vtable.h	/^typedef INTVAL (*isa_method_t)(Interp* interpreter, PMC* pmc, STRING* _class);$/;"	t
 isa_ok	languages/perl6/t/01-sanity/Test.pm	/^sub isa_ok (Any|Junction|Pair $ref is rw, Str $expected_type, Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
@@ -13854,31 +13869,31 @@ isa_ok	lib/Test/More.pm	/^sub isa_ok ($$;$) {$/;"	s
 isa_str	include/parrot/vtable.h	/^    STRING* isa_str;         \/* space-separated list of classes *\/$/;"	m	struct:_vtable
 isarray	languages/BASIC/compiler/COMP_expressions.pm	/^sub isarray {$/;"	s
 isbuiltin	languages/BASIC/compiler/COMP_expressions.pm	/^sub isbuiltin {		# Built in functions$/;"	s
-iseq	./src/ops/cmp.ops	934;"	f
-isfalse	./src/ops/cmp.ops	815;"	f
-isge	./src/ops/cmp.ops	853;"	f
-isgt	./src/ops/cmp.ops	834;"	f
+iseq	src/ops/cmp.ops	934;"	f
+isfalse	src/ops/cmp.ops	815;"	f
+isge	src/ops/cmp.ops	853;"	f
+isgt	src/ops/cmp.ops	834;"	f
 isjit	include/parrot/jit.h	/^    char                                 isjit;$/;"	m	struct:Parrot_jit_optimizer_section
 iskeyword	languages/BASIC/compiler/COMP_expressions.pm	/^sub iskeyword { $/;"	s
-isle	./src/ops/cmp.ops	870;"	f
+isle	src/ops/cmp.ops	870;"	f
 isleftrec	lib/Parse/RecDescent.pm	/^sub isleftrec($$)$/;"	s
-islt	./src/ops/cmp.ops	902;"	f
-isne	./src/ops/cmp.ops	969;"	f
+islt	src/ops/cmp.ops	902;"	f
+isne	src/ops/cmp.ops	969;"	f
 isnt	languages/perl6/t/01-sanity/Test.pm	/^sub isnt (Str $got, Str $expected, Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
 isnt	lib/Test/More.pm	/^sub isnt ($$;$) {$/;"	s
 isnt_eq	lib/Test/Builder.pm	/^sub isnt_eq {$/;"	s
 isnt_num	lib/Test/Builder.pm	/^sub isnt_num {$/;"	s
-isntsame	./src/ops/cmp.ops	797;"	f
+isntsame	src/ops/cmp.ops	797;"	f
 isplain	languages/regex/lib/Regex/Ops/Tree.pm	/^sub isplain {$/;"	s
 isprime1	examples/benchmarks/primes2.c	/^int isprime1(int input)$/;"	f
 isprime1	examples/benchmarks/primes2.pl	/^sub isprime1$/;"	s
-issame	./src/ops/cmp.ops	784;"	f
+issame	src/ops/cmp.ops	784;"	f
 issubrule	lib/Parse/RecDescent.pm	/^sub issubrule ($) { return $_[0]->{"subrule"} }$/;"	s
 issubrule	lib/Parse/RecDescent.pm	/^sub issubrule { 0 }$/;"	s
 issubrule	lib/Parse/RecDescent.pm	/^sub issubrule { undef }$/;"	s
 isterminal	lib/Parse/RecDescent.pm	/^sub isterminal { 0 }$/;"	s
 isterminal	lib/Parse/RecDescent.pm	/^sub isterminal { 1 }$/;"	s
-istrue	./src/ops/cmp.ops	810;"	f
+istrue	src/ops/cmp.ops	810;"	f
 isuserfunc	languages/BASIC/compiler/COMP_expressions.pm	/^sub isuserfunc {$/;"	s
 it	src/jit/ia64/jit_emit.h	/^long it = 0;$/;"	v
 it1	src/jit/ia64/jit_emit.h	/^    int     it1;$/;"	m
@@ -13888,7 +13903,7 @@ item_size	include/parrot/list.h	/^    int item_size;		\/* item size *\/$/;"	m	st
 item_type	include/parrot/list.h	/^    int item_type;	        \/* item type *\/$/;"	m	struct:List
 items	include/parrot/list.h	/^    UINTVAL items;              \/* items in this chunk *\/$/;"	m	struct:List_chunk
 items_per_chunk	include/parrot/list.h	/^    int items_per_chunk;	\/* override defaults *\/$/;"	m	struct:List
-iter	./src/ops/experimental.ops	193;"	f
+iter	src/ops/experimental.ops	193;"	f
 iter	src/pbc_info.c	/^iter(Interp* interpreter,$/;"	f	file:
 iter_init	include/parrot/encoding.h	/^    encoding_iter_init_t     iter_init;$/;"	m	struct:_encoding
 iter_init	src/encodings/fixed_8.c	/^iter_init(Interp *interpreter, String *src, String_iter *iter)$/;"	f	file:
@@ -14432,11 +14447,11 @@ jit_set_p_ki_i	src/jit/i386/jit_emit.h	/^jit_set_p_ki_i(Parrot_jit_info_t *jit_i
 jit_set_returns_pc	include/parrot/jit_emit.h	/^jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, $/;"	f
 jit_set_returns_pc	src/jit/i386/jit_emit.h	/^jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, $/;"	f
 jit_set_returns_pc	src/jit/ppc/jit_emit.h	/^jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, $/;"	f
-join	./src/ops/string.ops	480;"	f
-jsr	./src/ops/core.ops	230;"	f
-jump	./src/ops/core.ops	246;"	f
+join	src/ops/string.ops	480;"	f
+jsr	src/ops/core.ops	230;"	f
 jump	include/parrot/op.h	/^    unsigned short jump;           \/* s. above *\/$/;"	m
 jump	lib/Parrot/Op.pm	/^sub jump$/;"	s
+jump	src/ops/core.ops	246;"	f
 k	compilers/imcc/reg_alloc_bc.c	/^    int k;       \/* maximum color used in graph (0 means uncolored) *\/$/;"	m	file:
 k0	src/jit/mips/jit_emit.h	/^    k0,$/;"	e
 k1	src/jit/mips/jit_emit.h	/^    k1,$/;"	e
@@ -14444,7 +14459,7 @@ keepcost	src/malloc.c	/^  int keepcost; \/* top-most, releasable (via malloc_tri
 key	include/parrot/hash.h	/^    void *key;$/;"	m	struct:_hashbucket
 key	include/parrot/inter_call.h	/^    PMC *key;           \/* to iterate a flattening hash *\/$/;"	m	struct:call_state
 key	include/parrot/packfile.h	/^        PMC *key;$/;"	m	union:PackFile_Constant::<anonymous>
-key_2_idx	src/pmc/unmanagedstruct.pmc	/^key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)$/;"	f
+key_2_idx	src/pmc/unmanagedstruct.pmc	/^key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)$/;"	f	file:
 key_append	src/key.c	/^key_append(Interp *interpreter, PMC *key1, PMC *key2)$/;"	f
 key_consts	compilers/imcc/pbc.c	/^    SymHash key_consts;                 \/* cached key constants for this seg *\/$/;"	m	struct:cs_t	file:
 key_hash_STRING	src/hash.c	/^key_hash_STRING(Interp *interpreter, void *value, size_t seed)$/;"	f	file:
@@ -14527,14 +14542,14 @@ lastpc	src/jit/i386/jit_emit.h	/^static unsigned char *lastpc;$/;"	v
 lazy	src/gc_ims.c	/^    int         lazy;           \/* timely destruction run *\/$/;"	m	file:
 lazy_dod	include/parrot/resources.h	/^    int lazy_dod;               \/* flag that indicates whether we should stop$/;"	m	struct:Arenas
 lazy_dod_runs	include/parrot/resources.h	/^    size_t  lazy_dod_runs;      \/* Number of successful lazy DOD sweep *\/$/;"	m	struct:Arenas
-lcm	./src/ops/math.ops	1055;"	f
+lcm	src/ops/math.ops	1055;"	f
 ld	src/list.c	/^ld(UINTVAL x)$/;"	f
 ld_st_t	src/jit/alpha/jit_emit.h	/^} ld_st_t;$/;"	t
 ldm_stm_dir_t	src/jit/arm/jit_emit.h	/^} ldm_stm_dir_t;$/;"	t
 ldr_str_dir_t	src/jit/arm/jit_emit.h	/^} ldr_str_dir_t;$/;"	t
-le	./src/ops/cmp.ops	365;"	f
-le_num	./src/ops/cmp.ops	422;"	f
-le_str	./src/ops/cmp.ops	415;"	f
+le	src/ops/cmp.ops	365;"	f
+le_num	src/ops/cmp.ops	422;"	f
+le_str	src/ops/cmp.ops	415;"	f
 left	include/parrot/mmd.h	/^        INTVAL left, right;$/;"	m	struct:_MMD_init
 left	languages/jako/lib/Jako/Construct/Block.pm	/^sub left      { return shift->{LEFT};  }$/;"	s
 left	languages/jako/lib/Jako/Construct/Statement/Arithmetic.pm	/^sub left  { return shift->{LEFT};  }$/;"	s
@@ -14548,10 +14563,10 @@ left	languages/jako/lib/Jako/Construct/Statement/Return.pm	/^sub left  { return 
 leftmostsubrule	lib/Parse/RecDescent.pm	/^sub leftmostsubrule($)$/;"	s
 leftmostsubrules	lib/Parse/RecDescent.pm	/^sub leftmostsubrules($)$/;"	s
 len	include/parrot/string_private_cstring.h	/^    UINTVAL len;$/;"	m	struct:_cstrings
-length	./src/ops/string.ops	137;"	f
 length	compilers/imcc/sets.h	/^   int length;$/;"	m	struct:_Set
 length	include/parrot/intlist.h	/^    INTVAL length;              \/* number of items in list (1) *\/$/;"	m	struct:IntList_chunk_t
 length	include/parrot/list.h	/^    UINTVAL length;             \/* number of items in list *\/$/;"	m	struct:List
+length	src/ops/string.ops	137;"	f
 level	lib/Test/Builder.pm	/^sub level {$/;"	s
 lex_info	include/parrot/sub.h	/^    PMC      *lex_info;         \/* LexInfo PMC *\/$/;"	m	struct:Parrot_coro
 lex_info	include/parrot/sub.h	/^    PMC      *lex_info;         \/* LexInfo PMC *\/$/;"	m	struct:Parrot_sub
@@ -14609,28 +14624,28 @@ list_splice	src/list.c	/^list_splice(Interp *interpreter, List *list, List *valu
 list_to_pasm	languages/regex/lib/Regex.pm	/^sub list_to_pasm {$/;"	s
 list_unshift	src/list.c	/^list_unshift(Interp *interpreter, List *list, void *item, int type)$/;"	f
 list_visit	src/list.c	/^list_visit(Interp *interpreter, List *list, void *pinfo)$/;"	f
-listen	./src/ops/io.ops	571;"	f
+listen	src/ops/io.ops	566;"	f
 literal	languages/cola/cola.h	/^    struct _Symbol  *literal;$/;"	m	struct:_Symbol
 literal_label	languages/regex/lib/Regex/State.pm	/^sub literal_label {$/;"	s
 live_objects	include/parrot/smallobject.h	/^    size_t live_objects;$/;"	m	struct:Small_Object_Arena
 lives_ok	languages/perl6/t/01-sanity/Test.pm	/^sub lives_ok (Code &code, Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
-ln	./src/ops/math.ops	889;"	f
+ln	src/ops/math.ops	889;"	f
 lo_var_ptr	include/parrot/interpreter.h	/^    void *lo_var_ptr;                         \/* Pointer to memory on runops system stack *\/$/;"	m	struct:parrot_interp_t
-load_bytecode	./src/ops/core.ops	143;"	f
+load_bytecode	src/ops/core.ops	143;"	f
 load_nc	src/jit/ppc/jit_emit.h	692;"	d
 load_op_map_file	tools/build/ops2pm.pl	/^sub load_op_map_file {$/;"	s
 load_pbc	compilers/imcc/main.c	/^static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;$/;"	v	file:
 load_prederef	src/interpreter.c	/^load_prederef(Interp *interpreter, int which)$/;"	f	file:
 load_size	include/parrot/jit.h	/^    ptrdiff_t                            load_size;$/;"	m	struct:Parrot_jit_optimizer_section
 loadinst	src/jit/ia64/jit_emit.h	/^loadinst(char *pc, long inst, int itype)$/;"	f
-loadlib	./src/ops/core.ops	1153;"	f
+loadlib	src/ops/core.ops	1149;"	f
 loc	compilers/ast/ast.h	/^    YYLTYPE loc;		\/* yacc\/bison code location *\/$/;"	m	struct:nodeType_t
 local	src/io/io_private.h	/^    struct sockaddr_in local;$/;"	m	struct:_ParrotIO
-localtime	./src/ops/sys.ops	191;"	f
+localtime	src/ops/sys.ops	191;"	f
 locate_named_named	src/inter_call.c	/^locate_named_named(Interp *interpreter, struct call_state *st)$/;"	f	file:
 locate_pos_named	src/inter_call.c	/^locate_pos_named(Interp *interpreter, struct call_state *st)$/;"	f	file:
-log10	./src/ops/math.ops	902;"	f
-log2	./src/ops/math.ops	915;"	f
+log10	src/ops/math.ops	902;"	f
+log2	src/ops/math.ops	915;"	f
 log2int	config/gen/platform/darwin/memalign.c	/^static unsigned log2int(unsigned x) { return (x<2) ? 0 : log2int (x>>1)+1; };$/;"	f	file:
 logical_and_term	languages/m4/src/eval.c	/^logical_and_term (eval_token et, eval_t *v1)$/;"	f	file:
 logical_not	include/parrot/vtable.h	/^    logical_not_method_t logical_not;$/;"	m	struct:_vtable
@@ -14644,7 +14659,7 @@ longopt_get_shortopt	src/longopt.c	/^longopt_get_shortopt(Parrot_Interp interp, 
 longopt_opt_decl	include/parrot/longopt.h	/^struct longopt_opt_decl {$/;"	s
 longopt_opt_info	include/parrot/longopt.h	/^struct longopt_opt_info {$/;"	s
 longopt_string_t	include/parrot/longopt.h	/^typedef const char* longopt_string_t;$/;"	t
-lookback	./src/ops/stack.ops	119;"	f
+lookback	src/ops/stack.ops	119;"	f
 lookup_class	languages/cola/sym.c	/^Symbol * lookup_class(SymbolTable * tab, const char * name) {$/;"	f
 lookup_namespace	languages/cola/sym.c	/^Symbol * lookup_namespace(SymbolTable * tab, const char * name) {$/;"	f
 lookup_symbol	languages/cola/sym.c	/^Symbol * lookup_symbol(const char * name) {$/;"	f
@@ -14667,10 +14682,10 @@ lp3	t/op/gc.t	/^lp3:$/;"	l
 lpos	src/io/io_private.h	/^    PIOOFF_T lpos;              \/* Last file position           *\/$/;"	m	struct:_ParrotIO
 lru	include/parrot/pic.h	/^    Parrot_PIC_lru lru;                 \/* MIC - one cache *\/$/;"	m	struct:Parrot_mic_t
 lru	include/parrot/pic.h	/^    Parrot_PIC_lru lru[3];              \/* PIC - three more cache entries *\/$/;"	m	struct:Parrot_pic_t
-lsr	./src/ops/bit.ops	247;"	f
-lt	./src/ops/cmp.ops	277;"	f
-lt_num	./src/ops/cmp.ops	334;"	f
-lt_str	./src/ops/cmp.ops	327;"	f
+lsr	src/ops/bit.ops	247;"	f
+lt	src/ops/cmp.ops	277;"	f
+lt_num	src/ops/cmp.ops	334;"	f
+lt_str	src/ops/cmp.ops	327;"	f
 luaboolean_name	languages/lua/pmc/luaboolean.pmc	/^static STRING *luaboolean_name;$/;"	v	file:
 luafunction_name	languages/lua/pmc/luafunction.pmc	/^static STRING *luafunction_name;$/;"	v	file:
 luanumber_name	languages/lua/pmc/luanumber.pmc	/^static STRING *luanumber_name;$/;"	v	file:
@@ -14866,7 +14881,7 @@ mark_object_cache	src/objects.c	/^mark_object_cache(Interp* interpreter)$/;"	f
 mark_ptr	include/parrot/pmc_freeze.h	/^    PMC*                mark_ptr;$/;"	m	struct:_visit_info
 mark_register_stack	src/register.c	/^mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)$/;"	f
 mark_special	src/dod.c	/^mark_special(Parrot_Interp interpreter, PMC* obj)$/;"	f	file:
-mark_stack	src/stacks.c	/^mark_stack(Interp *interpreter,$/;"	f
+mark_stack	src/stacks.c	/^mark_stack(Interp *interpreter, Stack_Chunk_t *chunk \/*NN*\/)$/;"	f
 mark_subs	src/pmc/eval.pmc	/^mark_subs(Interp* interpreter, PMC* self)$/;"	f	file:
 marker	include/parrot/smallobject.h	/^    struct _gc_gms_hdr marker;          \/* limit of list *\/$/;"	m	struct:Small_Object_Pool
 mask	include/parrot/hash.h	/^    UINTVAL mask;               \/* alloced - 1 *\/$/;"	m	struct:_hash
@@ -15054,10 +15069,10 @@ mmd_wrap_v_pi	src/mmd.c	/^mmd_wrap_v_pi(Interp *interpreter, PMC *nci, INTVAL ri
 mmd_wrap_v_pn	src/mmd.c	/^mmd_wrap_v_pn(Interp *interpreter, PMC *nci, FLOATVAL right) {$/;"	f	file:
 mmd_wrap_v_pp	src/mmd.c	/^mmd_wrap_v_pp(Interp *interpreter, PMC *nci, PMC *right) {$/;"	f	file:
 mmd_wrap_v_ps	src/mmd.c	/^mmd_wrap_v_ps(Interp *interpreter, PMC *nci, STRING* right) {$/;"	f	file:
-mmdvtfind	./src/ops/pmc.ops	664;"	f
-mmdvtregister	./src/ops/pmc.ops	653;"	f
+mmdvtfind	src/ops/pmc.ops	664;"	f
+mmdvtregister	src/ops/pmc.ops	653;"	f
 mmu	languages/urm/urmc	/^sub mmu {$/;"	s
-mod	./src/ops/math.ops	584;"	f
+mod	src/ops/math.ops	584;"	f
 mod_rr_n	include/parrot/jit_emit.h	/^mod_rr_n(Parrot_jit_info_t *jit_info, int r)$/;"	f
 mod_rr_n	src/jit/i386/jit_emit.h	/^mod_rr_n(Parrot_jit_info_t *jit_info, int r)$/;"	f
 mode	include/parrot/inter_call.h	/^    int mode;       \/* from_sig, from_set_ops, flatten ...*\/$/;"	m	struct:call_state_1
@@ -15069,8 +15084,8 @@ modtime	tools/build/dynpmc.pl	/^sub modtime {$/;"	s
 more_objects	include/parrot/smallobject.h	/^    alloc_objects_fn_type       more_objects;$/;"	m	struct:Small_Object_Pool
 more_traceable_objects	src/smallobject.c	/^more_traceable_objects(Interp *interpreter,$/;"	f	file:
 morecore_properties	src/malloc.c	/^  unsigned int     morecore_properties;$/;"	m	struct:malloc_state	file:
-morph	./src/ops/experimental.ops	206;"	f
 morph	include/parrot/vtable.h	/^    morph_method_t morph;$/;"	m	struct:_vtable
+morph	src/ops/experimental.ops	206;"	f
 morph_method_t	include/parrot/vtable.h	/^typedef void (*morph_method_t)(Interp* interpreter, PMC* pmc, INTVAL type);$/;"	t
 mov_MR_f	include/parrot/jit.h	/^typedef void (*mov_MR_f)(Parrot_jit_info_t *, $/;"	t
 mov_MR_i	include/parrot/jit.h	/^    mov_MR_f mov_MR_i;$/;"	m	struct:jit_arch_info_t
@@ -15087,7 +15102,7 @@ mro	include/parrot/vtable.h	/^    PMC *mro;                \/* array PMC of [cla
 msg	include/parrot/events.h	/^        STRING*                 msg;            \/* for testing only *\/$/;"	m
 msg	include/parrot/exceptions.h	/^    STRING *msg;                        \/* may be NULL *\/$/;"	m	struct:parrot_exception_t
 mstate	src/malloc.c	/^typedef struct malloc_state *mstate;$/;"	t	file:
-mul	./src/ops/math.ops	620;"	f
+mul	src/ops/math.ops	620;"	f
 mult_term	languages/m4/src/eval.c	/^mult_term (eval_token et, eval_t *v1)$/;"	f	file:
 multi	compilers/imcc/symreg.h	/^    SymReg ** multi;$/;"	m	struct:pcc_sub_t
 multi_keyed	compilers/imcc/parser_util.c	/^multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,$/;"	f
@@ -15115,15 +15130,15 @@ n	compilers/ast/astparser.h	/^    struct nodeType_t *n;$/;"	m	union:YYSTYPE
 n	compilers/imcc/pcc.c	/^    int n;$/;"	m	struct:move_info_t	file:
 n	compilers/imcc/reg_alloc_bc.c	/^    int n;       \/* number of nodes *\/$/;"	m	file:
 n	include/parrot/inter_call.h	/^    INTVAL n;$/;"	m	struct:call_state_1
-n_abs	./src/ops/math.ops	199;"	f
+n_abs	src/ops/math.ops	199;"	f
 n_actual_args	include/parrot/inter_call.h	/^    int n_actual_args;  \/* arguments incl. flatten *\/$/;"	m	struct:call_state
 n_allocated	include/parrot/interpreter.h	/^    size_t n_allocated;                 \/* allocated size of it *\/$/;"	m	struct:_Prederef
 n_args	include/parrot/jit.h	/^    int                              n_args;$/;"	m
 n_basic_blocks	compilers/imcc/pbc.c	/^    int n_basic_blocks;                 \/* block count *\/$/;"	m	struct:subs	file:
 n_basic_blocks	compilers/imcc/unit.h	/^    int n_basic_blocks;$/;"	m	struct:_IMC_Unit
 n_binop_mmd_funcs	include/parrot/interpreter.h	/^    UINTVAL n_binop_mmd_funcs;                \/* function count *\/$/;"	m	struct:parrot_interp_t
-n_bnot	./src/ops/bit.ops	105;"	f
-n_bnots	./src/ops/bit.ops	144;"	f
+n_bnot	src/ops/bit.ops	105;"	f
+n_bnots	src/ops/bit.ops	144;"	f
 n_branches	include/parrot/interpreter.h	/^    size_t n_branches;                  \/* entries in that list *\/$/;"	m	struct:_Prederef
 n_charsets	src/charset.c	/^    int n_charsets;$/;"	m	file:
 n_chunks	include/parrot/intlist.h	/^    size_t n_chunks;            \/* number of used chunks in chunk_list (1) *\/$/;"	m	struct:IntList_chunk_t
@@ -15134,7 +15149,7 @@ n_converters	src/charset.c	/^    int n_converters;$/;"	m	file:
 n_encodings	src/encoding.c	/^    int n_encodings;$/;"	m	file:
 n_entries	compilers/imcc/cfg.h	/^	int n_entries;		\/* nr of entries to this loop *\/$/;"	m	struct:_loop_info
 n_extended_PMCs	src/gc_ims.c	/^    size_t      n_extended_PMCs;\/* PMCs found during mark_special *\/$/;"	m	file:
-n_infix	./src/ops/math.ops	103;"	f
+n_infix	src/ops/math.ops	103;"	f
 n_interpreters	include/parrot/thread.h	/^VAR_SCOPE size_t                        n_interpreters;$/;"	v
 n_items	include/parrot/list.h	/^    UINTVAL n_items;            \/* # of items with grow policy in flags *\/$/;"	m	struct:List_chunk
 n_libs	include/parrot/interpreter.h	/^    int         n_libs;                       \/* count of libs below *\/$/;"	m	struct:parrot_interp_t
@@ -15144,8 +15159,8 @@ n_mapped_I	include/parrot/jit.h	/^    int n_mapped_I;$/;"	m
 n_mics	include/parrot/pic.h	/^    size_t n_mics;			\/* range check, debugging mainly *\/$/;"	m	struct:Parrot_pic_store_t
 n_mmaps	src/malloc.c	/^  int              n_mmaps;$/;"	m	struct:malloc_state	file:
 n_mmaps_max	src/malloc.c	/^  int              n_mmaps_max;$/;"	m	struct:malloc_state	file:
-n_neg	./src/ops/math.ops	694;"	f
-n_not	./src/ops/cmp.ops	712;"	f
+n_neg	src/ops/math.ops	694;"	f
+n_not	src/ops/cmp.ops	712;"	f
 n_objects	include/parrot/smallobject.h	/^    UINTVAL n_objects;                  \/* live objects count *\/$/;"	m	struct:_gc_gms_gen
 n_objects	src/gc_ims.c	/^    size_t      n_objects;      \/* live count of prev run *\/$/;"	m	file:
 n_possibly_dead	include/parrot/smallobject.h	/^    UINTVAL n_possibly_dead;            \/* overwritten count *\/$/;"	m	struct:_gc_gms_gen
@@ -15270,22 +15285,21 @@ nci_v	src/nci_test.c	/^nci_v( ) {$/;"	f
 nci_vP	src/nci_test.c	/^nci_vP(void *pmc) {$/;"	f
 nci_vpii	src/nci_test.c	/^nci_vpii(Outer *my_data, int my_x, int my_y) {$/;"	f
 nci_vv	src/nci_test.c	/^nci_vv( void ) {$/;"	f
-ne	./src/ops/cmp.ops	175;"	f
-ne_addr	./src/ops/cmp.ops	239;"	f
-ne_num	./src/ops/cmp.ops	232;"	f
-ne_str	./src/ops/cmp.ops	225;"	f
+ne	src/ops/cmp.ops	175;"	f
+ne_addr	src/ops/cmp.ops	239;"	f
+ne_num	src/ops/cmp.ops	232;"	f
+ne_str	src/ops/cmp.ops	225;"	f
 need_endianize	include/parrot/packfile.h	/^    INTVAL                       need_endianize;$/;"	m	struct:PackFile
 need_group_setup	languages/regex/lib/Regex/Rewrite.pm	/^sub need_group_setup {$/;"	s
 need_wordsize	include/parrot/packfile.h	/^    INTVAL                       need_wordsize;$/;"	m	struct:PackFile
 needparen	languages/regex/lib/Regex/Ops/Tree.pm	/^sub needparen { 0 }$/;"	s
 needs_build	tools/build/dynoplibs.pl	/^sub needs_build {$/;"	s
 needs_build	tools/build/dynpmc.pl	/^sub needs_build {$/;"	s
-needs_destroy	./src/ops/core.ops	1097;"	f
-neg	./src/ops/math.ops	664;"	f
+needs_destroy	src/ops/core.ops	1093;"	f
 neg	include/parrot/vtable.h	/^    neg_method_t neg;$/;"	m	struct:_vtable
+neg	src/ops/math.ops	664;"	f
 neg_method_t	include/parrot/vtable.h	/^typedef PMC* (*neg_method_t)(Interp* interpreter, PMC* pmc, PMC* dest);$/;"	t
 nested	src/nci_test.c	/^    Nested *nested;$/;"	m	file:
-new	./src/ops/experimental.ops	142;"	f
 new	examples/benchmarks/oo1.pl	/^sub new {$/;"	s
 new	examples/benchmarks/oo2.pl	/^sub new {$/;"	s
 new	examples/benchmarks/oo3.pl	/^sub new {$/;"	s
@@ -15427,6 +15441,7 @@ new	lib/Pod/Simple/Text.pm	/^sub new {$/;"	s
 new	lib/Pod/Simple/TextContent.pm	/^sub new {$/;"	s
 new	lib/Pod/Simple/XMLOutStream.pm	/^sub new {$/;"	s
 new	lib/Test/Builder.pm	/^sub new {$/;"	s
+new	src/ops/experimental.ops	142;"	f
 new_array_type	languages/cola/type.c	/^Type * new_array_type(Symbol * typename, Symbol * sig) {$/;"	f
 new_ast	languages/cola/sym.c	/^AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2) {$/;"	f
 new_attrib_array	include/parrot/objects.h	80;"	d
@@ -15436,7 +15451,7 @@ new_buffer_pool	src/headers.c	/^new_buffer_pool(Interp *interpreter)$/;"	f
 new_bufferlike_header	src/headers.c	/^new_bufferlike_header(Interp *interpreter, size_t size)$/;"	f
 new_bufferlike_pool	src/headers.c	/^new_bufferlike_pool(Interp *interpreter,$/;"	f
 new_c_exception_handler	src/exceptions.c	/^new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)$/;"	f
-new_callback	./src/ops/core.ops	1218;"	f
+new_callback	src/ops/core.ops	1214;"	f
 new_closure	src/sub.c	/^new_closure(Interp *interp)$/;"	f
 new_con	compilers/ast/node.c	/^new_con(YYLTYPE *loc)$/;"	f	file:
 new_conditional	languages/cola/sym.c	/^AST * new_conditional(AST * condition, AST * then_part, AST * else_part) {$/;"	f
@@ -15482,7 +15497,7 @@ new_seg	include/parrot/packfile.h	/^    PackFile_Segment_new_func_t new_seg;$/;"
 new_singleton	include/parrot/vtable.h	/^    new_singleton_method_t new_singleton;$/;"	m	struct:_vtable
 new_singleton_method_t	include/parrot/vtable.h	/^typedef PMC* (*new_singleton_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
 new_small_object_pool	src/smallobject.c	/^new_small_object_pool(Interp *interpreter,$/;"	f
-new_stack	src/stacks.c	/^new_stack(Interp *interpreter, const char *name)$/;"	f
+new_stack	src/stacks.c	/^new_stack(Interp *interpreter, const char *name \/*NN*\/)$/;"	f
 new_statement	languages/cola/sym.c	/^AST * new_statement(int stmnttype, AST * left, AST * right) {$/;"	f
 new_stemp	languages/cola/gen.c	/^char * new_stemp() {$/;"	f
 new_string_header	src/headers.c	/^new_string_header(Interp *interpreter, UINTVAL flags)$/;"	f
@@ -15501,8 +15516,8 @@ new_temp_var	compilers/ast/node.c	/^new_temp_var(Interp* interp, int set)$/;"	f	
 new_tmp	languages/lua/Lua/build.pm	/^sub new_tmp {$/;"	s
 new_type_symbol	languages/cola/sym.c	/^Symbol * new_type_symbol(const char * name) {$/;"	f
 new_while	languages/cola/sym.c	/^AST * new_while(AST * condition, AST * block) {$/;"	f
-newclass	./src/ops/experimental.ops	378;"	f
-newclosure	./src/ops/core.ops	454;"	f
+newclass	src/ops/experimental.ops	378;"	f
+newclosure	src/ops/core.ops	451;"	f
 next	compilers/ast/ast.h	/^    struct nodeType_t *next;	\/* next statement *\/$/;"	m	struct:nodeType_t
 next	compilers/imcc/cfg.h	/^    struct _edge *next;$/;"	m	struct:_edge
 next	compilers/imcc/imc.h	/^    struct parser_state_t *next;$/;"	m	struct:parser_state_t
@@ -15580,17 +15595,17 @@ node_opt_t	compilers/ast/ast.h	/^typedef struct nodeType_t* (*node_opt_t)    (st
 node_to_pmc	compilers/ast/node.c	/^node_to_pmc(Interp* interpreter, nodeType *p)$/;"	f	file:
 nok_report	parrotbug	/^      nok_report: {$/;"	l
 noncontiguous	src/malloc.c	2382;"	d	file:
-noop	./src/ops/core.ops	103;"	f
+noop	src/ops/core.ops	103;"	f
 nosync_insert_entry	src/tsq.c	/^nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)$/;"	f
 nosync_pop_entry	src/tsq.c	/^nosync_pop_entry(QUEUE *queue) {$/;"	f
-not	./src/ops/cmp.ops	692;"	f
+not	src/ops/cmp.ops	692;"	f
 not_0	t/op/gc.t	/^not_0:$/;"	l
 not_empty	src/objects.c	/^not_empty(Interp* interpreter, PMC *seqs)$/;"	f	file:
 not_term	languages/m4/src/eval.c	/^not_term (eval_token et, eval_t *v1)$/;"	f	file:
 notify_func_table	src/interpreter.c	/^notify_func_table(Parrot_Interp interpreter, void* table, int on)$/;"	f	file:
 nret	compilers/imcc/symreg.h	/^    int nret;$/;"	m	struct:pcc_sub_t
 nsname	include/parrot/sub.h	/^    STRING* nsname;$/;"	m	struct:Parrot_Context_info
-null	./src/ops/set.ops	560;"	f
+null	src/ops/set.ops	556;"	f
 null_val	src/inter_call.c	/^null_val(int sig, struct call_state *st) $/;"	f	file:
 num_args	languages/tcl/tools/gen_inline.pl	/^sub num_args {$/;"	s
 num_early_DOD_PMCs	include/parrot/resources.h	/^    UINTVAL num_early_DOD_PMCs; \/* how many PMCs want immediate destruction *\/$/;"	m	struct:Arenas
@@ -15717,8 +15732,8 @@ opcode_to_prederef	src/ops/core_ops_cgp.c	16;"	d	file:
 opcode_to_prederef	src/ops/core_ops_switch.c	16;"	d	file:
 opcodes	docs/dev/nanoparrot.c	/^typedef enum { OPCODES } opcodes;$/;"	t	file:
 opcodetype	include/parrot/packfile.h	/^    opcode_t opcodetype;$/;"	m	struct:PackFile_Header
-open	./src/ops/io.ops	148;"	f
 open	compilers/imcc/instructions.h	/^    int (*open)(Interp *, void *param);$/;"	m	struct:_emittert
+open	src/ops/io.ops	147;"	f
 open_file	tools/build/pmc2c.pl	/^sub open_file {$/;"	s
 open_log_file	src/malloc-trace.c	/^open_log_file()$/;"	f	file:
 oplib_init_f	include/parrot/oplib.h	/^typedef op_lib_t *(*oplib_init_f)(long init);$/;"	t
@@ -15766,10 +15781,10 @@ options	lib/Parrot/Configure.pm	/^sub options$/;"	s
 options	src/pbc_merge.c	/^static struct longopt_opt_decl options[] = {$/;"	v	file:
 options	src/pdump.c	/^static struct longopt_opt_decl options[] = {$/;"	v	file:
 optype_of	languages/BASIC/compiler/COMP_expressions.pm	/^sub optype_of {$/;"	s
-or	./src/ops/cmp.ops	725;"	f
+or	src/ops/cmp.ops	725;"	f
 or_flag	lib/Parrot/OpsFile.pm	/^sub or_flag$/;"	s
 or_term	languages/m4/src/eval.c	/^or_term (eval_token et, eval_t *v1)$/;"	f	file:
-ord	./src/ops/string.ops	39;"	f
+ord	src/ops/string.ops	39;"	f
 ordblks	src/malloc.c	/^  int ordblks;  \/* number of free chunks *\/$/;"	m	struct:mallinfo	file:
 order_startset	languages/regex/lib/Regex/Ops/Tree.pm	/^sub order_startset {$/;"	s
 ostat	compilers/imcc/imc.h	/^EXTERN struct imcc_ostat ostat;$/;"	v
@@ -16403,7 +16418,7 @@ pcf_v_ptt	src/nci.c	/^pcf_v_ptt(Interp *interpreter, PMC *self)$/;"	f	file:
 pcf_v_t	src/nci.c	/^pcf_v_t(Interp *interpreter, PMC *self)$/;"	f	file:
 pcf_v_tiiiptt	src/nci.c	/^pcf_v_tiiiptt(Interp *interpreter, PMC *self)$/;"	f	file:
 pdb	include/parrot/interpreter.h	/^    PDB_t *pdb;                               \/* Debug system *\/$/;"	m	struct:parrot_interp_t
-peek	./src/ops/io.ops	391;"	f
+peek	src/ops/io.ops	386;"	f
 peek_entry	src/tsq.c	/^peek_entry(QUEUE *queue) {$/;"	f
 peer	languages/jako/lib/Jako/Construct/Block.pm	/^sub peer      { return shift->{PEER};  }$/;"	s
 peer	languages/jako/lib/Jako/Construct/Block/Conditional/Else.pm	/^sub peer { return shift->{PEER}; }$/;"	s
@@ -16428,17 +16443,17 @@ ph_many	src/jit/ia64/jit_emit.h	186;"	d
 phase	include/parrot/misc.h	/^        PHASE phase;$/;"	m	struct:spfinfo_t
 pic	include/parrot/pic.h	/^    Parrot_PIC *pic;		        \/* from rear *\/$/;"	m	struct:Parrot_pic_store_t
 pic	include/parrot/pic.h	/^    Parrot_PIC *pic;                    \/* more cache entries *\/$/;"	m	struct:Parrot_mic_t
-pic_callr__	./src/ops/pic.ops	246;"	f
-pic_get_params__	./src/ops/pic.ops	137;"	f
+pic_callr__	src/ops/pic.ops	246;"	f
+pic_get_params__	src/ops/pic.ops	137;"	f
 pic_idx	compilers/imcc/pbc.c	/^    int pic_idx;                        \/* next index of PIC *\/$/;"	m	struct:cs_t	file:
 pic_index	include/parrot/packfile.h	/^    struct PackFile_Segment   * pic_index; \/* segment of indices into store *\/$/;"	m	struct:PackFile_ByteCode
-pic_infix__	./src/ops/pic.ops	43;"	f
-pic_inline_sub__	./src/ops/pic.ops	83;"	f
-pic_set_returns__	./src/ops/pic.ops	188;"	f
+pic_infix__	src/ops/pic.ops	43;"	f
+pic_inline_sub__	src/ops/pic.ops	83;"	f
+pic_set_returns__	src/ops/pic.ops	188;"	f
 pic_store	include/parrot/packfile.h	/^    Parrot_PIC_store * pic_store;      \/* PIC storage *\/$/;"	m	struct:PackFile_ByteCode
 pic_test_func	src/pic_jit.c	/^pic_test_func(Interp *interpreter, INTVAL *sig_bits, void **args)$/;"	f	file:
 pid	src/malloc-trace.c	/^static int pid = 0;$/;"	v	file:
-pin	./src/ops/string.ops	166;"	f
+pin	src/ops/string.ops	166;"	f
 pio_buf_layer	src/io/io_buf.c	/^ParrotIOLayer pio_buf_layer = {$/;"	v
 pio_buf_layer_api	src/io/io_buf.c	/^const ParrotIOLayerAPI pio_buf_layer_api = {$/;"	v
 pio_mmap_layer	src/io/io_mmap.c	/^ParrotIOLayer pio_mmap_layer = {$/;"	v
@@ -16454,7 +16469,7 @@ pio_utf8_layer_api	src/io/io_utf8.c	/^static const ParrotIOLayerAPI pio_utf8_lay
 pio_utf8_layer_api	src/io/io_utf8.c	/^static const ParrotIOLayerAPI pio_utf8_layer_api;$/;"	v	file:
 pio_win32_layer	src/io/io_win32.c	/^ParrotIOLayer pio_win32_layer = {$/;"	v
 pio_win32_layer_api	src/io/io_win32.c	/^const ParrotIOLayerAPI pio_win32_layer_api = {$/;"	v
-pioctl	./src/ops/io.ops	128;"	f
+pioctl	src/ops/io.ops	127;"	f
 piodata	include/parrot/interpreter.h	/^    struct _ParrotIOData *piodata;            \/* interpreter's IO system *\/$/;"	m	struct:parrot_interp_t
 piooffsetzero	src/io/io.c	/^PIOOFF_T piooffsetzero;$/;"	v
 pipe_fds	src/events.c	/^static int pipe_fds[2];$/;"	v	file:
@@ -16494,13 +16509,13 @@ pobject_lives_fn	src/pmc/addrregistry.pmc	/^pobject_lives_fn(Interp *interp, POb
 pod	compilers/imcc/imclexer.c	2928;"	d	file:
 pod_as_html	lib/Parrot/Docs/File.pm	/^sub pod_as_html$/;"	s
 pod_errors	lib/Parrot/Docs/File.pm	/^sub pod_errors$/;"	s
-poll	./src/ops/io.ops	561;"	f
+poll	src/ops/io.ops	556;"	f
 pool	include/parrot/smallobject.h	/^    struct Small_Object_Pool * pool;$/;"	m	struct:Small_Object_Arena
 pool	include/parrot/smallobject.h	/^    struct Small_Object_Pool *pool;     \/* where this generation belongs to *\/$/;"	m	struct:_gc_gms_gen
 pool_iter_enum	include/parrot/headers.h	/^} pool_iter_enum;$/;"	t
 pool_iter_fn	include/parrot/headers.h	/^typedef int (*pool_iter_fn)(Interp *, struct Small_Object_Pool *, int, void*);$/;"	t
-pop	./src/ops/pmc.ops	433;"	f
 pop	languages/cola/sym.c	/^Node * pop(Node ** list) {$/;"	f
+pop	src/ops/pmc.ops	433;"	f
 pop_block	languages/jako/lib/Jako/Parser.pm	/^sub pop_block$/;"	s
 pop_dest	src/stacks.c	/^pop_dest(Interp *interpreter)$/;"	f
 pop_entry	src/tsq.c	/^pop_entry(QUEUE *queue) {$/;"	f
@@ -16519,12 +16534,12 @@ pop_scope	languages/cola/sym.c	/^Symbol * pop_scope() {$/;"	f
 pop_string	include/parrot/vtable.h	/^    pop_string_method_t pop_string;$/;"	m	struct:_vtable
 pop_string_method_t	include/parrot/vtable.h	/^typedef STRING* (*pop_string_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
 pop_sym	languages/cola/sym.c	/^Symbol * pop_sym(Symbol ** list) {$/;"	f
-popmark	./src/ops/core.ops	739;"	f
+popmark	src/ops/core.ops	736;"	f
 popop	languages/regex/lib/Regex/CodeGen/IMCC.pm	/^sub popop { "pop" };$/;"	s
 pos	languages/jako/lib/Jako/Processor.pm	/^sub pos$/;"	s
 possibly_reclaimable	include/parrot/resources.h	/^    size_t possibly_reclaimable;     \/* bytes that can possibly be reclaimed$/;"	m	struct:Memory_Pool
 postitempos	lib/Parse/RecDescent.pm	/^sub postitempos$/;"	s
-pow	./src/ops/experimental.ops	313;"	f
+pow	src/ops/experimental.ops	313;"	f
 ppc_flush_cache	src/jit/ppc/jit_emit.h	/^ppc_flush_cache(Parrot_jit_info_t * jit_info, Interp *i)$/;"	f
 ppc_flush_cache	src/jit/skeleton/jit_emit.h	/^ppc_flush_cache(Parrot_jit_info_t * jit_info, Interp *i)$/;"	f
 ppc_flush_line	src/jit/ppc/jit_emit.h	/^ppc_flush_line(char *_sync)$/;"	f
@@ -16547,7 +16562,7 @@ pred_list	compilers/imcc/cfg.h	/^    Edge *pred_list;$/;"	m	struct:_basic_block
 pred_next	compilers/imcc/cfg.h	/^    struct _edge *pred_next;$/;"	m	struct:_edge
 pred_offset	include/parrot/interpreter.h	/^    size_t pred_offset;$/;"	m	struct:Parrot_Context
 prederef	include/parrot/packfile.h	/^    Prederef prederef;          \/* The predereferenced code and info *\/$/;"	m	struct:PackFile_ByteCode
-prederef__	./src/ops/core.ops	134;"	f
+prederef__	src/ops/core.ops	134;"	f
 prederef_args	src/interpreter.c	/^prederef_args(void **pc_prederef, Interp *interpreter,$/;"	f	file:
 preferred_encoding	include/parrot/charset.h	/^    ENCODING *preferred_encoding;$/;"	m	struct:_charset
 prefix	languages/jako/lib/Jako/Construct/Block.pm	/^sub prefix$/;"	s
@@ -16586,7 +16601,7 @@ previous	src/malloc.c	/^    struct _region_list_entry *previous;$/;"	m	struct:_r
 prevwasreturn	lib/Parse/RecDescent.pm	/^sub prevwasreturn$/;"	s
 primary_block	languages/cola/sym.c	/^int             primary_block = 0;$/;"	v
 primary_block_stack	languages/cola/sym.c	/^AST             *primary_block_stack[256];$/;"	v
-print	./src/ops/io.ops	194;"	f
+print	src/ops/io.ops	189;"	f
 printGroup	languages/regex/lib/Regex/Driver.pm	/^printGroup:$/;"	l
 printLoop	languages/regex/lib/Regex/Driver.pm	/^printLoop:$/;"	l
 printMatchFailed	languages/regex/lib/Regex/Driver.pm	/^printMatchFailed:$/;"	l
@@ -16595,9 +16610,9 @@ print_debug	src/embed.c	/^print_debug(int status, void *p)$/;"	f	file:
 print_function	tools/build/nativecall.pl	/^sub print_function {$/;"	s
 print_head	tools/build/nativecall.pl	/^sub print_head {$/;"	s
 print_header	tools/dev/as2c.pl	/^sub print_header {$/;"	s
-print_item	./src/ops/python.ops	49;"	f
+print_item	src/ops/python.ops	49;"	f
 print_message	t/src/exit_2.c	/^        void print_message(int status, void* arg) {$/;"	f
-print_newline	./src/ops/python.ops	99;"	f
+print_newline	src/ops/python.ops	99;"	f
 print_pbc_location	src/warnings.c	/^print_pbc_location(Parrot_Interp interpreter)$/;"	f
 print_profile	src/embed.c	/^print_profile(int status, void *p)$/;"	f	file:
 print_stack	languages/python/pie-thon.pl	/^sub print_stack {$/;"	s
@@ -16609,7 +16624,7 @@ print_tail	tools/build/nativecall.pl	/^sub print_tail {$/;"	s
 print_tree	tools/build/pmc2c.pl	/^sub print_tree {$/;"	s
 print_warning	src/warnings.c	/^print_warning(Interp *interpreter, STRING *msg)$/;"	f	file:
 printem	lib/Class/Struct.pm	/^sub printem {$/;"	s
-printerr	./src/ops/io.ops	244;"	f
+printerr	src/ops/io.ops	239;"	f
 process	languages/regex/lib/Parrot/Test/Regex.pm	/^sub process {$/;"	s
 process_args	src/inter_call.c	/^process_args(Interp *interpreter, struct call_state *st, $/;"	f	file:
 process_cfile	tools/build/c2str.pl	/^sub process_cfile {$/;"	s
@@ -16627,13 +16642,13 @@ process_text_token	lib/Parrot/Docs/POD2HTML.pm	/^sub process_text_token$/;"	s
 process_upload	tools/util/smokeserv-server.pl	/^sub process_upload {$/;"	s
 proclaim	languages/perl6/t/01-sanity/Test.pm	/^sub proclaim (Bool $cond, Str $desc? is copy, $todo?, Str $got?, Str $expected?, $depends?, $negate?) returns Bool {$/;"	s
 prof_sort_f	src/embed.c	/^prof_sort_f(const void *a, const void *b)$/;"	f	file:
-profile	./src/ops/core.ops	802;"	f
 profile	include/parrot/interpreter.h	/^    RunProfile *profile;                      \/* The structure and array where we keep the$/;"	m	struct:parrot_interp_t
+profile	src/ops/core.ops	799;"	f
 profile_extra_enum	include/parrot/interpreter.h	/^} profile_extra_enum;$/;"	t
 promote	languages/python/pie-thon.pl	/^sub promote {$/;"	s
 prompt	lib/Parrot/Configure/Step.pm	/^sub prompt$/;"	s
 propagate_need	compilers/imcc/cfg.c	/^propagate_need(Basic_block *bb, SymReg* r, int i)$/;"	f	file:
-prophash	./src/ops/pmc.ops	584;"	f
+prophash	src/ops/pmc.ops	584;"	f
 props	languages/jako/lib/Jako/Construct/Block/Module.pm	/^sub props     { return %{shift->{PROPS}};  }$/;"	s
 props	languages/jako/lib/Jako/Construct/Block/Sub.pm	/^sub props     { return %{shift->{PROPS}};  }$/;"	s
 props	languages/jako/lib/Jako/Construct/Declaration/Sub.pm	/^sub props { return %{shift->{PROPS}}; }$/;"	s
@@ -16706,8 +16721,8 @@ public_vALLOc	src/malloc.c	543;"	d	file:
 public_vALLOc	src/malloc.c	559;"	d	file:
 pugs_bool_false	languages/pugs/pmc/pugsbool.pmc	/^PMC *pugs_bool_false;$/;"	v
 pugs_bool_true	languages/pugs/pmc/pugsbool.pmc	/^PMC *pugs_bool_true;$/;"	v
-push	./src/ops/pmc.ops	399;"	f
 push	languages/cola/sym.c	/^void push(Node ** list, Node * p) {$/;"	f
+push	src/ops/pmc.ops	399;"	f
 push_ascii_integer	src/pmc_freeze.c	/^push_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io, INTVAL v)$/;"	f	file:
 push_ascii_number	src/pmc_freeze.c	/^push_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)$/;"	f	file:
 push_ascii_pmc	src/pmc_freeze.c	/^push_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io, const PMC* v)$/;"	f	file:
@@ -16782,7 +16797,7 @@ push_c	src/jit_cpu.c	4629;"	d	file:
 push_c	src/jit_cpu.c	4754;"	d	file:
 push_c	src/jit_cpu.c	4774;"	d	file:
 push_content	languages/jako/lib/Jako/Construct/Block.pm	/^sub push_content$/;"	s
-push_eh	./src/ops/core.ops	699;"	f
+push_eh	src/ops/core.ops	696;"	f
 push_entry	src/tsq.c	/^push_entry(QUEUE *queue, QUEUE_ENTRY *entry) {$/;"	f
 push_exception	src/exceptions.c	/^push_exception(Interp * interpreter, PMC *handler)$/;"	f
 push_float	include/parrot/pmc_freeze.h	/^    push_number_f       push_float;$/;"	m	struct:_image_funcs
@@ -16880,9 +16895,9 @@ push_string	include/parrot/vtable.h	/^    push_string_method_t push_string;$/;"	
 push_string_f	include/parrot/pmc_freeze.h	/^typedef void    (*push_string_f)        (Parrot_Interp, IMAGE_IO*, STRING*);$/;"	t
 push_string_method_t	include/parrot/vtable.h	/^typedef void (*push_string_method_t)(Interp* interpreter, PMC* pmc, STRING* value);$/;"	t
 push_sym	languages/cola/sym.c	/^void push_sym(Symbol ** list, Symbol * p) {$/;"	f
-pushaction	./src/ops/core.ops	744;"	f
+pushaction	src/ops/core.ops	741;"	f
 pushargs	languages/BASIC/compiler/COMP_expressions.pm	/^sub pushargs {$/;"	s
-pushmark	./src/ops/core.ops	734;"	f
+pushmark	src/ops/core.ops	731;"	f
 pushop	languages/regex/lib/Regex/CodeGen/IMCC.pm	/^sub pushop { "push" };$/;"	s
 pushthing	languages/BASIC/compiler/COMP_expressions.pm	/^sub pushthing {$/;"	s
 pval	languages/cola/gen.c	/^int ival, nval, sval, pval;$/;"	v
@@ -17001,8 +17016,8 @@ rEALLOc	src/malloc.c	524;"	d	file:
 r_special	compilers/imcc/instructions.c	/^static int r_special[5];$/;"	v	file:
 ra	src/jit/mips/jit_emit.h	/^    ra$/;"	e
 rank	languages/cola/cola.h	/^    Rank    *rank;$/;"	m	struct:_Array
-read	./src/ops/io.ops	340;"	f
 read	lib/Parrot/IO/File.pm	/^sub read$/;"	s
+read	src/ops/io.ops	335;"	f
 read_all	tools/build/c2str.pl	/^sub read_all {$/;"	s
 read_braced	compilers/imcc/imclexer.c	/^read_braced (YYSTYPE *valp, void *interp, const char *macro_name,$/;"	f	file:
 read_dump	tools/build/pmc2c.pl	/^sub read_dump {$/;"	s
@@ -17011,7 +17026,7 @@ read_ops	lib/Parrot/OpsFile.pm	/^sub read_ops$/;"	s
 read_params	compilers/imcc/imclexer.c	/^read_params (YYSTYPE *valp, void *interp, struct params_t *params,$/;"	f	file:
 readable_name	src/objects.c	/^readable_name(Interp *interpreter, PMC *name)$/;"	f
 readjit	tools/build/jit2c.pl	/^sub readjit($) {$/;"	s
-readline	./src/ops/io.ops	357;"	f
+readline	src/ops/io.ops	352;"	f
 real_exception	src/exceptions.c	/^real_exception(Interp *interpreter, void *ret_addr,$/;"	f
 real_function	include/parrot/pic.h	/^        funcptr_t real_function; 	\/* the actual C code *\/$/;"	m	union:Parrot_pic_lru_t::<anonymous>
 realloc	src/malloc-trace.c	/^void* realloc(void* mem, size_t bytes)$/;"	f
@@ -17031,7 +17046,7 @@ recursion_depth	include/parrot/interpreter.h	/^    UINTVAL recursion_depth;    \
 recursion_limit	include/parrot/interpreter.h	/^    UINTVAL recursion_limit;                  \/* Sub call resursion limit *\/$/;"	m	struct:parrot_interp_t
 recursion_limit	src/pmc/parrotinterpreter.pmc	/^recursion_limit(Parrot_Interp interpreter, PMC *self, int l)$/;"	f	file:
 recursive_tail_call	compilers/imcc/pcc.c	/^recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,$/;"	f	file:
-recv	./src/ops/io.ops	549;"	f
+recv	src/ops/io.ops	544;"	f
 reduce	languages/regex/lib/Regex/Driver.pm	/^sub reduce {$/;"	s
 reduce_arenas	src/dod.c	/^reduce_arenas(Interp *interpreter,$/;"	f	file:
 ref_count	include/parrot/interpreter.h	/^    int ref_count;                   \/* how often refered to *\/$/;"	m	struct:Parrot_Context
@@ -17053,12 +17068,12 @@ regexp_isnt	languages/tcl/t/cmd_regexp.t	/^sub regexp_isnt { regexp_check(@_,0) 
 region_list_append	src/malloc.c	/^static int region_list_append (region_list_entry **last, void *base_reserved, long reserve_size) {$/;"	f	file:
 region_list_entry	src/malloc.c	/^} region_list_entry;$/;"	t	file:
 region_list_remove	src/malloc.c	/^static int region_list_remove (region_list_entry **last) {$/;"	f	file:
-register	./src/ops/pmc.ops	698;"	f
+register	src/ops/pmc.ops	698;"	f
 register_ast_compiler	compilers/ast/ast_main.c	/^register_ast_compiler(Interp* interpreter)$/;"	f	file:
 register_charset	src/charset.c	/^register_charset(Interp *interpreter, const char *charsetname,$/;"	f	file:
 register_compilers	compilers/imcc/parser_util.c	/^register_compilers(Parrot_Interp interp)$/;"	f
 register_encoding	src/encoding.c	/^register_encoding(Interp *interpreter, const char *encodingname,$/;"	f	file:
-register_new_stack	src/stack_common.c	/^register_new_stack(Interp *interpreter, const char *name, size_t item_size)$/;"	f
+register_new_stack	src/stack_common.c	/^register_new_stack(Interp *interpreter, const char *name \/*NN*\/, size_t item_size)$/;"	f
 register_pmc	src/core_pmcs.c	/^static void register_pmc(Interp *interp, PMC* registry, int pmc_id)$/;"	f	file:
 register_static_converters	src/charset.c	/^register_static_converters(Interp *interpreter)$/;"	f	file:
 register_type	src/objects.c	/^register_type(Interp *interpreter, PMC *name)$/;"	f	file:
@@ -17077,13 +17092,13 @@ relative_path_is_file	lib/Parrot/IO/Directory.pm	/^sub relative_path_is_file$/;"
 remote	src/io/io_private.h	/^    struct sockaddr_in remote;$/;"	m	struct:_ParrotIO
 remove_method	include/parrot/vtable.h	/^    remove_method_method_t remove_method;$/;"	m	struct:_vtable
 remove_method_method_t	include/parrot/vtable.h	/^typedef void (*remove_method_method_t)(Interp* interpreter, PMC* pmc, STRING* method);$/;"	t
-removeattribute	./src/ops/object.ops	389;"	f
-removedoes	./src/ops/object.ops	472;"	f
-removeparent	./src/ops/object.ops	365;"	f
+removeattribute	src/ops/object.ops	389;"	f
+removedoes	src/ops/object.ops	472;"	f
+removeparent	src/ops/object.ops	365;"	f
 render	languages/regex/lib/Regex/CodeGen.pm	/^sub render {$/;"	s
 renum_op_map_file	tools/build/ops2pm.pl	/^sub renum_op_map_file {$/;"	s
-repeat	./src/ops/string.ops	117;"	f
 repeat	include/parrot/events.h	/^    int                         repeat; \/* 0 = once, -1 = forever *\/$/;"	m
+repeat	src/ops/string.ops	117;"	f
 replenish_level	include/parrot/smallobject.h	/^    size_t replenish_level;$/;"	m	struct:Small_Object_Pool
 report_failure	languages/perl6/t/01-sanity/Test.pm	/^sub report_failure (Str $todo?, Str $got?, Str $expected?, Bool $negate?) returns Bool {$/;"	s
 report_odd_hash	lib/Parrot/Test.pm	/^sub report_odd_hash {$/;"	s
@@ -17106,7 +17121,7 @@ require_semicolon	languages/jako/lib/Jako/Processor.pm	/^sub require_semicolon  
 require_type	languages/jako/lib/Jako/Processor.pm	/^sub require_type          { return shift->require('type');          }$/;"	s
 require_value	languages/jako/lib/Jako/Processor.pm	/^sub require_value         { return shift->require('ident', 'literal'); }$/;"	s
 reserve_size	src/malloc.c	/^    long reserve_size;$/;"	m	struct:_region_list_entry	file:
-reserved	./src/ops/core.ops	139;"	f
+reserved	src/ops/core.ops	139;"	f
 reset	lib/Digest/Perl/MD5.pm	/^sub reset {$/;"	s
 reset	lib/Parse/RecDescent.pm	/^sub reset($)$/;"	s
 reset	lib/Test/Builder.pm	/^sub reset {$/;"	s
@@ -17122,33 +17137,33 @@ restart_address	lib/Parrot/OpTrans/Compiled.pm	/^sub restart_address$/;"	s
 restart_offset	lib/Parrot/OpTrans/C.pm	/^sub restart_offset$/;"	s
 restart_offset	lib/Parrot/OpTrans/CGoto.pm	/^sub restart_offset$/;"	s
 restart_offset	lib/Parrot/OpTrans/Compiled.pm	/^sub restart_offset$/;"	s
-restore	./src/ops/stack.ops	233;"	f
-restoreall	./src/ops/stack.ops	50;"	f
+restore	src/ops/stack.ops	233;"	f
+restoreall	src/ops/stack.ops	50;"	f
 result	lib/Parrot/Configure/Step/Base.pm	/^sub result$/;"	s
-result_info	./src/ops/core.ops	573;"	f
+result_info	src/ops/core.ops	570;"	f
 resume	include/parrot/exceptions.h	/^    void *resume;                       \/* opcode_t* for resume or NULL *\/$/;"	m	struct:parrot_exception_t
 resume_flag	include/parrot/interpreter.h	/^    INTVAL resume_flag;$/;"	m	struct:parrot_interp_t
 resume_flag_enum	include/parrot/interpreter.h	/^} resume_flag_enum;$/;"	t
 resume_offset	include/parrot/interpreter.h	/^    size_t resume_offset;$/;"	m	struct:parrot_interp_t
 resync	lib/Parse/RecDescent.pm	/^sub resync       # ($linecounter)$/;"	s
-ret	./src/ops/core.ops	216;"	f
 ret	compilers/imcc/symreg.h	/^    SymReg ** ret;$/;"	m	struct:pcc_sub_t
+ret	src/ops/core.ops	216;"	f
 ret0	t/op/gc.t	/^ret0:$/;"	l
 ret1	t/op/gc.t	/^ret1:$/;"	l
 ret_flags	compilers/imcc/symreg.h	/^    int *ret_flags;	\/* :slurpy, :optional, ... *\/$/;"	m	struct:pcc_sub_t
-ret_float	src/pmc/unmanagedstruct.pmc	/^ret_float(char *p, int type)$/;"	f	file:
+ret_float	src/pmc/unmanagedstruct.pmc	/^ret_float(const char *p, int type)$/;"	f	file:
 ret_int	src/pmc/sarray.pmc	/^ret_int(Interp* interpreter, HashEntry *e)$/;"	f	file:
-ret_int	src/pmc/unmanagedstruct.pmc	/^ret_int(char *p, int type)$/;"	f	file:
+ret_int	src/pmc/unmanagedstruct.pmc	/^ret_int(const char *p, int type)$/;"	f	file:
 ret_num	src/pmc/sarray.pmc	/^ret_num(Interp* interpreter, HashEntry *e)$/;"	f	file:
 ret_pmc	src/pmc/sarray.pmc	/^ret_pmc(Interp* interpreter, HashEntry *e)$/;"	f	file:
 ret_pmc	src/pmc/unmanagedstruct.pmc	/^ret_pmc(Interp* interpreter, PMC* pmc, char *p, int type, INTVAL idx)$/;"	f	file:
 ret_string	src/pmc/sarray.pmc	/^ret_string(Interp* interpreter, HashEntry *e)$/;"	f	file:
 ret_string	src/pmc/unmanagedstruct.pmc	/^ret_string(Interp* interpreter, char *p, int type)$/;"	f	file:
 ret_val	languages/python/pie-thon.pl	/^sub ret_val {$/;"	s
-rethrow	./src/ops/core.ops	717;"	f
+rethrow	src/ops/core.ops	714;"	f
 rethrow_c_exception	src/exceptions.c	/^rethrow_c_exception(Interp * interpreter)$/;"	f
 rethrow_exception	src/exceptions.c	/^rethrow_exception(Interp * interpreter, PMC *exception)$/;"	f
-returncc	./src/ops/core.ops	446;"	f
+returncc	src/ops/core.ops	445;"	f
 returns_match_results	src/pic_jit.c	/^returns_match_results(Interp *interpreter, PMC *sig_ret, PMC *sig_result)$/;"	f	file:
 retval	languages/pugs/pmc/pugscapture.pmc	/^static PMC* retval(Interp *interp, void *ret)$/;"	f	file:
 retval	src/pmc/array.pmc	/^static PMC* retval(Interp *interp, void *ret)$/;"	f	file:
@@ -17198,10 +17213,10 @@ right	languages/jako/lib/Jako/Construct/Statement/Return.pm	/^sub right { return
 rindex	include/parrot/charset.h	/^    charset_rindex_t rindex;$/;"	m	struct:_charset
 root_section	lib/Parrot/Docs/Section.pm	/^sub root_section$/;"	s
 rop	languages/regex/lib/Regex/Ops/Tree.pm	/^sub rop {$/;"	s
-rot	./src/ops/bit.ops	270;"	f
-rotate_entries	src/stacks.c	/^rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, INTVAL num_entries)$/;"	f
+rot	src/ops/bit.ops	270;"	f
+rotate_entries	src/stacks.c	/^rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p \/*NN*\/, INTVAL num_entries)$/;"	f
 rotate_left	lib/Digest/Perl/MD5.pm	/^sub rotate_left($$) {$/;"	s
-rotate_up	./src/ops/stack.ops	271;"	f
+rotate_up	src/ops/stack.ops	271;"	f
 rotation	src/jit/arm/jit_emit.h	/^    unsigned char rotation;$/;"	m	struct:constant
 round	lib/Digest/Perl/MD5.pm	/^  sub round {$/;"	s
 roundDownPowerOf2	config/gen/platform/darwin/memalign.c	/^static unsigned roundDownPowerOf2(unsigned x) { return (1 << log2int(x)); };$/;"	f	file:
@@ -17245,7 +17260,7 @@ run_tests	languages/tcl/tools/tcl-test.pl	/^sub run_tests {$/;"	s
 run_thaw	src/pmc_freeze.c	/^run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)$/;"	f	file:
 runcore2human	tools/util/smokeserv-server.pl	/^sub runcore2human {$/;"	s
 runcore_from_args	tools/util/smokeserv-server.pl	/^sub runcore_from_args {$/;"	s
-runinterp	./src/ops/core.ops	983;"	f
+runinterp	src/ops/core.ops	980;"	f
 runloop_level	include/parrot/exceptions.h	/^    int runloop_level;                  \/* for reentering run loop *\/$/;"	m	struct:parrot_exception_t
 runloop_level	include/parrot/interpreter.h	/^    int runloop_level;                  \/* for reentering run loop *\/$/;"	m	struct:Parrot_Context
 running_threads	src/thread.c	/^static int running_threads;$/;"	v	file:
@@ -17354,8 +17369,8 @@ s6	src/jit/mips/jit_emit.h	/^    s6,$/;"	e
 s7	src/jit/mips/jit_emit.h	/^    s7,$/;"	e
 sYSMALLOc	src/malloc.c	/^static Void_t* sYSMALLOc(INTERNAL_SIZE_T nb, mstate av)$/;"	f	file:
 sYSTRIm	src/malloc.c	/^static int sYSTRIm(size_t pad, mstate av)$/;"	f	file:
-saneify_string	src/string.c	41;"	d	file:
-save	./src/ops/stack.ops	185;"	f
+saneify_string	src/string.c	42;"	d	file:
+save	src/ops/stack.ops	185;"	f
 save_func_table	include/parrot/interpreter.h	/^    op_func_t *save_func_table;               \/* for restoring op_func_table *\/$/;"	m	struct:parrot_interp_t
 save_int	src/exec_save.c	/^save_int(FILE *fp, int i)$/;"	f	file:
 save_regs_t	src/register.c	/^} save_regs_t;$/;"	t	file:
@@ -17363,8 +17378,8 @@ save_report	parrotbug	/^sub save_report {$/;"	s
 save_short	src/exec_save.c	/^save_short(FILE *fp, short s)$/;"	f	file:
 save_struct	src/exec_save.c	/^save_struct(FILE *fp, void *sp, size_t size)$/;"	f	file:
 save_zero	src/exec_save.c	/^save_zero(FILE *fp)$/;"	f	file:
-saveall	./src/ops/stack.ops	39;"	f
-savec	./src/ops/stack.ops	214;"	f
+saveall	src/ops/stack.ops	39;"	f
+savec	src/ops/stack.ops	214;"	f
 sax	languages/jako/lib/Jako/Construct/Block/Bare.pm	/^sub sax$/;"	s
 sax	languages/jako/lib/Jako/Construct/Block/Conditional.pm	/^sub sax$/;"	s
 sax	languages/jako/lib/Jako/Construct/Block/File.pm	/^sub sax$/;"	s
@@ -17405,11 +17420,11 @@ scope_of_ident	languages/jako/lib/Jako/Construct/Block.pm	/^sub scope_of_ident$/
 scope_stack	languages/cola/sym.c	/^int		scope_stack[1024];$/;"	v
 scream	lib/Pod/Simple.pm	/^sub scream {    # like whine, but not suppressable$/;"	s
 search_predecessors_not_in	compilers/imcc/cfg.c	/^search_predecessors_not_in(Basic_block *node, Set* s)$/;"	f
-sec	./src/ops/math.ops	929;"	f
-sech	./src/ops/math.ops	942;"	f
+sec	src/ops/math.ops	929;"	f
+sech	src/ops/math.ops	942;"	f
 sections	include/parrot/jit.h	/^    Parrot_jit_optimizer_section_t  *sections;$/;"	m
 seed	include/parrot/hash.h	/^    size_t seed;                \/* randomizes the hash_key generation$/;"	m	struct:_hash
-seek	./src/ops/io.ops	459;"	f
+seek	src/ops/io.ops	454;"	f
 seen	include/parrot/pmc_freeze.h	/^    PMC*                seen;           \/* seen hash *\/$/;"	m	struct:_visit_info
 seg	compilers/imcc/pbc.c	/^    struct PackFile_ByteCode *seg;      \/* bytecode segment *\/$/;"	m	struct:cs_t	file:
 seg	include/parrot/packfile.h	/^    struct PackFile_ByteCode *seg;$/;"	m	struct:PackFile_FixupEntry
@@ -17419,17 +17434,17 @@ seg	include/parrot/sub.h	/^    struct PackFile_ByteCode *seg;   \/* bytecode seg
 segment_init	src/packfile.c	/^segment_init (Interp* interpreter, struct PackFile_Segment *self,$/;"	f	file:
 segments	include/parrot/packfile.h	/^    struct PackFile_Segment   ** segments;$/;"	m	struct:PackFile_Directory
 self	include/parrot/io.h	/^    void *self;                 \/* Instance specific data       *\/$/;"	m	struct:_ParrotIOLayer
-send	./src/ops/io.ops	556;"	f
+send	src/ops/io.ops	551;"	f
 send_report	parrotbug	/^sub send_report {$/;"	s
-set	./src/ops/set.ops	127;"	f
 set	compilers/imcc/symreg.h	/^    int set;                 \/* Which register set\/file it belongs to *\/$/;"	m	struct:_SymReg
 set	lib/Parrot/Configure/Data.pm	/^sub set$/;"	s
 set	src/charset.c	/^    One_charset *set;$/;"	m	file:
+set	src/ops/set.ops	123;"	f
 set_add	compilers/imcc/sets.c	/^set_add(Set *s, int element)$/;"	f
-set_addr	./src/ops/core.ops	624;"	f
+set_addr	src/ops/core.ops	621;"	f
 set_and_advance	include/parrot/string.h	/^    void (*set_and_advance)(Interp *, struct string_iterator_t *i, UINTVAL c);$/;"	m	struct:string_iterator_t
 set_anychunks	src/malloc.c	2345;"	d	file:
-set_args	./src/ops/core.ops	493;"	f
+set_args	src/ops/core.ops	490;"	f
 set_attr	include/parrot/vtable.h	/^    set_attr_method_t set_attr;$/;"	m	struct:_vtable
 set_attr_method_t	include/parrot/vtable.h	/^typedef void (*set_attr_method_t)(Interp* interpreter, PMC* pmc, INTVAL idx, PMC* value);$/;"	t
 set_attr_str	include/parrot/vtable.h	/^    set_attr_str_method_t set_attr_str;$/;"	m	struct:_vtable
@@ -17544,7 +17559,7 @@ set_position	include/parrot/string.h	/^    void (*set_position)(Interp *, struct
 set_reg_usage	src/jit.c	/^set_reg_usage(Interp *interpreter, opcode_t *pc)$/;"	f	file:
 set_register_usage	src/jit.c	/^set_register_usage(Interp *interpreter,$/;"	f	file:
 set_result	lib/Parrot/Configure/Step/Base.pm	/^sub set_result$/;"	s
-set_returns	./src/ops/core.ops	539;"	f
+set_returns	src/ops/core.ops	536;"	f
 set_retval	src/inter_call.c	/^set_retval(Parrot_Interp interpreter, int sig_ret, parrot_context_t *ctx)$/;"	f
 set_retval_f	src/inter_call.c	/^set_retval_f(Parrot_Interp interpreter, int sig_ret, parrot_context_t *ctx)$/;"	f
 set_retval_i	src/inter_call.c	/^set_retval_i(Parrot_Interp interpreter, int sig_ret, parrot_context_t *ctx)$/;"	f
@@ -17565,22 +17580,22 @@ set_string_same_method_t	include/parrot/vtable.h	/^typedef void (*set_string_sam
 set_symbol	languages/jako/lib/Jako/Construct/Block.pm	/^sub set_symbol$/;"	s
 set_test_info	lib/Parrot/Test/Perl6.pm	/^sub set_test_info {$/;"	s
 set_union	compilers/imcc/sets.c	/^set_union(Set *s1, Set *s2)$/;"	f
-setattribute	./src/ops/object.ops	426;"	f
+setattribute	src/ops/object.ops	426;"	f
 sethashname	lib/Parse/RecDescent.pm	/^sub sethashname { $_[0]->{hashname} = '__ACTION' . ++$_[1]->{actcount} .'__'; }$/;"	s
 sethashname	lib/Parse/RecDescent.pm	/^sub sethashname { $_[0]->{hashname} = '__DIRECTIVE' . ++$_[1]->{dircount} .  '__'; }$/;"	s
 sethashname	lib/Parse/RecDescent.pm	/^sub sethashname { $_[0]->{hashname} = '__PATTERN' . ++$_[1]->{patcount} . '__'; }$/;"	s
 sethashname	lib/Parse/RecDescent.pm	/^sub sethashname { $_[0]->{hashname} = '__STRING' . ++$_[1]->{strcount} . '__'; }$/;"	s
 sethashname	lib/Parse/RecDescent.pm	/^sub sethashname { }$/;"	s
 sethashname	lib/Parse/RecDescent.pm	/^sub sethashname {}$/;"	s
-seti_ind	./src/ops/set.ops	353;"	f
-setn_ind	./src/ops/set.ops	323;"	f
+seti_ind	src/ops/set.ops	349;"	f
+setn_ind	src/ops/set.ops	319;"	f
 setopt	examples/c/test_main.c	28;"	d	file:
-setp_ind	./src/ops/set.ops	308;"	f
-setprop	./src/ops/pmc.ops	544;"	f
+setp_ind	src/ops/set.ops	304;"	f
 setprop	include/parrot/vtable.h	/^    setprop_method_t setprop;$/;"	m	struct:_vtable
+setprop	src/ops/pmc.ops	544;"	f
 setprop_method_t	include/parrot/vtable.h	/^typedef void (*setprop_method_t)(Interp* interpreter, PMC* pmc, STRING* key, PMC* value);$/;"	t
-setref	./src/ops/set.ops	284;"	f
-sets_ind	./src/ops/set.ops	338;"	f
+setref	src/ops/set.ops	280;"	f
+sets_ind	src/ops/set.ops	334;"	f
 settrigger	lib/Parrot/Configure/Data.pm	/^sub settrigger$/;"	s
 setup_argv	src/embed.c	/^setup_argv(Interp *interpreter, int argc, char ** argv)$/;"	f	file:
 setup_compression	tools/util/smokeserv-client.pl	/^sub setup_compression {$/;"	s
@@ -17591,7 +17606,7 @@ severity	include/parrot/exceptions.h	/^    exception_severity severity;        \
 sh_add	src/exec_save.c	162;"	d	file:
 share	include/parrot/vtable.h	/^    share_method_t share;$/;"	m	struct:_vtable
 share_method_t	include/parrot/vtable.h	/^typedef void (*share_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
-shift	./src/ops/pmc.ops	501;"	f
+shift	src/ops/pmc.ops	501;"	f
 shift_ASL	src/jit/arm/jit_emit.h	/^    shift_ASL = 0x00	\/* Synonym - no sign extension (or not) on <<  *\/$/;"	e
 shift_ASR	src/jit/arm/jit_emit.h	/^    shift_ASR = 0x40,$/;"	e
 shift_LSL	src/jit/arm/jit_emit.h	/^    shift_LSL = 0x00,$/;"	e
@@ -17623,14 +17638,14 @@ shift_string	include/parrot/vtable.h	/^    shift_string_method_t shift_string;$/
 shift_string_f	include/parrot/pmc_freeze.h	/^typedef STRING* (*shift_string_f)       (Parrot_Interp, IMAGE_IO*);$/;"	t
 shift_string_method_t	include/parrot/vtable.h	/^typedef STRING* (*shift_string_method_t)(Interp* interpreter, PMC* pmc);$/;"	t
 shift_term	languages/m4/src/eval.c	/^shift_term (eval_token et, eval_t *v1)$/;"	f	file:
-shl	./src/ops/bit.ops	203;"	f
+shl	src/ops/bit.ops	203;"	f
 short	lib/Text/Balanced.pm	/^short:$/;"	l
 short_description	lib/Parrot/Docs/File.pm	/^sub short_description$/;"	s
 show_backtrace	src/pmc/null.pmc	/^show_backtrace(int ret, void *interp)$/;"	f	file:
 show_context	compilers/ast/node.c	/^static int show_context;$/;"	v	file:
 show_help	tools/dev/nm.pl	/^sub show_help {$/;"	s
 show_version	tools/dev/nm.pl	/^sub show_version {$/;"	s
-shr	./src/ops/bit.ops	225;"	f
+shr	src/ops/bit.ops	225;"	f
 sig	include/parrot/inter_call.h	/^            const char *sig;$/;"	m	struct:call_state_1::<anonymous>::<anonymous>
 sig	include/parrot/inter_call.h	/^        } sig;$/;"	m	union:call_state_1::<anonymous>
 sig	include/parrot/inter_call.h	/^    INTVAL sig;$/;"	m	struct:call_state_1
@@ -17649,9 +17664,9 @@ signbit	config/gen/platform/generic/math.h	15;"	d
 signbit	include/parrot/platform.h	41;"	d
 signbit	include/parrot/platform.h	44;"	d
 simple_term	languages/m4/src/eval.c	/^simple_term (eval_token et, eval_t *v1)$/;"	f	file:
-sin	./src/ops/math.ops	955;"	f
-singleton	./src/ops/object.ops	318;"	f
-sinh	./src/ops/math.ops	968;"	f
+sin	src/ops/math.ops	955;"	f
+singleton	src/ops/object.ops	318;"	f
+sinh	src/ops/math.ops	968;"	f
 sit	src/jit/ia64/jit_emit.h	/^inst_tmp_t sit;$/;"	v
 siva	languages/pugs/pmc/pugscapture.pmc	/^typedef struct siva {$/;"	s	file:
 siva	languages/pugs/pmc/pugscapture.pmc	/^} siva;$/;"	t	file:
@@ -17685,7 +17700,7 @@ size	lib/Parrot/Op.pm	/^sub size$/;"	s
 size	src/io/io_private.h	/^    size_t size;$/;"	m	struct:_ParrotIOBuf
 size	src/malloc.c	/^  INTERNAL_SIZE_T      size;       \/* Size in bytes, including overhead. *\/$/;"	m	struct:malloc_chunk	file:
 sized_header_pools	include/parrot/resources.h	/^    struct Small_Object_Pool **sized_header_pools;$/;"	m	struct:Arenas
-sizeof	./src/ops/sys.ops	322;"	f
+sizeof	src/ops/sys.ops	322;"	f
 skip	include/parrot/debug.h	/^    long                    skip;$/;"	m	struct:PDB_breakpoint
 skip	include/parrot/jit.h	/^    char                        skip;$/;"	m	struct:Parrot_jit_fixup
 skip	include/parrot/smallobject.h	/^    int skip;$/;"	m	struct:Small_Object_Pool
@@ -17716,10 +17731,10 @@ skip_why	languages/bc/lib/Parrot/Test/Bc/Antlr2.pm	/^sub skip_why {$/;"	s
 skip_why	languages/bc/lib/Parrot/Test/Bc/Antlr3.pm	/^sub skip_why {$/;"	s
 skip_why	languages/bc/lib/Parrot/Test/Bc/Posix.pm	/^sub skip_why {$/;"	s
 skip_ws	src/debug.c	/^skip_ws(const char* str)$/;"	f	file:
-sleep	./src/ops/sys.ops	294;"	f
+sleep	src/ops/sys.ops	294;"	f
 sleeping	include/parrot/interpreter.h	/^    int sleeping;                             \/* used during sleep in events *\/$/;"	m	struct:parrot_interp_t
-slice	./src/ops/experimental.ops	183;"	f
 slice	include/parrot/vtable.h	/^    slice_method_t slice;$/;"	m	struct:_vtable
+slice	src/ops/experimental.ops	183;"	f
 slice_deb	compilers/imcc/pbc.c	/^slice_deb(int bits) {$/;"	f	file:
 slice_method_t	include/parrot/vtable.h	/^typedef PMC* (*slice_method_t)(Interp* interpreter, PMC* pmc, PMC* key, INTVAL flag);$/;"	t
 slot_ptr	include/parrot/jit.h	/^    INTVAL                          *slot_ptr;$/;"	m
@@ -17733,8 +17748,8 @@ slwait	src/malloc.c	/^static int slwait (int *sl) {$/;"	f	file:
 smallbin_index	src/malloc.c	2165;"	d	file:
 smblks	src/malloc.c	/^  int smblks;   \/* number of fastbin blocks *\/$/;"	m	struct:mallinfo	file:
 snprintf	src/spf_render.c	32;"	d	file:
-sockaddr	./src/ops/io.ops	539;"	f
-socket	./src/ops/io.ops	531;"	f
+sockaddr	src/ops/io.ops	534;"	f
+socket	src/ops/io.ops	526;"	f
 sort_func_t	src/pmc/fixedpmcarray.pmc	/^typedef INTVAL (*sort_func_t)(Interp *, void*, void*);$/;"	t	file:
 sort_loops	compilers/imcc/cfg.c	/^sort_loops(Parrot_Interp interpreter, IMC_Unit * unit)$/;"	f	file:
 sort_pmcs	config/inter/pmc.pm	/^sub sort_pmcs$/;"	s
@@ -17750,7 +17765,7 @@ sourcefilename	include/parrot/debug.h	/^    char                    *sourcefilen
 sp	src/jit/mips/jit_emit.h	/^    sp,$/;"	e
 space	languages/tcl/src/pmc/tcllist.pmc	/^static STRING *space, *ob, *cb;$/;"	v	file:
 sparse	include/parrot/list.h	27;"	d
-spawnw	./src/ops/sys.ops	38;"	f
+spawnw	src/ops/sys.ops	38;"	f
 spec	src/jit_debug.c	/^    const char *spec;$/;"	m	file:
 spec	src/jit_debug_xcoff.c	/^    const char *spec;$/;"	m	file:
 special_core_ops_enum	include/parrot/oplib.h	/^} special_core_ops_enum;$/;"	t
@@ -17760,13 +17775,13 @@ spf_type_t	include/parrot/misc.h	/^    typedef enum spf_type_t {$/;"	g
 spfinfo_t	include/parrot/misc.h	/^    typedef struct spfinfo_t {$/;"	s
 spill	compilers/imcc/reg_alloc_bc.c	/^spill(Interp *interpreter, IMC_Unit * unit, int spilled)$/;"	f	file:
 spill_registers	compilers/imcc/reg_alloc_bc.c	/^spill_registers(Parrot_Interp interpreter, IMC_Unit* unit, graph* G)$/;"	f	file:
-splice	./src/ops/experimental.ops	160;"	f
 splice	include/parrot/vtable.h	/^    splice_method_t splice;$/;"	m	struct:_vtable
+splice	src/ops/experimental.ops	160;"	f
 splice_method_t	include/parrot/vtable.h	/^typedef void (*splice_method_t)(Interp* interpreter, PMC* pmc, PMC* value, INTVAL offset, INTVAL count);$/;"	t
-split	./src/ops/string.ops	485;"	f
 split	languages/cola/sym.c	/^Symbol * split(const char * pattern, const char * s) {$/;"	f
+split	src/ops/string.ops	485;"	f
 split_chunk	src/list.c	/^split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)$/;"	f	file:
-sprintf	./src/ops/string.ops	315;"	f
+sprintf	src/ops/string.ops	315;"	f
 sprintf_getchar_t	include/parrot/misc.h	/^    typedef STRING *(*sprintf_getchar_t) (Interp *, INTVAL,$/;"	t
 sprintf_getfloat_t	include/parrot/misc.h	/^    typedef HUGEFLOATVAL(*sprintf_getfloat_t) (Interp *, INTVAL,$/;"	t
 sprintf_getint_t	include/parrot/misc.h	/^    typedef HUGEINTVAL(*sprintf_getint_t) (Interp *, INTVAL,$/;"	t
@@ -17774,7 +17789,7 @@ sprintf_getptr_t	include/parrot/misc.h	/^    typedef void *(*sprintf_getptr_t) (
 sprintf_getstring_t	include/parrot/misc.h	/^    typedef STRING *(*sprintf_getstring_t) (Interp *, INTVAL,$/;"	t
 sprintf_getuint_t	include/parrot/misc.h	/^    typedef UHUGEINTVAL(*sprintf_getuint_t) (Interp *, INTVAL,$/;"	t
 sprintf_obj	include/parrot/misc.h	/^    struct sprintf_obj {$/;"	s
-sqrt	./src/ops/math.ops	756;"	f
+sqrt	src/ops/math.ops	756;"	f
 sr	compilers/imcc/imcparser.c	/^    SymReg * sr;$/;"	m	union:YYSTYPE	file:
 sr	compilers/imcc/imcparser.h	/^    SymReg * sr;$/;"	m	union:YYSTYPE
 sr_return	compilers/imcc/imc.h	/^    SymReg* sr_return;$/;"	m	struct:_imc_info_t
@@ -17783,13 +17798,13 @@ src	include/parrot/inter_call.h	/^    struct call_state_1 src;$/;"	m	struct:call
 src	include/parrot/packfile.h	/^    opcode_t *src;              \/* the possible mmap()ed start of the PF *\/$/;"	m	struct:PackFile
 stack	src/io/io_private.h	/^    ParrotIOLayer *stack;$/;"	m	struct:_ParrotIO
 stack_destroy	src/stacks.c	/^stack_destroy(Stack_Chunk_t * top)$/;"	f
-stack_entry	src/stacks.c	/^stack_entry(Interp *interpreter, Stack_Chunk_t *stack, INTVAL depth)$/;"	f
-stack_height	src/stacks.c	/^stack_height(Interp *interpreter, Stack_Chunk_t *chunk)$/;"	f
-stack_peek	src/stacks.c	/^stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,$/;"	f
-stack_pop	src/stacks.c	/^stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,$/;"	f
-stack_prepare_pop	src/stack_common.c	/^stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)$/;"	f
-stack_prepare_push	src/stack_common.c	/^stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)$/;"	f
-stack_push	src/stacks.c	/^stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,$/;"	f
+stack_entry	src/stacks.c	/^stack_entry(Interp *interpreter, Stack_Chunk_t *stack \/*NN*\/, INTVAL depth)$/;"	f
+stack_height	src/stacks.c	/^stack_height(Interp *interpreter, const Stack_Chunk_t *chunk \/*NN*\/)$/;"	f
+stack_peek	src/stacks.c	/^stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base \/*NN*\/,$/;"	f
+stack_pop	src/stacks.c	/^stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p \/*NN*\/,$/;"	f
+stack_prepare_pop	src/stack_common.c	/^stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p \/*NN*\/)$/;"	f
+stack_prepare_push	src/stack_common.c	/^stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p \/*NN*\/)$/;"	f
+stack_push	src/stacks.c	/^stack_push(Interp *interpreter, Stack_Chunk_t **stack_p \/*NN*\/,$/;"	f
 stack_system_init	src/stack_common.c	/^stack_system_init(Interp *interpreter)$/;"	f
 start	compilers/imcc/cfg.h	/^    Instruction *start;         \/* First instruction in basic block *\/$/;"	m	struct:_basic_block
 start	config/gen/platform/darwin/memalign.c	/^                    vm_address_t start; $/;"	m	struct:_memalign_marker_t	file:
@@ -17844,8 +17859,8 @@ starttime	include/parrot/interpreter.h	/^    FLOATVAL starttime;$/;"	m	struct:_R
 startup	languages/regex/lib/Regex/Rewrite.pm	/^sub startup {$/;"	s
 stash_hash	include/parrot/interpreter.h	/^    struct PMC *stash_hash;                   \/* namespace hash *\/$/;"	m	struct:parrot_interp_t
 stash_hash	include/parrot/resources.h	/^    struct PMC *stash_hash;$/;"	m	struct:Stash
-stat	./src/ops/io.ops	431;"	f
 stat	lib/Parrot/IO/Path.pm	/^sub stat$/;"	s
+stat	src/ops/io.ops	426;"	f
 state	compilers/imcc/imc.h	/^    struct parser_state_t *state;$/;"	m	struct:_imc_info_t
 state	include/parrot/debug.h	/^    int                     state;$/;"	m	struct:PDB
 state	include/parrot/interpreter.h	/^    struct Parrot_Context *state;       \/* context  *\/$/;"	m	struct:Interp_Context
@@ -17864,9 +17879,9 @@ stop_sys_timer_ms	src/platform.c	/^stop_sys_timer_ms(void *handle)$/;"	f
 store	include/parrot/smallobject.h	/^    Gc_gms_hdr * (store[GC_GMS_STORE_SIZE]);    \/* array of hdr pointers *\/$/;"	m	struct:_gc_gms_hdr_store
 store_arg	src/inter_call.c	/^store_arg(struct call_state *st, INTVAL idx) $/;"	f	file:
 store_fixup	compilers/imcc/pbc.c	/^store_fixup(Interp *interpreter, SymReg * r, int pc, int offset)$/;"	f	file:
-store_global	./src/ops/var.ops	111;"	f
+store_global	src/ops/var.ops	112;"	f
 store_key_const	compilers/imcc/pbc.c	/^store_key_const(char * str, int idx)$/;"	f	file:
-store_lex	./src/ops/var.ops	40;"	f
+store_lex	src/ops/var.ops	40;"	f
 store_lib_pmc	src/dynext.c	/^store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,$/;"	f	file:
 store_method	languages/cola/sym.c	/^Symbol * store_method(SymbolTable * tab, const char * name, Type * type) {$/;"	f
 store_nonanon_in_namespace	src/global.c	/^store_nonanon_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)$/;"	f	file:
@@ -17895,7 +17910,7 @@ string_bitwise_not	src/string.c	/^string_bitwise_not(Interp *interpreter,$/;"	f
 string_bitwise_or	src/string.c	/^string_bitwise_or(Interp *interpreter,$/;"	f
 string_bitwise_xor	src/string.c	/^string_bitwise_xor(Interp *interpreter,$/;"	f
 string_bool	src/string.c	/^string_bool(Interp *interpreter, const STRING *s)$/;"	f
-string_capacity	src/string.c	/^string_capacity(Interp *interpreter, STRING *s)$/;"	f
+string_capacity	src/string.c	/^string_capacity(Interp *interpreter, const STRING *s)$/;"	f
 string_chopn	src/string.c	/^string_chopn(Interp *interpreter, STRING *s, INTVAL n, int in_place)$/;"	f
 string_chr	src/string.c	/^string_chr(Interp *interpreter, UINTVAL character)$/;"	f
 string_compare	src/string.c	/^string_compare(Interp *interpreter,$/;"	f
@@ -17961,7 +17976,7 @@ string_upcase_inplace	src/string.c	/^string_upcase_inplace(Interp *interpreter, 
 string_val	include/parrot/pobj.h	72;"	d
 stringify	lib/Pod/Simple/LinkSection.pm	/^sub stringify {$/;"	s
 stringify_lol	lib/Pod/Simple/BlackBox.pm	/^sub stringify_lol {  # function: stringify_lol($lol)$/;"	s
-stringinfo	./src/ops/string.ops	384;"	f
+stringinfo	src/ops/string.ops	384;"	f
 strip_quotes	languages/converter.pl	/^sub strip_quotes {$/;"	s
 strlen	include/parrot/pobj.h	/^    UINTVAL strlen;$/;"	m	struct:parrot_string_t
 strstart	include/parrot/caches.h	/^    void * strstart;    \/* string address *\/$/;"	m	struct:_meth_cache_entry
@@ -17969,24 +17984,24 @@ strstart	include/parrot/pobj.h	/^    void *strstart;$/;"	m	struct:parrot_string_
 struct	lib/Class/Struct.pm	/^sub struct {$/;"	s
 struct_val	include/parrot/pobj.h	73;"	d
 stylesheet	lib/Pod/Simple/RTF.pm	/^sub stylesheet {$/;"	s
-sub	./src/ops/math.ops	728;"	f
 sub	compilers/imcc/symreg.h	/^    SymReg *sub;$/;"	m	struct:pcc_sub_t
 sub	include/parrot/events.h	/^    PMC*                        sub;    \/* handler sub *\/$/;"	m
 sub	include/parrot/pic.h	/^        PMC *sub; 			\/* or a Sub PMC *\/$/;"	m	union:Parrot_pic_lru_t::<anonymous>
+sub	src/ops/math.ops	728;"	f
 sub_flags_enum	include/parrot/sub.h	/^} sub_flags_enum;$/;"	t
 sub_pmc	compilers/imcc/unit.h	/^    PMC *sub_pmc;	\/* this sub *\/$/;"	m	struct:_IMC_Unit
 sub_pragma	src/packfile.c	/^sub_pragma(Parrot_Interp interpreter, int action, PMC *sub_pmc)$/;"	f	file:
-subclass	./src/ops/experimental.ops	393;"	f
 subclass	include/parrot/vtable.h	/^    subclass_method_t subclass;$/;"	m	struct:_vtable
+subclass	src/ops/experimental.ops	393;"	f
 subclass_method_t	include/parrot/vtable.h	/^typedef PMC* (*subclass_method_t)(Interp* interpreter, PMC* pmc, PMC* name);$/;"	t
 subname	include/parrot/sub.h	/^    STRING* subname;$/;"	m	struct:Parrot_Context_info
 subs	compilers/imcc/pbc.c	/^    struct subs *subs;                  \/* current sub data *\/$/;"	m	struct:cs_t	file:
 subs	compilers/imcc/pbc.c	/^struct subs {$/;"	s	file:
 subst_ins	compilers/imcc/instructions.c	/^subst_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp, int needs_freeing)$/;"	f
-substr	./src/ops/string.ops	231;"	f
 substr	include/parrot/vtable.h	/^    substr_method_t substr;$/;"	m	struct:_vtable
+substr	src/ops/string.ops	231;"	f
 substr_method_t	include/parrot/vtable.h	/^typedef void (*substr_method_t)(Interp* interpreter, PMC* pmc, INTVAL offset, INTVAL length, PMC* dest);$/;"	t
-substr_r	./src/ops/string.ops	243;"	f
+substr_r	src/ops/string.ops	243;"	f
 substr_str	include/parrot/vtable.h	/^    substr_str_method_t substr_str;$/;"	m	struct:_vtable
 substr_str_method_t	include/parrot/vtable.h	/^typedef STRING* (*substr_str_method_t)(Interp* interpreter, PMC* pmc, INTVAL offset, INTVAL length);$/;"	t
 subtype	include/parrot/vtable.h	/^    subtype_method_t subtype;$/;"	m	struct:_vtable
@@ -18008,15 +18023,15 @@ svn_version	lib/Parrot/IO/File.pm	/^sub svn_version$/;"	s
 sw	parrotbug	/^       sw: for ($action) {$/;"	l
 sw	parrotbug	/^  sw: {$/;"	l
 swap	src/pmc/fixedpmcarray.pmc	/^swap(void **x, void **y)$/;"	f	file:
-sweep	./src/ops/core.ops	1026;"	f
+sweep	src/ops/core.ops	1022;"	f
 sweep_cb	src/dod.c	/^sweep_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,$/;"	f	file:
 sweep_cb	src/gc_ims.c	/^sweep_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,$/;"	f	file:
 sweep_cb_buf	src/gc_gms.c	/^sweep_cb_buf(Interp *interpreter, struct Small_Object_Pool *pool,$/;"	f	file:
 sweep_cb_buf	src/headers.c	/^sweep_cb_buf(Interp *interpreter, struct Small_Object_Pool *pool, int flag,$/;"	f	file:
 sweep_cb_pmc	src/gc_gms.c	/^sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool,$/;"	f	file:
 sweep_cb_pmc	src/headers.c	/^sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool, int flag,$/;"	f	file:
-sweepoff	./src/ops/core.ops	1052;"	f
-sweepon	./src/ops/core.ops	1063;"	f
+sweepoff	src/ops/core.ops	1048;"	f
+sweepon	src/ops/core.ops	1059;"	f
 switch_core	src/ops/core_ops_switch.c	/^opcode_t * switch_core(opcode_t *cur_op, Parrot_Interp interpreter)$/;"	f
 switch_dan	src/dynoplibs/dan_ops_switch.c	/^opcode_t * switch_dan(opcode_t *cur_op, Parrot_Interp interpreter)$/;"	f
 switch_label	tools/build/pbc2c.pl	/^switch_label:$/;"	l
@@ -18037,7 +18052,7 @@ symbol_number	include/parrot/exec.h	/^    short                                 
 symbol_table	include/parrot/exec.h	/^    Parrot_exec_symbol_t                               *symbol_table;$/;"	m
 symreg_to_str	compilers/imcc/symreg.c	/^symreg_to_str(SymReg * s)$/;"	f
 sync_cache	src/jit/mips/jit_emit.h	/^sync_cache (void *_start, void *_end)$/;"	f
-sysinfo	./src/ops/sys.ops	274;"	f
+sysinfo	src/ops/sys.ops	274;"	f
 sysinfo_i	src/inter_misc.c	/^sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted)$/;"	f
 sysinfo_s	src/inter_misc.c	/^sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)$/;"	f
 system	include/parrot/exceptions.h	/^    long system;                        \/* what is this? *\/$/;"	m	struct:parrot_exception_t
@@ -18080,13 +18095,13 @@ tag	lib/Pod/Simple/PullParserStartToken.pm	/^sub tag { shift->tagname(@_) }$/;"	
 tagname	lib/Pod/Simple/PullParserEndToken.pm	/^sub tagname { (@_ == 2) ? ($_[0][1] = $_[1]) : $_[0][1] }$/;"	s
 tagname	lib/Pod/Simple/PullParserStartToken.pm	/^sub tagname   { (@_ == 2) ? ($_[0][1] = $_[1]) : $_[0][1] }$/;"	s
 tail	include/parrot/tsq.h	/^    QUEUE_ENTRY *tail;$/;"	m	struct:QUEUE
-tailcall	./src/ops/core.ops	436;"	f
-tailcallmethod	./src/ops/object.ops	130;"	f
-tan	./src/ops/math.ops	981;"	f
-tanh	./src/ops/math.ops	994;"	f
+tailcall	src/ops/core.ops	435;"	f
+tailcallmethod	src/ops/object.ops	130;"	f
+tan	src/ops/math.ops	981;"	f
+tanh	src/ops/math.ops	994;"	f
 targ	languages/cola/cola.h	/^    Symbol          *targ;$/;"	m	struct:_AST
 task_queue	include/parrot/interpreter.h	/^    struct QUEUE* task_queue;                 \/* per interpreter queue *\/$/;"	m	struct:parrot_interp_t
-tell	./src/ops/io.ops	492;"	f
+tell	src/ops/io.ops	487;"	f
 temp	languages/python/pie-thon.pl	/^sub temp {$/;"	s
 temp_buffer	compilers/imcc/imclexer.c	/^char temp_buffer[4096];$/;"	v
 temp_int	languages/jako/lib/Jako/Compiler.pm	/^sub temp_int { return shift->temp_reg('I'); }$/;"	s
@@ -18102,8 +18117,8 @@ text_content_of_treelet	lib/Pod/Simple/BlackBox.pm	/^sub text_content_of_treelet
 text_r	lib/Pod/Simple/PullParserTextToken.pm	/^sub text_r { \\ $_[0][1] }$/;"	s
 text_rellocation_count	include/parrot/exec.h	/^    int                                                 text_rellocation_count;$/;"	m
 text_rellocation_table	include/parrot/exec.h	/^    Parrot_exec_rellocation_t                          *text_rellocation_table;$/;"	m
-thaw	./src/ops/pmc.ops	620;"	f
 thaw	include/parrot/vtable.h	/^    thaw_method_t thaw;$/;"	m	struct:_vtable
+thaw	src/ops/pmc.ops	620;"	f
 thaw_create_pmc	src/pmc_freeze.c	/^thaw_create_pmc(Parrot_Interp interpreter, const visit_info *info,$/;"	f	file:
 thaw_method_t	include/parrot/vtable.h	/^typedef void (*thaw_method_t)(Interp* interpreter, PMC* pmc, visit_info* info);$/;"	t
 thaw_pmc	src/pmc_freeze.c	/^thaw_pmc(Parrot_Interp interpreter, visit_info *info,$/;"	f	file:
@@ -18154,12 +18169,12 @@ thread_func	src/thread.c	/^thread_func(void *arg)$/;"	f	file:
 thread_state_enum	include/parrot/thread.h	/^} thread_state_enum;$/;"	t
 threshold	include/parrot/interpreter.h	/^    char *threshold;                \/* continuation threshold *\/$/;"	m	struct:_context_mem
 throttle	src/gc_ims.c	/^    double      throttle;       \/* throttle * allocations per increment work *\/$/;"	m	file:
-throw	./src/ops/core.ops	711;"	f
+throw	src/ops/core.ops	708;"	f
 throw_exception	src/exceptions.c	/^throw_exception(Interp * interpreter, PMC *exception, void *dest)$/;"	f
 throws_ok	languages/perl6/t/01-sanity/Test.pm	/^sub throws_ok (Code &code, Any $match, Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
 tid	include/parrot/thread.h	/^    UINTVAL             tid;            \/* 0.. n-1 idx in interp array *\/$/;"	m	struct:_Thread_data
-time	./src/ops/sys.ops	92;"	f
 time	include/parrot/interpreter.h	/^    FLOATVAL time;$/;"	m	struct:ProfData
+time	src/ops/sys.ops	92;"	f
 time_hires	examples/benchmarks/mops.pl	/^sub time_hires { time() }$/;"	s
 time_hires	examples/mops/mops.pl	/^sub time_hires { time() }$/;"	s
 timely_destruct_obj_sofar	include/parrot/smallobject.h	/^    UINTVAL timely_destruct_obj_sofar; 	\/* sum up to this generation *\/$/;"	m	struct:_gc_gms_gen
@@ -18167,12 +18182,12 @@ timer_event	include/parrot/events.h	/^        parrot_timer_event      timer_even
 timespec	include/parrot/thr_windows.h	/^struct timespec {$/;"	s
 timespec	include/parrot/thread.h	/^struct timespec {$/;"	s
 title	lib/Parrot/Docs/File.pm	/^sub title$/;"	s
-titlecase	./src/ops/string.ops	454;"	f
 titlecase	include/parrot/charset.h	/^    charset_titlecase_t titlecase;$/;"	m	struct:_charset
 titlecase	src/charset/ascii.c	/^titlecase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 titlecase	src/charset/binary.c	/^titlecase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 titlecase	src/charset/iso-8859-1.c	/^titlecase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 titlecase	src/charset/unicode.c	/^titlecase(Interp *interpreter, STRING *src)$/;"	f	file:
+titlecase	src/ops/string.ops	454;"	f
 titlecase_first	include/parrot/charset.h	/^    charset_titlecase_first_t titlecase_first;$/;"	m	struct:_charset
 titlecase_first	src/charset/ascii.c	/^titlecase_first(Interp *interpreter, STRING *source_string)$/;"	f	file:
 titlecase_first	src/charset/binary.c	/^titlecase_first(Interp *interpreter, STRING *source_string)$/;"	f	file:
@@ -18239,7 +18254,7 @@ tpop	languages/cola/sym.c	/^Node * tpop(Node ** list) {$/;"	f
 tpop_sym	languages/cola/sym.c	/^Symbol * tpop_sym(Symbol ** list) {$/;"	f
 tpush	languages/cola/sym.c	/^void tpush(Node ** list, Node * p) {$/;"	f
 tpush_sym	languages/cola/sym.c	/^void tpush_sym(Symbol ** list, Symbol * p) {$/;"	f
-trace	./src/ops/core.ops	817;"	f
+trace	src/ops/core.ops	814;"	f
 trace_active_PMCs	src/dod.c	/^trace_active_PMCs(Interp *interpreter, int trace_stack)$/;"	f	file:
 trace_children_cb	src/gc_gms.c	/^trace_children_cb(Interp *interpreter, struct Small_Object_Pool *pool,$/;"	f	file:
 trace_class_name	src/trace.c	/^trace_class_name(Interp *interpreter, PMC* pmc)$/;"	f	file:
@@ -18254,8 +18269,8 @@ trace_system_areas	src/cpu_dep.c	/^trace_system_areas(Interp *interpreter)$/;"	f
 trace_system_stack	src/cpu_dep.c	/^trace_system_stack(Interp *interpreter)$/;"	f	file:
 tracing	src/malloc-trace.c	/^static int tracing = 1;$/;"	v	file:
 trans	lib/Parrot/Pmc2c.pm	/^sub trans$/;"	s
-trans_charset	./src/ops/string.ops	534;"	f
-trans_encoding	./src/ops/string.ops	589;"	f
+trans_charset	src/ops/string.ops	534;"	f
+trans_encoding	src/ops/string.ops	589;"	f
 transfer_flags	src/jit/arm/jit_emit.h	/^} transfer_flags;$/;"	t
 traps	src/bignum.h	/^    unsigned char traps;       \/* throw errors or not? *\/$/;"	m
 tree_to_list	languages/regex/lib/Regex.pm	/^sub tree_to_list {$/;"	s
@@ -18324,8 +18339,8 @@ type_name	languages/cola/type.c	/^const char * type_name(Type * t) {$/;"	f
 type_of_ident	languages/jako/lib/Jako/Construct/Block.pm	/^sub type_of_ident$/;"	s
 typename	languages/cola/cola.h	/^    Symbol          *typename;$/;"	m	struct:_AST
 typename	languages/cola/cola.h	/^    struct _Symbol  *typename;$/;"	m	struct:_Symbol
-typeof	./src/ops/pmc.ops	185;"	f
 typeof	languages/BASIC/compiler/COMP_parsefuncs.pm	/^sub typeof {$/;"	s
+typeof	src/ops/pmc.ops	185;"	f
 types	include/parrot/op.h	/^    char types[PARROT_MAX_ARGS];   \/* arg_type_t, 0 = 1st arg *\/$/;"	m
 u	compilers/ast/ast.h	/^    } u;$/;"	m	struct:nodeType_t
 u	include/parrot/events.h	/^    } u;$/;"	m
@@ -18363,8 +18378,8 @@ unique_reg	compilers/imcc/parser.h	/^    int unique_reg;$/;"	m	struct:_IdList
 unit	compilers/ast/ast.h	/^    struct _IMC_Unit *unit;	\/* IMCC compilation unit to place code *\/$/;"	m	struct:nodeType_t
 unit	compilers/imcc/pbc.c	/^    IMC_Unit * unit;$/;"	m	struct:subs	file:
 unit	compilers/imcc/pcc.c	/^    IMC_Unit *unit;$/;"	m	struct:move_info_t	file:
-unless	./src/ops/core.ops	335;"	f
-unless_null	./src/ops/cmp.ops	1030;"	f
+unless	src/ops/core.ops	334;"	f
+unless_null	src/ops/cmp.ops	1030;"	f
 unlike	languages/perl6/t/01-sanity/Test.pm	/^sub unlike (Str $got, Rule $expected, Str $desc?, :$todo, :$depends) returns Bool is export {$/;"	s
 unlike	lib/Test/Builder.pm	/^sub unlike {$/;"	s
 unlike	lib/Test/More.pm	/^sub unlike ($$;$) {$/;"	s
@@ -18372,13 +18387,13 @@ unlink	src/malloc.c	2132;"	d	file:
 unmark_bin	src/malloc.c	2287;"	d	file:
 unpack	include/parrot/packfile.h	/^    PackFile_Segment_unpack_func_t unpack;$/;"	m	struct:PackFile_funcs
 unpack_smoke	tools/util/smokeserv-server.pl	/^sub unpack_smoke {$/;"	s
-unpin	./src/ops/string.ops	179;"	f
+unpin	src/ops/string.ops	179;"	f
 unput	compilers/ast/astlexer.c	154;"	d	file:
 unput	compilers/imcc/imclexer.c	136;"	d	file:
 unput	languages/cola/lexer.c	138;"	d	file:
-unregister	./src/ops/pmc.ops	703;"	f
+unregister	src/ops/pmc.ops	703;"	f
 unsetopt	examples/c/test_main.c	29;"	d	file:
-unshift	./src/ops/pmc.ops	467;"	f
+unshift	src/ops/pmc.ops	467;"	f
 unshift_ast	languages/cola/sym.c	/^void unshift_ast(AST ** list, AST * p) {$/;"	f
 unshift_entry	src/tsq.c	/^unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry) {$/;"	f
 unshift_float	include/parrot/vtable.h	/^    unshift_float_method_t unshift_float;$/;"	m	struct:_vtable
@@ -18396,12 +18411,12 @@ uordblks	src/malloc.c	/^  int uordblks; \/* total allocated space *\/$/;"	m	stru
 up	include/parrot/io.h	/^    ParrotIOLayer *up;$/;"	m	struct:_ParrotIOLayer
 up	languages/cola/cola.h	/^    struct _AST     *up,$/;"	m	struct:_AST
 up_ctx	compilers/ast/ast.h	/^    context_type up_ctx;	\/* context coming from upper node *\/$/;"	m	struct:nodeType_t
-upcase	./src/ops/string.ops	414;"	f
 upcase	include/parrot/charset.h	/^    charset_upcase_t upcase;$/;"	m	struct:_charset
 upcase	src/charset/ascii.c	/^upcase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 upcase	src/charset/binary.c	/^upcase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 upcase	src/charset/iso-8859-1.c	/^upcase(Interp *interpreter, STRING *source_string)$/;"	f	file:
 upcase	src/charset/unicode.c	/^upcase(Interp *interpreter, STRING *src)$/;"	f	file:
+upcase	src/ops/string.ops	414;"	f
 upcase_first	include/parrot/charset.h	/^    charset_upcase_first_t upcase_first;$/;"	m	struct:_charset
 upcase_first	src/charset/ascii.c	/^upcase_first(Interp *interpreter, STRING *source_string)$/;"	f	file:
 upcase_first	src/charset/binary.c	/^upcase_first(Interp *interpreter, STRING *source_string)$/;"	f	file:
@@ -18454,7 +18469,7 @@ vALLOc	src/malloc.c	525;"	d	file:
 va_core	src/spf_vtable.c	/^SPRINTF_OBJ va_core = {$/;"	v
 val	include/parrot/hash.h	/^    UnionVal val;$/;"	m	struct:_hash_entry
 val	include/parrot/inter_call.h	/^    UnionVal val;$/;"	m	struct:call_state
-valid_type	./src/ops/pmc.ops	241;"	f
+valid_type	src/ops/pmc.ops	241;"	f
 validate	include/parrot/charset.h	/^    charset_validate_t validate;$/;"	m	struct:_charset
 validate	src/charset/ascii.c	/^validate(Interp *interpreter, STRING *src)$/;"	f	file:
 validate	src/charset/binary.c	/^validate(Interp *interpreter, STRING *source_string)$/;"	f	file:
@@ -18477,7 +18492,7 @@ vars	languages/cola/cola.h	/^    Symbol          *vars;$/;"	m	struct:_AST
 verbose	compilers/imcc/imc.h	/^    int verbose;$/;"	m	struct:_imc_info_t
 verify_CD	src/inter_cb.c	/^verify_CD(void *external_data, PMC *user_data)$/;"	f	file:
 verify_signature	compilers/imcc/pbc.c	/^verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)$/;"	f	file:
-vers	./src/ops/obscure.ops	88;"	f
+vers	src/ops/obscure.ops	88;"	f
 version	examples/c/test_main.c	/^version(void)$/;"	f	file:
 version	lib/Parrot/OpsFile.pm	/^sub version$/;"	s
 version	parrotbug	/^sub version {$/;"	s
@@ -18548,8 +18563,8 @@ warning	languages/urm/urmc	/^sub warning{$/;"	s
 warning	tools/dev/check_source_standards.pl	/^sub warning {$/;"	s
 warnings	lib/Class/Struct.pm	/^            warnings::warnif("function '$name' already defined, overrides struct accessor method");$/;"	l
 warnings_t	include/parrot/interpreter.h	/^typedef struct warnings_t {$/;"	s
-warningsoff	./src/ops/core.ops	916;"	f
-warningson	./src/ops/core.ops	903;"	f
+warningsoff	src/ops/core.ops	913;"	f
+warningson	src/ops/core.ops	900;"	f
 warns	include/parrot/interpreter.h	/^    UINTVAL warns;             \/* Keeps track of what warnings$/;"	m	struct:Parrot_Context
 watchpoint	include/parrot/debug.h	/^    PDB_condition_t         *watchpoint;$/;"	m	struct:PDB
 what	include/parrot/pmc_freeze.h	/^    visit_enum_type     what;$/;"	m	struct:_visit_info
@@ -18565,9 +18580,9 @@ width	include/parrot/misc.h	/^        UINTVAL width;$/;"	m	struct:spfinfo_t
 wordsize	include/parrot/packfile.h	/^    unsigned char wordsize;$/;"	m	struct:PackFile_Header
 world_inited	include/parrot/interpreter.h	/^    INTVAL world_inited;                      \/* Parrot_init is done *\/$/;"	m	struct:parrot_interp_t
 wrap	languages/regex/lib/Regex/Rewrite.pm	/^sub wrap {$/;"	s
-wrapper__	./src/ops/core.ops	128;"	f
-write	./src/ops/io.ops	221;"	f
+wrapper__	src/ops/core.ops	128;"	f
 write	lib/Parrot/IO/File.pm	/^sub write$/;"	s
+write	src/ops/io.ops	216;"	f
 write_all_files	lib/Parrot/Pmc2c/Library.pm	/^sub write_all_files {$/;"	s
 write_buildscripts	tools/dev/rebuild_miniparrot.pl	/^sub write_buildscripts {$/;"	s
 write_code_to_file	lib/Parrot/Test.pm	/^sub write_code_to_file {$/;"	s
@@ -18591,14 +18606,14 @@ x	src/nci_test.c	/^    int x, y;$/;"	m	file:
 x	src/nci_test.c	/^    int x;$/;"	m	file:
 xcalloc	src/res_lea.c	/^xcalloc(size_t n, size_t size)$/;"	f	file:
 xmalloc	src/res_lea.c	/^xmalloc(size_t size)$/;"	f	file:
-xor	./src/ops/cmp.ops	739;"	f
+xor	src/ops/cmp.ops	739;"	f
 xor_term	languages/m4/src/eval.c	/^xor_term (eval_token et, eval_t *v1)$/;"	f	file:
 xrealloc	src/res_lea.c	/^xrealloc(void *p, size_t size)$/;"	f	file:
 y	include/parrot/mmd.h	/^    UINTVAL y;               \/* The y coord for each table *\/$/;"	m	struct:_MMD_table
 y	src/nci_test.c	/^    int x, y;$/;"	m	file:
 y	src/nci_test.c	/^    int y;$/;"	m	file:
 yes	languages/tcl/src/pmc/tclstring.pmc	/^static STRING *true, *false, *yes, *no;$/;"	v	file:
-yield	./src/ops/core.ops	429;"	f
+yield	src/ops/core.ops	428;"	f
 yoyo	t/src/intlist_4.c	/^        void yoyo(Interp* interpreter, IntList** listP, int size)$/;"	f
 yy_accept	compilers/ast/astlexer.c	/^static yyconst short int yy_accept[78] =$/;"	v	file:
 yy_accept	compilers/imcc/imclexer.c	/^static yyconst short int yy_accept[1244] =$/;"	v	file:
