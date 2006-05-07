@@ -38,9 +38,9 @@ Parrot's LexPad throws an exception for unknown names.
 =cut
 
 op store_lex(in STR, in PMC) {
-    parrot_context_t *ctx = CONTEXT(interpreter->ctx);
-    STRING *lex_name = $1;
-    PMC *lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
+    parrot_context_t * const ctx = CONTEXT(interpreter->ctx);
+    STRING * const lex_name = $1;
+    PMC * const lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
     if (PMC_IS_NULL(lex_pad)) {
 	real_exception(interpreter, NULL, LEX_NOT_FOUND,
 		"Lexical '%Ss' not found", lex_name);
@@ -61,10 +61,11 @@ standard LexPad throws and exception for non-existing names.
 =cut
 
 op find_lex(out PMC, in STR) {
-    parrot_context_t *ctx = CONTEXT(interpreter->ctx);
-    STRING *lex_name = $2;
+    parrot_context_t * const ctx = CONTEXT(interpreter->ctx);
+    STRING * const lex_name = $2;
+    PMC * const lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
     PMC *result = NULL;
-    PMC *lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
+
     if (!PMC_IS_NULL(lex_pad))
 	result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
     if (!result) {
@@ -207,7 +208,7 @@ op find_name(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

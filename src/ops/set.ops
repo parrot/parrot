@@ -47,32 +47,28 @@ Exchange the contents of registers $1 and $2
 =cut
 
 op exchange(inout INT, inout INT) :base_core {
-   INTVAL temp;
-   temp = $1;
+   const INTVAL temp = $1;
    $1 = $2;
    $2 = temp;
    goto NEXT();
 }
 
 op exchange(inout PMC, inout PMC) :base_core {
-   PMC *temp;
-   temp = $1;
+   PMC * const temp = $1;
    $1 = $2;
    $2 = temp;
    goto NEXT();
 }
 
 op exchange(inout NUM, inout NUM) :base_core {
-   FLOATVAL temp;
-   temp = $1;
+   FLOATVAL temp = $1;
    $1 = $2;
    $2 = temp;
    goto NEXT();
 }
 
 op exchange(inout STR, inout STR) :base_core {
-   STRING *temp;
-   temp = $1;
+   STRING * const temp = $1;
    $1 = $2;
    $2 = temp;
    goto NEXT();
@@ -623,7 +619,7 @@ inline op clearp() :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

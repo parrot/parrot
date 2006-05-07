@@ -104,7 +104,7 @@ stack_destroy(Stack_Chunk_t * top)
 /*
 
 =item C<size_t
-stack_height(Interp *interpreter, Stack_Chunk_t *top)>
+stack_height(Interp *interpreter, const Stack_Chunk_t *top)>
 
 Returns the height of the stack. The maximum "depth" is height - 1.
 
@@ -113,7 +113,7 @@ Returns the height of the stack. The maximum "depth" is height - 1.
 */
 
 size_t
-stack_height(Interp *interpreter, Stack_Chunk_t *chunk)
+stack_height(Interp *interpreter, const Stack_Chunk_t *chunk)
 {
     size_t height = 0;
 
@@ -384,7 +384,7 @@ void *
 stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
            Stack_entry_type *type)
 {
-    Stack_Entry_t *entry = stack_entry(interpreter, stack_base, 0);
+    Stack_Entry_t * const entry = stack_entry(interpreter, stack_base, 0);
     if (entry == NULL) {
         return NULL;
     }

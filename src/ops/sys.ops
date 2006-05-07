@@ -68,13 +68,13 @@ inline op err(out INT) {
 }
 
 op err(out STR) {
-  const char *tmp = strerror(errno);
+  const char * const tmp = strerror(errno);
   $1 = string_make(interpreter, tmp, strlen(tmp), "ascii", 0);
   goto NEXT();
 }
 
 op err(out STR, in INT) {
-  const char *tmp = strerror($2);
+  const char * const tmp = strerror($2);
   $1 = string_make(interpreter, tmp, strlen(tmp), "ascii", 0);
   goto NEXT();
 }
@@ -180,7 +180,7 @@ decoding.
 
 op gmtime(out STR, in INT) {
   struct tm tm;
-  time_t t = (time_t) $2;
+  const time_t t = (time_t) $2;
   char resultbuffer[26];
   Parrot_gmtime_r(&t, &tm);
   Parrot_asctime_r(&tm, resultbuffer);
@@ -190,7 +190,7 @@ op gmtime(out STR, in INT) {
 
 op localtime(out STR, in INT) {
   struct tm tm;
-  time_t t = (time_t) $2;
+  const time_t t = (time_t) $2;
   char resultbuffer[26];
   Parrot_localtime_r(&t, &tm);
   Parrot_asctime_r(&tm, resultbuffer);
@@ -200,7 +200,7 @@ op localtime(out STR, in INT) {
 
 op decodetime(out PMC, in INT) {
   struct tm tm;
-  time_t t = (time_t) $2;
+  const time_t t = (time_t) $2;
   Parrot_gmtime_r(&t, &tm);
   $1 = tm_to_array(interpreter, &tm);
   goto NEXT();
@@ -208,7 +208,7 @@ op decodetime(out PMC, in INT) {
 
 op decodelocaltime(out PMC, in INT) {
   struct tm tm;
-  time_t t = (time_t) $2;
+  const time_t t = (time_t) $2;
   Parrot_localtime_r(&t, &tm);
   $1 = tm_to_array(interpreter, &tm);
   goto NEXT();
@@ -333,7 +333,7 @@ inline op sizeof(out INT, in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

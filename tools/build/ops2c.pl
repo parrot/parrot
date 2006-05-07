@@ -575,28 +575,27 @@ static size_t hash_str(const char * str) {
     size_t key = 0;
     const char * s;
     for(s=str; *s; s++)
-    key = key * 65599 + *s;
+        key = key * 65599 + *s;
     return key;
 }
 
 static void store_op(op_info_t *info, int full) {
-    HOP *p = mem_sys_allocate(sizeof(HOP));
-    size_t hidx;
-    hidx = hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
+    HOP * const p = mem_sys_allocate(sizeof(HOP));
+    const size_t hidx = hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
     p->info = info;
     p->next = hop[hidx];
     hop[hidx] = p;
 }
 static int get_op(const char * name, int full) {
     HOP * p;
-    size_t hidx = hash_str(name) % OP_HASH_SIZE;
+    const size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
-    hop = mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
-    hop_init();
+        hop = mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
+        hop_init();
     }
-    for(p = hop[hidx]; p; p = p->next) {
-    if(!strcmp(name, full ? p->info->full_name : p->info->name))
-        return p->info - ${bs}op_lib.op_info_table;
+    for (p = hop[hidx]; p; p = p->next) {
+        if(!strcmp(name, full ? p->info->full_name : p->info->name))
+            return p->info - ${bs}op_lib.op_info_table;
     }
     return -1;
 }
@@ -605,24 +604,24 @@ static void hop_init() {
     op_info_t * info = ${bs}op_lib.op_info_table;
     /* store full names */
     for (i = 0; i < ${bs}op_lib.op_count; i++)
-    store_op(info + i, 1);
+        store_op(info + i, 1);
     /* plus one short name */
     for (i = 0; i < ${bs}op_lib.op_count; i++)
-    if (get_op(info[i].name, 0) == -1)
-        store_op(info + i, 0);
+        if (get_op(info[i].name, 0) == -1)
+            store_op(info + i, 0);
 }
 static void hop_deinit(void)
 {
     HOP *p, *next;
-    size_t i;
     if (hop) {
-    for (i = 0; i < OP_HASH_SIZE; i++)
-        for(p = hop[i]; p; ) {
-        next = p->next;
-        free(p);
-        p = next;
-    }
-    free(hop);
+        size_t i;
+        for (i = 0; i < OP_HASH_SIZE; i++)
+            for (p = hop[i]; p; ) {
+                next = p->next;
+                free(p);
+                p = next;
+        }
+        free(hop);
     }
     hop = 0;
 }

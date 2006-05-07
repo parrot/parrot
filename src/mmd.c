@@ -1,5 +1,5 @@
 /*
-Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2003-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -56,7 +56,7 @@ dump_mmd(Interp *interpreter, INTVAL function)
 {
     UINTVAL x, y;
     UINTVAL offset, x_funcs, y_funcs;
-    MMD_table *table = interpreter->binop_mmd_funcs + function;
+    MMD_table * const table = interpreter->binop_mmd_funcs + function;
     funcptr_t func, def;
 
     x_funcs = table->x;
@@ -98,6 +98,10 @@ dump_mmd(Interp *interpreter, INTVAL function)
  */
 
 extern void Parrot_deleg_pmc_mark(Interp*, PMC* pmc);
+
+static int
+isa_deleg_pmc(Interp *interpreter, PMC *p)
+                __attribute__nonnull__(2);
 
 static int
 isa_deleg_pmc(Interp *interpreter, PMC *p)
@@ -367,16 +371,14 @@ PMC*
 mmd_dispatch_p_pip(Interp *interpreter,
 		 PMC *left, INTVAL right, PMC *dest, INTVAL func_nr)
 {
-    mmd_f_p_pip real_function;
-    PMC *sub;
     int is_pmc;
-    UINTVAL left_type;
 
-    left_type = left->vtable->base_type;
-    real_function = (mmd_f_p_pip)get_mmd_dispatch_type(interpreter,
-            func_nr, left_type, enum_type_INTVAL, &is_pmc);
+    const UINTVAL left_type = left->vtable->base_type;
+    const mmd_f_p_pip real_function =
+        (mmd_f_p_pip)get_mmd_dispatch_type(interpreter, func_nr, left_type, enum_type_INTVAL, &is_pmc);
+
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         if (is_pmc == 2) {
             /* mmd_register the wrapper */
             mmd_register(interpreter, func_nr, left->vtable->base_type,

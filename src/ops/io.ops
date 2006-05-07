@@ -54,8 +54,7 @@ XXX: integral file descriptors may not exist outside of the UNIX
 
 inline op fdopen(out PMC, in INT, in STR) :filesys_open {
   /* These char * need to go away soon */
-  const char * mode;
-  mode = string_to_cstring(interpreter, $3);
+  const char * const mode = string_to_cstring(interpreter, $3);
 
   $1 = PIO_fdopen(interpreter, NULL, (PIOHANDLE)$2, mode);
   if (!$1) {
@@ -147,10 +146,8 @@ read/write mode and create an IO object in $1.
 
 inline op open(out PMC, in STR, in STR) :filesys_open {
   /* These char * need to go away soon */
-  const char * path, * mode;
-
-  path = string_to_cstring(interpreter, $2);
-  mode = string_to_cstring(interpreter, $3);
+  const char * const path = string_to_cstring(interpreter, $2);
+  const char * const mode = string_to_cstring(interpreter, $3);
 
   $1 = PIO_open(interpreter, NULL, path, mode);
   /* string_cstring_free(mode); */
@@ -163,9 +160,7 @@ inline op open(out PMC, in STR, in STR) :filesys_open {
 
 inline op open(out PMC, in STR) :filesys_open {
   /* These char * need to go away soon */
-  const char * path;
-
-  path = string_to_cstring(interpreter, $2);
+  const char * const path = string_to_cstring(interpreter, $2);
 
   $1 = PIO_open(interpreter, NULL, path, "+<");
   /* string_cstring_free(path); */
@@ -202,7 +197,7 @@ inline op print(in NUM) :base_io {
 }
 
 op print(in STR) :base_io {
-  STRING *s = $1;
+  STRING * const s = $1;
   if (s && string_length(interpreter, s)) {
     PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
   }
@@ -210,8 +205,8 @@ op print(in STR) :base_io {
 }
 
 op print(in PMC) :base_io {
-  PMC *p = $1;
-  STRING *s = (VTABLE_get_string(interpreter, p));
+  PMC * const p = $1;
+  STRING * const s = (VTABLE_get_string(interpreter, p));
   if (s) {
     PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
   }
@@ -219,8 +214,8 @@ op print(in PMC) :base_io {
 }
 
 op write(in PMC) :base_io {
-  PMC *p = $1;
-  STRING *s = (VTABLE_get_string(interpreter, p));
+  PMC * const p = $1;
+  STRING * const s = (VTABLE_get_string(interpreter, p));
   if (s) {
     PIO_write(interpreter, PIO_STDOUT(interpreter), s->strstart, s->bufused);
   }
@@ -252,7 +247,7 @@ op printerr(in NUM) :base_io {
 }
 
 op printerr(in STR) :base_io {
-  STRING *s = $1;
+  STRING * const s = $1;
   if (s && string_length(interpreter, s)) {
     PIO_putps(interpreter, PIO_STDERR(interpreter), s);
   }
@@ -260,8 +255,8 @@ op printerr(in STR) :base_io {
 }
 
 op printerr(in PMC) :base_io {
-  PMC *p = $1;
-  STRING *s = (VTABLE_get_string(interpreter, p));
+  PMC * const p = $1;
+  STRING * const s = (VTABLE_get_string(interpreter, p));
   if (s) {
     PIO_putps(interpreter, PIO_STDERR(interpreter), s);
   }
@@ -284,7 +279,7 @@ Print $2 on the IO stream object $1.
 
 op print(in PMC, in INT) :base_io {
   if ($1) {
-    STRING *s = Parrot_sprintf_c(interpreter, INTVAL_FMT, $2);
+    STRING * const s = Parrot_sprintf_c(interpreter, INTVAL_FMT, $2);
     PIO_putps(interpreter, $1, s);
   }
   else {
@@ -295,7 +290,7 @@ op print(in PMC, in INT) :base_io {
 
 op print(in PMC, in NUM) :base_io {
   if ($1) {
-    STRING *s = Parrot_sprintf_c(interpreter, "%f", (double)$2);
+    STRING * const s = Parrot_sprintf_c(interpreter, "%f", (double)$2);
     PIO_putps(interpreter, $1, s);
   }
   else {
@@ -316,7 +311,7 @@ op print(in PMC, in STR) :base_io {
 
 op print(in PMC, in PMC) :base_io {
   if ($2 && $1) {
-    STRING *s = VTABLE_get_string(interpreter, $2);
+    STRING * const s = VTABLE_get_string(interpreter, $2);
     PIO_putps(interpreter, $1, s);
   }
   else {
@@ -355,7 +350,7 @@ This switches the filehandle to linebuffer-mode.
 =cut
 
 inline op readline(out STR, in PMC) :base_io {
-    PMC *pio = $2;
+    PMC * const pio = $2;
     ParrotIO *io;
     /* this ugly error handling will go away, when all the
      * io stuff are methods
@@ -389,7 +384,7 @@ remove it from the stream.
 =cut
 
 op peek(out STR) :base_io {
-  STRING **s = &$1;
+  STRING ** const s = &$1;
 
   *s = NULL;
   PIO_peek(interpreter, PIO_STDIN(interpreter), s);
@@ -397,7 +392,7 @@ op peek(out STR) :base_io {
 }
 
 op peek(out STR, in PMC) :base_io {
-  STRING **s = &$1;
+  STRING ** const s = &$1;
 
   *s = NULL;
   PIO_peek(interpreter, $2, s);
@@ -589,7 +584,7 @@ op accept(out PMC, in PMC) :base_network {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

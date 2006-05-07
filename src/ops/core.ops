@@ -179,7 +179,7 @@ Intersegment branch to location in fixup table named $1.
 =cut
 
 inline op branch_cs (in STR) :base_loop,check_event {
-    char * label = string_to_cstring(interpreter, $1);
+    char * const label = string_to_cstring(interpreter, $1);
     struct PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interpreter,
 	    enum_fixup_label, label);
     if (!fe)
@@ -244,8 +244,7 @@ Jump to the address held in register $1.
 =cut
 
 inline op jump(label INT) :base_loop {
-  opcode_t * loc;
-  loc = INTVAL2PTR(opcode_t *, $1);
+  opcode_t * const loc = INTVAL2PTR(opcode_t *, $1);
   goto ADDRESS(loc);
 }
 
@@ -408,7 +407,7 @@ Create a closure of the given subroutine PMC by cloning the sub's state.
 
 inline op invokecc(in PMC) {
   opcode_t *dest;
-  PMC * p = $1;
+  PMC * const p = $1;
   dest = expr NEXT();
   interpreter->current_object = NULL;
   interpreter->current_cont = NEED_CONTINUATION;
@@ -418,7 +417,7 @@ inline op invokecc(in PMC) {
 
 inline op invoke(in PMC, in PMC) {
   opcode_t *dest;
-  PMC * p = $1;
+  PMC * const p = $1;
 
   interpreter->current_object = NULL;
   interpreter->current_cont = $2;
@@ -428,14 +427,14 @@ inline op invoke(in PMC, in PMC) {
 
 inline op yield() {
   opcode_t *dest = expr NEXT();
-  PMC * p = CONTEXT(interpreter->ctx)->current_sub;
+  PMC * const p = CONTEXT(interpreter->ctx)->current_sub;
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
   goto ADDRESS(dest);
 }
 
 inline op tailcall(in PMC) {
   opcode_t *dest;
-  PMC * p = $1;
+  PMC * const p = $1;
   dest = expr NEXT();
   interpreter->current_cont = CONTEXT(interpreter->ctx)->current_cont;
   PObj_get_FLAGS(interpreter->current_cont) |= SUB_FLAG_TAILCALL;
@@ -444,10 +443,8 @@ inline op tailcall(in PMC) {
 }
 
 inline op returncc() {
-  opcode_t *dest;
-  PMC * p = CONTEXT(interpreter->ctx)->current_cont;
-
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
+  PMC * const p = CONTEXT(interpreter->ctx)->current_cont;
+  opcode_t * const dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
   goto ADDRESS(dest);
 }
 
@@ -491,8 +488,8 @@ to the elements of the signature array.
 
 
 op set_args(inconst PMC) {
-    opcode_t *this = CUR_OPCODE;
-    PMC *signature = $1;
+    opcode_t * const this = CUR_OPCODE;
+    PMC * const signature = $1;
     INTVAL argc;
 
     /* for now just point to the opcode */
@@ -502,8 +499,8 @@ op set_args(inconst PMC) {
 }
 
 op get_results(inconst PMC) {
-    opcode_t *this = CUR_OPCODE;
-    PMC *signature = $1;
+    opcode_t * const this = CUR_OPCODE;
+    PMC * const signature = $1;
     INTVAL argc;
 
     CONTEXT(interpreter->ctx)->current_results = this;
@@ -512,7 +509,7 @@ op get_results(inconst PMC) {
 }
 
 op get_params(inconst PMC) {
-    opcode_t *this = CUR_OPCODE;
+    opcode_t * const this = CUR_OPCODE;
     parrot_context_t *caller_ctx, *ctx;
     PMC *ccont;
     opcode_t *pc;
@@ -537,8 +534,8 @@ op get_params(inconst PMC) {
 }
 
 op set_returns(inconst PMC) {
-    opcode_t *this = CUR_OPCODE;
-    parrot_context_t *caller_ctx, *ctx;
+    opcode_t * const this = CUR_OPCODE;
+    parrot_context_t *ctx;
     PMC *ccont;
     PMC *signature = $1;
     INTVAL argc;
@@ -549,7 +546,7 @@ op set_returns(inconst PMC) {
 
     if (PMC_cont(ccont)->address) {
 	/* else its from runops_fromc */
-	caller_ctx = PMC_cont(ccont)->to_ctx;
+	parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx;
 	if (! caller_ctx) {
 	    real_exception(interpreter, NULL, INVALID_OPERATION,
 			   "null caller_ctx for ccont %p", ccont);
@@ -572,11 +569,11 @@ specified in F<docs/pdds/pdd03_calling_conventions.pod>.
 
 inline op result_info(out PMC) {
     /* Get context of callee from return continuation. */
-    PMC *cc = CONTEXT(interpreter->ctx)->current_cont;
+    PMC * const cc = CONTEXT(interpreter->ctx)->current_cont;
     PMC *sig = NULL;
     if (cc && PMC_cont(cc)->to_ctx) {
 	/* caller context has results */
-        opcode_t *results = PMC_cont(cc)->to_ctx->current_results;
+        opcode_t * const results = PMC_cont(cc)->to_ctx->current_results;
         if (results) {
 	    /* get results PMC index and get PMC. */
 	    sig = PF_CONST(PMC_cont(cc)->seg, results[1])->u.key;
@@ -697,7 +694,7 @@ return; C<1> means an exception has been raised.
 =cut
 
 inline op push_eh(labelconst INT) {
-  PMC *eh = pmc_new(interpreter, enum_class_Exception_Handler);
+  PMC * const eh = pmc_new(interpreter, enum_class_Exception_Handler);
   VTABLE_set_pointer(interpreter, eh, CUR_OPCODE + $1);
   push_exception(interpreter, eh);
   goto NEXT();
@@ -709,13 +706,13 @@ inline op clear_eh() {
 }
 
 inline op throw(in PMC) {
-  opcode_t *ret = expr NEXT();
-  opcode_t *dest = (opcode_t *)throw_exception(interpreter, $1, ret);
+  opcode_t * const ret = expr NEXT();
+  opcode_t * const dest = (opcode_t *)throw_exception(interpreter, $1, ret);
   goto ADDRESS(dest);
 }
 
 inline op rethrow(in PMC) {
-  opcode_t *dest = (opcode_t *)rethrow_exception(interpreter, $1);
+  opcode_t * const dest = (opcode_t *)rethrow_exception(interpreter, $1);
   goto ADDRESS(dest);
 }
 
@@ -981,8 +978,7 @@ Get the current ParrotInterpreter.
 =cut
 
 op runinterp(in PMC, label INT) {
-  Interp * new_interp =
-      (Interp *)PMC_data($1);
+  Interp * const new_interp = (Interp *)PMC_data($1);
   Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
   new_interp->code = interpreter->code;
   runops(new_interp, REL_PC + $2);
@@ -1157,7 +1153,7 @@ inline op loadlib(out PMC, in STR) {
 }
 
 op dlfunc (out PMC, in PMC, in STR, in STR) {
-  char * name = string_to_cstring(interpreter, ($3));
+  char * const name = string_to_cstring(interpreter, ($3));
 
   funcptr_t p = D2FPTR(Parrot_dlsym(PMC_IS_NULL($2) ? 
 	NULL : PMC_data($2), name));
@@ -1177,12 +1173,12 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
 }
 
 op dlvar (out PMC, in PMC, in STR) {
-  char * name = string_to_cstring(interpreter, ($3));
+  char * const name = string_to_cstring(interpreter, ($3));
 
-  void *p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
+  void * const p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
   string_cstring_free(name);
   if (p == NULL) {
-      const char * err = Parrot_dlerror();
+      const char * const err = Parrot_dlerror();
       Parrot_warn(interpreter, PARROT_WARNINGS_UNDEF_FLAG,
 	 "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
       $1 = pmc_new(interpreter, enum_class_Undef);
@@ -1202,14 +1198,14 @@ inline op compile(out PMC, in PMC, in STR) {
 }
 
 inline op compreg(in STR, in PMC) {
-  PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
+  PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
       interpreter->iglobals, IGLOBALS_COMPREG_HASH);
   VTABLE_set_pmc_keyed_str(interpreter, compreg_hash, $1, $2);
   goto NEXT();
 }
 
 inline op compreg(out PMC, in STR) {
-  PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
+  PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
       interpreter->iglobals, IGLOBALS_COMPREG_HASH);
   $1 = VTABLE_get_pmc_keyed_str(interpreter, compreg_hash, $2);
   goto NEXT();
@@ -1228,7 +1224,7 @@ op new_callback(out PMC, in PMC, in PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

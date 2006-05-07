@@ -47,7 +47,7 @@ Print a newline char to standard output.
 =cut
 
 inline op print_item(in INT) :base_io {
-  PMC *io = PIO_STDOUT(interpreter);
+  PMC * const io = PIO_STDOUT(interpreter);
   if (PIO_softspace(interpreter, io, 0))
     PIO_puts(interpreter, io, " ");
   PIO_printf(interpreter, INTVAL_FMT, (INTVAL)$1);
@@ -56,7 +56,7 @@ inline op print_item(in INT) :base_io {
 }
 
 inline op print_item(in NUM) :base_io {
-  PMC *io = PIO_STDOUT(interpreter);
+  PMC * const io = PIO_STDOUT(interpreter);
   STRING *s;
   if (PIO_softspace(interpreter, io, 0))
     PIO_puts(interpreter, io, " ");
@@ -72,8 +72,8 @@ inline op print_item(in NUM) :base_io {
 }
 
 op print_item(in STR) :base_io {
-  STRING *s = $1;
-  PMC *io = PIO_STDOUT(interpreter);
+  STRING * const s = $1;
+  PMC * const io = PIO_STDOUT(interpreter);
   if (s && string_length(interpreter, s)) {
     if (PIO_softspace(interpreter, io, 0))
       PIO_puts(interpreter, io, " ");
@@ -84,9 +84,9 @@ op print_item(in STR) :base_io {
 }
 
 op print_item(in PMC) :base_io {
-  PMC *p = $1;
-  PMC *io = PIO_STDOUT(interpreter);
-  STRING *s = (VTABLE_get_string(interpreter, p));
+  PMC * const p = $1;
+  PMC * const io = PIO_STDOUT(interpreter);
+  STRING * const s = (VTABLE_get_string(interpreter, p));
   if (s) {
     if (PIO_softspace(interpreter, io, 0))
       PIO_puts(interpreter, io, " ");
@@ -97,7 +97,7 @@ op print_item(in PMC) :base_io {
 }
 
 op print_newline() :base_io {
-  PMC *io = PIO_STDOUT(interpreter);
+  PMC * const io = PIO_STDOUT(interpreter);
   PIO_puts(interpreter, io, "\n");
   PIO_softspace(interpreter, io, 0);
   goto NEXT();
@@ -121,7 +121,7 @@ Print a newline char to IO stream object $1.
 =cut
 
 inline op print_item(in PMC, in INT) :base_io {
-  PMC *io = $1;
+  PMC * const io = $1;
   if (PIO_softspace(interpreter, io, 0))
     PIO_puts(interpreter, io, " ");
   PIO_fprintf(interpreter, io, INTVAL_FMT, (INTVAL)$2);
@@ -130,7 +130,7 @@ inline op print_item(in PMC, in INT) :base_io {
 }
 
 inline op print_item(in PMC, in NUM) :base_io {
-  PMC *io = $1;
+  PMC * const io = $1;
   STRING *s;
   if (PIO_softspace(interpreter, io, 0))
     PIO_puts(interpreter, io, " ");
@@ -146,8 +146,8 @@ inline op print_item(in PMC, in NUM) :base_io {
 }
 
 op print_item(in PMC, in STR) :base_io {
-  STRING *s = $2;
-  PMC *io = $1;
+  STRING * const s = $2;
+  PMC * const io = $1; /* TODO Can this be localized? */
   if (s && string_length(interpreter, s)) {
     if (PIO_softspace(interpreter, io, 0))
       PIO_puts(interpreter, io, " ");
@@ -158,8 +158,8 @@ op print_item(in PMC, in STR) :base_io {
 }
 
 op print_item(in PMC, in PMC) :base_io {
-  PMC *p = $2;
-  PMC *io = $1;
+  PMC * const p = $2;
+  PMC * const io = $1; /* TODO Can this be localized? */
   STRING *s = (VTABLE_get_string(interpreter, p));
   if (s) {
     if (PIO_softspace(interpreter, io, 0))
@@ -171,7 +171,7 @@ op print_item(in PMC, in PMC) :base_io {
 }
 
 op print_newline(in PMC) :base_io {
-  PMC *io = $1;
+  PMC * const io = $1;
   PIO_puts(interpreter, io, "\n");
   PIO_softspace(interpreter, io, 0);
   goto NEXT();
@@ -188,7 +188,7 @@ op print_newline(in PMC) :base_io {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

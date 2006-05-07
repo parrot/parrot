@@ -76,9 +76,9 @@ Gets the type of entry $2 of the user stack and puts it in $1.
 =cut
 
 op entrytype(out INT, in INT) :base_core {
-  Stack_Entry_t *entry;
+  Stack_Entry_t * const entry =
+    stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
 
-  entry = stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry) {
     internal_exception(99, "Stack Depth wrong");
   }
@@ -117,7 +117,7 @@ is the bottom-most)
 =cut
 
 op lookback(out INT, in INT) :base_core {
-  Stack_Entry_t *entry =
+  Stack_Entry_t * const entry =
   	stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
@@ -130,7 +130,7 @@ op lookback(out INT, in INT) :base_core {
 }
 
 op lookback(out STR, in INT) :base_core {
-  Stack_Entry_t *entry =
+  Stack_Entry_t * const entry =
   	stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
@@ -143,7 +143,7 @@ op lookback(out STR, in INT) :base_core {
 }
 
 op lookback(out NUM, in INT) :base_core {
-  Stack_Entry_t *entry =
+  Stack_Entry_t * const entry =
   	stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
@@ -156,7 +156,7 @@ op lookback(out NUM, in INT) :base_core {
 }
 
 op lookback(out PMC, in INT) :base_core {
-  Stack_Entry_t *entry =
+  Stack_Entry_t * const entry =
   	stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
@@ -281,7 +281,7 @@ inline op rotate_up(in INT) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

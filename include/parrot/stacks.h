@@ -14,6 +14,7 @@
 #define PARROT_STACKS_H_GUARD
 
 #include "parrot/parrot.h"
+#include "parrot/compiler.h"
 
 #define STACK_CHUNK_LIMIT 100000
 
@@ -64,12 +65,15 @@ void mark_stack_chunk_cache(Parrot_Interp interpreter);
  */
 
 PARROT_API Stack_Chunk_t * new_stack(Interp *interpreter, const char *name);
-PARROT_API void mark_stack(Interp *, Stack_Chunk_t * cur_stack);
+PARROT_API void mark_stack(Interp *, Stack_Chunk_t * cur_stack)
+                __attribute__nonnull__(2);
 
-PARROT_API size_t stack_height(Interp *interpreter, Stack_Chunk_t *stack_base);
+PARROT_API size_t stack_height(Interp *interpreter, const Stack_Chunk_t *stack_base)
+                __attribute__nonnull__(2);
 
 PARROT_API Stack_Entry_t * stack_entry(Interp *intepreter, Stack_Chunk_t *stack_base,
-                          INTVAL stack_depth);
+                          INTVAL stack_depth)
+                __attribute__nonnull__(2);
 
 PARROT_API void rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_base,
                     INTVAL num_entries);
@@ -86,7 +90,8 @@ PARROT_API void *pop_dest(Interp *interpreter);
 PARROT_API void *stack_peek(Interp *interpreter, Stack_Chunk_t *stack,
                 Stack_entry_type *type);
 
-PARROT_API Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry);
+PARROT_API Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry)
+    __attribute__nonnull__(2);
 
 
 

@@ -268,9 +268,9 @@ is performed.
 =cut
 
 inline op rot(out INT, in INT, in INT, inconst INT) {
-  INTVAL r = $2;
+  const INTVAL r = $2;
   INTVAL s = $3;
-  INTVAL w = $4;
+  const INTVAL w = $4;
   INTVAL d, t;
   if (s < 0)
     s += w;
@@ -335,7 +335,7 @@ inline op bxors(out STR, in STR, in STR) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 
