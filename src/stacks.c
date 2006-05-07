@@ -35,7 +35,7 @@ debugging/error reporting.
 */
 
 Stack_Chunk_t *
-new_stack(Interp *interpreter, const char *name)
+new_stack(Interp *interpreter, const char *name /*NN*/)
 {
 
     return register_new_stack(interpreter, name, sizeof(Stack_Entry_t));
@@ -45,8 +45,7 @@ new_stack(Interp *interpreter, const char *name)
 /*
 
 =item C<void
-mark_stack(Interp *interpreter,
-           Stack_Chunk_t *chunk)>
+mark_stack(Interp *interpreter, Stack_Chunk_t *chunk)>
 
 Mark entries in a stack structure during DOD.
 
@@ -55,12 +54,10 @@ Mark entries in a stack structure during DOD.
 */
 
 void
-mark_stack(Interp *interpreter,
-           Stack_Chunk_t *chunk)
+mark_stack(Interp *interpreter, Stack_Chunk_t *chunk /*NN*/)
 {
-    Stack_Entry_t *entry;
-
     for (; ; chunk = chunk->prev) {
+        Stack_Entry_t *entry;
 
         pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev)
@@ -113,7 +110,7 @@ Returns the height of the stack. The maximum "depth" is height - 1.
 */
 
 size_t
-stack_height(Interp *interpreter, const Stack_Chunk_t *chunk)
+stack_height(Interp *interpreter, const Stack_Chunk_t *chunk /*NN*/)
 {
     size_t height = 0;
 
@@ -142,7 +139,7 @@ if C<|depth| > number> of entries in stack.
 */
 
 Stack_Entry_t *
-stack_entry(Interp *interpreter, Stack_Chunk_t *stack, INTVAL depth)
+stack_entry(Interp *interpreter, Stack_Chunk_t *stack /*NN*/, INTVAL depth)
 {
     Stack_Chunk_t *chunk;
     Stack_Entry_t *entry = NULL;
@@ -184,7 +181,7 @@ element.
 */
 
 void
-rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, INTVAL num_entries)
+rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p /*NN*/, INTVAL num_entries)
 {
     Stack_Chunk_t *stack = *stack_p;
     Stack_Entry_t temp;
@@ -247,7 +244,7 @@ variable or something.
 */
 
 void
-stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
+stack_push(Interp *interpreter, Stack_Chunk_t **stack_p /*NN*/,
            void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)
 {
     Stack_Entry_t *entry = stack_prepare_push(interpreter, stack_p);
@@ -296,10 +293,10 @@ Pop off an entry and return a pointer to the contents.
 */
 
 void *
-stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
+stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p /*NN*/,
           void *where, Stack_entry_type type)
 {
-    Stack_Entry_t *entry = stack_prepare_pop(interpreter, stack_p);
+    Stack_Entry_t * const entry = stack_prepare_pop(interpreter, stack_p);
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {
@@ -381,7 +378,7 @@ Peek at stack and return pointer to entry and the type of the entry.
 */
 
 void *
-stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
+stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base /*NN*/,
            Stack_entry_type *type)
 {
     Stack_Entry_t * const entry = stack_entry(interpreter, stack_base, 0);
@@ -413,7 +410,7 @@ Returns the stack entry type of C<entry>.
 */
 
 Stack_entry_type
-get_entry_type(Interp *interpreter, Stack_Entry_t *entry)
+get_entry_type(Interp *interpreter, Stack_Entry_t *entry /*NN*/)
 {
     return entry->entry_type;
 }
