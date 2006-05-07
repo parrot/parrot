@@ -89,7 +89,7 @@ glob_loop:
 regex_mode:
   load_bytecode "PGE.pbc"
   .local pmc tclARE,rule,match
-  tclARE = compreg "PGE::P5Regexp"
+  tclARE = compreg "PGE::P5Regex"
 regex_loop:
   unless body goto body_end
   pattern = shift body

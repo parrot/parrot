@@ -441,7 +441,7 @@ found_match:
 
   load_bytecode 'PGE.pbc'
   .local pmc tclARE, retval
-  tclARE = compreg 'PGE::P5Regexp'
+  tclARE = compreg 'PGE::P5Regex'
   .local pmc rule
   rule = tclARE(pattern)
 

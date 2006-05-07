@@ -17,7 +17,7 @@
 
    # XXX            "tclARE"
    load_bytecode "PGE.pbc"
-   tclARE = compreg "PGE::P5Regexp"
+   tclARE = compreg "PGE::P5Regex"
 
    rule = tclARE(exp)
    match = rule(a_string)
