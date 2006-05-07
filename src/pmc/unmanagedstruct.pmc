@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -23,10 +23,11 @@ bounds access will very likely segfault.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/compiler.h"
 #include <assert.h>
 
 
-INTVAL key_2_idx(Interp* interpreter, PMC *pmc, PMC *key);
+static INTVAL key_2_idx(Interp* interpreter, PMC *pmc, PMC *key);
 static size_t calc_offsets(Interp* interpreter, PMC*,
     PMC *init, size_t toff);
 
@@ -66,7 +67,7 @@ char_offset_int(Interp* interpreter, PMC *pmc, INTVAL ix, int *type)
 
 /*
 
-=item C<INTVAL
+=item C<static INTVAL
 key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)>
 
 Returns the index for the element associated with key C<*key>. Raises an
@@ -76,19 +77,19 @@ exception if the key doesn't exist.
 
 */
 
-INTVAL
+static INTVAL
 key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)
 {
-    int ix = 0;  /* gcc -O uninit warn */
+    int ix;
 
     if (!PMC_pmc_val(pmc))
         real_exception(interpreter, NULL, E_ValueError,
                 "Missing struct initializer");
     if (PObj_get_FLAGS(key) & KEY_string_FLAG) {
-        PMC *types = PMC_pmc_val(pmc);
+        PMC * const types = PMC_pmc_val(pmc);
         if (types->vtable->base_type == enum_class_OrderedHash) {
-            Hash *hash = (Hash*)PMC_struct_val(types);
-            HashBucket *b = hash_get_bucket(interpreter, hash,
+            Hash * const hash = (Hash*)PMC_struct_val(types);
+            HashBucket * const b = hash_get_bucket(interpreter, hash,
                 key_string(interpreter, key));
             if (!b)
                 real_exception(interpreter, NULL, E_KeyError,
@@ -147,12 +148,10 @@ char_offset_key(Interp* interpreter, PMC *pmc, PMC *key, int *type)
 #endif
 
     if (*type == enum_type_struct_ptr || *type == enum_type_struct) {
-        PMC *ptr;
-
         /* the struct PMC is hanging off the initializer element
          * as property "_struct"
          */
-        ptr = VTABLE_get_pmc_keyed_int(interpreter, init, ix);
+        PMC * const ptr = VTABLE_get_pmc_keyed_int(interpreter, init, ix);
         init = VTABLE_getprop(interpreter, ptr,
             string_from_cstring(interpreter, "_struct", 0));
         assert(init && (init->vtable->base_type == enum_class_UnManagedStruct
@@ -204,7 +203,7 @@ char_offset_key(Interp* interpreter, PMC *pmc, PMC *key, int *type)
 /*
 
 =item C<static INTVAL
-ret_int(char *p, int type)>
+ret_int(const char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as an C<INTVAL>.
 
@@ -216,11 +215,15 @@ we need some more configure support for type sizes.
 */
 
 static INTVAL
-ret_int(char *p, int type)
+ret_int(const char *p, int type)
+    __attribute__nonnull__(1);
+
+static INTVAL
+ret_int(const char *p, int type)
 {
     switch (type) {
         case enum_type_INTVAL:
-            return *(INTVAL*) p;
+            return *(const INTVAL*) p;
 #if INT_SIZE == 4
         case enum_type_int32:
         case enum_type_uint32:
@@ -230,7 +233,7 @@ ret_int(char *p, int type)
         case enum_type_uint64:
 #endif
         case enum_type_int:
-            return *(int*) p;
+            return *(const int*) p;
 #if (LONG_SIZE == 4) && !(INT_SIZE == 4) /* Unlikely combination. */
         case enum_type_int32:
         case enum_type_uint32:
@@ -241,14 +244,14 @@ ret_int(char *p, int type)
 #endif
         case enum_type_long:
         case enum_type_ulong:
-            return *(long*) p;
+            return *(const long*) p;
 #if SHORT_SIZE == 2
         case enum_type_int16:
         case enum_type_uint16:
 #endif
         /* If SHORT_SIZE != 2 getting int16s requires extra tricks. */
         case enum_type_short:
-            return *(short*) p;
+            return *(const short*) p;
         case enum_type_uint8:
         case enum_type_int8:
         case enum_type_char:
@@ -263,7 +266,7 @@ ret_int(char *p, int type)
 /*
 
 =item C<static FLOATVAL
-ret_float(char *p, int type)>
+ret_float(const char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as a C<FLOATVAL>.
 
@@ -272,15 +275,19 @@ Returns the element of type C<type> starting at C<*p> as a C<FLOATVAL>.
 */
 
 static FLOATVAL
-ret_float(char *p, int type)
+ret_float(const char *p, int type)
+    __attribute__nonnull__(1);
+
+static FLOATVAL
+ret_float(const char *p, int type)
 {
     switch (type) {
         case enum_type_FLOATVAL:
-            return (FLOATVAL) *(FLOATVAL*) p;
+            return (FLOATVAL) *(const FLOATVAL*) p;
         case enum_type_float:
-            return (FLOATVAL) *(float*) p;
+            return (FLOATVAL) *(const float*) p;
         case enum_type_double:
-            return (FLOATVAL) *(double*) p;
+            return (FLOATVAL) *(const double*) p;
         default:
             internal_exception(1, "returning unhandled float type in struct");
     }
@@ -533,8 +540,7 @@ calc_align(Interp* interpreter, PMC* pmc, PMC* type_pmc,
     }
 
     if (align && offs % align) {
-        int diff;
-        diff = align - (offs % align);
+        const int diff = align - (offs % align);
         offs += diff;
     }
 
