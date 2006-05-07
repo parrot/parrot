@@ -19,12 +19,16 @@
 void Parrot_init_exceptions(Interp *interpreter);
 
 PARROT_API void internal_exception(int exitcode, const char *format, ...)
+        __attribute__nonnull__(2)
         __attribute__noreturn__;
 PARROT_API void real_exception(Interp *interpreter,
-        void *ret_addr, int exitcode,  const char *format, ...)
+        void *ret_addr, int exitcode, const char *format, ...)
+        __attribute__nonnull__(4)
         __attribute__noreturn__;
 PARROT_API void do_panic(Interp *interpreter, const char *message,
         const char *file, int line)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__noreturn__;
 
 #define PANIC(message)\
