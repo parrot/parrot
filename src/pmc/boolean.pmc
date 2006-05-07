@@ -64,8 +64,9 @@ C<bool> object according to the passed PMC value.
 */
     PMC* instantiate(PMC* sig) {
         /* XXX other types */
-        int argcP = REG_INT(3);
-        PMC *res = pmc_new(interpreter, enum_class_Boolean);
+        const int argcP = REG_INT(3);
+        PMC * const res = pmc_new(interpreter, enum_class_Boolean);
+
         if (argcP)
             PMC_int_val(res) = VTABLE_get_bool(interpreter, REG_PMC(5));
         return PMCNULL; /* TODO */

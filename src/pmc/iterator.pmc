@@ -118,7 +118,7 @@ Returns a textual representation of the iterator.
 */
 
     STRING* get_string () {
-        PMC *key = PMC_struct_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
         return string_from_int(INTERP, key_integer(INTERP, key));
     }
 
@@ -145,8 +145,8 @@ Get integer value of current position plus idx.
 */
 
     INTVAL get_integer_keyed_int (INTVAL idx) {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
         return VTABLE_get_integer_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
@@ -173,8 +173,8 @@ Get number value of current position plus idx.
 */
 
     FLOATVAL get_number_keyed_int (INTVAL idx) {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
         return VTABLE_get_number_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
@@ -203,8 +203,8 @@ Get string value of current position plus idx.
 */
 
     STRING* get_string_keyed_int (INTVAL idx) {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
         return VTABLE_get_string_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
@@ -219,7 +219,7 @@ Returns true if the idx/key is not C<-1>.
 */
 
     INTVAL get_bool () {
-        PMC *key = PMC_struct_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
         return key && PMC_int_val(key) != -1;
     }
 
@@ -262,8 +262,8 @@ Returns the element for C<key>.
 */
 
     PMC* get_pmc_keyed_int (INTVAL idx) {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
         return VTABLE_get_pmc_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
@@ -312,9 +312,9 @@ Reset the Iterator. C<value> must be one of
 */
 
     INTVAL pop_integer () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
+        const INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
@@ -329,9 +329,9 @@ Reset the Iterator. C<value> must be one of
 */
 
     FLOATVAL pop_float () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        FLOATVAL ret = VTABLE_get_number_keyed(INTERP, agg, key);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
+        const FLOATVAL ret = VTABLE_get_number_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
@@ -346,9 +346,9 @@ Reset the Iterator. C<value> must be one of
 */
 
     STRING* pop_string () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        STRING *ret = VTABLE_get_string_keyed(INTERP, agg, key);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
+        STRING * const ret = VTABLE_get_string_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
@@ -366,9 +366,9 @@ the previous one.
 */
 
     PMC* pop_pmc () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        PMC *ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
+        PMC * const ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
@@ -386,9 +386,9 @@ the next one.
 */
 
     INTVAL shift_integer () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
+        const INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;
@@ -453,9 +453,9 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
 */
 
     FLOATVAL shift_float () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        FLOATVAL ret = VTABLE_get_number_keyed(INTERP, agg, key);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
+        const FLOATVAL ret = VTABLE_get_number_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;
@@ -471,9 +471,9 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
 */
 
     STRING* shift_string () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        STRING * ret = VTABLE_get_string_keyed(INTERP, agg, key);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
+        STRING * const ret = VTABLE_get_string_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;
@@ -491,8 +491,8 @@ the next one.
 */
 
     PMC* shift_pmc () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
         PMC *ret;
         if (PObj_is_object_TEST(agg)) {
             REG_PMC(2) = agg;
@@ -533,8 +533,8 @@ Returns whether an element for C<idx> exists in the aggregate.
 */
 
     INTVAL exists_keyed_int (INTVAL idx) {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
         return VTABLE_exists_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
@@ -575,8 +575,8 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
 */
 
     INTVAL defined_keyed_int (INTVAL idx) {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
         return VTABLE_defined_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
@@ -605,8 +605,8 @@ Returns the result of calling C<type_keyed(key)> on the aggregate.
 */
 
     INTVAL type_keyed_int (INTVAL idx) {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
+        PMC * const key = PMC_struct_val(SELF);
+        PMC * const agg = PMC_pmc_val(SELF);
         return VTABLE_type_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 

@@ -49,10 +49,10 @@ Class method to construct an Integer according to passed arguments.
 
     PMC* instantiate(PMC* sig) {
         PMC * const class = REG_PMC(2);
-        int argcP = REG_INT(3);
-        int argcS = REG_INT(2);
+        const int argcP = REG_INT(3);
+        const int argcS = REG_INT(2);
 
-        return PMCNULL;
+        return PMCNULL; /* XXX This looks wrong, since we skip all the following code */
 
         SELF = pmc_new(INTERP, class->vtable->base_type);
         if (argcS == 1 && argcP == 1) {
@@ -219,7 +219,7 @@ Used to unarchive the Pair.
             io->vtable->push_string(INTERP, io, PMC_struct_val(SELF));
         }
         else {
-            PMC ** temp_pos = (PMC**)&PMC_struct_val(SELF);
+            PMC ** const temp_pos = (PMC**)&PMC_struct_val(SELF);
             info->thaw_ptr = temp_pos;
             (info->visit_pmc_now)(INTERP, *temp_pos, info);
         }
