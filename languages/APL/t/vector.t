@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 17;
+use t::APL tests => 18;
 
 run_apl_is();
 
@@ -45,27 +45,26 @@ __DATA__
 === reverse
 --- APL: ⌽1 2 3 4 5
 --- out: 5 4 3 2 1
---- todo
 
 === reverse, characters
 --- APL: ⌽'APL IS WIERD'
 --- out: DREIW SI LPA
---- todo
 
 === rotate
 --- APL: 1⊖6 7 8 9 
 --- out: 7 8 9 6
---- todo
 
 === rotate multiple positions
 --- APL: 2⊖1 2 3 4 5
---- APL: 3 4 5 1 2
---- todo
+--- out: 3 4 5 1 2
 
 === rotate backwards
 --- APL: ⁻2⊖1 2 3 4 5
 --- out: 4 5 1 2 3
---- todo
+
+=== rotate, but don't
+--- APL: 0⊖1 2 3 4 5
+--- out: 1 2 3 4 5
 
 === rotate characters
 --- APL: 3⊖'QWERTYUIOP'

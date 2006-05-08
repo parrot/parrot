@@ -189,8 +189,11 @@ END_PIR
     ret
 .end
 
-# XXX This doesn't handle numbers that are too big.
-.sub 'dyadic:\u2296' :multi(pmc, pmc) # rotate
+# XXX - the first argument to this multi sub should be some variant of
+# integer - but if you set it to Integer or int, the program dies with
+# 'Method not found.' or dispatches to the wrong method.
+
+.sub 'dyadic:\u2296' :multi(pmc, String) # rotate
     .param int    op1
 	.param string op2
 
@@ -214,9 +217,35 @@ nothing:
     .return(op2)
 .end
 
-#.sub 'dyadic:\u2296' :multi(Integer, ResizablePMCArray) # rotate
-  #.return ('eek')
-#.end
+# XXX - the first argument to this multi sub should be some variant of
+# integer - but if you set it to Integer or int, the program dies with
+# 'Method not found.' or dispatches to the wrong method.
+
+.sub 'dyadic:\u2296' :multi(pmc, ResizablePMCArray) # rotate
+    .param int op1
+	.param pmc op2
+
+    if op1 == 0 goto nothing
+	if op1 <  0 goto neg
+pos:
+    unless op1 goto done
+    # shift off the beginning and push onto the end.
+    $P1 = shift op2
+	push op2, $P1
+    dec op1
+    goto pos
+neg:
+    unless op1 goto done
+    # pop off the end and unshift onto the beginning
+	$P1 = pop op2
+	unshift op2, $P1
+    inc op1
+    goto neg
+
+done:
+nothing:
+    .return(op2)
+.end
 
 .sub 'dyadic:\u2308'           # maximum
     .param pmc op1
@@ -235,6 +264,7 @@ one:
 one:
     .return(op2)
 .end
+
 
 .sub 'dyadic:*'           # power
     .param pmc op1
@@ -493,6 +523,36 @@ neg_RHS:
     .return(1)
 true:
     .return(0)
+.end
+
+.sub 'monadic:\u233d' :multi(String) # reverse
+    .param string op1
+	# XXX reverse only works on ascii strings...
+	$I1 = find_charset 'ascii'
+	$S1 = trans_charset op1, $I1
+    
+	# sorry, ascii Strings.
+	$P1 = new String
+	$P1 = $S1
+	reverse $P1
+    .return($P1)
+.end
+
+.sub 'monadic:\u233d' :multi(ResizablePMCArray) # reverse
+    .param pmc op1
+
+	.local pmc result,iter
+	result = new .ResizablePMCArray
+    iter = new .Iterator, op1
+	iter = 0
+
+loop:
+    unless iter goto done
+    $P1 = shift iter
+    unshift result, $P1
+	goto loop
+done:
+    .return(result)
 .end
 
 =head1 LICENSE
