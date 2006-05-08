@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 40;
 
 =head1 NAME
 
@@ -1303,4 +1303,26 @@ CODE
 29_28_27_26_25_24_23_22_21_20_9_8_7_6_5_4_3_2_1_0_
 OUTPUT
 }
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "by default, iterate from start");
+.sub main :main
+    .local pmc ar, it
+    ar= new ResizablePMCArray
+    push ar, 'pi'
+    push ar, 3
+    push ar, 6.28
+
+    it = iter ar
+lp: unless it, ex
+    $P0 = shift it
+    print $P0
+    print "\n"
+    branch lp
+ex:
+.end
+CODE
+pi
+3
+6.28
+OUTPUT
 

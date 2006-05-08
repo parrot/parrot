@@ -49,6 +49,7 @@ void init () {
 =item C<void init_pmc(PMC *initializer)>
 
 Initializes the iterator with an aggregate PMC.
+Defaults iteration mode to iterate from start.
 
 =cut
 
@@ -58,6 +59,8 @@ Initializes the iterator with an aggregate PMC.
         PMC_pmc_val(SELF) = initializer; /* the aggregate itself */
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_SET(SELF);
+        /* by default, iterate from start */
+        DYNSELF.set_integer_native(ITERATE_FROM_START);
     }
 
 /*
