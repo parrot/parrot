@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 15;
+use t::APL tests => 17;
 
 run_apl_is();
 
@@ -68,7 +68,15 @@ __DATA__
 --- todo
 
 === rotate characters
---- APL: 3⊖'QWERTY'
---- out: RTYQWE
---- todo
+--- APL: 3⊖'QWERTYUIOP'
+--- out: RTYUIOPQWE
+
+=== rotate characters, backwards.
+--- APL: ⁻3⊖'QWERTYUIOP'
+--- out: IOPQWERTYU
+
+=== rotate characters, but don't
+--- APL: 0⊖'QWERTYUIOP'
+--- out: QWERTYUIOP
+
 

@@ -189,6 +189,35 @@ END_PIR
     ret
 .end
 
+# XXX This doesn't handle numbers that are too big.
+.sub 'dyadic:\u2296' :multi(pmc, pmc) # rotate
+    .param int    op1
+	.param string op2
+
+    if op1 == 0 goto nothing
+    if op1 <  0 goto neg
+pos:
+	# chop off the first N characters
+	$S0 = substr op2, 0, op1, ''
+    # tack them on the end.
+    op2 .= $S0
+	.return (op2)
+neg:
+    # chop off the last N characters 
+    # prepend them on the beginning.
+	$I1 = abs op1
+    $S0 = substr op2, op1, $I1, ''
+    op2 = $S0 . op2
+    .return (op2)
+
+nothing:
+    .return(op2)
+.end
+
+#.sub 'dyadic:\u2296' :multi(Integer, ResizablePMCArray) # rotate
+  #.return ('eek')
+#.end
+
 .sub 'dyadic:\u2308'           # maximum
     .param pmc op1
     .param pmc op2
