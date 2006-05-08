@@ -5,11 +5,11 @@ use warnings;
 
 =head1 NAME
 
-editor/addtags - add src/ops/*.ops to tags
+tools/build/addopstags.pl - add src/ops/*.ops to tags
 
 =head1 SYNOPSIS
 
-	perl editor/addtags src/ops/*.ops
+	perl tools/build/addopstags.pl src/ops/*.ops
 
 =head1 DESCRIPTION
 

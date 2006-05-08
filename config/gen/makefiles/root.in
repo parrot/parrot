@@ -573,7 +573,7 @@ $(GEN_LIBRARY) : $(PARROT)
 
 # constant string support
 .c.str :
-	$(PERL) tools/build/c2str.pl $< > $@
+	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl $< > $@
 
 STR_FILES = \
     $(SRC_DIR)/builtin.str \
@@ -590,13 +590,13 @@ STR_FILES = \
     $(SRC_DIR)/spf_vtable.str \
     $(CLASS_STR_FILES)
 
-$(INC_DIR)/string_private_cstring.h : $(STR_FILES) tools/build/c2str.pl
-	$(PERL) tools/build/c2str.pl --all
+$(INC_DIR)/string_private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --all
 
 # classes PMC build utils and rules
-PMC2CD = $(PERL) tools/build/pmc2c.pl --dump
-PMC2CC = $(PERL) tools/build/pmc2c.pl --c
-PMC2CV = $(PERL) tools/build/pmc2c.pl --vt
+PMC2CD = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
+PMC2CC = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
+PMC2CV = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vt
 
 .pmc.dump :
 	$(PMC2CD) $<
@@ -1496,7 +1496,7 @@ prog-clean :
     $(SRC_DIR)/nci_test$(O) \
     $(LIBNCI_TEST_SO) \
     install_config.fpmc
-	$(PERL) tools/build/c2str.pl --init
+	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
     $(INC_DIR)/string_private_cstring.h \
     "$(SRC_DIR)/*.str" "src/pmc/*.str" \
@@ -1730,7 +1730,7 @@ tags: tags.dummy
 		-R --exclude=blib --exclude=.svn --exclude=src/pmc/*.c \
 		--languages=c,perl --langmap=c:+.h,c:+.pmc \
 		$(CUR_DIR)
-	$(PERL) editor/addtags $(OPS_DIR)/*.ops
+	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_DIR)/*.ops
 
 tags.dummy:
 

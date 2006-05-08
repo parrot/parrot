@@ -371,7 +371,6 @@ docs/resources/favicon.ico                        [main]doc
 docs/resources/parrot.small.png                   [main]doc
 docs/resources/perl.css                           [main]doc
 docs/resources/up.gif                             [main]doc
-editor/addtags                                    [devel]
 editor/filetype_parrot.vim                        [devel]
 editor/indent_pir.vim                             [devel]
 editor/kate_syntax.pl                             [devel]
@@ -2294,6 +2293,7 @@ t/src/string.t                                    []
 t/stress/gc.t                                     []
 t/tools/pbc_merge.t                               []
 t/codingstd/cppcomments.t                         []
+tools/build/addopstags.pl                         [devel]
 tools/build/c2str.pl                              []
 tools/build/fingerprint_c.pl                      []
 tools/build/ops2c.pl                              [devel]
