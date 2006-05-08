@@ -299,7 +299,7 @@ Parses literal strings and whitespace.
     if $I0 < 2 goto term_literal
   term_charlist:
     (mob, $P99, $P99, $P0) = mob.newfrom(0, 'PGE::Exp::EnumCharList')
-    mob.set_value(initchar)
+    mob.'value'(initchar)
     mob['isnegated'] = isnegated
     $P0 = pos
     .return (mob)
@@ -361,7 +361,7 @@ Parses literal strings and whitespace.
     $S0 = substr target, litstart, $I0
     $S0 = concat initchar, $S0
     (mob, $S99, $P99, $P0) = mob.newfrom(0, 'PGE::Exp::Literal')
-    mob.set_value($S0)
+    mob.'value'($S0)
     $P0 = pos
     .return (mob)
 
@@ -734,7 +734,7 @@ Extract an enumerated character list.
     if $S0 != "]>" goto err_bracket
     pos += 2
     mpos = pos
-    mob.set_value(charlist)
+    mob.'value'(charlist)
     goto end
   err_bracket:
     parse_error(mob, pos, "Unescaped ']' in charlist")
@@ -777,14 +777,14 @@ Parse a modifier.
     $I1 = pos - $I0
     $S0 = substr target, $I0, $I1
     mob['key'] = $S0
-    mob.set_value(value)
+    mob.'value'(value)
     $S0 = substr target, pos, 1
     if $S0 != '(' goto end
     $I0 = pos + 1
     pos = index target, ')', pos
     $I1 = pos - $I0
     $S0 = substr target, $I0, $I1
-    mob.set_value($S0)
+    mob.'value'($S0)
     inc pos
   end:
     ### XXX pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
@@ -815,7 +815,7 @@ Parse a modifier.
     if $I0 < pos goto err_noclose
     $I1 = $I0 - pos
     $S1 = substr target, pos, $I1
-    mob.set_value($S1)
+    mob.'value'($S1)
     pos = $I0 + len
     mpos = pos
     .return (mob)
@@ -1092,7 +1092,6 @@ Parse a modifier.
     lexscope = pad['lexscope']
     savescope = new .Hash
     iter = new .Iterator, lexscope
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $P1 = shift iter
@@ -1228,7 +1227,7 @@ Parse a modifier.
     closure_fn = closure_pp[lang]
     $S1 = self
     $S1 = closure_fn($S1)
-    self.set_value($S1)
+    self.'value'($S1)
   end:
     .return (self)
 .end

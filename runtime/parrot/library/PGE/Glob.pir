@@ -51,12 +51,12 @@ or the resulting PIR code (target='PIR').
     .local pmc exp, pad
     exp = new 'PGE::Exp::Concat'
     $P0 = new 'PGE::Exp::Anchor'
-    $P0.set_value('^')
+    $P0.'value'('^')
     exp[0] = $P0
     $P0 = match['expr']
     exp[1] = $P0
     $P0 = new 'PGE::Exp::Anchor'
-    $P0.set_value('$')
+    $P0.'value'('$')
     exp[2] = $P0
     if target != 'exp' goto pir
     .return (exp)
@@ -175,7 +175,7 @@ set to the decoded literal.
     ($S0, $I0) = 'scan_literal'(target, mfrom, '*?[{')
     if $I0 <= pos goto end
     mpos = $I0
-    mob.set_value($S0)
+    mob.'value'($S0)
   end:
     .return (mob)
 .end
@@ -195,7 +195,7 @@ return a CCShortcut that is set to '.'
     ##   The '?' is already in mob['KEY'], so we don't need to find it here.
     (mob, mtarget, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::CCShortcut')
     assign mpos, mfrom
-    mob.set_value('.')
+    mob.'value'('.')
     .return (mob)
 .end
 
@@ -219,7 +219,7 @@ bit more complex, as we have to return a quantified '.'.
     mob['max'] = GLOB_INF
     ($P0, $P1, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::CCShortcut')
     assign $P3, $P2
-    $P0.set_value('.')
+    $P0.'value'('.')
     mob[0] = $P0
     .return (mob)
 .end
@@ -283,7 +283,7 @@ Parse an enumerated character list, such as [abcd],
   scan_end:
     inc pos
     mpos = pos
-    mob.set_value(charlist)
+    mob.'value'(charlist)
     .return (mob)
 
   err_noclose:
@@ -309,7 +309,7 @@ Parse an enumerated character list, such as [abcd],
     lastpos = length target
 
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
-    mob.set_value($S0)
+    mob.'value'($S0)
     $P3 = pos
   alt_loop:
     if pos >= lastpos goto err_noclose
@@ -323,18 +323,16 @@ Parse an enumerated character list, such as [abcd],
     ($P0, $P1, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::Literal')
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
     $P3 = pos
-    $P0.set_value($S0)
+    $P0.'value'($S0)
     mob[1] = $P0
     goto alt_loop
   end:
     inc pos
-    $P3 = mob.to()
-    $P3 = pos
+    mob.to(pos)
     .return (mob)
 
   err_noclose:
-    $P3 = mob.to()
-    $P3 = -1
+    mob.to(-1)
     .return (mob)
 .end
 

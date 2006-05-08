@@ -181,7 +181,7 @@ tree as a PIR code object that can be compiled.
         fail_rule:
           cutmark = %0
         fail_cut:
-          mob.failcut(cutmark)
+          mob.'_failcut'(cutmark)
           %1 (mob)
           goto fail_cut
         succeed:
@@ -354,7 +354,7 @@ tree as a PIR code object that can be compiled.
     $S0 = exp0
     $S1 = exp1
     concat $S0, $S1
-    exp0.set_value($S0)
+    exp0.'value'($S0)
     goto concat_lit_loop
   concat_lit_shift:
     inc j
@@ -381,7 +381,6 @@ tree as a PIR code object that can be compiled.
     code.emit('        %0: # concat', label)
     $P0 = self.get_array()
     iter = new .Iterator, $P0
-    iter = 1
     exp = shift iter
     $S0 = code.unique('R')
   iter_loop:
@@ -1281,12 +1280,12 @@ tree as a PIR code object that can be compiled.
           mpos = pos
           ($P0 :optional, $I0 :opt_flag) = $P1(mob)
           if $I0 == 0 goto %1
-          mob.set_value($P0)
+          mob.'value'($P0)
           push ustack, pos
           bsr succeed
           pos = pop ustack
           null $P0
-          mob.set_value($P0)
+          mob.'value'($P0)
           goto fail
         CODE
     .return ()

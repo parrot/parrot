@@ -41,7 +41,6 @@ of the match.
     .local string message
     message = ''
     iter = new .Iterator, list
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $S0 = shift iter

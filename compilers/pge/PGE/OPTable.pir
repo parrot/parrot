@@ -379,7 +379,6 @@ PGE::OPTable - PGE operator precedence table and parser
     goto key_next
   key_array:
     iter = new .Iterator, token
-    iter = 0
   key_array_1:
     unless iter goto key_next
     token = shift iter

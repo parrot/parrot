@@ -91,7 +91,6 @@ the output to the correct output file.
     .local string code, infile
     code = ''
     iter = new .Iterator, args
-    iter = 0
   read_loop:
     unless iter goto read_end
     infile = shift iter
@@ -231,7 +230,6 @@ OPTIONS
     initpir = new 'PGE::CodeString'
     rulepir = new 'PGE::CodeString'
     iter = new .Iterator, nstable
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     namespace = shift iter
@@ -357,7 +355,6 @@ OPTIONS
     $P0 = stmt[0]
     iter = new .Iterator, $P0
     traitlist = ''
-    iter = 0
   trait_loop:
     unless iter goto trait_end
     .local pmc t

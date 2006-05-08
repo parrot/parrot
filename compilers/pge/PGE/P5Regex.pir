@@ -158,7 +158,7 @@
     $I0 = pos - litstart
     $S0 = substr target, litstart, $I0
     $S0 = concat initchar, $S0
-    mob.set_value($S0)
+    mob.'value'($S0)
     goto end
   end:
     $P0 = getattribute mob, "PGE::Match\x0$.pos"
@@ -311,7 +311,7 @@
     mob["isnegated"] = 1
   end:
     mpos = pos
-    mob.set_value(charlist)
+    mob.'value'(charlist)
     .return (mob)
     
   err_close:

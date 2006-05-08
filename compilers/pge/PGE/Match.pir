@@ -85,6 +85,107 @@ the current position of C<mob>.
 
 =over 4
 
+=item C<new(PMC src, [ PMC adverbs :slurpy :named ])>
+
+Creates a new Match object based on C<src>.  If the C<grammar>
+adverb is specified, then the new Match object is of the given
+grammar class, otherwise if C<src> is an instance of C<Match>
+(or a subclass) then that class is used to create the object, 
+otherwise it uses the class of the invocant.  
+
+The C<pos>, C<p>, C<continue>, or C<c> adverbs specify where 
+the match object should begin.  If no starting position is
+given, the current position of C<src> is used if it has one,
+otherwise the start position is at offset zero.  The C<from>
+adverb can be used to initialize the Match's C<$.from>
+attribute to a value other than the starting position.
+
+The C<rw> adverb causes the invocant to be modified and
+returned instead of creating a new Match object.
+
+The C<new> method returns several values to the caller: the
+initialized match object, the target the object is matching against,
+a reference to its $.from attribute, a reference to its $.pos
+attribute, the value of C<pos/p/continue/c> used to
+initialize the object, and whether or not a continue flag
+is set or implied.
+
+=cut
+
+.sub 'new' :method
+    .param pmc src
+    .param pmc adverbs         :slurpy :named
+
+    ##   set values based on src param
+    .local int issrcmatch, pos, iscont
+    .local string grammar
+    .local pmc target
+    issrcmatch = isa src, 'PGE::Match'
+    if issrcmatch goto target_from_src
+    .local pmc target
+    target = new .String
+    target = src
+    pos = 0
+    iscont = 1
+    grammar = classname self
+    goto adverb_pos
+  target_from_src:
+    target = getattribute src, '$.target'
+    $P0 = getattribute src, '$.pos'
+    pos = $P0
+    iscont = 0
+    grammar = classname src
+
+  adverb_pos:
+    if null adverbs goto with_adverbs
+    ##   determine the value of pos
+    $I0 = exists adverbs['pos']
+    unless $I0 goto adverb_p
+    pos = adverbs['pos']
+    iscont = 0
+    goto with_pos
+  adverb_p:
+    $I0 = exists adverbs['p']
+    unless $I0 goto adverb_continue
+    pos = adverbs['p']
+    iscont = 0
+    goto with_pos
+  adverb_continue:
+    $I0 = exists adverbs['continue']
+    unless $I0 goto adverb_c
+    pos = adverbs['continue']
+    iscont = 1
+    goto with_pos
+  adverb_c:
+    $I0 = exists adverbs['c']
+    unless $I0 goto with_pos
+    pos = adverbs['c']
+    iscont = 1
+  with_pos:
+
+    ##   figure out the class of the new object
+    $I0 = exists adverbs['grammar']
+    unless $I0 goto with_grammar
+    grammar = adverbs['grammar']
+  with_grammar:
+  with_adverbs:
+
+    ##   create the new match object
+    .local pmc mob, mfrom, mpos
+    $I0 = find_type grammar
+    mob = new $I0
+    setattribute mob, '$.target', target
+    mfrom = new .Integer
+    mfrom = pos
+    setattribute mob, '$.from', mfrom
+    mpos = new .Integer
+    mpos = -1
+    setattribute mob, '$.pos', mpos
+
+    .return (mob, pos, target, mfrom, mpos, iscont)
+.end
+
+    
 =item C<next()>
 
 Tell a Match object to continue the previous match from where
@@ -108,38 +209,49 @@ it left off.
     .return ()
 .end
 
-=item C<from()>
 
-Returns the offset in the target string of the first item
+=item C<from([int pos])>
+
+Returns or sets the offset in the target string of the first item
 this object matched.
 
 =cut
 
 .sub 'from' :method
-    .local pmc from
-    from = getattribute self, '$.from'
-    .return (from)
+    .param int from            :optional
+    .param int has_from        :opt_flag
+    $P0 = getattribute self, '$.from'
+    if has_from == 0 goto get
+    $P0 = from
+  get:
+    .return ($P0)
 .end
 
-=item C<to()>
 
-Returns the offset at the end of this match.
+=item C<to([int pos])>
+
+Returns or sets the offset at the end of this match.
 
 =cut
 
 .sub 'to' :method
-    .local pmc to
-    to = getattribute self, '$.pos'
-    .return (to)
+    .param int to              :optional
+    .param int has_to          :opt_flag
+    $P0 = getattribute self, '$.pos'
+    if has_to == 0 goto get
+    $P0 = to
+  get:
+    .return ($P0)
 .end
 
-=item C<substring()>
+
+=item C<text()>
 
 Returns the portion of the target string matched by this object.
 
 =cut
 
-.sub 'substr' :method
+.sub 'text' :method
     $P0 = getattribute self, '$.target'
     $P1 = getattribute self, '$.from'
     $P2 = getattribute self, '$.pos'
@@ -154,38 +266,31 @@ Returns the portion of the target string matched by this object.
     .return ('')
 .end
 
-=item C<value()>
 
-Returns the "return value" for the match object.  If no return value has
-been explicitly set (by an embedded closure), return the substring
-that was matched by this match object.
+=item C<value([pmc value])>
+
+Returns or sets the "return value" for the match object.  If no 
+return value has been explicitly set (by an embedded closure), 
+return the substring that was matched by this match object.
 
 =cut
 
 .sub 'value' :method
-    $P0 = getattribute self, '$!value'
-    if_null $P0, value_1
-    .return ($P0)
-  value_1:
-    $S0 = self.'substr'()
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    if has_value == 0 goto get
+    setattribute self, '$!value', value
+  get:
+    value = getattribute self, '$!value'
+    if null value goto value_text
+    .return (value)
+  value_text:
+    $S0 = self.'text'()
     .return ($S0)
 .end
 
 
-=item C<setvalue(PMC val)>
-
-Sets the "return value" for this Match.
-
-=cut
-
-.sub 'set_value' :method
-    .param pmc value
-    setattribute self, '$!value', value
-    .return ()
-.end
-
-
-=item C<failcut(int cutvalue)>
+=item C<_failcut(int cutvalue)>
 
 Immediately "fail" this Match object, removing any 
 captured entities and coroutine continuation.  Set
@@ -193,7 +298,7 @@ the position of the match object to C<cutvalue>.
 
 =cut
 
-.sub failcut :method
+.sub '_failcut' :method
     .param int cutvalue
     $P0 = getattribute self, '$.pos'
     $P0 = cutvalue
@@ -204,7 +309,6 @@ the position of the match object to C<cutvalue>.
     setattribute self, '$!value', $P0
     .local pmc iter
     iter = new .Iterator, self
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $S0 = shift iter

@@ -39,7 +39,6 @@ This method enables Data::Dumper to work on Match objects.
     hash = self."get_hash"()
     if_null hash, dump_array
     iter = new .Iterator, hash
-    iter = 0
   dump_hash_1:
     unless iter goto dump_array
     if hascapts goto dump_hash_2
@@ -144,7 +143,6 @@ An alternate dump output for a Match object and all of its subcaptures.
     capt = self.get_hash()
     if_null capt, end
     iter = new .Iterator, capt
-    iter = 0
   subrules_1:
     unless iter goto end
     $S0 = shift iter
@@ -433,7 +431,6 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
     hash = self
     if_null hash, dump_rest
     iter = new .Iterator, hash
-    iter = 0
   dump_hash:
     unless iter goto dump_rest
     print "\n"
