@@ -23,15 +23,15 @@ APL.pbc: $(PARROT) $(SOURCES)
 interactive: APL.pbc
 	$(PARROT) APL.pbc
 
-.SUFFIXES : .pir .pbc .tge .pge
+.SUFFIXES : .pir .pbc .tg .pg
 
 .pir.pbc :
 	$(PARROT) -o $@ $<
 
-.tge.pir :
+.tg.pir :
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
 
-.pge.pir :
+.pg.pir :
 	$(PARROT) $(PGE_DIR)/pgc.pir --encoding=utf8 --output=$@ $<
 
 # This is a listing of all targets, that are meant to be called by users
