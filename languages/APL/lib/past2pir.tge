@@ -2,6 +2,7 @@ ROOT: pir(.) = {
     .local pmc pir
     .local pmc iter
     pir = new "PGE::CodeString"
+    pir.emit(".namespace [ 'APL' ]")
     pir.emit(".sub '_anon' :anon")
     pir.emit("    .local pmc var")
     pir.emit("    var = find_global 'APL', '%var'")

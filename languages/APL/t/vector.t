@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 12;
+use t::APL tests => 15;
 
 run_apl_is();
 
@@ -14,27 +14,33 @@ __DATA__
 === index list
 --- APL: ⍳5
 --- out: 1 2 3 4 5
---- todo
 
 === index list, empty
 --- APL: ⍳0
---- out:
---- todo
 
-=== index of
+=== index of, scalar
 --- APL: 1 2 3 5 7 9 11⍳7
 --- out: 5
---- todo
+
+=== index of, scalar, not found
+--- APL: 1 2 3 5 7 9 11⍳3.14
+--- out: 8
+
+=== index of, vector
+--- APL: 1 2 3 5 7 9 11⍳7 3 9 10
+--- out: 5 3 6 7
 
 === index of, alpha
 --- APL: 'COKE'⍳'O'
 --- out: 2
---- todo
+
+=== index of, alpha, multiple
+--- APL: 'ALPHABETICAL'⍳'CAB'
+--- out: 10 1 6
 
 === index of, not found
 --- APL: 'AEIOU'⍳'Y'
 --- out: 6
---- todo
 
 === reverse
 --- APL: ⌽1 2 3 4 5

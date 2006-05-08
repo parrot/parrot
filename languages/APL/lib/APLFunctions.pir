@@ -8,7 +8,7 @@ Note that the sub names here are single quoted - they look
 like unicode, but they're really escaped unicode. Parrot doesn't
 allow unicode sub-names yet, so we escape them and use that instead.
 
-Eventually make these be unicode strings.
+Eventually make these be unicode strings. [perl #38964]
 
 =cut
 
@@ -21,9 +21,9 @@ Eventually make these be unicode strings.
 
 .namespace [ 'APL' ]
 
-
 # any registers #'d 100 or higher are used here for temporary conversions
-# to other types required by the various opcodes.
+# to other types required by the various opcodes. XXX This should go away
+# Once PMI ports his lovely new perl6 code back into APL.
 
 .sub "__load_pirtable" :load
     $P0 = new .Hash
@@ -98,7 +98,6 @@ END_PIR
     %1 = $I100
 END_PIR
 
-
     $P0['monadic:+']      =  "    noop"             # conjugate
     $P0['monadic:|']      =  "    %1 = abs %1"      # magnitude
     $P0['monadic:!']      =  <<"END_PIR"            # factorial
@@ -133,8 +132,27 @@ END_PIR
 END_PIR
 
     $P0['monadic:\u235f'] =  "    %1 = ln %1"
+
+
     $P0['monadic:\u25cb'] =  "    %1 *= 3.14159265358979323846"
                                       # PI
+
+    $P0['monadic:\u2373']  =  <<"END_PIR"            # index of
+    #XXX hack all the _1's need the same, generated unique number.
+    $P100 = new .ResizablePMCArray
+    $I100 = 1
+    $I101 = 0
+    $I102 = %1
+  loop_begin_1:
+    if $I100 > $I102 goto loop_done_1 
+    $P100[$I101] = $I100
+    inc $I101
+    inc $I100
+    goto loop_begin_1
+  loop_done_1:
+    %1 = $P100
+END_PIR
+
 .end
 
 .sub 'aplprint'
@@ -215,6 +233,110 @@ negative_bad: # XXX This may be *too* protective.
     $N2 /= $N3 
     $N2 /= $N1 
     .return($N2)
+.end
+
+.sub 'dyadic:\u2373' :multi(String, String) # index of
+    .param string op1
+    .param string op2
+
+    .local pmc result
+    result = new .ResizablePMCArray
+    
+    .local int pos
+    pos = 0
+    .local int len
+    len = length op2
+    .local int index_pos
+    .local string index_char
+    .local int not_there
+    not_there = length op1
+    inc not_there
+
+loop_begin:
+    if pos == len goto loop_end
+    index_char = substr op2, pos, 1 
+    index_pos = index op1, index_char 
+    if index_pos == -1 goto not_found
+    inc index_pos
+    push result, index_pos
+    goto loop_next
+not_found:
+    push result, not_there
+loop_next:
+    inc pos
+    goto loop_begin
+loop_end:
+    .return (result)
+.end
+
+.sub 'dyadic:\u2373' :multi(ResizablePMCArray, ResizablePMCArray) # index of
+    .param pmc op1
+    .param pmc op2
+
+    .local pmc iter_one, iter_two
+	.local pmc item_one, item_two
+	.local int pos_one
+	.local int not_found
+	not_found = op1
+
+	.local pmc result
+	result = new .ResizablePMCArray
+
+	iter_two = new .Iterator, op2
+	iter_two = 0 # start from beginning
+loop_two:
+    unless iter_two goto loop_two_end
+    item_two = shift iter_two 
+	iter_one = new .Iterator, op1
+	iter_one = 0 # start from beginning
+    pos_one = 0 # parrot's 0 == APL's 1
+loop_one:
+    unless iter_one goto loop_one_end
+    item_one = shift iter_one 
+	inc pos_one
+    if item_one != item_two goto loop_one
+    push result, pos_one
+	# only need to find one, go back to outer loop.
+    goto loop_two
+loop_one_end:
+    # if we get this far, there was no match.
+	push result, not_found
+
+    goto loop_two 
+loop_two_end:
+
+    .return (result)
+.end
+
+.sub 'dyadic:\u2373' :multi(ResizablePMCArray, Float) # index of
+    .param pmc op1
+    .param float op2
+
+    .local pmc result
+    result = new .ResizablePMCArray
+ 
+    .local int pos
+    pos = 0
+    .local float value_at
+    .local int not_there
+    not_there = op1
+    inc not_there
+    .local pmc iter
+	iter = new .Iterator, op1
+    iter = 0 # start from beginning.
+loop_begin:
+    unless iter goto no_gots
+    value_at = shift iter
+    if value_at == op2 goto got_it
+    inc pos
+    goto loop_begin
+got_it:
+    inc pos
+    push result, pos
+    .return (result)
+no_gots:
+    push result, not_there
+    .return (result)
 .end
 
 .sub 'dyadic:\u25cb'          # circle

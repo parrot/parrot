@@ -44,11 +44,13 @@ sub run_apl_is() {
         $output .= "\n"; # XXX a slight hack
       }
       else {
-        $output = "0\n"; # XXX MAJOR hack - Test::Base seems to be converting our 0 into the empty string. Why?
+        $output = "0\n"; # XXX MAJOR hack - Test::Base is borkedly converting the 0 into the empty string. Why?
       }
     }
     else {
-      $output = q{}; # this lets todo tests not bother specifying an out.
+      $output = "\n"; # this lets todo tests not bother specifying an out.
+                      # XXX also gives us a way to specify a blank output,
+                      # Since we're converting an explicit blank output to 0
     }
     my $todo   = $block->todo;
     if (defined($todo)) {
