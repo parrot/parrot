@@ -25,42 +25,42 @@ or the resulting PIR code (target='PIR').
     .param pmc args            :slurpy
     .param pmc adverbs         :slurpy :named
 
-    unless null adverbs goto adverbs_1
+    unless null adverbs goto set_adverbs
     adverbs = new .Hash
 
-  adverbs_1:
+  set_adverbs:
     $I0 = exists adverbs['grammar']
-    if $I0 goto adverbs_2
-    unless args goto adverbs_1a
+    if $I0 goto with_grammar
+    unless args goto adverb_grammar_1
     $S0 = shift args
     adverbs['grammar'] = $S0
-    goto adverbs_2
-  adverbs_1a:
+    goto with_grammar
+  adverb_grammar_1:
     adverbs['grammar'] = 'PGE::Regex'
-  adverbs_2:
+  with_grammar:
     $I0 = exists adverbs['name']
-    if $I0 goto adverbs_3
-    unless args goto adverbs_2a
+    if $I0 goto with_name
+    unless args goto adverb_name_1
     $S0 = shift args
     adverbs['name'] = $S0
-    goto adverbs_3
-  adverbs_2a:
+    goto with_name
+  adverb_name_1:
     adverbs['name'] = '_regex'
-  adverbs_3:
+  with_name:
     $I0 = exists adverbs['lang']
-    if $I0 goto adverbs_3
+    if $I0 goto with_lang
     adverbs['lang'] = 'PIR'
-  adverbs_4:
+  with_lang:
     $I0 = exists adverbs['ignorecase']
-    if $I0 goto adverbs_4
+    if $I0 goto with_ignorecase
     $I0 = adverbs['i']
     adverbs['ignorecase'] = $I0
-  adverbs_5:
+  with_ignorecase:
     $I0 = exists adverbs['words']
-    if $I0 goto adverbs_5
+    if $I0 goto with_words
     $I0 = adverbs['w']
     adverbs['words'] = $I0
-  adverbs_6:
+  with_words:
 
     .local string target
     target = adverbs['target']
