@@ -44,22 +44,18 @@ __DATA__
 === minus vector, float
 --- APL: 1 2 3 4−3.14 
 --- out: ⁻2.14 ⁻1.14 ⁻0.14 0.86
---- todo
 
 === minus float, vector
 --- APL: 3.14−1 2 3 4 
 --- out: 2.14 1.14 0.14 ⁻0.86
---- todo
 
 === minus vector
 --- APL: 1 2 3 4−1.1 2.2 3.3 4.4
 --- out: ⁻0.1 ⁻0.2 ⁻0.3 ⁻0.4
---- todo
 
 === minus domain
 --- APL: 2−'TEA'
 --- out: DOMAIN ERROR
---- todo
 
 === times scalar (int/int)
 --- APL: 2×2
@@ -72,22 +68,18 @@ __DATA__
 === times vector, float
 --- APL: 1 2 3 4×3.14 
 --- out: 3.14 6.28 9.42 12.56
---- todo
 
 === times float, vector
 --- APL: 3.14×1 2 3 4
 --- out: 3.14 6.28 9.42 12.56
---- todo
 
 === times vector
 --- APL: 1 2 3 4×1.1 2.2 3.3 4.4
 --- out: 1.1 4.4 9.9 17.6
---- todo
 
 === times domain
 --- APL: 2×'TEA'
 --- out: DOMAIN ERROR
---- todo
 
 === divide scalar
 --- APL: 2.1÷64
@@ -96,22 +88,18 @@ __DATA__
 === divide vector, float
 --- APL: 1.1 2.2 3.3 4.4÷64
 --- out: 0.0171875 0.034375 0.0515625 0.06875
---- todo
 
 === divide float, vector
 --- APL: 24÷1 2 3 4 6
 --- out: 24 12 8 6 4
---- todo
 
 === divide vector
 --- APL: 1.1 2.2 3.3 4.4÷1 2 3 4
 --- out: 1.1 1.1 1.1 1.1
---- todo
 
 === divide domain
 --- APL: 2÷'TEA'
 --- out: DOMAIN ERROR
---- todo
 
 === maximum scalar
 --- APL: 2.1⌈2

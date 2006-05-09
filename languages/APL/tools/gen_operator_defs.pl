@@ -19,7 +19,10 @@ $macros{DOMAIN_ERROR} = <<'END_OF_PIR';
 END_OF_PIR
 
 my %scalar;
-$scalar{"+"} = "%1 = %1 + %2";
+$scalar{'+'}      = "%1 = %1 + %2"; # Add
+$scalar{'\x{d7}'} = "%1 = %1 * %2"; # Multiply
+$scalar{'\x{f7}'} = "%1 = %1 / %2"; # Divide
+$scalar{'\u2212'} = "%1 = %1 - %2"; # subtract
 
 my $template = <<'END_OF_TEMPLATE';
 
@@ -53,9 +56,6 @@ END_PIR
     %1 = $I100
 END_PIR
 
-    $P0['dyadic:\x{d7}']  =  "    %1 = %1 * %2"     # multiply
-    $P0['dyadic:\x{f7}']  =  "    %1 = %1 / %2"     # slash
-    $P0['dyadic:\u2212']  =  "    %1 = %1 - %2"     # subtract
     $P0['dyadic:\u2227']  =  <<"END_PIR"            # and
     $I100 = %1
     $I101 = %2
