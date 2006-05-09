@@ -68,13 +68,12 @@ tree as a PIR code object that can be compiled.
     store_global 'PGE::Exp', '$!group', exp
     exp = exp.reduce(self)
 
-    ##   If we cannot backtrack into the rule, then
-    ##   we don't need a coroutine for it.
+    ##   we don't need a coroutine if :ratchet is set
     .local int cutrule
-    $I0 = exp['backtrack']
-    cutrule = iseq $I0, PGE_BACKTRACK_NONE
+    $I0 = adverbs['ratchet']
+    cutrule = isne $I0, 0
 
-    ##   Generate the PIR for the expression tree.
+    ##   generate the PIR for the expression tree.
     .local pmc expcode
     expcode = new 'PGE::CodeString'
     explabel = 'R'
@@ -432,12 +431,48 @@ tree as a PIR code object that can be compiled.
   bt_greedy:
     args['c'] = 0
     args['C'] = '### '
-    goto bt_greedy_none
+    ##   handle 0..Inf as a special case
+    $I0 = self['min']
+    if $I0 != 0 goto bt_greedy_none
+    $I0 = self['max']
+    if $I0 != PGE_INF goto bt_greedy_none
+    code.emit(<<"        CODE", replabel, explabel, 'XXX'=>0, args :flat :named)
+        %L:  # quant 0..Inf greedy
+        %0:
+          push ustack, pos
+          bsr %1
+          pos = pop ustack
+          if cutmark != 0 goto fail
+          goto %S
+        CODE
+    goto end
 
   bt_none:
     $S0 = code.unique()
     args['c'] = $S0
     args['C'] = ''
+    ##   handle 0..Inf as a special case
+    $I0 = self['min']
+    if $I0 != 0 goto bt_greedy_none
+    $I0 = self['max']
+    if $I0 != PGE_INF goto bt_greedy_none
+    code.emit(<<"        CODE", replabel, explabel, 'XXX'=>0, args :flat :named)
+        %L:  # quant 0..Inf none
+          bsr %0
+          if cutmark != %c goto fail
+          cutmark = 0
+          goto fail
+        %0:
+          push ustack, pos
+          bsr %1
+          pos = pop ustack
+          if cutmark != 0 goto fail
+          bsr %S
+          if cutmark != 0 goto fail
+          cutmark = %c
+          goto fail
+        CODE
+    goto end
 
   bt_greedy_none:
     ##   handle greedy or none

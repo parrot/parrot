@@ -1,4 +1,4 @@
 grammar PGE::Regex;
 
-rule name { <ident> [ \:\: <ident> ]* }
+token name { <ident> [ \:\: <ident> ]* }
 

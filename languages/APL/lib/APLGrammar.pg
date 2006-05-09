@@ -1,58 +1,58 @@
 grammar APL::Grammar;
 
-rule statement_list { ^<statement> [ \n <statement> ]* }
+regex statement_list { ^<statement> [ \n <statement> ]* }
 
-rule statement { <expression> [ \s*? $$ | <syntax_error> ] }
+regex statement { <expression> [ \s*? $$ | <syntax_error> ] }
 
-rule expression { 
+regex expression { 
       <target> ← <expression>
     | <monadic_identifier> <expression>
     | <subexpression> [ <dyadic_identifier> <expression> ]?
 }
 
-rule subexpression {
+regex subexpression {
     <simple_expression>
 }
 
-rule simple_expression {
+regex simple_expression {
     <array_identifier>
 }
 
-rule target { <variable_identifier> }
+regex target { <variable_identifier> }
 
-rule dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷∧∨⍲⍱<≤=≥>≠⍳⊖]> }
+regex dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷∧∨⍲⍱<≤=≥>≠⍳⊖]> }
 
-rule monadic_identifier { <[|⍟*⌈⌊○!+−×÷~⍳⌽]> }
+regex monadic_identifier { <[|⍟*⌈⌊○!+−×÷~⍳⌽]> }
 
-rule array_identifier {
+regex array_identifier {
       <constant>
     | <variable_identifier>
 }
 
-rule constant {
+regex constant {
       <character_constant>
     | <numeric_constant>
 }
 
 
-rule numeric_constant { 
+regex numeric_constant { 
     <decimal_representation> [ \s+ <decimal_representation> ]*
 }
 
 
-rule decimal_representation {
+regex decimal_representation {
     [ ⁻? \d+: \.? \d*: | ⁻? \. \d+: ] [ E ⁻? \d+: ]?
 }
 
 
-rule character_constant {
+regex character_constant {
       (') ( [ '' | <-[']> ]*: ) '
     | (") ( [ "" | <-["]> ]*: ) "
    
 }
 
 
-rule variable_identifier { <[A..Za..z]> \w*: }
+regex variable_identifier { <[A..Za..z]> \w*: }
 
 
-rule syntax_error { <?PGE::Util::die: Syntax error> }
+regex syntax_error { <?PGE::Util::die: Syntax error> }

@@ -194,8 +194,6 @@ sub p5rx_template
 	.local string pattern
 	.local pmc rulesub
 	.local pmc match
-	.local pmc code
-	.local pmc exp
 	target = <<"TARGET"
 <<SUBJECT>>
 TARGET
@@ -218,7 +216,7 @@ repl    = <<REPL>>
 
 =cut
 
-	(rulesub, code, exp) = p5rx_compile(pattern)
+	rulesub = p5rx_compile(pattern)
 	match = rulesub(target)
 	unless match goto Match_fail
 

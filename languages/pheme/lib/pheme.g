@@ -1,20 +1,20 @@
 grammar Pheme::Grammar;
 
-rule prog { [ <list> <ws>* ]+ }
+regex prog { [ <list> <ws>* ]+ }
 
-rule list { \( <list_items>+ <ws>* \) }
+regex list { \( <list_items>+ <ws>* \) }
 
 # quoted_string has to come first
-rule list_items { [ <quoted_string> | <atom> | <list> | <empty_list> ] <ws>* }
+regex list_items { [ <quoted_string> | <atom> | <list> | <empty_list> ] <ws>* }
 
-rule empty_list { \(\) }
+regex empty_list { \(\) }
 
-rule atom { [ <symbol_tag> | <quote> ]? [ <-[ \n\r\(\)]> ]+ }
+regex atom { [ <symbol_tag> | <quote> ]? [ <-[ \n\r\(\)]> ]+ }
 
-rule quoted_string { <PGE::Text::bracketed: '"> }
+regex quoted_string { <PGE::Text::bracketed: '"> }
 
-rule quote { ' }
+regex quote { ' }
 
-rule symbol_tag { \# }
+regex symbol_tag { \# }
 
-rule ws { [ ; \N+ | \s ]+ }
+regex ws { [ ; \N+ | \s ]+ }

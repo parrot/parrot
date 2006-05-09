@@ -67,13 +67,13 @@ pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
     fasta_grammar = <<'END_FASTA_GRAMMAR'
 grammar Bio::Fasta;
 
-rule databank    { <Bio::Fasta::entry>+ }
-rule start_entry { \> }
-rule desc_line   { <Bio::Fasta::start_entry> <Bio::Fasta::id> \s+ <Bio::Fasta::desc> } 
-rule entry       { <Bio::Fasta::desc_line> \n <Bio::Fasta::sequence> } 
-rule id          { (\S+) }
-rule desc        { (\N*) }
-rule sequence    { (<-[>]>*) }
+regex databank    { <Bio::Fasta::entry>+ }
+regex start_entry { \> }
+regex desc_line   { <Bio::Fasta::start_entry> <Bio::Fasta::id> \s+ <Bio::Fasta::desc> } 
+regex entry       { <Bio::Fasta::desc_line> \n <Bio::Fasta::sequence> } 
+regex id          { (\S+) }
+regex desc        { (\N*) }
+regex sequence    { (<-[>]>*) }
 
 END_FASTA_GRAMMAR
 

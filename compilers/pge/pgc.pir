@@ -317,7 +317,21 @@ OPTIONS
     p6regex = compreg 'PGE::P6Regex'
     regex = stmt['regex']
 
-    rulepir = p6regex(regex, 'grammar'=>namespace, 'name'=>name, 'target'=>'PIR')
+    ##   set compile adverbs
+    .local pmc adverbs
+    adverbs = new .Hash
+    adverbs['grammar'] = namespace
+    adverbs['name'] = name
+
+    ##   handle options for 'token' and 'rule' commands
+    $S0 = stmt['cmd']
+    if $S0 == 'regex' goto with_adverbs
+    adverbs['ratchet'] = 1
+    if $S0 == 'token' goto with_adverbs
+    adverbs['words'] = 1
+  with_adverbs:
+
+    rulepir = p6regex(regex, 'target'=>'PIR', adverbs :flat :named)
 
     ##   add to set of rules
     .local pmc code
@@ -326,6 +340,13 @@ OPTIONS
     code.emit("\n## <%0::%1>\n", namespace, name)
     code .= rulepir
     .return ()
+.end
+
+.sub 'token_stmt'
+    .param pmc stmt
+    .param pmc namespace
+    .param pmc nstable
+    .return 'regex_stmt'(stmt, namespace, nstable)
 .end
 
 .sub 'rule_stmt'

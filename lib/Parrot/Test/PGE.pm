@@ -197,11 +197,9 @@ sub _generate_pir_for {
             .local string pattern
             .local pmc rulesub
             .local pmc match
-            .local pmc code
-            .local pmc exp
             target = $unicode"$target"
             pattern = "$pattern"
-            (rulesub, code, exp) = p6rule_compile(pattern)
+            rulesub = p6rule_compile(pattern)
             if_null rulesub, rule_fail
             match = rulesub(target)
             unless match goto match_fail
