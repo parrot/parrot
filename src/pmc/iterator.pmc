@@ -417,7 +417,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
         if (REG_INT(3) == 1) {       /* iterator constructor */
             PMC *iter, *arg = REG_PMC(5);
             if (PObj_is_object_TEST(arg)) {
-                REG_PMC(5) = iter = VTABLE_get_iter(INTERP, arg);
+                REG_PMC(5) = VTABLE_get_iter(INTERP, arg);
                 return next;
             }
             REG_PMC(5) = iter = pmc_new_init(INTERP,
