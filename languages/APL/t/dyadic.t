@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 92;
+use t::APL tests => 98;
 
 diag "need more tests to test int <op> int, float <op> float, etc.";
 
@@ -41,9 +41,14 @@ __DATA__
 --- APL: 2−3.14
 --- out: ⁻1.14
 
-=== minus mixed
+=== minus vector, float
 --- APL: 1 2 3 4−3.14 
 --- out: ⁻2.14 ⁻1.14 ⁻0.14 0.86
+--- todo
+
+=== minus float, vector
+--- APL: 3.14−1 2 3 4 
+--- out: 2.14 1.14 0.14 ⁻0.86
 --- todo
 
 === minus vector
@@ -64,8 +69,13 @@ __DATA__
 --- APL: 2×3.14
 --- out: 6.28
 
-=== times mixed
+=== times vector, float
 --- APL: 1 2 3 4×3.14 
+--- out: 3.14 6.28 9.42 12.56
+--- todo
+
+=== times float, vector
+--- APL: 3.14×1 2 3 4
 --- out: 3.14 6.28 9.42 12.56
 --- todo
 
@@ -83,9 +93,14 @@ __DATA__
 --- APL: 2.1÷64
 --- out: 0.0328125
 
-=== divide mixed
+=== divide vector, float
 --- APL: 1.1 2.2 3.3 4.4÷64
 --- out: 0.0171875 0.034375 0.0515625 0.06875
+--- todo
+
+=== divide float, vector
+--- APL: 24÷1 2 3 4 6
+--- out: 24 12 8 6 4
 --- todo
 
 === divide vector
@@ -102,8 +117,13 @@ __DATA__
 --- APL: 2.1⌈2
 --- out: 2.1
 
-=== maximum mixed
+=== maximum vector, float
 --- APL: 1.1 2.2 3.3 4.4⌈3.1
+--- out: 3.1 3.1 3.3 4.4
+--- todo
+
+=== maximum float, vector
+--- APL: 3.1⌈1.1 2.2 3.3 4.4
 --- out: 3.1 3.1 3.3 4.4
 --- todo
 
@@ -121,8 +141,13 @@ __DATA__
 --- APL: 2.1⌊2
 --- out: 2
 
-=== minimum mixed
+=== minimum vector, float
 --- APL: 1.1 2.2 3.3 4.4⌊3.1
+--- out: 1.1 2.2 3.1 3.1
+--- todo
+
+=== minimum float, vector
+--- APL: 3.1⌊1.1 2.2 3.3 4.4
 --- out: 1.1 2.2 3.1 3.1
 --- todo
 
@@ -140,9 +165,14 @@ __DATA__
 --- APL: 2*3
 --- out: 8
 
-=== power mixed
+=== power vector, float
 --- APL: 1.1 2.2 3.3 4.4*2
 --- out: 1.21 4.84 10.89 19.36
+--- todo
+
+=== power float, vector
+--- APL: 2*0 1 2 3 4 5
+--- out: 1 2 4 8 16 32
 --- todo
 
 === power vector
