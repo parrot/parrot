@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 18;
+use t::APL tests => 19;
 
 run_apl_is();
 
@@ -10,6 +10,10 @@ __DATA__
 === simple vector parsing
 --- APL: 10 2 3
 --- out: 10 2 3
+
+=== simple vector parsing, with negatives.
+--- APL: ⁻10 2 ⁻3.1
+--- out: ⁻10 2 ⁻3.1
 
 === index list
 --- APL: ⍳5
