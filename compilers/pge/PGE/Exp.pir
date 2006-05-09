@@ -96,12 +96,12 @@ tree as a PIR code object that can be compiled.
           .return (mob)
       .end
       .sub %0_corou
-          .param pmc mob
-          .param pmc adverbs
-          .local pmc newfrom
-          .local string target
-          .local pmc mfrom, mpos
-          .local int cpos, iscont
+          .param pmc mob       :unique_reg
+          .param pmc adverbs   :unique_reg
+          .local pmc newfrom   :unique_reg
+          .local string target :unique_reg
+          .local pmc mfrom, mpos :unique_reg
+          .local int cpos, iscont :unique_reg
           $P0 = getclass 'PGE::Match'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, 'XXX'=>1, adverbs :flat :named)
           $P0 = interpinfo %1
@@ -114,12 +114,12 @@ tree as a PIR code object that can be compiled.
     returnop = '.return'
     code.emit(<<"        CODE", name)
       .sub %0
-          .param pmc mob
-          .param pmc adverbs   :slurpy :named
-          .local pmc newfrom
-          .local string target
-          .local pmc mfrom, mpos
-          .local int cpos, iscont
+          .param pmc mob          :unique_reg
+          .param pmc adverbs      :unique_reg :slurpy :named
+          .local pmc newfrom      :unique_reg
+          .local string target    :unique_reg
+          .local pmc mfrom, mpos  :unique_reg
+          .local int cpos, iscont :unique_reg
           $P0 = getclass 'PGE::Match'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, 'XXX'=>1, adverbs :flat :named)
         CODE
@@ -130,24 +130,24 @@ tree as a PIR code object that can be compiled.
     expstr = expcode
     $I0 = index expstr, 'ustack'
     if $I0 < 0 goto code_body_1
-    code.emit("          .local pmc ustack")
+    code.emit("          .local pmc ustack :unique_reg")
     code.emit("          ustack = new .ResizablePMCArray")
   code_body_1:
     ##   generate the gpad only if we need it
     $I0 = index expstr, 'gpad'
     if $I0 < 0 goto code_body_2
-    code.emit("          .local pmc gpad")
+    code.emit("          .local pmc gpad :unique_reg")
     code.emit("          gpad = new .ResizablePMCArray")
   code_body_2:
     ##   set the captscope if we need it
     $I0 = index expstr, 'captscope'
     if $I0 < 0 goto code_body_3
-    code.emit("          .local pmc captscope, captob")
+    code.emit("          .local pmc captscope, captob :unique_reg")
     code.emit("          captscope = mob")
   code_body_3:
 
     code.emit(<<"        CODE", PGE_CUT_RULE, returnop)
-          .local int pos, lastpos, rep, cutmark
+          .local int pos, lastpos, rep, cutmark :unique_reg
           lastpos = length target
         try_match:
           if cpos > lastpos goto fail_rule
