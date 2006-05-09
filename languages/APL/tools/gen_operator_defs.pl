@@ -1,3 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
 print <<"END_OF_HEADER";
 
 # DO NOT EDIT.
@@ -5,28 +10,18 @@ print <<"END_OF_HEADER";
 
 END_OF_HEADER
 
-print <<'END_OF_TEMPLATE';
+my %macros;
+$macros{DOMAIN_ERROR} = <<'END_OF_PIR';
+    .sym pmc throwable
+    throwable = new .Exception
+    throwable[0] = "DOMAIN ERROR\n"
+    throw throwable
+END_OF_PIR
 
-=head1 NAME
+my %scalar;
+$scalar{"+"} = "%1 = %1 + %2";
 
-APL::Functions - APL built-in functions and operators
-
-=for comment
-
-Note that the sub names here are single quoted - they look
-like unicode, but they're really escaped unicode. Parrot doesn't
-allow unicode sub-names yet, so we escape them and use that instead.
-
-Eventually make these be unicode strings. [perl #38964]
-
-=cut
-
-.macro domain_error ()
-  .sym pmc throwable
-  throwable = new .Exception
-  throwable[0] = "DOMAIN ERROR\n"
-  throw throwable
-.endm
+my $template = <<'END_OF_TEMPLATE';
 
 .namespace [ 'APL' ]
 
@@ -43,7 +38,6 @@ Eventually make these be unicode strings. [perl #38964]
     $P0['monadic:'] =  "    $P0 = find_global 'APL', %0\n    %1 = $P0(%1)"
 
     # special-purpose parrot ops here
-    $P0['dyadic:+']        =  "    %1 = %1 + %2"    # plus
     $P0['dyadic:<']       =  <<"END_PIR"            # less than
     $I100 = islt %1, %2
     %1 = $I100
@@ -204,20 +198,20 @@ END_PIR
 
 .sub 'dyadic:\u2296' :multi(pmc, String) # rotate
     .param int    op1
-	.param string op2
+    .param string op2
 
     if op1 == 0 goto nothing
     if op1 <  0 goto neg
 pos:
-	# chop off the first N characters
-	$S0 = substr op2, 0, op1, ''
+    # chop off the first N characters
+    $S0 = substr op2, 0, op1, ''
     # tack them on the end.
     op2 .= $S0
-	.return (op2)
+    .return (op2)
 neg:
     # chop off the last N characters 
     # prepend them on the beginning.
-	$I1 = abs op1
+    $I1 = abs op1
     $S0 = substr op2, op1, $I1, ''
     op2 = $S0 . op2
     .return (op2)
@@ -232,22 +226,22 @@ nothing:
 
 .sub 'dyadic:\u2296' :multi(pmc, ResizablePMCArray) # rotate
     .param int op1
-	.param pmc op2
+    .param pmc op2
 
     if op1 == 0 goto nothing
-	if op1 <  0 goto neg
+    if op1 <  0 goto neg
 pos:
     unless op1 goto done
     # shift off the beginning and push onto the end.
     $P1 = shift op2
-	push op2, $P1
+    push op2, $P1
     dec op1
     goto pos
 neg:
     unless op1 goto done
     # pop off the end and unshift onto the beginning
-	$P1 = pop op2
-	unshift op2, $P1
+    $P1 = pop op2
+    unshift op2, $P1
     inc op1
     goto neg
 
@@ -284,7 +278,7 @@ one:
     $N3 = pow $N1, $N2
     .return($N3)
 negative_bad: # XXX This may be *too* protective.
-    .domain_error()
+    %% DOMAIN_ERROR %%
 .end
 
 .sub 'dyadic:!'           # binomial coefficient
@@ -342,33 +336,33 @@ loop_end:
     .param pmc op2
 
     .local pmc iter_one, iter_two
-	.local pmc item_one, item_two
-	.local int pos_one
-	.local int not_found
-	not_found = op1
+    .local pmc item_one, item_two
+    .local int pos_one
+    .local int not_found
+    not_found = op1
 
-	.local pmc result
-	result = new .ResizablePMCArray
+    .local pmc result
+    result = new .ResizablePMCArray
 
-	iter_two = new .Iterator, op2
-	iter_two = 0 # start from beginning
+    iter_two = new .Iterator, op2
+    iter_two = 0 # start from beginning
 loop_two:
     unless iter_two goto loop_two_end
     item_two = shift iter_two 
-	iter_one = new .Iterator, op1
-	iter_one = 0 # start from beginning
+    iter_one = new .Iterator, op1
+    iter_one = 0 # start from beginning
     pos_one = 0 # parrot's 0 == APL's 1
 loop_one:
     unless iter_one goto loop_one_end
     item_one = shift iter_one 
-	inc pos_one
+    inc pos_one
     if item_one != item_two goto loop_one
     push result, pos_one
-	# only need to find one, go back to outer loop.
+    # only need to find one, go back to outer loop.
     goto loop_two
 loop_one_end:
     # if we get this far, there was no match.
-	push result, not_found
+    push result, not_found
 
     goto loop_two 
 loop_two_end:
@@ -390,7 +384,7 @@ loop_two_end:
     not_there = op1
     inc not_there
     .local pmc iter
-	iter = new .Iterator, op1
+    iter = new .Iterator, op1
     iter = 0 # start from beginning.
 loop_begin:
     unless iter goto no_gots
@@ -427,7 +421,8 @@ no_gots:
     if $I1 == -6 goto neg_six
     if $I1 == -7 goto neg_seven
 
-.domain_error() # XXX this right?
+# XXX this right?
+%% DOMAIN_ERROR %%
 zero:
     $N1 = op2 * op2
     $N1 = 1 - $N1
@@ -521,7 +516,7 @@ zero_LHS:
     if op2 < 0 goto neg_RHS
     .return(op2) 
 neg_RHS:
-    .domain_error()
+    %% DOMAIN_ERROR %%
 .end
 
 .sub 'monadic:~'               # not
@@ -536,33 +531,178 @@ true:
 
 .sub 'monadic:\u233d' :multi(String) # reverse
     .param string op1
-	# XXX reverse only works on ascii strings...
-	$I1 = find_charset 'ascii'
-	$S1 = trans_charset op1, $I1
+    # XXX reverse only works on ascii strings...
+    $I1 = find_charset 'ascii'
+    $S1 = trans_charset op1, $I1
     
-	# sorry, ascii Strings.
-	$P1 = new String
-	$P1 = $S1
-	reverse $P1
+    # sorry, ascii Strings.
+    $P1 = new String
+    $P1 = $S1
+    reverse $P1
     .return($P1)
 .end
 
 .sub 'monadic:\u233d' :multi(ResizablePMCArray) # reverse
     .param pmc op1
 
-	.local pmc result,iter
-	result = new .ResizablePMCArray
+    .local pmc result,iter
+    result = new .ResizablePMCArray
     iter = new .Iterator, op1
-	iter = 0
+    iter = 0
 
 loop:
     unless iter goto done
     $P1 = shift iter
     unshift result, $P1
-	goto loop
+    goto loop
 done:
     .return(result)
 .end
+
+END_OF_TEMPLATE
+
+# Generate all variants for scalar dyadic ops.
+my @type_pairs = (
+  [ 'String', 'String' ],
+  [ 'String', 'Float' ],
+  [ 'Float', 'String' ],
+  [ 'String', 'ResizablePMCArray' ],
+  [ 'ResizablePMCArray', 'String' ],
+  [ 'Float', 'Float' ],
+  [ 'Float', 'ResizablePMCArray' ], 
+  [ 'ResizablePMCArray', 'Float' ], 
+  [ 'ResizablePMCArray', 'ResizablePMCArray' ], 
+);
+
+foreach my $operator (keys %scalar) {
+    foreach my $types (@type_pairs) {
+        my ($type1, $type2) = @$types;
+
+        $template .= <<"END_PREAMBLE";
+
+.sub 'dyadic:$operator' :multi ( $type1, $type2 )
+    .param pmc op1
+    .param pmc op2
+END_PREAMBLE
+
+        if ($type1 eq "String" || $type2 eq "String") {
+            # For now, anything with a string is a domain error.
+            $template .= "%% DOMAIN_ERROR %%";
+
+        } elsif ($type1 eq "Float" && $type2 eq "Float") {
+          # scalar to scalar..
+            $template .= interpolate($scalar{$operator}, 'op1', 'op2');
+        } elsif ($type1 eq "ResizablePMCArray" && $type2 eq "ResizablePMCArray") {
+          # vector to vector
+          $template .= << 'END_PIR';
+    # Verify Shapes conform.
+    $I1 = op1
+    $I2 = op2
+    if $I1 == $I2 goto good
+    %% DOMAIN_ERROR %%
+good:
+    # Create a result vector
+    .local pmc result 
+    result = new .ResizablePMCArray
+    # Loop through each vector, doing the ops.
+    .local pmc iter1, iter2
+    iter1 = new .Iterator, op1
+    iter2 = new .Iterator, op2
+loop:    
+    unless iter1 goto loop_done
+    $P1 = shift iter1
+    $P2 = shift iter2
+END_PIR
+   
+     $template .= interpolate($scalar{$operator}, '$P1', '$P2');
+
+          $template .= << 'END_PIR';
+
+    push result, $P1
+    goto loop
+loop_done:
+    # return the result vector
+    .return (result)
+END_PIR
+
+        } else {
+           # Vector to Scalar
+           my ($vector, $scalar, @order);
+           if ($type1 eq 'ResizablePMCArray') {
+               $vector = "op1";
+               $scalar = "op2";
+			   @order = qw/ $P1 $P2 /;
+           } else {
+               $vector = "op2";
+               $scalar = "op1";
+			   @order = qw/ $P2 $P1 /;
+           }
+
+           $template .= << "END_PIR";
+    # Create a result vector
+    .local pmc result 
+    result = new .ResizablePMCArray
+    # Loop through each vector, doing the ops.
+    .local pmc iter1
+    iter1 = new .Iterator, $vector
+loop:    
+    unless iter1 goto loop_done
+    \$P1 = shift iter1
+	\$P2 = clone $scalar
+END_PIR
+   
+     $template .= interpolate($scalar{$operator}, @order);
+
+     $template .= 'push result, ' . $order[0] . "\n";
+
+          $template .= << 'END_PIR';
+    goto loop
+loop_done:
+    # return the result vector
+    .return (result)
+END_PIR
+        }
+
+        $template .= <<"END_POSTAMBLE"
+.return (op1) # might be pre-empted
+.end
+END_POSTAMBLE
+    }
+}
+
+# Substitute all macros
+foreach my $macro (keys %macros) {
+    $template =~ s/%% \s+ $macro \s+ %%/$macros{$macro}/gx;
+}
+
+print $template;
+
+# Given a code snippet, convert it to something usable in the generated file
+
+sub interpolate {
+    my $code = shift;
+    my $op1  = shift;
+    my $op2  = shift;
+    $code =~ s/%1/$op1/g;
+    $code =~ s/%2/$op2/g;
+    $code .= "\n";
+    return($code);
+}
+
+__END__ 
+
+=head1 NAME
+
+tools/gen_operator_defs.pl - Generate the definitions for all the various
+APL operators in all possible configurations.
+
+=for comment
+
+Note that the sub names generated here are single quoted - they look
+like unicode, but they're really escaped unicode. Parrot doesn't
+allow unicode sub-names yet, so we escape them and use that instead.
+
+Eventually make these be unicode strings. [perl #38964]
 
 =head1 LICENSE
 
@@ -573,4 +713,3 @@ it under the same terms as Parrot.
 
 =cut
 
-END_OF_TEMPLATE

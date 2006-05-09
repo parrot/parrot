@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 91;
+use t::APL tests => 92;
 
 diag "need more tests to test int <op> int, float <op> float, etc.";
 
@@ -17,20 +17,21 @@ __DATA__
 --- APL: 2+3.14
 --- out: 5.14
 
-=== plus mixed
+=== plus vector, float
 --- APL: 1 2 3 4+3.14 
 --- out: 4.14 5.14 6.14 7.14
---- todo
+
+=== plus float, vector
+--- APL: 3.14+1 2 3 4 
+--- out: 4.14 5.14 6.14 7.14
 
 === plus vector
 --- APL: 1 2 3 4+1.1 2.2 3.3 4.4
 --- out: 2.1 4.2 6.3 8.4
---- todo
 
 === plus domain
 --- APL: 1+'TEA'
 --- out: DOMAIN ERROR
---- todo
 
 === minus scalar (int/int)
 --- APL: 2−3
