@@ -645,8 +645,6 @@ FUNCDOC:
 
 Returns the number of characters in the specified Parrot string.
 
-=cut
-
 */
 
 UINTVAL
@@ -726,9 +724,7 @@ are treated as counting from the end of the string.
 INTVAL
 string_ord(Interp *interpreter, const STRING *s, INTVAL idx)
 {
-    UINTVAL len;
-
-    len = string_length(interpreter, s);
+    const UINTVAL len = string_length(interpreter, s);
 
     if (len == 0) {
         internal_exception(ORD_OUT_OF_STRING,
@@ -837,8 +833,7 @@ created and returned.
 */
 
 STRING *
-string_concat(Interp *interpreter,
-    STRING *a, STRING *b, UINTVAL Uflags)
+string_concat(Interp *interpreter, STRING *a, STRING *b, UINTVAL Uflags)
 {
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
@@ -1260,8 +1255,6 @@ FUNCDOC:
 Makes the specified Parrot string writable with minimum length C<len>.
 The C<representation> argument is required in case a new Parrot string
 has to be created.
-
-=cut
 
 */
 
@@ -1710,8 +1703,6 @@ A number is such that:
 
 The integer value is the appropriate integer representation of such a
 number, rounding towards zero.
-
-=cut
 
 */
 
@@ -2238,7 +2229,8 @@ string_unescape_cstring(Interp * interpreter,
     if (!enc_char)
         enc_char = "ascii";
     /* check for encoding: */
-    if ( (p = strchr(enc_char, ':')) != 0) {
+    p = strchr(enc_char, ':');
+    if (p) {
         *p = '\0';
         encoding = Parrot_find_encoding(interpreter, enc_char);
         if (!encoding) {
@@ -2608,33 +2600,34 @@ string_join(Interp *interpreter, STRING *j, PMC *ar)
 PMC* 
 string_split(Interp *interpreter, STRING *delim, STRING *str)
 {
-    PMC *res =  pmc_new(interpreter, enum_class_ResizableStringArray);
-    int dlen = string_length(interpreter, delim);
-    int slen = string_length(interpreter, str);
+    PMC * const res =  pmc_new(interpreter, enum_class_ResizableStringArray);
+    const int slen = string_length(interpreter, str);
+    int dlen;
     int ps,pe;
 
     if (!slen)
 	return res;
 
+    dlen = string_length(interpreter, delim);
     if (dlen == 0) {
         int i;
         VTABLE_set_integer_native(interpreter, res, slen);
         for (i = 0; i < slen; ++i) {
-           STRING *p = string_substr(interpreter, str, i, 1, NULL, 0);
+           STRING * const p = string_substr(interpreter, str, i, 1, NULL, 0);
            VTABLE_set_string_keyed_int(interpreter, res, i, p);
         }
 	return res;
     }
 
-    ps = 0;
     pe = string_str_index(interpreter,str,delim,0);
     if (pe < 0) {
 	VTABLE_push_string(interpreter,res,str);
 	return res;
     }
+    ps = 0;
     while (ps <= slen) {
-        int pl = pe - ps;
-	STRING *tstr = string_substr(interpreter, str, ps, pl, NULL, 0);
+        const int pl = pe - ps;
+	STRING * const tstr = string_substr(interpreter, str, ps, pl, NULL, 0);
 	VTABLE_push_string(interpreter,res,tstr);
 	ps = pe + string_length(interpreter,delim);
 	if (ps > slen)
