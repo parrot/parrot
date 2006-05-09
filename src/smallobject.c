@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -50,7 +50,7 @@ contained_in_pool(Interp *interpreter,
     ptr = PObj_to_ARENA(ptr);
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        ptrdiff_t ptr_diff = (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
+        const ptrdiff_t ptr_diff = (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
 
         if (0 <= ptr_diff
                 && ptr_diff <
@@ -312,8 +312,7 @@ and put them on.
 
 #if ARENA_DOD_FLAGS
 static void
-gc_ms_alloc_objects(Interp *interpreter,
-        struct Small_Object_Pool *pool)
+gc_ms_alloc_objects(Interp *interpreter, struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
     size_t size;
@@ -387,8 +386,7 @@ gc_ms_alloc_objects(Interp *interpreter,
 #else
 
 static void
-gc_ms_alloc_objects(Interp *interpreter,
-        struct Small_Object_Pool *pool)
+gc_ms_alloc_objects(Interp *interpreter, struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
     size_t size;

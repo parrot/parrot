@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -40,8 +40,7 @@ void
 enter_nci_method(Parrot_Interp interpreter, int type,
 		 void *func, const char *name, const char *proto)
 {
-    PMC *method;
-    method = pmc_new(interpreter, enum_class_NCI);
+    PMC * const method = pmc_new(interpreter, enum_class_NCI);
     /* create call func */
     VTABLE_set_pointer_keyed_str(interpreter, method,
             string_make(interpreter, proto, strlen(proto),
@@ -129,7 +128,6 @@ INTVAL
 interpinfo(Interp *interpreter, INTVAL what)
 {
     INTVAL ret = 0;
-    struct Small_Object_Pool *header_pool;
     int j;
     struct Arenas *arena_base = interpreter->arena_base;
 
@@ -158,7 +156,8 @@ interpinfo(Interp *interpreter, INTVAL what)
         case ACTIVE_BUFFERS:
             ret = 0;
             for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-                header_pool = arena_base->sized_header_pools[j];
+                struct Small_Object_Pool * const header_pool =
+                    arena_base->sized_header_pools[j];
                 if (header_pool)
                     ret += header_pool->total_objects -
                         header_pool->num_free_objects;
@@ -170,7 +169,8 @@ interpinfo(Interp *interpreter, INTVAL what)
         case TOTAL_BUFFERS:
             ret = 0;
             for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-                header_pool = arena_base->sized_header_pools[j];
+                struct Small_Object_Pool * const header_pool =
+                    arena_base->sized_header_pools[j];
                 if (header_pool)
                     ret += header_pool->total_objects;
             }
@@ -200,16 +200,17 @@ interpinfo(Interp *interpreter, INTVAL what)
 PMC*
 interpinfo_p(Interp *interpreter, INTVAL what)
 {
-    PMC *cont;
     switch (what) {
         case CURRENT_SUB:
             return CONTEXT(interpreter->ctx)->current_sub;
         case CURRENT_CONT:
-            cont = CONTEXT(interpreter->ctx)->current_cont;
+            {
+            PMC * const cont = CONTEXT(interpreter->ctx)->current_cont;
             if (!PMC_IS_NULL(cont) && cont->vtable->base_type ==
                     enum_class_RetContinuation)
                 return VTABLE_clone(interpreter, cont);
             return cont;
+            }
         case CURRENT_OBJECT:
             return CONTEXT(interpreter->ctx)->current_object;
         case NAMESPACE_ROOT: 

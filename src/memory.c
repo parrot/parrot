@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -40,7 +40,7 @@ Uses C<malloc> to allocate system memory.
 void *
 mem_sys_allocate(size_t size)
 {
-    void *ptr = malloc((size_t)size);
+    void * const ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
@@ -52,7 +52,7 @@ mem_sys_allocate(size_t size)
 void *
 mem__internal_allocate(size_t size, const char *file, int line)
 {
-    void *ptr = malloc((size_t)size);
+    void * const ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
 #endif
@@ -75,7 +75,7 @@ Uses C<calloc> to allocate system memory.
 void *
 mem_sys_allocate_zeroed(size_t size)
 {
-    void *ptr = calloc(1, (size_t)size);
+    void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
@@ -87,7 +87,7 @@ mem_sys_allocate_zeroed(size_t size)
 void *
 mem__internal_allocate_zeroed(size_t size, const char *file, int line)
 {
-    void *ptr = calloc(1, (size_t)size);
+    void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
 #endif
@@ -126,7 +126,7 @@ mem__sys_realloc(void *from, size_t size)
 void *
 mem__internal_realloc(void *from, size_t size, const char *file, int line)
 {
-    void *ptr = realloc(from, size);
+    void * const ptr = realloc(from, size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "internal free of %p (realloc -- %i bytes) (%s/%d)\n", from, size, file, line);
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n", size, ptr, file, line);
