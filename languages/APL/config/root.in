@@ -34,6 +34,9 @@ interactive: APL.pbc
 .pg.pir :
 	$(PARROT) $(PGE_DIR)/pgc.pir --encoding=utf8 --output=$@ $<
 
+lib/APLFunctions.pir: tools/gen_operator_defs.pl
+	$(PERL) tools/gen_operator_defs.pl > lib/APLFunctions.pir
+
 # This is a listing of all targets, that are meant to be called by users
 help:
 	@echo ""
@@ -70,7 +73,8 @@ clean: testclean
   lib/pge2past.pir \
   lib/past2pir.pir \
   lib/pasteval.pir \
-  lib/APLGrammar.pir
+  lib/APLGrammar.pir \
+  lib/APLFunctions.pir
 
 realclean: clean
 	$(RM_F) Makefile "EVAL_*"

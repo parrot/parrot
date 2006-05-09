@@ -1,3 +1,12 @@
+print <<"END_OF_HEADER";
+
+# DO NOT EDIT.
+# This file generated automatically by '$0'
+
+END_OF_HEADER
+
+print <<'END_OF_TEMPLATE';
+
 =head1 NAME
 
 APL::Functions - APL built-in functions and operators
@@ -563,3 +572,5 @@ This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.
 
 =cut
+
+END_OF_TEMPLATE

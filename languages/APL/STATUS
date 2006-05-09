@@ -11,9 +11,13 @@ Things to do:
 
 - Add function declarations.
 
-- Add vectors (May involve re-doing how we handle strings, as from APL's
-  point of view, strings are just vectors of characters)
-
 - Add DOMAIN ERROR exceptions when trying to use certain operators on
   strings - Probably by using MMD with everything, and having Strings throw
   errors most of the time.
+
+- Automatically generate *all* of our dispatch code at build time. This will
+  allow us to handle argument ordering in :multi, and automatically generate
+  the appropriate code for each of the scalar/vector operators with no issue.
+
+- possibly separate out the scalar ops in the grammar to simplify the dispatch.
+  (or just make our generating code smart enough to deal.)
