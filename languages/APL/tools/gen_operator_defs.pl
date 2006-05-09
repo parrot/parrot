@@ -18,11 +18,36 @@ $macros{DOMAIN_ERROR} = <<'END_OF_PIR';
     throw throwable
 END_OF_PIR
 
-my %scalar;
-$scalar{'+'}      = "%1 = %1 + %2"; # Add
-$scalar{'\x{d7}'} = "%1 = %1 * %2"; # Multiply
-$scalar{'\x{f7}'} = "%1 = %1 / %2"; # Divide
-$scalar{'\u2212'} = "%1 = %1 - %2"; # subtract
+my %scalar = (
+    '+' => [ 'Add', '%1 = %1 + %2' ],
+	'*' => [ 'Power', << 'END_PIR' ],
+	# XXX This is too restrictive. Need better tests
+    if %1 >= 0 goto power_ok
+%% DOMAIN_ERROR %%
+power_ok:
+    $N1 = %1
+    $N2 = %2
+    $N1 = pow $N1, $N2
+	%1 = $N1
+
+END_PIR
+
+    '\x{d7}' => [ 'Multiply', '%1 = %1 * %2' ],
+    '\x{f7}' => [ 'Divide', '%1 = %1 / %2' ],
+    '\u2212' => [ 'Subtract', '%1 = %1 - %2' ],
+    '\u2308' => [ 'Maximum',  <<'END_PIR' ],
+    if %1 > %2 goto maximum_done
+    %1 = %2
+maximum_done:
+END_PIR
+
+    '\u230a' => [ 'Minimum', <<'END_PIR' ],
+    if %1 < %2 goto minimum_done
+    %1 = %2
+minimum_done:
+END_PIR
+);
+
 
 my $template = <<'END_OF_TEMPLATE';
 
@@ -248,37 +273,6 @@ neg:
 done:
 nothing:
     .return(op2)
-.end
-
-.sub 'dyadic:\u2308'           # maximum
-    .param pmc op1
-    .param pmc op2
-    if op1 > op2 goto one
-    .return(op2)
-one:
-    .return(op1)
-.end
-
-.sub 'dyadic:\u230a'           # minimum
-    .param pmc op1
-    .param pmc op2
-    if op1 > op2 goto one
-    .return(op1)
-one:
-    .return(op2)
-.end
-
-
-.sub 'dyadic:*'           # power
-    .param pmc op1
-    .param pmc op2
-    if op1 <0 goto negative_bad
-    $N1 = op1
-    $N2 = op2
-    $N3 = pow $N1, $N2
-    .return($N3)
-negative_bad: # XXX This may be *too* protective.
-    %% DOMAIN_ERROR %%
 .end
 
 .sub 'dyadic:!'           # binomial coefficient
@@ -575,11 +569,14 @@ my @type_pairs = (
 );
 
 foreach my $operator (keys %scalar) {
+    my ($name,$code) = @ {$scalar{$operator}};
     foreach my $types (@type_pairs) {
         my ($type1, $type2) = @$types;
 
         $template .= <<"END_PREAMBLE";
 
+
+# $name
 .sub 'dyadic:$operator' :multi ( $type1, $type2 )
     .param pmc op1
     .param pmc op2
@@ -591,7 +588,7 @@ END_PREAMBLE
 
         } elsif ($type1 eq "Float" && $type2 eq "Float") {
           # scalar to scalar..
-            $template .= interpolate($scalar{$operator}, 'op1', 'op2');
+            $template .= interpolate($code, 'op1', 'op2');
         } elsif ($type1 eq "ResizablePMCArray" && $type2 eq "ResizablePMCArray") {
           # vector to vector
           $template .= << 'END_PIR';
@@ -614,7 +611,7 @@ loop:
     $P2 = shift iter2
 END_PIR
    
-     $template .= interpolate($scalar{$operator}, '$P1', '$P2');
+     $template .= interpolate($code, '$P1', '$P2');
 
           $template .= << 'END_PIR';
 
@@ -651,7 +648,7 @@ loop:
 	\$P2 = clone $scalar
 END_PIR
    
-     $template .= interpolate($scalar{$operator}, @order);
+     $template .= interpolate($code, @order);
 
      $template .= 'push result, ' . $order[0] . "\n";
 
@@ -664,7 +661,7 @@ END_PIR
         }
 
         $template .= <<"END_POSTAMBLE"
-.return (op1) # might be pre-empted
+    .return (op1) # might be pre-empted
 .end
 END_POSTAMBLE
     }

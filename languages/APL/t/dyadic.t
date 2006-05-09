@@ -108,22 +108,18 @@ __DATA__
 === maximum vector, float
 --- APL: 1.1 2.2 3.3 4.4⌈3.1
 --- out: 3.1 3.1 3.3 4.4
---- todo
 
 === maximum float, vector
 --- APL: 3.1⌈1.1 2.2 3.3 4.4
 --- out: 3.1 3.1 3.3 4.4
---- todo
 
 === maximum vector
 --- APL: 1.1 2.2 3.3 4.4⌈1.5 2 3.5 4
 --- out: 1.5 2.2 3.5 4.4
---- todo
 
 === maximum domain
 --- APL: 2⌈'TEA'
 --- out: DOMAIN ERROR
---- todo
 
 === minimum scalar
 --- APL: 2.1⌊2
@@ -132,22 +128,18 @@ __DATA__
 === minimum vector, float
 --- APL: 1.1 2.2 3.3 4.4⌊3.1
 --- out: 1.1 2.2 3.1 3.1
---- todo
 
 === minimum float, vector
 --- APL: 3.1⌊1.1 2.2 3.3 4.4
 --- out: 1.1 2.2 3.1 3.1
---- todo
 
 === minimum vector
 --- APL: 1.1 2.2 3.3 4.4⌊1.5 2 3.5 4
 --- out: 1.1 2 3.3 4
---- todo
 
 === minimum domain
 --- APL: 2⌊'TEA'
 --- out: DOMAIN ERROR
---- todo
 
 === power scalar
 --- APL: 2*3
@@ -156,22 +148,18 @@ __DATA__
 === power vector, float
 --- APL: 1.1 2.2 3.3 4.4*2
 --- out: 1.21 4.84 10.89 19.36
---- todo
 
 === power float, vector
 --- APL: 2*0 1 2 3 4 5
 --- out: 1 2 4 8 16 32
---- todo
 
 === power vector
 --- APL: 1.1 2.2 3.3 4.4*1 2 1 2
 --- out: 1.1 4.84 3.3 19.36
---- todo
 
 === power domain (character)
 --- APL: 2*'TEA'
 --- out: DOMAIN ERROR
---- todo
 
 === power domain (negative sqrt)
 --- APL: ⁻9*.5
@@ -409,7 +397,6 @@ __DATA__
 --- APL: 1≠1
 --- out: 0
 
-
-=== deal, and, or, nand, nor, less, not greater, equal, not less, greater, not equal
+=== deal
 --- excuse: need tests
 --- todo
