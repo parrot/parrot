@@ -15,6 +15,14 @@ in F<src/*.c>.
 
 =head1 DESCRIPTION
 
+=head1 TODO
+
+* Tell if there are funcs without docs
+
+* Generate docs from funcs
+
+* Test the POD of the stuff we're parsing.
+
 =head1 COMMAND-LINE OPTIONS
 
 =over 4
@@ -40,9 +48,6 @@ Verbose status along the way.
 use strict;
 use warnings;
 
-use FindBin;
-use lib "$FindBin::Bin/../..";
-use lib "$FindBin::Bin/../../lib";
 use Getopt::Long;
 
 my %opt;
@@ -57,10 +62,13 @@ sub open_file {
     my $direction = shift;
     my $filename = shift;
 
-    my $action =
-        ($direction eq "<") ? "Reading" :
-        ($direction eq ">>") ? "Appending" : "Writing";
+    my %actions = (
+        "<" => "Reading",
+        ">" => "Writing",
+        ">>" => "Appending",
+    );
 
+    my $action = $actions{$direction} or die "Invalid direction '$direction'";
     print "$action $filename\n" if $opt{verbose};
     open my $fh, $direction, $filename or die "$action $filename: $!\n";
     return $fh;
@@ -74,7 +82,17 @@ sub main {
         "cdir=s"    => \$opt{cdir},
         "verbose"   => \$opt{verbose},
     ) or exit(1);
-    unshift @include, ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/pmc/";
+
+    my @cfiles = glob( "$opt{cdir}/*.c" );
+    @cfiles = "src/string.c";
+
+    for my $cfile ( @cfiles ) {
+        my $fh = open_file( "<", $cfile );
+        my $source = do { local $/; <$fh> };
+        close $fh;
+
+        :q
+    }
 }
 
 # vim: expandtab shiftwidth=4:
