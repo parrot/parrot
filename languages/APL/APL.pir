@@ -199,12 +199,15 @@ executing program statements.
     $I0 = elements args
     if $I0 > 0 goto file_arg
 
-    .local pmc stdin
-    stdin = getstdin
+    .local pmc stdin, stdout
+    stdin  = getstdin
+    stdout = getstdout
     push stdin, 'utf8'
 
   stmt_loop:
     .local string stmt
+    print '    '  #prompt
+    stdout.'flush'()
     stmt = readline stdin
     unless stmt goto end
     bsr apl_eval
