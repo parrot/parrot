@@ -184,7 +184,7 @@ END_PIR
     .return ()
 
   print_value:
-    if value >= 0 goto print_value_1
+    if value >= 0.0 goto print_value_1
     print unicode:"\u207b"
     value = abs value
   print_value_1:
