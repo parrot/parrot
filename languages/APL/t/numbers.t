@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 10;
+use t::APL tests => 11;
 
 run_apl_is();
 
@@ -22,6 +22,10 @@ __DATA__
 === negative number
 --- APL: ⁻1.44
 --- out: ⁻1.44
+
+=== negative number with no integer component.
+--- APL: ⁻0.44
+--- out: ⁻0.44
 
 === integer positive exponent
 --- APL: 10E2
