@@ -67,10 +67,12 @@ tree as a PIR code object that can be compiled.
     exp = self
     store_global 'PGE::Exp', '$!group', exp
     exp = exp.reduce(self)
+
+    ##   If we cannot backtrack into the rule, then
+    ##   we don't need a coroutine for it.
     .local int cutrule
     $I0 = exp['backtrack']
     cutrule = iseq $I0, PGE_BACKTRACK_NONE
-    
 
     ##   Generate the PIR for the expression tree.
     .local pmc expcode
@@ -91,21 +93,20 @@ tree as a PIR code object that can be compiled.
           .const .Sub corou = '%0_corou'
           $P0 = corou
           $P0 = clone $P0
-          mob = $P0(mob)
+          mob = $P0(mob, adverbs)
           .return (mob)
       .end
       .sub %0_corou
           .param pmc mob
+          .param pmc adverbs
           .local pmc newfrom
           .local string target
           .local pmc mfrom, mpos
-          newfrom = find_global 'PGE::Match', 'newfrom'
-          (mob, target, mfrom, mpos) = newfrom(mob, -1)
+          .local int cpos, iscont
+          $P0 = getclass 'PGE::Match'
+          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, 'XXX'=>1, adverbs :flat :named)
           $P0 = interpinfo %1
           setattribute mob, '&!corou', $P0
-          .local int pos, lastpos, rep, cutmark
-          lastpos = length target
-          pos = mfrom
         CODE
     goto code_body
 
@@ -115,14 +116,13 @@ tree as a PIR code object that can be compiled.
     code.emit(<<"        CODE", name)
       .sub %0
           .param pmc mob
+          .param pmc adverbs   :slurpy :named
           .local pmc newfrom
           .local string target
           .local pmc mfrom, mpos
-          newfrom = find_global 'PGE::Match', 'newfrom'
-          (mob, target, mfrom, mpos) = newfrom(mob, -1)
-          .local int pos, lastpos, rep, cutmark
-          lastpos = length target
-          pos = mfrom
+          .local int cpos, iscont
+          $P0 = getclass 'PGE::Match'
+          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, 'XXX'=>1, adverbs :flat :named)
         CODE
 
   code_body:
@@ -147,16 +147,9 @@ tree as a PIR code object that can be compiled.
     code.emit("          captscope = mob")
   code_body_3:
 
-    ##   If the :pos adverb is supplied, we won't do :continue semantics.
-    $I0 = adverbs['pos']
-    if $I0 goto code_body_pos
-    ##   This handles :continue semantics.  XXX: It's not
-    ##   exactly according to S05 spec, but close enough until
-    ##   we get String $.pos semantics defined.
-    code.emit(<<"        CODE", PGE_CUT_RULE)
-          if pos >= 0 goto try_at_pos
-          .local int cpos
-          cpos = 0
+    code.emit(<<"        CODE", PGE_CUT_RULE, returnop)
+          .local int pos, lastpos, rep, cutmark
+          lastpos = length target
         try_match:
           if cpos > lastpos goto fail_rule
           mfrom = cpos
@@ -165,19 +158,7 @@ tree as a PIR code object that can be compiled.
           bsr R
           if cutmark <= %0 goto fail_cut
           inc cpos
-          goto try_match
-        try_at_pos:
-        CODE
-
-  code_body_pos:
-    ##   This handles the case where we're only trying the match
-    ##   at the current position, as well as the failure and
-    ##   success modes.
-    code.emit(<<"        CODE", PGE_CUT_RULE, returnop)
-          mfrom = pos
-          cutmark = 0
-          bsr R
-          if cutmark < %0 goto fail_cut
+          if iscont goto try_match
         fail_rule:
           cutmark = %0
         fail_cut:

@@ -135,9 +135,11 @@ is set or implied.
     pos = $P0
     iscont = 0
     grammar = classname src
+    if pos >= 0 goto adverb_pos
+    pos = 0
 
   adverb_pos:
-    if null adverbs goto with_adverbs
+    unless adverbs goto with_adverbs
     ##   determine the value of pos
     $I0 = exists adverbs['pos']
     unless $I0 goto adverb_p
