@@ -88,7 +88,6 @@ ok:
     return len;
 }
 
-void *Parrot_utf8_encode(void *ptr, UINTVAL c);
 static size_t
 PIO_utf8_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
 {

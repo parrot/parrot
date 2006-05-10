@@ -560,10 +560,11 @@ ins_print(Interp *interp, FILE *fd, Instruction * ins)
 
 /* for debug */
 static char *output;
+
 static int
 e_file_open(Interp *interp, void *param)
 {
-    char *file = (char *) param;
+    char * const file = (char *) param;
 
     UNUSED(interp);
     if (strcmp(file, "-"))
