@@ -48,6 +48,7 @@ Verbose status along the way.
 use strict;
 use warnings;
 
+use Data::Dumper;
 use Getopt::Long;
 
 my %opt;
@@ -74,6 +75,40 @@ sub open_file {
     return $fh;
 }
 
+
+sub extract_functions {
+    my $text = shift;
+
+    # Strip blocks of comments
+    $text =~ s[^/\*.*?\*/][]mxsg;
+
+    # Strip # compiler directives (Thanks, Audrey!)
+    $text =~ s[^#(\\\n|.)*][]mg;
+
+    # Strip code blocks
+    $text =~ s[^{.+?^}][]msg;
+
+    # Split on paragraphs
+    my @funcs = split /\n{2,}/, $text;
+
+    # If it doesn't start in the left column, it's not a func
+    #@funcs = grep /^\S/, @funcs;
+
+    # Typedefs and structs are no good
+    @funcs = grep !/^(typedef|struct)/, @funcs;
+
+    # Variables are no good
+    @funcs = grep !/=/, @funcs;
+
+    # Get rid of any code blocks that might be there
+    s/{(.|\n)+//ms for @funcs;
+
+    chomp @funcs;
+
+    return @funcs;
+}
+
+
 sub main {
     $opt{hdir} = "include/parrot";
     $opt{cdir} = "src";
@@ -84,15 +119,16 @@ sub main {
     ) or exit(1);
 
     my @cfiles = glob( "$opt{cdir}/*.c" );
-    @cfiles = "src/string.c";
 
     for my $cfile ( @cfiles ) {
         my $fh = open_file( "<", $cfile );
         my $source = do { local $/; <$fh> };
         close $fh;
 
-        :q
-    }
+        my @funcs = extract_functions( $source );
+
+        print join( "\n\n", @funcs ), "\n" if @funcs;
+    } # for @cfiles
 }
 
 # vim: expandtab shiftwidth=4:
