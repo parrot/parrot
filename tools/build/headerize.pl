@@ -125,7 +125,7 @@ sub main {
 
     my @ofiles = @ARGV;
     for my $ofile ( @ofiles ) {
-        next if $ofile =~ m[src/ops];
+        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/;
 
         my $cfile = $ofile;
         $cfile =~ s/\Q$PConfig{o}\E$/.c/;
