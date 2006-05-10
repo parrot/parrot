@@ -341,10 +341,11 @@ Creates and returns a clone of the subroutine.
          */
         PObj_custom_mark_destroy_SETALL(ret);
         sub = mem_sys_allocate(sizeof(struct Parrot_sub));
-        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
-        sub->name = string_copy(INTERP, sub->name);
+        /* first set the sub struct, string_copy may cause GC */
         PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret) = NULL;
+        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
+        sub->name = string_copy(INTERP, sub->name);
         return ret;
     }
 
