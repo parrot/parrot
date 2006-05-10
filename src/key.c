@@ -466,7 +466,8 @@ key_mark(Interp *interpreter, PMC *key)
     if (flags == KEY_hash_iterator_FLAGS)
         return;
 
-    if (PMC_data(key))
+    /* if iteration hasn't started, above flag isn't set yet */
+    if (PMC_data(key) && PMC_data(key) != (void *)INITBucketIndex)
         pobject_lives(interpreter, (PObj *)PMC_data(key));
 
 }
