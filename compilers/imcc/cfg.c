@@ -129,49 +129,17 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
          * so start a new one with the next instruction */
         if (ins->type & ITBRANCH) {
             SymReg * addr = get_branch_reg(bb->end);
-            int found = 1;
 
             if (addr)
                 addr->last_ins = ins;
-            /* if we have a bsr, then consider it only as a branch,
-             * when we have the target here
-             * and it doesn't saveall - like P6C recursive bsr's
-             *
+            /* 
              * ignore set_addr - no new basic block
              */
-            if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr")) {
-                char *name = ins->r[0]->name;
-                r = get_sym(name);
-                if (*ins->op == 'b') {  /* bsr */
-                    Instruction * lab;
-                    found = r != NULL && r->first_ins;
-                    IMCC_debug(interpreter, DEBUG_CFG, "bsr %s local:%s\n",
-                            name, found ? "yes": "no");
-                    if (r) {
-                        int j;
-                        lab = r->first_ins;
-                        if (lab)
-                            for (j = 0, lab = lab->next; j < 5 && lab;
-                                    lab = lab->next, j++) {
-                                if (!strcmp(lab->op, "saveall")) {
-                                    ins->type |= ITSAVES;
-                                    lab->type |= ITSAVES;
-                                    IMCC_debug(interpreter, DEBUG_CFG, "\ttype saveall\n");
-                                    break;
-                                }
-                            }
-                    }
-                }
-                else {
-                    /* don't treat set_addr as jump source */
-                    found = 0;
-                }
-            }
-            if (found) {
-                if (ins->next)
-                    bb = make_basic_block(interpreter, unit, ins->next);
-                nu = 1;
-            }
+            if (!strcmp(ins->op, "set_addr")) 
+                continue;
+            if (ins->next)
+                bb = make_basic_block(interpreter, unit, ins->next);
+            nu = 1;
         }
     }
 

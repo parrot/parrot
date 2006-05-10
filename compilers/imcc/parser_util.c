@@ -510,7 +510,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     ins->opnum = op;
     ins->opsize = n + 1;
     /* mark end as absolute branch */
-    if (!strcmp(name, "end")) {
+    if (!strcmp(name, "end") || !strcmp(name, "ret")) {
         ins->type |= ITBRANCH | IF_goto;
     }
     else if (!strcmp(name, "warningson")) {
