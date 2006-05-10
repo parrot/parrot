@@ -376,10 +376,12 @@ store_nonanon_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
         multi_sub = Parrot_find_global_p(interpreter, namespace, sub_name);
         if (!multi_sub) {
             multi_sub = pmc_new(interpreter, enum_class_MultiSub);
+            VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
             store_sub_in_namespace(interpreter, multi_sub,
                     namespace, sub_name);
         }
-        VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
+        else
+            VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
         long_name = Parrot_multi_long_name(interpreter, sub_pmc);
         store_sub_in_namespace(interpreter, sub_pmc, namespace, long_name);
 
