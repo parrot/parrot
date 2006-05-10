@@ -200,12 +200,16 @@ tree as a PIR code object that can be compiled.
     quant = hash['quant']
     $I0 = quant['min']
     $I1 = quant['max']
+    $S2 = quant['backtrack']
     hash['m'] = $I0                                  # %m = min repetitions
     hash['n'] = $I1                                  # %n = max repetitions
     $S0 = $I0
     $S0 .= '..'
     $S1 = $I1
     $S0 .= $S1
+    $S0 .= ' ('
+    $S0 .= $S2
+    $S0 .= ')'
     hash['Q'] = $S0                                  # %Q = printable quant
     hash['M'] = ''
     hash['N'] = ''
@@ -1007,7 +1011,7 @@ tree as a PIR code object that can be compiled.
 
   emit_pir:    
     code.emit(<<"        CODE", token, negstr, cclass, 'XXX'=>1, args :flat :named)
-        %L: # cclass %0 %Q cut
+        %L: # cclass %0 %Q 
           $I0 = find%1_cclass %2, target, pos, lastpos
           rep = $I0 - pos
           %Mif rep < %m goto fail
