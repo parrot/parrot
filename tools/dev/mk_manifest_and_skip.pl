@@ -25,6 +25,7 @@ use warnings;
 use File::Find;
 
 my @dirs;  # will be filled in wanted
+
 # XXX Most of these can propably be cleaned up
 my %special = qw(
     NEWS                                            [devel]doc
@@ -133,7 +134,12 @@ foreach my $dir (sort keys %ignore) {
 
 
 sub wanted {
+
     return if $File::Find::name =~ m[/\.svn|blib|debian];
+
+    # This is currently the only ignored directory    
+    return if $File::Find::name =~ m{runtime.parrot.library.PAST};
+
     $File::Find::name =~ s[^\./][];
     -d and push @dirs, $File::Find::name;
     -f and -e ".svn/text-base/$_.svn-base" and MANIFEST();
