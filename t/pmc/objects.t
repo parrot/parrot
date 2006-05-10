@@ -2179,7 +2179,7 @@ ok bar
 OUTPUT
 
 
-pir_output_is(<<'CODE', <<'OUTPUT', "super __init called twice (#39081)", todo=>'rt #39081');
+pir_output_is(<<'CODE', <<'OUTPUT', "super __init called twice (#39081)");
 .sub main :main
     $P0 = newclass 'Foo'
     $P1 = subclass $P0, 'Bar'

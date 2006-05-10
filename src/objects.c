@@ -596,7 +596,7 @@ get_init_meth(Interp* interpreter, PMC *class,
 {
     STRING *meth;
     HashBucket *b;
-    PMC *props;
+    PMC *props, *ns, *method;
 
     *meth_str = NULL;
 #if 0
@@ -615,7 +615,10 @@ get_init_meth(Interp* interpreter, PMC *class,
     meth = PMC_str_val((PMC*) b->value);
 #endif
     *meth_str = meth;
-    return Parrot_find_method_with_cache(interpreter, class, meth);
+
+    ns = VTABLE_namespace(interpreter, class);
+    method = VTABLE_get_pmc_keyed_str(interpreter, ns, meth);
+    return PMC_IS_NULL(method) ? NULL : method;
 }
 
 
@@ -682,10 +685,14 @@ do_initcall(Interp* interpreter, PMC* class, PMC *object, PMC *init)
                 CONST_STRING(interpreter, "BUILD"), &meth_str);
         /* no method found and no BUILD property set? */
         if (!meth && meth_str == NULL) {
+            PMC *ns;
             /* use __init as fallback constructor method, if it exists */
             meth_str = CONST_STRING(interpreter, "__init");
-            meth = Parrot_find_method_with_cache(interpreter,
-                    parent_class, meth_str);
+            ns = VTABLE_namespace(interpreter, parent_class);
+            /* can't use find_method, it walks mro */
+            meth = VTABLE_get_pmc_keyed_str(interpreter, ns, meth_str);
+            if (meth == PMCNULL)
+                meth = NULL;
             default_meth = 1;
         }
         else
