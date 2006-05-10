@@ -1,58 +1,56 @@
 grammar APL::Grammar;
 
-regex statement_list { ^<statement> [ \n <statement> ]* }
+token statement_list { ^<statement> [ \n <statement> ]* }
 
-regex statement { <expression> [ \s*? $$ | <syntax_error> ] }
+token statement { <expression> [ \s*? $$ | <syntax_error> ] }
 
-regex expression { 
+token expression { 
       <target> ← <expression>
     | <monadic_identifier> <expression>
     | <subexpression> [ <dyadic_identifier> <expression> ]?
 }
 
-regex subexpression {
+token subexpression {
     <simple_expression>
 }
 
-regex simple_expression {
+token simple_expression {
     <array_identifier>
 }
 
-regex target { <variable_identifier> }
+token target { <variable_identifier> }
 
-regex dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷∧∨⍲⍱<≤=≥>≠⍳⊖]> }
+token dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷∧∨⍲⍱<≤=≥>≠⍳⊖]> }
 
-regex monadic_identifier { <[|⍟*⌈⌊○!+−×÷~⍳⌽]> }
+token monadic_identifier { <[|⍟*⌈⌊○!+−×÷~⍳⌽]> }
 
-regex array_identifier {
+token array_identifier {
       <constant>
     | <variable_identifier>
 }
 
-regex constant {
+token constant {
       <character_constant>
     | <numeric_constant>
 }
 
 
-regex numeric_constant { 
+token numeric_constant { 
     <decimal_representation> [ \s+ <decimal_representation> ]*
 }
 
 
-regex decimal_representation {
-    [ ⁻? \d+: \.? \d*: | ⁻? \. \d+: ] [ E ⁻? \d+: ]?
+token decimal_representation {
+    [ ⁻? \d+ \.? \d* | ⁻? \. \d+ ] [ E ⁻? \d+ ]?
 }
 
 
-regex character_constant {
-      (') ( [ '' | <-[']> ]*: ) '
-    | (") ( [ "" | <-["]> ]*: ) "
+token character_constant {
+      (') ( [ '' | <-[']> ]* ) '
+    | (") ( [ "" | <-["]> ]* ) "
    
 }
 
+token variable_identifier { <[A..Za..z]> \w* }
 
-regex variable_identifier { <[A..Za..z]> \w*: }
-
-
-regex syntax_error { <?PGE::Util::die: Syntax error> }
+token syntax_error { <?PGE::Util::die: Syntax error> }
