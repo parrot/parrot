@@ -467,7 +467,8 @@ INTERP_O_FILES = \
 O_FILES = \
     $(INTERP_O_FILES) \
     $(CHARSET_O_FILES) \
-    $(IO_O_FILES) $(CLASS_O_FILES) \
+    $(IO_O_FILES) \
+    $(CLASS_O_FILES) \
     $(ENCODING_O_FILES) \
     $(IMCC_O_FILES) \
     $(AST_O_FILES)
@@ -1734,8 +1735,15 @@ tags: tags.dummy
 
 tags.dummy:
 
+HEADERIZER_O_FILES = \
+    $(INTERP_O_FILES) \
+    $(CHARSET_O_FILES) \
+    $(IO_O_FILES) \
+    $(CLASS_O_FILES) \
+    $(ENCODING_O_FILES)
+
 headerizer:
-	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(O_FILES)
+	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
 
 ###############################################################################
 #
