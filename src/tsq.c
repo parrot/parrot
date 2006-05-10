@@ -52,7 +52,8 @@ return C<NULL> if the queue is empty.
 
 */
 QUEUE_ENTRY *
-peek_entry(QUEUE *queue) {
+peek_entry(QUEUE *queue)
+{
     return queue->head;
 }
 

@@ -95,7 +95,7 @@ sub extract_functions {
     @funcs = grep /^\S/, @funcs;
 
     # Typedefs and structs are no good
-    @funcs = grep !/^(typedef|struct)/, @funcs;
+    @funcs = grep !/^(typedef|struct|enum)/, @funcs;
 
     # Variables are of no use to us
     @funcs = grep !/=/, @funcs;
@@ -126,6 +126,8 @@ sub main {
 
     my @ofiles = @ARGV;
     for my $ofile ( @ofiles ) {
+        next if $ofile =~ m[src/ops];
+
         my $cfile = $ofile;
         $cfile =~ s/\.o$/.c/;
 
@@ -137,7 +139,7 @@ sub main {
         my @funcs = extract_functions( $source );
 
         for my $func ( @funcs ) {
-            print "\n---\n$func\n";
+            print "---\n$func\n";
         }
     } # for @cfiles
 }

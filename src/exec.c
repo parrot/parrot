@@ -132,6 +132,7 @@ C<< obj->data_size[N] >>.
 static void
 add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
                 __attribute__nonnull__(1);
+
 static void
 add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
 {
@@ -351,6 +352,7 @@ static int
 symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)
     __attribute__nonnull__(1)
     __attribute__nonnull__(2);
+
 static int
 symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)
 {

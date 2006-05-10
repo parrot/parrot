@@ -37,7 +37,6 @@ typedef struct {
 
 static All_encodings *all_encodings;
 
-void parrot_init_encodings_2(Interp *interpreter);
 void
 parrot_init_encodings_2(Interp *interpreter)
 {

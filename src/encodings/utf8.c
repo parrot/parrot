@@ -152,9 +152,6 @@ utf8_encode(void *ptr, UINTVAL c)
     return u8ptr + len;
 }
 
-/* temporary */
-void * Parrot_utf8_encode(void *ptr, UINTVAL c);
-
 void *
 Parrot_utf8_encode(void *ptr, UINTVAL c)
 {

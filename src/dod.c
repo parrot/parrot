@@ -992,19 +992,15 @@ trace_mem_block(Interp *interpreter,
 
 /*
 
-=item C<static void Parrot_dod_clear_live_bits(Parrot_Interp interpreter)>
-
+FUNCDOC:
 Run through all PMC arenas and clear live bits.
-
-=cut
 
 */
 
-void Parrot_dod_clear_live_bits(Parrot_Interp interpreter);
 void
 Parrot_dod_clear_live_bits(Parrot_Interp interpreter)
 {
-    struct Small_Object_Pool *pool = interpreter->arena_base->pmc_pool;
+    struct Small_Object_Pool * const pool = interpreter->arena_base->pmc_pool;
     struct Small_Object_Arena *arena;
     UINTVAL i;
 #if !ARENA_DOD_FLAGS

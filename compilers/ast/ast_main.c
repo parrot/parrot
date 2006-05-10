@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -26,7 +26,6 @@ extern void ASTparse(Interp *);
 extern void ASTparse(Interp *);
 extern void AST_scan_string(const char *yy_str);
 
-PMC * ast_compile_past(Parrot_Interp, const char *);
 PMC *
 ast_compile_past(Parrot_Interp interp, const char *src_string)
 {
@@ -117,14 +116,13 @@ void
 IMCC_ast_compile(Interp *interpreter, FILE *fp)
 {
     nodeType *top_node;
-    SymReg *sym;
 
     ASTin = fp;
     ASTparse(interpreter);
 
     top_node = interpreter->imc_info->top_node;
     if (top_node) {
-        sym = IMCC_expand_nodes(interpreter, top_node);
+        SymReg * const sym = IMCC_expand_nodes(interpreter, top_node);
         if (interpreter->imc_info->debug & DEBUG_AST) {
             IMCC_dump_nodes(interpreter, top_node);
         }
@@ -136,7 +134,7 @@ IMCC_ast_compile(Interp *interpreter, FILE *fp)
 static void
 register_ast_compiler(Interp* interpreter)
 {
-    STRING *past = const_string(interpreter, "PAST");
+    STRING * const past = const_string(interpreter, "PAST");
     Parrot_compreg(interpreter, past, ast_compile_past);
 }
 /*

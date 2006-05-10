@@ -51,7 +51,7 @@ iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
     SymReg *regs[3];
     SymReg *pmc;
     int i, nargs;
-    int pmc_num = pmc_type(interpreter,
+    const int pmc_num = pmc_type(interpreter,
             string_from_cstring(interpreter, *type == '.' ?type+1:type, 0));
 
     sprintf(fmt, "%d", pmc_num);
@@ -277,7 +277,7 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n, int mmd_op)
 }
 
 static int
-is_infix(char *name, int n, SymReg **r)
+is_infix(const char *name, int n, SymReg **r)
 {
     if (n < 2 || r[0]->set != 'P')
         return -1;
@@ -779,7 +779,6 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname)
     return cs;
 }
 
-void * IMCC_compile_file (Parrot_Interp interp, const char *s);
 void *
 IMCC_compile_file (Parrot_Interp interp, const char *s)
 {

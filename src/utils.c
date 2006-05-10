@@ -686,13 +686,6 @@ TODO add a define, if it's implemented so that we can start filling the gaps
 typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
 
 void 
-Parrot_register_move(Interp *, int n_regs,
-        unsigned char *dest_regs, unsigned char *src_regs,
-        unsigned char temp_reg, 
-        reg_move_func mov, 
-        reg_move_func mov_alt, 
-        void *info);
-void 
 Parrot_register_move(Interp *interpreter, int n_regs,
         unsigned char *dest_regs, unsigned char *src_regs,
         unsigned char temp_reg, 

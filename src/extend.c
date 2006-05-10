@@ -653,7 +653,7 @@ Returns the special C<NULL> PMC.
 
 */
 
-Parrot_PMC Parrot_PMC_null() {
+Parrot_PMC Parrot_PMC_null(void) {
     return PMCNULL;
 }
 

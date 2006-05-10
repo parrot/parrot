@@ -52,7 +52,6 @@ static void ig_set(int i, int j, int N, unsigned int* graph)
     *word |= (1 << bit_ofs);
 }
 
-int ig_test(int i, int j, int N, unsigned int* graph);
 int ig_test(int i, int j, int N, unsigned int* graph)
 {
     int bit_ofs;
