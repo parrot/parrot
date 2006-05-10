@@ -538,6 +538,10 @@ The currently recognised values are:
     'iso-8859-1'
     'ascii'
     'binary'
+    'unicode'
+
+The encoding is implicitly guessed; C<unicode> impliies the C<utf-8>
+encoding, and the other three assume C<fixed-8> encoding.
 
 If C<charset> is unspecified the default charset 'ascii' will be
 used.

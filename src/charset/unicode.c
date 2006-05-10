@@ -581,6 +581,8 @@ Parrot_charset_unicode_init(Interp *interpreter)
     /*
      * for now use utf8
      * TODO replace it with a fixed uint_16 or uint_32 encoding
+     *      XXX if this is changed, modify string_make so it
+     *          still takes "utf8" when fed "unicode" as charset!
      */
     return_set->preferred_encoding = Parrot_utf8_encoding_ptr;
     Parrot_register_charset(interpreter, "unicode", return_set);
