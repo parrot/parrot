@@ -92,16 +92,22 @@ sub extract_functions {
     my @funcs = split /\n{2,}/, $text;
 
     # If it doesn't start in the left column, it's not a func
-    #@funcs = grep /^\S/, @funcs;
+    @funcs = grep /^\S/, @funcs;
 
     # Typedefs and structs are no good
     @funcs = grep !/^(typedef|struct)/, @funcs;
 
-    # Variables are no good
+    # Variables are of no use to us
     @funcs = grep !/=/, @funcs;
 
-    # Get rid of any code blocks that might be there
-    s/{(.|\n)+//ms for @funcs;
+    # Get rid of any blocks at the end
+    s/\s*{.*//s for @funcs;
+
+    # Toast anything non-whitespace
+    @funcs = grep /\S/, @funcs;
+
+    # If it ends with a semicolon, it's not a function
+    @funcs = grep !/;$/, @funcs;
 
     chomp @funcs;
 
@@ -118,16 +124,21 @@ sub main {
         "verbose"   => \$opt{verbose},
     ) or exit(1);
 
-    my @cfiles = glob( "$opt{cdir}/*.c" );
+    my @ofiles = @ARGV;
+    for my $ofile ( @ofiles ) {
+        my $cfile = $ofile;
+        $cfile =~ s/\.o$/.c/;
 
-    for my $cfile ( @cfiles ) {
         my $fh = open_file( "<", $cfile );
         my $source = do { local $/; <$fh> };
         close $fh;
 
+        print "\n=== $cfile ===\n";
         my @funcs = extract_functions( $source );
 
-        print join( "\n\n", @funcs ), "\n" if @funcs;
+        for my $func ( @funcs ) {
+            print "\n---\n$func\n";
+        }
     } # for @cfiles
 }
 
