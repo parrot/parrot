@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 # $Id: pmc2c.pl 12524 2006-05-05 21:50:26Z petdance $
 
@@ -11,7 +11,7 @@ tools/build/headerizer.pl - Generates the function header parts of .h files from
 Update the headers in F<include/parrot> with the function declarations
 in F<src/*.c>.
 
-    % perl tools/build/headerizer.pl --cdir=src --hdir=include/parrot
+    % perl tools/build/headerizer.pl --cdir=src --hdir=include/parrot OBJFILES
 
 =head1 DESCRIPTION
 
@@ -43,6 +43,16 @@ Verbose status along the way.
 
 =back
 
+=head 1 COMMAND-LINE ARGUMENTS
+
+=over 4
+
+=item C<OBJFILES>
+
+One or more object file names.
+
+=back
+
 =cut
 
 use strict;
@@ -50,6 +60,8 @@ use warnings;
 
 use Data::Dumper;
 use Getopt::Long;
+use lib qw( lib );
+use Parrot::Config;
 
 my %opt;
 
@@ -129,7 +141,7 @@ sub main {
         next if $ofile =~ m[src/ops];
 
         my $cfile = $ofile;
-        $cfile =~ s/\.o$/.c/;
+        $cfile =~ s/\Q$PConfig{o}\E$/.c/;
 
         my $fh = open_file( "<", $cfile );
         my $source = do { local $/; <$fh> };
