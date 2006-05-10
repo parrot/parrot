@@ -1915,7 +1915,8 @@ Returns a Parrot string representation of the specified integer value.
 */
 
 STRING *
-string_from_int(Interp * interpreter, INTVAL i) {
+string_from_int(Interp * interpreter, INTVAL i)
+{
     char buf[128];
     return int_to_str(interpreter, buf, i, 10);
 }
@@ -1974,7 +1975,8 @@ sorts of leak potential otherwise.
 */
 
 void
-string_cstring_free(void *ptr) {
+string_cstring_free(void *ptr)
+{
     mem_sys_free(ptr);
 }
 
@@ -1987,7 +1989,8 @@ memory.
 */
 
 void
-string_pin(Interp * interpreter, STRING * s) {
+string_pin(Interp * interpreter, STRING * s)
+{
     void *memory;
     INTVAL size;
 
@@ -2014,7 +2017,8 @@ memory.
 */
 
 void
-string_unpin(Interp * interpreter, STRING * s) {
+string_unpin(Interp * interpreter, STRING * s)
+{
     void *memory;
     INTVAL size;
 
