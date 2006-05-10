@@ -1202,7 +1202,7 @@
     bsr CollectWord
     .emit(".POP\n")
     .emit("$S0 = \"_\"\n")
-    .emit("fetchmethod $P0, .TOS, \"_")
+    .emit("find_method $P0, .TOS, \"_")
     .emit(.CURR)
     .emit("\"\n")
     .emit(".SAVEM\n")
