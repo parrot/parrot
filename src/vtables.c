@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -30,7 +30,8 @@ Creates and returns a pointer to the new C<VTABLE>.
 */
 
 VTABLE *
-Parrot_new_vtable(Parrot_Interp interpreter) {
+Parrot_new_vtable(Parrot_Interp interpreter)
+{
     return mem_sys_allocate_zeroed(sizeof(VTABLE));
 }
 
@@ -50,7 +51,8 @@ Destroys C<*vtable>.
 */
 
 VTABLE *
-Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable) {
+Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable)
+{
     VTABLE * const new_vtable = mem_sys_allocate(sizeof(VTABLE));
     if (new_vtable) {
         memcpy(new_vtable, base_vtable, sizeof(VTABLE));
@@ -60,7 +62,8 @@ Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable) {
 
 
 void
-Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable) {
+Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable)
+{
     mem_sys_free(vtable);
 }
 

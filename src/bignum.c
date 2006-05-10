@@ -2280,8 +2280,8 @@ Multiplies C<*one> and C<*two>, storing the result in C<*result>.
 
 void 
 BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-             BN_CONTEXT *context) {
-
+             BN_CONTEXT *context)
+{
     if (one->digits == 0 || two->digits == 0) {
         if (am_NAN(one) || am_NAN(two)) {
             if (am_sNAN(one) || am_sNAN(two)) {
@@ -2329,7 +2329,8 @@ Multiplication without the rounding and other set up.
 
 int
 BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-              BN_CONTEXT *context) {
+              BN_CONTEXT *context)
+{
     INTVAL i,j;
     int carry, dig;
 
@@ -3012,11 +3013,9 @@ Calculate C<result> = C<bignum> to the power of C<*expn>;
 
 void
 BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
-              BIGNUM* expn, BN_CONTEXT* context) {
-
+              BIGNUM* expn, BN_CONTEXT* context)
+{
     BN_arith_setup(PINT_ result, bignum, expn, context, NULL);
-
-
     BN_arith_cleanup(PINT_ result, bignum, expn, context, NULL);
 }
 

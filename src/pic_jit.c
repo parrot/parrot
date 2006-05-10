@@ -298,8 +298,9 @@ parrot_pic_is_safe_to_jit(Interp *interpreter, PMC *sub,
     return 1;
 }
 
-funcptr_t 
-parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags) {
+funcptr_t
+parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags)
+{
 #if PIC_TEST
     UNUSED(interpreter);
     UNUSED(sub);
