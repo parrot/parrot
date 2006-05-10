@@ -1,6 +1,12 @@
 =head1 Deprecated opcodes
 
-All are gone. Please read the history of this file for more.
+=over 4
+
+=item fetchmethod
+
+Use the C<find_method> opcode instead.
+
+=back
 
 =head1 .imc file extension
 
