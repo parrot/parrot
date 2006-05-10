@@ -8,10 +8,11 @@ tools/build/headerizer.pl - Generates the function header parts of .h files from
 
 =head1 SYNOPSIS
 
-Update the headers in F<include/parrot> with the function declarations
-in F<src/*.c>.
+Update the headers in F<include/parrot> with the function declarations in
+the F<*.pmc> or F<*.c> files that correspond to the F<*.o> files passed
+on the command line.
 
-    % perl tools/build/headerizer.pl --cdir=src --hdir=include/parrot OBJFILES
+    % perl tools/build/headerizer.pl OBJFILES
 
 =head1 DESCRIPTION
 
@@ -26,16 +27,6 @@ in F<src/*.c>.
 =head1 COMMAND-LINE OPTIONS
 
 =over 4
-
-=item C<--cdir=dir>
-
-Specify the directory to find the source files.  Defaults to F<src>
-if not specified.
-
-=item C<--hdir=dir>
-
-Specify the directory to find the header files.  Defaults to
-F<include/parrot> if not specified.
 
 =item C<--verbose>
 
@@ -107,7 +98,7 @@ sub extract_functions {
     @funcs = grep /^\S/, @funcs;
 
     # Typedefs and structs are no good
-    @funcs = grep !/^(typedef|struct|enum)/, @funcs;
+    @funcs = grep !/^(typedef|struct|enum|extern)/, @funcs;
 
     # Variables are of no use to us
     @funcs = grep !/=/, @funcs;
@@ -118,8 +109,8 @@ sub extract_functions {
     # Toast anything non-whitespace
     @funcs = grep /\S/, @funcs;
 
-    # If it ends with a semicolon, it's not a function
-    @funcs = grep !/;$/, @funcs;
+    # If it's got a semicolon, it's not a function header
+    @funcs = grep !/;/, @funcs;
 
     chomp @funcs;
 
@@ -128,11 +119,7 @@ sub extract_functions {
 
 
 sub main {
-    $opt{hdir} = "include/parrot";
-    $opt{cdir} = "src";
     GetOptions(
-        "hdir=s"    => \$opt{hdir},
-        "cdir=s"    => \$opt{cdir},
         "verbose"   => \$opt{verbose},
     ) or exit(1);
 
@@ -142,6 +129,11 @@ sub main {
 
         my $cfile = $ofile;
         $cfile =~ s/\Q$PConfig{o}\E$/.c/;
+
+        my $pmcfile = $ofile;
+        $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
+
+        my $sourcefile = -f $pmcfile ? $pmcfile : $cfile;
 
         my $fh = open_file( "<", $cfile );
         my $source = do { local $/; <$fh> };
