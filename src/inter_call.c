@@ -838,8 +838,8 @@ process_args(Interp *interpreter, struct call_state *st,
          */
         if (!(state & CALL_STATE_NAMED_x)) {
             if (!(state & CALL_STATE_SLURP) &&
-                (st->dest.sig & 
-                    (PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_NAME)) == 
+                    (st->dest.sig & 
+                     (PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_NAME)) == 
                     PARROT_ARG_SLURPY_ARRAY) {
                 /* create array */
                 idx = st->dest.u.op.pc[st->dest.i];
@@ -855,9 +855,22 @@ process_args(Interp *interpreter, struct call_state *st,
                     /* stop slurpy array */
                     st->dest.slurp = NULL;
                     st->dest.mode &= ~CALL_STATE_SLURP;
-                    st->src.mode &= ~CALL_STATE_NEXT_ARG;
-                    st->dest.mode |= CALL_STATE_NEXT_ARG;
-                    continue;
+                    /*
+                     * work around bad interaction of _NEXT_ARG
+                     * and flattening (which always advances to next)
+                     * TODO rewrite all again, now that all pieces are
+                     * together
+                     */
+                    if (st->src.mode & CALL_STATE_FLATTEN) {
+                        if (!next_arg(interpreter, &st->dest)) {
+                            st->dest.mode |= CALL_STATE_x_END;
+                        }
+                    }
+                    else {
+                        st->src.mode &= ~CALL_STATE_NEXT_ARG;
+                        st->dest.mode |= CALL_STATE_NEXT_ARG;
+                        continue;
+                    }
                 }
             }
         }

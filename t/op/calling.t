@@ -2324,7 +2324,7 @@ ok 3
 ok 4
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named loses :flat arg (#39044)", todo => 'rt #39044');
+pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named loses :flat arg (#39044)");
 .sub main :main
     $P0 = new .Hash
     $P0['a'] = 11
@@ -2336,6 +2336,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named loses :flat arg (#39044)", tod
 .sub foo
     .param pmc array :slurpy
     .param pmc hash :slurpy :named
+    $I0 = elements array
+    print $I0
+    print "\n"
     $P0 = hash['a']
     say $P0
     $P0 = hash['b']
@@ -2344,6 +2347,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "slurpy named loses :flat arg (#39044)", tod
     say $P0
 .end
 CODE
+2
 11
 22
 33
