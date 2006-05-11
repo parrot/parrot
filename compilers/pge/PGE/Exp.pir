@@ -103,7 +103,7 @@ tree as a PIR code object that can be compiled.
           .local pmc mfrom, mpos :unique_reg
           .local int cpos, iscont :unique_reg
           $P0 = getclass 'PGE::Match'
-          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, 'XXX'=>1, adverbs :flat :named)
+          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
           $P0 = interpinfo %1
           setattribute mob, '&!corou', $P0
         CODE
@@ -121,7 +121,7 @@ tree as a PIR code object that can be compiled.
           .local pmc mfrom, mpos  :unique_reg
           .local int cpos, iscont :unique_reg
           $P0 = getclass 'PGE::Match'
-          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, 'XXX'=>1, adverbs :flat :named)
+          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
         CODE
 
   code_body:
@@ -286,7 +286,7 @@ tree as a PIR code object that can be compiled.
 
     literal = code.escape(literal)
 
-    code.emit(<<"        CODE", litlen, literal, 'XXX'=>0, args :named :flat)
+    code.emit(<<"        CODE", litlen, literal, args :named :flat)
         %L: # literal
           $I0 = pos + %0
           if $I0 > lastpos goto fail
@@ -440,7 +440,7 @@ tree as a PIR code object that can be compiled.
     if $I0 != 0 goto bt_greedy_none
     $I0 = self['max']
     if $I0 != PGE_INF goto bt_greedy_none
-    code.emit(<<"        CODE", replabel, explabel, 'XXX'=>0, args :flat :named)
+    code.emit(<<"        CODE", replabel, explabel, args :flat :named)
         %L:  # quant 0..Inf greedy
         %0:
           push ustack, pos
@@ -460,7 +460,7 @@ tree as a PIR code object that can be compiled.
     if $I0 != 0 goto bt_greedy_none
     $I0 = self['max']
     if $I0 != PGE_INF goto bt_greedy_none
-    code.emit(<<"        CODE", replabel, explabel, 'XXX'=>0, args :flat :named)
+    code.emit(<<"        CODE", replabel, explabel, args :flat :named)
         %L:  # quant 0..Inf none
           bsr %0
           if cutmark != %c goto fail
@@ -480,7 +480,7 @@ tree as a PIR code object that can be compiled.
 
   bt_greedy_none:
     ##   handle greedy or none
-    code.emit(<<"        CODE", replabel, explabel, 'XXX'=>0, args :flat :named)
+    code.emit(<<"        CODE", replabel, explabel, args :flat :named)
         %L:  # quant %Q greedy/none
           push gpad, 0
           bsr %0
@@ -515,7 +515,7 @@ tree as a PIR code object that can be compiled.
 
   bt_eager:
     ##   handle eager backtracking
-    code.emit(<<"        CODE", replabel, explabel, 'XXX'=>0, args :flat :named)
+    code.emit(<<"        CODE", replabel, explabel, args :flat :named)
         %L:  # quant %Q eager
           push gpad, 0
           bsr %0
@@ -721,7 +721,7 @@ tree as a PIR code object that can be compiled.
     rname = substr subname, $I0
     $I0 -= 2
     grammar = substr subname, 0, $I0
-    code.emit(<<"        CODE", grammar, rname, 'XXX'=>1, args :flat :named)
+    code.emit(<<"        CODE", grammar, rname, args :flat :named)
         %L: # grammar subrule %0::%1
           (captob, $P9, $P9, $P0) = captscope.'newfrom'(pos, '%0')
           $P0 = pos
@@ -733,7 +733,7 @@ tree as a PIR code object that can be compiled.
     ##   The subrule is of the form <rule>, which means we first look
     ##   for a method on the current match object, otherwise we do a
     ##   normal name lookup.
-    code.emit(<<"        CODE", subname, 'XXX'=>1, args :flat :named)
+    code.emit(<<"        CODE", subname, args :flat :named)
         %L: # subrule %0
           captob = captscope
           $P0 = getattribute captob, '$.pos'
@@ -1010,7 +1010,7 @@ tree as a PIR code object that can be compiled.
     negstr = ''
 
   emit_pir:    
-    code.emit(<<"        CODE", token, negstr, cclass, 'XXX'=>1, args :flat :named)
+    code.emit(<<"        CODE", token, negstr, cclass, args :flat :named)
         %L: # cclass %0 %Q 
           $I0 = find%1_cclass %2, target, pos, lastpos
           rep = $I0 - pos
