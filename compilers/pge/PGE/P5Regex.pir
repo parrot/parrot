@@ -12,14 +12,14 @@
   adverbs_1:
     $I0 = exists adverbs['grammar']
     if $I0 goto adverbs_2
-    adverbs['grammar'] = 'PGE::Regex'
+    adverbs['grammar'] = 'PGE::Grammar'
   adverbs_2:
 
     .local string target
     target = adverbs['target']
 
     .local pmc match
-    $P0 = find_global "PGE::Regex", "p5regex"
+    $P0 = find_global "PGE::Grammar", "p5regex"
     match = $P0(source)
     if target != 'parse' goto check
     .return (match)
@@ -55,7 +55,7 @@
 .end
 
 
-.namespace [ "PGE::Regex" ]
+.namespace [ "PGE::Grammar" ]
 
 .sub "p5regex"
     .param pmc mob

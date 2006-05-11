@@ -33,7 +33,7 @@ or the resulting PIR code (target='PIR').
     target = adverbs['target']
 
     .local pmc match
-    $P0 = find_global 'PGE::Regex', 'glob'
+    $P0 = find_global 'PGE::Grammar', 'glob'
     match = $P0(source)
     if target != 'parse' goto check
     .return (match)
@@ -106,13 +106,13 @@ or the resulting PIR code (target='PIR').
 
 Parses a glob expression, returning the corresponding
 parse C<PGE::Match> object.   This is installed as a
-C<< <glob> >> subrule in C<PGE::Regex>, so one can call
+C<< <glob> >> subrule in C<PGE::Grammar>, so one can call
 it from another regex in order to parse a valid glob
 expression.
 
 =cut
 
-.namespace [ 'PGE::Regex' ]
+.namespace [ 'PGE::Grammar' ]
 
 .const int GLOB_INF = 2147483647 
 

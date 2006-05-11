@@ -68,7 +68,7 @@ whole thing may be taken out or refactored away at any moment.
     null rulesub
     rulesub = p6rule_compile(pattern)
     ## leo XXX need namespace
-    store_global "PGE::Regex", name, rulesub
+    store_global "PGE::Grammar", name, rulesub
 
     .return (name)
 .end

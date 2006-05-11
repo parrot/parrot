@@ -27,7 +27,7 @@ PunieGrammar -- A grammar for parsing Perl 1
 =head1 DESCRIPTION
 
 This is a grammar to parse Perl 1 programs. It inherits the behavior
-of the PGE::Regex class. It parses a string of source code according to
+of the PGE::Grammar class. It parses a string of source code according to
 its hierarchy of rules and returns a PGE::Match object (a parse tree).
 
 =cut
@@ -38,7 +38,7 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
 
-    $P0 = getclass 'PGE::Regex'
+    $P0 = getclass 'PGE::Grammar'
     $P1 = subclass $P0, 'PunieGrammar'
 
     .local pmc optable

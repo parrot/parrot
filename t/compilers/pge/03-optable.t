@@ -133,7 +133,7 @@ sub optable_output_is {
     optable.newtok('postfix:--', 'equiv'=>'prefix:++')
 
     .local pmc ident
-    ident = find_global 'PGE::Regex', 'ident'
+    ident = find_global 'PGE::Match', 'ident'
     optable.newtok('term:', 'tighter'=>'prefix:++', 'parsed'=>ident)
     optable.newtok('circumfix:( )', 'equiv'=>'term:')
     optable.newtok('circumfix:[ ]', 'equiv'=>'term:')

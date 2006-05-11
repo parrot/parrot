@@ -9,14 +9,14 @@ a number of built-in rules.
 
 =cut
 
-.namespace [ 'PGE::Regex' ]
+.namespace [ 'PGE::Match' ]
 
 .include 'cclass.pasm'
 .include 'interpinfo.pasm'
 
 .sub '__onload' :load
     .local pmc base
-    $P0 = subclass 'PGE::Match', 'PGE::Regex'
+    $P0 = subclass 'PGE::Match', 'PGE::Grammar'
     $P0 = new .Hash
     store_global '%!cache', $P0
     .return ()

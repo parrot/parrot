@@ -16,7 +16,7 @@ also.)
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = subclass 'PGE::Regex', 'PGE::Text'
+    $P0 = subclass 'PGE::Grammar', 'PGE::Text'
 .end
 
 =head2 Available rules

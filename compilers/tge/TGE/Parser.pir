@@ -15,7 +15,7 @@ TGE::Parser - parser for the grammar syntax of TGE
 
     .local string classname
     classname = 'TGE::Parser'
-    $P1 = subclass 'PGE::Regex', classname
+    $P1 = subclass 'PGE::Grammar', classname
 
     # Construct the grammar
     .local pmc p6rule

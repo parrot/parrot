@@ -236,14 +236,14 @@ OPTIONS
     ns = iter[namespace]
     $P0 = ns['rule']
     rulepir .= $P0
-    if namespace == 'PGE::Regex' goto ns_optable
+    if namespace == 'PGE::Grammar' goto ns_optable
     if namespace == '' goto ns_optable
     $S0 = initpir.unique('onload_')
     initpir.emit(<<'        CODE', namespace, $S0)
           ## namespace %0
           $I0 = find_type '%0'
           if $I0 != 0 goto %1
-          $P0 = subclass 'PGE::Regex', '%0'
+          $P0 = subclass 'PGE::Grammar', '%0'
         %1:
         CODE
   ns_optable:

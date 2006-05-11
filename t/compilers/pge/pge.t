@@ -42,10 +42,10 @@ my $ns_subs = {
 		'PGE' => [qw/ /],
 		'PGE::Exp' => [qw/ /],
 		'PGE::P6Regex' => [qw/ /],
-		'PGE::Regex' => [qw/ regex /], ## TODO deprecated
+		'PGE::Grammar' => [qw/ regex /], ## TODO deprecated
 	},
 	'PGE/Regex.pir' => {
-		'PGE::Regex' => [qw/
+		'PGE::Match' => [qw/
 			ident null fail upper lower alpha digit xdigit space
 			print graph blank cntrl punct alnum sp lt gt dot ws before
 			/],

@@ -1289,7 +1289,7 @@ tree as a PIR code object that can be compiled.
           $S0 = concat %2, ':"'
           $S1 = %3
           $S0 .= $S1
-          $P0 = find_global 'PGE::Regex', '%!cache'
+          $P0 = find_global 'PGE::Match', '%!cache'
           $I0 = exists $P0[$S0]
           if $I0 goto %0_1
           $P1 = compreg %2

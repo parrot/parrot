@@ -36,7 +36,7 @@ or the resulting PIR code (target='PIR').
     adverbs['grammar'] = $S0
     goto with_grammar
   adverb_grammar_1:
-    adverbs['grammar'] = 'PGE::Regex'
+    adverbs['grammar'] = 'PGE::Grammar'
   with_grammar:
     $I0 = exists adverbs['name']
     if $I0 goto with_name
@@ -78,7 +78,7 @@ or the resulting PIR code (target='PIR').
 
   parse:
     ##   Let's parse the source as a regex
-    $P0 = find_global 'PGE::Regex', 'regex'
+    $P0 = find_global 'PGE::Grammar', 'regex'
     match = $P0(source)
     if target != 'parse' goto check
     .return (match)
@@ -119,7 +119,7 @@ or the resulting PIR code (target='PIR').
   make_grammar:
     $I0 = find_type grammar
     if $I0 > 0 goto end
-    $P0 = subclass 'PGE::Regex', grammar
+    $P0 = subclass 'PGE::Grammar', grammar
   end:
     .return ($P1)
 .end
@@ -129,12 +129,12 @@ or the resulting PIR code (target='PIR').
 
 Parses a regex according to Perl 6 regex syntax, and returns 
 the corresponding parse tree.  This is installed as a C<< <regex> >> 
-rule in C<PGE::Regex>, so one can call it from another regex to 
+rule in C<PGE::Grammar>, so one can call it from another regex to 
 parse valid Perl 6 regular expressions.
 
 =cut
 
-.namespace [ 'PGE::Regex' ]
+.namespace [ 'PGE::Grammar' ]
 
 .sub 'regex'
     .param pmc mob
@@ -639,7 +639,7 @@ Parses a subrule token.
     inc pos
     mpos = pos
     .local pmc regex
-    regex = find_global 'PGE::Regex', 'regex'
+    regex = find_global 'PGE::Grammar', 'regex'
     $P1 = regex(mob)
     unless $P1 goto end
     $S0 = $P1

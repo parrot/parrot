@@ -17,7 +17,7 @@ parsing tasks using PGE.
 
 .sub "__onload" :load
     .local pmc base
-    $P0 = subclass 'PGE::Regex', 'PGE::Util'
+    $P0 = subclass 'PGE::Grammar', 'PGE::Util'
     .return ()
 .end 
 

@@ -176,7 +176,7 @@ executing program statements.
     $P0()
     $P0 = find_global 'APL', '__load_pirtable'
     $P0()
-    $P0 = subclass 'PGE::Regex', 'APL::Grammar'
+    $P0 = subclass 'PGE::Grammar', 'APL::Grammar'
 
     load_bytecode 'dumper.pbc'
     load_bytecode 'PGE/Dumper.pbc'
