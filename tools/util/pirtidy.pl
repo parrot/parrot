@@ -45,10 +45,10 @@ tools/util/pirtidy.pl - a PIR script indenter and reformatter
 
 =head1 DESCRIPTION
 
-pirtidy reads a perl script and writes an indented, reformatted script.
+pirtidy reads a pir file and writes an indented, reformatted script.
 
-pirtidy is somewhat liberal about how it formats your script - it has
-no qualms about converting your script to use a maximal amount of 
+pirtidy is somewhat liberal about how it formats your file -- it has
+no qualms about converting your script to use a maximal amount of
 syntactic sugar.
 
 Inspired by perltidy.
@@ -57,7 +57,7 @@ Inspired by perltidy.
 
  perl pirtidy.pl somefile.pir
 
-This will produce a file somefile.pir.tdy containing the script
+This will produce a file somefile.pir.tdy containing the pir file
 reformatted using the default options. pirtidy never changes the input file.
 
 =head1 BUGS
