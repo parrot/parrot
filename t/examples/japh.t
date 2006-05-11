@@ -51,6 +51,9 @@ my %todo = ( 1  => 'opcode "pack" is gone',
 if ( $PConfig{bigendian} ) {
     $todo{8} = 'works only on little endian';
 }
+if ( $PConfig{intvalsize} == 8) {
+    $todo{8} = 'works only with 32-bit integer values';
+}
 
 # run all tests and tell about todoness
 foreach ( 1 .. 17 ) {
