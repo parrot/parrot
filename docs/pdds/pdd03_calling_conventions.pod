@@ -332,7 +332,7 @@ Specific exceptions to throw for specific errors.
   foo(x, ar :flat, y)             # flattening array
   foo(p, 'q' => q)                # named argument
   foo(p, q :named('q'))           # the same
-  foo(kw :named :flat)            # a flattening has
+  foo(kw :named :flat)            # a flattening hash
 
 =head2 Parameters
 
