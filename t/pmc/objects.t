@@ -2119,17 +2119,21 @@ CODE
 Perl6;PAST;Node
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "isa (#39045)", todo => 'rt #39045');
+pir_output_is(<<'CODE', <<'OUTPUT', "isa (#39045)");
 .sub main :main
     .local pmc base, o1, o2
     base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
     $P0 = new [ 'Perl6'; 'PAST'; 'Node' ]
     $I0 = isa $P0, [ 'Perl6'; 'PAST'; 'Node']
     print $I0
+    $I0 = isa $P0, 'Hash'
+    print $I0
+    $I0 = isa $P0, 'Perl6'
+    print $I0
     print "\n"
 .end
 CODE
-0
+110
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering", todo => 'awaiting fix');

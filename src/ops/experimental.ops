@@ -430,6 +430,13 @@ inline op getclass(out PMC, in KEY) :object_classes {
     $1 = class;
   goto ADDRESS(next);
 }
+
+inline op isa(out INT, in PMC, in KEY) :object_base {
+    PMC *class = Parrot_class_lookup_p(interpreter, $3);
+    $1 = Parrot_object_isa(interpreter, $2, class);
+    goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

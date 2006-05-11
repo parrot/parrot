@@ -398,6 +398,9 @@ pmc_type(Interp* interpreter, STRING *name)
     PMC *item;
 
     item = VTABLE_get_pointer_keyed_str(interpreter, classname_hash, name); 
+    /* nested namespace with same name */
+    if (item->vtable->base_type == enum_class_NameSpace)
+        return 0;
     if (!PMC_IS_NULL(item))
         return PMC_int_val((PMC*) item);
     return Parrot_get_datatype_enum(interpreter, name);
