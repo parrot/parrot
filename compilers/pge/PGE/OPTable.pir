@@ -31,6 +31,8 @@ PGE::OPTable - PGE operator precedence table and parser
 .const int PGE_OPTABLE_POSTCIRCUMFIX = 0x0800
 .const int PGE_OPTABLE_CIRCUMFIX     = 0x0900
 
+.const int PGE_OPTABLE_STOP_SUB      = -1
+
 .include "cclass.pasm"
 
 .sub "__onload" :load
@@ -64,68 +66,6 @@ PGE::OPTable - PGE operator precedence table and parser
     setattribute self, "PGE::OPTable\x0%!klen", klentable
 .end
 
-
-.sub "addtok" :method
-    .param string name
-    .param string rel          
-    .param string opts         :optional
-    .param int has_opts        :opt_flag
-    .param pmc match           :optional
-    .param int has_match       :opt_flag
-
-    .local pmc args
-    args = new .Hash
-
-  addtok_rel:
-    if rel == '' goto no_precedence
-    $S0 = substr rel, 0, 1
-    if $S0 == '<' goto looser
-    if $S0 == '>' goto tighter
-    args['equiv'] = rel 
-    goto addtok_opts
-  looser:
-    $S0 = substr rel, 1
-    args['looser'] = $S0
-    goto addtok_opts
-  tighter:
-    $S0 = substr rel, 1
-    args['tighter'] = $S0
-    goto addtok_opts
-  no_precedence:
-    args['precedence'] = '='
-
-  addtok_opts:
-    if has_opts == 0 goto addtok_match
-  addtok_right:
-    $I0 = index opts, 'right'
-    if $I0 < 0 goto addtok_list
-    args['assoc'] = 'right'
-  addtok_list:
-    $I0 = index opts, 'list'
-    if $I0 < 0 goto addtok_nows
-    args['assoc'] = 'list'
-  addtok_nows:
-    $I0 = index opts, 'nows'
-    if $I0 < 0 goto addtok_nullterm
-    args['nows'] = 1
-  addtok_nullterm:
-    $I0 = index opts, 'nullterm'
-    if $I0 < 0 goto addtok_match
-    args['nullterm'] = 1
-
-  addtok_match:
-    if has_match == 0 goto end
-    $I0 = isa match, 'Sub'
-    if $I0 goto add_parsed
-    args['match'] = match
-    goto end
-  add_parsed:
-    args['parsed'] = match
-
-  end:
-    .return self.'newtok'(name, args :named :flat)
-.end
-    
 
 .sub 'newtok' :method
     .param string name
@@ -286,21 +226,29 @@ PGE::OPTable - PGE operator precedence table and parser
     ##   see if we have a 'stop' adverb.  If so, then it is either
     ##   a string to be matched directly or a sub(rule) to be called 
     ##   to check for a match.
-    .local int has_stop
+    .local int has_stop, has_stop_nows
     .local string stop_str
     .local pmc stop
     has_stop = 0
-    if null adverbs goto parse_1
+    if null adverbs goto with_stop
     $I0 = exists adverbs['stop']
-    if $I0 == 0 goto parse_1
+    if $I0 == 0 goto with_stop
     stop = adverbs['stop']
-    has_stop = -1
+    has_stop = PGE_OPTABLE_STOP_SUB
     $I0 = isa stop, 'Sub'
-    if $I0 goto parse_1
+    if $I0 goto with_stop
     stop_str = stop
+    $S0 = substr stop_str, 0, 1
+    if $S0 != ' ' goto stop_str_nows
+    stop_str = substr stop_str, 1
     has_stop = length stop_str
+    has_stop_nows = 0
+    goto with_stop
+  stop_str_nows:
+    has_stop = length stop_str
+    has_stop_nows = PGE_OPTABLE_NOWS
+  with_stop:
     
-  parse_1:
     tokentable = self
     keytable = getattribute self, "PGE::OPTable\x0%!key"
     klentable = getattribute self, "PGE::OPTable\x0%!klen"
@@ -352,14 +300,16 @@ PGE::OPTable - PGE operator precedence table and parser
     ##  if we're in a circumfix.
     if circumnest > 0 goto key_search
     if has_stop == 0 goto key_search
-    if has_stop > 0 goto check_stop_str
-    mpos = pos
-    $P0 = stop(mob)
-    if $P0 goto oper_not_found
-    goto key_search
-  check_stop_str:
+    if has_stop == PGE_OPTABLE_STOP_SUB goto check_stop_sub
+    $I0 = has_stop_nows & nows
+    if $I0 goto key_search
     $S0 = substr target, pos, has_stop
     if $S0 == stop_str goto oper_not_found
+    goto key_search
+  check_stop_sub:
+    mpos = wspos
+    $P0 = stop(mob)
+    if $P0 goto oper_not_found
 
   ## look through eligible tokens to find longest match
   key_search:
@@ -661,3 +611,71 @@ PGE::OPTable - PGE operator precedence table and parser
 #       E = either the end of the parse, or a parse error (probably
 #           to be determined by the caller)
 #
+
+=item C<addtok(string name, string rel [, string opts [, pmc match]])>
+
+Deprecated.  Use C<newtok>.
+
+=cut
+
+.sub "addtok" :method
+    .param string name
+    .param string rel          
+    .param string opts         :optional
+    .param int has_opts        :opt_flag
+    .param pmc match           :optional
+    .param int has_match       :opt_flag
+
+    .local pmc args
+    args = new .Hash
+
+  addtok_rel:
+    if rel == '' goto no_precedence
+    $S0 = substr rel, 0, 1
+    if $S0 == '<' goto looser
+    if $S0 == '>' goto tighter
+    args['equiv'] = rel 
+    goto addtok_opts
+  looser:
+    $S0 = substr rel, 1
+    args['looser'] = $S0
+    goto addtok_opts
+  tighter:
+    $S0 = substr rel, 1
+    args['tighter'] = $S0
+    goto addtok_opts
+  no_precedence:
+    args['precedence'] = '='
+
+  addtok_opts:
+    if has_opts == 0 goto addtok_match
+  addtok_right:
+    $I0 = index opts, 'right'
+    if $I0 < 0 goto addtok_list
+    args['assoc'] = 'right'
+  addtok_list:
+    $I0 = index opts, 'list'
+    if $I0 < 0 goto addtok_nows
+    args['assoc'] = 'list'
+  addtok_nows:
+    $I0 = index opts, 'nows'
+    if $I0 < 0 goto addtok_nullterm
+    args['nows'] = 1
+  addtok_nullterm:
+    $I0 = index opts, 'nullterm'
+    if $I0 < 0 goto addtok_match
+    args['nullterm'] = 1
+
+  addtok_match:
+    if has_match == 0 goto end
+    $I0 = isa match, 'Sub'
+    if $I0 goto add_parsed
+    args['match'] = match
+    goto end
+  add_parsed:
+    args['parsed'] = match
+
+  end:
+    .return self.'newtok'(name, args :named :flat)
+.end
+    

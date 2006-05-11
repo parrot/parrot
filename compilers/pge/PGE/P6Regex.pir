@@ -79,7 +79,7 @@ or the resulting PIR code (target='PIR').
   parse:
     ##   Let's parse the source as a regex
     $P0 = find_global 'PGE::Grammar', 'regex'
-    match = $P0(source)
+    match = $P0(source, adverbs :flat :named)
     if target != 'parse' goto check
     .return (match)
 
@@ -140,9 +140,17 @@ parse valid Perl 6 regular expressions.
     .param pmc mob
     .param pmc adverbs         :slurpy :named
 
-    .local pmc optable, match
+    .local string stop
+    .local pmc stopstack, optable, match
+
+    stopstack = find_global 'PGE::P6Regex', '@!stopstack'
     optable = find_global 'PGE::P6Regex', '$optable'
-    match = optable.'parse'(mob)
+
+    stop = adverbs['stop']
+    push stopstack, stop
+    match = optable.'parse'(mob, 'stop'=>stop)
+    $S0 = pop stopstack
+
     .return (match)
 .end
 
@@ -246,6 +254,10 @@ needed for compiling regexes.
     $P1 = find_global 'PGE::P6Regex', 'PIR_closure'
     $P0["PIR"] = $P1
 
+    # Create an array for holding stop tokens
+    $P0 = new .ResizablePMCArray
+    store_global 'PGE::P6Regex', '@!stopstack', $P0
+
     $P0 = find_global 'compile_p6regex'
     compreg 'PGE::P6Regex', $P0
     .return ()
@@ -254,7 +266,8 @@ needed for compiling regexes.
 
 =item C<parse_term(PMC mob [, PMC adverbs :slurpy :named])>
 
-Parses literal strings and whitespace.
+Parses literal strings and whitespace.  
+Return a failed match if the stoptoken is found.
 
 =cut
 
@@ -270,9 +283,18 @@ Parses literal strings and whitespace.
     pos = $P0
     lastpos = length target
 
+    .local string stop
+    $P0 = find_global 'PGE::P6Regex', '@!stopstack'
+    stop = $P0[-1]
+
     .local string initchar
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
     if $I0 goto term_ws
+    $I0 = length stop
+    if $I0 == 0 goto not_stop
+    $S0 = substr target, pos, $I0
+    if $S0 == stop goto end_noterm
+  not_stop:
     initchar = substr target, pos, 1
     $I0 = index '<>[](){}:*?+|&^$.', initchar
     if $I0 >= 0 goto end_noterm
@@ -339,14 +361,18 @@ Parses literal strings and whitespace.
 
   term_literal:
     .local int litstart, litlen
+    .local string delim
     litstart = pos
     litlen = 0
+    delim = "<>[](){}:*?+\\|&#^$"
+    $S0 = substr stop, 0, 1
+    delim .= $S0
   term_literal_loop:
     if pos >= lastpos goto term_literal_end
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
     if $I0 goto term_literal_end
     $S0 = substr target, pos, 1
-    $I0 = index "<>[](){}:*?+\\|&#^$.", $S0
+    $I0 = index delim, $S0
     if $I0 >= 0 goto term_literal_end
     inc pos
     inc litlen
