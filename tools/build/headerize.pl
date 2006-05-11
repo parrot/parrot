@@ -34,7 +34,7 @@ Verbose status along the way.
 
 =back
 
-=head 1 COMMAND-LINE ARGUMENTS
+=head1 COMMAND-LINE ARGUMENTS
 
 =over 4
 
