@@ -200,15 +200,17 @@ Many things to muck with line could be done here:
 
  o remove extraneous spaces.
  o add in "proper" spacing (after commas, etc.)
- o turn opcode, <OUT>, <IN> into <OUT> = opcode <IN>
  o heredocs could be treated as blocks to set them off visually.
  o could remove/add explicit declarations of string type
- o could add in single quotes wrapping .sub names.
- o could add in single quotes wrapping method names.
  o could convert double to single quotes when possible.
- o could fixup Pmc vs. .Pmc
  o could convert strings with embedded newlines to heredocs.
- o vertical align :param modifiers
+
+Things that might ease deprecation, but probably won't get done until
+after these items are already deprecated.
+
+ o could fixup Pmc vs. .Pmc
+ o could undo usage of '<reg> = opcode' syntax where that syntax will
+   eventually be prohibited.
 
 Or not. =-)
 
