@@ -1,6 +1,12 @@
+# $Id$
+
 =head1 Title
 
 PGE::OPTable - PGE operator precedence table and parser
+
+=head1 Methods
+
+=over 4
 
 =cut
 
@@ -679,3 +685,4 @@ Deprecated.  Use C<newtok>.
     .return self.'newtok'(name, args :named :flat)
 .end
     
+=back
