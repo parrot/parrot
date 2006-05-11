@@ -208,6 +208,7 @@ Many things to muck with line could be done here:
  o could convert double to single quotes when possible.
  o could fixup Pmc vs. .Pmc
  o could convert strings with embedded newlines to heredocs.
+ o vertical align :param modifiers
 
 Or not. =-)
 
