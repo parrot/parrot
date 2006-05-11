@@ -144,7 +144,7 @@ sub optable_output_is {
     test = "<<test>>"
 
     .local pmc match
-    match = optable.parse(test, 'stop'=>';')
+    match = optable.parse(test, 'stop'=>' ;')
     unless match goto fail
     $P0 = match['expr']
     tree($P0)
