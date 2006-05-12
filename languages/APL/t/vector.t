@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 19;
+use t::APL tests => 21;
 
 run_apl_is();
 
@@ -82,4 +82,11 @@ __DATA__
 --- APL: 0⊖'QWERTYUIOP'
 --- out: QWERTYUIOP
 
+=== without, characters
+--- APL: 'APL ON PARROT'~'AEIOU '
+--- out: PLNPRRT
+
+=== without, numbers
+--- APL: 1 2 3 4 5 6 7 8 9~1 3 5 7 9
+--- out: 2 4 6 8
 

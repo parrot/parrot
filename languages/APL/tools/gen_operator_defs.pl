@@ -553,6 +553,61 @@ done:
     .return(result)
 .end
 
+.sub 'dyadic:~' :multi(String, String) # without
+    .param string op1
+    .param string op2
+
+    .local string result
+    result = ''
+
+    .local int pos,len
+    .local string char
+    pos = 0
+    len = length op1
+
+loop:
+    if pos > len goto done
+    char = substr op1, pos, 1 
+    $I1 = index op2, char
+    if $I1 != -1 goto next
+    result .= char
+next:
+    inc pos
+    goto loop
+done:
+    .return(result)
+.end
+
+.sub 'dyadic:~' :multi(ResizablePMCArray, ResizablePMCArray) # without
+    .param pmc op1
+    .param pmc op2
+
+    .local pmc result
+    result = new .ResizablePMCArray
+
+    .local pmc iter1,iter2
+    iter1 = new .Iterator, op1
+
+outer_loop:
+    unless iter1 goto outer_done
+    $P1 = shift iter1
+ 
+    iter2 = new .Iterator, op2
+inner_loop:
+    unless iter2 goto inner_done
+    $P2 = shift iter2
+    if $P1 == $P2 goto outer_loop # result must be without this.
+    goto inner_loop
+
+inner_done:
+    push result, $P1
+    goto outer_loop
+
+outer_done:
+    .return(result)
+.end
+
+
 END_OF_TEMPLATE
 
 # Generate all variants for scalar dyadic ops.

@@ -20,7 +20,7 @@ token simple_expression {
 
 token target { <variable_identifier> }
 
-token dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷∧∨⍲⍱<≤=≥>≠⍳⊖]> }
+token dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷~∧∨⍲⍱<≤=≥>≠⍳⊖]> }
 
 token monadic_identifier { <[|⍟*⌈⌊○!+−×÷~⍳⌽]> }
 

@@ -4,20 +4,15 @@ Work in progress.
 
 Things to do:
 
-- Need more tests! Add more tests to t/dyadic.t. Int * Float is alright, but
-  need Int * Int and Float * Float.
-
-- Any todo'd tests.
+- Need more tests! More tests for each type of operand per operator.
 
 - Add function declarations.
 
-- Add DOMAIN ERROR exceptions when trying to use certain operators on
-  strings - Probably by using MMD with everything, and having Strings throw
-  errors most of the time.
-
-- Automatically generate *all* of our dispatch code at build time. This will
-  allow us to handle argument ordering in :multi, and automatically generate
-  the appropriate code for each of the scalar/vector operators with no issue.
-
 - possibly separate out the scalar ops in the grammar to simplify the dispatch.
   (or just make our generating code smart enough to deal.)
+
+- implement an APLVector that knows its shape. Everything will be stored as
+  a 1 dimensional array, indexed access will be computed. Eventually ponder
+  more compact +/or faster implementations.
+ 
+- properly print display N dimensional arrays.
