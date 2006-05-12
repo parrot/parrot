@@ -686,3 +686,5 @@ Deprecated.  Use C<newtok>.
 .end
     
 =back
+
+=cut
