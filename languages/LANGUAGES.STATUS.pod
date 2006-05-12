@@ -43,7 +43,7 @@ The Amber PMCs are in C<languages/amber>.
 
 =item Author
 
-Will Coleda
+Will Coleda, Patrick Michaud
 
 =item Description
 
@@ -51,11 +51,12 @@ APL
 
 =item Status
 
-Virtually nonexistant
+Provides support for a variety of monadic/dyadic operators, character
+vectors, floats, int, and 1-D vectors.
 
 =item Last verified with parrot version
 
-N/A
+0.4.3
 
 =item Location
 
