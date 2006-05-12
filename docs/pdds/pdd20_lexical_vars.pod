@@ -80,8 +80,8 @@ languages (e.g. Tcl) their names.  They are the interface through which the
 Parrot runtime stores and fetches lexical variables.
 
 At run time, each call frame for a Subroutine (or Subroutine derivative) that
-uses lexical variables will be populated with a populated with a PMC of
-HLL-mapped type LexPad.  Note that call frames for subroutines without lexical
+uses lexical variables will be populated with a PMC of HLL-mapped 
+type LexPad.  Note that call frames for subroutines without lexical
 variables will omit the LexPad.
 
 From the interface perspective, LexPads are basically Hashes, with strings as
