@@ -607,6 +607,109 @@ outer_done:
     .return(result)
 .end
 
+.sub 'monadic:\u2191' # first
+    .param pmc op1
+    $P1 = shift op1
+    .return ($P1)
+.end
+
+.sub 'dyadic:\u2191' :multi (Float, ResizablePMCArray) # take
+    .param int op1
+    .param pmc op2
+
+    .local pmc result 
+    result = new .ResizablePMCArray
+
+    .local pmc iter
+    iter = new .Iterator, op2
+
+    if op1 >= 0 goto pos_loop
+    iter = 4 # ITERATE_FROM_END
+
+neg_loop:
+    if op1 == 0 goto done
+    unless iter goto done
+
+    $P1 = pop op2  # have to pop when iterating from end.
+    unshift result, $P1
+
+    inc op1
+    goto neg_loop
+
+pos_loop:
+    if op1 == 0 goto done
+    unless iter goto done
+    
+    $P1 = shift iter
+    push result, $P1
+
+    dec op1
+    goto pos_loop
+
+done:
+    .return (result)
+.end
+
+.sub 'dyadic:\u2191' :multi (Float, String) # take
+    .param int op1
+    .param string op2
+
+    if op1 < 0 goto neg
+pos:
+    $S1 = substr op2, 0, op1
+    .return ($S1)
+
+neg:
+    .local int pos
+    pos = length op2
+    op1 = abs op1
+    pos -= op1
+    $S1 = substr op2, pos, op1
+    .return ($S1)
+.end
+
+.sub 'dyadic:\u2193' :multi (Float, ResizablePMCArray) # drop
+    .param int op1
+    .param pmc op2
+
+    if op1 < 0 goto neg_loop
+
+pos_loop:
+    if op1 == 0 goto done
+    $P1 = shift op2 # ignore p1, we're discarding it
+    dec op1
+    goto pos_loop
+
+neg_loop:
+    if op1 == 0 goto done
+    $P1 = pop op2 # ignore p1, we're discarding it
+    inc op1
+    goto neg_loop
+
+done:
+    .return (op2)
+.end
+
+.sub 'dyadic:\u2193' :multi (Float, String) # drop
+    .param int op1
+    .param string op2
+
+    .local int diff
+    diff = length op2
+
+    if op1 < 0 goto neg
+
+pos:
+    diff -= op1
+    $S1 = substr op2, op1, diff
+    .return ($S1)
+
+neg:
+    diff += op1
+    $S1 = substr op2, 0, diff
+    .return ($S1)
+.end
+
 
 END_OF_TEMPLATE
 

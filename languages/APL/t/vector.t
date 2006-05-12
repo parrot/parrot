@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 21;
+use t::APL tests => 30;
 
 run_apl_is();
 
@@ -90,3 +90,38 @@ __DATA__
 --- APL: 1 2 3 4 5 6 7 8 9~1 3 5 7 9
 --- out: 2 4 6 8
 
+=== first
+--- APL: ↑1 2 3 4 5
+--- out: 1
+
+=== take, characters
+--- APL: 5↑'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+--- out: ABCDE
+
+=== take, characters, negative
+--- APL: ⁻5↑'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+--- out: VWXYZ
+
+=== take, simple vector
+--- APL: 5↑⍳20
+--- out: 1 2 3 4 5
+
+=== take, simple vector, negative
+--- APL: ⁻5↑⍳20
+--- out: 16 17 18 19 20
+
+=== drop, characters
+--- APL: 5↓'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+--- out: FGHIJKLMNOPQRSTUVWXYZ
+
+=== drop, characters, negative
+--- APL: ⁻5↓'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+--- out: ABCDEFGHIJKLMNOPQRSTU
+
+=== drop, simple vector
+--- APL: 5↓⍳11
+--- out: 6 7 8 9 10 11
+
+=== drop, simple vector, negative
+--- APL: ⁻5↓⍳11
+--- out: 1 2 3 4 5 6
