@@ -5,6 +5,11 @@ New in 0.4.4
 - Iterator?
 - APL?
 - Pugs incorporated?
+- perl6 compiler
+  - lexicals
+  - conditionals
+  - regexes
+- pheme?
 
 New in 0.4.3
 
