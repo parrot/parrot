@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 30;
+use t::APL tests => 35;
 
 run_apl_is();
 
@@ -125,3 +125,24 @@ __DATA__
 === drop, simple vector, negative
 --- APL: ⁻5↓⍳11
 --- out: 1 2 3 4 5 6
+
+=== shape, characters
+--- APL: ⍴'AEIOU'
+--- out: 5
+
+=== shape, scalar
+--- APL: ⍴2.3
+
+=== shape, vector
+--- APL: ⍴⍳20
+--- out: 20
+
+=== format, number
+--- APL: ⍴⍕23.2
+--- out: 4
+
+=== format, vector
+--- APL: ⍴⍕⍳20
+--- out: 50
+
+

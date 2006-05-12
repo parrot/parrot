@@ -183,15 +183,18 @@ END_PIR
 
 .end
 
-.sub 'aplprint'
+.sub 'aplformat'
     .param pmc arg
+
+    .local string result
+    result = ''
+
     .local pmc value
     $I0 = isa arg, "ResizablePMCArray"
     if $I0 goto print_array
     value = arg
     bsr print_value
-    print "\n"
-    .return ()
+    .return (result)
 
   print_array:
     .local pmc iter
@@ -202,19 +205,26 @@ END_PIR
     value = shift iter
     bsr print_value
     unless iter goto iter_end
-    print ' '
+    result .= ' '
     goto iter_loop
   iter_end:
-    print "\n"
-    .return ()
+    .return (result)
 
   print_value:
     if value >= 0.0 goto print_value_1
-    print unicode:"\u207b"
+    result .= unicode:"\u207b"
     value = abs value
   print_value_1:
-    print value
+    $S0 = value
+    result .= $S0
     ret
+.end
+
+.sub 'aplprint'
+    .param pmc arg
+
+    $S0 = aplformat(arg)
+    say $S0
 .end
 
 # XXX - the first argument to this multi sub should be some variant of
@@ -708,6 +718,39 @@ neg:
     diff += op1
     $S1 = substr op2, 0, diff
     .return ($S1)
+.end
+
+.sub 'monadic:\u2374' :multi (String) # shape
+    .param string op1
+
+    $I1 = length op1
+    .return ($I1)
+.end
+
+.sub 'monadic:\u2374' :multi (Float) # shape
+    .param pmc op1
+
+    .local pmc result
+    result = new .ResizablePMCArray
+    .return (result)
+.end
+
+.sub 'monadic:\u2374' :multi (ResizablePMCArray) # shape
+    .param pmc op1
+
+    .local pmc result
+    result = new .ResizablePMCArray
+
+    $I1 = op1
+    push result, $I1
+    .return (result)
+.end
+
+.sub 'monadic:\u2355' #format
+    .param pmc op1
+
+    $S0 = aplformat(op1)
+    .return($S0)
 .end
 
 
