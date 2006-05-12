@@ -9,7 +9,7 @@ t/run/exit.t - test parrot exit codes
 
 =head1 SYNOPSIS
 
-    % perl -Ilib t/run/exit.t
+    % prove t/run/exit.t
 
 =head1 DESCRIPTION
 
@@ -20,6 +20,8 @@ with combinations of STDERR and STDOUT open and closed.
 
 use strict;
 use warnings;
+use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 8;
 use Parrot::Config;
@@ -38,8 +40,8 @@ sub exits
     my $pre = shift;
     $pre ||= '';
 
-    is( system(qq|$PARROT --version $redir|) >> 8, 0, "$pre: normal exit" );
-    isnt( system(qq|$PARROT --foo $redir|) >> 8, 0, "$pre: abnormal exit" );
+    is( system(qq|$PARROT --version $redir > $redir 2> $redir|) >> 8, 0, "$pre: normal exit" );
+    isnt( system(qq|$PARROT --foo $redir > $redir 2> $redir|) >> 8, 0, "$pre: abnormal exit" );
 }
 
 # all open
