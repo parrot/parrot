@@ -113,8 +113,13 @@ APL::Grammar::subexpression: result(.) = {
 
 
 APL::Grammar::simple_expression: result(.) = {
+    $I0 = exists node['expression']
+    if $I0 goto paren_expression
     $P0 = node['array_identifier']
-    .return tree.get('result', $P0, 'APL::Grammar::array_identifier')
+    .return tree.'get'('result', $P0, 'APL::Grammar::array_identifier')
+  paren_expression:
+    $P0 = node['expression']
+    .return tree.'get'('result', $P0, 'APL::Grammar::expression')
 }
 
 
