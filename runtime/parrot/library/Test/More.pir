@@ -284,31 +284,102 @@ hard to extend it for hash-like structures, too.
 =cut
 
 .sub is_deeply
-    .param pmc l_array
-    .param pmc r_array
+    .param pmc left
+    .param pmc right
     .param string description :optional
+
+    .local int    result
+    .local string diagnosis
+
+    .local pmc position
+    position = new .ResizablePMCArray
 
     .local pmc test
     find_global test, 'Test::More', '_test'
 
-    .local string diagnosis
+    .local int does_flag
+    does_flag = does left, 'array'
+    if does_flag goto compare_array
+
+    does_flag = does left, 'hash'
+    if does_flag goto compare_hash
+
+    diagnosis  = typeof left
+    diagnosis .= ' is not a nested data structure'
+    result     = 0
+    goto report_result
+
+  compare_array:
+    ( result, diagnosis ) = compare_array( left, right, position )
+    goto report_result
+
+  compare_hash:
+    (result, diagnosis ) = compare_hash( left, right, position )
+    goto report_result
+
+  report_result:
+    test.'ok'( result, description )
+
+    unless result goto report_diagnostic
+    .return( result )
+
+  report_diagnostic:
+    ne diagnosis, '', return_it
+
+    .local string left
+    .local string right
+    right = pop position
+    left  = pop position
+
+    .local string nested_path
+    nested_path = join '][', position
+
+    diagnosis   = 'Mismatch'
+    unless nested_path goto show_expected
+
+    diagnosis  .= ' at ['
+    diagnosis  .= nested_path
+    diagnosis  .= ']'
+
+  show_expected:
+    diagnosis  .= ': expected '
+    diagnosis  .= left
+    diagnosis  .= ', received '
+    diagnosis  .= right
+
+  return_it:
+    test.'diag'( diagnosis )
+    .return( result )
+.end
+
+.sub compare_array
+    .param pmc l_array
+    .param pmc r_array
+    .param pmc position
+
+    .local pmc test
+    find_global test, 'Test::More', '_test'
 
     .local int l_count
     .local int r_count
     l_count = l_array
     r_count = r_array
     if l_count == r_count goto compare_contents
-    test.'ok'( 0, description )
 
-    .local string count_string
-    diagnosis   = 'Received '
-    count_string = l_count
-    diagnosis .= count_string
-    diagnosis .= ' elements in array, expected '
-    count_string = r_count
-    diagnosis .= count_string
+    .local string l_count_string
+    .local string r_count_string
+    l_count_string  = l_count
+    l_count_string .= ' element'
 
-    test.'diag'( diagnosis )
+    if l_count == 1 goto pluralization_done
+    l_count_string .= 's'
+
+  pluralization_done:
+    r_count_string  = r_count
+
+    push position, l_count_string
+    push position, r_count_string
+
     .return( 0 )
 
   compare_contents:
@@ -324,36 +395,237 @@ hard to extend it for hash-like structures, too.
 
     .local pmc l_elem
     .local pmc r_elem
+    .local int elems_equal
 
   iter_start:
     unless l_iter goto iter_end
     l_elem = shift l_iter
     r_elem = shift r_iter
-    unless l_elem == r_elem goto elems_not_equal
+
+    $S0 = typeof l_elem
+    elems_equal = compare_elements( l_elem, r_elem, position )
+    unless elems_equal goto elems_not_equal
 
     inc count
     goto iter_start
 
   elems_not_equal:
-    .local string count_string
-    .local string elem_string
-
-    test.'ok'( 0, description )
-    diagnosis    = "Mismatch at position "
-    count_string = count
-    diagnosis   .= count_string
-    diagnosis   .= ": received "
-    elem_string  = l_elem
-    diagnosis   .= elem_string
-    diagnosis   .= ", expected "
-    elem_string  = r_elem
-    diagnosis   .= elem_string
-    test.'diag'( diagnosis )
+    unshift position, count
     .return( 0 )
 
   iter_end:
-    test.'ok'( 1, description )
     .return( 1 )
+.end
+
+.sub compare_hash
+    .param pmc l_hash
+    .param pmc r_hash
+    .param pmc position
+
+    .local pmc test
+    find_global test, 'Test::More', '_test'
+
+    .local int l_count
+    .local int r_count
+    l_count = l_hash
+    r_count = r_hash
+    if l_count == r_count goto compare_contents
+
+    .local string l_count_string
+    .local string r_count_string
+    l_count_string  = l_count
+    l_count_string .= ' element'
+
+    if l_count == 1 goto pluralization_done
+    l_count_string .= 's'
+
+  pluralization_done:
+    r_count_string  = r_count
+
+    push position, l_count_string
+    push position, r_count_string
+
+    .return( 0 )
+
+  compare_contents:
+    .local pmc l_iter
+    .local pmc r_iter
+    .local int count
+
+    l_iter = new .Iterator, l_hash
+    r_iter = new .Iterator, r_hash
+    l_iter = 0
+    r_iter = 0
+    count  = 0
+
+    .local pmc l_key
+    .local pmc r_key
+    .local pmc l_elem
+    .local pmc r_elem
+    .local int elems_equal
+
+  iter_start:
+    unless l_iter goto iter_end
+    l_key  = shift l_iter
+    r_key  = shift r_iter
+    l_elem = l_hash[ l_key ]
+    r_elem = r_hash[ r_key ]
+
+    elems_equal = compare_elements( l_elem, r_elem, position )
+    unless elems_equal goto elems_not_equal
+
+    inc count
+    goto iter_start
+
+  elems_not_equal:
+    unshift position, l_key
+    .return( 0 )
+
+  iter_end:
+    .return( 1 )
+.end
+
+.sub compare_elements :multi( string, string, PMC )
+    .param string left
+    .param string right
+    .param pmc position
+
+    .local int equal
+
+    eq left, right, are_equal
+
+  are_not_equal:
+    .return( 0 )
+
+  are_equal:
+    .return( 1 )
+.end
+
+.sub compare_elements :multi( int, int, PMC )
+    .param int left
+    .param int right
+    .param pmc position
+
+    .local int equal
+    eq left, right, are_equal
+
+  are_not_equal:
+    push position, left
+    push position, right
+    .return( 0 )
+
+  are_equal:
+    .return( 1 )
+.end
+
+.sub compare_elements :multi( String, String, PMC )
+    .param pmc left
+    .param pmc right
+    .param pmc position
+
+    .local int equal
+    eq left, right, are_equal
+
+  are_not_equal:
+    push position, left
+    push position, right
+    .return( 0 )
+
+  are_equal:
+    .return( 1 )
+.end
+
+.sub compare_elements :multi( Integer, Integer, PMC )
+    .param pmc left
+    .param pmc right
+    .param pmc position
+
+    .local int equal
+    eq left, right, are_equal
+
+  are_not_equal:
+    push position, left
+    push position, right
+    .return( 0 )
+
+  are_equal:
+    .return( 1 )
+.end
+
+.sub compare_elements :multi( Array, Array, PMC )
+    .param pmc left
+    .param pmc right
+    .param pmc position
+
+    .local int equal
+    equal = compare_array( left, right, position )
+    .return( equal )
+.end
+
+.sub compare_elements :multi( Hash, Hash, PMC )
+    .param pmc left
+    .param pmc right
+    .param pmc position
+
+    .local int equal
+    equal = compare_hash( left, right, position )
+    .return( equal )
+.end
+
+.sub compare_elements :multi( Undef, Undef, PMC )
+    .param pmc left
+    .param pmc right
+    .param pmc position
+
+    .return( 1 )
+.end
+
+.sub compare_elements :multi( Undef, PMC, PMC )
+    .param pmc left
+    .param pmc right
+    .param pmc position
+
+    .local string l_undef
+    l_undef = '(undef)'
+    push position, l_undef
+    push position, right
+    .return( 0 )
+.end
+
+.sub compare_elements :multi( PMC, Undef, PMC )
+    .param pmc left
+    .param pmc right
+    .param pmc position
+
+    .local string r_undef
+    r_undef = '(undef)'
+    push position, left
+    push position, r_undef
+    .return( 0 )
+.end
+
+.sub compare_elements :multi( PMC, PMC, PMC )
+    .param pmc left
+    .param pmc right
+    .param pmc position
+
+    .local int does_flag
+    .local int equal
+
+  check_array:
+    does_flag = does left, 'array'
+    unless does_flag goto check_hash
+    equal = compare_array( left, right, position )
+    .return( equal )
+
+  check_hash:
+    does_flag = does left, 'hash'
+    if does_flag goto compare_hash
+    .return( 0 )
+
+  compare_hash:
+    equal = compare_hash( left, right, position )
+    .return( equal )
 .end
 
 =item C<like( target, pattern, description )>

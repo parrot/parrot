@@ -1,5 +1,10 @@
 #!./parrot
 
+.macro IMPORT ( lib, subname )
+	import_sub = find_global .lib, .subname
+	store_global .subname, import_sub
+.endm
+
 .sub _main :main
 	load_bytecode 'library/Test/Builder/Tester.pir'
 	load_bytecode 'library/Test/More.pir'
@@ -13,29 +18,29 @@
 	.local pmc test
 	test = new tb_type, tb_args
 
-	.local pmc plan
-	.local pmc test_pass
-	.local pmc test_fail
-	.local pmc test_diag
-	.local pmc test_test
-	.local pmc ok
-	.local pmc is
-	.local pmc is_deeply
-	.local pmc like
-	.local pmc diag
-	plan      = find_global 'Test::Builder::Tester', 'plan'
-	test_pass = find_global 'Test::Builder::Tester', 'test_pass'
-	test_fail = find_global 'Test::Builder::Tester', 'test_fail'
-	test_diag = find_global 'Test::Builder::Tester', 'test_diag'
-	test_test = find_global 'Test::Builder::Tester', 'test_test'
-	ok        = find_global 'Test::More',            'ok'
-	is        = find_global 'Test::More',            'is'
-	is_deeply = find_global 'Test::More',            'is_deeply'
-	like      = find_global 'Test::More',            'like'
-	diag      = find_global 'Test::More',            'diag'
+	.local pmc import_sub
+	.IMPORT( 'Test::More', 'ok' )
+	.IMPORT( 'Test::More', 'is' )
+	.IMPORT( 'Test::More', 'diag' )
+	.IMPORT( 'Test::More', 'like' )
+	.IMPORT( 'Test::More', 'is_deeply' )
+	.IMPORT( 'Test::Builder::Tester', 'plan' )
+	.IMPORT( 'Test::Builder::Tester', 'test_diag' )
+	.IMPORT( 'Test::Builder::Tester', 'test_fail' )
+	.IMPORT( 'Test::Builder::Tester', 'test_pass' )
+	.IMPORT( 'Test::Builder::Tester', 'test_test' )
 
-	plan( 30 )
+	plan( 42 )
+	test_ok()
+	test_is()
+	test_like()
+	test_is_deeply()
+	test_diagnostics()
 
+	test.'finish'()
+.end
+
+.sub test_ok
 	test_pass()
 	ok( 1 )
 	test_test( 'passing test ok()')
@@ -51,7 +56,9 @@
 	test_fail( 'with description' )
 	ok( 0, 'with description' )
 	test_test( 'failing test ok() with description')
+.end
 
+.sub test_is
 	test_pass()
 	is( 100, 100 )
 	test_test( 'passing test is() for ints')
@@ -149,50 +156,9 @@
 	test_diag( expected )
 	is( left, right, 'comparing two pmcs' )
 	test_test( 'failing test is() for pmcs with description')
+.end
 
-	test_pass()
-	ok( 1 )
-	diag( 'foo bar baz' )
-	test_diag( 'foo bar baz' )
-	test_test( 'single line diagnostics' )
-
-	test_pass()
-	ok( 1 )
-	diag( 'foo bar baz' )
-	diag( 'rum tum tugger')
-	test_diag( "foo bar baz\nrum tum tugger" )
-	test_test( 'multi line diagnostics' )
-
-	left  = new .ResizablePMCArray
-	right = new .ResizablePMCArray
-
-	push left,  7
-	push right, 7
-	push left,  'seven'
-	push right, 'seven'
-	push left,  right
-	push right, right
-
-	test_pass()
-	is_deeply( left, right )
-	test_test( 'passing test is_deeply() for pmc arrays' )
-
-	test_pass( 'comparing two pmc arrays' )
-	is_deeply( left, right, 'comparing two pmc arrays' )
-	test_test( 'passing test is_deeply() for pmc arrays with description' )
-
-	push left,  '9 - 2'
-
-	test_fail()
-	test_diag( 'Received 4 elements in array, expected 3' )
-	is_deeply( left, right )
-	test_test( 'failing test is_deeply() for pmc arrays' )
-
-	test_fail( 'comparing two pmc arrays' )
-	test_diag( 'Received 4 elements in array, expected 3' )
-	is_deeply( left, right, 'comparing two pmc arrays' )
-	test_test( 'failing test is_deeply() for pmc arrays with description' )
-
+.sub test_like
 	test_pass()
 	like( 'abcdef', '<[c]>' )
 	test_test( 'passing test like()' )
@@ -210,6 +176,156 @@
 	test_diag( 'match failed' )
 	like( 'abcdef', '<[g]>', 'testing like()' )
 	test_test( 'failing test like() with description' )
+.end
 
-	test.'finish'()
+.sub test_is_deeply
+	test_is_deeply_array()
+	test_is_deeply_hash()
+	test_is_deeply_mismatch()
+	test_is_deeply_nested()
+.end
+
+.sub test_is_deeply_array
+	.local pmc left
+	.local pmc right
+	left  = new .ResizablePMCArray
+	right = new .ResizablePMCArray
+
+	push left,  7
+	push right, 7
+	push left,  'seven'
+	push right, 'seven'
+
+	test_pass()
+	is_deeply( left, right )
+	test_test( 'passing test is_deeply() for pmc arrays' )
+
+	test_pass( 'comparing two pmc arrays' )
+	is_deeply( left, right, 'comparing two pmc arrays' )
+	test_test( 'passing test is_deeply() for pmc arrays with description' )
+
+	push left,  '9 - 2'
+
+	test_fail()
+	test_diag( 'Mismatch: expected 3 elements, received 2' )
+	is_deeply( left, right )
+	test_test( 'failing test is_deeply() for pmc arrays' )
+
+	test_fail( 'comparing two pmc arrays' )
+	test_diag( 'Mismatch: expected 3 elements, received 2' )
+	is_deeply( left, right, 'comparing two pmc arrays' )
+	test_test( 'failing test is_deeply() for pmc arrays with description' )
+
+	push right, '9 - 3'
+	test_fail()
+	test_diag( 'Mismatch at [2]: expected 9 - 2, received 9 - 3' )
+	is_deeply( left, right )
+	test_test( 'failing test is_deeply() for item mismatch at position' )
+
+	test_fail( 'comparing mismatch of elements' )
+	test_diag( 'Mismatch at [2]: expected 9 - 2, received 9 - 3' )
+	is_deeply( left, right, 'comparing mismatch of elements' )
+	test_test( 'failing test is_deeply() for item mismatch at position' )
+.end
+
+.sub test_is_deeply_hash
+	.local pmc left
+	.local pmc right
+
+	left  = new .Hash
+	right = new .Hash
+
+	test_pass()
+	is_deeply( left, right )
+	test_test( 'passing test is_deeply() for empty pmc hashes' )
+
+	test_pass( 'empty hashes match' )
+	is_deeply( left, right, 'empty hashes match' )
+	test_test( 'passing test is_deeply() for empty pmc hashes with diagnostic' )
+
+	left['foo'] = 1
+
+	test_fail()
+	is_deeply( left, right )
+	test_diag( 'Mismatch: expected 1 element, received 0' )
+	test_test( 'failing is_deeply() for hashes with different numbers of keys' )
+
+	left['bar']  = 1
+	right['foo'] = 1
+
+	test_fail( 'more diag' )
+	is_deeply( left, right, 'more diag' )
+	test_diag( 'Mismatch: expected 2 elements, received 1' )
+	test_test( '... with description and proper pluralization' )
+
+	right['bar'] = 2
+
+	test_fail()
+	is_deeply( left, right )
+	test_diag( 'Mismatch at [bar]: expected 1, received 2' )
+	test_test( 'failing is_deeply() for hash with value mismatch' )
+
+	test_fail( '2 is not 1' )
+	is_deeply( left, right, '2 is not 1' )
+	test_diag( 'Mismatch at [bar]: expected 1, received 2' )
+	test_test( '... with description' )
+.end
+
+.sub test_is_deeply_mismatch
+.end
+
+.sub test_is_deeply_nested
+	.local pmc left
+	.local pmc right
+
+	left  = new .Hash
+	right = new .Hash
+
+	.local pmc left_array
+	.local pmc right_array
+	left_array  = new .Array
+	left_array  = 3
+	right_array = new .Array
+	right_array = 3
+
+	left[  'array' ] = left_array
+	right[ 'array' ] = right_array
+
+	left_array[0]  = 1 
+	right_array[0] = 1 
+
+	test_pass()
+	is_deeply( left, right )
+	test_test( 'Nested data structure equality' )
+
+	test_pass( '... are they equal?' )
+	is_deeply( left, right, '... are they equal?' )
+	test_test( '... with description' )
+
+	right_array[2] = 2
+
+	test_fail()
+	is_deeply( left, right )
+	test_diag( 'Mismatch at [array][2]: expected (undef), received 2' )
+	test_test( 'Nested data structure inequality' )
+
+	test_fail( '... are they inequal?' )
+	is_deeply( left, right, '... are they inequal?' )
+	test_diag( 'Mismatch at [array][2]: expected (undef), received 2' )
+	test_test( '... with description' )
+.end
+
+.sub test_diagnostics
+	test_pass()
+	ok( 1 )
+	diag( 'foo bar baz' )
+	test_diag( 'foo bar baz' )
+	test_test( 'single line diagnostics' )
+
+	test_pass()
+	ok( 1 )
+	diag( 'foo bar baz' )
+	diag( 'rum tum tugger')
+	test_diag( "foo bar baz\nrum tum tugger" )
+	test_test( 'multi line diagnostics' )
 .end
