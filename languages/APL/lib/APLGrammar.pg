@@ -11,14 +11,16 @@ token expression {
 }
 
 token subexpression {
-    <simple_expression>
+    <simple_expression> [ \[ <list> \] ]?
 }
 
 token simple_expression {
-    <array_identifier>
+    <array_identifier> | \( <expression> \)
 }
 
-token target { <variable_identifier> }
+token target { <variable_identifier> [ \[ <list> \] ]? }
+
+token list { $0:=(<expression>?) $0:=( ; <expression>? )* }
 
 token dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷~∧∨⍲⍱<≤=≥>≠⍳⊖↑↓⍕]> }
 
