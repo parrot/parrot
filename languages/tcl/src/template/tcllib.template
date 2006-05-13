@@ -307,8 +307,6 @@ env_loop_done:
 
 ${FALLBACKS}
 
-${RULES}
-
 .HLL 'tcl', 'tcl_group'
 .namespace ['']
 
