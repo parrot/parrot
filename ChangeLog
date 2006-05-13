@@ -1,5 +1,8 @@
 # $Id$
 
+2006.04.30    bernhard
+	* Make the Perl PMCs dynamic and move them to src/dynpmc
+
 2006.04.02    leo
 	* Released 0.4.3
 	See NEWS for more.
