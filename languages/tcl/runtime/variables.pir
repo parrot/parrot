@@ -1,4 +1,5 @@
 .HLL '_Tcl', ''
+.namespace ['']
 
 =head2 _Tcl::__read
 
