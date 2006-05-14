@@ -266,9 +266,9 @@ PGE::OPTable - PGE operator precedence table and parser
     ##   set 'tighter' to be the precedence of the op specified.
     .local string tighter
     tighter = adverbs['tighter']
-    $I0 = exists tokentable['tighter']
+    $I0 = exists tokentable[tighter]
     if $I0 == 0 goto with_tighter
-    token = tokentable['tighter']
+    token = tokentable[tighter]
     tighter = token['precedence']
   with_tighter:
 
