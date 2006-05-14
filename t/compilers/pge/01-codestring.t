@@ -1,6 +1,6 @@
 #!perl
 # Copyright: 2006 The Perl Foundation.  All Rights Reserved.
-# $Id: $
+# $Id$
 
 use strict;
 use warnings;

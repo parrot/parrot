@@ -1,6 +1,6 @@
 #! perl
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
-# $Id: pge_globs.t 11501 2006-02-10 18:27:13Z particle $
+# $Id$
 
 use strict;
 use warnings;
