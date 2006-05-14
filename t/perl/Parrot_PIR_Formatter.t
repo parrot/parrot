@@ -1,6 +1,6 @@
 #! perl
 # Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
-# $Id: Parrot_Distribution.t 11904 2006-03-14 22:53:28Z bernhard $
+# $Id$
 
 use strict;
 use warnings;
