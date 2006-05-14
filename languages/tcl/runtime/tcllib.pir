@@ -78,6 +78,17 @@ providing a compreg-compatible method.
 # all the builtin commands
 .include 'languages/tcl/runtime/builtins.pir'
 
+# library files
+.include 'languages/tcl/runtime/conversions.pir'
+.include 'languages/tcl/runtime/expression.pir'
+.include 'languages/tcl/runtime/list.pir'
+.include 'languages/tcl/runtime/list_to_string.pir'
+.include 'languages/tcl/runtime/string.pir'
+.include 'languages/tcl/runtime/string_to_list.pir'
+.include 'languages/tcl/runtime/variables.pir'
+.include 'languages/tcl/src/compiler.pir'
+.include 'languages/tcl/src/parser.pir'
+
 .HLL 'Tcl', 'tcl_group'
 .HLL '_Tcl', ''
 
