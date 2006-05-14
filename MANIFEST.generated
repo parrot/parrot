@@ -2,11 +2,11 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.0.4.3.dylib                    [main]lib
+blib/lib/libparrot.0.4.4.dylib                    [main]lib
 blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.dylib                          [main]lib
 blib/lib/libparrot.so                             [main]lib
-blib/lib/libparrot.so.0.4.3                       [main]lib
+blib/lib/libparrot.so.0.4.4                       [main]lib
 disassemble                                       [main]bin
 disassemble.exe                                   [main]bin
 docs/ops/bit.pod                                  [main]doc
