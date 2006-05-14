@@ -17,7 +17,15 @@
 
 .namespace [ 'Pheme' ]
 
-.sub __resolve_at_runtime
+.sub __resolve_at_runtime :multi( ResizablePMCArray )
+	.param pmc args
+	.param pmc more_args :slurpy
+
+	unshift more_args, args
+	.return( more_args )
+.end
+
+.sub __resolve_at_runtime :multi( string )
 	.param string symbol_name
 	.param pmc    args :slurpy
 
@@ -47,7 +55,6 @@
 
   really_car:
 	.local pmc first_item
-	first_item = new .String
 	first_item = list[0]
 
 	.return( first_item )
@@ -123,6 +130,6 @@
 
 .sub __make_empty_cons
 	.local pmc result
-	result = new .ResizableStringArray
+	result = new .ResizablePMCArray
 	.return( result )
 .end

@@ -1,7 +1,17 @@
 http://schemers.org/Documents/Standards/R5RS/HTML/
 
+Create cons object
+	- head (the data)
+	- tail (another cons)
+
+Port car/cdr/cons to work on cons cells
+	- car: return head
+	- cdr: return tail
+	- cons: create new cons cell, assign l to head and r to tail
+
 Compiler:
-	- merge PAST/POST improvements back to Punie
+	- extract and merge POST improvements with Punie
+	- publish them under compilers/
 	- share those nodes somehow
 
 Fix namespace:
@@ -10,7 +20,6 @@ Fix namespace:
 	- use nested namespaces properly
 
 Grammar:
-	- empty list does NOT work yet
 	- tighten identifiers
 		- allow ! $ % & * + - . / : < = > ? @ ^ _ ~ 
 		- start with any non-number-beginning character
