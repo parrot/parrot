@@ -229,6 +229,14 @@ PGE::OPTable - PGE operator precedence table and parser
     .local int lastcat
     .local int circumnest
 
+    tokentable = self
+    keytable = getattribute self, "PGE::OPTable\x0%!key"
+    klentable = getattribute self, "PGE::OPTable\x0%!klen"
+
+    unless null adverbs goto with_adverbs
+    adverbs = new .Hash
+  with_adverbs:
+
     ##   see if we have a 'stop' adverb.  If so, then it is either
     ##   a string to be matched directly or a sub(rule) to be called 
     ##   to check for a match.
@@ -236,7 +244,6 @@ PGE::OPTable - PGE operator precedence table and parser
     .local string stop_str
     .local pmc stop
     has_stop = 0
-    if null adverbs goto with_stop
     $I0 = exists adverbs['stop']
     if $I0 == 0 goto with_stop
     stop = adverbs['stop']
@@ -254,10 +261,17 @@ PGE::OPTable - PGE operator precedence table and parser
     has_stop = length stop_str
     has_stop_nows = PGE_OPTABLE_NOWS
   with_stop:
-    
-    tokentable = self
-    keytable = getattribute self, "PGE::OPTable\x0%!key"
-    klentable = getattribute self, "PGE::OPTable\x0%!klen"
+
+    ##   see if we have a 'tighter' adverb.  If so, then
+    ##   set 'tighter' to be the precedence of the op specified.
+    .local string tighter
+    tighter = adverbs['tighter']
+    $I0 = exists tokentable['tighter']
+    if $I0 == 0 goto with_tighter
+    token = tokentable['tighter']
+    tighter = token['precedence']
+  with_tighter:
+
     ws = getattribute self, "PGE::OPTable\x0&!ws"
     tokenstack = new .ResizablePMCArray
     operstack = new .ResizablePMCArray
@@ -372,6 +386,9 @@ PGE::OPTable - PGE operator precedence table and parser
     goto expect_oper
 
   oper_found:
+    ##   if the token is below our minimum precedence, treat it as not found
+    $S0 = token['precedence']
+    if $S0 <= tighter goto oper_not_found
     tokenmode = token["mode"]
     tokencat = tokenmode & PGE_OPTABLE_SYNCAT
     ##   this hack handles prelist term followed by postcircumfix op
