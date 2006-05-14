@@ -176,14 +176,6 @@ make_branch_list(Interp *interpreter,
         int i, n;
         size_t rel_offset;
 
-        /*
-         * for all opcodes that are dynamically loaded, we can't have
-         * a JITted version, so we execute the function incarnation
-         * via the wrapper opcode, which just runs one opcode
-         * see ops/core.ops for more
-         */
-        if (*cur_op >= jit_op_count())
-           op = CORE_OPS_wrapper__;
 
         /* Predereference the opcode information table for this opcode
          * early since it's going to be used many times */
@@ -431,7 +423,7 @@ This C<Parrot_jit_vtable_n_op()> does use register mappings.
 */
 
 #ifndef EXTCALL
-#  define EXTCALL(op) (op_jit[*(op)].extcall >= 1)
+#  define EXTCALL(op) (op_jit[op].extcall >= 1 || op >= jit_op_count())
 #  define CALLS_C_CODE(op) (op_func[op].extcall == -1)
 #endif
 
@@ -463,8 +455,6 @@ make_sections(Interp *interpreter,
         init_regusage(interpreter, cur_section);
     while (cur_section) {
         opcode_t op = *cur_op;
-        if (*cur_op >= jit_op_count())
-           op = CORE_OPS_wrapper__;
         branched = start_new = 0;
         /* Predereference the opcode information for this opcode
          * early since it's going to be used many times */
@@ -484,16 +474,16 @@ make_sections(Interp *interpreter,
         /*
          * End a section:
          * If this opcode is jitted and next is a C function */
-        if (!EXTCALL(cur_op)) {
+        if (!EXTCALL(op)) {
             cur_section->jit_op_count++;
 
-            if (next_op < code_end && EXTCALL(next_op))
+            if (next_op < code_end && EXTCALL(*next_op))
                 start_new = 1;
         }
         else
             /* or if current section is not jitted, and the next opcode
              * is. */
-            if (next_op < code_end && !EXTCALL(next_op))
+            if (next_op < code_end && !EXTCALL(*next_op))
                 start_new = 1;
 
         /* or when the current opcode is a branch source,
@@ -512,7 +502,7 @@ make_sections(Interp *interpreter,
         if (start_new) {
             /* Set the type, depending on whether the current
              * instruction is external or jitted. */
-            cur_section->isjit = !EXTCALL(cur_op);
+            cur_section->isjit = !EXTCALL(op);
 
             /* Save the address where the section ends */
             cur_section->end = cur_op;
@@ -783,8 +773,6 @@ assign_registers(Interp *interpreter,
     cur_op = cur_section->begin;
     while (cur_op <= cur_section->end) {
         opcode_t op = *cur_op;
-        if (*cur_op >= jit_op_count())
-           op = CORE_OPS_wrapper__;
         op_info = &interpreter->op_info_table[op];
         /* For each argument of the current opcode */
         n = op_info->op_count;
@@ -896,8 +884,6 @@ debug_sections(Interp *interpreter,
         for (cur_op = cur_section->begin; cur_op <= cur_section->end;) {
             char instr[256];
             opcode_t op = *cur_op;
-            if (*cur_op >= jit_op_count())
-                op = CORE_OPS_wrapper__;
             op_info = &interpreter->op_info_table[op];
             PDB_disassemble_op(interpreter, instr, sizeof(instr),
                     op_info, cur_op, NULL, code_start, 0);
@@ -1068,8 +1054,6 @@ optimize_imcc_jit(Interp *interpreter,
         }
         while (cur_op <= section->end) {
             opcode_t op = *cur_op;
-            if (*cur_op >= jit_op_count())
-                op = CORE_OPS_wrapper__;
             op_info = &interpreter->op_info_table[op];
             set_register_usage(interpreter, jit_info, section,
                     op_info, cur_op, code_start);
@@ -1592,7 +1576,12 @@ parrot_build_asm(Interp *interpreter,
                 }
             }
 
-            /* Generate native code for current op */
+            /*
+             * for all opcodes that are dynamically loaded, we can't have
+             * a JITted version, so we execute the function incarnation
+             * via the wrapper opcode, which just runs one opcode
+             * see ops/core.ops for more
+             */
             if (cur_opcode_byte >= jit_op_count()) {
                 cur_opcode_byte = CORE_OPS_wrapper__;
             }
