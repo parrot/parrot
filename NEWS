@@ -2,8 +2,7 @@
 
 New in 0.4.4
 
-- Iterator?
-- Pugs incorporated?
+- hierarchical class names
 - APL compiler
   - under development
   - understands simple vector ops, strings
@@ -16,6 +15,7 @@ New in 0.4.4
   - tgc, tree grammar compiler
 - perl6 compiler
   - support for many operators, lexical scalars, regex matches
+- new pheme (Parrot scheme) compiler  
 
 New in 0.4.3
 
