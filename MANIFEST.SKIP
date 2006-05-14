@@ -639,8 +639,7 @@
 # generated from svn:ignore of 'languages/tcl/runtime/'
 ^languages/tcl/runtime/.*\.pbc$
 ^languages/tcl/runtime/.*\.pbc/
-^languages/tcl/runtime/tcllib\.pir$
-^languages/tcl/runtime/tcllib\.pir/
+^languages/tcl/runtime/builtins\.pir$
 # generated from svn:ignore of 'languages/tcl/src/builtin/'
 ^languages/tcl/src/builtin/.*\.pir$
 ^languages/tcl/src/builtin/.*\.pir/

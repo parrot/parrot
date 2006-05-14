@@ -102,8 +102,7 @@ src@slash@compiler.pir \
 src@slash@macros.pir \
 src@slash@parser.pir \
 src@slash@returncodes.pir \
-src@slash@tcl.p6r \
-src@slash@template@slash@tcllib.template
+src@slash@tcl.p6r
 
 all: tcl.pbc
 
@@ -137,10 +136,10 @@ pmcs:
 	@cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
-runtime@slash@tcllib.pir: $(GENERATED_INLINES) $(DEPS) tools@slash@gen_lib.pl
-	$(PERL) tools@slash@gen_lib.pl src@slash@template@slash@tcllib.template > runtime@slash@tcllib.pir
+runtime@slash@builtins.pir: $(GENERATED_INLINES) $(DEPS) tools@slash@gen_builtins.pl
+	$(PERL) tools@slash@gen_builtins.pl > runtime@slash@builtins.pir
 
-runtime@slash@tcllib_temp.pbc: $(PARROT) runtime@slash@tcllib.pir
+runtime@slash@tcllib_temp.pbc: $(PARROT) runtime@slash@builtins.pir
 	$(PARROT) --output=runtime@slash@tcllib_temp.pbc runtime@slash@tcllib.pir
 
 $(CLASSDIR)@slash@tclbinaryops.pbc: $(PARROT) $(CLASSDIR)@slash@tclbinaryops.pir
@@ -183,8 +182,8 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 CLEANERS = \
-runtime@slash@tcllib.pir \
 tcl.pbc \
+runtime@slash@builtins.pir \
 "runtime@slash@*.pbc" \
 "$(CLASSDIR)@slash@*.pbc" \
 "$(PMCDIR)@slash@pmc_*.h" \

@@ -75,6 +75,9 @@ providing a compreg-compatible method.
   .const int FUNCTION_TANH   = 67
   .const int FUNCTION_RAND   = 68
 
+# all the builtin commands
+.include 'languages/tcl/runtime/builtins.pir'
+
 .HLL 'Tcl', 'tcl_group'
 .HLL '_Tcl', ''
 
@@ -302,12 +305,3 @@ env_loop_done:
   ($I0,$S0) = compiler(0,tcl_code)
   .return pir_compiler($I0,$S0)
 .end
-
-.HLL 'Tcl', ''
-
-${FALLBACKS}
-
-.HLL 'tcl', 'tcl_group'
-.namespace ['']
-
-${INCLUDES}
