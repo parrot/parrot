@@ -54,7 +54,7 @@ PAST::Op: pir(.) = {
   child_gen:    
     pir = new "PGE::CodeString"
     children = node['children']
-    childret = new .ResizablePMCArray
+    childret = new 'APLVector'
   
     iter = new .Iterator, children
     iter = 0
@@ -151,7 +151,7 @@ PAST::Vector: pir(.) = {
     pir = new "PGE::CodeString"
     ret = pir.unique('$P')
     node['ret'] = ret
-    pir.emit('    %0 = new .ResizablePMCArray', ret)
+    pir.emit("    %0 = new 'APLVector'", ret)
     $P0 = node['children']
     iter = new .Iterator, $P0
     iter = 0

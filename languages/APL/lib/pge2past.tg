@@ -6,7 +6,7 @@ ROOT: result(.) = {
     result = new 'PAST::Stmts'
     result.'set_node'(node)
 
-    children = new .ResizablePMCArray
+    children = new 'APLVector'
     $P0 = node['statement']
     iter = new .Iterator, $P0
     iter = 0
@@ -74,7 +74,7 @@ APL::Grammar::expression: result(.) = {
     result['op'] = op
 
     # build a 'children' array of our (two) operands   
-    children = new .ResizablePMCArray 
+    children = new 'APLVector'
     $P0 = node['subexpression']
     $P1 = tree.get('result', $P0, 'APL::Grammar::subexpression')
     push children, $P1
@@ -97,7 +97,7 @@ APL::Grammar::expression: result(.) = {
     result['op'] = op
 
     # build a "children" array of our (one) operand
-    children = new .ResizablePMCArray
+    children = new 'APLVector'
     $P0 = node['expression']
     $P1 = tree.get('result', $P0, 'APL::Grammar::expression')
     push children, $P1
@@ -167,7 +167,7 @@ APL::Grammar::numeric_constant: result(.) = {
     result = new 'PAST::Vector'
     result.set_node(node)
 
-    children = new .ResizablePMCArray
+    children = new 'APLVector'
     iter = new .Iterator, $P0
     iter = 0
   iter_loop:

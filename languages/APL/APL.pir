@@ -170,6 +170,16 @@ executing program statements.
 
 .sub 'main' :main
     .param pmc args
+
+    # Load the pmc library
+    $P1 = loadlib 'apl_group'
+    if $P1 goto pmcs_ok
+    $P2 = new .Exception
+    $P2[0] = "unable to load APL's dynpmc library"
+    throw $P2
+pmcs_ok:
+
+
     $P0 = find_global 'APL', '__onload'
     $P0()
     $P0 = find_global 'PAST', '__onload'

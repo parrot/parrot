@@ -33,7 +33,7 @@ PAST::Stmt: eval(.) = {
 
 PAST::Op: eval(.) = {
     .local pmc children_eval
-    children_eval = new .ResizablePMCArray
+    children_eval = new 'APLVector'
   
     .local pmc iter 
     $P0 = node['children']

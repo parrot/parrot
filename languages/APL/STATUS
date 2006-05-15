@@ -13,6 +13,9 @@ Things to do:
 
 - implement an APLVector that knows its shape. Everything will be stored as
   a 1 dimensional array, indexed access will be computed. Eventually ponder
-  more compact +/or faster implementations.
+  more compact +/or faster implementations. (current code in src/pmc is
+  a stub implementation only)
  
-- properly print display N dimensional arrays.
+- properly print/display N dimensional arrays.
+
+- clean up the tools/ script so non-generated code is moved into a .pir file.

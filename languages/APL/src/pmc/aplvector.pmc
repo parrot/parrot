@@ -18,12 +18,10 @@ These are the vtable functions for the APL Vector class.
 
 */
 
-/* cache of classes referenced */
-
 pmclass APLVector
-    extends Array
-    does array
-    group apl_group
+    extends ResizablePMCArray
+    does    array
+    group   apl_group
 
     need_ext
     dynpmc
@@ -40,6 +38,7 @@ Class initialization. Caches the type id of various PMCs.
 */
 
     void class_init() {
+      /* do what now? */
     }
 
 /*

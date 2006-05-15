@@ -167,7 +167,7 @@ END_PIR
 
     $P0['monadic:\u2373']  =  <<"END_PIR"            # index of
     #XXX hack all the _1's need the same, generated unique number.
-    $P100 = new .ResizablePMCArray
+    $P100 = new 'APLVector'
     $I100 = 1
     $I101 = 0
     $I102 = %1
@@ -190,7 +190,7 @@ END_PIR
     result = ''
 
     .local pmc value
-    $I0 = isa arg, "ResizablePMCArray"
+    $I0 = isa arg, 'APLVector'
     if $I0 goto print_array
     value = arg
     bsr print_value
@@ -259,7 +259,7 @@ nothing:
 # integer - but if you set it to Integer or int, the program dies with
 # 'Method not found.' or dispatches to the wrong method.
 
-.sub 'dyadic:\u2296' :multi(pmc, ResizablePMCArray) # rotate
+.sub 'dyadic:\u2296' :multi(pmc, APLVector) # rotate
     .param int op1
     .param pmc op2
 
@@ -306,7 +306,7 @@ nothing:
     .param string op2
 
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
     
     .local int pos
     pos = 0
@@ -335,7 +335,7 @@ loop_end:
     .return (result)
 .end
 
-.sub 'dyadic:\u2373' :multi(ResizablePMCArray, ResizablePMCArray) # index of
+.sub 'dyadic:\u2373' :multi(APLVector, APLVector) # index of
     .param pmc op1
     .param pmc op2
 
@@ -346,7 +346,7 @@ loop_end:
     not_found = op1
 
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
 
     iter_two = new .Iterator, op2
     iter_two = 0 # start from beginning
@@ -374,12 +374,12 @@ loop_two_end:
     .return (result)
 .end
 
-.sub 'dyadic:\u2373' :multi(ResizablePMCArray, Float) # index of
+.sub 'dyadic:\u2373' :multi(APLVector, Float) # index of
     .param pmc op1
     .param float op2
 
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
  
     .local int pos
     pos = 0
@@ -546,11 +546,11 @@ true:
     .return($P1)
 .end
 
-.sub 'monadic:\u233d' :multi(ResizablePMCArray) # reverse
+.sub 'monadic:\u233d' :multi(APLVector) # reverse
     .param pmc op1
 
     .local pmc result,iter
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
     iter = new .Iterator, op1
     iter = 0
 
@@ -588,12 +588,12 @@ done:
     .return(result)
 .end
 
-.sub 'dyadic:~' :multi(ResizablePMCArray, ResizablePMCArray) # without
+.sub 'dyadic:~' :multi(APLVector, APLVector) # without
     .param pmc op1
     .param pmc op2
 
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
 
     .local pmc iter1,iter2
     iter1 = new .Iterator, op1
@@ -623,12 +623,12 @@ outer_done:
     .return ($P1)
 .end
 
-.sub 'dyadic:\u2191' :multi (Float, ResizablePMCArray) # take
+.sub 'dyadic:\u2191' :multi (Float, APLVector) # take
     .param int op1
     .param pmc op2
 
     .local pmc result 
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
 
     .local pmc iter
     iter = new .Iterator, op2
@@ -678,7 +678,7 @@ neg:
     .return ($S1)
 .end
 
-.sub 'dyadic:\u2193' :multi (Float, ResizablePMCArray) # drop
+.sub 'dyadic:\u2193' :multi (Float, APLVector) # drop
     .param int op1
     .param pmc op2
 
@@ -731,15 +731,15 @@ neg:
     .param pmc op1
 
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
     .return (result)
 .end
 
-.sub 'monadic:\u2374' :multi (ResizablePMCArray) # shape
+.sub 'monadic:\u2374' :multi (APLVector) # shape
     .param pmc op1
 
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
 
     $I1 = op1
     push result, $I1
@@ -761,12 +761,12 @@ my @type_pairs = (
   [ 'String', 'String' ],
   [ 'String', 'Float' ],
   [ 'Float', 'String' ],
-  [ 'String', 'ResizablePMCArray' ],
-  [ 'ResizablePMCArray', 'String' ],
+  [ 'String', 'APLVector' ],
+  [ 'APLVector', 'String' ],
   [ 'Float', 'Float' ],
-  [ 'Float', 'ResizablePMCArray' ], 
-  [ 'ResizablePMCArray', 'Float' ], 
-  [ 'ResizablePMCArray', 'ResizablePMCArray' ], 
+  [ 'Float', 'APLVector' ], 
+  [ 'APLVector', 'Float' ], 
+  [ 'APLVector', 'APLVector' ], 
 );
 
 foreach my $operator (keys %scalar) {
@@ -790,7 +790,7 @@ END_PREAMBLE
         } elsif ($type1 eq "Float" && $type2 eq "Float") {
           # scalar to scalar..
             $template .= interpolate($code, 'op1', 'op2');
-        } elsif ($type1 eq "ResizablePMCArray" && $type2 eq "ResizablePMCArray") {
+        } elsif ($type1 eq "APLVector" && $type2 eq "APLVector") {
           # vector to vector
           $template .= << 'END_PIR';
     # Verify Shapes conform.
@@ -801,7 +801,7 @@ END_PREAMBLE
 good:
     # Create a result vector
     .local pmc result 
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
     # Loop through each vector, doing the ops.
     .local pmc iter1, iter2
     iter1 = new .Iterator, op1
@@ -826,7 +826,7 @@ END_PIR
         } else {
            # Vector to Scalar
            my ($vector, $scalar, @order);
-           if ($type1 eq 'ResizablePMCArray') {
+           if ($type1 eq 'APLVector') {
                $vector = "op1";
                $scalar = "op2";
 			   @order = qw/ $P1 $P2 /;
@@ -839,7 +839,7 @@ END_PIR
            $template .= << "END_PIR";
     # Create a result vector
     .local pmc result 
-    result = new .ResizablePMCArray
+    result = new 'APLVector'
     # Loop through each vector, doing the ops.
     .local pmc iter1
     iter1 = new .Iterator, $vector
