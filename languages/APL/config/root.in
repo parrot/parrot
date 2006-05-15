@@ -7,10 +7,13 @@ PARROT = ../../parrot@exe@
 BUILD  = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
 # Directories
-PGE_DIR = ../../compilers/pge
-TGE_DIR = ../../compilers/tge
-DESTDIR = @build_dir@/runtime/parrot/dynext
-PMCDIR  = src/pmc
+PGE_DIR  = ../../compilers/pge
+TGE_DIR  = ../../compilers/tge
+PMC_DIR   = src/pmc
+GROUP_DIR = @build_dir@/runtime/parrot/dynext
+
+# Files
+APL_GROUP = $(GROUP_DIR)/APL_group$(LOAD_EXT)
 
 # Extensions
 O        = @o@
@@ -89,11 +92,11 @@ clean: testclean
   lib/pasteval.pir \
   lib/APLGrammar.pir \
   lib/APLFunctions.pir \
-  $(PMCDIR)/*.h \
-  $(PMCDIR)/*.c \
-  $(PMCDIR)/*$(LOAD_EXT) \
-  $(PMCDIR)/*$(O) \
-  $(DESTDIR)/APL_group$(LOAD_EXT)
+  $(PMC_DIR)/*.h \
+  $(PMC_DIR)/*.c \
+  $(PMC_DIR)/*$(LOAD_EXT) \
+  $(PMC_DIR)/*$(O) \
+  $(APL_GROUP)
 
 realclean: clean
 	$(RM_F) Makefile "EVAL_*"
@@ -104,7 +107,7 @@ distclean: realclean
 # targets so we can let make do its job, not forcing us to call it in 
 # this manner.
 pmcs:
-	@cd $(PMCDIR) && $(BUILD) generate $(PMCS)
-	@cd $(PMCDIR) && $(BUILD) compile  $(PMCS)
-	@cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
-	@cd $(PMCDIR) && $(BUILD) copy "--destination=$(DESTDIR)"  $(PMCS)
+	@cd $(PMC_DIR) && $(BUILD) generate $(PMCS)
+	@cd $(PMC_DIR) && $(BUILD) compile  $(PMCS)
+	@cd $(PMC_DIR) && $(BUILD) linklibs $(PMCS)
+	@cd $(PMC_DIR) && $(BUILD) copy "--destination=$(GROUP_DIR)"  $(PMCS)
