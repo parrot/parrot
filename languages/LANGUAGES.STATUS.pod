@@ -33,6 +33,7 @@ See also http://xamber.org/history.html
 =item Location
 
 http://xamber.org/.
+
 The Amber PMCs are in C<languages/amber>.
 
 =back
@@ -444,7 +445,7 @@ Lua 5.1 Standard Libraries implemented in PIR (still incomplete).
 
 =item Status
 
-Early stage - but all examples and test cases are working.
+Early stage - Part of languages smoke testing.
 
 =item Last verified with parrot version
 
@@ -943,7 +944,7 @@ C<languages/tcl>
 =back
 
 
-=head2 unlamba
+=head2 unlambda
 
 =over 4
 
@@ -953,8 +954,11 @@ Leopold TE<ouml>tsch
 
 =item Description
 
-unlambda is a pure functional programming language with mostly eager evaluation following the SKI calculus (+ a few extensions)
+unlambda is a pure functional programming language with mostly eager
+evaluation following the SKI calculus (+ a few extensions)
+
 See also http://www.madore.org/~david/programs/unlambda/
+
 =item Status
 
 Working. Part of languages smoke testing.
