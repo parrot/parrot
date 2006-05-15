@@ -1,13 +1,24 @@
-# Setup some commands
-LN_S     = @lns@
-PERL     = @perl@
-RM_F     = @rm_f@
-PARROT   = ../../parrot@exe@
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
-CP       = @cp@
+# Commands
+LN_S   = @lns@
+PERL   = @perl@
+RM_F   = @rm_f@
+CP     = @cp@
+PARROT = ../../parrot@exe@
+BUILD  = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
-all: APL.pbc
+# Directories
+PGE_DIR = ../../compilers/pge
+TGE_DIR = ../../compilers/tge
+DESTDIR = @build_dir@/runtime/parrot/dynext
+PMCDIR  = src/pmc
+
+# Extensions
+O        = @o@
+LOAD_EXT = @load_ext@
+
+PMCS = APLVector
+
+all: APL.pbc pmcs
 
 SOURCES = APL.pir \
   lib/APLGrammar.pir \
@@ -44,6 +55,9 @@ help:
 	@echo ""
 	@echo "  all:               APL.pbc"
 	@echo "                     This is the default."
+	@echo "Running:"
+	@echo "  interactive:       Run the interative APL shell"
+	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
 	@echo "  devtest:           Run the test suite, using TODO not SKIP"
@@ -74,9 +88,23 @@ clean: testclean
   lib/past2pir.pir \
   lib/pasteval.pir \
   lib/APLGrammar.pir \
-  lib/APLFunctions.pir
+  lib/APLFunctions.pir \
+  $(PMCDIR)/*.h \
+  $(PMCDIR)/*.c \
+  $(PMCDIR)/*$(LOAD_EXT) \
+  $(PMCDIR)/*$(O) \
+  $(DESTDIR)/APL_group$(LOAD_EXT)
 
 realclean: clean
 	$(RM_F) Makefile "EVAL_*"
 
 distclean: realclean
+
+# XXX Really dislike this setup - the build script should be giving us the make
+# targets so we can let make do its job, not forcing us to call it in 
+# this manner.
+pmcs:
+	@cd $(PMCDIR) && $(BUILD) generate $(PMCS)
+	@cd $(PMCDIR) && $(BUILD) compile  $(PMCS)
+	@cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
+	@cd $(PMCDIR) && $(BUILD) copy "--destination=$(DESTDIR)"  $(PMCS)
