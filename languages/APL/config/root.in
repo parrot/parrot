@@ -14,14 +14,15 @@ GROUP_DIR = @build_dir@/runtime/parrot/dynext
 
 # Files
 APL_GROUP = $(GROUP_DIR)/APL_group$(LOAD_EXT)
+PMC_NAMES = APLVector
+PMC_FILES = $(PMC_DIR)/APLVector.pmc
 
 # Extensions
 O        = @o@
 LOAD_EXT = @load_ext@
 
-PMCS = APLVector
 
-all: APL.pbc pmcs
+all: APL.pbc
 
 SOURCES = APL.pir \
   lib/APLGrammar.pir \
@@ -31,7 +32,7 @@ SOURCES = APL.pir \
   lib/PAST.pir \
   lib/APLFunctions.pir
 
-APL.pbc: $(PARROT) $(SOURCES) 
+APL.pbc: $(PARROT) $(APL_GROUP) $(SOURCES) 
 	$(PARROT) --output=APL.pbc APL.pir
 
 interactive: APL.pbc
@@ -94,6 +95,7 @@ clean: testclean
   lib/APLFunctions.pir \
   $(PMC_DIR)/*.h \
   $(PMC_DIR)/*.c \
+  $(PMC_DIR)/*.dump \
   $(PMC_DIR)/*$(LOAD_EXT) \
   $(PMC_DIR)/*$(O) \
   $(APL_GROUP)
@@ -106,8 +108,8 @@ distclean: realclean
 # XXX Really dislike this setup - the build script should be giving us the make
 # targets so we can let make do its job, not forcing us to call it in 
 # this manner.
-pmcs:
-	@cd $(PMC_DIR) && $(BUILD) generate $(PMCS)
-	@cd $(PMC_DIR) && $(BUILD) compile  $(PMCS)
-	@cd $(PMC_DIR) && $(BUILD) linklibs $(PMCS)
-	@cd $(PMC_DIR) && $(BUILD) copy "--destination=$(GROUP_DIR)"  $(PMCS)
+$(APL_GROUP): $(PMC_FILES)
+	cd $(PMC_DIR) && $(BUILD) generate $(PMC_NAMES)
+	cd $(PMC_DIR) && $(BUILD) compile  $(PMC_NAMES)
+	cd $(PMC_DIR) && $(BUILD) linklibs $(PMC_NAMES)
+	cd $(PMC_DIR) && $(BUILD) copy "--destination=$(GROUP_DIR)"  $(PMC_NAMES)
