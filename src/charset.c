@@ -245,8 +245,6 @@ Parrot_register_charset(Interp *interpreter, const char *charsetname,
     return 0;
 }
 
-void parrot_init_encodings_2(Interp *interpreter);
-
 void
 Parrot_charsets_encodings_init(Interp *interpreter)
 {
