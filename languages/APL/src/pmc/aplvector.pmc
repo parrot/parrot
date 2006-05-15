@@ -23,7 +23,7 @@ These are the vtable functions for the APL Vector class.
 pmclass APLVector
     extends Array
     does array
-    group APL_group
+    group apl_group
 
     need_ext
     dynpmc

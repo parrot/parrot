@@ -13,7 +13,7 @@ PMC_DIR   = src/pmc
 GROUP_DIR = @build_dir@/runtime/parrot/dynext
 
 # Files
-APL_GROUP = $(GROUP_DIR)/APL_group$(LOAD_EXT)
+APL_GROUP = $(GROUP_DIR)/apl_group$(LOAD_EXT)
 PMC_NAMES = APLVector
 PMC_FILES = $(PMC_DIR)/APLVector.pmc
 
