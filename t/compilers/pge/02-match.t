@@ -23,7 +23,7 @@ Tests the Match class directly.
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)',         'todo'=>'rt #39135');
+pir_output_is(<<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)');
 .sub main :main
     load_bytecode 'PGE.pbc'
 
@@ -36,9 +36,19 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)',      
     $P3 = new .String
     $P3 = 'hello '
 
-    $P4 = new .String
-    $P4 = concat $P3, $P2
+    $P4 = n_concat $P3, $P2
     say $P4              # hello world
+.end
+
+.sub __concatenate :multi(String, PGE::Match)
+    .param pmc l
+    .param pmc r
+    $S0 = l
+    $S1 = r
+    $S2 = $S0 . $S1
+    $P0 = new .String
+    $P0 = $S2
+    .return ($P0)
 .end
 CODE
 world
