@@ -48,7 +48,7 @@ list: result(.) = {
 	result = new 'PAST::Exp'
 
 	.local pmc match
-	match = node['list_items']
+	match = node['list_item']
 
 	.local pmc iter
 	iter  = new Iterator, match # setup iterator for node
@@ -59,7 +59,7 @@ list: result(.) = {
 
 	.local pmc child
 	child = shift iter
-	child = tree.get( 'result', child, 'list_items' )
+	child = tree.get( 'result', child, 'list_item' )
 
 	.local pmc op
 	op    = tree.get( 'maybe_op', child )
@@ -68,7 +68,7 @@ list: result(.) = {
   iter_loop:
 	unless iter, iter_end        # while (entries) ...
 	shift child, iter            # get key for next entry
-	child = tree.get( 'result', child, 'list_items' )
+	child = tree.get( 'result', child, 'list_item' )
 	result.'add_child'( child )
 	goto iter_loop
 
@@ -189,7 +189,7 @@ quoted_string: result(.) = {
 	.return( result )
 }
 
-list_items: result(.) = {
+list_item: result(.) = {
 	.local pmc result
 	.local pmc iter
 

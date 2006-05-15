@@ -2,10 +2,10 @@ grammar Pheme::Grammar;
 
 rule prog { <list>+ }
 
-rule list { \( <list_items>+ \) }
+rule list { \( <list_item>+ \) }
 
 # quoted_string has to come first
-rule list_items { <quoted_string> | <atom> | <list> | <empty_list> }
+rule list_item { <quoted_string> | <atom> | <list> | <empty_list> }
 
 token empty_list { \(\) }
 
