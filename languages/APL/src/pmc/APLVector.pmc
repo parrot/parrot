@@ -1,0 +1,54 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id: tcllist.pmc 12341 2006-04-18 15:13:54Z coke $
+
+=head1 NAME
+
+src/pmc/APLVector.pmc - APLVector
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the APL Vector class.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* cache of classes referenced */
+
+pmclass APLVector
+    extends Array
+    does array
+    group APL_group
+
+    need_ext
+    dynpmc
+    {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs.
+
+=cut
+
+*/
+
+    void class_init() {
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
