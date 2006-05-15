@@ -690,7 +690,7 @@ AGAIN:
         else {
             close((SOCKET)io->fd);
         }
-        /* The charset should propably be 'binary', but right now httpd.imc
+        /* The charset should probably be 'binary', but right now httpd.imc
          * only works with 'ascii'
          */
         *s = string_make(interpreter, buf, bytesread, "ascii", 0);

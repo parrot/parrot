@@ -140,7 +140,7 @@ NO_VERSION_FLAG:
     end
 NO_HELP_FLAG: 
 
-  # TODO: In near future we propably should use objects here
+  # TODO: In near future we probably should use objects here
   # For now let's just just use a hash with all state information
   .local pmc state
   state = new .Hash

@@ -190,7 +190,7 @@ TODO:
            # floats
            [ '.1', '.1', 'Parrot bc says 0.1', with_past => 1 ],
            [ '-.1', '-.1', 'Parrot bc says -0.1', with_past => 1],
-           [ '-1.0000001', '-1.0000001', 'propably limited precission of Float PMC', with_past => 1 ],
+           [ '-1.0000001', '-1.0000001', 'probably limited precission of Float PMC', with_past => 1 ],
 
            # keyword quit
            [ "0\n1; 2; quit;  3", [ 0 ], 'is that correct in GNU bc?', with_past => 1 ],

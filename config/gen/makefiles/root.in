@@ -1337,7 +1337,7 @@ TOOLS_TEST_FILES = \
     t/tools/*.t
 
 # Common prep for all test targets.
-# We propably need a complete build before running the tests.
+# We probably need a complete build before running the tests.
 test_prep : all
 
 # Run test cases with a single call of t/harness. Users have to look at only

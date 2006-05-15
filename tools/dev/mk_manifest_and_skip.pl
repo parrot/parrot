@@ -26,7 +26,7 @@ use File::Find;
 
 my @dirs;  # will be filled in wanted
 
-# XXX Most of these can propably be cleaned up
+# XXX Most of these can probably be cleaned up
 my %special = qw(
     NEWS                                            [devel]doc
     PBC_COMPAT                                      [devel]doc
