@@ -24,6 +24,10 @@ LOAD_EXT = @load_ext@
 
 all: APL.pbc
 
+$(PARROT):
+	@echo "You must first configure and build parrot. See ../../README"
+	@$(PERL) -e "exit 1"
+
 SOURCES = APL.pir \
   lib/APLGrammar.pir \
   lib/pge2past.pir \
