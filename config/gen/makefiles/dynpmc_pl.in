@@ -145,7 +145,11 @@ elsif ($mode eq 'copy') {
         gather_groups_and_libs(@pmcs);
     my @ungrouped_pmcs = grep { ! exists $pmc_group->{$_} } @pmcs;
 
-    foreach (@ungrouped_pmcs, keys %$group_files) {
+    my (@list_to_process) = (@ungrouped_pmcs, keys %$group_files);
+
+    die "nothing found to copy" unless @list_to_process;
+
+    foreach (@list_to_process) {
         copy("$_$LOAD_EXT", $dest) or die "Copy $_$LOAD_EXT failed ($?)\n";
 
         # Execute permissions on libraries is especially important on
