@@ -12,36 +12,26 @@ PGE::OPTable - PGE operator precedence table and parser
 
 .namespace [ "PGE::OPTable" ]
 
-.const int PGE_OPTABLE_ARITY         = 0x0003
-.const int PGE_OPTABLE_ASSOC         = 0x000c
-.const int PGE_OPTABLE_ASSOC_RIGHT   = 0x0004
-.const int PGE_OPTABLE_ASSOC_LIST    = 0x0008
-.const int PGE_OPTABLE_NOWS          = 0x1000
-.const int PGE_OPTABLE_NULLTERM      = 0x2000
+.const int PGE_OPTABLE_EXPECT_TERM   = 0x01
+.const int PGE_OPTABLE_EXPECT_OPER   = 0x02
+.const int PGE_OPTABLE_EXPECT_TERMPOST = 0x05
 
-.const int PGE_OPTABLE_EXPECT        = 0x00f0
-.const int PGE_OPTABLE_EXPECT_TERM   = 0x0010
-.const int PGE_OPTABLE_EXPECT_OPER   = 0x0060
-.const int PGE_OPTABLE_EXPECT_TERMPOST = 0x0050
-
-.const int PGE_OPTABLE_SYNCAT        = 0x0f00
-
-.const int PGE_OPTABLE_EMPTY         = 0x0000
-.const int PGE_OPTABLE_TERM          = 0x0100
-.const int PGE_OPTABLE_POSTFIX       = 0x0200
-.const int PGE_OPTABLE_CLOSE         = 0x0300
-.const int PGE_OPTABLE_PREFIX        = 0x0400
-.const int PGE_OPTABLE_PRELIST       = 0x0500
-.const int PGE_OPTABLE_INFIX         = 0x0600
-.const int PGE_OPTABLE_TERNARY       = 0x0700
-.const int PGE_OPTABLE_POSTCIRCUMFIX = 0x0800
-.const int PGE_OPTABLE_CIRCUMFIX     = 0x0900
+.const int PGE_OPTABLE_EMPTY         = 0x00
+.const int PGE_OPTABLE_TERM          = 0x10
+.const int PGE_OPTABLE_POSTFIX       = 0x20
+.const int PGE_OPTABLE_CLOSE         = 0x30
+.const int PGE_OPTABLE_PREFIX        = 0x40
+.const int PGE_OPTABLE_PRELIST       = 0x50
+.const int PGE_OPTABLE_INFIX         = 0x60
+.const int PGE_OPTABLE_TERNARY       = 0x70
+.const int PGE_OPTABLE_POSTCIRCUMFIX = 0x80
+.const int PGE_OPTABLE_CIRCUMFIX     = 0x90
 
 .const int PGE_OPTABLE_STOP_SUB      = -1
 
 .include "cclass.pasm"
 
-.sub "__onload" :load
+.sub '__onload' :load
     .local pmc base
     .local pmc sctable
     $P0 = getclass "Hash"
@@ -50,18 +40,37 @@ PGE::OPTable - PGE operator precedence table and parser
     addattribute base, '%!klen'
     addattribute base, '&!ws'
     sctable = new .Hash
-    sctable["term:"]          = 0x0110
-    sctable["postfix:"]       = 0x0221
-    sctable["close:"]         = 0x0320
-    sctable["prefix:"]        = 0x0411
-    sctable["prelist:"]       = 0x0511
-    sctable["infix:"]         = 0x0622
-    sctable["ternary:"]       = 0x0723
-    sctable["postcircumfix:"] = 0x0842
-    sctable["circumfix:"]     = 0x0911
-    store_global "PGE::OPTable", "%!sctable", sctable
+    store_global '%!sctable', sctable
+
+    'sctable'('term:', 'syncat'=>PGE_OPTABLE_TERM, 'expect'=>0x0201)
+    'sctable'('postfix:', 'syncat'=>PGE_OPTABLE_POSTFIX, 'expect'=>0x0202, 'arity'=>1)
+    'sctable'('close:', 'syncat'=>PGE_OPTABLE_CLOSE, 'expect'=>0x0202)
+    'sctable'('prefix:', 'syncat'=>PGE_OPTABLE_PREFIX, 'expect'=>0x0101, 'arity'=>1)
+    'sctable'('infix:', 'syncat'=>PGE_OPTABLE_INFIX, 'expect'=>0x0102, 'arity'=>2)
+    'sctable'('ternary:', 'syncat'=>PGE_OPTABLE_TERNARY, 'expect'=>0x0102, 'expectclose'=>0x0102, 'arity'=>3)
+    'sctable'('postcircumfix:', 'syncat'=>PGE_OPTABLE_POSTCIRCUMFIX, 'expect'=>0x0102, 'arity'=>2)
+    'sctable'('circumfix:', 'syncat'=>PGE_OPTABLE_CIRCUMFIX, 'expect'=>0x0101, 'arity'=>1)
     .return ()
 .end
+
+=item C<syncat(string name, adverbs :slurpy :named)
+
+Adds (or replaces) a syntactic category's defaults.
+
+=cut
+
+.sub 'sctable'
+    .param string name
+    .param pmc adverbs         :slurpy :named
+    .local pmc sctable
+    sctable = find_global '%!sctable'
+    unless null adverbs goto with_adverbs
+    adverbs = new .Hash
+  with_adverbs:
+    sctable[name] = adverbs
+    .return (adverbs)
+.end
+
 
 .sub "__init" :method
     .local pmc tokentable, keytable, klentable
@@ -77,19 +86,23 @@ PGE::OPTable - PGE operator precedence table and parser
     .param string name
     .param pmc args            :slurpy :named
 
-    .local pmc token
     .local string syncat, key
-    token = clone args
-    token['name'] = name
     $I0 = index name, ':'
     inc $I0
     syncat = substr name, 0, $I0
     key = substr name, $I0
 
-    .local pmc sctable
-    .local int mode
+    .local pmc sctable, token
     sctable = find_global "PGE::OPTable", "%!sctable"
-    mode = sctable[syncat]
+    $I0 = exists sctable[syncat]
+    if $I0 == 0 goto token_hash
+    token = sctable[syncat]
+    token = clone token
+    goto with_token
+  token_hash:
+    token = new .Hash
+  with_token:
+    token['name'] = name
 
     # we don't replace existing tokens
     .local pmc tokentable
@@ -98,55 +111,64 @@ PGE::OPTable - PGE operator precedence table and parser
     if $I0 goto end
     tokentable[name] = token
 
-    ##   don't process undef syntactic categories -- just store
-    if mode == 0 goto end
+    $P0 = new .Iterator, args
+  args_loop:
+    unless $P0 goto args_end
+    $P1 = shift $P0
+    $P2 = $P0[$P1]
+    token[$P1] = $P2
+    goto args_loop
+  args_end:
+    
+    $S0 = token['match']
+    if $S0 > '' goto with_match
+    token['match'] = 'PGE::Match'
+  with_match:
 
-    $S0 = args['match']
-    if $S0 > '' goto token_returns
-    $S0 = 'PGE::Match'
-  token_returns:
-    token['match'] = $S0
-
-  token_equiv:
     $S0 = token['equiv']
-    unless $S0 goto token_looser
+    unless $S0 goto with_equiv
     $S1 = tokentable[$S0;'precedence']
     token['precedence'] = $S1
     $S1 = tokentable[$S0;'assoc']
     token['assoc'] = $S1
+  with_equiv:
 
-  token_looser:
     $S0 = token['looser']
-    unless $S0 goto token_tighter
+    unless $S0 goto with_looser
     $S0 = tokentable[$S0;'precedence']
     $S0 = clone $S0
     substr $S0, -1, 0, '<'
     token['precedence'] = $S0
+  with_looser:
 
-  token_tighter:
     $S0 = token['tighter']
-    unless $S0 goto token_prec_close
+    unless $S0 goto with_tighter
     $S0 = tokentable[$S0;'precedence']
     $S0 = clone $S0
     substr $S0, -1, 0, '>'
     token['precedence'] = $S0
+  with_tighter:
 
-  token_prec_close:
-    $I0 = exists token['prec_close']
-    if $I0 goto token_close
+    $I0 = exists token['precclose']
+    if $I0 goto with_precclose
     $P0 = token['precedence']
-    token['prec_close'] = $P0
+    token['precclose'] = $P0
+  with_precclose:
     
-  token_close:
     .local string keyclose
     $I0 = index key, ' '
-    if $I0 < 0 goto add_key
+    if $I0 < 0 goto with_close
     $I1 = $I0 + 1
     keyclose = substr key, $I1
     key = substr key, 0, $I0
     token['keyclose'] = keyclose
     $S0 = concat 'close:', keyclose
-    self.'newtok'($S0, 'equiv' => name)
+    $I0 = token['expectclose']
+    if $I0 goto with_expectclose
+    $I0 = 0x0202
+  with_expectclose:
+    self.'newtok'($S0, 'equiv' => name, 'expect'=>$I0)
+  with_close:
 
   add_key:
     .local pmc keytable, klentable
@@ -175,37 +197,13 @@ PGE::OPTable - PGE operator precedence table and parser
     push $P0, token
   add_key_end:
 
-    # set the mode for the token
-    token = tokentable[name]
-  mode_nullterm:
-    $I0 = token['nullterm']
-    if $I0 == 0 goto mode_nows
-    mode |= PGE_OPTABLE_NULLTERM
-
-  mode_nows:
-    $I0 = token['nows']
-    if $I0 == 0 goto mode_assoc
-    mode |= PGE_OPTABLE_NOWS
-
-  mode_assoc:
     .local string assoc
     assoc = token['assoc']
-    if assoc == 'left' goto mode_done
-    if assoc == '' goto assoc_left
-    if assoc == 'right' goto assoc_right
-    if assoc == 'list' goto assoc_list
-    goto mode_done
-  assoc_left:
+    if assoc > '' goto with_assoc
     token['assoc'] = 'left'
-    goto mode_done
-  assoc_right:
-    mode |= PGE_OPTABLE_ASSOC_RIGHT
-    goto mode_done
-  assoc_list:
-    mode |= PGE_OPTABLE_ASSOC_LIST
-  mode_done:
+  with_assoc:
+
   end:
-    token['mode'] = mode
     .return (token)
 .end
     
@@ -224,9 +222,7 @@ PGE::OPTable - PGE operator precedence table and parser
     .local string key 
     .local pmc token, top, oper
     .local pmc iter
-    .local int tokenmode, topmode
     .local int tokencat, topcat
-    .local int lastcat
     .local int circumnest
 
     tokentable = self
@@ -259,11 +255,11 @@ PGE::OPTable - PGE operator precedence table and parser
     goto with_stop
   stop_str_nows:
     has_stop = length stop_str
-    has_stop_nows = PGE_OPTABLE_NOWS
+    has_stop_nows = 1
   with_stop:
 
-    ##   see if we have a 'tighter' adverb.  If so, then
-    ##   set 'tighter' to be the precedence of the op specified.
+    ## if we have a 'tighter' adverb, set
+    ## tighter to the precedence of the op specified
     .local string tighter
     tighter = adverbs['tighter']
     $I0 = exists tokentable[tighter]
@@ -281,19 +277,8 @@ PGE::OPTable - PGE operator precedence table and parser
     (mob, target, mfrom, mpos) = newfrom(mob, 0)
     pos = mfrom
     lastpos = length target
-    lastcat = PGE_OPTABLE_EMPTY
     circumnest = 0
-
-  expect_term:
     expect = PGE_OPTABLE_EXPECT_TERM
-    goto token_next
-
-  expect_termpost:
-    expect = PGE_OPTABLE_EXPECT_TERMPOST
-    goto token_next
-
-  expect_oper:
-    expect = PGE_OPTABLE_EXPECT_OPER
 
   token_next:
     ##   figure out what we're looking for
@@ -310,10 +295,8 @@ PGE::OPTable - PGE operator precedence table and parser
   token_next_ws:
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
   token_next_1:
-    nows = 0
     ##   "nows" tokens are eligible if we don't have leading ws
-    if pos == wspos goto check_stop
-    nows = PGE_OPTABLE_NOWS
+    nows = isne pos, wspos
 
   check_stop:
     ##  Check for a stop pattern or string.  But don't check
@@ -378,28 +361,22 @@ PGE::OPTable - PGE operator precedence table and parser
     ##   if the current operator doesn't allow nullterm, end match
     unless tokenstack goto end
     top = tokenstack[-1]
-    topmode = top["mode"]
-    $I0 = topmode & PGE_OPTABLE_NULLTERM
+    $I0 = top['nullterm']
     if $I0 == 0 goto end
     ##   it's a nullterm operator, so we can continue parsing
     $P1 = pos
-    goto expect_oper
+    expect = PGE_OPTABLE_EXPECT_OPER
+    goto token_next
 
   oper_found:
-    ##   if the token is below our minimum precedence, treat it as not found
+    ##   tighter: if we have an insufficiently tight token, 
+    ##   treat it as not found.
+    if circumnest > 0 goto oper_found_1
     $S0 = token['precedence']
     if $S0 <= tighter goto oper_not_found
-    tokenmode = token["mode"]
-    tokencat = tokenmode & PGE_OPTABLE_SYNCAT
-    ##   this hack handles prelist term followed by postcircumfix op
-    if lastcat != PGE_OPTABLE_PRELIST goto oper_found_1
-    if tokencat != PGE_OPTABLE_POSTCIRCUMFIX goto oper_found_1
-    $P0 = pop tokenstack
-    $P0 = pop operstack
-    push termstack, $P0
   oper_found_1:
-    lastcat = tokencat
-    ##   the remainder of this section processes according to the
+    tokencat = token['syncat']
+    ##   this section processes according to the
     ##   table at the end of this function
     if tokencat == PGE_OPTABLE_TERM goto term_shift
     if tokencat == PGE_OPTABLE_PREFIX goto oper_shift          # (S1)
@@ -418,21 +395,20 @@ PGE::OPTable - PGE operator precedence table and parser
     goto oper_shift                                            # (S3)
   shift_reduce_1:
     top = tokenstack[-1]
-    topmode = top["mode"]
-    topcat = topmode & PGE_OPTABLE_SYNCAT
+    topcat = top['syncat']
     if topcat == PGE_OPTABLE_POSTFIX goto oper_reduce          # (R4)
     if tokencat == PGE_OPTABLE_CLOSE goto oper_close           # (R5, C5)
     if topcat >= PGE_OPTABLE_POSTCIRCUMFIX goto oper_shift     # (S6)
     $P0 = token['precedence']
-    $P1 = top['prec_close']
+    $P1 = top['precclose']
     if $P0 > $P1 goto oper_shift                               # (P)
     if topcat != PGE_OPTABLE_TERNARY goto shift_reduce_2
     if tokencat != PGE_OPTABLE_TERNARY goto err_ternary        # (P/E)
     goto oper_shift
   shift_reduce_2:
     if $P0 < $P1 goto oper_reduce
-    $I0 = topmode & PGE_OPTABLE_ASSOC_RIGHT                    
-    if $I0 goto oper_shift                                     # (P/A)
+    $P2 = top['assoc']
+    if $P2 == 'right' goto oper_shift                          # (P/A)
 
   oper_reduce:
     bsr reduce
@@ -455,24 +431,22 @@ PGE::OPTable - PGE operator precedence table and parser
     ##   for circumfix ops, increase the circumfix nesting level
     $I0 = isgt tokencat, PGE_OPTABLE_POSTCIRCUMFIX
     circumnest += $I0
-    ##   choose next expect state based on current state
-    if tokencat == PGE_OPTABLE_PRELIST goto expect_termpost
-    if tokencat >= PGE_OPTABLE_PREFIX goto expect_term
-    if tokencat == PGE_OPTABLE_POSTFIX goto expect_oper
-    if topcat == PGE_OPTABLE_TERNARY goto expect_term
-    goto expect_oper
+    expect = token['expect']
+    expect = shr expect, 8
+    goto token_next
 
   term_shift:
     push termstack, oper
     pos = oper.to()
-    goto expect_oper
+    expect = token['expect']
+    expect = shr expect, 8
+    goto token_next
 
   ## reduce top operation on stack
   reduce:
-    $P0 = pop tokenstack
+    top = pop tokenstack
     $P1 = pop operstack
-    topmode = $P0["mode"]
-    topcat = topmode & PGE_OPTABLE_SYNCAT
+    topcat = top['syncat']
     if topcat == PGE_OPTABLE_CLOSE goto reduce_close
     if topcat < PGE_OPTABLE_POSTCIRCUMFIX goto reduce_normal
     ##   we have an unbalanced open, so error.  remove the
@@ -485,12 +459,11 @@ PGE::OPTable - PGE operator precedence table and parser
     push termstack, oper
     goto reduce_end
   reduce_close:
-    $P0 = pop tokenstack
+    top = pop tokenstack
     $P1 = pop operstack
   reduce_normal:
     .local int arity
-    topmode = $P0["mode"]
-    arity = topmode & PGE_OPTABLE_ARITY
+    arity = top['arity']
   reduce_args:
     if arity < 1 goto reduce_list
     $P2 = pop termstack
@@ -505,8 +478,8 @@ PGE::OPTable - PGE operator precedence table and parser
     goto reduce_end
   reduce_list:
     ##   combine matching list associative operations
-    $I0 = topmode & PGE_OPTABLE_ASSOC
-    if $I0 != PGE_OPTABLE_ASSOC_LIST goto reduce_saveterm
+    $S0 = top['assoc']
+    if $S0 != 'list' goto reduce_saveterm
     $S1 = $P1['type']
     $S2 = $P2['type']
     if $S1 != $S2 goto reduce_saveterm
@@ -522,10 +495,11 @@ PGE::OPTable - PGE operator precedence table and parser
   token_match:
     mpos = pos
     null oper
-    tokenmode = token["mode"]
-    $I0 = tokenmode & expect
+    $I0 = token['expect']
+    $I0 = $I0 & expect
     if $I0 == 0 goto token_match_end
-    $I0 = tokenmode & nows
+    $I0 = token['nows']
+    $I0 = $I0 & nows
     if $I0 goto token_match_end
     $I0 = exists token['parsed']
     if $I0 goto token_match_sub
