@@ -53,7 +53,7 @@ PGE::OPTable - PGE operator precedence table and parser
     .return ()
 .end
 
-=item C<syncat(string name, adverbs :slurpy :named)
+=item C<syncat(string name, adverbs :slurpy :named)>
 
 Adds (or replaces) a syntactic category's defaults.
 
