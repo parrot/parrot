@@ -73,9 +73,8 @@ eventually be compiled (C<INLINED>).
 
 $contents = <$handle>;
 
-my $code = "\$template = $contents";
-eval "\$template = { $contents }";    # ewww...
-die "error processing $file: $@" if ($@);
+$template = eval "{ $contents }";
+die "error processing $file: $@" if $@;
 
 add_wrapped(<<END_PIR);
 
@@ -386,10 +385,10 @@ sub num_args {
     my $is_repeating; 
 
     foreach my $arg (@args) {
-        $min-- if ( $arg->{optional} );
+        $min-- if $arg->{optional};
 
         # XXX this isn't quite right. Need to be more clever with options.
-        $max++ if ( $arg->{option} && $arg->{type} );
+        $max++ if $arg->{option} && $arg->{type};
         $is_repeating = $arg->{repeating};
     }
 
@@ -470,7 +469,7 @@ sub create_usage {
             $usage = "$usage ?$usage ...?";
           }
         } else {
-          $usage = "?$usage?" if ( $arg->{optional} );
+          $usage = "?$usage?" if $arg->{optional};
         }
         push @results, $usage;
     }
