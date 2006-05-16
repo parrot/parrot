@@ -172,7 +172,17 @@ Return a string containing your class name.
 
 =item C<init>
 
-Do any data set-up you need to do.
+Initialization.  Parrot makes exactly one call to either C<init> or
+C<init_pmc> at PMC construction time.
+
+=item C<init_pmc>
+
+Alternative entry point for initialization that takes a PMC argument.
+Parrot makes exactly one call to either C<init> or C<init_pmc> at PMC
+construction time.
+
+NOTE: It is strongly suggested that C<init_pmc(PMCNULL)> be equivalent to
+C<init()>.
 
 =item C<is_equal>
 

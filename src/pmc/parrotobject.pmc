@@ -79,30 +79,15 @@ C<Parrot_instantiate_object()>.
 
 /*
 
-=item C<void init_pmc(PMC *init)>
+=item C<STRING *name()>
+
+Shortcut for .class().name()
+
+XXX - this is bad and should go
 
 =cut
 
 */
-
-    void init_pmc(PMC* init) {
-        SELF.init();
-    }
-
-/*
-
-=item C<void init_pmc_props(PMC *init, PMC *props)>
-
-These two methods just call C<init()>. The arguments are ignored.
-
-=cut
-
-*/
-
-    void init_pmc_props(PMC* init, PMC* props) {
-        SELF.init();
-    }
-
 
     STRING* name() {
         PMC *class = VTABLE_get_class(INTERP, SELF);

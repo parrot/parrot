@@ -71,23 +71,8 @@ shouldn't leak unshared PMCs into different threads.
 
 */
 
-    void init_pmc(PMC* init) {
-        SUPER(init);
-        PObj_active_destroy_SET(SELF);
-    }
-
-/*
-
-=item C<void init_pmc_props(PMC *init, PMC *props)>
-
-Initialize the shared reference with the specified properties.
-
-=cut
-
-*/
-
-    void init_pmc_props(PMC* init, PMC* props) {
-        SUPER(init, props);
+    void init_pmc(PMC* initializer) {
+        SUPER(initializer);
         PObj_active_destroy_SET(SELF);
     }
 

@@ -48,7 +48,7 @@ Sets the referenced PMC to C<PMCNULL>.
 
 =item C<void init_pmc(PMC *initializer)>
 
-Sets the referenced PMC to C<*initializer>.
+Sets the referenced PMC to C<initializer>.
 
 =cut
 
@@ -65,22 +65,6 @@ Sets the referenced PMC to C<*initializer>.
             if (PObj_active_destroy_TEST(initializer))
                 PObj_active_destroy_SET(SELF);
         }
-    }
-
-/*
-
-=item C<void init_pmc_props(PMC *init, PMC *props)>
-
-Sets the referenced PMC to C<*init>, and associates the properties in
-C<*props> with the reference.
-
-
-=cut
-
-*/
-
-    void init_pmc_props(PMC* init, PMC* props) {
-        SUPER(init, props);
     }
 
 /*

@@ -90,12 +90,7 @@ op new(out PMC, in INT, in PMC) {
   goto NEXT();
 }
 
-op new(out PMC, in INT, in PMC, in PMC) {
-  if ($2 <= 0 || $2 >= interpreter->n_vtable_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in new", (int)$2);
-  }
-  $1 = pmc_new_noinit(interpreter, $2);
-  $1->vtable->init_pmc_props(interpreter, $1, $3, $4);
+op DELETED_new(out PMC, in INT, in PMC, in PMC) {
   goto NEXT();
 }
 

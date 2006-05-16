@@ -191,10 +191,6 @@ Solidify design for Truly Evil speed hack for fast regex/string matching
 
 =item *
 
-Describe the behavior of init_pmc_props. L<PDD02>
-
-=item *
-
 Describe the behavior of the serialization functions. (freeze, thaw,
 thawfinish, visit). L<PDD02>
 

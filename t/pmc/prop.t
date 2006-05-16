@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -167,26 +167,3 @@ ten
 zehn
 -
 OUTPUT
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "new_init_props");
-    new P1, .Hash
-    new P2, .String
-    set P2, "value"
-    set P1["prop"], P2
-    null P3
-
-    new P0, .Integer, P3, P1
-
-    getprop P3, "prop", P0
-    print P3
-    print "\n"
-    prophash P4, P0
-    set I0, P4
-    print I0
-    print "\n"
-    end
-CODE
-value
-1
-OUTPUT
-

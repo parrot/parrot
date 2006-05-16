@@ -717,8 +717,8 @@ new_p_ic                        686
 new_p_sc                        687
 new_p_i_p                       688
 new_p_ic_p                      689
-new_p_i_p_p                     690
-new_p_ic_p_p                    691
+DELETED_new_p_i_p_p                     690
+DELETED_new_p_ic_p_p                    691
 new_p_i_s                       692
 new_p_ic_s                      693
 new_p_i_sc                      694

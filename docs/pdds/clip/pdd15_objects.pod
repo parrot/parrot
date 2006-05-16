@@ -539,7 +539,12 @@ Called when the object is first created.
 
 =item __init_pmc
 
-=item __init_pmc_props
+Alternative entry point called when object is first created.  Accepts a PMC
+parameter used to initialize the given object.  Interpretation of the PMC is
+PMC-specific.
+
+NOTE: It is strongly suggested that init_pmc(PMCNULL) be equivalent to
+init(), though there will of necessity be exceptions.
 
 =item __morph
 
