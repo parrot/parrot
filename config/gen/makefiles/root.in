@@ -185,6 +185,7 @@ GEN_MAKEFILES = \
     editor/Makefile \
     languages/Makefile \
     languages/amber/Makefile \
+    languages/APL/Makefile \
     languages/bc/Makefile \
     languages/befunge/Makefile \
     languages/bf/Makefile \
@@ -197,6 +198,9 @@ GEN_MAKEFILES = \
     languages/miniperl/Makefile \
     languages/ook/Makefile \
     languages/parrot_compiler/Makefile \
+    languages/perl6/Makefile \
+    languages/pheme/Makefile \
+    languages/pugs/Makefile \
     languages/punie/Makefile \
     languages/regex/Makefile \
     languages/scheme/Makefile \
