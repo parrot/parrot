@@ -22,7 +22,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'inc' );
@@ -91,3 +91,17 @@ CODE
 21
 OUT
 }
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'add' );
+function add(x)
+    return function (y) return (x + y) end
+end
+
+f = add(2)
+print(type(f), f(10))
+g = add(5)
+print(g(1), g(10), f(1))
+CODE
+function	12
+6	15	3
+OUT
