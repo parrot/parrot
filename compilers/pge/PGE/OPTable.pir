@@ -14,7 +14,7 @@ PGE::OPTable - PGE operator precedence table and parser
 
 .const int PGE_OPTABLE_EXPECT_TERM   = 0x01
 .const int PGE_OPTABLE_EXPECT_OPER   = 0x02
-.const int PGE_OPTABLE_EXPECT_TERMPOST = 0x05
+.const int PGE_OPTABLE_EXPECT_START  = 0x05
 
 .const int PGE_OPTABLE_EMPTY         = 0x00
 .const int PGE_OPTABLE_TERM          = 0x10
@@ -278,7 +278,7 @@ Adds (or replaces) a syntactic category's defaults.
     pos = mfrom
     lastpos = length target
     circumnest = 0
-    expect = PGE_OPTABLE_EXPECT_TERM
+    expect = PGE_OPTABLE_EXPECT_START
 
   token_next:
     ##   figure out what we're looking for

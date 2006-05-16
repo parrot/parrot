@@ -178,7 +178,7 @@ OPTIONS
         $<cmd>:=(grammar) $<name>:=<arg> ;?
       | $<cmd>:=(regex|token|rule) 
           $<name>:=<arg>
-          \{ <regex> \}
+          \{<regex>\}
       | [multi]? $<cmd>:=(proto)
           $<name>:=<arg>
           ( is $<trait>:=[\w+]<arg>? )*

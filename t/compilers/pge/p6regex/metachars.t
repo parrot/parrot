@@ -138,9 +138,17 @@ p6rule_like("bcd", '&b', '/Missing term/', 'conjunction (&) - null left arg ille
 p6rule_like("bcd", '&', '/Missing term/', 'conjunction (&) - null both args illegal', todo => 'not yet implemented');
 p6rule_is  ("&", '\&', 'conjunction (&) - literal must be escaped');
 p6rule_isnt("&", '&', 'conjunction (&) - literal must be escaped', todo => 'not yet implemented');
-p6rule_isnt("a&|b", 'a&|b', 'alternation and conjunction (&|) - parse error',
+p6rule_like("a&|b", 'a&|b', '/Missing term/', 
+        'alternation and conjunction (&|) - parse error',
         todo => 'parse errors not yet trapped');
-p6rule_isnt("a|&b", 'a|&b', 'alternation and conjunction (|&) - parse error', 
+p6rule_like("a|&b", 'a|&b', '/Missing term/',
+        'alternation and conjunction (|&) - parse error', 
+        todo => 'parse errors not yet trapped');
+p6rule_is  ("abc", '|d|b', 'leading alternation ignored');
+p6rule_is  ("abc", ' |d|b', 'leading alternation ignored');
+p6rule_is  ("abc", '|d |b', 'leading alternation ignored');
+p6rule_is  ("abc", ' | d | b', 'leading alternation ignored');
+p6rule_isnt("abc", ' b |  | d', 'null pattern invalid',
         todo => 'parse errors not yet trapped');
 
 
@@ -361,4 +369,4 @@ p6rule_isnt("ab0cdef", 'a\D+f', 'not digit');
 
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 208; }
+BEGIN { plan tests => 213; }

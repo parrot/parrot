@@ -227,6 +227,7 @@ needed for compiling regexes.
     optable.newtok('infix:', 'looser'=>'postfix:*', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
     optable.newtok('infix:&', 'looser'=>'infix:', 'nows'=>1, 'match'=>'PGE::Exp::Conj')
     optable.newtok('infix:|', 'looser'=>'infix:&', 'nows'=>1, 'match'=>'PGE::Exp::Alt')
+    optable.newtok('prefix:|', 'equiv'=>'infix:|', 'nows'=>1, 'match'=>'PGE::Exp::Alt')
 
     optable.newtok('infix::=', 'tighter'=>'infix:', 'assoc'=>'right', 'match'=>'PGE::Exp::Alias')
 
@@ -1114,6 +1115,24 @@ Parse a modifier.
 .sub 'p6exp' :method
     .param pmc pad
 
+    .local pmc exp0, exp1
+    exp0 = self[0]
+    exp1 = self[1]
+
+    ##   if we only have one operand (prefix:|),
+    ##   reduce and return it.
+    $I0 = defined self[1]
+    if $I0 goto with_rhs
+    .return exp0.'p6exp'(pad)
+  with_rhs:
+
+    ##   if lhs is whitespace, then this is a prefix-alt and
+    ##   we ignore it (by simply returning its rhs)
+    $I0 = isa exp0, 'PGE::Exp::WS'
+    if $I0 == 0 goto with_lhs
+    .return exp1.'p6exp'(pad)
+  with_lhs:
+
     .local pmc lexscope, savescope, iter
     lexscope = pad['lexscope']
     savescope = new .Hash
@@ -1125,16 +1144,13 @@ Parse a modifier.
     savescope[$P1] = $P2
     goto iter_loop
   iter_end:
-    .local pmc exp0, exp1
     $I0 = pad['subpats']
-    exp0 = self[0]
     exp0 = exp0.p6exp(pad)
     self[0] = exp0
 
     $I1 = pad['subpats']
     pad['subpats'] = $I0
     pad['lexscope'] = savescope
-    exp1 = self[1]
     exp1 = exp1.'p6exp'(pad)
     self[1] = exp1
     $I0 = pad['subpats']
