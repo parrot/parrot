@@ -190,7 +190,7 @@ END_PIR
     result = ''
 
     .local pmc value
-    $I0 = isa arg, 'APLVector'
+    $I0 = does arg, 'array'
     if $I0 goto print_array
     value = arg
     bsr print_value
@@ -737,13 +737,7 @@ neg:
 
 .sub 'monadic:\u2374' :multi (APLVector) # shape
     .param pmc op1
-
-    .local pmc result
-    result = new 'APLVector'
-
-    $I1 = op1
-    push result, $I1
-    .return (result)
+    .return op1.'get_shape'()
 .end
 
 .sub 'monadic:\u2355' #format

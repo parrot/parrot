@@ -29,13 +29,27 @@ pmclass APLVector
 
 /*
 
-=item C<void class_init()>
+=item C<PMC* get_shape()>
 
-Class initialization. Caches the type id of various PMCs.
+Returns a vector-like PMC containing the shape of this PMC.
 
 =cut
 
 */
+
+    /* XXX This should merely return the pre-constructed shape PMC 
+     * This is a hack for 1-D Vector support. For bonus points,
+     * the shape PMC should be of the same type we are! */
+    METHOD PMC* get_shape() {
+        INTVAL array_type_num;
+        PMC* shape;
+        /* Create a new PMC */
+        array_type_num = pmc_type(INTERP, string_from_const_cstring(INTERP, "Array",0));
+        shape = pmc_new(INTERP, array_type_num);
+        VTABLE_set_integer_native(INTERP, shape, 1);
+        VTABLE_set_integer_keyed_int(INTERP,shape,0,VTABLE_get_integer(INTERP, SELF));
+        return (shape);
+    }
 
     void class_init() {
       /* do what now? */
