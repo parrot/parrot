@@ -8,13 +8,10 @@ Things to do:
 
 - Add function declarations.
 
-- possibly separate out the scalar ops in the grammar to simplify the dispatch.
-  (or just make our generating code smart enough to deal.)
-
 - implement an APLVector that knows its shape. Everything will be stored as
   a 1 dimensional array, indexed access will be computed. Eventually ponder
-  more compact +/or faster implementations. (current code in src/pmc is
-  a stub implementation only)
+  more compact +/or faster implementations. (current code in src/pmc still
+  only works with vectors)
  
 - properly print/display N dimensional arrays.
 
