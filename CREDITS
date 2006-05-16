@@ -36,7 +36,7 @@ N: Alex Gough
 D: bignum
 
 N: Allison Randal
-D: P6C and Punie (Perl 1)
+D: TGE, Punie (Perl 1), P6C
 
 N: Amir Karger
 D: editor bugfixes
@@ -359,7 +359,7 @@ N: OOLLEY kj
 D: Miscellaneous cleanup and PDD07-conformance
 
 N: Patrick R. Michaud
-D: Parrot Grammar Engine
+D: Parrot Grammar Engine, Perl 6 pumpking, APL
 E: pmichaud@pobox.com
 
 N: Peter Gibbs
@@ -463,7 +463,7 @@ D: Win32, IO fixes
 
 N: Will "Coke" Coleda
 E: will@coleda.com
-D: Tcl language (partcl), website, various languages/ upkeep, misc.
+D: Tcl language (partcl), APL, website, various languages/ upkeep, misc.
 
 N: Zach Lipton
 
