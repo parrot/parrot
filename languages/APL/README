@@ -20,7 +20,7 @@ to process:
 Run the APL system interactively:
 
   $ parrot APL.pbc
-  10×2+3
+      10×2+3
   50
 
 Display parse trees instead of executing statements:
