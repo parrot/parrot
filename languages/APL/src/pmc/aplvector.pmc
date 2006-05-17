@@ -29,6 +29,45 @@ pmclass APLVector
 
 /*
 
+=item C<void class_init()>
+
+initialize the pmc class. Store some constants, etc.
+
+=cut
+
+*/
+
+    /* XXX: move any constant string declarations here so we just do them once. */
+    void class_init() {
+    }
+
+
+/*
+
+=item C<PMC* init()>
+
+initialize the instance.
+
+=cut
+
+*/
+
+void init() {
+    PMC* shape;
+    INTVAL array_t;
+    STRING *property_name;
+
+    SUPER();
+
+    array_t = pmc_type(INTERP, string_from_const_cstring(INTERP, "Array", 0));
+    shape = pmc_new(INTERP, array_t);
+    VTABLE_set_integer_native(INTERP, shape, 1);
+    property_name = string_from_cstring(INTERP,"shape",0);
+    VTABLE_setprop(INTERP, SELF, property_name, shape);
+};
+
+/*
+
 =item C<PMC* get_shape()>
 
 Returns a vector-like PMC containing the shape of this PMC.
@@ -37,22 +76,36 @@ Returns a vector-like PMC containing the shape of this PMC.
 
 */
 
-    /* XXX This should merely return the pre-constructed shape PMC 
-     * This is a hack for 1-D Vector support. For bonus points,
-     * the shape PMC should be of the same type we are! */
     METHOD PMC* get_shape() {
         INTVAL array_type_num;
         PMC* shape;
         /* Create a new PMC */
-        array_type_num = pmc_type(INTERP, string_from_const_cstring(INTERP, "Array",0));
-        shape = pmc_new(INTERP, array_type_num);
-        VTABLE_set_integer_native(INTERP, shape, 1);
+        STRING* property_name = string_from_cstring(INTERP,"shape",0);
+        shape = VTABLE_getprop(INTERP, SELF, property_name);
+        // XXX Only hack remaining here: the shape should be modified whenever the array is modified.
         VTABLE_set_integer_keyed_int(INTERP,shape,0,VTABLE_get_integer(INTERP, SELF));
         return (shape);
     }
 
-    void class_init() {
-      /* do what now? */
+/*
+
+=item C<PMC* set_shape()>
+
+Reshape the existing APLvector by passing in an existing vector.
+
+TODO: Handle reshapes to larger and smaller #'s of elements. This
+implementation assumes equivalence. (2x6 to 4x3, e.g.)
+
+=cut
+
+*/
+
+
+    METHOD void set_shape(PMC *new_shape) {
+        STRING* property_name;
+        property_name = string_from_cstring(INTERP,"shape",0);
+        VTABLE_setprop(INTERP, SELF, property_name, new_shape);
+        return;
     }
 
 /*

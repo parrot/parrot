@@ -1,18 +1,16 @@
-Current status:
-
-Work in progress.
-
 Things to do:
+
+- Update APLVector to handle at least 2-dimensional arrays.
+  - properly print/display N dimensional arrays.
 
 - Need more tests! More tests for each type of operand per operator.
 
 - Add function declarations.
 
-- implement an APLVector that knows its shape. Everything will be stored as
-  a 1 dimensional array, indexed access will be computed. Eventually ponder
-  more compact +/or faster implementations. (current code in src/pmc still
-  only works with vectors)
- 
-- properly print/display N dimensional arrays.
+- Add selective specification {in perl: lvalues}
+
+- Add multiple specification {in perl: my ($a, $b, $c) = (1, 2, 3) }
+
+- Add bracket indexing. { in perl: $a[1] } { implement index operator first }
 
 - clean up the tools/ script so non-generated code is moved into a .pir file.
