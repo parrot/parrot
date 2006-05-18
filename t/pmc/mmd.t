@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 34;
 
 =head1 NAME
 
@@ -1111,4 +1111,59 @@ CODE
 foo string
 foo
 foo string
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/o .HLL");
+.sub main :main
+    $P0 = new .Integer
+    $P0 = 3
+    $P9 = 'foo'($P0)
+
+    $P0 = new .ResizablePMCArray
+    push $P0, 4
+    $P1 = new .String
+    $P1 = 'hello'
+    $P9 = 'foo'($P0, $P1)
+.end
+
+.sub 'foo' :multi(Integer)
+    print "foo(Integer)\n"
+    .return (0)
+.end
+
+.sub 'foo' :multi(ResizablePMCArray, _)
+    print "foo(ResizablePMCArray,_)\n"
+    .return (0)
+.end
+CODE
+foo(Integer)
+foo(ResizablePMCArray,_)
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161", 'todo'=>'rt #39161');
+.HLL 'Perl6', ''
+.sub main :main
+    $P0 = new .Integer
+    $P0 = 3
+    $P9 = 'foo'($P0)
+
+    $P0 = new .ResizablePMCArray
+    push $P0, 4
+    $P1 = new .String
+    $P1 = 'hello'
+    $P9 = 'foo'($P0, $P1)
+.end
+
+.sub 'foo' :multi(Integer)
+    print "foo(Integer)\n"
+    .return (0)
+.end
+
+.sub 'foo' :multi(ResizablePMCArray, _)
+    print "foo(ResizablePMCArray,_)\n"
+    .return (0)
+.end
+CODE
+foo(Integer)
+foo(ResizablePMCArray,_)
 OUTPUT
