@@ -5,11 +5,12 @@
 
 use strict;
 use warnings;
+use 5.006;
 use lib qw( lib ../lib );
 
 use File::Spec;
 use Getopt::Long;
-use Parrot::Config qw/%PConfig/;
+use Parrot::Config qw( %PConfig );
 use Test::Harness  ();
 
 =head1 Languages harness
@@ -52,7 +53,8 @@ For well behaved languages you can do something like:
 
 =head1 TODO
 
-It should be possible to use non-Perl5 test files, like for languages/perl6.
+It should be possible to use non-Perl5 test files,
+like for languages/perl6 or languages/pheme.
 
 =cut
 
@@ -81,6 +83,8 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # lisp                 No t/harness
 # miniperl             not maintained, should be removed
 # parakeet             No t/harness
+# perl6                test scrips are written in Perl 6, not Perl 5
+# pheme                test scrips are written in Scheme, not Perl 5
 # python               not maintained
 # ruby                 not maintained, should be removed
 
@@ -101,7 +105,6 @@ my @unified_testable_languages
               m4
               ook
               parrot_compiler
-              perl6
               punie
               regex
               scheme
@@ -205,4 +208,3 @@ if ( ! $do_gen_html ) {
         print "$html_fn has been generated.\n";
     }
 }
-
