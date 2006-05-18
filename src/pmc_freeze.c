@@ -931,8 +931,9 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info)
     UINTVAL id;
     INTVAL type;
     PMC ** pos;
-    int must_have_seen = thaw_pmc(interpreter, info, &id, &type);
+    int must_have_seen;
     type = 0; /* it's set below, avoid compiler warning. */
+    must_have_seen = thaw_pmc(interpreter, info, &id, &type);
 
     id >>= 2;
 
