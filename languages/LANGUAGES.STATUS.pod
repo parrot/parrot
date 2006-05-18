@@ -54,10 +54,11 @@ APL
 
 Provides support for a variety of monadic/dyadic operators, character
 vectors, floats, int, and 1-D vectors.
+Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.3
+0.4.4
 
 =item Location
 
@@ -138,7 +139,7 @@ Very simple arithmetic expressions are working. Some test failures
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -186,7 +187,7 @@ Leon Brocard
 
 =item Description
 
-bf
+bf. See http://en.wikipedia.org/wiki/Brainfuck.
 
 =item Status
 
@@ -194,7 +195,7 @@ Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.3
+0.4.4
 
 =item Location
 
@@ -355,7 +356,7 @@ Works and is mostly complete.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -390,9 +391,11 @@ Has a low-tech hand-coded lexer and parser, and the ability to spit out the pars
 tree as XML for debugging. Syntax is a bit rigid, but includes forms that will
 be familiar to Perl programmers.
 
+Part of languages smoke testing.
+
 =item Last verified with parrot version
 
-0.4.3
+0.4.4
 
 =item Location
 
@@ -420,7 +423,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -449,7 +452,7 @@ Early stage - Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.3
+0.4.4
 
 =item Location
 
@@ -508,11 +511,13 @@ Port of GNU m4 to PIR.
 Functioning for handcrafted test cases. Loading frozen
 state is currently broken. Far from complete. Revision 0.0.14
 
+Part of languages smoke testing.
+
 Development is stalled. Takers are welcome. 
 
 =item Last verified with parrot version
 
-0.4.3
+0.4.4
 
 =item Location
 
@@ -563,10 +568,11 @@ Functioning compiler targeting pasm.
 =item Status
 
 Samples working, README explain how to build/use.
+Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -651,11 +657,75 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
 C<languages/parrot_compiler>
+
+=back
+
+
+=head2 Perl 6 parser/compiler
+
+=over 4
+
+=item Author
+
+Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
+
+=item Description
+
+This is a Perl 6 parser/compiler, an early version (no version numbers
+yet).  It's still very early, only simple expressions and functions are
+available.  If you're in a hurry to write "real Perl 6" programs,
+you might try looking at Pugs -- http://www.pugscode.org.  Or, you
+can send patches and contributions to the one being built here!
+
+=item Status
+
+Part of languages smoke testing.
+
+=item Last verified with Parrot version
+
+0.4.4
+
+=item Location
+
+C<languages/perl6>
+
+=back
+
+
+
+
+=head2 Pheme
+
+=over 4
+
+=item Author
+
+chromatic
+
+=item Description
+
+It's not Scheme, it's Pheme!  Pheme is a cleaned-up, partially implemented
+Lisp-2 compiler inspired by Scheme and built with TGE and PGE. 
+
+=item Status
+
+Pheme handles function calls, a few built-in-PIR primitives, and atoms and
+lists.  It also runs its tests written in pure Pheme.  It is nearly to the
+point of being able to define the rest of the standard library in terms of its
+builtins. 
+
+=item Last verified with Parrot version
+
+0.4.3
+
+=item Location
+
+C<languages/pheme>
 
 =back
 
@@ -705,7 +775,7 @@ Basic IO and control flow elements; mutable variables; assignment.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -740,37 +810,6 @@ and logic ops.
 =item Location
 
 C<languages/punie>
-
-=back
-
-
-=head2 Pheme
-
-=over 4
-
-=item Author
-
-chromatic
-
-=item Description
-
-It's not Scheme, it's Pheme!  Pheme is a cleaned-up, partially implemented
-Lisp-2 compiler inspired by Scheme and built with TGE and PGE. 
-
-=item Status
-
-Pheme handles function calls, a few built-in-PIR primitives, and atoms and
-lists.  It also runs its tests written in pure Pheme.  It is nearly to the
-point of being able to define the rest of the standard library in terms of its
-builtins. 
-
-=item Last verified with Parrot version
-
-0.4.3
-
-=item Location
-
-C<languages/pheme>
 
 =back
 
@@ -821,7 +860,7 @@ Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -907,7 +946,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -932,10 +971,11 @@ A from scratch implementation of a Tcl 8.5 compiler in parrot.
 
 [break],[continue],[rename] - some tests failing.
 Passes about 5.5% of tcl's (converted) test suite
+Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -965,7 +1005,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -993,7 +1033,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
@@ -1049,7 +1089,7 @@ Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
 
 =item Last verified with parrot version
 
-0.4.2
+0.4.4
 
 =item Location
 
