@@ -18,7 +18,7 @@ subcommands can be specified, the build tool takes this and generates the
 actual compiler for that command.
 
 Many builtins need to use the same type of code, and do the same kind
-of optimizations. By making the inline'd versions more declarative, this
+of optimizations. By making the inlined versions more declarative, this
 lets us do this work B<once> instead of many times, which B<should> make it
 easier to inline more builtins accurately.
 
@@ -31,7 +31,8 @@ local undef $/;
 
 my $file = shift @ARGV;
 
-open my $handle, "<", $file or die "can't open $file for reading";
+open my $handle, "<", $file
+    or die "can't open '$file' for reading";
 
 my $template;                        # perl variable containing the commands DS.
 my $contents;                        # raw contents of the .tmt file
@@ -42,7 +43,7 @@ my @pir_code;                        # see comment below
 @pir_code internal variable
 
 This is a bit complicated. We are munging a template file into PIR code
-which in turn is generating more PIR code. We'll call the inner PIR C<INLINED>
+which in turn is generating more PIR code. We will call the inner PIR C<INLINED>
 and the outer PIR C<CALLER>.
 
 @pir_code is an array of array refs. The first is a key, the second is data.
@@ -168,6 +169,7 @@ foreach my $arg (@args_opts) {
 END_PIR
             },
         },
+        
         expr => {
             pre => sub {
                 add_wrapped(<<END_PIR);
@@ -177,6 +179,7 @@ END_PIR
 END_PIR
             },
         },
+        
         var => {
             pre => sub {
 
@@ -198,6 +201,7 @@ END_PIR
 END_PIR
               }
         },
+        
         channel => {
             pre => sub {
                 add_wrapped(<<END_PIR);
@@ -212,6 +216,7 @@ END_PIR
 END_PIR
               }
         },
+        
         list => {
             pre => sub {
                 add_wrapped(<<END_PIR);
@@ -226,6 +231,7 @@ END_PIR
 END_PIR
               }
         },
+        
         int => {
             pre => sub {
                 $type       = "TclInt";
@@ -242,6 +248,7 @@ END_PIR
 END_PIR
               }
         },
+        
         string => {
             pre => sub {
                 add_wrapped(<<END_PIR);
@@ -458,7 +465,7 @@ sub create_usage {
         my $usage = $arg->{name};
         if ( $arg->{option} ) {
             $usage = "-$usage";
-            if ( defined( $arg->{type} ) ) {
+            if ( defined $arg->{type} ) {
                 $usage = "$usage $arg->{type}";
             }
         }
@@ -474,7 +481,7 @@ sub create_usage {
         push @results, $usage;
     }
 
-    my $result = join( " ", @results );
+    my $result = join " ", @results;
     $result = " $result" if @results;
     return $result;
 }
