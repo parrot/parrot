@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 
 =head1 NAME
 
@@ -1166,4 +1166,37 @@ pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161", 'todo'=>'rt #
 CODE
 foo(Integer)
 foo(ResizablePMCArray,_)
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ flatten", 'todo'=>'rt #39173');
+.sub main :main
+    .local pmc int_pmc
+    int_pmc = new .Integer
+    int_pmc = 3
+
+    .local pmc args
+    args = new .ResizablePMCArray
+    push args, int_pmc
+    'foo'( args :flat )
+
+    .local pmc string_pmc
+    string_pmc = new .String
+    string_pmc = 'hello'
+
+    args = new .ResizablePMCArray
+    push args, string_pmc
+    'foo'( args :flat )
+    end
+.end
+
+.sub 'foo' :multi(Integer)
+    print "foo(Integer)\n"
+.end
+
+.sub 'foo' :multi(String)
+    print "foo(String)\n"
+.end
+CODE
+foo(Integer)
+foo(String)
 OUTPUT
