@@ -1,18 +1,32 @@
 http://schemers.org/Documents/Standards/R5RS/HTML/
 
-Create cons object
-	- head (the data)
-	- tail (another cons)
+Atom:
+	- create atom object
+	- add subtypes for string, number, etc.?
 
-Port car/cdr/cons to work on cons cells
-	- car: return head
-	- cdr: return tail
-	- cons: create new cons cell, assign l to head and r to tail
+Cons:
+	- fix cons count for empty cons?
+
+Builtins:
+	- get rid of argument counting thunks when :flat works correctly
+	- consider if eq? and eqlist? should really be multis
+		- add varieties for mismatched parameters if not
+	- refactor is_deeply() and is() in Pheme::Test
+		- add diagnostics too, if possible
+	- add nil?
+	- fix car on empty cons
 
 Compiler:
 	- extract and merge POST improvements with Punie
-	- publish them under compilers/
-	- share those nodes somehow
+		- publish them under compilers/
+		- share those nodes somehow
+	- port to new TGE, when the branch lands
+	- fix load_bytecode section in generated code
+	- refactor compiler backend object
+		- make parameters available for TGE files
+		- share with Perl 6 and Punie
+		- move somewhere in Parrot lib path
+		- allow dumping of trees and (runnable) PIR
 
 Fix namespace:
 	- lowercase

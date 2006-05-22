@@ -4,7 +4,7 @@ ROOT: result(.) = {
 .namespace [ 'Pheme' ]
 
 .sub __onload :anon :load
-	load_bytecode 'lib/PhemeSymbols.pbc'
+#	load_bytecode 'lib/PhemeSymbols.pbc'
 	main()
 .end
 
