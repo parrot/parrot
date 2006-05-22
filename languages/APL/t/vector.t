@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 41;
+use t::APL tests => 43;
 
 run_apl_is();
 
@@ -133,6 +133,12 @@ __DATA__
 === shape, scalar
 --- APL: ⍴2.3
 
+=== shape of shape of scalar
+--- APL: ⍴⍴2.3
+--- out: 0
+
+
+
 === shape, vector
 --- APL: ⍴⍳20
 --- out: 20
@@ -185,4 +191,11 @@ BAB
 --- out
 ABC
 DEF
+--- todo
+
+=== use reshape to create a single-element vector
+--- APL
+X←1⍴2
+⍴X
+--- out: 1
 --- todo
