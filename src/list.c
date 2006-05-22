@@ -1227,7 +1227,7 @@ After getting these values out of the key/value pairs, a new array with
 these values is stored in user_data, where the keys are explicit.
 
 =item C<List *
-list_new_init(Interp *interpreter, PMC *container, PMC *init)>
+list_pmc_new_init(Interp *interpreter, PMC *container, PMC *init)>
 
 Create a new list containing PMC* values in PMC_data(container).
 
