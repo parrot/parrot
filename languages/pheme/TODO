@@ -8,7 +8,6 @@ Cons:
 	- fix cons count for empty cons?
 
 Builtins:
-	- get rid of argument counting thunks when :flat works correctly
 	- consider if eq? and eqlist? should really be multis
 		- add varieties for mismatched parameters if not
 	- refactor is_deeply() and is() in Pheme::Test

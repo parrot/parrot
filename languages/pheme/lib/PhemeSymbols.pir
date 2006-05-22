@@ -99,18 +99,7 @@
 	clear_eh
 
 	.local pmc    result
-	.local int    num_args
-	.local string num_args_string
-	num_args        = args
-	num_args_string = num_args
-
-	.local pmc    temp_count_thunk
-	.local string temp_thunk_name
-	temp_thunk_name  = '__call_func_'
-	temp_thunk_name .= num_args_string
-
-	temp_count_thunk = find_global temp_thunk_name
-	result = temp_count_thunk( function, args :flat )
+	result = function( args :flat )
 
 	.return( result )
 
@@ -289,55 +278,5 @@
 
 	.local pmc result
 	result = new cons_type
-	.return( result )
-.end
-
-.sub __call_func_0
-	.param pmc func
-
-	.local pmc result
-	result = func()
-	.return( result )
-.end
-
-.sub __call_func_1
-	.param pmc func
-	.param pmc arg_1
-
-	.local pmc result
-	result = func( arg_1 )
-	.return( result )
-.end
-
-.sub __call_func_2
-	.param pmc func
-	.param pmc arg_1
-	.param pmc arg_2
-
-	.local pmc result
-	result = func( arg_1, arg_2 )
-	.return( result )
-.end
-
-.sub __call_func_3
-	.param pmc func
-	.param pmc arg_1
-	.param pmc arg_2
-	.param pmc arg_3
-
-	.local pmc result
-	result = func( arg_1, arg_2, arg_3 )
-	.return( result )
-.end
-
-.sub __call_func_4
-	.param pmc func
-	.param pmc arg_1
-	.param pmc arg_2
-	.param pmc arg_3
-	.param pmc arg_4
-
-	.local pmc result
-	result = func( arg_1, arg_2, arg_3, arg_4 )
 	.return( result )
 .end
