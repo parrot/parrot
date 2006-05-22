@@ -311,6 +311,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
                 interpreter->lo_var_ptr = lo_var_ptr;
                 return result;
             }
+            break;
         case PBC_POSTCOMP:
             /*
              * run POSTCOMP sub
@@ -324,6 +325,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
                 interpreter->resume_flag = RESUME_INITIAL;
                 return NULL;
             }
+            break;
 
         case PBC_LOADED:
             if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_LOAD) {

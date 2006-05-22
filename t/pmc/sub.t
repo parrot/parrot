@@ -889,9 +889,9 @@ OUTPUT
 
 
 {
-    # the test is failing when run with --run-pbc (make testr)
-    # actually the POSTCOMP is run and "initial" is printed, but
-    # its not captured by the test system
+    # the test has different output when run with --run-pbc (make testr)
+    # actually not - compiling creates 2 'initial'
+    #                running emts 'main'
 
     my $code = <<'CODE';
 .sub optc :immediate, :postcomp
@@ -901,20 +901,20 @@ OUTPUT
     print "main\n"
 .end
 CODE
-    my $output = <<'OUTPUT';
+    my $descr = ':immediate, :postcomp';
+    if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ )
+    {
+	pir_output_is( $code, <<'OUT', $descr);
+initial
 initial
 main
-OUTPUT
-    my $descr = ':immediate, :postcomp';
-    if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r / )
-    {
-        TODO:
-        {
-            local $TODO = "output from :postcomp is lost";
-            pasm_output_is( $code, $output, $descr);
-        };
+OUT
     } else {
-        pir_output_is( $code, $output, $descr);
+	pir_output_is( $code, <<'OUT', $descr);
+initial
+initial
+main
+OUT
     }
 }
 
