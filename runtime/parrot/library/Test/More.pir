@@ -283,7 +283,7 @@ hard to extend it for hash-like structures, too.
 
 =cut
 
-.sub is_deeply
+.sub is_deeply :multi( pmc, pmc )
     .param pmc left
     .param pmc right
     .param string description :optional
