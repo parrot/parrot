@@ -150,9 +150,9 @@ Returns the string itself.
 =cut
 
 */
-    /* XXX useless? */
+
     STRING* get_string () {
-        return (STRING*) PMC_str_val(SELF);
+        return Parrot_make_COW_reference(INTERP, (STRING*)PMC_str_val(SELF));
     }
 
 /*

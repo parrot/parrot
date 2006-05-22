@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 40;
 
 =head1 NAME
 
@@ -1208,4 +1208,22 @@ pir_output_is( <<'CODE', <<OUTPUT, "new_from_string");
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_string returns COW string")
+.sub main :main
+  $P0 = new .String
+  $P0 = "Foo"
+
+  $S0 = $P0
+  substr $S0, 0, 1, "B"
+
+  print $P0
+  print "\n"
+  print $S0
+  print "\n"
+.end
+CODE
+Foo
+Boo
 OUTPUT
