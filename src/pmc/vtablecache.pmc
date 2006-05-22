@@ -17,17 +17,16 @@ vtable is freed.
 
 #include "parrot/parrot.h"
 
-pmclass VtableCache extends default needs_ext {
+pmclass VtableCache {
 
     void init () {
-        /* PObj_active_destroy_SET(SELF); */
         PMC_struct_val(SELF) = NULL;
+        PObj_active_destroy_SET(SELF);
     }
 
     void destroy () {
-        return;
         if (NULL != PMC_struct_val(SELF)) {
-            Parrot_destroy_vtable(INTERP, PMC_data(SELF));
+            Parrot_destroy_vtable(INTERP, PMC_struct_val(SELF));
         }
     }
 

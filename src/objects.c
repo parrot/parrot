@@ -523,8 +523,6 @@ parrot_class_register(Interp* interpreter, PMC *name,
     /* Build a new vtable for this class
      * The child class PMC gets the vtable of its parent class or
      * a ParrotClass vtable
-     *
-     * XXX we are leaking this vtable
      */
     parent_vtable = new_class->vtable;
     if (parent && PObj_is_class_TEST(parent))
