@@ -1441,7 +1441,7 @@ mmd_arg_tuple_func(Interp *interpreter)
      * - dispatch in invoke - yeah ugly
      */
 
-    arg_tuple = pmc_new(interpreter, enum_class_FixedIntegerArray);
+    arg_tuple = pmc_new(interpreter, enum_class_ResizableIntegerArray);
     args_op = interpreter->current_args;
     if (!args_op)
         return arg_tuple;
@@ -1449,27 +1449,40 @@ mmd_arg_tuple_func(Interp *interpreter)
     constants = interpreter->code->const_table->constants;
     ++args_op;
     args_array = constants[*args_op]->u.key;
-    assert(args_array->vtable->base_type == enum_class_FixedIntegerArray);
-    sig_len = VTABLE_elements(interpreter, args_array);
+    ASSERT_SIG_PMC(args_array);
+    sig_len = SIG_ELEMS(args_array);
     if (!sig_len)
         return arg_tuple;
-    VTABLE_set_integer_native(interpreter, arg_tuple, sig_len);
     ++args_op;
 
     for (i = 0; i < sig_len; ++i, ++args_op) {
-        type = VTABLE_get_integer_keyed_int(interpreter, args_array, i);
+        type = SIG_ITEM(args_array, i);
+        /* named don't MMD */
+        if (type & PARROT_ARG_NAME)
+            break;
+        /* expand flattening args */
+        if (type & PARROT_ARG_FLATTEN) {
+            int j, n;
+
+            idx = *args_op;
+            arg = REG_PMC(idx);
+            n = VTABLE_elements(interpreter, arg);
+            for (j = 0; j < n; ++j)  {
+                PMC *elem = VTABLE_get_pmc_keyed_int(interpreter, arg, j);
+                type = VTABLE_type(interpreter, elem);
+                VTABLE_push_integer(interpreter, arg_tuple, type);
+            }
+            return arg_tuple;
+        }
         switch (type & PARROT_ARG_TYPE_MASK) {
             case PARROT_ARG_INTVAL:
-                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
-                        i, enum_type_INTVAL);
+                VTABLE_push_integer(interpreter, arg_tuple, enum_type_INTVAL);
                 break;
             case PARROT_ARG_FLOATVAL:
-                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
-                        i, enum_type_FLOATVAL);
+                VTABLE_push_integer(interpreter, arg_tuple, enum_type_FLOATVAL);
                 break;
             case PARROT_ARG_STRING:
-                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
-                        i, enum_type_STRING);
+                VTABLE_push_integer(interpreter, arg_tuple, enum_type_STRING);
                 break;
             case PARROT_ARG_PMC:
                 idx = *args_op;
@@ -1478,8 +1491,7 @@ mmd_arg_tuple_func(Interp *interpreter)
                 else
                     arg = REG_PMC(idx);
                 type = VTABLE_type(interpreter, arg);
-                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
-                        i, type);
+                VTABLE_push_integer(interpreter, arg_tuple, type);
                 break;
             default:
                 internal_exception(1,

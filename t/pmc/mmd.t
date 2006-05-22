@@ -1168,7 +1168,8 @@ foo(Integer)
 foo(ResizablePMCArray,_)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ flatten", 'todo'=>'rt #39173');
+pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ flatten");
+# seel also 'rt #39173
 .sub main :main
     .local pmc int_pmc
     int_pmc = new .Integer
