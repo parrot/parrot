@@ -1140,7 +1140,7 @@ foo(Integer)
 foo(ResizablePMCArray,_)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161", 'todo'=>'rt #39161');
+pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161");
 .HLL 'Perl6', ''
 .sub main :main
     $P0 = new .Integer

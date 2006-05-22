@@ -341,7 +341,7 @@ Parrot_multi_long_name(Parrot_Interp interpreter, PMC* sub_pmc)
     multi_sig = PMC_sub(sub_pmc)->multi_signature;
     n = VTABLE_elements(interpreter, multi_sig);
     /*
-     * foo @MULTI(STRING, Integer) =>
+     * foo :multi(STRING, Integer) =>
      *
      * foo_@STRING_@Integer
      */
@@ -372,9 +372,23 @@ store_nonanon_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
     else {
         STRING *long_name;
         PMC *multi_sub;
-
-        multi_sub = Parrot_find_global_p(interpreter, namespace, sub_name);
-        if (!multi_sub) {
+        PMC *stash;
+        
+        /* If namespace is NULL, we need to look in the root HLL namespace. But
+           since we haven't actually run code yet, the context hasn't been set
+           to include the HLL, so we have to do the work ourselves. */
+        if (PMC_IS_NULL(namespace))
+        {
+            stash = VTABLE_get_pmc_keyed_int(interpreter,
+                                             interpreter->HLL_namespace,
+                                             PMC_sub(sub_pmc)->HLL_id);
+            multi_sub =
+                VTABLE_get_pmc_keyed_str(interpreter, stash, sub_name);
+        }
+        else
+            multi_sub = Parrot_find_global_p(interpreter, namespace, sub_name);
+        
+        if (PMC_IS_NULL(multi_sub)) {
             multi_sub = pmc_new(interpreter, enum_class_MultiSub);
             VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
             store_sub_in_namespace(interpreter, multi_sub,
