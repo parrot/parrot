@@ -238,34 +238,6 @@ END_PIR
 # integer - but if you set it to Integer or int, the program dies with
 # 'Method not found.' or dispatches to the wrong method.
 
-.sub 'dyadic:\u2296' :multi(pmc, String) # rotate
-    .param int    op1
-    .param string op2
-
-    if op1 == 0 goto nothing
-    if op1 <  0 goto neg
-pos:
-    # chop off the first N characters
-    $S0 = substr op2, 0, op1, ''
-    # tack them on the end.
-    op2 .= $S0
-    .return (op2)
-neg:
-    # chop off the last N characters 
-    # prepend them on the beginning.
-    $I1 = abs op1
-    $S0 = substr op2, op1, $I1, ''
-    op2 = $S0 . op2
-    .return (op2)
-
-nothing:
-    .return(op2)
-.end
-
-# XXX - the first argument to this multi sub should be some variant of
-# integer - but if you set it to Integer or int, the program dies with
-# 'Method not found.' or dispatches to the wrong method.
-
 .sub 'dyadic:\u2296' :multi(pmc, APLVector) # rotate
     .param int op1
     .param pmc op2
@@ -306,40 +278,6 @@ nothing:
     $N2 /= $N3 
     $N2 /= $N1 
     .return($N2)
-.end
-
-.sub 'dyadic:\u2373' :multi(String, String) # index of
-    .param string op1
-    .param string op2
-
-    .local pmc result
-    result = new 'APLVector'
-    
-    .local int pos
-    pos = 0
-    .local int len
-    len = length op2
-    .local int index_pos
-    .local string index_char
-    .local int not_there
-    not_there = length op1
-    inc not_there
-
-loop_begin:
-    if pos == len goto loop_end
-    index_char = substr op2, pos, 1 
-    index_pos = index op1, index_char 
-    if index_pos == -1 goto not_found
-    inc index_pos
-    push result, index_pos
-    goto loop_next
-not_found:
-    push result, not_there
-loop_next:
-    inc pos
-    goto loop_begin
-loop_end:
-    .return (result)
 .end
 
 .sub 'dyadic:\u2373' :multi(APLVector, APLVector) # index of
@@ -540,19 +478,6 @@ true:
     .return(0)
 .end
 
-.sub 'monadic:\u233d' :multi(String) # reverse
-    .param string op1
-    # XXX reverse only works on ascii strings...
-    $I1 = find_charset 'ascii'
-    $S1 = trans_charset op1, $I1
-    
-    # sorry, ascii Strings.
-    $P1 = new String
-    $P1 = $S1
-    reverse $P1
-    .return($P1)
-.end
-
 .sub 'monadic:\u233d' :multi(APLVector) # reverse
     .param pmc op1
 
@@ -565,31 +490,6 @@ loop:
     unless iter goto done
     $P1 = shift iter
     unshift result, $P1
-    goto loop
-done:
-    .return(result)
-.end
-
-.sub 'dyadic:~' :multi(String, String) # without
-    .param string op1
-    .param string op2
-
-    .local string result
-    result = ''
-
-    .local int pos,len
-    .local string char
-    pos = 0
-    len = length op1
-
-loop:
-    if pos > len goto done
-    char = substr op1, pos, 1 
-    $I1 = index op2, char
-    if $I1 != -1 goto next
-    result .= char
-next:
-    inc pos
     goto loop
 done:
     .return(result)
@@ -667,24 +567,6 @@ done:
     .return (result)
 .end
 
-.sub 'dyadic:\u2191' :multi (Float, String) # take
-    .param int op1
-    .param string op2
-
-    if op1 < 0 goto neg
-pos:
-    $S1 = substr op2, 0, op1
-    .return ($S1)
-
-neg:
-    .local int pos
-    pos = length op2
-    op1 = abs op1
-    pos -= op1
-    $S1 = substr op2, pos, op1
-    .return ($S1)
-.end
-
 .sub 'dyadic:\u2193' :multi (Float, APLVector) # drop
     .param int op1
     .param pmc op2
@@ -707,33 +589,6 @@ done:
     .return (op2)
 .end
 
-.sub 'dyadic:\u2193' :multi (Float, String) # drop
-    .param int op1
-    .param string op2
-
-    .local int diff
-    diff = length op2
-
-    if op1 < 0 goto neg
-
-pos:
-    diff -= op1
-    $S1 = substr op2, op1, diff
-    .return ($S1)
-
-neg:
-    diff += op1
-    $S1 = substr op2, 0, diff
-    .return ($S1)
-.end
-
-.sub 'monadic:\u2374' :multi (String) # shape
-    .param string op1
-
-    $I1 = length op1
-    .return ($I1)
-.end
-
 .sub 'monadic:\u2374' :multi (Float) # shape
     .param pmc op1
 
@@ -751,9 +606,19 @@ neg:
     .param pmc op1
 
     $S0 = aplformat(op1)
-    .return($S0)
+    .local pmc result
+    result = new 'APLVector'
+    $I0 = 0
+    $I1 = length $S0
+  loop:
+    if $I0 >= $I1 goto loop_end 
+    $S1 = substr $S0, $I0, 1
+    push result, $S1
+    inc $I0
+    goto loop
+  loop_end:
+    .return(result)
 .end
-
 
 END_OF_TEMPLATE
 
