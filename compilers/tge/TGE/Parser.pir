@@ -47,6 +47,7 @@ structure.
 
   err_parse:
     print "Unable to parse the tree grammar.\n"
+    exit 1
     end
 .end
 
@@ -145,6 +146,7 @@ err_no_tree:
    
 err_no_rule:
     print "Unable to find all the components of a rule definition\n"
+    exit 1
     .return ()
 .end
 
