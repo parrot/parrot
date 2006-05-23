@@ -32,7 +32,8 @@ token array_identifier {
 }
 
 token constant {
-      <character_constant>
+      <character_constant_double>
+    | <character_constant_single>
     | <numeric_constant>
 }
 
@@ -46,12 +47,17 @@ token decimal_representation {
     [ ⁻? \d+ \.? \d* | ⁻? \. \d+ ] [ E ⁻? \d+ ]?
 }
 
-
-token character_constant {
-      (') ( [ '' | <-[']> ]* ) '
-    | (") ( [ "" | <-["]> ]* ) "
-   
+token character_constant_double {
+    (") <double_quoted_character>* "   
 }
+
+token character_constant_single {
+    (') <single_quoted_character>* '
+}
+
+token single_quoted_character { '' | <-[']> }
+
+token double_quoted_character { "" | <-["]> }
 
 token variable_identifier { <[A..Za..z]> \w* }
 

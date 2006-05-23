@@ -142,13 +142,19 @@ APL::Grammar::array_identifier: result(.) = {
 
 APL::Grammar::constant: result(.) = {
     .local pmc result
-    $P0 = node['character_constant']
-    unless $P0 goto numeric_constant
-    .return tree.get('result', $P0, 'APL::Grammar::character_constant')
 
-  numeric_constant:
     $P0 = node['numeric_constant']
+    unless $P0 goto char_single
     .return tree.get('result', $P0, 'APL::Grammar::numeric_constant')
+
+  char_single:
+    $P0 = node['character_constant_single']
+    unless $P0 goto char_double
+    .return tree.get('result', $P0, 'APL::Grammar::character_constant_single')
+
+  char_double:
+    $P0 = node['character_constant_double']
+    .return tree.get('result', $P0, 'APL::Grammar::character_constant_double')
 }
 
 
@@ -202,29 +208,73 @@ APL::Grammar::decimal_representation: result(.) = {
     .return (result)
 }
 
+APL::Grammar::character_constant_double: result(.) = {
+    .local pmc result, iter, children
+    result = new 'PAST::Vector'
+    result.set_node(node)
 
-APL::Grammar::character_constant: result(.) = {
+    children = new 'APLVector'
+    $P0 = node['double_quoted_character'] 
+
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    $P1 = shift iter
+    $P2 = tree.get('result', $P1, 'APL::Grammar::double_quoted_character')
+    if null $P2 goto iter_loop
+    push children, $P2
+    goto iter_loop 
+  iter_end:
+    result['children'] = children
+    .return (result)
+}
+
+APL::Grammar::character_constant_single: result(.) = {
+    .local pmc result, iter, children
+    result = new 'PAST::Vector'
+    result.set_node(node)
+
+    children = new 'APLVector'
+    $P0 = node['single_quoted_character'] 
+
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    $P1 = shift iter
+    $P2 = tree.get('result', $P1, 'APL::Grammar::single_quoted_character')
+    if null $P2 goto iter_loop
+    push children, $P2
+    goto iter_loop 
+  iter_end:
+    result['children'] = children
+    .return (result)
+}
+
+APL::Grammar::single_quoted_character: result(.) = {
     .local pmc result
-    .local string delim, delim2, value
     result = new 'PAST::Val'
     result.set_node(node)
-    delim = node[0]
-    value = node[1]
-    delim2 = concat delim, delim
-    $I0 = 0
-    # replace any '' with '
-  remove_quotes:
-    $I0 = index value, delim2, $I0
-    if $I0 < 0 goto end
-    substr value, $I0, 2, delim
-    inc $I0
-    goto remove_quotes
-  end:
-    result['value'] = value
+    $S0 = node
+    if $S0 != "''" goto done
+    $S0 = "'"
+done:
+    result['value'] = $S0
     result['class'] = '.String'
     .return (result)
 }
 
+APL::Grammar::double_quoted_character: result(.) = {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.set_node(node)
+    $S0 = node
+    if $S0 != '""' goto done
+    $S0 = '"'
+done:
+    result['value'] = $S0
+    result['class'] = '.String'
+    .return (result)
+}
 
 APL::Grammar::variable_identifier: result(.) = {
     .local pmc result

@@ -197,14 +197,21 @@ END_PIR
     .return (result)
 
   print_array:
+    .local string value_type, old_type
+    value_type = 'String'
     .local pmc iter
     iter = new .Iterator, arg
-    iter = 0
     unless iter goto iter_end
   iter_loop:
+    old_type = value_type
     value = shift iter
     bsr print_value
     unless iter goto iter_end
+    value_type = typeof value
+    if value_type != 'String' goto print_space
+    if old_type != value_type goto print_space
+    goto iter_loop
+  print_space:
     result .= ' '
     goto iter_loop
   iter_end:

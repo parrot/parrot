@@ -62,6 +62,13 @@ storage.
 This will also let us remove all the String variants from our :multi's -
 we no longer need substr/length to do indexing/shape, etc.
 
-We might need to be able to detect when we have any strings in our APLVector,
+We might need to be able to detect when we have only strings in our APLVector,
 but if necessary, we can add another property that keeps track of such things.
-(To avoid a full check of all elements each time)
+(To avoid a full check of all elements each time). Turns out this is 
+needed to print strings differently from other vectors.
+
+  -- First pass of this is done, 'AAA' is now stored as an APL Vector.
+     Next step is to remove the now-crufty String variants of all the
+     various :multi opcodes, and fixup the vectorized ops so that a
+     proper domain error is thrown (instead of blinding trying to do 
+     math on characters)
