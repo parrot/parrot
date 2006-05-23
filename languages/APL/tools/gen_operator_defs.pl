@@ -759,11 +759,6 @@ END_OF_TEMPLATE
 
 # Generate all variants for scalar dyadic ops.
 my @type_pairs = (
-  [ 'String', 'String' ],
-  [ 'String', 'Float' ],
-  [ 'Float', 'String' ],
-  [ 'String', 'APLVector' ],
-  [ 'APLVector', 'String' ],
   [ 'Float', 'Float' ],
   [ 'Float', 'APLVector' ], 
   [ 'APLVector', 'Float' ], 
@@ -784,11 +779,7 @@ foreach my $operator (keys %scalar) {
     .param pmc op2
 END_PREAMBLE
 
-        if ($type1 eq "String" || $type2 eq "String") {
-            # For now, anything with a string is a domain error.
-            $template .= "%% DOMAIN_ERROR %%";
-
-        } elsif ($type1 eq "Float" && $type2 eq "Float") {
+        if ($type1 eq "Float" && $type2 eq "Float") {
           # scalar to scalar..
             $template .= interpolate($code, 'op1', 'op2');
         } elsif ($type1 eq "APLVector" && $type2 eq "APLVector") {
