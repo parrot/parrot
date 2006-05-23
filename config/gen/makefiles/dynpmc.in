@@ -49,13 +49,13 @@ DISABLED_PMCS = \
   pyproxyclass \
   pyiter
 
-BUILD = $(PERL) "@build_dir@@slash@tools@slash@build@slash@dynpmc.pl"
+BUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
 
 all :
 	@$(BUILD) generate $(PMCS)
 	@$(BUILD) compile $(PMCS)
 	@$(BUILD) linklibs $(PMCS)
-	@$(BUILD) copy "--destination=$(RUNTIME_DIR)" $(PMCS)
+	@$(BUILD) copy --destination=$(RUNTIME_DIR) $(PMCS)
 
 test : all
 	cd ../.. ; perl -Ilib t/harness t/dynpmc/*.t

@@ -31,7 +31,7 @@ our $O = qq[@o@];
 our $CFLAGS = qq[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@];
 
 our $LIBPARROT = qq[];
-#CONDITIONED_LINE(parrot_is_shared):$LIBPARROT = qq[@libparrot_ldflags@];
+#CONDITIONED_LINE(parrot_is_shared):$LIBPARROT = q[@libparrot_ldflags@];
 
 # Here comes some stuff for Win32.
 our $PATHQUOTE = '';
