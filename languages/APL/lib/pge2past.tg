@@ -202,8 +202,8 @@ transform result (APL::Grammar::decimal_representation) :language('PIR') {
     substr $S0, $I0, 1, "-"
     goto minus_loop
   set_value:
-    $N0 = $S0
-    result['value'] = $N0
+    # $N0 = $S0
+    result['value'] = $S0
     result['class'] = '.Float'
     .return (result)
 }

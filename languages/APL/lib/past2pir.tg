@@ -114,6 +114,8 @@ transform pir (PAST::Val) :language('PIR') {
   assign_float:                                    
     $I0 = index $S0, '.'                           # XXX: '.' hack due to
     if $I0 >= 0 goto assign_val                    # parrotbug #38896
+    $I0 = index $S0, 'E'
+    if $I0 >= 0 goto assign_val
     concat $S0, '.'
     goto assign_val
   assign_string:
