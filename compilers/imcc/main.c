@@ -94,7 +94,7 @@ help(void)
     "    -. --wait    Read a keystroke before starting\n"
     "       --runtime-prefix\n"
     "   <Compiler options>\n"
-    "    -d --imcc_debug[=HEXFLAGS]\n"
+    "    -d --imcc-debug[=HEXFLAGS]\n"
     "    -v --verbose\n"
     "    -E --pre-process-only\n"
     "    -o --output=FILE\n"
