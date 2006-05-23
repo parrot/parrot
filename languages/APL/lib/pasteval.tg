@@ -1,4 +1,4 @@
-ROOT: eval(.) = {
+transform eval (ROOT) :language('PIR') {
     .local pmc eval
     .local pmc iter
     $P0 = node['children']
@@ -13,8 +13,7 @@ ROOT: eval(.) = {
     .return (eval)
 }
 
-
-PAST::Stmt: eval(.) = {
+transform eval (PAST::Stmt) :language('PIR') {
     .local pmc eval
     $P0 = node['statement']
     eval = tree.get('eval', $P0)
@@ -31,7 +30,7 @@ PAST::Stmt: eval(.) = {
 }
 
 
-PAST::Op: eval(.) = {
+transform eval (PAST::Op) :language('PIR') {
     .local pmc children_eval
     children_eval = new 'APLVector'
   
@@ -56,14 +55,13 @@ PAST::Op: eval(.) = {
     .return(eval)
 }
  
-
-PAST::Val: eval(.) = {
+transform eval (PAST::Val) :language('PIR') {
     $P0 = node['value']
     .return ($P0)
 }
 
 
-PAST::Var: eval(.) = {
+transform eval (PAST::Var) :language('PIR') {
     .local pmc var
     .local pmc eval
     var = find_global 'APL', '%var'
@@ -78,7 +76,7 @@ PAST::Var: eval(.) = {
 }
 
 
-PAST::Assign: eval(.) = {
+transform eval (PAST::Assign) :language('PIR') {
     .local pmc eval
 
     # obtain rhs value
