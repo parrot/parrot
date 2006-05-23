@@ -657,7 +657,7 @@ END_PREAMBLE
     $I2 = op2
     if $I1 == $I2 goto good
     %% DOMAIN_ERROR %%
-good:
+  good:
     # Create a result vector
     .local pmc result 
     result = new 'APLVector'
@@ -665,10 +665,18 @@ good:
     .local pmc iter1, iter2
     iter1 = new .Iterator, op1
     iter2 = new .Iterator, op2
-loop:    
+  loop:    
     unless iter1 goto loop_done
     $P1 = shift iter1
     $P2 = shift iter2
+    $S1 = typeof $P1
+    if $S1 == 'String' goto bad_args
+    $S2 = typeof $P2
+    if $S2 == 'String' goto bad_args
+    goto got_args
+  bad_args:
+    %% DOMAIN_ERROR %%
+  got_args:
 END_PIR
    
      $template .= interpolate($code, '$P1', '$P2');
@@ -702,9 +710,13 @@ END_PIR
     # Loop through each vector, doing the ops.
     .local pmc iter1
     iter1 = new .Iterator, $vector
-loop:    
+  loop:    
     unless iter1 goto loop_done
     \$P1 = shift iter1
+    \$S1 = typeof \$P1
+    if \$S1 != 'String' goto got_args
+    %% DOMAIN_ERROR %%
+  got_args:
 	\$P2 = clone $scalar
 END_PIR
    
