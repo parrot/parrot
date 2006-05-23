@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/pdds/clip/pdd23_exceptions.pod - Parrot Exceptions
+docs/pdds/pdd23_exceptions.pod - Parrot Exceptions
 
 =head1 ABSTRACT
 
@@ -16,169 +16,108 @@ $Revision$
 
 =head1 DESCRIPTION
 
-An exception system gives user-developed code control over how run-time
-error conditions are handled. Exceptions are errors or unusual
-conditions that require special processing. An exception handler
-performs the necessary steps to appropriately respond to a particular
-kind of exception.
+An exception system gives user-developed code control over how run-time error
+conditions are handled.  Exceptions are errors or unusual conditions that
+require special processing.  An exception handler performs the necessary steps
+to appropriately respond to a particular kind of exception.
+
+Parrot is designed to support dynamic languages, but Parrot compromises the
+principle of dynamic behavior when necessary. For example, Parrot requires any
+given subroutine to be fully compiled before it can be called.
+
+Since the structure and content of a compiled subroutine are fixed at compile
+time, it would be wasteful use the dynamic execution of opcodes at runtime to
+keep track of meta-information about that structure -- I<including the spans
+of opcodes that the programmer expects to throw exceptions, and how the
+programmer wants to handle them.>
+
+=head2 Exception PIR Directives
+
+These are the PIR directives relevant to exceptions and exception handlers:
+
+=over
+
+=item B<.begin_eh I<LABEL>>
+
+A C<.begin_eh> directive marks the beginning of a span of opcodes which the
+programmer expects to throw an exception.  If an exception occurs in the
+execution of the given opcode span, Parrot will transfer control to I<LABEL>.
+
+[XXX - Is a label a good approach?  Treating exception handlers as label jumps
+rather than full subroutines may be error-prone, but having the lexical stack
+conveniently at hand is worth a lot.]
+
+=item B<.end_eh>
+
+A C<.end_eh> marks the end of the most recent (innermost) still-open exception
+handler opcode span.
+
+=back
 
 =head2 Exception Opcodes
 
 These are the opcodes relevant to exceptions and exception handlers:
 
-=over
+=item B<throw I<PMC>>
 
-=item *
+The C<throw> opcode throws the given PMC as an exception.
 
-C<push_eh> creates an exception handler and pushes it onto the control
-stack. It takes a label (the location of the exception handler) as its
-only argument. [Is this right? Treating exception handlers as label
-jumps rather than full subroutines is error-prone.]
+Any PMC can be thrown, as long as you're prepared to catch it.  If there's any
+chance of cross-language calls -- and in a Parrot environment, cross-language
+operations are kind of the point -- then be prepared to catch object of
+classes you would never throw yourself.
 
-=item *
+However, it is I<VERY STRONGLY RECOMMENDED> for inter-HLL operation that any
+thrown PMC that can possibly escape your private sandbox should meet the
+minimal interface requirements of the C<parrot;exception> class.
 
-C<clear_eh> removes the most recently added exception from the control
-stack.
+=item B<rethrow>
 
-=item *
+The C<rethrow> opcode rethrows the exception object which is currently being
+handled.  It can only be called from inside an exception handler.
 
-C<throw> throws an exception object.
+=item B<die> I<-- dead>
 
-=item *
+The C<die> opcode is, ironically enough, now dead.  This section of the docs
+will be deleted soon.
 
-C<rethrow> rethrows an exception object. It can only be called from
-inside an exception handler.
+=item B<exit>
 
-=item *
+The C<exit> opcode throws an exception of type C<parrot;exception;exit>.  If
+not caught, this exception results eventually in Parrot executing C<exit(0)>.
 
-C<die> throws an exception. It takes two arguments, one for the severity
-of the exception and one for the type of exception.
+=item B<pushaction I<SUBPMC>>
 
-If the severity is C<EXCEPT_DOOMED>, it exits via a call to
-C<_exit($2)>, which is not a catchable exception.
+C<pushaction> pushes a subroutine object onto the control stack.  If the
+control stack is unwound due to an exception (or C<popmark>, or subroutine
+return), the subroutine is invoked with an integer argument: C<0> means a
+normal return is in progress; C<1> means the stack is unwinding due to an
+exception.
 
-These are the constants defined for severity:
-
-  0    EXCEPT_NORMAL
-  1    EXCEPT_WARNING
-  2    EXCEPT_ERROR
-  3    EXCEPT_SEVERE
-  4    EXCEPT_FATAL
-  5    EXCEPT_DOOMED
-  6    EXCEPT_EXIT
-
-These are the constants defined for exception types:
-
-  0    E_Exception
-  1    E_SystemExit
-  2    E_StopIteration
-  3    E_StandardError
-  4    E_KeyboardInterrupt
-  5    E_ImportError
-  6    E_EnvironmentError
-  7    E_IOError
-  8    E_OSError
-  9    E_WindowsError
-  10   E_VMSError
-  11   E_EOFError
-  12   E_RuntimeError
-  13   E_NotImplementedError
-  14   E_LibraryNotLoadedError
-  15   E_NameError
-  16   E_UnboundLocalError
-  17   E_AttributeError
-  18   E_SyntaxError
-  19   E_IndentationError
-  20   E_TabError
-  21   E_TypeError
-  22   E_AssertionError
-  23   E_LookupError
-  24   E_IndexError
-  25   E_KeyError
-  26   E_ArithmeticError
-  27   E_OverflowError
-  28   E_ZeroDivisionError
-  29   E_FloatingPointError
-  30   E_ValueError
-  31   E_UnicodeError
-  32   E_UnicodeEncodeError
-  33   E_UnicodeDecodeError
-  34   E_UnicodeTranslateError
-  35   E_ReferenceError
-  36   E_SystemError
-  37   E_MemoryError
-  37   E_LAST_PYTHON_E
-  38   BAD_BUFFER_SIZE
-  39   MISSING_ENCODING_NAME
-  40   INVALID_STRING_REPRESENTATION
-  41   ICU_ERROR
-  42   UNIMPLEMENTED
-  43   NULL_REG_ACCESS
-  44   NO_REG_FRAMES
-  45   SUBSTR_OUT_OF_STRING
-  46   ORD_OUT_OF_STRING
-  47   MALFORMED_UTF8
-  48   MALFORMED_UTF16
-  49   MALFORMED_UTF32
-  50   INVALID_CHARACTER
-  51   INVALID_CHARTYPE
-  52   INVALID_ENCODING
-  53   INVALID_CHARCLASS
-  54   NEG_REPEAT
-  55   NEG_SUBSTR
-  56   NEG_SLEEP
-  57   NEG_CHOP
-  58   INVALID_OPERATION
-  59   ARG_OP_NOT_HANDLED
-  60   KEY_NOT_FOUND
-  61   JIT_UNAVAILABLE
-  62   EXEC_UNAVAILABLE
-  63   INTERP_ERROR
-  64   PREDEREF_LOAD_ERROR
-  65   PARROT_USAGE_ERROR
-  66   PIO_ERROR
-  67   PARROT_POINTER_ERROR
-  68   DIV_BY_ZERO
-  69   PIO_NOT_IMPLEMENTED
-  70   ALLOCATION_ERROR
-  71   INTERNAL_PANIC
-  72   OUT_OF_BOUNDS
-  73   JIT_ERROR
-  74   EXEC_ERROR
-  75   ILL_INHERIT
-  76   NO_PREV_CS
-  77   NO_CLASS
-  78   LEX_NOT_FOUND
-  79   PAD_NOT_FOUND
-  80   ATTRIB_NOT_FOUND
-  81   GLOBAL_NOT_FOUND
-  82   METH_NOT_FOUND
-  83   WRITE_TO_CONSTCLASS
-  84   NOSPAWN
-  85   INTERNAL_NOT_IMPLEMENTED
-  86   ERR_OVERFLOW
-  87   LOSSY_CONVERSION
-
-=item *
-
-C<exit> throws an exception of severity C<EXCEPT_EXIT>. It takes a
-single argument for the exception type.
-
-=item *
-
-C<pushaction> pushes a subroutine object onto the control stack. If the
-control stack is unwound due to an exception (or C<popmark>, or
-subroutine return), the subroutine is invoked with an integer argument:
-C<0> means a normal return; C<1> means an exception has been raised.
-[Seems like there's lots of room for dangerous collisions here.]
+[XXX - Seems like there's lots of room for dangerous collisions here.
+Keep on the lookout.]
 
 =back
 
-=head1 IMPLEMENTATION
+=head1 STANDARD EXCEPTION CLASSES
 
-[I'm not convinced the control stack is the right way to handle
-exceptions. Most of Parrot is based on the continuation-passing style of
-control, shouldn't exceptions be based on it too? See bug #38850.]
+Parrot comes with a small hierarchy of classes designed to be thrown.  Parrot
+throws them when internal Parrot errors occur, and HLL creators and end users
+can throw them too.
+
+[[[[ TODO - introduce herarchy and minimal interface ]]]]
+
+
+
+-------------------[ WHERE CHIP LEFT OFF EDITING ]---------------------
+-------------[ TEXT BELOW THIS POINT IS PROBABLY WRONG ]---------------
+
+
+=head1 HOW PARROT HANDLES EXCEPTIONS
+
+[I'm not convinced the control stack is the right way to handle exceptions.
+Most of Parrot is based on the continuation-passing style of control,
+shouldn't exceptions be based on it too? See bug #38850.]
 
 =head2 Opcodes that Throw Exceptions
 
