@@ -32,7 +32,7 @@ __DATA__
 
 === index of, vector
 --- APL: 1 2 3 5 7 9 11⍳7 3 9 10
---- out: 5 3 6 7
+--- out: 5 3 6 8
 
 === index of, alpha
 --- APL: 'COKE'⍳'O'

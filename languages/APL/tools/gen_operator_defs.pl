@@ -283,12 +283,14 @@ nothing:
 .sub 'dyadic:\u2373' :multi(APLVector, APLVector) # index of
     .param pmc op1
     .param pmc op2
-
+ 
     .local pmc iter_one, iter_two
     .local pmc item_one, item_two
     .local int pos_one
     .local int not_found
+
     not_found = op1
+    inc not_found
 
     .local pmc result
     result = new 'APLVector'
