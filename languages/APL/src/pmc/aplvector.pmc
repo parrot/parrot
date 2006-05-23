@@ -2,6 +2,7 @@
 Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 $Id: tcllist.pmc 12341 2006-04-18 15:13:54Z coke $
 
+
 =head1 NAME
 
 src/pmc/APLVector.pmc - APLVector
@@ -53,17 +54,7 @@ initialize the instance.
 */
 
 void init() {
-    PMC* shape;
-    INTVAL array_t;
-    STRING *property_name;
-
     SUPER();
-
-    array_t = pmc_type(INTERP, string_from_const_cstring(INTERP, "Array", 0));
-    shape = pmc_new(INTERP, array_t);
-    VTABLE_set_integer_native(INTERP, shape, 1);
-    property_name = string_from_cstring(INTERP,"shape",0);
-    VTABLE_setprop(INTERP, SELF, property_name, shape);
 };
 
 /*
@@ -77,13 +68,27 @@ Returns a vector-like PMC containing the shape of this PMC.
 */
 
     METHOD PMC* get_shape() {
-        INTVAL array_type_num;
         PMC* shape;
-        /* Create a new PMC */
-        STRING* property_name = string_from_cstring(INTERP,"shape",0);
+        INTVAL array_t;
+        STRING* property_name;
+
+        property_name = string_from_cstring(INTERP,"shape",0);
         shape = VTABLE_getprop(INTERP, SELF, property_name);
-        // XXX Only hack remaining here: the shape should be modified whenever the array is modified.
-        VTABLE_set_integer_keyed_int(INTERP,shape,0,VTABLE_get_integer(INTERP, SELF));
+        if (shape == PMCNULL) {
+           /*
+            * No shape has been set yet. This means that we are
+            * a simple vector
+            */
+            array_t = pmc_type(INTERP, 
+                string_from_const_cstring(INTERP, "Array", 0)
+            );
+            shape = pmc_new(INTERP, array_t);
+            VTABLE_set_integer_native(INTERP, shape, 1);
+            VTABLE_set_integer_keyed_int(INTERP,shape,0,
+                VTABLE_get_integer(INTERP, SELF)
+            );
+            VTABLE_setprop(INTERP, SELF, property_name, shape);
+        }
         return (shape);
     }
 
@@ -92,9 +97,6 @@ Returns a vector-like PMC containing the shape of this PMC.
 =item C<PMC* set_shape()>
 
 Reshape the existing APLvector by passing in an existing vector.
-
-TODO: Handle reshapes to larger and smaller #'s of elements. This
-implementation assumes equivalence. (2x6 to 4x3, e.g.)
 
 =cut
 
