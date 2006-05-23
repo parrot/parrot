@@ -1,4 +1,4 @@
-ROOT: result(.) = {
+transform result (ROOT) :language('PIR') {
 	.local string result
 	result = <<'EOT'
 .namespace [ 'Pheme' ]
@@ -31,7 +31,7 @@ EOT
 	.return( result )
 }
 
-POST::Sub: emit(.) = {
+transform emit (POST::Sub) :language('PIR') {
 	.local string result
 	.local string name
 	name = node.'name'()
@@ -83,7 +83,7 @@ POST::Sub: emit(.) = {
 	.return( result )
 }
 
-POST::Ops: resolve_ops(.) = {
+transform resolve_ops (POST::Ops) :language('PIR') {
 	.local pmc result
 
 	.local pmc children
@@ -106,7 +106,7 @@ POST::Ops: resolve_ops(.) = {
 	.return( node )
 }
 
-POST::Ops: emit(.) = {
+transform emit (POST::Ops) :language('PIR') {
 	.local string result
 
 	# get name for variable used to hold the results of this op
@@ -158,7 +158,7 @@ POST::Ops: emit(.) = {
 	.return( result )
 }
 
-POST::Ops: emit_declarations(.) = {
+transform emit_declarations (POST::Ops) :language('PIR') {
 	.local string result
 	result = ''
 
@@ -190,7 +190,7 @@ POST::Ops: emit_declarations(.) = {
 	.return( result )
 }
 
-POST::Val: emit(.) = {
+transform emit (POST::Val) :language('PIR') {
 	.local string result
 	result = node.'value'()
 
@@ -210,19 +210,19 @@ POST::Val: emit(.) = {
 	.return( result )
 }
 
-POST::Var: emit(.) = {
+transform emit (POST::Var) :language('PIR') {
 	.local string varname
 	varname = node.'varname'()
 	.return( varname )
 }
 
-POST::Var: outvar(.) = {
+transform outvar (POST::Var) :language('PIR') {
 	.local string result
 	result = node.'varname'()
 	.return( result )
 }
 
-POST::Op: emit(.) = {
+transform emit (POST::Op) :language('PIR') {
 	.local string result
 	.local string name
 	name = node.'op'()

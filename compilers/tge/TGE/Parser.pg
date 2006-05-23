@@ -1,0 +1,46 @@
+grammar TGE::Parser;
+
+token start { ^ <TGE::Parser::statements> $ }
+
+rule statements { 
+    [ <TGE::Parser::transrule>
+    | <TGE::Parser::grammardec>
+    ]* 
+}
+
+rule grammardec {
+    grammar <TGE::Parser::type>
+    [is <TGE::Parser::type>]?;
+}
+
+rule transrule {
+    transform <TGE::Parser::name> 
+    \( <TGE::Parser::type> \)
+    <TGE::Parser::parent>?
+    <TGE::Parser::language>?
+    <TGE::Parser::action>
+}
+    
+rule parent {
+    \:applyto \( \'(<-[']>*)\' \)
+}
+
+rule language {
+    \:language \( \'(\w+)\' \)
+}
+
+rule action {
+    \{ (<-[}]>*) \}
+}
+
+token type {
+    [ \:\: ]? \w+ [ \:\: \w+ ]*
+}
+
+token name { \w+ }
+
+token ws {
+    [ \s+
+    | \# \N*
+    ]*
+}

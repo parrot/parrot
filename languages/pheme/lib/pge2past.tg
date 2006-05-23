@@ -1,4 +1,4 @@
-ROOT: result(.) = {
+transform result (ROOT) :language('PIR') {
 	.local pmc result
 	result = new 'Node'
 
@@ -43,7 +43,7 @@ ROOT: result(.) = {
 	.return( result )
 }
 
-list: result(.) = {
+transform result (list) :language('PIR') {
 	.local pmc result
 	result = new 'PAST::Exp'
 
@@ -83,11 +83,11 @@ list: result(.) = {
 	.return( result )
 }
 
-PAST::Exp: maybe_op(.) = {
+transform maybe_op (PAST::Exp) :language('PIR') {
 	.return( node )
 }
 
-PAST::Val: maybe_op(.) = {
+transform maybe_op (PAST::Val) :language('PIR') {
 	.local pmc op
 	op = new 'PAST::Op'
 
@@ -99,7 +99,7 @@ PAST::Val: maybe_op(.) = {
 	.return( op )
 }
 
-PAST::Exp: maybe_promote_sub(.) = {
+transform maybe_promote_sub (PAST::Exp) :language('PIR') {
 	.local pmc children
 	children = node.'children'()
 
@@ -137,7 +137,7 @@ PAST::Exp: maybe_promote_sub(.) = {
 }
 
 # XXX: almost certainly wrong
-empty_list: result(.) = {
+transform result (empty_list) :language('PIR') {
 	.local pmc result
 	result = new 'PAST::Exp'
 
@@ -149,7 +149,7 @@ empty_list: result(.) = {
 	.return( result )
 }
 
-atom: result(.) = {
+transform result (atom) :language('PIR') {
 	.local pmc result
 	result   = new 'PAST::Val'
 
@@ -161,7 +161,7 @@ atom: result(.) = {
 	.return( result )
 }
 
-quoted_string: result(.) = {
+transform result (quoted_string) :language('PIR') {
 	.local pmc result
 	result = new 'PAST::Val'
 
@@ -189,7 +189,7 @@ quoted_string: result(.) = {
 	.return( result )
 }
 
-list_item: result(.) = {
+transform result (list_item) :language('PIR') {
 	.local pmc result
 	.local pmc iter
 

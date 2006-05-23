@@ -23,16 +23,16 @@ t/parser.t - TGE::Parser tests
 pir_output_is(<<'CODE', <<'OUT', "parse a basic attribute grammar");
 
 .sub _main :main
-    load_bytecode "compilers/tge/TGE/Parser.pir"
+    load_bytecode "compilers/tge/TGE.pir"
 
     .local string source
     source = <<'GRAMMAR'
-    Leaf:   min(.) = {
+    transform min (Leaf) {
         $P1 = getattribute node, "value"
         .return ($P1)
     }
     # A test comment
-    Branch: gmin(.left)  = {
+    transform gmin (Branch) :applyto('left') {
         .local pmc gmin
         gmin = tree.get('gmin', node)
         .return (gmin)
@@ -42,7 +42,7 @@ GRAMMAR
     # Match against the source
     .local pmc match
     .local pmc start_rule
-    start_rule = find_global "TGE::Parser", "input"
+    start_rule = find_global "TGE::Parser", "start"
     print "loaded start rule\n"
     match = start_rule(source)
     print "matched start rule\n"

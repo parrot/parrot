@@ -1,4 +1,4 @@
-ROOT: pir(.) = {
+transform pir (ROOT) :language('PIR') {
     .local pmc pir
     .local pmc iter
     pir = new "PGE::CodeString"
@@ -21,7 +21,7 @@ ROOT: pir(.) = {
 }
 
 
-PAST::Stmt: pir(.) = {
+transform pir (PAST::Stmt) :language('PIR') {
     .local pmc pir
     pir = new "PGE::CodeString"
 
@@ -42,7 +42,7 @@ PAST::Stmt: pir(.) = {
 }
 
 
-PAST::Op: pir(.) = {
+transform pir (PAST::Op) :language('PIR') {
     .local pmc pirtable
     .local pmc children
     .local pmc childret
@@ -98,7 +98,7 @@ PAST::Op: pir(.) = {
 }
  
  
-PAST::Val: pir(.) = {
+transform pir (PAST::Val) :language('PIR') {
     .local pmc pir
     .local pmc ret
     .local pmc class
@@ -129,7 +129,7 @@ PAST::Val: pir(.) = {
 }
 
 
-PAST::Var: pir(.) = {
+transform pir (PAST::Var) :language('PIR') {
     .local pmc pir
     .local pmc ret
     
@@ -143,7 +143,7 @@ PAST::Var: pir(.) = {
 }
 
 
-PAST::Vector: pir(.) = {
+transform pir (PAST::Vector) :language('PIR') {
     .local pmc pir
     .local pmc ret
     .local pmc iter
@@ -168,7 +168,7 @@ PAST::Vector: pir(.) = {
 }
 
 
-PAST::Assign: pir(.) = {
+transform pir (PAST::Assign) :language('PIR') {
     .local pmc pir
     .local pmc rvalue, lvalue
 

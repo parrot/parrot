@@ -5,6 +5,7 @@ LN_S     = @lns@
 PERL     = @perl@
 RM_RF    = @rm_rf@
 PARROT   = ..@slash@..@slash@parrot@exe@
+PGE_DIR   = ..@slash@..@slash@compilers@slash@pge
 CP       = @cp@
 
 # Where to put things
@@ -25,7 +26,8 @@ TGE@slash@Rule.pbc: TGE@slash@Rule.pir
 TGE@slash@Instance.pbc: TGE@slash@Instance.pir
 	$(PARROT) -o TGE@slash@Instance.pbc --output-pbc TGE@slash@Instance.pir 
 
-TGE@slash@Parser.pbc: TGE@slash@Parser.pir
+TGE@slash@Parser.pbc: TGE@slash@Parser.pir TGE@slash@Parser.pg
+	$(PARROT) $(PGE_DIR)@slash@pgc.pir --output=TGE@slash@/Parser_gen.pir TGE@slash@/Parser.pg
 	$(PARROT) -o TGE@slash@Parser.pbc --output-pbc TGE@slash@Parser.pir 
 
 # This is a listing of all targets, that are meant to be called by users

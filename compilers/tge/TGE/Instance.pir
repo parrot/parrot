@@ -236,8 +236,7 @@ error_defined:
     .param pmc node
     .param pmc name
     $S0 = name
-    $S1 = substr $S0, 1
-    $P1 = getattribute node, $S1
+    $P1 = getattribute node, $S0
     .return($P1)
 .end
 

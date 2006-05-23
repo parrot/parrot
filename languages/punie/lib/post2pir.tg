@@ -1,7 +1,8 @@
 # This is just a stub to allow Punie to execute code. It will be
 # replaced.
+grammar PIRGrammar is TGE::Grammar;
 
-ROOT: result(.) = {
+transform result (ROOT) :language('PIR') {
     .local string output
     output = ".sub _main :main\n"
     .local pmc iter
@@ -18,7 +19,7 @@ ROOT: result(.) = {
 }
 
 # Flatten out the ops into a simple sequence.
-POST::Ops: result(.) = {
+transform result (POST::Ops) :language('PIR') {
     .local string output
     .local pmc iter
     iter = node.'child_iter'()
@@ -32,7 +33,7 @@ POST::Ops: result(.) = {
     .return (output)
 }
 
-POST::Op: result(.) = {
+transform result (POST::Op) :language('PIR') {
     .local string output
     .local int counter
     counter = 0
@@ -57,12 +58,12 @@ POST::Op: result(.) = {
     .return (output)
 }
 
-POST::Var: result(.) = {
+transform result (POST::Var) :language('PIR') {
     $S1 = node.varname()
     .return ($S1)
 }
 
-POST::Label: result(.) = {
+transform result (POST::Label) :language('PIR') {
     $S1 = node.name()
     $I1 = node.dest()
     unless $I1 goto not_dest
@@ -71,7 +72,7 @@ POST::Label: result(.) = {
     .return ($S1)
 }
 
-POST::Val: result(.) = {
+transform result (POST::Val) :language('PIR') {
     $S1 = node.value()
     $S2 = node.valtype()
     if $S2 == 'strq' goto wrap_string_single

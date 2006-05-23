@@ -1,4 +1,6 @@
-ROOT: result(.) = {
+grammar OSTGrammar is TGE::Grammar;
+
+transform result (ROOT) :language('PIR') {
     .local pmc result
     result = new 'POST::Sub'
     result.'clone'(node)
@@ -16,7 +18,7 @@ ROOT: result(.) = {
     .return (result)
 }
 
-PAST::Stmts: result(.) = {
+transform result (PAST::Stmts) :language('PIR') {
     .local pmc result
     result = new 'POST::Ops'
     result.'clone'(node)
@@ -33,21 +35,21 @@ PAST::Stmts: result(.) = {
     .return (result)
 }
 
-PAST::Stmt: result(.) = {
+transform result (PAST::Stmt) :language('PIR') {
     $P1 = node.children()
     $P2 = $P1[0]
     $P3 = tree.get('result', $P2)
     .return ($P3)
 }
 
-PAST::Exp: result(.) = {
+transform result (PAST::Exp) :language('PIR') {
     $P1 = node.children()
     $P2 = $P1[0]
     $P3 = tree.get('result', $P2)
     .return ($P3)
 }
 
-PAST::Op: result(.) = {
+transform result (PAST::Op) :language('PIR') {
      .local string opname
      opname = node.op()
     $S1 = substr opname, 0, 5
@@ -131,7 +133,7 @@ PAST::Op: result(.) = {
     .return (newops)
 }
 
-PAST::Op: infix(.) = {
+transform infix (PAST::Op) :language('PIR') {
     # Create the node to contain all the generated ops.
     .local pmc newops
     newops = new 'POST::Ops'
@@ -199,7 +201,7 @@ PAST::Op: infix(.) = {
     .return (newops)
 }
 
-PAST::Op: conditional(.) = {
+transform conditional (PAST::Op) :language('PIR') {
     # Create the node to contain all the generated ops.
     .local pmc newops
     newops = new 'POST::Ops'
@@ -276,14 +278,14 @@ PAST::Op: conditional(.) = {
     .return (newops)
 }
 
-PAST::Op: nullop(.) = {
+transform nullop (PAST::Op) :language('PIR') {
     $P1 = node.children()
     $P2 = $P1[0]
     $P3 = tree.get('result', $P2)
     .return ($P3)
 }
 
-PAST::Op: print_op(.) = {
+transform print_op (PAST::Op) :language('PIR') {
     # This fairly lengthy bit collapses comma ops, by traversing down
     # the tree and yanking up the children of the comma op to the
     # current level.
@@ -347,7 +349,7 @@ PAST::Op: print_op(.) = {
     .return (newops)
 }
 
-PAST::Val: result(.) = {
+transform result (PAST::Val) :language('PIR') {
     .local pmc result
     result = new 'POST::Val'
     result.'clone'(node)

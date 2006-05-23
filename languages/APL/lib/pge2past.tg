@@ -1,4 +1,4 @@
-ROOT: result(.) = {
+transform result (ROOT) :language('PIR') {
     .local pmc result
     .local pmc children
     .local pmc iter
@@ -23,7 +23,7 @@ ROOT: result(.) = {
 } 
     
 
-APL::Grammar::statement: result(.) = {
+transform result (APL::Grammar::statement) :language('PIR') {
     .local pmc result
     result = new 'PAST::Stmt'
     result.'set_node'(node)
@@ -35,7 +35,7 @@ APL::Grammar::statement: result(.) = {
 }
 
 
-APL::Grammar::expression: result(.) = {
+transform result (APL::Grammar::expression) :language('PIR') {
     .local pmc result
     .local string op
     .local pmc children
@@ -106,13 +106,13 @@ APL::Grammar::expression: result(.) = {
 }
 
 
-APL::Grammar::subexpression: result(.) = {
+transform result (APL::Grammar::subexpression) :language('PIR') {
     $P0 = node['simple_expression']
     .return tree.get('result', $P0, 'APL::Grammar::simple_expression')
 }
 
 
-APL::Grammar::simple_expression: result(.) = {
+transform result (APL::Grammar::simple_expression) :language('PIR') {
     $I0 = exists node['expression']
     if $I0 goto paren_expression
     $P0 = node['array_identifier']
@@ -123,13 +123,13 @@ APL::Grammar::simple_expression: result(.) = {
 }
 
 
-APL::Grammar::target: result(.) = {
+transform result (APL::Grammar::target) :language('PIR') {
     $P0 = node['variable_identifier']
     .return tree.get('result', $P0, 'APL::Grammar::variable_identifier')
 }
 
 
-APL::Grammar::array_identifier: result(.) = {
+transform result (APL::Grammar::array_identifier) :language('PIR') {
     $P0 = node['constant']
     unless $P0 goto variable_name
     .return tree.get('result', $P0, 'APL::Grammar::constant')
@@ -140,7 +140,7 @@ APL::Grammar::array_identifier: result(.) = {
 }
 
 
-APL::Grammar::constant: result(.) = {
+transform result (APL::Grammar::constant) :language('PIR') {
     .local pmc result
 
     $P0 = node['numeric_constant']
@@ -158,7 +158,7 @@ APL::Grammar::constant: result(.) = {
 }
 
 
-APL::Grammar::numeric_constant: result(.) = {
+transform result (APL::Grammar::numeric_constant) :language('PIR') {
 
     $P0 = node['decimal_representation']
     $I0 = elements $P0
@@ -190,7 +190,7 @@ APL::Grammar::numeric_constant: result(.) = {
 }
 
     
-APL::Grammar::decimal_representation: result(.) = {
+transform result (APL::Grammar::decimal_representation) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
     result.set_node(node)
@@ -208,7 +208,7 @@ APL::Grammar::decimal_representation: result(.) = {
     .return (result)
 }
 
-APL::Grammar::character_constant_double: result(.) = {
+transform result (APL::Grammar::character_constant_double) :language('PIR') {
     .local pmc result, iter, children
     result = new 'PAST::Vector'
     result.set_node(node)
@@ -229,7 +229,7 @@ APL::Grammar::character_constant_double: result(.) = {
     .return (result)
 }
 
-APL::Grammar::character_constant_single: result(.) = {
+transform result (APL::Grammar::character_constant_single) :language('PIR') {
     .local pmc result, iter, children
     result = new 'PAST::Vector'
     result.set_node(node)
@@ -250,7 +250,7 @@ APL::Grammar::character_constant_single: result(.) = {
     .return (result)
 }
 
-APL::Grammar::single_quoted_character: result(.) = {
+transform result (APL::Grammar::single_quoted_character) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
     result.set_node(node)
@@ -263,7 +263,7 @@ done:
     .return (result)
 }
 
-APL::Grammar::double_quoted_character: result(.) = {
+transform result (APL::Grammar::double_quoted_character) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
     result.set_node(node)
@@ -276,7 +276,7 @@ done:
     .return (result)
 }
 
-APL::Grammar::variable_identifier: result(.) = {
+transform result (APL::Grammar::variable_identifier) :language('PIR') {
     .local pmc result
     result = new 'PAST::Var'
     result.set_node(node)

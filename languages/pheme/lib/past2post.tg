@@ -1,4 +1,4 @@
-ROOT: result(.) = {
+transform result (ROOT) :language('PIR') {
 	.local pmc result
 	result = new 'POST::Node'
 
@@ -22,7 +22,7 @@ ROOT: result(.) = {
 	.return( result )
 }
 
-Node: find_sub_names(.) = {
+transform find_sub_names (Node) :language('PIR') {
 	.local pmc symbols
 	symbols = find_global 'PhemeCompiler', 'symbols'
 
@@ -42,7 +42,7 @@ Node: find_sub_names(.) = {
 	.return( symbols )
 }
 
-PAST::Sub: result(.) = {
+transform result (PAST::Sub) :language('PIR') {
 	.local pmc result
 	result = new 'POST::Sub'
 
@@ -119,7 +119,7 @@ PAST::Sub: result(.) = {
 	.return( result )
 }
 
-PAST::Sub: create_sub_declarations(.) = {
+transform create_sub_declarations (PAST::Sub) :language('PIR') {
 	.local pmc variables
 	variables = tree.'get'( 'find_sub_variables', node )
 
@@ -161,7 +161,7 @@ PAST::Sub: create_sub_declarations(.) = {
 	.return( declarations )
 }
 
-PAST::Sub: find_sub_variables(.) = {
+transform find_sub_variables (PAST::Sub) :language('PIR') {
 	.local pmc result
 
 	.local pmc children
@@ -195,7 +195,7 @@ PAST::Sub: find_sub_variables(.) = {
 	.return( result )
 }
 
-PAST::Exp: get_var_names(.) = {
+transform get_var_names (PAST::Exp) :language('PIR') {
 	.local pmc result
 	result = new .ResizableStringArray
 
@@ -226,19 +226,19 @@ PAST::Exp: get_var_names(.) = {
   	.return( result )
 }
 
-PAST::Op: get_var_name(.) = {
+transform get_var_name (PAST::Op) :language('PIR') {
 	.local string name
 	name = node.'op'()
 	.return( name )
 }
 
-PAST::Val: get_var_name(.) = {
+transform get_var_name (PAST::Val) :language('PIR') {
 	.local string name
 	name = node.'value'()
 	.return( name )
 }
 
-PAST::Stmts: result(.) = {
+transform result (PAST::Stmts) :language('PIR') {
 	.local pmc result
 	result = new 'POST::Ops'
 
@@ -277,7 +277,7 @@ PAST::Stmts: result(.) = {
 	.return( resulty )
 }
 
-PAST::Exp: result(.) = {
+transform result (PAST::Exp) :language('PIR') {
 	.local pmc result
 	result   = new .ResizablePMCArray
 
@@ -328,7 +328,7 @@ PAST::Exp: result(.) = {
 	.return( result )
 }
 
-PAST::Exp: lambda_to_ops(.) = {
+transform lambda_to_ops (PAST::Exp) :language('PIR') {
 	.local pmc children
 	children = node.'children'()
 
@@ -343,7 +343,7 @@ PAST::Exp: lambda_to_ops(.) = {
 	.return( result )
 }
 
-PAST::Op: result(.) = {
+transform result (PAST::Op) :language('PIR') {
 	.local pmc result
 
 	.local pmc symbols
@@ -371,7 +371,7 @@ PAST::Op: result(.) = {
 	.return( result )
 }
 
-PAST::Val: result(.) = {
+transform result (PAST::Val) :language('PIR') {
 	.local pmc result
 
 	.local string value
