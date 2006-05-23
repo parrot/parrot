@@ -40,16 +40,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)');
     say $P4              # hello world
 .end
 
-.sub __concatenate :multi(String, PGE::Match)
-    .param pmc l
-    .param pmc r
-    $S0 = l
-    $S1 = r
-    $S2 = $S0 . $S1
-    $P0 = new .String
-    $P0 = $S2
-    .return ($P0)
-.end
 CODE
 world
 hello world
