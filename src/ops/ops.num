@@ -1184,3 +1184,5 @@ find_global_p_p_s              1153
 find_global_p_p_sc             1154
 find_name_p_s                  1155
 find_name_p_sc                 1156
+addmethod_p_s_p                1157
+addmethod_p_sc_p               1158

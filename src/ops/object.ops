@@ -173,6 +173,17 @@ op fetchmethod(out PMC, in PMC, in STR) {
   goto ADDRESS(next);
 }
 
+=item B<addmethod>(in PMC, in STR, in PMC)
+
+Adds $3 as a method named $2 to $1.
+
+=cut
+
+inline op addmethod(in PMC, in STR, in PMC) :object_classes {
+  VTABLE_add_method(interpreter, $1, $2, $3);
+  goto NEXT();
+}
+
 =item B<can>(out INT, in PMC, in STR)
 
 Sets $1 to true or false, depending on whether $2 ->can the method in $3.
