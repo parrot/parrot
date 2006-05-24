@@ -22,7 +22,6 @@ Compiler:
 	- port to new TGE, when the branch lands
 	- fix load_bytecode section in generated code
 	- refactor compiler backend object
-		- make parameters available for TGE files
 		- share with Perl 6 and Punie
 		- move somewhere in Parrot lib path
 		- allow dumping of trees and (runnable) PIR

@@ -3,36 +3,61 @@
 .sub __onload :load
 	load_bytecode 'PGE.pbc'
 	load_bytecode 'PGE/Text.pbc'
+
+	.local pmc compiler
+	compiler = newclass 'PhemeCompiler'
+	addattribute compiler, 'pge2past'
+	addattribute compiler, 'past2post'
+	addattribute compiler, 'post2pir'
+
 	.return()
 .end
 
-.sub compile_pheme
+.sub __init :method
+	.param pmc init_args
+
+	.local pmc arg_string
+
+	arg_string = new .String
+	arg_string = init_args['pge2past']
+	setattribute self, 'pge2past',  arg_string
+
+	arg_string = new .String
+	arg_string = init_args['past2post']
+	setattribute self, 'past2post', arg_string
+
+	arg_string = new .String
+	arg_string = init_args['post2pir']
+	setattribute self, 'post2pir',  arg_string
+.end
+
+.sub 'compile' :method
 	.param pmc source
 
 	.local pmc parse_tree
-	parse_tree = get_parse_tree( source )
+	parse_tree = self.get_parse_tree( source )
 	unless parse_tree goto err_parse_fail
 
 	# dump_parse_tree( parse_tree )
 
 	.local pmc past_tree
-	past_tree = get_past_tree( parse_tree )
+	past_tree = self.get_past_tree( parse_tree )
 	unless past_tree goto err_past_fail
 
 	# dump_it( past_tree )
 
 	.local pmc post_tree
-	post_tree = get_post_tree( past_tree )
+	post_tree = self.get_post_tree( past_tree )
 	unless post_tree goto err_post_fail
 
  	# dump_it( post_tree )
 
 	.local pmc pir
-	pir = get_pir( post_tree )
+	pir = self.get_pir( post_tree )
 	unless pir goto err_pir_fail
 
 	.local pmc pir_compiled
-	pir_compiled = compile_pir( pir )
+	pir_compiled = self.compile_pir( pir )
 	unless pir_compiled goto err_no_pir_compiled
 
 	pir_compiled()
@@ -57,7 +82,7 @@
   	.return()
 .end
 
-.sub get_parse_tree
+.sub get_parse_tree :method
 	.param pmc source
 
 	.local pmc start_rule
@@ -72,7 +97,7 @@
 	.return( match )
 .end
 
-.sub get_past_tree
+.sub get_past_tree :method
 	.param pmc parse_tree
 
 	load_bytecode 'TGE.pbc'
@@ -84,8 +109,8 @@
 
 	store_global 'PhemeCompiler', 'symbols', compiled_symbols
 
-	.local string tg_source
-	tg_source = _slurp_file( 'lib/pge2past.tg' )
+	.local pmc tg_source
+	tg_source = getattribute self, 'pge2past'
 
 	.local pmc tree_grammar
 	tree_grammar = new 'TGE'
@@ -99,13 +124,13 @@
 	.return( past_tree )
 .end
 
-.sub get_post_tree
+.sub get_post_tree :method
 	.param pmc past_tree
 
 	load_bytecode 'lib/POST.pir'
 
-	.local string tg_source
-	tg_source = _slurp_file( 'lib/past2post.tg' )
+	.local pmc tg_source
+	tg_source = getattribute self, 'past2post'
 
 	.local pmc post_grammar
 	post_grammar = new 'TGE'
@@ -119,11 +144,11 @@
 	.return( post_tree )
 .end
 
-.sub get_pir
+.sub get_pir :method
 	.param pmc post_tree
 
-	.local string tg_source
-	tg_source = _slurp_file( 'lib/post2pir.tg' )
+	.local pmc tg_source
+	tg_source = getattribute self, 'post2pir'
 
 	.local pmc pir_grammar
 	pir_grammar = new 'TGE'
@@ -137,7 +162,7 @@
 	.return( pir )
 .end
 
-.sub compile_pir
+.sub compile_pir :method
 	.param pmc pir
 
 	.local pmc pir_compiler
@@ -147,7 +172,7 @@
 	.return( pir_compiled )
 .end
 
-.sub dump_parse_tree
+.sub dump_parse_tree :method
 	.param pmc match
 	load_bytecode 'dumper.pbc'
 	load_bytecode 'PGE/Dumper.pbc'
@@ -158,7 +183,7 @@
 	.return()
 .end
 
-.sub dump_it
+.sub dump_it :method
 	.param pmc tree
 	tree.'dump'()
 	end
