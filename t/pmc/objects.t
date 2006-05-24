@@ -2136,11 +2136,12 @@ CODE
 110
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering", todo => 'awaiting fix');
+pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering");
 .sub main :main
-    .local pmc c1, c2
+    .local pmc c1, c2, o
     c1 = newclass ['Foo']
-    c2 = newclass ['Foo';'Baz']
+    c2 = newclass ['Foo';'Bar']
+    o = new ['Foo';'Bar']
     print "ok\n"
 .end
 .namespace ['Foo']
@@ -2152,7 +2153,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering", todo => 'awaiting fix
 	print "__init Bar\n"
 .end
 CODE
-__init Foo
 __init Bar
 ok
 OUTPUT

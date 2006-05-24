@@ -291,6 +291,8 @@ a NameSpace or a var, the var is returned.
             while (key) {
                 part = key_string(INTERP, key);
                 key = key_next(INTERP, key);
+                if (ns->vtable->base_type != enum_class_NameSpace)
+                    return PMCNULL;
                 if (key)
                     ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);
                 else
