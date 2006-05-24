@@ -5,14 +5,14 @@
 (is
 	(cons banana (and honey sandwich))
 	(banana and honey sandwich)
-	cons-of-atom-to-list-should-add-atom-to-list-head)
+	"cons of atom to list should add atom to list head")
 
 (is
 	(car (cons banana (and honey sandwich)))
 	banana
-	cons-of-atom-to-list-should-add-atom-to-list-head)
+	"cons of atom to list should add atom to list head")
 
 (is
 	(car (cons (banana) (and honey sandwich)))
 	(banana)
-	cons-of-list-to-list-should-add-list-to-list-head)
+	"cons of list to list should add list to list head")

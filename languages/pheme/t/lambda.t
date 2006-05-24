@@ -6,10 +6,17 @@
 	(lambda (l)
 		(car (cdr l))))
 
-(is (cdr (biz baz buzz)) (baz buzz) cdr-gives-final-two-elements)
-
-(is (car (cdr (biz baz buzz))) baz car-gives-first-element)
+(is
+	(cdr (biz baz buzz))
+	(baz buzz)
+	"cdr gives final two elements")
 
 (is
-	(carcar (biz baz buzz)) baz
-	head-of-two-element-list-is-first-element)
+	(car (cdr (biz baz buzz)))
+	baz
+	"car gives first element")
+
+(is
+	(carcar (biz baz buzz))
+	baz
+	"head of two element list is first element")
