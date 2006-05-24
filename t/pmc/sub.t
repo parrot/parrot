@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 45;
 use Parrot::Config;
 
 =head1 NAME
@@ -1142,4 +1142,27 @@ CODE
 /uninit.*\n.*\nback\nok/
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', ':postcomp');
+.sub main :main
+    print "main\n"
+.end
+.sub pc :postcomp
+    print "pc\n"
+.end
+.sub im :immediate
+    print "im\n"
+.end
+.sub pc2 :postcomp
+    print "pc2\n"
+.end
+.sub im2 :immediate
+    print "im2\n"
+.end
+CODE
+im
+im2
+pc
+pc2
+main
+OUTPUT
 
