@@ -15,6 +15,10 @@ Builtins:
 	- add nil?
 	- fix car on empty cons
 
+Special forms:
+	- cond
+	- quote
+
 Compiler:
 	- extract and merge POST improvements with Punie
 		- publish them under compilers/
