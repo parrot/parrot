@@ -58,6 +58,8 @@ handler opcode span.
 
 These are the opcodes relevant to exceptions and exception handlers:
 
+=over
+
 =item B<throw I<PMC>>
 
 The C<throw> opcode throws the given PMC as an exception.
