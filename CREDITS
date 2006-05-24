@@ -109,7 +109,7 @@ D: Designer and demagogue
 E: chip@pobox.com
 
 N: chromatic
-D: SDL library and examples; Test::Builder; test suite cleanup
+D: SDL library and examples; Test::Builder; test suite cleanup; Pheme
 
 N: Clayton O'Neill
 D: Fix for parrot linking issue on Solaris 8

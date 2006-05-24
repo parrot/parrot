@@ -35,5 +35,7 @@ t/car.t
 t/cdr.t
 t/cons.t
 t/lambda.t
+t/quote.t
+t/write.t
 README
 TODO

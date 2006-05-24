@@ -88,13 +88,26 @@ transform maybe_op (PAST::Exp) :language('PIR') {
 }
 
 transform maybe_op (PAST::Val) :language('PIR') {
+	.local string value
+	.local string valtype
+
+	value   = node.'value'()
+	valtype = node.'valtype'()
+
+	unless valtype goto treat_as_op
+
+	.local pmc val
+	val = new 'PAST::Val'
+	val.'value'( value )
+	val.'valtype'( valtype )
+
+	.return( val )
+
+  treat_as_op:
 	.local pmc op
 	op = new 'PAST::Op'
 
-	.local string op_name
-	op_name = node.'value'()
-
-	op.'op'( op_name )
+	op.'op'( value )
 
 	.return( op )
 }
@@ -156,8 +169,33 @@ transform result (atom) :language('PIR') {
 	.local string value
 	value    = node
 
+	.local string valtype
+	valtype  = ''
+
+	.local int quote
+	.local int value_length
+	value_length = length value
+
+	quote = exists node['quote']
+	unless quote goto check_double_quoted
+
+	dec value_length
+	value   = substr value, 1, value_length
+	valtype = 'literal'
+	goto unquoted
+
+  check_double_quoted:
+	quote = exists node['quoted_string']
+	unless quote goto unquoted
+
+	sub value_length, 2
+	value   = substr value, 1, value_length
+	valtype = 'literal'
+	goto unquoted
+
+  unquoted:
 	result.'value'( value )
-	result.'valtype'( '' )
+	result.'valtype'( valtype )
 	.return( result )
 }
 

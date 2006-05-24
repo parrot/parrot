@@ -17,7 +17,6 @@ Builtins:
 
 Special forms:
 	- cond
-	- quote
 
 Compiler:
 	- extract and merge POST improvements with Punie
@@ -51,8 +50,6 @@ Grammar:
 		- . + - allowed at the start of a number
 	- add more rules
 		- ` indicates almost constant data
-		- ' indicates literal data
-		- " delimits strings
 		- \ is an escape character
 
 Predicates:

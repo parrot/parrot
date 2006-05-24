@@ -10,7 +10,7 @@
 	(a b c)
 	"car of ((a b c) x y z) should be (a b c)")
 
-(is (car ()) 'nil' 'car of empty list should be nil')
+(is (car ()) "nil" "car of empty list should be nil")
 
 (is_deeply
 	(car

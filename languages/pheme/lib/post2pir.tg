@@ -95,14 +95,27 @@ transform resolve_ops (POST::Ops) :language('PIR') {
 	.local string child_type
 	child_type = typeof first_child
 
-	unless child_type == 'POST::Op' goto insert_check
+	unless child_type == 'POST::Op' goto maybe_an_exp
 	.return( node )
 
+  maybe_an_exp:
+ 	.local string op_type
+	unless child_type == 'POST::Val' goto insert_check
+	.local string valtype
+	valtype = first_child.'valtype'()
+	unless valtype goto insert_check
+	op_type = '__list_to_cons'
+	goto return_node
+
   insert_check:
+	op_type = '__resolve_at_runtime' 
+
+  return_node:
   	.local pmc check_node
 	check_node = new 'POST::Op'
-	check_node.'op'( '__resolve_at_runtime' )
+	check_node.'op'( op_type )
 	unshift children, check_node
+
 	.return( node )
 }
 
