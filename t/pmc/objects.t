@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 76;
+use Parrot::Test tests => 75;
 
 =head1 NAME
 
@@ -1714,75 +1714,6 @@ CODE
 OUTPUT
 }
 
-{ local $TODO = "new Px, Ix: argcP is wrong in __init method";
-pir_output_is(<<'CODE', <<'OUTPUT', "__init argcP");
-
-.sub main :main
-    $P0 = newclass "Foo"
-    $I0 = find_type "Foo"
-
-    argcI = 2
-    argcS = 3
-    argcP = 4
-    argcN = 5
-
-    print "a: "
-    print argcI
-    print argcS
-    print argcP
-    print argcN
-    print "\n"
-
-    $P0 = new $I0
-
-    print "b: "
-    print argcI
-    print argcS
-    print argcP
-    print argcN
-    print "\n"
-
-    argcI = 6
-    argcS = 7
-    argcP = 8
-    argcN = 9
-
-    print "c: "
-    print argcI
-    print argcS
-    print argcP
-    print argcN
-    print "\n"
-    $P0 = new $I0, $P0
-    print "d: "
-    print argcI
-    print argcS
-    print argcP
-    print argcN
-    print "\n"
-
-    end
-.end
-
-.namespace ["Foo"]
-.sub __init :method
-    print "X: "
-    print argcI
-    print argcS
-    print argcP
-    print argcN
-    print "\n"
-.end
-CODE
-a: 2345
-X: 0000
-b: 2345
-c: 6789
-X: 0010
-d: 6789
-OUTPUT
-
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "namespace vs name");
 .sub main :main
