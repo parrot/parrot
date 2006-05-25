@@ -1570,8 +1570,6 @@ ok 4
 MyInt2(42)
 OUTPUT
 
-TODO: {
-  local $TODO = "methods can't be overridden in derived class only";
 pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
 
 .sub main :main
@@ -1635,7 +1633,7 @@ ok 4
 42
 MyInt2(42)
 OUTPUT
-};
+
 
 pir_output_is(<<'CODE', <<'OUTPUT', "subclassing ParrotClass");
 
@@ -2088,7 +2086,7 @@ __init Bar
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)", todo=>'rt #39056');
+pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)");
 .sub main :main
     .local pmc base
     $P0 = getclass 'Integer'

@@ -199,7 +199,8 @@ on the existence of the method for this class.
 */
 
 static void
-create_deleg_pmc_vtable(Interp *interpreter, PMC *class, PMC *class_name)
+create_deleg_pmc_vtable(Interp *interpreter, PMC *class, 
+        PMC *class_name, int full)
 {
     int i;
     const char *meth;
@@ -235,7 +236,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, PMC *class_name)
                     class_name, meth);
 #endif
         }
-        else {
+        else if (full) {
             /*
              * if the method doesn't exist, put in the deleg_pmc vtable,
              * but only if ParrotObject hasn't overridden the method
@@ -374,7 +375,29 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
          * then create a vtable derived from ParrotObject and
          * deleg_pmc - the ParrotObject vtable is already built
          */
-        create_deleg_pmc_vtable(interpreter, child_class, name);
+        create_deleg_pmc_vtable(interpreter, child_class, name, 1);
+    }
+    else {
+        /*
+         * if any parent isa PMC, then still individual vtables might
+         * be overridden in this subclass
+         */
+        const PMC* parent;
+        int i, n, any_pmc_parent;
+
+        n = VTABLE_elements(interpreter, mro);
+        any_pmc_parent = 0;
+
+        /* 0 = this, 1 = parent (handled above), 2 = grandpa */
+        for (i = 2; i < n; ++i) {
+            parent = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
+            if (!PObj_is_class_TEST(parent)) {
+                any_pmc_parent = 1;
+                break;
+            }
+        }
+        if (any_pmc_parent)
+            create_deleg_pmc_vtable(interpreter, child_class, name, 0);
     }
     return child_class;
 }
