@@ -92,22 +92,6 @@ dump_mmd(Interp *interpreter, INTVAL function)
 }
 #endif
 
-/*
- * isa_str contains for real objects and for deleg_pmc objects
- * both the string "delegate" - so compare a vtable slot
- */
-
-extern void Parrot_deleg_pmc_mark(Interp*, PMC* pmc);
-
-static int
-isa_deleg_pmc(Interp *interpreter, PMC *p)
-                __attribute__nonnull__(2);
-
-static int
-isa_deleg_pmc(Interp *interpreter, PMC *p)
-{
-    return p->vtable->mark == Parrot_deleg_pmc_mark;
-}
 
 funcptr_t
 get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,

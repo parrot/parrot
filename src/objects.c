@@ -246,11 +246,6 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, PMC *class_name)
                 ((void **)vtable)[i] = ((void**)object_vtable)[i];
         }
     }
-    /*
-     * a cruel hash to disceren a delegate from a deleg_pmc vtable
-     * see also src/mmd.c:isa_deleg_pmc
-     */
-    class->vtable->mark = vtable->mark;
 }
 
 /*
