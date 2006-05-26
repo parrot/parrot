@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 27;
 
 =head1 NAME
 
@@ -1012,17 +1012,3 @@ CODE
 current instr\.:/
 OUTPUT
 #'
-
-pir_output_is(<<'CODE', <<'OUTPUT', "Inherited join method")
-.sub main :main
-    $P0 = new .ResizableStringArray
-    $P0[0] = "Foo"
-    $P0[1] = "Bar"
-    $P0[2] = "Baz"
-    $S0 = $P0.'join'("-")
-    print $S0
-    print "\n"
-.end
-CODE
-Foo-Bar-Baz
-OUTPUT

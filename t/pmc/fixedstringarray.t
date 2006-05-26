@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -370,48 +370,6 @@ CODE
 2000
 4000
 8000
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "join method - empty array");
-.sub main :main
-    $P0 = new .FixedStringArray
-    $S0 = $P0.'join'("--")
-    print $S0
-    print "\n"
-    end
-.end
-CODE
-
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "join method - single elem");
-.sub main :main
-    $P0 = new .FixedStringArray
-    $P0 = 1
-    $P0[0] = "Foo"
-    $S0 = $P0.'join'("--")
-    print $S0
-    print "\n"
-    end
-.end
-CODE
-Foo
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "join method - multiple elements");
-.sub main :main
-    $P0 = new .FixedStringArray
-    $P0 = 3
-    $P0[0] = "Foo"
-    $P0[1] = "Bar"
-    $P0[2] = "Baz"
-    $S0 = $P0.'join'("::")
-    print $S0
-    print "\n"
-    end
-.end
-CODE
-Foo::Bar::Baz
 OUTPUT
 
 1;
