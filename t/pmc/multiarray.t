@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -217,4 +217,42 @@ CODE
 0
 1
 0
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', 'Verify Basic Iterator support');
+  .sub test :main
+     $P1 = new 'ResizablePMCArray'
+
+     $P1[0] = 0
+     $P1[1] = 4
+
+     $P2 = new 'Key'
+     $P2 = 2
+     $P3 = new 'Key'
+     $P3 = 2
+     push $P2, $P3
+
+     $P1[2] = 1
+     $P1[3] = $P2
+
+     $P0 = new 'MultiArray', $P1
+
+     $P0[0;0] = 1
+     $P0[1;0] = 2
+     $P0[0;1] = 3
+     $P0[1;1] = 4
+
+     $P9 = new 'Iterator', $P0
+loop:
+    unless $P9 goto end_loop
+    $P10 = shift $P9
+    say $P10
+    goto loop
+end_loop:
+  .end
+CODE
+1
+2
+3
+4
 OUTPUT
