@@ -522,6 +522,37 @@ Used to unarchive the string.
                 data[i] = io->vtable->shift_string(INTERP, io);
         }
     }
+
+/*
+
+=item C<STRING *join(STRING *sep)>
+
+Join the strings in the array into a single string, separating each element by
+sep.
+
+=cut
+
+*/
+
+    METHOD STRING* join(STRING *sep) {
+        INTVAL n    = VTABLE_elements(INTERP, SELF);
+        STRING *str = string_make_empty(INTERP, enum_stringrep_one, 0);
+        STRING **data;
+        int i;
+        
+        if (n == 0)
+            return str;
+        
+        data = PMC_data(SELF);
+        string_append(INTERP, str, data[0], 1);
+        
+        for (i=1; i<n; i++) {
+            string_append(INTERP, str, sep, 1);
+            string_append(INTERP, str, data[i], 1);
+        }
+        
+        return str;
+    }
 }
 
 /*
