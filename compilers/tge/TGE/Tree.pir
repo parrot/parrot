@@ -1,19 +1,27 @@
-# Copyright 2005, The Perl Foundation.
+# Copyright 2005-2006, The Perl Foundation.
 
 =head1 NAME
 
-TGE::Instance - the runtime engine for TGE
+TGE::Tree - The top-level node of every tree.
 
 =head1 DESCRIPTION
 
+A TGE::Tree is the core object at the center of every tree transformation. You
+can think of it as something like a PGE::Match object. The first step of
+applying every tree grammar is to create a TGE::Tree object and wrap it around
+the tree being transformed. The TGE::Tree object handles result caching for
+particular transform rules on particular nodes, maintains connections between
+particular nodes and the transforms that can apply to those nodes, and will
+eventually handle indexing for faster tree searches.
+
 =cut
 
-.namespace [ "TGE::Instance" ]
+.namespace [ "TGE::Tree" ]
 
 .sub "__onload" :load
     # define the class
     .local pmc base
-    newclass base, "TGE::Instance"
+    newclass base, "TGE::Tree"
     addattribute base, "cell"  # a hash for storing values of tree nodes
     addattribute base, "visit" # arrays of rules that apply to each node type
     addattribute base, "data"  # the original unmodified tree
@@ -22,7 +30,7 @@ TGE::Instance - the runtime engine for TGE
 
 =head2 new
 
-Returns a simple initialized TGE::Instance object. Doesn't accept any
+Returns a simple initialized TGE::Tree object. Doesn't accept any
 constructor parameters.
 
 =cut
@@ -73,13 +81,13 @@ end_loop:
 
 =head2 get
 
-  value = AGI.get('attrname')
+  value = Tree.get('attrname')
 
 Fetches the value of a particular attribute from the root node of the
 grammar.
 
-  value = AGI.get('attrname', node)
-  value = AGI.get('attrname', node, 'type')
+  value = Tree.get('attrname', node)
+  value = Tree.get('attrname', node, 'type')
 
 Fetches the value of a particular attribute from the node passed in.
 When working with a tree where the nodes don't know their type (PGE

@@ -82,7 +82,7 @@ applies to a child of the current node (generally inherited attributes).
     # use other modules
     load_bytecode 'PGE.pbc'
     load_bytecode 'compilers/tge/TGE/Rule.pbc'
-    load_bytecode 'compilers/tge/TGE/Instance.pbc'
+    load_bytecode 'compilers/tge/TGE/Tree.pbc'
     load_bytecode 'compilers/tge/TGE/Parser.pbc'
 
     # define the class
@@ -264,7 +264,7 @@ I<top node> of the data structure.
     .param pmc tree
     .local pmc newtree
     .local pmc visit
-    newtree = new 'TGE::Instance'
+    newtree = new 'TGE::Tree'
     setattribute newtree, 'data', tree
     visit = getattribute newtree, 'visit' 
     # Build up the visit hash

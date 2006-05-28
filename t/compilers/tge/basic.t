@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2005, The Perl Foundation.  All Rights Reserved.
+# Copyright 2005-2006, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -11,7 +11,7 @@ use Parrot::Test;
 
 =head1 NAME
 
-t/basic.t - testing a few basic components of TGE and TGE::Instance
+t/basic.t - testing a few basic components of TGE and TGE::Tree
 
 =head1 SYNOPSIS
 
@@ -52,10 +52,10 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', 'autoincrementing id generator');
 .sub _main :main
-    load_bytecode 'compilers/tge/TGE/Instance.pir'
+    load_bytecode 'compilers/tge/TGE/Tree.pir'
     
     .local pmc new_id
-    new_id = find_global 'TGE::Instance', '_new_id'
+    new_id = find_global 'TGE::Tree', '_new_id'
     .local int id
     id = new_id()
     print id
