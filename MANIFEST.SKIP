@@ -165,6 +165,8 @@
 # generated from svn:ignore of 'compilers\tge\TGE/'
 ^compilers\tge\TGE/.*\.pbc$
 ^compilers\tge\TGE/.*\.pbc/
+^compilers/tge/TGE/Parser\.pir$
+^compilers/tge/TGE/Parser\.pir/
 # generated from svn:ignore of 'docs/'
 ^docs/.*\.tmp$
 ^docs/.*\.tmp/

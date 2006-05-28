@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-TGE::Compiler - parser for the grammar syntax of TGE
+TGE::Compiler - A compiler for the grammar syntax of TGE.
 
 =head1 DESCRIPTION
 
