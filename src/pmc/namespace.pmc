@@ -349,9 +349,6 @@ Return the name of this namespace part.
 
 Returns the name of the namespace as an array of strings.
 
-XXX Should the NULL String of namespace root be included?
-    See also t/pmc/namespace_20.pir.  
-
   $P2 = $P3.'name'()
   $S0 = join '::', $P2            # '::Foo::Bar'
 
@@ -368,6 +365,10 @@ XXX Should the NULL String of namespace root be included?
             VTABLE_unshift_string(INTERP, ar, PMC_data(ns));
             ns = PMC_pmc_val(ns);
         }
+        
+        /* remove the NULL string of the namespace root */
+        VTABLE_shift_string(INTERP, ar);
+        
         return ar;
     }
 

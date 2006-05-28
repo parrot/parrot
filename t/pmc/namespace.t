@@ -324,7 +324,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
 CODE
 ok
 baz
-::parrot::Foo::Bar
+parrot::Foo::Bar
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "segv in get_name");
@@ -415,11 +415,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "ns.name()");
     print $S0
     print "\n"
 .end
-# namespace root doesnt have a name
-# XXX should the root namespace be included?
 CODE
-3
-::parrot::Foo
+2
+parrot::Foo
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
@@ -452,13 +450,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
     print $S0
     print "\n"
 .end
-# namespace root doesnt have a name
-# XXX should the root namespace be included?
 CODE
-3
-::parrot::Foo
-3
-::parrot::Foo
+2
+parrot::Foo
+2
+parrot::Foo
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Sub.get_namespace, get_namespace");
@@ -481,7 +477,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Sub.get_namespace, get_namespace");
 .end
 CODE
 ok
-::parrot::Foo
+parrot::Foo
 Foo
 OUTPUT
 
