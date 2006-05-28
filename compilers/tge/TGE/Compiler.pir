@@ -1,16 +1,14 @@
-# Copyright 2005, The Perl Foundation.
+# Copyright (C) 2005-2006, The Perl Foundation.
 
 =head1 NAME
 
-TGE::Parser - parser for the grammar syntax of TGE
+TGE::Compiler - parser for the grammar syntax of TGE
 
 =head1 DESCRIPTION
 
 =cut
 
-.namespace [ 'TGE::Parser' ]
-
-.include "compilers/tge/TGE/Parser_gen.pir"
+.namespace [ 'TGE::Compiler' ]
 
 =head2 agparse
 
@@ -55,21 +53,21 @@ structure.
     # Construct a tree grammar for manipulating the parse tree
     .local pmc grammar
     grammar = new "TGE"
-    $P3 = find_global "TGE::Parser", "ROOT_result"
+    $P3 = find_global "TGE::Compiler", "ROOT_result"
     grammar.agrule("ROOT", "result", ".", $P3)
-    $P3 = find_global "TGE::Parser", "statements_result"
+    $P3 = find_global "TGE::Compiler", "statements_result"
     grammar.agrule("statements", "result", ".", $P3)
-    $P3 = find_global "TGE::Parser", "transrule_result"
+    $P3 = find_global "TGE::Compiler", "transrule_result"
     grammar.agrule("transrule", "result", ".", $P3)
-    $P3 = find_global "TGE::Parser", "type_value"
+    $P3 = find_global "TGE::Compiler", "type_value"
     grammar.agrule("type", "value", ".", $P3)
-    $P3 = find_global "TGE::Parser", "name_value"
+    $P3 = find_global "TGE::Compiler", "name_value"
     grammar.agrule("name", "value", ".", $P3)
-    $P3 = find_global "TGE::Parser", "parent_value"
+    $P3 = find_global "TGE::Compiler", "parent_value"
     grammar.agrule("parent", "value", ".", $P3)
-    $P3 = find_global "TGE::Parser", "action_value"
+    $P3 = find_global "TGE::Compiler", "action_value"
     grammar.agrule("action", "value", ".", $P3)
-    $P3 = find_global "TGE::Parser", "language_value"
+    $P3 = find_global "TGE::Compiler", "language_value"
     grammar.agrule("language", "value", ".", $P3)
 
     .return (grammar)

@@ -84,6 +84,7 @@ applies to a child of the current node (generally inherited attributes).
     load_bytecode 'compilers/tge/TGE/Rule.pbc'
     load_bytecode 'compilers/tge/TGE/Tree.pbc'
     load_bytecode 'compilers/tge/TGE/Parser.pbc'
+    load_bytecode 'compilers/tge/TGE/Compiler.pbc'
 
     # define the class
     .local pmc base
@@ -181,7 +182,7 @@ Compile a grammar from a source string.
     .local pmc rule_data
     .local string header_string
 
-     agparse = find_global 'TGE::Parser', 'agparse'
+     agparse = find_global 'TGE::Compiler', 'agparse'
      rule_data = agparse(source)
 
     # Construct grammar rules from the data structure of rule info

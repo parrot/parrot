@@ -17,7 +17,7 @@ all: $(PARROT_LIBRARY)@slash@TGE.pbc
 $(PARROT_LIBRARY)@slash@TGE.pbc: TGE.pbc
 	$(CP) TGE.pbc $(PARROT_LIBRARY)
 
-TGE.pbc: TGE.pir TGE@slash@Rule.pbc TGE@slash@Parser.pbc TGE@slash@Tree.pbc
+TGE.pbc: TGE.pir TGE@slash@Rule.pbc TGE@slash@Parser.pbc TGE@slash@Compiler.pbc TGE@slash@Tree.pbc
 	$(PARROT) -o TGE.pbc --output-pbc TGE.pir 
 
 TGE@slash@Rule.pbc: TGE@slash@Rule.pir
@@ -26,9 +26,14 @@ TGE@slash@Rule.pbc: TGE@slash@Rule.pir
 TGE@slash@Tree.pbc: TGE@slash@Tree.pir
 	$(PARROT) -o TGE@slash@Tree.pbc --output-pbc TGE@slash@Tree.pir 
 
-TGE@slash@Parser.pbc: TGE@slash@Parser.pir TGE@slash@Parser.pg
-	$(PARROT) $(PGE_DIR)@slash@pgc.pir --output=TGE@slash@/Parser_gen.pir TGE@slash@/Parser.pg
+TGE@slash@Compiler.pbc: TGE@slash@Compiler.pir
+	$(PARROT) -o TGE@slash@Compiler.pbc --output-pbc TGE@slash@Compiler.pir 
+
+TGE@slash@Parser.pbc: TGE@slash@Parser.pir
 	$(PARROT) -o TGE@slash@Parser.pbc --output-pbc TGE@slash@Parser.pir 
+
+TGE@slash@Parser.pir: TGE@slash@Parser.pg
+	$(PARROT) $(PGE_DIR)@slash@pgc.pir --output=TGE@slash@/Parser.pir TGE@slash@/Parser.pg
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -57,9 +62,13 @@ testclean:
 	$(RM_RF) "..@slash@..@slash@t@slash@compilers@slash@tge@slash@*.pir"
 
 clean: testclean
-	$(RM_RF) TGE.pbc $(PARROT_LIBRARY)@slash@TGE.pbc
-	$(RM_RF) TGE@slash@Rule.pbc TGE@slash@Parser.pbc
-	$(RM_RF) TGE@slash@Tree.pbc
+	$(RM_RF) TGE.pbc \
+	TGE@slash@Rule.pbc \
+	TGE@slash@Parser.pir \
+	TGE@slash@Parser.pbc \
+	TGE@slash@Tree.pbc \
+	TGE@slash@Compiler.pbc \
+	$(PARROT_LIBRARY)@slash@TGE.pbc \
 
 realclean: clean
 	$(RM_RF) Makefile
