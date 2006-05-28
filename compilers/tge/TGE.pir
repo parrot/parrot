@@ -1,4 +1,4 @@
-# Copyright 2005, The Perl Foundation.
+# Copyright 2005-2006, The Perl Foundation.
 
 =head1 NAME
 
@@ -6,8 +6,8 @@ TGE - A tree grammar engine.
 
 =head1 SYNOPSIS
 
-    # define a grammar leaf.g
-    Leaf:   min(.) = { 
+    # define a grammar leaf.tg
+    transform min (Leaf) :language('PIR') { 
         $P1 = getattribute node, "value"
         .return ($P1)
     }
@@ -51,19 +51,28 @@ grammars.
 
 This is the syntax for tree grammar rules:
 
-    type: name(parent) = {
+    transform name (pattern) {
         # action
     }
 
-The I<type> is the type of node this particular rule applies to. The
-I<name> is the name of the attribute the rule defines a value for. The
-I<parent> says which node the attribute applies to: '.' if the attribute
-applies to the current node (generally synthesized attributes),
-'.childname' if the attribute applies to a child of the current node
-(generally inherited attributes). The I<action> is a block of PIR code
-run to get the value of the attribute. Within the block, two parameters
-are supplied for you: C<node> is the current node considered, and
-C<tree> is the top-level node for the entire tree.
+The I<name> is the name of the transform rule. The I<pattern> is the type of
+node this particular transform applies to. You can have multiple transforms
+with the same name, as long as they match different patterns. The I<action> is
+a block of code that executes the transform. You can specify what language the
+action code is written in with the C<:language> modifier. At the moment, the
+only valid language is PIR. Within the block, two parameters are supplied for
+you: C<node> is the current node considered, and C<tree> is the top-level node
+for the entire tree.
+
+The C<:applyto> modifier says which node the transform applies to. 
+
+    transform name (pattern) :applyto('childname') {
+        # action
+    }
+
+By default the transform applies to the current node (generally synthesized
+attributes), but you can specify the name of a child node if the transform
+applies to a child of the current node (generally inherited attributes).
 
 =cut
 
