@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2001-2006 Yet Another Society.  All rights reserved.
+Copyright (C) 2001-2006 The Perl Foundation.
 $Id$
 
 =head1 NAME
