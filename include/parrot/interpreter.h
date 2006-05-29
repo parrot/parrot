@@ -301,11 +301,6 @@ struct parrot_interp_t {
     int         n_libs;                       /* count of libs below */
     op_lib_t  **all_op_libs;                  /* all loaded opcode libraries */
 
-/* XXX kwoo:  Is this for future, or is it safe to remove? */
-#if 0
-    str_func_t *string_funcs;
-#endif
-
     Interp_flags flags;                       /* Various interpreter flags that */
 
     UINTVAL debug_flags;                      /* debug settings */
