@@ -302,7 +302,8 @@ Dami^WLeopold Toetsch (as if you couldn't guess)
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003, Leopold Toetsch. All Rights Reserved.
+Copyright (C) 2003, The Perl Foundation.
+
 This module is free software. It may be used, redistributed
 and/or modified under the same terms as Parrot.
 

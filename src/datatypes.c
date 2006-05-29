@@ -1,5 +1,5 @@
 /*
-Copyright: (c) 2002-2005 Leopold Toetsch <lt@toetsch.at>
+Copyright (C) 2002-2005, The Perl Foundation.
 License:  Artistic/GPL, see README and LICENSES for details
 $Id$
 

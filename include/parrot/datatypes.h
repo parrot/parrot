@@ -1,6 +1,6 @@
 /*
  * datatypes.h
- *  Copyright: (c) 2002 Leopold Toetsch <lt@toetsch.at>
+ *  Copyright (C) 2002, The Perl Foundation.
  *  License:  Artistic/GPL, see README and LICENSES for details
  *  SVN Info
  *     $Id$
