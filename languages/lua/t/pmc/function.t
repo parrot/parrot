@@ -17,7 +17,7 @@ Tests C<LuaFunction> PMC
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -209,3 +209,32 @@ nil
 nil
 OUTPUT
 
+TODO: {
+local $TODO = 'PBC loader does not support LuaFunction';
+
+pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
+.namespace [ "Lua" ]
+.HLL "Lua", "lua_group"
+
+#.include "languages/lua/lib/luaaux.pir"
+#.include "languages/lua/lib/luabasic.pir"
+
+.sub __start :main
+#    init_basic()  
+    load_bytecode "languages/lua/lib/luaaux.pbc"
+    load_bytecode "languages/lua/lib/luabasic.pbc"
+    _main()
+.end
+
+.sub _main :anon
+    .local pmc tmp_0
+    tmp_0 = find_global "_G"
+    .const .LuaString cst_1 = "print"
+    .local pmc tmp_1
+    tmp_1 = tmp_0[cst_1]
+    tmp_1(tmp_1)
+.end
+CODE
+/function: [0-9A-Fa-f]{8}/
+OUTPUT
+}
