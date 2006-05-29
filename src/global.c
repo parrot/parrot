@@ -88,6 +88,7 @@ Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
 
     if (PMC_IS_NULL(ns))
         return Parrot_find_global(interpreter, NULL, name);
+    
     switch (ns->vtable->base_type) {
         case enum_class_String:
             return Parrot_find_global(interpreter, PMC_str_val(ns), name);
@@ -240,6 +241,7 @@ Parrot_store_global(Interp *interpreter, STRING *class,
     }
     else
         stash = CONTEXT(interpreter->ctx)->current_namespace;
+    
     VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
     Parrot_invalidate_method_cache(interpreter, class, globalname);
 }
@@ -268,7 +270,7 @@ store_sub(Interp *interpreter, STRING *class,
     Parrot_invalidate_method_cache(interpreter, class, globalname);
     /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure 
      * MultiSub could also contain subs from various namespaces,
-     * that it doesn't make much sense, to associate a namespace
+     * so it doesn't make much sense to associate a namespace
      * with a multi.
      *
      */
@@ -291,6 +293,7 @@ store_sub_p(Interp *interpreter, PMC *namespace,
         VTABLE_set_pmc_keyed(interpreter, globals, namespace, stash);
     }
     VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
+    
     /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure */
     if (pmc->vtable->base_type != enum_class_MultiSub)
         PMC_sub(pmc)->namespace_stash = stash;
@@ -355,7 +358,7 @@ Parrot_multi_long_name(Parrot_Interp interpreter, PMC* sub_pmc)
 }
 
 static void
-store_nonanon_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
+store_named_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
 {
     STRING* sub_name;
     PMC *multi_sig;
@@ -363,9 +366,10 @@ store_nonanon_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
     INTVAL func_nr;
     char *c_meth;
 
-    sub_name = PMC_sub(sub_pmc)->name;
+    sub_name  = PMC_sub(sub_pmc)->name;
     namespace = PMC_sub(sub_pmc)->namespace;
     multi_sig = PMC_sub(sub_pmc)->multi_signature;
+    
     if (PMC_IS_NULL(multi_sig)) {
         store_sub_in_namespace(interpreter, sub_pmc, namespace, sub_name);
     }
@@ -388,14 +392,18 @@ store_nonanon_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
         else
             multi_sub = Parrot_find_global_p(interpreter, namespace, sub_name);
         
+        /* is there an existing MultiSub PMC? or do we need to create one? */
         if (PMC_IS_NULL(multi_sub)) {
             multi_sub = pmc_new(interpreter, enum_class_MultiSub);
+            /* we have to push the sub onto the MultiSub before we try to store
+               it because storing requires information from the sub */
             VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
             store_sub_in_namespace(interpreter, multi_sub,
                     namespace, sub_name);
         }
         else
             VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
+        
         long_name = Parrot_multi_long_name(interpreter, sub_pmc);
         store_sub_in_namespace(interpreter, sub_pmc, namespace, long_name);
 
@@ -408,23 +416,25 @@ store_nonanon_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
 }
 
 void
-Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* pmc)
+Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC *sub)
 {
-    if (!(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_ANON)) {
-        INTVAL cur_id =  CONTEXT(interpreter->ctx)->current_HLL;
+    if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {
+        INTVAL cur_id = CONTEXT(interpreter->ctx)->current_HLL;
         /* PF structures aren't fully constructed yet */
         Parrot_block_DOD(interpreter);
         /* store relative to HLL namespace */
-        CONTEXT(interpreter->ctx)->current_HLL = PMC_sub(pmc)->HLL_id;
-        store_nonanon_in_namespace(interpreter, pmc);
+        CONTEXT(interpreter->ctx)->current_HLL = PMC_sub(sub)->HLL_id;
+        
+        store_named_in_namespace(interpreter, sub);
+        
         /* restore HLL_id */
         CONTEXT(interpreter->ctx)->current_HLL = cur_id;
         Parrot_unblock_DOD(interpreter);
     }
     else {
         PMC *stash = VTABLE_get_pmc_keyed_int(interpreter, 
-                interpreter->HLL_namespace, PMC_sub(pmc)->HLL_id);
-        PMC_sub(pmc)->namespace_stash = stash;
+                interpreter->HLL_namespace, PMC_sub(sub)->HLL_id);
+        PMC_sub(sub)->namespace_stash = stash;
     }
 }
 /*
