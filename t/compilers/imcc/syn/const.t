@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use vars qw($TODO);
 
 pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
@@ -595,4 +595,20 @@ CODE
 10.000000
 OUT
 
-
+pir_output_is(<<'CODE', <<'OUT', "RT # 34991");
+.const int c = 12
+.sub test
+    .local float a
+    a = 96
+    # Uncomment this line, and the c symbol is 'forgotten'
+    a += c
+    print a
+    print_newline
+    print c
+    print_newline
+    end
+.end
+CODE
+108.000000
+12
+OUT
