@@ -286,7 +286,7 @@ Returns the PMC global value for C<key>.
                 new_interp->iglobals, key);
         /* quick hack to get the global stash */
         if (key == -1)
-            return new_interp->stash_hash;
+            return new_interp->root_namespace;
         return NULL;
     }
 
@@ -320,7 +320,7 @@ Introspection interface. C<key> can be:
         item =  key_string(interpreter, key);
         s = CONST_STRING(interpreter, "globals");
         if (string_equal(interpreter, item, s) == 0)
-            return interpreter->stash_hash;
+            return interpreter->root_namespace;
         outer = NULL;
         s = CONST_STRING(interpreter, "outer");
         if (string_equal(interpreter, item, s) == 0) {
@@ -584,7 +584,7 @@ Finish thawing.
              * XXX always try to fetch namespace first?
              */
 
-            ns_hash = Parrot_global_namespace(INTERP, INTERP->stash_hash,
+            ns_hash = Parrot_global_namespace(INTERP, INTERP->root_namespace,
                     hll_name);
             /* cache HLLs toplevel namespace */
             VTABLE_set_pmc_keyed_int(INTERP, INTERP->HLL_namespace, 

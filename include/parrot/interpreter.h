@@ -276,8 +276,6 @@ struct parrot_interp_t {
     struct Interp_Context ctx;
     context_mem ctx_mem;                      /* ctx memory managment */
 
-    struct PMC *stash_hash;                   /* namespace hash */
-
     struct Arenas *arena_base;                /* Pointer to this interpreter's
                                                * arena */
 
@@ -345,6 +343,8 @@ struct parrot_interp_t {
 
     PMC* HLL_info;                            /* storage for HLL names and types */
     PMC* HLL_namespace;                       /* cache of HLL toplevel ns */
+
+    PMC *root_namespace;                      /* namespace hash */
 
     MMD_table *binop_mmd_funcs;               /* Table of MMD functions */
     UINTVAL n_binop_mmd_funcs;                /* function count */

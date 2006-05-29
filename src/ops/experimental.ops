@@ -255,21 +255,21 @@ op get_namespace(out PMC) {
 }
 
 op get_namespace(out PMC, in PMC) {
-    PMC *ns_root = interpreter->stash_hash, *ns;
+    PMC *ns_root = interpreter->root_namespace, *ns;
     ns = VTABLE_get_pmc_keyed(interpreter, ns_root, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
 op get_namespace(out PMC, in KEY) {
-    PMC *ns_root = interpreter->stash_hash, *ns;
+    PMC *ns_root = interpreter->root_namespace, *ns;
     ns = VTABLE_get_pmc_keyed(interpreter, ns_root, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
 op get_namespace(out PMC, in STR) {
-    PMC *ns_root = interpreter->stash_hash, *ns;
+    PMC *ns_root = interpreter->root_namespace, *ns;
     ns = VTABLE_get_pmc_keyed_str(interpreter, ns_root, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();

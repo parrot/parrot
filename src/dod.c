@@ -323,8 +323,8 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
         pobject_lives(interpreter, (PObj*)interpreter->exception_list[i]);
     }
-    /* mark the stash_hash */
-    pobject_lives(interpreter, (PObj *)interpreter->stash_hash);
+    /* mark the root_namespace */
+    pobject_lives(interpreter, (PObj *)interpreter->root_namespace);
     /* s. packfile.c */
     mark_const_subs(interpreter);
 

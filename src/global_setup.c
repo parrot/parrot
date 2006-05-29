@@ -164,7 +164,7 @@ parrot_global_setup_2(Interp *interpreter)
     
 
     /* create the namespace root stash */
-    interpreter->stash_hash =
+    interpreter->root_namespace =
         pmc_new(interpreter, enum_class_NameSpace);
 
     interpreter->HLL_info = constant_pmc_new(interpreter,
@@ -178,7 +178,7 @@ parrot_global_setup_2(Interp *interpreter)
     parrot_ns = 
         VTABLE_get_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 0); 	
     CONTEXT(interpreter->ctx)->current_namespace = parrot_ns; 
-    VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash, 	
+    VTABLE_set_pmc_keyed_str(interpreter, interpreter->root_namespace, 	
             const_string(interpreter, "parrot"),
             parrot_ns);
     /* We need a class hash */

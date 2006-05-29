@@ -1600,7 +1600,7 @@ mmd_search_global(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
     PMC *pmc;
 
-    pmc = Parrot_find_global_p(interpreter, interpreter->stash_hash, meth);
+    pmc = Parrot_find_global_p(interpreter, interpreter->root_namespace, meth);
     if (pmc) {
         if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
             return 1;
@@ -1627,7 +1627,7 @@ mmd_get_ns(Interp *interpreter)
 
     ns_name = CONST_STRING(interpreter, "__parrot_core");
     ns = VTABLE_get_pmc_keyed_str(interpreter, 
-            interpreter->stash_hash, ns_name);
+            interpreter->root_namespace, ns_name);
     return ns;
 }
 
@@ -1639,11 +1639,11 @@ mmd_create_ns(Interp *interpreter)
 
     ns_name = CONST_STRING(interpreter, "__parrot_core");
     ns = VTABLE_get_pmc_keyed_str(interpreter, 
-            interpreter->stash_hash, ns_name);
+            interpreter->root_namespace, ns_name);
     if (PMC_IS_NULL(ns)) {
         ns = pmc_new(interpreter, enum_class_NameSpace);
         VTABLE_set_pmc_keyed_str(interpreter, 
-                interpreter->stash_hash, ns_name, ns);
+                interpreter->root_namespace, ns_name, ns);
     }
     return ns;
 }

@@ -113,7 +113,7 @@ Parrot_register_HLL(Interp *interpreter,
      * XXX always try to fetch namespace first?
      */
     ns_hash  = pmc_new(interpreter, enum_class_NameSpace);
-    VTABLE_set_pmc_keyed_str(interpreter, interpreter->stash_hash,
+    VTABLE_set_pmc_keyed_str(interpreter, interpreter->root_namespace,
             hll_name, ns_hash);
     /* cache HLLs toplevel namespace */
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 

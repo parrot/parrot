@@ -111,11 +111,6 @@ struct Arenas {
     void *  gc_private;         /* gc subsystem data */
 };
 
-struct Stash {
-    struct PMC *stash_hash;
-    struct Stash *parent_stash;
-};
-
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
 
 typedef enum {
