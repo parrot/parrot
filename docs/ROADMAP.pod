@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -7,20 +7,15 @@ ROADMAP - A plan for Parrot
 
 =head1 PURPOSE
 
-As of this writing, there is no one place in which all remaining parrot work is
-documented. There are various TODO files, the RT queue, comments in the source
-code and the documentation. This document is a first pass at unifying this
-information and providing a single point of reference for anyone interested in
-the current state of the parrot, whether they are developers looking for items
-to work on, or external users looking for an idea of when they can expect a
-release.
+There is no single place in which all remaining parrot work is documented.
+There are various TODO files, the RT queue, comments in the source code and
+the documentation. This document is a first pass at unifying this information
+and providing a single point of reference for anyone interested in the current
+state of the parrot, whether they are developers looking for items to work on,
+or external users looking for an idea of when they can expect a release.
 
 This document is not meant to contain all the metadata regarding particular
 tasks, but merely provide a summary of the tasks.
-
-This document is now becoming a roadmap, because the Architect is deep in a
-weeklong mindmeld with the Pumpking and the results are being encoded in this
-document, among others.
 
 For a high level overview of parrot milestones, please see:
 L<http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html>
@@ -315,13 +310,13 @@ from floating point types, sprintf output of bignumbers. L<PDD14>
 =item *
 
 Implement the Parrot equivalent of Perl 5's C<$0>, based on recent (January
-2005) mailing list activity.
+2005) mailing list activity. [[ 33923 ]]
 
 =item *
 
 The debugger needs to clone the interpreter to "allow people to play into the
 debugger and then continue the normal execution of the program."
-L<src/ops/debug.ops> (DONE). TODO - rewrite debugger. 
+L<src/ops/debug.ops> (DONE). TODO - rewrite debugger.
 
 =back
 
