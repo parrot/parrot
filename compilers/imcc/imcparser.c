@@ -296,7 +296,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright 2002-2006 The Perl Foundation. All Righs Reserved
+ * Copyright 2002-2006, The Perl Foundation.
  *
  * Grammar for the parser.
  *

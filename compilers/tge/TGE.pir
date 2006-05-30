@@ -1,4 +1,4 @@
-# Copyright 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2006, The Perl Foundation.
 
 =head1 NAME
 

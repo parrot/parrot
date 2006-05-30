@@ -97,7 +97,7 @@
  *
  * AST parser
  *
- * Copyright (C) 2004-2005 The Perl Foundation.  All Rights Reserved.
+ * Copyright (C) 2004-2005, The Perl Foundation.
  *
  */
 
