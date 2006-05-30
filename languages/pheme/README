@@ -1,7 +1,7 @@
 This is Pheme, version 0.0.1
 ----------------------------
 
-Copyright (c) 2006, The Perl Foundation.
+Copyright (C) 2006, The Perl Foundation.
 
 Pheme is a Parrot-based implementation of Scheme, in the sense that it has the
 same syntax (what syntax it has) and shares the name of some built-ins.  Please

@@ -192,7 +192,7 @@ AUTHOR
     and its compiler.
 
 COPYRIGHT
-    Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+    Copyright (C) 2001-2005, The Perl Foundation.
 
 LICENSE
     The Jako compiler is free software. It is subject to the same license as

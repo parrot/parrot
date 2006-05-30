@@ -177,7 +177,7 @@ with C<Data::Dumper>.
 
 =head1 LICENSE
 
-Copyright (c) 2005-2006 The Perl Foundation
+Copyright (C) 2005-2006, The Perl Foundation.
 
 This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.

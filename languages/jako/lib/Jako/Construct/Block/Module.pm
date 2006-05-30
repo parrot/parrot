@@ -1,7 +1,7 @@
 #
 # Module.pm
 #
-# Copyright: 2003-2005 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2003-2005, The Perl Foundation.
 # This program is free software. It is subject to the same license
 # as the Parrot interpreter.
 #

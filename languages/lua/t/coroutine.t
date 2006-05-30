@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2006, The Perl Foundation.
 # $Id: coroutine.t  $
 
 =head1 NAME

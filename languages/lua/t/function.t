@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2006, The Perl Foundation.
 # $Id: function.t 10933 2006-01-06 01:43:24Z particle $
 
 =head1 NAME

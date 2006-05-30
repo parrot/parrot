@@ -1,4 +1,4 @@
-# Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2006, The Perl Foundation.
 # $Id: luadebug.pir 11770 2006-02-28 08:02:51Z fperrad $
 
 =head1 NAME

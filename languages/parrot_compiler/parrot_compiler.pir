@@ -1,4 +1,4 @@
-# Copyright: 2002-2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2002-2006, The Perl Foundation.
 # $Id$
 
 .sub main :main

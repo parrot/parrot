@@ -1,5 +1,5 @@
 # Pugs-specific PMC testing
-# Copyright: 2005-2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
 package t::pmc;

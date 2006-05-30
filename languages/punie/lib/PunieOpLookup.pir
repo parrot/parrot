@@ -78,7 +78,7 @@ data file, possibly in YAML.
 
 =head1 LICENSE
 
-Copyright (c) 2006 The Perl Foundation
+Copyright (C) 2006, The Perl Foundation.
 
 This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.

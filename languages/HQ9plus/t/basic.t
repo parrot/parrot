@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME

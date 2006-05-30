@@ -467,7 +467,7 @@ Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright: 2002-2005 The Perl Foundation.  All Rights Reserved.
+Copyright (C) 2002-2005, The Perl Foundation.
 
 =head1 LICENSE
 

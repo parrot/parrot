@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2006, The Perl Foundation.
 # $Id: os.t 11478 2006-02-09 08:26:19Z fperrad $
 
 =head1 NAME
