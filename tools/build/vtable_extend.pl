@@ -24,7 +24,7 @@ open OUT, ">include/parrot/extend_vtable.h" or die $!;
 print OUT $header, <<'EOF';
 
 /*
-Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+Copyright (C) 2005, The Perl Foundation. 
 */
 #if !defined(PARROT_EXTEND_VTABLE_H_GUARD)
 #define PARROT_EXTEND_VTABLE_H_GUARD
@@ -48,7 +48,7 @@ open OUT, ">src/extend_vtable.c" or die $!;
 print OUT $header, <<'EOF';
 
 /*
-Copyright: 2001-2003, 2005 The Perl Foundation.  All Rights Reserved.
+Copyright (C) 2001-2003, 2005, The Perl Foundation. 
 
 =head1 NAME
 

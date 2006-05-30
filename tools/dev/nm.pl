@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2004, The Perl Foundation. 
 # $Id$
 
 =head1 NAME
