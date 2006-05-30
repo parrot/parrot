@@ -38,19 +38,19 @@
 	parse_tree = self.get_parse_tree( source )
 	unless parse_tree goto err_parse_fail
 
-	# dump_parse_tree( parse_tree )
+	# self.dump_parse_tree( parse_tree )
 
 	.local pmc past_tree
 	past_tree = self.get_past_tree( parse_tree )
 	unless past_tree goto err_past_fail
 
-	# dump_it( past_tree )
+	# self.dump_it( past_tree )
 
 	.local pmc post_tree
 	post_tree = self.get_post_tree( past_tree )
 	unless post_tree goto err_post_fail
 
- 	# dump_it( post_tree )
+ 	# self.dump_it( post_tree )
 
 	.local pmc pir
 	pir = self.get_pir( post_tree )
