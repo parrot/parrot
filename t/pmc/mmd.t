@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 37;
 
 =head1 NAME
 
@@ -1169,7 +1169,7 @@ foo(ResizablePMCArray,_)
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ flatten");
-# seel also 'rt #39173
+# see also 'rt #39173
 .sub main :main
     .local pmc int_pmc
     int_pmc = new .Integer
@@ -1200,4 +1200,53 @@ pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ flatten");
 CODE
 foo(Integer)
 foo(String)
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "keyed class name and multi");
+.sub main :main
+	.local pmc class
+	newclass class, [ 'Some'; 'Class' ]
+
+	.local int class_type
+	class_type = find_type [ 'Some'; 'Class' ]
+
+    .local pmc instance
+	instance = new class_type
+
+	.local string name
+	name = typeof instance
+
+	print "Type: "
+	print name
+	print "\n"
+    end
+.end
+CODE
+Type: Some::Class
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "keyed class name and multi");
+.sub main :main
+	.local pmc class
+	newclass class, [ 'Some'; 'Class' ]
+
+	.local int class_type
+	class_type = find_type [ 'Some'; 'Class' ]
+
+    .local pmc instance
+	instance = new class_type
+
+	foo( instance )
+    end
+.end
+
+.sub 'foo' :multi( [ 'Some'; 'Class' ])
+    print "Called multi for class\n"
+.end
+
+.sub 'foo' :multi(_)
+    print "Called wrong multi\n"
+.end
+CODE
+Called multi for class
 OUTPUT
