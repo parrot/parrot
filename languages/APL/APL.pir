@@ -78,7 +78,7 @@ Initializes the compiling subsystem.
 
     # tge transformer classes
     .local pmc tge
-    tge = getclass 'TGE'
+    tge = getclass 'TGE::Grammar'
     $P1 = subclass tge, 'ASTGrammar'
     $P1 = subclass tge, 'EvalGrammar'
     $P1 = subclass tge, 'PIRGrammar'

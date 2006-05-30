@@ -30,7 +30,7 @@ an abstract syntax tree.
 .sub _load :load
     load_bytecode 'TGE.pbc'
 
-    $P0 = getclass 'TGE'
+    $P0 = getclass 'TGE::Grammar'
     $P1 = subclass $P0, 'ASTGrammar'
 
 .end

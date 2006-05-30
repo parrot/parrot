@@ -28,7 +28,7 @@ PIRGrammar -- A grammar for transforming an opcode syntax tree to PIR.
 .sub _load :load
     load_bytecode 'TGE.pbc'
 
-    $P0 = getclass 'TGE'
+    $P0 = getclass 'TGE::Grammar'
     $P1 = subclass $P0, 'PIRGrammar'
 
 .end
