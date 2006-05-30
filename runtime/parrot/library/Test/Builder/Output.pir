@@ -210,6 +210,6 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005, the Perl Foundation.
+Copyright (C) 2005, The Perl Foundation.
 
 =cut

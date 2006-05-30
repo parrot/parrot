@@ -468,6 +468,6 @@ mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2006, the Perl Foundation.
+Copyright (C) 2005-2006, The Perl Foundation.
 
 =cut

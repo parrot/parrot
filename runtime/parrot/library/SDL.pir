@@ -729,6 +729,6 @@ list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Perl Foundation.
+Copyright (C) 2004, The Perl Foundation.
 
 =cut

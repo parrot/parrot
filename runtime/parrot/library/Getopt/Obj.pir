@@ -834,7 +834,7 @@ F<t/library/getopt_obj.t>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006 The Perl Foundation.  All rights reserved.
+Copyright (C) 2006, The Perl Foundation.
 This program is free software. It is subject to the same
 license as The Parrot Interpreter.
 

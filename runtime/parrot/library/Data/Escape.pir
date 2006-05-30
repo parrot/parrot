@@ -154,6 +154,6 @@ Modifications by Jerry Gay to escape backslash and use character class ops.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (C) 2004, The Perl Foundation.
 
 =cut
