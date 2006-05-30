@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation. 
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id: pmc2c.pl 12524 2006-05-05 21:50:26Z petdance $
 
 =head1 NAME

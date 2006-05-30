@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2003, The Perl Foundation. 
+# Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -45,7 +45,7 @@ my $classname = shift
 ## emit file header
 print <<EOF;
 /* ${classname}.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
  *     \$Id\$
  *  Overview:

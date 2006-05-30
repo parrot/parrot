@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright (C) 2001-2003, The Perl Foundation. 
+# Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 use strict;
 

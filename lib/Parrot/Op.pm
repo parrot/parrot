@@ -469,7 +469,7 @@ license as Parrot itself.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2005 The Perl Foundation. All rights reserved.
+Copyright (C) 2001-2005, The Perl Foundation.
 
 =end TODO
 
