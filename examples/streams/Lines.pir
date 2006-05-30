@@ -63,6 +63,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, the Perl Foundation.
+Copyright (C) 2004, The Perl Foundation.
 
 =cut
