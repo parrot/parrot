@@ -17,7 +17,7 @@ all: $(PARROT_LIBRARY)@slash@TGE.pbc
 $(PARROT_LIBRARY)@slash@TGE.pbc: TGE.pbc
 	$(CP) TGE.pbc $(PARROT_LIBRARY)
 
-TGE.pbc: TGE.pir TGE@slash@Rule.pbc TGE@slash@Parser.pbc TGE@slash@Compiler.pbc TGE@slash@Tree.pbc
+TGE.pbc: TGE.pir TGE@slash@Rule.pbc TGE@slash@Parser.pbc TGE@slash@Grammar.pbc TGE@slash@Compiler.pbc TGE@slash@Tree.pbc
 	$(PARROT) -o TGE.pbc --output-pbc TGE.pir 
 
 TGE@slash@Rule.pbc: TGE@slash@Rule.pir
@@ -25,6 +25,9 @@ TGE@slash@Rule.pbc: TGE@slash@Rule.pir
 
 TGE@slash@Tree.pbc: TGE@slash@Tree.pir
 	$(PARROT) -o TGE@slash@Tree.pbc --output-pbc TGE@slash@Tree.pir 
+
+TGE@slash@Grammar.pbc: TGE@slash@Grammar.pir
+	$(PARROT) -o TGE@slash@Grammar.pbc --output-pbc TGE@slash@Grammar.pir 
 
 TGE@slash@Compiler.pbc: TGE@slash@Compiler.pir
 	$(PARROT) -o TGE@slash@Compiler.pbc --output-pbc TGE@slash@Compiler.pir 
@@ -67,6 +70,7 @@ clean: testclean
 	TGE@slash@Parser.pir \
 	TGE@slash@Parser.pbc \
 	TGE@slash@Tree.pbc \
+	TGE@slash@Grammar.pbc \
 	TGE@slash@Compiler.pbc \
 	$(PARROT_LIBRARY)@slash@TGE.pbc \
 

@@ -31,7 +31,7 @@ pir_output_is(<<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar');
 .sub _main :main
     .param pmc argv
 
-    load_bytecode "compilers/tge/TGE.pir"
+    load_bytecode 'TGE.pbc'
 
     # Load the grammar in a string
     .local string source
@@ -111,8 +111,8 @@ GRAMMAR
 
     # Compile a grammar from the source 
     .local pmc grammar
-    grammar = new 'TGE'
-    grammar.agcompile(source)
+    $P1 = new 'TGE::Compiler'
+    grammar = $P1.'compile'(source)
 
     # Build up the tree for testing
     .local pmc tree

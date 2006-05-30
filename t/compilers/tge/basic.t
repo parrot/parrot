@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -11,7 +11,7 @@ use Parrot::Test;
 
 =head1 NAME
 
-t/basic.t - testing a few basic components of TGE and TGE::Tree
+t/basic.t - testing a few basic components of TGE::Grammar and TGE::Tree
 
 =head1 SYNOPSIS
 
@@ -23,11 +23,11 @@ t/basic.t - testing a few basic components of TGE and TGE::Tree
 pir_output_is(<<'CODE', <<'OUT', 'build up a basic rule in a grammar');
 
 .sub _main :main
-    load_bytecode 'compilers/tge/TGE.pir'
+    load_bytecode 'TGE.pbc'
 
     .local pmc AG
-    AG = new 'TGE'
-    AG.agrule('Leaf', 'min', '.', '.return(1)')
+    AG = new 'TGE::Grammar'
+    AG.add_rule('Leaf', 'min', '.', '.return(1)')
 
     $P1 = getattribute AG, 'rules'
     .local pmc rule_obj

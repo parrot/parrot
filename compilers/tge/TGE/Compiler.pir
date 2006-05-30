@@ -10,14 +10,21 @@ TGE::Compiler - A compiler for the grammar syntax of TGE.
 
 .namespace [ 'TGE::Compiler' ]
 
-=head2 agparse
+.sub _load :load
+    load_bytecode 'TGE.pbc'
+
+    $P0 = getclass 'TGE::Grammar'
+    $P1 = subclass $P0, 'TGE::Compiler'
+.end
+
+=head2 parse_grammar
 
 Take the source string for a tree grammar, and return a sensible data
 structure.
 
 =cut
 
-.sub agparse
+.sub parse_grammar :method
     .param string source
 
     # Parse the source string and build a match tree
@@ -34,12 +41,9 @@ structure.
 #        load_bytecode "PGE/Dumper.pbc"
 #        '_dumper'(match, "match")
 
-    .local pmc grammar
-    grammar = _load_grammar()
-
     # Transform the parse tree and return the result
     .local pmc tree_match
-    tree_match = grammar.apply(match)
+    tree_match = self.apply(match)
     $P5 = tree_match.get('result')
     .return($P5)
 
@@ -49,28 +53,26 @@ structure.
     end
 .end
 
-.sub _load_grammar
+.sub __init :method
     # Construct a tree grammar for manipulating the parse tree
-    .local pmc grammar
-    grammar = new "TGE"
+    $P1 = new .ResizablePMCArray
+    setattribute self, 'rules', $P1
     $P3 = find_global "TGE::Compiler", "ROOT_result"
-    grammar.agrule("ROOT", "result", ".", $P3)
+    self.add_rule("ROOT", "result", ".", $P3)
     $P3 = find_global "TGE::Compiler", "statements_result"
-    grammar.agrule("statements", "result", ".", $P3)
+    self.add_rule("statements", "result", ".", $P3)
     $P3 = find_global "TGE::Compiler", "transrule_result"
-    grammar.agrule("transrule", "result", ".", $P3)
+    self.add_rule("transrule", "result", ".", $P3)
     $P3 = find_global "TGE::Compiler", "type_value"
-    grammar.agrule("type", "value", ".", $P3)
+    self.add_rule("type", "value", ".", $P3)
     $P3 = find_global "TGE::Compiler", "name_value"
-    grammar.agrule("name", "value", ".", $P3)
+    self.add_rule("name", "value", ".", $P3)
     $P3 = find_global "TGE::Compiler", "parent_value"
-    grammar.agrule("parent", "value", ".", $P3)
+    self.add_rule("parent", "value", ".", $P3)
     $P3 = find_global "TGE::Compiler", "action_value"
-    grammar.agrule("action", "value", ".", $P3)
+    self.add_rule("action", "value", ".", $P3)
     $P3 = find_global "TGE::Compiler", "language_value"
-    grammar.agrule("language", "value", ".", $P3)
-
-    .return (grammar)
+    self.add_rule("language", "value", ".", $P3)
 .end
 
 .sub ROOT_result
@@ -207,6 +209,138 @@ err_no_rule:
     $S1 = $P2
     value = $S1
     .return (value)
+.end
+
+=head2 rule_emit
+
+Generate the PIR code for a rule, and emit it to a file.
+
+=cut
+
+.sub 'rule_emit' :method
+    .param pmc rule
+    .param pmc outfh
+
+    $S1 = self.'rule_string'(rule)
+    print outfh, $S1
+
+.end
+
+=head2 precompile
+
+Compile a grammar from a source string.
+
+=cut
+
+.sub 'precompile' :method
+    .param string source
+    .param pmc outfh     :optional
+    .param int fileoutput :opt_flag
+    .local pmc rule_data
+    .local string header_string
+
+    # If a filehandle was passed in, write the PIR code to it,
+    # otherwise, write it to standard output.
+    if fileoutput goto got_fh
+        outfh = getstdout
+  got_fh:
+
+     rule_data = self.'parse_grammar'(source)
+
+    # Construct grammar rules from the data structure of rule info
+    .local pmc rule
+    .local pmc iter
+    iter = new .Iterator, rule_data # loop over the rule info
+    iter = 0 # start at the beginning
+loop_start:
+    unless iter goto loop_end
+        rule = shift iter
+        self.rule_emit(rule, outfh)
+        $S1 = self.rule_header(rule)
+        header_string .= $S1
+    goto loop_start
+loop_end:
+
+    print outfh, "\n.sub __init :method\n"
+    print outfh, header_string
+    print outfh, "\n.end\n"
+    .return ()
+.end
+
+.sub 'compile' :method
+    .param string source
+
+    .local pmc compiler
+    compiler = compreg "PIR"
+
+    .local pmc rule_data
+    rule_data = self.'parse_grammar'(source)
+
+    .local pmc new_grammar
+    new_grammar = new 'TGE::Grammar'
+
+    # Construct grammar rules from the data structure of rule info
+    .local pmc rule
+    .local string code
+    .local pmc action
+
+    .local pmc iter
+    iter = new .Iterator, rule_data # loop over the rule info
+    iter = 0 # start at the beginning
+loop_start:
+    unless iter goto loop_end
+        rule = shift iter
+        # Compile the rule and install it immediately.
+        code = self.'rule_string'(rule)
+        action = compiler(code)
+        $P1 = rule["type"]
+        $P2 = rule["name"]
+        $P3 = rule["parent"]
+        new_grammar.add_rule($P1, $P2, $P3, action)
+      goto loop_start
+loop_end:
+
+    .return (new_grammar)
+.end
+
+.sub 'rule_header' :method
+    .param pmc rule
+    .local string output
+    .local string type
+    .local string name
+    .local string parent
+    type = rule["type"]
+    name = rule["name"]
+    parent = rule["parent"]
+    output = "$P1 = find_global '_" . type
+    output .= "_"
+    output .= name
+    output .= "'\nself.add_rule('"
+    output .= type
+    output .= "', '"
+    output .= name
+    output .= "', '"
+    output .= parent
+    output .= "', $P1)\n"
+    .return (output)
+.end
+
+.sub 'rule_string' :method
+    .param pmc rule
+    .local string code
+    $S1 = rule["type"]
+    $S2 = rule["name"]
+    $S3 = rule["action"]
+    code = "\n.sub '_"
+    code .= $S1
+    code .= "_"
+    code .= $S2
+    code .= "'\n"
+    code .= "   .param pmc tree\n"
+    code .= "   .param pmc node\n"
+    code .= $S3
+    code .= "\n.end\n\n"
+    .return (code)
 .end
 
 =head1 AUTHOR
