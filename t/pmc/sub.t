@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 47;
 use Parrot::Config;
 
 =head1 NAME
@@ -1166,3 +1166,26 @@ pc2
 main
 OUTPUT
 
+SKIP: {
+  skip 'not implemented', 2;
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub names, compilation');
+.sub unicode:"\u7777"
+   print "ok\n"
+.end
+CODE
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub names, invocation');
+.sub unicode:"\u7777"
+    print "ok\n"
+.end
+
+.sub test :main
+    unicode:"\u7777"()
+.end
+CODE
+ok
+OUTPUT
+
+}
