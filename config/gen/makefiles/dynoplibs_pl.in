@@ -1,4 +1,4 @@
-# Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id: dynoplibs_pl.in 10975 2006-01-08 00:42:47Z jonathan $
 
 =head1 NAME
