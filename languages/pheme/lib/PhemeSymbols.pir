@@ -9,7 +9,6 @@
 	symbols['cons']              = 1
 	symbols['include_file']      = 1
 	symbols['write']             = 1
-	symbols['__make_empty_cons'] = 1
 
 	store_global 'PhemeCompiler', 'symbols', symbols
 	.return()

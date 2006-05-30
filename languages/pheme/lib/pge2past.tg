@@ -1,4 +1,12 @@
 transform result (ROOT) :language('PIR') {
+	# XXX: transform into a method on the TGE object, when it's possible
+	.local pmc specials
+	specials = new .Hash
+	specials['define'] = 1
+	specials['quote']  = 1
+
+	store_global 'specials', specials
+
 	.local pmc result
 	result = new 'Node'
 
@@ -77,12 +85,13 @@ transform result (list) :language('PIR') {
 	child_type = typeof op
 	unless child_type == 'PAST::Op' goto return_result
 
-	result = tree.get( 'maybe_promote_sub', result )
+	result = tree.get( 'handle_specials', result )
 
   return_result:
 	.return( result )
 }
 
+# XXX - don't know why I need this, but it prevents ambiguity errors
 transform maybe_op (PAST::Exp) :language('PIR') {
 	.return( node )
 }
@@ -106,26 +115,41 @@ transform maybe_op (PAST::Val) :language('PIR') {
   treat_as_op:
 	.local pmc op
 	op = new 'PAST::Op'
-
 	op.'op'( value )
 
 	.return( op )
 }
 
-transform maybe_promote_sub (PAST::Exp) :language('PIR') {
+transform handle_specials (PAST::Exp) :language('PIR') {
+	.local pmc children
+	children = node.'children'()
+
+	.local pmc op
+	op = children[0]
+
+	.local string name
+	name = op.'op'()
+
+	.local pmc specials
+	specials = find_global 'specials'
+
+	.local int special_exists
+	special_exists = exists specials[name]
+
+	unless special_exists goto not_a_special
+
+	node = tree.'get'( name, node )
+
+  not_a_special:
+	.return( node )
+}
+
+transform define (PAST::Exp) :language('PIR') {
 	.local pmc children
 	children = node.'children'()
 
 	.local pmc op
 	op       = children[0]
-
-
-	.local string op_name
-	op_name = op.'op'()
-	if op_name == 'define' goto return_sub
-	.local pmc result
-	result = node
-	.return( result )
 
   return_sub:
 	.local pmc sub_name
@@ -147,6 +171,50 @@ transform maybe_promote_sub (PAST::Exp) :language('PIR') {
 
 	result.'add_child'( stmts )
 	.return( result )
+}
+
+transform quote (PAST::Exp) :language( 'PIR' ) {
+	.local pmc children
+	children = node.'children'()
+
+	# remove this Exp and promote the first sibling
+	.local pmc sibling
+	sibling  = children[1]
+	children = sibling.'children'()
+
+	.local pmc first_child
+	first_child = children[0]
+
+	.local string child_type
+	child_type = typeof first_child
+
+	unless child_type == 'PAST::Op' goto rewrite_op
+
+	.local string op_name
+	op_name = first_child.'op'()
+
+	# if it's an empty list, let it be an empty list
+	unless op_name == '__make_empty_cons' goto rewrite_op
+	.return( sibling )
+
+  rewrite_op:
+	.local pmc val_child
+	val_child = new 'PAST::Val'
+
+	# XXX: this might fail unless the first kid is an op
+	.local string value
+	value   = first_child.'op'()
+	val_child.'value'( value )
+
+	children[0] = val_child
+	
+	.local pmc cons_op
+	cons_op = new 'PAST::Op'
+	cons_op.'op'( '__list_to_cons' )
+
+	unshift children, cons_op
+
+	.return( sibling )
 }
 
 # XXX: almost certainly wrong

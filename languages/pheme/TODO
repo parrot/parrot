@@ -17,6 +17,10 @@ Builtins:
 
 Special forms:
 	- cond
+	- lambda (be careful of define interaction though!)
+	- else
+	- and
+	- or
 
 Compiler:
 	- extract and merge POST improvements with Punie
@@ -28,6 +32,8 @@ Compiler:
 		- share with Perl 6 and Punie
 		- move somewhere in Parrot lib path
 		- allow dumping of trees and (runnable) PIR
+	- use precompiled tree grammars
+	- merge all PBC files into pheme.pbc
 
 Fix namespace:
 	- lowercase
@@ -43,13 +49,9 @@ Grammar:
 		- ... can be an identifier
 	- fix whitespace
 		- space, newline (also tab, carriage return)
-	- allow comments
-		- semicolon to end of line
-		- can be at start of line
 	- parse numbers
 		- . + - allowed at the start of a number
 	- add more rules
-		- ` indicates almost constant data
 		- \ is an escape character
 
 Predicates:
