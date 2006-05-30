@@ -1,5 +1,5 @@
 /* misc.h
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

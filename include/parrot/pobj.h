@@ -1,5 +1,5 @@
 /* pobj.h
- *  Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+ *  Copyright (C) 2001-2005, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

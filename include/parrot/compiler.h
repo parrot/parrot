@@ -1,5 +1,5 @@
 /* compiler.h
- *  Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+ *  Copyright (C) 2006, The Perl Foundation.
  *  SVN Info
  *     $Id: exceptions.h 11903 2006-03-14 20:49:11Z bernhard $
  *  Overview:

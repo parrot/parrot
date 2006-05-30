@@ -1,5 +1,5 @@
 /* mmd.h
- *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+ *  Copyright (C) 2003, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
