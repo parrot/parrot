@@ -1049,7 +1049,7 @@ op unless_null(invar STR, labelconst INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004, The Perl Foundation.
 
 =head1 LICENSE
 

@@ -1,5 +1,5 @@
 /* fixed_8.h
- *  Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+ *  Copyright (C) 2004, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

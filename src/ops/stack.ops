@@ -281,7 +281,7 @@ inline op rotate_up(in INT) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006, The Perl Foundation.
 
 =head1 LICENSE
 

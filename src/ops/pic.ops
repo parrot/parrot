@@ -306,7 +306,7 @@ inline op pic_callr__(inconst PMC) :pic {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005 The Perl Foundation.  All rights reserved.
+Copyright (C) 2005, The Perl Foundation.
 
 =head1 LICENSE
 

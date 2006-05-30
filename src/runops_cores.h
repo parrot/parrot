@@ -1,5 +1,5 @@
 /* runops_cores.h
- *  Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
+ *  Copyright (C) 2001-2006, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

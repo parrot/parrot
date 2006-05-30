@@ -208,7 +208,7 @@ op find_name(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006, The Perl Foundation.
 
 =head1 LICENSE
 

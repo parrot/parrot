@@ -188,7 +188,7 @@ op print_newline(in PMC) :base_io {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2006 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2006, The Perl Foundation.
 
 =head1 LICENSE
 
