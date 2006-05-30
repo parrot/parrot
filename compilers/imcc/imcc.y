@@ -694,6 +694,7 @@ multi_type:
                            }
                            $$ = r;
                       }
+   | '[' keylist ']'  { $$ = $2; }
    ;
 
 sub_body:

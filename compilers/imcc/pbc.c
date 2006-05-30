@@ -495,6 +495,7 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
         return multi_sig;
     }
     for (i = 0; i < n; ++i) {
+        /* TODO multi[i] can be a Key too - store PMC constants instead of bare strings ? */
         if (pcc_sub->multi[i]->name[0] == '"')
             sig = string_unescape_cstring(interpreter, 
                                           pcc_sub->multi[i]->name + 1, '"',
