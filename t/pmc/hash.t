@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 39;
 
 =head1 NAME
 
@@ -1398,3 +1398,33 @@ after deletion
 a
 e
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "unicode keys (register) (RT #39249)");
+.sub test
+  $P1 = new .Hash
+  $S99 = unicode:"\u7777"
+  $P1[$S99] = "ok"
+  $S1 = $P1[$S99]
+  say $S1
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "unicode keys (literal) (RT ##39249)");
+.sub test
+  $P1 = new .Hash
+  $P1[unicode:"\u7777"] = "ok"
+  $S1 = $P1[unicode:"\u7777"]
+  say $S1
+.end
+CODE
+ok
+OUTPUT
+
+
+
+
+
+
+
