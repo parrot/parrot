@@ -1166,14 +1166,13 @@ pc2
 main
 OUTPUT
 
-SKIP: {
-  skip 'not implemented', 2;
-
+# see also #38964
 pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub names, compilation');
 .sub unicode:"\u7777"
    print "ok\n"
 .end
 CODE
+ok
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub names, invocation');
@@ -1188,4 +1187,3 @@ CODE
 ok
 OUTPUT
 
-}

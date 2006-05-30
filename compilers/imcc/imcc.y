@@ -1205,6 +1205,7 @@ func_assign:
 
 the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1); }
        | STRINGC  { $$ = mk_sub_address_fromc(interp, $1); }
+       | USTRINGC  { $$ = mk_sub_address_fromc(interp, $1); }
        | target   { $$ = $1;
                        if ($1->set != 'P')
                             IMCC_fataly(interp, E_SyntaxError,
@@ -1345,6 +1346,7 @@ _var_or_i:
 sub_label_op_c:
      sub_label_op
    | STRINGC       { $$ = mk_sub_address_fromc(interp, $1); }
+   | USTRINGC      { $$ = mk_sub_address_fromc(interp, $1); }
    ;
 
 sub_label_op:
