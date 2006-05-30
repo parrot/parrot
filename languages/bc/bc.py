@@ -215,13 +215,13 @@ visit>>
     # Compile the abstract syntax tree down to an opcode syntax tree
     .local string ost_tg_source
     ost_tg_source = _slurp_file('languages/punie/lib/past2post.tg')
-    .local pmc ostgrammar
-    ostgrammar = new 'TGE'
-    ostgrammar.agcompile(ost_tg_source)
-    .local pmc ostbuilder
-    ostbuilder = ostgrammar.apply(stmts)
+    .local pmc tge_compiler, ost_grammar
+    tge_compiler = new 'TGE::Compiler'
+    ost_grammar = tge_compiler.'compile'(ost_tg_source)
+    .local pmc ost_builder
+    ost_builder = ost_grammar.apply(stmts)
     .local pmc ost
-    ost = ostbuilder.get('result')
+    ost = ost_builder.get('result')
     $I0 = defined ost
     unless $I0 goto err_no_ost # if OST fails stop
 
@@ -231,13 +231,12 @@ visit>>
     # Compile the OST down to PIR
     .local string pir_tg_source
     pir_tg_source = _slurp_file('languages/punie/lib/post2pir.tg')
-    .local pmc pirgrammar
-    pirgrammar = new 'TGE'
-    pirgrammar.agcompile(pir_tg_source)
-    .local pmc pirbuilder
-    pirbuilder = pirgrammar.apply(ost)
+    .local pmc pir_grammar
+    pir_grammar = tge_compiler.'compile'(pir_tg_source)
+    .local pmc pir_builder
+    pir_builder = pir_grammar.apply(ost)
     .local pmc pir
-    pir = pirbuilder.get('result')
+    pir = pir_builder.get('result')
     unless pir goto err_no_pir # if PIR not generated, stop
 
     # print "\\n\\nPIR dump:\\n"
