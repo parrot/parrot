@@ -1,4 +1,4 @@
-# Copyright: 2006 The Perl Foundation.  All Rights Reserved.
+# Copyright (C) 2006, The Perl Foundation.
 # $Id: Compilers.pm 11501 2006-02-10 18:27:13Z particle $
 
 =head1 NAME
