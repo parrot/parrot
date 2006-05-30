@@ -216,6 +216,8 @@ inline op typeof(out STR, in INT) {
 
 =item B<find_type>(out INT, in STR)
 
+=item B<find_type>(out INT, in KEY)
+
 Find the PMC type or Parrot datatype by name.
 
 =cut

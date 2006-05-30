@@ -437,6 +437,10 @@ inline op isa(out INT, in PMC, in KEY) :object_base {
     goto NEXT();
 }
 
+op find_type(out INT, in KEY) {
+    $1 = pmc_type_p(interpreter, $2);
+    goto NEXT();
+}
 =back
 
 =head1 COPYRIGHT
