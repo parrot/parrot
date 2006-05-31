@@ -642,8 +642,6 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
 
     if (unit->namespace) {
         ns = unit->namespace->reg;
-        if (ns->set == 'K')
-            ns->color = build_key(interpreter, ns);
         IMCC_debug(interpreter, DEBUG_PBC_CONST,
                 "name space const = %d ns name '%s'\n",
                 ns->color, ns->name);
@@ -933,6 +931,7 @@ make_pmc_const(Interp *interpreter, SymReg *r)
 static void
 add_1_const(Interp *interpreter, SymReg *r)
 {
+    SymReg *key;
     if (r->color >= 0)
         return;
     if (r->use_count <= 0)
@@ -950,9 +949,11 @@ add_1_const(Interp *interpreter, SymReg *r)
             r->color = add_const_num(interpreter, r->name);
             break;
         case 'K':
+            key = r;
             for (r = r->nextkey; r; r = r->nextkey)
                 if (r->type & VTCONST)
                     add_1_const(interpreter, r);
+            build_key(interpreter, key);
             break;
         case 'P':
             make_pmc_const(interpreter, r);
@@ -1273,7 +1274,14 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                     IMCC_debug(interpreter, DEBUG_PBC," %d", r->color);
                     break;
                 case PARROT_ARG_KC:
-                    *pc++ = build_key(interpreter, ins->r[i]);
+                    r = ins->r[i];
+                    if (r->set == 'K') {
+                        assert(r->color >= 0);
+                        *pc++ = r->color;
+                    }
+                    else {
+                        *pc++ = build_key(interpreter, r);
+                    }
                     IMCC_debug(interpreter, DEBUG_PBC," %d", pc[-1]);
                     break;
                 default:
