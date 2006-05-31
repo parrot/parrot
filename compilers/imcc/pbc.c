@@ -836,6 +836,7 @@ build_key(Interp *interpreter, SymReg *reg)
                 break;
             case VT_CONSTP:
             case VTCONST:
+            case VTCONST|VT_ENCODED:
                 switch (r->set) {
                     case 'S':                       /* P["key"] */
                         *pc++ = PARROT_ARG_SC | slice_bits;  /* str constant */

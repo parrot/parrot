@@ -1417,8 +1417,12 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "unicode keys (literal) (RT ##39249)");
   $P1[unicode:"\u7777"] = "ok"
   $S1 = $P1[unicode:"\u7777"]
   say $S1
+  $S2 = unicode:"\u7777"
+  $S1 = $P1[$S2]
+  say $S1
 .end
 CODE
+ok
 ok
 OUTPUT
 
