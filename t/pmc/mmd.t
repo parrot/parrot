@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 
 =head1 NAME
 
@@ -1249,4 +1249,25 @@ pir_output_is(<<'CODE', <<'OUTPUT', "keyed class name and multi");
 .end
 CODE
 Called multi for class
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "unicode sub names and multi (RT#39254)");
+.sub unicode:"\u7777" :multi(string)
+  .param pmc arg
+  print 'String:'
+  say arg
+.end
+.sub unicode:"\u7777" :multi(int)
+  .param pmc arg
+  print 'Int:'
+  say arg
+.end
+
+.sub main :main
+  unicode:"\u7777"('what')
+  unicode:"\u7777"(23)
+.end
+CODE
+String:what
+Int:23
 OUTPUT
