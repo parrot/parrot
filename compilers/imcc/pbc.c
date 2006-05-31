@@ -495,7 +495,9 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
         return multi_sig;
     }
     for (i = 0; i < n; ++i) {
-        /* TODO multi[i] can be a Key too - store PMC constants instead of bare strings ? */
+        /* TODO multi[i] can be a Key too - 
+         * store PMC constants instead of bare strings ? 
+         */
         if (pcc_sub->multi[i]->name[0] == '"')
             sig = string_unescape_cstring(interpreter, 
                                           pcc_sub->multi[i]->name + 1, '"',
@@ -784,7 +786,7 @@ slice_deb(int bits) {
  */
 
 static opcode_t
-build_key(Interp *interpreter, SymReg *reg)
+build_key(Interp *interpreter, SymReg *key_reg)
 {
 #define KEYLEN 21
     opcode_t key[KEYLEN], *pc, size;
@@ -792,14 +794,13 @@ build_key(Interp *interpreter, SymReg *reg)
     int key_length;     /* P0["hi;there"; S0; 2] has length 3 */
     char *s;
     int k;
-    SymReg * r;
+    SymReg *r, *reg;
     int var_type, slice_bits, type;
 
     pc = key + 1;       /* 0 is length */
     s = s_key;          /* stringified key */
     *s = 0;
-    if (reg->set == 'K')
-        reg = reg->nextkey;
+    reg = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         if ((pc - key - 2) >= KEYLEN)
@@ -871,6 +872,9 @@ build_key(Interp *interpreter, SymReg *reg)
     /* XXX endianess? probably no, we pack/unpack on the very
      * same computer */
     k =  add_const_key(interpreter, key, size, s_key);
+    /* single 'S' keys already have their color assigned */
+    if (key_reg->set == 'K')
+        key_reg->color = k;
     return k;
 }
 
