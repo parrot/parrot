@@ -8,7 +8,6 @@ transform pir (ROOT) :language('PIR') {
     pir.emit("    var = find_global 'APL', '%var'")
     $P0 = node['children']
     iter = new .Iterator, $P0
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $P1 = shift iter
@@ -57,7 +56,6 @@ transform pir (PAST::Op) :language('PIR') {
     childret = new 'APLVector'
   
     iter = new .Iterator, children
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter
@@ -156,7 +154,6 @@ transform pir (PAST::Vector) :language('PIR') {
     pir.emit("    %0 = new 'APLVector'", ret)
     $P0 = node['children']
     iter = new .Iterator, $P0
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter

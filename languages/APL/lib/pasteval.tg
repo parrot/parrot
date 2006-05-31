@@ -3,7 +3,6 @@ transform eval (ROOT) :language('PIR') {
     .local pmc iter
     $P0 = node['children']
     iter = new .Iterator, $P0
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $P1 = shift iter
@@ -37,7 +36,6 @@ transform eval (PAST::Op) :language('PIR') {
     .local pmc iter 
     $P0 = node['children']
     iter = new .Iterator, $P0
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter

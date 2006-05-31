@@ -9,7 +9,6 @@ transform result (ROOT) :language('PIR') {
     children = new 'APLVector'
     $P0 = node['statement']
     iter = new .Iterator, $P0
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $P1 = shift iter
@@ -175,7 +174,6 @@ transform result (APL::Grammar::numeric_constant) :language('PIR') {
 
     children = new 'APLVector'
     iter = new .Iterator, $P0
-    iter = 0
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter

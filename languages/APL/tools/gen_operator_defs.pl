@@ -296,12 +296,10 @@ nothing:
     result = new 'APLVector'
 
     iter_two = new .Iterator, op2
-    iter_two = 0 # start from beginning
 loop_two:
     unless iter_two goto loop_two_end
     item_two = shift iter_two 
     iter_one = new .Iterator, op1
-    iter_one = 0 # start from beginning
     pos_one = 0 # parrot's 0 == APL's 1
 loop_one:
     unless iter_one goto loop_one_end
@@ -336,7 +334,6 @@ loop_two_end:
     inc not_there
     .local pmc iter
     iter = new .Iterator, op1
-    iter = 0 # start from beginning.
 loop_begin:
     unless iter goto no_gots
     value_at = shift iter
@@ -486,7 +483,6 @@ true:
     .local pmc result,iter
     result = new 'APLVector'
     iter = new .Iterator, op1
-    iter = 0
 
 loop:
     unless iter goto done
