@@ -648,13 +648,14 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         ns_const = ns->color;
         /* strip namespace off from front */
         real_name = strrchr(r->name, '@');
-        if (!real_name)
-            real_name = r->name;
-        else
+        if (real_name) {
+            char *p;
             ++real_name;
+            p = str_dup(real_name); 
+            free(r->name);
+            r->name = p;
+        }
     }
-    else
-        real_name = r->name;
 
     ct = interpreter->code->const_table;
     k = PDB_extend_const_table(interpreter);
@@ -674,7 +675,9 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     sub_pmc = pmc_new(interpreter, type);
     PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
     sub = PMC_sub(sub_pmc);
-    sub->name = string_from_cstring(interpreter, real_name, 0);
+
+    r->color = add_const_str(interpreter, r);
+    sub->name = ct->constants[r->color]->u.string;
 
     ns_pmc = NULL;
     if (ns_const >= 0 && ns_const < ct->const_count) {
@@ -713,9 +716,9 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     pfc->u.key = sub_pmc;
     unit->sub_pmc = sub_pmc;
     IMCC_debug(interpreter, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' -> '%s' flags %d color %d (%s) "
+            "add_const_pmc_sub '%s' flags %d color %d (%s) "
             "lex_info %s :outer(%s)\n",
-            r->name, real_name, r->pcc_sub->pragma, k,
+            r->name, r->pcc_sub->pragma, k,
             (char*) sub_pmc->vtable->whoami->strstart,
             sub->lex_info ? "yes" : "no",
             sub->outer_sub ?
@@ -726,7 +729,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
      * create entry in our fixup (=symbol) table
      * the offset is the index in the constant table of this Sub
      */
-    PackFile_FixupTable_new_entry(interpreter, real_name, enum_fixup_sub, k);
+    PackFile_FixupTable_new_entry(interpreter, r->name, enum_fixup_sub, k);
     return k;
 }
 

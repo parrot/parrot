@@ -78,7 +78,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 
     /* XXX FIXME: Now the way to check for a sub is unit->type */
     ins = unit->instructions;
-    if (first && ins->type == ITLABEL && ins->r[0]->type == VT_PCC_SUB) {
+    if (first && ins->type == ITLABEL && (ins->r[0]->type & VT_PCC_SUB)) {
         IMCC_debug(interpreter, DEBUG_CFG, "pcc_sub %s nparams %d\n",
                 ins->r[0]->name, ins->r[0]->pcc_sub->nargs);
         expand_pcc_sub(interpreter, unit, ins);

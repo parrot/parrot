@@ -192,7 +192,7 @@ static Instruction * iLABEL(IMC_Unit * unit, SymReg * r0) {
 static Instruction * iSUBROUTINE(Interp *interp, IMC_Unit * unit, SymReg * r) {
     Instruction *i;
     i =  iLABEL(unit, r);
-    r->type = VT_PCC_SUB;
+    r->type = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
     cur_call = r;
     i->line = line - 1;
@@ -271,6 +271,14 @@ mk_sub_address_fromc(Interp *interp, char * name)
     return r;
 }
 
+static SymReg *
+mk_sub_address_u(Interp *interp, char * name)
+{
+    SymReg *r = mk_sub_address(interp, name);
+    r->type = VT_ENCODED;
+    return r;
+}
+
 void
 IMCC_itcall_sub(Interp* interp, SymReg* sub)
 {
@@ -293,7 +301,7 @@ begin_return_or_yield(Interp *interp, int yield)
     Instruction *i, *ins;
     char name[128];
     ins = cur_unit->instructions;
-    if(!ins || !ins->r[0] || ins->r[0]->type != VT_PCC_SUB)
+    if(!ins || !ins->r[0] || !(ins->r[0]->type & VT_PCC_SUB))
         IMCC_fataly(interp, E_SyntaxError,
               "yield or return directive outside pcc subroutine\n");
     if(yield)
@@ -1206,7 +1214,7 @@ func_assign:
 
 the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1); }
        | STRINGC  { $$ = mk_sub_address_fromc(interp, $1); }
-       | USTRINGC  { $$ = mk_sub_address_fromc(interp, $1); }
+       | USTRINGC  { $$ = mk_sub_address_u(interp, $1); }
        | target   { $$ = $1;
                        if ($1->set != 'P')
                             IMCC_fataly(interp, E_SyntaxError,
@@ -1347,7 +1355,7 @@ _var_or_i:
 sub_label_op_c:
      sub_label_op
    | STRINGC       { $$ = mk_sub_address_fromc(interp, $1); }
-   | USTRINGC      { $$ = mk_sub_address_fromc(interp, $1); }
+   | USTRINGC      { $$ = mk_sub_address_u(interp, $1); }
    ;
 
 sub_label_op:
