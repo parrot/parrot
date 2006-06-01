@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 49;
 use Parrot::Config;
 
 =head1 NAME
@@ -1198,4 +1198,19 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub names, dynamic');
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', 'unicode sub names');
+.sub unicode:"\u7777"
+    print "ok\n"
+.end
+
+.sub test :main
+    # unicode:"\u7777" ends up as a string nicode:"\u7777
+    # (or it did, in r12860)
+    $P1 = find_name 'nicode:"\u7777'
+    $P1()
+.end
+CODE
+/Name 'nicode:"\\u7777' not found\n.*\n/
 OUTPUT
