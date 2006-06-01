@@ -462,7 +462,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     get_name = NULL;
     if (ins->type & ITCALL) {
         SymReg * the_sub = sub->pcc_sub->sub;
-        if (!meth_call && the_sub->type == VTADDRESS) {
+        if (!meth_call && (the_sub->type & VTADDRESS)) {
             /*
              * sub->pcc_sub->sub is an actual subroutine name,
              * not a variable.

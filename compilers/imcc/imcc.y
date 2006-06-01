@@ -275,7 +275,7 @@ static SymReg *
 mk_sub_address_u(Interp *interp, char * name)
 {
     SymReg *r = mk_sub_address(interp, name);
-    r->type = VT_ENCODED;
+    r->type |= VT_ENCODED;
     return r;
 }
 
