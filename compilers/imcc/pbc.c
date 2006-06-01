@@ -480,31 +480,39 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
 {
     INTVAL i, n;
     STRING *sig;
-    PMC *multi_sig;
+    PMC *multi_sig, *sig_pmc;
     struct pcc_sub_t *pcc_sub;
+    struct PackFile_ConstTable *ct;
 
     pcc_sub = r->pcc_sub;
-    multi_sig = pmc_new(interpreter, enum_class_FixedStringArray);
+    multi_sig = pmc_new(interpreter, enum_class_FixedPMCArray);
 
     n = pcc_sub->nmulti;
     VTABLE_set_integer_native(interpreter, multi_sig, n);
     /* :multi() n = 1, reg = NULL */
     if (!pcc_sub->multi[0]) {
         sig = string_from_cstring(interpreter, "__VOID", 0);
-        VTABLE_set_string_keyed_int(interpreter, multi_sig, 0, sig);
+        sig_pmc = pmc_new(interpreter, enum_class_String);
+        VTABLE_set_string_native(interpreter, sig_pmc, sig);
+        VTABLE_set_pmc_keyed_int(interpreter, multi_sig, 0, sig_pmc);
         return multi_sig;
     }
+    ct = interpreter->code->const_table;
     for (i = 0; i < n; ++i) {
-        /* TODO multi[i] can be a Key too - 
-         * store PMC constants instead of bare strings ? 
+        /* multi[i] can be a Key too - 
+         * store PMC constants instead of bare strings 
          */
-        if (pcc_sub->multi[i]->name[0] == '"')
-            sig = string_unescape_cstring(interpreter, 
-                                          pcc_sub->multi[i]->name + 1, '"',
-                                          NULL);
-        else
-            sig = string_from_cstring(interpreter, pcc_sub->multi[i]->name, 0);
-        VTABLE_set_string_keyed_int(interpreter, multi_sig, i, sig);
+        const SymReg *r = pcc_sub->multi[i];
+        if (r->set == 'S') {
+            sig_pmc = pmc_new(interpreter, enum_class_String);
+            VTABLE_set_string_native(interpreter, sig_pmc, 
+                    ct->constants[r->color]->u.string);
+        }
+        else {
+            assert(r->set == 'K');
+            sig_pmc = ct->constants[r->color]->u.key;
+        }
+        VTABLE_set_pmc_keyed_int(interpreter, multi_sig, i, sig_pmc);
     }
     return multi_sig;
 }

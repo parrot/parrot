@@ -1258,19 +1258,25 @@ static PMC*
 mmd_cvt_to_types(Interp* interpreter, PMC *multi_sig)
 {
     INTVAL i, n, type;
-    PMC *ar;
+    PMC *ar, *sig_elem;
     STRING *sig;
 
     n = VTABLE_elements(interpreter, multi_sig);
     ar = pmc_new(interpreter, enum_class_FixedIntegerArray);
     VTABLE_set_integer_native(interpreter, ar, n);
     for (i = 0; i < n; ++i) {
-        sig = VTABLE_get_string_keyed_int(interpreter, multi_sig, i);
-        if (memcmp(sig->strstart, "__VOID", 6) == 0) {
-            PMC_int_val(ar)--;  /* XXX */
-            break;
+        sig_elem = VTABLE_get_pmc_keyed_int(interpreter, multi_sig, i);
+        if (sig_elem->vtable->base_type == enum_class_String) {
+            sig = VTABLE_get_string(interpreter, sig_elem);
+            if (memcmp(sig->strstart, "__VOID", 6) == 0) {
+                PMC_int_val(ar)--;  /* XXX */
+                break;
+            }
+            type = pmc_type(interpreter, sig);
         }
-        type = pmc_type(interpreter, sig);
+        else {
+            type = pmc_type_p(interpreter, sig_elem);
+        }
         VTABLE_set_integer_keyed_int(interpreter, ar, i, type);
     }
     return ar;
@@ -1295,7 +1301,7 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
             /* some method */
             return 0;
         }
-        if (multi_sig->vtable->base_type == enum_class_FixedStringArray) {
+        if (multi_sig->vtable->base_type == enum_class_FixedPMCArray) {
             multi_sig = PMC_sub(pmc)->multi_signature =
                 mmd_cvt_to_types(interpreter, multi_sig);
         }
