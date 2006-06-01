@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 use Parrot::Config;
 
 =head1 NAME
@@ -1187,3 +1187,15 @@ CODE
 ok
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub names, dynamic');
+.sub unicode:"\u7777"
+    print "ok\n"
+.end
+
+.sub test :main
+    $P1 = find_name unicode:"\u7777"
+    $P1()
+.end
+CODE
+ok
+OUTPUT
