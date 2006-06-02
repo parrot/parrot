@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 52;
+use Parrot::Test tests => 53;
 use Parrot::Config;
 
 =head1 NAME
@@ -1240,6 +1240,14 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub constant');
 
 .sub unicode:"\u7777"
    print "ok\n"
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'literal \u in sub name (not unicode)');
+.sub '\u2193'
+    say 'ok'
 .end
 CODE
 ok
