@@ -698,6 +698,14 @@ real_exception(Interp *interpreter, void *ret_addr,
     /*
      * FIXME classify errors
      */
+    if (!the_exception) {
+	PIO_eprintf(interpreter, 
+                "real_exception (severity:%d error:%d): %Ss\n"
+                "likely reason: argument count mismatch in main "
+                "(more than 1 param)\n", 
+	    EXCEPT_error, exitcode, msg );
+        exit(exitcode);
+    }
     the_exception->severity = EXCEPT_error;
     the_exception->error = exitcode;
     the_exception->msg = msg;
