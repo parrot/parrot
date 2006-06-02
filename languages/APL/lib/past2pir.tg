@@ -75,9 +75,8 @@ transform pir (PAST::Op) :language('PIR') {
   emit_op:
     .local string op, opquot
     op = node['op']
-    op = escape op
     opquot = escape op
-    opquot = concat '"', opquot
+    opquot = concat 'unicode:"', opquot
     opquot = concat opquot, '"'
     pirtable = find_global "APL", "%pirtable"    
     # use the code in the pirtable if it exists

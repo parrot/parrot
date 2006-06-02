@@ -81,36 +81,36 @@ END_PIR
     %1 = $I100
 END_PIR
 
-    $P0['dyadic:\u2227']  =  <<"END_PIR"            # and
+    $P0[unicode:"dyadic:\u2227"]  =  <<"END_PIR"            # and
     $I100 = %1
     $I101 = %2
     $I100 = and $I100, $I101
     %1 = $I100
 END_PIR
 
-    $P0['dyadic:\u2228']  = <<"END_PIR"             # or
+    $P0[unicode:"dyadic:\u2228"]  = <<"END_PIR"             # or
     $I100 = %1
     $I101 = %2
     $I100 = or $I100, $I101
     %1 = $I100
 END_PIR
 
-    $P0['dyadic:\u2260']  = <<"END_PIR"             # not equal
+    $P0[unicode:"dyadic:\u2260"]  = <<"END_PIR"             # not equal
     $I100 = isne %1, %2
     %1 = $I100
 END_PIR
 
-    $P0['dyadic:\u2264']  = <<"END_PIR"             # not greater than
+    $P0[unicode:"dyadic:\u2264"]  = <<"END_PIR"             # not greater than
     $I100 = isle %1, %2
     %1 = $I100
 END_PIR
 
-    $P0['dyadic:\u2265']  = <<"END_PIR"             # not less than
+    $P0[unicode:"dyadic:\u2265"]  = <<"END_PIR"             # not less than
     $I100 = isge %1, %2
     %1 = $I100
 END_PIR
 
-    $P0['dyadic:\u2371']  = <<"END_PIR"             # nor
+    $P0[unicode:"dyadic:\u2371"]  = <<"END_PIR"             # nor
     $I100 = %1
     $I101 = %2
     $I100 = or $I100, $I101
@@ -118,7 +118,7 @@ END_PIR
     %1 = $I100
 END_PIR
 
-    $P0['dyadic:\u2372']  =  <<"END_PIR"            # nand
+    $P0[unicode:"dyadic:\u2372"]  =  <<"END_PIR"            # nand
     $I100 = %1
     $I101 = %2
     $I100 = and $I100, $I101
@@ -135,37 +135,37 @@ END_PIR
 END_PIR
 
     $P0['monadic:*']      =  "    %1 = exp %1"      # exp
-    $P0['monadic:\x{d7}'] =  <<"END_PIR"            # signum
+    $P0[unicode:"monadic:\x{d7}"] =  <<"END_PIR"            # signum
     $N100 = %1
     $I100 = cmp_num $N100, 0.0
     %1 = $I100
 END_PIR
-    $P0['monadic:\x{f7}'] =  <<"END_PIR"            # reciprocal
+    $P0[unicode:"monadic:\x{f7}"] =  <<"END_PIR"            # reciprocal
     $N100 = %1
     $N100 = 1.0 / $N100
     %1 = $N100
 END_PIR
 
-    $P0['monadic:\u2212'] =  "    %1 = neg %1"      # negate
-    $P0['monadic:\u2308'] =  <<"END_PIR"            # ceiling
+    $P0[unicode:"monadic:\u2212"] =  "    %1 = neg %1"      # negate
+    $P0[unicode:"monadic:\u2308"] =  <<"END_PIR"            # ceiling
     $N100 = %1
     $I100 = ceil $N100
     %1 = $I100
 END_PIR
 
-    $P0['monadic:\u230a'] =  <<"END_PIR"            # floor
+    $P0[unicode:"monadic:\u230a"] =  <<"END_PIR"            # floor
     $N100 = %1
     $I100 = floor $N100
     %1 = $I100
 END_PIR
 
-    $P0['monadic:\u235f'] =  "    %1 = ln %1"
+    $P0[unicode:"monadic:\u235f"] =  "    %1 = ln %1"
 
 
-    $P0['monadic:\u25cb'] =  "    %1 *= 3.14159265358979323846"
+    $P0[unicode:"monadic:\u25cb"] =  "    %1 *= 3.14159265358979323846"
                                       # PI
 
-    $P0['monadic:\u2373']  =  <<"END_PIR"            # index of
+    $P0[unicode:"monadic:\u2373"]  =  <<"END_PIR"            # index of
     #XXX hack all the _1's need the same, generated unique number.
     $P100 = new 'APLVector'
     $I100 = 1
@@ -238,7 +238,7 @@ END_PIR
 # integer - but if you set it to Integer or int, the program dies with
 # 'Method not found.' or dispatches to the wrong method.
 
-.sub 'dyadic:\u2296' :multi(pmc, APLVector) # rotate
+.sub unicode:"dyadic:\u2296" :multi(pmc, APLVector) # rotate
     .param int op1
     .param pmc op2
 
@@ -280,7 +280,7 @@ nothing:
     .return($N2)
 .end
 
-.sub 'dyadic:\u2373' :multi(APLVector, APLVector) # index of
+.sub unicode:"dyadic:\u2373" :multi(APLVector, APLVector) # index of
     .param pmc op1
     .param pmc op2
  
@@ -319,7 +319,7 @@ loop_two_end:
     .return (result)
 .end
 
-.sub 'dyadic:\u2373' :multi(APLVector, Float) # index of
+.sub unicode:"dyadic:\u2373" :multi(APLVector, Float) # index of
     .param pmc op1
     .param float op2
 
@@ -349,7 +349,7 @@ no_gots:
     .return (result)
 .end
 
-.sub 'dyadic:\u25cb'          # circle
+.sub unicode:"dyadic:\u25cb"          # circle
     .param num op1
     .param num op2
     $I1 = op1
@@ -440,7 +440,7 @@ neg_seven: # arctanh(x) = .5 * (ln (1+x) - ln (1 -x))
     .return ($N1)
 .end
 
-.sub 'dyadic:\u235f'          # logarithm
+.sub unicode:"dyadic:\u235f"          # logarithm
     .param num op1
     .param num op2
     $N1 = ln op1
@@ -477,7 +477,7 @@ true:
     .return(0)
 .end
 
-.sub 'monadic:\u233d' :multi(APLVector) # reverse
+.sub unicode:"monadic:\u233d" :multi(APLVector) # reverse
     .param pmc op1
 
     .local pmc result,iter
@@ -522,13 +522,13 @@ outer_done:
     .return(result)
 .end
 
-.sub 'monadic:\u2191' # first
+.sub unicode:"monadic:\u2191" # first
     .param pmc op1
     $P1 = shift op1
     .return ($P1)
 .end
 
-.sub 'dyadic:\u2191' :multi (Float, APLVector) # take
+.sub unicode:"dyadic:\u2191" :multi (Float, APLVector) # take
     .param int op1
     .param pmc op2
 
@@ -565,7 +565,7 @@ done:
     .return (result)
 .end
 
-.sub 'dyadic:\u2193' :multi (Float, APLVector) # drop
+.sub unicode:"dyadic:\u2193" :multi (Float, APLVector) # drop
     .param int op1
     .param pmc op2
 
@@ -587,7 +587,7 @@ done:
     .return (op2)
 .end
 
-.sub 'monadic:\u2374' :multi (Float) # shape
+.sub unicode:"monadic:\u2374" :multi (Float) # shape
     .param pmc op1
 
     .local pmc result
@@ -595,12 +595,12 @@ done:
     .return (result)
 .end
 
-.sub 'monadic:\u2374' :multi (APLVector) # shape
+.sub unicode:"monadic:\u2374" :multi (APLVector) # shape
     .param pmc op1
     .return op1.'get_shape'()
 .end
 
-.sub 'monadic:\u2355' #format
+.sub unicode:"monadic:\u2355" #format
     .param pmc op1
 
     $S0 = aplformat(op1)
@@ -637,7 +637,7 @@ foreach my $operator (keys %scalar) {
 
 
 # $name
-.sub 'dyadic:$operator' :multi ( $type1, $type2 )
+.sub unicode:"dyadic:$operator" :multi ( $type1, $type2 )
     .param pmc op1
     .param pmc op2
 END_PREAMBLE
@@ -760,14 +760,6 @@ __END__
 
 tools/gen_operator_defs.pl - Generate the definitions for all the various
 APL operators in all possible configurations.
-
-=for comment
-
-Note that the sub names generated here are single quoted - they look
-like unicode, but they're really escaped unicode. Parrot doesn't
-allow unicode sub-names yet, so we escape them and use that instead.
-
-Eventually make these be unicode strings. [perl #38964]
 
 =head1 LICENSE
 
