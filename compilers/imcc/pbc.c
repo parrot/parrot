@@ -441,8 +441,9 @@ IMCC_string_from_reg(Interp *interpreter, SymReg *r)
                 PObj_constant_FLAG);
     }
     else {
-        /* unquoted bare name - ascii only for now */
-        s = string_unescape_cstring(interpreter, buf, 0, NULL);
+        /* unquoted bare name - ascii only dont't unescape it */
+        s = string_make(interpreter, buf, strlen(buf), "ascii",
+                PObj_constant_FLAG);
     }
     return s;
 }
