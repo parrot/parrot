@@ -111,7 +111,7 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     SymReg *rhs;
     SymReg *r[2];
     char *name;
-    int len;
+    int len, ascii;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
         if (IMCC_INFO(interp)->state->pasm_file) {
@@ -123,16 +123,23 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
         left->set = 'P';
     }
     r[0] = left;
-    /* strip delimiters */
-    len = strlen(constant);
-    name = mem_sys_allocate(len);
-    constant[len - 1] = '\0';
-    strcpy(name, constant + 1);
-    free(constant);
+    ascii = (*constant == '\'' || *constant == '"' );
+    if (ascii) {
+        /* strip delimiters */
+        len = strlen(constant);
+        name = mem_sys_allocate(len);
+        constant[len - 1] = '\0';
+        strcpy(name, constant + 1);
+        free(constant);
+    }
+    else
+        name = constant;
     switch (type_enum) {
         case enum_class_Sub:
         case enum_class_Coroutine:
             rhs = mk_const(interp, name, 'p');
+            if (!ascii)
+                rhs->type |= VT_ENCODED;  
             r[1] = rhs;
             rhs->pmc_type = type_enum;
             rhs->usage = U_FIXUP;
@@ -422,7 +429,7 @@ adv_named_set(Interp *interp, char *name) {
 %type <i> class_namespace
 %type <i> global constdef sub emit pcc_sub  pcc_ret
 %type <i> compilation_units compilation_unit pmc_const pragma
-%type <s> classname relop
+%type <s> classname relop any_string
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
@@ -532,9 +539,14 @@ constdef:
    ;
 
 pmc_const:
-     CONST { is_def=1; } INTC var_or_i '=' STRINGC
+     CONST { is_def=1; } INTC var_or_i '=' any_string
                 { $$ = mk_pmc_const(interp, cur_unit, $3, $4, $6);is_def=0; }
    ;
+any_string: 
+     STRINGC 
+   | USTRINGC
+   ;
+
 pasmcode:
      pasmline
    | pasmcode pasmline

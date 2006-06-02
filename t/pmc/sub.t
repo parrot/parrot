@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 50;
 use Parrot::Config;
 
 =head1 NAME
@@ -1213,4 +1213,17 @@ pir_output_like(<<'CODE', <<'OUTPUT', 'unicode sub names');
 .end
 CODE
 /Name 'nicode:"\\u7777' not found\n.*\n/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub constant');
+.sub main :main
+    .const .Sub s = unicode:"\u7777"
+    s()
+.end
+
+.sub unicode:"\u7777"
+   print "ok\n"
+.end
+CODE
+ok
 OUTPUT
