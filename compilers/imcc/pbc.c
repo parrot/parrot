@@ -240,6 +240,8 @@ store_fixup(Interp *interpreter, SymReg * r, int pc, int offset)
             str_dup(r->name), U_add_all);
     if (r->set == 'p')
         fixup->set = 'p';
+    if (r->type & VT_ENCODED)
+        fixup->type |= VT_ENCODED;
     fixup->color = pc;
     fixup->offset = offset;        /* set_p_pc  = 2  */
 }
@@ -375,7 +377,8 @@ fixup_globals(Interp *interpreter)
                     op = interpreter->op_lib->op_code("find_name_p_sc", 1);
                     assert(op);
                     interpreter->code->base.data[addr] = op;
-                    nam = mk_const(interpreter, str_dup(fixup->name), 'S');
+                    nam = mk_const(interpreter, str_dup(fixup->name), 
+                            fixup->type & VT_ENCODED ? 'U' : 'S');
                     if (nam->color >= 0)
                         col = nam->color;
                     else {

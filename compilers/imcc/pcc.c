@@ -475,7 +475,8 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             the_sub = dup_sym(the_sub);
             the_sub->set = 'p';
             the_sub->usage = U_FIXUP;
-            the_sub->type = VTCONST;
+            the_sub->type &= ~VTADDRESS;
+            the_sub->type |= VTCONST;   /* preserve VT_ENCODED */
             regs[0] = reg;
             regs[1] = the_sub;
             /*
