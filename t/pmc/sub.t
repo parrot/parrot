@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 50;
+use Parrot::Test tests => 52;
 use Parrot::Config;
 
 =head1 NAME
@@ -649,6 +649,23 @@ first
 second
 OUTPUT
 
+pir_output_like(<<'CODE', <<'OUTPUT', "implicit :main with wrong # args.");
+.sub a
+  .param int op1
+  .param int op2
+.end
+CODE
+/argument count mismatch in main \(more than 1 param\)/
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "explicit :main with wrong # args.");
+.sub a :main
+  .param int op1
+  .param int op2
+.end
+CODE
+/argument count mismatch in main \(more than 1 param\)/
+OUTPUT
 
 $temp = "temp.pir";
 open S, ">$temp" or die "Can't write $temp";
