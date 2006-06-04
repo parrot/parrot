@@ -31,7 +31,7 @@ transform eval (PAST::Stmt) :language('PIR') {
 
 transform eval (PAST::Op) :language('PIR') {
     .local pmc children_eval
-    children_eval = new 'APLVector'
+    children_eval = new 'ResizablePMCArray'
   
     .local pmc iter 
     $P0 = node['children']

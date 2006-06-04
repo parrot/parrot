@@ -52,6 +52,10 @@ sub run_apl_is() {
                       # XXX also gives us a way to specify a blank output,
                       # Since we're converting an explicit blank output to 0
     }
+    if ($output =~ m/\n\n$/smx) {
+      chomp $output;  # XXX Keep hackin' it up!
+    }
+
     my $todo   = $block->todo;
     if (defined($todo)) {
       if (! $todo) {

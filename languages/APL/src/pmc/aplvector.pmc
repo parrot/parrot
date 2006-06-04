@@ -11,6 +11,45 @@ src/pmc/APLVector.pmc - APLVector
 
 These are the vtable functions for the APL Vector class.
 
+=cut
+
+=head2 Helper functions
+
+=over 4
+
+=item INTVAL size_of_shape(INTERP, PMC)
+
+*/
+
+#include "parrot/parrot.h"
+
+INTVAL
+size_of_shape(Interp *interpreter, PMC* self, PMC* shape)
+{
+    INTVAL retval;
+    INTVAL dimension;
+    INTVAL length;
+    INTVAL pos;
+
+    if (!shape || shape == PMCNULL) { 
+        /* not set, so a simple 1D */
+        return VTABLE_get_integer(interpreter, self);
+    }
+
+    retval = 1;
+    dimension = VTABLE_get_integer(interpreter, shape);
+    for (pos = 0; pos < dimension; pos++)
+    {
+        length = VTABLE_get_integer_keyed_int(interpreter, shape, pos);
+        retval *= length; 
+    }
+    return retval;
+}
+
+/*
+
+=back
+
 =head2 Methods
 
 =over 4
@@ -18,6 +57,9 @@ These are the vtable functions for the APL Vector class.
 =cut
 
 */
+
+
+
 
 pmclass APLVector
     extends ResizablePMCArray
@@ -78,11 +120,15 @@ Returns a vector-like PMC containing the shape of this PMC.
            /*
             * No shape has been set yet. This means that we are
             * a simple vector
+            *
+            * we use our own type here. Perhaps a better way to 
+            * specify it?
             */
-            array_t = pmc_type(INTERP, 
-                string_from_const_cstring(INTERP, "Array", 0)
-            );
-            shape = pmc_new(INTERP, array_t);
+            //array_t = pmc_type(INTERP, 
+                //string_from_const_cstring(INTERP, "APLVector", 0)
+            //);
+            shape = pmc_new(INTERP,VTABLE_type(INTERP,SELF));
+//#array_t);
             VTABLE_set_integer_native(INTERP, shape, 1);
             VTABLE_set_integer_keyed_int(INTERP,shape,0,
                 VTABLE_get_integer(INTERP, SELF)
@@ -98,6 +144,12 @@ Returns a vector-like PMC containing the shape of this PMC.
 
 Reshape the existing APLvector by passing in an existing vector.
 
+If the new shape is larger than our old shape, pad the end of the APLv
+with elements from the beginning.
+
+If the new shape is shorter than our old shape, truncate elements from
+the end of the APLv.
+
 =cut
 
 */
@@ -105,8 +157,32 @@ Reshape the existing APLvector by passing in an existing vector.
 
     METHOD void set_shape(PMC *new_shape) {
         STRING* property_name;
+        PMC*    old_shape;
+        INTVAL  old_size,new_size,pos;
+
+        /* save the old shape momentarily, set the new shape */
         property_name = string_from_cstring(INTERP,"shape",0);
+        old_shape = VTABLE_getprop(INTERP, SELF, property_name);
         VTABLE_setprop(INTERP, SELF, property_name, new_shape);
+
+        /* how big are these shapes? */
+        old_size = size_of_shape(INTERP,SELF,old_shape);
+        new_size = size_of_shape(INTERP,SELF,new_shape);
+
+        if (old_size > new_size) {
+            for (; new_size != old_size; new_size++) {
+                VTABLE_pop_pmc(INTERP,SELF);
+            }
+        } else if (new_size > old_size) {
+            pos = 0;
+            for (; new_size != old_size; old_size++, pos++) {
+                /* XXX clone this? */
+                VTABLE_push_pmc(INTERP,SELF,
+                    VTABLE_get_pmc_keyed_int(INTERP,SELF,pos)
+                );
+            }
+        }
+
         return;
     }
 

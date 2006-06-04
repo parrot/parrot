@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 43;
+use t::APL tests => 44;
 
 run_apl_is();
 
@@ -151,51 +151,48 @@ __DATA__
 --- APL: ⍴⍕⍳20
 --- out: 50
 
+=== reshape, numeric vector (verify resulting shape)
+--- APL: ⍴2 3⍴⍳6
+--- out
+2 3
+
 === reshape, numeric vector
 --- APL: 2 3⍴⍳6
 --- out
 1 2 3
 4 5 6
---- todo
 
 === reshape, numeric vector, too few elements.
 --- APL: 2 3⍴⍳2
 --- out
 1 2 1
 2 1 2
---- todo
 
 === reshape, numeric vector, too many elements.
 --- APL: 2 3⍴⍳10
 --- out
 1 2 3
 4 5 6
---- todo
 
 === reshape, character vector
 --- APL: 2 3⍴'ABCDEF'
 --- out
 ABC
 DEF
---- todo
 
 === reshape, character vector, too few elements
 --- APL: 2 3⍴'AB'
 --- out
 ABA
 BAB
---- todo
 
 === reshape, character vector, too many elements
 --- APL: 2 3⍴'ABCDEFGHIJKL'
 --- out
 ABC
 DEF
---- todo
 
 === use reshape to create a single-element vector
 --- APL
-X←1⍴2
-⍴X
+⍴1⍴2
 --- out: 1
---- todo

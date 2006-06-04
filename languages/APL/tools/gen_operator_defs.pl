@@ -191,16 +191,20 @@ END_PIR
 
     .local pmc value
     $I0 = does arg, 'array'
-    if $I0 goto print_array
+    if $I0 goto print_vector
     value = arg
     bsr print_value
     .return (result)
 
-  print_array:
+  print_vector:
+    .local pmc shape, iter
     .local string value_type, old_type
     value_type = 'String'
-    .local pmc iter
     iter = new .Iterator, arg
+    shape = arg.'get_shape'()
+    $I0 = shape
+    if $I0 == 2 goto print_2D
+    # XXX assume 1d otherwise.
     unless iter goto iter_end
   iter_loop:
     old_type = value_type
@@ -217,6 +221,45 @@ END_PIR
   iter_end:
     .return (result)
 
+  print_2D:
+    .local int row_size, pos, newline
+    row_size = shape[1]
+    pos = 1 
+    iter = new .Iterator, arg
+    value_type = 'String'
+    unless iter goto loop_end_2d
+  loop_2d:
+    newline = 0
+    if pos != row_size goto cont_2d
+    newline = 1
+    pos = 0
+
+  cont_2d:
+    old_type = value_type
+    value = shift iter
+    bsr print_value
+    unless iter goto loop_end_2d
+    value_type = typeof value
+    if newline goto print_newline
+    if value_type != 'String' goto print_space_2d
+    if old_type != value_type goto print_space_2d
+    goto print_newline
+
+  print_space_2d:  # don't print a space if we're about to end a row
+    if newline goto print_newline
+    result .= ' '
+    goto continue_2d
+
+  print_newline:
+    if newline==0 goto continue_2d
+    result .= "\n"
+
+  continue_2d:
+    inc pos 
+    goto loop_2d
+  loop_end_2d:
+   .return(result)
+ 
   print_value:
     if value >= 0.0 goto print_value_1
     result .= unicode:"\u207b"
@@ -599,6 +642,29 @@ done:
     .param pmc op1
     .return op1.'get_shape'()
 .end
+
+.sub unicode:"dyadic:\u2374" :multi (APLVector,APLVector) # reshape
+    .param pmc op1
+    .param pmc op2
+
+    # XXX is a clone needed here?
+    say 'what'
+    op2.'set_shape'(op1)
+    .return (op2)
+.end
+
+.sub unicode:"dyadic:\u2374" :multi (APLVector,Float) # reshape
+    .param pmc op1
+    .param pmc op2
+
+    # Convert the scalar into a vector and reshape it.
+    $P1 = new 'APLVector'
+    push $P1, op2
+    say 'eek'
+    $P1.'set_shape'(op1)
+    .return ($P1)
+.end
+
 
 .sub unicode:"monadic:\u2355" #format
     .param pmc op1

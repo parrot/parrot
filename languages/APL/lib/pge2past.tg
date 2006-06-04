@@ -6,7 +6,7 @@ transform result (ROOT) :language('PIR') {
     result = new 'PAST::Stmts'
     result.'set_node'(node)
 
-    children = new 'APLVector'
+    children = new 'ResizablePMCArray'
     $P0 = node['statement']
     iter = new .Iterator, $P0
   iter_loop:
@@ -73,7 +73,7 @@ transform result (APL::Grammar::expression) :language('PIR') {
     result['op'] = op
 
     # build a 'children' array of our (two) operands   
-    children = new 'APLVector'
+    children = new 'ResizablePMCArray'
     $P0 = node['subexpression']
     $P1 = tree.get('result', $P0, 'APL::Grammar::subexpression')
     push children, $P1
@@ -96,7 +96,7 @@ transform result (APL::Grammar::expression) :language('PIR') {
     result['op'] = op
 
     # build a "children" array of our (one) operand
-    children = new 'APLVector'
+    children = new 'ResizablePMCArray'
     $P0 = node['expression']
     $P1 = tree.get('result', $P0, 'APL::Grammar::expression')
     push children, $P1
@@ -172,7 +172,7 @@ transform result (APL::Grammar::numeric_constant) :language('PIR') {
     result = new 'PAST::Vector'
     result.set_node(node)
 
-    children = new 'APLVector'
+    children = new 'ResizablePMCArray'
     iter = new .Iterator, $P0
   iter_loop:
     unless iter goto iter_end
@@ -197,7 +197,7 @@ transform result (APL::Grammar::decimal_representation) :language('PIR') {
   minus_loop:
     $I0 = index $S0, unicode:"\u207b"
     if $I0 < 0 goto set_value
-    substr $S0, $I0, 1, "-"
+    substr $S0, $I0, 1, '-'
     goto minus_loop
   set_value:
     # $N0 = $S0
@@ -211,7 +211,7 @@ transform result (APL::Grammar::character_constant_double) :language('PIR') {
     result = new 'PAST::Vector'
     result.set_node(node)
 
-    children = new 'APLVector'
+    children = new 'ResizablePMCArray'
     $P0 = node['double_quoted_character'] 
 
     iter = new .Iterator, $P0
@@ -232,7 +232,7 @@ transform result (APL::Grammar::character_constant_single) :language('PIR') {
     result = new 'PAST::Vector'
     result.set_node(node)
 
-    children = new 'APLVector'
+    children = new 'ResizablePMCArray'
     $P0 = node['single_quoted_character'] 
 
     iter = new .Iterator, $P0

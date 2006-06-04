@@ -29,5 +29,6 @@ o More type issues: Given the APL code:
   ≡⊂FOO
 2
 
-... How do we store ⊂FOO? It's a scalar (shape), but contains a matrix (depth). Perhaps a ref type of some kind? Or should we try to make APLVector deal with this?
-
+... How do we store ⊂FOO? It's a scalar (shape), but contains a matrix (depth).
+Perhaps a ref type of some kind? Or should we try to make APLVector deal with
+this?

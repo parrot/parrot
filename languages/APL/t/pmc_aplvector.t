@@ -102,7 +102,7 @@ dim2:2
 OUT
 
 SKIP: {
-    skip "not implemented", 7;
+    skip "not implemented", 5;
 
 pir_output_is(<<'CODE', <<'OUT', 'index 1D');
   .sub test :main
@@ -162,6 +162,7 @@ pir_output_is(<<'CODE', <<'OUT', 'index 2D');
      say $P3
      $P3 = $P1[2;2]
      say $P3
+  .end
 CODE
 1
 2
@@ -197,6 +198,7 @@ pir_output_is(<<'CODE', <<'OUT', 'reshape with fewer elements');
      say $P3
      $P3 = $P1[2;2]
      say $P3
+  .end
 CODE
 1
 2
@@ -234,6 +236,7 @@ pir_output_is(<<'CODE', <<'OUT', 'reshape with more elements');
      say $P3
      $P3 = $P1[2;2]
      say $P3
+   .end
 CODE
 1
 2
@@ -282,7 +285,8 @@ pir_output_is(<<'CODE', <<'OUT', '3-dimensional');
      $P3 = $P1[2;2;1]
      say $P3
      $P3 = $P1[2;2;2]
-     say $P3
+     say $P4
+  .end
 CODE
 1
 2
@@ -293,6 +297,8 @@ CODE
 7
 8
 OUT
+
+}
 
 pir_output_is(<<'CODE', <<'OUT', 'Iterator: 1d');
   .sub test :main
@@ -316,7 +322,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Iterator: 1d');
      say $P3
      goto loop
   end_loop:
-  end
+  .end
 CODE
 1
 2
@@ -360,5 +366,3 @@ CODE
 3
 4
 OUT
-
-}
