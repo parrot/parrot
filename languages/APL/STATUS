@@ -1,10 +1,5 @@
 Things to do:
 
-o Update APLVector to handle at least 2-dimensional arrays. See core 
-  "multiarray" for potentially reuse / subclassing. This now also
-  includes character arrays.
-  o properly print/display N dimensional arrays. 
-
 o Need more tests! More tests for each type of operand per operator.
 
 o Add function declarations.
