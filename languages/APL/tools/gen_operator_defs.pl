@@ -648,7 +648,6 @@ done:
     .param pmc op2
 
     # XXX is a clone needed here?
-    say 'what'
     op2.'set_shape'(op1)
     .return (op2)
 .end
@@ -660,7 +659,6 @@ done:
     # Convert the scalar into a vector and reshape it.
     $P1 = new 'APLVector'
     push $P1, op2
-    say 'eek'
     $P1.'set_shape'(op1)
     .return ($P1)
 .end
