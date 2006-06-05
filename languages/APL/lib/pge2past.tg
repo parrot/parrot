@@ -91,7 +91,6 @@ transform result (APL::Grammar::expression) :language('PIR') {
 
     # set the function name for this operator
     op = node['monadic_identifier']
-    op = op[0]
     op = concat 'monadic:', op
     result['op'] = op
 
