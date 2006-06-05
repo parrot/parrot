@@ -42,6 +42,7 @@ C
 2
 3
 --- todo
+--- excuse: APLX only?
 
 === multiple specification, repeated
 --- APL
@@ -54,4 +55,4 @@ C
 3.14
 3.14
 --- todo
-
+--- excuse: APLX only?
