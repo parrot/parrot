@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib qw(APL . lib ../lib ../../lib ../../../lib);
-use t::APL tests => 98;
+use t::APL tests => 100;
 
 diag "need more tests to test int <op> int, float <op> float, etc.";
 
@@ -400,3 +400,17 @@ __DATA__
 === deal
 --- excuse: need tests
 --- todo
+
+=== quad output, midstream.
+--- APL: 2+⎕←3+4
+--- out
+7
+9
+
+=== quad output, variable
+--- APL
+⎕← A ← 2+2
+A+1
+--- out
+4
+5

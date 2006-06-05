@@ -682,6 +682,14 @@ done:
     .return(result)
 .end
 
+.sub unicode:"monadic:\u2395\u2190" # quad output
+    .param pmc op1
+
+    'aplprint'(op1)
+    .return(op1)
+.end
+
+
 END_OF_TEMPLATE
 
 # Generate all variants for scalar dyadic ops.
