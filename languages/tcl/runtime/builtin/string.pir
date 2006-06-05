@@ -946,3 +946,9 @@ bad_args:
   .throw ("wrong # args: should be \"string compare ?-nocase? ?-length int? string1 string2\"")
 
 .end
+
+.sub "wordend"
+  .param pmc argv
+  print "wordend\n"
+  .return()
+.end
