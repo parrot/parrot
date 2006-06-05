@@ -45,7 +45,7 @@ static STRING* match_range(Interp* interp, PMC* self, PMC* range)
     STRING* input;
     int start, end;
 
-    b = hash_get_bucket(interp, hash, input_key);
+    b = parrot_hash_get_bucket(interp, hash, input_key);
     if (!b) {
         internal_exception(1, "Match: input string not set");
         return NULL;
@@ -113,7 +113,7 @@ needs to be done once.
     STRING* get_string_keyed_str (STRING* key) {
         PMC* value;
         Hash* hash = (Hash*) PMC_struct_val(SELF);
-        HashBucket *b = hash_get_bucket(INTERP, hash, key);
+        HashBucket *b = parrot_hash_get_bucket(INTERP, hash, key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
             /* return VTABLE_get_string(INTERP, undef); */
@@ -145,14 +145,14 @@ Returns the string value for the element at C<*key>.
                 /* BUG! This will iterate through the input string as
                  * well as all of the real values. */
                 if (hash->key_type == Hash_key_type_int) {
-                    INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
+                    INTVAL i = (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
                     return string_from_int(INTERP, i);
                 }
-                return hash_get_idx(INTERP, hash, key);
+                return parrot_hash_get_idx(INTERP, hash, key);
             default:
                 keystr = make_hash_key(INTERP, key);
         }
-        b = hash_get_bucket(INTERP, hash, keystr);
+        b = parrot_hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             return SELF.get_string_keyed_str(keystr);
         }
@@ -176,16 +176,16 @@ Returns the string value for the element at C<*key>.
                  * check if we really have Hash_key_type_int
                  */
                 if (hash->key_type == Hash_key_type_int) {
-                    return (INTVAL)hash_get_idx(INTERP, hash, key);
+                    return (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
                 }
                 else {
-                    STRING *s = hash_get_idx(INTERP, hash, key);
+                    STRING *s = parrot_hash_get_idx(INTERP, hash, key);
                     return string_to_int(INTERP, s);
                 }
             default:
                 keystr = make_hash_key(INTERP, key);
         }
-        b = hash_get_bucket(INTERP, hash, keystr);
+        b = parrot_hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
             return 0;
@@ -212,7 +212,7 @@ has not completed yet.
         Hash* hash = (Hash*) PMC_struct_val(SELF);
         HashBucket *b;
 
-        b = hash_get_bucket(INTERP, hash, input_key);
+        b = parrot_hash_get_bucket(INTERP, hash, input_key);
         if (!b) {
             internal_exception(1, "Match: cannot get status of incomplete match");
             return 0;

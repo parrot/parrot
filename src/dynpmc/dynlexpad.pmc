@@ -76,7 +76,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         }
         else
             PMC_pmc_val(SELF) = NULL;
-        new_pmc_hash(INTERP, SELF);
+        parrot_new_pmc_hash(INTERP, SELF);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -88,7 +88,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
     void destroy () {
         if (PMC_struct_val(SELF)) {
-            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            parrot_hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -107,11 +107,11 @@ Marks the lexpad hash as live.
         if (std_pad)
             pobject_lives(INTERP, (PObj *)std_pad);
         if (PMC_struct_val(SELF))
-            mark_hash(INTERP, PMC_struct_val(SELF));
+            parrot_mark_hash(INTERP, PMC_struct_val(SELF));
     }
 
     PMC* get_pmc_keyed_str (STRING* name) {
-        HashBucket *b = hash_get_bucket(INTERP,
+        HashBucket *b = parrot_hash_get_bucket(INTERP,
             (Hash*) PMC_struct_val(SELF), name);
         if (!b) {
             PMC *std_pad = PMC_pmc_val(SELF);
@@ -124,7 +124,7 @@ Marks the lexpad hash as live.
 
     INTVAL exists_keyed_str(STRING* name) {
         PMC *std_pad;
-        if (hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), name))
+        if (parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), name))
             return 1;
         std_pad = PMC_pmc_val(SELF);
         if (std_pad)
@@ -147,7 +147,7 @@ Marks the lexpad hash as live.
         if (std_pad && VTABLE_exists_keyed_str(INTERP, std_pad, name)) {
             VTABLE_set_pmc_keyed_str(INTERP, std_pad, name, value);
         }
-        hash_put(INTERP, PMC_struct_val(SELF), name, value);
+        parrot_hash_put(INTERP, PMC_struct_val(SELF), name, value);
     }
 
     void set_pmc_keyed(PMC* name, PMC* value) {

@@ -114,7 +114,7 @@ a NameSpace or a var, the NameSpace is returned.
 
     void set_pmc_keyed_str(STRING *key, PMC *value) {
         PMC *tuple = NULL;
-        HashBucket *b = hash_get_bucket(INTERP, 
+        HashBucket *b = parrot_hash_get_bucket(INTERP, 
                 (Hash*) PMC_struct_val(SELF), key);
         int val_is_NS = value->vtable->base_type == enum_class_NameSpace;
         if (!b)
@@ -215,7 +215,7 @@ a NameSpace or a var, the NameSpace is returned.
     }
 
     PMC* get_pmc_keyed_str (STRING* key) {
-        PMC *ns = hash_get(INTERP, 
+        PMC *ns = parrot_hash_get(INTERP, 
                 (Hash*) PMC_struct_val(SELF), key);
         if (!ns)
             return PMCNULL;
@@ -269,7 +269,7 @@ a NameSpace or a var, the var is returned.
 */
 
     void* get_pointer_keyed_str (STRING* key) {
-        PMC *ns = hash_get(INTERP, 
+        PMC *ns = parrot_hash_get(INTERP, 
                 (Hash*) PMC_struct_val(SELF), key);
         if (!ns)
             return PMCNULL;

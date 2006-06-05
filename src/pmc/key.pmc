@@ -321,7 +321,7 @@ PMC_int_val(-1) means end of iteration.
                 break;
             case ITERATE_GET_NEXT:
                 /*
-                 * src/hash.c:hash_get_idx() advances to next
+                 * src/hash.c:parrot_hash_get_idx() advances to next
                  * so, if we are iterating over a hash do nothing
                  * */
                 if (!is_hash_iter(agg, ret)) {

@@ -73,7 +73,7 @@ subroutine.
     void init_pmc(PMC* sub) {
         assert(PObj_constant_TEST(SELF));
         PMC_pmc_val(SELF) = sub;
-        new_pmc_hash_x(INTERP, SELF,
+        parrot_new_pmc_hash_x(INTERP, SELF,
             enum_hash_int,
             Hash_key_type_STRING,
             (hash_comp_fn)string_equal,     /* STRING compare */
@@ -96,11 +96,11 @@ Returns the number of elements in the LexInfo hash.
 */
 
     METHOD void declare_lex_preg (STRING* name, INTVAL preg) {
-        hash_put(INTERP, PMC_struct_val(SELF), name, (void*)preg);
+        parrot_hash_put(INTERP, PMC_struct_val(SELF), name, (void*)preg);
     }
 
     INTVAL elements () {
-        return hash_size(INTERP, PMC_struct_val(SELF));
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
     }
 
 /*

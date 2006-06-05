@@ -399,7 +399,7 @@ The created key = "\1idx".
     INTVAL exists_keyed_str(STRING* key) {
         Hash *h = PMC_struct_val(SELF);
         HashBucket *b;
-        b = hash_get_bucket(INTERP, h, key);
+        b = parrot_hash_get_bucket(INTERP, h, key);
         if (b && b->key)
             return 1;
         return 0;
@@ -516,7 +516,7 @@ Deletes the key C<*key> from the hash.
     void delete_keyed_str(STRING* key) {
         Hash *h = PMC_struct_val(SELF);
         HashBucket *b;
-        b = hash_get_bucket(INTERP, h, key);
+        b = parrot_hash_get_bucket(INTERP, h, key);
         if (b)
             b->key = NULL;
     }
@@ -543,7 +543,7 @@ were deleted
         void *valtmp;
 
         dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        new_pmc_hash_x(INTERP, dest, hash->entry_type,
+        parrot_new_pmc_hash_x(INTERP, dest, hash->entry_type,
                 hash->key_type, hash->compare, hash->hash_val);
         h_dest = PMC_struct_val(dest);
         for (i = 0; i <= hash->mask; i++) {
@@ -552,7 +552,7 @@ were deleted
             if (!key)
                 continue;
             valtmp = VTABLE_clone(INTERP, (PMC*)b->value);
-            hash_put(INTERP, h_dest, key, valtmp);
+            parrot_hash_put(INTERP, h_dest, key, valtmp);
         }
         return dest;
     }

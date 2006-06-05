@@ -138,12 +138,12 @@ Free hash structure.
     void init () {
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-        new_pmc_hash(INTERP, SELF);
+        parrot_new_pmc_hash(INTERP, SELF);
     }
 
     void destroy () {
         if (PMC_struct_val(SELF)) {
-            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            parrot_hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -159,7 +159,7 @@ Marks the hash as live.
 
     void mark () {
         if (PMC_struct_val(SELF))
-            mark_hash(INTERP, PMC_struct_val(SELF));
+            parrot_mark_hash(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -173,7 +173,7 @@ Returns the type of the element for C<*key>.
 */
 
     INTVAL type_keyed_str (STRING* key) {
-        HashBucket* const b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+        HashBucket* const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
@@ -197,7 +197,7 @@ Returns the type of the element for C<*key>.
         PMC* valpmc;
         PMC* nextkey;
         STRING* const keystr = make_hash_key(INTERP, key);
-        HashBucket* const b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+        HashBucket* const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                             keystr);
         if (b == NULL) {
             PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
@@ -224,7 +224,7 @@ Creates and returns a clone of the hash.
     PMC* clone () {
         PMC* const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_destroy_SETALL(dest);
-        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
+        parrot_hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
                    (Hash**)&PMC_struct_val(dest));
         ((Hash*)PMC_struct_val(dest))->container = dest;
         return dest;
@@ -241,7 +241,7 @@ Returns the size of the hash.
 */
 
     INTVAL get_integer () {
-        return hash_size(INTERP, PMC_struct_val(SELF));
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -255,7 +255,7 @@ Returns the size of the hash.
 */
 
     INTVAL get_integer_keyed_str (STRING* key) {
-        HashBucket * const b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+        HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
@@ -293,16 +293,16 @@ Returns the integer value for the element at C<*key>.
                  * check if we really have Hash_key_type_int
                  */
                 if (hash->key_type == Hash_key_type_int) {
-                    return (INTVAL)hash_get_idx(INTERP, hash, key);
+                    return (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
                 }
                 else {
-                    STRING *s = hash_get_idx(INTERP, hash, key);
+                    STRING *s = parrot_hash_get_idx(INTERP, hash, key);
                     return string_to_int(INTERP, s);
                 }
             default:
                 keystr = make_hash_key(INTERP, key);
         }
-        b = hash_get_bucket(INTERP, hash, keystr);
+        b = parrot_hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
             PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
@@ -327,7 +327,7 @@ Returns the integer value for the element at C<*key>.
 */
 
     FLOATVAL get_number_keyed_str (STRING* key) {
-        HashBucket * const b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+        HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             /* XXX Warning: Use of uninitialized value */
@@ -355,7 +355,7 @@ Returns the floating-point value for the element at C<*key>.
     FLOATVAL get_number_keyed (PMC* key) {
         PMC* valpmc;
         STRING* const keystr = make_hash_key(INTERP, key);
-        HashBucket * const b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+        HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         keystr);
         PMC* nextkey;
         if (b == NULL) {
@@ -444,7 +444,7 @@ Return a representation of the hash contents.
 */
 
     STRING* get_string_keyed_str (STRING* key) {
-        HashBucket * const b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+        HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
@@ -481,14 +481,14 @@ Returns the string value for the element at C<*key>.
             case KEY_hash_iterator_FLAGS:
                 /* called from iterator with an integer idx in key */
                 if (hash->key_type == Hash_key_type_int) {
-                    INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
+                    INTVAL i = (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
                     return string_from_int(INTERP, i);
                 }
-                return hash_get_idx(INTERP, hash, key);
+                return parrot_hash_get_idx(INTERP, hash, key);
             default:
                 keystr = make_hash_key(INTERP, key);
         }
-        b = hash_get_bucket(INTERP, hash, keystr);
+        b = parrot_hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
             PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
@@ -513,7 +513,7 @@ Returns true if the hash size is not zero.
 */
 
     INTVAL get_bool () {
-        return hash_size(INTERP, PMC_struct_val(SELF)) != 0;
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF)) != 0;
     }
 
 /*
@@ -527,7 +527,7 @@ Returns the number of elements in the hash.
 */
 
     INTVAL elements () {
-        return hash_size(INTERP, PMC_struct_val(SELF));
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -542,7 +542,7 @@ Returns the number of elements in the hash.
 
     PMC* get_pmc_keyed_str (STRING* key) {
         HashBucket * const b =
-            hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
+            parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (b == NULL) {
             /* XXX should store the undef for consistency */
             return get_none_pmc(INTERP, SELF->vtable->base_type);
@@ -577,7 +577,7 @@ Returns the PMC value for the element at C<*key>.
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
         PMC_data(key) = (void *)INITBucketIndex;
         /* -1 for an empty hash, 0 for a non-empty hash.  */
-        PMC_int_val(key) = hash_size(INTERP, PMC_struct_val(SELF)) ? 0 : -1;
+        PMC_int_val(key) = parrot_hash_size(INTERP, PMC_struct_val(SELF)) ? 0 : -1;
         return iter;
     }
 
@@ -598,12 +598,12 @@ Returns the PMC value for the element at C<*key>.
                  * check if we really have Hash_key_type_int
                  */
                 if (hash->key_type == Hash_key_type_int) {
-                    const INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
+                    const INTVAL i = (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
                     result = pmc_new(INTERP, enum_class_Integer);
                     PMC_int_val(result) = i;
                 }
                 else {
-                    STRING * const s = hash_get_idx(INTERP, hash, key);
+                    STRING * const s = parrot_hash_get_idx(INTERP, hash, key);
                     result = pmc_new(INTERP, enum_class_String);
                     VTABLE_set_string_native(INTERP, result, s);
                 }
@@ -611,7 +611,7 @@ Returns the PMC value for the element at C<*key>.
             default:
                 keystr = make_hash_key(INTERP, key);
         }
-        b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+        b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         keystr);
         if (b == NULL) {
             /* XXX should store the undef for consistency */
@@ -658,7 +658,7 @@ Returns whether the hash is the same as C<*other>.
             PMC* val = get_integer_pmc(INTERP, SELF->vtable->base_type);
 
             VTABLE_set_integer_native(INTERP, val, value);
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+            parrot_hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
         }
         box = SELF.get_pmc_keyed_str(keystr);
@@ -681,7 +681,7 @@ Returns whether the hash is the same as C<*other>.
         PMC* const val = get_integer_pmc(INTERP, SELF->vtable->base_type);
 
         PMC_int_val(val) = value;
-        hash_put(INTERP, PMC_struct_val(SELF), key, val);
+        parrot_hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }
 
 /*
@@ -703,7 +703,7 @@ Returns whether the hash is the same as C<*other>.
         if (nextkey == NULL) {
             PMC* val = get_number_pmc(INTERP, SELF->vtable->base_type);
             PMC_num_val(val) = value;
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+            parrot_hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
         }
         box = SELF.get_pmc_keyed_str(keystr);
@@ -728,7 +728,7 @@ Sets C<value> as the value for C<*key>.
         PMC* const val = get_number_pmc(INTERP, SELF->vtable->base_type);
 
         PMC_num_val(val) = value;
-        hash_put(INTERP, PMC_struct_val(SELF), key, val);
+        parrot_hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }
 
 /*
@@ -750,7 +750,7 @@ Sets C<value> as the value for C<*key>.
         if (nextkey == NULL) {
             PMC* const val = get_string_pmc(INTERP, SELF->vtable->base_type);
             VTABLE_set_string_native(INTERP, val, value);
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+            parrot_hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
         }
         box = SELF.get_pmc_keyed_str(keystr);
@@ -773,7 +773,7 @@ Sets C<value> as the value for C<*key>.
         PMC* const val = get_string_pmc(INTERP, SELF->vtable->base_type);
 
         VTABLE_set_string_native(INTERP, val, value);
-        hash_put(INTERP, PMC_struct_val(SELF), key, val);
+        parrot_hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }
 
 /*
@@ -793,7 +793,7 @@ Sets C<value> as the value for C<*key>.
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, value);
+            parrot_hash_put(INTERP, PMC_struct_val(SELF), keystr, value);
             return;
         }
         box = SELF.get_pmc_keyed_str(keystr);
@@ -815,7 +815,7 @@ Sets C<*value> as the value for C<*key>.
 */
 
     void set_pmc_keyed_str (STRING* key, PMC* value) {
-        hash_put(INTERP, PMC_struct_val(SELF), key, value);
+        parrot_hash_put(INTERP, PMC_struct_val(SELF), key, value);
     }
 
 /*
@@ -865,7 +865,7 @@ Check if two hashes hold the same keys and values.
 
     INTVAL exists_keyed_str(STRING* key) {
         HashBucket * const b =
-            hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
+            parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         return b != NULL;
     }
 
@@ -885,7 +885,7 @@ Returns whether a key C<*key> exists in the hash.
         HashBucket *b;
 
         key = key_next(INTERP, key);
-        b = hash_get_bucket(INTERP, h, sx);
+        b = parrot_hash_get_bucket(INTERP, h, sx);
         if (b == NULL)
             return 0;       /* no such key */
         if (key == NULL)
@@ -903,7 +903,7 @@ Returns whether a key C<*key> exists in the hash.
 
     INTVAL defined_keyed_str(STRING* key) {
         HashBucket * const b =
-            hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
+            parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
 
         if (b == NULL)
             return 0;       /* no such key */
@@ -926,7 +926,7 @@ Returns whether the value for C<*key> is defined.
         HashBucket *b;
 
         key = key_next(INTERP, key);
-        b = hash_get_bucket(INTERP, h, sx);
+        b = parrot_hash_get_bucket(INTERP, h, sx);
         if (b == NULL)
             return 0;       /* no such key */
         if (key == NULL)
@@ -944,7 +944,7 @@ Returns whether the value for C<*key> is defined.
 */
 
     void delete_keyed_str(STRING* key) {
-        hash_delete(INTERP, (Hash *)PMC_struct_val(SELF), key);
+        parrot_hash_delete(INTERP, (Hash *)PMC_struct_val(SELF), key);
     }
 
 /*
@@ -963,11 +963,11 @@ Deletes the element associated with C<*key>.
         HashBucket *b;
 
         key = key_next(INTERP, key);
-        b = hash_get_bucket(INTERP, h, sx);
+        b = parrot_hash_get_bucket(INTERP, h, sx);
         if (b == NULL)
             return;  /* no such key */
         if (key == NULL)
-            hash_delete(INTERP, h, sx);
+            parrot_hash_delete(INTERP, h, sx);
         else
             VTABLE_delete_keyed(INTERP, (PMC*)b->value, key);
     }
@@ -1010,7 +1010,7 @@ Used during archiving to visit the elements in the hash.
 
     void visit(visit_info *info) {
         info->container = SELF;
-        hash_visit(INTERP, (Hash*)PMC_struct_val(SELF), info);
+        parrot_hash_visit(INTERP, (Hash*)PMC_struct_val(SELF), info);
         SUPER(info);
     }
 

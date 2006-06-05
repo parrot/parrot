@@ -1191,7 +1191,7 @@ todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         UINTVAL *id)
 {
     HashBucket * const b =
-        hash_get_bucket(interpreter, PMC_struct_val(info->seen), pmc);
+        parrot_hash_get_bucket(interpreter, PMC_struct_val(info->seen), pmc);
 
     if (b) {
         *id = (UINTVAL) b->value;
@@ -1200,7 +1200,7 @@ todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
 
     info->id += 4;      /* next id to freeze */
     *id = info->id;
-    hash_put(interpreter, PMC_struct_val(info->seen), pmc, (void*)*id);
+    parrot_hash_put(interpreter, PMC_struct_val(info->seen), pmc, (void*)*id);
     /* remember containers */
     if (pmc->pmc_ext)
         list_unshift(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);

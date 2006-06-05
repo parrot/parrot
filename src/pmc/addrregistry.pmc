@@ -67,13 +67,13 @@ Free hash structure.
     void init () {
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-        new_pmc_hash_x(INTERP, SELF, enum_type_int, Hash_key_type_PMC,
+        parrot_new_pmc_hash_x(INTERP, SELF, enum_type_int, Hash_key_type_PMC,
                 int_compare, key_hash_int);
     }
 
     void destroy () {
         if (PMC_struct_val(SELF)) {
-            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            parrot_hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -90,7 +90,7 @@ Marks the hash as live.
 
     void mark () {
         if (PMC_struct_val(SELF))
-            mark_hash(INTERP, PMC_struct_val(SELF));
+            parrot_mark_hash(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -116,18 +116,18 @@ Returns true if the hash size is not zero.
         Hash *hash = PMC_struct_val(SELF);
         HashBucket *b;
 
-        b = hash_get_bucket(INTERP, hash, key);
+        b = parrot_hash_get_bucket(INTERP, hash, key);
         if (b == NULL)
             return 0;
         return (INTVAL) b->value;
     }
 
     INTVAL elements () {
-        return hash_size(INTERP, PMC_struct_val(SELF));
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
     }
 
     INTVAL get_bool () {
-        return hash_size(INTERP, PMC_struct_val(SELF)) != 0;
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF)) != 0;
     }
 /*
 
@@ -153,25 +153,25 @@ reaches 0, delete the entry.
     void set_pmc_keyed (PMC* key, PMC* value) {
         Hash * hash = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
-        b = hash_get_bucket(INTERP, hash, key);
+        b = parrot_hash_get_bucket(INTERP, hash, key);
         if (b)
             LVALUE_CAST(char *, b->value) ++;
         else
-            hash_put(INTERP, hash, key, (void *) 1);
+            parrot_hash_put(INTERP, hash, key, (void *) 1);
     }
 
     void set_integer_keyed (PMC* key, INTVAL value) {
         Hash * hash = (Hash *)PMC_struct_val(SELF);
-        hash_put(INTERP, hash, key, (void *) value);
+        parrot_hash_put(INTERP, hash, key, (void *) value);
     }
 
     void delete_keyed(PMC* key) {
         Hash * hash = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
-        b = hash_get_bucket(INTERP, hash, key);
+        b = parrot_hash_get_bucket(INTERP, hash, key);
         if (b) {
             if ((long) b->value == 1L)
-                hash_delete(INTERP, hash, key);
+                parrot_hash_delete(INTERP, hash, key);
             else
                 LVALUE_CAST(long, b->value) --;
         }
@@ -200,7 +200,7 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
 
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
                 KEY_hash_iterator_FLAGS) {
-            return hash_get_idx(INTERP, hash, key);
+            return parrot_hash_get_idx(INTERP, hash, key);
         }
         return PMCNULL;
     }

@@ -81,7 +81,7 @@ Free hash structure.
     void init () {
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-        new_pmc_hash_x(INTERP, SELF,
+        parrot_new_pmc_hash_x(INTERP, SELF,
             enum_type_PMC,
             Hash_key_type_PMC,
             object_compare,     /* object compare */
@@ -90,7 +90,7 @@ Free hash structure.
 
     void destroy () {
         if (PMC_struct_val(SELF)) {
-            hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            parrot_hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -106,7 +106,7 @@ Marks the hash as live.
 
     void mark () {
         if (PMC_struct_val(SELF))
-            mark_hash(INTERP, PMC_struct_val(SELF));
+            parrot_mark_hash(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -123,11 +123,11 @@ Deletes the element associated with C<*key>.
         Hash * h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
         PMC *nextkey = key_next(INTERP, key);
-        b = hash_get_bucket(INTERP, h, key);
+        b = parrot_hash_get_bucket(INTERP, h, key);
         if (b == NULL)
                 return;  /* no such key */
         else if (nextkey == NULL)
-            hash_delete(INTERP, h, key);
+            parrot_hash_delete(INTERP, h, key);
         else
             VTABLE_delete_keyed(INTERP, (PMC*)b->value, nextkey);
     }
@@ -143,7 +143,7 @@ Returns the number of elements in the hash.
 */
 
     INTVAL elements () {
-        return hash_size(INTERP, PMC_struct_val(SELF));
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -160,7 +160,7 @@ Returns whether a key C<*key> exists in the hash.
         Hash * h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
         PMC *nextkey = key_next(INTERP, key);
-        b = hash_get_bucket(INTERP, h, key);
+        b = parrot_hash_get_bucket(INTERP, h, key);
         if (b == NULL)
             return 0;       /* no such key */
         if (nextkey == NULL)
@@ -238,7 +238,7 @@ Return a new iterator for dictionary
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
         PMC_int_val(key) = 0;
         PMC_data(key) = (void *)INITBucketIndex;
-        if (!hash_size(INTERP, PMC_struct_val(SELF)))
+        if (!parrot_hash_size(INTERP, PMC_struct_val(SELF)))
             PMC_int_val(key) = -1;
         return iter;
     }
@@ -260,10 +260,10 @@ Returns the PMC value for the element at C<*key>.
         PMC* nextkey;
 
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS) {
-            return hash_get_idx(INTERP, hash, key);
+            return parrot_hash_get_idx(INTERP, hash, key);
         }
 
-        b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+        b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             real_exception(INTERP, NULL, E_KeyError,
@@ -482,7 +482,7 @@ Check if two dictionaries hold the same keys and values.
 
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            hash_put(INTERP, PMC_struct_val(SELF), key, value);
+            parrot_hash_put(INTERP, PMC_struct_val(SELF), key, value);
             return;
         }
         box = SELF.get_pmc_keyed(key);

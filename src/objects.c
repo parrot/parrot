@@ -624,7 +624,7 @@ get_init_meth(Interp* interpreter, PMC *class,
 #else
     if ( !(props = PMC_metadata(class)))
         return NULL;
-    b = hash_get_bucket(interpreter,
+    b = parrot_hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(props), prop_str);
     if (!b)
         return NULL;
@@ -1402,7 +1402,7 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
     class = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
     class_array = (SLOTTYPE *)PMC_data(class);
     attr_hash = get_attrib_num(class_array, PCD_ATTRIBUTES);
-    b = hash_get_bucket(interpreter,
+    b = parrot_hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(attr_hash), attr);
     if (b)
         return PMC_int_val((PMC*)b->value);
@@ -1505,7 +1505,7 @@ Parrot_class_offset(Interp* interpreter, PMC *object, STRING *class) {
     /*
      * cheat a bit--the offset_hash is a Hash PMC
      */
-    b = hash_get_bucket(interpreter,
+    b = parrot_hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(offset_hash), class);
     if (!b)
         offset = -1;

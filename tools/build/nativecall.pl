@@ -586,7 +586,7 @@ HEADER
         PMC_data(temp_pmc) = (void*)$value;
         VTABLE_set_pmc_keyed_str(interpreter, HashPointer, string_from_cstring(interpreter, "$key", 0), temp_pmc);
 PUT_POINTER
-#        qq|        hash_put( interpreter, known_frames, const_cast("$key"), $value );|;
+#        qq|        parrot_hash_put( interpreter, known_frames, const_cast("$key"), $value );|;
 }
 
 

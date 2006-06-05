@@ -85,7 +85,7 @@ Initializes the instance.
     void init () {
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-        new_pmc_hash(INTERP, SELF);
+        parrot_new_pmc_hash(INTERP, SELF);
     }
 
 /*
@@ -99,7 +99,7 @@ Marks the hash as live.
 */
     void mark () {
         if (PMC_struct_val(SELF))
-            mark_hash(INTERP, PMC_struct_val(SELF));
+            parrot_mark_hash(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -113,7 +113,7 @@ Free hash structure.
 */
     void destroy () {
         if (PMC_struct_val(SELF)) {
-            hash_destroy(INTERP, PMC_struct_val(SELF));
+            parrot_hash_destroy(INTERP, PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -185,7 +185,7 @@ A copy of the value is retrieved, otherwise, this could happen:
 
         hash = PMC_struct_val(SELF);
         keystr = make_hash_key(INTERP, key);
-        retval = hash_get(INTERP, PMC_struct_val(SELF), keystr);
+        retval = parrot_hash_get(INTERP, PMC_struct_val(SELF), keystr);
         if (retval == NULL) {
             PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__index", 0));
@@ -230,7 +230,7 @@ A copy of the value is stored, otherwise, this could happen:
         }
         hash = PMC_struct_val(SELF);
         keystr = make_hash_key(INTERP, key);
-        if (NULL == hash_get(INTERP, hash, keystr)) {
+        if (NULL == parrot_hash_get(INTERP, hash, keystr)) {
             PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__newindex", 0));
             if (metamethod != NULL) {
@@ -243,11 +243,11 @@ A copy of the value is stored, otherwise, this could happen:
             }
         }
         if (dynpmc_LuaNil == value->vtable->base_type) {
-            hash_delete(INTERP, hash, keystr);
+            parrot_hash_delete(INTERP, hash, keystr);
         } 
         else {
             PMC *newcopy = VTABLE_clone(INTERP, value);
-            hash_put(INTERP, hash, keystr, newcopy);
+            parrot_hash_put(INTERP, hash, keystr, newcopy);
         }
     }
 
@@ -261,7 +261,7 @@ Returns the number of elements in the hash.
 
 */
     INTVAL elements () {
-        return hash_size(INTERP, PMC_struct_val(SELF));
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -449,7 +449,7 @@ MMD_DEFAULT: {
 
         hash = PMC_struct_val(SELF);
         keystr = make_hash_key(INTERP, key);
-        retval = hash_get(INTERP, PMC_struct_val(SELF), keystr);
+        retval = parrot_hash_get(INTERP, PMC_struct_val(SELF), keystr);
         if (retval == NULL) {
             retval = pmc_new(INTERP, dynpmc_LuaNil);
             return retval;
@@ -475,11 +475,11 @@ MMD_DEFAULT: {
         hash = PMC_struct_val(SELF);
         keystr = make_hash_key(INTERP, key);
         if (dynpmc_LuaNil == value->vtable->base_type) {
-            hash_delete(INTERP, hash, keystr);
+            parrot_hash_delete(INTERP, hash, keystr);
         } 
         else {
             PMC *newcopy = VTABLE_clone(INTERP, value);
-            hash_put(INTERP, hash, keystr, newcopy);
+            parrot_hash_put(INTERP, hash, keystr, newcopy);
         }
     }
 

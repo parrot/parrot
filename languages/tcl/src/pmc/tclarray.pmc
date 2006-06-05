@@ -90,13 +90,13 @@ XXX - Why is Hash's implementation insufficient here??
         HashBucket *b;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
-                s = hash_get_idx(INTERP, hash, key);
+                s = parrot_hash_get_idx(INTERP, hash, key);
                 result = pmc_new(INTERP, dynpmc_TclString);
                 VTABLE_set_string_native(INTERP, result, s);
                 return result;
         }
         s = make_hash_key(INTERP, key);
-        b = hash_get_bucket(INTERP, hash, s);
+        b = parrot_hash_get_bucket(INTERP, hash, s);
         if (b == NULL) {
             return NULL;
         }

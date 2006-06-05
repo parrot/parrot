@@ -88,12 +88,12 @@ Return the LexInfo PMC, if any or a Null PMC.
 
     INTVAL elements() {
         PMC *info = PMC_pmc_val(SELF);
-        return hash_size(INTERP, PMC_struct_val(info));
+        return parrot_hash_size(INTERP, PMC_struct_val(info));
     }
 
     INTVAL exists_keyed_str(STRING* name) {
         PMC *info = PMC_pmc_val(SELF);
-        return hash_get_bucket(INTERP,
+        return parrot_hash_get_bucket(INTERP,
             (Hash*) PMC_struct_val(info), name) != 0;
     }
 
@@ -106,7 +106,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC *info = PMC_pmc_val(SELF);
         Hash *hash = PMC_struct_val(info);
         parrot_context_t *ctx = PMC_struct_val(SELF);
-        HashBucket *b = hash_get_bucket(INTERP, hash, name);
+        HashBucket *b = parrot_hash_get_bucket(INTERP, hash, name);
         INTVAL regno;
         if (!b)
             return NULL;
@@ -123,7 +123,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC *info = PMC_pmc_val(SELF);
         Hash *hash = PMC_struct_val(info);
         parrot_context_t *ctx = PMC_struct_val(SELF);
-        HashBucket *b = hash_get_bucket(INTERP, hash, name);
+        HashBucket *b = parrot_hash_get_bucket(INTERP, hash, name);
         INTVAL regno;
         if (!b)
             real_exception(interpreter, NULL, LEX_NOT_FOUND,

@@ -90,7 +90,7 @@ key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)
         PMC * const types = PMC_pmc_val(pmc);
         if (types->vtable->base_type == enum_class_OrderedHash) {
             Hash * const hash = (Hash*)PMC_struct_val(types);
-            HashBucket * const b = hash_get_bucket(interpreter, hash,
+            HashBucket * const b = parrot_hash_get_bucket(interpreter, hash,
                 key_string(interpreter, key));
             if (!b)
                 real_exception(interpreter, NULL, E_KeyError,

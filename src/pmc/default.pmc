@@ -806,7 +806,7 @@ Look for NCI methods and properties.
          * XXX do we need that in the default object system?
          */
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
-             b = hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF), name);
+             b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF), name);
              if (b)
                  p = b->value;
         }
