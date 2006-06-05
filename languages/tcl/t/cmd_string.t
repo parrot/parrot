@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 136;
+use Parrot::Test tests => 139;
 use Parrot::Config;
 use Test::More;
 
@@ -828,3 +828,23 @@ TCL
 -1
 OUT
 
+SKIP: {
+    skip("not implemented yet", 3);
+language_output_is("tcl", <<'TCL', <<'OUT', "string wordend, from beginning");
+  puts [string wordend "foo bar baz" 0]
+TCL
+3
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "string wordend, numerics and underscores");
+  puts [string wordend "foo bar99_baz" 5]
+TCL
+13
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "string wordend, space");
+  puts [string wordend "foo bar" 3]
+TCL
+4
+OUT
+}
