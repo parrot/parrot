@@ -190,7 +190,7 @@ clear_regs(Interp *interpreter, parrot_context_t *ctx)
 {
     int i;
 
-    /* NULL out registers
+    /* NULL out registers - P/S have to be NULL for GC
      *
      * if the architecture has 0x := NULL and 0.0 we could memset too
      */
@@ -202,29 +202,25 @@ clear_regs(Interp *interpreter, parrot_context_t *ctx)
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; i++) {
         CTX_REG_STR(ctx, i) = NULL;
     }
-#ifndef NDEBUG
-    for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
-        /* depending on -D40 we set int, num to garbage or zero
+
+    if (Interp_debug_TEST(interpreter, PARROT_REG_DEBUG_FLAG)) {
+        /* depending on -D40 we set int, num to garbage different garbage
+         * TODO remove this code for parrot 1.0
          */
-        if (Interp_debug_TEST(interpreter, PARROT_REG_DEBUG_FLAG)) {
-            /* TODO better use rand values */
+        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
             CTX_REG_INT(ctx, i) = -999;
         }
-        else {
-            CTX_REG_INT(ctx, i) = 0;
-        }
-    }
-    for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
-        /* depending on -D40 we set int, num to garbage or zero
-         */
-        if (Interp_debug_TEST(interpreter, PARROT_REG_DEBUG_FLAG)) {
+        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
             CTX_REG_NUM(ctx, i) = -99.9;
         }
-        else {
-            CTX_REG_NUM(ctx, i) = 0.0;
+    } else {
+        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
+            CTX_REG_INT(ctx, i) = -888;
+        }
+        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
+            CTX_REG_NUM(ctx, i) = -88.8;
         }
     }
-#endif
 }
 
 static void

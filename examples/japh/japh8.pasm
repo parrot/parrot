@@ -14,6 +14,7 @@
     set P0[0;5], 1801675080
     set P0[0;6], 1879732837
     set P1[0], -93
+    null I1
     assign P0, P1
 l:  set I0, P0[0;I1]
     chr S0, I0
