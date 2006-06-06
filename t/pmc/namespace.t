@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Parrot::Config;
 
 =head1 NAME
@@ -636,3 +636,37 @@ CODE
 ok
 OUTPUT
 }
+
+open S, ">$temp_b.pir" or die "Can't write $temp_b.pir";
+print S <<'EOF';
+.HLL 'B', ''
+.sub b_foo
+    print "b_foo\n"
+.end
+EOF
+close S;
+
+pir_output_is(<<"CODE", <<'OUTPUT', "export_to");
+.HLL 'A', ''
+.sub main :main
+    a_foo()
+    load_bytecode "$temp_b.pir"
+    .local pmc nsr, nsa, nsb, ar
+    ar = new .ResizableStringArray
+    push ar, "b_foo"
+    .include "interpinfo.pasm"
+    nsr = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    nsa = nsr['a']
+    nsb = nsr['b']
+    nsb."export_to"(nsa, ar)
+    b_foo()
+.end
+
+.sub a_foo
+    print "a_foo\\n"
+.end
+CODE
+a_foo
+b_foo
+OUTPUT
+
