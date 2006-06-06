@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Parrot::Config;
 
 =head1 NAME
@@ -673,3 +673,17 @@ a_foo
 b_foo
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "parent");
+.sub main :main
+    .local pmc ns
+    ns = get_namespace ['parrot';'Foo']
+    ns = ns.'parent'()
+    print ns
+    print "\n"
+.end
+.namespace ['Foo']
+.sub dummy
+.end
+CODE
+parrot
+OUTPUT

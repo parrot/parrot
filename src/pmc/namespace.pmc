@@ -398,6 +398,21 @@ is an array of (string) names to be exported.
             VTABLE_set_pmc_keyed_str(INTERP, dest, name, el);
         }
     }
+
+/*
+
+=item C<METHOD PMC* parent()>
+
+Return the parent NameSpace of PMCNULL, if none.
+
+=cut
+
+*/
+
+    METHOD PMC* parent() {
+        return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+    }
+
 }
 /*
 
