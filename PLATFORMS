@@ -13,6 +13,7 @@ darwin_8.6.0 PPC (10.4.6) gcc4.0.1
                              ?    ?    ?     ?   ?   ?    Y/1   ?  20060605
 linux-x86-gcc3.3.5.2005013   Y    Y    Y     Y   Y   Y    Y     ?  20060514
 linux-x86-gcc4.0.2           Y    Y    Y     Y   Y   Y    Y     ?  20060514
+linux-x86-gcc4.0.3           Y    Y    Y     Y   Y   Y    Y     ?  20060606
 linux-x86-gcc4.1.0           Y    Y    Y     Y   Y   Y    Y     Y  20060306
 linux-x86_64-gcc3.4.3    8   Y    -    -     Y   Y   Y    Y     ?  20060108
 sol8-sparc-cc           B    -    -    -     -   -   -    Y/997 ?  20060530
