@@ -403,7 +403,7 @@ is an array of (string) names to be exported.
 
 =item C<METHOD PMC* parent()>
 
-Return the parent NameSpace of PMCNULL, if none.
+Return the parent NameSpace or PMCNULL, if none.
 
 =cut
 
