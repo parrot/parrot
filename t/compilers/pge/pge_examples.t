@@ -1,10 +1,11 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test;
 use Parrot::Test::PGE;
@@ -16,7 +17,7 @@ t/library/pge_examples.t - Parrot Grammar Engine tests of examples
 
 =head1 SYNOPSIS
 
-	% prove t/compilers/pge/pge_examples.t
+    % prove t/compilers/pge/pge_examples.t
 
 =cut
 
@@ -68,9 +69,9 @@ pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
 grammar Bio::Fasta;
 
 regex databank    { <Bio::Fasta::entry>+ }
-regex start_entry { \> }
-regex desc_line   { <Bio::Fasta::start_entry> <Bio::Fasta::id> \s+ <Bio::Fasta::desc> } 
 regex entry       { <Bio::Fasta::desc_line> \n <Bio::Fasta::sequence> } 
+regex desc_line   { <Bio::Fasta::start_entry> <Bio::Fasta::id> \s+ <Bio::Fasta::desc> } 
+regex start_entry { \> }
 regex id          { (\S+) }
 regex desc        { (\N*) }
 regex sequence    { (<-[>]>*) }
@@ -85,6 +86,8 @@ EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
 LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
 GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
 IENY
+>poly_a teasing the parser with DNA
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 END_FASTA
 
     .local pmc p6grammar
@@ -113,6 +116,8 @@ EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
 LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
 GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
 IENY
+>poly_a teasing the parser with DNA
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 OUT
 
 
