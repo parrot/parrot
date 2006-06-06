@@ -673,11 +673,11 @@ a_foo
 b_foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "parent");
+pir_output_is(<<'CODE', <<'OUTPUT', "get_parent");
 .sub main :main
     .local pmc ns
     ns = get_namespace ['parrot';'Foo']
-    ns = ns.'parent'()
+    ns = ns.'get_parent'()
     print ns
     print "\n"
 .end

@@ -401,7 +401,7 @@ is an array of (string) names to be exported.
 
 /*
 
-=item C<METHOD PMC* parent()>
+=item C<METHOD PMC* get_parent()>
 
 Return the parent NameSpace or PMCNULL, if none.
 
@@ -409,7 +409,7 @@ Return the parent NameSpace or PMCNULL, if none.
 
 */
 
-    METHOD PMC* parent() {
+    METHOD PMC* get_parent() {
         return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
     }
 
