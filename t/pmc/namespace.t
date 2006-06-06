@@ -612,16 +612,19 @@ CODE
 OUTPUT
 }
 
-SKIP: {
-  skip('not implemented', 1);
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global should find from .HLL namespace, not current .namespace");
+
+# the test was skipped, the description says:
+# find_global should find from .HLL namespace, not current .namespace
+# but according to pdd21, {find,store}_global are relative to current
+pir_output_is(<<'CODE', <<'OUTPUT', "find_global in current");
 .HLL 'bork', ''
 .namespace [ '' ]
 
 .sub a :immediate
   $P1 = new .String
   $P1 = "ok\n"
-  store_global "eek", $P1
+  store_global 'sub_namespace', "eek", $P1
+## store_global "eek", $P1
 .end
 
 .namespace [ 'sub_namespace' ]
@@ -635,7 +638,7 @@ print $P1
 CODE
 ok
 OUTPUT
-}
+
 
 open S, ">$temp_b.pir" or die "Can't write $temp_b.pir";
 print S <<'EOF';
