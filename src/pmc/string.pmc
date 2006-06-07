@@ -90,7 +90,7 @@ Creates a copy of the string.
     PMC* clone () {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
-        PMC_str_val(dest) = string_copy(INTERP,PMC_str_val(SELF));
+        PMC_str_val(dest) = string_copy(INTERP,VTABLE_get_string(INTERP, SELF));
         return dest;
     }
 
@@ -105,7 +105,7 @@ Returns the integer representation of the string.
 */
 
     INTVAL get_integer () {
-        STRING *s = (STRING*) PMC_str_val(SELF);
+        STRING *s = (STRING*) VTABLE_get_string(INTERP, SELF);
         return string_to_int(INTERP, s);
     }
 
@@ -120,7 +120,7 @@ Returns the floating-point representation of the string.
 */
 
     FLOATVAL get_number () {
-        STRING *s = (STRING*) PMC_str_val(SELF);
+        STRING *s = (STRING*) VTABLE_get_string(INTERP, SELF);
         return string_to_num(INTERP, s);
     }
 
@@ -135,7 +135,7 @@ Returns the big numbers representation of the string.
 */
 
     PMC* get_bignum () {
-        STRING *s = DYNSELF.get_string();
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         PMC *ret = pmc_new(INTERP, enum_class_BigInt);
         VTABLE_set_string_native(INTERP, ret, s);
         return ret;
@@ -166,7 +166,7 @@ Returns the boolean value of the string.
 */
 
     INTVAL get_bool () {
-        STRING *s = (STRING*) PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         return string_bool(INTERP, s);
     }
 
@@ -183,11 +183,11 @@ Sets the value of the string to the integer C<value>.
 */
 
     void set_integer_native (INTVAL value) {
-        PMC_str_val(SELF) = string_from_int(INTERP, value);
+        DYNSELF.set_string_native( string_from_int(INTERP, value) );
     }
 
     void set_bool (INTVAL value) {
-        PMC_str_val(SELF) = string_from_int(INTERP, value);
+        DYNSELF.set_string_native( string_from_int(INTERP, value) );
     }
 
 /*
@@ -201,7 +201,7 @@ Sets the value of the string to the floating-point C<value>.
 */
 
     void set_number_native (FLOATVAL value) {
-        PMC_str_val(SELF) = string_from_num(INTERP, value);
+        DYNSELF.set_string_native( string_from_num(INTERP, value) );
     }
 
 
@@ -261,7 +261,7 @@ the specified C<PMC>.
 
 */
     void set_pmc (PMC* value) {
-        PMC_str_val(SELF) = VTABLE_get_string(INTERP, value);
+        DYNSELF.set_string_native( VTABLE_get_string(INTERP, value) );
     }
 
 /*
@@ -304,7 +304,7 @@ strings in place.
 
 */
     PMC* bitwise_ors (PMC* value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -314,7 +314,7 @@ strings in place.
     }
 
     PMC* bitwise_ors_str (STRING* value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_string_native(
@@ -323,18 +323,18 @@ strings in place.
     }
 
     void i_bitwise_ors (PMC* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         DYNSELF.set_string_native(string_bitwise_or(INTERP, s, v, &s));
     }
 
     void i_bitwise_ors_str (STRING* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         DYNSELF.set_string_native(string_bitwise_or(INTERP, s, value, &s));
     }
 
     PMC* bitwise_ands (PMC* value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -344,7 +344,7 @@ strings in place.
     }
 
     PMC* bitwise_ands_str (STRING* value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_string_native(
@@ -354,18 +354,18 @@ strings in place.
 
 
     void i_bitwise_ands (PMC* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         DYNSELF.set_string_native(string_bitwise_and(INTERP, s, v, &s));
     }
 
     void i_bitwise_ands_str (STRING* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         DYNSELF.set_string_native(string_bitwise_and(INTERP, s, value, &s));
     }
 
     PMC* bitwise_xors (PMC* value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -375,7 +375,7 @@ strings in place.
     }
 
     PMC* bitwise_xors_str (STRING* value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_string_native(
@@ -384,18 +384,18 @@ strings in place.
     }
 
     void i_bitwise_xors (PMC* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         DYNSELF.set_string_native(string_bitwise_xor(INTERP, s, v, &s));
     }
 
     void i_bitwise_xors_str (STRING* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         DYNSELF.set_string_native(string_bitwise_xor(INTERP, s, value, &s));
     }
 
     PMC* bitwise_nots (PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_string_native(
@@ -404,7 +404,7 @@ strings in place.
     }
 
     void i_bitwise_nots () {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         VTABLE_set_string_native(
             INTERP, SELF, string_bitwise_not(INTERP, s, &s));
     }
@@ -420,7 +420,7 @@ they match.
 
 */
     INTVAL is_equal (PMC* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         return (INTVAL)(0 == string_equal(INTERP, s, v));
     }
@@ -437,7 +437,7 @@ C<value>; returns true if they match.
 */
 
     INTVAL is_equal_num (PMC* value) {
-        FLOATVAL sf = string_to_num(INTERP, PMC_str_val(SELF));
+        FLOATVAL sf = string_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
         FLOATVAL vf = VTABLE_get_number(INTERP, value);
         return (INTVAL)(sf == vf);
     }
@@ -453,7 +453,7 @@ Compares the string with C<value>; returns FALSE if they match.
 */
 
     INTVAL is_equal_string (PMC* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         return string_equal(INTERP, s, v) == 0;
     }
@@ -472,8 +472,8 @@ class and their strings are aliases of the same internal string.
 
 */
     INTVAL is_same (PMC* value) {
-        STRING *s = PMC_str_val(SELF);
-        STRING *v = PMC_str_val(value);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
+        STRING *v = VTABLE_get_string(INTERP, value);
         return (INTVAL)(
                 value->vtable == SELF->vtable &&
                 s == v
@@ -492,7 +492,7 @@ is smaller.
 
 */
     INTVAL cmp (PMC* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         return string_compare(INTERP, s, v);
     }
@@ -509,7 +509,7 @@ are equal, and 1 if C<value> is smaller.
 
 */
     INTVAL cmp_num (PMC* value) {
-        FLOATVAL sf = string_to_num(INTERP, PMC_str_val(SELF));
+        FLOATVAL sf = string_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
         FLOATVAL vf = VTABLE_get_number(INTERP, value);
         if(sf < vf)
             return (INTVAL)(-1);
@@ -530,7 +530,7 @@ is smaller.
 
 */
     INTVAL cmp_string (PMC* value) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         return string_compare(INTERP, s, v);
     }
@@ -546,7 +546,7 @@ C<length>, and places it in C<dest>.
 
 */
     void substr (INTVAL offset, INTVAL length, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING *s2 = string_substr(INTERP, s, offset, length, NULL, 0);
         VTABLE_set_string_native(INTERP, dest, s2);
     }
@@ -562,7 +562,7 @@ C<length>, and returns it.
 
 */
     STRING* substr_str (INTVAL offset, INTVAL length) {
-        STRING *s = PMC_str_val(SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         return string_substr(INTERP, s, offset, length, NULL, 0);
     }
 
@@ -578,7 +578,7 @@ numbers count from the end.
 */
 
     INTVAL exists_keyed(PMC* key) {
-        INTVAL n = string_length(INTERP, PMC_str_val(SELF));
+        INTVAL n = string_length(INTERP, VTABLE_get_string(INTERP, SELF));
         INTVAL k = VTABLE_get_integer(INTERP, key);
         return (INTVAL)( (k>=0 && k<=n) || (k<0 && -k<=n) );
     }
@@ -678,7 +678,7 @@ Return length of the string.
 */
 
     INTVAL elements () {
-        return string_length(INTERP, PMC_str_val(SELF));
+        return string_length(INTERP, VTABLE_get_string(INTERP, SELF));
     }
 
     PMC* slice (PMC* key, INTVAL f) {
@@ -702,7 +702,7 @@ Return length of the string.
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
         PMC_int_val(key) = 0;
-        if (!string_length(INTERP, PMC_str_val(SELF)))
+        if (!string_length(INTERP, VTABLE_get_string(INTERP, SELF)))
             PMC_int_val(key) = -1;
         return iter;
     }
@@ -725,7 +725,7 @@ Used to archive the string.
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
-        io->vtable->push_string(INTERP, io, PMC_str_val(SELF));
+        io->vtable->push_string(INTERP, io, VTABLE_get_string(INTERP, SELF));
     }
 
 /*
@@ -741,7 +741,7 @@ Used to unarchive the string.
         IMAGE_IO *io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            PMC_str_val(SELF) = io->vtable->shift_string(INTERP, io);
+            DYNSELF.set_string_native( io->vtable->shift_string(INTERP, io) );
     }
 /*
 
@@ -760,7 +760,7 @@ Downcase this string
 */
 
     METHOD PMC* lower() {
-        STRING *s = string_downcase(INTERP, PMC_str_val(SELF));
+        STRING *s = string_downcase(INTERP, VTABLE_get_string(INTERP, SELF));
         PMC *ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_str_val(ret) = s;
         PObj_custom_mark_SET(ret);
