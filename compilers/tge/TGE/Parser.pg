@@ -1,16 +1,19 @@
 grammar TGE::Parser;
 
-token start { ^ <TGE::Parser::statements> $ }
+token start { ^ <TGE::Parser::statements>* $ }
 
 rule statements { 
-    [ <TGE::Parser::transrule>
+     <TGE::Parser::transrule>
     | <TGE::Parser::grammardec>
-    ]* 
 }
 
 rule grammardec {
     grammar <TGE::Parser::type>
-    [is <TGE::Parser::type>]?;
+    <TGE::Parser::inherit>?;
+}
+
+rule inherit {
+    is <TGE::Parser::type>
 }
 
 rule transrule {
