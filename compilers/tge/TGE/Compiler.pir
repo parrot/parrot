@@ -286,6 +286,9 @@ Compile a grammar from a source string.
     .local string outstring
     .local string header_string
 
+    # Unnamed grammars are class 'AnonGrammar'
+    .local string grammarname
+    grammarname = 'AnonGrammar'
      rule_data = self.'parse_grammar'(source)
 
     # Construct grammar rules from the data structure of rule info
@@ -306,6 +309,7 @@ loop_start:
       grammar_build:
         $S1 = self.'grammar_string'(statement)
         outstring .= $S1
+        grammarname = statement['type']
     goto loop_start
 loop_end:
 
@@ -313,7 +317,7 @@ loop_end:
     outstring .= header_string
     outstring .= "\n.end\n"
 
-    .return (outstring)
+    .return (outstring, grammarname)
 .end
 
 .sub 'compile' :method
