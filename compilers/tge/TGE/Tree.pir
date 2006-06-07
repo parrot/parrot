@@ -25,6 +25,7 @@ eventually handle indexing for faster tree searches.
     addattribute base, "cell"  # a hash for storing values of tree nodes
     addattribute base, "visit" # arrays of rules that apply to each node type
     addattribute base, "data"  # the original unmodified tree
+    addattribute base, "agid"  # a hash of node address => node id
     .return ()
 .end
 
@@ -42,6 +43,8 @@ constructor parameters.
     setattribute self, "cell", $P0
     setattribute self, "visit", $P1
     setattribute self, "data", $P2
+    $P3 = new .AddrRegistry 
+    setattribute self, "agid", $P3
 .end
 
 # Call all visitors for a given node
@@ -109,7 +112,7 @@ node.
 node_exists:
 
     .local pmc id
-    id = _lookup_id(node)
+    id = self.'_lookup_id'(node)
 
     .local pmc cell
     $P1 = getattribute self, "cell"
@@ -200,10 +203,10 @@ name_hash_exists:
     if parent == '.' goto use_parent_id
     .local pmc child_node
     child_node = self._lookup_child(node, parent)
-    id = _lookup_id(child_node)
+    id = self.'_lookup_id'(child_node)
     goto use_child_id
 use_parent_id:
-    id = _lookup_id(node)
+    id = self.'_lookup_id'(node)
 use_child_id:
 
     # Check that the entry (by attribute name and id) in the "cell" hash
@@ -248,28 +251,20 @@ error_defined:
     .return($P1)
 .end
 
-.sub _lookup_id
+.sub _lookup_id :method
     .param pmc node
-    .local pmc id
+
+    .local pmc id_hash
+    .local int id
     # Get the id of the node, or if it doesn't exist, generate one.
-    id = getprop "agid", node
-    $I0 = defined id
-    if $I0 goto got_id
-    id = new .Integer
-    id = _new_id()
-    setprop node, "agid", id
+    id_hash = getattribute self, 'agid'
+    id = id_hash[node]
+    if id goto got_id          # 0 means, doesn't exist
+    id = elements id_hash
+    inc id
+    id_hash[node] = id
 got_id:
     .return (id)
-.end
-
-# Autoincrementing id generator
-.sub _new_id
-    .local int id
-    id = 0
-loop:
-    inc id 
-    .yield(id)
-    goto loop
 .end
 
 

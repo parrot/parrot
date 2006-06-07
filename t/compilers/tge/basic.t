@@ -50,26 +50,45 @@ min
 .
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'autoincrementing id generator');
+pir_output_is(<<'CODE', <<'OUT', 'agid hash');
 .sub _main :main
     load_bytecode 'compilers/tge/TGE/Tree.pir'
-    
-    .local pmc new_id
-    new_id = find_global 'TGE::Tree', '_new_id'
+    .local pmc tree
+    tree = new 'TGE::Tree'
     .local int id
-    id = new_id()
+    
+    $P0 = new .Integer
+    id = tree.'_lookup_id'($P0)
     print id
     print "\n"
-    id = new_id()
+    $P1 = new .Integer
+    id = tree.'_lookup_id'($P1)
     print id
     print "\n"
-    id = new_id()
+    id = tree.'_lookup_id'($P0)
+    print id
+    print "\n"
+    $P2 = new .Integer
+    id = tree.'_lookup_id'($P2)
+    print id
+    print "\n"
+    id = tree.'_lookup_id'($P0)
+    print id
+    print "\n"
+    id = tree.'_lookup_id'($P1)
+    print id
+    print "\n"
+    id = tree.'_lookup_id'($P2)
     print id
     print "\n"
     end
 .end
 
 CODE
+1
+2
+1
+3
 1
 2
 3
