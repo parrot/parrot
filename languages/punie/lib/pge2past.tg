@@ -1,3 +1,30 @@
+=head1 NAME
+
+ASTGrammar -- A grammar for transforming the output of a PGE parse into
+an abstract syntax tree.
+
+=head1 SYNOPSYS
+
+  .sub _main :main
+      load_bytecode 'ASTGrammar.pir'
+      .local pmc grammar
+       grammar = new 'ASTGrammar'
+
+      # Construct the "AST"
+      load_bytecode "PAST.pbc"
+      .local pmc astbuilder
+      astbuilder = grammar.apply(match)
+      .local pmc ast
+      ast = astbuilder.get('result')
+
+      end
+  .end
+
+=head1 DESCRIPTION
+
+
+=cut
+
 grammar ASTGrammar is TGE::Grammar;
 
 transform result (ROOT) :language('PIR') {
@@ -377,3 +404,16 @@ transform term (expr) :language('PIR') {
     print "error: Currently, 'term' nodes should have only one child.\n"
     end
 }
+
+=head1 LICENSE
+
+Copyright (C) 2006, The Perl Foundation.
+
+This is free software; you may redistribute it and/or modify
+it under the same terms as Parrot.
+
+=head1 AUTHOR
+
+Allison Randal <allison@perl.org>
+
+=cut
