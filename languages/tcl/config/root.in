@@ -1,15 +1,15 @@
 RM_F    = @rm_f@
 PERL    = @perl@
-PARROT  = ..@slash@..@slash@parrot@exe@
-PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
+PARROT  = ../../parrot@exe@
+PBC_MERGE = ../../pbc_merge@exe@
 
-C_BUILTIN = src@slash@builtin
-R_BUILTIN = runtime@slash@builtin
-BUILD     = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
-DESTDIR   = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+C_BUILTIN = src/builtin
+R_BUILTIN = runtime/builtin
+BUILD     = $(PERL) @build_dir@/tools/build/dynpmc.pl
+DESTDIR   = @build_dir@/runtime/parrot/dynext
 O         = @o@
-PMCDIR    = src@slash@pmc
-CLASSDIR  = src@slash@class
+PMCDIR    = src/pmc
+CLASSDIR  = src/class
 LOAD_EXT  = @load_ext@
 
 PMCS = \
@@ -21,114 +21,114 @@ PMCS = \
  tclarray
 
 GENERATED_INLINES = \
- $(C_BUILTIN)@slash@eof.pir \
- $(C_BUILTIN)@slash@exit.pir \
- $(C_BUILTIN)@slash@incr.pir \
- $(C_BUILTIN)@slash@join.pir \
- $(C_BUILTIN)@slash@llength.pir \
- $(C_BUILTIN)@slash@pwd.pir \
- $(C_BUILTIN)@slash@time.pir \
- $(C_BUILTIN)@slash@while.pir
+ $(C_BUILTIN)/eof.pir \
+ $(C_BUILTIN)/exit.pir \
+ $(C_BUILTIN)/incr.pir \
+ $(C_BUILTIN)/join.pir \
+ $(C_BUILTIN)/llength.pir \
+ $(C_BUILTIN)/pwd.pir \
+ $(C_BUILTIN)/time.pir \
+ $(C_BUILTIN)/while.pir
 
 DEPS = \
-$(R_BUILTIN)@slash@after.pir \
-$(R_BUILTIN)@slash@append.pir \
-$(R_BUILTIN)@slash@array.pir \
-$(C_BUILTIN)@slash@auto_execok.pir \
-$(C_BUILTIN)@slash@auto_load.pir \
-$(R_BUILTIN)@slash@binary.pir \
-$(C_BUILTIN)@slash@break.pir \
-$(R_BUILTIN)@slash@catch.pir \
-$(C_BUILTIN)@slash@cd.pir \
-$(C_BUILTIN)@slash@close.pir \
-$(R_BUILTIN)@slash@concat.pir \
-$(C_BUILTIN)@slash@continue.pir \
-$(R_BUILTIN)@slash@error.pir \
-$(R_BUILTIN)@slash@eval.pir \
-$(C_BUILTIN)@slash@exec.pir \
-$(R_BUILTIN)@slash@expr.pir \
-$(C_BUILTIN)@slash@fconfigure.pir \
-$(R_BUILTIN)@slash@file.pir \
-$(C_BUILTIN)@slash@flush.pir \
-$(C_BUILTIN)@slash@for.pir \
-$(R_BUILTIN)@slash@foreach.pir \
-$(R_BUILTIN)@slash@format.pir \
-$(R_BUILTIN)@slash@gets.pir \
-$(C_BUILTIN)@slash@glob.pir \
-$(R_BUILTIN)@slash@global.pir \
-$(R_BUILTIN)@slash@if.pir \
-$(R_BUILTIN)@slash@info.pir \
-$(R_BUILTIN)@slash@inline.pir \
-$(C_BUILTIN)@slash@interp.pir \
-$(R_BUILTIN)@slash@lappend.pir \
-$(R_BUILTIN)@slash@lassign.pir \
-$(R_BUILTIN)@slash@lindex.pir \
-$(R_BUILTIN)@slash@linsert.pir \
-$(R_BUILTIN)@slash@list.pir \
-$(R_BUILTIN)@slash@lrange.pir \
-$(R_BUILTIN)@slash@lrepeat.pir \
-$(C_BUILTIN)@slash@lsearch.pir \
-$(R_BUILTIN)@slash@lset.pir \
-$(R_BUILTIN)@slash@lsort.pir \
-$(R_BUILTIN)@slash@namespace.pir \
-$(R_BUILTIN)@slash@open.pir \
-$(C_BUILTIN)@slash@package.pir \
-$(R_BUILTIN)@slash@parray.pir \
-$(R_BUILTIN)@slash@proc.pir \
-$(R_BUILTIN)@slash@puts.pir \
-$(R_BUILTIN)@slash@regexp.pir \
-$(C_BUILTIN)@slash@regsub.pir \
-$(R_BUILTIN)@slash@rename.pir \
-$(C_BUILTIN)@slash@return.pir \
-$(R_BUILTIN)@slash@set.pir \
-$(R_BUILTIN)@slash@source.pir \
-$(R_BUILTIN)@slash@split.pir \
-$(R_BUILTIN)@slash@string.pir \
-$(R_BUILTIN)@slash@switch.pir \
-$(C_BUILTIN)@slash@trace.pir \
-$(R_BUILTIN)@slash@unknown.pir \
-$(R_BUILTIN)@slash@unset.pir \
-$(R_BUILTIN)@slash@uplevel.pir \
-$(R_BUILTIN)@slash@upvar.pir \
-$(C_BUILTIN)@slash@variable.pir \
-runtime@slash@conversions.pir \
-runtime@slash@expression.pir \
-runtime@slash@list.pir \
-runtime@slash@list_to_string.pir \
-runtime@slash@string_to_list.pir \
-runtime@slash@string.pir \
-runtime@slash@variables.pir \
-src@slash@compiler.pir \
-src@slash@macros.pir \
-src@slash@parser.pir \
-src@slash@returncodes.pir \
-src@slash@tcl.p6r
+$(R_BUILTIN)/after.pir \
+$(R_BUILTIN)/append.pir \
+$(R_BUILTIN)/array.pir \
+$(C_BUILTIN)/auto_execok.pir \
+$(C_BUILTIN)/auto_load.pir \
+$(R_BUILTIN)/binary.pir \
+$(C_BUILTIN)/break.pir \
+$(R_BUILTIN)/catch.pir \
+$(C_BUILTIN)/cd.pir \
+$(C_BUILTIN)/close.pir \
+$(R_BUILTIN)/concat.pir \
+$(C_BUILTIN)/continue.pir \
+$(R_BUILTIN)/error.pir \
+$(R_BUILTIN)/eval.pir \
+$(C_BUILTIN)/exec.pir \
+$(R_BUILTIN)/expr.pir \
+$(C_BUILTIN)/fconfigure.pir \
+$(R_BUILTIN)/file.pir \
+$(C_BUILTIN)/flush.pir \
+$(C_BUILTIN)/for.pir \
+$(R_BUILTIN)/foreach.pir \
+$(R_BUILTIN)/format.pir \
+$(R_BUILTIN)/gets.pir \
+$(C_BUILTIN)/glob.pir \
+$(R_BUILTIN)/global.pir \
+$(R_BUILTIN)/if.pir \
+$(R_BUILTIN)/info.pir \
+$(R_BUILTIN)/inline.pir \
+$(C_BUILTIN)/interp.pir \
+$(R_BUILTIN)/lappend.pir \
+$(R_BUILTIN)/lassign.pir \
+$(R_BUILTIN)/lindex.pir \
+$(R_BUILTIN)/linsert.pir \
+$(R_BUILTIN)/list.pir \
+$(R_BUILTIN)/lrange.pir \
+$(R_BUILTIN)/lrepeat.pir \
+$(C_BUILTIN)/lsearch.pir \
+$(R_BUILTIN)/lset.pir \
+$(R_BUILTIN)/lsort.pir \
+$(R_BUILTIN)/namespace.pir \
+$(R_BUILTIN)/open.pir \
+$(C_BUILTIN)/package.pir \
+$(R_BUILTIN)/parray.pir \
+$(R_BUILTIN)/proc.pir \
+$(R_BUILTIN)/puts.pir \
+$(R_BUILTIN)/regexp.pir \
+$(C_BUILTIN)/regsub.pir \
+$(R_BUILTIN)/rename.pir \
+$(C_BUILTIN)/return.pir \
+$(R_BUILTIN)/set.pir \
+$(R_BUILTIN)/source.pir \
+$(R_BUILTIN)/split.pir \
+$(R_BUILTIN)/string.pir \
+$(R_BUILTIN)/switch.pir \
+$(C_BUILTIN)/trace.pir \
+$(R_BUILTIN)/unknown.pir \
+$(R_BUILTIN)/unset.pir \
+$(R_BUILTIN)/uplevel.pir \
+$(R_BUILTIN)/upvar.pir \
+$(C_BUILTIN)/variable.pir \
+runtime/conversions.pir \
+runtime/expression.pir \
+runtime/list.pir \
+runtime/list_to_string.pir \
+runtime/string_to_list.pir \
+runtime/string.pir \
+runtime/variables.pir \
+src/compiler.pir \
+src/macros.pir \
+src/parser.pir \
+src/returncodes.pir \
+src/tcl.p6r
 
 all: tcl.pbc
 
-tcl.pbc: $(PARROT) pmcs runtime@slash@tcllib.pbc src@slash@tclsh.pir
-	$(PARROT) --output=tcl.pbc src@slash@tclsh.pir
+tcl.pbc: $(PARROT) pmcs runtime/tcllib.pbc src/tclsh.pir
+	$(PARROT) --output=tcl.pbc src/tclsh.pir
 
-$(GENERATED_INLINES) : tools@slash@gen_inline.pl
+$(GENERATED_INLINES) : tools/gen_inline.pl
 
 .SUFFIXES : .pir .tmt
 
 .tmt.pir :
-	$(PERL) tools@slash@gen_inline.pl $< > $@
+	$(PERL) tools/gen_inline.pl $< > $@
 
 PBCS = \
-runtime@slash@tcllib_temp.pbc \
-$(CLASSDIR)@slash@tclbinaryops.pbc \
-$(CLASSDIR)@slash@tclcommand.pbc \
-$(CLASSDIR)@slash@tclcommandlist.pbc \
-$(CLASSDIR)@slash@tclconst.pbc \
-$(CLASSDIR)@slash@tclfunc.pbc \
-$(CLASSDIR)@slash@tclops.pbc \
-$(CLASSDIR)@slash@tclvar.pbc \
-$(CLASSDIR)@slash@tclword.pbc
+runtime/tcllib_temp.pbc \
+$(CLASSDIR)/tclbinaryops.pbc \
+$(CLASSDIR)/tclcommand.pbc \
+$(CLASSDIR)/tclcommandlist.pbc \
+$(CLASSDIR)/tclconst.pbc \
+$(CLASSDIR)/tclfunc.pbc \
+$(CLASSDIR)/tclops.pbc \
+$(CLASSDIR)/tclvar.pbc \
+$(CLASSDIR)/tclword.pbc
 
-runtime@slash@tcllib.pbc: $(PBC_MERGE) $(PBCS)
-	$(PBC_MERGE) -o runtime@slash@tcllib.pbc $(PBCS)
+runtime/tcllib.pbc: $(PBC_MERGE) $(PBCS)
+	$(PBC_MERGE) -o runtime/tcllib.pbc $(PBCS)
 
 pmcs:
 	@cd $(PMCDIR) && $(BUILD) generate $(PMCS)
@@ -136,65 +136,65 @@ pmcs:
 	@cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
-runtime@slash@builtins.pir: $(GENERATED_INLINES) $(DEPS) tools@slash@gen_builtins.pl
-	$(PERL) tools@slash@gen_builtins.pl > runtime@slash@builtins.pir
+runtime/builtins.pir: $(GENERATED_INLINES) $(DEPS) tools/gen_builtins.pl
+	$(PERL) tools/gen_builtins.pl > runtime/builtins.pir
 
-runtime@slash@tcllib_temp.pbc: $(PARROT) runtime@slash@builtins.pir
-	$(PARROT) --output=runtime@slash@tcllib_temp.pbc runtime@slash@tcllib.pir
+runtime/tcllib_temp.pbc: $(PARROT) runtime/builtins.pir
+	$(PARROT) --output=runtime/tcllib_temp.pbc runtime/tcllib.pir
 
-$(CLASSDIR)@slash@tclbinaryops.pbc: $(PARROT) $(CLASSDIR)@slash@tclbinaryops.pir
-	$(PARROT) --output=$(CLASSDIR)@slash@tclbinaryops.pbc $(CLASSDIR)@slash@tclbinaryops.pir
+$(CLASSDIR)/tclbinaryops.pbc: $(PARROT) $(CLASSDIR)/tclbinaryops.pir
+	$(PARROT) --output=$(CLASSDIR)/tclbinaryops.pbc $(CLASSDIR)/tclbinaryops.pir
 
-$(CLASSDIR)@slash@tclcommand.pbc: $(PARROT) $(CLASSDIR)@slash@tclcommand.pir
-	$(PARROT) --output=$(CLASSDIR)@slash@tclcommand.pbc $(CLASSDIR)@slash@tclcommand.pir
+$(CLASSDIR)/tclcommand.pbc: $(PARROT) $(CLASSDIR)/tclcommand.pir
+	$(PARROT) --output=$(CLASSDIR)/tclcommand.pbc $(CLASSDIR)/tclcommand.pir
 
-$(CLASSDIR)@slash@tclcommandlist.pbc: $(PARROT) $(CLASSDIR)@slash@tclcommandlist.pir
-	$(PARROT) --output=$(CLASSDIR)@slash@tclcommandlist.pbc $(CLASSDIR)@slash@tclcommandlist.pir
+$(CLASSDIR)/tclcommandlist.pbc: $(PARROT) $(CLASSDIR)/tclcommandlist.pir
+	$(PARROT) --output=$(CLASSDIR)/tclcommandlist.pbc $(CLASSDIR)/tclcommandlist.pir
 
-$(CLASSDIR)@slash@tclconst.pbc: $(PARROT) $(CLASSDIR)@slash@tclconst.pir
-	$(PARROT) --output=$(CLASSDIR)@slash@tclconst.pbc $(CLASSDIR)@slash@tclconst.pir
+$(CLASSDIR)/tclconst.pbc: $(PARROT) $(CLASSDIR)/tclconst.pir
+	$(PARROT) --output=$(CLASSDIR)/tclconst.pbc $(CLASSDIR)/tclconst.pir
 
-$(CLASSDIR)@slash@tclfunc.pbc: $(PARROT) $(CLASSDIR)@slash@tclfunc.pir
-	$(PARROT) --output=$(CLASSDIR)@slash@tclfunc.pbc $(CLASSDIR)@slash@tclfunc.pir
+$(CLASSDIR)/tclfunc.pbc: $(PARROT) $(CLASSDIR)/tclfunc.pir
+	$(PARROT) --output=$(CLASSDIR)/tclfunc.pbc $(CLASSDIR)/tclfunc.pir
 
-$(CLASSDIR)@slash@tclops.pbc: $(PARROT) $(CLASSDIR)@slash@tclops.pir
-	$(PARROT) --output=$(CLASSDIR)@slash@tclops.pbc $(CLASSDIR)@slash@tclops.pir
+$(CLASSDIR)/tclops.pbc: $(PARROT) $(CLASSDIR)/tclops.pir
+	$(PARROT) --output=$(CLASSDIR)/tclops.pbc $(CLASSDIR)/tclops.pir
 
-$(CLASSDIR)@slash@tclvar.pbc: $(PARROT) $(CLASSDIR)@slash@tclvar.pir
-	$(PARROT) --output=$(CLASSDIR)@slash@tclvar.pbc $(CLASSDIR)@slash@tclvar.pir
+$(CLASSDIR)/tclvar.pbc: $(PARROT) $(CLASSDIR)/tclvar.pir
+	$(PARROT) --output=$(CLASSDIR)/tclvar.pbc $(CLASSDIR)/tclvar.pir
 
-$(CLASSDIR)@slash@tclword.pbc: $(PARROT) $(CLASSDIR)@slash@tclword.pir
-	$(PARROT) --output=$(CLASSDIR)@slash@tclword.pbc $(CLASSDIR)@slash@tclword.pir
+$(CLASSDIR)/tclword.pbc: $(PARROT) $(CLASSDIR)/tclword.pir
+	$(PARROT) --output=$(CLASSDIR)/tclword.pbc $(CLASSDIR)/tclword.pir
 
 tclsh: $(PARROT) tcl.pbc
 	$(PARROT) --gc-debug tcl.pbc
 
 test:	tcl.pbc
-	$(PERL) t@slash@harness
+	$(PERL) t/harness
 
 tcl-test: t_tcl
-	$(PERL) t@slash@harness t_tcl@slash@*.t
+	$(PERL) tools/tcl_harness.pl
 
 t_tcl:
-	$(PERL) tools@slash@tcl-test.pl
+	$(PERL) tools/tcl-test.pl
 
 devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 CLEANERS = \
 tcl.pbc \
-runtime@slash@builtins.pir \
-"runtime@slash@*.pbc" \
-"$(CLASSDIR)@slash@*.pbc" \
-"$(PMCDIR)@slash@pmc_*.h" \
-"$(PMCDIR)@slash@*_group.h" \
-"$(PMCDIR)@slash@*$(LOAD_EXT)" \
-"$(PMCDIR)@slash@*.dump" \
-#CONDITIONED_LINE(ld_parrot_exe_def):"$(PMCDIR)@slash@*.def" \
-"$(PMCDIR)@slash@*.c" \
-"$(PMCDIR)@slash@*$(O)" \
-"t@slash@*.pir" \
-"t@slash@*.tcl" \
+runtime/builtins.pir \
+"runtime/*.pbc" \
+"$(CLASSDIR)/*.pbc" \
+"$(PMCDIR)/pmc_*.h" \
+"$(PMCDIR)/*_group.h" \
+"$(PMCDIR)/*$(LOAD_EXT)" \
+"$(PMCDIR)/*.dump" \
+#CONDITIONED_LINE(ld_parrot_exe_def):"$(PMCDIR)/*.def" \
+"$(PMCDIR)/*.c" \
+"$(PMCDIR)/*$(O)" \
+"t/*.pir" \
+"t/*.tcl" \
 $(GENERATED_INLINES)
 
 clean:

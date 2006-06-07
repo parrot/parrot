@@ -1,15 +1,19 @@
 #!/usr/bin/perl -w
 # Copyright (C) 2005, The Perl Foundation.
 # $Id$
+
 use strict;
-use vars qw($DIR);
+use warnings;
+use vars qw($DIR %tests);
 
 # the directory to put the tests in
 $DIR = 't_tcl';
 
+use Fatal qw{open};
 use File::Spec;
 use Getopt::Std;
-use Text::Balanced; #XXX temporarily limit ourselves to perl 5.8...
+use Text::Balanced; # XXX temporarily limit ourselves to perl 5.8...
+                    # XXX This doesn't ever seem to be used...
 use Test::Harness;
 
 $|=1;
@@ -23,9 +27,9 @@ tcl-test.pl
 
 =head1 DESCRIPTION
 
-Run the tests from the Tcl distribution. This script will download 
-the tests from Tcl CVS, extract them, and use Test::Harness to
-run them and report the results.
+Run the tests from the Tcl distribution. This script will download
+the tests from the Tcl CVS repository, convert them into a a TAP-style
+protocol that can then use Test::Harness to run and report results.
 
 =head1 SYNOPSIS
 
@@ -40,13 +44,13 @@ main();
 
 ##
 ## main()
-## 
+##
 sub main {
     usage() and exit if $opt_h;
     checkout_tests() and convert_tests() if not -d $DIR;
     update_tests()   and convert_tests() if $opt_u;
     convert_tests() if $opt_c;
-    run_tests(grep {-f $_} @ARGV);
+    return run_tests(grep {-f $_} @ARGV);
 }
 
 ##
@@ -59,33 +63,30 @@ sub convert_tests {
     my @files = glob( File::Spec->catfile( $DIR, "*.test" ) );
     for my $file (@files) {
         my $test = substr $file, 0, -3;
-        # parrot's getopt dislikes filenames with - in them. 
+        # parrot's getopt dislikes filenames with - in them.
         $test =~ s/-/_/g;
         system("rm $test") if -e $test;
-        
-        open my $ffh, "<", $file
-            or die "Couldn't open $file\n";
-        my %tests = extract_tests( do{local $/;<$ffh>} );
+
+        open my $ffh, '<', $file;
+        %tests = extract_tests( do{undef local $/;<$ffh>} );
         close $ffh;
-       
-	# Only generate output test file if we can find tests... 
+
+	# Only generate output test file if we can find tests...
         my $output;
-        eval {  
+        eval {
             $output = format_tests(%tests);
         };
         if ($@) {
             warn "Warning! Unable to extract tests for $file\n";
         } else {
             warn "Extracting tests for $file\n";
-            open my $tfh, ">>", $test
-                or die "Couldn't open $test\n";
-            print $tfh $output;
+            open my $tfh, '>>', $test;
+            print {$tfh} $output;
             close $tfh;
         };
     }
-    1;
+    return;
 }
-
 ##
 ## checkout_tests()
 ##
@@ -93,8 +94,12 @@ sub convert_tests {
 ##
 sub checkout_tests {
     print "Checking out tests from CVS\n";
-    system "cvs -d :pserver:anonymous\@cvs.sourceforge.net:/cvsroot/tcl co -d $DIR tcl/tests";
-    1;
+    
+    my $rc = system <<"END_COMMAND";
+cvs -z3 -d :pserver:anonymous:\@tcl.cvs.sourceforge.net:/cvsroot/tcl co -d $DIR tcl/tests
+END_COMMAND
+
+    return ($rc == 0) ; # just care if it failed, not howm
 }
 
 ##
@@ -117,7 +122,7 @@ sub choose {
 sub extract_tests {
     my ($source) = @_;
     my %tests;
-   
+
     my $regex = qr[
         test \s+ (\S+)                  # test ident
              \s+ \{ ([^}]+) \}          # test description
@@ -128,17 +133,17 @@ sub extract_tests {
               | " ((?:[^"\\]|\\.)+) "   #" (keep my editor happy)
               | (\w+) )
     ]sx;
-    
+
     while ($source =~ m[$regex]go) {
         my ($name, $expl, $body, $out) = ($1, $2, $3, choose($4, unescape($5), $6));
-        
+
         # make the test print the last line of output
         # XXX This should be "print the last command". Which is harder.
         $body =~ s/^(\s*)([^\n]+)\s*\Z/$1puts [$2]/m;
-        
+
         $tests{$name} = [$expl, $body, $out];
     }
-    
+
     return %tests;
 }
 
@@ -153,7 +158,7 @@ sub extract_preamble {
     my ($source) = @_;
     my $preamble;
 
-    my $regex = qr[
+    my $regex = qr{
         ^                               # preambles begin the line
         (                               # then contain one of...
         catch {                       # a catch statement
@@ -168,18 +173,19 @@ sub extract_preamble {
             (?: \{ ([^\n]+) \}          # test result
               | " ((?:[^"\\]|\\.)+) "   #" (keep my editor happy)
               | (\w+) )
-    ]sx;
-    
-    while ($source =~ m[$regex]go) {
+        )
+    }sx;
+
+    while ($source =~ m{$regex}go) {
         my ($name, $expl, $body, $out) = ($1, $2, $3, choose($4, unescape($5), $6));
-        
+
         # make the test print the last line of output
         # XXX This should be "print the last command". Which is harder.
         $body =~ s/^(\s*)([^\n]+)\s*\Z/$1puts [$2]/m;
-        
+
         $tests{$name} = [$expl, $body, $out];
     }
-    
+
     return %tests;
 }
 
@@ -190,20 +196,20 @@ sub extract_preamble {
 ##
 sub format_tests {
     my (%tests) = @_;
-    
+
     my $count = scalar keys %tests;
     die unless $count;
 
     my $string = <<"END";
 #!/usr/bin/perl
-    
+
 use strict;
-use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => $count;
 
 END
 
-    my $counter = 1;    
+    my $counter = 1;
     for my $name (sort keys %tests) {
         my ($expl, $body, $out) = @{ $tests{$name} };
         $string .= <<"END";
@@ -217,10 +223,10 @@ $name - $expl
 DESC
 
 END
-   
+
         $counter++;
     }
-    
+
     return $string;
 }
 
@@ -228,12 +234,15 @@ END
 ## run_tests(@globs)
 ##
 ## Run the tests.
-## 
+##
 sub run_tests {
-    my (@files) = @_ ? @_ : glob( File::Spec->catfile( $DIR, "*.t" ) );
-    
-    return unless @files;
-    runtests(@files);
+    my (@files) = @_ ? @_ : glob File::Spec->catfile( $DIR, '*.t' ) ;
+
+    if (@files) {
+        return runtests(@files);
+    } else {  
+        return;
+    }
 }
 
 ##
@@ -244,34 +253,35 @@ sub run_tests {
 sub unescape {
     my ($string) = @_;
     return if not $string;
-    
+
     $string =~ s/\\([^abfnrtvoxu])/$1/g;
-    
+
     return $string;
 }
 
 ##
 ## update_tests()
-## 
+##
 ## Run CVS update.
 ##
 sub update_tests {
     print "Updating tests from CVS\n";
     system "(cd $DIR && cvs -Q up *.test)";
-    1;
+    
+    return;
 }
 
 ##
 ## usage()
-## 
+##
 ## Print the usage message.
 ##
 sub usage {
-    print <<"USAGE";
+    print <<'END_USAGE';
 Usage: tcl-test.pl [-cu]
     -c Convert the .test files to .t files
     -u Update the tests from CVS.
-USAGE
-    1;
-}
+END_USAGE
 
+    return;
+}
