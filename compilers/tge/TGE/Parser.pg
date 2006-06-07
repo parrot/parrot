@@ -45,5 +45,15 @@ token name { \w+ }
 token ws {
     [ \s+
     | \# \N*
+    | <?pod_comment>
     ]*
+}
+
+
+regex pod_comment {
+    ^^ = [ [ cut \h*: | end [\h\N*]? ]
+         | for [ \h\N+: ] \n [ \N+\n ]*:
+         | \w\N*: \n .*? \n = [ cut \h*: | end [\h\N*:]? ]
+         ]
+         [\n|$]
 }
