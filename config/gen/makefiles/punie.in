@@ -16,16 +16,16 @@ lib/PunieGrammar.pbc: lib/PunieGrammar.pir lib/punie.pg
 	$(PARROT) $(PGE_DIR)@slash@pgc.pir --output=lib/punie_grammar_gen.pir lib/punie.pg
 	$(PARROT) -o lib/PunieGrammar.pbc --output-pbc lib/PunieGrammar.pir 
 
-lib/ASTGrammar.pbc: lib/ASTGrammar.pir lib/pge2past.tg
-	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@pge2past_gen.pir lib@slash@pge2past.tg
+lib/ASTGrammar.pbc: lib/ASTGrammar.tg
+	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@ASTGrammar.pir lib@slash@ASTGrammar.tg
 	$(PARROT) -o lib@slash@ASTGrammar.pbc --output-pbc lib@slash@ASTGrammar.pir 
 
-lib/OSTGrammar.pbc: lib/OSTGrammar.pir lib/past2post.tg
-	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@past2post_gen.pir lib@slash@past2post.tg
+lib/OSTGrammar.pbc: lib/OSTGrammar.tg
+	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@OSTGrammar.pir lib@slash@OSTGrammar.tg
 	$(PARROT) -o lib@slash@OSTGrammar.pbc --output-pbc lib@slash@OSTGrammar.pir 
 
-lib/PIRGrammar.pbc: lib/PIRGrammar.pir lib/post2pir.tg
-	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@post2pir_gen.pir lib@slash@post2pir.tg
+lib/PIRGrammar.pbc: lib/PIRGrammar.tg
+	$(PARROT) $(TGE_DIR)@slash@tgc.pir --output=lib@slash@PIRGrammar.pir lib@slash@PIRGrammar.tg
 	$(PARROT) -o lib@slash@PIRGrammar.pbc --output-pbc lib@slash@PIRGrammar.pir 
 
 punie.pbc: punie.pir lib/PunieGrammar.pbc lib/ASTGrammar.pbc lib/OSTGrammar.pbc lib/PIRGrammar.pbc
@@ -62,11 +62,11 @@ clean: testclean
 	lib/punie_grammar_gen.pir \
 	lib/PunieGrammar.pbc \
 	lib/ASTGrammar.pbc \
-	lib/pge2past_gen.pir \
+	lib/ASTGrammar.pir \
 	lib/OSTGrammar.pbc \
-	lib/past2post_gen.pir \
+	lib/OSTGrammar.pir \
 	lib/PIRGrammar.pbc \
-	lib/post2pir_gen.pir
+	lib/PIRGrammar.pir
 
 realclean: clean
 	$(RM_F) Makefile
