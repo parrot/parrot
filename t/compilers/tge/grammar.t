@@ -8,6 +8,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Test::More;
 use Parrot::Test;
 
+BEGIN { plan tests => 2; };
 
 =head1 NAME
 
@@ -25,6 +26,37 @@ tree of the specified type.
 
 =cut
 
+pir_output_is(<<'CODE', <<'OUT', 'test compiling anonymous and named grammars');
+
+.sub _main :main
+    load_bytecode 'TGE.pbc'
+
+    # Load the grammar in a string
+    .local string source
+    source = <<'GRAMMAR'
+    transform min (Leaf) :language('PIR') { 
+        $P1 = getattribute node, "value"
+       .return ($P1)
+    }
+GRAMMAR
+
+    # Compile a grammar from the source 
+    .local pmc grammar
+    $P1 = new 'TGE::Compiler'
+    grammar = $P1.'compile'(source)
+    $S1 = typeof grammar
+    say $S1
+
+    # Add the grammar keyword and recompile
+    source = "grammar TreeMin is TGE::Grammar;\n\n" . source
+    grammar = $P1.'compile'(source)
+    $S1 = typeof grammar
+    say $S1
+.end
+CODE
+AnonGrammar
+TreeMin
+OUT
 
 pir_output_is(<<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar');
 
@@ -233,6 +265,4 @@ Allison Randal <allison@perl.org>
 =cut
 
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 1; }
 

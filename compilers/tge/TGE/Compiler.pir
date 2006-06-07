@@ -56,9 +56,6 @@ structure.
 .end
 
 .sub __init :method
-    # Construct a tree grammar for manipulating the parse tree
-    $P1 = new .ResizablePMCArray
-    setattribute self, 'rules', $P1
     $P3 = find_global "TGE::Compiler", "ROOT_result"
     self.add_rule("ROOT", "result", ".", $P3)
     $P3 = find_global "TGE::Compiler", "statements_result"
@@ -325,32 +322,26 @@ loop_end:
     .local pmc compiler
     compiler = compreg "PIR"
 
-    .local pmc rule_data
-    rule_data = self.'parse_grammar'(source)
-
-    .local pmc new_grammar
-    new_grammar = new 'TGE::Grammar'
-
-    # Construct grammar rules from the data structure of rule info
-    .local pmc rule
     .local string code
-    .local pmc action
+    .local string grammarname
+    .local pmc libloader
+    .local pmc new_grammar
 
-    .local pmc iter
-    iter = new .Iterator, rule_data # loop over the rule info
-    iter = 0 # start at the beginning
-loop_start:
-    unless iter goto loop_end
-        rule = shift iter
-        # Compile the rule and install it immediately.
-        code = self.'rule_string'(rule)
-        action = compiler(code)
-        $P1 = rule["type"]
-        $P2 = rule["name"]
-        $P3 = rule["parent"]
-        new_grammar.add_rule($P1, $P2, $P3, action)
-      goto loop_start
-loop_end:
+    (code, grammarname) = self.'precompile'(source)
+
+    unless grammarname == 'AnonGrammar' goto named_grammar
+    $P2 = new .Hash
+    $P2['type'] = 'AnonGrammar'
+    $P2['inherit'] = 'TGE::Grammar'
+    $S1 = self.'grammar_string'($P2)
+    code = $S1 . code
+  named_grammar:
+    libloader = compiler(code)
+    libloader()
+
+
+    $I0 = find_type grammarname
+    new_grammar = new $I0
 
     .return (new_grammar)
 .end
