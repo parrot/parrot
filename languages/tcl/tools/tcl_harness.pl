@@ -3,29 +3,31 @@
 use strict;
 use warnings;
 
-#get a list of all the builtins we have.
+use Fatal qw{open};
 
-my @commands = (glob ('lib/builtins/*.pir'),glob('lib/commands/*.pir'));
-my @a = map {$a = $_; $a =~ s/.*\/(.*)\.pir/$1/; $a} (@commands);
+# get a list of all the builtins we have.
 
-# Check each of these builtins to see if they are just a stub.
+my @commands = ((glob 'src/builtin/*.pir'), (glob 'runtime/builtin/*.pir'));
+my @a = map {my $a = $_; $a =~ s{.*/(.*)[.]pir}{$1}; $a} (@commands);
+
+# Check each of these builtins to see if they are just a stub, and skippable.
 
 my (@keep,@skip);
 foreach my $file (@commands) {
-  open (F,"<",$file);
-  my $line = <F>;
+  open my $fh, '<', $file;
+  my $line = <$fh>;
   if ($line =~ /XXX Stub/i) {
-    $file =~ m/.*\/(.*)\.pir/;
+    $file =~ m{.*/(.*)[.]pir$};
     push @skip, $1;
   }
-  close(F);
+  close $fh;
 }
 
 print "SKIPPING @skip\n";
 
 # get a list of all the tests in the harness.
 
-my $teetcl = "t_tcl";
+my $teetcl = 't_tcl';
 
 my @b= map {s/.*\/(.*)\.t/$1/; $_} (glob ("$teetcl/*.t"));
 
@@ -50,23 +52,25 @@ foreach my $test (@b) {
 my ($total_skipped, $clock_skipped, $deprecated);
 
 for my $file (@skip) {
-  open (T,"<","$teetcl/$file.t");
+  my $path = "$teetcl/$file.t";
+  next unless -f $path; # Might have a command that doesn't have a test file.
+  open my $test_h, '<', $path;
   READLINE:
-  while (!eof(T)) {
-    my $line = <T>;
+  while (!eof $test_h) {
+    my $line = <$test_h>;
     $line =~ /^use Parrot::Test tests => (\d+)/;
     my $num_tests = $1;
     next READLINE unless $num_tests;
     $numtests{$file} = $num_tests;
     $total_skipped += $num_tests;
-    if ($file eq "clock") {
+    if ($file eq 'clock') {
       $clock_skipped = $num_tests;
-    } elsif ($file eq "case") {
+    } elsif ($file eq 'case') {
       $deprecated = $num_tests;
     }
     last READLINE;
   }
-  close(T);
+  close $test_h
 }
 
 my @tests = map {"$teetcl/$_.t"} @keep;
@@ -75,8 +79,8 @@ if (! @tests) {
 }
 my $cmd = "$^X t/harness @tests";
 print "$cmd\n";
-system($cmd);
+system $cmd;
 
-print "we are skipping $total_skipped total tests at the moment.\n";
+print "we are skipping $total_skipped total tests.\n";
 print "(-clock ($clock_skipped) -deprecated ($deprecated))\n";
 
