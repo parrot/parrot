@@ -52,9 +52,16 @@ GRAMMAR
     grammar = $P1.'compile'(source)
     $S1 = typeof grammar
     say $S1
+
+    # Add a POD comment and recompile
+    source = "=head NAME\n\n  TreeMin\n\n=cut\n\n" . source
+    grammar = $P1.'compile'(source)
+    $S1 = typeof grammar
+    say $S1
 .end
 CODE
 AnonGrammar
+TreeMin
 TreeMin
 OUT
 
