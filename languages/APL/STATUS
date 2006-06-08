@@ -6,9 +6,6 @@ o Add function declarations.
 
 o Add selective specification {in perl: lvalues}
 
-o Add bracket indexing. { in perl: $a[1] } { implement index operator first }
-  (Need TODO tests.)
-
 o clean up the tools/ script so non-generated code is moved into a .pir file.
 
 o While the PMC can handle arbitrarily dimensioned vectors, we don't print
