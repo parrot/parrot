@@ -65,7 +65,13 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 #endif
     if (class) {
         globals = parrot_HLL_namespace(interpreter);
-        stash = VTABLE_get_pmc_keyed_str(interpreter, globals, class);
+        
+        /* Make `find_global [''], 'Foo'` work correctly */
+        if (string_length(interpreter, class) == 0)
+            stash = globals;
+        else
+            stash = VTABLE_get_pmc_keyed_str(interpreter, globals, class);
+        
         if (PMC_IS_NULL(stash))
             return NULL;
     }
