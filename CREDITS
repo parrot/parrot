@@ -84,7 +84,7 @@ N: Bob Diertens
 D: patch regarding macro argument expansion
 
 N: Bob Rogers
-D: Updates to pmc2c.pl
+D: Random small bug fixes, including one for the linguine bug.
 E: rogers-perl6@rgrjr.dyndns.org
 
 N: Brent Royal-Gordon
