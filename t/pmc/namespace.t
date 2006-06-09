@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 32;
 use Parrot::Config;
 
 =head1 NAME
@@ -153,6 +153,27 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz");
 CODE
 ok
 baz
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "find_global Foo::bazz not found");
+.sub 'main' :main
+    $P2 = find_global ["Foo"], "bazz"
+    $P2()
+    print "ok\n"
+.end
+CODE
+/Global 'bazz' not found/
+OUTPUT
+
+# [this used to behave differently from the previous case.]
+pir_output_like(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::bazz not found");
+.sub 'main' :main
+    $P2 = find_global ["Foo";"Bar"], "bazz"
+    $P2()
+    print "ok\n"
+.end
+CODE
+/Global 'bazz' not found/
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash");
