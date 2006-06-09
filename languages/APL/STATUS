@@ -6,6 +6,9 @@ o Add function declarations.
 
 o Add selective specification {in perl: lvalues}
 
+o APL should be fairly whitespace agnostic - (Need TODO tests). Right now,
+  extraneous whitespace around operators is a syntax error.
+
 o clean up the tools/ script so non-generated code is moved into a .pir file.
 
 o While the PMC can handle arbitrarily dimensioned vectors, we don't print
