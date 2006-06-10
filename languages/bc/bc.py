@@ -214,7 +214,7 @@ visit>>
 
     # Compile the abstract syntax tree down to an opcode syntax tree
     .local string ost_tg_source
-    ost_tg_source = _slurp_file('languages/punie/lib/past2post.tg')
+    ost_tg_source = _slurp_file('languages/punie/lib/OSTGrammar.tg')
     .local pmc tge_compiler, ost_grammar
     tge_compiler = new 'TGE::Compiler'
     ost_grammar = tge_compiler.'compile'(ost_tg_source)
@@ -230,7 +230,7 @@ visit>>
 
     # Compile the OST down to PIR
     .local string pir_tg_source
-    pir_tg_source = _slurp_file('languages/punie/lib/post2pir.tg')
+    pir_tg_source = _slurp_file('languages/punie/lib/PIRGrammar.tg')
     .local pmc pir_grammar
     pir_grammar = tge_compiler.'compile'(pir_tg_source)
     .local pmc pir_builder
