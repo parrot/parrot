@@ -1,0 +1,92 @@
+=head1 Translating Managed Pointers
+
+This document discusses .NET managed pointers and how they can be supported on
+Parrot.
+
+=head2 About .NET Managed Pointers
+A managed pointer holds the address of a local variable or parameter on the
+stack, a field from an object or an element in an array. These can be used
+with a number of instructions that load and store data indirectly, that is
+using the address in the pointer. The "managed" part means that a number of
+limitations are placed upon the pointer. Namely, in verifiable code, the
+location the pointer references can only be set by a limited number of
+instructions and can not be modified by user code. This means that the pointer
+will always point to a valid location so the safety of the VM can not be
+comprimised.
+
+=head2 Parrot Issues
+Parrot, at the time of writing, lacks a straightforward way to implement
+managed pointers. One issue is that there is no official and documented way to
+obtain references to or the addresses of registers, fields of objects or array
+elements. Another is that post-translation, there is nothing to distinguish a
+register holding a reference, so verification as used in .NET does not help
+with regard to protecting the Parrot VM at runtime. Further complications
+arise with regard to references to arrays and objects as even if undocumented
+knowledge of internals are used there is still no clean way to get the address
+of an element or field, and also while the location of a PMC stays constant,
+the data that it holds need not, thus meaning the pointer is potentially
+invalidated at some point. Registers are somewhat to get the address of, but
+present a security issue - if the managed reference exists beyond lifetime of
+the register frame that it has a pointer into, whatever is in memory at that
+location at a later time can be written over.
+
+=head2 The Basics
+A managed pointer is represented by a ManagedPointer PMC, specifically a
+dynamic PMC written specifically for the .NET translator rather than provided
+by the Parrot core. Beneath it will be a structure containing details of the
+pointer (conceptually, the location it points to), however it will not be
+possible to set or modify this from outside of the PMC. This will ensure one
+of the safety properties of managed pointers hold. There will also need to be
+a flag that states what kind of location the pointer is pointing at (This is
+not needed by a standard .NET VM, but a standard .NET VM Parrot is not.)
+
+=head2 Managed pointers to array elements
+As the index of the array element being referenced is always known at the time
+the pointer is created, the pointer can be emulated by storing the index and
+a pointer to the array PMC, then using the PMC v-table methods to get and set
+the value. The array PMC needs to be marked live when the garbage collector
+visits the managed pointer PMC, so the object holding the referenced field can
+not disappear.
+
+=head2 Managed pointers to fields
+Similar to the array case, the name of the field along with a pointer to the
+object PMC can be stored and used to implement indirect access to the field.
+The object PMC needs to be marked live for GC purposes too.
+
+=head2 Managed pointers to registers
+This covers managed pointers to local variables and paramters, which are all
+stored in registers. The current method that is being executed will have a
+Parrot_Context structure associated with it. This structure contains data
+relating to the method state and references its register frame. It also has a
+reference count relating to how many items are currently using it. It would be
+much more convenient if it was actually elligible for garbage collection, then
+it could be marked live just as arrays and objects that are referenced are. It
+appears that this is the long term goal, but for now it can't work.
+
+Instead, when a managed pointer is created it takes a pointer to the current
+context and increment its reference count. This count is be decremented in the
+destructor for the managed pointer PMC. The type and number of the register
+the pointer is referencing also needs to be stored. This mechanism should
+ensure that the safety of the VM by preventing register frames that are still
+referenced from vanishing. Admittedly, this is somewhat evil and is certainly
+playing with parts of the internals liable to change. However, it works.
+
+=head2 Implementation
+The managed pointer PMC has the following underlying structure.
+
+struct dotnet_managed_ptr
+{
+    int type; /* The type of managed pointer this is. */
+    union ref {
+        PMC* pmc;            /* For arrays, fields. */
+        Parrot_Context *ctx; /* For registers. */
+    }
+    union tag {
+        int index;           /* For arrays. */
+        STRING *name;        /* For field name. */
+        struct reg_info {    /* For registers. */
+            int number;
+            int reg_type;
+        }
+    }
+}

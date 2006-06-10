@@ -1,0 +1,63 @@
+=head1 TABLE OF CONTENTS
+
+This is a list of documents relating to the .NET CLI => Parrot Intermediate
+Representation translator.
+
+=head2 USING THE TRANSLATOR
+
+=over 4
+
+=item L<introduction.pod>: Introduction
+
+=item L<building.pod>: Building
+
+=item L<running.pod>: Running the EXE/DLL => PBC translator
+
+=item L<pirinterface.pod>: Loading .NET classes directly from PIR code
+
+=back
+
+=head2 HACKING ON THE TRANSLATOR
+
+=over 4
+
+=item L<overview.pod>: Overview of the system
+
+=item L<pmcs.pod>: The .NET metadata PMCs
+
+=item L<metadatatranslator.pod>: Translating .NET class metadata to PIR
+
+=item L<rulesfile.pod>: The translation rules file format
+
+=item L<translatorbuilder.pod>: The translator builder
+
+=item L<stacktoregister.pod>: Notes on stack to register mapping
+
+=back
+
+=head2 CONSTRUCT TRANSLATION DETAILS
+
+=over 4
+
+=item L<constructs/arrays.pod>: Arrays
+
+=item L<constructs/calling.pod>: Calling
+
+=item L<constructs/exceptions.pod>: Exceptions
+
+=item L<constructs/managedpointers.pod>: Managed Pointers
+
+=item L<constructs/oop.pod>: OOP
+
+=item L<constructs/valuetypes.pod>: Value Types
+
+=item L<constructs/builtintypes.pod>: Built in types (TO DO)
+
+=item L<constructs/strings.pod>: Strings (TO DO)
+
+=item L<constructs/typechecking.pod>: Type Checking (TO DO)
+
+=item L<constructs/visibility.pod>: Visibility Modifiers (TO DO)
+
+=back
+

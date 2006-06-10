@@ -1,0 +1,664 @@
+/* .NET CLI Bytecode PMC */
+
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass DotNetBytecode dynpmc group dotnet {
+
+    /* Instance initialization. We need a custom DOD marking and destroy. */
+    void init()
+    {
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+
+    /* Garbage Collection mark routine. */
+    void mark()
+    {
+        /* Tell the GC about stuff we're holding on to. */
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        if (bc->parent)
+            pobject_lives(INTERP, (PObj*)bc->parent);
+        if (bc->eh)
+            pobject_lives(INTERP, (PObj*)bc->eh);
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+            if (bc->body)
+                free(bc->body);
+            free(bc);
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* Get local variables signature blob location. */
+    METHOD int get_locals_sig()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+        else
+            return (int) bc->locals_signature;
+    }
+
+
+    /* Initialize local variables flag. */
+    METHOD int init_locals()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+        else
+            return (int) bc->init_locals_flag;
+    }
+
+
+	/* Get length of bytecode. */
+    METHOD int get_length()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+        else
+            return (int) bc->body_size;
+    }
+
+
+    /* Get current bytecode position, for when walking bytecode. */
+    METHOD int get_pos()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+        else
+            return (int) bc->cur_pos;
+    }
+
+
+    /* Set current bytecode position, for when walking bytecode. */
+    METHOD void set_pos(int pos)
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+        else
+            bc->cur_pos = pos;
+    }
+
+
+    /* Get error handlers PMC array. */
+    METHOD PMC* get_eh()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+        else
+            return bc->eh;
+    }
+
+
+    /* Read a signed 8-bit integer. */
+    METHOD INTVAL read_int8()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        char val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            val = bc->body[bc->cur_pos];
+            bc->cur_pos++;
+            return (int) val;
+        }
+    }
+
+    
+    /* Read an unsigned 8-bit integer. */
+    METHOD INTVAL read_uint8()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        unsigned char val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            val = bc->body[bc->cur_pos];
+            bc->cur_pos++;
+            return (INTVAL) val;
+        }
+    }
+
+
+    /* Read a signed 16-bit integer. */
+    METHOD INTVAL read_int16()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_Int2 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 1 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[1] = bc->body[bc->cur_pos];
+                val_ptr[0] = bc->body[bc->cur_pos + 1];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+            }
+            bc->cur_pos += 2;
+            return (INTVAL)val;
+        }
+    }
+
+
+    /* Read an unsigned 16-bit integer. */
+    METHOD INTVAL read_uint16()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_UInt2 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 1 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[1] = bc->body[bc->cur_pos];
+                val_ptr[0] = bc->body[bc->cur_pos + 1];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+            }
+            bc->cur_pos += 2;
+            return (INTVAL)val;
+        }
+    }
+
+
+    /* Read a signed 32-bit integer. */
+    METHOD INTVAL read_int32()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_Int4 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 3 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[3] = bc->body[bc->cur_pos];
+                val_ptr[2] = bc->body[bc->cur_pos + 1];
+                val_ptr[1] = bc->body[bc->cur_pos + 2];
+                val_ptr[0] = bc->body[bc->cur_pos + 3];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+                val_ptr[2] = bc->body[bc->cur_pos + 2];
+                val_ptr[3] = bc->body[bc->cur_pos + 3];
+            }
+            bc->cur_pos += 4;
+            return (INTVAL)val;
+        }
+    }
+
+
+    /* Read an unsigned 32-bit integer. */
+    METHOD INTVAL read_uint32()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_UInt4 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 3 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[3] = bc->body[bc->cur_pos];
+                val_ptr[2] = bc->body[bc->cur_pos + 1];
+                val_ptr[1] = bc->body[bc->cur_pos + 2];
+                val_ptr[0] = bc->body[bc->cur_pos + 3];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+                val_ptr[2] = bc->body[bc->cur_pos + 2];
+                val_ptr[3] = bc->body[bc->cur_pos + 3];
+            }
+            bc->cur_pos += 4;
+            return (INTVAL)val;
+        }
+    }
+
+
+    /* Read a 32-bit (single precision) floating pointer number. */
+    METHOD FLOATVAL read_float32()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_Float4 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 3 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[3] = bc->body[bc->cur_pos];
+                val_ptr[2] = bc->body[bc->cur_pos + 1];
+                val_ptr[1] = bc->body[bc->cur_pos + 2];
+                val_ptr[0] = bc->body[bc->cur_pos + 3];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+                val_ptr[2] = bc->body[bc->cur_pos + 2];
+                val_ptr[3] = bc->body[bc->cur_pos + 3];
+            }
+            bc->cur_pos += 4;
+            return (FLOATVAL)val;
+        }
+    }
+
+
+    /* Read a 64-bit (double precision) floating pointer number. */
+    METHOD FLOATVAL read_float64()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_Float8 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 7 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            int i;
+            for (i = 0; i <= 4; i += 4)
+            {
+                if (PARROT_BIGENDIAN)
+                {
+                    val_ptr[i + 3] = bc->body[bc->cur_pos + i];
+                    val_ptr[i + 2] = bc->body[bc->cur_pos + i + 1];
+                    val_ptr[i + 1] = bc->body[bc->cur_pos + i + 2];
+                    val_ptr[i] = bc->body[bc->cur_pos + i + 3];
+                }
+                else
+                {
+                    val_ptr[i] = bc->body[bc->cur_pos + i];
+                    val_ptr[i + 1] = bc->body[bc->cur_pos + i + 1];
+                    val_ptr[i + 2] = bc->body[bc->cur_pos + i + 2];
+                    val_ptr[i + 3] = bc->body[bc->cur_pos + i + 3];
+                }
+            }
+            bc->cur_pos += 8;
+            return (FLOATVAL)val;
+        }
+    }
+
+
+    /* Read a field token (32 bits, unsigned). */
+    METHOD INTVAL read_tfield()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_UInt4 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 3 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[3] = bc->body[bc->cur_pos];
+                val_ptr[2] = bc->body[bc->cur_pos + 1];
+                val_ptr[1] = bc->body[bc->cur_pos + 2];
+                val_ptr[0] = bc->body[bc->cur_pos + 3];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+                val_ptr[2] = bc->body[bc->cur_pos + 2];
+                val_ptr[3] = bc->body[bc->cur_pos + 3];
+            }
+            bc->cur_pos += 4;
+            return (INTVAL)val;
+        }
+    }
+
+
+    /* Read a method token (32 bits, unsigned). */
+    METHOD INTVAL read_tmethod()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_UInt4 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 3 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[3] = bc->body[bc->cur_pos];
+                val_ptr[2] = bc->body[bc->cur_pos + 1];
+                val_ptr[1] = bc->body[bc->cur_pos + 2];
+                val_ptr[0] = bc->body[bc->cur_pos + 3];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+                val_ptr[2] = bc->body[bc->cur_pos + 2];
+                val_ptr[3] = bc->body[bc->cur_pos + 3];
+            }
+            bc->cur_pos += 4;
+            return (INTVAL)val;
+        }
+    }
+
+
+    /* Read a type token (32 bits, unsigned). */
+    METHOD INTVAL read_ttype()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_UInt4 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 3 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[3] = bc->body[bc->cur_pos];
+                val_ptr[2] = bc->body[bc->cur_pos + 1];
+                val_ptr[1] = bc->body[bc->cur_pos + 2];
+                val_ptr[0] = bc->body[bc->cur_pos + 3];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+                val_ptr[2] = bc->body[bc->cur_pos + 2];
+                val_ptr[3] = bc->body[bc->cur_pos + 3];
+            }
+            bc->cur_pos += 4;
+            return (INTVAL)val;
+        }
+    }
+
+
+    /* Read a string token (32 bits, unsigned). */
+    METHOD INTVAL read_tstring()
+    {
+        struct dotnet_bytecode *bc = PMC_struct_val(SELF);
+        Parrot_UInt4 val;
+        char *val_ptr = (char*)&val;
+
+        /* Handle cases where we've an invalid PMC. */
+        if (bc == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetBytecode PMC");
+            return 0;
+        }
+
+        /* Ensure we won't read past the end. */
+        else if (bc->cur_pos + 3 >= bc->body_size)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Read past end of bytecode");
+            return 0;
+        }
+        
+        /* Otherwise read the value. */
+        else
+        {
+            if (PARROT_BIGENDIAN)
+            {
+                val_ptr[3] = bc->body[bc->cur_pos];
+                val_ptr[2] = bc->body[bc->cur_pos + 1];
+                val_ptr[1] = bc->body[bc->cur_pos + 2];
+                val_ptr[0] = bc->body[bc->cur_pos + 3];
+            }
+            else
+            {
+                val_ptr[0] = bc->body[bc->cur_pos];
+                val_ptr[1] = bc->body[bc->cur_pos + 1];
+                val_ptr[2] = bc->body[bc->cur_pos + 2];
+                val_ptr[3] = bc->body[bc->cur_pos + 3];
+            }
+            bc->cur_pos += 4;
+            return (INTVAL)val;
+        }
+    }
+}
+

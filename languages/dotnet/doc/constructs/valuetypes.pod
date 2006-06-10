@@ -1,0 +1,121 @@
+=head1 Translating Value Types
+
+This document discusses .NET's value types and how their semantics can be
+realised on the Parrot platform.
+
+=head2 About .NET's Value Types
+The name pretty much says it all - value types are simply types that exhibit
+value semantics (that is, anywhere that, say, an integer would be copied a
+value type will almost be copied; think passing, assignment etc).
+
+All value types derive directly from System.ValueType and be sealed. They
+can have instance and static fields and methods. They can exist in two
+forms - an unboxed form where they have value semantics and a boxed form
+where they become an object. When calling an instance method on the unboxed
+form, a managed pointer to it is passed. When calling an instance method on
+the boxed form, the reference is passed.
+
+There is a special cases of value types, System.Enum, where there is only
+a single instance field that must be of an integral or number type. These
+can be treated as integers or numbers on the stack as appropriate. This
+allows the .NET platform to implement them efficiently (and will allow for
+the same to be achieved in the Parrot translation).
+
+
+=head2 Parrot's Support For Value Types
+While Parrot provides all the primitives upon which complex value types can
+be built, it doesn't provide any support in the form that .NET does.
+
+
+=head2 Translating Value Types
+
+=head3 Value Types Are Really Just Classes With A Property
+Value types have fields (in Parrot terminology, attributes) and, in their
+boxed form may have virtual methods called on them. Their value semantics
+aside they are much like objects. (The .NET benefit aside that you avoid
+an additional indirection; trying to emulate that in Parrot would be hard
+to do, thus that is lost in this implementation of the translation.)
+
+There needs to be a way to differentiate between the boxed and unboxed
+forms, even though in the Parrot translation they are essentially the
+same thing at a data structure level. Therefore, a PMC property is used
+to mark an object as "boxed". This is optimized for the common case -
+that the unboxed form will be being used.
+
+=head3 Initialization
+As it is completely OK to start using a value type without initialising
+it. This is different from objects. Locals that are to hold a value type
+therefore need to have their value type PMCs initialized. For arguments
+this should be a non-issue - what gets passed will have been initialised.
+For instance fields, initialization should be done in the __init method.
+For static fields, initialization should be done at the point that static
+variables are declared. For arrays, each element needs to be initialized;
+this feels expensive and a possible improvement may be a special value
+type array PMC that, if the element is empty, auto-vivifies it.
+
+=head3 Copy On Load (And No, I Didn't Mean Write ;-))
+When a value type is loaded, an instruction to clone it must be emitted
+directly afterwards. These instructions include all loads from locals,
+arguments, array elements and fields. These should all be marked up
+with the "load" instruction class and therefore this can be done
+automatically. Note that care is needed with the interaction with
+LOADREG - the pre_load and post_load without the "need destination
+register" flag should be allowed to proceed as normal, then "pre_op"
+and "post_op" used to make the value available for the clone. This way,
+no additional assistance from the SRM is needed. The SRM should not
+need to know about value types. It doesn't want to. I don't want to.
+Your dog doesn't want to. Nobody wants to.
+
+Note that value types will also have to implement __clone. This is
+because when a value type "references" another value type, then it is
+really a flat data structure, but in Parrot's view it's a reference to
+another PMC that will also need to be cloned.
+
+=head3 Calling
+XXX TO DO
+
+=head3 The Enum Special Casae
+XXX TO DO
+
+=head3 Box and Unbox Instructions
+Both of these instructions need special cases for enumerations and the 
+built-in raw types. For other value types, a more general mechanism is
+required.
+
+Boxing (through the box instruction) requires that the attributes are
+copied when the boxing takes place. This can be done with the clone
+Parrot instruction, and then the "boxed" property needs to be set. The
+box instruction will update the stack type state so reflect that the
+object on the stack is now an object.
+
+Unboxing does not require any copying of the attributes, the operation
+simply needs to unset the boxed property and update the stack type
+state. However, the unbox instruction has an additional subtlety - it
+places onto the stack not the unboxed value itself, but rather a managed
+pointer to it. This is not really a problem, just some extra instructions
+to emit when translating the unbox operation.
+
+=head3 Other Value Type Instructions
+
+=head4 initobj
+A PMC __init method can be provided; since it knows the fields it can
+be generated to do the Right Thing. This instruction simply gets the value
+type using the managed pointer to it, then calls its __init v-table method.
+
+=head4 copyobj
+This is translated to a call to load_pmc on the managed pointer to get
+the value, followed by a clone of that value and finally a call to
+store_pmc on the destination managed pointer.
+
+=head4 ldobj
+This is translated as a call to load_pmc on the managed pointer that is
+followed by a clone.
+
+=head4 sizeof
+XXX TO DO
+Thoughts: as we are using PMCs then any array would be a PMC array so we
+can just hand back sizeof(void*)? Or is that going to cause problems? Ugh.
+
+=head4 stobj
+Clone the PMC representing the value type, then call store_pmc on the
+on the managed pointer to actually do the store.

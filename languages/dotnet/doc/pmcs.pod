@@ -1,0 +1,427 @@
+=head1 PMCs
+
+This document details the PMCs (Parrot Magic Cookies) that are used to read in
+.NET assemblies and provide access to the data held in them from PIR.
+
+
+=head2 DotNetAssembly
+This PMC represents an entire .NET CLI EXE or DLL file. It handles loading of
+a .NET assembly and instantiates all other PMCs that relate to the assembly.
+It also provides access to some of the global data 
+
+=head3 Synopsis
+
+  # Load an .NET CLI DLL or EXE file.
+  $P1 = new .DotNetAssembly
+  $P1 = "Example.dll"
+  $P1.load()
+  
+  # Get name of loaded file.
+  $S1 = $P1
+  
+  # Is it a DLL?
+  $I1 = $P1.is_dll()
+  if $I1 = 0 goto EXE
+  print "This is a DLL\n"
+  goto CONTINUE
+EXE:
+  print "This is an EXE file\n"
+CONTINUE:
+  
+  # Get an array of classes.
+  $P2 = $P1.get_classes()
+  
+  # Get the globals pseudo-class.
+  $P3 = $P1.get_global()
+  
+=head3 Vtable Methods
+
+=head4 set_string_native
+Sets the filename of the .NET assembly to be loaded.
+
+=head4 get_string
+Gets the filename of the .NET assembly that is loaded or to be loaded.
+
+=head3 Additional Methods
+With the exception of load, all of these methods should only be called
+when after the load method.
+
+=head4 void load()
+Attempts to load the .NET assembly whose filenmae is stored in the string
+representation of the PMC.
+
+=head4 INTVAL is_dll()
+Returns a non-zero integer if the file is a DLL and zero otherwise.
+
+=head4 STRING* get_internal_string(INTVAL i)
+Gets the string with at the position identifier i from the strings heap.
+This is the string heap that is used for internal identifiers and are
+UTF-8 encoded.
+
+=head4 STRING* get_user_string(INTVAL i)
+Gets the string at position i from the user strings heap. This is the
+string heap that is used for strings that make up various bits of user
+data. Strings on the user heap are encoded as 16-bit unicode.
+
+=head4 STRING* get_blob(INTVAL i)
+Gets the blob at position i from the blobs heap. A blob is a lump of
+binary data; Parrot strings can handle these fine, though.
+
+=head4 PMC* get_classes()
+Returns a PMC array of classes that are defined by the assembly. Each
+element of the PMC array will be a DotNetClassMetadata PMC.
+
+=head4 PMC* get_class_order()
+Returns an integer array specifying indexes into the PMC array of
+classes as returned by the get_classes method. This array provides
+an ordering that ensures parent types come before their children.
+
+=head4 PMC* get_global()
+Returns a DotNetClassMetadata PMC representing the global pseudoclass.
+The fields and methods of this class are global variables/subs.
+
+=head4 PMC* get_field(INTVAL i)
+Returns a DotNetFieldMetadata PMC representing the field at the given
+row of the Field metadata table.
+
+=head4 PMC* get_method(INTVAL i)
+Returns a DotNetMethodMetadata PMC representing the method at the given
+row of the MethodDef metadata table.
+
+=head4 PMC* get_typerefs()
+Returns a PMC array of DotNetTypeRefMetadata PMCs, each one representing
+a type from an external module or assembly.
+
+=head4 PMC* get_memberrefs()
+Returns a PMC array of DotNetMemberRefMetadata PMCs, each one representing
+a field or method (aka member) from an external module or assembly.
+
+
+=head2 DotNetClassMetadata
+This PMC represents the metadata associated with a particular class.
+
+=head3 Synopsis
+
+  # Imagining $P2 is an array of DotNetClassMetadata PMCs...
+  $P3 = $P2[0]
+  
+  # Get name and namespace.
+  $S1 = $P3
+  $S2 = $P3.get_namespace()
+  
+  # Get flags bit vector
+  $I1 = $P3.get_flags()
+  
+  # Get fields and methods.
+  $P4 = $P3.get_fields()
+  $P5 = $P3.get_methods()
+
+=head3 Vtable methods
+
+=head4 get_string
+Gets the name of the class.
+
+=head3 Additional methods
+
+=head4 get_namespace
+Returns a string that is the namespace the class is in.
+
+=head4 get_flags
+Returns a bit vector of flags set on the method. For details of what the
+flags mean, see Partition II Clause 22.1.4 of the .NET Specification.
+
+=head4 PMC* get_fields()
+Returns a PMC array of fields belonging to this class. Each element of
+the PMC array will be a DotNetFieldMetadata PMC.
+
+=head4 PMC* get_methods()
+Returns a PMC array of methods belonging to this class. Each element of
+the PMC array will be a DotNetMethodMetadata PMC.
+
+=head4 get_parent_id()
+Returns the ID of the parent class.
+
+=head4 get_parent_type()
+Returns the type of the parent class ID - that is, whether it is a type
+in the current assembly or in another one.
+
+=head4 get_interface_ids()
+Returns an integer array PMC containing the IDs of the interfaces that
+the type implements. 
+
+=head4 get_interface_types()
+Returns an integer array PMC containing the type of each of the IDs
+that was returned by get_interface_ids.
+
+
+=head2 DotNetMethodMetadata
+This PMC represents the metadata associated with a particular method.
+Note that some additional metadata about a method is stored in a
+seperate header preceding the instruction stream itself. This data
+is not accessible through this PMC; the DotNetBytecode PMC provides
+access to that.
+
+=head3 Synopsis
+
+  # Imagine $P1 contains an array of DotNetMethodMetadata PMCs...
+  $P2 = $P1[0]
+  
+  # Get the name of the method.
+  $S1 = $P2
+  
+  # Get the position of the blob holding a signature for the method.
+  $I0 = $P2.get_signature()
+  
+  # Get flags bit vector
+  $I1 = $P2.get_flags()
+  
+  # Get the method implementation (a DotNetBytecode PMC).
+  $P4 = $P2.get_bytecode()
+  
+  # Get parameters (an array of DotNetParamMetadata PMCs).
+  $P5 = $P2.get_params()
+
+=head3 Vtable methods
+
+=head4 get_string
+Gets the name of the method.
+
+=head3 Additional methods
+
+=head4 get_signature
+Returns an integer specifying the position in the blobs heap of the
+signature for the method.
+
+=head4 get_flags
+Returns a bit vector of flags set on the method. For details of what the
+flags mean, see Partition II Clause 22.1.9 of the .NET Specification.
+
+=head4 get_bytecode
+Returns a DotNetBytecode PMC that allows the bytecode that specifies the
+method body to be walked over easily.
+
+=head4 get_params
+Returns a PMC array of DotNetParamMetadata PMCs, one describing each of
+the parameters of the method.
+
+
+=head2 DotNetFieldMetadata
+This PMC represents the metadata associated with a particular field.
+
+=head3 Synopsis
+
+  # Imagine $P1 contains an array of DotNetFieldMetadata PMCs...
+  $P2 = $P1[0]
+  
+  # Get the name of the field.
+  $S1 = $P2
+  
+  # Get the position of the blob holding a signature for the field.
+  $I0 = $P2.get_signature()
+  
+  # Get flags bit vector
+  $I1 = $P2.get_flags()
+
+=head3 Vtable Methods
+
+=head4 get_string
+Gets the name of the field.
+
+=head3 Additional Methods
+
+=head4 get_signature
+Returns an integer specifying the position in the blobs heap of the
+signature for the field.
+
+=head4 get_flags
+Returns a bit vector of flags set on the field. For details of what the
+flags mean, see Partition II Clause 22.1.5 of the .NET Specification.
+
+=head3 TODO
+No handling of fields with some RVAs.
+
+
+=head2 DotNetParamMetadata
+This PMC represents a parameter of a method.
+
+=head3 Synopsis
+
+  # Imagine $P1 contains an array of DotNetParamMetadata PMCs...
+  $P2 = $P1[0]
+  
+  # Get the name of the parameter.
+  $S1 = $P2
+  
+  # Get flags for the parameter.
+  $I0 = $P2.get_flags()
+  
+  # Get sequence number.
+  $I1 = $P2.get_sequence()
+
+=head3 Vtable Methods
+
+=head4 get_string
+Gets the name of the parameter.
+
+=head3 Additional Methods
+
+=head4 get_flags
+Returns a bit vector of flags set on the parameter. For details of what
+the flags mean, see Partition II Clause 22.1.12 of the .NET Specification.
+
+=head4 get_sequence
+Returns an integer specifying the sequence number of the parameter.
+This is the position of the parameter. Sequence number 0 corresponds
+to the return value rather than a parameter. Sequence numbers should
+then increase, according to the .NET specification, however gaps are
+allowed. Quite what a gap in the sequence would imply is unclear,
+however.
+
+
+=head2 DotNetSignature
+Signatures in .NET are represented as binary blobs of data. This PMC,
+one assigned a string representing a blob, provides some assistance
+to programs walking signatures, hiding away the compression scheme.
+This PMC does not understand the structure of different types of
+signature.
+
+=head3 Synopsis
+
+  $P0 = new DotNetSignature
+  $S0 = assembly.get_blob(blob_position)
+  $P0 = $S0
+  type = $P0.read_byte()
+  # etc
+
+=head3 Vtable Methods
+
+=head4 set_string_native
+Assigns a string containing the concents of the signature blob. This
+must be done before any other operations are performed or an exception
+will be thrown. Doing this also resets the current internal position
+pointer to zero.
+
+=head3 Additional Methods
+
+=head4 read_uint8
+Reads 1 unsigned byte of data. Updates the internal current position
+pointer.
+
+=head4 read_compressed
+Reads a compressed integer, compressed according to the method described
+in Partition II Section 22.2 of the .NET specification. Updates the
+current internal position pointer.
+
+
+=head2 DotNetBytecode
+This PMC provides useful methods for walking .NET CLI instruction streams
+and accessing data in the metadata encoded within the instruction stream,
+rather than the main metadata tables.
+
+=head3 Synopsis
+
+  $P0.set_pos(0)
+  $I0 = $P0.read_uint8()
+  $N0 = $P0.read_float32()
+  $I1 = $P0.get_pos() # $I1 will contain 5
+
+=head3 Vtable Methods
+None.
+
+=head3 Additional Methods
+
+=head4 get_locals_sig
+Returns an integer specifying the position in the blobs heap of the
+signature for the local variables of the method.
+
+=head4 init_locals
+Returns an integer that is 0 if the initialize locals flag is set for the
+method and a non-zero value if it is.
+
+=head4 get_eh
+Returns a PMC array of DotNetEH (.NET exception handdler info) PMCs.
+
+=head4 get_pos
+Returns an integer value specifying the current offset into the instruction
+stream that is being held. This position is changed when any of the read_*
+methods are called.
+
+=head4 set_pos
+Sets the current offset into the instruction stream that is being held.
+
+=head4 read_int8
+Reads a signed 8-bit integer and returns it as a native sized integer.
+Increments the current read position by 1 byte.
+
+=head4 read_uint8
+Reads an unsigned 8-bit integer and returns it as a native sized integer.
+Increments the current read position by 1 byte.
+
+=head4 read_int16
+Reads a signed 16-bit integer and returns it as a native sized integer.
+Increments the current read position by 2 bytes.
+
+=head4 read_uint16
+Reads an unsigned 16-bit integer and returns it as a native sized integer.
+Increments the current read position by 2 bytes.
+
+=head4 read_int32
+Reads a signed 32-bit integer and returns it as a native sized integer.
+Increments the current read position by 4 bytes.
+
+=head4 read_uint32
+Reads an unsigned 32-bit integer and returns it as a native sized integer.
+Increments the current read position by 4 bytes.
+
+=head4 read_float32
+Reads a 32-bit (single precision) float and returns it as the native sized
+floating point number type used for Parrot's N registers. Increments the
+current read position by 4 bytes.
+
+=head4 read_float64
+Reads a 64-bit (single precision) float and returns it as the native sized
+floating point number type used for Parrot's N registers. Increments the
+current read position by 8 bytes.
+
+=head3 TODO
+Subtle issues relating to 32-bit unsigned integers and I registers, 64-bit
+integers.
+
+
+=head2 DotNetTypeRefMetadata
+This PMC represents the metadata associated with a type in an external
+module.
+
+=head3 Synopsis
+
+  # Imagining $P2 is an array of DotNetTypeRefMetadata PMCs...
+  $P3 = $P2[0]
+  
+  # Get name and namespace.
+  $S1 = $P3
+  $S2 = $P3.get_namespace()
+  
+  # Get resolution scope.
+  $I1 = $P3.get_resolution_scope()
+
+=head3 Vtable methods
+
+=head4 get_string
+Gets the name of the class.
+
+=head3 Additional methods
+
+=head4 get_namespace
+Returns a string that is the namespace the class is in.
+
+=head4 get_resolution_scope
+Returns an integer that defines the module or assembly containing the
+implementation of the type.
+
+
+=head2 DotNetMemberRefMetadata
+XXX TO DO
+
+
+=head2 DotNetEH
+XXX TO DO

@@ -1,0 +1,96 @@
+/* .NET CLI Param Metadata PMC */
+
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass DotNetParamMetadata dynpmc group dotnet {
+
+    /* Instance initialization. We need a custom DOD marking and destroy. */
+    void init()
+    {
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+
+    /* Get string vtable function; returns the name of the parameter. */
+    STRING* get_string()
+    {
+        struct dotnet_param *p = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (p == NULL || p->str_name == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetParamMetadata PMC");
+            return NULL;
+        }
+        else
+            return p->str_name;
+    }
+
+
+    /* Garbage Collection mark routine. */
+    void mark()
+    {
+        /* Tell the GC about stuff we're holding on to. */
+        struct dotnet_param *p = PMC_struct_val(SELF);
+        if (p)
+        {
+            if (p->parent)
+                pobject_lives(INTERP, (PObj*)p->parent);
+            if (p->str_name)
+                pobject_lives(INTERP, (PObj*)p->str_name);
+        }
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            free(PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* Returns the flags associated with the parameter. */
+    METHOD int get_flags()
+    {
+        struct dotnet_param *p = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (p == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetParamMetadata PMC");
+            return 0;
+        }
+        else
+            return (int) p->flags;
+    }
+
+
+    /* Returns the sequence number associated with the parameter. */
+    METHOD int get_sequence()
+    {
+        struct dotnet_param *p = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (p == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetParamMetadata PMC");
+            return 0;
+        }
+        else
+            return (int) p->sequence;
+    }
+}
+

@@ -1,0 +1,64 @@
+/* .NET 64-bit signed integer PMC */
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass Int64 dynpmc group dotnet_runtime {
+    
+    /* Instance initialization. We need a custom destroy. */
+    void init()
+    {
+        struct dotnet_int64 *i = mem_sys_allocate(sizeof(struct dotnet_int64));
+        PObj_active_destroy_SET(SELF);
+        PMC_struct_val(SELF) = i;
+        i->x = 0;
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            /* Free memory associated with underlying struct. */
+            struct dotnet_int64 *i = PMC_struct_val(SELF);
+            free(i);
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* Lower bits are integer assign, upper bits are PMC method. */
+    void set_integer_native(INTVAL low)
+    {
+        struct dotnet_int64 *i = PMC_struct_val(SELF);
+        i->x = (i->x & 0xFFFFFFFF00000000) | low;
+    }
+    METHOD void set_high_bits(int high)
+    {
+        struct dotnet_int64 *i = PMC_struct_val(SELF);
+        i->x = (i->x & 0xFFFFFFFF) | ((__int64)high << 32);
+    }
+
+
+    /* Get integer casts back to integer; methods to get high and low 32s. */
+    INTVAL get_integer()
+    {
+        struct dotnet_int64 *i = PMC_struct_val(SELF);
+        return (int) i->x;
+    }
+    METHOD int get_low_bits()
+    {
+        struct dotnet_int64 *i = PMC_struct_val(SELF);
+        return (int) (i->x & 0xFFFFFFFF);
+    }
+    METHOD int get_high_bits()
+    {
+        struct dotnet_int64 *i = PMC_struct_val(SELF);
+        return (int) (i->x >> 32);
+    }
+}
+

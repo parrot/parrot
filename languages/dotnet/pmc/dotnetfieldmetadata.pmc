@@ -1,0 +1,113 @@
+/* .NET CLI Field Metadata PMC */
+
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass DotNetFieldMetadata dynpmc group dotnet {
+
+    /* Instance initialization. We need a custom DOD marking and destroy. */
+    void init()
+    {
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+
+    /* Get string vtable function; returns the name of the field. */
+    STRING* get_string()
+    {
+        struct dotnet_field *f = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (f == NULL || f->str_name == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetFieldMetadata PMC");
+            return NULL;
+        }
+        else
+            return f->str_name;
+    }
+
+
+    /* Garbage Collection mark routine. */
+    void mark()
+    {
+        /* Tell the GC about stuff we're holding on to. */
+        struct dotnet_field *f = PMC_struct_val(SELF);
+        if (f)
+        {
+            if (f->parent)
+                pobject_lives(INTERP, (PObj*)f->parent);
+            if (f->str_name)
+                pobject_lives(INTERP, (PObj*)f->str_name);
+        }
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            free(PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* Get flags of the field. */
+    METHOD int get_flags()
+    {
+        struct dotnet_field *f = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (f == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetFieldMetadata PMC");
+            return 0;
+        }
+        else
+            return (int) f->flags;
+    }
+
+
+    /* Get the position of the blob holding the signature for the method. */
+    METHOD int get_signature()
+    {
+        struct dotnet_field *f = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (f == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetFieldMetadata PMC");
+            return 0;
+        }
+        else
+            return (int) f->signature;
+    }
+
+
+    /* Get the class meta-data PMC for the field. */
+    METHOD PMC* get_class()
+    {
+        struct dotnet_field *f = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (f == NULL || f->parent == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetFieldMetadata PMC");
+            return NULL;
+        }
+        else
+            return f->parent;
+    }
+}
+

@@ -1,0 +1,56 @@
+=head1 Building 
+
+This document describes the process of building the .NET CLI to PIR translator.
+
+
+=head2 Requirements
+To build the translator you will need the following:-
+
+=over 4
+
+=item * A C compiler, linker, make tool and Perl 5. If you have built Parrot
+before, you will already have all of these.
+
+=item * ICU (International Components For Unicode), so Parrot can handle the
+UTF-16 strings used by .NET. Parrot must be built with ICU support.
+
+=item * A built Parrot source tree. The Parrot source, available from SVN as
+well as a number of release builds, can be located at the Parrot webstie
+(L<http://www.parrotcode.org/>.
+
+=item * For running the regression tests and translating any vaguely real
+world programs (as in, ones that use the .NET class library), Mono
+(L<http://www.go-mono.com/>). This is an open source implementation of the
+.NET runtime, class libraries and compilers.
+
+=item * pod2html for generating HTML documentation (usually installed with
+Perl).
+
+=back
+
+
+=head2 Building
+
+Enter the source directory for the translator and run Configure.pl, passing it
+the path to your built Parrot source tree.
+
+  perl Configure.pl --parrot ../parrot
+
+This will generate a makefile. To build the translator using the makefile, type
+the name of the make program for your platform, which will likely be one of the
+following:
+
+  make
+
+Or
+
+  nmake
+
+
+=head2 Running The Tests
+Run the regression tests like this:
+
+  make test
+
+Replacing make with the name of your make program, as used when building.
+

@@ -1,0 +1,168 @@
+/* .NET CLI Method Metadata PMC */
+
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass DotNetMethodMetadata dynpmc group dotnet {
+
+    /* Instance initialization. We need a custom DOD marking and destroy. */
+    void init()
+    {
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+
+    /* Get string vtable function; returns the name of the method. */
+    STRING* get_string()
+    {
+        struct dotnet_method *m = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (m == NULL || m->str_name == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMethodMetadata PMC");
+            return NULL;
+        }
+        else
+            return m->str_name;
+    }
+
+
+    /* Garbage Collection mark routine. */
+    void mark()
+    {
+        /* Tell the GC about stuff we're holding on to. */
+        struct dotnet_method *m = PMC_struct_val(SELF);
+        if (m)
+        {
+            if (m->parent)
+                pobject_lives(INTERP, (PObj*)m->parent);
+            if (m->str_name)
+                pobject_lives(INTERP, (PObj*)m->str_name);
+            if (m->params)
+                pobject_lives(INTERP, (PObj*)m->params);
+            if (m->bytecode)
+                pobject_lives(INTERP, (PObj*)m->bytecode);
+        }
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            free(PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* Get flags of the method. */
+    METHOD int get_flags()
+    {
+        struct dotnet_method *m = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (m == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMethodMetadata PMC");
+            return 0;
+        }
+        else
+            return (int) m->flags;
+    }
+
+
+    /* Get implementation flags of the method. */
+    METHOD int get_impl_flags()
+    {
+        struct dotnet_method *m = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (m == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMethodMetadata PMC");
+            return 0;
+        }
+        else
+            return (int) m->implFlags;
+    }
+
+
+    /* Get the position of the blob holding the signature for the method. */
+    METHOD int get_signature()
+    {
+        struct dotnet_method *m = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (m == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMethodMetadata PMC");
+            return 0;
+        }
+        else
+            return (int) m->signature;
+    }
+
+
+    /* Get bytecode PMC for the method. */
+    METHOD PMC* get_bytecode()
+    {
+        struct dotnet_method *m = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (m == NULL || m->bytecode == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMethodMetadata PMC");
+            return NULL;
+        }
+        else
+            return m->bytecode;
+    }
+
+
+    /* Get parameters PMC array for the method. */
+    METHOD PMC* get_params()
+    {
+        struct dotnet_method *m = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (m == NULL || m->params == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMethodMetadata PMC");
+            return NULL;
+        }
+        else
+            return m->params;
+    }
+
+
+    /* Get the class meta-data PMC for the method. */
+    METHOD PMC* get_class()
+    {
+        struct dotnet_method *m = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (m == NULL || m->parent == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMethodMetadata PMC");
+            return NULL;
+        }
+        else
+            return m->parent;
+    }
+}
+

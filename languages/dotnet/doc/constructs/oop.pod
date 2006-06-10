@@ -1,0 +1,83 @@
+=head1 Translating Object Oriented Features
+
+This document discusses the support for object oriented programming that the
+.NET virtual machine provides, the support that Parrot provides and how to map
+the .NET object model onto the Parrot one in a way that, as far as possible,
+will allow other Parrot languages to interoperate with .NET languages.
+
+
+=head2 The .NET Model
+The .NET object model includes classes with many methods and fields. Methods
+and fields may be static or per instance, and instance methods may be virtual
+(that is, subclasses may provide seperate implementations), thus providing for
+polymorphism.
+
+Only single inheritance of classes is supported, however many interfaces may
+be inherited (or in .NET terminology, implemented). An interface is a class
+with no instance fields and where strictly every method is abstract. Abstract
+methods are those with a declaration but no definition (that is, they have no
+implementation). Abstract classes are also available and allow one or more
+methods to be abstract while others may have an implementation. They can only
+be singly inherited.
+
+Details of object oriented constructs are stored in the meta-data tables. The
+classes table provides a parent field to reference the parent class. Every
+class must have a parent except System.Object. Interfaces may or may not have
+a parent. Mappings of a class to the interfaces it implements are stored in
+another table and details of fields in yet another.
+
+
+=head2 The Parrot Model
+Parrot provides two PMCs that support object orientation, namely ParrotClass
+(which represents a class) and ParrotObject (which represents an object; that
+is, the instantiation of a class). A class can inherit many other classes and
+the inheritance hierachy may change at runtime.
+
+Class creation and definition of the inheritance hierachy are performed through
+a number of Parrot instructions. This means that classes are not "hard-wired"
+at compile time, and only come into existence at runtime. It also means that
+the parents of a particular class must all have been created before that class
+can be.
+
+A ParrotClass may have many attributes (runtime storage locations per instance
+of the class that get inherited) and also many properties (runtime storage
+locations per instance of the class that do not get inherited). These map to
+what .NET calls fields.
+
+While Parrot does have some support for interfaces stubbed in, this has not
+yet been implemented.
+
+It is possible to find out at runtime the dynamic type of an object (that is,
+the class it really is), whether it is an instance of a particular class (for
+example, if A inherits B then an object of type B is an instance of both A and
+B) and whether a class has a certain method.
+
+
+=head2 Mapping .NET OOP Onto Parrot OOP
+
+=head3 Classes
+
+=head3 Interfaces
+Since Parrot currently lacks interfaces, they have to be "faked out" using
+classes and taking advantage of multiple inheritance. An interface is translated
+just as a class would be, but each of the methods simply contain code to throw
+an exception if they are invoked stating that an interface has not been fully
+implemented. The constructor also throws an exception to prevent instantiation
+of interfaces. This provides all of the required semantics.
+
+=head3 Methods
+
+=head3 Fields
+
+=head3 Class Inheritance
+
+=head3 Interface Implementation
+Since interfaces are really just classes in the translated code, implementing
+the interface looks just like inheriting a class.
+
+=head3 Instantiation
+
+=head3 Constructors
+
+=head3 Finalizers
+

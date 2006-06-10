@@ -1,0 +1,15 @@
+=head1 Translating Exceptions
+
+This document discusses the way that .NET and Parrot provide support for
+exceptions. It then describes how .NET's exception model can be implemented
+using the Parrot exception support.
+
+
+=head2 The .NET Model
+
+
+=head2 The Parrot Model
+
+
+=head2 Translating Exceptions
+

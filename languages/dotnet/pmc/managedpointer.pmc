@@ -1,0 +1,564 @@
+/* .NET Managed Pointer PMC */
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass ManagedPointer dynpmc group dotnet_runtime {
+
+    /* Instance initialization. We need a custom DOD marking and destroy. */
+    void init()
+    {
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+
+    /* Garbage Collection mark routine. */
+    void mark()
+    {
+        /* Tell the GC about any PMCs we're holding on to. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_managed_ptr *mp = PMC_struct_val(SELF);
+            if ((mp->type == PTR_TYPE_FIELD || mp->type == PTR_TYPE_ELEMENT ||
+                 mp->type == PTR_TYPE_PMC) && mp->pmc != NULL)
+            {
+                pobject_lives(INTERP, (PObj*)mp->pmc);
+            }
+        }
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            /* Free memory associated with underlying struct. */
+            struct dotnet_managed_ptr *mp = PMC_struct_val(SELF);
+            free(mp);
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* The following methods provide a way to implement load and store indirect. */
+    METHOD int load_int()
+    {
+        int ret_val;
+
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_managed_ptr *mp = PMC_struct_val(SELF);
+
+            /* What kinda reference is it? */
+            switch (mp->type)
+            {
+            case PTR_TYPE_ELEMENT:
+                if (mp->pmc)
+                {
+                    ret_val = VTABLE_get_integer_keyed_int(INTERP, mp->pmc,
+                        mp->index);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_FIELD:
+                if (mp->pmc)
+                {
+                    PMC *field = VTABLE_get_attr_str(INTERP, mp->pmc, mp->name);
+                    ret_val = VTABLE_get_integer(INTERP, field);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_REGISTER:
+                if (mp->ctx)
+                {
+                    /* Check type is an integer register. If not, we can't load
+                       an integer value from it. */
+                    if (mp->r.reg_type == PTR_REGTYPE_I)
+                    {
+                        ret_val = CTX_REG_INT(mp->ctx, mp->r.number);
+                    }
+                    else
+                    {
+                        internal_exception(INVALID_OPERATION,
+                            "Register reference type conflict");
+                    }
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of unititialized reference!");
+                }
+                break;
+            
+            case PTR_TYPE_PMC:
+                if (mp->pmc)
+                {
+                    ret_val = VTABLE_get_integer(INTERP, mp->pmc);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+            }
+        }
+        else
+        {
+            internal_exception(INVALID_OPERATION,
+                "Use of unititialized reference!");
+        }
+
+        /* Return result. */
+        return ret_val;
+    }
+
+    METHOD void store_int(int value)
+    {
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_managed_ptr *mp = PMC_struct_val(SELF);
+
+            /* What kinda reference is it? */
+            switch (mp->type)
+            {
+            case PTR_TYPE_ELEMENT:
+                if (mp->pmc)
+                {
+                    VTABLE_set_integer_keyed_int(INTERP, mp->pmc,
+                        mp->index, value);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_FIELD:
+                if (mp->pmc)
+                {
+                    PMC *box = pmc_new(INTERP, enum_class_Integer);
+                    VTABLE_set_integer_native(INTERP, box, value);
+                    VTABLE_set_attr_str(INTERP, mp->pmc, mp->name, box);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_REGISTER:
+                if (mp->ctx)
+                {
+                    /* Check type is an integer register. If not, we can't store
+                       an integer value in it. */
+                    if (mp->r.reg_type == PTR_REGTYPE_I)
+                    {
+                        CTX_REG_INT(mp->ctx, mp->r.number) = value;
+                    }
+                    else
+                    {
+                        internal_exception(INVALID_OPERATION,
+                            "Register reference type conflict");
+                    }
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of unititialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_PMC:
+                if (mp->pmc)
+                {
+                    VTABLE_set_integer_native(INTERP, mp->pmc, value);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+            }
+        }
+        else
+        {
+            internal_exception(INVALID_OPERATION,
+                "Use of unititialized reference!");
+        }
+    }
+
+    METHOD FLOATVAL load_float()
+    {
+        FLOATVAL ret_val;
+
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_managed_ptr *mp = PMC_struct_val(SELF);
+
+            /* What kinda reference is it? */
+            switch (mp->type)
+            {
+            case PTR_TYPE_ELEMENT:
+                if (mp->pmc)
+                {
+                    ret_val = VTABLE_get_number_keyed_int(INTERP, mp->pmc,
+                        mp->index);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_FIELD:
+                if (mp->pmc)
+                {
+                    PMC *field = VTABLE_get_attr_str(INTERP, mp->pmc, mp->name);
+                    ret_val = VTABLE_get_number(INTERP, field);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_REGISTER:
+                if (mp->ctx)
+                {
+                    /* Check type is an number register. If not, we can't load
+                       an integer value from it. */
+                    if (mp->r.reg_type == PTR_REGTYPE_N)
+                    {
+                        ret_val = CTX_REG_NUM(mp->ctx, mp->r.number);
+                    }
+                    else
+                    {
+                        internal_exception(INVALID_OPERATION,
+                            "Register reference type conflict");
+                    }
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of unititialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_PMC:
+                if (mp->pmc)
+                {
+                    ret_val = VTABLE_get_number(INTERP, mp->pmc);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+            }
+        }
+        else
+        {
+            internal_exception(INVALID_OPERATION,
+                "Use of unititialized reference!");
+        }
+
+        /* Return result. */
+        return ret_val;
+    }
+
+    METHOD void store_float(FLOATVAL value)
+    {
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_managed_ptr *mp = PMC_struct_val(SELF);
+
+            /* What kinda reference is it? */
+            switch (mp->type)
+            {
+            case PTR_TYPE_ELEMENT:
+                if (mp->pmc)
+                {
+                    VTABLE_set_number_keyed_int(INTERP, mp->pmc,
+                        mp->index, value);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_FIELD:
+                if (mp->pmc)
+                {
+                    PMC *box = pmc_new(INTERP, enum_class_Float);
+                    VTABLE_set_number_native(INTERP, box, value);
+                    VTABLE_set_attr_str(INTERP, mp->pmc, mp->name, box);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_REGISTER:
+                if (mp->ctx)
+                {
+                    /* Check type is an number register. If not, we can't store
+                       an integer value in it. */
+                    if (mp->r.reg_type == PTR_REGTYPE_N)
+                    {
+                        CTX_REG_NUM(mp->ctx, mp->r.number) = value;
+                    }
+                    else
+                    {
+                        internal_exception(INVALID_OPERATION,
+                            "Register reference type conflict");
+                    }
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of unititialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_PMC:
+                if (mp->pmc)
+                {
+                    VTABLE_set_number_native(INTERP, mp->pmc, value);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+            }
+        }
+        else
+        {
+            internal_exception(INVALID_OPERATION,
+                "Use of unititialized reference!");
+        }
+    }
+
+    METHOD PMC* load_pmc()
+    {
+        PMC* ret_val = NULL;
+
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_managed_ptr *mp = PMC_struct_val(SELF);
+
+            /* What kinda reference is it? */
+            switch (mp->type)
+            {
+            case PTR_TYPE_ELEMENT:
+                if (mp->pmc)
+                {
+                    ret_val = VTABLE_get_pmc_keyed_int(INTERP, mp->pmc,
+                        mp->index);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_FIELD:
+                if (mp->pmc)
+                {
+                    ret_val = VTABLE_get_attr_str(INTERP, mp->pmc, mp->name);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_REGISTER:
+                if (mp->ctx)
+                {
+                    /* Check type is an PMC register. If not, we can't load
+                       an integer value from it. */
+                    if (mp->r.reg_type == PTR_REGTYPE_P)
+                    {
+                        ret_val = CTX_REG_PMC(mp->ctx, mp->r.number);
+                    }
+                    else
+                    {
+                        internal_exception(INVALID_OPERATION,
+                            "Register reference type conflict");
+                    }
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of unititialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_PMC:
+                if (mp->pmc)
+                {
+                    ret_val = mp->pmc;
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+            }
+        }
+        else
+        {
+            internal_exception(INVALID_OPERATION,
+                "Use of unititialized reference!");
+        }
+
+        /* Return result. */
+        return ret_val;
+    }
+
+    METHOD void store_pmc(PMC* value)
+    {
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_managed_ptr *mp = PMC_struct_val(SELF);
+
+            /* What kinda reference is it? */
+            switch (mp->type)
+            {
+            case PTR_TYPE_ELEMENT:
+                if (mp->pmc)
+                {
+                    VTABLE_set_pmc_keyed_int(INTERP, mp->pmc,
+                        mp->index, value);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_FIELD:
+                if (mp->pmc)
+                {
+                    VTABLE_set_attr_str(INTERP, mp->pmc, mp->name, value);
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_REGISTER:
+                if (mp->ctx)
+                {
+                    /* Check type is an number register. If not, we can't store
+                       an integer value in it. */
+                    if (mp->r.reg_type == PTR_REGTYPE_P)
+                    {
+                        CTX_REG_PMC(mp->ctx, mp->r.number) = value;
+                    }
+                    else
+                    {
+                        internal_exception(INVALID_OPERATION,
+                            "Register reference type conflict");
+                    }
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of unititialized reference!");
+                }
+                break;
+
+            case PTR_TYPE_PMC:
+                if (mp->pmc)
+                {
+                    mp->pmc = value;
+                }
+                else
+                {
+                    internal_exception(INVALID_OPERATION,
+                        "Use of uninitialized reference!");
+                }
+                break;
+            }
+        }
+        else
+        {
+            internal_exception(INVALID_OPERATION,
+                "Use of unititialized reference!");
+        }
+    }
+
+
+    /* Managed pointer PMCs may point to value types. .NET expects to be able
+       to use the managed pointer as it would use an object reference for some
+       operations. For these cases we discover if we're holidng onto a PMC,
+       and if we are we pass on the call to the PMC we're holding. */
+    
+    PMC* get_attr(INTVAL idx)
+    {
+        PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
+        if (ref)
+            return VTABLE_get_attr(INTERP, ref, idx);
+        else
+            return NULL;
+    }
+    
+    PMC* get_attr_str(STRING* idx)
+    {
+        PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
+        if (ref)
+            return VTABLE_get_attr_str(INTERP, ref, idx);
+        else
+            return NULL;
+    }
+
+    void set_attr(INTVAL idx, PMC* value)
+    {
+        PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
+        if (ref)
+            VTABLE_set_attr(INTERP, ref, idx, value);
+    }
+
+    void set_attr_str(STRING* idx, PMC* value)
+    {
+        PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
+        if (ref)
+            VTABLE_set_attr_str(INTERP, ref, idx, value);
+    }
+}
+

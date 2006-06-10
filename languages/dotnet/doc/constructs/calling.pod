@@ -1,0 +1,138 @@
+=head1 Translating Method Calls
+
+This document discusses .NET method calling and how this is translated to work
+on Parrot.
+
+
+=head2 The .NET Model
+The .NET CLI provides a stack based calling mechanism. Arguments are pushed
+onto the stack left to right, then the method is called. If there is a return
+value then it is left on the stack. Suckfully, methods are limited to 
+returning a single value.
+
+The method to call is given as a parameter to the call instructions (apart
+from calli, which calls through a method reference; here the signature is
+provided with the instruction). The method to call is specified by a 4-byte
+integer that points into the meta-data table. Note that if a virtual call is
+taking place then a method of the same name and signature may be called in
+place of the specific method the token refers to, depending what is in the
+v-table.
+
+.NET does support having methods of the same name with different signatures,
+however the VM does not "support" this at call-time. It is up to the compiler
+to resolve which method to call and put the correct meta-data reference with
+the call.
+
+
+=head2 The Parrot Model
+Parrot provides standard calling conventions that attempt to cover the needs
+of many languages. They use Continuation Passing Style and under the hood are
+implemented as several variable argument register instructions (set_args,
+get_params, set_results and get_returns). Both positional and named parameters
+are supported with required and slurply support for both, subject to some
+ordering constraints (positional before named, required before slurpy).
+
+Parrot also provides a multi-method dispatch mechanism. This is used to call
+methods with the same name but varying signatures. As Parrot supports dynamic
+languages, the method that will be called can not be determined at compile
+time and may change throughout the lifetime of the program as new methods
+appear and inheritance hierachies change. A cache is used to aid performance.
+In fact, in run cores that are capable of it the instruction stream is modified
+at runtime to just have a call to the method that the dispatch algorithm found,
+so the cost of the dynamic dispatch is amortised. This technique is known as a
+Polymorhpic Inline Cache (PIC).
+
+
+=head2 The Translated Code Will Use Parrot Calling Conventions
+The .NET method calls will be translated in a way that uses the Parrot calling
+conventions. This will without doubt mean that calling times will be higher,
+for the Parrot calling conventions are far more complex than the .NET ones.
+However, not using the Parrot calling conventions would create difficulties
+in calling methods on .NET classes and objects from other languages that
+target Parrot. More bluntly, as the entire point of writing this translator is
+interoperability, not targetting the Parrot calling conventions would be
+pretty dumb.
+
+
+=head2 Translating Method Calls
+
+=head3 The "call" Instruction
+The "call" instruction does a non-virtual method call; the method specified by
+the meta-data token referenced by the instruction is the one to, no matter
+what. This can be achieved in Parrot by looking up the method in the namespace
+holding the class it is exists in, which can be determined from the meta-data
+token.
+
+Assuming that $P1 and $I2 contain the parameters to be passed and $I0 is to
+hold the return value, then a call to the method "factorial" in the class
+"Test" in the namespace "Testing" will translate to Parrot instructions as
+shown below.
+
+  $P1000000 = find_global "Testing.Test", "factorial"
+  $I0 = $P1000000($P1, $I2)
+
+
+=head3 The "callvirt" Instruction
+The "callvirt" instruction does a virtual method call. That is, an object
+currently viewed as being an A that is actually some subtype B of A may
+override some method "foo". Whereas "call" would call the method "foo" as
+defined by the class A, callvirt uses the runtime type of the object to decide
+what method to call. This can be translated directly to Parrot method call
+syntax.
+
+  $I0 = $P1."foo"($I2)
+
+
+=head3 The "calli" Instruction
+The "calli" instruction does a method call through a method reference. Another
+instruction is used to load a function reference. As shown in the example PIR
+for the "call" instruction, Parrot can handle storing a reference to a method
+in a PMC. This has not, however, been implemented at this time.
+
+
+=head2 Supporting Method Overloading
+Using Parrot's MMD mechanism will provide most of what is required to support
+.NET method overloading. However, there is a problem: Parrot does not recognize
+different types of integers and floating point numbers as fundemental types
+like .NET does. For efficiency it is desirable to have, for example, both
+32-bit and 16-bit integers stored in Integer registers, but at dispatch time
+Parrot will be unable to distinguish between the two types.
+
+A number of options exist to solve this. Name mangling the subs and then using
+the signature to generate the mangled name when translating the call would
+work. This avoids Parrot's MMD completely, meaning it is cheaper at runtime
+and that the intended method is always called. However, this really hurts
+interoperability with other languages.
+
+Another option is to wrap up anything other than a native integer or double
+into a PMC type at call time - essentially boxing it - and then unboxing it
+inside the call. This allows the MMD system in Parrot to be used, avoids name
+mangling the methods so other languages can still see and call them as desired
+but makes calling more costly.
+
+Since the goal of the project is interoperability rather than performance, the
+second option makes more sense. It is implemented by declaring a number of
+classes that derive either from Parrot's built in Integer or Float PMCs and
+named "@@DOTNET_MMDBOX_I1" for the single byte signed integer, etc. When
+translating a calling related instruction, code must be emitted to place any
+types that must be boxed for MMD purposes into the appropriate box type. All
+methods are annotated with ":multi(...)" directives using name of the boxed
+types where appropriate. Note that there is no need for explicit unboxing on
+the callee side; if an integer register is declared but a PMC is passed, then
+the get_integer v-table method will be called on that PMC automatically.
+
+
+=head2 References
+PIC - http://citeseer.ist.psu.edu/hlzle91optimizing.html
+
+
+
+
+
+
+
+
+
+
+
+

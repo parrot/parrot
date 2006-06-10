@@ -1,0 +1,111 @@
+/* .NET CLI MemberRef Metadata PMC */
+
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass DotNetMemberRefMetadata dynpmc group dotnet {
+
+    /* Instance initialization. We need a custom DOD marking and destroy. */
+    void init()
+    {
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+
+    /* Get string vtable function; returns the name of the member. */
+    STRING* get_string()
+    {
+        struct dotnet_memberref *c = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (c == NULL || c->str_name == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMemberRefMetadata PMC");
+            return NULL;
+        }
+        else
+            return c->str_name;
+    }
+
+
+    /* Garbage Collection mark routine. */
+    void mark()
+    {
+        /* Tell the GC about stuff we're holding on to. */
+        struct dotnet_memberref *c = PMC_struct_val(SELF);
+		if (c)
+		{
+			if (c->str_name)
+				pobject_lives(INTERP, (PObj*)c->str_name);
+		}
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            free(PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* Get the location of the signature blob for this member. */
+	METHOD int get_signature()
+    {
+        struct dotnet_memberref *c = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (c == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMemberRefMetadata PMC");
+            return 0;
+        }
+        else
+            return c->signature;
+    }
+
+
+    /* Get the type of "class" that the member belongs to. */
+	METHOD int get_class_type()
+    {
+        struct dotnet_memberref *c = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (c == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMemberRefMetadata PMC");
+            return 0;
+        }
+        else
+            return c->class_type;
+    }
+
+
+    /* Get the id of "class" that the member belongs to. */
+	METHOD int get_class_id()
+    {
+        struct dotnet_memberref *c = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (c == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetMemberRefMetadata PMC");
+            return 0;
+        }
+        else
+            return c->class_id;
+    }
+}
+

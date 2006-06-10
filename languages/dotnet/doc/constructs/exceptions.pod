@@ -1,0 +1,167 @@
+=head1 Translating Exceptions
+
+This document discusses the way that .NET and Parrot provide support for
+exceptions. It then describes how .NET's exception model can be implemented
+using the Parrot exception support.
+
+
+=head2 The .NET Model
+The .NET exception subsystem uses objects to represent exceptions and a per-
+method set of protected regions with associated handlers. These protected
+regions map closely to the high level languages concept of a try block; if
+an exception is thrown from within a protected region then handlers that are
+associated with that region will be searched to find one that can handle the
+exception. The innermost handler will be preferred. If there is no handler in
+the current method, then the exception will propogate out of the method and
+handlers down the call stack will be searched.
+
+Four different types of handler are provided for. The most commonly used is a
+typed handler. Here the handler is annotated with a type and is invoked if
+an exception is thrown that is of that type. There is also a filtered handler.
+Here, code at a certain offset is run to determine whether or not the handler
+should be selected to handle the exception; if it is to do so, a value of 1
+should be left on the stack, otherwise a 0 is left there.
+
+The remaining two handlers are not exception handlers in the sense that they
+capture and prevent further propogation of the exception. Instead, they are
+invoked when the search for an appropriate handler passes over them - in some
+cases. The first of these is the finally handler, which is run whether or not
+the "try" region was left due to an exception or naturally. The second is the
+fault handler, which is run only when the "try" region was left due to an
+exception being thrown.
+
+Leaving a protected region or handler is greatly restricted. For leaving a
+protected region or typed handler, only the leave or leave.s instructions can
+be used. At the end of a finally or fault handler, endfinally must be used. At
+the end of a filter, endfilter must be used. Similarly, entering a protected
+region is restricted to falling into it from the top or entering it from a
+catch block.
+
+At the entry to a try block or the destination of a leave instruction, the
+evaluation stack must be empty. At entry to a typed or filter handler, the
+stack will only contain the exception object; for other handlers it must be
+empty.
+
+The table of exception handlers is sorted inner-most to outer-most where
+there is nesting.
+
+
+=head2 The Parrot Model
+The Parrot exception system is based around an exception stack. Handlers are
+simply represented as offsets in a given context, and are created at runtime
+by using the push_eh instruction and supplying a label located at the start
+of the handler. The last exception handler that was placed on the stack can
+be popped off using the clear_eh instruction.
+
+Exceptions themselves are PMCs; more specifically, an exception must be an
+instance of the built-in Exception PMC. This PMC provides a keyed interface
+so data relating to an exception can be stored inside the exception object.
+A throw instruction is used to throw an exception object.
+
+When searching for an exception handler, the exception stack is checked and
+the top exception handler is popped off and run. If it wishes to handle the
+exception, it will do so. If not, it can use the rethrow instruction to
+continue the unwinding of the exception stack.
+
+As well as handlers, two additional items may reside on the exception stack.
+The first of these is a mark. A mark is simply an integer value pushed onto
+the stack. When a mark is popped, any marks and exception handlers above the
+mark are popped off the stack too. This provides a way of handling scope exits
+more elegantly. The second item is an action. This is simply a sub PMC that 
+gets invoked if, while unwinding the stack looking for an exception handler,
+the entry is walked over.
+
+
+=head2 Translating Exceptions
+
+=head3 Entry To Protected Regions
+There is no instruction marking entry to protected regions, so the translator
+must identify them from the handlers table by looking through the table at the
+start of each iteration of the translation loop and find entries where the
+protected region offset matches the current location in the translated code.
+The handlers table must be searched in reverse, since it is essential that if
+nested regions start at the same offset the handler for the outer-most region
+is pushed before the handler for the inner-most region.
+
+For each handler that starts at the current location, two PIR instructions are
+emitted. The first is a push_eh instruction. The second is a push_mark
+instruction which will place a mark on the stack that matches the row number
+in the exception table that the handler is defined at. The handler starts at the
+location specified by the handler offset in the exception table apart from in
+the case of a filter type exception in which case the filter offset will be
+used instead.
+
+=head3 Typed Handlers
+PIR to get the exception object that was thrown will be emitted at the start
+of a typed handler block. This will be followed by PIR to assign the .NET
+exception object, contained within the Parrot exception object, to what the
+translated program would consider the first stack location (since the stack is
+considered empty on entry to the handler). PIR will then be emitted that tests
+if the .NET exception object is of the required type. If it is not, then the
+exception will be re-thrown. If it is, then the handler will be executed.
+
+=head3 Filtered Handlers
+XXX TO DO - will run filter, then jump into handler at endfilter if needed
+and if not will re-throw.
+
+=head3 Finally Handlers
+There are two ways to enter a finally handler. One is while un-winding the
+exception stack because an exception was thrown. Another is when the leave
+instruction is used.
+
+The case where the finally is walked over is relatively trivial to handle.
+The handler will be invoked just as any other Parrot exception handler would.
+The exception object will be retrieved and stored. Upon the endfinally
+instruction it will be re-thrown. This is not completely trivial, since if
+finally handlers are nested the outermost one must still know which exception
+to rethrow. Therefore an array of exceptions waiting to be thrown from finally
+handlers must be maintained.
+
+The array of exceptions waiting to be thrown has a second purpose: an empty
+(null) entry can be used to signify that the finally block was entered from a
+leave statement and should instead use the Parrot ret instruction, which
+returns from a subroutine branch made within the current method. These
+subroutine branches are emitted in leave instructions and simply invoke the
+required finally blocks (that is, those not walked over while unwinding the
+stack). Note that detection of which finally handlers to invoke involves
+looking at the exception handlers table and locating ones that would not have
+been walked over and are on the "path" from the current location to the
+destination of the leave instruction.
+
+The only remaining piece of the puzzle is that after the code emitted at the
+start of a finally handler, a label must be inserted that can be used to run
+the finally handler from a leave instruction.
+
+XXX The .NET spec suggests finally is not run if the exception thrown is
+never caught. That is probably not something that can be handled too easily
+if true.
+
+=head3 Fault Handlers
+XXX TO DO - basically, just replce endfinally with a re-throw
+
+=head3 The leave Instruction
+The leave instruction is basically a branch, and therefore translates to a
+goto. However, since it is the way that a protected region or handler is left,
+it is also a good point for clearing exception handlers from the stack and,
+in the case of a try, running any finally blocks.
+
+Details of what to emit with regards to finally blocks has already been
+discussed and will not be repeated here. This comes before the process that
+follows.
+
+When a leave instruction is translated, before the goto a popmark instruction
+will be inserted. The mark will be computed by scanning through the exception
+handlers table and locating the first protected region that occupies the
+location being branched to. Immediately following the popmark, a pushmark will
+be generated for the same mark. The reason for this is that the intention of
+the popmark is to clear all handlers on the stack that belong to nested
+protected regions. However, the mark that also gets removed is that of the
+region that will be branched into. If there are a sequence of protected
+regions within another one, failure to restore the mark would cause failure
+beyond the first in the sequence.
+
+Note that if there is no containing region, the mark 0 should be used. Note
+that this requires a pushmark 0 to be emitted at the top of every translated
+method, and a popmark 0 at every return.
+
+

@@ -1,0 +1,323 @@
+=head1 Translation Rules File
+
+This document describes the format of the translation rules file used by the
+translator builder, as documented in L<translatorbuilder.pod>.
+
+
+=head2 Syntax
+The file contains an entry for each .NET instruction to translate. The entry
+for an instruction starts with its full name in square brackets on a line of
+its own.
+
+  [add]
+
+This is followed by a number of entries in a "key = value" format, with one
+entry per line. The ordering of these entries does not matter.
+
+  pop = 2
+
+Sometimes a value may need to span multiple lines. When this happens, it is
+specified as a here-document; that is, the value starts with <<TOKEN and ends
+on the first line found that only contains TOKEN.
+
+  pir = <<PIRCODE
+  # Multi line
+  # stuff goes
+  # here
+  PIRCODE
+
+Meta-variables, things that the translator generator will substitute with
+something else such as an actual register name, are prefixed by a dollar
+sign and circumfixed with curly braces.
+
+  ${STACK0}
+
+These can only be used in some values, as described in the next sections
+of the document.
+
+A complete example of a translation rule follows.
+
+  [add]
+  code = 58
+  class = op
+  pop = 2
+  push = 1
+  instruction = add ${DEST}, ${STACK0}, ${STACK1}
+
+
+=head2 Instruction Information Entries
+Many of the types of entry simply provide information about the instruction
+that is being translated. These are needed by the translator generator.
+
+=head3 code
+This entry specifies the numerical representation of the instruction. It is
+specified as one or more pairs of hexadecimal digits seperated by spaces.
+Examples:
+
+  code = 2E
+  code = FE 11
+
+This entry is B<mandatory>.
+
+=head3 class
+This entry specifies the type of instruction. Valid instruction types are:
+
+=over 4
+=item * op - For any operation that operates only on the stack and results
+             in no change of flow control (for example, add and ceq). An
+             instruction such as debug, which has no effect on the stack
+             or global state, would fit into this category.
+=item * branch - For any control flow related operation that could transfer
+                 control to an instruction other than the next one, but
+                 restricted to instructions in the current method (so call
+                 or ret are not in this class, for example).
+=item * load - For any operation that takes data from a location other than
+               the stack and places it onto the stack.
+=item * store - For any operation that takes data from the stack and stores
+                it in a location other than the stack.
+=item * calling - For any operation that is involved in calling another
+                  method or returning from a method, incorporating tail
+                  calling and method jumps.
+=back
+
+Example:
+
+  class = op
+
+This entry is B<mandatory>.
+
+=head3 push
+The number of new items that the instruction places on the stack. Note that
+this is strictly the total number of pushes, not accounting for any pops.
+This means that the add instruction, which pops two items off the top of
+the stack, adds them together and pushes the result onto the stack, has
+a value of 1. Example:
+
+  push = 1
+
+This entry is not allowed when class is set to calling. It is optional in
+other classes when it would bet set to zero.
+
+=head3 pop
+The number of items that the instruction removes from the stack. Note that
+this is strictly the number of pops, not accounting for any pushes. This
+means that the add instruction, which pops two items off the top of the
+stack, adds them together and pushes the result onto the stack, has a
+value of 1. Example:
+
+  pop = 2
+
+This entry is not allowed when class is set to calling. It is optional in
+other classes when it would bet set to zero.
+
+=head3 arguments
+This entry specifies any arguments that an instruction takes and their
+types. This is specified as a list of types seperated by commas. Valid
+types are as follows.
+
+=over 4
+=item * uint8 - unsigned 8 bit integer
+=item * int8 - signed 8 bit integer
+=item * uint16 - unsigned 16 bit integer
+=item * int16 - signed 16 bit integer
+=item * uint32 - unsigned 32 bit integer
+=item * int32 - signed 32 bit integer
+=item * int64 - signed 64 bit integer
+=item * float32 - single precision floating point number
+=item * float64 - double precision floating point number
+=item * tmethod - a MethodDef or MethodRef (actually MemberRef) metadata token
+=item * tstandalonesig - A StandAloneSig metadata token
+=item * tvaluetype - A valueType token
+=item * ttype - a TypeDef or TypeRef metadata token
+=item * tfield - a FieldDef or FieldRef (actually MemberRef) metadata token
+=item * tstring - a string (metadata token?! - the spec sucks at times)
+=back
+
+Examples:
+
+  arguments = uint8
+  arguments = uint16, uint32
+  arguments =
+
+This entry is B<optional> if there are no arguments.
+
+=head2 Translation Entries
+These specify the translation itself. One of insturction or pir is required
+(that is, not both).
+
+=head3 instruction
+This can be used when the translated instructions can be produced by simply
+substituting some meta-variables into PIR code and emitting it. Note that
+PIR written with the "instruction" directive is what will be emitted by the
+translator. If more control is needed for producing the translated code, use
+the "pir" entry. Example:
+
+  instruction = add ${DEST0}, ${STACK0}, ${STACK1}
+
+Multiple lines of instructions are allowed.
+
+
+=head3 pir
+This is for the times when instruction isn't enough. It allows a chunk of
+PIR to be written that will be inserted into the translator after meta-
+variables have been substituted. This may involve emitting some PIR that
+makes up the translated code, or just setting the right meta-variables.
+Example:
+
+  pir = <<PIR
+    ${INS} = concat "# A comment\n"
+  PIR
+
+Once again, to clarify: code specified with pir goes into the translator,
+code specified with instruction is what the translator will *emit*.
+
+
+=head2 Dataflow Analysis Entries
+There is a single entry that needs to be made for all rules with class
+op or load. In the case of op, it needs to populate ${DTYPES}. In the
+case of load, it needs to populate ${LOADTYPE}.
+
+=head3 typeinfo
+This entry contains code that will be placed into the translator that
+will determine the types of data being loaded or placed onto the stack.
+
+Example for a load instruction:
+
+  typeinfo = ${LOADTYPE} = ${PTYPES}[0]
+
+This is the typeinfo for loading the first parameter. It simply sets the
+load type to the type of the parameter.
+
+Example for an op instruction:
+
+  typeinfo = <<PIR
+  ${DTYPES}[0] = ${STYPES}[0]
+  ${DTYPES}[1] = ${STYPES}[0]
+  PIR
+
+Constants as specified in Partition II Section 22.1.15 will be set.
+
+
+=head2 Meta-variables
+
+=head3 ${STACK0}, ${STACK1}, ...
+These refer to locations on the stack. ${STACK0} refers to the stack top,
+${STACK1} refers to the element second from the top, etc. Note that these
+will be popped from the stack down to the lowest point in the stack tha is
+accessed. or example, if ${STACK0} and ${STACK2} are used, then the second
+location in the stack (which would be called ${STACK1}) will also be popped
+off.
+
+=head3 ${DEST0}, ${DEST1}, ...
+For instructions in the op class, these are the locations that the results of
+the operation will be placed. For instructions in the load class, ${DEST0} is
+sometimes used to mean the register that the loaded content will be placed in.
+These are used when new data needs to be pushed onto the stack. This works the
+opposite way round to the ${STACKn} meta-variables; ${DEST0} will be pushed
+first, followed by ${DEST1}, etc. If this is used when the class is anything
+other than op or load, or is used in a load and also mention ${LOADREG}, then
+a monkey may explode. Oh, and you'll get an error.
+
+=head3 ${ARG0}, ${ARG1}, ...
+These refer to the arguments for the instruction, as specified in the
+"arguments" entry. Here, ${ARG0} is the first argument, ${ARG1} the second,
+etc.
+
+=head3 ${ITEMP0}, ${ITEMP1}, ...
+These are temporary variables that can be used in any PIR code. They will
+alway map to an I register. Do not assume anything about the contents of
+these - they will likely contain junk from whatever used them last.
+
+=head3 ${NTEMP0}, ${NTEMP1}, ...
+These are temporary variables that can be used in any PIR code. They will
+alway map to a N register. Do not assume anything about the contents of
+these - they will likely contain junk from whatever used them last.
+
+=head3 ${STEMP0}, ${STEMP1}, ...
+These are temporary variables that can be used in any PIR code. They will
+alway map to a S register. Do not assume anything about the contents of
+these - they will likely contain junk from whatever used them last.
+
+=head3 ${PTEMP0}, ${PTEMP1}, ...
+These are temporary variables that can be used in any PIR code. They will
+alway map to a P register. Do not assume anything about the contents of
+these - they will likely contain junk from whatever used them last.
+
+=head3 ${LOADREG}
+This is used with instructions in the load class when the location to load is
+stored in a fixed register (that is, for locals and arguments). Assign to this
+the name of the register that would hold the variable in the translated code
+(e.g. not in the translator itself). ${DEST} should not be used in conjunction
+with this. Usage in anything other than a load instruction is an error. The
+purpose of this is to allow production of more optimal code when we can simply
+reference a register directly rather than copying it to a stack location.
+
+=head3 ${STOREREG}
+This is used with instructions in the store class when the location to store
+to is stored in a fixed register (that is, for locals and arguments). Assign
+to this the name of the register that would hold the variable in the translated
+code (e.g. not in the translator itself). Usage in anything other than a store
+instruction is an error. The purpose of this is to allow production of more
+optimal code when we can simply reference a register directly rather than
+copying it to a stack location.
+
+=head3 ${INS}
+This is the current sequence of PIR instructions that has been emitted. Just
+concatenate extra ones on to it to emit more. Simple.
+
+=head3 ${BC}
+This is the DotNetBytecode PMC, used for walking the bytecode. Hopefully, it
+should not be required to play with this too often. However, there is a case
+when it will be needed - iterating over the var arg switch instruction.
+
+=head3 ${STYPES}
+This is an array of type describing hashes (see translatorbuilder.pod) that
+describe the types of data on the stack. The last element is the stack top.
+Note that locals and parameters are not considered to be stack locations.
+
+=head3 ${DTYPES}
+This array of type describing hashes describes the types of items that are
+going to be placed on the stack as a result of some operation. The first
+element is the first item that will be pushed onto the stack.
+
+=head3 ${LOADTYPE}
+When a value is being loaded onto the stack, code needs to be provided to
+assign a type-describing hash to this meta-variable describing the type of
+the value that will be loaded onto the stack.
+
+=head3 ${PTYPES}
+An array of type describing hashes describing the type of each of the method's
+parameters.
+
+=head3 ${LTYPES}
+An array of type describing hashes describing the type of each of the method's
+local variable.
+
+=head3 ${CURIC}
+The instruction code of the current instruction.
+
+=head3 ${PARAMS}
+For use with instructions in the class calling. It is used to hold the names
+of registers that are being passed or returned. The ${STACKn} meta-variables
+are not suitable here as the number of parameters is not known until runtime.
+(That is, runtime for the translator.)
+
+
+=head2 Not Screwing It Up
+There are three levels at which this system is working. There's the translated
+code that is produced, which is PIR code. There's the translator that takes the
+.NET instructions and produces this PIR code, and that translator is written in
+PIR. Finally, there is the translator builder.
+
+When using the "instruction" entry, this is specifying the instruction that the
+translator will emit - *not* an instruction that will appear in the translator.
+Thefore this is wrong:
+
+  instruction = ${LOADREG} = "local0"
+
+As ${LOADREG} is a meta-variable of the translator. Emitting this into the
+translated code would assign the string "local0" to some likely unwanted
+place. Well, if the translator was written badly enough to allow mistakes
+like this to slip through anyway. However, more subtle ones are very likely
+possible and probably easy to make.
+

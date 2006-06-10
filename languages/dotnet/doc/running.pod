@@ -1,0 +1,28 @@
+=head1 Running
+
+This document describes how to use the command line net2pbc program, which
+converts a .NET EXE or DLL into a Parrot Bytecode file (or optionally dumps
+the PIR generated in the process).
+
+
+=head2 Usage
+To translate example.dll to example.pbc:
+
+  parrot net2pbc.pbc example.dll
+
+To translate example.dll to output.pbc:
+
+  parrot net2pbc.pbc -o output.pbc example.dll
+
+To translate example.dll to PIR and print the PIR:
+
+  parrot net2pbc.pbc -p example.dll
+
+This works just the same with exe files.
+
+A number of additional flags are available:
+
+  -f  Force translation to continue, even if translating a certain
+      type fails.
+  -t  Trace the translation process, producing useful debug info.
+  -q  Quiet mode; suppress output of summary at the end.

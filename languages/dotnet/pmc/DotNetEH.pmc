@@ -1,0 +1,177 @@
+/* .NET CLI Exception Handler PMC */
+
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass DotNetEH dynpmc group dotnet {
+
+    /* Instance initialization. We need a custom DOD marking and destroy. */
+    void init()
+    {
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+
+    /* Garbage Collection mark routine. */
+    void mark()
+    {
+        /* Tell the GC about stuff we're holding on to. */
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        if (eh->parent)
+            pobject_lives(INTERP, (PObj*)eh->parent);
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_eh *eh = PMC_struct_val(SELF);
+            free(eh);
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* Get try offset. */
+    METHOD int get_try_offset()
+    {
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (eh == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetEH PMC");
+            return 0;
+        }
+        else
+            return (int) eh->try_offset;
+    }
+
+
+    /* Get try length. */
+    METHOD int get_try_length()
+    {
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (eh == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetEH PMC");
+            return 0;
+        }
+        else
+            return (int) eh->try_length;
+    }
+
+
+    /* Get handler offset. */
+    METHOD int get_handler_offset()
+    {
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (eh == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetEH PMC");
+            return 0;
+        }
+        else
+            return (int) eh->handler_offset;
+    }
+
+
+    /* Get handler length. */
+    METHOD int get_handler_length()
+    {
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (eh == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetEH PMC");
+            return 0;
+        }
+        else
+            return (int) eh->handler_length;
+    }
+
+
+    /* Get flags. */
+    METHOD int get_flags()
+    {
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (eh == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetEH PMC");
+            return 0;
+        }
+        else
+            return (int) eh->flags;
+    }
+
+
+    /* Get typed handler's class type. */
+    METHOD int get_class_type()
+    {
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (eh == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetEH PMC");
+            return 0;
+        }
+        else
+            return (int) eh->class_type;
+    }
+
+
+    /* Get typed handler's class ID. */
+    METHOD int get_class_id()
+    {
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (eh == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetEH PMC");
+            return 0;
+        }
+        else
+            return (int) eh->class_id;
+    }
+
+
+    /* Get filter handler's offset. */
+    METHOD int get_filter_offset()
+    {
+        struct dotnet_eh *eh = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (eh == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetEH PMC");
+            return 0;
+        }
+        else
+            return (int) eh->filter_offset;
+    }
+}
+

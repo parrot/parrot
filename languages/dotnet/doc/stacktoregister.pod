@@ -1,0 +1,402 @@
+=head1 Stack To Register Translation
+
+The .NET CLI is a stack based virtual machine whereas Parrot is register based.
+This document details what that means and how the challenges the difference
+presents will be dealt with.
+
+
+=head2 Parrot's Register Architecture
+In general, register machines have a set of registers, perhaps numbered from
+r0 to r15. These registers are used to store data that is currently being
+operated on. Instructions load data from memory into registers, save data
+from registers into memory, move the contents of one register into another
+and perform arithmetic and logical operations. The operands for these are
+registers.
+
+  load r0, SOME_ADDRESS
+  load r1, SOME_OTHER_ADDRESS
+  add r2, r0, r1
+  store r2, YET_ANOTHER_ADDRESS
+
+Here two values are being loaded from memory into registers r0 and r1. The
+add operation is adding the contents of registers r0 and r1 and storing it
+in r2. Finally, the contents of r2 is being stored in memory.
+
+Just as some hardware CPUs have different types of registers (often one set for
+integers and another for floating point numbers), Parrot has 4 register types.
+Integer (I) registers hold native integers. Number (N) registers hold native
+floating point numbers, usually an IEEE 756 Double on platforms where this is
+supported. String (S) registers hold references to strings. PMC (P) registers
+hold references to PMCs (basically, any more complex type).
+
+In PASM (Parrot Assembly Language), registers are denoted I0, I1, I2, etc. The
+numbers index into the array of registers of the given type.
+
+  set S0, "Hello world!\n"
+  print S0
+  end
+
+In PIR (Parrot Intermediate Representation), virtual and named registers are
+introduced. Virtual registers are denoted as $I0, $I1, $I2, etc.
+
+  .sub main :main
+      set $S0, "Hello world!\n"
+      print $S0
+      end
+  .end
+
+Named registers are introduced using the ".local" syntax.
+
+  .sub main :main
+      .local string hello
+      set hello, "Hello world!\n"
+      print hello
+      end
+  .end
+
+PIR is a thin layer on top of PASM. The virtual registers and named registers
+get mapped to real Parrot registers, at the time of writing using a graph
+coloring algorithm.
+
+Unlike hardware CPUs, where a register is a physical area of storage and there
+are a fixed number of these, Parrot's registers are simply an array in memory.
+Initially Parrot mirrored this and provided a fixed number (32) of registers of
+each type. If PIR programs needed more registers than were available, P31 was
+reserved to hold a spilling array or stack. Later it was realized that there
+was no reason not to have variable sized register frames (a register frame
+being the set of registers corresponding to the currently executed unit of code
+e.g. a subroutine, closure or coroutine). This eliminates the expense of
+spilling and simplified register allocation greatly. Also, it means that less
+memory is consumed by register frames for small functions.
+
+This translator emits PIR. This means that it can freely use virtual registers
+as needed and rely on the PIR compiler to minimize the number of real registers
+that are needed. This still leaves a lot of work to do in converting stack code
+into good register code, but simplifies the problem by taking care of register
+allocation and freeing the translator from having to do that.
+
+
+=head2 The .NET CLI's Stack Architecture
+In general, stack machines simply consist of a stack - an array of elements of
+memory with a pointer to the "top" one. Items can be pushed onto or popped off
+the top of the stack and instructions generally operate on the items on the
+top of the stack, popping their operands of the stack and pushing their result
+onto the stack. The following example computes (A*B + C), leaving the result
+on the stack.
+
+  push A           # Stack contains 1 item: A
+  push B           # Stack contains 2 items: A and B
+  push C           # Stack contains 3 items: A, B and C
+  mul              # Stack contains 2 items: A and B*C
+  add              # Stack contains 1 item: A*B + C
+
+In practice the push instructions would actually be instructions to load a
+local variable or argument of the current method, a field of the current
+object/class or some other global data. Instructions exist to store data on
+the top of the stack back to these locations once computation has taken place.
+
+The stack locations as used in the above example are "untyped". In the above
+example A, B and C may have been integers. This code could be followed by
+identical code apart from using D, E and F which could be floating point
+numbers, for example. Stack positions that previous held integers are now
+used to hold floating point numbers. Data flow analysis can be used to
+find the types of items currently on the stack as needed. In a sense, the
+locations are transitionally typed.
+
+The .NET CLI, while supporting a number of data types, both different sizes
+and signings of integers as well as floating point numbers and more complex
+reference types, only has four possible data types that may be stored on the
+stack itself. These are 32-bit and 64-bit integers, native integers and a
+floating point data type. Smaller integer types are widened and narrowed as
+required on load and store.
+
+The .NET CLI places an additional constraint of the instruction stream. The
+specification, in Partition I Clause 12.3.2.1, states that "the type state of
+the stack (the stack depth and types of each element on the stack) at any
+given point in a program shall be identical for all possible control flow
+paths". Therefore, a program like the following one would be forbidden.
+
+  if A    # if operation skips the next instruction if A is false
+  push X
+  ...
+  if A
+  pop X
+
+In the region of instructions marked "..." the stack depth is unknown; it
+depends on whether A is true or false. The two control flow paths that are
+possible upon reaching "..." do not result in identical stack type states.
+The property that makes code like this invalid means that the stack pointer
+can always be determined statically; that is, at translation time.
+
+
+=head2 Data On The Stack
+There are essentially 3 types of item found on the .NET CLI's execution stack 
+that need to be mapped to Parrot registers.
+
+=head3 Arguments
+This is the data that has been passed to a method. In a stack architecture, the
+calling convention is that parameters for the method are pushed onto the stack
+before the method is called. They are accessed by a number of .NET instructions
+that simply access the part of the stack where the currently executing method's
+arguments are located. These intructions load the arguments onto the top of the
+stack so they can be manipulated. The space they consume on the stack is
+retained for the duration of the method call.
+
+=head3 Locals
+These are local variables that will almost always relate to variables declared
+in the high level language source code. When the method is entered, space for
+these is allocated on the stack. Just as with arguments, some intructions
+exist for copying values from the area of the stack holding the locals onto
+the top of the stack and vice versa. The space they consume on the stack is
+retained for the duration of the method call.
+
+=head3 Temporaries
+These usually do not correspond to variables used in the high level language
+code. Rather, they are introduced by virtue of the fact that the execution
+model can only do a number of simple operations and therefore temporary
+storage of working data is needed outside of local variables. A stack
+machine has even greater need for this, for all operands need to be loaded
+onto the stack. Any data on the stack that is not an argument or a local
+can be considered a temporary.
+
+
+=head2 Solutions For Allocating Arguments
+Arguments consume a number of fixed stack locations. The calling conventions
+for stack machines involve pushing the parameters for the call onto the
+stack. Parrot's calling conventions are register based. However, PIR syntax
+abstracts away the details of the calling conventions. Here is a factorial
+function in PIR.
+
+  .sub fact
+      # Get input parameter.
+      .param int n
+      
+      # return (n > 1 ? n * _fact(n - 1) : 1)
+      .local int result
+      
+      if n > 1 goto recurse
+      result = 1
+      goto return
+  
+  recurse:
+      $I0 = n - 1
+      result = fact($I0)
+      result *= n
+      
+  return:
+      .return (result)
+  .end
+
+Calling a function is simply written as it might be in a high level language -
+the function name with arguments in parentheses. Parameters are retrieved by
+the ".param" directive. Each ".param" is stored in a named virtual register.
+.NET CLI code always retrieves parameters by number, the argument number being
+a constant and thus known at translation time. Therefore, a naming scheme that
+has the first parameter named "arg0", the second parameter named "arg1" etc.
+will be sufficient.
+
+=head2 Solutions For Allocating Locals
+PIR provides a ".local" directive for declaring a local in a named register.
+
+  .local int name
+
+.NET CLI code retrieves parameters by number, the number being a constant
+and thus known at translation time. Therefore, a naming scheme that has
+the first local named "local0", the second local named "local1" etc. will be
+sufficient.
+
+=head2 Solutions For Allocating Temporaries
+Temporaries make up the part of the stack that changes in depth and type
+during the execution of the method. Therefore the mapping is more complex.
+This section investigates several options.
+
+=head3 Having A Stack
+One way to translate stack code to register code is to actually have a stack.
+In the Parrot case, that could be a PMC array (which can also have strings and
+boxed integers and numbers on it); the PMC array in Parrot supports push and
+pop operations already. As the maximum stack depth is known in .NET (it is
+stated in the method metadata) a fixed size PMC array can be allocated.
+
+Translation of loads from arguments or locals can simply be a push - a one to
+one instruction mapping.
+
+  push stack, arg1
+  push stack, local2
+
+Translation of loads from fields involves two instructions; one to do the field
+access and store the instruction in a register, and another to push the contents
+of that register onto the stack. Store operations will have the same costs as
+load operations depending on the storage location. At worst, a load or store
+would translate to two instructions, with one in the common case.
+
+While this sounds reasonable so far, the real weakness of this approach is
+made clear when operations are being performed. For example, an addition
+instruction under this scheme becomes 4 register operations.
+
+  pop stack, $I0
+  pop stack, $I1
+  add $I0, $I1
+  push stack, $I0
+
+Maintaining a stack has overhead too; under the hood it translates to doing
+v-table calls to the push and pop method of an array PMC. This will adversely
+affect performance beyond simply having more operations to dispatch (or JIT).
+
+The whole sequence of pushing a local and an arguemnt onto the stack, adding
+them together and storing the result in another local variable (4 instructions
+in stack code) can actually become a single register instruction.
+
+  add local3, arg1, local2
+
+Where local3 is the destination for the result and arg1 and local2 are the
+operands for the add instruction.
+
+=head3 Lazy Stack Operations
+One partial solution is to do pushes and pops lazily. Lazy pushing can be
+implemented by keeping track of things that would be on the stack, but instead
+no push instruction is generated. It is important to note that this tracking is
+done at translation time, not when the code runs. On seeing a push in the .NET
+stack code, the thing that would have been pushed, if it is a local or argument,
+can have its register name stored in an array. Then, when an instruction such
+as add is encountered, this array is inspected and instead of generating any
+pop instructions, the names of the registers holding the source data are
+substitued directly into the instruction. This eliminates 4 instructions - a
+vast improvement. What about the store after the add? This will require peeking
+ahead to the next instruction to see if it is a store to a local, and if it is
+then replacing the destination register with the appropriate register, and
+then not generating any code for that instruction. Here is an example where
+some stack code to multiply two numbers passed as arguments using a loop
+addition is translated.
+
+  STACK CODE        LAZY STACK        REGISTER CODE
+
+  LOOP:                               LOOP:
+  ldlocal 1         local1
+  ldarg 1           local1, arg1
+  if_ge END                           if local1 >= arg1 goto END
+  ldlocal 2         local2
+  ldarg 2           local2, arg2      
+  add                                 
+  stlocal 2         --> LOOKAHEAD     add local2, local2, arg2
+  ldlocal 1         local1
+  iconst 1          local1, 1
+  add
+  stlocal 1         --> LOOKAHEAD     add local1, local1, 1
+  br LOOP                             goto LOOP
+  END:                                END:
+  ldlocal 2         local2
+  ret                                 .return(local2)
+
+In this example, the register code produced is very good - as good as one could
+produce by hand. However, it still requires a stack when a result is used by
+a non-store instruction.
+
+  STACK CODE        LAZY STACK        REGISTER CODE
+
+  ldarg 1           arg1
+  ldarg 2           arg1, arg2
+  ldarg 3           arg3
+  add               arg1              add $I0, arg2, arg3
+                                      push stack, $I0
+  mul               arg1              pop stack, $I0
+                                      mul local1, arg1, $I0
+  stlocal 1         --> LOOKAHEAD
+
+In addition to this, without analysing the basic blocks[2] that make up the
+code to determine when it can be avoided, it is necesary to push all cached
+items onto the stack before a branch or a conditional branch takes place or a
+label is found. While this and a full set of optimizations to minimize stack
+use are possible, this path will not be explored. Given that there are essentially unlimited registers available to use, it would be desirable to 
+completely do away with having a stack. Doing stack operations costs v-table
+calls, which harms performance and makes poor use of the Parrot execution model.
+
+=head3 Mapping Stack Locations To Registers
+An early paper[1] on translating Java bytecode to native code suggested that,
+in cases where the stack depth could be statically determined, each stack
+location could be mapped to a register. This way, pushes and pops simply became
+move instructions and a stack is no longer required. The condition that the
+stack depth can always be determined statically holds in .NET CLI code, though
+they do provide an algorithm for checking that this is the case in the paper.
+
+This approach means that each stack instruction becomes one register
+instruction, provided there is a single register instruction with equivalent
+semantics to the stack instruction (that is, some .NET instructions may map
+to multiple Parrot instructions independent of the stack to register 
+translation method used).
+
+The following example demonstrates the translation of some stack code to
+equivalent register code for a trivial example. Note that the stack pointer
+is internal to the translator and simply denotes which virtual registers
+hold the operands. Note also that the "set" instruction is how Parrot spells
+"move".
+
+  STACK CODE        REGISTER CODE             STACK POINTER (BEFORE/AFTER)
+
+  LOOP:             LOOP:                     0 / 0
+  ldlocal 1         set $I0, local1           0 / 1
+  ldarg 1           set $I1, arg1             1 / 2
+  if_ge END         if $I0 >= $I1 goto END    2 / 0
+  ldlocal 2         set $I0, local2           0 / 1
+  ldarg 2           set $I0, arg2             1 / 2
+  add               add $I0, $I0, $I1         2 / 1
+  stlocal 2         set local1, $I0           1 / 0
+  ldlocal 1         set $I0, local1           0 / 1
+  iconst 1          set $I1, 1                1 / 2
+  add               add $I0, $I0, $I1         2 / 1
+  stlocal 1         set local1, $I0           1 / 0
+  br LOOP           goto LOOP                 0 / 0
+  END:              END:                      0 / 0
+  ldlocal 2         set $I0, local2           0 / 1
+  ret               .return($I0)              1 / 0
+
+Note that this is a massive simplification; it is only possible to translate
+instructions in the order they appear if there is always nothing on the stack
+whenever a branch takes place. In general this is not true, and must be
+resolved by identifying basic blocks and propogating the stack position at
+a jump to the block along with the block, so when translation of that basic
+block takes place the translator knows what the stack pointer is.
+
+The code that has been produced here is far from optimal, however it only uses
+registers, not a stack, which is a move in the right direction. Also, it is
+now possible for a register code optimizer to improve it.
+
+=head3 Clearing Redundant Moves
+A paper entitled "The Case For Virtual Register Machines"[3] published in 2000,
+along with the earlier paper[1], acknowledge that many of the move instructions
+generated when mapping the stack onto some registers are redundant. The 2000
+paper explains how a copy propogation algorithm was used that "re-wires the
+source and destination registers of instructions to bypass moves". This can be
+done fairly easily by converting the code into SSA form. It is possible that
+the Parrot PIR optimizer could catch many of these cases.
+
+PIR is textual in nature, and the less of it that needs to be parsed and
+compiled, the better. While copy propogation as a post-translation optimization
+could be implemented within the translator, it would likely require an
+intermediate form for the translated code to avoid a lot of expensive text
+manipulation operations. It would be desirable to just never generate the
+moves that would be removed, just as instructions were never generated when
+this was clearly avoidable in the lazy pushes/pops algorithm presented earlier.
+
+=head3 Never Generating Redundant Moves
+This method essentially does "lazy moves" when loading data from a register.
+This covers loads of locals and arguments, which make a high proportioin of
+the loads that are performed. It takes advantage of constraints on the .NET
+instruction stream to do this in a single pass.
+
+XXX TO DO
+
+
+=head2 References
+
+B<[1] Java Bytecode to Native Code Translation: The Caffeine Prototype And
+Preliminary Results>
+L<http://portal.acm.org/ft_gateway.cfm?id=243864&type=pdf>
+Performance issues with imitating the stack, suggestion of mapping stack
+locations to registers and additional problems with that.
+
+B<[2] Modern Compiler Design>
+Book
+Description of basic blocks.
+
+B<[3] The Case For Virtual Register Machines>
+

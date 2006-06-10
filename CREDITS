@@ -238,8 +238,8 @@ D: Lexical pads, CPS.
 N: Jonathan Stowe
 
 N: Jonathan Worthington
-D: Win32 dynpmc support, Win32 fixes, PBC utilities, debug segment work
-D: and various patches
+D: Bits of Win32 support, PBC utilities, debug segment work, .Net 
+D: to PIR translator and various patches
 E: jonathan@jwcs.net
 W: http://www.jwcs.net/~jonathan/
 

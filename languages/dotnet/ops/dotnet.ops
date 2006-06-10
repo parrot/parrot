@@ -1,0 +1,1819 @@
+#include "parrot/dynext.h"
+#include "../pmc/tableinfo.h"
+#include "../pmc/structures.h"
+VERSION = PARROT_VERSION;
+
+/* Overflow checking macros for add, subtract and multiply. Taken from Mono
+   (http://svn.myrealbox.com/viewcvs/trunk/mono/mono/interpreter/interp.c). */
+
+#define FALSE 0
+#define MAX_UINT4 4294967295U
+#define MAX_INT4 2147483647
+#define MIN_INT4 (-MAX_INT4 -1)
+#define MAX_UINT8 18446744073709551615
+#define MAX_INT8 9223372036854775807
+#define MIN_INT8 (-MAX_INT8 -1)
+	
+#define CHECK_ADD_OVERFLOW(a,b) \
+	(Parrot_Int4)(b) >= 0 ? (Parrot_Int4)(MAX_INT4) - (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0	\
+	: (Parrot_Int4)(MIN_INT4) - (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
+
+#define CHECK_SUB_OVERFLOW(a,b) \
+	(Parrot_Int4)(b) < 0 ? (Parrot_Int4)(MAX_INT4) + (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0	\
+	: (Parrot_Int4)(MIN_INT4) + (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
+
+#define CHECK_ADD_OVERFLOW_UN(a,b) \
+	(Parrot_UInt4)(MAX_UINT4) - (Parrot_UInt4)(b) < (Parrot_UInt4)(a) ? -1 : 0
+
+#define CHECK_SUB_OVERFLOW_UN(a,b) \
+	(Parrot_UInt4)(a) < (Parrot_UInt4)(b) ? -1 : 0
+
+#define CHECK_ADD_OVERFLOW64(a,b) \
+	(__int64)(b) >= 0 ? (__int64)(MAX_INT8) - (__int64)(b) < (__int64)(a) ? -1 : 0	\
+	: (__int64)(MIN_INT8) - (__int64)(b) > (__int64)(a) ? +1 : 0
+
+#define CHECK_SUB_OVERFLOW64(a,b) \
+	(__int64)(b) < 0 ? (__int64)(MAX_INT8) + (__int64)(b) < (__int64)(a) ? -1 : 0	\
+	: (__int64)(MIN_INT8) + (__int64)(b) > (__int64)(a) ? +1 : 0
+
+#define CHECK_ADD_OVERFLOW64_UN(a,b) \
+	(unsigned __int64)(MAX_UINT8) - (unsigned __int64)(b) < (unsigned __int64)(a) ? -1 : 0
+
+#define CHECK_SUB_OVERFLOW64_UN(a,b) \
+	(unsigned __int64)(a) < (unsigned __int64)(b) ? -1 : 0
+
+#define CHECK_MUL_OVERFLOW(a,b) \
+	((Parrot_Int4)(a) == 0) || ((Parrot_Int4)(b) == 0) ? 0 : \
+	(((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) == -1)) ? FALSE : \
+	(((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) == -1)) ? (a == - MAX_INT4) : \
+	(((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) > 0)) ? (Parrot_Int4)(a) > ((MAX_INT4) / (Parrot_Int4)(b)) : \
+	(((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) < 0)) ? (Parrot_Int4)(a) > ((MIN_INT4) / (Parrot_Int4)(b)) : \
+	(((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) > 0)) ? (Parrot_Int4)(a) < ((MIN_INT4) / (Parrot_Int4)(b)) : \
+	(Parrot_Int4)(a) < ((MAX_INT4) / (Parrot_Int4)(b))
+
+#define CHECK_MUL_OVERFLOW_UN(a,b) \
+	((Parrot_UInt4)(a) == 0) || ((Parrot_UInt4)(b) == 0) ? 0 : \
+	(Parrot_UInt4)(b) > ((MAX_UINT4) / (Parrot_UInt4)(a))
+
+#define CHECK_MUL_OVERFLOW64(a,b) \
+	((__int64)(a) == 0) || ((__int64)(b) == 0) ? 0 : \
+	(((__int64)(a) > 0) && ((__int64)(b) == -1)) ? FALSE : \
+	(((__int64)(a) < 0) && ((__int64)(b) == -1)) ? (a == - MAX_INT8) : \
+	(((__int64)(a) > 0) && ((__int64)(b) > 0)) ? (__int64)(a) > ((MAX_INT8) / (__int64)(b)) : \
+	(((__int64)(a) > 0) && ((__int64)(b) < 0)) ? (__int64)(a) > ((MIN_INT8) / (__int64)(b)) : \
+	(((__int64)(a) < 0) && ((__int64)(b) > 0)) ? (__int64)(a) < ((MIN_INT8) / (__int64)(b)) : \
+	(__int64)(a) < ((MAX_INT8) / (__int64)(b))
+
+#define CHECK_MUL_OVERFLOW64_UN(a,b) \
+	((unsigned __int64)(a) == 0) || ((unsigned __int64)(b) == 0) ? 0 : \
+	(unsigned __int64)(b) > ((MAX_UINT8) / (unsigned __int64)(a))
+
+
+/* Overflow exception thrower. */
+static opcode_t* dotnet_OverflowException(Parrot_Interp interpreter, opcode_t *ret)
+{
+    PMC *ex_pmc = pmc_new(interpreter, enum_class_Exception);
+    VTABLE_set_string_native(interpreter, ex_pmc, 
+        string_from_const_cstring(interpreter, "System.OverflowException", 0));
+    return (opcode_t *)throw_exception(interpreter, ex_pmc, ret);
+}
+
+
+/* Unsigned arithmetic ops. */
+inline op net_div_un(out INT, in INT, in INT) :base_core {
+	$1 = ((unsigned int) $2) / ((unsigned int) $3);
+	goto NEXT();
+}
+
+inline op net_div_un(out PMC, in PMC, in PMC) :base_core {
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+        struct dotnet_uint64 *i1 = PMC_struct_val($2);
+        struct dotnet_uint64 *i2 = PMC_struct_val($3);
+        $1 = pmc_new(interpreter, pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "UInt64", 0)));
+        PMC_struct_val($1) = i;
+        i->x = i1->x / i2->x;
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        $1 = pmc_new(interpreter, pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "Integer", 0)));
+        $1->vtable->set_integer_native(interpreter, $1, i1 / i2);
+    }
+    goto NEXT();
+}
+
+inline op net_rem_un(out INT, in INT, in INT) :base_core {
+	$1 = ((unsigned int) $2) % ((unsigned int) $3);
+	goto NEXT();
+}
+
+inline op net_rem_un(out PMC, in PMC, in PMC) :base_core {
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+        struct dotnet_uint64 *i1 = PMC_struct_val($2);
+        struct dotnet_uint64 *i2 = PMC_struct_val($3);
+        $1 = pmc_new(interpreter, pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "UInt64", 0)));
+        PMC_struct_val($1) = i;
+        i->x = i1->x % i2->x;
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        $1 = pmc_new(interpreter, pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "Integer", 0)));
+        $1->vtable->set_integer_native(interpreter, $1, i1 % i2);
+    }
+    goto NEXT();
+}
+
+
+/* Overflow checked arithmetic ops. */
+inline op net_add_ovf(out INT, in INT, in INT) :base_core {
+    if (CHECK_ADD_OVERFLOW($2, $3))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = $2 + $3;
+        goto NEXT();
+    }
+}
+
+inline op net_add_ovf(out PMC, in PMC, in PMC) :base_core {
+    opcode_t *ret = expr NEXT();
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "Int64", 0)))
+    {
+        struct dotnet_int64 *i1 = PMC_struct_val($2);
+        struct dotnet_int64 *i2 = PMC_struct_val($3);
+        if (CHECK_ADD_OVERFLOW64(i1->x, i2->x))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Int64", 0)));
+            PMC_struct_val($1) = i;
+            i->x = i1->x + i2->x;
+            goto NEXT();
+        }
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        if (CHECK_ADD_OVERFLOW(i1, i2))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Integer", 0)));
+            $1->vtable->set_integer_native(interpreter, $1, i1 + i2);
+            goto NEXT();
+        }
+    }
+}
+
+inline op net_add_ovf_un(out INT, in INT, in INT) :base_core {
+    if (CHECK_ADD_OVERFLOW_UN($2, $3))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = ((unsigned int) $2) + ((unsigned int) $3);
+        goto NEXT();
+    }
+}
+
+inline op net_add_ovf_un(out PMC, in PMC, in PMC) :base_core {
+    opcode_t *ret = expr NEXT();
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($2);
+        struct dotnet_uint64 *i2 = PMC_struct_val($3);
+        if (CHECK_ADD_OVERFLOW64_UN(i1->x, i2->x))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "UInt64", 0)));
+            PMC_struct_val($1) = i;
+            i->x = i1->x + i2->x;
+            goto NEXT();
+        }
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        if (CHECK_ADD_OVERFLOW_UN(i1, i2))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Integer", 0)));
+            $1->vtable->set_integer_native(interpreter, $1, i1 + i2);
+            goto NEXT();
+        }
+    }
+}
+
+inline op net_sub_ovf(out INT, in INT, in INT) :base_core {
+    if (CHECK_SUB_OVERFLOW($2, $3))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = $2 - $3;
+        goto NEXT();
+    }
+}
+
+inline op net_sub_ovf(out PMC, in PMC, in PMC) :base_core {
+    opcode_t *ret = expr NEXT();
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "Int64", 0)))
+    {
+        struct dotnet_int64 *i1 = PMC_struct_val($2);
+        struct dotnet_int64 *i2 = PMC_struct_val($3);
+        if (CHECK_SUB_OVERFLOW64(i1->x, i2->x))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Int64", 0)));
+            PMC_struct_val($1) = i;
+            i->x = i1->x - i2->x;
+            goto NEXT();
+        }
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        if (CHECK_SUB_OVERFLOW(i1, i2))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Integer", 0)));
+            $1->vtable->set_integer_native(interpreter, $1, i1 - i2);
+            goto NEXT();
+        }
+    }
+}
+
+inline op net_sub_ovf_un(out INT, in INT, in INT) :base_core {
+    if (CHECK_SUB_OVERFLOW_UN($2, $3))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = ((unsigned int) $2) - ((unsigned int) $3);
+        goto NEXT();
+    }
+}
+
+inline op net_sub_ovf_un(out PMC, in PMC, in PMC) :base_core {
+    opcode_t *ret = expr NEXT();
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($2);
+        struct dotnet_uint64 *i2 = PMC_struct_val($3);
+        if (CHECK_SUB_OVERFLOW64_UN(i1->x, i2->x))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "UInt64", 0)));
+            PMC_struct_val($1) = i;
+            i->x = i1->x - i2->x;
+            goto NEXT();
+        }
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        if (CHECK_SUB_OVERFLOW_UN(i1, i2))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Integer", 0)));
+            $1->vtable->set_integer_native(interpreter, $1, i1 - i2);
+            goto NEXT();
+        }
+    }
+}
+
+inline op net_mul_ovf(out INT, in INT, in INT) :base_core {
+    if (CHECK_MUL_OVERFLOW($2, $3))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = $2 * $3;
+        goto NEXT();
+    }
+}
+
+inline op net_mul_ovf(out PMC, in PMC, in PMC) :base_core {
+    opcode_t *ret = expr NEXT();
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "Int64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($2);
+        struct dotnet_uint64 *i2 = PMC_struct_val($3);
+        if (CHECK_MUL_OVERFLOW64(i1->x, i2->x))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Int64", 0)));
+            PMC_struct_val($1) = i;
+            i->x = i1->x * i2->x;
+            goto NEXT();
+        }
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        if (CHECK_MUL_OVERFLOW(i1, i2))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Integer", 0)));
+            $1->vtable->set_integer_native(interpreter, $1, i1 * i2);
+            goto NEXT();
+        }
+    }
+}
+
+inline op net_mul_ovf_un(out INT, in INT, in INT) :base_core {
+    if (CHECK_MUL_OVERFLOW_UN($2, $3))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = ((unsigned int) $2) * ((unsigned int) $3);
+        goto NEXT();
+    }
+}
+
+inline op net_mul_ovf_un(out PMC, in PMC, in PMC) :base_core {
+    opcode_t *ret = expr NEXT();
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($2);
+        struct dotnet_uint64 *i2 = PMC_struct_val($3);
+        if (CHECK_MUL_OVERFLOW64_UN(i1->x, i2->x))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "UInt64", 0)));
+            PMC_struct_val($1) = i;
+            i->x = i1->x * i2->x;
+            goto NEXT();
+        }
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        if (CHECK_MUL_OVERFLOW_UN(i1, i2))
+        {
+            opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+            goto ADDRESS(dest);
+        }
+        else
+        {
+            $1 = pmc_new(interpreter, pmc_type(interpreter,
+                string_from_const_cstring(interpreter, "Integer", 0)));
+            $1->vtable->set_integer_native(interpreter, $1, i1 * i2);
+            goto NEXT();
+        }
+    }
+}
+
+
+/* Unsigned comparison ops. */
+inline op net_cgt_un(out INT, in INT, in INT) :base_core {
+    $1 = ((unsigned int) $2) > ((unsigned int) $3) ? 1 : 0;
+    goto NEXT();
+}
+
+inline op net_cgt_un(out INT, in NUM, in NUM) :base_core {
+    $1 = $2 > $3 ? 1 : 0;
+    goto NEXT();
+}
+
+inline op net_cgt_un(out INT, in PMC, in PMC) :base_core {
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($2);
+        struct dotnet_uint64 *i2 = PMC_struct_val($3);
+        $1 = i1->x > i2->x ? 1 : 0;
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        $1 = i1 > i2 ? 1 : 0;
+    }
+    goto NEXT();
+}
+
+inline op net_clt_un(out INT, in INT, in INT) :base_core {
+    $1 = ((unsigned int) $2) < ((unsigned int) $3) ? 1 : 0;
+    goto NEXT();
+}
+
+inline op net_clt_un(out INT, in NUM, in NUM) :base_core {
+    $1 = $2 < $3 ? 1 : 0;
+    goto NEXT();
+}
+
+inline op net_clt_un(out INT, in PMC, in PMC) :base_core {
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($2);
+        struct dotnet_uint64 *i2 = PMC_struct_val($3);
+        $1 = i1->x < i2->x ? 1 : 0;
+    }
+    else
+    {
+        int i1 = $2->vtable->get_integer(interpreter, $2);
+        int i2 = $3->vtable->get_integer(interpreter, $3);
+        $1 = i1 < i2 ? 1 : 0;
+    }
+    goto NEXT();
+}
+
+
+/* Unsigned branch ops. */
+inline op net_bge_un(in INT, in INT, labelconst INT) :base_core {
+	if ((unsigned int)$1 >= (unsigned int)$2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_bge_un(in NUM, in NUM, labelconst INT) :base_core {
+	if ((unsigned int)$1 >= (unsigned int)$2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_bge_un(in PMC, in PMC, labelconst INT) :base_core {
+    int result;
+    if ($1->vtable->isa(interpreter, $1,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($1);
+        struct dotnet_uint64 *i2 = PMC_struct_val($2);
+        result = i1->x >= i2->x ? 1 : 0;
+    }
+    else
+    {
+        int i1 = $1->vtable->get_integer(interpreter, $1);
+        int i2 = $2->vtable->get_integer(interpreter, $2);
+        result = i1 >= i2 ? 1 : 0;
+    }
+    if (result)
+    {
+        goto OFFSET($3);
+    }
+    else
+    {
+        goto NEXT();
+    }
+}
+
+inline op net_bgt_un(in INT, in INT, labelconst INT) :base_core {
+	if ((unsigned int)$1 > (unsigned int)$2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_bgt_un(in NUM, in NUM, labelconst INT) :base_core {
+	if ($1 > $2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_bgt_un(in PMC, in PMC, labelconst INT) :base_core {
+    int result;
+    if ($1->vtable->isa(interpreter, $1,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($1);
+        struct dotnet_uint64 *i2 = PMC_struct_val($2);
+        result = i1->x > i2->x ? 1 : 0;
+    }
+    else
+    {
+        int i1 = $1->vtable->get_integer(interpreter, $1);
+        int i2 = $2->vtable->get_integer(interpreter, $2);
+        result = i1 > i2 ? 1 : 0;
+    }
+    if (result)
+    {
+        goto OFFSET($3);
+    }
+    else
+    {
+        goto NEXT();
+    }
+}
+
+inline op net_ble_un(in INT, in INT, labelconst INT) :base_core {
+	if ((unsigned int)$1 <= (unsigned int)$2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_ble_un(in NUM, in NUM, labelconst INT) :base_core {
+	if ($1 <= $2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_ble_un(in PMC, in PMC, labelconst INT) :base_core {
+    int result;
+    if ($1->vtable->isa(interpreter, $1,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($1);
+        struct dotnet_uint64 *i2 = PMC_struct_val($2);
+        result = i1->x <= i2->x ? 1 : 0;
+    }
+    else
+    {
+        int i1 = $1->vtable->get_integer(interpreter, $1);
+        int i2 = $2->vtable->get_integer(interpreter, $2);
+        result = i1 <= i2 ? 1 : 0;
+    }
+    if (result)
+    {
+        goto OFFSET($3);
+    }
+    else
+    {
+        goto NEXT();
+    }
+}
+
+inline op net_blt_un(in INT, in INT, labelconst INT) :base_core {
+	if ((unsigned int)$1 < (unsigned int)$2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_blt_un(in NUM, in NUM, labelconst INT) :base_core {
+	if ($1 < $2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_blt_un(in PMC, in PMC, labelconst INT) :base_core {
+    int result;
+    if ($1->vtable->isa(interpreter, $1,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($1);
+        struct dotnet_uint64 *i2 = PMC_struct_val($2);
+        result = i1->x < i2->x ? 1 : 0;
+    }
+    else
+    {
+        int i1 = $1->vtable->get_integer(interpreter, $1);
+        int i2 = $2->vtable->get_integer(interpreter, $2);
+        result = i1 < i2 ? 1 : 0;
+    }
+    if (result)
+    {
+        goto OFFSET($3);
+    }
+    else
+    {
+        goto NEXT();
+    }
+}
+
+inline op net_bne_un(in INT, in INT, labelconst INT) :base_core {
+	if ((unsigned int)$1 != (unsigned int)$2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_bne_un(in NUM, in NUM, labelconst INT) :base_core {
+	if ($1 != $2)
+	{
+		goto OFFSET($3);
+	}
+	else
+	{
+		goto NEXT();
+	}
+}
+
+inline op net_bne_un(in PMC, in PMC, labelconst INT) :base_core {
+    int result;
+    if ($1->vtable->isa(interpreter, $1,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_uint64 *i1 = PMC_struct_val($1);
+        struct dotnet_uint64 *i2 = PMC_struct_val($2);
+        result = i1->x != i2->x ? 1 : 0;
+    }
+    else
+    {
+        result = $1 != $2 ? 1 : 0;
+    }
+    if (result)
+    {
+        goto OFFSET($3);
+    }
+    else
+    {
+        goto NEXT();
+    }
+}
+
+
+/* Unchecked conversion ops. */
+inline op net_conv_i1(out INT, in INT) :base_core {
+	$1 = (Parrot_Int1) $2;
+	goto NEXT();
+}
+
+inline op net_conv_i1(out INT, in NUM) :base_core {
+	$1 = (Parrot_Int1) $2;
+	goto NEXT();
+}
+
+inline op net_conv_i1(out INT, in PMC) :base_core {
+	$1 = (Parrot_Int1) $2->vtable->get_integer(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_u1(out INT, in INT) :base_core {
+	$1 = (Parrot_UInt1) $2;
+	goto NEXT();
+}
+
+inline op net_conv_u1(out INT, in NUM) :base_core {
+	$1 = (Parrot_UInt1) $2;
+	goto NEXT();
+}
+
+inline op net_conv_u1(out INT, in PMC) :base_core {
+	$1 = (Parrot_UInt1) $2->vtable->get_integer(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_i2(out INT, in INT) :base_core {
+	$1 = (Parrot_Int2) $2;
+	goto NEXT();
+}
+
+inline op net_conv_i2(out INT, in NUM) :base_core {
+	$1 = (Parrot_Int2) $2;
+	goto NEXT();
+}
+
+inline op net_conv_i2(out INT, in PMC) :base_core {
+	$1 = (Parrot_Int2) $2->vtable->get_integer(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_u2(out INT, in INT) :base_core {
+	$1 = (Parrot_UInt2) $2;
+	goto NEXT();
+}
+
+inline op net_conv_u2(out INT, in NUM) :base_core {
+	$1 = (Parrot_UInt2) $2;
+	goto NEXT();
+}
+
+inline op net_conv_u2(out INT, in PMC) :base_core {
+	$1 = (Parrot_UInt2) $2->vtable->get_integer(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_i4(out INT, in INT) :base_core {
+	$1 = (Parrot_Int4) $2;
+	goto NEXT();
+}
+
+inline op net_conv_i4(out INT, in NUM) :base_core {
+	$1 = (Parrot_Int4) $2;
+	goto NEXT();
+}
+
+inline op net_conv_i4(out INT, in PMC) :base_core {
+	$1 = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_u4(out INT, in INT) :base_core {
+	$1 = (Parrot_UInt4) $2;
+	goto NEXT();
+}
+
+inline op net_conv_u4(out INT, in NUM) :base_core {
+	$1 = (Parrot_UInt4) $2;
+	goto NEXT();
+}
+
+inline op net_conv_u4(out INT, in PMC) :base_core {
+	$1 = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_i8(out PMC, in INT) :base_core {
+    PMC* i8 = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "Int64", 0)));
+    struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+    PMC_struct_val(i8) = i;
+	i->x = $2;
+    $1 = i8;
+	goto NEXT();
+}
+
+inline op net_conv_i8(out PMC, in NUM) :base_core {
+    PMC* i8 = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "Int64", 0)));
+    struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+    PMC_struct_val(i8) = i;
+	i->x = (__int64) $2;
+    $1 = i8;
+	goto NEXT();
+}
+
+inline op net_conv_u8(out PMC, in INT) :base_core {
+    PMC* u8 = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "UInt64", 0)));
+    struct dotnet_uint64* ui = mem_sys_allocate(sizeof(struct dotnet_uint64));
+    PMC_struct_val(u8) = ui;
+	ui->x = $2;
+    $1 = u8;
+	goto NEXT();
+}
+
+inline op net_conv_u8(out PMC, in NUM) :base_core {
+    PMC* u8 = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "UInt64", 0)));
+    struct dotnet_uint64* ui = mem_sys_allocate(sizeof(struct dotnet_uint64));
+    PMC_struct_val(u8) = ui;
+	ui->x = (unsigned __int64) $2;
+    $1 = u8;
+	goto NEXT();
+}
+
+inline op net_conv_r4(out NUM, in INT) :base_core {
+	$1 = (Parrot_Float4) $2;
+	goto NEXT();
+}
+
+inline op net_conv_r4(out NUM, in NUM) :base_core {
+	$1 = (Parrot_Float4) $2;
+	goto NEXT();
+}
+
+inline op net_conv_r4(out NUM, in PMC) :base_core {
+	$1 = (Parrot_Float) $2->vtable->get_number(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_r8(out NUM, in INT) :base_core {
+	$1 = (Parrot_Float8) $2;
+	goto NEXT();
+}
+
+inline op net_conv_r8(out NUM, in NUM) :base_core {
+	$1 = (Parrot_Float8) $2;
+	goto NEXT();
+}
+
+inline op net_conv_r8(out NUM, in PMC) :base_core {
+	$1 = (Parrot_Float) $2->vtable->get_number(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_i(out INT, in INT) :base_core {
+	$1 = (int) $2;
+	goto NEXT();
+}
+
+inline op net_conv_i(out INT, in NUM) :base_core {
+	$1 = (int) $2;
+	goto NEXT();
+}
+
+inline op net_conv_i(out INT, in PMC) :base_core {
+	$1 = (int) $2->vtable->get_integer(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_u(out INT, in INT) :base_core {
+	$1 = (unsigned int) $2;
+	goto NEXT();
+}
+
+inline op net_conv_u(out INT, in NUM) :base_core {
+	$1 = (unsigned int) $2;
+	goto NEXT();
+}
+
+inline op net_conv_u(out INT, in PMC) :base_core {
+	$1 = (unsigned int) $2->vtable->get_integer(interpreter, $2);
+	goto NEXT();
+}
+
+inline op net_conv_r_un(out NUM, in INT) :base_core {
+	$1 = (Parrot_Float) ((unsigned int) $2);
+	goto NEXT();
+}
+
+inline op net_conv_r_un(out NUM, in PMC) :base_core {
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        $1 = (Parrot_Float) i->x;
+    }
+    else
+    {
+        $1 = (Parrot_Float) $2->vtable->get_integer(interpreter, $2);
+    }
+	goto NEXT();
+}
+
+
+/* Checked conversion ops. */
+inline op net_conv_ovf_i1_un(out INT, in INT) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2;
+    if (tmp > 0x7F)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int1) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i1_un(out INT, in PMC) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
+    if (tmp > 0x7F)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int1) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u1_un(out INT, in INT) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2;
+    if (tmp > 0xFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt1) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u1_un(out INT, in PMC) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
+    if (tmp > 0xFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt1) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i2_un(out INT, in INT) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2;
+    if (tmp > 0x7FFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int2) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i2_un(out INT, in PMC) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
+    if (tmp > 0x7FFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int2) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u2_un(out INT, in INT) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2;
+    if (tmp > 0xFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt2) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u2_un(out INT, in PMC) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
+    if (tmp > 0xFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt2) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i4_un(out INT, in INT) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2;
+    if (tmp > 0x7FFFFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int4) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i4_un(out INT, in PMC) :base_core {
+    int ok = 1;
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x > 0x7FFFFFFF)
+            ok = 0;
+    }
+    else
+    {
+        if ($2->vtable->get_integer(interpreter, $2) > 0x7FFFFFFF)
+            ok = 0;
+    }
+    if (!ok)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u4_un(out INT, in INT) :base_core {
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2;
+    if (tmp > 0xFFFFFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt4) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u4_un(out INT, in PMC) :base_core {
+    int ok = 1;
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "Int64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x > 0xFFFFFFFF)
+            ok = 0;
+    }
+    else
+    {
+        if ($2->vtable->get_integer(interpreter, $2) > 0xFFFFFFFF)
+            ok = 0;
+    }
+    if (!ok)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i_un(out INT, in INT) :base_core {
+    /* XXX TO DO Fix for 64-bit architecture. */
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2;
+    if (tmp > 0x7FFFFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (int) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u_un(out INT, in INT) :base_core {
+    /* XXX TO DO Fix for 64-bit architecture. */
+    Parrot_UInt4 tmp = (Parrot_UInt4) $2;
+    if (tmp > 0xFFFFFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (unsigned int) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i1(out INT, in INT) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2;
+    if (tmp > 0x7F || tmp < ((Parrot_Int1) 0x80))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int1) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i1(out INT, in PMC) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
+    if (tmp > 0x7F || tmp < ((Parrot_Int1) 0x80))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int1) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u1(out INT, in INT) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2;
+    if (tmp < 0 || tmp > 0xFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt1) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u1(out INT, in PMC) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
+    if (tmp < 0 || tmp > 0xFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt1) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i2(out INT, in INT) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2;
+    if (tmp > 0x7FFF || tmp < ((Parrot_Int2) 0x8000))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int2) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i2(out INT, in PMC) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
+    if (tmp > 0x7FFF || tmp < ((Parrot_Int2) 0x8000))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int2) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u2(out INT, in INT) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2;
+    if (tmp < 0 || tmp > 0xFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt2) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u2(out INT, in PMC) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
+    if (tmp < 0 || tmp > 0xFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt2) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i4(out INT, in INT) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2;
+    if (tmp > 0x7FFFFFFF || tmp < ((Parrot_Int4) 0x80000000))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int4) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i4(out INT, in PMC) :base_core {
+    int ok = 1;
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "Int64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x > 0x7FFFFFFF)
+            ok = 0;
+    }
+    else if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x > 0x7FFFFFFF)
+            ok = 0;
+    }
+    else
+    {
+        if ($2->vtable->get_integer(interpreter, $2) > 0x7FFFFFFF)
+            ok = 0;
+    }
+    if (!ok)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u4(out INT, in INT) :base_core {
+    Parrot_Int4 tmp = (Parrot_Int4) $2;
+    if (tmp < 0 || tmp > 0xFFFFFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt4) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u4(out INT, in PMC) :base_core {
+    int ok = 1;
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "Int64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x < 0 || i->x > 0xFFFFFFFF)
+            ok = 0;
+    }
+    else if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x < 0 || i->x > 0xFFFFFFFF)
+            ok = 0;
+    }
+    else
+    {
+        if ($2->vtable->get_integer(interpreter, $2) > 0xFFFFFFFF ||
+            $2->vtable->get_integer(interpreter, $2) < 0)
+            ok = 0;
+    }
+    if (!ok)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i(out INT, in INT) :base_core {
+    /* XXX TO DO Fix for 64-bit architecture. */
+    Parrot_Int4 tmp = (Parrot_Int4) $2;
+    if (tmp > 0x7FFFFFFF || tmp < ((Parrot_Int4) 0x80000000))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (int) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i(out INT, in PMC) :base_core {
+    /* XXX TO DO Fix for 64-bit architecture. */
+    int ok = 1;
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "Int64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x > 0x7FFFFFFF)
+            ok = 0;
+    }
+    else if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x > 0x7FFFFFFF)
+            ok = 0;
+    }
+    else
+    {
+        if ($2->vtable->get_integer(interpreter, $2) > 0x7FFFFFFF)
+            ok = 0;
+    }
+    if (!ok)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (int) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u(out INT, in INT) :base_core {
+    /* XXX TO DO Fix for 64-bit architecture. */
+    Parrot_Int4 tmp = (Parrot_Int4) $2;
+    if (tmp < 0 || tmp > 0xFFFFFFFF)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (unsigned int) tmp;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u(out INT, in PMC) :base_core {
+    /* XXX TO DO Fix for 64-bit architecture. */
+    int ok = 1;
+    if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "Int64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x < 0 || i->x > 0xFFFFFFFF)
+            ok = 0;
+    }
+    else if ($2->vtable->isa(interpreter, $2,
+        string_from_const_cstring(interpreter, "UInt64", 0)))
+    {
+        struct dotnet_int64 *i = PMC_struct_val($2);
+        if (i->x < 0 || i->x > 0xFFFFFFFF)
+            ok = 0;
+    }
+    else
+    {
+        if ($2->vtable->get_integer(interpreter, $2) > 0xFFFFFFFF ||
+            $2->vtable->get_integer(interpreter, $2) < 0)
+            ok = 0;
+    }
+    if (!ok)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (unsigned int) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i1(out INT, in NUM) :base_core {
+    if ($2 > ((Parrot_Float) 0x7F) || $2 < ((Parrot_Float) ((Parrot_Int1) 0x80)))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int1) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u1(out INT, in NUM) :base_core {
+    if ($2 < 0 || $2 > ((Parrot_Float) 0xFF))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt1) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i2(out INT, in NUM) :base_core {
+    if ($2 > ((Parrot_Float) 0x7FFF) || $2 < ((Parrot_Float) ((Parrot_Int2) 0x8000)))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int2) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u2(out INT, in NUM) :base_core {
+    if ($2 < 0 || $2 > ((Parrot_Float) 0xFFFF))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt2) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i4(out INT, in NUM) :base_core {
+    if ($2 > ((Parrot_Float) 0x7FFFFFFF) || $2 < ((Parrot_Float) ((Parrot_Int4) 0x80000000)))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_Int4) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u4(out INT, in NUM) :base_core {
+    if ($2 < 0 || $2 > ((Parrot_Float) 0xFFFFFFFF))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (Parrot_UInt4) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i8(out PMC, in NUM) :base_core {
+    if ($2 > ((Parrot_Float) MAX_INT8) || $2 < ((Parrot_Float) ((Parrot_Int4) MIN_INT8)))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+        $1 = pmc_new(interpreter, pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "Int64", 0)));
+        PMC_struct_val($1) = i;
+        i->x = (__int64) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u8(out PMC, in NUM) :base_core {
+    if ($2 > ((Parrot_Float) MAX_UINT8) || $2 < 0)
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+        $1 = pmc_new(interpreter, pmc_type(interpreter,
+            string_from_const_cstring(interpreter, "UInt64", 0)));
+        PMC_struct_val($1) = i;
+        i->x = (unsigned __int64) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_i(out INT, in NUM) :base_core {
+    /* XXX TO DO Fix for 64-bit architecture. */
+    if ($2 > ((Parrot_Float) 0x7FFFFFFF) || $2 < ((Parrot_Float) ((Parrot_Int4) 0x80000000)))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (int) $2;
+        goto NEXT();
+    }
+}
+
+inline op net_conv_ovf_u(out INT, in NUM) :base_core {
+    /* XXX TO DO Fix for 64-bit architecture. */
+    if ($2 < 0 || $2 > ((Parrot_Float) 0xFFFFFFFF))
+    {
+        opcode_t *ret = expr NEXT();
+        opcode_t *dest = dotnet_OverflowException(interpreter, ret);
+        goto ADDRESS(dest);
+    }
+    else
+    {
+        $1 = (unsigned int) $2;
+        goto NEXT();
+    }
+}
+
+
+/* Ops related to managed pointers. */
+
+inline op net_ldelema(out PMC, in PMC, in INT) :base_core {
+    /* Create PMC, underlying struct and tie them together. */
+    PMC* mp = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "ManagedPointer", 0)));
+    struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
+        sizeof(struct dotnet_managed_ptr));
+    PMC_struct_val(mp) = managed_ptr;
+
+    /* Stash away array details inside the pointer struct. */
+    managed_ptr->type = PTR_TYPE_ELEMENT;
+    managed_ptr->pmc = $2;
+    managed_ptr->index = $3;
+
+    /* Hand back managed pointer PMC. */
+    $1 = mp;
+    goto NEXT();
+}
+
+inline op net_ldelema(out PMC, in PMC, in PMC) :base_core {
+    /* Create PMC, underlying struct and tie them together. */
+    PMC* mp = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "ManagedPointer", 0)));
+    struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
+        sizeof(struct dotnet_managed_ptr));
+    PMC_struct_val(mp) = managed_ptr;
+
+    /* Stash away array details inside the pointer struct. */
+    managed_ptr->type = PTR_TYPE_ELEMENT;
+    managed_ptr->pmc = $2;
+    managed_ptr->index = VTABLE_get_integer(interpreter, $3);
+
+    /* Hand back managed pointer PMC. */
+    $1 = mp;
+    goto NEXT();
+}
+
+inline op net_ldflda(out PMC, in PMC, in STR) :base_core {
+    /* Create PMC, underlying struct and tie them together. */
+    PMC* mp = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "ManagedPointer", 0)));
+    struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
+        sizeof(struct dotnet_managed_ptr));
+    PMC_struct_val(mp) = managed_ptr;
+
+    /* Stash away field details inside the pointer struct. */
+    managed_ptr->type = PTR_TYPE_FIELD;
+    managed_ptr->pmc = $2;
+    managed_ptr->name = $3;
+
+    /* Hand back managed pointer PMC. */
+    $1 = mp;
+    goto NEXT();
+}
+
+inline op net_reg_ptr(out PMC, in INT) :base_core {
+    /* Create PMC, underlying struct and tie them together. */
+    PMC* mp = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "ManagedPointer", 0)));
+    struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
+        sizeof(struct dotnet_managed_ptr));
+    PMC_struct_val(mp) = managed_ptr;
+
+    /* Set up the pointer to the register. */
+    managed_ptr->type = PTR_TYPE_REGISTER;
+    managed_ptr->ctx = interpreter->ctx.state;
+    managed_ptr->r.reg_type = PTR_REGTYPE_I;
+    managed_ptr->r.number = CUR_OPCODE[2];
+
+    /* Hand back managed pointer PMC. */
+    $1 = mp;
+    goto NEXT();
+}
+
+inline op net_reg_ptr(out PMC, in NUM) :base_core {
+    /* Create PMC, underlying struct and tie them together. */
+    PMC* mp = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "ManagedPointer", 0)));
+    struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
+        sizeof(struct dotnet_managed_ptr));
+    PMC_struct_val(mp) = managed_ptr;
+
+    /* Set up the pointer to the register. */
+    managed_ptr->type = PTR_TYPE_REGISTER;
+    managed_ptr->ctx = interpreter->ctx.state;
+    managed_ptr->r.reg_type = PTR_REGTYPE_N;
+    managed_ptr->r.number = CUR_OPCODE[2];
+
+    /* Hand back managed pointer PMC. */
+    $1 = mp;
+    goto NEXT();
+}
+
+inline op net_reg_ptr(out PMC, in PMC) :base_core {
+    /* Create PMC, underlying struct and tie them together. */
+    PMC* mp = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "ManagedPointer", 0)));
+    struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
+        sizeof(struct dotnet_managed_ptr));
+    PMC_struct_val(mp) = managed_ptr;
+
+    /* Set up the pointer to the register. */
+    managed_ptr->type = PTR_TYPE_REGISTER;
+    managed_ptr->ctx = interpreter->ctx.state;
+    managed_ptr->r.reg_type = PTR_REGTYPE_P;
+    managed_ptr->r.number = CUR_OPCODE[2];
+
+    /* Hand back managed pointer PMC. */
+    $1 = mp;
+    goto NEXT();
+}
+
+inline op net_pmc_ptr(out PMC, in PMC) :base_core {
+    /* Create PMC, underlying struct and tie them together. */
+    PMC* mp = pmc_new(interpreter, pmc_type(interpreter,
+              string_from_const_cstring(interpreter, "ManagedPointer", 0)));
+    struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
+        sizeof(struct dotnet_managed_ptr));
+    PMC_struct_val(mp) = managed_ptr;
+
+    /* Set up the pointer to the PMC. */
+    managed_ptr->type = PTR_TYPE_PMC;
+    managed_ptr->pmc = $2;
+
+    /* Hand back managed pointer PMC. */
+    $1 = mp;
+    goto NEXT();
+}
+
+
+/* Op to get the address of a PMC. */
+inline op net_pmc_addr(out INT, in PMC) :base_core {
+    $1 = (int) $2;
+    goto NEXT();
+}

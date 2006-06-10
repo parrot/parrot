@@ -1,0 +1,15 @@
+#!perl -w
+
+use strict;
+use Test::Harness();
+
+# Check that we have the Mono C# compiler handy.
+my $check = `mcs --version`;
+unless ($check =~ /Mono/) {
+    die "You need the Mono C# compiler (mcs) in your path to build the test assemblies.\n";
+}
+
+# Run tests.
+my @default_tests = glob( "t/*.t" );
+my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
+Test::Harness::runtests(@tests);

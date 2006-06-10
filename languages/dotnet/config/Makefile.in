@@ -1,0 +1,149 @@
+# #############################################################################
+# .NET CLI To PIR Translator
+# Copyright (C) Jonathan Worthington 2005, 2006
+# #############################################################################
+# Makefile
+# ########
+# THIS IS A GENERATED FILE! If you want to edit it, be sure you are editing the
+# template (config/Makefile.in).
+# #############################################################################
+
+
+# BUILD TOOLS AND UTILITIES
+# #########################
+PERL     = ${perl}
+RM_F     = ${rm_f}
+PARROT   = ${trans_parrot_path}${slash}parrot${exe}
+MONOLIB  = ${trans_mono_lib_path}
+PBCMERGE = ${trans_parrot_path}${slash}pbc_merge${exe}
+PMCBUILD = $(PERL) ${build_dir}${slash}tools${slash}build${slash}dynpmc.pl
+OPSBUILD = $(PERL) ${build_dir}${slash}tools${slash}build${slash}dynoplibs.pl
+DESTDIR  = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
+
+
+# FILE EXTENSIONS
+# ###############
+O        = ${o}
+LOAD_EXT = ${load_ext}
+A        = ${a}
+
+
+# DIRECTORIES AND FILES
+# #####################
+PMCDIR    = pmc
+PMCS      = dotnetassembly dotnetclassmetadata dotnetmethodmetadata \
+            dotnetfieldmetadata dotnetparammetadata dotnetsignature \
+            dotnetbytecode dotnettyperefmetadata dotnetmemberrefmetadata \
+            dotneteh managedpointer dotnetassemblyref int64 uint64
+PMC_FILES = pmc/dotnetassembly.pmc pmc/dotnetclassmetadata.pmc \
+            pmc/dotnetmethodmetadata.pmc pmc/dotnetfieldmetadata.pmc \
+            pmc/dotnetparammetadata.pmc pmc/dotnetsignature.pmc \
+            pmc/dotnetbytecode.pmc pmc/dotnettyperefmetadata.pmc \
+            pmc/dotnetmemberrefmetadata.pmc pmc/dotneteh.pmc \
+            pmc/managedpointer.pmc pmc/dotnetassemblyref.pmc \
+            pmc/int64.pmc pmc/uint64.pmc
+OPSDIR    = ops
+OPSLIB    = dotnet
+OPS_FILES = ops/dotnet.ops
+TRAN_PIR  = src/translator.pir src/method.pir src/signature.pir src/typeinfo.pir \
+            src/field.pir src/exception.pir
+TRAN_PBC  = src/translator.pbc src/method.pbc src/signature.pbc src/typeinfo.pbc \
+            src/field.pbc src/exception.pbc
+
+
+# BUILD TARGETS
+# #############
+
+all : pmc/dotnet$(LOAD_EXT) ops/dotnet_ops$(LOAD_EXT) src/it.pbc \
+      src/builtins.pbc src/translib.pbc net2pbc.pbc
+
+pmc/dotnet$(LOAD_EXT) : $(PMC_FILES) pmc/structures.h pmc/tableinfo.h
+	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+
+ops/dotnet_ops$(LOAD_EXT) : $(OPS_FILES)
+	@cd $(OPSDIR) && $(OPSBUILD) generate $(OPSLIB)
+	@cd $(OPSDIR) && $(OPSBUILD) compile $(OPSLIB)
+	@cd $(OPSDIR) && $(OPSBUILD) linklibs $(OPSLIB)
+	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(DESTDIR)" $(OPSLIB)
+
+src/it.pbc : src/translation.rules build/translator.pl build/SRM/Stack.pm \
+             build/SRM/Register.pm build/SRM/OptRegister.pm
+	$(PERL) build/translator.pl src/translation.rules --srm ${srm} \
+	  --output src/it.pir
+	$(PARROT) -o src/it.pbc src/it.pir
+
+src/builtins.pbc : src/internal.methods build/builtins.pl
+	$(PERL) build/builtins.pl src/internal.methods --output src/builtins.pir
+	$(PARROT) -o src/builtins.pbc src/builtins.pir
+
+src/translib.pbc : src/it.pbc src/builtins.pbc $(TRAN_PBC)
+	$(PBCMERGE) -o src/translib.pbc $(TRAN_PBC) src/it.pbc src/builtins.pbc
+
+net2pbc.pbc : pmc/dotnet$(LOAD_EXT) src/translib.pbc src/net2pbc.pbc
+	$(PBCMERGE) -o net2pbc.pbc src/net2pbc.pbc src/translib.pbc
+
+class-library : net2pbc.pbc
+${trans_class_library}
+
+
+# PER FILE RULES AND DEPENDENCIES
+# ###############################
+
+src/net2pbc.pbc : src/net2pbc.pir
+	$(PARROT) -o src/net2pbc.pbc src/net2pbc.pir
+
+src/translator.pbc : src/translator.pir
+	$(PARROT) -o src/translator.pbc src/translator.pir
+
+src/method.pbc : src/method.pir
+	$(PARROT) -o src/method.pbc src/method.pir
+
+src/signature.pbc : src/signature.pir
+	$(PARROT) -o src/signature.pbc src/signature.pir
+
+src/typeinfo.pbc : src/typeinfo.pir
+	$(PARROT) -o src/typeinfo.pbc src/typeinfo.pir
+
+src/field.pbc : src/field.pir
+	$(PARROT) -o src/field.pbc src/field.pir
+
+src/exception.pbc : src/exception.pir
+	$(PARROT) -o src/exception.pbc src/exception.pir
+
+$(TRAN_PIR) :
+
+src/translation.rules : 
+
+build/translator.pl :
+
+src/build/SRM/Stack.pm :
+
+
+# TEST TARGETS
+# ############
+
+test : all
+	${perl} -It t/harness
+
+
+# CLEANUP TARGETS
+# ###############
+
+clean :
+	$(RM_F) $(PMCDIR)${slash}pmc_*.h $(PMCDIR)${slash}*_group.h $(PMCDIR)${slash}*$(LOAD_EXT) \
+	        $(PMCDIR)${slash}*.dump $(PMCDIR)${slash}*.c $(PMCDIR)${slash}*$(O) \
+	        $(PMCDIR)${slash}*.def $(PMCDIR)${slash}*.exp $(PMCDIR)${slash}*.pdb \
+	        $(PMCDIR)${slash}*.ilk $(PMCDIR)${slash}*.lib \
+			$(OPSDIR)${slash}*.c $(OPSDIR)${slash}*.h $(OPSDIR)${slash}*$(O) \
+			$(OPSDIR)${slash}*$(LOAD_EXT) $(OPSDIR)${slash}*.exp \
+			$(OPSDIR)${slash}*.pdb $(OPSDIR)${slash}*.ilk \
+			$(OPSDIR)${slash}*.lib \
+			*.pbc src${slash}*.pbc src${slash}it.pir
+
+
+realclean : clean
+	$(RM_F) Makefile config${slash}N2PConfig.pm
+

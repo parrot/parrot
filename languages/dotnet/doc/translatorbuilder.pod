@@ -1,0 +1,418 @@
+=head1 The Translator Builder
+
+The subsystem that translates the .NET instruction stream into a stream of 
+Parrot instructions is not written directly in PIR, but instead is generated
+from a rules file, as described in L<rulesfile.pod>, by the translator builder
+in conjunction with a particular stack to register mapping module. The idea
+behind this is to seperate the concerns of instruction mapping, walking the
+instruction stream and stack to register mapping. Writing this directly in
+PIR would be error prone and would make it more difficult to try out different
+stack to register mapping schemes or optimize the instruction translation
+code lookup.
+
+
+=head2 Generating Code That...Generates Code
+The translator builder is generating the code that will translate .NET CLI
+instructions into Parrot instructions. That code in turn is also generating
+code. The key to hacking on this part of the system is keeping a firm hold
+on what code is being talked about - the code of the instruction translator
+or the code that the instruction translator will generate.
+
+
+=head2 Usage
+The translator builder is invoked as follows:-
+
+  perl build/translator.pl src/translation.rules --srm Stack --ouptput src/it.pir
+
+Where translation.rules is the input translation rules file, Stack is the
+stack to register mapping algorithm to use and src/it.pir is the output
+PIR file to generate.
+
+
+=head2 Steps
+
+=head3 Rules File Parsing
+The first simple task carried out by the translator builder is parsing the
+translation rules file and placing its contents in a data structure that
+allows easy access to the data for each rule.
+
+=head3 Load A Stack To Register Mapper
+Next, a stack to register mapping module must be loaded, as specified in the
+command line arguments to the script. These all adhere to a standard interface
+as defined in SRM::Base, and indeed inhreit from SRM::Base. These modules are
+used to provide ways of turning stack based code into register based code and
+by being modules easily allow a number of different mapping algorithms to be
+benchmarked.
+
+=head3 Emit Setup PIR
+This step emits any PIR that sets things up for instruction translation. This
+includes giving the stack to register mapper a chance to emit any code that it
+would like to.
+
+=head3 Build Dispatch Code
+It is desirable to be able to dispatch to the translation code for a particular
+instruction efficiently. This step emits PIR code that does this. The lookup
+will happen in a number of steps O(log n) where n is the number of instructions
+we know how to translate.
+
+=head3 Build Rule Translation Code
+This step generates the code for each rule. With support from the register
+mapping module it substitures metavariables for named or numbered Parrot
+registers. The register mapping module also takes care of inserting labels.
+This section has a lot of hooks into the stack to register mapping module,
+some dependent on the type of instruction being translated. More below.
+
+=head3 Emit Trailing PIR
+Once translation has taken place, the stack to register mapping code may
+wish to perform some cleanup, so there is a hook for it to do so. Also,
+the end of the translate routine that returns the generated PIR needs to
+be generated.
+
+
+=head2 Data Flow To Determine Register Types
+The .NET CLR needs to keep track of the types of items on the stack. For
+example, the add instruction is expected to handle both integer addition
+and floating point addition and thus the types of the items on the stack
+that will be added together need to be known so the operation can be
+carried out correctly. The .NET specification lays down restrictions that
+ensure that this can be determined statically.
+
+Parrot works somewhat differently; registers and floating point numbers go
+in a different set of registers. This means that Parrot does not have the
+cost of determining what behaviour will be required at runtime. (This is
+a result of .NET being designed to assume a JIT will be present and Parrot
+trying to ensure that a high performance interpreter is possible).
+
+This means that the translator needs to use data flow analysis to determine
+the types of Parrot registers that should be used to hold the data that is
+being operated on. This is discussed in .NET terms as determining the stack
+type state. There are three cases to consider.
+
+=over 4
+=item * Loads - here type data is added to the stack type state.
+=item * Stores - here type data is removed from the stack type state.
+=item * Operations - here type data may be transformed, but based on existing
+data already in the stack type state rather than external type information.
+=back
+
+A type will be represented as a type describing hash, which is a Hash PMC with
+the following fields:
+
+=over4
+=item * type - corresponds to one of the constants in the .NET Specification
+Partition II Section 22.1.15.
+=item * byref - set if the byref flag is set on the type.
+=item * token - for some values of type a token is also expected; it is stored
+in this entry.
+=item * reg_type_short - The Parrot register type that the type is stored in,
+represented as a single letter I, N, S or P. This does not need to be set by
+any code that instantiates a new type describing hash, but will be available
+in existing ones. The routine "annotate_reg_type" is responsible for making
+this entry.
+=item * reg_type_long - The Parrot register type that the type is stored in,
+one of "int", "num", "string" or "pmc". This does not need to be set by any
+code that instantiates a new type describing hash, but will be available in
+existing ones. The routine "annotate_reg_type" is responsible for making this
+entry.
+=back
+
+The rules file provides the "typeinfo" entry for load op and call class rules
+that specifies PIR code that sets values in ${DTYPES} (for ops) or ${LOADTYPE}
+(for loads). It is up to the translator builder to ensure that ${DTYPES} is
+set up as an array of the correct size and that ${STYPES} is maintained. (Note
+that this becomes a little trickier with calling, when the number of entries
+to pop of ${STYPES} is unknown until runtime. Only a little tricker though.)
+
+
+=head2 Generating Instruction Translation Code
+This section of the document describes the steps that the translator
+generator takes when builder the translator for each instruction type.
+
+=head3 Operations (op class instructions)
+1. The destination types must be computed. ${DTYPES} will be an array of
+type describing hashes and used to determine register names in the SRM.
+
+2. The pre_op SRM method is called to generate translator code that will
+assign to the meta-variables ${STACK0} to ${STACKn), where n is the number
+of stack locations that the operations pops off to use, and also to the
+meta-variables ${DEST0} to ${DESTm}, where m is the number of values that
+are pushed onto the stack after the compuation. Both n and m are passed.
+
+2. If an "instruction" entry has been supplied in the rules file then code
+to emit this instruction will be inserted into the translator, with the
+meta-variables substituted as needed. If a PIR entry is supplied then it
+have meta-variables substituted and then be inserted directly into the
+translator.
+
+3. The post_op SRM method is called. This does any post-op tasks. For
+example, if a real stack is being maintained in user code and ${DESTm}
+were just temporary registers, then these values will need to be pushed
+onto the real stack. Note that n and m are passed, as in step 2.
+
+=head3 Loads (load class instructions)
+1. A load instruction must provide as part of its translation rule a
+chunk of code that assigns to the meta-variable ${LOADTYPE} a type
+describing hash for the type of data that the load is placing on the
+stack. This code will be emitted into the translator first.
+
+2. The translator builder looks at whether or not ${DEST0} is used,
+meaning that a register is needed to store the loaded value in, or
+${LOADREG} is used, meaning that the value being loaded is already in a
+register (e.g. in the case of a local or an argument). In the first case,
+let NEED_DEST = 1, in the second case let NEED_DEST = 0. We provide both
+of these mechanisms to give the SRM chance to optimize away useless data
+movement.
+
+3. The pre_load SRM method is called, passing the NEED_DEST flag and adding
+any PIR that is generated to the translator.
+
+4. Emit the translation code as supplied by the pir entry of the load rule.
+
+5. The post_load SRM method is called, passing the NEED_DEST flag and adding
+any PIR that is generated to the translaotr.
+
+=head3 Stores (store class instructions)
+1. The translator builder looks at whether or not ${STOREREG} is assigned to
+in the PIR that is produced. If this is the case let DEST_REG = 1 otherwise
+let DEST_REG = 0. In the case where ${STOREREG} is used, the destination for
+storage is a register and the SRM can produce more optimal code by knowing
+this. When DEST_REG = 0 then ${STACK0} is set to the name of a register
+holding the value being popped off the top of the stack to be stored.
+
+2. The pre_store SRM method is called, passing the DEST_REG flag and adding
+any PIR that is generated to the translator.
+
+3. Emit the translation code as supplied by the pir entry of the store rule.
+
+4. The post_store SRM method is called, passing the DEST_REG flag and adding
+any PIR that is generated to the translator.
+
+=head3 Branches (branch class instructions)
+1. The pre_branch SRM method is called to generate translator code that will
+assign to the meta-variables ${STACK0} to ${STACKn), where n is the number
+of stack locations that the branch instruction pops off to use. Note that for
+unconditional branches then n = 0. The value n is passed and any PIR that is
+generated is added to the translator.
+
+2. Emit the translation code as supplied by the pir entry of the branch rule.
+
+3. The post_branch SRM method is called, passing the pop count as was passed to
+pre_branch and adding any PIR that is generated to the translator.
+
+=head3 Calling (calling class instructions)
+1. A calling translation rule may supply code that will optionally compute a
+single destination type and store it in ${DTYPES}[0]. In the case where no
+result will be pushed onto the stack (for example, when returning or when a
+void method is invoked) then ${DTYPES}[0] should not be assigned to - not
+even a null value.
+
+2. The pre_call SRM method is called. As there is no way to know how many
+values may need to be popped off the stack until translation time, the stack
+meta-variables are unhelpful here. Therefore this method must place a list of
+registers, as many as are needed for the call or return, into the array that
+has been set up in ${PARAMS}. (Params may be seen as a mis-leading name when
+returning, but given Parrot uses continuation passing scheme a call and a
+return look very similar anyway, so it feels kinda natural from a Parrot point
+of view, if not a .NET one.)
+
+3. Emit the translation code as supplied by the pir entry of the call rule.
+
+4. The post_call SRM method is called.
+
+
+=head2 Stack to Register Mapping (SRM) Modules
+
+=head3 Having An Appropriate Relationship With Data Flow Analysis
+The SRM modules have a rather intimate relationship with the data flow anlysis
+that determines the types of items on the stack. As in real life, getting too
+intimate often makes for trouble. Therefore the following rules should always
+be obeyed.
+
+1. Look but don't touch. That is, look at the type hashes in the stack types
+array and get whatever data is needed from them. Never modify the data in the
+type hashes or remove a type hash from an array of type hashes. Doing so is
+like cheating on the translator builder, which inserts all the code that is
+needed to handle data flow analysis information.
+
+2. Don't look at things that aren't available. The three arrays of type
+hashes that will usually be available (unless it's stated they are not) are
+${STYPES} - the types of items on the stack, ${LTYPES} - the types of local
+variables and ${PTYPES} - the types of parameters passed to the method that
+the translator is translating. Availability of anything else should not be
+assumed unless the specification for the SRM method in question says otherwise.
+
+=head3 pre_translation()
+The PIR returned by this method will be placed near the start of the translator
+so that it runs before instruction translation begins. This will usually be setup
+code for the stack to register mapper.
+
+Only ${LTYPES} and ${PTYPES} will be available in this method.
+
+=head3 post_translation()
+The PIR returned by this method will be placed near the end of the translator so
+that is is run after the instruction translation has been completed. Parrot's GC
+probably eliminates the need to clean up any data structures, but this method is
+here just in case some tear-down needs to be performed.
+
+Only ${LTYPES} and ${PTYPES} will be available in this method.
+
+=head3 subs()
+A stack to register mapper may wish to provide a number of subroutines that are
+used in the mapping process. PIR returned by this method will be inserted outside
+of the instruction translation sub. Therefore, no meta-variables are available.
+
+=head3 gen_label()
+Label generation is given to the stack to register mapping module as one of its
+tasks. Why? Because the SRM is likely to need to know about basic blocks as
+this knowledge is needed by most stack to register mapping algorithms. In the
+case that the stack to register mapping algorithm doesn't know, a default
+implementation of this method is provided that emits a label for every 
+instruction whether or not it is named as a branch target.
+
+Meta-variables are available to this method, however the only one that is
+likely to be needed is ${PC}, the program counter.
+
+If a label is being generated then it must be of the form "LABn:" where n
+is the program counter held when that instruction is reached.
+
+=head3 pre_op(POP_COUNT, PUSH_COUNT)
+This will be called to generate code that precedes the code to translate an
+instruction that only operates on values on the top of the stack. This is
+always modelled as popping the registers off the stack, doing the compuation
+and pushing the results back on the top of the stack. The code generated by
+pre_op relates to the pop phase, but must produce register names for both the
+items being popped off the stack and the items being pushed onto the stack. 
+
+The count of values that are popped off the top of the stack is passed in as
+POP_COUNT. The count of values that are pushed onto the top of the stack is
+passed in as PUSH_COUNT.
+
+For a POP_COUNT value of n the PIR returned must assign the meta-variables STACK0
+to STACKn with the names of registers holding the popped values. Under some SRM
+schemes this may involve actually popping the data from a stack being maintained
+by the translated instruction stream. Under others it may involve just popping the
+name from a stack that the translator is maintaining as the values are already in
+registers in the generated code.
+
+For a PUSH_COUNT value of m the PIR returned must assign the meta-variables DEST0
+to DESTm with the names of registers that will hold the values being pushed. Under
+some SRM schemes these may correspond to the final destination of the values, e.g.
+if stack locations are being mapped onto registers. In other cases they may be
+temporary storage locations that will be pushed onto the stack in post_op.
+
+Note that register name compuations will likely involve the ${STYPES} and ${DTYPES}
+meta-variables, which contain the types of values currently on the stack and the
+computed types of the values to be pushed onto the stack computed using data flow
+analysis.
+
+=head3 post_op(POP_COUNT, PUSH_COUNT)
+This will be called to generate code that follows the code to translate an
+instruction that only operates on values on the top of the stack. This is
+always modelled as popping the registers off the stack, doing the compuation
+and pushing a single result back on the top of the stack if needed. The code
+generated by post_op relates to the push phase.
+
+The count of values that are popped off the top of the stack is passed in as
+POP_COUNT. The count of values that are pushed onto the top of the stack is
+passed in as PUSH_COUNT.
+
+There are no requirements on the PIR returend to set any meta-variables. In
+some SRM algorithms there may be nothing to do in post_op. In ones that are
+maintaining a real stack under the hood, however, this is a chance for values
+stored in temporary result registers to be pushed onto the real stack that is
+being maintained.
+
+Again, the ${DTYPES} meta-variable for the array of destination type hashes is
+available.
+
+=head3 pre_load(NEED_DEST)
+This is called to generate code that precedes the translation code for a load
+instruction. It comes after the type of the item being loaded has been stored
+as a type describing hash in ${LOADTYPE} so that this data is available.
+
+If NEED_DEST is set then the PIR that is returend must assign to ${DEST0} the
+name of a register that will be used to store the loaded value. This may be a
+temporary that will be pushed onto the stack in post_load or it may be a
+register that is mapped to a particular stack location, depending on the SRM
+algorithm.
+
+If NEED_DEST is not set then there are no need to assign to any meta-variables.
+
+=head3 post_load(NEED_DEST)
+This is called to generate code that follows the the translation code for a load
+instruction.
+
+If NEED_DEST is set then the value being loaded will now be in the register named
+in ${DEST0}. If NEED_DEST is not set then the register holding the value being
+loaded is stored in ${LOADREG}.
+
+There are no requirements on this method to set any meta-variables. As in
+pre_load, ${LOADTYPE} will be available.
+
+=head3 pre_store(DEST_REG)
+This is called to generate code that precedes the translation code for a store
+instruction.
+
+If DEST_REG is set then this means that the destination of the store will be a
+register, though at this time the name of the register is *not* available. The
+purpose of the translation code is to produce the name of that register, but not
+to copy the value to it. This will need to be done in post_store.
+
+If DEST_REG is not set this means that the destination of the store will not be
+a register. This means that the translation code will need to do something more
+advanced and will be storing the value itself. Therefore, it needs access to the
+value, meaning that this method must assign the name of a register holding the
+value to ${STACK0} and cause the translator to emit any code needed to place the
+value in that register.
+
+=head3 post_store(DEST_REG)
+This is called to generate code that follows the translation code for a store
+instruction.
+
+If DEST_REG is set then this means that the destination of the store will be the
+register named in ${STOREREG}. The translation code does not copy the value to
+this location, so this SRM method must return PIR that emits translated code that
+does this copy operation. The reason behind this is to provide opportunities for
+optimizing away useless operations. Taking advantage of these is down to the SRM
+module.
+
+If DEST_REG is not set this means that the destination of the store was not a
+register. Furthermore, the store will now have been completed. In this case, this
+method may have little or nothing to do.
+
+=head3 pre_branch(POP_COUNT)
+This is called to generate code that precedes the translation code for a branch
+instruction. The branch operation may involve values stored on the top of the
+stack. The count of values that are popped off the top of the stack by the branch
+is passed in as POP_COUNT.
+
+For a POP_COUNT value of n the PIR returned must assign the meta-variables STACK0
+to STACKn with the names of registers holding the popped values. Under some SRM
+schemes this may involve actually popping the data from a stack being maintained
+by the translated instruction stream. Under others it may involve just popping the
+name from a stack that the translator is maintaining as the values are already in
+registers in the generated code.
+
+=head3 post_branch(POP_COUNT)
+This is called to generate code that follows the translation code for a branch
+instruction. As with pre_branch, the number of values that the branch instruction
+takes from the stack top is available in POP_COUNT.
+
+This method has no requirements on setting meta-variables.
+
+=head3 pre_call
+This is called to generate code that precedes the translation code for a
+calling related instruction (either a method call or a return). It needs to
+put names of registers that contain the parameters to pass or return into
+the ${PARAMS} array, first parameter as the first element, etc. It will be
+able to achieve this by looking at the argument to the opcode, which will
+refer to the method signature.
+
+In addition, if ${DTYPES} has an element, the destination register (for the
+result of the call) must be set in ${DEST0}.
+
+=head3 post_call
+This is called to generate code that follows the translation code for a
+calling instruction. This could be used, for example, to put a returned
+value back onto the stack.
+

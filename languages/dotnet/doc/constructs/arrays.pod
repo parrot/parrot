@@ -1,0 +1,46 @@
+=head1 Translating Arrays
+
+This document discusses .NET arrays and how they can be supported in Parrot.
+
+
+=head2 The .NET Model
+At the runtime level only one-dimensional arrays of fixed size, a single type
+and with first element at index zero are supported. Anything beyond this is
+supported through the System.Array class.
+
+
+=head2 The Parrot Model
+Arrays are implemented using PMCs. PMCs have keyed v-table operations (that
+is, v-table functions that as one of their parameters take a key). For arrays
+the key is the array index and is expected to be an integer. A number of PMCs
+exist ready to use in the Parrot source tree, however languages are free to
+provide their own. The v-table mechanism to access elements means that the
+interface to the array is always the same, so translated .NET code will be
+able to handle being passed a Perl array even though their behaviours are
+very different (Perl arrays are resizable, for example, where as .NET arrays
+are of fixed length).
+
+
+=head2 Translating Array Instructions
+
+Arrays are created using a "newarr" instruction which takes the type that the
+array will contain. As the notion of .NET value types isn't really handled so
+gracefully in the translation, there is a need to special-case them, mapping
+any type of array that stores integers to be a FixedIntegerArray and any array
+that stores floating point numbers to be a FixedFloatArray. All other types
+get stored in a FixedPMCArray.
+
+Array loads and stores can be translated trivially to the PIR keyed syntax.
+
+  $I1 = $P1[$I0] # load
+  $P1[$I0] = $I1 # store
+
+There $P1 is the array PMC, $I0 is the array index and $I1 is the register the
+value is loaded in to or the value to be stored.
+
+The only remaining array instruction is ldlen, which loads the element count of
+the array onto the stack. This maps to the elements v-table call in Parrot.
+
+  $I0 = elements $P0
+
+Where $P0 is the array PMC and $I0 will hold the number of elements.

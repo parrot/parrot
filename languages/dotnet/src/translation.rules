@@ -1,0 +1,3489 @@
+## UNCHECKED ARITHMETIC AND LOGICAL OPERATIONS
+
+[add]
+code = 58
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK0} + ${STACK1}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[sub]
+code = 59
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1} - ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[mul]
+code = 5A
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1} * ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[div]
+code = 5B
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1} / ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[div.un]
+code = 5C
+class = op
+pop = 2
+push = 1
+instruction = net_div_un ${DEST0}, ${STACK1}, ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[rem]
+code = 5D
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = cmod ${STACK1}, ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[rem.un]
+code = 5E
+class = op
+pop = 2
+push = 1
+instruction = net_rem_un ${DEST0}, ${STACK1}, ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[neg]
+code = 65
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = neg ${STACK0}
+typeinfo = <<PIR
+# Output type is same as input type.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 1
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[and]
+code = 5F
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = band ${STACK1}, ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[or]
+code = 60
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = bor ${STACK1}, ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[xor]
+code = 61
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = bxor ${STACK1}, ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[shl]
+code = 62
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1} << ${STACK0}
+typeinfo = <<PIR
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[shr]
+code = 63
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = lsr ${STACK1}, ${STACK0}
+typeinfo = <<PIR
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[shr.un]
+code = 64
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = shr ${STACK1}, ${STACK0}
+typeinfo = <<PIR
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[not]
+code = 66
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = bnot ${STACK0}
+typeinfo = <<PIR
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 1
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+
+## CHECKED ARITHMETIC OPS
+[add.ovf]
+code = D6
+class = op
+pop = 2
+push = 1
+instruction = net_add_ovf ${DEST0}, ${STACK0}, ${STACK1}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[add.ovf.un]
+code = D7
+class = op
+pop = 2
+push = 1
+instruction = net_add_ovf_un ${DEST0}, ${STACK0}, ${STACK1}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[sub.ovf]
+code = DA
+class = op
+pop = 2
+push = 1
+instruction = net_sub_ovf ${DEST0}, ${STACK1}, ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[sub.ovf.un]
+code = DB
+class = op
+pop = 2
+push = 1
+instruction = net_sub_ovf_un ${DEST0}, ${STACK1}, ${STACK0}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[mul.ovf]
+code = D8
+class = op
+pop = 2
+push = 1
+instruction = net_mul_ovf ${DEST0}, ${STACK0}, ${STACK1}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+[mul.ovf.un]
+code = D9
+class = op
+pop = 2
+push = 1
+instruction = net_mul_ovf_un ${DEST0}, ${STACK0}, ${STACK1}
+typeinfo = typeinfo_bin_num_op(${STYPES}, ${DTYPES})
+
+
+## UNCHECKED CONVERSION OPS
+
+[conv.i1]
+code = 67
+class = op
+pop = 1
+push = 1
+instruction = net_conv_i1 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I1
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.i2]
+code = 68
+class = op
+pop = 1
+push = 1
+instruction = net_conv_i2 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I2
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.i4]
+code = 69
+class = op
+pop = 1
+push = 1
+instruction = net_conv_i4 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.i8]
+code = 6A
+class = op
+pop = 1
+push = 1
+instruction = net_conv_i8 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.r4]
+code = 6B
+class = op
+pop = 1
+push = 1
+instruction = net_conv_r4 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_R4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.r8]
+code = 6C
+class = op
+pop = 1
+push = 1
+instruction = net_conv_r8 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_R8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.u1]
+code = D2
+class = op
+pop = 1
+push = 1
+instruction = net_conv_u1 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U1
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.u2]
+code = D1
+class = op
+pop = 1
+push = 1
+instruction = net_conv_u2 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U2
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.u4]
+code = 6D
+class = op
+pop = 1
+push = 1
+instruction = net_conv_u4 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.u8]
+code = 6E
+class = op
+pop = 1
+push = 1
+instruction = net_conv_u8 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.i]
+code = D3
+class = op
+pop = 1
+push = 1
+instruction = net_conv_i ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+# Ensure we're not trying to convert a managed pointer.
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${ITEMP0} = ${PTEMP0}["type"]
+if ${ITEMP0} != ELEMENT_TYPE_PTR goto conv_i_OK
+${PTEMP0} = new .Exception
+${PTEMP0}["_message"] = "Code does unverifiable pointer operation"
+throw ${PTEMP0}
+conv_i_OK:
+
+# Set type.
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.u]
+code = E0
+class = op
+pop = 1
+push = 1
+instruction = net_conv_u ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+# Ensure we're not trying to convert a managed pointer.
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${ITEMP0} = ${PTEMP0}["type"]
+if ${ITEMP0} != ELEMENT_TYPE_PTR goto conv_u_OK
+${PTEMP0} = new .Exception
+${PTEMP0}["_message"] = "Code does unverifiable pointer operation"
+throw ${PTEMP0}
+conv_u_OK:
+
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.r.un]
+code = 76
+class = op
+pop = 1
+push = 1
+instruction = net_conv_r_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_R8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+
+## CHECKED CONVERSION OPS
+
+[conv.ovf.i1]
+code = B3
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i1 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I1
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i2]
+code = B5
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i2 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I2
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i4]
+code = B7
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i4 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i8]
+code = B9
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i8 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u1]
+code = B4
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u1 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U1
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u2]
+code = B6
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u2 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U2
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u4]
+code = B8
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u4 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u8]
+code = BA
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u8 ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i]
+code = D4
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u]
+code = D5
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i1.un]
+code = 82
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i1_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I1
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i2.un]
+code = 83
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i2_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I2
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i4.un]
+code = 84
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i4_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i8.un]
+code = 85
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i8_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u1.un]
+code = 86
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u1_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U1
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u2.un]
+code = 87
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u2_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U2
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u4.un]
+code = 88
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u4_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u8.un]
+code = 89
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u8_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.i.un]
+code = 8A
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_i_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[conv.ovf.u.un]
+code = 8B
+class = op
+pop = 1
+push = 1
+instruction = net_conv_ovf_u_un ${DEST0}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+
+## VARIOUS RANDOM OPERATIONS
+
+[nop]
+code = 00
+class = op
+instruction = # Nothing to do
+typeinfo = # Nothing to do
+
+[break]
+code = 01
+class = op
+instruction = debug_break
+typeinfo = # Nothing to do
+
+[dup]
+code = 25
+class = op
+pop = 1
+push = 2
+instruction = <<INS
+set ${DEST0}, ${STACK0}
+set ${DEST1}, ${STACK0}
+INS
+typeinfo = <<PIR
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 1
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[0] = ${PTEMP0}
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[1] = ${PTEMP0}
+PIR
+
+[pop]
+code = 26
+class = op
+pop = 1
+instruction =  # Nothing to do
+typeinfo =  # Nothing to do
+
+[arglist]
+code = FE 00
+class = op
+push = 1
+instruction = ${DEST0} = varargs
+typeinfo = <<PIR
+${PTEMP0} = new .Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_PTR
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[volatile]
+# XXX TO DO: This doesn't honour volatile at all! Parrot can't support it yet.
+code = FE 13
+class = op
+instruction = # XXX VOLATILE NOT IMPLEMENTED
+typeinfo = # None
+
+
+## BRANCHES
+
+[br.s]
+code = 2B
+class = branch
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[br]
+code = 38
+class = branch
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[brfalse.s]
+code = 2C
+class = branch
+arguments = int8
+pop = 1
+pir = <<PIR
+# Determine register type.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 1
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${STEMP0} = ${PTEMP0}["reg_type_short"]
+if ${STEMP0} == "S" goto brfalse_s_ISREF
+if ${STEMP0} == "P" goto brfalse_s_ISREF
+
+# Int or num = compare to zero.
+${INS} = concat "if "
+${INS} = concat ${STACK0}
+${INS} = concat " == 0 goto LAB"
+goto brfalse_s_ISEND
+
+# String or object = compare to null
+brfalse_s_ISREF:
+${INS} = concat "if null "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+
+# Finally add jump location.
+brfalse_s_ISEND:
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[brfalse]
+code = 39
+class = branch
+arguments = int32
+pop = 1
+pir = <<PIR
+# Determine register type.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 1
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${STEMP0} = ${PTEMP0}["reg_type_short"]
+if ${STEMP0} == "S" goto brfalse_ISREF
+if ${STEMP0} == "P" goto brfalse_ISREF
+
+# Int or num = compare to zero.
+${INS} = concat "if "
+${INS} = concat ${STACK0}
+${INS} = concat " == 0 goto LAB"
+goto brfalse_ISEND
+
+# String or object = compare to null
+brfalse_ISREF:
+${INS} = concat "if null "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+
+# Finally add jump location.
+brfalse_ISEND:
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[brtrue.s]
+code = 2D
+class = branch
+arguments = int8
+pop = 1
+pir = <<PIR
+# Determine register type.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 1
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${STEMP0} = ${PTEMP0}["reg_type_short"]
+if ${STEMP0} == "S" goto brtrue_s_ISREF
+if ${STEMP0} == "P" goto brtrue_s_ISREF
+
+# Int or num = compare to zero.
+${INS} = concat "if "
+${INS} = concat ${STACK0}
+${INS} = concat " != 0 goto LAB"
+goto brtrue_s_ISEND
+
+# String or object = compare to null
+brtrue_s_ISREF:
+${INS} = concat "unless null "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+
+# Finally add jump location.
+brtrue_s_ISEND:
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[brtrue]
+code = 3A
+class = branch
+arguments = int32
+pop = 1
+pir = <<PIR
+# Determine register type.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 1
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${STEMP0} = ${PTEMP0}["reg_type_short"]
+if ${STEMP0} == "S" goto brtrue_ISREF
+if ${STEMP0} == "P" goto brtrue_ISREF
+
+# Int or num = compare to zero.
+${INS} = concat "if "
+${INS} = concat ${STACK0}
+${INS} = concat " != 0 goto LAB"
+goto brtrue_ISEND
+
+# String or object = compare to null
+brtrue_ISREF:
+${INS} = concat "unless null "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+
+# Finally add jump location.
+brtrue_ISEND:
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[beq.s]
+code = 2E
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " == "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[beq]
+code = 3B
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " == "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bge.s]
+code = 2F
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " >= "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bge]
+code = 3C
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " >= "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bge.un.s]
+code = 34
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_bge_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bge.un]
+code = 41
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_bge_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bgt.s]
+code = 30
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " > "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bgt]
+code = 3D
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " > "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bgt.un.s]
+code = 35
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_bgt_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bgt.un]
+code = 42
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_bgt_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[ble.s]
+code = 31
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " <= "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[ble]
+code = 3E
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " <= "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[ble.un.s]
+code = 36
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_ble_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[ble.un]
+code = 43
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_ble_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[blt.s]
+code = 32
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " < "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[blt]
+code = 3F
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "if "
+${INS} = concat ${STACK1}
+${INS} = concat " < "
+${INS} = concat ${STACK0}
+${INS} = concat " goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[blt.un.s]
+code = 37
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_blt_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[blt.un]
+code = 44
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_blt_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bne.un.s]
+code = 33
+class = branch
+pop = 2
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_bne_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[bne.un]
+code = 40
+class = branch
+pop = 2
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "net_bne_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat ", LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[switch]
+code = 45
+class = branch
+pop = 1
+arguments = jumptable
+pir = <<PIR
+# Loop through arguments, reading each one.
+${ITEMP0} = 0
+${ITEMP2} = elements ${ARG0}
+switch_LOOP:
+if ${ITEMP0} == ${ITEMP2} goto switch_LOOP_END
+${ITEMP1} = ${ARG0}[${ITEMP0}]
+
+# Build if statement.
+${INS} = concat "if "
+${INS} = concat ${STACK0}
+${INS} = concat " == "
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat " goto LAB"
+${ITEMP1} += ${NEXTPC}
+${STEMP0} = ${ITEMP1}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+
+# Increment and goto next.
+inc ${ITEMP0}
+goto switch_LOOP
+switch_LOOP_END:
+PIR
+
+
+## COMPARISON OPS
+
+[ceq]
+code = FE 01
+class = op
+pop = 2
+push = 1
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${INS} = concat ${STACK0}
+${INS} = concat " == "
+${INS} = concat ${STACK1}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[cgt]
+code = FE 02
+class = op
+pop = 2
+push = 1
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${INS} = concat ${STACK1}
+${INS} = concat " > "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[cgt.un]
+code = FE 03
+class = op
+pop = 2
+push = 1
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = net_cgt_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[clt]
+code = FE 04
+class = op
+pop = 2
+push = 1
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${INS} = concat ${STACK1}
+${INS} = concat " < "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[clt.un]
+code = FE 05
+class = op
+pop = 2
+push = 1
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = net_clt_un "
+${INS} = concat ${STACK1}
+${INS} = concat ", "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+
+## CALLING RELATED
+
+[ret]
+code = 2A
+class = calling
+pir = <<PIR
+${INS} = concat "popmark 0\n"
+${INS} = concat ".return("
+${ITEMP0} = elements ${PARAMS}
+if ${ITEMP0} == 0 goto ret_NO_RETURN
+${STEMP0} = ${PARAMS}[0]
+${INS} = concat ${STEMP0}
+ret_NO_RETURN:
+${INS} = concat ")\n"
+PIR
+typeinfo = <<PIR
+${ITEMP0} = ${RETTYPE}["type"]
+if ${ITEMP0} == ELEMENT_TYPE_VOID goto ret_NO_RETURN_TS
+${DTYPES}[0] = ${RETTYPE}
+ret_NO_RETURN_TS:
+PIR
+
+[call]
+code = 28
+class = calling
+arguments = tmethod
+pir = <<PIR
+# Get method into.
+(${PTEMP0}, ${STEMP0}, ${PTEMP1}, ${PTEMP2}) = method_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Build PIR for MMD boxing and update params with respect to this.
+${STEMP1} = method_call_mmd_box(${ASSEMBLY}, ${PTEMP2}, ${PARAMS})
+${INS} = concat ${STEMP1}
+
+# Need to get class the method is in to generate name to look it up.
+${INS} = concat "$P1000000 = find_global \""
+${INS} = concat ${STEMP0}
+${INS} = concat "\", \""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\"\n"
+
+# If we have a return value, spit out an assignment to it.
+${ITEMP0} = ${PTEMP1}["type"]
+if ${ITEMP0} == ELEMENT_TYPE_VOID goto call_NO_RETURN
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+call_NO_RETURN:
+
+# Emit method call.
+${INS} = concat "$P1000000("
+
+# Emit parameters.
+${ITEMP0} = elements ${PARAMS}
+if ${ITEMP0} == 0 goto call_END
+${STEMP0} = ${PARAMS}[0]
+${INS} = concat ${STEMP0}
+if ${ITEMP0} == 1 goto call_END
+${ITEMP1} = 0
+call_PLOOP:
+inc ${ITEMP1}
+if ${ITEMP1} == ${ITEMP0} goto call_END
+${STEMP0} = ${PARAMS}[${ITEMP1}]
+${INS} = concat ", "
+${INS} = concat ${STEMP0}
+goto call_PLOOP
+
+# Emit end of call.
+call_END:
+${INS} = concat ")\n"
+PIR
+typeinfo = <<PIR
+# Get method into.
+(${PTEMP0}, ${STEMP0}, ${PTEMP2}, ${PTEMP3}) = method_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# We're interested in rettype here as that is the destination type.
+${ITEMP0} = ${PTEMP2}["type"]
+if ${ITEMP0} == ELEMENT_TYPE_VOID goto call_NO_RETURN_TS
+${DTYPES}[0] = ${PTEMP2}
+call_NO_RETURN_TS:
+PIR
+
+[callvirt]
+code = 6F
+class = calling
+arguments = tmethod
+pir = <<PIR
+# Get method into.
+(${PTEMP0}, ${STEMP0}, ${PTEMP1}, ${PTEMP2}) = method_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Build PIR for MMD boxing and update params with respect to this.
+${STEMP1} = method_call_mmd_box(${ASSEMBLY}, ${PTEMP2}, ${PARAMS})
+${INS} = concat ${STEMP1}
+
+# If we have a return value, spit out an assignment to it.
+${ITEMP0} = ${PTEMP1}["type"]
+if ${ITEMP0} == ELEMENT_TYPE_VOID goto callvirt_NO_RETURN
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+callvirt_NO_RETURN:
+
+# Emit method callvirt.
+${STEMP0} = ${PARAMS}[0]
+${INS} = concat ${STEMP0}
+${INS} = concat ".\""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\"("
+
+# Emit parameters. Note first one was used for invocant.
+${ITEMP0} = elements ${PARAMS}
+if ${ITEMP0} == 1 goto callvirt_END
+${STEMP0} = ${PARAMS}[1]
+${INS} = concat ${STEMP0}
+if ${ITEMP0} == 2 goto callvirt_END
+${ITEMP1} = 1
+callvirt_PLOOP:
+inc ${ITEMP1}
+if ${ITEMP1} == ${ITEMP0} goto callvirt_END
+${STEMP0} = ${PARAMS}[${ITEMP1}]
+${INS} = concat ", "
+${INS} = concat ${STEMP0}
+goto callvirt_PLOOP
+
+# Emit end of callvirt.
+callvirt_END:
+${INS} = concat ")\n"
+PIR
+typeinfo = <<PIR
+# Get method into.
+(${PTEMP0}, ${STEMP0}, ${PTEMP1}, ${PTEMP2}) = method_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# We're interested in rettype here as that is the destination type.
+${ITEMP0} = ${PTEMP1}["type"]
+if ${ITEMP0} == ELEMENT_TYPE_VOID goto callvirt_NO_RETURN_TS
+${DTYPES}[0] = ${PTEMP1}
+callvirt_NO_RETURN_TS:
+PIR
+
+
+## FIELDS
+
+[ldfld]
+code = 7B
+class = op
+pop = 1
+push = 1
+arguments = tfield
+pir = <<PIR
+# Get field info.
+(${PTEMP0}, ${ITEMP0}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Build attribute access.
+${INS} = concat "$P1000000 = new "
+${PTEMP1} = ${DTYPES}[0]
+${STEMP0} = ${PTEMP1}["reg_type_pmc"]
+${INS} = concat ${STEMP0}
+${INS} = concat "\n$P1000000 = getattribute "
+${INS} = concat ${STACK0}
+${INS} = concat ", \""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\"\n"
+${INS} = concat ${DEST0}
+${INS} = concat " = $P1000000\n"
+PIR
+typeinfo = <<PIR
+# Get field info.
+(${PTEMP0}, ${ITEMP0}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Get signature.
+${PTEMP1} = new "DotNetSignature"
+${STEMP0} = ${ASSEMBLY}.get_blob(${ITEMP0})
+${PTEMP1} = ${STEMP0}
+
+# Parse signature, annotate it with register types and store it.
+${PTEMP2} = get_signature_Field(${PTEMP1})
+annotate_reg_type(${PTEMP2})
+${DTYPES}[0] = ${PTEMP2}
+PIR
+
+[ldsfld]
+code = 7E
+class = op
+push = 1
+arguments = tfield
+pir = <<PIR
+# Get field info.
+(${PTEMP0}, ${ITEMP0}, ${STEMP1}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Build attribute access.
+${INS} = concat "$P1000000 = new "
+${PTEMP1} = ${DTYPES}[0]
+${STEMP0} = ${PTEMP1}["reg_type_pmc"]
+${INS} = concat ${STEMP0}
+${INS} = concat "\n$P1000000 = find_global \""
+${INS} = concat ${STEMP1}
+${INS} = concat "\", \""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\"\n"
+${INS} = concat ${DEST0}
+${INS} = concat " = $P1000000\n"
+PIR
+typeinfo = <<PIR
+# Get field info.
+(${PTEMP0}, ${ITEMP0}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Get signature.
+${PTEMP1} = new "DotNetSignature"
+${STEMP0} = ${ASSEMBLY}.get_blob(${ITEMP0})
+${PTEMP1} = ${STEMP0}
+
+# Parse signature, annotate it with register types and store it.
+${PTEMP2} = get_signature_Field(${PTEMP1})
+${ITEMP0} = ${PTEMP2}["type"]
+annotate_reg_type(${PTEMP2})
+${DTYPES}[0] = ${PTEMP2}
+PIR
+
+[stfld]
+code = 7D
+class = op
+pop = 2
+arguments = tfield
+pir = <<PIR
+# Get field info.
+(${PTEMP0}, ${ITEMP0}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Build attribute store.
+${INS} = concat "$P1000000 = new "
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP1} = ${STYPES}[${ITEMP0}]
+${STEMP0} = ${PTEMP1}["reg_type_pmc"]
+${INS} = concat ${STEMP0}
+${INS} = concat "\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\nsetattribute "
+${INS} = concat ${STACK1}
+${INS} = concat ", \""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\", $P1000000\n"
+PIR
+typeinfo = # Nothing to do
+
+[stsfld]
+code = 80
+class = store
+pop = 1
+arguments = tfield
+pir = <<PIR
+# Get field info.
+(${PTEMP0}, ${ITEMP0}, ${STEMP1}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Build static field store.
+${INS} = concat "$P1000000 = new "
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP1} = ${STYPES}[${ITEMP0}]
+${STEMP0} = ${PTEMP1}["reg_type_pmc"]
+${INS} = concat ${STEMP0}
+${INS} = concat "\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\nstore_global \""
+${INS} = concat ${STEMP1}
+${INS} = concat "\", \""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\", $P1000000\n"
+PIR
+
+
+## OBJECTS
+
+[newobj]
+code = 73
+class = calling
+arguments = tmethod
+pir = <<PIR
+# Get method into.
+(${PTEMP0}, ${STEMP0}, ${PTEMP1}, ${PTEMP2}) = method_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Build PIR for MMD boxing and update params with respect to this.
+${STEMP1} = method_call_mmd_box(${ASSEMBLY}, ${PTEMP2}, ${PARAMS})
+${INS} = concat ${STEMP1}
+
+# Emit new instruction.
+${INS} = concat ${DEST0}
+${INS} = concat " = new \""
+${INS} = concat ${STEMP0}
+${INS} = concat "\"\n"
+
+# Now emit instructions to find constructor.
+${INS} = concat "$P1000000 = find_global \""
+${INS} = concat ${STEMP0}
+${INS} = concat "\", \""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\"\n"
+
+# Emit constructor call.
+${INS} = concat "$P1000000("
+
+# First parameter is the newly constructed object.
+${INS} = concat ${DEST0}
+
+# Emit parameters, skipping first one.
+${ITEMP0} = elements ${PARAMS}
+${ITEMP1} = 0
+newobj_PLOOP:
+if ${ITEMP1} == ${ITEMP0} goto newobj_END
+${STEMP0} = ${PARAMS}[${ITEMP1}]
+${INS} = concat ", "
+${INS} = concat ${STEMP0}
+inc ${ITEMP1}
+goto newobj_PLOOP
+
+# Emit end of call.
+newobj_END:
+${INS} = concat ")\n"
+PIR
+typeinfo = <<PIR
+# This is an object type.
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_OBJECT
+${PTEMP0}["byref"] = 0
+
+# Get method into.
+(${PTEMP1}, ${STEMP0}, ${PTEMP3}, ${PTEMP4}, ${PTEMP2}) = method_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Annotate it.
+${PTEMP0}["token"] = ${PTEMP2}
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldnull]
+code = 14
+class = load
+push = 1
+instruction = ${DEST0} = null
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_OBJECT
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[castclass]
+code = 74
+class = op
+pop = 1
+push = 1
+arguments = ttype
+pir = <<PIR
+# Look up class.
+${ITEMP0} = band ${ARG0}, 0x02000000
+if ${ITEMP0} goto castclass_INTERNAL_TYPE
+
+# External type. Get typeref token.
+${ITEMP0} = band ${ARG0}, 0x00FFFFFF
+dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
+${PTEMP2} = ${ASSEMBLY}.get_typerefs()
+${PTEMP3} = ${PTEMP2}[${ITEMP0}]
+${STEMP1} = ${PTEMP3}.get_namespace()
+goto castclass_DONE_TYPE
+
+# Internal type. Get class token.
+castclass_INTERNAL_TYPE:
+${ITEMP0} = band ${ARG0}, 0x01FFFFFF
+${ITEMP0} -= 2
+${PTEMP2} = ${ASSEMBLY}.get_classes()
+${PTEMP3} = ${PTEMP2}[${ITEMP0}]
+${STEMP1} = ${PTEMP3}.get_fullname()
+castclass_DONE_TYPE:
+
+# Generate two new labels.
+inc ${LABELNUM}
+${ITEMP0} = ${LABELNUM}
+
+# Emit check for if input is null; if it is, we jump to copy.
+${INS} = concat "if null "
+${INS} = concat ${STACK0}
+${INS} = concat " goto IILAB"
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+
+# Emit "isa" check and jump to copy if it's OK.
+${INS} = concat "\n$I1000000 = isa "
+${INS} = concat ${STACK0}
+${INS} = concat ", \""
+${INS} = concat ${STEMP1}
+${INS} = concat "\"\nif $I1000000 goto IILAB"
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+
+# Emit exception throwing code.
+${INS} = concat <<"CCPIR"
+$P1000000 = new .Exception
+$P1000000["_message"] = "InvalidCastException"
+throw $P1000000
+CCPIR
+
+# Emit successful cast instruction - output just becomes the input.
+${INS} = concat "IILAB"
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat ": "
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[isinst]
+code = 75
+class = op
+pop = 1
+push = 1
+arguments = ttype
+pir = <<PIR
+# Look up class.
+${ITEMP0} = band ${ARG0}, 0x02000000
+if ${ITEMP0} goto isinst_INTERNAL_TYPE
+
+# External type. Get typeref token.
+${ITEMP0} = band ${ARG0}, 0x00FFFFFF
+dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
+${PTEMP2} = ${ASSEMBLY}.get_typerefs()
+${PTEMP3} = ${PTEMP2}[${ITEMP0}]
+${STEMP1} = ${PTEMP3}.get_namespace()
+goto isinst_DONE_TYPE
+
+# Internal type. Get class token.
+isinst_INTERNAL_TYPE:
+${ITEMP0} = band ${ARG0}, 0x01FFFFFF
+${ITEMP0} -= 2
+${PTEMP2} = ${ASSEMBLY}.get_classes()
+${PTEMP3} = ${PTEMP2}[${ITEMP0}]
+${STEMP1} = ${PTEMP3}.get_fullname()
+isinst_DONE_TYPE:
+
+# Generate two new labels.
+inc ${LABELNUM}
+${ITEMP0} = ${LABELNUM}
+inc ${LABELNUM}
+${ITEMP1} = ${LABELNUM}
+
+# Emit check for if input is null; if it is, we jump to putting null on the 
+# stack.
+${INS} = concat "if null "
+${INS} = concat ${STACK0}
+${INS} = concat " goto IILAB"
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+
+# Emit "isa" check.
+${INS} = concat "\n$I1000000 = isa "
+${INS} = concat ${STACK0}
+${INS} = concat ", \""
+${INS} = concat ${STEMP1}
+${INS} = concat "\"\nunless $I1000000 goto IILAB"
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+
+# Emit successful check instruction - output just becomes the input - then
+# a jump to after the check.
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${INS} = concat ${STACK0}
+${INS} = concat "\ngoto IILAB"
+${STEMP0} = ${ITEMP1}
+${INS} = concat ${STEMP0}
+
+# Emit null or not right type case, then end label.
+${INS} = concat "\nIILAB"
+${STEMP0} = ${ITEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat ": "
+${INS} = concat ${DEST0}
+${INS} = concat " = null\nIILAB"
+${STEMP0} = ${ITEMP1}
+${INS} = concat ${STEMP0}
+${INS} = concat ":\n"
+PIR
+typeinfo = <<PIR
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+
+## VALUE TYPES
+
+[initobj]
+code = FE 15
+class = op
+pop = 1
+arguments = ttype
+instruction = <<INS
+$P1000000 = ${STACK0}.load_pmc()
+$P1000000.__init()
+INS
+typeinfo = # None
+
+[copyobj]
+code = 70
+class = op
+pop = 2
+arguments = ttype
+instruction = <<INS
+$P1000000 = ${STACK0}.load_pmc()
+$P1000000 = clone $P1000000
+${STACK1}.store_pmc($P1000000)
+INS
+typeinfo = # None
+
+[ldobj]
+code = 71
+class = op
+pop = 1
+push = 1
+arguments = ttype
+instruction = <<INS
+$P1000000 = ${STACK0}.load_pmc()
+${DEST0} = clone $P1000000
+INS
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_VALUETYPE
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[stobj]
+code = 81
+class = op
+pop = 2
+arguments = ttype
+pir = <<PIR
+# Emit approprite clone/store code.
+# XXX Actually need to pay attention to ttype, probably...
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${STEMP0} = ${PTEMP0}["reg_type_short"]
+if ${STEMP0} == "P" goto stobj_PMC
+if ${STEMP0} == "I" goto stobj_INT
+if ${STEMP0} == "N" goto stobj_NUM
+
+stobj_PMC:
+${INS} = concat "$P1000000 = clone "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto stobj_DONE
+
+stobj_INT:
+${INS} = concat "$P1000000 = new .Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto stobj_DONE
+
+stobj_NUM:
+${INS} = concat "$P1000000 = new .Float\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto stobj_DONE
+
+stobj_DONE:
+${INS} = concat ${STACK1}
+${INS} = concat ".store_pmc($P1000000)\n"
+PIR
+typeinfo = # None
+
+[box]
+code = 8C
+class = op
+pop = 1
+push = 1
+arguments = ttype
+pir = <<PIR
+# Get type.
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${ITEMP0} = ${PTEMP0}["type"]
+
+# If it's just a normal value type, clone and set boxed property.
+if ${ITEMP0} != ELEMENT_TYPE_VALUETYPE goto box_NOT_VAL_TYPE
+${INS} = concat ${DEST0}
+${INS} = concat " = clone "
+${INS} = concat ${STACK0}
+${INS} = concat "\n$P1000000 = new .Integer\n$P1000000 = 1\nsetprop "
+${INS} = concat ${DEST0}
+${INS} = concat ", \"boxed\", $P1000000\n"
+goto box_DONE
+
+# Not a value type; need to work out name of box to use.
+box_NOT_VAL_TYPE:
+if ${ITEMP0} == ELEMENT_TYPE_I4 goto box_I4
+if ${ITEMP0} == ELEMENT_TYPE_U4 goto box_U4
+if ${ITEMP0} == ELEMENT_TYPE_I2 goto box_I2
+if ${ITEMP0} == ELEMENT_TYPE_U2 goto box_U2
+if ${ITEMP0} == ELEMENT_TYPE_I1 goto box_I1
+if ${ITEMP0} == ELEMENT_TYPE_U1 goto box_U1
+if ${ITEMP0} == ELEMENT_TYPE_I goto box_I
+if ${ITEMP0} == ELEMENT_TYPE_U goto box_U
+if ${ITEMP0} == ELEMENT_TYPE_R4 goto box_R4
+if ${ITEMP0} == ELEMENT_TYPE_R8 goto box_R8
+${PTEMP0} = new .Exception
+${PTEMP0}["_message"] = "Attempt to box non-value type"
+throw ${PTEMP0}
+box_I4:
+${STEMP0} = "System.Int32"
+${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_U4:
+${STEMP0} = "System.UInt32"
+${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_I2:
+${STEMP0} = "System.Int16"
+${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_U2:
+${STEMP0} = "System.UInt16"
+${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_I1:
+${STEMP0} = "System.SByte"
+${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_U1:
+${STEMP0} = "System.Byte"
+${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_I:
+${STEMP0} = "System.IntPtr"
+${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_U:
+${STEMP0} = "System.UIntPtr"
+${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_R4:
+${STEMP0} = "System.Single"
+${INS} = concat "$P1000000 = new Float\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+box_R8:
+${STEMP0} = "System.Double"
+${INS} = concat "$P1000000 = new Float\n$P1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+goto box_EMIT
+
+box_EMIT:
+${INS} = concat ${DEST0}
+${INS} = concat " = new \""
+${INS} = concat ${STEMP0}
+${INS} = concat "\"\nsetattribute "
+${INS} = concat ${DEST0}
+${INS} = concat ", 0, $P1000000\n"
+
+box_DONE:
+PIR
+typeinfo = <<PIR
+# Just take current type and make into an object.
+${ITEMP0} = elements ${STYPES}
+dec ${ITEMP0}
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP0} = clone ${PTEMP0}
+${PTEMP0}["type"] = ELEMENT_TYPE_OBJECT
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[unbox]
+code = 79
+class = op
+pop = 1
+push = 1
+arguments = ttype
+pir = <<PIR
+# If what we're to get is a value type, just need to unset value type
+# property.
+${PTEMP0} = ${DTYPES}[0]
+${ITEMP0} = ${PTEMP0}["token"]
+if ${ITEMP0} != ELEMENT_TYPE_VALUETYPE goto unbox_NOT_VT
+${INS} = concat "$P1000000 = null\nsetprop "
+${INS} = concat ${STACK0}
+${INS} = concat ", \"boxed\", $P1000000\n"
+goto unbox_EMIT
+
+# If it's not a value type, then need to extract the field.
+unbox_NOT_VT:
+if ${ITEMP0} == ELEMENT_TYPE_I1 goto unbox_integer
+if ${ITEMP0} == ELEMENT_TYPE_I2 goto unbox_integer
+if ${ITEMP0} == ELEMENT_TYPE_I4 goto unbox_integer
+if ${ITEMP0} == ELEMENT_TYPE_U1 goto unbox_integer
+if ${ITEMP0} == ELEMENT_TYPE_U2 goto unbox_integer
+if ${ITEMP0} == ELEMENT_TYPE_U4 goto unbox_integer
+if ${ITEMP0} == ELEMENT_TYPE_I goto unbox_integer
+if ${ITEMP0} == ELEMENT_TYPE_U goto unbox_integer
+if ${ITEMP0} == ELEMENT_TYPE_R4 goto unbox_float
+if ${ITEMP0} == ELEMENT_TYPE_R8 goto unbox_float
+${PTEMP0} = new .Exception
+${PTEMP0}["_message"] = "Attempt to unbox unknown built-in."
+throw ${PTEMP0}
+unbox_integer:
+${INS} = concat "$P1000000 = new Integer\n$I1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n$P1000000 = $I1000000\n"
+${STACK0} = "$P1000000"
+goto unbox_EMIT
+unbox_float:
+${INS} = concat "$P1000000 = new Float\n$N1000000 = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n$P1000000 = $N1000000\n"
+${STACK0} = "$P1000000"
+goto unbox_EMIT
+
+# Emit code to make managed pointer to the value.
+unbox_EMIT:
+${INS} = concat ${DEST0}
+${INS} = concat " = net_pmc_ptr "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+# Look up class.
+${ITEMP0} = band ${ARG0}, 0x02000000
+if ${ITEMP0} goto unbox_INTERNAL_TYPE
+
+# External type. Get typeref token.
+${ITEMP0} = band ${ARG0}, 0x00FFFFFF
+dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
+${PTEMP2} = ${ASSEMBLY}.get_typerefs()
+${PTEMP3} = ${PTEMP2}[${ITEMP0}]
+${STEMP1} = ${PTEMP3}.get_namespace()
+goto unbox_DONE_TYPE
+
+# Internal type. Get class token.
+unbox_INTERNAL_TYPE:
+${ITEMP0} = band ${ARG0}, 0x01FFFFFF
+${ITEMP0} -= 2
+${PTEMP2} = ${ASSEMBLY}.get_classes()
+${PTEMP3} = ${PTEMP2}[${ITEMP0}]
+${STEMP1} = ${PTEMP3}.get_fullname()
+unbox_DONE_TYPE:
+
+# Build new type info hash.
+${PTEMP0} = new .Hash
+
+# See if it's a special case.
+if ${STEMP1} == "System.Int32" goto unbox_I4
+if ${STEMP1} == "System.Int16" goto unbox_I2
+if ${STEMP1} == "System.SByte" goto unbox_I1
+if ${STEMP1} == "System.UInt32" goto unbox_U1
+if ${STEMP1} == "System.UInt16" goto unbox_U2
+if ${STEMP1} == "System.Byte" goto unbox_U4
+if ${STEMP1} == "System.IntPtr" goto unbox_I
+if ${STEMP1} == "System.UIntPtr" goto unbox_U
+if ${STEMP1} == "System.Single" goto unbox_R4
+if ${STEMP1} == "System.Double" goto unbox_R8
+goto unbox_VT
+
+# Set types.
+unbox_I4:
+${PTEMP0}["type"] = ELEMENT_TYPE_I4
+goto unbox_DONE
+unbox_I2:
+${PTEMP0}["type"] = ELEMENT_TYPE_I2
+goto unbox_DONE
+unbox_I1:
+${PTEMP0}["type"] = ELEMENT_TYPE_I1
+goto unbox_DONE
+unbox_U4:
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+goto unbox_DONE
+unbox_U2:
+${PTEMP0}["type"] = ELEMENT_TYPE_U2
+goto unbox_DONE
+unbox_U1:
+${PTEMP0}["type"] = ELEMENT_TYPE_U1
+goto unbox_DONE
+unbox_I:
+${PTEMP0}["type"] = ELEMENT_TYPE_I
+goto unbox_DONE
+unbox_U:
+${PTEMP0}["type"] = ELEMENT_TYPE_U
+goto unbox_DONE
+unbox_R4:
+${PTEMP0}["type"] = ELEMENT_TYPE_R4
+goto unbox_DONE
+unbox_R8:
+${PTEMP0}["type"] = ELEMENT_TYPE_R8
+goto unbox_DONE
+unbox_VT:
+${PTEMP0}["type"] = ELEMENT_TYPE_VALUETYPE
+
+# Stash away type info.
+unbox_DONE:
+${ITEMP0} = ${PTEMP0}["type"]
+${PTEMP0}["token"] = ${ITEMP0}
+${PTEMP0}["type"] = ELEMENT_TYPE_PTR
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+
+## ARRAYS
+
+[newarr]
+code = 8D
+class = op
+pop = 1
+push = 1
+arguments = ttype
+pir = <<PIR
+# Always start with the same thing.
+${INS} = concat ${DEST0}
+${INS} = concat " = new ."
+
+# Now decide on array type to use.
+${PTEMP0} = ${DTYPES}[0]
+${PTEMP1} = ${PTEMP0}["elements"]
+${ITEMP0} = ${PTEMP1}["type"]
+if ${ITEMP0} == ELEMENT_TYPE_I4 goto newarr_INTARRAY
+if ${ITEMP0} == ELEMENT_TYPE_U4 goto newarr_INTARRAY
+if ${ITEMP0} == ELEMENT_TYPE_I2 goto newarr_INTARRAY
+if ${ITEMP0} == ELEMENT_TYPE_U2 goto newarr_INTARRAY
+if ${ITEMP0} == ELEMENT_TYPE_I1 goto newarr_INTARRAY
+if ${ITEMP0} == ELEMENT_TYPE_U1 goto newarr_INTARRAY
+if ${ITEMP0} == ELEMENT_TYPE_I goto newarr_INTARRAY
+if ${ITEMP0} == ELEMENT_TYPE_U goto newarr_INTARRAY
+if ${ITEMP0} == ELEMENT_TYPE_R4 goto newarr_FLOATARRAY
+if ${ITEMP0} == ELEMENT_TYPE_R8 goto newarr_FLOATARRAY
+
+# If we get here, it's an object type.
+${INS} = concat "FixedPMCArray"
+goto newarr_FINAL
+
+# Integer type.
+newarr_INTARRAY:
+${INS} = concat "FixedIntegerArray"
+goto newarr_FINAL
+
+# Float type.
+newarr_FLOATARRAY:
+${INS} = concat "FixedFloatArray"
+goto newarr_FINAL
+
+# Now do final stuff.
+newarr_FINAL:
+${INS} = concat "\n"
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${INS} = concat ${STACK0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+# This is an array type.
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_SZARRAY
+${PTEMP0}["byref"] = 0
+${PTEMP1} = new Hash
+${PTEMP0}["elements"] = ${PTEMP1}
+
+# Look up class.
+${ITEMP0} = band ${ARG0}, 0x02000000
+if ${ITEMP0} goto newarr_INTERNAL_TYPE
+
+# External type. Get typeref token.
+${ITEMP0} = band ${ARG0}, 0x00FFFFFF
+dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
+${PTEMP2} = ${ASSEMBLY}.get_typerefs()
+${PTEMP3} = ${PTEMP2}[${ITEMP0}]
+goto newarr_DONE_TYPE
+
+# Internal type. Get class token.
+newarr_INTERNAL_TYPE:
+${ITEMP0} = band ${ARG0}, 0x01FFFFFF
+dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
+${PTEMP2} = ${ASSEMBLY}.get_classes()
+${PTEMP3} = ${PTEMP2}[${ITEMP0}]
+newarr_DONE_TYPE:
+
+# See if we have a built-in type.
+${STEMP0} = ${PTEMP3}.get_namespace()
+if ${STEMP0} != "System" goto newarr_OBJECT
+
+# Get name of the built-in type and see if it's an integer or float.
+${STEMP0} = ${PTEMP3}
+if ${STEMP0} == "Int32" goto newarr_INT32
+if ${STEMP0} == "UInt32" goto newarr_UINT32
+if ${STEMP0} == "Int16" goto newarr_INT16
+if ${STEMP0} == "UInt16" goto newarr_UINT16
+if ${STEMP0} == "SByte" goto newarr_SBYTE
+if ${STEMP0} == "Byte" goto newarr_BYTE
+if ${STEMP0} == "IntPtr" goto newarr_INTPTR
+if ${STEMP0} == "Single" goto newarr_SINGLE
+if ${STEMP0} == "Double" goto newarr_DOUBLE
+goto newarr_OBJECT
+
+# Numeric types.
+newarr_INT32:
+${PTEMP1}["type"] = ELEMENT_TYPE_I4
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+newarr_UINT32:
+${PTEMP1}["type"] = ELEMENT_TYPE_U4
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+newarr_INT16:
+${PTEMP1}["type"] = ELEMENT_TYPE_I2
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+newarr_UINT16:
+${PTEMP1}["type"] = ELEMENT_TYPE_U2
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+newarr_SBYTE:
+${PTEMP1}["type"] = ELEMENT_TYPE_I1
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+newarr_BYTE:
+${PTEMP1}["type"] = ELEMENT_TYPE_U1
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+newarr_INTPTR:
+${PTEMP1}["type"] = ELEMENT_TYPE_I
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+
+# Float types.
+newarr_SINGLE:
+${PTEMP1}["type"] = ELEMENT_TYPE_R4
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+newarr_DOUBLE:
+${PTEMP1}["type"] = ELEMENT_TYPE_R8
+${PTEMP1}["byref"] = 0
+goto newarr_DONE
+
+# If we have an object type, set up token to point to the class and mark this
+# as an object.
+newarr_OBJECT:
+${PTEMP1}["type"] = ELEMENT_TYPE_OBJECT
+${PTEMP1}["byref"] = 0
+${PTEMP1}["token"] = ${PTEMP3}
+
+# Annotate 'em and stash.
+newarr_DONE:
+annotate_reg_type(${PTEMP1})
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldlen]
+code = 8E
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = elements ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldelem.i1]
+code = 90
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.u1]
+code = 91
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.i2]
+code = 92
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.u2]
+code = 93
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.i4]
+code = 94
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.u4]
+code = 95
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.i8]
+code = 96
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.i]
+code = 97
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.r4]
+code = 98
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.r8]
+code = 99
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[ldelem.ref]
+code = 9A
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = ${STACK1}[${STACK0}]
+typeinfo = <<PIR
+# Get type describing hash for what's stored in the array.
+${ITEMP0} = elements ${STYPES}
+${ITEMP0} -= 2
+${PTEMP0} = ${STYPES}[${ITEMP0}]
+${PTEMP1} = ${PTEMP0}["elements"]
+${DTYPES}[0] = ${PTEMP1}
+PIR
+
+[stelem.i]
+code = 9B
+class = op
+pop = 3
+instruction = ${STACK2}[${STACK1}] = ${STACK0}
+typeinfo = # Nothing to do
+
+[stelem.i1]
+code = 9C
+class = op
+pop = 3
+instruction = ${STACK2}[${STACK1}] = ${STACK0}
+typeinfo = # Nothing to do
+
+[stelem.i2]
+code = 9D
+class = op
+pop = 3
+instruction = ${STACK2}[${STACK1}] = ${STACK0}
+typeinfo = # Nothing to do
+
+[stelem.i4]
+code = 9E
+class = op
+pop = 3
+instruction = ${STACK2}[${STACK1}] = ${STACK0}
+typeinfo = # Nothing to do
+
+[stelem.i8]
+code = 9F
+class = op
+pop = 3
+instruction = ${STACK2}[${STACK1}] = ${STACK0}
+typeinfo = # Nothing to do
+
+[stelem.r4]
+code = A0
+class = op
+pop = 3
+instruction = ${STACK2}[${STACK1}] = ${STACK0}
+typeinfo = # Nothing to do
+
+[stelem.r8]
+code = A1
+class = op
+pop = 3
+instruction = ${STACK2}[${STACK1}] = ${STACK0}
+typeinfo = # Nothing to do
+
+[stelem.ref]
+code = A2
+class = op
+pop = 3
+instruction = ${STACK2}[${STACK1}] = ${STACK0}
+typeinfo = # Nothing to do
+
+
+## STRINGS
+
+[ldstr]
+code = 72
+class = load
+push = 1
+arguments = tstring
+pir = <<PIR
+${ITEMP0} = band ${ARG0}, 0x0FFFFFFF
+${STEMP0} = ${ASSEMBLY}.get_user_string(${ITEMP0})
+${STEMP2} = '"'
+${STEMP1} = escaper(${STEMP0}, ${STEMP2})
+${ITEMP0} = find_encoding "utf8"
+${STEMP1} = trans_encoding ${ITEMP0}
+${INS} = concat ${DEST0}
+${INS} = concat " = new \"System.String\"\n"
+${INS} = concat ${DEST0}
+${INS} = concat ".\".ctor\"(\""
+${INS} = concat ${STEMP1}
+${INS} = concat "\")\n"
+PIR
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_STRING
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+
+## EXCEPTIONS
+
+[leave]
+code = DD
+class = branch
+arguments = int32
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = handler_leave_code(${ASSEMBLY}, ${EHANDLERS}, ${ITEMP0}, ${PC})
+${INS} = concat ${STEMP0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[leave.s]
+code = DE
+class = branch
+arguments = int8
+pir = <<PIR
+${ITEMP0} = ${NEXTPC} + ${ARG0}
+${STEMP0} = handler_leave_code(${ASSEMBLY}, ${EHANDLERS}, ${ITEMP0}, ${PC})
+${INS} = concat ${STEMP0}
+${STEMP0} = ${ITEMP0}
+${INS} = concat "goto LAB"
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+
+[throw]
+code = 7A
+class = op
+pop = 1
+instruction = <<INS
+$P1000000 = new .Exception
+$P1000000["obj"] = ${STACK0}
+throw $P1000000
+INS
+typeinfo = # None
+
+[endfinally]
+code = DC
+class = op
+pir = <<PIR
+${STEMP0} = endfinally_code(${ASSEMBLY}, ${EHANDLERS}, ${PC})
+${INS} = concat ${STEMP0}
+PIR
+typeinfo = # None
+
+[rethrow]
+# XXX TO DO This actually could go rather wrong on if there's nested handling
+# inside the block we rethrow from. The spec lets us be pretty liberal, but
+# we can't get away with as much as this tries to.
+code = FE 1A
+class = op
+instruction = throw cur_exception
+typeinfo = # None
+
+
+## MANAGED POINTERS
+
+[ldloca.s]
+code = 12
+class = load
+push = 1
+arguments = uint8
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = net_reg_ptr local"
+${STEMP0} = ${ARG0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_PTR
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldloca]
+code = FE 0D
+class = load
+push = 1
+arguments = uint32
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = net_reg_ptr local"
+${STEMP0} = ${ARG0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_PTR
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldarga.s]
+code = 0F
+class = load
+push = 1
+arguments = uint8
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = net_reg_ptr arg"
+${STEMP0} = ${ARG0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_PTR
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldlarga]
+code = FE 0A
+class = load
+push = 1
+arguments = uint32
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = net_reg_ptr arg"
+${STEMP0} = ${ARG0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_PTR
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldflda]
+code = 7C
+class = op
+pop = 1
+push = 1
+arguments = tfield
+pir = <<PIR
+# Get field info.
+(${PTEMP0}, ${ITEMP0}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Emit instruction to get reference.
+${INS} = concat ${DEST0}
+${INS} = concat " = net_ldflda "
+${INS} = concat ${STACK0}
+${INS} = concat ", \""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\"\n"
+PIR
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_PTR
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldsflda]
+code = 7F
+class = op
+push = 1
+arguments = tfield
+pir = <<PIR
+# Get field info.
+(${PTEMP0}, ${ITEMP0}, ${STEMP1}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+
+# Build attribute access.
+${INS} = concat "$P1000000 = find_global \""
+${INS} = concat ${STEMP1}
+${INS} = concat "\", \""
+${STEMP0} = ${PTEMP0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\"\n"
+${INS} = concat ${DEST0}
+${INS} = concat " = net_pmc_ptr $P1000000\n"
+PIR
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_PTR
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldelema]
+code = 8F
+class = op
+pop = 2
+push = 1
+arguments = ttype
+instruction = net_ldelema ${DEST0}, ${STACK1}, ${STACK0}
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_PTR
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.i1]
+code = 46
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_int()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I1
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.u1]
+code = 47
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_int()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U1
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.i2]
+code = 48
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_int()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I2
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.u2]
+code = 49
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_int()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U2
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.i4]
+code = 4A
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_int()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.i8]
+code = 4C
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_pmc()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.u4]
+code = 4B
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_int()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_U4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.i]
+code = 4D
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_int()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_I
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.r4]
+code = 4E
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_float()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_R4
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.r8]
+code = 4F
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_float()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_R8
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[ldind.ref]
+code = 50
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.load_pmc()
+typeinfo = <<PIR
+${PTEMP0} = new Hash
+${PTEMP0}["type"] = ELEMENT_TYPE_OBJECT
+${PTEMP0}["byref"] = 0
+annotate_reg_type(${PTEMP0})
+${DTYPES}[0] = ${PTEMP0}
+PIR
+
+[stind.ref]
+code = 51
+class = op
+pop = 2
+instruction = ${STACK1}.store_pmc(${STACK0})
+typeinfo = # None
+
+[stind.i1]
+code = 52
+class = op
+pop = 2
+instruction = ${STACK1}.store_int(${STACK0})
+typeinfo = # None
+
+[stind.i2]
+code = 53
+class = op
+pop = 2
+instruction = ${STACK1}.store_int(${STACK0})
+typeinfo = # None
+
+[stind.i4]
+code = 54
+class = op
+pop = 2
+instruction = ${STACK1}.store_int(${STACK0})
+typeinfo = # None
+
+[stind.i8]
+code = 55
+class = op
+pop = 2
+instruction = ${STACK1}.store_pmc(${STACK0})
+typeinfo = # None
+
+[stind.i]
+code = DF
+class = op
+pop = 2
+instruction = ${STACK1}.store_int(${STACK0})
+typeinfo = # None
+
+[stind.r4]
+code = 56
+class = op
+pop = 2
+instruction = ${STACK1}.store_float(${STACK0})
+typeinfo = # None
+
+[stind.r8]
+code = 57
+class = op
+pop = 2
+instruction = ${STACK1}.store_float(${STACK0})
+typeinfo = # None
+
+
+## LOAD ARGUMENTS
+
+[ldarg.0]
+code = 02
+class = load
+pop = 0
+push = 1
+pir = ${LOADREG} = "arg0"
+typeinfo = ${LOADTYPE} = ${PTYPES}[0]
+
+[ldarg.1]
+code = 03
+class = load
+pop = 0
+push = 1
+pir = ${LOADREG} = "arg1"
+typeinfo = ${LOADTYPE} = ${PTYPES}[1]
+
+[ldarg.2]
+code = 04
+class = load
+pop = 0
+push = 1
+pir = ${LOADREG} = "arg2"
+typeinfo = ${LOADTYPE} = ${PTYPES}[2]
+
+[ldarg.3]
+code = 05
+class = load
+pop = 0
+push = 1
+pir = <<PIR
+${LOADREG} = "arg3"
+PIR
+typeinfo = ${LOADTYPE} = ${PTYPES}[3]
+
+[ldarg.s]
+code = 0E
+class = load
+pop = 0
+push = 1
+arguments = uint8
+pir = <<PIR
+${STEMP0} = ${ARG0}
+${LOADREG} = "arg"
+${LOADREG} = concat ${STEMP0}
+PIR
+typeinfo = ${LOADTYPE} = ${PTYPES}[${ARG0}]
+
+[ldarg]
+code = FE 09
+class = load
+pop = 0
+push = 1
+arguments = uint32
+pir = <<PIR
+${STEMP0} = ${ARG0}
+${LOADREG} = "arg"
+${LOADREG} = concat ${STEMP0}
+PIR
+typeinfo = ${LOADTYPE} = ${PTYPES}[${ARG0}]
+
+
+## LOAD LOCALS
+
+[ldloc.0]
+code = 06
+class = load
+pop = 0
+push = 1
+pir = ${LOADREG} = "local0"
+typeinfo = ${LOADTYPE} = ${LTYPES}[0]
+
+[ldloc.1]
+code = 07
+class = load
+pop = 0
+push = 1
+pir = ${LOADREG} = "local1"
+typeinfo = ${LOADTYPE} = ${LTYPES}[1]
+
+[ldloc.2]
+code = 08
+class = load
+pop = 0
+push = 1
+pir = ${LOADREG} = "local2"
+typeinfo = ${LOADTYPE} = ${LTYPES}[2]
+
+[ldloc.3]
+code = 09
+class = load
+pop = 0
+push = 1
+pir = ${LOADREG} = "local3"
+typeinfo = ${LOADTYPE} = ${LTYPES}[3]
+
+[ldloc.s]
+code = 11
+class = load
+pop = 0
+push = 1
+arguments = uint8
+pir = <<PIR
+${STEMP0} = ${ARG0}
+${LOADREG} = "local"
+${LOADREG} = concat ${STEMP0}
+PIR
+typeinfo = ${LOADTYPE} = ${LTYPES}[${ARG0}]
+
+[ldloc]
+code = FE 0C
+class = load
+pop = 0
+push = 1
+arguments = uint32
+pir = <<PIR
+${STEMP0} = ${ARG0}
+${LOADREG} = "local"
+${LOADREG} = concat ${STEMP0}
+PIR
+typeinfo = ${LOADTYPE} = ${LTYPES}[${ARG0}]
+
+
+## LOAD CONSTANTS
+
+[ldc.i4.0]
+code = 16
+class = load
+push = 1
+pir = ${LOADREG} = "0"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.1]
+code = 17
+class = load
+push = 1
+pir = ${LOADREG} = "1"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.2]
+code = 18
+class = load
+push = 1
+pir = ${LOADREG} = "2"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.3]
+code = 19
+class = load
+push = 1
+pir = ${LOADREG} = "3"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.4]
+code = 1A
+class = load
+push = 1
+pir = ${LOADREG} = "4"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.5]
+code = 1B
+class = load
+push = 1
+pir = ${LOADREG} = "5"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.6]
+code = 1C
+class = load
+push = 1
+pir = ${LOADREG} = "6"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.7]
+code = 1D
+class = load
+push = 1
+pir = ${LOADREG} = "7"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.8]
+code = 1E
+class = load
+push = 1
+pir = ${LOADREG} = "8"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.m1]
+code = 15
+class = load
+push = 1
+pir = ${LOADREG} = "-1"
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4.s]
+code = 1F
+class = load
+push = 1
+arguments = int8
+pir = ${LOADREG} = ${ARG0}
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i4]
+code = 20
+class = load
+push = 1
+arguments = int32
+pir = ${LOADREG} = ${ARG0}
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.i8]
+code = 21
+class = load
+push = 1
+arguments = int32, int32
+pir = <<PIR
+${INS} = concat ${DEST0}
+${INS} = concat " = new \"Int64\"\n"
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${STEMP0} = ${ARG0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+${INS} = concat ${DEST0}
+${INS} = concat ".set_high_bits("
+${STEMP0} = ${ARG1}
+${INS} = concat ${STEMP0}
+${INS} = concat ")\n"
+PIR
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_I8
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.r4]
+code = 22
+class = load
+push = 1
+arguments = float32
+pir = <<PIR
+# XXX Work around -1.#INF issues with opt reg SRM
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${STEMP0} = ${ARG0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_R4
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+[ldc.r8]
+code = 23
+class = load
+push = 1
+arguments = float64
+pir = <<PIR
+# XXX Work around -1.#INF issues with opt reg SRM
+${INS} = concat ${DEST0}
+${INS} = concat " = "
+${STEMP0} = ${ARG0}
+${INS} = concat ${STEMP0}
+${INS} = concat "\n"
+PIR
+typeinfo = <<PIR
+${LOADTYPE} = new Hash
+${LOADTYPE}["type"] = ELEMENT_TYPE_R8
+${LOADTYPE}["byref"] = 0
+annotate_reg_type(${LOADTYPE})
+PIR
+
+
+## STORE LOCALS
+
+[stloc.0]
+code = 0A
+class = store
+pop = 1
+push = 0
+pir = ${STOREREG} = "local0"
+typeinfo = typeinfo_stloc(${LTYPES}, ${STYPES}, 0)
+
+[stloc.1]
+code = 0B
+class = store
+pop = 1
+push = 0
+pir = ${STOREREG} = "local1"
+typeinfo = typeinfo_stloc(${LTYPES}, ${STYPES}, 1)
+
+[stloc.2]
+code = 0C
+class = store
+pop = 1
+push = 0
+pir = ${STOREREG} = "local2"
+typeinfo = typeinfo_stloc(${LTYPES}, ${STYPES}, 2)
+
+[stloc.3]
+code = 0D
+class = store
+pop = 1
+push = 0
+pir = ${STOREREG} = "local3"
+typeinfo = typeinfo_stloc(${LTYPES}, ${STYPES}, 3)
+
+[stloc.s]
+code = 13
+class = store
+pop = 1
+push = 0
+arguments = uint8
+pir = <<PIR
+${STEMP0} = ${ARG0}
+${STOREREG} = "local"
+${STOREREG} = concat ${STEMP0}
+PIR
+typeinfo = typeinfo_stloc(${LTYPES}, ${STYPES}, ${ARG0})
+
+[stloc]
+code = FE 0E
+class = store
+pop = 1
+push = 0
+arguments = uint32
+pir = <<PIR
+${STEMP0} = ${ARG0}
+${STOREREG} = "local"
+${STOREREG} = concat ${STEMP0}
+PIR
+typeinfo = typeinfo_stloc(${LTYPES}, ${STYPES}, ${ARG0})
+
+
+## STORE ARGUMENTS
+
+[starg.s]
+code = 10
+class = store
+pop = 1
+push = 0
+arguments = uint8
+pir = <<PIR
+${STEMP0} = ${ARG0}
+${STOREREG} = "arg"
+${STOREREG} = concat ${STEMP0}
+PIR
+typeinfo = typeinfo_starg(${PTYPES}, ${STYPES}, ${ARG0})
+
+[starg]
+code = FE 0B
+class = store
+pop = 1
+push = 0
+arguments = uint32
+pir = <<PIR
+${STEMP0} = ${ARG0}
+${STOREREG} = "arg"
+${STOREREG} = concat ${STEMP0}
+PIR
+typeinfo = typeinfo_starg(${PTYPES}, ${STYPES}, ${ARG0})

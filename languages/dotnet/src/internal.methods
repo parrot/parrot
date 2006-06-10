@@ -1,0 +1,19 @@
+[System.Object::GetType :unimplemented]
+
+
+[System.Object::InternalGetHashCode]
+    .param pmc obj
+    $I0 = obj.__hash(42)
+    .return($I0)
+
+
+[System.Object::MemberwiseClone]
+    .local pmc cpy
+    cpy = clone self
+    .return(cpy)
+
+
+[System.Object::obj_address]
+    $I0 = net_pmc_addr self
+    .return($I0)
+

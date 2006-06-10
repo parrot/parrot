@@ -312,6 +312,34 @@ L<languages/conversion>.
 =back
 
 
+=head2 .Net To PIR Translator
+
+=over 4
+
+=item Author
+
+Jonathan Worthington
+
+=item Description
+
+Translates .Net bytecode to PIR.
+
+=item Status
+
+Much is left to do, but it's complete enough to tranlate 75% of the .Net class
+library.
+
+=item Last verified with parrot version
+
+0.4.4
+
+=item Location
+
+C<languages/dotnet>
+
+=back
+
+
 =head2 forth
 
 =over 4

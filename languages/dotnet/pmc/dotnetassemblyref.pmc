@@ -1,0 +1,199 @@
+/* .NET CLI Assembly Reference Metadata PMC */
+
+
+#include "parrot/parrot.h"
+#include "tableinfo.h"
+#include "structures.h"
+
+
+pmclass DotNetAssemblyRef dynpmc group dotnet {
+
+    /* Instance initialization. We need a custom DOD marking and destroy. */
+    void init()
+    {
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+
+    /* Garbage Collection mark routine. */
+    void mark()
+    {
+        /* Tell the GC about stuff we're holding on to. */
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+        if (ar != NULL)
+        {
+            if (ar->str_name)
+                pobject_lives(INTERP, (PObj*)ar->str_name);
+            if (ar->str_culture)
+                pobject_lives(INTERP, (PObj*)ar->str_culture);
+        }
+    }
+
+
+    /* Destructor. */
+    void destroy()
+    {
+        /* Cleanup any memory we're using. */
+        if (PMC_struct_val(SELF) != NULL)
+        {
+            struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+            free(ar);
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+
+    /* Get string vtable function; returns the name referenced. */
+    STRING* get_string()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return ar->str_name;
+    }
+
+
+    /* Get major version. */
+    METHOD int get_version_major()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return (int) ar->version_major;
+    }
+
+
+    /* Get minor version. */
+    METHOD int get_version_minor()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return (int) ar->version_minor;
+    }
+
+
+    /* Get build version. */
+    METHOD int get_version_build()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return (int) ar->version_build;
+    }
+    
+
+    /* Get revision version. */
+    METHOD int get_version_revision()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return (int) ar->version_revision;
+    }
+
+
+    /* Get flags. */
+    METHOD int get_flags()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return (int) ar->flags;
+    }
+
+
+    /* Get public key blob location. */
+    METHOD int get_public_key()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return (int) ar->public_key;
+    }
+
+
+    /* Get culture. */
+    METHOD STRING* get_culture()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return ar->str_culture;
+    }
+
+
+    /* Get hash value blob location. */
+    METHOD int get_hash_value()
+    {
+        struct dotnet_assemblyref *ar = PMC_struct_val(SELF);
+
+        /* Handle cases where we've an invalid PMC. */
+        if (ar == NULL)
+        {
+            real_exception(INTERP, NULL, E_StandardError, 
+               "Invalid DotNetAssemblyRef PMC");
+            return 0;
+        }
+        else
+            return (int) ar->hash_value;
+    }
+}
+
