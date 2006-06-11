@@ -1,0 +1,60 @@
+This is certainly not a complete list of everything that remains to be done. If
+you fancy taking one of these on, but have questions, just ask. :-)
+
+GENERAL TASKS
+These are pretty unspecific and may range from low hanging fruit to tricky.
+
+* Find an unimplemented runtime method (a method that is expected to be
+  implemented inside the VM). Implement it by hand, trying to stick just
+  to PIR and/or Parrot built-in PMCs. See internal.methods in src/.
+
+* Find a class in the .Net class library, or any other chunk of .Net code,
+  that fails to translate. Figure out why (that might be obvious) and see
+  if it's a known bug or unimplemented feature already on this list. If not,
+  add it to this list. In the alternative, fix what's broken. ;-)
+
+
+EASIER TASKS
+These are generally quite isolated and not too large tasks. They may well
+be dependent on each other in places.
+
+* Fix namespace stuff to match the latest Parrot policy, syntax etc.
+
+* Delegates (e.g. indirect calls)
+
+* Typed references.
+
+* Variadic calling
+
+* 64-bit support is not as there as you might be led to think by the code
+  and tests. Sort it out.
+
+* Deal with method calling when a parameter is null (hint: long names, not
+  MMD).
+
+* Nested classes.
+
+* Tail calls and method jumps.
+
+* Re-work the newclass code so that it's only in a single .sub, not one per
+  class. Then investigate marking that sub :emit_pbc or :immediate (or
+  whatever you call the thing that makes it run at compile time) and see if
+  that works. If it doesn't, fix Parrot. ;-) This should vastly improve the
+  startup time when loading the .Net class library.
+
+
+HARDER TASKS
+Either long and time-consuming, or Just Plain Evil.
+
+* Reflection support is completely missing. Implement it.
+
+* Sort out basic I/O. This will be nastier than you fear. Trust me, I took
+  time to try and do this and got somewhere, but it still felt like there
+  was a very long way to go.
+
+* Sort out threading stuff.
+
+* Sort out calling using the C calling conventions (use Parrot NCI).
+
+* Try and make a GUI app run!
+
