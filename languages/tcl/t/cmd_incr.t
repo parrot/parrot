@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple");
@@ -81,6 +81,12 @@ language_output_is("tcl",<<'TCL',<<'OUT',"expected integer, got float");
   incr a 1.5
 TCL
 expected integer but got "1.5"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"no such variable");
+  incr a
+TCL
+can't read "a": no such variable
 OUT
 
 # Uses the same parsing mechanism as 
