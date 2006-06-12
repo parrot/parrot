@@ -1,5 +1,3 @@
-This is APL
-
 APL is Copyright (C) 2006, The Perl Foundation.
 
 INSTRUCTIONS
@@ -10,8 +8,7 @@ Compile APL to bytecode and run its test suite:
   $ make
   $ make test
 
-Run the APL compiler via Parrot, passing it an APL source file
-to process:
+Run the APL compiler via Parrot, passing it an APL source file to process:
 
   $ parrot APL.pbc demo.apl
   20
@@ -41,4 +38,9 @@ SimPL.tff font, available from:
 
   http://www.vector.org.uk/resource/simp2.htm
 
-
+EDITOR: On OSX, I recommend SubEthaEdit for editing utf-8 encoded files. Also,
+you'll want to enable the character palette: Go to System Preferences -> International -> Input Menu; enable 'Show input menu in menu bar'. To use the palette,
+Click on the flag in the menu bar, select 'Character Palette'. A window will
+pop up that lets you select unicode by code point, search by name of character,
+insert into the open application, or bring up information about the selected
+character.
