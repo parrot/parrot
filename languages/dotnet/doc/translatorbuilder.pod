@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 The Translator Builder
 
 The subsystem that translates the .NET instruction stream into a stream of 
@@ -12,6 +14,7 @@ code lookup.
 
 
 =head2 Generating Code That...Generates Code
+
 The translator builder is generating the code that will translate .NET CLI
 instructions into Parrot instructions. That code in turn is also generating
 code. The key to hacking on this part of the system is keeping a firm hold
@@ -20,6 +23,7 @@ or the code that the instruction translator will generate.
 
 
 =head2 Usage
+
 The translator builder is invoked as follows:-
 
   perl build/translator.pl src/translation.rules --srm Stack --ouptput src/it.pir
@@ -32,11 +36,13 @@ PIR file to generate.
 =head2 Steps
 
 =head3 Rules File Parsing
+
 The first simple task carried out by the translator builder is parsing the
 translation rules file and placing its contents in a data structure that
 allows easy access to the data for each rule.
 
 =head3 Load A Stack To Register Mapper
+
 Next, a stack to register mapping module must be loaded, as specified in the
 command line arguments to the script. These all adhere to a standard interface
 as defined in SRM::Base, and indeed inhreit from SRM::Base. These modules are
@@ -45,17 +51,20 @@ by being modules easily allow a number of different mapping algorithms to be
 benchmarked.
 
 =head3 Emit Setup PIR
+
 This step emits any PIR that sets things up for instruction translation. This
 includes giving the stack to register mapper a chance to emit any code that it
 would like to.
 
 =head3 Build Dispatch Code
+
 It is desirable to be able to dispatch to the translation code for a particular
 instruction efficiently. This step emits PIR code that does this. The lookup
 will happen in a number of steps O(log n) where n is the number of instructions
 we know how to translate.
 
 =head3 Build Rule Translation Code
+
 This step generates the code for each rule. With support from the register
 mapping module it substitures metavariables for named or numbered Parrot
 registers. The register mapping module also takes care of inserting labels.
@@ -63,6 +72,7 @@ This section has a lot of hooks into the stack to register mapping module,
 some dependent on the type of instruction being translated. More below.
 
 =head3 Emit Trailing PIR
+
 Once translation has taken place, the stack to register mapping code may
 wish to perform some cleanup, so there is a hook for it to do so. Also,
 the end of the translate routine that returns the generated PIR needs to
@@ -70,6 +80,7 @@ be generated.
 
 
 =head2 Data Flow To Determine Register Types
+
 The .NET CLR needs to keep track of the types of items on the stack. For
 example, the add instruction is expected to handle both integer addition
 and floating point addition and thus the types of the items on the stack
@@ -89,31 +100,40 @@ being operated on. This is discussed in .NET terms as determining the stack
 type state. There are three cases to consider.
 
 =over 4
+
 =item * Loads - here type data is added to the stack type state.
+
 =item * Stores - here type data is removed from the stack type state.
+
 =item * Operations - here type data may be transformed, but based on existing
 data already in the stack type state rather than external type information.
+
 =back
 
 A type will be represented as a type describing hash, which is a Hash PMC with
 the following fields:
 
-=over4
-=item * type - corresponds to one of the constants in the .NET Specification
-Partition II Section 22.1.15.
+=over 4
+
+=item * type - corresponds to one of the constants in the .NET Specification Partition II Section 22.1.15.
+
 =item * byref - set if the byref flag is set on the type.
-=item * token - for some values of type a token is also expected; it is stored
-in this entry.
+
+=item * token - for some values of type a token is also expected; it is stored in this entry.
+
 =item * reg_type_short - The Parrot register type that the type is stored in,
+
 represented as a single letter I, N, S or P. This does not need to be set by
 any code that instantiates a new type describing hash, but will be available
 in existing ones. The routine "annotate_reg_type" is responsible for making
 this entry.
+
 =item * reg_type_long - The Parrot register type that the type is stored in,
 one of "int", "num", "string" or "pmc". This does not need to be set by any
 code that instantiates a new type describing hash, but will be available in
 existing ones. The routine "annotate_reg_type" is responsible for making this
 entry.
+
 =back
 
 The rules file provides the "typeinfo" entry for load op and call class rules
@@ -125,10 +145,12 @@ to pop of ${STYPES} is unknown until runtime. Only a little tricker though.)
 
 
 =head2 Generating Instruction Translation Code
+
 This section of the document describes the steps that the translator
 generator takes when builder the translator for each instruction type.
 
 =head3 Operations (op class instructions)
+
 1. The destination types must be computed. ${DTYPES} will be an array of
 type describing hashes and used to determine register names in the SRM.
 
@@ -150,6 +172,7 @@ were just temporary registers, then these values will need to be pushed
 onto the real stack. Note that n and m are passed, as in step 2.
 
 =head3 Loads (load class instructions)
+
 1. A load instruction must provide as part of its translation rule a
 chunk of code that assigns to the meta-variable ${LOADTYPE} a type
 describing hash for the type of data that the load is placing on the
@@ -172,6 +195,7 @@ any PIR that is generated to the translator.
 any PIR that is generated to the translaotr.
 
 =head3 Stores (store class instructions)
+
 1. The translator builder looks at whether or not ${STOREREG} is assigned to
 in the PIR that is produced. If this is the case let DEST_REG = 1 otherwise
 let DEST_REG = 0. In the case where ${STOREREG} is used, the destination for
@@ -188,6 +212,7 @@ any PIR that is generated to the translator.
 any PIR that is generated to the translator.
 
 =head3 Branches (branch class instructions)
+
 1. The pre_branch SRM method is called to generate translator code that will
 assign to the meta-variables ${STACK0} to ${STACKn), where n is the number
 of stack locations that the branch instruction pops off to use. Note that for
@@ -200,6 +225,7 @@ generated is added to the translator.
 pre_branch and adding any PIR that is generated to the translator.
 
 =head3 Calling (calling class instructions)
+
 1. A calling translation rule may supply code that will optionally compute a
 single destination type and store it in ${DTYPES}[0]. In the case where no
 result will be pushed onto the stack (for example, when returning or when a
@@ -223,6 +249,7 @@ of view, if not a .NET one.)
 =head2 Stack to Register Mapping (SRM) Modules
 
 =head3 Having An Appropriate Relationship With Data Flow Analysis
+
 The SRM modules have a rather intimate relationship with the data flow anlysis
 that determines the types of items on the stack. As in real life, getting too
 intimate often makes for trouble. Therefore the following rules should always
@@ -242,6 +269,7 @@ the translator is translating. Availability of anything else should not be
 assumed unless the specification for the SRM method in question says otherwise.
 
 =head3 pre_translation()
+
 The PIR returned by this method will be placed near the start of the translator
 so that it runs before instruction translation begins. This will usually be setup
 code for the stack to register mapper.
@@ -249,6 +277,7 @@ code for the stack to register mapper.
 Only ${LTYPES} and ${PTYPES} will be available in this method.
 
 =head3 post_translation()
+
 The PIR returned by this method will be placed near the end of the translator so
 that is is run after the instruction translation has been completed. Parrot's GC
 probably eliminates the need to clean up any data structures, but this method is
@@ -257,11 +286,13 @@ here just in case some tear-down needs to be performed.
 Only ${LTYPES} and ${PTYPES} will be available in this method.
 
 =head3 subs()
+
 A stack to register mapper may wish to provide a number of subroutines that are
 used in the mapping process. PIR returned by this method will be inserted outside
 of the instruction translation sub. Therefore, no meta-variables are available.
 
 =head3 gen_label()
+
 Label generation is given to the stack to register mapping module as one of its
 tasks. Why? Because the SRM is likely to need to know about basic blocks as
 this knowledge is needed by most stack to register mapping algorithms. In the
@@ -276,6 +307,7 @@ If a label is being generated then it must be of the form "LABn:" where n
 is the program counter held when that instruction is reached.
 
 =head3 pre_op(POP_COUNT, PUSH_COUNT)
+
 This will be called to generate code that precedes the code to translate an
 instruction that only operates on values on the top of the stack. This is
 always modelled as popping the registers off the stack, doing the compuation
@@ -306,6 +338,7 @@ computed types of the values to be pushed onto the stack computed using data flo
 analysis.
 
 =head3 post_op(POP_COUNT, PUSH_COUNT)
+
 This will be called to generate code that follows the code to translate an
 instruction that only operates on values on the top of the stack. This is
 always modelled as popping the registers off the stack, doing the compuation
@@ -326,6 +359,7 @@ Again, the ${DTYPES} meta-variable for the array of destination type hashes is
 available.
 
 =head3 pre_load(NEED_DEST)
+
 This is called to generate code that precedes the translation code for a load
 instruction. It comes after the type of the item being loaded has been stored
 as a type describing hash in ${LOADTYPE} so that this data is available.
@@ -339,6 +373,7 @@ algorithm.
 If NEED_DEST is not set then there are no need to assign to any meta-variables.
 
 =head3 post_load(NEED_DEST)
+
 This is called to generate code that follows the the translation code for a load
 instruction.
 
@@ -350,6 +385,7 @@ There are no requirements on this method to set any meta-variables. As in
 pre_load, ${LOADTYPE} will be available.
 
 =head3 pre_store(DEST_REG)
+
 This is called to generate code that precedes the translation code for a store
 instruction.
 
@@ -366,6 +402,7 @@ value to ${STACK0} and cause the translator to emit any code needed to place the
 value in that register.
 
 =head3 post_store(DEST_REG)
+
 This is called to generate code that follows the translation code for a store
 instruction.
 
@@ -381,6 +418,7 @@ register. Furthermore, the store will now have been completed. In this case, thi
 method may have little or nothing to do.
 
 =head3 pre_branch(POP_COUNT)
+
 This is called to generate code that precedes the translation code for a branch
 instruction. The branch operation may involve values stored on the top of the
 stack. The count of values that are popped off the top of the stack by the branch
@@ -394,6 +432,7 @@ name from a stack that the translator is maintaining as the values are already i
 registers in the generated code.
 
 =head3 post_branch(POP_COUNT)
+
 This is called to generate code that follows the translation code for a branch
 instruction. As with pre_branch, the number of values that the branch instruction
 takes from the stack top is available in POP_COUNT.
@@ -401,6 +440,7 @@ takes from the stack top is available in POP_COUNT.
 This method has no requirements on setting meta-variables.
 
 =head3 pre_call
+
 This is called to generate code that precedes the translation code for a
 calling related instruction (either a method call or a return). It needs to
 put names of registers that contain the parameters to pass or return into
@@ -412,6 +452,7 @@ In addition, if ${DTYPES} has an element, the destination register (for the
 result of the call) must be set in ${DEST0}.
 
 =head3 post_call
+
 This is called to generate code that follows the translation code for a
 calling instruction. This could be used, for example, to put a returned
 value back onto the stack.
