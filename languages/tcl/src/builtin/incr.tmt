@@ -2,6 +2,6 @@ command => 'incr',
 usage=> "varName:var ?increment:int=1?",
 code => <<'END_PIR'
 
-$P{register_num} = $P{register_varName} + $P{register_increment}
-__set($P{register_varName_varname},$P{register_num})
+$P{register_varName} += $P{register_increment}
+$P{register_num} = clone $P{register_varName}
 END_PIR
