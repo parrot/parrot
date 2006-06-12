@@ -67,7 +67,21 @@ ok 1
 ok 2
 OUT
 
+pir_output_is(<<'CODE', <<OUT, "find/store global with key");
+.sub main :main
+	set_it()
+	$P1 = find_global [ "Monkey" ; "Toaster" ], "Explosion"
+	print $P1
+.end
+.sub set_it
+	$P0 = new .String
+	$P0 = "Ook...BANG!\n"
+	store_global [ "Monkey" ; "Toaster" ], "Explosion", $P0
+.end
+CODE
+Ook...BANG!
+OUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 4; }
+BEGIN { plan tests => 5; }
 

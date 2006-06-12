@@ -252,6 +252,35 @@ Parrot_store_global(Interp *interpreter, STRING *class,
     Parrot_invalidate_method_cache(interpreter, class, globalname);
 }
 
+void
+Parrot_store_global_p(Interp *interpreter, PMC *ns,
+        STRING *globalname, PMC *pmc)
+{
+    PMC *globals;
+    PMC *stash;
+
+    if (PMC_IS_NULL(ns))
+        Parrot_store_global(interpreter, NULL, globalname, pmc);
+    
+    switch (ns->vtable->base_type) {
+        case enum_class_String:
+            Parrot_store_global(interpreter, PMC_str_val(ns), globalname, pmc);
+            break;
+        case enum_class_Key:
+            globals = parrot_HLL_namespace(interpreter);
+            stash = VTABLE_get_pmc_keyed(interpreter, globals, ns);
+            if (PMC_IS_NULL(stash) || 
+                stash->vtable->base_type != enum_class_NameSpace) {
+                stash = pmc_new(interpreter, enum_class_NameSpace);
+                VTABLE_set_pmc_keyed(interpreter, globals, ns, stash);
+            }
+            VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
+            break;
+        case enum_class_NameSpace:
+            VTABLE_set_pmc_keyed_str(interpreter, ns, globalname, pmc);
+    }
+}
+
 static void
 store_sub(Interp *interpreter, STRING *class,
         STRING *globalname, PMC *pmc)

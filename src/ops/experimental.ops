@@ -247,6 +247,10 @@ If the namespace doesn't exist, $1 is set to PMCNULL.
 
 Find the variable $3 in $2.
 
+=item B<store_global>(in KEY, in STR, in PMC)
+
+Store the PMC $3 as the variable $2 in $1.
+
 =cut
 
 op get_namespace(out PMC) {
@@ -277,6 +281,11 @@ op get_namespace(out PMC, in STR) {
 
 op find_global(out PMC, in KEY, in STR) {
     $1 = Parrot_get_global_p(interpreter, $2, $3);
+    goto NEXT();
+}
+
+op store_global(in KEY, in STR, in PMC) {
+    Parrot_store_global_p(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
