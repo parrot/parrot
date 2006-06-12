@@ -24,7 +24,7 @@ the faster dispatch of operations.
 #include "runops_cores.h"
 #include "parrot/embed.h"
 #include "parrot/trace.h"
-#include "parrot/interp_guts.h"
+#include "interp_guts.h"
 
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"

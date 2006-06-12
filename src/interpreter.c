@@ -34,7 +34,7 @@ have the same number of elements since there is a one-to-one mapping.
 
 #include <assert.h>
 #include "parrot/parrot.h"
-#include "parrot/interp_guts.h"
+#include "interp_guts.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"

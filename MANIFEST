@@ -647,7 +647,6 @@ include/parrot/hash.h                             [main]include
 include/parrot/headers.h                          [main]include
 include/parrot/hll.h                              [main]include
 include/parrot/interpreter.h                      [main]include
-include/parrot/interp_guts.h                      [main]include
 include/parrot/inter_call.h                       [main]include
 include/parrot/intlist.h                          [main]include
 include/parrot/io.h                               [main]include
@@ -1893,6 +1892,7 @@ src/hash.c                                        []
 src/headers.c                                     []
 src/hll.c                                         []
 src/interpreter.c                                 []
+src/interp_guts.h                                 []
 src/inter_call.c                                  []
 src/inter_cb.c                                    []
 src/inter_create.c                                []

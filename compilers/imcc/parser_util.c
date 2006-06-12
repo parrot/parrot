@@ -17,7 +17,6 @@
 #define _PARSER
 
 #include "imc.h"
-#include "parrot/interp_guts.h"
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
 #include "parrot/builtin.h"
