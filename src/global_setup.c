@@ -65,7 +65,8 @@ using the last registered config data.
 
 */
 
-static void parrot_set_config_hash_interpreter (Interp* interpreter)
+static void
+parrot_set_config_hash_interpreter (Interp* interpreter)
 {
     PMC *iglobals = interpreter->iglobals;
 

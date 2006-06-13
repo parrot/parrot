@@ -188,7 +188,9 @@ pobject_lives(Interp *interpreter, PObj *obj)
 
 #  else
 
-void pobject_lives(Interp *interpreter, PObj *obj)
+/* XXX This should really use the same header, with different guts #ifdeffed */
+void
+pobject_lives(Interp *interpreter, PObj *obj)
 {
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
