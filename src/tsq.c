@@ -31,7 +31,8 @@ Does a synchronized removal of the head entry off the queue and returns it.
 */
 
 QUEUE_ENTRY *
-pop_entry(QUEUE *queue) {
+pop_entry(QUEUE *queue)
+{
     QUEUE_ENTRY *returnval;
     queue_lock(queue);
     returnval = nosync_pop_entry(queue);
@@ -71,7 +72,8 @@ in here so we don't have to duplicate pop code.
 */
 
 QUEUE_ENTRY *
-nosync_pop_entry(QUEUE *queue) {
+nosync_pop_entry(QUEUE *queue)
+{
     QUEUE_ENTRY *returnval;
     if (!queue->head) {
         return NULL;
@@ -100,7 +102,8 @@ necessary until there is an entry, and then returns it.
 */
 
 QUEUE_ENTRY *
-wait_for_entry(QUEUE *queue) {
+wait_for_entry(QUEUE *queue)
+{
     QUEUE_ENTRY *returnval;
     queue_lock(queue);
     while (queue->head == NULL) {
@@ -124,7 +127,8 @@ Does a synchronized insertion of C<entry> onto the tail of the queue.
 */
 
 void
-push_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
+push_entry(QUEUE *queue, QUEUE_ENTRY *entry)
+{
     queue_lock(queue);
     /* Is there something in the queue? */
     if (queue->tail) {
@@ -150,7 +154,8 @@ Does a synchronized insertion of C<entry> into the head of the queue.
 */
 
 void
-unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
+unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry)
+{
     QUEUE_ENTRY *cur;
 
     queue_lock(queue);
@@ -251,7 +256,8 @@ Locks the queue's mutex.
 */
 
 void
-queue_lock(QUEUE *queue) {
+queue_lock(QUEUE *queue)
+{
     LOCK(queue->queue_mutex);
 }
 
@@ -267,7 +273,8 @@ Unlocks the queue's mutex.
 */
 
 void
-queue_unlock(QUEUE *queue) {
+queue_unlock(QUEUE *queue)
+{
     UNLOCK(queue->queue_mutex);
 }
 
@@ -283,7 +290,8 @@ This function wakes up I<every> thread waiting on the queue.
 */
 
 void
-queue_broadcast(QUEUE *queue) {
+queue_broadcast(QUEUE *queue)
+{
     COND_BROADCAST(queue->queue_condition);
 }
 
@@ -299,7 +307,8 @@ Description.
 */
 
 void
-queue_signal(QUEUE *queue) {
+queue_signal(QUEUE *queue)
+{
     COND_SIGNAL(queue->queue_condition);
 }
 
@@ -315,7 +324,8 @@ Instructs the queue to wait.
 */
 
 void
-queue_wait(QUEUE *queue) {
+queue_wait(QUEUE *queue)
+{
     COND_WAIT(queue->queue_condition, queue->queue_mutex);
 }
 
@@ -331,7 +341,8 @@ Instructs the queue to wait for C<abs_time> seconds (?).
 */
 
 void
-queue_timedwait(QUEUE *queue, struct timespec *abs_time) {
+queue_timedwait(QUEUE *queue, struct timespec *abs_time)
+{
     COND_TIMED_WAIT(queue->queue_condition, queue->queue_mutex, abs_time);
 }
 

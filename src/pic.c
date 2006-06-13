@@ -195,7 +195,7 @@ bytecode segement.
 */
 
 Parrot_MIC*
-parrot_PIC_alloc_mic(Interp*interpreter, size_t n)
+parrot_PIC_alloc_mic(Interp* interpreter, size_t n)
 {
     Parrot_PIC_store * const store = interpreter->code->pic_store;
     assert(n < store->n_mics);

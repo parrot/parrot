@@ -131,6 +131,9 @@ sub function_components {
     my $funcname = $1;
     $parms = $2;
     my @parms = split( /\s*,\s*/, $parms );
+    for ( @parms ) {
+        /\S+\s+\S+/ || ($_ eq "...") || ($_ eq "void") || /theINTERP/ or die "Bad parms in $proto";
+    }
 
     my $static;
     $returntype =~ s/^((static)\s+)?//i;
