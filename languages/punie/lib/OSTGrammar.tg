@@ -29,8 +29,19 @@ grammar OSTGrammar is TGE::Grammar;
 
 transform result (ROOT) :language('PIR') {
     .local pmc result
-    result = new 'POST::Sub'
+    result = new 'POST::Ops'
     result.'clone'(node)
+    .local pmc mainsub
+    mainsub = new 'POST::Sub'
+    mainsub.'clone'(node)
+    mainsub.'name'('_main')
+    mainsub.'attribute'('main')
+
+    .local pmc loadop
+    loadop = new 'POST::Op'
+    loadop.'clone'(node)
+    loadop.'op'('__load()')
+    mainsub.'add_child'(loadop)
 
     .local pmc iter
     iter = node.'child_iter'()
@@ -38,11 +49,57 @@ transform result (ROOT) :language('PIR') {
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
       $P3 = tree.get('result', $P2)
-      result.'add_child'($P3)
+      mainsub.'add_child'($P3)
       goto iter_loop
   iter_end:
 
+    result.'add_child'(mainsub)
+
+    $P4 = tree.'get'('symbols', node, 'ROOT')
+
+    result.'add_child'($P4)
     .return (result)
+}
+
+transform symbols (ROOT) :language('PIR') {
+    .local pmc loadsub
+    loadsub = new 'POST::Sub'
+    loadsub.'clone'(node)
+    loadsub.'name'('__load')
+    loadsub.'attribute'('load')
+    .local pmc temp_var
+    .local pmc iter
+    iter = self.'symbol_iter'()
+  iter_loop:
+    unless iter, iter_end # while (entries) ...
+      shift $S2, iter
+      $P1 = iter[$S2]
+
+      # Create a temporary variable from the entry for this symbol
+      temp_var = clone $P1
+      $P2 = temp_var.new_dummy()
+      loadsub.'add_child'($P2)
+
+      # And put it in the global symbol table
+      .local pmc storeop
+      storeop = new 'POST::Op'
+      storeop.'clone'(node)
+      storeop.'op'('store_global')
+
+      $P3 = new 'POST::Val'
+      $S4 = temp_var.'hllname'()
+      $P3.'value'($S4)
+      $P3.'valtype'('strq')
+      storeop.'add_child'($P3)
+
+      $P4 = clone temp_var
+      storeop.'add_child'($P4)
+
+      loadsub.'add_child'(storeop)
+
+      goto iter_loop
+  iter_end:
+    .return (loadsub)
 }
 
 transform result (PAST::Stmts) :language('PIR') {
@@ -79,6 +136,7 @@ transform result (PAST::Exp) :language('PIR') {
 transform result (PAST::Op) :language('PIR') {
      .local string opname
      opname = node.op()
+    if opname == 'infix:=' goto not_infix
     $S1 = substr opname, 0, 5
     if $S1 == 'infix' goto infix
     goto not_infix
@@ -106,13 +164,22 @@ transform result (PAST::Op) :language('PIR') {
       $P4 = tree.get('nullop', node)
       .return ($P4)
   not_nullop:
+
+    # Lookup operator name to see if there is a direct PIR translation
+    # for it.
+    .local pmc oplookup
+    oplookup = find_global 'PunieOpLookup', 'lookup'
+    $S1 = oplookup(opname)
+    unless $S1 goto no_trans
+    opname = $S1
+  no_trans:
+
     # Iterate through the children of the node, and generate the result
     # for each child.
     .local pmc childop
     childop = new 'POST::Op'
     childop.'clone'(node)
-    $S2 = node.op()
-    childop.op($S2)
+    childop.op(opname)
 
     # Create a node to contain the generated ops.
     .local pmc newops
@@ -385,6 +452,57 @@ transform result (PAST::Val) :language('PIR') {
     $P2 = node.'valtype'()
     result.'valtype'($P2)
     .return (result)
+}
+
+transform result (PAST::Var) :language('PIR') {
+    # The node to contain all the generated ops for a variable access
+    .local pmc newops
+    newops = new 'POST::Ops'
+    newops.'clone'(node)
+
+    # The PIR variable that corresponds to the HLL variable for this
+    # piece of code
+    .local pmc hllname
+    hllname = node.'varname'()
+
+    .local pmc newvar
+    newvar = new 'POST::Var'
+    newvar.'clone'(node)
+    newvar.'new_temp'()
+    newvar.'hllname'(hllname)
+    $P1 = node.'vartype'()
+    newvar.'vartype'($P1)
+    $P1 = node.'scope'()
+    newvar.'scope'($P1)
+
+    # Let the grammar know that it needs to add initialization code for
+    # this HLL variable in the global symbol table
+    self.'add_symbol'(hllname, newvar)
+
+    # A string constant argument of the name of the variable to
+    # lookup in the global symbol table
+    .local pmc name
+    name = node.'varname'()
+    .local pmc namenode
+    namenode = new 'POST::Val'
+    namenode.'clone'(node)
+    namenode.'value'(name)
+    namenode.'valtype'('strq')
+
+    # The operation to lookup the variable
+    .local pmc findop
+    findop = new 'POST::Op'
+    findop.'clone'(node)
+    findop.'op'('find_global')
+    findop.'add_child'(newvar)
+    findop.'add_child'(namenode)
+    newops.'add_child'(findop)
+
+    # The final resulting variable from the operations
+    $P1 = clone newvar
+    newops.'tmpvar'($P1)
+
+    .return (newops)
 }
 
 =head1 LICENSE

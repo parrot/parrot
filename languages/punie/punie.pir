@@ -52,8 +52,8 @@ and logic ops.
     # Verify the match
     $I0 = match.__get_bool()
     unless $I0 goto err_match_fail           # if match fails stop
-#    print "parse succeeded\n"
-#    print "Match tree dump:\n"
+#    say "parse succeeded"
+#    say "Match tree dump:"
 #    load_bytecode "dumper.pbc"
 #    load_bytecode "PGE/Dumper.pbc"
 #    $P0 = find_global "_dumper"
@@ -73,7 +73,7 @@ and logic ops.
     $I0 = defined ast
     unless $I0 goto err_no_ast # if AST fails stop
 
-#    print "\n\nAST tree dump:\n"
+#    say "\n\nAST tree dump:"
 #    ast.dump()
 
     # Compile the abstract syntax tree down to an opcode syntax tree
@@ -89,7 +89,7 @@ and logic ops.
     $I0 = defined ost
     unless $I0 goto err_no_ost # if OST fails stop
 
-#    print "\n\nOST tree dump:\n"
+#    say "\n\nOST tree dump:"
 #    ost.dump()
 
     # Compile the OST down to PIR

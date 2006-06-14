@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 language_output_is('punie', <<'CODE', <<'OUT', 'simple conditionals');
@@ -53,6 +53,13 @@ language_output_is('punie', <<'CODE', <<'OUT', 'conditional expression');
 if (1 + 1) {
   print "ok 1\n";
 }
+CODE
+ok 1
+OUT
+
+language_output_is('punie', <<'CODE', <<'OUT', 'conditional with variable');
+$x = 'test';
+if ($x) { print "ok 1\n"; } else { print "not ok 1\n";}
 CODE
 ok 1
 OUT

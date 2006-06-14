@@ -45,6 +45,9 @@ CODE
     'source' => 'foo',
     'pos' => '42',
     'varname' => 'bar',
+    'hllname' => undef,
+    'vartype' => undef,
+    'scope' => undef,
 }
 OUT
 

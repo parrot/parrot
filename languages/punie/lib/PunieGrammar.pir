@@ -61,6 +61,11 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
     optable.newtok("infix:|",  'looser'=>"infix:&")
     optable.newtok("infix:^",  'equiv'=>"infix:|")
 
+    optable.newtok("infix:=",  'looser'=>"infix:|")
+
+#    optable.newtok("infix:eq",  'looser'=>"infix:<<")
+#    optable.newtok("infix:ne",  'looser'=>"infix:<<")
+
     term = find_global "PunieGrammar", "term"
     optable.newtok("term:", 'tighter'=>"infix:+", 'parsed'=>term)
 

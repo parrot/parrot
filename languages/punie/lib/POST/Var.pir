@@ -15,7 +15,10 @@ of Node.
     .local pmc base
     $P0 = getclass 'Node'
     base = subclass $P0, 'POST::Var'
-    addattribute base, "varname"     # the PIR name of this variable
+    addattribute base, 'varname'     # the PIR name of this variable
+    addattribute base, 'hllname'     # the HLL name associated with this variable
+    addattribute base, 'vartype'     # the container type
+    addattribute base, 'scope'       # global, lexical, etc.
     .return ()
 .end
 
@@ -23,6 +26,24 @@ of Node.
     .param string varname       :optional
     .param int passed_varname   :opt_flag
     .return self.'accessor'('varname', varname, passed_varname)
+.end
+
+.sub 'hllname' :method
+    .param string hllname       :optional
+    .param int passed_hllname   :opt_flag
+    .return self.'accessor'('hllname', hllname, passed_hllname)
+.end
+
+.sub 'vartype' :method
+    .param string vartype       :optional
+    .param int passed_vartype   :opt_flag
+    .return self.'accessor'('vartype', vartype, passed_vartype)
+.end
+
+.sub 'scope' :method
+    .param string scope       :optional
+    .param int passed_scope   :opt_flag
+    .return self.'accessor'('scope', scope, passed_scope)
 .end
 
 .sub generate_temp :method
@@ -74,5 +95,22 @@ loop:
     push $P1, 'source'
     push $P1, 'pos'
     push $P1, 'varname'
+    push $P1, 'hllname'
+    push $P1, 'vartype'
+    push $P1, 'scope'
     .return ($P1)
+.end
+
+.sub __clone :method
+    .local pmc result
+    result = new 'POST::Var'
+    $P1 = self.'varname'()
+    result.'varname'($P1)
+    $P2 = self.'hllname'()
+    result.'hllname'($P2)
+    $P3 = self.'vartype'()
+    result.'vartype'($P3)
+    $P3 = self.'scope'()
+    result.'scope'($P3)
+    .return (result)
 .end

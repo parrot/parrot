@@ -29,7 +29,6 @@ grammar PIRGrammar is TGE::Grammar;
 
 transform result (ROOT) :language('PIR') {
     .local string output
-    output = ".sub _main :main\n"
     .local pmc iter
     iter = node.'child_iter'()
   iter_loop:
@@ -39,7 +38,31 @@ transform result (ROOT) :language('PIR') {
       output .= $S3
       goto iter_loop
   iter_end:
-    output .= ".end\n"
+    .return (output)
+}
+
+transform result (POST::Sub) :language('PIR') {
+    .local string output
+    output = ".sub "
+    $S1 = node.'name'()
+    output .= $S1
+    $S2 = node.'attribute'()
+    unless $S2 goto no_attribute
+      output .= " :"
+      output .= $S2
+  no_attribute:
+    output .= "\n"
+
+    .local pmc iter
+    iter = node.'child_iter'()
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $P2, iter
+      $S3 = tree.get('result', $P2)
+      output .= $S3
+      goto iter_loop
+  iter_end:
+    output .= ".end\n\n"
     .return (output)
 }
 

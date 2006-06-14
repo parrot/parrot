@@ -266,6 +266,26 @@ transform result (PunieGrammar::oexpr) :language('PIR') {
 }
 
 
+transform result (PunieGrammar::variable) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Var'
+    result.'clone'(node)
+    .local string sigil
+    .local string name
+    sigil = node['sigil']
+    $S1 = node['word']
+    name = sigil . $S1
+
+    result.'varname'(name)
+    result.'scope'('global')
+
+    unless sigil == '$' goto not_scalar
+      result.'vartype'('scalar')
+  not_scalar:
+
+    .return (result)
+}
+
 transform result (PunieGrammar::number) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'

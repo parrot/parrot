@@ -39,12 +39,15 @@ rule cexpr {
 }
 
 regex term {
-    <PunieGrammar::number>
+    <PunieGrammar::variable>
+    | <PunieGrammar::number>
     | <PunieGrammar::integer>
     | <PunieGrammar::stringdouble>
     | <PunieGrammar::stringsingle>
     | do <PunieGrammar::block>
 }
+rule variable { <sigil> <word> }
+token sigil { <[$@%]> }
 token integer { \d+ }
 token number { \d+\.\d+ }
 regex stringdouble { <PGE::Text::bracketed: "> }
