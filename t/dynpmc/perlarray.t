@@ -11,11 +11,11 @@ use Parrot::Test tests => 32;
 
 =head1 NAME
 
-t/pmc/perlarray.t - testing the PerlArray PMC
+t/dynpmc/perlarray.t - testing the PerlArray PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/perlarray.t
+    % prove t/dynpmc/perlarray.t
 
 =head1 DESCRIPTION
 

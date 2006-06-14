@@ -11,11 +11,11 @@ use Parrot::Test tests => 69;
 
 =head1 NAME
 
-t/pmc/perlstring.t - Perl Strings
+t/dynpmc/perlstring.t - Perl Strings
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/perlstring.t
+    % prove t/dynpmc/perlstring.t
 
 =head1 DESCRIPTION
 

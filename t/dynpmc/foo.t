@@ -12,7 +12,7 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/pmc/foo.t - Test for a very simple dynamic PMC
+t/dynpmc/foo.t - Test for a very simple dynamic PMC
 
 =head1 SYNOPSIS
 
