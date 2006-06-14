@@ -12,6 +12,9 @@ PMCDIR    = src/pmc
 CLASSDIR  = src/class
 LOAD_EXT  = @load_ext@
 
+PGE_DIR  = ../../compilers/pge
+TGE_DIR  = ../../compilers/tge
+
 PMCS = \
  tclobject \
  tclstring \
@@ -102,7 +105,9 @@ src/compiler.pir \
 src/macros.pir \
 src/parser.pir \
 src/returncodes.pir \
-src/tcl.p6r
+src/tcl_expr_optok.pir \
+src/tcl_expr.pir
+
 
 all: tcl.pbc
 
@@ -111,10 +116,16 @@ tcl.pbc: $(PARROT) pmcs runtime/tcllib.pbc src/tclsh.pir
 
 $(GENERATED_INLINES) : tools/gen_inline.pl
 
-.SUFFIXES : .pir .tmt
+.SUFFIXES : .pir .tmt .pg .tg
 
 .tmt.pir :
 	$(PERL) tools/gen_inline.pl $< > $@
+
+.tg.pir : 
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
+
+.pg.pir :
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=$@ $<
 
 PBCS = \
 runtime/tcllib_temp.pbc \

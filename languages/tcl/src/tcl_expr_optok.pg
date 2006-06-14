@@ -1,0 +1,44 @@
+grammar _Tcl::Grammar::Expr;
+
+proto 'prefix:-' is precedence('1=') {...}
+proto 'prefix:+' is precedence('1=') {...}
+proto 'prefix:~' is precedence('1=') {...}
+proto 'prefix:!' is precedence('1=') {...}
+
+proto 'infix:**' is precedence('2=') {...}
+
+proto 'infix:*'  is precedence('3=') {...}
+proto 'infix:/'  is precedence('3=') {...}
+proto 'infix:%'  is precedence('3=') {...}
+
+proto 'infix:+'  is precedence('4=') {...}
+proto 'infix:-'  is precedence('4=') {...}
+
+proto 'infix:<<' is precedence('5=') {...}
+proto 'infix:>>' is precedence('5=') {...}
+
+proto 'infix:<'  is precedence('6=') {...}
+proto 'infix:>'  is precedence('6=') {...}
+proto 'infix:<=' is precedence('6=') {...}
+proto 'infix:>=' is precedence('6=') {...}
+
+proto 'infix:==' is precedence('7=') {...}
+proto 'infix:!=' is precedence('7=') {...}
+
+proto 'infix:eq' is precedence('8=') {...}
+proto 'infix:ne' is precedence('8=') {...}
+
+proto 'infix:in' is precedence('9=') {...}
+proto 'infix:ni' is precedence('9=') {...}
+
+proto 'infix:&'  is precedence('10=') {...}
+
+proto 'infix:^'  is precedence('11=') {...}
+
+proto 'infix:|'  is precedence('12=') {...}
+
+proto 'infix:&&' is precedence('13=') {...}
+
+proto 'infix:||' is precedence('14=') {...}
+
+# XXX Missing Ternary op. is precedence('15=') {...}
