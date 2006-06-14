@@ -2,6 +2,8 @@
 ** experimental.ops
 */
 
+extern PMC* Parrot_NameSpace_name(Interp* interpreter, PMC* pmc);
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -251,6 +253,11 @@ Find the variable $3 in $2.
 
 Store the PMC $3 as the variable $2 in $1.
 
+=item B<classname>(out PMC, in PMC)
+
+Get the class name for the class in $2 and put it in $1. Note that $1 will be
+a Key PMC that you can use with "new", for example.
+
 =cut
 
 op get_namespace(out PMC) {
@@ -286,6 +293,36 @@ op find_global(out PMC, in KEY, in STR) {
 
 op store_global(in KEY, in STR, in PMC) {
     Parrot_store_global_p(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+op classname(out PMC, in PMC) :object_base {
+    PMC *ns = Parrot_NameSpace_name(interpreter, 
+                                    VTABLE_namespace(interpreter, $2));
+    if (PMC_IS_NULL(ns) || VTABLE_elements(interpreter, ns) < 2)
+    {
+        real_exception(interpreter, NULL, NO_CLASS, 
+            "Attempt to get class name of a non-class.");
+    }
+    else
+    {
+        PMC *key_tail, *key;
+        STRING *tmp;
+        int i, max;
+
+        /* Need to turn list of strings into a key. Note that we are not
+           including the first item in the array, since that is the HLL. */
+        tmp = VTABLE_get_string_keyed_int(interpreter, ns, 1);
+        $1 = key_tail = key_new_string(interpreter, tmp);
+        max = VTABLE_elements(interpreter, ns);
+        for (i = 2; i < max; i++)
+        {
+            tmp = VTABLE_get_string_keyed_int(interpreter, ns, i);
+            key = key_new_string(interpreter, tmp);
+            key_append(interpreter, key_tail, key);
+            key_tail = key;
+        }
+    }    
     goto NEXT();
 }
 
@@ -385,18 +422,43 @@ op getclass(out PMC, in INT) {
 }
 
 inline op newclass(out PMC, in KEY) :object_classes {
-  $1 = pmc_new_init(interpreter, enum_class_ParrotClass, $2);
-  goto NEXT();
+    $1 = pmc_new_init(interpreter, enum_class_ParrotClass, $2);
+    goto NEXT();
 }
 
 inline op new(out PMC, in KEY) :object_classes {
-  PMC *class = $2;
+    PMC *class = $2;
     INTVAL type = pmc_type_p(interpreter, class);
     if (type <= 0)
         real_exception(interpreter, NULL, NO_CLASS,
-            "Class '%Ss' not found", class);
-  $1 = pmc_new(interpreter, type);
-  goto NEXT();
+            "Class '%Ss' not found", readable_name(interpreter, class));
+    $1 = pmc_new(interpreter, type);
+    goto NEXT();
+}
+
+inline op new(out PMC, in PMC) :object_classes {
+    INTVAL type;
+    switch ($2->vtable->base_type)
+    {
+        case enum_class_String:
+	        type = pmc_type(interpreter, PMC_str_val($2));
+            if (type <= 0)
+                real_exception(interpreter, NULL, NO_CLASS,
+                    "Class '%Ss' not found", PMC_str_val($2));
+            $1 = pmc_new(interpreter, type);
+            break;
+        case enum_class_Key:
+            type = pmc_type_p(interpreter, $2);
+            if (type <= 0)
+                real_exception(interpreter, NULL, NO_CLASS,
+                    "Class '%Ss' not found", readable_name(interpreter, $2));
+            $1 = pmc_new(interpreter, type);
+            break;
+        default:
+            real_exception(interpreter, NULL, NO_CLASS,
+                "Can only use a Key or String PMC with new");
+    }
+    goto NEXT();
 }
 
 op subclass(out PMC, in STR, in KEY) :object_classes {

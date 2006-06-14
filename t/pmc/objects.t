@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 75;
+use Parrot::Test tests => 76;
 
 =head1 NAME
 
@@ -2128,5 +2128,26 @@ pir_output_is(<<'CODE', <<'OUTPUT', "super __init called twice (#39081)");
 .end
 CODE
 foo constructor
+OUTPUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Using key from classname op with new");
+.sub main :main
+    $P0 = newclass [ "Monkey" ; "Banana" ]
+    $P0 = new [ "Monkey" ; "Banana" ]
+    $P0.ook()
+    $P1 = class $P0
+    $P2 = classname $P0
+    $P3 = new $P2
+    $P3.ook()    
+.end
+
+.namespace [ "Monkey" ; "Banana" ]
+.sub ook
+    print "Ook!\n"
+.end
+CODE
+Ook!
+Ook!
 OUTPUT
 
