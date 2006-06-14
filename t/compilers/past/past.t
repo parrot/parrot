@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 6;
 
 pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
 .sub _main
@@ -11,7 +11,7 @@ pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
 CODE
 OUT
 
-foreach my $name (qw(Code Exp Stmts Stmt Sub Var)) {
+foreach my $name (qw(Code Exp Stmts Stmt Sub)) {
 my $module = "PAST::$name";
 my $code = <<'CODE'
 .sub _main
