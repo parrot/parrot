@@ -17,7 +17,10 @@ TGE::Grammar - The base class for all tree grammars.
     # define the class
     .local pmc base
     newclass base, 'TGE::Grammar'
-    addattribute base, 'rules' # the rules in the grammar (an array)
+    addattribute base, 'rules'   # the rules in the grammar (an array)
+    addattribute base, 'symbols' # used for tracking symbols parsed
+                                 # (often a hash, but grammar chooses
+                                 # implementation)
     .return ()
 .end
 
@@ -32,6 +35,8 @@ of TGE::Rule objects, which are the semantics defined by the grammar.
 .sub __init :method
     $P1 = new .ResizablePMCArray
     setattribute self, 'rules', $P1
+    $P2 = new .Hash
+    setattribute self, 'symbols', $P2
 .end
 
 =head2 add_rule
@@ -74,6 +79,7 @@ I<top node> of the data structure.
     .local pmc visit
     newtree = new 'TGE::Tree'
     setattribute newtree, 'data', tree
+    setattribute newtree, 'grammar', self
     visit = getattribute newtree, 'visit' 
     # Build up the visit hash
     .local pmc rules
@@ -101,6 +107,40 @@ end_loop:
 
     newtree._scan_node(tree, 'ROOT')
     .return (newtree)
+.end
+
+=head2 add_symbol
+
+Add a symbol to the lookup table.
+
+=cut
+
+.sub 'add_symbol' :method
+    .param pmc name
+    .param pmc value
+
+    # add the new symbol
+    .local pmc symbols
+    symbols = getattribute self, 'symbols'
+
+    $I0 = defined symbols[name]
+    if $I0 goto no_set
+    symbols[name] = value
+  no_set:
+    .return(1)
+.end
+
+=head2 symbol_iter
+
+Return an iterator for the symbol lookup table.
+
+=cut
+
+.sub 'symbol_iter' :method
+    $P1 = getattribute self, 'symbols'
+    $P2 = new Iterator, $P1
+
+    .return($P2)
 .end
 
 =head2 dump

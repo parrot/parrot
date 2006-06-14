@@ -56,31 +56,20 @@ structure.
 .end
 
 .sub __init :method
-    $P3 = find_global "TGE::Compiler", "ROOT_result"
-    self.add_rule("ROOT", "result", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "statements_result"
-    self.add_rule("statements", "result", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "statement_result"
-    self.add_rule("statement", "result", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "transrule_result"
-    self.add_rule("transrule", "result", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "grammardec_result"
-    self.add_rule("grammardec", "result", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "type_value"
-    self.add_rule("type", "value", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "inherit_value"
-    self.add_rule("inherit", "value", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "name_value"
-    self.add_rule("name", "value", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "parent_value"
-    self.add_rule("parent", "value", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "action_value"
-    self.add_rule("action", "value", ".", $P3)
-    $P3 = find_global "TGE::Compiler", "language_value"
-    self.add_rule("language", "value", ".", $P3)
+    self.add_rule("ROOT",       "result", ".", "ROOT_result")
+    self.add_rule("statements", "result", ".", "statements_result")
+    self.add_rule("statement",  "result", ".", "statement_result")
+    self.add_rule("transrule",  "result", ".", "transrule_result")
+    self.add_rule("grammardec", "result", ".", "grammardec_result")
+    self.add_rule("type",       "value",  ".", "type_value")
+    self.add_rule("inherit",    "value",  ".", "inherit_value")
+    self.add_rule("name",       "value",  ".", "name_value")
+    self.add_rule("parent",     "value",  ".", "parent_value")
+    self.add_rule("action",     "value",  ".", "action_value")
+    self.add_rule("language",   "value",  ".", "language_value")
 .end
 
-.sub ROOT_result
+.sub ROOT_result :method
     .param pmc tree
     .param pmc node
     $I0 = exists node["TGE::Parser::statements"]
@@ -94,7 +83,7 @@ err_no_tree:
    .return ()
 .end
 
-.sub statements_result
+.sub statements_result :method
     .param pmc tree
     .param pmc node
     .local pmc statements
@@ -119,7 +108,7 @@ err_no_tree:
     .return (statements)
 .end
 
-.sub statement_result
+.sub statement_result :method
     .param pmc tree
     .param pmc node
     .local pmc result
@@ -141,7 +130,7 @@ err_no_tree:
     .return (result)
 .end
 
-.sub transrule_result
+.sub transrule_result :method
     .param pmc tree
     .param pmc node
     .local pmc rule
@@ -176,7 +165,7 @@ err_no_rule:
     .return ()
 .end
 
-.sub grammardec_result
+.sub grammardec_result :method
     .param pmc tree
     .param pmc node
     .local pmc decl
@@ -202,7 +191,7 @@ err_no_rule:
 .end
 
 # The attribute 'value' on nodes of type 'inherit'.
-.sub inherit_value
+.sub inherit_value :method
     .param pmc tree
     .param pmc node
     $P1 = node[0]
@@ -213,7 +202,7 @@ err_no_rule:
 .end
 
 # The attribute 'value' on nodes of type 'type'.
-.sub type_value
+.sub type_value :method
     .param pmc tree
     .param pmc node
     .local pmc value
@@ -224,7 +213,7 @@ err_no_rule:
 .end
 
 # The attribute 'value' on nodes of type 'name'.
-.sub name_value
+.sub name_value :method
     .param pmc tree
     .param pmc node
     .local pmc name
@@ -236,7 +225,7 @@ err_no_rule:
 .end
 
 # The attribute 'value' on nodes of type 'parent'.
-.sub parent_value
+.sub parent_value :method
     .param pmc tree
     .param pmc node
     .local pmc value
@@ -249,7 +238,7 @@ err_no_rule:
 .end
 
 # The attribute 'value' on nodes of type 'action'.
-.sub action_value
+.sub action_value :method
     .param pmc tree
     .param pmc node
     .local pmc value
@@ -262,7 +251,7 @@ err_no_rule:
 
 # The attribute 'value' on nodes of type 'language'.
 # (This will be refactored out to a general syntax for modifiers.)
-.sub language_value
+.sub language_value :method
     .param pmc tree
     .param pmc node
     .local pmc value
@@ -359,16 +348,17 @@ loop_end:
     type = rule["type"]
     name = rule["name"]
     parent = rule["parent"]
-    output = "    $P1 = find_global '_" . type
-    output .= "_"
-    output .= name
-    output .= "'\n    self.add_rule('"
+    output = "    self.add_rule('"
     output .= type
     output .= "', '"
     output .= name
     output .= "', '"
     output .= parent
-    output .= "', $P1)\n"
+    output .= "',  '_" 
+    output .= type
+    output .= "_"
+    output .= name
+    output .= "')\n"
     .return (output)
 .end
 
@@ -381,7 +371,7 @@ loop_end:
     code .= "_"
     $S2 = rule["name"]
     code .= $S2
-    code .= "'\n"
+    code .= "' :method\n"
     code .= "    .param pmc tree\n"
     code .= "    .param pmc node\n"
     $S3 = rule["action"]

@@ -22,10 +22,11 @@ eventually handle indexing for faster tree searches.
     # define the class
     .local pmc base
     newclass base, "TGE::Tree"
-    addattribute base, "cell"  # a hash for storing values of tree nodes
-    addattribute base, "visit" # arrays of rules that apply to each node type
-    addattribute base, "data"  # the original unmodified tree
-    addattribute base, "agid"  # a hash of node address => node id
+    addattribute base, "cell"    # a hash for storing values of tree nodes
+    addattribute base, "visit"   # arrays of rules that apply to each node type
+    addattribute base, "data"    # the original unmodified tree
+    addattribute base, "grammar" # the current grammar object
+    addattribute base, "agid"    # a hash of node address => node id
     .return ()
 .end
 
@@ -142,6 +143,10 @@ done_scan:
     print "Cannot find the attribute '"
     print name
     print "' ("
+    unless got_type goto class_is_type
+    print type
+    print " on node "
+  class_is_type:
     $S1 = typeof node
     print $S1
     print ") that you asked for.\n"
@@ -160,11 +165,14 @@ eval_cell:
     if $I0 goto run_thunk_action
     goto return_value
 run_thunk_action:
+    .local pmc grammar
+    grammar = getattribute self, 'grammar'
     # the stored node (parent for inherited attributes, self for
     # synthesized attributes)
     $P1 = cell['node']
-    $P0 = cell['action']
-    value = $P0(self, $P1)
+    $S0 = cell['action']
+    # the action is a method on the grammar object
+    value = grammar.$S0(self, $P1) 
     cell['value'] = value
     cell['thunk'] = 0
 
