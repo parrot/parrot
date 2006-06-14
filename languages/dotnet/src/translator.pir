@@ -1,6 +1,8 @@
 # This file contains some of the code that drives the .NET EXE/DLL to PIR
 # translation process.
 
+.HLL '_dotnet', ''
+
 # This sub is the way translation from .NET to PIR is started.
 .sub dotnet_to_pir
 	.param string filename
@@ -25,6 +27,9 @@
 
 	# Initialize PIR output string.
 	pir_output = ""
+
+    # Output HLL directive.
+    pir_output = concat ".HLL 'dotnet', ''\n"
 
 	# Put in ops loader code.
 	pir_output = concat <<"PIR"
@@ -76,11 +81,11 @@ PIR
     # We'll only put fake System.Object in when we're in standalone mode.
     if standalone == 0 goto NO_STANDALONE_CLASSES
     pir_output = concat <<"PIR"
-.namespace [ "System.Object" ]
+.namespace [ "System"; "Object" ]
 .sub __FAKE_SYSTEM_OBJECT :load
-    $I0 = find_type "System.Object"
+    $I0 = find_type [ "System" ; "Object" ]
     if $I0 goto EXISTS
-	$P0 = newclass "System.Object"
+	$P0 = newclass [ "System" ; "Object" ]
 EXISTS:
 .end
 .sub ".ctor" :method
@@ -90,20 +95,20 @@ NO_STANDALONE_CLASSES:
 
     # Put in fake temporary System.Exception and System.String.
     pir_output = concat <<"PIR"
-.namespace [ "System.Exception" ]
+.namespace [ "System" ; "Exception" ]
 .sub __FAKE_SYSTEM_EXCEPTION :load
-    $I0 = find_type "System.Exception"
+    $I0 = find_type [ "System" ; "Exception" ]
     if $I0 goto EXISTS
-	$P0 = newclass "System.Exception"
+	$P0 = newclass [ "System" ; "Exception" ]
 EXISTS:
 .end
 .sub ".ctor" :method
 .end
-.namespace [ "System.String" ]
+.namespace [ "System" ; "String" ]
 .sub __FAKE_SYSTEM_STRING :load
-    $I0 = find_type "System.String"
+    $I0 = find_type [ "System" ; "String" ]
     if $I0 goto EXISTS
-    $P0 = newclass "System.String"
+    $P0 = newclass [ "System" ; "String" ]
     addattribute $P0, "Chars"
 EXISTS:
 .end
@@ -118,18 +123,18 @@ EXISTS:
     $S0 = $P0
     .return($S0)
 .end
-.namespace [ "System.ValueType" ]
+.namespace [ "System" ; "ValueType" ]
 .sub __FAKE_SYSTEM_VALUETYPE :load
-    $I0 = find_type "System.ValueType"
+    $I0 = find_type [ "System" ; "ValueType" ]
     if $I0 goto EXISTS
-	$P0 = newclass "System.ValueType"
+	$P0 = newclass [ "System" ; "ValueType" ]
 EXISTS:
 .end
-.namespace [ "System.Enum" ]
+.namespace [ "System" ; "Enum" ]
 .sub __FAKE_SYSTEM_ENUM :load
-    $I0 = find_type "System.Enum"
+    $I0 = find_type [ "System" ; "Enum" ]
     if $I0 goto EXISTS
-	$P0 = newclass "System.Enum"
+	$P0 = newclass [ "System" ; "Enum" ]
 EXISTS:
 .end
 PIR
@@ -242,7 +247,7 @@ AR_LOOP_END:
 	.param pmc assembly
 	.param pmc class
     .param int trace
-	.local string pir_output, name, namespace, internal_name, tmp, p_name
+	.local string pir_output, name, namespace, internal_name, tmp, p_name, name_key
 	.local pmc fields, field, methods, meth, ex, int_types, int_ids
 	.local int i, max_field, max_method, parent_id, parent_type
     .local int flags, is_interface, is_abstract, num_interfaces, done_init
@@ -262,17 +267,18 @@ AR_LOOP_END:
 NOTRACE:
 
 	# Emit a namespace directive.
-	pir_output = concat ".namespace [ \""
-	pir_output = concat internal_name
-	pir_output = concat "\" ]\n\n"
+    name_key = namespace_to_key(internal_name)
+	pir_output = concat ".namespace "
+	pir_output = concat name_key
+	pir_output = concat "\n\n"
 
 	# Emit start of on load type setup.
 	pir_output = concat ".sub \"__onload\" :load\n"
     pir_output = concat "    .local pmc type, parent\n"
     pir_output = concat "     push_eh FAILED\n" # XXX Ignoring missing parents
-	pir_output = concat "    type = newclass \""
-	pir_output = concat internal_name
-	pir_output = concat "\"\n"
+	pir_output = concat "    type = newclass "
+	pir_output = concat name_key
+	pir_output = concat "\n"
 
     # Add any interfaces that this class implements.
     int_types = class.get_interface_types()
@@ -313,9 +319,10 @@ FEND:
 
     # Add code to run constructor.
     pir_output = concat "push_eh FAILED\n"
-    pir_output = concat "$P0 = find_global \""
-    pir_output = concat internal_name
-    pir_output = concat "\", \".cctor\"\n$P0()\n"
+    pir_output = concat "$P0 = find_global "
+    tmp = namespace_to_key(internal_name)
+    pir_output = concat tmp
+    pir_output = concat ", \".cctor\"\n$P0()\n"
 
 	# This is the end of the on load type setup sub.
 	pir_output = concat "FAILED:\n.end\n\n"
@@ -365,8 +372,8 @@ PIR
 NOT_ABSTRACT:
 
     # If it is a value type, add the __init and __clone v-table methods.
-    if p_name == "System.ValueType" goto VAL_TYPE
-    if p_name == "System.Enum" goto VAL_TYPE
+    if p_name == "[ \"System\" ; \"ValueType\" ]" goto VAL_TYPE
+    if p_name == "[ \"System\" ; \"Enum\" ]" goto VAL_TYPE
     goto NOT_VAL_TYPE
 VAL_TYPE:
     tmp = value_type_methods(assembly, class, p_name)
@@ -401,7 +408,7 @@ MEND:
     .local string pclass_ns, pir_output, tmp
 
     # Find out what type of parent we have.
-    pir_output = "    parent = getclass \""
+    pir_output = "    parent = getclass "
     if parent_type == 0 goto PARENT_DEF
     if parent_type == 1 goto PARENT_REF
     ex = new .Exception
@@ -414,6 +421,7 @@ PARENT_DEF:
     classes = assembly.get_classes()
     pclass = classes[parent_id]
     pclass_ns = pclass.get_fullname()
+    pclass_ns = namespace_to_key(pclass_ns)
     pir_output = concat pclass_ns
     goto PARENT_DONE
 
@@ -428,11 +436,12 @@ PARENT_REF:
 PARENT_NO_NS:
     tmp = pclass
     pclass_ns = concat tmp
+    pclass_ns = namespace_to_key(pclass_ns)
     pir_output = concat pclass_ns
     
     # Finally, do code to add parent to the class and return.
 PARENT_DONE:
-    pir_output = concat "\"\n    addparent type, parent\n"
+    pir_output = concat "\n    addparent type, parent\n"
     .return (pir_output, pclass_ns)
 .end
 
@@ -563,9 +572,8 @@ ILOOP_END:
 .sub __clone :method
 .local pmc cpy
 $P0 = class self
-$S0 = classname $P0
-$I0 = find_type $S0
-cpy = new $I0
+$P1 = classname $P0
+cpy = new $P1
 PIR
     pir_output = concat clone_body
     pir_output = concat ".return(cpy)\n.end\n"
@@ -573,7 +581,7 @@ PIR
     # If we have an enum, provide get and set integer and float v-table
     # methods to provide or hand back first field. This is for supporting
     # enums.
-    if parent != "System.Enum" goto NOT_ENUM
+    if parent != "[ \"System\" ; \"Enum\" ]" goto NOT_ENUM
     pir_output = concat <<"PIR"
 .sub __get_integer
     .param pmc s
@@ -606,4 +614,37 @@ NOT_ENUM:
 
     # Return generated code.
     .return(pir_output)
+.end
+
+
+# Takes a .Net namespace separated by dots and makes a Parrot namespace key.
+.sub namespace_to_key
+    .param string in_ns
+    .local string ns_key, tmp
+    .local pmc keys
+    .local int i, max
+
+    # Initial bracket of key.
+    ns_key = "[ "
+
+    # Split up and make key sequence.
+    keys = split ".", in_ns
+    max = elements keys
+    i = 0
+LOOP:
+    if i == max goto LOOP_END
+    if i == 0 goto NO_SC
+    ns_key = concat "; "
+NO_SC:
+    tmp = keys[i]
+    ns_key = concat "\""
+    ns_key = concat tmp
+    ns_key = concat "\" "
+    inc i
+    goto LOOP
+LOOP_END:
+
+    # End and return key.
+    ns_key = concat "]"
+    .return(ns_key)
 .end

@@ -83,7 +83,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_i1_i');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_i1_i(42)
 	print $I0
 	print "\n"
@@ -108,7 +108,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_i1_f');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_i1_f(42.0)
 	print $I0
 	print "\n"
@@ -133,7 +133,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_u1_i');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_u1_i(42)
 	print $I0
 	print "\n"
@@ -150,7 +150,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_u1_f');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_u1_f(42.0)
 	print $I0
 	print "\n"
@@ -167,7 +167,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_i2_i');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_i2_i(42)
 	print $I0
 	print "\n"
@@ -192,7 +192,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_i2_f');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_i2_f(42.0)
 	print $I0
 	print "\n"
@@ -217,7 +217,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_u2_i');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_u2_i(42)
 	print $I0
 	print "\n"
@@ -234,7 +234,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_u2_f');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_u2_f(42.0)
 	print $I0
 	print "\n"
@@ -251,7 +251,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_i4_f');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_i4_f(42.0)
 	print $I0
 	print "\n"
@@ -268,7 +268,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_u4_f');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.conv_u4_f(42.0)
 	print $I0
 	print "\n"
@@ -281,7 +281,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_r4_i');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$N0 = obj.conv_r4_i(42)
 	print $N0
 	print "\n"
@@ -298,7 +298,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'conv_r8_i');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$N0 = obj.conv_r8_i(42)
 	print $N0
 	print "\n"

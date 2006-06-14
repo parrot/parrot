@@ -1,6 +1,8 @@
 # net2pbc
 # Turns a .NET EXE or DLL file into Parrot bytecode.
 
+.HLL '_dotnet', ''
+
 .sub main :main
     .param pmc argv
 	.local string program_name, filename, output, temp

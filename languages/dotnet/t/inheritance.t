@@ -84,8 +84,8 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'test_2_up');
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
-	obj1 = new "Testing.Test"
-    obj2 = new "Testing.baby"
+	obj1 = new [ "Testing" ; "Test" ]
+    obj2 = new [ "Testing" ; "baby" ]
 	$I0 = obj1.test_2_up(obj2)
     print $I0
     print "\n"
@@ -98,8 +98,8 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'test_1_up');
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
-	obj1 = new "Testing.Test"
-    obj2 = new "Testing.baby"
+	obj1 = new [ "Testing" ; "Test" ]
+    obj2 = new [ "Testing" ; "baby" ]
 	$I0 = obj1.test_1_up(obj2)
     print $I0
     print "\n"
@@ -112,8 +112,8 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'test_cur');
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
-	obj1 = new "Testing.Test"
-    obj2 = new "Testing.baby"
+	obj1 = new [ "Testing" ; "Test" ]
+    obj2 = new [ "Testing" ; "baby" ]
 	$I0 = obj1.test_cur(obj2)
     print $I0
     print "\n"
@@ -126,8 +126,8 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'override 1');
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
-	obj1 = new "Testing.Test"
-    obj2 = new "Testing.mummy"
+	obj1 = new [ "Testing" ; "Test" ]
+    obj2 = new [ "Testing" ; "mummy" ]
 	$I0 = obj1.test(obj2)
     print $I0
     print "\n"
@@ -140,8 +140,8 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'override 2');
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
-	obj1 = new "Testing.Test"
-    obj2 = new "Testing.baby"
+	obj1 = new [ "Testing" ; "Test" ]
+    obj2 = new [ "Testing" ; "baby" ]
 	$I0 = obj1.test(obj2)
     print $I0
     print "\n"

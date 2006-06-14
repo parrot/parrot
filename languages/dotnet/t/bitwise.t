@@ -53,7 +53,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'and');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.and(65, 1088)
 	print $I0
 	print "\n"
@@ -66,7 +66,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'or');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.or(65, 1024)
 	print $I0
 	print "\n"
@@ -79,7 +79,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'xor');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.xor(0xF0, 0x77)
 	print $I0
 	print "\n"
@@ -92,7 +92,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'not');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.not(0xFFFFFFF0)
 	print $I0
 	print "\n"

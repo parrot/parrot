@@ -1,6 +1,8 @@
 # This file contains code relating to transforming stack type state info as it
 # is being tracked.
 
+.HLL '_dotnet', ''
+
 # This migrates the type of an argument being stored to the argument itself.
 .sub typeinfo_starg
     .param pmc ptypes

@@ -29,7 +29,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'set_long');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$P0 = obj.set_long()
     $I0 = $P0.get_high_bits()
 	print $I0

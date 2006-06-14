@@ -41,7 +41,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'set_x');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	obj.set_x(28)
     $P0 = new Integer
     $P0 = getattribute obj, "x"
@@ -56,7 +56,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'set_y');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	obj.set_y(14)
     $P0 = new Integer
     $P0 = getattribute obj, "y"
@@ -71,7 +71,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'add');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	obj.set_x(28)
 	obj.set_y(14)
     $I0 = obj.add()

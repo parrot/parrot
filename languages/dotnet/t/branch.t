@@ -55,7 +55,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'lt');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.lt(5,7)
 	print $I0
 	print "\n"
@@ -84,7 +84,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'le');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.le(5,7)
 	print $I0
 	print "\n"
@@ -113,7 +113,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'gt');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.gt(5,7)
 	print $I0
 	print "\n"
@@ -142,7 +142,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'ge');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.ge(5,7)
 	print $I0
 	print "\n"

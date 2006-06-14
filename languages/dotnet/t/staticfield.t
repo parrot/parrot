@@ -38,13 +38,14 @@ ok(translate("t.dll", "t.pbc"), 'translate');
 
 ## Tests.
 is (run_pir(<<'PIR'), <<'OUTPUT', 'set_x');
+.HLL 'dotnet', ''
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	obj.set_x(26)
     $P0 = new Integer
-    $P0 = find_global "Testing.Test", "x"
+    $P0 = find_global [ "Testing" ; "Test" ], "x"
 	print $P0
 	print "\n"
 .end
@@ -53,13 +54,14 @@ PIR
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'set_y');
+.HLL 'dotnet', ''
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	obj.set_y(16)
     $P0 = new Integer
-    $P0 = find_global "Testing.Test", "y"
+    $P0 = find_global [ "Testing" ; "Test" ], "y"
 	print $P0
 	print "\n"
 .end
@@ -71,7 +73,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'add');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	obj.set_x(26)
 	obj.set_y(16)
     $I0 = obj.add()

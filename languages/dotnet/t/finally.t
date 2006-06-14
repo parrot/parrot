@@ -177,7 +177,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'unwind over');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.unwind_over()
     print $I0
     print "\n"
@@ -190,7 +190,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'unwind over 2');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.unwind_over_2()
     print $I0
     print "\n"
@@ -203,7 +203,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'try...finally');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.try_finally()
     print $I0
     print "\n"
@@ -216,7 +216,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'mixed');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.mixed()
     print $I0
     print "\n"
@@ -229,7 +229,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 1');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.nested_1(0)
     print $I0
     print "\n"
@@ -246,7 +246,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 2');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.nested_2(0)
     print $I0
     print "\n"

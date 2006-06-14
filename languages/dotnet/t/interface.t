@@ -75,7 +75,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'no instantiation');
 	.local pmc obj
 	load_bytecode "t.pbc"
     push_eh handler
-	obj = new "Testing.Kickable"
+	obj = new [ "Testing" ; "Kickable" ]
     print "not "
 handler:
     print "ok\n"
@@ -89,7 +89,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'no instantiation');
 	.local pmc obj
 	load_bytecode "t.pbc"
     push_eh EH
-	obj = new "Testing.Sufferer"
+	obj = new [ "Testing" ; "Sufferer" ]
     print "not "
 EH:
     print "ok\n"
@@ -104,7 +104,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'concrete instantiation');
 	.local pmc obj
 	load_bytecode "t.pbc"
     push_eh EH
-	obj = new "Testing.UnfortunatePerson"
+	obj = new [ "Testing" ; "UnfortunatePerson" ]
     print "ok\n"
     end
 EH:
@@ -118,7 +118,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'abstract method call');
 .sub main
 	.local pmc prt, cls, obj
 	load_bytecode "t.pbc"
-    prt = getclass "Testing.Kickable"
+    prt = getclass [ "Testing" ; "Kickable" ]
     cls = newclass "badness"
     addparent cls, prt
 	obj = new "badness"
@@ -136,7 +136,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'methods');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
     obj.setup()
     obj.kick_da_brother(10)
     $I0 = obj.ready_to_sell()
@@ -151,7 +151,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'methods');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
     obj.setup()
     obj.kick_da_brother(1000) # ouch!
     $I0 = obj.ready_to_sell()

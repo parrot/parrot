@@ -35,7 +35,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'switch');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.test(0)
 	print $I0
 	print "\n"

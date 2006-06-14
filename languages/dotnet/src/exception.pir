@@ -1,5 +1,7 @@
 # This file contains code related to translating exception handling.
 
+.HLL '_dotnet', ''
+
 # This generates code that goes before a leave instruction to ensure the
 # correct stuff is removed from the exception stack and any finally blocks are
 # executed.

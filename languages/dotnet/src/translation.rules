@@ -1425,9 +1425,10 @@ ${STEMP1} = method_call_mmd_box(${ASSEMBLY}, ${PTEMP2}, ${PARAMS})
 ${INS} = concat ${STEMP1}
 
 # Need to get class the method is in to generate name to look it up.
-${INS} = concat "$P1000000 = find_global \""
+${INS} = concat "$P1000000 = find_global "
+${STEMP0} = namespace_to_key(${STEMP0})
 ${INS} = concat ${STEMP0}
-${INS} = concat "\", \""
+${INS} = concat ", \""
 ${STEMP0} = ${PTEMP0}
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\"\n"
@@ -1585,9 +1586,10 @@ ${INS} = concat "$P1000000 = new "
 ${PTEMP1} = ${DTYPES}[0]
 ${STEMP0} = ${PTEMP1}["reg_type_pmc"]
 ${INS} = concat ${STEMP0}
-${INS} = concat "\n$P1000000 = find_global \""
+${INS} = concat "\n$P1000000 = find_global "
+${STEMP1} = namespace_to_key(${STEMP1})
 ${INS} = concat ${STEMP1}
-${INS} = concat "\", \""
+${INS} = concat ", \""
 ${STEMP0} = ${PTEMP0}
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\"\n"
@@ -1645,6 +1647,7 @@ arguments = tfield
 pir = <<PIR
 # Get field info.
 (${PTEMP0}, ${ITEMP0}, ${STEMP1}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
+${STEMP1} = namespace_to_key(${STEMP1})
 
 # Build static field store.
 ${INS} = concat "$P1000000 = new "
@@ -1655,9 +1658,9 @@ ${STEMP0} = ${PTEMP1}["reg_type_pmc"]
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\n$P1000000 = "
 ${INS} = concat ${STACK0}
-${INS} = concat "\nstore_global \""
+${INS} = concat "\nstore_global "
 ${INS} = concat ${STEMP1}
-${INS} = concat "\", \""
+${INS} = concat ", \""
 ${STEMP0} = ${PTEMP0}
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\", $P1000000\n"
@@ -1680,14 +1683,15 @@ ${INS} = concat ${STEMP1}
 
 # Emit new instruction.
 ${INS} = concat ${DEST0}
-${INS} = concat " = new \""
+${INS} = concat " = new "
+${STEMP0} = namespace_to_key(${STEMP0})
 ${INS} = concat ${STEMP0}
-${INS} = concat "\"\n"
+${INS} = concat "\n"
 
 # Now emit instructions to find constructor.
-${INS} = concat "$P1000000 = find_global \""
+${INS} = concat "$P1000000 = find_global "
 ${INS} = concat ${STEMP0}
-${INS} = concat "\", \""
+${INS} = concat ", \""
 ${STEMP0} = ${PTEMP0}
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\"\n"
@@ -1782,9 +1786,10 @@ ${INS} = concat ${STEMP0}
 # Emit "isa" check and jump to copy if it's OK.
 ${INS} = concat "\n$I1000000 = isa "
 ${INS} = concat ${STACK0}
-${INS} = concat ", \""
+${INS} = concat ", "
+${STEMP1} = namespace_to_key(${STEMP1})
 ${INS} = concat ${STEMP1}
-${INS} = concat "\"\nif $I1000000 goto IILAB"
+${INS} = concat "\nif $I1000000 goto IILAB"
 ${STEMP0} = ${ITEMP0}
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\n"
@@ -1858,9 +1863,10 @@ ${INS} = concat ${STEMP0}
 # Emit "isa" check.
 ${INS} = concat "\n$I1000000 = isa "
 ${INS} = concat ${STACK0}
-${INS} = concat ", \""
+${INS} = concat ", "
+${STEMP1} = namespace_to_key(${STEMP1})
 ${INS} = concat ${STEMP1}
-${INS} = concat "\"\nunless $I1000000 goto IILAB"
+${INS} = concat "\nunless $I1000000 goto IILAB"
 ${STEMP0} = ${ITEMP0}
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\n"
@@ -2628,7 +2634,7 @@ ${STEMP1} = escaper(${STEMP0}, ${STEMP2})
 ${ITEMP0} = find_encoding "utf8"
 ${STEMP1} = trans_encoding ${ITEMP0}
 ${INS} = concat ${DEST0}
-${INS} = concat " = new \"System.String\"\n"
+${INS} = concat " = new [ \"System\" ; \"String\" ]\n"
 ${INS} = concat ${DEST0}
 ${INS} = concat ".\".ctor\"(\""
 ${INS} = concat ${STEMP1}
@@ -2817,9 +2823,10 @@ pir = <<PIR
 (${PTEMP0}, ${ITEMP0}, ${STEMP1}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
 
 # Build attribute access.
-${INS} = concat "$P1000000 = find_global \""
+${INS} = concat "$P1000000 = find_global "
+${STEMP1} = namespace_to_key(${STEMP1})
 ${INS} = concat ${STEMP1}
-${INS} = concat "\", \""
+${INS} = concat ", \""
 ${STEMP0} = ${PTEMP0}
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\"\n"

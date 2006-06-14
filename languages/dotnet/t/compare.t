@@ -53,7 +53,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'is_same');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.is_same(0, 0)
 	print $I0
 	print "\n"
@@ -78,7 +78,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'is_lt');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.is_lt(0, 0)
 	print $I0
 	print "\n"
@@ -103,7 +103,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'is_lt_un');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.is_lt_un(0, 0)
 	print $I0
 	print "\n"
@@ -128,7 +128,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'is_gt');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.is_gt(0, 0)
 	print $I0
 	print "\n"
@@ -153,7 +153,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'is_gt_un');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.is_gt_un(0, 0)
 	print $I0
 	print "\n"

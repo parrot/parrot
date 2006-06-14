@@ -50,7 +50,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'add_hundred');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.add_hundred(0)
 	print $I0
 	print "\n"
@@ -79,7 +79,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'multiply');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.multiply(4,5)
 	print $I0
 	print "\n"

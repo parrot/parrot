@@ -23,6 +23,10 @@ my @methods = parse($input);
 
 # Start of output.
 my $output = <<'PIR_OUT';
+# THIS IS A GENERATED FILE! DO NOT EDIT!
+
+.HLL '_dotnet', ''
+
 .sub internal_method_body
     .param pmc class
     .param pmc meth

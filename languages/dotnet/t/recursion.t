@@ -31,7 +31,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'factorial');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.factorial(0)
     print $I0
     print "\n"

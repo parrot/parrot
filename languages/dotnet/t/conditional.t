@@ -51,7 +51,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'clip');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.clip(0)
 	print $I0
 	print "\n"
@@ -80,7 +80,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'band_pass');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.band_pass(1)
 	print $I0
 	print "\n"
@@ -113,7 +113,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'is_42');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.is_42(99)
 	print $I0
 	print "\n"

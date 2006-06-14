@@ -53,7 +53,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'add');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.add(500,72)
 	print $I0
 	print "\n"
@@ -70,7 +70,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'sub');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj."sub"(500,72)
 	print $I0
 	print "\n"
@@ -87,7 +87,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'mul');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.mul(50,7)
 	print $I0
 	print "\n"
@@ -104,7 +104,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'div');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.div(12,3)
 	print $I0
 	print "\n"
@@ -125,7 +125,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'rem');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.rem(13,3)
 	print $I0
 	print "\n"
@@ -142,7 +142,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'neg');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.neg(100)
 	print $I0
 	print "\n"

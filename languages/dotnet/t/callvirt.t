@@ -46,8 +46,8 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'mummy');
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
-	obj1 = new "Testing.Test"
-    obj2 = new "Testing.mummy"
+	obj1 = new [ "Testing" ; "Test" ]
+    obj2 = new [ "Testing" ; "mummy" ]
 	$I0 = obj1.test_call(obj2)
     print $I0
     print "\n"
@@ -60,8 +60,8 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'baby');
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
-	obj1 = new "Testing.Test"
-    obj2 = new "Testing.baby"
+	obj1 = new [ "Testing" ; "Test" ]
+    obj2 = new [ "Testing" ; "baby" ]
 	$I0 = obj1.test_call(obj2)
     print $I0
     print "\n"

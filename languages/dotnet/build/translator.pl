@@ -334,6 +334,10 @@ sub generate_initial_pir($$$) {
 
     # Emit the translator PIR.
     my $pir = <<TRANSPIR;
+# THIS IS A GENERATED FILE! DO NOT EDIT!
+
+.HLL '_dotnet', ''
+
 .sub trans_instructions
     .param pmc assembly
     .param pmc class
@@ -520,10 +524,11 @@ NOT_TRY_START:
     gen_pir = concat "$P1000001 = cur_exception[\"obj\"]\n"
     class_type = eh.get_class_type()
     class_id = eh.get_class_id()
-    gen_pir = concat "$I1000000 = isa $P1000001, \""
+    gen_pir = concat "$I1000000 = isa $P1000001, "
     ($P0, $S0) = class_info_from_ehtype(assembly, class_type, class_id)
+    $S0 = namespace_to_key($S0)
     gen_pir = concat $S0
-    gen_pir = concat "\"\nif $I1000000 goto TYPED_EH_FOUND_"
+    gen_pir = concat "\nif $I1000000 goto TYPED_EH_FOUND_"
     tmp = handler_offset
     gen_pir = concat tmp
     gen_pir = concat "\nthrow $P1000000\nTYPED_EH_FOUND_"

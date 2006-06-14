@@ -175,7 +175,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'simple no exception');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.simple(0)
     print $I0
     print "\n"
@@ -188,7 +188,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'simple exception');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.simple(1)
     print $I0
     print "\n"
@@ -201,7 +201,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'typed exception handler');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.typed(1)
     print $I0
     print "\n"
@@ -218,7 +218,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 1');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.nested1(0)
     print $I0
     print "\n"
@@ -235,7 +235,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 2');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.nested2(0)
     print $I0
     print "\n"
@@ -252,7 +252,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 3');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.nested3(0)
     print $I0
     print "\n"
@@ -269,7 +269,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 4');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.nested4(0)
     print $I0
     print "\n"
@@ -286,7 +286,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 5');
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
-	obj = new "Testing.Test"
+	obj = new [ "Testing" ; "Test" ]
 	$I0 = obj.nested5(0)
     print $I0
     print "\n"

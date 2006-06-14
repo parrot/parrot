@@ -1,5 +1,7 @@
 # This file contains code relating to method translation.
 
+.HLL '_dotnet', ''
+
 # This is the starting point for translating a method.
 .sub trans_method
 	.param pmc assembly
@@ -140,9 +142,8 @@ METHOD_END:
     this_offset = 1
 
     # Also generate MMD entry.
-    pir_multi = concat "\""
+    self_ns = namespace_to_key(self_ns)
     pir_multi = concat self_ns
-    pir_multi = concat "\""
 NOSELF:
 
 	# Loop over parameters and produce list.
@@ -198,17 +199,15 @@ MMD_CLASS_DEF:
     dec class_id
     class = classes[class_id]
     tmp = class.get_fullname()
-    pir_multi = concat "\""
+    tmp = namespace_to_key(tmp)
     pir_multi = concat tmp
-    pir_multi = concat "\""
     goto MMD_DONE
 MMD_CLASS_REF:
     classes = assembly.get_typerefs()
     class = classes[class_id]
     tmp = class
-    pir_multi = concat "\""
+    tmp = namespace_to_key(tmp)
     pir_multi = concat tmp
-    pir_multi = concat "\""
     goto MMD_DONE
 MMD_I1:
     pir_multi = concat "\"@@DOTNET_MMDBOX_I1\""
@@ -308,10 +307,11 @@ LOCAL:
     type = ltype["token"]
     pir_output = concat "local"
 	pir_output = concat $S0
-	pir_output = concat " = new \""
+	pir_output = concat " = new "
     ($P0, $S0) = class_info_from_sig(assembly, type)
+    $S0 = namespace_to_key($S0)
     pir_output = concat $S0
-    pir_output = concat "\"\n"
+    pir_output = concat "\n"
 NOT_VT:
 	
 	# Loop.
