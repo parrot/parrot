@@ -3,7 +3,7 @@
 
 tcl_expr_parse.pir - Parsing support subroutines for [expr] 
 
-=over4
+=over 4
 
 =item C<expression(PMC mob)>
 
