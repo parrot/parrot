@@ -112,9 +112,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'int');
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-    print "inst\n"
 	$I0 = obj.m_int()
-    print "called\n"
     print $I0
     print "\n"
 .end
