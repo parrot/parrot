@@ -637,6 +637,12 @@ OUTPUT
 # the test was skipped, the description says:
 # find_global should find from .HLL namespace, not current .namespace
 # but according to pdd21, {find,store}_global are relative to current
+
+SKIP:
+{
+    skip("immediate test, doesn't with -r (from .pbc)", 1)
+	if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ );
+
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global in current");
 .HLL 'bork', ''
 .namespace [ '' ]
@@ -655,11 +661,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global in current");
 $P1 = find_global 'eek'
 print $P1
 .end
-
 CODE
 ok
 OUTPUT
-
+}
 
 open S, ">$temp_b.pir" or die "Can't write $temp_b.pir";
 print S <<'EOF';
