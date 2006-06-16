@@ -28,7 +28,7 @@ my $parrotdir = File::Spec->curdir();
 my ( %opts, %parrot, %report );
 my ( $editor, $user, $domain, $msgid, $tmpfile );
 my ( $is_linux, $is_macos, $is_mswin32, $is_os2, $is_vms );
-my @categories = qw[ core docs install library utilities ];
+my @categories = qw[ core docs install library utilities languages ];
 my @severities = qw[ critical high medium low wishlist none ];
 
 
