@@ -193,6 +193,7 @@ ABC
 DEF
 
 === use reshape to create a single-element vector
+--- todo
 --- APL
 ⍴1⍴2
 --- out: 1

@@ -408,6 +408,7 @@ __DATA__
 9
 
 === quad output, variable
+--- todo
 --- APL
 ⎕← A ← 2+2
 A+1
