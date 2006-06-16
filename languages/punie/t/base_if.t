@@ -64,9 +64,6 @@ CODE
 ok 1
 OUT
 
-TODO: {
-local $TODO = 'unimplemented feature';
-
 language_output_is('punie', <<'EOC', <<'OUT', 'base_cond.t');
 #!./perl
 
@@ -86,4 +83,3 @@ ok 1
 ok 2
 OUT
 
-}

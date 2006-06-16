@@ -106,6 +106,41 @@ transform result (POST::Op) :language('PIR') {
     .return (output)
 }
 
+transform result (POST::Call) :language('PIR') {
+    .local string output
+    .local int counter
+    counter = 0
+
+    output = "    " # initial indentation
+    .local pmc iter
+    iter = node.'child_iter'()
+    unless iter goto no_first         # first entry
+      shift $P1, iter
+      $S1 = tree.get('result', $P1)
+      output .= $S1
+      output .= " = "
+  no_first:
+
+    .local string subname
+    subname = node.'name'()
+    output .= "'"
+    output .= subname
+    output .= "'("
+  iter_loop:
+    unless iter goto iter_end         # while (entries) ...
+      shift $P2, iter
+      inc counter
+      $S3 = tree.get('result', $P2)
+      if counter <= 1 goto no_comma_out
+      output .= ", "
+    no_comma_out:
+      output .= $S3
+      goto iter_loop
+  iter_end:
+    output .= ")\n"
+    .return (output)
+}
+
 transform result (POST::Var) :language('PIR') {
     $S1 = node.varname()
     .return ($S1)

@@ -38,9 +38,9 @@ transform result (ROOT) :language('PIR') {
     mainsub.'attribute'('main')
 
     .local pmc loadop
-    loadop = new 'POST::Op'
+    loadop = new 'POST::Call'
     loadop.'clone'(node)
-    loadop.'op'('__load()')
+    loadop.'name'('__load')
     mainsub.'add_child'(loadop)
 
     .local pmc iter
@@ -67,6 +67,18 @@ transform symbols (ROOT) :language('PIR') {
     loadsub.'clone'(node)
     loadsub.'name'('__load')
     loadsub.'attribute'('load')
+
+    # Add an op to load the library of builtin operators
+    .local pmc builtinsop
+    builtinsop = new 'POST::Op'
+    builtinsop.'clone'(node)
+    builtinsop.'op'('load_bytecode')
+    $P3 = new 'POST::Val'
+    $P3.'value'('languages/punie/lib/PunieBuiltins.pir')
+    $P3.'valtype'('strq')
+    builtinsop.'add_child'($P3)
+    loadsub.'add_child'(builtinsop)
+
     .local pmc temp_var
     .local pmc iter
     iter = self.'symbol_iter'()
@@ -234,15 +246,21 @@ transform infix (PAST::Op) :language('PIR') {
     newops.'clone'(node)
 
     # Create the op for the current node
-    .local pmc childop
-    childop = new 'POST::Op'
-
-    .local string opname
     .local pmc oplookup
+    .local string opname
+    .local pmc childop
     oplookup = find_global 'PunieOpLookup', 'lookup'
     $S1 = node.op()
     opname = oplookup($S1)
-    childop.'op'(opname)
+    if opname goto op_is_simple
+      childop = new 'POST::Call'
+      $S2 = substr $S1, 6
+      childop.'name'($S2)
+      goto end_op_create
+  op_is_simple:
+      childop = new 'POST::Op'
+      childop.'op'(opname)
+  end_op_create:
 
     # Create a temporary variable
     .local pmc temp_var

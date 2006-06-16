@@ -16,6 +16,7 @@ for the opcode syntax tree nodes created by the Punie compiler.
 .sub "__onload" :load
     load_bytecode "Node.pbc"
     load_bytecode "languages/punie/lib/POST/Op.pir"
+    load_bytecode "languages/punie/lib/POST/Call.pir"
     load_bytecode "languages/punie/lib/POST/Ops.pir"
     load_bytecode "languages/punie/lib/POST/Sub.pir"
     load_bytecode "languages/punie/lib/POST/Val.pir"

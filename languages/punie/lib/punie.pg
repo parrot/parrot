@@ -53,4 +53,8 @@ token number { \d+\.\d+ }
 regex stringdouble { <PGE::Text::bracketed: "> }
 regex stringsingle { <PGE::Text::bracketed: '> }
 
-
+token ws {
+    [ \s+
+    | \# \N*
+    ]*
+}
