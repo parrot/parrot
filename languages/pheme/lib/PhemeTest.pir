@@ -1,6 +1,6 @@
 .namespace[ 'Test::More' ]
 
-.sub is :multi( Pheme::Cons, Pheme::Cons )
+.sub is :multi( [ 'Pheme'; 'Cons' ], [ 'Pheme'; 'Cons' ] )
 	.param pmc    l_cons
 	.param pmc    r_cons
 	.param string description :optional
@@ -18,7 +18,7 @@
 	.return( equal )
 .end
 
-.sub is_deeply :multi( Pheme::Cons, Pheme::Cons )
+.sub is_deeply :multi( [ 'Pheme'; 'Cons' ], [ 'Pheme'; 'Cons' ] )
 	.param pmc    l_cons
 	.param pmc    r_cons
 	.param string description :optional

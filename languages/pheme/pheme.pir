@@ -6,6 +6,7 @@
 	errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
 
 	load_bytecode 'languages/pheme/lib/PhemeCompiler.pbc'
+	load_bytecode 'languages/pheme/lib/PhemeObjects.pir'
 	load_bytecode 'languages/pheme/lib/PhemeSymbols.pbc'
 	load_bytecode 'languages/pheme/lib/pheme_grammar_gen.pir'
 

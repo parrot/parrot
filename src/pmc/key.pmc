@@ -410,6 +410,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         INTVAL flags = io->vtable->shift_integer(INTERP, io);
         flags &= KEY_type_FLAGS;
         PObj_get_FLAGS(SELF) |= flags;
+        PObj_custom_mark_SET(SELF);
         /* get contents */
         switch (flags) {
             case KEY_integer_FLAG:
