@@ -70,7 +70,7 @@ whole thing may be taken out or refactored away at any moment.
     rulesub = p6rule_compile(pattern, adverbs :named :flat)
 
     $I0 = exists adverbs["grammar"]
-    unless $I0 goto done
+    if $I0 goto done
     store_global "PGE::Grammar", name, rulesub
 
   done:
