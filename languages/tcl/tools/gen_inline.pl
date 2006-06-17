@@ -8,7 +8,7 @@ gen_inline.pl
 
 =head1 SYNOPSIS
 
- %perl languages/tcl/tools/gen_inline.pl lib/builtins/foo.tmt > lib/builtins/foo.pir
+ %perl languages/tcl/tools/gen_inline.pl src/builtins/foo.tmt > src/builtins/foo.pir
 
 =head1 DESCRIPTION
 
@@ -25,378 +25,318 @@ easier to inline more builtins accurately.
 Currently supports the following types of arguments: 
 variable name, integer, channel, list, string, script, and expressions.
 
-=head2 Internal notes...
-
-If code is run through the C<inlined> subroutine, magic is done to expand
-{pir_variable} elements into the string to support the common idiom of:
-
- pir_code .= "$P"
- $S0 = some_var
- pir_code .= $S0
- pir_code .= "= value\n"
-
-Which can now be written as: 
- 
- $P{some_var} = value
-
 =cut
 
-local undef $/;
+my $file = open_tmt(shift @ARGV);
+my ($cmd, @args) = extract_info($file);
 
-my $file = shift @ARGV;
+print    header($cmd, @args);
+print arg_check(@args);
+print   helpers(@args);
+print arguments(@args);
+print      body($file, @args);
+print   badargs($cmd, @args);
+print    footer();
 
-open my $handle, "<", $file
-or die "can't open '$file' for reading";
+sub open_tmt {
+    my ($filename) = @_;
 
-my $contents = <$handle>;            # raw contents of the .tmt file
-my $template = eval "{ $contents }"; # perl variable containing the commands DS.
-die "error processing $file: $@" if $@;
+    local $/ = undef;
+    open my $file, "<", $filename
+        or die "can't open '$filename' for reading";
 
-my @args_opts = parse_usage( $template->{usage} );
-
-my ( $min_args, $max_args ) = num_args(@args_opts);
-
-
-print <<"END_PIR";
-
-.HLL '_Tcl', ''
-.namespace [ 'builtins' ]
-
-.sub '$template->{command}'
-  .param int register_num
-  .param pmc argv
-
-  .local pmc compiler
-  .get_from_HLL(compiler, '_tcl', 'compile_dispatch')
-
-  .local int argc
-  .local string pir_code,temp_code
-  pir_code = ''
-  argc = argv
-END_PIR
-
-
-if ( $max_args == $min_args ) {
-    print <<"END_PIR";
-  if argc != $max_args goto bad_args
-END_PIR
-
-}
-else {
-
-    print <<"END_PIR";
-  if argc < $min_args goto bad_args
-END_PIR
-
-  if ($max_args) {
-    print <<"END_PIR";
-  if argc > $max_args goto bad_args
-END_PIR
-  }
+    return $file;
 }
 
-# XXX We're including more here than we need to. Check for which
-# arguments are required - even better, push this out to the compiler.
-# Eventually all these helpers should be inlined, but in the meantime,
-# we could scan the compiled code for __foo( and pull in the global def
-# as needed.
-
-print inlined(<<"END_PIR");
-  .local pmc __read
-  .get_from_HLL(__read,'_tcl','__read')
-  .local pmc __set
-  .get_from_HLL(__set,'_tcl','__set')
-  .local pmc __integer
-  .get_from_HLL(__integer,'_tcl','__integer')
-  .local pmc __list
-  .get_from_HLL(__list,'_tcl','__list')
-  .local pmc __channel
-  .get_from_HLL(__channel,'_tcl','__channel')
-END_PIR
-
-print <<"END_PIR";
-  .local pmc __script_compile
-  .get_from_HLL(__script_compile, '_tcl', 'compile')
-  .local pmc __expression_compile
-  .get_from_HLL(__expression_compile, '_tcl', '__expression_compile')
-END_PIR
-
-# Now, grab each arg off the list and compile it, handling defaults, etc.
-# XXX Refactor when we add subcommands
-my $ii = 0;
-foreach my $arg (@args_opts) {
-    my $argument     = "argument_$arg->{name}";
-    my $arg_register = "register_$arg->{name}";
-    my $arg_default  = "default_$arg->{name}";
-    my $arg_done     = "done_$arg->{name}";
-    my $type         = "TclString";
-    my $typequotes   = "'";
-
-    my $type_handlers = {
-        script => sub {
-            print <<"END_PIR";
-  .local string ${arg_register}_code
-  ($arg_register,${arg_register}_code) = __script_compile(register_num, $argument)
-  #XXX This wild increase in register numbers is to avoid a problem in 
-  #    tcl command's compiler which, in one case, used \$P5 to calculate an
-  #    argument, but then returned the result in \$P4. Register usage should be
-  #    bounded between the value you pass in and the value you return. Using
-  #    something outside that range is bad, mmkay? -coke
-  register_num = $arg_register + 100 
-END_PIR
-        },
-        
-        expr => sub {
-            print <<"END_PIR";
-  .local string ${arg_register}_code
-  ($arg_register,${arg_register}_code) = __expression_compile(register_num, $argument)
-  register_num = $arg_register + 100
-END_PIR
-        },
-        
-        var     => sub {
-            # Using 'variable' means we have two registers we care about:
-            # $arg_register is the register of the resulting value
-            # $arg_register_varname is the register of the variable name.
-
-            print <<"END_PIR";
-  .local int ${arg_register}_varname
-  (${arg_register}_varname,temp_code) = compiler(register_num, $argument)
-  $arg_register = ${arg_register}_varname + 1
-  register_num = $arg_register + 1
-  pir_code .= temp_code
-END_PIR
-            print inlined(<<"END_PIR");
-  \$P{$arg_register} = __read(\$P{${arg_register}_varname})
-END_PIR
-        },
-        
-        channel => sub {
-            print <<"END_PIR";
-  ($arg_register,temp_code) = compiler(register_num, $argument)
-  register_num = $arg_register + 1
-  pir_code .= temp_code
-END_PIR
-            print inlined(<<"END_PIR");
-  \$P{$arg_register} = __channel(\$P{$arg_register})
-END_PIR
-        },
-        
-        list    => sub {
-            print <<"END_PIR";
-  ($arg_register,temp_code) = compiler(register_num, $argument)
-  register_num = $arg_register + 1
-  pir_code .= temp_code
-END_PIR
-            print inlined(<<"END_PIR");
-  \$P{$arg_register} = __list(\$P{$arg_register})
-END_PIR
-        },
-        
-        int     => sub {
-            $type       = "TclInt";
-            $typequotes = '';
-            print <<"END_PIR";
-  ($arg_register,temp_code) = compiler(register_num, $argument)
-  register_num = $arg_register + 1
-  pir_code .= temp_code
-END_PIR
-            print inlined(<<"END_PIR");
-  \$P{$arg_register} = __integer(\$P{$arg_register})
-END_PIR
-        },
-        
-        string  => sub {
-            print <<"END_PIR";
-  ($arg_register,temp_code) = compiler(register_num, $argument)
-  register_num = $arg_register + 1
-  pir_code .= temp_code
-END_PIR
-        }
-    };
-
-    print <<"END_PIR";
-  .local pmc $argument
-  .local int $arg_register
-END_PIR
-
-    if ( $arg->{optional} ) {
-        my $next_arg = $ii + 1;
-        print <<"END_PIR";
-  if argc < $next_arg goto $arg_default
-END_PIR
-
-    }
-
-    print <<"END_PIR";
-  $argument = argv[$ii]
-END_PIR
-
-    my $handler = $type_handlers->{ $arg->{type} };
-    $handler->() if $handler;
-
-    print <<"END_PIR";
-  goto $arg_done
-$arg_default:
-END_PIR
-
-    if ( defined $arg->{default} ) {
-        print <<"END_PIR";
-  $arg_register = register_num
-  register_num = $arg_register + 1
-END_PIR
-
-        print inlined(<<"END_PIR");
-  \$P{$arg_register} = new .$type
-  \$P{$arg_register} = $typequotes$arg->{default}$typequotes
-END_PIR
-
-    }
-    else {
-        print "  #no default\n";
-    }
-
-    print <<"END_PIR";
-$arg_done:
-END_PIR
-
-    $ii++;
-}
-
-print <<"END_PIR";
-  inc register_num
-  # Begin template code
-END_PIR
-
-print inlined( $template->{code} );
-
-print <<"END_PIR";
-  # End template code
-  .return(register_num,pir_code)
-bad_args:
-END_PIR
-
-if ( $template->{bad_args} ) {
-
-    print inlined(<<"END_PIR");
-.throw('$template->{bad_args}')
-END_PIR
-
-}
-else {
-    my $usage_str = create_usage(@args_opts);
-    print <<"END_PIR";
-  .throw('wrong # args: should be "$template->{command}$usage_str"')
-END_PIR
-}
-
-print ".end\n";
-
-=head1 Utility Methods
-
-=head2 (min,max) = num_args($template)
-
-Given an argset, figure out the minimum and maximum number of args required
-for this builtin.
-
-=cut
-
-sub num_args {
-    my @args = @_;
-
-    my $min = my $max = @args;
-
-    my $is_repeating; 
-
-    foreach my $arg (@args) {
-        $min-- if $arg->{optional};
-
-        # XXX this isn't quite right. Need to be more clever with options.
-        $max++ if $arg->{option} && $arg->{type};
-        $is_repeating = $arg->{repeating};
-    }
-
-    $max = undef if $is_repeating;
+sub extract_info {
+    my ($file) = @_;
     
-    return $min, $max;
-}
+    my $spec = <$file>;
+    die "Invalid args: '$spec'\n"
+        unless $spec =~ /\[ (\w+) (?: \s+ (.+?) )? \]/x;
 
-sub inlined {
-    my $code = "";
-    
-    foreach my $line (split "\n", shift) {
-        $line =~ s/\\/\\\\/g;
-        $line =~ s/"/\\"/g;
-        $line =~ s/\\n/\\\\n/g;
-        if ( $line =~ s/(.*?){(.*?)}// ) {
-            # register interpolation
-             if ($1 ne "") {
-                 $code .= "  pir_code .= \"$1\"\n";
-             }
-             $code .= "  \$S0 = $2\n";
-             $code .= "  pir_code .= \$S0\n";
-             redo
-             ; # keep processing this line until we've gotten all the elements
-        }
-        else {
-            $code .= "  pir_code .= \"$line\\n\"\n";
-        }
-    }
+    my $cmd  = $1;
+    my $args = $2;
 
-    return $code;
+    return $cmd, parse_usage($args);
 }
 
 sub parse_usage {
     my $usage = shift;
-
+    
     my @results;
     my $types = join "|", qw(int string var list channel script expr);
+    my $type  = qr{
+        (\??)             # literal, optional ?
 
+        (-?)              # option marker
+
+        (\w+)             # name
+
+        (?: : ($types) )? # optional type
+        (?: = ([^?]*)  )? # optional default value
+
+        (\+?)             # is this repeating?
+
+        (\??)             # optional closing ?
+    }xo;
+    
     while ($usage) {
-        $usage =~ s/^ +//;
+        $usage =~ s/^\s+//;
         next unless $usage;
-        if (
-            $usage =~ s{
-      ^
-      (\??)             # literal, optional ?
-
-       (-?)             # option marker
-
-      (\w+)             # name
-
-      (?: : ($types) )? # optional type
-      (?: = ([^?]*)  )? # optional default value
-      (\+?)             # is this repeating?
-
-      (\??)             # optional closing ?
-    }{}x
-          )
-        {
-            my $arg = {};
+        die "invalid usage: '$usage'\n"
+            unless $usage =~ s/^$type//;
+        
+        my $arg = {};
             
-            $arg->{optional}    = !!$1;
-            $arg->{option}      = !!$2;
-            $arg->{name}        = $3;
-            $arg->{type}        = $4 || ( $arg->{option} ? undef: "string" );
-            $arg->{default}     = $5;
-            $arg->{repeating}   = $6 eq "+";
+        $arg->{optional}    = !!$1;
+        $arg->{option}      = !!$2;
+        $arg->{name}        = $3;
+        $arg->{type}        = $4 || ( $arg->{option} ? undef: "string" );
+        $arg->{default}     = $5;
+        $arg->{repeating}   = $6 eq "+";
+
+        die "Optionals need to be optional.\n"
+            if $arg->{option} and not $arg->{optional};
             
-            if ( $arg->{option} && !$arg->{optional} ) {
-                die "Optionals need to be optional.\n";
-            }
-            
-            push @results, $arg;
-        }
-        else {
-            die "invalid usage '$usage'\n";
-        }
+        push @results, $arg;
     }
-
+    
     return @results;
 }
 
-# the usage from the .tmt file is not the same as the generated error
-# messages: construct a user-visible usage.
+sub header {
+    my ($cmd, @args) = @_;
+    
+    my $code = <<"END_PIR";
+.HLL '_Tcl', ''
+.namespace [ 'builtins' ]
+        
+.sub '$cmd'
+  .param int register
+  .param pmc argv
+
+  .local pmc compiler
+  .get_from_HLL(compiler, '_tcl', 'compile_dispatch')
+        
+  .local int argc
+  .local string pir
+  pir = ''
+  argc = elements argv
+END_PIR
+    
+    return $code;
+}
+
+sub arg_check {
+    my (@args) = @_;
+    
+    my ($min, $max) = num_args(@args);
+    my $code = "";
+    
+    if ($max == $min) {
+        $code .= "  if argc != $max goto bad_args\n";
+    }
+    else {
+        $code .= "  if argc < $min goto bad_args\n";
+        
+        $code .= "  if argc > $max goto bad_args\n"
+            if $max;
+    }
+    
+    return $code;
+}
+
+sub helpers {
+    my (@args) = @_;
+    
+    # types present in this command
+    my %types = ();
+    for my $arg (@args) {
+        next unless $arg->{type};
+        
+        $types{ $arg->{type} } = 1;
+    }
+    
+    # helper conversion subroutines
+    my %helpers = (
+        # type     subroutine
+        channel => '__channel',
+        expr    => '__expr',
+        int     => '__integer',
+        list    => '__list',
+        script  => '__script',
+        var     => '__read',
+    );
+    
+    # add code to get subs for needed conversions
+    my $code = "  # get necessary conversion subs\n";
+    for my $type (keys %types) {
+        next unless my $help = $helpers{$type};
+        
+        $code .= emit("  .local pmc $help");
+        $code .= emit("  .get_from_HLL($help, '_tcl', '$help')");
+    }
+    
+    return $code;
+}
+
+sub inline {
+    my $line = shift;
+    return "  pir .= \"$line\"\n";
+}
+
+sub arguments {
+    my (@args) = @_;
+    
+    my %conversions =
+    (
+        channel => '__channel',
+        expr    => '__expr',
+        int     => '__integer',
+        list    => '__list',
+        script  => '__script',
+        var     => '__read',
+    );
+    
+    my $code = "";
+    for my $i (0..$#args)
+    {
+        my $arg  = $args[$i];
+        my $name = $arg->{name};
+        
+        $code .= emit("  .local pmc a_$name");
+        # do we need to use a default?
+        $code .= "  if argc < ".($i+1)." goto default_$name \n"
+            if $arg->{optional};
+        
+        # the actual thing to be compiled
+        $code .= "  \$P0 = argv[$i] \n";
+        # the register behind this argument
+        $code .= "  .local int    r_$name \n";
+        $code .= "  (r_$name, \$S0) = compiler(register, \$P0) \n";
+        $code .= "  register = r_$name + 1 \n";
+        $code .= "  pir .= \$S0 \n";
+        $code .= emit("a_$name = \$P%0", "r_$name");
+        
+        # convert the argument, if necessary
+        my $convert = $conversions{ $arg->{type} };
+        $code .= emit("a_$name = $convert(a_$name)")
+            if $convert;
+        
+        # default value, if necessary
+        if (defined $arg->{default}) {
+            my $type    = $arg->{type} eq 'int' ? 'TclInt' : 'TclString';
+            my $quote   = $arg->{type} eq 'int' ? ''       : "'";
+            my $default = $arg->{default};
+            
+            $code .= "  goto done_$name \n";
+            $code .= "default_$name: \n";
+            $code .= emit("a_$name = new .$type");
+            $code .= emit("a_$name = $quote$default$quote");
+            $code .= "done_$name: \n";
+        }
+    }
+    
+    return $code;
+}
+
+sub emit {
+    my ($code, @args) = @_;
+    
+    chomp $code;
+    
+    my $pir = '';
+    while ($code =~ s/^([^%]*)%(\d+)//)
+    {
+        $pir .= inline($1) if $1;
+        $pir .= "  \$S0 = $args[$2] \n";
+        $pir .= "  pir .= \$S0 \n";
+    }
+    
+    # catch anything at the end
+    $pir .= $code ? inline("$code\\n") : inline("\\n");
+    
+    return $pir;
+}
+
+sub body {
+    my ($file, @args) = @_;
+    
+    my %args = map { $_->{name} => $_ } @args;
+    
+    # the number for the loops
+    my $code = "  .local int loop_num \n"
+             . "  loop_num = register \n";
+    $code .= emit('.local pmc temp');
+    # locals inside this code
+    my %locals;
+    while (my $line = <$file>)
+    {
+        # rename labels
+        if ($line =~ /^\s* (\w+) \s* : \s*$/mx) {
+            $code .= emit($1."_%0:", 'loop_num');
+            next;
+        }
+        
+        # rename locals (during declaration)
+        if ($line =~ /^\s* \.local \s+ (\w+) \s+ (.+)$/mx) {
+            my @vars = split /\s*,\s*/, $2;
+            
+            $locals{$_} = 1 for @vars;
+            $code .= inline("  .local $1 ");
+            $code .= emit(join(",", map {$_."_%0"} @vars), 'loop_num');
+
+            next;
+        }
+        
+
+        # comments
+        $line =~ s/#.*$//m;
+
+        # gotos and exceptions
+        $line =~ s/(goto|push_eh) \s+ (\w+)/$1 $2_%0/gx;
+
+        # locals
+        if (%locals) {
+            my $locals = join "|", keys %locals;
+            $line =~ s/\b($locals)\b/$1_%0/g;
+        }
+
+        # args
+        while ($line =~ s/\$(?!(?:P|S|N|I)\d+|R\b)(\w+)/a_$1/)
+        {
+            my $name = $1;
+            my $arg  = $args{$name};
+            
+            if ($arg->{type} eq 'script' or $arg->{type} eq 'expr') {
+                $code .= emit("temp = a_$name()");
+                
+                # if that's all there is, remove it
+                $line =~ s/^\s*a_$name\s*$//m or $line =~ s/a_$name/temp/;
+            }
+        }
+        
+        # $R
+        $line =~ s/\$R\b/\$P%1/g;
+
+        $code .= emit($line, 'loop_num', 'register');
+    }
+
+    $code .= "  .return(register, pir) \n";
+    
+    return $code;
+}
+
+sub badargs {
+    my ($cmd, @args) = @_;
+    
+    my $usage = create_usage(@args);
+    my $code  = "bad_args: \n"
+              . ".throw('wrong # args: should be \"$cmd$usage\"') \n";
+    
+    return $code;
+}
 
 sub create_usage {
     my @args = @_;
@@ -429,6 +369,39 @@ sub create_usage {
     my $result = join " ", @results;
     $result = " $result" if @results;
     return $result;
+}
+
+sub footer {
+    return ".end\n";
+}
+
+=head1 Utility Methods
+
+=head2 (min,max) = num_args($template)
+
+Given an argset, figure out the minimum and maximum number of args required
+for this builtin.
+
+=cut
+
+sub num_args {
+    my @args = @_;
+
+    my $min = my $max = @args;
+
+    my $is_repeating; 
+
+    foreach my $arg (@args) {
+        $min-- if $arg->{optional};
+
+        # XXX this isn't quite right. Need to be more clever with options.
+        $max++ if $arg->{option} && $arg->{type};
+        $is_repeating = $arg->{repeating};
+    }
+
+    $max = undef if $is_repeating;
+    
+    return $min, $max;
 }
 
 =head1 TODO

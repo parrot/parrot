@@ -1,8 +1,4 @@
-command => 'exit',
-usage => "?returnCode:int=0?",
-code => <<'END_PIR'
+[exit ?returnCode:int=0?]
 
-$I{register_returnCode} = $P{register_returnCode}
-exit $I{register_returnCode}
-
-END_PIR
+$I0 = $returnCode
+exit $I0

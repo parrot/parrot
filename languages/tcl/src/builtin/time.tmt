@@ -1,23 +1,26 @@
-command => 'time',
-usage=> "script:script ?count:int=1?",
-code => <<'END_PIR'
+[time script:script ?count:int=1?]
 
-$I0 = $P{register_count}
-time_loop_{register_num}:
-if $I0 == 0 goto time_{register_num}_done
-$N0 = time
-{register_script_code}
-dec $I0
-goto time_loop_{register_num}
-time_{register_num}_done:
-$N{register_num}  = time
-$N{register_num}  = $N{register_num} - $N0
-$N{register_num}  = $N{register_num} * 1000000
-$N0 = $P{register_count}
-$N{register_num}  = $N{register_num} / $N0
-$S{register_num}  = $N{register_num}
-$S{register_num} .= ' microseconds per iteration'
-$P{register_num} = new .TclString
-$P{register_num} = $S{register_num}
-
-END_PIR
+  $I0 = $count
+  .local float t
+  t = time
+time_loop:
+  if $I0 == 0 goto time_done
+  
+  $script
+  
+  dec $I0
+  goto time_loop
+  
+time_done:
+  $N0 = time
+  t -= $N0
+  t *= 1000000
+  
+  $N0 = $count
+  t /= $N0
+  
+  $S0 = t
+  $S0 .= ' microseconds per iteration'
+  
+  $R = new .TclString
+  $R = $S0

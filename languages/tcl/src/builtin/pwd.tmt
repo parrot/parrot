@@ -1,7 +1,4 @@
-command => 'pwd',
-code => <<'END_PIR'
+[pwd]
 
-$P{register_num} = new .OS
-$P{register_num} = $P{register_num}.'cwd'()
-
-END_PIR
+$R = new .OS
+$R = $R.'cwd'()

@@ -1,9 +1,6 @@
-command => 'join',
-usage => "list:list ?joinString= ?",
-code => <<'END_PIR'
+[join list:list ?joinString= ?]
 
-$S{register_joinString} = $P{register_joinString}
-$S{register_num} = join $S{register_joinString}, $P{register_list}
-$P{register_num} = new .TclString
-$P{register_num} = $S{register_num}
-END_PIR
+$S0 = $joinString
+$S0 = join $S0, $list
+$R  = new .TclString
+$R  = $S0

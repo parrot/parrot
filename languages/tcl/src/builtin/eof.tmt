@@ -1,9 +1,5 @@
-command => 'eof',
-usage => "channelId:channel",
-code => <<'END_PIR'
+[eof channelId:channel]
 
-$I{register_num} = isfalse $P{register_channelId}
-$P{register_num} = new .TclInt
-$P{register_num} = $I{register_num}
-
-END_PIR
+$I0 = isfalse $channelId
+$R  = new .TclInt
+$R  = $I0

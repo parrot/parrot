@@ -1,8 +1,5 @@
-command => 'llength',
-usage => "list:list",
-code => <<'END_PIR'
+[llength list:list]
 
-$I{register_num} = $P{register_list}
-$P{register_num} = new .TclInt
-$P{register_num} = $I{register_num}
-END_PIR
+$I0 = elements $list
+$R  = new .TclInt
+$R  = $I0

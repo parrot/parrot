@@ -115,3 +115,35 @@ bad_channel:
  .throw($S0)
 
 .end
+
+=head2 _Tcl::__expr
+
+Given an expression, return a subroutine.
+
+=cut
+
+.sub __expr
+  .param string expr
+  
+  .get_from_HLL($P0, '_tcl', '__expression_compile')
+  ($I0,$S0) = $P0(0,expr)
+  $P2 = pir_compiler($I0,$S0)
+  
+  .return($P2)
+.end
+
+=head2 _Tcl::__script
+
+Given a chunk of tcl code, return a subroutine.
+
+=cut
+
+.sub __script
+  .param string code
+  
+  .get_from_HLL($P0, '_tcl', 'compile')
+  ($I0,$S0) = $P0(0,code)
+  $P2 = pir_compiler($I0,$S0)
+  
+  .return($P2)
+.end
