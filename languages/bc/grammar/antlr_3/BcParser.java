@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea8 grammar/antlr_3/bc.g 2006-03-17 18:45:45
+// $ANTLR 3.0ea10 grammar/antlr_3/bc.g 2006-06-17 11:43:23
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -10,7 +10,7 @@ import org.antlr.runtime.tree.*;
 
 public class BcParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "UNARY_MINUS", "INT", "ML_COMMENT", "WS", "\'-\'", "\'quit\'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "UNARY_MINUS", "INT", "ML_COMMENT", "WS", "'-'", "'quit'"
     };
     public static final int UNARY_MINUS=5;
     public static final int INT=6;
@@ -19,8 +19,7 @@ public class BcParser extends Parser {
     public static final int ML_COMMENT=7;
     public static final int PROGRAM=4;
         public BcParser(TokenStream input) {
-            super(input);
-        }
+            super(input);    }
         
     protected TreeAdaptor adaptor = new CommonTreeAdaptor();
 
@@ -31,8 +30,8 @@ public class BcParser extends Parser {
         return adaptor;
     }
 
-
     public String[] getTokenNames() { return tokenNames; }
+    public String getGrammarFileName() { return "grammar/antlr_3/bc.g"; }
 
 
     public static class program_return extends ParserRuleReturnScope {
@@ -59,14 +58,14 @@ public class BcParser extends Parser {
             // grammar/antlr_3/bc.g:23:5: ( input_item quit -> ^( PROGRAM input_item ) )
             // grammar/antlr_3/bc.g:23:5: input_item quit
             {
-            following.push(FOLLOW_input_item_in_program66);
+            pushFollow(FOLLOW_input_item_in_program66);
             input_item1=input_item();
-            following.pop();
+            _fsp--;
 
             list_input_item.add(input_item1.tree);
-            following.push(FOLLOW_quit_in_program68);
+            pushFollow(FOLLOW_quit_in_program68);
             quit2=quit();
-            following.pop();
+            _fsp--;
 
             list_quit.add(quit2.tree);
 
@@ -99,8 +98,10 @@ public class BcParser extends Parser {
         }
         finally {
             retval.stop = input.LT(-1);
-            retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
-            adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
+                retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
+                adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
         }
         return retval;
     }
@@ -146,9 +147,9 @@ public class BcParser extends Parser {
             	    {
             	    CommonTree root_1 = (CommonTree)adaptor.nil();
 
-            	    following.push(FOLLOW_expression_in_input_item91);
+            	    pushFollow(FOLLOW_expression_in_input_item91);
             	    expression3=expression();
-            	    following.pop();
+            	    _fsp--;
 
             	    adaptor.addChild(root_1, expression3.tree);
 
@@ -176,8 +177,10 @@ public class BcParser extends Parser {
         }
         finally {
             retval.stop = input.LT(-1);
-            retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
-            adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
+                retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
+                adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
         }
         return retval;
     }
@@ -217,7 +220,7 @@ public class BcParser extends Parser {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("30:1: expression : ( INT | \'-\' expression -> ^( UNARY_MINUS expression ) );", 2, 0, input);
+                    new NoViableAltException("30:1: expression : ( INT | '-' expression -> ^( UNARY_MINUS expression ) );", 2, 0, input);
 
                 throw nvae;
             }
@@ -242,9 +245,9 @@ public class BcParser extends Parser {
                     match(input,9,FOLLOW_9_in_expression112); 
                     list_9.add(char_literal5);
 
-                    following.push(FOLLOW_expression_in_expression114);
+                    pushFollow(FOLLOW_expression_in_expression114);
                     expression6=expression();
-                    following.pop();
+                    _fsp--;
 
                     list_expression.add(expression6.tree);
 
@@ -279,8 +282,10 @@ public class BcParser extends Parser {
         }
         finally {
             retval.stop = input.LT(-1);
-            retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
-            adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
+                retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
+                adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
         }
         return retval;
     }
@@ -324,12 +329,15 @@ public class BcParser extends Parser {
         }
         finally {
             retval.stop = input.LT(-1);
-            retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
-            adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
+                retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
+                adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
         }
         return retval;
     }
     // $ANTLR end quit
+
 
 
 

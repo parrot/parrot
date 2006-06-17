@@ -1,10 +1,8 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
 # Some tidbits on what is to do for Parrot bc.
 # See docs/parrot_bc.pod for visions.
-
-- Emit Perl6 code
 
 - Custom PMCs for Parrot bc
   - Decimal BigNum libraries

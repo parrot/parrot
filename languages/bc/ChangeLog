@@ -1,5 +1,8 @@
 # $Id$
 
+2006-06-17     Bernhard Schmalhofer
+        * Try to make it work with current compiler tools and antlr-3ea10
+
 2006-02-20     Bernhard Schmalhofer
         * Add the generated Java code to SVN
 

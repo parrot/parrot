@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea8 grammar/antlr_3/bc.g 2006-03-17 18:45:45
+// $ANTLR 3.0ea10 grammar/antlr_3/bc.g 2006-06-17 11:43:23
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -19,6 +19,7 @@ public class BcParserLexer extends Lexer {
     public BcParserLexer(CharStream input) {
         super(input);
     }
+    public String getGrammarFileName() { return "grammar/antlr_3/bc.g"; }
 
 
     // $ANTLR start T9
@@ -40,6 +41,7 @@ public class BcParserLexer extends Lexer {
         }
         finally {
         }
+        return ;
     }
     // $ANTLR end T9
 
@@ -64,6 +66,7 @@ public class BcParserLexer extends Lexer {
         }
         finally {
         }
+        return ;
     }
     // $ANTLR end T10
 
@@ -76,10 +79,10 @@ public class BcParserLexer extends Lexer {
             int line = getLine();
             int charPosition = getCharPositionInLine();
             int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:36:4: ( ( '0' .. '9' )+ )
-            // grammar/antlr_3/bc.g:36:4: ( '0' .. '9' )+
+            // grammar/antlr_3/bc.g:37:4: ( ( '0' .. '9' )+ )
+            // grammar/antlr_3/bc.g:37:4: ( '0' .. '9' )+
             {
-            // grammar/antlr_3/bc.g:36:4: ( '0' .. '9' )+
+            // grammar/antlr_3/bc.g:37:4: ( '0' .. '9' )+
             int cnt1=0;
             loop1:
             do {
@@ -92,7 +95,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:36:5: '0' .. '9'
+            	    // grammar/antlr_3/bc.g:37:5: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -115,6 +118,7 @@ public class BcParserLexer extends Lexer {
         }
         finally {
         }
+        return ;
     }
     // $ANTLR end INT
 
@@ -127,12 +131,12 @@ public class BcParserLexer extends Lexer {
             int line = getLine();
             int charPosition = getCharPositionInLine();
             int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:48:5: ( '/*' ( options {greedy=false; } : . )* '*/' )
-            // grammar/antlr_3/bc.g:48:5: '/*' ( options {greedy=false; } : . )* '*/'
+            // grammar/antlr_3/bc.g:49:5: ( '/*' ( options {greedy=false; } : . )* '*/' )
+            // grammar/antlr_3/bc.g:49:5: '/*' ( options {greedy=false; } : . )* '*/'
             {
             match("/*"); 
 
-            // grammar/antlr_3/bc.g:49:5: ( options {greedy=false; } : . )*
+            // grammar/antlr_3/bc.g:50:5: ( options {greedy=false; } : . )*
             loop2:
             do {
                 int alt2=2;
@@ -155,7 +159,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:49:33: .
+            	    // grammar/antlr_3/bc.g:50:33: .
             	    {
             	    matchAny(); 
 
@@ -179,6 +183,7 @@ public class BcParserLexer extends Lexer {
         }
         finally {
         }
+        return ;
     }
     // $ANTLR end ML_COMMENT
 
@@ -191,10 +196,10 @@ public class BcParserLexer extends Lexer {
             int line = getLine();
             int charPosition = getCharPositionInLine();
             int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:57:5: ( ( (' '|'\t'|'\r'|'\n'))+ )
-            // grammar/antlr_3/bc.g:57:5: ( (' '|'\t'|'\r'|'\n'))+
+            // grammar/antlr_3/bc.g:58:5: ( ( (' '|'\\t'|'\\r'|'\\n'))+ )
+            // grammar/antlr_3/bc.g:58:5: ( (' '|'\\t'|'\\r'|'\\n'))+
             {
-            // grammar/antlr_3/bc.g:57:5: ( (' '|'\t'|'\r'|'\n'))+
+            // grammar/antlr_3/bc.g:58:5: ( (' '|'\\t'|'\\r'|'\\n'))+
             int cnt3=0;
             loop3:
             do {
@@ -207,7 +212,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:57:9: (' '|'\t'|'\r'|'\n')
+            	    // grammar/antlr_3/bc.g:58:9: (' '|'\\t'|'\\r'|'\\n')
             	    {
             	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
             	        input.consume();
@@ -242,6 +247,7 @@ public class BcParserLexer extends Lexer {
         }
         finally {
         }
+        return ;
     }
     // $ANTLR end WS
 
@@ -323,6 +329,8 @@ public class BcParserLexer extends Lexer {
         }
 
     }
+
+
 
 
 }

@@ -136,6 +136,7 @@ A new implementation with Java code generated with ANTLR 3 is under construction
 =item Status
 
 Very simple arithmetic expressions are working. Some test failures
+Part of languages smoke testing.
 
 =item Last verified with parrot version
 
