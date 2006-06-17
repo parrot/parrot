@@ -68,15 +68,19 @@ whole thing may be taken out or refactored away at any moment.
     p6rule_compile = compreg 'PGE::P6Regex'
     null rulesub
     rulesub = p6rule_compile(pattern, adverbs :named :flat)
-    ## leo XXX need namespace
+
+    $I0 = exists adverbs["grammar"]
+    unless $I0 goto done
     store_global "PGE::Grammar", name, rulesub
 
+  done:
     .return (name)
 .end
 
 .sub "match"
     .param string x
     .param string pattern
+    .param pmc adverbs :slurpy :named
     .local string out, tmps
     .local pmc rulesub
     .local pmc match
@@ -87,7 +91,7 @@ whole thing may be taken out or refactored away at any moment.
     null rulesub
 
     push_eh match_error
-    rulesub = p6rule_compile(pattern)
+    rulesub = p6rule_compile(pattern, adverbs :named :flat)
     match = rulesub(x)
 
   match_result:
