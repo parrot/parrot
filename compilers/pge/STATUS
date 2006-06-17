@@ -11,7 +11,7 @@ Perl 6 rule features implemented
 * alternation  (|)
 * conjunction  (&)
 * capturing and non-capturing groups
-* modifiers :w, :words, :i, :ignorecase
+* modifiers :i, :ignorecase, :s, :sigspace (with synonyms :w and :words)
 * enumerated character lists (<[abcdef]>, <-[a..f]>)
 * character classes (., \d, \w, \s, \n, \e, \f, \r, \t, \x[hhh], \o[nnn])
 * anchors (^, $, ^^, $$, \b, \b)

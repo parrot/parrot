@@ -58,6 +58,18 @@ or the resulting PIR code (target='PIR').
   with_ignorecase:
     $I0 = exists adverbs['words']
     if $I0 goto with_words
+    $I0 = exists adverbs['w']
+    if $I0 goto with_w
+    $I0 = exists adverbs['sigspace']
+    if $I0 goto with_sigspace
+    $I0 = adverbs['s']
+    adverbs['words'] = $I0
+    goto with_words
+  with_sigspace:
+    $I0 = adverbs['sigspace']
+    adverbs['words'] = $I0
+    goto with_words
+  with_w:
     $I0 = adverbs['w']
     adverbs['words'] = $I0
   with_words:
@@ -1220,6 +1232,8 @@ Parse a modifier.
     .local string value
     key = self['key']
     value = self
+    if key == 's' goto words
+    if key == 'sigspace' goto words
     if key == 'w' goto words
     if key == 'i' goto ignorecase
     goto setpad
