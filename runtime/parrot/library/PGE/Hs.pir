@@ -62,11 +62,12 @@ whole thing may be taken out or refactored away at any moment.
 .sub "add_rule"
     .param string name
     .param string pattern
+    .param pmc adverbs :slurpy :named
     .local pmc p6rule_compile, rulesub
 
     p6rule_compile = compreg 'PGE::P6Regex'
     null rulesub
-    rulesub = p6rule_compile(pattern)
+    rulesub = p6rule_compile(pattern, adverbs :named :flat)
     ## leo XXX need namespace
     store_global "PGE::Grammar", name, rulesub
 
@@ -218,7 +219,7 @@ END:
     goto subrules_body
 
   dumper:
-    $I0 = isa elm, "Array"
+    $I0 = does elm, "array"
     if $I0 goto dumper_array
     $I0 = can elm, "dump_hs"
     unless $I0 goto dumper_string
