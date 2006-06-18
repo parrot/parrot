@@ -2,7 +2,7 @@
 
 =head1 Overview of the Punie Compiler
 
-The heart of the Punie compiler is punie.pir in languages/punie. It does
+The heart of the Punie compiler is F<punie.pir> in F<languages/punie>. It does
 all the work of slurping up the source file, parsing it, running the
 resulting parse tree through 3 transformations, compiling the resulting
 source code, and executing it. One useful tool for development here is
@@ -14,12 +14,13 @@ wrong structure.
 
 =head2 Stage 1, Parsing:
 
-Parsing is handled by PGE. The core grammar is in lib/punie.g. During
-the build process this is compiled down to a PIR file
-lib/punie_grammar_gen.pir. This PIR file is then included in
-lib/PunieGrammar.pir, the main class of the Punie parser (i.e. the
+Parsing is handled by the Parrot Grammar Engine PGE.
+The core grammar is in F<lib/punie.pg>. During
+the build process this grammar is compiled down to the PIR file
+F<lib/punie_grammar_gen.pir>. This PIR file is then included in
+F<lib/PunieGrammar.pir>, the main class of the Punie parser (i.e. the
 generated PIR is basically a role that adds some methods to the grammar
-class). PunieGrammar.pir also contains the rules defined for the
+class). F<PunieGrammar.pir> also contains the rules defined for the
 operator precedence parser. The <oexpr> rule allows the recursive
 descent parser to call into the operator precedence parser. The OPP rule
 "term:", allows the operator precedence parser to call back into the
@@ -34,7 +35,7 @@ they come back as a hash.]
 =head2 Stage 2, Abstract Syntax Tree:
 
 The first transformation is from the parse tree to an abstract syntax
-tree. This is handled by the TGE grammar lib/pge2past.g. Unfortunately,
+tree. This is handled by the TGE grammar F<lib/ASTGrammar.tg>. Unfortunately,
 at the moment, the internal core of all the tree grammar rules is
 written in PIR. It's ugly (the lack of control structures and easy
 access to data structures is particularly annoying), and will eventually
@@ -60,7 +61,7 @@ kind of rule). Other places iterate through the hash keys and dispatch
 each key/value pair as a node to transform and the node name
 (PunieGrammar::line is an example of this kind of rule).
 
-A third kind of rule in pge2past.g is the set of rules defined for the
+A third kind of rule in F<ASTGrammar.tg> is the set of rules defined for the
 results of the operator precedence parser. These do know their own name,
 but it's stored in a "type" hash key inside the node. So, the "result"
 rule for an "expr" match ("expr: result") just checks the type of the
@@ -77,7 +78,7 @@ of other nodes.
 
 The second transformation turns the abstract syntax tree into a
 lower-level opcode syntax tree. This is done by the TGE grammar
-lib/past2post.g. For the most part, these rules are simpler than the
+F<lib/OSTGrammar.tg>. For the most part, these rules are simpler than the
 first set, because all they have to do is iterate through the children
 of a node and call for the results of its children. The rule doesn't
 have to figure out what the children are called, because each child
@@ -101,7 +102,7 @@ opcode).
 
 One significant addition to this stage is a lookup table for transforming
 the HLL operator names to their low-level Parrot equivalents, in
-lib/PunieOpLookup.pir. The basic idea is to keep all of these changes in
+F<lib/PunieOpLookup.pir>. The basic idea is to keep all of these changes in
 one place so it's more maintainable, and to keep them all in one
 transformation stage so the AST closely corresponds to the HLL, while
 the OST closely corresponds to the assembly language.
@@ -109,7 +110,7 @@ the OST closely corresponds to the assembly language.
 =head2 Stage 4, PIR Output:
 
 The final transformation turns the opcode syntax tree into PIR code.
-This is handled by the TGE grammar lib/post2pir.g. It traverses the
+This is handled by the TGE grammar F<lib/PIRGrammar.tg>. It traverses the
 syntax tree much like stage 3 does, but each rule returns a string of
 PIR source code instead of returning a transformed tree node.
 (Ultimately this won't be done with a tree grammar, but it works for
