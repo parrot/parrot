@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea10 grammar/antlr_3/antlr_past2pir_past.g 2006-06-17 11:43:24
+// $ANTLR 3.0ea10 grammar/antlr_3/antlr_past2pir_past.g 2006-06-18 15:07:09
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -91,6 +91,8 @@ public class AntlrPast2PirPast extends TreeParser {
                       + "# entering gen_pir_past" + "\n"
                       + "  .local pmc stmts" + "\n"
                       + "  stmts = new 'PAST::Stmts'" + "\n"
+                      + "  stmts.'add_child'( $P50 )" + "\n"
+                      + "  stmts.'add_child'( $P100 )" + "\n"
                       + "  stmts.'source'('1')" + "\n"
                       + "  stmts.'pos'(1)" + "\n"
                       + "\n"
@@ -185,14 +187,14 @@ public class AntlrPast2PirPast extends TreeParser {
     };
 
     // $ANTLR start expr_int_1
-    // grammar/antlr_3/antlr_past2pir_past.g:118:1: expr_int_1 : INT ;
+    // grammar/antlr_3/antlr_past2pir_past.g:120:1: expr_int_1 : INT ;
     public expr_int_1_return expr_int_1() throws RecognitionException {   
         expr_int_1_return retval = new expr_int_1_return();
         retval.start = input.LT(1);
 
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:119:5: ( INT )
-            // grammar/antlr_3/antlr_past2pir_past.g:119:5: INT
+            // grammar/antlr_3/antlr_past2pir_past.g:121:5: ( INT )
+            // grammar/antlr_3/antlr_past2pir_past.g:121:5: INT
             {
             match(input,INT,FOLLOW_INT_in_expr_int_178); 
 
@@ -213,7 +215,7 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
     // $ANTLR start expr
-    // grammar/antlr_3/antlr_past2pir_past.g:123:1: expr returns [String reg] : expr_int_1 ;
+    // grammar/antlr_3/antlr_past2pir_past.g:125:1: expr returns [String reg] : expr_int_1 ;
     public String expr() throws RecognitionException {   
         String reg;
         expr_int_1_return expr_int_11 = null;
@@ -223,8 +225,8 @@ public class AntlrPast2PirPast extends TreeParser {
             reg = "reg_expr";
           
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:128:5: ( expr_int_1 )
-            // grammar/antlr_3/antlr_past2pir_past.g:128:5: expr_int_1
+            // grammar/antlr_3/antlr_past2pir_past.g:130:5: ( expr_int_1 )
+            // grammar/antlr_3/antlr_past2pir_past.g:130:5: expr_int_1
             {
             pushFollow(FOLLOW_expr_int_1_in_expr105);
             expr_int_11=expr_int_1();
@@ -241,28 +243,20 @@ public class AntlrPast2PirPast extends TreeParser {
                       + reg + ".valtype( 'num' )" + "\n"
                       + "# leaving expr" + "\n"
                       + "               $P20 = new 'PAST::Exp' " + "\n"
-                      + "               $P21 = new .ResizablePMCArray " + "\n"
-                      + "               push $P21, " + reg + " \n"
-                      + "               $P20.'add_child'( $P21 )" + "\n"
+                      + "               $P20.'add_child'( " + reg + " )" + "\n"
                       + "               $P20.'source'('1')" + "\n"
                       + "               $P20.'pos'(1)" + "\n"
                       + "       $P30 = new 'PAST::Op' " + "\n"
-                      + "       $P31 = new .ResizablePMCArray " + "\n"
-                      + "       push $P31, $P20 " + "\n"
-                      + "       $P30.'add_child'( $P31 )" + "\n"
+                      + "       $P30.'add_child'( $P20 )" + "\n"
                       + "       $P30.'op'( 'print' )" + "\n"
                       + "       $P30.'source'('1')" + "\n"
                       + "       $P30.'pos'(1)" + "\n"
                       + "               $P40 = new 'PAST::Exp' " + "\n"
-                      + "               $P41 = new .ResizablePMCArray " + "\n"
-                      + "               push $P41, $P30 " + "\n"
-                      + "               $P40.'add_child'( $P41 )" + "\n"
+                      + "               $P40.'add_child'( $P30 )" + "\n"
                       + "               $P40.'source'('1')" + "\n"
                       + "               $P40.'pos'(1)" + "\n"
                       + "  $P50 = new 'PAST::Stmt' " + "\n"
-                      + "  $P51 = new .ResizablePMCArray " + "\n"
-                      + "  push $P51, $P40 " + "\n"
-                      + "  $P50.'add_child'( $P51 )" + "\n"
+                      + "  $P50.'add_child'( $P40 )" + "\n"
                       + "  $P50.'source'('1')" + "\n"
                       + "  $P50.'pos'(1)" + "\n"
                       + "               $P60 = new 'PAST::Val' " + "\n"
@@ -271,28 +265,20 @@ public class AntlrPast2PirPast extends TreeParser {
                       + "               $P60.'pos'(0)" + "\n"
                       + "               $P60.valtype( 'strqq' ) " + "\n"
                       + "               $P70 = new 'PAST::Exp' " + "\n"
-                      + "               $P71 = new .ResizablePMCArray " + "\n"
-                      + "               push $P71, $P60 " + "\n"
-                      + "               $P70.'add_child'( $P71 )" + "\n"
+                      + "               $P70.'add_child'( $P60 )" + "\n"
                       + "               $P70.'source'('1')" + "\n"
                       + "               $P70.'pos'(1)" + "\n"
                       + "       $P80 = new 'PAST::Op' " + "\n"
-                      + "       $P81 = new .ResizablePMCArray " + "\n"
-                      + "       push $P81, $P70 " + "\n"
-                      + "       $P80.'add_child'( $P81 )" + "\n"
+                      + "       $P80.'add_child'( $P70 )" + "\n"
                       + "       $P80.'op'( 'print' )" + "\n"
                       + "       $P80.'source'('1')" + "\n"
                       + "       $P80.'pos'(1)" + "\n"
                       + "               $P90 = new 'PAST::Exp' " + "\n"
-                      + "               $P91 = new .ResizablePMCArray " + "\n"
-                      + "               push $P91, $P80 " + "\n"
-                      + "               $P90.'add_child'( $P91 )" + "\n"
+                      + "               $P90.'add_child'( $P80 )" + "\n"
                       + "               $P90.'source'('1')" + "\n"
                       + "               $P90.'pos'(1)" + "\n"
                       + "  $P100 = new 'PAST::Stmt' " + "\n"
-                      + "  $P101 = new .ResizablePMCArray " + "\n"
-                      + "  push $P101, $P90 " + "\n"
-                      + "  $P100.'add_child'( $P101 )" + "\n"
+                      + "  $P100.'add_child'( $P90 )" + "\n"
                       + "  $P100.'source'('1')" + "\n"
                       + "  $P100.'pos'(1)" + "\n"
                       + "\n"

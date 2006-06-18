@@ -12,7 +12,8 @@ See http://www.antlr.org/v3/index.html.
 
 =head2 Running
 
-  export CLASSPATH=/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/antlr-3.0ea7.jar:/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/antlr-2.7.5.jar:/home/bernhard/devel/ANTLR/v3/antlr-3.0ea7/lib/stringtemplate-2.3b4.jar:$CLASSPATH
+Bc.java needs to find the needed classes. This works for me:
+
   export ANTLR_HOME=/home/bernhard/devel/ANTLR/antlr-3
   export PARROT_HOME=/home/bernhard/devel/Parrot/repos/parrot
   export CLASSPATH=$ANTLR_HOME/lib/antlr-2.7.6.jar:$ANTLR_HOME/lib/antlr-3.0ea10.jar:$ANTLR_HOME/lib/stringtemplate-2.3b7.jar:$PARROT_HOME/languages/bc/grammar/antlr_3:$PARROT_HOME/languages/bc
