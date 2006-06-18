@@ -11,11 +11,11 @@ Platform                B8    Runloops      Feature Comp Test Inst YYYYMMDD
 darwin7.9.0-ppc-3.3     B    Y    Y    -     Y   Y   Y    Y     Y  20060514
 darwin8.6.0-ppc-gcc4.0.1     ?    ?    ?     ?   ?   ?    Y     ?  20060613
 darwin8.6.0-x86-gcc4.0.1     ?    -    ?     ?   ?   ?    Y     ?  20060607
-linux-x86-gcc3.3.5.2005013   Y    Y    Y     Y   Y   Y    Y     ?  20060514
+linux-x86-gcc3.3.5.2005013   Y    Y    Y     Y   Y   Y    Y     ?  20060618
 linux-x86-gcc4.0.2           Y    Y    Y     Y   Y   Y    Y     ?  20060514
 linux-x86-gcc4.0.3           Y    Y    Y     Y   Y   Y    Y     ?  20060606
 linux-x86-gcc4.1.0           Y    Y    Y     Y   Y   Y    Y     Y  20060306
-linux-x86_64-gcc3.4.3    8   Y    -    -     Y   Y   Y    Y     ?  20060108
+linux-x86_64-gcc3.4.3    8   Y    -    -     Y   Y   Y    Y     ?  20060618
 sol8-sparc-cc           B    -    -    -     -   -   -    Y/997 ?  20060530
 sol10-sparc-cc_5.8      B    Y    -    -     Y   Y   Y    Y/6   ?  20060331
 sol10-sparc-gcc_4.0.2   B    Y    -    -     Y   Y   Y    Y/7   ?  20060401
