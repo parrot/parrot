@@ -47,11 +47,6 @@ Optionally a PMC may be passed to the constructor. It's up to the
 class what to do with the intializer.
 s. PDD02 for more.
 
-=item B<new>(out PMC, in INT, in PMC, in PMC)
-
-Like above. The fourth argument is a property hash - it isn't copied in,
-only referenced. The initializer may be NULL.
-
 =cut
 
 op new(out PMC, in INT) {
@@ -82,16 +77,22 @@ op new(out PMC, inconst STR) {
   goto NEXT();
 }
 
+inline op new(out PMC, in KEY) :object_classes {
+    PMC *class = $2;
+    INTVAL type = pmc_type_p(interpreter, class);
+    if (type <= 0)
+        real_exception(interpreter, NULL, NO_CLASS,
+            "Class '%Ss' not found", readable_name(interpreter, class));
+    $1 = pmc_new(interpreter, type);
+    goto NEXT();
+}
+
 op new(out PMC, in INT, in PMC) {
   if ($2 <= 0 || $2 >= interpreter->n_vtable_max) {
     real_exception(interpreter, 0, NO_CLASS,
 		   "Illegal PMC enum (%d) in new", (int)$2);
   }
   $1 = pmc_new_init(interpreter, $2, $3);
-  goto NEXT();
-}
-
-op DELETED_new(out PMC, in INT, in PMC, in PMC) {
   goto NEXT();
 }
 
@@ -226,6 +227,11 @@ Find the PMC type or Parrot datatype by name.
 
 op find_type(out INT, in STR) {
     $1 = pmc_type(interpreter, $2);
+    goto NEXT();
+}
+
+op find_type(out INT, in KEY) {
+    $1 = pmc_type_p(interpreter, $2);
     goto NEXT();
 }
 
