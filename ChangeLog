@@ -1,5 +1,9 @@
 # $Id$
 
+2006.06.19    leo
+	* Released 0.4.5
+	See NEWS for more.
+
 2006.06.03    leo
         * I and N registers are never cleared to 0 / 0.0 on subroutine entry
 
