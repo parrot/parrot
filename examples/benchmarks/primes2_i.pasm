@@ -19,6 +19,7 @@ of primes and the last one found.
 set I1, 0
 set I3, 0
 set I4, 10000
+set I6, 0
 
 LOOP:
   save I1

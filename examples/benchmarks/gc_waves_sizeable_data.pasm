@@ -35,6 +35,7 @@ statistics indicating:
 =cut
 
 	set I0, 11
+	set I3, 0
 	set I2, 200
 	set S0,  "                         "
 	set S1, S0
