@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea10 grammar/antlr_3/bc.g 2006-06-18 15:07:07
+// $ANTLR 3.0ea10 grammar/antlr_3/bc.g 2006-06-19 21:02:29
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -40,7 +40,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start program
-    // grammar/antlr_3/bc.g:22:1: program : input_item quit -> ^( PROGRAM input_item ) ;
+    // grammar/antlr_3/bc.g:21:1: program : input_item quit -> ^( PROGRAM input_item ) ;
     public program_return program() throws RecognitionException {   
         program_return retval = new program_return();
         retval.start = input.LT(1);
@@ -55,15 +55,15 @@ public class BcParser extends Parser {
         List list_input_item=new ArrayList();
 
         try {
-            // grammar/antlr_3/bc.g:23:5: ( input_item quit -> ^( PROGRAM input_item ) )
-            // grammar/antlr_3/bc.g:23:5: input_item quit
+            // grammar/antlr_3/bc.g:22:5: ( input_item quit -> ^( PROGRAM input_item ) )
+            // grammar/antlr_3/bc.g:22:5: input_item quit
             {
-            pushFollow(FOLLOW_input_item_in_program66);
+            pushFollow(FOLLOW_input_item_in_program65);
             input_item1=input_item();
             _fsp--;
 
             list_input_item.add(input_item1.tree);
-            pushFollow(FOLLOW_quit_in_program68);
+            pushFollow(FOLLOW_quit_in_program67);
             quit2=quit();
             _fsp--;
 
@@ -73,9 +73,9 @@ public class BcParser extends Parser {
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 23:21: -> ^( PROGRAM input_item )
+            // 22:21: -> ^( PROGRAM input_item )
             {
-                // grammar/antlr_3/bc.g:23:24: ^( PROGRAM input_item )
+                // grammar/antlr_3/bc.g:22:24: ^( PROGRAM input_item )
                 {
                 CommonTree root_1 = (CommonTree)adaptor.nil();
                 root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(PROGRAM, "PROGRAM"), root_1);
@@ -113,7 +113,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start input_item
-    // grammar/antlr_3/bc.g:26:1: input_item : ( expression )+ ;
+    // grammar/antlr_3/bc.g:25:1: input_item : ( expression )+ ;
     public input_item_return input_item() throws RecognitionException {   
         input_item_return retval = new input_item_return();
         retval.start = input.LT(1);
@@ -125,12 +125,12 @@ public class BcParser extends Parser {
 
 
         try {
-            // grammar/antlr_3/bc.g:27:5: ( ( expression )+ )
-            // grammar/antlr_3/bc.g:27:5: ( expression )+
+            // grammar/antlr_3/bc.g:26:5: ( ( expression )+ )
+            // grammar/antlr_3/bc.g:26:5: ( expression )+
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            // grammar/antlr_3/bc.g:27:5: ( expression )+
+            // grammar/antlr_3/bc.g:26:5: ( expression )+
             int cnt1=0;
             loop1:
             do {
@@ -143,11 +143,11 @@ public class BcParser extends Parser {
 
                 switch (alt1) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:27:5: expression
+            	    // grammar/antlr_3/bc.g:26:5: expression
             	    {
             	    CommonTree root_1 = (CommonTree)adaptor.nil();
 
-            	    pushFollow(FOLLOW_expression_in_input_item91);
+            	    pushFollow(FOLLOW_expression_in_input_item90);
             	    expression3=expression();
             	    _fsp--;
 
@@ -192,7 +192,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start expression
-    // grammar/antlr_3/bc.g:30:1: expression : ( INT | '-' expression -> ^( UNARY_MINUS expression ) );
+    // grammar/antlr_3/bc.g:29:1: expression : ( INT | '-' expression -> ^( UNARY_MINUS expression ) );
     public expression_return expression() throws RecognitionException {   
         expression_return retval = new expression_return();
         retval.start = input.LT(1);
@@ -209,7 +209,7 @@ public class BcParser extends Parser {
         CommonTree char_literal5_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:31:5: ( INT | '-' expression -> ^( UNARY_MINUS expression ) )
+            // grammar/antlr_3/bc.g:30:5: ( INT | '-' expression -> ^( UNARY_MINUS expression ) )
             int alt2=2;
             int LA2_0 = input.LA(1);
             if ( LA2_0==INT ) {
@@ -220,18 +220,18 @@ public class BcParser extends Parser {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("30:1: expression : ( INT | '-' expression -> ^( UNARY_MINUS expression ) );", 2, 0, input);
+                    new NoViableAltException("29:1: expression : ( INT | '-' expression -> ^( UNARY_MINUS expression ) );", 2, 0, input);
 
                 throw nvae;
             }
             switch (alt2) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:31:5: INT
+                    // grammar/antlr_3/bc.g:30:5: INT
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     INT4=(Token)input.LT(1);
-                    match(input,INT,FOLLOW_INT_in_expression106); 
+                    match(input,INT,FOLLOW_INT_in_expression105); 
                     INT4_tree = (CommonTree)adaptor.create(INT4);
                     adaptor.addChild(root_0, INT4_tree);
 
@@ -242,10 +242,10 @@ public class BcParser extends Parser {
                     // grammar/antlr_3/bc.g:32:5: '-' expression
                     {
                     char_literal5=(Token)input.LT(1);
-                    match(input,9,FOLLOW_9_in_expression112); 
+                    match(input,9,FOLLOW_9_in_expression117); 
                     list_9.add(char_literal5);
 
-                    pushFollow(FOLLOW_expression_in_expression114);
+                    pushFollow(FOLLOW_expression_in_expression119);
                     expression6=expression();
                     _fsp--;
 
@@ -315,7 +315,7 @@ public class BcParser extends Parser {
             root_0 = (CommonTree)adaptor.nil();
 
             string_literal7=(Token)input.LT(1);
-            match(input,10,FOLLOW_10_in_quit154); 
+            match(input,10,FOLLOW_10_in_quit161); 
             string_literal7_tree = (CommonTree)adaptor.create(string_literal7);
             adaptor.addChild(root_0, string_literal7_tree);
 
@@ -342,12 +342,12 @@ public class BcParser extends Parser {
 
 
 
-    public static final BitSet FOLLOW_input_item_in_program66 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_quit_in_program68 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_input_item91 = new BitSet(new long[]{0x0000000000000242L});
-    public static final BitSet FOLLOW_INT_in_expression106 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_9_in_expression112 = new BitSet(new long[]{0x0000000000000240L});
-    public static final BitSet FOLLOW_expression_in_expression114 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_10_in_quit154 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_input_item_in_program65 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_quit_in_program67 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_input_item90 = new BitSet(new long[]{0x0000000000000242L});
+    public static final BitSet FOLLOW_INT_in_expression105 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_9_in_expression117 = new BitSet(new long[]{0x0000000000000240L});
+    public static final BitSet FOLLOW_expression_in_expression119 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_10_in_quit161 = new BitSet(new long[]{0x0000000000000002L});
 
 }

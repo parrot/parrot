@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea10 grammar/antlr_3/bc.g 2006-06-18 15:07:08
+// $ANTLR 3.0ea10 grammar/antlr_3/bc.g 2006-06-19 21:02:29
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -79,10 +79,10 @@ public class BcParserLexer extends Lexer {
             int line = getLine();
             int charPosition = getCharPositionInLine();
             int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:37:4: ( ( '0' .. '9' )+ )
-            // grammar/antlr_3/bc.g:37:4: ( '0' .. '9' )+
+            // grammar/antlr_3/bc.g:37:5: ( ( '0' .. '9' )+ )
+            // grammar/antlr_3/bc.g:37:5: ( '0' .. '9' )+
             {
-            // grammar/antlr_3/bc.g:37:4: ( '0' .. '9' )+
+            // grammar/antlr_3/bc.g:37:5: ( '0' .. '9' )+
             int cnt1=0;
             loop1:
             do {
@@ -95,7 +95,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:37:5: '0' .. '9'
+            	    // grammar/antlr_3/bc.g:37:6: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -136,7 +136,7 @@ public class BcParserLexer extends Lexer {
             {
             match("/*"); 
 
-            // grammar/antlr_3/bc.g:50:5: ( options {greedy=false; } : . )*
+            // grammar/antlr_3/bc.g:49:10: ( options {greedy=false; } : . )*
             loop2:
             do {
                 int alt2=2;
@@ -159,7 +159,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:50:33: .
+            	    // grammar/antlr_3/bc.g:49:38: .
             	    {
             	    matchAny(); 
 
@@ -196,10 +196,10 @@ public class BcParserLexer extends Lexer {
             int line = getLine();
             int charPosition = getCharPositionInLine();
             int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:58:5: ( ( (' '|'\\t'|'\\r'|'\\n'))+ )
-            // grammar/antlr_3/bc.g:58:5: ( (' '|'\\t'|'\\r'|'\\n'))+
+            // grammar/antlr_3/bc.g:56:5: ( ( (' '|'\\t'|'\\r'|'\\n'))+ )
+            // grammar/antlr_3/bc.g:56:5: ( (' '|'\\t'|'\\r'|'\\n'))+
             {
-            // grammar/antlr_3/bc.g:58:5: ( (' '|'\\t'|'\\r'|'\\n'))+
+            // grammar/antlr_3/bc.g:56:5: ( (' '|'\\t'|'\\r'|'\\n'))+
             int cnt3=0;
             loop3:
             do {
@@ -212,7 +212,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:58:9: (' '|'\\t'|'\\r'|'\\n')
+            	    // grammar/antlr_3/bc.g:56:9: (' '|'\\t'|'\\r'|'\\n')
             	    {
             	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
             	        input.consume();

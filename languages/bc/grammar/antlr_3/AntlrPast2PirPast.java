@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea10 grammar/antlr_3/antlr_past2pir_past.g 2006-06-18 15:07:09
+// $ANTLR 3.0ea10 grammar/antlr_3/antlr_past2pir_past.g 2006-06-19 20:24:05
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -23,13 +23,16 @@ public class AntlrPast2PirPast extends TreeParser {
     public String getGrammarFileName() { return "grammar/antlr_3/antlr_past2pir_past.g"; }
 
 
+      int reg_num = 0;  // for generation register numbers
+
+
 
     // $ANTLR start gen_pir_past
-    // grammar/antlr_3/antlr_past2pir_past.g:14:1: gen_pir_past : ^( PROGRAM ( expr )+ ) ;
+    // grammar/antlr_3/antlr_past2pir_past.g:19:1: gen_pir_past : ^( PROGRAM ( expr )+ ) ;
     public void gen_pir_past() throws RecognitionException {   
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:16:3: ( ^( PROGRAM ( expr )+ ) )
-            // grammar/antlr_3/antlr_past2pir_past.g:16:3: ^( PROGRAM ( expr )+ )
+            // grammar/antlr_3/antlr_past2pir_past.g:21:3: ( ^( PROGRAM ( expr )+ ) )
+            // grammar/antlr_3/antlr_past2pir_past.g:21:3: ^( PROGRAM ( expr )+ )
             {
 
                 String pirBefore = "" 
@@ -49,10 +52,10 @@ public class AntlrPast2PirPast extends TreeParser {
 
                 System.out.println( pirBefore );    
               
-            match(input,PROGRAM,FOLLOW_PROGRAM_in_gen_pir_past54); 
+            match(input,PROGRAM,FOLLOW_PROGRAM_in_gen_pir_past61); 
 
             match(input, Token.DOWN, null); 
-            // grammar/antlr_3/antlr_past2pir_past.g:34:15: ( expr )+
+            // grammar/antlr_3/antlr_past2pir_past.g:39:15: ( expr )+
             int cnt1=0;
             loop1:
             do {
@@ -65,9 +68,9 @@ public class AntlrPast2PirPast extends TreeParser {
 
                 switch (alt1) {
             	case 1 :
-            	    // grammar/antlr_3/antlr_past2pir_past.g:34:15: expr
+            	    // grammar/antlr_3/antlr_past2pir_past.g:39:15: expr
             	    {
-            	    pushFollow(FOLLOW_expr_in_gen_pir_past56);
+            	    pushFollow(FOLLOW_expr_in_gen_pir_past63);
             	    expr();
             	    _fsp--;
 
@@ -187,16 +190,16 @@ public class AntlrPast2PirPast extends TreeParser {
     };
 
     // $ANTLR start expr_int_1
-    // grammar/antlr_3/antlr_past2pir_past.g:120:1: expr_int_1 : INT ;
+    // grammar/antlr_3/antlr_past2pir_past.g:125:1: expr_int_1 : INT ;
     public expr_int_1_return expr_int_1() throws RecognitionException {   
         expr_int_1_return retval = new expr_int_1_return();
         retval.start = input.LT(1);
 
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:121:5: ( INT )
-            // grammar/antlr_3/antlr_past2pir_past.g:121:5: INT
+            // grammar/antlr_3/antlr_past2pir_past.g:126:5: ( INT )
+            // grammar/antlr_3/antlr_past2pir_past.g:126:5: INT
             {
-            match(input,INT,FOLLOW_INT_in_expr_int_178); 
+            match(input,INT,FOLLOW_INT_in_expr_int_185); 
 
             }
 
@@ -215,7 +218,7 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
     // $ANTLR start expr
-    // grammar/antlr_3/antlr_past2pir_past.g:125:1: expr returns [String reg] : expr_int_1 ;
+    // grammar/antlr_3/antlr_past2pir_past.g:130:1: expr returns [String reg] : expr_int_1 ;
     public String expr() throws RecognitionException {   
         String reg;
         expr_int_1_return expr_int_11 = null;
@@ -225,10 +228,10 @@ public class AntlrPast2PirPast extends TreeParser {
             reg = "reg_expr";
           
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:130:5: ( expr_int_1 )
-            // grammar/antlr_3/antlr_past2pir_past.g:130:5: expr_int_1
+            // grammar/antlr_3/antlr_past2pir_past.g:135:5: ( expr_int_1 )
+            // grammar/antlr_3/antlr_past2pir_past.g:135:5: expr_int_1
             {
-            pushFollow(FOLLOW_expr_int_1_in_expr105);
+            pushFollow(FOLLOW_expr_int_1_in_expr112);
             expr_int_11=expr_int_1();
             _fsp--;
 
@@ -303,9 +306,9 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
 
-    public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past54 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expr_in_gen_pir_past56 = new BitSet(new long[]{0x0000000000000048L});
-    public static final BitSet FOLLOW_INT_in_expr_int_178 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expr_int_1_in_expr105 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past61 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expr_in_gen_pir_past63 = new BitSet(new long[]{0x0000000000000048L});
+    public static final BitSet FOLLOW_INT_in_expr_int_185 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expr_int_1_in_expr112 = new BitSet(new long[]{0x0000000000000002L});
 
 }

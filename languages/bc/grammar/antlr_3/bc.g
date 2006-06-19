@@ -4,7 +4,6 @@
 // Parse bc with ANTLR3
 // This grammar is derived from <http://www.funet.fi/pub/doc/posix/p1003.2/d11.2/4.3>
 
-
 grammar BcParser;
 
 options 
@@ -29,12 +28,13 @@ input_item
 
 expression
   : INT
-  | '-' expression -> ^( UNARY_MINUS expression )
+    |
+    '-' expression -> ^( UNARY_MINUS expression )
   ;
 
 INT
- : ('0'..'9')+
- ;
+  : ('0'..'9')+
+  ;
 
 // quit is required, make testing easier
 quit
@@ -45,19 +45,17 @@ quit
 
 
 ML_COMMENT
-  : '/*'
-    ( options {greedy=false;} : . )*
-    '*/'
+  : '/*' ( options {greedy=false;} : . )* '*/'
     {
       channel = 99;       // send into nirwana 
     }
-	;
+  ;
 
 WS
   : (   ' '
-      |   '\t'
-      |   '\r'
-      |   '\n'
+      | '\t'
+      | '\r'
+      | '\n'
     )+
     {
       channel = 99;       // send into nirwana 
