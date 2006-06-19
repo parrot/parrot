@@ -7,6 +7,7 @@ any languages bundled with parrot that work with the unified test
 suite will have their test results listed under the smokes marked
 'languages' at http://smoke.parrotcode.org/smoke/.
 
+
 =head2 Amber for parrot
 
 =over 4
@@ -38,6 +39,7 @@ The Amber PMCs are in C<languages/amber>.
 
 =back
 
+
 =head2 APL
 
 =over 4
@@ -58,13 +60,14 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
 L<languages/APL>
 
 =back
+
 
 =head2 BASIC/compiler
 
@@ -140,7 +143,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -196,13 +199,14 @@ Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
 C<languages/bf>
 
 =back
+
 
 =head2 Cardinal
 
@@ -387,7 +391,7 @@ Works and is mostly complete.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -426,7 +430,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -454,7 +458,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -483,7 +487,7 @@ Early stage - Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -548,7 +552,7 @@ Development is stalled. Takers are welcome.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -604,7 +608,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -689,7 +693,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -720,15 +724,13 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
 C<languages/perl6>
 
 =back
-
-
 
 
 =head2 Pheme
@@ -831,19 +833,20 @@ TGE, Tree Grammar Engine, and PGE, Parrot Grammar Engine.
 
 =item Status
 
-So far, Punie handles constants (strings, integers, floats), print
+So far, Punie handles constants (strings, integers, floats), variables, print
 statements, conditionals, do blocks, comma lists, and some basic math
 and logic ops.
 
 =item Last verified with parrot version
 
-0.4.1
+0.4.5
 
 =item Location
 
 C<languages/punie>
 
 =back
+
 
 =head2 Python
 
@@ -892,7 +895,7 @@ Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -979,7 +982,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -1008,7 +1011,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -1038,7 +1041,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -1066,7 +1069,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
@@ -1122,7 +1125,7 @@ Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.5
 
 =item Location
 
