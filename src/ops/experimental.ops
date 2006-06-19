@@ -224,7 +224,6 @@ inline op exec(in STR) {
   goto NEXT();
 }
 
-=back
 
 =item B<classname>(out PMC, in PMC)
 
