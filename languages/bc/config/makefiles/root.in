@@ -54,7 +54,7 @@ test-python: build-python
 test-posix: build-posix 
 	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-posix
 
-test-java: build-java
+test-java: 
 	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-java
 
 # For smoke testing build only the Implementation in Python
@@ -66,11 +66,10 @@ build-python:
 build-posix:
 # Nothing to do
 
-build-java: Bc.class 
-
-Bc.class: Bc.java 
-	@echo 'Be sure to set CLASSPATH first'
+build-java: 
+	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr_3.pod'
 	javac Bc.java 
+	javac grammar/antlr_3/*.java
 
 maintain: maintain-python maintain-java
 
@@ -80,7 +79,6 @@ maintain-java: grammar/antlr_3/bc.g
 	@echo 'Be sure to set CLASSPATH first'
 	java org.antlr.Tool grammar/antlr_3/bc.g
 	java org.antlr.Tool grammar/antlr_3/antlr_past2pir_past.g
-	javac grammar/antlr_3/*.java
 
 # BcLexer.py will be created too
 # TODO: antlr_past2pir_past shouldn't need BcLexerTokenTypes.txt
@@ -102,7 +100,9 @@ clean-python:
 
 clean-java:
 	$(RM_F) \
-    "*.class"
+    "*.class" \
+    "grammar/antlr_3/*.class" \
+    "grammar/antlr_3/*.tokens"
 
 realclean: clean
 	$(RM_F) \
