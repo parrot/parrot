@@ -39,7 +39,7 @@ to get destroyed.
 #if EXEC_CAPABLE
 #  include "parrot/exec.h"
 #endif /* EXEC_CAPABLE */
-#include "parrot/jit.h"
+#include "jit.h"
 #endif
 Parrot_Interp
 Parrot_new(Parrot_Interp parent)

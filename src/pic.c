@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2006, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -85,7 +85,7 @@ lookup of the cache has to be done in the opcode itself.
 
 #if HAS_JIT
 #include "parrot/exec.h"
-#include "parrot/jit.h"
+#include "jit.h"
 #endif
 
 #define PIC_TEST 1

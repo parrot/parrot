@@ -650,7 +650,6 @@ include/parrot/interpreter.h                      [main]include
 include/parrot/inter_call.h                       [main]include
 include/parrot/intlist.h                          [main]include
 include/parrot/io.h                               [main]include
-include/parrot/jit.h                              [main]include
 include/parrot/key.h                              [main]include
 include/parrot/library.h                          [main]include
 include/parrot/list.h                             [main]include
@@ -1905,6 +1904,7 @@ src/inter_misc.c                                  []
 src/inter_run.c                                   []
 src/intlist.c                                     []
 src/jit.c                                         []
+src/jit.h                                         []
 src/jit_debug.c                                   []
 src/jit_debug_xcoff.c                             []
 src/key.c                                         []

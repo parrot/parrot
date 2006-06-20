@@ -26,7 +26,7 @@ executables.
 #include "parrot/parrot.h"
 #include "parrot/string.h"
 #include "parrot/exec.h"
-#include "parrot/jit.h"
+#include "jit.h"
 #define JIT_EMIT 1
 #include "parrot/jit_emit.h"
 #include "parrot/embed.h"

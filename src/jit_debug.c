@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2006, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -30,7 +30,7 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 
 #include <parrot/parrot.h>
 #include "parrot/exec.h"
-#include "parrot/jit.h"
+#include "jit.h"
 
 #define N_GSYM "32"     /* global variable */
 #define N_FNAME "34"

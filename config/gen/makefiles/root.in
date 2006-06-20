@@ -954,17 +954,17 @@ $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) @TEMP_jit_h@ $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(INC_DIR)/jit_emit.h
 
-$(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) @TEMP_jit_h@
+$(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) 
 
-$(SRC_DIR)/jit_debug_xcoff$(O) : $(GENERAL_H_FILES) @TEMP_jit_h@
+$(SRC_DIR)/jit_debug_xcoff$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/jit_cpu$(O) : $(GENERAL_H_FILES) @TEMP_jit_h@ $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/jit_cpu$(O) : $(GENERAL_H_FILES) $(INC_DIR)/jit_emit.h
 
-$(SRC_DIR)/exec$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ @TEMP_jit_h@ $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/exec$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(INC_DIR)/jit_emit.h
 
-$(SRC_DIR)/exec_cpu$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ @TEMP_jit_h@ $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/exec_cpu$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(INC_DIR)/jit_emit.h
 
 $(INC_DIR)/extend_vtable.h $(SRC_DIR)/extend_vtable.c $(SRC_DIR)/vtable.h : vtable.tbl $(BUILD_TOOLS_DIR)/vtable_extend.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
@@ -1017,8 +1017,7 @@ $(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h
 
-$(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES) \
-    @TEMP_jit_h@
+$(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/inter_call$(O) : $(SRC_DIR)/inter_call.c $(GENERAL_H_FILES) \
     $(SRC_DIR)/inter_call.str

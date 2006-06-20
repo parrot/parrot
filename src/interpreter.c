@@ -41,7 +41,7 @@ have the same number of elements since there is a one-to-one mapping.
 #include "runops_cores.h"
 #if JIT_CAPABLE
 #  include "parrot/exec.h"
-#  include "parrot/jit.h"
+#  include "jit.h"
 #endif
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"

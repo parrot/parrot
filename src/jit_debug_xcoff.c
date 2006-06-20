@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2006, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 
 #include <parrot/parrot.h>
 #include "parrot/exec.h"
-#include "parrot/jit.h"
+#include "jit.h"
 
 #ifdef __IBMC__
 
@@ -369,7 +369,7 @@ Parrot_jit_debug(Interp* interpreter)
 
 =head1 SEE ALSO
 
-F<src/jit_debug.c>, F<src/jit.c>, F<include/parrot/jit.h>.
+F<src/jit_debug.c>, F<src/jit.c>, F<src/jit.h>.
 
 =cut
 

@@ -40,7 +40,7 @@ TODO:
 
 #if HAS_JIT
 #include "parrot/exec.h"
-#include "parrot/jit.h"
+#include "jit.h"
 
 #if PIC_TEST
 /*

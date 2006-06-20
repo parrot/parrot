@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -56,7 +56,6 @@ sub runstep
         jitcapable         => 0,
         execcapable        => 0,
         cc_hasjit          => '',
-        TEMP_jit_h         => '',
         TEMP_jit_o         => '',
         TEMP_exec_h        => '',
         TEMP_exec_o        => '',

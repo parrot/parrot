@@ -27,7 +27,7 @@ used and not per subroutine or even opcode, it works per bytecode segment.
 #if PARROT_EXEC_CAPABLE
 #  include "parrot/exec.h"
 #endif
-#include "parrot/jit.h"
+#include "jit.h"
 #define JIT_EMIT 0
 #include "parrot/jit_emit.h"
 #include "parrot/packfile.h"
@@ -1745,7 +1745,7 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
 
 =head1 SEE ALSO
 
-F<include/parrot/jit.h>, F<docs/jit.pod>,d F<src/jit_debug.c>,
+F<src/jit.h>, F<docs/jit.pod>,d F<src/jit_debug.c>,
 F<jit/$jitcpuarch/jit_emit.h>, F<jit/$jitcpuarch/core.jit>.
 
 =cut

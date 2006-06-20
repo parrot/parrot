@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -66,7 +66,7 @@ here. To simplify the maintenance of these functions, they are specified in a
 format that is pre-processed by F<jit2c.pl> to produce a valid C source file,
 F<jit_cpu.c>. See L<Format of .jit Files> below.
 
-=item include/parrot/jit.h
+=item src/jit.h
 
 This file contains definitions of generic structures used by the JIT subsystem.
 
@@ -88,7 +88,7 @@ The B<Parrot_jit_info> structure holds data used while producing and executing
 native code.  An important piece of data in this structure is the B<op_map>
 array, which maps from opcode addresses to native code addresses.
 
-=item jit.c
+=item src/jit.c
 
 B<parrot_build_asm>() is the main routine of the code generator, which loops
 over the parrot bytecode, calling the code generating routines for each opcode
@@ -107,7 +107,7 @@ these offsets while executing native code.
 
 See F<src/jit/skeleton/jit_emit.h> for details.
 
-=item jit2c.pl
+=item tools/build/jit2c.pl
 
 Preprocesses the .jit files to produce F<jit_cpu.c>.
 
@@ -135,7 +135,7 @@ the defines must therefore follow a specific syntax.
 
     #endif
 
-See F<jit/skeleton/jit_emit.h> for a more detailed explanation.
+See F<src/jit/skeleton/jit_emit.h> for a more detailed explanation.
 
 =head2 Defines
 
@@ -198,7 +198,7 @@ base pointer.
 
 =back
 
-S. F<jit/i386/jit_emit.h> for actual usage of these defines.
+See F<src/jit/i386/jit_emit.h> for actual usage of these defines.
 
 =head1 Format of .jit Files
 
