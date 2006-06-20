@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,18 +8,19 @@ tools/build/jit2c.pl - JIT to C
 
 =head1 SYNOPSIS
 
-    % perl tools/build/jit2c.pl <cpu-architecture-name> jit_cpu.c
+    % perl tools/build/jit2c.pl <cpu-architecture-name> src/jit_cpu.c
 
 =head1 DESCRIPTION
 
-This script creates F<jit_cpu.c>. It parses the JIT file for the
-specified CPU architecture type (F<jit/cpu-architecture-name/core.jit>).
+This script creates F<src/jit_cpu.c>. It parses the JIT file for the
+specified CPU architecture type (F<src/jit/cpu-architecture-name/core.jit>).
 
 =cut
 
-
 use strict;
+use warnings;
 use lib 'lib';
+
 use Parrot::OpLib::core;
 use Parrot::Op;
 use Parrot::OpTrans::C;
@@ -27,54 +28,47 @@ use Parrot::OpTrans::C;
 my $trans = Parrot::OpTrans::C->new;
 
 my %type_to_arg = (
-    INT_CONST => 'ic',
-    NUM_CONST => 'nc',
-    PMC_CONST => 'pc',
+    INT_CONST    => 'ic',
+    NUM_CONST    => 'nc',
+    PMC_CONST    => 'pc',
     STRING_CONST => 'sc',
-    STR_CONST => 'sc',
-    INT_REG => 'i',
-    NUM_REG => 'n',
-    PMC_REG => 'p',
-    STRING_REG => 's',
-    STR_REG => 's',
+    STR_CONST    => 'sc',
+    INT_REG      => 'i',
+    NUM_REG      => 'n',
+    PMC_REG      => 'p',
+    STRING_REG   => 's',
+    STR_REG      => 's',
 );
 
-my $core_numops = scalar(@$Parrot::OpLib::core::ops);
-my @core_opfunc = map { $_->func_name($trans) } @$Parrot::OpLib::core::ops;
+my $core_numops = scalar @{$Parrot::OpLib::core::ops};
+my @core_opfunc = map { $_->func_name($trans) } @{$Parrot::OpLib::core::ops};
 my %opcodes;
 
-for(@$Parrot::OpLib::core::ops) {
-    my $name = $_->{NAME} . '_' .join '_',@{$_->{ARGS}}[0..$#{$_->{ARGS}}];
+for ( @{$Parrot::OpLib::core::ops} ) {
+    my $name = join( '_', $_->{NAME}, @{$_->{ARGS}}[0..$#{$_->{ARGS}}] );
     $opcodes{$name} = $_->{CODE};
 }
 
 my $cpuarch = shift @ARGV;
 my $genfile = shift @ARGV;
 
-my ($i,$j,$k,$n);
+my ($function, $body, $extern, $header, $asm, $precompiled);
 
-my ($function, $body, $line, $extern, $header);
-
-my ($asm, $precompiled);
-
-my %core_ops;
 my %templates;
 
 my @jit_funcs;
 my $func_end;
-my $normal_op;
-my $cpcf_op;
-my $restart_op;
+my ( $normal_op, $cpcf_op, $restart_op );
 my %argmaps;
 my $jit_cpu;
 
 if ($genfile =~ /jit_cpu.c/) {
     $jit_cpu = 1;
     push @jit_funcs, "Parrot_jit_fn_info_t _op_jit[$core_numops] = {\n";
-    $func_end = "_jit";
-    $normal_op = "Parrot_jit_normal_op";
-    $cpcf_op = "Parrot_jit_cpcf_op";
-    $restart_op = "Parrot_jit_restart_op";
+    $func_end = '_jit';
+    $normal_op = 'Parrot_jit_normal_op';
+    $cpcf_op = 'Parrot_jit_cpcf_op';
+    $restart_op = 'Parrot_jit_restart_op';
     %argmaps = %Parrot::OpTrans::C::arg_maps;
 }
 else {
@@ -85,32 +79,32 @@ else {
     $cpcf_op = "Parrot_exec_cpcf_op";
     $restart_op = "Parrot_exec_restart_op";
     %argmaps = (
-        'op' => "cur_opcode[%ld]",
+        op  => "cur_opcode[%ld]",
 
-        'i'  => "IREG(%ld)",
-        'n'  => "NREG(%ld)",
-        'p'  => "PREG(%ld)",
-        's'  => "SREG(%ld)",
-        'k'  => "PREG(%ld)",
-        'ki' => "IREG(%ld)",
+        i   => "IREG(%ld)",
+        n   => "NREG(%ld)",
+        p   => "PREG(%ld)",
+        s   => "SREG(%ld)",
+        k   => "PREG(%ld)",
+        ki  => "IREG(%ld)",
 
-        'ic' => "cur_opcode[%ld]",
-        'nc' => "CONST(%ld)",
-        'pc' => "CONST(%ld)",
-        'sc' => "CONST(%ld)",
-        'kc' => "CONST(%ld)",
-        'kic' => "cur_opcode[%ld]"
+        ic  => "cur_opcode[%ld]",
+        nc  => "CONST(%ld)",
+        pc  => "CONST(%ld)",
+        sc  => "CONST(%ld)",
+        kc  => "CONST(%ld)",
+        kic => "cur_opcode[%ld]"
     );
 }
 
-sub readjit($) {
+sub readjit {
     my $file = shift;
 
     my %ops;
     my $template;
 
-    open (IN,$file) or die "Can't open file $file: $!";
-    while ($line = <IN>) {
+    open IN, '<', $file or die "Can't open file $file: $!";
+    while ( my $line = <IN>) {
         if ($line =~ m/^#define/) {
             $line =~ s/PREV_OP\s(..?)\s(\w+)/(jit_info->prev_op) && (*jit_info->prev_op $1 $opcodes{$2})/g;
             $header .= $line;
@@ -121,14 +115,14 @@ sub readjit($) {
         if (!defined($function) && !defined($template)) {
             if ($line =~ m/TEMPLATE\s+(\w+)\s*{/) { #}
                 $template = $1;
-                $asm = "";
+                $asm = q{};
                 next;
             }
             else {
                 $line =~ m/(extern\s*)?(\w+)\s*{/; #}
                 $extern = (defined($1))? 1 : 0;
                 $function = $2;
-                $asm = "";
+                $asm = q{};
                 next;
             }
         }
@@ -216,9 +210,9 @@ sub vtable_num($) {
 
 my $jit_emit_n = ($genfile =~ /jit_cpu.c/) ? 2 : 1;
 
-open JITCPU, ">$genfile" or die;
+open JITCPU, '>', $genfile or die;
 
-print JITCPU<<END_C;
+print JITCPU <<"END_C";
 /*
  * !!!!!!!   DO NOT EDIT THIS FILE   !!!!!!!
  *
@@ -284,7 +278,7 @@ extern PARROT_API int Parrot_exec_rel_count;
 END_C
 
 if ($jit_cpu) {
-    print JITCPU<<END_C;
+    print JITCPU <<'END_C';
 #define IREG(i) REG_INT(jit_info->cur_op[i])
 #define NREG(i) REG_NUM(jit_info->cur_op[i])
 #define PREG(i) REG_PMC(jit_info->cur_op[i])
@@ -293,29 +287,29 @@ if ($jit_cpu) {
 END_C
 }
 else {
-    print JITCPU<<END_C;
+    print JITCPU <<'END_C';
 #define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + offsetof(struct PackFile_Constant, u))
 #define RCONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
-#define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \\
+#define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \
     emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 
 END_C
 }
-if (($cpuarch eq 'ppc') && ($genfile ne "src/jit_cpu.c")) {
+if ( $cpuarch eq 'ppc' && $genfile ne 'src/jit_cpu.c' ) {
     print JITCPU "#define ECONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 8)\n";
 }
 
 
-%core_ops = readjit("src/jit/$cpuarch/core.jit");
+my %core_ops = readjit("src/jit/$cpuarch/core.jit");
 
 print JITCPU $header if ($header);
 
 my $njit = scalar keys(%core_ops);
 
-my $jit_fn_retn = "void";
-my $jit_fn_params = "(Parrot_jit_info_t *jit_info, Interp * interpreter)";
+my $jit_fn_retn = 'void';
+my $jit_fn_params = '(Parrot_jit_info_t *jit_info, Interp * interpreter)';
 
-for ($i = 0; $i < $core_numops; $i++) {
+for ( my $i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]}[0];
     $extern = $core_ops{$core_opfunc[$i]}[1];
 
@@ -352,7 +346,7 @@ for ($i = 0; $i < $core_numops; $i++) {
         {{\@1}}
         \);
         \s+{{\+=\d}}/xm) {
-            $jit_func = "Parrot_jit_vtable1_op";
+            $jit_func = 'Parrot_jit_vtable1_op';
             $extern = vtable_num($1);
             #print $op->full_name .": $jit_func $extern\n";
         }
@@ -367,7 +361,7 @@ for ($i = 0; $i < $core_numops; $i++) {
         {{\@2}}
         \);
         \s+{{\+=\d}}/xm) {
-            $jit_func = "Parrot_jit_vtable1r_op";
+            $jit_func = 'Parrot_jit_vtable1r_op';
             $extern = vtable_num($1);
             #print $op->full_name .": $jit_func $extern\n";
         }
@@ -454,7 +448,7 @@ for ($i = 0; $i < $core_numops; $i++) {
 print JITCPU @jit_funcs, "};\n";
 
 if ($genfile =~ /jit_cpu.c/) {
-    print JITCPU <<EOC;
+    print JITCPU <<"EOC";
     PARROT_API Parrot_jit_fn_info_t *op_jit = &_op_jit[0];
 
     extern int jit_op_count(void);
@@ -463,7 +457,9 @@ EOC
 }
 
 print("jit2c: JITed $njit (+ $vjit vtable) of $core_numops ops\n");
+
 sub make_subs {
     my ($ptr, $type, $index) = @_;
+
     return(($ptr eq '&' ? '&' : '') . sprintf($argmaps{$type_to_arg{$type}}, $index));
 }
