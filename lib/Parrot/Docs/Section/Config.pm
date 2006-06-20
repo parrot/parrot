@@ -22,6 +22,7 @@ A documentation section describing Parrot's configuration system.
 package Parrot::Docs::Section::Config;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Config::ISA = qw(Parrot::Docs::Section);

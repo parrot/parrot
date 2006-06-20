@@ -28,6 +28,7 @@ and Perl 6 rules.
 =cut
 
 use strict;
+use warnings;
 
 require Parrot::Test;
 

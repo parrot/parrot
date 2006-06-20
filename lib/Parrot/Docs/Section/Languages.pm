@@ -22,6 +22,7 @@ A documentation section describing Parrot's client languages.
 package Parrot::Docs::Section::Languages;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Languages::ISA = qw(Parrot::Docs::Section);

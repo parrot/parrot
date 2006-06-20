@@ -22,6 +22,7 @@ A documentation section describing all the Parrot examples.
 package Parrot::Docs::Section::Examples;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Examples::ISA = qw(Parrot::Docs::Section);

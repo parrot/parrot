@@ -18,10 +18,10 @@ C C<goto> run loop.
 
 =cut
 
-use strict;
-#use warnings;
-
 package Parrot::OpTrans::CGoto;
+
+use strict;
+use warnings;
 
 use Parrot::OpTrans;
 use vars qw(@ISA);

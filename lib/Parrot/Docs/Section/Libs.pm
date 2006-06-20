@@ -22,6 +22,7 @@ A documentation section describing libraries in Parrot.
 package Parrot::Docs::Section::Libs;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Libs::ISA = qw(Parrot::Docs::Section);

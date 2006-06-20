@@ -62,9 +62,11 @@ Op Type:
 
 =cut
 
-use strict;
-
 package Parrot::Op;
+
+use strict;
+use warnings;
+
 
 =item C<new($code, $type, $name, $args, $argdirs, $labels, $flags)>
 

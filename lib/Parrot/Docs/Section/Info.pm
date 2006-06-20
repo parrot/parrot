@@ -22,6 +22,7 @@ A documentation section describing Parrot's project info.
 package Parrot::Docs::Section::Info;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Info::ISA = qw(Parrot::Docs::Section);

@@ -16,10 +16,10 @@ function-based (slow or fast core) run loop.
 
 =cut
 
-use strict;
-#use warnings;
-
 package Parrot::OpTrans::C;
+
+use strict;
+use warnings;
 
 use Parrot::OpTrans;
 use vars qw(@ISA %arg_maps);

@@ -24,6 +24,7 @@ This is the top-level section for the HTML documentation for Parrot.
 package Parrot::Docs::Section::Parrot;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Parrot::ISA = qw(Parrot::Docs::Section);

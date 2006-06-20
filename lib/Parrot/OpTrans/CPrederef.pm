@@ -17,10 +17,10 @@ to provide predereferenced register addressing run loop.
 
 =cut
 
-use strict;
-#use warnings;
-
 package Parrot::OpTrans::CPrederef;
+
+use strict;
+use warnings;
 
 use Parrot::OpTrans;
 use vars qw(@ISA);

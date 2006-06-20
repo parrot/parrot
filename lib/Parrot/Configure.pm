@@ -37,6 +37,7 @@ I<symbols>.
 package Parrot::Configure;
 
 use strict;
+use warnings;
 
 use lib qw(config);
 use Carp qw(carp);

@@ -22,6 +22,7 @@ A documentation section describing Parrot tests.
 package Parrot::Docs::Section::Tests;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Tests::ISA = qw(Parrot::Docs::Section);

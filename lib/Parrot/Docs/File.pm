@@ -26,6 +26,7 @@ It's used by the documentation tools in F<tools/docs>.
 package Parrot::Docs::File;
 
 use strict;
+use warnings;
 
 use Parrot::IO::File;
 @Parrot::Docs::File::ISA = qw(Parrot::IO::File);

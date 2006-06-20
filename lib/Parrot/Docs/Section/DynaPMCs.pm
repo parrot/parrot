@@ -22,6 +22,7 @@ A documentation section describing all the dynamic PMCs.
 package Parrot::Docs::Section::DynaPMCs;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::DynaPMCs::ISA = qw(Parrot::Docs::Section);

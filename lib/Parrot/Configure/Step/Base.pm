@@ -28,6 +28,7 @@ I<symbols>.
 package Parrot::Configure::Step::Base;
 
 use strict;
+use warnings;
 
 =head2 Methods
 

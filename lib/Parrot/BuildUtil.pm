@@ -15,10 +15,10 @@ For now only a sub for getting the current version.
 
 =cut
 
+package Parrot::BuildUtil;
+
 use strict;
 use warnings;
-
-package Parrot::BuildUtil;
 
 =item C<parrot_version()>
 

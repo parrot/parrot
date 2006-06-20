@@ -17,10 +17,10 @@ C<switch>ed run loop.
 
 =cut
 
-use strict;
-#use warnings;
-
 package Parrot::OpTrans::CSwitch;
+
+use strict;
+use warnings;
 
 use Parrot::OpTrans;
 use Parrot::OpTrans::CPrederef;

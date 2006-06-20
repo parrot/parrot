@@ -40,6 +40,7 @@ I<symbols>.
 package Parrot::Configure::Data;
 
 use strict;
+use warnings;
 
 use Data::Dumper;
 

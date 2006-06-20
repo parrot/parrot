@@ -22,6 +22,7 @@ A documentation section describing Parrot-related editor plugins.
 package Parrot::Docs::Section::EditorPlugins;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::EditorPlugins::ISA = qw(Parrot::Docs::Section);

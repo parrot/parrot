@@ -25,6 +25,7 @@ C<Parrot::Docs::Section> is a subclass of C<Parrot::Docs::Group>.
 package Parrot::Docs::Section;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Group;
 @Parrot::Docs::Section::ISA = qw(Parrot::Docs::Group);

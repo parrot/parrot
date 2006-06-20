@@ -32,10 +32,10 @@ The subclass hierarchy is as follows:
 
 =cut
 
-use strict;
-#use warnings;
-
 package Parrot::OpTrans;
+
+use strict;
+use warnings;
 
 =item C<new()>
 

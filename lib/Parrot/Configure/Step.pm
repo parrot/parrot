@@ -24,6 +24,7 @@ configuration steps.
 package Parrot::Configure::Step;
 
 use strict;
+use warnings;
 
 use Exporter;
 use Carp;

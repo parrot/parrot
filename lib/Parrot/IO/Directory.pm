@@ -22,6 +22,7 @@ Use this to query and manipulate directories and their contents.
 package Parrot::IO::Directory;
 
 use strict;
+use warnings;
 
 use Parrot::IO::Path;
 @Parrot::IO::Directory::ISA = qw(Parrot::IO::Path);

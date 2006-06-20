@@ -24,6 +24,7 @@ It's used by the documentation tools in F<tools/docs>.
 package Parrot::Docs::Directory;
 
 use strict;
+use warnings;
 
 use Parrot::IO::Directory;
 @Parrot::Docs::Directory::ISA = qw(Parrot::IO::Directory);

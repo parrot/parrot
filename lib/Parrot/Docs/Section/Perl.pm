@@ -22,6 +22,7 @@ A documentation section describing Perl modules in Parrot.
 package Parrot::Docs::Section::Perl;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Perl::ISA = qw(Parrot::Docs::Section);

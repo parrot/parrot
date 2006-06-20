@@ -17,10 +17,10 @@ and C C<goto> run loop.
 
 =cut
 
-use strict;
-#use warnings;
-
 package Parrot::OpTrans::CGP;
+
+use strict;
+use warnings;
 
 use Parrot::OpTrans;
 use Parrot::OpTrans::CPrederef;

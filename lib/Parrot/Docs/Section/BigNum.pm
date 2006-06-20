@@ -22,6 +22,7 @@ A documentation section describing Parrot's big number subsystem.
 package Parrot::Docs::Section::BigNum;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::BigNum::ISA = qw(Parrot::Docs::Section);

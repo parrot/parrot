@@ -31,6 +31,8 @@ file to place under the file path in the index HTML.
 package Parrot::Docs::Item;
 
 use strict;
+use warnings;
+
 use Parrot::Docs::Directory;
 use Parrot::Docs::POD2HTML;
 

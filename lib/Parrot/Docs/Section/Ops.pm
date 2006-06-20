@@ -22,6 +22,7 @@ A documentation section describing the Parrot ops.
 package Parrot::Docs::Section::Ops;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Ops::ISA = qw(Parrot::Docs::Section);

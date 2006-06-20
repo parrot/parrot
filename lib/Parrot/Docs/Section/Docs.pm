@@ -22,6 +22,7 @@ A documentation section describing all the POD documentation in F<docs>.
 package Parrot::Docs::Section::Docs;
 
 use strict;
+use warnings;
 
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Docs::ISA = qw(Parrot::Docs::Section);
