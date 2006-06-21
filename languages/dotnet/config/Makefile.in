@@ -154,6 +154,7 @@ CLEANERS = \
  "$(OPSDIR)/*.ilk" \
  "$(OPSDIR)/*.lib" \
  "*.pbc" \
+ "*.dll" \
  "src/*.pbc" \
  src/it.pir
 
