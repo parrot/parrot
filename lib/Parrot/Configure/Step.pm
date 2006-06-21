@@ -26,7 +26,8 @@ package Parrot::Configure::Step;
 use strict;
 use warnings;
 
-use Exporter;
+use base qw( Exporter );
+
 use Carp;
 use File::Basename qw( basename );
 use File::Copy ();
@@ -34,9 +35,7 @@ use File::Spec;
 use File::Which;
 
 # XXX $conf is a temporary hack
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $conf);
-
-@ISA = qw(Exporter);
+use vars qw(@EXPORT @EXPORT_OK %EXPORT_TAGS $conf);
 
 @EXPORT = ();
 

@@ -24,8 +24,7 @@ package Parrot::Docs::Section::Compilers;
 use strict;
 use warnings;
 
-use Parrot::Docs::Section;
-@Parrot::Docs::Section::Compilers::ISA = qw(Parrot::Docs::Section);
+use base qw( Parrot::Docs::Section );
 
 use Parrot::Distribution;
 

@@ -21,9 +21,9 @@ package Parrot::OpTrans::C;
 use strict;
 use warnings;
 
-use Parrot::OpTrans;
-use vars qw(@ISA %arg_maps);
-@ISA = qw(Parrot::OpTrans);
+use base qw( Parrot::OpTrans );
+
+use vars qw(%arg_maps);
 
 =item C<core_type()>
 

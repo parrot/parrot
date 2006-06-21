@@ -24,8 +24,7 @@ package Parrot::IO::Directory;
 use strict;
 use warnings;
 
-use Parrot::IO::Path;
-@Parrot::IO::Directory::ISA = qw(Parrot::IO::Path);
+use base qw( Parrot::IO::Path );
 
 use DirHandle;
 use File::Path;

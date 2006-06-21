@@ -26,8 +26,7 @@ package Parrot::Docs::Directory;
 use strict;
 use warnings;
 
-use Parrot::IO::Directory;
-@Parrot::Docs::Directory::ISA = qw(Parrot::IO::Directory);
+use base qw( Parrot::IO::Directory );
 
 use Parrot::Docs::File;
 

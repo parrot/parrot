@@ -24,8 +24,7 @@ package Parrot::Docs::Section::Tools;
 use strict;
 use warnings;
 
-use Parrot::Docs::Section;
-our @ISA = qw(Parrot::Docs::Section);
+use base qw( Parrot::Docs::Section );
 
 use Parrot::Docs::Item;
 

@@ -23,9 +23,7 @@ use strict;
 use warnings;
 
 use Parrot::OpTrans;
-use vars qw(@ISA);
-use Parrot::OpTrans::C;
-@ISA = qw(Parrot::OpTrans::C);
+use base qw( Parrot::OpTrans::C );
 
 =item C<core_type()>
 

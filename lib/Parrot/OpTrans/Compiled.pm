@@ -23,9 +23,7 @@ package Parrot::OpTrans::Compiled;
 use strict;
 use warnings;
 
-use Parrot::OpTrans;
-use vars qw(@ISA);
-@ISA = qw(Parrot::OpTrans);
+use base qw( Parrot::OpTrans );
 
 =item C<defines()>
 

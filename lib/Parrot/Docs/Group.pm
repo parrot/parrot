@@ -27,8 +27,7 @@ package Parrot::Docs::Group;
 use strict;
 use warnings;
 
-use Parrot::Docs::Item;
-@Parrot::Docs::Group::ISA = qw(Parrot::Docs::Item);
+use base qw( Parrot::Docs::Item );
 
 =item C<new_group($name, $text, @items)>
 

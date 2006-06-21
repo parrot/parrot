@@ -155,15 +155,13 @@ package Parrot::OpsFile;
 use strict;
 use warnings;
 
+use base qw( Exporter );
+
 use Parrot::Op;
 use Parrot::Config;
 
-BEGIN {
-    use Exporter;
-    use vars qw(%op_body @EXPORT @ISA);
-    @ISA = qw(Exporter);
-    @EXPORT = qw(%op_body);
-};
+our %op_body;
+our @EXPORT = qw( %op_body );
 
 # private sub  _trim()
 #

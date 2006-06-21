@@ -24,8 +24,7 @@ package Parrot::Docs::Section::Config;
 use strict;
 use warnings;
 
-use Parrot::Docs::Section;
-@Parrot::Docs::Section::Config::ISA = qw(Parrot::Docs::Section);
+use base qw( Parrot::Docs::Section );
 
 =item C<config_groups()>
 

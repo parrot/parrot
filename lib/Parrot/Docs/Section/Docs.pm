@@ -24,8 +24,7 @@ package Parrot::Docs::Section::Docs;
 use strict;
 use warnings;
 
-use Parrot::Docs::Section;
-@Parrot::Docs::Section::Docs::ISA = qw(Parrot::Docs::Section);
+use base qw( Parrot::Docs::Section );
 
 =item C<new()>
 

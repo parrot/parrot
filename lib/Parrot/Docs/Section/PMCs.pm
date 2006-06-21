@@ -26,8 +26,7 @@ use warnings;
 
 use Parrot::Distribution;
 
-use Parrot::Docs::Section;
-@Parrot::Docs::Section::PMCs::ISA = qw(Parrot::Docs::Section);
+use base qw( Parrot::Docs::Section );
 
 =item C<new()>
 

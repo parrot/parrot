@@ -29,10 +29,10 @@ package Parrot::Vtable;
 use strict;
 use warnings;
 
-use Exporter;
+use base qw( Exporter );
+
 use FileHandle;
 
-our @ISA    = qw(Exporter);
 our @EXPORT = qw(parse_vtable vtbl_defs vtbl_struct vtbl_macros vtbl_embed);
 
 sub make_re {

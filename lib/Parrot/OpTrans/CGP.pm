@@ -22,11 +22,7 @@ package Parrot::OpTrans::CGP;
 use strict;
 use warnings;
 
-use Parrot::OpTrans;
-use Parrot::OpTrans::CPrederef;
-use Parrot::OpTrans::CGoto;
-use vars qw(@ISA);
-@ISA = qw(Parrot::OpTrans::CPrederef Parrot::OpTrans::CGoto);
+use base qw( Parrot::OpTrans::CPrederef Parrot::OpTrans::CGoto );
 
 =item C<core_type()>
 

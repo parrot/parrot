@@ -28,8 +28,7 @@ package Parrot::Docs::File;
 use strict;
 use warnings;
 
-use Parrot::IO::File;
-@Parrot::Docs::File::ISA = qw(Parrot::IO::File);
+use base qw( Parrot::IO::File );
 
 use Pod::Simple::Checker;
 use Parrot::Docs::POD2HTML;
