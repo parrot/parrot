@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"for no args");
@@ -49,7 +49,7 @@ TCL
 4
 OUT
 
-language_output_is("tcl",<<'TCL',<<'OUT',"variable for last arg")
+language_output_is("tcl",<<'TCL',<<'OUT',"variable for last arg");
 set a {puts $i}
 for {set i 0} {$i < 5} {set i [expr $i+1]} $a
 TCL
@@ -58,5 +58,10 @@ TCL
 2
 3
 4
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"test not met initially")
+for {set x 11} {$x < 10} {incr x} {puts x}
+TCL
 OUT
 
