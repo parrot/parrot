@@ -24,6 +24,7 @@ PMCS = \
  tclarray
 
 GENERATED_INLINES = \
+ $(C_BUILTIN)/break.pir \
  $(C_BUILTIN)/eof.pir \
  $(C_BUILTIN)/exit.pir \
  $(C_BUILTIN)/incr.pir \
@@ -40,7 +41,6 @@ $(R_BUILTIN)/array.pir \
 $(C_BUILTIN)/auto_execok.pir \
 $(C_BUILTIN)/auto_load.pir \
 $(R_BUILTIN)/binary.pir \
-$(C_BUILTIN)/break.pir \
 $(R_BUILTIN)/catch.pir \
 $(C_BUILTIN)/cd.pir \
 $(C_BUILTIN)/close.pir \
