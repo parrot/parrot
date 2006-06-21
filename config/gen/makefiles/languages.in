@@ -17,6 +17,7 @@ LANGUAGES = \
     befunge \
     bf \
     cola \
+    dotnet \
     jako \
     lisp \
     lua \
@@ -79,6 +80,7 @@ clean: \
     befunge.clean \
     bf.clean \
     cola.clean \
+    dotnet.clean \
     jako.clean \
     lisp.clean \
     lua.clean \
@@ -154,6 +156,15 @@ cola.test:
 	- $(MAKE) cola test
 cola.clean:
 # don't clean cola, as files in MANIFEST are removed
+
+dotnet : dotnet.dummy
+dotnet.dummy:
+	cd dotnet && $(PERL) Configure.pl
+	- $(MAKE) dotnet
+dotnet.test:
+	- $(MAKE) dotnet test
+dotnet.clean:
+	- $(MAKE) dotnet clean
 
 HQ9plus: HQ9plus.dummy
 HQ9plus.dummy:
