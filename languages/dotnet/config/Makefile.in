@@ -132,18 +132,34 @@ test : all
 # CLEANUP TARGETS
 # ###############
 
-clean :
-	$(RM_F) $(PMCDIR)${slash}pmc_*.h $(PMCDIR)${slash}*_group.h $(PMCDIR)${slash}*$(LOAD_EXT) \
-	        $(PMCDIR)${slash}*.dump $(PMCDIR)${slash}*.c $(PMCDIR)${slash}*$(O) \
-	        $(PMCDIR)${slash}*.def $(PMCDIR)${slash}*.exp $(PMCDIR)${slash}*.pdb \
-	        $(PMCDIR)${slash}*.ilk $(PMCDIR)${slash}*.lib \
-			$(OPSDIR)${slash}*.c $(OPSDIR)${slash}*.h $(OPSDIR)${slash}*$(O) \
-			$(OPSDIR)${slash}*$(LOAD_EXT) $(OPSDIR)${slash}*.exp \
-			$(OPSDIR)${slash}*.pdb $(OPSDIR)${slash}*.ilk \
-			$(OPSDIR)${slash}*.lib \
-			*.pbc src${slash}*.pbc src${slash}it.pir
+CLEANERS = \
+ "$(PMCDIR)/dotnet*.h" \
+ "$(PMCDIR)/pmc_*.h" \
+ "$(PMCDIR)/*_group.h" \
+ "$(PMCDIR)/*$(LOAD_EXT)" \
+ "$(PMCDIR)/*.dump" \
+ "$(PMCDIR)/*.c" \
+ "$(PMCDIR)/*$(O)" \
+ "$(PMCDIR)/*.def" \
+ "$(PMCDIR)/*.exp" \
+ "$(PMCDIR)/*.pdb" \
+ "$(PMCDIR)/*.ilk" \
+ "$(PMCDIR)/*.lib" \
+ "$(OPSDIR)/*.c" \
+ "$(OPSDIR)/*.h" \
+ "$(OPSDIR)/*$(O)" \
+ "$(OPSDIR)/*$(LOAD_EXT)" \
+ "$(OPSDIR)/*.exp" \
+ "$(OPSDIR)/*.pdb" \
+ "$(OPSDIR)/*.ilk" \
+ "$(OPSDIR)/*.lib" \
+ "*.pbc" \
+ "src/*.pbc" \
+ src/it.pir
 
+clean:
+	$(RM_F) $(CLEANERS)
 
 realclean : clean
-	$(RM_F) Makefile config${slash}N2PConfig.pm
+	$(RM_F) Makefile config/N2PConfig.pm
 
