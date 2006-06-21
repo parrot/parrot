@@ -33,7 +33,6 @@ include/parrot/exec_dep.h                         [main]include
 include/parrot/extend_vtable.h                    [main]include
 include/parrot/feature.h                          [main]include
 include/parrot/has_header.h                       [main]include
-include/parrot/jit_emit.h                         [main]include
 include/parrot/oplib/core_ops.h                   [main]include
 include/parrot/oplib/core_ops_cg.h                [main]include
 include/parrot/oplib/core_ops_cgp.h               [main]include
@@ -182,4 +181,5 @@ runtime/parrot/library/dumper.pbc                 [main]
 runtime/parrot/library/ncurses.pbc                [main]
 runtime/parrot/library/parrotlib.pbc              [main]
 runtime/parrot/library/pcre.pbc                   [main]
+src/jit_emit.h                                    [main]include
 tools/build/dynpmc.pl                             [devel]

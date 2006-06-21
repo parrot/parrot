@@ -260,7 +260,7 @@ print JITCPU <<"END_C";
 
 #define Parrot_jit_restart_op Parrot_jit_cpcf_op
 
-#include"parrot/jit_emit.h"
+#include"jit_emit.h"
 
 #undef CONST
 #ifndef MAP

@@ -28,7 +28,7 @@ executables.
 #include "parrot/exec.h"
 #include "jit.h"
 #define JIT_EMIT 1
-#include "parrot/jit_emit.h"
+#include "jit_emit.h"
 #include "parrot/embed.h"
 
 opcode_t* run_compiled(Interp *interpreter,

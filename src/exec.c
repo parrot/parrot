@@ -23,7 +23,7 @@ src/exec.c - Generate an object file
 #include "parrot/exec.h"
 #include "jit.h"
 #define JIT_EMIT 1
-#include "parrot/jit_emit.h"
+#include "jit_emit.h"
 #include "exec_dep.h"
 #include "exec_save.h"
 #include "parrot/compiler.h"

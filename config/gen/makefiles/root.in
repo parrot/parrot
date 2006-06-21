@@ -2,10 +2,12 @@
 # $Id$
 
 ###############################################################################
-# NOTES:
+#
+# NOTE:
 #
 # This makefile makes use of specific .dummy targets (rather than .PHONY
 # or .VIRTUAL targets) in an effort to work with various flavors of make.
+#
 ###############################################################################
 
 ###############################################################################
@@ -313,7 +315,7 @@ GEN_LIBRARY = \
 #    runtime/parrot/library/Data/Replace.pbc \
 #    runtime/parrot/library/postgres.pbc \
 
-# the dependencies of jit_emit.h are done explicitely
+# the dependencies of $(SRC_DIR)/jit_emit.h are done explicitely
 # including this file in GEN_HEADERS causes unnecessary recompile of all
 FLUID_FILES = \
     $(GEN_OPSFILES) \
@@ -321,7 +323,7 @@ FLUID_FILES = \
     $(GEN_SOURCES) \
     $(GEN_MODULES) \
     $(GEN_LIBRARY) \
-    $(INC_DIR)/jit_emit.h \
+    $(SRC_DIR)/jit_emit.h \
     runtime/parrot/include/parrotlib.pbc
 
 
@@ -954,17 +956,17 @@ $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h
 
 $(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) 
 
 $(SRC_DIR)/jit_debug_xcoff$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/jit_cpu$(O) : $(GENERAL_H_FILES) $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/jit_cpu$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h
 
-$(SRC_DIR)/exec$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/exec$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h
 
-$(SRC_DIR)/exec_cpu$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/exec_cpu$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h
 
 $(INC_DIR)/extend_vtable.h $(SRC_DIR)/extend_vtable.c $(SRC_DIR)/vtable.h : vtable.tbl $(BUILD_TOOLS_DIR)/vtable_extend.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
@@ -1145,14 +1147,14 @@ $(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parr
 $(INC_DIR)/vtable.h : vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_h.pl
 
-$(INC_DIR)/jit_emit.h : $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h
-	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h $(INC_DIR)/jit_emit.h
+$(SRC_DIR)/jit_emit.h : $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h
+	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h $(SRC_DIR)/jit_emit.h
 $(SRC_DIR)/exec_dep.h : $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h
 	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h $(SRC_DIR)/exec_dep.h
-$(SRC_DIR)/jit_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
+$(SRC_DIR)/jit_cpu.c : lib/Parrot/OpLib/core.pm $(SRC_DIR)/jit_emit.h \
     $(SRC_DIR)/jit/@jitcpuarch@/core.jit $(JIT_BUILD_TOOL)
 	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ $(SRC_DIR)/jit_cpu.c
-$(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
+$(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(SRC_DIR)/jit_emit.h \
     $(SRC_DIR)/jit/@jitcpuarch@/core.jit @TEMP_exec_h@ $(SRC_DIR)/exec_dep.h $(JIT_BUILD_TOOL)
 	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ $(SRC_DIR)/exec_cpu.c
 
@@ -1530,7 +1532,7 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(SRC_DIR)/parrot_config$(O) \
     $(SRC_DIR)/install_config$(O) \
     $(SRC_DIR)/asmfun.s \
-    $(INC_DIR)/jit_emit.h \
+    $(SRC_DIR)/jit_emit.h \
     $(SRC_DIR)/jit_cpu.c \
     $(SRC_DIR)/exec_cpu.c \
     $(SRC_DIR)/exec_start$(O) \
