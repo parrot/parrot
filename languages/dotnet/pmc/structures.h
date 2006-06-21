@@ -258,6 +258,10 @@ struct dotnet_managed_ptr
 
 
 /* Int64 and UInt64 PMC underlying structs. */
+#ifndef WIN32
+#define __int64 long long
+#endif
+
 struct dotnet_int64
 {
     __int64 x;
