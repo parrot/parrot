@@ -162,7 +162,7 @@ OPTIONS
     $S0 = "<?ident> [ \:\: <?ident> ]*"
     p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'name')
 
-    $S0 = '[ \# \N+ | \s+ ]* :::'
+    $S0 = '[ \# \N* | \s+ ]* :::'
     p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'ws')
 
    $S0 = <<'      END_ARG_RULE'
