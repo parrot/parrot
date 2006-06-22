@@ -1,4 +1,4 @@
-# Copyright (C) 2002, The Perl Foundation.
+# Copyright (C) 2002-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -22,8 +22,6 @@ use strict;
 use warnings;
 
 use base qw( Parrot::OpTrans );
-
-use vars qw(%arg_maps);
 
 =item C<core_type()>
 
@@ -119,21 +117,21 @@ sub expr_pop
     return "pop_dest(interpreter)";
 }
 
-%arg_maps = (
-  'op' => "cur_opcode[%ld]",
+our %arg_maps = (
+  'op'  => "cur_opcode[%ld]",
 
-  'i'  => "IREG(%ld)",
-  'n'  => "NREG(%ld)",
-  'p'  => "PREG(%ld)",
-  's'  => "SREG(%ld)",
-  'k'  => "PREG(%ld)",
-  'ki' => "IREG(%ld)",
+  'i'   => "IREG(%ld)",
+  'n'   => "NREG(%ld)",
+  'p'   => "PREG(%ld)",
+  's'   => "SREG(%ld)",
+  'k'   => "PREG(%ld)",
+  'ki'  => "IREG(%ld)",
 
-  'ic' => "cur_opcode[%ld]",
-  'nc' => "CONST(%ld)->u.number",
-  'pc' => "CONST(%ld)->u.key",
-  'sc' => "CONST(%ld)->u.string",
-  'kc' => "CONST(%ld)->u.key",
+  'ic'  => "cur_opcode[%ld]",
+  'nc'  => "CONST(%ld)->u.number",
+  'pc'  => "CONST(%ld)->u.key",
+  'sc'  => "CONST(%ld)->u.string",
+  'kc'  => "CONST(%ld)->u.key",
   'kic' => "cur_opcode[%ld]"
 );
 

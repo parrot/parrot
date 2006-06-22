@@ -7,7 +7,7 @@ Parrot::Pmc2c - PMC to C Code Generation
 
 =head1 SYNOPSIS
 
-	use Parrot::Pmc2c;
+    use Parrot::Pmc2c;
 
 =head1 DESCRIPTION
 
@@ -25,17 +25,17 @@ package Parrot::Pmc2c;
 use strict;
 use warnings;
 
-use vars qw( @writes %writes );
 use Parrot::PMC qw(%pmc_types);
 
 use base qw( Exporter );
+
 our @EXPORT_OK = qw(count_newlines gen_ret dont_edit dynext_load_code);
 
-BEGIN {
-    @writes = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
-    @writes{@writes} = (1) x @writes;
-};
-
+our %writes;
+{
+  my @writes = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
+  @writes{@writes} = (1) x @writes;
+}
 use Text::Balanced 'extract_bracketed';
 
 =item C<does_write($method, $section)>
