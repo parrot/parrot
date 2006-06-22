@@ -1,7 +1,38 @@
-#!perl -w
+# Copyright (C) 2006, The Perl Foundation.
+# $Id: harness 12840 2006-05-30 15:08:05Z coke $
+
+=head1 NAME
+
+languages/dotnet/t/harness - A harness for .Net
+
+=head1 SYNOPSIS
+
+    cd languages && perl -Idotnet/t dotnet/t/harness --files
+
+    cd languages && perl -Idotnet/t dotnet/t/harness
+
+    cd languages/dotnet && perl -It t/harness
+
+    cd languages/dotnet && perl -It t/harness t/examples.t
+
+=head1 DESCRIPTION
+
+If I'm called with a single
+argument of "--files", I just return a list of files to process.
+This list is one per line, and is relative to the languages dir.
+
+If I'm called with no args, I run the complete suite.
+
+Otherwise I run the tests that were passed on the command line.
+
+=cut
 
 use strict;
-use Test::Harness();
+
+use Test::Harness;
+use File::Spec;
+
+my $language = 'dotnet';
 
 # Check that we have the Mono C# compiler handy.
 my $check = `mcs --version`;
@@ -9,7 +40,34 @@ unless ($check =~ /Mono/) {
     die "You need the Mono C# compiler (mcs) in your path to build the test assemblies.\n";
 }
 
-# Run tests.
-my @default_tests = glob( "t/*.t" );
-my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
-Test::Harness::runtests(@tests);
+my @files;
+
+if ( grep { /^--files$/ } @ARGV ) {
+    # I must be running out of languages/
+    my $dir = File::Spec->catfile( $language, 't' );
+    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
+    print join("\n", @files);
+    print "\n" if @files;
+    exit;
+} elsif (@ARGV) {
+    # Someone specified tests for me to run.
+    @files = map { glob( $_ ) } @ARGV
+} else {
+    # I must be running out of languages/$language
+    # You may want a deeper search than this.
+    @files = glob( File::Spec->catfile( 't', '*.t' ) );
+}
+
+exit unless @files;
+runtests(@files);
+
+=head1 HISTORY
+
+Mostly taken from F<languages/bc/t/harness>.
+
+=head1 SEE ALSO
+
+F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+
+=cut
+
