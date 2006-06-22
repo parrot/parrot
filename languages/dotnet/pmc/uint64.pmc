@@ -40,7 +40,7 @@ pmclass UInt64 dynpmc group dotnet_runtime {
     METHOD void set_high_bits(int high)
     {
         struct dotnet_uint64 *i = PMC_struct_val(SELF);
-        i->x = (i->x & 0xFFFFFFFF) | ((__int64)high << 32);
+        i->x = (i->x & 0xFFFFFFFF) | ((HUGEINTVAL)high << 32);
     }
 
 

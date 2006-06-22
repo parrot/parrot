@@ -29,18 +29,18 @@ VERSION = PARROT_VERSION;
 	(Parrot_UInt4)(a) < (Parrot_UInt4)(b) ? -1 : 0
 
 #define CHECK_ADD_OVERFLOW64(a,b) \
-	(__int64)(b) >= 0 ? (__int64)(MAX_INT8) - (__int64)(b) < (__int64)(a) ? -1 : 0	\
-	: (__int64)(MIN_INT8) - (__int64)(b) > (__int64)(a) ? +1 : 0
+	(HUGEINTVAL)(b) >= 0 ? (HUGEINTVAL)(MAX_INT8) - (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0	\
+	: (HUGEINTVAL)(MIN_INT8) - (HUGEINTVAL)(b) > (HUGEINTVAL)(a) ? +1 : 0
 
 #define CHECK_SUB_OVERFLOW64(a,b) \
-	(__int64)(b) < 0 ? (__int64)(MAX_INT8) + (__int64)(b) < (__int64)(a) ? -1 : 0	\
-	: (__int64)(MIN_INT8) + (__int64)(b) > (__int64)(a) ? +1 : 0
+	(HUGEINTVAL)(b) < 0 ? (HUGEINTVAL)(MAX_INT8) + (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0	\
+	: (HUGEINTVAL)(MIN_INT8) + (HUGEINTVAL)(b) > (HUGEINTVAL)(a) ? +1 : 0
 
 #define CHECK_ADD_OVERFLOW64_UN(a,b) \
-	(unsigned __int64)(MAX_UINT8) - (unsigned __int64)(b) < (unsigned __int64)(a) ? -1 : 0
+	(UHUGEINTVAL)(MAX_UINT8) - (UHUGEINTVAL)(b) < (UHUGEINTVAL)(a) ? -1 : 0
 
 #define CHECK_SUB_OVERFLOW64_UN(a,b) \
-	(unsigned __int64)(a) < (unsigned __int64)(b) ? -1 : 0
+	(UHUGEINTVAL)(a) < (UHUGEINTVAL)(b) ? -1 : 0
 
 #define CHECK_MUL_OVERFLOW(a,b) \
 	((Parrot_Int4)(a) == 0) || ((Parrot_Int4)(b) == 0) ? 0 : \
@@ -56,17 +56,17 @@ VERSION = PARROT_VERSION;
 	(Parrot_UInt4)(b) > ((MAX_UINT4) / (Parrot_UInt4)(a))
 
 #define CHECK_MUL_OVERFLOW64(a,b) \
-	((__int64)(a) == 0) || ((__int64)(b) == 0) ? 0 : \
-	(((__int64)(a) > 0) && ((__int64)(b) == -1)) ? FALSE : \
-	(((__int64)(a) < 0) && ((__int64)(b) == -1)) ? (a == - MAX_INT8) : \
-	(((__int64)(a) > 0) && ((__int64)(b) > 0)) ? (__int64)(a) > ((MAX_INT8) / (__int64)(b)) : \
-	(((__int64)(a) > 0) && ((__int64)(b) < 0)) ? (__int64)(a) > ((MIN_INT8) / (__int64)(b)) : \
-	(((__int64)(a) < 0) && ((__int64)(b) > 0)) ? (__int64)(a) < ((MIN_INT8) / (__int64)(b)) : \
-	(__int64)(a) < ((MAX_INT8) / (__int64)(b))
+	((HUGEINTVAL)(a) == 0) || ((HUGEINTVAL)(b) == 0) ? 0 : \
+	(((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) == -1)) ? FALSE : \
+	(((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) == -1)) ? (a == - MAX_INT8) : \
+	(((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) > 0)) ? (HUGEINTVAL)(a) > ((MAX_INT8) / (HUGEINTVAL)(b)) : \
+	(((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) < 0)) ? (HUGEINTVAL)(a) > ((MIN_INT8) / (HUGEINTVAL)(b)) : \
+	(((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) > 0)) ? (HUGEINTVAL)(a) < ((MIN_INT8) / (HUGEINTVAL)(b)) : \
+	(HUGEINTVAL)(a) < ((MAX_INT8) / (HUGEINTVAL)(b))
 
 #define CHECK_MUL_OVERFLOW64_UN(a,b) \
-	((unsigned __int64)(a) == 0) || ((unsigned __int64)(b) == 0) ? 0 : \
-	(unsigned __int64)(b) > ((MAX_UINT8) / (unsigned __int64)(a))
+	((UHUGEINTVAL)(a) == 0) || ((UHUGEINTVAL)(b) == 0) ? 0 : \
+	(UHUGEINTVAL)(b) > ((MAX_UINT8) / (UHUGEINTVAL)(a))
 
 
 /* Overflow exception thrower. */
@@ -866,7 +866,7 @@ inline op net_conv_i8(out PMC, in NUM) :base_core {
               string_from_const_cstring(interpreter, "Int64", 0)));
     struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
     PMC_struct_val(i8) = i;
-	i->x = (__int64) $2;
+	i->x = (HUGEINTVAL) $2;
     $1 = i8;
 	goto NEXT();
 }
@@ -886,7 +886,7 @@ inline op net_conv_u8(out PMC, in NUM) :base_core {
               string_from_const_cstring(interpreter, "UInt64", 0)));
     struct dotnet_uint64* ui = mem_sys_allocate(sizeof(struct dotnet_uint64));
     PMC_struct_val(u8) = ui;
-	ui->x = (unsigned __int64) $2;
+	ui->x = (UHUGEINTVAL) $2;
     $1 = u8;
 	goto NEXT();
 }
@@ -1627,7 +1627,7 @@ inline op net_conv_ovf_i8(out PMC, in NUM) :base_core {
         $1 = pmc_new(interpreter, pmc_type(interpreter,
             string_from_const_cstring(interpreter, "Int64", 0)));
         PMC_struct_val($1) = i;
-        i->x = (__int64) $2;
+        i->x = (HUGEINTVAL) $2;
         goto NEXT();
     }
 }
@@ -1645,7 +1645,7 @@ inline op net_conv_ovf_u8(out PMC, in NUM) :base_core {
         $1 = pmc_new(interpreter, pmc_type(interpreter,
             string_from_const_cstring(interpreter, "UInt64", 0)));
         PMC_struct_val($1) = i;
-        i->x = (unsigned __int64) $2;
+        i->x = (UHUGEINTVAL) $2;
         goto NEXT();
     }
 }
