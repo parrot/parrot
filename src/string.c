@@ -22,7 +22,7 @@ strings.
 
 #include "parrot/parrot.h"
 #include "parrot/compiler.h"
-#include "parrot/string_private_cstring.h"
+#include "string_private_cstring.h"
 #include <assert.h>
 
 /*

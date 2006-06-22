@@ -597,7 +597,7 @@ STR_FILES = \
     $(SRC_DIR)/spf_vtable.str \
     $(CLASS_STR_FILES)
 
-$(INC_DIR)/string_private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
+$(SRC_DIR)/string_private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --all
 
 # classes PMC build utils and rules
@@ -1003,7 +1003,7 @@ $(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debug.h
 
 $(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/string$(O) : $(GENERAL_H_FILES) $(INC_DIR)/string_private_cstring.h
+$(SRC_DIR)/string$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/string_private_cstring.h
 
 $(SRC_DIR)/string_primitives$(O) : $(GENERAL_H_FILES) 
 
@@ -1504,7 +1504,7 @@ prog-clean :
     install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
-    $(INC_DIR)/string_private_cstring.h \
+    $(SRC_DIR)/string_private_cstring.h \
     "$(SRC_DIR)/*.str" "src/pmc/*.str" \
     "src/pmc/*.c" "src/pmc/*.h" "src/pmc/*.dump" \
     vtable.dump "*.def" "*.lib" "*.exp"

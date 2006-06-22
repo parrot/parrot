@@ -40,7 +40,6 @@ include/parrot/oplib/core_ops_switch.h            [main]include
 include/parrot/oplib/ops.h                        [main]include
 include/parrot/platform.h                         [main]include
 include/parrot/platform_interface.h               [main]include
-include/parrot/string_private_cstring.h           [main]include
 include/parrot/vtable.h                           [main]include
 installable_disassemble                           [main]bin
 installable_disassemble.exe                       [main]bin
@@ -182,4 +181,5 @@ runtime/parrot/library/ncurses.pbc                [main]
 runtime/parrot/library/parrotlib.pbc              [main]
 runtime/parrot/library/pcre.pbc                   [main]
 src/jit_emit.h                                    [main]include
+src/string_private_cstring.h                      [main]include
 tools/build/dynpmc.pl                             [devel]
