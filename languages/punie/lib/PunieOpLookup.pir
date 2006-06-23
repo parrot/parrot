@@ -49,7 +49,7 @@ data file, possibly in YAML.
     _add_entry(lookuptable, 'infix:|', 'bor')
     _add_entry(lookuptable, 'infix:^', 'bxor')
 
-    _add_entry(lookuptable, 'infix:=', 'set')
+    _add_entry(lookuptable, 'infix:=', 'assign')
 
     # These look odd, I know, but the logic is actually cleaner when
     # it's reversed.

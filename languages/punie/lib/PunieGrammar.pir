@@ -57,11 +57,6 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
 
     optable.newtok("infix:<<", 'looser'=>"infix:+")
     optable.newtok("infix:>>", 'equiv'=>"infix:<<")
-    optable.newtok("infix:&",  'looser'=>"infix:<<")
-    optable.newtok("infix:|",  'looser'=>"infix:&")
-    optable.newtok("infix:^",  'equiv'=>"infix:|")
-
-    optable.newtok("infix:=",  'looser'=>"infix:|")
 
     optable.newtok("infix:<",  'looser'=>"infix:<<", 'assoc'=>'non')
     optable.newtok("infix:>",  'equiv'=>"infix:<", 'assoc'=>'non')
@@ -76,6 +71,15 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
     optable.newtok("infix:!=", 'equiv'=>"infix:==", 'assoc'=>'non')
     optable.newtok("infix:eq", 'equiv'=>"infix:==", 'assoc'=>'non')
     optable.newtok("infix:ne", 'equiv'=>"infix:==", 'assoc'=>'non')
+
+    optable.newtok("infix:&", 'looser'=>"infix:==", 'assoc'=>'left')
+    optable.newtok("infix:|", 'looser'=>"infix:&",  'assoc'=>'left')
+    optable.newtok("infix:^", 'equiv'=>"infix:|",   'assoc'=>'left')
+
+    optable.newtok("infix:&&", 'looser'=>"infix:|",  'assoc'=>'left')
+    optable.newtok("infix:||", 'looser'=>"infix:&&", 'assoc'=>'left')
+
+    optable.newtok("infix:=",  'looser'=>"infix:||")
 
     term = find_global "PunieGrammar", "term"
     optable.newtok("term:", 'tighter'=>"infix:+", 'parsed'=>term)

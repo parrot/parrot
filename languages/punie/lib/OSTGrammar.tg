@@ -148,6 +148,14 @@ transform result (PAST::Exp) :language('PIR') {
 transform result (PAST::Op) :language('PIR') {
      .local string opname
      opname = node.op()
+
+    if opname == 'infix:&&' goto and_op
+    goto not_and_op
+  and_op:
+      $P4 = tree.get('andshortcircuit', node)
+      .return ($P4)
+  not_and_op:
+
     if opname == 'infix:=' goto not_infix
     $S1 = substr opname, 0, 5
     if $S1 == 'infix' goto infix
@@ -162,6 +170,8 @@ transform result (PAST::Op) :language('PIR') {
       $P4 = tree.get('print_op', node)
       .return ($P4)
   not_print_op:
+
+
     if opname == 'if' goto conditional
     if opname == 'unless' goto conditional
     if opname == 'elsif' goto conditional
@@ -387,6 +397,122 @@ transform conditional (PAST::Op) :language('PIR') {
     $P6.dest(1)
     newops.'add_child'($P6)
 
+    .return (newops)
+}
+
+transform andshortcircuit (PAST::Op) :language('PIR') {
+    # Create the node to contain all the generated ops.
+    .local pmc newops
+    newops = new 'POST::Ops'
+
+    .local string opname
+    opname = node.op()
+
+    # Create a temporary variable for the return value of the whole
+    # expression
+    .local pmc temp_var
+    temp_var = new 'POST::Var'
+    temp_var.'clone'(node)
+    $P1 = temp_var.new_dummy()
+    newops.'add_child'($P1)
+
+    # The default return value of an AND op is an empty string (false)
+    .local pmc defaultval
+    defaultval = new 'POST::Val'
+    defaultval.'value'('')
+    defaultval.'valtype'('strq')
+
+    .local pmc setdefault
+    setdefault = new 'POST::Op'
+    setdefault.'op'('set')
+    $P2 = clone temp_var
+    setdefault.'add_child'($P2)
+    setdefault.'add_child'(defaultval)
+    newops.'add_child'(setdefault)
+
+    # Create the branching op for the first argument to AND. The first
+    # child is the result of evaluating the argument, the second child
+    # is a label.
+    .local pmc test_arg1
+    test_arg1 = new 'POST::Op'
+    test_arg1.'clone'(node)
+    test_arg1.'op'('unless')
+
+    # Set up to handle children of Op node.
+    .local pmc iter
+    iter = node.'child_iter'()
+
+    # Handle the first argument of the AND, which may be a series of
+    # expressions resulting in a single value.
+    .local pmc arg1
+    shift $P3, iter
+    arg1 = tree.get('result', $P3)
+    $S1 = typeof arg1
+    if $S1 == 'POST::Ops' goto complex_result # the argument has setup
+      test_arg1.'add_child'(arg1)
+      goto end_condition
+    complex_result:
+      newops.'add_child'(arg1)
+      $P4 = arg1.'tmpvar'()
+      test_arg1.'add_child'($P4)
+  end_condition:
+
+    # Create the second child of the branching op: a lable to jump to
+    .local pmc falselabel
+    falselabel = new 'POST::Label'
+    falselabel.'new_dummy'('false')
+    test_arg1.'add_child'(falselabel)
+
+    newops.'add_child'(test_arg1)
+
+
+    # Create the branching op for the second argument to AND. The first
+    # child is the result of evaluating the argument, the second child
+    # is a label.
+    .local pmc test_arg2
+    test_arg2 = new 'POST::Op'
+    test_arg2.'clone'(node)
+    test_arg2.'op'('unless')
+
+    # Handle the second argument of the AND, which may be a series of
+    # expressions resulting in a single value.
+    .local pmc arg2
+    .local pmc arg2result
+    shift $P5, iter
+    arg2 = tree.get('result', $P5)
+    $S1 = typeof arg2
+    if $S1 == 'POST::Ops' goto complex_result2 # the argument has setup
+      arg2result = arg2
+      goto end_condition2
+    complex_result2:
+      newops.'add_child'(arg2)
+      arg2result = arg2.'tmpvar'()
+  end_condition2:
+
+      test_arg2.'add_child'(arg2result)
+
+    # Create the second child of the branching op: a lable to jump to
+    $P7 = clone falselabel
+    test_arg2.'add_child'($P7)
+    newops.'add_child'(test_arg2)
+
+    # When both arguments of AND are true, return the value of the
+    # second
+    .local pmc settrue
+    settrue = new 'POST::Op'
+    settrue.'op'('set')
+    $P1 = clone temp_var
+    settrue.'add_child'($P1)
+    settrue.'add_child'(arg2result)
+
+    newops.'add_child'(settrue)
+
+    # Destination for the branching op
+    $P6 = clone falselabel
+    $P6.dest(1)
+    newops.'add_child'($P6)
+
+    newops.'tmpvar'(temp_var)
     .return (newops)
 }
 

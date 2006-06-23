@@ -2,8 +2,36 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
+
+language_output_is('punie', <<'EOC', <<'OUT', 'short circuiting AND');
+$x = 1;
+if (1 && $x) { print "ok 9\n";} else { print "not ok 9\n";}
+if (0 && $x) { print "not ok 10\n";} else { print "ok 10\n";}
+$x = '';
+if (1 && $x) { print "not ok 11\n";} else { print "ok 11\n";}
+if (0 && $x) { print "not ok 12\n";} else { print "ok 12\n";}
+
+$a = 'a';
+$x = 1;
+if ($a eq 'a' && $x) { print "ok 25\n";} else { print "not ok 25\n";}
+if ($a ne 'a' && $x) { print "not ok 26\n";} else { print "ok 26\n";}
+$x = '';
+if ($a eq 'a' && $x) { print "not ok 27\n";} else { print "ok 27\n";}
+if ($a ne 'a' && $x) { print "not ok 28\n";} else { print "ok 28\n";}
+
+EOC
+ok 9
+ok 10
+ok 11
+ok 12
+ok 25
+ok 26
+ok 27
+ok 28
+OUT
+
 
 TODO: {
 local $TODO = 'unimplemented feature';

@@ -29,3 +29,18 @@ unless (1 - 1) {
 unless (1) {
   print "should never be printed\n";
 }
+
+# comment
+
+$x = 4;
+
+if ($x >= 4) {
+  print "ok 1\n";
+}
+if ($x <= 5) {
+  print "ok 1\n";
+}
+
+
+$y = 1 + 1 && 5 + 5;
+print $y, "\n";

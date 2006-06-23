@@ -39,7 +39,8 @@ rule cexpr {
 }
 
 regex term {
-    <PunieGrammar::variable>
+      \( <PunieGrammar::expr> \)
+    | <PunieGrammar::variable>
     | <PunieGrammar::number>
     | <PunieGrammar::integer>
     | <PunieGrammar::stringdouble>
