@@ -31,10 +31,11 @@ Define the attributes required for the class.
   .get_from_HLL(compile,'_tcl','compile_dispatch')
 
 
-   .local string pir_code, args, inlined, dynamic, invalid, error
+   .local string pir_code, args, dynamic, invalid, error
+   .local pmc inlined
    pir_code = "# src/class/tclcommand.pir :: compile\n"
    args     = ""
-   inlined  = ""
+   inlined  = new 'TclCodeString'
    dynamic  = ""
    invalid  = ""
    error    = ""
@@ -104,17 +105,10 @@ arg_loop_done:
 
    .local pmc epoch
    .get_from_HLL(epoch, '_tcl', 'epoch')
-   $S0 = epoch
-   inlined .= "if epoch != "
-   inlined .= $S0
-   inlined .= " goto dynamic_"
-   inlined .= label_num
-   inlined .= "\n"
+   inlined.emit("  if epoch != %0 goto dynamic_%1", epoch, label_num)
    inlined .= retval
+   inlined.emit("  goto end_%0", label_num)
 
-   inlined .= "goto end_"
-   inlined .= label_num
-   inlined .= "\n"
    inlineable = 1
 dynamic_command:
    dynamic .= ".local pmc command\n"
@@ -212,7 +206,8 @@ unk_elem_loop_done:
    pir_code .= "start_"
    pir_code .= label_num
    pir_code .= ":\n"
-   pir_code .= inlined
+   $S0 = inlined
+   pir_code .= $S0
    pir_code .= "dynamic_"
    pir_code .= label_num
    pir_code .= ":\n"
