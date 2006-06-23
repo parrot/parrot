@@ -2,7 +2,8 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
+use Test::More;
 
 language_output_is('punie', <<'EOC', '1', 'printing one');
 print 1;
@@ -78,3 +79,51 @@ CODE
 -1
 6
 OUT
+
+
+TODO: {
+local $TODO = 'unimplemented feature';
+
+language_output_is('punie', <<'EOC', <<'OUT', 'io.print');
+#!./perl
+
+# $Header: io.print,v 1.0 87/12/18 13:12:55 root Exp $
+
+print "1..11\n";
+
+print stdout "ok 1\n";
+print "ok 2\n","ok 3\n","ok 4\n","ok 5\n";
+
+open(foo,">-");
+print foo "ok 6\n";
+
+printf "ok %d\n",7;
+printf("ok %d\n",8);
+
+@a = ("ok %d%c",9,ord("\n"));
+printf @a;
+
+$a[1] = 10;
+printf stdout @a;
+
+$, = ' ';
+$\ = "\n";
+
+print "ok","11";
+
+EOC
+1..4
+ok 1
+ok 2
+ok 3 
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+ok 11
+OUT
+
+}
