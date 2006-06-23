@@ -1079,5 +1079,20 @@ CODE
 20
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'find_lex: (Perl6 OUTER::)', todo => 'not yet implemented');
+.sub main :main
+	.lex '$x', 42
+	get_outer()
+.end
+
+.sub 'get_outer' :outer('main')
+	.lex '$x', 13
+	$P0 = find_lex '$x', 1
+	say $P0
+.end
+CODE
+42
+OUTPUT
+
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 40; }
+BEGIN { plan tests => 41; }
