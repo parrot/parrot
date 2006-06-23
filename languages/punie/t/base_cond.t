@@ -56,7 +56,7 @@ OUT
 TODO: {
 local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'base_cond.t');
+language_output_is('punie', <<'EOC', <<'OUT', 'base.cond');
 #!./perl
 
 # $Header: base.cond,v 1.0 87/12/18 13:11:41 root Exp $

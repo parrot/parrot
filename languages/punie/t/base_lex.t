@@ -8,7 +8,7 @@ use Test::More;
 TODO: {
 local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'base_cond.t');
+language_output_is('punie', <<'EOC', <<'OUT', 'base.lex');
 #!./perl
 
 # $Header: base.lex,v 1.0.1.1 88/01/28 10:37:00 root Exp $

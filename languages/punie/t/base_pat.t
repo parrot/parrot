@@ -8,7 +8,7 @@ use Test::More;
 TODO: {
 local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'base_cond.t');
+language_output_is('punie', <<'EOC', <<'OUT', 'base.pat');
 #!./perl
 
 # $Header: base.pat,v 1.0 87/12/18 13:11:56 root Exp $
