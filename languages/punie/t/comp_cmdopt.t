@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 language_output_is('punie', <<'EOC', <<'OUT', 'short circuiting AND');
@@ -30,6 +30,33 @@ ok 25
 ok 26
 ok 27
 ok 28
+OUT
+
+language_output_is('punie', <<'EOC', <<'OUT', 'short circuiting OR');
+$x = 1;
+if (1 || $x) { print "ok 13\n";} else { print "not ok 13\n";}
+if (0 || $x) { print "ok 14\n";} else { print "not ok 14\n";}
+$x = '';
+if (1 || $x) { print "ok 15\n";} else { print "not ok 15\n";}
+if (0 || $x) { print "not ok 16\n";} else { print "ok 16\n";}
+
+$a = 'a';
+$x = 1;
+if ($a eq 'a' || $x) { print "ok 29\n";} else { print "not ok 29\n";}
+if ($a ne 'a' || $x) { print "ok 30\n";} else { print "not ok 30\n";}
+$x = '';
+if ($a eq 'a' || $x) { print "ok 31\n";} else { print "not ok 31\n";}
+if ($a ne 'a' || $x) { print "not ok 32\n";} else { print "ok 32\n";}
+
+EOC
+ok 13
+ok 14
+ok 15
+ok 16
+ok 29
+ok 30
+ok 31
+ok 32
 OUT
 
 

@@ -35,12 +35,15 @@ unless (1) {
 $x = 4;
 
 if ($x >= 4) {
-  print "ok 1\n";
+  print "ok 20\n";
 }
 if ($x <= 5) {
-  print "ok 1\n";
+  print "ok 21\n";
 }
 
 
-$y = 1 + 1 && 5 + 5;
-print $y, "\n";
+$y = 1 + 1 && 11 + 11;
+print "ok ", $y, "\n";
+
+$z = 0 || 23;
+print "ok ", $z, "\n";
