@@ -189,7 +189,7 @@ void
 Parrot_pop_mark(Interp * interpreter, INTVAL mark)
 {
     do {
-        Stack_Entry_t * const e = stack_entry(interpreter, CONTEXT(interpreter->ctx)->control_stack, 0);
+        const Stack_Entry_t * const e = stack_entry(interpreter, CONTEXT(interpreter->ctx)->control_stack, 0);
         if (!e)
             internal_exception(1, "mark not found");
         (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
