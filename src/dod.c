@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2005, The Perl Foundation.
+Copyright (C) 2001-2006, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -90,7 +90,7 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
         hi_prio = 0;
 
     if (obj->pmc_ext) {
-        PMC* tptr = arena_base->dod_trace_ptr;
+        PMC* const tptr = arena_base->dod_trace_ptr;
 
         ++arena_base->num_extended_PMCs;
         /*
@@ -148,11 +148,11 @@ void
 pobject_lives(Interp *interpreter, PObj *obj)
 {
 
-    struct Small_Object_Arena *arena = GET_ARENA(obj);
-    size_t n = GET_OBJ_N(arena, obj);
-    size_t ns = n >> ARENA_FLAG_SHIFT;
-    UINTVAL nm = (n & ARENA_FLAG_MASK) << 2;
-    UINTVAL *dod_flags = arena->dod_flags + ns;
+    struct Small_Object_Arena * const arena = GET_ARENA(obj);
+    const size_t n = GET_OBJ_N(arena, obj);
+    const size_t ns = n >> ARENA_FLAG_SHIFT;
+    const UINTVAL nm = (n & ARENA_FLAG_MASK) << 2;
+    UINTVAL * const dod_flags = arena->dod_flags + ns;
     if (*dod_flags & ((PObj_on_free_list_FLAG | PObj_live_FLAG) << nm))
         return;
 
@@ -217,7 +217,7 @@ pobject_lives(Interp *interpreter, PObj *obj)
 #ifndef NDEBUG
     else {
         if (PObj_is_PMC_TEST(obj)) {
-            PMC *p = (PMC*)obj;
+            PMC * const p = (PMC*)obj;
             if (p->pmc_ext && PMC_metadata(p)) {
                 fprintf(stderr, "GC: error obj %p (%s) has properties\n",
                         p, (char*)p->vtable->whoami->strstart);
@@ -384,12 +384,12 @@ int
 Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
 {
     PMC *next;
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas * const arena_base = interpreter->arena_base;
     INTVAL i = 0;
-    UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
+    const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
     PMC *current = arena_base->dod_mark_start;
 
-    int lazy_dod = arena_base->lazy_dod;
+    const int lazy_dod = arena_base->lazy_dod;
 
     /*
      * First phase of mark is finished. Now if we are the owner
@@ -405,7 +405,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
     pt_DOD_mark_root_finished(interpreter);
 
     for (; ; current = next) {
-        UINTVAL bits = PObj_get_FLAGS(current) & mask;
+        const UINTVAL bits = PObj_get_FLAGS(current) & mask;
 
         if (lazy_dod && arena_base->num_early_PMCs_seen >=
                 arena_base->num_early_DOD_PMCs) {
@@ -487,16 +487,14 @@ void
 clear_cow(Interp *interpreter, struct Small_Object_Pool *pool,
         int cleanup)
 {
-    UINTVAL object_size = pool->object_size;
+    const UINTVAL object_size = pool->object_size;
     struct Small_Object_Arena *cur_arena;
-    UINTVAL i;
-    Buffer *b;
-    INTVAL *refcount;
 
     /* clear refcount for COWable objects. */
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
-        b = cur_arena->start_objects;
+        UINTVAL i;
+        Buffer *b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
             if (!PObj_on_free_list_TEST(b)) {
                 if (cleanup) {
@@ -512,7 +510,7 @@ clear_cow(Interp *interpreter, struct Small_Object_Pool *pool,
 
                 if (PObj_COW_TEST(b) && PObj_bufstart(b) &&
                         !PObj_external_TEST(b)) {
-                    refcount = (INTVAL *) PObj_bufstart(b) - 1;
+                    INTVAL * const refcount = (INTVAL *) PObj_bufstart(b) - 1;
                     *refcount = 0;
                 }
             }
@@ -534,24 +532,22 @@ Find other users of COW's C<bufstart>.
 */
 
 void
-used_cow(Interp *interpreter, struct Small_Object_Pool *pool,
-        int cleanup)
+used_cow(Interp *interpreter, struct Small_Object_Pool *pool, int cleanup)
 {
     UINTVAL object_size = pool->object_size;
     struct Small_Object_Arena *cur_arena;
-    UINTVAL i;
-    Buffer *b;
-    INTVAL *refcount;
 
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
-        b = cur_arena->start_objects;
+        Buffer *b = cur_arena->start_objects;
+        UINTVAL i;
+
         for (i = 0; i < cur_arena->used; i++) {
             if (!PObj_on_free_list_TEST(b) &&
                     PObj_COW_TEST(b) &&
                     PObj_bufstart(b) &&
                     !PObj_external_TEST(b)) {
-                refcount = (INTVAL *) PObj_bufstart(b) - 1;
+                INTVAL * const refcount = (INTVAL *) PObj_bufstart(b) - 1;
                 /* mark users of this bufstart by incrementing refcount */
                 if (PObj_live_TEST(b))
                     *refcount = 1 << 29;        /* ~infinite usage */
@@ -900,7 +896,7 @@ static size_t
 find_common_mask(size_t val1, size_t val2)
 {
     int i;
-    int bound = sizeof(size_t) * 8;
+    const int bound = sizeof(size_t) * 8;
 
     /* Shifting a value by its size (in bits) or larger is undefined behaviour.
        So need an explicit check to return 0 if there is no prefix, rather than
@@ -938,21 +934,21 @@ void
 trace_mem_block(Interp *interpreter,
                 size_t lo_var_ptr, size_t hi_var_ptr)
 {
-    size_t prefix, tmp_ptr;
+    size_t prefix;
     ptrdiff_t cur_var_ptr;
 
-    size_t buffer_min = get_min_buffer_address(interpreter);
-    size_t buffer_max = get_max_buffer_address(interpreter);
-    size_t pmc_min = get_min_pmc_address(interpreter);
-    size_t pmc_max = get_max_pmc_address(interpreter);
+    const size_t buffer_min = get_min_buffer_address(interpreter);
+    const size_t buffer_max = get_max_buffer_address(interpreter);
+    const size_t pmc_min = get_min_pmc_address(interpreter);
+    const size_t pmc_max = get_max_pmc_address(interpreter);
 
-    size_t mask = find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
+    const size_t mask = find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
             buffer_max > pmc_max ? buffer_max : pmc_max);
 
     if (!lo_var_ptr || !hi_var_ptr)
         return;
     if (lo_var_ptr < hi_var_ptr) {
-        tmp_ptr = hi_var_ptr;
+        const size_t tmp_ptr = hi_var_ptr;
         hi_var_ptr = lo_var_ptr;
         lo_var_ptr = tmp_ptr;
     }
@@ -964,7 +960,7 @@ trace_mem_block(Interp *interpreter,
             (ptrdiff_t)cur_var_ptr < (ptrdiff_t)lo_var_ptr;
             cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof(void *))
             ) {
-        size_t ptr = *(size_t *)cur_var_ptr;
+        const size_t ptr = *(size_t *)cur_var_ptr;
 
         /* Do a quick approximate range check by bit-masking */
         if ((ptr & mask) == prefix || !prefix) {
@@ -984,7 +980,6 @@ trace_mem_block(Interp *interpreter,
                 /* ...and since pobject_lives doesn't care about bufstart, it
                  * doesn't really matter if it sets a flag */
                 pobject_lives(interpreter, (PObj *)ptr);
-                            
             }
         }
     }
@@ -1006,7 +1001,7 @@ Parrot_dod_clear_live_bits(Parrot_Interp interpreter)
     struct Small_Object_Arena *arena;
     UINTVAL i;
 #if !ARENA_DOD_FLAGS
-    UINTVAL object_size = pool->object_size;
+    const UINTVAL object_size = pool->object_size;
 #endif
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
@@ -1062,8 +1057,8 @@ void
 Parrot_dod_profile_end(Parrot_Interp interpreter, int what)
 {
     if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        RunProfile *profile = interpreter->profile;
-        FLOATVAL now = Parrot_floatval_time();
+        RunProfile * const profile = interpreter->profile;
+        const FLOATVAL now = Parrot_floatval_time();
 
         profile->data[what].numcalls++;
         profile->data[what].time += now - profile->dod_time;
@@ -1104,7 +1099,7 @@ Prepare for a mark & sweep DOD run.
 void
 Parrot_dod_ms_run_init(Interp *interpreter)
 {
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas * const arena_base = interpreter->arena_base;
 #if ARENA_DOD_FLAGS
     int j;
 #endif
@@ -1116,7 +1111,7 @@ Parrot_dod_ms_run_init(Interp *interpreter)
 #if ARENA_DOD_FLAGS
     clear_live_counter(interpreter, arena_base->pmc_pool);
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-        struct Small_Object_Pool *header_pool =
+        struct Small_Object_Pool * const header_pool =
             arena_base->sized_header_pools[j];
         if (header_pool)
             clear_live_counter(interpreter, header_pool);
@@ -1128,7 +1123,7 @@ static int
 sweep_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
-    int *total_free = (int *) arg;
+    int * const total_free = (int *) arg;
 #ifdef GC_IS_MALLOC
     if (flag & POOL_BUFFER)
         used_cow(interpreter, pool, 0);
