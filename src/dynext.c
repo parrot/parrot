@@ -39,10 +39,9 @@ static void
 set_cstring_prop(Parrot_Interp interpreter, PMC *lib_pmc, const char *what,
         STRING *name)
 {
-    PMC *prop;
     STRING *key;
 
-    prop = pmc_new(interpreter, enum_class_String);
+    PMC * const prop = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, prop, name);
     key = const_string(interpreter, what);
     VTABLE_setprop(interpreter, lib_pmc, key, prop);
@@ -64,10 +63,8 @@ static void
 store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
         STRING *type)
 {
-    PMC *iglobals, *dyn_libs;
-
-    iglobals = interpreter->iglobals;
-    dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
+    PMC * const iglobals = interpreter->iglobals;
+    PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_DYN_LIBS);
     /*
      * remember path/file in props
@@ -92,10 +89,8 @@ If it does, return it. Otherwise, return NULL.
 static PMC*
 is_loaded(Parrot_Interp interpreter, STRING *path)
 {
-    PMC *iglobals, *dyn_libs;
-
-    iglobals = interpreter->iglobals;
-    dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
+    PMC * const iglobals = interpreter->iglobals;
+    PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_DYN_LIBS);
     if (!VTABLE_exists_keyed_str(interpreter, dyn_libs, path))
         return NULL;
@@ -119,20 +114,18 @@ get_path(Interp *interpreter, STRING *lib, void **handle, STRING *wo_ext, STRING
 {
     STRING *path, *full_name;
     const char *err = NULL;    /* buffer returned from Parrot_dlerror */
-    PMC *iglobals, *lib_paths, *share_ext;
-    INTVAL i, n;
 
-    iglobals = interpreter->iglobals;
-    lib_paths = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
-            IGLOBALS_LIB_PATHS);
-    share_ext = VTABLE_get_pmc_keyed_int(interpreter, lib_paths, 
-	    PARROT_LIB_DYN_EXTS);
+    PMC * const iglobals = interpreter->iglobals;
+    PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interpreter, iglobals, IGLOBALS_LIB_PATHS);
+    PMC * const share_ext = VTABLE_get_pmc_keyed_int(interpreter, lib_paths, PARROT_LIB_DYN_EXTS);
 
     /*
      * first, try to add an extension to the file if it has none.
      */
     if (! ext) {
-	n = VTABLE_elements(interpreter, share_ext);
+	const INTVAL n = VTABLE_elements(interpreter, share_ext);
+	INTVAL i;
+
 	for (i = 0; i < n; ++i) {
 	    ext = VTABLE_get_string_keyed_int(interpreter, share_ext, i);
 	    full_name = string_concat(interpreter, wo_ext, ext, 0);
