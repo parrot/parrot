@@ -610,7 +610,30 @@ pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
         }
         
         /* Handle special case variable argument opcodes. */
-        ADD_OP_VAR_PART(interpreter, bc, op_ptr, cur_op);
+        if (op_num == PARROT_OP_set_args_pc ||
+            op_num == PARROT_OP_get_results_pc ||
+            op_num == PARROT_OP_get_params_pc ||
+            op_num == PARROT_OP_set_returns_pc)
+        {
+            /* Get the signature. */
+            PMC *sig = bc->const_table->constants[op_ptr[1]]->u.key;
+
+            /* Loop over the arguments to locate any that need a fixup. */
+            int sig_items = SIG_ELEMS(sig);
+            for (cur_arg = 0; cur_arg < sig_items; cur_arg++)
+            {
+                switch (VTABLE_get_integer_keyed_int(interpreter, sig, cur_arg))
+                {
+                    case PARROT_ARG_NC:
+                    case PARROT_ARG_PC:
+                    case PARROT_ARG_SC:
+                    case PARROT_ARG_KC:
+                        ops[cur_op] += inputs[cur_input]->const_start;
+                        break;
+                }
+                cur_op++;
+            }
+        }
     }
 }
 
