@@ -108,6 +108,26 @@ recording it with the optional test description in C<description>.
     test.ok( passed, description )
 .end
 
+=item C<nok( passed, description )>
+
+Records a test as pass or fail depending on the falsehood of the integer
+C<passed>, recording it with the optional test description in C<description>.
+
+=cut
+
+.sub nok
+	.param int passed
+	.param string description :optional
+
+	.local pmc test
+	find_global test, 'Test::More', '_test'
+
+	.local int reverse_passed
+	reverse_passed = not passed
+
+	test.ok( reverse_passed, description )
+.end
+
 =item C<is( left, right, description )>
 
 Compares the parameters passed as C<left> and C<right>, passing if they are
@@ -709,7 +729,7 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005 - 2006 The Perl Foundation.
 
 =cut
 

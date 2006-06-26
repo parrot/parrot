@@ -199,6 +199,26 @@
 	.return( result )
 .end
 
+# XXX - return #t
+.sub 'atom?' :multi( [ 'Pheme'; 'Atom' ] )
+	.param pmc atom
+
+	.return( 1 )
+.end
+
+# XXX - return #f
+.sub 'atom?' :multi( [ 'Pheme'; 'Cons' ] )
+	.param pmc cons
+
+	.return( 0 )
+.end
+
+# XXX - a cheat for now
+.sub 'atom?' :multi( String )
+	.param pmc val
+	.return( 1 )
+.end
+
 .sub 'write' :multi( string )
 	.param string message_string
 
