@@ -622,7 +622,7 @@ pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
             int sig_items = SIG_ELEMS(sig);
             for (cur_arg = 0; cur_arg < sig_items; cur_arg++)
             {
-                switch (VTABLE_get_integer_keyed_int(interpreter, sig, cur_arg))
+                switch (SIG_ITEM(sig, cur_arg))
                 {
                     case PARROT_ARG_NC:
                     case PARROT_ARG_PC:
