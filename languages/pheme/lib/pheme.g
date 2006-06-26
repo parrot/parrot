@@ -7,7 +7,7 @@ rule list { \( <list_item>+ \) }
 # quoted_string has to come first
 rule list_item { <quoted_string> | <atom> | <list> | <empty_list> }
 
-token empty_list { \(\) }
+token empty_list { <quote>? \(\) }
 
 token atom { [ <symbol_tag> | <quote> ]? <-[ \n\r\(\)]>+ }
 

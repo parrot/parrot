@@ -25,7 +25,7 @@
 	"cons of list to list should add list to list head")
 
 (is
-	(cons (alpha beta (gamma)) ())
+	(cons (alpha beta (gamma)) '())
 	((alpha beta (gamma)))
 	"cons onto empty list should wrap sexpr in another cons")
 

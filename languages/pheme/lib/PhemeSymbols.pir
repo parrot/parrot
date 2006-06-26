@@ -219,6 +219,23 @@
 	.return( 1 )
 .end
 
+.sub 'null?' :multi( [ 'Pheme'; 'Cons' ] )
+	.param pmc cons
+	.local int count
+	count = cons
+
+	eq count, 0, indeed_empty
+	.return( 0 )
+
+  indeed_empty:
+	.return( 1 )
+.end
+
+.sub 'null?' :multi( _ )
+	.param pmc dummy
+	.return( 0 )
+.end
+
 .sub 'write' :multi( string )
 	.param string message_string
 
