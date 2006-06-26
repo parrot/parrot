@@ -681,9 +681,7 @@ include/parrot/sub.h                              [main]include
 include/parrot/thread.h                           [main]include
 include/parrot/thr_pthread.h                      [main]include
 include/parrot/thr_windows.h                      [main]include
-include/parrot/trace.h                            [main]include
 include/parrot/tsq.h                              [main]include
-include/parrot/unicode.h                          [main]include
 include/parrot/vtables.h                          [main]include
 include/parrot/warnings.h                         [main]include
 languages/converter.pl                            []
@@ -1950,7 +1948,9 @@ src/string_primitives.c                           []
 src/sub.c                                         []
 src/thread.c                                      []
 src/trace.c                                       []
+src/trace.h                                       []
 src/tsq.c                                         []
+src/unicode.h                                     []
 src/utils.c                                       []
 src/vtables.c                                     []
 src/warnings.c                                    []

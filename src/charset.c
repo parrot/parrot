@@ -19,15 +19,15 @@ These are parrot's generic charset handling functions
 #define PARROT_NO_EXTERN_CHARSET_PTRS
 #include "parrot/parrot.h"
 
-#include "../src/encodings/fixed_8.h"
-#include "../src/encodings/utf8.h"
-#include "../src/encodings/utf16.h"
-#include "../src/encodings/ucs2.h"
+#include "encodings/fixed_8.h"
+#include "encodings/utf8.h"
+#include "encodings/utf16.h"
+#include "encodings/ucs2.h"
 
-#include "../src/charset/ascii.h"
-#include "../src/charset/binary.h"
-#include "../src/charset/iso-8859-1.h"
-#include "../src/charset/unicode.h"
+#include "charset/ascii.h"
+#include "charset/binary.h"
+#include "charset/iso-8859-1.h"
+#include "charset/unicode.h"
 
 CHARSET *Parrot_iso_8859_1_charset_ptr;
 CHARSET *Parrot_binary_charset_ptr;

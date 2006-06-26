@@ -19,7 +19,7 @@ UTF-16 encoding with the help of the ICU library.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/unicode.h"
+#include "../unicode.h"
 
 #include "utf16.h"
 

@@ -23,7 +23,7 @@ the faster dispatch of operations.
 
 #include "runops_cores.h"
 #include "parrot/embed.h"
-#include "parrot/trace.h"
+#include "trace.h"
 #include "interp_guts.h"
 
 #ifdef HAVE_COMPUTED_GOTO

@@ -19,7 +19,7 @@ UCS-2 encoding with the help of the ICU library.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/unicode.h"
+#include "../unicode.h"
 
 #include "ucs2.h"
 

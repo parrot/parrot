@@ -19,7 +19,7 @@ UTF-8 (L<http://www.utf-8.com/>).
 */
 
 #include "parrot/parrot.h"
-#include "parrot/unicode.h"
+#include "../unicode.h"
 #include "utf8.h"
 
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf8")

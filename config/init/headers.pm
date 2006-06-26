@@ -14,16 +14,14 @@ Uses C<ExtUtils::Manifest> to determine which headers are nongenerated.
 package init::headers;
 
 use strict;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(maniread);
 
-$description = 'Determining nongenerated header files';
-
-@args = ();
+our $description = 'Determining nongenerated header files';
+our @args;
 
 sub runstep
 {

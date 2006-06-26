@@ -25,7 +25,7 @@ debugger, and the C<debug> ops.
 #include "parrot/parrot.h"
 #include "interp_guts.h"
 #include "parrot/oplib.h"
-#include "parrot/trace.h"
+#include "trace.h"
 #include "parrot/debug.h"
 #include "parrot/oplib/ops.h"
 

@@ -23,7 +23,7 @@ src/test_main.c
 
 */
 
-#include "parrot/trace.h"
+#include "trace.h"
 #include "parrot/oplib/ops.h"
 
 /*
@@ -443,7 +443,7 @@ trace_op(Interp *interpreter, opcode_t *code_start,
 
 =head1 SEE ALSO
 
-F<include/parrot/trace.h>
+F<src/trace.h>
 
 =cut
 

@@ -25,7 +25,7 @@ representation.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
-#include "parrot/unicode.h"
+#include "../unicode.h"
 
 /* Defined at bottom */
 static const ParrotIOLayerAPI pio_utf8_layer_api;
