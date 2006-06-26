@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 21;
 use Test::More;
 use vars qw($TODO);
 
@@ -117,4 +117,23 @@ language_output_is("tcl",<<'TCL',<<'OUT',"command: global explicit");
 TCL
 ok
 OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"command: global explicit (extra colons)");
+  :::::::puts ok
+TCL
+ok
+OUT
 }
+
+language_output_is("tcl",<<'TCL',<<'OUT',"command: global explicit (not enough colons)");
+  :puts ok
+TCL
+invalid command name ":puts"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"command: all colons");
+  proc ::: {} {puts ok}
+  :::
+TCL
+ok
+OUT
