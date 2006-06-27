@@ -124,6 +124,7 @@ get:
   inc pos
   if_null word, get
   $S0 = word
+  if $S0 == "" goto check # this is special
   $I0 = ord $S0, 0
   if $I0 == 35 goto got_comment
 check:

@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
@@ -153,6 +153,13 @@ language_output_is("tcl",<<'TCL',<<'OUT',"compiler bug with reusing registers");
   puts [list [catch {lappend x "a"} msg] $msg]
 TCL
 1 {unmatched open brace in list}
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"{} command");
+  proc {} {} {puts ok}
+  {}
+TCL
+ok
 OUT
 
 {
