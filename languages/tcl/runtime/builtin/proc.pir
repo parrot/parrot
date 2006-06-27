@@ -54,26 +54,25 @@ got_args:
   .get_from_HLL($P1, '_tcl', 'proc_args')
   $P1[name] = args_p
 
-  .local string proc_body, temp_code
+  .local pmc proc_body
+  proc_body = new 'TclCodeString'
 
-  temp_code = <<"END_PIR"
+  proc_body.emit(<<"END_PIR", name)
 .HLL 'tcl', 'tcl_group'
 .sub '_xxx' :immediate
   P0 = loadlib 'dynlexpad' 
 .end
 .HLL_map .LexPad, .DynLexPad
-.sub '&%s' :lex
-.param pmc args :slurpy
-.include 'languages/tcl/src/returncodes.pir'
-.local pmc epoch
-.get_from_HLL(epoch,'_tcl','epoch')
+.sub '&%0' :lex
+  .param pmc args :slurpy
+  .include 'languages/tcl/src/returncodes.pir'
+  .local pmc epoch
+  .get_from_HLL(epoch,'_tcl','epoch')
 
-.local pmc call_level
-.get_from_HLL(call_level,'_tcl','call_level')
-inc call_level
+  .local pmc call_level
+  .get_from_HLL(call_level,'_tcl','call_level')
+  inc call_level
 END_PIR
-
-  .sprintf1(proc_body, temp_code, name)
 
   .local int arg_count
   arg_count = args_p
@@ -92,37 +91,26 @@ END_PIR
   dec last_arg
 
 check_args:
-  proc_body .= ".local int argc\n  argc=args\n  "
+  proc_body.emit("  .local int argc")
+  proc_body.emit("  argc = elements args")
 
   if is_slurpy goto slurpy_arg_count
-  proc_body .= "if argc != "
-  $S0 = arg_count
-  proc_body .=  $S0
-  proc_body .= " goto BAD_ARGS\n\n"
+  proc_body.emit("  if argc != %0 goto BAD_ARGS", arg_count)
   goto arg_loop
 
-
 slurpy_arg_count:
-  proc_body .= "if argc < "
   $I0 = arg_count - 1
-  $S0 = $I0
-  proc_body .=  $S0
-  proc_body .= " goto BAD_ARGS\n  "
+  proc_body.emit("  if argc < %0 goto BAD_ARGS", $I0)
 
 arg_loop:
   if ii == last_arg goto arg_loop_done
 
-  temp_code= <<"END_PIR"
-  $P1 = args[%i]
-  store_lex '$%s', $P1
-END_PIR
+  proc_body.emit("  $P1 = args[%0]", ii)
+  # escape this?
+  $S0 = args_p[ii]
+  proc_body.emit("  store_lex '$%0', $P1", $S0)
 
-  $S0 = args_p[ii]  #Escape this?
-  .sprintf2($S1, temp_code, ii, $S0) 
-
-  proc_body .= $S1
-
-  ii = ii + 1
+  ii += 1
   goto arg_loop
 
 arg_loop_done:
@@ -130,9 +118,9 @@ arg_loop_done:
 
   # Convert the remaining elements returned by foldup into a TclList
   # XXX This code lifted from Tcl::&list - eventually factor this out.
-  temp_code = <<"END_PIR"
+  proc_body.emit(<<"END_PIR", ii)
   .local int cnt,jj
-  cnt = %i
+  cnt = %0
   jj = 0
   if cnt == argc goto NO_SLURPY_ARGS
   .local pmc arg_list
@@ -151,32 +139,23 @@ DONE:
   store_lex '$args', arg_list
 END_PIR
 
-   .sprintf1($S1,temp_code, ii)
-   proc_body .= $S1
-
 done_args:
-  temp_code = <<"END_PIR"
+  proc_body.emit(<<"END_PIR", name, args)
   goto ARGS_OK
 BAD_ARGS:
-  .throw('wrong # args: should be \"%s %s\"')
+  .throw('wrong # args: should be \"%0 %1\"')
 ARGS_OK:
   push_eh is_return
 END_PIR
-   
-  .sprintf2($S1, temp_code, name, args) 
-  proc_body .= $S1
 
   proc_body .= parsed_body
   
-  temp_code = <<"END_PIR"
+  proc_body.emit(<<"END_PIR", body_reg)
   clear_eh
 was_ok:
   dec call_level
-  .return($P%i)
+  .return($P%0)
 END_PIR
-
-  .sprintf1($S1, temp_code, body_reg)
-  proc_body .= $S1
 
   proc_body .= <<"END_PIR"
 is_return:
@@ -196,10 +175,10 @@ END_PIR
   pir_compiler = compreg "PIR"
 
   # (see note on trans_charset in lib/parser.pir) XXX
+  $S0 = proc_body
   $I0 = find_charset 'ascii'
-  proc_body = trans_charset $I0
-
-  $P0 = pir_compiler(proc_body)
+  $S0 = trans_charset $I0
+  $P0 = pir_compiler($S0)
 
   .return ("")
 
