@@ -231,6 +231,30 @@
 	.return( 1 )
 .end
 
+.sub '+' :multi( String, String )
+	.param String first
+	.param pmc    rest   :slurpy
+
+	.local int result
+	result   = first
+
+	.local pmc add_iter
+	add_iter = new .Iterator, rest
+
+	.local String next
+	.local int    next_int
+
+  loop:
+ 	unless add_iter goto end_loop
+	next     = shift add_iter
+	next_int = next
+	result  += next_int
+	goto loop
+
+  end_loop:
+	.return( result )
+.end
+
 .sub 'null?' :multi( _ )
 	.param pmc dummy
 	.return( 0 )
