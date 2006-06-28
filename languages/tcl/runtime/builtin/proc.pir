@@ -54,16 +54,34 @@ got_args:
   .get_from_HLL($P1, '_tcl', 'proc_args')
   $P1[name] = args_p
 
+  .local string namespace
+  namespace = ""
+  if name == "" goto empty
+  
+  load_bytecode 'PGE.pbc'
+  load_bytecode 'PGE/Util.pbc'
+  .local pmc split, p6rule, regex
+  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  p6rule = compreg "PGE::P6Regex"
+  regex  = p6rule('\:\:+')
+
+  .local string namespace
+  $P0  = split(regex, name)
+  name = pop $P0
+  namespace = join "'; '", $P0
+
+empty:  
   .local pmc proc_body
   proc_body = new 'TclCodeString'
-
-  proc_body.emit(<<"END_PIR", name)
+  
+  proc_body.emit(<<"END_PIR", namespace, name)
 .HLL 'tcl', 'tcl_group'
+.namespace ['%0']
 .sub '_xxx' :immediate
   P0 = loadlib 'dynlexpad' 
 .end
 .HLL_map .LexPad, .DynLexPad
-.sub '&%0' :lex
+.sub '&%1' :lex
   .param pmc args :slurpy
   .include 'languages/tcl/src/returncodes.pir'
   .local pmc epoch

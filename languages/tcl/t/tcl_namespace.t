@@ -20,6 +20,7 @@ language_output_is("tcl",<<'TCL',<<'OUT',"command: global explicit (extra colons
 TCL
 ok
 OUT
+}
 
 language_output_is("tcl",<<'TCL',<<'OUT',"command: all colons");
   proc ::: {} {puts ok}
@@ -27,7 +28,6 @@ language_output_is("tcl",<<'TCL',<<'OUT',"command: all colons");
 TCL
 ok
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<'OUT',"command: global explicit (not enough colons)");
   :puts ok
