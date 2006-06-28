@@ -235,20 +235,20 @@
 	.param String first
 	.param pmc    rest   :slurpy
 
-	.local int result
+	.local float result
 	result   = first
 
 	.local pmc add_iter
 	add_iter = new .Iterator, rest
 
 	.local String next
-	.local int    next_int
+	.local float    next_val
 
   loop:
  	unless add_iter goto end_loop
 	next     = shift add_iter
-	next_int = next
-	result  += next_int
+	next_val = next
+	result  += next_val
 	goto loop
 
   end_loop:
