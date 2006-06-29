@@ -109,7 +109,6 @@ speedup.
 
 B<Interpreter flags setting> is done by a call of C<Parrot_set_flag()> like>:
 
-
     Parrot_set_flag(interp, PARROT_TRACE_FLAG, NULL);
 
 See F</include/parrot/interpreter.h> for an up to date list.
@@ -220,7 +219,7 @@ Loads a packfile into a Parrot interpreter.
 Runs the bytecode associated with a Parrot interpreter.  C<argc> and C<argv>
 are the parameters the bytecode should receive.
 
-=item C<Parrot_destroy(Parrot_Interp)>
+=item C<void Parrot_destroy(Parrot_Interp)>
 
 Deallocates all memory associated with a Parrot interpreter.
 

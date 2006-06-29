@@ -32,7 +32,7 @@ introspection.
 These are the fundamental operations.
 Please note: These opcodes must not be moved; they must have
 exactly these opcode numbers. Opcodes ending with underscores are for
-internal use only, don't emit these opcodes.
+internal use only; don't emit these opcodes.
 
 =over 4
 
@@ -269,7 +269,7 @@ op enternative() {
 =head2 Conditional branch operations
 
 These operations perform a conditional relative branch. If the condition is
-met, the branch happens, otherwise control falls to the next operation.
+met, the branch happens.  Otherwise control falls to the next operation.
 
 =over 4
 
@@ -365,7 +365,7 @@ op unless(in PMC, labelconst INT) {
 
 ###############################################################################
 
-=head2 Subroutine  operations
+=head2 Subroutine operations
 
 These operations are used to generate and call subroutines and
 continuations.
@@ -379,8 +379,8 @@ continuations.
 =item B<invokecc>(in PMC)
 
 Call the subroutine in $1 and generate a new return continuation, if needed.
-E.g. a NCI subroutine, which executes code in some C library will not
-create a continuation, neither the not-first call to a coroutine.
+For example, a NCI subroutine which executes code in some C library will not
+create a continuation, nor will anything but the first call to a coroutine.
 
 =item B<invoke>(in PMC, in PMC)
 
@@ -478,8 +478,8 @@ Define function parameters for this subroutine.
 Define return results for the subroutine return statement.
 
 For all of these opcodes the passed in PMC constant is the string
-representation of a fixed integer array with one flag word per argument.
-The flags are documented currently in F<include/parrrot/enum.h> only.
+representation of a FixedIntegerArray with one flag word per argument.
+The flags are documented currently in F<include/parrot/enum.h> only.
 
 After this argument a variable amount of arguments must follow according
 to the elements of the signature array.
@@ -545,7 +545,7 @@ op set_returns(inconst PMC) {
     ccont = ctx->current_cont;
 
     if (PMC_cont(ccont)->address) {
-	/* else its from runops_fromc */
+	/* else it's from runops_fromc */
 	parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx;
 	if (! caller_ctx) {
 	    real_exception(interpreter, NULL, INVALID_OPERATION,
@@ -837,7 +837,7 @@ inline op gc_debug(in INT) {
 
 Fetch some piece of information about the interpreter and put it in $1.
 Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
-Below are listed the valid constants for each return value.
+The valid constants for each return value are:
 
 =over 4
 
@@ -877,9 +877,9 @@ op interpinfo(out STR, in INT) {
 
 =item B<warningson>(in INT)
 
-Turns on warnings categories. Categories already turned on will
-stay on. Initial setting is currently all warnings off.
-Current categories are (include "warnings.pasm"):
+Turns on warnings categories. Categories already turned on will stay on.
+Initial setting is currently all warnings off.  Include F<warnings.pasm> to
+access the categories.  They are:
 
 =over 4
 
@@ -917,27 +917,26 @@ inline op warningsoff(in INT) {
 
 =item B<errorson>(in INT)
 
-Turns on error categories. Categories already turned on will
-stay on.
-Current categories are (include "errors.pasm"):
+Turns on error categories. Categories already turned on will stay on.  To
+access these from PASM, include F<errors.pasm>.  The current categories are:
 
 =over 4
 
 =item .PARROT_ERRORS_GLOBALS_FLAG
 
-Throw an exception, if global doesn't exist, default on.
+Throw an exception if global doesn't exist.  Default: on.
 
 =item .PARROT_ERRORS_OVERFLOW_FLAG
 
-Throw math overflow instead of promoting to BigInt, default off.
+Throw math overflow instead of promoting to BigInt.  Default: off.
 
 =item .PARROT_ERRORS_PARAM_COUNT_FLAG
 
-Throw exception on argument <-> param count mismatch, default off
+Throw exception on argument <-> param count mismatch.  Default: off.
 
 =item .PARROT_ERRORS_RESULT_COUNT_FLAG
 
-Throw exception on return <-> result count mismatch, default off
+Throw exception on return <-> result count mismatch.  Default: off.
 
 =item .PARROT_ERRORS_ALL_FLAG
 
@@ -1013,9 +1012,20 @@ Opcodes that interact with the DOD and GC subsystems.
 
 =item B<sweep>(inconst INT)
 
-0 ...  Trigger a DOD run only if there are things that have flagged
-       themselves as really needing to be collected.
-1 ...  Trigger a dead object detection (DOD) sweep unconditionally.
+Triggers a DOD run, based on the value of $1, where:
+
+=over
+
+=item * 0 
+
+Trigger a DOD run only if there are things that have flagged themselves as
+really needing to be collected.
+
+=item * 1
+
+Trigger a dead object detection (DOD) sweep unconditionally.
+
+=back
 
 =cut
 
@@ -1085,8 +1095,8 @@ op collecton() {
 
 =item B<needs_destroy>(in PMC)
 
-Mark the PMC wanting destruction as soon as possible, i.e.
-when unused during the lazy sweep, triggered by "sweep 0".
+Mark the PMC wanting destruction as soon as possible, for example
+when unused during the lazy sweep, triggered by C<sweep 0>.
 
 =cut
 
@@ -1124,11 +1134,11 @@ can build or find an appropriate thunking function.
 
 Look up symbol $3 in library $2. We assume that this is actually a
 variable address rather than a function address, and build an
-unmanagedstruct PMC and stick the address into its data pointer.
+UnManagedStruct PMC and stick the address into its data pointer.
 
 =item B<compile>(out PMC, in PMC, in STR)
 
-Don't use compile - just invoke the compiler.
+Don't use compile -- just invoke the compiler.
 
 =item B<compreg>(out PMC, in STR)
 
@@ -1137,7 +1147,7 @@ Get a compiler for source type $2.
 =item B<compreg>(in STR, in PMC)
 
 Register the sub $2 as a compiler for source type $1.
-$2 is either a NCI PMC with signature "pIt" or a PASM Sub.
+$2 is either a NCI PMC with signature C<pIt> or a PASM Sub.
 
 =item B<new_callback>(out PMC, in PMC, in PMC, in STR)
 
