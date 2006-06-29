@@ -10,6 +10,7 @@
 	symbols['include_file']      = 1
 	symbols['write']             = 1
 	symbols['+']                 = 1
+	symbols['-']                 = 1
 
 	store_global 'PhemeCompiler', 'symbols', symbols
 	.return()
@@ -253,6 +254,16 @@
 	goto loop
 
   end_loop:
+	.return( result )
+.end
+
+.sub '-' :multi( String, String )
+	.param float l
+	.param float r
+
+	.local float result
+	result = l - r
+
 	.return( result )
 .end
 
