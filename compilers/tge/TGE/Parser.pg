@@ -32,7 +32,7 @@ rule language {
     \:language \( \'(\w+)\' \)
 }
 
-rule action {
+token action {
     \{ (<-[}]>*) \}
 }
 
