@@ -475,6 +475,9 @@ delimited by the string $2. If $2 does not appear in $3, then return $3
 as the sole element of the Array PMC. Will return empty strings for
 delimiters at the beginning and end of $3
 
+Note: the string $2 is just a string. If you want a perl-ish split
+on regular expression, use C<PGE::Util>'s split from the standard library.
+
 =cut
 
 op join(out STR, in STR, in PMC) :base_core {
