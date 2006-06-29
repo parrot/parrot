@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 
 =head1 NAME
 
@@ -1270,4 +1270,31 @@ pir_output_is(<<'CODE', <<'OUTPUT', "unicode sub names and multi (RT#39254)");
 CODE
 String:what
 Int:23
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "autoboxing on multis");
+.sub box_me_up :multi(string)
+	.param string first
+	.param pmc    second
+
+	.local string promoted_type
+	promoted_type = typeof second
+	print "BMU autobox type: "
+	print promoted_type
+	print "\n"
+.end
+
+.sub box_me_up :multi()
+	print "BMU no autobox, so sad\n"
+.end
+
+.sub box_me_up :multi(int, int)
+	print "BMU inty, so bad\n"
+.end
+
+.sub main :main
+	box_me_up( 'foo', 'bar' )
+.end
+CODE
+BMU autobox type: String
 OUTPUT
