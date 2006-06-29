@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -65,6 +65,29 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - nested");
 .namespace ["Foo" ; "Bar"]
 .sub f
     print "ok\n"
+.end
+CODE
+ok
+OUTPUT
+
+# this is pretty much taken from PDD 20
+pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - array");
+.namespace ['Foo'; 'Bar']
+.sub test
+  print "ok\n"
+  .return()
+.end
+
+.namespace ['']
+.sub main :main
+  $P0 = split "::", "Foo::Bar::test"
+  $S0 = pop $P0
+
+  $P0 = get_namespace $P0
+  $P1 = find_global $P0, $S0
+
+  $P1()
+  end
 .end
 CODE
 ok
