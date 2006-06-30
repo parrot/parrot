@@ -1,0 +1,20 @@
+grammar TAP::Grammar;
+
+## this is an example grammar for parsing TAP format
+
+token output {
+    | ^ <plan> <tap_line>+  [ $ | <syntax_error> ]
+    | ^ <tap_line>+ <plan>? [ $ | <syntax_error> ]
+}
+
+token plan { <'1..'> \d+ }
+
+token tap_line { ^^ <test_line> | <description> $$ }
+rule  test_line {
+    $<status>:=(<'not '>?<'ok'>) <test_num> <description>?
+}
+
+token test_num { \d+ }
+token description { \# \N }
+
+token syntax_error { <?PGE::Util::die: Syntax error> }

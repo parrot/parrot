@@ -533,6 +533,7 @@ examples/pge/perl6.pir                            [main]doc
 examples/pge/README                               [main]doc
 examples/pge/simple.pir                           [main]doc
 examples/pge/grammars/PatchGrammar.pg             [main]doc
+examples/pge/grammars/TAP.pg                      [main]doc
 examples/pir/circle.pir                           [main]doc
 examples/pir/euclid.pir                           [main]doc
 examples/pir/hanoi.pir                            [main]doc
