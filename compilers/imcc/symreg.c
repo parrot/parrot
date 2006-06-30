@@ -247,7 +247,7 @@ mk_pasm_reg(Interp *interp, char * name)
     r = mk_symreg(interp, name, *name);
     r->type = VTPASM;
     r->color = atoi(name+1);
-    if (r->color < 0 || r->color > 31)
+    if (r->color < 0)
         IMCC_fataly(interp, E_SyntaxError,
                 "register number out of range '%s'\n", name);
     return r;
