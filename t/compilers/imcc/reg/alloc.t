@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 11;
 
 pir_output_is(<<'CODE', <<'OUT', "alligator");
 # if the side-effect of set_addr/continuation isn't
@@ -80,4 +80,79 @@ main:
         mul I2, I1, 2
         set_returns
         returncc
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "Explicit large register: S, PIR");
+.sub main
+  S32 = "ok\n"
+  print S32
+  print "\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "Explicit large register: N, PIR");
+.sub main
+  N32 = 3.8
+  print N32
+  print "\n"
+.end
+CODE
+3.8
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "Explicit large register: I, PIR");
+.sub main
+  I32 = 123
+  print I32
+  print "\n"
+.end
+CODE
+123
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "Explicit large register: P, PIR");
+.sub main
+  P32 = new .String
+  P32 = "ok\n"
+  print P32
+.end
+CODE
+ok
+OUT
+
+pasm_output_is(<<'CODE', <<'OUT', "Explicit large register: S, PASM");
+  set S32, "ok\n"
+  print S32
+  end
+CODE
+ok
+OUT
+
+pasm_output_is(<<'CODE', <<'OUT', "Explicit large register: N, PASM");
+  set N32, 3.8
+  print N32
+  print "\n"
+  end
+CODE
+3.8
+OUT
+
+pasm_output_is(<<'CODE', <<'OUT', "Explicit large register: I, PASM");
+  set I32, 123
+  print I32
+  print "\n"
+  end
+CODE
+123
+OUT
+
+pasm_output_is(<<'CODE', <<'OUT', "Explicit large register: P, PASM");
+  new P32, .String
+  set P32, "ok\n"
+  print P32
+  end
+CODE
+ok
 OUT
