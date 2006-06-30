@@ -218,6 +218,9 @@ needed for compiling regexes.
     optable.newtok('term:<-[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:<+[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
+    $P0 = find_global 'parse_quoted_literal'
+    optable.newtok("term:<'", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
     optable.newtok('term:::', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Cut')
     optable.newtok('term:<commit>', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Cut')
 
@@ -788,6 +791,44 @@ Extract an enumerated character list.
 .end
 
 
+=item C<parse_quoted_literal>
+
+Parses <'...'> literals.
+
+=cut
+
+.sub 'parse_quoted_literal'
+    .param pmc mob
+    .local int pos, lastpos
+    .local string target
+    (mob, target, pos) = mob.newfrom(0, 'PGE::Exp::Literal')
+    lastpos = length target
+    lastpos -= 2
+    .local string lit
+    lit = ''
+  literal_iter:
+    if pos > lastpos goto literal_error
+    $S0 = substr target, pos, 2
+    if $S0 == "'>" goto literal_end
+    $S0 = substr target, pos, 1
+    if $S0 != "\\" goto literal_add
+    inc pos
+    $S0 = substr target, pos, 1
+  literal_add:
+    inc pos
+    lit .= $S0
+    goto literal_iter
+  literal_end:
+    pos += 2
+    mob.value(lit)
+    mob.to(pos)
+    .return (mob)
+  literal_error:
+    parse_error(mob, pos, "No closing '> in quoted literal")
+    .return (mob)
+.end
+
+
 =item C<parse_modifier>
 
 Parse a modifier.
@@ -877,7 +918,7 @@ Parse a modifier.
     $S1 = pos
     $S0 .= $S1
     $S0 .= ", found '"
-    $P1 = getattribute mob, 'PGE::Match\x0$.target'
+    $P1 = getattribute mob, '$.target'
     $S1 = $P1
     $S1 = substr $S1, pos, 1
     $S0 .= $S1

@@ -103,10 +103,10 @@ p6rule_isnt('><', '^<-[><]>', 'not gt, lt character class');
 p6rule_isnt('><', '^<-[<>]>', 'not lt, gt  character class');
 
 # single quote -- specifies literal match
-p6rule_is  ('... --- ...', "<'... --- ...'>", "literal match (\')",
-	todo => 'not yet implemented');
-p6rule_isnt('...---...', "<'... --- ...'>", "literal match (\')",
-        todo => 'not yet implemented');
+p6rule_is  ('... --- ...', "<'... --- ...'>", "literal match (\')");
+p6rule_isnt('...---...', "<'... --- ...'>", "literal match (\')");
+p6rule_is  ("ab'>cd", "<'ab\\'>cd'>", "literal match w/'>");
+p6rule_is  ("ab\\cd", "<'ab\\\\cd'>", "literal match w/backslash");
 
 # remember to change the number of tests :-)
-BEGIN { plan tests => 62; }
+BEGIN { plan tests => 64; }
