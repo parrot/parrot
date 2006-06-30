@@ -86,7 +86,6 @@ pir_output_is(<<'CODE', <<'OUT', "Explicit large register: S, PIR");
 .sub main
   S32 = "ok\n"
   print S32
-  print "\n"
 .end
 CODE
 ok
@@ -99,7 +98,7 @@ pir_output_is(<<'CODE', <<'OUT', "Explicit large register: N, PIR");
   print "\n"
 .end
 CODE
-3.8
+3.800000
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "Explicit large register: I, PIR");
@@ -136,7 +135,7 @@ pasm_output_is(<<'CODE', <<'OUT', "Explicit large register: N, PASM");
   print "\n"
   end
 CODE
-3.8
+3.800000
 OUT
 
 pasm_output_is(<<'CODE', <<'OUT', "Explicit large register: I, PASM");
