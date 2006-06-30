@@ -175,8 +175,7 @@ p6rule_is  ("Gabc", '\Gabc', 'retired metachars (\G)');
 
 
 ## \1 -- backreferences deprecated
-p6rule_is  ("1abc", '\1abc', 'retired metachars (\1)', todo => 'implement me');
-
+p6rule_like  ("1abc", '\1abc', qr{\\1 and \\012 illegal, use \$1, \\o012, or \\x0a}, 'retired metachars (\1)');
 
 ## setup for unicode whitespace tests
 ## see http://www.unicode.org/Public/UNIDATA/PropList.txt for White_Space list
