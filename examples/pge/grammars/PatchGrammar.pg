@@ -1,0 +1,33 @@
+grammar Patch::Grammar;
+
+## this is an example grammar for parsing unified diff format
+## also known as input to 'patch'
+## look for a working example of 'patch' on parrot soon!
+
+token patch_input { ^ <file_info>+ [ $ | <syntax_error> ] }
+
+regex file_info {
+    [ <file_head> [ <change_head> <change_body> ]+ ]+
+    | <?PGE::Util::die: Invalid diff command!>
+}
+
+token file_head    { Index: <filename> $$ =+ $$ <old_file> <new_file> }
+rule  old_file     { ^^ <'--- '> <filename> <revision> $$ }
+rule  new_file     { ^^ <'+++ '> <filename> <revision> $$ }
+token filename     { \S+ }
+token revision     { \N+ }
+token change_head  {
+    ^^ <'@@ -'> $<del_range>:=<line_range>
+       <' +'>   $<add_range>:=<line_range> <' @@'> $$
+}
+token line_range   { <line_num>,<line_num> }
+token line_num     { \d+ }
+token change_body  {
+    [ <context_line> | <del_line> | <add_line> ]+
+    | <?PGE::Util::die: no change body found>
+}
+token context_line { ^^ \s .* $$ }
+token del_line     { ^^ \- .* $$ }
+token add_line     { ^^ \+ .* $$ }
+
+token syntax_error { <?PGE::Util::die: Syntax error> }
