@@ -639,7 +639,10 @@ help :
 	@echo "  $(PBCMERGE):         Merge bytecode files"
 	@echo ""
 	@echo "Installation:"
-	@echo "  install:           Install under '/usr/local/parrot' on Unix systems"
+	@echo "  install:           Install under '$(PREFIX)' on Unix systems"
+	@echo "                      WARNING: Installing Parrot may interfere with"
+	@echo "                               developing Parrot on the same machine."
+	@echo "                               This flaw will be fixed eventually."
 	@echo ""
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."
@@ -1659,6 +1662,12 @@ splint2 : $(PARROT)
 ###############################################################################
 
 install : installable
+	@echo "WARNING:"
+	@echo "  Installing Parrot may interfere with developing Parrot"
+	@echo "  on the same machine.  This is a temporary flaw in the"
+	@echo "  Parrot build system.  If you are not sure this is OK,"
+	@echo "  press ^C (or your interrupt key) in the next ten seconds."
+	$(PERL) -e "sleep(10)"
 	$(PERL) tools/dev/install_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
