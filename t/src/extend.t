@@ -535,7 +535,7 @@ print S <<'EOF';
     compreg compiler, 'PIR'
 
     .local string code
-    code = argv[1]
+    code = argv[0]
 
     .local pmc compiled_sub
     compiled_sub = compiler( code )
@@ -556,21 +556,23 @@ c_output_is(<<'CODE', <<'OUTPUT', "eval code through a parrot sub - #39669");
 int main(int argc, char* argv[])
 {
     Parrot_PackFile packfile;
+	char * code[] = { ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n" };
 
     Parrot_Interp interpreter = Parrot_new(NULL);
     if (!interpreter) {
+		printf( "Hiss\n" );
         return 1;
     }
 
     packfile = Parrot_readbc( interpreter, "temp.pbc" );
 
     if (!packfile) {
+		printf( "Boo\n" );
         return 1;
     }
 
     Parrot_loadbc( interpreter, packfile );
-    Parrot_runcode(
-        interpreter, 1, ".sub foo\nprint \"Hello from foo!\\n\"\n.end\n" );
+    Parrot_runcode( interpreter, 1, code );
 
     Parrot_destroy( interpreter );
 
