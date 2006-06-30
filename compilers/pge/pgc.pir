@@ -178,11 +178,11 @@ OPTIONS
         $<cmd>:=(grammar) $<name>:=<arg> ;?
       | $<cmd>:=(regex|token|rule) 
           $<name>:=<arg>
-          \{<regex>\}
+          [ \{<regex>\} | <?PGE::Util::die: unable to parse rule> ]
       | [multi]? $<cmd>:=(proto)
           $<name>:=<arg>
           ( is $<trait>:=[\w+]<arg>? )*
-          [ \{ <-[}]>*: \} | ; | <PGE::Util::die: missing proto/sub body> ]
+          [ \{ <-[}]>*: \} | ; | <?PGE::Util::die: missing proto/sub body> ]
       | [$|<PGE::Util::die: unrecognized statement>]
       STMT_PARSE
     $P0 = p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'statement', 'w'=>1)
