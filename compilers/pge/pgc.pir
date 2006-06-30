@@ -178,7 +178,7 @@ OPTIONS
         $<cmd>:=(grammar) $<name>:=<arg> ;?
       | $<cmd>:=(regex|token|rule) 
           $<name>:=<arg>
-          [ \{<regex>\} | <?PGE::Util::die: unable to parse rule> ]
+          [ \{<regex>\} | <?PGE::Util::die: unable to parse regex> ]
       | [multi]? $<cmd>:=(proto)
           $<name>:=<arg>
           ( is $<trait>:=[\w+]<arg>? )*
