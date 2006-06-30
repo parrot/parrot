@@ -81,6 +81,7 @@ void free_reglist(IMC_Unit *);
 /*
  * parser_util.c
  */
+PARROT_API void imcc_init(Parrot_Interp interpreter);
 int get_keyvec(Parrot_Interp, int opnum);
 int check_op(Interp *, char * fullname, char *op, SymReg *r[],
     int narg, int keyvec);
