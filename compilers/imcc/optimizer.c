@@ -932,7 +932,7 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
                     }
 
                     /* this was screwing up multi-block loops... */
-                    if (end != ins) {
+                    if (end != ins && ins->next != NULL) {
                         ins->next->prev = end;
                         start->prev->next = end->next;
                         if (end->next)
