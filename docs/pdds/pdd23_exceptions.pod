@@ -40,6 +40,8 @@ specific type (class) of an exception object indicates its category.)
 
 These are the opcodes relevant to exceptions and exception handlers:
 
+=over
+
 =item B<< push_eh I<LABEL> >>  {{FIXME - Not Available Yet}}
 
 =item B<< push_eh I<CONTINUATION> >>
