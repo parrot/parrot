@@ -247,11 +247,20 @@ the namespace name with which you found the namespace in the first place.
 
 =over 4
 
+=item $P0 = parse_name($S0)
+
+Parse the name in $S0 using the rules specific to the given compiler, and
+return an array of individual name elements.
+
+For example, a Java compiler would turn 'a.b.c' to ['a','b','c'], while a Perl
+compiler would turn 'a::b::c' into the same result.  Meanwhile, due to Perl's
+sigil rules, '$a::b::c' would become ['a','b','$c'].
+
 =item get_namespace($P0)
 
-Ask this compiler to find its namespace named by the elements of the array in
-$P0.  Returns namespace PMC on success and null PMC on failure.  Note that a
-null PMC or an empty array requests the HLL's base namespace.
+Ask this compiler to find its namespace which is named by the elements of the
+array in $P0.  Returns namespace PMC on success and null PMC on failure.  Note
+that a null PMC or an empty array requests the HLL's base namespace.
 
 This method allows other HLLs to know one name (the HLL) and then work with
 that HLL's modules without having to know the name it chose for its namespace
