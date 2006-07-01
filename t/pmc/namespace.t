@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Parrot::Config;
 
 =head1 NAME
@@ -725,6 +725,26 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global [''], \"print_ok\"");
 
 .sub main :main
   $P0 = find_global [''], 'print_ok'
+  $P0()
+  end
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "find_global with empty array");
+.namespace
+
+.sub print_ok
+  print "ok\n"
+  .return()
+.end
+
+.namespace ['foo']
+
+.sub main :main
+  $P0 = new .ResizablePMCArray
+  $P0 = find_global $P0, 'print_ok'
   $P0()
   end
 .end
