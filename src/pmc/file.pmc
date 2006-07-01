@@ -53,6 +53,32 @@ information see F<src/pmc.c>.
 
 /*
 
+=item C<INTVAL exists(STRING* file)>
+
+Returns a true value (1) if the supplied file or directory exists.
+
+=cut
+
+*/
+
+    METHOD INTVAL exists(STRING *path) {
+        struct stat info;
+        char *cpath = string_to_cstring(interpreter, path);
+#ifdef WIN32
+        int error = stat(cpath, &info);
+#else
+        int error = lstat(cpath, &info);
+#endif
+        string_cstring_free(cpath);
+        if (error) {
+            return 0;
+        }
+
+        return 1;
+    }
+
+/*
+
 =item C<INTVAL is_dir(STRING* path)>
 
 Returns a true value (1) if the supplied path is a directory.
