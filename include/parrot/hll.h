@@ -17,8 +17,12 @@ PARROT_API INTVAL Parrot_register_HLL(Interp*, STRING *hll_name, STRING *hll_lib
 PARROT_API INTVAL Parrot_get_HLL_id(Interp*, STRING *hll_name);
 PARROT_API void Parrot_register_HLL_type(Interp *, INTVAL hll_id,
 	INTVAL core_type, INTVAL hll_type);
+
 PARROT_API INTVAL Parrot_get_HLL_type(Interp *, INTVAL hll_id, INTVAL core_type);
 PARROT_API INTVAL Parrot_get_ctx_HLL_type(Interp *, INTVAL core_type);
+
+PARROT_API PMC *Parrot_get_HLL_namespace(Interp *, int hll_id);
+PARROT_API PMC *Parrot_get_ctx_HLL_namespace(Interp *);
 
 #endif /* PARROT_HLL_H_GUARD */
 

@@ -450,9 +450,8 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
     $P1["Foo"] = $P3
     # fetch w array
     $P1 = new .FixedStringArray
-    $P1 = 2
-    $P1[0] = 'parrot'
-    $P1[1] = 'Foo'
+    $P1 = 1
+    $P1[0] = 'Foo'
     $P2 = get_namespace $P1
     $P2 = $P2.'name'()
     $I2 = elements $P2
@@ -462,7 +461,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
     print $S0
     print "\n"
     # fetch w key
-    $P2 = get_namespace ["parrot";"Foo"]
+    $P2 = get_namespace ["Foo"]
     $P2 = $P2.'name'()
     $I2 = elements $P2
     print $I2
@@ -504,7 +503,7 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "check parrot ns");
 .sub 'main' :main
-    $P0 = get_namespace ["parrot"; "String"]
+    $P0 = get_namespace ["String"]
     $P1 = find_global $P0, "lower"
     $S0 = $P1("OK\n")
     print $S0
@@ -702,7 +701,7 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "get_parent");
 .sub main :main
     .local pmc ns
-    ns = get_namespace ['parrot';'Foo']
+    ns = get_namespace ['Foo']
     ns = ns.'get_parent'()
     print ns
     print "\n"

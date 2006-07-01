@@ -220,6 +220,39 @@ Parrot_get_ctx_HLL_type(Interp *interpreter, INTVAL core_type)
     hll_id = CONTEXT(interpreter->ctx)->current_HLL;
     return Parrot_get_HLL_type(interpreter, hll_id, core_type);
 }
+
+/*
+
+=item C<PMC *
+Parrot_get_ctx_HLL_namespace(Parrot_Interp interpreter)
+
+Return root namespace of the current HLL.
+
+=item C<PMC *
+Parrot_get_HLL_namespace(Parrot_Interp interpreter, int hll_id)
+
+Return root namespace of the HLL with the id of I<hll_id>.
+
+*/
+
+PMC*
+Parrot_get_ctx_HLL_namespace(Interp *interpreter)
+{
+    parrot_context_t *ctx = CONTEXT(interpreter->ctx);
+
+    return VTABLE_get_pmc_keyed_int(interpreter,
+                                    interpreter->HLL_namespace,
+                                    ctx->current_HLL);
+}
+
+PMC*
+Parrot_get_HLL_namespace(Interp *interpreter, int hll_id)
+{
+    return VTABLE_get_pmc_keyed_int(interpreter,
+                                    interpreter->HLL_namespace,
+                                    hll_id);
+}
+
 /*
 
 =back

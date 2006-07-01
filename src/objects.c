@@ -569,11 +569,7 @@ parrot_class_register(Interp* interpreter, PMC *name,
     /* XXX nested, use current as base ? */
     if (PMC_IS_NULL(ns)) {
         /* XXX try HLL namespace too XXX */
-        parrot_context_t *ctx = CONTEXT(interpreter->ctx);
-        const INTVAL hll_id = ctx->current_HLL;
-
-        top =  VTABLE_get_pmc_keyed_int(interpreter, 
-                interpreter->HLL_namespace, hll_id);
+        top = Parrot_get_ctx_HLL_namespace(interpreter);
         ns = VTABLE_get_pmc_keyed(interpreter, top, name);
     }
     if (PMC_IS_NULL(ns)) {
