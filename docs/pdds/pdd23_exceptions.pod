@@ -42,26 +42,29 @@ These are the opcodes relevant to exceptions and exception handlers:
 
 =over
 
-=item B<< push_eh I<LABEL> >>  {{FIXME - Not Available Yet}}
+=item B<< push_eh I<SUB_LABEL> >>
 
-=item B<< push_eh I<CONTINUATION> >>
+=item B<< push_eh I<INVOCABLE_PMC> >>
 
-The C<push_eh> opcode pushes a continuation onto the exception handler stack.
+Push an invocable PMC -- usually a closure or, in rarer cases, a subroutine --
+onto the exception handler stack.
 
-If a I<LABEL> is provided, Parrot automatically performs the equivalent of a
-C<newcontinuation> operation on the given label, and pushes the resulting
-continuation.
-
-{{FIXME - there is no "newcontinuation" opcode ... yet!  In the meantime, you
-have to create the continuations the old-fashioned way.}}
+If a I<SUB_LABEL> is provided, Parrot automatically performs the equivalent of
+a C<newclosure> operation on the given subroutine, and pushes the resulting
+closure.
 
 When an exception is thrown, Parrot walks up the stack of active exception
-handlers, invoking each one in turn.  (See C<rethrow> and C<caught>.)
+handlers, invoking each one in turn, but still in the dynamic context of the
+exception (i.e. the call stack is I<not> unwound first).  See below for more
+detail.
 
 =item B<< pop_eh >>
 
-The C<pop_eh> opcode removes the most recently pushed exception handler from
-the control stack.
+Pop the most recently pushed exception handler off the control stack.
+
+{{ TODO: should we provide a "pop_eh $P0" variant returning the address, since
+it's easy and somebody might find it useful?  Or is it more important to
+provide generic control stack introspection?  Probably the latter.  }}
 
 =item B<< throw I<EXCEPTION> >>
 
@@ -87,14 +90,15 @@ Throw an exception consisting of the given I<EXCEPTION> PMC after taking a
 continuation at the next opcode.  Active exception handlers (if any) will be
 invoked with I<EXCEPTION> and the given continuation as parameters.
 
-Exception handlers can resume execution immediately after this opcode by
-executing the C<caught> opcode, and then invoking the given continuation.
+Except for its taking of a continuation which is then passed to exception
+handlers, C<throwcc> is just like C<throw>.  This opcode is useful for
+exceptions that are more like warnings or notices than errors.
 
-{{TODO: May the continuation be invoked with values, or in other words, can
-throwcc return a value?}}
-
-Except for the taking of a continuation which is passed to exception handlers,
-C<throwcc> is just like C<throw>.
+Exception handlers can resume execution immediately after the C<throwcc>
+opcode by executing the C<caught> opcode, and then invoking the given
+continuation which they receive as a paremter.  That continuation must be
+invoked with no parameters; in other words, C<throwcc> may I<not> return a
+value.
 
 =item B<die [ I<MESSAGE> ]>
 
@@ -119,17 +123,12 @@ If not caught, this exception results in Parrot returning I<EXITCODE>
 as a status to its embedded environment, or when running standalone,
 to execute the C function C<exit(I<EXITCODE>)>.
 
-=item B<< rethrow >>
-
-While handling an exception, stop execution and move on to the next exception
-handler, if any.  This opcode is an exception handler's way of telling Parrot
-that it cannot handle the exception.
-
 =item B<< caught >>
 
-While handling an exception, tell Parrot that the exception has been handled
-and should be removed from the stack of active exceptions.  This opcode is an
-exception handler's way of telling Parrot that it has handled the exception.
+While handling an exception, tell Parrot that the exception has been caught
+(handled) and should be removed from the stack of active exceptions.  This
+opcode is an exception handler's way of telling Parrot that it has handled the
+exception.
 
 =back
 
@@ -146,20 +145,22 @@ exception handler's way of telling Parrot that it has handled the exception.
          containing pointer to exception handler block
             and exception PMC
             (and possibly a continuation)
-      invoke the handler's continuation
+      invoke the handler
+        (note: this is still in the thrower's dynamic context)
 
-=item C<rethrow>
+=item if the handler returns normally:
 
    find the "exception handling in progress" record
    find the next exception handler
    if found,
-      invoke its continuation
-   else if there is a continuation in the Exception Record (from C<throwcc>),
-      invoke it (i.e. resume execution)
+      invoke it
+   else if there is a continuation in the Exception Record
+        (because the throwing opcode was C<throwcc>),
+      invoke the ER's continuation (i.e. resume execution)
    else,
       terminate program a la C<die>
 
-=item C<caught>
+=item C<caught> opcode
 
    pop and destroy Exception Record
 
@@ -321,17 +322,18 @@ pad PMC, its behavior may be very different.  (For example, in Tcl,
 C<store_lex> is likely to succeed every time, as creating new lexicals at
 runtime is OK in Tcl.)
 
-[[ FIXME - Is it true that more opcodes throw exceptions?  If so, they should
-be listed here.]]
+{{ FIXME - Is it true that more opcodes throw exceptions?  If so, they should
+be listed here. }}
 
-
-{{ FIXME }}
 Other opcodes respond to an C<errorson> setting to decide whether to
 throw an exception or return an error value. C<find_global> throws an
 exception (or returns a Null PMC) if the global name requested doesn't
 exist. C<find_name> throws an exception (or returns a Null PMC) if the
 name requested doesn't exist in a lexical, current, global, or built-in
 namespace.
+
+{{ FIXME - "erroron" as specified is dynamically rather than lexically
+scoped; is this good? }}
 
 It's a little odd that so few opcodes throw exceptions (these are the
 ones that are documented, but a few others throw exceptions internally
@@ -354,8 +356,8 @@ resumable.
 
   $P0 = new String
   $P0 = "something bad happened"
-  $P1 = new ['parrot';'exception'], $P0  # create new exception object
-  throw $P1                  # throw it
+  $P1 = new ['exception'], $P0  # create new exception object
+  throw $P1                     # throw it
 
 Exceptions are designed to work with the Parrot calling conventions.
 Since the return addresses of C<bsr> subroutine calls and exception
