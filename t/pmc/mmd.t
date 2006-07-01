@@ -790,8 +790,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
     r = new Float
     l = 3
     r = 39.42
-    ns = get_namespace ["__parrot_core"]
-    a = ns["__add"]
+    .include "interpinfo.pasm"
+    ns = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    a = ns["__parrot_core"; "__add"]
     a(l, r, d)
     print d
     print "\n"
