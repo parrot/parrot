@@ -269,6 +269,8 @@ i	tpiibi
 p	iiil
 i	ppl
 v	pip
+p	pti
+i	ppp
 
 # Used by SDL::Font
 p	ti

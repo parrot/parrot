@@ -63,13 +63,13 @@ depth of each component.
 	.param int depth  :named( 'depth'  ) :optional
 	.param int flags  :named( 'flags'  ) :optional
 	.param int have_flags :opt_flag
-	.param int red    :named( 'Rmask' )
+	.param int red    :named( 'Rmask' )  :optional
 	.param int have_red :opt_flag
-	.param int green  :named( 'Gmask' )
+	.param int green  :named( 'Gmask' )  :optional
 	.param int have_green :opt_flag
-	.param int blue   :named( 'Bmask' )
+	.param int blue   :named( 'Bmask' )  :optional
 	.param int have_blue :opt_flag
-	.param int alpha  :named( 'Amask' )
+	.param int alpha  :named( 'Amask' )  :optional
 	.param int have_alpha :opt_flag
 
 	.local pmc SDL_CreateRGBSurface
@@ -219,7 +219,7 @@ representing a color, fills a portion of this surface with the given color.
 	getattribute surface, self, offset
 
 	.local int color
-	color = color_object.'color'()
+	color = color_object
 
 	.local pmc dest_rect
 	dest_rect = rect.'rect'()
@@ -240,11 +240,8 @@ Do this on the main surface to see your changes.
 .sub update_rect :method
 	.param pmc rect
 
-	.local int offset
-	classoffset offset, self, 'SDL::Surface'
-
 	.local pmc surface
-	getattribute surface, self, offset
+	getattribute surface, self, 'surface'
 
 	.local int x
 	.local int y

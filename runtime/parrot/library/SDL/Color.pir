@@ -88,60 +88,67 @@ is none and 255 is the maximum possible.
 	.param int green :named( 'g' )
 	.param int blue  :named( 'b' )
 
-	.local int arg_color
+	.local pmc fetch_layout
+	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+
+	.local pmc layout
+	layout = fetch_layout( 'Color' )
+
 	.local pmc color
+	color     = new .ManagedStruct, layout
 
-	color     = new .Integer
+	set color['r'], red
+	set color['g'], green
+	set color['b'], blue
 
-	arg_color = red << 16
-	add color, arg_color
-
-	arg_color = green <<  8
-	add color, arg_color
-
-	arg_color = blue
-	add color, arg_color
-
-	.local int offset
-	classoffset offset, self, 'SDL::Color'
-	setattribute self, offset, color
+	setattribute self, 'color', color
 
 	color = new .Integer
 	color = red
-	inc offset
-	setattribute self, offset, color
+	setattribute self, 'r', color
 
 	color = new .Integer
 	color = green
-	inc offset
-	setattribute self, offset, color
+	setattribute self, 'g', color
 
 	color = new .Integer
 	color = blue
-	inc offset
-	setattribute self, offset, color
+	setattribute self, 'b', color
 
 	.return()
 .end
 
+.sub __get_integer :method
+	.local pmc color
+	color = self.'color'()
+
+	.local int color_int
+	.local int component
+
+	component = color['r']
+	color_int = component << 16
+
+	component = color['g']
+	component <<= 8
+	color_int += component
+
+	component = color['b']
+	color_int += component
+	
+	.return( color_int )
+.end
+
 =item color()
 
-Returns an integer representing the actual color value passed to the underlying
-SDL functions.  You should never need to use this directly, unless you need to
-call those functions directly.
+Returns a PMC representing the actual color value passed to the underlying SDL
+functions.  You should never need to use this directly, unless you need to call
+those functions directly.
 
 =cut
 
 .sub color :method
-
-	.local int color
-	.local int offset
-	.local pmc color_value
-
-	classoffset offset, self, 'SDL::Color'
-	getattribute color_value, self, offset
-
-	set color, color_value
+	.local pmc color
+	getattribute color, self, 'color'
 
 	.return( color )
 .end
