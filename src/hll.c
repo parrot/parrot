@@ -224,12 +224,12 @@ Parrot_get_ctx_HLL_type(Interp *interpreter, INTVAL core_type)
 /*
 
 =item C<PMC *
-Parrot_get_ctx_HLL_namespace(Parrot_Interp interpreter)
+Parrot_get_ctx_HLL_namespace(Parrot_Interp interpreter)>
 
 Return root namespace of the current HLL.
 
 =item C<PMC *
-Parrot_get_HLL_namespace(Parrot_Interp interpreter, int hll_id)
+Parrot_get_HLL_namespace(Parrot_Interp interpreter, int hll_id)>
 
 Return root namespace of the HLL with the id of I<hll_id>.
 
