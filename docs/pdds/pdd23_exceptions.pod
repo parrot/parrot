@@ -95,12 +95,12 @@ handlers, C<throwcc> is just like C<throw>.  This opcode is useful for
 exceptions that are more like warnings or notices than errors.
 
 Exception handlers can resume execution immediately after the C<throwcc>
-opcode by executing the C<caught> opcode, and then invoking the given
+opcode by executing the C<handled> opcode, and then invoking the given
 continuation which they receive as a paremter.  That continuation must be
 invoked with no parameters; in other words, C<throwcc> may I<not> return a
 value.
 
-=item B<die [ I<MESSAGE> ]>
+=item B<< die [ I<MESSAGE> ] >>
 
 The C<die> opcode throws an exception of type C<exception;death> with a
 payload of I<MESSAGE>.  If I<MESSAGE> is a string register, the exception
@@ -109,26 +109,25 @@ is used directly as the exception payload.
 
 {{ TODO: What is the default when no I<MESSAGE> is given? }}
 
-If this exception is not caught, it results in Parrot returning an error
+If this exception is not handled, it results in Parrot returning an error
 indication and the stringification of I<MESSAGE> to its embedding environment.
 When running standalone, this means writing the stringification of I<MESSAGE>
 to the standard error and executing the standard C function C<exit(1)>.
 
-=item B<exit [ I<EXITCODE> ]>
+=item B<< exit [ I<EXITCODE> ] >>
 
 Throw an exception of type C<exception;exit> with a payload of I<EXITCODE>,
 which defaults to zero, as an Integer PMC.
 
-If not caught, this exception results in Parrot returning I<EXITCODE>
+If not handled, this exception results in Parrot returning I<EXITCODE>
 as a status to its embedded environment, or when running standalone,
 to execute the C function C<exit(I<EXITCODE>)>.
 
-=item B<< caught >>
+=item B<< handled >>
 
-While handling an exception, tell Parrot that the exception has been caught
-(handled) and should be removed from the stack of active exceptions.  This
-opcode is an exception handler's way of telling Parrot that it has handled the
-exception.
+While handling an exception, tell Parrot that the exception has been handled
+and should be removed from the stack of active exceptions.  This opcode is an
+exception handler's way of telling Parrot that it has handled the exception.
 
 =back
 
@@ -160,7 +159,7 @@ exception.
    else,
       terminate program a la C<die>
 
-=item C<caught> opcode
+=item C<handled> opcode
 
    pop and destroy Exception Record
 
