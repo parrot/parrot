@@ -356,8 +356,8 @@ resumable.
 
   $P0 = new String
   $P0 = "something bad happened"
-  $P1 = new ['exception'], $P0  # create new exception object
-  throw $P1                     # throw it
+  $P1 = new ['parrot';'exception'], $P0  # create new exception object
+  throw $P1                              # throw it
 
 Exceptions are designed to work with the Parrot calling conventions.
 Since the return addresses of C<bsr> subroutine calls and exception
