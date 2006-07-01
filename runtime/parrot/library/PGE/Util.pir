@@ -94,8 +94,7 @@ of the match.
 =item C<split(PMC regex, STR string [, INT count]>
 
 Split the string where the regex matches, returning an array. Optionally limit
-the number of splits. (This works like Perl's C<split> except it doesn't add
-captures to the return array.)
+the number of splits.
 
 =back
 
@@ -125,6 +124,20 @@ split_loop:
     $S0 = substr str, pos, $I0
     push result, $S0
     pos = match.to()
+
+    .local pmc captures
+    captures = match.get_array()
+    if null captures goto capture_end
+    $I0 = elements captures
+    $I1 = 0
+capture_loop:
+    if $I1 == $I0 goto capture_end
+    $P0 = captures[$I1]
+    $S0 = $P0
+    push result, $S0
+    inc $I1
+    goto capture_loop
+capture_end:
     
     ##  are we counting matches?
     unless has_count goto split_loop
