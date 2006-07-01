@@ -65,10 +65,13 @@ got_args:
   p6rule = compreg "PGE::P6Regex"
   regex  = p6rule('\:\:+')
 
-  .local string namespace
   $P0  = split(regex, name)
   name = pop $P0
+  $I0 = elements $P0
+  if $I0 == 0 goto empty
   namespace = join "'; '", $P0
+  namespace = "['" . namespace
+  namespace .= "']"
 
 empty:  
   .local pmc proc_body
@@ -76,7 +79,7 @@ empty:
   
   proc_body.emit(<<"END_PIR", namespace, name)
 .HLL 'tcl', 'tcl_group'
-.namespace ['%0']
+.namespace %0
 .sub '_xxx' :immediate
   P0 = loadlib 'dynlexpad' 
 .end
