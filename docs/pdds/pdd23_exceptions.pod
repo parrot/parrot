@@ -32,7 +32,7 @@ control.  They are mainly used for error reporting or cleanup tasks.
 (A digression on terminology: In a system analysis sense, the word "exception"
 usually refers to the exceptional event that requires out-of-band handling.
 However, in Parrot, "exception" also refers to the object that holds all the
-information describing hte exceptional condition: the nature of the exception,
+information describing the exceptional condition: the nature of the exception,
 the error message describing it, and other ancillary information.  The
 specific type (class) of an exception object indicates its category.)
 
@@ -96,7 +96,7 @@ exceptions that are more like warnings or notices than errors.
 
 Exception handlers can resume execution immediately after the C<throwcc>
 opcode by executing the C<handled> opcode, and then invoking the given
-continuation which they receive as a paremter.  That continuation must be
+continuation which they receive as a parameter.  That continuation must be
 invoked with no parameters; in other words, C<throwcc> may I<not> return a
 value.
 
