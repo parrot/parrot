@@ -19,18 +19,12 @@ To run this file, run the following command from the Parrot root directory:
 	load_bytecode "library/SDL/Image.pir"
 	load_bytecode "library/SDL/Sprite.pir"
 
-	.local pmc args
-	args             = new .Hash
-	args[ 'height' ] =        480
-	args[ 'width'  ] =        640
-	args[ 'bpp'    ] =          0
-	args[ 'flags'  ] = 1073741825
-
 	.local pmc app
 	.local int app_type
 
 	find_type app_type, 'SDL::App'
-	app = new app_type, args
+	app = new app_type
+	app.init( 'height' => 480, 'width' => 640, 'bpp' => 0, 'flags' => 1073741825 )
 
 	.local pmc main_screen
 	main_screen = app.'surface'()
@@ -38,58 +32,39 @@ To run this file, run the following command from the Parrot root directory:
 	.local int rect_type
 	find_type  rect_type, 'SDL::Rect'
 
-	args[ 'height' ] = 100
-	args[ 'width'  ] = 100
-	args[ 'x'      ] =   0
-	args[ 'y'      ] = 190
-
 	.local pmc dest_rect
-	dest_rect = new rect_type, args
+	dest_rect = new rect_type
+	dest_rect.'init'( 'height' => 100, 'width' => 100, 'x' => 0, 'y' => 190 )
 
-	args['width'] = 101
 	.local pmc prev_rect
-	prev_rect = new rect_type, args
-
-	args[ 'height' ] =  56
-	args[ 'width'  ] = 100
-	args[ 'x'      ] =   0
-	args[ 'y'      ] =   0
+	prev_rect = new rect_type
+	prev_rect.'init'( 'height' => 100, 'width' => 101, 'x' => 0, 'y' => 190 )
 
 	.local pmc source_rect
-	source_rect = new rect_type, args
+	source_rect = new rect_type
+	source_rect.'init'( 'height' => 56, 'width' => 100, 'x' => 0, 'y' => 0 )
 
 	.local int color_type
 	find_type  color_type, 'SDL::Color'
 
-	args[ 'r' ] = 0
-	args[ 'g' ] = 0
-	args[ 'b' ] = 0
-
 	.local pmc black
-	black = new color_type, args
+	black = new color_type
+	black.'init'( 'r' => 0, 'g' => 0, 'b' => 0 )
 
 	.local int sprite_type
 	find_type  sprite_type, 'SDL::Sprite'
 
 	.local pmc image
 	.local int image_type
-	.local pmc filename
 
 	find_type image_type, 'SDL::Image'
-	filename = new .String
-	filename = 'examples/sdl/parrot_small.png'
-	image    = new image_type, filename
+	image    = new image_type
+	image.'init'( 'examples/sdl/parrot_small.png' )
 
-	args = new .Hash
-	args[ 'surface'  ] = image
-	args[ 'source_x' ] =     0
-	args[ 'source_y' ] =     0
-	args[ 'dest_x'   ] =     0
-	args[ 'dest_y'   ] =   190
-	args[ 'bgcolor'  ] = black
 
 	.local pmc sprite
-	sprite = new sprite_type, args
+	sprite = new sprite_type
+	sprite.'init'( 'surface' => image, 'source_x' => 0, 'source_y' => 0, 'dest_x' => 0, 'dest_y' => 190, 'bgcolor' => black )
 
 	.local float start_time
 	time start_time
