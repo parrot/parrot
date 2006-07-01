@@ -3,7 +3,7 @@
 #
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&lrange"
   .param pmc argv :slurpy  

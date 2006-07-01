@@ -3,7 +3,7 @@
 #
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&linsert"
   .param pmc argv :slurpy

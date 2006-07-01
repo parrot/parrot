@@ -2,7 +2,7 @@
 # [array]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 #
 # similar to but not exactly like [string]'s subcommand dispatch

@@ -1,6 +1,6 @@
 .HLL '_Tcl', ''
 
-.namespace [ '' ]
+.namespace
 
 =head1 NAME
 

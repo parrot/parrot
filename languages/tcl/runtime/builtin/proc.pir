@@ -5,7 +5,7 @@ Create a PIR sub on the fly for this user defined proc.
 =cut
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&proc"
   .param pmc argv :slurpy

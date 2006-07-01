@@ -5,7 +5,7 @@
 # eval arg [... arg arg]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&eval"
   .param pmc argv :slurpy

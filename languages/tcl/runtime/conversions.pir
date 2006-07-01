@@ -1,5 +1,5 @@
 .HLL '_Tcl', ''
-.namespace [ '' ]
+.namespace
 
 =head2 _Tcl::__list
 

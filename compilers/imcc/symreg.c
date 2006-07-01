@@ -156,7 +156,7 @@ add_namespace(Parrot_Interp interp, IMC_Unit *unit)
     SymReg *ns = IMCC_INFO(interp)->cur_namespace;
     SymReg *r, *g;
 
-    if (!ns || strlen(ns->name) <= 2)
+    if (!ns)
         return;
     if (unit->namespace)
         return;

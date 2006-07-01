@@ -441,7 +441,7 @@ adv_named_set(Interp *interp, char *name) {
 %type <i> func_assign get_results
 %type <i> opt_invocant
 %type <sr> target targetlist reg const var string result
-%type <sr> key keylist _keylist
+%type <sr> keylist _keylist maybe_keylist key
 %type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args
@@ -607,19 +607,24 @@ opt_pasmcode:
   ;
 
 class_namespace:
-    NAMESPACE '[' keylist ']'
+    NAMESPACE maybe_keylist '\n'
                 {
                     int re_open = 0;
-                    $$=0;
+                    $$ = 0;
                     if (IMCC_INFO(interp)->state->pasm_file && cur_namespace) {
                         imc_close_unit(interp, cur_unit);
                         re_open = 1;
                     }
-                    IMCC_INFO(interp)->cur_namespace = $3;
-                    cur_namespace = $3;
+                    IMCC_INFO(interp)->cur_namespace = $2;
+                    cur_namespace = $2;
                     if (re_open)
                         cur_unit = imc_open_unit(interp, IMC_PASM);
                 }
+   ;
+
+maybe_keylist:
+     '[' keylist ']'	{ $$ = $2; }
+   |			{ $$ = NULL; }
    ;
 
 sub:

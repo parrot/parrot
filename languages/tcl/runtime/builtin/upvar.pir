@@ -2,7 +2,7 @@
 # [upvar]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&upvar"
   .param pmc argv :slurpy

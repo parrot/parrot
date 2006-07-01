@@ -3,7 +3,7 @@
 #
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&lsort"
   .param pmc argv :slurpy

@@ -54,23 +54,15 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
     PIO_printf(interpreter, "find_global class '%Ss' meth '%Ss'\n",
             class, globalname);
 #endif
-    if (class) {
+    if (!class)
+        stash = CONTEXT(interpreter->ctx)->current_namespace;
+    else {
         globals = Parrot_get_ctx_HLL_namespace(interpreter);
-        
-        /* Make `find_global [''], 'Foo'` work correctly */
-        if (string_length(interpreter, class) == 0)
-            stash = globals;
-        else
-            stash = VTABLE_get_pmc_keyed_str(interpreter, globals, class);
-        
+        stash = VTABLE_get_pmc_keyed_str(interpreter, globals, class);
         if (PMC_IS_NULL(stash))
             return NULL;
     }
-    else {
-        stash = CONTEXT(interpreter->ctx)->current_namespace;
-    }
-    res = VTABLE_get_pointer_keyed_str(interpreter,
-            stash, globalname);
+    res = VTABLE_get_pointer_keyed_str(interpreter, stash, globalname);
     if (PMC_IS_NULL(res))
         return NULL;
     return res;
@@ -232,13 +224,12 @@ Parrot_store_global(Interp *interpreter, STRING *class,
     PMC *globals;
     PMC *stash;
 
-    if (class) {
+    if (!class)
+        stash = CONTEXT(interpreter->ctx)->current_namespace;
+    else {
         globals = Parrot_get_ctx_HLL_namespace(interpreter);
         stash = Parrot_global_namespace(interpreter, globals, class);
     }
-    else
-        stash = CONTEXT(interpreter->ctx)->current_namespace;
-    
     VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
     Parrot_invalidate_method_cache(interpreter, class, globalname);
 }
@@ -328,27 +319,23 @@ store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
         PMC *namespace, STRING *sub_name)
 {
     /*
-     * namespace is either s String or a Key PMC or NULL
+     * namespace is either a String, or a Key, or NULL
      */
-    if (PMC_IS_NULL(namespace)) {
-global_ns:
+    if (PMC_IS_NULL(namespace))
         store_sub(interpreter, NULL, sub_name, sub_pmc);
-    }
     else {
         STRING *names;
         INTVAL type = namespace->vtable->base_type;
         switch (type) {
             case enum_class_String:
                 names = PMC_str_val(namespace);
-                if (!string_length(interpreter, names))
-                    goto global_ns;
                 store_sub(interpreter, names, sub_name, sub_pmc);
                 break;
             case enum_class_Key:
                 store_sub_p(interpreter, namespace, sub_name, sub_pmc);
                 break;
             default:
-                internal_exception(1, "Unhandled namespace constant");
+                internal_exception(1, "Namespace constant is neither String nor Key");
         }
 
     }

@@ -78,7 +78,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - array");
   .return()
 .end
 
-.namespace ['']
+.namespace
 .sub main :main
   $P0 = split "::", "Foo::Bar::test"
   $S0 = pop $P0

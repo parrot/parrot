@@ -67,7 +67,7 @@ _x:
     branch I17
     pack S0, 380, I0, I17
     print S0
-.namespace [""]
+.namespace
 _init:
     dlfunc P0, P1, "mmd_register", "vIiiip"
     dlvar P5, P1, "Parrot_delegate_divide"

@@ -5,7 +5,7 @@
 # expr arg [... arg arg]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&expr"
   .param pmc argv :slurpy

@@ -2,7 +2,7 @@
 # [source]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&source"
   .param pmc argv :slurpy

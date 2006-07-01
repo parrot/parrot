@@ -215,7 +215,7 @@ subroutine declaration contains "method".
 
 Restore namespace to the global namespace:
 
-  .namespace [ "" ]
+  .namespace
 
 =head2 NCI
 

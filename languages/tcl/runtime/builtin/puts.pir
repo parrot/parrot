@@ -2,7 +2,7 @@
 # [puts]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&puts"
   .param pmc argv :slurpy

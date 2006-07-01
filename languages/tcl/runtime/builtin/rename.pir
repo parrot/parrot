@@ -2,7 +2,7 @@
 # [rename]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&rename"
   .param pmc argv :slurpy

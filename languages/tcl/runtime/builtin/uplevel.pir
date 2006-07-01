@@ -5,7 +5,7 @@
 # needs argument checking.
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&uplevel"
   .param pmc argv :slurpy

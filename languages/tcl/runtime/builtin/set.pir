@@ -2,7 +2,7 @@
 # [set]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&set"
   .param pmc argv :slurpy

@@ -5,7 +5,7 @@
 # format string arg arg arg
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&format"
   .param pmc argv :slurpy

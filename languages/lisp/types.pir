@@ -794,4 +794,4 @@ DONE:
   .return(retv)
 .end
 
-.namespace [""]
+.namespace

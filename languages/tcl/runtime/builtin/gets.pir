@@ -5,7 +5,7 @@ read a line from a channel
 =cut
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&gets"
   .param pmc argv :slurpy

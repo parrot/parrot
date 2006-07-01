@@ -1,5 +1,5 @@
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 # XXX This implementation uses a lot of temp vars that should be named -coke
 

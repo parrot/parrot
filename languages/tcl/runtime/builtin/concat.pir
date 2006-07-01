@@ -2,7 +2,7 @@
 # [concat]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&concat"
   .param pmc argv :slurpy

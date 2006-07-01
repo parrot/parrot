@@ -150,7 +150,7 @@ pir_output_is(<<'CODE', <<'OUT', "initializer");
     print "baz_init\n"
 .end
 
-.namespace [""]	# main again
+.namespace  # main again
 .sub _sub
     print "in sub\n"
 .end

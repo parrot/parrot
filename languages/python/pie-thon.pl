@@ -250,7 +250,7 @@ sub New_func {
     }
     print <<EOC;
 .end		# $cur_func
-.namespace [""]
+.namespace
 
 $nst
 .sub $real_name prototyped$meth $cmt

@@ -5,7 +5,7 @@
 # append var [...]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&append"
   .param pmc argv :slurpy

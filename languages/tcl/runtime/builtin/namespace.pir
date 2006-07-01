@@ -10,7 +10,7 @@ real top level namespace.
 =cut
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&namespace"
    .param pmc argv :slurpy

@@ -747,7 +747,7 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types - Any");
     q($P0)
 .end
 
-.namespace [""]
+.namespace
 
 .sub p :multi(String)
     .param pmc p
@@ -998,7 +998,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "mmd bug reported by Jeff");
     print "nothing\n"
 .end
 
-.namespace ['']
+.namespace
 
 .sub main :main
     newclass $P0, 'Foo'

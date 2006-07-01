@@ -18,7 +18,7 @@ my @dynamic_cmds = pir_cmds_in_dir($dynamic_dir);
 print <<"END_PIR";
 
 .HLL 'tcl', 'tcl_group'
-.namespace ['']
+.namespace
 
 END_PIR
 
@@ -36,7 +36,7 @@ print "  .include 'languages/tcl/$dynamic_dir/$_.pir'\n"
 print <<"END_PIR";
 
 .HLL 'Tcl', ''
-.namespace ['']
+.namespace
 
 END_PIR
 

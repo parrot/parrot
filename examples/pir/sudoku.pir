@@ -1754,7 +1754,7 @@ out:
     key = f()
 .end
 
-.namespace [""]
+.namespace
 # ncurses support
 
 .sub nc_start

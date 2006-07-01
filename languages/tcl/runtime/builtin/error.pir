@@ -7,7 +7,7 @@
 # (So, the usage statement lies)
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&error"
   .param pmc argv :slurpy

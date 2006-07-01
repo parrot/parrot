@@ -2,7 +2,7 @@
 # [global]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&global"
   .param pmc argv :slurpy

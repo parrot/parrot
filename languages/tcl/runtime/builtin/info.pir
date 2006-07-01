@@ -5,7 +5,7 @@
 =cut
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&info"
   .param pmc argv :slurpy

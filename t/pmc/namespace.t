@@ -368,7 +368,7 @@ pir_output_is(<<'CODE', <<'OUT', "latin1 namespace, global");
 	print "latin1 namespaces are fun\n"
 .end
 
-.namespace [ "" ]
+.namespace
 
 .sub 'main' :main
 	$P0 = find_global iso-8859-1:"François", '__init'
@@ -385,7 +385,7 @@ pir_output_is(<<'CODE', <<'OUT', "unicode namespace, global");
 	print "unicode namespaces are fun\n"
 .end
 
-.namespace [ "" ]
+.namespace
 
 .sub 'main' :main
 	$P0 = find_global unicode:"Fran\xe7ois", '__init'
@@ -644,7 +644,7 @@ SKIP:
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global in current");
 .HLL 'bork', ''
-.namespace [ '' ]
+.namespace
 
 .sub a :immediate
   $P1 = new .String

@@ -1,5 +1,5 @@
 .HLL '_Tcl', ''
-.namespace [ '' ]
+.namespace
 
 .const int MAX_PRECEDENCE =  11
 

@@ -1,5 +1,5 @@
 .HLL '_Tcl', ''
-.namespace [ '' ]
+.namespace
 
 .sub __stringToList
   .param string str

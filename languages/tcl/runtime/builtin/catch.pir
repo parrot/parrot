@@ -2,7 +2,7 @@
 # [catch]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&catch"
   .param pmc argv :slurpy

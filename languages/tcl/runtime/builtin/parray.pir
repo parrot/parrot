@@ -2,7 +2,7 @@
 # [parray]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace [ '' ]
+.namespace
 
 .sub "&parray"
   .param pmc argv :slurpy
