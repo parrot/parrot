@@ -10,18 +10,10 @@ SDL::Surface - Parrot class representing surfaces in Parrot SDL
 	# load this library
 	load_bytecode 'library/SDL/Surface.pir'
 
-	# set the surface's arguments
-	.local pmc surface_args
-	surface_args             = new .Hash
-	surface_args[ 'height' ] = 480
-	surface_args[ 'width'  ] = 640
-
 	# create a new SDL::Surface object
-	.local pmc surface
-	.local int surface_type
-
 	find_type surface_type, 'SDL::Surface'
-	surface = new surface_type, surface_args
+	surface = new surface_type
+	surface.'init'( 'height' => 480, 'width' => 640 )
 
 	# ... blit to, fill, update, and flip this surface as necessary
 
@@ -55,47 +47,60 @@ END:
 
 .end
 
-=item _new( surface_args )
+=item init( surface_args )
 
-Given a C<Hash> of arguments, set the attributes of this surface.  The keys of
-this hash are C<height> and C<width>, two integer values representing the
-height and width of this surface in pixels.
-
-The name of this method may change, per discussion on p6i.
+Given a list of key-value pairs, the attributes of this surface.  The valid
+keys are C<height> and C<width>, two integer values representing the height and
+width of this surface in pixels.  Other keys are C<depth>, the screen depth,
+C<flags>, the SDL flags, and C<r>, C<g>, C<b>, and C<a>, representing the bit
+depth of each component.
 
 =cut
 
-.sub create method
-	.param pmc args :optional
-	.param int has_args
+.sub init :method
+	.param int height :named( 'height' )
+	.param int width  :named( 'width'  )
+	.param int depth  :named( 'depth'  ) :optional
+	.param int flags  :named( 'flags'  ) :optional
+	.param int have_flags :opt_flag
+	.param int red    :named( 'Rmask' )
+	.param int have_red :opt_flag
+	.param int green  :named( 'Gmask' )
+	.param int have_green :opt_flag
+	.param int blue   :named( 'Bmask' )
+	.param int have_blue :opt_flag
+	.param int alpha  :named( 'Amask' )
+	.param int have_alpha :opt_flag
 
-	if has_args goto OK
-	print "no surface parameters!\n"
-	branch END
-OK:
 	.local pmc SDL_CreateRGBSurface
-	.local int flags
-	.local int width
-	.local int height
-	.local int depth
-	.local int r
-	.local int g
-	.local int b
-	.local int a
-	
-	flags = args["flags"]
-	width = args["width"]
-	height = args["height"]
-	depth = args["depth"]
-	r = args["Rmask"]
-	g = args["Gmask"]
-	b = args["Bmask"]
-	a = args["Amask"]
-	
+
+	if have_flags goto check_red
+	flags = 0
+
+  check_red:
+	if have_red goto check_green
+	red = 5
+
+  check_green:
+	if have_blue goto check_blue
+	green = 6
+
+  check_blue:
+	if have_blue goto check_alpha
+	blue = 5
+
+  check_alpha:
+	if have_alpha goto create_surface
+	alpha = 0
+
+  create_surface:
 	SDL_CreateRGBSurface = find_global 'SDL::NCI', 'CreateRGBSurface'
-	$P0 = SDL_CreateRGBSurface( flags, width, height, depth, r, g, b, a )
-	self."wrap_surface"( $P0 )
-END:
+
+	.local pmc surface
+	surface = SDL_CreateRGBSurface( flags, width, height, depth, red, green, blue, alpha )
+	self."wrap_surface"( surface )
+
+	.return()
 .end
 
 =item new_from_surface( raw_surface )
@@ -108,7 +113,7 @@ you have little reason to use it directly.
 
 =cut
 
-.sub wrap_surface method
+.sub wrap_surface :method
 	.param pmc surface_struct
 
 	.local pmc  fetch_layout
@@ -168,16 +173,14 @@ value.
 
 =cut
 
-.sub height method
+.sub height :method
 	.local pmc surface
 	surface = self.'surface'()
 
 	.local int height
 	height = surface['h']
 
-	.pcc_begin_return
-		.return height
-	.pcc_end_return
+	.return( height )
 .end
 
 =item width()
@@ -186,16 +189,14 @@ Returns the width of this surface, in pixels.  This is always an integer value.
 
 =cut
 
-.sub width method
+.sub width :method
 	.local pmc surface
 	surface = self.'surface'()
 
 	.local int width
 	width = surface['w']
 
-	.pcc_begin_return
-		.return width
-	.pcc_end_return
+	.return( width )
 .end
 
 =item fill_rect( rect, color )
@@ -205,7 +206,7 @@ representing a color, fills a portion of this surface with the given color.
 
 =cut
 
-.sub fill_rect method
+.sub fill_rect :method
 	.param pmc rect
 	.param pmc color_object
 
@@ -236,7 +237,7 @@ Do this on the main surface to see your changes.
 
 =cut
 
-.sub update_rect method
+.sub update_rect :method
 	.param pmc rect
 
 	.local int offset
@@ -268,7 +269,7 @@ at once.  Pass in an C<Array> of rects to update.
 
 =cut
 
-.sub update_rects method
+.sub update_rects :method
 	.param pmc rects
 
 	.local int count
@@ -334,7 +335,7 @@ case) to the main buffer, so you can see it.
 
 =cut
 
-.sub flip method
+.sub flip :method
 	.local int offset
 	classoffset offset, self, 'SDL::Surface'
 
@@ -360,14 +361,10 @@ understand.
 
 =cut
 
-.sub blit method
+.sub blit :method
 	.param pmc surface
 	.param pmc source
 	.param pmc dest
-
-	goto OK
-	print "SDL::Surface::blit: Warning: wrong parameter count\n"
-OK:
 
 	.local pmc SDL_BlitSurface
 	SDL_BlitSurface = find_global 'SDL::NCI', 'BlitSurface'
@@ -381,10 +378,11 @@ OK:
 	.local pmc source_rect
 	.local pmc dest_rect
 
-	source_rect = source.'rect'()
-	dest_rect   = dest.'rect'()
+	source_rect    = source.'rect'()
+	dest_rect      = dest.'rect'()
 
 	SDL_BlitSurface( source_surface, source_rect, dest_surface, dest_rect )
+	.return()
 .end
 
 =item surface()
@@ -394,16 +392,14 @@ to use this directly.
 
 =cut
 
-.sub surface method
+.sub surface :method
 	.local int offset
 	classoffset offset, self, 'SDL::Surface'
 
 	.local pmc surface
 	getattribute surface, self, offset
 
-	.pcc_begin_return
-		.return surface
-	.pcc_end_return
+	.return( surface )
 .end
 
 =item color_key( color )
@@ -413,7 +409,7 @@ if I add flag options.
 
 =cut
 
-.sub color_key method
+.sub color_key :method
 	.param pmc color
 
 	.local int color_value
@@ -437,7 +433,7 @@ Returns the bitdepth of the current surface.
 
 =cut
 
-.sub bpp method
+.sub bpp :method
 	.local pmc surface
 	surface = self.'surface'()
 
@@ -445,9 +441,7 @@ Returns the bitdepth of the current surface.
 
 	bpp    = surface[ 'format'; 'BitsPerPixel' ]
 
-	.pcc_begin_return
-		.return bpp
-	.pcc_end_return
+	.return( bpp )
 .end
 
 =item lock()
@@ -458,7 +452,7 @@ while you hold the lock.
 
 =cut
 
-.sub lock method
+.sub lock :method
 	.local pmc surface
 	surface = self.'surface'()
 
@@ -467,8 +461,7 @@ while you hold the lock.
 
 	LockSurface( surface )
 
-	.pcc_begin_return
-	.pcc_end_return
+	.return()
 .end
 
 =item unlock()
@@ -477,7 +470,7 @@ Unlocks the surface after you've finished raw pixel operations.
 
 =cut
 
-.sub unlock method
+.sub unlock :method
 	.local pmc surface
 	surface = self.'surface'()
 
@@ -486,8 +479,7 @@ Unlocks the surface after you've finished raw pixel operations.
 
 	UnlockSurface( surface )
 
-	.pcc_begin_return
-	.pcc_end_return
+	.return()
 .end
 
 =item draw_pixel( x, y, color )
@@ -503,7 +495,7 @@ heart.
 
 =cut
 
-.sub draw_pixel method
+.sub draw_pixel :method
 	.param int x
 	.param int y
 	.param int raw_color
@@ -539,7 +531,7 @@ surface.
 
 =cut
 
-.sub convert_red method
+.sub convert_red :method
 	.local pmc surface
 	.local int rloss
 	.local int rshift
@@ -548,10 +540,7 @@ surface.
 	rloss    = surface[ 'format'; 'Rloss'  ]
 	rshift   = surface[ 'format'; 'Rshift' ]
 
-	.pcc_begin_return
-		.return rloss
-		.return rshift
-	.pcc_end_return
+	.return( rloss, rshift )
 .end
 
 =item convert_green()
@@ -561,7 +550,7 @@ surface.
 
 =cut
 
-.sub convert_green method
+.sub convert_green :method
 	.local pmc surface
 	.local int gloss
 	.local int gshift
@@ -570,10 +559,7 @@ surface.
 	gloss    = surface[ 'format'; 'Gloss'  ]
 	gshift   = surface[ 'format'; 'Gshift' ]
 
-	.pcc_begin_return
-		.return gloss
-		.return gshift
-	.pcc_end_return
+	.return( gloss, gshift )
 .end
 
 =item convert_blue()
@@ -583,7 +569,7 @@ surface.
 
 =cut
 
-.sub convert_blue method
+.sub convert_blue :method
 	.local pmc surface
 	.local int bloss
 	.local int bshift
@@ -592,10 +578,7 @@ surface.
 	bloss    = surface[ 'format'; 'Bloss'  ]
 	bshift   = surface[ 'format'; 'Bshift' ]
 
-	.pcc_begin_return
-		.return bloss
-		.return bshift
-	.pcc_end_return
+	.return( bloss, bshift )
 .end
 
 =back
@@ -608,6 +591,6 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, The Perl Foundation.
+Copyright (c) 2004, 2006 The Perl Foundation.
 
 =cut

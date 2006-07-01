@@ -55,15 +55,10 @@ All SDL::Font objects have the following methods:
 	addattribute font_class, 'font'
 	addattribute font_class, 'size'
 
-	.local pmc initializer
-	initializer = new .String
-	initializer = '_BUILD'
-
-	setprop      font_class, 'BUILD', initializer
-
+	.return()
 .end
 
-=item _BUILD( font_args )
+=item init( font_args )
 
 Given a C<Hash> containing arguments, set the attributes of this font.  The
 keys of this hash are C<font_file> and C<point_size>, two strings containing
@@ -74,7 +69,7 @@ The name of this method may change.
 
 =cut
 
-.sub _BUILD method
+.sub _BUILD :method
 	.param pmc    args
 
 	.local string font_name
@@ -111,7 +106,7 @@ Whew.
 
 =cut
 
-.sub draw method
+.sub draw :method
 	.param string text
 	.param pmc    color_pmc
 	.param pmc    screen
@@ -156,7 +151,7 @@ C<SDL::Surface> containing the rendered font.
 
 =cut
 
-.sub render_text method
+.sub render_text :method
 	.param string text
 	.param pmc    color_pmc
 
@@ -180,9 +175,7 @@ C<SDL::Surface> containing the rendered font.
 
 	font_surface.'wrap_surface'( font_surface_struct )
 
-	.pcc_begin_return
-		.return font_surface
-	.pcc_end_return
+	.return( font_surface )
 .end
 
 =item font()
@@ -193,16 +186,14 @@ in which case why not send me a patch?
 
 =cut
 
-.sub font method
+.sub font :method
 	.local int offset
 	classoffset offset, self, 'SDL::Font'
 
 	.local pmc font
 	getattribute font, self, offset
 
-	.pcc_begin_return
-		.return font
-	.pcc_end_return
+	.return( font )
 .end
 
 =item point_size( [ new_size ] )
@@ -212,7 +203,7 @@ argument is an integer and is optional.
 
 =cut
 
-.sub point_size method
+.sub point_size :method
 	.param int new_size
 
 	.local int size
@@ -235,9 +226,7 @@ getter:
 	getattribute size_value, self, offset
 	size = size_value
 
-	.pcc_begin_return
-		.return size
-	.pcc_end_return
+	.return( size )
 .end
 
 =back

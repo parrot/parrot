@@ -58,7 +58,7 @@ The stopwatch will be drawn onto the specified screen.
 
 =cut
 
-.sub __init method
+.sub __init :method
     .param pmc screen
 
     $I0 = classoffset self, 'SDL::StopWatch'
@@ -90,7 +90,7 @@ Resets the stopwatch.
 
 =cut
 
-.sub reset method
+.sub reset :method
     .local pmc total
     .local pmc precision
     .local pmc start
@@ -113,7 +113,7 @@ Starts the stopwatch.
 
 =cut
 
-.sub start method
+.sub start :method
     .local pmc total
     .local pmc precision
     .local pmc start
@@ -143,7 +143,7 @@ Stops the stopwatch.
 
 =cut
 
-.sub stop method
+.sub stop :method
     .local pmc total
     .local pmc precision
     .local pmc start
@@ -183,7 +183,7 @@ reciprocal of the precision value.
 
 =cut
 
-.sub current_time method
+.sub current_time :method
     .local pmc total
     .local pmc precision
     .local pmc start
@@ -210,10 +210,9 @@ reciprocal of the precision value.
     $N1 = precision
     $N0 /= $N1
     ret = $N0
+
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return( ret )
 .end
 
 =item draw()
@@ -224,7 +223,7 @@ It is drawn onto the screen consigned to the constructor.
 
 =cut
 
-.sub draw method
+.sub draw :method
     $I0 = self.'current_time'()
     
     cmod $I5, $I0, 10
@@ -312,8 +311,7 @@ DISABLE:
     timer[.PARROT_TIMER_RUNNING] = 0
 
 END:
-    .pcc_begin_return
-    .pcc_end_return
+	.return()
 .end
 
 .sub addWatch

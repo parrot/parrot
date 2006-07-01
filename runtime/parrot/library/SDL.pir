@@ -48,6 +48,12 @@ The subsystem initalizers include:
 
 .namespace [ 'SDL' ]
 
+.macro store_nci_func( func_name, signature )
+	c_func_name = prefix . .func_name
+	dlfunc c_function, libsdl, c_func_name, .signature
+	store_global namespace, .func_name, c_function
+.endm
+
 .sub _sdl_init :load
 	_init_video()
 
@@ -103,8 +109,19 @@ OK_HINT1:
 OK_HINT2:
 	printerr "Hint: create a link from libSDL-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
 OK:
-	dlfunc sdl_function, libsdl, 'SDL_Init', 'ii'
-	store_global 'SDL::NCI', 'Init', sdl_function
+	.local string namespace
+	namespace = 'SDL::NCI'
+
+	.local string prefix
+	prefix    = 'SDL_'
+
+	.local string c_func_name
+	.local pmc    c_function
+
+	.store_nci_func( 'Init', 'ii' )
+
+#	dlfunc sdl_function, libsdl, 'SDL_Init', 'ii'
+#	store_global 'SDL::NCI', 'Init', sdl_function
 	dlfunc sdl_function, libsdl, 'SDL_SetVideoMode', 'piiil'
 	store_global 'SDL::NCI', 'SetVideoMode', sdl_function
 	dlfunc sdl_function, libsdl, 'SDL_Quit', 'v'
@@ -689,10 +706,7 @@ build_managed:
 	struct       = new ManagedStruct,   initializer
 
 built_struct:
-
-	.pcc_begin_return
-		.return struct
-	.pcc_end_return
+	.return( struct )
 .end
 
 .sub fetch_layout
@@ -716,9 +730,7 @@ found:
 	layout = layouts[ layout_name ]
 
 found_done:
-	.pcc_begin_return
-		.return layout
-	.pcc_end_return
+	.return( layout )
 .end
 
 =head1 AUTHOR
@@ -729,6 +741,6 @@ list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, The Perl Foundation.
+Copyright (c) 2004, 2006 The Perl Foundation.
 
 =cut

@@ -17,14 +17,7 @@ SDL::Color - Parrot class representing colors in Parrot SDL
 	color = new color_type
 
 	# set the color values; this one's blue
-	.local pmc color_args
-	color_args = new .Hash
-
-	color_args[ 'r' ] =   0
-	color_args[ 'g' ] =   0
-	color_args[ 'b' ] = 255
-
-	color.'_new'( color_args )
+	color.'init'( 'r' => 0, 'g' => 0, 'b' => 255 )
 
 	# fetch the color value to pass directly to SDL functions
 	# (you should never need to do this if the rest of the library works right)
@@ -63,18 +56,11 @@ SDL::Color objects have the following methods:
 	addattribute color_class, 'r'
 	addattribute color_class, 'g'
 	addattribute color_class, 'b'
-
-	.local pmc initializer
-	new initializer, .String
-	initializer = '_new'
-	setprop      color_class, 'BUILD', initializer
-
 .end
 
-=item _new( color_args )
+=item _new( 'r' => xxx, 'g' => xxx, 'b' => xxx )
 
-Initialize the new object with the necessary arguments,  The single argument,
-C<color_args>, should be a C<Hash> PMC containing the following keys:
+Initialize the new object with the necessary arguments, key-value pairs where:
 
 =over 4
 
@@ -95,51 +81,47 @@ is none and 255 is the maximum possible.
 
 =back
 
-The name of this method I<may> change, pending better ideas as discussed on
-p6i.
-
 =cut
 
-.sub _new method
-	.param pmc args
+.sub 'init' :method
+	.param int red   :named( 'r' )
+	.param int green :named( 'g' )
+	.param int blue  :named( 'b' )
 
 	.local int arg_color
 	.local pmc color
-	.local pmc red
-	.local pmc green
-	.local pmc blue
-
-	.local int offset
 
 	color     = new .Integer
-	red       = new .Integer
-	green     = new .Integer
-	blue      = new .Integer
 
-	arg_color = args['r']
-	red       = arg_color
-	arg_color = arg_color << 16
+	arg_color = red << 16
 	add color, arg_color
 
-	arg_color = args['g']
-	green     = arg_color
-	arg_color = arg_color <<  8
+	arg_color = green <<  8
 	add color, arg_color
 
-	arg_color = args['b']
-	blue      = arg_color
+	arg_color = blue
 	add color, arg_color
 
+	.local int offset
 	classoffset offset, self, 'SDL::Color'
 	setattribute self, offset, color
 
+	color = new .Integer
+	color = red
 	inc offset
-	setattribute self, offset, red
-	inc offset
-	setattribute self, offset, green
-	inc offset
-	setattribute self, offset, blue
+	setattribute self, offset, color
 
+	color = new .Integer
+	color = green
+	inc offset
+	setattribute self, offset, color
+
+	color = new .Integer
+	color = blue
+	inc offset
+	setattribute self, offset, color
+
+	.return()
 .end
 
 =item color()
@@ -150,7 +132,7 @@ call those functions directly.
 
 =cut
 
-.sub color method
+.sub color :method
 
 	.local int color
 	.local int offset
@@ -161,9 +143,7 @@ call those functions directly.
 
 	set color, color_value
 
-	.pcc_begin_return
-		.return color
-	.pcc_end_return
+	.return( color )
 .end
 
 =item color_for_surface( surface )
@@ -179,7 +159,7 @@ The name of this method may change.
 
 =cut
 
-.sub color_for_surface method
+.sub color_for_surface :method
 	.param pmc surface
 
 	.local pmc component
@@ -229,9 +209,7 @@ The name of this method may change.
 	shl blue,  shift_bits
 	add color, blue
 
-	.pcc_begin_return
-		.return color
-	.pcc_end_return
+	.return( color )
 .end
 
 =back

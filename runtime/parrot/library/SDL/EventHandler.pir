@@ -19,7 +19,7 @@ SDL::EventHandler - base class for application-specific SDL event handlers
 	subclass class_type, parent_class, 'My::Event::Handler'
 
 	# define your overridden methods
-	.sub key_down_down method
+	.sub key_down_down :method
 		.param pmc event
 		.param pmc event_args
 
@@ -68,30 +68,24 @@ SDL::EventHandler provides the following methods:
 .namespace [ 'SDL::EventHandler' ]
 
 .sub _initialize :load
-
 	.local pmc   handler_class
 
 	newclass     handler_class, 'SDL::EventHandler'
 	addattribute handler_class, 'args'
 
-	.local pmc initializer
-	new initializer, .String
-	set initializer, 'BUILD'
-	setprop handler_class, 'BUILD', initializer
-
+	.return()
 .end
 
 # not documented now; could set default args here
 # maybe nice, maybe not
 
-.sub BUILD method
+.sub 'init' :method
 	.param pmc args
 
 	.local int offset
 	classoffset offset, self, 'SDL::EventHandler'
 
 	setattribute self, offset, args
-
 .end
 
 =item key_down( event, event_args )
@@ -105,7 +99,7 @@ want to override the C<key_down_*> methods instead.
 
 =cut
 
-.sub key_down method
+.sub key_down :method
 	.param pmc event
 	.param pmc event_args
 
@@ -140,7 +134,7 @@ want to override the C<key_up_*> methods instead.
 
 =cut
 
-.sub key_up method
+.sub key_up :method
 	.param pmc event
 	.param pmc event_args
 
@@ -234,19 +228,19 @@ At the very least, you should override C<quit()>.
 
 =cut
 
-.sub active_event method
+.sub active_event :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub mouse_motion method
+.sub mouse_motion :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub mouse_button_down method
+.sub mouse_button_down :method
 	.param pmc event
 	.param pmc event_args
 
@@ -257,103 +251,103 @@ At the very least, you should override C<quit()>.
 
 .end
 
-.sub joy_axis_motion method
+.sub joy_axis_motion :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub joy_ball_motion method
+.sub joy_ball_motion :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub joy_hat_motion method
+.sub joy_hat_motion :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub joy_button_down method
+.sub joy_button_down :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub joy_button_up method
+.sub joy_button_up :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub quit method
+.sub quit :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub sys_wm_event method
+.sub sys_wm_event :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub event_reserved_a method
+.sub event_reserved_a :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub event_reserved_b method
+.sub event_reserved_b :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub video_resize method
+.sub video_resize :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub video_expose method
+.sub video_expose :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub event_reserved_2 method
+.sub event_reserved_2 :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub event_reserved_3 method
+.sub event_reserved_3 :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub event_reserved_4 method
+.sub event_reserved_4 :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub event_reserved_5 method
+.sub event_reserved_5 :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub event_reserved_6 method
+.sub event_reserved_6 :method
 	.param pmc event
 	.param pmc event_args
 
 .end
 
-.sub event_reserved_7 method
+.sub event_reserved_7 :method
 	.param pmc event
 	.param pmc event_args
 

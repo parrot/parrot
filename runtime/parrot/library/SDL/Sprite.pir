@@ -12,28 +12,20 @@ SDL::Sprite - Parrot class representing sprites in Parrot SDL
 
 	# ... load a new SDL::Image into image
 
-	# set the sprite's arguments
-	.local pmc sprite_args
-
-	sprite_args = new .Hash
-	sprite_args[ 'surface'  ] = image
-	sprite_args[ 'source_x' ] =     0
-	sprite_args[ 'source_y' ] =     0
-	sprite_args[ 'dest_x'   ] =   270
-	sprite_args[ 'dest_y'   ] =   212
-	sprite_args[ 'bgcolor'  ] = black
-
-	# if the image has multiple tiles that represent animation frames, set the
-	# width and height of each tile
-	sprite_args[ 'width'    ] =   100
-	sprite_args[ 'height'   ] =    56
-
 	# create a new SDL::Sprite object
 	.local pmc sprite
 	.local int sprite_type
 
 	find_type sprite_type, 'SDL::Sprite'
-	sprite = new sprite_type, sprite_args
+	sprite = new sprite_type
+
+	# set the sprite's arguments
+	sprite.'init'( 'surface'  => image, 'source_x' =>     0, 'source_y' =>     0, 'dest_x'   =>   270, 'dest_y'   =>   212, 'bgcolor'  => black )
+
+
+	# if the image has multiple tiles that represent animation frames, set the
+	# width and height of each tile
+	# 'width'    =>   100, 'height'   =>    56
 
 	# ... draw the sprite to surfaces as you will
 
@@ -71,17 +63,12 @@ A SDL::Sprite object has the following methods:
 	addattribute sprite_class, 'x_velocity'
 	addattribute sprite_class, 'y_velocity'
 
-	.local pmc initializer
-	initializer = new .String
-	set initializer, '_new'
-	setprop sprite_class, 'BUILD', initializer
-
 .end
 
-=item _new( sprite_args )
+=item init( 'arg' => pairs )
 
-Given a C<Hash> full of arguments, sets the attributes of this object.  The
-useful hash keys are as follows:
+Given argument key-value pairs, sets the attributes of this object.  The useful
+keys are as follows:
 
 =over 4
 
@@ -132,119 +119,86 @@ If you don't set this value, this will use the current height of the image.
 B<Note:>  I'm not completely thrilled with these arguments, so they may change
 slightly.
 
-The name of this method may change, as per discussion on p6i.
-
 =cut
 
-.sub _new method
-	.param pmc args
+.sub 'init' :method
+	.param pmc surface  :named( 'surface'  )
+	.param pmc source_x :named( 'source_x' )
+	.param pmc source_y :named( 'source_y' )
+	.param pmc dest_x   :named( 'dest_x'   )
+	.param pmc dest_y   :named( 'dest_y'   )
+	.param pmc bgcolor  :named( 'bgcolor'  )
+	.param pmc width    :named( 'width'    ) :optional
+	.param int has_width                     :opt_flag
+	.param pmc height   :named( 'height'   ) :optional
+	.param int has_height                    :opt_flag
 
-	# set the surface attribute
-	.local pmc surface
-	surface = args[ 'surface' ]
-
-	.local int offset
-	classoffset offset, self, 'SDL::Sprite'
-	setattribute self, offset, surface
-	inc offset
+	setattribute self, 'surface', surface
 
 	# set all of the rect attributes
 	.local int rect_type
 	find_type rect_type, 'SDL::Rect'
 
-	.local int x
-	.local int y
-	.local int height
-	.local int width
-
-	x = args[ 'source_x' ]
-	y = args[ 'source_y' ]
-
-	exists $I0, args[ 'width' ]
-	if $I0 goto width_arg
-
+	if has_width goto set_height
 	width = surface.'width'()
-	goto set_height
-
-width_arg:
-	width = args[ 'width' ]
 
 set_height:
-	exists $I0, args[ 'height' ]
-	if $I0 goto height_arg
-
+	if has_height goto done
 	height = surface.'height'()
-	goto done
-
-height_arg:
-	height = args[ 'height' ]
 
 done:
-	.local pmc rect_args
-	rect_args = new .Hash
-	rect_args[ 'x'      ] = x
-	rect_args[ 'y'      ] = y
-	rect_args[ 'height' ] = height
-	rect_args[ 'width'  ] = width
-
 	# first the source rectangle
 	.local pmc source_rect
 
-	source_rect = new rect_type, rect_args
+	source_rect = new rect_type
+	source_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
 
-	setattribute self, offset, source_rect
-	inc offset
+	setattribute self, 'source_rect', source_rect
 
 	# now the dest rectangle
 	.local pmc rect
+	rect = new rect_type
+	rect.'init'( 'x' => dest_x, 'y' => dest_y )
 
-	x                = args[ 'dest_x' ]
-	y                = args[ 'dest_y' ]
-	rect_args[ 'x' ] = x
-	rect_args[ 'y' ] = y
-
-	rect = new rect_type, rect_args
-
-	setattribute self, offset, rect
-	inc offset
+	setattribute self, 'rect', rect
+	rect = self.'rect'()
 
 	# and now the previous rect
 	.local pmc prev_rect
-	prev_rect = new rect_type, rect_args
+	prev_rect = new rect_type
+	prev_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
 
-	setattribute self, offset, prev_rect
-	inc offset
+	setattribute self, 'prev_rect', prev_rect
 
 	# the background color
-	.local pmc bgcolor
-	bgcolor = args[ 'bgcolor' ]
-	setattribute self, offset, bgcolor
-	inc offset
+	.local pmc bgcolor_pmc
+	bgcolor_pmc = bgcolor
+	setattribute self, 'bgcolor', bgcolor_pmc
 
 	# the drawn rect
 	.local pmc drawn_rect
-	drawn_rect = new rect_type, rect_args
-	setattribute self, offset, drawn_rect
-	inc offset
+	drawn_rect = new rect_type
+	drawn_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
+	setattribute self, 'drawn_rect', drawn_rect
 
 	# the undrawn rect
 	.local pmc undrawn_rect
-	undrawn_rect = new rect_type, rect_args
-	setattribute self, offset, undrawn_rect
-	inc offset
+	undrawn_rect = new rect_type
+	undrawn_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
+	setattribute self, 'undrawn_rect', undrawn_rect
 
 	# and finally the x and y velocities
 	.local pmc x_velocity
 	x_velocity = new .Integer
 	x_velocity = 0
-	setattribute self, offset, x_velocity
-	inc offset
+	setattribute self, 'x_velocity', x_velocity
 
 	.local pmc y_velocity
 	y_velocity = new .Integer
 	y_velocity = 0
-	setattribute self, offset, y_velocity
+	setattribute self, 'y_velocity', y_velocity
 
+	.return()
 .end
 
 =item draw_undraw( surface )
@@ -262,7 +216,7 @@ in the constructor.
 
 =cut
 
-.sub draw_undraw method
+.sub draw_undraw :method
 	.param pmc dest_surface
 
 	.local pmc surface
@@ -303,11 +257,7 @@ in the constructor.
 	prev_rect.'x'( x )
 	prev_rect.'y'( y )
 
-	.pcc_begin_return
-		.return drawn_rect
-		.return undrawn_rect
-	.pcc_end_return
-
+	.return( drawn_rect, undrawn_rect )
 .end
 
 =item draw( surface )
@@ -323,7 +273,7 @@ appear.
 
 =cut
 
-.sub draw method
+.sub draw :method
 	.param pmc dest_surface
 
 	.local pmc surface
@@ -358,16 +308,14 @@ functions.
 
 =cut
 
-.sub surface method
+.sub surface :method
 	.local int offset
 	classoffset offset, self, 'SDL::Sprite'
 
 	.local pmc surface
 	getattribute surface, self, offset
 
-	.pcc_begin_return
-		.return surface
-	.pcc_end_return
+	.return( surface )
 .end
 
 =item source_rect()
@@ -379,7 +327,7 @@ You should never need to call this directly.
 
 =cut
 
-.sub source_rect method
+.sub source_rect :method
 	.local int offset
 	classoffset offset, self, 'SDL::Sprite'
 	add offset, 1
@@ -387,9 +335,7 @@ You should never need to call this directly.
 	.local pmc source_rect
 	getattribute source_rect, self, offset
 
-	.pcc_begin_return
-		.return source_rect
-	.pcc_end_return
+	.return( source_rect )
 .end
 
 =item prev_rect()
@@ -401,7 +347,7 @@ You should never need to call this directly.
 
 =cut
 
-.sub prev_rect method
+.sub prev_rect :method
 	.local int offset
 	classoffset offset, self, 'SDL::Sprite'
 	add offset, 2
@@ -409,9 +355,7 @@ You should never need to call this directly.
 	.local pmc prev_rect
 	getattribute prev_rect, self, offset
 
-	.pcc_begin_return
-		.return prev_rect
-	.pcc_end_return
+	.return( prev_rect )
 .end
 
 =item rect()
@@ -423,17 +367,11 @@ You should never need to call this directly.
 
 =cut
 
-.sub rect method
-	.local int offset
-	classoffset offset, self, 'SDL::Sprite'
-	add offset, 3
-
+.sub rect :method
 	.local pmc rect
-	getattribute rect, self, offset
+	getattribute rect, self, 'rect'
 
-	.pcc_begin_return
-		.return rect
-	.pcc_end_return
+	.return( rect )
 .end
 
 =item bgcolor()
@@ -445,7 +383,7 @@ You should never need to call this directly.
 
 =cut
 
-.sub bgcolor method
+.sub bgcolor :method
 	.local int offset
 	classoffset offset, self, 'SDL::Sprite'
 	add offset, 4
@@ -453,9 +391,7 @@ You should never need to call this directly.
 	.local pmc bgcolor
 	getattribute bgcolor, self, offset
 
-	.pcc_begin_return
-		.return bgcolor
-	.pcc_end_return
+	.return( bgcolor )
 .end
 
 =item drawn_rect()
@@ -468,7 +404,7 @@ suddenly in a brilliant flash of insight.
 
 =cut
 
-.sub drawn_rect method
+.sub drawn_rect :method
 	.local int offset
 	classoffset offset, self, 'SDL::Sprite'
 	add offset, 5
@@ -476,9 +412,7 @@ suddenly in a brilliant flash of insight.
 	.local pmc drawn_rect
 	getattribute drawn_rect, self, offset
 
-	.pcc_begin_return
-		.return drawn_rect
-	.pcc_end_return
+	.return( drawn_rect )
 .end
 
 =item undrawn_rect()
@@ -491,7 +425,7 @@ suddenly in a brilliant flash of insight.
 
 =cut
 
-.sub undrawn_rect method
+.sub undrawn_rect :method
 	.local int offset
 	classoffset offset, self, 'SDL::Sprite'
 	add offset, 6
@@ -499,9 +433,7 @@ suddenly in a brilliant flash of insight.
 	.local pmc undrawn_rect
 	getattribute undrawn_rect, self, offset
 
-	.pcc_begin_return
-		.return undrawn_rect
-	.pcc_end_return
+	.return( undrawn_rect )
 .end
 
 =item x( [ new_x_coordinate ] )
@@ -511,25 +443,21 @@ in pixels.  This is always an integer.
 
 =cut
 
-.sub x method
-	.param int new_x
+.sub x :method
+	.param int new_x  :optional
+	.param int have_x :opt_flag
 
-	.local int param_count
 	.local pmc rect
-
-	param_count = I1
 	rect = self.'rect'()
 
-	if param_count == 0 goto getter
+	if have_x == 0 goto getter
 	rect.'x'( new_x )
 
 getter:
 	.local int result
 	result = rect.'x'()
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =item y( [ new_y_coordinate ] )
@@ -539,25 +467,21 @@ in pixels.  This is always an integer.
 
 =cut
 
-.sub y method
-	.param int new_y
+.sub y :method
+	.param int new_y  :optional
+	.param int have_y :opt_flag
 
-	.local int param_count
 	.local pmc rect
-
-	param_count = I1
 	rect = self.'rect'()
 
-	if param_count == 0 goto getter
+	if have_y == 0 goto getter
 	rect.'y'( new_y )
 
 getter:
 	.local int result
 	result = rect.'y'()
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =item x_velocity( [ new_x_velocity ] )
@@ -568,31 +492,28 @@ Maybe this method shouldn't be here; it may move.
 
 =cut
 
-.sub x_velocity method
-	.param int new_x_vel
+.sub x_velocity :method
+	.param int new_x_vel :optional
+	.param int have_x    :opt_flag
 
 	.local int offset
 	classoffset offset, self, 'SDL::Sprite'
 	add offset, 7
 
 	.local pmc x_vel
-	getattribute x_vel, self, offset
+	getattribute x_vel, self, 'x_velocity'
 
-	.local int param_count
 	.local pmc rect
 
-	param_count = I1
-
-	if param_count == 0 goto getter
+	if have_x == 0 goto getter
 	x_vel = new_x_vel
+	.return( new_x_vel )
 
 getter:
 	.local int result
 	result = x_vel
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =item y_velocity( [ new_y_velocity ] )
@@ -603,7 +524,7 @@ Maybe this method shouldn't be here; it may move.
 
 =cut
 
-.sub y_velocity method
+.sub y_velocity :method
 	.param int new_y_vel
 
 	.local int offset
@@ -625,9 +546,7 @@ getter:
 	.local int result
 	result = y_vel
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =back

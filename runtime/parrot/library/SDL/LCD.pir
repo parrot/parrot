@@ -60,7 +60,7 @@ An SDL::LCD object has the following methods:
 END:
 .end
 
-.sub __init method
+.sub __init :method
     $I0 = classoffset self, "SDL::LCD"
 
     $P0 = new .String
@@ -88,7 +88,7 @@ Adjusts the minimum number of digits to display.
 
 =cut
 
-.sub _digits method
+.sub _digits :method
     .param int val
 
     $I0 = classoffset self, "SDL::LCD"
@@ -103,7 +103,7 @@ Sets the LCD content to display.
 
 =cut
 
-.sub __set_integer_native method
+.sub __set_integer_native :method
     .param int val
 
     $I0 = classoffset self, "SDL::LCD"
@@ -117,7 +117,7 @@ Sets the LCD content to display.
 
 =cut
 
-.sub __set_string_native method
+.sub __set_string_native :method
     .param string val
 
     $I0 = classoffset self, "SDL::LCD"
@@ -131,7 +131,7 @@ Draws the LCD onto the specified screen.
 
 =cut
 
-.sub draw method
+.sub draw :method
     .param pmc screen
     .local string val
     .local int i
@@ -261,7 +261,7 @@ Sets the x position of the LCD.
 
 =cut
 
-.sub xpos method
+.sub xpos :method
     .param int val
     
     $I0 = classoffset self, "SDL::LCD"
@@ -276,7 +276,7 @@ Sets the y position of the LCD.
 
 =cut
 
-.sub ypos method
+.sub ypos :method
     .param int val
     
     $I0 = classoffset self, "SDL::LCD"

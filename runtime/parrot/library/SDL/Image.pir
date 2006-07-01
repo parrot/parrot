@@ -10,17 +10,13 @@ SDL::Image - Parrot class representing images in Parrot SDL
 	# load this library
 	load_bytecode 'library/SDL/Image.pir'
 
-	# set a filename in a PMC
-	.local pmc filename
-	new filename, .String
-	set filename, 'examples/sdl/parrot_small.png'
-
 	# create a new SDL::Image object
 	.local pmc image
 	.local int image_type
 
 	find_type image_type, 'SDL::Image'
-	image = new image_type, filename
+	image = new image_type
+	image.'init'( file => 'examples/sdl/parrot_small.png' )
 
 	# blit and update this object as you like!
 
@@ -55,30 +51,19 @@ An SDL::Image object has the following methods:
 
 	getclass surface_type,        'SDL::Surface'
 	subclass image_class, surface_type, 'SDL::Image'
-
-	.local pmc initializer
-	new initializer, .String
-	set initializer, 'BUILD'
-	setprop image_class, 'BUILD', initializer
 END:
-
+	.return()
 .end
 
-=item BUILD( filename )
+=item init( file => 'xxx' )
 
-Given the string C<filename> containing the path to a file to load, loads the
+Given the string C<file> containing the path to a file to load, loads the
 image.
-
-The name of this method may change, per discussion on p6i.
 
 =cut
 
-.sub BUILD method
-	.param pmc filename_pmc
-
-	# can only pass PMCs implicitly for now
-	.local string filename
-	set filename, filename_pmc
+.sub 'init' :method
+	.param string filename :named( 'file' )
 
 	.local pmc IMG_Load
 	IMG_Load = find_global 'SDL::NCI', 'IMG_Load'
@@ -88,6 +73,8 @@ The name of this method may change, per discussion on p6i.
 	image = IMG_Load( filename )
 
 	self.'wrap_surface'( image )
+
+	.return()
 .end
 
 =back

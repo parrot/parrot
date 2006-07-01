@@ -63,7 +63,7 @@ END:
 
 =cut
 
-.sub __init method
+.sub __init :method
     .param pmc name
     
     $I0 = classoffset self, 'SDL::Button'
@@ -107,7 +107,7 @@ END:
 
 =cut
 
-.sub __set_integer_native method
+.sub __set_integer_native :method
     .param int val
     
     $I0 = classoffset self, 'SDL::Button'
@@ -120,21 +120,20 @@ END:
 
 =cut
 
-.sub __get_integer method
+.sub __get_integer :method
     $I0 = classoffset self, 'SDL::Button'
     inc $I0
     $P0 = getattribute self, $I0
     $I0 = $P0
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+
+    .return( $I0 )
 .end
 
 =item states( count )
 
 =cut
 
-.sub states method
+.sub states :method
     .param int count
     
     $I0 = classoffset self, 'SDL::Button'
@@ -147,7 +146,7 @@ END:
 
 =cut
 
-.sub pos method
+.sub pos :method
     .param int x
     .param int y
 
@@ -163,7 +162,7 @@ END:
 
 =cut
 
-.sub size method
+.sub size :method
     .param int w
     .param int h
 
@@ -179,7 +178,7 @@ END:
 
 =cut
 
-.sub draw method
+.sub draw :method
     .param pmc screen
     .local pmc image
     .local int status
@@ -231,7 +230,7 @@ END:
 
 =cut
 
-.sub click method
+.sub click :method
     .param int x
     .param int y
     .param int b
@@ -274,21 +273,17 @@ OUT:
     clicked = 0
 
 OK:
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return( 1 )
 
 END:
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return( 0 )
 .end
 
 =item raise( arg )
 
 =cut
 
-.sub raise method
+.sub raise :method
     .param pmc arg
     .local int status
     .local pmc action
@@ -311,7 +306,7 @@ END:
 
 =cut
 
-.sub setAction method
+.sub setAction :method
     .param int status
     .param pmc cb
     .local pmc action

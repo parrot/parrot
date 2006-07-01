@@ -31,8 +31,7 @@ This library declares the following constants:
 	# load the constants
 	_load_key_names()
 
-	.pcc_begin_return
-	.pcc_end_return
+	.return()
 .end
 
 =item * SDL::Constant::key_names
@@ -289,8 +288,7 @@ For example, C<8> corresponds to C<backspace>.
 	key_names[ 321 ] = 'euro'
 	key_names[ 322 ] = 'undo'
 
-	.pcc_begin_return
-	.pcc_end_return
+	.return()
 .end
 
 =back

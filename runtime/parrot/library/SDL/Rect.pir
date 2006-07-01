@@ -17,17 +17,8 @@ SDL::Rect - Parrot class representing rectangles in Parrot SDL
 	find_type rect_type, 'SDL::Rect'
 	rect = new rect_type
 
-	# set some arguments for this SDL::Rect
-	.local pmc rect_args
-
-	new rect_args, .Hash
-	rect_args[ 'x'      ] = 270
-	rect_args[ 'y'      ] = 190
-	rect_args[ 'height' ] = 100
-	rect_args[ 'width'  ] = 100
-
 	# now set the arguments on the object
-	rect.'_new'( rect_args )
+	rect.'init'( 'x' => 270, 'y' => 190, 'height' => 100, 'width'=> 100 )
 
 	# ... and blit to or fill surfaces with this object!
 
@@ -56,18 +47,14 @@ An SDL::Rect object has the following methods:
 	newclass     rect_class, 'SDL::Rect'
 	addattribute rect_class, '_rect'
 
-	.local pmc initializer
-	new initializer, .String
-	initializer = '_new'
-	setprop      rect_class, 'BUILD', initializer
 END:
-
+	.return ()
 .end
 
-=item _new( rect_args )
+=item init( arg => value )
 
-Given a C<Hash> of arguments, sets the attributes of this object.  The hash
-has the following keys:
+Given a list of key-value pairs, sets the attributes of this object.  The keys
+are:
 
 =over 4
 
@@ -95,10 +82,32 @@ The name of this method may change, as per discussion on p6i.
 
 =cut
 
-.sub _new method
-	.param pmc args :optional
-	.param int argc :opt_flag
+.sub 'init' :method
+	.param int x      :named( 'x' ) :optional
+	.param int y      :named( 'y' ) :optional
+	.param int width  :named( 'width' ) :optional
+	.param int height :named( 'height' ) :optional
+	.param int have_x      :opt_flag
+	.param int have_y      :opt_flag
+	.param int have_width  :opt_flag
+	.param int have_height :opt_flag
 
+	if have_x goto check_y
+	x = 0
+
+  check_y:
+	if have_y goto check_width
+	y = 0
+
+  check_width:
+	if have_width goto check_height
+	width = 0
+
+  check_height:
+	if have_height goto check_done
+	height = 0
+
+  check_done:
 	.local pmc  fetch_layout
 	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
 
@@ -108,37 +117,16 @@ The name of this method may change, as per discussion on p6i.
 	.local pmc rect
 	new rect, .ManagedStruct, layout
 
-	.local int height
-	.local int width
-	.local int x
-	.local int y
-
-	if argc == 0 goto ZEROS
-	
-	set height, args['height']
 	set rect['height'], height
-
-	set width, args['width']
 	set rect['width'], width
-
-	set x, args['x']
 	set rect['x'], x
-
-	set y, args['y']
 	set rect['y'], y
-	branch DONE
 
-ZEROS:
-	set rect['height'], 0
-	set rect['width'], 0
-	set rect['x'], 0
-	set rect['y'], 0
-
-DONE:
 	.local int offset
 	classoffset  offset,   self, 'SDL::Rect'
 	setattribute   self, offset, rect
 
+	.return()
 .end
 
 =item rect()
@@ -148,16 +136,14 @@ call this directly, unless you're using raw SDL functions.
 
 =cut
 
-.sub rect method
+.sub rect :method
 	.local pmc rect 
 	.local int offset
 
 	classoffset  offset, self, 'SDL::Rect'
 	getattribute   rect, self, offset
 
-	.pcc_begin_return
-		.return rect
-	.pcc_end_return
+	.return( rect )
 .end
 
 =item height()
@@ -167,7 +153,7 @@ the value.
 
 =cut
 
-.sub height method
+.sub height :method
 	.param int new_height     :optional
 	.param int has_new_height :opt_flag
 
@@ -182,9 +168,7 @@ the value.
 getter:
 	result           = rect[ 'height' ]
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =item width()
@@ -194,7 +178,7 @@ value.
 
 =cut
 
-.sub width method
+.sub width :method
 	.param int new_width     :optional
 	.param int has_new_width :optional
 
@@ -209,9 +193,7 @@ value.
 getter:
 	result          = rect[ 'width' ]
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =item x( [ new_x_coordinate ] )
@@ -221,7 +203,7 @@ integer.
 
 =cut
 
-.sub x method
+.sub x :method
 	.param int new_x     :optional
 	.param int has_new_x :opt_flag
 
@@ -246,7 +228,7 @@ integer.
 
 =cut
 
-.sub y method
+.sub y :method
 	.param int new_y     :optional
 	.param int has_new_y :opt_flag
 
@@ -261,9 +243,7 @@ _getter:
 	.local int result
 	result         = rect[ 'y' ]
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =back

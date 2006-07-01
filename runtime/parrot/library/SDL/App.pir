@@ -62,7 +62,7 @@ The SDL::App object has the following methods:
 
 .namespace [ 'SDL::App' ]
 
-.sub _initialize @LOAD 
+.sub _initialize :load
 
 	.include 'datatypes.pasm'
 	load_bytecode 'library/SDL.pir'
@@ -78,17 +78,13 @@ The SDL::App object has the following methods:
 	addattribute app_class, 'flags'
 	addattribute app_class, 'surface'
 
-	.local pmc initializer
-	new initializer, .String
-	initializer = '_new'
-	setprop      app_class, 'BUILD', initializer
-
+	.return()
 .end
 
-=item _new( app_args )
+=item init( [ width => xxx ], [ height => xxx ], [ bpp => xx ], [ flags => xx ])
 
-Initialize the new object with the necessary arguments.  The single argument,
-C<app_args>, should be a C<Hash> PMC containing the following keys:
+Initialize the new object with the necessary arguments.  The named arguments
+areas follows:
 
 =over 4
 
@@ -114,26 +110,13 @@ about the interface here.
 
 =back
 
-This method returns an C<SDL::Surface> object representing the main surface.
-Keep track of it; draw into it and update or flip it if you want to see
-anything.
-
-The name of this method I<may> change, pending better ideas discussed on p6i.
-
 =cut
 
-.sub _new method
-	.param pmc args
-
-	.local int width
-	.local int height
-	.local int bpp
-	.local int flags
-
-	width  = args[ 'width'  ]
-	height = args[ 'height' ]
-	bpp    = args[ 'bpp'    ]
-	flags  = args[ 'flags'  ]
+.sub 'init' :method
+	.param int width  :named('width')
+	.param int height :named('height')
+	.param int bpp    :named('bpp')
+	.param int flags  :named('flags')
 
 	.local pmc SetVideoMode
 	SetVideoMode = find_global 'SDL::NCI', 'SetVideoMode'
@@ -179,6 +162,7 @@ The name of this method I<may> change, pending better ideas discussed on p6i.
 	inc offset
 	setattribute self, offset, main_surface
 
+	.return()
 .end
 
 =item surface()
@@ -187,7 +171,7 @@ Returns the main surface.  This is an L<SDL::Surface>.
 
 =cut
 
-.sub surface method
+.sub surface :method
 	.local pmc surface
 	.local int offset
 
@@ -195,9 +179,7 @@ Returns the main surface.  This is an L<SDL::Surface>.
 	add offset, 4
 	getattribute surface, self, offset
 
-	.pcc_begin_return
-		.return surface
-	.pcc_end_return
+	.return( surface )
 .end
 
 =item quit()
@@ -207,7 +189,7 @@ this.
 
 =cut
 
-.sub quit method
+.sub quit :method
 	.local pmc SDL_Quit
 	SDL_Quit = find_global 'SDL::NCI', 'Quit'
 	SDL_Quit()
@@ -220,7 +202,7 @@ L<SDL::Surface>.
 
 =cut
 
-.sub height method
+.sub height :method
 	.local pmc height
 	.local int offset
 	.local int result
@@ -229,9 +211,7 @@ L<SDL::Surface>.
 	getattribute height, self, offset
 	set result, height
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =item width()
@@ -241,7 +221,7 @@ L<SDL::Surface>.
 
 =cut
 
-.sub width method
+.sub width :method
 	.local pmc width
 	.local int offset
 	.local int result
@@ -251,9 +231,7 @@ L<SDL::Surface>.
 	getattribute width, self, offset
 	set result, width
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =item bpp()
@@ -262,7 +240,7 @@ Returns the bit depth of the main window, in pixels.
 
 =cut
 
-.sub bpp method
+.sub bpp :method
 	.local pmc bpp
 	.local int offset
 	.local int result
@@ -272,9 +250,7 @@ Returns the bit depth of the main window, in pixels.
 	getattribute bpp, self, offset
 	set result, bpp
 
-	.pcc_begin_return
-		.return result
-	.pcc_end_return
+	.return( result )
 .end
 
 =back
