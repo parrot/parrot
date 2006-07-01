@@ -244,8 +244,6 @@ a NameSpace or a var, the NameSpace is returned.
             return ns;
         }
         n = VTABLE_elements(INTERP, key);
-        if (!n)
-            return PMCNULL;
         for (i = 0; i < n; ++i) {
             part = VTABLE_get_string_keyed_int(INTERP, key, i);
             ns = VTABLE_get_pmc_keyed_str(INTERP, ns, part);

@@ -81,19 +81,21 @@ Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
     switch (ns->vtable->base_type) {
         case enum_class_String:
             return Parrot_find_global(interpreter, PMC_str_val(ns), name);
-        case enum_class_Key:
-            globals = Parrot_get_ctx_HLL_namespace(interpreter);
-            ns = VTABLE_get_pmc_keyed(interpreter, globals, ns);
-            if (PMC_IS_NULL(ns))
-                return NULL;
-            /* fall through */
         case enum_class_NameSpace:
             res = VTABLE_get_pointer_keyed_str(interpreter, ns, name);
             if (PMC_IS_NULL(res))
                 return NULL;
             return res;
     }
-    return NULL;
+    /* Keys and Arrays */
+    globals = Parrot_get_ctx_HLL_namespace(interpreter);
+    ns = VTABLE_get_pmc_keyed(interpreter, globals, ns);
+    if (PMC_IS_NULL(ns))
+        return NULL;
+    res = VTABLE_get_pointer_keyed_str(interpreter, ns, name);
+    if (PMC_IS_NULL(res))
+        return NULL;
+    return res;
 }
 
 PMC *
