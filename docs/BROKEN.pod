@@ -23,6 +23,14 @@ Ways to emulate these would be nice too.
 
 =item * Submethods
 
+=item * ParrotIO objects that work on strings
+
+It should be possible to redirect input from and output to ParrotIO objects
+that don't actually perform IO, instead working with memory.  Unfortunately, it
+looks like there are no vtable methods for read and write operations.
+
+See the C<setstdout> and C<setstderr> ops.
+
 =back
 
 =head2 Broken Features
