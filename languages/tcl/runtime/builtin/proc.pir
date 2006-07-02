@@ -15,12 +15,13 @@ Create a PIR sub on the fly for this user defined proc.
 
   if argc != 3 goto error
 
-  .local string name
+  .local string full_name
+  .local pmc name
   .local pmc args_p
   .local pmc body_p
-  name   = argv[0]
-  args_p = argv[1]
-  body_p = argv[2]
+  full_name = argv[0]
+  args_p    = argv[1]
+  body_p    = argv[2]
 
   .local pmc retval
 
@@ -47,26 +48,26 @@ got_args:
 
   # Save the code for the proc for [info body]
   .get_from_HLL($P1, '_tcl', 'proc_body')
-  $P1[name] = body_p
+  $P1[full_name] = body_p
 
   # Save the args for the proc for [info body]
   # XXX When dealing with defaults, this will have to be updated.
   .get_from_HLL($P1, '_tcl', 'proc_args')
-  $P1[name] = args_p
+  $P1[full_name] = args_p
 
   .local string namespace
   namespace = ""
-  if name == "" goto empty
+  if full_name == "" goto empty
   
-  .local pmc split, p6rule, regex
-  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
-  p6rule = compreg "PGE::P6Regex"
-  regex  = p6rule('\:\:+')
-
-  $P0  = split(regex, name)
-  name = pop $P0
+  .local pmc __namespace
+  .get_from_HLL(__namespace, '_tcl', '__namespace')
+  ($P0, name) = __namespace(full_name)
+  
   $I0 = elements $P0
   if $I0 == 0 goto empty
+  $P1 = get_namespace $P0
+  if null $P1 goto unknown_namespace
+  
   namespace = join "'; '", $P0
   namespace = "['" . namespace
   namespace .= "']"
@@ -204,6 +205,12 @@ END_PIR
 
   .return ("")
 
+unknown_namespace:
+  $S0 = "can't create procedure \""
+  $S0 .= full_name
+  $S0 .= '": unknown namespace'
+  .throw($S0)
+  
 error:
   .throw ("wrong # args: should be \"proc name args body\"\n")
 
