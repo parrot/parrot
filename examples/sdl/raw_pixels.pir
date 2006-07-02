@@ -19,56 +19,39 @@ To run this file, run the following command from the Parrot directory:
 	load_bytecode "library/SDL/Rect.pir"
 	load_bytecode "library/SDL/Color.pir"
 
-	# arguments for the SDL::App constructor
-	.local pmc args
-	args             = new .Hash
-	args[ 'height' ] = 480
-	args[ 'width'  ] = 640
-	args[ 'bpp'    ] =   0
-	args[ 'flags'  ] =   1
 
 	# create an SDL::App object
 	.local pmc app
 	.local int app_type
 
 	find_type app_type, 'SDL::App'
-	app = new app_type, args
+	app = new app_type
+	app.'init'( 'height' => 480, 'width' => 640, 'bpp' => 0, 'flags' => 1 )
 
 	# fetch the SDL::Surface representing the main window
 	.local pmc main_screen
 	main_screen = app.'surface'()
 
-	args             = new .Hash
-	args[ 'height' ] = 480
-	args[ 'width'  ] = 640
-	args[ 'x'    ]   =   0
-	args[ 'y'  ]     =   0
 
 	# create an SDL::Rect representing the entire main screen
 	.local pmc rect
 	.local int rect_type
 	find_type  rect_type, 'SDL::Rect'
-	rect = new rect_type, args
+	rect = new rect_type
+	rect.'init'( 'height' => 480, 'width' => 640, 'x' => 0, 'y' => 0 )
 
 	.local int color_type
 	find_type  color_type, 'SDL::Color'
 
 	# create a white color to paint the background; make new pixels show up
-	args        = new .Hash
-	args[ 'r' ] = 255
-	args[ 'g' ] = 255
-	args[ 'b' ] = 255
-
 	.local pmc white
-	white = new color_type, args
+	white = new color_type
+	white.'init'( 'r' => 255, 'g' => 255, 'b' => 255 )
 
 	# create a blue color to paint the new pixels
-	args[ 'r' ] =   0
-	args[ 'g' ] =   0
-	args[ 'b' ] = 255
-
 	.local pmc blue
-	blue = new color_type, args
+	blue = new color_type
+	blue.'init'( 'r' => 0, 'g' => 0, 'b' => 255 )
 
 	# draw the background
 	main_screen.'fill_rect'( rect, white )
@@ -116,8 +99,8 @@ loop_end:
 
 chromatic, E<lt>chromatic at wgz dot orgE<gt>.
 
-=head1 COPYRIGHt
+=head1 COPYRIGHT
 
-Copyright (C) 2004, The Perl Foundation.
+Copyright (c) 2004 - 2006, The Perl Foundation.
 
 =cut
