@@ -8,11 +8,10 @@ src/io/io.c - Generic IO
 
 =head1 DESCRIPTION
 
-The Parrot IO subsystem uses a per-interpreter stack to provide a
-layer-based approach to IO. Each layer implements a subset of the
-C<ParrotIOLayerAPI> vtable. To find an IO function the layer
-stack is searched downwards until a non-C<NULL> function pointer
-is found for that particular slot.
+The Parrot IO subsystem uses a per-interpreter stack to provide a layer-based
+approach to IO. Each layer implements a subset of the C<ParrotIOLayerAPI>
+vtable. To find an IO function, Parrot searches the layer stack downwards until
+it finds a non-C<NULL> function pointer for that particular slot.
 
 This file implements the generic functionality. Specific layers are in
 separate files: F<src/io/io_buf.c>, F<src/io/io_stdio.c>, F<src/io/io_unix.c>,
@@ -76,17 +75,29 @@ new_io_pmc(theINTERP, ParrotIO *io)
 
 =item C<STRING *PIO_make_io_string(Interp *, STRING **buf, size_t default_len)>
 
-Create a STRING* suitable for returning results from IO read functions.
-The passed in C<buf> parameter can be either:
+Creates a STRING* suitable for returning results from IO read functions.
+The passed in C<buf> parameter can:
 
-  1) Point to a NULL STRING
-  2) Point to a real STRING
-  3) Point to a fake STRING with (strstart, bufused) holding the *buffer
-     information.
+=over
 
-In case 3) the buffer or STRING must be able to hold the required
-amount of data. For case 1) or 2) with a NULL strstart the STRING memory
-gets allocated.
+=item 1
+
+Point to a NULL STRING
+
+=item 2
+
+Point to a real STRING
+
+=item 3
+
+Point to a fake STRING with (strstart, bufused) holding the *buffer
+information.
+
+=back
+
+In the third case, the buffer or STRING must be able to hold the required
+amount of data. For cases 1 and 2, a NULL C<strstart> tells this function to
+allocate the STRING memory.
 
 =cut
 
@@ -115,8 +126,10 @@ PIO_make_io_string(Interp *interpreter, STRING **buf, size_t len)
 =item C<ParrotIOTable
 alloc_pio_array(int numhandles)>
 
-Called in C<PIO_init()> to allocate an interpreter's IO handle table
-with room for C<numhandles> IO handles.
+Allocates an interpreter's IO handle table with room for C<numhandles> IO
+handles.
+
+Called from C<PIO_init()>.
 
 =cut
 
@@ -134,7 +147,7 @@ alloc_pio_array(int numhandles)
 =item C<int
 realloc_pio_array(ParrotIOTable *table, int numhandles)>
 
-Unimplemented. Simply returns C<-1>.
+Unimplemented; returns C<-1>.
 
 =cut
 
@@ -153,7 +166,7 @@ realloc_pio_array(ParrotIOTable *table, int numhandles)
 =item C<ParrotIO *
 PIO_new(theINTERP, INTVAL iotype, INTVAL flags, INTVAL mode)>
 
-Create a new IO stream.
+Creates a new IO stream.
 
 The values of C<flags> and C<mode> are set in the returned C<ParrotIO>.
 
@@ -186,7 +199,7 @@ PIO_new(theINTERP, INTVAL iotype, INTVAL flags, INTVAL mode)
 =item C<void
 PIO_destroy(theINTERP, PMC *pmc)>
 
-Destroying the IO stream at the moment only frees the memory and removes
+Destroys the IO stream.  At the moment, this only frees the memory and removes
 the pointers from the PMC.
 
 =cut
@@ -239,8 +252,9 @@ PIO_destroy(theINTERP, PMC *pmc)
 =item C<void
 PIO_init(theINTERP)>
 
-This is called when creating an interpreter to set up its layer stack
-and creates the C<STD*> handles.
+Sets up the interpreter's layer stack and creates the C<STD*> handles.
+
+Called when creating an interpreter.
 
 =cut
 
@@ -294,8 +308,8 @@ PIO_init(theINTERP)
 =item C<void
 PIO_finish(theINTERP)>
 
-Called when the interpreter is being destroyed to close down its IO
-resourses.
+Closes the interpreter's IO resourses.  Called during its interpreter
+destruction.
 
 =cut
 
@@ -310,7 +324,7 @@ PIO_finish(theINTERP)
     ParrotIO *io;
     int i;
 
-    /* When here, the PMC arena is already destructed, these PMCs
+    /* When here, the PMC arena is already destroyed, these PMCs
      * aren't usable any more.
      * But ParrotIO::destroy should have flushed/closed all PIOs
      * already. If that's not quite true, we have to separate IO subsys
@@ -364,7 +378,7 @@ PIO_internal_shutdown(theINTERP)
 =item C<INTVAL
 PIO_init_stacks(theINTERP)>
 
-Initialize the interpreter's default IO stack by pushing on the IO
+Initializes the interpreter's default IO stack by pushing on the IO
 layers (OS-specific first).
 
 =cut
@@ -446,7 +460,7 @@ PIO_base_init(theINTERP, ParrotIOLayer *l)>
 Init routine called once for each layer at interpreter creation time.
 This is similar to a Perl module C<INIT {}> block.
 
-This default implementation does nothing. Returns C<0>.
+This default implementation does nothing and returns C<0>.
 
 =cut
 
@@ -553,7 +567,7 @@ PIO_parse_open_flags(const char *flagstr)
 =item C<INTVAL
 PIO_peek(theINTERP, PMC *pmc, void *buffer)>
 
- Iterate down the stack to the first layer implementing "Peek" API
+Iterates down the stack to the first layer implementing "Peek" API.
 
 =cut
 
@@ -576,15 +590,14 @@ PIO_peek(theINTERP, PMC *pmc, STRING **buffer)
 =item C<INTVAL
 PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)>
 
-General purpose interface for manipulation of IO objects and
-layer attributes.
+General purpose interface for manipulating IO objects and layer attributes.
 
 Refer to the C<PIOCTL*> values in F<include/parrot/io.h>.
 
-All "set" operations return C<0> on success and a negative value on
-error. "get" operations will use the return value as the value
-requested, but should always be C<< >= 0 >>. A negative value indicates an
-error. This may be too limited but we will see. --Melvin
+All C<set> operations return C<0> on success and a negative value on error.
+C<get> operations use the return value as the value requested, but should
+always be C<< >= 0 >>. A negative value indicates an error. This may be too
+limited, but we will see. --Melvin
 
 =cut
 
@@ -756,7 +769,7 @@ PIO_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, const char *sflags)
 =item C<INTVAL
 PIO_close(theINTERP, PMC *pmc)>
 
-Flushes, closes and destroys the C<ParrotIO> PMC C<*pmc>.
+Flushes, closes, and destroys the C<ParrotIO> PMC C<*pmc>.
 
 =cut
 
@@ -809,7 +822,7 @@ Return a new C<STRING*> holding up to C<len> bytes.
 =item C<INTVAL
 PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)>
 
-Reads up to C<len> bytes from C<*pmc> and copys them into C<*buffer>.
+Reads up to C<len> bytes from C<*pmc> and copies them into C<*buffer>.
 
 =cut
 
@@ -990,7 +1003,7 @@ void *Parrot_utf8_encode(void *ptr, UINTVAL c);
 =item C<INTVAL
 PIO_putps(theINTERP, PMC *pmc, STRING *s)>
 
-Writes C<*s> tp C<*pmc>. Parrot string version.
+Writes C<*s> to C<*pmc>. Parrot string version.
 
 =cut
 
@@ -1324,9 +1337,9 @@ PIO_poll(theINTERP, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec)
 =item C<PMC *
 PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto)>
 
-Creates and returns a socket using the specified address family, socket
-type and protocol number. The returned PMC has to be checked with a
-boolean test to see whether the socket was successfully created.
+Creates and returns a socket using the specified address family, socket type,
+and protocol number. Check the returned PMC with a boolean test to see whether
+the socket was successfully created.
 
 =cut
 
@@ -1350,7 +1363,8 @@ PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto)
 =item C<INTVAL
 PIO_recv(theINTERP, PMC *pmc, STRING **buf)>
 
-Receives a message from the connected socket C<*pmc> in C<*buf>.
+Receives a message from the connected socket C<*pmc> in C<*buf>.  Returns C<-1>
+if it fails.
 
 =cut
 
@@ -1372,7 +1386,7 @@ PIO_recv(theINTERP, PMC *pmc, STRING **buf)
 =item C<INTVAL
 PIO_send(theINTERP, PMC *pmc, STRING *buf)>
 
-Send the message C<*buf> to the connected socket C<*pmc>.
+Sends the message C<*buf> to the connected socket C<*pmc>.  Returns C<-1> if it cannot send the message.
 
 =cut
 
@@ -1394,7 +1408,7 @@ PIO_send(theINTERP, PMC *pmc, STRING *buf)
 =item C<INTVAL
 PIO_connect(theINTERP, PMC *pmc, STRING *address)>
 
-Connect C<*pmc> to C<*address>.
+Connects C<*pmc> to C<*address>.  Returns C<-1> on failure.
 
 =cut
 
@@ -1416,7 +1430,7 @@ PIO_connect(theINTERP, PMC *pmc, STRING *address)
 =item C<INTVAL
 PIO_bind(theINTERP, PMC *pmc, STRING *address)>
 
-Binds C<*pmc>'s socket to the local address and port specified by C<*address>.
+Binds C<*pmc>'s socket to the local address and port specified by C<*address>.  Returns C<-1> on failure.
 
 =cut
 
@@ -1438,7 +1452,7 @@ PIO_bind(theINTERP, PMC *pmc, STRING *address)
 =item C<INTVAL
 PIO_listen(theINTERP, PMC *pmc, INTVAL backlog)>
 
-Listen for new connections on socket C<*pmc>.
+Listens for new connections on socket C<*pmc>.  Returns C<-1> on failure.
 
 =cut
 
@@ -1460,7 +1474,9 @@ PIO_listen(theINTERP, PMC *pmc, INTVAL backlog)
 =item C<INTVAL
 PIO_accept(theINTERP, PMC *pmc)>
 
-Accept a new connection and return a newly created C<ParrotIO> socket.
+Accepts a new connection and returns a newly created C<ParrotIO> socket.
+Returns C<NULL> on failure.
+
 =cut
 
 */
@@ -1471,6 +1487,8 @@ PIO_accept(theINTERP, PMC *pmc)
     ParrotIO *io2;
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data(pmc);
+
+	/* XXX - return NULL or -1 -- c (02 July 2006) */
     if(!io)
         return NULL;
 
@@ -1501,8 +1519,6 @@ PIO_isatty(theINTERP, PMC *pmc)
 
     return (io->flags & PIO_F_CONSOLE) ? 1 : 0;
 }
-
-int PIO_softspace(theINTERP, PMC *pmc, int new);
 
 int
 PIO_softspace(theINTERP, PMC *pmc, int new)
@@ -1538,12 +1554,12 @@ F<io/io_private.h>.
 
 Initially written by Melvin Smith.
 
-Some ideas and goals from Perl5.7 and Nick Ing-Simmons' work.
+Some ideas and goals from Perl 5.7 and Nick Ing-Simmons' work.
 
 =head1 TODO
 
-In future rework to use copy-on-write IO stacks rather than creating a
-new stack for each IO stream.
+Rework to use copy-on-write IO stacks rather than creating a new stack for each
+IO stream.
 
 Add support for loadable layers in Parrot bytecode.
 

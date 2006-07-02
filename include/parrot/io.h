@@ -189,6 +189,7 @@ PARROT_API extern INTVAL PIO_connect(theINTERP, PMC *pmc, STRING *address);
 PARROT_API extern INTVAL PIO_bind(theINTERP, PMC *pmc, STRING *address);
 PARROT_API extern INTVAL PIO_listen(theINTERP, PMC *pmc, INTVAL backlog);
 PARROT_API extern PMC *PIO_accept(theINTERP, PMC *pmc);
+PARROT_API extern int PIO_softspace(theINTERP, PMC *pmc, int new);
 
 
 PARROT_API extern INTVAL PIO_putps(theINTERP, PMC *io, STRING *s);
