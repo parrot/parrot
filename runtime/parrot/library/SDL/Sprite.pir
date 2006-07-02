@@ -496,10 +496,6 @@ Maybe this method shouldn't be here; it may move.
 	.param int new_x_vel :optional
 	.param int have_x    :opt_flag
 
-	.local int offset
-	classoffset offset, self, 'SDL::Sprite'
-	add offset, 7
-
 	.local pmc x_vel
 	getattribute x_vel, self, 'x_velocity'
 
@@ -525,22 +521,15 @@ Maybe this method shouldn't be here; it may move.
 =cut
 
 .sub y_velocity :method
-	.param int new_y_vel
-
-	.local int offset
-	classoffset offset, self, 'SDL::Sprite'
-	add offset, 8
+	.param int new_y_vel :optional
+	.param int have_y    :opt_flag
 
 	.local pmc y_vel
-	getattribute y_vel, self, offset
+	getattribute y_vel, self, 'y_velocity'
 
-	.local int param_count
-	.local pmc rect
-
-	param_count = I1
-
-	if param_count == 0 goto getter
+	if have_y == 0 goto getter
 	y_vel = new_y_vel
+	.return( new_y_vel )
 
 getter:
 	.local int result

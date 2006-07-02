@@ -24,62 +24,39 @@ Use the Escape key or close the window when you've had enough.
 	load_bytecode "library/SDL/EventHandler.pir"
 	load_bytecode "library/SDL/Event.pir"
 
-	.local pmc app_args
-	new app_args, .Hash
-	set app_args[ 'width'  ], 640
-	set app_args[ 'height' ], 480
-	set app_args[ 'bpp'    ],   0
-	set app_args[ 'flags'  ],   0
-
 	.local pmc app
 	.local int app_type
 
 	find_type app_type, 'SDL::App'
-	app = new app_type, app_args
+	app = new app_type
+	app.'init'( 'width' => 640, 'height' => 480, 'bpp' => 0, 'flags' => 0 )
 
 	.local pmc main_screen
 	main_screen = app.'surface'()
-
-	.local pmc color_args
-	color_args = new .Hash
-
-	color_args[ 'r' ] = 0
-	color_args[ 'g' ] = 0
-	color_args[ 'b' ] = 0
 
 	.local pmc black
 	.local int color_type
 
 	find_type color_type, 'SDL::Color'
-	black = new color_type, color_args
+	black = new color_type
+	black.'init'( 'r' => 0, 'g' => 0, 'b' => 0 )
 
 	.local pmc image
 	.local int image_type
-	.local pmc filename
-
-	new filename, .String
-	filename = 'examples/sdl/parrot_small.png'
 
 	find_type image_type, 'SDL::Image'
-	image = new image_type, filename
-
-	.local pmc sprite_args
-	sprite_args = new .Hash
-	sprite_args[ 'surface'  ] = image
-	sprite_args[ 'source_x' ] =     0
-	sprite_args[ 'source_y' ] =     0
-	sprite_args[ 'dest_x'   ] =   270
-	sprite_args[ 'dest_y'   ] =   212
-	sprite_args[ 'bgcolor'  ] = black
+	image = new image_type
+	image.'init'( 'examples/sdl/parrot_small.png' )
 
 	.local pmc sprite
 	.local int sprite_type
 
 	find_type sprite_type, 'SDL::Sprite'
-	sprite = new sprite_type, sprite_args
+	sprite = new sprite_type
+	sprite.'init'( 'surface' => image, 'source_x' => 0, 'source_y' => 0, 'dest_x' => 270, 'dest_y' => 212, 'bgcolor' => black )
 
 	_main_loop( main_screen, sprite )
-
+	end
 .end
 
 .sub _main_loop
@@ -102,6 +79,7 @@ Use the Escape key or close the window when you've had enough.
 
 	find_type event_type, 'SDL::Event'
 	event = new event_type
+	event.'init'()
 
 	.local pmc handler_args
 	handler_args = new .Hash
@@ -204,10 +182,7 @@ neg_y_dir:
 	self.'move_sprite_y'( sprite, -1 )
 
 return:
-	.pcc_begin_return
-		.return updated
-	.pcc_end_return
-
+	.return( updated )
 .end
 
 .sub draw_screen method
@@ -382,6 +357,6 @@ chromatic, E<lt>chromatic at wgz dot orgE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, The Perl Foundation.
+Copyright (c) 2004 - 2006, The Perl Foundation.
 
 =cut

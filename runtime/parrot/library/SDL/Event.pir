@@ -71,9 +71,7 @@ away.
 	.local pmc event
 	new event, .ManagedStruct, layout
 
-	.local int offset
-	classoffset offset, self, 'SDL::Event'
-	setattribute self, offset, event
+	setattribute self, 'event', event
 
 	.return()
 .end
@@ -86,17 +84,16 @@ this directly, unless you're working with raw SDL calls.
 =cut
 
 .sub event :method
-	.param string name :optional
-	.param int argcS   :opt_flag 
+	.param string name      :optional
+	.param int    have_name :opt_flag 
 	
-	.local int offset
-	classoffset offset, self, 'SDL::Event'
-
 	.local pmc event
-	getattribute event, self, offset
+	getattribute event, self, 'event'
 
-	if argcS == 0 goto END
+	if have_name == 1 goto assign_event
+	.return( event )
 
+  assign_event:
 	.local pmc  fetch_layout
 	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
 
@@ -110,11 +107,8 @@ this directly, unless you're working with raw SDL calls.
 	#new event, .ManagedStruct, layout
 	assign event, layout
 
-	.local int offset
-	classoffset offset, self, 'SDL::Event'
-	setattribute self, offset, event
+	setattribute self, 'event', event
 
-END:
 	.return( event )
 .end
 
@@ -306,9 +300,8 @@ Use this method inside your own loop structure.
 	eq event_waiting, 0, return
 
 	self.'dispatch_event'( event, event_handler, handler_args )
-
 return:
-
+	.return()
 .end
 
 =item dispatch_event( event, event_handler, handler_args )
