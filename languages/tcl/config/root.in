@@ -187,7 +187,7 @@ tclsh: $(PARROT) tcl.pbc
 test:	tcl.pbc
 	$(PERL) t/harness
 
-tcl-test: t_tcl
+tcl-test: t_tcl tcl.pbc
 	$(PERL) tools/tcl_harness.pl
 
 t_tcl:
@@ -210,6 +210,8 @@ runtime/builtins.pir \
 "$(PMCDIR)/*$(O)" \
 "t/*.pir" \
 "t/*.tcl" \
+src/tcl_expr_optok.pir \
+src/tcl_expr.pir \
 $(GENERATED_INLINES)
 
 clean:
