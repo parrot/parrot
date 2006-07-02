@@ -58,8 +58,6 @@ got_args:
   namespace = ""
   if name == "" goto empty
   
-  load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pbc'
   .local pmc split, p6rule, regex
   .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
   p6rule = compreg "PGE::P6Regex"
@@ -77,7 +75,7 @@ empty:
   .local pmc proc_body
   proc_body = new 'TclCodeString'
   
-  proc_body.emit(<<"END_PIR", namespace, name)
+  proc_body.emit(<<'END_PIR', namespace, name)
 .HLL 'tcl', 'tcl_group'
 .namespace %0
 .sub '_xxx' :immediate
@@ -87,8 +85,11 @@ empty:
 .sub '&%1' :lex
   .param pmc args :slurpy
   .include 'languages/tcl/src/returncodes.pir'
-  .local pmc epoch
+  .local pmc epoch, p6rule, colons, split
   .get_from_HLL(epoch,'_tcl','epoch')
+  p6rule = compreg "PGE::P6Regex"
+  colons = p6rule('\:\:+')
+  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
 
   .local pmc call_level
   .get_from_HLL(call_level,'_tcl','call_level')

@@ -138,7 +138,7 @@ done_init:
   # If someone wants to generate standalone code only, include
   # The library bits that they'll need.
 
-  stub_code = <<"END_PIR"
+  stub_code = <<'END_PIR'
 # src/compiler.pir :: pir_compiler (1)
 .sub _dynlexload :immediate
 $P1=loadlib 'dynlexpad'
@@ -147,11 +147,15 @@ $P1=loadlib 'dynlexpad'
 .HLL_map .LexPad, .DynLexPad
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon :main
-load_bytecode 'languages/tcl/runtime/tcllib.pbc'
-.include "languages/tcl/src/returncodes.pir"
-.local pmc epoch
-.get_from_HLL(epoch,'_tcl','epoch')
-%s.return ($P%i)
+  load_bytecode 'languages/tcl/runtime/tcllib.pbc'
+  .include "languages/tcl/src/returncodes.pir"
+  .local pmc epoch, p6rule, colons, split
+  .get_from_HLL(epoch,'_tcl','epoch')
+  p6rule = compreg "PGE::P6Regex"
+  colons = p6rule('\:\:+')
+  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+%s
+  .return ($P%i)
 .end
 END_PIR
 
@@ -160,15 +164,19 @@ END_PIR
   # Otherwise, leave out items that will will cause reloading
   # conflicts with the parser itself.
 
-  stub_code = <<"END_PIR"
+  stub_code = <<'END_PIR'
 .HLL 'tcl', 'tcl_group'
 # src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon
 .include "languages/tcl/src/returncodes.pir"
-.local pmc epoch
-.get_from_HLL(epoch,'_tcl','epoch')
-%s.return ($P%i)
+  .local pmc epoch, p6rule, colons, split
+  .get_from_HLL(epoch,'_tcl','epoch')
+  p6rule = compreg "PGE::P6Regex"
+  colons = p6rule('\:\:+')
+  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+%s
+  .return ($P%i)
 .end
 END_PIR
 

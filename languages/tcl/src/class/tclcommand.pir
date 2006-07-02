@@ -120,9 +120,23 @@ dynamic_command:
 
    dynamic .= retval
 
-   dynamic.emit("  $S0 = $P%0", name_register)
-   dynamic.emit("  $S0 = '&' . $S0")
-   dynamic.emit("  .get_from_HLL(command, 'tcl', $S0)")
+   dynamic.emit(<<'END_PIR', label_num, name_register)
+    .local pmc namespace_%0
+    namespace_%0 = split(colons, $P%1)
+    $S0 = ""
+    if $P%1 == "" goto find_%0
+    $S0 = pop namespace_%0
+    $I0 = elements namespace_%0
+    if $I0 != 1 goto find_%0
+    $S1 = namespace_%0[0]
+    if $S1 != "" goto find_%0
+    $S1 = shift namespace_%0
+find_%0:
+    $S0 = '&' . $S0
+    push_eh invalid_%0
+    command = find_global namespace_%0, $S0
+    clear_eh
+END_PIR
    dynamic.emit("  if_null command, invalid_%0", label_num)
    dynamic.emit("  $P%0 = command(%1)", result_num, args)
    dynamic.emit("  goto end_%0", label_num)

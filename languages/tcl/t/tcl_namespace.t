@@ -6,9 +6,6 @@ use Parrot::Test tests => 4;
 use Test::More;
 use vars qw($TODO);
 
-
-TODO: {
-  local $TODO = "unimplemented";
 language_output_is("tcl",<<'TCL',<<'OUT',"command: global explicit");
   ::puts ok
 TCL
@@ -20,7 +17,6 @@ language_output_is("tcl",<<'TCL',<<'OUT',"command: global explicit (extra colons
 TCL
 ok
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<'OUT',"command: all colons");
   proc ::: {} {puts ok}
