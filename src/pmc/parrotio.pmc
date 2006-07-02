@@ -34,8 +34,8 @@ pmclass ParrotIO need_ext {
 
 =item C<METHOD INTVAL say(STRING *s)>
 
-Print the string with newline appended to SELF or to stdout if used
-as class method
+Print the string with an appended newline to SELF or to stdout if used as a
+class method.
 
 =cut
 
@@ -52,7 +52,7 @@ as class method
 
 =item C<METHOD PMC* open(STRING* file, STRING *mode, STRING* layer)>
 
-Open the file with the given mode and use the IO given layer.
+Opens the file with the given mode, using the given IO layer.
 
 =cut
 
@@ -98,23 +98,34 @@ Open the file with the given mode and use the IO given layer.
 
 =item C<METHOD INTVAL set_readline_interactive(INTVAL)>
 
-Set readline interactive mode to the given valie, if PARROT_HAS_READLINE is
-defined, i.e. if the readline library is available. Returns:
+Sets readline interactive mode to the given value, if PARROT_HAS_READLINE is
+defined, that is, if the readline library is available.  The return values are:
 
-  -1 ... readline isn't configured
-  -2 ... file not open/not input or not a tty, if turning on interactive
-  0 / 1  old interactive setting
+=over
+
+=item * -1 
+
+readline isn't configured
+
+=item * -2 
+
+The file is not open/not input or not a tty, if turning on interactive.
+
+=item * 0 / 1 
+
+old interactive setting
+
+=back
 
 =item C<METHOD STRING* readline(STRING* prompt)>
 
-Read a line from the given PIO. If readline is interactive and a prompt
-is not-empty, it will be displayed. The interactive feature is not
+Reads a line from the given PIO. If readline is interactive and a prompt
+is not empty, it will be displayed. The interactive feature is not
 available with the C<readline> opcode (which will be removed anyway).
-In interactive mode non-empty lines are added to the readline history.
+Interactive mode adds non-empty lines to the readline history.
 
-Returns the line without the newline or:
-
-  NULL  ... end of input (e.g. after ^D or end of file)
+Returns the line without the newline or NULL, indicating the end of input (for
+example, after ^D or at the end of the file.)
 
 SYNOPSIS  
 
@@ -203,11 +214,11 @@ Class initialization.
 
 =item C<METHOD INTVAL eof()>
 
-Return 0/1 according to eof state of the object.
+Returns true or false according to the end of file state of the object.
 
 =item C<METHOD void flush()>
 
-Flush pending writes.
+Flushes pending writes.
 
 =item C<METHOD INTVAL setbuf(INTVAL)>
 
@@ -280,8 +291,8 @@ Destroys the IO PMC, flushing and closing as necessary.
 
 Clones the IO PMC.
 
-For now both PMCs refer to the same C<ParrotIO> object. If we have
-different IO layers, we might copy C<data> and C<struct_val>.
+For now, both PMCs refer to the same C<ParrotIO> object. If we have different
+IO layers, we might copy C<data> and C<struct_val>.
 
 =cut
 
@@ -312,10 +323,9 @@ Returns whether at C<EOF> or not.
 
 =item C<STRING* get_string_keyed_int(INTVAL n)>
 
-Return the name of the nth layer. B<n> >= 0 returns layer names up
-from the bottom.
-If B<n> is negative returns layer names from top down. For non-existing
-layers an empty string is returned.
+Returns the name of the nth layer. B<n> >= 0 returns layer names up from the
+bottom.  If B<n> is negative, returns layer names from top down. For
+non-existant layers, returns an empty string.
 
 =cut
 
@@ -348,11 +358,11 @@ layers an empty string is returned.
 
 =item C<void push_string (STRING* value)>
 
-Push the layer name C<value> onto the PIO's layer stack.
+Pushes the layer name C<value> onto the PIO's layer stack.
 
 =item C<STRING* pop_string ()>
 
-Pop a layer off the PIO's layer stack. Returns the layer name.
+Pops a layer off the PIO's layer stack and returns its name.
 
 =cut
 
