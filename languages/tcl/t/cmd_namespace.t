@@ -98,8 +98,6 @@ TCL
 0
 OUT
 
-TODO: {
-  local $TODO = "unimplemented";
 language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: global implicit");
    puts [namespace exists {}]
 TCL
@@ -111,4 +109,4 @@ language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: global explicit");
 TCL
 1
 OUT
-}
+

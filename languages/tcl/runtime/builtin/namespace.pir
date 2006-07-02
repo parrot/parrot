@@ -72,13 +72,36 @@ not_done:
   .throw ('XXX')
 .end
 
-.sub 'exists' # XXX
+.sub "exists"
   .param pmc argv
 
   .local int argc
   argc = argv
   if argc != 1 goto bad_args
-  # canonicalize namespace.
+
+  .local pmc p6rule, colons, split, name
+  p6rule = compreg "PGE::P6Regex"
+  colons = p6rule('\:\:+')
+  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  name = argv[0]
+
+  $P0 = split(colons, name)
+  $I0 = elements $P0
+  if $I0 == 0 goto relative
+
+  $S0 = $P0[0]
+  if $S0 != "" goto relative
+  $P1 = pop $P0
+  goto get
+
+relative:
+
+get:
+  $P0 = get_namespace $P0
+  if null $P0 goto doesnt_exist
+  .return(1)
+  
+doesnt_exist:
   .return(0)
 
 bad_args:
