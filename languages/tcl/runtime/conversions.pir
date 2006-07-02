@@ -147,3 +147,57 @@ Given a chunk of tcl code, return a subroutine.
   
   .return($P2)
 .end
+
+=head2 _Tcl::__namespace
+
+Given a string namespace, return the namespace object and the tail.
+
+=cut
+
+.sub __namespace
+  .param string name
+  
+  .local pmc p6rule, colons, split
+  p6rule = compreg "PGE::P6Regex"
+  colons = p6rule('\:\:+')
+  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  
+  .local pmc ns_name
+  .local string tail
+  ns_name = split(colons, name)
+  $I0 = elements ns_name
+  if $I0 == 0 goto empty
+  tail = pop ns_name
+  if $I0 == 1  goto relative
+  $S0 = ns_name[0]
+  if $S0 != "" goto relative
+  
+absolute:
+  $P1 = shift ns_name
+  goto return
+
+empty:
+  tail = ""
+relative:
+  .local pmc interp
+  interp = getinterp
+  $I0 = 0
+relative_loop:
+  inc $I0
+  $P0 = interp["sub"; $I0]
+  $P0 = $P0.'get_namespace'()
+  $P0 = $P0.'name'()
+  $S0 = $P0[0]
+  if $S0 == '_tcl' goto relative_loop
+  
+  $I0 = elements $P0
+combine_loop:
+  dec $I0
+  if $I0 == 0 goto return
+  $P1 = $P0[$I0]
+  unshift ns_name, $P1
+  goto combine_loop
+
+return:
+  .return(ns_name, tail)
+.end
