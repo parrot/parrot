@@ -1,13 +1,13 @@
 ###
 # [uplevel]
 
-# Pretty much a copy of "eval" except for the call_level...
+# Pretty much a copy of 'eval' except for the call_level...
 # needs argument checking.
 
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&uplevel"
+.sub '&uplevel'
   .param pmc argv :slurpy
  
   .local string expr
@@ -33,7 +33,7 @@
   $P1 = shift argv # pop the call level argument 
 skip:
 
-  expr = ""
+  expr = ''
   looper = 1
   argc = argv
 
@@ -43,7 +43,7 @@ loop:
   concat expr, $S0
   inc looper
   if looper == argc goto loop_done
-  concat expr," "
+  concat expr,' '
 
   goto loop
 

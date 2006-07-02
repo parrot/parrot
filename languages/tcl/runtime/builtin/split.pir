@@ -3,7 +3,7 @@
 
 # XXX This implementation uses a lot of temp vars that should be named -coke
 
-.sub "&split"
+.sub '&split'
   .param pmc argv :slurpy
 
   .local int argc
@@ -15,13 +15,13 @@
   .local string splitchars,splitstring
   splitstring = argv[0]
   # XXX Make this the default whitespace splitchars.
-  splitchars = " "
+  splitchars = ' '
 
   if argc == 1 goto got_splitchars
   splitchars = argv[1]
 
 got_splitchars:
-  if splitchars == "" goto split_empty
+  if splitchars == '' goto split_empty
 
   .local pmc charHash 
   charHash = new .Hash

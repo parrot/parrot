@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&upvar"
+.sub '&upvar'
   .param pmc argv :slurpy
 
   .local pmc call_level,current_call_level
@@ -44,7 +44,7 @@ resume:
   goto loop
  
 done:
-  .return("")
+  .return('')
 
 catch:
   goto resume

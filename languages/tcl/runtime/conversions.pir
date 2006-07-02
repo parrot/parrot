@@ -42,9 +42,9 @@ Given a PMC, get a number from it.
   multiplier = 1
 
   $S1 = substr $S0, 0, 1
-  if $S1 == "+" goto positive
+  if $S1 == '+' goto positive
   # If the first character is -, assume a negative number.
-  unless $S1 == "-" goto get_value
+  unless $S1 == '-' goto get_value
   multiplier = -1
 positive:
   $S0 = substr $S0, 1
@@ -61,7 +61,7 @@ done:
   .return(value)
 
 NaN:
-  .throw("Not a number!")
+  .throw('Not a number!')
 .end
 
 =head2 _Tcl::__integer
@@ -109,9 +109,9 @@ Given a string, return the appropriate channel.
   .return (io_obj)
 
 bad_channel:
-  $S0 = "can not find channel named \""
+  $S0 = 'can not find channel named "'
   $S0 .= channelID
-  $S0 .= "\""
+  $S0 .= '"'
  .throw($S0)
 
 .end

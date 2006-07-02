@@ -7,7 +7,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&expr"
+.sub '&expr'
   .param pmc argv :slurpy
  
   .local string expr
@@ -19,7 +19,7 @@
   .get_from_HLL(expression_compiler, '_tcl', '__expression_compile')
   .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
 
-  expr = ""
+  expr = ''
   looper = 0
   argc = argv 
   unless argc goto no_args
@@ -30,7 +30,7 @@ loop:
   concat expr, $S0
   inc looper
   if looper == argc goto loop_done
-  concat expr," "
+  concat expr,' '
 
   goto loop
 
@@ -40,5 +40,5 @@ loop_done:
   .return $P2()
 
 no_args:
-  .throw("wrong # args: should be \"expr arg ?arg ...?\"")
+  .throw('wrong # args: should be "expr arg ?arg ...?"')
 .end

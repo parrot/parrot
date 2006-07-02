@@ -4,14 +4,14 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&concat"
+.sub '&concat'
   .param pmc argv :slurpy
  
   .local int argc 
   argc = argv
 
   .local string retval
-  retval = ""
+  retval = ''
 
   .local int arg_num
   arg_num = 0
@@ -26,7 +26,7 @@ arg_loop:
   $P1 = argv[arg_num]
   current_arg = $P1
   # empty elements don't count
-  if current_arg == "" goto arg_loop_next
+  if current_arg == '' goto arg_loop_next
 
 
 loop_init:
@@ -57,13 +57,13 @@ right_done:
   trimmed_string = substr current_arg, start_pos, str_length
 
   # elements that are all whitespace don't count
-  if trimmed_string == "" goto arg_loop_next
+  if trimmed_string == '' goto arg_loop_next
 
   # Escape any special characters from string. Currently,
   # this is backslashes.
 
   if first_time goto append_string
-  retval .= " "
+  retval .= ' '
 append_string:
   first_time = 0
   retval .= trimmed_string

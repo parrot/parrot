@@ -5,7 +5,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&lsort"
+.sub '&lsort'
   .param pmc argv :slurpy
 
   .local int return_type, argc
@@ -27,10 +27,10 @@ chew_flag:
   $P0 = shift argv
   unless argv goto got_list
 
-  if $P0 == "-decreasing" goto c_decr
-  if $P0 == "-increasing" goto c_incr
-  if $P0 == "-unique" goto c_uniq
-  if $P0 == "-integer" goto c_int
+  if $P0 == '-decreasing' goto c_decr
+  if $P0 == '-increasing' goto c_incr
+  if $P0 == '-unique' goto c_uniq
+  if $P0 == '-integer' goto c_int
   # XXX dictionary, real, command etc necessary
   branch bad_opt
 
@@ -80,19 +80,19 @@ skip_unique:
   .return ($P0)
 
 bad_opt:
-  $S0 = "bad option \""
+  $S0 = 'bad option "'
   $S1 = $P0
   $S0 .= $S1
-  $S0 .= "\": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -integer, -real, or -unique"
+  $S0 .= '": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -integer, -real, or -unique'
   .throw ($S0)
 wrong_args:
-  .throw ("wrong # args: should be \"lsort ?options? list\"")
+  .throw ('wrong # args: should be "lsort ?options? list"')
 .end
 
 .HLL '_Tcl', ''
 .namespace [ 'helpers'; 'lsort' ]
 
-.sub "sort"
+.sub 'sort'
   .param pmc compare
   .param pmc list
   .param int decreasing
@@ -103,7 +103,7 @@ wrong_args:
   quicksort(compare, list, 0, size, decreasing)
 .end
 
-.sub "quicksort"
+.sub 'quicksort'
   .param pmc compare
   .param pmc list
   .param int lo
@@ -161,7 +161,7 @@ done:
   .return ()
 .end
 
-.sub "ascii"
+.sub 'ascii'
   .param pmc s1
   .param pmc s2
   .param int is_decr
@@ -173,7 +173,7 @@ decreasing:
   .return ($I0)
 .end
 
-.sub "integer"
+.sub 'integer'
   .param pmc s1
   .param pmc s2
   .param int is_decr
@@ -204,9 +204,9 @@ bad_s2:
   $S1 = s2
 
 bad:
-  $S0  = "expected integer but got \""
+  $S0  = 'expected integer but got "'
   $S0 .= $S1
-  $S0 .= "\""
+  $S0 .= '"'
 
   .throw ($S0)
 .end

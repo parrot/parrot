@@ -24,7 +24,7 @@ other than the default, and multiple interpreters.
   char = ord name, -1
   if char != 41 goto scalar
   # contains a (
-  char = index name, "("
+  char = index name, '('
   if char == -1 goto scalar
 
 array:
@@ -42,7 +42,7 @@ array:
   variable = __find_var(var)
   if_null variable, no_such_variable
   
-  $I0 = does variable, "hash"
+  $I0 = does variable, 'hash'
   unless $I0 goto cant_read_not_array
 
   variable = variable[key]
@@ -52,7 +52,7 @@ array:
 bad_index:
   $S0 = "can't read \""
   $S0 .= name
-  $S0 .= "\": no such element in array"
+  $S0 .= '": no such element in array'
   .throw($S0)
 
 cant_read_not_array:
@@ -65,20 +65,20 @@ scalar:
   variable = __find_var(name)
   if_null variable, no_such_variable
   
-  $I0 = does variable, "hash"
+  $I0 = does variable, 'hash'
   if $I0 goto cant_read_array
   .return(variable)
 
 cant_read_array:
   $S0 = "can't read \""
   $S0 .= name
-  $S0 .= "\": variable is array"
+  $S0 .= '": variable is array'
   .throw($S0)
 
 no_such_variable:
   $S0 = "can't read \""
   $S0 .= name
-  $S0 .= "\": no such variable"
+  $S0 .= '": no such variable'
   .throw($S0)
 .end
 
@@ -105,7 +105,7 @@ other than the default, and multiple interpreters.
   char = ord name, -1
   if char != 41 goto find_scalar
   # contains a (
-  char = index name, "("
+  char = index name, '('
   if char == -1 goto find_scalar
 
 find_array:
@@ -125,7 +125,7 @@ find_array:
   array = __find_var(var)
   if_null array, create_array
 
-  $I0 = does array, "hash"
+  $I0 = does array, 'hash'
   unless $I0 goto cant_set_not_array
   goto set_array
 
@@ -171,12 +171,12 @@ Gets the actual variable from memory and returns it.
 .sub __find_var
   .param string name
 
-  name = "$" . name
+  name = '$' . name
   
   .local pmc value
 
   $S0 = substr name, 1, 2
-  if $S0 == "::"     goto coloned
+  if $S0 == '::'     goto coloned
   
   .local int call_level
   $P1 = find_global 'call_level'
@@ -189,7 +189,7 @@ Gets the actual variable from memory and returns it.
   goto found
 
 coloned:
-    substr name, 1, 2, ""
+    substr name, 1, 2, ''
 
 global_var:
   push_eh notfound
@@ -215,10 +215,10 @@ Sets the actual variable from memory.
   .param string name
   .param pmc value
 
-  name = "$" . name
+  name = '$' . name
 
   $S0 = substr name, 1, 2
-  if $S0 == "::"     goto coloned
+  if $S0 == '::'     goto coloned
 
   .local int call_level
   $P1 = find_global 'call_level'
@@ -229,7 +229,7 @@ lexical_var:
   .return()
 
 coloned:
-  substr name, 1, 2, ""
+  substr name, 1, 2, ''
 global_var:
   .set_in_HLL('tcl',name,value)
 
@@ -246,7 +246,7 @@ global_var:
 
 get_lexpad:
   # Is there a lexpad at this depth?
-  lexpad = interp["lexpad";depth]
+  lexpad = interp['lexpad';depth]
   unless_null lexpad, got_lexpad
 
   # try again
@@ -268,7 +268,7 @@ got_lexpad:
 
 get_lexpad:
   # Is there a lexpad at this depth?
-  lexpad = interp["lexpad";depth]
+  lexpad = interp['lexpad';depth]
   unless_null lexpad, got_lexpad
 
   # try again

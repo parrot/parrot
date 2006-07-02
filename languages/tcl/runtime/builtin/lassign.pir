@@ -1,7 +1,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&lassign"
+.sub '&lassign'
   .param pmc argv :slurpy
 
   .local int argc
@@ -30,7 +30,7 @@ var_loop:
 
 list_empty:
   value = new .String
-  value = ""
+  value = ''
 null_loop:
   unless argv goto var_end
   varname = shift argv
@@ -41,5 +41,5 @@ var_end:
   .return(list)
 
 bad_args:
-  .throw ("wrong # args: should be \"lassign list varName ?varName ...?\"")
+  .throw ('wrong # args: should be "lassign list varName ?varName ...?"')
 .end

@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&rename"
+.sub '&rename'
   .param pmc argv :slurpy
 
   .local int argc
@@ -21,8 +21,8 @@
   inc $P0
 
   .local string old_proc,new_proc
-  old_proc = "&" . old_s
-  new_proc = "&" . new_s
+  old_proc = '&' . old_s
+  new_proc = '&' . new_s
 
  
   .local pmc theSub
@@ -32,7 +32,7 @@
   clear_eh
 
   # If newName is empty, then just delete
-  if new_s == "" goto delete
+  if new_s == '' goto delete
 
 add:
   # Create the new sub
@@ -41,7 +41,7 @@ add:
 delete:
   null theSub
   store_global old_proc, theSub
-  .return("")
+  .return('')
 
 doesnt_exist:
   $S0 = "can't rename \""
@@ -50,6 +50,6 @@ doesnt_exist:
   .throw ($S0)
 
 error:
-  .throw ("wrong # args: should be \"rename oldName newName\"")
+  .throw ('wrong # args: should be "rename oldName newName"')
 
 .end

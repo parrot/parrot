@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&source"
+.sub '&source'
   .param pmc argv :slurpy
   
   .local int argc 
@@ -26,15 +26,14 @@
 
 file:
   filename = $P1
-  $S1="<"
-  open handle, filename, $S1
+  handle = open filename, '<'
   $I0 = typeof handle
   if $I0 == .Undef goto badfile
-  contents = ""
+  contents = ''
  
 loop:
   read chunk, handle, 1024
-  if chunk == "" goto gotfile
+  if chunk == '' goto gotfile
   contents = contents . chunk
   goto loop
 
@@ -45,11 +44,11 @@ gotfile:
 
 badfile:
   $S0 = "couldn't read file \""
-  $S0 = $S0 . filename
-  $S0 = $S0 . "\": no such file or directory"
+  $S0 .= filename
+  $S0 .= '": no such file or directory'
   .throw($S0)
 
 fail:
-  .throw("wrong # args: should be \"source fileName\"")
+  .throw('wrong # args: should be "source fileName"')
 
 .end

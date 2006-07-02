@@ -21,10 +21,10 @@
 
   .local int index_1
 
-  if position == "end" goto my_end
+  if position == 'end' goto my_end
 
   $S0 = substr position, 0, 4
-  if $S0 == "end-" goto has_end
+  if $S0 == 'end-' goto has_end
 
   push_eh bad_arg
     retval = __number(position)
@@ -34,9 +34,9 @@
   .return(retval)
   
 bad_arg:
-  $S9  = "bad index \""
+  $S9  = 'bad index "'
   $S9 .= position
-  $S9 .= "\": must be integer?[+-]integer? or end?[+-]integer?"
+  $S9 .= '": must be integer?[+-]integer? or end?[+-]integer?'
   .throw($S9)
  
 has_end:

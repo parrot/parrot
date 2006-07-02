@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&lappend"
+.sub '&lappend'
   .param pmc argv :slurpy
 
   .local pmc value, retval
@@ -46,6 +46,6 @@ loop_done:
   .return set(listname, value)
 
 error:
-  .throw ("wrong # args: should be \"lappend varName ?value value ...?\"")
+  .throw ('wrong # args: should be "lappend varName ?value value ...?"')
 
 .end

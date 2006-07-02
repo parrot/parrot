@@ -7,7 +7,7 @@ read a line from a channel
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&gets"
+.sub '&gets'
   .param pmc argv :slurpy
 
   .local string channelID

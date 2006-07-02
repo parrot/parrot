@@ -7,7 +7,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&append"
+.sub '&append'
   .param pmc argv :slurpy
 
   .local int argc 
@@ -36,7 +36,7 @@ setter:
   goto loop
 
 new_variable:
-  value = ""
+  value = ''
 
 loop:
   if looper == argc goto loop_done
@@ -55,5 +55,5 @@ getter:
   .return read(name)
 
 badargs:
-  .throw ("wrong # args: should be \"append varName ?value value ...?\"")
+  .throw ('wrong # args: should be "append varName ?value value ...?"')
 .end

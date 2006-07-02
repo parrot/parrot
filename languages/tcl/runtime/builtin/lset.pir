@@ -5,7 +5,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&lset"
+.sub '&lset'
   .param pmc argv :slurpy
 
   .local int return_type, argc
@@ -29,7 +29,7 @@
   if count == 2 goto replace
   $P0 = argv[1]
   $S0 = $P0
-  if $S0 == "" goto replace
+  if $S0 == '' goto replace
 
 lset:
   .local pmc __list
@@ -61,7 +61,7 @@ loop_done:
   .return set(name, retval)
 
 wrong_args:
-  .throw ("wrong # args: should be \"lset listVar index ?index...? value\"")
+  .throw ('wrong # args: should be "lset listVar index ?index...? value"')
 
 replace:
   $P0 = argv[-1]

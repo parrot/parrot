@@ -1,7 +1,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&regexp"
+.sub '&regexp'
   .param pmc argv :slurpy
  
   .local int argc
@@ -16,8 +16,8 @@
    .local pmc tclARE, rule, match
 
    # XXX            "tclARE"
-   load_bytecode "PGE.pbc"
-   tclARE = compreg "PGE::P5Regex"
+   load_bytecode 'PGE.pbc'
+   tclARE = compreg 'PGE::P5Regex'
 
    rule = tclARE(exp)
    match = rule(a_string)
@@ -25,6 +25,6 @@
    .return match.__get_bool()
 
 badargs:
-  .throw("wrong # args: should be \"regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?\"")
+  .throw('wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"')
 
 .end

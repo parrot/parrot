@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&string"
+.sub '&string'
   .param pmc argv :slurpy
 
   .local pmc retval
@@ -22,14 +22,14 @@
   .return subcommand_proc(argv)
 
 bad_args:
-  $S0 = "bad option \""
+  $S0 = 'bad option "'
   $S0 .= subcommand_name
-  $S0 .= "\": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart"
+  $S0 .= '": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart'
 
   .throw ($S0)
 
 no_args:
-  .throw ("wrong # args: should be \"string option arg ?arg ...?\"")
+  .throw ('wrong # args: should be "string option arg ?arg ...?"')
 
 .end
 
@@ -61,11 +61,11 @@ first_do:
   .return(index_1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string first subString string ?startIndex?\"")
+  .throw ('wrong # args: should be "string first subString string ?startIndex?"')
 
 .end
 
-.sub "last"
+.sub 'last'
   .param pmc argv
 
   .local int argc
@@ -109,11 +109,11 @@ not_found:
   .return(-1)
   
 bad_args:
-  .throw ("wrong # args: should be \"string last subString string ?lastIndex?\"")
+  .throw ('wrong # args: should be "string last subString string ?lastIndex?"')
 
 .end
 
-.sub "index"
+.sub 'index'
   .param pmc argv
 
   .local int index_1
@@ -132,17 +132,17 @@ bad_args:
   .return ($S0)
 
 index_null:
-  .return ("")
+  .return ('')
 
 bad_index:
-  .throw ("wrong # args: should be \"string index string charIndex\"")
+  .throw ('wrong # args: should be "string index string charIndex"')
 
 done:
   .return (retval)
 .end
 
 
-.sub "tolower"
+.sub 'tolower'
   .param pmc argv
 
   .local int argc
@@ -188,14 +188,14 @@ tolower_return:
   .return($S1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string tolower string ?first? ?last?\"")
+  .throw ('wrong # args: should be "string tolower string ?first? ?last?"')
 
 .end
 
 
 
 
-.sub "toupper"
+.sub 'toupper'
   .param pmc argv
 
   .local int argc
@@ -241,13 +241,13 @@ toupper_return:
   .return($S1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string toupper string ?first? ?last?\"")
+  .throw ('wrong # args: should be "string toupper string ?first? ?last?"')
 
 .end
 
 
 
-.sub "totitle"
+.sub 'totitle'
   .param pmc argv
 
   .local int argc
@@ -293,13 +293,13 @@ totitle_return:
   .return($S1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string totitle string ?first? ?last?\"")
+  .throw ('wrong # args: should be "string totitle string ?first? ?last?"')
 
 .end
 
 
 
-.sub "bytelength"
+.sub 'bytelength'
   .param pmc argv
 
   .local int argc
@@ -310,10 +310,10 @@ bad_args:
   .return($I0)
 
 bad_length:
-  .throw ("wrong # args: should be \"string bytelength string\"")
+  .throw ('wrong # args: should be "string bytelength string"')
 .end
 
-.sub "length"
+.sub 'length'
   .param pmc argv
 
   .local int argc
@@ -325,10 +325,10 @@ bad_length:
   .return($I0)
 
 bad_length:
-  .throw ("wrong # args: should be \"string length string\"")
+  .throw ('wrong # args: should be "string length string"')
 .end
 
-.sub "range"
+.sub 'range'
   .param pmc argv
 
   .local int index_1
@@ -362,10 +362,10 @@ range_doo:
   .return($S9)
 
 bad_range:
-  .throw ("wrong # args: should be \"string range string first last\"")
+  .throw ('wrong # args: should be "string range string first last"')
 .end
 
-.sub "match"
+.sub 'match'
   .param pmc argv
 
   .local int argc
@@ -377,7 +377,7 @@ bad_range:
   if argc < 2 goto bad_match
   if argc > 3 goto bad_match
   $S0 = shift argv
-  if $S0 != "-nocase" goto bad_option
+  if $S0 != '-nocase' goto bad_option
   nocase = 1
 
 match_next:
@@ -404,16 +404,16 @@ match_continue:
   .return match.__get_bool()
 
 bad_option:
-  $S1 = "bad option \""
+  $S1 = 'bad option "'
   $S1 .= $S0
-  $S1 = "\": must be -nocase"
+  $S1 = '": must be -nocase'
   .throw ($S1)
 
 bad_match:
-  .throw ("wrong # args: should be \"string match ?-nocase? pattern string\"")
+  .throw ('wrong # args: should be "string match ?-nocase? pattern string"')
 .end
 
-.sub "repeat"
+.sub 'repeat'
   .param pmc argv
 
   .local int argc
@@ -429,11 +429,11 @@ bad_match:
   .return($S0)
 
 bad_repeat:
-  .throw ("wrong # args: should be \"string repeat string count\"")
+  .throw ('wrong # args: should be "string repeat string count"')
 .end
 
 # XXX stub
-.sub "map"
+.sub 'map'
   .param pmc argv
 
   .local int argc
@@ -444,7 +444,7 @@ bad_repeat:
   nocase = 0
   if argc == 2 goto setup
   $S0 = shift argv
-  if $S0 != "-nocase" goto bad_option
+  if $S0 != '-nocase' goto bad_option
   nocase = 1
 
 setup:
@@ -503,19 +503,19 @@ outer_done:
   .return (the_string)
 
 oddly_enough:
-  .throw ("char map list unbalanced")
+  .throw ('char map list unbalanced')
 
 bad_option:
-  $S1 = "bad option \""
+  $S1 = 'bad option "'
   $S1 .= $S0
-  $S1 .= "\": must be -nocase"
+  $S1 .= '": must be -nocase'
   .throw ($S1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string map ?-nocase? charMap string\"")
+  .throw ('wrong # args: should be "string map ?-nocase? charMap string"')
 .end
 
-.sub "equal"
+.sub 'equal'
   .param pmc argv
   .local int argc
   argc = argv
@@ -531,8 +531,8 @@ bad_args:
   .local string flag
 flag_loop:
   flag = shift argv
-  if flag == "-length" goto got_length
-  if flag == "-nocase" goto got_nocase
+  if flag == '-length' goto got_length
+  if flag == '-nocase' goto got_nocase
   branch bad_args
 
 got_length:
@@ -569,14 +569,14 @@ ret_one:
   .return (1)
 
 bad_args:
-  .throw("wrong # args: should be \"string equal ?-nocase? ?-length int? string1 string2\"")
+  .throw('wrong # args: should be "string equal ?-nocase? ?-length int? string1 string2"')
 
 .end
 
 
 # XXX doesn't currently respect the -options.
 # XXX Mdiep will probably want to change this to a hash-dispatch
-.sub "is"
+.sub 'is'
   .param pmc argv
   .local int argc
   argc = argv
@@ -592,24 +592,24 @@ bad_args:
   class = argv[0]
   the_string = argv[1]
 
-  if class == "alnum" goto alnum_check
-  if class == "alpha" goto alpha_check
-  if class == "ascii" goto ascii_check
-  if class == "control" goto control_check
-  if class == "boolean" goto boolean_check
-  if class == "digit" goto digit_check
-  if class == "double" goto double_check
-  if class == "false" goto false_check
-  if class == "graph" goto graph_check
-  if class == "integer" goto integer_check
-  if class == "lower" goto lower_check
-  if class == "print" goto print_check
-  if class == "punct" goto punct_check
-  if class == "space" goto space_check
-  if class == "true" goto true_check
-  if class == "upper" goto upper_check
-  if class == "wordchar" goto wordchar_check
-  if class == "xdigit" goto xdigit_check
+  if class == 'alnum' goto alnum_check
+  if class == 'alpha' goto alpha_check
+  if class == 'ascii' goto ascii_check
+  if class == 'control' goto control_check
+  if class == 'boolean' goto boolean_check
+  if class == 'digit' goto digit_check
+  if class == 'double' goto double_check
+  if class == 'false' goto false_check
+  if class == 'graph' goto graph_check
+  if class == 'integer' goto integer_check
+  if class == 'lower' goto lower_check
+  if class == 'print' goto print_check
+  if class == 'punct' goto punct_check
+  if class == 'space' goto space_check
+  if class == 'true' goto true_check
+  if class == 'upper' goto upper_check
+  if class == 'wordchar' goto wordchar_check
+  if class == 'xdigit' goto xdigit_check
 
 bad_class:
   $S0 = 'bad class "'
@@ -629,12 +629,12 @@ control_check:
   the_cclass = .CCLASS_CONTROL
   goto cclass_check
 boolean_check:
-  if the_string == "true" goto yep 
-  if the_string == "false" goto yep 
-  if the_string == "yes" goto yep 
-  if the_string == "no" goto yep 
-  if the_string == "1" goto yep 
-  if the_string == "0" goto yep 
+  if the_string == 'true' goto yep 
+  if the_string == 'false' goto yep 
+  if the_string == 'yes' goto yep 
+  if the_string == 'no' goto yep 
+  if the_string == '1' goto yep 
+  if the_string == '0' goto yep 
   goto nope 
 digit_check:
   the_cclass = .CCLASS_NUMERIC
@@ -650,9 +650,9 @@ double_check:
   if $I0 == .TclInt   goto yep
   goto nope
 false_check:
-  if the_string == "false" goto yep 
-  if the_string == "no" goto yep 
-  if the_string == "0" goto yep 
+  if the_string == 'false' goto yep 
+  if the_string == 'no' goto yep 
+  if the_string == '0' goto yep 
   goto nope 
 graph_check:
   the_cclass = .CCLASS_GRAPHICAL
@@ -679,9 +679,9 @@ space_check:
   the_cclass = .CCLASS_WHITESPACE
   goto cclass_check
 true_check:
-  if the_string == "true" goto yep 
-  if the_string == "yes" goto yep 
-  if the_string == "1" goto yep 
+  if the_string == 'true' goto yep 
+  if the_string == 'yes' goto yep 
+  if the_string == '1' goto yep 
   goto nope 
 upper_check:
   the_cclass = .CCLASS_UPPERCASE
@@ -717,7 +717,7 @@ bad_args:
 .end
 
                            
-.sub "replace"
+.sub 'replace'
   .param pmc argv
 
   .local int argc
@@ -734,7 +734,7 @@ bad_args:
   if argc < 3 goto bad_args
   
   $S1 = argv[0]
-  $S4 = ""
+  $S4 = ''
          
   $S2 = argv[1]
   low = string_index($S2, $S1)
@@ -765,11 +765,11 @@ replace_done:
   .return($S1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string replace string first last ?string?\"")
+  .throw ('wrong # args: should be "string replace string first last ?string?"')
 .end
 
          
-.sub "trimleft"
+.sub 'trimleft'
   .param pmc argv
 
   .local int argc
@@ -793,20 +793,20 @@ trimleft_do:
   $I1 = index $S2, char
 
   if $I1 < 0 goto trimleft_done
-  substr $S1, 0, 1, ""
+  substr $S1, 0, 1, ''
   goto trimleft_do
          
 trimleft_done:  
   .return($S1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string trimleft string ?chars?\"")
+  .throw ('wrong # args: should be "string trimleft string ?chars?"')
 
 .end
 
 
                   
-.sub "trimright"
+.sub 'trimright'
   .param pmc argv
 
   .local int argc
@@ -837,14 +837,14 @@ trimright_done:
   .return($S1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string trimright string ?chars?\"")
+  .throw ('wrong # args: should be "string trimright string ?chars?"')
 
 .end
 
 # here, I might use trimleft and trim right, but I think it is
 # better to implement it here as it should be faster
                   
-.sub "trim"
+.sub 'trim'
   .param pmc argv
 
   .local int argc
@@ -876,20 +876,20 @@ trim_do2:
   $I1 = index $S2, char
 
   if $I1 < 0 goto trim_done
-  substr $S1, 0, 1, ""
+  substr $S1, 0, 1, ''
   goto trim_do2
          
 trim_done:  
   .return($S1)
 
 bad_args:
-  .throw ("wrong # args: should be \"string trim string ?chars?\"")
+  .throw ('wrong # args: should be "string trim string ?chars?"')
 
 .end
          
 
                   
-.sub "compare"
+.sub 'compare'
   .param pmc argv
 
   .local int argc
@@ -908,8 +908,8 @@ args_processment:
   argc = argv
   if argc == 0 goto args_processed
   $S4 = shift argv
-  if $S4 == "-nocase" goto arg_nocase
-  if $S4 == "-length" goto arg_length
+  if $S4 == '-nocase' goto arg_nocase
+  if $S4 == '-length' goto arg_length
   goto bad_args
 
 args_processed:
@@ -943,11 +943,11 @@ arg_length:
   goto args_processment
          
 bad_args:
-  .throw ("wrong # args: should be \"string compare ?-nocase? ?-length int? string1 string2\"")
+  .throw ('wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"')
 
 .end
 
-.sub "wordend"
+.sub 'wordend'
   .param pmc argv
   print "wordend\n"
   .return()

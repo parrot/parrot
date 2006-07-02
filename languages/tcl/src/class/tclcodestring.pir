@@ -51,7 +51,7 @@ Initializes the C<CodeString> class.
 
     $P0 = new .Integer
     $P0 = 10
-    store_global "$!serno", $P0
+    store_global '$!serno', $P0
     .return ()
 .end
 
@@ -154,7 +154,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
     if has_fmt goto unique_1
     fmt = ''
   unique_1:
-    $P0 = find_global "$!serno"
+    $P0 = find_global '$!serno'
     $S0 = $P0
     $S0 = concat fmt, $S0
     inc $P0

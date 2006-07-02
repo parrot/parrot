@@ -21,14 +21,14 @@
   .local int index_length, pos
   .local pmc number_result
 
-  if position == "end" goto my_end
+  if position == 'end' goto my_end
   
   $S0 = substr position, 0, 4
-  if $S0 == "end-" goto has_end
+  if $S0 == 'end-' goto has_end
   index_length = length position
   (retval, pos) = get_number(position,0)
   if pos != index_length goto bad_arg
-  $I0 = isa retval, "Integer"
+  $I0 = isa retval, 'Integer'
   if $I0 == 0 goto bad_arg
   
   # if the number is greater than the number of elements
@@ -40,9 +40,9 @@
   .return(retval,is_end)
 
 bad_arg:
-  $S9  = "bad index \""
+  $S9  = 'bad index "'
   $S9 .= position
-  $S9 .= "\": must be integer?[+-]integer? or end?[+-]integer?"
+  $S9 .= '": must be integer?[+-]integer? or end?[+-]integer?'
   .throw($S9)
 
 has_end:
@@ -51,7 +51,7 @@ has_end:
   # is this an int?
   (number_result, pos) = get_number(position,4)
   if pos != index_length goto bad_arg
-  $I0 = isa number_result, "Integer"
+  $I0 = isa number_result, 'Integer'
   if $I0 == 0 goto bad_arg
   # say, 1 if -1
   $I0 = number_result

@@ -5,7 +5,7 @@
   .param pmc list
   
   .local string retval
-  retval = ""
+  retval = ''
   
   .local int elems
   elems = list
@@ -47,25 +47,25 @@ check_list_done:
   # {}'d constructs
 check_spaces:
   $I0 = find_cclass .CCLASS_WHITESPACE, $S0, 0, chars
-  # Unlike any other "find a character" opcode, this returns
+  # Unlike any other 'find a character' opcode, this returns
   # length instead of -1 upon failure.
   if $I0 != chars goto quote
 
 check_left_bracket:
-  $I0 = index $S0, "["
+  $I0 = index $S0, '['
   if $I0 != -1 goto quote
 
 check_dollar_sign:
-  $I0 = index $S0, "$"
+  $I0 = index $S0, '$'
   if $I0 != -1 goto quote
 
 check_semi_colon:
-  $I0 = index $S0, ";"
+  $I0 = index $S0, ';'
   if $I0 != -1 goto quote
 
   # \'d constructs
 check_right_bracket:
-  $I0 = index $S0, "]"
+  $I0 = index $S0, ']'
   if $I0 != -1 goto escape
 
 check_backslash:
@@ -73,7 +73,7 @@ check_backslash:
   if $I0 != -1 goto escape
 
 check_quotes:
-  $I0 = index $S0, "\""
+  $I0 = index $S0, '"'
   if $I0 != -1 goto escape
 
   goto append_elem
@@ -82,27 +82,27 @@ escape:
   $P0 = new .String
   $P0 = $S0
   
-  $P0."replace"("\\", "\\\\")
-  $P0."replace"("}", "\\}")
-  $P0."replace"("{", "\\{")
-  $P0."replace"(" ", "\\ ")
-  $P0."replace"("]", "\\]")
-  $P0."replace"("\"", "\\\"")
+  $P0.'replace'("\\", "\\\\")
+  $P0.'replace'('}', "\\}")
+  $P0.'replace'('{', "\\{")
+  $P0.'replace'(' ', "\\ ")
+  $P0.'replace'(']', "\\]")
+  $P0.'replace'('"', "\\\"")
   
   $S0 = $P0 
   goto append_elem
 
 empty:
-  $S0 = "{}"
+  $S0 = '{}'
   goto append_elem
 
 quote:
-  $S0 = "{" . $S0
-  $S0 = $S0 . "}"
+  $S0 = '{' . $S0
+  $S0 = $S0 . '}'
 
 append_elem:
   retval .= $S0
-  retval .= " "
+  retval .= ' '
   inc i
   goto loop
 
@@ -110,7 +110,7 @@ done:
   $I0 = length retval
   unless $I0 goto goback
   # remove the extra space at the end
-  substr retval, -1, 1, ""
+  substr retval, -1, 1, ''
 
 goback:
   .return(retval)

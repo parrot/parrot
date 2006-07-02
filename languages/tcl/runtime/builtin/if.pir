@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&if"
+.sub '&if'
   .param pmc argv :slurpy
 
   .local int argc 
@@ -29,7 +29,7 @@
   .get_from_HLL(expr_compiler,'_tcl','__expression_compile')
  
   .local string temp_str
-  temp_str ="" 
+  temp_str ='' 
 
   counter = 0
   condition = argv[counter]
@@ -37,7 +37,7 @@
   if counter >= argc goto missing_script
   body = argv[counter]
   inc counter
-  if body != "then" goto get_elseifs 
+  if body != 'then' goto get_elseifs 
   if counter >= argc goto missing_script
   body = argv[counter]
   inc counter
@@ -45,7 +45,7 @@
 get_elseifs:
   if counter >= argc goto get_final
   temp_str = argv[counter]
-  if temp_str != "elseif" goto get_else
+  if temp_str != 'elseif' goto get_else
   $P1 = new .TclList
   inc counter
   if counter >= argc goto missing_elseif
@@ -61,7 +61,7 @@ get_elseifs:
 get_else:
   handling_else = 1
   temp_str = argv[counter]
-  if temp_str != "else" goto get_final
+  if temp_str != 'else' goto get_final
   inc counter
   if counter >= argc goto missing_script
   temp_str = argv[counter]
@@ -110,21 +110,21 @@ done:
   .return $P2()
 
 no_args:
-  .throw("wrong # args: no expression after \"if\" argument")
+  .throw('wrong # args: no expression after "if" argument')
 
 missing_script:
-  $S0 = "wrong # args: no script following \"" 
+  $S0 = 'wrong # args: no script following "' 
   $I0 = counter
   dec $I0
   $S1  = argv[$I0]
   $S0 .= $S1
-  $S0 .=  "\" argument"
+  $S0 .=  '" argument'
   .throw ($S0)
 
 more_than_else:
-  .throw ("wrong # args: extra words after \"else\" clause in \"if\" command")
+  .throw ('wrong # args: extra words after "else" clause in "if" command')
 
 missing_elseif:
-  .throw ("wrong # args: no expression after \"elseif\" argument")
+  .throw ('wrong # args: no expression after "elseif" argument')
 
 .end

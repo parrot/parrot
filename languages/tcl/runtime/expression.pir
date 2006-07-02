@@ -70,9 +70,9 @@ operand:
   goto operator
 
 no_operand:
-  $S0 = "syntax error in expression \""
+  $S0 = 'syntax error in expression "'
   $S0 .= expr
-  $S0 .= "\": premature end of expression"
+  $S0 .= '": premature end of expression'
   .throw ($S0)
 
 operator:
@@ -162,7 +162,7 @@ left_arg_precalc:
 shift_op:
   .local pmc type
   type = our_op[1]
-  $I0 = find_type "TclBinaryOp" # XXX should cache this?
+  $I0 = find_type 'TclBinaryOp' # XXX should cache this?
   .local pmc binary_op
   binary_op = new $I0
 
@@ -195,7 +195,7 @@ singleton_chunk:
   .return ($P1)
 
 die_horribly:
-  .throw ("XXX: An error occurred parsing [expr]")
+  .throw ('XXX: An error occurred parsing [expr]')
 
 converter_done:
   $P1 = program_stack[0]
@@ -374,12 +374,12 @@ paren_done:
   .return(retval, pos)
 
 die_horribly:
-  .throw("XXX: An error occurred processing a sub-expression")
+  .throw('XXX: An error occurred processing a sub-expression')
 
 premature_end:
-  $S0 = "syntax error in expression \""
+  $S0 = 'syntax error in expression "'
   $S0 .= expr
-  $S0 .= "\": premature end of expression"
+  $S0 .= '": premature end of expression'
   .throw($S0)
 .end
 
@@ -417,7 +417,7 @@ integer_done:
   # At this point, if there's no e, we're definitely an integer, 
   # check for octal.
   $S1 = substr $S0, 0, 1
-  if $S1 != "0" goto integer_return
+  if $S1 != '0' goto integer_return
 
   .local int octal_value
   .local int octal_digit
@@ -468,7 +468,7 @@ float_loop:
 float_done:
   $I0 = pos - start
   $S0 = substr expr, start, $I0
-  if $S0  == "." goto failure
+  if $S0  == '.' goto failure
   if char == 101 goto e
   # XXX Can't we just assign this string directly to the the TclFloat - WJC
   $N0 = $S0
@@ -521,7 +521,7 @@ done:
   .local pmc func,operand
 
   # functions *must* have ()s
-  pos = index expr, "(", start
+  pos = index expr, '(', start
   if pos == -1 goto fail
 
   .local int depth, paren_pos
@@ -555,7 +555,7 @@ loop_done:
   func = $P1[$S0]
   if_null func, unknown_func
 
-  $I0 = find_type "TclFunc"
+  $I0 = find_type 'TclFunc'
   func = new $I0
   $P0 = new .String
   $P0 = $S0
@@ -579,18 +579,18 @@ done:
   .return(func, pos)
 
 fail:
-  .throw("error parsing function arguments!")
+  .throw('error parsing function arguments!')
 
 missing_paren:
-  $S0 = "syntax error in expression \""
+  $S0 = 'syntax error in expression "'
   $S0 .= expr
-  $S0 .= "\": missing close parenthesis at end of function call"
+  $S0 .= '": missing close parenthesis at end of function call'
   .throw($S0)
 
 unknown_func:
-  $S1 = "unknown math function \""
+  $S1 = 'unknown math function "'
   $S1 .= $S0
-  $S1 .= "\""
+  $S1 .= '"'
   .throw($S1)
 .end
 
@@ -608,7 +608,7 @@ unknown_func:
   (operand, pos) = get_operand(expr, pos)
 
   .local pmc unary
-  $I0   = find_type "TclUnaryOp"
+  $I0   = find_type 'TclUnaryOp'
   unary = new $I0
   setattribute unary, "TclUnaryOp\x00name", name
   setattribute unary, "TclUnaryOp\x00operand", operand

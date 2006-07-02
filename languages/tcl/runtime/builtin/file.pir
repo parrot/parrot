@@ -39,7 +39,7 @@ few_args:
   if argc == 0 goto bad_args
 
   .local string dirsep
-  dirsep = "/" # XXX should pull from parrot config.
+  dirsep = '/' # XXX should pull from parrot config.
 
   .local string result
   result = ''
@@ -91,7 +91,7 @@ bad_args:
   clear_eh
 
   .local pmc __set
-  __set = find_global "__set" 
+  __set = find_global '__set' 
 
   $P3 = new .TclArray
   $P1 = $P2[8]
@@ -117,7 +117,7 @@ bad_args:
   $I2 = 0o170000   #S_IFMT
   $I3 = $I1 & $I2
 
-  $P4 = find_global "filetypes"  
+  $P4 = find_global 'filetypes'  
   $S1 = $P4[$I3]
   $P3['type'] = $S1
 
@@ -233,7 +233,7 @@ bad_args:
   $I2 = 0o170000   #S_IFMT
   $I3 = $I1 & $I2
 
-  $P4 = find_global "filetypes"  
+  $P4 = find_global 'filetypes'  
   $S1 = $P4[$I3]
   .return ($S1)
 

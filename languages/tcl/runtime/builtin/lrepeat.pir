@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&lrepeat"
+.sub '&lrepeat'
   .param pmc argv :slurpy
 
   # XXX Need error handling

@@ -9,7 +9,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&error"
+.sub '&error'
   .param pmc argv :slurpy
 
   .local int argc 
@@ -45,5 +45,5 @@ finish:
   .throw($P0)
 
 badargs:
-  .throw("wrong # args: should be \"error message ?errorInfo? ?errorCode?\"")
+  .throw('wrong # args: should be "error message ?errorInfo? ?errorCode?"')
 .end

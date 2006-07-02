@@ -58,10 +58,10 @@ Define the attributes required for the class.
 =cut
 
 .sub __class_init :load
-  $P0 = newclass "TclBinaryOp"
-  addattribute $P0, "type"
-  addattribute $P0, "l_operand"
-  addattribute $P0, "r_operand"
+  $P0 = newclass 'TclBinaryOp'
+  addattribute $P0, 'type'
+  addattribute $P0, 'l_operand'
+  addattribute $P0, 'r_operand'
 .end
 
 =head2 __init

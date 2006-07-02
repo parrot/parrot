@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&lindex"
+.sub '&lindex'
   .param pmc argv :slurpy
   
   .local int argc 
@@ -46,6 +46,6 @@ done:
   .return(list)
 
 bad_args:
-  .throw("wrong # args: should be \"lindex list ?index...?\"")
+  .throw('wrong # args: should be "lindex list ?index...?"')
 
 .end

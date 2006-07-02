@@ -4,16 +4,16 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&parray"
+.sub '&parray'
   .param pmc argv :slurpy
-.include "iterator.pasm"
+.include 'iterator.pasm'
 
   .local int argc
   argc = argv
 
   .local pmc retval
   retval = new .String
-  retval = ""
+  retval = ''
 
   if argc == 0 goto bad_args
   if argc > 2 goto bad_args
@@ -21,7 +21,7 @@
   # get the array...
   .local string name, full_name
   name = argv[0]
-  full_name = "$" . name
+  full_name = '$' . name
 
   .local pmc array
   .local int call_level
@@ -43,7 +43,7 @@ catch_var:
 
   # get the pattern
   .local string match_str
-  match_str = "*"
+  match_str = '*'
   if argc == 1 goto match_all
   match_str = argv[1]
 match_all:
@@ -84,7 +84,7 @@ add_loop:
 add_end:
 
 null $P0
-filtered."sort"($P0)
+filtered.'sort'($P0)
 
 .local int c, size
 c = 0
@@ -95,18 +95,17 @@ print_loop:
   $P1 = array[$S0]
 
   print name
-  print "("
+  print '('
   print $S0
-  print ")"
+  print ')'
 
   $I0 = length $S0
   $I1 = maxsize - $I0
-  $S1 = repeat " ", $I1
+  $S1 = repeat ' ', $I1
   print $S1
 
-  print " = "
-  print $P1
-  print "\n"
+  print ' = '
+  say   $P1
 
   inc c
   branch print_loop
@@ -116,10 +115,10 @@ done:
   .return(retval)
 
 bad_args:
-  .throw ("wrong # args: should be \"parray arrayName ?pattern?\"")
+  .throw ('wrong # args: should be "parray arrayName ?pattern?"')
 
 not_array:
-  $S0 = "\""
+  $S0 = '"'
   $S0 .= name
   $S0 .= "\" isn't an array"
   .throw ($S0)

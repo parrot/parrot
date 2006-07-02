@@ -12,7 +12,7 @@ real top level namespace.
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&namespace"
+.sub '&namespace'
    .param pmc argv :slurpy
 
   .local pmc retval
@@ -30,13 +30,13 @@ real top level namespace.
   .return subcommand_proc(argv)
 
 bad_args:
-  $S0 = "bad option \""
+  $S0 = 'bad option "'
   $S0 .= subcommand_name
-  $S0 .= "\": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which"
+  $S0 .= '": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which'
   .throw ($S0)
 
 no_args:
-  .throw ("wrong # args: should be \"namespace subcommand ?arg ...?\"")
+  .throw ('wrong # args: should be "namespace subcommand ?arg ...?"')
 
 .end
 
@@ -44,21 +44,21 @@ no_args:
 .namespace [ 'helpers'; 'namespace' ]
 
 # TODO: hey, this is cheating!
-.sub "current"
+.sub 'current'
   .param pmc argv
 
   .local int argc
   argc = argv
   if argc goto bad_args
 
-  .return("::")
+  .return('::')
 
 bad_args:
-  .throw ("wrong # args: should be \"namespace current\"")
+  .throw ('wrong # args: should be "namespace current"')
 
 .end
 
-.sub "delete"
+.sub 'delete'
   .param pmc argv
 
   .local int argc
@@ -66,13 +66,13 @@ bad_args:
   if argc !=0  goto not_done
 
   # No arg delete does nothing.
-  .return("")
+  .return('')
 
 not_done:
-  .throw ("XXX")
+  .throw ('XXX')
 .end
 
-.sub "exists" # XXX
+.sub 'exists' # XXX
   .param pmc argv
 
   .local int argc
@@ -82,19 +82,19 @@ not_done:
   .return(0)
 
 bad_args:
-  .throw("wrong # args: should be \"namespace exists name\"" )
+  .throw('wrong # args: should be "namespace exists name"' )
 .end
 
-.sub "qualifiers"
+.sub 'qualifiers'
   .param pmc argv
   
   .local int argc
   argc = argv
   if argc != 1 goto bad_args
 
-  load_bytecode "PGE.pbc"
+  load_bytecode 'PGE.pbc'
   .local pmc p6r,match
-  p6r = compreg "PGE::P6Regex"
+  p6r = compreg 'PGE::P6Regex'
   match = p6r("(.*)\\:\\:+<-[:]>*$$")
 
   $S0 = argv[0]
@@ -109,20 +109,20 @@ WHOLE:
   .return($S0)
 
   bad_args:
-  .throw ("wrong # args: should be \"namespace qualifiers string\"")
+  .throw ('wrong # args: should be "namespace qualifiers string"')
 
 .end
 
-.sub "tail"
+.sub 'tail'
   .param pmc argv
   
   .local int argc
   argc = argv
   if argc != 1 goto bad_args
 
-  load_bytecode "PGE.pbc"
+  load_bytecode 'PGE.pbc'
   .local pmc p6r,match
-  p6r= compreg "PGE::P6Regex"
+  p6r= compreg 'PGE::P6Regex'
   match = p6r("\\:\\:+(<-[:]>)$$")
 
   $S0 = argv[0]
@@ -139,7 +139,7 @@ WHOLE:
   .return($P0)
 
   bad_args:
-  .throw ("wrong # args: should be \"namespace tail string\"")
+  .throw ('wrong # args: should be "namespace tail string"')
 
 .end
 

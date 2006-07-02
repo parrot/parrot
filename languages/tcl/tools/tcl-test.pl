@@ -60,7 +60,7 @@ sub main {
 ##
 sub convert_tests {
     print "Converting tests\n";
-    my @files = glob( File::Spec->catfile( $DIR, "*.test" ) );
+    my @files = glob( File::Spec->catfile( $DIR, '*.test' ) );
     for my $file (@files) {
         my $test = substr $file, 0, -3;
         # parrot's getopt dislikes filenames with - in them.

@@ -4,7 +4,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&global"
+.sub '&global'
   .param pmc argv :slurpy
 
   .local int argc 
@@ -25,7 +25,7 @@
 loop:
   if ii == argc goto done
   varname = argv[ii]
-  sigil_varname = "$" . varname
+  sigil_varname = '$' . varname
 
   push_eh next
     $P1 = find_global sigil_varname
@@ -40,9 +40,8 @@ next:
   goto loop
   
 done:
-  .return("")
+  .return('')
 
 badargs:
-  .throw("wrong # args: should be \"global varName ?varName ...?\"")
-
+  .throw('wrong # args: should be "global varName ?varName ...?"')
 .end

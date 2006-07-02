@@ -1,7 +1,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&foreach"
+.sub '&foreach'
   .param pmc argv :slurpy
   # Requires multiple of 3 args.
 
@@ -98,7 +98,7 @@ loop_inner:
   if counter >= $I0 goto loop_inner_done_good
 
   varname = varnames[counter]
-  sigil_varname = "$" . varname
+  sigil_varname = '$' . varname
   $P0 = arglists[counter]
   $I1 = $P0
   $I2 = iterator
@@ -115,7 +115,7 @@ store_done:
   goto loop_inner
 empty_var:
   $P0 = new .TclString
-  $P0 = ""
+  $P0 = ''
   if call_level goto store_lex2
     store_global sigil_varname, $P0
     goto loop_inner
@@ -155,6 +155,6 @@ done:
   .return(retval)
 
 error:
-  .throw("wrong # args: should be \"foreach varList list ?varList list ...? command\"")
+  .throw('wrong # args: should be "foreach varList list ?varList list ...? command"')
 
 .end

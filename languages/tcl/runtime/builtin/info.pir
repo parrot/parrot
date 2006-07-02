@@ -7,7 +7,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&info"
+.sub '&info'
   .param pmc argv :slurpy
 
   .local int argc
@@ -25,20 +25,20 @@
   .return subcommand_proc(argv)
 
 bad_subcommand:
-  $S0  = "bad option \""
+  $S0  = 'bad option "'
   $S0 .= subcommand_name
-  $S0 .= "\": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars"
+  $S0 .= '": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars'
 
   .throw ($S0)
 
 bad_args:
-  .throw("wrong # args: should be \"info option ?arg arg ...?\"")
+  .throw('wrong # args: should be "info option ?arg arg ...?"')
 .end
 
 .HLL '_Tcl', ''
 .namespace [ 'helpers'; 'info' ]
 
-.sub "args"
+.sub 'args'
   .param pmc argv
 
   .local int argc
@@ -55,16 +55,16 @@ bad_args:
   .return($P2)
 
 no_args:
-  $S0 = "\""
+  $S0 = '"'
   $S0 .= procname
   $S0 .= "\" isn't a procedure"
   .throw ($S0)
 
 bad_args:
-  .throw ("wrong # args: should be \"info args procname\"")
+  .throw ('wrong # args: should be "info args procname"')
 .end
 
-.sub "body"
+.sub 'body'
   .param pmc argv
 
   .local int argc
@@ -81,16 +81,16 @@ bad_args:
   .return($P2)
 
 no_body:
-  $S0 = "\""
+  $S0 = '"'
   $S0 .= procname
   $S0 .= "\" isn't a procedure"
   .throw ($S0)
 
 bad_args:
-  .throw ("wrong # args: should be \"info body procname\"")
+  .throw ('wrong # args: should be "info body procname"')
 .end
 
-.sub "functions"
+.sub 'functions'
   .param pmc argv
 
   .local int argc
@@ -131,10 +131,10 @@ loop:
   .return(retval)
 
 bad_args:
-  .throw ("wrong # args: should be \"info functions ?pattern?\"")
+  .throw ('wrong # args: should be "info functions ?pattern?"')
 .end
 
-.sub "exists"
+.sub 'exists'
   .param pmc argv
 
   .local int argc
@@ -155,10 +155,10 @@ not_found:
   .return (0)
 
 bad_args:
-  .throw ("wrong # args: should be \"info exists varName\"")
+  .throw ('wrong # args: should be "info exists varName"')
 .end
 
-.sub "tclversion"
+.sub 'tclversion'
   .param pmc argv
 
   .local int argc
@@ -170,7 +170,7 @@ bad_args:
   .return($P1)
 
 bad_args:
-  .throw ("wrong # args: should be \"info tclversion\"")
+  .throw ('wrong # args: should be "info tclversion"')
 
 .end
 

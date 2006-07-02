@@ -42,7 +42,7 @@ sub open_tmt {
     my ($filename) = @_;
 
     local $/ = undef;
-    open my $file, "<", $filename
+    open my $file, '<', $filename
         or die "can't open '$filename' for reading";
 
     return $file;
@@ -65,7 +65,7 @@ sub parse_usage {
     my $usage = shift;
     
     my @results;
-    my $types = join "|", qw(int string var list channel script expr);
+    my $types = join '|', qw(int string var list channel script expr);
     my $type  = qr{
         (\??)             # literal, optional ?
 
@@ -94,7 +94,7 @@ sub parse_usage {
         $arg->{name}        = $3;
         $arg->{type}        = $4 || ( $arg->{option} ? undef: "string" );
         $arg->{default}     = $5;
-        $arg->{repeating}   = $6 eq "+";
+        $arg->{repeating}   = $6 eq '+';
 
         die "Optionals need to be optional.\n"
             if $arg->{option} and not $arg->{optional};
@@ -132,7 +132,7 @@ sub arg_check {
     my (@args) = @_;
     
     my ($min, $max) = num_args(@args);
-    my $code = "";
+    my $code = '';
     
     if ($max == $min) {
         $code .= "  if argc != $max goto bad_args\n";
@@ -199,7 +199,7 @@ sub arguments {
         var     => '__read',
     );
     
-    my $code = "";
+    my $code = '';
     for my $i (0..$#args)
     {
         my $arg  = $args[$i];
@@ -285,7 +285,7 @@ sub body {
             
             $locals{$_} = 1 for @vars;
             $code .= inline("  .local $1 ");
-            $code .= emit(join(",", map {$_."_%0"} @vars), 'loop_num');
+            $code .= emit(join(',', map {$_."_%0"} @vars), 'loop_num');
 
             next;
         }
@@ -299,7 +299,7 @@ sub body {
 
         # locals
         if (%locals) {
-            my $locals = join "|", keys %locals;
+            my $locals = join '|', keys %locals;
             $line =~ s/\b($locals)\b/$1_%0/g;
         }
 
@@ -366,7 +366,7 @@ sub create_usage {
         push @results, $usage;
     }
 
-    my $result = join " ", @results;
+    my $result = join ' ', @results;
     $result = " $result" if @results;
     return $result;
 }

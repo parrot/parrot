@@ -4,10 +4,10 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&unset"
+.sub '&unset'
   .param pmc argv :slurpy
 
-  # For now, pretend the usage is "unset <foo>"
+  # For now, pretend the usage is 'unset <foo>'
 
   .local int argc
   argc = argv
@@ -23,7 +23,7 @@
   char = ord name, -1
   if char != 41 goto scalar
   # contains a (
-  char = index name, "("
+  char = index name, '('
   if char == -1 goto scalar
 
 array:
@@ -46,12 +46,12 @@ array:
   $I0 = exists var[key]
   if $I0 == 0 goto no_such_element
   delete var[key]
-  .return("")
+  .return('')
 
 no_such_element:
   $S0 = "can't unset \""
   $S0 .= name
-  $S0 .= "\": no such element in array"
+  $S0 .= '": no such element in array'
   .throw($S0)
 
 scalar:
@@ -64,11 +64,11 @@ scalar:
   .local pmc store_var
   .get_from_HLL(store_var, '_tcl', '__store_var')
   store_var(name, var)
-  .return("")
+  .return('')
 
 no_such_var:
   $S0 = "can't unset \""
   $S0 .= name
-  $S0 .= "\": no such variable"
+  $S0 .= '": no such variable'
   .throw($S0)
 .end

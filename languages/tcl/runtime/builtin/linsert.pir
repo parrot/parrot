@@ -5,7 +5,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&linsert"
+.sub '&linsert'
   .param pmc argv :slurpy
 
   # make sure we have the right # of args
@@ -26,7 +26,7 @@
   .get_from_HLL(list_index, '_tcl', '_list_index')
 
   ($P0,$I2) = list_index(the_list,position)
-  #linsert treats "end" differently
+  #linsert treats 'end' differently
   if $I2 == 0 goto next
   inc $P0
 
@@ -88,6 +88,6 @@ DONE2:
   .return (retval)
 
 wrong_args:
-  .throw ("wrong # args: should be \"linsert list index element ?element ...?\"")
+  .throw ('wrong # args: should be "linsert list index element ?element ...?"')
 
 .end

@@ -1,7 +1,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&binary"
+.sub '&binary'
   .param pmc argv :slurpy
 
   .local pmc retval
@@ -19,9 +19,9 @@
   .return subcommand_proc(argv)
 
 bad_args:
-  $S0 = "bad option \""
+  $S0 = 'bad option "'
   $S0 .= subcommand_name
-  $S0 .= "\": must be format or scan"
+  $S0 .= '": must be format or scan'
 
   .throw ($S0)
 
@@ -39,7 +39,7 @@ no_args:
   inc argvIndex
 .endm
 
-.sub "format"
+.sub 'format'
   .param pmc argv
 
   .local int argc
@@ -79,7 +79,7 @@ format_loop:
   num_pos = pos + 1
  
   $S0 = substr formatString, num_pos, 1
-  if $S0 != "*" goto get_int_count
+  if $S0 != '*' goto get_int_count
   count = -1
   pos = num_pos
   goto got_count
@@ -116,9 +116,9 @@ got_count:
 
 which_format:
 
-  if formatChar == "a" goto format_a
-  if formatChar == "A" goto format_A
-  if formatChar == "x" goto format_x
+  if formatChar == 'a' goto format_a
+  if formatChar == 'A' goto format_A
+  if formatChar == 'x' goto format_x
  
   .throw('This error should never occur: must be missing a field specifier implementation.')
 
@@ -162,7 +162,7 @@ format_A_counted:
 format_A_padding:
   outputString .= argString
   count = count - $I0
-  $S0 = repeat " ", count
+  $S0 = repeat ' ', count
   outputString .= $S0
   goto format_done
 
@@ -179,7 +179,7 @@ format_done:
   goto format_loop
 end_format_loop:
 
-  print "ESCAPED OUTPUT IS:"
+  print 'ESCAPED OUTPUT IS:'
   $S0 = escape outputString
   print $S0
   print_newline
@@ -197,7 +197,7 @@ out_of_args:
 
 .end
 
-.sub "scan"
+.sub 'scan'
   .param pmc argv
 
   .local int argc
