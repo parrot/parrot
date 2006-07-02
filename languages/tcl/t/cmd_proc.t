@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"return value");
@@ -104,6 +104,13 @@ language_output_is("tcl",<<'TCL',<<OUT,"vararg empty");
 TCL
 2
 
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "unknown namespace");
+  proc a::b {} {puts a::b}
+  a::b
+TCL
+can't create procedure "a::b": unknown namespace
 OUT
 
 TODO: {
