@@ -36,7 +36,9 @@ N: Alex Gough
 D: bignum
 
 N: Allison Randal
+D: Lead Designer
 D: TGE, Punie (Perl 1), P6C
+E: allison@perl.org
 
 N: Amir Karger
 D: editor bugfixes
@@ -56,6 +58,10 @@ D: vim syntax files and editor doc
 
 N: Andy Dougherty
 D: Config and building.
+
+N: Andy Lester
+D: consting, cleanups, and Chief Cage Cleaner
+E: andy@petdance.com
 
 N: Angel Faus
 D: CFG and live analysis.
@@ -105,11 +111,13 @@ D: And, yes, {sigh}, *that* Warnock.
 E: bwarnock@raba.com
 
 N: Chip Salzenberg
-D: Designer and demagogue
+D: Pumpking (0.4.6 - ... ) and demagogue
 E: chip@pobox.com
 
 N: chromatic
 D: SDL library and examples; Test::Builder; test suite cleanup; Pheme
+D: lead philosopher -- "Why doesn't this work?"
+E: chromatic@wgz.org
 
 N: Clayton O'Neill
 D: Fix for parrot linking issue on Solaris 8
@@ -284,7 +292,7 @@ D: FreeBSD and other build fixes
 N: Leon Brocard
 
 N: Leopold Toetsch
-D: Patchmonster & pumpking
+D: Patchmonster & pumpking emeritus (0.0.13 - 0.4.5)
 E: lt@toetsch.at
 S: Herrnbaumgarten, Austria
 
