@@ -116,6 +116,31 @@ inline op getstderr(out PMC) :base_io {
 
 #########################################
 
+=item B<setstdout>(in PMC)
+
+Sets the standard output for a bare C<print> op to go to the supplied ParrotIO
+PMC.  Call C<getstdout> first if you care about retaining the previous PMC.
+
+=item B<setstderr>(in PMC)
+
+Sets the standard error for a bare C<printerr> op to go to the supplied
+ParrotIO PMC.  Call C<getstderr> first if you care about retaining the previous
+PMC.
+
+=cut
+
+inline op setstdout(in PMC) :base_io {
+	PIO_STDOUT(interpreter) = $1;
+	goto NEXT();
+}
+
+inline op setstderr(in PMC) :base_io {
+	PIO_STDERR(interpreter) = $1;
+	goto NEXT();
+}
+
+#########################################
+
 =item B<pioctl>(out INT, in PMC, in INT, in INT)
 
 Perform an operation an an IO object. This is a general purpose
