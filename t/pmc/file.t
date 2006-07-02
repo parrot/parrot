@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 use Parrot::Config;
 
@@ -236,4 +236,41 @@ ok:
 CODE
 ok
 ok
+OUT
+
+my $bad_file = catfile( $xpto, 'not a file' );
+# test exists
+pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
+.sub main :main
+       \$P1 = new .File
+       \$I1 = \$P1.'exists'( '$otpxcopy' )
+
+       if \$I1 goto file_exists
+	   print "not "
+
+  file_exists:
+       print "ok 1 - file exists\\n"
+
+       \$I1 = \$P1.'exists'( '$xpto' )
+
+       if \$I1 goto dir_exists
+	   print "not "
+
+  dir_exists:
+       print "ok 2 - directory exists\\n"
+
+       \$I1 = \$P1.'exists'( '$bad_file' )
+
+       if \$I1 == 0 goto file_does_not_exist
+	   print "not "
+
+  file_does_not_exist:
+       print "ok 3 - file does not exist\\n"
+
+       end
+.end
+CODE
+ok 1 - file exists
+ok 2 - directory exists
+ok 3 - file does not exist
 OUT
