@@ -171,7 +171,40 @@ bad_args:
   
   .local int argc
   argc = elements argv
-  if argc < 4 goto bad_args
+  if argc < 2 goto bad_args
+  
+  .local pmc ns, p6rule, colons, split
+  p6rule = compreg "PGE::P6Regex"
+  colons = p6rule('\:\:+')
+  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  
+  ns = shift argv
+  ns = split(colons, ns)
+  
+  .local string namespace
+  namespace = ""
+  $I0 = elements ns
+  if $I0 == 0 goto global_ns
+  
+  namespace = join "'; '", ns
+  namespace = "['" . namespace
+  namespace .= "']"
+
+global_ns:
+  .local pmc code
+  code = new 'TclCodeString'
+  code.emit(<<'END_PIR', namespace)
+.namespace %0
+.sub foo 
+  .return()
+.end
+END_PIR
+  
+  .local pmc pir_compiler
+  pir_compiler = compreg "PIR"
+  $P0 = pir_compiler(code)
+  
+  .return()
 
 bad_args:
   .throw('wrong # args: should be "namespace eval name arg ?arg...?"')  
