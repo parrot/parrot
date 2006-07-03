@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -109,7 +109,7 @@ use strict;
 use lib 'lib';
 
 use Pod::Usage;
-use Getopt::Long;
+use Getopt::Long qw(:config permute);
 
 use Parrot::OpsFile;
 use Parrot::OpLib::core;

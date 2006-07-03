@@ -603,7 +603,7 @@ $(SRC_DIR)/string_private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
 # classes PMC build utils and rules
 PMC2CD = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
 PMC2CC = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
-PMC2CV = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vt
+PMC2CV = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable
 
 .pmc.dump :
 	$(PMC2CD) $<
