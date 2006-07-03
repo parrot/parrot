@@ -1,0 +1,25 @@
+=head1 Parrot Cage Cleaners high-level goals
+
+=head2 Enforcing coding standards, naming conventions, etc
+
+=head2 Smoke testing on many platforms
+
+=head2 Decreasing the amount of repeated code
+
+=head2 Automated generation of C headers
+
+=head2 Improve low-level code quality
+
+=head2 Creating automated code checking tools
+
+=head2 Documenting function behavior and structure members
+
+=head2 Developing coverage tools where they don't exist
+
+=head2 IMCC cleanup
+
+From #parrot:
+
+    vsoni: there seems to be some dead code/feature....I had a chat
+    with leo and I am going to send and email to p6i for deprecation
+    of certain old features
