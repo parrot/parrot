@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 19;
 use Test::More;
 use vars qw($TODO);
 
@@ -110,3 +110,16 @@ TCL
 1
 OUT
 
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace eval foo {}");
+  namespace eval foo {}
+  puts [namespace exists foo]
+TCL
+1
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace eval foo {}");
+  namespace eval foo { proc bar {} {puts ok} }
+  foo::bar
+TCL
+ok
+OUT
