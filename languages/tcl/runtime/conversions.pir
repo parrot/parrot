@@ -181,7 +181,9 @@ empty:
 relative:
   .local pmc interp
   interp = getinterp
-  $I0 = 0
+  # skip this and the parent
+  # because this only gets called by builtins (I hope)
+  $I0 = 1
 relative_loop:
   inc $I0
   $P0 = interp["sub"; $I0]

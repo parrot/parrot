@@ -97,8 +97,20 @@ not_done:
 relative:
 
 get:
-  $P0 = get_namespace $P0
-  if null $P0 goto doesnt_exist
+  .local pmc ns
+  $I0 = 0
+  $I1 = elements $P0
+  .include 'interpinfo.pasm'
+  ns = interpinfo .INTERPINFO_NAMESPACE_ROOT
+  ns = ns['tcl']
+get_loop:
+  if $I0 == $I1 goto get_end
+  $P1 = $P0[$I0]
+  ns  = ns[$P1]
+  if null ns goto doesnt_exist
+  inc $I0
+  goto get_loop
+get_end:
   .return(1)
   
 doesnt_exist:
@@ -191,11 +203,25 @@ bad_args:
   namespace .= "']"
 
 global_ns:
-  .local pmc code
+  .local pmc compile, code
+  .get_from_HLL(compile, '_tcl', 'compile')
   code = new 'TclCodeString'
-  code.emit(<<'END_PIR', namespace)
+  $S0 = join " ", argv
+  ($I0, $S0) = compile(1, $S0)
+  $I0 = code.unique()
+  code.emit(<<'END_PIR', namespace, $S0, $I0)
+.HLL 'tcl', 'tcl_group'
 .namespace %0
-.sub foo 
+# src/compiler.pir :: pir_compiler (2)
+.pragma n_operators 1
+.sub compiled_tcl_sub_%2 
+  .include "languages/tcl/src/returncodes.pir"
+  .local pmc epoch, p6rule, colons, split
+  .get_from_HLL(epoch,'_tcl','epoch')
+  p6rule = compreg "PGE::P6Regex"
+  colons = p6rule('\:\:+')
+  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  %1
   .return()
 .end
 END_PIR
@@ -203,6 +229,7 @@ END_PIR
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
   $P0 = pir_compiler(code)
+  $P0()
   
   .return()
 
