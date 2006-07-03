@@ -8,6 +8,10 @@
 
 =head2 Automated generation of C headers
 
+This has started significantly with the F<headerizer.pl> program.
+Right now, it extracts the function headers correctly, but now I
+have to have it create the F<.h> files.
+
 =head2 Improve low-level code quality
 
 =head2 Creating automated code checking tools
@@ -15,6 +19,17 @@
 =head2 Documenting function behavior and structure members
 
 =head2 Developing coverage tools where they don't exist
+
+=head2 Run on many different C compilers
+
+Most of Andy's work right now is with GCC 4.2 on Linux.  We need
+many more.
+
+=head2 Run under splint
+
+=head2 Run under Solaris lint
+
+=head2 Run under valgrind
 
 =head2 IMCC cleanup
 
