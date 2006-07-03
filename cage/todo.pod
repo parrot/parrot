@@ -1,10 +1,20 @@
 =head1 Parrot Cage Cleaners high-level goals
 
+=head2 Smoke testing on many platforms with many compilers
+
+The more platforms we have, the more likely we are to find portability
+problems.  Parrot has to be the most portable thing we've created.
+
+More platforms also means more compilers.  Maybe your DEC compiler
+is more picky than gcc, and spews more warnings.  Good!  More
+opportunities for cleaning!
+
 =head2 Enforcing coding standards, naming conventions, etc
 
-=head2 Smoke testing on many platforms
-
 =head2 Decreasing the amount of repeated code
+
+PMD (http://pmd.sourceforge.net/) has been used on C code, even
+though it's a Java tool.
 
 =head2 Automated generation of C headers
 
@@ -18,7 +28,9 @@ have to have it create the F<.h> files.
 
 =head2 Documenting function behavior and structure members
 
-=head2 Developing coverage tools where they don't exist
+=head2 Developing coverage tools
+
+=head2 Automatically running the coverage tools
 
 =head2 Run on many different C compilers
 
@@ -27,9 +39,27 @@ many more.
 
 =head2 Run under splint
 
+Splint (http://www.splint.org) is a very very picky lint tool, and
+setup and configuration is a pain.  Andy has tried to get Perl 5
+running under it nicely, but has met with limited success.  Maybe
+the Parrot will be nicer.
+
 =head2 Run under Solaris lint
 
+Sun has made its dev tools freely available at
+http://developers.sun.com/prodtech/cc/.  Its lint is the best one
+out there, except from Gimpel's FlexeLint
+(http://www.gimpel.com/html/flex.htm) which costs many dollars.
+
 =head2 Run under valgrind
+
+Valgrind (http://valgrind.org/) is a profiler/debugger most notable
+for the way it magically monitors memory accesses and management.
+
+=head2 Run under Coverity Prevent
+
+Coverity already runs Prevent on the Perl 5 source.  Let's get
+Parrot running under it, too. http://scan.coverity.com/
 
 =head2 IMCC cleanup
 
@@ -38,3 +68,13 @@ From #parrot:
     vsoni: there seems to be some dead code/feature....I had a chat
     with leo and I am going to send and email to p6i for deprecation
     of certain old features
+
+=head2 Helping other contributors hack their patches into Parrot-style industrial-strength C code.
+
+From chip's comment at http://www.oreillynet.com/onlamp/blog/2006/07/calling_for_parrot_janitors.html
+
+    We've just had contributed an improved register allocation
+    implementation, but since the contributor is new to Parrot,
+    there are some style and coding standards issues that need to
+    be worked out. It'd be great if a Cage Cleaner could step up
+    and help our new contributor bang the code into Parrotish form.
