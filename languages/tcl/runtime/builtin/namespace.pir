@@ -161,12 +161,20 @@ WHOLE:
   $P0 = argv[0]
   .return($P0)
 
-  bad_args:
+bad_args:
   .throw ('wrong # args: should be "namespace tail string"')
 
 .end
 
 .sub 'eval'
+  .param pmc argv
+  
+  .local int argc
+  argc = elements argv
+  if argc < 4 goto bad_args
+
+bad_args:
+  .throw('wrong # args: should be "namespace eval name arg ?arg...?"')  
 .end
 
 .sub 'export'

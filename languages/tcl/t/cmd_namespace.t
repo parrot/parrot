@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 use Test::More;
 use vars qw($TODO);
 
@@ -108,6 +108,12 @@ language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: global explicit");
    puts [namespace exists ::]
 TCL
 1
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace eval - bad args");
+  namespace eval foo
+TCL
+wrong # args: should be "namespace eval name arg ?arg...?"
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "namespace eval foo {}");
