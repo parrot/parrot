@@ -42,9 +42,9 @@ These are the opcodes relevant to exceptions and exception handlers:
 
 =over
 
-=item B<< push_eh I<SUB_LABEL> >>
+=item B<push_eh I<SUB_LABEL>>
 
-=item B<< push_eh I<INVOCABLE_PMC> >>
+=item B<push_eh I<INVOCABLE_PMC>>
 
 Push an invocable PMC -- usually a closure or, in rarer cases, a subroutine --
 onto the exception handler stack.
@@ -58,15 +58,13 @@ handlers, invoking each one in turn, but still in the dynamic context of the
 exception (i.e. the call stack is I<not> unwound first).  See below for more
 detail.
 
-=item B<< pop_eh >>
+=item B<pop_eh>
 
 Pop the most recently pushed exception handler off the control stack.
 
-{{ TODO: should we provide a "pop_eh $P0" variant returning the address, since
-it's easy and somebody might find it useful?  Or is it more important to
-provide generic control stack introspection?  Probably the latter.  }}
+{{ TODO: Provide control stack introspection. }}
 
-=item B<< throw I<EXCEPTION> >>
+=item B<throw I<EXCEPTION>>
 
 Throw an exception consisting of the given I<EXCEPTION> PMC.  Active exception
 handlers (if any) will be invoked with I<EXCEPTION> as the only parameter.
@@ -78,21 +76,22 @@ opcode.  (But see B<throwcc> below.)
 Any type of PMC can be thrown as an exception.  However, if there's any chance
 of cross-language calls -- and in a Parrot environment, cross-language
 operations are kind of the point -- then you should be prepared to catch
-object of classes you would never have thrown yourself.
+exception classes you would never have thrown yourself.
 
 That said, it is I<VERY STRONGLY RECOMMENDED> that any thrown PMC that can
 possibly escape your private sandbox should meet the minimal interface
 requirements of the C<parrot;exception> class, described below.
 
-=item B<< throwcc I<EXCEPTION> >>
+=item B<throwcc I<EXCEPTION> [ , I<CONTINUATION> ]>
 
-Throw an exception consisting of the given I<EXCEPTION> PMC after taking a
-continuation at the next opcode.  Active exception handlers (if any) will be
+Throw an exception consisting of the given I<EXCEPTION> PMC after taking
+a continuation at the next opcode.  When a I<CONTINUATION> is passed in,
+it will use that instead. Active exception handlers (if any) will be
 invoked with I<EXCEPTION> and the given continuation as parameters.
 
-Except for its taking of a continuation which is then passed to exception
-handlers, C<throwcc> is just like C<throw>.  This opcode is useful for
-exceptions that are more like warnings or notices than errors.
+Except for the continuation which is passed to exception handlers,
+C<throwcc> is just like C<throw>.  This opcode is useful for exceptions
+that are more like warnings or notices than errors.
 
 Exception handlers can resume execution immediately after the C<throwcc>
 opcode by executing the C<handled> opcode, and then invoking the given
@@ -100,21 +99,26 @@ continuation which they receive as a parameter.  That continuation must be
 invoked with no parameters; in other words, C<throwcc> may I<not> return a
 value.
 
-=item B<< die [ I<MESSAGE> ] >>
+{{ TODO: Resuming immediately after the C<throw> opcode isn't quite
+flexible enough. Perl 6, for example, resumes control flow after the end
+of the block in which the exception was thrown. }}
+
+=item B<die [ I<MESSAGE> ]>
 
 The C<die> opcode throws an exception of type C<exception;death> with a
 payload of I<MESSAGE>.  If I<MESSAGE> is a string register, the exception
 payload is a C<String> PMC containing I<MESSAGE>; if I<MESSAGE> is a PMC, it
 is used directly as the exception payload.
 
-{{ TODO: What is the default when no I<MESSAGE> is given? }}
+{{ TODO: What is the default when no I<MESSAGE> is given? Something like
+"Fatal exception at LINE in FILE." followed by a backtrace. }}
 
 If this exception is not handled, it results in Parrot returning an error
 indication and the stringification of I<MESSAGE> to its embedding environment.
 When running standalone, this means writing the stringification of I<MESSAGE>
-to the standard error and executing the standard C function C<exit(1)>.
+to standard error and executing the standard C function C<exit(1)>.
 
-=item B<< exit [ I<EXITCODE> ] >>
+=item B<exit [ I<EXITCODE> ]>
 
 Throw an exception of type C<exception;exit> with a payload of I<EXITCODE>,
 which defaults to zero, as an Integer PMC.
@@ -123,7 +127,7 @@ If not handled, this exception results in Parrot returning I<EXITCODE>
 as a status to its embedded environment, or when running standalone,
 to execute the C function C<exit(I<EXITCODE>)>.
 
-=item B<< handled >>
+=item B<handled I<EXCEPTION>>
 
 While handling an exception, tell Parrot that the exception has been handled
 and should be removed from the stack of active exceptions.  This opcode is an
@@ -133,37 +137,64 @@ exception handler's way of telling Parrot that it has handled the exception.
 
 =head2 Order of Operations in Exception Handling
 
-=over 4
+When B<throw> or B<throwcc> is called, for all active exception
+handlers, in LIFO order:
 
-=item B<throw> or B<throwcc>
+=over
 
-   For all active exception handlers, in LIFO order:
-      find the topmost exception handler
-      push Exception Record somewhere,
-         presumably on the control stack,
-         containing pointer to exception handler block
-            and exception PMC
-            (and possibly a continuation)
-      invoke the handler
-        (note: this is still in the thrower's dynamic context)
+=item 1
+Find the topmost exception handler
 
-=item if the handler returns normally:
+=item 2
+Push an exception record somewhere, presumably on the control stack.
+The exception record contains a pointer to an exception handler block
+and an exception PMC (and possibly a continuation)
 
-   find the "exception handling in progress" record
-   find the next exception handler
-   if found,
-      invoke it
-   else if there is a continuation in the Exception Record
-        (because the throwing opcode was C<throwcc>),
-      invoke the ER's continuation (i.e. resume execution)
-   else,
-      terminate program a la C<die>
-
-=item C<handled> opcode
-
-   pop and destroy Exception Record
+=item 3
+Invoke the handler (note: this is still in the thrower's dynamic
+context)
 
 =back
+
+If the handler returns normally:
+
+=over
+
+=item 1
+Find the "exception handling in progress" record
+
+=item 2
+Find the next exception handler
+
+=item 3
+If the handler is found, invoke it
+
+=item 4
+Or if there is a continuation in the exception record
+(because the throwing opcode was C<throwcc>),
+invoke the ER's continuation (i.e. resume execution)
+
+=item 5
+Otherwise terminate program a la C<die>
+
+=back
+
+{{ TODO: this isn't right, another option is a) invoke the handler, b)
+the handler calls handled, and c) invoke the continuation to resume
+because the exception was handled. The question of whether to resume or
+die when an exception is never handled is determined by the severity of
+the exception, not by the simple fact of having a continuation. }}
+
+
+When the C<handled> opcode is called:
+
+=over
+
+=item 1
+Pop and destroy exception record
+
+=back
+
 
 =head1 STANDARD EXCEPTIONS
 
@@ -220,7 +251,9 @@ If an exception is a consequence of a previous exception, use the
 C<set_inner_exception()> method to store that previous exception
 as part of the exception object.
 
-{{ TODO: Should we use properties instead? }}
+{{ TODO: Should we use properties instead? ANR: I'm not sure what you
+mean by "an exception is a consequence of a previous exception".
+Example? }}
 
 =back
 
@@ -251,6 +284,8 @@ Generic base class for math errors.
 Division by zero (integer or float).  No payload.
 
 =item B<exception;domain>
+
+{{ TODO: How about calling these B<exception;input>? }}
 
 Generic base class for miscellaneous domain (input value) errors.  Payload is
 an array, the first element of which is the operation that failed (e.g. the
@@ -321,8 +356,8 @@ pad PMC, its behavior may be very different.  (For example, in Tcl,
 C<store_lex> is likely to succeed every time, as creating new lexicals at
 runtime is OK in Tcl.)
 
-{{ FIXME - Is it true that more opcodes throw exceptions?  If so, they should
-be listed here. }}
+{{ TODO: List any other opcodes that currently throw exceptions and
+general categories of opcodes that should throw exceptions. }}
 
 Other opcodes respond to an C<errorson> setting to decide whether to
 throw an exception or return an error value. C<find_global> throws an
@@ -331,8 +366,32 @@ exist. C<find_name> throws an exception (or returns a Null PMC) if the
 name requested doesn't exist in a lexical, current, global, or built-in
 namespace.
 
-{{ FIXME - "erroron" as specified is dynamically rather than lexically
-scoped; is this good? }}
+{{ FIXME - "errorson" as specified is dynamically rather than lexically
+scoped; is this good? ANR: There are a couple of different factors here.
+One is the ability to globally define the severity of certain exceptions
+or categories of exceptions without needing to define a handler for each
+one. (e.g. Perl 6 may have pragmas to set how severe type-checking
+errors are. A simple "incompatible type" error may be fatal under one
+pragma, a resumable warning under another pragma, and completely silent
+under a third pragma.) Another is the ability to "defang" opcodes so
+they return error codes instead of throwing exceptions. We might provide
+a very simple interface to catch an exception and capture its payload
+without the full complexity of manually defining exception handlers
+(though it would still be implemented as an exception handler
+internally). Something like:
+
+  .local pmc error_code
+  .capture_start error_code
+  $P1 = find_lex 'foo'
+  .capture_end
+
+  # error_code contains what would have been the "error" return value
+
+This could eliminate the need for "defanging" because it would be almost
+as easy to use as error codes. It could be implemented once for all
+exceptional opcodes, instead of needing to be defined for each one. And,
+it still keeps the error information out-of-band, instead of mixing the
+error in with normal return values. }}
 
 It's a little odd that so few opcodes throw exceptions (these are the
 ones that are documented, but a few others throw exceptions internally
@@ -344,7 +403,7 @@ like the way C<LexPad>s and the C<errorson> settings provide the option
 for exception-based or non-exception-based implementations, rather than
 forcing one or the other.]
 
-=head2 
+=head2 Resuming after Exceptions
 
 Exceptions thrown by standard Parrot opcodes (like the one thrown by
 C<find_global> above or by the C<throw> opcode) are always resumable,
@@ -358,10 +417,19 @@ resumable.
   $P1 = new ['parrot';'exception'], $P0  # create new exception object
   throw $P1                              # throw it
 
+=head2 Consequenses
+
 Exceptions are designed to work with the Parrot calling conventions.
 Since the return addresses of C<bsr> subroutine calls and exception
 handlers are both pushed onto the control stack, it's generally a bad
 idea to combine the two.
+
+{{ TODO: If this continues to be true, then we need a way to turn off
+all exceptions. A number of built-in opcodes throw exceptions. If there
+is no way to prevent this, then it is never safe to use the control
+stack for anything other than exceptions. Alternatively, we leave the
+control stack safe for more primitive control flow, and pick another
+strategy for exceptions. }}
 
 =head1 ATTACHMENTS
 
