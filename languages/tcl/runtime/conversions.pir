@@ -150,24 +150,28 @@ Given a chunk of tcl code, return a subroutine.
 
 =head2 _Tcl::__namespace
 
-Given a string namespace, return the namespace object and the tail.
+Given a string namespace, return an array of names.
 
 =cut
 
 .sub __namespace
   .param string name
-  
+  .param int    depth     :optional
+  .param int    has_depth :opt_flag
+
+  if has_depth goto depth_set
+  depth = 0
+
+depth_set:
   .local pmc p6rule, colons, split
   p6rule = compreg "PGE::P6Regex"
   colons = p6rule('\:\:+')
   .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
   
   .local pmc ns_name
-  .local string tail
   ns_name = split(colons, name)
   $I0 = elements ns_name
   if $I0 == 0 goto empty
-  tail = pop ns_name
   if $I0 == 1  goto relative
   $S0 = ns_name[0]
   if $S0 != "" goto relative
@@ -177,16 +181,13 @@ absolute:
   goto return
 
 empty:
-  tail = ""
+  push ns_name, ""
 relative:
   .local pmc interp
   interp = getinterp
-  # skip this and the parent
-  # because this only gets called by builtins (I hope)
-  $I0 = 1
 relative_loop:
-  inc $I0
-  $P0 = interp["sub"; $I0]
+  inc depth
+  $P0 = interp["sub"; depth]
   $P0 = $P0.'get_namespace'()
   $P0 = $P0.'name'()
   $S0 = $P0[0]
@@ -201,5 +202,5 @@ combine_loop:
   goto combine_loop
 
 return:
-  .return(ns_name, tail)
+  .return(ns_name)
 .end

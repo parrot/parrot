@@ -61,7 +61,8 @@ got_args:
   
   .local pmc __namespace
   .get_from_HLL(__namespace, '_tcl', '__namespace')
-  ($P0, name) = __namespace(full_name)
+  $P0  = __namespace(full_name, 1)
+  name = pop $P0
   
   $I0 = elements $P0
   if $I0 == 0 goto empty

@@ -43,7 +43,6 @@ no_args:
 .HLL '_Tcl', ''
 .namespace [ 'helpers'; 'namespace' ]
 
-# TODO: hey, this is cheating!
 .sub 'current'
   .param pmc argv
 
@@ -51,11 +50,16 @@ no_args:
   argc = argv
   if argc goto bad_args
 
-  .return('::')
+  .local pmc ns, __namespace
+  .get_from_HLL(__namespace, '_tcl', '__namespace')
+  ns  = __namespace('')
+  $P0 = pop ns
+  $S0 = join "::", ns
+  $S0 = "::" . $S0
+  .return($S0)
 
 bad_args:
   .throw ('wrong # args: should be "namespace current"')
-
 .end
 
 .sub 'delete'
@@ -185,14 +189,12 @@ bad_args:
   argc = elements argv
   if argc < 2 goto bad_args
   
-  .local pmc ns, p6rule, colons, split
-  p6rule = compreg "PGE::P6Regex"
-  colons = p6rule('\:\:+')
-  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  .local pmc ns, __namespace
+  .get_from_HLL(__namespace, '_tcl', '__namespace')
   
   ns = shift argv
-  ns = split(colons, ns)
-  
+  ns = __namespace(ns, 1)
+
   .local string namespace
   namespace = ""
   $I0 = elements ns
@@ -262,6 +264,39 @@ bad_args:
 .end
 
 .sub 'parent'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+
+  .local string name
+  name = ""
+  
+  if argc > 1  goto bad_args
+  if argc == 0 goto get_parent
+
+  name = argv[0]
+  
+get_parent:
+  .local pmc ns, __namespace
+  .get_from_HLL(__namespace, '_tcl', '__namespace')
+  ns  = __namespace(name)
+  $S0 = pop ns
+  if $S0 != "" goto no_pop
+  # for when someone calls [namespace current] from ::
+  push_eh current_in_root
+    $S0 = pop ns
+  clear_eh
+no_pop:
+  $S0 = join "::", ns
+  $S0 = "::" . $S0
+  .return($S0)
+
+current_in_root:
+  .return('')
+
+bad_args:
+  .throw('wrong # args: should be "namespace parent ?name?"')
 .end
 
 .sub 'which'
