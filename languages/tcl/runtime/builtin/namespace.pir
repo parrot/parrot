@@ -72,8 +72,9 @@ bad_args:
   
   .local pmc __namespace, ns_root
   .get_from_HLL(__namespace, '_tcl', '__namespace')
-  $P0 = new ResizablePMCArray
-  ns_root = get_namespace $P0
+  .include 'interpinfo.pasm'
+  ns_root = interpinfo .INTERPINFO_NAMESPACE_ROOT
+  ns_root = ns_root['tcl']
   
   $I0 = 0
 delete_loop:
