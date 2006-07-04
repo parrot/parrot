@@ -23,6 +23,7 @@ strings.
 #include "parrot/parrot.h"
 #include "parrot/compiler.h"
 #include "string_private_cstring.h"
+#include "parrot/string_funcs.h"
 #include <assert.h>
 
 /*
@@ -45,13 +46,12 @@ strings.
            s->charset && \
            !PObj_on_free_list_TEST(s))
 
-/*
-HEADER: include/parrot/string_funcs.h
-*/
+/* HEADER: include/parrot/string_funcs.h */
 
 /*
 
-FUNCDOC:
+FUNCDOC: Parrot_unmake_COW
+
 If the specified Parrot string is copy-on-write then the memory is
 copied over and the copy-on-write flag is cleared.
 
@@ -93,7 +93,8 @@ Parrot_unmake_COW(Interp *interpreter, STRING *s /*NN*/)
 
 /*
 
-FUNCDOC:
+FUNCDOC: copy_string_header
+
 Copies the string header from the first Parrot string to the second.
 
 */
@@ -106,7 +107,8 @@ copy_string_header(String *dest /*NN*/, const String *src /*NN*/)
 
 /*
 
-FUNCDOC:
+FUNCDOC: Parrot_make_COW_reference
+
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer.
 
@@ -116,9 +118,9 @@ STRING *
 Parrot_make_COW_reference(Interp *interpreter, STRING *s)
 {
     STRING *d;
-    if (s == NULL) {
+    if (s == NULL)
         return NULL;
-    }
+
     if (PObj_constant_TEST(s)) {
         d = new_string_header(interpreter, 0);
         PObj_COW_SET(s);
@@ -137,9 +139,11 @@ Parrot_make_COW_reference(Interp *interpreter, STRING *s)
     }
     return d;
 }
+
 /*
 
-FUNCDOC:
+FUNCDOC: Parrot_reuse_COW_reference
+
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer. Doesn't allocate a new string header, instead
 using the one passed in and returns it.
@@ -168,7 +172,8 @@ Parrot_reuse_COW_reference(Interp *interpreter, STRING *s, STRING *d /*NN*/)
 
 /*
 
-FUNCDOC:
+FUNCDOC: string_set
+
 Makes the contents of first Parrot string a copy of the contents of
 second.
 
@@ -202,7 +207,8 @@ string_set(Interp *interpreter, STRING *dest /*NN*/, STRING *src)
 
 Creation, enlargement, etc.
 
-FUNCDOC:
+FUNCDOC: string_init
+
 Initializes the Parrot string subsystem.
 
 */
