@@ -201,30 +201,35 @@ sub main {
         for my $cfile ( sort keys %$cfiles ) {
             my $funcs = $cfiles->{$cfile};
 
-            my $function_defs = "";
-            foreach my $func ( @$funcs ){
-                $function_defs .= sprintf "%s%s %s( %s );\n",
-                $func->[0] ? $func->[0]." " : '',  # static
-                $func->[1],                        # returntype
-                $func->[2],                        # funcname
-                # CHOOSE one of these two methods (or config item??):
-                #          join(",", @{$func}[3..$#$func]), # params -- all on one line
-                $#$func < 3 ? '' : join(",", map { "\n\t$_" } @{$func}[3..$#$func]) . "\n", # params -- formatted one per line & indented
-                ;
+            my @function_defs;
+            foreach my $func ( sort { $a->[2] cmp $b->[2] } @$funcs ) {
+                my $static = shift @$func;
+                next if $static;
+
+                my $ret_type = shift @$func;
+                my $funcname = shift @$func;
+                my @args = @$func;
+
+                push( @function_defs,
+                    sprintf "PARROT_API %s %s( %s );\n",
+                        $ret_type,
+                        $funcname,
+                        join( ",\n\t", @args ),
+                );
             }
-            my ($START_TXT, $END_TXT) = (qq#/* HEADERIZER BEGIN: $cfile */\n#, qq#/* HEADERIZER END: $cfile */\n#);
-            my ($START_RE, $END_RE);
-            ($START_RE = $START_TXT) =~ s/\*/\\*/g;
-            ($END_RE   = $END_TXT)   =~ s/\*/\\*/g;
-            $header =~ s#($START_RE)(?:.*?)($END_RE)#$1$function_defs$2#s or do {
-                $header .= $START_TXT . $function_defs . $END_TXT;
-            };
-        }
+
+            my $function_defs = join( "\n", @function_defs );
+            my $STARTMARKER = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
+            my $ENDMARKER   = qr#/\* HEADERIZER END: $cfile \*/\n?#;
+            $header =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1$function_defs$2#s
+                or die "no HEADERIZER markers for '$cfile' found in '$hfile'";
+        } # for %cfiles
+
         open FILE, '>', $hfile or die "couldn't write '$hfile': $!";
         print FILE $header;
         close FILE;
         print "Wrote '$hfile'\n";
-    } # while % files
+    } # for %files
 }
 
 # vim: expandtab shiftwidth=4:
