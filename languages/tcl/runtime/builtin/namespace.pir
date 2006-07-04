@@ -66,14 +66,37 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
-  if argc !=0  goto not_done
+  argc = elements argv
+  # no arg delete does nothing
+  if argc == 0 goto return
+  
+  .local pmc __namespace, ns_root
+  .get_from_HLL(__namespace, '_tcl', '__namespace')
+  $P0 = new ResizablePMCArray
+  ns_root = get_namespace $P0
+  
+  $I0 = 0
+delete_loop:
+  if $I0 == argc goto return
+  $S0 = argv[$I0]
+  $P0 = __namespace($S0)
+  $I1 = 0
+  $I2 = elements $P0
+  dec $I2
+  $P1 = ns_root
+loop:
+  $S0 = $P0[$I1]
+  if $I1 == $I2 goto end
+  $P1 = $P1[$S0]
+  inc $I1
+  goto loop
+end:
+  delete $P1[$S0]
+  inc $I0
+  goto delete_loop
 
-  # No arg delete does nothing.
+return:
   .return('')
-
-not_done:
-  .throw ('XXX')
 .end
 
 .sub "exists"
