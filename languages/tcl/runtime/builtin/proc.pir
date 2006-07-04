@@ -11,14 +11,12 @@ Create a PIR sub on the fly for this user defined proc.
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 3 goto error
 
   .local string full_name
-  .local pmc name
-  .local pmc args_p
-  .local pmc body_p
+  .local pmc name, args_p, body_p
   full_name = argv[0]
   args_p    = argv[1]
   body_p    = argv[2]
@@ -50,7 +48,7 @@ got_args:
   .get_from_HLL($P1, '_tcl', 'proc_body')
   $P1[full_name] = body_p
 
-  # Save the args for the proc for [info body]
+  # Save the args for the proc for [info args]
   # XXX When dealing with defaults, this will have to be updated.
   .get_from_HLL($P1, '_tcl', 'proc_args')
   $P1[full_name] = args_p
@@ -59,25 +57,25 @@ got_args:
   namespace = ""
   if full_name == "" goto empty
   
-  .local pmc __namespace
+  .local pmc __namespace, ns
   .get_from_HLL(__namespace, '_tcl', '__namespace')
-  $P0  = __namespace(full_name, 1)
-  name = pop $P0
+  ns   = __namespace(full_name, 1)
+  name = pop ns
   
-  $I0 = elements $P0
+  $I0 = elements ns
   if $I0 == 0 goto empty
-  $P1 = get_namespace $P0
-  if null $P1 goto unknown_namespace
+  $P0 = get_namespace ns
+  if null $P0 goto unknown_namespace
   
-  namespace = join "'; '", $P0
+  namespace = join "'; '", ns
   namespace = "['" . namespace
   namespace .= "']"
 
 empty:  
-  .local pmc proc_body
-  proc_body = new 'TclCodeString'
+  .local pmc code
+  code = new 'TclCodeString'
   
-  proc_body.emit(<<'END_PIR', namespace, name)
+  code.emit(<<'END_PIR', namespace, name)
 .HLL 'tcl', 'tcl_group'
 .namespace %0
 .sub '_xxx' :immediate
@@ -98,8 +96,10 @@ empty:
   inc call_level
 END_PIR
 
-  .local int arg_count
-  arg_count = args_p
+  .local int arg_count, min_args, max_args
+  arg_count = elements args_p
+  min_args = arg_count
+  max_args = arg_count
   .local int ii,is_slurpy
   is_slurpy = 0
   ii = 0
@@ -113,26 +113,23 @@ END_PIR
   if $S0 != "args" goto check_args
   is_slurpy = 1
   dec last_arg
+  dec min_args
 
 check_args:
-  proc_body.emit("  .local int argc")
-  proc_body.emit("  argc = elements args")
+  code.emit("  .local int argc")
+  code.emit("  argc = elements args")
 
-  if is_slurpy goto slurpy_arg_count
-  proc_body.emit("  if argc != %0 goto BAD_ARGS", arg_count)
-  goto arg_loop
-
-slurpy_arg_count:
-  $I0 = arg_count - 1
-  proc_body.emit("  if argc < %0 goto BAD_ARGS", $I0)
+  code.emit("  if argc < %0 goto BAD_ARGS", min_args)
+  if is_slurpy goto arg_loop
+  code.emit("  if argc > %0 goto BAD_ARGS", max_args)
 
 arg_loop:
   if ii == last_arg goto arg_loop_done
 
-  proc_body.emit("  $P1 = args[%0]", ii)
+  code.emit("  $P1 = args[%0]", ii)
   # escape this?
   $S0 = args_p[ii]
-  proc_body.emit("  store_lex '$%0', $P1", $S0)
+  code.emit("  store_lex '$%0', $P1", $S0)
 
   ii += 1
   goto arg_loop
@@ -142,7 +139,7 @@ arg_loop_done:
 
   # Convert the remaining elements returned by foldup into a TclList
   # XXX This code lifted from Tcl::&list - eventually factor this out.
-  proc_body.emit(<<"END_PIR", ii)
+  code.emit(<<"END_PIR", ii)
   .local int cnt,jj
   cnt = %0
   jj = 0
@@ -164,7 +161,7 @@ DONE:
 END_PIR
 
 done_args:
-  proc_body.emit(<<"END_PIR", name, args)
+  code.emit(<<"END_PIR", name, args)
   goto ARGS_OK
 BAD_ARGS:
   .throw('wrong # args: should be \"%0 %1\"')
@@ -172,16 +169,16 @@ ARGS_OK:
   push_eh is_return
 END_PIR
 
-  proc_body .= parsed_body
+  code .= parsed_body
   
-  proc_body.emit(<<"END_PIR", body_reg)
+  code.emit(<<"END_PIR", body_reg)
   clear_eh
 was_ok:
   dec call_level
   .return($P%0)
 END_PIR
 
-  proc_body .= <<"END_PIR"
+  code .= <<"END_PIR"
 is_return:
   .catch()
   .get_return_code($I0)
@@ -199,7 +196,7 @@ END_PIR
   pir_compiler = compreg "PIR"
 
   # (see note on trans_charset in lib/parser.pir) XXX
-  $S0 = proc_body
+  $S0 = code
   $I0 = find_charset 'ascii'
   $S0 = trans_charset $I0
   $P0 = pir_compiler($S0)
@@ -213,6 +210,5 @@ unknown_namespace:
   .throw($S0)
   
 error:
-  .throw ("wrong # args: should be \"proc name args body\"\n")
-
+  .throw('wrong # args: should be "proc name args body"')
 .end
