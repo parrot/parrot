@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 use Test::More;
 use vars qw($TODO);
 
@@ -64,20 +64,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"namespace tail: extra colons");
    puts [namespace tail :::a:::b::c]
 TCL
 c
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"namespace current: too many args");
-   namespace current current
-TCL
-wrong # args: should be "namespace current"
-OUT
-
-# TODO : more tests once we can *change* the namespace
-
-language_output_is("tcl",<<'TCL',<<OUT,"namespace current: too many args");
-   puts [namespace current]
-TCL
-::
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"namespace exists: no args");
@@ -154,4 +140,23 @@ TCL
 1
 0
 0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace current - too many args");
+namespace current foo
+TCL
+wrong # args: should be "namespace current"
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace current - global");
+  puts [namespace current]
+TCL
+::
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace current - ::foo");
+  namespace eval foo { proc test {} {puts [namespace current]} }
+  foo::test
+TCL
+::foo
 OUT
