@@ -1,5 +1,5 @@
 /* string_funcs.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2006, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -18,6 +18,8 @@
 #ifdef PARROT_IN_CORE
 
 /* Declarations of accessors */
+
+/* HEADERIZER BEGIN: src/string.c */
 
 PARROT_API STRING *Parrot_reuse_COW_reference(Interp *, STRING *, STRING *);
 PARROT_API STRING *Parrot_make_COW_reference(Interp *, STRING *);
@@ -133,6 +135,7 @@ PARROT_API CHARSET* string_rep_compatible (Interp *, STRING *a, const STRING *b,
         ENCODING**);
 PARROT_API STRING* string_join(Interp *, STRING *j, PMC *ar);
 PARROT_API PMC* string_split(Interp *, STRING *del, STRING *s);
+/* HEADERIZER END: src/string.c */
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_FUNCS_H_GUARD */

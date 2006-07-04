@@ -45,6 +45,9 @@ strings.
            s->charset && \
            !PObj_on_free_list_TEST(s))
 
+/*
+HEADER: include/parrot/string.h
+*/
 
 /*
 
