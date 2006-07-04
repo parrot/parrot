@@ -137,8 +137,6 @@ https://rt.perl.org/rt3//Ticket/Display.html?id=33923
 =item * Give invokable PMCs a canonical way to store their associated HLL
 source and argument information.
 
-Will Coleda is thinking about this.
-
 =item * Allow Runtime Compiler Registration
 
 Leo suggests an eventual startup sequence of:
