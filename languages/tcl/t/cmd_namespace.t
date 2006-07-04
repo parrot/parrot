@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 27;
 use Test::More;
 use vars qw($TODO);
 
@@ -159,4 +159,29 @@ language_output_is("tcl", <<'TCL', <<'OUT', "namespace current - ::foo");
   foo::test
 TCL
 ::foo
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace parent ::");
+  puts [namespace parent ""]
+TCL
+
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace parent ::foo");
+  namespace eval foo {}
+  puts [namespace parent foo]
+TCL
+::
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace parent - ::foo");
+namespace eval foo {puts [namespace parent]}
+TCL
+::
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "namespace parent - too many args");
+  namespace parent foo bar
+TCL
+wrong # args: should be "namespace parent ?name?"
 OUT
