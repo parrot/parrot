@@ -149,7 +149,7 @@ if ($a =~ /a/ || $x) { print "ok 39\n";} else { print "not ok 39\n";}
 if ($a !~ /a/ || $x) { print "not ok 40\n";} else { print "ok 40\n";}
 
 EOC
-1..2
+1..40
 ok 1
 ok 2
 ok 3

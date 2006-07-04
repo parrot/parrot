@@ -51,7 +51,7 @@ print "#3\t/label/ in :$x";
 if ($x =~ /label/) {print "ok 3\n";} else {print "not ok 3\n";}
 
 EOC
-1..4
+1..3
 ok 1
 ok 2
 ok 3 

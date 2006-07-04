@@ -38,7 +38,7 @@ if (length("\\\n$one") == 3) {print "ok 9\n";} else {print "not ok 9\n";}
 
 
 EOC
-1..2
+1..9
 ok 1
 ok 2
 ok 3
