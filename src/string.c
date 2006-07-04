@@ -46,7 +46,7 @@ strings.
            !PObj_on_free_list_TEST(s))
 
 /*
-HEADER: include/parrot/string.h
+HEADER: include/parrot/string_funcs.h
 */
 
 /*
