@@ -426,6 +426,7 @@ my @steps = qw(
     gen::config_h
     gen::core_pmcs
     gen::parrot_include
+    gen::languages
     gen::makefiles
     gen::platform
     gen::config_pm
