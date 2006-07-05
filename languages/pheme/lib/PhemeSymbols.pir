@@ -242,15 +242,15 @@
 	.local float result
 	result   = first
 
-	.local pmc add_iter
-	add_iter = new .Iterator, rest
+	.local pmc iter
+	iter = new .Iterator, rest
 
 	.local pmc   next
 	.local float next_val
 
   loop:
- 	unless add_iter goto end_loop
-	next     = shift add_iter
+ 	unless iter goto end_loop
+	next     = shift iter
 	next_val = next
 	result  += next_val
 	goto loop
@@ -266,15 +266,15 @@
 	.local float result
 	result   = first
 
-	.local pmc add_iter
-	add_iter = new .Iterator, rest
+	.local pmc iter
+	iter = new .Iterator, rest
 
 	.local pmc   next
 	.local float next_val
 
   loop:
- 	unless add_iter goto end_loop
-	next     = shift add_iter
+ 	unless iter goto end_loop
+	next     = shift iter
 	next_val = next
 	result  *= next_val
 	goto loop
@@ -284,12 +284,26 @@
 .end
 
 .sub '-' :multi( float, float )
-	.param float l
-	.param float r
+	.param float first
+	.param pmc   rest :slurpy
 
 	.local float result
-	result = l - r
+	result   = first
 
+	.local pmc iter
+	iter = new .Iterator, rest
+
+	.local pmc   next
+	.local float next_val
+
+  loop:
+ 	unless iter goto end_loop
+	next     = shift iter
+	next_val = next
+	result  -= next_val
+	goto loop
+
+  end_loop:
 	.return( result )
 .end
 
