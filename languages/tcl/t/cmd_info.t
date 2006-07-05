@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Test::More;
 use vars qw($TODO);
 
@@ -55,6 +55,13 @@ language_output_is("tcl",<<'TCL',<<OUT,"info args no proc");
  puts [info args me]
 TCL
 "me" isn't a procedure
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "info args default args");
+  proc foo {a {b 2}} {puts a; puts b}
+  puts [info args foo]
+TCL
+a b
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"info body no args");

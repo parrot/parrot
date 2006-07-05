@@ -113,9 +113,6 @@ TCL
 can't create procedure "a::b": unknown namespace
 OUT
 
-TODO: {
-  local $TODO = "unimplemented, pending new CC.";
-
 language_output_is("tcl",<<'TCL',<<OUT,"default args");
  proc me {{a 2}} {
   puts $a
@@ -148,4 +145,3 @@ language_output_is("tcl", <<'TCL', <<'OUT', "proc default - too many args");
 TCL
 wrong # args: should be "test ?a?"
 OUT
-}
