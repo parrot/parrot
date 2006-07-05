@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 15;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"return value");
@@ -133,5 +133,19 @@ language_output_is("tcl",<<'TCL',<<OUT,"bad default args");
  }
 TCL
 too many fields in argument specifier "a 2 3"
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "proc test {{a 2} b}");
+  proc test {{a 2} b} {puts $a; puts $b}
+  test 3
+TCL
+wrong # args: should be "test ?a? b"
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "proc default - too many args");
+  proc test {{a 2}} {puts $a}
+  test 3 4
+TCL
+wrong # args: should be "test ?a?"
 OUT
 }
