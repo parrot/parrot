@@ -81,4 +81,4 @@ From chip's comment at http://www.oreillynet.com/onlamp/blog/2006/07/calling_for
 
 =head1 See Also
 
-Also look at F<docs/BROKEN.pod> and F<ROADMAP.pod>.
+Also look at F<docs/BROKEN.pod> and F<docs/ROADMAP.pod>.
