@@ -233,9 +233,9 @@
 	.return( 1 )
 .end
 
-.sub '+' :multi( String, String )
-	.param String first
-	.param pmc    rest   :slurpy
+.sub '+' :multi( float, float )
+	.param float first
+	.param pmc   rest   :slurpy
 
 	.local float result
 	result   = first
@@ -243,8 +243,8 @@
 	.local pmc add_iter
 	add_iter = new .Iterator, rest
 
-	.local String next
-	.local float    next_val
+	.local pmc   next
+	.local float next_val
 
   loop:
  	unless add_iter goto end_loop
@@ -257,7 +257,7 @@
 	.return( result )
 .end
 
-.sub '-' :multi( String, String )
+.sub '-' :multi( float, float )
 	.param float l
 	.param float r
 
