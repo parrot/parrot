@@ -12,6 +12,7 @@
 	symbols['+']                 = 1
 	symbols['-']                 = 1
 	symbols['*']                 = 1
+	symbols['/']                 = 1
 
 	store_global 'PhemeCompiler', 'symbols', symbols
 	.return()
@@ -288,6 +289,16 @@
 
 	.local float result
 	result = l - r
+
+	.return( result )
+.end
+
+.sub '/' :multi( float, float )
+	.param float l
+	.param float r
+
+	.local float result
+	result = l / r
 
 	.return( result )
 .end
