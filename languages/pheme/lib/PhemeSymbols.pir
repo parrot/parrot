@@ -11,6 +11,7 @@
 	symbols['write']             = 1
 	symbols['+']                 = 1
 	symbols['-']                 = 1
+	symbols['*']                 = 1
 
 	store_global 'PhemeCompiler', 'symbols', symbols
 	.return()
@@ -251,6 +252,30 @@
 	next     = shift add_iter
 	next_val = next
 	result  += next_val
+	goto loop
+
+  end_loop:
+	.return( result )
+.end
+
+.sub '*' :multi( float, float )
+	.param float first
+	.param pmc   rest   :slurpy
+
+	.local float result
+	result   = first
+
+	.local pmc add_iter
+	add_iter = new .Iterator, rest
+
+	.local pmc   next
+	.local float next_val
+
+  loop:
+ 	unless add_iter goto end_loop
+	next     = shift add_iter
+	next_val = next
+	result  *= next_val
 	goto loop
 
   end_loop:
