@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea10 grammar/antlr_3/bc.g 2006-06-21 21:38:37
+// $ANTLR 3.0b1 grammar/antlr_3/bc.g 2006-07-05 21:39:17
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -21,10 +21,10 @@ public class BcParserLexer extends Lexer {
     }
     public String getGrammarFileName() { return "grammar/antlr_3/bc.g"; }
 
-
     // $ANTLR start T9
     public void mT9() throws RecognitionException {
         try {
+            ruleNestingLevel++;
             int type = T9;
             int start = getCharIndex();
             int line = getLine();
@@ -37,18 +37,21 @@ public class BcParserLexer extends Lexer {
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
         }
-        return ;
     }
     // $ANTLR end T9
-
 
     // $ANTLR start T10
     public void mT10() throws RecognitionException {
         try {
+            ruleNestingLevel++;
             int type = T10;
             int start = getCharIndex();
             int line = getLine();
@@ -62,18 +65,21 @@ public class BcParserLexer extends Lexer {
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
         }
-        return ;
     }
     // $ANTLR end T10
-
 
     // $ANTLR start INT
     public void mINT() throws RecognitionException {
         try {
+            ruleNestingLevel++;
             int type = INT;
             int start = getCharIndex();
             int line = getLine();
@@ -88,7 +94,7 @@ public class BcParserLexer extends Lexer {
             do {
                 int alt1=2;
                 int LA1_0 = input.LA(1);
-                if ( (LA1_0>='0' && LA1_0<='9') ) {
+                if ( ((LA1_0>='0' && LA1_0<='9')) ) {
                     alt1=1;
                 }
 
@@ -114,18 +120,21 @@ public class BcParserLexer extends Lexer {
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
         }
-        return ;
     }
     // $ANTLR end INT
-
 
     // $ANTLR start ML_COMMENT
     public void mML_COMMENT() throws RecognitionException {
         try {
+            ruleNestingLevel++;
             int type = ML_COMMENT;
             int start = getCharIndex();
             int line = getLine();
@@ -141,18 +150,18 @@ public class BcParserLexer extends Lexer {
             do {
                 int alt2=2;
                 int LA2_0 = input.LA(1);
-                if ( LA2_0=='*' ) {
+                if ( (LA2_0=='*') ) {
                     int LA2_1 = input.LA(2);
-                    if ( LA2_1=='/' ) {
+                    if ( (LA2_1=='/') ) {
                         alt2=2;
                     }
-                    else if ( (LA2_1>='\u0000' && LA2_1<='.')||(LA2_1>='0' && LA2_1<='\uFFFE') ) {
+                    else if ( ((LA2_1>='\u0000' && LA2_1<='.')||(LA2_1>='0' && LA2_1<='\uFFFE')) ) {
                         alt2=1;
                     }
 
 
                 }
-                else if ( (LA2_0>='\u0000' && LA2_0<=')')||(LA2_0>='+' && LA2_0<='\uFFFE') ) {
+                else if ( ((LA2_0>='\u0000' && LA2_0<=')')||(LA2_0>='+' && LA2_0<='\uFFFE')) ) {
                     alt2=1;
                 }
 
@@ -179,18 +188,21 @@ public class BcParserLexer extends Lexer {
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
         }
-        return ;
     }
     // $ANTLR end ML_COMMENT
-
 
     // $ANTLR start WS
     public void mWS() throws RecognitionException {
         try {
+            ruleNestingLevel++;
             int type = WS;
             int start = getCharIndex();
             int line = getLine();
@@ -205,7 +217,7 @@ public class BcParserLexer extends Lexer {
             do {
                 int alt3=2;
                 int LA3_0 = input.LA(1);
-                if ( (LA3_0>='\t' && LA3_0<='\n')||LA3_0=='\r'||LA3_0==' ' ) {
+                if ( ((LA3_0>='\t' && LA3_0<='\n')||LA3_0=='\r'||LA3_0==' ') ) {
                     alt3=1;
                 }
 
@@ -243,11 +255,14 @@ public class BcParserLexer extends Lexer {
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
         }
-        return ;
     }
     // $ANTLR end WS
 
@@ -331,6 +346,6 @@ public class BcParserLexer extends Lexer {
     }
 
 
-
+ 
 
 }

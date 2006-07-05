@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea10 grammar/antlr_3/bc.g 2006-06-21 21:38:36
+// $ANTLR 3.0b1 grammar/antlr_3/bc.g 2006-07-05 21:39:16
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -18,8 +18,10 @@ public class BcParser extends Parser {
     public static final int EOF=-1;
     public static final int ML_COMMENT=7;
     public static final int PROGRAM=4;
+
         public BcParser(TokenStream input) {
-            super(input);    }
+            super(input);
+        }
         
     protected TreeAdaptor adaptor = new CommonTreeAdaptor();
 
@@ -136,7 +138,7 @@ public class BcParser extends Parser {
             do {
                 int alt1=2;
                 int LA1_0 = input.LA(1);
-                if ( LA1_0==INT||LA1_0==9 ) {
+                if ( (LA1_0==INT||LA1_0==9) ) {
                     alt1=1;
                 }
 
@@ -212,10 +214,10 @@ public class BcParser extends Parser {
             // grammar/antlr_3/bc.g:30:5: ( INT | '-' expression -> ^( UNARY_MINUS expression ) )
             int alt2=2;
             int LA2_0 = input.LA(1);
-            if ( LA2_0==INT ) {
+            if ( (LA2_0==INT) ) {
                 alt2=1;
             }
-            else if ( LA2_0==9 ) {
+            else if ( (LA2_0==9) ) {
                 alt2=2;
             }
             else {
@@ -339,8 +341,7 @@ public class BcParser extends Parser {
     // $ANTLR end quit
 
 
-
-
+ 
 
     public static final BitSet FOLLOW_input_item_in_program65 = new BitSet(new long[]{0x0000000000000400L});
     public static final BitSet FOLLOW_quit_in_program67 = new BitSet(new long[]{0x0000000000000002L});

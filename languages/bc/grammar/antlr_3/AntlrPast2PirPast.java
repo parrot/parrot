@@ -1,4 +1,4 @@
-// $ANTLR 3.0ea10 grammar/antlr_3/antlr_past2pir_past.g 2006-06-21 21:38:38
+// $ANTLR 3.0b1 grammar/antlr_3/antlr_past2pir_past.g 2006-07-05 21:39:20
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -15,8 +15,10 @@ public class AntlrPast2PirPast extends TreeParser {
     public static final int WS=8;
     public static final int ML_COMMENT=7;
     public static final int PROGRAM=4;
+
         public AntlrPast2PirPast(TreeNodeStream input) {
-            super(input);    }
+            super(input);
+        }
         
 
     public String[] getTokenNames() { return tokenNames; }
@@ -67,7 +69,7 @@ public class AntlrPast2PirPast extends TreeParser {
             do {
                 int alt1=2;
                 int LA1_0 = input.LA(1);
-                if ( LA1_0==INT ) {
+                if ( (LA1_0==INT) ) {
                     alt1=1;
                 }
 
@@ -208,7 +210,8 @@ public class AntlrPast2PirPast extends TreeParser {
     // $ANTLR start expr
     // grammar/antlr_3/antlr_past2pir_past.g:117:1: expr returns [String reg] : expr_int_1 ;
     public String expr() throws RecognitionException {   
-        String reg;
+        String reg = null;
+
         expr_int_1_return expr_int_11 = null;
 
 
@@ -274,8 +277,7 @@ public class AntlrPast2PirPast extends TreeParser {
     // $ANTLR end expr
 
 
-
-
+ 
 
     public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past52 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expr_in_gen_pir_past54 = new BitSet(new long[]{0x0000000000000048L});

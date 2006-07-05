@@ -16,7 +16,7 @@ Bc.java needs to find the needed classes. This works for me:
 
   export ANTLR_HOME=/home/bernhard/devel/ANTLR/antlr-3
   export PARROT_HOME=/home/bernhard/devel/Parrot/repos/parrot
-  export CLASSPATH=$ANTLR_HOME/lib/antlr-2.7.6.jar:$ANTLR_HOME/lib/antlr-3.0ea10.jar:$ANTLR_HOME/lib/stringtemplate-2.3b7.jar:$PARROT_HOME/languages/bc/grammar/antlr_3:$PARROT_HOME/languages/bc
+  export CLASSPATH=$ANTLR_HOME/lib/antlr-2.7.6.jar:$ANTLR_HOME/lib/antlr-3.0b1.jar:$ANTLR_HOME/lib/stringtemplate-2.3b8.jar:$PARROT_HOME/languages/bc/grammar/antlr_3:$PARROT_HOME/languages/bc 
 
 And see the targest maintain-java, build-java, test-java in bc/Makefile.
 
