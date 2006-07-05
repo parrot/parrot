@@ -161,10 +161,10 @@ add more.
     .local int pass
     pass       = 0
 
-    eq left, right, pass
+    if left == right goto pass_it
     goto report
 
-  pass:
+  pass_it:
     pass = 1
 
   report:
@@ -194,10 +194,10 @@ add more.
     .local int pass
     pass = 0
 
-    eq left, right, pass
+    eq left, right, pass_it
     goto report
 
-  pass:
+  pass_it:
     pass = 1
 
   report:
@@ -227,10 +227,10 @@ add more.
     .local int pass
     pass = 0
 
-    eq left, right, pass
+    eq left, right, pass_it
     goto report
 
-  pass:
+  pass_it:
     pass = 1
 
   report:
@@ -273,23 +273,23 @@ add more.
 	l_val = left
 	r_val = right
 
-    if l_val == r_val goto pass
+    if l_val == r_val goto pass_it
 
 	# XXX - significant places?  I don't care :)
 	.local float diff
 	diff = l_val - r_val
 
-	if diff < 0.000000000001 goto pass
+	if diff < 0.000000000001 goto pass_it
 
   string_compare:
 	.local string l_val
 	.local string r_val
 	l_val = left
 	r_val = right
-	eq l_val, r_val, pass
+	eq l_val, r_val, pass_it
 	goto report
 
-  pass:
+  pass_it:
     pass = 1
 
   report:
@@ -718,7 +718,7 @@ optional test description in C<description>.
     match = rulesub(target)
     unless match goto match_fail
   match_success:
-    goto pass
+    goto pass_it
   match_fail:
     diagnostic = "match failed"
     goto report
@@ -726,7 +726,7 @@ optional test description in C<description>.
     diagnostic = "rule error"
     goto report
 
-  pass:
+  pass_it:
     pass = 1
 
   report:
