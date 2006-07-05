@@ -138,6 +138,13 @@ This is a multi-method, with separate implementations for int-int, float-float,
 string-string, and PMC-PMC comparisons.  The latter uses the C<eq> opcode for
 comparison.
 
+If there is a mismatch, the current implementation takes the type of C<left> as
+the proper type for the comparison, converting any numeric arguments to floats.
+Note that there is a hard-coded precision check to avoid certain rounding
+errors.  It's not entirely robust, but it's not completely awful either.
+
+Patches very welcome.  Multi-dispatch is a bit tricky here.
+
 This probably doesn't handle all of the comparisons you want, but it's easy to
 add more.
 
@@ -154,15 +161,15 @@ add more.
     .local int pass
     pass       = 0
 
-    eq left, right, PASS
-    goto REPORT
+    eq left, right, pass
+    goto report
 
-  PASS:
+  pass:
     pass = 1
 
-  REPORT:
+  report:
     test.ok( pass, description )
-    if pass goto DONE
+    if pass goto done
 
     .local string diagnostic
     .local string l_string
@@ -173,7 +180,7 @@ add more.
 
     diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )
-  DONE:
+  done:
 .end
 
 .sub is :multi( float, float )
@@ -187,15 +194,15 @@ add more.
     .local int pass
     pass = 0
 
-    eq left, right, PASS
-    goto REPORT
+    eq left, right, pass
+    goto report
 
-  PASS:
+  pass:
     pass = 1
 
-  REPORT:
+  report:
     test.ok( pass, description )
-    if pass goto DONE
+    if pass goto done
 
     .local string diagnostic
     .local string l_string
@@ -206,7 +213,7 @@ add more.
 
     diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )
-  DONE:
+  done:
 .end
 
 .sub is :multi( string, string )
@@ -220,15 +227,15 @@ add more.
     .local int pass
     pass = 0
 
-    eq left, right, PASS
-    goto REPORT
+    eq left, right, pass
+    goto report
 
-  PASS:
+  pass:
     pass = 1
 
-  REPORT:
+  report:
     test.ok( pass, description )
-    if pass goto DONE
+    if pass goto done
 
     .local string diagnostic
     .local string l_string
@@ -239,7 +246,7 @@ add more.
 
     diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )
-  DONE:
+  done:
 .end
 
 .sub is :multi()
@@ -253,15 +260,41 @@ add more.
     .local int pass
     pass = 0
 
-    eq left, right, PASS
-    goto REPORT
+	.local string l_type
+	l_type = typeof left
 
-  PASS:
+	if l_type == 'Float' goto num_compare
+	if l_type == 'Int'   goto num_compare
+	goto string_compare
+
+  num_compare:
+ 	.local float l_val
+ 	.local float r_val
+	l_val = left
+	r_val = right
+
+    if l_val == r_val goto pass
+
+	# XXX - significant places?  I don't care :)
+	.local float diff
+	diff = l_val - r_val
+
+	if diff < 0.000000000001 goto pass
+
+  string_compare:
+	.local string l_val
+	.local string r_val
+	l_val = left
+	r_val = right
+	eq l_val, r_val, pass
+	goto report
+
+  pass:
     pass = 1
 
-  REPORT:
+  report:
     test.ok( pass, description )
-    if pass goto DONE
+    if pass goto done
 
     .local string diagnostic
     .local string l_string
@@ -272,9 +305,8 @@ add more.
 
     diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )
-  DONE:
+  done:
 .end
-
 
 =item C<diag( diagnostic )>
 
@@ -686,23 +718,23 @@ optional test description in C<description>.
     match = rulesub(target)
     unless match goto match_fail
   match_success:
-    goto PASS
+    goto pass
   match_fail:
     diagnostic = "match failed"
-    goto REPORT
+    goto report
   rule_fail:
     diagnostic = "rule error"
-    goto REPORT
+    goto report
 
-  PASS:
+  pass:
     pass = 1
 
-  REPORT:
+  report:
     test.ok( pass, description )
-    if pass goto DONE
+    if pass goto done
 
     test.diag( diagnostic )
-  DONE:
+  done:
 .end
 
 .sub _make_diagnostic
