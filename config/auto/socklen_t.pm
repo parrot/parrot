@@ -31,7 +31,7 @@ sub runstep
 
     my $verbose = $conf->options->get('verbose');
 
-    my $d_socklen_t = $Config{d_socklen_t};
+    my $d_socklen_t = $Config{d_socklen_t} || $conf->data->get('has_socklen_t');
     my $has_socklen_t = ( $d_socklen_t && $d_socklen_t ne 'undef' ) ? 1 : 0; 
     $self->set_result( $has_socklen_t ? 'yes' : 'no' );
     $conf->data->set(
