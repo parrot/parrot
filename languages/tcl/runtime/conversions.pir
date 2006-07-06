@@ -216,7 +216,6 @@ was this a valid tcl-style level, or did we get this value as a default?
 .sub __call_level
   .param pmc tcl_level
   .local pmc parrot_level, defaulted, orig_level
-  parrot_level = new Integer
   defaulted = new Integer
   defaulted = 0
 
@@ -255,6 +254,7 @@ get_integer:
  
 default:
   defaulted = 1
+  parrot_level = new Integer
   parrot_level = orig_level - 1
   # fallthrough.
 
