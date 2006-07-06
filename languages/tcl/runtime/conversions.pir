@@ -204,3 +204,72 @@ combine_loop:
 return:
   .return(ns_name)
 .end
+
+=head2 _Tcl::__call_level
+
+Given a pmc containing the tcl-style call level, return an int-like pmc
+indicating the parrot-style level, and an integer with a boolean 0/1 -
+was this a valid tcl-style level, or did we get this value as a default?
+
+=cut
+
+.sub __call_level
+  .param pmc tcl_level
+  .local pmc parrot_level, defaulted, orig_level
+  parrot_level = new Integer
+  defaulted = new Integer
+  defaulted = 0
+
+  .local pmc current_call_level, get_number
+  .get_from_HLL(current_call_level, '_tcl', 'call_level')
+  .get_from_HLL(get_number, '_tcl', 'get_number')
+  orig_level = current_call_level
+ 
+  .local int num_length
+
+get_absolute:
+  # Is this an absolute? 
+  $S0 = tcl_level
+  $S1 = substr $S0, 0, 1
+  if $S1 != "#" goto get_integer
+  $S0 = tcl_level
+  (parrot_level, num_length) = get_number($S0,1)
+  if null parrot_level goto default
+  $S0 = tcl_level
+  $I0 = length $S0
+
+  dec $I0
+  if $I0 != num_length goto default
+  goto bounds_check
+ 
+get_integer:
+  # Is this an integer? 
+  $S0 = tcl_level
+  (parrot_level, num_length) = get_number($S0,0)
+  if null parrot_level goto default
+  $S0 = tcl_level
+  $I0 = length $S0
+  if $I0 != num_length goto default
+  parrot_level = orig_level - parrot_level
+  goto bounds_check
+ 
+default:
+  defaulted = 1
+  parrot_level = orig_level - 1
+  # fallthrough.
+
+bounds_check:
+  # Are we < 0 ? 
+  if parrot_level >= 0 goto bounds_pos
+  parrot_level = 0
+  goto done
+
+bounds_pos:
+  # Are we > the current max level?
+  if parrot_level <= orig_level goto done
+  parrot_level = orig_level
+
+done: 
+  $I1 = defaulted 
+  .return(parrot_level,$I1)
+.end

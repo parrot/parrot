@@ -10,13 +10,17 @@
 .sub '&uplevel'
   .param pmc argv :slurpy
  
-  .local string expr
   .local int argc
+  argc = elements argv
+  if argc == 0 goto bad_args
+  
+  .local string expr
   .local int looper
  
-  .local pmc compiler,pir_compiler
+  .local pmc compiler, pir_compiler, __call_level
   .get_from_HLL(compiler, '_tcl', 'compile')
   .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
+  .get_from_HLL(__call_level, '_tcl', '__call_level')
 
   # save the old call level
   .local pmc old_call_level
@@ -27,7 +31,7 @@
   call_level = argv[0]
  
   .local int defaulted 
-  (call_level,defaulted) = __get_call_level(call_level)
+  (call_level,defaulted) = __call_level(call_level)
   if defaulted == 1 goto skip
 
   $P1 = shift argv # pop the call level argument 
@@ -64,5 +68,8 @@ loop_done:
   .set_in_HLL('_tcl', 'call_level', old_call_level)
 
 done:
-  .return($P0) 
+  .return($P0)
+
+bad_args:
+  .throw('wrong # args: should be "uplevel ?level? command ?arg ...?"')
 .end
