@@ -82,6 +82,86 @@ no_such_variable:
   .throw($S0)
 .end
 
+=head2 _Tcl::__make
+
+Read a variable from its name. If it doesn't exist, create it. It may be a
+scalar or an array.
+
+Use the call level to determine if we are referring to a 
+global variable or a lexical variable - will no doubt
+require further refinement later as we support namespaces
+other than the default, and multiple interpreters.
+
+=cut
+
+.sub __make
+  .param string name
+
+  .local pmc variable
+
+  # is this an array?
+  # ends with )
+  .local int char
+  char = ord name, -1
+  if char != 41 goto scalar
+  # contains a (
+  char = index name, '('
+  if char == -1 goto scalar
+
+array:
+  .local string var
+  var = substr name, 0, char
+  
+  .local string key
+  .local int len
+  len = length name
+  len -= char
+  len -= 2
+  inc char
+  key = substr name, char, len
+ 
+  variable = __find_var(var)
+  if null variable goto make_variable
+  
+  $I0 = does variable, 'hash'
+  unless $I0 goto cant_read_not_array
+
+  variable = variable[key]
+  if_null variable, bad_index 
+  .return(variable)
+
+bad_index:
+  $S0 = "can't read \""
+  $S0 .= name
+  $S0 .= '": no such element in array'
+  .throw($S0)
+
+cant_read_not_array:
+  $S0 =  "can't read \""
+  $S0 .= name
+  $S0 .= "\": variable isn't array"
+  .throw($S0)
+
+scalar:
+  variable = __find_var(name)
+  if_null variable, make_variable
+  
+  $I0 = does variable, 'hash'
+  if $I0 goto cant_read_array
+  .return(variable)
+
+cant_read_array:
+  $S0 = "can't read \""
+  $S0 .= name
+  $S0 .= '": variable is array'
+  .throw($S0)
+
+make_variable:
+    variable = new .Undef
+    __store_var(name, variable)
+    .return(variable)
+.end
+
 =head2 _Tcl::__set
 
 Set a variable by its name. It may be a scalar or an array.
@@ -156,7 +236,10 @@ create_scalar:
   __store_var(name, value)
 
 return_scalar:
+  $S0 = typeof value
+  if $S0 == "Undef" goto return
   variable = clone value
+return:
   .return(variable)
 .end
 

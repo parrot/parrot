@@ -25,6 +25,10 @@ skip:
   # XXX Need error handling.
   
   # for each othervar/myvar pair, created a mapping from
+ 
+  .local pmc __make, __set
+  .get_from_HLL(__make, '_tcl', '__make')
+  .get_from_HLL(__set, '_tcl', '__set')
 
   .local int counter,argc
   argc = argv
@@ -38,24 +42,24 @@ loop:
   $S0 = argv[counter]
   inc counter
   $S1 = argv[counter]
- 
-  .local pmc __read, __set
-  .get_from_HLL(__read, '_tcl', '__read')
-  .get_from_HLL(__set, '_tcl', '__set')
-  push_eh catch 
-    $P1 = __read($S0)
-    __set($S1, $P1)
+  
+  push_eh store_var
+    $P0 = __read($S1)
   clear_eh
-resume:
+  $S0 = 'variable "'
+  $S0 .= $S1
+  $S0 .= '" already exists'
+  .throw($S0)
+
+store_var:
+  $P1 = __make($S0)
+  __set($S1, $P1)
 
   inc counter
   goto loop
  
 done:
   .return('')
-
-catch:
-  goto resume
 
 bad_args:
   .throw('wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"')
