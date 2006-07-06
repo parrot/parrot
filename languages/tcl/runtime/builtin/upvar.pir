@@ -26,9 +26,10 @@ skip:
   
   # for each othervar/myvar pair, created a mapping from
  
-  .local pmc __make, __set
+  .local pmc __make, __set, __find_var
   .get_from_HLL(__make, '_tcl', '__make')
   .get_from_HLL(__set, '_tcl', '__set')
+  .get_from_HLL(__find_var, '_tcl', '__find_var')
 
   .local int counter,argc
   argc = argv
@@ -43,9 +44,8 @@ loop:
   inc counter
   $S1 = argv[counter]
   
-  push_eh store_var
-    $P0 = __read($S1)
-  clear_eh
+  $P0 = __find_var($S1)
+  if null $P0 goto store_var
   $S0 = 'variable "'
   $S0 .= $S1
   $S0 .= '" already exists'

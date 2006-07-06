@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 language_output_is("tcl", <<'TCL', <<'OUT', 'upvar $var n');
@@ -54,3 +54,10 @@ TCL
 3
 OUT
 
+language_output_is("tcl", <<'TCL', <<'OUT', "upvar with array");
+  array set a [list 1 2 3 4]
+  upvar 0 a b
+  puts [array get b 1]
+TCL
+1 2
+OUT

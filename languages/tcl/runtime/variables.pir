@@ -144,17 +144,8 @@ cant_read_not_array:
 
 scalar:
   variable = __find_var(name)
-  if_null variable, make_variable
-  
-  $I0 = does variable, 'hash'
-  if $I0 goto cant_read_array
+  if_null variable, make_variable  
   .return(variable)
-
-cant_read_array:
-  $S0 = "can't read \""
-  $S0 .= name
-  $S0 .= '": variable is array'
-  .throw($S0)
 
 make_variable:
     variable = new .Undef
