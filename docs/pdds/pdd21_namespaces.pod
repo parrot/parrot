@@ -343,19 +343,29 @@ or, if the name is not known at compile time, this idiom:
   $P1 = split "::", "Foo::Bar"
   $P0 = get_namespace $P1
 
-=item $P0 = find_global $P1, $S0
-
 =item $P0 = find_global $S0
 
-Find $P0 as the variable $S0 in the current namespace. or in $P1 (an array of
-names or a multidimensional hash index), relative to the HLL root namespace.
+Find $P0 as the variable named $S0 in the current namespace.
 
-=item store_global $P1, $S0, $P0
+=item $P0 = find_global $S1, $S0
+
+=item $P0 = find_global $P1, $S0
+
+Find $P0 as the variable named $S0 in $S1 (a first-level namespace) or $P1 (an
+array of names or a multidimensional hash index), relative to the HLL root
+namespace.
 
 =item store_global $S0, $P0
 
-Store $P0 as the variable $S0 in the current namespace, or in $P1 (an array of
-names or a multidimensional hash index), relative to the HLL root namespace.
+Store $P0 as the variable $S0 in the current namespace.
+
+=item store_global $S1, $S0, $P0
+
+=item store_global $P1, $S0, $P0
+
+Store $P0 as the variable $S0 in $S1 (a first-level namespace) or $P1 (an
+array of names or a multidimensional hash index), relative to the HLL root
+namespace.  If the given namespace does not exist it is created.
 
 =back
 

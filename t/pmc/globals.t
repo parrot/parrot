@@ -26,7 +26,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace");
 .sub main
    .local pmc ns, o
    ns = find_global "Foo"
-   o =  find_global ns, "f"
+   o = ns["f"]
    o()
 .end
 
@@ -58,7 +58,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - nested");
 .sub main
    .local pmc ns, o
    ns = get_namespace ["Foo"; "Bar"]
-   o =  find_global ns, "f"
+   o = ns["f"]
    o()
 .end
 
@@ -70,7 +70,7 @@ CODE
 ok
 OUTPUT
 
-# this is pretty much taken from PDD 20
+# this is pretty much taken from PDD 21
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - array");
 .namespace ['Foo'; 'Bar']
 .sub test
@@ -84,7 +84,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - array");
   $S0 = pop $P0
 
   $P0 = get_namespace $P0
-  $P1 = find_global $P0, $S0
+  $P1 = $P0[$S0]
 
   $P1()
   end

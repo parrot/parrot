@@ -324,8 +324,8 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
 .sub 'main' :main
     $P0 = find_global "Foo"
-    $P1 = find_global $P0, "Bar"
-    $P2 = find_global $P1, "baz"
+    $P1 = $P0["Bar"]
+    $P2 = $P1["baz"]
     print "ok\n"
     $P2()
 .end
@@ -503,9 +503,8 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "check parrot ns");
 .sub 'main' :main
-    $P0 = get_namespace ["String"]
-    $P1 = find_global $P0, "lower"
-    $S0 = $P1("OK\n")
+    $P0 = find_global ["String"], "lower"
+    $S0 = $P0("OK\n")
     print $S0
 .end
 CODE

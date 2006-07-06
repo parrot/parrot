@@ -95,39 +95,36 @@ Operations to modify global variables
 
 =item B<store_global>(in STR, in PMC)
 
-Store global $2 as global symbol $1
+Store global $2 as global symbol $1 in current namespace.
 
 =item B<store_global>(in STR, in STR, in PMC)
-
-Store global $3 as global symbol $2 in namespace $1. If namespace $1 doesn't
-exist it is created.
 
 =item B<store_global>(in PMC, in STR, in PMC)
 
 =item B<store_global>(in KEY, in STR, in PMC)
 
-Store global $3 as global symbol $2 in namespace $1.
+Store global $3 as global symbol $2 in namespace designated by $1.
+If namespace $1 doesn't exist it is created.
 
-
-=cut
+=cut '
 
 op store_global(in STR, in PMC) {
-    Parrot_store_global(interpreter, NULL, $1, $2);
+    Parrot_store_global_cur(interpreter, $1, $2);
     goto NEXT();
 }
 
 op store_global(in STR, in STR, in PMC) {
-    Parrot_store_global(interpreter, $1, $2, $3);
+    Parrot_store_global_s(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
 op store_global(in PMC, in STR, in PMC) {
-    VTABLE_set_pmc_keyed_str(interpreter, $1, $2, $3);
+    Parrot_store_global_k(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
 op store_global(in KEY, in STR, in PMC) {
-    Parrot_store_global_p(interpreter, $1, $2, $3);
+    Parrot_store_global_k(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
@@ -159,39 +156,26 @@ See B<errorson>.
 =cut
 
 op find_global(out PMC, in STR) {
-    opcode_t * next;
-    if (!$2)
-	internal_exception(1, "Tried to get null global.");
-
-    next = expr NEXT();
-    $1 = Parrot_get_global(interpreter, NULL, $2, next);
+    PMC * const ns = CONTEXT(interpreter->ctx)->current_namespace;
+    $1 = Parrot_find_global_op(interpreter, ns, $2, expr NEXT());
     goto NEXT();
 }
 
 op find_global(out PMC, in STR, in STR) {
-    opcode_t * next;
-    if (!$2)
-	internal_exception(1, "Tried to get null class.");
-
-    next = expr NEXT();
-    $1 = Parrot_get_global(interpreter, $2, $3, next);
+    PMC * const ns = Parrot_find_namespace_s(interpreter, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
 
 op find_global(out PMC, in PMC, in STR) {
-    opcode_t * next;
-    if (PMC_IS_NULL($2))
-	internal_exception(1, "Tried to get from null namespace.");
-    if (!$3)
-	internal_exception(1, "Tried to get null global.");
-
-    next = expr NEXT();
-    $1 = Parrot_get_global_p(interpreter, $2, $3);
+    PMC * const ns = Parrot_find_namespace_k(interpreter, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
 
 op find_global(out PMC, in KEY, in STR) {
-    $1 = Parrot_get_global_p(interpreter, $2, $3);
+    PMC * const ns = Parrot_find_namespace_k(interpreter, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
 
@@ -205,12 +189,10 @@ errors settings. See B<errorson>.
 =cut
 
 op find_name(out PMC, in STR) {
-    opcode_t * next;
     if (!$2)
-	internal_exception(1, "Tried to get null name");
+	internal_exception(1, "Tried to find null name");
 
-    next = expr NEXT();
-    $1 = Parrot_get_name(interpreter, $2);
+    $1 = Parrot_find_name_op(interpreter, $2, expr NEXT());
     goto NEXT();
 }
 

@@ -385,8 +385,10 @@ Store the method as a global in the namespace of this class.
     }
 
     void add_method(STRING *method_name, PMC *sub_pmc) {
-        STRING *names = DYNSELF.name();
-        Parrot_store_global(INTERP, names, method_name, sub_pmc);
+        /* XXX - multi-level namespaces not supported? */
+        /* Why aren't we using SELF->vtable->_namespace? */
+        STRING *ns_name = DYNSELF.name();
+        Parrot_store_global_s(INTERP, ns_name, method_name, sub_pmc);
     }
 /*
 

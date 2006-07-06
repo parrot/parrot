@@ -578,17 +578,14 @@ Finish thawing.
             hll_name = string_downcase(INTERP, hll_name);
 
             /* HLL type mappings aren't yet created, we can't create
-             * a namespace in HLL's flavor yet - mabe promote the
-             * ns_hash to another type, if mappings provide one
-             *
-             * XXX always try to fetch namespace first?
+             * a namespace in HLL's flavor yet - maybe promote the
+             * ns_hash to another type later, if mappings provide one?
+             * XXX - FIXME
              */
+            ns_hash = Parrot_make_namespace_gen(interpreter, PARROT_HLL_NONE, PMCNULL, hll_name);
 
-            ns_hash = Parrot_global_namespace(INTERP, INTERP->root_namespace,
-                    hll_name);
             /* cache HLLs toplevel namespace */
-            VTABLE_set_pmc_keyed_int(INTERP, INTERP->HLL_namespace, 
-                    i, ns_hash);
+            VTABLE_set_pmc_keyed_int(INTERP, INTERP->HLL_namespace, i, ns_hash);
         }
         if (m > n) {
             /* TODO destruct old HLL_info are constants */

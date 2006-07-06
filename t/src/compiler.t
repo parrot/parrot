@@ -69,7 +69,7 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     dod_register_pmc(interpreter, prog);
     /* locate function to run */
     smain  = const_string(interpreter, "main");
-    entry = Parrot_find_global(interpreter, NULL, smain);
+    entry = Parrot_find_global_cur(interpreter, smain);
     /* location of the entry */
     interpreter->current_cont  = new_ret_continuation_pmc(interpreter, NULL);
     dest = VTABLE_invoke(interpreter, entry, NULL);

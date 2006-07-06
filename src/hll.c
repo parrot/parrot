@@ -27,9 +27,9 @@ this feature.
 
 =item C<INTVAL Parrot_register_HLL(Interp*, STRING *hll_name, STRING *hll_lib)>
 
-Register HLL C<hll_name> within Parrot core. If C<hll_lib> isn't a NULL STRING,
-load the shared language support library. Returns a type id for this HLL or 0
-on error.
+Register HLL C<hll_name> within Parrot core.  If C<hll_lib> isn't a NULL
+STRING, load the shared language support library.  Creates a root namespace for
+the HLL named C<hll_name>.  Returns a type id for this HLL or 0 on error.
 
 =item C<INTVAL Parrot_get_HLL_id(Interp*, STRING *hll_name)>
 
@@ -42,13 +42,14 @@ Register a type mapping	C<core_type => hll_type> for the given HLL.
 
 =item C<INTVAL Parrot_get_HLL_type(Interp *, INTVAL hll_id, INTVAL core_type)>
 
-Get an equivalent HLL type number for the language C<hll_id> or return
-C<core_type> if the HLL doesn't remap the type.
+Get an equivalent HLL type number for the language C<hll_id>.  If the given HLL
+doesn't remap the given type, or if C<hll_id> is the special value
+C<PARROT_HLL_NONE>, just return C<core_type> unchanged.
 
 =item C<INTVAL Parrot_get_ctx_HLL_type(Interp *, INTVAL core_type)>
 
 Return an equivalent PMC type number according to the current HLL setings
-in the context. If no type is registered just return C<core_type>.
+in the context.  If no type is registered just return C<core_type>.
 
 =cut
 
@@ -109,15 +110,12 @@ Parrot_register_HLL(Interp *interpreter,
     /* HLL type mappings aren't yet created, we can't create
      * a namespace in HLL's flavor yet - mabe promote the
      * ns_hash to another type, if mappings provide one
-     *
-     * XXX always try to fetch namespace first?
+     * XXX - FIXME
      */
-    ns_hash  = pmc_new(interpreter, enum_class_NameSpace);
-    VTABLE_set_pmc_keyed_str(interpreter, interpreter->root_namespace,
-            hll_name, ns_hash);
+    ns_hash = Parrot_make_namespace_gen(interpreter, PARROT_HLL_NONE, PMCNULL, hll_name);
+
     /* cache HLLs toplevel namespace */
-    VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 
-            idx, ns_hash);
+    VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, idx, ns_hash);
 
     /* register HLL lib */
     name = constant_pmc_new_noinit(interpreter, enum_class_String);
@@ -187,12 +185,12 @@ Parrot_get_HLL_type(Interp *interpreter, INTVAL hll_id, INTVAL core_type)
     HashBucket *b;
     INTVAL n;
 
-    if (hll_id < 0) {
+    if (hll_id == PARROT_HLL_NONE || hll_id == 0)
+        return core_type;
+    if (hll_id < 0)
         real_exception(interpreter, NULL, E_ValueError,
                 "no such HLL id (%vd)", hll_id);
-    }
-    if (hll_id == 0)
-        return core_type;
+
     hll_info = interpreter->HLL_info;
     n = VTABLE_elements(interpreter, hll_info);
     if (hll_id >= n) {
@@ -231,7 +229,8 @@ Return root namespace of the current HLL.
 =item C<PMC *
 Parrot_get_HLL_namespace(Parrot_Interp interpreter, int hll_id)>
 
-Return root namespace of the HLL with the id of I<hll_id>.
+Return root namespace of the HLL with the id of I<hll_id>.  If C<hll_id> is the
+special value C<PARROT_HLL_NONE>, return the global root namespace.
 
 */
 
@@ -248,6 +247,9 @@ Parrot_get_ctx_HLL_namespace(Interp *interpreter)
 PMC*
 Parrot_get_HLL_namespace(Interp *interpreter, int hll_id)
 {
+    if (hll_id == PARROT_HLL_NONE)
+        return interpreter->root_namespace;
+
     return VTABLE_get_pmc_keyed_int(interpreter,
                                     interpreter->HLL_namespace,
                                     hll_id);

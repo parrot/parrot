@@ -40,7 +40,7 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "Find null global");
        find_global P1, S0
        end
 CODE
-/Tried to get null global/
+/Tried to find null global/
 OUTPUT
 
 pasm_output_like(<<'CODE', <<OUT, "not found exception");

@@ -435,7 +435,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     pf = Parrot_readbc(interpreter, "temp.pbc");
     Parrot_loadbc(interpreter, pf);
     name = const_string(interpreter, "_sub1");
-    sub = Parrot_find_global(interpreter, NULL, name);
+    sub = Parrot_find_global_cur(interpreter, name);
     Parrot_call_sub(interpreter, sub, "v");
     PIO_eprintf(interpreter, "back\n");
 
@@ -443,7 +443,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     PIO_flush(interpreter, PIO_STDERR(interpreter));
 
     name = const_string(interpreter, "_sub2");
-    sub = Parrot_find_global(interpreter, NULL, name);
+    sub = Parrot_find_global_cur(interpreter, name);
     arg = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, arg,
                  string_from_cstring(interpreter, "hello ", 0));
@@ -507,7 +507,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     pf = Parrot_readbc(interpreter, "temp.pbc");
     Parrot_loadbc(interpreter, pf);
     name = const_string(interpreter, "_sub1");
-    sub = Parrot_find_global(interpreter, NULL, name);
+    sub = Parrot_find_global_cur(interpreter, name);
 
     if (setjmp(jb.destination)) {
     PIO_eprintf(interpreter, "caught\n");
