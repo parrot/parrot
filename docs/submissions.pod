@@ -258,7 +258,7 @@ repository. So the usual rules for Parrot patches apply for this content.
 
 For changes specific for parrotcode.org please send patches to    
 B<webmaster> I<at> B<perl> I<dot> B<org>, and cc
-B<perl6-internals> I<at> B<perl> I<dot> B<org>.
+B<parrot-porters> I<at> B<perl> I<dot> B<org>.
 
 =head1 Getting Commit Privileges
 
@@ -282,7 +282,7 @@ The pumpking or architect must put in a request to have your perl.org account
 granted svn commit privileges.
 
 The two best ways to let us know you're interested in becoming a committer
-are via the perl6-internals mailing list, or via IRC (#parrot on irc.perl.org).
+are via the parrot-porters mailing list, or via IRC (#parrot on irc.perl.org).
 Thanks for your help!
 
 =back

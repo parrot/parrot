@@ -288,10 +288,10 @@ managed to generate sufficient interest to get anyone else involved.
 I am assuming that PGE is going to get the momentum of the community
 behind it, so I would advise anyone interested in working on a rule
 engine to look there first. (Look for discussion on the
-perl6-internals and perl6-compiler mailing lists.) However, I still
+parrot-porters and perl6-compiler mailing lists.) However, I still
 intend to work on this engine for a while longer, and welcome any
 interested participants. (Send any requests/comments/suggestions
-either to perl6-internals or directly to me at steve@fink.com.) So
+either to parrot-porters or directly to me at steve@fink.com.) So
 far, I have only briefly looked at PGE, but I think this
 languages/regex engine has enough of a different approach that it is
 still valuable for gathering lessons -- and may still make the most

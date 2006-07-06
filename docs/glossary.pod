@@ -305,6 +305,6 @@ made it to anyone else in the forum.
 
 =head1 CORRECTIONS
 
-Please send corrections to the perl6-internals mailing list.
+Please send corrections to the parrot-porters mailing list.
 
 =cut

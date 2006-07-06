@@ -57,7 +57,7 @@ for instructions.
 To run the test suite, type C<make test>. Note - if I<any> tests fail, try
 setting the environment variable C<TEST_PROG_ARGS> to C<-G> and retry.
 
-If any tests fail (with C<-G> or not), please email the perl6-internals list.
+If any tests fail (with C<-G> or not), please email the parrot-porters list.
 
 =head2 Documentation
 

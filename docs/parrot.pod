@@ -129,7 +129,7 @@ ones. The Parrot team is committed to supporting the following combinations as
 =head2 Authors
 
 Parrot is developed and maintained by the members of the
-C<perl6-internals@perl.org> mailing list. The list is archived at:
+C<parrot-porters@perl.org> mailing list. The list is archived at:
 L<http://nntp.perl.org/group/perl.perl6.internals>
 
 =over 4

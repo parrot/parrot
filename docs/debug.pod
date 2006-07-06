@@ -147,7 +147,7 @@ instruction, C<gdb> will start running and only stop when the entire parrot
 program has finished. To work around this, do 'si' twice just before executing
 any keyed op. For some reason, C<gdb> can then figure out when it's supposed to
 stop next. If you know of a better technique, please let the mailing list know
-(C<perl6-internals@perl.org>).
+(C<parrot-porters@perl.org>).
 
 =head1 PIR CODE GENERATION
 

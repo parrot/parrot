@@ -2,7 +2,7 @@
 
 To prepare a release:
 
-    0.  Announce to perl6-internals and #parrot at least a
+    0.  Announce to parrot-porters and #parrot at least a
         couple days in advance, asking if there are any
         showstopping bugs.
 
@@ -61,9 +61,9 @@ To prepare a release:
 
     8.  upload to CPAN.
 
-    9.  Compose and send out the announcements--perl6-internals,
-        -language, -announce, perl5-porters, use Perl, PerlMonks,
-        comp.lang.perl.misc, etc.
+    9.  Compose and send out the announcements -- parrot-porters,
+        perl6-language, perl6-announce, perl5-porters, use Perl,
+        PerlMonks, comp.lang.perl.misc, etc.
 
     9a. Submit the use Perl announcement story to Slashdot, Newsforge, etc.
 

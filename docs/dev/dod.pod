@@ -122,7 +122,7 @@ Jones and Lins
 
 =back
 
-Also, the L<http://dev.perl.org> web site has an archive of the perl6-internals
-mailing list which contains numerous discussions on the Parrot garbage
-collector.
+Also, the L<http://dev.perl.org> web site has an archive of the
+parrot-porters and old perl6-internals mailing list which contains
+numerous discussions on the Parrot garbage collector.
 

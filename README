@@ -148,8 +148,8 @@ progress.
 MAILING LISTS
 -------------
 
-The mailing list for parrot is perl6-internals.  Subscribe by sending mail to
-perl6-internals-subscribe@perl.org. It is archived at
+The mailing list for parrot is parrot-porters.  Subscribe by sending mail to
+parrot-porters-subscribe@perl.org. It is archived at
 http://www.nntp.perl.org/group/perl.perl6.internals
 and available via NNTP at nntp://nntp.perl.org/perl.perl6.internals
 

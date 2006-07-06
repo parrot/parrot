@@ -413,10 +413,10 @@ entitled I<Testing Parrot> that will help with this.
 
 =head2 The Parrot Mailing List
 
-Much Parrot development and discussion takes place on the perl6-internals
-mailing list. You can subscribe by sending an email to
-C<perl6-internals-subscribe@perl.org> or read the perl6-internals NNTP archive
-at L<http://www.nntp.perl.org/group/perl.perl6.internals>.
+Much Parrot development and discussion takes place on the
+parrot-porters mailing list. You can subscribe by sending an email to
+C<parrot-porters-subscribe@perl.org> or read the NNTP archive at
+L<http://www.nntp.perl.org/group/perl.perl6.internals>.
 
 =head2 IRC
 

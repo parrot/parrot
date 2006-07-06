@@ -145,8 +145,8 @@ The PDD author may add any additional sections he or she wishes.
 
 =head2 SUBMISSION CRITERIA
 
-Proposed PDDs should be submitted to the perl6-internals mailing list (located
-at perl6-internals@perl.org) for discussion, criticism and general kibitzing.
+Proposed PDDs should be submitted to the parrot-porters mailing list (located
+at parrot-porters@perl.org) for discussion, criticism and general kibitzing.
 Acceptance of a particular PDD is ultimately up to the Parrot Architect.
 
 =head2 PDD TRANSLATIONS

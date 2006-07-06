@@ -217,9 +217,9 @@ with, say, Erlang or Haskell as an implementation language.
 
 =head2 Why is the development list called perl6-internals?
 
-The mailing list precedes the Parrot joke and subsequent unveiling of the True
-Grand Project by a number of months. We've just not gotten around to renaming
-the mailing list. We will.
+It's not anymore.  As of July 2006, the list is called parrot-porters
+to reflect the growing list of languages and platforms embraced by
+Parrot.  The old perl6-internals list forwards to the new one.
 
 =head2 Pugs is going great shakes - why not just toss Parrot and run Perl 6 on Pugs?
 
