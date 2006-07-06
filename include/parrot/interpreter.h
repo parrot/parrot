@@ -413,9 +413,9 @@ typedef enum {
 
 #if PARROT_CATCH_NULL
 PARROT_API extern PMC * PMCNULL;   /* Holds single Null PMC */
-#  define PMC_IS_NULL(p)  (!(p) || (p) == PMCNULL)
+#  define PMC_IS_NULL(p)  ((p) == PMCNULL || (p) == NULL)
 #else
-#  define PMCNULL         ((PMC *)0)
+#  define PMCNULL         ((PMC *)NULL)
 #  define PMC_IS_NULL(p)  ((p) == PMCNULL)
 #endif /* PARROT_CATCH_NULL */
 
