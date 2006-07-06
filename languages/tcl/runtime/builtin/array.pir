@@ -26,28 +26,19 @@
   if_null subcommand_proc, bad_args
 
   .local int is_array
-  .local string array_name, sigil_array_name
+  .local string array_name
   .local pmc the_array
-
+  
   array_name = shift argv
-  sigil_array_name = '$' . array_name
 
   .local int call_level
   .get_from_HLL($P0, '_tcl', 'call_level')
   call_level = $P0
   null the_array
 
-  push_eh catch_var
-    if call_level goto find_lexical
-    the_array = find_global sigil_array_name
-    goto done_find
-find_lexical:
-    the_array = find_lex sigil_array_name
-done_find:
-  clear_eh
-resume_var:
-
-  catch_var: #XXX [array set bug: sometimes this exception handler is called on the return from subcommand_proc()]
+  .local pmc __find_var
+  .get_from_HLL(__find_var, '_tcl', '__find_var')
+  the_array = __find_var(array_name)
 
   if_null the_array, array_no
 

@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 46;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"array, no args");
@@ -47,6 +47,16 @@ language_output_is("tcl",<<'TCL',<<OUT,"array exists too many args");
  puts [array exists a b]
 TCL
 wrong # args: should be "array exists arrayName"
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "array exists lexical");
+  proc test {} {
+      array set foo [list 1 2 3 4]
+      if {[array exists foo]} {puts ok}
+  }
+  test
+TCL
+ok
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"array size too many args");
