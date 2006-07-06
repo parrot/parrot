@@ -202,7 +202,7 @@ static Instruction * iSUBROUTINE(Interp *interp, IMC_Unit * unit, SymReg * r) {
     r->type = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
     cur_call = r;
-    i->line = line - 1;
+    i->line = line;
     add_namespace(interp, unit);
     return i;
 }
