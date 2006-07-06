@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"bad args 1");
@@ -70,4 +70,18 @@ language_output_is("tcl",<<'TCL',<<OUT,"foreach continue");
 TCL
 2
 3
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "foreach - lexicals");
+  proc test {} {
+      foreach name {a b c d} {
+          puts $name
+      }
+  }
+  test
+TCL
+a
+b
+c
+d
 OUT
