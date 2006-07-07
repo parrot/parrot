@@ -114,6 +114,10 @@ N: Chip Salzenberg
 D: Pumpking (0.4.6 - ... ) and demagogue
 E: chip@pobox.com
 
+N: Chris Dolan
+D: Bug fixes
+E: cdolan@cpan.org
+
 N: chromatic
 D: SDL library and examples; Test::Builder; test suite cleanup; Pheme
 D: lead philosopher -- "Why doesn't this work?"

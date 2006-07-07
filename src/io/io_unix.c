@@ -786,7 +786,7 @@ PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 
     if ((bind(io->fd, (struct sockaddr *)&io->local,
                     sizeof(struct sockaddr))) == -1) {
-        fprintf(stderr, "bind: errno= ret=%d fd = %d port = %d\n",
+        fprintf(stderr, "bind: errno=%d ret=-1 fd = %d port = %d\n",
              errno, (int)io->fd, (int)ntohs(io->local.sin_port));
         return -1;
     }
@@ -812,7 +812,7 @@ PIO_unix_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)
     UNUSED(layer);
     UNUSED(interpreter);
     if ((listen(io->fd, sec)) == -1) {
-        fprintf(stderr, "listen: errno= ret=%d fd = %d port = %d\n",
+        fprintf(stderr, "listen: errno=%d ret=-1 fd = %d port = %d\n",
              errno, (int)io->fd, (int)ntohs(io->local.sin_port));
         return -1;
     }
