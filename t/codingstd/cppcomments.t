@@ -7,65 +7,52 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 1;
+use Parrot::Distribution;
 
 
 =head1 NAME
 
-t/src/cppcomments.t - checks for C++ style comments
+t/codingstd/cppcomments.t - checks for C++ style comments
 
 =head1 SYNOPSIS
 
-    % prove t/src/cppcomments.t
+    % prove t/codingstd/cppcomments.t
 
 =head1 DESCRIPTION
 
 Checks that no source file in the distribution uses C++ style comments.
 
-=head1 TODO
-
-Use Parrot::Distribution for looking for C-source files.
-
 =cut
 
 
-my @globs = qw(
-    compilers/ast/*.c
-    compilers/ast/*.h
-    compilers/imcc/*.c
-    compilers/imcc/*.h
-    include/parrot/*.h
-    include/parrot/oplib/*.h
-    src/*.c
-    src/charset/*.c
-    src/charset/*.h
-    src/dynoplibs/*.ops
-    src/dynpmc/*.pmc
-    src/encodings/*.c
-    src/encodings/*.h
-    src/io/*.c
-    src/io/*.h
-    src/jit/*/*.h
-    src/ops/*.ops
-    src/pmc/*.pmc
-    src/packfile/*.c
-);
 
 my @comments;
 
-foreach my $glob ( @globs ) {
-    foreach my $file ( glob $glob ) {
-
-        open FILE, "<$file" or die "Can not open '$file' for reading!\n";
-        foreach my $line ( <FILE> ) {
-            next unless $line =~ m{//};
-            next if $line =~ m{://};     # skip ftp:// http:// etc
-            next if $line =~ m{"//};     # skip printf("//= ")
-
-            push @comments, "$file: $line"
-        }
-        close FILE;
+foreach my $file ( source_files() ) {
+    my $path = $file->path;
+    open(my $fh, q(<), $path) or die "Can not open '$path' for reading!\n";
+    foreach my $line (<$fh>) {
+        next unless $line =~ m{//};
+        next if $line =~ m{://};    # skip ftp:// http:// etc
+        next if $line =~ m{"//};    # skip printf("//= ")
+        push @comments, "$path: $line";
     }
 }
 
-ok( ! scalar(@comments), 'C++ style comments')
-or diag( "C++ style comments found:\n@comments" );
+ok(!scalar(@comments), 'C++ style comments')
+  or diag("C++ style comments found:\n@comments");
+
+
+exit;
+
+
+sub source_files {
+    my $dist = Parrot::Distribution->new;
+    return (
+        map($_->files_of_type('C code'),   $dist->c_source_file_directories),
+        map($_->files_of_type('C header'), $dist->c_header_file_directories),
+    );
+}
+
+
+## vim: expandtab sw=4
