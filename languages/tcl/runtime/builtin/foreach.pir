@@ -17,8 +17,9 @@
   $I0 = $I1 % 2
   if $I0 != 1 goto error
 
-  .local pmc __list
+  .local pmc __list, __set
   .get_from_HLL(__list, '_tcl', '__list')
+  .get_from_HLL(__set, '_tcl', '__set')
 
   .get_from_HLL(compiler, '_tcl', 'compile')
   .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
@@ -91,36 +92,26 @@ loop_inner:
   inc counter
   if counter >= end_counter goto loop_inner_done_good
 
-  .local string varname,sigil_varname
+  .local string varname
   .local pmc value
 
   $I0 = varnames
   if counter >= $I0 goto loop_inner_done_good
 
   varname = varnames[counter]
-  sigil_varname = '$' . varname
   $P0 = arglists[counter]
   $I1 = $P0
   $I2 = iterator
   if $I1 <= $I2 goto empty_var
   value = $P0[$I2]
+  __set(varname, value)
 
-  if call_level goto store_lex
-    store_global sigil_varname, value
-    goto store_done
-store_lex:
-    store_lex sigil_varname, value
-store_done:
   got_one = 1
   goto loop_inner
 empty_var:
   $P0 = new .TclString
   $P0 = ''
-  if call_level goto store_lex2
-    store_global sigil_varname, $P0
-    goto loop_inner
-store_lex2:
-    store_lex sigil_varname, $P0
+  __set(varname, $P0)
   goto loop_inner
 loop_inner_done_good:
   got_one = 1
