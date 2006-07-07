@@ -33,6 +33,7 @@ my @files = @ARGV ? @ARGV : source_files();
 
 plan tests => scalar @files;
 
+
 foreach my $file (@files) {
     open FILE, "<$file" or die "Unable to open '$file' for reading: $!";
 
@@ -47,6 +48,10 @@ foreach my $file (@files) {
       or diag(@matches);
 }
 
+
+exit;
+
+
 sub source_files {
     my $dist = Parrot::Distribution->new;
     return map { $_->path } (
@@ -55,3 +60,4 @@ sub source_files {
     );
 }
 
+## vim: expandtab sw=4
