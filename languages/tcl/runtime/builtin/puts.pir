@@ -46,7 +46,7 @@ two_arg_nonewline:
   goto done
 
 two_arg_channel:  
-  io = channels($S2)
+  io = __channel($S2)
 
   io.'say'($S3)
   goto done

@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 # XXX:  Missing channelId tests.
@@ -29,4 +29,10 @@ language_output_is("tcl",<<'TCL',<<OUT,"normal");
  puts whee
 TCL
 whee
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "puts stdout ok");
+  puts stdout ok
+TCL
+ok
 OUT
