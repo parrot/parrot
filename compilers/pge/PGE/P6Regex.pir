@@ -117,9 +117,14 @@ or the resulting PIR code (target='PIR').
   pir:
     .local pmc code
     .local string grammar
+    .local string nsformat
     grammar = adverbs['grammar']
+    nsformat = ".namespace"
+    if grammar == '' goto pir_emit
+    nsformat = ".namespace [ '%0' ]"
+  pir_emit:
     code = new 'PGE::CodeString'
-    code.emit(".namespace [ '%0' ]", grammar)
+    code.emit(nsformat, grammar)
     $P0 = exp.root_pir(adverbs :flat :named)
     code .= $P0
     if target != 'PIR' goto bytecode
