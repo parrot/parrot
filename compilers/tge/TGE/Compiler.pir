@@ -380,6 +380,9 @@ loop_end:
     .return (code)
 .end
 
+# NOTE - this code assumes that a type of '' is impossible
+#        (in older versions of Parrot, it was)
+
 .sub 'grammar_string' :method
     .param pmc grammar
     .local string code
@@ -387,9 +390,13 @@ loop_end:
     .local string inherit
     type = grammar["type"]
     inherit = grammar["inherit"]
-    code = "\n.namespace [ '"
+    code = "\n.namespace"
+    if type == '' goto no_type
+    code .= " [ '"
     code .= type
-    code .= "' ]\n\n"
+    code .= "' ]"
+  no_type:
+    code .= "\n\n"
     code .= ".sub '__onload' :load\n"
     code .= "    load_bytecode 'TGE.pbc'\n"
     code .= "    $I0 = find_type '"
