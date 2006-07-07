@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"bad args 1");
@@ -84,4 +84,10 @@ a
 b
 c
 d
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "foreach - inner exception")
+  foreach name {a b c d} { aputs }
+TCL
+invalid command name "aputs"
 OUT
