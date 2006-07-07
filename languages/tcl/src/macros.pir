@@ -69,7 +69,12 @@ normal parrot C<.return>
 =cut
 
 .macro get_return_code (output)
-  .output = exception[CODE_SLOT]
+   .output = -1
+   push_eh .$bad_handler
+    .output = exception[CODE_SLOT]
+   clear_eh
+
+.local $bad_handler:
 .endm
 
 =head2 throw (IN string mess)
