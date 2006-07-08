@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 17;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"middle");
@@ -112,5 +112,21 @@ language_output_is("tcl", <<'TCL', <<'OUT', 'puts $foo([set key) - syntax error'
 TCL
 ok
 missing close-bracket
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'puts $foo([set key]a)');
+  array set array {a 1 b 2 c 3}
+  set foo b
+  puts $array([set foo]a)
+TCL
+can't read "array(ba)": no such element in array
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'puts $array([set )])');
+  array set array {a 1 b 2 c 3}
+  set ) b
+  puts $array([set )])
+TCL
+2
 OUT
 
