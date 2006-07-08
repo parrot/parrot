@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"middle");
@@ -102,5 +102,15 @@ language_output_is("tcl", <<'TCL', <<'OUT', 'puts $foo([set key])');
   puts $foo([set key])
 TCL
 ok
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'puts $foo([set key) - syntax error');
+  array set array {a 1 b 2 c 3}
+  set foo b
+  puts ok
+  puts $array([set foo)
+TCL
+ok
+missing close-bracket
 OUT
 
