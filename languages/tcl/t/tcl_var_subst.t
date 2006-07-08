@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"middle");
@@ -95,3 +95,12 @@ language_output_is("tcl", <<'TCL', <<'OUT', 'puts $foo($)');
 TCL
 ok
 OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'puts $foo([set key])');
+  array set foo {) ok}
+  set key )
+  puts $foo([set key])
+TCL
+ok
+OUT
+
