@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"set");
@@ -30,4 +30,11 @@ language_output_is("tcl",<<'TCL',<<OUT,"not an array");
  set b(c) 2
 TCL
 can't set "b(c)": variable isn't array
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "array");
+  array set test {4 ok}
+  puts [set {test(4)}]
+TCL
+ok
 OUT
