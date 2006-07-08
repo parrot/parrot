@@ -238,8 +238,12 @@ S: Lyon, France
 
 N: Jerry Gay a.k.a. particle
 E: Jerry.Gay@gmail.com
-D: Test Suite, general tidiness
+D: test suite, compiler tools, perl6, entropy reduction
 S: Seattle, WA
+
+N: John J. Trammell
+E: trammell@el-swifto.com
+D: coding standard tests
 
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
