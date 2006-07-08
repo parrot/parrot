@@ -101,35 +101,41 @@ Similarly, one can yield using the .yield directive
 
 =head2 Subpragma
 
-This is a list of zero or more items with the
-following meaning:
+This is a list of zero or more items with the following meanings:
 
 =over 4
 
-=item * :main
+=item :main
 
 Define "main" entry point to start execution. If multiple subroutines
 are marked as B<:main>, the B<last> marked subroutine is entered.
 
-=item * :load
+=item :load
 
 Run this subroutine during the B<load_library> opcode.
 B<:load> is ignored, if another subroutine in that file is marked with
 B<:main>. If multiple subs have the B<:load> pragma, the subs are
-run in compilation that is source code order.
+run in source code order.
 
-=item * :anon
+=item :anon
 
 Do not install this subroutine in the namespace. Allows the subroutine
 name to be reused.
 
-=item * :multi(Type1, Type2...)
+=item :multi(Type1, Type2...)
 
 Engage in multiple dispatch with the listed types.
 
-=item * :method
+=item :immediate
 
-Declare subroutine being a method.
+This subroutine is executed immediately after being compiled. (Analagous to
+C<BEGIN> in perl5.) Useful for preloading dynamic ops or pmcs so the rest of 
+the compilation unit can take advantage of them.
+
+=item :method
+
+The marked C<.sub> is a method. In the method body, the object PMC
+can be referred to with C<self>.
 
 =back
 
