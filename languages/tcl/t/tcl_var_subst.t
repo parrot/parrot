@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"middle");
@@ -79,6 +79,19 @@ language_output_is("tcl", <<'TCL', <<'OUT', 'puts $array($key)');
 array set array {test ok}
 set key test
 puts $array($key)
+TCL
+ok
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'puts $foo($bar) - can\'t read');
+  puts $foo($bar)
+TCL
+can't read "bar": no such variable
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'puts $foo($)');
+  array set foo {$ ok}
+  puts $foo($)
 TCL
 ok
 OUT
