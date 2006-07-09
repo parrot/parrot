@@ -23,15 +23,15 @@
   .get_from_HLL(__call_level, '_tcl', '__call_level')
 
   # save the old call level
-  .local pmc old_call_level
-  .get_from_HLL($P2, '_tcl', 'call_level')
-  old_call_level = clone $P2
+  .local pmc call_level, old_call_level
+  .get_from_HLL(call_level, '_tcl', 'call_level')
+  old_call_level = clone call_level
 
-  .local pmc call_level
-  call_level = argv[0]
+  .local pmc new_call_level
+  new_call_level = argv[0]
  
   .local int defaulted 
-  (call_level,defaulted) = __call_level(call_level)
+  (new_call_level,defaulted) = __call_level(new_call_level)
   if defaulted == 1 goto skip
 
   $P1 = shift argv # pop the call level argument 
@@ -54,9 +54,7 @@ loop:
 loop_done:
 
   # Set the new level 
-  .set_in_HLL('_tcl', 'call_level', call_level)
-
-  $P1 = parse(expr,0,0)
+  assign call_level, new_call_level
 
   ($I0,$P0) = compiler(0,expr)
   $P1 = pir_compiler($I0,$P0)
@@ -65,7 +63,7 @@ loop_done:
   $P0 = $P1()
 
   #restore the old level
-  .set_in_HLL('_tcl', 'call_level', old_call_level)
+  assign call_level, old_call_level
 
 done:
   .return($P0)
@@ -73,3 +71,4 @@ done:
 bad_args:
   .throw('wrong # args: should be "uplevel ?level? command ?arg ...?"')
 .end
+
