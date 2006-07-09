@@ -236,8 +236,7 @@ get_absolute:
   if null parrot_level goto default
   $S0 = tcl_level
   $I0 = length $S0
-
-  dec $I0
+  # num_length isn't really num_length -- it's the pos after the last digit
   if $I0 != num_length goto default
   goto bounds_check
  
