@@ -410,3 +410,6 @@ l ttl	#  unsigned long mysql_escape_string(char *to,const char *from, unsigned l
 l pttl	#  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,const char *from, unsigned long length)
 v t	#  void mysql_debug(const char *debug)
 # --- end mysqlclient library ---
+
+# win32
+l lttl
