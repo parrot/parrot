@@ -121,20 +121,23 @@ array:
   key = substr name, char, len
  
   variable = __find_var(var)
-  if null variable goto make_variable
+  unless null variable goto check_is_hash
+
+  variable = new .TclArray
+  __store_var(var, variable)
   
+check_is_hash:
   $I0 = does variable, 'hash'
   unless $I0 goto cant_read_not_array
 
-  variable = variable[key]
-  if_null variable, bad_index 
-  .return(variable)
+  $P0 = variable[key]
+  if null $P0 goto create_elem 
+  .return($P0)
 
-bad_index:
-  $S0 = "can't read \""
-  $S0 .= name
-  $S0 .= '": no such element in array'
-  .throw($S0)
+create_elem:
+  $P0 = new .Undef
+  variable[key] = $P0
+  .return($P0)
 
 cant_read_not_array:
   $S0 =  "can't read \""
@@ -144,7 +147,7 @@ cant_read_not_array:
 
 scalar:
   variable = __find_var(name)
-  if_null variable, make_variable  
+  if null variable goto make_variable  
   .return(variable)
 
 make_variable:
@@ -205,6 +208,12 @@ create_array:
   __store_var(var, array)
 
 set_array:
+  variable = array[key]
+  if null variable goto set_new_elem
+  assign variable, value
+  .return(value)
+
+set_new_elem:
   array[key] = value
   variable = clone value
   .return(variable)
