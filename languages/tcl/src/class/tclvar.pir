@@ -38,7 +38,8 @@ Define the attributes required for the class.
   if null $P%1 goto no_such_variable_%1
   $I0  = does $P%1, 'hash'
   unless $I0 goto cant_read_not_array_%1
-  $P%1 = $P%1[$P%0]
+  $S0 = $P%0
+  $P%1 = $P%1[$S0]
   unless null $P%1 goto have_array_%1
   $S0 = "can't read \"%2("
   $S1 = $P%0
