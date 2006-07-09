@@ -1927,6 +1927,26 @@ CODE
 128 is 200
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'sprintf - left justify');
+.sub main :main
+  $P0 = new .ResizablePMCArray
+  $P1 = new .Integer
+  $P1 = 10
+  $P0[0] = $P1
+  $P1 = new .String
+  $P1 = "foo"
+  $P0[1] = $P1
+  $P1 = new .String
+  $P1 = "bar"
+  $P0[2] = $P1
+  $S0 = sprintf "%-*s - %s\n", $P0
+  print $S0
+  end
+.end
+CODE
+foo        - bar
+OUTPUT
+
 pasm_output_is(<<'CODE', <<'OUTPUT', 'exchange');
     set S0, "String #0\n"
     set S1, "String #1\n"
@@ -2868,5 +2888,5 @@ CODE
 OUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 158; }
+BEGIN { plan tests => 159; }
 

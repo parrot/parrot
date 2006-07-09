@@ -175,7 +175,7 @@ handle_flags(Interp *interpreter,
         fill = string_repeat(interpreter, fill, info->width - len, NULL);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
-            string_append(interpreter, str, fill, 0);
+            str = string_concat(interpreter, str, fill, 0);
         }
         else {                  /* right-align */
             /* signed and zero padded */
