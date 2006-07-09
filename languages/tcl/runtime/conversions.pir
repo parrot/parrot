@@ -252,24 +252,16 @@ get_integer:
   goto bounds_check
  
 default:
-  if orig_level == 0 goto bad_level
   defaulted = 1
   parrot_level = new Integer
   parrot_level = orig_level - 1
   # fallthrough.
 
 bounds_check:
-  # Are we < 0 ? 
-  if parrot_level >= 0 goto bounds_pos
-  parrot_level = 0
-  goto done
+  # Are we < 0 ?
+  if parrot_level < 0          goto bad_level
+  if parrot_level > orig_level goto bad_level
 
-bounds_pos:
-  # Are we > the current max level?
-  if parrot_level <= orig_level goto done
-  parrot_level = orig_level
-
-done: 
   $I1 = defaulted 
   .return(parrot_level,$I1)
 
