@@ -15,7 +15,7 @@
   if argc == 0 goto bad_args
   
   .local string expr
-  .local int looper
+  .local int i
  
   .local pmc compiler, pir_compiler, __call_level
   .get_from_HLL(compiler, '_tcl', 'compile')
@@ -38,15 +38,15 @@
 skip:
 
   expr = ''
-  looper = 1
+  i = 0
   argc = argv
 
 loop:
-  if looper == argc goto loop_done
-  $S0 = argv[looper]
+  if i == argc goto loop_done
+  $S0 = argv[i]
   concat expr, $S0
-  inc looper
-  if looper == argc goto loop_done
+  inc i
+  if i == argc goto loop_done
   concat expr,' '
 
   goto loop
