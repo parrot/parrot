@@ -253,6 +253,7 @@ get_integer:
   goto bounds_check
  
 default:
+  if orig_level == 0 goto bad_level
   defaulted = 1
   parrot_level = new Integer
   parrot_level = orig_level - 1
@@ -272,4 +273,10 @@ bounds_pos:
 done: 
   $I1 = defaulted 
   .return(parrot_level,$I1)
+
+bad_level:
+  $S0 = tcl_level
+  $S0 = "bad level \"" . $S0
+  $S0 = $S0 . "\""
+  .throw($S0)
 .end
