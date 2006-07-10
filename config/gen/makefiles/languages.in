@@ -27,7 +27,7 @@ LANGUAGES = \
     punie \
     regex \
     scheme \
-    TAP \
+    tap \
     tcl \
     urm
 

@@ -135,7 +135,7 @@ sub runstep
         replace_slashes                              => 1
     );
     genfile(
-        'languages/TAP/config/makefiles/root.in'     => 'languages/TAP/Makefile',
+        'languages/tap/config/makefiles/root.in'     => 'languages/tap/Makefile',
         commentType                                  => '#',
         replace_slashes                              => 1,
         conditioned_lines                            => 1
