@@ -87,17 +87,14 @@ input_loop:
   goto input_loop_continue
 
 loop_error:
-  .local pmc exception
+  .catch()
   .local string exception_msg
-  get_results '(0)', exception, exception_msg
+  .get_message(exception_msg)
   # Are we just missing a close-foo?
-  # XXX Should add check to make sure we're dealing with a tcl exception
-  #     and not a mere parrot one.
   if exception_msg == 'missing close-brace' goto input_loop_continue2
   if exception_msg == "missing quote"       goto input_loop_continue2
   
 loop_error_real:
-  .catch()
   .get_stacktrace($S0)
   print $S0
   #goto input_loop_continue
