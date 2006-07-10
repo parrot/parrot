@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 116;
+use Parrot::Test tests => 120;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -722,3 +722,28 @@ TCL
 1
 OUT
 
+language_output_is("tcl", <<'TCL', <<'OUT', "in - true");
+  set list {b c d f}
+  puts [expr {b in $list}]
+TCL
+1
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "in - false");
+  set list {b c d f}
+  puts [expr {e in $list}]
+TCL
+0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "ni - true");
+  puts [expr {e ni {b c d f}}]
+TCL
+1
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "ni - false");
+  puts [expr {b ni {b c d f}}]
+TCL
+0
+OUT
