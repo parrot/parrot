@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"discard error");
@@ -80,3 +80,10 @@ language_output_is("tcl",<<'TCL',<<'OUT',"bad args");
 TCL
 wrong # args: should be "catch script ?resultVarName? ?optionVarName?"
 OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "catch {incr} msg");
+  puts [list [catch {incr} msg] $msg]
+TCL
+1 {wrong # args: should be "incr varName ?increment?"}
+OUT
+

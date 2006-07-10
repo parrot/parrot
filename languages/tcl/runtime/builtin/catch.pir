@@ -21,10 +21,9 @@
   if argc  > 2 goto badargs
 
   code = argv[0]
-  ($I0,$P1) = compiler(0,code)
-  $P2 = pir_compiler($I0,$P1)
-  
   push_eh non_ok
+    ($I0,$P1) = compiler(0,code)
+    $P2 = pir_compiler($I0,$P1)
     code_retval = $P2()
     retval = TCL_OK  # no exception => TCL_OK
   clear_eh
