@@ -79,18 +79,17 @@ test:
 	cd .. && $(PERL) -I../lib -Ilua/t lua/t/harness
 
 CLEANERS = \
-"t/lib/*.pir" \
-"t/pmc/*.pir" \
-"t/*.pir" \
-"t/*.lua" \
-"t/*.orig_out" \
-"t/*.parrot_out" \
-"$(CLASSDIR)/*.dump" \
-"$(CLASSDIR)/*.c" \
-"$(CLASSDIR)/*.h" \
-"$(CLASSDIR)/*$(LOAD_EXT)" \
-"$(CLASSDIR)/*$(O)" \
-"$(LIBPATH)/*.pbc"
+ "t/pmc/*.pir" \
+ "t/*.pir" \
+ "t/*.lua" \
+ "t/*.orig_out" \
+ "t/*.parrot_out" \
+ "$(CLASSDIR)/*.dump" \
+ "$(CLASSDIR)/*.c" \
+ "$(CLASSDIR)/*.h" \
+ "$(CLASSDIR)/*$(LOAD_EXT)" \
+ "$(CLASSDIR)/*$(O)" \
+ "$(LIBPATH)/*.pbc"
 
 clean:
 	$(RM_F) $(CLEANERS)

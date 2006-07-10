@@ -37,8 +37,6 @@ pmclass LuaFunction
 */
     void class_init() {
         if (pass) {
-            PMC *meth;
-
             luafunction_name = const_string(INTERP, "function");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaBoolean", 0));

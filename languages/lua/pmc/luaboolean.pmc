@@ -41,8 +41,6 @@ pmclass LuaBoolean
 */
     void class_init() {
         if (pass) {
-            PMC *meth;
-
             Parrot_LuaBase_super_init(INTERP, NULL);
             false_string = const_string(INTERP, "false");
             true_string = const_string(INTERP, "true");

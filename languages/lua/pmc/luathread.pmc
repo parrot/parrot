@@ -37,8 +37,6 @@ pmclass LuaThread
 */
     void class_init() {
         if (pass) {
-            PMC *meth;
-
             luathread_name = const_string(INTERP, "thread");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaBoolean", 0));

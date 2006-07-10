@@ -38,8 +38,6 @@ pmclass LuaUserdata
 */
     void class_init() {
         if (pass) {
-            PMC *meth;
-
             Parrot_LuaBase_super_init(INTERP, NULL);
             luauserdata_name = const_string(INTERP, "userdata");
             dynpmc_LuaBoolean = pmc_type(INTERP,

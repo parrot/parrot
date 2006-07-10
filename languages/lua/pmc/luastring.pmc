@@ -39,8 +39,6 @@ pmclass LuaString
 */
     void class_init() {
         if (pass) {
-            PMC *meth;
-
             Parrot_LuaBase_super_init(INTERP, NULL);
             luastring_name = const_string(INTERP, "string");
             dynpmc_LuaBoolean = pmc_type(INTERP,

@@ -56,8 +56,6 @@ pmclass LuaTable
 */
     void class_init() {
         if (pass) {
-            PMC *meth;
-
             Parrot_LuaBase_super_init(INTERP, NULL);
             luatable_name = const_string(INTERP, "table");
             dynpmc_LuaBoolean = pmc_type(INTERP,
