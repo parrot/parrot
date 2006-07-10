@@ -267,6 +267,19 @@ bad_args:
 .end
 
 .sub 'children'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc > 2  goto bad_args
+
+  .local pmc list
+  list = new .TclList
+
+  .return(list)
+
+bad_args:
+  .throw('wrong # args: should be "namespace children ?name? ?pattern?"')
 .end
 
 .sub 'code'
