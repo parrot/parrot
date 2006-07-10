@@ -27,6 +27,7 @@ LANGUAGES = \
     punie \
     regex \
     scheme \
+    TAP \
     tcl \
     urm
 
@@ -90,6 +91,7 @@ clean: \
     punie.clean \
     regex.clean \
     scheme.clean \
+    TAP.clean \
     tcl.clean \
     urm.clean \
     smoke-clean
@@ -245,6 +247,14 @@ scheme.test :
 	- $(MAKE) scheme test
 scheme.clean :
 	- $(MAKE) scheme clean
+
+TAP: TAP.dummy
+TAP.dummy:
+	- $(MAKE) TAP
+TAP.test:
+	$(MAKE) TAP test
+TAP.clean:
+	$(MAKE) TAP clean
 
 tcl: tcl.dummy
 tcl.dummy:

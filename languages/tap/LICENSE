@@ -1,0 +1,20 @@
+Copyright (C) 2006, Chris Dolan
+
+LICENSE INFORMATION
+-------------------
+
+This code is distributed under the same license as Parrot; you can
+redistribute it and/or modify it under the terms of either:
+
+    a) the GNU General Public License
+
+    b) the "Artistic License"
+
+as found in the "LICENSES" directory at the top level of the Parrot
+distribution.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either
+the GNU General Public License or the Artistic License for more
+details.

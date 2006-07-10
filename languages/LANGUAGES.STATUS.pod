@@ -1020,6 +1020,33 @@ C<languages/tcl>
 =back
 
 
+=head2 TAP (Test Anything Protocol)
+
+=over 4
+
+=item Author
+
+Chris Dolan and Jerry Gay
+
+=item Description
+
+A parser for the Test Anything Protocol
+
+=item Status
+
+See Parrot RT for details. Search for [TAP]
+
+=item Last verified with parrot version
+
+0.4.6
+
+=item Location
+
+C<languages/tap>
+
+=back
+
+
 =head2 unlambda
 
 =over 4

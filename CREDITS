@@ -115,7 +115,7 @@ D: Pumpking (0.4.6 - ... ) and demagogue
 E: chip@pobox.com
 
 N: Chris Dolan
-D: Bug fixes
+D: TAP language author, and Parrot Bug fixes
 E: cdolan@cpan.org
 
 N: chromatic
@@ -238,7 +238,7 @@ S: Lyon, France
 
 N: Jerry Gay a.k.a. particle
 E: Jerry.Gay@gmail.com
-D: test suite, compiler tools, perl6, entropy reduction
+D: test suite, compiler tools, perl6, TAP language, entropy reduction
 S: Seattle, WA
 
 N: John J. Trammell

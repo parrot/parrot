@@ -1,0 +1,7 @@
+1..6
+ok # skip
+ok # SKIP
+ok # todo
+ok # TODO
+ok 5 # skip
+ok 6 - description # skip

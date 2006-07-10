@@ -1,0 +1,11 @@
+1..10
+ok 1 - test
+not ok 2 - failure
+ok 3 !@$%^&*)({}|?/.,<
+not ok 4    indented
+ok 5 SKIP
+ok 6 TODO
+ok 7 Bail out!
+ok 8 8
+ok 9 ok
+ok 10 not ok

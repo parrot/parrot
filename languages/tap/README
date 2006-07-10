@@ -1,0 +1,66 @@
+## $Id$
+
+=head1 TAP Parser
+
+This is a TAP (Test Anything Protocol) parser.  It is designed to show
+how to use PGE to write a top-down (recursive-descent) parser.  It has not
+yet been decided as to whether this will also become a TAP generator.
+
+This effort shows how TAP output is parsed, and in the future may be used to
+(among other things) test that HLLs generate proper TAP output. So, creating
+useful test cases and extending the grammar to cover more of TAP is welcome.
+
+=head2 Parsing
+
+The TAP parser lives in the TAP.pbc file.
+To create this file, simply issue the command
+
+  $ make
+
+To invoke the parser from a shell on a TAP input file named "foo.tap", use:
+
+  $ parrot TAP.pbc --target=parse foo.tap
+
+To run interactively, entering single-line statements:
+
+  $ parrot TAP.pbc --target=parse
+
+=head2 Files
+
+The "top" file for the parser is F<TAP.pir> which is used to
+create the F<TAP.pbc> file.  It initializes the overall
+parsing system and registers the parser as a Parrot "TAP" compiler.
+
+The other files needed for the compiler are in the F<src/> subdirectory.
+
+The F<src/TAP.pg> file defines the "top-down" grammar used for TAP output
+structures, defined using rules in Perl 6 rules syntax.  PGE's "pgc.pir"
+compiler is then used to compile the grammar file into F<src/TAP_gen.pir>,
+which is included by F<TAP.pir>.
+
+The F<src/main.pir> file controls what happens when TAP.pbc is invoked
+directly from parrot (as opposed to being loaded via the load_bytecode op.)
+
+The PIR files in F<src/> are included as part of compiling
+F<TAP.pir> to produce F<TAP.pbc>.
+
+The F<TAP.pbc> file can also be used to parse TAP output from PIR:
+
+    load_bytecode "TAP.pbc"
+    $S0 = <<'TAP'
+    1..2
+    ok 1
+    not ok 2 # todo
+    TAP
+    $P0 = compreg("TAP")                 # obtain the compiler
+    $P1 = $P0($S0, 'target'=>'parse')    # parse source code
+
+=head1 AUTHOR
+
+Chris Dolan (E<chris@clotho.net>) and Jerry Gay (E<jerry.gay@gmail.com>) are
+the authors and maintainers. Patches and suggestions should be sent to
+the Parrot Porters list (E<parrot-porters@perl.org>).
+
+=cut
+
+## vim: expandtab sw=4

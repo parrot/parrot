@@ -1,0 +1,36 @@
+## Copyright (C) 2006, The Perl Foundation.
+## $Id$
+
+grammar TAP::Grammar;
+
+## this grammar parses TAP format
+
+token output {
+    | ^ <plan> <tap_line>+  [ $ | <?syntax_error> ]
+    | ^ <tap_line>+ <plan>? [ $ | <?syntax_error> ]
+}
+
+token plan { <'1..'> \d+ \n }
+token tap_line { <tap> \n }
+token tap { <test_result> | <diagnostic> | <bail_out> }
+
+token test_result { <status> <test_result_extra>? }
+token test_result_extra {
+    <?sp> [ <directive> | <test_num> <test_num_extra>? ]
+}
+token test_num_extra {
+    <?sp> [ <directive> | <description> <directive>? ]
+}
+
+token diagnostic { \# \N* }
+token bail_out { <'Bail out!'> \N* }
+
+token status { <'not ok'> | <'ok'> }
+token test_num { \d+ }
+token description { <-[\#\n]>+ } # eats trailing spaces!
+token directive { \# <?sp> <directive_word> \N* }
+token directive_word { [:ignorecase skip | todo ] }
+
+token syntax_error { <?PGE::Util::die: Syntax error> }
+
+## vim: expandtab sw=4
