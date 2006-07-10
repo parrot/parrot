@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 98;
+use Parrot::Test tests => 116;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -328,6 +328,114 @@ TCL
 0.761594155956
 OUT
 
+language_output_is("tcl", <<'TCL', <<'OUT', "expr2");
+  puts [expr atan2(4,5)]
+TCL
+0.674740942224
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "ceil(4.6)");
+  puts [expr ceil(4.6)]
+TCL
+5.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "ceil(-1.6)");
+  puts [expr ceil(-1.6)]
+TCL
+-1.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "ceil(a)");
+  expr ceil(a)
+TCL
+syntax error in expression "ceil(a)": variable references require preceding $
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "double(5)");
+  puts [expr double(5)]
+TCL
+5.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "exp(exp(50)) - overflow");
+  expr exp(exp(50))
+TCL
+floating-point value too large to represent
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "fmod(3,2)");
+  puts [expr fmod(3,2)]
+TCL
+1.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "fmod(3,0) - domain error");
+  expr fmod(3,0)
+TCL
+domain error: argument not in valid range
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "fmod(-4,-1)");
+  puts [expr fmod(-4, -1)]
+TCL
+-0.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "hypot(3,4)");
+  puts [expr hypot(3,4)]
+TCL
+5.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "hypot(-3,4)");
+  puts [expr hypot(-3,4)]
+TCL
+5.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "int(4.6)");
+  puts [expr int(4.6)]
+TCL
+4
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "log(-4) - domain error");
+  expr log(-4)
+TCL
+domain error: argument not in valid range
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "pow(2,10)");
+  puts [expr pow(2,10)]
+TCL
+1024.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "round(4.5)");
+  puts [expr round(4.5)]
+TCL
+5
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "round(4.4)");
+  puts [expr round(4.4)]
+TCL
+4
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "round(2)");
+  puts [expr round(2)]
+TCL
+2
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "sqrt(-49) - domain error");
+  expr sqrt(-49)
+TCL
+domain error: argument not in valid range
+OUT
+
 # misc.
 
 language_output_is("tcl",<<TCL,<<OUT,"simple precedence");
@@ -506,9 +614,6 @@ TCL
 unknown math function "fink"
 OUT
 
-TODO: {
-  local $TODO = "not all string cases are currently working properly";
-
 language_output_is("tcl",<<TCL,<<OUT,"string mul");
  puts [expr {"a" * "b"}]
 TCL
@@ -568,8 +673,6 @@ language_output_is("tcl",<<TCL,<<OUT,"string ^");
 TCL
 can't use non-numeric string as operand of "^"
 OUT
-
-}
 
 language_output_is("tcl",<<TCL,<<OUT,"octal");
  puts [expr 000012345]
