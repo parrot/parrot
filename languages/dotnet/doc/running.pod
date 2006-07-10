@@ -6,6 +6,7 @@ the PIR generated in the process).
 
 
 =head2 Usage
+
 To translate example.dll to example.pbc:
 
   parrot net2pbc.pbc example.dll
@@ -26,3 +27,4 @@ A number of additional flags are available:
       type fails.
   -t  Trace the translation process, producing useful debug info.
   -q  Quiet mode; suppress output of summary at the end.
+

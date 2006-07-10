@@ -4,7 +4,6 @@ This document discusses the way that .NET and Parrot provide support for
 exceptions. It then describes how .NET's exception model can be implemented
 using the Parrot exception support.
 
-
 =head2 The .NET Model
 
 

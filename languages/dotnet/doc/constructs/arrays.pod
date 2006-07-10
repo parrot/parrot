@@ -2,14 +2,14 @@
 
 This document discusses .NET arrays and how they can be supported in Parrot.
 
-
 =head2 The .NET Model
+
 At the runtime level only one-dimensional arrays of fixed size, a single type
 and with first element at index zero are supported. Anything beyond this is
 supported through the System.Array class.
 
-
 =head2 The Parrot Model
+
 Arrays are implemented using PMCs. PMCs have keyed v-table operations (that
 is, v-table functions that as one of their parameters take a key). For arrays
 the key is the array index and is expected to be an integer. A number of PMCs
@@ -19,7 +19,6 @@ interface to the array is always the same, so translated .NET code will be
 able to handle being passed a Perl array even though their behaviours are
 very different (Perl arrays are resizable, for example, where as .NET arrays
 are of fixed length).
-
 
 =head2 Translating Array Instructions
 
@@ -44,3 +43,4 @@ the array onto the stack. This maps to the elements v-table call in Parrot.
   $I0 = elements $P0
 
 Where $P0 is the array PMC and $I0 will hold the number of elements.
+

@@ -4,8 +4,8 @@ This document discusses the way that .NET and Parrot provide support for
 exceptions. It then describes how .NET's exception model can be implemented
 using the Parrot exception support.
 
-
 =head2 The .NET Model
+
 The .NET exception subsystem uses objects to represent exceptions and a per-
 method set of protected regions with associated handlers. These protected
 regions map closely to the high level languages concept of a try block; if
@@ -45,8 +45,8 @@ empty.
 The table of exception handlers is sorted inner-most to outer-most where
 there is nesting.
 
-
 =head2 The Parrot Model
+
 The Parrot exception system is based around an exception stack. Handlers are
 simply represented as offsets in a given context, and are created at runtime
 by using the push_eh instruction and supplying a label located at the start
@@ -71,10 +71,10 @@ more elegantly. The second item is an action. This is simply a sub PMC that
 gets invoked if, while unwinding the stack looking for an exception handler,
 the entry is walked over.
 
-
 =head2 Translating Exceptions
 
 =head3 Entry To Protected Regions
+
 There is no instruction marking entry to protected regions, so the translator
 must identify them from the handlers table by looking through the table at the
 start of each iteration of the translation loop and find entries where the
@@ -92,6 +92,7 @@ the case of a filter type exception in which case the filter offset will be
 used instead.
 
 =head3 Typed Handlers
+
 PIR to get the exception object that was thrown will be emitted at the start
 of a typed handler block. This will be followed by PIR to assign the .NET
 exception object, contained within the Parrot exception object, to what the
@@ -101,10 +102,12 @@ if the .NET exception object is of the required type. If it is not, then the
 exception will be re-thrown. If it is, then the handler will be executed.
 
 =head3 Filtered Handlers
+
 XXX TO DO - will run filter, then jump into handler at endfilter if needed
 and if not will re-throw.
 
 =head3 Finally Handlers
+
 There are two ways to enter a finally handler. One is while un-winding the
 exception stack because an exception was thrown. Another is when the leave
 instruction is used.
@@ -137,9 +140,11 @@ never caught. That is probably not something that can be handled too easily
 if true.
 
 =head3 Fault Handlers
+
 XXX TO DO - basically, just replce endfinally with a re-throw
 
 =head3 The leave Instruction
+
 The leave instruction is basically a branch, and therefore translates to a
 goto. However, since it is the way that a protected region or handler is left,
 it is also a good point for clearing exception handlers from the stack and,
@@ -163,5 +168,4 @@ beyond the first in the sequence.
 Note that if there is no containing region, the mark 0 should be used. Note
 that this requires a pushmark 0 to be emitted at the top of every translated
 method, and a popmark 0 at every return.
-
 

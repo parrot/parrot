@@ -3,8 +3,8 @@
 This document discusses .NET method calling and how this is translated to work
 on Parrot.
 
-
 =head2 The .NET Model
+
 The .NET CLI provides a stack based calling mechanism. Arguments are pushed
 onto the stack left to right, then the method is called. If there is a return
 value then it is left on the stack. Suckfully, methods are limited to 
@@ -23,8 +23,8 @@ however the VM does not "support" this at call-time. It is up to the compiler
 to resolve which method to call and put the correct meta-data reference with
 the call.
 
-
 =head2 The Parrot Model
+
 Parrot provides standard calling conventions that attempt to cover the needs
 of many languages. They use Continuation Passing Style and under the hood are
 implemented as several variable argument register instructions (set_args,
@@ -42,8 +42,8 @@ at runtime to just have a call to the method that the dispatch algorithm found,
 so the cost of the dynamic dispatch is amortised. This technique is known as a
 Polymorhpic Inline Cache (PIC).
 
-
 =head2 The Translated Code Will Use Parrot Calling Conventions
+
 The .NET method calls will be translated in a way that uses the Parrot calling
 conventions. This will without doubt mean that calling times will be higher,
 for the Parrot calling conventions are far more complex than the .NET ones.
@@ -53,10 +53,10 @@ target Parrot. More bluntly, as the entire point of writing this translator is
 interoperability, not targetting the Parrot calling conventions would be
 pretty dumb.
 
-
 =head2 Translating Method Calls
 
 =head3 The "call" Instruction
+
 The "call" instruction does a non-virtual method call; the method specified by
 the meta-data token referenced by the instruction is the one to, no matter
 what. This can be achieved in Parrot by looking up the method in the namespace
@@ -71,8 +71,8 @@ shown below.
   $P1000000 = find_global "Testing.Test", "factorial"
   $I0 = $P1000000($P1, $I2)
 
-
 =head3 The "callvirt" Instruction
+
 The "callvirt" instruction does a virtual method call. That is, an object
 currently viewed as being an A that is actually some subtype B of A may
 override some method "foo". Whereas "call" would call the method "foo" as
@@ -82,15 +82,15 @@ syntax.
 
   $I0 = $P1."foo"($I2)
 
-
 =head3 The "calli" Instruction
+
 The "calli" instruction does a method call through a method reference. Another
 instruction is used to load a function reference. As shown in the example PIR
 for the "call" instruction, Parrot can handle storing a reference to a method
 in a PMC. This has not, however, been implemented at this time.
 
-
 =head2 Supporting Method Overloading
+
 Using Parrot's MMD mechanism will provide most of what is required to support
 .NET method overloading. However, there is a problem: Parrot does not recognize
 different types of integers and floating point numbers as fundemental types
@@ -121,18 +121,7 @@ types where appropriate. Note that there is no need for explicit unboxing on
 the callee side; if an integer register is declared but a PMC is passed, then
 the get_integer v-table method will be called on that PMC automatically.
 
-
 =head2 References
+
 PIC - http://citeseer.ist.psu.edu/hlzle91optimizing.html
-
-
-
-
-
-
-
-
-
-
-
 

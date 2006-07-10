@@ -5,8 +5,8 @@ This document discusses the support for object oriented programming that the
 the .NET object model onto the Parrot one in a way that, as far as possible,
 will allow other Parrot languages to interoperate with .NET languages.
 
-
 =head2 The .NET Model
+
 The .NET object model includes classes with many methods and fields. Methods
 and fields may be static or per instance, and instance methods may be virtual
 (that is, subclasses may provide seperate implementations), thus providing for
@@ -26,8 +26,8 @@ class must have a parent except System.Object. Interfaces may or may not have
 a parent. Mappings of a class to the interfaces it implements are stored in
 another table and details of fields in yet another.
 
-
 =head2 The Parrot Model
+
 Parrot provides two PMCs that support object orientation, namely ParrotClass
 (which represents a class) and ParrotObject (which represents an object; that
 is, the instantiation of a class). A class can inherit many other classes and
@@ -58,6 +58,7 @@ B) and whether a class has a certain method.
 =head3 Classes
 
 =head3 Interfaces
+
 Since Parrot currently lacks interfaces, they have to be "faked out" using
 classes and taking advantage of multiple inheritance. An interface is translated
 just as a class would be, but each of the methods simply contain code to throw
@@ -72,6 +73,7 @@ of interfaces. This provides all of the required semantics.
 =head3 Class Inheritance
 
 =head3 Interface Implementation
+
 Since interfaces are really just classes in the translated code, implementing
 the interface looks just like inheriting a class.
 

@@ -1,10 +1,11 @@
 =head1 The .NET Metadata To PIR Translator
+
 Much data about .NET classes along with their fields and methods are stored in
 tables, collectively known as metadata, outside of the instruction stream. A
 number of PMCs (documented in L<pmcs.pod>) are used to access this metadata.
 
-
 =head2 Interface
+
 This subsystem represents itself as a single sub that takes a single parameter,
 the filename of the EXE or DLL file with CLI metadata inside it that needs to
 be translated. It returns the PIR of the translated file. The sub is simply
@@ -14,8 +15,8 @@ named "dotnet_to_pir".
 
 This is contained in the file "src/translator.pir".
 
-
 =head2 Guts
+
 This section describes the internals of the metadata translator.
 
 =head3 Flow
@@ -77,20 +78,24 @@ This section describes the internals of the metadata translator.
       +----------------------+          +----------------------+
 
 =head3 Files
+
 The translator source consists of a number of PIR files.
 
 =head4 translator.pir
+
 This contains the main dotnet_to_pir sub that initiates the translation process.
 It also contains translate_class, which drives translation of a .NET class, and
 translate_field, which translates a field.
 
 =head4 method.pir
+
 This contains routines related to translating methods along with their local
 variables and parameters. The sub translate_method drives this, using a couple
 of utility functions. It also makes use of signature translation routines in
 signature.pir.
 
 =head4 signature.pir
+
 This contains routines that parse parts of signature blobs and build some simple
 data structures out of them.
 

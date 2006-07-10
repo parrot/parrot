@@ -4,8 +4,8 @@ The .NET CLI is a stack based virtual machine whereas Parrot is register based.
 This document details what that means and how the challenges the difference
 presents will be dealt with.
 
-
 =head2 Parrot's Register Architecture
+
 In general, register machines have a set of registers, perhaps numbered from
 r0 to r15. These registers are used to store data that is currently being
 operated on. Instructions load data from memory into registers, save data
@@ -75,8 +75,8 @@ that are needed. This still leaves a lot of work to do in converting stack code
 into good register code, but simplifies the problem by taking care of register
 allocation and freeing the translator from having to do that.
 
-
 =head2 The .NET CLI's Stack Architecture
+
 In general, stack machines simply consist of a stack - an array of elements of
 memory with a pointer to the "top" one. Items can be pushed onto or popped off
 the top of the stack and instructions generally operate on the items on the
@@ -128,12 +128,13 @@ possible upon reaching "..." do not result in identical stack type states.
 The property that makes code like this invalid means that the stack pointer
 can always be determined statically; that is, at translation time.
 
-
 =head2 Data On The Stack
+
 There are essentially 3 types of item found on the .NET CLI's execution stack 
 that need to be mapped to Parrot registers.
 
 =head3 Arguments
+
 This is the data that has been passed to a method. In a stack architecture, the
 calling convention is that parameters for the method are pushed onto the stack
 before the method is called. They are accessed by a number of .NET instructions
@@ -143,6 +144,7 @@ stack so they can be manipulated. The space they consume on the stack is
 retained for the duration of the method call.
 
 =head3 Locals
+
 These are local variables that will almost always relate to variables declared
 in the high level language source code. When the method is entered, space for
 these is allocated on the stack. Just as with arguments, some intructions
@@ -151,6 +153,7 @@ the top of the stack and vice versa. The space they consume on the stack is
 retained for the duration of the method call.
 
 =head3 Temporaries
+
 These usually do not correspond to variables used in the high level language
 code. Rather, they are introduced by virtue of the fact that the execution
 model can only do a number of simple operations and therefore temporary
@@ -159,8 +162,8 @@ machine has even greater need for this, for all operands need to be loaded
 onto the stack. Any data on the stack that is not an argument or a local
 can be considered a temporary.
 
-
 =head2 Solutions For Allocating Arguments
+
 Arguments consume a number of fixed stack locations. The calling conventions
 for stack machines involve pushing the parameters for the call onto the
 stack. Parrot's calling conventions are register based. However, PIR syntax
@@ -196,6 +199,7 @@ has the first parameter named "arg0", the second parameter named "arg1" etc.
 will be sufficient.
 
 =head2 Solutions For Allocating Locals
+
 PIR provides a ".local" directive for declaring a local in a named register.
 
   .local int name
@@ -206,11 +210,13 @@ the first local named "local0", the second local named "local1" etc. will be
 sufficient.
 
 =head2 Solutions For Allocating Temporaries
+
 Temporaries make up the part of the stack that changes in depth and type
 during the execution of the method. Therefore the mapping is more complex.
 This section investigates several options.
 
 =head3 Having A Stack
+
 One way to translate stack code to register code is to actually have a stack.
 In the Parrot case, that could be a PMC array (which can also have strings and
 boxed integers and numbers on it); the PMC array in Parrot supports push and
@@ -252,6 +258,7 @@ Where local3 is the destination for the result and arg1 and local2 are the
 operands for the add instruction.
 
 =head3 Lazy Stack Operations
+
 One partial solution is to do pushes and pops lazily. Lazy pushing can be
 implemented by keeping track of things that would be on the stack, but instead
 no push instruction is generated. It is important to note that this tracking is
@@ -311,6 +318,7 @@ completely do away with having a stack. Doing stack operations costs v-table
 calls, which harms performance and makes poor use of the Parrot execution model.
 
 =head3 Mapping Stack Locations To Registers
+
 An early paper[1] on translating Java bytecode to native code suggested that,
 in cases where the stack depth could be statically determined, each stack
 location could be mapped to a register. This way, pushes and pops simply became
@@ -361,6 +369,7 @@ registers, not a stack, which is a move in the right direction. Also, it is
 now possible for a register code optimizer to improve it.
 
 =head3 Clearing Redundant Moves
+
 A paper entitled "The Case For Virtual Register Machines"[3] published in 2000,
 along with the earlier paper[1], acknowledge that many of the move instructions
 generated when mapping the stack onto some registers are redundant. The 2000
@@ -378,13 +387,13 @@ moves that would be removed, just as instructions were never generated when
 this was clearly avoidable in the lazy pushes/pops algorithm presented earlier.
 
 =head3 Never Generating Redundant Moves
+
 This method essentially does "lazy moves" when loading data from a register.
 This covers loads of locals and arguments, which make a high proportioin of
 the loads that are performed. It takes advantage of constraints on the .NET
 instruction stream to do this in a single pass.
 
 XXX TO DO
-
 
 =head2 References
 

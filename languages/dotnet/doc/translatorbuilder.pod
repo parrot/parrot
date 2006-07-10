@@ -12,7 +12,6 @@ PIR would be error prone and would make it more difficult to try out different
 stack to register mapping schemes or optimize the instruction translation
 code lookup.
 
-
 =head2 Generating Code That...Generates Code
 
 The translator builder is generating the code that will translate .NET CLI
@@ -20,7 +19,6 @@ instructions into Parrot instructions. That code in turn is also generating
 code. The key to hacking on this part of the system is keeping a firm hold
 on what code is being talked about - the code of the instruction translator
 or the code that the instruction translator will generate.
-
 
 =head2 Usage
 
@@ -31,7 +29,6 @@ The translator builder is invoked as follows:-
 Where translation.rules is the input translation rules file, Stack is the
 stack to register mapping algorithm to use and src/it.pir is the output
 PIR file to generate.
-
 
 =head2 Steps
 
@@ -77,7 +74,6 @@ Once translation has taken place, the stack to register mapping code may
 wish to perform some cleanup, so there is a hook for it to do so. Also,
 the end of the translate routine that returns the generated PIR needs to
 be generated.
-
 
 =head2 Data Flow To Determine Register Types
 
@@ -244,7 +240,6 @@ of view, if not a .NET one.)
 3. Emit the translation code as supplied by the pir entry of the call rule.
 
 4. The post_call SRM method is called.
-
 
 =head2 Stack to Register Mapping (SRM) Modules
 

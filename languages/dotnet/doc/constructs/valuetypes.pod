@@ -4,6 +4,7 @@ This document discusses .NET's value types and how their semantics can be
 realised on the Parrot platform.
 
 =head2 About .NET's Value Types
+
 The name pretty much says it all - value types are simply types that exhibit
 value semantics (that is, anywhere that, say, an integer would be copied a
 value type will almost be copied; think passing, assignment etc).
@@ -21,15 +22,15 @@ can be treated as integers or numbers on the stack as appropriate. This
 allows the .NET platform to implement them efficiently (and will allow for
 the same to be achieved in the Parrot translation).
 
-
 =head2 Parrot's Support For Value Types
+
 While Parrot provides all the primitives upon which complex value types can
 be built, it doesn't provide any support in the form that .NET does.
-
 
 =head2 Translating Value Types
 
 =head3 Value Types Are Really Just Classes With A Property
+
 Value types have fields (in Parrot terminology, attributes) and, in their
 boxed form may have virtual methods called on them. Their value semantics
 aside they are much like objects. (The .NET benefit aside that you avoid
@@ -43,6 +44,7 @@ to mark an object as "boxed". This is optimized for the common case -
 that the unboxed form will be being used.
 
 =head3 Initialization
+
 As it is completely OK to start using a value type without initialising
 it. This is different from objects. Locals that are to hold a value type
 therefore need to have their value type PMCs initialized. For arguments
@@ -54,6 +56,7 @@ this feels expensive and a possible improvement may be a special value
 type array PMC that, if the element is empty, auto-vivifies it.
 
 =head3 Copy On Load (And No, I Didn't Mean Write ;-))
+
 When a value type is loaded, an instruction to clone it must be emitted
 directly afterwards. These instructions include all loads from locals,
 arguments, array elements and fields. These should all be marked up
@@ -72,12 +75,15 @@ really a flat data structure, but in Parrot's view it's a reference to
 another PMC that will also need to be cloned.
 
 =head3 Calling
+
 XXX TO DO
 
 =head3 The Enum Special Casae
+
 XXX TO DO
 
 =head3 Box and Unbox Instructions
+
 Both of these instructions need special cases for enumerations and the 
 built-in raw types. For other value types, a more general mechanism is
 required.
@@ -98,24 +104,31 @@ to emit when translating the unbox operation.
 =head3 Other Value Type Instructions
 
 =head4 initobj
+
 A PMC __init method can be provided; since it knows the fields it can
 be generated to do the Right Thing. This instruction simply gets the value
 type using the managed pointer to it, then calls its __init v-table method.
 
 =head4 copyobj
+
 This is translated to a call to load_pmc on the managed pointer to get
 the value, followed by a clone of that value and finally a call to
 store_pmc on the destination managed pointer.
 
 =head4 ldobj
+
 This is translated as a call to load_pmc on the managed pointer that is
 followed by a clone.
 
 =head4 sizeof
+
 XXX TO DO
+
 Thoughts: as we are using PMCs then any array would be a PMC array so we
 can just hand back sizeof(void*)? Or is that going to cause problems? Ugh.
 
 =head4 stobj
+
 Clone the PMC representing the value type, then call store_pmc on the
 on the managed pointer to actually do the store.
+

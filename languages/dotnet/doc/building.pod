@@ -2,8 +2,8 @@
 
 This document describes the process of building the .NET CLI to PIR translator.
 
-
 =head2 Requirements
+
 To build the translator you will need the following:-
 
 =over 4
@@ -28,7 +28,6 @@ Perl).
 
 =back
 
-
 =head2 Building
 
 Enter the source directory for the translator and run Configure.pl, passing it
@@ -46,8 +45,8 @@ Or
 
   nmake
 
-
 =head2 Running The Tests
+
 Run the regression tests like this:
 
   make test

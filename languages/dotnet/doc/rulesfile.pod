@@ -46,7 +46,6 @@ A complete example of a translation rule follows.
   push = 1
   instruction = add ${DEST}, ${STACK0}, ${STACK1}
 
-
 =head2 Instruction Information Entries
 
 Many of the types of entry simply provide information about the instruction
@@ -68,7 +67,6 @@ This entry is B<mandatory>.
 This entry specifies the type of instruction. Valid instruction types are:
 
 =over 4
-
 
 =item * op - For any operation that operates only on the stack and results
              in no change of flow control (for example, add and ceq). An
@@ -189,7 +187,6 @@ the "pir" entry. Example:
 
 Multiple lines of instructions are allowed.
 
-
 =head3 pir
 
 This is for the times when instruction isn't enough. It allows a chunk of
@@ -204,7 +201,6 @@ Example:
 
 Once again, to clarify: code specified with pir goes into the translator,
 code specified with instruction is what the translator will *emit*.
-
 
 =head2 Dataflow Analysis Entries
 
@@ -354,7 +350,6 @@ For use with instructions in the class calling. It is used to hold the names
 of registers that are being passed or returned. The ${STACKn} meta-variables
 are not suitable here as the number of parameters is not known until runtime.
 (That is, runtime for the translator.)
-
 
 =head2 Not Screwing It Up
 

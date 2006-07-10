@@ -4,6 +4,7 @@ This document discusses .NET managed pointers and how they can be supported on
 Parrot.
 
 =head2 About .NET Managed Pointers
+
 A managed pointer holds the address of a local variable or parameter on the
 stack, a field from an object or an element in an array. These can be used
 with a number of instructions that load and store data indirectly, that is
@@ -15,6 +16,7 @@ will always point to a valid location so the safety of the VM can not be
 comprimised.
 
 =head2 Parrot Issues
+
 Parrot, at the time of writing, lacks a straightforward way to implement
 managed pointers. One issue is that there is no official and documented way to
 obtain references to or the addresses of registers, fields of objects or array
@@ -31,6 +33,7 @@ the register frame that it has a pointer into, whatever is in memory at that
 location at a later time can be written over.
 
 =head2 The Basics
+
 A managed pointer is represented by a ManagedPointer PMC, specifically a
 dynamic PMC written specifically for the .NET translator rather than provided
 by the Parrot core. Beneath it will be a structure containing details of the
@@ -41,6 +44,7 @@ a flag that states what kind of location the pointer is pointing at (This is
 not needed by a standard .NET VM, but a standard .NET VM Parrot is not.)
 
 =head2 Managed pointers to array elements
+
 As the index of the array element being referenced is always known at the time
 the pointer is created, the pointer can be emulated by storing the index and
 a pointer to the array PMC, then using the PMC v-table methods to get and set
@@ -49,11 +53,13 @@ visits the managed pointer PMC, so the object holding the referenced field can
 not disappear.
 
 =head2 Managed pointers to fields
+
 Similar to the array case, the name of the field along with a pointer to the
 object PMC can be stored and used to implement indirect access to the field.
 The object PMC needs to be marked live for GC purposes too.
 
 =head2 Managed pointers to registers
+
 This covers managed pointers to local variables and paramters, which are all
 stored in registers. The current method that is being executed will have a
 Parrot_Context structure associated with it. This structure contains data
@@ -72,21 +78,23 @@ referenced from vanishing. Admittedly, this is somewhat evil and is certainly
 playing with parts of the internals liable to change. However, it works.
 
 =head2 Implementation
+
 The managed pointer PMC has the following underlying structure.
 
-struct dotnet_managed_ptr
-{
-    int type; /* The type of managed pointer this is. */
-    union ref {
-        PMC* pmc;            /* For arrays, fields. */
-        Parrot_Context *ctx; /* For registers. */
-    }
-    union tag {
-        int index;           /* For arrays. */
-        STRING *name;        /* For field name. */
-        struct reg_info {    /* For registers. */
-            int number;
-            int reg_type;
-        }
-    }
-}
+  struct dotnet_managed_ptr
+  {
+      int type; /* The type of managed pointer this is. */
+      union ref {
+          PMC* pmc;            /* For arrays, fields. */
+          Parrot_Context *ctx; /* For registers. */
+      }
+      union tag {
+          int index;           /* For arrays. */
+          STRING *name;        /* For field name. */
+          struct reg_info {    /* For registers. */
+              int number;
+              int reg_type;
+          }
+      }
+  }
+
