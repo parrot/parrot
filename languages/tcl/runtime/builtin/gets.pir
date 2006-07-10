@@ -10,6 +10,11 @@ read a line from a channel
 .sub '&gets'
   .param pmc argv :slurpy
 
+  .local int argc
+  argc = elements argv
+  if argc == 0 goto bad_args
+  if argc > 2  goto bad_args
+
   .local string channelID
   channelID = argv[0]
 
@@ -23,4 +28,8 @@ read a line from a channel
   line = readline io
 
   .return (line)
+
+bad_args:
+  .throw('wrong # args: should be "gets channelId ?varName?"')
 .end
+
