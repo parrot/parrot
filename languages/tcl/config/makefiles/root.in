@@ -105,8 +105,8 @@ src/compiler.pir \
 src/macros.pir \
 src/parser.pir \
 src/returncodes.pir \
-src/tcl_expr_optok.pir \
-src/tcl_expr.pir
+src/grammar/optok.pir \
+src/grammar/expression.pir
 
 
 all: tcl.pbc

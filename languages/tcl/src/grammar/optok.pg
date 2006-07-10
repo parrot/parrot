@@ -41,4 +41,4 @@ proto 'infix:&&' is precedence('13=') {...}
 
 proto 'infix:||' is precedence('14=') {...}
 
-# XXX Missing Ternary op. is precedence('15=') {...}
+proto 'ternary:? :' is precedence('15=') {...}

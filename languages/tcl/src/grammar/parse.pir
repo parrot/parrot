@@ -29,13 +29,11 @@ and returns the result to the caller.
     load_bytecode 'PGE/Util.pbc'
 
     optable = find_global '_Tcl::Grammar::Expr', '$optable'
-    # XXX - try just using the default ws?
-    #ws = find_global 'Perl6::Grammar', 'ws'
-    #setattribute optable, "PGE::OPTable\x0&!ws", ws
+    ws = find_global '_Tcl::Grammar::Expr', 'ws'
+    setattribute optable, "PGE::OPTable\x0&!ws", ws
     if has_stoptoken > 0 goto expression_1
     stoptoken = ''
   expression_1:
-    say 'GOT HERE'
     $P10 = optable.'parse'(mob, 'stop'=> stoptoken)
     $P1 = find_global 'PGE::Util', 'die' 
     $P1($P10, 'eek')
