@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
@@ -181,4 +181,11 @@ env(cowpig) = moink
 env(pig)    = oink
 OUT
 }
+
+language_output_is("tcl", <<'TCL', <<'OUT', "args checking from inlined commands");
+  proc incr {} { puts ok }
+  incr
+TCL
+ok
+OUT
 

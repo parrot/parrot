@@ -333,7 +333,7 @@ sub badargs {
     
     my $usage = create_usage(@args);
     my $code  = "bad_args: \n"
-              . ".throw('wrong # args: should be \"$cmd$usage\"') \n";
+              . "  .return(register, \"  .throw('wrong # args: should be \\\"$cmd$usage\\\"')\\n\") \n";
     
     return $code;
 }
