@@ -7,6 +7,7 @@
 	.local pmc stdin
 	.local string line
 	.local int count, tmp, linelen
+	count = 0
 	stdin = getstdin
 beginwhile:
 	line = readline stdin

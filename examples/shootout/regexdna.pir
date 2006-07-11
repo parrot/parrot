@@ -3,7 +3,7 @@
 	.local pmc p6rule_compile, rulesub, match, variants, variants_p5, iub, iter, matches, capt
 	.local string pattern, chunk, seq, key, replacement
 	.local int readlen, chunklen, seqlen, finallen, i, varnum, count
-	p6rule_compile = compreg "PGE::P6Rule"
+	p6rule_compile = compreg "PGE::P6Regex"
 	
 	# Store the regexes we need...
 	variants = new .FixedStringArray
