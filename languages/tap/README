@@ -57,9 +57,10 @@ The F<TAP.pbc> file can also be used to parse TAP output from PIR:
 
 =head1 AUTHOR
 
-Chris Dolan (E<chris@clotho.net>) and Jerry Gay (E<jerry.gay@gmail.com>) are
-the authors and maintainers. Patches and suggestions should be sent to
-the Parrot Porters list (E<parrot-porters@perl.org>).
+Chris Dolan (L<mailto:chris@clotho.net>) and Jerry Gay
+(L<mailto:jerry.gay@gmail.com>) are the authors and maintainers.  Patches
+and suggestions should be sent to the Parrot Porters list
+(L<mailto:parrot-porters@perl.org>).
 
 =cut
 
