@@ -93,7 +93,7 @@ clean: \
     punie.clean \
     regex.clean \
     scheme.clean \
-    TAP.clean \
+    tap.clean \
     tcl.clean \
     urm.clean \
     smoke-clean
@@ -258,13 +258,13 @@ scheme.test :
 scheme.clean :
 	- $(MAKE) scheme clean
 
-TAP: TAP.dummy
-TAP.dummy:
-	- $(MAKE) TAP
-TAP.test:
-	$(MAKE) TAP test
-TAP.clean:
-	$(MAKE) TAP clean
+tap: tap.dummy
+tap.dummy:
+	- $(MAKE) tap
+tap.test:
+	$(MAKE) tap test
+tap.clean:
+	$(MAKE) tap clean
 
 tcl: tcl.dummy
 tcl.dummy:
