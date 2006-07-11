@@ -1,0 +1,116 @@
+/*
+Copyright (C) 2006, The Perl Foundation.
+$Id: wmlsfloat.pmc 12840 2006-05-30 15:08:05Z coke $
+
+=head1 NAME
+
+pmc/wmlsfloat.pmc - WMLScript Floating-point
+
+=head1 DESCRIPTION
+
+C<WmlsFloat> extends C<Float> to provide a class with the behaviour of
+the WMLScript C<Floating-point> type.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static INTVAL dynpmc_WmlsBoolean;
+static INTVAL dynpmc_WmlsInteger;
+
+pmclass WmlsFloat
+    extends Float
+    does scalar
+    does float
+    dynpmc
+    group wmls_group
+    hll Lua maps Float {
+
+/* Class initialization. Caches constant strings that will be used later.
+*/
+    void class_init() {
+        if (pass) {
+            dynpmc_WmlsBoolean = pmc_type(INTERP,
+              const_string(INTERP, "WmlsBoolean"));
+            dynpmc_WmlsInteger = pmc_type(INTERP,
+              const_string(INTERP, "WmlsInteger"));
+        }
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void set_integer_native(INTVAL value)>
+
+=cut
+
+*/
+    void set_integer_native (INTVAL value) {
+        PMC_num_val(SELF) = (FLOATVAL)value;
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<PMC* typeof (PMC* value)>
+
+return 1
+
+=cut
+
+*/
+    METHOD PMC* typeof (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_WmlsInteger);
+        PMC_int_val(retval) = 1;
+        return retval;
+    }
+
+/*
+
+=item C<PMC* isvalid (PMC* value)>
+
+return true
+
+=cut
+
+*/
+    METHOD PMC* isvalid (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_WmlsBoolean);
+        PMC_int_val(retval) = 1;
+        return retval;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Francois Perrad.
+
+=cut
+
+*/
+

@@ -1,0 +1,99 @@
+/*
+Copyright (C) 2006, The Perl Foundation.
+$Id: wmlsinteger.pmc 12840 2006-05-30 15:08:05Z coke $
+
+=head1 NAME
+
+pmc/wmlsinteger.pmc - WMLScript Integer
+
+=head1 DESCRIPTION
+
+C<WmlsInteger> extends C<Integer> to provide a class with the behaviour of
+the WMLScript C<Integer> type.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static INTVAL dynpmc_WmlsBoolean;
+static INTVAL dynpmc_WmlsInteger;
+
+pmclass WmlsInteger
+    extends Integer
+    does scalar
+    does integer
+    dynpmc
+    group wmls_group
+    hll Lua maps Integer {
+
+/* Class initialization. Caches constant strings that will be used later.
+*/
+    void class_init() {
+        if (pass) {
+            dynpmc_WmlsBoolean = pmc_type(INTERP,
+              const_string(INTERP, "WmlsBoolean"));
+            dynpmc_WmlsInteger = pmc_type(INTERP,
+              const_string(INTERP, "WmlsInteger"));
+        }
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<PMC* typeof (PMC* value)>
+
+return 0
+
+=cut
+
+*/
+    METHOD PMC* typeof (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_WmlsInteger);
+        PMC_int_val(retval) = 0;
+        return retval;
+    }
+
+/*
+
+=item C<PMC* isvalid (PMC* value)>
+
+return true
+
+=cut
+
+*/
+    METHOD PMC* isvalid (PMC* value) {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_WmlsBoolean);
+        PMC_int_val(retval) = 1;
+        return retval;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Francois Perrad.
+
+=cut
+
+*/
+

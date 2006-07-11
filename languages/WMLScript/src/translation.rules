@@ -1,0 +1,884 @@
+## Control Flow Instructions
+
+[JUMP_FW_S]
+code = 80
+class = branch
+inline = 1F
+pir = <<PIR
+    $I0 = ${NEXTPC} + ${INLINE}
+    $S0 = $I0
+    ${INS} = concat "  goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[JUMP_FW]
+code = 01
+class = branch
+arguments = uint8
+pir = <<PIR
+    $I0 = ${NEXTPC} + ${ARG1}
+    $S0 = $I0
+    ${INS} = concat "  goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[JUMP_FW_W]
+code = 02
+class = branch
+arguments = uint16
+pir = <<PIR
+    $I0 = ${NEXTPC} + ${ARG1}
+    $S0 = $I0
+    ${INS} = concat "  goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[JUMP_BW_S]
+code = A0
+class = branch
+inline = 1F
+pir = <<PIR
+    $I0 = ${NEXTPC} + ${INLINE}
+    $S0 = $I0
+    ${INS} = concat "  goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[JUMP_BW]
+code = 03
+class = branch
+arguments = uint8
+pir = <<PIR
+    $I0 = ${NEXTPC} - ${ARG1}
+    $S0 = $I0
+    ${INS} = concat "  goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[JUMP_BW_W]
+code = 04
+class = branch
+arguments = uint16
+pir = <<PIR
+    $I0 = ${NEXTPC} - ${ARG1}
+    $S0 = $I0
+    ${INS} = concat "  goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[TJUMP_FW_S]
+code = C0
+class = branch
+inline = 1F
+pop = 1
+pir = <<PIR
+    $I0 = ${NEXTPC} + ${INLINE}
+    $S0 = $I0
+    ${INS} = concat "  ${ITEMP0} = isfalse "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+    ${INS} = concat "  if ${ITEMP0} goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[TJUMP_FW]
+code = 05
+class = branch
+arguments = uint8
+pop = 1
+pir = <<PIR
+    $I0 = ${NEXTPC} + ${ARG1}
+    $S0 = $I0
+    ${INS} = concat "  ${ITEMP0} = isfalse "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+    ${INS} = concat "  if ${ITEMP0} goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[TJUMP_FW_W]
+code = 06
+class = branch
+arguments = uint16
+pop = 1
+pir = <<PIR
+    $I0 = ${NEXTPC} + ${ARG1}
+    $S0 = $I0
+    ${INS} = concat "  ${ITEMP0} = isfalse "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+    ${INS} = concat "  if ${ITEMP0} goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[TJUMP_BW]
+code = 07
+class = branch
+arguments = uint8
+pop = 1
+pir = <<PIR
+    $I0 = ${NEXTPC} - ${ARG1}
+    $S0 = $I0
+    ${INS} = concat "  ${ITEMP0} = isfalse "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+    ${INS} = concat "  if ${ITEMP0} goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[TJUMP_BW_W]
+code = 08
+class = branch
+arguments = uint16
+pop = 1
+pir = <<PIR
+    $I0 = ${NEXTPC} - ${ARG1}
+    $S0 = $I0
+    ${INS} = concat "  ${ITEMP0} = isfalse "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+    ${INS} = concat "  if ${ITEMP0} goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+## Function Call Instructions
+
+[CALL_S]
+code = 60
+class = calling
+inline = 07
+nb_arg = script.get_nb_arg(${INLINE}) 
+pir = <<PIR
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = fct_"
+    $S0 = ${INLINE}
+    ${INS} = concat $S0
+    ${INS} = concat "("
+    ${INS} = concat ${PARAMS}
+    ${INS} = concat ")\n"
+PIR
+
+[CALL]
+code = 09
+class = calling
+arguments = uint8
+nb_arg = script.get_nb_arg(${ARG1})
+pir = <<PIR
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = fct_"
+    $S0 = ${ARG1}
+    ${INS} = concat $S0
+    ${INS} = concat "("
+    ${INS} = concat ${PARAMS}
+    ${INS} = concat ")\n"
+PIR
+
+[CALL_LIB_S]
+code = 68
+class = calling
+inline = 07
+arguments = uint8
+nb_arg = get_nb_arg_lib(${ARG1}, ${INLINE})
+pir = <<PIR
+    ${INS} = concat "  ${PTEMP0} = find_lib("
+    $S0 = ${ARG1}
+    ${INS} = concat $S0
+    ${INS} = concat ", "
+    $S0 = ${INLINE}
+    ${INS} = concat $S0
+    ${INS} = concat ")\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${PTEMP0}("
+    ${INS} = concat ${PARAMS}
+    ${INS} = concat ")\n"
+PIR
+
+[CALL_LIB]
+code = 0A
+class = calling
+arguments = uint8, uint8
+nb_arg = get_nb_arg_lib(${ARG2}, ${ARG1})
+pir = <<PIR
+    ${INS} = concat "  ${PTEMP0} = find_lib("
+    $S0 = ${ARG2}
+    ${INS} = concat $S0
+    ${INS} = concat ", "
+    $S0 = ${ARG1}
+    ${INS} = concat $S0
+    ${INS} = concat ")\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${PTEMP0}("
+    ${INS} = concat ${PARAMS}
+    ${INS} = concat ")\n"
+PIR
+
+[CALL_LIB_W]
+code = 0B
+class = calling
+arguments = uint8, uint16
+nb_arg = get_nb_arg_lib(${ARG2}, ${ARG1})
+pir = <<PIR
+    ${INS} = concat "  ${PTEMP0} = find_lib("
+    $S0 = ${ARG2}
+    ${INS} = concat $S0
+    ${INS} = concat ", "
+    $S0 = ${ARG1}
+    ${INS} = concat $S0
+    ${INS} = concat ")\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${PTEMP0}("
+    ${INS} = concat ${PARAMS}
+    ${INS} = concat ")\n"
+PIR
+
+[CALL_URL]
+code = 0C
+class = calling
+arguments = uint8, uint8, uint8
+nb_arg = ${ARG3}
+pir = <<PIR
+    ${INS} = concat "  ${PTEMP0} = cst["
+    $S0 = ${ARG2}
+    ${INS} = concat $S0
+    ${INS} = concat "]\n"
+    ${INS} = concat "  ${STEMP2} = ${PTEMP0}\n"
+    ${INS} = concat "  ${PTEMP0} = cst["
+    $S0 = ${ARG1}
+    ${INS} = concat $S0
+    ${INS} = concat "]\n"
+    ${INS} = concat "  ${STEMP1} = ${PTEMP0}\n"
+    ${INS} = concat "  ${PTEMP0} = find_lib_url(${STEMP2}, ${STEMP1})\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${PTEMP0}("
+    ${INS} = concat ${PARAMS}
+    ${INS} = concat ")\n"
+PIR
+
+[CALL_URL_W]
+code = 0D
+class = calling
+arguments = uint16, uint16, uint8
+nb_arg = ${ARG3}
+pir = <<PIR
+    ${INS} = concat "  ${PTEMP0} = cst["
+    $S0 = ${ARG2}
+    ${INS} = concat $S0
+    ${INS} = concat "]\n"
+    ${INS} = concat "  ${STEMP2} = ${PTEMP0}\n"
+    ${INS} = concat "  ${PTEMP0} = cst["
+    $S0 = ${ARG1}
+    ${INS} = concat $S0
+    ${INS} = concat "]\n"
+    ${INS} = concat "  ${STEMP1} = ${PTEMP0}\n"
+    ${INS} = concat "  ${PTEMP0} = find_lib_url(${STEMP2}, ${STEMP1})\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${PTEMP0}("
+    ${INS} = concat ${PARAMS}
+    ${INS} = concat ")\n"
+PIR
+
+## Variable Access and Manipulation
+
+[LOAD_VAR_S]
+code = E0
+class = load
+inline = 1F
+push = 1
+pir = <<PIR
+    $S0 = ${INLINE}
+    ${LOADREG} = "local"
+    ${LOADREG} = concat $S0
+PIR
+
+[LOAD_VAR]
+code = 0E
+class = load
+arguments = uint8
+push = 1
+pir = <<PIR
+    $S0 = ${ARG1}
+    ${LOADREG} = "local"
+    ${LOADREG} = concat $S0
+PIR
+
+[STORE_VAR_S]
+code = 40
+class = store
+inline = 0F
+pop = 1
+pir = <<PIR
+    $S0 = ${INLINE}
+    ${STOREREG} = "local"
+    ${STOREREG} = concat $S0
+PIR
+
+[STORE_VAR]
+code = 0F
+class = store
+arguments = uint8
+pop = 1
+pir = <<PIR
+    $S0 = ${ARG1}
+    ${STOREREG} = "local"
+    ${STOREREG} = concat $S0
+PIR
+
+[INCR_VAR_S]
+code = 70
+class = op
+inline = 07
+pir = <<PIR
+    $S0 = ${INLINE}
+    ${INS} = concat "  inc local"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[INCR_VAR]
+code = 10
+class = op
+arguments = uint8
+pir = <<PIR
+    $S0 = ${ARG1}
+    ${INS} = concat "  inc local"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+[DECR_VAR]
+code = 11
+class = op
+arguments = uint8
+pir = <<PIR
+    $S0 = ${ARG1}
+    ${INS} = concat "  dec local"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+PIR
+
+## Access To Constants
+
+[LOAD_CONST_S]
+code = 50
+class = load
+inline = 0F
+push = 1
+pir = <<PIR
+    $S0 = ${INLINE}
+    ${LOADREG} = "const"
+    ${LOADREG} = concat $S0
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = constants.translate(${INLINE})
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[LOAD_CONST]
+code = 12
+class = load
+arguments = uint8
+push = 1
+pir = <<PIR
+    $S0 = ${ARG1}
+    ${LOADREG} = "const"
+    ${LOADREG} = concat $S0
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = constants.translate(${ARG1})
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[LOAD_CONST_W]
+code = 13
+class = load
+arguments = uint16
+push = 1
+pir = <<PIR
+    $S0 = ${ARG1}
+    ${LOADREG} = "const"
+    ${LOADREG} = concat $S0
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = constants.translate(${ARG1})
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[CONST_0]
+code = 14
+class = load
+push = 1
+pir = <<PIR
+    ${LOADREG} = "const_0"
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = "  .local pmc const_0\n  new const_0, .WmlsInteger\n  set const_0, 0\n"
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[CONST_1]
+code = 15
+class = load
+push = 1
+pir = <<PIR
+    ${LOADREG} = "const_1"
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = "  .local pmc const_1\n  new const_1, .WmlsInteger\n  set const_1, 1\n"
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[CONST_M1]
+code = 16
+class = load
+push = 1
+pir = <<PIR
+    ${LOADREG} = "const_m1"
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = "  .local pmc const_m1\n  new const_m1, .WmlsInteger\n  set const_m1, -1\n"
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[CONST_ES]
+code = 17
+class = load
+push = 1
+pir = <<PIR
+    ${LOADREG} = "const_es"
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = "  .local pmc const_es\n  new const_es, .WmlsString, ''\n"
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[CONST_INVALID]
+code = 18
+class = load
+push = 1
+pir = <<PIR
+    ${LOADREG} = "const_invalid"
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = "  .local pmc const_invalid\n  new const_invalid, .WmlsInvalid\n"
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[CONST_TRUE]
+code = 19
+class = load
+push = 1
+pir = <<PIR
+    ${LOADREG} = "const_true"
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = "  .local pmc const_true\n  new const_true, .WmlsBoolean\n  set const_true, 1\n"
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+[CONST_FALSE]
+code = 1A
+class = load
+push = 1
+pir = <<PIR
+    ${LOADREG} = "const_false"
+    $I0 = exists ${CONST}[${LOADREG}]
+    if $I0 goto L1_${CURIC}
+    $S0 = "  .local pmc const_false\n  new const_false, .WmlsBoolean\n  set const_false, 0\n"
+    ${CONST}[${LOADREG}] = $S0
+L1_${CURIC}:
+PIR
+
+## Arithmetic Instructions
+
+[INCR]
+code = 1B
+class = op
+pop = 1
+push = 1
+pir = <<PIR
+    ${INS} = concat "  ${PTEMP0} = "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+    ${INS} = concat "  inc ${PTEMP0}\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${PTEMP0}\n"
+PIR
+
+[DECR]
+code = 1C
+class = op
+pop = 1
+push = 1
+pir = <<PIR
+    ${INS} = concat "  ${PTEMP0} = "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+    ${INS} = concat "  dec ${PTEMP0}\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${PTEMP0}\n"
+PIR
+
+[ADD_ASG]
+code = 1D
+class = op
+arguments = uint8
+pop = 1
+pir = <<PIR
+    $S0 = ${ARG1}
+    ${INS} = concat "  local"
+    ${INS} = concat $S0
+    ${INS} = concat " = add local"
+    ${INS} = concat $S0
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+PIR
+
+[SUB_ASG]
+code = 1E
+class = op
+arguments = uint8
+pop = 1
+pir = <<PIR
+    $S0 = ${ARG1}
+    ${INS} = concat "  local"
+    ${INS} = concat $S0
+    ${INS} = concat " = sub local"
+    ${INS} = concat $S0
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat "\n"
+PIR
+
+[UMINUS]
+code = 1F
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = neg ${STACK0}
+
+[ADD]
+code = 20
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = add ${STACK0}, ${STACK1}
+
+[SUB]
+code = 21
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = sub ${STACK0}, ${STACK1}
+
+[MUL]
+code = 22
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = mul ${STACK0}, ${STACK1}
+
+[DIV]
+code = 23
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = div ${STACK0}, ${STACK1}
+
+[IDIV]
+code = 24
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = fdiv ${STACK0}, ${STACK1}
+
+[REM]
+code = 25
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = cmod ${STACK0}, ${STACK1}
+
+## Bitwise Instructions
+
+[B_AND]
+code = 26
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = band ${STACK0}, ${STACK1}
+
+[B_OR]
+code = 27
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = bor ${STACK0}, ${STACK1}
+
+[B_XOR]
+code = 28
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = bxor ${STACK0}, ${STACK1}
+
+[B_NOT]
+code = 29
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = bnot ${STACK0}
+
+[B_LSHIFT]
+code = 2A
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = shl ${STACK0}, ${STACK1}
+
+[B_RSSHIFT]
+code = 2B
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = shr ${STACK0}, ${STACK1}
+
+[B_RSZSHIFT]
+code = 2C
+class = op
+pop = 2
+push = 1
+instruction = ${DEST0} = lsr ${STACK0}, ${STACK1}
+
+## Comparison Instructions
+
+[EQ]
+code = 2D
+class = op
+pop = 2
+push = 1
+#instruction = ${DEST0} = iseq ${STACK0}, ${STACK1}
+pir = <<PIR
+    ${INS} = concat "  ${ITEMP0} = iseq "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK1}
+    ${INS} = concat "\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = new .WmlsBoolean\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${ITEMP0}\n"
+PIR
+
+[LE]
+code = 2E
+class = op
+pop = 2
+push = 1
+#instruction = ${DEST0} = isle ${STACK0}, ${STACK1}
+pir = <<PIR
+    ${INS} = concat "  ${ITEMP0} = isle "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK1}
+    ${INS} = concat "\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = new .WmlsBoolean\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${ITEMP0}\n"
+PIR
+
+[LT]
+code = 2F
+class = op
+pop = 2
+push = 1
+#instruction = ${DEST0} = islt ${STACK0}, ${STACK1}
+pir = <<PIR
+    ${INS} = concat "  ${ITEMP0} = islt "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK1}
+    ${INS} = concat "\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = new .WmlsBoolean\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${ITEMP0}\n"
+PIR
+
+[GE]
+code = 30
+class = op
+pop = 2
+push = 1
+#instruction = ${DEST0} = isge ${STACK0}, ${STACK1}
+pir = <<PIR
+    ${INS} = concat "  ${ITEMP0} = isge "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK1}
+    ${INS} = concat "\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = new .WmlsBoolean\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${ITEMP0}\n"
+PIR
+
+[GT]
+code = 31
+class = op
+pop = 2
+push = 1
+#instruction = ${DEST0} = isgt ${STACK0}, ${STACK1}
+pir = <<PIR
+    ${INS} = concat "  ${ITEMP0} = isgt "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK1}
+    ${INS} = concat "\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = new .WmlsBoolean\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${ITEMP0}\n"
+PIR
+
+[NE]
+code = 32
+class = op
+pop = 2
+push = 1
+#instruction = ${DEST0} = isne ${STACK0}, ${STACK1}
+pir = <<PIR
+    ${INS} = concat "  ${ITEMP0} = isne "
+    ${INS} = concat ${STACK0}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK1}
+    ${INS} = concat "\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = new .WmlsBoolean\n"
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = ${ITEMP0}\n"
+PIR
+
+## Logical Instructions
+
+[NOT]
+code = 33
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = not ${STACK0}
+
+[SCAND]
+code = 34
+class = op
+pop = 1
+push = 1
+instruction = todo
+
+[SCOR]
+code = 35
+class = op
+pop = 1
+push = 1
+instruction = todo
+
+[TOBOOL]
+code = 36
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = istrue ${STACK0}
+
+## Stack Instructions
+
+[POP]
+code = 37
+class = op
+pop = 1
+instruction = # just pop
+
+## Access to Operand Type
+
+[TYPEOF]
+code = 38
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.typeof()
+
+[ISVALID]
+code = 39
+class = op
+pop = 1
+push = 1
+instruction = ${DEST0} = ${STACK0}.isvalid()
+
+## Function Return Instructions
+
+[RETURN]
+code = 3A
+class = op
+pop = 1
+pir = <<PIR
+    ${INS} = concat "  .return ("
+    ${INS} = concat ${STACK0}
+    ${INS} = concat ")\n"
+PIR
+
+[RETURN_ES]
+code = 3B
+class = op
+pir = <<PIR
+    ${INS} = concat "  ${PTEMP0} = new .WmlsString, \"\"\n"
+    ${INS} = concat "  .return (${PTEMP0})\n"
+PIR
+
+## Miscellaneous Instructions
+
+[DEBUG]
+code = 3C
+class = op
+instruction = # debug op
+

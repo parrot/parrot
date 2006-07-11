@@ -1,0 +1,58 @@
+
+=head1 TITLE
+
+Using WMLScript Translator
+
+=head1 In brief
+
+The language WMLScript is a subset of ECMAScript (ie JavaScript).
+
+A WMLScript Compiler is available on CPAN : 
+L<http://search.cpan.org/search?query=wmls&mode=dist>.
+
+=head1 Building
+
+After building C<parrot> :
+
+  cd languages/WMLScript
+  make
+
+=head1 Running the whole test suite
+
+  make test
+
+=head1 Compiling your own code
+
+  cat example.wmls
+    extern function main()
+    {
+        Console.println("Hello World!");
+    }
+    
+  wmlsc example.wmls
+
+=head1 Disassembling
+
+  ../../parrot src/wmlsd.pbc example.wmlsc
+
+=head1 Translating
+
+  ../../parrot src/wmls2pir.pbc example.wmlsc
+
+  ../../parrot src/wmls2pbc.pbc example.wmlsc
+
+=head1 Interpreting
+
+  ../../parrot src/wmlsi.pbc example.wmlsc main
+
+=head1 BUGS & LIMITATIONS
+
+=head1 SEE ALSO
+
+F<languages/WMLScript/doc/status.pod>
+
+=head1 AUTHOR
+
+Francois Perrad.
+
+=cut

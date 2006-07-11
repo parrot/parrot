@@ -1,0 +1,476 @@
+/*
+Copyright (C) 2006, The Perl Foundation.
+$Id: wmlsbytecode.pmc 11615 2006-02-17 02:54:09Z particle $
+
+=head1 NAME
+
+pmc/wmlsbytecode - WMLScript bytecode loader
+
+=head1 DESCRIPTION
+
+This singleton PMC holds a factory.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static PMC * WmlsBytecode_PMC;
+static PMC * script;
+static const char * bytecode;
+static UINTVAL maxi;
+static const unsigned char *fp; 
+
+static void _init(Interp *interpreter, STRING *str)
+{
+    bytecode = Parrot_string_cstring(interpreter, str);
+    maxi = string_length(interpreter, str);
+    fp = (const unsigned char *)bytecode;
+}
+                                                 
+#define _info_get()     (&bytecode[maxi] - (const char *)fp)
+#define _get_pos()      (fp)
+#define _get_c()        (*(fp++))
+
+static unsigned short _get_mb16(void)
+{
+    unsigned short value;
+    unsigned char c;
+    
+    value = 0;
+    for (;;) {
+        c = _get_c();
+        value <<= 7;
+        value += (c & 0x7F);
+        if ((c & 0x80) == 0)
+            break;
+    }
+    return value;
+}
+
+static unsigned int _get_mb32(void)
+{
+    unsigned int value;
+    unsigned char c;
+    
+    value = 0;
+    for (;;) {
+        c = _get_c();
+        value <<= 7;
+        value += (c & 0x7F);
+        if ((c & 0x80) == 0)
+            break;
+    }
+    return value;
+}
+
+static unsigned char _get_uint8(void)
+{
+    return _get_c();
+}
+
+static unsigned short _get_uint16(void)
+{
+    unsigned short value;
+    unsigned char c;
+    
+    c = _get_c();
+    value = c & 0xFF;
+    c = _get_c();
+    value <<= 8;
+    value += (c & 0xFF);
+    return value;    
+}
+
+static char _get_int8(void)
+{
+    return (char)_get_c();
+}
+
+static short _get_int16(void)
+{
+    short value;
+    unsigned char c;
+    
+    c = _get_c();
+    value = c & 0xFF;
+    c = _get_c();
+    value <<= 8;
+    value += (c & 0xFF);
+    return value;    
+}
+
+static int _get_int32(void)
+{
+    short value;
+    unsigned char c;
+    
+    c = _get_c();
+    value = c & 0xFF;
+    c = _get_c();
+    value <<= 8;
+    value += (c & 0xFF);
+    c = _get_c();
+    value <<= 8;
+    value += (c & 0xFF);
+    c = _get_c();
+    value <<= 8;
+    value += (c & 0xFF);
+    return value;    
+}
+
+static float _get_float32(void)
+{
+    float value;
+    unsigned char *ptr = (unsigned char *)&value;
+
+#if PARROT_BIGENDIAN
+    ptr[3] = _get_c();
+    ptr[2] = _get_c();
+    ptr[1] = _get_c();
+    ptr[0] = _get_c();
+#else
+    ptr[0] = _get_c();
+    ptr[1] = _get_c();
+    ptr[2] = _get_c();
+    ptr[3] = _get_c();
+#endif
+
+    return value;    
+}
+
+static int _load_header(Interp *interpreter)
+{
+    UINTVAL VersionNumber;
+    UINTVAL CodeSize;
+                            
+    VersionNumber = _get_uint8();
+    if (VersionNumber != 0x01) {
+        real_exception(interpreter, NULL, ILL_INHERIT,
+            "incorrect version");
+        return -1;
+    }
+    VTABLE_set_integer_keyed_str(interpreter, script, 
+        const_string(interpreter, "VersionNumber"), VersionNumber);
+
+    CodeSize = _get_mb32();
+    if (CodeSize != _info_get()) {
+        real_exception(interpreter, NULL, ILL_INHERIT,
+            "incorrect code size");
+        return -1;
+    }
+    VTABLE_set_integer_keyed_str(interpreter, script, 
+        const_string(interpreter, "CodeSize"), CodeSize);
+
+    return 0;
+}
+
+static int _load_constant_pool(Interp *interpreter)
+{
+    UINTVAL NumberOfConstants;
+    UINTVAL CharacterSet;
+    UINTVAL idx;
+    PMC * Constants;
+    
+    NumberOfConstants = _get_mb16();
+    Constants = pmc_new(interpreter, pmc_type(interpreter,
+          const_string(interpreter, "Wmls::Constants")));                      
+    VTABLE_set_integer_native(interpreter, Constants, NumberOfConstants); 
+    VTABLE_set_pmc_keyed_str(interpreter, script, 
+        const_string(interpreter, "Constants"), Constants);
+
+    CharacterSet = _get_mb16();
+    VTABLE_set_integer_keyed_str(interpreter, script, 
+        const_string(interpreter, "CharacterSet"), CharacterSet);
+
+    for (idx = 0; idx < NumberOfConstants; idx++) {
+        PMC * Constant;
+        UINTVAL ConstantType = _get_uint8();
+        switch (ConstantType) {
+        case 0:
+        {
+            INTVAL ConstantInteger8 = _get_int8();
+            Constant = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::ConstantInteger")));
+            VTABLE_set_integer_native(interpreter, Constant, ConstantInteger8); 
+            break;
+        }
+        case 1:
+        {
+            INTVAL ConstantInteger16 = _get_int16();
+            Constant = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::ConstantInteger")));
+            VTABLE_set_integer_native(interpreter, Constant, ConstantInteger16); 
+            break;
+        }
+        case 2:
+        {
+            INTVAL ConstantInteger32 = _get_int32();
+            Constant = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::ConstantInteger")));
+            VTABLE_set_integer_native(interpreter, Constant, ConstantInteger32); 
+            break;
+        }
+        case 3:
+        {
+            FLOATVAL ConstantFloat32 = _get_float32();
+            Constant = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::ConstantFloat")));
+            VTABLE_set_number_native(interpreter, Constant, ConstantFloat32); 
+            break;
+        }
+        case 4:
+        {
+            UINTVAL StringSize = _get_mb32();
+            STRING * String = string_make(interpreter, _get_pos(),
+              StringSize, "unicode", 0);
+            while (StringSize --) {
+                (void)_get_uint8();
+            } 
+            Constant = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::ConstantUTF8String")));
+            VTABLE_set_string_native(interpreter, Constant, String);
+            break; 
+        }
+        case 5:
+        {
+            Constant = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::ConstantEmptyString")));
+            break; 
+        }
+        case 6:
+        {
+            UINTVAL StringSize = _get_mb32();
+            STRING * String = string_from_const_cstring(interpreter,
+              _get_pos(), StringSize);
+            while (StringSize --) {
+                (void)_get_uint8();
+            } 
+            Constant = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::ConstantString")));
+            VTABLE_set_string_native(interpreter, Constant, String);
+            break; 
+        }
+        default:
+            real_exception(interpreter, NULL, ILL_INHERIT,
+                "invalid ConstantType (%u).", ConstantType);
+            return -1;
+        }
+        VTABLE_set_pmc_keyed_int(interpreter, Constants, idx, Constant);        
+    }
+
+    return 0;
+}
+
+static int _load_pragma_pool(Interp *interpreter)
+{
+    UINTVAL NumberOfPragmas;
+    UINTVAL idx;
+    PMC * Pragmas;
+    
+    NumberOfPragmas = _get_mb16();
+    Pragmas = pmc_new(interpreter, pmc_type(interpreter,
+          const_string(interpreter, "Wmls::Pragmas")));                      
+    VTABLE_set_integer_native(interpreter, Pragmas, NumberOfPragmas); 
+    VTABLE_set_pmc_keyed_str(interpreter, script, 
+        const_string(interpreter, "Pragmas"), Pragmas);
+
+    for (idx = 0; idx < NumberOfPragmas; idx++) {
+        PMC * Pragma;
+        UINTVAL PragmaType = _get_uint8();
+        switch (PragmaType) {
+        case 0:
+        {
+            UINTVAL AccessDomainIndex = _get_mb16();
+            Pragma = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::AccessDomain")));
+            VTABLE_set_integer_keyed_str(interpreter, Pragma, 
+              const_string(interpreter, "AccessDomainIndex"), AccessDomainIndex);
+            break;
+        }
+        case 1:
+        {
+            UINTVAL AccessPathIndex = _get_mb16();
+            Pragma = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::AccessPath")));
+            VTABLE_set_integer_keyed_str(interpreter, Pragma, 
+              const_string(interpreter, "AccessPathIndex"), AccessPathIndex);
+            break;
+        }
+        case 2:
+        {
+            UINTVAL PropertyNameIndex = _get_mb16();
+            UINTVAL ContentIndex = _get_mb16();
+            Pragma = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::UserAgentProperty")));
+            VTABLE_set_integer_keyed_str(interpreter, Pragma, 
+              const_string(interpreter, "PropertyNameIndex"), PropertyNameIndex);
+            VTABLE_set_integer_keyed_str(interpreter, Pragma, 
+              const_string(interpreter, "ContentIndex"), ContentIndex);
+            break;
+        }
+        case 3:
+        {
+            UINTVAL PropertyNameIndex = _get_mb16();
+            UINTVAL ContentIndex = _get_mb16();
+            UINTVAL SchemeIndex = _get_mb16();
+            Pragma = pmc_new(interpreter, pmc_type(interpreter,
+              const_string(interpreter, "Wmls::UserAgentProperty&Scheme")));
+            VTABLE_set_integer_keyed_str(interpreter, Pragma, 
+              const_string(interpreter, "PropertyNameIndex"), PropertyNameIndex);
+            VTABLE_set_integer_keyed_str(interpreter, Pragma, 
+              const_string(interpreter, "ContentIndex"), ContentIndex);
+            VTABLE_set_integer_keyed_str(interpreter, Pragma, 
+              const_string(interpreter, "SchemeIndex"), SchemeIndex);
+            break;
+        }
+        default:
+            real_exception(interpreter, NULL, ILL_INHERIT,
+                "invalid PragmaType (%u).", PragmaType);
+            return -1;
+        }
+        VTABLE_set_pmc_keyed_int(interpreter, Pragmas, idx, Pragma);        
+    }
+
+    return 0;
+}
+
+static int _load_function_pool(Interp *interpreter)
+{
+    UINTVAL NumberOfFunctions;
+    UINTVAL NumberOfFunctionNames;
+    UINTVAL idx;
+    PMC * Functions;
+    PMC * FunctionNameTable;
+    
+    NumberOfFunctions = _get_uint8();
+    Functions = pmc_new(interpreter, pmc_type(interpreter,
+          const_string(interpreter, "Wmls::Functions")));                      
+    VTABLE_set_integer_native(interpreter, Functions, NumberOfFunctions); 
+    VTABLE_set_pmc_keyed_str(interpreter, script, 
+        const_string(interpreter, "Functions"), Functions);
+
+    NumberOfFunctionNames = _get_uint8();
+    FunctionNameTable = pmc_new(interpreter, pmc_type(interpreter,
+          const_string(interpreter, "Wmls::FunctionNameTable")));                      
+    VTABLE_set_integer_native(interpreter, FunctionNameTable, NumberOfFunctionNames); 
+    VTABLE_set_pmc_keyed_str(interpreter, script, 
+        const_string(interpreter, "FunctionNameTable"), FunctionNameTable);
+
+    for (idx = 0; idx < NumberOfFunctionNames; idx++) {
+        PMC * Couple = pmc_new(interpreter, enum_class_Array);
+        UINTVAL FunctionIndex = _get_uint8();
+        UINTVAL FunctionNameSize = _get_uint8();
+        STRING * FunctionName = string_make(interpreter, _get_pos(),
+          FunctionNameSize, "unicode", 0);
+        while (FunctionNameSize --) {
+            (void)_get_uint8();
+        }
+        VTABLE_set_integer_native(interpreter, Couple, 2); 
+        VTABLE_set_integer_keyed_int(interpreter, Couple, 0, FunctionIndex); 
+        VTABLE_set_string_keyed_int(interpreter, Couple, 1, FunctionName); 
+
+        VTABLE_set_pmc_keyed_int(interpreter, FunctionNameTable, idx, Couple);        
+    }
+
+    for (idx = 0; idx < NumberOfFunctions; idx++) {
+        PMC * Function;
+        UINTVAL NumberOfArguments = _get_uint8();
+        UINTVAL NumberOfLocalVariables = _get_uint8();
+        UINTVAL FunctionSize = _get_mb32();
+        STRING * CodeArray = string_make(interpreter, _get_pos(),
+          FunctionSize, "binary", 0);
+        while (FunctionSize --) {
+            (void)_get_uint8();
+        } 
+        Function = pmc_new(interpreter, pmc_type(interpreter,
+          const_string(interpreter, "Wmls::Function")));                      
+        VTABLE_set_integer_keyed_str(interpreter, Function, 
+          const_string(interpreter, "NumberOfArguments"), NumberOfArguments);
+        VTABLE_set_integer_keyed_str(interpreter, Function, 
+          const_string(interpreter, "NumberOfLocalVariables"), NumberOfLocalVariables);
+        VTABLE_set_string_keyed_str(interpreter, Function, 
+          const_string(interpreter, "CodeArray"), CodeArray);
+
+        VTABLE_set_pmc_keyed_int(interpreter, Functions, idx, Function);        
+    }
+
+    if (_info_get() != 0) {
+        real_exception(interpreter, NULL, ILL_INHERIT,
+            "incorrect size");
+        return -1;
+    }
+
+    return 0;
+}
+
+
+pmclass WmlsBytecode
+    singleton
+    dynpmc
+    group wmls_group {
+
+/*                                                 
+
+=item C<void* get_pointer()>
+
+=item C<void set_pointer(void *ptr)>
+
+These two functions are part of the singleton creation interface. For more
+information see F<src/pmc.c>.
+
+=cut
+
+*/
+    void* get_pointer() {
+        return WmlsBytecode_PMC;
+    }
+
+    void set_pointer(void* ptr) {
+        WmlsBytecode_PMC = (PMC*) ptr;
+    }
+
+/*
+
+=item C<PMC* load(STRING* bytecode)>
+
+Loads WMLScript bytecode.
+
+=cut
+
+*/
+    METHOD PMC* load(STRING* bytecode) {
+        script = pmc_new(INTERP, pmc_type(INTERP,
+          const_string(INTERP, "Wmls::Script")));
+        _init(INTERP, bytecode);
+        if (_load_header(INTERP))
+            goto err;
+        if (_load_constant_pool(INTERP))
+            goto err;
+        if (_load_pragma_pool(INTERP))
+            goto err;
+        if (_load_function_pool(INTERP))
+            goto err;
+        return script;
+err:
+        return NULL;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Francois Perrad
+
+=cut
+
+*/

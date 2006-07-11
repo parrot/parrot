@@ -1,0 +1,102 @@
+RM_F    = @rm_f@
+PERL    = @perl@
+PARROT  = ..@slash@..@slash@parrot@exe@
+PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
+
+LIBPATH  = runtime
+BUILD    = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
+DESTDIR  = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+O        = @o@
+CLASSDIR = pmc
+LOAD_EXT = @load_ext@
+
+SRM=Stack
+
+PMCS = \
+ wmlsinteger \
+ wmlsfloat \
+ wmlsstring \
+ wmlsboolean \
+ wmlsinvalid \
+ wmlsbytecode
+
+PBCS = \
+ $(LIBPATH)@slash@wmlslang.pbc \
+ $(LIBPATH)@slash@wmlsfloat.pbc \
+ $(LIBPATH)@slash@wmlsstring.pbc \
+ $(LIBPATH)@slash@wmlsconsole.pbc \
+ $(LIBPATH)@slash@wmlsstdlibs.pbc
+
+
+all: pmcs $(LIBPATH)@slash@wmlslib.pbc src@slash@wmlsd.pbc src@slash@wmls2pir.pbc src@slash@wmls2pbc.pbc src@slash@wmlsi.pbc
+
+pmcs:
+	@cd $(CLASSDIR) && $(BUILD) generate $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) compile $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+
+src@slash@wmlsd.pbc: src@slash@wmlsd.pir src@slash@script.pir src@slash@opcode.pir
+	$(PARROT) -o src/wmlsd.pbc src/wmlsd.pir 
+
+src@slash@wmls2pir.pbc: src@slash@wmls2pir.pir src@slash@script.pir src@slash@opcode.pir src@slash@stdlibs.pir
+	$(PARROT) -o src/wmls2pir.pbc src/wmls2pir.pir 
+
+src@slash@wmls2pbc.pbc: src@slash@wmls2pbc.pir src@slash@script.pir src@slash@opcode.pir src@slash@stdlibs.pir
+	$(PARROT) -o src/wmls2pbc.pbc src/wmls2pbc.pir 
+
+src@slash@wmlsi.pbc: src@slash@wmlsi.pir src@slash@script.pir src@slash@opcode.pir src@slash@stdlibs.pir
+	$(PARROT) -o src/wmlsi.pbc src/wmlsi.pir 
+
+src@slash@opcode.pir: src@slash@translation.rules build@slash@translator.pl \
+ build@slash@SRM@slash@Stack.pm build@slash@SRM@slash@Register.pm
+	$(PERL) build/translator.pl --output src/opcode.pir --srm $(SRM) \
+	  src/translation.rules 
+
+src@slash@stdlibs.pir: src@slash@wmlslibs.cfg build@slash@stdlibs.pl
+	$(PERL) build\stdlibs.pl --output src\stdlibs.pir src\wmlslibs.cfg
+
+$(LIBPATH)@slash@wmlslib.pbc: $(PBCS)
+	$(PBC_MERGE) -o $(LIBPATH)@slash@wmlslib.pbc $(PBCS) 
+
+$(LIBPATH)@slash@wmlslang.pbc: $(LIBPATH)@slash@wmlslang.pir
+	$(PARROT) --output=$(LIBPATH)@slash@wmlslang.pbc $(LIBPATH)@slash@wmlslang.pir
+
+$(LIBPATH)@slash@wmlsfloat.pbc: $(LIBPATH)@slash@wmlsfloat.pir
+	$(PARROT) --output=$(LIBPATH)@slash@wmlsfloat.pbc $(LIBPATH)@slash@wmlsfloat.pir
+
+$(LIBPATH)@slash@wmlsstring.pbc: $(LIBPATH)@slash@wmlsstring.pir
+	$(PARROT) --output=$(LIBPATH)@slash@wmlsstring.pbc $(LIBPATH)@slash@wmlsstring.pir
+
+$(LIBPATH)@slash@wmlsconsole.pbc: $(LIBPATH)@slash@wmlsconsole.pir
+	$(PARROT) --output=$(LIBPATH)@slash@wmlsconsole.pbc $(LIBPATH)@slash@wmlsconsole.pir
+
+$(LIBPATH)@slash@wmlsstdlibs.pbc: $(LIBPATH)@slash@wmlsstdlibs.pir
+	$(PARROT) --output=$(LIBPATH)@slash@wmlsstdlibs.pbc $(LIBPATH)@slash@wmlsstdlibs.pir
+
+test:
+	cd .. && $(PERL) -I../../lib -IWMLScript/t WMLScript/t/harness
+
+CLEANERS = \
+ "t/pmc/*.pir" \
+ "t/*.pir" \
+ "t/*.pbc" \
+ "t/*.wmls" \
+ "t/*.wmlsc" \
+ "t/*.out" \
+ "$(CLASSDIR)/*.dump" \
+ "$(CLASSDIR)/*.c" \
+ "$(CLASSDIR)/*.h" \
+ "$(CLASSDIR)/*$(LOAD_EXT)" \
+ "$(CLASSDIR)/*$(O)" \
+ "$(LIBPATH)/*.pbc" \
+ "src/*.pbc" \
+ "src/opcode.pir" \
+ "src/stdlibs.pir"
+
+clean:
+	$(RM_F) $(CLEANERS)
+
+distclean: clean
+	$(RM_F) Makefile
+
