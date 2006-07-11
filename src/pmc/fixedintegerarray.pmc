@@ -46,10 +46,12 @@ Initializes the array.
 
 /*
 
-=item C<PMC new_from_string(STRING *rep)>
+=item C<PMC new_from_string(STRING *rep, INTVAL flags)>
 
 Class method to construct an array from the string representation C<rep>,
-which is a string I<"(el0, el1, ...)">.
+which is a string I<"(el0, el1, ...)">. C<flags> may have the 
+C<PObj_constant_FLAG> bit set, which will be honored to create a PMC
+in the constant PMC pool.
 
 =cut
 
