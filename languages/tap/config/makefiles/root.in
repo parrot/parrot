@@ -78,9 +78,9 @@ CLEANUPS = \
 	src/TAP_grammar.pir
 
 clean:
-	$(RM_RF) $(CLEANUPS)
+	$(RM_F) $(CLEANUPS)
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean
