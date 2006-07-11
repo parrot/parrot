@@ -12,6 +12,7 @@ LANGUAGES = \
     APL \
     BASIC \
     HQ9plus \
+    WMLScript \
     Zcode \
     bc \
     befunge \
@@ -76,6 +77,7 @@ clean: \
     APL.clean \
     BASIC.clean \
     HQ9plus.clean \
+    WMLScript.clean \
     Zcode.clean \
     bc.clean \
     befunge.clean \
@@ -118,6 +120,14 @@ BASIC.test:
 # Don't know how to test BASIC
 BASIC.clean:
 # Don't know how to clean BASIC
+
+WMLScript: WMLScript.dummy
+WMLScript.dummy:
+	- $(MAKE) WMLScript
+WMLScript.test:
+	- $(MAKE) WMLScript test
+WMLScript.clean:
+	- $(MAKE) WMLScript clean
 
 Zcode : Zcode.dummy
 Zcode.dummy:

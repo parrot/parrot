@@ -66,6 +66,7 @@ sub new
         $self->new_section('TCL', 'tcl.html', '', 'languages/tcl'),
         $self->new_section('unlambda', 'unlambda.html', '', 'languages/unlambda'),
         $self->new_section('URM', 'urm.html', '', 'languages/urm'),
+        $self->new_section('WMLScript', 'wmlscript.html', '', 'languages/WMLScript'),
         $self->new_section('Zcode', 'zcode.html', '', 'languages/Zcode'),
     );
 }

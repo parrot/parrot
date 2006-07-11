@@ -112,6 +112,7 @@ my @unified_testable_languages
               tcl
               unlambda
               urm
+              WMLScript
               Zcode
             );
 my @harnesses

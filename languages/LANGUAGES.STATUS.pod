@@ -483,7 +483,9 @@ Lua 5.1 Standard Libraries implemented in PIR (still incomplete).
 
 =item Status
 
-Early stage - Part of languages smoke testing.
+Part of languages smoke testing.
+
+See details in F<languages/lua/doc/status.pod>.
 
 =item Last verified with parrot version
 
@@ -1101,6 +1103,38 @@ expected to change soon.
 =item Location
 
 C<languages/urm>
+
+=back
+
+
+=head2 WMLScript Translator
+
+=over 4
+
+=item Author
+
+Francois Perrad
+
+=item Description
+
+Translates WMLScript bytecode to PIR.
+
+The language WMLScript is a subset of ECMAScript (ie JavaScript).
+WMLScript defines also an bytecode interpreter (stack based), a binary format.
+
+=item Status
+
+Part of languages smoke testing.
+
+See details in F<languages/WMLScript/doc/status.pod>.
+
+=item Last verified with parrot version
+
+0.4.5
+
+=item Location
+
+C<languages/WMLScript>
 
 =back
 
