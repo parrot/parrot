@@ -11,9 +11,9 @@ To prepare a release:
     2.  Update files with version-specific information:
 
         a.  Increment the version number in:
-	    - VERSION
-            - parrot.spec, 
-	    - compilers/imcc/main.c
+            - VERSION
+            - parrot.spec,
+            - compilers/imcc/main.c
             - MANIFEST.generated
             - META.yml
 
@@ -29,14 +29,14 @@ To prepare a release:
         f.  Make sure RESPONSIBLE_PARTIES is still
             accurate.
 
-	g.  Update PBC_COMPAT
+        g.  Update PBC_COMPAT
 
-	h.  run perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc
-	    to update version and fingerprint in native tests
+        h.  run perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc
+            to update version and fingerprint in native tests
 
-	i.  make realclean
-	    perl Configure.pl ...
-	    make -s all world fulltest
+        i.  make realclean
+            perl Configure.pl ...
+            make -s all world fulltest
 
     3.  svn commit.
 
@@ -53,8 +53,8 @@ To prepare a release:
     7.  tag the release as: RELEASE_a_b_c
            where a.b.c is the version number
 
-  	$ export SVNPARROT=https://svn.perl.org/parrot
-  	$ svn copy -m"tagged release a.b.c \
+          $ export SVNPARROT=https://svn.perl.org/parrot
+          $ svn copy -m"tagged release a.b.c \
             "$SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
 
         See also below [1]
@@ -67,7 +67,7 @@ To prepare a release:
 
     9a. Submit the use Perl announcement story to Slashdot, Newsforge, etc.
 
-	Don't forget to set a Reply-To: or Followup-To: header.
+        Don't forget to set a Reply-To: or Followup-To: header.
 
     10. You're done!  Help yourself to a beer, cola or other
         celebratory drink.

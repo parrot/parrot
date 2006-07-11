@@ -12,18 +12,18 @@ Use the C<find_method> opcode instead.
 
 http://xrl.us/jc4u
 
- IMC vs. PIR 
- Two names enter 
- One name leaves 
+ IMC vs. PIR
+ Two names enter
+ One name leaves
 
- /me giggles 
+ /me giggles
  -- Chip Salzenberg
 
 =head1 Deprecated APIs
 
 =over 4
 
-=item * 
+=item *
 
 All Parrot_char_is_* functions from src/string_primitives.c will
 be removed. Please use Parrot_string_is_cclass() instead.
@@ -36,18 +36,18 @@ be removed. Please use Parrot_string_is_cclass() instead.
 
 =item PGE
 
-PGE::P6Rule is now a registered compiler, and should be used like so:
+PGE::P6Regex is now a registered compiler, and should be used like so:
 
- <@pmichaud> it's easy; instead of  $P0 = find_global "PGE", "p6rule"   
-   one now does  $P0 = compreg "PGE::P6Rule"
+ <@pmichaud> it's easy; instead of  $P0 = find_global "PGE", "p6rule"
+   one now does  $P0 = compreg "PGE::P6Regex"
 
-This syntax is also true for PGE::Glob and PGE::P5Regexp
+This syntax is also true for PGE::Glob and PGE::P5Regex
 
 =back
 
 =head1 FUTURE changes
 
-Not yet deprecated, but it's recommended to use the new syxtax and
+Not yet deprecated, but it's recommended to use the new syntax and
 gradually change the old.
 
 =over 4
@@ -76,31 +76,12 @@ will be allowed, as it is today.
 In any other case (i.e. C<INOUT>, C<IN>), this will become
 a syntax error. For example:
 
-	$S0 = print
-	$P0 = substr 1, 2, "x"
+    $S0 = print
+    $P0 = substr 1, 2, "x"
 
 Will have to be:
 
-	print $S0
-	substr $P0, 1, 2, "x"
-
-=item Assignment Syntax
-
-Currently, C<=> is used for both assignment and aliasing. Chip says that, 
-once this change is in effect, we'll use the following syntax:
-
-   P0 := P1      # aliasing:   P0 and P1 point to same PMC
-   P0 := opcode  # aliasing:   P0 points to PMC returned by opcode
-   P0 = ...      # assignment: modifies P0, NO MATTER WHAT '...' IS
-
-   S0 := S1      # aliasing:   S0 and S1 point to same header
-   S0 := opcode  # aliasing:   S0 points to header returned by opcode
-   S0 = ...      # assignment: modifies S0, NO MATTER WHAT '...' IS
-
-   I0 := ...     # ILLEGAL
-   I0 = ...      # assignment: modifies I0
-
-   N0 := ...     # ILLEGAL
-   N0 = ...      # assignment: modifies N0
+    print $S0
+    substr $P0, 1, 2, "x"
 
 =back

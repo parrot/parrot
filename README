@@ -110,7 +110,7 @@ On some systems you can install parrot:
     make install
 
 This installs a bunch of files in /usr/local. The parrot executable is in
-/usr/local/bin.   Please note that this feature is currently experimental.  
+/usr/local/bin.   Please note that this feature is currently experimental.
 
 You can install into a different location with:
 
@@ -138,12 +138,6 @@ CHANGES
 
 For documentation on the user-visible changes between this version and
 previous versions, please see NEWS.
-
-KNOWN ISSUES
-------------
-
-The docs/BROKEN file lists other major subsystems and regressions that block
-progress.
 
 MAILING LISTS
 -------------

@@ -50,7 +50,7 @@ The surest way to build it is on Windows NT/2000/XP, using the cmd shell.
 Parrot no longer comes with its own ICU, thus you need to install it on your
 system if you want to use it.  Note that ICU is now optional, you can
 build Parrot without it, by not installing it or asking Parrot to
-ignore it (C<--without-icu>).  
+ignore it (C<--without-icu>).
 
 If you want to use ICU, download it from
 L<http://www-306.ibm.com/software/globalization/icu/downloads.jsp>.
@@ -76,13 +76,13 @@ F<lib/icudt.lib>, which contains the standard data in binary form.
 
 The availability of these libraries is checked by Configure.pl.
 
-B<gdbm> - GNU database manager 
+B<gdbm> - GNU database manager
 L<http://gnuwin32.sourceforge.net/>
 
-B<GMP> - GNU multiple precision arithmetic library 
+B<GMP> - GNU multiple precision arithmetic library
 L<http://developer.berlios.de/projects/win32gmp/>
 
-B<pcre> - Perl-Compatible Regular Expression library 
+B<pcre> - Perl-Compatible Regular Expression library
 L<http://gnuwin32.sourceforge.net/>
 
 B<readline> - edit command lines
@@ -92,23 +92,23 @@ L<http://gnuwin32.sourceforge.net/>
 
 The availability of these utilities is checked by Configure.pl.
 
-B<antlr> - ANother Tool for Language Recognition 
+B<antlr> - ANother Tool for Language Recognition
 L<http://www.antlr.org/>
 
-B<bc> - arbitrary-precision arithmetic language and calculator 
+B<bc> - arbitrary-precision arithmetic language and calculator
 L<http://gnuwin32.sourceforge.net/>
 
-B<m4> - macro language processor 
+B<m4> - macro language processor
 L<http://gnuwin32.sourceforge.net/>
 
 B<Python> - an interpreted, interactive, object-oriented programming language
-L<http://www.python.org/>  
+L<http://www.python.org/>
 
 =item Inno Setup
 
 Inno Setup is a I<free> installer for Windows programs.
 
-The latest release of Inno Setup at the time of writing is 5.1.4. 
+The latest release of Inno Setup at the time of writing is 5.1.4.
 
 The HomePage is on L<http://www.jrsoftware.org/>.
 
@@ -131,8 +131,8 @@ linker stuff.
 
 If you use the Toolkit, be sure to follow the directions for setting up
 your build environment that come with the perl distributions. (README.win32
-in the latest perl distribution.) You may have to substitute "Microsoft 
-Platform SDK" wherever "Microsoft SDK" is listed, depending on the your 
+in the latest perl distribution.) You may have to substitute "Microsoft
+Platform SDK" wherever "Microsoft SDK" is listed, depending on the your
 install. You can ignore the entries regarding "win32/config.vc", but be sure
 to create the "link.bat" batch file. Copy the missing files mentioned,
 run the Toolkit Command Prompt, set the appropriate env vars, and you
@@ -144,8 +144,8 @@ have to compile your own perl.
 
 =item MinGW32 with GCC
 
-The latest release of MinGW package at the time of writing is 4.1.1, 
-which contains gcc-3.4.2. It can be downloaded here: 
+The latest release of MinGW package at the time of writing is 4.1.1,
+which contains gcc-3.4.2. It can be downloaded here:
 L<http://prdownloads.sf.net/mingw/MinGW-4.1.1.exe>
 
 The HomePage is on L<http://www.mingw.org/>.
@@ -178,8 +178,8 @@ XXX
 =head2 Installer
 
     $MAKE win32-inno-installer
-    
-This command creates a setup-parrot-x.y.z.exe that contains all parrot install 
+
+This command creates a setup-parrot-x.y.z.exe that contains all parrot install
 directories.
 
 =head2 Usage Hints

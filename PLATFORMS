@@ -1,7 +1,7 @@
 # $Id$
 
 Parrot was reported to compile and run tests successfully on the following
-platforms. 
+platforms.
 See also http://smoke.parrotcode.org/smoke/ for recent test results.
 See also t/TESTS.STATUS.pod about the status of the test suite.
 
