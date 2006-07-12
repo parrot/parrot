@@ -592,8 +592,7 @@ Looks up the method for C<*method_name>.
                 return retval;
         }
         else if (dynpmc_LuaString == SELF->vtable->base_type) {
-            retval = Parrot_find_global(INTERP,
-                    NULL,
+            retval = Parrot_find_global_cur(INTERP,
                     const_string(INTERP, "mt_string"));
             if (retval != NULL)
                 return retval;

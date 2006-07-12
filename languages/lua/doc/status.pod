@@ -23,13 +23,13 @@ This compiler is written in Perl5 :
 
 =over 4
 
-=item lexer
+=item * lexer
 
 Implemented with Perl5 regex
 
 F<languages/lua/Lua/lexer.pm>
 
-=item parser
+=item * parser
 
 Implemented with Parse::Yapp.
 
@@ -39,19 +39,19 @@ Only one C<error> rule, so the syntax error diagnostic is minimalist.
 
 F<languages/lua/Lua/lua51.yp>
 
-=item code generation
+=item * code generation
 
 F<languages/lua/Lua/build.pm>
 
-=item symbole table
+=item * symbole table
 
 F<languages/lua/Lua/symbtab.pm>
 
-=item opcode representation
+=item * opcode representation
 
 F<languages/lua/Lua/opcode.pm>
 
-=item opcode emission
+=item * opcode emission
 
 F<languages/lua/Lua/pir.pm>
 
@@ -92,43 +92,27 @@ There are eight basic types in Lua, each of them is implemented by a PMC.
 
 =over 4
 
-=item nil
+=item * nil F<languages/lua/pmc/luanil.pmc>
 
-F<languages/lua/pmc/luanil.pmc>
+=item * boolean F<languages/lua/pmc/luaboolean.pmc>
 
-=item boolean
+=item * number F<languages/lua/pmc/luanumber.pmc>
 
-F<languages/lua/pmc/luaboolean.pmc>
+=item * string F<languages/lua/pmc/luastring.pmc>
 
-=item number
+=item * function F<languages/lua/pmc/luafunction.pmc>
 
-F<languages/lua/pmc/luanumber.pmc>
-
-=item string
-
-F<languages/lua/pmc/luastring.pmc>
-
-=item function
-
-F<languages/lua/pmc/luafunction.pmc>
-
-=item userdata
-
-F<languages/lua/pmc/luauserdata.pmc>
+=item * userdata F<languages/lua/pmc/luauserdata.pmc>
 
 This type allows OO extension.
 
 Currently, C<file> in I/O library is an C<userdata>.
 
-=item thread
-
-F<languages/lua/pmc/luathread.pmc>
+=item * thread F<languages/lua/pmc/luathread.pmc>
 
 This type is used to implement coroutines. 
 
-=item table
-
-F<languages/lua/pmc/luatable.pmc>
+=item * table F<languages/lua/pmc/luatable.pmc>
 
 This type is I<the> data structure of the language.
 
@@ -162,41 +146,23 @@ Lua 5.1 defines the following standard libraries:
 
 =over 4
 
-=item basic library
+=item * basic library F<languages/lua/lib/luabasic.pir>
 
-F<languages/lua/lib/luabasic.pir>
+=item * coroutine manipulation F<languages/lua/lib/luacoroutine.pir>
 
-=item coroutine manipulation
+=item * package library F<languages/lua/lib/luapackage.pir>
 
-F<languages/lua/lib/luacoroutine.pir>
+=item * string manipulation F<languages/lua/lib/luastring.pir>
 
-=item package library
+=item * table manipulation F<languages/lua/lib/luatable.pir>
 
-F<languages/lua/lib/luapackage.pir>
+=item * mathematical functions F<languages/lua/lib/luamath.pir>
 
-=item string manipulation
+=item * input and output F<languages/lua/lib/luaio.pir>
 
-F<languages/lua/lib/luastring.pir>
+=item * operating system facilities F<languages/lua/lib/luaos.pir>
 
-=item table manipulation
-
-F<languages/lua/lib/luatable.pir>
-
-=item mathematical functions
-
-F<languages/lua/lib/luamath.pir>
-
-=item input and output
-
-F<languages/lua/lib/luaio.pir>
-
-=item operating system facilities
-
-F<languages/lua/lib/luaos.pir>
-
-=item debug facilities
-
-F<languages/lua/lib/luadebug.pir>
+=item * debug facilities F<languages/lua/lib/luadebug.pir>
 
 =back
 
@@ -223,11 +189,11 @@ Klaas-Jan Stol works on 2 projects :
 
 =over 4
 
-=item Monkey, an implementation of Lua on Parrot
+=item * Monkey, an implementation of Lua on Parrot
 
 A Lua to PIR compiler implemented in C
 
-=item lua2pir
+=item * lua2pir
 
 A Lua bytecode to PIR compiler
 
