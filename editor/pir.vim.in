@@ -37,7 +37,7 @@ syn match pirDirective  /\.\(sub\|end\|pcc_sub\|macro\|endm\|emit\|eom\)/
 syn match pirDirective  /\.\(local\|sym\|const\|lex\|global\|globalconst\)/
 syn match pirDirective  /\.\(namespace\|endnamespace\)/
 syn match pirDirective  /\.\(param\|arg\|return\|yield\)/
-syn match pirDirective  /\.\(pragma\|HLL\|HLL_map\|include\)/
+syn match pirDirective  /\.\(pragma\|HLL\|HLL_map\|include\|loadlib\)/
 syn match pirDirective  /\.\(pcc_begin\|pcc_call\|pcc_end\|invocant\|meth_call\|nci_call\)/
 syn match pirDirective  /\.\(pcc_begin_return\|pcc_end_return\)/
 syn match pirDirective  /\.\(pcc_begin_yield\|pcc_end_yield\)/

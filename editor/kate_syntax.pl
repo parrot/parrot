@@ -25,7 +25,7 @@ my @imcc_spdirec = qw(.pcc_call .result .return .local .const .globalconst
     end goto if unless call branch jump jsr ret invoke invokecc throw 
     rethrow die_hard .emit .eom .sub .end .pcc_begin
     .pcc_end .pcc_sub .pcc_begin_return .pcc_end_return .pcc_begin_yield
-    .pcc_end_yield .namespace .endnamespace .macro .include);
+    .pcc_end_yield .loadlib .namespace .endnamespace .macro .include);
 my @pod_start = qw(head[1-6] over back item for begin end pod);
 my $pod_start_rx = join '|', @pod_start;
 my @imcc_basic_types = qw(int float string);
