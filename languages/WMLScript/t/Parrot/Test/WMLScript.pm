@@ -60,6 +60,8 @@ foreach my $func ( keys %language_test_map ) {
         Parrot::Test::run_command(
             "wmlsc $cflags languages/${lang_fn}",
             CD     => $self->{relpath},
+            STDOUT => $out_fn,
+            STDERR => $out_fn,
         );
 
         my @test_prog = (
