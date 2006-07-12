@@ -91,6 +91,15 @@ char *str_cat(const char *, const char *);
 int imcc_vfprintf(Interp *, FILE *fd, const char *format, va_list ap);
 int imcc_fprintf(Interp *, FILE *fd, const char *fmt, ...);
 
+/*
+ * FIXME create an official interface
+ * imcc compile interface
+ *       this is needed for the debugger pdb and called from imcc/main.c
+ */
+PMC *imcc_compile_pir(Parrot_Interp interp, const char *s);
+PMC *imcc_compile_pasm(Parrot_Interp interp, const char *s);
+void *IMCC_compile_file (Parrot_Interp interp, const char *s);
+
 
 /* Call convention independant API */
 

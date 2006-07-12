@@ -44,6 +44,15 @@ PARROT_API INTVAL Parrot_byte_index(Interp *interpreter, const STRING *base,
         const STRING *search, UINTVAL start_offset);
 PARROT_API INTVAL Parrot_byte_rindex(Interp *interpreter, const STRING *base,
         const STRING *search, UINTVAL start_offset);
+typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
+
+PARROT_API void Parrot_register_move(Interp *interpreter, int n_regs,
+        unsigned char *dest_regs, unsigned char *src_regs,
+        unsigned char temp_reg, 
+        reg_move_func mov, 
+        reg_move_func mov_alt, 
+        void *info);
+
 /*
  * misc.c
  */

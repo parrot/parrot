@@ -682,9 +682,6 @@ TODO add a define, if it's implemented so that we can start filling the gaps
 
 */
 
-/* proto TODO mv to hdr */
-typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
-
 void 
 Parrot_register_move(Interp *interpreter, int n_regs,
         unsigned char *dest_regs, unsigned char *src_regs,

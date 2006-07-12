@@ -23,13 +23,6 @@
 #include "pbc.h"
 #include "parser.h"
 
-/*
- * FIXME create an official interface
- *       this is needed for the debugger pdb and called from imcc/main.c
- */
-PMC * imcc_compile_pir(Parrot_Interp interp, const char *s);
-PMC * imcc_compile_pasm(Parrot_Interp interp, const char *s);
-
 static PMC * imcc_compile(Parrot_Interp interp, const char *s, int pasm);
 static const char * try_rev_cmp(Parrot_Interp, IMC_Unit * unit, char *name,
         SymReg ** r);
