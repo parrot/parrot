@@ -10,7 +10,7 @@
 #define YY_FLEX_MINOR_VERSION 5
 
 #include <stdio.h>
-
+#include <errno.h>
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
 #ifdef c_plusplus
@@ -23,7 +23,9 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -62,6 +64,7 @@
 #else
 #define YY_PROTO(proto) ()
 #endif
+
 
 /* Returned upon end-of-file. */
 #define YY_NULL 0
@@ -2870,7 +2873,7 @@ struct macro_t {
 };
 
 /* XXX: boe: rework this hack to use a hash */
-#define N_MACROS 4096
+#define N_MACROS 8192
 struct macro_t macros[N_MACROS];
 int num_macros = 0;
 
@@ -2941,7 +2944,7 @@ static char *heredoc_content;
 
 #define heredoc2 10
 
-#line 2945 "compilers/imcc/imclexer.c"
+#line 2948 "compilers/imcc/imclexer.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -3041,9 +3044,20 @@ YY_MALLOC_DECL
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
 		result = n; \
 		} \
-	else if ( ((result = fread( buf, 1, max_size, yyin )) == 0) \
-		  && ferror( yyin ) ) \
-		YY_FATAL_ERROR( "input in flex scanner failed" );
+	else \
+		{ \
+		errno=0; \
+		while ( (result = fread(buf, 1, max_size, yyin))==0 && ferror(yyin)) \
+			{ \
+			if( errno != EINTR) \
+				{ \
+				YY_FATAL_ERROR( "input in flex scanner failed" ); \
+				break; \
+				} \
+			errno=0; \
+			clearerr(yyin); \
+			} \
+		}
 #endif
 
 /* No semi-colon after return; correct usage is to write "yyterminate();" -
@@ -3112,7 +3126,7 @@ YY_DECL
             return 0;
         }
 
-#line 3116 "compilers/imcc/imclexer.c"
+#line 3130 "compilers/imcc/imclexer.c"
 
 	if ( yy_init )
 		{
@@ -4222,7 +4236,7 @@ YY_RULE_SETUP
 #line 588 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 4226 "compilers/imcc/imclexer.c"
+#line 4240 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -4795,9 +4809,13 @@ YY_BUFFER_STATE b;
 	}
 
 
+#ifndef _WIN32
+#include <unistd.h>
+#else
 #ifndef YY_ALWAYS_INTERACTIVE
 #ifndef YY_NEVER_INTERACTIVE
 extern int isatty YY_PROTO(( int ));
+#endif
 #endif
 #endif
 

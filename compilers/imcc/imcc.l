@@ -31,7 +31,7 @@ struct macro_t {
 };
 
 /* XXX: boe: rework this hack to use a hash */
-#define N_MACROS 4096
+#define N_MACROS 8192
 struct macro_t macros[N_MACROS];
 int num_macros = 0;
 
