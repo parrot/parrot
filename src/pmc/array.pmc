@@ -1263,8 +1263,8 @@ Used to unarchive the array.
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
             DYNSELF.set_integer_native(io->vtable->shift_integer(INTERP, io));
-        }
     }
+}
 
 /*
 
