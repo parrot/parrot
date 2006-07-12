@@ -29,13 +29,22 @@ Checks that no source file in the distribution uses C++ style comments.
 my @comments;
 
 foreach my $file ( source_files() ) {
+    my $buf;
     my $path = $file->path;
     open(my $fh, q(<), $path) or die "Can not open '$path' for reading!\n";
-    foreach my $line (<$fh>) {
-        next unless $line =~ m{//};
-        next if $line =~ m{://};    # skip ftp:// http:// etc
-        next if $line =~ m{"//};    # skip printf("//= ")
-        push @comments, "$path: $line";
+    {
+        local $/;
+        $buf = <$fh>;
+    }
+    $buf =~ s{ (?:
+                   (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
+                 | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
+                 | /\* .*? \*/                         # remove C comment
+               )
+            }{}gsx;
+
+    if ( $buf =~ m{ ( .*? // .* ) }x ) {
+            push( @comments, "$path: $1\n" );
     }
 }
 
