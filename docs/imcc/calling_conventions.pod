@@ -129,8 +129,7 @@ Engage in multiple dispatch with the listed types.
 =item :immediate
 
 This subroutine is executed immediately after being compiled. (Analagous to
-C<BEGIN> in perl5.) Useful for preloading dynamic ops or pmcs so the rest of 
-the compilation unit can take advantage of them.
+C<BEGIN> in perl5.)
 
 =item :method
 
