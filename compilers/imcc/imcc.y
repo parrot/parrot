@@ -21,6 +21,7 @@
 #define _PARSER
 #define PARSER_MAIN
 #include "imc.h"
+#include "parrot/dynext.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -383,6 +384,12 @@ adv_named_set(Interp *interp, char *name) {
     adv_named_id = name;
 }
 
+static void 
+do_loadlib(Interp *interp, char *lib) 
+{
+    STRING *s = string_from_cstring(interp, lib + 1, strlen(lib) - 2);
+    Parrot_load_lib(interp, s, NULL);
+}
 
 %}
 
@@ -417,7 +424,7 @@ adv_named_set(Interp *interp, char *name) {
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
-%token <t> MULTI
+%token <t> MULTI LOADLIB
 %token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -491,6 +498,7 @@ compilation_unit:
 
 pragma: PRAGMA pragma_1 '\n'   { $$ = 0; }
    | hll_def            '\n'   { $$ = 0; }
+   | LOADLIB STRINGC    '\n'   { $$ = 0; do_loadlib(interp, $2); }
    ;
 
 pragma_1:  N_OPERATORS INTC
@@ -559,6 +567,7 @@ pasmline:
    | LINECOMMENT                       { $$ = 0; }
    | class_namespace  { $$ = $1; }
    | pmc_const
+   | pragma
    ;
 
 pasm_inst:         { clear_state(); }

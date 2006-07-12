@@ -157,6 +157,10 @@ prefix.
    $P0 = $P1 + $P2           # n_add $P0, $P1, $P2
    $P2 = abs $P0             # n_abs $P2, $P0
 
+=item .loadlib "lib_name"
+
+Load the given library at B<compile time>, that is, as soon that line is
+parsed. See also the C<loadlib> opcode, which does the same at run time.
 
 =item .HLL "hll_name", "hll_lib"
 
@@ -172,9 +176,7 @@ a PMC of type I<.UserType> instead of I<.CoreType>, if such a mapping is defined
 
 E.g. with this code snippet ...
 
-  .sub _my_init :immediate
-    $P0 = loadlib 'dynlexpad'
-  .end
+  .loadlib 'dynlexpad'
 
   .HLL "Foo", ""
   .HLL_map .LexPad, .DynLexPad

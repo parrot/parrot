@@ -1,9 +1,7 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+/* A Bison parser, made by GNU Bison 1.875.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+/* Skeleton parser for Yacc-like parsing with Bison,
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,21 +15,13 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
-/* As a special exception, you may create a larger work that contains
-   part or all of the Bison parser skeleton and distribute that work
-   under terms of your choice, so long as that work isn't itself a
-   parser generator using the skeleton or a modified version thereof
-   as a parser skeleton.  Alternatively, if you modify or redistribute
-   the parser skeleton itself, you may (at your option) remove this
-   special exception, which will cause the skeleton and the resulting
-   Bison output files to be licensed under the GNU General Public
-   License without this special exception.
-
-   This special exception was added by the Free Software Foundation in
-   version 2.2 of Bison.  */
+/* As a special exception, when this file is copied by Bison into a
+   Bison output file, you may use that output file without restriction.
+   This special exception was added by the Free Software Foundation
+   in version 1.24 of Bison.  */
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -130,32 +120,32 @@
      OUTER = 346,
      NEED_LEX = 347,
      MULTI = 348,
-     UNIQUE_REG = 349,
-     LABEL = 350,
-     EMIT = 351,
-     EOM = 352,
-     IREG = 353,
-     NREG = 354,
-     SREG = 355,
-     PREG = 356,
-     IDENTIFIER = 357,
-     REG = 358,
-     MACRO = 359,
-     ENDM = 360,
-     STRINGC = 361,
-     INTC = 362,
-     FLOATC = 363,
-     USTRINGC = 364,
-     PARROT_OP = 365,
-     VAR = 366,
-     LINECOMMENT = 367,
-     FILECOMMENT = 368,
-     DOT = 369,
-     CONCAT = 370,
-     POINTY = 371
+     LOADLIB = 349,
+     UNIQUE_REG = 350,
+     LABEL = 351,
+     EMIT = 352,
+     EOM = 353,
+     IREG = 354,
+     NREG = 355,
+     SREG = 356,
+     PREG = 357,
+     IDENTIFIER = 358,
+     REG = 359,
+     MACRO = 360,
+     ENDM = 361,
+     STRINGC = 362,
+     INTC = 363,
+     FLOATC = 364,
+     USTRINGC = 365,
+     PARROT_OP = 366,
+     VAR = 367,
+     LINECOMMENT = 368,
+     FILECOMMENT = 369,
+     DOT = 370,
+     CONCAT = 371,
+     POINTY = 372
    };
 #endif
-/* Tokens.  */
 #define LOW_PREC 258
 #define PARAM 259
 #define PRAGMA 260
@@ -247,50 +237,51 @@
 #define OUTER 346
 #define NEED_LEX 347
 #define MULTI 348
-#define UNIQUE_REG 349
-#define LABEL 350
-#define EMIT 351
-#define EOM 352
-#define IREG 353
-#define NREG 354
-#define SREG 355
-#define PREG 356
-#define IDENTIFIER 357
-#define REG 358
-#define MACRO 359
-#define ENDM 360
-#define STRINGC 361
-#define INTC 362
-#define FLOATC 363
-#define USTRINGC 364
-#define PARROT_OP 365
-#define VAR 366
-#define LINECOMMENT 367
-#define FILECOMMENT 368
-#define DOT 369
-#define CONCAT 370
-#define POINTY 371
+#define LOADLIB 349
+#define UNIQUE_REG 350
+#define LABEL 351
+#define EMIT 352
+#define EOM 353
+#define IREG 354
+#define NREG 355
+#define SREG 356
+#define PREG 357
+#define IDENTIFIER 358
+#define REG 359
+#define MACRO 360
+#define ENDM 361
+#define STRINGC 362
+#define INTC 363
+#define FLOATC 364
+#define USTRINGC 365
+#define PARROT_OP 366
+#define VAR 367
+#define LINECOMMENT 368
+#define FILECOMMENT 369
+#define DOT 370
+#define CONCAT 371
+#define POINTY 372
 
 
 
 
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 389 "compilers/imcc/imcc.y"
-{
+#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
+#line 396 "compilers/imcc/imcc.y"
+typedef union YYSTYPE {
     IdList * idlist;
     int t;
     char * s;
     SymReg * sr;
     Instruction *i;
-}
-/* Line 1529 of yacc.c.  */
-#line 289 "compilers/imcc/imcparser.h"
-	YYSTYPE;
+} YYSTYPE;
+/* Line 1249 of yacc.c.  */
+#line 278 "compilers/imcc/imcparser.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
+
+
 
 
 

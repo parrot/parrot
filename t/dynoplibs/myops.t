@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 7;
 use Parrot::Config;
 
 
@@ -27,19 +27,9 @@ Tests the sample dynamic op library "myops".
 my $is_ms_win32 = $^O =~ m!MSWin32!;
 my $is_mingw    = $is_ms_win32 && grep { $PConfig{cc} eq $_ } qw(gcc gcc.exe);
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "load");
-.sub main :main
-    loadlib P1, "myops_ops"
-    print P1
-    print "\n"
-.end
-CODE
-myops_ops
-OUTPUT
-
 pir_output_is(<< 'CODE', << 'OUTPUT', "fortytwo");
+.loadlib "myops_ops"
 .sub main :main
-    loadlib P1, "myops_ops"
     $I0 = fortytwo
     print $I0
     print "\n"
@@ -49,8 +39,8 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "what_do_you_get_if_you_multiply_six_by_nine");
+.loadlib "myops_ops"
 .sub main :main
-    loadlib P1, "myops_ops"
     $S0 = what_do_you_get_if_you_multiply_six_by_nine
     print $S0
     print "\n"
@@ -60,8 +50,8 @@ fortytwo
 OUTPUT
 
 pir_output_like(<< 'CODE', << 'OUTPUT', "hcf");
+.loadlib "myops_ops"
 .sub main :main
-    loadlib P1, "myops_ops"
     print "neither here\n"
     hcf
     print "nor there\n"
@@ -73,16 +63,16 @@ OUTPUT
 
 {
     my $quine = <<'END_PASM';
-loadlib P1, "myops_ops"
+.loadlib "myops_ops"
 q
 END_PASM
     pasm_output_is( $quine, $quine, 'a short cheating quine');
 }
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "one alarm");
+.loadlib "myops_ops"
 
 .sub main :main
-    P1 = loadlib "myops_ops"
     find_global P0, "_alarm"
     alarm 2.0, P0
     set I0, 1
@@ -112,8 +102,8 @@ SKIP: {
 
     pir_output_is(<< 'CODE', << 'OUTPUT', "three alarm");
 
+.loadlib "myops_ops"
 .sub main :main
-    P1 = loadlib "myops_ops"
     find_global P0, "_alarm3"
     alarm 3.3, 0.4, P0
     find_global P0, "_alarm2"
@@ -163,7 +153,7 @@ OUTPUT
 
 # bxand boolean op
 pasm_output_is(<<'CODE', <<'OUTPUT', 'bxand - A AND B, but not BOTH');
-    loadlib P1, "myops_ops"
+.loadlib "myops_ops"
 
     bxand I0, 0, 0
     bsr test

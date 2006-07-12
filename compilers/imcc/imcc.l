@@ -281,6 +281,7 @@ SP              [ ]
 ".get_results"       return(GET_RESULTS);
 ".yield"        return(YIELDT);
 ".return"       return(RETURN);
+<emit,INITIAL>".loadlib"      return(LOADLIB); 
 
 ":flat"         return(ADV_FLAT);
 ":slurpy"       return(ADV_SLURPY);

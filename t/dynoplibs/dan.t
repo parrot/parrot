@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 6;
 use Parrot::Config;
 
 
@@ -25,19 +25,9 @@ Tests the sample dynamic op library "dan".
 =cut
 
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "load");
-.sub main :main
-    loadlib P1, "dan_ops"
-    print P1
-    print "\n"
-.end
-CODE
-dan_ops
-OUTPUT
-
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_ic_nc");
+.loadlib "dan_ops"
 .sub main :main
-    loadlib P1, "dan_ops"
     mul $I1, 10, 2.5
     print $I1
     print "\n"
@@ -47,8 +37,8 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_i_nc");
+.loadlib "dan_ops"
 .sub main :main
-    loadlib P1, "dan_ops"
 	$I2 = 10
     mul $I1, $I2, 4.2
     print $I1
@@ -59,8 +49,8 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_ic_n");
+.loadlib "dan_ops"
 .sub main :main
-    loadlib P1, "dan_ops"
 	$N3 = 4.2
     mul $I1, 10, $N3
     print $I1
@@ -71,8 +61,8 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_i_n");
+.loadlib "dan_ops"
 .sub main :main
-    loadlib P1, "dan_ops"
 	$I2 = 10
 	$N3 = 4.2
     mul $I1, $I2, $N3
@@ -84,8 +74,8 @@ CODE
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul pir syntax");
+.loadlib "dan_ops"
 .sub main :main
-    loadlib P1, "dan_ops"
 	$I2 = 10
 	$N3 = 4.2
     $I1 = mul $I2, $N3
@@ -97,7 +87,7 @@ CODE
 OUTPUT
 
 pasm_output_is(<< 'CODE', << 'OUTPUT', "mul pasm syntax");
-    loadlib P0, "dan_ops"
+.loadlib "dan_ops"
     mul I0, 3, 3.9
     print I0
     print "\n"

@@ -508,22 +508,6 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         /* emit a debug seg, if this op is seen */
         PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
     }
-#if 1
-    else if (!strcmp(name, "loadlib")) {
-        SymReg *r1 = r[1];   /* lib name */
-        STRING *lib;
-        if ((r1->type & VTCONST) && strstr(r1->name, "ops")) {
-            /*
-             * XXX we should not read in dynamic PMC classes
-             *     OTOH we have to load dynamic opcodes
-             *     to get at the opcode information
-             */
-            lib = string_from_cstring(interpreter, r1->name + 1,
-                    strlen(r1->name) - 2);
-            Parrot_load_lib(interpreter, lib, NULL);
-        }
-    }
-#endif
     else if (!strcmp(name, "yield")) {
         cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1 |ITPCCYIELD;
     }
