@@ -31,6 +31,9 @@ Register HLL C<hll_name> within Parrot core.  If C<hll_lib> isn't a NULL
 STRING, load the shared language support library.  Creates a root namespace for
 the HLL named C<hll_name>.  Returns a type id for this HLL or 0 on error.
 
+If C<hll_name> is NULL, only the lbrary is loaded. This is used from the
+C<.loadlib> pragma.
+
 =item C<INTVAL Parrot_get_HLL_id(Interp*, STRING *hll_name)>
 
 Return the id of the given HLL name or -1 on error. "parrot" has id 0.
@@ -98,6 +101,18 @@ Parrot_register_HLL(Interp *interpreter,
 
     VTABLE_set_integer_native(interpreter, entry, e_HLL_MAX);
 
+    if (!hll_name) {
+        /* .loadlib pragma */
+        VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_name, PMCNULL);
+        /* register  dynlib */
+        name = constant_pmc_new_noinit(interpreter, enum_class_String);
+        if (!hll_lib)
+            hll_lib = const_string(interpreter, "");
+        hll_lib = string_as_const_string(interpreter, hll_lib);
+        VTABLE_set_string_native(interpreter, name, hll_lib);
+        VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_lib, name);
+        return idx;
+    }
     /* register HLL name */
     name = constant_pmc_new_noinit(interpreter, enum_class_String);
     hll_name = string_as_const_string(interpreter, hll_name);

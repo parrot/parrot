@@ -387,8 +387,9 @@ adv_named_set(Interp *interp, char *name) {
 static void 
 do_loadlib(Interp *interp, char *lib) 
 {
-    STRING *s = string_from_cstring(interp, lib + 1, strlen(lib) - 2);
+    STRING *s = string_unescape_cstring(interp, lib + 1, '"', NULL);
     Parrot_load_lib(interp, s, NULL);
+    Parrot_register_HLL(interp, NULL, s);
 }
 
 %}
