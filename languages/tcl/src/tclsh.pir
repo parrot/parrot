@@ -10,10 +10,7 @@
 # available
 #
 
-.sub _load_lib :immediate
-    .local pmc lib
-    lib = loadlib 'dynlexpad'
-.end
+.loadlib 'dynlexpad'
 
 .HLL 'Tcl', 'tcl_group'
 .HLL_map .LexPad, .DynLexPad
