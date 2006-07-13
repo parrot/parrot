@@ -9,7 +9,62 @@ More platforms also means more compilers.  Maybe your DEC compiler
 is more picky than gcc, and spews more warnings.  Good!  More
 opportunities for cleaning!
 
+=head2 Compiler pickiness
+
+Use as many compiler warnings as we possibly can.  The more warnings
+we enable, the less likely something will pass the watchful eye of
+the compiler.
+
+Note that warnings may not just be -W flags.  Some warnings in gcc
+only show up when optimization is enabled.
+
+=head2 Static code analysis
+
+There are a number of lint-like tools out there that can do static
+code analysis.  Make targets for them.
+
+=over 4
+
+=item * splint
+
+Splint (http://www.splint.org) is a very very picky lint tool, and
+setup and configuration is a pain.  Andy has tried to get Perl 5
+running under it nicely, but has met with limited success.  Maybe
+the Parrot will be nicer.
+
+=item * Solaris lint
+
+Sun has made its dev tools freely available at
+http://developers.sun.com/prodtech/cc/.  Its lint is the best one
+out there, except from Gimpel's FlexeLint
+(http://www.gimpel.com/html/flex.htm) which costs many dollars.
+
+=back
+
+=head2 Bounds-checkers
+
 =head2 Enforcing coding standards, naming conventions, etc
+
+=over 4
+
+=item * Automatic standards checking
+
+The docs in F<filename here> explains what our code should look
+like.  Write something that automatically validates it in a .t file.
+
+=item * C<const> checking
+
+Declaring variables as C<const> wherever possible lets the compiler
+do lots of checking that wouldn't normally be possible.  Walk the
+source code adding the C<const> qualifier wherever possible.  The
+biggest bang is always in passing pointers into functions.
+
+=item * C<const> explaining
+
+The description above is pretty sparse.  A good decscription of
+C<const> and its benefit would be helpful for newcomers.
+
+=back
 
 =head2 Decreasing the amount of repeated code
 
@@ -36,20 +91,6 @@ have to have it create the F<.h> files.
 
 Most of Andy's work right now is with GCC 4.2 on Linux.  We need
 many more.
-
-=head2 Run under splint
-
-Splint (http://www.splint.org) is a very very picky lint tool, and
-setup and configuration is a pain.  Andy has tried to get Perl 5
-running under it nicely, but has met with limited success.  Maybe
-the Parrot will be nicer.
-
-=head2 Run under Solaris lint
-
-Sun has made its dev tools freely available at
-http://developers.sun.com/prodtech/cc/.  Its lint is the best one
-out there, except from Gimpel's FlexeLint
-(http://www.gimpel.com/html/flex.htm) which costs many dollars.
 
 =head2 Run under valgrind
 
