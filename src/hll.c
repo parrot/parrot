@@ -78,19 +78,12 @@ string_as_const_string(Interp* interpreter, STRING *src)
     return NULL;
 }
 
-INTVAL
-Parrot_register_HLL(Interp *interpreter,
-	STRING *hll_name, STRING *hll_lib)
+static PMC*
+new_hll_entry(Interp *interpreter)
 {
-    PMC *hll_info, *entry, *name, *type_hash, *ns_hash;
-    INTVAL idx;
+    PMC *hll_info, *entry;
 
-    idx = Parrot_get_HLL_id(interpreter, hll_name);
-    if (idx >= 0)
-        return idx;
-    /* TODO LOCK or disallow in threads */
     hll_info = interpreter->HLL_info;
-    idx = VTABLE_elements(interpreter, hll_info);
     /*
      * ATT: all items that are owned by the HLL_info structure
      *      have to be created as constant objects, because
@@ -100,19 +93,34 @@ Parrot_register_HLL(Interp *interpreter,
     VTABLE_push_pmc(interpreter, hll_info, entry);
 
     VTABLE_set_integer_native(interpreter, entry, e_HLL_MAX);
+    return entry;
+}
+
+INTVAL
+Parrot_register_HLL(Interp *interpreter,
+	STRING *hll_name, STRING *hll_lib)
+{
+    PMC *entry, *name, *type_hash, *ns_hash;
+    INTVAL idx;
+
+    /* TODO LOCK or disallow in threads */
 
     if (!hll_name) {
         /* .loadlib pragma */
+        entry = new_hll_entry(interpreter);
         VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_name, PMCNULL);
         /* register  dynlib */
         name = constant_pmc_new_noinit(interpreter, enum_class_String);
-        if (!hll_lib)
-            hll_lib = const_string(interpreter, "");
         hll_lib = string_as_const_string(interpreter, hll_lib);
         VTABLE_set_string_native(interpreter, name, hll_lib);
         VTABLE_set_pmc_keyed_int(interpreter, entry, e_HLL_lib, name);
-        return idx;
+        return 0;
     }
+    idx = Parrot_get_HLL_id(interpreter, hll_name);
+    if (idx >= 0)
+        return idx;
+    idx = VTABLE_elements(interpreter, interpreter->HLL_info);
+    entry = new_hll_entry(interpreter);
     /* register HLL name */
     name = constant_pmc_new_noinit(interpreter, enum_class_String);
     hll_name = string_as_const_string(interpreter, hll_name);
@@ -163,8 +171,13 @@ Parrot_get_HLL_id(Interp* interpreter, STRING *hll_name)
 
     for (i = 0; i < nelements; ++i) {
         PMC * const entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, i);
-        PMC * const name_pmc = VTABLE_get_pmc_keyed_int(interpreter, entry, e_HLL_name);
-        STRING * const name = VTABLE_get_string(interpreter, name_pmc);
+        PMC * const name_pmc = VTABLE_get_pmc_keyed_int(interpreter, entry, 
+                e_HLL_name);
+        STRING * name;
+
+        if (PMC_IS_NULL(name_pmc))
+            continue;   
+        name = VTABLE_get_string(interpreter, name_pmc);
         if (!string_equal(interpreter, name, hll_name))
             return i;
     }

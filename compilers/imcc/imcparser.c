@@ -682,11 +682,7 @@ do_loadlib(Interp *interp, char *lib)
 {
     STRING *s = string_unescape_cstring(interp, lib + 1, '"', NULL);
     Parrot_load_lib(interp, s, NULL);
-
-    /* Heuristics: If the lib name contains "_group", then it's a HLL */
-    if (strstr(s, "_group") != NULL) {
-        Parrot_register_HLL(interp, NULL, s);
-    }
+    Parrot_register_HLL(interp, NULL, s);
 }
 
 
