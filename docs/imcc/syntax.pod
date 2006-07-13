@@ -160,10 +160,10 @@ prefix.
 =item .loadlib "lib_name"
 
 Load the given library at B<compile time>, that is, as soon that line is
-parsed. See also the C<loadlib> opcode, which does the same at run time.
+parsed.  See also the C<loadlib> opcode, which does the same at run time.
 
-If the library name contains the substring C<_group>, it's assumed to be a
-library of dynamic HLL PMCs and registered accordingly.
+A library loaded this way is also available at runtime, as if it has been
+loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 
 =item .HLL "hll_name", "hll_lib"
 
