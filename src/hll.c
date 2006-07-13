@@ -31,7 +31,7 @@ Register HLL C<hll_name> within Parrot core.  If C<hll_lib> isn't a NULL
 STRING, load the shared language support library.  Creates a root namespace for
 the HLL named C<hll_name>.  Returns a type id for this HLL or 0 on error.
 
-If C<hll_name> is NULL, only the lbrary is loaded. This is used from the
+If C<hll_name> is NULL, only the library is loaded. This is used from the
 C<.loadlib> pragma.
 
 =item C<INTVAL Parrot_get_HLL_id(Interp*, STRING *hll_name)>
