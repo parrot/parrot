@@ -219,7 +219,10 @@ sub new
                 'String encodings', 
                 'contents' => ['src/encodings']
             ),
-            $self->c_header_item('', 'unicode'),
+            $self->c_item(
+                'String charset', 
+                'contents' => ['src/charset']
+            ),
             $self->c_item(
                 'Miscellaneous, <code>sprintf</code> and utility functions.', 
                 'pairs' => ['misc'],
