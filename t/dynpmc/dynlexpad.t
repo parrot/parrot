@@ -41,14 +41,11 @@ OUTPUT
 
 my $loadlib = <<'EOC';
 #
-# the immediate sub gets run, before the .HLL_map below
-# is parsed, therefore the .DynLexPad constant is aready
+# the .loadlib directive gets run, before the .HLL_map below
+# is parsed, therefore the .DynLexPad constant is already
 # available
 #
-.sub _load_lib :immediate
-    .local pmc lib
-    lib = loadlib "dynlexpad"
-.end
+.loadlib "dynlexpad"
 
 .HLL "Some", "dynlexpad"
 .HLL_map .LexPad, .DynLexPad

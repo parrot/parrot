@@ -5,7 +5,7 @@
 # then parse and interpret/compile the tcl code we were passed.
 
 #
-# the immediate sub gets run, before the .HLL_map below
+# the .loadlib directive gets run, before the .HLL_map below
 # is parsed, therefore the .DynLexPad constant is already
 # available
 #
