@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2005, The Perl Foundation.
-# $Id: pbc_merge.t 13020 2006-06-26 01:06:16Z jonathan $
+# $Id$
 
 =head1 NAME
 
