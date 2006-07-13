@@ -16,14 +16,19 @@
 # - changing operands of existing ops
 # - adding/deleting/renaming a PMC to classes
 # - changes in the packfile format itself
+# - changes to any PMCs that are frozen into the .pbc like
+#   ParrotInterpreter (HLL_info), Subs and more
 # - other core changes that invalidate byte code :)
 #
 # After changing PBC_COMPAT either disable t/native_pbc tests or
 # better, if you have an i386 box at hand, regenerate the PBCs
 # with tools/dev/mk_native_pbc and commit the changes
 
+# or TODO much better: all .pbc files should make-depend on PBC_COMPAT
+
 # please insert tab separated entries at the top of the list
 
+2006.07.12	leo	.loadlib HLL_info change    
 2006.06.19	leo	released 0.4.5
 2006.06.18	leo	reorder opcodes
 2006.05.14	leo	released 0.4.4
