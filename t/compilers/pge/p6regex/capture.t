@@ -118,6 +118,8 @@ p6rule_like('bookkeeper', '[(.)$0]+',
 p6rule_like('123x', '(.)*x',
             qr/mob: <123x @ 0>/, 'repeated dot capture');
 
+p6rule_is  ('hello hello', '(\w+) <?ws> $0', 'backreference at end of string');
+
 ## TODO Subpattern captures, Accessing captured subpatterns,
 ## Nested subpattern captures, Quantified subpattern captures,
 ## Indirectly quantified subpattern captures, Subpattern numbering,
@@ -125,4 +127,4 @@ p6rule_like('123x', '(.)*x',
 ## of the same subrule, Aliasing, Capturing from repeated matches
 
 # remember to change the number of tests :-)
-BEGIN { plan tests => 45; }
+BEGIN { plan tests => 46; }

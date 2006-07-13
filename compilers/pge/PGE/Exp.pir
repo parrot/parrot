@@ -1139,7 +1139,7 @@ tree as a PIR code object that can be compiled.
           $S1 = $P0
           $I1 = length $S1
           $I0 = pos + $I1
-          if $I0 >= lastpos goto fail
+          if $I0 > lastpos goto fail
           $S0 = substr target, pos, $I1
           if $S0 != $S1 goto fail
           pos += $I1
