@@ -1,4 +1,4 @@
-# $Id$ $Date$
+# ATT no autoexpanding svn markers please
 
 .sub quine :main
     .param pmc argv
@@ -813,17 +813,45 @@ push code_as_data, 32
 push code_as_data, 34
 push code_as_data, 35
 push code_as_data, 32
-push code_as_data, 36
-push code_as_data, 73
-push code_as_data, 100
-push code_as_data, 36
+push code_as_data, 65
+push code_as_data, 84
+push code_as_data, 84
 push code_as_data, 32
-push code_as_data, 36
-push code_as_data, 68
+push code_as_data, 110
+push code_as_data, 111
+push code_as_data, 32
 push code_as_data, 97
+push code_as_data, 117
 push code_as_data, 116
+push code_as_data, 111
 push code_as_data, 101
-push code_as_data, 36
+push code_as_data, 120
+push code_as_data, 112
+push code_as_data, 97
+push code_as_data, 110
+push code_as_data, 100
+push code_as_data, 105
+push code_as_data, 110
+push code_as_data, 103
+push code_as_data, 32
+push code_as_data, 115
+push code_as_data, 118
+push code_as_data, 110
+push code_as_data, 32
+push code_as_data, 109
+push code_as_data, 97
+push code_as_data, 114
+push code_as_data, 107
+push code_as_data, 101
+push code_as_data, 114
+push code_as_data, 115
+push code_as_data, 32
+push code_as_data, 112
+push code_as_data, 108
+push code_as_data, 101
+push code_as_data, 97
+push code_as_data, 115
+push code_as_data, 101
 push code_as_data, 92
 push code_as_data, 110
 push code_as_data, 34
@@ -1258,6 +1286,31 @@ push code_as_data, 97
 push code_as_data, 109
 push code_as_data, 101
 push code_as_data, 10
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 46
+push code_as_data, 105
+push code_as_data, 110
+push code_as_data, 99
+push code_as_data, 108
+push code_as_data, 117
+push code_as_data, 100
+push code_as_data, 101
+push code_as_data, 32
+push code_as_data, 34
+push code_as_data, 115
+push code_as_data, 116
+push code_as_data, 97
+push code_as_data, 116
+push code_as_data, 46
+push code_as_data, 112
+push code_as_data, 97
+push code_as_data, 115
+push code_as_data, 109
+push code_as_data, 34
+push code_as_data, 10
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
@@ -1281,6 +1334,71 @@ push code_as_data, 101
 push code_as_data, 95
 push code_as_data, 102
 push code_as_data, 104
+push code_as_data, 10
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 46
+push code_as_data, 108
+push code_as_data, 111
+push code_as_data, 99
+push code_as_data, 97
+push code_as_data, 108
+push code_as_data, 32
+push code_as_data, 105
+push code_as_data, 110
+push code_as_data, 116
+push code_as_data, 32
+push code_as_data, 115
+push code_as_data, 105
+push code_as_data, 122
+push code_as_data, 101
+push code_as_data, 10
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 115
+push code_as_data, 105
+push code_as_data, 122
+push code_as_data, 101
+push code_as_data, 32
+push code_as_data, 61
+push code_as_data, 32
+push code_as_data, 115
+push code_as_data, 116
+push code_as_data, 97
+push code_as_data, 116
+push code_as_data, 32
+push code_as_data, 112
+push code_as_data, 114
+push code_as_data, 111
+push code_as_data, 103
+push code_as_data, 114
+push code_as_data, 97
+push code_as_data, 109
+push code_as_data, 95
+push code_as_data, 110
+push code_as_data, 97
+push code_as_data, 109
+push code_as_data, 101
+push code_as_data, 44
+push code_as_data, 32
+push code_as_data, 46
+push code_as_data, 83
+push code_as_data, 84
+push code_as_data, 65
+push code_as_data, 84
+push code_as_data, 95
+push code_as_data, 70
+push code_as_data, 73
+push code_as_data, 76
+push code_as_data, 69
+push code_as_data, 83
+push code_as_data, 73
+push code_as_data, 90
+push code_as_data, 69
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
@@ -1368,11 +1486,10 @@ push code_as_data, 102
 push code_as_data, 104
 push code_as_data, 44
 push code_as_data, 32
-push code_as_data, 49
-push code_as_data, 48
-push code_as_data, 48
-push code_as_data, 48
-push code_as_data, 48
+push code_as_data, 115
+push code_as_data, 105
+push code_as_data, 122
+push code_as_data, 101
 push code_as_data, 10
 push code_as_data, 10
 push code_as_data, 32
@@ -3018,21 +3135,13 @@ push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 39
 push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
-push code_as_data, 35
+push code_as_data, 32
+push code_as_data, 45
+push code_as_data, 45
+push code_as_data, 45
+push code_as_data, 45
+push code_as_data, 45
+push code_as_data, 45
 push code_as_data, 39
 push code_as_data, 32
 push code_as_data, 109
@@ -3324,7 +3433,7 @@ push code_as_data, 10
 
 DO_QUINE:
     # First print the stuff data section
-    print "# $Id$ $Date$\n"
+    print "# ATT no autoexpanding svn markers please\n"
     print "\n"
     print ".sub quine :main\n" 
     print "    .param pmc argv\n"
@@ -3343,11 +3452,14 @@ DO_QUINE:
 .sub print_code_as_data
 
     .param string program_name
+    .include "stat.pasm"
 
     .local pmc code_fh
+    .local int size
+    size = stat program_name, .STAT_FILESIZE
     code_fh = open program_name, "<"
     .local string code 
-    code = read code_fh, 10000
+    code = read code_fh, size
 
     # Ignore everything up to end of data section
     .local int end_of_data_pos
@@ -3416,7 +3528,7 @@ quine_ord.pir - a quine that store the code in a ResizableIntegerArray
 
 =head1 DESCRIPTION
 
-When making changes, delete the code between the  '################' markers and run 
+When making changes, delete the code between the  '# ------' markers and run 
 
   ../../parrot quine_ord.pir --print-code-as-data
 
