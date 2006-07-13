@@ -108,6 +108,23 @@ sub p6rule_like {
     goto &Parrot::Test::pir_output_like;
 }
 
+=item C<p6rule_throws($pattern, $expected, $description, @todo)>
+
+Compiles the Perl 6 pattern, catching any thrown exceptions.  The test
+passes if the pattern throws an exception and the exception message
+matches the C<$expected> parameter.  Note that C<$expected> is a
+I<Perl 5> pattern.
+
+=cut
+
+sub p6rule_throws {
+    my ($pattern) = (shift);
+
+    unshift @_ => Parrot::Test::PGE::_generate_pir_catch_for($pattern);
+
+    goto &Parrot::Test::pir_output_like;
+}
+
 =item C<pgeglob_is($target, $pattern, $description, @todo)>
 
 Runs the target string against the Perl 6 pattern, passing the test
@@ -213,6 +230,39 @@ sub _generate_pir_for {
             goto end
           rule_fail:
             print "rule error"
+          end:
+        .end\n);
+}
+
+sub _generate_pir_catch_for {
+    my($pattern) = @_;
+    $pattern = _parrot_stringify($pattern);
+    return qq(
+        .sub _PGE_Test
+            .local pmc p6rule_compile
+            load_bytecode "PGE.pbc"
+            load_bytecode "PGE/Dumper.pir"
+            load_bytecode "PGE/Text.pir"
+            load_bytecode "PGE/Util.pir"
+            p6rule_compile = compreg "PGE::P6Regex"
+
+            .local string pattern
+            .local pmc rulesub
+            pattern = "$pattern"
+            push_eh handler
+            rulesub = p6rule_compile(pattern)
+            if_null rulesub, compile_fail
+          compile_success:
+            print "OK"
+            goto end
+          compile_fail:
+            print "unknown compile error"
+            goto end
+          handler:
+            .local pmc exception
+            .local string message
+            .get_results (exception, message)
+            print message
           end:
         .end\n);
 }
