@@ -56,9 +56,7 @@ empty:
   code.emit(<<'END_PIR', namespace, name)
 .HLL 'tcl', 'tcl_group'
 .namespace %0
-.sub '_xxx' :immediate
-  P0 = loadlib 'dynlexpad' 
-.end
+.loadlib 'dynlexpad'
 .HLL_map .LexPad, .DynLexPad
 .sub '&%1' :lex
   .param pmc args :slurpy
