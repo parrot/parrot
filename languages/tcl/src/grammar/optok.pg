@@ -1,4 +1,4 @@
-grammar _Tcl::Grammar::Expr;
+grammar Tcl::Grammar::Expr;
 
 proto 'prefix:-' is precedence('1=') {...}
 proto 'prefix:+' is precedence('1=') {...}

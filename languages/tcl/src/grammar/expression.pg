@@ -1,10 +1,11 @@
-grammar _Tcl::Grammar::Expr;
+grammar Tcl::Grammar::Expr;
 
 # The expression token is the top level expression - it is defined in 
 # XXX-NAME-OF-SUB in XXX-NAME-OF-FILE, which in turn invokes the
 # opcode parser from src/tcl_expr_optok.pg.
 
-# XXX Some of the items here actually belong in the language grammar. (like command, quoted, etc.)
+# XXX Some of the items here actually belong in the language grammar. 
+# (like command, quoted, etc.) Move them there when we use PGE for everything.
 
 token term {
     [
@@ -16,8 +17,7 @@ token term {
     ]
 }
 
-## used by expression
-token ws { \s* }
+## used by term
 
 token command  { \[ (.*?) \] }
 token quoted   { " ([\\.|<-["]>]*) : " }
