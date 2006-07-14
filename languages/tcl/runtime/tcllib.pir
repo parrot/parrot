@@ -8,6 +8,7 @@ providing a compreg-compatible method.
 
 =cut
 
+.loadlib 'dynlexpad'
 .include 'languages/tcl/src/returncodes.pir'
 .include 'languages/tcl/src/macros.pir'
 .include 'cclass.pasm'
