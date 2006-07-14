@@ -106,7 +106,8 @@ src/macros.pir \
 src/parser.pir \
 src/returncodes.pir \
 src/grammar/optok.pir \
-src/grammar/expression.pir
+src/grammar/expression.pir \
+src/grammar/parse.pir
 
 
 all: tcl.pbc
@@ -210,8 +211,8 @@ runtime/builtins.pir \
 "$(PMCDIR)/*$(O)" \
 "t/*.pir" \
 "t/*.tcl" \
-src/tcl_expr_optok.pir \
-src/tcl_expr.pir \
+src/grammar/expression.pir \
+src/grammar/optok.pir \
 $(GENERATED_INLINES)
 
 clean:
