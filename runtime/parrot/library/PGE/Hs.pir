@@ -95,7 +95,7 @@ whole thing may be taken out or refactored away at any moment.
 
     push_eh match_error
     rulesub = p6rule_compile(pattern, adverbs :named :flat)
-    match = rulesub(x)
+    match = rulesub(x, 'grammar' => 'PGE::Grammar')
 
   match_result:
     unless match goto match_fail
