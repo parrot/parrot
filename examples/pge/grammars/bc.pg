@@ -1,0 +1,74 @@
+grammar Bc::Grammar;
+
+## an example 'bc' grammar
+
+## recognize terms
+token term { \d+ }
+
+
+## create operator precedence parser
+rule 'expression'   is optable { ... }
+
+
+## terms
+proto 'term:'       is precedence('=')
+    is parsed(&term)
+    is pastrule('past_term')
+    { ... }
+
+## autoincrement
+proto 'postfix:++'  is looser('term:')     { ... }
+proto 'postfix:--'  is equiv('postfix:++') { ... }
+proto 'prefix:++'   is equiv('postfix:++') { ... }
+proto 'prefix:--'   is equiv('postfix:++') { ... }
+
+## negation
+proto 'prefix:-'    is looser('postfix:++')
+    is post('neg')
+    { ... }
+
+## exponentiation
+proto 'infix:^'     is looser('prefix:-')  { ... }
+
+## multiplicative
+proto 'infix:*'     is looser('infix:^')
+    is post('mul')
+    { ... }
+
+proto 'infix:/'     is equiv('infix:*')
+    is post('div')
+    { ... }
+
+proto 'infix:%'     is equiv('infix:*')
+    is post('mod')
+    { ... }
+
+## additive
+proto 'infix:+'     is looser('infix:*')
+    is post('add')
+    { ... }
+
+proto 'infix:-'     is equiv('infix:+')
+    is post('sub')
+    { ... }
+
+## assignment
+proto 'infix:='     is looser('infix:+')
+    is assoc('right')
+    is pasttype('assign')
+    { ... }
+
+## relational
+proto 'infix:=='    is looser('infix:=')  is assoc('non')  { ... }
+proto 'infix:!='    is equiv('infix:==') { ... }
+proto 'infix:<'     is equiv('infix:==') { ... }
+proto 'infix:<='    is equiv('infix:==') { ... }
+proto 'infix:>'     is equiv('infix:==') { ... }
+proto 'infix:>='    is equiv('infix:==') { ... }
+
+## boolean
+proto 'prefix:!'    is looser('infix:==') is assoc('non')  { ... }
+proto 'infix:&&'    is looser('prefix:!') is assoc('left') { ... }
+proto 'infix:||'    is looser('infix:&&') is assoc('left') { ... }
+
+## vim: expandtab sw=4
