@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"return value");
@@ -104,6 +104,14 @@ language_output_is("tcl",<<'TCL',<<OUT,"vararg empty");
 TCL
 2
 
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "redefined inlinable builtin");
+  proc incr {varName} {upvar $varName var; set var [expr {$var+2}]}
+  proc test {} { set a 1; incr a; puts $a }
+  test
+TCL
+3
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "unknown namespace");
