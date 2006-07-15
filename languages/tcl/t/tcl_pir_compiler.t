@@ -21,6 +21,7 @@ ok 2
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "test tcl compiler global variable interop");
+.loadlib 'dynlexpad'
 .HLL 'Tcl', 'tcl_group'
   .sub main :main
      load_bytecode 'languages/tcl/runtime/tcllib.pbc'
@@ -37,6 +38,7 @@ ok 1
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR");
+.loadlib 'dynlexpad'
 .HLL 'Tcl', 'tcl_group'
 .sub main :main
 
