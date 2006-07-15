@@ -1165,7 +1165,7 @@ EQ2:	print "ok 2\\n"
         set P2, 100
         set P3, 12.5
         add P2, P2, P3
-        eq P2, 112, EQ3
+        eq P2, 112.5, EQ3
         print P2
 	print "not "
 EQ3:	print "ok 3\\n"
@@ -1224,7 +1224,7 @@ EQ3:	print "ok 3\\n"
 	set P2, 21
 	set P3, 321.321
 	sub P2, P2, P3
-	eq P2, -300, EQ4
+	.fp_eq( P2, -300.321, EQ4)
 	print P2
 	print "not "
 EQ4:	print "ok 4\\n"
@@ -1274,7 +1274,7 @@ EQ3:	print "ok 3\\n"
 	set P2, 5
 	set P3, 1010.0101
 	mul P2, P2, P3
-	eq P2, 5050, EQ4
+	.fp_eq( P2, 5050.0505, EQ4)
 	print P2
 	print "not "
 EQ4:	print "ok 4\\n"
@@ -1324,7 +1324,7 @@ EQ3:	print "ok 3\\n"
 	set P2, 300
 	set P3, 246.246
 	div P2, P2, P3
-	eq P2, 1, EQ4
+	.fp_eq( P2, 1.218293, EQ4)
 	print P2
 	print "not "
 EQ4:	print "ok 4\\n"
