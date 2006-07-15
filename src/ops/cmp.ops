@@ -95,7 +95,13 @@ op eq (in PMC, in PMC, labelconst INT) :base_core {
 }
 
 op eq (in PMC, in INT, labelconst INT) :base_core {
-  if ($1->vtable->get_integer(interpreter, $1) == $2) {
+  /*
+   * see also #34949
+   * the temp is necessary, *if* $1 isa BigInt
+   */
+  PMC *temp = pmc_new(interpreter, enum_class_Integer);
+  PMC_int_val(temp) = $2;
+  if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_EQ)) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -201,7 +207,9 @@ op ne(in PMC, in PMC, labelconst INT) :base_core {
 }
 
 op ne (in PMC, in INT, labelconst INT) :base_core {
-  if ($1->vtable->get_integer(interpreter, $1) != $2) {
+  PMC *temp = pmc_new(interpreter, enum_class_Integer);
+  PMC_int_val(temp) = $2;
+  if (! mmd_dispatch_i_pp(interpreter, $1, temp, MMD_EQ)) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -303,7 +311,9 @@ op lt (in PMC, in PMC, labelconst INT) :base_core {
 }
 
 op lt (in PMC, in INT, labelconst INT) :base_core {
-  if ($1->vtable->get_integer(interpreter, $1) < $2) {
+  PMC *temp = pmc_new(interpreter, enum_class_Integer);
+  PMC_int_val(temp) = $2;
+  if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_CMP) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -391,7 +401,9 @@ op le(in PMC, in PMC, labelconst INT) :base_core {
 }
 
 op le(in PMC, in INT, labelconst INT) :base_core {
-  if ($1->vtable->get_integer(interpreter, $1) <= $2) {
+  PMC *temp = pmc_new(interpreter, enum_class_Integer);
+  PMC_int_val(temp) = $2;
+  if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_CMP) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -452,7 +464,9 @@ op gt(in PMC, in PMC, labelconst INT) :base_core {
 }
 
 op gt(in PMC, in INT, labelconst INT) :base_core {
-  if ($1->vtable->get_integer(interpreter, $1) > $2) {
+  PMC *temp = pmc_new(interpreter, enum_class_Integer);
+  PMC_int_val(temp) = $2;
+  if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_CMP) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -513,7 +527,9 @@ op ge(in PMC, in PMC, labelconst INT) :base_core {
 }
 
 op ge(in PMC, in INT, labelconst INT) :base_core {
-  if ($1->vtable->get_integer(interpreter, $1) >= $2) {
+  PMC *temp = pmc_new(interpreter, enum_class_Integer);
+  PMC_int_val(temp) = $2;
+  if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_CMP) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();

@@ -25,7 +25,7 @@ Tests the BigInt PMC.
 =cut
 
 if ($PConfig{gmp}) {
-    plan tests => 31;
+    plan tests => 36;
 }
 else {
     plan skip_all => "No BigInt Lib configured";
@@ -797,9 +797,7 @@ CODE
 100000000000
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "BUG #34949");
-## maybe TODO
-
+pir_output_is(<<'CODE', <<'OUT', "BUG #34949 gt");
 .sub main :main
     .local pmc b
     b = new BigInt
@@ -809,6 +807,81 @@ pir_output_is(<<'CODE', <<'OUT', "BUG #34949");
     end
 ok:
     print "ok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "BUG #34949 ge");
+.sub main :main
+    .local pmc b
+    b = new BigInt
+    b = 1e10
+    if b >= 4 goto ok
+    print "never\n"
+    end
+ok:
+    print "ok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "BUG #34949 ne");
+.sub main :main
+    .local pmc b
+    b = new BigInt
+    b = 1e10
+    if b != 4 goto ok
+    print "never\n"
+    end
+ok:
+    print "ok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "BUG #34949 eq");
+.sub main :main
+    .local pmc b
+    b = new BigInt
+    b = 1e10
+    if b == 4 goto nok
+    print "ok\n"
+    end
+nok:
+    print "nok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "BUG #34949 le");
+.sub main :main
+    .local pmc b
+    b = new BigInt
+    b = 1e10
+    if b <= 4 goto nok
+    print "ok\n"
+    end
+nok:
+    print "nok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "BUG #34949 lt");
+.sub main :main
+    .local pmc b
+    b = new BigInt
+    b = 1e10
+    if b < 4 goto nok
+    print "ok\n"
+    end
+nok:
+    print "nok\n"
 .end
 CODE
 ok
