@@ -5197,8 +5197,10 @@ destroy_frame (struct macro_frame_t *frame)
     /* FIXME if frame->s.file was allocated free it */
 
     mem_sys_free(frame);
-
-    yy_switch_to_buffer(buffer);
+    
+    if (buffer != NULL) {
+        yy_switch_to_buffer(buffer);
+    }
 }
 
 static int
@@ -5579,10 +5581,22 @@ compile_file(Interp *interp, FILE *file)
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
 
     emit_open(interp, 1, NULL);
-    yyparse((void *) interp);
-    imc_compile_all_units(interp);
 
-    yy_switch_to_buffer(buffer);
+    IMCC_TRY(IMCC_INFO(interp)->jump_buf, IMCC_INFO(interp)->error_code) {
+        yyparse((void *) interp);
+        imc_compile_all_units(interp);
+    }
+    IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
+        IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
+    }
+    IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
+        IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
+    }
+    IMCC_END_TRY;
+
+    if(buffer != NULL) {
+        yy_switch_to_buffer(buffer);
+    }
 }
 
 void
@@ -5595,9 +5609,22 @@ compile_string(Interp *interp, char *s)
 
     yy_scan_string(s);
     emit_open(interp, 1, NULL);
-    yyparse((void *) interp);
-    imc_compile_all_units(interp);
-    yy_switch_to_buffer(buffer);
+    
+    IMCC_TRY(IMCC_INFO(interp)->jump_buf, IMCC_INFO(interp)->error_code) {
+        yyparse((void *) interp);
+        imc_compile_all_units(interp);
+    }
+    IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
+        IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
+    }
+    IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
+        IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
+    }
+    IMCC_END_TRY;
+
+    if(buffer != NULL) {
+        yy_switch_to_buffer(buffer);
+    }
 }
 
 void

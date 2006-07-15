@@ -23,9 +23,10 @@
 #include "pbc.h"
 #include "parser.h"
 
-static PMC * imcc_compile(Parrot_Interp interp, const char *s, int pasm);
-static const char * try_rev_cmp(Parrot_Interp, IMC_Unit * unit, char *name,
-        SymReg ** r);
+PMC * imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
+                   STRING **error_message);
+static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, char *name,
+                               SymReg **r);
 
 /*
  * P = new type, [init]
@@ -569,14 +570,15 @@ extern SymReg *cur_namespace; /* s. imcc.y */
 
 
 PMC *
-imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
+imcc_compile(Parrot_Interp interp, const char *s, int pasm_file, 
+             STRING **error_message)
 {
     /* imcc always compiles to interp->code
      * save old cs, make new
      */
     char name[64];
     struct PackFile_ByteCode *old_cs, *new_cs;
-    PMC *sub;
+    PMC *sub=NULL;
     parrot_sub_t sub_data;
     struct _imc_info_t *imc_info = NULL;
     struct parser_state_t *next;
@@ -633,23 +635,28 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     IMCC_INFO(interp)->state->next = next;
     IMCC_pop_parser_state(interp);
 
-    sub = pmc_new(interp, enum_class_Eval);
-    PackFile_fixup_subs(interp, PBC_MAIN, sub);
-    if (old_cs) {
-        /* restore old byte_code, */
-        (void)Parrot_switch_to_cs(interp, old_cs, 0);
-    }
+    if (!IMCC_INFO(interp)->error_code) {
+        sub = pmc_new(interp, enum_class_Eval);
+        PackFile_fixup_subs(interp, PBC_MAIN, sub);
+        if (old_cs) {
+            /* restore old byte_code, */
+            (void)Parrot_switch_to_cs(interp, old_cs, 0);
+        }
 
-    /*
-     * create sub PMC
-     *
-     * TODO if a sub was denoted :main return that instead
-     */
-    sub_data = PMC_sub(sub);
-    sub_data->seg = new_cs;
-    sub_data->start_offs = 0;
-    sub_data->end_offs = new_cs->base.size;
-    sub_data->name = string_from_cstring(interp, name, 0);
+        /*
+         * create sub PMC
+         *
+         * TODO if a sub was denoted :main return that instead
+         */
+        sub_data = PMC_sub(sub);
+        sub_data->seg = new_cs;
+        sub_data->start_offs = 0;
+        sub_data->end_offs = new_cs->base.size;
+        sub_data->name = string_from_cstring(interp, name, 0);
+    }
+    else {
+        *error_message = IMCC_INFO(interp)->error_message;
+    }
 
     if (imc_info) {
         IMCC_INFO(interp) = imc_info->prev;
@@ -664,26 +671,50 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     return sub;
 }
 
+/*
+ * Note: This function is provided for backward compatibility. This
+ * function can go away in future.
+ */
 PMC *
 imcc_compile_pasm(Parrot_Interp interp, const char *s)
 {
-    return imcc_compile(interp, s, 1);
+    STRING *error_message;
+    return imcc_compile(interp, s, 1, &error_message);
 }
 
+/*
+ * Note: This function is provided for backward compatibility. This
+ * function can go away in future.
+ */
 PMC *
 imcc_compile_pir (Parrot_Interp interp, const char *s)
 {
-    return imcc_compile(interp, s, 0);
+    STRING *error_message;
+    return imcc_compile(interp, s, 0, &error_message);
 }
 
+PMC *
+IMCC_compile_pir_s(Parrot_Interp interp, const char *s,
+                   STRING **error_message)
+{
+    return imcc_compile(interp, s, 0, error_message);
+}
+
+PMC *
+IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
+                    STRING **error_message)
+{
+    return imcc_compile(interp, s, 1, error_message);
+}
 
 /*
  * Compile a file by filename (can be either PASM or IMCC code)
  */
 static void *
-imcc_compile_file (Parrot_Interp interp, const char *fullname)
+imcc_compile_file (Parrot_Interp interp, const char *fullname, 
+                   STRING **error_message)
 {
-    struct PackFile_ByteCode *cs_save = interp->code, *cs;
+    struct PackFile_ByteCode *cs_save = interp->code, *cs=NULL;
     char *ext;
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;
@@ -742,7 +773,13 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname)
 
     imc_cleanup(interp);
     fclose(fp);
-    cs = interp->code;
+
+    if (!IMCC_INFO(interp)->error_code) {
+        cs = interp->code;
+    }
+    else {
+        *error_message = IMCC_INFO(interp)->error_message;    
+    }
 
     if (cs_save)
         (void)Parrot_switch_to_cs(interp, cs_save, 0);
@@ -754,12 +791,23 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname)
     return cs;
 }
 
+/*
+ * Note: This function is provided for backward compatibility. This
+ * function can go away in future.
+ */
 void *
-IMCC_compile_file (Parrot_Interp interp, const char *s)
+IMCC_compile_file(Parrot_Interp interp, const char *s) 
 {
-    return imcc_compile_file(interp, s);
+    STRING *error_message;
+    return imcc_compile_file(interp, s, &error_message);
 }
 
+void *
+IMCC_compile_file_s(Parrot_Interp interp, const char *s, 
+                   STRING **error_message)
+{
+        return imcc_compile_file(interp, s , error_message);
+}
 
 /* Register additional compilers with the interpreter */
 void

@@ -607,13 +607,34 @@ main(int argc, char * argv[])
 
         if (ast_file) {
             IMCC_ast_compile(interp, imc_yyin_get());
+            imc_compile_all_units(interp);
             imc_compile_all_units_for_ast(interp);
         }
         else {
             IMCC_INFO(interp)->state->pasm_file = pasm_file;
-            yyparse((void *) interp);
+            IMCC_TRY(IMCC_INFO(interp)->jump_buf, 
+                     IMCC_INFO(interp)->error_code) {
+                yyparse((void *) interp);
+                imc_compile_all_units(interp);
+            }
+            IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
+                IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
+                fprintf(stderr,"error:imcc:%s",
+                        string_to_cstring(interp, 
+                        IMCC_INFO(interp)->error_message));
+                IMCC_print_inc(interp);
+                Parrot_exit(IMCC_FATAL_EXCEPTION);
+            }
+            IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
+                IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
+                fprintf(stderr,"error:imcc:%s",
+                        string_to_cstring(interp, 
+                        IMCC_INFO(interp)->error_message));
+                IMCC_print_inc(interp);
+                Parrot_exit(IMCC_FATALY_EXCEPTION);
+            }
+            IMCC_END_TRY;
         }
-        imc_compile_all_units(interp);
 
         imc_cleanup(interp);
 

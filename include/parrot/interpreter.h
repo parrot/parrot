@@ -484,6 +484,12 @@ typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interpreter,
                                        const char * program );
 
 PARROT_API void Parrot_compreg(Interp * interpreter, STRING *, Parrot_compiler_func_t func);
+
+PARROT_API PMC *Parrot_compile_string(Parrot_Interp interpreter, 
+        STRING *type, char *code, STRING **error);
+PARROT_API void *Parrot_compile_file(Parrot_Interp interpreter, 
+        char *fullname, String **error);
+
 INTVAL sysinfo_i(Interp * interpreter, INTVAL info_wanted);
 STRING *sysinfo_s(Interp * interpreter, INTVAL info_wanted);
 void exec_init_prederef(Interp *interpreter,
