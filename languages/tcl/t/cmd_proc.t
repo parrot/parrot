@@ -107,11 +107,11 @@ TCL
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "redefined inlinable builtin");
-  proc incr {varName} {upvar $varName var; set var [expr {$var+2}]}
-  proc test {} { set a 1; incr a; puts $a }
+  proc incr {varName} {puts $varName}
+  proc test {} { incr a }
   test
 TCL
-3
+a
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "unknown namespace");
