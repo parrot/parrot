@@ -15,6 +15,11 @@ my @static_cmds  = pir_cmds_in_dir($static_dir);
 # subroutines that generate the PIR for Tcl commands
 my @dynamic_cmds = pir_cmds_in_dir($dynamic_dir);
 
+print " .HLL 'tcl', 'tcl_group'\n";
+
+print "  .include 'languages/tcl/$dynamic_dir/$_.pir'\n"
+    for @dynamic_cmds;
+
 print <<'END_PIR';
 
 .HLL 'tcl', 'tcl_group'
@@ -24,42 +29,12 @@ END_PIR
 
 print "  .include 'languages/tcl/$static_dir/$_.pir'\n"
     for @static_cmds;
-print "  .include 'languages/tcl/$dynamic_dir/$_.pir'\n"
-    for @dynamic_cmds;
 
 
 
 # For every builtin with an inline'd version and no interpreted version,
 # create a shim for the interpreted version that automatically calls 
 # the inline'd version, compiles the result and invokes it.
-
-print <<'END_PIR';
-
-.HLL 'Tcl', ''
-.namespace
-
-END_PIR
-
-my %static_cmds = map { $_ => 1 } @static_cmds;
-for my $cmd (@dynamic_cmds) {
-    # skip if there's a static version
-    next if $static_cmds{$cmd};
-    
-    print <<"END_PIR";
-.sub '&$cmd'
-  .param pmc argv :slurpy
-  .local pmc inlined, pir_compiler, invokable
-  .get_from_HLL(inlined, '_tcl';'builtins', '$cmd')
-  .local string pir_code
-  .local int register_num
-  (register_num,pir_code) = inlined(0,argv)
-  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
-  invokable = pir_compiler(register_num,pir_code)
-  .return invokable()
-.end
-END_PIR
-
-}
 
 sub pir_cmds_in_dir {
     my ($dir) = @_;
