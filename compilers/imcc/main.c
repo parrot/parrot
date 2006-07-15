@@ -477,8 +477,6 @@ do_pre_process(Parrot_Interp interp)
     }
 }
 
-extern void imcc_init(Parrot_Interp interp);
-
 int
 main(int argc, char * argv[])
 {
