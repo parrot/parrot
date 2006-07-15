@@ -108,6 +108,12 @@ op eq (in PMC, in INT, labelconst INT) :base_core {
 }
 
 op eq (in PMC, in NUM, labelconst INT) :base_core {
+  /* 
+   * the get_number and get_string should probably
+   * be also replaced with code like above, as
+   * overriding the compare multi subs wouldn't
+   * have any effect with the current code
+   */ 
   if ($1->vtable->get_number(interpreter, $1) == $2) {
     goto OFFSET($3);
   }
