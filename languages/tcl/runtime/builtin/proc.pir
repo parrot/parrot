@@ -21,15 +21,11 @@ Create a PIR sub on the fly for this user defined proc.
   args      = argv[1]
   body      = argv[2]
 
-  .local pmc compiler, pir_compiler, __list, __namespace, epoch
+  .local pmc compiler, pir_compiler, __list, __namespace
   .get_from_HLL(compiler,     '_tcl', 'compile')
   .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
   .get_from_HLL(__list,       '_tcl', '__list')
   .get_from_HLL(__namespace,  '_tcl', '__namespace')
-  .get_from_HLL(epoch,        '_tcl', 'epoch')
-
-  # defining a proc. update the epoch.
-  inc epoch
   
   .local pmc code, args_code, defaults
   .local string namespace
@@ -37,22 +33,41 @@ Create a PIR sub on the fly for this user defined proc.
   args_code = new 'TclCodeString'
   defaults  = new 'TclCodeString'
   namespace = ""
-  if full_name == "" goto empty
+  if full_name == "" goto create
   
   .local pmc ns
   ns   = __namespace(full_name, 1)
   name = pop ns
   
   $I0 = elements ns
-  if $I0 == 0 goto empty
+  if $I0 == 0 goto root
   $P0 = get_namespace ns
   if null $P0 goto unknown_namespace
   
   namespace = join "'; '", ns
   namespace = "['" . namespace
   namespace .= "']"
+  goto create
 
-empty:
+root:
+  # check to see if this is inlinable
+  # if it is, we need to update the epoch
+  $S0 = name
+  .get_from_HLL($P1, '_tcl'; 'builtins', $S0)
+  if null $P1 goto create
+  
+  .local pmc epoch
+  .get_from_HLL(epoch, '_tcl', 'epoch')
+  inc epoch
+
+  # now we need to delete the helper sub
+  # so we don't try to inline anything else
+  .include 'interpinfo.pasm'
+  $P1 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+  $P1 = $P1['_tcl'; 'builtins']
+  delete $P1[$S0]
+
+create:
   code.emit(<<'END_PIR', namespace, name)
 .HLL 'tcl', 'tcl_group'
 .namespace %0

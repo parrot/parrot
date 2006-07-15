@@ -30,6 +30,9 @@
   push_eh doesnt_exist
     theSub = find_global old_proc
   clear_eh
+  
+  # see if an inlinable helper sub exists
+  .get_from_HLL($P1, '_tcl'; 'builtins', old_s)
 
   # If newName is empty, then just delete
   if new_s == '' goto delete
@@ -37,10 +40,23 @@
 add:
   # Create the new sub
   store_global new_proc, theSub
+  
+  if null $P1 goto delete
+  # Create the new inlinable helper sub
+  .set_in_HLL('_tcl'; 'builtins', new_s, $P1)
 
 delete:
   null theSub
   store_global old_proc, theSub
+  
+  if null $P1 goto return
+  # Delete the old inlinable helper sub
+  .include 'interpinfo.pasm'
+  $P1 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+  $P1 = $P1['_tcl'; 'builtins']
+  delete $P1[old_s]
+
+return:
   .return('')
 
 doesnt_exist:
