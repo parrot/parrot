@@ -25,7 +25,7 @@ Tests the BigInt PMC.
 =cut
 
 if ($PConfig{gmp}) {
-    plan tests => 30;
+    plan tests => 31;
 }
 else {
     plan skip_all => "No BigInt Lib configured";
@@ -795,4 +795,21 @@ CODE
 2
 100000000000
 100000000000
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "BUG #34949");
+## maybe TODO
+
+.sub main :main
+    .local pmc b
+    b = new BigInt
+    b = 1e10
+    if b > 4 goto ok
+    print "never\n"
+    end
+ok:
+    print "ok\n"
+.end
+CODE
+ok
 OUT
