@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 
 =head1 NAME
 
@@ -614,4 +614,23 @@ EOC
 CODE
 parrot;foo
 parrot;bar
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "catch compile err");
+.sub main :main
+     push_eh handler
+     $P2 = compreg "PIR"
+     $S0 = <<"EPIR"
+  .sub foo
+     print a typo
+  .end
+EPIR
+     $P0 = $P2($S0)
+     $P0()
+     end
+handler:
+     print "ok\n"
+.end
+CODE
+ok
 OUTPUT
