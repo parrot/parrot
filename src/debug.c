@@ -564,11 +564,6 @@ PDB_cond(Interp *interpreter, const char *command)
 
     /* get the register number */
     condition->reg = atoi(++command);
-    if (condition->reg >= NUM_REGISTERS ) {
-        PIO_eprintf(interpreter, "Out-of-bounds register\n");
-        mem_sys_free(condition);
-        return NULL;
-    }
 
     /* the next argument might have no spaces between the register and the
      * condition. */
@@ -661,7 +656,7 @@ WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
         }
         /* Now we check and store the register number */
         reg_number = (int)atoi(++command);
-        if (reg_number >= (int) NUM_REGISTERS || reg_number < 0) {
+        if (reg_number < 0) {
             PIO_eprintf(interpreter, "Out-of-bounds register\n");
             mem_sys_free(condition);
             return NULL;
@@ -1145,6 +1140,9 @@ PDB_check_condition(Interp *interpreter,
     STRING *m, *n;
 
     if (condition->type & PDB_cond_int) {
+        /*
+         * TODO verify register is in range
+         */
         i = REG_INT(condition->reg);
         if (condition->type & PDB_cond_const)
             j = *(INTVAL *)condition->value;
