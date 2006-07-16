@@ -18,30 +18,46 @@ the compiler.
 Note that warnings may not just be -W flags.  Some warnings in gcc
 only show up when optimization is enabled.
 
-=head2 Static code analysis
+=head2 splint
 
-There are a number of lint-like tools out there that can do static
-code analysis.  Make targets for them.
-
-=over 4
-
-=item * splint
-
-Splint (http://www.splint.org) is a very very picky lint tool, and
+Splint (L<http://www.splint.org>) is a very very picky lint tool, and
 setup and configuration is a pain.  Andy has tried to get Perl 5
 running under it nicely, but has met with limited success.  Maybe
 the Parrot will be nicer.
 
-=item * Solaris lint
+=over 4
 
-Sun has made its dev tools freely available at
-http://developers.sun.com/prodtech/cc/.  Its lint is the best one
-out there, except from Gimpel's FlexeLint
-(http://www.gimpel.com/html/flex.htm) which costs many dollars.
+=item * Create a F<make> target for splint.
+
+Make splint run against all the F<*.c> files.
+
+=item * Make a reasonable set of rules for splint.
+
+splint spews many many errors by default.  Take a look at the
+Makefile that perl5 has for the start of some rules that Andy worked
+on for the perl5 code.
 
 =back
 
-=head2 Bounds-checkers
+=head2 Solaris lint
+
+Sun has made its dev tools freely available at
+L<http://developers.sun.com/prodtech/cc/>.  Its lint is the best one
+out there, except from Gimpel's FlexeLint
+(L<http://www.gimpel.com/html/flex.htm>) which costs many dollars.
+
+=over 4
+
+=item * Create a F<make> target for lint.
+
+Make lint run against all the F<*.c> files.
+
+=item * Make a reasonable set of rules for lint.
+
+Andy has a pretty decent set of rules for perl5's code in that
+project's Makefile.  Take a look at those for a start.
+
+=back
 
 =head2 Enforcing coding standards, naming conventions, etc
 
@@ -68,8 +84,9 @@ C<const> and its benefit would be helpful for newcomers.
 
 =head2 Decreasing the amount of repeated code
 
-PMD (http://pmd.sourceforge.net/) has been used on C code, even
-though it's a Java tool.
+PMD (L<http://pmd.sourceforge.net/>) has been used on C code, even
+though it's a Java tool.  It looks for repeated strings of tokens
+that are candidates for either functions or macros.
 
 =head2 Automated generation of C headers
 
@@ -94,13 +111,19 @@ many more.
 
 =head2 Run under valgrind
 
-Valgrind (http://valgrind.org/) is a profiler/debugger most notable
+Valgrind (L<http://valgrind.org/>) is a profiler/debugger most notable
 for the way it magically monitors memory accesses and management.
+
+=over 4
+
+=item * Make a "make valgrind" target
+
+=back
 
 =head2 Run under Coverity Prevent
 
 Coverity already runs Prevent on the Perl 5 source.  Let's get
-Parrot running under it, too. http://scan.coverity.com/
+Parrot running under it, too. L<http://scan.coverity.com/>
 
 =head2 IMCC cleanup
 
@@ -112,7 +135,7 @@ From #parrot:
 
 =head2 Helping other contributors hack their patches into Parrot-style industrial-strength C code.
 
-From chip's comment at http://www.oreillynet.com/onlamp/blog/2006/07/calling_for_parrot_janitors.html
+From chip's comment at L<http://www.oreillynet.com/onlamp/blog/2006/07/calling_for_parrot_janitors.html>
 
     We've just had contributed an improved register allocation
     implementation, but since the contributor is new to Parrot,
@@ -123,4 +146,4 @@ From chip's comment at http://www.oreillynet.com/onlamp/blog/2006/07/calling_for
 =head1 See Also
 
 Also look at F<docs/BROKEN.pod>, F<docs/ROADMAP.pod>, and
-the list of Cage items on RT: http://xrl.us/owsd (Link to rt.perl.org)
+the list of Cage items on RT: L<http://xrl.us/owsd> (Link to rt.perl.org)
