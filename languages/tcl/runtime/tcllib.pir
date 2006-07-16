@@ -91,7 +91,15 @@ providing a compreg-compatible method.
 .include 'languages/tcl/src/parser.pir'
 
 .HLL 'Tcl', 'tcl_group'
+
+# create the 'tcl' namespace
+.namespace ['tcl']
+.sub foo
+  .return()
+.end
+
 .HLL '_Tcl', ''
+.namespace
 
 .sub __load_macros :load :anon
   $P0 = compreg 'PIR'

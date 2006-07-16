@@ -297,7 +297,6 @@ namespace_loop:
   goto namespace_loop
 namespace_end:
   
-  ns = ns.get_hash_hack()
   .local pmc iter
   iter = new .Iterator, ns
 
