@@ -152,7 +152,7 @@ pmcs:
 runtime/builtins.pir: $(GENERATED_INLINES) $(DEPS) tools/gen_builtins.pl
 	$(PERL) tools/gen_builtins.pl > runtime/builtins.pir
 
-runtime/tcllib_temp.pbc: $(PARROT) runtime/builtins.pir
+runtime/tcllib_temp.pbc: $(PARROT) runtime/tcllib.pir runtime/builtins.pir
 	$(PARROT) --output=runtime/tcllib_temp.pbc runtime/tcllib.pir
 
 $(CLASSDIR)/tclbinaryops.pbc: $(PARROT) $(CLASSDIR)/tclbinaryops.pir
