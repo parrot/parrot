@@ -288,7 +288,8 @@ D: yield and other PIR improvements
 N: Kevin Falcone
 
 N: Kevin Tew
-D: Warnings fix
+D: Cardinal(Ruby on Parrot)
+D: Various Config Fixes, Compiler Warnings, etc
 
 N: Klaas-Jan Stol
 D: dynpmc and doc updates
