@@ -285,6 +285,10 @@ env_loop_done:
   $P1 = new .Integer
   $P1 = 0
   store_global 'call_level', $P1
+  # call level diff (for skipping lex pads in upvar and uplevel)
+  $P1 = new .Integer
+  $P1 = 0
+  store_global 'call_level_diff', $P1
 
   # Change counter: when something is compiled, it is compared to
   # This counter: if the counter hasn't changed since it was compiled,

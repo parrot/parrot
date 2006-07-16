@@ -37,6 +37,11 @@
   $P1 = shift argv # pop the call level argument 
 skip:
 
+  .local pmc call_level_diff, difference
+  .get_from_HLL(call_level_diff, '_tcl', 'call_level_diff')
+  difference = new .Integer
+  difference = old_call_level - new_call_level
+
   expr = ''
   i = 0
   argc = argv
@@ -55,6 +60,7 @@ loop_done:
 
   # Set the new level 
   assign call_level, new_call_level
+  call_level_diff += difference
 
   ($I0,$P0) = compiler(0,expr)
   $P1 = pir_compiler($I0,$P0)
@@ -63,6 +69,7 @@ loop_done:
   $P0 = $P1()
 
   #restore the old level
+  call_level_diff -= difference
   assign call_level, old_call_level
 
 done:

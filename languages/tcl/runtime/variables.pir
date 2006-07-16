@@ -296,7 +296,7 @@ Sets the actual variable from memory.
 
 .sub __store_var
   .param string name
-  .param pmc value
+  .param pmc    value
 
   name = '$' . name
 
@@ -322,6 +322,10 @@ global_var:
 .sub find_lex_pdd20
   .param string variable_name
 
+  .get_from_HLL($P1, '_tcl', 'call_level_diff')
+  .local int pad_depth
+  pad_depth = $P1
+
   .local pmc interp, lexpad, variable
   .local int depth
   interp = getinterp
@@ -332,10 +336,12 @@ get_lexpad:
   lexpad = interp['lexpad';depth]
   unless_null lexpad, got_lexpad
 
-  # try again
+try_again:
   inc depth
   goto get_lexpad
 got_lexpad:
+  dec pad_depth
+  unless pad_depth < 0 goto try_again
   variable = lexpad[variable_name]
   .return(variable)
 .end
@@ -344,6 +350,10 @@ got_lexpad:
   .param string variable_name
   .param pmc variable
 
+  .get_from_HLL($P1, '_tcl', 'call_level_diff')
+  .local int pad_depth
+  pad_depth = $P1
+
   .local pmc interp, lexpad, variable
   .local int depth
   interp = getinterp
@@ -354,10 +364,12 @@ get_lexpad:
   lexpad = interp['lexpad';depth]
   unless_null lexpad, got_lexpad
 
-  # try again
+try_again:
   inc depth
   goto get_lexpad
 got_lexpad:
+  dec pad_depth
+  unless pad_depth < 0 goto try_again
   lexpad[variable_name] = variable
   .return()
 .end
