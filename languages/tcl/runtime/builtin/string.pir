@@ -118,7 +118,9 @@ bad_args:
 
   .local int index_1
   .local pmc retval
-  if argv != 2 goto bad_index
+  .local int argc
+  argc = elements argv
+  if argc != 2 goto bad_index
   $S1 = argv[0]
   $S2 = argv[1]
   .local pmc string_index
@@ -333,7 +335,9 @@ bad_length:
 
   .local int index_1
 
-  if argv != 3 goto bad_range
+  .local int argc
+  argc = elements argv
+  if argc != 3 goto bad_range
   $S1 = argv[0]
   $S2 = argv[1]
   $S3 = argv[2]
