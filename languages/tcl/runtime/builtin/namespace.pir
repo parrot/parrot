@@ -275,6 +275,47 @@ bad_args:
 
   .local pmc list
   list = new .TclList
+  
+  .local pmc __namespace, ns
+  .get_from_HLL(__namespace, '_tcl', '__namespace')
+  .include 'interpinfo.pasm'
+  ns = interpinfo .INTERPINFO_NAMESPACE_ROOT
+  ns = ns['tcl']
+  
+  .local pmc ns_name
+  $S0      = argv[0]
+  ns_name  = __namespace($S0)
+  $S0      = pop ns_name
+
+  $I0 = 0
+  $I1 = elements ns_name
+namespace_loop:
+  if $I0 == $I1 goto namespace_end
+  $S0 = ns_name[$I0]
+  ns  = ns[$S0]
+  inc $I0
+  goto namespace_loop
+namespace_end:
+  
+  ns = ns.get_hash_hack()
+  .local pmc iter
+  iter = new .Iterator, ns
+
+loop:
+  unless iter goto end
+  $S0 = shift iter
+  $P0 = ns[$S0]
+  $I0 = isa $P0, "NameSpace"
+  unless $I0 goto loop
+  $P0 = $P0.'name'()
+  $S0 = shift $P0 # get rid of 'tcl'
+  $S0 = join "::", $P0
+  $S0 = "::" . $S0
+  $P0 = new .TclString
+  $P0 = $S0
+  push list, $P0
+  goto loop
+end:
 
   .return(list)
 
