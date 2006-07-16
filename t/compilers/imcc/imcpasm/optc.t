@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 # these tests are run with -Oc by TestCompiler and show
@@ -69,4 +69,29 @@ CODE
 / set I(\d), I(\d)
   set I\2, I(\d)
   set I\3, I\1/
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "tailcall 3 args", todo => 'use temp');
+.sub _main
+    foo(0, 1, 2, 3)
+.end
+.sub foo
+    .param int done
+    .param int i
+    .param int j
+    .param int k
+    unless done goto tc
+    print_item "i"
+    print_item i
+    print_item "j"
+    print_item j
+    print_item "k"
+    print_item k
+    print_newline
+    end
+tc:    
+    .return foo(1, i, k, j)
+.end
+CODE
+i 1 j 3 k 2
 OUT

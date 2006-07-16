@@ -432,7 +432,11 @@ sub _generate_functions {
                 write_code_to_file($code, $code_f);
             }
 
+            # honor opt* filename to actually run code with -Ox
             my $args = $ENV{TEST_PROG_ARGS} || '';
+            my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "";
+            $args .= " $opt";
+
             my $run_exec = 0;
             if ( $args =~ s/--run-exec// ) {
                 $run_exec = 1;
