@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is("tcl", <<'TCL', <<'OUT', 'upvar $command');
@@ -40,3 +40,12 @@ language_output_is("tcl", <<'TCL', <<'OUT', "uplevel #0");
 TCL
 42
 OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "uplevel - from one lexical to another");
+  proc add2to_a {} {uplevel {set a [expr {$a+2}]}}
+  proc test {} { set a 1; add2to_a; puts $a }
+  test
+TCL
+3
+OUT
+
