@@ -193,13 +193,13 @@ wrong # args: should be "namespace children ?name? ?pattern?"
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "namespace children, no args");
-  namespace children
+  puts [namespace children]
 TCL
 ::tcl
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "namespace children, ::");
-  namespace children ::
+  puts [namespace children ::]
 TCL
 ::tcl
 OUT
@@ -207,15 +207,15 @@ OUT
 language_output_is("tcl", <<'TCL', <<'OUT', "namespace children after eval, ordering");
   namespace eval Bob {}
   namespace eval audreyt {}
-  namespace children ::
+  puts [namespace children ::]
 TCL
 ::audreyt ::Bob ::tcl
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "namespace children, multiple levels ");
   namespace eval audreyt { namespace eval Bob {} }
-  namespace children
-  namespace children ::audreyt
+  puts [namespace children]
+  puts [namespace children ::audreyt]
 TCL
 ::audreyt ::tcl
 ::audreyt::Bob
@@ -228,14 +228,15 @@ unknown namespace "what?" in namespace children command
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "namespace children, pattern");
-  namespace children :: *t*
+  puts [namespace children :: *t*]
 TCL
 ::tcl
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "namespace children, missed pattern");
-  namespace children :: a
+  puts [namespace children :: a]
 TCL
+
 OUT
 
 
