@@ -57,8 +57,8 @@ compiled symbols.)
 Namespaces are denoted in Parrot as simple strings, multidimentional
 hash keys, or arrays of name strings.
 
-A non-nested namespace may appear in Parrot source code as the string
-C<"a"> or the key C<["a"]>.
+A namespace may appear in Parrot source code as the string C<"a"> or the
+key C<["a"]>.
 
 A nested namespace "b" inside the namespace "a" will appear as the key
 C<["a"; "b"]>.
@@ -67,25 +67,13 @@ There is no limit to namespace nesting.
 
 =head2 Naming Conventions
 
-There are many different ways to implement a namespace and Parrot's target
-languages display a wide variety of them.  By implementing an API and standard
-conventions, it should be possible to allow interoperability while still
-allowing each one to choose the best internal representation.
+Parrot's target languages have a wide variety of namespace models. By
+implementing an API and standard conventions, it should be possible to
+allow interoperability while still allowing each one to choose the best
+internal representation.
 
 
 =over 4
-
-=item HLL Root Namespaces
-
-Each HLL must store public items in a namespace named with the lowercased
-name of the HLL.  This is the HLL root namespace.  For instance, Tcl's user-
-created namespaces should live in the C<tcl> namespace.  This eliminates any
-accidental collisions between languages.
-
-This namespace must be stored at the first level in parrot's namespace
-hierarchy.  These top-level namespaces should also be specified in a standard
-unicode encoding.  The reasons for these restrictions is to allow compilers
-to remain completely ignorant of each other.
 
 =item True Root Namespace
 
@@ -94,11 +82,24 @@ via the C<get_root_namespace> opcode. For example:
 
   $P0 = get_root_namespace
 
+=item HLL Root Namespaces
+
+Each HLL must store public items in a namespace named with the lowercased
+name of the HLL.  This is the HLL root namespace.  For instance, Tcl's user-
+created namespaces should live in the C<tcl> namespace.  This eliminates any
+accidental collisions between languages.
+
+An HLL root namespace must be stored at the first level in Parrot's namespace
+hierarchy.  These top-level namespaces should also be specified in a standard
+unicode encoding.  The reasons for these restrictions is to allow compilers
+to remain completely ignorant of each other.
+
 =item HLL Implementation Namespaces
 
-Each HLL must store implementation internals (private items) in a namespace
-named with an underscore and the lowercased name of the HLL.  For instance,
-Tcl's implementation internals should live in the C<_tcl> namespace.
+Each HLL must store implementation internals (private items) in an HLL
+root namespace named with an underscore and the lowercased name of the
+HLL.  For instance, Tcl's implementation internals should live in the
+C<_tcl> namespace.
 
 =item HLL User-Created Namespaces
 
@@ -158,36 +159,34 @@ for a multi-level namespace relative to the namespace $P1.
 
     $P1 = $P2.get_global($S3)
 
-Retrieve a global variable $P1 from the namespace $P2, with the name
-$S3.
+Retrieve a symbol $P1 from the namespace $P2, with the name $S3.
 
     $P1 = $P2.get_global($P3, $S4)
 
-Retrieve a global variable $P1, with the name $S4, in a namespace
-selected by an array $P3 relative to the namespace $P2.
+Retrieve a symbol $P1, with the name $S4, from a namespace selected by an
+array $P3 relative to the namespace $P2.
 
 =item set_global
 
     $P1.set_global($S2, $P3)
 
-Store a global variable $P3, in the namespace $P1 with the name $S2.
+Store a symbol $P3, in the namespace $P1 with the name $S2.
 
     $P1.set_global($P2, $S3, $P4)
 
-Store a global variable $P4, with the name $S3, in a namespace selected
-by an array $P2 relative to the namespace $P1.  If the given namespace
-does not exist it is created.
+Store a symbol $P4, with the name $S3, in a namespace selected by an
+array $P2 relative to the namespace $P1.  If the given namespace does
+not exist it is created.
 
 =item get_name
 
     $P1 = $P2.get_name()
 
 Gets the name of the namespace $P2 as an array of strings.  For example,
-if the current language is Perl 5 and the current Perl 5 namespace is
-"Some::Module" (that's Perl 5 syntax), then get_name() on that namespace
-returns an array of "perl5", "Some", "Module". This returns the literal
-namespace names as the HLL stored them, without filtering for name
-mangling.
+if $P2 is a Perl 5 namespace "Some::Module", within the Perl 5 HLL, then
+get_name() on $P2 returns an array of "perl5", "Some", "Module". It
+returns the literal namespace names as the HLL stored them, without
+filtering for name mangling.
 
 NOTE: Due to aliasing, this value may be wrong -- i.e. it may disagree with
 the namespace name with which you found the namespace in the first place.
@@ -315,15 +314,17 @@ sigil rules, '$a::b::c' would become ['a','b','$c'].
 =item get_namespace
 
     $P1 = $P2.get_namespace($P3)
+    $P1 = $P2.get_namespace()
 
 Ask the compiler $P2 to find its namespace which is named by the
-elements of the array in $P3.  Returns a namespace PMC on success and a
-null PMC on failure.  A null PMC or an empty array retrieves the HLL's
-base namespace.
+elements of the array in $P3.  If no parameter is passed to the method,
+or if $P3 is a null PMC or an empty array, C<get_namespace> retrieves
+the base namespace for the HLL.  It returns a namespace PMC on success
+and a null PMC on failure.
 
 This method allows other HLLs to know one name (the HLL) and then work with
 that HLL's modules without having to know the name it chose for its namespace
-tree.  (If you really want to know the name, the name() method should work on
+tree.  (If you really want to know the name, the get_name() method should work on
 the returned namespace PMC.)
 
 Note that this method is basically a convenience and/or performance hack, as
