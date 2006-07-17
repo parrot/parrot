@@ -65,8 +65,6 @@ Returns the absolute value of the given number. If the given number is of
 type integer then an integer value is returned. If the given number is of type
 floating-point then a floating-point value is returned.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value = Number
@@ -79,7 +77,9 @@ Number or invalid.
 
 .sub _lang_abs :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    ret = abs value
+    .return (ret)
 .end
 
 
@@ -197,8 +197,6 @@ leading '+' or '-' or a decimal digit.
 
 The result is the parsed string converted to an integer value.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value = String
@@ -215,7 +213,18 @@ In case of a parsing error an C<invalid> value is returned.
 
 .sub _lang_parseInt :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    ret = value.parseInt()
+    .return (ret)
+L1:
+    ret = value
+    $I0 = isa value, "WmlsInteger"
+    if $I0 goto L2
+    new ret, .WmlsInvalid
+L2:
+    .return (ret)
 .end
 
 
@@ -239,8 +248,6 @@ be parsed as being part of the floating-point representation.
 
 The result is the parsed string converted to a floating-point value.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value = String
@@ -257,7 +264,25 @@ In case of a parsing error an C<invalid> value is returned.
 
 .sub _lang_parseFloat :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    ret = value.parseFloat()
+    .return (ret)
+L1:
+    ret = value
+    $I0 = isa value, "WmlsFloat"
+    if $I0 goto L2
+    $I0 = isa value, "WmlsInteger"
+    unless $I0 goto L3
+    $I0 = value
+    new ret, .WmlsFloat
+    set ret, $I0
+    goto L2
+L3:    
+    new ret, .WmlsInvalid
+L2:
+    .return (ret)
 .end
 
 
@@ -268,8 +293,6 @@ In case of a parsing error an C<invalid> value is returned.
 Returns a boolean value that is C<true> if the given value can be converted
 into an integer number by using parseInt(value). Otherwise C<false> is
 returned.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -283,7 +306,22 @@ Boolean or invalid.
 
 .sub _lang_isInt :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseInt()
+    ret = $P0.isvalid()
+    .return (ret)
+L1:
+    $I0 = isa value, "WmlsInvalid"
+    unless $I0 goto L2
+    new ret, .WmlsInvalid
+    .return (ret) 
+L2:                                             
+    new ret, .WmlsBoolean
+    $I0 = isa value, "WmlsInteger"
+    set ret, $I0
+    .return (ret)
 .end
 
 
@@ -294,8 +332,6 @@ Boolean or invalid.
 Returns a boolean value that is C<true> if the given value can be converted
 into a floating-point number using parseFloat(value). Otherwise C<false> is
 returned.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -309,7 +345,26 @@ Boolean or invalid.
 
 .sub _lang_isFloat :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseFloat()
+    ret = $P0.isvalid()
+    .return (ret)
+L1:
+    $I0 = isa value, "WmlsInvalid"
+    unless $I0 goto L2
+    new ret, .WmlsInvalid
+    .return (ret)
+L2:
+    new ret, .WmlsBoolean
+    $I0 = isa value, "WmlsFloat"
+    set ret, $I0
+    if $I0 goto L3
+    $I0 = isa value, "WmlsInteger"
+    set ret, $I0
+L3:
+    .return (ret)
 .end
 
 

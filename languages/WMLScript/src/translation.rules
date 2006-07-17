@@ -591,42 +591,42 @@ code = 20
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = add ${STACK0}, ${STACK1}
+instruction = ${DEST0} = add ${STACK1}, ${STACK0}
 
 [SUB]
 code = 21
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = sub ${STACK0}, ${STACK1}
+instruction = ${DEST0} = sub ${STACK1}, ${STACK0}
 
 [MUL]
 code = 22
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = mul ${STACK0}, ${STACK1}
+instruction = ${DEST0} = mul ${STACK1}, ${STACK0}
 
 [DIV]
 code = 23
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = div ${STACK0}, ${STACK1}
+instruction = ${DEST0} = div ${STACK1}, ${STACK0}
 
 [IDIV]
 code = 24
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = fdiv ${STACK0}, ${STACK1}
+instruction = ${DEST0} = fdiv ${STACK1}, ${STACK0}
 
 [REM]
 code = 25
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = cmod ${STACK0}, ${STACK1}
+instruction = ${DEST0} = cmod ${STACK1}, ${STACK0}
 
 ## Bitwise Instructions
 
@@ -635,21 +635,21 @@ code = 26
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = band ${STACK0}, ${STACK1}
+instruction = ${DEST0} = band ${STACK1}, ${STACK0}
 
 [B_OR]
 code = 27
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = bor ${STACK0}, ${STACK1}
+instruction = ${DEST0} = bor ${STACK1}, ${STACK0}
 
 [B_XOR]
 code = 28
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = bxor ${STACK0}, ${STACK1}
+instruction = ${DEST0} = bxor ${STACK1}, ${STACK0}
 
 [B_NOT]
 code = 29
@@ -663,21 +663,21 @@ code = 2A
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = shl ${STACK0}, ${STACK1}
+instruction = ${DEST0} = shl ${STACK1}, ${STACK0}
 
 [B_RSSHIFT]
 code = 2B
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = shr ${STACK0}, ${STACK1}
+instruction = ${DEST0} = shr ${STACK1}, ${STACK0}
 
 [B_RSZSHIFT]
 code = 2C
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = lsr ${STACK0}, ${STACK1}
+instruction = ${DEST0} = lsr ${STACK1}, ${STACK0}
 
 ## Comparison Instructions
 
@@ -686,12 +686,12 @@ code = 2D
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = iseq ${STACK0}, ${STACK1}
+#instruction = ${DEST0} = iseq ${STACK1}, ${STACK0}
 pir = <<PIR
     ${INS} = concat "  ${ITEMP0} = iseq "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat ", "
     ${INS} = concat ${STACK1}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK0}
     ${INS} = concat "\n"
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -706,12 +706,12 @@ code = 2E
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = isle ${STACK0}, ${STACK1}
+#instruction = ${DEST0} = isle ${STACK1}, ${STACK0}
 pir = <<PIR
     ${INS} = concat "  ${ITEMP0} = isle "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat ", "
     ${INS} = concat ${STACK1}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK0}
     ${INS} = concat "\n"
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -726,12 +726,12 @@ code = 2F
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = islt ${STACK0}, ${STACK1}
+#instruction = ${DEST0} = islt ${STACK1}, ${STACK0}
 pir = <<PIR
     ${INS} = concat "  ${ITEMP0} = islt "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat ", "
     ${INS} = concat ${STACK1}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK0}
     ${INS} = concat "\n"
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -746,12 +746,12 @@ code = 30
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = isge ${STACK0}, ${STACK1}
+#instruction = ${DEST0} = isge ${STACK1}, ${STACK0}
 pir = <<PIR
     ${INS} = concat "  ${ITEMP0} = isge "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat ", "
     ${INS} = concat ${STACK1}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK0}
     ${INS} = concat "\n"
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -769,9 +769,9 @@ push = 1
 #instruction = ${DEST0} = isgt ${STACK0}, ${STACK1}
 pir = <<PIR
     ${INS} = concat "  ${ITEMP0} = isgt "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat ", "
     ${INS} = concat ${STACK1}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK0}
     ${INS} = concat "\n"
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -786,12 +786,12 @@ code = 32
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = isne ${STACK0}, ${STACK1}
+#instruction = ${DEST0} = isne ${STACK1}, ${STACK0}
 pir = <<PIR
     ${INS} = concat "  ${ITEMP0} = isne "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat ", "
     ${INS} = concat ${STACK1}
+    ${INS} = concat ", "
+    ${INS} = concat ${STACK0}
     ${INS} = concat "\n"
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -829,7 +829,7 @@ code = 36
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = istrue ${STACK0}
+instruction = ${DEST0} = ${STACK0}.tobool()
 
 ## Stack Instructions
 

@@ -23,6 +23,7 @@ the WMLScript C<Invalid> type.
 
 static INTVAL dynpmc_WmlsBoolean;
 static INTVAL dynpmc_WmlsInteger;
+static INTVAL dynpmc_WmlsInvalid;
 
 pmclass WmlsInvalid
     extends Undef 
@@ -39,6 +40,8 @@ pmclass WmlsInvalid
               const_string(INTERP, "WmlsBoolean"));
             dynpmc_WmlsInteger = pmc_type(INTERP,
               const_string(INTERP, "WmlsInteger"));
+            dynpmc_WmlsInvalid = pmc_type(INTERP,
+              const_string(INTERP, "WmlsInvalid"));
         }
     }
 
@@ -57,20 +60,331 @@ Return the string "invalid".
 
 /*
 
+=item C<void increment()>
+
+=cut
+
+*/
+    void increment () {
+        return;
+    }
+
+/*
+
+=item C<void decrement ()>
+
+=cut
+
+*/
+    void decrement () {
+        return;
+    }
+
+/*
+
+=item C<PMC* absolute(PMC *dest)>
+
+=item C<void i_absolute ()>
+
+=cut
+
+*/
+    PMC* absolute (PMC* dest) {
+        return SELF;
+    }
+
+    void i_absolute () {
+            return;
+    }
+
+/*
+
+=item C<PMC* neg(PMC *dest)>
+
+=item C<void i_neg ()>
+
+=cut
+
+*/
+    PMC* neg (PMC* dest) {
+        return SELF;
+    }
+
+    void i_neg () {
+            return;
+    }
+
+/*
+
+=item C<PMC* bitwise_not(PMC *dest)>
+
+=item C<void i_bitwise_not ()>
+
+=cut
+
+*/
+    PMC* bitwise_not (PMC* dest) {
+        return SELF;
+    }
+
+    void i_bitwise_not () {
+            return;
+    }
+
+/*
+
+=item C<PMC* logical_not(PMC *dest)>
+
+=item C<void i_logical_not ()>
+
+=cut
+
+*/
+    PMC* logical_not (PMC* dest) {
+        return SELF;
+    }
+
+    void i_logical_not () {
+            return;
+    }
+
+/*
+
+=back
+
+=head2 non-Vtable Methods
+
+=over 4
+
+=item C<void add(PMC *value, PMC *dest)>
+
+=item C<void i_add(PMC *value)>
+
+=cut
+
+*/
+    PMC* add (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_add (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* subtract(PMC *value, PMC *dest)>
+
+=item C<void i_subtract(PMC *value)>
+
+=cut
+
+*/
+    PMC* subtract (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_subtract (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* multiply(PMC *value, PMC *dest)>
+
+=item C<void i_multiply(PMC *value)>
+
+=cut
+
+*/
+    PMC* multiply (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_multiply (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* divide(PMC *value, PMC *dest)>
+
+=item C<void i_divide(PMC *value)>
+
+=cut
+
+*/
+    PMC* divide (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_divide (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* floor_divide(PMC *value, PMC *dest)>
+
+=item C<void i_floor_divide(PMC *value)>
+
+=cut
+
+*/
+    PMC* floor_divide (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_floor_divide (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* cmodulus(PMC *value, PMC *dest)>
+
+=item C<void i_cmodulus(PMC *value)>
+
+=cut
+
+*/
+    PMC* cmodulus (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_cmodulus (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* bitwise_or(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_or(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_or (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_bitwise_or (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* bitwise_and(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_and(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_and (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_bitwise_and (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<void bitwise_xor(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_xor(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_xor (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_bitwise_xor (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* bitwise_shr(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_shr(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_shr (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_bitwise_shr (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* bitwise_lsr(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_lsr(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_lsr (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_bitwise_lsr (PMC* value) {
+            return;
+    }
+
+/*
+
+=item C<PMC* bitwise_shl(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_shl(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_shl (PMC* value, PMC* dest) {
+            return SELF;
+    }
+
+    void i_bitwise_shl (PMC* value) {
+            return;
+    }
+
+/*
+
 =back
 
 =head2 Specific Methods
 
 =over 4
 
-=item C<PMC* typeof (PMC* value)>
-
-return 0
+=item C<PMC* tobool ()>
 
 =cut
 
 */
-    METHOD PMC* typeof (PMC* value) {
+    METHOD PMC* tobool () {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+/*
+
+=item C<PMC* typeof ()>
+
+return 4
+
+=cut
+
+*/
+    METHOD PMC* typeof () {
         PMC *retval;
        
         retval = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -80,14 +394,14 @@ return 0
 
 /*
 
-=item C<PMC* isvalid (PMC* value)>
+=item C<PMC* isvalid ()>
 
-return true
+return false
 
 =cut
 
 */
-    METHOD PMC* isvalid (PMC* value) {
+    METHOD PMC* isvalid () {
         PMC *retval;
        
         retval = pmc_new(INTERP, dynpmc_WmlsBoolean);

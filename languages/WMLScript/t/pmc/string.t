@@ -17,7 +17,7 @@ Tests C<WmlsString> PMC
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -176,6 +176,25 @@ CODE
 1
 OUTPUT
 }
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tobool' );
+.HLL "WMLScript", "wmls_group"
+.sub _main
+    .const .WmlsString cst1 = "simple string"
+    print cst1
+    print "\n"
+    $P0 = cst1.tobool()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+simple string
+true
+WmlsBoolean
+OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check typeof' );
 .HLL "WMLScript", "wmls_group"

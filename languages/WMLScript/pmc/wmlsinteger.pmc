@@ -20,9 +20,13 @@ the WMLScript C<Integer> type.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_wmlsstring.h"
 
 static INTVAL dynpmc_WmlsBoolean;
+static INTVAL dynpmc_WmlsFloat;
 static INTVAL dynpmc_WmlsInteger;
+static INTVAL dynpmc_WmlsInvalid;
+static INTVAL dynpmc_WmlsString;
 
 pmclass WmlsInteger
     extends Integer
@@ -38,8 +42,912 @@ pmclass WmlsInteger
         if (pass) {
             dynpmc_WmlsBoolean = pmc_type(INTERP,
               const_string(INTERP, "WmlsBoolean"));
+            dynpmc_WmlsFloat = pmc_type(INTERP,
+              const_string(INTERP, "WmlsFloat"));
             dynpmc_WmlsInteger = pmc_type(INTERP,
               const_string(INTERP, "WmlsInteger"));
+            dynpmc_WmlsInvalid = pmc_type(INTERP,
+              const_string(INTERP, "WmlsInvalid"));
+            dynpmc_WmlsString = pmc_type(INTERP,
+              const_string(INTERP, "WmlsString"));
+        }
+    }
+
+/*
+
+=item C<PMC* logical_not(PMC *dest)>
+
+=item C<void i_logical_not ()>
+
+=cut
+
+*/
+    PMC* logical_not (PMC* dest) {
+        dest = pmc_new(INTERP, dynpmc_WmlsBoolean);
+        VTABLE_set_bool(INTERP, dest, ! DYNSELF.get_bool());
+        return dest;
+    }
+
+    void i_logical_not () {
+        INTVAL result = ! DYNSELF.get_bool();
+        DYNSELF.morph(dynpmc_WmlsBoolean);
+        DYNSELF.set_integer_native(result);
+    }
+
+/*
+
+=back
+
+=head2 non-Vtable Methods
+
+=over 4
+
+=item C<void add(PMC *value, PMC *dest)>
+
+=item C<void i_add(PMC *value)>
+
+=cut
+
+*/
+    PMC* add (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() + VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() + VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsFloat: {
+            FLOATVAL result = DYNSELF.get_number() + VTABLE_get_number(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+            VTABLE_set_number_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            STRING* result = string_concat(INTERP,
+                DYNSELF.get_string(),
+                VTABLE_get_string(INTERP, value), 0);
+            dest = pmc_new(INTERP, dynpmc_WmlsString);
+            VTABLE_set_string_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_add (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() + VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() + VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsFloat: {
+            FLOATVAL result = DYNSELF.get_number() + VTABLE_get_number(INTERP, value);
+            DYNSELF.morph(dynpmc_WmlsFloat);
+            DYNSELF.set_number_native(result);
+        }
+MMD_WmlsString: {
+            STRING* result = string_concat(INTERP,
+                DYNSELF.get_string(),
+                VTABLE_get_string(INTERP, value), 0);
+            DYNSELF.morph(dynpmc_WmlsString);
+            DYNSELF.set_string_native(result);
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* subtract(PMC *value, PMC *dest)>
+
+=item C<void i_subtract(PMC *value)>
+
+=cut
+
+*/
+    PMC* subtract (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() - VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() - VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsFloat: {
+            FLOATVAL result = DYNSELF.get_number() - VTABLE_get_number(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+            VTABLE_set_number_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() - VTABLE_get_integer(INTERP, trans);
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_subtract (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() - VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() - VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsFloat: {
+            FLOATVAL result = DYNSELF.get_number() - VTABLE_get_number(INTERP, value);
+            DYNSELF.morph(dynpmc_WmlsFloat);
+            DYNSELF.set_number_native(result);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() - VTABLE_get_integer(INTERP, trans);
+                DYNSELF.set_integer_native(result);
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* multiply(PMC *value, PMC *dest)>
+
+=item C<void i_multiply(PMC *value)>
+
+=cut
+
+*/
+    PMC* multiply (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() * VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() * VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsFloat: {
+            FLOATVAL result = DYNSELF.get_number() * VTABLE_get_number(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+            VTABLE_set_number_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() * VTABLE_get_integer(INTERP, trans);
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_multiply (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() * VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() * VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsFloat: {
+            FLOATVAL result = DYNSELF.get_number() * VTABLE_get_number(INTERP, value);
+            DYNSELF.morph(dynpmc_WmlsFloat);
+            DYNSELF.set_number_native(result);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() * VTABLE_get_integer(INTERP, trans);
+                DYNSELF.set_integer_native(result);
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* divide(PMC *value, PMC *dest)>
+
+=item C<void i_divide(PMC *value)>
+
+=cut
+
+*/
+    PMC* divide (PMC* value, PMC* dest) {
+MMD_WmlsFloat: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = DYNSELF.get_number() / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
+                return dest;
+            }
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_WmlsInteger: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = DYNSELF.get_number() / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
+                return dest;
+            }
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_WmlsBoolean: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = DYNSELF.get_number() / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
+                return dest;
+            }
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                FLOATVAL d = VTABLE_get_number(INTERP, trans);
+                if (d != 0.0) {
+                    FLOATVAL result = DYNSELF.get_number() / d;
+                    dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                    VTABLE_set_number_native(INTERP, dest, result);
+                    return dest;
+                }
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_divide (PMC* value) {
+MMD_WmlsFloat: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = DYNSELF.get_number() / d;
+                DYNSELF.morph(dynpmc_WmlsFloat);
+                DYNSELF.set_number_native(result);
+            }
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }            
+        }
+MMD_WmlsInteger: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = DYNSELF.get_number() / d;
+                DYNSELF.morph(dynpmc_WmlsFloat);
+                DYNSELF.set_number_native(result);
+            }
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }            
+        }
+MMD_WmlsBoolean: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = DYNSELF.get_number() / d;
+                DYNSELF.morph(dynpmc_WmlsFloat);
+                DYNSELF.set_number_native(result);
+            }
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }            
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                FLOATVAL d = VTABLE_get_integer(INTERP, trans);
+                if (d != 0.0) {
+                    FLOATVAL result = DYNSELF.get_number() / d;
+                    DYNSELF.morph(dynpmc_WmlsFloat);
+                    DYNSELF.set_number_native(result);
+                }
+                else { 
+                    DYNSELF.morph(dynpmc_WmlsInvalid);
+                }
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* floor_divide(PMC *value, PMC *dest)>
+
+=item C<void i_floor_divide(PMC *value)>
+
+=cut
+
+*/
+    PMC* floor_divide (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+            if (d != 0) {
+                INTVAL result = DYNSELF.get_integer() / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            }
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_WmlsBoolean: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+            if (d != 0) {
+                INTVAL result = DYNSELF.get_integer() / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            }
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL d = VTABLE_get_integer(INTERP, trans);
+                if (d != 0) {
+                    INTVAL result = DYNSELF.get_integer() / d;
+                    dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                    VTABLE_set_integer_native(INTERP, dest, result);
+                    return dest;
+                }
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_floor_divide (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+            if (d != 0) {
+                INTVAL result = DYNSELF.get_integer() / d;
+                DYNSELF.set_integer_native(result);
+            }
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }            
+        }
+MMD_WmlsBoolean: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+            if (d != 0) {
+                INTVAL result = DYNSELF.get_integer() / d;
+                DYNSELF.set_integer_native(result);
+            }
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }            
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL d = VTABLE_get_integer(INTERP, trans);
+                if (d != 0) {
+                    INTVAL result = DYNSELF.get_integer() / d;
+                    DYNSELF.set_integer_native(result);
+                }
+                else { 
+                    DYNSELF.morph(dynpmc_WmlsInvalid);
+                }
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* cmodulus(PMC *value, PMC *dest)>
+
+=item C<void i_cmodulus(PMC *value)>
+
+=cut
+
+*/
+    PMC* cmodulus (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+            if (d != 0) {
+                INTVAL result = DYNSELF.get_integer() % d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            }
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_WmlsBoolean: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+            if (d != 0) {
+                INTVAL result = DYNSELF.get_integer() % d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            }
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL d = VTABLE_get_integer(INTERP, trans);
+                if (d != 0) {
+                    INTVAL result = DYNSELF.get_integer() % d;
+                    dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                    VTABLE_set_integer_native(INTERP, dest, result);
+                    return dest;
+                }
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_cmodulus (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+            if (d != 0) {
+                INTVAL result = DYNSELF.get_integer() % d;
+                DYNSELF.set_integer_native(result);
+            }
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }            
+        }
+MMD_WmlsBoolean: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+            if (d != 0) {
+                INTVAL result = DYNSELF.get_integer() % d;
+                DYNSELF.set_integer_native(result);
+            }
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }            
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL d = VTABLE_get_integer(INTERP, trans);
+                if (d != 0) {
+                    INTVAL result = DYNSELF.get_integer() % d;
+                    DYNSELF.set_integer_native(result);
+                }
+                else { 
+                    DYNSELF.morph(dynpmc_WmlsInvalid);
+                }
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* bitwise_or(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_or(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_or (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, trans);
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_bitwise_or (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, trans);
+                DYNSELF.set_integer_native(result);
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* bitwise_and(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_and(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_and (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, trans);
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_bitwise_and (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, trans);
+                DYNSELF.set_integer_native(result);
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<void bitwise_xor(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_xor(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_xor (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, trans);
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_bitwise_xor (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, trans);
+                DYNSELF.set_integer_native(result);
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* bitwise_shr(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_shr(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_shr (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, trans);
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_bitwise_shr (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, trans);
+                DYNSELF.set_integer_native(result);
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* bitwise_lsr(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_lsr(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_lsr (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, trans);
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_bitwise_lsr (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, trans);
+                DYNSELF.set_integer_native(result);
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* bitwise_shl(PMC *value, PMC *dest)>
+
+=item C<void i_bitwise_shl(PMC *value)>
+
+=cut
+
+*/
+    PMC* bitwise_shl (PMC* value, PMC* dest) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, trans);
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            } 
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+MMD_DEFAULT: {
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        }
+    }
+
+    void i_bitwise_shl (PMC* value) {
+MMD_WmlsInteger: {
+            INTVAL result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsBoolean: {
+            INTVAL result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(result);
+        }
+MMD_WmlsString: {
+            PMC * trans = Parrot_WmlsString_parseInt(INTERP, value);
+            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+                INTVAL result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, trans);
+                DYNSELF.set_integer_native(result);
+            } 
+            else { 
+                DYNSELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+MMD_DEFAULT: {
+            DYNSELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
@@ -51,14 +959,29 @@ pmclass WmlsInteger
 
 =over 4
 
-=item C<PMC* typeof (PMC* value)>
+=item C<PMC* tobool ()>
+
+=cut
+
+*/
+    METHOD PMC* tobool () {
+        PMC *retval;
+       
+        retval = pmc_new(INTERP, dynpmc_WmlsBoolean);
+        PMC_int_val(retval) = VTABLE_get_bool(INTERP, SELF);
+        return retval;
+    }
+
+/*
+
+=item C<PMC* typeof ()>
 
 return 0
 
 =cut
 
 */
-    METHOD PMC* typeof (PMC* value) {
+    METHOD PMC* typeof () {
         PMC *retval;
        
         retval = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -68,14 +991,14 @@ return 0
 
 /*
 
-=item C<PMC* isvalid (PMC* value)>
+=item C<PMC* isvalid ()>
 
 return true
 
 =cut
 
 */
-    METHOD PMC* isvalid (PMC* value) {
+    METHOD PMC* isvalid () {
         PMC *retval;
        
         retval = pmc_new(INTERP, dynpmc_WmlsBoolean);

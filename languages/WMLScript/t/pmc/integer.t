@@ -17,7 +17,7 @@ Tests C<WmlsInteger> PMC
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -139,6 +139,25 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
 CODE
 42
 1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check tobool' );
+.HLL "WMLScript", "wmls_group"
+.sub _main
+    .const .WmlsInteger cst1 = "42"
+    print cst1
+    print "\n"
+    $P0 = cst1.tobool()
+    print $P0
+    print "\n"
+    $S0 = typeof $P0
+    print $S0
+    print "\n"
+.end
+CODE
+42
+true
+WmlsBoolean
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check typeof' );
