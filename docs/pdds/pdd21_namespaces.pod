@@ -314,13 +314,11 @@ sigil rules, '$a::b::c' would become ['a','b','$c'].
 =item get_namespace
 
     $P1 = $P2.get_namespace($P3)
-    $P1 = $P2.get_namespace()
 
 Ask the compiler $P2 to find its namespace which is named by the
-elements of the array in $P3.  If no parameter is passed to the method,
-or if $P3 is a null PMC or an empty array, C<get_namespace> retrieves
-the base namespace for the HLL.  It returns a namespace PMC on success
-and a null PMC on failure.
+elements of the array in $P3.  If $P3 is a null PMC or an empty array,
+C<get_namespace> retrieves the base namespace for the HLL.  It returns a
+namespace PMC on success and a null PMC on failure.
 
 This method allows other HLLs to know one name (the HLL) and then work with
 that HLL's modules without having to know the name it chose for its namespace
