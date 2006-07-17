@@ -3,25 +3,24 @@ grammar TGE::Parser;
 token start { ^ <TGE::Parser::statements>* $ }
 
 rule statements { 
-     <TGE::Parser::transrule>
-    | <TGE::Parser::grammardec>
+     <transrule>
+    | <grammardec>
 }
 
 rule grammardec {
-    grammar <TGE::Parser::type>
-    <TGE::Parser::inherit>?;
+    grammar <type> <inherit>?;
 }
 
 rule inherit {
-    is <TGE::Parser::type>
+    is <type>
 }
 
 rule transrule {
-    transform <TGE::Parser::name> 
-    \( <TGE::Parser::type> \)
-    <TGE::Parser::parent>?
-    <TGE::Parser::language>?
-    <TGE::Parser::action>
+    transform <name> 
+    \( <type> \)
+    <parent>?
+    <language>?
+    <action>
 }
     
 rule parent {

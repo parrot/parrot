@@ -31,7 +31,7 @@ structure.
     .local pmc match
     .local pmc start_rule
     start_rule = find_global "TGE::Parser", "start"
-    match = start_rule(source)
+    match = start_rule(source, 'grammar'=>'TGE::Parser')
     # Verify the parse
     $I0 = match.__get_bool()
     unless $I0 goto err_parse    # if parse fails, stop
@@ -120,9 +120,8 @@ err_no_tree:
     unless iter, iter_end         # while (entries) ...
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
-      $S2 = substr $S1, 13
 
-      result = tree.get('result', $P2, $S2)
+      result = tree.get('result', $P2, $S1)
 
       goto iter_loop
   iter_end:
@@ -144,11 +143,10 @@ err_no_tree:
       $P3 = new Undef
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
-      $S2 = substr $S1, 13
 
-      $P3 = tree.get('value', $P2, $S2)
+      $P3 = tree.get('value', $P2, $S1)
 
-      rule[$S2] = $P3
+      rule[$S1] = $P3
       goto iter_loop
   iter_end:
 
@@ -179,11 +177,10 @@ err_no_rule:
       $P3 = new Undef
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
-      $S2 = substr $S1, 13
 
-      $P3 = tree.get('value', $P2, $S2)
+      $P3 = tree.get('value', $P2, $S1)
 
-      decl[$S2] = $P3
+      decl[$S1] = $P3
       goto iter_loop
   iter_end:
     decl["build"] = "grammar"
@@ -195,7 +192,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     $P1 = node[0]
-    $P2 = $P1['TGE::Parser::type']
+    $P2 = $P1['type']
     .local pmc value
     value = tree.get('value', $P2, 'type')
     .return (value)
@@ -278,7 +275,7 @@ Compile a grammar from a source string.
     # Unnamed grammars are class 'AnonGrammar'
     .local string grammarname
     grammarname = 'AnonGrammar'
-     rule_data = self.'parse_grammar'(source)
+    rule_data = self.'parse_grammar'(source)
 
     # Construct grammar rules from the data structure of rule info
     .local pmc statement
@@ -289,17 +286,17 @@ loop_start:
     unless iter goto loop_end
         statement = shift iter
         $S0 = statement['build']
-        if $S0 == 'grammar' goto grammar_build
+      unless $S0 == 'rule' goto grammar_build
           $S1 = self.'rule_string'(statement)
           outstring .= $S1
           $S2 = self.'rule_header'(statement)
           header_string .= $S2
-    goto loop_start
+          goto loop_start
       grammar_build:
-        $S1 = self.'grammar_string'(statement)
-        outstring .= $S1
-        grammarname = statement['type']
-    goto loop_start
+          $S1 = self.'grammar_string'(statement)
+          outstring .= $S1
+          grammarname = statement['type']
+          goto loop_start
 loop_end:
 
     outstring .= "\n.sub __init :method\n"
