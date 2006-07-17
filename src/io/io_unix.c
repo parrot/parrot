@@ -696,6 +696,8 @@ PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
     if ((sock = socket(fam, type, proto)) >= 0) {
         io = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = sock;
+        memset(&io->local, 0, sizeof(struct sockaddr_in));
+        memset(&io->remote, 0, sizeof(struct sockaddr_in));
         io->remote.sin_family = fam;
         return io;
     }
@@ -733,7 +735,7 @@ AGAIN:
             io->fd, ntohs(io->remote.sin_port));
 #endif
     if ((connect(io->fd, (struct sockaddr*)&io->remote,
-                    sizeof(struct sockaddr))) != 0) {
+                    sizeof(struct sockaddr_in))) != 0) {
         switch(errno) {
             case EINTR:
                 goto AGAIN;
@@ -780,12 +782,12 @@ PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
     if (!l)
         return -1;
 
-    memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr));
+    memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr_in));
     io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
     io->local.sin_port = sa.sin_port;
 
     if ((bind(io->fd, (struct sockaddr *)&io->local,
-                    sizeof(struct sockaddr))) == -1) {
+                    sizeof(struct sockaddr_in))) == -1) {
         fprintf(stderr, "bind: errno=%d ret=-1 fd = %d port = %d\n",
              errno, (int)io->fd, (int)ntohs(io->local.sin_port));
         return -1;
@@ -840,6 +842,7 @@ PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     UNUSED(layer);
     newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
+    addrlen = sizeof(struct sockaddr_in);
     if ((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
                           &addrlen)) == -1)
     {
