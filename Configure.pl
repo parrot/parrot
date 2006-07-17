@@ -13,8 +13,8 @@ Configure.pl - Parrot's Configuration Script
 
 =head1 DESCRIPTION
 
-This is Parrot's configuration script. It should be run to create the necessary
-system-specific files before building Parrot.
+This is Parrot's configuration program. It should be run to create
+the necessary system-specific files before building Parrot.
 
 =head2 Command-line Options
 
@@ -369,7 +369,7 @@ how to build Parrot. The process is completely automated, unless you passed in
 the `--ask' flag on the command line, in which case it'll prompt you for a few
 pieces of info.
 
-Since you're running this script, you obviously have Perl 5--I'll be pulling
+Since you're running this program, you obviously have Perl 5--I'll be pulling
 some defaults from its configuration.
 END
 
