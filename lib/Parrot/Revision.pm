@@ -28,11 +28,12 @@ our $svn_entries = undef;
 
 sub __get_revision {
     return 0 unless (-e 'DEVELOPING');
-    $svn_entries = ".svn/entries";
+    my $ent = ".svn/entries";
 
     my $revision;
     # code taken from pugs/util/version_h.pl rev 859
-    if (-r $svn_entries) {
+    if (-r $ent) {
+	$svn_entries = $ent;
         open my $FH, '<', $svn_entries or die $!;
         while (<$FH>) {
             /^ *committed-rev=.(\d+)./ or next;
