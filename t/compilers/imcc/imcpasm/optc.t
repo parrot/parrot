@@ -119,7 +119,7 @@ foreach $x (@b)
     $x=~tr/ /,/;
     $y=$x;
     $y=~tr/ijk/123/;
-    pir_output_is(<<"CODE", <<"OUT", "tailcall 3 args");
+    pir_output_is(<<"CODE", <<"OUT", "tailcall 3 args $x");
 .sub _main
     foo(0, 1, 2, 3)
 .end
@@ -152,7 +152,7 @@ foreach $x (@b)
 	$x=~tr/ /,/;
 	$y=$x;
 	$y=~tr/ijkl/1234/;
-	pir_output_is(<<"CODE", <<"OUT", "tailcall 4 args");	
+	pir_output_is(<<"CODE", <<"OUT", "tailcall 4 args $x");	
 .sub _main
     foo(0, 1, 2, 3, 4)
 .end
@@ -189,7 +189,7 @@ foreach $x (@b)
     $x=~tr/ /,/;
     $y=$x;
     $y=~tr/ij/12/;
-    pir_output_is(<<"CODE", <<"OUT", "tailcall 2 args");
+    pir_output_is(<<"CODE", <<"OUT", "tailcall 2 args $x");
 .sub _main
     foo(0, 1, 2)
 .end
