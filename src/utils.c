@@ -705,7 +705,7 @@ emit_mov(reg_move_func mov, Interp * interpreter, void *info, int emit,
         if (emit_temp) {
             mov(interpreter, dest, temp, info);
         }
-        else {
+        else if (src != dest) {
             mov(interpreter, dest, src, info);
         }
     }
@@ -853,7 +853,7 @@ Parrot_register_move(Interp * interpreter, int n_regs,
     for (i = 0; i < uniq_reg_cnt; i++) {
         if (ROOT_VERTEX(reg_move_graph, uniq_reg_cnt, i) > 0) {
             if (GRAPH_ELEMENT(reg_move_graph, uniq_reg_cnt, i, i) == 1) {
-                mov(interpreter, i, i, info);
+                /* mov(interpreter, i, i, info); */
             }
             else {
                 if (CYCLE_NODE(reg_move_graph, uniq_reg_cnt, i)) {
