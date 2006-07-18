@@ -135,7 +135,7 @@ Parrot_register_HLL(Interp *interpreter,
      * ns_hash to another type, if mappings provide one
      * XXX - FIXME
      */
-    ns_hash = Parrot_make_namespace_gen(interpreter, PARROT_HLL_NONE, PMCNULL, hll_name);
+    ns_hash = Parrot_make_namespace_keyed_str(interpreter, interpreter->root_namespace, hll_name);
 
     /* cache HLLs toplevel namespace */
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, idx, ns_hash);

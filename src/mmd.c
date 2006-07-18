@@ -1632,22 +1632,18 @@ mmd_get_ns(Interp *interpreter)
     PMC *ns;
 
     ns_name = CONST_STRING(interpreter, "__parrot_core");
-    ns = Parrot_find_namespace_gen(interpreter,
-                                   PARROT_HLL_NONE, /* from global root */
-                                   PMCNULL, ns_name);
+    ns = Parrot_get_namespace_keyed_str(interpreter, interpreter->root_namespace, ns_name);
     return ns;
 }
 
 static PMC*
-mmd_create_ns(Interp *interpreter) 
+mmd_make_ns(Interp *interpreter) 
 {
     STRING *ns_name;
     PMC *ns;
 
     ns_name = CONST_STRING(interpreter, "__parrot_core");
-    ns = Parrot_make_namespace_gen(interpreter,
-                                   PARROT_HLL_NONE, /* from global root */
-                                   PMCNULL, ns_name);
+    ns = Parrot_make_namespace_keyed_str(interpreter, interpreter->root_namespace, ns_name);
     return ns;
 }
 
@@ -1795,7 +1791,7 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
     PMC *ns;
 
     table = interpreter->binop_mmd_funcs;
-    ns = mmd_create_ns(interpreter);
+    ns = mmd_make_ns(interpreter);
     if ((INTVAL)table->x < type && type < enum_class_core_max) {
         /*
          * pre-allocate the function table

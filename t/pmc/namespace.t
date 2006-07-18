@@ -449,10 +449,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
     $P3 = new .NameSpace
     $P1["Foo"] = $P3
     # fetch w array
-    $P1 = new .FixedStringArray
-    $P1 = 1
-    $P1[0] = 'Foo'
-    $P2 = get_namespace $P1
+    $P4 = new .FixedStringArray
+    $P4 = 1
+    $P4[0] = 'Foo'
+    $P2 = $P1.'get_namespace'($P4)
     $P2 = $P2.'name'()
     $I2 = elements $P2
     print $I2
@@ -461,7 +461,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
     print $S0
     print "\n"
     # fetch w key
-    $P2 = get_namespace ["Foo"]
+    $P2 = get_hll_namespace ["Foo"]
     $P2 = $P2.'name'()
     $I2 = elements $P2
     print $I2
@@ -700,7 +700,7 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "get_parent");
 .sub main :main
     .local pmc ns
-    ns = get_namespace ['Foo']
+    ns = get_hll_namespace ['Foo']
     ns = ns.'get_parent'()
     print ns
     print "\n"
@@ -772,7 +772,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace with array ('')");
+pir_output_is(<<'CODE', <<'OUTPUT', "Namespace.get_global() with array ('')");
 .namespace ['']
 
 .sub print_ok
@@ -783,11 +783,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace with array ('')");
 .namespace ['foo']
 
 .sub main :main
-  $P0 = new .ResizableStringArray
-  $P0[0] = ''
-  $P0 = get_namespace $P0
-  $P0 = find_global $P0, 'print_ok'
-  $P0()
+  $P0 = get_hll_namespace
+  $P1 = new .ResizableStringArray
+  $P1[0] = ''
+  $P1 = $P0.'get_global'($P1, 'print_ok')
+  $P1()
   end
 .end
 CODE

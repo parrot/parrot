@@ -13,23 +13,42 @@
 #if !defined(PARROT_GLOBAL_H_GUARD)
 #define PARROT_GLOBAL_H_GUARD
 
-PARROT_API PMC *Parrot_find_namespace_k(Interp *, PMC *ns_key);
-PARROT_API PMC *Parrot_find_namespace_s(Interp *, STRING *ns_name);
-PARROT_API PMC *Parrot_find_namespace_gen(Interp *, int hll_id, PMC *ns_key, STRING *ns_name);
+PARROT_API PMC *Parrot_get_namespace_keyed(     Interp *, PMC *base_ns, PMC *pmc_key);
+PARROT_API PMC *Parrot_get_namespace_keyed_str( Interp *, PMC *base_ns, STRING *str_key);
 
-PARROT_API PMC *Parrot_make_namespace_k(Interp *, PMC *ns_key);
-PARROT_API PMC *Parrot_make_namespace_s(Interp *, STRING *ns_name);
-PARROT_API PMC *Parrot_make_namespace_gen(Interp *, int hll_id, PMC *ns_key, STRING *ns_name);
+PARROT_API PMC *Parrot_make_namespace_keyed(    Interp *, PMC *base_ns, PMC *pmc_key);
+PARROT_API PMC *Parrot_make_namespace_keyed_str(Interp *, PMC *base_ns, STRING *str_key);
+
+/*
+ * {get,set}_global.
+ *
+ * Parrot_get_global allows a null namespace without throwing an exception; it
+ * simply returns PMCNULL in that case.
+ *
+ * NOTE: At present the use of the {get,set}_global functions is mandatory due to the
+ *       wacky namespace typing of the default Parrot namespace.  Eventually it will be
+ *       safe to just use the standard hash interface (if desired).
+ */
+
+PARROT_API PMC *Parrot_get_global(Interp *, PMC *ns, STRING *globname);
+PARROT_API void Parrot_set_global(Interp *, PMC *ns, STRING *globname, PMC *val);
+
+
+
+/*
+ * OLD API FOLLOWS.
+ * The below functions may be deprecated soon.
+ */
 
 PARROT_API PMC *Parrot_find_global_cur(Interp *,                STRING *globalname);
 PARROT_API PMC *Parrot_find_global_n(Interp *, PMC    *ns,      STRING *globalname);
-PARROT_API PMC *Parrot_find_global_k(Interp *, PMC    *ns_key,  STRING *globalname);
-PARROT_API PMC *Parrot_find_global_s(Interp *, STRING *ns_name, STRING *globalname);
+PARROT_API PMC *Parrot_find_global_k(Interp *, PMC    *pmc_key, STRING *globalname);
+PARROT_API PMC *Parrot_find_global_s(Interp *, STRING *str_key, STRING *globalname);
 
 PARROT_API void Parrot_store_global_cur(Interp *,                STRING *globalname, PMC *val);
 PARROT_API void Parrot_store_global_n(Interp *, PMC    *ns,      STRING *globalname, PMC *val);
-PARROT_API void Parrot_store_global_k(Interp *, PMC    *ns_key,  STRING *globalname, PMC *val);
-PARROT_API void Parrot_store_global_s(Interp *, STRING *ns_name, STRING *globalname, PMC *val);
+PARROT_API void Parrot_store_global_k(Interp *, PMC    *pmc_key, STRING *globalname, PMC *val);
+PARROT_API void Parrot_store_global_s(Interp *, STRING *str_key, STRING *globalname, PMC *val);
 
 /* helpers for opcode implementation */
 

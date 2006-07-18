@@ -76,6 +76,114 @@ op find_lex(out PMC, in STR) {
     goto NEXT();
 }
 
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Namespace opcodes
+
+=over 4
+
+=item B<get_namespace>(out PMC)
+
+Get current namespace.
+
+=item B<get_namespace>(out PMC, in KEY)
+
+=item B<get_namespace>(out PMC, in STR)
+
+Get the specified namespace relative to the current namespace. $2 is either
+an array of names or a key.  If the namespace doesn't exist, $1 is set to
+PMCNULL.
+
+=cut
+
+op get_namespace(out PMC) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    $1 = cur_ns;
+    goto NEXT();
+}
+
+op get_namespace(out PMC, in KEY) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    PMC *ns = VTABLE_get_pmc_keyed(interpreter, cur_ns, $2);
+    $1 = ns ? ns : PMCNULL;
+    goto NEXT();
+}
+
+op get_namespace(out PMC, in STR) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    PMC *ns = VTABLE_get_pmc_keyed_str(interpreter, cur_ns, $2);
+    $1 = ns ? ns : PMCNULL;
+    goto NEXT();
+}
+
+=item B<get_hll_namespace>(out PMC)
+
+Get current HLL root namespace.
+
+=item B<get_hll_namespace>(out PMC, in KEY)
+
+=item B<get_hll_namespace>(out PMC, in STR)
+
+Get the specified namespace relative to the current HLL root namespace.  $2
+is either an array of names or a key.  If the namespace doesn't exist, $1 is
+set to PMCNULL.
+
+=cut
+
+op get_hll_namespace(out PMC) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    $1 = hll_ns;
+    goto NEXT();
+}
+
+op get_hll_namespace(out PMC, in KEY) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    PMC *ns = VTABLE_get_pmc_keyed(interpreter, hll_ns, $2);
+    $1 = ns ? ns : PMCNULL;
+    goto NEXT();
+}
+
+op get_hll_namespace(out PMC, in STR) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    PMC *ns = VTABLE_get_pmc_keyed_str(interpreter, hll_ns, $2);
+    $1 = ns ? ns : PMCNULL;
+    goto NEXT();
+}
+
+=item B<get_root_namespace>(out PMC)
+
+Get interpreter root namespace.
+
+=item B<get_root_namespace>(out PMC, in KEY)
+
+=item B<get_root_namespace>(out PMC, in STR)
+
+Get the specified namespace relative to the interpreter root namespace.  $2
+is either an array of names or a key.  If the namespace doesn't exist, $1 is
+set to PMCNULL.
+
+=cut
+
+op get_root_namespace(out PMC) {
+    $1 = interpreter->root_namespace;
+    goto NEXT();
+}
+
+op get_root_namespace(out PMC, in KEY) {
+    PMC *ns = VTABLE_get_pmc_keyed(interpreter, interpreter->root_namespace, $2);
+    $1 = ns ? ns : PMCNULL;
+    goto NEXT();
+}
+
+op get_root_namespace(out PMC, in STR) {
+    PMC *ns = VTABLE_get_pmc_keyed_str(interpreter, interpreter->root_namespace, $2);
+    $1 = ns ? ns : PMCNULL;
+    goto NEXT();
+}
 
 =back
 
@@ -158,25 +266,31 @@ Null PMC, depending on current errors settings.  See B<errorson>.
 =cut
 
 op find_global(out PMC, in STR) {
-    PMC * const ns = CONTEXT(interpreter->ctx)->current_namespace;
-    $1 = Parrot_find_global_op(interpreter, ns, $2, expr NEXT());
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    $1 = Parrot_find_global_op(interpreter, cur_ns, $2, expr NEXT());
     goto NEXT();
 }
 
 op find_global(out PMC, in STR, in STR) {
-    PMC * const ns = Parrot_find_namespace_s(interpreter, $2);
+    PMC * const ns = Parrot_get_namespace_keyed_str(interpreter,
+						    Parrot_get_ctx_HLL_namespace(interpreter),
+						    $2);
     $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
 
 op find_global(out PMC, in PMC, in STR) {
-    PMC * const ns = Parrot_find_namespace_k(interpreter, $2);
+    PMC * const ns = Parrot_get_namespace_keyed(interpreter,
+						Parrot_get_ctx_HLL_namespace(interpreter),
+						$2);
     $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
 
 op find_global(out PMC, in KEY, in STR) {
-    PMC * const ns = Parrot_find_namespace_k(interpreter, $2);
+    PMC * const ns = Parrot_get_namespace_keyed(interpreter,
+						Parrot_get_ctx_HLL_namespace(interpreter),
+						$2);
     $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
@@ -197,56 +311,6 @@ op find_name(out PMC, in STR) {
     $1 = Parrot_find_name_op(interpreter, $2, expr NEXT());
     goto NEXT();
 }
-
-=item B<get_namespace>(out PMC)
-
-Get currrent namespace.
-
-=item B<get_namespace>(out PMC, in PMC)
-
-=item B<get_namespace>(out PMC, in KEY)
-
-=item B<get_namespace>(out PMC, in STR)
-
-Get the specified namespace. $2 is either an array of names or a key.
-If the namespace doesn't exist, $1 is set to PMCNULL.
-
-=back
-
-=head2 Namespace opcodes
-
-These will be moved to F<var.ops> soon.
-
-=over 4
-
-=cut
-
-op get_namespace(out PMC) {
-    $1 = CONTEXT(interpreter->ctx)->current_namespace;
-    goto NEXT();
-}
-
-op get_namespace(out PMC, in PMC) {
-    PMC *ns = VTABLE_get_pmc_keyed(interpreter,
-				   Parrot_get_ctx_HLL_namespace(interpreter), $2);
-    $1 = ns ? ns : PMCNULL;
-    goto NEXT();
-}
-
-op get_namespace(out PMC, in KEY) {
-    PMC *ns = VTABLE_get_pmc_keyed(interpreter,
-				   Parrot_get_ctx_HLL_namespace(interpreter), $2);
-    $1 = ns ? ns : PMCNULL;
-    goto NEXT();
-}
-
-op get_namespace(out PMC, in STR) {
-    PMC *ns = VTABLE_get_pmc_keyed_str(interpreter,
-				       Parrot_get_ctx_HLL_namespace(interpreter), $2);
-    $1 = ns ? ns : PMCNULL;
-    goto NEXT();
-}
-
 
 =back
 

@@ -60,6 +60,8 @@ v       JOSP     # String.trans
 v       JOS      # String.reverse
 P       JOS      # Added for os.stat
 I       JOI      # os.umask
+P       JOPS     # Namespace.get_global
+v       JOPSP	 # Namespace.set_global
 
 v	JPPP	 # infix MMD
 v	JPIP
