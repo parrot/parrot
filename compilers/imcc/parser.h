@@ -30,15 +30,22 @@ PARROT_API EXTERN int yydebug;
 
 #define KEY_BIT(argnum) (1 << (argnum))
 
+/* An opaque pointer. */
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#define YY_TYPEDEF_YY_SCANNER_T
+typedef void* yyscan_t;
+#endif
 
 SymReg * macro(Interp *, char *name);
-PARROT_API int yyerror(void *, Interp*, char *);
-PARROT_API int yyparse (void *, Interp*);
-PARROT_API int yylex(YYSTYPE *, void*, Interp*);
-PARROT_API int yylex_destroy (void *yyscanner);
-PARROT_API int yylex_init (void** scanner);
-PARROT_API int yyget_column (void * yyscanner);
-PARROT_API void yyset_column (int column_no , void *yyscanner);
+
+int yyparse (yyscan_t, Interp*);
+int yylex(YYSTYPE *, yyscan_t, Interp*);
+int yylex_init (yyscan_t*);
+int yyget_column (yyscan_t);
+void yyset_column (int column_no , yyscan_t);
+int yylex_destroy (yyscan_t);
+int yyerror(yyscan_t, Interp*, char *);
+
 void op_fullname(char * dest, const char * name, SymReg * args[], int, int);
 PARROT_API void open_comp_unit(void);
 void register_compilers(Parrot_Interp);
