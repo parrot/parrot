@@ -1253,9 +1253,6 @@ CODE
 ok
 OUTPUT
 
-TODO: {
-    local $TODO = "PIR loading is known to be broken (RT #39807)";
-
 pir_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode with .pir (RT #39807)');
 .sub main :main
     load_bytecode 'PGE.pbc'
@@ -1271,8 +1268,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode with .pir (RT #39807)');
 CODE
 "VAR1" => PMC 'PGE::Match' => "aabbb" @ 3
 OUTPUT
-
-} # TODO
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode with .pbc (RT #39807)');
 .sub main :main
