@@ -36,8 +36,6 @@
  * attached to the interpreter
  */
 
-#define YYPARSE_PARAM interp
-#define YYLEX_PARAM interp
 /*
  * Choosing instructions for Parrot is pretty easy since
  * many are polymorphic.
@@ -465,7 +463,17 @@ do_loadlib(Interp *interp, char *lib)
 
 %pure_parser
 
-%parse-param {Interp *interp}
+/* Note that we pass interp last, because Bison only passes
+   the last param to yyerror().  (Tested on bison <= 2.3)
+*/
+%parse-param {void *yyscanner, Interp *interp}
+
+/* In yylex(), we also pass in interp after yyscanner for consistency.
+   Note that this has to be done once-per-line, otherwise all but the last
+   one are discarded.  (Tested on bison <= 2.3)
+*/
+%lex-param {void *yyscanner}
+%lex-param {Interp *interp}
 
 %start program
 

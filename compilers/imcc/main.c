@@ -632,7 +632,7 @@ main(int argc, char * argv[])
             IMCC_INFO(interp)->state->pasm_file = pasm_file;
             IMCC_TRY(IMCC_INFO(interp)->jump_buf, 
                      IMCC_INFO(interp)->error_code) {
-                yyparse((void *) interp, yyscanner);
+                yyparse(yyscanner, (void *) interp);
                 imc_compile_all_units(interp);
             }
             IMCC_CATCH(IMCC_FATAL_EXCEPTION) {

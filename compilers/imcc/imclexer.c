@@ -2983,7 +2983,7 @@ static int prev_state;
 static char *heredoc_end;
 static char *heredoc_content;
 
-#define YY_DECL int yylex(YYSTYPE *valp,Interp *interp,yyscan_t yyscanner)
+#define YY_DECL int yylex(YYSTYPE *valp,yyscan_t yyscanner,Interp *interp)
 
 #define YYCHOP() (yytext[--yyleng] = '\0')
 #define DUP_AND_RET(valp, token)             \
@@ -4056,7 +4056,7 @@ YY_RULE_SETUP
 {
         int c;
 
-    c = yylex(valp,interp,yyscanner);
+    c = yylex(valp,yyscanner,interp);
     if (c != STRINGC) return c;
 
     YYCHOP();
@@ -4312,7 +4312,7 @@ YY_RULE_SETUP
         char *label;
     char *name = macros[num_macros].name;
 
-    if (yylex(valp,interp,yyscanner) != LABEL)
+    if (yylex(valp,yyscanner,interp) != LABEL)
             IMCC_fataly(interp, E_SyntaxError, "LABEL expected");
 
     if (valp) {
@@ -5623,7 +5623,7 @@ yylex_skip (YYSTYPE *valp, void *interp, const char *skip, void *yyscanner)
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
     do {
-        c = yylex(valp,interp,yyscanner);
+        c = yylex(valp,yyscanner,interp);
         p = skip;
     while (*p && c != *p) p++;
     } while (*p != '\0');
@@ -5641,7 +5641,7 @@ read_braced (YYSTYPE *valp, void *interp, const char *macro_name,
     YYSTYPE val;
 
     len = strlen(current);
-    c = yylex(&val,interp,yyscanner);
+    c = yylex(&val,yyscanner,interp);
     count = 0;
     while (c != '}' || count > 0) {
         if (c == '}')      count--;
@@ -5654,7 +5654,7 @@ read_braced (YYSTYPE *valp, void *interp, const char *macro_name,
         current = realloc(current, len + 1);
         strcat(current,val.s);
         free(val.s);
-        c = yylex(&val,interp,yyscanner);
+        c = yylex(&val,yyscanner,interp);
     }
     if (valp) *valp = val;
     else free(val.s);
@@ -5709,7 +5709,7 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
                 strcat(current,val.s);
             }
             free(val.s);
-            c = yylex(&val,interp,yyscanner);
+            c = yylex(&val,yyscanner,interp);
         }
     }
     params->name[params->num_param++] = current;
@@ -5752,7 +5752,7 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
 
         c = read_params(NULL, interp, &m->params, m->name, 1, yyscanner);
 
-        c = yylex(valp,interp,yyscanner);
+        c = yylex(valp,yyscanner,interp);
     }
 
     while (c != ENDM) {
@@ -5763,7 +5763,7 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
         strcat(temp_buffer, valp->s);
         free(valp->s);
 
-        c = yylex(valp,interp,yyscanner);
+        c = yylex(valp,yyscanner,interp);
     }
     free(valp->s);
 
@@ -6002,7 +6002,7 @@ compile_file(Interp *interp, FILE *file, void *yyscanner)
     emit_open(interp, 1, NULL);
 
     IMCC_TRY(IMCC_INFO(interp)->jump_buf, IMCC_INFO(interp)->error_code) {
-        yyparse((void *) interp, yyscanner);
+        yyparse(yyscanner, (void *) interp);
         imc_compile_all_units(interp);
     }
     IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
@@ -6031,7 +6031,7 @@ compile_string(Interp *interp, char *s, void *yyscanner)
     emit_open(interp, 1, NULL);
     
     IMCC_TRY(IMCC_INFO(interp)->jump_buf, IMCC_INFO(interp)->error_code) {
-        yyparse((void *) interp, yyscanner);
+        yyparse(yyscanner, (void *) interp);
         imc_compile_all_units(interp);
     }
     IMCC_CATCH(IMCC_FATAL_EXCEPTION) {

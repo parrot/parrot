@@ -33,9 +33,9 @@ PARROT_API EXTERN int yydebug;
 
 SymReg * macro(Interp *, char *name);
 PARROT_API int yyerror(Interp*, char *);
-PARROT_API int yyparse(void *param, void *yyscanner);
-PARROT_API int yylex(YYSTYPE *valp, Interp *, void *);
-PARROT_API int yylex_destroy (void *yyscanner );
+PARROT_API int yyparse (void *, Interp*);
+PARROT_API int yylex(YYSTYPE *, void*, Interp*);
+PARROT_API int yylex_destroy (void *yyscanner);
 PARROT_API int yylex_init (void** scanner);
 PARROT_API int yyget_column (void * yyscanner);
 PARROT_API void yyset_column (int column_no , void *yyscanner);
