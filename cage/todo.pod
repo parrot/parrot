@@ -77,7 +77,7 @@ biggest bang is always in passing pointers into functions.
 
 =item * C<const> explaining
 
-The description above is pretty sparse.  A good decscription of
+The description above is pretty sparse.  A good description of
 C<const> and its benefit would be helpful for newcomers.
 
 =back
