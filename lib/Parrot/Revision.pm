@@ -33,12 +33,14 @@ sub __get_revision {
     my $revision;
     # code taken from pugs/util/version_h.pl rev 859
     if (-r $ent) {
-	$svn_entries = $ent;
+        $svn_entries = $ent;
         open my $FH, '<', $svn_entries or die $!;
         while (<$FH>) {
             /^ *committed-rev=.(\d+)./ or next;
             $revision = $1;
+            last;
         }
+        close $FH;
     }
     elsif (my @info = qx/svk info/ and $? == 0) {
         if (my ($line) = grep /(?:file|svn|https?)\b/, @info) {
@@ -54,7 +56,7 @@ sub __get_revision {
             }
         }
     }
-    return($revision || 0);
+    return ($revision || 0);
 }
 
 our $current = __get_revision();
