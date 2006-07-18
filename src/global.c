@@ -156,35 +156,35 @@ Parrot_make_namespace_keyed_str(Interp *interp, PMC *base_ns, STRING *str_key)
 /*
 
 =item C<PMC *
-Parrot_get_global(Interp *, PMC *ns, STRING *globname)>
+Parrot_get_global(Interp *, PMC *ns, STRING *globalname)>
 
-Look up the global named C<globname> in the namespace C<ns>.  Return the
+Look up the global named C<globalname> in the namespace C<ns>.  Return the
 global, or return PMCNULL if C<ns> is null or if the global is not found.
 
 KLUDGE ALERT: Currently prefers non-namespaces in case of collision.
 
 =item C<PMC *
-Parrot_set_global(Interp *, PMC *ns, STRING *globname, PMC *val)>
+Parrot_set_global(Interp *, PMC *ns, STRING *globalname, PMC *val)>
 
-Set the global named C<globname> in the namespace C<ns> to the value C<val>.
+Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
 =cut
 
 */
 
 PMC *
-Parrot_get_global(Interp *interp, PMC *ns, STRING *globname)
+Parrot_get_global(Interp *interp, PMC *ns, STRING *globalname)
 {
     if (PMC_IS_NULL(ns))
         return PMCNULL;
 
-    return VTABLE_get_pointer_keyed_str(interp, ns, globname);
+    return VTABLE_get_pointer_keyed_str(interp, ns, globalname);
 }
 
 void
-Parrot_set_global(Interp *interp, PMC *ns, STRING *globname, PMC *val)
+Parrot_set_global(Interp *interp, PMC *ns, STRING *globalname, PMC *val)
 {
-    VTABLE_set_pmc_keyed_str(interp, ns, globname, val);
+    VTABLE_set_pmc_keyed_str(interp, ns, globalname, val);
 }
 
 

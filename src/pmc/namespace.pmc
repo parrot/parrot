@@ -371,10 +371,10 @@ by the given locator, which is either a string or an array of strings.
 
 */
 
-    METHOD PMC* get_global(PMC* nsloc, STRING* globname) {
+    METHOD PMC* get_global(PMC* nsloc, STRING* globalname) {
         return Parrot_get_global(INTERP,
 				 Parrot_get_namespace_keyed(INTERP, SELF, nsloc),
-				 globname);
+				 globalname);
     }
 
 /*
@@ -389,10 +389,10 @@ strings.
 
 */
 
-    METHOD void set_global(PMC* nsloc, STRING* globname, PMC* val) {
+    METHOD void set_global(PMC* nsloc, STRING* globalname, PMC* val) {
         Parrot_set_global(INTERP,
 			  Parrot_make_namespace_keyed(INTERP, SELF, nsloc),
-			  globname, val);
+			  globalname, val);
     }
 
 /*

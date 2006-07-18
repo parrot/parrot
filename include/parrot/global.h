@@ -30,8 +30,8 @@ PARROT_API PMC *Parrot_make_namespace_keyed_str(Interp *, PMC *base_ns, STRING *
  *       safe to just use the standard hash interface (if desired).
  */
 
-PARROT_API PMC *Parrot_get_global(Interp *, PMC *ns, STRING *globname);
-PARROT_API void Parrot_set_global(Interp *, PMC *ns, STRING *globname, PMC *val);
+PARROT_API PMC *Parrot_get_global(Interp *, PMC *ns, STRING *globalname);
+PARROT_API void Parrot_set_global(Interp *, PMC *ns, STRING *globalname, PMC *val);
 
 
 
