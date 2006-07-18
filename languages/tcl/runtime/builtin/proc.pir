@@ -41,7 +41,9 @@ Create a PIR sub on the fly for this user defined proc.
   
   $I0 = elements ns
   if $I0 == 0 goto root
-  $P0 = get_namespace ns
+  .include 'interpinfo.pasm'
+  $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+  $P0 = $P0.get_namespace(ns)
   if null $P0 goto unknown_namespace
   
   namespace = join "'; '", ns
