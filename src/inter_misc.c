@@ -90,13 +90,17 @@ Parrot_compreg(Parrot_Interp interpreter, STRING *type, Parrot_compiler_func_t f
 }
 
 /*
+
 =item C<PMC *
 Parrot_compile_string(Parrot_Interp interpreter, STRING *type, 
-                      STRING *code, String **error)
+                      STRING *code, String **error)>
 
 Compile code string.
 
+=cut
+
 */
+
 PMC *
 Parrot_compile_string(Parrot_Interp interpreter, STRING *type, 
                       char *code, STRING **error)
@@ -116,13 +120,17 @@ Parrot_compile_string(Parrot_Interp interpreter, STRING *type,
 }
 
 /*
+
 =item C<void
 Parrot_compile_file(Parrot_Interp interpreter, const char *fullname, 
-                    String **error)
+                    String **error)>
 
 Compile code file.
 
+=cut
+
 */
+
 void *
 Parrot_compile_file(Parrot_Interp interpreter, char *fullname, 
                     String **error)
