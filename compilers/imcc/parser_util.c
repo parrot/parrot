@@ -587,9 +587,6 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
         void * __ptr;
     } __ptr_u;
     INTVAL regs_used[4] = {3,3,3,3};
-    void *yyscanner;
-
-    yylex_init ( &yyscanner );
 
     /*
      * we create not yet anchored PMCs - e.g. Subs: turn off DOD
@@ -625,7 +622,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     expect_pasm = 0;
     Parrot_push_context(interp, regs_used);
 
-    compile_string(interp, const_cast(s), yyscanner);
+    compile_string(interp, const_cast(s));
 
     Parrot_pop_context(interp);
     /*
@@ -636,7 +633,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
      * set next here and pop
      */
     IMCC_INFO(interp)->state->next = next;
-    IMCC_pop_parser_state(interp, yyscanner);
+    IMCC_pop_parser_state(interp);
 
     if (!IMCC_INFO(interp)->error_code) {
         sub = pmc_new(interp, enum_class_Eval);
@@ -671,8 +668,6 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     else
         imc_cleanup(interp);
     Parrot_unblock_DOD(interp);
-
-    yylex_destroy ( yyscanner );
     return sub;
 }
 
@@ -762,26 +757,16 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
     Parrot_push_context(interp, regs_used);
 
     if (ext && strcmp (ext, ".pasm") == 0) {
-        void *yyscanner;
-        yylex_init ( &yyscanner );
-
         IMCC_INFO(interp)->state->pasm_file = 1;
         /* see imcc.l */
-        compile_file(interp, fp, yyscanner);
-
-        yylex_destroy ( yyscanner );
+        compile_file(interp, fp);
     }
     else if (ext && strcmp (ext, ".past") == 0) {
         IMCC_ast_compile(interp, fp);
     }
     else {
-        void *yyscanner;
-        yylex_init ( &yyscanner );
-
         IMCC_INFO(interp)->state->pasm_file = 0;
-        compile_file(interp, fp, yyscanner);
-
-        yylex_destroy ( yyscanner );
+        compile_file(interp, fp);
     }
     Parrot_unblock_DOD(interp);
     Parrot_pop_context(interp);

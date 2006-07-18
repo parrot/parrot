@@ -384,12 +384,9 @@ do_pre_process(Parrot_Interp interp)
 {
     int c;
     YYSTYPE val;
-    void *yyscanner;
-
-    yylex_init ( &yyscanner );
 
     IMCC_push_parser_state(interp);
-    while ( (c = yylex(&val, interp, yyscanner)) ) {
+    while ( (c = yylex(&val, interp)) ) {
         switch (c) {
             case EMIT:          printf(".emit\n"); break;
             case EOM:           printf(".eom\n"); break;
@@ -403,7 +400,7 @@ do_pre_process(Parrot_Interp interp)
             case ENDNAMESPACE:  printf(".endnamespace"); break;
             case CONST:         printf(".const "); break;
             case PARAM:         printf(".param "); break;
-            case MACRO:         yylex(&val, interp, yyscanner);
+            case MACRO:         yylex(&val, interp);
                                 break; /* swallow nl */
 
             case GOTO:          printf("goto ");break;
@@ -493,9 +490,6 @@ main(int argc, char * argv[])
     char *sourcefile;
     const char *output_file;
     Interp *interp;
-    void *yyscanner;
-
-    yylex_init ( &yyscanner );
 
     Parrot_set_config_hash();
 
@@ -529,7 +523,7 @@ main(int argc, char * argv[])
         IMCC_fatal(interp, 1, "main: No source file specified.\n" );
     }
     else if (!strcmp(sourcefile, "-")) {
-        imc_yyin_set(stdin, yyscanner);
+        imc_yyin_set(stdin);
     }
     else {
         char *ext;
@@ -539,7 +533,7 @@ main(int argc, char * argv[])
             write_pbc = 0;
         }
         else if (!load_pbc) {
-            if (!(imc_yyin_set(fopen(sourcefile, "r"), yyscanner)))    {
+            if (!(imc_yyin_set(fopen(sourcefile, "r"))))    {
                 IMCC_fatal(interp, E_IOError,
                     "Error reading source file %s.\n",
                         sourcefile);
@@ -555,7 +549,6 @@ main(int argc, char * argv[])
     if (pre_process) {
         do_pre_process(interp);
         Parrot_destroy(interp);
-        yylex_destroy(yyscanner);
         Parrot_exit(0);
     }
 
@@ -588,7 +581,7 @@ main(int argc, char * argv[])
     if (IMCC_INFO(interp)->verbose) {
         IMCC_info(interp, 1,"debug = 0x%x\n", IMCC_INFO(interp)->debug);
         IMCC_info(interp, 1,"Reading %s\n", 
-                  imc_yyin_get(yyscanner) == stdin ? "stdin":sourcefile);
+                  imc_yyin_get() == stdin ? "stdin":sourcefile);
     }
 
     /* If the input file is Parrot bytecode, then we simply read it
@@ -616,7 +609,7 @@ main(int argc, char * argv[])
         IMCC_info(interp, 1, "Starting parse...\n");
 
         if (ast_file) {
-            IMCC_ast_compile(interp, imc_yyin_get(yyscanner));
+            IMCC_ast_compile(interp, imc_yyin_get());
             imc_compile_all_units(interp);
             imc_compile_all_units_for_ast(interp);
         }
@@ -624,7 +617,7 @@ main(int argc, char * argv[])
             IMCC_INFO(interp)->state->pasm_file = pasm_file;
             IMCC_TRY(IMCC_INFO(interp)->jump_buf, 
                      IMCC_INFO(interp)->error_code) {
-                yyparse((void *) interp, yyscanner);
+                yyparse((void *) interp);
                 imc_compile_all_units(interp);
             }
             IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
@@ -648,7 +641,7 @@ main(int argc, char * argv[])
 
         imc_cleanup(interp);
 
-        fclose(imc_yyin_get(yyscanner));
+        fclose(imc_yyin_get());
 
         IMCC_info(interp, 1, "%ld lines compiled.\n", line);
         if (per_pbc)
@@ -715,7 +708,6 @@ main(int argc, char * argv[])
 
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
-    yylex_destroy(yyscanner);
     mem_sys_free(IMCC_INFO(interp));
     Parrot_exit(0);
 
