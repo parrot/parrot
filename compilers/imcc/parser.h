@@ -38,12 +38,13 @@ typedef void* yyscan_t;
 
 SymReg * macro(Interp *, char *name);
 
-int yyparse (yyscan_t, Interp*);
-int yylex(YYSTYPE *, yyscan_t, Interp*);
-int yylex_init (yyscan_t*);
+PARROT_API int yyparse (yyscan_t, Interp*);
+PARROT_API int yylex(YYSTYPE *, yyscan_t, Interp*);
+PARROT_API int yylex_init (yyscan_t*);
+PARROT_API int yylex_destroy (yyscan_t);
+
 int yyget_column (yyscan_t);
 void yyset_column (int column_no , yyscan_t);
-int yylex_destroy (yyscan_t);
 int yyerror(yyscan_t, Interp*, char *);
 
 void op_fullname(char * dest, const char * name, SymReg * args[], int, int);
