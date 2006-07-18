@@ -49,6 +49,8 @@ Markus Amsler - <markus.amsler@oribi.org>
 .const string LFLF = "\n\n"
 .const string CRCR = "\r\r"
 
+.include "stat.pasm"
+
 .sub main :main
     .local pmc sock, work, fp
     .local pmc fp               # read requested files from disk
@@ -120,6 +122,7 @@ SERVE_REQ:
     print "unknown method:'"
     print meth
     print "'\n"
+    close work
     goto NEXT
 
 SERVE_GET:
@@ -140,14 +143,14 @@ SERVE_file:
     concat url, doc_root, url
     fp = open url, "<"
     unless fp goto SERVE_404
+    len = stat url, .STAT_FILESIZE
 
-    read file_content, fp, 65535
+    read file_content, fp, len
     rep = "HTTP/1.x 200 OK"
     rep .= CRLF
     rep .= "Server: Parrot-httpd/0.1"
     rep .= CRLF
     rep .= "Content-Length: "
-    length len, file_content
     temp = to_string (len)
     rep .= temp
     rep .= CRLFCRLF
@@ -156,6 +159,7 @@ SERVE_file:
     print "served file '"
     print url
     print "'\n"
+    close work
     goto NEXT
 
 SERVE_docroot:
@@ -172,6 +176,7 @@ SERVE_docroot:
     concat rep, file_content
     send ret, work, rep
     print "Redirect to 'docs/html/index.hmtl'\n"
+    close work
     goto NEXT
 
 SERVE_favicon:
