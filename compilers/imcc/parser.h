@@ -33,8 +33,12 @@ PARROT_API EXTERN int yydebug;
 
 SymReg * macro(Interp *, char *name);
 PARROT_API int yyerror(Interp*, char *);
-PARROT_API int yyparse(void *param);
-PARROT_API int yylex(YYSTYPE *valp, Interp *);
+PARROT_API int yyparse(void *param, void *yyscanner);
+PARROT_API int yylex(YYSTYPE *valp, Interp *, void *);
+PARROT_API int yylex_destroy (void *yyscanner );
+PARROT_API int yylex_init (void** scanner);
+PARROT_API int yyget_column (void * yyscanner);
+PARROT_API void yyset_column (int column_no , void *yyscanner);
 void op_fullname(char * dest, const char * name, SymReg * args[], int, int);
 PARROT_API void open_comp_unit(void);
 void register_compilers(Parrot_Interp);
@@ -44,8 +48,8 @@ int try_find_op(Parrot_Interp, IMC_Unit *, char *, SymReg **, int, int, int);
 Instruction * multi_keyed(Interp *interpreter, IMC_Unit *, char *name,
     SymReg ** r, int nr, int keyvec, int emit);
 
-extern void compile_file(Interp *interp, FILE *file);
-extern void compile_string(Interp *interp, char *);
+extern void compile_file(Interp *interp, FILE *file, void *);
+extern void compile_string(Interp *interp, char *, void *);
 
 #endif /* PARROT_IMCC_PARSER_H_GUARD */
 
