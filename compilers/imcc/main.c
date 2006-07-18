@@ -368,11 +368,10 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
         usage(stderr);
         exit(EX_USAGE);
     }
+    /* reached the end of the option list and consumed all of argv */
     if (*argc == opt.opt_index ) {
-        char *arg = (*argv)[*argc - 1];
-        if (arg && *arg == '-' && strlen(arg) == 2) {
-            /* We are looking at "parrot -o", or maybe "parrot -o -x" */
-            fprintf(stderr, "Missing program name or argument for option %s\n", arg);
+        if (interp->output_file) {
+            fprintf(stderr, "Missing program name or argument for -o\n");
         }
         else {
             /* We are not looking at an option, so it must be a program name */
