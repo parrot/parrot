@@ -88,6 +88,47 @@ PMD (L<http://pmd.sourceforge.net/>) has been used on C code, even
 though it's a Java tool.  It looks for repeated strings of tokens
 that are candidates for either functions or macros.
 
+=head2 Automated source macros
+
+Perl5 has a lot of good source management techniques that we can use.
+
+=over 4
+
+=item * Standardizing on "interp"
+
+Standarizing on "interp" or maybe even "intr" as the interpreter
+variable, for brevity & consistency
+
+=item * Macro for interp argument
+
+A macro for declaring the interpreter argument, and maybe a macro
+for passing it
+
+BTW, our Perl experience teaches us that somebody is going to want
+to make the interpreter a C++ object for Windows environments, and
+it wouldn't hurt to make that possible, or at least work in that
+direction, as long as clarity doesn't suffer.
+
+=item * Redo CONTEXT(interp->ctx)->foo
+
+Eliminating the C<< CONTEXT(interp->ctx)->foo >> usage in favor of
+the much simpler C<< interp->ctx->foo >>, or similar simplification.
+
+=item * Parrot_xxx macros
+
+Automated processing that would make a macro to let us write
+
+    somefunc(interp,a,b,c)
+
+while the linkage is
+
+    Parrot_somefunc(interp,a,b,c)
+
+for namespace cleanup.  This is straight out of F<embed.fnc> and
+F<proto.h> in Perl5.
+
+=back
+
 =head2 Automated generation of C headers
 
 This has started significantly with the F<headerizer.pl> program.
