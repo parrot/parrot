@@ -29,8 +29,7 @@ Opcode helper functions that don't really fit elsewhere.
 
 /*
 
-=item C<INTVAL
-intval_mod(INTVAL i2, INTVAL i3)>
+=item C<INTVAL intval_mod(INTVAL i2, INTVAL i3)>
 
 NOTE: This "corrected mod" algorithm is based on the C code on page 70
 of [1]. Assuming correct behavior of the built-in mod operator (%) with
@@ -689,7 +688,7 @@ find_root(int *graph, int node_count, int src, int dest)
 
 =item C<static void
 emit_mov(reg_move_func mov, Interp *interpreter, void *info, int emit,
-          int emit_temp, int dest, int src, int temp, int * map)
+          int emit_temp, int dest, int src, int temp, int * map)>
           
    
 Emit the move instructions
