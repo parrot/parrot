@@ -68,8 +68,8 @@ PARROT_API void imc_compile_all_units_for_ast(Interp *);
 PARROT_API void imc_compile_unit(Interp *, IMC_Unit * unit);
 PARROT_API void imc_cleanup(Interp *);
 PARROT_API void imc_pragma(char * str);
-PARROT_API FILE* imc_yyin_set(FILE*);
-PARROT_API FILE* imc_yyin_get(void);
+PARROT_API FILE* imc_yyin_set(FILE*, void*);
+PARROT_API FILE* imc_yyin_get(void*);
 
 /*
  * instructions.c
@@ -182,7 +182,7 @@ typedef enum _AsmState {
 } AsmState;
 
 PARROT_API void IMCC_push_parser_state(Interp*);
-PARROT_API void IMCC_pop_parser_state(Interp*);
+PARROT_API void IMCC_pop_parser_state(Interp*, void *yyscanner);
 
 typedef struct _imc_info_t {
     struct _imc_info_t *prev;

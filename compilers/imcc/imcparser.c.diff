@@ -1,0 +1,65 @@
+#
+# This patch is a kluge to get imcparser.c working with the
+# reentrant flex (2.5.30+) interface as used in imclexer.c.
+#
+# It needs to be applied whenever imcparser.c is regenerated.
+# 
+--- imcparser.c	2006-07-18 03:13:10.000000000 -0400
++++ imcparser.c	2006-07-18 03:09:25.000000000 -0400
+@@ -1773,9 +1773,9 @@
+ /* YYLEX -- calling `yylex' with the right arguments.  */
+ 
+ #ifdef YYLEX_PARAM
+-# define YYLEX yylex (&yylval, YYLEX_PARAM)
++# define YYLEX yylex (&yylval, YYLEX_PARAM , yyscanner)
+ #else
+-# define YYLEX yylex (&yylval)
++# define YYLEX yylex (&yylval, yyscanner)
+ #endif
+ 
+ /* Enable debugging if requested.  */
+@@ -2065,15 +2065,15 @@
+ 
+ #ifdef YYPARSE_PARAM
+ # if defined (__STDC__) || defined (__cplusplus)
+-int yyparse (void *YYPARSE_PARAM);
++int yyparse (void *YYPARSE_PARAM , void *yyscanner);
+ # else
+-int yyparse ();
++int yyparse (void *yyscanner);
+ # endif
+ #else /* ! YYPARSE_PARAM */
+ #if defined (__STDC__) || defined (__cplusplus)
+-int yyparse (Interp *interp);
++int yyparse (Interp *interp, void *yyscanner);
+ #else
+-int yyparse ();
++int yyparse (void *yyscanner);
+ #endif
+ #endif /* ! YYPARSE_PARAM */
+ 
+@@ -2088,19 +2088,19 @@
+ 
+ #ifdef YYPARSE_PARAM
+ # if defined (__STDC__) || defined (__cplusplus)
+-int yyparse (void *YYPARSE_PARAM)
++int yyparse (void *YYPARSE_PARAM , void *yyscanner)
+ # else
+-int yyparse (YYPARSE_PARAM)
++int yyparse (YYPARSE_PARAM , void *yyscanner)
+   void *YYPARSE_PARAM;
+ # endif
+ #else /* ! YYPARSE_PARAM */
+ #if defined (__STDC__) || defined (__cplusplus)
+ int
+-yyparse (Interp *interp)
++yyparse (Interp *interp, void *yyscanner)
+ #else
+ int
+-yyparse (interp)
+-    Interp *interp;
++yyparse (interp, yyscanner)
++    Interp *interp, void *yyscanner;
+ #endif
+ #endif
+ {
