@@ -369,7 +369,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
         exit(EX_USAGE);
     }
     if (*argc == opt.opt_index ) {
-        fprintf(stderr, "Missing option value or program name\n");
+        fprintf(stderr, "Option %s expects an argument\n", (*argv)[*argc - 1]);
         usage(stderr);
         exit(EX_USAGE);
     }
