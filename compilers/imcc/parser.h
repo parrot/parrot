@@ -32,7 +32,7 @@ PARROT_API EXTERN int yydebug;
 
 
 SymReg * macro(Interp *, char *name);
-PARROT_API int yyerror(Interp*, char *);
+PARROT_API int yyerror(void *, Interp*, char *);
 PARROT_API int yyparse (void *, Interp*);
 PARROT_API int yylex(YYSTYPE *, void*, Interp*);
 PARROT_API int yylex_destroy (void *yyscanner);

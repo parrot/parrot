@@ -466,14 +466,10 @@ do_loadlib(Interp *interp, char *lib)
 /* Note that we pass interp last, because Bison only passes
    the last param to yyerror().  (Tested on bison <= 2.3)
 */
-%parse-param {void *yyscanner, Interp *interp}
-
-/* In yylex(), we also pass in interp after yyscanner for consistency.
-   Note that this has to be done once-per-line, otherwise all but the last
-   one are discarded.  (Tested on bison <= 2.3)
-*/
-%lex-param {void *yyscanner}
-%lex-param {Interp *interp}
+%parse-param {void *yyscanner}
+%lex-param   {void *yyscanner}
+%parse-param {Interp *interp}
+%lex-param   {Interp *interp}
 
 %start program
 
@@ -1463,7 +1459,7 @@ string:
 %%
 
 
-int yyerror(Interp *interp, char * s)
+int yyerror(void *yyscanner, Interp *interp, char * s)
 {
     /* support bison 1.75, convert 'parse error to syntax error' */
     if (!memcmp(s, "parse", 5))
