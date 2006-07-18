@@ -22,6 +22,11 @@ Opcode helper functions that don't really fit elsewhere.
 
 #include "parrot/parrot.h"
 
+#define GRAPH_ELEMENT(PTR,REGS,X,Y)  (PTR)[((Y) * ((REGS) + 3)) + (X)]
+#define ROOT_VERTEX(PTR,REGS,Y)      GRAPH_ELEMENT(PTR,REGS,REGS+0,Y)
+#define REG_MOVE_VAL(PTR,REGS,Y)     GRAPH_ELEMENT(PTR,REGS,REGS+1,Y)
+#define CYCLE_NODE(PTR,REGS,Y)        GRAPH_ELEMENT(PTR,REGS,REGS+2,Y)
+
 /*
 
 =item C<INTVAL
@@ -629,6 +634,128 @@ Parrot_byte_rindex(Interp *interpreter, const STRING *base,
 }
 
 /*
+  
+=item C<static int
+find_first_indegree(int *graph,int node_count, int dest)>
+  
+Finds the first indegree for the given node.
+   
+=cut
+      
+*/
+static int
+find_first_indegree(int *graph, int node_count, int dest)
+{
+    int i = 0;
+    for (i = 0; i < node_count; i++) {
+        if (GRAPH_ELEMENT(graph, node_count, i, dest) > 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/*
+ 
+=item C<static int
+find_root(int *graph ,int node_count, int src, int dest)>
+          
+Finds the root vertex of the graph.
+
+=cut
+
+*/
+static int
+find_root(int *graph, int node_count, int src, int dest)
+{
+    int in_degree;
+    if (GRAPH_ELEMENT(graph, node_count, src, dest) == 2) {
+        CYCLE_NODE(graph, node_count, dest) = 1;    
+        GRAPH_ELEMENT(graph, node_count, src, dest) = 1;
+        return dest;
+    }
+    ROOT_VERTEX(graph, node_count, src) = 0;
+    GRAPH_ELEMENT(graph, node_count, src, dest) = 2;
+    in_degree = find_first_indegree(graph, node_count, src);
+    if (in_degree == -1) {
+        ROOT_VERTEX(graph, node_count, dest) = 0;
+        GRAPH_ELEMENT(graph, node_count, src, dest) = 1;
+        return src;
+    }
+    return find_root(graph, node_count, in_degree, src);
+}
+
+/*
+
+=item C<static void
+emit_mov(reg_move_func mov, Interp *interpreter, void *info, int emit,
+          int emit_temp, int dest, int src, int temp, int * map)
+          
+   
+Emit the move instructions
+  
+=cut
+       
+*/
+static void
+emit_mov(reg_move_func mov, Interp * interpreter, void *info, int emit,
+         int emit_temp, int dest, int src, int temp)
+{
+    if (emit > -1) {
+        if (emit_temp) {
+            mov(interpreter, dest, temp, info);
+        }
+        else {
+            mov(interpreter, dest, src, info);
+        }
+    }
+}
+
+/*
+ 
+=item C<static int
+reorder_move(int *graph, INT node_count, int *map, INT * val,
+             int src, int prev, int depth, reg_move_func mov,
+             Interp *interpreter, void *info, int temp)>
+                          
+   
+This method reorders the move operations.OA
+   
+=cut
+       
+*/
+static int
+reorder_move(int *graph, int node_count, int src, int prev, int depth, 
+            reg_move_func mov, Interp * interpreter, void *info, int temp)
+{
+    int i, x;
+    REG_MOVE_VAL(graph, node_count, src) = 1;
+  
+    for (i = 0; i < node_count; i++) {
+        if (GRAPH_ELEMENT(graph, node_count, src, i) > 0) {
+            if (REG_MOVE_VAL(graph, node_count, i) == 1) {
+                emit_mov(mov, interpreter, info, prev, 0, i, src, temp);
+                emit_mov(mov, interpreter, info, prev, depth <= 1, src, prev,
+                         temp);
+                return 1;
+            }
+            if (REG_MOVE_VAL(graph, node_count, i) != 2) {
+                depth++;
+                x = reorder_move(graph, node_count, i, src, depth,
+                                     mov, interpreter, info, temp);
+                depth--;
+                emit_mov(mov, interpreter, info, prev,
+                         x && (depth <= 1), src, prev, temp);
+                return x;
+            }
+        }
+    }
+    REG_MOVE_VAL(graph, node_count, src) = 2;
+    emit_mov(mov, interpreter, info, prev, 0, src, prev, temp);
+    return 0;
+}
+
+/*
 
 =item C<typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);>
 
@@ -676,29 +803,71 @@ To handle such cases, we do:
 
 The amount of register moves should of course be minimal.  
 
-TODO add a define, if it's implemented so that we can start filling the gaps
+TODO The current implementation will not work for following cases
 
+Talked to Leo and he said those cases are not likely (Vishal Soni).
+1. I0->I1 I1->I0 I0->I3
+2. I1->I2 I3->I2
+
+TODO: Add tests for the above conditions.
 =cut
-
+  
 */
-
-void 
-Parrot_register_move(Interp *interpreter, int n_regs,
-        unsigned char *dest_regs, unsigned char *src_regs,
-        unsigned char temp_reg, 
-        reg_move_func mov, 
-        reg_move_func mov_alt, 
-        void *info)
+void
+Parrot_register_move(Interp * interpreter, int n_regs,
+                     unsigned char *dest_regs, unsigned char *src_regs,
+                     unsigned char temp_reg,
+                     reg_move_func mov, reg_move_func mov_alt, void *info)
 {
-    int i;
-    /* TODO */
+    int i, uniq_reg_cnt;
+    int *reg_move_graph;
+    uniq_reg_cnt=0;
 
-    /* brute force and wrong */
-    for (i = 0; i < n_regs; ++i) {
-        if (dest_regs[i] != src_regs[i])
-            mov(interpreter, dest_regs[i], src_regs[i], info);
+    if (n_regs == 0)
+        return;
+
+    for (i = 0; i < n_regs; i++) {
+        if (src_regs[i] > uniq_reg_cnt) {
+            uniq_reg_cnt=src_regs[i];
+        }
+        
+        if (dest_regs[i] > uniq_reg_cnt) {
+            uniq_reg_cnt=dest_regs[i];
+        }   
     }
+    uniq_reg_cnt++;
+    
+    reg_move_graph = (int *)
+        mem_sys_allocate_zeroed(sizeof(int) * uniq_reg_cnt *
+                                (uniq_reg_cnt + 3));
+
+    for (i = 0; i < n_regs; i++) {
+        GRAPH_ELEMENT(reg_move_graph, uniq_reg_cnt, src_regs[i],
+                      dest_regs[i]) = 1;
+        ROOT_VERTEX(reg_move_graph, uniq_reg_cnt,
+                    find_root(reg_move_graph, uniq_reg_cnt, src_regs[i],
+                              dest_regs[i])) = 1;
+        GRAPH_ELEMENT(reg_move_graph, uniq_reg_cnt, src_regs[i],
+                      dest_regs[i]) = 1;
+    }
+    for (i = 0; i < uniq_reg_cnt; i++) {
+        if (ROOT_VERTEX(reg_move_graph, uniq_reg_cnt, i) > 0) {
+            if (GRAPH_ELEMENT(reg_move_graph, uniq_reg_cnt, i, i) == 1) {
+                mov(interpreter, i, i, info);
+            }
+            else {
+                if (CYCLE_NODE(reg_move_graph, uniq_reg_cnt, i)) {
+                    mov(interpreter, temp_reg, i, info);
+                }
+                reorder_move(reg_move_graph, uniq_reg_cnt, i, -1, 0, mov,
+                         interpreter, info, temp_reg);
+            }
+        }
+    }
+
+    mem_sys_free(reg_move_graph);
 }
+
 
 /*
 
