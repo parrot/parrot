@@ -115,15 +115,15 @@ imcc_version(void)
     int rev = PARROT_REVISION;
     printf("This is parrot version " PARROT_VERSION);
     if (rev != 0)
-	printf(" (r%d)", rev);
+        printf(" (r%d)", rev);
     printf(" built for " PARROT_ARCHNAME ".\n");
     rev = Parrot_revision();
     if (PARROT_REVISION != rev) {
-	printf( "Warning: runtime has revision %d!\n", rev );
+        printf( "Warning: runtime has revision %d!\n", rev );
     }
     rev = Parrot_config_revision();
     if (PARROT_REVISION != rev) {
-	printf( "Warning: used Configure.pl revision %d!\n", rev );
+        printf( "Warning: used Configure.pl revision %d!\n", rev );
     }
     printf("Copyright (C) 2001-2006, The Perl Foundation.\n\
 \n\
@@ -198,8 +198,8 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
     if (*argc == 1) {
-	usage(stderr);
-	exit(1);
+        usage(stderr);
+        exit(1);
     }
     run_pbc = 1;
 
@@ -365,6 +365,11 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
     }
     if (status == -1) {
         fprintf(stderr, "%s\n", opt.opt_error);
+        usage(stderr);
+        exit(EX_USAGE);
+    }
+    if (*argc == opt.opt_index ) {
+        fprintf(stderr, "Missing option value or program name\n");
         usage(stderr);
         exit(EX_USAGE);
     }
