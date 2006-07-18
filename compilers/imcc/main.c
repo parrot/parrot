@@ -369,7 +369,15 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
         exit(EX_USAGE);
     }
     if (*argc == opt.opt_index ) {
-        fprintf(stderr, "Option %s expects an argument\n", (*argv)[*argc - 1]);
+        char *arg = (*argv)[*argc - 1];
+        if (arg && *arg == '-' && strlen(arg) == 2) {
+            /* We are looking at "parrot -o", or maybe "parrot -o -x" */
+            fprintf(stderr, "Missing program name or argument for option %s\n", arg);
+        }
+        else {
+            /* We are not looking at an option, so it must be a program name */
+            fprintf(stderr, "Missing program name\n");
+        }
         usage(stderr);
         exit(EX_USAGE);
     }
