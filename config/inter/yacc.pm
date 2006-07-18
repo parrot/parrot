@@ -26,6 +26,8 @@ $description = "Determining whether $util is installed";
 $prompt      = "Do you have a parser generator, like bison or yacc?";
 @args        = qw( yacc ask maintainer );
 
+my ($bison_major, $bison_minor) = (2, 0);
+
 sub runstep
 {
     my ($self, $conf) = @_;
@@ -52,7 +54,7 @@ sub runstep
     # the user is responsible for the consequences.
     if (defined $prog) {
         $conf->data->set($util => $prog);
-        $self->set_result('yes');
+        $self->set_result('user defined');
         return $self;
     }
 
@@ -60,9 +62,8 @@ sub runstep
 
     unless ($prog) {
 
-        # fall back to default
-        $self->set_result('no');
-        return $self;
+      $self->set_result('no yacc program was found');
+      return;
     }
 
     if ($conf->options->get('ask')) {
@@ -76,18 +77,26 @@ sub runstep
     if ($ret == -1 and !$conf->options->get('ask')) {
 
         # fall back to default
-        $self->set_result('no');
-        return $self;
+      $self->set_result('yacc program does not exist or does not understand --version');
+      return;
     }
 
     # if '--version' returns a string assume that this is bison.
     # if this is bison pretending to be yacc '--version' doesn't work
     if ($stdout =~ /Bison .*? (\d+) \. (\d+) (\w)? /x) {
-        $conf->data->set(bison_version => $3 ? "$1.$2$3" : "$1.$2");
+      # later we might need to check $3 also.
+      unless ($1 >= $bison_major && $2 >= $bison_minor) {
+        $self->set_result("found bison version $1.$2 but at least $bison_major.$bison_minor is required");
+        return;
+      }
+      $conf->data->set(bison_version => $3 ? "$1.$2$3" : "$1.$2");
+      $self->set_result($3 ? "bison $1.$2$3" : "bison $1.$2");
+      $conf->data->set($util => $prog);
+    } else {
+      $self->set_result(
+            'yacc program does not exist or does not understand --version');
+      return;
     }
-
-    $conf->data->set($util => $prog);
-    $self->set_result('yes');
 
     return $self;
 }
