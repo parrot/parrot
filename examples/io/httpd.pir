@@ -44,6 +44,11 @@ Markus Amsler - <markus.amsler@oribi.org>
 
 =cut
 
+.const string CRLF = "\r\n"
+.const string CRLFCRLF = "\r\n\r\n"
+.const string LFLF = "\n\n"
+.const string CRCR = "\r\r"
+
 .sub main :main
     .local pmc sock, work, fp
     .local pmc fp               # read requested files from disk
@@ -83,15 +88,15 @@ MORE:
 
     if ret <= 0 goto SERVE_REQ
     concat req, buf
-    index pos, req, "\r\n\r\n"
+    index pos, req, CRLFCRLF
     # print "\npos1:"
     # print pos
     if pos >= 0 goto SERVE_REQ
-    index pos, req, "\n\n"
+    index pos, req, LFLF
     # print "\npos2:"
     # print pos
     if pos >= 0 goto SERVE_REQ
-    index pos, req, "\r\r"
+    index pos, req, CRCR
     # print "\npos3:"
     # print pos
     if pos >= 0 goto SERVE_REQ
@@ -137,14 +142,16 @@ SERVE_file:
     unless fp goto SERVE_404
 
     read file_content, fp, 65535
-    rep = "HTTP/1.x 200 OK\n"
-    concat rep, "Server: Parrot-httpd/0.1\n"
-    concat rep, "Content-Length: "
+    rep = "HTTP/1.x 200 OK"
+    rep .= CRLF
+    rep .= "Server: Parrot-httpd/0.1"
+    rep .= CRLF
+    rep .= "Content-Length: "
     length len, file_content
     temp = to_string (len)
-    concat rep, temp
-    concat rep, "\n\n"
-    concat rep, file_content
+    rep .= temp
+    rep .= CRLFCRLF
+    rep .= file_content
     send ret, work, rep
     print "served file '"
     print url
@@ -152,12 +159,16 @@ SERVE_file:
     goto NEXT
 
 SERVE_docroot:
-    rep = "HTTP1/1 301 Moved Permamently\nLocation: /docs/html/index.html\nContent-Length: "
+    rep = 'HTTP1/1 301 Moved Permamently'
+    rep .= CRLF
+    rep .= 'Location: /docs/html/index.html'
+    rep .= CRLF
+    rep .= 'Content-Length: '
     file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>." 
     length len, file_content
     temp = to_string (len)
     concat rep, temp
-    concat rep, "\n\n"
+    concat rep, CRLFCRLF
     concat rep, file_content
     send ret, work, rep
     print "Redirect to 'docs/html/index.hmtl'\n"
@@ -168,7 +179,17 @@ SERVE_favicon:
     goto SERVE_file
 
 SERVE_404:
-    rep = "HTTP1/1 404 Not Found\nContent-Length: 3\n\n404\n"
+    $S0 = '404 Not found'
+    $I0 = length $S0
+    rep = 'HTTP1/1 404 Not Found'
+    rep .= CRLF
+    rep .= 'Content-Length: '
+    $S1 = $I0
+    rep .= $S1
+    rep .= CRLF
+    rep .= 'Content-Type: text/plain'
+    rep .= CRLFCRLF
+    rep .= $S0
     print "File not found: '"
     print url
     print "'\n"
