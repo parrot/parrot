@@ -55,6 +55,46 @@ pmclass WmlsInteger
 
 /*
 
+=item C<PMC* neg(PMC *dest)>
+
+=item C<void i_neg ()>
+
+=cut
+
+*/
+    PMC* neg (PMC* dest) {
+        dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+        PMC_int_val(dest) = - DYNSELF.get_integer();
+        return dest;
+    }
+
+    void i_neg () {
+        INTVAL result = - DYNSELF.get_integer();
+        DYNSELF.set_integer_native(result);
+    }
+
+/*
+
+=item C<PMC* bitwise_not(PMC *dest)>
+
+=item C<void i_bitwise_not ()>
+
+=cut
+
+*/
+    PMC* bitwise_not (PMC* dest) {
+        dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+        PMC_int_val(dest) = ~ DYNSELF.get_integer();
+        return dest;
+    }
+
+    void i_bitwise_not () {
+        INTVAL result = ~ DYNSELF.get_integer();
+        DYNSELF.set_integer_native(result);
+    }
+
+/*
+
 =item C<PMC* logical_not(PMC *dest)>
 
 =item C<void i_logical_not ()>

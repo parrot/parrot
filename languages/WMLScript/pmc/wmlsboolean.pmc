@@ -159,6 +159,26 @@ Return the string "true" or "false".
 
 /*
 
+=item C<PMC* logical_not(PMC *dest)>
+
+=item C<void i_logical_not ()>
+
+=cut
+
+*/
+    PMC* logical_not (PMC* dest) {
+        dest = pmc_new(INTERP, dynpmc_WmlsBoolean);
+        VTABLE_set_bool(INTERP, dest, ! DYNSELF.get_bool());
+        return dest;
+    }
+
+    void i_logical_not () {
+        INTVAL result = ! DYNSELF.get_bool();
+        DYNSELF.set_integer_native(result);
+    }
+
+/*
+
 =back
 
 =head2 non-Vtable Methods

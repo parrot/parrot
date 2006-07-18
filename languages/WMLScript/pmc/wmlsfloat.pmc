@@ -72,6 +72,26 @@ pmclass WmlsFloat
 
 /*
 
+=item C<PMC* neg(PMC *dest)>
+
+=item C<void i_neg ()>
+
+=cut
+
+*/
+    PMC* neg (PMC* dest) {
+        dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+        PMC_num_val(dest) = - DYNSELF.get_number();
+        return dest;
+    }
+
+    void i_neg () {
+        FLOATVAL result = - DYNSELF.get_number();
+        DYNSELF.set_number_native(result);
+    }
+
+/*
+
 =item C<PMC* bitwise_not(PMC *dest)>
 
 =item C<void i_bitwise_not ()>
