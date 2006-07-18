@@ -26,6 +26,8 @@ $description = "Determining whether $util is installed";
 $prompt      = "Do you have a lexical analyzer generator like flex or lex?";
 @args        = qw( lex ask maintainer );
 
+my ($flex_major, $flex_minor, $flex_patch) = (2, 5, 33);
+
 sub runstep
 {
     my ($self, $conf) = @_;
@@ -52,17 +54,15 @@ sub runstep
     # the user is responsible for the consequences.
     if (defined $prog) {
         $conf->data->set($util => $prog);
-        $self->set_result('yes');
+        $self->set_result('user defined');
         return $self;
     }
 
     $prog = check_progs(['flex', 'lex'], $verbose);
 
     unless ($prog) {
-
-        # fall back to default
-        $self->set_result('no');
-        return $self;
+        $self->set_result('no lex program was found');
+        return;
     }
 
     if ($conf->options->get('ask')) {
@@ -74,20 +74,30 @@ sub runstep
     # don't override the user even if the program they provided appears to be
     # broken
     if ($ret == -1 and !$conf->options->get('ask')) {
-
         # fall back to default
-        $self->set_result('no');
-        return $self;
+        $self->set_result(
+                'lex program does not exist or does not understand --version');
+        return;
     }
 
     # if '--version' returns a string assume that this is flex.
     # flex calls it self by $0 so it will claim to be lex if invoked as `lex`
     if ($stdout =~ /f?lex .*? (\d+) \. (\d+) \. (\d+)/x) {
-        $conf->data->set(flex_version => "$1.$2.$3");
-    }
+        unless (($1 >= $flex_major)
+            and ($2 >= $flex_minor)
+            and ($3 >= $flex_patch)) {
+            $self->set_result("found flex version $1.$2.$3 but at least $flex_major.$flex_minor.$flex_patch is required");
+            return;
+        }
 
-    $conf->data->set($util => $prog);
-    $self->set_result('yes');
+        $conf->data->set(flex_version => "$1.$2.$3");
+        $self->set_result("flex $1.$2.$3");
+        $conf->data->set($util => $prog);
+    } else {
+        $self->set_result(
+                'lex program does not exist or does not understand --version');
+        return;
+    }
 
     return $self;
 }
