@@ -134,7 +134,7 @@ typedef void* yyscan_t;
 #define yycolumn (YY_CURRENT_BUFFER_LVALUE->yy_bs_column)
 #define yy_flex_debug yyg->yy_flex_debug_r
 
-PARROT_API int yylex_init (yyscan_t* scanner);
+int yylex_init (yyscan_t* scanner);
 
 /* Enter a start condition.  This macro really ought to take a parameter,
  * but we do it the disgusting crufty way forced on us by the ()-less
@@ -5401,7 +5401,7 @@ void yyset_debug (int  bdebug , yyscan_t yyscanner)
  * That's why we explicitly handle the declaration, instead of using our macros.
  */
 
-PARROT_API int yylex_init(yyscan_t* ptr_yy_globals)
+int yylex_init(yyscan_t* ptr_yy_globals)
 
 {
     if (ptr_yy_globals == NULL){

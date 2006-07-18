@@ -40,9 +40,10 @@ SymReg * macro(Interp *, char *name);
 
 PARROT_API int yyparse (yyscan_t, Interp*);
 PARROT_API int yylex(YYSTYPE *, yyscan_t, Interp*);
-PARROT_API int yylex_init (yyscan_t*);
 PARROT_API int yylex_destroy (yyscan_t);
+PARROT_API int do_yylex_init (yyscan_t*);
 
+int yylex_init (yyscan_t*);
 int yyget_column (yyscan_t);
 void yyset_column (int column_no , yyscan_t);
 int yyerror(yyscan_t, Interp*, char *);

@@ -569,6 +569,12 @@ extern void* yy_scan_string(const char *);
 extern SymReg *cur_namespace; /* s. imcc.y */
 
 
+int
+do_yylex_init (yyscan_t* yyscanner)
+{
+    return yylex_init(yyscanner);
+}
+
 PMC *
 imcc_compile(Parrot_Interp interp, const char *s, int pasm_file, 
              STRING **error_message)
@@ -589,7 +595,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     INTVAL regs_used[4] = {3,3,3,3};
     void *yyscanner;
 
-    yylex_init ( &yyscanner );
+    do_yylex_init ( &yyscanner );
 
     /*
      * we create not yet anchored PMCs - e.g. Subs: turn off DOD
@@ -763,7 +769,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
 
     if (ext && strcmp (ext, ".pasm") == 0) {
         void *yyscanner;
-        yylex_init ( &yyscanner );
+        do_yylex_init ( &yyscanner );
 
         IMCC_INFO(interp)->state->pasm_file = 1;
         /* see imcc.l */
@@ -776,7 +782,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
     }
     else {
         void *yyscanner;
-        yylex_init ( &yyscanner );
+        do_yylex_init ( &yyscanner );
 
         IMCC_INFO(interp)->state->pasm_file = 0;
         compile_file(interp, fp, yyscanner);
