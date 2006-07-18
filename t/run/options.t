@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -64,11 +64,6 @@ is( `"$PARROT" --trace "$first" "$second" $redir`, "second\n",
 
 unlink $first;
 unlink $second;
-
-
-# http://rt.perl.org/rt3/Ticket/Display.html?id=39866
-is( `"$PARROT" -D 1`, '', 'should not segfault' );
-is( `"$PARROT" ''`, '', 'should not segfault' );
 
 
 exit;
