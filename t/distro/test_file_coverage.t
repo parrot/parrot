@@ -60,10 +60,9 @@ PMC: {
         local $TODO = "not yet implemented";
         ok(!@$pmc_miss, "there are test files for all PMC files in $pmc_dir")
             or diag "files in $test_dir but not in PMC dir:\n\t@$pmc_miss";
-
-        ok(!@$test_miss, "there are PMC files for all test files in $test_dir")
-            or diag "files in $pmc_dir but not in test dir:\n\t@$test_miss";
     }
+    ok(!@$test_miss, "there are PMC files for all test files in $test_dir")
+        or diag "files in $pmc_dir but not in test dir:\n\t@$test_miss";
 
 } # PMC
 
