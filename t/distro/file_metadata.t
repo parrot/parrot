@@ -5,14 +5,13 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
-use File::Find qw( find );
 use File::Basename qw( fileparse );
-use File::Spec::Functions qw( canonpath catdir catfile );
+use File::Spec::Functions qw( catfile );
 use Parrot::Config;
 use Parrot::Revision;
 use ExtUtils::Manifest qw( maniread );
-
 
 =head1 NAME
 
@@ -37,20 +36,13 @@ NOTE: these tests take a B<LONG> time to run.
 my @manifest_files =
 	sort keys %{maniread( catfile $PConfig{build_dir}, 'MANIFEST' )};
 
-
-## all test files have "text/plain" mime-type
+## all test files have "text/plain" mime-type. Assume anything in the
+## repository with a .t is test file.
 TEST_MIME: {
-	my $test_dir = 't';
 	my $test_suffix = '.t';
 
-	my @test_files;
-
-
 	# find test files
-	find { no_chdir => 1,
-			wanted => sub{ files_of_type( \@test_files, $test_suffix ) },
-		} => canonpath catdir( $PConfig{build_dir}, $test_dir );
-
+	my @test_files = grep { m/\Q$test_suffix\E$/} @manifest_files;
 
 	my @cmd = qw(svn pg svn:mime-type);
 
@@ -64,15 +56,19 @@ TEST_MIME: {
 	) for @test_files;
 } # TEST_MIME
 
+## keyword expansion should be set for any manifest files with an explicit
+## mime type of text/plain. Assume a default of text/plain if not specified
 
-## keyword expansion
 KEYWORD_EXP: {
 	diag "this may take a while...";
 
 	my @cmd = qw(svn pg svn:mime-type);
 
 	my @plain_files =
-		grep { $_ if qx(@cmd $_) =~ m!text/plain! } @manifest_files;
+		grep {
+		    my $r = qx(@cmd $_); chomp $r; 
+            $r eq 'text/plain' or $r eq q{};
+        } @manifest_files;
 	chomp @plain_files;
 
 	@cmd = qw(svn pg svn:keywords);
