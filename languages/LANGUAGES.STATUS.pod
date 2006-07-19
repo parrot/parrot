@@ -214,6 +214,33 @@ C<languages/bf>
 
 =item Author
 
+Kevin Tew
+
+=item Description
+
+Implementation of Ruby CVS Head 1.9
+
+=item Status
+
+Parser is pretty complete.
+Only generates PIR for hello world at the moment
+
+=item Last verified with parrot version
+
+0.4.5
+
+=item Location
+
+C<languages/cardinal>
+
+=back
+
+=head2 Cardinal OLD DEAD
+
+=over 4
+
+=item Author
+
 Mark Spashett
 
 =item Description
@@ -226,7 +253,7 @@ Not active.
 
 =item Last verified with parrot version
 
-Unknown
+unknown
 
 =item Location
 
