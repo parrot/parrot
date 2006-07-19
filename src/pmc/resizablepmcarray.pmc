@@ -593,6 +593,43 @@ The C<==> operation. Compares two array to hold equal elements.
         return 1;
     }
 
+/*
+
+=item METHOD void append(PMC* other)
+
+Append the other array to this array.
+
+=cut
+
+*/
+
+    METHOD void append(PMC* other) {
+        INTVAL i, n, m;
+        n = VTABLE_elements(INTERP, SELF);
+        m = VTABLE_elements(INTERP, other);
+        if (!m)
+            return;
+        /* pre-size it */
+        VTABLE_set_integer_native(INTERP, SELF, n + m);
+        if (other->vtable->base_type == SELF->vtable->base_type ||
+                other->vtable->base_type == enum_class_FixedPMCArray) {
+            PMC **other_data, **this_data;
+
+            other_data = PMC_data(other);
+            this_data =  PMC_data(SELF);
+            for (i = 0; i < m; ++i) {
+                this_data[n + i] = other_data[i];
+            }
+        }
+        else {
+            PMC **this_data;
+            this_data = PMC_data(SELF);
+            for (i = 0; i < m; ++i) {
+                this_data[n + i] = VTABLE_get_pmc_keyed_int(INTERP, other, i);
+            }
+        }
+    }
+
 }
 
 /*
