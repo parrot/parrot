@@ -47,7 +47,7 @@ and logic ops.
     .local pmc match
     .local pmc start_rule
     start_rule = find_global "PunieGrammar", "prog"
-    match = start_rule(source)
+    match = start_rule(source, 'grammar' => 'PunieGrammar')
 
     # Verify the match
     $I0 = match.__get_bool()
@@ -102,7 +102,7 @@ and logic ops.
     pir = pirbuilder.get('result')
     unless pir goto err_no_pir # if PIR not generated, stop
 
-#    print "\n\nPIR dump:\n"
+#    say "\n\nPIR dump:"
 #    print pir
 
     # Execute

@@ -30,9 +30,9 @@ grammar ASTGrammar is TGE::Grammar;
 transform result (ROOT) :language('PIR') {
     # Ask the child node for its result
     .local pmc child
-    $I0 = defined node["PunieGrammar::lineseq"]
+    $I0 = defined node["lineseq"]
     unless $I0 goto err_no_tree
-    $P0 = node["PunieGrammar::lineseq"]
+    $P0 = node["lineseq"]
     child = tree.get('result', $P0, 'PunieGrammar::lineseq')
 
     .return (child)
@@ -45,9 +45,9 @@ transform result (ROOT) :language('PIR') {
 transform result (PunieGrammar::block) :language('PIR') {
     # Ask the child node for its result
     .local pmc child
-    $I0 = defined node["PunieGrammar::lineseq"]
+    $I0 = defined node["lineseq"]
     unless $I0 goto err_no_tree
-    $P0 = node["PunieGrammar::lineseq"]
+    $P0 = node["lineseq"]
     child = tree.get('result', $P0, 'PunieGrammar::lineseq')
 
     .return (child)
@@ -64,9 +64,9 @@ transform result (PunieGrammar::lineseq) :language('PIR') {
 
     # Ask the child node for its result
     .local pmc child
-    $I0 = defined node["PunieGrammar::line"]
+    $I0 = defined node["line"]
     unless $I0 goto err_no_tree
-    $P0 = node["PunieGrammar::line"]
+    $P0 = node["line"]
 
     .local pmc iter
     iter = new Iterator, $P0    # setup iterator for node
@@ -97,6 +97,7 @@ transform result (PunieGrammar::line) :language('PIR') {
     unless iter, iter_end         # while (entries) ...
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
+      $S1 = concat 'PunieGrammar::', $S1
       $P3 = tree.get('result', $P2, $S1)
       if null $P3 goto iter_loop
       result.'add_child'($P3)
@@ -118,6 +119,7 @@ transform result (PunieGrammar::expr) :language('PIR') {
     unless $P0, iter_end         # while (entries) ...
       shift $S2, $P0             # get key for next entry
       $P2 = $P0[$S2]      # get entry at current key
+      $S2 = concat 'PunieGrammar::', $S2
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
       result.'add_child'($P3)
@@ -141,6 +143,7 @@ transform result (PunieGrammar::gprint) :language('PIR') {
     unless $P0, iter_end         # while (entries) ...
       shift $S2, $P0             # get key for next entry
       $P2 = $P0[$S2]      # get entry at current key
+      $S2 = concat 'PunieGrammar::', $S2
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
       result.'add_child'($P3)
@@ -165,6 +168,7 @@ transform result (PunieGrammar::cond) :language('PIR') {
     unless iter, iter_end         # while (entries) ...
       shift $S2, iter             # get key for next entry
       $P2 = iter[$S2]      # get entry at current key
+      $S2 = concat 'PunieGrammar::', $S2
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
       result.'add_child'($P3)
@@ -192,6 +196,7 @@ transform result (PunieGrammar::else) :language('PIR') {
     unless iter, iter_end         # while (entries) ...
       shift $S2, iter             # get key for next entry
       $P2 = iter[$S2]      # get entry at current key
+      $S2 = concat 'PunieGrammar::', $S2
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
       result.'add_child'($P3)
@@ -209,9 +214,9 @@ transform result (PunieGrammar::label) :language('PIR') {
 
 transform result (PunieGrammar::cexpr) :language('PIR') {
     .local pmc result
-    $I0 = defined node["PunieGrammar::oexpr"]
+    $I0 = defined node["oexpr"]
     unless $I0 goto err_no_oexpr
-    $P1 = node["PunieGrammar::oexpr"]
+    $P1 = node["oexpr"]
     result = new 'PAST::Op'
     result.'clone'(node)
     result.'op'('O_COMMA')
@@ -409,6 +414,7 @@ transform term (expr) :language('PIR') {
       # skip 'type' keys added by the operator precedence parser
       if $S2 == 'type' goto iter_loop 
       $P2 = $P0[$S2]      # get entry at current key
+      $S2 = concat 'PunieGrammar::', $S2
       $P3 = tree.get('result', $P2, $S2)
       if null $P3 goto iter_loop
       push children, $P3

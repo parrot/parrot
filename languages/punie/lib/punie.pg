@@ -1,51 +1,51 @@
 grammar PunieGrammar;
 
-token prog    { ^<PunieGrammar::lineseq>$ }
+token prog    { ^<lineseq>$ }
 
-rule block { \s* \{ <PunieGrammar::lineseq> \} \s* }
+rule block { \s* \{ <lineseq> \} \s* }
 
-rule lineseq { <PunieGrammar::line>* }
+rule lineseq { <line>* }
 
 token line    { 
-    <PunieGrammar::label>
-    [ <PunieGrammar::cond> 
-    | <PunieGrammar::expr>;
+    <label>
+    [ <cond> 
+    | <expr>;
     ] \s* 
 }
 
-rule label { [<PunieGrammar::word>\:]? }
+rule label { [<word>\:]? }
 
 token word { \w[\w|\d]* }
 
 rule else {
-    (else) <PunieGrammar::block>
-    | (elsif) \( <PunieGrammar::expr> \)
-              <PunieGrammar::block>
-              <PunieGrammar::else>?
+    (else) <block>
+    | (elsif) \( <expr> \)
+              <block>
+              <else>?
 }
 
 rule cond {
-    (if|unless) \( <PunieGrammar::expr> \)
-              <PunieGrammar::block>
-              <PunieGrammar::else>?
+    (if|unless) \( <expr> \)
+              <block>
+              <else>?
 } 
 
-rule expr    { <PunieGrammar::gprint> | <PunieGrammar::cexpr> }
+rule expr    { <gprint> | <cexpr> }
 
-rule gprint  { (print) <PunieGrammar::expr> }
+rule gprint  { (print) <expr> }
 
 rule cexpr {
-    <PunieGrammar::oexpr> \s* [, \s* <PunieGrammar::oexpr>]*
+    <oexpr> \s* [, \s* <oexpr>]*
 }
 
 regex term {
-      \( <PunieGrammar::expr> \)
-    | <PunieGrammar::variable>
-    | <PunieGrammar::number>
-    | <PunieGrammar::integer>
-    | <PunieGrammar::stringdouble>
-    | <PunieGrammar::stringsingle>
-    | do <PunieGrammar::block>
+      \( <expr> \)
+    | <variable>
+    | <number>
+    | <integer>
+    | <stringdouble>
+    | <stringsingle>
+    | do <block>
 }
 rule variable { <sigil> <word> }
 token sigil { <[$@%]> }
