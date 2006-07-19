@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 
 =head1 NAME
 
@@ -904,4 +904,85 @@ defined_keyed_int 5: 0
 OUTPUT
 
 
+pir_output_is(<<'CODE', <<'OUTPUT', '$P1.append()');
+.sub test :main
+    load_bytecode 'Test/More.pir'
+
+    .local pmc plan
+    .local pmc ok
+    .local pmc is
+    plan = find_global 'Test::More', 'plan'
+    ok   = find_global 'Test::More', 'ok'
+    is   = find_global 'Test::More', 'is'
+
+    $P1 = new ResizablePMCArray
+    push $P1, 'a'
+    push $P1, 'b'
+    push $P1, 'c'
+
+    $P2 = new ResizablePMCArray
+    $P0 = new .Null
+    push $P2, $P0
+    push $P2, 'e'
+    $P0 = new .Undef
+
+    $P3 = new ResizablePMCArray
+    push $P3, $P0
+    push $P3, '7'
+    push $P3, '-8.8'
+
+    $P4 = new ResizablePMCArray
+
+
+    plan( 10 )
+
+    $P4.append( $P4 )
+    ok( 1, 'parsing' )
+
+    $I1 = $P4
+    is( $I1, 0, 'still size 0' )
+
+    $P10 = $P1
+    $I1 = $P10
+    $P10.append( $P4 )
+    $I2 = $P10
+    is( $I1, $I2, 'size does not change' )
+
+    $S1 = $P10[2]
+    is( $S1, 'c', 'indexing elements' )
+
+    $P10.append( $P2 )
+    is( $P10, 5, 'size changes' )
+
+    $S1 = $P10[2]
+    is( $S1, 'c', 'indexing elements' )
+
+    $S1 = $P10[4]
+    is( $S1, 'e', 'indexing elements' )
+
+    $P3.append( $P10 )
+    is( $P3, 8, 'size changes' )
+
+    $S1 = $P3[2]
+    is( $S1, '-8.8', 'indexing elements' )
+
+    $S1 = $P3[4]
+    is( $S1, 'b', 'indexing elements' )
+.end
+CODE
+1..10
+ok 1 - parsing
+ok 2 - still size 0
+ok 3 - size does not change
+ok 4 - indexing elements
+ok 5 - size changes
+ok 6 - indexing elements
+ok 7 - indexing elements
+ok 8 - size changes
+ok 9 - indexing elements
+ok 10 - indexing elements
+OUTPUT
+
+
 # don't forget to change the number of tests
+# vim: expandtab sw=4
