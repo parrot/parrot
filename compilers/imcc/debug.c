@@ -34,6 +34,33 @@ IMCC_fataly(Interp *interp, int code, const char *fmt, ...)
 
 
 void
+IMCC_fatal_standalone(Interp *interp, int code, const char *fmt, ...)
+{
+    va_list ap;
+    
+    va_start(ap, fmt);
+    imcc_vfprintf(interp, stderr, fmt, ap);
+    va_end(ap);
+    Parrot_exit(code);
+}
+
+
+void
+IMCC_fataly_standalone(Interp *interp, int code, const char *fmt, ...)
+{
+
+    va_list ap;
+
+    va_start(ap, fmt);
+    fprintf(stderr, "error:imcc:");
+    imcc_vfprintf(interp, stderr, fmt, ap);
+    va_end(ap);
+    IMCC_print_inc(interp);
+    Parrot_exit(code);
+}
+
+
+void
 IMCC_warning(Parrot_Interp interp, const char *fmt, ...)
 {
     va_list ap;

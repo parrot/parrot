@@ -359,7 +359,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 SET_FLAG(PARROT_DESTROY_FLAG);
                 break;
             default:
-                IMCC_fatal(interp, 1, "main: Invalid flag '%s' used."
+                IMCC_fatal_standalone(interp, 1, "main: Invalid flag '%s' used."
                         "\n\nhelp: parrot -h\n", (*argv)[0]);
         }
     }
@@ -533,7 +533,7 @@ main(int argc, char * argv[])
        PASM or a Parrot abstract syntax tree (PAST) file. If it isn't
        any of these, then we assume that it is PIR. */
     if (!sourcefile || !*sourcefile) {
-        IMCC_fatal(interp, 1, "main: No source file specified.\n" );
+        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n" );
     }
     else if (!strcmp(sourcefile, "-")) {
         imc_yyin_set(stdin, yyscanner);
@@ -547,7 +547,7 @@ main(int argc, char * argv[])
         }
         else if (!load_pbc) {
             if (!(imc_yyin_set(fopen(sourcefile, "r"), yyscanner)))    {
-                IMCC_fatal(interp, E_IOError,
+                IMCC_fatal_standalone(interp, E_IOError,
                     "Error reading source file %s.\n",
                         sourcefile);
             }
@@ -582,11 +582,11 @@ main(int argc, char * argv[])
             obj_file = 1;
             Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
-            IMCC_fatal(interp, 1, "main: can't produce object file");
+            IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
 #endif
         }
         if (!strcmp(sourcefile, output_file) && strcmp(sourcefile, "-"))
-            IMCC_fatal(interp, 1,
+            IMCC_fatal_standalone(interp, 1,
                 "main: outputfile is sourcefile\n");
     }
 
@@ -603,7 +603,7 @@ main(int argc, char * argv[])
     if (load_pbc) {
         pf = Parrot_readbc(interp, sourcefile);
         if (!pf)
-            IMCC_fatal(interp, 1,
+            IMCC_fatal_standalone(interp, 1,
                 "main: Packfile loading failed\n");
         Parrot_loadbc(interp, pf);
     }
@@ -677,11 +677,11 @@ main(int argc, char * argv[])
         if (strcmp (output_file, "-") == 0)
             fp = stdout;
         else if ((fp = fopen(output_file, "wb")) == 0)
-            IMCC_fatal(interp, E_IOError,
+            IMCC_fatal_standalone(interp, E_IOError,
                 "Couldn't open %s\n", output_file);
 
         if ((1 != fwrite(packed, size, 1, fp)) )
-            IMCC_fatal(interp, E_IOError,
+            IMCC_fatal_standalone(interp, E_IOError,
                 "Couldn't write %s\n", output_file);
         fclose(fp);
         IMCC_info(interp, 1, "%s written.\n", output_file);
@@ -693,7 +693,7 @@ main(int argc, char * argv[])
         IMCC_info(interp, 1, "Loading %s\n", output_file);
         pf = Parrot_readbc(interp, output_file);
         if (!pf)
-            IMCC_fatal(interp, 1,
+            IMCC_fatal_standalone(interp, 1,
             "Packfile loading failed\n");
         Parrot_loadbc(interp, pf);
         load_pbc = 1;

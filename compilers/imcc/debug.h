@@ -20,6 +20,8 @@
 
 PARROT_API void IMCC_fatal(Interp *, int code,  const char *fmt, ...);
 PARROT_API void IMCC_fataly(Interp *, int code, const char *fmt, ...);
+PARROT_API void IMCC_fatal_standalone(Interp *, int code,  const char *fmt, ...);
+PARROT_API void IMCC_fataly_standalone(Interp *, int code, const char *fmt, ...);
 PARROT_API void IMCC_print_inc(Interp *);
 PARROT_API void IMCC_warning(Interp*, const char *fmt, ...);
 PARROT_API void IMCC_debug(Interp*, int level, const char *fmt, ...);
