@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 120;
+use Parrot::Test tests => 122;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -746,4 +746,16 @@ language_output_is("tcl", <<'TCL', <<'OUT', "ni - false");
   puts [expr {b ni {b c d f}}]
 TCL
 0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "hex number");
+  puts [expr {0xf}]
+TCL
+15
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "hex multiplication");
+  puts [expr {0xf*0xa}]
+TCL
+150
 OUT
