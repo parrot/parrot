@@ -77,6 +77,15 @@ There are five types in WMLScript, each of them is implemented by a PMC.
 
 Conversion type.
 
+=head1 WMLScript Ops
+
+F<languages/WMLScript/ops/wmls.ops> defines new opcode or opcode with new
+signature.
+
+=head2 TODO
+
+Comparaison opcodes.
+
 =head1 WMLScript Standard Libraries
 
 Some of these libraries are implemented in :

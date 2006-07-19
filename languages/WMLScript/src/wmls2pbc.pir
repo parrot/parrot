@@ -23,6 +23,7 @@ Francois Perrad.
 
 =cut
 
+.loadlib "wmls_ops"
 .HLL 'WMLScript', 'wmls_group'
 
 .sub main :main

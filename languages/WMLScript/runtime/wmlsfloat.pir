@@ -16,6 +16,7 @@ See "WMLScript Standard Libraries Specification", section 8 "Float".
 
 =cut
 
+.loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 
 

@@ -42,6 +42,7 @@ See "WMLScript Standard Libraries Specification", section 9 "String".
 
 =cut
 
+.loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 
 

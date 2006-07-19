@@ -16,6 +16,7 @@ See "WMLScript Standard Libraries Specification", section 7 "Lang".
 
 =cut
 
+.loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 
 
@@ -310,7 +311,7 @@ Boolean or invalid.
     $I0 = isa value, "WmlsString"
     unless $I0 goto L1
     $P0 = value.parseInt()
-    ret = $P0.isvalid()
+    ret = defined $P0
     .return (ret)
 L1:
     $I0 = isa value, "WmlsInvalid"
@@ -349,7 +350,7 @@ Boolean or invalid.
     $I0 = isa value, "WmlsString"
     unless $I0 goto L1
     $P0 = value.parseFloat()
-    ret = $P0.isvalid()
+    ret = defined $P0
     .return (ret)
 L1:
     $I0 = isa value, "WmlsInvalid"

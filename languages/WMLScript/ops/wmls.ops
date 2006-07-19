@@ -1,0 +1,116 @@
+/*
+Copyright (C) 2006, The Perl Foundation.
+$Id: wmls.ops 12840 2006-05-30 15:08:05Z coke $
+*/
+
+=head1 NAME
+
+wmls.ops - WMLScript Operations
+
+=head1 DESCRIPTION
+
+=head2 Operations
+
+=over 8
+
+=cut
+
+#include "parrot/dynext.h"
+VERSION = PARROT_VERSION;
+
+
+=item B<defined>(out PMC, in PMC)
+
+implements C<isvalid> WMLScript opcode.
+
+=cut
+
+inline op defined(out PMC, in PMC) :base_core {
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
+        const_string(interpreter, "WmlsBoolean"));
+
+    INTVAL result = PMC_IS_NULL($2) ? 0 : VTABLE_defined(interpreter, $2);
+    $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+    PMC_int_val($1) = result;
+    goto NEXT();
+}
+
+
+=item B<istrue>(out PMC, in PMC)
+
+implements C<tobool> WMLScript opcode.
+
+=cut
+
+inline op istrue(out PMC, in PMC) :base_core {
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
+        const_string(interpreter, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
+        const_string(interpreter, "WmlsInvalid"));
+    INTVAL type = VTABLE_type(interpreter, $2); 
+
+    if (type == dynpmc_WmlsInvalid) {
+        $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
+    }
+    else {
+        INTVAL result = VTABLE_get_bool(interpreter, $2);                                  
+        $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+        PMC_int_val($1) = result;
+    }
+    goto NEXT();
+}
+
+
+=item B<typeof>(out PMC, in PMC)
+
+implements C<typeof> WMLScript opcode.
+
+=cut
+
+inline op typeof(out PMC, in PMC) :base_core {
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
+        const_string(interpreter, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsFloat = pmc_type(interpreter,
+        const_string(interpreter, "WmlsFloat"));
+    INTVAL dynpmc_WmlsInteger = pmc_type(interpreter,
+        const_string(interpreter, "WmlsInteger"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
+        const_string(interpreter, "WmlsInvalid"));
+    INTVAL dynpmc_WmlsString = pmc_type(interpreter,
+        const_string(interpreter, "WmlsString"));
+    INTVAL type = VTABLE_type(interpreter, $2); 
+    INTVAL result;
+
+    if      (type == dynpmc_WmlsInteger) {
+        result = 0;
+    }
+    else if (type == dynpmc_WmlsFloat) {
+        result = 1;
+    } 
+    else if (type == dynpmc_WmlsString) {
+        result = 2;
+    } 
+    else if (type == dynpmc_WmlsBoolean) {
+        result = 3;
+    } 
+    else if (type == dynpmc_WmlsInvalid) {
+        result = 4;
+    }
+    else {
+        real_exception(interpreter, NULL, NO_CLASS, 
+            "Attempt to typeof of a non-wmls type.");
+    } 
+    $1 = pmc_new(interpreter, dynpmc_WmlsInteger);
+    PMC_int_val($1) = result;
+    goto NEXT();
+}
+
+
+=back
+
+=head1 AUTHORS
+
+Francois Perrad.
+
+=cut
+

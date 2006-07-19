@@ -3,11 +3,13 @@ PERL    = @perl@
 PARROT  = ..@slash@..@slash@parrot@exe@
 PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
 
-LIBPATH  = runtime
-BUILD    = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
+PMCBUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
+OPSBUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynoplibs.pl
 DESTDIR  = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+LIBPATH  = runtime
+PMCDIR   = pmc
+OPSDIR   = ops
 O        = @o@
-CLASSDIR = pmc
 LOAD_EXT = @load_ext@
 
 SRM=Stack
@@ -20,6 +22,18 @@ PMCS = \
  wmlsinvalid \
  wmlsbytecode
 
+PMC_FILES = \
+ $(PMCDIR)@slash@wmlsinteger.pmc \
+ $(PMCDIR)@slash@wmlsfloat.pmc \
+ $(PMCDIR)@slash@wmlsstring.pmc \
+ $(PMCDIR)@slash@wmlsboolean.pmc \
+ $(PMCDIR)@slash@wmlsinvalid.pmc \
+ $(PMCDIR)@slash@wmlsbytecode.pmc
+
+OPS_FILES = $(OPSDIR)@slash@wmls.ops
+
+OPSLIB    = wmls
+
 PBCS = \
  $(LIBPATH)@slash@wmlslang.pbc \
  $(LIBPATH)@slash@wmlsfloat.pbc \
@@ -28,13 +42,26 @@ PBCS = \
  $(LIBPATH)@slash@wmlsstdlibs.pbc
 
 
-all: pmcs $(LIBPATH)@slash@wmlslib.pbc src@slash@wmlsd.pbc src@slash@wmls2pir.pbc src@slash@wmls2pbc.pbc src@slash@wmlsi.pbc
+all: \
+ pmc@slash@wmls_group$(LOAD_EXT) \
+ ops@slash@wmls_ops$(LOAD_EXT) \
+ $(LIBPATH)@slash@wmlslib.pbc \
+ src@slash@wmlsd.pbc \
+ src@slash@wmls2pir.pbc \
+ src@slash@wmls2pbc.pbc \
+ src@slash@wmlsi.pbc
 
-pmcs:
-	@cd $(CLASSDIR) && $(BUILD) generate $(PMCS)
-	@cd $(CLASSDIR) && $(BUILD) compile $(PMCS)
-	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
-	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+pmc@slash@wmls_group$(LOAD_EXT) : $(PMC_FILES)
+	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+
+ops@slash@wmls_ops$(LOAD_EXT) : $(OPS_FILES)
+	@cd $(OPSDIR) && $(OPSBUILD) generate $(OPSLIB)
+	@cd $(OPSDIR) && $(OPSBUILD) compile $(OPSLIB)
+	@cd $(OPSDIR) && $(OPSBUILD) linklibs $(OPSLIB)
+	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(DESTDIR)" $(OPSLIB)
 
 src@slash@wmlsd.pbc: src@slash@wmlsd.pir src@slash@script.pir src@slash@opcode.pir
 	$(PARROT) -o src/wmlsd.pbc src/wmlsd.pir 
@@ -84,11 +111,15 @@ CLEANERS = \
  "t/*.wmls" \
  "t/*.wmlsc" \
  "t/*.out" \
- "$(CLASSDIR)/*.dump" \
- "$(CLASSDIR)/*.c" \
- "$(CLASSDIR)/*.h" \
- "$(CLASSDIR)/*$(LOAD_EXT)" \
- "$(CLASSDIR)/*$(O)" \
+ "$(PMCDIR)/*.dump" \
+ "$(PMCDIR)/*.c" \
+ "$(PMCDIR)/*.h" \
+ "$(PMCDIR)/*$(LOAD_EXT)" \
+ "$(PMCDIR)/*$(O)" \
+ "$(OPSDIR)/*.c" \
+ "$(OPSDIR)/*.h" \
+ "$(OPSDIR)/*$(LOAD_EXT)" \
+ "$(OPSDIR)/*$(O)" \
  "$(LIBPATH)/*.pbc" \
  "src/*.pbc" \
  "src/opcode.pir" \

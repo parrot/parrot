@@ -358,57 +358,6 @@ Return the string "invalid".
             return;
     }
 
-/*
-
-=back
-
-=head2 Specific Methods
-
-=over 4
-
-=item C<PMC* tobool ()>
-
-=cut
-
-*/
-    METHOD PMC* tobool () {
-        return pmc_new(INTERP, dynpmc_WmlsInvalid);
-    }
-
-/*
-
-=item C<PMC* typeof ()>
-
-return 4
-
-=cut
-
-*/
-    METHOD PMC* typeof () {
-        PMC *retval;
-       
-        retval = pmc_new(INTERP, dynpmc_WmlsInteger);
-        PMC_int_val(retval) = 4;
-        return retval;
-    }
-
-/*
-
-=item C<PMC* isvalid ()>
-
-return false
-
-=cut
-
-*/
-    METHOD PMC* isvalid () {
-        PMC *retval;
-       
-        retval = pmc_new(INTERP, dynpmc_WmlsBoolean);
-        PMC_int_val(retval) = 0;
-        return retval;
-    }
-
 }
 
 /*

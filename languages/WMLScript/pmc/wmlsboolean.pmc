@@ -1086,61 +1086,6 @@ MMD_DEFAULT: {
         }
     }
 
-/*
-
-=back
-
-=head2 Specific Methods
-
-=over 4
-
-=item C<PMC* tobool ()>
-
-=cut
-
-*/
-    METHOD PMC* tobool () {
-        PMC *retval;
-       
-        retval = pmc_new(INTERP, dynpmc_WmlsBoolean);
-        PMC_int_val(retval) = VTABLE_get_bool(INTERP, SELF);
-        return retval;
-    }
-
-/*
-
-=item C<PMC* typeof ()>
-
-return 3
-
-=cut
-
-*/
-    METHOD PMC* typeof () {
-        PMC *retval;
-       
-        retval = pmc_new(INTERP, dynpmc_WmlsInteger);
-        PMC_int_val(retval) = 3;
-        return retval;
-    }
-
-/*
-
-=item C<PMC* isvalid ()>
-
-return true
-
-=cut
-
-*/
-    METHOD PMC* isvalid () {
-        PMC *retval;
-       
-        retval = pmc_new(INTERP, dynpmc_WmlsBoolean);
-        PMC_int_val(retval) = 1;
-        return retval;
-    }
-
 }
 
 /*

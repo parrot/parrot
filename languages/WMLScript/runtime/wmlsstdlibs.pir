@@ -23,6 +23,7 @@ See "WMLScript Standard Libraries Specification".
 
 =cut
 
+.loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 
 .sub _init :load :anon

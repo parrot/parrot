@@ -829,7 +829,7 @@ code = 36
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.tobool()
+instruction = ${DEST0} = istrue ${STACK0}
 
 ## Stack Instructions
 
@@ -846,14 +846,14 @@ code = 38
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.typeof()
+instruction = ${DEST0} = typeof ${STACK0}
 
 [ISVALID]
 code = 39
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.isvalid()
+instruction = ${DEST0} = defined ${STACK0}
 
 ## Function Return Instructions
 
