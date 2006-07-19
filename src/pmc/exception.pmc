@@ -10,8 +10,16 @@ src/pmc/exception.pmc - Exception PMC
 
 This is the exception base class.
 
-As we are still lacking objects, this class is based on a C<SArray>.
+As we are still lacking objects, this class is based on C<ResziablePMCArray>.
 This will probably change.
+
+Please note (#39744):
+
+Keyed access to exception objects should be very forgiving of mistakes,
+returning the equivalent of 'null' for invalid keys.
+
+This issue *may* be revisited when exception objects get their new pdd23
+interface.
 
 An exception object has these attributes:
 
@@ -84,7 +92,7 @@ fixed. The interface isn't fixed.
 
 #include "parrot/parrot.h"
 
-pmclass Exception extends SArray need_ext {
+pmclass Exception extends ResizablePMCArray need_ext {
 
 /*
 
@@ -98,18 +106,8 @@ Initializes the exception with default values.
 
     void init() {
         SUPER();
+        /* pre-fill 11 slots with PMCNULL */
         DYNSELF.set_integer_native(11);
-        DYNSELF.set_string_keyed_int(0, NULL);
-        DYNSELF.set_integer_keyed_int(1, 0);
-        DYNSELF.set_integer_keyed_int(2, 0);
-        DYNSELF.set_pmc_keyed_int(3, PMCNULL);
-        DYNSELF.set_pmc_keyed_int(4, PMCNULL);
-        DYNSELF.set_pmc_keyed_int(5, PMCNULL);
-        DYNSELF.set_pmc_keyed_int(6, PMCNULL);
-        DYNSELF.set_pmc_keyed_int(7, PMCNULL);
-        DYNSELF.set_pmc_keyed_int(8, PMCNULL);
-        DYNSELF.set_pmc_keyed_int(9, PMCNULL);
-        DYNSELF.set_pmc_keyed_int(10, PMCNULL);
     }
 
 /*
@@ -173,6 +171,23 @@ Returns the PMC value for C<*key>.
     PMC* get_pmc_keyed(PMC* key) {
         STRING* s = key_string(INTERP, key);
         return DYNSELF.getprop(s);
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Returns the PMC value of the element at index C<key>, but ignores too
+big negative keys.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        if (key <= -PMC_int_val(SELF))
+            return PMCNULL;
+        return SUPER(key);
     }
 
 /*
@@ -243,6 +258,75 @@ Compare the passed in Exception with SELF. Returns True if C<SELF> isa C<value>
             return 1;
         }
         return 0;
+    }
+
+/*
+
+=item C<shift_*>, C<unshift_*>, C<pop_*>, C<push_*>
+
+These methods are silently ignored.
+
+=cut
+
+*/
+    PMC* shift_pmc () {
+        /* fprintf(stderr, "don't do that then\n"); XXX */
+        return NULL;
+    }
+    FLOATVAL shift_float () {
+        (void) SELF.shift_pmc();
+        return 0.0;
+    }
+    INTVAL shift_integer () {
+        (void) SELF.shift_pmc();
+        return 0;
+    }
+    STRING* shift_string () {
+        (void) SELF.shift_pmc();
+        return NULL;
+    }
+        
+    void unshift_pmc(PMC* value) {
+        /* fprintf(stderr, "don't do that then\n"); XXX */
+    }
+    void unshift_float(FLOATVAL value) {
+        SELF.unshift_pmc(NULL);
+    }
+    void unshift_integer(INTVAL value) {
+        SELF.unshift_pmc(NULL);
+    }
+    void unshift_string(STRING* value) {
+        SELF.unshift_pmc(NULL);
+    }
+
+    void push_pmc(PMC* value) {
+        /* fprintf(stderr, "don't do that then\n"); XXX */
+    }
+    void push_float(FLOATVAL value) {
+        SELF.push_pmc(NULL);
+    }
+    void push_integer(INTVAL value) {
+        SELF.push_pmc(NULL);
+    }
+    void push_string(STRING* value) {
+        SELF.push_pmc(NULL);
+    }
+
+    PMC* pop_pmc() {
+        /* fprintf(stderr, "don't do that then\n"); XXX */
+        return NULL;
+    }
+    FLOATVAL pop_float() {
+        (void) SELF.pop_pmc();
+        return 0.0;
+    }
+    INTVAL pop_integer() {
+        (void) SELF.pop_pmc();
+        return 0;
+    }
+    STRING* pop_string() {
+        (void) SELF.pop_pmc();
+        return NULL;
     }
 }
 
