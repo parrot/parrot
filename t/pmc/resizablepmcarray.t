@@ -920,10 +920,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', '$P1.append()');
     push $P1, 'b'
     push $P1, 'c'
 
-    $P2 = new ResizablePMCArray
+    $P2 = new FixedPMCArray
+    $P2 = 2
     $P0 = new .Null
-    push $P2, $P0
-    push $P2, 'e'
+    $P2[0] = $P0
+    $P2[1] = 'e'
     $P0 = new .Undef
 
     $P3 = new ResizablePMCArray
@@ -933,8 +934,11 @@ pir_output_is(<<'CODE', <<'OUTPUT', '$P1.append()');
 
     $P4 = new ResizablePMCArray
 
+    $P5 = new MultiSub    # extends ResizablePMCArray
+    $P99 = new Sub
+    push $P5, $P99
 
-    plan( 10 )
+    plan( 13 )
 
     $P4.append( $P4 )
     ok( 1, 'parsing' )
@@ -946,13 +950,13 @@ pir_output_is(<<'CODE', <<'OUTPUT', '$P1.append()');
     $I1 = $P10
     $P10.append( $P4 )
     $I2 = $P10
-    is( $I1, $I2, 'size does not change' )
+    is( $I1, $I2, 'append empty array' )
 
     $S1 = $P10[2]
     is( $S1, 'c', 'indexing elements' )
 
     $P10.append( $P2 )
-    is( $P10, 5, 'size changes' )
+    is( $P10, 5, 'append FixedPMCArray' )
 
     $S1 = $P10[2]
     is( $S1, 'c', 'indexing elements' )
@@ -961,26 +965,39 @@ pir_output_is(<<'CODE', <<'OUTPUT', '$P1.append()');
     is( $S1, 'e', 'indexing elements' )
 
     $P3.append( $P10 )
-    is( $P3, 8, 'size changes' )
+    is( $P3, 8, 'append ResizablePMCArray' )
 
     $S1 = $P3[2]
     is( $S1, '-8.8', 'indexing elements' )
 
     $S1 = $P3[4]
     is( $S1, 'b', 'indexing elements' )
+
+    $P3.append( $P5 )
+    is( $P3, 9, 'append subclass' )
+
+    $S1 = $P3[2]
+    is( $S1, '-8.8', 'indexing elements' )
+
+    $P99 = $P3[8]
+    $I99 = isa $P99, 'Sub'
+    ok( $I99, 'indexing elements' )
 .end
 CODE
-1..10
+1..13
 ok 1 - parsing
 ok 2 - still size 0
-ok 3 - size does not change
+ok 3 - append empty ResizablePMCArray
 ok 4 - indexing elements
-ok 5 - size changes
+ok 5 - append FixedPMCArray
 ok 6 - indexing elements
 ok 7 - indexing elements
-ok 8 - size changes
+ok 8 - append ResizablePMCArray
 ok 9 - indexing elements
 ok 10 - indexing elements
+ok 11 - append subclass
+ok 12 - indexing elements
+ok 13 - indexing elements
 OUTPUT
 
 
