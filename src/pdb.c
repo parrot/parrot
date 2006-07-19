@@ -134,6 +134,9 @@ main(int argc, char *argv[])
     char *ext;
     int pasm_file;
     PDB_t *pdb;
+    void *yyscanner;
+
+    do_yylex_init ( &yyscanner );
 
     /*Parrot_set_config_hash();  TODO link with cfg */
     debugger = Parrot_new(NULL);
@@ -174,7 +177,7 @@ main(int argc, char *argv[])
         IMCC_push_parser_state(interpreter);
         IMCC_INFO(interpreter)->state->file = filename;
 
-        if (!(imc_yyin_set(fopen(filename, "r"))))    {
+        if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
             IMCC_fatal(interpreter, E_IOError,
                     "Error reading source file %s.\n",
                     filename);
@@ -184,12 +187,12 @@ main(int argc, char *argv[])
             pasm_file = 1;
         emit_open(interpreter, 1, NULL);
         IMCC_INFO(interpreter)->state->pasm_file = pasm_file;
-        yyparse((void *) interpreter);
+        yyparse(yyscanner, (void *) interpreter);
         imc_compile_all_units(interpreter);
 
         imc_cleanup(interpreter);
 
-        fclose(imc_yyin_get());
+        fclose(imc_yyin_get(yyscanner));
         PackFile_fixup_subs(interpreter, PBC_POSTCOMP, NULL);
     }
     Parrot_unblock_DOD(interpreter);
