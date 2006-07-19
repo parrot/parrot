@@ -1,0 +1,1062 @@
+grammar ASTGrammar is TGE::Grammar;
+
+preamble{
+.include 'interpinfo.pasm'
+.macro unless_defined ( x, l )
+    .sym int result
+    .result = defined .x
+    unless .result goto .l
+.endm
+
+.macro kdump ( x )
+    .sym pmc it
+    it = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    it = it[ 'parrot'; '_dumper' ]
+    it(.x)
+.endm
+
+.macro kdump2 ( x, d)
+    .sym pmc it
+    it = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    it = it[ 'parrot'; '_dumper' ]
+    it(.x, .d)
+.endm
+}
+
+transform result (ROOT) :language('PIR') {
+    debug_init
+
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['compound_statement']
+    unless $I0 goto err_no_tree
+    $P0 = node['compound_statement']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
+
+    .return (child)
+
+  err_no_tree:
+    print "The top-level node doesn't contain an 'compound_statement' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::compound_statement) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['statements']
+    unless $I0 goto err_no_tree
+    $P0 = node['statements']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::statements')
+
+    .return (child)
+
+  err_no_tree:
+    print "The compound_statement node doesn't contain a 'statements' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::statements) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Stmts'
+    result.'clone'(node)
+
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['statement']
+    unless $I0 goto err_no_tree
+    $P0 = node['statement']
+
+    .local pmc iter
+    iter = new Iterator, $P0    # setup iterator for node
+    iter = 0
+
+    iter_loop:
+    unless iter, iter_end         # while (entries) ...
+    shift $P2, iter
+
+    .local pmc child
+    child = tree.get('result', $P2, 'Cardinal::Grammar::statement')
+
+    result.'add_child'(child)
+
+    goto iter_loop
+    iter_end:
+
+    .return (result)
+
+    err_no_tree:
+    print "The statements node doesn't contain a 'statement' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::statement) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Stmt'
+    result.'clone'(node)
+    
+    $I0 = defined node['expression']
+    unless $I0 goto err_no_tree
+    $P0 = node['expression']      
+    $P1 = $P0[0]
+    .local pmc child
+    child = tree.get('result', $P1, 'Cardinal::Grammar::expression')
+    
+    $P2 = node
+    $I0 = defined $P2['if']
+    $S0 = "if"
+    if $I0 goto cond_op
+    $I0 = defined $P2['unless']
+    $S0 = "unless"
+    if $I0 goto cond_op
+    $I0 = defined $P2['while']
+    $S0 = "while"
+    if $I0 goto cond_op
+    $I0 = defined $P2['rescue']
+    $S0 = "rescue"
+    if $I0 goto cond_op
+    
+    result.'add_child'(child)
+    .return (result)
+
+  cond_op:
+    .local pmc op
+    op = new 'PAST::Op'
+    op.'clone'($P2)
+    op.'op'($S0)
+    $P1 = $P0[1]
+    $P3 = tree.get('result', $P1, 'Cardinal::Grammar::expression')
+
+    op.'add_child'(child)
+    op.'add_child'($P3)
+    result.'add_child'(op)
+    .return (result)
+
+  err_no_tree:
+    print "The statement node doesn't contain a 'expression' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::expression) :language('PIR') {
+
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['operator_precedence_parser']
+    unless $I0 goto err_no_tree
+    $P0 = node['operator_precedence_parser']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::operator_precedence_parser')
+
+    .local pmc result 
+    result = new 'PAST::Exp'
+    result.'clone'(node)
+    result.'add_child'(child) 
+    .return (result)
+
+  err_no_tree:
+    print "The expression node doesn't contain a 'operator_precedence_parser' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::operator_precedence_parser) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Exp'
+    result.'clone'(node)
+
+    .local pmc iter
+    $P1 = node.get_hash()
+    iter = new Iterator, $P1    # setup iterator for node
+    iter = 0
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $S1, iter           # get the key of the iterator
+      $P2 = iter[$S1]
+      $S0 = 'Cardinal::Grammar::'
+      $S0 .= $S1
+      $P3 = tree.get('result', $P2, $S0)
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
+  iter_end:
+
+    .return (result)
+}
+
+transform result (Cardinal::Grammar::expr) :language('PIR') {
+    .local string type
+    type = node["type"]
+    unless node goto error_no_node
+    if type == 'term:' goto transform_term
+      # else
+      $P1 = tree.get('op', node, 'expr')
+      .return($P1)
+    transform_term:
+      $P1 = tree.get('term', node, 'expr')
+      .return($P1)
+    error_no_node:
+      print "error: no node\n"
+      end
+}
+
+
+transform result (Cardinal::Grammar::assignment) :language('PIR') {
+    .local pmc child
+    .local string assign_symbol
+    .local pmc child2
+  
+    $I0 = defined node[0]
+    unless $I0 goto other_assignment
+    $S0 = node[0]
+    .kdump($S0)
+    ne_str $S0, "=", na1
+    print "HERE\n"
+    assign_symbol = node[0]
+    goto get_left
+  na1:
+
+  other_assignment:
+    $I0 = defined node['ASSIGN_OP']
+    unless $I0 goto try_command
+    assign_symbol = node['ASSIGN_OP']
+    goto get_left
+    
+  get_left:
+    $I0 = defined node['left_hand_side']
+    unless $I0 goto get_left2
+    $P0 = node['left_hand_side']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::left_hand_side')
+    goto get_right
+  get_left2:
+
+
+  get_right:
+    $I0 = defined node['expression']
+    unless $I0 goto err_no_tree
+    $P0 = node['expression']
+    child2 = tree.get('result', $P0, 'Cardinal::Grammar::expression')
+    goto build_assignment
+
+    
+
+   try_command:
+    $I0 = defined node['command_call']
+    unless $I0 goto try_primary
+    $P0 = node['command_call']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::command_call')
+    goto single_item
+  
+  try_primary:
+    $I0 = defined node['primary']
+    unless $I0 goto err_no_tree
+    $P0 = node['primary']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::primary')
+    goto single_item
+
+  
+  get_ast_node: 
+    .local pmc identChild
+    $S0 = typeof child
+    unless $S0 == 'PAST::Val' goto err_not_past_val
+    $S0 = child.'valtype'()
+    unless $S0 == 'identifier' goto err_not_past_val
+    identChild = child
+    child = new 'PAST::Var'
+    child.'varname'($S0)
+
+
+  build_assignment: 
+    .local pmc result
+    result = new 'PAST::Op'
+    result.'clone'(node)
+    result.'op'(assign_symbol)
+    result.'add_child'(child)
+    result.'add_child'(child2)
+    .return (result)
+
+  single_item:
+    .return (child)
+
+  err_not_past_val:
+    print "Not a Identifier\n"
+    end
+
+  err_no_tree:
+    print "The assignment node doesn't contain a 'postfix' match.\n"
+    .kdump2(node, "Node")
+    end
+  err_no_assign_symbol:
+    print "The assignment node doesn't contain a assignment symbol.\n"
+    end
+  err_no_conditional:
+    print "The assignment node doesn't contain a 'conditional' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::command_call) :language('PIR') {
+    .local pmc command
+    $I0 = defined node['command']
+    unless $I0 goto err_no_tree
+    $P1 = node['command']
+    command = tree.get('result', $P1, 'Cardinal::Grammar::command')
+
+    .return (command)
+
+  err_no_tree:
+    print "The command_call node doesn't contain a 'command' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::command) :language('PIR') {
+    .local pmc name
+    $I0 = defined node['operation']
+    unless $I0 goto err_no_name
+    $P1 = node['operation']
+    name = tree.get('result', $P1, 'Cardinal::Grammar::operation')
+
+    # Check for args
+    .local pmc args
+    $I0 = defined node['command_args']
+    unless $I0 goto noargs
+    $P1 = node['command_args']
+    args = tree.get('result', $P1, 'Cardinal::Grammar::command_args')
+    if_null args, noargs
+
+    .local pmc result
+    result = new 'PAST::Op'
+    result.'clone'(node)
+    $S0 = name.'value'()
+    result.'op'($S0)
+    
+    .local pmc iter
+    iter = new Iterator, args    # setup iterator for node
+    iter = 0
+
+    iter_loop:
+    unless iter, iter_end         # while (entries) ...
+    shift $P2, iter
+   
+    result.'add_child'($P2)
+
+    goto iter_loop
+    iter_end:
+
+    .return (result)
+
+  noargs:
+    .return (name)
+
+  err_no_name:
+    print "The command node doesn't contain a 'operation' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::command_args) :language('PIR') {
+    .local pmc args
+    $I0 = defined node['paren_args']
+    unless $I0 goto call_args
+    $P0 = node['paren_args']
+    args = tree.get('result', $P0, 'Cardinal::Grammar::paren_args')
+    .return (args)
+
+  call_args:
+    $I0 = defined node['call_args']
+    unless $I0 goto err_no_tree
+    $P0 = node['call_args']
+    args = tree.get('result', $P0, 'Cardinal::Grammar::call_args')
+    .return (args)
+
+  err_no_tree:
+    print "The command_args node doesn't contain an 'paren_args' or 'call_args' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::paren_args) :language('PIR') {
+    .local pmc args
+    $I0 = defined node['call_args']
+    unless $I0 goto no_call_args
+    $P0 = node['call_args']
+    args = tree.get('result', $P0, 'Cardinal::Grammar::call_args')
+    .return (args)
+
+  no_call_args:
+    null args
+    .return (args)
+}
+
+transform result (Cardinal::Grammar::call_args) :language('PIR') {
+    .local pmc result
+    result = new .ResizablePMCArray
+
+    .local pmc iter
+    iter = new Iterator, node    # setup iterator for node
+    iter = 0
+
+    iter_loop:
+    unless iter, iter_end         # while (entries) ...
+    shift $P2, iter
+    
+    .local pmc child
+    
+    $I0 = defined $P2['call_args_positional']
+    unless $I0 goto next_1
+    $P3 = $P2['call_args_positional']
+    child = tree.get('result', $P3, 'Cardinal::Grammar::call_args_positional')
+    .return (child)
+    goto add_child
+
+  next_1:
+    goto err_no_tree
+    $I0 = defined $P2['call_args_positional']
+    unless $I0 goto err_no_tree
+    $P3 = $P2['call_args_positional']
+    child = tree.get('result', $P3, 'Cardinal::Grammar::call')
+    goto add_child
+
+  add_child:
+    push result, child
+
+    goto iter_loop
+    iter_end:
+    
+    .return (result)
+
+  err_no_tree:
+    print "The call_args node doesn't contain a proper 'argument' match.\n"
+    end
+
+}
+
+transform result (Cardinal::Grammar::call_args_positional) :language('PIR') { 
+    .local pmc result
+    result = new .ResizablePMCArray
+
+    $I0 = defined node['expression']
+    unless $I0 goto err_no_tree
+    $P0 = node['expression']
+
+    .local pmc iter
+    iter = new Iterator, $P0    # setup iterator for node
+    iter = 0
+
+    iter_loop:
+    unless iter, iter_end         # while (entries) ...
+    shift $P2, iter
+    
+    .local pmc child
+    child = tree.get('result', $P2, 'Cardinal::Grammar::expression')
+    push result, child
+
+    goto iter_loop
+  iter_end:
+    
+    .return (result)
+
+  err_no_tree:
+    print "The call_args_positional node doesn't contain a proper 'expression' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::operation) :language('PIR') {
+  # Get IDENTIFIER or CONSTANT
+    .local pmc name
+    $I0 = defined node['IDENTIFIER']
+    unless $I0 goto test_constant
+    $P0 = node['IDENTIFIER']
+    name = tree.get('result', $P0, 'Cardinal::Grammar::IDENTIFIER')
+    .return (name)
+
+  test_constant:
+    $I0 = defined node['CONSTANT']
+    unless $I0 goto err_no_name
+    $P0 = node['CONSTANT']
+    name = tree.get('result', $P0, 'Cardinal::Grammar::CONSTANT')
+    .return (name)
+  
+  err_no_name:
+    print "The PGE operation node doesn't contain a 'IDENTIFIER' or a 'CONSTANT' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::IDENTIFIER) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+
+    $I0 = defined node[0]
+    unless $I0 goto err_no_tree
+    $P0 = node[0]
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+    $S2 = node 
+    
+    ne $S2, "true", l1
+    result.'value'("1")
+    result.'valtype'('boolean')      
+    goto case_end
+l1:
+    ne $S2, "false", l2
+    result.'value'("0")
+    result.'valtype'('boolean')      
+    goto case_end
+l2:
+    result.'value'($S2)
+    result.'valtype'('identifier')      
+  
+case_end:
+    .return (result)             
+
+  err_no_tree:
+    print "The IDENTIFIER node doesn't contain a 'YYY' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::CONSTANT) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node[0]
+    unless $I0 goto err_no_tree
+    $P0 = node[0]
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+    $S2 = node 
+    result.'value'($S2)
+    result.'valtype'('constant')      
+    .return (result)             
+
+    .return (child)
+
+  err_no_tree:
+    print "The CONSTANT node doesn't contain a 'YYY' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::primary) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['primary2']
+    unless $I0 goto err_no_tree
+    $P0 = node['primary2']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::primary2')
+
+    .return (child)
+
+  err_no_tree:
+    print "The primary node doesn't contain a 'primary2' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::primary2) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['atom']
+    unless $I0 goto err_no_tree
+    $P0 = node['atom']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::atom')
+
+    .return (child)
+
+  err_no_tree:
+    print "The primary2 node doesn't contain a 'atom' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::atom) :language('PIR') {
+
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['literal']
+    unless $I0 goto try_string
+    $P0 = node['literal']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::literal')
+    goto done
+    
+  try_string:
+    $I0 = defined node['string']
+    unless $I0 goto try_variable
+    $P0 = node['string']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::string')
+    goto done
+
+  try_variable:
+    $I0 = defined node['variable']
+    unless $I0 goto err_no_tree
+    $P0 = node['variable']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::variable')
+
+  done:
+    .return (child)
+
+  err_no_tree:
+    print "The atom node doesn't contain a 'literal' or a 'string'  match.\n"
+    .kdump2(node, "atom")
+    end
+}
+
+transform result (Cardinal::Grammar::string) :language('PIR') {
+
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['DOUBLE_STRING']
+    unless $I0 goto try_string2
+    $P0 = node['DOUBLE_STRING']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::DOUBLE_STRING')
+    goto done
+
+  try_string2:
+    $I0 = defined node['SINGLE_STRING']
+    unless $I0 goto err_no_tree
+    $P0 = node['SINGLE_STRING']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::SINGLE_STRING')
+
+  done:
+    .return (child)
+
+  err_no_tree:
+    print "The atom node doesn't contain a 'literal' or a 'string'  match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::literal) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['numeric']
+    unless $I0 goto err_no_tree
+    $P0 = node['numeric']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::numeric')
+    goto done
+
+  done:
+    .return (child)
+
+  err_no_tree:
+    print "The literal node doesn't contain a 'numeric' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::numeric) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['INTEGER']
+    unless $I0 goto try_float
+    $P0 = node['INTEGER']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::INTEGER')
+    goto done
+    
+  try_float:
+    $I0 = defined node['FLOAT']
+    unless $I0 goto err_no_tree
+    $P0 = node['FLOAT']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::FLOAT')
+    goto done
+
+  done:
+    .return (child)
+
+  err_no_tree:
+    print "The numeric node doesn't contain a 'INTEGER', or a 'LOAT' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::INTEGER) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['DECIMAL']
+    unless $I0 goto err_no_tree
+    $P0 = node['DECIMAL']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::DECIMAL')
+
+    .return (child)
+
+  err_no_tree:
+    print "The INTEGER node doesn't contain a 'DECIMAL' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::DECIMAL) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node[0]
+    unless $I0 goto err_no_tree
+    $P0 = node[0]
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+    $S2 = node 
+    result.'value'($S2)
+    result.'valtype'('int')      
+    .return (result)             
+
+  err_no_tree:
+    print "The DECIMAL node doesn't contain a 'YYY' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::DOUBLE_STRING) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+
+    .local string value
+    # Check if this is a string match
+    $I0 = defined node["PGE::Text::bracketed"]
+    if $I0 goto bracketed_value
+    value = node
+    goto no_bracketed_value
+  bracketed_value:
+    $P1 = node["PGE::Text::bracketed"]
+    $P2 = $P1[0]
+    value = $P2
+  no_bracketed_value:
+
+    result.'value'(value)
+    result.'valtype'('strqq')
+    .return (result)
+
+}
+
+transform result (Cardinal::Grammar::SINGLE_STRING) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+
+    .local string value
+    # Check if this is a string match
+    $I0 = defined node["PGE::Text::bracketed"]
+    if $I0 goto bracketed_value
+    value = node
+    goto no_bracketed_value
+  bracketed_value:
+    $P1 = node["PGE::Text::bracketed"]
+    $P2 = $P1[0]
+    value = $P2
+  no_bracketed_value:
+
+    result.'value'(value)
+    result.'valtype'('strqq')
+    .return (result)
+}
+
+transform result (Cardinal::Grammar::left_hand_side) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['variable']
+    unless $I0 goto err_no_tree
+    $P0 = node['variable']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::variable')
+
+    .return (child)
+
+  err_no_tree:
+    print "The left_hand_side node doesn't contain a 'variable' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::variable) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc child
+    $I0 = defined node['IDENTIFIER']
+    unless $I0 goto err_no_tree
+    $P0 = node['IDENTIFIER']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::IDENTIFIER')
+
+    .return (child)
+
+  err_no_tree:
+    print "The variable node doesn't contain a 'IDENTIFIER' match.\n"
+    end
+}
+
+
+transform result (PunieGrammar::expr) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Exp'
+    result.'clone'(node)
+
+    $P1 = node.get_hash()
+    $P0 = new Iterator, $P1    # setup iterator for node
+    set $P0, 0 # reset iterator, begin at start
+  iter_loop:
+    unless $P0, iter_end         # while (entries) ...
+      shift $S2, $P0             # get key for next entry
+      $P2 = $P0[$S2]      # get entry at current key
+      $P3 = tree.get('result', $P2, $S2)
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
+  iter_end:
+
+    .return (result)
+}
+
+transform result (PunieGrammar::cond) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Op'
+    result.'clone'(node)
+    $S1 = node[0]
+    result.'op'($S1)
+
+    $P1 = node.get_hash()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    set iter, 0 # reset iterator, begin at start
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $S2, iter             # get key for next entry
+      $P2 = iter[$S2]      # get entry at current key
+      $P3 = tree.get('result', $P2, $S2)
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
+  iter_end:
+
+    .return (result)
+}
+
+transform result (PunieGrammar::else) :language('PIR') {
+    .local pmc onechild
+    onechild = node[0]
+    unless onechild goto no_child
+    .local pmc result
+    result = new 'PAST::Op'
+    result.'clone'(onechild)
+    $S1 = onechild[0]
+    result.'op'($S1)
+
+    $P1 = onechild.get_hash()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    set iter, 0 # reset iterator, begin at start
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $S2, iter             # get key for next entry
+      $P2 = iter[$S2]      # get entry at current key
+      $P3 = tree.get('result', $P2, $S2)
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
+  iter_end:
+
+    .return (result)
+  no_child:
+    .return ()
+}
+
+transform result (PunieGrammar::label) :language('PIR') {
+    .return ()
+}
+
+transform result (PunieGrammar::cexpr) :language('PIR') {
+    .local pmc result
+    $I0 = defined node["PunieGrammar::oexpr"]
+    unless $I0 goto err_no_oexpr
+    $P1 = node["PunieGrammar::oexpr"]
+    result = new 'PAST::Op'
+    result.'clone'(node)
+    result.'op'('O_COMMA')
+
+    $P0 = new Iterator, $P1    # setup iterator for node
+    set $P0, 0 # reset iterator, begin at start
+  iter_loop:
+    unless $P0, iter_end         # while (entries) ...
+      shift $P2, $P0             # get next entry
+      $P3 = tree.get('result', $P2, 'PunieGrammar::oexpr')
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
+  iter_end:
+
+    # If there's only one child node, it's a single element, not a list,
+    # so just return the single element. Otherwise, we have a comma
+    # separated list, so build a comma op node.
+    .local pmc children
+    children = result.'children'()
+    $I0 = elements children
+    unless $I0 > 1 goto no_comma
+    .return (result)
+  no_comma:
+    result = shift children # there's only one result
+    .return (result)
+  err_no_oexpr:
+    print "The cexpr node doesn't contain a 'oexpr' match.\n"
+    end
+}
+
+transform result (PunieGrammar::oexpr) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Exp'
+    result.'clone'(node)
+
+    .local pmc iter
+    $P1 = node.get_hash()
+    iter = new Iterator, $P1    # setup iterator for node
+    iter = 0
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $S1, iter           # get the key of the iterator
+      $P2 = iter[$S1]
+      $P3 = tree.get('result', $P2, $S1)
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
+  iter_end:
+
+    .return (result)
+}
+
+
+transform result (PunieGrammar::variable) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Var'
+    result.'clone'(node)
+    .local string sigil
+    .local string name
+    sigil = node['sigil']
+    $S1 = node['word']
+    name = sigil . $S1
+
+    result.'varname'(name)
+    result.'scope'('global')
+
+    unless sigil == '$' goto not_scalar
+      result.'vartype'('scalar')
+  not_scalar:
+
+    .return (result)
+}
+
+transform result (PunieGrammar::number) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+    $S2 = node 
+    result.'value'($S2)
+    result.'valtype'('num')
+
+    .return (result)
+}
+
+transform result (PunieGrammar::integer) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+    $S2 = node 
+    result.'value'($S2)
+    result.'valtype'('int')
+    .return (result)
+}
+
+transform result (PunieGrammar::stringdouble) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+
+    .local string value
+    # Check if this is a string match
+    $I0 = defined node["PGE::Text::bracketed"]
+    if $I0 goto bracketed_value
+    value = node
+    goto no_bracketed_value
+  bracketed_value:
+    $P1 = node["PGE::Text::bracketed"]
+    $P2 = $P1[0]
+    value = $P2
+  no_bracketed_value:
+
+    result.'value'(value)
+    result.'valtype'('strqq')
+    .return (result)
+}
+
+transform result (PunieGrammar::stringsingle) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+
+    .local string value
+    # Check if this is a string match
+    $I0 = defined node["PGE::Text::bracketed"]
+    if $I0 goto bracketed_value
+    value = node
+    goto no_bracketed_value
+  bracketed_value:
+    $P1 = node["PGE::Text::bracketed"]
+    $P2 = $P1[0]
+    value = $P2
+  no_bracketed_value:
+
+    result.'value'(value)
+    result.'valtype'('strq')
+    .return (result)
+}
+
+# The following rules are for the results of the operator precedence
+# parser. These operate very differently than the standard grammar
+# rules, because they give the node type in a "type" hash key inside the
+# node, instead of storing the node as the value of a hash key that
+# is their type.
+
+transform op (expr) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Op'
+    result.'clone'(node)
+    $S1 = node["type"]
+    result.'op'($S1)
+
+    $P1 = node.get_array()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    set iter, 0 # reset iterator, begin at start
+  iter_loop:
+    unless iter, iter_end         # while (entries) ...
+      shift $P2, iter            # get entry
+      $P3 = tree.get('result', $P2, 'expr')
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
+  iter_end:
+
+    .return (result)
+}
+
+transform term (expr) :language('PIR') {
+    .local pmc result
+    .local pmc children
+    children = new .ResizablePMCArray
+    $P1 = node.get_hash()
+    $P0 = new Iterator, $P1    # setup iterator for node
+    set $P0, 0 # reset iterator, begin at start
+  iter_loop:
+    unless $P0, iter_end         # while (entries) ...
+      shift $S2, $P0             # get key for next entry
+      # skip 'type' keys added by the operator precedence parser
+      if $S2 == 'type' goto iter_loop 
+      $P2 = $P0[$S2]      # get entry at current key
+      $S1 = 'Cardinal::Grammar::'
+      $S1 .= $S2
+      $P3 = tree.get('result', $P2, $S1)
+      if null $P3 goto iter_loop
+      push children, $P3
+      goto iter_loop
+  iter_end:
+
+    $I0 = elements children
+    unless $I0 == 1 goto err_too_many
+    result = children[0]
+    .return (result)
+
+  err_too_many:
+    print "error: Currently, 'term' nodes should have only one child.\n"
+    end
+}
+
+=head1 LICENSE
+
+Copyright (C) 2006, The Perl Foundation.
+
+This is free software; you may redistribute it and/or modify
+it under the same terms as Parrot.
+
+=head1 AUTHOR
+
+Kevin Tew <tewk@tewk.com>
+
+=cut

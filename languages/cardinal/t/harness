@@ -1,0 +1,8 @@
+#! perl
+
+# $Id: harness 13278 2006-07-13 13:40:14Z coke $
+
+use FindBin;
+use lib qw( . lib ../lib ../../lib ../../lib );
+use Parrot::Test::Harness language => 'cardinal';
+

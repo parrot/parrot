@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+
+# vim: syntax=perl
+use strict;
+use warnings;
+
+my $PARROT = '../../parrot';
+my $CARDINAL = 'cardinal.pbc';
+my $CURRENT_TEST = 'trb/puts.rb';
+my $TRACE_ARGS = "";
+
+if ( @ARGV > 0 )
+{
+  eval($ARGV[0]);
+}
+else
+{
+  execute();
+}
+
+sub trace
+{
+  $TRACE_ARGS = "-t 5";
+  execute();
+}
+
+sub execute
+{
+  execute_cmd( "make ; $PARROT $TRACE_ARGS $CARDINAL $CURRENT_TEST" );
+}
+
+sub debug
+{
+  execute_cmd( "make ; $PARROT $TRACE_ARGS $CARDINAL -d $CURRENT_TEST" );
+}
+
+sub gdb
+{
+  execute_cmd( "echo 'set args $CARDINAL $CURRENT_TEST\n run\n' > .rit_gdb_cmds");
+  exec( "gdb -x .rit_gdb_cmds ../../parrot" );
+}
+
+sub execute_cmd
+{
+my ($cmd) = @_;
+print $cmd . "\n";
+print `$cmd`;
+$$;
+}
+
+sub publish
+{
+  print `cd ..; tar zcf cardinal.tgz cardinal; date; ls -al cardinal.tgz ; scp cardinal.tgz tewk\@tewk.com:www/www ; cd cardinal`;
+}

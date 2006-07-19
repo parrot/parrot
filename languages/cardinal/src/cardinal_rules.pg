@@ -1,0 +1,490 @@
+grammar Cardinal::Grammar;
+
+##Ruby Whitespace rule
+token ws {<[\ \t]>*}
+
+token program { ^<compound_statement>$ }
+
+rule body_statement {<compound_statement> <rescue_clause>? <else_clause>? <ensure_clause>?}
+
+rule compound_statement {<statements> <?terminators>?}
+
+rule statements {<?terminators>? [<statement> <?terminators>]*}
+
+rule statement {
+          <'alias'> [ <function_item> <function_item>
+                    |<GLOBAL_VARIABLE> [<GLOBAL_VARIABLE>|<back_reference>]]
+          |<'undef'> <undef_list>
+          |<'begin'> \{ <compound_statement> \}
+          |<'end'> \{ <compound_statement> \}
+          |<expression> [[<'if'>|<'unless'>|<'while'>|<'until'>] <expression>
+                        |<'rescue'> <statement>]?
+}
+
+#rule boolean_expression {
+#          | \! <command_call>
+#          |<command_call>
+#}
+
+## We enter the operator precedance expression parser HERE
+rule expression {<operator_precedence_parser>}
+
+## We leave the operator precedance Expression parser HERE 
+rule expression_term {<assignment>}
+
+rule assignment {
+          <left_hand_side> (<'='>) [<command_call>|<expression>|<multiple_right_hand_side>|<expression> <'rescue'> <expression>]
+          |<multiple_left_hand_side> (<'='>) [<command_call>|<expression>|<multiple_right_hand_side>]
+
+
+          #|<left_hand_side <ASSIGN_OP> [<command_call>|<expression>]
+
+          |<variable> <ASSIGN_OP> [<command_call>|<expression>]
+#          |<primary_value> \[ <call_args>? \] <ASSIGN_OP> [<command_call>|<expression>]
+#          |<primary_value> \. [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> [<command_call>|<expression>]
+          
+#          |<primary_value> \:\: <IDENTIFIER> <ASSIGN_OP> <command_call>
+#          |<primary_value> \:\: [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> <expression>
+
+#          |<atom> \[ <call_args>? \] <ASSIGN_OP> [<command_call>|<expression>]
+#          |<atom> \. [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> [<command_call>|<expression>]
+          
+#          |<atom> \:\: <IDENTIFIER> <ASSIGN_OP> <command_call>
+#          |<atom> \:\: [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> <expression>
+
+          |<atom> [
+                    [\[ <call_args>? \] |\. [<IDENTIFIER>|<CONSTANT>]] <ASSIGN_OP> [<command_call>|<expression>]
+                    |\:\: <IDENTIFIER> <ASSIGN_OP> <command_call>
+                    |\:\: [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> <expression>]
+
+          |<back_reference> <ASSIGN_OP> [<command_call>|<expression>]
+
+          |\:\: <CONSTANT> <ASSIGN_OP> <expression>
+
+#          |<'defined'> <newline>? <expression>
+          |[\!]? <command_call>
+          |<primary>
+}
+
+token ASSIGN_OP { [\=|\%\=|\~\=|\/\=|\-\=|\+\=|\|\=|\&\=|\>\>\=|\<\<\=|\*\=|\&\&\=|\|\|\=|\*\*\=] }
+          
+rule method_call { 
+          <operation> [<paren_args> <brace_block>?|<brace_block>]
+#          | <primary_value> [\.|\:\:] <operation2> <paren_args>?  <brace_block>?
+#          | <primary_value> \:\: <operation3><brace_block>?
+#          | <primary_value> [\.|\:\:] <paren_args><brace_block>?
+#          | <primary_value> \[ <call_args>? <rbracket> <brace_block>?
+#          | <'super'> <paren_args><brace_block>?
+
+          | <atom> [\.|\:\:] <operation2> <paren_args>?  <brace_block>?
+          | <atom> [\.|\:\:] <paren_args><brace_block>?
+          | <atom> \:\: <operation3><brace_block>?
+          | <atom> \[ <call_args>? <rbracket> <brace_block>?
+          | <'super'> <paren_args><brace_block>?
+}
+
+rule method_call_block { 
+          \{ <block_parameter>? <compound_statement> \}
+          |<'do'> <block_parameter>? <compound_statement> <'end'>
+}
+rule do_block { <'do'> <block_parameter>? <compound_statement> <'end'> }
+
+
+rule command_call { 
+          <command>
+          |<command_call_block> [[\.|\:\:] <operation2> <command_args>]?
+          |[<'return'>|<'break'>|<'next'>] <call_args>
+}
+rule command_call_block { <command> <do_block> [[\.|\:\:] <operation2> <paren_args>?]* }
+
+rule command { 
+          <operation> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
+#          |<primary_value> [\.|\:\:] <operation2> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
+          |<atom> [\.|\:\:] <operation2> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
+          |[<'super'>|<'yield'>] <command_args>
+}
+rule command_args {<paren_args>|<call_args>}
+rule paren_args {\( <call_args>? \)}
+
+## These should be renamed parameters!
+##rule set only command is called outside this group
+rule call_args { <command>
+          | <call_args_positional> <call_block_arg_wc>?                #positional and optional block arg
+          | <call_args_positional> \, <assocs> <call_block_arg_wc>?    #positional, named, and optional block arg
+          | <assocs> <call_block_arg_wc>?                   #named and optional block arg
+          | \& <expression>                                 #block arg only
+}
+rule call_args_positional { 
+          [<expression> \,]* <expression> [\, \* <expression>]?
+          |\* <expression> 
+}
+rule call_block_arg_wc {\, \& <expression>}
+
+
+token operation  { <IDENTIFIER> | <CONSTANT> | <FID> }
+token operation2 { <IDENTIFIER> | <CONSTANT> | <FID> | <op> }
+token operation3 { <IDENTIFIER> | <FID> | <op> }
+
+
+
+## Multiple Left Hand Side
+rule multiple_left_hand_side {<multiple_left_hand_side_basic>|\(<multiple_left_hand_side_entry>\)}
+rule multiple_left_hand_side_entry {<multiple_left_hand_side_basic>|\(<multiple_left_hand_side_entry>\)}
+rule multiple_left_hand_side_basic {
+##          <multiple_left_hand_side_head>
+##          |<multiple_left_hand_side_head> <multiple_left_hand_side_item>
+##          |<multiple_left_hand_side_head> \* <multiple_left_hand_side_node>
+##          |<multiple_left_hand_side_head> \* <multiple_left_hand_side_node> \, <multiple_left_hand_side_post>
+##          |<multiple_left_hand_side_head> \*
+##          |<multiple_left_hand_side_head> \* \, <multiple_left_hand_side_post>
+##          |\* <multiple_left_hand_side_node>
+##          |\* <multiple_left_hand_side_node> \, <multiple_left_hand_side_post>
+##          |\*
+##          |\* \, <multiple_left_hand_side_head>
+          <multiple_left_hand_side_head> [<multiple_left_hand_side_item>|<multiple_left_hand_side_basic_part>]?
+          |<multiple_left_hand_side_basic_part>
+}
+rule multiple_left_hand_side_basic_part {
+          \* [ <multiple_left_hand_side_node> [\, <multiple_left_hand_side_post>]?
+             | \, <multiple_left_hand_side_post> ]?
+}
+
+rule multiple_left_hand_side_item {
+          <multiple_left_hand_side_node>
+          |\( <multiple_left_hand_side_entry> \)
+}
+rule multiple_left_hand_side_head {[<multiple_left_hand_side_item> \,]+}
+rule multiple_left_hand_side_post {[<multiple_left_hand_side_item> \,]* <multiple_left_hand_side_item>}
+rule multiple_left_hand_side_node {<left_hand_side>}
+
+rule left_hand_side {
+          <variable>
+#          |<primary_value> \[ <call_args>? \]
+#          |<primary_value> [\.|\:\:] [<IDENTIFIER>|<CONSTANT>]
+          |<atom> [ \[ <call_args>? \]
+                  | [\.|\:\:] [<IDENTIFIER>|<CONSTANT>]]
+          |\:\: <CONSTANT>
+          |<back_reference>
+}
+
+
+rule class_name {<IDENTIFIER>|<CONSTANT>}
+rule class_path {[\:\:]? [<atom> \:\:]* <class_name>}
+
+#OLD_CLASS_NAME/PATH
+#rule class_name {<IDENTIFIER>|<CONSTANT>}
+#rule class_path {
+#          \:\: <class_name>
+#          | <class_name>
+#          | <primary_value> \:\: <class_name>
+#}
+
+token function_name {
+          <IDENTIFIER>
+          |<CONSTANT>
+          |<FID>
+          |<op>
+          |<reserved_words>
+}
+
+token function_symbol {
+          <function_name>
+          |<symbol>
+}
+
+token function_item {
+          <function_symbol>
+          |<dsymbol>
+}
+
+token op {
+          \|
+          |\^
+          |\&
+          |\<\=\>
+          |\=\=
+          |\=\=\=
+          |\=\~
+          |\>
+          |\>\=
+          |\<
+          |\<\=
+          |\<\<
+          |\>\>
+          |\+
+          |\-
+          |\*
+          |\*
+          |\/
+          |\%
+          |\*\*
+          |~
+          |\+
+          |\-
+          |\[\]
+          |\[\]\=
+          |\`
+}
+
+token reserved_words {
+          alias
+          |and
+          |begin
+          |break
+          |case
+          |class
+          |def
+          |defined
+          |do
+          |else
+          |elsif
+          |end
+          |ensure
+          |false
+          |for
+          |or
+          |nil
+          |not
+          |of
+          |redo
+          |rescue
+          |retry
+          |return
+          |self
+          |super
+          |then
+          |true
+          |undef
+          |when
+          |yield
+          |if
+          |unless
+          |while
+          |until
+          |__FILE__
+          |__LINE__
+}
+
+
+
+rule array_reference_args { 
+          <expression> <trailer>
+          |<expression> \, <assocs> <trailer>
+          |<assocs> <trailer>
+}
+
+
+rule multiple_right_hand_side { 
+          [<expression> \,]+ <expression> [\, `\* <expression>]?
+          |<expression> \, `\* <expression>
+          | \* <expression>
+}
+
+rule primary {
+          <primary2>
+          |<primary2> \:\: <CONSTANT>
+}
+
+token primary2 { 
+
+#          |<operation> <brace_block> # put this in method call         
+#          |<method_call> <brace_block>?
+          <atom> 
+}
+
+rule atom {
+          <literal>
+          |<string>
+          |<xstring>
+          |<regexp>
+          |<words>
+          |<qwords>
+          |<back_reference>
+          |<FID>
+          |\( <expression> <rparen>
+          |\( <compound_statement> \)
+          |\:\: <CONSTANT>
+          |\[ <array_reference_args>? \]
+          |\{ <assoc_list> \}
+          
+          |<'return'>
+          |<'break'> 
+          |<'next'>
+          |<'redo'>
+          |<'retry'>
+          |<'yield'> [\( <call_args>? <rparen>]? #\)
+          |<'defined'> <newline>? \( <expression> <rparen> #\)
+#          |<operation> <brace_block> # put this in method call
+#          |<method_call> <brace_block>?
+          |\-\> <lambda>
+          
+          |<'begin'> <body_statement> <'end'>
+          |<'if'> <expression> <then_clause> <compound_statement> <elsif_clause>* <else_clause>? <'end'>
+          |<'unless'> <expression> <then_clause> <compound_statement> <else_clause>? <'end'>
+          |<'while'> <expression> <'do'>? <compound_statement> <'end'>
+          |<'until'> <expression> <'do'>? <compound_statement> <'end'>
+          |<'case'> <?terminators>? <expression> <?terminator>? [<WHEN> <expression> <then_clause> <compound_statement>]+ <else_clause>? <'end'>
+          |<'for'> <for_variable> <'in'> <expression> <compound_statement> <'end'>
+          |<'class'> <class_path> <superclass> <'do'>? <body_statement> <'end'>
+          |<'class'> \<\< <expression> <term> <body_statement> <'end'>
+          |<'moldule'> <class_path> <body_statement> <'end'>
+          |<'def'> [singleton [\.|\:]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'>
+          
+          |<variable>
+}
+
+rule elsif_clause {<'elsif'> <expression> <then_clause> <compound_statement>}
+rule else_clause {<'else'> <compound_statement>}
+
+rule then_clause {<?terminator>
+          |<'then'>
+          |<?terminator> <'then'>
+}
+
+token for_variable {
+          <left_hand_side>
+          |<multiple_left_hand_side>
+}
+
+rule block_parameter {
+          <multiple_left_hand_side_item>
+          |<multiple_left_hand_side_head> <block_block>?
+          |<multiple_left_hand_side_head> \* <left_hand_side> \, <multiple_left_hand_side_post> <block_c_block>?
+          |<multiple_left_hand_side_head> \* <block_block>?
+          |<multiple_left_hand_side_head> \* \, <multiple_left_hand_side_post> <block_c_block>?
+          |<multiple_left_hand_side_head> \* <left_hand_side>
+          |\* <left_hand_side> <block_c_block>?
+          |\* <block_block>?
+          |\* <left_hand_side>? \, <multiple_left_hand_side_post>
+          |\& <left_hand_side>
+}
+
+rule block_block { \& <left_hand_side> }
+rule block_c_block { \, <block_block> }
+
+rule block_parameter_def {
+          \| <bv_decls>? \|
+          | \|\|
+          | \| <block_parameter> <bv_decls>? \|
+}
+
+rule bv_decls { [<bv_decl> \,]* <bc_decl> }
+
+token bv_decl { <IDENTIFIER> }
+
+rule lambda { <function_lambda_arg_list> <lambda_body> }
+
+rule function_lambda_arg_list { \( <function_prototype_arg_list> <bv_decls>? <rparen> }  #\)
+
+rule lambda_body { \{ <compound_statement> \} }
+
+rule rescue_clause { [<'rescue'> [<expression> | <multiple_right_hand_side>]? [<ASSOC> <left_hand_side>]?  <then_clause> <compound_statement>]* } 
+rule ensure_clause { <ENSURE> <compound_statement> }
+token literal { <numeric> | <symbol> | <dsymbol> }
+#rule string { <character> | <string1>+ }
+rule string { <SINGLE_STRING> | <DOUBLE_STRING> }
+rule string1 { [\"|\'] <string_contents> [\"|\'] }
+rule xstring { \` <xstring_contents> \` }
+rule regexp { \/ <xstring_contents> \/ }
+rule words { \%w\{ [<string_contents> <ws>]* \} }
+rule qwords { \%q\{ [<string_contents> <ws>]* \} }
+
+token symbol { \:<sym> }
+token sym { <funciton_name>|<ivar>|<gvar>|<cvar> }
+token dsymbol { \: <xstring_contents> }
+token numeric { <INTEGER> | <FLOAT> | \-<INTEGER> | \-<FLOAT> }
+token variable { <IDENTIFIER>|<INSTANCE_VARIABLE>|<GLOBAL_VARIABLE>|<CONSTANT>|<CLASS_VARIABLE>|<'nil'>|<'self'>|<'true'>|<'false'>|<'__FILE__'>|<'__LINE__'> }
+token back_reference { <NTH_REF> | <BACK_REF> }
+rule superclass { 
+          <?terminator>
+          | [<expression>|<error>] <?terminator>
+}
+
+rule function_prototype_arg_list {
+          \( <function_prototype_args>? <rparen> #\)
+          | <function_prototype_args>? <?terminator>
+}
+
+rule function_prototype_args {
+          [<function_prototype_arg> \,]* [<function_prototype_optinal_arg> \,]* [<function_prototype_rest_args>[\, <function_prototype_arg>]* \,]? <function_prototype_block_arg>?
+}
+
+token funtion_prototype_arg {
+          <CONSTANT>
+          |<INSTANCE_VARIABLE>
+          |<GLOBAL_VARIABLE>
+          |<CLASS_VARIABLE>
+          |<IDENTIFIER>
+}
+
+rule function_prototype_optinal_arg {<IDENTIFIER> \= <expression>}
+rule function_prototype_rest_args {\* <IDENTIFIER>}
+rule function_prototype_block_arg {\, \& <IDENTIFIER>}
+
+rule singleton { 
+          <variable>
+          |\( <expression> <rparen>#\)
+} 
+
+rule assoc_list { 
+          <assocs> <?trailer>
+          |<expression> <?trailer>
+}
+rule assocs {[<assoc> \,]* <assoc>}
+rule assoc {
+          <expression> \=\> <expression>
+          |<LABEL> <expression>
+}
+
+token trailer {[\n|\,]?}
+token newline {\n}
+token terminator {\;|\n} 
+rule terminators {<?terminator> [\;]*}
+
+token rparen { <newline>? \) }
+token rbracket { <newline>? \] }
+
+rule undef_list { [<fitem> \,]* <fitem> }
+
+token LABEL { \: <IDENTIFIER> }
+token NUMBER { {{match.dump()}} ( <INTEGER> | <FLOAT>) }
+token INTEGER { <DECIMAL> 
+                  | 0 ( <OCTAL_DIGIT> | _ )* <OCTAL_DIGIT>
+                  | 0 ( x | X ) ( <HEXADECIMAL_DIGIT> | _ )* <HEXADECIMAL_DIGIT>
+                  | 0 ( b | B ) ( <BINARY_DIGIT> | _ )* <BINARY_DIGIT>
+                  | 0 ( d | D ) ( <DECIMAL_DIGIT> | _ ) <DECIMAL_DIGIT>
+                 }
+token FLOAT { (<DECIMAL> {{ match.dump() }} \. <DIGITS> <EXPONENT>? ) 
+            | <DECIMAL> <EXPONENT> }
+token DECIMAL { (<[1..9]>) [<DECIMAL_DIGIT>|_<DECIMAL_DIGIT>]* | (0) }
+token DIGITS { <[0..9]> ((<DECIMAL_DIGIT> | _ )* <DECIMAL_DIGIT>)? }
+token EXPONENT { <[eE]>  <[+\-]>? <DIGITS> }
+#Identifiers
+token CONSTANT {(<[A..Z]>[<[a..z]>|<[A..Z]>|<[0..9]>|_]*)}        #starts with an uppercase letter eg Class and Module names
+token IDENTIFIER {([<[a..z]>|_][<[a..z]>|<[A..Z]>|<[0..9]>|_]*)}  #starts with a lowercase letter eg variables
+token SYMBOL {(\:<SYMBOL_NAME>)}
+token SYMBOL_NAME {(<[a..z]>|<[A..Z]>|_|<[0..9]>)+ }
+
+token GLOBAL_VARIABLE {\$<[~*$?!@/\\;,.=:<>"]>}
+token CLASS_VARIABLE {\@\@<IDENTIFIER>}
+token INSTANCE_VARIABLE {\@<IDENTIFIER>}
+
+token NTH_REF {\$<INTEGER>}
+token BACK_REF {\$<[&`+]>}
+
+token EOL {<[\r\n]>}
+token LINE_CONTINUATOR { \\\\ | \n | \r | \r\n }
+rule CHAR { \? ( \\\\ M-)? ( \\\\ ( C- | c ))? ( ~( \ | \n | \r ) | \\\\ (  s | n | r ) ) }
+# rule SINGLE_STRING { ' .* ' }
+token SINGLE_STRING { <PGE::Text::bracketed: '> }
+# rule DOUBLE_STRING { " .* " }
+token DOUBLE_STRING { <PGE::Text::bracketed: "> }
+# rule EXECUTE_STRING { ` .* ` }
+token EXECUTE_STRING { <PGE::Text::bracketed: `> }
+
+token OCTAL_DIGIT { <[0..7]> }
+token DECIMAL_DIGIT {<[0..9]>}
+token HEXADECIMAL_DIGIT { <[0..9]> | <[a..f]> | <[A..F]> }
+token BINARY_DIGIT { 0 | 1 }
+
+token FID { FID }
