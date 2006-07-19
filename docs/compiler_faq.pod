@@ -544,3 +544,24 @@ Create a new C<Env> PMC and access it like a hash.
 See F<config_lib.pasm> for all the keys in the config hash - or iterate over
 the config hash.
 
+=head1 Languages
+
+=head2 What files do I need to modify to add my new language compiler?
+
+Aside from the files in your new language directory, you must modify
+
+    CREDITS
+    MANIFEST
+    config/gen/languages.pm
+    config/gen/makefiles/languages.in
+    languages/LANGUAGES.STATUS.pod
+
+Inside your language dir, you may consider adding the following:
+
+    LICENSE
+    MAINTAINER
+    README
+    STATUS
+
+Look to existing languages for some examples.
+
