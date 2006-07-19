@@ -1,5 +1,11 @@
 # $Id$
 
+2006.07.17    chip
+	partial implementation of new pdd21:
+	* old: "get_namespace KEY".  new: "get_hll_namespace KEY"
+	* get_namespace and find_global opcodes no longer accept arrays
+	  of strings.  To use arrays, call namespace object methods.
+
 2006.06.19    leo
 	* Released 0.4.5
 	See NEWS for more.
