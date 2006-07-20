@@ -67,6 +67,8 @@ Parrot_unmake_COW(Interp *interpreter, STRING *s /*NN*/)
         /* Create new pool data for this header to use,
          * independent of the original COW data */
         PObj_constant_CLEAR(s);
+        /* constant may have been marked */
+        PObj_live_CLEAR(s);     
         /*
          * allocate a dummy strings memory
          * buflen might be bigger and used, so pass this length
