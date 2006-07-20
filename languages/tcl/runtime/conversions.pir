@@ -35,26 +35,34 @@ Given a PMC, get a number from it.
   if $I0 == .TclInt goto done
   if $I0 == .TclFloat goto done
   
-  $S0 = value
-  $I0 = length $S0
+  .local string str
+  .local int len
+  str = value
+  len = length str
+
+  .include 'cclass.pasm'
+  .local int pos
+  pos = find_not_cclass .CCLASS_WHITESPACE, str, 0, len
 
   .local int multiplier
   multiplier = 1
 
-  $S1 = substr $S0, 0, 1
+  $S1 = substr str, pos, 1
   if $S1 == '+' goto positive
   # If the first character is -, assume a negative number.
   unless $S1 == '-' goto get_value
   multiplier = -1
 positive:
-  $S0 = substr $S0, 1
-  # we check for the length below
-  dec $I0
+  inc pos
+  str = substr str, pos
+  len = length str
+  pos = 0
 
 get_value:
-  (value, $I1) = get_number($S0, 0)
+  (value, pos) = get_number(str, pos)
   if null value goto NaN
-  if $I0 != $I1 goto NaN
+  $I0 = find_not_cclass .CCLASS_WHITESPACE, str, pos, len
+  if len != $I0 goto NaN
   value *= multiplier
 
 done:

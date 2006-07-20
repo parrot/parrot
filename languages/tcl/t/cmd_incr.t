@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple");
@@ -103,5 +103,13 @@ language_output_is("tcl", <<'TCL', <<'OUT', 'not an int');
   incr x
 TCL
 expected integer but got "foo"
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'space padded int');
+  set x {   14   }
+  incr x
+  puts $x
+TCL
+15
 OUT
 
