@@ -401,3 +401,103 @@ $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
 [(.)$0]+				bookkeeper	/mob 0 2: <e @ 5>/	backref $1
 (.)*x					123x		/mob: <123x @ 0>/	repeated dot capture
 
+
+##  modifiers
+:i bcd			abcdef	y	ignorecase (:i)
+:i bcd			aBcdef	y	ignorecase (:i)
+:i bcd			abCdef	y	ignorecase (:i)
+:i bcd			abcDef	y	ignorecase (:i)
+:i bcd			abc-ef	n	ignorecase (:i)
+:ignorecase bcd		abcdef	y	ignorecase (:ignorecase)
+:ignorecase bcd		aBCDef	y	ignorecase (:ignorecase)
+:ignorecase bcd		abc-ef	n	ignorecase (:ignorecase)
+:i(0) bcd		abcdef	y	ignorecase, repetition (:i(0))
+:i(0) bcd		abCdef	n	ignorecase, repetition (:i(0))
+:i(1) bcd		abcdef	y	ignorecase, repetition (:i(1))
+:i(1) bcd		abCdef	y	ignorecase, repetition (:i(1))
+:i(1) bcd		aBxDef	n	ignorecase, repetition (:i(1))
+:0i bcd			abcdef	y	ignorecase, repetition (:0i)
+:0i bcd			abCdef	n	ignorecase, repetition (:0i)
+:1i bcd			abcdef	y	ignorecase, repetition (:1i)
+:1i bcd			abCdef	y	ignorecase, repetition (:1i)
+:1i bcd			aBCDef	y	ignorecase, repetition (:1i)
+:1i bcd			aBxDef	n	ignorecase, repetition (:1i)
+ab [:i cd ] ef		abcdef	y	ignorecase, lexical (:i)
+ab [:i cd ] ef		abCdef	y	ignorecase, lexical (:i)
+ab [:i cd ] ef		abcDef	y	ignorecase, lexical (:i)
+ab [:i cd ] ef		abCDef	y	ignorecase, lexical (:i)
+ab [:i cd ] ef		aBCDef	n	ignorecase, lexical (:i)
+ab [:i cd ] ef		abCDEf	n	ignorecase, lexical (:i)
+:i ab [:i cd ] ef	abCDef	y	ignorecase, lexical (:i)
+:i ab [:i cd ] ef	AbCDeF	y	ignorecase, lexical (:i)
+:i ab [:i cd ] ef	AbcdeF	y	ignorecase, lexical (:i)
+:i a [:i(0) b [:i(1) c [:0i d [:1i e [:i(0) f ] ] ] ] ]		AbCdEf		y	ignorecase, lexical (:i)
+:i aa [:i(0) bb [:i(1) cc [:0i dd [:1i ee [:i(0) ff ] ] ] ] ]	AabbCcddEeff	y	ignorecase, lexical (:i)
+:i a [:i(0) b [:i(1) c [:0i d [:1i e [:i(0) f ] ] ] ] ]		AbCdEF		n	ignorecase, lexical (:i)
+:i aa [:i(0) bb [:i(1) cc [:0i dd [:1i ee [:i(0) ff ] ] ] ] ]	AabbCcddEeFf	n	ignorecase, lexical (:i)
+:i ab [:i(0) cd ] ef	AbcdeF	y	ignorecase, lexical repetition (:i)
+:i ab [:0i cd ] ef	AbcdeF	y	ignorecase, lexical repetition (:i)
+:0i ab [:1i cd ] ef	abCDef	y	ignorecase, lexical repetition (:i)
+:0i ab [:1i cd ] ef	AbCDeF	n	ignorecase, lexical repetition (:i)
+:0i ab [:1i cd ] ef	AbcdeF	n	ignorecase, lexical repetition (:i)
+:0i ab [:i(0) cd ] ef	abcdef	y	ignorecase, lexical repetition (:i)
+:0i ab [:1i cd ] ef	AbcdeF	n	ignorecase, lexical repetition (:i)
+:i(1) ab [:1i cd ] ef	AbCdeF	y	ignorecase, lexical repetition (:i)
+:i(1) ab [:i(0) cd ] ef	AbcdeF	y	ignorecase, lexical repetition (:i)
+:i(1) ab [:i(0) cd ] ef	AbcDeF	n	ignorecase, lexical repetition (:i)
+:i(2) ab [:i(999) cd ] ef	ABCDEF	y	ignorecase, lexical repetition (:i)
+:1i ab [:i(1) cd ] ef		ABCDEF	y	ignorecase, lexical repetition (:i)
+:0i ab [:1i cd ] ef		abcDeF	n	ignorecase, lexical repetition (:i)
+:2i ab [:999i cd ] ef		ABCDEF	y	ignorecase, lexical repetition (:i)
+ab [:ignorecase cd ] ef		abCDef	y	ignorecase, lexical (:ignorecase)
+ab [:ignorecase cd ] ef		aBCDef	n	ignorecase, lexical (:ignorecase)
+:1ignorecase ab [:ignorecase(1) cd ] ef	ABCDEF	y	ignorecase, lexical repetition (:ignorecase)
+:w bcd			a bcdef		y	words (:w)
+:w bcd			a bcd ef	y	words (:w)
+:w bcd			abcdef		n	words (:w)
+:w bcd			abcd ef		n	words (:w)
+:w bcd			ab cdef		n	words (:w)
+:w b c d		a b c d ef	y	words (:w)
+:w b c d		a b c def	y	words (:w)
+:w b c d		ab c d ef	n	words (:w)
+:w b c d		a bcdef		n	words (:w)
+:w b c d		abcdef		n	words (:w)
+:words bcd		a bcdef		y	words (:words)
+:words bcd		a bcd ef	y	words (:words)
+:words bcd		abcdef		n	words (:words)
+:words b c d		a b c d ef	y	words (:words)
+:words b c d		a b c def	y	words (:words)
+:words b c d		ab c d ef	n	words (:words)
+:w(1) b c [:w(0) d e f ]	a b c def	y	words, lexical repetition (:w)
+:w(1) b c [:w(0) d e f ]	a b c def	y	words, lexical repetition (:w)
+:w(0) b c [:w(1) d e f ]	a b c def	n	words, lexical repetition (:w)
+:w(0) b c [:w(0) d e f ]	a b c def	n	words, lexical repetition (:w)
+:w ab 				ab		y	words, trailing ws
+foo\s*-?\s*bar			foo\t \n-\n\t bar	y	basic match
+foo\s*-?\s*bar			foo - bar	y	basic match
+foo\s+-?\s*bar			foo   bar	y	basic match \s+ \s*
+foo\s+-?\s*bar			foo  -bar	y	basic match \s+ \s*
+foo\s*-?\s+bar			foo-  bar	y	basic match \s* \s+
+foo -? bar			foo-bar		y	basic match \s* \s*
+foo -? bar			foobar		y	basic match
+foo -? bar			foo - bar	n	basic non-match
+:w foo -? bar			foo\n \t- \t\t\nbar	y	basic ws match
+:w foo -? bar			foo - bar	y	basic ws match
+:w foo -? bar			foo   bar	y	basic ws match \s+ \s*
+:w foo -? bar			foo  -bar	y	basic ws match \s+ \s*
+:w foo -? bar			foo-  bar	y	basic ws match \s* \s+
+:w foo -? bar			foo-bar		y	basic ws match \s* \s*
+:w foo -? bar			foobar		n	basic ws non-match
+:w()foo -? bar			foo - bar	n	basic ws match
+:w[]foo -? bar			foo - bar	y	TODO: basic ws match
+:w\bfoo -? bar			foo - bar	y	basic ws match with boundary modifier separation
+:w::foo -? bar			foo - bar	y	basic ws match with backtrack no-op modifier separation
+:w::(\w+) \:= (\S+)		dog := spot	/mob 0: <dog @ 0>/	words and capture together
+:w::(\w+) \:= (\S+)		dog := spot	/mob 1: <spot @ 7>/	words and capture together
+:perl5 \A.*? bcd\Q$\E..\z	a bcd$ef	y	TODO: perl5 syntax (:perl5)
+:x(6) \d			123456		y	repetition (:x)
+:x(3) \d			123456		y	repetition (:x)
+:x(0) \d			123456		y	repetition (:x)
+:nth(3) a \d			a1a2a3		y	nth occurance (:nth)
+:nth(4) a \d			a1a2a3		n	TODO: nth occurance (:nth)
+:nth(0) a \d			a1a2a3		n	TODO: nth occurance (:nth)
