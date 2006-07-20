@@ -368,17 +368,8 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
         usage(stderr);
         exit(EX_USAGE);
     }
-    /* if we reached the end of the option list and consumed all of argv,
-     * we don't have the name of a program to run */
+    /* reached the end of the option list and consumed all of argv */
     if (*argc == opt.opt_index ) {
-    
-        /* If the user passed the -o flag -- the only flag that must take a 
-         * parameter -- then we can't be sure that the user forgot the name of
-         * the program. it could be that the user forgot to give the argument
-         * for -o and the rest of argv got slurped up as flags. (If -o appeared
-         * with no argument, the getopt check would have complained earlier.)
-         *
-         * Given that, this was the best error message we could come up with */
         if (interp->output_file) {
             fprintf(stderr, "Missing program name or argument for -o\n");
         }
