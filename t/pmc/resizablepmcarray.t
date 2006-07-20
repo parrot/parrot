@@ -950,7 +950,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', '$P1.append()');
     $I1 = $P10
     $P10.append( $P4 )
     $I2 = $P10
-    is( $I1, $I2, 'append empty array' )
+    is( $I1, $I2, 'append empty ResizablePMCArray' )
 
     $S1 = $P10[2]
     is( $S1, 'c', 'indexing elements' )
