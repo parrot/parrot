@@ -72,12 +72,16 @@ Given a PMC, get an integer from it.
 
 .sub __integer
   .param pmc value
+  
+  .local pmc integer
 
   push_eh not_integer
-    value = __number(value)
+    integer = __number(value)
   clear_eh
-  $I0 = typeof value
+  $I0 = typeof integer
   if $I0 != .TclInt goto not_integer
+
+  assign value, integer
 
   .return(value)
 

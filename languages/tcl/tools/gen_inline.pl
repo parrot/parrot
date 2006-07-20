@@ -98,8 +98,8 @@ sub parse_usage {
 
         (\w+)             # name
 
-        (?: : ($types) )? # optional type
-        (?: = ([^?]*)  )? # optional default value
+        ( (?: : (?:$types))* ) # optional types
+        (?: = ([^?]*)  )?      # optional default value
 
         (\+?)             # is this repeating?
 
@@ -117,9 +117,12 @@ sub parse_usage {
         $arg->{optional}    = !!$1;
         $arg->{option}      = !!$2;
         $arg->{name}        = $3;
-        $arg->{type}        = $4 || ( $arg->{option} ? undef: "string" );
+        $arg->{type}        = [ grep length, split(':', $4) ];
         $arg->{default}     = $5;
         $arg->{repeating}   = $6 eq '+';
+
+        $arg->{type} = [ 'string' ]
+            if not @{ $arg->{type} };
 
         die "Optionals need to be optional.\n"
             if $arg->{option} and not $arg->{optional};
@@ -191,9 +194,8 @@ sub inlined_helpers {
     # types present in this command
     my %types = ();
     for my $arg (@args) {
-        next unless $arg->{type};
-        
-        $types{ $arg->{type} } = 1;
+        $types{$_} = 1
+            for @{ $arg->{type} };
     }
     
     # add code to get subs for needed conversions
@@ -214,9 +216,8 @@ sub helpers {
     # types present in this command
     my %types = ();
     for my $arg (@args) {
-        next unless $arg->{type};
-        
-        $types{ $arg->{type} } = 1;
+        $types{$_} = 1
+            for @{ $arg->{type} };
     }
     
     # add code to get subs for needed conversions
@@ -260,14 +261,19 @@ sub inlined_arguments {
         $code .= emit("a_$name = \$P%0", "r_$name");
         
         # convert the argument, if necessary
-        my $convert = $conversions{ $arg->{type} };
-        $code .= emit("a_$name = $convert(a_$name)")
-            if $convert;
+        for my $type (@{ $arg->{type} })
+        {
+            my $convert = $conversions{$type};
+            
+            $code .= emit("a_$name = $convert(a_$name)")
+                if $convert;
+        }
         
         # default value, if necessary
         if (defined $arg->{default}) {
-            my $type    = $arg->{type} eq 'int' ? 'TclInt' : 'TclString';
-            my $quote   = $arg->{type} eq 'int' ? ''       : "'";
+            my $is_int  = $arg->{type}[-1] eq 'int';
+            my $type    = $is_int ? 'TclInt' : 'TclString';
+            my $quote   = $is_int ? ''       : "'";
             my $default = $arg->{default};
             
             $code .= "  goto done_$name \n";
@@ -299,14 +305,19 @@ sub arguments {
         $code .= "  a_$name = argv[$i] \n";
         
         # convert the argument, if necessary
-        my $convert = $conversions{ $arg->{type} };
-        $code .= "  a_$name = $convert(a_$name) \n"
-            if $convert;
+        for my $type (@{ $arg->{type} })
+        {
+            my $convert = $conversions{ $type };
+
+            $code .= "  a_$name = $convert(a_$name) \n"
+                if $convert;
+        }
                 
         # default value, if necessary
         if (defined $arg->{default}) {
-            my $type    = $arg->{type} eq 'int' ? 'TclInt' : 'TclString';
-            my $quote   = $arg->{type} eq 'int' ? ''       : "'";
+            my $is_int  = $arg->{type}[-1] eq 'int';
+            my $type    = $is_int ? 'TclInt' : 'TclString';
+            my $quote   = $is_int ? ''       : "'";
             my $default = $arg->{default};
                         
             $code .= "  goto done_$name \n";
@@ -390,7 +401,7 @@ sub inlined_body {
             my $name = $1;
             my $arg  = $args{$name};
             
-            if ($arg->{type} eq 'script' or $arg->{type} eq 'expr') {
+            if ($arg->{type}[-1] eq 'script' or $arg->{type}[-1] eq 'expr') {
                 $code .= emit("temp = a_$name()");
                 
                 # if that's all there is, remove it
@@ -428,7 +439,7 @@ sub body {
             my $name = $1;
             my $arg  = $args{$name};
     
-            if ($arg->{type} eq 'script' or $arg->{type} eq 'expr') {
+            if ($arg->{type}[-1] eq 'script' or $arg->{type}[-1] eq 'expr') {
                 $code .= "temp = a_$name() \n";
         
                 # if that's all there is, remove it
@@ -475,13 +486,6 @@ sub create_usage {
     foreach my $arg (@args) {
         my $usage = $arg->{name};
         
-        if ( $arg->{option} ) {
-            $usage = "-$usage";
-            if ( defined $arg->{type} ) {
-                $usage = "$usage $arg->{type}";
-            }
-        }
-        
         if ($arg->{repeating}) {
             if ($arg->{optional}) {
                 $usage = "?$usage $usage ...?";
@@ -523,8 +527,6 @@ sub num_args {
     foreach my $arg (@args) {
         $min-- if $arg->{optional};
 
-        # XXX this isn't quite right. Need to be more clever with options.
-        $max++ if $arg->{option} && $arg->{type};
         $is_repeating = $arg->{repeating};
     }
 
