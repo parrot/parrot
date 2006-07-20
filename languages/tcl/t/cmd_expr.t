@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 125;
+use Parrot::Test tests => 149;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -250,10 +250,22 @@ TCL
 1
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'abs("a")');
+  expr abs("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"acos");
  puts [expr acos(0)]
 TCL
 1.57079632679
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'acos("a")');
+  expr acos("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"asin");
@@ -262,10 +274,22 @@ TCL
 1.57079632679
 OUT
 
+language_output_is("tcl", <<'TCL', <<'OUT', 'asin("a")');
+  expr asin("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"atan");
  puts [expr atan(1)]
 TCL
 0.785398163397
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'atan("a")');
+  expr atan("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"cos");
@@ -274,10 +298,22 @@ TCL
 0.540302305868
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'cos("a")');
+  expr cos("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"cosh");
  puts [expr cosh(1)]
 TCL
 1.54308063482
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'cosh("a")');
+  expr cosh("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"exp");
@@ -286,10 +322,22 @@ TCL
 2.71828182846
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'exp("a")');
+  expr exp("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"log");
  puts [expr log(32)]
 TCL
 3.4657359028
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'log("a")');
+  expr log("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"log10");
@@ -298,10 +346,22 @@ TCL
 1.50514997832
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'log10("a")');
+  expr log10("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"sin");
  puts [expr sin(1)]
 TCL
 0.841470984808
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'sin("a")');
+  expr sin("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"sinh");
@@ -310,10 +370,22 @@ TCL
 1.17520119364
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'sinh("a")');
+  expr sinh("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"sqrt");
  puts [expr sqrt(64)]
 TCL
 8.0
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'sqrt("a")');
+  expr sqrt("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"tan");
@@ -322,16 +394,40 @@ TCL
 1.55740772465
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'tan("a")');
+  expr tan("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"tanh");
  puts [expr tanh(1)]
 TCL
 0.761594155956
 OUT
 
-language_output_is("tcl", <<'TCL', <<'OUT', "expr2");
+language_output_is('tcl', <<'TCL', <<'OUT', 'tanh("a")');
+  expr tanh("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', "atan2");
   puts [expr atan2(4,5)]
 TCL
 0.674740942224
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'atan2(3, "a")');
+  expr atan2(3,"a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'atan2("a")');
+  expr atan2("a")
+TCL
+too few arguments for math function
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "ceil(4.6)");
@@ -352,10 +448,22 @@ TCL
 syntax error in expression "ceil(a)": variable references require preceding $
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'ceil("a")');
+  expr ceil("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl", <<'TCL', <<'OUT', "double(5)");
   puts [expr double(5)]
 TCL
 5.0
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'double("a")');
+  expr double("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "exp(exp(50)) - overflow");
@@ -382,6 +490,12 @@ TCL
 -0.0
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'fmod(-4, "a")');
+  expr fmod(-4, "a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl", <<'TCL', <<'OUT', "hypot(3,4)");
   puts [expr hypot(3,4)]
 TCL
@@ -394,10 +508,22 @@ TCL
 5.0
 OUT
 
+language_output_is("tcl", <<'TCL', <<'OUT', 'hypot(-3, "a")');
+  expr hypot(-3,"a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl", <<'TCL', <<'OUT', "int(4.6)");
   puts [expr int(4.6)]
 TCL
 4
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'int("a")');
+  expr int("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "log(-4) - domain error");
@@ -406,10 +532,22 @@ TCL
 domain error: argument not in valid range
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'log("a")');
+  expr log("a")
+TCL
+argument to math function didn't have numeric value
+OUT
+
 language_output_is("tcl", <<'TCL', <<'OUT', "pow(2,10)");
   puts [expr pow(2,10)]
 TCL
 1024.0
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'pow(2,"a")');
+  expr pow(2,"a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "round(4.5)");
@@ -428,6 +566,12 @@ language_output_is("tcl", <<'TCL', <<'OUT', "round(2)");
   puts [expr round(2)]
 TCL
 2
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'round("a")');
+  expr round("a")
+TCL
+argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "sqrt(-49) - domain error");
