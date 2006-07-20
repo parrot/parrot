@@ -686,120 +686,42 @@ code = 2D
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = iseq ${STACK1}, ${STACK0}
-pir = <<PIR
-    ${INS} = concat "  ${ITEMP0} = iseq "
-    ${INS} = concat ${STACK1}
-    ${INS} = concat ", "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat "\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = new .WmlsBoolean\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = ${ITEMP0}\n"
-PIR
+instruction = ${DEST0} = iseq ${STACK1}, ${STACK0}
 
 [LE]
 code = 2E
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = isle ${STACK1}, ${STACK0}
-pir = <<PIR
-    ${INS} = concat "  ${ITEMP0} = isle "
-    ${INS} = concat ${STACK1}
-    ${INS} = concat ", "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat "\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = new .WmlsBoolean\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = ${ITEMP0}\n"
-PIR
+instruction = ${DEST0} = isle ${STACK1}, ${STACK0}
 
 [LT]
 code = 2F
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = islt ${STACK1}, ${STACK0}
-pir = <<PIR
-    ${INS} = concat "  ${ITEMP0} = islt "
-    ${INS} = concat ${STACK1}
-    ${INS} = concat ", "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat "\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = new .WmlsBoolean\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = ${ITEMP0}\n"
-PIR
+instruction = ${DEST0} = islt ${STACK1}, ${STACK0}
 
 [GE]
 code = 30
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = isge ${STACK1}, ${STACK0}
-pir = <<PIR
-    ${INS} = concat "  ${ITEMP0} = isge "
-    ${INS} = concat ${STACK1}
-    ${INS} = concat ", "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat "\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = new .WmlsBoolean\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = ${ITEMP0}\n"
-PIR
+instruction = ${DEST0} = isge ${STACK1}, ${STACK0}
 
 [GT]
 code = 31
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = isgt ${STACK0}, ${STACK1}
-pir = <<PIR
-    ${INS} = concat "  ${ITEMP0} = isgt "
-    ${INS} = concat ${STACK1}
-    ${INS} = concat ", "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat "\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = new .WmlsBoolean\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = ${ITEMP0}\n"
-PIR
+instruction = ${DEST0} = isgt ${STACK0}, ${STACK1}
 
 [NE]
 code = 32
 class = op
 pop = 2
 push = 1
-#instruction = ${DEST0} = isne ${STACK1}, ${STACK0}
-pir = <<PIR
-    ${INS} = concat "  ${ITEMP0} = isne "
-    ${INS} = concat ${STACK1}
-    ${INS} = concat ", "
-    ${INS} = concat ${STACK0}
-    ${INS} = concat "\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = new .WmlsBoolean\n"
-    ${INS} = concat "  "
-    ${INS} = concat ${DEST0}
-    ${INS} = concat " = ${ITEMP0}\n"
-PIR
+instruction = ${DEST0} = isne ${STACK1}, ${STACK0}
 
 ## Logical Instructions
 

@@ -28,6 +28,33 @@ static INTVAL dynpmc_WmlsInteger;
 static INTVAL dynpmc_WmlsInvalid;
 static INTVAL dynpmc_WmlsString;
 
+static inline INTVAL num_cmp(FLOATVAL v1, FLOATVAL v2)
+{
+    if (v1 == v2) {
+        return 0;
+    }
+    else if (v1 > v2) {
+        return 1;
+    }
+    else {
+        return -1;
+    }
+}
+
+static inline INTVAL int_cmp(INTVAL v1, INTVAL v2)
+{
+    if (v1 == v2) {
+        return 0;
+    }
+    else if (v1 > v2) {
+        return 1;
+    }
+    else {
+        return -1;
+    }
+}
+
+
 pmclass WmlsBoolean
     extends Boolean
     does scalar
@@ -1083,6 +1110,58 @@ MMD_WmlsString: {
         }
 MMD_DEFAULT: {
             DYNSELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+/*
+
+=item C<PMC* is_equal (PMC* value)>
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+MMD_WmlsFloat: {
+            return DYNSELF.get_number() == VTABLE_get_number(INTERP, value);
+        }
+MMD_WmlsInteger: {
+            return DYNSELF.get_integer() == VTABLE_get_integer(INTERP, value);
+        }
+MMD_WmlsBoolean: {
+            return DYNSELF.get_integer() == VTABLE_get_integer(INTERP, value);
+        }
+MMD_WmlsString: {
+            return !string_equal(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_DEFAULT: {
+            return 4;
+        }
+    }
+
+/*
+
+=item C<PMC* cmp (PMC *value)>
+
+=cut
+
+*/
+    INTVAL cmp (PMC* value) {
+MMD_WmlsFloat: {
+            return num_cmp(DYNSELF.get_number(), VTABLE_get_number(INTERP, value));
+        }
+MMD_WmlsInteger: {
+            return int_cmp(DYNSELF.get_integer(), VTABLE_get_integer(INTERP, value));
+        }
+MMD_WmlsBoolean: {
+            return int_cmp(DYNSELF.get_integer(), VTABLE_get_integer(INTERP, value));
+        }
+MMD_WmlsString: {
+            return string_compare(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_DEFAULT: {
+            return 4;
         }
     }
 

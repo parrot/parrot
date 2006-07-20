@@ -358,6 +358,28 @@ Return the string "invalid".
             return;
     }
 
+/*
+
+=item C<PMC* is_equal (PMC* value)>
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+            return 4;
+    }
+
+/*
+
+=item C<PMC* cmp (PMC *value)>
+
+=cut
+
+*/
+    INTVAL cmp (PMC* value) {
+            return 4;
+    }
+
 }
 
 /*

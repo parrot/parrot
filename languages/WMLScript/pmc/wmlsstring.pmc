@@ -1433,6 +1433,64 @@ MMD_DEFAULT: {
 
 /*
 
+=item C<PMC* is_equal (PMC* value)>
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+MMD_WmlsString: {
+            return !string_equal(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_WmlsInteger: {
+            return !string_equal(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_WmlsBoolean: {
+            return !string_equal(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_WmlsFloat: {
+            return !string_equal(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_DEFAULT: {
+            return 4;
+        }
+    }
+
+/*
+
+=item C<PMC* cmp (PMC *value)>
+
+=cut
+
+*/
+    INTVAL cmp (PMC* value) {
+MMD_WmlsString: {
+            return string_compare(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_WmlsInteger: {
+            return string_compare(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_WmlsBoolean: {
+            return string_compare(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_WmlsFloat: {
+            return string_compare(INTERP,
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
+        }
+MMD_DEFAULT: {
+            return 4;
+        }
+    }
+
+/*
+
 =back
 
 =head2 Specific Methods
