@@ -56,23 +56,23 @@ or the resulting PIR code (target='PIR').
     $I0 = adverbs['i']
     adverbs['ignorecase'] = $I0
   with_ignorecase:
-    $I0 = exists adverbs['words']
-    if $I0 goto with_words
-    $I0 = exists adverbs['w']
-    if $I0 goto with_w
     $I0 = exists adverbs['sigspace']
     if $I0 goto with_sigspace
-    $I0 = adverbs['s']
-    adverbs['words'] = $I0
-    goto with_words
-  with_sigspace:
-    $I0 = adverbs['sigspace']
-    adverbs['words'] = $I0
-    goto with_words
-  with_w:
+    $I0 = exists adverbs['s']
+    if $I0 goto with_s
+    $I0 = exists adverbs['words']
+    if $I0 goto with_words
     $I0 = adverbs['w']
-    adverbs['words'] = $I0
+    adverbs['sigspace'] = $I0
+    goto with_sigspace
+  with_s:
+    $I0 = adverbs['s']
+    adverbs['sigspace'] = $I0
+    goto with_sigspace
   with_words:
+    $I0 = adverbs['words']
+    adverbs['sigspace'] = $I0
+  with_sigspace:
 
     .local string target
     target = adverbs['target']
@@ -1157,7 +1157,7 @@ Parse a modifier.
 .sub 'p6exp' :method 
     .param pmc pad
 
-    $I0 = pad['words']
+    $I0 = pad['sigspace']
     if $I0 goto end
     null $P0
     .return ($P0)
@@ -1278,13 +1278,13 @@ Parse a modifier.
     .local string value
     key = self['key']
     value = self
-    if key == 's' goto words
-    if key == 'sigspace' goto words
-    if key == 'w' goto words
+    if key == 'words' goto sigspace
+    if key == 's' goto sigspace
+    if key == 'w' goto sigspace
     if key == 'i' goto ignorecase
     goto setpad
-  words:
-    key = 'words'
+  sigspace:
+    key = 'sigspace'
     goto setpad
   ignorecase:
     key = 'ignorecase'
