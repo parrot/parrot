@@ -389,10 +389,10 @@ $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 2: <a @ 0>/	perl5 numbered captures $1
 $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 3: <b @ 1>/	perl5 numbered captures $1
 $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 4: <c @ 2>/	perl5 numbered captures $1
 $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
-:w $<key>:=[\w+] = $<val>:=[\S+]	 abc = 123	/mob<key>: <abc @ 1>/	named capture
-:w $<key>:=[\w+] = $<val>:=[\S+]	 abc = 123	/mob<val>: <123 @ 7>/	named capture
-:w (\w+) $<foo>:=(\w+) (\w+)	   	abc def ghi	/mob<foo>: <def @ 7>/	mixing named and unnamed capture
-:w (\w+) $<foo>:=(\w+) (\w+)	   	abc def ghi	/mob 1: <ghi @ 11>/	mixing named and unnamed capture
+:s $<key>:=[\w+] = $<val>:=[\S+]	 abc = 123	/mob<key>: <abc @ 1>/	named capture
+:s $<key>:=[\w+] = $<val>:=[\S+]	 abc = 123	/mob<val>: <123 @ 7>/	named capture
+:s (\w+) $<foo>:=(\w+) (\w+)	   	abc def ghi	/mob<foo>: <def @ 7>/	mixing named and unnamed capture
+:s (\w+) $<foo>:=(\w+) (\w+)	   	abc def ghi	/mob 1: <ghi @ 11>/	mixing named and unnamed capture
 <alpha> [ - <alpha> ]?	   		abc def ghi	/mob<alpha> 0: <a @ 3>/	multiple subrule captures in same scope
 [(.)$0]+				bookkeeper	y			backreference
 (\w+) <?ws> $0				hello hello	y			backreference at end of string
@@ -452,27 +452,27 @@ ab [:i cd ] ef		abCDEf	n	ignorecase, lexical (:i)
 ab [:ignorecase cd ] ef		abCDef	y	ignorecase, lexical (:ignorecase)
 ab [:ignorecase cd ] ef		aBCDef	n	ignorecase, lexical (:ignorecase)
 :1ignorecase ab [:ignorecase(1) cd ] ef	ABCDEF	y	ignorecase, lexical repetition (:ignorecase)
-:w bcd			a bcdef		y	words (:w)
-:w bcd			a bcd ef	y	words (:w)
-:w bcd			abcdef		n	words (:w)
-:w bcd			abcd ef		n	words (:w)
-:w bcd			ab cdef		n	words (:w)
-:w b c d		a b c d ef	y	words (:w)
-:w b c d		a b c def	y	words (:w)
-:w b c d		ab c d ef	n	words (:w)
-:w b c d		a bcdef		n	words (:w)
-:w b c d		abcdef		n	words (:w)
-:words bcd		a bcdef		y	words (:words)
-:words bcd		a bcd ef	y	words (:words)
-:words bcd		abcdef		n	words (:words)
-:words b c d		a b c d ef	y	words (:words)
-:words b c d		a b c def	y	words (:words)
-:words b c d		ab c d ef	n	words (:words)
-:w(1) b c [:w(0) d e f ]	a b c def	y	words, lexical repetition (:w)
-:w(1) b c [:w(0) d e f ]	a b c def	y	words, lexical repetition (:w)
-:w(0) b c [:w(1) d e f ]	a b c def	n	words, lexical repetition (:w)
-:w(0) b c [:w(0) d e f ]	a b c def	n	words, lexical repetition (:w)
-:w ab 				ab		y	words, trailing ws
+:s bcd			a bcdef		y	sigspace (:s)
+:s bcd			a bcd ef	y	sigspace (:s)
+:s bcd			abcdef		n	sigspace (:s)
+:s bcd			abcd ef		n	sigspace (:s)
+:s bcd			ab cdef		n	sigspace (:s)
+:s b c d		a b c d ef	y	sigspace (:s)
+:s b c d		a b c def	y	sigspace (:s)
+:s b c d		ab c d ef	n	sigspace (:s)
+:s b c d		a bcdef		n	sigspace (:s)
+:s b c d		abcdef		n	sigspace (:s)
+:sigspace bcd		a bcdef		y	sigspace (:sigspace)
+:sigspace bcd		a bcd ef	y	sigspace (:sigspace)
+:sigspace bcd		abcdef		n	sigspace (:sigspace)
+:sigspace b c d		a b c d ef	y	sigspace (:sigspace)
+:sigspace b c d		a b c def	y	sigspace (:sigspace)
+:sigspace b c d		ab c d ef	n	sigspace (:sigspace)
+:s(1) b c [:s(0) d e f ]	a b c def	y	sigspace, lexical repetition (:s)
+:s(1) b c [:s(0) d e f ]	a b c def	y	sigspace, lexical repetition (:s)
+:s(0) b c [:s(1) d e f ]	a b c def	n	sigspace, lexical repetition (:s)
+:s(0) b c [:s(0) d e f ]	a b c def	n	sigspace, lexical repetition (:s)
+:s ab 				ab		y	sigspace, trailing ws
 foo\s*-?\s*bar			foo\t \n-\n\t bar	y	basic match
 foo\s*-?\s*bar			foo - bar	y	basic match
 foo\s+-?\s*bar			foo   bar	y	basic match \s+ \s*
@@ -481,19 +481,19 @@ foo\s*-?\s+bar			foo-  bar	y	basic match \s* \s+
 foo -? bar			foo-bar		y	basic match \s* \s*
 foo -? bar			foobar		y	basic match
 foo -? bar			foo - bar	n	basic non-match
-:w foo -? bar			foo\n \t- \t\t\nbar	y	basic ws match
-:w foo -? bar			foo - bar	y	basic ws match
-:w foo -? bar			foo   bar	y	basic ws match \s+ \s*
-:w foo -? bar			foo  -bar	y	basic ws match \s+ \s*
-:w foo -? bar			foo-  bar	y	basic ws match \s* \s+
-:w foo -? bar			foo-bar		y	basic ws match \s* \s*
-:w foo -? bar			foobar		n	basic ws non-match
-:w()foo -? bar			foo - bar	n	basic ws match
-:w[]foo -? bar			foo - bar	y	TODO: basic ws match
-:w\bfoo -? bar			foo - bar	y	basic ws match with boundary modifier separation
-:w::foo -? bar			foo - bar	y	basic ws match with backtrack no-op modifier separation
-:w::(\w+) \:= (\S+)		dog := spot	/mob 0: <dog @ 0>/	words and capture together
-:w::(\w+) \:= (\S+)		dog := spot	/mob 1: <spot @ 7>/	words and capture together
+:s foo -? bar			foo\n \t- \t\t\nbar	y	basic ws match
+:s foo -? bar			foo - bar	y	basic ws match
+:s foo -? bar			foo   bar	y	basic ws match \s+ \s*
+:s foo -? bar			foo  -bar	y	basic ws match \s+ \s*
+:s foo -? bar			foo-  bar	y	basic ws match \s* \s+
+:s foo -? bar			foo-bar		y	basic ws match \s* \s*
+:s foo -? bar			foobar		n	basic ws non-match
+:s()foo -? bar			foo - bar	n	basic ws match
+:s[]foo -? bar			foo - bar	y	TODO: basic ws match
+:s\bfoo -? bar			foo - bar	y	basic ws match with boundary modifier separation
+:s::foo -? bar			foo - bar	y	basic ws match with backtrack no-op modifier separation
+:s::(\w+) \:= (\S+)		dog := spot	/mob 0: <dog @ 0>/	sigspace and capture together
+:s::(\w+) \:= (\S+)		dog := spot	/mob 1: <spot @ 7>/	sigspace and capture together
 :perl5 \A.*? bcd\Q$\E..\z	a bcd$ef	y	TODO: perl5 syntax (:perl5)
 :x(6) \d			123456		y	repetition (:x)
 :x(3) \d			123456		y	repetition (:x)
