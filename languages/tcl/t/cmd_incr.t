@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple");
@@ -97,3 +97,11 @@ language_output_is("tcl",<<'TCL',<<'OUT',"octal offset");
 TCL
 5374
 OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'not an int');
+  set x foo
+  incr x
+TCL
+expected integer but got "foo"
+OUT
+
