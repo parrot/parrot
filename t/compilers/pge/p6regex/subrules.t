@@ -74,6 +74,14 @@ p6rule_is("ab",
 
 p6rule_isnt("   ab", '^ <ws>: \ ab', "cut on subrules");
 
+p6rule_isnt('whence',
+    [
+        [ subrule => 'when <commit> ever' ],
+        [ _MASTER => '<subrule> | whence' ],
+    ],
+    "<commit> in nested subrule");
+
+
 
 # remember to change the number of tests :-)
-BEGIN { plan tests => 6; }
+BEGIN { plan tests => 7; }
