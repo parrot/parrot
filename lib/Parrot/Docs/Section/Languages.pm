@@ -46,6 +46,7 @@ sub new
         $self->new_section('bc', 'bc.html', '', 'languages/bc'),
         $self->new_section('Befunge', 'befunge.html', '', 'languages/befunge'),
         $self->new_section('BF', 'bf.html', '', 'languages/bf'),
+        $self->new_section('Cardinal', 'cardinal.html', '', 'languages/cardinal'),
         $self->new_section('Cola', 'cola.html', '', 'languages/cola'),
         $self->new_section('Commun Lisp', 'lisp.html', '', 'languages/lisp'),
         $self->new_section('.Net', 'dotnet.html', '', 'languages/dotnet'),

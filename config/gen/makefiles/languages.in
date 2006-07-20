@@ -17,6 +17,7 @@ LANGUAGES = \
     bc \
     befunge \
     bf \
+    cardinal \
     cola \
     dotnet \
     jako \
@@ -82,6 +83,7 @@ clean: \
     bc.clean \
     befunge.clean \
     bf.clean \
+    cardinal.clean \
     cola.clean \
     dotnet.clean \
     jako.clean \
@@ -160,6 +162,14 @@ bf.test:
 	- $(MAKE) bf test
 bf.clean:
 	- $(MAKE) bf clean
+
+cardinal : cardinal.dummy
+cardinal.dummy:
+	- $(MAKE) cardinal
+cardinal.test:
+	- $(MAKE) cardinal test
+cardinal.clean:
+	- $(MAKE) cardinal clean
 
 cola : cola.dummy
 cola.dummy:
