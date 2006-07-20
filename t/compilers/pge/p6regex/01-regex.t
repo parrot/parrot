@@ -1,12 +1,11 @@
 #!perl
 # Copyright (C) 2001-2003, The Perl Foundation.
-# $Id: backtrack.t 12838 2006-05-30 14:19:10Z coke $
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test tests => 232;
+use Parrot::Test tests => 273;
 use Parrot::Test::PGE;
 
 =head1 NAME
