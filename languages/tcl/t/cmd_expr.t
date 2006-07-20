@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 122;
+use Parrot::Test tests => 125;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -436,6 +436,18 @@ TCL
 domain error: argument not in valid range
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'abs(1,2) - too many args');
+  expr abs(1,2)
+TCL
+too many arguments for math function
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'hypot(1) - too few args');
+  expr hypot(1)
+TCL
+too few arguments for math function
+OUT
+
 # misc.
 
 language_output_is("tcl",<<TCL,<<OUT,"simple precedence");
@@ -759,3 +771,10 @@ language_output_is("tcl", <<'TCL', <<'OUT', "hex multiplication");
 TCL
 150
 OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'bad hex');
+  expr 0xg
+TCL
+syntax error in expression "0xg": extra tokens at end of expression
+OUT
+
