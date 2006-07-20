@@ -432,6 +432,10 @@ Loads the C<PackFile> returned by C<Parrot_readbc()>.
 void
 Parrot_loadbc(Interp *interpreter, struct PackFile *pf)
 {
+	if (pf == NULL) {
+		PIO_eprintf(interpreter, "Invalid packfile\n" );
+		return;
+	}
     interpreter->initial_pf = pf;
     interpreter->code = pf->cur_cs;
 }
