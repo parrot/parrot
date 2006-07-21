@@ -18,7 +18,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 41;
 use Test::More;
 
 language_output_is( 'WMLScript', <<'CODE', <<'OUT', '! 0.0', cflags => '-On');
@@ -319,5 +319,167 @@ extern function main()
 CODE
 3.14text
 2
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 == 3.14', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 == 3.14;
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+true
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 == 2.0', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 == 2.0;
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+false
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 != 2.0', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 != 2.0;
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+true
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.0 == 3', cflags => '-On');
+extern function main()
+{
+    var a = 3.0 == 3;
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+true
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.0 != true', cflags => '-On');
+extern function main()
+{
+    var a = 3.0 != true;
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+true
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 == "3.14"', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 == "3.14";
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+true
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 != "text"', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 != "text";
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+true
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 == invalid', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 == invalid;
+    Console.println(typeof a);
+}
+CODE
+4
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 != invalid', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 != invalid;
+    Console.println(typeof a);
+}
+CODE
+4
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 <= 2.0', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 <= 2.0;
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+false
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 < 2', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 <= 2;
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+false
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 >= true', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 >= true;
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+true
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 > "text"', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 > "text";
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+false
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3.14 < invalid', cflags => '-On');
+extern function main()
+{
+    var a = 3.14 < invalid;
+    Console.println(typeof a);
+}
+CODE
+4
 OUT
 

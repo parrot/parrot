@@ -90,11 +90,11 @@ Return the string "invalid".
 
 */
     PMC* absolute (PMC* dest) {
-        return SELF;
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_absolute () {
-            return;
+        return;
     }
 
 /*
@@ -107,11 +107,11 @@ Return the string "invalid".
 
 */
     PMC* neg (PMC* dest) {
-        return SELF;
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_neg () {
-            return;
+        return;
     }
 
 /*
@@ -124,11 +124,11 @@ Return the string "invalid".
 
 */
     PMC* bitwise_not (PMC* dest) {
-        return SELF;
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_not () {
-            return;
+        return;
     }
 
 /*
@@ -141,11 +141,11 @@ Return the string "invalid".
 
 */
     PMC* logical_not (PMC* dest) {
-        return SELF;
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_logical_not () {
-            return;
+        return;
     }
 
 /*
@@ -164,7 +164,7 @@ Return the string "invalid".
 
 */
     PMC* add (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_add (PMC* value) {
@@ -181,7 +181,7 @@ Return the string "invalid".
 
 */
     PMC* subtract (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_subtract (PMC* value) {
@@ -198,7 +198,7 @@ Return the string "invalid".
 
 */
     PMC* multiply (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_multiply (PMC* value) {
@@ -215,7 +215,7 @@ Return the string "invalid".
 
 */
     PMC* divide (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_divide (PMC* value) {
@@ -232,7 +232,7 @@ Return the string "invalid".
 
 */
     PMC* floor_divide (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_floor_divide (PMC* value) {
@@ -249,7 +249,7 @@ Return the string "invalid".
 
 */
     PMC* cmodulus (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_cmodulus (PMC* value) {
@@ -266,7 +266,7 @@ Return the string "invalid".
 
 */
     PMC* bitwise_or (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_or (PMC* value) {
@@ -283,7 +283,7 @@ Return the string "invalid".
 
 */
     PMC* bitwise_and (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_and (PMC* value) {
@@ -300,7 +300,7 @@ Return the string "invalid".
 
 */
     PMC* bitwise_xor (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_xor (PMC* value) {
@@ -317,7 +317,7 @@ Return the string "invalid".
 
 */
     PMC* bitwise_shr (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_shr (PMC* value) {
@@ -334,7 +334,7 @@ Return the string "invalid".
 
 */
     PMC* bitwise_lsr (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_lsr (PMC* value) {
@@ -351,7 +351,7 @@ Return the string "invalid".
 
 */
     PMC* bitwise_shl (PMC* value, PMC* dest) {
-            return SELF;
+            return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_shl (PMC* value) {

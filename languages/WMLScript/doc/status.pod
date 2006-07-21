@@ -82,10 +82,6 @@ Conversion type.
 F<languages/WMLScript/ops/wmls.ops> defines new opcode or opcode with new
 signature.
 
-=head2 TODO
-
-Comparaison opcodes.
-
 =head1 WMLScript Standard Libraries
 
 Some of these libraries are implemented in :

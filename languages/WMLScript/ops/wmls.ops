@@ -126,7 +126,6 @@ inline op isgt(out PMC, in PMC, in PMC) {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result > 0;
     }  
-//  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) > 0);
     goto NEXT();
 }
 
@@ -151,7 +150,6 @@ inline op isge(out PMC, in PMC, in PMC) {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result >= 0;
     }  
-//  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) >= 0);
     goto NEXT();
 }
 
@@ -176,7 +174,6 @@ inline op isle(out PMC, in PMC, in PMC) {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result <= 0;
     }  
-//  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) <= 0);
     goto NEXT();
 }
 
@@ -201,7 +198,6 @@ inline op islt(out PMC, in PMC, in PMC) {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result < 0;
     }  
-//  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) < 0);
     goto NEXT();
 }
 

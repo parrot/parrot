@@ -714,7 +714,7 @@ code = 31
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = isgt ${STACK0}, ${STACK1}
+instruction = ${DEST0} = isgt ${STACK1}, ${STACK0}
 
 [NE]
 code = 32
