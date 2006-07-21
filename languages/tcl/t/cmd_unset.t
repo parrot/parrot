@@ -2,12 +2,14 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 11;
 use Test::More;
 
-language_output_is("tcl",<<'TCL',"can't unset \"a\": no such variable\n","unset nothing");
+language_output_is("tcl", <<'TCL', <<'OUT', "unset nothing");
  unset a
 TCL
+can't unset "a": no such variable
+OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"unset something");
  set a 2
@@ -51,4 +53,34 @@ language_output_is("tcl",<<'TCL',<<'OUT',"unset element in missing array");
 TCL
 can't unset "a(2)": no such variable
 OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'unset - no args');
+ puts [unset]
+TCL
+
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'unset -nocomplain');
+ set -nocomplain 2
+ unset -nocomplain
+ puts ${-nocomplain}
+TCL
+2
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'unset -nocomplain -nocomplain');
+ set -nocomplain 2
+ unset -nocomplain -nocomplain
+ puts ${-nocomplain}
+TCL
+can't read "-nocomplain": no such variable
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'unset -nocomplain foo');
+  unset -nocomplain foo
+  puts 1
+TCL
+1
+OUT
+
 
