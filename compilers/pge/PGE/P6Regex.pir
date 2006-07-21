@@ -199,6 +199,10 @@ needed for compiling regexes.
     optable.newtok('term:$$', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.newtok('term:\b', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.newtok('term:\B', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok('term:<<', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok('term:>>', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok(unicode:"term:\xab", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok(unicode:"term:\xbb", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
 
     optable.newtok('term:.', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
     optable.newtok('term:\d', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
@@ -254,7 +258,6 @@ needed for compiling regexes.
     $P0 = find_global 'parse_modifier'
     optable.newtok('prefix::', 'looser'=>'infix:|', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('close:>', 'precedence'=>'<', 'nows'=>1)
     optable.newtok('close:}', 'precedence'=>'<', 'nows'=>1)
 
     .local pmc esclist
@@ -687,7 +690,7 @@ Parses a subrule token.
     mpos = pos
     .local pmc regex
     regex = find_global 'PGE::Grammar', 'regex'
-    $P1 = regex(mob)
+    $P1 = regex(mob, 'stop'=>'>')
     unless $P1 goto end
     $S0 = $P1
     mob['arg'] = $S0

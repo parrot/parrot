@@ -16,6 +16,19 @@ def $			def\nabc	n	start and end of string ($)
 def $ \n abc		def\nabc	n	start and end of string (^)
 abc \n $		abc\n		y	end of string ($)
 abc $			abc\n		n	end of string ($)
+<<def			abc-def		y	left word boundary, beginning of word
+<<bc			abc-def		n	left word boundary, mid-word
+c<<			abc-def		n	left word boundary, end of word
+<<abc			abc-def		y	left word boundary, BOS
+def<<			abc-def		n	left word boundary, EOS
+<<			-------		n	left word boundary, no word chars
+>>def			abc-def		n	right word boundary, beginning of word
+>>bc			abc-def		n	right word boundary, mid-word
+c>>			abc-def		y	right word boundary, end of word
+>>abc			abc-def		n	right word boundary, BOS
+def>>			abc-def		y	right word boundary, EOS
+>>			-------		n	right word boundary, no word chars
+
 c \n d			abc\ndef	y	logical newline (\n)
 c \n d			abc\012def	y	logical newline (\n)
 c \n d			abc\015def	y	logical newline (\n)

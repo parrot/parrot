@@ -866,6 +866,10 @@ tree as a PIR code object that can be compiled.
     if token == '$' goto anchor_eos
     if token == '^^' goto anchor_bol
     if token == '$$' goto anchor_eol
+    if token == '<<' goto anchor_word_left
+    if token == '>>' goto anchor_word_right
+    if token == unicode:"\xab" goto anchor_word_left
+    if token == unicode:"\xbb" goto anchor_word_right
     test = '!='
     if token == '\b' goto anchor_word
     test = '=='
@@ -924,6 +928,34 @@ tree as a PIR code object that can be compiled.
         %0_2:
           if $I0 %3 $I1 goto %1
           goto fail
+        CODE
+    .return ()
+
+  anchor_word_left:
+    code.emit(<<"        CODE", label, next, .CCLASS_WORD)
+        %0: # left word boundary
+          if pos >= lastpos goto fail
+          $I0 = is_cclass %2, target, pos
+          if $I0 == 0 goto fail
+          if pos == 0 goto %1
+          $I0 = pos - 1
+          $I0 = is_cclass %2, target, $I0
+          if $I0 goto fail
+          goto %1
+        CODE
+    .return ()
+
+  anchor_word_right:
+    code.emit(<<"        CODE", label, next, .CCLASS_WORD)
+        %0: # right word boundary
+          if pos == 0 goto fail
+          $I0 = pos - 1
+          $I0 = is_cclass %2, target, $I0
+          if $I0 == 0 goto fail
+          if pos >= lastpos goto %1
+          $I0 = is_cclass %2, target, pos
+          if $I0 goto fail
+          goto %1
         CODE
     .return ()
 
