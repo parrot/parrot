@@ -26,8 +26,8 @@ rule statement {
     | break
     | continue
     | halt
-    | return
-    | return \( <expression> \)
+    | return [ \( <expression> \) ]?
+    | <expression>
 }
 
 rule pseudo_statement { limits | quit | warranty }
