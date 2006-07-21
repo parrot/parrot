@@ -192,18 +192,6 @@ c \O41 d		abc!def		n	not octal (\O)
 c \O41 d		abc\041def	n	not octal (\O)
 c \O41+ d		abc!!def	n	not octal (\O)
 a \O41+ f		abcdef		y	not octal (\O)
-\bdef			abc\ndef\n-==\nghi	y	word boundary \W\w
-abc\b			abc\ndef\n-==\nghi	y	word boundary \w\W
-\babc			abc\ndef\n-==\nghi	y	BOS word boundary
-ghi\b			abc\ndef\n-==\nghi	y	EOS word boundary
-a\b			abc\ndef\n-==\nghi	n	\w\w word boundary
--\b			abc\ndef\n-==\nghi	n	\W\W word boundary
-\Bdef			abc\ndef\n-==\nghi	n	nonword boundary \W\w
-abc\B			abc\ndef\n-==\nghi	n	nonword boundary \w\W
-\Babc			abc\ndef\n-==\nghi	n	BOS nonword boundary
-ghi\B			abc\ndef\n-==\nghi	n	EOS nonword boundary
-a\B			abc\ndef\n-==\nghi	y	\w\w nonword boundary
--\B			abc\ndef\n-==\nghi	y	\W\W nonword boundary
 a\w+f			a=[ *f		n	word character
 a\w+f			abcdef		y	word character
 a\W+f			a&%- f		y	not word character
@@ -281,6 +269,20 @@ ab:::cd | gh:::ij	xyabghij	n	rule cut at top
 
 ##  builtin subrules
 abc <fail> def	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	n				<fail>
+
+<?wb>def		abc\ndef\n-==\nghi	y	word boundary \W\w
+abc<?wb>		abc\ndef\n-==\nghi	y	word boundary \w\W
+<?wb>abc		abc\ndef\n-==\nghi	y	BOS word boundary
+ghi<?wb>		abc\ndef\n-==\nghi	y	EOS word boundary
+a<?wb>			abc\ndef\n-==\nghi	n	\w\w word boundary
+-<?wb>			abc\ndef\n-==\nghi	n	\W\W word boundary
+<!wb>def		abc\ndef\n-==\nghi	n	nonword boundary \W\w
+abc<!wb>		abc\ndef\n-==\nghi	n	nonword boundary \w\W
+<!wb>abc		abc\ndef\n-==\nghi	n	BOS nonword boundary
+ghi<!wb>		abc\ndef\n-==\nghi	n	EOS nonword boundary
+a<!wb>			abc\ndef\n-==\nghi	y	\w\w nonword boundary
+-<!wb>			abc\ndef\n-==\nghi	y	\W\W nonword boundary
+
 <upper>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<upper>: <A @ 45>/		<upper>
 <?upper>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <A @ 45>/			<?upper>
 <?upper>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <ABCDEFGHIJ @ 45>/	<?upper>+
@@ -490,7 +492,7 @@ foo -? bar			foo - bar	n	basic non-match
 :s foo -? bar			foobar		n	basic ws non-match
 :s()foo -? bar			foo - bar	n	basic ws match
 :s[]foo -? bar			foo - bar	y	TODO: basic ws match
-:s\bfoo -? bar			foo - bar	y	basic ws match with boundary modifier separation
+:s<?wb>foo -? bar		foo - bar	y	basic ws match with boundary modifier separation
 :s::foo -? bar			foo - bar	y	basic ws match with backtrack no-op modifier separation
 :s::(\w+) \:= (\S+)		dog := spot	/mob 0: <dog @ 0>/	sigspace and capture together
 :s::(\w+) \:= (\S+)		dog := spot	/mob 1: <spot @ 7>/	sigspace and capture together

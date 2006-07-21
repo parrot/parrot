@@ -470,6 +470,35 @@ Match whitespace between tokens.
 .end
 
 
+=item C<wb(PMC mob)>
+
+Returns true if we're at a word boundary (as defined by
+Perl 5's \b regex).
+
+=cut
+
+.sub "wb"
+    .param pmc mob
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos
+    $P0 = find_global "PGE::Match", "newfrom"
+    (mob, target, mfrom, mpos) = $P0(mob)
+    pos = mfrom
+    if pos == 0 goto succeed
+    $I0 = length target
+    if pos == $I0 goto succeed
+    $I1 = is_cclass .CCLASS_WORD, target, pos
+    dec pos
+    $I0 = is_cclass .CCLASS_WORD, target, pos
+    if $I0 == $I1 goto end    
+  succeed:
+    assign mpos, mfrom
+  end:
+    .return (mob)
+.end
+
+
 =item C<before(PMC mob, STR pattern)>
 
 Perform lookahead -- i.e., check if we're at a position where
