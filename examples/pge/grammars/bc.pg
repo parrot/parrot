@@ -5,6 +5,33 @@ grammar Bc::Grammar;
 ## recognize terms
 token term { \d+ }
 
+token string { \" <-["]>* \" }
+
+## ignores backslash characters for now
+rule print {
+    print [ <string> | <expression> ] [ , [ <string> | <expression> ] ]*
+}
+
+rule compound_statement { \{ <statement>+ \} }
+rule if_statement { if \( <expression> \) <statement> [ else <statement> ]? }
+rule while_statement { while \( <expression> \) <statement> }
+rule for_statement {
+    for \( <expression> ; <expression> ; <expression> \) <statement>
+}
+rule statement {
+    | <if_statement>
+    | <while_statement>
+    | <for_statement>
+    | <compound_statement>
+    | break
+    | continue
+    | halt
+    | return
+    | return \( <expression> \)
+}
+
+rule pseudo_statement { limits | quit | warranty }
+
 
 ## create operator precedence parser
 rule 'expression'   is optable { ... }
