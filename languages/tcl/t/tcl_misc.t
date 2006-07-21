@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
@@ -187,5 +187,12 @@ language_output_is("tcl", <<'TCL', <<'OUT', "args checking from inlined commands
   incr
 TCL
 ok
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'order of arguments with __integer conversion');
+set x 0012
+puts [list $x [incr x]]
+TCL
+0012 11
 OUT
 
