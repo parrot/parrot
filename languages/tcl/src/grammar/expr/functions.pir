@@ -268,6 +268,24 @@ domain_error:
 
 =cut
 
+.sub 'function:atan2' :multi (String, pmc)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:atan2' :multi (pmc, String)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:atan2' :multi (pmc, pmc)
+    .param num a
+    .param num b
+    $N0 = atan a, b
+    .local pmc ret
+    ret = new 'TclFloat'
+    ret = $N0
+    .return(ret)
+.end
+
 .sub 'function:fmod' :multi (String, pmc)
     .throw("argument to math function didn't have numeric value")
 .end
