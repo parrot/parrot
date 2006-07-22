@@ -23,10 +23,10 @@
   handling_else = 0
   .local int counter
 
-  .local pmc compiler,pir_compiler,expr_compiler
+  .local pmc compiler, pir_compiler, __expr
   .get_from_HLL(compiler,'_tcl','compile')
   .get_from_HLL(pir_compiler,'_tcl','pir_compiler')
-  .get_from_HLL(expr_compiler,'_tcl','__expr')
+  .get_from_HLL(__expr, '_tcl', '__expr')
  
   .local string temp_str
   temp_str ='' 
@@ -73,8 +73,7 @@ get_final:
   if counter != argc goto more_than_else
 
 begin_parsing:
-  ($I0,$S1) = expr_compiler(0,condition)
-  $P2 = pir_compiler($I0,$S1)
+  $P2 = __expr(condition)
   retval = $P2()
 
   unless retval goto do_elseifs
@@ -89,8 +88,7 @@ elseif_loop:
   if $I2 == $I1 goto do_else
   $P1 = elseifs[$I2]
   condition = $P1[0]
-  ($I0,$S2) = expr_compiler(0,condition)
-  $P3 = pir_compiler($I0,$S2)
+  $P3 = __expr(condition)
   retval = $P3()
   if retval goto done_elseifs
   inc $I2
