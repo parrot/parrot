@@ -184,6 +184,7 @@ GEN_MAKEFILES = \
     compilers/past/Makefile \
     compilers/pge/Makefile \
     compilers/tge/Makefile \
+    compilers/bcg/Makefile \
     editor/Makefile \
     languages/Makefile \
     languages/amber/Makefile \
@@ -1269,6 +1270,7 @@ compilers.dummy : $(PARROT)
 	$(MAKE) compilers/past
 	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
+	$(MAKE) compilers/bcg
 
 languages : languages.dummy
 
@@ -1294,7 +1296,8 @@ compilers-clean :
 	$(MAKE) compilers/past clean
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
-
+	$(MAKE) compilers/bcg clean
+	
 ###############################################################################
 #
 # editors targets:

@@ -1,0 +1,33 @@
+RM_F			= @rm_f@
+PERL			= @perl@
+PARROT	    	= ../../parrot@exe@
+O				= @o@
+LOAD_EXT		= @load_ext@
+
+BUILD_PMC   	= $(PERL) @build_dir@/tools/build/dynpmc.pl
+SRC_PMC_DIR		= src/pmc
+DEST_PMC_DIR	= @build_dir@/runtime/parrot/dynext
+PMC_GROUP       = $(DEST_PMC_DIR)/bcg_group$(LOAD_EXT)
+
+PMCS = \
+ bcg
+
+PMC_GEN_FILES = \
+ $(SRC_PMC_DIR)/*.dump \
+ $(SRC_PMC_DIR)/*.c \
+ $(SRC_PMC_DIR)/*.h \
+ $(SRC_PMC_DIR)/*$(O) \
+ $(SRC_PMC_DIR)/*$(LOAD_EXT) \
+ $(PMC_GROUP)
+
+all: pmcs
+
+pmcs:
+	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) generate $(PMCS)
+	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) compile $(PMCS)
+	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) linklibs $(PMCS)
+	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) copy "--destination=$(DEST_PMC_DIR)" \
+		 $(PMCS)
+
+clean:
+	$(RM_F) $(PMC_GEN_FILES)

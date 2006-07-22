@@ -1,0 +1,30 @@
+/* bcg.pmc
+ *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  SVN Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the bcg base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass bcg dynpmc need_ext group bcg_group {
+
+    void init () {
+    }
+
+    void init_pmc (PMC* initializer) {
+    }
+
+    void mark () {
+    }
+
+    void destroy () {
+    }
+
+}

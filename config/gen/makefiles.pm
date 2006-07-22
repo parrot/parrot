@@ -95,6 +95,11 @@ sub makefiles
         commentType                             => '#',
         replace_slashes                         => 1
     );
+	genfile(
+        'config/gen/makefiles/bcg.in'     		=> 'compilers/bcg/Makefile',
+        commentType                             => '#',
+        replace_slashes                         => 1,
+    );
     genfile(
         'config/gen/makefiles/dynpmc.in'        => 'src/dynpmc/Makefile',
         commentType                             => '#',
