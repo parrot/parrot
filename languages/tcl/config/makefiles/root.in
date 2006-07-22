@@ -106,6 +106,7 @@ src/macros.pir \
 src/parser.pir \
 src/returncodes.pir \
 src/grammar/expr/expression.pir \
+src/grammar/expr/functions.pir \
 src/grammar/expr/parse.pir \
 src/grammar/expr/operators.pir \
 src/grammar/expr/past2pir.pir \

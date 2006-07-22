@@ -231,4 +231,5 @@ env_loop_done:
 
 .include 'languages/tcl/src/grammar/expr/expression.pir'
 .include 'languages/tcl/src/grammar/expr/parse.pir'
+.include 'languages/tcl/src/grammar/expr/functions.pir'
 .include 'languages/tcl/src/grammar/expr/operators.pir'
