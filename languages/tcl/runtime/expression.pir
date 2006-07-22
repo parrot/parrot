@@ -15,10 +15,12 @@ XXX - rewrite using the PGE/TGE tools.
 
 =over 4
 
-=cut
+=item (PMC val, INT pos) get_number(STRING expr, INT pos)
 
-# given a string, starting at position, return a PMC
-# for the number and the new position
+Given a string, starting at position, return a PMC
+for the number and the position after the last character used.
+
+=cut
 
 .sub get_number
   .param string expr
@@ -145,3 +147,7 @@ failure:
 done:
   .return(value, pos)
 .end
+
+=back
+
+=cut

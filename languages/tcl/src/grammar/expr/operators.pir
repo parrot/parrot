@@ -4,9 +4,7 @@
 
 src/expr/operators.pir - [expr] operator definitions.
 
-=head1 Functions
-
-=over 4
+=head2 Prefix Operators
 
 =cut
 
@@ -40,6 +38,10 @@ src/expr/operators.pir - [expr] operator definitions.
     $I0 = not a
     .return ($I0)
 .end
+
+=head2 Infix Operators
+
+=cut
 
 # XXX No Strings.
 .sub 'infix:*'      # multiply
@@ -185,17 +187,21 @@ src/expr/operators.pir - [expr] operator definitions.
     .return ($I0)
 .end
 
-# Note: &&, ||, ?: will be handled in the TGE transformation.
+# XXX Note: &&, ||, ?: will be handled in the TGE transformation.
 
-# Functions are very similar to ops, so handle them similarly here.
+=head2 Nullary Functions
 
-# We have a bit of setup/teardown here to insure we return a TclFloat
+Functions are very similar to ops, so handle them similarly here.
 
-# nullary 
+=cut
+
 .sub 'function:rand'
 .end
 
-# unary
+=head2 Unary Functions
+
+=cut
+
 .sub 'function:abs' :multi (String)
     .throw("argument to math function didn't have numeric value")
 .end
@@ -441,8 +447,9 @@ domain_error:
 .sub 'function:wide'
 .end
 
-# binary
-# atan2 | fmod | hypot | pow 
+=head2 Binary Functions
+
+=cut
 
 .sub 'function:fmod' :multi (String, pmc)
     .throw("argument to math function didn't have numeric value")
