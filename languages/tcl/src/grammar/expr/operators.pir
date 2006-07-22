@@ -51,10 +51,11 @@ src/expr/operators.pir - [expr] operator definitions.
 
 # XXX No Strings.
 .sub 'infix:/'     # divide
-    .param float a
-    .param float b
-    $N0 = div a, b
-    .return ($N0)
+    .param pmc a
+    .param pmc b
+    $P0 = new 'TclFloat'
+    $P0 = div a, b
+    .return ($P0)
 .end
 
 # XXX Integer Only
@@ -191,9 +192,11 @@ src/expr/operators.pir - [expr] operator definitions.
 
 # We have a bit of setup/teardown here to insure we return a TclFloat
 
+# nullary 
 .sub 'function:rand'
 .end
 
+# unary
 .sub 'function:abs' :multi (String)
     .throw("argument to math function didn't have numeric value")
 .end
@@ -245,7 +248,17 @@ src/expr/operators.pir - [expr] operator definitions.
     .return (ret)
 .end
 
-.sub 'function:ceil'
+.sub 'function:ceil' :multi (String)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:ceil' :multi (pmc)
+    .param float a
+    .local pmc ret
+    ret = new "TclFloat"
+    $N0 = ceil a
+    ret = $N0
+    .return (ret)
 .end
 
 .sub 'function:cos' :multi (String)
@@ -274,7 +287,13 @@ src/expr/operators.pir - [expr] operator definitions.
     .return (ret)
 .end
 
-.sub 'function:double'
+.sub 'function:double' :multi (String)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:double' :multi (pmc)
+    .param float a
+    .return (a)
 .end
 
 .sub 'function:exp' :multi (String)
@@ -290,10 +309,16 @@ src/expr/operators.pir - [expr] operator definitions.
     .return (ret)
 .end
 
-.sub 'function:floor'
+.sub 'function:floor' 
 .end
 
-.sub 'function:int'
+.sub 'function:int' :multi (String)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:int' :multi (pmc)
+    .param int a
+    .return (a)
 .end
 
 .sub 'function:log' :multi (String)
@@ -322,7 +347,21 @@ src/expr/operators.pir - [expr] operator definitions.
     .return (ret)
 .end
 
-.sub 'function:round'
+.sub 'function:round' :multi (String)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:round' :multi (pmc)
+    .param float a
+    if a < 0 goto neg
+
+    $N0 = a + 0.5
+    $I0 = $N0
+    .return ($I0)
+neg: 
+    $N0 = a - 0.5
+    $I0 = $N0
+    .return ($I0)
 .end
 
 .sub 'function:sin' :multi (String)
@@ -358,10 +397,14 @@ src/expr/operators.pir - [expr] operator definitions.
 .sub 'function:sqrt' :multi (pmc)
     .param float a
     .local pmc ret
+    if a < 0 goto domain_error
     ret = new "TclFloat"
     $N0 = sqrt a
     ret = $N0
     .return (ret)
+
+domain_error:
+    .throw('domain error: argument not in valid range')
 .end
 
 .sub 'function:srand'
@@ -395,3 +438,6 @@ src/expr/operators.pir - [expr] operator definitions.
 
 .sub 'function:wide'
 .end
+
+# binary
+# atan2 | fmod | hypot | pow 
