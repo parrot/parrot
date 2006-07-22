@@ -191,7 +191,7 @@ sub gather_groups_and_libs {
         push @{ $group_files{$group} }, $pmc;
         $group_libs{$group} ||= {};
         foreach my $lib ( keys %libs ) {
-            $group_libs{$group}->{lib} = 1;
+            $group_libs{$group}->{$lib} = 1;
         }
     }
 
