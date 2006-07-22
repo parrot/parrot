@@ -13,9 +13,8 @@ the current state of the parse, passes the match object
 to the operator precedence parser to obtain an expression,
 and returns the result to the caller.
 
-=cut
 
-.namespace [ 'Tcl::Grammar::Expr' ]
+.namespace [ 'TclExpr::Grammar' ]
 
 .include 'cclass.pasm'
 
@@ -25,14 +24,11 @@ and returns the result to the caller.
     .param int has_stoptoken   :opt_flag # ignored
 
     .local pmc optable
-    .local pmc ws
 
     load_bytecode 'PGE/Util.pbc'
 
-    optable = find_global 'Tcl::Grammar::Expr', '$optable'
-    #ws = find_global '_Tcl::Grammar::Expr', 'ws'
-    #setattribute optable, "PGE::OPTable\x0&!ws", ws
-
+    optable = find_global 'TclExpr::Grammar', '$optable'
     .return optable.'parse'(mob)
 .end
 
+=cut

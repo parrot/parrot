@@ -1,0 +1,106 @@
+grammar TclExpr::PIR::Grammar is TGE::Grammar;
+
+transform result (ROOT) :language('PIR') {
+    .local pmc pir
+    .local pmc return_register
+
+    pir = new 'PGE::CodeString'
+    pir.emit(".namespace [ 'Tcl' ]")
+    pir.emit(".sub '_anon' :anon")
+   
+    $P0 = node['children']
+    if $P0 goto has_children
+    $P0 = node['command']
+    if $P0 goto is_command
+
+    $P0 = tree.get('pir', node, 'PAST::Val')
+    goto end
+
+  has_children:
+    $P0 = tree.get('pir', node, 'PAST::Op')
+    goto end
+
+  is_command:
+    $S0 = node['command'] 
+    #pir .= k
+    .throw($S0)
+
+  end:
+    return_register = node['ret']
+    pir .= $P0
+    pir.emit('  .return(%0)', return_register)
+    pir .= ".end\n"
+    .return(pir)
+}
+
+transform pir (PAST::Val) :language('PIR') {
+    .local pmc pir
+    .local pmc ret
+    .local pmc class
+
+    pir = new 'PGE::CodeString'
+    ret = pir.unique('$P')
+    class = node['class']
+    pir.emit('    %0 = new %1', ret, class)
+    $S0 = node['value']
+    if class == "'TclFloat'" goto assign_float
+    if class == "'.TclString'" goto assign_string
+    goto assign_val
+  assign_float:                                    
+    $I0 = index $S0, '.'                           # XXX: '.' hack due to
+    if $I0 >= 0 goto assign_val                    # parrotbug #38896
+    $I0 = index $S0, 'E'
+    if $I0 >= 0 goto assign_val
+    concat $S0, '.'
+    goto assign_val
+  assign_string:
+    $S0 = escape $S0
+    $S0 = concat '"', $S0
+    $S0 = concat $S0, '"'
+  assign_val:
+    pir.emit('    assign %0, %1', ret, $S0)
+  end:
+    node['ret'] = ret
+    node['istemp'] = 1
+    .return (pir)
+}
+
+transform pir (PAST::Op) {
+    .local pmc args,iter,pir
+    .local pmc return_register
+ 
+
+    pir = new 'PGE::CodeString'
+    args = new .ResizablePMCArray
+    iter = node.'child_iter'()
+  iter_loop: 
+    unless iter goto iter_done
+    $P1 = shift iter
+    $P0 = tree.get('pir', $P1)
+    return_register = $P1['ret']
+    push args, return_register
+    pir .= $P0
+    goto iter_loop
+  iter_done:
+    # get a result PMC
+    .local pmc retval
+    retval = pir.unique('$P')
+    pir .= retval
+    pir .= " = '"
+    $S0 = node['opfunc']
+    pir .= $S0
+    pir .= "'("
+    iter = new .Iterator, args
+  arg_loop:
+    unless iter goto arg_done 
+    $P0 = shift iter
+    $S0 = $P0
+    pir .= $S0
+    unless iter goto arg_done 
+    pir .= ","
+    goto arg_loop
+  arg_done:
+    pir .= ")\n" 
+    node['ret'] = retval
+    .return (pir)
+}

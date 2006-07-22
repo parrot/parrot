@@ -44,6 +44,17 @@ This is roughly equivalent to C<tclsh> - It takes the command line arguments
 and uses the tcl library to parse those contents as tcl. You can also specify
 command line options to be used with this bytecode file.
 
+=item src/grammar/expr/pge2past.pir
+=item src/grammar/expr/past2pir.pir
+=item src/grammar/expr/expression.pir
+
+This C<PIR> files are generated from their corresponding C<.tg> and C<.pg>
+files. These grammar files allow us to use PGE's implementation of perl6
+rules to more simply specify our parsing rules. At the moment, only the
+[expr] rules are used. This might eventually be extended to replace
+the entire parsing system used by tcl, which was originally hand-rolled
+in C<PIR>.
+
 =back
 
 =head2 Classes
@@ -134,7 +145,8 @@ common to all the scalar value types.
 
 To run the test suite, C<make test>. If you want to also get output from the
 TODO tests, C<make devtest> instead. This is NOT the tcl test suite.
-No failures are expected.
+Occasional failures are suspected against svn-head; there should be no
+failures in a released version, however.
 
 To run the tcl test suite, type C<make tcl-test>. This will checkout the latest
 cvs copy of the tests from the tcl repository and run them. Warning:
@@ -158,3 +170,5 @@ implement 100% of Tcl yet anyway. Expect a low pass rate.
 
 There are examples in the C<examples> directory that are vaguely more
 interesting. Change to that directory and type C<make> for directions.
+
+=cut

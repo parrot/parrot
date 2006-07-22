@@ -200,6 +200,18 @@ Simplistic implementation of C<__clone>
 
 .endm
 
+=head2 dumper
+
+Utility macro to simplify generating output during debug cycles.
+
+=cut
+
+.macro dumper(dingus)
+  load_bytecode 'library/dumper.pbc'
+  load_bytecode 'PGE/Dumper.pbc'
+  _dumper(.dingus)
+.endm
+
 =head1 compilation related macros
  
 =head2 sprintf<N>(OUT str code, IN str format, IN pmc val, ...)
@@ -210,23 +222,6 @@ C<val> arguments it's expecting.
 
 =cut
 
-.macro sprintf1(output,format,val1)
-  .sym pmc arglist 
-  arglist = new .Array
-  arglist = 1
-  arglist[0] = .val1
-  .output = sprintf .format, arglist
-.endm
-
-.macro sprintf2(output,format,val1,val2)
-  .sym pmc    arglist 
-  arglist = new .Array
-  arglist = 2
-  arglist[0] = .val1
-  arglist[1] = .val2
-  .output = sprintf .format, arglist
-.endm
-
 .macro sprintf3(output,format,val1,val2,val3)
   .sym pmc arglist 
   arglist = new .Array
@@ -234,17 +229,6 @@ C<val> arguments it's expecting.
   arglist[0] = .val1
   arglist[1] = .val2
   arglist[2] = .val3
-  .output = sprintf .format, arglist
-.endm
-
-.macro sprintf4(output,format,val1,val2,val3,val4)
-  .sym pmc arglist 
-  arglist = new .Array
-  arglist = 4
-  arglist[0] = .val1
-  arglist[1] = .val2
-  arglist[2] = .val3
-  arglist[3] = .val4
   .output = sprintf .format, arglist
 .endm
 
@@ -260,60 +244,3 @@ C<val> arguments it's expecting.
   arglist[5] = .val6
   .output = sprintf .format, arglist
 .endm
-
-.macro sprintf8(output,format,val1,val2,val3,val4,val5,val6,val7,val8)
-  .sym pmc arglist 
-  arglist = new .Array
-  arglist = 8
-  arglist[0] = .val1
-  arglist[1] = .val2
-  arglist[2] = .val3
-  arglist[3] = .val4
-  arglist[4] = .val5
-  arglist[5] = .val6
-  arglist[6] = .val7
-  arglist[7] = .val8
-  .output = sprintf .format, arglist
-.endm
-
-.macro sprintf10(output,format,val1,val2,val3,val4,val5,val6,val7,val8,val9,val10)
-  .sym pmc arglist 
-  arglist = new .Array
-  arglist = 10
-  arglist[0] = .val1
-  arglist[1] = .val2
-  arglist[2] = .val3
-  arglist[3] = .val4
-  arglist[4] = .val5
-  arglist[5] = .val6
-  arglist[6] = .val7
-  arglist[7] = .val8
-  arglist[8] = .val9
-  arglist[9] = .val10
-  .output = sprintf .format, arglist
-.endm
-
-.macro sprintf14(output,format,val1,val2,val3,val4,val5,val6,val7,val8,val9,val10,val11,val12,val13,val14)
-  .sym pmc arglist 
-  arglist = new .Array
-  arglist = 14
-  arglist[0] = .val1
-  arglist[1] = .val2
-  arglist[2] = .val3
-  arglist[3] = .val4
-  arglist[4] = .val5
-  arglist[5] = .val6
-  arglist[6] = .val7
-  arglist[7] = .val8
-  arglist[8] = .val9
-  arglist[9] = .val10
-  arglist[10] = .val11
-  arglist[11] = .val12
-  arglist[12] = .val13
-  arglist[13] = .val14
-  .output = sprintf .format, arglist
-.endm
-
-
-
-

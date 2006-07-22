@@ -26,7 +26,7 @@ Create a PIR sub on the fly for this user defined proc.
   .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
   .get_from_HLL(__list,       '_tcl', '__list')
   .get_from_HLL(__namespace,  '_tcl', '__namespace')
-  
+ 
   .local pmc code, args_code, defaults
   .local string namespace
   code      = new 'TclCodeString'

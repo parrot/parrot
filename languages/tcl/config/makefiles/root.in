@@ -105,10 +105,11 @@ src/compiler.pir \
 src/macros.pir \
 src/parser.pir \
 src/returncodes.pir \
-src/grammar/optok.pir \
-src/grammar/expression.pir \
-src/grammar/parse.pir
-
+src/grammar/expr/expression.pir \
+src/grammar/expr/parse.pir \
+src/grammar/expr/operators.pir \
+src/grammar/expr/past2pir.pir \
+src/grammar/expr/pge2past.pir
 
 all: tcl.pbc
 
@@ -130,13 +131,10 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 
 PBCS = \
 runtime/tcllib_temp.pbc \
-$(CLASSDIR)/tclbinaryops.pbc \
 $(CLASSDIR)/tclcodestring.pbc \
 $(CLASSDIR)/tclcommand.pbc \
 $(CLASSDIR)/tclcommandlist.pbc \
 $(CLASSDIR)/tclconst.pbc \
-$(CLASSDIR)/tclfunc.pbc \
-$(CLASSDIR)/tclops.pbc \
 $(CLASSDIR)/tclvar.pbc \
 $(CLASSDIR)/tclword.pbc
 
@@ -211,8 +209,9 @@ runtime/builtins.pir \
 "$(PMCDIR)/*$(O)" \
 "t/*.pir" \
 "t/*.tcl" \
-src/grammar/expression.pir \
-src/grammar/optok.pir \
+src/grammar/expr/expression.pir \
+src/grammar/expr/past2pir.pir \
+src/grammar/expr/pge2past.pir \
 $(GENERATED_INLINES)
 
 clean:

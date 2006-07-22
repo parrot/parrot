@@ -1,0 +1,196 @@
+grammar TclExpr::PAST::Grammar is TGE::Grammar;
+
+transform result (ROOT) {
+    # Top level result is always going to be an expr.
+
+    node = node['expr']
+    .return tree.get('dispatch', node)
+} 
+
+# Handle generic dispatch (needed at ROOT, and for things with kids.)
+
+transform dispatch (PGE::Match) {
+    .local pmc child
+
+    # Ask the child node for its result.
+
+    $P0 = node['integer']
+    if $P0 goto integer
+    $P0 = node['number']
+    if $P0 goto number
+    $P0 = node['quoted']
+    if $P0 goto quoted
+    $P0 = node['function']
+    if $P0 goto function
+    $P0 = node['command']
+    if $P0 goto command
+    $P0 = node['type']
+    if $P0 goto operator
+  
+  .return(node)
+ 
+ operator:
+    .return tree.get('result', node, 'operator')
+
+  function:
+    .return tree.get('result', $P0, 'function')
+
+  command:
+    .return tree.get('result', $P0, 'command')
+
+  quoted:
+    .return tree.get('result', $P0, 'quoted')
+
+  number:
+    .return tree.get('result', $P0, 'number')
+
+  integer:
+    .return tree.get('result', $P0, 'integer')
+}
+
+# Go through all the children of an operator and transform them.
+
+transform result (operator) {
+    # for each child of this operator, dispatch to get the result,
+    # use those as our children.
+    .local pmc children, iter, past
+    .local string name
+
+    past = new 'PAST::Op'
+    name = node['type']
+    # XXX this would be a good spot to branch to deal with ||, &&, ?:, etc.
+    past['opfunc'] = name
+    $P0 = node.'get_array'()
+    if null $P0 goto iter_end
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $S0 = $P0
+    if $S0 == '' goto iter_loop # XXX needed?
+    $P1 = tree.'get'('dispatch', $P0)
+    past.'add_child'($P1)
+    goto iter_loop
+  iter_end:
+    past['children'] = 1
+    .return (past)
+}
+
+transform result (function) {
+    # for each child of this operator, dispatch to get the result,
+    # use those as our children.
+    .local pmc children, iter, past
+    .local string function_name
+
+    past = new 'PAST::Op'
+    $P0  = node['unary_function']
+    if $P0 goto unary
+    $P0  = node['nullary_function']
+    if $P0 goto nullary
+    $P0  = node['binary_function']
+    if $P0 goto binary
+ 
+  # never get here
+
+  nullary:
+    function_name = node['nullary_function']
+    goto arguments
+
+  unary:
+    function_name = node['unary_function']
+    $P0 = node ['expression'; 'expr']
+    $P1 = tree.'get'('dispatch', $P0)
+    past.'add_child'($P1)
+    goto arguments
+
+  binary:
+    function_name = node['binary_function']
+
+  arguments:
+    function_name = 'function:' . function_name
+    past['opfunc'] = function_name
+
+
+    past['children'] = 1
+    .return (past)
+}
+
+transform result (integer) {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.set_node(node)
+
+    $P0 = node['octal']
+    if $P0 goto octal
+    $P0 = node['hex']
+    if $P0 goto hex
+
+  decimal:
+    $S0 = node
+    result['value'] = $S0
+    result['class'] = "'TclInt'"
+    .return (result)
+ 
+  octal: 
+     $S0 = node
+
+    .local int octal_value
+    .local int octal_digit
+    .local int octal_counter
+    .local int octal_length
+    octal_length = length $S0
+    octal_counter = 1 #skip the first 0
+    dec octal_counter
+    octal_value = 0
+    # at this point, string should consist only of digits 0-7
+  octal_loop:
+    if octal_counter == octal_length goto octal_done # skip first 0
+    octal_digit = ord $S0, octal_counter
+    octal_digit -= 48 # ascii value of 0
+    octal_value *= 8
+    octal_value += octal_digit
+    inc octal_counter
+    goto octal_loop
+  
+  octal_done:
+    result['value'] = octal_value
+    result['class'] = "'TclInt'"
+    .return (result)
+
+  hex: 
+    .return ()
+
+}
+
+transform result (number) {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.set_node(node)
+
+    $S0 = node
+    result['value'] = $S0
+    result['class'] = "'TclFloat'"
+    .return (result)
+}
+
+transform result (quoted) {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.set_node(node)
+
+    $S0 = node
+    result['value'] = $S0
+    result['class'] = "'TclString'"
+    .return (result)
+}
+
+transform result (command) {
+    .local pmc result
+    result = new 'PAST::Command'
+    result.set_node(node)
+    $P0 = node.'get_array'()
+
+    $S0 = $P0[0] # strip the []'s 
+    result['command'] = $S0
+    .return (result)
+}

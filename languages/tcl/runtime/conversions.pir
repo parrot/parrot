@@ -130,18 +130,49 @@ bad_channel:
 
 =head2 _Tcl::__expr
 
-Given an expression, return a subroutine.
+Given an expression, return a subroutine, or optionally, the raw PIR
 
 =cut
 
 .sub __expr
-  .param string expr
-  
-  .get_from_HLL($P0, '_tcl', '__expression_compile')
-  ($I0,$S0) = $P0(0,expr)
-  $P2 = pir_compiler($I0,$S0)
-  
-  .return($P2)
+    .param string expression
+    .param int     pir_only :named('pir_only') :optional
+    .param int has_pir_only :opt_flag
+
+    .local pmc parse
+    .local pmc match
+
+    .get_from_HLL($P0, '_tcl', 'TclExpr::Grammar')
+    parse = $P0['expression']
+    match = parse(expression)
+ 
+    unless match goto bad_expression
+
+    .local pmc astgrammar, astbuilder, ast
+    astgrammar = new 'TclExpr::PAST::Grammar'
+    astbuilder = astgrammar.apply(match)
+    ast = astbuilder.get('result')
+
+  build_pir:
+    .local pmc pirgrammar, pirbuilder
+    .local string pir
+    pirgrammar = new 'TclExpr::PIR::Grammar'
+    pirbuilder = pirgrammar.'apply'(ast)
+    pir = pirbuilder.get('result')
+
+    if has_pir_only goto only_pir
+
+    $P1 = compreg 'PIR'
+    $P2 = $P1(pir)
+    .return ($P2)
+
+  only_pir:
+    .return (pir)
+
+  bad_expression:
+    # XXX either shouldn't happen, or need better message
+    .throw ('unparsable expression') 
+
 .end
 
 =head2 _Tcl::__script

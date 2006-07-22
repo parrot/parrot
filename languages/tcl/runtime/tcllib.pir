@@ -8,78 +8,27 @@ providing a compreg-compatible method.
 
 =cut
 
+# XXX It would be nice to be able to reduce the # of times we call
+# .HLL here and in the .included files to a minimum.
+
+.HLL 'parrot', ''
+
 .loadlib 'dynlexpad'
-.include 'languages/tcl/src/returncodes.pir'
 .include 'languages/tcl/src/macros.pir'
 .include 'cclass.pasm'
 
-# don't pollute the global namespaces with our utility functions.
+.namespace [ 'TclExpr::PAST::Grammar' ]
+.include 'languages/tcl/src/grammar/expr/pge2past.pir'
 
-# setup some global constants (a bit TOO global, we should confine these
-# to at least the _Tcl namespace)
+.namespace [ 'TclExpr::PIR::Grammar' ]
+.include 'languages/tcl/src/grammar/expr/past2pir.pir'
 
-# expression codes - we use TCL_OK there, so move these out high enough
-# so there's no conflict.
+.include 'languages/tcl/src/grammar/expr/past.pir'
 
-  .const int OP      = 20
-  .const int OPERAND = 11
- 
-  # Still not sure if these are going to be useful
-  .const int BLOCK   = 14
-  .const int COMMAND = 16
-
-
-# Constants for operator/function lookup.
-
-  .const int OPERATOR_AND    = 26
-  .const int OPERATOR_OR     = 27
-  .const int OPERATOR_EQ     = 28
-  .const int OPERATOR_NE     = 29
-  .const int OPERATOR_BITAND = 30
-  .const int OPERATOR_BITOR  = 31
-  .const int OPERATOR_BITXOR = 32
-  .const int OPERATOR_DIV    = 33
-  .const int OPERATOR_EQUAL  = 34
-  .const int OPERATOR_GT     = 35
-  .const int OPERATOR_GTE    = 36
-  .const int OPERATOR_LT     = 37
-  .const int OPERATOR_LTE    = 38
-  .const int OPERATOR_MINUS  = 39
-  .const int OPERATOR_MOD    = 40
-  .const int OPERATOR_MUL    = 41
-  .const int OPERATOR_PLUS   = 42
-  .const int OPERATOR_SHL    = 43
-  .const int OPERATOR_SHR    = 44
-  .const int OPERATOR_UNEQUAL= 45
-
-  .const int FUNCTION_ATAN2  = 46
-  .const int FUNCTION_FMOD   = 47
-  .const int FUNCTION_POW    = 48
-  .const int OPERATOR_UMINUS = 49
-  .const int OPERATOR_UPLUS  = 50
-  .const int OPERATOR_BITNOT = 51
-  .const int OPERATOR_LOGNOT = 52
-  .const int FUNCTION_ABS    = 53
-  .const int FUNCTION_ACOS   = 54
-  .const int FUNCTION_ASIN   = 55
-  .const int FUNCTION_ATAN   = 56
-  .const int FUNCTION_COS    = 57
-  .const int FUNCTION_COSH   = 58
-  .const int FUNCTION_EXP    = 59
-  .const int FUNCTION_LOG    = 60
-  .const int FUNCTION_LOG10  = 61
-  .const int FUNCTION_ROUND  = 62
-  .const int FUNCTION_SIN    = 63
-  .const int FUNCTION_SINH   = 64
-  .const int FUNCTION_SQRT   = 65
-  .const int FUNCTION_TAN    = 66
-  .const int FUNCTION_TANH   = 67
-  .const int FUNCTION_RAND   = 68
-
-# all the builtin commands
+# all the builtin commands (HLL: Tcl - loads 'tcl_group')
 .include 'languages/tcl/runtime/builtins.pir'
 
-# library files
+# library files (HLL: _Tcl)
 .include 'languages/tcl/runtime/conversions.pir'
 .include 'languages/tcl/runtime/expression.pir'
 .include 'languages/tcl/runtime/list.pir'
@@ -90,7 +39,6 @@ providing a compreg-compatible method.
 .include 'languages/tcl/src/compiler.pir'
 .include 'languages/tcl/src/parser.pir'
 
-.HLL 'Tcl', 'tcl_group'
 
 # create the 'tcl' namespace -- see RT #39852
 # http://rt.perl.org/rt3/Ticket/Display.html?id=39852
@@ -114,8 +62,7 @@ providing a compreg-compatible method.
   load_bytecode 'Getopt/Obj.pbc'
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pbc'
-
-  #_load_grammar()
+  load_bytecode 'TGE.pbc'
 
   # Expose Environment variables.
   .local pmc env,tcl_env,iterator
@@ -173,80 +120,29 @@ env_loop_done:
 
    store_global 'binary_types', binary_types
 
-  .local pmc operators
-  .local pmc math_funcs
-  .local pmc precedence
-
-  # XXX Should track how many args are needed for each of these.
+  # XXX - this is a holdover. We should incorporate this list into the
+  # appropriate grammar so we don't have two lists sitting around.
 
   # Keep track of math functions
+  .local pmc math_funcs
   math_funcs = new .TclArray
 
-  math_funcs['abs']   = FUNCTION_ABS
-  math_funcs['acos']  = FUNCTION_ACOS
-  math_funcs['asin']  = FUNCTION_ASIN
-  math_funcs['atan']  = FUNCTION_ATAN
-  math_funcs['cos']   = FUNCTION_COS
-  math_funcs['cosh']  = FUNCTION_COSH
-  math_funcs['exp']   = FUNCTION_EXP
-  math_funcs['log']   = FUNCTION_LOG
-  math_funcs['log10'] = FUNCTION_LOG10
-  math_funcs['sin']   = FUNCTION_SIN
-  math_funcs['sinh']  = FUNCTION_SINH
-  math_funcs['sqrt']  = FUNCTION_SQRT
-  math_funcs['tan']   = FUNCTION_TAN
-  math_funcs['tanh']  = FUNCTION_TANH
+  math_funcs['abs']   = 1
+  math_funcs['acos']  = 1
+  math_funcs['asin']  = 1
+  math_funcs['atan']  = 1
+  math_funcs['cos']   = 1
+  math_funcs['cosh']  = 1
+  math_funcs['exp']   = 1
+  math_funcs['log']   = 1
+  math_funcs['log10'] = 1
+  math_funcs['sin']   = 1
+  math_funcs['sinh']  = 1
+  math_funcs['sqrt']  = 1
+  math_funcs['tan']   = 1
+  math_funcs['tanh']  = 1
 
-  operators = new .TclArray
-  precedence = new .TclArray
-
-  # XXX This precedence check should be shoved into [expr]. There's no need
-  # to make it this generic. 
-
-  operators['*'] = OPERATOR_MUL
-  precedence['*'] = 1 
-  operators['/'] = OPERATOR_DIV
-  precedence['/'] = 1 
-  operators['%'] = OPERATOR_MOD
-  precedence['%'] = 1 
-  operators['+'] = OPERATOR_PLUS
-  precedence['+'] = 2
-  operators['-'] = OPERATOR_MINUS
-  precedence['-'] = 2 
-  operators['<<'] = OPERATOR_SHL
-  precedence['<<'] = 3 
-  operators['>>'] = OPERATOR_SHR
-  precedence['>>'] = 3 
-  operators['<'] = OPERATOR_LT
-  precedence['<'] = 4
-  operators['>'] = OPERATOR_GT
-  precedence['>'] = 4
-  operators['<='] = OPERATOR_LTE
-  precedence['<='] = 4 
-  operators['>='] = OPERATOR_GTE
-  precedence['>='] = 4
-  operators['=='] = OPERATOR_EQUAL
-  precedence['=='] = 5
-  operators['!='] = OPERATOR_UNEQUAL
-  precedence['!='] = 5
-  operators['ne'] = OPERATOR_NE
-  precedence['ne'] = 6
-  operators['eq'] = OPERATOR_EQ 
-  precedence['eq'] = 6
-  operators['&'] = OPERATOR_BITAND
-  precedence['&'] = 7
-  operators['^'] = OPERATOR_BITXOR
-  precedence['^'] =  8
-  operators['|'] = OPERATOR_BITOR
-  precedence['|'] = 9
-  operators['&&'] = OPERATOR_AND
-  precedence['&&'] = 10
-  operators['||'] = OPERATOR_OR
-  precedence['||'] = 11
-
-  store_global 'operators', operators
   store_global 'functions', math_funcs
-  store_global 'precedence', precedence
 
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
@@ -333,6 +229,6 @@ env_loop_done:
   .return pir_compiler($I0,$S0)
 .end
 
-.include 'languages/tcl/src/grammar/expression.pir'
-.include 'languages/tcl/src/grammar/parse.pir'
-.include 'languages/tcl/src/grammar/optok.pir'
+.include 'languages/tcl/src/grammar/expr/expression.pir'
+.include 'languages/tcl/src/grammar/expr/parse.pir'
+.include 'languages/tcl/src/grammar/expr/operators.pir'

@@ -16,8 +16,7 @@
 
   .local pmc retval
   .local pmc expression_compiler,pir_compiler
-  .get_from_HLL(expression_compiler, '_tcl', '__expression_compile')
-  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
+  .get_from_HLL(expression_compiler, '_tcl', '__expr')
 
   expr = ''
   looper = 0
@@ -35,9 +34,9 @@ loop:
   goto loop
 
 loop_done:
-  ($I0,$S0) = expression_compiler(0,expr)
-  $P2 = pir_compiler($I0,$S0)
-  .return $P2()
+  $P1 = expression_compiler(expr)
+  $P2 = $P1()
+  .return ($P2)
 
 no_args:
   .throw('wrong # args: should be "expr arg ?arg ...?"')

@@ -1,0 +1,105 @@
+grammar TclExpr::Grammar;
+
+# The expression token is the top level expression - it is defined in 
+# XXX-NAME-OF-SUB in XXX-NAME-OF-FILE, which in turn invokes the
+# opcode parser from src/tcl_expr_optok.pg.
+
+# XXX Some of the items here actually belong in the language grammar. 
+# (like command, quoted, etc.) Move them there when we use PGE for everything.
+
+token term {
+    [
+    | <command>
+    | <quoted>
+    | <number>
+    | <integer>
+    | <variable>
+    | <function>
+    ]
+}
+
+## used by term
+
+# XXX EXTREMELY naive
+token command  { \[ (<[A..Za..z\d{}"]>*) \] }
+
+# XXX naive
+token quoted   { " ([\\.|<-["]>]*) : " }
+
+# XXX naive
+token variable { \$ (<[a..zA..Z]>) }
+
+token number  { [<[0..9]>+|0+]\.<[0..9]>* }
+
+token decimal { [<[1..9]><[0..9]>*] }
+
+# XXX squawk about invalid looking octal.
+
+token octal   { 0 <[0..7]> *: }
+token hex     { 0<[xX]> ( <[0..9A..Fa..f]>) + }
+token integer { [<decimal> | <octal> | <hex> ] }
+
+token nullary_function { rand }
+
+token unary_function { 
+ abs    | acos   | asin   | atan   | ceil   | cosh?  | double | exp    |
+ floor  | int    | log    | log10  | round  | sinh?  | sqrt   | srand  |
+ tanh?  | wide
+}
+
+token binary_function { atan2 | fmod | hypot | pow }
+
+token function { 
+  [ <nullary_function> \( \)
+  | <unary_function>   \( <expression> \)
+  | <binary_function>  \( <expression> , <expression> \)
+  ] 
+}
+
+rule 'expression' is optable {...}
+
+proto 'term:' is precedence('16=')
+    is parsed(&term) {...}
+ 
+proto 'prefix:-' is precedence('15=') {...}
+proto 'prefix:+' is precedence('15=') {...}
+proto 'prefix:~' is precedence('15=') {...}
+proto 'prefix:!' is precedence('15=') {...}
+
+proto 'infix:**' is precedence('14=') {...}
+
+proto 'infix:*'  is precedence('13=') {...}
+proto 'infix:/'  is precedence('13=') {...}
+proto 'infix:%'  is precedence('13=') {...}
+
+proto 'infix:+'  is precedence('12=') {...}
+proto 'infix:-'  is precedence('12=') {...}
+
+proto 'infix:<<' is precedence('11=') {...}
+proto 'infix:>>' is precedence('11=') {...}
+
+proto 'infix:<'  is precedence('10=') {...}
+proto 'infix:>'  is precedence('10=') {...}
+proto 'infix:<=' is precedence('10=') {...}
+proto 'infix:>=' is precedence('10=') {...}
+
+proto 'infix:==' is precedence('9=') {...}
+proto 'infix:!=' is precedence('9=') {...}
+
+proto 'infix:eq' is precedence('8=') {...}
+proto 'infix:ne' is precedence('8=') {...}
+
+proto 'infix:in' is precedence('7=') {...}
+proto 'infix:ni' is precedence('7=') {...}
+
+proto 'infix:&'  is precedence('6=') {...}
+
+proto 'infix:^'  is precedence('5=') {...}
+
+proto 'infix:|'  is precedence('4=') {...}
+
+proto 'infix:&&' is precedence('3=') {...}
+
+proto 'infix:||' is precedence('2=') {...}
+
+proto 'ternary:? :' is precedence('1=') {...}

@@ -26,7 +26,7 @@
   .local pmc compiler,pir_compiler,expr_compiler
   .get_from_HLL(compiler,'_tcl','compile')
   .get_from_HLL(pir_compiler,'_tcl','pir_compiler')
-  .get_from_HLL(expr_compiler,'_tcl','__expression_compile')
+  .get_from_HLL(expr_compiler,'_tcl','__expr')
  
   .local string temp_str
   temp_str ='' 
