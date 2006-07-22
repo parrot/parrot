@@ -13,7 +13,8 @@ transform result (ROOT) :language('PIR') {
     $P0 = node['command']
     if $P0 goto is_command
 
-    $P0 = tree.get('pir', node, 'PAST::Val')
+    $S0 = typeof node
+    $P0 = tree.get('pir', node, $S0)
     goto end
 
   has_children:
@@ -63,6 +64,23 @@ transform pir (PAST::Val) :language('PIR') {
     node['ret'] = ret
     node['istemp'] = 1
     .return (pir)
+}
+
+transform pir (PAST::Var) :language('PIR') {
+    .local pmc pir, ret
+    pir = new 'PGE::CodeString'
+    ret = pir.unique('$P')
+    node['ret']    = ret
+    node['istemp'] = 1
+    
+    $S0 = node['name']
+    pir.emit(<<'END_PIR', ret, $S0)
+  .local pmc __read
+  .get_from_HLL(__read, '_tcl', '__read')
+  %0 = __read('%1')
+END_PIR
+    
+    .return(pir)
 }
 
 transform pir (PAST::Op) {

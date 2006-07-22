@@ -24,28 +24,33 @@ transform dispatch (PGE::Match) {
     if $P0 goto function
     $P0 = node['command']
     if $P0 goto command
+    $P0 = node['variable']
+    if $P0 goto variable
     $P0 = node['type']
     if $P0 goto operator
   
   .return(node)
  
- operator:
+operator:
     .return tree.get('result', node, 'operator')
 
-  function:
+function:
     .return tree.get('result', $P0, 'function')
 
-  command:
+command:
     .return tree.get('result', $P0, 'command')
 
-  quoted:
+quoted:
     .return tree.get('result', $P0, 'quoted')
 
-  number:
+number:
     .return tree.get('result', $P0, 'number')
 
-  integer:
+integer:
     .return tree.get('result', $P0, 'integer')
+
+variable:
+    .return tree.get('result', $P0, 'variable')
 }
 
 # Go through all the children of an operator and transform them.
@@ -203,4 +208,14 @@ transform result (command) {
     $S0 = $P0[0] # strip the []'s 
     result['command'] = $S0
     .return (result)
+}
+
+transform result (variable) {
+    .local pmc result
+    result = new 'PAST::Var'
+    result.set_node(node)
+    
+    $S0 = node[0]
+    result['name'] = $S0
+    .return(result)
 }
