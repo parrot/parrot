@@ -309,3 +309,46 @@ domain_error:
  domain_error:
     .throw('domain error: argument not in valid range')
 .end
+
+.sub 'function:hypot' :multi (String, pmc)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:hypot' :multi (pmc, String)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:hypot' :multi (pmc, pmc)
+    .param num a
+    .param num b
+    
+    $N0 = pow a, 2
+    $N1 = pow b, 2
+    
+    $N0 = $N0 + $N1
+    $N0 = sqrt $N0
+    
+    .local pmc ret
+    ret = new 'TclFloat'
+    ret = $N0
+    .return(ret)
+.end
+
+.sub 'function:pow' :multi (String, pmc)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:pow' :multi (pmc, String)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:pow' :multi (pmc, pmc)
+    .param num a
+    .param num b
+    
+    $N0 = pow a, b
+    .local pmc ret
+    ret = new 'TclFloat'
+    ret = $N0
+    .return(ret)
+.end
