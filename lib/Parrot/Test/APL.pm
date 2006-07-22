@@ -1,4 +1,4 @@
-# $Id: Punie.pm 11766 2006-02-27 11:53:00Z bernhard $
+# $Id$
 
 package Parrot::Test::APL;
 
