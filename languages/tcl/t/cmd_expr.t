@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 149;
+use Parrot::Test tests => 152;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -922,3 +922,20 @@ TCL
 syntax error in expression "0xg": extra tokens at end of expression
 OUT
 
+language_output_is("tcl", <<'TCL', <<'OUT', 'simple ternary');
+  puts [ expr 1?"whee":"cry"]
+TCL
+whee
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'ternary, true, short circuit');
+  expr {1?[puts ok]:[puts nok]}
+TCL
+ok
+OUT
+
+language_output_is("tcl", <<'TCL', <<'OUT', 'ternary, false, short circuit');
+  expr {0?[puts true]:[puts false]}
+TCL
+false
+OUT
