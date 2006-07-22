@@ -51,11 +51,10 @@ src/expr/operators.pir - [expr] operator definitions.
 
 # XXX No Strings.
 .sub 'infix:/'     # divide
-    .param pmc a
-    .param pmc b
-    $P0 = new 'TclFloat'
-    $P0 = div a, b
-    .return ($P0)
+    .param float a
+    .param float b
+    $N0 = div a, b
+    .return ($N0)
 .end
 
 # XXX Integer Only
@@ -293,7 +292,10 @@ src/expr/operators.pir - [expr] operator definitions.
 
 .sub 'function:double' :multi (pmc)
     .param float a
-    .return (a)
+    .local pmc ret
+    ret = new "TclFloat"
+    ret = a
+    .return (ret)
 .end
 
 .sub 'function:exp' :multi (String)
@@ -441,3 +443,27 @@ domain_error:
 
 # binary
 # atan2 | fmod | hypot | pow 
+
+.sub 'function:fmod' :multi (String, pmc)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:fmod' :multi (pmc, String)
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:fmod' :multi (pmc, pmc)
+    .param float a
+    .param float b
+    if b == 0 goto domain_error
+    $N0 = a / b
+    $I0 = $N0
+    $N0 -= $I0 
+    .local pmc ret
+    ret = new "TclFloat"
+    ret = $N0
+    .return (ret)
+
+ domain_error:
+    .throw('domain error: argument not in valid range')
+.end

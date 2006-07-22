@@ -105,6 +105,16 @@ transform result (function) {
 
   binary:
     function_name = node['binary_function']
+    $P0 = node ['expression']
+
+    $P1 = $P0[0]
+    $P1 = $P1['expr']
+    $P2 = tree.'get'('dispatch', $P1)
+    past.'add_child'($P2)
+    $P1 = $P0[1]
+    $P1 = $P1['expr']
+    $P2 = tree.'get'('dispatch', $P1)
+    past.'add_child'($P2)
 
   arguments:
     function_name = 'function:' . function_name
