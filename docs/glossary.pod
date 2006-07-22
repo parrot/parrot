@@ -15,6 +15,10 @@ development.
 =for comment
 Please keep me alphabetical!
 
+=head2 AST
+
+Abstract Syntax Tree.
+
 =head2 Continuations
 
 Think of continuations as an execution "context". This context includes
@@ -158,6 +162,10 @@ processing. Other languages chew through objects faster than memory)
 
 See also: L<"DOD">
 
+=head2 HLL
+
+High-Level Language
+
 =head2 ICU
 
 International Components for Unicode
@@ -222,6 +230,14 @@ the Parrot interpreter should implement.
 
 See also L<pdds/pdd00_pdd>.
 
+=head2 PGE
+
+Parrot Grammar Engine.
+
+=head2 PIL
+
+Pugs' Intermediate Language.
+
 =head2 PIR
 
 Parrot Intermediate Representation. A medium-level assembly language for Parrot
@@ -241,6 +257,10 @@ fundamental types, such as Perl's scalar values.
 POD is an acronym for Plain Old Documentation. This is for now the preferred
 form for all kinds of documentation in Parrot. See "perldoc perlpod" for
 details.
+
+=head2 POST
+
+Parrot Opcode Syntax Tree.
 
 =head2 Predereferencing
 
@@ -284,6 +304,10 @@ See L<running.pod> on how to tell parrot which run core should be used.
 
 =for TODO
   Add a list of available run cores, or provide pointer to documentation.
+
+=head2 TGE
+
+Tree Grammar Engine
 
 =head2 Vtable
 
