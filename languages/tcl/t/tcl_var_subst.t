@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"middle");
@@ -126,5 +126,13 @@ language_output_is("tcl", <<'TCL', <<'OUT', 'puts $array([set )])');
   puts $array([set )])
 TCL
 2
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', '$x\\::bar');
+  namespace eval foo {  proc bar {} { puts ok }  }
+  set x foo
+  $x\::bar
+TCL
+ok
 OUT
 
