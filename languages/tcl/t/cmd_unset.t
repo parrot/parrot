@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is("tcl", <<'TCL', <<'OUT', "unset nothing");
@@ -89,5 +89,16 @@ language_output_is('tcl', <<'TCL', <<'OUT', 'unset -nocomplain -- foo');
   puts ${--}
 TCL
 2
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'unset foo bar');
+  set foo 2
+  set bar 3
+  unset foo bar
+  puts [catch {puts $foo}]
+  puts [catch {puts $bar}]
+TCL
+1
+1
 OUT
 
