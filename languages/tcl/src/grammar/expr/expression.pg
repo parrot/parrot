@@ -9,7 +9,7 @@ grammar TclExpr::Grammar;
 
 token term {
     [
-    | <command>
+    | <subcommand>
     | <quoted>
     | <number>
     | <integer>
@@ -21,13 +21,25 @@ token term {
 ## used by term
 
 # XXX EXTREMELY naive
-token command  { \[ (<[A..Za..z\d{}"]>*) \] }
+rule subcommand  { \[ (<[A..Za..z\d{}"]>*) \] }
+
+token command {
+    \# \N* \n
+  | <word> [<?ws> <word>]*
+}
+
+token word {
+    <subcommand>
+  | <quoted>
+  | <variable>
+  | (\S+)
+}
 
 # XXX naive
 token quoted   { " ([\\.|<-["]>]*) : " }
 
 # XXX naive
-token variable { \$ (<[a..zA..Z]>) }
+token variable { \$ (<[a..zA..Z]>+) }
 
 token number  { [<[0..9]>+|0+]\.<[0..9]>* }
 
