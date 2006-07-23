@@ -990,7 +990,7 @@ TCL
 false
 OUT
 
-language_output_is("tcl",<<TCL,<<OUT,"string mul - don't confuse variables for strings.");
+language_output_is("tcl",<<'TCL',<<'OUT',"string mul - don't confuse variables for strings.");
   set a 1; puts [expr {$a * 10}]
 TCL
 10
