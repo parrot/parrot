@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 152;
+use Parrot::Test tests => 154;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -206,6 +206,12 @@ TCL
 3
 OUT
 
+language_output_is("tcl",<<TCL,<<OUT,"simple &&");
+  puts [expr 2&&2][expr 2&&0][expr 0&&2][expr 0&&0]
+TCL
+1000
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"&&, both sides");
  proc true {} {puts T; return 1}
  proc false {} {puts F; return 0}
@@ -233,6 +239,12 @@ language_output_is("tcl",<<TCL,<<OUT,"&&, short circuited");
 TCL
 F
 0
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"simple ||");
+  puts [expr 2||2][expr 2||0][expr 0||2][expr 0||0]
+TCL
+1110
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"||, short circuited");
