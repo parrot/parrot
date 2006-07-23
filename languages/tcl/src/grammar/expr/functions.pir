@@ -152,11 +152,17 @@ Functions are very similar to ops, so handle them similarly here.
 
 .sub 'function:log' :multi (pmc)
     .param float a
+
+    if a < 0 goto domain_error
+
     .local pmc ret
     ret = new "TclFloat"
     $N0 = ln a
     ret = $N0
     .return (ret)
+
+domain_error:
+    .throw('domain error: argument not in valid range')
 .end
 
 .sub 'function:log10' :multi (String)
@@ -165,11 +171,17 @@ Functions are very similar to ops, so handle them similarly here.
 
 .sub 'function:log10' :multi (pmc)
     .param float a
+
+    if a < 0 goto domain_error
+
     .local pmc ret
     ret = new "TclFloat"
     $N0 = log10 a
     ret = $N0
     .return (ret)
+
+domain_error:
+    .throw('domain error: argument not in valid range')
 .end
 
 .sub 'function:round' :multi (String)
