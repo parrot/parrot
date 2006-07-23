@@ -41,6 +41,8 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 
 =head2 Infix Operators
 
+&&, || (and ?:) are handled during the PGE transformation stage.
+
 =cut
 
 # XXX No Strings.
@@ -262,5 +264,3 @@ is_string:
     $I0 = bor a, b
     .return ($I0)
 .end
-
-# XXX Note: &&, ||, ?: will be handled in the TGE transformation.

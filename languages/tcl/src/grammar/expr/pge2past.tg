@@ -92,9 +92,9 @@ transform result (operator) {
   is_ternary:
     .return tree.get('ternary', node, 'PAST::Op')
   is_and:
-    .return tree.get('and', node, 'PAST::Op')
+    .return tree.get('logical_and', node, 'PAST::Op')
   is_or:
-    .return tree.get('or', node, 'PAST::Op')
+    .return tree.get('logical_or', node, 'PAST::Op')
 }
 
 transform result (function) {
@@ -269,6 +269,92 @@ transform ternary (PAST::Op) {
     $P1 = node[2]
     $P2 = tree.'get'('dispatch', $P1)
     result.'add_child'($P2)
+ 
+    result['conditional'] = 1
+ 
+    .return(result)
+}
+
+transform logical_and (PAST::Op) {
+    .local pmc result, true, false, A, B
+    .local pmc inner
+
+    # Transform A && B into:
+    # A ? ( B ? 1 : 0) : 0
+
+    true = new 'PAST::Val'
+    true['value'] = 1
+    true['class'] = "'TclInt'"
+
+    false = new 'PAST::Val'
+    false['value'] = 0
+    false['class'] = "'TclInt'"
+
+    # Get our A & B trees..
+    $P1 = node[0]
+    A = tree.'get'('dispatch', $P1)
+    $P1 = node[1]
+    B = tree.'get'('dispatch', $P1)
+
+    # Generate (B ? 1 : 0)
+    inner = new 'PAST::Cond'
+    inner.'add_child'(B)
+
+    inner.'add_child'(true)
+    inner.'add_child'(false)
+    inner['conditional'] = 1
+
+    # Generate (A ? (...) : 0)
+    result = new 'PAST::Cond'
+    result.set_node(node)
+
+    result.'add_child' (A)
+
+    result.'add_child' (inner)
+    result.'add_child' (false)
+ 
+    result['conditional'] = 1
+ 
+    .return(result)
+}
+
+transform logical_or (PAST::Op) {
+    .local pmc result, true, false, A, B
+    .local pmc inner
+
+    # Transform A || B into:
+    # A ? 1 : ( B ? 1 : 0)
+
+    true = new 'PAST::Val'
+    true['value'] = 1
+    true['class'] = "'TclInt'"
+
+    false = new 'PAST::Val'
+    false['value'] = 0
+    false['class'] = "'TclInt'"
+
+    # Get our A & B trees..
+    $P1 = node[0]
+    A = tree.'get'('dispatch', $P1)
+    $P1 = node[1]
+    B = tree.'get'('dispatch', $P1)
+
+    # Generate (B ? 1 : 0)
+    inner = new 'PAST::Cond'
+    inner.'add_child'(B)
+
+    inner.'add_child'(true)
+    inner.'add_child'(false)
+    inner['conditional'] = 1
+
+    # Generate (A ? (...) : 0)
+    result = new 'PAST::Cond'
+    result.set_node(node)
+
+    result.'add_child' (A)
+
+    result.'add_child' (true)
+    result.'add_child' (inner)
  
     result['conditional'] = 1
  
