@@ -66,9 +66,13 @@ transform result (operator) {
     .local pmc children, iter, past
     .local string name
 
-    past = new 'PAST::Op'
     name = node['type']
-    # XXX this would be a good spot to branch to deal with ||, &&, ?:, etc.
+    if name == 'ternary:? :' goto is_ternary
+    if name == 'infix:&&' goto is_and
+    if name == 'infix:||' goto is_or
+
+    past = new 'PAST::Op'
+
     past['opfunc'] = name
     $P0 = node.'get_array'()
     if null $P0 goto iter_end
@@ -84,6 +88,13 @@ transform result (operator) {
   iter_end:
     past['children'] = 1
     .return (past)
+
+  is_ternary:
+    .return tree.get('ternary', node, 'PAST::Op')
+  is_and:
+    .return tree.get('and', node, 'PAST::Op')
+  is_or:
+    .return tree.get('or', node, 'PAST::Op')
 }
 
 transform result (function) {
@@ -240,5 +251,26 @@ transform result (variable) {
     
     $S0 = node[0]
     result['name'] = $S0
+    .return(result)
+}
+
+transform ternary (PAST::Op) {
+    .local pmc result
+
+    result = new 'PAST::Cond'
+    result.set_node(node)
+
+    $P1 = node[0]
+    $P2 = tree.'get'('dispatch', $P1)
+    result.'add_child'($P2)
+    $P1 = node[1]
+    $P2 = tree.'get'('dispatch', $P1)
+    result.'add_child'($P2)
+    $P1 = node[2]
+    $P2 = tree.'get'('dispatch', $P1)
+    result.'add_child'($P2)
+ 
+    result['conditional'] = 1
+ 
     .return(result)
 }

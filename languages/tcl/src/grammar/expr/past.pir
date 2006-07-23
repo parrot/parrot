@@ -10,6 +10,7 @@ needed for tcl expressions. The currently defined ast nodes:
     PAST::Node       - base class for all ast nodes
 
     PAST::Command    - a tcl command to be evaluated.
+    PAST::Cond       - a conditional expression.
     PAST::Op         - a operation
     PAST::Val        - a constant value
     PAST::Var        - a variable
@@ -41,6 +42,7 @@ Creates the C<PAST::*> classes.
     addattribute base, '$.pos'                     # offset position
 
     $P0 = subclass base, 'PAST::Command'
+    $P0 = subclass base, 'PAST::Cond'
     $P0 = subclass base, 'PAST::Op'
     $P0 = subclass base, 'PAST::Val'
     $P0 = subclass base, 'PAST::Var'
@@ -185,6 +187,12 @@ with C<Data::Dumper>.
     $P1 = 0
     .return ($P1)
 .end
+
+.sub 'get_children' :method
+    $P0 = getattribute self, '@.children'
+    .return ($P0)
+.end
+
 
 =back
 

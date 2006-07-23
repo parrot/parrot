@@ -1,6 +1,6 @@
 grammar TclExpr::PIR::Grammar is TGE::Grammar;
 
-transform result (ROOT) :language('PIR') {
+transform result (ROOT)  {
     .local pmc pir
     .local pmc return_register
 
@@ -10,6 +10,8 @@ transform result (ROOT) :language('PIR') {
    
     $P0 = node['children']
     if $P0 goto has_children
+    $P0 = node['conditional']
+    if $P0 goto is_conditional
 
     $S0 = typeof node
     $P0 = tree.get('pir', node, $S0)
@@ -17,6 +19,10 @@ transform result (ROOT) :language('PIR') {
 
   has_children:
     $P0 = tree.get('pir', node, 'PAST::Op')
+    goto end
+
+  is_conditional:
+    $P0 = tree.get('pir', node, 'PAST::Cond')
     goto end
 
   end:
@@ -27,7 +33,7 @@ transform result (ROOT) :language('PIR') {
     .return(pir)
 }
 
-transform pir (PAST::Val) :language('PIR') {
+transform pir (PAST::Val) {
     .local pmc pir
     .local pmc ret
     .local pmc class
@@ -60,7 +66,7 @@ transform pir (PAST::Val) :language('PIR') {
     .return (pir)
 }
 
-transform pir (PAST::Var) :language('PIR') {
+transform pir (PAST::Var) {
     .local pmc pir, ret
     pir = new 'PGE::CodeString'
     ret = pir.unique('$P')
@@ -147,3 +153,59 @@ END_PIR
     node['ret'] = retval
     .return(pir)
 }
+
+transform pir (PAST::Cond) {
+    .local pmc args, pir, ret, label
+    .local pmc children, cond, then, else
+    .local string cond_result, then_result, else_result
+
+    pir = new 'PGE::CodeString'
+
+    # This node has 3 children. generate PIR so that:
+    # if node1 then node2 else node3
+
+    # pick a unique register to store our result in.
+    ret = pir.unique('$P')
+
+    #  pick a unique number for our labels..
+    label = pir.unique('label_')
+
+    children = node.'get_children'()
+
+    cond = children[0] 
+    $S0 = tree.get('pir', cond)
+    pir .= $S0
+    cond_result = cond['ret']
+
+    pir.emit("  unless %0 goto else_%1", cond_result, label)
+
+    then = children[1] 
+    $S0 = tree.get('pir', then)
+    pir .= $S0
+    then_result = then['ret']
+
+    pir.emit('    %0 = %1', ret, then_result)
+    pir.emit("  goto end_if_%0", label)
+ 
+    #set the result register to the answer from this section  
+ 
+   #then jump to custom end label..
+
+    pir.emit("  else_%0:",label)
+
+    else = children[2] 
+    $S0 = tree.get('pir', else)
+    pir .= $S0
+    else_result = else['ret']
+
+    pir.emit('    %0 = %1', ret, else_result)
+
+    #set the result register to the answer from this section  
+
+    pir.emit("  end_if_%0:",label)
+
+    node['ret'] = ret
+
+    .return (pir)
+}
+
