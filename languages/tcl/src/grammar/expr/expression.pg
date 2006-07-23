@@ -42,9 +42,9 @@ token integer { [<decimal> | <octal> | <hex> ] }
 token nullary_function { rand }
 
 token unary_function { 
- abs    | acos   | asin   | atan   | ceil   | cosh?  | double | exp    |
- floor  | int    | log    | log10  | round  | sinh?  | sqrt   | srand  |
- tanh?  | wide
+ abs    | acos   | asin      | atan   | ceil   | cosh?  | double | exp    |
+ floor  | int    | log[10]?  | round  | sinh?  | sqrt   | srand  | tanh?  |
+ wide
 }
 
 token binary_function { atan2 | fmod | hypot | pow }
