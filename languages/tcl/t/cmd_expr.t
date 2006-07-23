@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 160;
+use Parrot::Test tests => 161;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -988,4 +988,10 @@ language_output_is("tcl", <<'TCL', <<'OUT', 'ternary, false, short circuit');
   expr {0?[puts true]:[puts false]}
 TCL
 false
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string mul - don't confuse variables for strings.");
+  set a 1; puts [expr {$a * 10}]
+TCL
+10
 OUT
