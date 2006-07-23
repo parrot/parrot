@@ -224,7 +224,7 @@ is_string:
     .return ($I0)
 .end
 
-# XXX *ALL* operands
+# *ALL* operands
 .sub 'infix:<='    # boolean less than or equal
     .param pmc a
     .param pmc b
@@ -392,6 +392,52 @@ is_string:
     .param int b
     $I0 = bor a, b
     .return ($I0)
+.end
+
+.sub 'infix:in'
+    .param pmc elem
+    .param pmc list
+
+    .local pmc __list
+    $P0 = get_root_namespace
+    __list = $P0['_tcl'; '__list']
+
+    .local pmc iter
+    list = __list(list)
+    iter = new .Iterator, list
+loop:
+    unless iter goto false
+    $P0 = shift iter
+    $I0 = 'infix:=='(elem, $P0)
+    if $I0 goto true
+    goto loop
+true:
+    .return(1)
+false:
+    .return(0)
+.end
+
+.sub 'infix:ni'
+    .param pmc elem
+    .param pmc list
+
+    .local pmc __list
+    $P0 = get_root_namespace
+    __list = $P0['_tcl'; '__list']
+
+    .local pmc iter
+    list = __list(list)
+    iter = new .Iterator, list
+loop:
+    unless iter goto true
+    $P0 = shift iter
+    $I0 = 'infix:=='(elem, $P0)
+    if $I0 goto false
+    goto loop
+true:
+    .return(1)
+false:
+    .return(0)
 .end
 
 =cut

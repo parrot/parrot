@@ -928,26 +928,28 @@ OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "in - true");
   set list {b c d f}
-  puts [expr {b in $list}]
+  puts [expr {"b" in $list}]
 TCL
 1
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "in - false");
   set list {b c d f}
-  puts [expr {e in $list}]
+  puts [expr {"e" in $list}]
 TCL
 0
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "ni - true");
-  puts [expr {e ni {b c d f}}]
+  set list {b c d f}
+  puts [expr {"e" ni $list}]
 TCL
 1
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "ni - false");
-  puts [expr {b ni {b c d f}}]
+  set list {b c d f}
+  puts [expr {"b" ni $list}]
 TCL
 0
 OUT
