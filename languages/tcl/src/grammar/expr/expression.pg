@@ -69,11 +69,9 @@ token unary_function {
 
 token binary_function { atan2 | fmod | hypot | pow }
 
-token function { 
-  [ <nullary_function> \( \)
-  | <unary_function>   \( <expression> \)
-  | <binary_function>  \( <expression> , <expression> \)
-  ] 
+token function {
+  [ <binary_function> | <unary_function> | <nullary_function> ]
+        \( [<expression> [, <expression>]*]? \)
 }
 
 rule 'expression' is optable {...}

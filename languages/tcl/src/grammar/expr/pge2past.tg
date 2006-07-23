@@ -103,11 +103,16 @@ transform result (operator) {
 }
 
 transform result (function) {
-    # for each child of this operator, dispatch to get the result,
-    # use those as our children.
-    .local pmc children, iter, past
     .local string function_name
+    .local pmc args
+    .local int argc
+    args = node['expression']
+    argc = 0
+    unless args goto has_argc
+    argc = elements args
 
+has_argc:
+    .local pmc past
     past = new 'PAST::Op'
     $P0  = node['unary_function']
     if $P0 goto unary
@@ -119,26 +124,29 @@ transform result (function) {
   # never get here
 
   nullary:
+    if argc > 0 goto too_many
     function_name = node['nullary_function']
     goto arguments
 
   unary:
+    if argc == 0 goto too_few
+    if argc > 1  goto too_many
     function_name = node['unary_function']
-    $P0 = node ['expression'; 'expr']
+    $P0 = args[0; 'expr']
     $P1 = tree.'get'('dispatch', $P0)
     past.'add_child'($P1)
     goto arguments
 
   binary:
+    if argc < 2 goto too_few
+    if argc > 2 goto too_many
     function_name = node['binary_function']
-    $P0 = node ['expression']
 
-    $P1 = $P0[0]
-    $P1 = $P1['expr']
+    $P1 = args[0; 'expr']
     $P2 = tree.'get'('dispatch', $P1)
     past.'add_child'($P2)
-    $P1 = $P0[1]
-    $P1 = $P1['expr']
+
+    $P1 = args[1; 'expr']
     $P2 = tree.'get'('dispatch', $P1)
     past.'add_child'($P2)
 
@@ -146,9 +154,14 @@ transform result (function) {
     function_name = 'function:' . function_name
     past['opfunc'] = function_name
 
-
     past['children'] = 1
     .return (past)
+
+too_few:
+    .throw('too few arguments for math function')
+
+too_many:
+    .throw('too many arguments for math function')
 }
 
 transform result (constant) {
