@@ -1,4 +1,8 @@
-# $Id$
+#1 $Id$
+
+2006.07.xx    audreyt
+	* --maintainer prerequesites are now bison 2.2+ and flex 2.5.3x
+	  (or some such --leo)
 
 2006.07.17    chip
 	partial implementation of new pdd21:
