@@ -21,7 +21,7 @@ public class Bc
     CommonTokenStream tokens = new CommonTokenStream(lex);
     // System.out.println("tokens="+tokens);
 
-    // Parsing, generating PAST in ANTLT
+    // Parsing, generating PAST in ANTLR
     BcParser parser = new BcParser(tokens);
     BcParser.program_return antlrPast = parser.program();
     // System.out.println("tree: "+((Tree)antlrPast.tree).toStringTree());

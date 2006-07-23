@@ -8,7 +8,7 @@ tree grammar AntlrPast2PirPast;
 options
 {
   ASTLabelType = CommonTree;
-  tokenVocab   = 'grammar/antlr_3/BcParser';
+  tokenVocab   = BcParser;
 }
 
 gen_pir_past 

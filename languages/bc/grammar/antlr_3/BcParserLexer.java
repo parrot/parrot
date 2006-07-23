@@ -1,4 +1,4 @@
-// $ANTLR 3.0b1 grammar/antlr_3/bc.g 2006-07-05 21:39:17
+// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-07-23 16:18:56
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -38,10 +38,12 @@ public class BcParserLexer extends Lexer {
             }
 
 
-            if ( token==null && ruleNestingLevel==1 ) {
-                emit(type,line,charPosition,channel,start,getCharIndex()-1);
-            }
-        }
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
         finally {
             ruleNestingLevel--;
         }
@@ -66,10 +68,12 @@ public class BcParserLexer extends Lexer {
             }
 
 
-            if ( token==null && ruleNestingLevel==1 ) {
-                emit(type,line,charPosition,channel,start,getCharIndex()-1);
-            }
-        }
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
         finally {
             ruleNestingLevel--;
         }
@@ -121,10 +125,12 @@ public class BcParserLexer extends Lexer {
             }
 
 
-            if ( token==null && ruleNestingLevel==1 ) {
-                emit(type,line,charPosition,channel,start,getCharIndex()-1);
-            }
-        }
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
         finally {
             ruleNestingLevel--;
         }
@@ -189,10 +195,12 @@ public class BcParserLexer extends Lexer {
             }
 
 
-            if ( token==null && ruleNestingLevel==1 ) {
-                emit(type,line,charPosition,channel,start,getCharIndex()-1);
-            }
-        }
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
         finally {
             ruleNestingLevel--;
         }
@@ -256,10 +264,12 @@ public class BcParserLexer extends Lexer {
             }
 
 
-            if ( token==null && ruleNestingLevel==1 ) {
-                emit(type,line,charPosition,channel,start,getCharIndex()-1);
-            }
-        }
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
         finally {
             ruleNestingLevel--;
         }
