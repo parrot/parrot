@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 154;
+use Parrot::Test tests => 160;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -800,6 +800,12 @@ TCL
 can't use non-numeric string as operand of "%"
 OUT
 
+language_output_is("tcl",<<TCL,<<OUT,"float remainder");
+ puts [expr 3.2 % 2]
+TCL
+can't use floating-point value as operand of "%"
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"string plus");
  puts [expr {"a" + "b"}]
 TCL
@@ -818,10 +824,22 @@ TCL
 can't use non-numeric string as operand of "<<"
 OUT
 
+language_output_is("tcl",<<TCL,<<OUT,"float left shift");
+ puts [expr 3.2 << 2]
+TCL
+can't use floating-point value as operand of "<<"
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"string right shift");
  puts [expr {"a" >> "b"}]
 TCL
 can't use non-numeric string as operand of ">>"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"float right shift");
+ puts [expr 3.2 >> 2]
+TCL
+can't use floating-point value as operand of ">>"
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"string &");
@@ -830,16 +848,34 @@ TCL
 can't use non-numeric string as operand of "&"
 OUT
 
+language_output_is("tcl",<<TCL,<<OUT,"float &");
+ puts [expr 3.2 & 2]
+TCL
+can't use floating-point value as operand of "&"
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"string |");
  puts [expr {"a" | "b"}]
 TCL
 can't use non-numeric string as operand of "|"
 OUT
 
+language_output_is("tcl",<<TCL,<<OUT,"float |");
+ puts [expr 3.2 | 2]
+TCL
+can't use floating-point value as operand of "|"
+OUT
+
 language_output_is("tcl",<<TCL,<<OUT,"string ^");
  puts [expr {"a" ^ "b"}]
 TCL
 can't use non-numeric string as operand of "^"
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"float ^");
+ puts [expr 3.2 ^ 2]
+TCL
+can't use floating-point value as operand of "^"
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"octal");

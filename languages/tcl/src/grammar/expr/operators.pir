@@ -45,40 +45,89 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 
 =cut
 
-# XXX No Strings.
-.sub 'infix:*'      # multiply
+# multiply
+.sub 'infix:*'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"*\"")
+.end
+
+.sub 'infix:*'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"*\"")
+.end
+
+.sub 'infix:*'     :multi(pmc, pmc)   
     .param pmc a
     .param pmc b
     $P0 = mul a, b
     .return ($P0)
 .end
 
-# XXX No Strings.
-.sub 'infix:/'     # divide
+# divide
+.sub 'infix:/'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"/\"")
+.end
+
+.sub 'infix:/'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"/\"")
+.end
+
+.sub 'infix:/'     :multi(pmc, pmc)
     .param float a
     .param float b
     $N0 = div a, b
     .return ($N0)
 .end
 
-# XXX Integer Only
-.sub 'infix:%'     # remainder
+
+# remainder
+.sub 'infix:%'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"%\"")
+.end
+
+.sub 'infix:%'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"%\"")
+.end
+
+.sub 'infix:%'     :multi(Float, pmc)
+  .throw ("can't use floating-point value as operand of \"%\"")
+.end
+
+.sub 'infix:%'     :multi(pmc, Float)
+  .throw ("can't use floating-point value as operand of \"%\"")
+.end
+
+.sub 'infix:%'     :multi(Integer, Integer)
     .param int a
     .param int b
     $I0 = mod a, b
     .return ($I0)
 .end
 
-# XXX No strings.
-.sub 'infix:+'     # add
+# add
+.sub 'infix:+'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"+\"")
+.end
+
+.sub 'infix:+'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"+\"")
+.end
+
+.sub 'infix:+'     :multi(pmc, pmc)
     .param float a
     .param float b
     $N0 = a + b
     .return ($N0)
 .end
 
-# XXX No strings.
-.sub 'infix:-'     # subtract
+# subtract
+.sub 'infix:-'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"-\"")
+.end
+
+.sub 'infix:-'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"-\"")
+.end
+
+.sub 'infix:-'     :multi(pmc, pmc)
     .param pmc a
     .param pmc b
     $N0 = a
@@ -87,16 +136,48 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
     .return ($N2)
 .end
 
-# XXX Int only
-.sub 'infix:<<'    # left shift
+# left shift
+.sub 'infix:<<'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"<<\"")
+.end
+
+.sub 'infix:<<'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"<<\"")
+.end
+
+.sub 'infix:<<'     :multi(Float, pmc)
+  .throw ("can't use floating-point value as operand of \"<<\"")
+.end
+
+.sub 'infix:<<'     :multi(pmc, Float)
+  .throw ("can't use floating-point value as operand of \"<<\"")
+.end
+
+.sub 'infix:<<'     :multi(Integer, Integer)
     .param int a
     .param int b
     $I0 = shl a, b
     .return ($I0)
 .end
 
-# XXX Int only
-.sub 'infix:>>'    # right shift
+# right shift
+.sub 'infix:>>'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \">>\"")
+.end
+
+.sub 'infix:>>'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \">>\"")
+.end
+
+.sub 'infix:>>'     :multi(Float, pmc)
+  .throw ("can't use floating-point value as operand of \">>\"")
+.end
+
+.sub 'infix:>>'     :multi(pmc, Float)
+  .throw ("can't use floating-point value as operand of \">>\"")
+.end
+
+.sub 'infix:>>'     :multi(Integer, Integer)
     .param int a
     .param int b
     $I0 = shr a, b
@@ -241,26 +322,76 @@ is_string:
     .return ($I0)
 .end
 
-# XXX Int only
-.sub 'infix:&'     # bitwise AND
+# bitwise AND
+.sub 'infix:&'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"&\"")
+.end
+
+.sub 'infix:&'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"&\"")
+.end
+
+.sub 'infix:&'     :multi(Float, pmc)
+  .throw ("can't use floating-point value as operand of \"&\"")
+.end
+
+.sub 'infix:&'     :multi(pmc, Float)
+  .throw ("can't use floating-point value as operand of \"&\"")
+.end
+
+.sub 'infix:&'     :multi(Integer, Integer)
     .param int a
     .param int b
     $I0 = band a, b
     .return ($I0)
 .end
 
-# XXX int only
-.sub 'infix:^'     # bitwise exclusive OR
+# bitwise exclusive OR 
+.sub 'infix:^'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"^\"")
+.end
+
+.sub 'infix:^'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"^\"")
+.end
+
+.sub 'infix:^'     :multi(Float, pmc)
+  .throw ("can't use floating-point value as operand of \"^\"")
+.end
+
+.sub 'infix:^'     :multi(pmc, Float)
+  .throw ("can't use floating-point value as operand of \"^\"")
+.end
+
+.sub 'infix:^'     :multi(Integer, Integer)
     .param int a
     .param int b
     $I0 = bxor a, b
     .return ($I0)
 .end
 
-# XXX int only
-.sub 'infix:|'     # bitwise OR
+# bitwise OR
+.sub 'infix:|'     :multi(String, pmc)
+  .throw ("can't use non-numeric string as operand of \"|\"")
+.end
+
+.sub 'infix:|'     :multi(pmc, String)
+  .throw ("can't use non-numeric string as operand of \"|\"")
+.end
+
+.sub 'infix:|'     :multi(Float, pmc)
+  .throw ("can't use floating-point value as operand of \"|\"")
+.end
+
+.sub 'infix:|'     :multi(pmc, Float)
+  .throw ("can't use floating-point value as operand of \"|\"")
+.end
+
+.sub 'infix:|'     :multi(Integer, Integer)
     .param int a
     .param int b
     $I0 = bor a, b
     .return ($I0)
 .end
+
+=cut
