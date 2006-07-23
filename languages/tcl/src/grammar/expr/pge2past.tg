@@ -347,7 +347,7 @@ transform logical_or (PAST::Op) {
     inner.'add_child'(false)
     inner['conditional'] = 1
 
-    # Generate (A ? (...) : 0)
+    # Generate (A ? 1 : (...))
     result = new 'PAST::Cond'
     result.set_node(node)
 
