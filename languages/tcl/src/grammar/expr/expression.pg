@@ -8,31 +8,36 @@ grammar TclExpr::Grammar;
 # (like command, quoted, etc.) Move them there when we use PGE for everything.
 
 token term {
-    [
-    | <subcommand>
+      <subcommand>
     | <quoted>
     | <number>
     | <integer>
     | <variable>
     | <function>
-    ]
 }
 
 ## used by term
 
 # XXX EXTREMELY naive
-rule subcommand  { \[ (<[A..Za..z\d{}"]>*) \] }
+rule subcommand  { \[ [<command> ;?]+ \] }
 
 token command {
-    \# \N* \n
-  | <word> [<?ws> <word>]*
+    <word> [<?ws>? <word>]*
+}
+
+token comment {
+  \# \N* \n?
 }
 
 token word {
     <subcommand>
   | <quoted>
   | <variable>
-  | (\S+)
+  | <constant>
+}
+
+token constant {
+    (\w+)
 }
 
 # XXX naive

@@ -14,6 +14,8 @@ transform dispatch (PGE::Match) {
 
     # Ask the child node for its result.
 
+    $P0 = node['constant']
+    if $P0 goto constant
     $P0 = node['integer']
     if $P0 goto integer
     $P0 = node['number']
@@ -22,8 +24,8 @@ transform dispatch (PGE::Match) {
     if $P0 goto quoted
     $P0 = node['function']
     if $P0 goto function
-    $P0 = node['command']
-    if $P0 goto command
+    $P0 = node['subcommand']
+    if $P0 goto subcommand
     $P0 = node['variable']
     if $P0 goto variable
     $P0 = node['type']
@@ -37,14 +39,17 @@ operator:
 function:
     .return tree.get('result', $P0, 'function')
 
-command:
-    .return tree.get('result', $P0, 'command')
+subcommand:
+    .return tree.get('result', $P0, 'subcommand')
 
 quoted:
     .return tree.get('result', $P0, 'quoted')
 
 number:
     .return tree.get('result', $P0, 'number')
+
+constant:
+    .return tree.get('result', $P0, 'constant')
 
 integer:
     .return tree.get('result', $P0, 'integer')
@@ -130,6 +135,17 @@ transform result (function) {
     .return (past)
 }
 
+transform result (constant) {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.set_node(node)
+    
+    $S0 = node
+    result['value'] = $S0
+    result['class'] = "'TclConst'"
+    .return(result)
+}
+
 transform result (integer) {
     .local pmc result
     result = new 'PAST::Val'
@@ -199,15 +215,22 @@ transform result (quoted) {
     .return (result)
 }
 
-transform result (command) {
-    .local pmc result
-    result = new 'PAST::Command'
-    result.set_node(node)
-    $P0 = node.'get_array'()
-
-    $S0 = $P0[0] # strip the []'s 
-    result['command'] = $S0
-    .return (result)
+transform result (subcommand) {
+    .local pmc past
+    past = new 'PAST::Command'
+    past.set_node(node)
+    
+    .local pmc words, iter
+    words = node['command'; 0; 'word']
+    iter  = new .Iterator, words
+loop:
+    unless iter goto end
+    $P0 = shift iter
+    $P1 = tree.'get'('dispatch', $P0)
+    past.'add_child'($P1)
+    goto loop
+end:
+    .return (past)
 }
 
 transform result (variable) {
