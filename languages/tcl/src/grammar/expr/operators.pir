@@ -101,18 +101,42 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
     .return ($I0)
 .end
 
-# XXX *ALL* operands
+# *ALL* operands
 .sub 'infix:<'     # boolean less than
     .param pmc a
     .param pmc b
-    $I0 = islt a, b
+
+    .local pmc __number
+    $P0 = get_root_namespace
+    __number = $P0['_tcl'; '__number']
+    push_eh is_string
+      $P0 = __number(a)
+      $P1 = __number(b)
+      $I0 = islt $P0, $P1
+    clear_eh
     .return ($I0)
+
+is_string:
+    $I0 = islt a, b
+    .return($I0)
 .end
 
-# XXX *ALL* operands
+# *ALL* operands
 .sub 'infix:>'     # boolean greater than
     .param pmc a
     .param pmc b
+
+    .local pmc __number
+    $P0 = get_root_namespace
+    __number = $P0['_tcl'; '__number']
+    push_eh is_string
+      $P0 = __number(a)
+      $P1 = __number(b)
+      $I0 = isgt $P0, $P1
+    clear_eh
+    .return($I0)
+
+is_string:
     $I0 = isgt a, b
     .return ($I0)
 .end
@@ -121,30 +145,82 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 .sub 'infix:<='    # boolean less than or equal
     .param pmc a
     .param pmc b
+
+    .local pmc __number
+    $P0 = get_root_namespace
+    __number = $P0['_tcl'; '__number']
+
+    push_eh is_string
+      $P0 = __number(a)
+      $P1 = __number(b)
+      $I0 = isle $P0, $P1
+    clear_eh
+    .return($I0)
+
+is_string:
     $I0 = isle a, b
     .return ($I0)
 .end
 
-# XXX *ALL* operands
+# *ALL* operands
 .sub 'infix:>='    # boolean greater than or equal
     .param pmc a
     .param pmc b
+
+    .local pmc __number
+    $P0 = get_root_namespace
+    __number = $P0['_tcl'; '__number']
+
+    push_eh is_string
+      $P0 = __number(a)
+      $P1 = __number(b)
+      $I0 = isge $P0, $P1
+    clear_eh
+    .return($I0)
+
+is_string:
     $I0 = isge a, b
     .return ($I0)
 .end
 
-# XXX *ALL* operands
+# *ALL* operands
 .sub 'infix:=='    # boolean equal
     .param pmc a
     .param pmc b
+
+    .local pmc __number
+    $P0 = get_root_namespace
+    __number = $P0['_tcl'; '__number']
+
+    push_eh is_string
+      $P0 = __number(a)
+      $P1 = __number(b)
+      $I0 = iseq $P0, $P1
+    clear_eh
+    .return($I0)
+
+is_string:
     $I0 = iseq a, b
     .return ($I0)
 .end
 
-# XXX *ALL* operands
+# *ALL* operands
 .sub 'infix:!='    # boolean not equal
     .param pmc a
     .param pmc b
+
+    .local pmc __number
+    $P0 = get_root_namespace
+    __number = $P0['_tcl'; '__number']
+
+    push_eh is_string
+      $P0 = __number(a)
+      $P1 = __number(b)
+      $I0 = isne $P0, $P1
+    clear_eh
+    .return($I0)
+
+is_string:
     $I0 = isne a, b
     .return ($I0)
 .end
