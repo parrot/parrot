@@ -315,7 +315,7 @@ is_string:
     .return ($I0)
 .end
 
-.sub 'infix:eq'    # string inequality
+.sub 'infix:ne'    # string inequality
     .param pmc a
     .param pmc b
     $I0 = isne a, b 

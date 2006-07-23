@@ -10,6 +10,7 @@ grammar TclExpr::Grammar;
 token term {
       <subcommand>
     | <quoted>
+    | <braced>
     | <number>
     | <integer>
     | <variable>
@@ -42,6 +43,8 @@ token constant {
 
 # XXX naive
 token quoted   { " ([\\.|<-["]>]*) : " }
+
+token braced   { \{ ([ \\. | <braced> | <-[}]> ]*) \} }
 
 # XXX naive
 token variable { \$ (<[a..zA..Z]>+) }

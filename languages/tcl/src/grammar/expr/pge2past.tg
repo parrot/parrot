@@ -16,6 +16,8 @@ transform dispatch (PGE::Match) {
 
     $P0 = node['constant']
     if $P0 goto constant
+    $P0 = node['braced']
+    if $P0 goto braced
     $P0 = node['integer']
     if $P0 goto integer
     $P0 = node['number']
@@ -44,6 +46,9 @@ subcommand:
 
 quoted:
     .return tree.get('result', $P0, 'quoted')
+
+braced:
+    .return tree.get('result', $P0, 'braced')
 
 number:
     .return tree.get('result', $P0, 'number')
@@ -147,6 +152,17 @@ transform result (function) {
 }
 
 transform result (constant) {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.set_node(node)
+    
+    $S0 = node
+    result['value'] = $S0
+    result['class'] = "'TclConst'"
+    .return(result)
+}
+
+transform result (braced) {
     .local pmc result
     result = new 'PAST::Val'
     result.set_node(node)
