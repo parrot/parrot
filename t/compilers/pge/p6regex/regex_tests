@@ -118,7 +118,7 @@ a|&b			a|&b		/Missing term/	TODO: alternation and conjunction (|&) - parse error
 ^ \v+ $			\u000a\u000b\u000c\u000d\u0085	y	0-255 vertical whitespace (\v)
 ^ \h+ $			\u000a\u000b\u000c\u000d\u0085	n	0-255 horizontal whitespace (\h)
 ^ \v+ $			\u0009\u0020\u00a0	n	0-255 vertical whitespace (\v)
-^ \s+ $			\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2008\u2009\u200a\u202f\u205f\u3000\u000a\u000b\u000c\u000d\u0085	y	unicode whitespace (\s)
+^ \s+ $			\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2008\u2009\u200a\u202f\u205f\u3000\u000a\u000b\u000c\u000d\u0085	y	ICU: unicode whitespace (\s)
 ^ \h+ $			\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2008\u2009\u200a\u202f\u205f\u3000	y	unicode whitespace (\h)
 ^ \v+ $			\u000a\u000b\u000c\u000d\u0085	y	unicode whitespace (\v)
 ^ \h+ $			\u000a\u000b\u000c\u000d\u0085	n	unicode whitespace (\h)

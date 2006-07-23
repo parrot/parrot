@@ -7,6 +7,7 @@ use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
 use Parrot::Test tests => 494;
 use Parrot::Test::PGE;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -54,7 +55,16 @@ while (<TESTS>) {
     $target =~ s/\\x(..)/chr(hex($1))/eg;
 
     my @todo = ();
-    if ($description =~ m{TODO:}) { @todo = ('todo' => $description); }
+    if ($description =~ m{TODO:}) {
+	@todo = ('todo' => $description);
+    }
+    elsif ($description =~ m{ICU:} 
+	   && ! $PConfig{has_icu}) {
+      SKIP: {
+	  skip("no $description", 1);
+	}
+	next;
+    }
 
     if ($result =~ m{^/(.*)/$}) {
         p6rule_like($target, $pattern, qr/$1/, $description, @todo);
