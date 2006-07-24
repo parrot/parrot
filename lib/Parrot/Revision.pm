@@ -45,9 +45,14 @@ sub __get_revision {
     elsif (my @info = qx/svk info/ and $? == 0) {
         if (my ($line) = grep /(?:file|svn|https?)\b/, @info) {
             ($revision) = $line =~ / (\d+)$/;
-        } elsif (my ($source_line) = grep /^(Copied|Merged) From/, @info) {
-            if (my ($source_depot) = $source_line =~ /From: (.*?), Rev\. \d+/) {
-                $source_depot = '/'.$source_depot; # convert /svk/trunk to //svk/trunk
+        } else {
+	    my ($source_line) = grep /^(Copied|Merged) From/, @info;
+	    my ($depot_line)  = grep /^Depot Path/, @info;
+
+            if (    my ($source_depot) = $source_line =~ m{From: (.*?), Rev\. \d+}
+		and my ($depot_root)   = $depot_line  =~ m{^Depot Path: (/[^/]*)} )
+	    {
+                $source_depot = $depot_root.$source_depot; # convert /svk/trunk to //svk/trunk
                 if (my @info = qx/svk info $source_depot/ and $? == 0) {
                     if (my ($line) = grep /(?:file|svn|https?)\b/, @info) {
                         ($revision) = $line =~ / (\d+)$/;
