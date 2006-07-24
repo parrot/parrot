@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2006.07.23	chip	inserted removeattribute ops
 2006.07.17	chip	namespace opcode changes
 2006.07.12	leo	.loadlib HLL_info change    
 2006.06.19	leo	released 0.4.5

@@ -1227,3 +1227,7 @@ get_root_namespace_p_k         1196
 get_root_namespace_p_kc        1197
 get_root_namespace_p_s         1198
 get_root_namespace_p_sc        1199
+removeattribute_p_s            1200
+removeattribute_p_sc           1201
+removeattribute_p_i            1202
+removeattribute_p_ic           1203
