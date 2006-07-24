@@ -90,7 +90,7 @@ op find_lex(out PMC, in STR) {
 
 Get current namespace.
 
-=item B<get_namespace>(out PMC, in KEY)
+=item B<get_namespace>(out PMC, inconst KEY)
 
 =item B<get_namespace>(out PMC, in STR)
 
@@ -106,7 +106,7 @@ op get_namespace(out PMC) {
     goto NEXT();
 }
 
-op get_namespace(out PMC, in KEY) {
+op get_namespace(out PMC, inconst KEY) {
     PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
     PMC *ns = VTABLE_get_pmc_keyed(interpreter, cur_ns, $2);
     $1 = ns ? ns : PMCNULL;
@@ -124,7 +124,7 @@ op get_namespace(out PMC, in STR) {
 
 Get current HLL root namespace.
 
-=item B<get_hll_namespace>(out PMC, in KEY)
+=item B<get_hll_namespace>(out PMC, inconst KEY)
 
 =item B<get_hll_namespace>(out PMC, in STR)
 
@@ -140,7 +140,7 @@ op get_hll_namespace(out PMC) {
     goto NEXT();
 }
 
-op get_hll_namespace(out PMC, in KEY) {
+op get_hll_namespace(out PMC, inconst KEY) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
     PMC *ns = VTABLE_get_pmc_keyed(interpreter, hll_ns, $2);
     $1 = ns ? ns : PMCNULL;
@@ -158,7 +158,7 @@ op get_hll_namespace(out PMC, in STR) {
 
 Get interpreter root namespace.
 
-=item B<get_root_namespace>(out PMC, in KEY)
+=item B<get_root_namespace>(out PMC, inconst KEY)
 
 =item B<get_root_namespace>(out PMC, in STR)
 
@@ -173,7 +173,7 @@ op get_root_namespace(out PMC) {
     goto NEXT();
 }
 
-op get_root_namespace(out PMC, in KEY) {
+op get_root_namespace(out PMC, inconst KEY) {
     PMC *ns = VTABLE_get_pmc_keyed(interpreter, interpreter->root_namespace, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
@@ -191,7 +191,7 @@ op get_root_namespace(out PMC, in STR) {
 
 ###############################################################################
 
-=head2 Global variable ops
+=head2 Deprecated global variable ops
 
 Operations to modify global variables
 
@@ -209,7 +209,7 @@ Store value $2 as global symbol $1 in the current namespace.
 
 =item B<store_global>(in PMC, in STR, in PMC)
 
-=item B<store_global>(in KEY, in STR, in PMC)
+=item B<store_global>(inconst KEY, in STR, in PMC)
 
 Store global $3 as global symbol $2 in namespace designated by $1.  If
 namespace does not exist, create it.  $1 may be a key, a string, or an array
@@ -232,7 +232,7 @@ op store_global(in PMC, in STR, in PMC) {
     goto NEXT();
 }
 
-op store_global(in KEY, in STR, in PMC) {
+op store_global(inconst KEY, in STR, in PMC) {
     Parrot_store_global_k(interpreter, $1, $2, $3);
     goto NEXT();
 }
@@ -255,7 +255,7 @@ Null PMC, depending on current errors settings. See B<errorson>.
 
 =item B<find_global>(out PMC, in PMC, in STR)
 
-=item B<find_global>(out PMC, in KEY, in STR)
+=item B<find_global>(out PMC, inconst KEY, in STR)
 
 Find the global named $3 in the namespace designated by $2 and store it in
 $1.  $2 may be a key, a string, or an array of strings.
@@ -287,7 +287,7 @@ op find_global(out PMC, in PMC, in STR) {
     goto NEXT();
 }
 
-op find_global(out PMC, in KEY, in STR) {
+op find_global(out PMC, inconst KEY, in STR) {
     PMC * const ns = Parrot_get_namespace_keyed(interpreter,
 						Parrot_get_ctx_HLL_namespace(interpreter),
 						$2);

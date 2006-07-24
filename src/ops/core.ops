@@ -277,40 +277,40 @@ met, the branch happens.  Otherwise control falls to the next operation.
 
 ########################################
 
-=item B<if>(in INT, labelconst INT)
+=item B<if>(invar INT, labelconst INT)
 
-=item B<if>(in NUM, labelconst INT)
+=item B<if>(invar NUM, labelconst INT)
 
-=item B<if>(in PMC, labelconst INT)
+=item B<if>(invar PMC, labelconst INT)
 
-=item B<if>(in STR, labelconst INT)
+=item B<if>(invar STR, labelconst INT)
 
 Check register $1. If true, branch by $2.
 
 =cut
 
-inline op if(in INT, labelconst INT) {
+inline op if(invar INT, labelconst INT) {
   if ($1 != 0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-inline op if(in NUM, labelconst INT) {
+inline op if(invar NUM, labelconst INT) {
   if ($1 != 0.0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op if (in STR, labelconst INT) {
+op if (invar STR, labelconst INT) {
   if (string_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op if(in PMC, labelconst INT) {
+op if(invar PMC, labelconst INT) {
   if ($1->vtable->get_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
@@ -319,40 +319,40 @@ op if(in PMC, labelconst INT) {
 
 ########################################
 
-=item B<unless>(in INT, labelconst INT)
+=item B<unless>(invar INT, labelconst INT)
 
-=item B<unless>(in NUM, labelconst INT)
+=item B<unless>(invar NUM, labelconst INT)
 
-=item B<unless>(in PMC, labelconst INT)
+=item B<unless>(invar PMC, labelconst INT)
 
-=item B<unless>(in STR, labelconst INT)
+=item B<unless>(invar STR, labelconst INT)
 
 Check register $1. If false, branch by $2.
 
 =cut
 
-inline op unless(in INT, labelconst INT) {
+inline op unless(invar INT, labelconst INT) {
   if ($1 == 0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-inline op unless(in NUM, labelconst INT) {
+inline op unless(invar NUM, labelconst INT) {
   if ($1 == 0.0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op unless (in STR, labelconst INT) {
+op unless (invar STR, labelconst INT) {
   if (!string_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op unless(in PMC, labelconst INT) {
+op unless(invar PMC, labelconst INT) {
   if (!$1->vtable->get_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
