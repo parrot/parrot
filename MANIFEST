@@ -350,7 +350,6 @@ docs/compiler_faq.pod                             [devel]doc
 docs/parrot.pod                                   [main]doc
 docs/submissions.pod                              [main]doc
 docs/embed.pod                                    [main]doc
-docs/pir-tutorial.pod                             [main]doc
 docs/BROKEN.pod                                   [devel]doc
 docs/ROADMAP.pod                                  [devel]doc
 docs/debugger.pod                                 [main]doc
