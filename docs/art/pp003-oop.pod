@@ -1,0 +1,353 @@
+=head1 Programming Parrot -- Using objects
+
+Yes, you've read correctly. Parrot has the ability to create
+and manipulate objects (aka, object oriented programming).
+While it may seem strange for a low-level language like
+PIR to have the facility for object oriented programming,
+it makes perfect sense in this particular case. Remember,
+Parrot's number one goal is to be the underlying
+implementation for Perl6, which has object oriented
+features. Parrot's secondary goal is to provide a good
+platform for other dynamic languages such as Python, Ruby,
+PHP, Javascript, etc. and those languages too have the
+ability (if not the requirement) to be object oriented. Thus
+Parrot contains facilities for a manipulating objects so
+that language implementors can easily express the
+appropriate object semantics for their language of interest.
+
+=head2 Namespaces
+
+Before I begin talking about how to create classes and
+instantiate objects, I first need to talk about an
+intimately related subject: namespaces. Namespaces serve a
+twofold purpose, they allow you to group related routines
+together and they allow you to give several subroutines the
+same name but different, domain specific, implementations.
+These characteristics are, oddly enough, similar to the
+basic requirements for a class.
+
+For instance, you may put all of your subroutines dealing
+with people in a C<Person> namespace and all of your
+subroutines dealing with computer programs in the C<Process>
+namespace. Both namespaces may have a subroutine called
+C<run()> but with radically different implementations. Below
+is some code to illustrate this example:
+
+=head3 Example 1:
+
+    .namespace [ "Person" ]
+
+    .sub run
+        print "Run Forrest, Run!\n"
+    .end
+
+    .namespace [ "Process" ]
+
+    .sub run
+        print "Running process #53\n"
+    .end
+
+As you might guess, the C<.namespace> directive tells Parrot
+what namespace to group subroutines under.  A namespace ends when
+another C<.namespace> directive changes the namespace or when
+the end of the file is reached. A bare C<.namespace> directive
+(i.e., with no name following it) changes back to the default
+namespace.
+
+Perl programmers will recognize that Parrot
+C<.namespace> declarations are just like Perl C<package>
+declarations. But there are a few differences. We'll
+talk more about how Parrot uses namespaces and classes
+together in just a minute.
+
+=head2 PIR with class
+
+Creating classes in Parrot is relatively easy. There are
+opcodes for it. The easiest to start with is C<newclass>;
+just say C<$P0 = newclass 'Foo'> where $P0 can be any PMC
+thing (a register or a local variable) and 'Foo' is the name
+of the class you want to create.
+
+When you wish to instantiate objects that belong to the class
+you've created, it's equally simple.  Just say C<myobj = new
+"Foo"> where C<myobj> is a PMC and "Foo" is the classname you've
+created with C<newclass>.  Here's a simple example:
+
+=head3 Example 2: A classic Dog
+
+    .sub _ :main
+        $P0 = newclass 'Dog'
+        .local pmc spot
+        spot = new 'Dog'
+    .end
+
+You may notice that I didn't use the return value of
+C<newclass>.  That's only because this is a simple example.  :-)
+We'll talk about what to do with the return value of C<newclass>
+a little later.  Right now, let's talk about methods.
+
+=head2 Madness ... er, Methods
+
+So now that I've created a C<Dog> class, how do I add methods
+to it?  Remember before when I talked about namespaces?  Well,
+that's the answer.  To add methods to a class, you create a
+namespace with the same name as the class and then put your
+subroutines in that namespace. Parrot also provides a syntactic
+marker to let everyone know these subroutines are methods.  When
+declaring the subroutine add the C<:method> modifier after the
+subroutine name.  Here's a familiar example to anyone who has
+read L<perlboot>.
+
+=head3 Example 3: Barnyard animals
+
+    .namespace [ "Cow" ]
+
+    .sub speak :method
+        print "Moo\n"
+    .end
+
+    .namespace [ "Dog" ]
+
+    .sub speak :method
+        print "Woof\n"
+    .end
+
+    .namespace [ "Pig" ]
+
+    .sub speak :method
+        print "Oink\n"
+    .end
+
+    .namespace
+
+    .sub _ :main
+        $P0 = newclass "Cow"
+        $P0 = newclass "Dog"
+        $P0 = newclass "Pig"
+
+        .local pmc elsie, fido, porky
+
+        elsie   = new "Cow"
+        fido    = new "Dog"
+        porky   = new "Pig"
+
+        elsie.speak()
+        fido.speak()
+        porky.speak()
+    .end
+
+It's important to note that even though I've declared the
+namespaces and put subroutines in them, this does not
+automatically create classes. The C<newclass> declarations
+tell Parrot to create a class and as a side effect,
+namespaces with the same name as the class may be used to
+store methods for that class.
+
+=head2 But where do I store my stuff?
+
+So far I've talked about namespaces and creating classes
+and associating methods with those classes, but what about
+storing data in the class? Remember how the C<newclass>
+opcode returned a PMC that I didn't do anything to/with?
+Well, here's where it's used. The PMC returned from
+C<newclass> is the handle by which you manipulate the class.
+One such manipulation involves class "attributes".  Attributes
+are where you store your class-specific data.
+
+Parrot has several opcodes for manipulating attributes; they
+are: C<addattribute>, C<setattribute>, and C<getattribute>.
+The C<addattribute> opcode lets you add a spot in the class
+for storing a particular value which may be get and set with
+C<getattribute> and C<setattribute> respectively.  The only
+restriction on these values is that currently all
+attributes must be PMCs.
+
+So, say I wanted to give my barnyard animals names (I'll
+illustrate with just one animal and you can infer how to do the
+same for the rest):
+
+=head3 Example 4: Naming my animals
+
+    .namespace [ "Dog" ]
+
+    .sub name :method
+        .local pmc name
+        name = getattribute self, "name"
+        print name
+    .end
+
+    .sub speak :method
+        print "woof"
+    .end
+
+    .namespace
+
+    .sub _ :main
+        $P0 = newclass "Dog"
+        addattribute $P0, "name"
+
+        .local pmc dog
+        dog = new "Dog"
+        $P0 = new .String
+        $P0 = "Phideaux"
+        setattribute dog, "name", $P0
+
+        dog.name()
+        print " says "
+        dog.speak()
+        print "!\n"
+    .end
+
+Whew! There's alot of new stuff in this code. I'll take them
+starting from the top of the program and working towards the
+bottom.
+
+One of the benefits of tagging your subroutines as methods
+is that they get a PMC named C<self> that represents the
+object they are acting on behalf of. The C<name> method
+takes advantage of this to retrieve the attribute called
+"name" from the C<self> PMC and print it.
+
+Immediately after I create the class called "Dog", I use the
+PMC handle returned from C<newclass> to add an attribute called
+"name" to the class.  This just allocates a slot in the class for
+the value, it does nothing more.  
+
+Next, I create a new Dog and give it a name. Because
+attributes may only be PMCs, in order to give the Dog a
+name, I first have to create a new .String PMC (this is one
+of the PMCs builtin to Parrot) and assign the name I wish
+to give the dog to this PMC.  Then I can pass this PMC as a
+parameter to C<setattribute> to give my Dog a name.
+
+Seems kind of complicated, doesn't it?  Especially when you think
+about doing this for each animal.  Each animal namespace
+would have an identical version of the C<name> method.  For each
+call to C<newclass> I'd need to also call C<addattribute> so
+that all of the animals may have a name.  Each time I wish to
+assign a name to an animal, I'd first need to create a
+C<.String> and call C<setattribute> on it.  Et cetera.
+
+Surely there's a better way?!?  There is ...
+
+=head2 Inheritance
+
+You saw it coming didn't you? What's object oriented
+programming without inheritance? Parrot has an opcode
+C<subclass> that lets you inherit data and methods from an
+existing class. We can use this ability to create a base
+class called "Animal" that contains the "name" attribute and
+2 methods that are common to all animals: C<setname> and
+C<getname> Then, to create new animals, I just inherit from
+the Animal base class like so:
+
+=head3 Example 5: inheriting
+
+    ...
+    $P0 = newclass "Animal"
+    addattribute $P0, "name"
+    $P0 = subclass "Animal", "Cow"
+    $P0 = subclass "Animal", "Dog"
+    $P0 = subclass "Animal", "Pig"
+    ...
+    cow = new 'Cow'
+    cow.setname("Elsie")
+    ...
+    cow.getname()
+
+Each subclass will contain an attribute called "name" that can be
+used to store the name of the animal.  The C<setname> method
+abstracts out the process of creating a C<.String> PMC and
+calling C<setattribute> on it.  And finally the C<getname> method
+becomes a wrapper around C<getattribute>.
+
+=head2 Wrapup
+
+I hope this gives you an idea of how to do object oriented
+programming using Parrot.  The opcodes illustrated here are what
+any language implementor that targets Parrot would use to
+implement object oriented features in their language.  Of course
+there are more opcodes for richer object oriented behavior
+available in Parrot.  This article only covers the basics.  For
+more information see parrot/docs/pdds/pdd15_objects.pod.
+
+At the end of this article is a complete listing of the
+final program that gives my barnyard animals voices.
+There are many improvements that can be made to this code
+so take this opportunity to experiment and learn more
+about OOP in Parrot.
+
+=head2 Acknowledgements 
+
+Thanks to Randal Schwartz for providing a neat set of
+examples in L<perlboot> from which this article
+shamelessly borrows.
+
+
+=head3 Example 6: Full barnyard listing
+
+    .namespace [ "Animal" ]
+
+    .sub setname :method
+        .param string name
+        $P0 = new .String
+        $P0 = name
+        setattribute self, "name", $P0
+    .end
+
+    .sub getname :method
+        $P0 = getattribute self, "name"
+        print $P0
+    .end
+
+    .namespace [ "Cow" ]
+
+    .sub speak :method
+        print "Moo"
+    .end
+
+    .namespace [ "Dog" ]
+
+    .sub speak :method
+        print "Woof"
+    .end
+
+    .namespace [ "Pig" ]
+
+    .sub speak :method
+        print "Oink"
+    .end
+
+    .namespace
+
+    .sub _ :main
+        $P0 = newclass "Animal"
+        addattribute $P0, "name"
+        $P0 = subclass "Animal", "Cow"
+        $P0 = subclass "Animal", "Dog"
+        $P0 = subclass "Animal", "Pig"
+
+        .local pmc cow, dog, pig
+
+        cow   = new "Cow"
+        cow.setname("Elsie")
+        dog    = new "Dog"
+        dog.setname("Snoopy")
+        pig   = new "Pig"
+        pig.setname("Porky")
+        
+        cow.getname()
+        print " says "
+        cow.speak()
+        print "\n"
+
+        dog.getname()
+        print " says "
+        dog.speak()
+        print "\n"
+
+        pig.getname()
+        print " says "
+        pig.speak()
+        print "\n"
+    .end

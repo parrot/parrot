@@ -1,0 +1,357 @@
+=head1 Programming Parrot -- PMCs
+
+=head2 Preliminaries
+
+To run the example code in this article, you'll need to
+obtain a copy of Parrot and build it for your system. For
+information on obtaining Parrot, see
+http://www.parrotcode.org/. Instructions for compiling
+Parrot are available in the Parrot distribution itself. All
+code examples in this article were tested with Parrot 0.4.5
+
+=head2 A quick review of Parrot
+
+As mentioned by Alberto Manuel Simões in TPR 2.3, Parrot is
+a register-based virtual machine with 4 register types:
+Integer, String, Number, PMC. There are 32 registers for
+each register type (0 through 31) and registers are
+referenced by a capital letter signifying the register type
+followed by the register number (C<S15> is String register
+number 15). Parrot programs consist of lines of text where
+each line contains one opcode and its arguments.
+
+Utilizing a slightly higher-level syntax called PIR (Parrot
+Intermediate Representation) you may obtain an arbitrary
+number of each register type by prefixing the register with
+a C<$> (For example, the virtual register C<$I51> is
+perfectly valid). PIR also provides for a more "natural"
+syntax for opcodes. Rather than saying C<set I1, 0> to
+assign a zero to the I1 register, you may say instead C<I1 =
+0>. PIR also provides syntax for easily creating named
+variables and constants, subroutines, passing parameters to
+subroutines, accessing parameters by name, etc.
+
+Now, on to business ...
+
+=head2 What's a PMC?
+
+Integers, strings, and arbitrary floating point numbers are
+common data types in most programming languages, but what's
+a PMC? PMC stands for "Parrot Magic Cookie". PMCs are how
+Parrot handles more complicated structures and behaviors
+(hence the magic :) Some examples of PMC usage would be for
+arrays, hashes, data structures, objects, etc. Anything that
+can't be expressed using just integers, floating point
+numbers and strings can be expressed with a PMC.
+
+Parrot comes with many types of PMC that encapsulate common,
+useful behavior. Here's a program that lists all of the PMC
+types that are builtin to Parrot:
+
+=head3 Example 1: list all PMC types
+
+    .sub _ :main
+        $I0 = 1                         # The first PMC
+      loop:
+        $I1 = valid_type $I0            
+        unless $I1 goto end_loop        # stop on invalid PMC number
+        $S0 = typeof $I0                # get PMC type name
+        print $I0                       # output PMC number
+        print "\t"
+        print $S0                       # output PMC type name
+        print "\n"
+        inc $I0
+        goto loop
+      end_loop:
+    .end
+
+In this program, the C<typeof> opcode is used to determine
+the type of each PMC available to Parrot. When given an
+integer argument, C<typeof> will return the name of the PMC
+type corresponding to that integer as a string.
+
+Many of the PMC type names give clues as to how they are
+used. Here's a table that gives a short description of
+several interesting and useful PMC types:
+
+    PMC type        Description of PMC
+    --------        ------------------
+    Env             access environment variables
+    Iterator        iterate over aggregates such as arrays or hashes
+    Array           A generic, resizable array
+    Hash            A generic, resizable hash
+    Random          Obtain a random number
+    String          Similar to a string register but in PMC form
+    Integer         Similar to an integer register but in PMC form
+    Float           Similar to a number register but in PMC form
+    Exception       The standard exception mechanism
+    Timer           A timer of course :)
+
+=head2 Your wish is my command line
+
+Before I take a closer look at some of these PMC types,
+let's look at a common thing that people want to know how to
+do-- read command line arguments. The subroutine designated
+as the main program (by the C<:main> modifier) has an
+implicit parameter passed to it that is the command line
+arguments. Since previous examples never had such a
+parameter to the main program, Parrot simply ignored
+whatever was passed on the command line. Now I want Parrot
+to capture the command line so that I can manipulate it. So,
+let's write a program that reads the command line arguments
+and outputs them one per line:
+
+=head3 Example 2: reading command line arguments, take 1
+
+    .sub _ :main
+        .param pmc args
+      loop:
+        unless args goto end_loop           # line 4
+        $S0 = shift args
+        print $S0
+        print "\n"
+        goto loop
+      end_loop:
+    .end
+
+The C<.param> directive tells parrot that I want this
+subroutine to accept a single parameter and that parameter
+is some sort of PMC that I've named C<args>. Since this is
+the main subroutine of my program (as designated by the
+C<:main> modifier to the subroutine), Parrot arranges for
+the C<args> PMC to be an aggregate of some sort that
+contains the command line arguments. We then repeatedly use
+the C<shift> opcode to remove an element from the front of
+C<args> and place it into a string register which I then
+output. When the C<args> PMC is empty, it will evaluate as a
+boolean false and the conditional on line will cause the
+program to end.
+
+One problem with my program is that it's destructive to the
+C<args> PMC. What if I wanted to use the C<args> PMC later
+in the program? One way to do that is to use an integer to
+keep an index into the aggregate and then just print out
+each indexed value.
+
+=head3 Example 3: reading command line arguments, take 2
+
+    .sub _ :main
+        .param pmc args
+        .local int argc
+        argc = args                         # line 4
+        $I0 = 0
+      loop:
+        unless $I0 < argc goto end_loop
+        print $I0
+        print "\t"
+        $S0 = args[$I0]                     # line 10
+        print $S0
+        print "\n"
+        inc $I0
+        goto loop
+      end_loop:
+    .end
+
+Line 4 shows something interesting about aggregates. Similar
+to perl, when you assign an aggregate to an integer thing
+(whether it be a register or local variable), Parrot puts
+the number of elements in the aggregate into the integer
+thing. (e.g., if you had a PMC that held 5 things in C<$P0>,
+the statement C<$I0 = $P0> assigns 5 to the register C<$I0>)
+
+Since I know how many things are in the aggregate, I can
+make a loop that increments a value until it reaches that
+number. Line 10 shows that to index an aggregate, you use
+square brackets just like you would in Perl and other
+programming languages. Also note that I'm assigning to a
+string register and then printing that register. Why didn't
+I just do C<print args[$I0]> instead? Because this isn't a
+high level language. PIR provides a nicer syntax but it's
+still really low level. Each line of PIR still essentially
+corresponds to one opcode. So, while there's an opcode to
+index into an aggregate and an opcode to print a string,
+there is no opcode to do I<both> of those things.
+
+BTW, what type of aggregate is the C<args> PMC anyway?
+Another way to use the C<typeof> opcode is to pass it an
+actual PMC:
+
+=head3 Example 4: Typing the C<args> PMC
+
+    .sub _ :main
+        .param pmc args
+        $S0 = typeof args
+        print $S0
+        print "\n"
+    .end
+
+When you run this program it should output
+"ResizableStringArray". If you assign the result of the
+C<typeof> opcode to a string thing, you get the name of the
+PMC type. If you assign the result to an integer thing, you
+get the PMC type number.
+
+=head2 "You are standing in a field of PMCs"
+
+Now, let's get back to that table above. The C<Env> PMC can
+be thought of as a hash where the keys are environment
+variable names and the values are the corresponding
+environment variable values. But where does the actual PMC
+come from? For the command line, the PMC showed up as an
+implicit parameter to the main subroutine. Does C<Env> do
+something similar?
+
+Nope. If you want to access environment variables I<you>
+need to create a PMC of type C<Env>. This is accomplished by
+the C<new> opcode like so: C<$P0 = new .Env> After that
+statement, C<$P0> will contain a hash consisting of all of
+the environment variables at that time. All built-in types
+are prefixed with a dot, so if the PMC type is
+C<OrderedHash>, to create a new one you'd do C<$P0 = new
+.OrderedHash>.
+
+But, both the keys and values the C<Env> hash are strings,
+so how do I iterate over them as I did for the command
+line? We can't do the same as I did with the command line
+and use an integer index into the PMC because the keys are
+strings, not integers. So, how do I do it? The answer is
+another PMC type--C<Iterator>
+
+An C<Iterator> PMC is used, as its name implies, to iterate
+over aggregates. It doesn't care if they are arrays or
+hashes or something else entirely, it just gives you a way
+to walk from one end of the aggregate to the other.
+
+Here's a program that outputs the name and value of all
+environment variables:
+
+=head3 Example 5: output environment
+
+    .sub _ :main
+        .local pmc env, iter
+        .local string key, value
+
+        env = new .Env                      # line 3
+        iter = new .Iterator, env           # line 4
+      iterloop:
+        unless iter goto iterend
+        key = shift iter                    # line 8
+        value = env[key]
+        print key
+        print ":"
+        print value
+        print "\n"
+        goto iterloop
+      iterend:
+    .end
+
+Lines 3 and 4 create my new PMCs. Line 3 creates a new
+C<Env> PMC which at the moment of its existence contains a
+hash of all of the environment variables currently in the
+environment. Line 4 creates a new C<Iterator> PMC and
+initializes it with the PMC that I wish to iterate over
+(my newly created C<Env> PMC in this case). From that point
+on, I treat the C<Iterator> much the same way I first
+treated the PMC of command line arguments. Test if it's
+"empty" (the iterator has been exhausted) and shift elements
+from the C<Iterator> in order to walk from one end of the
+aggregate to the other. A key difference is however, I'm
+not modifying the original aggregate, just the C<Iterator>
+which can be thrown away or reset so that I can iterate the
+aggregate over and over again or even have two iterators
+iterating the same aggregate simultaneously. For more
+information on iterators, see
+L<parrot/docs/pmc/iterator.pod>
+
+So, to output the environment variables, I use the
+C<Iterator> to walk the keys, and then index each key into
+the C<Env> PMC to get the value associated with that key and
+then output it. Simple. Say ... couldn't I have iterated
+over the command line this same way? Sure!
+
+=head3 Example 6: reading command line arguments, take 3
+
+    .sub _ :main
+        .param pmc args
+        .local pmc cmdline
+        cmdline = new .Iterator, args
+      loop:
+        unless cmdline goto end_loop
+        $S0 = shift cmdline
+        print $S0
+        print "\n"
+        goto loop
+      end_loop:
+    .end
+
+Notice how this code approaches the simplicity of the
+original that destructively iterated the C<args> PMC. Using
+indexes can quickly become complicated by comparison.
+
+=head2 How do I create my own PMC type?
+
+That's really beyond the scope of this article, but if
+you're really interested in doing so, get a copy of the
+Parrot source and read the file C<docs/vtables.pod>.
+This file outlines the steps you need to take to create
+a new PMC type.
+
+=head2 A few more PMC examples
+
+I'll conclude with a few examples without explanation. I
+encourage you to explore the Parrot source code and
+documentation to find out more about these (and other) PMCs.
+A good place to start is the docs directory in the Parrot
+distribution (parrot/docs)
+
+=head3 Example 7: Output random numbers
+
+    .sub _ :main
+        $P0 = new .Random
+        $N0 = $P0
+        print $N0
+        print "\n"
+        $N0 = $P0
+        print $N0
+        print "\n"
+    .end
+
+=head3 Example 8: Triggering an exception
+
+    .sub _ :main
+        $P0 = new .Exception
+        $P0['_message'] = "The sky is falling!"
+        throw $P0
+    .end
+
+=head3 Example 9: Setting a timer
+
+    .include "timer.pasm"                   # for the timer constants
+
+    .sub expired
+        print "Timer has expired!\n"
+    .end
+
+    .sub _ :main
+        $P0 = new .Timer
+        $P1 = global "expired"
+
+        $P0[.PARROT_TIMER_HANDLER] = $P1    # call sub in $P1 when timer goes off
+        $P0[.PARROT_TIMER_SEC] = 2          # trigger every 2 seconds
+        $P0[.PARROT_TIMER_REPEAT] = -1      # repeat indefinitely
+        $P0[.PARROT_TIMER_RUNNING] = 1      # start timer immediately
+        global "timer" = $P0                # keep the timer around
+
+        $I0 = 0
+      loop:
+        print $I0
+        print ": running...\n"
+        inc $I0
+        sleep 1                             # wait a second
+        goto loop
+    .end
+
+
+=head2 Author
+
+Jonathan Scott Duff <duff@pobox.com>
