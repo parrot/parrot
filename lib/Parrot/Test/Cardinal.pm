@@ -23,7 +23,7 @@ sub new {
 
 sub output_is() {
     my ($self, $code, $output, $desc) = @_;
-    print "@_\n";
+    #print "@_\n";
 
     my $count = $self->{builder}->current_test + 1;
     $desc = 'Cardinal Test' unless $desc;
@@ -31,6 +31,7 @@ sub output_is() {
     my $lang_f = File::Spec->rel2abs(Parrot::Test::per_test('.rb',$count));
     my $out_f  = File::Spec->rel2abs(Parrot::Test::per_test('.out',$count));
     my $cardinal_out_f = File::Spec->rel2abs(Parrot::Test::per_test('.cardinal.out',$count));
+    my $cardinal_out_debug_f = File::Spec->rel2abs(Parrot::Test::per_test('.cardinal.debug.out',$count));
     my $parrotdir = dirname $self->{parrot};
     
     Parrot::Test::write_code_to_file( $code, $lang_f );
@@ -43,7 +44,7 @@ sub output_is() {
     my $ruby_output = Parrot::Test::slurp_file($out_f);
 
     my $cardinal_cmd = "$self->{parrot} $args languages/cardinal/cardinal.pbc $lang_f";
-    my $cardinal_exit_code = Parrot::Test::run_command($cardinal_cmd, CD => $self->{relpath}, STDOUT => $cardinal_out_f, STDERR => $out_f );
+    my $cardinal_exit_code = Parrot::Test::run_command($cardinal_cmd, CD => $self->{relpath}, STDOUT => $cardinal_out_f, STDERR => $cardinal_out_f );
     my $cardinal_output = Parrot::Test::slurp_file($cardinal_out_f);
 
     my $pass = $self->{builder}->is_eq( $cardinal_output, $ruby_output, $desc );
@@ -51,8 +52,14 @@ sub output_is() {
     $self->{builder}->diag("'$cardinal_cmd' failed with exit code $cardinal_exit_code") if $cardinal_exit_code and not $pass;
 
 
+    if (not $pass) {
+      my $cardinal_debug_cmd = "$self->{parrot} $args languages/cardinal/cardinal.pbc -d $lang_f";
+      my $cardinal_debug_exit_code = Parrot::Test::run_command($cardinal_debug_cmd, CD => $self->{relpath}, STDOUT => $cardinal_out_debug_f, STDERR => $cardinal_out_debug_f );
+      my $cardinal_debug_output = Parrot::Test::slurp_file($cardinal_out_debug_f);
+    }
+
     unless ($ENV{POSTMORTEM}) {
-        unlink $lang_f;
+        #unlink $lang_f;
         unlink $out_f;
         unlink $cardinal_out_f;
     }
