@@ -29,8 +29,8 @@ before configuring Parrot.
 
 Get it from http://www-306.ibm.com/software/globalization/icu/downloads.jsp
 
-You'll also need Perl 5.6 or above to run various configure and
-build scripts.
+You'll also need Perl 5.6.1 or above to run various configure and build
+scripts.
 
 For most of the platforms that we are supporting initially,
 Parrot should build out of the box.
