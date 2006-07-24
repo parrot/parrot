@@ -55,7 +55,7 @@ token decimal { [<[1..9]><[0..9]>*] }
 
 # XXX squawk about invalid looking octal.
 
-token octal   { 0 <[0..7]> *: }
+token octal   { 0 [ <[0..7]> | <[89]><[0..9]>* <invalid_octal> ]* }
 token hex     { 0<[xX]> ( <[0..9A..Fa..f]>) + }
 token integer { [<decimal> | <octal> | <hex> ] }
 
@@ -70,7 +70,8 @@ token unary_function {
 token binary_function { atan2 | fmod | hypot | pow }
 
 token function {
-  [ <binary_function> | <unary_function> | <nullary_function> ]
+  [ <binary_function> | <unary_function> | <nullary_function> 
+  | ( <[a..zA..Z]>\w* )  \(  <unknown_math_function>  ]
         \( [<expression> [, <expression>]*]? \)
 }
 

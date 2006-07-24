@@ -1,34 +1,30 @@
 
 =head1 TITLE
 
-tcl_expr_parse.pir - Parsing support subroutines for [expr] 
+parse.pir - Parsing support subroutines for [expr] 
 
 =over 4
 
-=item C<expression(PMC mob)>
+=cut
 
-The C<expression> subroutine implements the Tcl
-<expression> subrule.  It accepts a match object representing
-the current state of the parse, passes the match object
-to the operator precedence parser to obtain an expression,
-and returns the result to the caller.
-
-
-.namespace [ 'TclExpr::Grammar' ]
-
-.include 'cclass.pasm'
-
-.sub 'expression'
+.sub 'invalid_octal'
     .param pmc mob
-    .param string stoptoken    :optional # ignored
-    .param int has_stoptoken   :opt_flag # ignored
+    .param pmc adverbs :named :slurpy
 
-    .local pmc optable
-
-    load_bytecode 'PGE/Util.pbc'
-
-    optable = find_global 'TclExpr::Grammar', '$optable'
-    .return optable.'parse'(mob)
+    $S0 = mob
+    $S0 = 'expected integer but got "' . $S0
+    $S0 = $S0 . '" (looks like invalid octal number)'
+    
+    .throw($S0)
 .end
 
-=cut
+.sub 'unknown_math_function'
+    .param pmc mob
+    .param pmc adverbs :named :slurpy
+
+    $S0 = mob[0]
+    $S0 = 'unknown math function "' . $S0
+    $S0 = $S0 . '"'
+
+    .throw($S0)
+.end

@@ -310,9 +310,7 @@ domain_error:
     .param float a
     .param float b
     if b == 0 goto domain_error
-    $N0 = a / b
-    $I0 = $N0
-    $N0 -= $I0 
+    $N0 = a % b 
     .local pmc ret
     ret = new "TclFloat"
     ret = $N0

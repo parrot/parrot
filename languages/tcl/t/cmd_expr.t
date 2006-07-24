@@ -502,8 +502,8 @@ TCL
 -0.0
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'fmod(-4, "a")');
-  expr fmod(-4, "a")
+language_output_is('tcl', <<'TCL', <<'OUT', 'fmod(-4,"a")');
+  expr fmod(-4,"a")
 TCL
 argument to math function didn't have numeric value
 OUT

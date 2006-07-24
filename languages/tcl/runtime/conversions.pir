@@ -144,7 +144,16 @@ Given an expression, return a subroutine, or optionally, the raw PIR
 
     .get_from_HLL($P0, '_tcl', 'TclExpr::Grammar')
     parse = $P0['expression']
-    match = parse(expression)
+    .get_from_HLL($P0, 'parrot'; 'PGE::Match', 'newfrom')
+    match = $P0(expression, 0, 'TclExpr::Grammar')
+    match.to(0)
+    match = parse(match)
+    
+    # the following will dump out the match object
+    #load_bytecode 'dumper.pbc'
+    #load_bytecode 'PGE/Dumper.pbc'
+    #.get_from_HLL($P0, 'parrot', '_dumper')
+    #$P0(match)
  
     unless match goto bad_expression
 

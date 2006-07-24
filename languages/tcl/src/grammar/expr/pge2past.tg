@@ -2,14 +2,17 @@ grammar TclExpr::PAST::Grammar is TGE::Grammar;
 
 transform result (ROOT) {
     # Top level result is always going to be an expr.
-
-    node = node['expr']
-    .return tree.get('dispatch', node)
+    .return tree.get('expression', node)
 } 
+
+transform expression (TclExpr::Grammar) {
+    node = node['expr']
+    .return tree.get('dispatch', node, 'TclExpr::Grammar')
+}
 
 # Handle generic dispatch (needed at ROOT, and for things with kids.)
 
-transform dispatch (PGE::Match) {
+transform dispatch (TclExpr::Grammar) {
     .local pmc child
 
     # Ask the child node for its result.
@@ -87,7 +90,7 @@ transform result (operator) {
     $P0 = shift iter
     $S0 = $P0
     if $S0 == '' goto iter_loop # XXX needed?
-    $P1 = tree.'get'('dispatch', $P0)
+    $P1 = tree.'get'('dispatch', $P0, 'TclExpr::Grammar')
     past.'add_child'($P1)
     goto iter_loop
   iter_end:
@@ -132,8 +135,8 @@ has_argc:
     if argc == 0 goto too_few
     if argc > 1  goto too_many
     function_name = node['unary_function']
-    $P0 = args[0; 'expr']
-    $P1 = tree.'get'('dispatch', $P0)
+    $P0 = args[0]
+    $P1 = tree.'get'('expression', $P0)
     past.'add_child'($P1)
     goto arguments
 
@@ -142,12 +145,12 @@ has_argc:
     if argc > 2 goto too_many
     function_name = node['binary_function']
 
-    $P1 = args[0; 'expr']
-    $P2 = tree.'get'('dispatch', $P1)
+    $P1 = args[0]
+    $P2 = tree.'get'('expression', $P1)
     past.'add_child'($P2)
 
-    $P1 = args[1; 'expr']
-    $P2 = tree.'get'('dispatch', $P1)
+    $P1 = args[1]
+    $P2 = tree.'get'('expression', $P1)
     past.'add_child'($P2)
 
   arguments:
@@ -180,7 +183,7 @@ transform result (braced) {
     result = new 'PAST::Val'
     result.set_node(node)
     
-    $S0 = node
+    $S0 = node[0]
     result['value'] = $S0
     result['class'] = "'TclConst'"
     .return(result)
@@ -266,7 +269,7 @@ transform result (subcommand) {
 loop:
     unless iter goto end
     $P0 = shift iter
-    $P1 = tree.'get'('dispatch', $P0)
+    $P1 = tree.'get'('dispatch', $P0, 'TclExpr::Grammar')
     past.'add_child'($P1)
     goto loop
 end:
@@ -290,13 +293,13 @@ transform ternary (PAST::Op) {
     result.set_node(node)
 
     $P1 = node[0]
-    $P2 = tree.'get'('dispatch', $P1)
+    $P2 = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
     result.'add_child'($P2)
     $P1 = node[1]
-    $P2 = tree.'get'('dispatch', $P1)
+    $P2 = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
     result.'add_child'($P2)
     $P1 = node[2]
-    $P2 = tree.'get'('dispatch', $P1)
+    $P2 = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
     result.'add_child'($P2)
  
     result['conditional'] = 1
@@ -321,9 +324,9 @@ transform logical_and (PAST::Op) {
 
     # Get our A & B trees..
     $P1 = node[0]
-    A = tree.'get'('dispatch', $P1)
+    A = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
     $P1 = node[1]
-    B = tree.'get'('dispatch', $P1)
+    B = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
 
     # Generate (B ? 1 : 0)
     inner = new 'PAST::Cond'
@@ -364,9 +367,9 @@ transform logical_or (PAST::Op) {
 
     # Get our A & B trees..
     $P1 = node[0]
-    A = tree.'get'('dispatch', $P1)
+    A = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
     $P1 = node[1]
-    B = tree.'get'('dispatch', $P1)
+    B = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
 
     # Generate (B ? 1 : 0)
     inner = new 'PAST::Cond'
