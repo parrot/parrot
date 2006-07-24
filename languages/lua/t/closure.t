@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: closure.t  $
+# $Id$
 
 =head1 NAME
 

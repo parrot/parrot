@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: wmlslang.pir 12840 2006-05-30 15:08:05Z coke $
+# $Id$
 
 =head1 NAME
 

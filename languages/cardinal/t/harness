@@ -1,6 +1,6 @@
 #! perl
 
-# $Id: harness 13278 2006-07-13 13:40:14Z coke $
+# $Id$
 
 use FindBin;
 use lib qw( . lib ../lib ../../lib ../../lib );

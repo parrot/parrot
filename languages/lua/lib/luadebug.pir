@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: luadebug.pir 11770 2006-02-28 08:02:51Z fperrad $
+# $Id$
 
 =head1 NAME
 

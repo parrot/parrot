@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: luapackage.pir 11848 2006-03-10 08:39:33Z fperrad $
+# $Id$
 
 =head1 NAME
 

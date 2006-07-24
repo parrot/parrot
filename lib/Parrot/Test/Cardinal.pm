@@ -1,4 +1,4 @@
-# $Id: Cardinal.pm 12039 2006-03-26 19:46:16Z bernhard $
+# $Id$
 
 package Parrot::Test::Cardinal;
 

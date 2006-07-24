@@ -1,5 +1,5 @@
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: $
+# $Id$
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ Parrot's threading model.
 
 =head1 VERSION
 
-$Revision: $
+$Revision$
 
 =head1 DEFINITIONS
 

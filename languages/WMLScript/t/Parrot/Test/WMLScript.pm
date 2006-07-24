@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: Lua.pm 12840 2006-05-30 15:08:05Z coke $
+# $Id$
 
 package Parrot::Test::WMLScript;
 

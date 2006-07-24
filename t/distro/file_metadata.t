@@ -51,7 +51,7 @@ TEST_MIME: {
 
 	like(
 		sub{ my $r = qx(@cmd $_); chomp $r; "$_ ($r)" }->(),
-		qr!^\Q$_\E \(text/plain!,
+		qr!^$_ \(text/plain!,
 		"$msg ($_)"
 	) for @test_files;
 } # TEST_MIME

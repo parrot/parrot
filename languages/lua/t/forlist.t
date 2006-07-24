@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: forlist.t 11357 2006-01-27 07:56:36Z fperrad $
+# $Id$
 
 =head1 NAME
 

@@ -1,4 +1,4 @@
-# $Id: /parrotcode/trunk/config/gen/makefiles/pheme.in 13083 2006-03-04T20:17:22.853686Z svm  $
+# $Id$
 
 # Setup some commands
 PERL     = @perl@

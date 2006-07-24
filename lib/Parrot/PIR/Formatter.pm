@@ -1,5 +1,5 @@
 # Copyright (C) 2004-2005, The Perl Foundation.
-# $Id: $
+# $Id$
 
 package Parrot::PIR::Formatter;
 

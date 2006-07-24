@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: boolean.t 11446 2006-02-06 14:07:49Z fperrad $
+# $Id$
 
 =head1 NAME
 

@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: Compilers.pm 11501 2006-02-10 18:27:13Z particle $
+# $Id$
 
 =head1 NAME
 

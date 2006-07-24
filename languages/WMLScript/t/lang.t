@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: lang.t 11478 2006-02-09 08:26:19Z fperrad $
+# $Id$
 
 =head1 NAME
 
