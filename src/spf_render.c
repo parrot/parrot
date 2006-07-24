@@ -184,7 +184,7 @@ handle_flags(Interp *interpreter,
                     string_ord(interpreter, str,0) == '+')) {
                 STRING *temp = NULL;
                 string_substr(interpreter, str, 1, len-1, &temp, 0);
-                str = string_chopn(interpreter, str, -1, 1);
+                string_chopn(interpreter, str, -1, 1);
                 str = string_append(interpreter, str, fill, 0);
                 str = string_append(interpreter, str, temp, 0);
             }
