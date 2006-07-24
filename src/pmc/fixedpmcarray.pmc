@@ -438,14 +438,16 @@ Resizes the array to C<size> elements.
     void set_pmc(PMC *value) {
         INTVAL size;
 
+        if (SELF == value)
+            return;
+        
         if (value->vtable->base_type != enum_class_FixedPMCArray &&
                 value->vtable->base_type != enum_class_ResizablePMCArray)
             real_exception(INTERP, NULL, E_TypeError,
                     "Can't set self from this type");
-        if (SELF != value) {
-            if (PMC_data(SELF))
-                mem_sys_free(PMC_data(SELF));
-        }
+        
+        if (PMC_data(SELF))
+            mem_sys_free(PMC_data(SELF));
         size = PMC_int_val(SELF) = PMC_int_val(value);
         PMC_data(SELF) = mem_sys_allocate(size * sizeof(PMC*));
         mem_sys_memcopy(PMC_data(SELF), PMC_data(value), size*sizeof(PMC*));
