@@ -52,18 +52,19 @@ proc eval_is {code expected args}  {
       set description ""
     }
 
-    set result [catch {set actual [eval $code]} error]
+    # Ignore exceptions for the moment
+    set result [catch {eval $code} actual]
 
-    if {$result || $actual ne $expected} {
+    if {$actual eq $expected} {
+        puts "ok $very_bad_global_variable_test_num $description"
+        return 1
+    } {
         puts "not ok $very_bad_global_variable_test_num $description"
 
         # XXX escape strings.
-        puts "#      got : '$error'"
+        puts "#      got : '$actual'"
         puts "# expected : '$expected'"
         return 0 
-    } {
-        puts "ok $very_bad_global_variable_test_num $description"
-        return 1
     }
 }
 
@@ -97,9 +98,9 @@ proc diag {diagnostic} {
 # XXX hacks to help avoid translating the actual tcl tests, until we actuall
 # support tcltest.
 
-# A placeholder that simulates the real tcltest's test proc.
+# A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description code output} {
-  return [eval_is $code $output "$num $description"]
+  return [eval_is $code $output "$num: $description"]
 }
 
 # A very big hack placeholder to avoid transform
