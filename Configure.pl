@@ -241,7 +241,7 @@ F<lib/Parrot/Configure/Step.pm>, F<docs/configuration.pod>
 use strict;
 use warnings;
 use lib 'lib';
-use 5.006;
+use 5.006_001;
 
 use English qw( -no_match_vars );
 use Parrot::BuildUtil;
