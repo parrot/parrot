@@ -383,6 +383,9 @@ string_rep_compatible (Interp *interpreter, STRING *a /*NN*/, const STRING *b /*
 
 FUNCDOC:
 Take in two Parrot strings and append the second to the first.
+NOTE THAT RETURN VALUE MAY NOT BE THE FIRST STRING,
+  if the first string is COW'd or read-only.
+So make sure to _use_ the return value.
 
 */
 
@@ -866,8 +869,8 @@ string_concat(Interp *interpreter, STRING *a, STRING *b, UINTVAL Uflags)
                         a->bufused + b->bufused,
                         enc, cs, 0);
 
-            string_append(interpreter, result, a, Uflags);
-            string_append(interpreter, result, b, Uflags);
+            result = string_append(interpreter, result, a, Uflags);
+            result = string_append(interpreter, result, b, Uflags);
 
             return result;
         }

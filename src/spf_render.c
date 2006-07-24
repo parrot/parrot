@@ -184,9 +184,9 @@ handle_flags(Interp *interpreter,
                     string_ord(interpreter, str,0) == '+')) {
                 STRING *temp = NULL;
                 string_substr(interpreter, str, 1, len-1, &temp, 0);
-                string_chopn(interpreter, str, -1, 1);
-                string_append(interpreter, str, fill, 0);
-                string_append(interpreter, str, temp, 0);
+                str = string_chopn(interpreter, str, -1, 1);
+                str = string_append(interpreter, str, fill, 0);
+                str = string_append(interpreter, str, temp, 0);
             }
             else {
                 str = string_concat(interpreter, fill, str, 0);
@@ -305,7 +305,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
         if (string_ord(interpreter, pat, i) == '%') {        /* % */
             if (len) {
                 string_substr(interpreter, pat, old, len, &substr, 1);
-                string_append(interpreter, targ, substr, 0);
+                targ = string_append(interpreter, targ, substr, 0);
             }
             len = 0;
             old = i;
@@ -556,9 +556,9 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                         switch (ch) {
                             /* INTEGERS */
                         case 'c':
-                            string_append(interpreter, targ,
-                                          obj->getchr(interpreter,
-                                                      info.type, obj), 0);
+                            targ = string_append(interpreter, targ,
+                                                 obj->getchr(interpreter,
+                                                             info.type, obj), 0);
                             break;
 
                         case 'd':
@@ -568,7 +568,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
 
                             ts = handle_flags(interpreter, &info, ts, 1, NULL);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'o':
@@ -579,7 +579,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             ts = handle_flags(interpreter, &info,
                                     ts, 1, prefix);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'x':
@@ -590,7 +590,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             ts = handle_flags(interpreter, &info,
                                     ts, 1, prefix);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'X':
@@ -602,7 +602,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             ts = handle_flags(interpreter, &info,
                                     ts, 1, prefix);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'b':
@@ -614,7 +614,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             ts = handle_flags(interpreter, &info,
                                     ts, 1, prefix);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'B':
@@ -625,7 +625,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             ts = handle_flags(interpreter, &info,
                                     ts, 1, prefix);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'u':
@@ -635,7 +635,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
 
                             ts = handle_flags(interpreter, &info, ts, 1, NULL);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'p':
@@ -647,7 +647,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             ts = handle_flags(interpreter, &info,
                                     ts, 1, prefix);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                             /* FLOATS - We cheat on these and use snprintf. */
@@ -698,7 +698,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             }
 #endif
 
-                            string_append(interpreter, targ, cstr2pstr(tc), 0);
+                            targ = string_append(interpreter, targ, cstr2pstr(tc), 0);
                             break;
 
                             /* STRINGS */
@@ -716,7 +716,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                                 ts = handle_flags(interpreter, &info, string,
                                     0, NULL);
 
-                                string_append(interpreter, targ, ts, 0);
+                                targ = string_append(interpreter, targ, ts, 0);
 
                                 break;
                             }
@@ -729,7 +729,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             ts = handle_flags(interpreter, &info, string,
                                     0, NULL);
 
-                            string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts, 0);
 
                             break;
 
@@ -772,7 +772,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
     }
     if (len) {
         string_substr(interpreter, pat, old, len, &substr, 1);
-        string_append(interpreter, targ, substr, 0);
+        targ = string_append(interpreter, targ, substr, 0);
     }
 
     return targ;
