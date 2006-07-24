@@ -161,7 +161,7 @@ if ($renum_flag) {
 }    
 # else check strictly against ops.num and renumber
 else {
-    load_op_map_file();
+    load_op_map_files();
 
     my $cur_code = 0;
     for(@{$ops->{OPS}}) {
@@ -300,21 +300,26 @@ END_C
 close OUT;
 
 
-# if opcode numer is not in ops.num create one but
-# only for *experimental* ops
-# other opcodes are just skipped
+#
+# if opcode numer is not in ops.num:
+#   warn developers
+#   create one for *experimental* ops, else skip
+#
 sub find_op_number {
     my ($opname, $experimental) = @_;
     if (exists $ParrotOps::optable{$opname}) {
 	return $ParrotOps::optable{$opname};
-    } elsif (!$experimental) {
-	warn "$opname\t\t* skipped not in ops.num\n"
-	    if -e "DEVELOPING" and exists $ENV{PARROT_OPS_DEBUG};
+    } elsif (exists $ParrotOps::skiptable{$opname}) {
 	return -1;
-    } else {
+    } elsif ($experimental) {
 	my $n = $ParrotOps::optable{$opname} = ++$ParrotOps::max_op_num;
-	warn "$opname\t$n\tnot mentioned in ops.num\n" if -e "DEVELOPING";
+	warn "$opname\t$n\texperimental, not in ops.num\n"
+	  if -e "DEVELOPING";
 	return $n;
+    } else {
+	warn "$opname\t\tSKIPPED: not in ops.num nor ops.skip\n"
+	  if -e "DEVELOPING";
+	return -1;
     }
 }
 
@@ -361,25 +366,19 @@ sub renum_op_map_file {
     }
     close OP;
 }
-  
-sub load_op_map_file {
-  my $file = shift;
 
-  if (!defined $file) {
-    $file = "src/ops/ops.num";
-  }
+sub load_op_map_files {
+  my $num_file = "src/ops/ops.num";
+  my $skip_file = "src/ops/ops.skip";
 
-  my ($name, $number, $prev);
+  my ($op, $name, $number, $prev);
 
-  if (!defined $ParrotOps::max_op_num) {
-    $ParrotOps::max_op_num = 0;
-  }
+  $ParrotOps::max_op_num ||= 0;
 
-  local *OP;
-  open OP, "< $file" or die "Can't open $file, error $!";
+  open $op, '<', $num_file
+    or die "Can't open $num_file: $!";
   $prev = -1;
-
-  while (<OP>) {
+  while (<$op>) {
     chomp;
     s/#.*$//;
     s/\s*$//;
@@ -387,7 +386,7 @@ sub load_op_map_file {
     next unless $_;
     ($name, $number) = split(/\s+/, $_);
     if ($prev + 1 != $number) {
-	    die "hole in ops.num opcode # $number";
+	    die "hole in ops.num before #$number";
     }
     if (exists $ParrotOps::optable{$name}) {
 	    die "duplicate opcode $name and $number";
@@ -398,7 +397,24 @@ sub load_op_map_file {
       $ParrotOps::max_op_num = $number;
     }
   }
-  close OP;
+  undef $op;
+
+  open $op, '<', $skip_file
+    or die "Can't open $skip_file: $!";
+  while (<$op>) {
+    chomp;
+    s/#.*$//;
+    s/\s*$//;
+    s/^\s*//;
+    next unless $_;
+    ($name) = split(/\s+/, $_);
+    if (exists $ParrotOps::optable{$name}) {
+	die "skipped opcode is also in $num_file";
+    }
+    $ParrotOps::skiptable{$name} = 1;
+  }
+  undef $op;
+
   return;
 }
 
