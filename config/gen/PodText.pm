@@ -1,5 +1,5 @@
 # Copyright (C) 2001-2004, The Perl Foundation.
-# $Id: /mirror/trunk/config/gen/cpu.pm 10933 2006-01-06T01:43:24.870411Z particle  $
+# $Id$
 
 =head1 NAME
 
