@@ -3,8 +3,6 @@
 
 parse.pir - Parsing support subroutines for [expr] 
 
-=over 4
-
 =cut
 
 .sub 'invalid_octal'

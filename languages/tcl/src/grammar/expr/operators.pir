@@ -439,5 +439,3 @@ true:
 false:
     .return(0)
 .end
-
-=cut
