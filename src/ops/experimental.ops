@@ -475,7 +475,7 @@ Possible values for $3 are:
 
 =back
 
-=todo TODO move/officalize this opcode at next op cleanup.
+B<TODO> move/officalize this opcode at next op cleanup.
 
 =cut
 
