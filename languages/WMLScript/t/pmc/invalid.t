@@ -17,7 +17,7 @@ Tests C<WmlsInvalid> PMC
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -91,6 +91,29 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_string' );
     end
 .end
 CODE
+invalid
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check clone' );
+.sub _main
+    loadlib P1, "wmls_group"
+    find_type $I0, "WmlsInvalid"
+    .local pmc pmc1
+    pmc1 = new $I0
+    .local pmc pmc2
+    pmc2 = clone pmc1
+    .local string str1
+    str1 = classname pmc2
+    print str1
+    print "\n"
+    .local string str2
+    str2 = pmc2
+    print str2
+    print "\n"
+    end
+.end
+CODE
+WmlsInvalid
 invalid
 OUTPUT
 

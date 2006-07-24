@@ -115,22 +115,19 @@ sub post_branch {
 
 # Pre and post load operation hooks.
 sub pre_load {
-    # Nothing to do.
-    return q{};
+    return <<'PIR';
+    # Increment stack depth.
+    inc stack_depth
+    # Assign register name.
+    ${DEST0} = "$P"
+    $S0 = stack_depth
+    ${DEST0} = concat $S0
+PIR
 }
 
 sub post_load {
-    return <<'PIR';
-    inc stack_depth 
-    $S0 = "$P"
-    $S1 = stack_depth
-    $S0 = concat $S1
-    ${INS} = concat "  "
-    ${INS} = concat $S0
-    ${INS} = concat " = "
-    ${INS} = concat ${LOADREG}
-    ${INS} = concat "\n"
-PIR
+    # Nothing to do.
+    return q{};
 }
 
 # Pre and post store operation hooks.
@@ -168,11 +165,12 @@ sub pre_call {
 L1_\${CURIC}:
     unless \$I1 < \$I0 goto L2_\${CURIC}
     if \$I1 == 0 goto L3_\${CURIC}
-    \${PARAMS} = concat ", "
+    \${PARAMS} = concat ", ", \${PARAMS}
 L3_\${CURIC}:
-    \${PARAMS} = concat "\$P"
-    \$S0 = stack_depth
-    \${PARAMS} = concat \$S0
+    \$S0 = "\$P"
+    \$S1 = stack_depth
+    \$S0 = concat \$S1
+    \${PARAMS} = concat \$S0, \${PARAMS}
     # Decrement stack height.
     dec stack_depth
     inc \$I1

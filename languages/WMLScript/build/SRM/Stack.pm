@@ -125,14 +125,16 @@ sub post_branch {
 
 # Pre and post load operation hooks.
 sub pre_load {
-    # Nothing to do here.
-    return q{};
+    return <<'PIR';
+    # Just got it in the 0th register.
+    ${DEST0} = "reg0"
+PIR
 }
 
 sub post_load {
     return <<'PIR';
     ${INS} = concat "  push s, "
-    ${INS} = concat ${LOADREG}
+    ${INS} = concat ${DEST0}
     ${INS} = concat "\n"
 PIR
 }
@@ -158,19 +160,21 @@ sub pre_call {
     return <<"PIR";
     \${PARAMS} = ""
     \$I0 = $nb_arg
-    \$I1 = 0
+    dec \$I0
+    \$I1 = \$I0
 L1_\${CURIC}:
-    unless \$I1 < \$I0 goto L2_\${CURIC}
+    unless \$I1 >= 0 goto L2_\${CURIC}
     \${INS} = concat "  \$P"
     \$S0 = \$I1
     \${INS} = concat \$S0
     \${INS} = concat " = pop s\\n"
-    if \$I1 == 0 goto L3_\${CURIC}
-    \${PARAMS} = concat ", "
+    if \$I1 == \$I0 goto L3_\${CURIC}
+    \${PARAMS} = concat ", ", \${PARAMS}
 L3_\${CURIC}:
-    \${PARAMS} = concat "\$P"
-    \${PARAMS} = concat \$S0
-    inc \$I1
+    \$S1 = "\$P"
+    \$S1 = concat \$S1, \$S0
+    \${PARAMS} = concat \$S1, \${PARAMS}
+    dec \$I1
     goto L1_\${CURIC}
 L2_\${CURIC}:
     # Just got it in the 0th register.

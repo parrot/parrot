@@ -162,7 +162,7 @@ nb_arg = script.get_nb_arg(${INLINE})
 pir = <<PIR
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
-    ${INS} = concat " = fct_"
+    ${INS} = concat " = function"
     $S0 = ${INLINE}
     ${INS} = concat $S0
     ${INS} = concat "("
@@ -178,7 +178,7 @@ nb_arg = script.get_nb_arg(${ARG1})
 pir = <<PIR
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
-    ${INS} = concat " = fct_"
+    ${INS} = concat " = function"
     $S0 = ${ARG1}
     ${INS} = concat $S0
     ${INS} = concat "("
@@ -304,8 +304,11 @@ inline = 1F
 push = 1
 pir = <<PIR
     $S0 = ${INLINE}
-    ${LOADREG} = "local"
-    ${LOADREG} = concat $S0
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone local"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [LOAD_VAR]
@@ -315,8 +318,11 @@ arguments = uint8
 push = 1
 pir = <<PIR
     $S0 = ${ARG1}
-    ${LOADREG} = "local"
-    ${LOADREG} = concat $S0
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone local"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [STORE_VAR_S]
@@ -383,12 +389,17 @@ inline = 0F
 push = 1
 pir = <<PIR
     $S0 = ${INLINE}
-    ${LOADREG} = "const"
-    ${LOADREG} = concat $S0
-    $I0 = exists ${CONST}[${LOADREG}]
+    $S1 = "const"
+    $S1 = concat $S0
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone "
+    ${INS} = concat $S1
+    ${INS} = concat "\n"
+    $I0 = exists ${CONST}[$S1]
     if $I0 goto L1_${CURIC}
     $S0 = constants.translate(${INLINE})
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}[$S1] = $S0
 L1_${CURIC}:
 PIR
 
@@ -399,12 +410,17 @@ arguments = uint8
 push = 1
 pir = <<PIR
     $S0 = ${ARG1}
-    ${LOADREG} = "const"
-    ${LOADREG} = concat $S0
-    $I0 = exists ${CONST}[${LOADREG}]
+    $S1 = "const"
+    $S1 = concat $S0
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone "
+    ${INS} = concat $S1
+    ${INS} = concat "\n"
+    $I0 = exists ${CONST}[$S1]
     if $I0 goto L1_${CURIC}
     $S0 = constants.translate(${ARG1})
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}[$S1] = $S0
 L1_${CURIC}:
 PIR
 
@@ -415,12 +431,17 @@ arguments = uint16
 push = 1
 pir = <<PIR
     $S0 = ${ARG1}
-    ${LOADREG} = "const"
-    ${LOADREG} = concat $S0
-    $I0 = exists ${CONST}[${LOADREG}]
+    $S1 = "const"
+    $S1 = concat $S0
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone "
+    ${INS} = concat $S1
+    ${INS} = concat "\n"
+    $I0 = exists ${CONST}[$S1]
     if $I0 goto L1_${CURIC}
     $S0 = constants.translate(${ARG1})
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}[$S1] = $S0
 L1_${CURIC}:
 PIR
 
@@ -429,11 +450,13 @@ code = 14
 class = load
 push = 1
 pir = <<PIR
-    ${LOADREG} = "const_0"
-    $I0 = exists ${CONST}[${LOADREG}]
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone const_0\n"
+    $I0 = exists ${CONST}['const_0']
     if $I0 goto L1_${CURIC}
     $S0 = "  .local pmc const_0\n  new const_0, .WmlsInteger\n  set const_0, 0\n"
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}['const_0'] = $S0
 L1_${CURIC}:
 PIR
 
@@ -442,11 +465,13 @@ code = 15
 class = load
 push = 1
 pir = <<PIR
-    ${LOADREG} = "const_1"
-    $I0 = exists ${CONST}[${LOADREG}]
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone const_1\n"
+    $I0 = exists ${CONST}['const_1']
     if $I0 goto L1_${CURIC}
     $S0 = "  .local pmc const_1\n  new const_1, .WmlsInteger\n  set const_1, 1\n"
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}['const_1'] = $S0
 L1_${CURIC}:
 PIR
 
@@ -455,11 +480,13 @@ code = 16
 class = load
 push = 1
 pir = <<PIR
-    ${LOADREG} = "const_m1"
-    $I0 = exists ${CONST}[${LOADREG}]
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone const_m1\n"
+    $I0 = exists ${CONST}['const_m1']
     if $I0 goto L1_${CURIC}
     $S0 = "  .local pmc const_m1\n  new const_m1, .WmlsInteger\n  set const_m1, -1\n"
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}['const_m1'] = $S0
 L1_${CURIC}:
 PIR
 
@@ -468,11 +495,13 @@ code = 17
 class = load
 push = 1
 pir = <<PIR
-    ${LOADREG} = "const_es"
-    $I0 = exists ${CONST}[${LOADREG}]
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone const_es\n"
+    $I0 = exists ${CONST}['const_es'] 
     if $I0 goto L1_${CURIC}
     $S0 = "  .local pmc const_es\n  new const_es, .WmlsString, ''\n"
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}['const_es'] = $S0
 L1_${CURIC}:
 PIR
 
@@ -481,11 +510,13 @@ code = 18
 class = load
 push = 1
 pir = <<PIR
-    ${LOADREG} = "const_invalid"
-    $I0 = exists ${CONST}[${LOADREG}]
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone const_invalid\n"
+    $I0 = exists ${CONST}['const_invalid']
     if $I0 goto L1_${CURIC}
     $S0 = "  .local pmc const_invalid\n  new const_invalid, .WmlsInvalid\n"
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}['const_invalid'] = $S0
 L1_${CURIC}:
 PIR
 
@@ -494,11 +525,13 @@ code = 19
 class = load
 push = 1
 pir = <<PIR
-    ${LOADREG} = "const_true"
-    $I0 = exists ${CONST}[${LOADREG}]
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone const_true\n"
+    $I0 = exists ${CONST}['const_true']
     if $I0 goto L1_${CURIC}
     $S0 = "  .local pmc const_true\n  new const_true, .WmlsBoolean\n  set const_true, 1\n"
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}['const_true'] = $S0
 L1_${CURIC}:
 PIR
 
@@ -507,11 +540,13 @@ code = 1A
 class = load
 push = 1
 pir = <<PIR
-    ${LOADREG} = "const_false"
-    $I0 = exists ${CONST}[${LOADREG}]
+    ${INS} = concat "  "
+    ${INS} = concat ${DEST0}
+    ${INS} = concat " = clone const_false\n"
+    $I0 = exists ${CONST}['const_false']
     if $I0 goto L1_${CURIC}
     $S0 = "  .local pmc const_false\n  new const_false, .WmlsBoolean\n  set const_false, 0\n"
-    ${CONST}[${LOADREG}] = $S0
+    ${CONST}['const_false'] = $S0
 L1_${CURIC}:
 PIR
 

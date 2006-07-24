@@ -47,6 +47,17 @@ pmclass WmlsInvalid
 
 /*
 
+=item C<PMC *clone()>
+
+=cut
+
+*/
+    PMC* clone () {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+/*
+
 =item C<STRING* get_string ()>
 
 Return the string "invalid".

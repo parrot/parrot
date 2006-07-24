@@ -17,7 +17,7 @@ Tests C<WmlsString> PMC
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -82,6 +82,35 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 CODE
 WmlsString
 WmlsString
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check clone' );
+.sub _main
+    loadlib P1, "wmls_group"
+    find_type $I0, "WmlsString"
+    .local pmc pmc1
+    pmc1 = new $I0
+    pmc1 = "str"
+    .local pmc pmc2
+    pmc2 = clone pmc1
+    pmc1 = "STR"
+    .local string str1
+    str1 = classname pmc2
+    print str1
+    print "\n"
+    .local string str2
+    str2 = pmc2
+    print str2
+    print "\n"
+    str1 = pmc1
+    print str1
+    print "\n"
+    end
+.end
+CODE
+WmlsString
+str
+STR
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );

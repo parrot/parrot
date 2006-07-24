@@ -555,15 +555,11 @@ PIRCODE
 
     # Loads (load class).
     elsif ($rule->{class} eq 'load') {
-        if ($rule->{pir} =~ /\$\{DEST0\}/) {
-            die "\${DEST0} not allowed in rule $rule->{name}\n";
+        if ($rule->{pir} =~ /\$\{LOADREG\}/) {
+            die "\${LOADREG} not allowed in rule $rule->{name}\n";
         }
-        elsif ($rule->{pir} =~ /\$\{LOADREG\}/) {
-            $mv->{LOADREG} = 'loadreg';
-            push @localmv, 'LOADREG';
-        }
-        else {
-            die "pir must use \${LOADREG} in rule $rule->{name}\n";
+        elsif ($rule->{pir} !~ /\$\{DEST0\}/) {
+            die "pir must use \${DEST0} in rule $rule->{name}\n";
         } 
 
         # Now call pre_load and append code that it generates.

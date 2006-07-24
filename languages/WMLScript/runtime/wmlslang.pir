@@ -47,8 +47,8 @@ See "WMLScript Standard Libraries Specification", section 7 "Lang".
     $P0[10] = _lang_exit
     .const .Sub _lang_abort = "_lang_abort"
     $P0[11] = _lang_abort
-    .const .Sub _lang_exit = "_lang_exit"
-    $P0[12] = _lang_exit
+    .const .Sub _lang_random = "_lang_random"
+    $P0[12] = _lang_random
     .const .Sub _lang_seed = "_lang_seed"
     $P0[13] = _lang_seed
     .const .Sub _lang_characterSet = "_lang_characterSet"
@@ -110,8 +110,6 @@ If the values are equal then the first value is selected.
     
 =back
     
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value1 = Number
@@ -127,7 +125,30 @@ Number or invalid.
 .sub _lang_min :anon
     .param pmc value1
     .param pmc value2
-    not_implemented()
+    .local pmc ret
+    $P1 = value1
+    $I0 = isa value1, "WmlsString"
+    unless $I0 goto L1
+    $P1 = value1.parseNumber()
+L1:
+    $P2 = value2
+    $I0 = isa value2, "WmlsString"
+    unless $I0 goto L2
+    $P2 = value2.parseNumber()
+L2:        
+    $P0 = isle $P1, $P2
+    $I0 = isa $P0, "WmlsInvalid"
+    unless $I0 goto L3
+    .return ($P0)
+L3:
+    $I0 = $P0
+    unless $I0 goto L4
+    ret = clone value1
+    goto L5
+L4:
+    ret = clone value2
+L5:
+    .return (ret)
 .end
 
 
@@ -157,8 +178,6 @@ If the values are equal then the first value is selected.
 
 =back
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value1 = Number
@@ -174,7 +193,30 @@ Number or invalid.
 .sub _lang_max :anon
     .param pmc value1
     .param pmc value2
-    not_implemented()
+    .local pmc ret
+    $P1 = value1
+    $I0 = isa value1, "WmlsString"
+    unless $I0 goto L1
+    $P1 = value1.parseNumber()
+L1:
+    $P2 = value2
+    $I0 = isa value2, "WmlsString"
+    unless $I0 goto L2
+    $P2 = value2.parseNumber()
+L2:        
+    $P0 = isge $P1, $P2
+    $I0 = isa $P0, "WmlsInvalid"
+    unless $I0 goto L3
+    .return ($P0)
+L3:
+    $I0 = $P0
+    unless $I0 goto L4
+    ret = clone value1
+    goto L5
+L4:
+    ret = clone value2
+L5:
+    .return (ret)
 .end
 
 
@@ -384,8 +426,8 @@ Integer 2147483647.
 .sub _lang_maxInt :anon
     .local pmc ret
     new ret, .WmlsInteger
-    ret = 2147483647
-    return (ret)
+    set ret, 2147483647
+    .return (ret)
 .end
 
 
@@ -404,8 +446,8 @@ Integer -2147483648.
 .sub _lang_minInt :anon
     .local pmc ret
     new ret, .WmlsInteger
-    ret = -2147483648
-    return (ret)
+    set ret, -2147483648
+    .return (ret)
 .end
 
 
@@ -424,8 +466,8 @@ Boolean.
 .sub _lang_float :anon
     .local pmc ret
     new ret, .WmlsBoolean
-    ret = 1
-    return (ret)
+    set ret, 1
+    .return (ret)
 .end
 
 
@@ -437,8 +479,6 @@ Ends the interpretation of the WMLScript bytecode and returns the control
 back to the caller of the WMLScript interpreter with the given return value.
 This function can be used to perform a normal exit from a function in cases
 where the execution of the WMLScript bytecode should be discontinued.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -452,7 +492,15 @@ None (this function ends the interpretation).
 
 .sub _lang_exit :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseInt()
+    $I0 = $P0
+    exit $I0
+L1:
+    $I0 = value
+    exit $I0                                            
 .end
 
 
@@ -467,8 +515,6 @@ cases where the execution of the WMLScript should be discontinued due to
 serious errors detected by the program. If the type of the errorDescription is
 invalid, string "invalid" is used as the errorDescription instead.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 errorDescription = String
@@ -481,7 +527,11 @@ None (this function aborts the interpretation).
 
 .sub _lang_abort :anon
     .param pmc value
-    not_implemented()
+    .local pmc ex
+    new ex, .Exception
+    $S0 = value
+    ex["_message"] = $S0
+    throw ex
 .end
 
 
@@ -515,7 +565,7 @@ If value is less than zero (0), the function returns C<invalid>.
 
 =cut
 
-.sub _lang_exit :anon
+.sub _lang_random :anon
     .param pmc value
     not_implemented()
 .end

@@ -21,10 +21,10 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 21;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.abs', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.abs');
 extern function main()
 {
     var a = -3;
@@ -38,7 +38,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.abs', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.abs');
 extern function main()
 {
     var a = Lang.abs(-3.14);
@@ -62,7 +62,105 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.parseInt', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.min');
+extern function main()
+{
+    var a = -3;
+    var b = Lang.abs(a);
+
+    var c = Lang.min(a,b); // c = -3
+    Console.println(c);
+    Console.println(typeof c);
+
+    var d = Lang.min(45, 76.3); // d = 45 (integer)
+    Console.println(d);
+    Console.println(typeof d);
+
+    var e = Lang.min(45, 45.0); // e = 45 (integer)
+    Console.println(e);
+    Console.println(typeof e);
+}
+CODE
+-3
+0
+45
+0
+45
+0
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.min');
+extern function main()
+{
+    var a = Lang.min(3, invalid);
+    Console.println(typeof a);
+
+    var b = Lang.min(true, 12);
+    Console.println(b);
+    Console.println(typeof b);
+
+    var c = Lang.min(1, "12");
+    Console.println(c);
+    Console.println(typeof c);
+}
+CODE
+4
+true
+3
+1
+0
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.max');
+extern function main()
+{
+    var a = -3;
+    var b = Lang.abs(a);
+
+    var c = Lang.max(a,b); // c = 3
+    Console.println(c);
+    Console.println(typeof c);
+
+    var d = Lang.max(45.5, 76); // d = 76 (integer)
+    Console.println(d);
+    Console.println(typeof d);
+
+    var e = Lang.max(45.0, 45); // e = 45.0 (float)
+    Console.println(e);
+    Console.println(typeof e);
+}
+CODE
+3
+0
+76
+0
+45
+1
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.max');
+extern function main()
+{
+    var a = Lang.max(3, invalid);
+    Console.println(typeof a);
+
+    var b = Lang.max(true, 12);
+    Console.println(b);
+    Console.println(typeof b);
+
+    var c = Lang.max(1, "12");
+    Console.println(c);
+    Console.println(typeof c);
+}
+CODE
+4
+12
+0
+12
+2
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.parseInt');
 extern function main()
 {
     var i = Lang.parseInt("1234");
@@ -80,7 +178,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.parseInt', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.parseInt');
 extern function main()
 {
     var a = Lang.parseInt(12);
@@ -104,7 +202,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.parseFloat', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.parseFloat');
 extern function main()
 {
     var a = Lang.parseFloat("123.7");
@@ -152,7 +250,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.parseFloat', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.parseFloat');
 extern function main()
 {
     var a = Lang.parseFloat(12);
@@ -178,7 +276,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.isInt', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.isInt');
 extern function main()
 {
     var a = Lang.isInt(" -123");
@@ -204,7 +302,7 @@ false
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.isInt', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.isInt');
 extern function main()
 {
     var a = Lang.isInt(12);
@@ -226,7 +324,7 @@ false
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.isFloat', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.isFloat');
 extern function main()
 {
     var a = Lang.isFloat(" -123");
@@ -252,7 +350,7 @@ false
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.isFloat', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.isFloat');
 extern function main()
 {
     var a = Lang.isFloat(12);
@@ -272,5 +370,87 @@ true
 true
 false
 4
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.maxInt');
+extern function main()
+{
+    var a = Lang.maxInt();
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+2147483647
+0
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.minInt');
+extern function main()
+{
+    var a = Lang.minInt();
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+-2147483648
+0
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.float');
+extern function main()
+{
+    var a = Lang.float();
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+true
+3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.exit(0)');
+extern function main()
+{
+    Console.println("exit");
+    Lang.exit(0);
+    Console.println("ko");
+}
+CODE
+exit
+
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.exit("1")');
+extern function main()
+{
+    Console.println("exit");
+    Lang.exit("1");
+    Console.println("ko");
+}
+CODE
+exit
+
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.exit(invalid)');
+extern function main()
+{
+    Console.println("exit");
+    Lang.exit(invalid);
+    Console.println("ko");
+}
+CODE
+exit
+
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.abort');
+extern function main()
+{
+    Lang.abort("abort");
+    Console.println("ko");
+}
+CODE
+abort
 OUT
 
