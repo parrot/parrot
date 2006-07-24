@@ -355,7 +355,33 @@ CODE
 1102269
 OUTPUT
 
+# Concatenate unicode: with iso-8859-1; RT #39930
+pir_output_is( <<'CODE', <<'OUTPUT', "Concat unicode with iso-8859-1", todo => 'RT #39930');
+.sub main
+    $S0 = unicode:"A"
+    $S1 = ascii:"B"
+    $S2 = concat $S0, $S1
+    print $S2
+    print "\n"
+
+    $S0 = unicode:"A"
+    $S1 = unicode:"B"
+    $S2 = concat $S0, $S1
+    print $S2
+    print "\n"
+
+    $S0 = unicode:"A"
+    $S1 = iso-8859-1:"B"
+    $S2 = concat $S0, $S1
+    print $S2
+    print "\n"
+.end
+CODE
+AB
+AB
+AB
+OUTPUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 24; }
+BEGIN { plan tests => 25; }
 
