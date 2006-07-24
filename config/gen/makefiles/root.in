@@ -899,7 +899,7 @@ $(INSTALLABLEPBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT)
 $(IMCC_DIR)/main$(O) : $(IMCC_DIR)/main.c $(GENERAL_H_FILES) $(IMCC_H_FILES)
 
 $(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
-    lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS_DIR)/ops.num
+    lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS_DIR)/ops.num $(OPS_DIR)/ops.skip
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl $(OPS_FILES)
 
 $(SRC_DIR)/fingerprint.c : $(BUILD_TOOLS_DIR)/fingerprint_c.pl PBC_COMPAT
