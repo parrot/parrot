@@ -62,6 +62,6 @@ token single_quoted_character { '' | <-[']> }
 
 token double_quoted_character { "" | <-["]> }
 
-token variable_identifier { <[A..Za..z]> \w* }
+token variable_identifier { <[A..Za..z]> <[A..Za..z0..9_]>* }
 
 token syntax_error { <?PGE::Util::die: Syntax error> }
