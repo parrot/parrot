@@ -787,9 +787,11 @@ string_chr(Interp *interpreter, UINTVAL character)
     if (character > 0xff)
         return Parrot_unicode_charset_ptr->string_from_codepoint(interpreter,
                 character);
-    else
+    else if (character > 0x7f)
         return Parrot_iso_8859_1_charset_ptr->string_from_codepoint(interpreter,
                 character);
+    else return Parrot_ascii_charset_ptr->string_from_codepoint(interpreter,
+                 character);
 }
 
 

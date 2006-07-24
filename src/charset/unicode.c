@@ -359,83 +359,83 @@ validate(Interp *interpreter, STRING *src)
     return 1;
 }
 
-#if PARROT_HAS_ICU
 static int
-is_foo(Interp *interpreter, UINTVAL codepoint, int bit)
+u_iscclass(Interp *interpreter, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
 {
-    switch (bit) {
-        case enum_cclass_uppercase:
-            return u_isupper(codepoint);
-            break;
-        case enum_cclass_lowercase:
-            return u_islower(codepoint);
-            break;
-        case enum_cclass_alphabetic:
-            return u_isalpha(codepoint);
-            break;
-        case enum_cclass_numeric:
-            return u_isdigit(codepoint);
+#if PARROT_HAS_ICU
             /* XXX which one
                return u_charDigitValue(codepoint);
                */
-            break;
-        case enum_cclass_hexadecimal:
-            return u_isxdigit(codepoint);
-            break;
-        case enum_cclass_whitespace:
-            return u_isspace(codepoint);
-            break;
-        case enum_cclass_printing:
-            return u_isprint(codepoint);
-            break;
-        case enum_cclass_graphical:
-            return u_isgraph(codepoint);
-            break;
-        case enum_cclass_blank:
-            return u_isblank(codepoint);
-            break;
-        case enum_cclass_control:
-            return u_iscntrl(codepoint);
-            break;
-        case enum_cclass_alphanumeric:
-            return u_isalnum(codepoint);
-            break;
-        case enum_cclass_word:
-            return u_isalnum(codepoint) || codepoint == '_';
-            break;
-        default:
-            UNIMPL;
-    }
+    if ((flags & enum_cclass_uppercase) && u_isupper(codepoint)) return 1;
+    if ((flags & enum_cclass_lowercase) && u_islower(codepoint)) return 1;
+    if ((flags & enum_cclass_alphabetic) && u_isalpha(codepoint)) return 1;
+    if ((flags & enum_cclass_numeric) && u_isdigit(codepoint)) return 1;
+    if ((flags & enum_cclass_hexadecimal) && u_isxdigit(codepoint)) return 1;
+    if ((flags & enum_cclass_whitespace) && u_isspace(codepoint)) return 1;
+    if ((flags & enum_cclass_printing) && u_isprint(codepoint)) return 1;
+    if ((flags & enum_cclass_graphical) && u_isgraph(codepoint)) return 1;
+    if ((flags & enum_cclass_blank) && u_isblank(codepoint)) return 1;
+    if ((flags & enum_cclass_control) && u_iscntrl(codepoint)) return 1;
+    if ((flags & enum_cclass_alphanumeric) && u_isalnum(codepoint)) return 1;
+    if ((flags & enum_cclass_word) && 
+        (u_isalnum(codepoint) || codepoint == '_')) return 1;
     return 0;
-}
+#else
+    if (codepoint < 256) {
+        return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
+    }
+    if (flags & enum_cclass_whitespace) {
+        /* from http://www.unicode.org/Public/UNIDATA/PropList.txt */
+        switch (codepoint) {
+            case 0x1680: case 0x180e: case 0x2000: case 0x2001:
+            case 0x2002: case 0x2003: case 0x2004: case 0x2005:
+            case 0x2006: case 0x2007: case 0x2008: case 0x2009:
+            case 0x200a: case 0x202f: case 0x205f: case 0x3000:
+                return 1;
+        }
+    }
+    if (flags & enum_cclass_numeric) {
+        /* from http://www.unicode.org/Public/UNIDATA/UnicodeData.txt */
+        if (codepoint >= 0x0660 && codepoint <= 0x0669) return 1;
+        if (codepoint >= 0x06f0 && codepoint <= 0x06f9) return 1;
+        if (codepoint >= 0x07c0 && codepoint <= 0x07c9) return 1;
+        if (codepoint >= 0x0966 && codepoint <= 0x096f) return 1;
+        if (codepoint >= 0x09e6 && codepoint <= 0x09ef) return 1;
+        if (codepoint >= 0x0a66 && codepoint <= 0x0a6f) return 1;
+        if (codepoint >= 0x0ae6 && codepoint <= 0x0aef) return 1;
+        if (codepoint >= 0x0b66 && codepoint <= 0x0b6f) return 1;
+        if (codepoint >= 0x0be6 && codepoint <= 0x0bef) return 1;
+        if (codepoint >= 0x0c66 && codepoint <= 0x0c6f) return 1;
+        if (codepoint >= 0x0ce6 && codepoint <= 0x0cef) return 1;
+        if (codepoint >= 0x0d66 && codepoint <= 0x0d6f) return 1;
+        if (codepoint >= 0x0e50 && codepoint <= 0x0e59) return 1;
+        if (codepoint >= 0x0ed0 && codepoint <= 0x0ed9) return 1;
+        if (codepoint >= 0x0f20 && codepoint <= 0x0f29) return 1;
+        if (codepoint >= 0x1040 && codepoint <= 0x1049) return 1;
+        if (codepoint >= 0x17e0 && codepoint <= 0x17e9) return 1;
+        if (codepoint >= 0x1810 && codepoint <= 0x1819) return 1;
+        if (codepoint >= 0x1946 && codepoint <= 0x194f) return 1;
+        if (codepoint >= 0x19d0 && codepoint <= 0x19d9) return 1;
+        if (codepoint >= 0x1b50 && codepoint <= 0x1b59) return 1;
+        if (codepoint >= 0xff10 && codepoint <= 0xff19) return 1;
+    }
+    if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric)) 
+        real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+            "no ICU lib loaded");
+    return 0;
 #endif
+}
 
 static INTVAL
 is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
-#if PARROT_HAS_ICU
-    int bit, mask;
-#endif
 
     if (offset >= source_string->strlen)
         return 0;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
     if (codepoint >= 256) {
-#if PARROT_HAS_ICU
-        for (mask = enum_cclass_uppercase;
-                mask <= enum_cclass_word ; mask <<= 1) {
-            bit = mask & flags;
-            if (!bit)
-                continue;
-            if (is_foo(interpreter, codepoint, bit))
-                return 1;
-        }
-        return 0;
-#else
-        real_exception(interpreter, NULL, E_LibraryNotLoadedError,
-                "no ICU lib loaded");
-#endif
+        return u_iscclass(interpreter, codepoint, flags) != 0;
     }
     return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
 }
@@ -446,28 +446,14 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_strin
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
     UINTVAL codepoint;
-#if PARROT_HAS_ICU
-    int bit, mask;
-#endif
 
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
         if (codepoint >= 256) {
-#if PARROT_HAS_ICU
-            for (mask = enum_cclass_uppercase;
-                    mask <= enum_cclass_word ; mask <<= 1) {
-                bit = mask & flags;
-                if (!bit)
-                    continue;
-                if (is_foo(interpreter, codepoint, bit))
+            if (u_iscclass(interpreter, codepoint, flags))
                     return pos;
-            }
-#else
-            real_exception(interpreter, NULL, E_LibraryNotLoadedError,
-                    "no ICU lib loaded");
-#endif
         }
         else {
             if (Parrot_iso_8859_1_typetable[codepoint] & flags) {
@@ -484,28 +470,18 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_s
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
     UINTVAL codepoint;
-#if PARROT_HAS_ICU
-    int bit, mask;
-#endif
+    int bit;
 
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
         if (codepoint >= 256) {
-#if PARROT_HAS_ICU
-            for (mask = enum_cclass_uppercase;
-                    mask <= enum_cclass_word ; mask <<= 1) {
-                bit = mask & flags;
-                if (!bit)
-                    continue;
-                if (!is_foo(interpreter, codepoint, bit))
+            for (bit = enum_cclass_uppercase;
+                    bit <= enum_cclass_word ; bit <<= 1) {
+		if ((bit & flags) && !u_iscclass(interpreter, codepoint, bit))
                     return pos;
             }
-#else
-            real_exception(interpreter, NULL, E_LibraryNotLoadedError,
-                    "no ICU lib loaded");
-#endif
         }
         else {
             if (!(Parrot_iso_8859_1_typetable[codepoint] & flags)) {
