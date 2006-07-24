@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -44,10 +44,10 @@ Markus Amsler - <markus.amsler@oribi.org>
 
 =cut
 
-.const string CRLF = "\r\n"
+.const string CRLF     = "\r\n"
 .const string CRLFCRLF = "\r\n\r\n"
-.const string LFLF = "\n\n"
-.const string CRCR = "\r\r"
+.const string LFLF     = "\n\n"
+.const string CRCR     = "\r\r"
 
 .include "stat.pasm"
 
@@ -68,9 +68,10 @@ Markus Amsler - <markus.amsler@oribi.org>
 
     # Pack a sockaddr_in structure with IP and port
     address = sockaddr 1234, "localhost"
-    print "Binding to port 1234 on localhost.\n"
     ret = bind sock, address
+    print "Running webserver on port 1234 of localhost.\n"
     print "The Parrot documentation can now be accessed at http://localhost:1234 .\n"
+    print "Be sure that the HTML docs have been generated with 'make html'.\n"
 
 NEXT:
     listen ret, sock, 5
@@ -263,95 +264,41 @@ END:
 
 
 .sub hex_to_int
-    .param string in
+    .param string hex
 
-    .local string char
-    .local int ret
-    .local int pos
-    .local int factor
-    .local int temp
-    .local int len
+    hex = upcase hex
 
-    ret = 0
-    factor = 1
-    length len, in
-    sub pos, len, 1
+    .local int len, num_offset, chr_offset, result
 
-NEXT_CHAR:
-    substr char, in, pos, 1
+    num_offset = ord '0', 0
+    chr_offset = ord 'A', 0
 
-    if char=="0" goto CHAR0
-    if char=="1" goto CHAR1
-    if char=="2" goto CHAR2
-    if char=="3" goto CHAR3
-    if char=="4" goto CHAR4
-    if char=="5" goto CHAR5
-    if char=="6" goto CHAR6
-    if char=="7" goto CHAR7
-    if char=="8" goto CHAR8
-    if char=="9" goto CHAR9
-    if char=="A" goto CHARA
-    if char=="B" goto CHARB
-    if char=="C" goto CHARC
-    if char=="D" goto CHARD
-    if char=="E" goto CHARE
-    if char=="F" goto CHARF
+    len = length hex
 
-CHAR0:
-    temp = 0
-    goto CHAREND
-CHAR1:
-    temp = 1
-    goto CHAREND
-CHAR2:
-    temp = 2
-    goto CHAREND
-CHAR3:
-    temp = 3
-    goto CHAREND
-CHAR4:
-    temp = 4
-    goto CHAREND
-CHAR5:
-    temp = 5
-    goto CHAREND
-CHAR6:
-    temp = 6
-    goto CHAREND
-CHAR7:
-    temp = 7
-    goto CHAREND
-CHAR8:
-    temp = 8
-    goto CHAREND
-CHAR9:
-    temp = 9
-    goto CHAREND
-CHARA:
-    temp = 10
-    goto CHAREND
-CHARB:
-    temp = 11
-    goto CHAREND
-CHARC:
-    temp = 12
-    goto CHAREND
-CHARD:
-    temp = 13
-    goto CHAREND
-CHARE:
-    temp = 14
-    goto CHAREND
-CHARF:
-    temp = 15
-    goto CHAREND
+    result = 0
+    $I0 = 0
+  LOOP:
+    unless $I0 < len goto RETURN
+    $I1 = ord hex, $I0
+    if $I1 < chr_offset goto HAVE_NUMBER
 
-CHAREND:
-    mul temp, factor, temp
-    add ret, temp, ret
-    mul factor, factor, 16
-    sub pos, pos, 1
-    if pos>=0 goto    NEXT_CHAR
+  HAVE_CHAR:
+    $I1 -= chr_offset
+    $I1 += 10
+    goto CALC
 
-    .return( ret )
+  HAVE_NUMBER:
+    $I1 -= num_offset
+
+  CALC:
+    result *= 16
+    result += $I1
+    inc $I0
+
+    goto LOOP
+
+  RETURN:
+    print result
+    print "\n"
+    .return(result)
 .end
