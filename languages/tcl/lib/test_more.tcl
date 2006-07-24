@@ -18,8 +18,31 @@ proc plan {number} {
     }
 }
 
+proc is {value expected args}  {
+    global very_bad_global_variable_test_num
+    incr   very_bad_global_variable_test_num
+
+    if {$args eq ""} {
+      set description "- $args"
+    } {
+      set description {}
+    }
+
+    if {$value eq $expected} {
+        puts "ok $very_bad_global_variable_test_num $description"
+        return 1
+    } {
+        puts "not ok $very_bad_global_variable_test_num $description"
+
+        # XXX escape strings.
+        puts "#      got : '$value'"
+        puts "# expected : '$expected'"
+        return 0
+    }
+}
+
 # XXX Need to handle the case where we expect an exception.
-proc is {code expected args}  {
+proc eval_is {code expected args}  {
     global very_bad_global_variable_test_num
     incr   very_bad_global_variable_test_num
 
@@ -37,9 +60,10 @@ proc is {code expected args}  {
         # XXX escape strings.
         puts "#      got : '$error'"
         puts "# expected : '$expected'"
-
+        return 0 
     } {
         puts "ok $very_bad_global_variable_test_num $description"
+        return 1
     }
 }
 
@@ -49,7 +73,7 @@ proc ok {code args}  {
 
 proc not_ok {code args} {
     set test_code "expr ! \[eval {$code}\]"
-    ok $test_code $args
+    return [ok $test_code $args]
 }
 
 
@@ -59,11 +83,11 @@ proc isnt {code expected args}  {
     set code     "\"\[eval {$code}\]\""
     set expected "\"$expected\""
 
-    cmp_ok $code ne $expected $args
+    return [cmp_ok $code ne $expected $args]
 }
 
 proc cmp_ok {left op right args} {
-  ok "expr {$left $op $right}" $args
+  return [ok "expr {$left $op $right}" $args]
 }
 
 proc diag {diagnostic} {

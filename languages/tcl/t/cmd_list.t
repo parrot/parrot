@@ -1,98 +1,24 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 15;
-use Test::More;
+source lib/test_more.tcl
 
-language_output_is("tcl",<<'TCL',<<OUT,"no elements");
-  puts [list]
-TCL
+plan 15
 
-OUT
+is [list]     {}    {no elements}
+is [list a]   {a}   {one element}
+is [list a b] {a b} {two elements}
 
-language_output_is("tcl",<<'TCL',<<OUT,"one element");
-  puts [list a]
-TCL
-a
-OUT
+is [list a b {c {d e}}] {a b {c {d e}}} {spaces with braces}
+is [list a b "c {d e}"] {a b {c {d e}}} {spaces with quotes}
+is [list {1 2} {3 4}]   {{1 2} {3 4}}   {spaces in two elements}
 
-language_output_is("tcl",<<'TCL',<<OUT,"two elements");
-  puts [list a b]
-TCL
-a b
-OUT
+is [list "} {"] {\}\ \{} {braces with spaces}
+is [list \{ \}] {\{ \}}  {braces}
 
-language_output_is("tcl",<<'TCL',<<OUT,"spaces with braces");
-  puts [list a b {c {d e}}]
-TCL
-a b {c {d e}}
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"spaces with quotes");
-  puts [list a b "c {d e}"]
-TCL
-a b {c {d e}}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"spaces in two elements");
-puts [list {1 2} {3 4}]
-TCL
-{1 2} {3 4}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"braces with spaces");
-  puts [list "} {" ]
-TCL
-\}\ \{
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"braces");
-  puts [list \{ \} ]
-TCL
-\{ \}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"newline");
-  puts [list "\n" ]
-TCL
-{
-}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"semicolon");
-  puts [list ";" ]
-TCL
-{;}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"tab");
-  puts [list "\t" ]
-TCL
-{	}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"dollar");
-  puts [list "$" ]
-TCL
-{$}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"backslash");
-  puts [list "\\" ]
-TCL
-\\
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"open bracket");
-  puts [list \[ ]
-TCL
-{[}
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"close bracket");
-  puts [list \] ]
-TCL
-\]
-OUT
-
+is [list "\n"]  "{\n}" {newline}
+is [list ";"]   {{;}}  {semicolon}
+is [list "\t"]  "{\t}" {tab}
+is [list "$"]   {{$}}  {dollar}
+is [list "\\"]  {\\}   {backslash}
+is [list \[]    {{[}}  {open bracket}
+is [list \]]    {\]}   {close bracket}
