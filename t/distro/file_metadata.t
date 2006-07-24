@@ -49,9 +49,9 @@ TEST_MIME: {
 	my $msg = "test file has 'text/plain' mime-type";
 	diag $msg;
 
-	is(
+	like(
 		sub{ my $r = qx(@cmd $_); chomp $r; "$_ ($r)" }->(),
-		"$_ (text/plain)",
+		qr!^\Q$_\E \(text/plain!,
 		"$msg ($_)"
 	) for @test_files;
 } # TEST_MIME
