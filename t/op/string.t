@@ -7,6 +7,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 
 
 =head1 NAME
@@ -1947,18 +1948,16 @@ CODE
 foo        - bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'Correct precision for %x');
+{ my $output = substr(('f' x ($PConfig{hugeintvalsize} * 2)) . (' ' x 20), 0, 20);
+pir_output_is(<<'CODE', $output, 'Correct precision for %x'); }
 .sub main :main
   $P0 = new .ResizablePMCArray
   $P0[0] = -1
   $S0 = sprintf "%-20x", $P0
   print $S0
-  print "\n"
   end
 .end
 CODE
-ffffffff            
-OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', 'exchange');
     set S0, "String #0\n"
