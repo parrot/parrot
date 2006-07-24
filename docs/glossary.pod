@@ -19,6 +19,12 @@ Please keep me alphabetical!
 
 Abstract Syntax Tree.
 
+=head2 bcg
+
+bcg is an acronym for Byte Code Generation.
+bcg will be part of the Parrot Compiler
+tools. It will aid in coverting POST to byte code.
+
 =head2 Continuations
 
 Think of continuations as an execution "context". This context includes
