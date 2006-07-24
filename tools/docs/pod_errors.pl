@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
@@ -16,6 +16,8 @@ This script reports on any POD errors found in the files.
 
 =cut
 
+use strict;
+use warnings;
 use lib 'lib';
 use Parrot::Docs::Directory;
 

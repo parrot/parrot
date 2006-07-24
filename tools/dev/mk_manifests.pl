@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 ################################################################################
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
@@ -58,6 +58,9 @@ F<install_files.pl>
 =cut
 
 ################################################################################
+
+use strict;
+use warnings;
 
 my %options = ( prefix => '/usr',
                 exec_prefix => '/usr',

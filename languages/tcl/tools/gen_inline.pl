@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
-
+#! perl
 use strict;
+use warnings;
 
 =head1 NAME
 

@@ -1,8 +1,12 @@
-#! perl -w
+#! perl
 
 # Relies on "testrun.pl" being setup correctly.
 #
 #
+
+use strict;
+use warnings;
+
 $tn=0;
 while(1) {
 	{

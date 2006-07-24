@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl
 # Copyright (C) 2004, The Perl Foundation.
 # $Id$
 
@@ -134,6 +134,7 @@ Author: Jarkko Hietaniemi.
 =cut
 
 use strict;
+use warnings;
 
 my $Obj;
 

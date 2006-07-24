@@ -1,9 +1,10 @@
-#!/usr/bin/perl
+#! perl
 # .NET CLI => PIR Translator Built-in Methods Build Tool
 # Script to take a file containing internal methods and spit out a chunk of
 # PIR that can look up the built-in that's needed and return its PIR.
 
 use strict;
+use warnings;
 use Getopt::Long;
 
 # Grab parameters.

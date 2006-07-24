@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 
-
 =head1 NAME
 
 tools/build/addopstags.pl - add src/ops/*.ops to tags

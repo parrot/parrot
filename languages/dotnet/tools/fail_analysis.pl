@@ -1,4 +1,8 @@
-%res = ();
+#! perl
+use warnings;
+use strict;
+
+my %res = ();
 while (<>) {
 	# Extract message
 	chomp;

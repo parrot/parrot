@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 
 =head1 ncidef2asm.pl
 
@@ -139,6 +139,9 @@ Taken from an I register
 =back
 
 =cut
+
+use strict;
+use warnings;
 
 my ($from_file, $to_file) = @ARGV;
 # If there is no destination file, strip off the extension of the

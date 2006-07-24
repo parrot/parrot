@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
@@ -17,8 +17,8 @@ specified CPU architecture type (F<src/jit/cpu-architecture-name/core.jit>).
 
 =cut
 
-use strict;
 use warnings;
+use strict;
 use lib 'lib';
 
 use Parrot::OpLib::core;

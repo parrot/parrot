@@ -1,6 +1,7 @@
-#!/usr/bin/perl
+#! perl
 
 use strict;
+use warnings;
 use Getopt::Long;
 
 # Grab parameters.

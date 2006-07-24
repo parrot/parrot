@@ -7,11 +7,13 @@ tools/build/c2str.pl - constant string support
 
 =cut 
 
+use warnings;
+use strict;
 use lib 'lib';
+
 use Text::Balanced qw(extract_delimited);
 use Math::BigInt;
 use Getopt::Long;
-use strict;
 
 my $outfile = 'all_cstring.str';
 my $string_private_h = 'src/string_private_cstring.h';

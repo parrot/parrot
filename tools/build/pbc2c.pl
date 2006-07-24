@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # TODO: Resolve copyright. See ADDITIONAL section at end of file.
 # $Id$
 
@@ -17,6 +17,7 @@ input if no file is named, and turn it into a C implementation file.
 
 =cut
 
+use warnings;
 use strict;
 
 use lib 'lib';

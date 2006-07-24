@@ -1,5 +1,4 @@
-#!/usr/bin/perl
-
+#! perl
 # $Id$
 
 =head1 NAME

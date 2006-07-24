@@ -1,10 +1,11 @@
-#! perl -w
+#! perl
 
 # Remember, this is BAD PERL later to be translated to PASM
 # First tokenize the input stream into:
 #          @tokens and @tokdsc
 # Then compile.
 use strict;
+use warnings;
 use Getopt::Std;
 use vars qw( @tokens @tokdsc);
 use vars qw(%code %options @basic %common);

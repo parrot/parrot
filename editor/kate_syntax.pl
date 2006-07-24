@@ -1,9 +1,12 @@
-#! perl -w
+#! perl
 
 # Create Kate syntax highlighting XML file for IMCC
 # Language:	Parrot IMCC
 # Maintainer:	Andy Bussey <andybussey@yahoo.co.uk>
 # Last change:	2003 Aug 19
+
+use strict;
+use warnings;
 
 my $parrot = $ARGV[0];
 

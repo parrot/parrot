@@ -261,12 +261,6 @@ SP              [ ]
 
 "method"        return(METHOD); /* old compat cruft -
                                   the canonical colon names are below */
-<emit,INITIAL>"@MULTI"   return(MULTI);
-<emit,INITIAL>"@MAIN"    return(MAIN);
-<emit,INITIAL>"@LOAD"    return(LOAD);
-<emit,INITIAL>"@IMMEDIATE"    return(IMMEDIATE);
-<emit,INITIAL>"@POSTCOMP"    return(POSTCOMP);
-<emit,INITIAL>"@ANON"    return(ANON);
 
 ":method"        return(METHOD);
 <emit,INITIAL>":multi"   return(MULTI);

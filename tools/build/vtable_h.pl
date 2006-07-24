@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
@@ -24,6 +24,9 @@ uses C<Parrot::Vtable>.
 =back
 
 =cut
+
+use strict;
+use warnings;
 
 use lib 'lib';
 use Parrot::Vtable;

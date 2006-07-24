@@ -1,9 +1,10 @@
-#!/usr/bin/perl
+#! perl
 # .NET CLI => PIR Translator Generator
 # Script to generate the instruction translator from a rules file and a
 # stack to register mapping algorithm.
 
 use strict;
+use warnings;
 use Getopt::Long;
 use lib 'build';
 

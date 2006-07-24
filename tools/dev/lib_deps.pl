@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 ################################################################################
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
@@ -42,6 +42,7 @@ magical and therefore less conclusive.
 ################################################################################
 
 use strict;
+use warnings;
 use File::Find;
 use File::Spec;
 

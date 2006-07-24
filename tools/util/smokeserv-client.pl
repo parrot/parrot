@@ -1,7 +1,7 @@
-#!/usr/bin/perl
+#! perl
 
-use warnings;
 use strict;
+use warnings;
 
 use Getopt::Long;
 use LWP::UserAgent;

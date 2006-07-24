@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl
 
 # $Id$
 
@@ -7,6 +7,7 @@
 # in Parrot and how to translate Python stack-oriented bytecode to PIR.
 
 use strict;
+use warnings;
 use Getopt::Std;
 
 my ($DIS, @dis, @source, $file, %opt, $DEFVAR, $cur_func, $lambda_count,

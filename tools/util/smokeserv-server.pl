@@ -1,7 +1,7 @@
-#!/usr/bin/perl
+#! perl
 
-use warnings;
 use strict;
+use warnings;
 
 #HSS use base qw/HTTP::Server::Simple::CGI/;
 #HSS use HTTP::Server::Simple::Static;

@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 
 # Copyright (C) 2001-2004, The Perl Foundation.
 # $Id$
@@ -75,6 +75,7 @@ modified so that it doesn't need to concatenate separate ops files.
 
 =cut
 
+use warnings;
 use strict;
 use lib 'lib';
 

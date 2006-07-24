@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 ################################################################################
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
@@ -63,9 +63,10 @@ handling;
 
 ################################################################################
 
+use strict;
+use warnings;
 use Regexp::Common qw/comment/;
 use Getopt::Long;
-use strict;
 
 if(1) {
     my $show_full = 0;

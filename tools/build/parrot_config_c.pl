@@ -1,6 +1,8 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
+
+use warnings;
 use strict;
 
 my ($svnid) = '$Id$' =~ /^\$[iI][dD]:\s(.*)\$$/;

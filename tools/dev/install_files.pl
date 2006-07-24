@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 ################################################################################
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
@@ -110,10 +110,11 @@ F<tools/dev/mk_manifests.pl>
 
 ################################################################################
 
+use strict;
+use warnings;
 use File::Basename qw(dirname basename);
 use File::Copy;
 use File::Spec;
-use strict;
 
 # When run from the makefile, which is probably the only time this
 # script will ever be used, all of these defaults will get overridden.

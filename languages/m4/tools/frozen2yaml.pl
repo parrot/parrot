@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 
 # $Id$
 
@@ -10,6 +10,7 @@
 
 # pragmata
 use strict;
+use warnings;
 use 5.005;
 
 # standard perl modules

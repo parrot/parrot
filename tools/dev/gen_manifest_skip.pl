@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2005, The Perl Foundation.
 # $Id$
 
@@ -18,6 +18,7 @@ Print content for a MANIFEST.SKIP file to STDOUT.
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 

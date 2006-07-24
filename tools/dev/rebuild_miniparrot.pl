@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 ################################################################################
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
@@ -38,6 +38,7 @@ Run the specified subroutine.
 
 use strict;
 no  strict 'refs';
+use warnings;
 use Config;
 use Getopt::Long;
 use File::Copy;

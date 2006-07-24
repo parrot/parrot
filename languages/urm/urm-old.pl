@@ -1,10 +1,10 @@
-#! perl -w
+#! perl
 # urm.pl 
 # 2003 (c) by Marcus Thiesen
 # Maybe you can use it for debugging
 
-use warnings;
 use strict;
+use warnings;
 use Data::Dumper;
 
 my @program;

@@ -1,5 +1,6 @@
 #! perl -w
-
+use strict;
+use warnings;
 no warnings 'once';
 $parpath='../../../';
 

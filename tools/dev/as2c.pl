@@ -1,10 +1,11 @@
-#!/usr/bin/perl
+#! perl
 use strict;
+use warnings;
 
 # convert gas assember listing to i386 code array
 # creates also a test file
 
-my ($src, $func, $out, $cmd, $func);
+my ($src, $func, $out, $cmd);
 
 $src =  $ARGV[0];
 $cmd  = "cc -c $src.c -Wall -O3 -fomit-frame-pointer -DNDEBUG -Wa,-a > $src.s";

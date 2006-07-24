@@ -1,9 +1,9 @@
-#!/usr/bin/perl -w
-
+#! perl
+use strict;
+use warnings;
 use lib 'lib';
 use Regex;
 use Regex::Driver;
-use strict;
 
 my $operation;
 my $expr;

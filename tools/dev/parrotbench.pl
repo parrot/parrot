@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
-
+#! perl
 use strict;
+use warnings;
 use Config::IniFiles;
 use File::Basename;
 use File::Find;

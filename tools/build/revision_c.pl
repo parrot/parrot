@@ -19,6 +19,7 @@ F<include/parrot/config.h>
 
 =cut
 
+use warnings;
 use strict;
 use Parrot::Revision;
 

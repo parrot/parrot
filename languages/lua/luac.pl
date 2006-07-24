@@ -1,9 +1,7 @@
-#!/usr/bin/perl -w
-
+#! perl
 use strict;
-
+use warnings;
 use Getopt::Std;
-
 use Lua::parser;
 
 my %opts;

@@ -29,6 +29,7 @@ See parrot/config/gen/makefiles/imcc.in for an example usage.
 =cut
 
 use strict;
+use warnings;
 
 my $Verbose = 0;
 if ($ARGV[0] eq '-v') {

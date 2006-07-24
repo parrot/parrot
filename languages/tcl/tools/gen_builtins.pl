@@ -1,5 +1,6 @@
-#! perl -w
+#! perl
 use strict;
+use warnings;
 use lib qw(lib);
 
 my $static_dir  = 'runtime/builtin';

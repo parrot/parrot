@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 #
 # $Id$
 # $Log: basic.pl,v 
@@ -23,6 +23,10 @@
 # Subsequent runs can be done with:
 #    parrot.exe out.pbc
 #
+
+use strict;
+use warnings;
+
 open(T, ">merged_basic.pasm") || die;
 
 print T <<'EOF';

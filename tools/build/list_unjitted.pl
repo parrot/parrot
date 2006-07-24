@@ -1,5 +1,6 @@
-#!/usr/bin/perl -wl
+#! perl -l
 
+use warnings;
 use strict;
 
 unless (1 == scalar @ARGV){

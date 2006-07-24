@@ -1,4 +1,4 @@
-#!/usr/bin/perl -ws
+#! perl -s
 
 #
 # Create a symlink tree shadowing the Parrot source tree.  Nifty for
@@ -14,6 +14,7 @@
 #
 
 use strict;
+use warnings;
 
 use File::Basename;
 use File::Spec;

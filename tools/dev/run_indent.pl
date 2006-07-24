@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 ################################################################################
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
@@ -28,6 +28,14 @@ shell:
 
 ################################################################################
 
+use strict;
+use warnings;
+use lib 'lib';
+
+use Parrot::Config;
+use C::Scan;
+use Text::Wrap;
+
 # the following #defined macros are really used as data types, and should
 # be converted to typedefs.
 my @type_macros = qw(CHARTYPE ENCODING STRING
@@ -36,13 +44,6 @@ my @type_macros = qw(CHARTYPE ENCODING STRING
 die "Usage: $0 <c source files>\n" unless @ARGV;
 
 $|=1;
-use strict;
-use lib 'lib';
-
-use Parrot::Config;
-use C::Scan;
-use Text::Wrap;
-
 my @incdirs;
 my $cc_inc  = $PConfig{'cc_inc'};
 my $ccflags = $PConfig{'ccflags'} . " -DPARROT_IN_CORE";

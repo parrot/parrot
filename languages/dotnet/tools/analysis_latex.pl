@@ -1,5 +1,6 @@
-#!/usr/bin/perl
+#! perl
 use strict;
+use warnings;
 
 my @results = ();
 while (<>) {

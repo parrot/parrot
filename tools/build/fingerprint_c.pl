@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
@@ -21,7 +21,7 @@ file F<DEVELOPING> exists. Releases include a non-dynamic fingerprint.c.
 
 =cut
 
-
+use warnings;
 use strict;
 use lib 'lib';
 use Digest::Perl::MD5 qw(md5_hex);

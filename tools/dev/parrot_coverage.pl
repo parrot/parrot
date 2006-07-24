@@ -1,3 +1,4 @@
+#! perl
 # Copyright (C) 2001-2005, The Perl Foundation.
 # $Id$
 
@@ -21,6 +22,7 @@ The reports start at F<parrot_coverage/index.html>.
 =cut
 
 use strict;
+use warnings;
 
 use Data::Dumper;
 use File::Basename;

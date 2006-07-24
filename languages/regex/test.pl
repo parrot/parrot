@@ -1,12 +1,12 @@
-#! perl -w
+#! perl
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Regex;
 use Regex::Driver;
 # use lib "$FindBin::Bin/../../lib";
 # use Parrot::Config;
-use strict;
 
 # Running this with perl5.005 produces:
 # Can't locate object method "new" via package "Regex::CodeGen::IMCC"

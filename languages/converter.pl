@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 
 =head1 NAME
 
@@ -11,6 +11,7 @@ An early attempt at Python support for Parrot.
 =cut
 
 use strict;
+use warnings;
 use YAML;
 use Parse::RecDescent;
 

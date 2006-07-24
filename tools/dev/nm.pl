@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl
 # Copyright (C) 2004, The Perl Foundation.
 # $Id$
 
@@ -132,6 +132,7 @@ leading dash ("-") can be used instead of two ("--").
 =cut
 
 use strict;
+use warnings;
 use Getopt::Long;
 use File::Basename;
 
