@@ -23,9 +23,8 @@ These are the vtable functions for the TclList base class
 /* cache of classes referenced */
 
 static INTVAL dynpmc_TclInt;
-static STRING *space, *ob, *cb;
 
-pmclass TclList extends Array need_ext does array dynpmc group tcl_group hll Tcl maps Array {
+pmclass TclList extends ResizablePMCArray need_ext does array dynpmc group tcl_group hll Tcl maps Array {
 
 /*
 
@@ -38,26 +37,9 @@ Class initialization. Caches the type id of various PMCs.
 */
 
     void class_init() {
-        PMC *string_anchor;
-        INTVAL fixedstringarray_typenum;
         if (pass) {
-            dynpmc_TclInt    = pmc_type(INTERP,
+            dynpmc_TclInt = pmc_type(INTERP,
                 string_from_const_cstring(INTERP, "TclInt", 0));
- 
-            space = string_from_const_cstring(INTERP, " ", 1);
-            ob    = string_from_const_cstring(INTERP, "{", 1);
-            cb    = string_from_const_cstring(INTERP, "}", 1);
-
-            /* Avoid having these strings GC'd */ 
-            fixedstringarray_typenum =
-              pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "FixedStringArray", 0));
-            string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
-            VTABLE_set_integer_native(INTERP, string_anchor, 3);
-            VTABLE_set_string_keyed_int(INTERP,string_anchor,0,space);
-            VTABLE_set_string_keyed_int(INTERP,string_anchor,1,ob);
-            VTABLE_set_string_keyed_int(INTERP,string_anchor,2,cb);
-            dod_register_pmc(INTERP,string_anchor);
         }
     }
 
@@ -66,6 +48,8 @@ Class initialization. Caches the type id of various PMCs.
 =item C<STRING *get_string()>
 
 Returns the list as a string
+
+=back
 
 =cut
 
@@ -88,49 +72,6 @@ Returns the list as a string
                          (INTERP, listToString, "SP", SELF);
         return value;
     }
-
-/*
-
-=item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>
-
-Sets the integer value of the PMC at element C<key> to C<value>.
-
-XXX Should probably have String and Float variants, though this 
-isn't tested.
-
-=cut
-
-*/
-
-    void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        PMC *src = pmc_new_noinit(INTERP, dynpmc_TclInt);
-        PMC_int_val(src) = value;
-        list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
-    }
-
-/*
-
-=item C<void set_pmc_keyed_int(INTVAL key, PMC *src)>
-
-Assigns C<*src> to the array at index C<key>.
-
-XXX why do we need to override this ?
-
-=cut
-
-*/
-
-    void set_pmc_keyed_int (INTVAL key, PMC* src) {
-        list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
-    }
-
-/*
-
-=back
-
-=cut
-
-*/
 
 }
 
