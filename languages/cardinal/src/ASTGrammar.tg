@@ -101,34 +101,25 @@ transform result (Cardinal::Grammar::statement) :language('PIR') {
     .local pmc child
     child = tree.get('result', $P1, 'Cardinal::Grammar::expression')
     
-    $P2 = node
-    $I0 = defined $P2['if']
-    $S0 = "if"
-    if $I0 goto cond_op
-    $I0 = defined $P2['unless']
-    $S0 = "unless"
-    if $I0 goto cond_op
-    $I0 = defined $P2['while']
-    $S0 = "while"
-    if $I0 goto cond_op
-    $I0 = defined $P2['rescue']
-    $S0 = "rescue"
-    if $I0 goto cond_op
-    
-    result.'add_child'(child)
-    .return (result)
-
+    $P4 = node[0]
+    $S0 = $P4[0]
+    unless $S0 goto pass_through
+  
   cond_op:
     .local pmc op
     op = new 'PAST::Op'
-    op.'clone'($P2)
+    op.'clone'(node)
     op.'op'($S0)
     $P1 = $P0[1]
     $P3 = tree.get('result', $P1, 'Cardinal::Grammar::expression')
 
-    op.'add_child'(child)
     op.'add_child'($P3)
+    op.'add_child'(child)
     result.'add_child'(op)
+    .return (result)
+
+  pass_through: 
+    result.'add_child'(child)
     .return (result)
 
   err_no_tree:
@@ -668,6 +659,21 @@ transform result (Cardinal::Grammar::INTEGER) :language('PIR') {
 
   err_no_tree:
     print "The INTEGER node doesn't contain a 'DECIMAL' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::FLOAT) :language('PIR') {
+    # Ask the child node for its result
+    .local pmc result
+    result = new 'PAST::Val'
+    result.'clone'(node)
+    $S2 = node 
+    result.'value'($S2)
+    result.'valtype'('float')      
+    .return (result)             
+
+  err_no_tree:
+    print "The FLOAT node doesn't contain a 'DECIMAL' match.\n"
     end
 }
 

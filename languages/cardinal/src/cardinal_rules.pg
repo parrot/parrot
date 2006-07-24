@@ -17,7 +17,7 @@ rule statement {
           |<'undef'> <undef_list>
           |<'begin'> \{ <compound_statement> \}
           |<'end'> \{ <compound_statement> \}
-          |<expression> [[<'if'>|<'unless'>|<'while'>|<'until'>] <expression>
+          |<expression> [(<'if'>|<'unless'>|<'while'>|<'until'>) <expression>
                         |<'rescue'> <statement>]?
 }
 
@@ -292,8 +292,7 @@ token primary2 {
           <atom> 
 }
 
-rule atom {
-          <literal>
+rule atom { <literal>
           |<string>
           |<xstring>
           |<regexp>
@@ -392,7 +391,7 @@ rule qwords { \%q\{ [<string_contents> <ws>]* \} }
 token symbol { \:<sym> }
 token sym { <funciton_name>|<ivar>|<gvar>|<cvar> }
 token dsymbol { \: <xstring_contents> }
-token numeric { <INTEGER> | <FLOAT> | \-<INTEGER> | \-<FLOAT> }
+token numeric { <FLOAT> | \-<FLOAT> | \-<INTEGER> | <INTEGER> }
 token variable { <IDENTIFIER>|<INSTANCE_VARIABLE>|<GLOBAL_VARIABLE>|<CONSTANT>|<CLASS_VARIABLE>|<'nil'>|<'self'>|<'true'>|<'false'>|<'__FILE__'>|<'__LINE__'> }
 token back_reference { <NTH_REF> | <BACK_REF> }
 rule superclass { 
@@ -447,14 +446,13 @@ token rbracket { <newline>? \] }
 rule undef_list { [<fitem> \,]* <fitem> }
 
 token LABEL { \: <IDENTIFIER> }
-token NUMBER { {{match.dump()}} ( <INTEGER> | <FLOAT>) }
 token INTEGER { <DECIMAL> 
                   | 0 ( <OCTAL_DIGIT> | _ )* <OCTAL_DIGIT>
                   | 0 ( x | X ) ( <HEXADECIMAL_DIGIT> | _ )* <HEXADECIMAL_DIGIT>
                   | 0 ( b | B ) ( <BINARY_DIGIT> | _ )* <BINARY_DIGIT>
                   | 0 ( d | D ) ( <DECIMAL_DIGIT> | _ ) <DECIMAL_DIGIT>
                  }
-token FLOAT { (<DECIMAL> {{ match.dump() }} \. <DIGITS> <EXPONENT>? ) 
+token FLOAT { ( <DECIMAL> \. <DIGITS> <EXPONENT>? ) 
             | <DECIMAL> <EXPONENT> }
 token DECIMAL { (<[1..9]>) [<DECIMAL_DIGIT>|_<DECIMAL_DIGIT>]* | (0) }
 token DIGITS { <[0..9]> ((<DECIMAL_DIGIT> | _ )* <DECIMAL_DIGIT>)? }

@@ -9,6 +9,11 @@ my $CARDINAL = 'cardinal.pbc';
 my $CURRENT_TEST = 'trb/puts.rb';
 my $TRACE_ARGS = "";
 
+if ( @ARGV > 1 )
+{
+  $CURRENT_TEST = $ARGV[1];
+}
+
 if ( @ARGV > 0 )
 {
   eval($ARGV[0]);
@@ -25,6 +30,11 @@ sub trace
 }
 
 sub execute
+{
+  execute_cmd( "make ; $PARROT $TRACE_ARGS $CARDINAL $CURRENT_TEST" );
+}
+
+sub test
 {
   execute_cmd( "make ; $PARROT $TRACE_ARGS $CARDINAL $CURRENT_TEST" );
 }
