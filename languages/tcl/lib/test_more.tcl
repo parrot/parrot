@@ -93,3 +93,14 @@ proc cmp_ok {left op right args} {
 proc diag {diagnostic} {
   puts "# $diagnostic"
 }
+
+# XXX hacks to help avoid translating the actual tcl tests, until we actuall
+# support tcltest.
+
+# A placeholder that simulates the real tcltest's test proc.
+proc test {num description code output} {
+  return [eval_is $code $output "$num $description"]
+}
+
+# A very big hack placeholder to avoid transform
+namespace eval ::Tcltest { proc cleanupTests {args} {} }
