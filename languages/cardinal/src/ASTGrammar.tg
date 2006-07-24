@@ -1,28 +1,5 @@
 grammar ASTGrammar is TGE::Grammar;
 
-preamble{
-.include 'interpinfo.pasm'
-.macro unless_defined ( x, l )
-    .sym int result
-    .result = defined .x
-    unless .result goto .l
-.endm
-
-.macro kdump ( x )
-    .sym pmc it
-    it = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    it = it[ 'parrot'; '_dumper' ]
-    it(.x)
-.endm
-
-.macro kdump2 ( x, d)
-    .sym pmc it
-    it = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    it = it[ 'parrot'; '_dumper' ]
-    it(.x, .d)
-.endm
-}
-
 transform result (ROOT) :language('PIR') {
     debug_init
 

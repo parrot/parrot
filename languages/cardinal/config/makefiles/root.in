@@ -41,7 +41,8 @@ src/CardinalGrammar.pbc: src/CardinalGrammar.pir src/cardinal_rules.pg src/cardi
 
 src/ASTGrammar.pbc: src/ASTGrammar.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/ASTGrammar.pir src/ASTGrammar.tg
-	$(PARROT) -o src/ASTGrammar.pbc --output-pbc src/ASTGrammar.pir 
+	perl genit.pl
+  $(PARROT) -o src/ASTGrammar.pbc --output-pbc src/ASTGrammar_gen.pir 
 
 src/OSTGrammar.pbc: src/OSTGrammar.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/OSTGrammar.pir src/OSTGrammar.tg
