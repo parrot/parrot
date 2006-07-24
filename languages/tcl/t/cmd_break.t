@@ -1,27 +1,21 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
-use Test::More;
+source lib/test_more.tcl
 
-language_output_is("tcl",<<'TCL',<<OUT,"break from for");
+plan 2
+
+is {
  for {set a 0} {$a < 20} {incr a} {
    if {$a > 10} { break }
  }
- puts $a
-TCL
-11
-OUT
+ set a
+} 11 {break from for}
 
-language_output_is("tcl",<<'TCL',<<OUT,"break from while");
+is {
  set a 20
  while {$a} {
    incr a -1
    if {$a < 10} { break }
  }
- puts $a
-TCL
-9
-OUT
-
+ set a
+} 9 {break from while}

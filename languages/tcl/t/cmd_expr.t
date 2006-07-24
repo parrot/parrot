@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 185;
+use Parrot::Test tests => 186;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -1150,4 +1150,10 @@ language_output_is("tcl",<<'TCL',<<'OUT',"string mul - don't confuse variables f
   set a 1; puts [expr {$a * 10}]
 TCL
 10
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','complicated expression required for test_more.tcl');
+  puts [expr {"[eval {set a "aok"}]" ne "bork"}]
+TCL
+1
 OUT
