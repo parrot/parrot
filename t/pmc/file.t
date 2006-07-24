@@ -49,7 +49,7 @@ pir_output_is(<<"CODE", <<"OUT", "Test is_dir");
 .sub main :main
         \$P1 = new .File
 
-        \$S1 = "$xpto"
+        \$S1 = '$xpto'
         \$I1 = \$P1."is_dir"(\$S1)
 
         if \$I1 goto ok1
@@ -81,7 +81,7 @@ pir_output_is(<<"CODE", <<"OUT", "Test is_file");
 .sub main :main
         \$P1 = new .File
 
-        \$S1 = "$xpto"
+        \$S1 = '$xpto'
         \$I1 = \$P1."is_file"(\$S1)
         \$I1 = !\$I1
 
@@ -91,7 +91,7 @@ pir_output_is(<<"CODE", <<"OUT", "Test is_file");
 ok1:
         print "ok 1\\n"
 
-        \$S1 = "$otpx"
+        \$S1 = '$otpx'
         \$I1 = \$P1."is_file"(\$S1)
 
         if \$I1 goto ok2
@@ -119,7 +119,7 @@ SKIP: {
 .sub main :main
         \$P1 = new .File
 
-        \$S1 = "$lotpx"
+        \$S1 = '$lotpx'
         \$I1 = \$P1."is_link"(\$S1)
 
         if \$I1 goto ok1
@@ -127,7 +127,7 @@ SKIP: {
 ok1:
         print "ok 1\\n"
 
-        \$S1 = "$otpx"
+        \$S1 = '$otpx'
         \$I1 = \$P1."is_link"(\$S1)
         \$I1 = !\$I1
         if \$I1 goto ok2
@@ -154,7 +154,7 @@ SKIP: {
 .sub main :main
         \$P1 = new .File
 
-        \$S1 = "$xptol"
+        \$S1 = '$xptol'
         \$I1 = \$P1."is_link"(\$S1)
 
         if \$I1 goto ok1
@@ -162,7 +162,7 @@ SKIP: {
 ok1:
         print "ok 1\\n"
 
-        \$S1 = "$xpto"
+        \$S1 = '$xpto'
         \$I1 = \$P1."is_link"(\$S1)
         \$I1 = !\$I1
         if \$I1 goto ok2
@@ -181,8 +181,8 @@ my $otpxcopy = catdir( $xpto, 'otpxcopy' );
 # test copy
 pir_output_is(<<"CODE", <<"OUT", "Test copy for files");
 .sub main :main
-       \$S1 = "$otpx"
-       \$S2 = "$otpxcopy"
+       \$S1 = '$otpx'
+       \$S2 = '$otpxcopy'
 
        \$P1 = new .File
        \$P2 = new .OS
@@ -211,8 +211,8 @@ OUT
 # test rename
 pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
 .sub main :main
-       \$S1 = "$otpx"
-       \$S2 = "$otpxcopy"
+       \$S1 = '$otpx'
+       \$S2 = '$otpxcopy'
 
        \$P1 = new .File
        \$P2 = new .OS
