@@ -16,6 +16,10 @@
 
 src/dynpmc/quantumreg.pmc - QuantumReg PMC
 
+=head1 STATUS
+
+Development has stalled. Takers are welcome.
+
 =head1 DESCRIPTION
 
 This is an interface to the libquantum library.
@@ -123,7 +127,7 @@ Returns the number of qbits in the quantum register.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd08_keys.pod>, L<http://gdbm.gnu.org>
+L<http://www.enyo.de/libquantum/>
 
 =cut
 
