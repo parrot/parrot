@@ -44,6 +44,14 @@ PARROT_API void dod_unregister_pmc(Interp *, PMC*);
 /* mro creation */
 PARROT_API void Parrot_create_mro(Interp *, INTVAL);
 
+/* pmcinfo parameters */
+
+/* &gen_from_def(pmcinfo.pasm) */
+
+#define PMCINFO_FLAGS    4      /* see also STRINGINFO_FLAGS */
+
+/* &end_gen */
+
 #endif /* PARROT_PMC_H_GUARD */
 
 /*

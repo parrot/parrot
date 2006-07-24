@@ -35,6 +35,7 @@ my @files = qw(
     include/parrot/resources.h
     include/parrot/stat.h
     include/parrot/string.h
+    include/parrot/pmc.h
     include/parrot/vtable.h
     include/parrot/warnings.h
     src/pmc/timer.pmc

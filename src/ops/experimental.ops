@@ -464,6 +464,27 @@ op instantiate(out PMC) {
   goto NEXT();
 }
 
+=item B<pmcinfo>(out INT, in PMC, inconst INT)
+
+Extract some information about PMC $2 and store it in $1.
+Possible values for $3 are:
+
+=over 4
+
+=item .PMCINFO_FLAGS Get the PMC's flags.
+
+=back
+
+=todo TODO move/officalize this opcode at next op cleanup.
+
+=cut
+
+op pmcinfo(out INT, in PMC, inconst INT) {
+  switch ($3) {
+    case PMCINFO_FLAGS:    $1 = PObj_get_FLAGS($2); break;
+  }
+  goto NEXT();
+}
 
 =back
 

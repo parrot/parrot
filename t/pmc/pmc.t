@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 use Parrot::PMC qw(%pmc_types);
 
 =head1 NAME
@@ -370,4 +370,20 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "new_p_i_s");
 CODE
 Integer
 42
+OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "pmcinfo_i_p_ic");
+.include "pmcinfo.pasm"
+    new P0, .Integer
+    pmcinfo I0, P0, .PMCINFO_FLAGS
+    shl I2, 1, 9	# PObj_is_PMC_FLAG s. pobj.h
+    band I1, I0, I2
+    if I1, ok
+    print "PMC flag not set\n"
+    end
+ok:
+    print "ok\n"
+    end
+CODE
+ok
 OUTPUT
