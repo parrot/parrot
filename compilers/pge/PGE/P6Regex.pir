@@ -333,7 +333,11 @@ Return a failed match if the stoptoken is found.
     .local int isnegated
     isnegated = is_cclass .CCLASS_UPPERCASE, target, pos
     inc pos
-    $S0 = downcase initchar
+    $S0 = initchar
+    $I0 = index "ABCDEFGHIJKLMNOPQRSTUVWXYZ", $S0
+    if $I0 < 0 goto term_backslash_1
+    $S0 = substr "abcdefghijklmnopqrstuvwxyz", $I0, 1
+  term_backslash_1:  
     if $S0 == 'x' goto term_backslash_x            # \x.. \X..
     if $S0 == 'o' goto term_backslash_o            # \o.. \O..
     $P0 = find_global '%esclist'
@@ -365,9 +369,9 @@ Return a failed match if the stoptoken is found.
     inc pos
   term_bx1:
     $S0 = substr target, pos, 1
-    downcase $S0
-    $I1 = index "0123456789abcdef", $S0
+    $I1 = index "0123456789abcdef0123456789ABCDEF", $S0
     if $I1 < 0 goto term_bx2
+    $I1 = $I1 % 16
     if $I1 >= base goto term_bx2
     $I0 *= base
     $I0 += $I1
@@ -770,6 +774,7 @@ Extract an enumerated character list.
     inc $I2
     if $I2 > $I0 goto scan
     $S1 = chr $I2
+    $I99 = $I2
     charlist .= $S1
     goto addrange_1
   dotrange:
