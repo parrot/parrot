@@ -356,7 +356,7 @@ CODE
 OUTPUT
 
 # Concatenate unicode: with iso-8859-1; RT #39930
-pir_output_is( <<'CODE', <<'OUTPUT', "Concat unicode with iso-8859-1", todo => 'RT #39930');
+pir_output_is( <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1", todo => 'RT #39930');
 .sub main
     $S0 = unicode:"A"
     $S1 = ascii:"B"
@@ -379,7 +379,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Concat unicode with iso-8859-1", todo => '
 CODE
 AB
 AB
-AB
+A\x00B\x00
 OUTPUT
 
 ## remember to change the number of tests :-)
