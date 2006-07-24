@@ -333,8 +333,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode");
 .sub main
     .include 'cclass.pasm'
     .local string s
-    s = unicode:" \t\u207babc\n\u2000\u2009"
-    s = unicode:"01\u207babc\u0660\u17e1\u19d9"
+    s = unicode:"01\u207bxyz\u0660\u17e1\u19d9"
     $I9 = length s
     $I0 = is_cclass .CCLASS_NUMERIC, s, 0
     print $I0
@@ -355,6 +354,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode");
 CODE
 1102269
 OUTPUT
+
 
 ## remember to change the number of tests :-)
 BEGIN { plan tests => 24; }
