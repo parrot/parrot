@@ -365,6 +365,8 @@ SP              [ ]
             "Constant '%s' value must be a number, "
             "stringliteral or register", name);
 
+    if (num_macros >= N_MACROS)
+        internal_exception(1, "Too many macros/constants");
     m = macros + num_macros++;
     m->name = name;
     m->expansion = str_dup (valp->s);
