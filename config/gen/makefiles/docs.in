@@ -2,10 +2,10 @@
 # $Id$
 
 # Setup of some commands
-PERL  = @perl@
-RM_F  = @rm_f@
-MKDIR = @mkdir@
-CHMOD = @chmod@
+PERL   = @perl@
+RM_F   = @rm_f@
+MKPATH = @mkpath@
+CHMOD  = @chmod@
 
 # long list of .pod files
 POD = @pod@
@@ -31,7 +31,7 @@ help :
 	@echo ""
 
 doc-prep:
-	$(MKDIR) ops
+	$(MKPATH) ops
 
 packfile-c.pod: ../src/packfile.c
 #CONDITIONED_LINE(new_perldoc):	perldoc -ud packfile-c.pod ../src/packfile.c 

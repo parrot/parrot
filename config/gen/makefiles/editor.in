@@ -6,10 +6,10 @@ VIM_FT_DIR  = $(VIM_DIR)/plugin
 VIM_IN_DIR  = $(VIM_DIR)/indent
 VIM_SYN_DIR = $(VIM_DIR)/syntax
 
-PERL  = @perl@
-CP    = @cp@
-MKDIR = @mkdir@
-RM_F  = @rm_f@
+PERL   = @perl@
+CP     = @cp@
+MKPATH = @mkpath@
+RM_F   = @rm_f@
 
 default: all
 
@@ -36,15 +36,15 @@ pir.vim: pir.vim.in $(OPS_DIR)/*.ops ops2vim.pl
 	$(PERL) ops2vim.pl $(OPS_DIR)/*.ops >> pir.vim
 
 vim-install: pir.vim
-	$(MKDIR) $(VIM_DIR)
+	$(MKPATH) $(VIM_DIR)
 	$(CP) skeleton.pir $(VIM_DIR)
-	$(MKDIR) $(VIM_SYN_DIR)
+	$(MKPATH) $(VIM_SYN_DIR)
 	$(CP) pir.vim $(VIM_SYN_DIR)
 	$(CP) pasm.vim $(VIM_SYN_DIR)
 	$(CP) pmc.vim $(VIM_SYN_DIR)
-	$(MKDIR) $(VIM_FT_DIR)
+	$(MKPATH) $(VIM_FT_DIR)
 	$(CP) filetype_parrot.vim $(VIM_FT_DIR)/parrot.vim
-	$(MKDIR) $(VIM_IN_DIR)
+	$(MKPATH) $(VIM_IN_DIR)
 	$(CP) indent_pir.vim $(VIM_IN_DIR)/pir.vim
 
 imc.kate: imcc.xml

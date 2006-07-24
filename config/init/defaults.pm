@@ -137,7 +137,7 @@ sub runstep
         test_prog => 'parrot',
         rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
-        mkdir     => '$(PERL) -MExtUtils::Command -e mkpath',
+        mkpath    => '$(PERL) -MExtUtils::Command -e mkpath',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
         chmod     => '$(PERL) -MExtUtils::Command -e ExtUtils::Command::chmod',
         ar        => $Config{ar},

@@ -93,7 +93,7 @@ CP         = @cp@
 TOUCH      = @touch@
 YACC       = @yacc@
 LEX        = @lex@
-MKDIR      = @mkdir@
+MKPATH     = @mkpath@
 AS         = @as@
 CC         = @cc@
 CC_INC     = @cc_inc@
@@ -802,14 +802,13 @@ PARROT_LIBS: \
 #CONDITIONED_LINE(has_static_linking):  $(LIBPARROT_STATIC) \
 #CONDITIONED_LINE(has_dynamic_linking): $(LIBPARROT_SHARED)
 
-@blib_dir@:
-	$(MKDIR) @blib_dir@
-
-$(LIBPARROT_STATIC) : $(O_FILES) @blib_dir@
+$(LIBPARROT_STATIC) : $(O_FILES)
+	$(MKPATH) @blib_dir@
 	$(AR_CR) @ar_out@$@ @ar_extra@ $(O_FILES)
 	$(RANLIB) $@
 
-$(LIBPARROT_SHARED) : $(O_FILES) @blib_dir@
+$(LIBPARROT_SHARED) : $(O_FILES)
+	$(MKPATH) @blib_dir@
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
     $(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #CONDITIONED_LINE(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )

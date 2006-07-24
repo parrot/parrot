@@ -7,7 +7,7 @@ RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
 TOOL_DIR = ../..
 CP       = @cp@
-MKDIR    = @mkdir@
+MKPATH   = @mkpath@
 
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
@@ -27,7 +27,7 @@ SOURCES = PAST.pir \
   PAST/Var.pir
 
 $(PARROT_LIBRARY)/PAST:
-	$(MKDIR) $(PARROT_LIBRARY)/PAST
+	$(MKPATH) $(PARROT_LIBRARY)/PAST
 
 $(PARROT_LIBRARY)/Node.pbc: Node.pbc
 	$(CP) Node.pbc $(PARROT_LIBRARY)
