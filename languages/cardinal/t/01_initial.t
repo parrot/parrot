@@ -13,7 +13,7 @@ sub test_rb_file
 
 for (glob './trb/*')
 {
-  print STDERR "$_\n";
-  print "$_\n";
+  print STDERR "FILENAME $_\n";
+  print "FILENAME $_\n";
   test_rb_file($_, $_);
 }
