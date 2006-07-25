@@ -40,7 +40,7 @@ PGE::OPTable - PGE operator precedence table and parser
     addattribute base, '%!klen'
     addattribute base, '&!ws'
     sctable = new .Hash
-    store_global '%!sctable', sctable
+    set_global '%!sctable', sctable
 
     'sctable'('term:', 'syncat'=>PGE_OPTABLE_TERM, 'expect'=>0x0201)
     'sctable'('postfix:', 'syncat'=>PGE_OPTABLE_POSTFIX, 'expect'=>0x0202, 'arity'=>1)
@@ -63,7 +63,7 @@ Adds (or replaces) a syntactic category's defaults.
     .param string name
     .param pmc adverbs         :slurpy :named
     .local pmc sctable
-    sctable = find_global '%!sctable'
+    sctable = get_global '%!sctable'
     unless null adverbs goto with_adverbs
     adverbs = new .Hash
   with_adverbs:
@@ -93,7 +93,7 @@ Adds (or replaces) a syntactic category's defaults.
     key = substr name, $I0
 
     .local pmc sctable, token
-    sctable = find_global "PGE::OPTable", "%!sctable"
+    sctable = get_hll_global "PGE::OPTable", "%!sctable"
     $I0 = exists sctable[syncat]
     if $I0 == 0 goto token_hash
     token = sctable[syncat]
@@ -273,7 +273,7 @@ Adds (or replaces) a syntactic category's defaults.
     operstack = new .ResizablePMCArray
     termstack = new .ResizablePMCArray
 
-    newfrom = find_global "PGE::Match", "newfrom"
+    newfrom = get_hll_global "PGE::Match", "newfrom"
     (mob, target, mfrom, mpos) = newfrom(mob, 0)
     pos = mfrom
     lastpos = length target
