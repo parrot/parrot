@@ -45,22 +45,22 @@ This syntax is also true for PGE::Glob and PGE::P5Regex
 
 =back
 
-=head1 FUTURE changes
+=item Subpragma syntax
 
-Not yet deprecated, but it's recommended to use the new syntax and
-gradually change the old.
-
-=over 4
-
-=item Chip's colon
-
-Subroutine attributes will use the colon syntax:
+Subroutine attributes now use the colon syntax:
 
   .sub foo method, @MULTI(x,y)    => .sub foo :method :multi(x,y)
   .sub foo @ANON, @LOAD           => .sub foo :anon :load
 
 The new syntax uses no comma separators and all sub attributes are lower
 case and prefixed by a colon.
+
+=head1 FUTURE changes
+
+Not yet deprecated, but it's recommended to use the new syntax and
+gradually change the old.
+
+=over 4
 
 =item Class name IDs
 
