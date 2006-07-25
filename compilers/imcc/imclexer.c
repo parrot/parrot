@@ -5547,11 +5547,11 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
         } while (c == ' ' || c == '\t');
 
         if (c != '(') {
-            unput(c);
             if (m->params.num_param != 0)
                 IMCC_fataly(interp, E_SyntaxError,
                         "Macro '%s' needs %d arguments",
                         name, m->params.num_param);
+            unput(c);
             scan_string(frame, m->expansion, yyscanner);
             return 1;
         }
