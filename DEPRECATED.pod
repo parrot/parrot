@@ -43,8 +43,6 @@ PGE::P6Regex is now a registered compiler, and should be used like so:
 
 This syntax is also true for PGE::Glob and PGE::P5Regex
 
-=back
-
 =item Subpragma syntax
 
 Subroutine attributes now use the colon syntax:
@@ -54,6 +52,8 @@ Subroutine attributes now use the colon syntax:
 
 The new syntax uses no comma separators and all sub attributes are lower
 case and prefixed by a colon.
+
+=back
 
 =head1 FUTURE changes
 
