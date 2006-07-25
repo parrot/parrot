@@ -1375,10 +1375,12 @@ _var_or_i:
                    {
                       regs[nargs++] = $1;
                       keyvec |= KEY_BIT(nargs);
-                      regs[nargs++] = $3; $$ = $1;
+                      regs[nargs++] = $3;
+                      $$ = $1;
                    }
    | '[' keylist ']'
                    {
+                      keyvec |= KEY_BIT(nargs);
                       regs[nargs++] = $2;
                       $$ = $2;
                    }

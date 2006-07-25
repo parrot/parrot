@@ -1,5 +1,9 @@
 #1 $Id$
 
+2006.07.25    chip
+	* fix longstanding bug that sometimes didn't encode pasm keys as
+	Key PMCs (specifically "[S0]" and "['stringliteral']").
+
 2006.07.24    chip
 	further implementation of new pdd21:
 	* new opcodes {get,set}*global

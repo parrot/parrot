@@ -110,13 +110,6 @@ op get_namespace(out PMC, inconst KEY) {
     goto NEXT();
 }
 
-op get_namespace(out PMC, in STR) {
-    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
-    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, cur_ns, $2);
-    $1 = ns ? ns : PMCNULL;
-    goto NEXT();
-}
-
 =item B<get_hll_namespace>(out PMC)
 
 Set $1 to the current HLL root namespace.
@@ -142,13 +135,6 @@ op get_hll_namespace(out PMC, inconst KEY) {
     goto NEXT();
 }
 
-op get_hll_namespace(out PMC, in STR) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
-    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, hll_ns, $2);
-    $1 = ns ? ns : PMCNULL;
-    goto NEXT();
-}
-
 =item B<get_root_namespace>(out PMC)
 
 Set $1 to the true root namespace.
@@ -169,13 +155,6 @@ op get_root_namespace(out PMC) {
 op get_root_namespace(out PMC, inconst KEY) {
     PMC * const root_ns = interpreter->root_namespace;
     PMC *ns = Parrot_get_namespace_keyed(interpreter, root_ns, $2);
-    $1 = ns ? ns : PMCNULL;
-    goto NEXT();
-}
-
-op get_root_namespace(out PMC, in STR) {
-    PMC * const root_ns = interpreter->root_namespace;
-    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, root_ns, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
@@ -216,13 +195,6 @@ op get_global(out PMC, inconst KEY, in STR) {
     goto NEXT();
 }
 
-op get_global(out PMC, in STR, in STR) {
-    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
-    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, cur_ns, $2);
-    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
-    goto NEXT();
-}
-
 =item B<get_hll_global>(out PMC, in STR)
 
 Set $1 to the global named $2 in the current HLL root namespace.  If the
@@ -249,13 +221,6 @@ op get_hll_global(out PMC, inconst KEY, in STR) {
     goto NEXT();
 }
 
-op get_hll_global(out PMC, in STR, in STR) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
-    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, hll_ns, $2);
-    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
-    goto NEXT();
-}
-
 =item B<get_root_global>(out PMC, in STR)
 
 Set $1 to the global named $2 in the true root namespace.  If the global
@@ -278,13 +243,6 @@ op get_root_global(out PMC, in STR) {
 op get_root_global(out PMC, inconst KEY, in STR) {
     PMC * const root_ns = interpreter->root_namespace;
     PMC *ns = Parrot_get_namespace_keyed(interpreter, root_ns, $2);
-    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
-    goto NEXT();
-}
-
-op get_root_global(out PMC, in STR, in STR) {
-    PMC * const root_ns = interpreter->root_namespace;
-    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, root_ns, $2);
     $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
@@ -324,13 +282,6 @@ op set_global(inconst KEY, in STR, in PMC) {
     goto NEXT();
 }
 
-op set_global(in STR, in STR, in PMC) {
-    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
-    PMC *ns = Parrot_make_namespace_keyed_str(interpreter, cur_ns, $1);
-    Parrot_set_global(interpreter, ns, $2, $3);
-    goto NEXT();
-}
-
 =item B<set_hll_global>(in STR, in PMC)
 
 Set $1 to the global named $2 in the current HLL root namespace.  If the
@@ -357,13 +308,6 @@ op set_hll_global(inconst KEY, in STR, in PMC) {
     goto NEXT();
 }
 
-op set_hll_global(in STR, in STR, in PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
-    PMC *ns = Parrot_make_namespace_keyed_str(interpreter, hll_ns, $1);
-    Parrot_set_global(interpreter, ns, $2, $3);
-    goto NEXT();
-}
-
 =item B<set_root_global>(in STR, in PMC)
 
 Set $1 to the global named $2 in the true root namespace.  If the global
@@ -386,13 +330,6 @@ op set_root_global(in STR, in PMC) {
 op set_root_global(inconst KEY, in STR, in PMC) {
     PMC * const root_ns = interpreter->root_namespace;
     PMC *ns = Parrot_make_namespace_keyed(interpreter, root_ns, $1);
-    Parrot_set_global(interpreter, ns, $2, $3);
-    goto NEXT();
-}
-
-op set_root_global(in STR, in STR, in PMC) {
-    PMC * const root_ns = interpreter->root_namespace;
-    PMC *ns = Parrot_make_namespace_keyed_str(interpreter, root_ns, $1);
     Parrot_set_global(interpreter, ns, $2, $3);
     goto NEXT();
 }
