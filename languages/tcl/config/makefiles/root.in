@@ -185,7 +185,7 @@ tclsh: $(PARROT) tcl.pbc
 	$(PARROT) --gc-debug tcl.pbc
 
 test:	tcl.pbc
-	$(PERL) t/harness
+	prove t/harness
 
 tcl-test: t_tcl tcl.pbc
 	prove t_tcl/*.t
