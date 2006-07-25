@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 186;
+use Parrot::Test tests => 188;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -278,6 +278,7 @@ language_output_is("tcl",<<TCL,<<OUT,"acos");
  puts [expr acos(0)]
 TCL
 1.57079632679
+OUT
 
 language_output_is('tcl', <<'TCL', <<'OUT', 'acos("0")');
   puts [expr acos(0)]
@@ -386,7 +387,7 @@ language_output_is("tcl",<<TCL,<<OUT,"log");
  puts [expr log(32)]
 TCL
 3.4657359028
-    OUT
+OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', 'log("32")');
   puts [expr log("32")]

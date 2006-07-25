@@ -45,36 +45,42 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 
 =cut
 
-# multiply
-.sub 'infix:*'     :multi(String, pmc)
-  .throw ("can't use non-numeric string as operand of \"*\"")
-.end
-
-.sub 'infix:*'     :multi(pmc, String)
-  .throw ("can't use non-numeric string as operand of \"*\"")
-.end
-
-.sub 'infix:*'     :multi(pmc, pmc)   
+.sub 'infix:*'  
     .param pmc a
     .param pmc b
-    $P0 = mul a, b
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+      $P0 = new 'TclFloat'
+      $P0 = mul a, b
+    clear_eh
     .return ($P0)
+
+is_string:
+    .throw("can't use non-numeric string as operand of \"*\"")
 .end
 
-# divide
-.sub 'infix:/'     :multi(String, pmc)
-  .throw ("can't use non-numeric string as operand of \"/\"")
-.end
+.sub 'infix:/'
+    .param pmc a
+    .param pmc b
 
-.sub 'infix:/'     :multi(pmc, String)
-  .throw ("can't use non-numeric string as operand of \"/\"")
-.end
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
 
-.sub 'infix:/'     :multi(pmc, pmc)
-    .param float a
-    .param float b
-    $N0 = div a, b
-    .return ($N0)
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+      $P0 = new 'TclFloat'
+      $P0 = div a, b
+    clear_eh
+    .return($P0)
+
+is_string:
+    .throw("can't use non-numeric string as operand of \"/\"")
 .end
 
 
@@ -102,38 +108,42 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
     .return ($I0)
 .end
 
-# add
-.sub 'infix:+'     :multi(String, pmc)
-  .throw ("can't use non-numeric string as operand of \"+\"")
-.end
-
-.sub 'infix:+'     :multi(pmc, String)
-  .throw ("can't use non-numeric string as operand of \"+\"")
-.end
-
-.sub 'infix:+'     :multi(pmc, pmc)
-    .param float a
-    .param float b
-    $N0 = a + b
-    .return ($N0)
-.end
-
-# subtract
-.sub 'infix:-'     :multi(String, pmc)
-  .throw ("can't use non-numeric string as operand of \"-\"")
-.end
-
-.sub 'infix:-'     :multi(pmc, String)
-  .throw ("can't use non-numeric string as operand of \"-\"")
-.end
-
-.sub 'infix:-'     :multi(pmc, pmc)
+.sub 'infix:+'
     .param pmc a
     .param pmc b
-    $N0 = a
-    $N1 = b
-    $N2 = $N0 - $N1
-    .return ($N2)
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+      $P0 = new 'TclFloat'
+      $P0 = a + b
+    clear_eh
+    .return($P0)
+
+is_string:
+    .throw("can't use non-numeric string as operand of \"+\"")
+.end
+
+.sub 'infix:-'
+    .param pmc a
+    .param pmc b
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+      $P0 = new 'TclFloat'
+      $P0 = a - b
+    clear_eh
+    .return($P0)
+
+is_string:
+    .throw("can't use non-numeric string as operand of \"-\"")
 .end
 
 # left shift
@@ -190,8 +200,7 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
     .param pmc b
 
     .local pmc __number
-    $P0 = get_root_namespace
-    __number = $P0['_tcl'; '__number']
+    __number = get_root_global ['_tcl'], '__number'
     push_eh is_string
       $P0 = __number(a)
       $P1 = __number(b)
@@ -210,8 +219,7 @@ is_string:
     .param pmc b
 
     .local pmc __number
-    $P0 = get_root_namespace
-    __number = $P0['_tcl'; '__number']
+    __number = get_root_global ['_tcl'], '__number'
     push_eh is_string
       $P0 = __number(a)
       $P1 = __number(b)
@@ -230,8 +238,7 @@ is_string:
     .param pmc b
 
     .local pmc __number
-    $P0 = get_root_namespace
-    __number = $P0['_tcl'; '__number']
+    __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       $P0 = __number(a)

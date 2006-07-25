@@ -19,258 +19,403 @@ Functions are very similar to ops, so handle them similarly here.
 
 =cut
 
-.sub 'function:abs' :multi (String)
-    .throw("argument to math function didn't have numeric value")
-.end
-
-.sub 'function:abs' :multi (pmc)
+.sub 'function:abs'
     .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc b
     b = clone a
     b = neg b
     .return (b)
-.end
 
-.sub 'function:acos' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:acos' :multi (pmc)
-    .param float a
+.sub 'function:acos'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = acos a
+    $N0 = a
+    $N0 = acos $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:asin' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:asin' :multi (pmc)
-    .param float a
+.sub 'function:asin'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = asin a
+    $N0 = a
+    $N0 = asin $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:atan' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:atan' :multi (pmc)
-    .param float a
+.sub 'function:atan'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = atan a
+    $N0 = a
+    $N0 = atan $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:ceil' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:ceil' :multi (pmc)
-    .param float a
+.sub 'function:ceil'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = ceil a
+    $N0 = a
+    $N0 = ceil $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:cos' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:cos' :multi (pmc)
-    .param float a
+.sub 'function:cos'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = cos a
+    $N0 = a
+    $N0 = cos $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:cosh' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:cosh' :multi (pmc)
-    .param float a
+.sub 'function:cosh'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = cosh a
+    $N0 = a
+    $N0 = cosh $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:double' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:double' :multi (pmc)
-    .param float a
+.sub 'function:double'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    ret = a
-    .return (ret)
-.end
-
-.sub 'function:exp' :multi (String)
-    .throw("argument to math function didn't have numeric value")
-.end
-
-.sub 'function:exp' :multi (pmc)
-    .param float a
-    .local pmc ret
-    ret = new "TclFloat"
-    $N0 = exp a
+    $N0 = a
     ret = $N0
     .return (ret)
+
+is_string:
+    .throw("argument to math function didn't have numeric value")
+.end
+
+.sub 'function:exp'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
+    .local pmc ret
+    ret = new "TclFloat"
+    $N0 = a
+    $N0 = exp $N0
+    ret = $N0
+    .return (ret)
+
+is_string:
+    .throw("argument to math function didn't have numeric value")
 .end
 
 .sub 'function:floor' 
 .end
 
-.sub 'function:int' :multi (String)
+.sub 'function:int'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
+    $I0 = a
+    $P0 = new 'TclInt'
+    $P0 = $I0
+    
+    .return ($P0)
+
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:int' :multi (pmc)
-    .param int a
-    .return (a)
-.end
+.sub 'function:log'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
 
-.sub 'function:log' :multi (String)
-    .throw("argument to math function didn't have numeric value")
-.end
-
-.sub 'function:log' :multi (pmc)
-    .param float a
+    push_eh is_string
+      a = __number(a)
+    clear_eh
 
     if a < 0 goto domain_error
 
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = ln a
+    $N0 = a
+    $N0 = ln $N0
     ret = $N0
     .return (ret)
 
 domain_error:
     .throw('domain error: argument not in valid range')
-.end
 
-.sub 'function:log10' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:log10' :multi (pmc)
-    .param float a
+.sub 'function:log10'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
 
     if a < 0 goto domain_error
 
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = log10 a
+    $N0 = a
+    $N0 = log10 $N0
     ret = $N0
     .return (ret)
 
 domain_error:
     .throw('domain error: argument not in valid range')
-.end
 
-.sub 'function:round' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:round' :multi (pmc)
-    .param float a
+.sub 'function:round'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     if a < 0 goto neg
 
-    $N0 = a + 0.5
+    $N0 = a
+    $N0 += 0.5
     $I0 = $N0
     .return ($I0)
 neg: 
-    $N0 = a - 0.5
+    $N0 = a
+    $N0 -= 0.5
     $I0 = $N0
     .return ($I0)
-.end
 
-.sub 'function:sin' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:sin' :multi (pmc)
-    .param float a
+.sub 'function:sin'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = sin a
+    $N0 = a
+    $N0 = sin $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:sinh' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:sinh' :multi (pmc)
-    .param float a
+.sub 'function:sinh'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = sinh a
+    $N0 = a
+    $N0 = sinh $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:sqrt' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:sqrt' :multi (pmc)
-    .param float a
+.sub 'function:sqrt'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     if a < 0 goto domain_error
     ret = new "TclFloat"
-    $N0 = sqrt a
+    $N0 = a
+    $N0 = sqrt $N0
     ret = $N0
     .return (ret)
 
 domain_error:
     .throw('domain error: argument not in valid range')
+
+is_string:
+    .throw("argument to math function didn't have numeric value")
 .end
 
 .sub 'function:srand'
 .end
 
-.sub 'function:tan' :multi (String)
+.sub 'function:tan'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
+    .local pmc ret
+    ret = new "TclFloat"
+    $N0 = a
+    $N0 = tan $N0
+    ret = $N0
+    .return (ret)
+
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:tan' :multi (pmc)
-    .param float a
+.sub 'function:tanh'
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
     .local pmc ret
     ret = new "TclFloat"
-    $N0 = tan a
+    $N0 = a
+    $N0 = tanh $N0
     ret = $N0
     .return (ret)
-.end
 
-.sub 'function:tanh' :multi (String)
+is_string:
     .throw("argument to math function didn't have numeric value")
-.end
-
-.sub 'function:tanh' :multi (pmc)
-    .param float a
-    .local pmc ret
-    ret = new "TclFloat"
-    $N0 = tanh a
-    ret = $N0
-    .return (ret)
 .end
 
 .sub 'function:wide'
@@ -280,37 +425,46 @@ domain_error:
 
 =cut
 
-.sub 'function:atan2' :multi (String, pmc)
-    .throw("argument to math function didn't have numeric value")
-.end
+.sub 'function:atan2'
+    .param pmc a
+    .param pmc b
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
 
-.sub 'function:atan2' :multi (pmc, String)
-    .throw("argument to math function didn't have numeric value")
-.end
-
-.sub 'function:atan2' :multi (pmc, pmc)
-    .param num a
-    .param num b
-    $N0 = atan a, b
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+    clear_eh
+    
+    $N0 = a
+    $N1 = b
+    $N0 = atan $N0, $N1
     .local pmc ret
     ret = new 'TclFloat'
     ret = $N0
     .return(ret)
-.end
 
-.sub 'function:fmod' :multi (String, pmc)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:fmod' :multi (pmc, String)
-    .throw("argument to math function didn't have numeric value")
-.end
+.sub 'function:fmod'
+    .param pmc a
+    .param pmc b
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
 
-.sub 'function:fmod' :multi (pmc, pmc)
-    .param float a
-    .param float b
-    if b == 0 goto domain_error
-    $N0 = a % b 
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+    clear_eh
+    
+    if b == 0 goto domain_error 
+    $N0 = a
+    $N1 = b
+    $N0 = $N0 % $N1
     .local pmc ret
     ret = new "TclFloat"
     ret = $N0
@@ -318,22 +472,27 @@ domain_error:
 
  domain_error:
     .throw('domain error: argument not in valid range')
-.end
 
-.sub 'function:hypot' :multi (String, pmc)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:hypot' :multi (pmc, String)
-    .throw("argument to math function didn't have numeric value")
-.end
-
-.sub 'function:hypot' :multi (pmc, pmc)
-    .param num a
-    .param num b
+.sub 'function:hypot'
+    .param pmc a
+    .param pmc b
     
-    $N0 = pow a, 2
-    $N1 = pow b, 2
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+    clear_eh
+    
+    $N0 = a
+    $N1 = b
+    $N0 = pow $N0, 2
+    $N1 = pow $N1, 2
     
     $N0 = $N0 + $N1
     $N0 = sqrt $N0
@@ -342,23 +501,30 @@ domain_error:
     ret = new 'TclFloat'
     ret = $N0
     .return(ret)
-.end
 
-.sub 'function:pow' :multi (String, pmc)
+is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'function:pow' :multi (pmc, String)
-    .throw("argument to math function didn't have numeric value")
-.end
-
-.sub 'function:pow' :multi (pmc, pmc)
-    .param num a
-    .param num b
+.sub 'function:pow'
+    .param pmc a
+    .param pmc b
     
-    $N0 = pow a, b
-    .local pmc ret
-    ret = new 'TclFloat'
-    ret = $N0
-    .return(ret)
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+    clear_eh
+
+    $N0 = a
+    $N1 = b
+    $N0 = pow $N0, $N1 # pow only exists as pow_n_n_n
+    $P0 = new 'TclFloat'
+    $P0 = $N0
+    .return($P0)
+
+is_string:
+    .throw("argument to math function didn't have numeric value")
 .end

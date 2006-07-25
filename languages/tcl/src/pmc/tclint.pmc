@@ -28,7 +28,7 @@ pmclass TclInt extends TclObject extends Integer dynpmc group tcl_group hll Tcl 
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-        PMC_int_val(dest) = n / d;
+        VTABLE_set_integer_native(INTERP, dest, n / d);
         return dest;
       }
       MMD_DEFAULT: {
