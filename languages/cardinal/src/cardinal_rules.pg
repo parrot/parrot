@@ -21,11 +21,6 @@ rule statement {
                         |<'rescue'> <statement>]?
 }
 
-#rule boolean_expression {
-#          | \! <command_call>
-#          |<command_call>
-#}
-
 ## We enter the operator precedance expression parser HERE
 rule expression {<operator_precedence_parser>}
 
@@ -61,7 +56,6 @@ rule assignment {
 
           |\:\: <CONSTANT> <ASSIGN_OP> <expression>
 
-#          |<'defined'> <newline>? <expression>
           |[\!]? <command_call>
           |<primary>
 }
@@ -76,11 +70,11 @@ rule method_call {
 #          | <primary_value> \[ <call_args>? <rbracket> <brace_block>?
 #          | <'super'> <paren_args><brace_block>?
 
-          | <atom> [\.|\:\:] <operation2> <paren_args>?  <brace_block>?
-          | <atom> [\.|\:\:] <paren_args><brace_block>?
-          | <atom> \:\: <operation3><brace_block>?
-          | <atom> \[ <call_args>? <rbracket> <brace_block>?
-          | <'super'> <paren_args><brace_block>?
+          | <atom>[[\.|\:\:][<operation2> <paren_args>?  <brace_block>?
+                              |<paren_args><brace_block>? ]
+                    |\:\:<operation3> <brace_block>?
+                    |\[ <call_args>? <rbracket> <brace_block>? ]
+          | <'super'> <paren_args> <brace_block>?
 }
 
 rule method_call_block { 
@@ -281,15 +275,9 @@ rule multiple_right_hand_side {
 }
 
 rule primary {
-          <primary2>
-          |<primary2> \:\: <CONSTANT>
-}
-
-token primary2 { 
-
+          <atom> [\:\: <CONSTANT>]?
 #          |<operation> <brace_block> # put this in method call         
 #          |<method_call> <brace_block>?
-          <atom> 
 }
 
 rule atom { <literal>

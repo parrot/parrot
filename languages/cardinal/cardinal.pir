@@ -163,8 +163,9 @@ compiler, see:
     # Match against the source
     .local pmc match
     .local pmc start_rule
-    #start_rule = get_namespace [ 'Cardinal'; 'Grammar'; 'program' ]
-    start_rule = get_namespace [ 'Cardinal::Grammar'; 'program' ]
+    start_rule = get_root_namespace
+    #start_rule = get_namespace [ 'parrot'; 'Cardinal'; 'Grammar'; 'program' ]
+    start_rule = start_rule[ 'parrot'; 'Cardinal::Grammar'; 'program' ]
     match = start_rule(source, 'grammar'=> 'Cardinal::Grammar')
 
     # Verify the match

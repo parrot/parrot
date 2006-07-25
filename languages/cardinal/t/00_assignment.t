@@ -4,8 +4,11 @@ use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 1;
 
+TODO: {
+#local $TODO = "variables not implemented in ASTGrammar\n";
+
 language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
-puts(1+2) if true
+a=1
 CODE
-3
 OUT
+}

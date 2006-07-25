@@ -341,6 +341,7 @@ transform result (Cardinal::Grammar::paren_args) :language('PIR') {
     $I0 = defined node['call_args']
     unless $I0 goto no_call_args
     $P0 = node['call_args']
+    $P0 = $P0[0]
     args = tree.get('result', $P0, 'Cardinal::Grammar::call_args')
     .return (args)
 
@@ -353,37 +354,23 @@ transform result (Cardinal::Grammar::call_args) :language('PIR') {
     .local pmc result
     result = new .ResizablePMCArray
 
-    .local pmc iter
-    iter = new Iterator, node    # setup iterator for node
-    iter = 0
-
-    iter_loop:
-    unless iter, iter_end         # while (entries) ...
-    shift $P2, iter
-    
     .local pmc child
-    
-    $I0 = defined $P2['call_args_positional']
+    $I0 = defined node['call_args_positional']
     unless $I0 goto next_1
-    $P3 = $P2['call_args_positional']
-    child = tree.get('result', $P3, 'Cardinal::Grammar::call_args_positional')
+    $P0 = node['call_args_positional']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::call_args_positional')
     .return (child)
-    goto add_child
 
   next_1:
     goto err_no_tree
-    $I0 = defined $P2['call_args_positional']
+    $I0 = defined node['call_args_positional']
     unless $I0 goto err_no_tree
-    $P3 = $P2['call_args_positional']
-    child = tree.get('result', $P3, 'Cardinal::Grammar::call')
+    $P0 = node['call_args_positional']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::call')
     goto add_child
 
   add_child:
     push result, child
-
-    goto iter_loop
-    iter_end:
-    
     .return (result)
 
   err_no_tree:
@@ -500,21 +487,6 @@ transform result (Cardinal::Grammar::CONSTANT) :language('PIR') {
 transform result (Cardinal::Grammar::primary) :language('PIR') {
     # Ask the child node for its result
     .local pmc child
-    $I0 = defined node['primary2']
-    unless $I0 goto err_no_tree
-    $P0 = node['primary2']
-    child = tree.get('result', $P0, 'Cardinal::Grammar::primary2')
-
-    .return (child)
-
-  err_no_tree:
-    print "The primary node doesn't contain a 'primary2' match.\n"
-    end
-}
-
-transform result (Cardinal::Grammar::primary2) :language('PIR') {
-    # Ask the child node for its result
-    .local pmc child
     $I0 = defined node['atom']
     unless $I0 goto err_no_tree
     $P0 = node['atom']
@@ -523,7 +495,7 @@ transform result (Cardinal::Grammar::primary2) :language('PIR') {
     .return (child)
 
   err_no_tree:
-    print "The primary2 node doesn't contain a 'atom' match.\n"
+    print "The primary node doesn't contain a 'atom' match.\n"
     end
 }
 
@@ -991,7 +963,7 @@ transform op (expr) :language('PIR') {
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter            # get entry
-      $P3 = tree.get('result', $P2, 'expr')
+      $P3 = tree.get('term', $P2, 'expr')
       if null $P3 goto iter_loop
       result.'add_child'($P3)
       goto iter_loop

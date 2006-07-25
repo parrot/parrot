@@ -21,8 +21,12 @@ puts(100)
 CODE
 100
 OUT
+
+TODO: {
+#local $TODO = "RubyFloatPMC needs to be implemented";
 language_output_is('cardinal', <<'CODE', <<'OUT', 'simple put test');
 puts(100.1)
 CODE
 100.1
 OUT
+}

@@ -107,7 +107,9 @@ CLEANUPS = \
 	$(PMCDIR)/*.c \
 	$(PMCDIR)/*.dump \
 	$(PMCDIR)/*$(O) \
-	$(PMCDIR)/*$(LOAD_EXT)
+	$(PMCDIR)/*$(LOAD_EXT) \
+  t/*.out \
+  t/*.rb
 
 clean: 
 	$(RM_RF) $(CLEANUPS)
