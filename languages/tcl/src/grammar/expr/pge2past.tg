@@ -231,8 +231,39 @@ transform result (integer) {
     result['class'] = "'TclInt'"
     .return (result)
 
-  hex: 
-    .return ()
+  hex:
+    $S0 = node
+    .local int len, digit, hex_value
+    len = length $S0
+    $I0 = 2 # skip 0x
+    hex_value = 0
+  hex_loop:
+    if $I0 == len goto hex_done
+    digit = ord $S0, $I0
+    # higher than Z - must be lowercase letter
+    if digit > 90 goto hex_lower
+    # higher than 9 - must be uppercase letter
+    if digit > 57 goto hex_upper
+    digit -= 48 # value of 0
+    goto hex_next
+  hex_lower:
+    digit -= 97 # value of a
+    digit += 10
+    goto hex_next
+  hex_upper:
+    digit -= 65 # value of A
+    digit += 10
+    # goto hex_next
+  hex_next:
+    hex_value *= 16
+    hex_value += digit
+    inc $I0
+    goto hex_loop
+
+  hex_done:
+    result['value'] = hex_value
+    result['class'] = "'TclInt'"
+    .return(result)
 
 }
 
