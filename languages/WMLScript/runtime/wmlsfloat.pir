@@ -51,8 +51,6 @@ See "WMLScript Standard Libraries Specification", section 8 "Float".
 Returns the integer part of the given value. If the value is already an integer,
 the result is the value itself.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value = Number
@@ -65,7 +63,22 @@ Integer or invalid.
 
 .sub _float_int :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $P0 = value
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseNumber()
+L1:
+    $I0 = isa $P0, "WmlsInvalid"
+    if $I0 goto L2
+    $I0 = $P0
+    new ret, .WmlsInteger
+    set ret, $I0
+    goto L3
+L2:
+    new ret, .WmlsInvalid
+L3:
+    .return (ret)
 .end
 
 
@@ -76,8 +89,6 @@ Integer or invalid.
 Returns the greatest integer value that is not greater than the given value. If
 the value is already an integer, the result is the value itself.
     
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value = Number
@@ -90,7 +101,23 @@ Integer or invalid.
 
 .sub _float_floor :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $P0 = value
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseNumber()
+L1:
+    $I0 = isa $P0, "WmlsInvalid"
+    if $I0 goto L2
+    $N0 = $P0
+    $I0 = floor $N0
+    new ret, .WmlsInteger
+    set ret, $I0
+    goto L3
+L2:
+    new ret, .WmlsInvalid
+L3:
+    .return (ret)
 .end
 
 
@@ -100,8 +127,6 @@ Integer or invalid.
 
 Returns the smallest integer value that is not less than the given value. If
 the value is already an integer, the result is the value itself.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -115,7 +140,23 @@ Integer or invalid.
 
 .sub _float_ceil :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $P0 = value
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseNumber()
+L1:
+    $I0 = isa $P0, "WmlsInvalid"
+    if $I0 goto L2
+    $N0 = $P0
+    $I0 = ceil $N0
+    new ret, .WmlsInteger
+    set ret, $I0
+    goto L3
+L2:
+    new ret, .WmlsInvalid
+L3:
+    .return (ret)
 .end
 
 
@@ -163,8 +204,6 @@ mathematical integer. If two integer number values are equally close to the
 value, the result is the larger number value. If the value is already an
 integer, the result is the value itself.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value = Number
@@ -177,7 +216,24 @@ Integer or invalid.
 
 .sub _float_round :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $P0 = value
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseNumber()
+L1:
+    $I0 = isa $P0, "WmlsInvalid"
+    if $I0 goto L2
+    $N0 = $P0
+    $N0 += 0.5
+    $I0 = floor $N0
+    new ret, .WmlsInteger
+    set ret, $I0
+    goto L3
+L2:
+    new ret, .WmlsInvalid
+L3:
+    .return (ret)
 .end
 
 
@@ -187,8 +243,6 @@ Integer or invalid.
 
 Returns an implementation-dependent approximation to the square root of
 the given value.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -206,7 +260,24 @@ If value is a negative number then invalid is returned.
 
 .sub _float_sqrt :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $P0 = value
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseNumber()
+L1:
+    $I0 = isa $P0, "WmlsInvalid"
+    if $I0 goto L2
+    $N0 = $P0
+    if $N0 < 0.0 goto L2
+    $N1 = sqrt $N0
+    new ret, .WmlsFloat
+    set ret, $N1
+    goto L3
+L2:
+    new ret, .WmlsInvalid
+L3:
+    .return (ret)
 .end
 
 
@@ -219,15 +290,15 @@ precision floating-point format.
 
 =head3 RETURN VALUE
 
-Floating-point 3.40282347E+38.
+Floating-point 3.40282347e+38.
 
 =cut
 
 .sub _float_maxFloat :anon
     .local pmc ret
     new ret, .WmlsFloat
-    ret = 3.40282347E+38
-    return (ret)
+    set ret, 3.40282347e+38
+    .return (ret)
 .end
 
 
@@ -241,15 +312,15 @@ single precision floating-point format.
 =head3 RETURN VALUE
 
 Floating-point. Smaller than or equal to the normalised minimum single
-precision floating-point value: 1.17549435E-38.
+precision floating-point value: 1.17549435e-38.
 
 =cut
 
 .sub _float_minFloat :anon
     .local pmc ret
     new ret, .WmlsFloat
-    ret = 1.17549435E-38
-    return (ret)
+    set ret, 1.17549435e-38
+    .return (ret)
 .end
 
 

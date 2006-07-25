@@ -29,14 +29,14 @@ extern function main()
     var a = 0;
     Console.println(a);
     Console.println(typeof a);
-    a = 123;
+    a = -123;
     Console.println(a);
     Console.println(typeof a);
 }
 CODE
 0
 0
-123
+-123
 0
 OUT
 
@@ -73,7 +73,7 @@ extern function main()
     a = 2.0;
     Console.println(a);
     Console.println(typeof a);
-    a = 1.23;
+    a = -1.23;
     Console.println(a);
     Console.println(typeof a);
 }
@@ -82,7 +82,7 @@ CODE
 1
 2
 1
-1.23
+-1.23
 1
 OUT
 
