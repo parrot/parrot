@@ -208,7 +208,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
     union {
         const void * __c_ptr;
         void * __ptr;
-    } __ptr_u;                  /* FIXME - THIS SHOULD NOT BE HERE */
+    } __ptr_u; /* for const_cast */
 
     PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class), PCD_OBJECT_VTABLE);
     VTABLE * const vtable           = PMC_struct_val(vtable_pmc);
