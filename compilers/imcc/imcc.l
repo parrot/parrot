@@ -24,18 +24,25 @@ struct params_t {
 };
 
 struct macro_t {
-    char *name;
     struct params_t params;
     char *expansion;
     int line;
 };
 
-/* XXX: boe: rework this hack to use a hash */
-#define N_MACROS 8192
-struct macro_t macros[N_MACROS];
-int num_macros = 0;
+/*
+ * XXX: The use of a cstring hash is good, pretty much.  But we're never
+ * clearing the hash, ever, which is bad, pretty much.
+ */
+static Hash *macros;
 
-char temp_buffer[4096];
+/*
+ * These have to be global because we don't have an imcc state structure yet
+ */
+static char *cur_macro_name;
+
+/* this is just a sign that we suck.  that's all. */
+static char temp_buffer[4096];
+
 
 /* parser state structure
  * the first few items are common to struct parser_state, but
@@ -58,6 +65,9 @@ struct macro_frame_t *frames = NULL;
 /* static function declariations */
 static void pop_parser_state(Interp* interp, void *yyscanner);
 static struct macro_frame_t *new_frame (Interp*);
+static void define_macro(Interp *interp, char *name, struct params_t *params,
+			 char *expansion, int start_line);
+static struct macro_t *find_macro(Interp *interp, const char *name);
 static void scan_string (struct macro_frame_t *frame, const char *expansion, void *yyscanner);
 static void scan_file (Interp* interp, struct macro_frame_t *frame, FILE *, void *yyscanner);
 static void destroy_frame (struct macro_frame_t *frame, void *yyscanner);
@@ -347,9 +357,8 @@ SP              [ ]
     }
 
 <emit>".constant" {
-        int c;
-    char *name;
-    struct macro_t *m;
+    int c;
+    int start_line;
 
     BEGIN(macro);
     c = yylex_skip(valp, interp, " ", yyscanner);
@@ -357,20 +366,17 @@ SP              [ ]
         IMCC_fataly(interp, E_SyntaxError,
            "Constant names must be identifiers");
 
-    name = str_dup(valp->s);
+    cur_macro_name = valp->s;
+    start_line = line;
 
     c = yylex_skip(valp, interp, " ", yyscanner);
         if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
         IMCC_fataly(interp, E_SyntaxError,
             "Constant '%s' value must be a number, "
-            "stringliteral or register", name);
+            "stringliteral or register", cur_macro_name);
 
-    if (num_macros >= N_MACROS)
-        internal_exception(1, "Too many macros/constants");
-    m = macros + num_macros++;
-    m->name = name;
-    m->expansion = str_dup (valp->s);
-    m->params.num_param = 0;
+    define_macro(interp, cur_macro_name, NULL, valp->s, start_line);
+    cur_macro_name = NULL;
 
     BEGIN (emit);
     return MACRO;
@@ -545,8 +551,7 @@ SP              [ ]
 
 <macro>"$"{ID}":"  return LABEL;
 <macro>".local"{WS}+ {
-        char *label;
-    char *name = macros[num_macros].name;
+    char *label;
 
     if (yylex(valp, yyscanner, interp) != LABEL)
             IMCC_fataly(interp, E_SyntaxError, "LABEL expected");
@@ -554,8 +559,8 @@ SP              [ ]
     if (valp) {
         YYCHOP();
 
-        label = mem_sys_allocate(strlen(name) + yyleng + 15);
-        sprintf(label, "local__%s__%s__$:", name, yytext+1);
+        label = mem_sys_allocate(strlen(cur_macro_name) + yyleng + 15);
+        sprintf(label, "local__%s__%s__$:", cur_macro_name, yytext+1);
 
         valp->s = label;
     }
@@ -564,12 +569,11 @@ SP              [ ]
     }
 
 <macro>".$"{ID} {
-        char *label;
-    char *name = macros[num_macros].name;
+    char *label;
 
     if (valp) {
-        label = mem_sys_allocate(strlen(name) + yyleng + 15);
-        sprintf(label, "local__%s__%s__$", name, yytext+2);
+        label = mem_sys_allocate(strlen(cur_macro_name) + yyleng + 15);
+        sprintf(label, "local__%s__%s__$", cur_macro_name, yytext+2);
 
         valp->s = label;
     }
@@ -773,12 +777,9 @@ static int
 read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
 {
     int c;
-    struct macro_t *m = macros + num_macros;
-    int start_cond;
+    int start_cond, start_line;
+    struct params_t params;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-
-    if (num_macros >= N_MACROS)
-        internal_exception(1, "Too many macros");
 
     temp_buffer[0]='\0';
 
@@ -790,8 +791,9 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
         IMCC_fataly(interp, E_SyntaxError,
                 "Macro names must be identifiers");
 
-    m->name = valp->s;
-    m->line = line;
+    cur_macro_name = valp->s;
+    start_line = line;
+    memset(&params, 0, sizeof(struct params_t));
 
     /* white space is allowed between macro and opening paren) */
     c = yylex_skip(valp, interp, " ", yyscanner);
@@ -799,7 +801,7 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
     if (c == '(') {
         free(valp->s);
 
-        c = read_params(NULL, interp, &m->params, m->name, 1, yyscanner);
+        c = read_params(NULL, interp, &params, cur_macro_name, 1, yyscanner);
 
         c = yylex(valp, yyscanner, interp);
     }
@@ -807,7 +809,11 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
     while (c != ENDM) {
         if (c <= 0)
             IMCC_fataly(interp, E_SyntaxError,
-                    "File ended before macro '%s' was complete", m->name);
+                    "File ended before macro '%s' was complete", cur_macro_name);
+
+	if (strlen(temp_buffer) + strlen(valp->s) >= sizeof temp_buffer)
+            IMCC_fataly(interp, E_SyntaxError,
+                    "Macro '%s' is too big", cur_macro_name);
 
         strcat(temp_buffer, valp->s);
         free(valp->s);
@@ -817,9 +823,10 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
     free(valp->s);
 
     BEGIN(start_cond);
-    macros[num_macros].expansion = str_dup(temp_buffer);
 
-    num_macros++;
+    define_macro(interp, cur_macro_name, &params, str_dup(temp_buffer), start_line);
+    cur_macro_name = NULL;
+
     return MACRO;
 }
 
@@ -842,16 +849,47 @@ find_macro_param (const char *name)
     return NULL;
 }
 
-static struct macro_t *
-find_macro (const char* name)
-{
-    int i;
+static void
+define_macro(Interp *interp, char *name, struct params_t *params,
+	     char *expansion, int start_line) {
+    struct macro_t *m;
 
-    for (i = 0; i < num_macros; i++) {
-        if (strcmp(name, macros[i].name) == 0) return macros + i;
+    m = find_macro(interp, name);
+
+    if (m) {
+	mem_sys_free(name);
+        mem_sys_free(m->expansion);
+    }
+    else {
+        m = mem_sys_allocate(sizeof(struct macro_t));
+        memset(m, 0, sizeof(struct macro_t));
+
+        if (!macros)
+	    parrot_new_cstring_hash(interp, &macros);
+	parrot_hash_put(interp, macros, name, m);
     }
 
-    return NULL;
+    if (params)
+        m->params = *params;
+    else
+        memset(&m->params, 0, sizeof(struct params_t));
+    m->expansion = expansion;
+    m->line = start_line;
+}
+
+static struct macro_t *
+find_macro(Interp *interp, const char *name)
+{
+    struct macro_t *m;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;			/* for const_cast */
+
+    if (!macros)
+	return NULL;
+
+    return parrot_hash_get(interp, macros, const_cast(name));
 }
 
 static int
@@ -883,7 +921,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
         return 1;
     }
 
-    m = find_macro(name);
+    m = find_macro(interp, name);
     if (m) {
         frame = new_frame(interp);
         frame->params = &m->params;
@@ -902,7 +940,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
             if (m->params.num_param != 0)
                 IMCC_fataly(interp, E_SyntaxError,
                         "Macro '%s' needs %d arguments",
-                        m->name, m->params.num_param);
+                        name, m->params.num_param);
             scan_string(frame, m->expansion, yyscanner);
             return 1;
         }
@@ -910,7 +948,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
         start_cond = YY_START;
         BEGIN(macro);
 
-        read_params (NULL, interp, &frame->expansion, m->name, 0, yyscanner);
+        read_params (NULL, interp, &frame->expansion, name, 0, yyscanner);
 
         BEGIN(start_cond);
 
@@ -922,7 +960,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
         if (frame->expansion.num_param != m->params.num_param) {
             IMCC_fataly(interp, E_SyntaxError,
                     "Macro '%s' requires %d arguments, but %d given",
-                    m->name, m->params.num_param, frame->expansion.num_param);
+                    name, m->params.num_param, frame->expansion.num_param);
         }
 
         /* expand arguments */
