@@ -6,7 +6,7 @@
 
 # XXX put this in a namespace to avoid global pollution
 
-# XXX TODO: todo, skip, skip_all
+# XXX TODO: skip_all
 
 set very_bad_global_variable_test_num   0
 
@@ -18,21 +18,25 @@ proc plan {number} {
     }
 }
 
-proc is {value expected args}  {
+# The special argument, if passed, should be a two element list, e.g.
+# {TODO "message"}
+proc is {value expected {description ""} {special {}}}  {
     global very_bad_global_variable_test_num
     incr   very_bad_global_variable_test_num
 
-    if {$args eq ""} {
-      set description "- $args"
-    } {
-      set description {}
-    }
+    if {[llength $special] == 2} {
+        set description " # $special"
+    } else {
+        if  {$description ne ""} {
+            set description " - $description"
+        }
+    } 
 
     if {$value eq $expected} {
-        puts "ok $very_bad_global_variable_test_num $description"
+        puts "ok $very_bad_global_variable_test_num$description"
         return 1
     } {
-        puts "not ok $very_bad_global_variable_test_num $description"
+        puts "not ok $very_bad_global_variable_test_num$description"
 
         # XXX escape strings.
         puts "#      got : '$value'"
@@ -42,53 +46,41 @@ proc is {value expected args}  {
 }
 
 # XXX Need to handle the case where we expect an exception.
-proc eval_is {code expected args}  {
-    global very_bad_global_variable_test_num
-    incr   very_bad_global_variable_test_num
-
-    if {$args eq ""} {
-      set description "- $args"
-    } {
-      set description ""
+proc eval_is {code expected {description ""} {special {}}}  {
+    # The one case where skip actually means "don't do that"
+    if {[llength $special] == 2} {
+        set special_type [lindex $special 1]
+        if {$special_type eq "SKIP"} {
+            puts "ok $very_bad_global_variable_test_num $special"
+            return 1
+        }
     }
-
     # Ignore exceptions for the moment
-    set result [catch {eval $code} actual]
-
-    if {$actual eq $expected} {
-        puts "ok $very_bad_global_variable_test_num $description"
-        return 1
-    } {
-        puts "not ok $very_bad_global_variable_test_num $description"
-
-        # XXX escape strings.
-        puts "#      got : '$actual'"
-        puts "# expected : '$expected'"
-        return 0 
-    }
+    catch {eval $code} actual
+    is $actual $expected $description $special
 }
 
-proc ok {code args}  {
-    is $code 1 $args
+proc ok {value {description ""} {special {}}}  {
+    is $value 1 $description $special
 }
 
-proc not_ok {code args} {
-    set test_code "expr ! \[eval {$code}\]"
-    return [ok $test_code $args]
+proc not_ok {value {description ""} {special {}}} {
+    set value [expr !$value]
+    ok $value $description $special
 }
 
 
 # NOTE: This doesn't work in tcl-current, because we can't parse:
 # XXX : expr {"[eval {set a "aok"}]" ne "bork"}
-proc isnt {code expected args}  {
+proc isnt {code expected {description ""} {special {}}}  {
     set code     "\"\[eval {$code}\]\""
     set expected "\"$expected\""
 
-    return [cmp_ok $code ne $expected $args]
+    cmp_ok $code ne $expected $description $special
 }
 
-proc cmp_ok {left op right args} {
-  return [ok "expr {$left $op $right}" $args]
+proc cmp_ok {left op right {description ""} {special {}}} {
+    ok "expr {$left $op $right}" $description $special
 }
 
 proc diag {diagnostic} {
@@ -100,7 +92,7 @@ proc diag {diagnostic} {
 
 # A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description code output} {
-  return [eval_is $code $output "$num: $description"]
+    eval_is $code $output "$num: $description"
 }
 
 # A very big hack placeholder to avoid transform

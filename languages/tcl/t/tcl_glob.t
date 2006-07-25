@@ -1,86 +1,49 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3;
-use Test::More;
-use vars qw($TODO);
+source lib/test_more.tcl
 
-language_output_is("tcl",<<'TCL',<<OUT,"wildcards");
-  puts [string match {b?n*a} banana]
-  puts [string match {b?n*a} bznza]
-  puts [string match {b?n*a} bana]
+plan 29
 
-  puts [string match {b?n*a} bnan]
+    ok [string match {b?n*a} banana]
+    ok [string match {b?n*a} bznza]
+    ok [string match {b?n*a} bana]
 
-  puts [string match {b\?n*a} b?nana]
-  puts [string match {b\?n*a} banana]
-  puts [string match {b?n\*a} ban*a]
-  puts [string match {b?n\*a} banana]
+not_ok [string match {b?n*a} bnan]
 
-  puts [string match {?n?*} bnan]
-  puts [string match {?n?*} ana]
-  puts [string match {?n?*} an]
-TCL
-1
-1
-1
-0
-1
-0
-1
-0
-1
-1
-0
-OUT
+    ok [string match {b\?n*a} b?nana]
+not_ok [string match {b\?n*a} banana]
+    ok [string match {b?n\*a} ban*a]
+not_ok [string match {b?n\*a} banana]
 
-TODO: {
-local $TODO="globbing needs to be specialised for Tcl";
-language_output_is("tcl",<<'TCL',<<OUT,"character classes");
-  puts [string match {[ab]*} apple]
-  puts [string match {[ab]*} boot]
-  puts [string match {[ab]*} a]
+    ok [string match {?n?*} bnan]
+    ok [string match {?n?*} ana]
+not_ok [string match {?n?*} an]
 
-  puts [string match {[ab]*} ring]
+set TODO {TODO "globbing needs to be specialised for Tcl"}
 
-  puts [string match {[0-9]} 0]
-  puts [string match {[0-9]} 5]
-  puts [string match {[0-9]} 9]
-  puts [string match {[0-9]} a]
+# character classes
 
-  puts [string match {[^d-f]} z]
-  puts [string match {[^d-f]} c]
-  puts [string match {[!d-f]} g]
-  puts [string match {[!d-f]} d]
-  puts [string match {[^d-f]} e]
-  puts [string match {[^d-f]} f]
-TCL
-1
-1
-1
-0
-1
-1
-1
-0
-0
-0
-0
-1
-1
-1
-OUT
+    ok [string match {[ab]*} apple] "" $TODO
+    ok [string match {[ab]*} boot]  "" $TODO
+    ok [string match {[ab]*} a]     "" $TODO
 
-language_output_is("tcl",<<'TCL',<<OUT,"braces should be literal");
-  puts [string match {{az,bz}} "{az,bz}"]
-  puts [string match {{az,bz}} "bz"]
-  puts [string match {[a-z]{5}} "b{5}"]
-  puts [string match {[a-z]{5}} "bbbbb"]
-TCL
-1
-0
-1
-0
-OUT
-}
+not_ok [string match {[ab]*} ring]  "" $TODO
+
+    ok [string match {[0-9]} 0]     "" $TODO
+    ok [string match {[0-9]} 5]     "" $TODO
+    ok [string match {[0-9]} 9]     "" $TODO
+not_ok [string match {[0-9]} a]     "" $TODO
+
+not_ok [string match {[^d-f]} z]    "" $TODO
+not_ok [string match {[^d-f]} c]    "" $TODO
+not_ok [string match {[!d-f]} g]    "" $TODO
+    ok [string match {[!d-f]} d]    "" $TODO
+    ok [string match {[^d-f]} e]    "" $TODO
+    ok [string match {[^d-f]} f]    "" $TODO
+
+# braces should be literal
+
+    ok [string match {{az,bz}} "{az,bz}"] "" $TODO
+not_ok [string match {{az,bz}} "bz"]      "" $TODO
+    ok [string match {[a-z]{5}} "b{5}"]   "" $TODO
+not_ok [string match {[a-z]{5}} "bbbbb"]  "" $TODO
