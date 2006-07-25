@@ -33,6 +33,7 @@ token comment {
 token word {
     <subcommand>
   | <quoted>
+  | <braced>
   | <variable>
   | <constant>
 }
