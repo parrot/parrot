@@ -19,7 +19,7 @@
     target = adverbs['target']
 
     .local pmc match
-    $P0 = get_hll_global "PGE::Grammar", "p5regex"
+    $P0 = get_hll_global ["PGE::Grammar"], "p5regex"
     match = $P0(source)
     if target != 'parse' goto check
     .return (match)
@@ -60,7 +60,7 @@
 .sub "p5regex"
     .param pmc mob
     .local pmc optable
-    optable = get_hll_global "PGE::P5Regex", "$optable"
+    optable = get_hll_global ["PGE::P5Regex"], "$optable"
     $P0 = optable."parse"(mob)
     .return ($P0)
 .end
@@ -77,9 +77,9 @@
 
     $I0 = find_type "PGE::OPTable"
     optable = new $I0
-    set_hll_global "PGE::P5Regex", "$optable", optable
+    set_hll_global ["PGE::P5Regex"], "$optable", optable
 
-    $P0 = get_hll_global "PGE::P5Regex", "parse_lit"
+    $P0 = get_hll_global ["PGE::P5Regex"], "parse_lit"
     optable.addtok("term:", "", "nows", $P0)
     optable.addtok("term:\\b", "term:", "nows", "PGE::Exp::Anchor")
     optable.addtok("term:\\B", "term:", "nows", "PGE::Exp::Anchor")
@@ -96,11 +96,11 @@
     optable.addtok("circumfix:( )", "term:", "nows,nullterm", 'PGE::Exp::CGroup')
     optable.addtok("circumfix:(?: )", "term:", "nows,nullterm", 'PGE::Exp::Group')
 
-    $P0 = get_hll_global "PGE::P5Regex", "parse_enumclass"
+    $P0 = get_hll_global ["PGE::P5Regex"], "parse_enumclass"
     optable.addtok("term:[", "", "nows", $P0)
     optable.addtok("term:.", "", "nows", $P0)
 
-    $P0 = get_hll_global "PGE::P5Regex", "parse_quant"
+    $P0 = get_hll_global ["PGE::P5Regex"], "parse_quant"
     optable.addtok("postfix:*", "<term:", "left,nows", $P0)
     optable.addtok("postfix:+", "postfix:*", "left,nows", $P0)
     optable.addtok("postfix:?", "postfix:*", "left,nows", $P0)
@@ -112,7 +112,7 @@
     optable.addtok("close:}", "<infix:|", "nows")            # XXX: hack
     optable.addtok("close:]", "close:}", "nows")             # XXX: hack
 
-    $P0 = get_hll_global "PGE::P5Regex", "compile_p5regex"
+    $P0 = get_hll_global ["PGE::P5Regex"], "compile_p5regex"
     compreg "PGE::P5Regex", $P0
 .end
 
@@ -124,7 +124,7 @@
     .local int pos, lastpos
     .local int litstart, litlen
     .local string initchar
-    newfrom = get_hll_global "PGE::Match", "newfrom"
+    newfrom = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, $P0, $P1) = newfrom(mob, 0, "PGE::Exp::Literal")
     pos = $P0
     lastpos = length target
@@ -174,7 +174,7 @@
     .local pmc mfrom, mpos
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Quant")
     pos = mfrom
     lastpos = length target
@@ -230,7 +230,7 @@
     .local string target
     .local pmc mfrom, mpos
     .local int pos, lastpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::CGroup")
     pos = mfrom
     inc pos
@@ -253,7 +253,7 @@
     .local string charlist
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::EnumCharList")
     pos = mfrom
     if key == '.' goto dot

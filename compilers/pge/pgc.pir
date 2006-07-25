@@ -209,7 +209,7 @@ OPTIONS
 
     # get our initial match object
     .local pmc match 
-    $P0 = get_hll_global 'PGE::Match', 'newfrom'
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
     match = $P0(source, 0, 'PGE::P6Grammar')
 
     .local pmc stmtrule
@@ -251,7 +251,7 @@ OPTIONS
     $P0 = ns['optable']
     if $P0 == '' goto iter_loop
     initpir.emit("          optable = new 'PGE::OPTable'")
-    initpir.emit("          set_hll_global '%0', '$optable', optable", namespace)
+    initpir.emit("          set_hll_global ['%0'], '$optable', optable", namespace)
     initpir .= $P0
     goto iter_loop
   iter_end:
@@ -343,7 +343,7 @@ OPTIONS
       .sub "%1"
         .param pmc mob
         .param pmc adverbs :named :slurpy
-        $P0 = get_hll_global "%0", "$optable"
+        $P0 = get_hll_global ["%0"], "$optable"
         .return $P0.'parse'(mob, adverbs :named :flat)
       .end
       END
@@ -409,7 +409,7 @@ OPTIONS
     if $S0 != '&' goto trait_parsed_1
     arg = substr arg, 1
   trait_parsed_1:
-    optable.emit("          $P0 = get_hll_global '%0', '%1'", namespace, arg)
+    optable.emit("          $P0 = get_hll_global ['%0'], '%1'", namespace, arg)
     arg = '$P0'
   trait_arg:
     if arg > '' goto trait_arg_2

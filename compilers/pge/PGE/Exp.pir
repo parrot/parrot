@@ -65,7 +65,7 @@ tree as a PIR code object that can be compiled.
     .local pmc exp
     .local string explabel
     exp = self
-    set_hll_global 'PGE::Exp', '$!group', exp
+    set_hll_global ['PGE::Exp'], '$!group', exp
     exp = exp.reduce(self)
 
     ##   we don't need a coroutine if :ratchet is set
@@ -565,11 +565,11 @@ tree as a PIR code object that can be compiled.
     .local pmc group
     ##   Temporarily store this group as the current group.  Any
     ##   cut nodes we encounter will set a cutmark into this group.
-    group = get_hll_global 'PGE::Exp', '$!group'
-    set_hll_global 'PGE::Exp', '$!group', self
+    group = get_hll_global ['PGE::Exp'], '$!group'
+    set_hll_global ['PGE::Exp'], '$!group', self
     exp = self[0]
     exp = exp.reduce(next)
-    set_hll_global 'PGE::Exp', '$!group', group
+    set_hll_global ['PGE::Exp'], '$!group', group
     $I0 = self['cutmark']
     if $I0 > 0 goto keep_group
     $I0 = self['iscapture']
@@ -725,7 +725,7 @@ tree as a PIR code object that can be compiled.
         %L: # grammar subrule %0::%1
           (captob, $P9, $P9, $P0) = captscope.'newfrom'(pos, '%0')
           $P0 = pos
-          $P0 = get_hll_global '%0', '%1'
+          $P0 = get_hll_global ['%0'], '%1'
         CODE
     goto subrule_match
 
@@ -1107,7 +1107,7 @@ tree as a PIR code object that can be compiled.
     ##   This node is cutting a group.  We need to
     ##   get the current group's cutmark, or set
     ##   one if it doesn't already have one.
-    group = get_hll_global 'PGE::Exp', '$!group'
+    group = get_hll_global ['PGE::Exp'], '$!group'
     cutmark = group['cutmark']
     if cutmark > 0 goto has_cutmark
     $P1 = new 'PGE::CodeString'
@@ -1321,7 +1321,7 @@ tree as a PIR code object that can be compiled.
           $S0 = concat %2, ':"'
           $S1 = %3
           $S0 .= $S1
-          $P0 = get_hll_global 'PGE::Match', '%!cache'
+          $P0 = get_hll_global ['PGE::Match'], '%!cache'
           $I0 = exists $P0[$S0]
           if $I0 goto %0_1
           $P1 = compreg %2

@@ -40,7 +40,7 @@ Match an identifier.
     .local pmc mfrom, mpos
     .local int pos, lastpos
 
-    $P0 = get_hll_global 'PGE::Match', 'newfrom'
+    $P0 = get_hll_global ["PGE::Match"], 'newfrom'
     (mob, target, mfrom, mpos) = $P0(mob)
 
     pos = mfrom
@@ -66,7 +66,7 @@ Match a null string (always returns true on first match).
 .sub "null"
     .param pmc mob
     .local pmc target, mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     assign mpos, mfrom
     .return (mob)    
@@ -80,7 +80,7 @@ Force a backtrack.  (Taken from A05.)
 
 .sub "fail"
     .param pmc mob
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     .return $P0(mob)
 .end
 
@@ -94,7 +94,7 @@ Match a single uppercase character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_UPPERCASE, target, $I0
@@ -114,7 +114,7 @@ Match a single lowercase character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_LOWERCASE, target, $I0
@@ -134,7 +134,7 @@ Match a single alphabetic character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_ALPHABETIC, target, $I0
@@ -154,7 +154,7 @@ Match a single digit.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_NUMERIC, target, $I0
@@ -174,7 +174,7 @@ Match a single alphanumeric character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_HEXADECIMAL, target, $I0
@@ -194,7 +194,7 @@ Match a single whitespace character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_WHITESPACE, target, $I0
@@ -214,7 +214,7 @@ Match a single printable character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_PRINTING, target, $I0
@@ -234,7 +234,7 @@ Match a single "graphical" character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_GRAPHICAL, target, $I0
@@ -254,7 +254,7 @@ Match a single "blank" character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_BLANK, target, $I0
@@ -274,7 +274,7 @@ Match a single "control" character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_CONTROL, target, $I0
@@ -294,7 +294,7 @@ Match a single punctuation character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_PUNCTUATION, target, $I0
@@ -314,7 +314,7 @@ Match a single alphanumeric character.
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $I1 = is_cclass .CCLASS_ALPHANUMERIC, target, $I0
@@ -334,7 +334,7 @@ Match a single space character.  (Taken from E05.)
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $S0 = substr target, $I0, 1
@@ -354,7 +354,7 @@ Match a single left angle bracket.  (Taken from E05.)
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $S0 = substr target, $I0, 1
@@ -374,7 +374,7 @@ Match a single right angle bracket. (Taken from E05.)
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $S0 = substr target, $I0, 1
@@ -394,7 +394,7 @@ Match a single dot ('.').  (Taken from E05.)
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     $I0 = mfrom
     $S0 = substr target, $I0, 1
@@ -419,7 +419,7 @@ Match whitespace between tokens.
     .const .Sub corou = "ws_corou"
     nextchars = ""
   ws_1:
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     lastpos = length target
     pos = mfrom
@@ -482,7 +482,7 @@ Perl 5's \b regex).
     .local string target
     .local pmc mfrom, mpos
     .local int pos
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob)
     pos = mfrom
     if pos == 0 goto succeed

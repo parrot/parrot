@@ -90,7 +90,7 @@ or the resulting PIR code (target='PIR').
 
   parse:
     ##   Let's parse the source as a regex
-    $P0 = get_hll_global 'PGE::Grammar', 'regex'
+    $P0 = get_hll_global ['PGE::Grammar'], 'regex'
     match = $P0(source, adverbs :flat :named)
     if target != 'parse' goto check
     .return (match)
@@ -160,8 +160,8 @@ parse valid Perl 6 regular expressions.
     .local string stop
     .local pmc stopstack, optable, match
 
-    stopstack = get_hll_global 'PGE::P6Regex', '@!stopstack'
-    optable = get_hll_global 'PGE::P6Regex', '$optable'
+    stopstack = get_hll_global ['PGE::P6Regex'], '@!stopstack'
+    optable = get_hll_global ['PGE::P6Regex'], '$optable'
 
     stop = adverbs['stop']
     push stopstack, stop
@@ -274,13 +274,13 @@ needed for compiling regexes.
 
     # Create and store closure preprocessors in %closure_pp
     $P0 = new .Hash
-    set_hll_global 'PGE::P6Regex', '%closure_pp', $P0
-    $P1 = get_hll_global 'PGE::P6Regex', 'PIR_closure'
+    set_hll_global ['PGE::P6Regex'], '%closure_pp', $P0
+    $P1 = get_hll_global ['PGE::P6Regex'], 'PIR_closure'
     $P0["PIR"] = $P1
 
     # Create an array for holding stop tokens
     $P0 = new .ResizablePMCArray
-    set_hll_global 'PGE::P6Regex', '@!stopstack', $P0
+    set_hll_global ['PGE::P6Regex'], '@!stopstack', $P0
 
     $P0 = get_global 'compile_p6regex'
     compreg 'PGE::P6Regex', $P0
@@ -308,7 +308,7 @@ Return a failed match if the stoptoken is found.
     lastpos = length target
 
     .local string stop
-    $P0 = get_hll_global 'PGE::P6Regex', '@!stopstack'
+    $P0 = get_hll_global ['PGE::P6Regex'], '@!stopstack'
     stop = $P0[-1]
 
     .local string initchar
@@ -588,7 +588,7 @@ anchors, and match subscripts.
     .local int pos, lastpos
     .local pmc newfrom, mfrom, mpos
     .local string cname
-    newfrom = get_hll_global 'PGE::Match', 'newfrom'
+    newfrom = get_hll_global ['PGE::Match'], 'newfrom'
     $P0 = getattribute mob, '$.target'
     target = $P0
     $P0 = getattribute mob, '$.pos'
@@ -693,7 +693,7 @@ Parses a subrule token.
     inc pos
     mpos = pos
     .local pmc regex
-    regex = get_hll_global 'PGE::Grammar', 'regex'
+    regex = get_hll_global ['PGE::Grammar'], 'regex'
     $P1 = regex(mob, 'stop'=>'>')
     unless $P1 goto end
     $S0 = $P1
@@ -892,7 +892,7 @@ Parse a modifier.
     .local string target
     .local pmc mfrom, mpos
     .local int pos, len
-    $P0 = get_hll_global "PGE::Match", "newfrom"
+    $P0 = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Closure")
     pos = mfrom
     len = 2
@@ -1331,7 +1331,7 @@ Parse a modifier.
     lang = pad['lang']
     self['lang'] = lang
     # see if we need to do any pre-processing of the closure
-    closure_pp = get_hll_global 'PGE::P6Regex', '%closure_pp'
+    closure_pp = get_hll_global ['PGE::P6Regex'], '%closure_pp'
     $I0 = defined closure_pp[lang]
     if $I0 == 0 goto end
     closure_fn = closure_pp[lang]

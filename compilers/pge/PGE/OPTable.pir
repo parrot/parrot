@@ -93,7 +93,7 @@ Adds (or replaces) a syntactic category's defaults.
     key = substr name, $I0
 
     .local pmc sctable, token
-    sctable = get_hll_global "PGE::OPTable", "%!sctable"
+    sctable = get_hll_global ["PGE::OPTable"], "%!sctable"
     $I0 = exists sctable[syncat]
     if $I0 == 0 goto token_hash
     token = sctable[syncat]
@@ -273,7 +273,7 @@ Adds (or replaces) a syntactic category's defaults.
     operstack = new .ResizablePMCArray
     termstack = new .ResizablePMCArray
 
-    newfrom = get_hll_global "PGE::Match", "newfrom"
+    newfrom = get_hll_global ["PGE::Match"], "newfrom"
     (mob, target, mfrom, mpos) = newfrom(mob, 0)
     pos = mfrom
     lastpos = length target
