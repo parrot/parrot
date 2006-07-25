@@ -19,20 +19,20 @@ not_ok [string match {b?n\*a} banana]
     ok [string match {?n?*} ana]
 not_ok [string match {?n?*} an]
 
-set TODO {TODO "globbing needs to be specialised for Tcl"}
-
 # character classes
 
-    ok [string match {[ab]*} apple] "" $TODO
-    ok [string match {[ab]*} boot]  "" $TODO
-    ok [string match {[ab]*} a]     "" $TODO
+    ok [string match {[ab]*} apple] ""
+    ok [string match {[ab]*} boot]  ""
+    ok [string match {[ab]*} a]     ""
 
-not_ok [string match {[ab]*} ring]  "" $TODO
+not_ok [string match {[ab]*} ring]  ""
 
-    ok [string match {[0-9]} 0]     "" $TODO
-    ok [string match {[0-9]} 5]     "" $TODO
-    ok [string match {[0-9]} 9]     "" $TODO
-not_ok [string match {[0-9]} a]     "" $TODO
+    ok [string match {[0-9]} 0]     ""
+    ok [string match {[0-9]} 5]     ""
+    ok [string match {[0-9]} 9]     ""
+not_ok [string match {[0-9]} a]     ""
+
+set TODO {TODO "globbing needs to be specialised for Tcl"}
 
 not_ok [string match {[^d-f]} z]    "" $TODO
 not_ok [string match {[^d-f]} c]    "" $TODO
@@ -46,4 +46,4 @@ not_ok [string match {[!d-f]} g]    "" $TODO
     ok [string match {{az,bz}} "{az,bz}"] "" $TODO
 not_ok [string match {{az,bz}} "bz"]      "" $TODO
     ok [string match {[a-z]{5}} "b{5}"]   "" $TODO
-not_ok [string match {[a-z]{5}} "bbbbb"]  "" $TODO
+not_ok [string match {[a-z]{5}} "bbbbb"]  ""
