@@ -1,5 +1,9 @@
 #!/usr/bin/perl
-$PREAMBLE =<<"END";
+
+use strict;
+use warnings;
+
+my $PREAMBLE = <<'END';
 .include 'interpinfo.pasm'
 .macro unless_defined ( x, l )
     .sym int result
@@ -22,11 +26,11 @@ $PREAMBLE =<<"END";
 .endm
 END
 
-$FILENAME = "src/preamble";
-open $GH, ">$FILENAME";
+my $FILENAME = 'src/preamble';
+open my $GH, '>', $FILENAME;
 print $GH $PREAMBLE;
 close $GH;
 
-`cat src/preamble src/ASTGrammar.pir > src/ASTGrammar_gen.pir`;
+`perl -MExtUtils::Command -e cat src/preamble src/ASTGrammar.pir > src/ASTGrammar_gen.pir`;
 #unlink $FILENAME;
 
