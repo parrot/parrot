@@ -3,6 +3,7 @@
 # Setup some commands
 LN_S     = @lns@
 PERL     = @perl@
+RM_F     = @rm_f@
 RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
 BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
@@ -41,7 +42,7 @@ src/CardinalGrammar.pbc: src/CardinalGrammar.pir src/cardinal_rules.pg src/cardi
 
 src/ASTGrammar.pbc: src/ASTGrammar.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/ASTGrammar.pir src/ASTGrammar.tg
-	perl genit.pl
+	$(PERL) genit.pl
 	$(PARROT) -o src/ASTGrammar.pbc --output-pbc src/ASTGrammar_gen.pir 
 
 src/OSTGrammar.pbc: src/OSTGrammar.tg
@@ -86,9 +87,10 @@ test: all
 	$(PERL) -Isrc -I../../src t/harness
 
 testclean:
-	$(RM_F) "t/*.p1" "t/*.out" "t/*.pir"
+	$(RM_F) "t/*.rb" "t/*.out" "t/*.pir"
 
 CLEANUPS = \
+	cardinal.pbc \
 	src/cardinal_rules.pbc \
 	src/cardinal_optok.pbc \
 	src/cardinal_grammar_gen.pir \
@@ -97,6 +99,7 @@ CLEANUPS = \
 	src/ASTGrammar.pbc \
 	src/OSTGrammar.pbc \
 	src/PIRGrammar.pbc \
+	src/ASTGrammar_gen.pir \
 	src/ASTGrammar.pir \
 	src/OSTGrammar.pir \
 	src/PIRGrammar.pir \
