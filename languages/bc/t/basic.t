@@ -13,6 +13,7 @@ Very basic checks.
 
 use strict;
 use warnings;
+use 5.006_001;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
@@ -61,7 +62,7 @@ my @tests = (
        [ '12345678', [ 12345678 ], 'another positive int',   with_past => 1, with_antlr3 => 1  ],
 
        # single negative integer 
-       [ '-1', [ -1 ], 'negative int 1',                     with_past => 1, with_antlr3 => 0  ],
+       [ '-1', [ -1 ], 'negative one',                       with_past => 1, with_antlr3 => 0  ],
        [ '-12345678', [ -12345678 ], 'another negative int', with_past => 1, with_antlr3 => 0  ],
 
        # multiple lines
@@ -97,7 +98,7 @@ my @tests = (
        [ '1.2 *2 - 2.0 + 3', '3.4' ],
 
        # binary PLUS
-       [ '1 + 2', '3' ],
+       [ '1 + 2', '3', 'two summands', with_antlr3 => 1 ],
        [ '1 + 2 + 3', '6' ],
        [ '1 + 0 + 3', '4' ],
        [ '1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14', '105', 'Gauss was right' ],

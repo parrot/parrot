@@ -1,14 +1,15 @@
 // Copyright (C) 2006, The Perl Foundation.
 // $Id$
 
-// Transform ANTLR PAST to PIR that sets up PAST and does the execution
+// Transform ANTLR PAST to PIR that sets up a PAST data structure
+// let the Parrot Compiler Tools handle the execution.
 
 tree grammar AntlrPast2PirPast;
 
 options
 {
   ASTLabelType = CommonTree;
-  tokenVocab   = BcParser;
+  tokenVocab   = BcParser;      // Token file is found because of '-lib' option
 }
 
 gen_pir_past 

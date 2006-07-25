@@ -15,7 +15,6 @@ options
 tokens 
 {
   PROGRAM;
-  UNARY_MINUS;
 } 
 
 program 
@@ -27,14 +26,29 @@ input_item
   ;
 
 expression
+  : adding_expression
+  ;
+
+adding_expression
+  : multiplying_expression ( (PLUS^^ | MINUS^^) multiplying_expression)* 
+  ;
+
+multiplying_expression
   : INT
-    |
-    '-' expression -> ^( UNARY_MINUS expression )
   ;
 
 INT
   : ('0'..'9')+
   ;
+
+MINUS
+  : '-'
+  ;
+
+PLUS
+  : '+'
+  ;
+
 
 // quit is required, make testing easier
 quit
