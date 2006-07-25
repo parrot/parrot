@@ -88,15 +88,12 @@ op find_lex(out PMC, in STR) {
 
 =item B<get_namespace>(out PMC)
 
-Get current namespace.
+Set $1 to the current namespace.
 
 =item B<get_namespace>(out PMC, inconst KEY)
 
-=item B<get_namespace>(out PMC, in STR)
-
-Get the specified namespace relative to the current namespace. $2 is either
-an array of names or a key.  If the namespace doesn't exist, $1 is set to
-PMCNULL.
+Set $1 to the namespace denoted by the key constant $2, relative to the
+current namespace.  If the namespace doesn't exist, $1 is set to null.
 
 =cut
 
@@ -108,29 +105,27 @@ op get_namespace(out PMC) {
 
 op get_namespace(out PMC, inconst KEY) {
     PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
-    PMC *ns = VTABLE_get_pmc_keyed(interpreter, cur_ns, $2);
+    PMC *ns = Parrot_get_namespace_keyed(interpreter, cur_ns, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
 op get_namespace(out PMC, in STR) {
     PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
-    PMC *ns = VTABLE_get_pmc_keyed_str(interpreter, cur_ns, $2);
+    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, cur_ns, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
 =item B<get_hll_namespace>(out PMC)
 
-Get current HLL root namespace.
+Set $1 to the current HLL root namespace.
 
 =item B<get_hll_namespace>(out PMC, inconst KEY)
 
-=item B<get_hll_namespace>(out PMC, in STR)
-
-Get the specified namespace relative to the current HLL root namespace.  $2
-is either an array of names or a key.  If the namespace doesn't exist, $1 is
-set to PMCNULL.
+Set $1 to the namespace denoted by the key constant $2, relative to the
+current HLL root namespace.  If the namespace doesn't exist, $1 is set to
+null.
 
 =cut
 
@@ -142,46 +137,263 @@ op get_hll_namespace(out PMC) {
 
 op get_hll_namespace(out PMC, inconst KEY) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
-    PMC *ns = VTABLE_get_pmc_keyed(interpreter, hll_ns, $2);
+    PMC *ns = Parrot_get_namespace_keyed(interpreter, hll_ns, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
 op get_hll_namespace(out PMC, in STR) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
-    PMC *ns = VTABLE_get_pmc_keyed_str(interpreter, hll_ns, $2);
+    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, hll_ns, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
 =item B<get_root_namespace>(out PMC)
 
-Get interpreter root namespace.
+Set $1 to the true root namespace.
 
 =item B<get_root_namespace>(out PMC, inconst KEY)
 
-=item B<get_root_namespace>(out PMC, in STR)
-
-Get the specified namespace relative to the interpreter root namespace.  $2
-is either an array of names or a key.  If the namespace doesn't exist, $1 is
-set to PMCNULL.
+Set $1 to the namespace denoted by the key constant $2, relative to the true
+root namespace.  If the namespace doesn't exist, $1 is set to null.
 
 =cut
 
 op get_root_namespace(out PMC) {
-    $1 = interpreter->root_namespace;
+    PMC * const root_ns = interpreter->root_namespace;
+    $1 = root_ns;
     goto NEXT();
 }
 
 op get_root_namespace(out PMC, inconst KEY) {
-    PMC *ns = VTABLE_get_pmc_keyed(interpreter, interpreter->root_namespace, $2);
+    PMC * const root_ns = interpreter->root_namespace;
+    PMC *ns = Parrot_get_namespace_keyed(interpreter, root_ns, $2);
     $1 = ns ? ns : PMCNULL;
     goto NEXT();
 }
 
 op get_root_namespace(out PMC, in STR) {
-    PMC *ns = VTABLE_get_pmc_keyed_str(interpreter, interpreter->root_namespace, $2);
+    PMC * const root_ns = interpreter->root_namespace;
+    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, root_ns, $2);
     $1 = ns ? ns : PMCNULL;
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Global variable 'get' opcodes
+
+=over 4
+
+=item B<get_global>(out PMC, in STR)
+
+Set $1 to the global named $2 in current namespace.  If the global doesn't
+exist, $1 is set to null.
+
+=item B<get_global>(out PMC, inconst KEY, in STR)
+
+Set $1 to the global named $3 in the namespace denoted by the key constant
+$2, relative to the current namespace.  If the namespace or the global
+doesn't exist, $1 is set to null.
+
+=cut
+
+op get_global(out PMC, in STR) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    $1 = Parrot_find_global_op(interpreter, cur_ns, $2, expr NEXT());
+    goto NEXT();
+}
+
+op get_global(out PMC, inconst KEY, in STR) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    PMC *ns = Parrot_get_namespace_keyed(interpreter, cur_ns, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
+    goto NEXT();
+}
+
+op get_global(out PMC, in STR, in STR) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, cur_ns, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
+    goto NEXT();
+}
+
+=item B<get_hll_global>(out PMC, in STR)
+
+Set $1 to the global named $2 in the current HLL root namespace.  If the
+global doesn't exist, $1 is set to null.
+
+=item B<get_hll_global>(out PMC, inconst KEY, in STR)
+
+Set $1 to the global named $3 in the namespace denoted by the key constant
+$2, relative to the current HLL root namespace.  If the namespace or the
+global doesn't exist, $1 is set to null.
+
+=cut
+
+op get_hll_global(out PMC, in STR) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    $1 = Parrot_find_global_op(interpreter, hll_ns, $2, expr NEXT());
+    goto NEXT();
+}
+
+op get_hll_global(out PMC, inconst KEY, in STR) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    PMC *ns = Parrot_get_namespace_keyed(interpreter, hll_ns, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
+    goto NEXT();
+}
+
+op get_hll_global(out PMC, in STR, in STR) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, hll_ns, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
+    goto NEXT();
+}
+
+=item B<get_root_global>(out PMC, in STR)
+
+Set $1 to the global named $2 in the true root namespace.  If the global
+doesn't exist, $1 is set to null.
+
+=item B<get_root_global>(out PMC, inconst KEY, in STR)
+
+Set $1 to the global named $3 in the namespace denoted by the key constant
+$2, relative to the true root namespace.  If the namespace or the global
+doesn't exist, $1 is set to null.
+
+=cut
+
+op get_root_global(out PMC, in STR) {
+    PMC * const root_ns = interpreter->root_namespace;
+    $1 = Parrot_find_global_op(interpreter, root_ns, $2, expr NEXT());
+    goto NEXT();
+}
+
+op get_root_global(out PMC, inconst KEY, in STR) {
+    PMC * const root_ns = interpreter->root_namespace;
+    PMC *ns = Parrot_get_namespace_keyed(interpreter, root_ns, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
+    goto NEXT();
+}
+
+op get_root_global(out PMC, in STR, in STR) {
+    PMC * const root_ns = interpreter->root_namespace;
+    PMC *ns = Parrot_get_namespace_keyed_str(interpreter, root_ns, $2);
+    $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Global variable 'set' opcodes
+
+=over 4
+
+=item B<set_global>(in STR, in PMC)
+
+Set the global named $1 in the current namespace to $2.
+
+=item B<set_global>(inconst KEY, in STR, in PMC)
+
+Set the global named $2 in the namespace denoted by the key constant $1,
+relative to the current namespace, to $3.  If the namespace does not exist,
+it is created.
+
+=cut
+
+op set_global(in STR, in PMC) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    Parrot_set_global(interpreter, cur_ns, $1, $2);
+    goto NEXT();
+}
+
+op set_global(inconst KEY, in STR, in PMC) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    PMC *ns = Parrot_make_namespace_keyed(interpreter, cur_ns, $1);
+    Parrot_set_global(interpreter, ns, $2, $3);
+    goto NEXT();
+}
+
+op set_global(in STR, in STR, in PMC) {
+    PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+    PMC *ns = Parrot_make_namespace_keyed_str(interpreter, cur_ns, $1);
+    Parrot_set_global(interpreter, ns, $2, $3);
+    goto NEXT();
+}
+
+=item B<set_hll_global>(in STR, in PMC)
+
+Set $1 to the global named $2 in the current HLL root namespace.  If the
+global doesn't exist, $1 is set to null.
+
+=item B<set_hll_global>(inconst KEY, in STR, in PMC)
+
+Set $1 to the global named $3 in the namespace denoted by the key constant
+$2, relative to the current HLL root namespace.  If the namespace or the
+global doesn't exist, $1 is set to null.
+
+=cut
+
+op set_hll_global(in STR, in PMC) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    Parrot_set_global(interpreter, hll_ns, $1, $2);
+    goto NEXT();
+}
+
+op set_hll_global(inconst KEY, in STR, in PMC) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    PMC *ns = Parrot_make_namespace_keyed(interpreter, hll_ns, $1);
+    Parrot_set_global(interpreter, ns, $2, $3);
+    goto NEXT();
+}
+
+op set_hll_global(in STR, in STR, in PMC) {
+    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interpreter);
+    PMC *ns = Parrot_make_namespace_keyed_str(interpreter, hll_ns, $1);
+    Parrot_set_global(interpreter, ns, $2, $3);
+    goto NEXT();
+}
+
+=item B<set_root_global>(in STR, in PMC)
+
+Set $1 to the global named $2 in the true root namespace.  If the global
+doesn't exist, $1 is set to null.
+
+=item B<set_root_global>(inconst KEY, in STR, in PMC)
+
+Set $1 to the global named $3 in the namespace denoted by the key constant
+$2, relative to the true root namespace.  If the namespace or the global
+doesn't exist, $1 is set to null.
+
+=cut
+
+op set_root_global(in STR, in PMC) {
+    PMC * const root_ns = interpreter->root_namespace;
+    Parrot_set_global(interpreter, root_ns, $1, $2);
+    goto NEXT();
+}
+
+op set_root_global(inconst KEY, in STR, in PMC) {
+    PMC * const root_ns = interpreter->root_namespace;
+    PMC *ns = Parrot_make_namespace_keyed(interpreter, root_ns, $1);
+    Parrot_set_global(interpreter, ns, $2, $3);
+    goto NEXT();
+}
+
+op set_root_global(in STR, in STR, in PMC) {
+    PMC * const root_ns = interpreter->root_namespace;
+    PMC *ns = Parrot_make_namespace_keyed_str(interpreter, root_ns, $1);
+    Parrot_set_global(interpreter, ns, $2, $3);
     goto NEXT();
 }
 

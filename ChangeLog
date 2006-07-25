@@ -1,6 +1,11 @@
 #1 $Id$
 
-2006.07.xx    audreyt
+2006.07.24    chip
+	further implementation of new pdd21:
+	* new opcodes {get,set}*global
+	  (old {find,store}*global will be supported for a short while)
+
+2006.07.20    audreyt
 	* --maintainer prerequesites are now bison 2.2+ and flex 2.5.3x
 	  (or some such --leo) 
           (at the moment code is checking for 2.0 -- ambs)
