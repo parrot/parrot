@@ -141,6 +141,12 @@ if {[catch {package require tcltest 2.1}]} {
     return
 }
 END_TCL
+    <<'END_TCL',
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest 2.1
+    namespace import -force ::tcltest::*
+}
+END_TCL
     );
 
     foreach my $prelude (@preludes) {
