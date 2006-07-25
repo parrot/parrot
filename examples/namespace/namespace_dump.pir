@@ -24,6 +24,16 @@ lp:
     unless it goto ex
     $S0 = shift it
     $P0 = it[$S0]
+    # there might be a smy with the same name as a namespace
+    $P1 = ns.'get_sym'($S0)
+    if null $P1 goto no_sym
+    eq_addr $P0, $P1, no_sym
+    print spac
+    print $S0
+    print " => "
+    print $P1
+    print "\n"
+no_sym:
     $I0 = typeof $P0
     if $I0 != .NCI goto no_nci
     $P0 = new .String

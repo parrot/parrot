@@ -347,6 +347,30 @@ either a string or an array of strings.
 
 /*
 
+=item C<METHOD PMC* get_sym(STRING* name)>
+
+Return the symbol (var or sub) with the given name. This can be used
+to retrieve symbols, if a NameSpace with the same name exists. 
+
+=cut
+
+*/
+
+    METHOD PMC* get_sym(STRING* key) {
+        PMC *ns = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+        if (!ns)
+            return PMCNULL;
+        if (ns->vtable == SELF->vtable) {
+            /* it's a NameSpace */
+            return PMCNULL;
+        }
+        if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
+                ns->vtable->base_type == enum_class_FixedPMCArray)
+            ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
+        return ns;
+    }
+/*
+
 =item C<METHOD PMC* make_namespace(PMC* nsloc)>
 
 Find or (if necessary) create a sub-namespace of SELF denoted by the given
