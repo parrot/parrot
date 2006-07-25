@@ -133,20 +133,6 @@ op_fullname(char * dest, const char * name, SymReg * args[],
 #endif
 }
 
-int
-get_keyvec(Parrot_Interp interpreter, int op)
-{
-    int i, k;
-    op_info_t * op_info = &interpreter->op_info_table[op];
-    for (i = k = 0; i < op_info->op_count - 1; i++)
-        if (op_info->types[i] == PARROT_ARG_K ||
-            op_info->types[i] == PARROT_ARG_KC ||
-            op_info->types[i] == PARROT_ARG_KI ||
-            op_info->types[i] == PARROT_ARG_KIC)
-            k |= KEY_BIT(i);
-    return k;
-}
-
 /*
  * Return opcode value for op name
  */
