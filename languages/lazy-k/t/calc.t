@@ -30,11 +30,21 @@ use Test::More tests => 1;
 use Parrot::Config;
 use File::Spec();
 
+my $is_win32  = $^O eq 'MSWin32';
+
 my $parrot    = File::Spec->catfile( File::Spec->updir(), $PConfig{test_prog} );
 my $lazy_k    = $parrot . q{ } . File::Spec->catfile( 'lazy-k', 'lazy.pir' );
 my $calc_lazy = File::Spec->catfile( 'lazy-k', 'calc.lazy' ); 
 
 # XXX This does not look portable.
-my $cmd = qq{echo '1+2*3' | $lazy_k $calc_lazy};
+my $cmd;
+if ($is_win32) {
+    # Don't quote the string on Windows, it is passed on literally
+    $cmd = qq{echo 1+2*3 | $lazy_k $calc_lazy};
+}
+else {
+    $cmd = qq{echo '1+2*3' | $lazy_k $calc_lazy};
+}
+
 # die Dumper( $cmd );
 is( `$cmd`, "7\n", 'calc.lazy' );
