@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-07-25 23:45:43
+// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-07-26 23:32:55
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -28,11 +28,11 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
     // $ANTLR start gen_pir_past
-    // grammar/antlr_3/antlr_past2pir_past.g:15:1: gen_pir_past : ^( PROGRAM ( expr )+ ) ;
+    // grammar/antlr_3/antlr_past2pir_past.g:15:1: gen_pir_past : ^( PROGRAM ( expression )+ ) ;
     public void gen_pir_past() throws RecognitionException {   
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:17:3: ( ^( PROGRAM ( expr )+ ) )
-            // grammar/antlr_3/antlr_past2pir_past.g:17:3: ^( PROGRAM ( expr )+ )
+            // grammar/antlr_3/antlr_past2pir_past.g:17:3: ( ^( PROGRAM ( expression )+ ) )
+            // grammar/antlr_3/antlr_past2pir_past.g:17:3: ^( PROGRAM ( expression )+ )
             {
 
                 String pirBefore =
@@ -44,13 +44,18 @@ public class AntlrPast2PirPast extends TreeParser {
                   + "  # entering gen_pir_past                                         \n"
                   + ".sub bc :main                                                     \n"
                   + "  load_bytecode 'languages/punie/lib/ASTGrammar.pir'              \n"
+                  + "  load_bytecode 'languages/punie/lib/PunieOpLookup.pir'           \n"              
                   + "  load_bytecode 'TGE.pbc'                                         \n"
                   + "  load_bytecode 'PAST.pbc'                                        \n"
                   + "  load_bytecode 'languages/punie/lib/POST.pir'                    \n"
                   + "  load_bytecode 'languages/punie/lib/OSTGrammar.pir'              \n"
                   + "                                                                  \n"
-                  + "  # set up register names                                         \n"
-                  + "  .sym pmc reg_expr_1, reg_expr_2, reg_expr_3, reg_expr_4         \n"
+                  + "  # set up named registers                                        \n"
+                  + "  .sym pmc reg_adding_expression                                  \n"
+                  + "  .sym pmc reg_adding_expression_plus                             \n"
+                  + "  .sym pmc reg_int_expression_left                                \n"
+                  + "  .sym pmc reg_int_expression_right                               \n"
+                  + "  .sym pmc reg_expr_2, reg_expr_3, reg_expr_4                     \n"
                   + "  .sym pmc reg_expr_5, reg_expr_6, reg_expr_7, reg_expr_8         \n"
                   + "  .sym pmc reg_expr_9, reg_expr_10                                \n"
                   + "                                                                  \n"
@@ -64,23 +69,23 @@ public class AntlrPast2PirPast extends TreeParser {
             match(input,PROGRAM,FOLLOW_PROGRAM_in_gen_pir_past59); 
 
             match(input, Token.DOWN, null); 
-            // grammar/antlr_3/antlr_past2pir_past.g:44:13: ( expr )+
+            // grammar/antlr_3/antlr_past2pir_past.g:49:13: ( expression )+
             int cnt1=0;
             loop1:
             do {
                 int alt1=2;
                 int LA1_0 = input.LA(1);
-                if ( (LA1_0==INT) ) {
+                if ( (LA1_0==PLUS||LA1_0==INT) ) {
                     alt1=1;
                 }
 
 
                 switch (alt1) {
             	case 1 :
-            	    // grammar/antlr_3/antlr_past2pir_past.g:44:13: expr
+            	    // grammar/antlr_3/antlr_past2pir_past.g:49:13: expression
             	    {
-            	    pushFollow(FOLLOW_expr_in_gen_pir_past61);
-            	    expr();
+            	    pushFollow(FOLLOW_expression_in_gen_pir_past61);
+            	    expression();
             	    _fsp--;
 
 
@@ -101,6 +106,8 @@ public class AntlrPast2PirPast extends TreeParser {
 
                   String pirAfter = 
                       "                                                                \n"
+                    + "  # say 'AST tree dump:'                                        \n"
+                    + "  # stmts.dump()                                                \n"
                     + "  # Compile the abstract syntax tree                            \n"
                     + "  # down to an opcode syntax tree                               \n"
                     + "  .sym string ost_tg_src                                        \n"
@@ -177,66 +184,24 @@ public class AntlrPast2PirPast extends TreeParser {
     }
     // $ANTLR end gen_pir_past
 
-    public static class expr_int_1_return extends TreeRuleReturnScope {
-    };
 
-    // $ANTLR start expr_int_1
-    // grammar/antlr_3/antlr_past2pir_past.g:112:1: expr_int_1 : INT ;
-    public expr_int_1_return expr_int_1() throws RecognitionException {   
-        expr_int_1_return retval = new expr_int_1_return();
-        retval.start = input.LT(1);
-
+    // $ANTLR start expression
+    // grammar/antlr_3/antlr_past2pir_past.g:119:1: expression : adding_expression ;
+    public void expression() throws RecognitionException {   
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:114:3: ( INT )
-            // grammar/antlr_3/antlr_past2pir_past.g:114:3: INT
+            // grammar/antlr_3/antlr_past2pir_past.g:121:3: ( adding_expression )
+            // grammar/antlr_3/antlr_past2pir_past.g:121:3: adding_expression
             {
-            match(input,INT,FOLLOW_INT_in_expr_int_185); 
-
-            }
-
-        }
-        catch (RecognitionException re) {
-            reportError(re);
-            recover(input,re);
-        }
-        finally {
-            retval.stop = input.LT(-1);
-
-        }
-        return retval;
-    }
-    // $ANTLR end expr_int_1
-
-
-    // $ANTLR start expr
-    // grammar/antlr_3/antlr_past2pir_past.g:118:1: expr returns [String reg] : expr_int_1 ;
-    public String expr() throws RecognitionException {   
-        String reg = null;
-
-        expr_int_1_return expr_int_11 = null;
-
-
-
-              reg = "reg_expr_1";
-            
-        try {
-            // grammar/antlr_3/antlr_past2pir_past.g:124:3: ( expr_int_1 )
-            // grammar/antlr_3/antlr_past2pir_past.g:124:3: expr_int_1
-            {
-            pushFollow(FOLLOW_expr_int_1_in_expr116);
-            expr_int_11=expr_int_1();
+            pushFollow(FOLLOW_adding_expression_in_expression85);
+            adding_expression();
             _fsp--;
 
 
                   String pir = 
                       "                                                                \n"
-                    + "# entering 'expr_int_1'                                         \n"
-                    + "reg_expr_1 = new 'PAST::Val'                                    \n"
-                    + "reg_expr_1.value( " + input.toString(expr_int_11.start,expr_int_11.stop) + " )                    \n"
-                    + "reg_expr_1.valtype( 'num' )                                     \n"
-                    + "# leaving expr                                                  \n"
+                    + "    # entering 'expression'                                     \n"
                     + "               reg_expr_2 = new 'PAST::Exp'                     \n"
-                    + "               reg_expr_2.'add_child'( reg_expr_1 )             \n"
+                    + "               reg_expr_2.'add_child'( reg_adding_expression )  \n"
                     + "       reg_expr_3 = new 'PAST::Op'                              \n"
                     + "       reg_expr_3.'add_child'( reg_expr_2 )                     \n"
                     + "       reg_expr_3.'op'( 'print' )                               \n"
@@ -258,7 +223,7 @@ public class AntlrPast2PirPast extends TreeParser {
                     + "  reg_expr_10 = new 'PAST::Stmt'                                \n"
                     + "  reg_expr_10.'add_child'( reg_expr_9 )                         \n"
                     + "  stmts.'add_child'( reg_expr_10 )                              \n"
-                    + "# leaving 'expr_int_1'                                          \n"
+                    + "# leaving 'expression'                                          \n"
                     + "                                                                \n"
                     ;
                   System.out.println( pir );    
@@ -273,16 +238,210 @@ public class AntlrPast2PirPast extends TreeParser {
         }
         finally {
         }
-        return reg;
+        return ;
     }
-    // $ANTLR end expr
+    // $ANTLR end expression
+
+
+    // $ANTLR start int_expression
+    // grammar/antlr_3/antlr_past2pir_past.g:156:1: int_expression : INT ;
+    public void int_expression() throws RecognitionException {   
+        CommonTree INT1=null;
+
+        try {
+            // grammar/antlr_3/antlr_past2pir_past.g:158:3: ( INT )
+            // grammar/antlr_3/antlr_past2pir_past.g:158:3: INT
+            {
+            INT1=(CommonTree)input.LT(1);
+            match(input,INT,FOLLOW_INT_in_int_expression106); 
+
+                  String pir = 
+                      "                                                                \n"
+                    + "# entering 'INT'                                                \n"
+                    + "reg_adding_expression = new 'PAST::Val'                         \n"
+                    + "reg_adding_expression.value( " + INT1.getText() + " )                \n"
+                    + "reg_adding_expression.valtype( 'num' )                          \n"
+                    + "# leaving INT                                                   \n"
+                    ;
+                  System.out.println( pir );    
+                
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return ;
+    }
+    // $ANTLR end int_expression
+
+
+    // $ANTLR start int_expression_left
+    // grammar/antlr_3/antlr_past2pir_past.g:172:1: int_expression_left : INT ;
+    public void int_expression_left() throws RecognitionException {   
+        CommonTree INT2=null;
+
+        try {
+            // grammar/antlr_3/antlr_past2pir_past.g:174:3: ( INT )
+            // grammar/antlr_3/antlr_past2pir_past.g:174:3: INT
+            {
+            INT2=(CommonTree)input.LT(1);
+            match(input,INT,FOLLOW_INT_in_int_expression_left127); 
+
+                  String pir = 
+                      "                                                                \n"
+                    + "# entering 'int_expression_left'                                \n"
+                    + "reg_int_expression_left = new 'PAST::Val'                       \n"
+                    + "reg_int_expression_left.value( " + INT2.getText() + " )              \n"
+                    + "reg_int_expression_left.valtype( 'num' )                        \n"
+                    + "# leaving 'int_expression_left'                                 \n"
+                    ;
+                  System.out.println( pir );    
+                
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return ;
+    }
+    // $ANTLR end int_expression_left
+
+
+    // $ANTLR start int_expression_right
+    // grammar/antlr_3/antlr_past2pir_past.g:188:1: int_expression_right : INT ;
+    public void int_expression_right() throws RecognitionException {   
+        CommonTree INT3=null;
+
+        try {
+            // grammar/antlr_3/antlr_past2pir_past.g:190:3: ( INT )
+            // grammar/antlr_3/antlr_past2pir_past.g:190:3: INT
+            {
+            INT3=(CommonTree)input.LT(1);
+            match(input,INT,FOLLOW_INT_in_int_expression_right148); 
+
+                  String pir = 
+                      "                                                                \n"
+                    + "# entering 'int_expression_right'                               \n"
+                    + "reg_int_expression_right = new 'PAST::Val'                      \n"
+                    + "reg_int_expression_right.value( " + INT3.getText() + " )             \n"
+                    + "reg_int_expression_right.valtype( 'num' )                       \n"
+                    + "# leaving 'int_expression_right'                                \n"
+                    ;
+                  System.out.println( pir );    
+                
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return ;
+    }
+    // $ANTLR end int_expression_right
+
+
+    // $ANTLR start adding_expression
+    // grammar/antlr_3/antlr_past2pir_past.g:204:1: adding_expression : ( int_expression | ^( PLUS int_expression_left int_expression_right ) );
+    public void adding_expression() throws RecognitionException {   
+        try {
+            // grammar/antlr_3/antlr_past2pir_past.g:206:3: ( int_expression | ^( PLUS int_expression_left int_expression_right ) )
+            int alt2=2;
+            int LA2_0 = input.LA(1);
+            if ( (LA2_0==INT) ) {
+                alt2=1;
+            }
+            else if ( (LA2_0==PLUS) ) {
+                alt2=2;
+            }
+            else {
+                NoViableAltException nvae =
+                    new NoViableAltException("204:1: adding_expression : ( int_expression | ^( PLUS int_expression_left int_expression_right ) );", 2, 0, input);
+
+                throw nvae;
+            }
+            switch (alt2) {
+                case 1 :
+                    // grammar/antlr_3/antlr_past2pir_past.g:206:3: int_expression
+                    {
+                    pushFollow(FOLLOW_int_expression_in_adding_expression169);
+                    int_expression();
+                    _fsp--;
+
+
+                    }
+                    break;
+                case 2 :
+                    // grammar/antlr_3/antlr_past2pir_past.g:208:3: ^( PLUS int_expression_left int_expression_right )
+                    {
+                    match(input,PLUS,FOLLOW_PLUS_in_adding_expression179); 
+
+                    match(input, Token.DOWN, null); 
+                    pushFollow(FOLLOW_int_expression_left_in_adding_expression181);
+                    int_expression_left();
+                    _fsp--;
+
+                    pushFollow(FOLLOW_int_expression_right_in_adding_expression183);
+                    int_expression_right();
+                    _fsp--;
+
+
+                    match(input, Token.UP, null); 
+
+                          String pir = 
+                              "                                                                \n"
+                            + "# entering 'PLUS int_expression_left int_expression_right '     \n"
+                            + "       reg_adding_expression = new 'PAST::Exp'                  \n"
+                            + "       reg_adding_expression_plus = new 'PAST::Op'              \n"
+                            + "       reg_adding_expression_plus.'add_child'( reg_int_expression_left )   \n"
+                            + "       reg_adding_expression_plus.'add_child'( reg_int_expression_right )  \n"
+                            + "       reg_adding_expression_plus.'op'( 'infix:+' )             \n"
+                            + "       reg_adding_expression.'add_child'( reg_adding_expression_plus )     \n"
+                            + "# leaving 'PLUS int_expression_left int_expression_right'       \n"
+                            ;
+                          System.out.println( pir );    
+                        
+
+                    }
+                    break;
+
+            }
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return ;
+    }
+    // $ANTLR end adding_expression
 
 
  
 
     public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past59 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expr_in_gen_pir_past61 = new BitSet(new long[]{0x0000000000000088L});
-    public static final BitSet FOLLOW_INT_in_expr_int_185 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expr_int_1_in_expr116 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_gen_pir_past61 = new BitSet(new long[]{0x00000000000000A8L});
+    public static final BitSet FOLLOW_adding_expression_in_expression85 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INT_in_int_expression106 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INT_in_int_expression_left127 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INT_in_int_expression_right148 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_int_expression_in_adding_expression169 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PLUS_in_adding_expression179 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_int_expression_left_in_adding_expression181 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_int_expression_right_in_adding_expression183 = new BitSet(new long[]{0x0000000000000008L});
 
 }

@@ -24,7 +24,7 @@ public class Bc
     // Parsing, generating PAST in ANTLR
     BcParser parser = new BcParser(tokens);
     BcParser.program_return antlrPast = parser.program();
-    // System.out.println("tree: "+((Tree)antlrPast.tree).toStringTree());
+    //System.out.println("tree: "+((Tree)antlrPast.tree).toStringTree());
     
     // Printing out PIR, that sets up PAST in PIR
     System.setOut( new PrintStream( new FileOutputStream( pirFn ) ) );

@@ -24,13 +24,18 @@ gen_pir_past
       + "  # entering gen_pir_past                                         \n"
       + ".sub bc :main                                                     \n"
       + "  load_bytecode 'languages/punie/lib/ASTGrammar.pir'              \n"
+      + "  load_bytecode 'languages/punie/lib/PunieOpLookup.pir'           \n"              
       + "  load_bytecode 'TGE.pbc'                                         \n"
       + "  load_bytecode 'PAST.pbc'                                        \n"
       + "  load_bytecode 'languages/punie/lib/POST.pir'                    \n"
       + "  load_bytecode 'languages/punie/lib/OSTGrammar.pir'              \n"
       + "                                                                  \n"
-      + "  # set up register names                                         \n"
-      + "  .sym pmc reg_expr_1, reg_expr_2, reg_expr_3, reg_expr_4         \n"
+      + "  # set up named registers                                        \n"
+      + "  .sym pmc reg_adding_expression                                  \n"
+      + "  .sym pmc reg_adding_expression_plus                             \n"
+      + "  .sym pmc reg_int_expression_left                                \n"
+      + "  .sym pmc reg_int_expression_right                               \n"
+      + "  .sym pmc reg_expr_2, reg_expr_3, reg_expr_4                     \n"
       + "  .sym pmc reg_expr_5, reg_expr_6, reg_expr_7, reg_expr_8         \n"
       + "  .sym pmc reg_expr_9, reg_expr_10                                \n"
       + "                                                                  \n"
@@ -41,10 +46,12 @@ gen_pir_past
       ;
     System.out.println( pirBefore );    
   }
-  ^(PROGRAM expr+ )
+  ^(PROGRAM expression+ )
     {
       String pirAfter = 
           "                                                                \n"
+        + "  # say 'AST tree dump:'                                        \n"
+        + "  # stmts.dump()                                                \n"
         + "  # Compile the abstract syntax tree                            \n"
         + "  # down to an opcode syntax tree                               \n"
         + "  .sym string ost_tg_src                                        \n"
@@ -109,29 +116,15 @@ gen_pir_past
     }
   ;
 
-expr_int_1
+expression
   :
-  INT
-  ;
-
-
-expr returns [String reg]
-  @init
-    {
-      $reg = "reg_expr_1";
-    }
-  :
-  expr_int_1
+  adding_expression
     {
       String pir = 
           "                                                                \n"
-        + "# entering 'expr_int_1'                                         \n"
-        + "reg_expr_1 = new 'PAST::Val'                                    \n"
-        + "reg_expr_1.value( " + $expr_int_1.text + " )                    \n"
-        + "reg_expr_1.valtype( 'num' )                                     \n"
-        + "# leaving expr                                                  \n"
+        + "    # entering 'expression'                                     \n"
         + "               reg_expr_2 = new 'PAST::Exp'                     \n"
-        + "               reg_expr_2.'add_child'( reg_expr_1 )             \n"
+        + "               reg_expr_2.'add_child'( reg_adding_expression )  \n"
         + "       reg_expr_3 = new 'PAST::Op'                              \n"
         + "       reg_expr_3.'add_child'( reg_expr_2 )                     \n"
         + "       reg_expr_3.'op'( 'print' )                               \n"
@@ -153,8 +146,77 @@ expr returns [String reg]
         + "  reg_expr_10 = new 'PAST::Stmt'                                \n"
         + "  reg_expr_10.'add_child'( reg_expr_9 )                         \n"
         + "  stmts.'add_child'( reg_expr_10 )                              \n"
-        + "# leaving 'expr_int_1'                                          \n"
+        + "# leaving 'expression'                                          \n"
         + "                                                                \n"
+        ;
+      System.out.println( pir );    
+    }
+  ;
+
+int_expression
+  :
+  INT
+    {
+      String pir = 
+          "                                                                \n"
+        + "# entering 'INT'                                                \n"
+        + "reg_adding_expression = new 'PAST::Val'                         \n"
+        + "reg_adding_expression.value( " + $INT.text + " )                \n"
+        + "reg_adding_expression.valtype( 'num' )                          \n"
+        + "# leaving INT                                                   \n"
+        ;
+      System.out.println( pir );    
+    }
+  ;
+
+int_expression_left
+  :
+  INT
+    {
+      String pir = 
+          "                                                                \n"
+        + "# entering 'int_expression_left'                                \n"
+        + "reg_int_expression_left = new 'PAST::Val'                       \n"
+        + "reg_int_expression_left.value( " + $INT.text + " )              \n"
+        + "reg_int_expression_left.valtype( 'num' )                        \n"
+        + "# leaving 'int_expression_left'                                 \n"
+        ;
+      System.out.println( pir );    
+    }
+  ;
+
+int_expression_right
+  :
+  INT
+    {
+      String pir = 
+          "                                                                \n"
+        + "# entering 'int_expression_right'                               \n"
+        + "reg_int_expression_right = new 'PAST::Val'                      \n"
+        + "reg_int_expression_right.value( " + $INT.text + " )             \n"
+        + "reg_int_expression_right.valtype( 'num' )                       \n"
+        + "# leaving 'int_expression_right'                                \n"
+        ;
+      System.out.println( pir );    
+    }
+  ;
+
+adding_expression
+  :
+  int_expression
+  |
+  ^( PLUS int_expression_left int_expression_right )
+    {
+      String pir = 
+          "                                                                \n"
+        + "# entering 'PLUS int_expression_left int_expression_right '     \n"
+        + "       reg_adding_expression = new 'PAST::Exp'                  \n"
+        + "       reg_adding_expression_plus = new 'PAST::Op'              \n"
+        + "       reg_adding_expression_plus.'add_child'( reg_int_expression_left )   \n"
+        + "       reg_adding_expression_plus.'add_child'( reg_int_expression_right )  \n"
+        + "       reg_adding_expression_plus.'op'( 'infix:+' )             \n"
+        + "       reg_adding_expression.'add_child'( reg_adding_expression_plus )     \n"
+        + "# leaving 'PLUS int_expression_left int_expression_right'       \n"
         ;
       System.out.println( pir );    
     }
