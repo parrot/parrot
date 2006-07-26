@@ -396,76 +396,49 @@ transform nullop (PAST::Op) :language('PIR') {
 }
 
 transform puts_op (PAST::Op) :language('PIR') {
-    # This fairly lengthy bit collapses comma ops, by traversing down
-    # the tree and yanking up the children of the comma op to the
-    # current level.
-
-    $P1 = node.children()
-    $I0 = elements node 
-    if $I0 > 1 goto no_munge
-      $P2 = $P1[0]
-      $S3 = typeof $P2
-    unless $S3 == 'PAST::Exp' goto no_munge
-      $P3 = $P2.children()
-      $P4 = $P3[0]
-      $S3 = typeof $P4
-    unless $S3 == 'PAST::Op' goto no_munge
-      $S4 = $P4.op()
-    unless $S4 == 'O_COMMA' goto no_munge
-      $P1 = $P4.'child_iter'()
-  no_munge:
-     # Done collapsing comma ops
 
     # Create a node to contain the generated ops.
     .local pmc newops
     .local string opname
     newops = new 'POST::Ops'
     newops.'clone'(node)
-    opname = node.op()
     opname = 'print'
 
-    # Iterate through the children of the node, and generate the result
-    # for each child.
+    $P1 = node.children()
     .local pmc iter
     iter = new Iterator, $P1
     iter = 0
   iter_loop:
-    unless iter goto iter_end         # while (entries) ...
-      shift $P2, iter
-      $P3 = tree.get('result', $P2)
-      $S1 = typeof $P3
-      $P5 = new 'POST::Op'
-      $P5.'clone'(node)
-      $P5.'op'(opname)
-      $S1 = typeof $P3
-      if $S1 == 'POST::Ops' goto complex_result # the argument has setup
-	# The default case, create a new 'print' op node with the child
-	# as an argument and push it on the list of new ops.
-        $P5.'add_child'($P3)
-        newops.'add_child'($P5)
-        goto iter_loop
-      complex_result:
-	# The complex case, retrieve the temp variable from the Ops
-	# node, and push the Ops node on the list of new ops. Then
-	# create a new 'print' op node with the temp variable as an
-	# argument and push it on the list of new ops.
-        $P1 = $P3.tmpvar()
-        newops.'add_child'($P3)
-        $P5.'add_child'($P1)
-        newops.'add_child'($P5)
-      goto iter_loop
-  iter_end:
+    unless iter goto iter_end   
+    shift $P2, iter
+    $P1 = tree.get('result', $P2)
+    $P5 = new 'POST::Op'
+    $P5.'clone'(node)
+    $P5.'op'(opname)
+    $S1 = typeof $P1
+    
+    unless $S1 == 'POST::Ops' goto result
+    # add Ops if complex
+    newops.'add_child'($P1)
+    $P1 = $P1.tmpvar()
+    # add result op
+  result:
+    $P5.'add_child'($P1)
+    newops.'add_child'($P5)
 
-  #Add newline at the end
-      $P5 = new 'POST::Op'
-      $P5.'clone'(node)
-      $P5.'op'(opname)
-      $P3 = new 'POST::Val'
-      $P3.'clone'(node)
-      $P3.'value'("\\n")
-      $P3.'valtype'('strqq')
-      $P5.'add_child'($P3)
-      newops.'add_child'($P5)
+    $P5 = new 'POST::Op'
+    $P5.'clone'(node)
+    $P5.'op'(opname)
+    $P3 = new 'POST::Val'
+    $P3.'clone'(node)
+    $P3.'value'("\\n")
+    $P3.'valtype'('strqq')
+    $P5.'add_child'($P3)
+    newops.'add_child'($P5)
+    
+    goto iter_loop
+
+  iter_end:
 
     .return (newops)
 }

@@ -9,6 +9,7 @@ TODO: {
 
 language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
 a=1
+puts a
 CODE
 OUT
 }

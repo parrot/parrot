@@ -13,7 +13,8 @@ rule compound_statement {<statements>? <?terminators>?}
 #if x then <compound_statement> end
 #style statements
 #rule statements {<?terminators>? [[ <statement> <?terminators>]* | <statement> ]}
-rule statements {<?terminators>? <statement> [<?terminators> [<statements> <?terminators>]*]? }
+rule statements {<?terminators>? [<statement> <?terminators>]* <statement>? }
+#rule statements {<?terminators>? <statement> [<?terminators> [<statements> <?terminators>]*]? <statement>? }
 
 rule statement {
           <'alias'> [ <function_item> <function_item>

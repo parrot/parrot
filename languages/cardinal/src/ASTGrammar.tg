@@ -23,6 +23,8 @@ transform result (Cardinal::Grammar::compound_statement) :language('PIR') {
     $I0 = defined node['statements']
     unless $I0 goto err_no_tree
     $P0 = node['statements']
+    $P0 = $P0[0]
+
     child = tree.get('result', $P0, 'Cardinal::Grammar::statements')
 
     .return (child)
@@ -38,17 +40,18 @@ transform result (Cardinal::Grammar::statements) :language('PIR') {
     .local pmc result
     result = new 'PAST::Stmts'
 
+    $I0 = defined node['statement']
+    unless $I0 goto err_no_tree
+    $P0 = node['statement']      
+    
     .local pmc iter
-    iter = new Iterator, node    # setup iterator for node
+    iter = new Iterator, $P0    # setup iterator for node
     iter = 0
 
   iter_loop:
     unless iter, iter_end         # while (entries) ...
     shift $P0, iter
     
-    $I0 = defined $P0['statement']
-    unless $I0 goto err_no_tree
-    $P0 = $P0['statement']      
     child = tree.get('result', $P0, 'Cardinal::Grammar::statement')
     result.'add_child'(child)
 
@@ -179,12 +182,12 @@ transform result (Cardinal::Grammar::assignment) :language('PIR') {
     $I0 = defined node[0]
     unless $I0 goto other_assignment
     $S0 = node[0]
-    .kdump($S0)
     ne_str $S0, "=", na1
-    print "HERE\n"
     assign_symbol = node[0]
     goto get_left
   na1:
+    print "No other assigns have been coded yet"
+    end
 
   other_assignment:
     $I0 = defined node['ASSIGN_OP']
@@ -223,18 +226,7 @@ transform result (Cardinal::Grammar::assignment) :language('PIR') {
     $P0 = node['primary']
     child = tree.get('result', $P0, 'Cardinal::Grammar::primary')
     goto single_item
-
   
-  get_ast_node: 
-    .local pmc identChild
-    $S0 = typeof child
-    unless $S0 == 'PAST::Val' goto err_not_past_val
-    $S0 = child.'valtype'()
-    unless $S0 == 'identifier' goto err_not_past_val
-    identChild = child
-    child = new 'PAST::Var'
-    child.'varname'($S0)
-
 
   build_assignment: 
     .local pmc result
@@ -446,7 +438,7 @@ transform result (Cardinal::Grammar::IDENTIFIER) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
     result.'clone'(node)
-    $S2 = node 
+    $S2 = $P0
     result.'value'($S2)
     result.'valtype'('identifier')      
     .return (result)             
@@ -751,29 +743,38 @@ transform result (Cardinal::Grammar::left_hand_side) :language('PIR') {
 
 transform result (Cardinal::Grammar::variable) :language('PIR') {
     # Ask the child node for its result
-    .local pmc child
+    .local pmc result
+    result = new 'PAST::Var'
+    result.'clone'(node)
+
+    .local pmc name
     $I0 = defined node['IDENTIFIER']
     unless $I0 goto l11
     $P0 = node['IDENTIFIER']
-    child = tree.get('result', $P0, 'Cardinal::Grammar::IDENTIFIER')
-    .return (child)
+    name = tree.get('result', $P0, 'Cardinal::Grammar::IDENTIFIER')
+    goto case_end
+
   l11:
-    .local pmc result
-    result = new 'PAST::Val'
-    result.'clone'(node)
+    .local pmc bool_val
+    bool_val = new 'PAST::Val'
+    bool_val.'clone'(node)
     $S0 = node
     ne $S0, "true", l1
-    result.'value'("1")
-    result.'valtype'('boolean')      
-    goto case_end
+    bool_val.'value'("1")
+    bool_val.'valtype'('boolean')      
+    .return (bool_val)
   l1:
     ne $S0, "false", l2
-    result.'value'("0")
-    result.'valtype'('boolean')      
-    goto case_end
+    bool_val.'value'("0")
+    bool_val.'valtype'('boolean')      
+    .return (bool_val)
   l2:
     goto err_no_tree
-  case_end:
+
+case_end:
+    $S0 = name.'value'()
+    result.'varname'($S0)
+    result.'scope'('global')
     .return (result)
 
 
