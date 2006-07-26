@@ -95,7 +95,6 @@ $(R_BUILTIN)/uplevel.pir \
 $(R_BUILTIN)/upvar.pir \
 $(C_BUILTIN)/variable.pir \
 runtime/conversions.pir \
-runtime/expression.pir \
 runtime/list.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \

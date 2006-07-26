@@ -18,18 +18,13 @@
 
   .local pmc retval
 
-  .local int index_length, pos
-  .local pmc number_result
-
   if position == 'end' goto my_end
   
   $S0 = substr position, 0, 4
   if $S0 == 'end-' goto has_end
-  index_length = length position
-  (retval, pos) = get_number(position,0)
-  if pos != index_length goto bad_arg
-  $I0 = isa retval, 'Integer'
-  if $I0 == 0 goto bad_arg
+  push_eh bad_arg
+    retval = __number(position)
+  clear_eh
   
   # if the number is greater than the number of elements
   # in the list, we want the end
@@ -47,14 +42,12 @@ bad_arg:
 
 has_end:
   # is this an int? if so, subtract it from -1 to get our parrot-style index.
-  index_length = length position
-  # is this an int?
-  (number_result, pos) = get_number(position,4)
-  if pos != index_length goto bad_arg
-  $I0 = isa number_result, 'Integer'
-  if $I0 == 0 goto bad_arg
+  substr position, 0, 4, ""
+  push_eh bad_arg
+    retval = __integer(position)
+  clear_eh
   # say, 1 if -1
-  $I0 = number_result
+  $I0 = retval
   # say, 2 if -2
   inc $I0
 
@@ -69,5 +62,4 @@ my_end:
   $I0 = the_list
   dec $I0
   .return($I0,is_end)
-  
 .end

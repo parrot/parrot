@@ -41,11 +41,11 @@ transform pir (PAST::Val) {
     pir = new 'PGE::CodeString'
     ret = pir.unique('$P')
     class = node['class']
-    pir.emit('    %0 = new %1', ret, class)
+    pir.emit("    %0 = new '%1'", ret, class)
     $S0 = node['value']
-    if class == "'TclFloat'" goto assign_float
-    if class == "'.TclString'" goto assign_string
-    if class == "'TclConst'" goto assign_string
+    if class == "TclFloat"  goto assign_float
+    if class == "TclString" goto assign_string
+    if class == "TclConst"  goto assign_string
     goto assign_val
   assign_float:                                    
     $I0 = index $S0, '.'                           # XXX: '.' hack due to

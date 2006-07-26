@@ -1,7 +1,11 @@
 grammar TclExpr::PAST::Grammar is TGE::Grammar;
 
 transform result (ROOT) {
-    # Top level result is always going to be an expr.
+    $P0 = node['expr']
+    if $P0 goto expression
+    .return tree.get('dispatch', node, 'TclExpr::Grammar')
+
+expression:
     .return tree.get('expression', node)
 } 
 
@@ -23,6 +27,10 @@ transform dispatch (TclExpr::Grammar) {
     if $P0 goto braced
     $P0 = node['integer']
     if $P0 goto integer
+    $P0 = node['float']
+    if $P0 goto has_float
+    $P0 = node['scientific']
+    if $P0 goto scientific
     $P0 = node['number']
     if $P0 goto number
     $P0 = node['quoted']
@@ -61,6 +69,12 @@ constant:
 
 integer:
     .return tree.get('result', $P0, 'integer')
+
+has_float:
+    .return tree.get('result', $P0, 'float')
+
+scientific:
+    .return tree.get('result', $P0, 'scientific')
 
 variable:
     .return tree.get('result', $P0, 'variable')
@@ -174,7 +188,7 @@ transform result (constant) {
     
     $S0 = node
     result['value'] = $S0
-    result['class'] = "'TclConst'"
+    result['class'] = "TclConst"
     .return(result)
 }
 
@@ -185,7 +199,45 @@ transform result (braced) {
     
     $S0 = node[0]
     result['value'] = $S0
-    result['class'] = "'TclConst'"
+    result['class'] = "TclConst"
+    .return(result)
+}
+
+transform result (number) {
+    $P0 = node['integer']
+    if $P0 goto integer
+    $P0 = node['float']
+    if $P0 goto have_float
+    $P0 = node['scientific']
+    if $P0 goto scientific
+    .throw("invalid number type")
+
+integer:
+    .return tree.get('result', $P0, 'integer')
+
+have_float:
+    .return tree.get('result', $P0, 'float')
+
+scientific:
+    .return tree.get('result', $P0, 'scientific')
+}
+
+transform result (scientific) {
+    .local pmc result
+    result = new 'PAST::Val'
+    result.set_node(node)
+    
+    $S0 = node[0]
+    $N0 = $S0
+    $S0 = node[1]
+    $N1 = $S0
+    $N1 = 10**$N1
+    $N0 *= $N1
+    
+    $S0 = $N0
+    result['value'] = $S0
+    result['class'] = "TclFloat"
+
     .return(result)
 }
 
@@ -202,7 +254,7 @@ transform result (integer) {
   decimal:
     $S0 = node
     result['value'] = $S0
-    result['class'] = "'TclInt'"
+    result['class'] = "TclInt"
     .return (result)
  
   octal: 
@@ -228,7 +280,7 @@ transform result (integer) {
   
   octal_done:
     result['value'] = octal_value
-    result['class'] = "'TclInt'"
+    result['class'] = "TclInt"
     .return (result)
 
   hex:
@@ -267,14 +319,14 @@ transform result (integer) {
 
 }
 
-transform result (number) {
+transform result (float) {
     .local pmc result
     result = new 'PAST::Val'
     result.set_node(node)
 
     $S0 = node
     result['value'] = $S0
-    result['class'] = "'TclFloat'"
+    result['class'] = "TclFloat"
     .return (result)
 }
 
@@ -283,9 +335,10 @@ transform result (quoted) {
     result = new 'PAST::Val'
     result.set_node(node)
 
-    $S0 = node
+    $P0 = node[0]
+    $S0 = $P0
     result['value'] = $S0
-    result['class'] = "'TclString'"
+    result['class'] = "TclString"
     .return (result)
 }
 
@@ -347,11 +400,11 @@ transform logical_and (PAST::Op) {
 
     true = new 'PAST::Val'
     true['value'] = 1
-    true['class'] = "'TclInt'"
+    true['class'] = "TclInt"
 
     false = new 'PAST::Val'
     false['value'] = 0
-    false['class'] = "'TclInt'"
+    false['class'] = "TclInt"
 
     # Get our A & B trees..
     $P1 = node[0]
@@ -390,11 +443,11 @@ transform logical_or (PAST::Op) {
 
     true = new 'PAST::Val'
     true['value'] = 1
-    true['class'] = "'TclInt'"
+    true['class'] = "TclInt"
 
     false = new 'PAST::Val'
     false['value'] = 0
-    false['class'] = "'TclInt'"
+    false['class'] = "TclInt"
 
     # Get our A & B trees..
     $P1 = node[0]

@@ -12,7 +12,6 @@ token term {
     | <quoted>
     | <braced>
     | <number>
-    | <integer>
     | <variable>
     | <function>
 }
@@ -43,22 +42,26 @@ token constant {
 }
 
 # XXX naive
-token quoted   { " ([\\.|<-["]>]*) : " }
+token quoted   { " ([\\.|<-["]>]*) " }
 
 token braced   { \{ ([ \\. | <braced> | <-[}]> ]*) \} }
 
 # XXX naive
 token variable { \$ (<[a..zA..Z]>+) }
 
-token number  { [<[0..9]>+|0+]\.<[0..9]>* }
+token number { <scientific> | <float> | <integer> }
+
+token float  { (<[+\-]>)? [ <[0..9]>+\.<[0..9]>* | \.<[0..9]>+ ] }
+
+token scientific { (<[+\-]>? <[0..9]>+) e (<[+\-]>? <[0..9]>+) }
 
 token decimal { [<[1..9]><[0..9]>*] }
 
 # XXX squawk about invalid looking octal.
 
 token octal   { 0 [ <[0..7]> | <[89]><[0..9]>* <invalid_octal> ]* }
-token hex     { 0<[xX]> ( <[0..9A..Fa..f]>+ ) }
-token integer { [<decimal> | <hex> | <octal> ] }
+token hex     { 0<[xX]> ( <[0..9A..Fa..f]>) + }
+token integer { (<[+\-]>)? [<decimal> | <hex> | <octal> ] }
 
 token nullary_function { rand }
 
