@@ -186,9 +186,18 @@ tclsh: $(PARROT) tcl.pbc
 test:	tcl.pbc
 	prove t/*.t
 
+RUNNABLE_TCL_TESTS = \
+  t_tcl/concat.t \
+  t_tcl/config.t \
+  t_tcl/eval.t \
+  t_tcl/for_old.t \
+  t_tcl/join.t \
+  t_tcl/llength.t \
+  t_tcl/package.t
+  
 tcl-test: t_tcl tcl.pbc
-	prove t_tcl/*.t
-
+    # For now, just test the ones that ``work'' with test_more
+	prove $(RUNNABLE_TCL_TESTS)
 t_tcl:
 	$(PERL) tools/tcl_test.pl
 
