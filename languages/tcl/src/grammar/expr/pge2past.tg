@@ -314,7 +314,7 @@ transform result (integer) {
 
   hex_done:
     result['value'] = hex_value
-    result['class'] = "'TclInt'"
+    result['class'] = "TclInt"
     .return(result)
 
 }
