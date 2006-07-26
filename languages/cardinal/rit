@@ -7,7 +7,7 @@ use warnings;
 my $PARROT = '../../parrot';
 my $CARDINAL = 'cardinal.pbc';
 my $CURRENT_TEST = 't/00_assignment_1.rb';
-my $TRACE_ARGS = "";
+my $TRACE_ARGS = "-t 4";
 
 if ( @ARGV > 1 )
 {
@@ -16,11 +16,28 @@ if ( @ARGV > 1 )
 
 if ( @ARGV > 0 )
 {
+  if ( $ARGV[0] eq "--help" )
+  {
+    help();
+    exit;
+  }
   eval($ARGV[0]);
 }
 else
 {
   execute();
+}
+
+sub help
+{
+  print <<"EOF"
+./rit command program.rb
+Commands
+  trace :-> parrot -t
+  execute :-> executes the 
+  debug executes cardinal.pbc w/ -d
+  gdb executes cardinal under gdb
+EOF
 }
 
 sub trace

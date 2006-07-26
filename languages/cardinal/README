@@ -1,0 +1,3 @@
+Cardinal is a Implementation of the Ruby Language and Interpreter on top of Parrot.
+
+./rit provides fast access to debugging tools.

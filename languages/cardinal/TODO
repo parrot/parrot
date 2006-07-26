@@ -1,0 +1,4 @@
+Get test suites running from 
+Rubicon - cvs -d :pserver:anonymous@cvs.ruby-lang.org:/src co rubicon
+Unit Tests for Ruby builtin classes and modules - http://groups.google.com/group/RubyTests/
+

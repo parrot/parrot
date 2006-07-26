@@ -19,8 +19,6 @@ pmclass RubyFloat extends RubyObject extends Float dynpmc group ruby_group hll C
     STRING* get_string () {
         UINTVAL buflen;
         STRING * buff;
-        STRING * dot;
-        STRING * dot_zero;
 
         buff = Parrot_sprintf_c(INTERP, "%.12vg",PMC_num_val(SELF));
 
