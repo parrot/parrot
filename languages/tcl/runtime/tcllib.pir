@@ -41,6 +41,7 @@ providing a compreg-compatible method.
 
 # create the 'tcl' namespace -- see RT #39852
 # http://rt.perl.org/rt3/Ticket/Display.html?id=39852
+.HLL 'Tcl', ''
 .namespace ['tcl']
 .sub foo
   .return()

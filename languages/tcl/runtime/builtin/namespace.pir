@@ -316,10 +316,23 @@ loop:
   goto loop
 end:
 
+  $P0 = find_name 'lc_cmp'
+  list.sort($P0)
   .return(list)
 
 bad_args:
   .throw('wrong # args: should be "namespace children ?name? ?pattern?"')
+.end
+
+.sub 'lc_cmp'
+    .param string a
+    .param string b
+
+    a = downcase a
+    b = downcase b
+
+    $I0 = cmp a, b
+    .return($I0)
 .end
 
 .sub 'code'
