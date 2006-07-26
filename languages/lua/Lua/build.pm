@@ -33,7 +33,7 @@ sub get_global {
             'prolog' => 1,
             'result' => $parser->YYData->{_G},
         );
-        push @opcodes, new FindGlobalOp( $parser,
+        push @opcodes, new GetGlobalOp( $parser,
             'prolog' => 1,
             'result' => $parser->YYData->{_G},
             'arg1'   => '_G',

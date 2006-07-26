@@ -117,12 +117,12 @@ package pirVisitor;
         print {$FH} "  inc $op->{result}->{symbol}\n";
     }
 
-    sub visitFindGlobalOp {
+    sub visitGetGlobalOp {
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH}
-            "  $op->{result}->{symbol} = find_global \"$op->{arg1}\"\n";
+            "  $op->{result}->{symbol} = get_global \"$op->{arg1}\"\n";
     }
 
     sub visitFindLexOp {

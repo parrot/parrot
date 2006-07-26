@@ -70,7 +70,7 @@ use base qw(Lua::opcode);
 package NoOp;
 use base qw(Lua::opcode);
 
-package FindGlobalOp;
+package GetGlobalOp;
 use base qw(Lua::opcode);
 
 package FindLexOp;
