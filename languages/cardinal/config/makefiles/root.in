@@ -19,7 +19,7 @@ PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 PMCDIR   = src/pmc
 
 # the default target
-all: cardinal.pbc 
+all: cardinal.pbc $(PMCDIR)/ruby_group$(LOAD_EXT)
 
 SOURCES  = cardinal.pir \
 	src/cardinal_rules.pg \
@@ -29,8 +29,25 @@ SOURCES  = cardinal.pir \
 	src/OSTGrammar.tg \
 	src/PIRGrammar.tg \
 
-PMCS = cardinal_str
-PMC_SOURCES = $(PMCDIR)/cardinal_str.pmc
+PMCS = \
+	rubyobject \
+	rubyinteger \
+  rubyhash \
+	rubybignum \
+	rubycomplex \
+	rubyfixnum \
+	rubyfloat \
+	rubystring
+
+PMC_SOURCES = \
+              $(PMCDIR)/rubyobject.pmc \
+              $(PMCDIR)/rubyinteger.pmc \
+              $(PMCDIR)/rubyhash.pmc \
+              $(PMCDIR)/rubybignum.pmc \
+              $(PMCDIR)/rubycomplex.pmc \
+              $(PMCDIR)/rubyfixnum.pmc \
+              $(PMCDIR)/rubyfloat.pmc \
+              $(PMCDIR)/rubystring.pmc
 
 cardinal.pbc: $(PARROT) $(PGE_DIR)/pgc.pir $(SOURCES) cardinal.pir src/CardinalGrammar.pbc src/ASTGrammar.pbc src/OSTGrammar.pbc src/PIRGrammar.pbc
 	$(PARROT) -o cardinal.pbc --output-pbc cardinal.pir 
@@ -53,11 +70,11 @@ src/PIRGrammar.pbc: src/PIRGrammar.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/PIRGrammar.pir src/PIRGrammar.tg
 	$(PARROT) -o src/PIRGrammar.pbc --output-pbc src/PIRGrammar.pir 
 
-#$(PMCDIR)/cardinal_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
-#	cd $(PMCDIR) && $(BUILD) generate $(PMCS)
-#	cd $(PMCDIR) && $(BUILD) compile $(PMCS)
-#	cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
-#	cd $(PMCDIR) && $(BUILD) copy --destination=$(PARROT_DYNEXT) $(PMCS)
+$(PMCDIR)/ruby_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
+	cd $(PMCDIR) && $(BUILD) generate $(PMCS)
+	cd $(PMCDIR) && $(BUILD) compile $(PMCS)
+	cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
+	cd $(PMCDIR) && $(BUILD) copy --destination=$(PARROT_DYNEXT) $(PMCS)
 
 #src/builtins_gen.pir: src/builtins/*.pir
 #	$(CAT) src/builtins/*.pir >src/builtins_gen.pir
@@ -118,4 +135,3 @@ realclean: clean
 	$(RM_RF) Makefile
 
 distclean: realclean
-

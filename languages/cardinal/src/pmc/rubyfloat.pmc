@@ -1,0 +1,57 @@
+/* RubyFloat.pmc
+ *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  SVN Info
+ *     $Id: rubyfloat.pmc 12840 2006-07-25 15:08:05Z tewk $
+ *  Overview:
+ *     These are the vtable functions for the RubyFloat base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include <assert.h>
+
+
+pmclass RubyFloat extends RubyObject extends Float dynpmc group ruby_group hll Cardinal maps Float {
+
+    STRING* get_string () {
+        UINTVAL buflen;
+        STRING * buff;
+        STRING * dot;
+        STRING * dot_zero;
+
+        buff = Parrot_sprintf_c(INTERP, "%.12vg",PMC_num_val(SELF));
+
+        buflen = string_length(INTERP,buff);
+        while (buflen) {
+               if (string_index(INTERP,buff,buflen-1) == '0') {
+                       buflen--;
+               } else {
+                       break;
+               }
+        }
+
+        /* truncate the string */
+        buff->strlen = buflen;
+        buff->bufused = buflen;
+        return buff;
+    }
+
+    METHOD PMC* interpret() {
+        return SELF;
+    }
+}
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
+

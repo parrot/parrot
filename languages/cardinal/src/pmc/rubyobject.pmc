@@ -1,0 +1,71 @@
+/* rubyobject.pmc
+ *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  SVN Info
+ *     $Id: rubyobject.pmc 12840 2006-05-30 15:08:05Z coke $
+ *  Overview:
+ *     These are the vtable functions for the rubyobject base class
+ *  Data Structure and Algorithms:
+ *    The following primary native types exist that we wish to track:
+ *    strings, integers, floats, lists {@array}, arrays, {%hash}.
+ *    when parsing code, everything starts out as a string. When we ask
+ *    for another representation, we do the conversion once and store it.
+ *    this way, the next time it's needed, we can just return it. Several
+ *    commands may generate a native type without first going through the
+ *    string representation - by avoiding conversion to and from string,
+ *    we can maintain a speed enhancement.
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+static INTVAL dynpmc_RubyString;
+static INTVAL dynpmc_RubyFloat;
+static INTVAL dynpmc_RubyInteger;
+
+pmclass RubyObject dynpmc group ruby_group {
+
+    void class_init() {
+        if (pass) {
+            dynpmc_RubyString = pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "RubyString", 0));
+            dynpmc_RubyInteger    = pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "RubyInteger", 0));
+            dynpmc_RubyFloat  = pmc_type(INTERP,
+                string_from_const_cstring(INTERP, "RubyFloat", 0));
+        }
+    }
+
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+	switch (type) {
+	    case enum_class_String:
+		type = dynpmc_RubyString;
+		break;
+	    case enum_class_Integer:
+		type = dynpmc_RubyInteger;
+		break;
+	    case enum_class_Float:
+		type = dynpmc_RubyFloat;
+		break;
+	}
+	pmc_reuse(INTERP, SELF, type, 0);
+    }
+
+    void set_integer_native (INTVAL value) {
+        DYNSELF.morph(dynpmc_RubyInteger);
+        PMC_int_val(SELF) = value;
+    }
+
+    void set_number_native (FLOATVAL value) {
+        DYNSELF.morph(dynpmc_RubyFloat);
+        PMC_num_val(SELF) = value;
+    }
+
+    void set_string_native (STRING* value) {
+        DYNSELF.morph(dynpmc_RubyString);
+        PMC_str_val(SELF) = string_copy(INTERP, value);
+    }
+}

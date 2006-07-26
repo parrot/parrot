@@ -9,6 +9,7 @@ Node.
 
 =cut
 
+.HLL 'Ruby', 'ruby_group'
 .namespace [ "POST::Op" ]
 
 .sub "__onload" :load

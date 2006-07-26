@@ -1,3 +1,5 @@
+.HLL 'Ruby', 'ruby_group'
+
 .sub 'puts'
     .param pmc a
     $P0 = a

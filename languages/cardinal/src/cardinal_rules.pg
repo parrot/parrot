@@ -1,4 +1,4 @@
-grammar Cardinal::Grammar;
+grammar Cardinal::Grammar
 
 ##Ruby Whitespace rule
 token ws {<[\ \t]>*}
@@ -7,9 +7,13 @@ token program { ^<compound_statement>$ }
 
 rule body_statement {<compound_statement> <rescue_clause>? <else_clause>? <ensure_clause>?}
 
-rule compound_statement {<statements> <?terminators>?}
-
-rule statements {<?terminators>? [<statement> <?terminators>]*}
+rule compound_statement {<statements>? <?terminators>?}
+#added [ <statement> |   
+#for    
+#if x then <compound_statement> end
+#style statements
+#rule statements {<?terminators>? [[ <statement> <?terminators>]* | <statement> ]}
+rule statements {<?terminators>? <statement> [<?terminators> [<statements> <?terminators>]*]? }
 
 rule statement {
           <'alias'> [ <function_item> <function_item>
@@ -275,7 +279,7 @@ rule multiple_right_hand_side {
 }
 
 rule primary {
-          <atom> [\:\: <CONSTANT>]?
+          <atom>[\:\:<CONSTANT>]?
 #          |<operation> <brace_block> # put this in method call         
 #          |<method_call> <brace_block>?
 }
@@ -306,7 +310,7 @@ rule atom { <literal>
           |\-\> <lambda>
           
           |<'begin'> <body_statement> <'end'>
-          |<'if'> <expression> <then_clause> <compound_statement> <elsif_clause>* <else_clause>? <'end'>
+          |<if_clause>
           |<'unless'> <expression> <then_clause> <compound_statement> <else_clause>? <'end'>
           |<'while'> <expression> <'do'>? <compound_statement> <'end'>
           |<'until'> <expression> <'do'>? <compound_statement> <'end'>
@@ -316,10 +320,18 @@ rule atom { <literal>
           |<'class'> \<\< <expression> <term> <body_statement> <'end'>
           |<'moldule'> <class_path> <body_statement> <'end'>
           |<'def'> [singleton [\.|\:]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'>
-          
           |<variable>
 }
 
+rule if_clause
+{
+          ##<'if'> <expression> {{print "h1\n"}} <then_clause> {{print "h2\n"}} <compound_statement> {{print "h3\n"}} <elsif_clause>* <else_clause>? {{print "h4\n"}} {{match.dump()}} <?end_clause> {{print "h5\n"}} {{match.dump()}}
+          <'if'> <expression> <then_clause> <compound_statement> <elsif_clause>* <else_clause>? <?end_clause> 
+}
+
+
+#rule end_clause { {{print "e1\n"}} <?terminator>? {{print "e2\n"}} {{match.dump()}} <'end'> {{print "e3\n"}} <?terminator>? {{print "e4\n"}} }
+rule end_clause { <?terminator>? <'end'> <?terminator>? }
 rule elsif_clause {<'elsif'> <expression> <then_clause> <compound_statement>}
 rule else_clause {<'else'> <compound_statement>}
 
@@ -447,7 +459,7 @@ token DIGITS { <[0..9]> ((<DECIMAL_DIGIT> | _ )* <DECIMAL_DIGIT>)? }
 token EXPONENT { <[eE]>  <[+\-]>? <DIGITS> }
 #Identifiers
 token CONSTANT {(<[A..Z]>[<[a..z]>|<[A..Z]>|<[0..9]>|_]*)}        #starts with an uppercase letter eg Class and Module names
-token IDENTIFIER {([<[a..z]>|_][<[a..z]>|<[A..Z]>|<[0..9]>|_]*)}  #starts with a lowercase letter eg variables
+token IDENTIFIER { <!reserved_words> ([<[a..z]>|_][<[a..z]>|<[A..Z]>|<[0..9]>|_]*) }  #starts with a lowercase letter eg variables
 token SYMBOL {(\:<SYMBOL_NAME>)}
 token SYMBOL_NAME {(<[a..z]>|<[A..Z]>|_|<[0..9]>)+ }
 

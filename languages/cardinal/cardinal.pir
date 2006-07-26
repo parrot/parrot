@@ -16,7 +16,7 @@ bytecode (actually to PIR, at first). For more on the ideas behind the
 compiler, see:
 
 =cut
-
+.HLL 'Ruby', 'ruby_group'
 .include "errors.pasm"
 .include "library/dumper.pir"
 
@@ -30,6 +30,9 @@ compiler, see:
     load_bytecode 'PGE/Dumper.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'Getopt/Obj.pbc'
+
+    .local pmc _dumper
+    _dumper = get_root_global [ 'parrot' ], '_dumper'
 
     .local pmc getopts, opts
     .local string arg0
@@ -147,12 +150,12 @@ compiler, see:
     print $P0
     ret
   dump_object:
-    '_dumper'($P0, target)
+    _dumper($P0, target)
     ret
 
   dump_optable:
-    $P0 = find_global "Cardinal::Grammar", "$optable"
-    "_dumper"($P0, "Cardinal::Grammar::optable")
+    $P0 = get_root_global [ 'parrot'; 'Cardinal::Grammar'], '$optable'
+    _dumper($P0, "Cardinal::Grammar::optable")
     goto end
 
   usage:
@@ -163,9 +166,7 @@ compiler, see:
     # Match against the source
     .local pmc match
     .local pmc start_rule
-    start_rule = get_root_namespace
-    #start_rule = get_namespace [ 'parrot'; 'Cardinal'; 'Grammar'; 'program' ]
-    start_rule = start_rule[ 'parrot'; 'Cardinal::Grammar'; 'program' ]
+    start_rule = get_root_global [ 'parrot'; 'Cardinal::Grammar'], 'program'
     match = start_rule(source, 'grammar'=> 'Cardinal::Grammar')
 
     # Verify the match
@@ -175,8 +176,7 @@ compiler, see:
     unless dump_pge goto after_pge_dump
     print "parse succeeded\n"
     print "Match tree dump:\n"
-    $P0 = find_global "_dumper"
-    $P0(match, "PGE Dump")
+    _dumper(match, "PGE Dump")
   after_pge_dump:
     eq stopafter, 1, end
 

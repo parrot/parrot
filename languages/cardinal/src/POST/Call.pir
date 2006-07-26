@@ -9,6 +9,7 @@ conventions) in the OST. It is a subclass of Node.
 
 =cut
 
+.HLL 'Ruby', 'ruby_group'
 .namespace [ "POST::Call" ]
 
 .sub "__onload" :load

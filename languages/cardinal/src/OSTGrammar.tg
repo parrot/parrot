@@ -96,7 +96,7 @@ transform symbols (ROOT) :language('PIR') {
       .local pmc storeop
       storeop = new 'POST::Op'
       storeop.'clone'(node)
-      storeop.'op'('store_global')
+      storeop.'op'('set_hll_global')
 
       $P3 = new 'POST::Val'
       $S4 = temp_var.'hllname'()
@@ -178,7 +178,7 @@ transform result (PAST::Op) :language('PIR') {
     # Lookup operator name to see if there is a direct PIR translation
     # for it.
     .local pmc oplookup
-    oplookup = find_global 'CardinalOpLookup', 'lookup'
+    oplookup = get_root_global ['ruby'; 'CardinalOpLookup'], 'lookup'
     $S1 = oplookup(opname)
     unless $S1 goto no_trans
     opname = $S1
@@ -247,7 +247,7 @@ transform infix (PAST::Op) :language('PIR') {
     .local pmc oplookup
     .local string opname
     .local pmc childop
-    oplookup = find_global 'CardinalOpLookup', 'lookup'
+    oplookup = get_root_global ['ruby'; 'CardinalOpLookup'], 'lookup'
     $S1 = node.op()
     opname = oplookup($S1)
     if opname goto op_is_simple
@@ -318,7 +318,7 @@ transform conditional (PAST::Op) :language('PIR') {
 
     .local string opname
     .local pmc oplookup
-    oplookup = find_global 'CardinalOpLookup', 'lookup'
+    oplookup = get_root_global ['ruby'; 'CardinalOpLookup'], 'lookup'
     $S1 = node.op()
     opname = oplookup($S1)
     .local pmc childop
@@ -584,7 +584,7 @@ transform result (PAST::Var) :language('PIR') {
     .local pmc findop
     findop = new 'POST::Op'
     findop.'clone'(node)
-    findop.'op'('find_global')
+    findop.'op'('get_hll_global')
     findop.'add_child'(newvar)
     findop.'add_child'(namenode)
     newops.'add_child'(findop)

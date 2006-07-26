@@ -1,0 +1,31 @@
+/* BignumInteger.pmc
+ *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  SVN Info
+ *     $Id: rubyint.pmc 13543 2006-07-25 07:10:31Z mdiep $
+ *  Overview:
+ *     These are the vtable functions for the BignumInteger base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass RubyBignum extends RubyObject extends BigInt dynpmc group ruby_group hll Ruby maps BigInt {
+
+    METHOD PMC* interpret() {
+        return SELF;
+    }
+    
+}
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

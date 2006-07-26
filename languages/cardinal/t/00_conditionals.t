@@ -10,6 +10,7 @@ language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
 if true
 1
 end
+
 CODE
 OUT
 

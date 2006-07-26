@@ -11,6 +11,7 @@ POST::Ops is a subclass of Node.
 
 =cut
 
+.HLL 'Ruby', 'ruby_group'
 .namespace [ "POST::Ops" ]
 
 .sub "__onload" :load

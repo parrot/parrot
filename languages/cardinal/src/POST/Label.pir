@@ -9,7 +9,7 @@ Node. Labels can either be a destination or an argument for an
 opcode.
 
 =cut
-
+.HLL 'Ruby', 'ruby_group'
 .namespace [ "POST::Label" ]
 
 .sub "__onload" :load

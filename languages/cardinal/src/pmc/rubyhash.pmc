@@ -1,0 +1,52 @@
+/* RubyHash.pmc
+ *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  SVN Info
+ *     $Id: rubyarray.pmc 12884 2006-06-05 13:29:13Z audreyt $
+ *  Overview:
+ *     These are the vtable functions for the RubyHash base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+
+=head1 NAME
+
+pmc/rubyhash.pmc - Ruby Hash PMC
+
+=head1 DESCRIPTION
+
+This is the Hash PMC for the Ruby implementation.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+ */
+
+#include "parrot/parrot.h"
+
+
+pmclass RubyHash extends RubyObject extends Hash need_ext does hash dynpmc group ruby_group hll Ruby maps Hash {
+}
+
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

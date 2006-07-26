@@ -76,13 +76,13 @@ data file, possibly in YAML.
     _add_entry(lookuptable, 'unless', 'if')
     _add_entry(lookuptable, 'elsif', 'unless')
 
-    store_global 'CardinalOpLookup', 'lookuptable', lookuptable
+    set_hll_global ['CardinalOpLookup'], 'lookuptable', lookuptable
 .end
 
 .sub lookup
     .param string opname
     .local pmc lookuptable
-    lookuptable = find_global 'CardinalOpLookup', 'lookuptable'
+    lookuptable = get_hll_global ['CardinalOpLookup'], 'lookuptable'
     $S1 = lookuptable[ opname ]
     .return ($S1)
 .end

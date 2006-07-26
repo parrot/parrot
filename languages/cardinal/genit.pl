@@ -13,15 +13,13 @@ my $PREAMBLE = <<'END';
 
 .macro kdump ( x )
     .sym pmc it
-    it = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    it = it[ 'parrot'; '_dumper' ]
+    it = get_root_global ['parrot'], '_dumper'
     it(.x)
 .endm
 
 .macro kdump2 ( x, d)
     .sym pmc it
-    it = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    it = it[ 'parrot'; '_dumper' ]
+    it = get_root_global ['parrot'], '_dumper'
     it(.x, .d)
 .endm
 END

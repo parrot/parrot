@@ -14,7 +14,7 @@ Cardinal::Grammar -- A grammar for parsing Ruby 1.8.4
       source = 'puts 1;'
 
       # Retrieve the start rule
-      start_rule = get_namespace [ 'Cardinal'; 'Grammar', 'prog' ]
+      start_rule = get_hll_namespace [ 'Cardinal'; 'Grammar', 'prog' ]
 
       # Parse the source and return a match object
       match = start_rule(source)
@@ -32,6 +32,7 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
 
 =cut
 
+#.HLL 'Ruby', 'ruby_group'
 #.namespace [ 'Cardinal'; 'Grammar' ]
 .namespace [ 'Cardinal::Grammar' ]
 
@@ -48,8 +49,8 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
 .sub "operator_precedence_parser"
   .param pmc mob
   .local pmc optable
-  #optable = get_namespace ['Cardinal'; 'Grammar'; '$optable']
-  optable = get_hll_namespace ['Cardinal::Grammar']
+  #optable = get_hll_namespace ['Cardinal'; 'Grammar']
+  optable = get_root_namespace [ 'parrot'; 'Cardinal::Grammar']
   optable = optable['$optable']
   $P0 = optable."parse"(mob)
   .return ($P0)

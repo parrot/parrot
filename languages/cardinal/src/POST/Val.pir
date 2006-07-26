@@ -8,6 +8,7 @@ POST::Val is a literal value in the OST. It is a subclass of Node.
 
 =cut
 
+.HLL 'Ruby', 'ruby_group'
 .namespace [ "POST::Val" ]
 
 .sub "__onload" :load
