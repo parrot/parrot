@@ -11,15 +11,25 @@ proc skip_all {} {
 }
 
 proc plan {number} {
-    if {$number ne "no_plan"} {
+    if {$number eq "no_plan"} {
+        global very_bad_global_variable_test_num
+        puts 1..$very_bad_global_variable_test_num
+    } {
         puts 1..$number
     }
 }
+
+set very_bad_global_variable_test_num 0
 
 # The special argument, if passed, should be a two element list, e.g.
 # {TODO "message"}
 
 proc is {value expected {description ""} {special {}}}  {
+    global very_bad_global_variable_test_num
+    incr  very_bad_global_variable_test_num 
+    
+    set num $very_bad_global_variable_test_num
+ 
     if {[llength $special] == 2} {
         set description " # $special"
     } else {
@@ -29,10 +39,10 @@ proc is {value expected {description ""} {special {}}}  {
     } 
 
     if {$value eq $expected} {
-        puts "ok$description"
+        puts "ok $num$description"
         return 1
     } {
-        puts "not ok$description"
+        puts "not ok $num$description"
 
         set value [join [split $value "\n"] "\n# "]
         set expected [join [split $expected "\n"] "\n# "]
@@ -91,6 +101,3 @@ proc diag {diagnostic} {
 proc test {num description code output} {
     eval_is $code $output "$num: $description"
 }
-
-# A very big hack placeholder to avoid transform
-namespace eval ::Tcltest { proc cleanupTests {args} {} }

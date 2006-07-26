@@ -119,7 +119,7 @@ sub extract_tests {
 
     # This is a bit unweildy.
 
-    my @preludes = (<<'END_TCL',
+    my @removes = (<<'END_TCL',
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest
     namespace import -force ::tcltest::*
@@ -147,17 +147,22 @@ if {[lsearch [namespace children] ::tcltest] == -1} {
     namespace import -force ::tcltest::*
 }
 END_TCL
+    <<'END_TCL',
+::tcltest::cleanupTests
+return
+END_TCL
     );
 
-    foreach my $prelude (@preludes) {
-        $source =~ s/\Q$prelude\E//xms;
+    foreach my $remove (@removes) {
+        $source =~ s/\Q$remove\E//xms;
     }
 
-    $source = <<'END_SHEBANG' . $source;
+    $source = <<'END_SHEBANG' . $source . <<'END_CLEANUP';
 #!../../parrot tcl.pbc
 source lib/test_more.tcl
-plan no_plan 
 END_SHEBANG
+plan no_plan
+END_CLEANUP
 
     return $source;
 }
