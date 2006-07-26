@@ -1,0 +1,9 @@
+From Pat Eyler:
+Actually, cardinal was not the first Ruby on Parrot attempt
+I wrote a very small subset of Ruby on Parrot called Rabbit in 2000
+at the time, Parrot had no object support, so I was limited to string 
+and numeric 'objects' and a small set of operators that posed as methods.
+Sadly, there is no extant copy of the code.
+
+Phil Tomson created the first version of Cardinal.
+http://rubyforge.org/projects/cardinal/
