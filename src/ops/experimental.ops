@@ -486,6 +486,37 @@ op pmcinfo(out INT, in PMC, inconst INT) {
   goto NEXT();
 }
 
+########################################
+
+=item B<find_type>(out INT, in PMC)
+
+Find the PMC type or Parrot datatype by PMC, which may be a string or an
+array.
+
+=cut'
+
+op find_type(out INT, in PMC) {
+    PMC *pmc_key = $2;
+    INTVAL n;
+
+    if (pmc_key->vtable->base_type == enum_class_String)
+        $1 = pmc_type(interpreter, VTABLE_get_string(interpreter, pmc_key));
+    else if ((n = VTABLE_elements(interpreter, pmc_key)) <= 0)
+        $1 = 0;
+    else {
+	PMC *class = interpreter->class_hash;
+	INTVAL i;
+	for (i = 0; i < n; ++i) {
+            STRING *part = VTABLE_get_string_keyed_int(interpreter, pmc_key, i);
+	    class = VTABLE_get_pmc_keyed_str(interpreter, class, part);
+	    if (PMC_IS_NULL(class))
+		break;
+	}
+	$1 = PMC_IS_NULL(class) ? 0 : PMC_int_val(class);
+    }
+    goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT
