@@ -77,7 +77,9 @@ transform result (Cardinal::Grammar::statement) :language('PIR') {
     $P1 = $P0[0]
     .local pmc child
     child = tree.get('result', $P1, 'Cardinal::Grammar::expression')
- 
+
+    $I0 = defined node[0]
+    unless $I0 goto pass_through
     $P4 = node[0]
     unless $P4 goto pass_through
     $I0 = typeof $P4
@@ -749,9 +751,18 @@ transform result (Cardinal::Grammar::variable) :language('PIR') {
 
     .local pmc name
     $I0 = defined node['IDENTIFIER']
-    unless $I0 goto l11
+    unless $I0 goto global_variable
     $P0 = node['IDENTIFIER']
     name = tree.get('result', $P0, 'Cardinal::Grammar::IDENTIFIER')
+    $S0 = name.'value'()
+    goto case_end
+
+  global_variable:
+    .local pmc name
+    $I0 = defined node['GLOBAL_VARIABLE']
+    unless $I0 goto l11
+    $P0 = node['GLOBAL_VARIABLE']
+    $S0 = $P0
     goto case_end
 
   l11:
@@ -772,7 +783,6 @@ transform result (Cardinal::Grammar::variable) :language('PIR') {
     goto err_no_tree
 
 case_end:
-    $S0 = name.'value'()
     result.'varname'($S0)
     result.'scope'('global')
     .return (result)

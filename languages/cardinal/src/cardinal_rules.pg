@@ -464,7 +464,7 @@ token IDENTIFIER { <!reserved_words> ([<[a..z]>|_][<[a..z]>|<[A..Z]>|<[0..9]>|_]
 token SYMBOL {(\:<SYMBOL_NAME>)}
 token SYMBOL_NAME {(<[a..z]>|<[A..Z]>|_|<[0..9]>)+ }
 
-token GLOBAL_VARIABLE {\$<[~*$?!@/\\;,.=:<>"]>}
+token GLOBAL_VARIABLE {\$[<[~*$?!@/\\;,.=:<>"]>|<IDENTIFIER>|<CONSTANT>]}
 token CLASS_VARIABLE {\@\@<IDENTIFIER>}
 token INSTANCE_VARIABLE {\@<IDENTIFIER>}
 

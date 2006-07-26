@@ -50,8 +50,7 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
   .param pmc mob
   .local pmc optable
   #optable = get_hll_namespace ['Cardinal'; 'Grammar']
-  optable = get_root_namespace [ 'parrot'; 'Cardinal::Grammar']
-  optable = optable['$optable']
+  optable = get_root_global [ 'parrot'; 'Cardinal::Grammar'], '$optable'
   $P0 = optable."parse"(mob)
   .return ($P0)
 .end

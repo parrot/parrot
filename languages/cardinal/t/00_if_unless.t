@@ -23,8 +23,6 @@ puts("NOK") unless true
 CODE
 OUT
 
-TODO: {
-#local $TODO = "puts needs to be implemented as a real operation, it just points to print currently\n";
 language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
 puts "OK", "OK" if true
 CODE
@@ -37,4 +35,3 @@ CODE
 OK
 OK
 OUT
-}
