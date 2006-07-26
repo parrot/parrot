@@ -6,24 +6,20 @@
 
 # XXX put this in a namespace to avoid global pollution
 
-# XXX TODO: skip_all
-
-set very_bad_global_variable_test_num   0
+proc skip_all {} {
+    puts 1..0
+}
 
 proc plan {number} {
-    if {$number eq "no_plan"} {
-        puts 1..0
-    } {
+    if {$number ne "no_plan"} {
         puts 1..$number
     }
 }
 
 # The special argument, if passed, should be a two element list, e.g.
 # {TODO "message"}
-proc is {value expected {description ""} {special {}}}  {
-    global very_bad_global_variable_test_num
-    incr   very_bad_global_variable_test_num
 
+proc is {value expected {description ""} {special {}}}  {
     if {[llength $special] == 2} {
         set description " # $special"
     } else {
@@ -33,12 +29,13 @@ proc is {value expected {description ""} {special {}}}  {
     } 
 
     if {$value eq $expected} {
-        puts "ok $very_bad_global_variable_test_num$description"
+        puts "ok$description"
         return 1
     } {
-        puts "not ok $very_bad_global_variable_test_num$description"
+        puts "not ok$description"
 
-        # XXX escape strings.
+        set value [join [split $value "\n"] "\n# "]
+        set expected [join [split $expected "\n"] "\n# "]
         puts "#      got : '$value'"
         puts "# expected : '$expected'"
         return 0
