@@ -219,19 +219,12 @@ void
 string_init(Parrot_Interp interpreter)
 {
     size_t i;
+
     /*
      * when string_init is called, the config hash isn't created
      * so we can't get at the runtime path
      * XXX do we still need this --leo
      */
-#if 0
-    char *data_dir;
-    int free_data_dir = 0;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
-#endif
 
     if (!interpreter->parent_interpreter) {
         /* Load in the basic encodings and charsets
@@ -590,11 +583,8 @@ STRING *
 string_make_direct(Interp *interpreter, const void *buffer,
         UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags)
 {
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
     STRING * const s = new_string_header(interpreter, flags);
+    DECL_CONST_CAST;
 
     s->encoding = encoding;
     s->charset = charset;
@@ -707,11 +697,7 @@ string_str_index(Interp *interpreter, const STRING *s,
 {
     STRING *src, *search;
     UINTVAL len;
-
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
 
     if (start < 0)
         return -1;
@@ -1785,10 +1771,7 @@ FLOATVAL
 string_to_num(Interp *interpreter, const STRING *s)
 {
     FLOATVAL f = 0.0;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
 
     if (s) {
         /*
@@ -2329,10 +2312,7 @@ TODO - implemented only for ASCII.
 STRING *
 string_upcase(Interp *interpreter, const STRING *s)
 {
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
     STRING * const dest = string_copy(interpreter, const_cast(s));
     string_upcase_inplace(interpreter, dest);
     return dest;
@@ -2365,10 +2345,7 @@ Non-caseable characters are left unchanged.
 STRING *
 string_downcase(Interp *interpreter, const STRING *s)
 {
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
     STRING * const dest = string_copy(interpreter, const_cast(s));
     string_downcase_inplace(interpreter, dest);
     return dest;
@@ -2407,10 +2384,7 @@ Non-caseable characters are left unchanged.
 STRING *
 string_titlecase(Interp *interpreter, const STRING *s)
 {
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
     STRING * const dest = string_copy(interpreter, const_cast(s));
     string_titlecase_inplace(interpreter, dest);
     return dest;

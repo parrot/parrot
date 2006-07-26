@@ -326,10 +326,7 @@ sub run_core_after_addr_table
     if (!${bs}ops_addr)
 	${bs}ops_addr = l_ops_addr;
     if (cur_opcode == 0) {
-	union {
-	    const void * __c_ptr;
-	    void * __ptr;
-	} __ptr_u;
+        DECL_CONST_CAST;
         return (opcode_t *)const_cast(${bs}ops_addr);
     }
 END_C

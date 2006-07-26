@@ -213,6 +213,12 @@ typedef struct parrot_interp_t Interp;
  * for usage grep e.g. in string.c
  */
 
+#define DECL_CONST_CAST_OF(CCTYPE) \
+    union { const CCTYPE *__c_ptr; CCTYPE *__ptr; } __ptr_u
+
+#define DECL_CONST_CAST \
+    DECL_CONST_CAST_OF(void)
+
 #define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
 

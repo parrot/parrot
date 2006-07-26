@@ -313,10 +313,7 @@ insINS(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         const char *name, SymReg **regs, int n)
 {
     Instruction *tmp;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST_OF(char);
     char *s = const_cast(name);
     tmp = INS(interpreter, unit, s, NULL, regs, n, 0, 0);
     insert_ins(unit, ins, tmp);

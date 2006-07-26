@@ -883,10 +883,7 @@ PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
 
     if(!io)
         return -1;

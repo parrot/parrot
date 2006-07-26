@@ -394,10 +394,7 @@ set_codepoint(Interp *interpreter, STRING *src,
 {
     const void *start;
     void *p;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
 
     start = utf8_skip_forward(src->strstart, offset);
     p = const_cast(start);

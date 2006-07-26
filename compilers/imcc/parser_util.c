@@ -398,10 +398,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     if (op < 0) {         /* still wrong, try reverse compare */
         const char *n_name = try_rev_cmp(interpreter, unit, name, r);
         if (n_name) {
-            union {
-                const void * __c_ptr;
-                void * __ptr;
-            } __ptr_u;
+            DECL_CONST_CAST;
             name = const_cast(n_name);
             op_fullname(fullname, name, r, n, keyvec);
             op = interpreter->op_lib->op_code(fullname, 1);
@@ -574,10 +571,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     parrot_sub_t sub_data;
     struct _imc_info_t *imc_info = NULL;
     struct parser_state_t *next;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
     INTVAL regs_used[4] = {3,3,3,3};
     void *yyscanner;
 

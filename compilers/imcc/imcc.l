@@ -880,11 +880,7 @@ define_macro(Interp *interp, char *name, struct params_t *params,
 static struct macro_t *
 find_macro(Interp *interp, const char *name)
 {
-    struct macro_t *m;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;			/* for const_cast */
+    DECL_CONST_CAST_OF(char);
 
     if (!macros)
 	return NULL;
@@ -904,10 +900,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
     char *current;
     char *s;
     int len;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    DECL_CONST_CAST;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
     UNUSED(valp);
