@@ -83,29 +83,32 @@ is_string:
     .throw("can't use non-numeric string as operand of \"/\"")
 .end
 
+.sub 'infix:%'
+    .param pmc a
+    .param pmc b
 
-# remainder
-.sub 'infix:%'     :multi(String, pmc)
-  .throw ("can't use non-numeric string as operand of \"%\"")
-.end
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
 
-.sub 'infix:%'     :multi(pmc, String)
-  .throw ("can't use non-numeric string as operand of \"%\"")
-.end
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+    clear_eh
+    
+    $I0 = isa a, 'TclFloat'
+    if $I0 goto is_float
+    $I0 = isa b, 'TclFloat'
+    if $I0 goto is_float
 
-.sub 'infix:%'     :multi(Float, pmc)
-  .throw ("can't use floating-point value as operand of \"%\"")
-.end
+    $P0 = new 'TclInt'
+    $P0 = mod a, b
+    .return($P0)
 
-.sub 'infix:%'     :multi(pmc, Float)
-  .throw ("can't use floating-point value as operand of \"%\"")
-.end
+is_string:
+    .throw("can't use non-numeric string as operand of \"%\"")
 
-.sub 'infix:%'     :multi(Integer, Integer)
-    .param int a
-    .param int b
-    $I0 = mod a, b
-    .return ($I0)
+is_float:
+    .throw("can't use floating-point value as operand of \"%\"")
 .end
 
 .sub 'infix:+'
