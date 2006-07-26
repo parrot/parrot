@@ -106,37 +106,29 @@ Parrot_dlopen(const char *filename)
                             | NSADDIMAGE_OPTION_WITH_SEARCHING);
 
         if (header)
-        {
-            union {
-                const void * __c_ptr;
-                void * __ptr;
-            } __ptr_u;
-#ifndef const_cast
-#  define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
-#endif
+            return (void *)header;
 
-            return const_cast(header);
-        }
-        else
-        { /* that didn't work either; go ahead and report the orignal error */
+        /*
+	 * that didn't work either; go ahead and report the orignal error
+	 */
 
-            switch(dyld_result) {
-            /* XXX for now, ignore all the known errors */
-            case NSObjectFileImageFailure:
-            case NSObjectFileImageInappropriateFile:
-            case NSObjectFileImageArch:
-            case NSObjectFileImageFormat:
-            case NSObjectFileImageAccess:
-                break;
-            default:
-                fprintf(stderr,
-                        "open result was unknown (%i) for fullpath [%s]\n",
-                        dyld_result, fullpath);
-                break;
-            }
+	switch(dyld_result) {
+        /* XXX for now, ignore all the known errors */
+	case NSObjectFileImageFailure:
+	case NSObjectFileImageInappropriateFile:
+	case NSObjectFileImageArch:
+	case NSObjectFileImageFormat:
+	case NSObjectFileImageAccess:
+	    break;
 
-            return NULL;
-        }
+	default:
+	    fprintf(stderr,
+		    "open result was unknown (%i) for fullpath [%s]\n",
+		    dyld_result, fullpath);
+	    break;
+	}
+
+	return NULL;
     }
 }
 
