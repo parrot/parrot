@@ -123,7 +123,11 @@ get:
   (word, pos) = get_word(tcl_code, chars, pos)
   inc pos
   if_null word, get
-  $S0 = word
+  # TclWord throws an exception if you try to stringify it
+  # but a TclWord isn't a comment, so we know it's not a comment
+  push_eh check
+    $S0 = word
+  clear_eh
   if $S0 == "" goto check # this is special
   $I0 = ord $S0, 0
   if $I0 == 35 goto got_comment
