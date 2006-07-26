@@ -277,15 +277,15 @@ bad_args:
   list = new .TclList
   
   .local pmc __namespace, ns
-  .get_from_HLL(__namespace, '_tcl', '__namespace')
-  .include 'interpinfo.pasm'
-  ns = interpinfo .INTERPINFO_NAMESPACE_ROOT
-  ns = ns['tcl']
+  ns = get_root_global 'tcl'
+  if argc == 0 goto namespace_end
+  __namespace = get_root_global ['_tcl'], '__namespace'
   
   .local pmc ns_name
-  $S0      = argv[0]
+  $S0 = argv[0]
+  $S0 .= ":: "
   ns_name  = __namespace($S0)
-  $S0      = pop ns_name
+  $S1      = pop ns_name
 
   $I0 = 0
   $I1 = elements ns_name
