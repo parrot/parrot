@@ -297,6 +297,7 @@ namespace_loop:
   goto namespace_loop
 namespace_end:
   
+  if null ns goto unknown_namespace
   .local pmc iter
   iter = new .Iterator, ns
 
@@ -322,6 +323,12 @@ end:
 
 bad_args:
   .throw('wrong # args: should be "namespace children ?name? ?pattern?"')
+
+unknown_namespace:
+  $S0 = argv[0]
+  $S0 = 'unknown namespace "' . $S0
+  $S0 = $S0 . '" in namespace children command'
+  .throw($S0)
 .end
 
 .sub 'lc_cmp'
