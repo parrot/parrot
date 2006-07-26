@@ -2,4 +2,8 @@
 
 Placeholder - real PDD will appear after consultation
 
+{{ NOTE: Plan to reclaim number 12 for the Parrot External C API PDD
+(used for both extending and embedding), since PDD 6 is already Parrot
+Assembly. }}
+
 =cut

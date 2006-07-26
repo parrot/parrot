@@ -7,6 +7,9 @@ docs/pdds/pdd14_bignum.pod - Big Numbers
 
 =head1 ABSTRACT
 
+{{ NOTE: needs to be compared to current behavior of bignum library.
+Future directions?}}
+
 This document describes the big number library, the functionality it provides
 and some internal details of interest to people making use of the library. 
 Some of the areas in which the big number library meet with the rest of Parrot

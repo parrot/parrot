@@ -16,6 +16,10 @@ super CISC machine. It makes sense, then, to define an assembly language for it
 for those people who may need to generate bytecode directly, rather than
 indirectly via the perl (or any other) language.
 
+{{ NOTE: out-of-date and incomplete. It seems that it would be more
+useful as a specification of the format of PASM than as a comprehensive
+listing of all opcodes. }}
+
 =head1 IMPLEMENTATION
 
 Parrot opcodes take the format of:
@@ -46,18 +50,18 @@ and number respectively.
 All assembly opcodes contain only ASCII lowercase letters, digits, and the
 underscore.
 
-Upper case names are reserved for assembler directives.
+Upper case names are reserved for assembler directives. {{ NOTE: no
+longer true. }}
 
 Labels all end with a colon. They may have ASCII letters, numbers, and
 underscores in them. Labels that begin with a dollar sign (the only valid spot
 in a label a dollar sign can appear) are private to the subroutine they appear
 in.
 
-Namespaces are noted with the NAMESPACE directive. It takes a single parameter,
-the name of the namespace. Multilevel namespaces are supported, and the
-namespaces should be double-colon separated.
+Namespaces are noted with the C<.namespace> directive. It takes a single parameter,
+the name of the namespace, in the form of a multi-dimensional key.
 
-Subroutine names are noted with the SUB directive. It takes a single parameter,
+Subroutine names are noted with the C<.sub> directive. It takes a single parameter,
 the name of the subroutine, which is added to the namespace's symbol table. Sub
 names may be any valid Unicode alphanumeric character and the underscore.
 

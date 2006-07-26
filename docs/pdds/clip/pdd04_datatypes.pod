@@ -9,6 +9,9 @@ docs/pdds/pdd04_datatypes.pod - Parrot's internal data types
 
 This PDD describes Parrot's internal data types.
 
+{{ NOTE: this is a good overview, but we need more complete
+specifications of the behavior of the datatypes. }}
+
 =head1 DESCRIPTION
 
 This PDD details the basic datatypes that the Parrot core knows how to deal 

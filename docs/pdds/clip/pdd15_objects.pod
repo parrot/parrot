@@ -212,6 +212,13 @@ defined in all the parent classes. (Multiple inheritance makes this necessary
 -- the offsets of a class' attributes will change from child class to child
 class)
 
+{{ NOTE: one feature I'd like to have is some way to access a list of
+the object's attributes. The particular use I have in mind is dumping
+the attributes of an object a la Data::Dumper. It abuses the notion
+of 'opaque object', so I could be persuaded it's not a good idea. On the
+other hand, it could be an introspective capability offered by Parrot
+but not directly exposed in the HLLs.  }}
+
 ParrotClass PMCs also have the "I am a class" flag set on them.
 
 The ParrotObject PMC is an array of meta-information and attributes. The

@@ -126,7 +126,7 @@ Note that not all types are valid as return types.
 =head2 Examples
 
 Most of the function parameters are reasonably self-evident. Some, however,
-merit additional explanation. The
+merit additional explanation. The {{ ??? }}
 
 =head2 Callbacks
 

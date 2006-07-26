@@ -35,7 +35,7 @@ another but not reachable from elsewhere, never gets collected.
 Starting from the root set (Parrot registers, stacks, internal structures) all
 reachable objects (and objects reachable from these) are marked being alive.
 
-Ojbects not reached are considered being dead and get collected by a sweep
+Objects not reached are considered dead and get collected by a sweep
 through the objects arenas.
 
 =item Copying collection
@@ -102,7 +102,7 @@ base for collecting variable sized-data that may hang off buffers.
 
 Variable-sized memory like string memory gets collected, when the associated
 header isn't found to be alive during DOD. While a copying collection could
-basically[1] be done at any time, its inefficient to copy buffers of objects
+basically[1] be done at any time, it's inefficient to copy buffers of objects
 that are non yet detected being dead. This implies that before a collection in
 the memory pools is run, a DOD run for fixed-sized headers is triggered.
 
@@ -114,7 +114,7 @@ objects.
 =head2 General Notes
 
 GC subsystems are rather independent. The goal for Parrot is just to provide
-new object headers in the fasted possible way. How that is achieved can be
+new object headers in the fastest possible way. How that is achieved can be
 considered as an implementation detail.
 
 While GC subsystems are independent they may share some code to reduce Parrot
@@ -229,7 +229,7 @@ overritten by C<new>. Both C<old> and C<new> may be NULL.
 
 =item C<DOD_WRITE_BARRIER_KEY(Interp*, PMC *agg, PMC *old, PObj *old_key, PMC *new, PObj *new_key)>
 
-Like above. Invoked when a hash key is inserted, possibly replacing and old
+Like above. Invoked when a hash key is inserted, possibly replacing an old
 key.
 
 =back

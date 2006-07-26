@@ -10,6 +10,9 @@ docs/pdds/pdd05_opfunc.pod - Opcode Function specs
 This PDD specifies how the opcode functions should behave and how they are
 called by the Parrot interpreter.
 
+{{ NOTE: this PDD is only loosely connected to the current state of
+Parrot. }}
+
 =head1 DESCRIPTION
 
 The opcode functions are the workhorse of the Parrot engine. They control

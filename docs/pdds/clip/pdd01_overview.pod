@@ -9,6 +9,8 @@ docs/pdds/pdd01_overview.pod - A high-level overview of the Parrot system
 
 This PDD provides a high-level overview of the Parrot system.
 
+{{ NOTE: this needs to be more of an overall architecture plan. }}
+
 =head1 DESCRIPTION
 
 =head2 Major components

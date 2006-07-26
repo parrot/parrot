@@ -6,6 +6,9 @@ docs/pdds/pdd18_security.pod - Parrot's security infrastructure
 
 This PDD describes the safety, security, and quota infrastructure of Parrot.
 
+{{ NOTE: This PDD is inadequate. We want to provide a much more
+extensive level of sandboxing. }}
+
 =head1 DESCRIPTION
 
 There are three basic subsystems in Parrot's security system. They are:

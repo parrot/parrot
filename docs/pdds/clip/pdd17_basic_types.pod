@@ -5,6 +5,9 @@
 
 docs/pdds/pdd17_basic_types.pod - Document parrot's basic PMC types
 
+{{ NOTE: could use a better name to differentiate it from PDD 04
+datatypes. Or perhaps the two should be merged. }}
+
 =head1 ABSTRACT
 
 This PDD documents the base Parrot PMC types and their behaviours.
