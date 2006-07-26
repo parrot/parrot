@@ -62,7 +62,11 @@ arg_loop:
    $P0 = $S0
    push compiled_args, $P0
    register_num = result_reg + 1 # Otherwise we can overlap results.
-   arg_code .= retval 
+   arg_code .= retval
+   arg_code .= $S0
+   arg_code .= ' = clone '
+   arg_code .= $S0
+   arg_code .= "\n"
    inc ii 
    goto arg_loop
 

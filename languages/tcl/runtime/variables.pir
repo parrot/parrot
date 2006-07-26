@@ -211,12 +211,11 @@ set_array:
   variable = array[key]
   if null variable goto set_new_elem
   assign variable, value
-  .return(value)
+  .return(variable)
 
 set_new_elem:
   array[key] = value
-  variable = clone value
-  .return(variable)
+  .return(value)
 
 cant_set_not_array:
   $S0 =  "can't set \""
@@ -237,10 +236,7 @@ create_scalar:
 
 return_scalar:
   $S0 = typeof value
-  if $S0 == "Undef" goto return
-  variable = clone value
-return:
-  .return(variable)
+  .return(value)
 .end
 
 =head2 _Tcl::__find_var
