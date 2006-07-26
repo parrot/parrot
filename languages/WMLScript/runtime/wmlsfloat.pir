@@ -168,8 +168,6 @@ Returns an implementation-dependent approximation to the result of raising
 value1 to the power of value2. If value1 is a negative number then value2
 must be an integer.
     
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value1 = Number
@@ -191,7 +189,41 @@ If value1 < 0 and value2 is not an integer then C<invalid> is returned.
 .sub _float_pow :anon
     .param pmc value1
     .param pmc value2
-    not_implemented()
+    .local pmc ret
+    $P1 = value1
+    $I0 = isa value1, "WmlsString"
+    unless $I0 goto L1
+    $P1 = value1.parseNumber()
+L1:
+    $I0 = isa $P1, "WmlsInvalid"
+    if $I0 goto L2
+    $N1 = $P1
+    $P2 = value2
+    $I0 = isa value2, "WmlsString"
+    unless $I0 goto L3
+    $P2 = value2.parseNumber()
+L3:
+    $I0 = isa $P2, "WmlsInvalid"
+    if $I0 goto L2
+    $N2 = $P2
+    unless $N1 == 0.0 goto L4
+    if $N2 < 0.0 goto L2
+    new ret, .WmlsFloat
+    set ret, 0.0
+    goto L5
+L4:
+    unless $N1 < 0.0 goto L6
+    $I0 = isa $P2, "WmlsFloat"
+    if $I0 goto L2
+L6:
+    $N0 = pow $N1, $N2
+    new ret, .WmlsFloat
+    set ret, $N0
+    goto L5
+L2:
+    new ret, .WmlsInvalid
+L5:
+    .return (ret)
 .end
 
 

@@ -21,10 +21,10 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.int', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.int', cflags => '-On');  # fix me
 extern function main()
 {
     var a = 3.14;
@@ -43,7 +43,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.floor', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.floor', cflags => '-On');    # fix me
 extern function main()
 {
     var a = 3.14;
@@ -62,7 +62,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.ceil', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.ceil', cflags => '-On'); # fix me
 extern function main()
 {
     var a = 3.14;
@@ -81,7 +81,20 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.round', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.pow', cflags => '-On');  # fix me
+extern function main()
+{
+    var a = 3;
+    var b = Float.pow(a,2);
+    Console.println(b);
+    Console.println(typeof b);
+}
+CODE
+9
+1
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.round', cflags => '-On');    # fix me
 extern function main()
 {
     var a = Float.round(3.5);
@@ -111,7 +124,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.sqrt', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Float.sqrt', cflags => '-On'); # fix me
 extern function main()
 {
     var a = 4;
