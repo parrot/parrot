@@ -9,13 +9,29 @@
 
   .local int argc
   argc = elements argv
+  if argc == 0 goto loop_end
+  
+  .local int i
+  i = 0
+  
+  .local int nocomplain
+  nocomplain = 0
+  
+  $S0 = argv[0]
+  if $S0 != "-nocomplain" goto flags_done
+  nocomplain = 1
+  i = 1
+  
+  if argc < 2 goto flags_done
+  $S0 = argv[1]
+  if $S0 != "--" goto flags_done
+  i = 2
 
+flags_done:
   .local pmc find_var, var
   .get_from_HLL(find_var, '_tcl', '__find_var')
 
   .local string name
-  .local int i
-  i = 0
 loop:
   if i == argc goto loop_end
   name = argv[i]
@@ -49,6 +65,7 @@ array:
   goto next
 
 no_such_element:
+  if nocomplain goto next
   $S0 = "can't unset \""
   $S0 .= name
   $S0 .= '": no such element in array'
@@ -72,6 +89,7 @@ loop_end:
   .return('')
 
 no_such_var:
+  if nocomplain goto next
   $S0 = "can't unset \""
   $S0 .= name
   $S0 .= '": no such variable'
