@@ -301,6 +301,7 @@ Compile Options:
    --optimize           Optimized compile
    --optimize=flags     Add given optimizer flags
    --parrot_is_shared   Link parrot dynamically
+   --m=32               Build 32bit executable on 64-bit architecture.
    --profile            Turn on profiled compile (gcc only for now)
 
    --cc=(compiler)      Use the given compiler
