@@ -125,9 +125,9 @@ get:
   if_null word, get
   # TclWord throws an exception if you try to stringify it
   # but a TclWord isn't a comment, so we know it's not a comment
-  push_eh check
-    $S0 = word
-  clear_eh
+  $I0 = isa word, 'TclWord'
+  if $I0 goto check
+  $S0 = word
   if $S0 == "" goto check # this is special
   $I0 = ord $S0, 0
   if $I0 == 35 goto got_comment
