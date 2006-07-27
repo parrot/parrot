@@ -41,8 +41,10 @@ token constant {
     (\w+)
 }
 
-# XXX naive
-token quoted   { " ([\\.|<-["]>]*) " }
+token quoted { " <quoted_literal> " }
+
+# this is defined as a pir sub in src/grammar/expr/parse.pir
+# token quoted_literal { ... }
 
 token braced   { \{ ([ \\. | <braced> | <-[}]> ]*) \} }
 

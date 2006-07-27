@@ -331,15 +331,50 @@ transform result (float) {
 }
 
 transform result (quoted) {
-    .local pmc result
-    result = new 'PAST::Val'
-    result.set_node(node)
+    .local pmc past
+    $P0 = node['quoted_literal']
+    $P0 = $P0.'get_array'()
+    if null $P0 goto empty_string
+    
+    .local pmc iter
+    iter = new .Iterator, $P0
+    null past
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    $S0 = cnode['type']
+    if $S0 == 'str' goto cpast_str
+    cpast = tree.'get'('result', cnode, $S0)
+    goto cpast_add
+  cpast_str:
+    $S0 = cnode
+    cpast = new 'PAST::Val'
+    cpast['node'] = node
+    cpast['class'] = 'TclConst'
+    cpast['value'] = $S0
+  cpast_add:
+    unless null past goto cpast_concat
+    past = cpast
+    goto iter_loop
+  cpast_concat:
+    $P0 = new 'PAST::Op'
+    $P0.add_child(past)
+    $P0.add_child(cpast)
+    $P0['node'] = node
+    $P0['opfunc'] = 'infix:concat'
+    past = $P0
+    goto iter_loop
+  iter_end:
+    .return(past)
 
-    $P0 = node[0]
-    $S0 = $P0
-    result['value'] = $S0
-    result['class'] = "TclString"
-    .return (result)
+empty_string:
+    past = new 'PAST::Val'
+    past['node']  = node
+    past['class'] = 'TclConst'
+    past['value'] = ''
+
+    .return(past)
 }
 
 transform result (subcommand) {

@@ -45,6 +45,21 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 
 =cut
 
+# this is used to make double-quoted strings work
+# (they're a series of captures that need to be concatenated)
+.sub 'infix:concat'
+    .param pmc a
+    .param pmc b
+
+    $S0 = a
+    $S1 = b
+    $S0 = $S0 . $S1
+
+    $P0 = new 'TclString'
+    $P0 = $S0
+    .return($P0)
+.end
+
 .sub 'infix:*'  
     .param pmc a
     .param pmc b
