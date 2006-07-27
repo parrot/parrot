@@ -547,8 +547,6 @@ that range, using an implementation-dependent algorithm or strategy.
 If the value is of type floating-point, Float.int() is first used to calculate the
 actual integer value.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value = Number
@@ -567,7 +565,27 @@ If value is less than zero (0), the function returns C<invalid>.
 
 .sub _lang_random :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $P0 = value
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseNumber()
+L1:
+    $I0 = isa $P0, "WmlsInvalid"
+    if $I0 goto L2
+    $I0 = $P0
+    if $I0 < 0 goto L2
+    new $P0, .Random
+    $N0 = $P0
+    $N0 = mul $I0
+    $I0 = $N0
+    new ret, .WmlsInteger
+    set ret, $I0
+    goto L3
+L2:
+    new ret, .WmlsInvalid
+L3:
+    .return (ret)
 .end
 
 
@@ -586,8 +604,6 @@ If the value is of type floating-point, Float.int() is first used to calculate t
 actual integer value. . If the value is non-numeric, invalid is returned and the
 current seed is unchanged.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 value = Number
@@ -600,7 +616,26 @@ String or invalid.
 
 .sub _lang_seed :anon
     .param pmc value
-    not_implemented()
+    .local pmc ret
+    $P0 = value
+    $I0 = isa value, "WmlsString"
+    unless $I0 goto L1
+    $P0 = value.parseNumber()
+L1:
+    $I0 = isa $P0, "WmlsInvalid"
+    if $I0 goto L2
+    $I0 = $P0
+    if $I0 >= 0 goto L3
+    $I0 = time
+L3:
+    new $P0, .Random
+    $P0 = $I0
+    new ret, .WmlsString, ''
+    goto L4
+L2:
+    new ret, .WmlsInvalid
+L4:
+    .return (ret)
 .end
 
 
@@ -622,7 +657,7 @@ Integer.
     .local pmc ret
     new ret, .WmlsInteger
     ret = 4     # latin1
-    return (ret)
+    .return (ret)
 .end
 
 

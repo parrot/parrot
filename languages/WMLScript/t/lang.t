@@ -21,7 +21,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 25;
 use Test::More;
 
 language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.abs');
@@ -452,5 +452,49 @@ extern function main()
 }
 CODE
 abort
+OUT
+
+language_output_like( 'WMLScript', <<'CODE', <<'OUT', 'Lang.random');
+extern function main()
+{
+    var a = Lang.random(10);
+    Console.println(a);
+}
+CODE
+/^\d$/
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.random');
+extern function main()
+{
+    var a = Lang.random("invalid");
+    Console.println(typeof a);
+}
+CODE
+4
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.seed');
+extern function main()
+{
+    var a = Lang.seed(3.14);
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+
+2
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'Lang.characterSet');
+extern function main()
+{
+    var a = Lang.characterSet();
+    Console.println(a);
+    Console.println(typeof a);
+}
+CODE
+4
+0
 OUT
 
