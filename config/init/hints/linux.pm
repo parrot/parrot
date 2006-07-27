@@ -17,7 +17,7 @@ sub runstep
     my $linkflags = $conf->data->get('linkflags');
 
     # should find g++ in most cases
-    my $link = 'c++';
+    my $link = $conf->data->get('link') || 'c++';
 
     if ($libs !~ /-lpthread/) {
         $libs .= ' -lpthread';

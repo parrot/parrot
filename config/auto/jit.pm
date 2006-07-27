@@ -37,7 +37,7 @@ sub runstep
     my $verbose = $conf->options->get('verbose');
 
     my $jitbase  = 'src/jit';        # base path for jit sources
-    my $archname = $Config{archname};
+    my $archname = $conf->data->get('archname');
     my ($cpuarch, $osname) = split(/-/, $archname);
 
     if (!defined $osname) {

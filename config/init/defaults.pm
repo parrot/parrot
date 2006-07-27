@@ -24,7 +24,7 @@ use Parrot::Configure::Step;
 
 $description = q{Setting up Configure's default values};
 
-@args = qw(debugging optimize profile verbose prefix);
+@args = qw(debugging optimize profile verbose prefix m);
 
 sub runstep
 {
@@ -54,7 +54,7 @@ sub runstep
         # unset.  Ultimately, it should be set to whatever ICU figures
         # out, or parrot should look for it and always tell ICU what to
         # use.
-        cxx => '',
+        cxx => 'c++',
 
         # Linker, used to link object files (plus libraries) into
         # an executable.  It is usually $cc on Unix-ish systems.
@@ -212,6 +212,30 @@ sub runstep
             ld_debug => " -pg ",
         );
     }
+
+    # adjust archname, cc and libs for e.g. --m=32
+    # TODO this is maybe gcc only
+    my $m = $conf->options->get('m');
+    my $archname = $Config{archname};
+    if ($m) {
+	if ($archname =~ /x86_64/ && $m eq '32') { 
+	    $archname =~ s/x86_64/i386/;
+
+	    # adjust gcc?
+	    for my $cc qw(cc cxx link ld) {
+		$conf->data->add(' ', $cc, '-m32');
+	    }
+	    # and lib flags
+	    for my $lib qw(ld_load_flags ld_share_flags ldflags linkflags) {
+		my $item = $conf->data->get($lib);
+		(my $ni = $item) =~ s/lib64/lib/g;
+		$conf->data->set($lib, $ni);
+	    }
+	}
+    }
+    # TODO adjust lib install-path /lib64 vs. lib
+    # remember corrected archname - jit.pm was using $Config('archname')
+    $conf->data->set('archname', $archname);
 
     return $self;
 }
