@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 14);
+plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 15);
 
 =head1 NAME
 
@@ -575,6 +575,47 @@ int main(int argc, char* argv[])
     Parrot_runcode( interpreter, 1, code );
 
     Parrot_destroy( interpreter );
+
+    Parrot_exit(0);
+    return 0;
+}
+CODE
+Hello from foo!
+OUTPUT
+
+c_output_is(<<'CODE', <<'OUTPUT', "compile string in a fresh interp - #39986");
+
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+#include <parrot/extend.h>
+
+int main(int argc, char* argv[])
+{
+    Parrot_PMC    retval;
+    Parrot_PMC    sub;
+    Parrot_Interp interp = Parrot_new(NULL);
+    char   * code[]      = { ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n" };
+    STRING * code_type;
+    STRING * error;
+    STRING * foo_name;
+
+    if (!interp) {
+        printf( "Hiss\n" );
+        return 1;
+    }
+
+    code_type = const_string( interp, "PIR" );
+    retval    = Parrot_compile_string( interp, code_type, code, &error );
+
+    if (!retval) {
+        printf( "Boo\n" );
+        return 1;
+    }
+
+    foo_name = const_string( interp, "foo" );
+    sub      = Parrot_find_global_cur( interp, foo_name );
+
+    retval   = Parrot_call_sub( interp, sub, "V", "" );
 
     Parrot_exit(0);
     return 0;
