@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 188;
+use Parrot::Test tests => 203;
 use Test::More;
 
 language_output_is("tcl",<<TCL,<<OUT,"int");
@@ -1157,4 +1157,94 @@ language_output_is("tcl",<<'TCL',<<'OUT','complicated expression required for te
   puts [expr {"[eval {set a "aok"}]" ne "bork"}]
 TCL
 1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','Infinity lc');
+  puts [expr inf]
+TCL
+Inf
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','Infinity mixed case');
+  puts [expr iNf]
+TCL
+Inf
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','Infinity add');
+  puts [expr inf + inf]
+TCL
+Inf
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','Infinity subtract');
+  puts [expr inf - inf]
+TCL
+domain error: argument not in valid range
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','Infinity func');
+  puts [expr sin(inf)]
+TCL
+domain error: argument not in valid range
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','Infinity trump div by 0');
+  puts [expr inf/0 ]
+TCL
+domain error: argument not in valid range
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','div by Infinity');
+  puts [expr 0/inf ]
+TCL
+0.0
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','Infinite comparision');
+  puts [expr 0 < inf ]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','NaN lc');
+  puts [expr nan]
+TCL
+domain error: argument not in valid range
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','NaN mixed case');
+  puts [expr nAn]
+TCL
+domain error: argument not in valid range
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','NaN add');
+  puts [expr nan + nan]
+TCL
+can't use non-numeric floating-point value as operand of "+"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','NaN subtract');
+  puts [expr nan - nan]
+TCL
+can't use non-numeric floating-point value as operand of "-"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','NaN func');
+  puts [expr sin(nan)]
+TCL
+floating point value is Not a Number
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','NaN trump div by 0');
+  puts [expr nan/0 ]
+TCL
+can't use non-numeric floating-point value as operand of "/"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT','div by NaN');
+  puts [expr 0/nan ]
+TCL
+can't use non-numeric floating-point value as operand of "/"
 OUT
