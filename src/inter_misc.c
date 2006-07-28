@@ -93,7 +93,7 @@ Parrot_compreg(Parrot_Interp interpreter, STRING *type, Parrot_compiler_func_t f
 
 =item C<PMC *
 Parrot_compile_string(Parrot_Interp interpreter, STRING *type, 
-                      STRING *code, String **error)>
+                      char *code, String **error)>
 
 Compile code string.
 
