@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 75
+plan 123
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -97,4 +97,49 @@ foreach operator $ops_list {
     "string $operator" 
 }
 
+# unary math functions, invalid string ops.
+set function_list \
+  [list acos asin atan cos cosh exp log log10 sin sinh sqrt tan tanh]
+foreach function $function_list {
+  eval_is "expr ${function}(\"a\")" \
+    {expected floating-point number but got "a"} \
+    "string $function"
+}
+
+# infinity tests
+eval_is {expr inf} Inf {infinity lc}
+eval_is {expr iNf} Inf {infinity mixed case}
+eval_is {expr inf + inf} Inf {infinity add}
+eval_is {expr inf - inf} \
+  {domain error: argument not in valid range} {infinity subtract}
+eval_is {expr sin(inf)} \
+  {domain error: argument not in valid range} {infinity function} 
+eval_is {expr inf/0} Inf {infinity trumps div by 0}
+eval_is {expr 0/inf} 0.0 {div by infinity}
+eval_is {expr 0 < inf} 1 {infinite comparison}
+
+# not a number tests.
+eval_is {expr nan} \
+  {domain error: argument not in valid range} {NaN lc}
+eval_is {expr nAn} \
+  {domain error: argument not in valid range} {NaN mixed case}
+eval_is {expr nan/0} \
+  {can't use non-numeric floating-point value as operand of "/"} \
+  {nan trumps div by 0}
+eval_is {expr nan+nan} \
+  {can't use non-numeric floating-point value as operand of "+"}
+foreach function $function_list {
+  eval_is "expr ${function}(nan)" \
+    {floating point value is Not a Number} \
+    "${function}(nan)"
+}
+foreach operator $ops_list {
+  eval_is "expr nan $operator nan" \
+    "can't use non-numeric floating-point value as operand of \"$operator\"" \
+    "nan $operator nan" 
+}
+
 # TD-    add tet   for ::tcl::mathfunc 
+
+
+
