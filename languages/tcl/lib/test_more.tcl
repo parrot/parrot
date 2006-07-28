@@ -46,7 +46,7 @@ proc is {value expected {description ""} {special {}}}  {
 
         set value [join [split $value "\n"] "\n# "]
         set expected [join [split $expected "\n"] "\n# "]
-        diag "\n#     Failed test (sorry, no line numbers)\n#      got : '$value'\n# expected : '$expected'"
+        diag "\n#     Failed test #$very_bad_global_variable_test_num\n#      got : '$value'\n# expected : '$expected'"
         return 0
     }
 }
