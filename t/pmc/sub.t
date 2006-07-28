@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 55;
+use Parrot::Test tests => 56;
 use Parrot::Config;
 
 =head1 NAME
@@ -1285,3 +1285,9 @@ CODE
 "VAR1" => PMC 'PGE::Match' => "aabbb" @ 3
 OUTPUT
 
+pir_output_like(<<'CODE', qr/Null PMC access in invoke()/, 'invoking null pmc');
+.sub main :main
+    null $P0
+    $P0()
+.end
+CODE
