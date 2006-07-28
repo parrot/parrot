@@ -2,75 +2,15 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 139;
+use Parrot::Test tests => 129;
 use Parrot::Config;
 use Test::More;
 
 
-language_output_is("tcl",<<TCL,<<OUT,"first, initial");
+language_output_is("tcl",<<TCL,<<OUT,"string, no args");
  string
 TCL
 wrong # args: should be "string option arg ?arg ...?"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, initial");
- puts [string first a abcdefa]
-TCL
-0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, middle");
- puts [string first a federala]
-TCL
-5
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, failure");
- puts [string first c green]
-TCL
--1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, index, failure");
- puts [string first c green 0]
-TCL
--1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, index, end");
- puts [string first c abcdc end-4]
-TCL
-2
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, index, overshot");
- puts [string first c abcd 20]
-TCL
--1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, index");
- puts [string first c abcdc 1]
-TCL
-2
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, index, invalid index");
- puts [string first c abcd joe]
-TCL
-bad index "joe": must be integer?[+-]integer? or end?[+-]integer?
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, not enough args");
- string first
-TCL
-wrong # args: should be "string first subString string ?startIndex?"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"first, too many args");
- string first a b c d
-TCL
-wrong # args: should be "string first subString string ?startIndex?"
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"last, initial");
