@@ -483,6 +483,7 @@ tools/dev/extract_file_descriptions.pl            [devel]
 tools/dev/check_source_standards.pl               [devel]
 tools/dev/cc_flags.pl                             [devel]
 tools/dev/ops_renum.mak                           [devel]
+tools/dev/src-t.sh                                [devel]
 LICENSES/gpl.txt                                  [main]doc
 LICENSES/Artistic                                 [main]doc
 lib/File/Which.pm                                 [devel]
