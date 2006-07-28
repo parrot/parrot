@@ -165,14 +165,6 @@ is_string:
 .end
 
 # left shift
-.sub 'infix:<<'     :multi(String, pmc)
-  .throw ("can't use non-numeric string as operand of \"<<\"")
-.end
-
-.sub 'infix:<<'     :multi(pmc, String)
-  .throw ("can't use non-numeric string as operand of \"<<\"")
-.end
-
 .sub 'infix:<<'     :multi(Float, pmc)
   .throw ("can't use floating-point value as operand of \"<<\"")
 .end
@@ -184,19 +176,41 @@ is_string:
 .sub 'infix:<<'     :multi(Integer, Integer)
     .param int a
     .param int b
+
     $I0 = shl a, b
+    .return($I0)
+.end
+
+.sub 'infix:<<'     :multi(pmc, pmc)
+    .param pmc a
+    .param pmc b
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+    clear_eh
+
+    $I0 = isa a, 'Float'
+    if $I0 goto is_float
+    $I0 = isa b, 'Float'
+    if $I0 goto is_float
+
+    $I0 = a
+    $I1 = b
+    $I0 = shl $I0, $I1
     .return ($I0)
+
+is_string:
+  .throw ("can't use non-numeric string as operand of \"<<\"")
+
+is_float:
+  .throw ("can't use floating-point value as operand of \"<<\"")
 .end
 
 # right shift
-.sub 'infix:>>'     :multi(String, pmc)
-  .throw ("can't use non-numeric string as operand of \">>\"")
-.end
-
-.sub 'infix:>>'     :multi(pmc, String)
-  .throw ("can't use non-numeric string as operand of \">>\"")
-.end
-
 .sub 'infix:>>'     :multi(Float, pmc)
   .throw ("can't use floating-point value as operand of \">>\"")
 .end
@@ -210,6 +224,35 @@ is_string:
     .param int b
     $I0 = shr a, b
     .return ($I0)
+.end
+
+.sub 'infix:>>'     :multi(pmc, pmc)
+    .param pmc a
+    .param pmc b
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+    clear_eh
+
+    $I0 = isa a, 'Float'
+    if $I0 goto is_float
+    $I0 = isa b, 'Float'
+    if $I0 goto is_float
+
+    $I0 = a
+    $I1 = b
+    $I0 = shr $I0, $I1
+    .return ($I0)
+
+is_string:
+  .throw ("can't use non-numeric string as operand of \">>\"")
+
+is_float:
+  .throw ("can't use floating-point value as operand of \">>\"")
 .end
 
 # *ALL* operands
