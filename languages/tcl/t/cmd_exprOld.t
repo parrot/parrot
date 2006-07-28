@@ -2,51 +2,8 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 197;
+use Parrot::Test tests => 190;
 use Test::More;
-
-language_output_is("tcl",<<TCL,<<OUT,"mul");
-  puts [expr {2 * "3"}]
-TCL
-6
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"div");
-  puts [expr {6 / "2"}]
-TCL
-3
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"remainder");
-  puts [expr {3 % "2"}]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"plus");
-  puts [expr {2 + "3"}]
-TCL
-5
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"minus");
-  puts [expr {2 - "3"}]
-TCL
--1
-OUT
-
-
-language_output_is("tcl",<<TCL,<<OUT,"left shift");
-  puts [expr {16 << "2"}]
-TCL
-64
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"right shift");
-  puts [expr {16 >> "2"}]
-TCL
-4
-OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"lt, numeric, not alpha...");
  puts [expr 10 < 9]
