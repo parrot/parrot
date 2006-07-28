@@ -1,3 +1,5 @@
+grammar PIRGrammar is TGE::Grammar;
+
 transform result (ROOT) :language('PIR') {
 	.local string result
 	result = <<'EOT'
@@ -94,7 +96,6 @@ transform resolve_ops (POST::Ops) :language('PIR') {
 
 	.local string child_type
 	child_type = typeof first_child
-
 	unless child_type == 'POST::Op' goto maybe_an_exp
 	.return( node )
 

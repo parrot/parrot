@@ -60,3 +60,19 @@
 	tail = getattribute self, 'tail'
 	.return( tail )
 .end
+
+.namespace [ 'Pheme'; 'Atom' ]
+
+.sub _initialize :anon :load
+	.local pmc atom_class
+	newclass atom_class, [ 'Pheme'; 'Atom' ]
+
+	addattribute atom_class, 'value'
+.end
+
+.namespace [ 'Pheme'; 'Atom'; 'Symbol' ]
+
+.sub _initialize :anon :load
+	.local pmc symbol_class
+	subclass symbol_class, [ 'Pheme'; 'Atom' ], [ 'Pheme'; 'Atom'; 'Symbol' ]
+.end

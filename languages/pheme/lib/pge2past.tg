@@ -1,3 +1,5 @@
+grammar ASTGrammar is TGE::Grammar;
+
 transform result (ROOT) :language('PIR') {
 	# XXX: transform into a method on the TGE object, when it's possible
 	.local pmc specials
@@ -240,6 +242,12 @@ transform result (atom) :language('PIR') {
 	.local string valtype
 	valtype  = ''
 
+	.local int symbol
+	symbol = exists node[ 'symbol' ]
+	unless symbol goto check_quoted
+	valtype = 'symbol'
+
+  check_quoted:
 	.local int quote
 	.local int value_length
 	value_length = length value

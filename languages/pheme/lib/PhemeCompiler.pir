@@ -6,36 +6,28 @@
 
 	.local pmc compiler
 	compiler = newclass 'PhemeCompiler'
-	addattribute compiler, 'pge2past'
-	addattribute compiler, 'past2post'
-	addattribute compiler, 'post2pir'
+	addattribute compiler, 'ast'
+	addattribute compiler, 'ost'
+	addattribute compiler, 'pir'
 
 	.return()
 .end
 
-.sub __init :method
-	.param pmc init_args
+.sub init :method
+	.param pmc ast :named('ast')
+	.param pmc ost :named('ost')
+	.param pmc pir :named('pir')
 
-	.local pmc arg_string
-
-	arg_string = new .String
-	arg_string = init_args['pge2past']
-	setattribute self, 'pge2past',  arg_string
-
-	arg_string = new .String
-	arg_string = init_args['past2post']
-	setattribute self, 'past2post', arg_string
-
-	arg_string = new .String
-	arg_string = init_args['post2pir']
-	setattribute self, 'post2pir',  arg_string
+	setattribute self, 'ast',  ast
+	setattribute self, 'ost', ost
+	setattribute self, 'pir',  pir
 .end
 
 .sub 'compile' :method
 	.param pmc source
 
 	.local pmc parse_tree
-	parse_tree = self.get_parse_tree( source )
+	parse_tree = self.'get_parse_tree'( source )
 	unless parse_tree goto err_parse_fail
 
 	# self.dump_parse_tree( parse_tree )
@@ -55,6 +47,8 @@
 	.local pmc pir
 	pir = self.get_pir( post_tree )
 	unless pir goto err_pir_fail
+	# print pir
+	# end
 
 	.local pmc pir_compiled
 	pir_compiled = self.compile_pir( pir )
@@ -109,17 +103,14 @@
 
 	store_global 'PhemeCompiler', 'symbols', compiled_symbols
 
-	.local pmc tg_source
-	tg_source = getattribute self, 'pge2past'
+	.local pmc tge_past
+	tge_past = getattribute self, 'ast'
 
 	.local pmc compiler
 	compiler = new 'TGE::Compiler'
 
-	.local pmc tree_grammar
-	tree_grammar = compiler.'compile'( tg_source )
-
 	.local pmc ast_builder
-	ast_builder = tree_grammar.apply( parse_tree )
+	ast_builder = tge_past.apply( parse_tree )
 
 	.local pmc past_tree
 	past_tree = ast_builder.get( 'result' )
@@ -131,17 +122,11 @@
 
 	load_bytecode 'lib/POST.pir'
 
-	.local pmc tg_source
-	tg_source = getattribute self, 'past2post'
-
-	.local pmc compiler
-	compiler = new 'TGE::Compiler'
-
-	.local pmc post_grammar
-	post_grammar = compiler.'compile'( tg_source )
+	.local pmc tge_ost
+	tge_ost = getattribute self, 'ost'
 
 	.local pmc post_builder
-	post_builder = post_grammar.apply( past_tree )
+	post_builder = tge_ost.apply( past_tree )
 
 	.local pmc post_tree
 	post_tree = post_builder.get( 'result' )
@@ -151,17 +136,11 @@
 .sub get_pir :method
 	.param pmc post_tree
 
-	.local pmc tg_source
-	tg_source = getattribute self, 'post2pir'
-
-	.local pmc compiler
-	compiler = new 'TGE::Compiler'
-
-	.local pmc pir_grammar
-	pir_grammar = compiler.'compile'( tg_source )
+	.local pmc tge_pir
+	tge_pir = getattribute self, 'pir'
 
 	.local pmc pir_builder
-	pir_builder = pir_grammar.apply( post_tree )
+	pir_builder = tge_pir.apply( post_tree )
 
 	.local pmc pir
 	pir = pir_builder.get( 'result' )

@@ -1,3 +1,5 @@
+grammar OSTGrammar is TGE::Grammar;
+
 transform result (ROOT) :language('PIR') {
 	.local pmc result
 	result = new 'POST::Node'

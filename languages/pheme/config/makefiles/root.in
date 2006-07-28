@@ -5,28 +5,41 @@ PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 PGE_DIR  = ../../compilers/pge
+TGE_DIR  = ../../compilers/tge
 CP       = @cp@
 
 # the default target
 all: pheme.pbc
 
 lib/PhemeGrammar.pbc: lib/PhemeGrammar.pir lib/pheme_grammar_gen.pir
-	$(PARROT) -o lib/PhemeGrammar.pbc --output-pbc lib/PhemeGrammar.pir
+	$(PARROT) -o lib/PhemeGrammar.pbc lib/PhemeGrammar.pir
 
 lib/pheme_grammar_gen.pir: lib/pheme.g
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pheme_grammar_gen.pir lib/pheme.g
 
+lib/ASTGrammar.pbc: lib/pge2past.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/ASTGrammar.pir lib/pge2past.tg
+	$(PARROT) -o lib/ASTGrammar.pbc lib/ASTGrammar.pir
+
+lib/OSTGrammar.pbc: lib/past2post.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/OSTGrammar.pir lib/past2post.tg
+	$(PARROT) -o lib/OSTGrammar.pbc lib/OSTGrammar.pir
+
+lib/PIRGrammar.pbc: lib/post2pir.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/PIRGrammar.pir lib/post2pir.tg
+	$(PARROT) -o lib/PIRGrammar.pbc lib/PIRGrammar.pir
+
 lib/PhemeSymbols.pbc: lib/PhemeSymbols.pir
-	$(PARROT) -o lib/PhemeSymbols.pbc --output-pbc lib/PhemeSymbols.pir
+	$(PARROT) -o lib/PhemeSymbols.pbc lib/PhemeSymbols.pir
 
 lib/PhemeCompiler.pbc: lib/PhemeCompiler.pir lib/POST.pbc
-	$(PARROT) -o lib/PhemeCompiler.pbc --output-pbc lib/PhemeCompiler.pir
+	$(PARROT) -o lib/PhemeCompiler.pbc lib/PhemeCompiler.pir
 
 lib/POST.pbc: lib/POST.pir
-	$(PARROT) -o lib/POST.pbc --output-pbc lib/POST.pir
+	$(PARROT) -o lib/POST.pbc lib/POST.pir
 
-pheme.pbc: lib/PhemeGrammar.pbc pheme.pir lib/PhemeSymbols.pbc lib/PhemeCompiler.pbc
-	$(PARROT) -o pheme.pbc --output-pbc pheme.pir
+pheme.pbc: lib/PhemeGrammar.pbc pheme.pir lib/PhemeSymbols.pbc lib/PhemeCompiler.pbc lib/ASTGrammar.pbc lib/OSTGrammar.pbc lib/PIRGrammar.pbc
+	$(PARROT) -o pheme.pbc pheme.pir
 
 # This is a listing of all targets that users can call
 help:
