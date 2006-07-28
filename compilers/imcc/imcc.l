@@ -77,7 +77,6 @@ static int read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner);
 static int expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner);
 static void include_file (Interp* interp, char *file_name, void *yyscanner);
 static int in_pod;
-static int prev_state;
 static char *heredoc_end;
 static char *heredoc_content;
 
@@ -179,7 +178,7 @@ SP              [ ]
             mem_sys_free(heredoc_end);
             frames->buffer = YY_CURRENT_BUFFER;
             valp->s = heredoc_content;
-            BEGIN(prev_state);
+            yy_pop_state(yyscanner); 
             yy_scan_string(frames->heredoc_rest, yyscanner);
             return(STRINGC); /* XXX delete quotes, -> emit, pbc */
         }
@@ -194,39 +193,48 @@ SP              [ ]
     }
 
 
-<*>^"#line"{SP}{DIGITS}{SP}["] { prev_state = YYSTATE; BEGIN(cmt2);
-                       valp->t = atoi(yytext+6);
-                       return LINECOMMENT;
-               }
-<cmt2>[^"]+    { BEGIN(cmt3);
-                      valp->s = str_dup(yytext);
-                      return FILECOMMENT;
-               }
-<cmt3>["]      { BEGIN(cmt4); }
-
-<*>setfile{SP}+["]   { prev_state = YYSTATE; BEGIN(cmt2); }
-<*>setline{SP}+      { prev_state = YYSTATE; BEGIN(cmt1); }
-<cmt1>{DIGITS}       {
-                       valp->t = atoi(yytext);
-                       BEGIN(cmt4);
-                       return LINECOMMENT;
-               }
-<cmt4>.*{EOL}  { BEGIN(prev_state) ; line++; }
-
+<*>^"#line"{SP}{DIGITS}{SP}["] {  
+        yy_push_state(cmt2, yyscanner);
+        valp->t = atoi(yytext+6);
+        return LINECOMMENT;
+    }
+<cmt2>[^"]+ {      
+        yy_pop_state(yyscanner);
+        yy_push_state(cmt3, yyscanner);
+        valp->s = str_dup(yytext);
+        return FILECOMMENT;
+    }
+<cmt3>["] { 
+        yy_pop_state(yyscanner);
+        yy_push_state(cmt4, yyscanner);
+}
+<*>setfile{SP}+["] { yy_push_state(cmt2, yyscanner); }
+<*>setline{SP}+ { yy_push_state(cmt1, yyscanner);  }
+<cmt1>{DIGITS} {
+        valp->t = atoi(yytext);
+        yy_pop_state(yyscanner);
+        yy_push_state(cmt4, yyscanner);
+        return LINECOMMENT;
+    }
+<cmt4>.*{EOL} { 
+        yy_pop_state(yyscanner);
+        line++; 
+    }
 <INITIAL,emit>{EOL} {
         if (expect_pasm == 2)
-      BEGIN(INITIAL);
+            BEGIN(INITIAL);
         expect_pasm = 0;
         line++;
         return '\n';
     }
-
-<INITIAL,emit># { prev_state = YYSTATE; BEGIN(cmt5); }
+<INITIAL,emit># { 
+        yy_push_state(cmt5, yyscanner);
+    } 
 <cmt5>.*{EOL} {
         if (expect_pasm == 2)
-      BEGIN(INITIAL);
+            BEGIN(INITIAL);
         else
-          BEGIN(prev_state);
+            yy_pop_state(yyscanner);
         expect_pasm = 0;
         line++;
         return '\n';
@@ -504,12 +512,11 @@ SP              [ ]
         frame = new_frame(interp);
         frame->s.next = (struct parser_state_t*) frames;
         frames = frame;
-        prev_state = YYSTATE;
         /* Start slurping up the heredoc. */
         heredoc_content = mem_sys_allocate(2);
         heredoc_content[0] = yytext[2];        /* preserve delim */
         heredoc_content[1] = 0;                /* eos */
-        BEGIN(heredoc1);
+        yy_push_state(heredoc1, yyscanner);
     }
 
 <*>{UNICODE} {
