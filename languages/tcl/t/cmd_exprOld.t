@@ -2,14 +2,8 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 190;
+use Parrot::Test tests => 160;
 use Test::More;
-
-language_output_is("tcl",<<TCL,<<OUT,"lt, numeric, not alpha...");
- puts [expr 10 < 9]
-TCL
-0
-OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"lt, numeric, not alpha, with vars");
  set a 10
@@ -23,114 +17,6 @@ language_output_is("tcl",<<'TCL',<<OUT,"lt, numeric, not alpha, with vars and br
  puts [expr {$a < 9}]
 TCL
 0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"lt, true");
- puts [expr 2 < 3]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"lt, false");
- puts [expr 3 < 2]
-TCL
-0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"gt, true");
- puts [expr 3 > 2]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"gt, false");
- puts [expr 2 > 3]
-TCL
-0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"lte, lt");
- puts [expr 2 <= 3]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"lte, gt");
- puts [expr 3 <= 2]
-TCL
-0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"lte, eq");
- puts [expr 3 <= 3]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"gte, gt");
- puts [expr 3 >= 2]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"gte, lt");
- puts [expr 2 >= 3]
-TCL
-0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"gte, eq");
- puts [expr 3 >= 3]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"==, eq");
- puts [expr 2 == 2]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"==, ne");
- puts [expr 2 == 1]
-TCL
-0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"==, ne");
- puts [expr 1 != 1]
-TCL
-0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"==, eq");
- puts [expr 2 != 1]
-TCL
-1
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"&");
- puts [expr 5 & 6 ]
-TCL
-4
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"|");
- puts [expr 5 | 6 ]
-TCL
-7
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"^");
- puts [expr 5 ^ 6 ]
-TCL
-3
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"simple &&");
-  puts [expr 2&&2][expr 2&&0][expr 0&&2][expr 0&&0]
-TCL
-1000
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"&&, both sides");
@@ -160,12 +46,6 @@ language_output_is("tcl",<<TCL,<<OUT,"&&, short circuited");
 TCL
 F
 0
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"simple ||");
-  puts [expr 2||2][expr 2||0][expr 0||2][expr 0||0]
-TCL
-1110
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"||, short circuited");
@@ -860,46 +740,10 @@ TCL
 unknown math function "fink"
 OUT
 
-language_output_is("tcl",<<TCL,<<OUT,"string mul");
- puts [expr {"a" * "b"}]
-TCL
-can't use non-numeric string as operand of "*"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"string div");
- puts [expr {"a" / "b"}]
-TCL
-can't use non-numeric string as operand of "/"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"string remainder");
- puts [expr {"a" % "b"}]
-TCL
-can't use non-numeric string as operand of "%"
-OUT
-
 language_output_is("tcl",<<TCL,<<OUT,"float remainder");
  puts [expr 3.2 % 2]
 TCL
 can't use floating-point value as operand of "%"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"string plus");
- puts [expr {"a" + "b"}]
-TCL
-can't use non-numeric string as operand of "+"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"string minus");
- puts [expr {"a" - "b"}]
-TCL
-can't use non-numeric string as operand of "-"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"string left shift");
- puts [expr {"a" << "b"}]
-TCL
-can't use non-numeric string as operand of "<<"
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"float left shift");
@@ -908,22 +752,10 @@ TCL
 can't use floating-point value as operand of "<<"
 OUT
 
-language_output_is("tcl",<<TCL,<<OUT,"string right shift");
- puts [expr {"a" >> "b"}]
-TCL
-can't use non-numeric string as operand of ">>"
-OUT
-
 language_output_is("tcl",<<TCL,<<OUT,"float right shift");
  puts [expr 3.2 >> 2]
 TCL
 can't use floating-point value as operand of ">>"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"string &");
- puts [expr {"a" & "b"}]
-TCL
-can't use non-numeric string as operand of "&"
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"float &");
@@ -932,22 +764,10 @@ TCL
 can't use floating-point value as operand of "&"
 OUT
 
-language_output_is("tcl",<<TCL,<<OUT,"string |");
- puts [expr {"a" | "b"}]
-TCL
-can't use non-numeric string as operand of "|"
-OUT
-
 language_output_is("tcl",<<TCL,<<OUT,"float |");
  puts [expr 3.2 | 2]
 TCL
 can't use floating-point value as operand of "|"
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"string ^");
- puts [expr {"a" ^ "b"}]
-TCL
-can't use non-numeric string as operand of "^"
 OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"float ^");
