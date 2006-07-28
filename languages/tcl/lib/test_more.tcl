@@ -46,8 +46,7 @@ proc is {value expected {description ""} {special {}}}  {
 
         set value [join [split $value "\n"] "\n# "]
         set expected [join [split $expected "\n"] "\n# "]
-        puts "#      got : '$value'"
-        puts "# expected : '$expected'"
+        diag "\n#     Failed test (sorry, no line numbers)\n#      got : '$value'\n# expected : '$expected'"
         return 0
     }
 }
@@ -91,7 +90,7 @@ proc cmp_ok {left op right {description ""} {special {}}} {
 }
 
 proc diag {diagnostic} {
-  puts "# $diagnostic"
+  puts stderr "# $diagnostic"
 }
 
 # XXX hacks to help avoid translating the actual tcl tests, until we actuall
