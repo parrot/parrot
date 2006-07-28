@@ -96,10 +96,7 @@ main(int margc, char *margv[])
     /* this registers the PIR compiler */
     imcc_init(interpreter);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new(interpreter, 0);
-    Parrot_loadbc(interpreter, pf);
-    pf->cur_cs = PF_create_default_segs(interpreter, "test_code", 1);
-    Parrot_loadbc(interpreter, pf);
+    pf = PackFile_new_dummy(interpreter, "test_code");
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
@@ -181,10 +178,7 @@ main(int margc, char *margv[])
     /* this registers the PIR compiler */
     imcc_init(interpreter);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new(interpreter, 0);
-    Parrot_loadbc(interpreter, pf);
-    pf->cur_cs = PF_create_default_segs(interpreter, "test_code", 1);
-    Parrot_loadbc(interpreter, pf);
+    pf = PackFile_new_dummy(interpreter, "test_code");
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
@@ -274,10 +268,7 @@ main(int margc, char *margv[])
     /* this registers the PIR compiler */
     imcc_init(interpreter);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new(interpreter, 0);
-    Parrot_loadbc(interpreter, pf);
-    pf->cur_cs = PF_create_default_segs(interpreter, "test_code", 1);
-    Parrot_loadbc(interpreter, pf);
+    pf = PackFile_new_dummy(interpreter, "test_code");
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
@@ -367,10 +358,7 @@ main(int margc, char *margv[])
     /* this registers the PIR compiler */
     imcc_init(interpreter);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new(interpreter, 0);
-    Parrot_loadbc(interpreter, pf);
-    pf->cur_cs = PF_create_default_segs(interpreter, "test_code", 1);
-    Parrot_loadbc(interpreter, pf);
+    pf = PackFile_new_dummy(interpreter, "test_code");
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
@@ -460,10 +448,7 @@ main(int margc, char *margv[])
     /* this registers the PIR compiler */
     imcc_init(interpreter);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new(interpreter, 0);
-    Parrot_loadbc(interpreter, pf);
-    pf->cur_cs = PF_create_default_segs(interpreter, "test_code", 1);
-    Parrot_loadbc(interpreter, pf);
+    pf = PackFile_new_dummy(interpreter, "test_code");
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
@@ -552,11 +537,7 @@ main(int margc, char *margv[])
     /* this registers the PIR compiler */
     imcc_init(interpreter);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new(interpreter, 0);
-    Parrot_loadbc(interpreter, pf);
-    pf->cur_cs = PF_create_default_segs(interpreter, "test_code", 1);
-    Parrot_loadbc(interpreter, pf);
-
+    pf = PackFile_new_dummy(interpreter, "test_code");
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
     Parrot_exit(0);

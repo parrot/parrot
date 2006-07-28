@@ -915,6 +915,29 @@ PackFile_new(Interp* interpreter, INTVAL is_mapped)
 
 /*
 
+=item C<struct PackFile * PackFile_new_dummy(Interp*, const char *name)>
+
+Create a new (initial) dummy PackFile. This is needed, if the interpreter
+doesn't load any bytecode, but is using Parrot_compile_string.
+
+=cut
+
+*/
+
+struct PackFile *
+PackFile_new_dummy(Interp* interpreter, const char *name)
+{
+    struct PackFile *pf;
+
+    pf = PackFile_new(interpreter, 0);
+    interpreter->initial_pf = pf;
+    interpreter->code = 
+        pf->cur_cs = PF_create_default_segs(interpreter, name, 1);
+    return pf;
+}
+
+/*
+
 =item C<INTVAL PackFile_funcs_register(Interp*, struct PackFile *pf, UINTVAL type, struct PackFile_funcs funcs)>
 
 Register the C<pack>/C<unpack>/... functions for a packfile type.

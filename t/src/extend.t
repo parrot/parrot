@@ -594,15 +594,18 @@ int main(int argc, char* argv[])
     Parrot_PMC    retval;
     Parrot_PMC    sub;
     Parrot_Interp interp = Parrot_new(NULL);
-    char   * code[]      = { ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n" };
+    char   * code      = ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n";
     STRING * code_type;
     STRING * error;
     STRING * foo_name;
+    Parrot_PackFile packfile;
 
     if (!interp) {
         printf( "Hiss\n" );
         return 1;
     }
+
+    packfile = PackFile_new_dummy(interp, "dummy");
 
     code_type = const_string( interp, "PIR" );
     retval    = Parrot_compile_string( interp, code_type, code, &error );

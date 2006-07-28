@@ -238,6 +238,7 @@ struct PackFile {
 */
 
 PARROT_API struct PackFile *PackFile_new(Interp *, INTVAL is_mapped);
+PARROT_API struct PackFile *PackFile_new_dummy(Interp *, const char* name);
 
 PARROT_API void PackFile_destroy(Interp *, struct PackFile * self);
 
