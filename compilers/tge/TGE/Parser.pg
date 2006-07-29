@@ -1,6 +1,6 @@
 grammar TGE::Parser;
 
-token start { ^ <TGE::Parser::statements>* $ }
+token start { ^ <TGE::Parser::statements>* [ $ | <syntax_error> ] }
 
 rule statements { 
      <transrule>
@@ -56,3 +56,5 @@ regex pod_comment {
          ]
          [\n|$]
 }
+
+token syntax_error { <?PGE::Util::die Syntax error> }

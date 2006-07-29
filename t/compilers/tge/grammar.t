@@ -16,7 +16,7 @@ tge/grammar.t - TGE::Parser tests
 
 =head1 SYNOPSIS
 
-    $ prove t/parser.t
+    $ prove t/compilers/tge/grammar.t
 
 =head1 DESCRIPTION
 

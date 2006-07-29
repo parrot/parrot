@@ -15,7 +15,7 @@ t/basic.t - testing a few basic components of TGE::Grammar and TGE::Tree
 
 =head1 SYNOPSIS
 
-	$ prove t/basic.t
+	$ prove t/compilers/tge/basic.t
 
 =cut
 

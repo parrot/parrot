@@ -15,7 +15,7 @@ t/parser.t - TGE::Parser tests
 
 =head1 SYNOPSIS
 
-	$ prove t/parser.t
+	$ prove t/compilers/tge/parser.t
 
 =cut
 
@@ -66,6 +66,27 @@ matched start rule
 parse succeeded
 OUT
 
+pir_output_like(<<'CODE', qr/Syntax error at line 4, near "transform "/, "parse failure");
+
+.sub _main :main
+    load_bytecode "compilers/tge/TGE.pir"
+
+    .local string source
+    source = <<'GRAMMAR'
+    transform min (Leaf) {
+      # nothing to see here.
+    }
+    transform max {  # missing ()'s
+    }
+
+GRAMMAR
+    .local pmc match
+    .local pmc start_rule
+    start_rule = find_global "TGE::Parser", "start"
+    match = start_rule(source) # should throw.
+.end
+
+CODE
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 1; }
+BEGIN { plan tests => 2; }

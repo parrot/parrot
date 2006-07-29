@@ -83,6 +83,7 @@ applies to a child of the current node (generally inherited attributes).
 .sub '__onload' :load
     # use other modules
     load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Util.pbc'
     load_bytecode 'compilers/tge/TGE/Rule.pbc'
     load_bytecode 'compilers/tge/TGE/Tree.pbc'
     load_bytecode 'compilers/tge/TGE/Parser.pbc'
