@@ -10,7 +10,7 @@ is [expr 4.0]     4.0 {float stays float}
 is [expr 3e2]   300.0 {scientific}
 is [expr 3e0]     3.0 {scientific with 0 exponent}
 is [expr 2.3e2] 230.0 {scientific with float base}
-# is [expr 2e17]  2e+17 {scientific in, scientific out}
+eval_is {expr 2e17}  2e+17 {scientific in, scientific out}
 eval_is {expr 3e2.0} \
  {syntax error in expression "3e2.0": extra tokens at end of expression} \
  {can only e with an integer exponent}
@@ -126,8 +126,6 @@ eval_is {expr nAn} \
 eval_is {expr nan/0} \
   {can't use non-numeric floating-point value as operand of "/"} \
   {nan trumps div by 0}
-eval_is {expr nan+nan} \
-  {can't use non-numeric floating-point value as operand of "+"}
 foreach function $function_list {
   eval_is "expr ${function}(nan)" \
     {floating point value is Not a Number} \
