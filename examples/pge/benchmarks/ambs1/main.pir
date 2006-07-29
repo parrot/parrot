@@ -21,5 +21,5 @@
 .end
 
 
-.include 'amb_gen.pir'
+.include 'ambs1_gen.pir'
    
