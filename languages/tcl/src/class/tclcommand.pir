@@ -105,7 +105,9 @@ arg_loop_done:
    .get_from_HLL($P1,'_tcl'; 'builtins', $S0)
    if_null $P1, dynamic_command
 
-   (result_num,retval) = $P1(register_num,self)
+   (result_num, $P0) = $P1(register_num,self)
+   if null $P0 goto dynamic_command
+   retval = $P0
    register_num = result_num
 
    .local pmc epoch
@@ -120,6 +122,44 @@ dynamic_command:
    dynamic.emit("  .local pmc command")
    .local int name_register
    name_register = register_num + 1
+
+   $I0 = isa name, 'TclConst'
+   unless $I0 goto dynamic_name
+
+    .local pmc colons, split
+    colons = get_root_global ['_tcl'], 'colons'
+    split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
+
+    .local string namespace, proc_name
+    proc_name = ''
+    namespace = ''
+    if name == '' goto find_name
+
+    .local pmc ns_name
+    ns_name   = split(colons, name)
+    proc_name = pop ns_name
+    $I0 = elements ns_name
+    if $I0 == 0 goto find_name
+    $S0 = ns_name[0]
+    if $S0 != "" goto join_ns_name
+    if $I0 == 1 goto find_name
+    $S0 = shift ns_name
+join_ns_name:
+    namespace = join "'; '", ns_name
+    namespace = "['" . namespace
+    namespace = namespace . "'], "
+
+find_name:
+    dynamic.emit(<<'END_PIR', label_num, name_register, namespace, proc_name)
+    $P%1 = new .String
+    $P%1 = '%3'
+    push_eh invalid_%0
+    command = get_hll_global %2 '&%3'
+    clear_eh
+END_PIR
+    goto has_name
+
+dynamic_name:
    (name_register,retval) = compile(name_register,name)
 
    dynamic .= retval
@@ -141,6 +181,8 @@ find_%0:
     command = find_global namespace_%0, $S0
     clear_eh
 END_PIR
+
+has_name:
    dynamic.emit("  if_null command, invalid_%0", label_num)
    dynamic.emit("  $P%0 = command(%1)", result_num, args)
    dynamic.emit("  goto end_%0", label_num)

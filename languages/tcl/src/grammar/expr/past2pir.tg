@@ -3,10 +3,6 @@ grammar TclExpr::PIR::Grammar is TGE::Grammar;
 transform result (ROOT)  {
     .local pmc pir
     .local pmc return_register
-
-    pir = new 'PGE::CodeString'
-    pir.emit(".namespace [ 'Tcl' ]")
-    pir.emit(".sub '_anon' :anon")
    
     $P0 = node['children']
     if $P0 goto has_children
@@ -26,11 +22,7 @@ transform result (ROOT)  {
     goto end
 
   end:
-    return_register = node['ret']
-    pir .= $P0
-    pir.emit('  .return(%0)', return_register)
-    pir .= ".end\n"
-    .return(pir)
+    .return($P0)
 }
 
 transform pir (PAST::Val) {

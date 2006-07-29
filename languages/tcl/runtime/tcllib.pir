@@ -203,6 +203,12 @@ env_loop_done:
   $P1 = 0
   store_global 'epoch', $P1
 
+  # the regex used for namespaces
+  .local pmc p6rule, colons
+  p6rule = compreg "PGE::P6Regex"
+  colons = p6rule('\:\:+')
+  set_hll_global 'colons', colons
+
   # register the TCL compiler.
   $P1 = find_global '_tcl_compile'
   compreg 'TCL', $P1

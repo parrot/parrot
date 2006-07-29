@@ -8,6 +8,7 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 
 =cut
 
+.HLL 'Tcl', ''
 .namespace
 
 # XXX No strings.

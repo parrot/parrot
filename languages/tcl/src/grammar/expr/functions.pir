@@ -10,6 +10,7 @@ Functions are very similar to ops, so handle them similarly here.
 
 =cut
 
+.HLL 'Tcl', ''
 .namespace
 
 .sub 'function:rand'

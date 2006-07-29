@@ -151,7 +151,6 @@ Given an expression, return a subroutine, or optionally, the raw PIR
 .sub __expr
     .param string expression
     .param int     pir_only :named('pir_only') :optional
-    .param int has_pir_only :opt_flag
 
     .local pmc parse
     .local pmc match
@@ -178,19 +177,30 @@ Given an expression, return a subroutine, or optionally, the raw PIR
 
   build_pir:
     .local pmc pirgrammar, pirbuilder
-    .local string pir
+    .local string result
     pirgrammar = new 'TclExpr::PIR::Grammar'
     pirbuilder = pirgrammar.'apply'(ast)
-    pir = pirbuilder.get('result')
+    result = pirbuilder.get('result')
 
-    if has_pir_only goto only_pir
+    $S0 = ast['ret']
+    if pir_only goto only_pir
+
+    .local pmc pir
+    pir = new 'TclCodeString'
+
+    pir.emit(".HLL 'Tcl', ''")
+    pir.emit(".namespace")
+    pir.emit(".sub '_anon' :anon")
+    pir .= result
+    pir.emit("  .return(%0)", $S0)
+    pir.emit(".end")
 
     $P1 = compreg 'PIR'
     $P2 = $P1(pir)
     .return ($P2)
 
   only_pir:
-    .return (pir)
+    .return(result, $S0)
 
   bad_expression:
     # XXX either shouldn't happen, or need better message

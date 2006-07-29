@@ -149,11 +149,10 @@ $P1=loadlib 'dynlexpad'
 .sub compiled_tcl_sub%i :anon :main
   load_bytecode 'languages/tcl/runtime/tcllib.pbc'
   .include "languages/tcl/src/returncodes.pir"
-  .local pmc epoch, p6rule, colons, split
+  .local pmc epoch, colons, split
   .get_from_HLL(epoch,'_tcl','epoch')
-  p6rule = compreg "PGE::P6Regex"
-  colons = p6rule('\:\:+')
-  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  colons = get_root_global ['_tcl'], 'colons'
+  split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
 %s
   .return ($P%i)
 .end
@@ -170,11 +169,10 @@ END_PIR
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon
 .include "languages/tcl/src/returncodes.pir"
-  .local pmc epoch, p6rule, colons, split
+  .local pmc epoch, colons, split
   .get_from_HLL(epoch,'_tcl','epoch')
-  p6rule = compreg "PGE::P6Regex"
-  colons = p6rule('\:\:+')
-  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  colons = get_root_global ['_tcl'], 'colons'
+  split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
 %s
   .return ($P%i)
 .end

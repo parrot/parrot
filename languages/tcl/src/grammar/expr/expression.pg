@@ -29,7 +29,8 @@ rule nested {
 rule subcommand  { \[ [<command> ;?]+ \] }
 
 token command {
-    <word> [<?ws>? <word>]*
+      <comment>
+    | <word> [<?ws>? <word>]*
 }
 
 token comment {
@@ -70,7 +71,7 @@ token decimal { [<[1..9]><[0..9]>*] }
 
 token octal   { 0 [ <[0..7]> | <[89]><[0..9]>* <invalid_octal> ]* }
 token hex     { 0<[xX]> ( <[0..9A..Fa..f]>) + }
-token integer { (<[+\-]>)? [<decimal> | <hex> | <octal> ] }
+token integer { (<[+\-]>)? [ <decimal> | <hex> | <octal> ] }
 
 token nullary_function { rand }
 
