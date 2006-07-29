@@ -1,5 +1,9 @@
 # $Id$
 
+2006-07-27     Bernhard Schmalhofer
+        * Generate Java with ANTLR 3.0b3
+        * Make '1 + 2 + 3' work 
+
 2006-06-17     Bernhard Schmalhofer
         * Try to make it work with current compiler tools and antlr-3ea10
 
@@ -15,7 +19,7 @@
 
 2005-12-11     Bernhard Schmalhofer
         * ANTLR is only needed for maintainance,
-	  so probing for ANTLR during Parrot configuration is not needed
+          so probing for ANTLR during Parrot configuration is not needed
 
 2005-12-11     Bernhard Schmalhofer
         * Generate PIR that sets up a PAST data structure and executes it via POST
@@ -48,4 +52,4 @@
 
 2005-07-30     Bernhard Schmalhofer
         * Release initial version to the Parrot SVN repository
-	* '+', '-', '*', '/', '%' are evaluated
+        * '+', '-', '*', '/', '%' are evaluated

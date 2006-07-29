@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -99,11 +99,11 @@ my @tests = (
 
        # binary PLUS
        [ '1 + 2', '3', 'two summands', with_antlr3 => 1 ],
-       [ '1 + 2 + 3', '6', 'three summands', with_antlr3 => 0 ],
-       [ '1 + 0 + 3', '4' ],
-       [ '1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14', '105', 'Gauss was right' ],
+       [ '1 + 2 + 3', '6', 'three summands', with_antlr3 => 1 ],
+       [ '1 + 0 + 3', '4', 'three summands including 0', with_antlr3 => 1 ],
+       [ '1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14', '105', 'Gauss was right', with_antlr3 => 1 ],
 
-       # binary '-'
+       # binary MINUS
        [ '2 - 1', '1' ],
        [ '1 - 1', '0' ],
        [ '1 - 2', '-1' ],
@@ -126,14 +126,14 @@ my @tests = (
        [ '2 % 2 + 4', '4' ],
 
        # parenthesis
-       [ '  ( 1 ) ', '1', 'one in parenthesis', with_past => 1 ],
+       [ '  ( 1 ) ', '1', 'one in parenthesis', with_past => 1, with_antlr3 => 0 ],
        [ '  ( 1 + 2 ) * 3 ', '9' ],
        [ '  ( 1 * 2 ) * 3 ', '6' ],
        [ '  ( 1 * 2 ) + 3 ', '5' ],
        [ '  ( 1 * 2 ) + ( ( ( ( 3 + 4 ) + 5 ) * 6 ) * 7 ) ', '506' ],
 
        # semicolons
-       [ '1; 2', [1, 2], 'two expressions seperated by a semicolon', with_past => 1 ],
+       [ '1; 2', [1, 2], 'two expressions seperated by a semicolon', with_past => 1, with_antlr3 => 0 ],
        [ '1+1*1; 2+2*2', [2, 6] ],
        [ '3-3/3; 4+4%4;  5-5+5', [2, 4, 5] ],
 
