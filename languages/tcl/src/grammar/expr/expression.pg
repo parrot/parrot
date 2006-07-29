@@ -15,6 +15,7 @@ token term {
     | <variable>
     | <function>
     | <nested>
+    | <[a..zA..Z]> <syntax_error: variable references require preceding $>
 }
 
 ## used by term
