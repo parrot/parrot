@@ -36,16 +36,16 @@ pir.vim: pir.vim.in $(OPS_DIR)/*.ops ops2vim.pl
 	$(PERL) ops2vim.pl $(OPS_DIR)/*.ops >> pir.vim
 
 vim-install: pir.vim
-	$(MKPATH) $(VIM_DIR)
-	$(CP) skeleton.pir $(VIM_DIR)
-	$(MKPATH) $(VIM_SYN_DIR)
-	$(CP) pir.vim $(VIM_SYN_DIR)
-	$(CP) pasm.vim $(VIM_SYN_DIR)
-	$(CP) pmc.vim $(VIM_SYN_DIR)
-	$(MKPATH) $(VIM_FT_DIR)
-	$(CP) filetype_parrot.vim $(VIM_FT_DIR)/parrot.vim
-	$(MKPATH) $(VIM_IN_DIR)
-	$(CP) indent_pir.vim $(VIM_IN_DIR)/pir.vim
+	$(MKPATH) "$(VIM_DIR)"
+	$(CP) skeleton.pir "$(VIM_DIR)"
+	$(MKPATH) "$(VIM_SYN_DIR)"
+	$(CP) pir.vim "$(VIM_SYN_DIR)"
+	$(CP) pasm.vim "$(VIM_SYN_DIR)"
+	$(CP) pmc.vim "$(VIM_SYN_DIR)"
+	$(MKPATH) "$(VIM_FT_DIR)"
+	$(CP) filetype_parrot.vim "$(VIM_FT_DIR)/parrot.vim"
+	$(MKPATH) "$(VIM_IN_DIR)"
+	$(CP) indent_pir.vim "$(VIM_IN_DIR)/pir.vim"
 
 imc.kate: imcc.xml
 
@@ -53,11 +53,11 @@ imcc.xml:
 	$(PERL) kate_syntax.pl '..@slash@' > imcc.xml
 
 vim-uninstall:
-	$(RM_F) $(VIM_SYN_DIR)/pir.vim
-	$(RM_F) $(VIM_SYN_DIR)/pasm.vim
-	$(RM_F) $(VIM_SYN_DIR)/pmc.vim
-	$(RM_F) $(VIM_FT_DIR)/parrot.vim
-	$(RM_F) $(VIM_IN_DIR)/pir.vim
+	$(RM_F) "$(VIM_SYN_DIR)/pir.vim"
+	$(RM_F) "$(VIM_SYN_DIR)/pasm.vim"
+	$(RM_F) "$(VIM_SYN_DIR)/pmc.vim"
+	$(RM_F) "$(VIM_FT_DIR)/parrot.vim"
+	$(RM_F) "$(VIM_IN_DIR)/pir.vim"
 
 clean:
 	$(RM_F) pir.vim
