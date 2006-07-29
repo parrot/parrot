@@ -93,3 +93,20 @@ fail:
 
     .throw($S0)
 .end
+
+.sub 'syntax_error'
+    .param pmc    mob
+    .param string msg
+    .param pmc    adverbs :named :slurpy
+    
+    .local pmc target
+    target = getattribute mob, '$.target'
+    
+    $P0 = new 'TclString'
+    $P0 = 'syntax error in expression "'
+    $P0 .= target
+    $P0 .= '": '
+    $P0 .= msg
+
+    .throw($P0)
+.end

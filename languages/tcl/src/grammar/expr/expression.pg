@@ -19,7 +19,10 @@ token term {
 
 ## used by term
 
-rule nested { \( <expression> \) }
+rule nested {
+    \(
+       [ <expression> \) 
+       | <syntax_error: premature end of expression> ] }
 
 # XXX EXTREMELY naive
 rule subcommand  { \[ [<command> ;?]+ \] }
