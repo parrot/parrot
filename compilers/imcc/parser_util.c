@@ -32,6 +32,10 @@ static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, char *name,
  * used in -D20 to print files with the output of every PIR compilation
  * this can't be attached to the interpreter or packfile because it has to be
  * absolutely global to prevent the files from being overwritten.
+ *
+ * This is not thread safe as is. A mutex needs to be added.
+ * 
+ * See RT#40010 for more discussion.
  */
 static INTVAL eval_nr = 0;
 
