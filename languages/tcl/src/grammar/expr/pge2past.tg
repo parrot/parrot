@@ -41,6 +41,8 @@ transform dispatch (TclExpr::Grammar) {
     if $P0 goto subcommand
     $P0 = node['variable']
     if $P0 goto variable
+    $P0 = node['nested']
+    if $P0 goto nested
     $P0 = node['type']
     if $P0 goto operator
   
@@ -78,6 +80,9 @@ scientific:
 
 variable:
     .return tree.get('result', $P0, 'variable')
+
+nested:
+    .return tree.get('result', $P0, 'nested')
 }
 
 # Go through all the children of an operator and transform them.
@@ -221,6 +226,15 @@ have_float:
 scientific:
     .return tree.get('result', $P0, 'scientific')
 }
+
+
+transform result (nested) :language('PIR') {
+    .local pmc past
+    $P0  = node['expression'; 'expr']
+    past = tree.'get'('dispatch', $P0, 'TclExpr::Grammar')
+    .return(past)
+}
+
 
 transform result (scientific) {
     .local pmc result

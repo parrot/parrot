@@ -14,9 +14,12 @@ token term {
     | <number>
     | <variable>
     | <function>
+    | <nested>
 }
 
 ## used by term
+
+rule nested { \( <expression> \) }
 
 # XXX EXTREMELY naive
 rule subcommand  { \[ [<command> ;?]+ \] }
