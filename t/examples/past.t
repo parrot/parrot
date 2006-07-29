@@ -6,7 +6,8 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 1;
+# use Parrot::Test tests => 1;
+use Parrot::Test plan  skip_all => 'PAST is being redesigned';
 use Parrot::Config;
 
 
