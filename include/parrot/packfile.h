@@ -224,7 +224,6 @@ struct PackFile {
 
     struct PackFile_ByteCode  * cur_cs;   /* used during PF loading */
 
-    INTVAL                       eval_nr;   /* nr. of eval cs */
     INTVAL                       need_wordsize;
     INTVAL                       need_endianize;
     opcode_t                     (*fetch_op)(unsigned char *);

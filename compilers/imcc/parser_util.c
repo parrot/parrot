@@ -29,6 +29,13 @@ static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, char *name,
                                SymReg **r);
 
 /*
+ * used in -D20 to print files with the output of every PIR compilation
+ * this can't be attached to the interpreter or packfile because it has to be
+ * absolutely global to prevent the files from being overwritten.
+ */
+static INTVAL eval_nr = 0;
+
+/*
  * P = new type, [init]
  * PASM like:
  *   new P, .SomeThing
@@ -589,7 +596,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
         IMCC_INFO(interp) = imc_info;
     }
 
-    sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->base.pf->eval_nr);
+    sprintf(name, "EVAL_" INTVAL_FMT, ++eval_nr);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
     cur_namespace = NULL;

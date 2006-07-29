@@ -26,6 +26,8 @@ extern FILE* ASTin;
 extern void ASTparse(Interp *);
 extern void AST_scan_string(const char *yy_str);
 
+static INTVAL eval_nr = 0;
+
 static PMC *
 ast_compile_past(Parrot_Interp interp, const char *src_string)
 {
@@ -48,7 +50,7 @@ ast_compile_past(Parrot_Interp interp, const char *src_string)
     /* pastc always compiles to interp->code->cur_cs
      * make new, switch and save old cs
      */
-    sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->base.pf->eval_nr);
+    sprintf(name, "EVAL_" INTVAL_FMT, ++eval_nr);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
     interp->imc_info->cur_namespace = NULL;
