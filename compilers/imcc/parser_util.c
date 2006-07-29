@@ -698,6 +698,34 @@ IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
     return imcc_compile(interp, s, 1, error_message);
 }
 
+PMC *
+imcc_compile_pasm_ex(Parrot_Interp interp, const char *s)
+{
+    STRING *error_message;
+    PMC *sub;
+    
+    sub = imcc_compile(interp, s, 1, &error_message);
+    if (sub == NULL ) {
+        real_exception(interp, NULL, E_Exception,
+              string_to_cstring(interp, error_message));
+    }
+    return sub;
+}
+
+PMC *
+imcc_compile_pir_ex(Parrot_Interp interp, const char *s)
+{
+    STRING *error_message;
+    PMC *sub;
+    
+    sub = imcc_compile(interp, s, 0, &error_message);
+    if (sub == NULL) {
+        real_exception(interp, NULL, E_Exception,
+              string_to_cstring(interp, error_message));
+    }
+    return sub;
+}
+
 /*
  * Compile a file by filename (can be either PASM or IMCC code)
  */
@@ -814,8 +842,8 @@ IMCC_compile_file_s(Parrot_Interp interp, const char *s,
 void
 register_compilers(Parrot_Interp interp)
 {
-    Parrot_compreg(interp, const_string(interp, "PASM"), imcc_compile_pasm);
-    Parrot_compreg(interp, const_string(interp, "PIR"), imcc_compile_pir);
+    Parrot_compreg(interp, const_string(interp, "PASM"), imcc_compile_pasm_ex);
+    Parrot_compreg(interp, const_string(interp, "PIR"), imcc_compile_pir_ex);
     /* It looks like this isn't used anywhere yet */
     /* TODO: return a Eval PMc, instead of a packfile */
     /* Parrot_compreg(interp, const_string(interp, "FILE"), imcc_compile_file ); */

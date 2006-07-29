@@ -106,6 +106,8 @@ int imcc_fprintf(Interp *, FILE *fd, const char *fmt, ...);
  */
 PMC *imcc_compile_pir(Parrot_Interp interp, const char *s);
 PMC *imcc_compile_pasm(Parrot_Interp interp, const char *s);
+PMC *imcc_compile_pir_ex(Parrot_Interp interp, const char *s);
+PMC *imcc_compile_pasm_ex(Parrot_Interp interp, const char *s);
 void *IMCC_compile_file(Parrot_Interp interp, const char *s);
 void *IMCC_compile_file_s(Parrot_Interp interp, const char *s,
       STRING **error_message);
