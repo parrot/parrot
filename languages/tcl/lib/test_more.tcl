@@ -89,6 +89,10 @@ proc cmp_ok {left op right {description ""} {special {}}} {
     ok "expr {$left $op $right}" $description $special
 }
 
+proc fail {{description ""}} {
+  is "something else: $description" {something} $description
+}
+
 proc diag {diagnostic} {
   puts stderr "# $diagnostic"
 }
@@ -97,6 +101,10 @@ proc diag {diagnostic} {
 # support tcltest.
 
 # A placeholder that simulates the real tcltest's exported test proc.
-proc test {num description code output} {
-    eval_is $code $output "$num: $description"
+proc test {num description code output args} {
+    if {$args eq ""} {
+      eval_is $code $output "$num $description"
+    } else {
+      fail "can't deal with this version of test yet."
+    }
 }
