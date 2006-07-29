@@ -1,0 +1,45 @@
+#!/usr/bin/perl -s
+
+our ($size);
+
+$size||=10;
+
+print "a = 10;\n";
+
+for (1..$size) {
+  my $op = int(rand(5));
+
+  if ($op == 0) {
+    print "print a;\n"
+  } elsif ($op == 1) {
+    print "a = ";
+    print int(rand(1000));
+    print " + ";
+    print int(rand(1000));
+    print ";\n"
+  } elsif ($op == 2) {
+    print "a = ";
+    print int(rand(1000));
+    print " - ";
+    print int(rand(1000));
+    print ";\n"
+  } elsif ($op == 3) {
+    print "a = ";
+    print int(rand(1000));
+    print " - ";
+    print int(rand(1000));
+    print " + ";
+    print int(rand(1000));
+    print ";\n"
+  } elsif ($op == 4) {
+    print "a = ";
+    print int(rand(1000));
+    print " - ";
+    print int(rand(1000));
+    print " + ";
+    print int(rand(1000));
+    print " - ";
+    print int(rand(1000));
+    print ";\n"
+  }
+}

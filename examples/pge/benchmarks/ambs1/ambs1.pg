@@ -1,0 +1,46 @@
+grammar Benchmark;
+
+token program { <statement>+ }
+
+rule statement { 
+    | print <expression> ;              {{ $I0 = match['expression']
+                                          print $I0
+                                          print "\n" }}
+    | <var> = <expression> ;            {{ $P0 = match['expression']
+                                          $S0 = match['var']
+                                          set_global $S0, $P0 }}
+}
+
+token expression { 
+    | <var>  \s*  [ \+\s* <expression>       {{ $S0 = match['var']
+                                          $P0 = get_global $S0
+                                          $I0 = $P0
+                                          $I1 = match['expression']
+                                          $I0 += $I1
+                                          .return ($I0) }}
+               | -\s*  <expression>       {{ $S0 = match['var']
+                                          $P0 = get_global $S0
+                                          $I0 = $P0
+                                          $I1 = match['expression']
+                                          $I0 -= $I1
+                                          .return ($I0) }}
+               |                       {{ $S0 = match['var']
+                                          $P0 = get_global $S0
+                                          $I0 = $P0
+                                          .return ($I0) }}
+               ]
+
+    | <number> \s*[ \+\s* <expression>       {{ $I0 = match['number']
+                                          $I1 = match['expression';0]
+                                          $I0 += $I1
+                                          .return ($I0) }}
+               | - \s*<expression>        {{ $I0 = match['number']
+                                          $I1 = match['expression';0]
+                                          $I0 -= $I1
+                                          .return ($I0) }}
+               ]?
+}
+
+token number { \d+ }
+token var { <[a..z]>+ }
+

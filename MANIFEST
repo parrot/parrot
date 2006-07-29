@@ -2468,6 +2468,9 @@ examples/pge/README                               [main]doc
 examples/pge/grammars/TAP.pg                      [main]doc
 examples/pge/grammars/bc.pg                       [main]doc
 examples/pge/grammars/PatchGrammar.pg             [main]doc
+examples/pge/bechmarks/ambs1/mktestcase           [main]doc
+examples/pge/bechmarks/ambs1/ambs1.pg             [main]doc
+examples/pge/bechmarks/ambs1/main.pir             [main]doc
 examples/subs/no_retval.pir                       [main]doc
 examples/subs/bsr_ret.pasm                        [main]doc
 examples/subs/multi_retvals.pir                   [main]doc
