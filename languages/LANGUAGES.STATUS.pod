@@ -274,6 +274,8 @@ Melvin Smith
 
 Java like language with some hybrid Perl features like regex operators planned.
 
+See also L<http://en.wikipedia.org/wiki/Cola_programming_language>.
+
 =item Status
 
 Functioning, all samples working, lacks IO routines
@@ -441,6 +443,8 @@ C/Perl like language, first compiler for Parrot. The intent is to have a block-s
 language that is higher level than IMC, but still exposes the underlying virtual machine
 rather directly, in the hope that this will eventually be useful for coding extensions to
 the VM in a language more natural than IMC.
+
+See also L<http://en.wikipedia.org/wiki/Jako_(programming)>.
 
 =item Status
 
