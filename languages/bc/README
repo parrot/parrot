@@ -1,21 +1,16 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
 This is an implementation of 'POSIX bc' for Parrot.
 'bc' is an arbitrary precision calculator dating back from Unix stone age.
 See L<http://en.wikipedia.org/wiki/Bc_%28Unix%29> for details.
 
-Implementation strategy:
+Actually these are two different implementations of bc.
+The older implementation requires ANTLR 2.7.6 and Python.
+Current development uses ANTLR 3.0 and Java.
 
-Generate PIR that sets up a PAST data structure, that will be transformed to POST
-which will be transformed to PIR, which will be  executed by Parrot.
-For details set 'languages/punie/punie.pir' and
-http://svn.lohutok.net/nam/trunk/parrot/docs/compiler_tools.pod
-
-Requirements:
-
-For maintainance and development ANTLR 2.7.5, and thus Java, is required.
-The runtime files for lexer and parsers are in the Parrot repository, thus only
+Per default the ANTLR 2 implementation is built and tested.
+The Python runtime files for lexer and parsers are in the Parrot repository, thus only
 Python is required for running.
 
 Building lexer, parser and treeparser:
@@ -31,11 +26,9 @@ Testing:
 'make test'. When GNU bc is available, the test suite will be run against GNU bc as well.
 For compatability with 'POSIX bc' the flags '--standard' and '--quiet' are used.
 
-Documentation:
+ANTLR 3 is under development. The easiest backend seems to be Java. So for now there is a 'build_java' and
+'test_java' targets. Be sure to set the CLASSPATH as shown in docs/antlr_3.pod.
 
-Sparse documentation is available in docs/parrot_bc.pod.
-
+For details see docs/parrot_bc.pod.
 Rumblings on ANTLR 3 are in docs/antlr_3.pod.
 
-ANTLR 3 is under development. The easiest backend seems to be Java. So for now there is a 'build_java' and
-'test_java' targets. Be sure to set the CLASSPATH as shown in F<docs/antlr_3.pod>.

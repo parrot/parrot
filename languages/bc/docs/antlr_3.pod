@@ -45,7 +45,9 @@ options
 'Sigil $' is for referencing alternations in actions, Lexer items only ???, also for setting returns
 
 '->' Is for tree construction
-'^' Is for definition and matching of tree nodes
+'^^' Makes a mother
+'^' Is for matching of tree nodes
+'[]' declaration and passing of parameters
 
 @members  declare additional member variables in the parser class
 
@@ -94,7 +96,8 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =head1 SEE ALSO
 
   L<http://www.antlr.org/>
-  L<http://www.antlr.org/blog/index.tml>
+  L<http://www.antlr.org/v3/index.html>
+  L<http://www.antlr.org/wiki/display/ANTLR3/Welcome+to+ANTLR+V3>
   L<http://www.antlr.org:8080/pipermail/antlr-dev/>
 
 =cut

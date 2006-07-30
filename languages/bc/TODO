@@ -4,6 +4,10 @@
 # Some tidbits on what is to do for Parrot bc.
 # See docs/parrot_bc.pod for visions.
 
+- Get rid of ANTLR 2
+
+- Switch to C# backend, run with languages/dotnet
+
 - Custom PMCs for Parrot bc
   - Decimal BigNum libraries
  

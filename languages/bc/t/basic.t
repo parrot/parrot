@@ -23,7 +23,7 @@ use Parrot::Test;
 use Test::More;
 
 if ( $PConfig{has_python} ) {
-  plan tests => 80;
+  plan tests => 81;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
@@ -70,8 +70,9 @@ my @tests = (
        [ "1\n2\n3\n4\n\n5\n6\n7", [ 1, 2, 3, 4, 5, 6, 7 ], 'seven lines', with_past => 1, with_antlr3 => 1 ],
 
        # comments 
-       [ '/* */7', 7, 'one line comment',                  with_past => 1, with_antlr3 => 1  ],
-       [ "/* line1 \n line2 \n line 3 */    -2  ", -2, 'multi line comment', with_past => 1, with_antlr3 => 0 ],
+       [ '/* */7', 7, 'one line comment',                    with_past => 1, with_antlr3 => 1  ],
+       [ "/* line1 \n line2 \n line 3 */    2  ", 2, 'multi line comment', with_past => 1, with_antlr3 => 1 ],
+       [ "/* line1 \n line2 \n line 3 */   -3  ", -3, 'multi line comment', with_past => 1, with_antlr3 => 0 ],
 
        # Strings 
        [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_past => 0 ],
@@ -83,11 +84,11 @@ my @tests = (
        # positive and negative Integers
        #[ '+1', '1', 'unary +', with_past => 1, ], Surprise, there is no unary + in POSIX bc
        [ '-1', '-1', 'unary -', with_past => 1, ],
-       [ '0', '0', undef, with_past => 1, ],
-       [ '-0', '0', undef, with_past => 1, ],
+       [ '0', '0', '0 without sign',       with_past => 1, with_antlr3 => 1 ],
+       [ '-0', '0', 'negative 0', with_past => 1, ],
        [ '1', '1', undef, with_past => 1, ],
        [ '-10', '-10', undef, with_past => 1, ],
-       [ '123456789', '123456789', undef, with_past => 1, ],
+       [ '123456789', '123456789', undef, with_past => 1, with_antlr3 => 1 ],
        [ '-123456789', '-123456789', undef, with_past => 1, ],
        [ '0001', '1', undef, with_past => 1, ],
        [ '-0001', '-1', undef, with_past => 1 ],
@@ -104,9 +105,9 @@ my @tests = (
        [ '1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14', '105', 'Gauss was right', with_antlr3 => 1 ],
 
        # binary MINUS
-       [ '2 - 1', '1' ],
-       [ '1 - 1', '0' ],
-       [ '1 - 2', '-1' ],
+       [ '2 - 1', '1', undef, with_antlr3 => 1 ],
+       [ '1 - 1', '0', undef, with_antlr3 => 1 ],
+       [ '1 - 2', '-1', undef, with_antlr3 => 1 ],
        [ '-1 - -2', '1' ],
        [ '-1 + -2 - -4 + 10', '11' ],
 

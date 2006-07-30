@@ -14,7 +14,9 @@ Self education. A fairly simple language but has symbols and subroutines.
 Test for decimal bignum libraries.
 A starting point for more interesting languages like R, GDL, JavaScript.
 
-=head1 Strategy
+=head1 Parrot bc with ANTLR 2
+
+Develoment has stalled.
 
 The language grammar is in grammar/bc_python.g. ANTLR2 takes the grammar and
 generates Python classes for lexer, parser and tree parser.
@@ -22,16 +24,18 @@ The driver program bc.py takes bc source and generates PIR.
 The generated PIR sets up a PAST data structure, and from there on Allison Randalls 
 TGE takes over.
 
-=head1 Current state
+=head2 Parrot bc with ANTLR 3
 
-The PAST generation is underway. Currently 'bc' is tranlated directly into PIR.
+Under development.
+
+Generate PIR that sets up a PAST data structure, that will be transformed to POST
+which will be transformed to PIR, which will be  executed by Parrot.
+For details set 'languages/punie/punie.pir' and
+http://svn.lohutok.net/nam/trunk/parrot/docs/compiler_tools.pod
 
 =head1 Vision
 
-Do the code generation like bc -> PAST (punie) -> PIR.
-Be compatible with Pirate and Pugs.
-Switch to ANTLR3 and let ANTLR3 create parser, lexer and treewalker in PIR.
-When that is achieved, 'Parrot bc' would need only 'parrot' at compile and run time.
+Use the C# Backend, generate .NET EXE/DLL and run with languages/dotnet. 
 
 =head1 SEE ALSO
 
