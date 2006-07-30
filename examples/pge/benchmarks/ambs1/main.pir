@@ -8,16 +8,18 @@
     .local pmc stdin
     stdin = getstdin
 
+    .local string source
+    .local string chunk
+    source = ""
     .local pmc program, match
     program = get_hll_global ['Benchmark'], 'program'
   loop:
-    .local string source
-    source = read stdin, 65535
-    unless source goto end
-
-    match = program(source, 'grammar'=>'Benchmark')
+    chunk = read stdin, 65536
+    unless chunk goto end
+    source .= chunk 
     goto loop
   end:
+    match = program(source, 'grammar'=>'Benchmark')
 .end
 
 
