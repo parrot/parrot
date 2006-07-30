@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 131;
+use Parrot::Test tests => 130;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"lt, numeric, not alpha, with vars");
@@ -397,12 +397,6 @@ language_output_is("tcl", <<'TCL', <<'OUT', "log(-4) - domain error");
   expr log(-4)
 TCL
 domain error: argument not in valid range
-OUT
-
-language_output_is('tcl', <<'TCL', <<'OUT', 'log("a")');
-  expr log("a")
-TCL
-argument to math function didn't have numeric value
 OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "pow(2,10)");
