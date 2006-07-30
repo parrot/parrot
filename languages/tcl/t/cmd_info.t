@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 25;
 use Test::More;
 use vars qw($TODO);
 
