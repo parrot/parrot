@@ -148,7 +148,7 @@ $P1=loadlib 'dynlexpad'
 .pragma n_operators 1
 .sub compiled_tcl_sub%i :anon :main
   load_bytecode 'languages/tcl/runtime/tcllib.pbc'
-  .include "languages/tcl/src/returncodes.pir"
+  .include "languages/tcl/src/macros.pir"
   .local pmc epoch, colons, split
   .get_from_HLL(epoch,'_tcl','epoch')
   colons = get_root_global ['_tcl'], 'colons'
