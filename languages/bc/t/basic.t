@@ -23,7 +23,7 @@ use Parrot::Test;
 use Test::More;
 
 if ( $PConfig{has_python} ) {
-  plan tests => 81;
+  plan tests => 82;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
@@ -94,9 +94,10 @@ my @tests = (
        [ '-0001', '-1', undef, with_past => 1 ],
 
        # floats
-       [ '-1.0001', '-1.0001' ],
-       [ '1.2', '1.2' ],
-       [ '1.2 *2 - 2.0 + 3', '3.4' ],
+       [ '.1 + 1', '1.1', 'float with leading dot', with_antrl3 => 1 ],
+       [ '-1.0001', '-1.0001' ], 
+       [ '1.2', '1.2', undef, with_antlr3 => 1 ],     # prints 1.200000 in ANTLR3 version
+       [ '1.2 *2 - 2.0 + 3', '3.4', undef, with_antlr3 => 0 ],
 
        # binary PLUS
        [ '1 + 2', '3', 'two summands', with_antlr3 => 1 ],

@@ -2,7 +2,11 @@
 // $Id$ 
  
 // Parse bc with ANTLR3
-// This grammar is derived from <http://www.funet.fi/pub/doc/posix/p1003.2/d11.2/4.3>
+
+// This grammar is derived from 
+// http://www.opengroup.org/onlinepubs/000095399/utilities/bc.html
+
+// The starting rule is 'program'
 
 grammar BcParser;
 
@@ -12,33 +16,45 @@ options
   ASTLabelType = CommonTree;
 }
 
+
 tokens 
 {
   PROGRAM;
 } 
 
+
 program 
   : input_item quit -> ^( PROGRAM input_item )
   ;
+
 
 input_item
   : expression +
   ;
 
+
 expression
   : adding_expression
   ;
+
 
 adding_expression
   : multiplying_expression ( (PLUS^^ | MINUS^^) multiplying_expression)* 
   ;
 
+
 multiplying_expression
-  : INT
+  : NUMBER
   ;
 
-INT
-  : ('0'..'9')+
+NUMBER
+  : INTEGER ('.' INTEGER)?
+    |
+    '.' INTEGER
+  ;
+
+INTEGER
+  : ('0'..'9' | 'A' .. 'F' )+
   ;
 
 MINUS
@@ -49,15 +65,12 @@ PLUS
   : '+'
   ;
 
-
 // quit is required, make testing easier
 quit
   : 'quit'
   ;    
 
 // ignore multiple-line comments
-
-
 ML_COMMENT
   : '/*' ( options {greedy=false;} : . )* '*/'
     {
@@ -65,6 +78,7 @@ ML_COMMENT
     }
   ;
 
+// ignore whitespace
 WS
   : (   ' '
       | '\t'

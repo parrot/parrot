@@ -39,12 +39,11 @@ Use the C# Backend, generate .NET EXE/DLL and run with languages/dotnet.
 
 =head1 SEE ALSO
 
-  L<http://www.funet.fi/pub/doc/posix/p1003.2/d11.2/4.3>
   L<http://en.wikipedia.org/wiki/Bc_%28Unix%29>
-  L<http://parrotcode.org>
-  L<http://pugscode.org>
-  L<http://pirate.tangentcode.com/>
-  L<http://www.javadude.com/articles/antlrtut/>
+  L<http://www.opengroup.org/onlinepubs/000095399/utilities/bc.html>
+  L<http://www.funet.fi/pub/doc/posix/p1003.2/d11.2/4.3>
+  L<http://directory.fsf.org/gnu/bc.html>
+  L<http://www.gnu.org/software/bc/manual/html_mono/bc.html>
   L<http://svn.lohutok.net/nam/trunk/parrot/docs/compiler_tools.pod>
 
 =cut
