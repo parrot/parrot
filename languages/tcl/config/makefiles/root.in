@@ -27,7 +27,6 @@ GENERATED_INLINES = \
  $(C_BUILTIN)/break.pir \
  $(C_BUILTIN)/eof.pir \
  $(C_BUILTIN)/exit.pir \
- $(C_BUILTIN)/expr.pir \
  $(C_BUILTIN)/for.pir \
  $(C_BUILTIN)/incr.pir \
  $(C_BUILTIN)/join.pir \
@@ -51,6 +50,7 @@ $(C_BUILTIN)/continue.pir \
 $(R_BUILTIN)/error.pir \
 $(R_BUILTIN)/eval.pir \
 $(C_BUILTIN)/exec.pir \
+$(C_BUILTIN)/expr.pir \
 $(R_BUILTIN)/expr.pir \
 $(C_BUILTIN)/fconfigure.pir \
 $(R_BUILTIN)/file.pir \
