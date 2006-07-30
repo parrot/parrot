@@ -124,7 +124,7 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 .tmt.pir :
 	$(PERL) tools/gen_inline.pl $< > $@
 
-.tg.pir : 
+.tg.pir :
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
 
 .pg.pir :
@@ -192,67 +192,78 @@ test:	tcl.pbc
 # run them all. For now - only run the ones that will report properly
 # to the harness.
 RUNNABLE_TCL_TESTS = \
+  t_tcl/append.t \
+  t_tcl/appendComp.t \
+  t_tcl/assocd.t \
+  t_tcl/case.t \
+  t_tcl/cmdInfo.t \
+  t_tcl/cmdIL.t  \
   t_tcl/concat.t \
   t_tcl/config.t \
+  t_tcl/dcall.t \
   t_tcl/eval.t \
+  t_tcl/foreach.t \
   t_tcl/for_old.t \
+  t_tcl/get.t \
   t_tcl/incr.t \
   t_tcl/incr_old.t \
+  t_tcl/indexObj.t \
   t_tcl/join.t \
+  t_tcl/link.t \
   t_tcl/linsert.t \
   t_tcl/llength.t \
+  t_tcl/lrange.t \
+  t_tcl/lreplace.t \
   t_tcl/lsetComp.t \
+  t_tcl/notify.t \
   t_tcl/package.t \
+  t_tcl/pid.t \
+  t_tcl/platform.t \
   t_tcl/pwd.t \
+  t_tcl/registry.t \
   t_tcl/security.t \
-  t_tcl/winConsole.t
- 
-#t_tcl/append.t          t_tcl/regexp.t
-#t_tcl/appendComp.t      t_tcl/regexpComp.t
-#t_tcl/apply.t           t_tcl/indexObj.t        t_tcl/registry.t
-#t_tcl/assocd.t          t_tcl/info.t            t_tcl/rename.t
-#t_tcl/async.t           t_tcl/init.t            t_tcl/result.t
-#t_tcl/autoMkindex.t     t_tcl/interp.t          t_tcl/safe.t
-#t_tcl/basic.t           t_tcl/io.t              t_tcl/scan.t
-#t_tcl/binary.t          t_tcl/ioCmd.t           
-#t_tcl/case.t            t_tcl/ioUtil.t          t_tcl/set.t
-#t_tcl/chan.t            t_tcl/iogt.t            t_tcl/set_old.t
-#t_tcl/clock.t           t_tcl/socket.t
-#t_tcl/cmdAH.t           t_tcl/lindex.t          t_tcl/source.t
-#t_tcl/cmdIL.t           t_tcl/link.t            t_tcl/split.t
-#t_tcl/cmdInfo.t         t_tcl/stack.t
-#t_tcl/cmdMZ.t           t_tcl/list.t            t_tcl/string.t
-#t_tcl/compExpr.t        t_tcl/listObj.t         t_tcl/stringComp.t
-#t_tcl/compExpr_old.t    t_tcl/stringObj.t
-#t_tcl/compile.t         t_tcl/load.t            t_tcl/subst.t
-#t_tcl/lrange.t          t_tcl/switch.t
-#t_tcl/lrepeat.t         t_tcl/tcltest.t
-#t_tcl/dcall.t           t_tcl/lreplace.t        t_tcl/thread.t
-#t_tcl/dict.t            t_tcl/lsearch.t         t_tcl/timer.t
+  t_tcl/split.t \
+  t_tcl/stringComp.t \
+  t_tcl/winConsole.t \
+  t_tcl/winNotify.t \
+  t_tcl/winTime.t
+
+# These test files die for various reasons. (or take too long to generate
+# any output, like expr.t)
+# In no particular order
+#t_tcl/regexp.t          t_tcl/regexpComp.t      t_tcl/apply.t
+#t_tcl/info.t            t_tcl/rename.t          t_tcl/async.t
+#t_tcl/init.t            t_tcl/result.t          t_tcl/stack.t
+#t_tcl/switch.t          t_tcl/ioUtil.t          t_tcl/set.t
+#t_tcl/if.t              t_tcl/compile.t         t_tcl/load.t
+#t_tcl/subst.t           t_tcl/lrepeat.t         t_tcl/tcltest.t
+#t_tcl/misc.t            t_tcl/unixInit.t        t_tcl/encoding.t
+#t_tcl/trace.t           t_tcl/autoMkindex.t     t_tcl/interp.t
+#t_tcl/basic.t           t_tcl/safe.t            t_tcl/io.t
+#t_tcl/chan.t            t_tcl/scan.t            t_tcl/iogt.t
+#t_tcl/cmdAH.t           t_tcl/set_old.t         t_tcl/lindex.t
+#t_tcl/thread.t          t_tcl/source.t          t_tcl/exec.t
+#t_tcl/binary.t          t_tcl/ioCmd.t           t_tcl/namespace.t
+#t_tcl/clock.t           t_tcl/socket.t          t_tcl/unknown.t
 #t_tcl/dstring.t         t_tcl/lset.t            t_tcl/tm.t
-#t_tcl/encoding.t       t_tcl/trace.t
+#t_tcl/dict.t            t_tcl/lsearch.t         t_tcl/timer.t
 #t_tcl/env.t             t_tcl/macOSXFCmd.t      t_tcl/unixFCmd.t
-#t_tcl/error.t           t_tcl/main.t            t_tcl/unixFile.t
-#t_tcl/misc.t            t_tcl/unixInit.t
 #t_tcl/event.t           t_tcl/msgcat.t          t_tcl/unixNotfy.t
-#t_tcl/exec.t            t_tcl/namespace.t       t_tcl/unknown.t
+#t_tcl/error.t           t_tcl/main.t            t_tcl/unixFile.t
 #t_tcl/execute.t         t_tcl/namespace_old.t   t_tcl/unload.t
-#t_tcl/expr.t            t_tcl/notify.t          t_tcl/uplevel.t
-#t_tcl/expr_old.t        t_tcl/obj.t             t_tcl/upvar.t
+#t_tcl/compExpr.t        t_tcl/listObj.t         t_tcl/compExpr_old.t
 #t_tcl/fCmd.t            t_tcl/opt.t             t_tcl/utf.t
-#t_tcl/fileName.t        t_tcl/util.t
-#t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/var.t
-#t_tcl/for.t             t_tcl/parseExpr.t       t_tcl/while.t
-#t_tcl/parseOld.t        t_tcl/while_old.t
-#t_tcl/foreach.t         t_tcl/pid.t
+#t_tcl/stringObj.t       t_tcl/expr.t            t_tcl/uplevel.t
+#t_tcl/fileName.t        t_tcl/util.t            t_tcl/if_old.t          
 #t_tcl/format.t          t_tcl/pkg.t             t_tcl/winDde.t
-#t_tcl/get.t             t_tcl/pkgMkIndex.t      t_tcl/winFCmd.t
-#t_tcl/history.t         t_tcl/platform.t        t_tcl/winFile.t
-#t_tcl/http.t            t_tcl/proc.t            t_tcl/winNotify.t
-#t_tcl/httpold.t         t_tcl/proc_old.t        t_tcl/winPipe.t
-#t_tcl/if.t              t_tcl/winTime.t
-#t_tcl/if_old.t          t_tcl/reg.t
- 
+#t_tcl/for.t             t_tcl/parseExpr.t       t_tcl/while.t
+#t_tcl/pkgMkIndex.t      t_tcl/proc.t            t_tcl/winFCmd.t
+#t_tcl/http.t            t_tcl/parseOld.t        t_tcl/while_old.t
+#t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/var.t
+#t_tcl/history.t         t_tcl/winFile.t         t_tcl/upvar.t
+#t_tcl/winPipe.t         t_tcl/proc_old.t        t_tcl/httpold.t         
+#t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t             
+
 tcl-test: t_tcl tcl.pbc
     # For now, just test the ones that ``work'' with test_more
 	prove $(RUNNABLE_TCL_TESTS)
