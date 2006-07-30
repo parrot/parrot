@@ -163,13 +163,13 @@ wrong # args: should be "info commands ?pattern?"
 OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"info commands exact");
-  info commands info
+  puts [info commands info]
 TCL
 info
 OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"info commands glob");
-  info commands inf?
+  puts [info commands inf?]
 TCL
-puts
+info
 OUT
