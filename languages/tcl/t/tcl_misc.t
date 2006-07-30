@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
@@ -196,3 +196,10 @@ TCL
 0012 11
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'make sure list value can be overridden by a string value');
+  set value [list a b c]
+  set value 2
+  puts $value
+TCL
+2
+OUT
