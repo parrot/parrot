@@ -11,30 +11,100 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 .HLL 'Tcl', ''
 .namespace
 
-# XXX No strings.
-.sub 'prefix:+' # unary plus
+# unary plus
+.sub 'prefix:+' :multi(String)
+    .param pmc a
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+
+    .return(a)
+
+is_string:
+    .throw("can't use non-numeric string as operand of \"+\"")
+.end
+
+.sub 'prefix:+' :multi(pmc)
     .param pmc a
     $N0 = a
     .return ($N0)
 .end
 
-# XXX No strings.
-.sub 'prefix:-'     # unary minus
+# unary minus
+.sub 'prefix:-' :multi(String)
+    .param pmc a
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+
+    $N0 = a
+    $N0 = neg $N0
+    .return($N0)
+
+is_string:
+    .throw("can't use non-numeric string as operand of \"-\"")
+.end
+
+.sub 'prefix:-' :multi(pmc)
     .param pmc a
     $N0 = a
     $N0 = neg $N0
     .return ($N0)
 .end
 
-# XXX Integer Only
-.sub 'prefix:~'     # bit-wise NOT
+# bit-wise NOT
+.sub 'prefix:~' :multi(String)
+    .param pmc a
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+
+    $I0 = a
+    $I0 = bnot $I0
+    .return($I0)
+
+is_string:
+    .throw("can't use non-numeric string as operand of \"~\"")
+.end
+
+.sub 'prefix:~' :multi(pmc)
     .param int a
     $I0 = bnot a
     .return ($I0)
 .end
 
-# XXX No strings.
-.sub 'prefix:!'     # logical NOT
+# logical NOT
+.sub 'prefix:!' :multi(String)
+    .param pmc a
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+
+    $I0 = a
+    $I0 = not $I0
+    .return($I0)
+
+is_string:
+    .throw("can't use non-numeric string as operand of \"!\"")
+.end
+
+.sub 'prefix:!' :multi(pmc)
     .param int a
     $I0 = not a
     .return ($I0)
