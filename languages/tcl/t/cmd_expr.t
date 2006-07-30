@@ -15,7 +15,7 @@ eval_is {expr 3e2.0} \
  {syntax error in expression "3e2.0": extra tokens at end of expression} \
  {can only e with an integer exponent}
 
-eval_is {expr {}} {syntax error en expression "": premature end of expression}
+eval_is {expr {}} {syntax error in expression "": premature end of expression}
 
 # simple unary ops.
 is [expr -2]  -2 {unary -}
