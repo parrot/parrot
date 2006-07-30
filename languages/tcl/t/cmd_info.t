@@ -1,175 +1,105 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 25;
-use Test::More;
-use vars qw($TODO);
+source lib/test_more.tcl
+plan 25
 
-language_output_is("tcl",<<'TCL',<<OUT,"info no subcommand");
- info
-TCL
-wrong # args: should be "info option ?arg arg ...?"
-OUT
+eval_is {info} \
+  {wrong # args: should be "info option ?arg arg ...?"} \
+  {info no subcommand}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info bad subcommand");
- info bork
-TCL
-bad option "bork": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars
-OUT
+eval_is {info bork} \
+  {bad option "bork": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars} \
+  {info bad subcommand}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info args bad param");
- info args
-TCL
-wrong # args: should be "info args procname"
-OUT
+eval_is {info args} \
+  {wrong # args: should be "info args procname"} \
+  {info args bad param}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info args bad param too many");
- info args a b c
-TCL
-wrong # args: should be "info args procname"
-OUT
+eval_is {info args a b c} \
+  {wrong # args: should be "info args procname"} \
+  {info args bad param too many}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info args no args");
- proc me {} { puts 2 }
- puts [info args me]
-TCL
+eval_is {
+  proc me {} { puts 2 }
+  info args me
+} {} {info args no args}
 
-OUT
+eval_is {
+  proc me {a} { puts 2 }
+  info args me
+} {a} {info args one var}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info args one arg");
- proc me {a} { puts 2 }
- puts [info args me]
-TCL
-a
-OUT
+eval_is {
+  proc me {a b c args} { puts 2 }
+  info args me
+} {a b c args} {info args multi args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info args multi args");
- proc me {a b c args} { puts 2 }
- puts [info args me]
-TCL
-a b c args
-OUT
+catch {rename me ""}
+eval_is {
+  info args me
+} {"me" isn't a procedure} {info args no proc}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info args no proc");
- puts [info args me]
-TCL
-"me" isn't a procedure
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT', "info args default args");
+eval_is {
   proc foo {a {b 2}} {puts a; puts b}
-  puts [info args foo]
-TCL
-a b
-OUT
+  info args foo
+} {a b} {info args default args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info body no args");
- info body
-TCL
-wrong # args: should be "info body procname"
-OUT
+eval_is {
+  info body
+} {wrong # args: should be "info body procname"} {info body no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info body too many args");
- info body a b
-TCL
-wrong # args: should be "info body procname"
-OUT
+eval_is {
+  info body a b
+} {wrong # args: should be "info body procname"} {info body too many args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"info body bad proc");
- info body bork
-TCL
-"bork" isn't a procedure
-OUT
+eval_is {
+  info body bork
+} {"bork" isn't a procedure} {info body bad proc}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info body normal proc");
- proc say {a} {
+eval_is {
+
+proc say {a} {
   puts $a
   #fun
- }
- puts [info body say]
-TCL
-
-  puts $a
-  #fun
- 
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"info functions too many args");
- info functions a b
-TCL
-wrong # args: should be "info functions ?pattern?"
-OUT
-
-TODO: {
-  local $TODO = "implement sorting before this can work reliably";
-
-language_output_is("tcl",<<'TCL',<<'OUT',"info functions basic");
- puts [info functions]
-TCL
-round wide sqrt sin double log10 atan hypot rand abs acos atan2 srand sinh floor log int tanh tan asin ceil cos cosh exp pow fmod
-OUT
 }
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info functions pattern");
- puts [info functions s??t]
-TCL
-sqrt
-OUT
+ info body say
+} {
+  puts $a
+  #fun
+} {info body normal proc}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info exists no args");
-  info exists
-TCL
-wrong # args: should be "info exists varName"
-OUT
+eval_is {info functions a b} \
+  {wrong # args: should be "info functions ?pattern?"} \
+  {info functions too many args}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info exists too many args");
-  info exists a b c
-TCL
-wrong # args: should be "info exists varName"
-OUT
+is [lsort [info functions]] \
+  {abs acos asin atan atan2 bool ceil cos cosh double exp floor fmod hypot int log log10 pow rand round sin sinh sqrt srand tan tanh wide} \
+  {info functions basic}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info exists true");
-  set a 1
-  puts [info exists a]
-TCL
-1
-OUT
+is [info functions s??t] {sqrt} {info functions pattern}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info exists false");
-  puts [info exists a]
-TCL
-0
-OUT
+eval_is {info exists} \
+  {wrong # args: should be "info exists varName"} \
+  {info exists no args}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info tclversion too many args");
-  info tclversion v
-TCL
-wrong # args: should be "info tclversion"
-OUT
+eval_is {info exists a b c} \
+  {wrong # args: should be "info exists varName"} \
+  {info exists too many args}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info tclversion");
-  if {[info tclversion] == [set tcl_version]} {
-    puts "ok"
-  }
-TCL
-ok
-OUT
+is [set a 1; info exists a] 1 {info exists true}
+catch {unset a}
+is [info exists a] 0 {info exists false}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info commands too many args");
-  info commands a b 
-TCL
-wrong # args: should be "info commands ?pattern?"
-OUT
+eval_is {info tclversion v} \
+  {wrong # args: should be "info tclversion"} \
+  {info tclversion too many args}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info commands exact");
-  puts [info commands info]
-TCL
-info
-OUT
+is [expr [info tclversion] == [set tcl_version]] 1 {info tclversion}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"info commands glob");
-  puts [info commands inf?]
-TCL
-info
-OUT
+eval_is {info commands a b} \
+  {wrong # args: should be "info commands ?pattern?"} \
+  {info commands too many args}
+
+is [info commands info] info {info commands exact}
+is [info commands inf?] info {info commands glob}
