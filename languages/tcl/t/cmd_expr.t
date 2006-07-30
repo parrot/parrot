@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 124
+plan 133
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -23,6 +23,13 @@ is [expr +2]   2 {unary +}
 is [expr ~0]  -1 {unary ~}
 is [expr !2]   0 {unary !}
 is [expr !!2]  1 {double unary !}
+
+# simple unary ops - stringified args
+is [expr {-"2"}]  -2 {unary -}
+is [expr {+"2"}]   2 {unary +}
+is [expr {~"0"}]  -1 {unary ~}
+is [expr {!"2"}]   0 {unary !}
+is [expr {!!"2"}]  1 {double unary !}
 
 # simple unary ops  - octal
 
@@ -90,6 +97,13 @@ is [expr 2||0] 1 {||}
 is [expr 0||2] 1 {||}
 is [expr 0||0] 0 {||}
 
+# invalid (string) operators for some unary ops
+set ops_list [list - + ~ !]
+foreach operator $ops_list {
+  eval_is "expr {${operator}\"a\"}" \
+    "can't use non-numeric string as operand of \"$operator\"" \
+    "string unary $operator" 
+}
 
 # invalid (string) operators for some binary ops
 set ops_list [list * / % + - << >> & | ^]
