@@ -269,10 +269,22 @@ bad_args:
 .sub 'children'
   .param pmc argv
 
+  .local int has_pattern
+  has_pattern = 0
+
   .local int argc
   argc = elements argv
   if argc > 2  goto bad_args
+  if argc != 2 goto iterate
 
+  .local pmc glob, pattern
+  load_bytecode 'PGE/Glob.pbc'
+  glob        = compreg 'PGE::Glob'
+  pattern     = argv[1]
+  pattern     = glob(pattern)
+  has_pattern = 1
+
+iterate:
   .local pmc list
   list = new .TclList
   
@@ -313,6 +325,10 @@ loop:
   $S0 = "::" . $S0
   $P0 = new .TclString
   $P0 = $S0
+  unless has_pattern goto is_namespace
+  $P1 = pattern($P0)
+  unless $P1 goto loop
+is_namespace:
   push list, $P0
   goto loop
 end:
