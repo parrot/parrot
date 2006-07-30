@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 123
+plan 124
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -14,6 +14,8 @@ eval_is {expr 2e17}  2e+17 {scientific in, scientific out}
 eval_is {expr 3e2.0} \
  {syntax error in expression "3e2.0": extra tokens at end of expression} \
  {can only e with an integer exponent}
+
+eval_is {expr {}} {syntax error en expression "": premature end of expression}
 
 # simple unary ops.
 is [expr -2]  -2 {unary -}
