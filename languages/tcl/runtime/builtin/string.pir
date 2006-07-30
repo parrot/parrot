@@ -109,8 +109,7 @@ not_found:
   .return(-1)
   
 bad_args:
-  .throw ('wrong # args: should be "string last subString string ?lastIndex?"')
-
+  .throw ('wrong # args: should be "string last subString string ?startIndex?"')
 .end
 
 .sub 'index'

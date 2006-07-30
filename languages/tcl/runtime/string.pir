@@ -11,7 +11,7 @@
 .HLL '_Tcl', ''
 
 .sub __string_index 
-  .param string position
+  .param pmc    position
   .param string the_string
 
   .local pmc retval
@@ -23,7 +23,8 @@
 
   if position == 'end' goto my_end
 
-  $S0 = substr position, 0, 4
+  $S0 = position
+  $S0 = substr $S0, 0, 4
   if $S0 == 'end-' goto has_end
 
   push_eh bad_arg
@@ -34,13 +35,14 @@
   .return(retval)
   
 bad_arg:
-  $S9  = 'bad index "'
-  $S9 .= position
+  $S9  = position
+  $S9  = 'bad index "' . $S9
   $S9 .= '": must be integer?[+-]integer? or end?[+-]integer?'
   .throw($S9)
  
 has_end:
-  $S1 = substr position, 4
+  $S1 = position
+  $S1 = substr $S1, 4
 
   push_eh bad_arg
     retval = __number($S1)
