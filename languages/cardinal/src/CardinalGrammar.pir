@@ -44,6 +44,15 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
 # Pull in the compiled grammar
 
 .include "languages/cardinal/src/cardinal_grammar_gen.pir"
+.sub '__onload' :load
+    $P0 = get_hll_global ['Cardinal::Grammar'], '$optable'
+    $P1 = get_hll_global ['Cardinal::Grammar'], 'ws'
+    setattribute $P0, '&!ws', $P1
+    $P0 = new .Hash
+    $P0['Str'] = '.Perl6Str'
+    $P0['Any'] = '_'
+    set_root_global ['parrot'; 'Cardinal'], 'CardinalParrotClassMap', $P0
+.end
 
 # Operator precedence parsing rule
 .sub "operator_precedence_parser"

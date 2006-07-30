@@ -25,548 +25,430 @@ opcode syntax tree.
 
 =cut
 
-grammar OSTGrammar is TGE::Grammar;
+grammar Cardinal::OSTGrammar is TGE::Grammar;
 
-transform result (ROOT) :language('PIR') {
-    .local pmc result
-    result = new 'POST::Ops'
-    result.'clone'(node)
-    .local pmc mainsub
-    mainsub = new 'POST::Sub'
-    mainsub.'clone'(node)
-    mainsub.'name'('_main')
-    mainsub.'attribute'('main')
+transform root (ROOT) :language('PIR') {
+    $P0 = new .Undef
+    store_global 'Cardinal::POST', '$?BLOCK', $P0
+    store_global 'Cardinal::PAST', '$?BLOCK', $P0
+    #tree.'outerpastblock'($P0)
+    #tree.'outerpostblock'($P0)
+    .return tree.'get'('post', node)
+}
 
-    .local pmc loadop
-    loadop = new 'POST::Call'
-    loadop.'clone'(node)
-    loadop.'name'('__load')
-    mainsub.'add_child'(loadop)
+transform post (Cardinal::PAST::Block) :language('PIR') {
+    .local string name, blocktype
+    name = node.'name'()
+    blocktype = node.'blocktype'()
+    if name > '' goto with_name
+    name = concat '_', blocktype
+    name = node.'unique'(name)
+  with_name:
+    .local pmc outerpost, outerpast
+
+    outerpost = find_global 'Cardinal::POST', '$?BLOCK'
+    outerpast = find_global 'Cardinal::PAST', '$?BLOCK'
+
+    .local pmc post
+    post = new 'Cardinal::POST::Sub'
+    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'subtype'=>blocktype)
+    store_global 'Cardinal::POST', '$?BLOCK', post
+    store_global 'Cardinal::PAST', '$?BLOCK', node
 
     .local pmc iter
     iter = node.'child_iter'()
   iter_loop:
-    unless iter, iter_end         # while (entries) ...
-      shift $P2, iter
-      $P3 = tree.get('result', $P2)
-      mainsub.'add_child'($P3)
-      goto iter_loop
+    unless iter goto iter_end
+    .local pmc cpast, cpost
+    cpast = shift iter
+    cpost = tree.'get'('post', cpast)
+    post.'add_child'(cpost)
+    goto iter_loop
   iter_end:
 
-    result.'add_child'(mainsub)
+    .local pmc value
+    value = cpost.'value'()
+    value = clone value
+    post.'value'(value)
 
-    $P4 = tree.'get'('symbols', node, 'ROOT')
-
-    result.'add_child'($P4)
-    .return (result)
-}
-
-transform symbols (ROOT) :language('PIR') {
-    .local pmc loadsub
-    loadsub = new 'POST::Sub'
-    loadsub.'clone'(node)
-    loadsub.'name'('__load')
-    loadsub.'attribute'('load')
-
-    # Add an op to load the library of builtin operators
-    .local pmc builtinsop
-    builtinsop = new 'POST::Op'
-    builtinsop.'clone'(node)
-    builtinsop.'op'('load_bytecode')
-    $P3 = new 'POST::Val'
-    $P3.'value'('languages/cardinal/src/CardinalBuiltins.pir')
-    $P3.'valtype'('strq')
-    builtinsop.'add_child'($P3)
-    loadsub.'add_child'(builtinsop)
-
-    .local pmc temp_var
-    .local pmc iter
-    iter = self.'symbol_iter'()
-  iter_loop:
-    unless iter, iter_end # while (entries) ...
-      shift $S2, iter
-      $P1 = iter[$S2]
-
-      # Create a temporary variable from the entry for this symbol
-      temp_var = clone $P1
-      $P2 = temp_var.new_dummy()
-      loadsub.'add_child'($P2)
-
-      # And put it in the global symbol table
-      .local pmc storeop
-      storeop = new 'POST::Op'
-      storeop.'clone'(node)
-      storeop.'op'('set_hll_global')
-
-      $P3 = new 'POST::Val'
-      $S4 = temp_var.'hllname'()
-      $P3.'value'($S4)
-      $P3.'valtype'('strq')
-      storeop.'add_child'($P3)
-
-      $P4 = clone temp_var
-      storeop.'add_child'($P4)
-
-      loadsub.'add_child'(storeop)
-
-      goto iter_loop
-  iter_end:
-    .return (loadsub)
-}
-
-transform result (PAST::Stmts) :language('PIR') {
-    .local pmc result
-    result = new 'POST::Ops'
-    result.'clone'(node)
-
-    .local pmc iter
-    iter = node.'child_iter'()
-  iter_loop:
-    unless iter, iter_end         # while (entries) ...
-      shift $P2, iter
-      $P3 = tree.get('result', $P2)
-      result.'add_child'($P3)
-      goto iter_loop
-  iter_end:
-    .return (result)
-}
-
-transform result (PAST::Stmt) :language('PIR') {
-    $P1 = node.children()
-    $P2 = $P1[0]
-    $P3 = tree.get('result', $P2)
-    .return ($P3)
-}
-
-transform result (PAST::Exp) :language('PIR') {
-    $P1 = node.children()
-    $P2 = $P1[0]
-    $P3 = tree.get('result', $P2)
-    .return ($P3)
-}
-
-transform result (PAST::Op) :language('PIR') {
-     .local string opname
-     opname = node.op()
-    if opname == 'infix:=' goto not_nullop
-    $S1 = substr opname, 0, 5
-    if $S1 == 'infix' goto infix
-    if opname == 'print' goto print_op
-    if opname == 'puts' goto puts_op
-    if opname == 'if' goto conditional
-    if opname == 'unless' goto conditional
-    if opname == 'elsif' goto conditional
-    if opname == 'else' goto nullop
-    goto not_nullop
-  infix:
-      $P4 = tree.get('infix', node)
-      .return ($P4)
-  puts_op:
-      $P4 = tree.get('puts_op', node)
-      .return ($P4)
-  print_op:
-      $P4 = tree.get('print_op', node)
-      .return ($P4)
-  conditional:
-      $P4 = tree.get('conditional', node)
-      .return ($P4)
-  nullop:
-      $P4 = tree.get('nullop', node)
-      .return ($P4)
-  not_nullop:
-
-    # Lookup operator name to see if there is a direct PIR translation
-    # for it.
-    .local pmc oplookup
-    oplookup = get_root_global ['ruby'; 'CardinalOpLookup'], 'lookup'
-    $S1 = oplookup(opname)
-    unless $S1 goto no_trans
-    opname = $S1
-  no_trans:
-
-    # Iterate through the children of the node, and generate the result
-    # for each child.
-    .local pmc childop
-    childop = new 'POST::Op'
-    childop.'clone'(node)
-    childop.op(opname)
-
-    # Create a node to contain the generated ops.
-    .local pmc newops
-    newops = new 'POST::Ops'
-    .local pmc iter
-    iter = node.'child_iter'()
-  iter_loop:
-    unless iter, iter_end         # while (entries) ...
-      shift $P2, iter
-      $P3 = tree.get('result', $P2)
-      $S1 = typeof $P3
-      # Does the argument have setup code?
-      unless $S1 == 'POST::Ops' goto simple_result
-        $P1 = $P3.tmpvar()
-      if null $P1 goto simple_result
-        childop.'add_child'($P1)
-        newops.'add_child'($P3)
-        goto iter_loop
-      simple_result:
-        childop.'add_child'($P3)
-      goto iter_loop
-  iter_end:
-
-    # In the context of an Op node, collapse a child comma op, so the
-    # child's children become the children of the current node.
-#    $I0 = elements newchildren
-#    if $I0 > 1 goto no_munge
-#      $P5 = newchildren[0]
-#      $S3 = typeof $P5
-#    unless $S3 == 'POST::Op' goto no_munge
-#      $S4 = $P5.op()
-#    unless $S4 == 'O_COMMA' goto no_munge
-#      newchildren = $P5.children()
-
-  no_munge:
+    store_global 'Cardinal::POST', '$?BLOCK', outerpost
+    store_global 'Cardinal::PAST', '$?BLOCK', outerpast
     
-    # Check if we had setup code for one of the children. If so, bundle
-    # it up in an Ops node.
-    $I0 = elements newops
-    if $I0 > 0 goto bundle_ops
-      .return (childop)
-  bundle_ops:
-    newops.'add_child'(childop)
-
-    .return (newops)
+    ##   For immediate blocks, generate code to execute the block.
+    $S0 = node.'blocktype'()
+    if $S0 != 'immediate' goto end
+    $P0 = post
+    post = post.'new'('Cardinal::POST::Ops', $P0, 'node'=>node)
+    post.'add_child_new'('Cardinal::POST::Op', post, 'name'=>$P0, 'node'=>node)
+  end:
+    .return (post)
 }
 
-transform infix (PAST::Op) :language('PIR') {
-    # Create the node to contain all the generated ops.
-    .local pmc newops
-    newops = new 'POST::Ops'
-    newops.'clone'(node)
-
-    # Create the op for the current node
-    .local pmc oplookup
-    .local string opname
-    .local pmc childop
-    oplookup = get_root_global ['ruby'; 'CardinalOpLookup'], 'lookup'
-    $S1 = node.op()
-    opname = oplookup($S1)
-    if opname goto op_is_simple
-      childop = new 'POST::Call'
-      $S2 = substr $S1, 6
-      childop.'name'($S2)
-      goto end_op_create
-  op_is_simple:
-      childop = new 'POST::Op'
-      childop.'op'(opname)
-  end_op_create:
-
-    # Create a temporary variable
-    .local pmc temp_var
-    temp_var = new 'POST::Var'
-    temp_var.'clone'(node)
-    $P8 = temp_var.new_dummy()
-    newops.'add_child'($P8)
-
-    # Add the temporary variable as the destination register of the op
-    childop.'add_child'(temp_var)
+transform post (Cardinal::PAST::Stmts) :language('PIR') {
+    .local pmc ops
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
 
     .local pmc iter
     iter = node.'child_iter'()
   iter_loop:
     unless iter, iter_end         # while (entries) ...
-      shift $P2, iter
-      $P3 = tree.get('result', $P2)
-      $S1 = typeof $P3
-      if $S1 == 'POST::Ops' goto complex_result # the argument has setup
-      if $S1 == 'POST::Val' goto create_tmp # the argument needs setup
-        childop.'add_child'($P3)
-        goto iter_loop
-      create_tmp:
-        # Create a temp variable
-        $P4 = new 'POST::Var'
-        $P4.'clone'(node)
-        $P5 = $P4.new_dummy()
-        newops.'add_child'($P5)
-        childop.'add_child'($P4)
-        # Assign the value node to the variable
-        $P7 = new 'POST::Op'
-        $P7.'clone'(node)
-        $P7.'op'('set')
-        $P7.'add_child'($P4) # the first argument is the variable
-        $P7.'add_child'($P3) # the second argument is the value
-        newops.'add_child'($P7)
-        goto iter_loop
-      complex_result:
-        $P1 = $P3.tmpvar()
-        childop.'add_child'($P1)
-        newops.'add_child'($P3)
-      goto iter_loop
+    $P0 = shift iter
+    $P1 = tree.get('post', $P0)
+    ops.'add_child'($P1)
+    goto iter_loop
   iter_end:
-
-    # The childop goes after all the setup code.
-    newops.'add_child'(childop)
-
-    newops.'tmpvar'(temp_var)
-
-    .return (newops)
+    $P1 = $P1.'value'()
+    ops.'value'($P1)
+    .return (ops)
 }
 
-transform conditional (PAST::Op) :language('PIR') {
-    # Create the node to contain all the generated ops.
-    .local pmc newops
-    newops = new 'POST::Ops'
+transform post (Cardinal::PAST::Stmt) :language('PIR') {
+    .local pmc past
+    .local pmc post
+    past = node[0]
+    post = tree.get('post', past)
+    .return (post)
+}
 
+transform post (Cardinal::PAST::Exp) :language('PIR') {
+    .local pmc past
+    .local pmc post
+    past = node[0]
+    post = tree.get('post', past)
+    .return (post)
+}
+
+transform post (Cardinal::PAST::Op) :language('PIR') {
     .local string opname
-    .local pmc oplookup
-    oplookup = get_root_global ['ruby'; 'CardinalOpLookup'], 'lookup'
-    $S1 = node.op()
-    opname = oplookup($S1)
-    .local pmc childop
-    childop = new 'POST::Op'
-    childop.'clone'(node)
-    childop.'op'(opname)
+    .local string pasttype
+    .local pmc optable
+    .local pmc optoken
+    
+    opname = node.'name'()
+    #optable = get_hll_global [ 'Cardinal'; 'Grammar' ], '$optable'
+    optable = get_root_global [ 'parrot'; 'Cardinal::Grammar' ], '$optable'
+    optoken = optable[opname]
+    unless optoken goto no_optoken
+    pasttype = optoken['pasttype']
+  no_optoken:
+    if pasttype > '' goto dispatch_post
+    pasttype = 'simple'
+  dispatch_post:
+    .return tree.get(pasttype, node)
+}
 
-    # Set up to handle children of Op node.
+transform postname (Cardinal::PAST::Op) :language('PIR') {
+    .local string opname
+    .local string postname
+    .local pmc optable
+    .local pmc optoken
+    
+    opname = node.'name'()
+    #optable = get_hll_global [ 'Cardinal'; 'Grammar' ], '$optable'
+    optable = get_root_global [ 'parrot'; 'Cardinal::Grammar' ], '$optable'
+    optoken = optable[opname]
+  
+    unless optoken goto no_optoken
+    postname = optoken['post']
+  no_optoken:
+    if postname > '' goto end
+    postname = concat "'", opname 
+    postname .= "'"
+  end:
+    .return (postname)
+}
+
+transform simple (Cardinal::PAST::Op) :language('PIR') {
+    .local pmc ops
+    .local string opname
+    .local string postname
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+    opname = node.'name'()
+    postname = tree.'get'('postname', node)
+
     .local pmc iter
+    .local pmc arglist
     iter = node.'child_iter'()
+    arglist = new .ResizablePMCArray
 
-    # First, handle the condition, which may be a series of statements
-    # resulting in a single value.
-    shift $P2, iter
-    $P3 = tree.get('result', $P2)
-    $S1 = typeof $P3
-    if $S1 == 'POST::Ops' goto complex_result # the argument has setup
-      childop.'add_child'($P3)
-      goto end_condition
-    complex_result:
-      $P1 = $P3.'tmpvar'()
-      childop.'add_child'($P1)
-      newops.'add_child'($P3)
-  end_condition:
-
-    # Second, create the branching op. The first child is the result of
-    # the condition, the second argument is a label.
-    .local pmc falselabel
-    falselabel = new 'POST::Label'
-    falselabel.'new_dummy'('false')
-    childop.'add_child'(falselabel)
-
-    newops.'add_child'(childop)
-
-    # Next handle the conditional body
-    shift $P2, iter
-    $P3 = tree.'get'('result', $P2)
-    newops.'add_child'($P3)
-
-    # When conditional body is selected, skip over any else/elsif
-    .local pmc endlabel
-    endlabel = new 'POST::Label'
-    endlabel.'new_dummy'('endcond')
-    $P4 = new 'POST::Op'
-    $P4.'clone'(node)
-    $P4.'op'('goto')
-    $P4.'add_child'(endlabel)
-    newops.'add_child'($P4)
-
-    # Destination for the branching op
-    $P6 = clone falselabel
-    $P6.dest(1)
-    newops.'add_child'($P6)
-
-    # Finally handle the else/elsif block if it exists
-    unless iter goto no_else_elsif
-    shift $P2, iter
-    $P3 = tree.'get'('result', $P2)
-    newops.'add_child'($P3)
-  no_else_elsif:
-
-    # Destination for the end of the conditional
-    $P6 = clone endlabel
-    $P6.dest(1)
-    newops.'add_child'($P6)
-
-    .return (newops)
-}
-
-transform nullop (PAST::Op) :language('PIR') {
-    $P1 = node.children()
-    $P2 = $P1[0]
-    $P3 = tree.get('result', $P2)
-    .return ($P3)
-}
-
-transform puts_op (PAST::Op) :language('PIR') {
-
-    # Create a node to contain the generated ops.
-    .local pmc newops
-    .local string opname
-    newops = new 'POST::Ops'
-    newops.'clone'(node)
-    opname = 'print'
-
-    $P1 = node.children()
-    .local pmc iter
-    iter = new Iterator, $P1
-    iter = 0
   iter_loop:
-    unless iter goto iter_end   
-    shift $P2, iter
-    $P1 = tree.get('result', $P2)
-    $P5 = new 'POST::Op'
-    $P5.'clone'(node)
-    $P5.'op'(opname)
-    $S1 = typeof $P1
-    
-    unless $S1 == 'POST::Ops' goto result
-    # add Ops if complex
-    newops.'add_child'($P1)
-    $P1 = $P1.tmpvar()
-    # add result op
-  result:
-    $P5.'add_child'($P1)
-    newops.'add_child'($P5)
-
-    $P5 = new 'POST::Op'
-    $P5.'clone'(node)
-    $P5.'op'(opname)
-    $P3 = new 'POST::Val'
-    $P3.'clone'(node)
-    $P3.'value'("\\n")
-    $P3.'valtype'('strqq')
-    $P5.'add_child'($P3)
-    newops.'add_child'($P5)
-    
+    unless iter goto iter_end
+    .local pmc past
+    .local pmc post
+    past = shift iter
+    $I0 = defined past
+    unless $I0 goto iter_loop
+    post = tree.'get'('post', past)
+    ops.'add_child'(post)
+    push arglist, post
     goto iter_loop
 
   iter_end:
 
-    .return (newops)
-}
-transform print_op (PAST::Op) :language('PIR') {
-    # This fairly lengthy bit collapses comma ops, by traversing down
-    # the tree and yanking up the children of the comma op to the
-    # current level.
-    $P1 = node.children()
-    $I0 = elements node 
-    if $I0 > 1 goto no_munge
-      $P2 = $P1[0]
-      $S3 = typeof $P2
-    unless $S3 == 'PAST::Exp' goto no_munge
-      $P3 = $P2.children()
-      $P4 = $P3[0]
-      $S3 = typeof $P4
-    unless $S3 == 'PAST::Op' goto no_munge
-      $S4 = $P4.op()
-    unless $S4 == 'O_COMMA' goto no_munge
-      $P1 = $P4.'child_iter'()
-  no_munge:
-     # Done collapsing comma ops
+    .local pmc optable
+    .local pmc optoken
+    .local string opreturn
 
-    # Create a node to contain the generated ops.
-    .local pmc newops
-    newops = new 'POST::Ops'
-    newops.'clone'(node)
+    #optable = get_hll_global [ 'Cardinal'; 'Grammar' ], '$optable'
+    optable = get_root_global [ 'parrot'; 'Cardinal::Grammar' ], '$optable'
+    optoken = optable[opname]
+    unless optoken goto without_opreturn
+    opreturn = optoken['returns']
 
-    # Store the opname for later reuse
-    .local string opname
-    opname = node.op()
-    opname = 'print'
-
-    # Iterate through the children of the node, and generate the result
-    # for each child.
-    .local pmc iter
-    iter = new Iterator, $P1
-    iter = 0
-  iter_loop:
-    unless iter goto iter_end         # while (entries) ...
-      shift $P2, iter
-      $P3 = tree.get('result', $P2)
-      $S1 = typeof $P3
-      $P5 = new 'POST::Op'
-      $P5.'clone'(node)
-      $P5.'op'(opname)
-      $S1 = typeof $P3
-      if $S1 == 'POST::Ops' goto complex_result # the argument has setup
-	# The default case, create a new 'print' op node with the child
-	# as an argument and push it on the list of new ops.
-        $P5.'add_child'($P3)
-        newops.'add_child'($P5)
-        goto iter_loop
-      complex_result:
-	# The complex case, retrieve the temp variable from the Ops
-	# node, and push the Ops node on the list of new ops. Then
-	# create a new 'print' op node with the temp variable as an
-	# argument and push it on the list of new ops.
-        $P1 = $P3.tmpvar()
-        newops.'add_child'($P3)
-        $P5.'add_child'($P1)
-        newops.'add_child'($P5)
-      goto iter_loop
-  iter_end:
-
-    .return (newops)
+    #$P0 = get_hll_global ['Cardinal'], 'CardinalParrotClassMap'
+    $P0 = get_root_global ['parrot'; 'Cardinal'], 'CardinalParrotClassMap'
+    unless $P0 goto without_opreturn
+    opreturn = $P0[opreturn]
+    unless opreturn goto without_opreturn
+  without_opreturn:
+    opreturn = '.Undef'
+  with_opreturn:
+    ops.'add_child_new'('Cardinal::POST::Op', ops, opreturn, 'name'=>'new')
+    ops.'add_child_new'('Cardinal::POST::Op', ops, arglist :flat, 'name'=>postname)
+    .return (ops)
 }
 
-transform result (PAST::Val) :language('PIR') {
-    .local pmc result
-    result = new 'POST::Val'
-    result.'clone'(node)
-    $P1 = node.'value'()
-    result.'value'($P1)
-    $P2 = node.'valtype'()
-    result.'valtype'($P2)
-    .return (result)
+transform assign (Cardinal::PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local pmc iter, lpast, rpast
+    .local pmc lpost, rpost
+
+    iter = node.'child_iter'()
+    lpast = shift iter
+    rpast = shift iter
+    lpost = tree.'get'('post', lpast)
+    lpost.'islvalue'(1)
+    rpost = tree.'get'('post', rpast)
+    ops.'add_child'(lpost)
+    ops.'add_child'(rpost)
+    ops.'add_child_new'('Cardinal::POST::Assign', lpost, rpost, 'name'=>'assign')
+
+    #return value 
+    .local string value
+    value = rpost.'value'()
+    ops.'value'(value)
+    .return (ops)
 }
 
-transform result (PAST::Var) :language('PIR') {
-    # The node to contain all the generated ops for a variable access
-    .local pmc newops
-    newops = new 'POST::Ops'
-    newops.'clone'(node)
+transform cond (Cardinal::PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
 
-    # The PIR variable that corresponds to the HLL variable for this
-    # piece of code
-    .local pmc hllname
-    hllname = node.'varname'()
+    .local pmc exprpast, thenpast, elsepast
+    .local pmc exprpost, thenpost, elsepost
+    exprpast = node[0]
+    thenpast = node[1]
+    elsepast = node[2]
 
-    .local pmc newvar
-    newvar = new 'POST::Var'
-    newvar.'clone'(node)
-    newvar.'new_temp'()
-    newvar.'hllname'(hllname)
-    $P1 = node.'vartype'()
-    newvar.'vartype'($P1)
-    $P1 = node.'scope'()
-    newvar.'scope'($P1)
+    .local pmc thenlabel, endlabel
+    thenlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'if_then')
+    endlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'if_end')
 
-    # Let the grammar know that it needs to add initialization code for
-    # this HLL variable in the global symbol table
-    self.'add_symbol'(hllname, newvar)
+    exprpost = tree.'get'('post', exprpast)
+    ops.'add_child'(exprpost)
+    ops.'add_child_new'('Cardinal::POST::Op', exprpost, thenlabel, 'name'=>'if')
+    
+    elsepost = exprpost
+    $I0 = defined elsepast
+    unless $I0 goto cond_no_else
+    elsepost = tree.'get'('post', elsepast)
+    ops.'add_child'(elsepost)
+  cond_no_else:
+    ops.'add_child_new'('Cardinal::POST::Op', ops, elsepost, 'name'=>'set')
+    ops.'add_child_new'('Cardinal::POST::Op', endlabel, 'name'=>'goto')
+    ops.'add_child'(thenlabel)
 
-    # A string constant argument of the name of the variable to
-    # lookup in the global symbol table
-    .local pmc name
-    name = node.'varname'()
-    .local pmc namenode
-    namenode = new 'POST::Val'
-    namenode.'clone'(node)
-    namenode.'value'(name)
-    namenode.'valtype'('strq')
+    thenpost = exprpost
+    $I0 = defined thenpast
+    unless $I0 goto cond_no_then
+    thenpost = tree.'get'('post', thenpast)
+    ops.'add_child'(thenpost)
+  cond_no_then:
+    ops.'add_child_new'('Cardinal::POST::Op', ops, thenpost, 'name'=>'set')
+    ops.'add_child'(endlabel)
+    .return (ops)
+}
 
-    # The operation to lookup the variable
-    .local pmc findop
-    findop = new 'POST::Op'
-    findop.'clone'(node)
-    findop.'op'('get_hll_global')
-    findop.'add_child'(newvar)
-    findop.'add_child'(namenode)
-    newops.'add_child'(findop)
 
-    # The final resulting variable from the operations
-    $P1 = clone newvar
-    newops.'tmpvar'($P1)
+transform xor (Perl6::PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'Perl6::POST::Ops'
+    ops.'init'('node'=>node)
 
-    .return (newops)
+    .local pmc endlabel, falselabel
+    falselabel = ops.'new'('Perl6::POST::Label', 'name'=>'xor_false')
+    endlabel = ops.'new'('Perl6::POST::Label', 'name'=>'xor_end')
+
+    .local pmc iter, apast, apost, i, t, u
+    i = ops.unique('$I')
+    t = ops.unique('$I')
+    u = ops.unique('$I')
+    iter = node.'child_iter'()
+    apast = shift iter
+    apost = tree.'get'('post', apast)
+    ops.'add_child'(apost)
+    ops.'add_child_new'('Perl6::POST::Op', ops, apost, 'name'=>'set')
+    ops.'add_child_new'('Perl6::POST::Op', t, apost, 'name'=>'istrue')
+  inner_child:
+    .local pmc bpast, bpost
+    bpast = shift iter
+    bpost = tree.'get'('post', bpast)
+    ops.'add_child'(bpost)
+    ops.'add_child_new'('Perl6::POST::Op', u, bpost, 'name'=>'istrue')
+    ops.'add_child_new'('Perl6::POST::Op', i, t, u, 'name'=>'and')
+    ops.'add_child_new'('Perl6::POST::Op', i, falselabel, 'name'=>'if')
+    unless iter goto last_child
+    .local pmc s
+    s = ops.'new'('Perl6::POST::Label', 'name'=>'xor_skip')
+    ops.'add_child_new'('Perl6::POST::Op', t, s, 'name'=>'if')
+    ops.'add_child_new'('Perl6::POST::Op', ops, bpost, 'name'=>'set')
+    ops.'add_child_new'('Perl6::POST::Op', t, u, 'name'=>'set')
+    ops.'add_child'(s)
+    goto inner_child
+  last_child:
+    ops.'add_child_new'('Perl6::POST::Op', t, endlabel, 'name'=>'if')
+    ops.'add_child_new'('Perl6::POST::Op', ops, bpost, 'name'=>'set')
+    ops.'add_child_new'('Perl6::POST::Op', endlabel, 'name'=>'goto')
+    ops.'add_child'(falselabel)
+    ops.'add_child_new'('Perl6::POST::Op', ops, '.Undef', 'name'=>'new')
+    ops.'add_child'(endlabel)
+    .return (ops)
+}
+
+
+transform chain (Perl6::PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'Perl6::POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local string opname, pasttype
+    .local pmc optable, optok
+    #optable = get_hll_global [ 'Cardinal'; 'Grammar' ], '$optable'
+    optable = get_root_global [ 'parrot'; 'Cardinal::Grammar' ], '$optable'
+
+    .local pmc childrenlist
+    childrenlist = new .ResizablePMCArray
+  chain_loop:
+    $I0 = isa node, 'Perl6::PAST::Op'
+    if $I0 == 0 goto chain_end
+    opname = node.'name'()
+    optok = optable[opname]
+    pasttype = optok['pasttype']
+    if pasttype != 'chain' goto chain_end
+    push childrenlist, node
+    node = node[0]
+    goto chain_loop
+  chain_end:
+
+    .local pmc endlabel, apast, apost
+    node = pop childrenlist
+    endlabel = ops.'new'('Perl6::POST::Label', 'name'=>'chain_end')
+    apast = node[0]
+    apost = tree.'get'('post', apast)
+    ops.'add_child'(apost)
+
+  childrenlist_loop:
+    .local pmc bpast, bpost
+    .local string postname
+    bpast = node[1]
+    bpost = tree.'get'('post', bpast)
+    postname = tree.'get'('postname', node)
+    ops.'add_child'(bpost)
+    ops.'add_child_new'('Perl6::POST::Op', ops, apost, bpost, 'name'=>postname)
+    unless childrenlist goto childrenlist_end
+    ops.'add_child_new'('Perl6::POST::Op', ops, endlabel, 'name'=>'unless')
+    apost = bpost
+    node = pop childrenlist
+    goto childrenlist_loop
+  childrenlist_end:
+    ops.'add_child'(endlabel)
+    .return (ops)
+}
+
+
+transform post (Cardinal::PAST::Val) :language('PIR') {
+    .local string val
+    .local string valtype
+    .local string objtype
+    val = node.'name'()
+    valtype = node.'valtype'()
+    unless valtype == 'string' goto n1
+    #objtype = '.RubyString'
+    objtype = '.String'
+    goto with_objtype
+    n1:
+    unless valtype == 'Integer' goto n2
+    #objtype = '.RubyInteger'
+    objtype = '.Integer'
+    goto with_val
+    n2:
+    unless valtype == 'float' goto n3
+    #objtype = '.RubyFloat'
+    objtype = '.Float'
+    goto with_val
+    n3:
+    objtype = '.Undef'
+
+  with_objtype:
+    val = escape val
+    val = concat '"', val
+    val = concat val, '"'
+
+    #unicode check    
+    $I0 = index val, '\x'
+    unless $I0 > 0 goto with_val
+    val = concat 'unicode:', val
+
+  with_val:
+    .local pmc ops
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+    ops.'add_child_new'('Cardinal::POST::Op', ops, objtype, 'name'=>'new')
+    $P0 = ops.'new'('Cardinal::POST::Val', 'valtype'=>valtype, 'value'=>val)
+    ops.'add_child_new'('Cardinal::POST::Op', ops, $P0, 'name'=>'assign')
+    .return (ops)
+}
+
+transform post (Cardinal::PAST::Var) :language('PIR') {
+    .local string name
+    .local string scope
+    .local pmc post
+    name = node.'name'()
+    scope = node.'scope'()
+
+    if scope == 'package' goto with_name
+    if scope == 'lecical' goto with_name
+    if scope == 'parameter' goto with_name
+
+    .local pmc outer
+    #outer = tree.'outer_block'()
+    outer = find_global 'Cardinal::PAST', '$?BLOCK'
+
+  outer_loop:
+    $I0 = isa outer, 'Cardinal::PAST::BLOCK'
+    unless $I0 goto with_name
+    $P0 = outer.'vardecl'(name)
+    $I0 = isa outer, 'Cardinal::PAST::Var'
+    unless $I0 goto outer_next
+    $S0 = $P0.'scope'()
+    ne $S0, 'outer', outer_end
+  outer_next:
+    outer = outer.'outer'()
+    goto outer_loop
+
+  outer_end:
+    scope .= $S0
+
+  with_name:
+    post = new 'Cardinal::POST::Var'
+    post.'init'('node'=>node, 'name'=>name, 'scope'=>scope)
+    .return (post)
 }
 
 =head1 LICENSE
@@ -578,6 +460,6 @@ it under the same terms as Parrot.
 
 =head1 AUTHOR
 
-Allison Randal <allison@perl.org>
+Kevin Tew <tewk@tewk.com>
 
 =cut

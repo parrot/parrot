@@ -6,8 +6,8 @@ use warnings;
 
 my $PARROT = '../../parrot';
 my $CARDINAL = 'cardinal.pbc';
-my $CURRENT_TEST = 't/00_assignment_1.rb';
-my $TRACE_ARGS = "-t 4";
+my $CURRENT_TEST = 't/00_conditionals_1.rb';
+my $TRACE_ARGS = "";
 
 if ( @ARGV > 1 )
 {
@@ -59,6 +59,11 @@ sub test
 sub debug
 {
   execute_cmd( "make ; $PARROT $TRACE_ARGS $CARDINAL -d $CURRENT_TEST" );
+}
+
+sub debug2
+{
+  execute_cmd( "make ; $PARROT $TRACE_ARGS $CARDINAL -a -o -i -s -e $CURRENT_TEST" );
 }
 
 sub gdb

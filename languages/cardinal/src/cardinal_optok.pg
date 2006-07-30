@@ -12,27 +12,27 @@ proto 'infix:**' is precedence('21=') { ... }
 proto 'prefix:!' is precedence('20=') { ... }
 proto 'prefix:~' is equiv("prefix:!") { ... }
 proto 'prefix:+' is equiv("prefix:!") { ... }
-proto 'prefix:-' is equiv("prefix:!") { ... }
+proto 'prefix:-' is equiv("prefix:!") is post('neg') { ... }
 
-proto 'infix:*' is precedence('19=') { ... }
-proto 'infix:/' is equiv("infix:*") { ... }
-proto 'infix:%' is equiv("infix:*") { ... }
+proto 'infix:*' is precedence('19=') is post('mul') { ... }
+proto 'infix:/' is equiv("infix:*") is post('div') { ... }
+proto 'infix:%' is equiv("infix:*") is post('mod') { ... }
 
-proto 'infix:+' is precedence('18=') { ... }
-proto 'infix:-' is equiv("infix:+") { ... }
+proto 'infix:+' is precedence('18=') is post('add') { ... }
+proto 'infix:-' is equiv("infix:+") is post('sub')  { ... }
 
-proto 'infix:<<' is precedence('17=') { ... }
-proto 'infix:>>' is equiv("infix:<<") { ... }
+proto 'infix:<<' is precedence('17=') is post('shl') { ... }
+proto 'infix:>>' is equiv("infix:<<") is post('shr') { ... }
 
-proto 'infix:&' is precedence('16=') { ... }
+proto 'infix:&' is precedence('16=') is post('band') { ... }
 
-proto 'infix:|' is precedence('15=') { ... }
-proto 'infix:^' is equiv("infix:|") { ... }
+proto 'infix:|' is precedence('15=') is post('bor') { ... }
+proto 'infix:^' is equiv("infix:|") is post('bxor') { ... }
 
-proto 'infix:<=' is precedence('14=') { ... }
-proto 'infix:<' is equiv("infix:<=") { ... }
-proto 'infix:>' is equiv("infix:<=") { ... }
-proto 'infix:>=' is equiv("infix<=") { ... }
+proto 'infix:<=' is precedence('14=') is pasttype('chain') { ... }
+proto 'infix:<' is equiv("infix:<=") is pasttype('chain') { ... }
+proto 'infix:>' is equiv("infix:<=") is pasttype('chain') { ... }
+proto 'infix:>=' is equiv("infix<=") is pasttype('chain') { ... }
 
 proto 'infix:<=>' is precedence('13=') { ... }
 proto 'infix:==' is equiv("infix:<=>") { ... }
@@ -55,37 +55,38 @@ proto 'ternary:? :' is precedence('9=') is assoc('right')
     { ... }
 
 ## assignment
-###proto 'infix:=' is precedence('8=') is assoc('right')
-###    is pasttype('assign') 
-###    { ... }
+#proto 'infix:=' is precedence('8=') is assoc('right')
+proto 'infix:=' is pasttype('assign') { ... }
+proto 'if' is pasttype('cond') { ... }
+proto 'unless' is pasttype('cond') { ... }
 
 ## regex operators
-###proto 'infix:~=' is equiv('infix:=') { ... }
-###proto 'infix:!=' is equiv('infix:=') { ... }
+#proto 'infix:~=' is equiv('infix:=') { ... }
+#proto 'infix:!=' is equiv('infix:=') { ... }
 ## arithmetic operators
-###proto 'infix:+=' is equiv('infix:=') { ... }
-###proto 'infix:-=' is equiv('infix:=') { ... }
-###proto 'infix:*=' is equiv('infix:=') { ... }
-###proto 'infix:/=' is equiv('infix:=') { ... }
-###proto 'infix:%=' is equiv('infix:=') { ... }
+#proto 'infix:+=' is equiv('infix:=') { ... }
+#proto 'infix:-=' is equiv('infix:=') { ... }
+#proto 'infix:*=' is equiv('infix:=') { ... }
+#proto 'infix:/=' is equiv('infix:=') { ... }
+#proto 'infix:%=' is equiv('infix:=') { ... }
 ## bit operators
-###proto 'infix:+|=' is equiv('infix:=') { ... }
-###proto 'infix:+&=' is equiv('infix:=') { ... }
+#proto 'infix:+|=' is equiv('infix:=') { ... }
+#proto 'infix:+&=' is equiv('infix:=') { ... }
 ## boolean operators
-###proto 'infix:||=' is equiv('infix:=') { ... }
-###proto 'infix:&&=' is equiv('infix:=') { ... }
+#proto 'infix:||=' is equiv('infix:=') { ... }
+#proto 'infix:&&=' is equiv('infix:=') { ... }
 ## bit shift operator
-###proto 'infix:<<=' is equiv('infix:=') { ... }
-###proto 'infix:>>=' is equiv('infix:=') { ... }
+#proto 'infix:<<=' is equiv('infix:=') { ... }
+#proto 'infix:>>=' is equiv('infix:=') { ... }
 ## power operator
-###proto 'infix:**=' is equiv('infix:=') { ... }
+#proto 'infix:**=' is equiv('infix:=') { ... }
 
-proto 'infix:defined?' is precedence('7=') { ... }
+#proto 'infix:defined?' is precedence('7=') { ... }
 
-proto 'prefix:not' is precedence('6=') { .. }
+#proto 'prefix:not' is precedence('6=') { .. }
 
-proto 'infix:and' is precedence('5=') { ... }
-proto 'infix:or' is equiv("infix:and") { ... }
+#proto 'infix:and' is precedence('5=') { ... }
+#proto 'infix:or' is equiv("infix:and") { ... }
 
 
 
