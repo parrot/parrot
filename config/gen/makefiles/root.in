@@ -222,7 +222,7 @@ GEN_CONFIGS = \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/core_pmcs.h \
     $(SRC_DIR)/exec_dep.h \
-    lib/Parrot/Config.pm \
+    lib/Parrot/Config/Generated.pm \
     lib/Parrot/PMC.pm \
     runtime/parrot/include/config.fpmc \
     $(SRC_DIR)/platform.c \

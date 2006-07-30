@@ -811,8 +811,8 @@
 ^lib/Parrot/PMC\.pm/
 ^lib/Parrot/Jit\.pm$
 ^lib/Parrot/Jit\.pm/
-^lib/Parrot/Config\.pm$
-^lib/Parrot/Config\.pm/
+^lib/Parrot/Config$
+^lib/Parrot/Config/
 ^lib/Parrot/blib$
 ^lib/Parrot/blib/
 ^lib/Parrot/pm_to_blib$
