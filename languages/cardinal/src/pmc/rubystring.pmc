@@ -1,7 +1,7 @@
 /* RubyString.pmc
  *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
- *     $Id: rubystring.pmc 12840 2006-05-30 15:08:05Z coke $
+ *     $Id$
  *  Overview:
  *     These are the vtable functions for the RubyString base class
  *  Data Structure and Algorithms:

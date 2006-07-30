@@ -1,7 +1,7 @@
 /* RubyHash.pmc
  *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
- *     $Id: rubyarray.pmc 12884 2006-06-05 13:29:13Z audreyt $
+ *     $Id$
  *  Overview:
  *     These are the vtable functions for the RubyHash base class
  *  Data Structure and Algorithms:

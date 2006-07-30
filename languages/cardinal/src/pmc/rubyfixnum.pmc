@@ -1,7 +1,7 @@
 /* RubyFixnum.pmc
  *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
- *     $Id: rubyint.pmc 13543 2006-07-25 07:10:31Z mdiep $
+ *     $Id$
  *  Overview:
  *     These are the vtable functions for the RubyFixnum base class
  *  Data Structure and Algorithms:

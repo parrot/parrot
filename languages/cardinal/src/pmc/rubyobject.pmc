@@ -1,7 +1,7 @@
 /* rubyobject.pmc
  *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
- *     $Id: rubyobject.pmc 12840 2006-05-30 15:08:05Z coke $
+ *     $Id$
  *  Overview:
  *     These are the vtable functions for the rubyobject base class
  *  Data Structure and Algorithms:
