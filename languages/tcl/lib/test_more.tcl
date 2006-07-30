@@ -108,3 +108,10 @@ proc test {num description code output args} {
       fail "can't deal with this version of test yet."
     }
 }
+
+# XXX hack to allow compilation. Constraints are like skip conditions that
+# can be specified by a particular invocation to test. Since we're ingoring
+# all the option params to test, we'll ignore this one two, and execute tests
+# when we shouldn't.
+
+proc testConstraint {args} {}

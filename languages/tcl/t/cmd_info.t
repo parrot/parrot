@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 use Test::More;
 use vars qw($TODO);
 
@@ -154,4 +154,22 @@ language_output_is("tcl",<<'TCL',<<'OUT',"info tclversion");
   }
 TCL
 ok
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"info commands too many args");
+  info commands a b 
+TCL
+wrong # args: should be "info commands ?pattern?"
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"info commands exact");
+  info commands info
+TCL
+info
+OUT
+
+language_output_is("tcl",<<'TCL',<<'OUT',"info commands glob");
+  info commands inf?
+TCL
+puts
 OUT

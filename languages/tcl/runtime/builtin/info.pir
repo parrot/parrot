@@ -134,6 +134,53 @@ bad_args:
   .throw ('wrong # args: should be "info functions ?pattern?"')
 .end
 
+.sub 'commands'
+    .param pmc argv
+
+    .local int argc
+    argc = argv
+    if argc > 1 goto bad_args
+    .local pmc matching 
+    null matching
+    if argc ==0 goto done_setup
+
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Glob.pbc'
+    $P1 = compreg 'PGE::Glob'
+    .local string pattern
+    pattern = argv[0]
+    matching = $P1(pattern)
+
+  done_setup:
+    .local pmc result
+    result = new 'TclList'
+
+    .local pmc ns
+    ns = get_root_global 'tcl'
+  
+    .local pmc iter
+    iter = new 'Iterator', ns
+  iter_loop:
+     unless iter goto iter_loop_end
+     $S1 = shift iter
+     $S2 = substr $S1, 0, 1
+     unless $S2 == '&' goto iter_loop
+     $S1 = substr $S1, 1
+     if_null matching, add_result
+     $P2 = matching($S1)
+     unless $P2 goto iter_loop
+  add_result: 
+     push result, $S1
+     goto iter_loop 
+  iter_loop_end:
+
+    .return(result)
+
+  bad_args:
+    .throw('wrong # args: should be "info commands ?pattern?"')
+
+.end
+
 .sub 'exists'
   .param pmc argv
 
