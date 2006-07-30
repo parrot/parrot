@@ -100,7 +100,9 @@ print $SKIP <<'END_HEADER';
 ^debian/
 END_HEADER
 
+my @MANI = ();
 find(\&wanted, '.');
+print $MANI $_ for (sort @MANI);
 
 my $svnignore = `svn propget svn:ignore @dirs`;
 my %ignore;
@@ -122,7 +124,7 @@ foreach (@ignore) {
 
 foreach my $dir (sort keys %ignore) {
     print $SKIP "# generated from svn:ignore of '$dir/'\n";
-    foreach (split /\n/, $ignore{$dir}) {
+    foreach (sort split /\n/, $ignore{$dir}) {
         s/\./\\./g; s/\*/.*/g;
         print $SKIP
             $dir ne '.' ?
@@ -162,7 +164,7 @@ sub MANIFEST {
         m[^tools/dev/]    ? '[devel]' :
         '[]';
     }
-    printf $MANI "%- 49s %s\n", $File::Find::name, $loc;
+    push @MANI, sprintf("%- 59s %s\n", $File::Find::name, $loc);
 
     return;
 }
