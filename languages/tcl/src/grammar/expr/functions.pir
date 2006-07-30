@@ -57,7 +57,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:asin'
@@ -78,7 +81,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:atan'
@@ -99,7 +105,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:ceil'
@@ -141,7 +150,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:cosh'
@@ -162,7 +174,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:double'
@@ -203,7 +218,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:floor' 
@@ -252,7 +270,10 @@ domain_error:
     .throw('domain error: argument not in valid range')
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:log10'
@@ -278,7 +299,10 @@ domain_error:
     .throw('domain error: argument not in valid range')
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:round'
@@ -325,7 +349,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:sinh'
@@ -346,7 +373,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:sqrt'
@@ -371,7 +401,10 @@ domain_error:
     .throw('domain error: argument not in valid range')
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:srand'
@@ -395,7 +428,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:tanh'
@@ -416,7 +452,10 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    $S0 = a
+    $S0 = 'expected floating-point number but got "' . $S0
+    $S0 = $S0 . '"'
+    .throw($S0)
 .end
 
 .sub 'function:wide'
