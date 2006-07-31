@@ -151,6 +151,10 @@ END_TCL
 ::tcltest::cleanupTests
 return
 END_TCL
+    <<'END_TCL',
+cleanupTests
+return
+END_TCL
     );
 
     foreach my $remove (@removes) {

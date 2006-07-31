@@ -85,7 +85,6 @@ $(R_BUILTIN)/regexp.pir \
 $(C_BUILTIN)/regsub.pir \
 $(R_BUILTIN)/rename.pir \
 $(C_BUILTIN)/return.pir \
-$(R_BUILTIN)/set.pir \
 $(R_BUILTIN)/source.pir \
 $(R_BUILTIN)/split.pir \
 $(R_BUILTIN)/string.pir \
@@ -206,6 +205,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
   t_tcl/get.t \
+  t_tcl/if.t \
   t_tcl/incr.t \
   t_tcl/incr_old.t \
   t_tcl/indexObj.t \
@@ -222,6 +222,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/platform.t \
   t_tcl/pwd.t \
   t_tcl/registry.t \
+  t_tcl/result.t \
   t_tcl/security.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
@@ -234,9 +235,9 @@ RUNNABLE_TCL_TESTS = \
 # In no particular order
 #t_tcl/regexp.t          t_tcl/regexpComp.t      t_tcl/apply.t
 #t_tcl/info.t            t_tcl/rename.t          t_tcl/async.t
-#t_tcl/init.t            t_tcl/result.t          t_tcl/stack.t
+#t_tcl/init.t            t_tcl/stack.t
 #t_tcl/switch.t          t_tcl/ioUtil.t          t_tcl/set.t
-#t_tcl/if.t              t_tcl/compile.t         t_tcl/load.t
+#t_tcl/compile.t         t_tcl/load.t
 #t_tcl/subst.t           t_tcl/lrepeat.t         t_tcl/tcltest.t
 #t_tcl/misc.t            t_tcl/unixInit.t        t_tcl/encoding.t
 #t_tcl/trace.t           t_tcl/autoMkindex.t     t_tcl/interp.t
