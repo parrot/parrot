@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export ANTLR=/usr/local/antlr-3.0b3
+export CLASSPATH=.:$ANTLR/lib/antlr-3.0b3.jar:$ANTLR/lib/stringtemplate-2.3b9.jar:$ANTLR/lib/antlr-2.7.6.jar
+
+java Main $@
+
