@@ -184,15 +184,20 @@ find_%0:
 END_PIR
 
 has_name:
-   dynamic.emit("  if_null command, invalid_%0", label_num)
-   dynamic.emit("  $P%0 = command(%1)", result_num, args)
-   dynamic.emit("  goto end_%0", label_num)
+   dynamic.emit(<<'END_PIR', label_num, result_num, args)
+  if_null command, invalid_%0
+  $P%1 = command(%2)
+  goto end_%0
+END_PIR
 
-   invalid.emit("  .local pmc interactive")
-   invalid.emit("  interactive = get_root_global ['tcl'], '$tcl_interactive'")
-   invalid.emit("  unless interactive goto err_command%0", label_num)
-   invalid.emit("  .local pmc unk")
-   invalid.emit("  unk=find_global '&unknown'")
+   invalid.emit(<<'END_PIR', label_num)
+  .local pmc interactive
+  interactive = get_root_global ['tcl'], '$tcl_interactive'
+  unless interactive goto err_command%0
+  .local pmc unk
+  unk=find_global '&unknown'
+END_PIR
+
    $S1 = name_register
    $S1 = "$P" . $S1
    unshift compiled_args, $S1
@@ -200,11 +205,13 @@ has_name:
    invalid.emit("  unk(%0)", $S0)
    invalid.emit("  goto end_%0", label_num)
 
-   error.emit("err_command%0:", label_num)
-   error.emit("  $S0 = $P%0", name_register)
-   error.emit("  $S0 = concat \"invalid command name \\\"\", $S0")
-   error.emit("  $S0 .= \"\\\"\"")
-   error.emit("  .throw($S0)")
+   error.emit(<<'END_PIR', label_num, name_register)
+err_command%0:
+  $S0 = $P%1
+  $S0 = concat "invalid command name \"", $S0
+  $S0 .= "\""
+  .throw($S0)
+END_PIR
 
    pir_code = ""
    pir_code .= arg_code

@@ -119,7 +119,7 @@ args_loop:
   if $I0 == 2 goto default_arg
   
   min = i + 1
-  args_code.emit("  $P1 = shift args", i)
+  args_code.emit("  $P1 = shift args")
   args_code.emit("  store_lex '$%0', $P1", $S0)
   
   args_usage .= $S0
@@ -127,15 +127,19 @@ args_loop:
   goto args_next
 
 default_arg:
-  args_code.emit("  unless args goto default_%0", i)
-  args_code.emit("  $P1 = shift args", i)
-  args_code.emit("  store_lex '$%0', $P1", $S0)
-  
-  defaults.emit("default_%0:", i)
-  defaults.emit("  $P1 = new TclString")
-  $S1 = arg[1]
-  defaults.emit("  $P1 = '%0'", $S1)
-  defaults.emit("  store_lex '$%0', $P1", $S0)
+    args_code.emit(<<'END_PIR', i, $S0, $S1)
+  unless args goto default_%0
+  $P1 = shift args
+  store_lex '$%1', $P1
+END_PIR
+
+    $S1 = arg[1]
+    defaults.emit(<<'END_PIR', i, $S0, $S1)
+default_%0:
+  $P1 = new TclString
+  $P1 = '%2'
+  store_lex '$%1', $P1
+END_PIR
 
   args_usage .= "?"
   args_usage .= $S0
@@ -159,8 +163,10 @@ store_info:
   $P1 = get_root_global ['_tcl'], 'proc_args'
   $P1[full_name] = args_info
 
-  code.emit("  .local int argc")
-  code.emit("  argc = elements args")
+    code .= <<'END_PIR'
+  .local int argc
+  argc = elements args
+END_PIR
 
   code.emit("  if argc < %0 goto BAD_ARGS", min)
   if is_slurpy goto emit_args
