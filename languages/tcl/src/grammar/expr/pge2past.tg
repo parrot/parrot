@@ -135,7 +135,7 @@ transform result (function) {
 
 has_argc:
     .local pmc past
-    past = new 'PAST::Op'
+    past = new 'PAST::MathFunc'
     $P0  = node['unary_function']
     if $P0 goto unary
     $P0  = node['nullary_function']
@@ -173,9 +173,7 @@ has_argc:
     past.'add_child'($P2)
 
   arguments:
-    function_name = 'function:' . function_name
-    past['opfunc'] = function_name
-
+    past['mathfunc'] = function_name
     past['children'] = 1
     .return (past)
 

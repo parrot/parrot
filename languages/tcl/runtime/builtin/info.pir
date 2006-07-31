@@ -97,10 +97,10 @@ bad_args:
   argc = argv
   if argc > 1 goto bad_args
 
-  .local pmc math_funcs,iterator,retval
+  .local pmc mathfunc,iterator,retval
 
-  .get_from_HLL(math_funcs, '_tcl', 'functions')
-  iterator = new .Iterator, math_funcs
+  mathfunc = get_root_namespace ['tcl'; 'tcl'; 'mathfunc']
+  iterator = new .Iterator, mathfunc
   iterator = 0
   retval = new .TclList
 
@@ -112,14 +112,17 @@ bad_args:
   $S1 = argv[0]
   rule = globber($S1)
 pattern_loop:
+  unless iterator goto pattern_end
   $S0 = shift iterator
+  $P0 = mathfunc[$S0]
+  $I0 = isa $P0, 'Sub'
+  unless $I0 goto pattern_loop
   match = rule($S0)
-  unless match goto pattern_next
+  unless match goto pattern_loop
   $P0 = new .TclString
   $P0 = $S0
   push retval, $P0
-pattern_next:
-  if iterator goto pattern_loop
+pattern_end:
   .return(retval)
 
 loop:

@@ -1,27 +1,8 @@
 grammar TclExpr::PIR::Grammar is TGE::Grammar;
 
 transform result (ROOT)  {
-    .local pmc pir
-    .local pmc return_register
-   
-    $P0 = node['children']
-    if $P0 goto has_children
-    $P0 = node['conditional']
-    if $P0 goto is_conditional
-
     $S0 = typeof node
     $P0 = tree.get('pir', node, $S0)
-    goto end
-
-  has_children:
-    $P0 = tree.get('pir', node, 'PAST::Op')
-    goto end
-
-  is_conditional:
-    $P0 = tree.get('pir', node, 'PAST::Cond')
-    goto end
-
-  end:
     .return($P0)
 }
 
@@ -79,7 +60,6 @@ transform pir (PAST::Op) {
     .local pmc args,iter,pir
     .local pmc return_register
  
-
     pir = new 'PGE::CodeString'
     args = new .ResizablePMCArray
     iter = node.'child_iter'()
@@ -100,6 +80,46 @@ transform pir (PAST::Op) {
     $S0 = node['opfunc']
     pir .= $S0
     pir .= "'("
+    iter = new .Iterator, args
+  arg_loop:
+    unless iter goto arg_done 
+    $P0 = shift iter
+    $S0 = $P0
+    pir .= $S0
+    unless iter goto arg_done 
+    pir .= ","
+    goto arg_loop
+  arg_done:
+    pir .= ")\n" 
+    node['ret'] = retval
+    .return (pir)
+}
+
+transform pir (PAST::MathFunc) {
+    .local pmc args,iter,pir
+    .local pmc return_register
+ 
+    pir  = new 'PGE::CodeString'
+    args = new .ResizablePMCArray
+    iter = node.'child_iter'()
+  iter_loop: 
+    unless iter goto iter_done
+    $P1 = shift iter
+    $P0 = tree.get('pir', $P1)
+    return_register = $P1['ret']
+    push args, return_register
+    pir .= $P0
+    goto iter_loop
+  iter_done:
+    # get a result PMC
+    .local pmc retval
+    retval = pir.unique('$P')
+    $S0    = node['mathfunc']
+    pir.emit("%0 = get_hll_global ['tcl'; 'mathfunc'], '%1'", retval, $S0)
+    pir .= retval
+    pir .= " = "
+    pir .= retval
+    pir .= "("
     iter = new .Iterator, args
   arg_loop:
     unless iter goto arg_done 

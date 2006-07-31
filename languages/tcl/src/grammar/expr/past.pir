@@ -12,6 +12,7 @@ needed for tcl expressions. The currently defined ast nodes:
     PAST::Command    - a tcl command to be evaluated.
     PAST::Cond       - a conditional expression.
     PAST::Op         - a operation
+    PAST::MathFunc   - a math function
     PAST::Val        - a constant value
     PAST::Var        - a variable
 
@@ -43,6 +44,7 @@ Creates the C<PAST::*> classes.
 
     $P0 = subclass base, 'PAST::Command'
     $P0 = subclass base, 'PAST::Cond'
+    $P0 = subclass base, 'PAST::MathFunc'
     $P0 = subclass base, 'PAST::Op'
     $P0 = subclass base, 'PAST::Val'
     $P0 = subclass base, 'PAST::Var'
