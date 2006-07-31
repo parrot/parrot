@@ -8,7 +8,7 @@ src/io/name.c - Win32 IO layer
 
 =head1 DESCRIPTION
 
-This is the Parrot OS-speciic IO layer for Win32 platforms.
+This is the Parrot OS-specific IO layer for Win32 platforms.
 
 =head2 References
 
@@ -138,8 +138,8 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 {
     HANDLE h;
 #if PARROT_NET_DEVEL
-		struct WSAData sockinfo;
-		int ret;
+    struct WSAData sockinfo;
+    int ret;
 #endif
 
     if ((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
@@ -149,8 +149,7 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
     else {
         return -1;
     }
-    if ((h = GetStdHandle(STD_OUTPUT_HANDLE))
-        != INVALID_HANDLE_VALUE) {
+    if ((h = GetStdHandle(STD_OUTPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
         PIO_STDOUT(interpreter) = new_io_pmc(interpreter,
             PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE));
     }
@@ -165,13 +164,13 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
         return -3;
     }
 #if PARROT_NET_DEVEL
-		/* Start Winsock
- 		 * no idea where or whether destroy it
- 		 */
+    /* Start Winsock
+     * no idea where or whether destroy it
+     */
     ret = WSAStartup (2, &sockinfo);
-    if (ret!=0){
-		    fprintf ( stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n", WSAGetLastError());
-		    return -4;
+    if (ret != 0) {
+        fprintf ( stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n", WSAGetLastError());
+        return -4;
     }
 #endif
     return 0;
@@ -227,12 +226,12 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     }
 #  endif
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
-        return (ParrotIO *)NULL;
+        return NULL;
 
     /* Set open flags - <, >, >>, +<, +> */
     /* add ? and ! for block/non-block */
     if (flags_to_win32(flags, &fAcc, &fShare, &fCreat) < 0)
-        return (ParrotIO *)NULL;
+        return NULL;
 
     /* Only files for now */
     flags |= PIO_F_FILE;
@@ -245,10 +244,12 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     }
     else {
         int err = GetLastError();
-        if(err) {}
+        if (err) {
+            errno = err;
+        }
     }
 
-    return (ParrotIO *)NULL;
+    return NULL;
 }
 
 /*
@@ -422,8 +423,7 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
     UNUSED(layer);
 
     /* do it by hand, Win32 hasn't any specific flag */
-    if (io->flags & PIO_F_APPEND)
-    {
+    if (io->flags & PIO_F_APPEND) {
         LARGE_INTEGER p;
         p.LowPart = 0;
         p.HighPart = 0;
@@ -530,19 +530,19 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     int family = AF_INET;
 
     char * s = string_to_cstring(interpreter, addr);
-		sa.sin_addr.s_addr = inet_addr (s);
-        /* Maybe it is a hostname, try to lookup */
-        /* XXX Check PIO option before doing a name lookup,
-         * it may have been toggled off.
-         */
-        he = gethostbyname(s);
-        /* XXX FIXME - Handle error condition better */
-        if(!he) {
-            string_cstring_free(s);
-            fprintf(stderr, "gethostbyname failure [%s]\n", s);
-            return NULL;
-        }
-        memcpy((char*)&sa.sin_addr, he->h_addr, sizeof(sa.sin_addr));
+    sa.sin_addr.s_addr = inet_addr (s);
+    /* Maybe it is a hostname, try to lookup */
+    /* XXX Check PIO option before doing a name lookup,
+     * it may have been toggled off.
+     */
+    he = gethostbyname(s);
+    /* XXX FIXME - Handle error condition better */
+    if (!he) {
+        string_cstring_free(s);
+        fprintf(stderr, "gethostbyname failure [%s]\n", s);
+        return NULL;
+    }
+    memcpy((char*)&sa.sin_addr, he->h_addr, sizeof(sa.sin_addr));
 
     string_cstring_free(s);
 
@@ -573,7 +573,7 @@ PIO_win32_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
 {
     int sock;
     ParrotIO * io;
-    if((sock = socket(fam, type, proto)) >= 0) {
+    if ((sock = socket(fam, type, proto)) >= 0) {
         io = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = (PIOHANDLE) sock;
         io->remote.sin_family = fam;
@@ -597,7 +597,7 @@ Connects C<*io>'s socket to address C<*r>.
 static INTVAL
 PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
 {
-    if(r) {
+    if (r) {
         struct sockaddr_in sa;
         memcpy(&sa, PObj_bufstart(r), sizeof(struct sockaddr));
         io->remote.sin_addr.s_addr = sa.sin_addr.s_addr;
@@ -605,7 +605,7 @@ PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
     }
 
 /*    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));*/
-    if((connect((SOCKET)io->fd, (struct sockaddr*)&io->remote,
+    if ((connect((SOCKET)io->fd, (struct sockaddr*)&io->remote,
                    sizeof(struct sockaddr))) != 0) {
         PIO_eprintf(interpreter, "PIO_win32_connect: errno = %d\n", WSAGetLastError());
         return -1;
@@ -636,28 +636,33 @@ AGAIN:
     /*
      * Ignore encoding issues for now.
      */
-    if((error = send((SOCKET)io->fd, (char *)PObj_bufstart(s) + byteswrote,
+    if ((error = send((SOCKET)io->fd, (char *)PObj_bufstart(s) + byteswrote,
                             PObj_buflen(s), 0)) >= 0) {
         byteswrote += error;
-        if(byteswrote >= bytes) {
+        if (byteswrote >= bytes) {
             return byteswrote;
         }
-        else if(bytes - byteswrote < maxwrite) {
+        else if (bytes - byteswrote < maxwrite) {
             maxwrite = bytes - byteswrote;
         }
         goto AGAIN;
     }
     else {
-        switch(errno) {
-            case EINTR:        goto AGAIN;
+        switch (errno) {
+            case EINTR:
+                goto AGAIN;
 #ifdef EWOULDBLOCK
-            case EWOULDBLOCK:  goto AGAIN;
+            case EWOULDBLOCK:  
+                goto AGAIN;
 #else
-            case EAGAIN:       goto AGAIN;
+            case EAGAIN:
+                goto AGAIN;
 #endif
-            case EPIPE:        close((SOCKET)io->fd);
-                               return -1;
-            default:           return -1;
+            case EPIPE:
+                close((SOCKET)io->fd);
+                return -1;
+            default:
+                return -1;
         }
     }
 }
@@ -682,10 +687,10 @@ PIO_win32_recv(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING **s)
     char buf[2048+1];
 
 AGAIN:
-	error = recv((SOCKET)io->fd, buf, 2048, 0);
-		err = WSAGetLastError();
-    if(error > 0) {
-        if(error > 0)
+    error = recv((SOCKET)io->fd, buf, 2048, 0);
+    err = WSAGetLastError();
+    if (error > 0) {
+        if (error > 0)
             bytesread += error;
         else {
             close((SOCKET)io->fd);
@@ -694,27 +699,32 @@ AGAIN:
          * only works with 'ascii'
          */
         *s = string_make(interpreter, buf, bytesread, "ascii", 0);
-        if(!*s) {
+        if (!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }
 #if PIO_TRACE
         PIO_eprintf(interpreter, "PIO_win32_recv: %d bytes\n", bytesread);
 #endif
         return bytesread;
-    } else {
-        switch(err) {
-            case WSAEINTR:        goto AGAIN;
-            case WSAEWOULDBLOCK:  goto AGAIN;
-            case WSAECONNRESET:   close((SOCKET)io->fd);
+    }
+    else {
+        switch (err) {
+            case WSAEINTR:
+                goto AGAIN;
+            case WSAEWOULDBLOCK:
+                goto AGAIN;
+            case WSAECONNRESET:
+                close((SOCKET)io->fd);
 #if PIO_TRACE
-            PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
+                PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
 #endif
-                               return -1;
-            default:           close((SOCKET)io->fd);
+                return -1;
+            default:
+                close((SOCKET)io->fd);
 #if PIO_TRACE
-		        PIO_eprintf(interpreter, "recv: errno = %d\n", err);
+                PIO_eprintf(interpreter, "recv: errno = %d\n", err);
 #endif
-                               return -1;
+                return -1;
         }
     }
 }
@@ -734,15 +744,16 @@ static INTVAL
 PIO_win32_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 {
     struct sockaddr_in sa;
-    if(!l) return -1;
+
+    if (!l)
+        return -1;
 
     memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr));
     io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
     io->local.sin_port = sa.sin_port;
     io->local.sin_family = AF_INET;
 
-    if((bind((SOCKET)io->fd, (struct sockaddr *)&io->local, sizeof(struct sockaddr))) == -1)
-    {
+    if ((bind((SOCKET)io->fd, (struct sockaddr *)&io->local, sizeof(struct sockaddr))) == -1) {
         PIO_eprintf(interpreter, "PIO_win32_bind: errno = %d\n", WSAGetLastError());
         return -1;
     }
@@ -765,7 +776,7 @@ C<SEQ> sockets.
 static INTVAL
 PIO_win32_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
 {
-    if((listen((SOCKET)io->fd, backlog)) == -1) {
+    if ((listen((SOCKET)io->fd, backlog)) == -1) {
         fprintf(stderr, "listen: errno= ret=%d fd = %d port = %d\n",
              errno, io->fd, ntohs(io->local.sin_port));
         return -1;
@@ -797,8 +808,7 @@ PIO_win32_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     newsock = accept((SOCKET)io->fd, (struct sockaddr *)&(newio->remote), &newsize);
     err_code = WSAGetLastError();
 
-    if(err_code != 0)
-    {
+    if (err_code != 0) {
         fprintf(stderr, "accept: errno=%d", err_code);
         /* Didn't get far enough, free the io */
         mem_sys_free(newio);
