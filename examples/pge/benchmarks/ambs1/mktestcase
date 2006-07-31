@@ -1,8 +1,6 @@
-#!/usr/bin/perl -s
+#!/usr/bin/perl
 
-our ($size);
-
-$size||=10;
+my $size = shift || 10;
 
 print "a = 10;\n";
 
