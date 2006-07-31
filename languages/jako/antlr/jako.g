@@ -9,12 +9,6 @@ semantic_unit
 
 deferred
 	:	declaration | definition ;
-	
-directive
-	:	use_directive;
-
-declaration
-	:	data_declaration | subroutine_declaration ;
 
 definition
 	:	subroutine_definition;
@@ -22,9 +16,19 @@ definition
 subroutine_header
 	:	'sub' type_name? IDENTIFIER option* '(' formal_argument_list ')' ;
 	
+subroutine_declaration
+	: 	subroutine_header ';' ;
+	
 subroutine_definition
 	:	subroutine_header block ;
 	 
+//
+// Declarations:
+//
+
+declaration
+	:	data_declaration | subroutine_declaration ;
+
 data_declaration
 	:	constant_declaration | variable_declaration;
 	
@@ -36,9 +40,10 @@ variable_declaration
 
 identifier_list
 	:	IDENTIFIER ( ',' IDENTIFIER )* ;
-	
-subroutine_declaration
-	: 	subroutine_header ';' ;
+
+//
+// Definitions:
+//
 
 option	:	':' IDENTIFIER ( '=' STRING_LITERAL )? ;
 
@@ -48,19 +53,23 @@ formal_argument_list
 	
 module_definition
 	:	'module' IDENTIFIER option* '{' deferred+ '}' ;
+
+//
+// Directives:
+//
 	
-type_name
-	:	'int' | 'str' | 'num' | 'pmc';
+directive
+	:	use_directive;
 
 use_directive
 	:	'use' name ';';
 
-name	:	IDENTIFIER ( '::' IDENTIFIER )* ;
+//
+// Statements:
+//
 
 statement
 	:	basic_statement statement_modifier? ';' | while_statement | if_statement ;
-
-label	:	LABEL ;
 
 basic_statement
 	:	call_statement
@@ -93,20 +102,36 @@ arithmetic_assign_operator
 
 goto_statement
 	:	'goto' IDENTIFIER ;
-	
-call	:	name '(' actual_argument_list ')' ;
 
 call_statement
 	:	call ;
 	
-assignment_statement
-	:	lvalue '=' expression ;
-
-lvalue	:	IDENTIFIER ( '[' expression ']' )? ;
+call	:	name '(' actual_argument_list ')' ;
 
 actual_argument_list
 	:	
 	|	expression ( ',' expression )* ;
+	
+assignment_statement
+	:	lvalue '=' expression ;
+
+string_concat_statement
+	:	value '~=' value ;
+	
+while_statement	:	'while' '(' expression ')' block ( 'continue' block )? ;
+
+if_statement
+	:	'if' '(' expression ')' block ( 'else' block )? ;
+	
+return_statement
+	:	'return' expression? ;
+
+loop_control_statement
+	:	( 'last' | 'next' ) IDENTIFIER? ;
+
+//
+// Expressions:
+//
 	
 expression
 	:	value
@@ -127,27 +152,26 @@ relational_expression
 arithmetic_expression
 	:	value arithmetic_operator value ;
 
-string_concat_statement
-	:	value '~=' value ;
+//
+// Operators:
+//
 	
 relational_operator
 	:	'<' | '<=' | '==' | '>=' | '>' | '!=' ;
 
 arithmetic_operator
 	:	'+' | '-' | '*' | '/' | '%' ;
-	
-while_statement	:	'while' '(' expression ')' block ( 'continue' block )? ;
 
-if_statement
-	:	'if' '(' expression ')' block ( 'else' block )? ;
-	
-return_statement
-	:	'return' expression? ;
+//
+// Basics:
+//
 
-loop_control_statement
-	:	( 'last' | 'next' ) IDENTIFIER? ;
+name	:	IDENTIFIER ( '::' IDENTIFIER )* ;
+
+label	:	LABEL ;
 	
-block	:	'{' ( data_declaration | statement )* '}' ;
+type_name
+	:	'int' | 'str' | 'num' | 'pmc';
 
 literal
     :   HEX_LITERAL
@@ -156,7 +180,15 @@ literal
     |	STRING_LITERAL
     |   FLOATING_POINT_LITERAL
     ;
-    
+
+lvalue	:	IDENTIFIER ( '[' expression ']' )? ;
+	
+block	:	'{' ( data_declaration | statement )* '}' ;
+
+//
+// Tokens:
+//
+
 IDENTIFIER
 	:	LETTER (LETTER|'0'..'9')*
 	;
