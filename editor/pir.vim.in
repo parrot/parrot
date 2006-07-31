@@ -30,20 +30,21 @@ syn match   pirPMC  /\.\(IntList\|Iterator\|Key\|ManagedStruct\|UnManagedStruct\
 syn match   pirPMC  /\.\(FloatVal\|Multi\|S\|String\)\?Array/
 syn match   pirPMC  /\.Perl\(Array\|Env\|Hash\|Int\|Num\|Scalar\|String\|Undef\)/
 syn match   pirPMC  /\.Parrot\(Class\|Interpreter\|IO\|Library\|Object\|Thread\)/
+syn keyword pirPMC self
 
 syn keyword pirOp   goto if unless global addr
 
-syn match pirDirective  /\.\(sub\|end\|pcc_sub\|macro\|endm\|emit\|eom\)/
+syn match pirDirective  /\.\(sub\|endm\|pcc_sub\|macro\|end\|emit\|eom\)/
 syn match pirDirective  /\.\(local\|sym\|const\|lex\|global\|globalconst\)/
-syn match pirDirective  /\.\(namespace\|endnamespace\)/
+syn match pirDirective  /\.\(endnamespace\|namespace\)/
 syn match pirDirective  /\.\(param\|arg\|return\|yield\)/
-syn match pirDirective  /\.\(pragma\|HLL\|HLL_map\|include\|loadlib\)/
+syn match pirDirective  /\.\(pragma\|HLL_map\|HLL\|include\|loadlib\)/
 syn match pirDirective  /\.\(pcc_begin\|pcc_call\|pcc_end\|invocant\|meth_call\|nci_call\)/
 syn match pirDirective  /\.\(pcc_begin_return\|pcc_end_return\)/
 syn match pirDirective  /\.\(pcc_begin_yield\|pcc_end_yield\)/
 
 syn match pirDirective  /:\(main\|method\|load\|anon\|multi\|immediate\|outer\|lex\)/
-syn match pirDirective  /:\(flat\|slurpy\|optional\|opt_flag\)/
+syn match pirDirective  /:\(flat\|slurpy\|optional\|opt_flag\|named\)/
 
 " Macro invocation
 syn match pirDirective  /\.\I\i*(/he=e-1
