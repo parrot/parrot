@@ -19,7 +19,7 @@ read a line from a channel
   channelID = argv[0]
 
   .local pmc __channel
-  .get_from_HLL(__channel, '_tcl', '__channel')
+  __channel = get_root_global ['_tcl'], '__channel'
 
   .local pmc io
   io = __channel(channelID)

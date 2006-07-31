@@ -24,9 +24,9 @@
   .local int counter
 
   .local pmc compiler, pir_compiler, __expr
-  .get_from_HLL(compiler,'_tcl','compile')
-  .get_from_HLL(pir_compiler,'_tcl','pir_compiler')
-  .get_from_HLL(__expr, '_tcl', '__expr')
+  compiler     = get_root_global ['_tcl'], 'compile'
+  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
+  __expr       = get_root_global ['_tcl'], '__expr'
  
   .local string temp_str
   temp_str ='' 

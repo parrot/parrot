@@ -20,7 +20,7 @@
   # get the channel specified to be flushed
 
   .local pmc compiler, value
-  .get_from_HLL(compiler, '_tcl', 'compile_dispatch')
+  compiler = get_root_global ['_tcl'], 'compile_dispatch'
   .local int value_num
   value = argv[0]
   (value_num, temp_code) = compiler(register_num, value)

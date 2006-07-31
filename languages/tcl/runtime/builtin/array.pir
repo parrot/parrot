@@ -22,8 +22,9 @@
   .local pmc subcommand_proc
   null subcommand_proc
 
-  .get_from_HLL(subcommand_proc, '_tcl'; 'helpers'; 'array', subcommand_name)
-  if_null subcommand_proc, bad_args
+  push_eh bad_args
+    subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'array'], subcommand_name
+  clear_eh
 
   .local int is_array
   .local string array_name
@@ -32,13 +33,13 @@
   array_name = shift argv
 
   .local int call_level
-  .get_from_HLL($P0, '_tcl', 'call_level')
+  $P0 = get_root_global ['_tcl'], 'call_level'
   call_level = $P0
   null the_array
 
   .local pmc __find_var
-  .get_from_HLL(__find_var, '_tcl', '__find_var')
-  the_array = __find_var(array_name)
+  __find_var = get_root_global ['_tcl'], '__find_var'
+  the_array  = __find_var(array_name)
 
   if_null the_array, array_no
 
@@ -120,8 +121,8 @@ bad_args:
   elems = argv[0]
 
   .local pmc __list
-  .get_from_HLL(__list, '_tcl', '__list')
-  elems = __list(elems)
+  __list = get_root_global ['_tcl'], '__list'
+  elems  = __list(elems)
 
 pre_loop:
   .local int count
@@ -136,7 +137,7 @@ pre_loop:
   .local pmc    val
 
   .local pmc set
-  .get_from_HLL(set, '_tcl', '__set')
+  set = get_root_global ['_tcl'], '__set'
 
   if_null the_array, new_array # create a new array if no var
   goto set_loop

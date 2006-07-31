@@ -19,8 +19,8 @@
   name = $P0
 
   .local pmc read, set
-  .get_from_HLL(read, '_tcl', '__read')
-  .get_from_HLL(set, '_tcl', '__set')
+  read = get_root_global ['_tcl'], '__read'
+  set  = get_root_global ['_tcl'], '__set'
 
   retval = read(name)
 
@@ -33,7 +33,7 @@
 
 lset:
   .local pmc __list
-  .get_from_HLL(__list, '_tcl', '__list')
+  __list = get_root_global ['_tcl'], '__list'
   retval = __list(retval)
 
   .local int i, end

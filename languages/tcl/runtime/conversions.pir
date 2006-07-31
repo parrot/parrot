@@ -44,9 +44,8 @@ Given a PMC, get a number from it.
   .local pmc parse
   .local pmc match
 
-  .get_from_HLL($P0, '_tcl', 'TclExpr::Grammar')
-  parse = $P0['number']
-  .get_from_HLL($P0, 'parrot'; 'PGE::Match', 'newfrom')
+  parse = get_root_global ['_tcl'; 'TclExpr::Grammar'], 'number'
+  $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
   match = $P0(number, 0, 'TclExpr::Grammar')
   $I0 = find_not_cclass .CCLASS_WHITESPACE, str, 0, len
   match.from($I0)
@@ -61,7 +60,7 @@ Given a PMC, get a number from it.
   # the following will dump out the match object
   #load_bytecode 'dumper.pbc'
   #load_bytecode 'PGE/Dumper.pbc'
-  #.get_from_HLL($P0, 'parrot', '_dumper')
+  #$P0 = get_root_global ['parrot'], '_dumper'
   #$P0(match)
  
   unless match goto NaN
@@ -155,9 +154,8 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     .local pmc parse
     .local pmc match
 
-    .get_from_HLL($P0, '_tcl', 'TclExpr::Grammar')
-    parse = $P0['expression']
-    .get_from_HLL($P0, 'parrot'; 'PGE::Match', 'newfrom')
+    parse = get_root_global ['_tcl'; 'TclExpr::Grammar'], 'expression'
+    $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
     match = $P0(expression, 0, 'TclExpr::Grammar')
     match.to(0)
     match = parse(match)
@@ -165,7 +163,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     # the following will dump out the match object
     #load_bytecode 'dumper.pbc'
     #load_bytecode 'PGE/Dumper.pbc'
-    #.get_from_HLL($P0, 'parrot', '_dumper')
+    #$P0 = get_root_global ['parrot'], '_dumper'
     #$P0(match)
  
     unless match goto bad_expression
@@ -217,7 +215,7 @@ Given a chunk of tcl code, return a subroutine.
 .sub __script
   .param string code
   
-  .get_from_HLL($P0, '_tcl', 'compile')
+  $P0 = get_root_global ['_tcl'], 'compile'
   ($I0,$S0) = $P0(0,code)
   $P2 = pir_compiler($I0,$S0)
   
@@ -239,10 +237,9 @@ Given a string namespace, return an array of names.
   depth = 0
 
 depth_set:
-  .local pmc p6rule, colons, split
-  p6rule = compreg "PGE::P6Regex"
-  colons = p6rule('\:\:+')
-  .get_from_HLL(split, 'parrot'; 'PGE::Util', 'split')
+  .local pmc colons, split
+  colons = get_root_global ['_tcl'], 'colons'
+  split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
   
   .local pmc ns_name
   ns_name = split(colons, name)
@@ -296,8 +293,8 @@ was this a valid tcl-style level, or did we get this value as a default?
   defaulted = 0
 
   .local pmc current_call_level, __number
-  .get_from_HLL(current_call_level, '_tcl', 'call_level')
-  .get_from_HLL(__number, '_tcl', '__number')
+  current_call_level = get_root_global ['_tcl'], 'call_level'
+  __number   = get_root_global ['_tcl'], '__number'
   orig_level = current_call_level
  
   .local int num_length

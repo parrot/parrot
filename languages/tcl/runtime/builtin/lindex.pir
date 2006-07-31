@@ -12,8 +12,8 @@
   if argc < 1 goto bad_args
   
   .local pmc __list, _list_index
-  .get_from_HLL(__list, '_tcl', '__list')
-  .get_from_HLL(_list_index, '_tcl', '_list_index')
+  __list      = get_root_global ['_tcl'], '__list'
+  _list_index = get_root_global ['_tcl'], '_list_index'
 
   .local pmc list
   list = argv[0]

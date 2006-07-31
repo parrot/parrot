@@ -20,10 +20,10 @@
   # end differently. need to have an option to pass in, or another 
 
   .local pmc list_index
-  .get_from_HLL(list_index, '_tcl', '_list_index')
+  list_index = get_root_global ['_tcl'], '_list_index'
 
   .local pmc __list
-  .get_from_HLL(__list, '_tcl', '__list')
+  __list = get_root_global ['_tcl'], '__list'
  
   the_list = __list(the_list)
 

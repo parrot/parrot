@@ -168,20 +168,6 @@ Used by _tcl to access tcl and vice versa.
   temp[.name] = .thing
 .endm
 
-=head2 get_from_HLL (OUT pmc var, IN string namespace, IN string varname)
-
-Find and return the variable/sub/whatever in the named top level interface.
-Used by _tcl to access tcl and vice versa.
-
-=cut
-
-.macro get_from_HLL(var, ns, name)
-  .include 'interpinfo.pasm'
-  .var = interpinfo .INTERPINFO_NAMESPACE_ROOT
-  .var = .var[.ns]
-  .var = .var[.name]
-.endm
-
 =head2 cloneable ()
 
 Simplistic implementation of C<__clone>

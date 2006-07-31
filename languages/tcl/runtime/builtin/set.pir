@@ -22,12 +22,12 @@
 
 getting:
   .local pmc read
-  .get_from_HLL(read ,'_tcl', '__read')
+  read = get_root_global ['_tcl'], '__read'
   .return read(name)
 
 setting:
   .local pmc set
-  .get_from_HLL(set ,'_tcl', '__set')
+  set = get_root_global ['_tcl'], '__set'
 
   .local pmc value
   value = argv[1]

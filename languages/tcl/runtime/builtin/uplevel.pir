@@ -18,13 +18,13 @@
   .local int i
  
   .local pmc compiler, pir_compiler, __call_level
-  .get_from_HLL(compiler, '_tcl', 'compile')
-  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
-  .get_from_HLL(__call_level, '_tcl', '__call_level')
+  compiler     = get_root_global ['_tcl'], 'compile'
+  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
+  __call_level = get_root_global ['_tcl'], '__call_level'
 
   # save the old call level
   .local pmc call_level, old_call_level
-  .get_from_HLL(call_level, '_tcl', 'call_level')
+  call_level     = get_root_global ['_tcl'], 'call_level'
   old_call_level = clone call_level
 
   .local pmc new_call_level
@@ -38,7 +38,7 @@
 skip:
 
   .local pmc call_level_diff, difference
-  .get_from_HLL(call_level_diff, '_tcl', 'call_level_diff')
+  call_level_diff = get_root_global ['_tcl'], 'call_level_diff'
   difference = new .Integer
   difference = old_call_level - new_call_level
 

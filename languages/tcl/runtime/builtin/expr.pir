@@ -14,9 +14,8 @@
   .local int argc
   .local int looper
 
-  .local pmc retval
-  .local pmc expression_compiler,pir_compiler
-  .get_from_HLL(expression_compiler, '_tcl', '__expr')
+  .local pmc __expr
+  __expr = get_root_global ['_tcl'], '__expr'
 
   expr = ''
   looper = 0
@@ -34,7 +33,7 @@ loop:
   goto loop
 
 loop_done:
-  $P1 = expression_compiler(expr)
+  $P1 = __expr(expr)
   $P2 = $P1()
   .return ($P2)
 

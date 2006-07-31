@@ -11,7 +11,7 @@
   directory_num = 0
 
   .local pmc compiler
-  .get_from_HLL(compiler,'_tcl', 'compile_dispatch')
+  compiler = get_root_global ['_tcl'], 'compile_dispatch'
 
   if argc == 0 goto noargs
   if argc == 1 goto got_dir

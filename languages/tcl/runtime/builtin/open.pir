@@ -16,9 +16,9 @@
   $I0 = typeof channel
   if $I0 == .Undef goto file_error
   channel_id = 'file'
-  .get_from_HLL(channels, '_tcl', 'channels')
+  channels = get_root_global ['_tcl'], 'channels'
   # get a new file channel name
-  .get_from_HLL(next_channel_id, '_tcl', 'next_channel_id')
+  next_channel_id = get_root_global ['_tcl'], 'next_channel_id'
   $S0 = next_channel_id
   channel_id .= $S0
   next_channel_id += 1

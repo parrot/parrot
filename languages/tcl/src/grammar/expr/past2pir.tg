@@ -49,7 +49,7 @@ transform pir (PAST::Var) {
     $S0 = node['name']
     pir.emit(<<'END_PIR', ret, $S0)
   .local pmc __read
-  .get_from_HLL(__read, '_tcl', '__read')
+  __read = get_root_global ['_tcl'], '__read'
   %0 = __read('%1')
 END_PIR
     

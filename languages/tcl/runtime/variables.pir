@@ -272,7 +272,7 @@ coloned:
 
 global_var:
   push_eh notfound
-    .get_from_HLL(value, 'tcl', name) 
+    value = get_root_global ['tcl'], name
   clear_eh
   goto found
 
@@ -318,7 +318,7 @@ global_var:
 .sub find_lex_pdd20
   .param string variable_name
 
-  .get_from_HLL($P1, '_tcl', 'call_level_diff')
+  $P1 = get_root_global ['_tcl'], 'call_level_diff'
   .local int pad_depth
   pad_depth = $P1
 
@@ -346,7 +346,7 @@ got_lexpad:
   .param string variable_name
   .param pmc variable
 
-  .get_from_HLL($P1, '_tcl', 'call_level_diff')
+  $P1 = get_root_global ['_tcl'], 'call_level_diff'
   .local int pad_depth
   pad_depth = $P1
 

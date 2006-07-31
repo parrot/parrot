@@ -62,8 +62,8 @@ Define the attributes required for the class.
   .local int value_length
 
   .local pmc backslashes, hexadecimal
-  .get_from_HLL(backslashes, '_tcl', 'backslashes')
-  .get_from_HLL(hexadecimal, '_tcl', 'hexadecimal')
+  backslashes = get_root_global ['_tcl'], 'backslashes'
+  hexadecimal = get_root_global ['_tcl'], 'hexadecimal'
   
   .local int pos
   pos = 0
@@ -266,7 +266,7 @@ Generate PIR code which can be used to generate our value
    value = getattribute self, $I0
 
    .local pmc compiler
-  .get_from_HLL(compiler,'_tcl','compile_dispatch')
+  compiler = get_root_global ['_tcl'], 'compile_dispatch'
 
    .return compiler(argnum, value)
 .end

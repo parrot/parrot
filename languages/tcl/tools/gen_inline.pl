@@ -143,7 +143,7 @@ sub inlined_header {
   .param pmc argv
     
   .local pmc compiler
-  .get_from_HLL(compiler, '_tcl', 'compile_dispatch')
+  compiler = get_root_global ['_tcl'], 'compile_dispatch'
   
   .local int argc
   .local string pir
@@ -204,7 +204,7 @@ sub inlined_helpers {
         next unless my $help = $conversions{$type};
         
         $code .= emit("  .local pmc $help");
-        $code .= emit("  .get_from_HLL($help, '_tcl', '$help')");
+        $code .= emit("  $help = get_root_global ['_tcl'], '$help'");
     }
     
     return $code;
@@ -226,7 +226,7 @@ sub helpers {
         next unless my $help = $conversions{$type};
         
         $code .= "  .local pmc $help \n";
-        $code .= "  .get_from_HLL($help, '_tcl', '$help') \n";
+        $code .= "  $help = get_root_global ['_tcl'], '$help' \n";
     }
     
     return $code;

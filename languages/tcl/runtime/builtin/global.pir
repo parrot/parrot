@@ -13,7 +13,7 @@
   if argc == 0 goto badargs
 
   .local int call_level
-  .get_from_HLL($P0, '_tcl', 'call_level')
+  $P0 = get_root_global ['_tcl'], 'call_level'
   call_level = $P0
   unless call_level goto done # global doesn't work when already global.
 
@@ -32,7 +32,7 @@ loop:
   clear_eh
 
   .local pmc store_lex_pdd20
-  .get_from_HLL(store_lex_pdd20, '_tcl', 'store_lex_pdd20')
+  store_lex_pdd20 = get_root_global ['_tcl'], 'store_lex_pdd20'
   store_lex_pdd20 (sigil_varname, $P1)
 
 next:

@@ -19,9 +19,10 @@
   .local pmc subcommand_proc
   null subcommand_proc
 
-  .get_from_HLL(subcommand_proc, '_tcl';'helpers';'info', subcommand_name)
+  push_eh bad_subcommand
+    subcommand_proc = get_root_global ['_tcl';'helpers';'info'], subcommand_name
+  clear_eh
 
-  if_null subcommand_proc, bad_subcommand
   .return subcommand_proc(argv)
 
 bad_subcommand:
@@ -49,7 +50,7 @@ bad_args:
 
   .local string procname
   procname = shift argv
-  .get_from_HLL($P1, '_tcl', 'proc_args')
+  $P1 = get_root_global ['_tcl'], 'proc_args'
   $P2 = $P1[procname]
   if_null $P2, no_args
   .return($P2)
@@ -75,7 +76,7 @@ bad_args:
 
   .local string procname
   procname = argv[0]
-  .get_from_HLL($P1, '_tcl', 'proc_body')
+  $P1 = get_root_global ['_tcl'], 'proc_body'
   $P2 = $P1[procname]
   if_null $P2, no_body
   .return($P2)
@@ -194,11 +195,10 @@ bad_args:
   .local string varname
   varname = argv[0]
 
-  .local pmc find_var
-  .get_from_HLL(find_var, '_tcl', '__find_var')
-  .local pmc found_var
+  .local pmc find_var, found_var
+  find_var  = get_root_global ['_tcl'], '__find_var'
   found_var = find_var(varname)
-  if_null found_var, not_found
+  if null found_var goto not_found
 
   .return (1)
 not_found:
@@ -216,7 +216,7 @@ bad_args:
 
   if argc != 0 goto bad_args
 
-  .get_from_HLL($P1,'tcl','$tcl_version')
+  $P1 = get_root_global ['tcl'], '$tcl_version'
   .return($P1)
 
 bad_args:

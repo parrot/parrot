@@ -150,7 +150,7 @@ $P1=loadlib 'dynlexpad'
   load_bytecode 'languages/tcl/runtime/tcllib.pbc'
   .include "languages/tcl/src/macros.pir"
   .local pmc epoch, colons, split
-  .get_from_HLL(epoch,'_tcl','epoch')
+  epoch  = get_root_global ['_tcl'], 'epoch'
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
 %s
@@ -170,7 +170,7 @@ END_PIR
 .sub compiled_tcl_sub%i :anon
 .include "languages/tcl/src/returncodes.pir"
   .local pmc epoch, colons, split
-  .get_from_HLL(epoch,'_tcl','epoch')
+  epoch  = get_root_global ['_tcl'], 'epoch'
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
 %s

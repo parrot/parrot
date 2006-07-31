@@ -28,7 +28,7 @@ Define the attributes required for the class.
    .local int inlineable
    inlineable = 0
    .local pmc compile
-  .get_from_HLL(compile,'_tcl','compile_dispatch')
+  compile = get_root_global ['_tcl'], 'compile_dispatch'
 
    .local string args, arg_code
    .local pmc pir_code, dynamic, error, inlined, invalid
@@ -102,8 +102,9 @@ arg_loop_done:
    if $I0 != $I1 goto dynamic_command
 
    $S0 = name
-   .get_from_HLL($P1,'_tcl'; 'builtins', $S0)
-   if_null $P1, dynamic_command
+   push_eh dynamic_command
+     $P1 = get_root_global ['_tcl'; 'builtins'], $S0
+   clear_eh
 
    (result_num, $P0) = $P1(register_num,self)
    if null $P0 goto dynamic_command
@@ -111,7 +112,7 @@ arg_loop_done:
    register_num = result_num
 
    .local pmc epoch
-   .get_from_HLL(epoch, '_tcl', 'epoch')
+   epoch = get_root_global ['_tcl'], 'epoch'
    inlined.emit("  if epoch != %0 goto dynamic_%1", epoch, label_num)
    inlined .= retval
    $S0 = "  goto end_%0"
@@ -188,7 +189,7 @@ has_name:
    dynamic.emit("  goto end_%0", label_num)
 
    invalid.emit("  .local pmc interactive")
-   invalid.emit("  .get_from_HLL(interactive,'tcl','$tcl_interactive')")
+   invalid.emit("  interactive = get_root_global ['tcl'], '$tcl_interactive'")
    invalid.emit("  unless interactive goto err_command%0", label_num)
    invalid.emit("  .local pmc unk")
    invalid.emit("  unk=find_global '&unknown'")

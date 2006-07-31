@@ -13,7 +13,7 @@
   if $I0 < 3 goto wrong_args
 
   .local pmc __list
-  .get_from_HLL(__list, '_tcl', '__list')
+  __list = get_root_global ['_tcl'], '__list'
   
   .local pmc the_list
   the_list = shift argv
@@ -23,7 +23,7 @@
   position = shift argv
 
   .local pmc list_index
-  .get_from_HLL(list_index, '_tcl', '_list_index')
+  list_index = get_root_global ['_tcl'], '_list_index'
 
   ($P0,$I2) = list_index(the_list,position)
   #linsert treats 'end' differently

@@ -33,7 +33,7 @@ Define the attributes required for the class.
     pir_code .= $S0
     pir_code.emit(<<'END_PIR', index_reg, register_num, self)
   .local pmc __find
-  .get_from_HLL(__find, '_tcl', '__find_var')
+  __find = get_root_global ['_tcl'], '__find_var'
   $P%1 = __find("%2")
   if null $P%1 goto no_such_variable_%1
   $I0  = does $P%1, 'hash'
@@ -66,7 +66,7 @@ not_array:
     pir_code.emit(<<'END_PIR', register_num, self)
   # src/class/tclvar.pir :: compile
   .local pmc read
-  .get_from_HLL(read,'_tcl','__read')
+  read = get_root_global ['_tcl'], '__read'
   $P%0 = read("%1")
 END_PIR
 

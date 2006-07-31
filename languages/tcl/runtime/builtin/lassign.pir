@@ -13,12 +13,12 @@
   list = shift argv
 
   .local pmc __list
-  .get_from_HLL(__list, '_tcl', '__list')
-  list = __list(list)
+  __list = get_root_global ['_tcl'], '__list'
+  list   = __list(list)
 
   .local string varname
   .local pmc set, value
-  .get_from_HLL(set, '_tcl', '__set')
+  set = get_root_global ['_tcl'], '__set'
 
 var_loop:
   varname = shift argv

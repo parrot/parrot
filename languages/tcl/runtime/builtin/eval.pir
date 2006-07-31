@@ -18,8 +18,8 @@
   .local int looper
  
   .local pmc compiler,pir_compiler
-  .get_from_HLL(compiler, '_tcl', 'compile')
-  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
+  compiler     = get_root_global ['_tcl'], 'compile'
+  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
 
   expr = ''
   looper = 0

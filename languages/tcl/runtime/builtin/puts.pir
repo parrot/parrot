@@ -16,7 +16,7 @@
   utf8 = find_encoding 'utf8'
 
   .local pmc __channel, io
-  .get_from_HLL(__channel,'_tcl','__channel')
+  __channel = get_root_global ['_tcl'], '__channel'
 
   if argc == 1 goto one_arg
   if argc == 2 goto two_arg

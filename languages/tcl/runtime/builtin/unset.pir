@@ -29,7 +29,7 @@
 
 flags_done:
   .local pmc find_var, var
-  .get_from_HLL(find_var, '_tcl', '__find_var')
+  find_var = get_root_global ['_tcl'], '__find_var'
 
   .local string name
 loop:
@@ -77,7 +77,7 @@ scalar:
 
   null var
   .local pmc store_var
-  .get_from_HLL(store_var, '_tcl', '__store_var')
+  store_var = get_root_global ['_tcl'], '__store_var'
   store_var(name, var)
   # goto next
 

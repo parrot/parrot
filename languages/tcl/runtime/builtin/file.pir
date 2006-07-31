@@ -13,7 +13,7 @@
   subcommand_name = shift argv
   .local pmc subcommand_proc
 
-  .get_from_HLL(subcommand_proc, '_tcl';'helpers';'file', subcommand_name)
+  subcommand_proc = get_root_global ['_tcl';'helpers';'file'], subcommand_name
   if_null subcommand_proc, bad_args
 
   .return subcommand_proc(argv)

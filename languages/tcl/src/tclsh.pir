@@ -50,8 +50,8 @@
   store_global '$tcl_interactive', tcl_interactive
 
   .local pmc compiler,pir_compiler
-  .get_from_HLL(compiler,'_tcl', 'compile')
-  .get_from_HLL(pir_compiler,'_tcl', 'pir_compiler')
+  compiler     = get_root_global ['_tcl'], 'compile'
+  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
 
   if argc > 1 goto open_file
 
@@ -170,8 +170,8 @@ oneliner:
   .local string tcl_code
   tcl_code = opt['e']
   if dump_only goto oneliner_dump
-  .get_from_HLL($P1, '_tcl', 'compile')
-  .get_from_HLL($P2, '_tcl', 'pir_compiler')
+  $P1 = get_root_global ['_tcl'], 'compile'
+  $P2 = get_root_global ['_tcl'], 'pir_compiler'
   ($I0, $S1) = $P1(0,tcl_code)
   $P3 = $P2($I0,$S1)
   push_eh file_error
@@ -180,8 +180,8 @@ oneliner:
   goto done
 
 oneliner_dump:
-  .get_from_HLL($P1, '_tcl', 'compile')
-  .get_from_HLL($P2, '_tcl', 'pir_compiler')
+  $P1 = get_root_global ['_tcl'], 'compile'
+  $P2 = get_root_global ['_tcl'], 'pir_compiler'
   ($I0, $S1) = $P1(0,tcl_code,1)
   $S2 = $P2($I0,$S1,1)
   print $S2
@@ -221,8 +221,8 @@ got_prompt:
   varname .= $S0
 
   .local pmc compiler,pir_compiler
-  .get_from_HLL(compiler, '_tcl', 'compile')
-  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
+  compiler     = get_root_global ['_tcl'], 'compile'
+  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
 
   push_eh no_prompt
     $P0 = find_global varname

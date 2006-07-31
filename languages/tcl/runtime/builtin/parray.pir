@@ -25,7 +25,7 @@
 
   .local pmc array
   .local int call_level
-  .get_from_HLL($P0, '_tcl', 'call_level')
+  $P0 = get_root_global ['_tcl'], 'call_level'
   call_level = $P0
 
   null array

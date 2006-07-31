@@ -14,8 +14,8 @@
   .local pmc code_retval,compiler,pir_compiler
   .local string varname,sigil_varname,code
 
-  .get_from_HLL(compiler, '_tcl', 'compile')
-  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
+  compiler     = get_root_global ['_tcl'], 'compile'
+  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
 
   if argc == 0 goto badargs
   if argc  > 2 goto badargs
@@ -44,7 +44,7 @@ got_retval:
   # Store the caught value in a 
 
   .local pmc __set
-  .get_from_HLL(__set, '_tcl', '__set')
+  __set = get_root_global ['_tcl'], '__set'
   __set(varname,code_retval)
 
 done:

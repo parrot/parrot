@@ -34,7 +34,7 @@ Define the attributes required for the class.
   compiled_args = new 'TclList'
 
   .local pmc compiler
-  .get_from_HLL(compiler,'_tcl','compile_dispatch')
+  compiler = get_root_global ['_tcl'], 'compile_dispatch'
 
 loop:
   if i == len goto loop_done

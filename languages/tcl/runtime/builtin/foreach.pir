@@ -8,7 +8,7 @@
   .local pmc compiler,pir_compiler,retval
 
   .local int call_level
-  .get_from_HLL($P0, '_tcl', 'call_level')
+  $P0 = get_root_global ['_tcl'], 'call_level'
   call_level = $P0
 
   # Were we passed the right # of arguments? (2n+1)
@@ -18,11 +18,11 @@
   if $I0 != 1 goto error
 
   .local pmc __list, __set
-  .get_from_HLL(__list, '_tcl', '__list')
-  .get_from_HLL(__set, '_tcl', '__set')
+  __list = get_root_global ['_tcl'], '__list'
+  __set  = get_root_global ['_tcl'], '__set'
 
-  .get_from_HLL(compiler, '_tcl', 'compile')
-  .get_from_HLL(pir_compiler, '_tcl', 'pir_compiler')
+  compiler     = get_root_global ['_tcl'], 'compile'
+  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
 
   .local int argc
   argc = argv

@@ -12,9 +12,9 @@
   if argc < 2 goto bad_args
   
   .local pmc call_level, call_level_diff, __call_level
-  .get_from_HLL(call_level,      '_tcl', 'call_level')
-  .get_from_HLL(call_level_diff, '_tcl', 'call_level_diff')
-  .get_from_HLL(__call_level,    '_tcl', '__call_level')
+  call_level      = get_root_global ['_tcl'], 'call_level'
+  call_level_diff = get_root_global ['_tcl'], 'call_level_diff'
+  __call_level    = get_root_global ['_tcl'], '__call_level'
 
   .local pmc new_call_level, orig_call_level
   orig_call_level = new .Integer
@@ -31,9 +31,9 @@ skip:
   # for each othervar/myvar pair, created a mapping from
  
   .local pmc __make, __set, __find_var
-  .get_from_HLL(__make, '_tcl', '__make')
-  .get_from_HLL(__set, '_tcl', '__set')
-  .get_from_HLL(__find_var, '_tcl', '__find_var')
+  __make     = get_root_global ['_tcl'], '__make'
+  __set      = get_root_global ['_tcl'], '__set'
+  __find_var = get_root_global ['_tcl'], '__find_var'
 
   .local int counter, argc
   argc       = argv

@@ -16,8 +16,8 @@
   argc = argv
   if argc == 0 goto wrong_args
 
-  .get_from_HLL(compare,'_tcl';'helpers';'lsort','ascii')
-  .get_from_HLL(sort,'_tcl';'helpers';'lsort','sort')
+  compare = get_root_global ['_tcl';'helpers';'lsort'], 'ascii'
+  sort    = get_root_global ['_tcl';'helpers';'lsort'], 'sort'
 
   # possible options
   .local int decr, unique
@@ -44,14 +44,14 @@ c_uniq:
   unique = 1
   branch chew_flag
 c_int:
-  .get_from_HLL(compare,'_tcl';'helpers';'lsort','integer')
+  compare = get_root_global ['_tcl';'helpers';'lsort'], 'integer'
   branch chew_flag
 
 
 got_list:
 
   .local pmc __list
-  .get_from_HLL(__list,'_tcl','__list')
+  __list = get_root_global ['_tcl'], '__list'
   $P0 = __list($P0)
 
   sort(compare, $P0, decr)
@@ -179,34 +179,16 @@ decreasing:
   .param int is_decr
 
   # check that they're actually integers.
-  .local pmc __number
-  .get_from_HLL(__number, '_tcl', '__number')
-  s1 = __number(s1)
-  s2 = __number(s2)
-
-  $I0 = typeof s1
-  if $I0 != .TclInt goto bad_s1
-  $I0 = typeof s2
-  if $I0 != .TclInt goto bad_s2
+  .local pmc __integer
+  __integer = get_root_global ['_tcl'], '__integer'
+  s1 = __integer(s1)
+  s2 = __integer(s2)
 
   if is_decr goto decreasing
   $I0 = cmp_num s1, s2
   .return ($I0)
+
 decreasing:
   $I0 = cmp_num s2, s1
   .return ($I0)
-
-bad_s1:
-  $S1 = s1
-  goto bad
-
-bad_s2:
-  $S1 = s2
-
-bad:
-  $S0  = 'expected integer but got "'
-  $S0 .= $S1
-  $S0 .= '"'
-
-  .throw ($S0)
 .end
