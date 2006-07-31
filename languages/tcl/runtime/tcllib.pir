@@ -82,7 +82,7 @@ env_loop:
   goto env_loop
 
 env_loop_done:
-  .set_in_HLL('tcl', '$env', tcl_env)
+  set_root_global ['tcl'], '$env', tcl_env
 
   # keep track of names of file types.
   .local pmc filetypes
@@ -158,18 +158,18 @@ env_loop_done:
    #version info
   $P0 = new .String
   $P0 = '0.1'
-  .set_in_HLL('tcl', '$tcl_patchLevel', $P0)
+  set_root_global ['tcl'], '$tcl_patchLevel', $P0
   $P0 = new .String
   $P0 = '0.1'
-  .set_in_HLL('tcl', '$tcl_version', $P0)
+  set_root_global ['tcl'], '$tcl_version', $P0
    
   #error information
   $P0 = new .TclString
   $P0 = 'NONE'
-  .set_in_HLL('tcl', '$errorCode', $P0)
+  set_root_global ['tcl'], '$errorCode', $P0
   $P0 = new .TclString
   $P0 = ''
-  .set_in_HLL('tcl', '$errorInfo', $P0)
+  set_root_global ['tcl'], '$errorInfo', $P0
 
   # Setup the default channelIds
   $P1 = new .TclArray

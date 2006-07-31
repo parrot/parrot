@@ -152,22 +152,6 @@ Generate a TCL_RETURN with the given return value.
 the implementation of these never change:
 define them once and just include them.
 
-=head2 set_in_HLL (IN string namespace, IN string varname, IN pmc var)
-
-Given a top level namespace, a variable name and a pmc value, set the 
-Find and return the variable/sub/whatever in the named top level interface.
-Used by _tcl to access tcl and vice versa.
-
-=cut
-
-.macro set_in_HLL(ns, name, thing)
-  .include 'interpinfo.pasm'
-  .sym pmc temp
-  temp = interpinfo .INTERPINFO_NAMESPACE_ROOT
-  temp = temp[.ns]
-  temp[.name] = .thing
-.endm
-
 =head2 cloneable ()
 
 Simplistic implementation of C<__clone>

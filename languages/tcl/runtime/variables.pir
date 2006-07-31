@@ -310,7 +310,7 @@ lexical_var:
 coloned:
   substr name, 1, 2, ''
 global_var:
-  .set_in_HLL('tcl',name,value)
+  set_root_global ['tcl'], name, value
 
   .return()
 .end
