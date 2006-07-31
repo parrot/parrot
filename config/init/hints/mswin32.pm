@@ -196,6 +196,8 @@ sub runstep
             ncilib_link_extra    => 'src/libnci_test.def',
             sym_export           => '__declspec(dllexport)',
             sym_import           => '__declspec(dllimport)',
+            make                 => 'mingw32-make',
+            make_c               => 'mingw32-make -C',
         );
     }
 }
