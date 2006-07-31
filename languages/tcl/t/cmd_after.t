@@ -1,18 +1,10 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
-use Test::More;
+source lib/test_more.tcl
+plan 2
 
-language_output_is("tcl",<<'TCL',<<OUT,"after - no args");
-  after
-TCL
-wrong # args: should be "after option ?arg arg ...?"
-OUT
+eval_is {after} \
+  {wrong # args: should be "after option ?arg arg ...?"} \
+  {after - no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"after - simple delay");
-  after 10 ; puts ok
-TCL
-ok
-OUT
+is [after 10; expr 1] 1 {after - simple delay}

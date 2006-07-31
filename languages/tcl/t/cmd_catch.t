@@ -1,89 +1,62 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 10;
-use Test::More;
+source lib/test_more.tcl
+plan 10
 
-language_output_is("tcl",<<'TCL',<<OUT,"discard error");
+eval_is {
   catch {
     error dead
   }
-TCL
-OUT
+  set a ""
+} {} {discard error}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error message");
+eval_is {
   catch {
     error dead
   } var
-  puts $var
-TCL
-dead
-OUT
+  set var
+} {dead} {error messsage}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error type: none");
-  set a [catch {
+eval_is {
+  catch {
     set b 0
-  }]
-  puts $a
-TCL
-0
-OUT
+  }
+} 0 {error type: none}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error type: error");
-  set a [catch {
+eval_is {
+  catch {
     error dead
-  }]
-  puts $a
-TCL
-1
-OUT
+  }
+} 1 {error type: error}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error type: return");
-  set a [catch {
+eval_is {
+  catch {
     return
-  }]
-  puts $a
-TCL
-2
-OUT
+  }
+} 2 {error type: return}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error type: break");
-  set a [catch {
+eval_is {
+  catch {
     break
-  }]
-  puts $a
-TCL
-3
-OUT
+  }
+} 3 {error type: break}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error type: continue");
-  set a [catch {
+eval_is {
+  catch {
     continue
-  }]
-  puts $a
-TCL
-4
-OUT
+  }
+} 4 {error type: continue}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error, invalid command");
+eval_is {
   set a [catch blorg var]
-  puts $a
-  puts $var
-TCL
-1
-invalid command name "blorg"
-OUT
+  list $a $var
+} {1 {invalid command name "blorg"}} {error, invalid command}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"bad args");
-  catch
-TCL
-wrong # args: should be "catch script ?resultVarName? ?optionVarName?"
-OUT
+eval_is {catch} \
+  {wrong # args: should be "catch script ?resultVarName? ?optionVarName?"} \
+  {too few args}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "catch {incr} msg");
-  puts [list [catch {incr} msg] $msg]
-TCL
-1 {wrong # args: should be "incr varName ?increment?"}
-OUT
-
+eval_is {
+  list [catch {incr} msg] $msg
+} {1 {wrong # args: should be "incr varName ?increment?"}} \
+  {catch {incr} msg}
