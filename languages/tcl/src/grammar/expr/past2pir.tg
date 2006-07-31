@@ -80,16 +80,8 @@ transform pir (PAST::Op) {
     $S0 = node['opfunc']
     pir .= $S0
     pir .= "'("
-    iter = new .Iterator, args
-  arg_loop:
-    unless iter goto arg_done 
-    $P0 = shift iter
-    $S0 = $P0
+    $S0 = join ", ", args
     pir .= $S0
-    unless iter goto arg_done 
-    pir .= ","
-    goto arg_loop
-  arg_done:
     pir .= ")\n" 
     node['ret'] = retval
     .return (pir)
@@ -120,16 +112,8 @@ transform pir (PAST::MathFunc) {
     pir .= " = "
     pir .= retval
     pir .= "("
-    iter = new .Iterator, args
-  arg_loop:
-    unless iter goto arg_done 
-    $P0 = shift iter
-    $S0 = $P0
+    $S0 = join ", ", args
     pir .= $S0
-    unless iter goto arg_done 
-    pir .= ","
-    goto arg_loop
-  arg_done:
     pir .= ")\n" 
     node['ret'] = retval
     .return (pir)
