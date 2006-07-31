@@ -74,9 +74,7 @@ bad_args:
   
   .local pmc __namespace, ns_root
   __namespace = get_root_global ['_tcl'], '__namespace'
-  .include 'interpinfo.pasm'
-  ns_root = interpinfo .INTERPINFO_NAMESPACE_ROOT
-  ns_root = ns_root['tcl']
+  ns_root = get_root_namespace ['tcl']
   
   $I0 = 0
 delete_loop:
@@ -129,9 +127,7 @@ get:
   .local pmc ns
   $I0 = 0
   $I1 = elements $P0
-  .include 'interpinfo.pasm'
-  ns = interpinfo .INTERPINFO_NAMESPACE_ROOT
-  ns = ns['tcl']
+  ns = get_root_namespace ['tcl']
 get_loop:
   if $I0 == $I1 goto get_end
   $P1 = $P0[$I0]
