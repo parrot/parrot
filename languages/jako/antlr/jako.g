@@ -10,7 +10,7 @@
 grammar JakoParser;
 
 options {
-//    backtrack=true;
+    backtrack=true;
     memoize=true;
 //    k=2;
 }
@@ -104,22 +104,28 @@ statement_modifier
 	;
 	
 side_effect_statement
-	:	expression
+	:	assignment_statement
+	|	expression
+	;
+
+assignment_statement
+	:	primary_expression assignment_operator expression
+	;
+
+assignment_operator
+	:	'='
+	|	'*='
+	|	'/='
+	|	'%='
+	|	'+='
+	|	'-='
+	|	'~='
 	;
 
 goto_statement
 	:	'goto' plain_identifier ;
-
-//call_statement
-//	:	call ;
-//	
-//call	:	identifier  '(' actual_argument_list ')' ;
-//
-//actual_argument_list
-//	:	
-//	|	expression ( ',' expression )* ;
 	
-while_statement	:	'while' '(' expression ')' block ( 'continue' block )? ;
+while_statement	:	'while' '(' logical_expression ')' block ( 'continue' block )? ;
 
 if_statement
 	:	'if' '(' expression ')' block ( 'else' block )? ;
@@ -134,102 +140,45 @@ loop_control_statement
 // Expressions:
 //
 
-//value	:	 literal | lvalue ;
-
-construction_expression
-	:	'new' identifier  ;
-
-argument_expression_list
-	:	assignment_expression ( ',' assignment_expression )*
-	;
-
-additive_expression
-	:	multiplicative_expression ( '+' multiplicative_expression | '-' multiplicative_expression )*
-	;
-
-multiplicative_expression
-	:	unary_expression ( '*' unary_expression | '/' unary_expression | '%' unary_expression )*
-	;
-
-unary_expression
-	: postfix_expression
-	| '++' unary_expression
-	| '--' unary_expression
-	| unary_operator unary_expression
-	;
-
-postfix_expression
+expression
 	:	primary_expression
+	|	arithmetic_expression
+	|	logical_expression
+	;
+
+primary_expression
+	:	( identifier | literal | '(' expression ')' | 'new' identifier )
 	(	'[' expression ']'
 	|	'(' ')'
 	|	'(' argument_expression_list ')'
 	|	'.' plain_identifier
-	|	'++'
-	|	'--'
 	)*
 	;
 
-unary_operator
-	:	'+'
-	|	'-'
-	|	'!'
+argument_expression_list
+	:	expression ( ',' expression )*
 	;
 
-primary_expression
-	:	identifier
-	|	literal
-	|	'(' expression ')'
+arithmetic_expression
+	:	primary_expression
+	|	'-' arithmetic_expression
+	|	'(' arithmetic_expression ( '+' | '-' | '*' | '/' | '%' ) arithmetic_expression ')'
 	;
 
-expression
-	:	assignment_expression
-	|	construction_expression
-	;
-
-assignment_expression
-	:	lvalue assignment_operator assignment_expression
-	;
-	
-lvalue
-	:	unary_expression
-	;
-
-assignment_operator
-	:	'='
-	|	'*='
-	|	'/='
-	|	'%='
-	|	'+='
-	|	'-='
-	|	'~='
-	;
-
-logical_or_expression
-	:	logical_and_expression ( '||' logical_and_expression )*
-	;
-
-logical_and_expression
-	:	inclusive_or_expression ( '&&' inclusive_or_expression )*
-	;
-
-inclusive_or_expression
-	:	exclusive_or_expression ( '|' exclusive_or_expression )*
-	;
-
-exclusive_or_expression
-	:	and_expression ( '^' and_expression )*
-	;
-
-and_expression
-	:	equality_expression ( '&' equality_expression )*
+logical_expression
+	:	primary_expression
+	|	equality_expression
+	|	relational_expression
+	|	'!' logical_expression
+	|	'(' logical_expression ( '||' | '&&' | '==' | '!=' ) logical_expression ')'
 	;
 
 equality_expression
-	:	relational_expression ( ( '==' | '!=' ) relational_expression )*
+	:	expression ( ( '==' | '!=' ) expression )*
 	;
 
 relational_expression
-	:	additive_expression ( ( '<' | '>' | '<=' | '>=' ) additive_expression )*
+	:	arithmetic_expression ( ( '<' | '>' | '<=' | '>=' ) arithmetic_expression )*
 	;
 
 //
