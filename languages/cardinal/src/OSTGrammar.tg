@@ -275,15 +275,48 @@ transform cond (Cardinal::PAST::Op) :language('PIR') {
     .return (ops)
 }
 
-
-transform xor (Perl6::PAST::Op) :language('PIR') {
+transform loop (Cardinal::PAST::Op) :language('PIR') {
     .local pmc ops
-    ops = new 'Perl6::POST::Ops'
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local string opname
+    .local string newopname
+    opname = node.'name'()
+    newopname = 'unless'
+    unless opname == 'until' goto its_a_while
+    newopname = 'if'
+    its_a_while:
+
+    .local pmc exprpast, bodypast
+    .local pmc exprpost, bodypost
+    exprpast = node[0]
+    bodypast = node[1]
+
+    .local pmc looplabel, loopendlabel
+    looplabel = ops.'new'('Cardinal::POST::Label', 'name'=>'loop')
+    loopendlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'loop_end')
+
+    ops.'add_child'(looplabel)
+    exprpost = tree.'get'('post', exprpast)
+    ops.'add_child'(exprpost)
+    ops.'add_child_new'('Cardinal::POST::Op', exprpost, loopendlabel, 'name'=>newopname)
+
+    bodypost = tree.'get'('post', bodypast)
+    ops.'add_child'(bodypost)
+    ops.'add_child_new'('Cardinal::POST::Op', looplabel, 'name'=>'goto')
+    ops.'add_child'(loopendlabel)
+    .return (ops)
+}
+
+transform xor (Cardinal::PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'Cardinal::POST::Ops'
     ops.'init'('node'=>node)
 
     .local pmc endlabel, falselabel
-    falselabel = ops.'new'('Perl6::POST::Label', 'name'=>'xor_false')
-    endlabel = ops.'new'('Perl6::POST::Label', 'name'=>'xor_end')
+    falselabel = ops.'new'('Cardinal::POST::Label', 'name'=>'xor_false')
+    endlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'xor_end')
 
     .local pmc iter, apast, apost, i, t, u
     i = ops.unique('$I')
@@ -293,38 +326,38 @@ transform xor (Perl6::PAST::Op) :language('PIR') {
     apast = shift iter
     apost = tree.'get'('post', apast)
     ops.'add_child'(apost)
-    ops.'add_child_new'('Perl6::POST::Op', ops, apost, 'name'=>'set')
-    ops.'add_child_new'('Perl6::POST::Op', t, apost, 'name'=>'istrue')
+    ops.'add_child_new'('Cardinal::POST::Op', ops, apost, 'name'=>'set')
+    ops.'add_child_new'('Cardinal::POST::Op', t, apost, 'name'=>'istrue')
   inner_child:
     .local pmc bpast, bpost
     bpast = shift iter
     bpost = tree.'get'('post', bpast)
     ops.'add_child'(bpost)
-    ops.'add_child_new'('Perl6::POST::Op', u, bpost, 'name'=>'istrue')
-    ops.'add_child_new'('Perl6::POST::Op', i, t, u, 'name'=>'and')
-    ops.'add_child_new'('Perl6::POST::Op', i, falselabel, 'name'=>'if')
+    ops.'add_child_new'('Cardinal::POST::Op', u, bpost, 'name'=>'istrue')
+    ops.'add_child_new'('Cardinal::POST::Op', i, t, u, 'name'=>'and')
+    ops.'add_child_new'('Cardinal::POST::Op', i, falselabel, 'name'=>'if')
     unless iter goto last_child
     .local pmc s
-    s = ops.'new'('Perl6::POST::Label', 'name'=>'xor_skip')
-    ops.'add_child_new'('Perl6::POST::Op', t, s, 'name'=>'if')
-    ops.'add_child_new'('Perl6::POST::Op', ops, bpost, 'name'=>'set')
-    ops.'add_child_new'('Perl6::POST::Op', t, u, 'name'=>'set')
+    s = ops.'new'('Cardinal::POST::Label', 'name'=>'xor_skip')
+    ops.'add_child_new'('Cardinal::POST::Op', t, s, 'name'=>'if')
+    ops.'add_child_new'('Cardinal::POST::Op', ops, bpost, 'name'=>'set')
+    ops.'add_child_new'('Cardinal::POST::Op', t, u, 'name'=>'set')
     ops.'add_child'(s)
     goto inner_child
   last_child:
-    ops.'add_child_new'('Perl6::POST::Op', t, endlabel, 'name'=>'if')
-    ops.'add_child_new'('Perl6::POST::Op', ops, bpost, 'name'=>'set')
-    ops.'add_child_new'('Perl6::POST::Op', endlabel, 'name'=>'goto')
+    ops.'add_child_new'('Cardinal::POST::Op', t, endlabel, 'name'=>'if')
+    ops.'add_child_new'('Cardinal::POST::Op', ops, bpost, 'name'=>'set')
+    ops.'add_child_new'('Cardinal::POST::Op', endlabel, 'name'=>'goto')
     ops.'add_child'(falselabel)
-    ops.'add_child_new'('Perl6::POST::Op', ops, '.Undef', 'name'=>'new')
+    ops.'add_child_new'('Cardinal::POST::Op', ops, '.Undef', 'name'=>'new')
     ops.'add_child'(endlabel)
     .return (ops)
 }
 
 
-transform chain (Perl6::PAST::Op) :language('PIR') {
+transform chain (Cardinal::PAST::Op) :language('PIR') {
     .local pmc ops
-    ops = new 'Perl6::POST::Ops'
+    ops = new 'Cardinal::POST::Ops'
     ops.'init'('node'=>node)
 
     .local string opname, pasttype
@@ -335,7 +368,7 @@ transform chain (Perl6::PAST::Op) :language('PIR') {
     .local pmc childrenlist
     childrenlist = new .ResizablePMCArray
   chain_loop:
-    $I0 = isa node, 'Perl6::PAST::Op'
+    $I0 = isa node, 'Cardinal::PAST::Op'
     if $I0 == 0 goto chain_end
     opname = node.'name'()
     optok = optable[opname]
@@ -348,7 +381,7 @@ transform chain (Perl6::PAST::Op) :language('PIR') {
 
     .local pmc endlabel, apast, apost
     node = pop childrenlist
-    endlabel = ops.'new'('Perl6::POST::Label', 'name'=>'chain_end')
+    endlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'chain_end')
     apast = node[0]
     apost = tree.'get'('post', apast)
     ops.'add_child'(apost)
@@ -360,9 +393,9 @@ transform chain (Perl6::PAST::Op) :language('PIR') {
     bpost = tree.'get'('post', bpast)
     postname = tree.'get'('postname', node)
     ops.'add_child'(bpost)
-    ops.'add_child_new'('Perl6::POST::Op', ops, apost, bpost, 'name'=>postname)
+    ops.'add_child_new'('Cardinal::POST::Op', ops, apost, bpost, 'name'=>postname)
     unless childrenlist goto childrenlist_end
-    ops.'add_child_new'('Perl6::POST::Op', ops, endlabel, 'name'=>'unless')
+    ops.'add_child_new'('Cardinal::POST::Op', ops, endlabel, 'name'=>'unless')
     apost = bpost
     node = pop childrenlist
     goto childrenlist_loop
@@ -378,7 +411,7 @@ transform post (Cardinal::PAST::Val) :language('PIR') {
     .local string objtype
     val = node.'name'()
     valtype = node.'valtype'()
-    unless valtype == 'string' goto n1
+    unless valtype == 'String' goto n1
     #objtype = '.RubyString'
     objtype = '.String'
     goto with_objtype
@@ -388,7 +421,7 @@ transform post (Cardinal::PAST::Val) :language('PIR') {
     objtype = '.Integer'
     goto with_val
     n2:
-    unless valtype == 'float' goto n3
+    unless valtype == 'Float' goto n3
     #objtype = '.RubyFloat'
     objtype = '.Float'
     goto with_val

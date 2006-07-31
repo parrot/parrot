@@ -1,28 +1,41 @@
 grammar Cardinal::Grammar
 
 ##Ruby Whitespace rule
-token ws {<[\ \t]>*}
+token ws {
+    [ <[\ \t]>
+    | ^^ \# \N*\n*
+    ]*
+}
 
-token program { ^<compound_statement>$ }
+regex pod_comment {
+    ^^ = [ [ pod \h*: ]
+         | for [ \h\N+: ] \n [ \N+\n ]*:
+         | \w\N*: \n .*? \n = [ cut \h*: ]
+         ]
+         [\n|$]
+}
 
-rule body_statement {<compound_statement> <rescue_clause>? <else_clause>? <ensure_clause>?}
 
-rule compound_statement {<statements>? <?terminators>?}
+rule program { <compound_statement> }
+
+rule body_statement { <compound_statement> <rescue_clause>? <else_clause>? <ensure_clause>? }
+
+rule compound_statement { <statements>? <?terminators>? }
 #added [ <statement> |   
 #for    
 #if x then <compound_statement> end
 #style statements
 #rule statements {<?terminators>? [[ <statement> <?terminators>]* | <statement> ]}
-rule statements {<?terminators>? [<statement> <?terminators>]* <statement>? }
+rule statements {<?terminators>? [<statement> <?terminators>* ]* <statement>? }
 #rule statements {<?terminators>? <statement> [<?terminators> [<statements> <?terminators>]*]? <statement>? }
 
 rule statement {
-          <'alias'> [ <function_item> <function_item>
+          $<ALIAS>:=<'alias'> [ <function_item> <function_item>
                     |<GLOBAL_VARIABLE> [<GLOBAL_VARIABLE>|<back_reference>]]
-          |<'undef'> <undef_list>
-          |<'begin'> \{ <compound_statement> \}
-          |<'end'> \{ <compound_statement> \}
-          |<expression> [(<'if'>|<'unless'>|<'while'>|<'until'>) <expression>
+          |$<UNDEF>:=<'undef'> <undef_list>
+          |$<BEGIN>:=<'begin'> \{ <compound_statement> \}
+          |$<END>:=<'end'> \{ <compound_statement> \}
+          |<expression> [$<MODIFIER>:=[<'if'>|<'unless'>|<'while'>|<'until'>] <expression>
                         |<'rescue'> <statement>]?
 }
 

@@ -71,36 +71,92 @@ transform result (Cardinal::Grammar::statements) :language('PIR') {
     end
 }
 
+transform val (string) :language('PIR') {
+  .local pmc result
+  .kdump(node)
+    result = new 'Cardinal::PAST::Val'
+    $S0 = node
+    result.'init'('node'=>node, 'name'=>$S0, 'valtype'=>'String')
+    .return (result)             
+}
+
 transform result (Cardinal::Grammar::statement) :language('PIR') {
     #.kdump2(node, 'statement')
     .local pmc result
+    .local pmc child
+    .local pmc op
+
     result = new 'Cardinal::PAST::Stmt'
     result.'init'('node'=>node)
     
+    $I0 = defined node['ALIAS']
+    unless $I0 goto n1
+    $S0 = node['ALIAS']
+    #child = tree.get('result', node, 'Cardinal::Grammar::alias')
+    
+    op = new 'Cardinal::PAST::Op'
+    op.'init'('node'=>node, 'name'=>$S0)
+    $I0 = defined node['function_item']
+    unless $I0 goto l1
+    $P0 = node['function_item']
+    $P1 = $P0[0]
+    $P1 = tree.'get'('val', $P1, 'string')
+    $P2 = $P0[1]
+    $P2 = tree.'get'('val', $P2, 'string')
+    goto finish_alias
+  l1:
+    $I0 = defined node['GLOBAL_VARIABLE']
+    unless $I0 goto err_no_tree
+
+    $P0 = node['GLOBAL_VARIABLE']
+    $P1 = $P0[0]
+    $P1 = tree.'get'('val', $P1, 'string')
+    $I0 = elements $P0
+    unless $I0 == 2 goto back_reference
+    $P2 = $P0[1]
+    goto finish_GLOBAL_VARIABLE
+back_reference:
+    $P2 = node['back_reference']
+  finish_GLOBAL_VARIABLE:
+    $P2 = tree.'get'('val', $P2, 'string')
+
+
+  finish_alias:
+    op.'add_child'($P1)
+    op.'add_child'($P2)
+    result.'add_child'(op)
+    .return (result)
+
+  n1:
+    $I0 = defined node['UNDEF']
+    unless $I0 goto n2
+    child = tree.get('result', node, 'Cardinal::Grammar::undef')
+    .return (child)
+
+  n2:
+    $I0 = defined node['BEGIN']
+    unless $I0 goto n3
+    child = tree.get('result', node, 'Cardinal::Grammar::begin')
+    .return (child)
+
+  n3:
+    $I0 = defined node['END']
+    unless $I0 goto n4
+    child = tree.get('result', node, 'Cardinal::Grammar::end')
+    .return (child)
+
+  n4:
+    # if | unless | while | until
     $I0 = defined node['expression']
     unless $I0 goto err_no_tree
     $P0 = node['expression']      
     $P1 = $P0[0]
-    .local pmc child
     child = tree.get('result', $P1, 'Cardinal::Grammar::expression')
 
-    $I0 = defined node[0]
-    unless $I0 goto pass_through
-    $P4 = node[0]
-    unless $P4 goto pass_through
-    $I0 = typeof $P4
-    #$S0 = typeof $P4
-    #print $S0
-    #print "\n"
-    unless $I0 == .ResizablePMCArray goto pass_through
-    $P4 = $P4[0]
-    $S0 = typeof $P4
-    unless $S0 == "Cardinal::Grammar" goto pass_through
-    $S0 = $P4
-    unless $S0 goto pass_through
-  
-  cond_op:
-    .local pmc op
+    $I0 = defined node['MODIFER']
+    unless $I0 goto n5
+    $S0 = node['MODIFIER']
+    
     op = new 'Cardinal::PAST::Op'
     op.'init'('node'=>node, 'name'=>$S0)
     $P1 = $P0[1]
@@ -110,10 +166,15 @@ transform result (Cardinal::Grammar::statement) :language('PIR') {
     unless $S0 == 'unless' goto its_a_if
     null $P4 
     op.'add_child'($P4)
-    its_a_if:
+  its_a_if:
     op.'add_child'(child)
     result.'add_child'(op)
     .return (result)
+
+  n5:
+    $I0 = defined node['RESCUE']
+    unless $I0 goto pass_through
+    $P4 = node['RESUCE']
 
   pass_through: 
     result.'add_child'(child)
@@ -739,8 +800,9 @@ transform result (Cardinal::Grammar::variable) :language('PIR') {
   global_variable:
     $I0 = defined node['GLOBAL_VARIABLE']
     unless $I0 goto true_bool
-    $S0 = node['GLOBAL_VARIABLE']
-    goto case_end
+    $P0 = node['GLOBAL_VARIABLE']
+    $P0 = tree.'get'('result', $P0, 'Cardinal::Grammar:GLOBAL_VARIABLE')
+    .return ($P0)
 
   true_bool:
     .local pmc bool_val
@@ -764,6 +826,14 @@ transform result (Cardinal::Grammar::variable) :language('PIR') {
     print "The variable node doesn't contain a valid variable match.\n"
     .kdump2(node, "VARIABLE NO MATCH")
     end
+}
+
+transform result (Cardinal::Grammar::GLOBAL_VARIABLE) :language('PIR') {
+    $S0 = node
+    .local pmc result
+    result = new 'Cardinal::PAST::Var'
+    result.'init'('node'=>node, 'name'=> $S0, 'scope'=>'global')
+    .return (result)
 }
 
 

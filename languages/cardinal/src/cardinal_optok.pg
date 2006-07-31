@@ -59,6 +59,8 @@ proto 'ternary:? :' is precedence('9=') is assoc('right')
 proto 'infix:=' is pasttype('assign') { ... }
 proto 'if' is pasttype('cond') { ... }
 proto 'unless' is pasttype('cond') { ... }
+proto 'while' is pasttype('loop') { ... }
+proto 'until' is pasttype('loop') { ... }
 
 ## regex operators
 #proto 'infix:~=' is equiv('infix:=') { ... }

@@ -116,6 +116,7 @@ CLEANUPS = \
 	src/ASTGrammar_gen.pir \
 	src/ASTGrammar.pir \
 	src/OSTGrammar.pir \
+  src/builtins_gen.pir \
 	$(PMCDIR)/*.h \
 	$(PMCDIR)/*.c \
 	$(PMCDIR)/*.dump \
