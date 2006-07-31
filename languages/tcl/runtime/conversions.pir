@@ -166,7 +166,10 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     #$P0 = get_root_global ['parrot'], '_dumper'
     #$P0(match)
  
-    unless match goto bad_expression
+    unless match goto premature_end
+    $I0 = length expression
+    $I1 = match.to()
+    unless $I0 == $I1 goto extra_tokens
 
     .local pmc astgrammar, astbuilder, ast
     astgrammar = new 'TclExpr::PAST::Grammar'
@@ -200,10 +203,17 @@ Given an expression, return a subroutine, or optionally, the raw PIR
   only_pir:
     .return(result, $S0)
 
-  bad_expression:
-    # XXX either shouldn't happen, or need better message
-    .throw ('unparsable expression') 
+  premature_end:
+    $S0 = expression
+    $S0 = 'syntax error in expression "' . $S0
+    $S0 = $S0 . '": premature end of expression'
+    .throw($S0) 
 
+  extra_tokens:
+    $S0 = expression
+    $S0 = 'syntax error in expression "' . $S0
+    $S0 = $S0 . '": extra tokens at end of expression'
+    .throw($S0)
 .end
 
 =head2 _Tcl::__script
