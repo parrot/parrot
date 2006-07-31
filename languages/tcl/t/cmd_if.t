@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple if");
@@ -91,4 +91,13 @@ language_output_is("tcl",<<'TCL',<<OUT,"simple if with implicit then, true");
  }
 TCL
 true
+OUT
+
+language_output_is("tcl", <<'TCL',<<OUT,"pathological elseif");
+if 0 then {
+  puts true
+} elseif 0 {
+  puts bar
+}
+TCL
 OUT
