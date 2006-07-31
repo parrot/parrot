@@ -182,7 +182,7 @@ oneliner:
 oneliner_dump:
   $P1 = get_root_global ['_tcl'], 'compile'
   $P2 = get_root_global ['_tcl'], 'pir_compiler'
-  ($I0, $S1) = $P1(0,tcl_code,1)
+  ($I0, $S1) = $P1(0,tcl_code)
   $S2 = $P2($I0,$S1,1)
   print $S2
 
