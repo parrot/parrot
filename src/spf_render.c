@@ -28,7 +28,7 @@ and its utility functions.
 /* Per Dan's orders, we will not use sprintf if snprintf isn't
  * around for us.
  */
-#ifdef _WIN32
+#ifdef _MSC_VER
 #  define snprintf _snprintf
 #endif
 
