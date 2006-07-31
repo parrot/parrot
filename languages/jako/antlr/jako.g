@@ -76,7 +76,7 @@ statement_modifier
 	:	'if' '(' expression ')' 
 	| 	'unless' '(' expression ')' ;
 	
-arithmetic_immediate_statement options
+arithmetic_immediate_statement
 	:	increment_statement | decrement_statement | arithmetic_assign_statement ;
 
 increment_statement
