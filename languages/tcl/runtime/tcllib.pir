@@ -120,30 +120,6 @@ env_loop_done:
 
    store_global 'binary_types', binary_types
 
-  # XXX - this is a holdover. We should incorporate this list into the
-  # appropriate grammar so we don't have two lists sitting around.
-
-  # Keep track of math functions
-  .local pmc math_funcs
-  math_funcs = new .TclArray
-
-  math_funcs['abs']   = 1
-  math_funcs['acos']  = 1
-  math_funcs['asin']  = 1
-  math_funcs['atan']  = 1
-  math_funcs['cos']   = 1
-  math_funcs['cosh']  = 1
-  math_funcs['exp']   = 1
-  math_funcs['log']   = 1
-  math_funcs['log10'] = 1
-  math_funcs['sin']   = 1
-  math_funcs['sinh']  = 1
-  math_funcs['sqrt']  = 1
-  math_funcs['tan']   = 1
-  math_funcs['tanh']  = 1
-
-  store_global 'functions', math_funcs
-
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
 
