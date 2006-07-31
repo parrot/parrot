@@ -30,7 +30,7 @@ PARROT_API extern CHARSET *Parrot_ascii_charset_ptr;
 #endif
 
 #define PARROT_DEFAULT_CHARSET Parrot_ascii_charset_ptr
-#define PARROT_BINARY_CHARSET Parrot_binary_charset
+#define PARROT_BINARY_CHARSET Parrot_binary_charset_ptr
 #define PARROT_UNICODE_CHARSET Parrot_unicode_charset_ptr
 
 typedef STRING *(*charset_get_graphemes_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL count);
