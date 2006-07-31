@@ -126,7 +126,7 @@ src/build/SRM/Stack.pm :
 # ############
 
 test : all
-	${perl} -It t/harness
+	$(PERL) -It t/harness
 
 
 # CLEANUP TARGETS
