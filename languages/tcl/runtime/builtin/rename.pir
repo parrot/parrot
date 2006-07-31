@@ -9,63 +9,79 @@
 
   .local int argc
   argc = argv
+  if argc != 2 goto bad_args
 
-  if argc != 2 goto error
-  .local string old_s
-  old_s = argv[0]
-  .local string new_s
-  new_s = argv[1]
+  .local string oldName, newName
+  oldName = argv[0]
+  newName = argv[1]
 
   # Change the epoch
-  .get_from_HLL($P0, '_tcl', 'epoch')
+  $P0 = get_root_global ['_tcl'], 'epoch'
   inc $P0
 
-  .local string old_proc,new_proc
-  old_proc = '&' . old_s
-  new_proc = '&' . new_s
+  .local pmc sub, args, builtin
 
- 
-  .local pmc theSub
-  # Grab the original sub
+  $S0 = '&' . oldName
   push_eh doesnt_exist
-    theSub = find_global old_proc
+    sub = get_root_global ['tcl'], $S0
+  clear_eh
+
+  # if the newName is '', just delete the sub
+  .local int delete_only
+  delete_only = 0
+  if newName != '' goto delete_sub
+  delete_only = 1
+
+
+delete_sub:
+  $P0 = get_root_namespace ['tcl']
+  delete $P0[$S0]
+  
+  if delete_only goto delete_builtin
+
+add_sub:
+  # Create the new sub
+  $S0 = '&' . newName
+  set_root_global ['tcl'], $S0, sub
+
+
+delete_builtin:
+  push_eh delete_args
+    builtin = get_root_global ['_tcl'; 'builtins'], oldName
   clear_eh
   
-  # see if an inlinable helper sub exists
-  .get_from_HLL($P1, '_tcl'; 'builtins', old_s)
+  $P0 = get_root_namespace ['_tcl'; 'builtins']
+  delete $P0[oldName]
 
-  # If newName is empty, then just delete
-  if new_s == '' goto delete
+  if delete_only goto delete_args
 
-add:
-  # Create the new sub
-  store_global new_proc, theSub
-  
-  if null $P1 goto delete
-  # Create the new inlinable helper sub
-  .set_in_HLL('_tcl'; 'builtins', new_s, $P1)
+add_builtin:
+  set_root_global ['_tcl'; 'builtins'], newName, builtin
 
-delete:
-  null theSub
-  store_global old_proc, theSub
-  
-  if null $P1 goto return
-  # Delete the old inlinable helper sub
-  .include 'interpinfo.pasm'
-  $P1 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-  $P1 = $P1['_tcl'; 'builtins']
-  delete $P1[old_s]
+
+delete_args:
+  $P0 = get_root_global ['_tcl'], 'proc_args'
+  $I0 = exists $P0[oldName]
+  unless $I0 goto return
+
+  args = $P0[oldName]
+  delete $P0[oldName]
+
+  if delete_only goto return
+
+add_args:
+  $P0[newName] = args
+
 
 return:
   .return('')
 
 doesnt_exist:
   $S0 = "can't rename \""
-  $S0 .= old_s
+  $S0 .= oldName
   $S0 .= "\": command doesn't exist"
   .throw ($S0)
 
-error:
-  .throw ('wrong # args: should be "rename oldName newName"')
-
+bad_args:
+  .throw('wrong # args: should be "rename oldName newName"')
 .end
