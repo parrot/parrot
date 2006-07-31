@@ -1,4 +1,4 @@
-## $Id: PAST.pir 13278 2006-07-13 13:40:14Z coke $
+## $Id$
 
 =head1 NAME
 
