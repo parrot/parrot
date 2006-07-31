@@ -110,7 +110,7 @@ help(void)
 
 
 static void
-imcc_version(void)
+imcc_version(Interp *interp)
 {
     int rev = PARROT_REVISION;
     printf("This is parrot version " PARROT_VERSION);
@@ -136,7 +136,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either\n\
 the GNU General Public License or the Artistic License for more details.\n\n");
 
     printf("PASM/PIR compiler version " IMCC_VERSION ".\n\n");
-    Parrot_exit(0);
+    Parrot_exit(interp, 0);
 }
 
 #define SET_FLAG(flag)   Parrot_set_flag(interp, flag)
@@ -275,7 +275,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 exit(0);
                 break;
             case 'V':
-                imcc_version();
+                imcc_version(interp);
                 break;
             case 'r':
                 ++run_pbc;
@@ -563,7 +563,7 @@ main(int argc, char * argv[])
         do_pre_process(interp);
         Parrot_destroy(interp);
         yylex_destroy(yyscanner);
-        Parrot_exit(0);
+        Parrot_exit(interp, 0);
     }
 
     /* Do we need to produce an output file? If so, what type? */
@@ -640,7 +640,7 @@ main(int argc, char * argv[])
                         string_to_cstring(interp, 
                         IMCC_INFO(interp)->error_message));
                 IMCC_print_inc(interp);
-                Parrot_exit(IMCC_FATAL_EXCEPTION);
+                Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
             }
             IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
                 IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
@@ -648,7 +648,7 @@ main(int argc, char * argv[])
                         string_to_cstring(interp, 
                         IMCC_INFO(interp)->error_message));
                 IMCC_print_inc(interp);
-                Parrot_exit(IMCC_FATALY_EXCEPTION);
+                Parrot_exit(interp, IMCC_FATALY_EXCEPTION);
             }
             IMCC_END_TRY;
         }
@@ -724,7 +724,7 @@ main(int argc, char * argv[])
     Parrot_destroy(interp);
     yylex_destroy(yyscanner);
     mem_sys_free(IMCC_INFO(interp));
-    Parrot_exit(0);
+    Parrot_exit(interp, 0);
 
     return 0;
 }

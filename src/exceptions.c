@@ -61,7 +61,12 @@ internal_exception(int exitcode, const char *format, ...)
     /* caution against output swap (with PDB_backtrace) */
     fflush(stderr);
     va_end(arglist);
-    Parrot_exit(exitcode);
+/*
+ * XXX TODO get rid of all the internal_exceptions or call them
+ *          with an interpreter arg 
+    Parrot_exit(interpreter, exitcode);
+ */
+    exit(exitcode);
 }
 
 /* Panic handler */
@@ -310,7 +315,7 @@ find_exception_handler(Interp * interpreter, PMC *exception)
      * only main should run the destroy functions - exit handler chain
      * is freed during Parrot_exit
      */
-    Parrot_exit(exit_status);
+    Parrot_exit(interpreter, exit_status);
 
     return NULL;
 }

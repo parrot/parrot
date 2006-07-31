@@ -639,7 +639,7 @@ runops_cgp(Interp *interpreter, opcode_t *pc)
 #else
     PIO_eprintf(interpreter,
             "Computed goto unavailable in this configuration.\n");
-    Parrot_exit(1);
+    Parrot_exit(interpreter, 1);
     return NULL;
 #endif
 }

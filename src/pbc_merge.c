@@ -52,18 +52,18 @@ struct pbc_merge_input
 
 /*
 
-static void help(void)
+static void help(Interp *)
 
 Print out the user help info.
 
 */
 static void
-help(void)
+help(Interp *interpreter)
 {
     printf("pbc_merge - merge multiple parrot bytecode files into one\n");
     printf("Usage:\n");
     printf("   pbc_merge -o out.pbc file1.pbc file2.pbc ...\n\n");
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
 }
 
 
@@ -96,7 +96,7 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
     if (!Parrot_stat_info_intval(interpreter, fs, STAT_EXISTS)) {
         PIO_eprintf(interpreter, "PBC Merge: Can't stat %s, code %i.\n",
                 fullname, errno);
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Get program size. */
@@ -107,7 +107,7 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
     if (!io) {
         PIO_eprintf(interpreter, "PBC Merge: Can't open %s, code %i.\n",
                 fullname, errno);
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Read in program. Nabbed from Parrot_readpbc. */
@@ -127,7 +127,7 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
         if (!program_code) {
             PIO_eprintf(interpreter,
                 "PBC Merge: Could not reallocate buffer");
-            Parrot_exit(1);
+            Parrot_exit(interpreter, 1);
         }
 
         cursor = (char *)program_code + program_size;
@@ -136,7 +136,7 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
     if (read_result < 0) {
         PIO_eprintf(interpreter,
                 "PBC Merge: Problem reading packfile from PIO.\n");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
     fclose(io);
 
@@ -146,7 +146,7 @@ pbc_merge_loadpbc(Interp *interpreter, char *fullname)
         (interpreter, pf, (opcode_t *)program_code, program_size)) {
         PIO_eprintf(interpreter, "PBC Merge: Can't unpack packfile %s.\n",
                 fullname);
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Return the packfile. */
@@ -179,7 +179,7 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
     if (bc_seg == NULL)
     {
         PIO_eprintf(interpreter, "PBC Merge: Error creating bytecode segment.");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Loop over input files. */
@@ -192,7 +192,7 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
             PIO_eprintf(interpreter,
                 "PBC Merge: Cannot locate bytecode segment in %s",
                 inputs[i]->filename);
-            Parrot_exit(1);
+            Parrot_exit(interpreter, 1);
         }
 
         /* Re-allocate the current buffer. */
@@ -201,7 +201,7 @@ pbc_merge_bytecode(Interp *interpreter, struct pbc_merge_input **inputs,
         if (bc == NULL)
         {
             PIO_eprintf(interpreter, "PBC Merge: Cannot reallocate memory\n");
-            Parrot_exit(1);
+            Parrot_exit(interpreter, 1);
         }
 
         /* Copy data and store cursor. */
@@ -248,7 +248,7 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
     {
         PIO_eprintf(interpreter,
             "PBC Merge: Error creating constant table segment.");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Loop over input files. */
@@ -261,7 +261,7 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
             PIO_eprintf(interpreter,
                 "PBC Merge: Cannot locate constant table segment in %s\n",
                 inputs[i]->filename);
-            Parrot_exit(1);
+            Parrot_exit(interpreter, 1);
         }
 
         /* Store cursor as position where constant table starts. */
@@ -275,7 +275,7 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
             if (constants == NULL)
             {
                 PIO_eprintf(interpreter, "PBC Merge: Out of memory");
-                Parrot_exit(1);
+                Parrot_exit(interpreter, 1);
             }
         }
 
@@ -289,7 +289,7 @@ pbc_merge_constants(Interp *interpreter, struct pbc_merge_input **inputs,
             if (copy == NULL)
             {
                 PIO_eprintf(interpreter, "PBC Merge: Out of memory");
-                Parrot_exit(1);
+                Parrot_exit(interpreter, 1);
             }
 
             /* Copy. */
@@ -352,7 +352,7 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
     {
         PIO_eprintf(interpreter,
             "PBC Merge: Error creating fixup table segment.");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Loop over input files. */
@@ -365,7 +365,7 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
             PIO_eprintf(interpreter,
                 "PBC Merge: Cannot locate fixup segment in %s",
                 inputs[i]->filename);
-            Parrot_exit(1);
+            Parrot_exit(interpreter, 1);
         }
 
         /* Allocate space for these fixups, provided we have some. */
@@ -376,7 +376,7 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
             if (fixups == NULL)
             {
                 PIO_eprintf(interpreter, "PBC Merge: Out of memory");
-                Parrot_exit(1);
+                Parrot_exit(interpreter, 1);
             }
         }
 
@@ -392,7 +392,7 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
             if (copy == NULL || name_copy == NULL)
             {
                 PIO_eprintf(interpreter, "PBC Merge: Out of memory");
-                Parrot_exit(1);
+                Parrot_exit(interpreter, 1);
             }
 
             /* Copy type and name. */
@@ -411,7 +411,7 @@ pbc_merge_fixups(Interp *interpreter, struct pbc_merge_input **inputs,
                     break;
                 default:
                     PIO_eprintf(interpreter, "PBC Merge: Unknown fixup type");
-                    Parrot_exit(1);
+                    Parrot_exit(interpreter, 1);
             }
 
             copy->seg = bc;
@@ -464,7 +464,7 @@ pbc_merge_debugs(Interp *interpreter, struct pbc_merge_input **inputs,
         if (lines == NULL)
         {
             PIO_eprintf(interpreter, "PBC Merge: Cannot reallocate memory\n");
-            Parrot_exit(1);
+            Parrot_exit(interpreter, 1);
         }
         memcpy(lines + num_lines, in_seg->base.data,
             in_seg->base.size * sizeof(opcode_t));
@@ -660,7 +660,7 @@ pbc_merge_begin(Interp *interpreter, struct pbc_merge_input **inputs,
     if (merged == NULL)
     {
         PIO_eprintf(interpreter, "PBC Merge: Error creating new packfile.\n");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Merge the various stuff. */
@@ -700,18 +700,18 @@ pbc_merge_write(Interp *interpreter, struct PackFile *pf, const char *filename)
     pack = (opcode_t*) mem_sys_allocate(size);
     if (pack == NULL) {
         PIO_eprintf(interpreter, "PBC Merge: Out of memory");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Write and clean up. */
     PackFile_pack(interpreter, pf, pack);
     if ((fp = fopen(filename, "wb")) == 0) {
         PIO_eprintf(interpreter, "PBC Merge: Couldn't open %s\n", filename);
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
     if ((1 != fwrite(pack, size, 1, fp)) ) {
         PIO_eprintf(interpreter, "PBC Merge: Couldn't write %s\n", filename);
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
     fclose(fp);
     mem_sys_free(pack);
@@ -751,7 +751,7 @@ main(int argc, char **argv)
     /* Get options, ensuring we have at least one input
        file and an output file. */
     if (argc < 4) {
-        help();
+        help(interpreter);
     }
     while ((status = longopt_get(interpreter, argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
@@ -759,15 +759,15 @@ main(int argc, char **argv)
                 if (output_file == NULL)
                     output_file = opt.opt_arg;
                 else
-                    help();
+                    help(interpreter);
                 break;
             case '?':
-                help();
+                help(interpreter);
                 break;
         }
     }
     if (status == -1 || !output_file) {
-        help();
+        help(interpreter);
     }
     argc -= opt.opt_index;    /* Now the number of input files. */
     argv += opt.opt_index;    /* Now at first input filename. */
@@ -791,7 +791,7 @@ main(int argc, char **argv)
             PIO_eprintf(interpreter,
                 "PBC Merge: Unknown error while reading and unpacking %s\n",
                 *argv);
-            Parrot_exit(1);
+            Parrot_exit(interpreter, 1);
         }
 
         /* Next file. */
@@ -803,14 +803,14 @@ main(int argc, char **argv)
     if (merged == NULL)
     {
         PIO_eprintf(interpreter, "PBC Merge: Unknown error during merge\n");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     /* Write merged packfile. */
     pbc_merge_write(interpreter, merged, output_file);
 
     /* Finally, we're done. */
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 

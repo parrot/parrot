@@ -86,7 +86,7 @@ main(int argc, char * argv[] )
     printf("%s\n", pf->directory.base.name);
     PackFile_map_segments(interpreter, &pf->directory, iter, (void*)2);
 
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 

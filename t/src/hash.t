@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
     Parrot_run_native(interpreter, the_test);
 
-    Parrot_exit(exit_value);
+    Parrot_exit(interpreter, exit_value);
     return exit_value;
 }
 

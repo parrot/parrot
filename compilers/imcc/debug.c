@@ -41,7 +41,7 @@ IMCC_fatal_standalone(Interp *interp, int code, const char *fmt, ...)
     va_start(ap, fmt);
     imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
-    Parrot_exit(code);
+    Parrot_exit(interp, code);
 }
 
 
@@ -56,7 +56,7 @@ IMCC_fataly_standalone(Interp *interp, int code, const char *fmt, ...)
     imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
     IMCC_print_inc(interp);
-    Parrot_exit(code);
+    Parrot_exit(interp, code);
 }
 
 

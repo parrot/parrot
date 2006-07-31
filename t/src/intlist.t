@@ -44,7 +44,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "creation");
             x = (int) intlist_get(interpreter, list, 0);
 
             printf("The answer is %d.\n", x);
-            Parrot_exit(0);
+            Parrot_exit(interpreter, 0);
             return 0;
         }
 CODE

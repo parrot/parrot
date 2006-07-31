@@ -63,17 +63,16 @@ static struct globals {
 
 static int add_const_str(Interp *, SymReg *r);
 
-static void imcc_globals_destroy(int ex, void *param);
 static opcode_t build_key(Interp *interpreter, SymReg *reg);
 
 static void
-imcc_globals_destroy(int ex, void *param)
+imcc_globals_destroy(Interp *interp, int ex, void *param)
 {
     struct cs_t *cs, *prev_cs;
     struct subs *s, *prev_s;
-    Interp *interp = (Interp *)param;
 
     UNUSED(ex);
+    UNUSED(param);
     UNUSED(interp);
     cs = globals.cs;
     while (cs) {
@@ -103,7 +102,7 @@ e_pbc_open(Interp * interpreter, void *param)
     UNUSED(param);
     if (!globals.cs) {
         /* register cleanup code */
-        Parrot_on_exit(imcc_globals_destroy, interpreter);
+        Parrot_on_exit(interpreter, imcc_globals_destroy, NULL);
     }
     cs = mem_sys_allocate_zeroed(sizeof(struct cs_t));
     cs->prev = globals.cs;

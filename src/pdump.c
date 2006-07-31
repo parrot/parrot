@@ -290,7 +290,7 @@ main(int argc, char **argv)
     /* do a directory dump, which dumps segs then */
     PackFile_Segment_dump(interpreter, &pf->directory.base);
 
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 

@@ -27,10 +27,12 @@ Tests the various C<Parrot_sprintf_*> functions.
 
 c_output_like(<<'CODE', <<'OUTPUT', "xxxVAL_FMT");
 #include "parrot/parrot.h"
+#include "parrot/embed.h"
 int main(int argc, char* argv[]) {
-    PIO_printf(NULL, INTVAL_FMT "\n", (INTVAL) 42);
-    PIO_printf(NULL, FLOATVAL_FMT "\n", (FLOATVAL) 42.0);
-    Parrot_exit(0);
+    Parrot_Interp interpreter = Parrot_new(NULL);
+    PIO_printf(interpreter, INTVAL_FMT "\n", (INTVAL) 42);
+    PIO_printf(interpreter, FLOATVAL_FMT "\n", (FLOATVAL) 42.0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 CODE
@@ -180,7 +182,7 @@ int main(int argc, char* argv[]) {
     interpreter = Parrot_new(NULL);
     do_test(interpreter);
 
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 CODE

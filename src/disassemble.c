@@ -54,7 +54,7 @@ main(int argc, char *argv[])
 
     if (argc != 2) {
         fprintf(stderr, "Usage: disassemble programfile \n");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     filename = argv[1];
@@ -69,7 +69,7 @@ main(int argc, char *argv[])
 
     do_dis(interpreter);
 
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
 
     return 0;
 }

@@ -100,7 +100,7 @@ main(int margc, char *margv[])
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 CODE
@@ -182,7 +182,7 @@ main(int margc, char *margv[])
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 CODE
@@ -272,7 +272,7 @@ main(int margc, char *margv[])
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 CODE
@@ -362,7 +362,7 @@ main(int margc, char *margv[])
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 CODE
@@ -452,7 +452,7 @@ main(int margc, char *margv[])
 
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 CODE
@@ -540,7 +540,7 @@ main(int margc, char *margv[])
     pf = PackFile_new_dummy(interpreter, "test_code");
     /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
     run(interpreter, argc, argv);
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 CODE

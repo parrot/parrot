@@ -269,6 +269,8 @@ typedef struct _context_mem {
 #endif
 
 } context_mem;
+
+struct _handler_node_t; /* forward def - exit.h */
 /*
  * The actual interpreter structure
  */
@@ -354,7 +356,7 @@ struct parrot_interp_t {
     STRING **const_cstring_table;             /* CONST_STRING(x) items */
 
     struct QUEUE* task_queue;                 /* per interpreter queue */
-
+    struct _handler_node_t *exit_handler_list;   /* exit.c */ 
     int sleeping;                             /* used during sleep in events */
 
     struct parrot_exception_t *exceptions;    /* internal exception stack */

@@ -25,19 +25,9 @@ called by C<Parrot_exit()> when the interpreter exits.
 
 #include <parrot/parrot.h>
 
-typedef struct _handler_node_t {
-    void (*function)(int , void *);
-    void *arg;
-    struct _handler_node_t *next;
-} handler_node_t;
-
-
-static handler_node_t *exit_handler_list;
-
-
 /*
 
-=item C<int Parrot_on_exit(void (*function)(int , void *), void *arg)>
+=item C<int Parrot_on_exit(Interp *, exit_handler_f func, void *arg)>
 
 Register the specified function to be called on exit.
 
@@ -46,7 +36,7 @@ Register the specified function to be called on exit.
 */
 
 int
-Parrot_on_exit(void (*function)(int , void *), void *arg) {
+Parrot_on_exit(Interp *interp, exit_handler_f function, void *arg) {
     /* XXX  we might want locking around the list access.   I'm sure this
      * will be the least of the threading issues. */
 
@@ -54,8 +44,8 @@ Parrot_on_exit(void (*function)(int , void *), void *arg) {
 
     new_node->function = function;
     new_node->arg = arg;
-    new_node->next = exit_handler_list;
-    exit_handler_list = new_node;
+    new_node->next = interp->exit_handler_list;
+    interp->exit_handler_list = new_node;
     return 0;
 }
 
@@ -70,7 +60,7 @@ Exit, calling any registered exit handlers.
 */
 
 void
-Parrot_exit(int status) {
+Parrot_exit(Interp *interp, int status) {
     /* call all the exit handlers */
 
     /* Must write the loop this way to protect against an exit handler calling
@@ -87,11 +77,11 @@ Parrot_exit(int status) {
      * XXX FIXME - and what about multiple interpreters - the first exit
      *             call would run all exit handlers
      */
-    while (exit_handler_list) {
-        handler_node_t * const node = exit_handler_list;
+    while (interp->exit_handler_list) {
+        handler_node_t * const node = interp->exit_handler_list;
 
-        exit_handler_list = exit_handler_list->next;
-        (node->function)(status, node->arg);
+        interp->exit_handler_list = interp->exit_handler_list->next;
+        (node->function)(interp, status, node->arg);
         mem_sys_free(node);
     }
 

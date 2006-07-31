@@ -1,5 +1,8 @@
 #1 $Id$
 
+2006.07.21    leo
+	* Parrot_exit, Parrot_on_exit take now an Interp * argument
+
 2006.07.25    chip
 	* add experimental op find_type_i_p
 	* fix longstanding bug that sometimes didn't encode pasm keys as

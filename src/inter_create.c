@@ -86,7 +86,7 @@ Create the Parrot interpreter. Allocate memory and clear the registers.
 
 */
 
-void Parrot_really_destroy(int exit_code, void *interpreter);
+void Parrot_really_destroy(Interp *, int exit_code, void *);
 
 Parrot_Interp
 make_interpreter(Parrot_Interp parent, Interp_flags flags)
@@ -249,7 +249,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
      * Threaded interpreters are destructed when the thread ends
      */
     if (!Interp_flags_TEST(interpreter, PARROT_IS_THREAD))
-        Parrot_on_exit(Parrot_really_destroy, (void*)interpreter);
+        Parrot_on_exit(interpreter, Parrot_really_destroy, NULL);
 #endif
 
     return interpreter;
@@ -294,11 +294,10 @@ Note that C<exit_code> is ignored.
 */
 
 void
-Parrot_really_destroy(int exit_code, void *vinterp)
+Parrot_really_destroy(Interp *interpreter, int exit_code, void *arg)
 {
-    Interp *interpreter = (Interp*) vinterp;
-
     UNUSED(exit_code);
+    UNUSED(arg);
 
     /*
      * wait for threads to complete if needed
