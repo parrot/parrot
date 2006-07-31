@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 32
+plan 60
 
 # arg checking
 eval_is {string} \
@@ -74,3 +74,67 @@ eval_is {string index} \
 eval_is {string index a b c} \
   {wrong # args: should be "string index string charIndex"} \
   {string index, too many args}
+
+# [string length]
+eval_is {string length} \
+  {wrong # args: should be "string length string"} \
+  {length, too few args}
+
+eval_is {string length a b} \
+  {wrong # args: should be "string length string"} \
+  {length, too many args}
+
+is [string length 10]     2 "length, ascii"
+is [string length \u6666] 1 "length, unicode"
+is [string length ""]     0 "length, empty"
+
+# [string range]
+eval_is {string range} \
+  {wrong # args: should be "string range string first last"} \
+  {range, too few args}
+eval_is {string range a b c d} \
+  {wrong # args: should be "string range string first last"} \
+  {range, too many args}
+
+is [string range abcde 0 end] abcde {range, total}
+is [string range abcde 1 end-1] bcd {range, partial}
+is [string range abcde end-20 20] abcde {range, overextended}
+
+# [string match]
+
+is [string match * foo]        1 {string match * only}
+is [string match a?c abc]      1 {string match ?}
+is [string match {a[bc]c} abc] 1 {string match charset}
+is [string match {a[ac]c} abc] 0 {string match charset, fail}
+is [string match {\*} *]       1 {string match \*}
+is [string match {\?} ?]       1 {string match \?}
+is [string match ABC abc]      0 {string match case failure}
+is [string match {\[} {[}]     1 {string match \[}
+is [string match {\]} {]}]     1 {string match \]}
+
+# [string repeat]
+eval_is {string repeat} \
+  {wrong # args: should be "string repeat string count"} \
+  {repeat no args}
+eval_is {string repeat a} \
+  {wrong # args: should be "string repeat string count"} \
+  {repeat too few args}
+eval_is {string repeat a b c} \
+  {wrong # args: should be "string repeat string count"} \
+  {repeat too many args}
+
+is [string repeat a 5] aaaaa {string repeat: simple}
+
+# [string bytelength]
+eval_is {string bytelength} \
+  {wrong # args: should be "string bytelength string"} \
+  {bytelength no args}
+eval_is {string bytelength a b} \
+  {wrong # args: should be "string bytelength string"} \
+  {bytelength too many args}
+
+is [string bytelength hi] 2 {bytelength ascii}
+is [string bytelength \u6666] 3 {bytelength unicode}
+is [string bytelength \u666]  2 {bytelength unicode 2}
+
+
