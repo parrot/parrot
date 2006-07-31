@@ -68,7 +68,7 @@ $(R_BUILTIN)/lappend.pir \
 $(R_BUILTIN)/lassign.pir \
 $(R_BUILTIN)/lindex.pir \
 $(R_BUILTIN)/linsert.pir \
-$(R_BUILTIN)/list.pir \
+$(C_BUILTIN)/list.pir \
 $(R_BUILTIN)/lrange.pir \
 $(R_BUILTIN)/lrepeat.pir \
 $(C_BUILTIN)/lsearch.pir \
