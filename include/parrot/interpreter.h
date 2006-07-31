@@ -195,8 +195,7 @@ typedef struct Parrot_Context {
                                  * have been activated */
     UINTVAL errors;            /* fatals that can be turned off */
     UINTVAL trace_flags;
-    UINTVAL recursion_depth;    /* Sub call resursion depth */
-    int runloop_level;                  /* for reentering run loop */
+    UINTVAL recursion_depth;    /* Sub call recursion depth */
     /*
      * new call scheme and introspective variables
      */
@@ -362,6 +361,9 @@ struct parrot_interp_t {
     struct parrot_exception_t *exceptions;    /* internal exception stack */
     struct parrot_exception_t *exc_free_list; /* and free list */
     PMC ** exception_list;                    /* precreated exception objects */
+
+    int current_runloop_level;                /* for reentering run loop */
+    int current_runloop_id;
 
     struct _Thread_data *thread_data;         /* thread specific items */
 

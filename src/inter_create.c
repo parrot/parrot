@@ -213,6 +213,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     SET_NULL_P(interpreter->DOD_registry, PMC *);
 
     /* create exceptions list */
+    interpreter->current_runloop_level = 0;
+    interpreter->current_runloop_id = 0;
     Parrot_init_exceptions(interpreter);
 
     /* register assembler/compilers */

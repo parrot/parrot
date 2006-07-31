@@ -132,6 +132,7 @@ Creates and returns a clone of the continuation.
 
         PObj_custom_mark_destroy_SETALL(ret);
         cc = new_continuation(INTERP, cc_self);
+        cc->runloop_id = cc_self->runloop_id;
         PMC_struct_val(ret) = cc;
         PMC_pmc_val(ret) = PMC_pmc_val(SELF);
         return ret;
@@ -169,6 +170,7 @@ Sets the pointer to the return instruction.
 
         PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
         cc->address = value;
+        cc->runloop_id = interpreter->current_runloop_id;
         if (pos && *pos == PARROT_OP_get_results_pc) {
             cc->current_results = pos;
         }
@@ -226,6 +228,16 @@ destination to continue execution.
         parrot_context_t *ctx;
         opcode_t *pc;
 
+	if (interpreter->current_runloop_id != cc->runloop_id
+            /* it's ok if we are exiting to "runloop 0"; there is no such
+               runloop, but the only continuation that thinks it came from
+               runloop 0 is for the return from the initial sub call. */
+            && cc->runloop_id != 0) {
+	    fprintf(stderr, "[oops; continuation %p of type %d "
+                    "is trying to jump from runloop %d to runloop %d]\n",
+		    SELF, SELF->vtable->base_type,
+                    interpreter->current_runloop_id, cc->runloop_id);
+	}
 #if CTX_LEAK_DEBUG
         if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             fprintf(stderr,

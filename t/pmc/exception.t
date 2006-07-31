@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 
 =head1 NAME
 
@@ -486,11 +486,8 @@ CODE
 1 2
 OUTPUT
 
-{
-local $TODO = 'bug';
-
 ## this is broken; continuation calling does not execute actions when unwinding.
-pir_output_is(<<'CODE', <<'OUTPUT', 'cleanup global:  continuation');
+pir_output_is(<<'CODE', <<'OUTPUT', 'cleanup global:  continuation', todo => 'bug');
 .sub main :main
 	.local pmc outer, cont
 	outer = new String
@@ -546,9 +543,6 @@ Innerer value
 [in test1_cleanup]
 Outer value
 OUTPUT
-
-$TODO++;	# suppress warning.
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'cleanup global:  throw');
 .sub main :main
@@ -653,3 +647,35 @@ Error: No exception to pop.
 done.
 OUTPUT
 
+# stringification is handled by a vtable method, which runs in a second
+# runloop. when an error in the method tries to go to a Error_Handler defined
+# outside it, it winds up going to the inner runloop, giving strange results.
+pir_output_is(<<'CODE', <<'OUTPUT', 'clear_eh out of context (2)', todo => 'runloop shenanigans');
+.sub main :main
+        $P0 = get_hll_global ['Foo'], 'load'
+        $P0()
+        $P0 = new 'Foo'
+        push_eh catch
+        $S0 = $P0
+        clear_eh
+        say "huh?"
+        .return()
+
+catch:
+        say "caught"
+        .return()
+.end
+
+.namespace ['Foo']
+
+.sub load
+        $P0 = newclass 'Foo'
+.end
+
+.sub __get_string :method
+        $P0 = new .Exception
+        throw $P0
+.end
+CODE
+caught
+OUTPUT

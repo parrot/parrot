@@ -34,13 +34,26 @@ Run parrot ops. Set exception handler and/or resume after exception.
 */
 
 #define STACKED_EXCEPTIONS 1
+/* #define RUNLOOP_TRACE 1 */
+
+static int
+runloop_id_counter = 0;		/* for synthesizing runloop ids. */
 
 void
 runops(Interp *interpreter, size_t offs)
 {
     volatile size_t offset = offs;
+    int old_runloop_id = interpreter->current_runloop_id;
+    int our_runloop_level = ++interpreter->current_runloop_level;
+    int our_runloop_id = ++runloop_id_counter;
 
-    CONTEXT(interpreter->ctx)->runloop_level++;
+    /* It is OK if the runloop ID overflows; we only ever test it for equality,
+       so the chance of collision is slight. */
+    interpreter->current_runloop_id = our_runloop_id;
+#ifdef RUNLOOP_TRACE
+    fprintf(stderr, "[entering loop %d, level %d]\n",
+            interpreter->current_runloop_id, our_runloop_level);
+#endif
     /*
      * STACKED_EXCEPTIONS are necessary to catch exceptions in reentered
      * run loops, e.g. if a delegate methods throws an exception
@@ -50,10 +63,14 @@ runops(Interp *interpreter, size_t offs)
 #endif
     {
         new_internal_exception(interpreter);
-        interpreter->exceptions->runloop_level =
-            CONTEXT(interpreter->ctx)->runloop_level;
         if (setjmp(interpreter->exceptions->destination)) {
             /* an exception was thrown */
+            interpreter->current_runloop_level = our_runloop_level;
+            interpreter->current_runloop_id = our_runloop_id;
+#ifdef RUNLOOP_TRACE
+            fprintf(stderr, "[exception; back to loop %d, level %d]\n",
+                    our_runloop_id, our_runloop_level);
+#endif
             offset = handle_exception(interpreter);
             /* update profile for exception execution time */
             if (interpreter->profile &&
@@ -67,19 +84,8 @@ runops(Interp *interpreter, size_t offs)
         }
     }
 
-    /*
-     * XXX this is broken
-     *  - the runloop_level has to be in the interpreter struct
-     *  - the exception loop level must be part of the exception
-     *    handler
-     */
-    if (1 || interpreter->exceptions->runloop_level ==
-            CONTEXT(interpreter->ctx)->runloop_level) {
-        /* if we are coming from an exception and it was thrown deeper
-         * in a nested run loop, we just leave this loop
-         */
-        runops_int(interpreter, offset);
-    }
+    runops_int(interpreter, offset);
+
     /*
      * pop off exception and put it onto the free list
      * s. above
@@ -87,7 +93,12 @@ runops(Interp *interpreter, size_t offs)
     if (STACKED_EXCEPTIONS) {
         free_internal_exception(interpreter);
     }
-    CONTEXT(interpreter->ctx)->runloop_level--;
+#ifdef RUNLOOP_TRACE
+    fprintf(stderr, "[exiting loop %d, level %d]\n",
+            our_runloop_id, our_runloop_level);
+#endif
+    interpreter->current_runloop_level = --our_runloop_level;
+    interpreter->current_runloop_id = old_runloop_id;
     /*
      * not yet - this needs classifying of exceptions and handlers
      * so that only an exit handler does catch this exception

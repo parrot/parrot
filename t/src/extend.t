@@ -510,11 +510,13 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     sub = Parrot_find_global_cur(interpreter, name);
 
     if (setjmp(jb.destination)) {
-    PIO_eprintf(interpreter, "caught\n");
+	PIO_eprintf(interpreter, "caught\n");
     }
     else {
-    push_new_c_exception_handler(interpreter, &jb);
-    Parrot_call_sub(interpreter, sub, "v");
+	interpreter->current_runloop_id++;	/* pretend the EH was pushed
+						   by the sub call. */
+	push_new_c_exception_handler(interpreter, &jb);
+	Parrot_call_sub(interpreter, sub, "v");
     }
     PIO_eprintf(interpreter, "back\n");
 
