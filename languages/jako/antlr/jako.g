@@ -38,19 +38,18 @@ subroutine_definition
 //
 
 declaration
-	:	data_declaration | subroutine_declaration ;
+	:	data_declaration
+	|	subroutine_declaration
+	;
 
 data_declaration
-	:	constant_declaration | variable_declaration;
-	
-constant_declaration
-	:	'const' type_name plain_identifier '=' literal ';';
-
-variable_declaration
-	:	'var' type_name plain_identifier_list ( '=' expression )? ';';
+	:	'const' type_name plain_identifier '=' literal ';'
+	|	'var' type_name plain_identifier_list ( '=' expression )? ';'
+	;
 
 plain_identifier_list
-	:	plain_identifier ( ',' plain_identifier )* ;
+	:	plain_identifier ( ',' plain_identifier )*
+	;
 
 //
 // Definitions:
@@ -104,12 +103,9 @@ statement_modifier
 	;
 	
 side_effect_statement
-	:	assignment_statement
-	|	expression
-	;
-
-assignment_statement
 	:	primary_expression assignment_operator expression
+	|	primary_expression ( '++' | '--' )
+	|	expression
 	;
 
 assignment_operator
@@ -125,7 +121,7 @@ assignment_operator
 goto_statement
 	:	'goto' plain_identifier ;
 	
-while_statement	:	'while' '(' logical_expression ')' block ( 'continue' block )? ;
+while_statement	:	'while' expression block ( 'continue' block )? ;
 
 if_statement
 	:	'if' '(' expression ')' block ( 'else' block )? ;
@@ -142,8 +138,9 @@ loop_control_statement
 
 expression
 	:	primary_expression
-	|	arithmetic_expression
-	|	logical_expression
+	|	'!' expression
+	|	'-' expression
+	|	'(' expression ( '||' | '&&' | '==' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/' | '%' ) expression ')'
 	;
 
 primary_expression
@@ -157,28 +154,6 @@ primary_expression
 
 argument_expression_list
 	:	expression ( ',' expression )*
-	;
-
-arithmetic_expression
-	:	primary_expression
-	|	'-' arithmetic_expression
-	|	'(' arithmetic_expression ( '+' | '-' | '*' | '/' | '%' ) arithmetic_expression ')'
-	;
-
-logical_expression
-	:	primary_expression
-	|	equality_expression
-	|	relational_expression
-	|	'!' logical_expression
-	|	'(' logical_expression ( '||' | '&&' | '==' | '!=' ) logical_expression ')'
-	;
-
-equality_expression
-	:	expression ( ( '==' | '!=' ) expression )*
-	;
-
-relational_expression
-	:	arithmetic_expression ( ( '<' | '>' | '<=' | '>=' ) arithmetic_expression )*
 	;
 
 //
