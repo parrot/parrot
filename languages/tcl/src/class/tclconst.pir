@@ -26,7 +26,7 @@ Define the attributes required for the class.
   $P0[118] = "\v"
 
   # XXX These should probably be moved into a class attribute.
-  .set_in_HLL('_tcl', 'backslashes', $P0)
+  set_root_global ['_tcl'], 'backslashes', $P0
 
   $P0 = new .Hash
   $P0[ 48] =  0 # "0"
@@ -51,8 +51,8 @@ Define the attributes required for the class.
   $P0[100] = 13
   $P0[101] = 14
   $P0[102] = 15
-  
-  .set_in_HLL('_tcl', 'hexadecimal', $P0)
+ 
+  set_root_global ['_tcl'], 'hexadecimal', $P0 
 
 .end
 
