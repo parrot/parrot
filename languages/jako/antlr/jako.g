@@ -1,8 +1,19 @@
+//
+// jako.g
+//
+// Jako Grammar for ANTLR v3.0b3.
+//
+// Expressions, comments, and literals taken from or patterned after the c.g ANSI C ANTLR v3 grammar
+// in the set of example grammars available from antlr.org on or about 2006-07-30.
+//
+
 grammar JakoParser;
 
-//options {
-//
-//}
+options {
+//    backtrack=true;
+    memoize=true;
+//    k=2;
+}
 
 semantic_unit
 	:	 (directive  | module_definition | deferred | statement)+ ;
@@ -14,7 +25,7 @@ definition
 	:	subroutine_definition;
 
 subroutine_header
-	:	'sub' type_name? IDENTIFIER option* '(' formal_argument_list ')' ;
+	:	'sub' type_name? plain_identifier option* '(' formal_argument_list ')' ;
 	
 subroutine_declaration
 	: 	subroutine_header ';' ;
@@ -33,90 +44,80 @@ data_declaration
 	:	constant_declaration | variable_declaration;
 	
 constant_declaration
-	:	'const' type_name IDENTIFIER '=' literal ';';
+	:	'const' type_name plain_identifier '=' literal ';';
 
 variable_declaration
-	:	'var' type_name identifier_list ( '=' expression )? ';';
+	:	'var' type_name plain_identifier_list ( '=' expression )? ';';
 
-identifier_list
-	:	IDENTIFIER ( ',' IDENTIFIER )* ;
+plain_identifier_list
+	:	plain_identifier ( ',' plain_identifier )* ;
 
 //
 // Definitions:
 //
 
-option	:	':' IDENTIFIER ( '=' STRING_LITERAL )? ;
+option
+	:	':' plain_identifier ( '=' STRING_LITERAL )?
+	;
 
 formal_argument_list
 	:
-	| type_name IDENTIFIER ( ',' type_name IDENTIFIER )* ;
+	|	type_name plain_identifier ( ',' type_name plain_identifier )*
+	;
 	
 module_definition
-	:	'module' IDENTIFIER option* '{' deferred+ '}' ;
+	:	'module' identifier  option* '{' deferred+ '}'
+	;
 
 //
 // Directives:
 //
 	
 directive
-	:	use_directive;
+	:	use_directive
+	;
 
 use_directive
-	:	'use' name ';';
+	:	'use' identifier  ';'
+	;
 
 //
 // Statements:
 //
 
 statement
-	:	basic_statement statement_modifier? ';' | while_statement | if_statement ;
+	:	basic_statement statement_modifier? ';'
+	|	while_statement
+	|	if_statement
+	;
 
 basic_statement
-	:	call_statement
-	|	assignment_statement
+	:	side_effect_statement
 	|	return_statement
 	|	loop_control_statement
-	|	arithmetic_immediate_statement
-	|	string_concat_statement
 	|	goto_statement
 	;
 
 statement_modifier
 	:	'if' '(' expression ')' 
-	| 	'unless' '(' expression ')' ;
+	| 	'unless' '(' expression ')'
+	;
 	
-arithmetic_immediate_statement
-	:	increment_statement | decrement_statement | arithmetic_assign_statement ;
-
-increment_statement
-	:	lvalue '++' ;
-	
-decrement_statement
-	:	lvalue '--' ;
-
-arithmetic_assign_statement
-	:	lvalue arithmetic_assign_operator expression ;
-
-arithmetic_assign_operator
-	:	'+=' | '-=' | '*=' | '%=' ;
+side_effect_statement
+	:	expression
+	;
 
 goto_statement
-	:	'goto' IDENTIFIER ;
+	:	'goto' plain_identifier ;
 
-call_statement
-	:	call ;
-	
-call	:	name '(' actual_argument_list ')' ;
-
-actual_argument_list
-	:	
-	|	expression ( ',' expression )* ;
-	
-assignment_statement
-	:	lvalue '=' expression ;
-
-string_concat_statement
-	:	value '~=' value ;
+//call_statement
+//	:	call ;
+//	
+//call	:	identifier  '(' actual_argument_list ')' ;
+//
+//actual_argument_list
+//	:	
+//	|	expression ( ',' expression )* ;
 	
 while_statement	:	'while' '(' expression ')' block ( 'continue' block )? ;
 
@@ -127,46 +128,113 @@ return_statement
 	:	'return' expression? ;
 
 loop_control_statement
-	:	( 'last' | 'next' ) IDENTIFIER? ;
+	:	( 'last' | 'next' ) plain_identifier? ;
 
 //
 // Expressions:
 //
-	
+
+//value	:	 literal | lvalue ;
+
+construction_expression
+	:	'new' identifier  ;
+
+argument_expression_list
+	:	assignment_expression ( ',' assignment_expression )*
+	;
+
+additive_expression
+	:	multiplicative_expression ( '+' multiplicative_expression | '-' multiplicative_expression )*
+	;
+
+multiplicative_expression
+	:	unary_expression ( '*' unary_expression | '/' unary_expression | '%' unary_expression )*
+	;
+
+unary_expression
+	: postfix_expression
+	| '++' unary_expression
+	| '--' unary_expression
+	| unary_operator unary_expression
+	;
+
+postfix_expression
+	:	primary_expression
+	(	'[' expression ']'
+	|	'(' ')'
+	|	'(' argument_expression_list ')'
+	|	'.' plain_identifier
+	|	'++'
+	|	'--'
+	)*
+	;
+
+unary_operator
+	:	'+'
+	|	'-'
+	|	'!'
+	;
+
+primary_expression
+	:	identifier
+	|	literal
+	|	'(' expression ')'
+	;
+
 expression
-	:	value
-	|	call
-	|	relational_expression
-	|	arithmetic_expression
+	:	assignment_expression
 	|	construction_expression
 	;
 
-value	:	 literal | lvalue ;
-
-construction_expression
-	:	'new' IDENTIFIER ;
+assignment_expression
+	:	lvalue assignment_operator assignment_expression
+	;
 	
-relational_expression 
-	:	value relational_operator value ;
+lvalue
+	:	unary_expression
+	;
 
-arithmetic_expression
-	:	value arithmetic_operator value ;
+assignment_operator
+	:	'='
+	|	'*='
+	|	'/='
+	|	'%='
+	|	'+='
+	|	'-='
+	|	'~='
+	;
 
-//
-// Operators:
-//
-	
-relational_operator
-	:	'<' | '<=' | '==' | '>=' | '>' | '!=' ;
+logical_or_expression
+	:	logical_and_expression ( '||' logical_and_expression )*
+	;
 
-arithmetic_operator
-	:	'+' | '-' | '*' | '/' | '%' ;
+logical_and_expression
+	:	inclusive_or_expression ( '&&' inclusive_or_expression )*
+	;
+
+inclusive_or_expression
+	:	exclusive_or_expression ( '|' exclusive_or_expression )*
+	;
+
+exclusive_or_expression
+	:	and_expression ( '^' and_expression )*
+	;
+
+and_expression
+	:	equality_expression ( '&' equality_expression )*
+	;
+
+equality_expression
+	:	relational_expression ( ( '==' | '!=' ) relational_expression )*
+	;
+
+relational_expression
+	:	additive_expression ( ( '<' | '>' | '<=' | '>=' ) additive_expression )*
+	;
 
 //
 // Basics:
 //
-
-name	:	IDENTIFIER ( '::' IDENTIFIER )* ;
 
 label	:	LABEL ;
 	
@@ -180,22 +248,33 @@ literal
     |	STRING_LITERAL
     |   FLOATING_POINT_LITERAL
     ;
-
-lvalue	:	IDENTIFIER ( '[' expression ']' )? ;
 	
 block	:	'{' ( data_declaration | statement )* '}' ;
+
+scoped_identifier
+	:	NAME
+	;
+
+plain_identifier
+	:	WORD
+	;
+
+identifier
+	:	scoped_identifier
+	|	plain_identifier
+	;
 
 //
 // Tokens:
 //
 
-IDENTIFIER
-	:	LETTER (LETTER|'0'..'9')*
-	;
+NAME	:	WORD ( '::' WORD )+ ;
 
-LABEL	:	':' IDENTIFIER ;
+WORD	:	LETTER (LETTER|'0'..'9')* ;
 
-	STRING_LITERAL
+LABEL	:	WORD ':' ;
+
+STRING_LITERAL
     :  '"' ( EscapeSequence | ~('\\'|'"') )* '"'
     ;
 
