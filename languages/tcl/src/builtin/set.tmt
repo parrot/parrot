@@ -1,0 +1,16 @@
+[set varName ?newValue?]
+
+  if null $newValue goto read_var
+
+  .local pmc set
+  set = get_root_global ['_tcl'], '__set'
+  $R = set($varName, $newValue)
+  goto end
+
+read_var:
+  .local pmc read
+  read = get_root_global ['_tcl'], '__read'
+  $R = read($varName)
+
+end:
+  $R = clone $R

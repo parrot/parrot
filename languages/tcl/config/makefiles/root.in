@@ -32,6 +32,7 @@ GENERATED_INLINES = \
  $(C_BUILTIN)/join.pir \
  $(C_BUILTIN)/llength.pir \
  $(C_BUILTIN)/pwd.pir \
+ $(C_BUILTIN)/set.pir \
  $(C_BUILTIN)/time.pir \
  $(C_BUILTIN)/while.pir
 
