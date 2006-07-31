@@ -9,7 +9,10 @@
 # #############################################################################
 
 use strict;
+use lib '../../lib';    # probably fails when parrot_path is passed in
+
 use Getopt::Long;
+use Parrot::Config;
 
 # Parse command line.
 our ($parrot_path, $mono_lib_path, $srm);
@@ -40,10 +43,8 @@ generate_config_pm(%config);
 # ########################
 sub get_parrot_config($$) {
 	# Try to include config information from Parrot tree.
-	my %config = eval {
-		require "$_[0]/lib/Parrot/Config.pm";
-		%Parrot::Config::PConfig
-	} or die "Unable to locate Parrot::Config.\n";
+	my %config = %Parrot::Config::PConfig
+	  or die "Unable to locate Parrot::Config.\n";
 	
 	# Return configuration.
 	return (%config, trans_parrot_path => $_[0], srm => $_[1]);
