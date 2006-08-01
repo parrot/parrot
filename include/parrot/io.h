@@ -136,6 +136,7 @@ extern ParrotIOLayer pio_stdio_layer;
 #endif
 extern ParrotIOLayer pio_buf_layer;
 extern ParrotIOLayer pio_mmap_layer;
+extern ParrotIOLayer pio_string_layer;
 
 
 

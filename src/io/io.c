@@ -408,7 +408,7 @@ PIO_init_stacks(theINTERP)
 
     fill = 0;
     if (!pio_registered_layers) {
-        n = 4;  /* 2 default layers for now + utf8, mmap */
+        n = 5;  /* 2 default layers for now + utf8, mmap, string */
         pio_registered_layers = mem_sys_allocate(
                 sizeof(ParrotIOLayer *) * (n + 1));
         fill = 1;
@@ -446,7 +446,8 @@ PIO_init_stacks(theINTERP)
         assert(pio_registered_layers[2] == NULL);
         pio_registered_layers[2] = PIO_utf8_register_layer();
         pio_registered_layers[3] = PIO_mmap_register_layer();
-        pio_registered_layers[4] = NULL;
+        pio_registered_layers[4] = PIO_string_register_layer();
+        pio_registered_layers[5] = NULL;
     }
 
     return 0;

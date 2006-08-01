@@ -632,7 +632,7 @@ Replace the string at C<key> with the chr of C<value>.
 
 =item C<void replace(STRING* orig, STRING* new)>
 
-Replace every occurence of C<orig> with C<new>.
+Replace every occurrence of C<orig> with C<new>.
 
 =cut
 

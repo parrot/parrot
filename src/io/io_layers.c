@@ -26,7 +26,7 @@ is found for that particular slot.
 PIO_base_new_layer(ParrotIOLayer *proto)>
 
 The default IO layer constructor. Creates and returns a new
-C<ParrotIOLayer>. If a prototype C<*proto> is supplied then it's values
+C<ParrotIOLayer>. If a prototype C<*proto> is supplied then its values
 will be copied to the new instance.
 
 =cut

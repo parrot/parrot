@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 
 =head1 NAME
 
@@ -709,6 +709,31 @@ CODE
 unicode
 utf8
 T\xf6tsch
+OUTPUT
+
+pir_output_is(<<'CODE', <<"OUTPUT", "string read/write layer");
+.sub main :main
+    .local pmc    pio
+	.local string greeting
+	.local string layer
+
+    pio = getstdout
+    push pio, "string"
+	print "Hello"
+	print ", "
+	print "world!"
+	print "\n"
+
+	greeting = read pio, 1024
+	pop layer, pio
+
+	print greeting
+	print layer
+	print "\n"
+.end
+CODE
+Hello, world!
+string
 OUTPUT
 
 unlink("temp.file");

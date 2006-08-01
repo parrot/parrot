@@ -394,6 +394,7 @@ IO_O_FILES = \
     $(IO_DIR)/io_mmap$(O) \
     $(IO_DIR)/io_win32$(O) \
     $(IO_DIR)/io_stdio$(O) \
+    $(IO_DIR)/io_string$(O) \
     $(IO_DIR)/io_passdown$(O)
 
 INTERP_O_FILES = \
@@ -1052,6 +1053,8 @@ $(IO_DIR)/io_mmap$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 $(IO_DIR)/io_win32$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(IO_DIR)/io_stdio$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
+
+$(IO_DIR)/io_string$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(IO_DIR)/io_passdown$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
