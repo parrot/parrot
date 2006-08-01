@@ -1,44 +1,25 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
-use Test::More;
+source lib/test_more.tcl
+plan 2
 
-language_output_is("tcl",<<'TCL',<<OUT,"continue from for");
+eval_is {
+ set result ""
  for {set a 0} {$a < 10} {incr a} {
    if {$a > 5} { continue }
-   puts $a
+   set result [append result $a]
  }
- puts $a
-TCL
-0
-1
-2
-3
-4
-5
-10
-OUT
+ list $a $result
+} {10 012345} {continue from for}
 
-language_output_is("tcl",<<'TCL',<<OUT,"continue from while");
+eval_is {
+ set result ""
  set a 0
  while {$a <= 10} {
    incr a
    if {$a < 5} { continue }
-   puts $a
+   set result [append result $a]
  }
- puts "--"
- puts $a
-TCL
-5
-6
-7
-8
-9
-10
-11
---
-11
-OUT
+ list $a $result
+} {11 567891011} {continue from while}
 
