@@ -21,13 +21,8 @@ rule program { <compound_statement> }
 rule body_statement { <compound_statement> <rescue_clause>? <else_clause>? <ensure_clause>? }
 
 rule compound_statement { <statements>? <?terminators>? }
-#added [ <statement> |   
-#for    
-#if x then <compound_statement> end
-#style statements
-#rule statements {<?terminators>? [[ <statement> <?terminators>]* | <statement> ]}
+
 rule statements {<?terminators>? [<statement> <?terminators>* ]* <statement>? }
-#rule statements {<?terminators>? <statement> [<?terminators> [<statements> <?terminators>]*]? <statement>? }
 
 rule statement {
           $<ALIAS>:=<'alias'> [ <function_item> <function_item>
@@ -49,21 +44,9 @@ rule assignment {
           <left_hand_side> (<'='>) [<command_call>|<expression>|<multiple_right_hand_side>|<expression> <'rescue'> <expression>]
           |<multiple_left_hand_side> (<'='>) [<command_call>|<expression>|<multiple_right_hand_side>]
 
-
           #|<left_hand_side <ASSIGN_OP> [<command_call>|<expression>]
 
           |<variable> <ASSIGN_OP> [<command_call>|<expression>]
-#          |<primary_value> \[ <call_args>? \] <ASSIGN_OP> [<command_call>|<expression>]
-#          |<primary_value> \. [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> [<command_call>|<expression>]
-          
-#          |<primary_value> \:\: <IDENTIFIER> <ASSIGN_OP> <command_call>
-#          |<primary_value> \:\: [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> <expression>
-
-#          |<atom> \[ <call_args>? \] <ASSIGN_OP> [<command_call>|<expression>]
-#          |<atom> \. [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> [<command_call>|<expression>]
-          
-#          |<atom> \:\: <IDENTIFIER> <ASSIGN_OP> <command_call>
-#          |<atom> \:\: [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> <expression>
 
           |<atom> [
                     [\[ <call_args>? \] |\. [<IDENTIFIER>|<CONSTANT>]] <ASSIGN_OP> [<command_call>|<expression>]
@@ -82,11 +65,6 @@ token ASSIGN_OP { [\=|\%\=|\~\=|\/\=|\-\=|\+\=|\|\=|\&\=|\>\>\=|\<\<\=|\*\=|\&\&
           
 rule method_call { 
           <operation> [<paren_args> <brace_block>?|<brace_block>]
-#          | <primary_value> [\.|\:\:] <operation2> <paren_args>?  <brace_block>?
-#          | <primary_value> \:\: <operation3><brace_block>?
-#          | <primary_value> [\.|\:\:] <paren_args><brace_block>?
-#          | <primary_value> \[ <call_args>? <rbracket> <brace_block>?
-#          | <'super'> <paren_args><brace_block>?
 
           | <atom>[[\.|\:\:][<operation2> <paren_args>?  <brace_block>?
                               |<paren_args><brace_block>? ]
@@ -113,7 +91,7 @@ rule command {
           <operation> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
 #          |<primary_value> [\.|\:\:] <operation2> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
           |<atom> [\.|\:\:] <operation2> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
-          |[<'super'>|<'yield'>] <command_args>
+          |[<'raise'>|<'throw']|<'super'>|<'yield'>] <command_args>
 }
 rule command_args {<paren_args>|<call_args>}
 rule paren_args {\( <call_args>? \)}
@@ -258,6 +236,7 @@ token reserved_words {
           |nil
           |not
           |of
+          |raise
           |redo
           |rescue
           |retry
@@ -265,6 +244,7 @@ token reserved_words {
           |self
           |super
           |then
+          |throw
           |true
           |undef
           |when
@@ -391,8 +371,8 @@ rule function_lambda_arg_list { \( <function_prototype_arg_list> <bv_decls>? <rp
 
 rule lambda_body { \{ <compound_statement> \} }
 
-rule rescue_clause { [<'rescue'> [<expression> | <multiple_right_hand_side>]? [<ASSOC> <left_hand_side>]?  <then_clause> <compound_statement>]* } 
-rule ensure_clause { <ENSURE> <compound_statement> }
+rule rescue_clause { [<'rescue'> [<expression> | <multiple_right_hand_side>]? [<ASSOC> <left_hand_side>]?  <then_clause> <compound_statement>]+ } 
+rule ensure_clause { <'ensure'> <compound_statement> }
 token literal { <numeric> | <symbol> | <dsymbol> }
 #rule string { <character> | <string1>+ }
 rule string { <SINGLE_STRING> | <DOUBLE_STRING> }
@@ -422,7 +402,7 @@ rule function_prototype_args {
           [<function_prototype_arg> \,]* [<function_prototype_optinal_arg> \,]* [<function_prototype_rest_args>[\, <function_prototype_arg>]* \,]? <function_prototype_block_arg>?
 }
 
-token funtion_prototype_arg {
+token function_prototype_arg {
           <CONSTANT>
           |<INSTANCE_VARIABLE>
           |<GLOBAL_VARIABLE>

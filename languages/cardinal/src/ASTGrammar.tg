@@ -136,7 +136,7 @@ back_reference:
     $I0 = defined node['BEGIN']
     unless $I0 goto n3
     .local pmc begin_sub
-    begin_sub = new 'Cardinal::PAST::Sub'
+    begin_sub = new 'Cardinal::PAST::Block'
     begin_sub.'init'('node'=>node, 'name'=>'begin')
     $P0 = node['compound_statement']
     child = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
@@ -147,7 +147,7 @@ back_reference:
     $I0 = defined node['END']
     unless $I0 goto n4
     .local pmc begin_sub
-    begin_sub = new 'Cardinal::PAST::Sub'
+    begin_sub = new 'Cardinal::PAST::Block'
     begin_sub.'init'('node'=>node, 'name'=>'end')
     $P0 = node['compound_statement']
     child = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
