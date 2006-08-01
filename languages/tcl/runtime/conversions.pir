@@ -169,6 +169,8 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     unless match goto premature_end
     $I0 = length expression
     $I1 = match.to()
+    .include 'cclass.pasm'
+    $I1 = find_not_cclass .CCLASS_WHITESPACE, expression, $I1, $I0
     unless $I0 == $I1 goto extra_tokens
 
     .local pmc astgrammar, astbuilder, ast
