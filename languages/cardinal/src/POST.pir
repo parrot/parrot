@@ -369,6 +369,7 @@ and that is returned.
     if scope == 'lexical' goto generate_lexical
     if scope == 'package' goto generate_package
     if scope == 'parameter' goto generate_parameter
+    if scope == 'global' goto generate_package
     goto generate_find
   generate_parameter:
     .local pmc varhash
@@ -395,7 +396,7 @@ and that is returned.
     goto end
   generate_package:
     if islvalue goto end
-    code.'emit'("    %0 = find_global '%1'", value, name)
+    code.'emit'("    %0 = get_hll_global '%1'", value, name)
     goto end
   generate_find:
     if islvalue goto end
@@ -421,11 +422,12 @@ and that is returned.
   with_varhash_name:
     if scope == 'outerpackage' goto store_package
     if scope == 'package' goto store_package
+    if scope == 'global' goto store_package
   store_lexical:
     code.'emit'("    store_lex '%0', %1", name, xvalue)
     .return (code)
   store_package:
-    code.'emit'("    store_global '%0', %1", name, xvalue)
+    code.'emit'("    set_hll_global '%0', %1", name, xvalue)
     .return (code)
 .end
     

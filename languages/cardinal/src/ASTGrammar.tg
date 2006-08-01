@@ -73,7 +73,6 @@ transform result (Cardinal::Grammar::statements) :language('PIR') {
 
 transform val (string) :language('PIR') {
   .local pmc result
-  .kdump(node)
     result = new 'Cardinal::PAST::Val'
     $S0 = node
     result.'init'('node'=>node, 'name'=>$S0, 'valtype'=>'String')
@@ -153,9 +152,10 @@ back_reference:
     $P1 = $P0[0]
     child = tree.get('result', $P1, 'Cardinal::Grammar::expression')
 
-    $I0 = defined node['MODIFER']
+    $I0 = defined node['MODIFIER']
     unless $I0 goto n5
-    $S0 = node['MODIFIER']
+    $P2 = node['MODIFIER']
+    $S0 = $P2[0]
     
     op = new 'Cardinal::PAST::Op'
     op.'init'('node'=>node, 'name'=>$S0)
@@ -265,6 +265,9 @@ transform result (Cardinal::Grammar::assignment) :language('PIR') {
     $I0 = defined node['ASSIGN_OP']
     unless $I0 goto try_command
     assign_symbol = node['ASSIGN_OP']
+    ne_str assign_symbol, '-=', na2
+    assign_symbol = 'infix:-='
+  na2:
     goto get_left
     
   get_left:
@@ -287,8 +290,6 @@ transform result (Cardinal::Grammar::assignment) :language('PIR') {
     $P0 = node['expression']
     child2 = tree.get('result', $P0, 'Cardinal::Grammar::expression')
     goto build_assignment
-
-    
 
    try_command:
     $I0 = defined node['command_call']
@@ -801,7 +802,7 @@ transform result (Cardinal::Grammar::variable) :language('PIR') {
     $I0 = defined node['GLOBAL_VARIABLE']
     unless $I0 goto true_bool
     $P0 = node['GLOBAL_VARIABLE']
-    $P0 = tree.'get'('result', $P0, 'Cardinal::Grammar:GLOBAL_VARIABLE')
+    $P0 = tree.'get'('result', $P0, 'Cardinal::Grammar::GLOBAL_VARIABLE')
     .return ($P0)
 
   true_bool:
