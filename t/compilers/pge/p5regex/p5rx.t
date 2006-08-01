@@ -27,16 +27,17 @@ If set to a number, that test will be run alone and unconditionally--even
 if it's designated as SKIP or TODO by the harness. This is quite helpful
 in debugging tests that cause parrot to spiral out of control.
 
+The test harness also has two variables @skip_tests and @todo_tests, which
+provide the reason to todo or skip a test followed by the test numbers
+applicable.
+
 B<NOTE:> Don't add new tests here. This file is strictly for Perl 5's tests.
 
-B<NOTE:> Only the first 130 tests are run, as the test framework is still
-under development.
-
 The Perl 5 equivalent file provides the following description of the test
-format. There are five columns, separated by tabs.
+format. There are 6 columns, separated by tabs.
 
 Column 1 contains the pattern, optionally enclosed in C<''>.
-Modifiers can be put after the closing C<'>. #'
+Modifiers can be put after the closing C<'>. 
 
 Column 2 contains the string to be matched.
 
@@ -54,8 +55,7 @@ Column 4 contains a string, usually C<$&>.
 Column 5 contains the expected result of double-quote
 interpolating that string after the match, or start of error message.
 
-Column 6, if present, contains a reason why the test is skipped.
-This is printed with "skipped", for harness to pick up.
+Column 6, if present, contains a description of what is being tested.
 
 \n in the tests are interpolated, as are variables of the form ${\w+}.
 
@@ -66,85 +66,117 @@ This is printed with "skipped", for harness to pick up.
 =cut
 
 
-open(TESTS, catfile($PConfig{build_dir}, 't/compilers/pge/p5regex/re_tests'))
-    or die "Can\'t open re_tests";
+my @file_path = split m{/}, 't/compilers/pge/p5regex/re_tests';
+open my $test_file, catfile($PConfig{build_dir}, @file_path)
+	or die "Can't open ".catfile ($PConfig{build_dir}, @file_path);
 
 ## figure out how many tests there are
-1 while (<TESTS>);
+1 while (<$test_file>);
 my $numtests = $.;
-seek(TESTS,0,0);
+seek($test_file,0,0);
 $. = 0;
 
+plan tests => $numtests;
 
-## if a test is specified in this environment variable, run it
-## as a single test, even if it's designated as SKIP or TODO by the harness
-my $run_unconditional = ( 
-	defined $ENV{TEST_P5RX} and $ENV{TEST_P5RX} =~ /\d+/
-		? $ENV{TEST_P5RX}
-		: ''
-	);
+my @todo_tests = (
+    q{unknown} => qw<99 100 142 172 184 223 232 233 234 236 241 243 244 246
+        247 253 254 256 257 260 261 381 382 396 397 398 419 422 428 429 432
+        435 439 440 444 445 446 447 448 449 452 453 454 455 485 495 498 500
+        501 503 504 505 506 507 508 509 510 511 512 515 522 523 524 527 528
+        536 540 541 543 544 545 548 549 553 554 595 596 600 601 602 603 604
+        605 606 607 621 623 624 625 639 641 642 643 693 695 696 697 747 749
+        750 751 801 832 833 840 859 860 861 862 863 865 866 871 874 875 876
+        882 887 888 890 891 893 894 895 896 897 898 899 900>,
+    q{reuse captured group}  => qw<928 929 930 931 932 933 934 935 936 937
+        938 939 940 941 942>,
+    q{non-greedy/lookbehind} => qw<915 916 918 919 920 921 922>,
+    q{greediness/lookbehind} => qw<901 902 903 904 905>,
+    q{non-greedy/zero-width assertion} => qw<907 908 909 910 912 913 914 960>,
+    q{\d in character class}  => qw<825 826 827>,
+    q{[ID 20010803.016]}      => qw<884>,
+    q{[perl #34195]}          => qw<959>,
+    q{undef [perl #16773]}    => qw<925>,
+    q{unmatched bracket}      => qw<923>,
+    q{16 tests for [perl #23171]} => qw<927>,
+);
 
+my @skip_tests = (
+    q{trailing modifiers}  => qw<264 265 266 267 268 269 270 271 272 273 274
+        275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291
+        292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308
+        309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325
+        326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342
+        343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 358 359
+        360 361 362 363 364 365 366 367 368 369 370 371 372 373 374 375 376
+        377 378 379 380 381 382 383 384 385 386 387 388 389 390 391 392 393
+        394 395 458 459 460 461 462 463 464 465 466 467 468 469 470 471 472
+        473 474 475 476 477 478 479 480 483 484 496 609 610 611 612 613 614
+        615 616 617 627 628 629 630 631 632 633 634 635 645 646 647 648 649
+        650 651 652 653 663 664 665 666 667 668 669 670 671 681 682 683 684
+        685 686 687 688 689 699 700 701 702 703 704 705 706 707 717 718 719
+        720 721 722 723 724 725 735 736 737 738 739 740 741 742 743 753 754
+        755 756 757 758 759 760 761 771 772 773 774 775 776 777 778 779 789
+        790 791 792 793 794 795 796 797 802 803 805 834 835 836 838 859 862
+        877 886>,
+    q{bug or error}        => qw<78 79 80 135 136 138 143 144 148 149 155 167
+        248 249 252 308 309 310 322 323 325 330 331 336 347 408 436 487 488
+        489 490 492 531 532 563 564 566 593 594 598 599 944 945>, 
+    q{kills a parrot}      => qw<81 129 130 131 139 140 141 491 493 556 557
+         568 569 570 571 572 573 574 575 576 577 578 579 580 581 582 583 584
+         585 586 587 588 589 590 591 592 800 828 829 830 957 958>,
+    q{hangs a parrot}      => qw<806 807 808 809 810 811 812 813 814 815 816
+        817 818 819 820 821 822 823 924>,
+    q{unknown} => qw<502 597 944 945>,
+    q{[ID 20010811.006]}   => qw<879>,
+    q{[perl #18019]}       => qw<926>,
+);
 
-## cut out after this many tests
-## still not ready to run *all* tests
-my $cutoff = 800;
-
-plan tests => ( $run_unconditional ? 1 : $cutoff );
-
-
-## todo these failing tests to prevent noise
-my @todo_tests = qw/
-	 81  99 100 139 140 141 142 172 184 223 232 233 234 241 243
-	244 246 247 253 254 256 257 260 261 396 397 398 419 422 428
-	429 432 435 439 440 444 445 446 447 448 449 452 453 454 455
-	485 491 493 495 498 500 501 503 504 505 506 507 508 509 510
-	511 512 515 522 523 524 527 528 536 540 541 543 544 545 548
-	549 553 554 556 557 568 569 570 571 572 573 574 575 576 577
-	578 579 580 581 582 583 584 585 586 587 588 589 590 591 592
-	595 596 600 601 602 603 604 605 606 607 621 623 624 625 639
-	641 642 643 693 695 696 697 747 749 750 751 800
-/;
-
-## unconditionally skip these tests which cause infinite recursion
-my @skip_tests = qw/ 502 597 /;
-
-
-while (<TESTS>)
-{
-	my $test_num = $.;
-	next if $test_num < $run_unconditional;
-	last if $test_num > $cutoff;
-
+while (<$test_file>) {
 	chomp;
-	s/\\n/\n/g;
 	s/\r//g;
-	my( $pattern, $subject, $result, $repl, $expect, $reason ) =
+    { # ignore message of undefined variable.
+        no warnings;
+	    s/(\$\{\w+\})/$1/eeg;
+    }
+	my ($pattern, $subject, $result, $repl, $expect,  $description ) =
 		split /\t/ => $_, 6;
-	my( $skip, @todo );
-
-	my $input =  join ':' => $pattern, $subject, $result, $repl, $expect;
 
 	$pattern  =  replace_special_vars( $pattern );
 	$subject  =  replace_special_vars( $subject );
 	$expect   =  replace_special_vars( $expect  );
 
-	## skip tests that break parrot
-	$skip++ if grep { /^$test_num$/ } @skip_tests;
-	## skip bugs and errors (PGE is not ready for them yet)
-	$skip++ if $result =~ m/b|c/i;
-	## skip patterns with trailing modifiers (same reason)
-	$skip++ if $pattern =~ m/'\w+$/;
 
-	$result   =~ s/b//i
-		unless $skip;
+    my @todo = ();
+    if (grep {$_ eq $.} @todo_tests) {
+        push @todo, todo => find_reason_for(@todo_tests);
+    }
 
-	unless( $run_unconditional )
-	{
-		push @todo, todo => 'various reasons'
-			if grep { /^$test_num$/ } @todo_tests;
+	if (grep {$_ eq $.} @skip_tests) {
+		skip_test($description, $subject, $pattern, $result, $repl, $expect, find_reason_for(@skip_tests), @todo);
+	} else {
+		do_test($description, $subject, $pattern, $result, $repl, $expect, @todo);
 	}
+}
 
+close $test_file;
 
+exit;
+
+sub skip_test {
+	my ($description, $subject, $pattern, $result, $repl, $expect, $skip, @todo) = @_;
+	SKIP: {
+		skip $skip => 1;
+		do_test($description, $subject, $pattern, $result, $repl, $expect, @todo);
+	}
+}
+
+sub do_test {
+	my ($description, $subject, $pattern, $result, $repl, $expect, @todo) = @_;
+	$result =~ s/b//i;
+	if ($result !~ /[cynBb]/) {
+		diag "Ill-formed test case: $subject\t$pattern\t$result\t$repl\t$expect";
+		return;
+	}
 	## create the test from the template
 	my $pir_code = p5rx_template();
 
@@ -156,29 +188,17 @@ while (<TESTS>)
 	$pir_code    =~ s/<<REPL>>/$repl/g;
 	$pir_code    =~ s/<<RESULTS>>/$results/g;
 
+	pir_output_is( $pir_code, $expect, $description, @todo );
 
-	## run the test, but skip it if i'm told to
-	SKIP:
-	{
-		unless( $run_unconditional )
-		{
-			skip 'bugs | errors | trailing modifiers' => 1
-				if $skip;
-			pir_output_is( $pir_code, $expect, $reason, @todo );
-		}
-	}
-
-	$run_unconditional
-		and pir_output_is( $pir_code, $expect, $reason, @todo ), last;
 }
 
-close(TESTS);
-
-
-
-exit;
-
-
+sub find_reason_for {
+    my $reason;
+    for (@_) {
+        $reason = $_ and next if /\D/;
+        return $reason if $_ == $.;
+    }
+}
 
 sub p5rx_template
 {
