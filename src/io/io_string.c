@@ -1,6 +1,6 @@
 /*
 Copyright (c) 2006, The Perl Foundation.
-$Id: /parrotcode/offline/src/io/io_string.c 18003 2006-06-28T20:51:32.654087Z chromatic  $
+$Id$
 
 =head1 NAME
 
