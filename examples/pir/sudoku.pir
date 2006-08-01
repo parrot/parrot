@@ -39,6 +39,10 @@ Print debug output and game progress to stdout.
 
 Print additionally invalid state of given number(s).
 
+=item --pairs
+
+Print additionally fields with uniqe pairs of numbers.
+
 =item --builtin=name
 
 Run builtin game. If no name is given a list of builtins is printed.
@@ -278,6 +282,7 @@ err:
     getopts = new "Getopt::Obj"
     push getopts, "version"
     push getopts, "debug"
+    push getopts, "pairs"
     push getopts, "inv=s"
     push getopts, "builtin=s"
     push getopts, "nc"
@@ -644,7 +649,7 @@ lx2:
 .sub display :method
     .local pmc ar, rows, row, opt, disp
     .local string s, c
-    .local int i, x, y, c1, c2, r
+    .local int i, x, y, c1, c2, r, deb_pairs
     .local string deb_n
     deb_n = ""  # print inv for that
     self."create_inv"()
@@ -654,6 +659,7 @@ lx2:
     unless $I0 goto no_deb
 	deb_n = opt["inv"]
 no_deb:
+    deb_pairs = defined opt["pairs"]
     i = 0
     y = 0
     s = ""
@@ -700,9 +706,12 @@ sp2:
     if x < 9 goto loop_x
     s .= '|'
     disp."print"(r,0, s)
-    unless deb_n goto not_deb
+    unless deb_n goto not_deb_n
     self."deb_inv"(y, deb_n)
-not_deb:
+not_deb_n:
+    unless deb_pairs goto not_deb_pairs
+    self."deb_pairs"(y)
+not_deb_pairs:
     disp."print"("\n")
     inc r
     s = ""
@@ -753,6 +762,44 @@ nxt:
     if i < len goto lp_inv
 .end
 
+# print pairs for given row
+.sub deb_pairs :method
+    .param int y
+
+    .local pmc invs, inv
+    .local int x
+    print "   "
+    invs = getattribute self, "i_rows"
+    inv = invs[y]
+    x = 0
+loop:
+    $I0 = x % 3
+    if $I0 goto nosp
+    print "   "
+nosp:
+    .local int el, bits, i, b
+    el = inv[x]
+    bits = bits0(el)
+    if bits == 2 goto isa_pair
+    print ".."
+    goto nxt_x
+isa_pair:    
+    i = 1
+bit_loop:
+    el >>= 1        # bits start at 1
+    b = el & 1
+    if b goto is_set
+    $I0 = i + 0x30
+    $S0 = chr $I0
+    print $S0
+is_set:
+    inc i
+    if i <= 9 goto bit_loop
+nxt_x:
+    inc x
+    print " "
+    if x < 9 goto loop
+.end
 
 # verify numbers
 # returns:
