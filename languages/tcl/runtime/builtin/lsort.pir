@@ -83,7 +83,7 @@ bad_opt:
   $S0 = 'bad option "'
   $S1 = $P0
   $S0 .= $S1
-  $S0 .= '": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -integer, -real, or -unique'
+  $S0 .= '": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -indices, -integer, -nocase, -real, or -unique'
   .throw ($S0)
 wrong_args:
   .throw ('wrong # args: should be "lsort ?options? list"')
