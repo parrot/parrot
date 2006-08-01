@@ -118,6 +118,6 @@ bad_args:
 bad_flag:
   $S1 = 'bad option "'
   $S1 .= $S0
-  $S1 .= '": must be -exact, -glob, -regexp, -matchvar, -indexvar, or --'
+  $S1 .= '": must be -exact, -glob, -indexvar, -matchvar, -nocase, -regexp, or --'
   .throw ($S1)
 .end
