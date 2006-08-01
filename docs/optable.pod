@@ -1,5 +1,5 @@
 # Copyright (C) 2005-2006, The Perl Foundation.
-# $Id: pdd21_namespaces.pod 13335 2006-07-17 20:48:29Z allison $
+# $Id$
 
 =head1 ***** WARNING ***** This is an ALPHA pod! The contents herein may not reflect reality. :)
 
@@ -9,7 +9,7 @@ docs/optable.pod - PGE operator precedence table and parser
 
 =head1 VERSION
 
-$Revision: 13335 $
+$Revision$
 
 =head1 DESCRIPTION
 
