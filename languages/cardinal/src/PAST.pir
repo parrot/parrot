@@ -43,6 +43,7 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     $P0 = subclass base, 'Cardinal::PAST::Exp'
     $P0 = subclass base, 'Cardinal::PAST::Stmt'
     $P0 = subclass base, 'Cardinal::PAST::Stmts'
+    $P0 = subclass base, 'Cardinal::PAST::Sub'
 
     $P0 = new .Integer
     $P0 = 10

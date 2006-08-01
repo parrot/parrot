@@ -135,14 +135,24 @@ back_reference:
   n2:
     $I0 = defined node['BEGIN']
     unless $I0 goto n3
-    child = tree.get('result', node, 'Cardinal::Grammar::begin')
-    .return (child)
+    .local pmc begin_sub
+    begin_sub = new 'Cardinal::PAST::Sub'
+    begin_sub.'init'('node'=>node, 'name'=>'begin')
+    $P0 = node['compound_statement']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
+    begin_sub.'add_child'(child)
+    .return (begin_sub)
 
   n3:
     $I0 = defined node['END']
     unless $I0 goto n4
-    child = tree.get('result', node, 'Cardinal::Grammar::end')
-    .return (child)
+    .local pmc begin_sub
+    begin_sub = new 'Cardinal::PAST::Sub'
+    begin_sub.'init'('node'=>node, 'name'=>'end')
+    $P0 = node['compound_statement']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
+    begin_sub.'add_child'(child)
+    .return (begin_sub)
 
   n4:
     # if | unless | while | until
