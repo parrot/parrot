@@ -1,30 +1,229 @@
-/* bcg.pmc
- *  Copyright (C) 2001-2003, The Perl Foundation.
- *  SVN Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the bcg base class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *     Please remove unneeded entries.
- *  References:
- */
+/*
+
+=head1 NAME
+
+bcg.pmc Byte Code Generator PMC
+
+=head1 DESCRIPTION
+
+Byte Code Generator PMC and methods associated with it.
+
+=head2 Methods
+
+List of methods/operations defined over the PMC.
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
-pmclass bcg dynpmc need_ext group bcg_group {
+static INTVAL dynpmc_BCG;
 
-    void init () {
-    }
+pmclass BCG dynpmc need_ext group bcg_group {
 
-    void init_pmc (PMC* initializer) {
-    }
-
-    void mark () {
-    }
-
-    void destroy () {
-    }
-
+void class_init() 
+{
+    if (pass) {
+    	dynpmc_BCG = Parrot_PMC_typenum(INTERP,"BCG");
+	}
 }
+
+/*
+
+=item C<void init ()>
+
+This method creates a BCG PMC instance
+
+=cut
+
+*/   
+    void init ()
+	{
+    }
+
+/*
+   
+=item C<void destroy ()>
+
+This method destroys BCG PMC instance.
+	
+=cut
+
+*/
+    void destroy () 
+	{
+    }
+
+/*
+
+=item C<void startCodeGen()>
+
+This method starts the code generation phase.
+
+=cut
+
+*/   
+	METHOD void startCodeGen()
+	{
+		
+	}
+/*
+
+=item C<void endCodeGen()>
+
+This method concludes the code generation phase.
+
+=cut
+
+*/   
+	METHOD void endCodeGen()
+	{
+			
+	}
+
+/*
+
+=item C<void startSub(STRING *subName, STRING *pragma)>
+
+This method is called to generate byte code for start subroutine.
+
+=cut
+
+*/   
+	METHOD void startSub(STRING *subName, STRING *pragma)
+	{
+		
+	}
+
+/*
+
+=item C<void endSub()>
+
+This method is called to generate bytecode for end subroutine 
+
+=cut
+
+*/   
+	METHOD void endSub()
+	{
+		
+	}
+/*
+
+=item C<void startCall(STRING *subName)>
+
+This method generates code for a subroutine call.
+
+=cut
+
+*/   
+	METHOD void startCall(STRING *subName)
+	{
+		
+	}
+
+/*
+
+=item C<void endCall()>
+
+This method generated code for ending a subroutine call.
+
+=cut
+
+*/
+	METHOD void endCall()
+	{
+		
+	}
+
+/*
+
+=item C<void startOp(STRING *op)>
+
+This method generates code for an opertion.
+
+=cut
+
+*/   
+	METHOD void startOp(STRING *op)
+	{
+		
+	}
+
+/*
+
+=item C<void startOp(STRING *op)>
+
+This method marks the end of an operation.
+
+=cut
+
+*/
+	METHOD void endOp()
+	{
+		
+	}
+
+/*
+
+=item C<void var(STRING *name)>
+
+This method generates bytecode for a variable.
+
+=cut
+
+*/
+	METHOD void var(STRING *name)
+	{
+		
+	}
+
+/*
+
+=item C<void val(STRING *value, STRING *type)>
+
+This method generates bytecode for a constant.
+
+=cut
+
+*/
+	METHOD void val(STRING *value, STRING *type)
+	{
+		
+	}
+
+/*
+
+=item C<void label(STRING *label)>
+
+This method generates bytecode for label.
+
+=cut
+
+*/
+	METHOD void label(STRING *label)
+	{
+		
+	}
+}
+/*
+
+=back
+   
+=head1 LICENSE
+
+Copyright (C) 2006, The Perl Foundation.
+
+This is free software; you may redistribute it and/or modify
+it under the same terms as Parrot.
+
+=head1 AUTHOR
+
+Vishal Soni <vishalrsoni@gmail.com>
+
+=cut
+
+*/
