@@ -1,142 +1,70 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 20;
-use Test::More;
-use vars qw($TODO);
+source lib/test_more.tcl
+plan 20
 
-language_output_is("tcl",<<'TCL',<<OUT,"empty list");
-  puts [lsort {}]
-TCL
+is [lsort {}] {} {empty list}
 
-OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"no args");
-  lsort
-TCL
-wrong # args: should be "lsort ?options? list"
-OUT
+eval_is {lsort} \
+  {wrong # args: should be "lsort ?options? list"} \
+  {no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad option");
-  lsort blah {}
-TCL
-bad option "blah": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -integer, -real, or -unique
-OUT
+eval_is {lsort blah {}} \
+  {bad option "blah": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -indices, -integer, -nocase, -real, or -unique} \
+  {bad option}
 
-language_output_is("tcl",<<'TCL',<<OUT,"one elem");
-  puts [lsort {SortMe}]
-TCL
-SortMe
-OUT
+is [lsort {SortMe}] {SortMe} {one element list}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implicit ASCII");
-  set a {a10 B2 b1 a1 a2}
-  puts [lsort $a]
-TCL
-B2 a1 a10 a2 b1
-OUT
+is [lsort [list a10 B2 b1 a1 a2]] \
+ {B2 a1 a10 a2 b1} \
+ {implicit ASCII}
 
-language_output_is("tcl",<<'TCL',<<OUT,"ASCII all same");
-  puts [lsort {z z z}]
-TCL
-z z z
-OUT
+is [lsort {z z z}] {z z z} {implicit ASCII, all same}
 
-language_output_is("tcl",<<'TCL',<<OUT,"few same");
-  puts [lsort {a z z t a monkey}]
-TCL
-a a monkey t z z
-OUT
+is [lsort {a z z t a monkey}] {a a monkey t z z} {implicit ASCII, few same}
 
-language_output_is("tcl",<<'TCL',<<OUT,"list of lists");
-  puts [lsort {{a b c} {} {a c d} {z z t}}]
-TCL
-{} {a b c} {a c d} {z z t}
-OUT
+is [lsort {{a b c} {} {a c d} {z z t}}] \
+ {{} {a b c} {a c d} {z z t}} \
+ {list of lists}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"list of lists mixed");
-  puts [lsort {{3 2} {3 4} {} no way}]
-TCL
-{} {3 2} {3 4} no way
-OUT
+is [lsort {{3 2} {3 4} {} no way}] \
+  {{} {3 2} {3 4} no way} \
+  {list of lists mixed}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"list of lists mixed var subst");
+eval_is {
   set a {{3 2} {3 4} {} no way}
-  puts [lsort $a]
-TCL
-{} {3 2} {3 4} no way
-OUT
+  lsort $a
+} {{} {3 2} {3 4} no way} \
+  {list of lists mixed var subst}
 
-language_output_is("tcl",<<'TCL',<<OUT,"explicit increasing");
-  set a {a10 B2 b1 a1 a2}
-  puts [lsort -increasing $a]
-TCL
-B2 a1 a10 a2 b1
-OUT
+is [lsort -increasing {a10 B2 b1 a1 a2}] \
+  {B2 a1 a10 a2 b1} {-increasing}
 
-language_output_is("tcl",<<'TCL',<<OUT,"unique");
-  set a {a10 B2 a2 B2 b1 a1 a2 z z t}
-  puts [lsort -unique $a]
-TCL
-B2 a1 a10 a2 b1 t z
-OUT
+is [lsort -unique {a10 B2 a2 B2 b1 a1 a2 z z t}] \
+  {B2 a1 a10 a2 b1 t z} {-unique}
 
-language_output_is("tcl",<<'TCL',<<OUT,"unique empty");
-  set a {}
-  puts [lsort -unique $a]
-TCL
+is [lsort -unique {}] {} {unique empty}
+is [lsort -unique A] {A} {unique one elem}
 
-OUT
+is [lsort -integer {10 2 30 5 0 -5 2}] \
+  {-5 0 2 2 5 10 30} {-integer}
 
-language_output_is("tcl",<<'TCL',<<OUT,"unique one elem");
-  set a {A}
-  puts [lsort -unique $a]
-TCL
-A
-OUT
+is [lsort -unique -integer {10 2 30 5 0 -5 2 -5}]  \
+  {-5 0 2 5 10 30} {-integer -unique}
 
-language_output_is("tcl",<<'TCL',<<OUT,"integer");
-  set a {10 2 30 5 0 -5 2}
-  puts [lsort -integer $a]
-TCL
--5 0 2 2 5 10 30
-OUT
+eval_is {lsort -integer {10 10.2}} \
+  {expected integer but got "10.2"} \
+  {integer on non-integer value}
 
-language_output_is("tcl",<<'TCL',<<OUT,"integer unique");
-  set a {10 2 30 5 0 -5 2 -5}
-  puts [lsort -unique -integer $a]
-TCL
--5 0 2 5 10 30
-OUT
+is [lsort -decreasing {1 3 2 5 9 4 8 7 6}] \
+ {9 8 7 6 5 4 3 2 1} {decreasing}
 
-language_output_is("tcl",<<'TCL',<<OUT,"integer die");
-  set a {10 10.2}
-  puts [lsort -integer $a]
-TCL
-expected integer but got "10.2"
-OUT
+is [lsort -decreasing -integer -unique {10 2 30 5 0 -5 2}] \
+  {30 10 5 2 0 -5} \
+  {decreasing integer unique}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"decreasing");
-  puts [lsort -decreasing {1 3 2 5 9 4 8 7 6}]
-TCL
-9 8 7 6 5 4 3 2 1
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"decreasing integer unique");
-  set a {10 2 30 5 0 -5 2}
-  puts [lsort -decreasing -integer -unique $a]
-TCL
-30 10 5 2 0 -5
-OUT
-
-TODO: {
-  local $TODO = "no excuses!";
-
-language_output_is("tcl",<<'TCL',<<OUT,"dictionary");
-  set a {a10 B2 b1 a1 a2}
-  puts [lsort -dictionary $a]
-TCL
-a1 a2 a10 b1 B2
-OUT
-}
+is [lsort -dictionary {a10 B2 b1 a1 a2}] \
+  {a1 a2 a10 b1 B2} \
+  {dictionary} \
+  {TODO {no excuses!}}

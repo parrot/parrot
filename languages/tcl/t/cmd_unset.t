@@ -1,104 +1,74 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 13;
-use Test::More;
+source lib/test_more.tcl
+plan 13
 
-language_output_is("tcl", <<'TCL', <<'OUT', "unset nothing");
- unset a
-TCL
-can't unset "a": no such variable
-OUT
+eval_is {unset a} \
+  {can't unset "a": no such variable} \
+  {unset nothing}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"unset something");
+eval_is {
  set a 2
  unset a
-TCL
-OUT
+} {} {unset something}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"unset something, use it again");
+eval_is {
  set a 2
  unset a
- puts $a
-TCL
-can't read "a": no such variable
-OUT
+ set a
+} {can't read "a": no such variable} \
+  {unset something, use it again}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"set/unset array element");
+eval_is {
  set a(2) 2
  unset a(2)
  puts $a(2)
-TCL
-can't read "a(2)": no such element in array
-OUT
+} {can't read "a(2)": no such element in array} \
+  {set/unset array element}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"set/unset array");
- set a(2) 2
- unset a
- puts $a(2)
-TCL
-can't read "a(2)": no such variable
-OUT
+eval_is {
+ set b(2) 2
+ unset b
+ set b(2)
+} {can't read "b(2)": no such variable} \
+  {set/unset array}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"unset missing array element");
- set a(1) 1
- unset a(2)
-TCL
-can't unset "a(2)": no such element in array
-OUT
+eval_is {
+ set c(1) 1
+ unset c(2)
+} {can't unset "c(2)": no such element in array} \
+  {unset missing array element}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"unset element in missing array");
- unset a(2)
-TCL
-can't unset "a(2)": no such variable
-OUT
+eval_is {unset d(2)} \
+  {can't unset "d(2)": no such variable} \
+  {unset element in missing array}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'unset - no args');
- puts [unset]
-TCL
+is [unset] {} {unset - no args}
 
-OUT
-
-language_output_is('tcl', <<'TCL', <<'OUT', 'unset -nocomplain');
+eval_is {
  set -nocomplain 2
  unset -nocomplain
- puts ${-nocomplain}
-TCL
-2
-OUT
+ set -nocomplain
+} 2 {unset -nocomplain}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'unset -nocomplain -nocomplain');
+eval_is {
  set -nocomplain 2
  unset -nocomplain -nocomplain
- puts ${-nocomplain}
-TCL
-can't read "-nocomplain": no such variable
-OUT
+ set -nocomplain
+} {can't read "-nocomplain": no such variable} \
+  {unset -nocomplain -nocomplain}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'unset -nocomplain foo');
-  unset -nocomplain foo
-  puts 1
-TCL
-1
-OUT
+eval_is {unset -nocomplain foo} {} {unset -nocomplain foo}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'unset -nocomplain -- foo');
+eval_is {
   set -- 2
   unset -nocomplain -- foo
-  puts ${--}
-TCL
-2
-OUT
+  set --
+} 2 {unset -nocomplain -- foo}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'unset foo bar');
+eval_is {
   set foo 2
   set bar 3
   unset foo bar
-  puts [catch {puts $foo}]
-  puts [catch {puts $bar}]
-TCL
-1
-1
-OUT
-
+  list [catch {puts $foo}] [catch {puts $bar}]
+} {1 1} {unset multiple variables}

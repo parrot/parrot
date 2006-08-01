@@ -1,41 +1,26 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
-use Test::More;
+source lib/test_more.tcl
+plan 9
 
-language_output_is("tcl",<<'TCL',<<OUT,"insert beginning empty list");
-  set a [list]
-  puts [linsert $a 0 a]
-TCL
-a
-OUT
+is [linsert [list] 0 a]  a {insert beginning empty list}
+is [linsert [list] 20 a] a {insert beyond end of empty list}
+is [linsert [list a] end b] {a b} {insert beyond end of single list}
+is [linsert [list a c] end-1 b] {a b c} {insert middle double list}
 
-language_output_is("tcl",<<'TCL',<<OUT,"insert beyond end of empty list");
-  set a [list]
-  puts [linsert $a 20 a]
-TCL
-a
-OUT
+is [linsert [list a b] end [list c d]] {a b {c d}} {insert, sub list}
+is [linsert [list a b] end c d] {a b c d} {insert, multiple elements}
 
-language_output_is("tcl",<<'TCL',<<OUT,"insert end single list");
-  set a [list a]
-  puts [linsert $a end b]
-TCL
-a b
-OUT
+eval_is {linsert} \
+  {wrong # args: should be "linsert list index element ?element ...?"} \
+  {too few args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"insert middle double list");
-  set a [list a c]
-  puts [linsert $a end-1 b]
-TCL
-a b c
-OUT
+eval_is {linsert a} \
+  {wrong # args: should be "linsert list index element ?element ...?"} \
+  {too few args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"insert bad index");
-  set a [list a c]
-  puts [linsert $a q b]
-TCL
-bad index "q": must be integer?[+-]integer? or end?[+-]integer?
-OUT
+eval_is {
+  linsert [list a c] q b]
+} {bad index "q": must be integer?[+-]integer? or end?[+-]integer?} \
+  {insert bad index}
+
