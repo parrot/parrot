@@ -54,10 +54,8 @@ for instructions.
 
 =head2 Test Suite
 
-To run the test suite, type C<make test>. Note - if I<any> tests fail, try
-setting the environment variable C<TEST_PROG_ARGS> to C<-G> and retry.
-
-If any tests fail (with C<-G> or not), please email the parrot-porters list.
+To run the test suite, type C<make test>. Note - partcl is currently under
+heavy development. Some tests may fail.
 
 =head2 Documentation
 
