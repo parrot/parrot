@@ -235,7 +235,7 @@ destination to continue execution.
             && cc->runloop_id != 0) {
 	    fprintf(stderr, "[oops; continuation %p of type %d "
                     "is trying to jump from runloop %d to runloop %d]\n",
-		    SELF, SELF->vtable->base_type,
+		    SELF, (int) SELF->vtable->base_type,
                     interpreter->current_runloop_id, cc->runloop_id);
 	}
 #if CTX_LEAK_DEBUG
