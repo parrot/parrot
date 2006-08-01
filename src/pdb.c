@@ -155,7 +155,7 @@ main(int argc, char *argv[])
 
     if (argc < 2) {
         fprintf(stderr, "Usage: pdb programfile [program-options]\n");
-        Parrot_exit(1);
+        Parrot_exit(interpreter, 1);
     }
 
     filename = argv[1];
@@ -201,7 +201,7 @@ main(int argc, char *argv[])
     PDB_printwelcome();
 
     Parrot_runcode(interpreter, argc - 1, argv + 1);
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
 
     return 0;
 }
