@@ -192,7 +192,7 @@ done_input:
     self = new "Sudoku"
     setattribute self, "opt", opt
     disp = self."new_display"()
-    push_eh nc_stop
+    ##push_eh nc_stop
 
     self."create"(ar)
     self."display"()
@@ -617,18 +617,13 @@ lx2:
     i_row[x] = inv
 
     # set col
-    $I0 = p % 9
-    col = cols[$I0]
-    i_col = i_cols[$I0]
-    $I1 = p / 9
-    col[$I1] = e
-    i_col[$I1] = inv
+    col = cols[x]
+    i_col = i_cols[x]
+    col[y] = e
+    i_col[y] = inv
 
     # set square
-    $I0 = x / 3
-    $I1 = y / 3
-    $I1 *= 3
-    $I2 = $I0 + $I1
+    $I2 = square_of(x, y)
     sqr = sqrs[$I2]
     i_sqr = i_sqrs[$I2]
     $I0 = x % 3
@@ -1089,6 +1084,12 @@ loop:
 done:
     #self."sanity_check"()
     $I0 = self."verify"()
+    # if yet unfished, try advanced methods before back_tracking starts
+    unless $I0 == 1 goto no_adv
+    r = self."adv_scan"()
+    # if changes, start over with "normal" stuff
+    if r == 1 goto loop
+no_adv:
     .return ($I0)
 err:
     print "mismatch\n"
@@ -1139,6 +1140,176 @@ not_uniq:
     .return (any)
 err:
     .return (-1)
+.end
+
+# scan for advanced methods
+# returns
+# -1 ... err
+# 0  ... no change
+# 1  ... changes
+.sub adv_scan :method
+    $I0 = self."y-wing"()
+    # TODO try more stuff
+    .return ($I0)
+.end
+
+.sub "y-wing" :method
+    # scan for pairs all over
+    .local int x, y, bits, el, res
+    .local pmc i_rows, i_row
+    res = 0
+    y = 0
+    i_rows = getattribute self, "i_rows"
+loop_y:
+    x = 0
+    i_row = i_rows[y]
+loop_x:
+    el = i_row[x]
+    bits = bits0(el)
+    if bits != 2 goto nxt_x
+    $I0 = self."check_y-wing"(x, y, el)
+    res |= $I0
+nxt_x:
+    inc x
+    if x < 9 goto loop_x
+    inc y
+    if y < 9 goto loop_y
+    .return (res)
+.end
+
+.sub pair_vals
+    .param int el
+    .local int i, b, A, B
+    A = 0
+    i = 1	    # A, B are 1-based
+loop:
+    el >>= 1        # bits start at 1
+    b = el & 1
+    if b goto next
+    if A goto A_is_set
+    A = i
+    goto next
+A_is_set:
+    B = i
+    .return (A, B)
+next:
+    inc i
+    if i <= 9 goto loop
+    printerr "failed to fined pair"
+    exit 1
+.end
+
+# get the square # of coors (x,y) TODO reuse
+.sub square_of
+    .param int x
+    .param int y
+    x /= 3
+    y /= 3
+    y *= 3
+    $I0 = x + y
+    .return ($I0)
+.end
+
+.sub "y-wing-pair" :method
+    .param pmc i_rcs
+    .param int A
+    .param int not_B
+    .local int x, el, bits, p1, p2
+    x = 0
+loop:
+    el = i_rcs[x]
+    bits = bits0(el)
+    if bits != 2 goto next
+    (p1, p2) = pair_vals(el)
+    if p1 == not_B goto next
+    if p2 == not_B goto next
+    if p1 != A goto check_p2
+	.return (p2, x)
+check_p2:
+    if p2 != A goto next
+	.return (p1, x)
+next:
+    inc x
+    if x < 9 goto loop
+    .return (0,0)
+.end
+    
+# find C for A w/o B
+.sub "find_C_y-wing_1" :method
+    .param int x
+    .param int y
+    .param int A
+    .param int not_B
+    # check same row, col, or sqr for a pair with A and not B
+    .local pmc i_rcss, i_rcs
+    i_rcss = getattribute self, "i_sqrs"
+    .local int sq
+    sq = square_of(x, y)	# TODO reuse this func
+    .local int C, c
+    i_rcs = i_rcss[sq]
+    (C, c) = self."y-wing-pair"(i_rcs, A, not_B)
+    unless C goto nope
+	$I0 = self."debug"()
+	unless $I0 goto nd
+	    print_item "possible Y-WING A ="
+	    print_item A
+	    print_item " B ="
+	    print_item not_B
+	    print_item " C ="
+	    print_item C
+	    print_item " at x ="
+	    print_item x
+	    print_item " y ="
+	    print_item y
+	    print_item " c ="
+	    print_item c
+	    print_item " sq ="
+	    print_item sq
+	    print_newline
+    nd:
+nope:
+    .return (0,0,0)
+.end
+
+# find C for A, or B
+.sub "find_C_y-wing" :method
+    .param int x
+    .param int y
+    .param int A
+    .param int B
+
+    .local int C, xc, yc
+    (C, xc, yc) = self."find_C_y-wing_1"(x, y, A, B)
+    unless C goto not_A
+    .return (C, xc, yc)
+not_A:
+    (C, xc, yc) = self."find_C_y-wing_1"(x, y, B, A)
+    unless C goto not_B
+    .return (C, xc, yc)
+not_B:
+    .return (0,0,0)
+.end
+
+# check, if we find another pair with 1 digit in common with el
+.sub "check_y-wing" :method
+    .param int x
+    .param int y
+    .param int el
+    # ok - we have a pair at col/row (x,y) with inv_bits el
+    # assume, we are at the corner of the Y
+    # let one number be A, the other B
+    .local int A, B, C
+    #trace 1
+    (A, B) = pair_vals(el)
+    # now find another pair in
+    # - another *this* row, col, or square
+    # - AC or BC giving another unique element C
+    .local int xc, yc	# coors of C, iff any
+    (C, xc, yc) = self."find_C_y-wing"(x, y, A, B)
+    unless C goto nope	# no C found
+
+nope:
+    .return (0)
 .end
 
 # the quare y has a uniq digit at x - set it
