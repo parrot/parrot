@@ -18,10 +18,8 @@ to the HLL language name
 
 =item - Namespaces should be hierarchical
 
-=item - The get_namespace opcode takes a multidimensional hash key 
-
-=item - The get_namespace method on a namespace object takes an array of
-name strings
+=item - The get_namespace opcode takes a multidimensional hash key or an
+array of name strings
 
 =item - Namespaces follow the semantics of the HLL in which they're defined
 
@@ -125,58 +123,13 @@ Each HLL may, when working with its own namespace objects, use the I<untyped
 interface>, which allows direct naming in the native style of the namespace's
 HLL.
 
-One part of this interface consists of standard Parrot hash interface,
-with all its keys, values, lookups, deletions, etc.  Just treat the
-namespace like a hash.  (It probably is one, really, deep down.)
+This interface consists of standard Parrot hash interface, with all its
+keys, values, lookups, deletions, etc.  Just treat the namespace like a
+hash.  (It probably is one, really, deep down.)
 
-The other part of this interface is a series of methods on the namespace
-object. These parallel the namespace opcodes but instead of taking a
-constant hash key argument to select a multi-level namespace, they
-take an array PMC.
+The untyped interface also has one method:
 
 =over 4
-
-=item get_namespace
-
-    $P1 = $P2.get_namespace($S3)
-
-Retrieve the namespace $P1 from within the namespace $P2 by a simple
-string name $S3.
-
-    $P1 = $P2.get_namespace($P3)
-
-Retrieve the namespace $P1 from within the namespace $P2 by an array of
-names $P3 for a multi-level namespace.
-
-=item set_namespace
-
-    $P1.set_namespace($P2, $P3)
-
-Add the namespace $P3 under a name denoted by an array of names $P2
-for a multi-level namespace relative to the namespace $P1.
-
-=item get_global
-
-    $P1 = $P2.get_global($S3)
-
-Retrieve a symbol $P1 from the namespace $P2, with the name $S3.
-
-    $P1 = $P2.get_global($P3, $S4)
-
-Retrieve a symbol $P1, with the name $S4, from a namespace selected by an
-array $P3 relative to the namespace $P2.
-
-=item set_global
-
-    $P1.set_global($S2, $P3)
-
-Store a symbol $P3, in the namespace $P1 with the name $S2.
-
-    $P1.set_global($P2, $S3, $P4)
-
-Store a symbol $P4, with the name $S3, in a namespace selected by an
-array $P2 relative to the namespace $P1.  If the given namespace does
-not exist it is created.
 
 =item get_name
 
@@ -370,13 +323,11 @@ opposed to the namespace(s) that it may have been exported to.)
 
 =head2 Namespace Opcodes
 
-Note that all namespace opcodes operate from the local HLL root
-namespace.  The namespace opcodes all have 3 variants: one that operates
-from the currently selected namespace (i.e. the namespace of the
-currently executing subroutine), one that operates from the HLL root
-namespace (identified by "hll" in the opcode name), and one that
-operates from the true root namespace (identified by "root" in the
-name).
+The namespace opcodes all have 3 variants: one that operates from the
+currently selected namespace (i.e. the namespace of the currently
+executing subroutine), one that operates from the HLL root namespace
+(identified by "hll" in the opcode name), and one that operates from the
+true root namespace (identified by "root" in the name).
 
 =over 4
 
@@ -388,6 +339,13 @@ name).
 
 Add the namespace PMC $P1 under the name denoted by a multidimensional
 hash key.
+
+    set_namespace $P1, $P2
+    set_hll_namespace $P1, $P2
+    set_root_namespace $P1, $P2
+
+Add the namespace PMC $P2 under the name denoted by an array of name
+strings $P1.
 
 =item del_namespace
 
@@ -410,18 +368,41 @@ root namespace and store it in $P1.
 Retrieve the namespace denoted by a multidimensional hash key and
 store it in C<$P1>.
 
-The opcodes for namespace lookups only accept hash keys. Thus, to get
-the "Foo::Bar" namespace from the top-level of the HLL, if the name was
-known at compile time, you could use this opcode:
+    $P1 = get_namespace $P2
+    $P1 = get_hll_namespace $P2
+    $P1 = get_root_namespace $P2
+
+Retrieve the namespace denoted by the array of names $P2 and store it in
+C<$P1>.
+
+Thus, to get the "Foo::Bar" namespace from the top-level of the HLL if
+the name was known at compile time, you could retrieve the namespace
+with a key:
 
   $P0 = get_hll_namespace ["Foo"; "Bar"]
 
-If the name was not known at compile time, you would use a method call
-on the namespace object instead:
+If the name was not known at compile time, you would retrieve the
+namespace with an array instead:
 
-  $P0 = get_hll_namespace
   $P1 = split "::", "Foo::Bar"
-  $P2 = $P0.get_namespace($P1)
+  $P0 = get_hll_namespace $P1
+
+=item make_namespace
+
+    $P1 = make_namespace [key]
+    $P1 = make_hll_namespace [key]
+    $P1 = make_root_namespace [key]
+
+Create and retrieve the namespace denoted by a multidimensional hash key
+and store it in C<$P1>. If the namespace already exists, only retrieve
+it.
+
+    $P1 = make_namespace $P2
+    $P1 = make_hll_namespace $P2
+    $P1 = make_root_namespace $P2
+
+Create and retrieve the namespace denoted by the array of names $P2 and
+store it in C<$P1>. If the namespace already exists, only retrieve it.
 
 =item get_global
 
@@ -439,6 +420,13 @@ namespace, or true root namespace.
 Retrieve the symbol named $S2 by a multidimensional hash key relative
 to the current namespace, HLL root namespace, or true root namespace.
 
+    $P1 = get_global $P2, $S3
+    $P1 = get_hll_global $P2, $S3
+    $P1 = get_root_global $P2, $S3
+
+Retrieve the symbol named $S3 by the array of names $P2 relative to the
+current namespace, HLL root namespace, or true root namespace.
+
 =item set_global
 
     set_global $S1, $P2
@@ -455,6 +443,14 @@ namespace, or true root namespace.
 Store $P2 as the symbol named $S1 by a multidimensional hash key,
 relative to the current namespace, HLL root namespace, or true root
 namespace.  If the given namespace does not exist it is created.
+
+    set_global $P1, $S2, $P3
+    set_hll_global $P1, $S2, $P3
+    set_root_global $P1, $S2, $P3
+
+Store $P3 as the symbol named $S2 by the array of names $P1, relative to
+the current namespace, HLL root namespace, or true root namespace.  If
+the given namespace does not exist it is created.
 
 =back
 
@@ -516,13 +512,12 @@ subroutine that calls the store function.
     $S0 = "$" . $S0
     $P3 = new .PerlInt
     $P3 = 5
-    $P4 = get_namespace
-    $P4.set_global($P2, $S0, $P3)
+    set_global $P2, $S0, $P3
   .end
 
-In this case, C<get_namespace> should see that it was called from
-"main", which is in a Perl5 namespace, so the C<set_global> method will
-create the "Foo" namespace as a Perl5 namespace.
+In this case, C<set_global> should see that it was called from "main",
+which is in a Perl5 namespace, so it will create the "Foo" namespace as
+a Perl5 namespace.
 
 =head1 LANGUAGE NOTES
 
