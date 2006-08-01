@@ -1,155 +1,145 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 16;
-use Test::More;
+source lib/test_more.tcl
+plan 16
 
-language_output_is("tcl",<<'TCL',<<OUT,"too few args, 0");
- switch
-TCL
-wrong # args: should be "switch ?switches? string pattern body ... ?default body?"
-OUT
+eval_is {switch} \
+  {wrong # args: should be "switch ?switches? string pattern body ... ?default body?"} \
+  {too few args, 0}
 
-language_output_is("tcl",<<'TCL',<<OUT,"too few args, 1");
- switch a
-TCL
-wrong # args: should be "switch ?switches? string pattern body ... ?default body?"
-OUT
+eval_is {switch a} \
+  {wrong # args: should be "switch ?switches? string pattern body ... ?default body?"} \
+  {too few args, 1}
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad flag, -monkey");
- switch -monkey a
-TCL
-bad option "-monkey": must be -exact, -glob, -regexp, -matchvar, -indexvar, or --
-OUT
+eval_is {switch -monkey a} \
+  {bad option "-monkey": must be -exact, -glob, -indexvar, -matchvar, -nocase, -regexp, or --} \
+  {bad flag, -monkey}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, singleton");
- switch a a {puts a}
-TCL
-a
-OUT
+eval_is {
+ set q 1
+ switch a a {set q 2}
+ set q
+} 2 {implied exact, singleton}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, two choices");
+eval_is {
+ set q 1
  switch b a {
-   puts a
+   set q 2
  } b {
-   puts b
- } 
-TCL
-b
-OUT
+   set q 3
+ }
+ set q
+} 3 {implied exact, two choices}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, --");
- switch -- -a -a {puts -a}
-TCL
--a
-OUT
+eval_is {
+ set q 1
+ switch -- -a -a {set q 2}
+ set q
+} 2 {implied exact, --}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, --, two choices");
+eval_is {
+ set q 1
  switch -- -b -a {
-   puts a
+   set q 2
  } -b {
-   puts b
- } 
-TCL
-b
-OUT
+   set q 3
+ }
+ set q
+} 3 {implied exact, --, two choices}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, single choice in list");
+eval_is {
+  set q 1
   switch ab {
-    ab	{ puts AB }
+    ab	{ set q 2 }
   }
-TCL
-AB
-OUT
+  set q
+} 2 {implied exact, single choice in list}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, no globbing");
+eval_is {
+  set q 1
   switch ab {
-    *b { puts *B }
-    a* { puts A* }
-    ab { puts AB }
-    ba { puts BA }
+    *b { set q 2 }
+    a* { set q 3 }
+    ab { set q 4 }
+    ba { set q 5 }
   }
-TCL
-AB
-OUT
+  set q
+} 4 {implied exact, no globbing}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, default");
+eval_is {
+  set q 1
   switch abc {
-    *b { puts *B }
-    a* { puts A* }
-    ab { puts AB }
-    ba { puts BA }
-    default { puts DEF }
+    *b { set q 2 }
+    a* { set q 3 }
+    ab { set q 4 }
+    ba { set q 5 }
+    default { set q 6 }
   }
-TCL
-DEF
-OUT
+  set q
+} 6 {implied exact, default}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, match before default");
+eval_is {
+  set q 1
   switch ab {
-    *b { puts *B }
-    a* { puts A* }
-    ab { puts AB }
-    ba { puts BA }
-    default { puts DEF }
+    *b { set q 2 }
+    a* { set q 3 }
+    ab { set q 4 }
+    ba { set q 5 }
+    default { set q 6 }
   }
-TCL
-AB
-OUT
+  set q
+} 4 {implied exact, match before default}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, no match, no default");
+eval_is {
+  set q 1
   switch abc {
-    *b { puts *B }
-    a* { puts A* }
-    ab { puts AB }
-    ba { puts BA }
+    *b { set q 2 }
+    a* { set q 3 }
+    ab { set q 4 }
+    ba { set q 5 }
   }
-  puts ok
-TCL
-ok
-OUT
+  set q
+} 1 {implied exact, no match, no default}
 
-language_output_is("tcl",<<'TCL',<<OUT,"implied exact, choices in list");
+eval_is {
+  set q 1  
   switch ab {
-    b  { puts B }
-    ab { puts AB }
-    ba { puts BA }
+    b  { set q 2 }
+    ab { set q 3 }
+    ba { set q 4 }
   }
-TCL
-AB
-OUT
+  set q
+} 3 {implied exact, choices in list}
 
-language_output_is("tcl",<<'TCL',<<OUT,"-glob, three choices");
+eval_is {
+  set q 1
   switch -glob ab {
-    b  { puts B }
-    a* { puts A* }
-    ab { puts AB }
+    b  { set q 2 }
+    a* { set q 3 }
+    ab { set q 4 }
   }
-TCL
-A*
-OUT
+  set q
+} 3 {-glob, three choices}
 
-language_output_is("tcl",<<'TCL',<<OUT,"-glob, no match, no default");
+eval_is {
+  set q 1
   switch -glob abc {
-    b  { puts B }
-    a? { puts A? }
-    *a { puts *A }
+    b  { set q 2 }
+    a? { set q 3 }
+    *a { set q 3 }
   }
-  puts ok
-TCL
-ok
-OUT
+  set q
+} 1 {-glob, no match, no default}
 
-language_output_is("tcl",<<'TCL',<<OUT,"-glob, no match, default");
+eval_is {
+  set q 1
   switch abc {
-    b  { puts B }
-    a? { puts A? }
-    *a { puts *A }
-    default { puts ok }
+    b  { set q 2 }
+    a? { set q 3 }
+    *a { set q 4 }
+    default { set q 5 }
   }
-TCL
-ok
-OUT
+  set q
+} 5 {-glob, no match, default}
 
 # XXX Need -regexp tests 
