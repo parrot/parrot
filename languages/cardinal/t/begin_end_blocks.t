@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 language_output_is('cardinal', <<'CODE', <<'OUT', 'begin block test');
 puts "This comes after"

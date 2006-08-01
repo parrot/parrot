@@ -303,7 +303,7 @@ rule atom { <literal>
 #          |<method_call> <brace_block>?
           |\-\> <lambda>
           
-          |<'begin'> <body_statement> <'end'>
+          |$<begin>:=<'begin'> <body_statement> <'end'>
           |<if_clause>
           |<'unless'> <expression> <then_clause> <compound_statement> <else_clause>? <'end'>
           |<'while'> <expression> <'do'>? <compound_statement> <'end'>
@@ -313,17 +313,13 @@ rule atom { <literal>
           |<'class'> <class_path> <superclass> <'do'>? <body_statement> <'end'>
           |<'class'> \<\< <expression> <term> <body_statement> <'end'>
           |<'moldule'> <class_path> <body_statement> <'end'>
-          |<'def'> [singleton [\.|\:]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'>
+          |$<def>:=<'def'> [singleton [\.|\:\:]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'>
           |<variable>
 }
 
-rule if_clause
-{
-          ##<'if'> <expression> {{print "h1\n"}} <then_clause> {{print "h2\n"}} <compound_statement> {{print "h3\n"}} <elsif_clause>* <else_clause>? {{print "h4\n"}} {{match.dump()}} <?end_clause> {{print "h5\n"}} {{match.dump()}}
-          <'if'> <expression> <then_clause> <compound_statement> <elsif_clause>* <else_clause>? <?end_clause> 
-}
-
-
+rule if_clause {
+          $<if>:=<'if'> <expression> <then_clause> <compound_statement> <elsif_clause>* <else_clause>? <?end_clause> 
+          }
 #rule end_clause { {{print "e1\n"}} <?terminator>? {{print "e2\n"}} {{match.dump()}} <'end'> {{print "e3\n"}} <?terminator>? {{print "e4\n"}} }
 rule end_clause { <?terminator>? <'end'> <?terminator>? }
 rule elsif_clause {<'elsif'> <expression> <then_clause> <compound_statement>}
@@ -394,7 +390,7 @@ rule superclass {
 }
 
 rule function_prototype_arg_list {
-          \( <function_prototype_args>? <rparen> #\)
+          \( <function_prototype_args>? <?rparen> #\)
           | <function_prototype_args>? <?terminator>
 }
 
