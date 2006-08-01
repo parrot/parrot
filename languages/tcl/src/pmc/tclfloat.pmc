@@ -22,7 +22,7 @@ pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group hll Tcl 
         STRING * dot;
         STRING * dot_zero;
 
-        buff = Parrot_sprintf_c(INTERP, "%.12vg",PMC_num_val(SELF));
+        buff = Parrot_sprintf_c(INTERP, "%.16vg",PMC_num_val(SELF));
 
         /* 
          * this sprintf variant will return something that looks like

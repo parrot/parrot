@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 133
+plan 192
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -112,6 +112,69 @@ foreach operator $ops_list {
     "can't use non-numeric string as operand of \"$operator\"" \
     "string $operator" 
 }
+
+# math functions, happy path
+is [expr abs(-1)]       1
+is [expr acos(0)]       1.5707963267948966
+is [expr asin(1)]       1.5707963267948966
+is [expr atan(1)]       0.7853981633974483
+is [expr atan2(4,5)]    0.6747409422235527
+is [expr ceil(4.6)]     5.0
+is [expr ceil(-1.6)]   -1.0
+is [expr cos(0)]        1.0
+is [expr cosh(1)]       1.5430806348152437
+is [expr double(5)]     5.0
+is [expr exp(1)]        2.718281828459045
+is [expr fmod(3,2)]     1.0
+is [expr fmod(-4, -1)] -0.0
+is [expr hypot(3,4)]    5.0
+is [expr hypot(-3,4)]   5.0
+is [expr int(4.6)]      4
+is [expr log(32)]       3.4657359027997265
+is [expr log10(32)]     1.505149978319906
+is [expr pow(2,10)]  1024.0
+is [expr round(4.5)]    5
+is [expr round(5.5)]    6
+is [expr round(4.4)]    4
+is [expr round(2)]      2
+is [expr sin(1)]        0.8414709848078965
+is [expr sinh(1)]       1.1752011936438014
+is [expr sqrt(64)]      8.0
+is [expr tan(1)]        1.5574077246549023
+is [expr tanh(1)]       0.7615941559557649
+
+# math functions, stringified numeric args
+is [expr abs("-1")]       1
+is [expr acos("0")]       1.5707963267948966
+is [expr asin("1")]       1.5707963267948966
+is [expr atan("1")]       0.7853981633974483
+is [expr atan2("4",5)]    0.6747409422235527
+is [expr atan2(4,"5")]    0.6747409422235527
+is [expr atan2("4","5")]  0.6747409422235527
+is [expr ceil("4.6")]     5.0
+is [expr ceil("-1.6")]   -1.0
+is [expr cos("0")]        1.0
+is [expr cosh("1")]       1.5430806348152437
+is [expr double("5")]     5.0
+is [expr exp("1")]        2.718281828459045
+is [expr fmod("3",2)]     1.0
+is [expr fmod(3,"2")]     1.0
+is [expr fmod("3","2")]   1.0
+is [expr hypot("3",4)]    5.0
+is [expr hypot(3,"4")]    5.0
+is [expr hypot("3","4")]  5.0
+is [expr int("4.6")]      4
+is [expr log("32")]       3.4657359027997265
+is [expr log10("32")]     1.505149978319906
+is [expr pow("2",10)]  1024.0
+is [expr pow(2,"10")]  1024.0
+is [expr pow("2","10")] 1024.0
+is [expr round("4.5")]    5
+is [expr sin("1")]        0.8414709848078965
+is [expr sinh("1")]       1.1752011936438014
+is [expr sqrt("64")]      8.0
+is [expr tan("1")]        1.5574077246549023
+is [expr tanh("1")]       0.7615941559557649
 
 # unary math functions, invalid string ops.
 set function_list \
