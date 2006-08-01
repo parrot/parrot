@@ -71,17 +71,29 @@ arg_loop:
    goto arg_loop
 
 arg_const:
+   result_reg = register_num + 1
+   register_num = result_reg + 1
+
+   .local string reg
+   reg = result_reg
+   reg = "$P" . reg
+   $P0 = new .String
+   $P0 = reg
+   push compiled_args, $P0
+
    $S0 = $P1
    $I1 = charset $S0
    $S1 = charsetname $I1
    $S0 = escape $S0
 
-   $P0 = new .String
-   $P0 = $S1
-   $P0 .= ':"'
-   $P0 .= $S0
-   $P0 .= '"'
-   push compiled_args, $P0
+   arg_code .= reg
+   arg_code .= " = new .String \n"
+   arg_code .= reg
+   arg_code .= " = "
+   arg_code .= $S1
+   arg_code .= ':"'
+   arg_code .= $S0
+   arg_code .= "\"\n"
    inc ii
    goto arg_loop
 
@@ -106,7 +118,7 @@ arg_loop_done:
      $P1 = get_root_global ['_tcl'; 'builtins'], $S0
    clear_eh
 
-   (result_num, $P0) = $P1(register_num,self)
+   (result_num, $P0) = $P1(register_num,self,compiled_args)
    if null $P0 goto dynamic_command
    retval = $P0
    register_num = result_num

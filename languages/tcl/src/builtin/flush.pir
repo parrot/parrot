@@ -3,6 +3,7 @@
 
 .sub 'flush'
   .param int register_num
+  .param pmc raw_args
   .param pmc argv
 
   .local string pir_code, temp_code
@@ -19,18 +20,13 @@
   # generate code that checks for the specified channel:
   # get the channel specified to be flushed
 
-  .local pmc compiler, value
+  .local pmc compiler
   compiler = get_root_global ['_tcl'], 'compile_dispatch'
-  .local int value_num
-  value = argv[0]
-  (value_num, temp_code) = compiler(register_num, value)
-  pir_code .= temp_code
-  register_num = value_num + 1
   $S0 = register_num
   pir_code .= '$P'
   pir_code .= $S0
-  pir_code .= '=$P'
-  $S0 = value_num
+  pir_code .= ' = '
+  $S0 = argv[0]
   pir_code .= $S0
   pir_code .= "\n"
   temp_code = ".local string channel_id\n"

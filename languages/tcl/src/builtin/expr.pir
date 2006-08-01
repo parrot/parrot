@@ -3,6 +3,7 @@
 
 .sub 'expr'
   .param int register_num
+  .param pmc raw_args
   .param pmc argv
 
   .local pmc pir
@@ -11,23 +12,20 @@
 
   if argc == 0 goto bad_args
 
-  $P0 = argv[0]
+  $P0 = raw_args[0]
   $I0 = isa $P0, 'TclConst'
   unless $I0 goto not_const
   .local string arg
-  arg = $P0
   $I0 = 1
 loop:
   if $I0 == argc goto end
   $P0 = argv[$I0]
   $I1 = isa $P0, 'TclConst'
   unless $I1 goto not_const
-  $S0 = $P0
-  arg .= ' '
-  arg .= $S0
   inc $I0
   goto loop
 end:
+  arg = join ' ', raw_args
 
   .local pmc __expr
   __expr = get_root_global ['_tcl'], '__expr'

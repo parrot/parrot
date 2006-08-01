@@ -140,6 +140,7 @@ sub inlined_header {
     
 .sub '$cmd'
   .param int register
+  .param pmc raw_argv
   .param pmc argv
     
   .local pmc compiler
@@ -256,13 +257,9 @@ sub inlined_arguments {
             if $arg->{optional};
         
         # the actual thing to be compiled
-        $code .= "  \$P0 = argv[$i] \n";
-        # the register behind this argument
-        $code .= "  .local int    r_$name \n";
-        $code .= "  (r_$name, \$S0) = compiler(register, \$P0) \n";
-        $code .= "  register = r_$name + 1 \n";
-        $code .= "  pir .= \$S0 \n";
-        $code .= emit("a_${name}_%0 = \$P%1", 'loop_num', "r_$name");
+        $code .= " .local string r_$name \n";
+        $code .= " r_$name = argv[$i] \n";
+        $code .= emit("a_${name}_%0 = %1", 'loop_num', "r_$name");
         
         # convert the argument, if necessary
         for my $type (@{ $arg->{type} })
@@ -418,7 +415,7 @@ sub inlined_body {
                 $code .= emit("temp = a_${name}_%0()", 'loop_num');
                 
                 # if that's all there is, remove it
-                $line =~ s/^\s*a_${name}_(\d+)\s*$//m or $line =~ s/a_${name}_(\d+)/temp/;
+                $line =~ s/^\s*a_${name}_%0\s*$//m or $line =~ s/a_${name}_%0/temp/;
             }
         }
         

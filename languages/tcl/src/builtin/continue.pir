@@ -3,6 +3,7 @@
 
 .sub 'continue'
   .param int register_num
+  .param pmc raw_args
   .param pmc argv
 
   .local string pir_code

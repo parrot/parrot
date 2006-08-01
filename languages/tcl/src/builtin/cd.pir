@@ -3,27 +3,21 @@
 
 .sub 'cd'
   .param int register_num
+  .param pmc raw_args
   .param pmc argv
 
   .local string pir_code,temp_code
   .local int argc,directory_num,result_num
-  argc = argv
+  argc = elements argv
   directory_num = 0
 
-  .local pmc compiler
-  compiler = get_root_global ['_tcl'], 'compile_dispatch'
+  .local string dir
+  dir = ""
 
+  if argc >= 2 goto bad_args
   if argc == 0 goto noargs
-  if argc == 1 goto got_dir
-
-  pir_code = ".throw ('wrong # args: should be \"cd\ ?dirName?\"')\n"
-  .return(register_num,pir_code)
-
-got_dir:
-  $P1 = argv[0]
-  (directory_num,temp_code) = compiler(register_num,$P1)
-  register_num = directory_num + 1
-  pir_code .= temp_code
+  
+  dir = argv[0]
   goto cd_it
 
 noargs: 
@@ -39,6 +33,7 @@ noargs:
   pir_code .= $S1
   pir_code .= "['HOME']\n"
   register_num = directory_num + 1
+  dir = "$P" . $S2
 
 cd_it:
   pir_code .= "$P"
@@ -51,11 +46,13 @@ cd_it:
   pir_code .= $S2
   pir_code .= " = $P"
   pir_code .= $S1
-  pir_code .= '."chdir"($P'
-  $S2 = directory_num
-  pir_code .= $S2
+  pir_code .= '."chdir"('
+  pir_code .= dir
   pir_code .= ")\n"
 
   .return(result_num,pir_code)
 
+bad_args:
+  pir_code = ".throw ('wrong # args: should be \"cd\ ?dirName?\"')\n"
+  .return(register_num,pir_code)
 .end
