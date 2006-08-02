@@ -61,7 +61,7 @@ TODO
 
   proto OPERATOR_NAME ADVERBIAL_CLAUSES* { ... }
 
-The C<grammar> statement at the top of is the namespace in which the optable will be generated.  Written in Perl6 style the C<grammar statement is translated by PGE into valid Parrot namespace syntax.
+The C<grammar> statement at the top of is the namespace in which the optable will be generated.  Written in Perl6 style the C<grammar> statement is translated by PGE into valid Parrot namespace syntax.
 
 The C<proto> statement declares a operator to be added to the precedence table and parser.  All operator attributes are defined using the Perl6 adverbial style of C<is ADVERB()>.  Adverbial clauses are separated by white space.  Adverbs can have 0-arity in which case they can be written without parenthesis.  Adverbial arguments are written comma separated in parenthesis.
 
