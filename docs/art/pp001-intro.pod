@@ -1,9 +1,7 @@
+# One first version of this article was published on TPR 2.3
 #
-# Note:
-#  for now, this is an article I am writting for next TPR.  So, please
-#  give me hints of what's wrong, and interesting things to add, but
-#  don't extend much the size of it.
-#
+# Please be free to edit it to suit latest parrot developments,
+# and to be a good starting point for beginners.
 
 =head1 Writing PIR
 
@@ -34,13 +32,16 @@ source and, if everything works correctly, a C<parrot> executable should
 appear. Normally, I use it directly from the root directory of the
 parrot source, instead of installing it into the system.
 
+If you do not want to compile your own Parrot you can download a pre-compiled
+binary from http://www.parrotcode.org/source.html
+
 =head2 Parrot Virtual Machine overview
 
 Before we get started with the examples, here's a quick overview of
 parrot's architecture.
 
 Parrot is a register-based virtual machine. It provides 4 types of
-registers and each type has 32 registers. The register types are:
+registers. The register types are:
 
 =over 4
 
@@ -55,7 +56,7 @@ registers and each type has 32 registers. The register types are:
 =back
 
 Registers are designated by the type of register followed by a number.
-For instance, the integer registers are C<I0>, C<I1> till C<I31>. The
+For instance, the integer registers are C<I0>, C<I1> and so on. The
 PMC registers hold arbitrary data objects and are parrot's mechanism
 for implementing more complex behavior than the ones that can be
 expressed using the other 3 register types alone. PMCs will be covered
