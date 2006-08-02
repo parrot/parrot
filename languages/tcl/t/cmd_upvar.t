@@ -1,85 +1,66 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 10;
-use Test::More;
+source lib/test_more.tcl
+plan 11
 
-language_output_is("tcl", <<'TCL', <<'OUT', 'upvar $var n');
+eval_is {
  set a 2
- puts $a
  proc add3 var {
    upvar $var n
    set n [expr "3+$n"]
  }
  add3 a
- puts $a
-TCL
-2
-5
-OUT
+ set a
+} 5 {upvar $var n}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar - bad args");
-  upvar 1
-TCL
-wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar - bad level");
-  upvar a b
-TCL
-bad level "a"
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar - bad level");
-  proc test {} {upvar 2 a b}
-  test
-TCL
-bad level "2"
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar - bad level -1");
-  upvar -1 a b
-TCL
-bad level "-1"
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar 0 a b");
+eval_is {
   upvar 0 a b
   set a 1
-  puts $b
-TCL
-1
-OUT
+  set b
+} 1 {upvar as alias in global scope}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar - variable already exists");
+eval_is {
   set b 1
   upvar 0 a b
-TCL
-variable "b" already exists
-OUT
+} {variable "b" already exists} \
+  {variable already exists}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar 0 a(b) c");
+eval_is {
   upvar 0 a(b) c
   array set a [list b 3]
-  puts $c
-TCL
-3
-OUT
+  set c
+} 3 {upvar into an array}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar with array");
+eval_is {
   array set a [list 1 2 3 4]
   upvar 0 a b
-  puts [array get b 1]
-TCL
-1 2
-OUT
+  array get b 1
+} {1 2} {upvar with array}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "upvar from one lexpad to another");
+eval_is {
   proc add2 {varName} {upvar $varName var; set var [expr {$var+2}]}
-  proc test {} { set a 1; add2 a; puts $a }
+  proc test {} { set a 1; add2 a; return $a }
   test
-TCL
-3
-OUT
+} 3 {upvar from one lexpad to another}
 
+eval_is {upvar} \
+  {wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"} \
+  {upvar no args}
+
+eval_is {upvar 1} \
+  {wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"} \
+  {upvar one args}
+
+# can't use 'test' here because of the proc level, so roll our own eval.
+is [catch {upvar a b} var; set var] {bad level "a"} {bad level}
+
+eval_is {
+  proc test {} {upvar 3 a b}
+  test
+} {bad level "3"} \
+  {can't go higher than the top level}
+
+eval_is {
+  upvar -1 a b
+} {wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"} \
+  {no negative level}
