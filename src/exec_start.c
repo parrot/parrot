@@ -106,8 +106,7 @@ main(int argc, char * argv[])
         run_compiled(interpreter,
             (opcode_t *)&((&program_code)[bytecode_offset]));
      */
-    Parrot_exit(0);
-    exit(0);
+    Parrot_exit(interpreter, 0);
 }
 
 /*

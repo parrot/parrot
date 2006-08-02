@@ -90,7 +90,7 @@ main(int argc, char *argv[])
     Parrot_runcode(interpreter, argc, argv);
     Parrot_destroy(interpreter);
 
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
     return 0;
 }
 
@@ -126,7 +126,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
     while (longopt_get(interpreter, *argc, *argv, options, &opt)) {
         if (opt.opt_id == -1) {
             fprintf(stderr, "parrot: %s\n", opt.opt_error);
-            Parrot_exit(1);
+            Parrot_exit(interpreter, 1);
         }
 
         switch (opt.opt_id) {
@@ -236,7 +236,7 @@ usage(void)
             cgoto_info
     );
 
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
 }
 
 /*
@@ -266,7 +266,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either\n\
 the GNU General Public License or the Artistic License for more details.\n\n");
 
-    Parrot_exit(0);
+    Parrot_exit(interpreter, 0);
 }
 
 /*
