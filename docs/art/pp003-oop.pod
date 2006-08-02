@@ -56,7 +56,7 @@ namespace.
 
 Perl programmers will recognize that Parrot
 C<.namespace> declarations are just like Perl C<package>
-declarations. But there are a few differences. We'll
+declarations. But there are a few differences. I'll
 talk more about how Parrot uses namespaces and classes
 together in just a minute.
 
@@ -83,7 +83,7 @@ created with C<newclass>.  Here's a simple example:
 
 You may notice that I didn't use the return value of
 C<newclass>.  That's only because this is a simple example.  :-)
-We'll talk about what to do with the return value of C<newclass>
+I'll talk about what to do with the return value of C<newclass>
 a little later.  Right now, let's talk about methods.
 
 =head2 Madness ... er, Methods
@@ -131,9 +131,9 @@ read L<perlboot>.
         fido    = new "Dog"
         porky   = new "Pig"
 
-        elsie.speak()
-        fido.speak()
-        porky.speak()
+        elsie.'speak'()
+        fido.'speak'()
+        porky.'speak'()
     .end
 
 It's important to note that even though I've declared the
@@ -192,9 +192,9 @@ same for the rest):
         $P0 = "Phideaux"
         setattribute dog, "name", $P0
 
-        dog.name()
+        dog.'name'()
         print " says "
-        dog.speak()
+        dog.'speak'()
         print "!\n"
     .end
 
@@ -251,9 +251,9 @@ the Animal base class like so:
     $P0 = subclass "Animal", "Pig"
     ...
     cow = new 'Cow'
-    cow.setname("Elsie")
+    cow.'setname'("Elsie")
     ...
-    cow.getname()
+    cow.'getname'()
 
 Each subclass will contain an attribute called "name" that can be
 used to store the name of the animal.  The C<setname> method
@@ -279,10 +279,16 @@ about OOP in Parrot.
 
 =head2 Acknowledgements 
 
-Thanks to Randal Schwartz for providing a neat set of
-examples in L<perlboot> from which this article
-shamelessly borrows.
+=over 4
 
+* Thanks to Randal Schwartz for providing a neat set of
+  examples in L<perlboot> from which this article
+  shamelessly borrows.
+* Thanks to the Parrot people for feedback
+
+=head2 Author
+
+Jonathan Scott Duff
 
 =head3 Example 6: Full barnyard listing
 
@@ -330,24 +336,26 @@ shamelessly borrows.
         .local pmc cow, dog, pig
 
         cow   = new "Cow"
-        cow.setname("Elsie")
+        cow.'setname'("Elsie")
         dog    = new "Dog"
-        dog.setname("Snoopy")
+        dog.'setname'("Snoopy")
         pig   = new "Pig"
-        pig.setname("Porky")
+        pig.'setname'("Porky")
         
-        cow.getname()
+        cow.'getname'()
         print " says "
-        cow.speak()
+        cow.'speak'()
         print "\n"
 
-        dog.getname()
+        dog.'getname'()
         print " says "
-        dog.speak()
+        dog.'speak'()
         print "\n"
 
-        pig.getname()
+        pig.'getname'()
         print " says "
-        pig.speak()
+        pig.'speak'()
         print "\n"
     .end
+
+=cut

@@ -285,6 +285,10 @@ With the PIR syntax shown in this article you should be able to start
 writting simple programs. Next article we will look into available
 PMCs, and how they can be used.
 
+=head2 Author
+
+Alberto Simões
+
 =head2 Thanks
 
 =over 4
