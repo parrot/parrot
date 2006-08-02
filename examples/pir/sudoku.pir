@@ -1329,16 +1329,38 @@ next:
 	i_rcss = getattribute self, "i_cols"
 	i_rcs  = i_rcss[x]
 	(has_bc, c) = self."y-wing-pair_BC"(i_rcs, B, C)
-	unless has_bc goto nope	# TODO row
+	unless has_bc goto try_row
 	bx = x
 	by = c
 	.local int start, end
-	# TODO invalidate col x too
+	# invalidate col x in sqr(x,y)
+	sq = square_of(x, y)
+	($I0, start) = square_to_xy(sq, 0)
+	end = start + 2
+	changed = self."y-wing_inv"(i_rcs, C, start, end)
+	# invalidate col x at BC
+	i_rcs  = i_rcss[cx]
+	sq = square_of(bx, by)
+	($I0, start) = square_to_xy(sq, 0)
+	end = start + 2
+	$I0 = self."y-wing_inv"(i_rcs, C, start, end)
+	changed |= $I0
+	goto show_debug
+    try_row:
+	i_rcss = getattribute self, "i_rows"
+	i_rcs  = i_rcss[y]
+	(has_bc, c) = self."y-wing-pair_BC"(i_rcs, B, C)
+	unless has_bc goto nope
+	bx = c
+	by = y
+	.local int start, end
+	# TODO invalidate row y too
 	i_rcs  = i_rcss[cx]
 	sq = square_of(bx, by)
 	($I0, start) = square_to_xy(sq, 0)
 	end = start + 2
 	changed = self."y-wing_inv"(i_rcs, C, start, end)
+    show_debug:
 	$I0 = self."debug"()
 	unless $I0 goto nd
 	    $S0 = "CHG"
@@ -2310,6 +2332,10 @@ Here is starts backtracking. A possible improvement would be:
 
   - detect such digit configuration
   - only backtrack try this digit ('6') above
+
+=head2 TODO deadly square
+
+See also std331.sud
 
 =cut
 
