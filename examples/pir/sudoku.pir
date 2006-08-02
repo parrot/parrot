@@ -1210,6 +1210,24 @@ next:
     .return ($I0)
 .end
 
+# given the square # and idx inside, return coors (x,y) TODO reuse
+.sub square_to_xy
+    .param int sq
+    .param int idx
+    .local int x, y
+    x = sq % 3
+    x *= 3
+    $I0 = idx % 3
+    x += $I0
+    y = sq / 3
+    y *= 3
+    $I1 = idx / 3
+    y += $I1
+    .return (x, y)
+.end
+
+# look for another pair AC (A,C != B)
+# return C and the position in i_rcs
 .sub "y-wing-pair" :method
     .param pmc i_rcs
     .param int A
@@ -1234,41 +1252,123 @@ next:
     .return (0,0)
 .end
     
-# find C for A w/o B
+# look for another pair BC 
+# return 0/1 and the position in i_rcs
+.sub "y-wing-pair_BC" :method
+    .param pmc i_rcs
+    .param int B
+    .param int C
+    .local int x, el, bits, p1, p2
+    x = 0
+loop:
+    el = i_rcs[x]
+    bits = bits0(el)
+    if bits != 2 goto next
+    (p1, p2) = pair_vals(el)
+    if p1 == B goto ok1
+    if p2 == B goto ok2
+    goto next
+ok1:
+    if p2 != C goto next
+	.return (1, x)
+ok2:
+    if p1 != C goto next
+	.return (1, x)
+next:
+    inc x
+    if x < 9 goto loop
+    .return (0,0)
+.end
+
+# invalidate C from the given [start,end] range#
+# return 1 if something changed
+.sub "y-wing_inv" :method
+    .param pmc i_rcs
+    .param int C
+    .param int start
+    .param int end
+
+    .local int changed, b
+    .local pmc el
+    changed = 0
+    b = 1 << C
+loop:
+    el = i_rcs[start]
+    $I0 = el
+    $I1 = $I0 & b
+    if $I1 goto next
+    el |= b
+    changed = 1
+next:
+    inc start
+    if start <= end goto loop
+    .return (changed)
+.end
+
+# find C for A B
+# and invalidate C if found
 .sub "find_C_y-wing_1" :method
     .param int x
     .param int y
     .param int A
-    .param int not_B
+    .param int B
     # check same row, col, or sqr for a pair with A and not B
     .local pmc i_rcss, i_rcs
     i_rcss = getattribute self, "i_sqrs"
-    .local int sq
+    .local int sq, changed
+    changed = 0
     sq = square_of(x, y)	# TODO reuse this func
     .local int C, c
     i_rcs = i_rcss[sq]
-    (C, c) = self."y-wing-pair"(i_rcs, A, not_B)
-    unless C goto nope
+    (C, c) = self."y-wing-pair"(i_rcs, A, B)
+    unless C goto nope	# TODO row, col
+	# convert the square coordinate to (x, y)
+	.local int cx, cy, bx, by, has_bc
+	(cx, cy) = square_to_xy(sq, c)	# AC
+	# check col and row at AB for a BC pair
+	i_rcss = getattribute self, "i_cols"
+	i_rcs  = i_rcss[x]
+	(has_bc, c) = self."y-wing-pair_BC"(i_rcs, B, C)
+	unless has_bc goto nope	# TODO row
+	bx = x
+	by = c
+	.local int start, end
+	# TODO invalidate col x too
+	i_rcs  = i_rcss[cx]
+	sq = square_of(bx, by)
+	($I0, start) = square_to_xy(sq, 0)
+	end = start + 2
+	changed = self."y-wing_inv"(i_rcs, C, start, end)
 	$I0 = self."debug"()
 	unless $I0 goto nd
-	    print_item "possible Y-WING A ="
+	    $S0 = "CHG"
+	    if changed goto chg_ok
+	    $S0 = "noC"
+	chg_ok:
+	    print_item $S0
+	    print_item " Y-WING A "
 	    print_item A
-	    print_item " B ="
-	    print_item not_B
-	    print_item " C ="
+	    print_item " B "
+	    print_item B
+	    print_item " C "
 	    print_item C
-	    print_item " at x ="
+	    print_item " at x "
 	    print_item x
-	    print_item " y ="
+	    print_item " y "
 	    print_item y
-	    print_item " c ="
-	    print_item c
-	    print_item " sq ="
-	    print_item sq
+	    print_item " cx "
+	    print_item cx
+	    print_item " cy "
+	    print_item cy
+	    print_item " bx "
+	    print_item bx
+	    print_item " by "
+	    print_item by
 	    print_newline
+	    self."display"()
     nd:
 nope:
-    .return (0,0,0)
+    .return (changed)
 .end
 
 # find C for A, or B
@@ -1278,16 +1378,12 @@ nope:
     .param int A
     .param int B
 
-    .local int C, xc, yc
-    (C, xc, yc) = self."find_C_y-wing_1"(x, y, A, B)
-    unless C goto not_A
-    .return (C, xc, yc)
+    .local int changed
+    changed = self."find_C_y-wing_1"(x, y, A, B)
+    unless changed goto not_A
+    .return (changed)
 not_A:
-    (C, xc, yc) = self."find_C_y-wing_1"(x, y, B, A)
-    unless C goto not_B
-    .return (C, xc, yc)
-not_B:
-    .return (0,0,0)
+    .return self."find_C_y-wing_1"(x, y, B, A)
 .end
 
 # check, if we find another pair with 1 digit in common with el
@@ -1304,12 +1400,7 @@ not_B:
     # now find another pair in
     # - another *this* row, col, or square
     # - AC or BC giving another unique element C
-    .local int xc, yc	# coors of C, iff any
-    (C, xc, yc) = self."find_C_y-wing"(x, y, A, B)
-    unless C goto nope	# no C found
-
-nope:
-    .return (0)
+    .return self."find_C_y-wing"(x, y, A, B)
 .end
 
 # the quare y has a uniq digit at x - set it
@@ -2124,6 +2215,63 @@ that in square 2 we have a unique '7' at row 0, col 7:
 
 Now the tests in "create_inv_n" invalidate illegal positions
 due to multiple-blocking and other tests are likely to proceed.  
+
+=head2 Y-WING
+
+(This is partially still TODO)
+
+Given this suduku:
+
+# "unsolvable" 3 - Y-Wing
+  . . . 8 . . . . 6
+  . . 1 6 2 . 4 3 . 
+  4 . . . 7 1 . . 2 
+  . . 7 2 . . . 8 . 
+  . . . . 1 . . . . 
+  . 1 . . . 6 2 . . 
+  1 . . 7 3 . . . 4 
+  . 2 6 . 4 8 1 . . 
+  3 . . . . 5 . . .
+
+It started backtracking at:
+
+  +---------+---------+---------+
+  | .  3  . | 8  5  4 | .  1  6 |      .. .. 29    .. .. ..    79 .. ..
+  | .  .  1 | 6  2  9 | 4  3  . |      .. .. ..    .. .. ..    .. .. ..
+  | 4  6  . | 3  7  1 | .  .  2 |      .. .. ..    .. .. ..    .. 59 ..
+  +---------+---------+---------+
+  | .  4  7 | 2  9  3 | .  8  1 |      56 .. ..    .. .. ..    56 .. ..
+  | .  .  . | .  1  7 | 3  .  . |      .. .. ..    45 .. ..    .. .. 59
+  | .  1  3 | .  8  6 | 2  .  . |      59 .. ..    45 .. ..    .. .. ..
+  +---------+---------+---------+
+  | 1  .  . | 7  3  2 | .  .  4 |      .. .. ..    .. .. ..    .. .. ..
+  | .  2  6 | 9  4  8 | 1  .  3 |      57 .. ..    .. .. ..    .. 57 ..
+  | 3  .  4 | 1  6  5 | .  2  . |      .. .. ..    .. .. ..    .. .. ..
+  +---------+---------+---------+
+
+The numbers on the right side are showing squares with unique pairs.
+Having a look at the columns 7 and 8, we see these pairs (79, 59, and 57)
+
+Let's label these numbers as A, B, and C:
+
+  +---------+---------+---------+
+  | .  3  . | 8  5  4 | AC 1  6 |
+  | .  .  1 | 6  2  9 | 4  3  . |
+  | 4  6  . | 3  7  1 | .  AB 2 |
+  +---------+---------+---------+
+  | .  4  7 | 2  9  3 | .  8  1 |
+  | .  .  . | .  1  7 | 3  .  . |
+  | .  1  3 | .  8  6 | 2  .  . |
+  +---------+---------+---------+
+  | 1  .  . | 7  3  2 | X  .  4 |
+  | .  2  6 | 9  4  8 | 1  BC 3 |
+  | 3  .  4 | 1  6  5 | X  2  . |
+  +---------+---------+---------+
+
+When we now try to fill row 2, column 7 with A or B, we see that at
+positions X, a C can't be valid. Either it's blocked via the column
+or directly via the last square. Thus we can eliminate digit 7 from
+positions X.
 
 =head2 TODO
 
