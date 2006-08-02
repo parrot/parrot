@@ -20,39 +20,28 @@ has been translated, the object's C<compile> method is invoked, which then
 generates PIR which can be compiled by parrot.
 
 The commands themselves have (well, some of them do) inlineable (compiled) 
-versions: These are
-in lib/builtins, and all new development should go here. There are many
-old, runtime-only versions that exist in lib/commands. All *new* development
-should occur in lib/builtins. Minor patches to things in lib/commands are
-ok, though.
-
-When you define an inline-able builtin,
-C<tcl.pl> will automatically generate a version similar in those in
-lib/commands/ that
-invokes the inline'able version, compiles it, invokes it, and returns
-the result immediately. The compiler will fall back to this version as 
-necessary, you don't have to worry about it.
+versions: These are located in src/builtins, and all new development should go
+there. There are many old, runtime-only versions that exist in lib/commands.
+Minor patches to things in lib/commands are ok, though.
 
 When writing inlined builtins, there are two variants: those generated
 automatically by running C<tools/gen_inline.pl>, and those that are
 handrolled.
 
-Templates for inlined builtins look a lot like a perl hash that defines
-the various arguments, options, and code for the builtin. By switching
-to this declarative scheme, we hope to elminate a lot of the bookkeeping
-code, as well as simplify generations. While we're using perl to generate
-the code, this is a one time cost at build time: at run time, we
-are using PIR. (Which in turn generates PIR itself).
+Templates for inlined builtins look a lot like PIR (they are, for the most
+part) but they have a little bit of magic. The compiler takes care of arg
+handling and renames local variables and labels so they don't collide. Since
+we're using perl to generate the code, this is a one time cost at build time: at
+runtime, we are using PIR. (Which in turn generates PIR itself).
 
-Handrolled inlined builtins take two args: a TclCompiler, and a single
-container PMC with the various args. The container
-PMC has objects generated from parser that need to be compiled themselves
-before you can rely on their values. Your return value is simply the compiler
-object.  You should only use this
-method for generating builtins if a builtin cannot be defined using a template,
-and even then, extending the template parser is probably the right answer.
+Handrolled inlined builtins take three args: a TclCompiler, an array PMC with
+the raw arguments, and an array PMC with the registers of the compiled
+arguments. Your return value is simply the compiler object.  You should only use
+this method for generating builtins if a builtin cannot be defined using a
+template, and even then, extending the template parser is probably the right
+answer.
 
-(This is as opposed to the interpreted style in lib/commands, which takes
+(This is as opposed to the interpreted style in runtime/builtins, which take
 a variable number of already compiled args at runtime. Our fallback method
 bundles these up, passing in a starting register of 0, and uses the resulting
 PIR to generate a .sub immediately and then invoke it. The runtime fallback
@@ -65,7 +54,7 @@ if it's constant, then you can optimize: for example, we could optimize
 we still have to be able to deal with [set a -nonewline; puts $a "whee\n"].
 So, your first pass should probably do no optimizations. If you see a potential
 for optimization, however, at least add an XXX comment so we can get back to
-it later. At this point, I'd rather spend time working on new features than
+it later. At this point, we'd rather spend time working on new features than
 making existing features faster.
 
 The results of calling
@@ -146,4 +135,3 @@ be checking partcl-specific functionaliity.
 =back
 
 =cut
-
