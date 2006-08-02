@@ -51,6 +51,8 @@ sub new
             'compilers/past' ),
         $self->new_group( 'POST', 'the Parrot/Punie Opcode Syntax Tree',
             'compilers/post' ),
+        $self->new_group( 'BCG', 'Byte Code Generation',
+            'compilers/bcg' ),
     );
 }
 
