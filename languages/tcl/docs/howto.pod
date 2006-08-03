@@ -1,6 +1,6 @@
 =head1 contributing to tcl/parrot
 
-a brief overview on how to help out, if you're interested. In general, 
+A brief overview on how to help out, if you're interested. In general, 
 it's ok to send patches for tcl to the RT system for anything that isn't
 "BIG STUFF" - those, please bounce off the MAINTAINERS first.
 We'd prefer C<diff -u> patches, but are happy to take complete files as well.
@@ -19,51 +19,50 @@ into an AST (in the form of a Tcl* object from lib/*). Once a section of code
 has been translated, the object's C<compile> method is invoked, which then
 generates PIR which can be compiled by parrot.
 
-The commands themselves have (well, some of them do) inlineable (compiled) 
-versions: These are located in src/builtins, and all new development should go
-there. There are many old, runtime-only versions that exist in lib/commands.
-Minor patches to things in lib/commands are ok, though.
+The commands themselves have (well, some of them do) inline-able (compiled) 
+versions: These are located in C<src/builtin>, and all new development should go
+there. There are many runtime-only versions that exist in C<runtime/builtin>.
+In general, no new development should occur here. The inline-able versions are
+preferred, as they help avoid runtime dispatch.
 
-When writing inlined builtins, there are two variants: those generated
-automatically by running C<tools/gen_inline.pl>, and those that are
-handrolled.
+When writing inlined builtins, these are further subdivided into two variants
+at the moment: those generated automatically by running C<tools/gen_inline.pl>, 
+and those that are handwritten.
 
 Templates for inlined builtins look a lot like PIR (they are, for the most
-part) but they have a little bit of magic. The compiler takes care of arg
+part) but they have a little bit of magic. The compiler takes care of argument
 handling and renames local variables and labels so they don't collide. Since
 we're using perl to generate the code, this is a one time cost at build time: at
 runtime, we are using PIR. (Which in turn generates PIR itself).
 
-Handrolled inlined builtins take three args: a TclCompiler, an array PMC with
+Hand-rolled inlined builtins take three arguments: a TclCompiler, an array PMC with
 the raw arguments, and an array PMC with the registers of the compiled
 arguments. Your return value is simply the compiler object.  You should only use
 this method for generating builtins if a builtin cannot be defined using a
 template, and even then, extending the template parser is probably the right
 answer.
 
-(This is as opposed to the interpreted style in runtime/builtins, which take
-a variable number of already compiled args at runtime. Our fallback method
+This is as opposed to the interpreted style in C<runtime/builtin>, which takes
+a variable number of already compiled arguments at runtime. Our fallback method
 bundles these up, passing in a starting register of 0, and uses the resulting
 PIR to generate a .sub immediately and then invoke it. The runtime fallback
-is always going to be necessary for HLL interoperability.)
+is *always* going to be necessary for HLL interoperability.
 
-Remember, every arg to your builtin is potentially variable and may change
+Remember, every argument to your builtin is potentially variable and may change
 at runtime. You can check the type of the object at compile time. However,
 if it's constant, then you can optimize: for example, we could optimize 
-[puts -nonewline "whee\n"] down to, basically, {print "whee\n"}... however,
+[puts -nonewline "whee\n"] down to, basically, {say 'whee'}... however,
 we still have to be able to deal with [set a -nonewline; puts $a "whee\n"].
 So, your first pass should probably do no optimizations. If you see a potential
 for optimization, however, at least add an XXX comment so we can get back to
 it later. At this point, we'd rather spend time working on new features than
 making existing features faster.
 
-The results of calling
-the inlined code will be used by C<lib/tclcommand.pir>. The inlined code
-is further wrapped in a protective conditional which will skip
-the inlined version if it can no longer be trusted (that is, if [proc]
-or [rename] has been invoked), and will fall back to
-the interpreted version as necessary. (And throw an exception if the command
-is not found at runtime.).
+The results of calling the inlined code will be used by C<lib/tclcommand.pir>. 
+The inlined code is further wrapped in a protective conditional which will skip
+the inlined version if it can no longer be trusted (that is, if [proc] or [rename]
+has been invoked), and will fall back to the interpreted version as necessary.
+(And throw an exception if the command is not found at runtime.).
 
 =item speed
 
@@ -78,7 +77,7 @@ We're currently missing some things that require support from parrot. See
 L<hacks.pod> for a list. In general, though, a lot of what we need to do is
 possible with parrot.
 
-If you're looking for something to todo, see L<TODO> one level up.
+If you're looking for something to to do, see L<TODO> one level up.
 
 =back
 
@@ -91,13 +90,7 @@ If you're looking for something to todo, see L<TODO> one level up.
 Every PIR .sub that's defined should probably have some POD to go along
 with it to document the arguments and return values. Only exceptions to
 this should be subs which correspond directly to Tcl builtins -- those
-are already documented elsewhere.
-
-=item big picture docs.
-
-Are the docs in C<docs/> useful? Could use someone to proof them, and
-verify that there are no missing chunks (if missing, write them, or 
-get them added to the C<TODO>), and that they are coherent.
+are already documented at L<http://www.tcl.tk/man/tcl8.5/TclCmd/contents.htm>
 
 =back
 
@@ -107,30 +100,27 @@ get them added to the C<TODO>), and that they are coherent.
 
 =item Missing Commands
 
-Every builtin command corresponds to an appropriately named file
-in C<src/builtins> or C<runtime/builtins> - Each of these subs takes some
-number of PMCs
-as arguments. For those commands that take a fixed number of parameters,
-we declare them with C<.param>. For those that take a variable number,
-we use the C<foldup> opcode.
+Every builtin command corresponds to an appropriately named file in C<src/builtin>
+or C<runtime/builtin>. Use a similar command as a template
 
-If the return value would be TCL_OK, then simply C<.return> the value
-from the sub. For any other return type, use one of the macros in 
-C<src/returncodes.pir>: C<.throw>, etc. the value can be any simple
-register or a PMC, the calling conventions will autobox as necessary.
+If the return value would be TCL_OK, then simply C<.return> the value from the
+sub. For any other return type, use one of the macros in C<src/macros.pir>:
+C<.throw>, etc. the value can be any simple register or a PMC, the calling
+conventions will auto-box as necessary.
 
 Before adding new functionality, add a test (or a test in an existing) file 
-in C<t/> - tests for C<puts>, for example, go in C<t/cmd_puts.t> - 
-we use the C<Test::Harness> framework, via C<Parrot::Test>. 
+in C<t/> - tests for C<puts>, for example, go in C<t/cmd_puts.t>. We are in the
+process of transitioning all our tests from the perl based Parrot::Test to a
+tcl-based version that generates TAP output. All new tests should be written
+using the tcl-based version. See C<t/cmd_expr.t> for an example.
 
-Our final goal will be to pass (most of) the tcl test suite: run 
+Our final goal will be to pass (most of) the tcl test suite: run
 C<make tcl-test> to checkout the latest version of of the tcl test suite
 and run it. Warning: slow...
 
-Long term goal is remove any tests in C<t/> that are testing things
-that are already tested in the official tcl suite.
-Partcl's checked in test suite should just
-be checking partcl-specific functionaliity.
+Long term goal is remove any tests in C<t/> that are testing things that are
+already tested in the official tcl suite.  Partcl's checked in test suite 
+should just be checking partcl-specific functionality.
 
 =back
 
