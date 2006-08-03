@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 60
+plan 126
 
 # arg checking
 eval_is {string} \
@@ -137,4 +137,143 @@ is [string bytelength hi] 2 {bytelength ascii}
 is [string bytelength \u6666] 3 {bytelength unicode}
 is [string bytelength \u666]  2 {bytelength unicode 2}
 
+# [string equal]
+
+eval_is {string equal banana} \
+  {wrong # args: should be "string equal ?-nocase? ?-length int? string1 string2"} \
+  {equal too few args}
+
+is [string equal oranges apples] 0 {equal, ne}
+is [string equal oranges orANGes] 0 {equal, ne by case only}
+is [string equal banana banana] 1 {sting equal, equal}
+is [string equal -length 5 ferry ferrous] 0 {equal, length, ne}
+is [string equal -length 4 ferry ferrous] 1 {equal, length, eq}
+is [string equal -length -1 banana bananarum] 0 {equal, neg length, ne}
+is [string equal -length -1 banana banana] 1 {equal, neg length, eq}
+
+# [string tolower]
+eval_is {string tolower} \
+  {wrong # args: should be "string tolower string ?first? ?last?"} \
+  {tolower, too few args}
+
+is [string tolower "AabcD ABC"] {aabcd abc} {tolower, simple}
+is [string tolower PARROT end-4 4] ParroT {tolower, both limits}
+is [string tolower PARROT 4] PARRoT {tolower, single index}
+is [string tolower PARROT 40] PARROT {tolower, single index, out of range}
+
+# [string toupper]
+
+eval_is {string toupper} \
+  {wrong # args: should be "string toupper string ?first? ?last?"} \
+  {toupper, too few args}
+
+is [string toupper "AabcD ABC"] {AABCD ABC} {toupper}
+is [string toupper parrot end-4 4] {pARROt} {toupper, both limits}
+is [string toupper parrot 4] parrOt {toupper, single index}
+is [string tolower parrot 40] parrot {toupper, single index out of range}
+
+# [string totitle]
+
+is [string totitle "AabcD ABC"] {Aabcd abc} {totitle}
+is [string totitle PARROT end-4 4] PArroT {totitle, both limits}
+is [string totitle parrot 4] parrOt {totitle, single index}
+is [string totitle PARROT 40] PARROT {totitle, single index, out of string}
+
+eval_is {string totitle} \
+  {wrong # args: should be "string totitle string ?first? ?last?"} \
+  {too few args}
+
+# [string replace]
+is [string replace parrcamelot 4 8] parrot {replace}
+is [string replace junkparrot -10 3] parrot {replace, negative index}
+is [string replace parrotjunk 6 20] parrot {replace, index > string len}
+is [string replace perl 1 3 arrot] parrot {replace with something}
+is [string replace perl 3 1 arrot] perl {replace, swapped indices}
+
+eval_is {string replace} \
+  {wrong # args: should be "string replace string first last ?string?"} \
+  {replace, too few args}
+
+
+# [string trimleft]
+is [string trimleft "  \nfoo"] foo {trimleft, default}
+is [string trimleft "abcfaoo" abc] faoo {trimleft, charset}
+is [string trimleft "abcfaoo" z] abcfaoo {trimleft, charset, nomatch}
+
+eval_is {string trimleft} \
+  {wrong # args: should be "string trimleft string ?chars?"} \
+  {trimleft, too few args}
+
+# [string trimright]
+is [string trimright " foo  "] { foo} {trimright, default}
+is [string trimright "abcfaoo" ao] abcf {trimright, charset}
+is [string trimright "abcfaoo" z] abcfaoo {trimright, charset, no match}
+
+eval_is {string trimright} \
+  {wrong # args: should be "string trimright string ?chars?"} \
+  {trimleft, too few args}
+
+# [string trim]
+is [string trim " \n foo  "] foo {trim, default}
+is [string trim "ooabacfaoo" ao] bacf {trim, charset}
+is [string trim "abcfaoo" z] abcfaoo {trim, charset, nomatch}
+
+eval_is {string trim} \
+  {wrong # args: should be "string trim string ?chars?"} \
+  {trim, too few args}
+
+# [string compare]
+is [string compare aaa aaa] 0 {compare, same}
+is [string compare aaa aab] -1 {compare, "lower" string}
+is [string compare aab aaa] 1 {compare, "higher" string}
+is [string compare aaaa aaa] 1 {compare, bigger string}
+is [string compare aaa aaaa] -1 {compare, smaller string}
+is [string compare -length 3 aaa aaaa] 0 {compare, different sizes, length}
+is [string compare -length 4 aaabc aaabb] 0 {compare, diff strings, length}
+is [string compare -nocase AAA aaa] 0 {compare, -nocase, eq}
+is [string compare -nocase aaa AAB] -1 {compare, "lower", -nocase}
+is [string compare -nocase AAB aaa] 1 {compare, "higher", -nocase}
+is [string compare -nocase AAAA aaa] 1 {compare, bigger string, -nocase}
+is [string compare -nocase AAA aaaa] -1 {compare, smaller, -nocase}
+is [string compare -length 3 -nocase aaa AAAA] 0 \
+  {compare, different lengths, -len -nocase}
+is [string compare -length 4 -nocase AAABC aaabb] 0 \
+  {compare, different strings, len specified, different cases}
+is [string compare AAAA aaaa] -1 {compare, same string, different case}
+is [string compare -length -10 aaabc aaabb] 1 {compare, negative length}
+
+eval_is {string compare} \
+  {wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"} \
+  {compare, no args}
+
+eval_is {string compare -length aaa bbb} \
+  {wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"} \
+  {compare, bad option to length}
+
+eval_is {string compare -length 4 -length 8 aaa bbb} \
+  {wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"} \
+  {compare multiple lengths}
+
+eval_is {string compare -length four aaabc aaabb} \
+  {expected integer but got "four"} \
+  {bad length arg}
+
+eval_is {string compare -length 4.2 aaabc aaabb} \
+  {expected integer but got "4.2"} \
+  {compare, float length}
+
+# [string wordend]
+is  [string wordend "foo bar baz" 0] 3 {wordend, from beginning} \
+  {TODO {not implemented}}
+
+is [string wordend "foo bar99_baz" 5] 13 {wordend, numerics and underscores} \
+  {TODO {not implemented}}
+
+is [string wordend "foo bar" 3] 4 {wordend, space} \
+  {TODO {not implemented}}
+
+eval_is {string wordend} \
+  {wrong # args: should be "string wordend string index"} \
+  {wordend too few args} \
+  {TODO {not implemented}}
 
