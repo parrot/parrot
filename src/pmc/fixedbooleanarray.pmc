@@ -31,23 +31,31 @@ The C<FixedBooleanArray PMC> is extended by the C<ResizableBooleanArray PMC>.
 
 static void
 booleanarray_init(Interp *interpreter, PMC *self) {
+    PMC_int_val(self) = 0;
     PMC_int_val2(self) = 0;
     PMC_data(self) = NULL;
 }
 
 static void
 booleanarray_clone(Interp *interpreter, PMC *self, PMC *dest) {
+    PMC_int_val(dest)  = PMC_int_val(self);
+    PMC_int_val2(dest) = PMC_int_val2(self);
     if (PMC_data(self)) {
-        Parrot_UInt1 *sd = PMC_data(self);
-        PMC_int_val2(dest) = PMC_int_val2(self);
         PMC_data(dest) = malloc(PMC_int_val2(self) / BITS_PER_CHAR);
         mem_sys_memcopy(PMC_data(dest), PMC_data(self), PMC_int_val2(self) / BITS_PER_CHAR);
     }
+    else
+        PMC_data(dest) = NULL;
 }
 
 static void
 booleanarray_clear(Interp *interpreter, PMC *self) {
+    PMC_int_val(self) = 0;
     PMC_int_val2(self) = 0;
+    if (PMC_data(self)) {
+        mem_sys_free(PMC_data(self));
+        PMC_data(self) = NULL;
+    }
 }
 
 pmclass FixedBooleanArray need_ext does array {
@@ -69,7 +77,6 @@ Initializes the array.
 */
 
     void init () {
-        PMC_int_val(SELF) = 0;       /* size of array */
         booleanarray_init(INTERP, SELF);
         PObj_active_destroy_SET(SELF);
     }
@@ -102,10 +109,6 @@ Destroys the array.
 
     void destroy () {
         booleanarray_clear(INTERP, SELF);
-        if (PMC_data(SELF))
-            mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
-        PMC_int_val(SELF) = 0;
     }
 
 /*
@@ -120,8 +123,6 @@ Creates and returns a copy of the array.
 
     PMC* clone () {
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_int_val(dest) = PMC_int_val(SELF);
-
         booleanarray_clone(INTERP, SELF, dest);
         PObj_active_destroy_SET(dest);
         return dest;
