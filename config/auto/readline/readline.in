@@ -6,11 +6,21 @@
   #include <readline/history.h>
 */
 
+/* Since we are not #include:ing <readline/readline.h> we cannot know
+ * the typedefs or prototypes of readline.  Let's boldly make stuff up
+ * and even lie for the sake of this test. */
+
 extern char* readline(const char*);
+extern void* rl_get_keymap(void); 
 
 int main(int argc, char *argv[])
 {
-
+    /* Cannot use readline() since we will actually run this
+     * and readline() would hang waiting for input.
+     * Instead, we use rl_get_keymap(). */
+#if 0
     char * r = readline ("hello polly>");
-    return 0;
+#endif
+    void* keymap = rl_get_keymap();
+    puts("1");
 }
