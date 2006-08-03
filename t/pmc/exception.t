@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 
 =head1 NAME
 
@@ -737,4 +737,35 @@ CODE
 /^main
 at_exit, flag = 1
 No exception handler/
+OUTPUT
+
+# creating the Closure converts RetContinuation to Continuations
+# which dont trigger acction handlers
+pir_output_is(<<'CODE', <<'OUTPUT', "pushaction as closure", todo => 'Continuation');
+.sub main :main
+    .local pmc a
+    .lex 'a', a
+    a = new .Integer
+    a = 42
+    print "main\n"
+    .const .Sub at_exit = "exit_handler"
+    pushaction at_exit
+    .return()
+.end
+
+.sub exit_handler :outer(main)
+    .param int flag
+    print_item "at_exit, flag ="
+    print_item flag
+    print_newline
+    .local pmc a
+    a = find_lex 'a'
+    print_item 'a ='
+    print_item a
+    print_newline
+.end
+CODE
+main
+at_exit, flag = 0
+a = 42
 OUTPUT
