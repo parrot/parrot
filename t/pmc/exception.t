@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 
 =head1 NAME
 
@@ -767,5 +767,31 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pushaction as closure", todo => 'Continuati
 CODE
 main
 at_exit, flag = 0
+a = 42
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "exit_handler via exit exception");
+.sub main :main
+    .local pmc a
+    .lex 'a', a
+    a = new .Integer
+    a = 42
+    push_eh handler
+    exit 0
+handler:
+    .return exit_handler()
+.end
+
+.sub exit_handler :outer(main)
+    print_item "at_exit"
+    print_newline
+    .local pmc a
+    a = find_lex 'a'
+    print_item 'a ='
+    print_item a
+    print_newline
+.end
+CODE
+at_exit
 a = 42
 OUTPUT
