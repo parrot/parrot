@@ -390,8 +390,8 @@ my @steps = qw(
     init::headers
     inter::progs
     inter::make
-    inter::lex
-    inter::yacc
+);
+my @steps2 = qw(
     auto::gcc
     auto::msvc
     init::optimize
@@ -447,6 +447,9 @@ my $conf = Parrot::Configure->new;
     $Parrot::Configure::Step::conf = $conf;
 }
 $conf->add_steps(@steps);
+$conf->add_step('inter::lex', require => '2.5.33');
+$conf->add_step('inter::yacc', require => '2.1');
+$conf->add_steps(@steps2);
 $conf->options->set(%args);
 # Run the actual steps
 $conf->runsteps or exit(1);

@@ -26,11 +26,9 @@ $description = "Determining whether $util is installed";
 $prompt      = "Do you have a lexical analyzer generator like flex or lex?";
 @args        = qw( lex ask maintainer );
 
-my ($flex_major, $flex_minor, $flex_patch) = (2, 5, 33);
-
 sub runstep
 {
-    my ($self, $conf) = @_;
+    my ($self, $conf, %p) = @_;
 
     my $verbose = $conf->options->get('verbose');
 
@@ -65,6 +63,8 @@ sub runstep
         return;
     }
 
+    # XXX should --ask be handled like the other user defines or checked for
+    # version requirements?
     if ($conf->options->get('ask')) {
         $prog = prompt($prompt, $prog ? $prog : $conf->data->get($util));
     }
@@ -83,15 +83,31 @@ sub runstep
     # if '--version' returns a string assume that this is flex.
     # flex calls it self by $0 so it will claim to be lex if invoked as `lex`
     if ($stdout =~ /f?lex .*? (\d+) \. (\d+) \. (\d+)/x) {
-        unless (($1 >= $flex_major)
-            and ($2 >= $flex_minor)
-            and ($3 >= $flex_patch)) {
-            $self->set_result("found flex version $1.$2.$3 but at least $flex_major.$flex_minor.$flex_patch is required");
-            return;
+        my ($prog_major, $prog_minor, $prog_patch) = ($1, $2, $3);
+        my $prog_version = "$1.$2.$3";
+
+        # is there a version requirement?
+        if (exists $p{require}) {
+            my ($rmajor, $rminor, $rpatch) =
+                $p{require} =~ /(\d+) \. (\d+) \. (\d+)/x;
+            unless ((defined $rmajor)
+                and (defined $rminor)
+                and (defined $rpatch)) {
+                $self->set_result("could not understand version requirement");
+                return;
+            }
+
+            unless (($prog_major >= $rmajor)
+                and ($prog_minor >= $rminor)
+                and ($prog_patch >= $rpatch)) {
+                $self->set_result("found flex version $prog_version"
+                        . " but at least $rmajor.$rminor.$rpatch is required");
+                return;
+            }
         }
 
-        $conf->data->set(flex_version => "$1.$2.$3");
-        $self->set_result("flex $1.$2.$3");
+        $conf->data->set(prog_version => $prog_version);
+        $self->set_result("flex $prog_version");
         $conf->data->set($util => $prog);
     } else {
         $self->set_result(
