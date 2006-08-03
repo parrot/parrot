@@ -993,9 +993,6 @@ PIO_puts(theINTERP, PMC *pmc, const char *s)
     return PIO_write(interpreter, pmc, s, strlen(s));
 }
 
-/* XXX Should be in an external header file */
-void *Parrot_utf8_encode(void *ptr, UINTVAL c);
-
 /*
 
 =item C<INTVAL
