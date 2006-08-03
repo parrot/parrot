@@ -286,6 +286,8 @@ about OOP in Parrot.
   shamelessly borrows.
 * Thanks to the Parrot people for feedback
 
+=back
+
 =head2 Author
 
 Jonathan Scott Duff
