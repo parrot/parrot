@@ -39,6 +39,8 @@ semicolon_list
 
 statement
   : expression
+    |
+    STRING
   ;
 
 expression
@@ -61,6 +63,7 @@ NUMBER
     '.' INTEGER
   ;
 
+fragment
 INTEGER
   : ('0'..'9' | 'A' .. 'F' )+
   ;
@@ -88,18 +91,21 @@ ML_COMMENT
 
 // ignore whitespace
 WS
-  : (   ' '
-      | '\t'
-      | '\r'
-      | '\n'
-    )+
+  : ( ' ' | '\t' | '\r' | '\n')+
     {
       channel = 99;       // send into nirwana 
     }
   ;    
 
 // Windows and Unix style newlines
+fragment
 NEWLINE
   : ('\r')? '\n'+
+  ;
+
+
+// String literals are everything in double quotes, no escaping
+STRING
+  : '\"' ( ~'\"' )*  '\"'
   ;
 

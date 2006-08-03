@@ -159,7 +159,40 @@ expression[String reg_mother]
         + "  # leaving 'expression'                                          \n"
       );
     }
+    |
+    {
+      String mother_for_string = $expression.reg_mother;
+    }
+    string[ mother_for_string ]
   ;
+
+string [ String reg_mother ]
+  : STRING
+    {
+      // TODO: strip String
+      System.out.print(     
+          "                                                                \n"
+        + "# entering 'string'                                             \n"
+        + "# " + $STRING.text + "                                          \n"
+        + "    reg_expression_stmt = new 'PAST::Stmt'                      \n"
+        + "      reg_expression_topexp = new 'PAST::Exp'                   \n"
+        + "        reg_expression_op = new 'PAST::Op'                      \n"
+        + "        reg_expression_op.'op'( 'print' )                       \n"
+        + "          reg_expression_exp = new 'PAST::Exp'                  \n"
+        + "            reg_temp = new 'PAST::Val'                          \n"
+        + "            reg_temp.value( " + $STRING.text + " )              \n"
+        + "            reg_temp.valtype( 'strqq' )                           \n"
+        + "          reg_expression_exp.'add_child'( reg_temp )            \n"
+        + "          null reg_temp                                         \n"
+        + "        reg_expression_op.'add_child'( reg_expression_exp )     \n"
+        + "      reg_expression_topexp.'add_child'( reg_expression_op )    \n"
+        + "    reg_expression_stmt.'add_child'( reg_expression_topexp )    \n"
+        + "  " + $string.reg_mother + ".'add_child'( reg_expression_stmt ) \n"
+        + "# leaving 'string'                                              \n"
+      );
+    }
+  ;
+  
 
 
 integer[ String reg_mother ]

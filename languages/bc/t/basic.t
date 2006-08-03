@@ -75,7 +75,7 @@ my @tests = (
        [ "/* line1 \n line2 \n line 3 */   -3  ", -3, 'multi line comment', with_past => 1, with_antlr3 => 0 ],
 
        # Strings 
-       [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_past => 0 ],
+       [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_past => 0, with_antlr3 => 1 ],
 
        # empty lines
        [ "\n-1", '-1', 'single newline', with_past => 1, ],
