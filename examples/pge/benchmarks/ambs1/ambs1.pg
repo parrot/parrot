@@ -6,9 +6,10 @@ rule statement {
     | print <expression> ;              {{ $I0 = match['expression']
                                           print $I0
                                           print "\n" }}
-    | <var> = <expression> ;            {{ $I0 = match['expression']
+    | <var> = <expression> ;            {{ 
+                                          $P0 = match['expression']
                                           $S0 = match['var']
-                                          set_global $S0, $I0 }}
+                                          set_global $S0, $P0 }}
 }
 
 rule expression { <value> [ \+ <value>  {{ $I0 = match['value';0]
@@ -26,8 +27,8 @@ rule value { <number>   {{ $I0 = match['number']
                            .return ($I0) }}
             | <var> {{ $S0 = match['var']
                        $P0 = get_global $S0
-                       $I0 = $P0
-                       .return($I0) }}
+                         $I0 = $P0
+                       .return($I0) }} 
 }
 
 token number { \d+ }
