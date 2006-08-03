@@ -137,6 +137,26 @@ have to have it create the F<.h> files.
 
 =head2 Improve low-level code quality
 
+=over 4
+
+=item * Fix symbol table namespace pollution
+
+Extern functions and variables must have names that begin with C<Parrot> .
+
+=item * Fix non-symbol-table namespace pollution in public headers
+
+Public headers are the ones in C<include/parrot> directory.  These are
+included by embedders and extenders.  They must not declare or define any
+symbol that isn't clearly Parrot-specific.  Prefixing symbols with C<Parrot>
+or C<PARROT> is the easiest & safest way, but it can lead to a lot of
+verbosity, so Chip is willing to entertain exceptions or new conventions.
+
+It's OK for public headers might have non-public parts protected with
+C<#ifdef PARROT_IN_CORE>.  Those non-public parts might #define shorter
+versions of the public symbols, e.g. C<#define foo Parrot_foo>.
+
+=back
+
 =head2 Creating automated code checking tools
 
 =head2 Documenting function behavior and structure members
