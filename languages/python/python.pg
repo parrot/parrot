@@ -1,0 +1,260 @@
+# Grammar for Python
+
+# Note:  Changing the grammar specified in this file will most likely
+#        require corresponding changes in the parser module
+#        (../Modules/parsermodule.c).  If you can't make the changes to
+#        that module yourself, please co-ordinate the required changes
+#        with someone who can; ask around on python-dev for help.  Fred
+#        Drake <fdrake@acm.org> will probably be listening there.
+
+# NOTE WELL: You should also follow all the steps listed in PEP 306,
+# "How to Change Python's Grammar"
+
+# Commands for Kees Blom's railroad program
+#diagram:token NAME
+#diagram:token NUMBER
+#diagram:token STRING
+#diagram:token NEWLINE
+#diagram:token ENDMARKER
+#diagram:token INDENT
+#diagram:output\input python.bla
+#diagram:token DEDENT
+#diagram:output\textwidth 20.04cm\oddsidemargin  0.0cm\evensidemargin 0.0cm
+#diagram:rules
+
+# Start symbols for the grammar:
+#	single_input is a single interactive statement;
+#	file_input is a module or sequence of commands read from an input file;
+#	eval_input is the input for the eval() and input() functions.
+# NB: compound_stmt in single_input is followed by extra NEWLINE!
+
+grammar Python;
+
+## start symbols
+rule single_input { <NEWLINE> | <simple_stmt> | <compound_stmt> <NEWLINE> }
+rule file_input { [<NEWLINE> | <stmt>]* <ENDMARKER> }
+rule eval_input { <testlist> <NEWLINE>* <ENDMARKER> }
+
+## function definitions
+rule funcdef { [<decorator>+] def <NAME> <parameters> \: <suite> }
+rule decorator { \@ <dotted_name> [ \( [arglist] \) ]? <NEWLINE> }
+rule parameters { \( <varargslist>? \) }
+rule varargslist { [
+  [ <fpdef> [\= <test>]? \,]* [\* <NAME> [\, \*\* <NAME>]?  | \*\* <NAME>] 
+  | <fpdef> [\= <test>]? [\, <fpdef> [\= <test> ]? ]* [\,]?]
+}
+rule fpdef { <NAME> | \( <fplist> \) }
+rule fplist { <fpdef> [\, <fpdef>]* [\,]? }
+
+## statements
+rule stmt { <simple_stmt> | <compound_stmt> }
+rule simple_stmt { <small_stmt> [\; <small_stmt>]* [\;]? <NEWLINE> }
+rule small_stmt { 
+  <expr_stmt> 
+  | <print_stmt>
+  | <del_stmt> 
+  | <pass_stmt> 
+  | <flow_stmt>
+  | <import_stmt> 
+  | <global_stmt> 
+  | <exec_stmt> 
+  | <assert_stmt> 
+}
+
+rule expr_stmt { 
+  <testlist> 
+    [ <augassign> [ <yield_expr> | <testlist> ] 
+    | [\= [<yield_expr> | <testlist> ] ]*]
+}
+## TODO convert to optok
+#rule augassign { <'+='> | <'-='> | <'*='> | <'/='> | '%=' | '&=' | '|=' | '^=' |
+#            '<<=' | '>>=' | '**=' | '//=')
+# For normal assignments, additional restrictions enforced by the interpreter
+rule print_stmt { print [ [ <test> [\, <test>]* [\,]? ]?
+                 | <'>>'> <test> [ [\, <test>]+ [\,]? ]? ] }
+rule del_stmt { del <exprlist> }
+rule pass_stmt { <?pass> }
+rule flow_stmt { <break_stmt> | <continue_stmt> | <return_stmt> | <raise_stmt> | <yield_stmt> }
+rule break_stmt { break }
+rule continue_stmt { continue }
+rule return_stmt { return <testlist>? }
+rule yield_stmt { <yield_expr> }
+rule raise_stmt { raise [<test> [\, <test>]**{0..2} ]? }
+rule import_stmt {
+  import <dotted_as_names> 
+  | from [<'.'>* <dotted_name> | <'.'>+] import
+    [\* 
+    | \( <import_as_names> \) 
+    | <import_as_names> ]
+}
+          
+rule import_as_name { <NAME> [ [as | <NAME>] <NAME>]? }
+rule dotted_as_name { <dotted_name> [[as | <NAME>] <NAME>]? }
+rule import_as_names { <import_as_name> [\, <import_as_name>]* [\,]? }
+rule dotted_as_names { <dotted_as_name> [\, <dotted_as_name>]* }
+rule dotted_name { <NAME> [\. <NAME>]* }
+rule global_stmt { global <NAME> [\, <NAME> ]* }
+rule exec_stmt { exec <expr> [in <test> [\, <test>]?]? }
+rule assert_stmt { assert <test> [\, <test>]? }
+
+rule compound_stmt { 
+<if_stmt> 
+| <while_stmt> 
+| <for_stmt> 
+| <try_stmt> 
+| <with_stmt> 
+| <funcdef> 
+| <classdef>
+}
+
+rule if_stmt { if <test> \: <suite> [elif <test> \: <suite>]* <else_clause>? }
+rule while_stmt { while <test> \: <suite> <else_clause>? }
+rule for_stmt { for <exprlist> in <testlist> \: <suite> <else_clause>? }
+rule try_stmt { 
+  try \: <suite>
+   [(<except_clause> \: <suite>)+ <else_clause>? <finally_clause>?
+   | <finally_clause> ] }
+rule finally_clause { finally \: <suite> }
+rule else_clause { else \: <suite> }
+rule with_stmt { with <test> [ <with_var> ]? \: <suite>? }
+rule with_var { [as | <NAME>] <expr> }
+# NB compile.c makes sure that the default except clause is last
+rule except_clause { except [<test> [\, <test>]? ]? }
+rule suite { <simple_stmt> | <NEWLINE INDENT> <stmt>+ <DEDENT> }
+
+
+# Backward compatibility cruft to support:
+# [ x for x in lambda: True, lambda: False if x() ]
+# even while also allowing:
+# lambda x: 5 if x else 2
+# (But not a mix of the two)
+rule testlist_safe { <old_test> [[\, <old_test>]+ [\,]?]? }
+rule old_test { <or_test> | <old_lambdef> }
+rule old_lambdef { lambda <varargslist>? \: <old_test> }
+
+rule test { <or_test> [if <or_test> else <test>]? | <lambdef> }
+proto 'infix:or' is precedence() { ... } #or_test: and_test ('or' and_test)*
+proto 'infix:and' is precedence() { ... } #and_test: not_test ('and' not_test)*
+proto 'prefix:not' is precedence() { ... } #not_test: 'not' not_test | comparison
+proto 'infix:<' is precedence() { ... } #comparison: expr (comp_op expr)*
+proto 'infix:>' is equiv() { ... }
+proto 'infix:==' is equiv() { ... }
+proto 'infix:>=' is equiv() { ... }
+proto 'infix:<=' is equiv() { ... }
+proto 'infix:<>' is equiv() { ... }
+proto 'infix:!=' is equiv() { ... }
+proto 'infix:in' is equiv() { ... }
+proto 'infix:not in' is equiv() { ... } #TODO whitespace?
+proto 'infix:is' is equiv() { ... } 
+proto 'infix:is not' is equiv() { ... } #TODO whitespace?
+#comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
+proto 'infix:|' is precedence() { ... } #expr: xor_expr ('|' xor_expr)*
+proto 'infix:^' is precedence() { ... } #xor_expr: and_expr ('^' and_expr)*
+proto 'infix:&' is precedence() { ... } #and_expr: shift_expr ('&' shift_expr)*
+proto 'infix:<<' is precedence() { ... } #shift_expr: arith_expr (('<<'|'>>') arith_expr)*
+proto 'infix:>>' is equiv() { ... }
+proto 'infix:+' is precedence() { ... } #arith_expr: term (('+'|'-') term)*
+proto 'infix:-' is equiv() { ... }
+proto 'infix:*' is precedence() { ... } #term: factor (('*'|'/'|'%'|'//') factor)*
+proto 'infix:/' is equiv() { ... }
+proto 'infix:%' is equiv() { ... }
+proto 'infix://' is equiv() { ... }
+proto 'prefix:+' is precedence() { ... } #factor: ('+'|'-'|'~') factor | power
+proto 'prefix:-' is equiv() { ... }
+proto 'prefix:~' is equiv() { ... }
+proto 'infix:**' is precedence() { ... } #power: atom trailer* ['**' factor]
+
+rule atom { 
+  \( [<yield_expr>|<testlist_gexp>]? \) 
+  | \[ <listmaker>? \]
+  | \{ <dictmaker>? \} 
+  | \` <testlist1> \` 
+  | <NAME>
+  | <NUMBER>
+  | <STRING>+
+}
+
+rule listmaker { <test> [ <list_for> | [\, <test>]* [\,]? ] }
+rule testlist_gexp { <test> [ <gen_for> | [\, <test>]* [\,]? ] }
+rule lambdef { lambda <varargslist>? \: <test> }
+rule trailer { 
+  \( <arglist>? \) 
+  | \[ <subscriptlist>? \] 
+  | \. <NAME> 
+}
+rule subscriptlist { <subscript> [\, < subscript>]* [\,]? }
+rule subscript { 
+  [\.]**{3}
+  | <test> 
+  | <test>? \: <test>? [\: <test> ]?
+}
+rule exprlist { <expr> [\, <expr>]* [\,]? }
+rule testlist { <test> [\, <test>]* [\,] }
+rule dictmaker { <test> \: <test> [\, <test> \: <test>]* [\,]? }
+
+rule classdef { class <NAME> [\( <testlist>? \)]? \: <suite> }
+
+rule arglist { 
+  [<argument> \,]*
+    [<argument> [\,] 
+    | \* <test> [\, \*\* <test>]? 
+    | \*\* <test>] 
+}
+rule argument { <test> <gen_for> | <test> \= <test> }  # Really [keyword '='] test
+
+rule list_iter { <list_for> | <list_if> }
+rule list_for { for <exprlist> in <testlist_safe> <list_iter>? }
+rule list_if { if <old_test> <list_iter>? }
+
+rule gen_iter { <gen_for> | <gen_if> }
+rule gen_for { for <exprlist> in <or_test> <gen_iter>? }
+rule gen_if { if <old_test> <gen_iter>? }
+
+rule testlist1 { <test> [\, <test>]* }
+
+# not used in grammar, but may appear in "node" passed from Parser to Compiler
+rule encoding_decl { <NAME> }
+
+rule yield_expr { yield <testlist>? }
+
+#TODO tokens are more comples than this
+token NAME { <identifier> }
+token NUMBER { <integer> | <long_integer> | <float_number> | <imag_number> }
+token STRING { 
+  <string_prefix>?
+  [ <PGE::Text::Bracketed: '> 
+  | <PGE::Text::Bracketed: "> 
+  | <PGE::Text::Bracketed: """>
+  | <PGE::Text::Bracketed: '''>
+  ]
+ }
+token stringprefix { <'r'> | <'u'> | <'ur'> | <'R'> | <'U'> | <'UR'> | <'Ur'> | <'uR'> }
+#shortstring ::= "'" shortstringitem* "'" | '"' shortstringitem* '"'
+#longstring ::= "'''" longstringitem* "'''" | '"""' longstringitem* '"""'
+#shortstringitem ::= shortstringchar | escapeseq
+#longstringitem ::= longstringchar | escapeseq
+#shortstringchar ::= <any ASCII character except "\" or newline or the quote>
+#longstringchar ::= <any ASCII character except "\">
+#escapeseq ::= "\" <any ASCII character>
+
+token NEWLINE { \r\n | \n\r | \n }
+token ENDMARKER { <EOF> }
+token INDENT { \t }
+#token DEDENT { }
+rule identifier { [<alpha>|_] [<alpha>|<digit>|_]* }
+#token letter { <lowercase> | <uppercase? }
+#token lowercase { <[a..z]> }
+#token uppercase { <[A..Z]> }
+#token digit { <[0..9] }
+
+token integer { <decimal_integer> | <oct_integer> | <hex_integer> }
+token long_integer { <integer> <[lL]> }
+token decimal_integer { <[1..9]> \d* | 0 }
+token oct_integer { 0 <[0..7]> }
+token hex_integer { 0 <[(xX]> <[0..9a..fA..F]>+ }
+token float_number { <point_float> | <exponent_float> }
+token point_float { \d+ \. [\d+]? }
+token exponent_float { [\d+ | <point_float>] <[eE]> <[+\-]> \d+ }
+token imag_number { [<float_number> | \d+] <[jJ]> }
+
+
