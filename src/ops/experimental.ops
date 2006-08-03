@@ -135,7 +135,7 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
 
 =cut
 
-=item B<splice>(in PMC, in PMC, in INT, in INT)
+=item B<splice>(invar PMC, invar PMC, in INT, in INT)
 
 Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
 The values are put into the aggregate by a shallow copy. If the values would
@@ -143,53 +143,53 @@ be reused, they have to be B<clone>d.
 
 =cut
 
-inline op splice(in PMC, in PMC, in INT, in INT) {
+inline op splice(invar PMC, invar PMC, in INT, in INT) {
     $1->vtable->splice(interpreter, $1, $2, $3, $4);
     goto NEXT();
 }
 
 
-=item B<slice>(out PMC, in PMC, in KEY)
+=item B<slice>(out PMC, invar PMC, in KEY)
 
 Return a new Iterator PMC $1 for aggregate $2 and Slice PMC $3.
 
-=item B<slice>(out PMC, in PMC, in KEY, inconst INT)
+=item B<slice>(out PMC, invar PMC, in KEY, inconst INT)
 
 Return a new list PMC $1 for aggregate $2 and Slice PMC $3.
 
 This is a Python opcode. Range is i <= k < j. $4 must be 1.
 May change and move to python.ops.
 
-=item B<iter>(out PMC, in PMC)
+=item B<iter>(out PMC, invar PMC)
 
 Return a new Iterator PMC $1 for aggregate $2.
 
 =cut
 
-inline op slice (out PMC, in PMC, in KEY) :base_core {
+inline op slice (out PMC, invar PMC, in KEY) :base_core {
     $1 = $2->vtable->slice(interpreter, $2, $3, 0);
     goto NEXT();
 }
 
-inline op slice (out PMC, in PMC, in KEY, inconst INT) :python {
+inline op slice (out PMC, invar PMC, in KEY, inconst INT) :python {
     $1 = $2->vtable->slice(interpreter, $2, $3, $4);
     goto NEXT();
 }
 
-inline op iter (out PMC, in PMC) :base_core {
+inline op iter (out PMC, invar PMC) :base_core {
     $1 = $2->vtable->get_iter(interpreter, $2);
     goto NEXT();
 }
 
 ########################################
 
-=item B<morph>(in PMC, in INT)
+=item B<morph>(invar PMC, in INT)
 
 Have $1 turn itself into a PMC of type $2.
 
 =cut
 
-inline op morph(in PMC, in INT) {
+inline op morph(invar PMC, in INT) {
   VTABLE_morph(interpreter, $1, $2);
   goto NEXT();
 }
@@ -209,14 +209,14 @@ inline op exec(in STR) {
 }
 
 
-=item B<classname>(out PMC, in PMC)
+=item B<classname>(out PMC, invar PMC)
 
 Get the class name for the class in $2 and put it in $1. Note that $1 will be
 a Key PMC that you can use with "new", for example.
 
 =cut
 
-op classname(out PMC, in PMC) :object_base {
+op classname(out PMC, invar PMC) :object_base {
     PMC *ns = Parrot_NameSpace_name(interpreter, 
                                     VTABLE_namespace(interpreter, $2));
     if (PMC_IS_NULL(ns) || VTABLE_elements(interpreter, ns) < 2)
@@ -316,83 +316,6 @@ op getclass(out PMC, in INT) {
     goto NEXT();
 }
 
-=item B<new>(out PMC, in PMC)
-
-WHO KNOWS WHAT THIS IS FOR?
-TELL CHIP AND PARROT-PORTERS.
-
-=cut
-
-inline op new(out PMC, in PMC) :object_classes {
-    INTVAL type;
-    switch ($2->vtable->base_type)
-    {
-        case enum_class_String:
-	        type = pmc_type(interpreter, PMC_str_val($2));
-            if (type <= 0)
-                real_exception(interpreter, NULL, NO_CLASS,
-                    "Class '%Ss' not found", PMC_str_val($2));
-            $1 = pmc_new(interpreter, type);
-            break;
-        case enum_class_Key:
-            type = pmc_type_p(interpreter, $2);
-            if (type <= 0)
-                real_exception(interpreter, NULL, NO_CLASS,
-                    "Class '%Ss' not found", readable_name(interpreter, $2));
-            $1 = pmc_new(interpreter, type);
-            break;
-        default:
-            real_exception(interpreter, NULL, NO_CLASS,
-                "Can only use a Key or String PMC with new");
-    }
-    goto NEXT();
-}
-
-=item B<new>(out PMC, in INT, inconst KEY)
-
-=item B<new>(out PMC, inconst STR, inconst KEY)
-
-=item B<new>(out PMC, inconst KEY, inconst KEY)
-
-Create a new PMC of class $2; use a key constant to initialize it.  This
-requires a lot of code duplication, so it's marked as EXPERIMENTAL pending
-possible destruction.
-
-=cut
-
-op new(out PMC, in INT, inconst KEY) {
-  if ($2 <= 0 || $2 >= interpreter->n_vtable_max) {
-    real_exception(interpreter, 0, NO_CLASS,
-		   "Illegal PMC enum (%d) in new", (int)$2);
-  }
-  $1 = pmc_new_init(interpreter, $2, $3);
-  goto NEXT();
-}
-
-op new(out PMC, inconst STR, inconst KEY) {
-    STRING *class = $2;
-    INTVAL type = pmc_type(interpreter, class);
-    if (!type) {
-        Parrot_autoload_class(interpreter, class);
-        type = pmc_type(interpreter, class);
-    }
-    if (type <= 0)
-        real_exception(interpreter, NULL, NO_CLASS,
-            "Class '%Ss' not found", class);
-    $1 = pmc_new_init(interpreter, type, $3);
-    goto NEXT();
-}
-
-op new(out PMC, inconst KEY, inconst KEY) {
-    PMC *class = $2;
-    INTVAL type = pmc_type_p(interpreter, class);
-    if (type <= 0)
-        real_exception(interpreter, NULL, NO_CLASS,
-            "Class '%Ss' not found", readable_name(interpreter, class));
-    $1 = pmc_new_init(interpreter, type, $3);
-    goto NEXT();
-}
-
 =item B<new>(out PMC, in INT, in STR)
 
 Create a new PMC of the type $2 according to the PMCs string representation
@@ -464,7 +387,7 @@ op instantiate(out PMC) {
   goto NEXT();
 }
 
-=item B<pmcinfo>(out INT, in PMC, inconst INT)
+=item B<pmcinfo>(out INT, invar PMC, inconst INT)
 
 Extract some information about PMC $2 and store it in $1.
 Possible values for $3 are:
@@ -479,7 +402,7 @@ B<TODO> move/officalize this opcode at next op cleanup.
 
 =cut
 
-op pmcinfo(out INT, in PMC, inconst INT) {
+op pmcinfo(out INT, invar PMC, inconst INT) {
   switch ($3) {
     case PMCINFO_FLAGS:    $1 = PObj_get_FLAGS($2); break;
   }
@@ -488,31 +411,30 @@ op pmcinfo(out INT, in PMC, inconst INT) {
 
 ########################################
 
-=item B<find_type>(out INT, in PMC)
+=item B<new>(out PMC, invar PMC)
 
-Find the PMC type or Parrot datatype by PMC, which may be a string or an
-array.
+=cut
 
-=cut'
-
-op find_type(out INT, in PMC) {
-    PMC *pmc_key = $2;
-    INTVAL n;
-
-    if (pmc_key->vtable->base_type == enum_class_String)
-        $1 = pmc_type(interpreter, VTABLE_get_string(interpreter, pmc_key));
-    else if ((n = VTABLE_elements(interpreter, pmc_key)) <= 0)
-        $1 = 0;
-    else {
-	PMC *class = interpreter->class_hash;
-	INTVAL i;
-	for (i = 0; i < n; ++i) {
-            STRING *part = VTABLE_get_string_keyed_int(interpreter, pmc_key, i);
-	    class = VTABLE_get_pmc_keyed_str(interpreter, class, part);
-	    if (PMC_IS_NULL(class))
-		break;
-	}
-	$1 = PMC_IS_NULL(class) ? 0 : PMC_int_val(class);
+inline op new(out PMC, invar PMC) :object_classes {
+    INTVAL type;
+    switch ($2->vtable->base_type) {
+        case enum_class_String:
+	        type = pmc_type(interpreter, PMC_str_val($2));
+            if (type <= 0)
+                real_exception(interpreter, NULL, NO_CLASS,
+                    "Class '%Ss' not found", PMC_str_val($2));
+            $1 = pmc_new(interpreter, type);
+            break;
+        case enum_class_Key:
+            type = pmc_type_p(interpreter, $2);
+            if (type <= 0)
+                real_exception(interpreter, NULL, NO_CLASS,
+                    "Class '%Ss' not found", readable_name(interpreter, $2));
+            $1 = pmc_new(interpreter, type);
+            break;
+        default:
+            real_exception(interpreter, NULL, NO_CLASS,
+                "Can only use a Key or String PMC with new");
     }
     goto NEXT();
 }

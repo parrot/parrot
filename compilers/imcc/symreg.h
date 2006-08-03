@@ -191,7 +191,7 @@ void   create_symhash(SymHash *hash);
 SymReg * _mk_const(SymHash *hash, char * name, int t);
 void _store_symreg(SymHash *hash, SymReg * r);
 SymReg * _mk_address(Interp *, SymHash *hash, char * name, int uniq);
-SymReg * link_keys(Interp *, int nargs, SymReg *keys[]);
+SymReg * link_keys(Interp *, int nargs, SymReg *keys[], int force);
 void clear_locals(struct _IMC_Unit *);
 void clear_sym_hash(SymHash *);
 void clear_globals(Interp *);

@@ -176,7 +176,7 @@ op lookback(out PMC, in INT) :base_core {
 
 =item B<save>(in STR)
 
-=item B<save>(in PMC)
+=item B<save>(invar PMC)
 
 Save register or constant $1 onto the user stack.
 
@@ -193,7 +193,7 @@ inline op save(in NUM) :base_core {
   goto NEXT();
 }
 
-inline op save(in PMC) :base_core {
+inline op save(invar PMC) :base_core {
   stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   goto NEXT();
 }

@@ -571,9 +571,9 @@ dup_sym(SymReg *r)
 }
 
 SymReg *
-link_keys(Interp *interp, int nargs, SymReg * keys[])
+link_keys(Interp *interp, int nargs, SymReg * keys[], int force)
 {
-    SymReg * first, *key, *keychain;
+    SymReg *key, *keychain;
     int i, len, any_slice;
     char *key_str;
     /* namespace keys are global consts - no cur_unit */
@@ -582,21 +582,21 @@ link_keys(Interp *interp, int nargs, SymReg * keys[])
     if (nargs == 0)
         IMCC_fataly(interp, E_SyntaxError,
             "link_keys: hu? no keys\n");
-    first = keys[0];
-    if (nargs == 1 && !(keys[0]->type & VT_SLICE_BITS))
-        return first;
+
+    /* short-circuit simple key unless we've been told not to */
+    if (nargs == 1 && !force && !(keys[0]->type & VT_SLICE_BITS))
+        return keys[0];
+
     /* calc len of key_str
      * also check if this is a slice - the first key might not
      * have the slice flag set
      */
-    for (i = any_slice = 0, len = 1; i < nargs; i++) {
-        len += strlen(keys[i]->name);
-        if (i < nargs - 1)
-            ++len;
+    for (i = any_slice = 0, len = 0; i < nargs; i++) {
+        len += 1 + strlen(keys[i]->name);
         if (keys[i]->type & VT_SLICE_BITS)
             any_slice = 1;
     }
-    if (any_slice & !(keys[0]->type & VT_SLICE_BITS))
+    if (any_slice && !(keys[0]->type & VT_SLICE_BITS))
         keys[0]->type |= (VT_START_SLICE|VT_END_SLICE);
     key_str = malloc(len);
     *key_str = 0;

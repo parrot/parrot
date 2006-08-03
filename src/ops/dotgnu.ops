@@ -32,25 +32,25 @@ dotgnu.ops
 
 =item B<conv_i4>(out INT, in NUM)
 
-=item B<conv_i4>(out INT, in PMC)
+=item B<conv_i4>(out INT, invar PMC)
 
 =item B<conv_u4>(out INT, in NUM)
 
-=item B<conv_u4>(out INT, in PMC)
+=item B<conv_u4>(out INT, invar PMC)
 
-=item B<conv_i8>(in PMC, in INT)
+=item B<conv_i8>(invar PMC, in INT)
 
-=item B<conv_i8>(in PMC, in PMC)
+=item B<conv_i8>(invar PMC, invar PMC)
 
-=item B<conv_i8>(in PMC, in NUM)
+=item B<conv_i8>(invar PMC, in NUM)
 
 =item B<conv_r4>(inout NUM)
 
-=item B<conv_r4>(out NUM, in PMC)
+=item B<conv_r4>(out NUM, invar PMC)
 
 =item B<conv_r8>(inout NUM)
 
-=item B<conv_r8>(out NUM, in PMC)
+=item B<conv_r8>(out NUM, invar PMC)
 
 Additional opcodes for C# compilation needed by cscc PM codegen
 
@@ -125,7 +125,7 @@ inline op conv_i4(out INT, in NUM) :dotgnu_core {
   goto NEXT();
 }
 
-inline op conv_i4(out INT, in PMC) :dotgnu_core {
+inline op conv_i4(out INT, invar PMC) :dotgnu_core {
   $1 = (INTVAL)(Parrot_Int4)($2->vtable->get_integer(interpreter, $2));
   goto NEXT();
 }
@@ -135,22 +135,22 @@ inline op conv_u4(out INT, in NUM) :dotgnu_core {
   goto NEXT();
 }
 
-inline op conv_u4(out INT, in PMC) :dotgnu_core {
+inline op conv_u4(out INT, invar PMC) :dotgnu_core {
   $1 = (UINTVAL)(Parrot_UInt4) ($2->vtable->get_integer(interpreter, $2));
   goto NEXT();
 }
 
-inline op conv_i8(in PMC, in INT) :dotgnu_core {
+inline op conv_i8(invar PMC, in INT) :dotgnu_core {
   $1->vtable->set_integer_native(interpreter, $1,$2);
   goto NEXT();
 }
 
-inline op conv_i8(in PMC, in PMC) :dotgnu_core {
+inline op conv_i8(invar PMC, invar PMC) :dotgnu_core {
   $1->vtable->set_integer_same(interpreter, $1,$2);
   goto NEXT();
 }
 
-inline op conv_i8(in PMC, in NUM) :dotgnu_core {
+inline op conv_i8(invar PMC, in NUM) :dotgnu_core {
   $1->vtable->set_integer_native(interpreter, $1, (INTVAL)$2);
   goto NEXT();
 }
@@ -160,7 +160,7 @@ inline op conv_r4(inout NUM) :dotgnu_core {
   goto NEXT();
 }
 
-inline op conv_r4(out NUM, in PMC) :dotgnu_core {
+inline op conv_r4(out NUM, invar PMC) :dotgnu_core {
   $1 = (FLOATVAL)(Parrot_Float4)($2->vtable->get_number(interpreter, $2));
   goto NEXT();
 }
@@ -170,7 +170,7 @@ inline op conv_r8(inout NUM) :dotgnu_core {
   goto NEXT();
 }
 
-inline op conv_r8(out NUM, in PMC) :dotgnu_core {
+inline op conv_r8(out NUM, invar PMC) :dotgnu_core {
   $1 = (FLOATVAL)(Parrot_Float8)($2->vtable->get_number(interpreter, $2));
   goto NEXT();
 }

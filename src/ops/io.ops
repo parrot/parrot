@@ -30,13 +30,13 @@ Parrot's IO API
 
 ########################################
 
-=item B<close>(in PMC)
+=item B<close>(invar PMC)
 
 Close IO object $1
 
 =cut
 
-inline op close(in PMC) :base_io {
+inline op close(invar PMC) :base_io {
   PIO_close(interpreter, $1);
   goto NEXT();
 }
@@ -68,7 +68,7 @@ inline op fdopen(out PMC, in INT, in STR) :filesys_open {
   goto NEXT();
 }
 
-=item B<getfd>(out INT, in PMC)
+=item B<getfd>(out INT, invar PMC)
 
 Get the file descriptor out of the ParrotIO object $2 and store it in $1
 
@@ -77,7 +77,7 @@ XXX: integral file descriptors may not exist outside of the UNIX
 
 =cut
 
-inline op getfd(out INT, in PMC) :advanced_io {
+inline op getfd(out INT, invar PMC) :advanced_io {
   $1 = (INTVAL)PIO_getfd(interpreter, $2);
   goto NEXT();
 }
@@ -116,12 +116,12 @@ inline op getstderr(out PMC) :base_io {
 
 #########################################
 
-=item B<setstdout>(in PMC)
+=item B<setstdout>(invar PMC)
 
 Sets the standard output for a bare C<print> op to go to the supplied ParrotIO
 PMC.  Call C<getstdout> first if you care about retaining the previous PMC.
 
-=item B<setstderr>(in PMC)
+=item B<setstderr>(invar PMC)
 
 Sets the standard error for a bare C<printerr> op to go to the supplied
 ParrotIO PMC.  Call C<getstderr> first if you care about retaining the previous
@@ -129,19 +129,19 @@ PMC.
 
 =cut
 
-inline op setstdout(in PMC) :base_io {
+inline op setstdout(invar PMC) :base_io {
 	PIO_STDOUT(interpreter) = $1;
 	goto NEXT();
 }
 
-inline op setstderr(in PMC) :base_io {
+inline op setstderr(invar PMC) :base_io {
 	PIO_STDERR(interpreter) = $1;
 	goto NEXT();
 }
 
 #########################################
 
-=item B<pioctl>(out INT, in PMC, in INT, in INT)
+=item B<pioctl>(out INT, invar PMC, in INT, in INT)
 
 Perform an operation an an IO object. This is a general purpose
 hook for setting various flags, modes, etc.
@@ -149,7 +149,7 @@ Examples: setting the record separator or setting the buffering
 
 =cut
 
-inline op pioctl(out INT, in PMC, in INT, in INT) :advanced_io {
+inline op pioctl(out INT, invar PMC, in INT, in INT) :advanced_io {
   $1 = PIO_pioctl(interpreter, $2, $3, $4);
   goto NEXT();
 }
@@ -201,11 +201,11 @@ inline op open(out PMC, in STR) :filesys_open {
 
 =item B<print>(in NUM)
 
-=item B<print>(in PMC)
+=item B<print>(invar PMC)
 
 =item B<print>(in STR)
 
-=item B<write>(in PMC)
+=item B<write>(invar PMC)
 
 Print $1 to standard output.
 
@@ -229,7 +229,7 @@ op print(in STR) :base_io {
   goto NEXT();
 }
 
-op print(in PMC) :base_io {
+op print(invar PMC) :base_io {
   PMC * const p = $1;
   STRING * const s = (VTABLE_get_string(interpreter, p));
   if (s) {
@@ -238,7 +238,7 @@ op print(in PMC) :base_io {
   goto NEXT();
 }
 
-op write(in PMC) :base_io {
+op write(invar PMC) :base_io {
   PMC * const p = $1;
   STRING * const s = (VTABLE_get_string(interpreter, p));
   if (s) {
@@ -255,7 +255,7 @@ op write(in PMC) :base_io {
 
 =item B<printerr>(in STR)
 
-=item B<printerr>(in PMC)
+=item B<printerr>(invar PMC)
 
 Print $1 to standard error.
 
@@ -279,7 +279,7 @@ op printerr(in STR) :base_io {
   goto NEXT();
 }
 
-op printerr(in PMC) :base_io {
+op printerr(invar PMC) :base_io {
   PMC * const p = $1;
   STRING * const s = (VTABLE_get_string(interpreter, p));
   if (s) {
@@ -290,19 +290,19 @@ op printerr(in PMC) :base_io {
 
 ##########################################
 
-=item B<print>(in PMC, in INT)
+=item B<print>(invar PMC, in INT)
 
-=item B<print>(in PMC, in NUM)
+=item B<print>(invar PMC, in NUM)
 
-=item B<print>(in PMC, in STR)
+=item B<print>(invar PMC, in STR)
 
-=item B<print>(in PMC, in PMC)
+=item B<print>(invar PMC, invar PMC)
 
 Print $2 on the IO stream object $1.
 
 =cut
 
-op print(in PMC, in INT) :base_io {
+op print(invar PMC, in INT) :base_io {
   if ($1) {
     STRING * const s = Parrot_sprintf_c(interpreter, INTVAL_FMT, $2);
     PIO_putps(interpreter, $1, s);
@@ -313,7 +313,7 @@ op print(in PMC, in INT) :base_io {
   goto NEXT();
 }
 
-op print(in PMC, in NUM) :base_io {
+op print(invar PMC, in NUM) :base_io {
   if ($1) {
     STRING * const s = Parrot_sprintf_c(interpreter, "%f", (double)$2);
     PIO_putps(interpreter, $1, s);
@@ -324,7 +324,7 @@ op print(in PMC, in NUM) :base_io {
   goto NEXT();
 }
 
-op print(in PMC, in STR) :base_io {
+op print(invar PMC, in STR) :base_io {
   if ($2 && $1) {
     PIO_putps(interpreter, $1, $2);
   }
@@ -334,7 +334,7 @@ op print(in PMC, in STR) :base_io {
   goto NEXT();
 }
 
-op print(in PMC, in PMC) :base_io {
+op print(invar PMC, invar PMC) :base_io {
   if ($2 && $1) {
     STRING * const s = VTABLE_get_string(interpreter, $2);
     PIO_putps(interpreter, $1, s);
@@ -351,7 +351,7 @@ op print(in PMC, in PMC) :base_io {
 
 Read up to N bytes from standard input stream
 
-=item B<read>(out STR, in PMC, in INT)
+=item B<read>(out STR, invar PMC, in INT)
 
 Read up to N bytes from IO PMC stream.
 
@@ -362,19 +362,19 @@ op read(out STR, in INT) :base_io {
   goto NEXT();
 }
 
-op read(out STR, in PMC, in INT) :base_io {
+op read(out STR, invar PMC, in INT) :base_io {
   $1 = PIO_reads(interpreter, $2, (size_t)$3);
   goto NEXT();
 }
 
-=item B<readline>(out STR, in PMC)
+=item B<readline>(out STR, invar PMC)
 
 Read a line up to EOL from filehandle $2.
 This switches the filehandle to linebuffer-mode.
 
 =cut
 
-inline op readline(out STR, in PMC) :base_io {
+inline op readline(out STR, invar PMC) :base_io {
     PMC * const pio = $2;
     ParrotIO *io;
     /* this ugly error handling will go away, when all the
@@ -401,7 +401,7 @@ inline op readline(out STR, in PMC) :base_io {
 Returns the next byte from standard input, but does not
 remove it from the stream.
 
-=item B<peek>(out STR, in PMC)
+=item B<peek>(out STR, invar PMC)
 
 Reads the next byte from an IO PMC, but does not
 remove it from the stream.
@@ -416,7 +416,7 @@ op peek(out STR) :base_io {
   goto NEXT();
 }
 
-op peek(out STR, in PMC) :base_io {
+op peek(out STR, invar PMC) :base_io {
   STRING ** const s = &$1;
 
   *s = NULL;
@@ -461,13 +461,13 @@ op stat(out INT, in INT, in INT) {
 
 ##########################################
 
-=item B<seek>(in PMC, in INT, in INT)
+=item B<seek>(invar PMC, in INT, in INT)
 
 seek:
 Set file position to offset $2 on IO stream $1. 'whence' is
 indicated by the value in $3.
 
-=item B<seek>(in PMC, in INT, in INT, in INT)
+=item B<seek>(invar PMC, in INT, in INT, in INT)
 
 64bit seek:
 Set file position to offset ($2 << 32 | $3) on IO stream $1. 'whence' is
@@ -476,7 +476,7 @@ INTVALS.
 
 =cut
 
-op seek(in PMC, in INT, in INT) :base_io {
+op seek(invar PMC, in INT, in INT) :base_io {
   if ($1) {
     if (PIO_seek(interpreter, $1, PIO_make_offset($2), $3) < 0) {
       real_exception(interpreter, NULL, PIO_ERROR, "seek failed (32bit)");
@@ -485,7 +485,7 @@ op seek(in PMC, in INT, in INT) :base_io {
   goto NEXT();
 }
 
-op seek(in PMC, in INT, in INT, in INT) :base_io {
+op seek(invar PMC, in INT, in INT, in INT) :base_io {
   if ($1) {
     if (PIO_seek(interpreter, $1, PIO_make_offset32($2, $3), $4) < 0) {
       real_exception(interpreter, NULL, PIO_ERROR, "seek failed (64bit)");
@@ -494,14 +494,14 @@ op seek(in PMC, in INT, in INT, in INT) :base_io {
   goto NEXT();
 }
 
-=item B<tell>(out INT, in PMC)
+=item B<tell>(out INT, invar PMC)
 
 tell:
 Get the current file position of stream $2 and store it in $1.
 On systems where INTVAL is 32bit the result will be truncated if the
 position is beyond 2 GiB
 
-=item B<tell>(out INT, out INT, in PMC)
+=item B<tell>(out INT, out INT, invar PMC)
 
 64bit tell:
 Get the current file positon of stream $3 in two parts of 32-bit each
@@ -509,14 +509,14 @@ Get the current file positon of stream $3 in two parts of 32-bit each
 
 =cut
 
-op tell(out INT, in PMC) :base_io {
+op tell(out INT, invar PMC) :base_io {
   if ($2) {
     $1 = (INTVAL)PIO_tell(interpreter, $2);
   }
   goto NEXT();
 }
 
-op tell(out INT, out INT, in PMC) :base_io {
+op tell(out INT, out INT, invar PMC) :base_io {
   if ($3) {
     PIOOFF_T pos;
     pos = PIO_tell(interpreter, $3);
@@ -532,19 +532,19 @@ op tell(out INT, out INT, in PMC) :base_io {
 
 =item B<sockaddr>(out STR, in INT, in STR)
 
-=item B<connect>(out INT, in PMC, in STR)
+=item B<connect>(out INT, invar PMC, in STR)
 
-=item B<recv>(out INT, in PMC, out STR)
+=item B<recv>(out INT, invar PMC, out STR)
 
-=item B<send>(out INT, in PMC, in STR)
+=item B<send>(out INT, invar PMC, in STR)
 
-=item B<poll>(out INT, in PMC, in INT, in INT, in INT)
+=item B<poll>(out INT, invar PMC, in INT, in INT, in INT)
 
-=item B<bind>(out INT, in PMC, in STR)
+=item B<bind>(out INT, invar PMC, in STR)
 
-=item B<listen>(out INT, in PMC, in INT)
+=item B<listen>(out INT, invar PMC, in INT)
 
-=item B<accept>(out PMC, in PMC)
+=item B<accept>(out PMC, invar PMC)
 
 =cut
 
@@ -561,39 +561,39 @@ op sockaddr(out STR, in INT, in STR) :base_network {
     goto NEXT();
 }
 
-op connect(out INT, in PMC, in STR) :base_network {
+op connect(out INT, invar PMC, in STR) :base_network {
     $1 = (INTVAL)PIO_connect(interpreter, $2, $3);
     goto NEXT();
 }
 
-op recv(out INT, in PMC, out STR) :base_network {
+op recv(out INT, invar PMC, out STR) :base_network {
     STRING *dest = $3;
     $1 = (INTVAL)PIO_recv(interpreter, $2, &dest);
     $3 = dest;
     goto NEXT();
 }
 
-op send(out INT, in PMC, in STR) :base_network {
+op send(out INT, invar PMC, in STR) :base_network {
     $1 = (INTVAL)PIO_send(interpreter, $2, $3);
     goto NEXT();
 }
 
-op poll(out INT, in PMC, in INT, in INT, in INT) :base_network {
+op poll(out INT, invar PMC, in INT, in INT, in INT) :base_network {
     $1 = (INTVAL)PIO_poll(interpreter, $2, $3, $4, $5);
     goto NEXT();
 }
 
-op bind(out INT, in PMC, in STR) :base_network {
+op bind(out INT, invar PMC, in STR) :base_network {
     $1 = (INTVAL)PIO_bind(interpreter, $2, $3);
     goto NEXT();
 }
 
-op listen(out INT, in PMC, in INT) :base_network {
+op listen(out INT, invar PMC, in INT) :base_network {
     $1 = (INTVAL)PIO_listen(interpreter, $2, $3);
     goto NEXT();
 }
 
-op accept(out PMC, in PMC) :base_network {
+op accept(out PMC, invar PMC) :base_network {
     $1 = PIO_accept(interpreter, $2);
     goto NEXT();
 }

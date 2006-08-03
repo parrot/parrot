@@ -40,21 +40,21 @@ their operands.
 
 =item B<eq>(in STR, in STR, labelconst INT)
 
-=item B<eq>(in PMC, in PMC, labelconst INT)
+=item B<eq>(invar PMC, invar PMC, labelconst INT)
 
-=item B<eq>(in PMC, in INT, labelconst INT)
+=item B<eq>(invar PMC, in INT, labelconst INT)
 
-=item B<eq>(in PMC, in NUM, labelconst INT)
+=item B<eq>(invar PMC, in NUM, labelconst INT)
 
-=item B<eq>(in PMC, in STR, labelconst INT)
+=item B<eq>(invar PMC, in STR, labelconst INT)
 
-=item B<eq_str>(in PMC, in PMC, labelconst INT)
+=item B<eq_str>(invar PMC, invar PMC, labelconst INT)
 
-=item B<eq_num>(in PMC, in PMC, labelconst INT)
+=item B<eq_num>(invar PMC, invar PMC, labelconst INT)
 
 =item B<eq_addr>(in STR, in STR, labelconst INT)
 
-=item B<eq_addr>(in PMC, in PMC, labelconst INT)
+=item B<eq_addr>(invar PMC, invar PMC, labelconst INT)
 
 Branch if $1 is equal to $2. For PMCs this does a generic comparison,
 whatever that is for the involved PMCs. Mixed PMC number/string
@@ -87,14 +87,14 @@ op eq(in STR, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op eq (in PMC, in PMC, labelconst INT) :base_core {
+op eq (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_EQ)) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq (in PMC, in INT, labelconst INT) :base_core {
+op eq (invar PMC, in INT, labelconst INT) :base_core {
   /*
    * see also #34949
    * the temp is necessary, *if* $1 isa BigInt
@@ -107,7 +107,7 @@ op eq (in PMC, in INT, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op eq (in PMC, in NUM, labelconst INT) :base_core {
+op eq (invar PMC, in NUM, labelconst INT) :base_core {
   /* 
    * the get_number and get_string should probably
    * be also replaced with code like above, as
@@ -120,7 +120,7 @@ op eq (in PMC, in NUM, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op eq (in PMC, in STR, labelconst INT) :base_core {
+op eq (invar PMC, in STR, labelconst INT) :base_core {
   if (0 == string_equal(interpreter,
       $1->vtable->get_string(interpreter, $1), $2)) {
     goto OFFSET($3);
@@ -128,14 +128,14 @@ op eq (in PMC, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op eq_str (in PMC, in PMC, labelconst INT) :base_core {
+op eq_str (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STREQ)) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq_num (in PMC, in PMC, labelconst INT) :base_core {
+op eq_num (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMEQ)) {
     goto OFFSET($3);
   }
@@ -149,7 +149,7 @@ op eq_addr(in STR, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op eq_addr(in PMC, in PMC, labelconst INT) :base_core {
+op eq_addr(invar PMC, invar PMC, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
@@ -164,21 +164,21 @@ op eq_addr(in PMC, in PMC, labelconst INT) :base_core {
 
 =item B<ne>(in STR, in STR, labelconst INT)
 
-=item B<ne>(in PMC, in PMC, labelconst INT)
+=item B<ne>(invar PMC, invar PMC, labelconst INT)
 
-=item B<ne>(in PMC, in INT, labelconst INT)
+=item B<ne>(invar PMC, in INT, labelconst INT)
 
-=item B<ne>(in PMC, in NUM, labelconst INT)
+=item B<ne>(invar PMC, in NUM, labelconst INT)
 
-=item B<ne>(in PMC, in STR, labelconst INT)
+=item B<ne>(invar PMC, in STR, labelconst INT)
 
-=item B<ne_str>(in PMC, in PMC, labelconst INT)
+=item B<ne_str>(invar PMC, invar PMC, labelconst INT)
 
-=item B<ne_num>(in PMC, in PMC, labelconst INT)
+=item B<ne_num>(invar PMC, invar PMC, labelconst INT)
 
 =item B<ne_addr>(in STR, in STR, labelconst INT)
 
-=item B<ne_addr>(in PMC, in PMC, labelconst INT)
+=item B<ne_addr>(invar PMC, invar PMC, labelconst INT)
 
 Branch if $1 is not equal to $2.
 
@@ -205,14 +205,14 @@ op ne(in STR, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op ne(in PMC, in PMC, labelconst INT) :base_core {
+op ne(invar PMC, invar PMC, labelconst INT) :base_core {
   if (! mmd_dispatch_i_pp(interpreter, $1, $2, MMD_EQ)) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne (in PMC, in INT, labelconst INT) :base_core {
+op ne (invar PMC, in INT, labelconst INT) :base_core {
   PMC *temp = pmc_new(interpreter, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (! mmd_dispatch_i_pp(interpreter, $1, temp, MMD_EQ)) {
@@ -221,14 +221,14 @@ op ne (in PMC, in INT, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op ne (in PMC, in NUM, labelconst INT) :base_core {
+op ne (invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne (in PMC, in STR, labelconst INT) :base_core {
+op ne (invar PMC, in STR, labelconst INT) :base_core {
   if (0 != string_equal(interpreter,
       $1->vtable->get_string(interpreter, $1), $2)) {
     goto OFFSET($3);
@@ -236,14 +236,14 @@ op ne (in PMC, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op ne_str (in PMC, in PMC, labelconst INT) :base_core {
+op ne_str (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) != 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne_num (in PMC, in PMC, labelconst INT) :base_core {
+op ne_num (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) != 0) {
     goto OFFSET($3);
   }
@@ -257,7 +257,7 @@ op ne_addr(in STR, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op ne_addr(in PMC, in PMC, labelconst INT) :base_core {
+op ne_addr(invar PMC, invar PMC, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
@@ -272,17 +272,17 @@ op ne_addr(in PMC, in PMC, labelconst INT) :base_core {
 
 =item B<lt>(in STR, in STR, labelconst INT)
 
-=item B<lt>(in PMC, in PMC, labelconst INT)
+=item B<lt>(invar PMC, invar PMC, labelconst INT)
 
-=item B<lt>(in PMC, in INT, labelconst INT)
+=item B<lt>(invar PMC, in INT, labelconst INT)
 
-=item B<lt>(in PMC, in NUM, labelconst INT)
+=item B<lt>(invar PMC, in NUM, labelconst INT)
 
-=item B<lt>(in PMC, in STR, labelconst INT)
+=item B<lt>(invar PMC, in STR, labelconst INT)
 
-=item B<lt_str>(in PMC, in PMC, labelconst INT)
+=item B<lt_str>(invar PMC, invar PMC, labelconst INT)
 
-=item B<lt_num>(in PMC, in PMC, labelconst INT)
+=item B<lt_num>(invar PMC, invar PMC, labelconst INT)
 
 Branch if $1 is less than $2.
 
@@ -309,14 +309,14 @@ op lt(in STR, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op lt (in PMC, in PMC, labelconst INT) :base_core {
+op lt (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt (in PMC, in INT, labelconst INT) :base_core {
+op lt (invar PMC, in INT, labelconst INT) :base_core {
   PMC *temp = pmc_new(interpreter, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_CMP) < 0) {
@@ -325,14 +325,14 @@ op lt (in PMC, in INT, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op lt (in PMC, in NUM, labelconst INT) :base_core {
+op lt (invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt (in PMC, in STR, labelconst INT) :base_core {
+op lt (invar PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter,
       $1->vtable->get_string(interpreter, $1), $2) < 0) {
     goto OFFSET($3);
@@ -340,14 +340,14 @@ op lt (in PMC, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op lt_str (in PMC, in PMC, labelconst INT) :base_core {
+op lt_str (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt_num (in PMC, in PMC, labelconst INT) :base_core {
+op lt_num (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) < 0) {
     goto OFFSET($3);
   }
@@ -362,17 +362,17 @@ op lt_num (in PMC, in PMC, labelconst INT) :base_core {
 
 =item B<le>(in STR, in STR, labelconst INT)
 
-=item B<le>(in PMC, in PMC, labelconst INT)
+=item B<le>(invar PMC, invar PMC, labelconst INT)
 
-=item B<le>(in PMC, in INT, labelconst INT)
+=item B<le>(invar PMC, in INT, labelconst INT)
 
-=item B<le>(in PMC, in NUM, labelconst INT)
+=item B<le>(invar PMC, in NUM, labelconst INT)
 
-=item B<le>(in PMC, in STR, labelconst INT)
+=item B<le>(invar PMC, in STR, labelconst INT)
 
-=item B<le_str>(in PMC, in PMC, labelconst INT)
+=item B<le_str>(invar PMC, invar PMC, labelconst INT)
 
-=item B<le_num>(in PMC, in PMC, labelconst INT)
+=item B<le_num>(invar PMC, invar PMC, labelconst INT)
 
 Branch if $1 is less than or equal to $2.
 
@@ -399,14 +399,14 @@ op le(in STR, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op le(in PMC, in PMC, labelconst INT) :base_core {
+op le(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le(in PMC, in INT, labelconst INT) :base_core {
+op le(invar PMC, in INT, labelconst INT) :base_core {
   PMC *temp = pmc_new(interpreter, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_CMP) <= 0) {
@@ -415,14 +415,14 @@ op le(in PMC, in INT, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op le (in PMC, in NUM, labelconst INT) :base_core {
+op le (invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le (in PMC, in STR, labelconst INT) :base_core {
+op le (invar PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter,
       $1->vtable->get_string(interpreter, $1), $2) <= 0) {
     goto OFFSET($3);
@@ -430,14 +430,14 @@ op le (in PMC, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op le_str (in PMC, in PMC, labelconst INT) :base_core {
+op le_str (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le_num (in PMC, in PMC, labelconst INT) :base_core {
+op le_num (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) <= 0) {
     goto OFFSET($3);
   }
@@ -446,30 +446,30 @@ op le_num (in PMC, in PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<gt>(in PMC, in PMC, labelconst INT)
+=item B<gt>(invar PMC, invar PMC, labelconst INT)
 
-=item B<gt>(in PMC, in INT, labelconst INT)
+=item B<gt>(invar PMC, in INT, labelconst INT)
 
-=item B<gt>(in PMC, in NUM, labelconst INT)
+=item B<gt>(invar PMC, in NUM, labelconst INT)
 
-=item B<gt>(in PMC, in STR, labelconst INT)
+=item B<gt>(invar PMC, in STR, labelconst INT)
 
-=item B<gt_str>(in PMC, in PMC, labelconst INT)
+=item B<gt_str>(invar PMC, invar PMC, labelconst INT)
 
-=item B<gt_num>(in PMC, in PMC, labelconst INT)
+=item B<gt_num>(invar PMC, invar PMC, labelconst INT)
 
 Branch if $1 is greater than $2.
 
 =cut
 
-op gt(in PMC, in PMC, labelconst INT) :base_core {
+op gt(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt(in PMC, in INT, labelconst INT) :base_core {
+op gt(invar PMC, in INT, labelconst INT) :base_core {
   PMC *temp = pmc_new(interpreter, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_CMP) > 0) {
@@ -478,14 +478,14 @@ op gt(in PMC, in INT, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op gt (in PMC, in NUM, labelconst INT) :base_core {
+op gt (invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt (in PMC, in STR, labelconst INT) :base_core {
+op gt (invar PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter,
       $1->vtable->get_string(interpreter, $1), $2) > 0) {
     goto OFFSET($3);
@@ -493,14 +493,14 @@ op gt (in PMC, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op gt_str (in PMC, in PMC, labelconst INT) :base_core {
+op gt_str (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt_num (in PMC, in PMC, labelconst INT) :base_core {
+op gt_num (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) > 0) {
     goto OFFSET($3);
   }
@@ -509,30 +509,30 @@ op gt_num (in PMC, in PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<ge>(in PMC, in PMC, labelconst INT)
+=item B<ge>(invar PMC, invar PMC, labelconst INT)
 
-=item B<ge>(in PMC, in INT, labelconst INT)
+=item B<ge>(invar PMC, in INT, labelconst INT)
 
-=item B<ge>(in PMC, in NUM, labelconst INT)
+=item B<ge>(invar PMC, in NUM, labelconst INT)
 
-=item B<ge>(in PMC, in STR, labelconst INT)
+=item B<ge>(invar PMC, in STR, labelconst INT)
 
-=item B<ge_str>(in PMC, in PMC, labelconst INT)
+=item B<ge_str>(invar PMC, invar PMC, labelconst INT)
 
-=item B<ge_num>(in PMC, in PMC, labelconst INT)
+=item B<ge_num>(invar PMC, invar PMC, labelconst INT)
 
 Branch if $1 is greater than or equal to $2.
 
 =cut
 
-op ge(in PMC, in PMC, labelconst INT) :base_core {
+op ge(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge(in PMC, in INT, labelconst INT) :base_core {
+op ge(invar PMC, in INT, labelconst INT) :base_core {
   PMC *temp = pmc_new(interpreter, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (mmd_dispatch_i_pp(interpreter, $1, temp, MMD_CMP) >= 0) {
@@ -541,14 +541,14 @@ op ge(in PMC, in INT, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op ge (in PMC, in NUM, labelconst INT) :base_core {
+op ge (invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge (in PMC, in STR, labelconst INT) :base_core {
+op ge (invar PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter,
       $1->vtable->get_string(interpreter, $1), $2) >= 0) {
     goto OFFSET($3);
@@ -556,14 +556,14 @@ op ge (in PMC, in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
-op ge_str (in PMC, in PMC, labelconst INT) :base_core {
+op ge_str (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge_num (in PMC, in PMC, labelconst INT) :base_core {
+op ge_num (invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) >= 0) {
     goto OFFSET($3);
   }
@@ -593,17 +593,17 @@ their operands.
 
 =item B<cmp>(out INT, in STR, in STR)
 
-=item B<cmp>(out INT, in PMC, in PMC)
+=item B<cmp>(out INT, invar PMC, invar PMC)
 
-=item B<cmp>(out INT, in PMC, in INT)
+=item B<cmp>(out INT, invar PMC, in INT)
 
-=item B<cmp>(out INT, in PMC, in NUM)
+=item B<cmp>(out INT, invar PMC, in NUM)
 
-=item B<cmp>(out INT, in PMC, in STR)
+=item B<cmp>(out INT, invar PMC, in STR)
 
-=item B<cmp_str>(out INT, in PMC, in PMC)
+=item B<cmp_str>(out INT, invar PMC, invar PMC)
 
-=item B<cmp_num>(out INT, in PMC, in PMC)
+=item B<cmp_num>(out INT, invar PMC, invar PMC)
 
 
 Sets $1 to -1 if $2 < $3, +1 if $2 > $3, and 0 otherwise.
@@ -629,12 +629,12 @@ inline op cmp(out INT, in STR, in STR) :base_core {
   goto NEXT();
 }
 
-inline op cmp(out INT, in PMC, in PMC) :base_core {
+inline op cmp(out INT, invar PMC, invar PMC) :base_core {
   $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP);
   goto NEXT();
 }
 
-inline op cmp(out INT, in PMC, in INT) :base_core {
+inline op cmp(out INT, invar PMC, in INT) :base_core {
   INTVAL l = VTABLE_get_integer(interpreter, $2);
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
@@ -642,7 +642,7 @@ inline op cmp(out INT, in PMC, in INT) :base_core {
   goto NEXT();
 }
 
-inline op cmp(out INT, in PMC, in NUM) :base_core {
+inline op cmp(out INT, invar PMC, in NUM) :base_core {
   FLOATVAL l = VTABLE_get_number(interpreter, $2);
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
@@ -650,18 +650,18 @@ inline op cmp(out INT, in PMC, in NUM) :base_core {
   goto NEXT();
 }
 
-inline op cmp(out INT, in PMC, in STR) :base_core {
+inline op cmp(out INT, invar PMC, in STR) :base_core {
   STRING* l = VTABLE_get_string(interpreter, $2);
   $1 = string_compare(interpreter, l, $3);
   goto NEXT();
 }
 
-inline op cmp_str(out INT, in PMC, in PMC) :base_core {
+inline op cmp_str(out INT, invar PMC, invar PMC) :base_core {
   $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_STRCMP);
   goto NEXT();
 }
 
-inline op cmp_num(out INT, in PMC, in PMC) :base_core {
+inline op cmp_num(out INT, invar PMC, invar PMC) :base_core {
   $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_NUMCMP);
   goto NEXT();
 }
@@ -697,15 +697,15 @@ inline op and(out INT, in INT, in INT) :base_core {
 
 =item B<not>(inout INT)
 
-=item B<not>(in PMC)
+=item B<not>(invar PMC)
 
 Set the boolean state of $1 to the opposite of the boolean state from $1.
 
 =item B<not>(out INT, in INT)
 
-=item B<not>(out PMC, in PMC)
+=item B<not>(out PMC, invar PMC)
 
-=item B<n_not>(out PMC, in PMC)
+=item B<n_not>(out PMC, invar PMC)
 
 Set the boolean state of $1 to the opposite of the boolean state from $2.
 
@@ -721,17 +721,17 @@ inline op not(out INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op not(in PMC) :base_core {
+inline op not(invar PMC) :base_core {
   $2->vtable->i_logical_not(interpreter, $1);
   goto NEXT();
 }
 
-inline op not(out PMC, in PMC) :base_core {
+inline op not(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->logical_not(interpreter, $2, $1);
   goto NEXT();
 }
 
-inline op n_not(out PMC, in PMC) :base_core {
+inline op n_not(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->logical_not(interpreter, $2, NULL);
   goto NEXT();
 }
@@ -780,30 +780,30 @@ These ops do comparisons and truth testing without doing flow control.
 
 ########################################
 
-=item B<issame>(out INT, in PMC, in PMC)
+=item B<issame>(out INT, invar PMC, invar PMC)
 
 =item B<issame>(out INT, in STR, in STR)
 
 Sets $1 to 1 or 0, depending on the identity of the 2 objects.
 The identity is the PMCs memory address.
 
-=item B<isntsame>(out INT, in PMC, in PMC)
+=item B<isntsame>(out INT, invar PMC, invar PMC)
 
 =item B<isntsame>(out INT, in STR, in STR)
 
 Sets $1 to 0 or 1, depending on the identity of the 2 objects.
 
-=item B<istrue>(out INT, in PMC)
+=item B<istrue>(out INT, invar PMC)
 
 Sets $1 to 1 or 0, depending on whether $2 is true or not.
 
-=item B<isfalse>(out INT, in PMC)
+=item B<isfalse>(out INT, invar PMC)
 
 Sets $1 to 1 or 0, depending on whether $2 is false or not.
 
 =cut
 
-inline op issame(out INT, in PMC, in PMC) {
+inline op issame(out INT, invar PMC, invar PMC) {
     if ($2 == $3)
         $1 = 1;
     else
@@ -816,7 +816,7 @@ inline op issame(out INT, in STR, in STR) {
     goto NEXT();
 }
 
-inline op isntsame(out INT, in PMC, in PMC) {
+inline op isntsame(out INT, invar PMC, invar PMC) {
     if ($2 == $3)
         $1 = 0;
     else
@@ -829,12 +829,12 @@ inline op isntsame(out INT, in STR, in STR) {
     goto NEXT();
 }
 
-inline op istrue(out INT, in PMC) {
+inline op istrue(out INT, invar PMC) {
     $1 = VTABLE_get_bool(interpreter, $2);
     goto NEXT();
 }
 
-inline op isfalse(out INT, in PMC) {
+inline op isfalse(out INT, invar PMC) {
     $1 = !VTABLE_get_bool(interpreter, $2);
     goto NEXT();
 }
@@ -847,13 +847,13 @@ inline op isfalse(out INT, in PMC) {
 
 These 3 opcodes are valid, but create as their reverse.
 
-=item B<isgt>(out INT, in PMC, in PMC)
+=item B<isgt>(out INT, invar PMC, invar PMC)
 
 Sets $1 to 1 if $2 is greater than $3.
 
 =cut
 
-inline op isgt(out INT, in PMC, in PMC) {
+inline op isgt(out INT, invar PMC, invar PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) > 0);
   goto NEXT();
 }
@@ -866,13 +866,13 @@ inline op isgt(out INT, in PMC, in PMC) {
 
 These 3 opcodes are valid, but create as their reverse.
 
-=item B<isge>(out INT, in PMC, in PMC)
+=item B<isge>(out INT, invar PMC, invar PMC)
 
 Sets $1 to 1 if $2 is greater than or equal to $3.
 
 =cut
 
-inline op isge(out INT, in PMC, in PMC) {
+inline op isge(out INT, invar PMC, invar PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) >= 0);
   goto NEXT();
 }
@@ -883,7 +883,7 @@ inline op isge(out INT, in PMC, in PMC) {
 
 =item B<isle>(out INT, in STR, in STR)
 
-=item B<isle>(out INT, in PMC, in PMC)
+=item B<isle>(out INT, invar PMC, invar PMC)
 
 Sets $1 to 1 if $2 is less than or equal to $3.
 
@@ -904,7 +904,7 @@ inline op isle(out INT, in STR, in STR) {
   goto NEXT();
 }
 
-inline op isle(out INT, in PMC, in PMC) {
+inline op isle(out INT, invar PMC, invar PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) <= 0);
   goto NEXT();
 }
@@ -915,7 +915,7 @@ inline op isle(out INT, in PMC, in PMC) {
 
 =item B<islt>(out INT, in STR, in STR)
 
-=item B<islt>(out INT, in PMC, in PMC)
+=item B<islt>(out INT, invar PMC, invar PMC)
 
 Sets $1 to 1 if $2 is less than $3.
 
@@ -936,7 +936,7 @@ inline op islt(out INT, in STR, in STR) {
   goto NEXT();
 }
 
-inline op islt(out INT, in PMC, in PMC) {
+inline op islt(out INT, invar PMC, invar PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) < 0);
   goto NEXT();
 }
@@ -947,7 +947,7 @@ inline op islt(out INT, in PMC, in PMC) {
 
 =item B<iseq>(out INT, in STR, in STR)
 
-=item B<iseq>(out INT, in PMC, in PMC)
+=item B<iseq>(out INT, invar PMC, invar PMC)
 
 Sets $1 to 1 if $2 is equal to $3.
 
@@ -968,7 +968,7 @@ inline op iseq(out INT, in STR, in STR) {
   goto NEXT();
 }
 
-inline op iseq(out INT, in PMC, in PMC) {
+inline op iseq(out INT, invar PMC, invar PMC) {
   if (&$2 == &$3)
     $1 = 1;
   else
@@ -982,7 +982,7 @@ inline op iseq(out INT, in PMC, in PMC) {
 
 =item B<isne>(out INT, in STR, in STR)
 
-=item B<isne>(out INT, in PMC, in PMC)
+=item B<isne>(out INT, invar PMC, invar PMC)
 
 Sets $1 to 1 if $2 is not equal to $3.
 
@@ -1003,7 +1003,7 @@ inline op isne(out INT, in STR, in STR) {
   goto NEXT();
 }
 
-inline op isne(out INT, in PMC, in PMC) {
+inline op isne(out INT, invar PMC, invar PMC) {
   if (&$2 == &$3)
     $1 = 0;
   else
@@ -1013,7 +1013,7 @@ inline op isne(out INT, in PMC, in PMC) {
 
 ########################################
 
-=item B<if_null>(in PMC, labelconst INT)
+=item B<if_null>(invar PMC, labelconst INT)
 
 Branch to $2 if $1 is a NULL PMC.
 
@@ -1023,7 +1023,7 @@ Branch to $2 if $1 is a NULL STRING.
 
 =cut
 
-op if_null(in PMC, labelconst INT) {
+op if_null(invar PMC, labelconst INT) {
   if (PMC_IS_NULL($1)) {
     goto OFFSET($2);
   }
@@ -1039,7 +1039,7 @@ op if_null(invar STR, labelconst INT) {
 
 ########################################
 
-=item B<unless_null>(in PMC, labelconst INT)
+=item B<unless_null>(invar PMC, labelconst INT)
 
 Branch to $2 if $1 is I<not> a NULL PMC.
 
@@ -1049,7 +1049,7 @@ Branch to $2 if $1 is I<not> a NULL STRING.
 
 =cut
 
-op unless_null(in PMC, labelconst INT) {
+op unless_null(invar PMC, labelconst INT) {
   if (!PMC_IS_NULL($1)) {
     goto OFFSET($2);
   }

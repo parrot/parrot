@@ -376,13 +376,13 @@ continuations.
 
 ########################################
 
-=item B<invokecc>(in PMC)
+=item B<invokecc>(invar PMC)
 
 Call the subroutine in $1 and generate a new return continuation, if needed.
 For example, a NCI subroutine which executes code in some C library will not
 create a continuation, nor will anything but the first call to a coroutine.
 
-=item B<invoke>(in PMC, in PMC)
+=item B<invoke>(invar PMC, invar PMC)
 
 Call the subroutine in $1 and use continuation $2.
 
@@ -390,7 +390,7 @@ Call the subroutine in $1 and use continuation $2.
 
 Yield results from a coroutine.
 
-=item B<tailcall>(in PMC)
+=item B<tailcall>(invar PMC)
 
 Call the subroutine in $1 and use the current continuation as the subs
 continuation.
@@ -399,13 +399,13 @@ continuation.
 
 Return from the sub or method via the current continuation.
 
-=item B<newclosure>(out PMC, in PMC)
+=item B<newclosure>(out PMC, invar PMC)
 
 Create a closure of the given subroutine PMC by cloning the sub's state.
 
 =cut
 
-inline op invokecc(in PMC) {
+inline op invokecc(invar PMC) {
   opcode_t *dest;
   PMC * const p = $1;
   dest = expr NEXT();
@@ -415,7 +415,7 @@ inline op invokecc(in PMC) {
   goto ADDRESS(dest);
 }
 
-inline op invoke(in PMC, in PMC) {
+inline op invoke(invar PMC, invar PMC) {
   opcode_t *dest;
   PMC * const p = $1;
 
@@ -432,7 +432,7 @@ inline op yield() {
   goto ADDRESS(dest);
 }
 
-inline op tailcall(in PMC) {
+inline op tailcall(invar PMC) {
   opcode_t *dest;
   PMC * const p = $1;
   dest = expr NEXT();
@@ -448,7 +448,7 @@ inline op returncc() {
   goto ADDRESS(dest);
 }
 
-inline op newclosure(out PMC, in PMC) {
+inline op newclosure(out PMC, invar PMC) {
   $1 = parrot_new_closure(interpreter, $2);
   goto NEXT();
 }
@@ -477,7 +477,7 @@ Define function parameters for this subroutine.
 
 Define return results for the subroutine return statement.
 
-For all of these opcodes the passed in PMC constant is the string
+For all of these opcodes the passed invar PMC constant is the string
 representation of a FixedIntegerArray with one flag word per argument.
 The flags are documented currently in F<include/parrot/enum.h> only.
 
@@ -604,15 +604,15 @@ inline op result_info(out PMC) {
 
 Sets register $1 to the current address plus the offset $2.
 
-=item B<set_addr>(in PMC, labelconst INT)
+=item B<set_addr>(invar PMC, labelconst INT)
 
 Sets PMC in register $1 to the current address plus the offset $2.
 
-=item B<set_addr>(in PMC, labelvar INT)
+=item B<set_addr>(invar PMC, labelvar INT)
 
 Sets PMC in register $1 to the absolute address $2 obtained from B<get_addr>.
 
-=item B<get_addr>(out INT, in PMC)
+=item B<get_addr>(out INT, invar PMC)
 
 Sets $1 to the absolute address of the Sub PMC $2.
 
@@ -623,17 +623,17 @@ inline op set_addr(out INT, labelconst INT) {
   goto NEXT();
 }
 
-inline op set_addr(in PMC, labelconst INT) {
+inline op set_addr(invar PMC, labelconst INT) {
   $1->vtable->set_pointer(interpreter, $1, (CUR_OPCODE + $2));
   goto NEXT();
 }
 
-inline op set_addr(in PMC, labelvar INT) {
+inline op set_addr(invar PMC, labelvar INT) {
   $1->vtable->set_pointer(interpreter, $1, (void* )$2);
   goto NEXT();
 }
 
-inline op get_addr(out INT, in PMC) {
+inline op get_addr(out INT, invar PMC) {
   $1 = (INTVAL)$2->vtable->get_pointer(interpreter, $2);
   goto NEXT();
 }
@@ -657,11 +657,11 @@ the control stack.
 
 Clear out the most recently placed exception.
 
-=item B<throw>(in PMC)
+=item B<throw>(invar PMC)
 
 Throw the exception in $1.
 
-=item B<rethrow>(in PMC)
+=item B<rethrow>(invar PMC)
 
 Only valid inside an exception handler. Rethrow the exception $1.
 
@@ -684,7 +684,7 @@ Push a mark labeled $1 onto the control stack.
 
 Pop all items off the control stack to the given mark.
 
-=item B<pushaction>(in PMC)
+=item B<pushaction>(invar PMC)
 
 Push the given Sub PMC $1 onto the control stack. If the control stack
 is unwound due to a C<popmark>, subroutine return, or an exception, the
@@ -705,13 +705,13 @@ inline op clear_eh() {
   goto NEXT();
 }
 
-inline op throw(in PMC) {
+inline op throw(invar PMC) {
   opcode_t * const ret = expr NEXT();
   opcode_t * const dest = (opcode_t *)throw_exception(interpreter, $1, ret);
   goto ADDRESS(dest);
 }
 
-inline op rethrow(in PMC) {
+inline op rethrow(invar PMC) {
   opcode_t * const dest = (opcode_t *)rethrow_exception(interpreter, $1);
   goto ADDRESS(dest);
 }
@@ -738,7 +738,7 @@ inline op popmark(in INT) {
   goto NEXT();
 }
 
-inline op pushaction(in PMC) {
+inline op pushaction(invar PMC) {
   Parrot_push_action(interpreter, $1);
   goto NEXT();
 }
@@ -966,7 +966,7 @@ inline op errorsoff(in INT) {
 
 ########################################
 
-=item B<runinterp>(in PMC, label INT)
+=item B<runinterp>(invar PMC, label INT)
 
 Run the code starting at offset $2 within interpreter $1.
 
@@ -976,7 +976,7 @@ Get the current ParrotInterpreter.
 
 =cut
 
-op runinterp(in PMC, label INT) {
+op runinterp(invar PMC, label INT) {
   Interp * const new_interp = (Interp *)PMC_data($1);
   Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
   new_interp->code = interpreter->code;
@@ -1093,14 +1093,14 @@ op collecton() {
   goto NEXT();
 }
 
-=item B<needs_destroy>(in PMC)
+=item B<needs_destroy>(invar PMC)
 
 Mark the PMC wanting destruction as soon as possible, for example
 when unused during the lazy sweep, triggered by C<sweep 0>.
 
 =cut
 
-op needs_destroy(in PMC) {
+op needs_destroy(invar PMC) {
    PObj_needs_early_DOD_SET($1);
    ++interpreter->arena_base->num_early_DOD_PMCs;
   goto NEXT();
@@ -1124,19 +1124,19 @@ Opcodes for interfacing with C functions in shared libraries.
 
 Load a dynamic link library named $2 and store it in $1.
 
-=item B<dlfunc>(out PMC, in PMC, in STR, in STR)
+=item B<dlfunc>(out PMC, invar PMC, in STR, in STR)
 
 Look up symbol $3 in library $2 with signature $4, and put the
 corresponding sub object in $1. Note that you need the signature so we
 can build or find an appropriate thunking function.
 
-=item B<dlvar>(out PMC, in PMC, in STR)
+=item B<dlvar>(out PMC, invar PMC, in STR)
 
 Look up symbol $3 in library $2. We assume that this is actually a
 variable address rather than a function address, and build an
 UnManagedStruct PMC and stick the address into its data pointer.
 
-=item B<compile>(out PMC, in PMC, in STR)
+=item B<compile>(out PMC, invar PMC, in STR)
 
 Don't use compile -- just invoke the compiler.
 
@@ -1144,12 +1144,12 @@ Don't use compile -- just invoke the compiler.
 
 Get a compiler for source type $2.
 
-=item B<compreg>(in STR, in PMC)
+=item B<compreg>(in STR, invar PMC)
 
 Register the sub $2 as a compiler for source type $1.
 $2 is either a NCI PMC with signature C<pIt> or a PASM Sub.
 
-=item B<new_callback>(out PMC, in PMC, in PMC, in STR)
+=item B<new_callback>(out PMC, invar PMC, invar PMC, in STR)
 
 Create a callback stub $1 for PASM subroutine $2 with userdata $3 and
 function signature $4.
@@ -1162,7 +1162,7 @@ inline op loadlib(out PMC, in STR) {
   goto NEXT();
 }
 
-op dlfunc (out PMC, in PMC, in STR, in STR) {
+op dlfunc (out PMC, invar PMC, in STR, in STR) {
   char * const name = string_to_cstring(interpreter, ($3));
 
   funcptr_t p = D2FPTR(Parrot_dlsym(PMC_IS_NULL($2) ? 
@@ -1182,7 +1182,7 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
   goto NEXT();
 }
 
-op dlvar (out PMC, in PMC, in STR) {
+op dlvar (out PMC, invar PMC, in STR) {
   char * const name = string_to_cstring(interpreter, ($3));
 
   void * const p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
@@ -1202,12 +1202,12 @@ op dlvar (out PMC, in PMC, in STR) {
   goto NEXT();
 }
 
-inline op compile(out PMC, in PMC, in STR) {
+inline op compile(out PMC, invar PMC, in STR) {
   internal_exception(1, "don't use compile - just invoke the compiler");
   goto NEXT();
 }
 
-inline op compreg(in STR, in PMC) {
+inline op compreg(in STR, invar PMC) {
   PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
       interpreter->iglobals, IGLOBALS_COMPREG_HASH);
   VTABLE_set_pmc_keyed_str(interpreter, compreg_hash, $1, $2);
@@ -1221,7 +1221,7 @@ inline op compreg(out PMC, in STR) {
   goto NEXT();
 }
 
-op new_callback(out PMC, in PMC, in PMC, in STR) {
+op new_callback(out PMC, invar PMC, invar PMC, in STR) {
   $1 = Parrot_make_cb(interpreter, $2, $3, $4);
   goto NEXT();
 }

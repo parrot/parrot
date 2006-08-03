@@ -34,13 +34,13 @@ These operations take an infix operation number and PMC arguments.
 
 =over 4
 
-=item B<pic_infix__>(inconst INT, in PMC, in PMC)
+=item B<pic_infix__>(inconst INT, invar PMC, invar PMC)
 
 One for fun and MOPS.
 
 =cut
 
-inline op pic_infix__(inconst INT, in PMC, in PMC) :pic {
+inline op pic_infix__(inconst INT, invar PMC, invar PMC) :pic {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     PMC *left, *right;
@@ -74,13 +74,13 @@ runit_v_pp:
     goto OFFSET(0);
 }
 
-=item B<pic_inline_sub__>(inconst INT, in PMC, in PMC)
+=item B<pic_inline_sub__>(inconst INT, invar PMC, invar PMC)
 
 And for more fun an inlined variant too.
 
 =cut
 
-inline op pic_inline_sub__(inconst INT, in PMC, in PMC) :pic {
+inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     PMC *left, *right;

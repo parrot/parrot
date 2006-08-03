@@ -192,7 +192,7 @@ op unpin(inout STR) :base_mem {
 
 =item B<substr>(inout STR, in INT, in INT, in STR)
 
-=item B<substr>(out STR, in PMC, in INT, in INT)
+=item B<substr>(out STR, invar PMC, in INT, in INT)
 
 Set $1 to the portion of $2 starting at (zero-based) character position
 $3 and having length $4. If no length ($4) is provided, it is equivalent to
@@ -258,7 +258,7 @@ inline op substr(inout STR, in INT, in INT, in STR) :base_core {
   goto NEXT();
 }
 
-inline op substr(out STR, in PMC, in INT, in INT) :base_core {
+inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
   $1 = $2->vtable->substr_str(interpreter, $2, $3, $4);
   goto NEXT();
 }
@@ -292,13 +292,13 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
 
 ########################################
 
-=item B<sprintf>(out STR, in STR, in PMC)
+=item B<sprintf>(out STR, in STR, invar PMC)
 
-=item B<sprintf>(out PMC, in PMC, in PMC)
+=item B<sprintf>(out PMC, invar PMC, invar PMC)
 
 #=item B<sprintf>(out STR, in STR) [unimplemented] [[what is this op supposed to do? --jrieks]]
 
-#=item B<sprintf>(out PMC, in PMC) [unimplemented] [[what is this op supposed to do? --jrieks]]
+#=item B<sprintf>(out PMC, invar PMC) [unimplemented] [[what is this op supposed to do? --jrieks]]
 
 Sets $1 to the result of calling C<Parrot_psprintf> with the
 given format ($2) and arguments ($3, which should be an ordered
@@ -312,12 +312,12 @@ see F<misc.c> for details.
 
 =cut
 
-inline op sprintf(out STR, in STR, in PMC) :base_core {
+inline op sprintf(out STR, in STR, invar PMC) :base_core {
     $1=Parrot_psprintf(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op sprintf(out PMC, in PMC, in PMC) :base_core {
+inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
     $1->vtable->set_string_native(interpreter, $1,
         Parrot_psprintf(interpreter, $2->vtable->get_string(interpreter, $2), $3)
     );
@@ -463,7 +463,7 @@ inline op titlecase(inout STR) :base_core {
 
 ###############################################################################
 
-=item B<join>(out STR, in STR, in PMC)
+=item B<join>(out STR, in STR, invar PMC)
 
 Create a new string $1 by joining array elements from array $3
 with string $2.
@@ -480,7 +480,7 @@ on regular expression, use C<PGE::Util>'s split from the standard library.
 
 =cut
 
-op join(out STR, in STR, in PMC) :base_core {
+op join(out STR, in STR, invar PMC) :base_core {
     $1 = string_join(interpreter, $2, $3);
     goto NEXT();
 }

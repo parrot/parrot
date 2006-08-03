@@ -27,95 +27,95 @@ These operations take an infix operation number and PMC arguments.
 
 =over 4
 
-=item B<infix>(inconst INT, in PMC, in INT)
+=item B<infix>(inconst INT, invar PMC, in INT)
 
-=item B<infix>(inconst INT, in PMC, in NUM)
+=item B<infix>(inconst INT, invar PMC, in NUM)
 
-=item B<infix>(inconst INT, in PMC, in STR)
+=item B<infix>(inconst INT, invar PMC, in STR)
 
-=item B<infix>(inconst INT, in PMC, in PMC)
+=item B<infix>(inconst INT, invar PMC, invar PMC)
 
 General inplace infix dispatch opcode. $1 is the MMD function number.
 
-=item B<infix>(inconst INT, out PMC, in PMC, in INT)
+=item B<infix>(inconst INT, out PMC, invar PMC, in INT)
 
-=item B<infix>(inconst INT, out PMC, in PMC, in NUM)
+=item B<infix>(inconst INT, out PMC, invar PMC, in NUM)
 
-=item B<infix>(inconst INT, out PMC, in PMC, in STR)
+=item B<infix>(inconst INT, out PMC, invar PMC, in STR)
 
-=item B<infix>(inconst INT, out PMC, in PMC, in PMC)
+=item B<infix>(inconst INT, out PMC, invar PMC, invar PMC)
 
 General infix dispatch opcode. $1 is the MMD function number.
 
-=item B<n_infix>(inconst INT, out PMC, in PMC, in INT)
+=item B<n_infix>(inconst INT, out PMC, invar PMC, in INT)
 
-=item B<n_infix>(inconst INT, out PMC, in PMC, in NUM)
+=item B<n_infix>(inconst INT, out PMC, invar PMC, in NUM)
 
-=item B<n_infix>(inconst INT, out PMC, in PMC, in STR)
+=item B<n_infix>(inconst INT, out PMC, invar PMC, in STR)
 
-=item B<n_infix>(inconst INT, out PMC, in PMC, in PMC)
+=item B<n_infix>(inconst INT, out PMC, invar PMC, invar PMC)
 
 General infix dispatch opcode. $1 is the MMD function number.
 These opcodes return a new result PMC $2.
 
 =cut
 
-inline op infix(inconst INT, in PMC, in INT) :base_core {
+inline op infix(inconst INT, invar PMC, in INT) :base_core {
   mmd_dispatch_v_pi(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op infix(inconst INT, in PMC, in NUM) :base_core {
+inline op infix(inconst INT, invar PMC, in NUM) :base_core {
   mmd_dispatch_v_pn(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op infix(inconst INT, in PMC, in STR) :base_core {
+inline op infix(inconst INT, invar PMC, in STR) :base_core {
   mmd_dispatch_v_ps(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op infix(inconst INT, in PMC, in PMC) :base_core {
+inline op infix(inconst INT, invar PMC, invar PMC) :base_core {
   mmd_dispatch_v_pp(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op infix(inconst INT, out PMC, in PMC, in INT) :base_core {
+inline op infix(inconst INT, out PMC, invar PMC, in INT) :base_core {
   $2 = mmd_dispatch_p_pip(interpreter, $3, $4, $2, $1);
   goto NEXT();
 }
 
-inline op infix(inconst INT, out PMC, in PMC, in NUM) :base_core {
+inline op infix(inconst INT, out PMC, invar PMC, in NUM) :base_core {
   $2 = mmd_dispatch_p_pnp(interpreter, $3, $4, $2, $1);
   goto NEXT();
 }
 
-inline op infix(inconst INT, out PMC, in PMC, in STR) :base_core {
+inline op infix(inconst INT, out PMC, invar PMC, in STR) :base_core {
   $2 = mmd_dispatch_p_psp(interpreter, $3, $4, $2, $1);
   goto NEXT();
 }
 
-inline op infix(inconst INT, out PMC, in PMC, in PMC) :base_core {
+inline op infix(inconst INT, out PMC, invar PMC, invar PMC) :base_core {
   $2 = mmd_dispatch_p_ppp(interpreter, $3, $4, $2, $1);
   goto NEXT();
 }
 
-inline op n_infix(inconst INT, out PMC, in PMC, in INT) :base_core {
+inline op n_infix(inconst INT, out PMC, invar PMC, in INT) :base_core {
   $2 = mmd_dispatch_p_pip(interpreter, $3, $4, NULL, $1);
   goto NEXT();
 }
 
-inline op n_infix(inconst INT, out PMC, in PMC, in NUM) :base_core {
+inline op n_infix(inconst INT, out PMC, invar PMC, in NUM) :base_core {
   $2 = mmd_dispatch_p_pnp(interpreter, $3, $4, NULL, $1);
   goto NEXT();
 }
 
-inline op n_infix(inconst INT, out PMC, in PMC, in STR) :base_core {
+inline op n_infix(inconst INT, out PMC, invar PMC, in STR) :base_core {
   $2 = mmd_dispatch_p_psp(interpreter, $3, $4, NULL, $1);
   goto NEXT();
 }
 
-inline op n_infix(inconst INT, out PMC, in PMC, in PMC) :base_core {
+inline op n_infix(inconst INT, out PMC, invar PMC, invar PMC) :base_core {
   $2 = mmd_dispatch_p_ppp(interpreter, $3, $4, NULL, $1);
   goto NEXT();
 }
@@ -138,7 +138,7 @@ constants into their destination register, $1.
 
 =item B<abs>(inout NUM)
 
-=item B<abs>(in PMC)
+=item B<abs>(invar PMC)
 
 Set $1 to its absolute value.
 
@@ -146,11 +146,11 @@ Set $1 to its absolute value.
 
 =item B<abs>(out NUM, in NUM)
 
-=item B<abs>(out PMC, in PMC)
+=item B<abs>(out PMC, invar PMC)
 
 Set $1 to absolute value of $2.
 
-=item B<n_abs>(out PMC, in PMC)
+=item B<n_abs>(out PMC, invar PMC)
 
 Create new $1 as the absolute of $2.
 
@@ -186,17 +186,17 @@ inline op abs(out NUM, in NUM) :base_core {
   goto NEXT();
 }
 
-inline op abs(in PMC) :base_core {
+inline op abs(invar PMC) :base_core {
   $1->vtable->i_absolute(interpreter, $1);
   goto NEXT();
 }
 
-inline op abs(out PMC, in PMC) :base_core {
+inline op abs(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->absolute(interpreter, $2, $1);
   goto NEXT();
 }
 
-inline op n_abs(out PMC, in PMC) :base_core {
+inline op n_abs(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->absolute(interpreter, $2, NULL);
   goto NEXT();
 }
@@ -333,7 +333,7 @@ inline op cmod(out NUM, in NUM, in NUM) :base_core {
 
 =item B<dec>(inout NUM)
 
-=item B<dec>(in PMC)
+=item B<dec>(invar PMC)
 
 Decrease $1 by one.
 
@@ -349,7 +349,7 @@ inline op dec(inout NUM) :base_core {
   goto NEXT();
 }
 
-inline op dec(in PMC) :base_core {
+inline op dec(invar PMC) :base_core {
   $1->vtable->decrement(interpreter, $1);
   goto NEXT();
 }
@@ -524,7 +524,7 @@ inline op floor(out NUM, in NUM) :base_core {
 
 =item B<inc>(inout NUM)
 
-=item B<inc>(in PMC)
+=item B<inc>(invar PMC)
 
 Increase $1 by one.
 
@@ -540,7 +540,7 @@ inline op inc(inout NUM) :base_core {
   goto NEXT();
 }
 
-inline op inc(in PMC) :base_core {
+inline op inc(invar PMC) :base_core {
   $1->vtable->increment(interpreter, $1);
   goto NEXT();
 }
@@ -643,7 +643,7 @@ inline op mul(out NUM, in NUM, in NUM) :base_core {
 
 =item B<neg>(inout NUM)
 
-=item B<neg>(in PMC)
+=item B<neg>(invar PMC)
 
 Set $1 to its negative.
 
@@ -651,11 +651,11 @@ Set $1 to its negative.
 
 =item B<neg>(out NUM, in NUM)
 
-=item B<neg>(out PMC, in PMC)
+=item B<neg>(out PMC, invar PMC)
 
 Set $1 to the negative of $2.
 
-=item B<n_neg>(out PMC, in PMC)
+=item B<n_neg>(out PMC, invar PMC)
 
 Create $1 as the negative of $2.
 
@@ -671,7 +671,7 @@ inline op neg(inout NUM) :base_core {
   goto NEXT();
 }
 
-inline op neg(in PMC) :base_core {
+inline op neg(invar PMC) :base_core {
   $1->vtable->i_neg(interpreter, $1);
   goto NEXT();
 }
@@ -686,12 +686,12 @@ inline op neg(out NUM, in NUM) :base_core {
   goto NEXT();
 }
 
-inline op neg(out PMC, in PMC) :base_core {
+inline op neg(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->neg(interpreter, $2, $1);
   goto NEXT();
 }
 
-inline op n_neg(out PMC, in PMC) :base_core {
+inline op n_neg(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->neg(interpreter, $2, NULL);
   goto NEXT();
 }

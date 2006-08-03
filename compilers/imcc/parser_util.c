@@ -106,7 +106,7 @@ op_fullname(char * dest, const char * name, SymReg * args[],
         *dest++ = '_';
         if (args[i]->type == VTADDRESS) {
 #if IMC_TRACE_HIGH
-        PIO_eprintf(NULL, " (address)%s", args[i]->name);
+            PIO_eprintf(NULL, " (address)%s", args[i]->name);
 #endif
             *dest++ = 'i';
             *dest++ = 'c';
@@ -115,18 +115,21 @@ op_fullname(char * dest, const char * name, SymReg * args[],
         /* if one ever wants num keys, they go with 'S' */
         if (keyvec & KEY_BIT(i)) {
 #if IMC_TRACE_HIGH
-        PIO_eprintf(NULL, " (key)%s", args[i]->name);
+            PIO_eprintf(NULL, " (key)%s", args[i]->name);
 #endif
             *dest++ = 'k';
-            if (args[i]->set == 'S' || args[i]->set == 'N' ||
-                    args[i]->set == 'K') {
+            if (args[i]->set == 'S' || args[i]->set == 'N' || args[i]->set == 'K') {
                 *dest++ = 'c';
                 continue;
             }
             else if (args[i]->set == 'P')
                 continue;
         }
-        *dest++ = tolower(args[i]->set);
+        if (args[i]->set == 'K')
+            *dest++ = 'p';
+        else
+            *dest++ = tolower(args[i]->set);
+
         if (args[i]->type & (VTCONST|VT_CONSTP)) {
 #if IMC_TRACE_HIGH
             PIO_eprintf(NULL, " (%cc)%s", tolower(args[i]->set), args[i]->name);
@@ -476,6 +479,8 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
             format[len] = '\0';
             strcat(format, "[%s], ");
         }
+        else if (r[i]->set == 'K')
+            strcat(format, "[%s], ");
         else
             strcat(format, "%s, ");
     }

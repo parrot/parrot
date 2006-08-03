@@ -80,9 +80,9 @@ op exchange(inout STR, inout STR) :base_core {
 
 =item B<set>(out INT, in NUM)
 
-=item B<set>(out INT, in PMC)
+=item B<set>(out INT, invar PMC)
 
-=item B<set>(out INT, in PMC)
+=item B<set>(out INT, invar PMC)
 
 =item B<set>(out INT, in STR)
 
@@ -90,23 +90,23 @@ op exchange(inout STR, inout STR) :base_core {
 
 =item B<set>(out NUM, in NUM)
 
-=item B<set>(out NUM, in PMC)
+=item B<set>(out NUM, invar PMC)
 
 =item B<set>(out NUM, in STR)
 
-=item B<set>(in PMC, in INT)
+=item B<set>(invar PMC, in INT)
 
-=item B<set>(in PMC, in NUM)
+=item B<set>(invar PMC, in NUM)
 
-=item B<set>(out PMC, in PMC)
+=item B<set>(out PMC, invar PMC)
 
-=item B<set>(in PMC, invar STR)
+=item B<set>(invar PMC, invar STR)
 
 =item B<set>(out STR, in INT)
 
 =item B<set>(out STR, in NUM)
 
-=item B<set>(out STR, in PMC)
+=item B<set>(out STR, invar PMC)
 
 =item B<set>(out STR, inconst STR)
 
@@ -114,7 +114,7 @@ op exchange(inout STR, inout STR) :base_core {
 
 =item B<set>(out PMC, inconst PMC)
 
-=item B<set>(in PMC, inconst STR)
+=item B<set>(invar PMC, inconst STR)
 
 Set $1 to $2.
 
@@ -150,12 +150,12 @@ inline op set(out NUM, in STR) :base_core {
   goto NEXT();
 }
 
-inline op set(out NUM, in PMC) :base_core {
+inline op set(out NUM, invar PMC) :base_core {
   $1 = $2->vtable->get_number(interpreter, $2);
   goto NEXT();
 }
 
-inline op set(out STR, in PMC) :base_core {
+inline op set(out STR, invar PMC) :base_core {
   $1 = $2->vtable->get_string(interpreter, $2);
   goto NEXT();
 }
@@ -185,32 +185,32 @@ inline op set(out PMC, inconst PMC) :base_core {
   goto NEXT();
 }
 
-inline op set(out PMC, in PMC) :base_core {
+inline op set(out PMC, invar PMC) :base_core {
   $1 = $2;
   goto NEXT();
 }
 
-inline op set(in PMC, in INT) :base_core {
+inline op set(invar PMC, in INT) :base_core {
   $1->vtable->set_integer_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op set(in PMC, in NUM) :base_core {
+inline op set(invar PMC, in NUM) :base_core {
   $1->vtable->set_number_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op set(in PMC, invar STR) :base_core {
+inline op set(invar PMC, invar STR) :base_core {
   $1->vtable->set_string_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op set(in PMC, inconst STR) :base_core {
+inline op set(invar PMC, inconst STR) :base_core {
   $1->vtable->set_string_native(interpreter, $1,
     string_copy(interpreter, $2));
   goto NEXT();
 }
-inline op set(out INT, in PMC) :base_core {
+inline op set(out INT, invar PMC) :base_core {
   $1 = $2->vtable->get_integer(interpreter, $2);
   goto NEXT();
 }
@@ -225,15 +225,15 @@ inline op set(out INT, in PMC) :base_core {
 
 =over 4
 
-=item B<assign>(in PMC, in INT)
+=item B<assign>(invar PMC, in INT)
 
-=item B<assign>(in PMC, in NUM)
+=item B<assign>(invar PMC, in NUM)
 
 Assign a new value $2, to PMC $1. Same as the equivalent B<set> opcodes.
 
-=item B<assign>(in PMC, in STR)
+=item B<assign>(invar PMC, in STR)
 
-=item B<assign>(in PMC, in PMC)
+=item B<assign>(invar PMC, invar PMC)
 
 Assign a new value $2, to PMC $1 by copying the value.
 
@@ -241,33 +241,33 @@ Assign a new value $2, to PMC $1 by copying the value.
 
 Assign a new value to a string by reusing the string header.
 
-=item B<setref>(in PMC, in PMC)
+=item B<setref>(invar PMC, invar PMC)
 
 Make $1 refer to $2 by calling C<set_pmc>.
 
-=item B<deref>(out PMC, in PMC)
+=item B<deref>(out PMC, invar PMC)
 
 Not strictly an assignment operation: Put into $1 the PMC that the
 reference PMC $2 refers to.
 
 =cut
 
-inline op assign(in PMC, in PMC) :base_core {
+inline op assign(invar PMC, invar PMC) :base_core {
   $1->vtable->assign_pmc(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op assign(in PMC, in INT) :base_core {
+inline op assign(invar PMC, in INT) :base_core {
   $1->vtable->set_integer_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op assign(in PMC, in NUM) :base_core {
+inline op assign(invar PMC, in NUM) :base_core {
   $1->vtable->set_number_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op assign(in PMC, in STR) :base_core {
+inline op assign(invar PMC, in STR) :base_core {
   $1->vtable->assign_string_native(interpreter, $1, $2);
   goto NEXT();
 }
@@ -277,12 +277,12 @@ inline op assign(out STR, in STR) :base_core {
   goto NEXT();
 }
 
-inline op setref(in PMC, in PMC) :base_core {
+inline op setref(invar PMC, invar PMC) :base_core {
   $1->vtable->set_pmc(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op deref(out PMC, in PMC) :base_ref {
+inline op deref(out PMC, invar PMC) :base_ref {
   $1 = $2->vtable->get_pmc(interpreter, $2);
   goto NEXT();
 }
@@ -293,7 +293,7 @@ inline op deref(out PMC, in PMC) :base_ref {
 
 =over 4
 
-=item B<setp_ind>(in INT, in PMC)
+=item B<setp_ind>(in INT, invar PMC)
 
 Set the PMC in register $1 to $2.
 Please note, that the register allocator doesn't track the usage of the
@@ -301,7 +301,7 @@ affected register - handle with care.
 
 =cut
 
-inline op setp_ind(in INT, in PMC) :base_ref {
+inline op setp_ind(in INT, invar PMC) :base_ref {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
         PANIC("Out of bound register access");
     REG_PMC($1) = $2;
@@ -363,32 +363,32 @@ inline op seti_ind(in INT, in INT) :base_ref {
 
 =over 4
 
-=item B<set>(in PMC, in INTKEY, in INT)
+=item B<set>(invar PMC, in INTKEY, in INT)
 
-=item B<set>(in PMC, in INTKEY, in NUM)
+=item B<set>(invar PMC, in INTKEY, in NUM)
 
-=item B<set>(in PMC, in INTKEY, in STR)
+=item B<set>(invar PMC, in INTKEY, in STR)
 
-=item B<set>(in PMC, in INTKEY, in PMC)
+=item B<set>(invar PMC, in INTKEY, invar PMC)
 
 =cut
 
-inline op set (in PMC, in INTKEY, in INT) :base_core {
+inline op set (invar PMC, in INTKEY, in INT) :base_core {
     $1->vtable->set_integer_keyed_int(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (in PMC, in INTKEY, in NUM) :base_core {
+inline op set (invar PMC, in INTKEY, in NUM) :base_core {
     $1->vtable->set_number_keyed_int(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (in PMC, in INTKEY, in STR) :base_core {
+inline op set (invar PMC, in INTKEY, in STR) :base_core {
     $1->vtable->set_string_keyed_int(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (in PMC, in INTKEY, in PMC) :base_core {
+inline op set (invar PMC, in INTKEY, invar PMC) :base_core {
     $1->vtable->set_pmc_keyed_int(interpreter, $1, $2, $3);
     goto NEXT();
 }
@@ -403,32 +403,32 @@ inline op set (in PMC, in INTKEY, in PMC) :base_core {
 
 =over 4
 
-=item B<set>(out INT, in PMC, in INTKEY)
+=item B<set>(out INT, invar PMC, in INTKEY)
 
-=item B<set>(out NUM, in PMC, in INTKEY)
+=item B<set>(out NUM, invar PMC, in INTKEY)
 
-=item B<set>(out STR, in PMC, in INTKEY)
+=item B<set>(out STR, invar PMC, in INTKEY)
 
-=item B<set>(out PMC, in PMC, in INTKEY)
+=item B<set>(out PMC, invar PMC, in INTKEY)
 
 =cut
 
-inline op set (out INT, in PMC, in INTKEY) :base_core {
+inline op set (out INT, invar PMC, in INTKEY) :base_core {
     $1 = $2->vtable->get_integer_keyed_int(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set (out NUM, in PMC, in INTKEY) :base_core {
+inline op set (out NUM, invar PMC, in INTKEY) :base_core {
     $1 = $2->vtable->get_number_keyed_int(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set (out STR, in PMC, in INTKEY) :base_core {
+inline op set (out STR, invar PMC, in INTKEY) :base_core {
     $1 = $2->vtable->get_string_keyed_int(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set (out PMC, in PMC, in INTKEY) :base_core {
+inline op set (out PMC, invar PMC, in INTKEY) :base_core {
     $1 = $2->vtable->get_pmc_keyed_int(interpreter, $2, $3);
     goto NEXT();
 }
@@ -443,32 +443,32 @@ inline op set (out PMC, in PMC, in INTKEY) :base_core {
 
 =over 4
 
-=item B<set>(in PMC, in KEY, in INT)
+=item B<set>(invar PMC, in KEY, in INT)
 
-=item B<set>(in PMC, in KEY, in NUM)
+=item B<set>(invar PMC, in KEY, in NUM)
 
-=item B<set>(in PMC, in KEY, in STR)
+=item B<set>(invar PMC, in KEY, in STR)
 
-=item B<set>(in PMC, in KEY, in PMC)
+=item B<set>(invar PMC, in KEY, invar PMC)
 
 =cut
 
-inline op set (in PMC, in KEY, in INT) :base_core {
+inline op set (invar PMC, in KEY, in INT) :base_core {
     $1->vtable->set_integer_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (in PMC, in KEY, in NUM) :base_core {
+inline op set (invar PMC, in KEY, in NUM) :base_core {
     $1->vtable->set_number_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (in PMC, in KEY, in STR) :base_core {
+inline op set (invar PMC, in KEY, in STR) :base_core {
     $1->vtable->set_string_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (in PMC, in KEY, in PMC) :base_core {
+inline op set (invar PMC, in KEY, invar PMC) :base_core {
     $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
@@ -483,44 +483,44 @@ inline op set (in PMC, in KEY, in PMC) :base_core {
 
 =over 4
 
-=item B<set>(out INT, in PMC, in KEY)
+=item B<set>(out INT, invar PMC, in KEY)
 
-=item B<set>(out NUM, in PMC, in KEY)
+=item B<set>(out NUM, invar PMC, in KEY)
 
-=item B<set>(out STR, in PMC, in KEY)
+=item B<set>(out STR, invar PMC, in KEY)
 
-=item B<set>(out PMC, in PMC, in KEY)
+=item B<set>(out PMC, invar PMC, in KEY)
 
 =cut
 
-inline op set (out INT, in PMC, in KEY) :base_core {
+inline op set (out INT, invar PMC, in KEY) :base_core {
     $1 = $2->vtable->get_integer_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set (out NUM, in PMC, in KEY) :base_core {
+inline op set (out NUM, invar PMC, in KEY) :base_core {
     $1 = $2->vtable->get_number_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set (out STR, in PMC, in KEY) :base_core {
+inline op set (out STR, invar PMC, in KEY) :base_core {
     $1 = $2->vtable->get_string_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set (out PMC, in PMC, in KEY) :base_core {
+inline op set (out PMC, invar PMC, in KEY) :base_core {
     $1 = $2->vtable->get_pmc_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
 
-=item B<clone>(out PMC, in PMC)
+=item B<clone>(out PMC, invar PMC)
 
 Makes a copy of the PMC in $2 and puts it in $1.
 
 =cut
 
-inline op clone(out PMC, in PMC) :base_mem {
+inline op clone(out PMC, invar PMC) :base_mem {
   $1 = VTABLE_clone(interpreter, $2);
   goto NEXT();
 }

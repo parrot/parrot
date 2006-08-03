@@ -24,7 +24,7 @@ Spawn a subprocess whose program name and arguments are contained in the string
 $2 and wait for it to finish. The return status, which is very
 system-dependent, goes in $1.
 
-=item B<spawnw>(out INT, in PMC)
+=item B<spawnw>(out INT, invar PMC)
 
 Spawn a subprocess whose program name and arguments are contained in the array
 $2 and wait for it to finish. The return status, which is very
@@ -40,7 +40,7 @@ inline op spawnw(out INT, in STR) {
   goto NEXT();
 }
 
-inline op spawnw(out INT, in PMC) {
+inline op spawnw(out INT, invar PMC) {
   $1 = Parrot_Run_OS_Command_Argv(interpreter, $2);
   goto NEXT();
 }

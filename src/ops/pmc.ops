@@ -30,15 +30,17 @@ type information.
 
 =item B<new>(out PMC, in INT)
 
-=item B<new>(out PMC, in INT, in PMC)
+=item B<new>(out PMC, in INT, invar PMC)
 
 =item B<new>(out PMC, inconst STR)
 
-=item B<new>(out PMC, inconst STR, in PMC)
+=item B<new>(out PMC, inconst STR, invar PMC)
 
-=item B<new>(out PMC, inconst KEY)
+=item B<new>(out PMC, inconst PMC)
 
-=item B<new>(out PMC, inconst KEY, in PMC)
+=item B<new>(out PMC, inconst PMC, invar PMC)
+
+=item B<new>(out PMC, in PMC)
 
 Create a new PMC of class $2; look in F<core_pmcs.h> for the base vtable
 types.  The assembler allows you to specify PMCs by type name, by key for
@@ -104,7 +106,7 @@ op new(out PMC, inconst STR, in PMC) {
     goto NEXT();
 }
 
-inline op new(out PMC, inconst KEY) :object_classes {
+inline op new(out PMC, inconst PMC) :object_classes {
     PMC *class = $2;
     INTVAL type = pmc_type_p(interpreter, class);
     if (type <= 0)
@@ -114,7 +116,7 @@ inline op new(out PMC, inconst KEY) :object_classes {
     goto NEXT();
 }
 
-op new(out PMC, inconst KEY, in PMC) {
+op new(out PMC, inconst PMC, in PMC) {
     PMC *class = $2;
     INTVAL type = pmc_type_p(interpreter, class);
     if (type <= 0)
@@ -126,36 +128,36 @@ op new(out PMC, inconst KEY, in PMC) {
 
 ########################################
 
-=item B<typeof>(out STR, in PMC)
+=item B<typeof>(out STR, invar PMC)
 
-=item B<typeof>(out INT, in PMC)
+=item B<typeof>(out INT, invar PMC)
 
 Return the type of PMC in $2.
 
-=item B<typeof>(out INT, in PMC, in KEY)
+=item B<typeof>(out INT, invar PMC, in KEY)
 
-=item B<typeof>(out INT, in PMC, in INTKEY)
+=item B<typeof>(out INT, invar PMC, in INTKEY)
 
 Return the type of the entry in aggregate PMC in $2 at key $3.
 
 =cut
 
-inline op typeof (out STR, in PMC) {
+inline op typeof (out STR, invar PMC) {
   $1 = VTABLE_name(interpreter, $2);
   goto NEXT();
 }
 
-inline op typeof (out INT, in PMC) {
+inline op typeof (out INT, invar PMC) {
   $1 = $2->vtable->type(interpreter, $2);
   goto NEXT();
 }
 
-inline op typeof (out INT, in PMC, in KEY) {
+inline op typeof (out INT, invar PMC, in KEY) {
   $1 = $2->vtable->type_keyed(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op typeof (out INT, in PMC, in INTKEY) {
+inline op typeof (out INT, invar PMC, in INTKEY) {
   $1 = $2->vtable->type_keyed_int(interpreter, $2, $3);
   goto NEXT();
 }
@@ -179,7 +181,7 @@ inline op typeof(out STR, in INT) {
 
 =item B<find_type>(out INT, in STR)
 
-=item B<find_type>(out INT, in KEY)
+=item B<find_type>(out INT, in PMC)
 
 Find the PMC type or Parrot datatype by name.
 
@@ -190,8 +192,29 @@ op find_type(out INT, in STR) {
     goto NEXT();
 }
 
-op find_type(out INT, in KEY) {
-    $1 = pmc_type_p(interpreter, $2);
+op find_type(out INT, in PMC) {
+
+    /* KLUDGE ALERT - XXX FIXME - THIS LOGIC SHOULD BE IN pmc_type_p() */
+
+    INTVAL n;
+
+    if ($2->vtable->base_type == enum_class_String)
+        $1 = pmc_type(interpreter, VTABLE_get_string(interpreter, $2));
+    else if ($2->vtable->base_type == enum_class_Key)
+        $1 = pmc_type_p(interpreter, $2);
+    else if ((n = VTABLE_elements(interpreter, $2)) <= 0)
+        $1 = 0;
+    else {
+	PMC *class = interpreter->class_hash;
+	INTVAL i;
+	for (i = 0; i < n; ++i) {
+            STRING *part = VTABLE_get_string_keyed_int(interpreter, $2, i);
+	    class = VTABLE_get_pmc_keyed_str(interpreter, class, part);
+	    if (PMC_IS_NULL(class))
+		break;
+	}
+	$1 = PMC_IS_NULL(class) ? 0 : PMC_int_val(class);
+    }
     goto NEXT();
 }
 
@@ -214,13 +237,13 @@ op valid_type(out INT, in INT) {
 }
 
 
-=item B<get_repr>(out STR, in PMC)
+=item B<get_repr>(out STR, invar PMC)
 
 Set $1 to a string representation of $2
 
 =cut
 
-op get_repr(out STR, in PMC) {
+op get_repr(out STR, invar PMC) {
     $1 = $2->vtable->get_repr(interpreter, $2);
     goto NEXT();
 }
@@ -241,14 +264,14 @@ A few simple and common PMC operations.
 
 ########################################
 
-=item B<find_method>(out PMC, in PMC, in STR)
+=item B<find_method>(out PMC, invar PMC, in STR)
 
 Looks up method $3 in $2's vtable, placing the corresponding method
 PMC in $1.
 
 =cut
 
-op find_method(out PMC, in PMC, in STR) {
+op find_method(out PMC, invar PMC, in STR) {
     opcode_t * resume = expr NEXT();
     $1 = $2->vtable->find_method(interpreter, $2, $3);
     if (!$1 || !VTABLE_defined(interpreter, $1))
@@ -259,76 +282,76 @@ op find_method(out PMC, in PMC, in STR) {
 
 ########################################
 
-=item B<defined>(out INT, in PMC)
+=item B<defined>(out INT, invar PMC)
 
-=item B<defined>(out INT, in PMC, in INTKEY)
+=item B<defined>(out INT, invar PMC, in INTKEY)
 
-=item B<defined>(out INT, in PMC, in KEY)
+=item B<defined>(out INT, invar PMC, in KEY)
 
 Test for PMC definedness.
 
-=item B<exists>(out INT, in PMC, in INTKEY)
+=item B<exists>(out INT, invar PMC, in INTKEY)
 
-=item B<exists>(out INT, in PMC, in KEY)
+=item B<exists>(out INT, invar PMC, in KEY)
 
 Test for key existence.
 
 =cut
 
-inline op defined(out INT, in PMC) {
+inline op defined(out INT, invar PMC) {
   $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined(interpreter, $2);
   goto NEXT();
 }
 
-inline op defined(out INT, in PMC, in INTKEY) {
+inline op defined(out INT, invar PMC, in INTKEY) {
   $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed_int(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op defined(out INT, in PMC, in KEY) {
+inline op defined(out INT, invar PMC, in KEY) {
   $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op exists(out INT, in PMC, in INTKEY) {
+inline op exists(out INT, invar PMC, in INTKEY) {
   $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->exists_keyed_int(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op exists(out INT, in PMC, in KEY) {
+inline op exists(out INT, invar PMC, in KEY) {
   $1 = PMC_IS_NULL($2) ? 0: $2->vtable->exists_keyed(interpreter, $2, $3);
   goto NEXT();
 }
 
 ########################################
 
-=item B<delete>(in PMC, in KEY)
+=item B<delete>(invar PMC, in KEY)
 
-=item B<delete>(in PMC, in INTKEY)
+=item B<delete>(invar PMC, in INTKEY)
 
 Delete the specified entry $2 from aggregate $1.
 
 =cut
 
-inline op delete(in PMC, in KEY) {
+inline op delete(invar PMC, in KEY) {
   $1->vtable->delete_keyed(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op delete(in PMC, in INTKEY) {
+inline op delete(invar PMC, in INTKEY) {
   $1->vtable->delete_keyed_int(interpreter, $1, $2);
   goto NEXT();
 }
 
 ########################################
 
-=item B<elements>(out INT, in PMC)
+=item B<elements>(out INT, invar PMC)
 
 Returns the number of items in aggregate $2
 
 =cut
 
-inline op elements(out INT, in PMC) {
+inline op elements(out INT, invar PMC) {
   $1 = VTABLE_elements(interpreter, $2);
   goto NEXT();
 }
@@ -341,7 +364,7 @@ inline op elements(out INT, in PMC) {
 
 =head2 Fast access ops
 
-The fast access ops are shortcuts to common operations implemented in PMCs.
+The fast access ops are shortcuts to common operations implemented invar PMCs.
 
 =over 4
 
@@ -349,136 +372,136 @@ The fast access ops are shortcuts to common operations implemented in PMCs.
 
 ########################################
 
-=item B<push>(in PMC, in INT)
+=item B<push>(invar PMC, in INT)
 
-=item B<push>(in PMC, in NUM)
+=item B<push>(invar PMC, in NUM)
 
-=item B<push>(in PMC, in STR)
+=item B<push>(invar PMC, in STR)
 
-=item B<push>(in PMC, in PMC)
+=item B<push>(invar PMC, invar PMC)
 
 Push $2 onto the end of the aggregate PMC $1, if that operation is defined.
 
 =cut
 
-inline op push (in PMC, in INT) {
+inline op push (invar PMC, in INT) {
     $1->vtable->push_integer(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op push (in PMC, in NUM) {
+inline op push (invar PMC, in NUM) {
     $1->vtable->push_float(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op push (in PMC, in STR) {
+inline op push (invar PMC, in STR) {
     $1->vtable->push_string(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op push (in PMC, in PMC) {
+inline op push (invar PMC, invar PMC) {
     $1->vtable->push_pmc(interpreter, $1, $2);
     goto NEXT();
 }
 
 ########################################
 
-=item B<pop>(out INT, in PMC)
+=item B<pop>(out INT, invar PMC)
 
-=item B<pop>(out NUM, in PMC)
+=item B<pop>(out NUM, invar PMC)
 
-=item B<pop>(out STR, in PMC)
+=item B<pop>(out STR, invar PMC)
 
-=item B<pop>(out PMC, in PMC)
+=item B<pop>(out PMC, invar PMC)
 
 Pop off last entry in the aggregate $2, placing the result in $1.
 
 =cut
 
-inline op pop (out INT, in PMC) {
+inline op pop (out INT, invar PMC) {
     $1 = $2->vtable->pop_integer(interpreter, $2);
     goto NEXT();
 }
 
-inline op pop (out NUM, in PMC) {
+inline op pop (out NUM, invar PMC) {
     $1 = $2->vtable->pop_float(interpreter, $2);
     goto NEXT();
 }
 
-inline op pop (out STR, in PMC) {
+inline op pop (out STR, invar PMC) {
     $1 = $2->vtable->pop_string(interpreter, $2);
     goto NEXT();
 }
 
-inline op pop (out PMC, in PMC) {
+inline op pop (out PMC, invar PMC) {
     $1 = $2->vtable->pop_pmc(interpreter, $2);
     goto NEXT();
 }
 
 ########################################
 
-=item B<unshift>(in PMC, in INT)
+=item B<unshift>(invar PMC, in INT)
 
-=item B<unshift>(in PMC, in NUM)
+=item B<unshift>(invar PMC, in NUM)
 
-=item B<unshift>(in PMC, in STR)
+=item B<unshift>(invar PMC, in STR)
 
-=item B<unshift>(in PMC, in PMC)
+=item B<unshift>(invar PMC, invar PMC)
 
 Unshift $2 onto the end of the aggregate PMC $1, if that operation is defined.
 
 =cut
 
-inline op unshift (in PMC, in INT) {
+inline op unshift (invar PMC, in INT) {
     $1->vtable->unshift_integer(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (in PMC, in NUM) {
+inline op unshift (invar PMC, in NUM) {
     $1->vtable->unshift_float(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (in PMC, in STR) {
+inline op unshift (invar PMC, in STR) {
     $1->vtable->unshift_string(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (in PMC, in PMC) {
+inline op unshift (invar PMC, invar PMC) {
     $1->vtable->unshift_pmc(interpreter, $1, $2);
     goto NEXT();
 }
 
 ########################################
 
-=item B<shift>(out INT, in PMC)
+=item B<shift>(out INT, invar PMC)
 
-=item B<shift>(out NUM, in PMC)
+=item B<shift>(out NUM, invar PMC)
 
-=item B<shift>(out STR, in PMC)
+=item B<shift>(out STR, invar PMC)
 
-=item B<shift>(out PMC, in PMC)
+=item B<shift>(out PMC, invar PMC)
 
 Shift off last entry in the aggregate $2, placing the result in $1.
 
 =cut
 
-inline op shift (out INT, in PMC) {
+inline op shift (out INT, invar PMC) {
     $1 = $2->vtable->shift_integer(interpreter, $2);
     goto NEXT();
 }
 
-inline op shift (out NUM, in PMC) {
+inline op shift (out NUM, invar PMC) {
     $1 = $2->vtable->shift_float(interpreter, $2);
     goto NEXT();
 }
 
-inline op shift (out STR, in PMC) {
+inline op shift (out STR, invar PMC) {
     $1 = $2->vtable->shift_string(interpreter, $2);
     goto NEXT();
 }
 
-inline op shift (out PMC, in PMC) {
+inline op shift (out PMC, invar PMC) {
     $1 = $2->vtable->shift_pmc(interpreter, $2);
     goto NEXT();
 }
@@ -500,53 +523,53 @@ Ops to deal with PMC properties.
 
 ########################################
 
-=item B<setprop>(in PMC, in STR, in PMC)
+=item B<setprop>(invar PMC, in STR, invar PMC)
 
 Set property $2 to value $3 for PMC $1.
 
 =cut
 
-op setprop(in PMC, in STR, in PMC) {
+op setprop(invar PMC, in STR, invar PMC) {
       $1->vtable->setprop(interpreter, $1, $2, $3);
       goto NEXT();
 }
 
 ########################################
 
-=item B<getprop>(out PMC, in STR, in PMC)
+=item B<getprop>(out PMC, in STR, invar PMC)
 
 Get property $2 of PMC $3 and put it in $1.
 
 =cut
 
-op getprop(out PMC, in STR, in PMC) {
+op getprop(out PMC, in STR, invar PMC) {
    $1 = $3->vtable->getprop(interpreter, $3, $2);
    goto NEXT();
 }
 
 ########################################
 
-=item B<delprop>(in PMC, in STR)
+=item B<delprop>(invar PMC, in STR)
 
 Delete property $2 from PMC $1.
 
 =cut
 
-op delprop(in PMC, in STR) {
+op delprop(invar PMC, in STR) {
    $1->vtable->delprop(interpreter, $1, $2);
    goto NEXT();
 }
 
 ########################################
 
-=item B<prophash>(out PMC, in PMC)
+=item B<prophash>(out PMC, invar PMC)
 
-Get a hash for the properties in PMC $2 and put it in $1. If the property
+Get a hash for the properties invar PMC $2 and put it in $1. If the property
 hash doesn't exist, the C<Null> PMC is returned.
 
 =cut
 
-op prophash(out PMC, in PMC) {
+op prophash(out PMC, invar PMC) {
    $1 = $2->vtable->getprops(interpreter, $2);
    goto NEXT();
 }
@@ -567,7 +590,7 @@ Ops to PMC freeze, thaw.
 
 ########################################
 
-=item B<freeze>(out STR, in PMC)
+=item B<freeze>(out STR, invar PMC)
 
 Set $1 to the frozen image of $2.
 
@@ -577,7 +600,7 @@ Set $1 to a newly created PMC from the image $2.
 
 =cut
 
-op freeze(out STR, in PMC) {
+op freeze(out STR, invar PMC) {
    $1 = Parrot_freeze(interpreter, $2);
    goto NEXT();
 }
@@ -608,14 +631,14 @@ addition or subtraction, or one of the other binary MMD operations.
 
 ########################################
 
-=item B<mmdvtregister>(in INT, in INT, in INT, in PMC)
+=item B<mmdvtregister>(in INT, in INT, in INT, invar PMC)
 
 Register method $4 as the MMD method for vtable entry $1 for classes
 $2 and $3.
 
 =cut
 
-inline op mmdvtregister(in INT, in INT, in INT, in PMC) {
+inline op mmdvtregister(in INT, in INT, in INT, invar PMC) {
   mmd_register_sub(interpreter, $1, $2, $3, $4);
   goto NEXT();
 }
@@ -645,7 +668,7 @@ inline op mmdvtfind(out PMC, in INT, in INT, in INT) {
 
 ########################################
 
-=item B<register>(in PMC)
+=item B<register>(invar PMC)
 
 Add a reference of PMC $1 to the interpreter's root set of PMCs. This is needed
 for extensions to make sure that the PMC is properly marked during DOD, if that
@@ -654,41 +677,41 @@ PMC is not known to Parrot's core elsewhere.
 A PMC can be registered multiple times.  If it's unregistered and the
 registration count reaches zero, it will be destroyed during the next DOD run.
 
-=item B<unregister>(in PMC)
+=item B<unregister>(invar PMC)
 
 Remove one reference of $1.
 
 =cut
 
-op register(in PMC) {
+op register(invar PMC) {
   dod_register_pmc(interpreter, $1);
   goto NEXT();
 }
 
-op unregister(in PMC) {
+op unregister(invar PMC) {
   dod_unregister_pmc(interpreter, $1);
   goto NEXT();
 }
 
-=item B<hash>(out INT, in PMC)
+=item B<hash>(out INT, invar PMC)
 
 Set $1 to the hash value of $2.
 
 =cut
 
-op hash(out INT, in PMC) {
+op hash(out INT, invar PMC) {
   $1 = VTABLE_hash(interpreter, $2, 0);   /* XXX */
   goto NEXT();
 }
 
-=item B<get_mro>(out PMC, in PMC)
+=item B<get_mro>(out PMC, invar PMC)
 
 Set $1 to the mro array of the PMC $2. Please note that this is a
 direct reference so messing with it can do harm to the method lookup.
 
 =cut
 
-op get_mro(out PMC, in PMC) {
+op get_mro(out PMC, invar PMC) {
   $1 = $2->vtable->mro;
   goto NEXT();
 }

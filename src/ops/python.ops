@@ -33,7 +33,7 @@ Currently included in main - will be split.
 
 =item B<print_item>(in NUM)
 
-=item B<print_item>(in PMC)
+=item B<print_item>(invar PMC)
 
 =item B<print_item>(in STR)
 
@@ -83,7 +83,7 @@ op print_item(in STR) :base_io {
   goto NEXT();
 }
 
-op print_item(in PMC) :base_io {
+op print_item(invar PMC) :base_io {
   PMC * const p = $1;
   PMC * const io = PIO_STDOUT(interpreter);
   STRING * const s = (VTABLE_get_string(interpreter, p));
@@ -103,24 +103,24 @@ op print_newline() :base_io {
   goto NEXT();
 }
 
-=item B<print_item>(in PMC, in INT)
+=item B<print_item>(invar PMC, in INT)
 
-=item B<print_item>(in PMC, in NUM)
+=item B<print_item>(invar PMC, in NUM)
 
-=item B<print_item>(in PMC, in PMC)
+=item B<print_item>(invar PMC, invar PMC)
 
-=item B<print_item>(in PMC, in STR)
+=item B<print_item>(invar PMC, in STR)
 
 Print $2 to IO stream object $1. If another C<print_item> follows, a
 space is inserted.
 
-=item B<print_newline>(in PMC)
+=item B<print_newline>(invar PMC)
 
 Print a newline char to IO stream object $1.
 
 =cut
 
-inline op print_item(in PMC, in INT) :base_io {
+inline op print_item(invar PMC, in INT) :base_io {
   PMC * const io = $1;
   if (PIO_softspace(interpreter, io, 0))
     PIO_puts(interpreter, io, " ");
@@ -129,7 +129,7 @@ inline op print_item(in PMC, in INT) :base_io {
   goto NEXT();
 }
 
-inline op print_item(in PMC, in NUM) :base_io {
+inline op print_item(invar PMC, in NUM) :base_io {
   PMC * const io = $1;
   STRING *s;
   if (PIO_softspace(interpreter, io, 0))
@@ -145,7 +145,7 @@ inline op print_item(in PMC, in NUM) :base_io {
   goto NEXT();
 }
 
-op print_item(in PMC, in STR) :base_io {
+op print_item(invar PMC, in STR) :base_io {
   STRING * const s = $2;
   PMC * const io = $1; /* TODO Can this be localized? */
   if (s && string_length(interpreter, s)) {
@@ -157,7 +157,7 @@ op print_item(in PMC, in STR) :base_io {
   goto NEXT();
 }
 
-op print_item(in PMC, in PMC) :base_io {
+op print_item(invar PMC, invar PMC) :base_io {
   PMC * const p = $2;
   PMC * const io = $1; /* TODO Can this be localized? */
   STRING *s = (VTABLE_get_string(interpreter, p));
@@ -170,7 +170,7 @@ op print_item(in PMC, in PMC) :base_io {
   goto NEXT();
 }
 
-op print_newline(in PMC) :base_io {
+op print_newline(invar PMC) :base_io {
   PMC * const io = $1;
   PIO_puts(interpreter, io, "\n");
   PIO_softspace(interpreter, io, 0);

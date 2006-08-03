@@ -447,7 +447,7 @@ do_loadlib(Interp *interp, char *lib)
 %type <i> func_assign get_results
 %type <i> opt_invocant
 %type <sr> target targetlist reg const var string result
-%type <sr> keylist _keylist maybe_keylist key
+%type <sr> keylist keylist_force _keylist key maybe_ns
 %type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args
@@ -621,7 +621,7 @@ opt_pasmcode:
   ;
 
 class_namespace:
-    NAMESPACE maybe_keylist '\n'
+    NAMESPACE maybe_ns '\n'
                 {
                     int re_open = 0;
                     $$ = 0;
@@ -636,7 +636,7 @@ class_namespace:
                 }
    ;
 
-maybe_keylist:
+maybe_ns:
      '[' keylist ']'	{ $$ = $2; }
    |			{ $$ = NULL; }
    ;
@@ -1378,9 +1378,8 @@ _var_or_i:
                       regs[nargs++] = $3;
                       $$ = $1;
                    }
-   | '[' keylist ']'
+   | '[' keylist_force ']'
                    {
-                      keyvec |= KEY_BIT(nargs);
                       regs[nargs++] = $2;
                       $$ = $2;
                    }
@@ -1411,8 +1410,12 @@ var:
    | const
    ;
 
-keylist:           {  nkeys=0; in_slice = 0; }
-     _keylist      {  $$ = link_keys(interp, nkeys, keys); }
+keylist:           {  nkeys = 0; in_slice = 0; }
+     _keylist      {  $$ = link_keys(interp, nkeys, keys, 0); }
+   ;
+
+keylist_force:     {  nkeys = 0; in_slice = 0; }
+     _keylist      {  $$ = link_keys(interp, nkeys, keys, 1); }
    ;
 
 _keylist:

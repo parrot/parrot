@@ -1,5 +1,11 @@
 #1 $Id$
 
+2006.08.02    chip
+	* opcodes: "in PMC" is no longer a synonym for "invar PMC";
+	there are opcodes now that want the real "in PMC".
+	* namespace opcodes now accept name arrays again, in addition
+	to keys; the corresponding namespace PMC methods are doomed.
+
 2006.07.21    leo
 	* Parrot_exit, Parrot_on_exit take now an Interp * argument
 

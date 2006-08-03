@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2006.08.02	chip	standalone keys are "_pc"; ns ops take arrays again
 2006.07.25	chip	experimental op find_type_i_p for Patrick
 2006.07.25	chip	fix key-encoding bug; clean up obsolete ops
 2006.07.24	chip	new {get,set}*global opcodes

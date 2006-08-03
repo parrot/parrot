@@ -369,7 +369,7 @@ sub read_ops
 
                 if ($use eq 'in')
                 {
-                    push @temp, ($type eq 'p') ? 'p' : "$type|${type}c";
+                    push @temp, "$type|${type}c";
                     push @argdirs, 'i';
                 }
                 elsif ($use eq 'invar')

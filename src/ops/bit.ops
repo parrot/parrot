@@ -68,15 +68,15 @@ inline op bands(out STR, in STR, in STR) :base_core {
 
 =item B<bnot>(inout INT)
 
-=item B<bnot>(in PMC)
+=item B<bnot>(invar PMC)
 
 Sets $1 to C<bitwise not> $1 inplace.
 
 =item B<bnot>(out INT, in INT)
 
-=item B<bnot>(out PMC, in PMC)
+=item B<bnot>(out PMC, invar PMC)
 
-=item B<n_bnot>(out PMC, in PMC)
+=item B<n_bnot>(out PMC, invar PMC)
 
 Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
@@ -92,30 +92,30 @@ inline op bnot(out INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op bnot(in PMC) :base_core {
+inline op bnot(invar PMC) :base_core {
   $1->vtable->i_bitwise_not(interpreter, $1);
   goto NEXT();
 }
 
-inline op bnot(out PMC, in PMC) :base_core {
+inline op bnot(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->bitwise_not(interpreter, $2, $1);
   goto NEXT();
 }
 
-inline op n_bnot(out PMC, in PMC) :base_core {
+inline op n_bnot(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->bitwise_not(interpreter, $2, NULL);
   goto NEXT();
 }
 
 =item B<bnots>(inout STR)
 
-=item B<bnots>(in PMC)
+=item B<bnots>(invar PMC)
 
 =item B<bnots>(out STR, in STR)
 
-=item B<bnots>(out PMC, in PMC)
+=item B<bnots>(out PMC, invar PMC)
 
-=item B<n_bnots>(out PMC, in PMC)
+=item B<n_bnots>(out PMC, invar PMC)
 
 Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
@@ -131,17 +131,17 @@ inline op bnots(out STR, in STR) :base_core {
   goto NEXT();
 }
 
-inline op bnots(in PMC) :base_core {
+inline op bnots(invar PMC) :base_core {
   $1->vtable->i_bitwise_nots(interpreter, $1);
   goto NEXT();
 }
 
-inline op bnots(out PMC, in PMC) :base_core {
+inline op bnots(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->bitwise_nots(interpreter, $2, $1);
   goto NEXT();
 }
 
-inline op n_bnots(out PMC, in PMC) :base_core {
+inline op n_bnots(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->bitwise_nots(interpreter, $2, NULL);
   goto NEXT();
 }
