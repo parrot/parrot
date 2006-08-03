@@ -1,7 +1,7 @@
 grammar js;
 
 proto 'postfix:++' is precedence('13') { ... }
-proto 'postfix:--' is equiv('postfix:--') { ... }
+proto 'postfix:--' is equiv('postfix:++') { ... }
 
 proto 'prefix:delete' is precedence('12') { ... }
 proto 'prefix:void' is equiv('infix:delete') { ... }
