@@ -444,16 +444,14 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
 .sub main :main
     .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    $P1 = $P0["parrot"]
     $P3 = new .NameSpace
-    $P1["Foo"] = $P3
+    set_hll_global "Foo", $P3
     # fetch w array
     $P4 = new .FixedStringArray
     $P4 = 1
     $P4[0] = 'Foo'
-    $P2 = $P1.'get_namespace'($P4)
-    $P2 = $P2.'name'()
+    $P0 = get_hll_namespace $P4
+    $P2 = $P0.'name'()
     $I2 = elements $P2
     print $I2
     print "\n"
@@ -783,10 +781,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Namespace.get_global() with array ('')");
 .namespace ['foo']
 
 .sub main :main
-  $P0 = get_hll_namespace
   $P1 = new .ResizableStringArray
   $P1[0] = ''
-  $P1 = $P0.'get_global'($P1, 'print_ok')
+  $P1 = get_hll_global $P1, 'print_ok'
   $P1()
   end
 .end

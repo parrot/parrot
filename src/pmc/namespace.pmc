@@ -332,21 +332,6 @@ Returns the name of the namespace as an array of strings.
 
 /*
 
-=item C<METHOD PMC* get_namespace(PMC* nsloc)>
-
-Return the sub-namespace of SELF denoted by the given locator, which is
-either a string or an array of strings.
-
-=cut
-
-*/
-
-    METHOD PMC* get_namespace(PMC* nsloc) {
-	return Parrot_get_namespace_keyed(INTERP, SELF, nsloc);
-    }
-
-/*
-
 =item C<METHOD PMC* get_sym(STRING* name)>
 
 Return the symbol (var or sub) with the given name. This can be used
@@ -368,55 +353,6 @@ to retrieve symbols, if a NameSpace with the same name exists.
                 ns->vtable->base_type == enum_class_FixedPMCArray)
             ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
         return ns;
-    }
-/*
-
-=item C<METHOD PMC* make_namespace(PMC* nsloc)>
-
-Find or (if necessary) create a sub-namespace of SELF denoted by the given
-locator, which is either a string or an array of strings.
-
-=cut
-
-*/
-
-    METHOD PMC* make_namespace(PMC* nsloc) {
-	return Parrot_make_namespace_keyed(INTERP, SELF, nsloc);
-    }
-
-/*
-
-=item C<METHOD PMC* get_global(PMC* nsloc, STRING* name)>
-
-Return the global with the given name in the sub-namespace of SELF denoted
-by the given locator, which is either a string or an array of strings.
-
-=cut
-
-*/
-
-    METHOD PMC* get_global(PMC* nsloc, STRING* globalname) {
-        return Parrot_get_global(INTERP,
-				 Parrot_get_namespace_keyed(INTERP, SELF, nsloc),
-				 globalname);
-    }
-
-/*
-
-=item C<METHOD PMC* set_global(PMC* nsloc, STRING* name, PMC* val)>
-
-Store the give value as a global with the given name in the sub-namespace of
-SELF denoted by the given locator, which is either a string or an array of
-strings.
-
-=cut
-
-*/
-
-    METHOD void set_global(PMC* nsloc, STRING* globalname, PMC* val) {
-        Parrot_set_global(INTERP,
-			  Parrot_make_namespace_keyed(INTERP, SELF, nsloc),
-			  globalname, val);
     }
 
 /*

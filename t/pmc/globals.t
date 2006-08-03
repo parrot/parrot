@@ -83,8 +83,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - array");
   $P0 = split "::", "Foo::Bar::test"
   $S0 = pop $P0
 
-  $P1 = get_hll_namespace
-  $P1 = $P1.'get_namespace'($P0)
+  $P1 = get_hll_namespace $P0
   $P1 = $P1[$S0]
 
   $P1()
