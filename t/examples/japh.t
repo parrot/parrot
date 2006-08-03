@@ -41,7 +41,7 @@ my %todo = ( 1  => 'opcode "pack" is gone',
              9  => 'P1 is no longer special',
              10 => 'core dump',
              11 => 'opcode "pack" is gone, other reasons',
-             12 => 'unknown reason',
+             12 => '{{deleted}}',
              13 => 'unreliable, but often succeeds',
              14 => 'unknown reason',
              15 => 'unknown reason',
@@ -58,6 +58,10 @@ if ( $PConfig{intvalsize} == 8) {
 # run all tests and tell about todoness
 foreach ( 1 .. 17 ) {
     my $pasm_fn   = "examples/japh/japh$_.pasm";
+    unless (-e $pasm_fn) {
+        pass("deleted");
+        next;
+    }
 
     my @todo = $todo{$_} ? ( todo => $todo{$_} ) : ();
     example_output_is($pasm_fn, "Just another Parrot Hacker\n", @todo);
