@@ -186,10 +186,10 @@ for(@{$ops->{OPS}}) {
     my $opname = $_->full_name;
     my $n = $ParrotOps::optable{$opname} ;
     if ($n != $_->{CODE}) {
-	die "op number mismatch ops.num: $n core.ops: $_->{CODE}";
+	die "op $opname: number mismatch: ops.num $n vs. core.ops $_->{CODE}";
     }
     if ($seq != $_->{CODE}) {
-	die "op sequence mismatch ops.num: $seq core.ops: $_->{CODE}";
+	die "op $opname: sequence mismatch: ops.num $seq vs. core.ops $_->{CODE}";
     }
     push @{$real_ops->{OPS}}, $_;
     ++$seq;
