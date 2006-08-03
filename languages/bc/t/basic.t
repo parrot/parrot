@@ -23,7 +23,7 @@ use Parrot::Test;
 use Test::More;
 
 if ( $PConfig{has_python} ) {
-  plan tests => 82;
+  plan tests => 83;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
@@ -135,12 +135,13 @@ my @tests = (
        [ '  ( 1 * 2 ) + ( ( ( ( 3 + 4 ) + 5 ) * 6 ) * 7 ) ', '506' ],
 
        # semicolons
-       [ '1; 2', [1, 2], 'two expressions seperated by a semicolon', with_past => 1, with_antlr3 => 0 ],
+       [ '1; 2', [1, 2], 'two expressions seperated by a semicolon', with_past => 1, with_antlr3 => 1 ],
+       [ '1+1+1; 2 + 2 + 2  ;  3 + 3 -1 + 3 +1', [3, 6, 9], '3 additive expression with semicolons', with_antlr3 => 1 ],
        [ '1+1*1; 2+2*2', [2, 6] ],
        [ '3-3/3; 4+4%4;  5-5+5', [2, 4, 5] ],
 
        # keyword quit
-       [ "1; 2\nquit\n 3", [1, 2] ],
+       [ "1; 2\nquit\n 3", [1, 2], 'int after quit', with_antlr3 => 1 ],
 
        # named expressions
        [ "a", [0], 'uninitialized a' ],

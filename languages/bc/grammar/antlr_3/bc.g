@@ -24,14 +24,22 @@ tokens
 
 
 program 
-  : input_item quit -> ^( PROGRAM input_item )
+  : input_item+ quit -> ^( PROGRAM input_item+)
   ;
 
 
-input_item
-  : expression +
+input_item 
+  : semicolon_list
   ;
 
+semicolon_list 
+  : statement ( ';'! statement )*
+  ;
+
+
+statement
+  : expression
+  ;
 
 expression
   : adding_expression
@@ -89,3 +97,9 @@ WS
       channel = 99;       // send into nirwana 
     }
   ;    
+
+// Windows and Unix style newlines
+NEWLINE
+  : ('\r')? '\n'+
+  ;
+
