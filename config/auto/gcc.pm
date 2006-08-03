@@ -29,6 +29,7 @@ sub runstep
     my ($self, $conf) = @_;
 
     my $verbose = $conf->options->get('verbose');
+    my $maint   = $conf->options->get('maintainer');
 
     my %gnuc;
 
@@ -88,7 +89,10 @@ sub runstep
 
         my @opt_and_vers = (
             0 =>
-                "-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
+                "-W -Wall -Wstrict-prototypes -Wmissing-prototypes -Winline"
+		." -Wshadow -Wpointer-arith -Wcast-qual"
+		." -Wwrite-strings -Waggregate-return -Winline -Wno-unused"
+                .($maint ? " -Wlarger-than-4096" : ""),
 
             # others; ones we might like marked with ?
             # ? -Wundef for undefined idenfiers in #if
@@ -107,7 +111,7 @@ sub runstep
             #
             # -Wcast-align is now removed: it gives too many false positives
             #    e.g. when accessing registers - this is all aligned
-     
+
             2.7  => "",
             2.8  => "-Wsign-compare",
             2.95 => "",
@@ -117,9 +121,10 @@ sub runstep
             # 3.x  does not align functions per default, its turned on with
             #      -O2 and -O3
             #      -falign-functions=16 is the real alignment, no exponent
-            3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked "
-                . "-Wdisabled-optimization -mno-accumulate-outgoing-args "
-                . "-Wno-shadow -falign-functions=16 ",
+            3.0 => "-falign-functions=16"
+                   ." -Wformat-nonliteral -Wformat-security -Wpacked"
+                   ." -Wdisabled-optimization -mno-accumulate-outgoing-args"
+                   ." -Wno-shadow",
 
             # -Wsequence-point is part of -Wall
             # -Wfloat-equal may not be what we want
