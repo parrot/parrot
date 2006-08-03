@@ -123,6 +123,7 @@ Initializes the array.
 
     void init () {
         PMC_int_val(SELF) = 0;
+        PMC_data(SELF) = NULL;
         PObj_active_destroy_SET(SELF);
         PObj_data_is_PMC_array_SET(SELF);
     }
@@ -153,9 +154,10 @@ Destroys the array.
 */
 
     void destroy () {
-        if (PMC_data(SELF))
+        if (PMC_data(SELF)) {
             mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
+            PMC_data(SELF) = NULL;
+        }
         PMC_int_val(SELF) = 0;
     }
 
@@ -170,17 +172,14 @@ Creates and returns a copy of the array.
 */
 
     PMC* clone () {
-        INTVAL size;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        if (!PMC_data(SELF))
-            return dest;
-        size = PMC_int_val(SELF);
-        PMC_int_val(dest) = size;
-
-        PMC_data(dest) = mem_sys_allocate(size * sizeof(PMC*));
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(PMC*));
-        PObj_data_is_PMC_array_SET(dest);
+        INTVAL size = PMC_int_val(SELF);
+        if (size) {
+            PMC_int_val(dest) = size;
+            PMC_data(dest) = mem_sys_allocate(size * sizeof(PMC*));
+            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(PMC*));
+            PObj_data_is_PMC_array_SET(dest);
+        }
         return dest;
     }
 
