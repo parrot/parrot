@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 33;
 
 =head1 NAME
 
@@ -678,4 +678,63 @@ catch:
 .end
 CODE
 caught
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pushaction - return from main");
+.sub main :main
+    print "main\n"
+    .const .Sub at_exit = "exit_handler"
+    pushaction at_exit
+    .return()
+.end
+
+.sub exit_handler
+    .param int flag
+    print_item "at_exit, flag ="
+    print_item flag
+    print_newline
+.end
+CODE
+main
+at_exit, flag = 0
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pushaction - end in main");
+.sub main :main
+    print "main\n"
+    .const .Sub at_exit = "exit_handler"
+    pushaction at_exit
+    # IMCC inserts end here, because it is :main
+.end
+
+.sub exit_handler
+    .param int flag
+    print_item "at_exit, flag ="
+    print_item flag
+    print_newline
+.end
+CODE
+main
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "pushaction - throw in main");
+.sub main :main
+    print "main\n"
+    .const .Sub at_exit = "exit_handler"
+    pushaction at_exit
+    $P0 = new .Exception
+    throw $P0
+    .return()
+.end
+
+.sub exit_handler
+    .param int flag
+    print_item "at_exit, flag ="
+    print_item flag
+    print_newline
+.end
+CODE
+/^main
+at_exit, flag = 1
+No exception handler/
 OUTPUT
