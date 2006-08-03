@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 
 =head1 NAME
 
@@ -783,4 +783,59 @@ pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Conure");
 .end
 CODE
 37
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs");
+.sub main :main
+    .local pmc cl, o
+    #cl = subclass 'Hash', 'OPTable'
+    cl = newclass 'OPTable'
+    addattribute cl, '%!key'
+    addattribute cl, '%!klen'
+    addattribute cl, '&!ws'
+    o = new 'OPTable'
+    o."init"()
+    o."test"()
+    $S0 = freeze o 
+    $P1 = thaw $S0 
+    $P1."test"()
+.end
+
+.namespace [ "OPTable" ]
+
+.sub "__init" :method
+    .local pmc keytable, klentable
+    keytable = new .Hash
+    klentable = new .Hash
+    setattribute self, '%!key', keytable
+    setattribute self, '%!klen', klentable
+.end
+
+.sub "init" :method
+    .local pmc keytable, klentable
+    keytable = getattribute self, '%!key'
+    keytable['bar'] = 1
+    keytable['foobar'] = 2
+    klentable = getattribute self, '%!klen'
+    klentable['bar'] = 3
+    klentable['foobar'] = 6
+.end
+
+.sub "test" :method
+    .local pmc keytable, klentable
+    keytable = getattribute self, "%!key"
+    $I0 = keytable['bar']
+    print_item $I0
+    $I0 = keytable['foobar']
+    print_item $I0
+    klentable = getattribute self, "%!klen"
+    $I0 = klentable['bar']
+    print_item $I0
+    $I0 = klentable['foobar']
+    print_item $I0
+    print_newline
+.end
+CODE
+1 2 3 6
+1 2 3 6
 OUTPUT

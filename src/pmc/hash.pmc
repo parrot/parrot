@@ -1047,14 +1047,21 @@ Used to unarchive the hash.
     void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
+        SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL) {
             const INTVAL elems = io->vtable->shift_integer(INTERP, io);
             const INTVAL k_type = io->vtable->shift_integer(INTERP, io);
             const INTVAL v_type = io->vtable->shift_integer(INTERP, io);
             Hash *hash;
-
+            /*
+             * XXX this is actually unused, but prevents bugs due to
+             *     thawing other PMC with properties, which is checking
+             *     EXTRA_IS_NULL.
+             *     It seems that f/t PMCs with properties isn't done in
+             *     a consistent order.
+             */
             info->extra_flags = EXTRA_IS_COUNT;
-            info->extra = (void *)elems;
+
             /* TODO make a better interface for hash creation
              * TODO create hash with needed size in the first place
              */
@@ -1069,9 +1076,7 @@ Used to unarchive the hash.
             assert((INTVAL)hash->key_type == k_type);
             assert(hash->entry_type == v_type);
             hash->container = SELF;
-        }
-        else {
-            SUPER(info);
+            hash->entries = elems;
         }
     }
 }

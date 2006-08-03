@@ -239,8 +239,8 @@ hash_thaw(Interp *interpreter, Hash *hash, visit_info* info)
     /*
      * during thaw info->extra is the key/value count
      */
-    assert(info->extra_flags == EXTRA_IS_COUNT);
-    n = (size_t) info->extra;
+    n = (size_t) hash->entries;
+    hash->entries = 0;
     for (i = 0; i < n; ++i) {
         switch (hash->key_type) {
             case Hash_key_type_STRING:
