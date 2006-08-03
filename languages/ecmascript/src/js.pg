@@ -1,0 +1,293 @@
+grammar JS;
+
+## whitespace
+token ws {
+    <?whitespace>
+    | <?newline>
+    | <?comment>
+}
+
+
+token whitespace {
+	\t
+#?	  | \verttab
+    | \f
+    | \ 
+#?    | \nbsp
+#?    | \usp #unicode sp
+}
+
+token newline {
+    \n
+    |\r
+#?    |\LS
+#?    |\PS
+}
+
+## comments
+rule multilinecomment {
+    <PGE::Text::Bracketed: /* */>
+}
+
+rule singlelinecomment {
+    \/\/ <!newline>* <newline>
+}
+
+## keywords
+token keyword { break | case | catch | continue | default 
+    | delete | do | else | finally | for | function | if 
+    | in | instance | new | return | this | throw | try | typeof
+    | var | void | while | with
+} 
+
+token future_reserved_word { 
+    abstract | enum | int | short
+    | boolean | export | interface | static
+    | byte | extends | long | super
+    | char | final | native | synchronized
+    | class | float | package | throws
+    | const | goto | private | transient
+    | debugger | implements | protected | volatile
+}
+
+token reserved_word {
+  <keyword>
+  | <future_reserved_word>
+  | <null_literal>
+  | <boolean_literal>
+}
+
+## literals
+rule literal { <null_literal>    
+    | <boolean_literal>
+    | <numeric_literal>
+    | <string_literal>
+}
+
+token null_literal {null}
+
+token boolean_literal {true|false}
+
+token numeric_lliteral { <decimal_literal> | <hex_integer_literal> }
+
+
+token decimal_literal { <decimal_integer_literal>\.[\d+]? <exponent_part>?
+    | \.\d+ <exponent_part>?
+    | <decimal_integer_literal> <exponent_part>?
+}
+
+token decimal_integer_literal {
+    0
+    |<[1..9]>\d+
+}
+
+token exponent_part { <[eE]> <[+\-]> \d }
+
+token hex_integer_literal { 0<[xX]><hex_digits>+ }
+
+token hex_digits { <[0..9,a..f,A..F]> }
+
+token string_literal {
+    <PGE::Text::Bracketed: ">
+    |<PGE::Text::Bracketed: '>
+}
+
+token source_character { <alphanum> }
+
+token string_escape_sequence {
+  [<['"bfnrtv]>|x<hex_digits>+|u<hex_digits>**{4}]
+}
+
+
+token unicode_escape_sequence { \\u<hex_digits>**{4} }
+
+#token regular_expression_literal {
+#}
+
+## identifiers
+##token identifier  { <ident> | get | set | include }
+token identifier { <!reserved_word> [<alpha>|$|_|<unicode_escape_sequeces>]
+[<alphanum>|$|_|<unicode_escape_sequence>]* }
+#token sim_qual_ident  {
+#    [ [ <identifier> | <reserved_ns> ] <'::'> ]? <identifier>
+#}
+#token exp_qual_ident { <paren_exp> <'::'> <identifier> }
+#token qual_ident { <sim_qual_ident> | qual_ident> }
+
+
+## primary expressions
+rule primary_expression {
+    this
+    |<identifier>
+    |<literal>
+    |<array_literal>
+    |<object_literal>
+    |\( <expression> \)
+}
+
+rule array_literal {
+    \[ [,]* \]
+    | [,]* <assignment_expression> [ \, [,]* <assignment_expression> ] [, [,]*]?
+}
+
+rule object_literal { \{ <property_name_and_value_list>? \} }
+
+rule property_name_and_value_list {
+    <property_name>\: <assignment_expression> [\, <property_name>\: <assignment_expression> ]*
+}
+
+token property_name {
+    <identifier>|<string_literal>|<numeric_literal>
+}
+
+## member expression
+rule member_expression {
+    <primary_expression>
+    |<function_expression>
+    |<member_expression> \[ <expression> \]
+    |<member_expression>\.<identifier>
+    |new <member_expression> <arguments>
+}
+
+rule new_expression { [new]* <new_expression> }
+
+rule call_expression { <member_expression> <arguments> [<arguments>| \[ <expression> \] | \. <identifier>]* }
+
+rule arguments { \( [<assignment_expression> [\, <assignment_expression>]*]? \) }
+
+rule left_hand_side_expression { <new_expression> | <call_expression> }
+
+##statements
+rule statement {
+    <block>
+    |<variable_statement>
+    |<empyt_statement>
+    |<expression_statement>
+    |<if_statement>
+    |<iteration_statement>
+    |<continue_statement>
+    |<break_statement>
+    |<return_statement> 
+    |<with_statement> 
+    |<labelled_statement> 
+    |<switch_statement> 
+    |<throw_statement>
+    |<try_statement>
+}
+
+rule block { \{ <statement_list>? \} }
+
+rule statement_list { <statement>+ }
+
+rule variable_statement { var <variable_declaration_list> \; }
+
+rule variable_declaration { <identifier> <initializer>? }
+rule variable_declaration_no_in { <identifier> <initializer_no_in>? }
+
+rule variable_declaration_list { <variable_declaration> [\, <variable_declaration>]* }
+rule variable_declaration_list_no_in { <variable_declaration_no_in> [\, <variable_declaration_no_in>]* }
+
+rule initializer { \= <assignment_expression> }
+rule initializer_no_in { \= <assignment_expression_no_in> }
+
+rule empyt_statement { \; }
+
+rule expression_statement { <expression> \; }  ##lookahead not e ({, function}) see pdf
+
+rule if_statement { if \( <expression> \) <statement> [ else <statement> ]? }
+
+rule iteration_statement {
+    do <statement> while \( <expression> \) \;
+    | while \( <expression> \) <statement>
+    | for \( <expression_no_in>? \; <expression>? \; <expression>? \) <statement>
+    | for \( var <variable_declaration_list_no_in> \; <expression>? \; <expression>? \) <statement>
+    | for \( <left_hand_side_expression> in <expression> \) <statement>
+    | for \( var <variable_declaration_no_in> in <expression> \) <statement>
+}
+
+token contunue_statement { continue <ws>-<newline><identifier>? <?ws> \; }
+token break_statement { continue <ws>-<newline><identifier>? <?ws> \; }
+token return_statement { continue <ws>-<newline><identifier>? <?ws> \; }
+
+rule with_statement { with \( <expression> \) <statement> }
+
+rule switch_statement { \( <expression> \) <case_block> }
+
+rule case_block { \{ <case_clause>* <default_clause>? <case_clause>* \} }
+
+rule case_clause { case <expression> \: <statement_list>? }
+
+rule default_clause { default \: <statement_list>? }
+
+rule labelled_statement { <identifier> \: <statement> }
+
+token throw_statement { throw <ws>-<newline> <expression> <?ws> \; }
+
+rule try_statement { try <block> [ <catch> | <finally> | <catch> <finally> ] }
+
+rule catch { catch \( <identifier> \) <block> }
+
+rule catch { finally <block> }
+
+rule expression { }
+rule expression_no_in { }
+## function expressions
+
+
+## function
+#token function_def  { function <function_name> <function_common> }
+#rule function_name  { <identifier> | get <identifier> 
+token function_declaration  { function <identifier> <function_common> }
+rule function_expression { function <identifier>? <function_common> }
+
+rule function_common { \( [<identifier> [\, <identifier>]* ]? \) \{ <source_element>+ \} }
+
+## programs
+rule program { <source_element>+ }
+
+rule source_element { <statement> | <function_declaration> }
+
+## class
+token class_def     { class <identifier> <inheritance> <block> }
+token inheritance   { <?null> | extends <type_expression> } # allowln
+
+
+## namespace
+token namespace_def { namespace <identifier> }
+
+## package definition
+token package_def   { package <package_name>? <block> }
+token package_name  { [ <string> | <package_ident> ] }
+token package_ident { <identifier> [ . <identifier> ]? }
+
+
+## regular expressions
+token pattern     { <disjunction> }
+token disjunction { <term> [ \| <term> ]+ }
+token term        { <assertion> | <atom> <quantifier>? }
+token assertion   { <[^$]> | <'\b'> | <'\B'> }
+token quantifier  { <[*+?]> \{ \d+ \,? \d+? \} }
+token atom        {
+    | <pat_char>
+    | <'.'>
+    | <'\'> <atom_escape>
+    | <char_class>
+    | <'('> [ <'?:'> | <'?='> | <'?!'> ]? <disjunction> <')'>
+}
+token pat_char    { <source_character> - <[^$\.*+?()[\]{}|]> }
+token atom_escape { <decimal_esc> | <char_esc> | <char_class_esc> }
+token char_esc    {
+    | <cntl_esc>
+    | <cntl_let>
+    | <hex_esc_seq>
+    | <uni_esc_seq>
+    | <ident_esc>
+}
+token cntl_esc    { <[fnrtv]> }
+token cntl_let    { <[a..zA..Z]> }
+token ident_esc   { <source_character>-<identifier_part> } ## need to look these up and see if they're defined
+token dec_esc     { <decimal_integer_literal> <before \d> }
+token char_class_esc { <[dDsSwW]> }
+#token char_class  { } #( whole bunch of weird stuff here )
+
+

@@ -61,9 +61,21 @@ sub runstep
         replace_slashes                              => 1,
     );
     genfile(
+        'languages/cardinal/config/makefiles/root.in' => 'languages/cardinal/Makefile',
+        commentType                                  => '#',
+        replace_slashes                              => 1,
+        conditioned_lines                            => 1,
+    );
+    genfile(
         'languages/cola/config/makefiles/root.in'    => 'languages/cola/Makefile',
         commentType                                  => '#',
         replace_slashes                              => 1,
+    );
+    genfile(
+        'languages/ecmascript/config/makefiles/root.in' => 'languages/ecmascript/Makefile',
+        commentType                                  => '#',
+        replace_slashes                              => 1,
+        conditioned_lines                            => 1,
     );
     genfile(
         'languages/HQ9plus/config/makefiles/root.in' => 'languages/HQ9plus/Makefile',
@@ -111,12 +123,6 @@ sub runstep
         'languages/pheme/config/makefiles/root.in'   => 'languages/pheme/Makefile',
         commentType                                  => '#',
         replace_slashes                              => 1,
-    );
-    genfile(
-        'languages/cardinal/config/makefiles/root.in'    => 'languages/cardinal/Makefile',
-        commentType                                  => '#',
-        replace_slashes                              => 1,
-        conditioned_lines                            => 1,
     );
     genfile(
         'languages/pugs/config/makefiles/root.in'    => 'languages/pugs/Makefile',

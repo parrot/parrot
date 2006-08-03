@@ -239,7 +239,7 @@ S: Lyon, France
 
 N: Jerry Gay a.k.a. particle
 E: Jerry.Gay@gmail.com
-D: test suite, compiler tools, perl6, TAP language, entropy reduction
+D: test suite, compiler tools, perl6, TAP language, entropy reduction, ECMAScript
 S: Seattle, WA
 
 N: John J. Trammell
@@ -290,7 +290,7 @@ D: yield and other PIR improvements
 N: Kevin Falcone
 
 N: Kevin Tew
-D: Cardinal(Ruby on Parrot)
+D: Cardinal(Ruby on Parrot), ECMAScript parser, ECMAScript parser
 D: Various Config Fixes, Compiler Warnings, etc
 
 N: Klaas-Jan Stol
@@ -493,4 +493,4 @@ E: nnunley@gmail.com
 
 N: Vishal Soni
 E: vishalrsoni@gmail.com
-D: Bug fixes in IMCC
+D: Bug fixes in IMCC, ECMAScript

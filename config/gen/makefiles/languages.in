@@ -20,6 +20,7 @@ LANGUAGES = \
     cardinal \
     cola \
     dotnet \
+    ecmascript \
     jako \
     lisp \
     lua \
@@ -86,6 +87,7 @@ clean: \
     cardinal.clean \
     cola.clean \
     dotnet.clean \
+    ecmascript.clean \
     jako.clean \
     lisp.clean \
     lua.clean \
@@ -187,6 +189,14 @@ dotnet.test:
 	- $(MAKE) dotnet test
 dotnet.clean:
 	- $(MAKE) dotnet clean
+
+ecmascript : ecmascript.dummy
+ecmascript.dummy:
+	- $(MAKE) ecmascript
+ecmascript.test:
+	- $(MAKE) ecmascript test
+ecmascript.clean:
+	- $(MAKE) ecmascript clean
 
 HQ9plus: HQ9plus.dummy
 HQ9plus.dummy:

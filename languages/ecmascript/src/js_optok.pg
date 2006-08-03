@@ -1,0 +1,60 @@
+grammar js;
+
+proto 'postfix:++' is precedence('13') { ... }
+proto 'postfix:--' is equiv('postfix:--') { ... }
+
+proto 'prefix:delete' is precedence('12') { ... }
+proto 'prefix:void' is equiv('infix:delete') { ... }
+proto 'prefix:typeof' is equiv('infix:delete') { ... }
+proto 'prefix:++' is equiv('infix:delete') { ... }
+proto 'prefix:--' is equiv('infix:delete') { ... }
+proto 'prefix:+' is equiv('infix:delete') { ... }
+proto 'prefix:-' is equiv('infix:delete') { ... }
+proto 'prefix:~' is equiv('infix:delete') { ... }
+proto 'prefix:!' is equiv('infix:delete') { ... }
+
+proto 'infix:*' is precedence('11') { ... }
+proto 'infix:/' is equiv('infix:*') { ... }
+proto 'infix:%' is equiv('infix:*') { ... }
+
+proto 'infix:+' is precedence('10') { ... }
+proto 'infix:-' is equiv('infix:+') { ... }
+
+proto 'infix:<<' is precedence('9') { ... }
+proto 'infix:>>' is equiv('infix:<<') { ... }
+proto 'infix:>>>' is equiv('infix:<<') { ... }
+
+proto 'infix:<' is precedence('8') { ... }
+proto 'infix:>' is equiv('infix:<') { ... }
+proto 'infix:<=' is equiv('infix:<') { ... }
+proto 'infix:>=' is equiv('infix:<') { ... }
+proto 'infix:instanceof' is equiv('infix:<') { ... }
+proto 'infix:in' is equiv('infix:<') { ... }
+
+proto 'infix:==' is precedence('7') { ... }
+proto 'infix:!=' is equiv('infix:==') { ... }
+proto 'infix:===' is equiv('infix:==') { ... }
+proto 'infix:!==' is equiv('infix:==') { ... }
+
+proto 'infix:&' is precedence('6') { ... }
+
+proto 'infix:^' is precedence('5') { ... }
+
+proto 'infix:|' is precedence('4') { ... }
+
+proto 'infix:||' is precedence('3') { ... }
+
+proto 'ternary:? :' is precedence('2') { ... }
+
+proto 'infix:=' is precedence('1') { ... }
+proto 'infix:*=' is equiv('infix:=') { ... }
+proto 'infix:/=' is equiv('infix:=') { ... }
+proto 'infix:%=' is equiv('infix:=') { ... }
+proto 'infix:+=' is equiv('infix:=') { ... }
+proto 'infix:-=' is equiv('infix:=') { ... }
+proto 'infix:<<=' is equiv('infix:=') { ... }
+proto 'infix:>>=' is equiv('infix:=') { ... }
+proto 'infix:>>>=' is equiv('infix:=') { ... }
+proto 'infix:&=' is equiv('infix:=') { ... }
+proto 'infix:^=' is equiv('infix:=') { ... }
+proto 'infix:|=' is equiv('infix:=') { ... }
