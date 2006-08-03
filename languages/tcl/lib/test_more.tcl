@@ -31,7 +31,7 @@ proc is {value expected {description ""} {special {}}}  {
     set num $very_bad_global_variable_test_num
  
     if {[llength $special] == 2} {
-        set description " # $special"
+        set description " - $description # $special"
     } else {
         if  {$description ne ""} {
             set description " - $description"
