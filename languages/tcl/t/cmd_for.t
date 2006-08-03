@@ -1,67 +1,46 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 8;
-use Test::More;
+source lib/test_more.tcl
+plan 8
 
-language_output_is("tcl",<<'TCL',<<OUT,"for no args");
- for
-TCL
-wrong # args: should be "for start test next command"
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"for 1 arg");
- for pete's
-TCL
-wrong # args: should be "for start test next command"
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"for 2 arg");
- for pete's sake
-TCL
-wrong # args: should be "for start test next command"
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"for 3 arg");
- for pete's sake don't
-TCL
-wrong # args: should be "for start test next command"
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"for too many args");
- for pete's sake don't do that.
-TCL
-wrong # args: should be "for start test next command"
-OUT
-
-
-
-language_output_is("tcl",<<'TCL',<<OUT,"simple for");
+eval_is {
+ set r ""
  for {set a 0} {$a < 5} {incr a} {
-   puts $a 
+   set r [append r $a]
  }
-TCL
-0
-1
-2
-3
-4
-OUT
+ set r
+} 01234 {simple for}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"variable for last arg");
-set a {puts $i}
-for {set i 0} {$i < 5} {set i [expr $i+1]} $a
-TCL
-0
-1
-2
-3
-4
-OUT
+eval_is {
+ set r ""
+ set a {set r [append r $i]}
+ for {set i 0} {$i < 5} {set i [expr $i+1]} $a
+ set r
+} 01234 {variable for last arg}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"test not met initially")
-for {set x 11} {$x < 10} {incr x} {puts x}
-TCL
-OUT
+eval_is {
+  set r ""
+  for {set x 11} {$x < 10} {incr x} {set r [append r $x]}
+  set r
+} {} {test not met initially}
+
+eval_is {for} \
+  {wrong # args: should be "for start test next command"} \
+  {no args}
+
+eval_is {for pete's} \
+  {wrong # args: should be "for start test next command"} \
+  {one args}
+
+eval_is {for pete's sake} \
+  {wrong # args: should be "for start test next command"} \
+  {two args}
+
+eval_is {for pete's sake don't} \
+  {wrong # args: should be "for start test next command"} \
+  {three args}
+
+eval_is {for pete's sake don't do that.} \
+  {wrong # args: should be "for start test next command"} \
+  {too many args}
 

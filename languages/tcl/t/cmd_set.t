@@ -1,40 +1,39 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
-use Test::More;
+source lib/test_more.tcl
+plan 7
 
-language_output_is("tcl",<<'TCL',<<OUT,"set");
+eval_is {
  set a 2
- puts $a
-TCL
-2
-OUT
+ expr $a
+} 2 {set}
 
-language_output_is("tcl",<<'TCL',<<OUT,"get");
+eval_is {
  set a 1
- puts [set a]
-TCL
-1
-OUT
+ set a
+} 1 {get}
 
-language_output_is("tcl",<<'TCL',<<OUT,"missing global");
- puts $a
-TCL
-can't read "a": no such variable
-OUT
+eval_is {expr $a} \
+  {can't read "a": no such variable} \
+  {missing global}
 
-language_output_is("tcl",<<'TCL',<<OUT,"not an array");
+eval_is {
  set b 1
  set b(c) 2
-TCL
-can't set "b(c)": variable isn't array
-OUT
+} {can't set "b(c)": variable isn't array} \
+  {not an array}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "array");
+eval_is {
   array set test {4 ok}
-  puts [set {test(4)}]
-TCL
-ok
-OUT
+  set {test(4)}
+} ok {array access}
+
+eval_is {set} \
+  {wrong # args: should be "set varName ?newValue?"} \
+  {no args}
+
+eval_is {set a b c} \
+  {wrong # args: should be "set varName ?newValue?"} \
+  {too many args}
+
+
