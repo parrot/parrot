@@ -91,7 +91,7 @@ void Parrot_PMC_delete_pmckey(Parrot_INTERP, Parrot_PMC, Parrot_PMC);
 
 Parrot_PMC Parrot_PMC_new(Parrot_INTERP, Parrot_Int);
 Parrot_PMC Parrot_PMC_null(void);
-Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, const char *);
+PARROT_API Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, const char *);
 
 void Parrot_free_cstring(char *);
 
