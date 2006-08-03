@@ -116,22 +116,21 @@ a NameSpace or a var, the NameSpace is returned.
         const int val_is_NS = value->vtable->base_type == enum_class_NameSpace;
         HashBucket *b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         PMC *new_tuple = NULL;
-	PMC *old;
 
         if (!b)
             SUPER(key, value);
-	else {
-	    PMC *old = b->value;
-	    if ((old->vtable->base_type == enum_class_NameSpace) == val_is_NS) {
-		/* simple ns or simple var/sub changed */
-		SUPER(key, value);
-	    }
+    else {
+        PMC *old = b->value;
+        if ((old->vtable->base_type == enum_class_NameSpace) == val_is_NS) {
+            /* simple ns or simple var/sub changed */
+            SUPER(key, value);
+        }
             else if ((PObj_get_FLAGS(old) & FPA_is_ns_ext) &&
                     old->vtable->base_type == enum_class_FixedPMCArray) {
                 /* we have a tuple extension already */
-                VTABLE_set_pmc_keyed_int(INTERP, old, 
-					 val_is_NS ? NS_slot_ns : NS_slot_var_sub,
-					 value);
+                VTABLE_set_pmc_keyed_int(INTERP, old,
+                        val_is_NS ? NS_slot_ns : NS_slot_var_sub,
+                        value);
             }
             else {
                 /* creat new tuple */
@@ -144,7 +143,7 @@ a NameSpace or a var, the NameSpace is returned.
         }
 
         if (val_is_NS) {
-	    /* TODO - this hack needs to go */
+            /* TODO - this hack needs to go */
             PMC_pmc_val(value) = SELF;  /* set parent */
             PMC_data(value)    = key;   /* and name */
 
@@ -165,7 +164,7 @@ a NameSpace or a var, the NameSpace is returned.
     }
 
     void set_pmc_keyed(PMC *key, PMC *value) {
-        PMC *ns = SELF, *next;
+        PMC *ns = SELF;
         STRING *part;
 
         if (key->vtable->base_type == enum_class_String) {
@@ -178,11 +177,11 @@ a NameSpace or a var, the NameSpace is returned.
                 part = key_string(INTERP, key);
                 key = key_next(INTERP, key);
                 if (!key) {
-		    Parrot_set_global(INTERP, ns, part, value);
+                    Parrot_set_global(INTERP, ns, part, value);
                     return;
-		}
-		ns = Parrot_make_namespace_keyed_str(INTERP, ns, part);
-	    }
+                }
+                ns = Parrot_make_namespace_keyed_str(INTERP, ns, part);
+            }
         }
 
         real_exception(INTERP, NULL, E_NameError, "Invalid namespace key");
@@ -201,7 +200,7 @@ a NameSpace or a var, the NameSpace is returned.
     PMC* get_pmc_keyed(PMC *key) {
         PMC *ns = SELF;
         STRING *part;
-        
+
         if (key->vtable->base_type == enum_class_String) {
             return SELF.get_pmc_keyed_str(VTABLE_get_string(INTERP, key));
         }
@@ -210,7 +209,7 @@ a NameSpace or a var, the NameSpace is returned.
             while (key) {
                 part = key_string(INTERP, key);
                 key = key_next(INTERP, key);
-		if (!key)
+                if (!key)
                     return VTABLE_get_pmc_keyed_str(INTERP, ns, part);
                 ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
                 if (PMC_IS_NULL(ns))
@@ -252,7 +251,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
     void* get_pointer_keyed(PMC *key) {
         PMC *ns = SELF;
         STRING *part;
-        
+
         if (key->vtable->base_type == enum_class_String) {
             return SELF.get_pointer_keyed_str(VTABLE_get_string(INTERP, key));
         }
@@ -274,7 +273,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
         /* NOTREACHED */
         return PMCNULL;
     }
-    
+
 /*
 
 =item C<STRING* get_string()>
@@ -323,10 +322,10 @@ Returns the name of the namespace as an array of strings.
             VTABLE_unshift_string(INTERP, ar, PMC_data(ns));
             ns = PMC_pmc_val(ns);
         }
-        
+
         /* remove the NULL string of the namespace root */
         VTABLE_shift_string(INTERP, ar);
-        
+
         return ar;
     }
 

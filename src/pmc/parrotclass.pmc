@@ -83,8 +83,6 @@ argument is not a PMC* but the C<classname> STRING.
     }
 
     void init_pmc (PMC* name) {
-        STRING *class_name;
-
         SELF.init();
         Parrot_new_class(INTERP, SELF, name);
     }

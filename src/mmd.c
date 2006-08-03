@@ -126,7 +126,6 @@ get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
             real_exception(interpreter, 0, 1, "MMD function %s not found "
                     "for types (%d, %d)", meth_c, left_type, r);
         if (method->vtable->base_type == enum_class_NCI) {
-            PMC *nci;
             /* C function is at struct_val */
             func = D2FPTR(PMC_struct_val(method));
             *is_pmc = 0;

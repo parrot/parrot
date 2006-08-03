@@ -147,7 +147,9 @@ SYNOPSIS
 
     METHOD INTVAL set_readline_interactive(INTVAL on) {
         ParrotIO *io = PMC_data(SELF);
+#ifdef PARROT_HAS_READLINE
         INTVAL flag;
+#endif
         if (!io) 
             return -2;
         if (!(io->flags & PIO_F_READ))

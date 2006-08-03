@@ -1345,7 +1345,7 @@ Returns the inverse function of SELF.
 
 
     METHOD PMC* acot() {
-        FLOATVAL a, b, aabb;
+        FLOATVAL a, b;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
         a = RE(SELF);
