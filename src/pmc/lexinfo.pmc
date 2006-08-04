@@ -130,16 +130,20 @@ The implementation of the Hash PMC is called.
         IMAGE_IO *io = info->image_io;
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            INTVAL elems = io->vtable->shift_integer(INTERP, io);
-            INTVAL k_type = io->vtable->shift_integer(INTERP, io);
-            INTVAL v_type = io->vtable->shift_integer(INTERP, io);
+            const INTVAL elems = io->vtable->shift_integer(INTERP, io);
+            const INTVAL k_type = io->vtable->shift_integer(INTERP, io);
+            const INTVAL v_type = io->vtable->shift_integer(INTERP, io);
+            Hash *hash;
+
+            /* XXX see src/pmc/hash.pmc */
             info->extra_flags = EXTRA_IS_COUNT;
-            info->extra = (void *)elems;
             assert(v_type == enum_hash_int);
             /* TODO make a better interface for hash creation
              * TODO create hash with needed types in the first place
              */
             SELF.init_pmc(NULL);
+            hash = PMC_struct_val(SELF);
+            hash->entries = elems;
         }
         else {
             SUPER(info);
