@@ -53,11 +53,12 @@ proc is {value expected {description ""} {special {}}}  {
 
 # XXX Need to handle the case where we expect an exception.
 proc eval_is {code expected {description ""} {special {}}}  {
+    global very_bad_global_variable_test_num
     # The one case where skip actually means "don't do that"
     if {[llength $special] == 2} {
-        set special_type [lindex $special 1]
-        if {$special_type eq "SKIP"} {
-            puts "ok $very_bad_global_variable_test_num $special"
+        set boolean [string compare -nocase [lindex $special 0] skip]
+        if {! $boolean} {
+            puts "ok $very_bad_global_variable_test_num # $special"
             return 1
         }
     }
