@@ -22,24 +22,28 @@
 have_list:
   if argc == 1 goto done
 
+  $I0 = 0
 select_elem:
-  $P0 = argv[1]
+  inc $I0
+  if $I0 == argc goto done
+
+  $P0 = argv[$I0]
   .local pmc indices
   indices = __list($P0)
   
   .local int index
   .local int elems
-  elems = indices
-  $I0 = 0
+  elems = elements indices
+  $I1 = 0
 select_loop:
-  if $I0 >= elems goto done
+  if $I1 >= elems goto select_elem
   list = __list(list)
   
-  $P0 = indices[$I0]
+  $P0 = indices[$I1]
   index = _list_index(list, $P0)
   list  = list[index]
   
-  inc $I0
+  inc $I1
   goto select_loop
 
 done:
@@ -47,5 +51,4 @@ done:
 
 bad_args:
   .throw('wrong # args: should be "lindex list ?index...?"')
-
 .end
