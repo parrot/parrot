@@ -1,14 +1,21 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
-use Test::More;
+source lib/test_more.tcl
+plan 4
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple eval");
- set code "set a 2"
- set b [eval $code]
- puts $b
-TCL
-2
-OUT
+eval_is {eval} \
+  {wrong # args: should be "eval arg ?arg ...?"} \
+  {no args}
+
+eval_is {
+ eval "set a 2"
+} 2 {single arg}
+
+eval_is {
+ eval set a 2
+} 2 {multiple args}
+
+eval_is {
+ eval set a 2
+ set a
+} 2 {multiple args, verify side effects}
