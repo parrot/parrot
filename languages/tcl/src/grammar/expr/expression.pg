@@ -15,10 +15,13 @@ token term {
     | <variable>
     | <function>
     | <nested>
+    | <boolean>
     | <[a..zA..Z]> <syntax_error: variable references require preceding $>
 }
 
 ## used by term
+
+rule boolean { ( true | false ) <?wb> }
 
 rule nested { \( <expression> \) }
 
