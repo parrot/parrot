@@ -1,42 +1,12 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 6;
-use Test::More;
+source lib/test_more.tcl
+plan 6
 
-language_output_is("tcl",<<TCL,<<OUT,"concat nothing");
-  puts [concat]
-TCL
+is [concat] {} {concat nothing}
+is [concat a] {a} {concat one thing}
+is [concat a b] {a b} {concat two things}
 
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"concat one");
-  puts [concat a]
-TCL
-a
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"concat two");
-  puts [concat a b]
-TCL
-a b
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"concat sub list of one");
-  puts [concat a {b}]
-TCL
-a b
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"concat sub list of two");
-  puts [concat a {b c}]
-TCL
-a b c
-OUT
-
-language_output_is("tcl",<<TCL,<<OUT,"concat sub sub list");
-  puts [concat a {b c {d e}}]
-TCL
-a b c {d e}
-OUT
+is [concat a [list b]] {a b} {concat sub list of one}
+is [concat a [list b c]] {a b c} {concat sub list of one}
+is [concat a [list b c [list d e]]] {a b c {d e}} {concat sub sub list of one}
