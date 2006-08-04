@@ -1,20 +1,18 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
-use Test::More;
+source lib/test_more.tcl
+plan 3
 
-language_output_is("tcl",<<'TCL',<<OUT,"flush no args");
- flush
-TCL
-wrong # args: should be flush "channelId"
-OUT
+eval_is {flush} \
+  {wrong # args: should be "flush channelId"} \
+  {no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"flush too many args");
- flush the monkeys
-TCL
-wrong # args: should be flush "channelId"
-OUT
+eval_is {flush the monkeys} \
+  {wrong # args: should be "flush channelId"} \
+  {too many args}
+
+eval_is {flush toilet} \
+  {can not find channel named "toilet"} \
+  {invalid channel name}
 
 # XXX test actual flushing.
