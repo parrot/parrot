@@ -1,22 +1,28 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
 
-docs/pdds/pdd17_basic_types.pod - Document parrot's basic PMC types
+docs/pdds/pdd17_basic_types.pod - Parrot's Core PMC types
 
 {{ NOTE: could use a better name to differentiate it from PDD 04
-datatypes. Or perhaps the two should be merged. }}
+datatypes. Possibly pdd17_core_pmcs.pod. }}
 
 =head1 ABSTRACT
 
-This PDD documents the base Parrot PMC types and their behaviours.
+This PDD documents the core Parrot PMC types and their behavior.
+
+=head1 VERSION
+
+$Revision$
 
 =head1 DESCRIPTION
 
-Parrot has a number of basic PMC types that all programs can guarantee will be
-available to them. (With the possible exception of parrot programs executing on
+Parrot has a number of core PMC types that all programs can guarantee will be
+available to them. (With the possible exception of Parrot programs executing on
 an embedded device or other restricted environment)
+
+=head1 IMPLEMENTATION
 
 =head2 Scalar types
 
@@ -72,13 +78,28 @@ integer or float when its integer or float value is fetched.
 
 =item Boolean
 
-The PMC wrapper for Parrot's low-level true/false value. Returns 0 for false, 1
-for true when fetched as an integer or float, empty string for false and '1'
-for true when fetched as a string.
+A true/false value. Returns 0 for false, 1 for true when fetched as an
+integer or float, empty string for false and '1' for true when fetched
+as a string.
+
+{{ IMPLEMENTATION NOTE: move the definitions of the Python constants
+"True" and "False" out of src/pmc/boolean.pmc. They belong in
+HLL-specific code, not in the core boolean type. }}
+
+=item BigInt
+
+An arbitrary precision integer.
 
 =item BigNum
 
 The PMC wrapper for Parrot's low-level BigNum type.
+{{ NOTE: this type doesn't seem to exist. }}
+
+=item Complex
+
+A complex number, consisting of a real part and an imaginary part.
+{{ NOTE: is this a complete and useful implementation of complex
+numbers? }}
 
 =item ParrotClass
 
@@ -89,10 +110,15 @@ all classes just objects)
 
 The PMC for Parrot's base object type.
 
-=item Reference
+=item Ref
 
 The PMC that represents a reference to another PMC. Delegates all functions to
 the referred-to PMC.
+
+=item Random
+
+A singleton PMC that generates a random number. {{ NOTE: Why do we have
+this? }}
 
 =back
 
@@ -102,10 +128,17 @@ Note that for the following types you can set the size of the array by using
 the VTABLE_set_integer_native() method. Assigning an integer to the array as a
 whole sets the array to that size.
 
-Note that size-changing operations, such as push, pop, shift, unshift, and
-splice, on fixed arrays will result in an exception.
+Size-changing operations (such as push, pop, shift, unshift, and splice)
+on statically-sized arrays will throw an exception.
 
 =over 4
+
+=item Array
+
+The base class for all array types (a statically sized array for any
+arbitrary type). New array types can be derived from the base Array.
+In user code it is recommended to use one of the specific array types
+below, rather than the base type. 
 
 =item FixedBooleanArray
 
@@ -147,6 +180,8 @@ A statically sized array which holds only String values.
 
 A dynamically sized array which holds only String values.
 
+=item Exception
+
 =back
 
 =head2 Hash types
@@ -169,11 +204,60 @@ Unix systems):
    new P1, .Env
    set S1, P1['TERM']
 
-Note that an embedding system may override this behaviour.
+Note that an embedding system may override this behavior.
+
+=item Namespace
+
+=item OrderedHash
+
+=item AddrRegistry
+
+Simulates reference counting for dead-object detection and garbage
+collection.
+
+=back
+
+=head2 Subroutine types
+
+=over 4
+
+=item Sub
+
+=item Closure
+
+A closure: subroutine object plus captured lexical scope.
+
+=item Coroutine
+
+=item Continuation
+
+=item CSub
+
+=item Eval
+
+=item Exception_Handler
+
+=item MultiSub
+
+=item NCI
+
+A native call interface wrapper around a C function.
+
+=item Bound_NCI
+
+An internal NCI method call bound to a particular call instance. 
+{{ NOTE: where are these used? }}
+
+=item Compiler
+
+A subroutine implementing a language compiler. (Derived from NCI.)
 
 =back
 
 =head2 Binary Math operations
+
+{{ NOTE: this section is barely a stub, and not particularly useful. I
+suggest deleting it. Any objections? }}
 
 The following is a list of what should happen with the basic types when used in
 a binary math operation:
@@ -186,7 +270,7 @@ The operation is an integer.
 
 =back 
 
-=head1 IMPLEMENTATION
+=head1 LANGUAGE NOTES
 
 =head1 FOOTNOTES
 
@@ -194,36 +278,11 @@ List of footnotes to the text.
 
 =head1 REFERENCES
 
-=head1 VERSION
+  src/pmc/*.pmc
 
-=head2 CURRENT
+=cut
 
-    Maintainer: Dan Sugalski
-    Class: Internals
-    PDD Number: 17
-    Version: 1.0
-    Status: Developing
-    Last Modified: 2004/06/11
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.0
-
-None. First version
-
-=back
-
+__END__
+Local Variables:
+  fill-column:78
+End:
