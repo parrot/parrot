@@ -1272,7 +1272,6 @@ compilers.dummy : $(PARROT)
 	$(MAKE) compilers/past
 	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
-	$(MAKE) compilers/bcg
 
 languages : languages.dummy
 
@@ -1298,7 +1297,6 @@ compilers-clean :
 	$(MAKE) compilers/past clean
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
-	$(MAKE) compilers/bcg clean
 	
 ###############################################################################
 #
