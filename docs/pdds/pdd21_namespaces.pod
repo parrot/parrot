@@ -25,7 +25,7 @@ array of name strings
 
 =item - exports follow the semantics of the library's language
 
-=item - Two interfaces: typed and generic
+=item - Two interfaces: typed and untyped
 
 =back
 
