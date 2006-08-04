@@ -200,7 +200,7 @@ OUT
 language_output_is("tcl",<<'TCL',<<'OUT',"float division");
 puts [expr 1 / 3.0]
 TCL
-0.333333333333
+0.3333333333333333
 OUT
 
 language_output_is("tcl",<<'TCL',<<'OUT',"nested expr (braces)");
