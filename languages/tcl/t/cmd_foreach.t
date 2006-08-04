@@ -1,93 +1,69 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 11;
-use Test::More;
+source lib/test_more.tcl
+plan 11
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad args 1");
-  foreach
-TCL
-wrong # args: should be "foreach varList list ?varList list ...? command"
-OUT
+eval_is {foreach} \
+  {wrong # args: should be "foreach varList list ?varList list ...? command"} \
+  {no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad args 2");
-  foreach a b q {puts $a}
-TCL
-wrong # args: should be "foreach varList list ?varList list ...? command"
-OUT
+eval_is {foreach a b q {puts $a}} \
+  {wrong # args: should be "foreach varList list ?varList list ...? command"} \
+  {uneven # of args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple foreach string");
-  foreach a {a b c} {puts $a}
-TCL
-a
-b
-c
-OUT
+eval_is {
+  set r ""
+  foreach a {a b c} {append r $a}
+  set r
+} {abc} {single var/list}
 
-language_output_is("tcl",<<'TCL',<<OUT,"double foreach string");
-  foreach a {a b c} b {d e f} {puts "$a $b"}
-TCL
-a d
-b e
-c f
-OUT
+eval_is {
+  set r ""
+  foreach a {a b c} b {d e f} {append r "$a $b:"}
+  set r
+} {a d:b e:c f:} {double var/list}
 
-language_output_is("tcl",<<'TCL',<<OUT,"double foreach uneven string");
-  foreach a {a b c} b {d e f g h} {puts "$a $b"}
-TCL
-a d
-b e
-c f
- g
- h
-OUT
+eval_is {
+  set r ""
+  foreach a {a b c} b {d e f g h} {append r "$a $b:"}
+  set r
+} {a d:b e:c f: g: h:} {double var/list, uneven}
 
-language_output_is("tcl",<<'TCL',<<OUT,"double foreach list");
-  foreach a [list a b c] b [list d e f] {puts "$a $b"}
-TCL
-a d
-b e
-c f
-OUT
+eval_is {
+  set r ""
+  foreach a [list a b c] {append r $a}
+  set r
+} {abc} {single var/list, list object}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple foreach list");
-  foreach a [list a b c] {puts $a}
-TCL
-a
-b
-c
-OUT
+eval_is {
+  set r ""
+  foreach a [list a b c] b [list d e f] {append r "$a $b:"}
+  set r
+} {a d:b e:c f:} {double var/list, list objects}
 
-language_output_is("tcl",<<'TCL',<<OUT,"foreach break");
-  foreach a [list a b c] {puts $a; break}
-TCL
-a
-OUT
+eval_is {
+  set r ""
+  foreach a [list a b c] {append r $a; break}
+  set r
+} a {break}
 
-language_output_is("tcl",<<'TCL',<<OUT,"foreach continue");
-  foreach a [list 1 2 3] {if {$a <2} {continue} ; puts $a}
-TCL
-2
-3
-OUT
+eval_is {
+  set r ""
+  foreach a [list 1 2 3] {if {$a <2} {continue} ; append r $a}
+  set r
+} 23 {continue}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "foreach - lexicals");
+eval_is {
   proc test {} {
+      set r ""
       foreach name {a b c d} {
-          puts $name
+          append r $name
       }
+      return $r
   }
   test
-TCL
-a
-b
-c
-d
-OUT
+} abcd {lexicals}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "foreach - inner exception")
+eval_is {
   foreach name {a b c d} { aputs }
-TCL
-invalid command name "aputs"
-OUT
+} {invalid command name "aputs"} {inner exception}
