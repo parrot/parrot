@@ -5,124 +5,89 @@
 .namespace
 
 .sub '&if'
-  .param pmc argv :slurpy
+    .param pmc argv :slurpy
 
-  .local int argc 
-  argc = argv
+    .local int argc
+    argc = elements argv
 
-  unless argc goto no_args
+    if argc == 0 goto no_args
 
-  .local pmc elseifs
-  elseifs = new .TclList
-  .local pmc retval,condition
-  .local string code
-  .local string condition
-  .local string body
-  .local string else
-  .local int handling_else
-  handling_else = 0
-  .local int counter
+    .local pmc __expr, __script
+    __expr   = get_root_global ['_tcl'], '__expr'
+    __script = get_root_global ['_tcl'], '__script'
 
-  .local pmc compiler, pir_compiler, __expr
-  compiler     = get_root_global ['_tcl'], 'compile'
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
-  __expr       = get_root_global ['_tcl'], '__expr'
- 
-  .local string temp_str
-  temp_str ='' 
+    .local string cond, code
+    cond = argv[0]
+    $I0  = 1
+    if argc == 1 goto no_script
+    code = argv[1]
 
-  counter = 0
-  condition = argv[counter]
-  inc counter
-  if counter >= argc goto missing_script
-  body = argv[counter]
-  inc counter
-  if body != 'then' goto get_elseifs 
-  if counter >= argc goto missing_script
-  body = argv[counter]
-  inc counter
-  if counter >= argc goto get_final
-get_elseifs:
-  if counter >= argc goto get_final
-  temp_str = argv[counter]
-  if temp_str != 'elseif' goto get_else
-  $P1 = new .TclList
-  inc counter
-  if counter >= argc goto missing_elseif
-  $P2 = argv[counter]
-  $P1[0] = $P2
-  inc counter
-  if counter > argc goto missing_script
-  $P2 = argv[counter]
-  $P1[1] = $P2
-  push elseifs, $P1
-  inc counter
-  goto get_elseifs
-get_else:
-  handling_else = 1
-  temp_str = argv[counter]
-  if temp_str != 'else' goto get_final
-  inc counter
-  if counter >= argc goto missing_script
-  temp_str = argv[counter]
-get_final:
-  else = temp_str
+    unless code == 'then' goto loop
+    $I0  = 2
+    if argc == 2 goto no_script
+    code = argv[2]
 
-  unless handling_else goto begin_parsing
-  inc counter
-  if counter != argc goto more_than_else
+loop:
+    $P0 = __expr(cond)
+    $P1 = $P0()
+    unless $P1 goto next
+    $P0 = __script(code)
+    .return $P0()
 
-begin_parsing:
-  $P2 = __expr(condition)
-  retval = $P2()
+next:
+    inc $I0
+    if $I0 == argc goto nothing
 
-  unless retval goto do_elseifs
-  code = body 
-  goto done
- 
-do_elseifs:
-  $I1 = elseifs
-  if $I1 == 0 goto do_else
-  $I2 = 0
-elseif_loop:
-  if $I2 == $I1 goto do_else
-  $P1 = elseifs[$I2]
-  condition = $P1[0]
-  $P3 = __expr(condition)
-  retval = $P3()
-  if retval goto done_elseifs
-  inc $I2
-  goto elseif_loop  
+    $S0 = argv[$I0]
+    if $S0 == 'elseif' goto elseif
+    if $S0 == 'else'   goto else
 
-done_elseifs:
-  code = $P1[1]
-  goto done
+    # 'else' is optional
+    dec $I0
+    goto else
 
-do_else:
-  code = else
+elseif:
+    inc $I0
+    if $I0 == argc goto no_expression
 
-done:
-  ($I0,$P1) = compiler(0,code)
-  $P2 = pir_compiler($I0,$P1)
+    cond = argv[$I0]
+    inc $I0
+    if $I0 == argc goto no_script
 
-  .return $P2()
+    code = argv[$I0]
+    goto loop
+
+else:
+    inc $I0
+    if $I0 == argc goto no_script
+    code = argv[$I0]
+
+    inc $I0
+    if $I0 != argc goto extra_words_after_else
+
+    $P0 = __script(code)
+    .return $P0()
+
+extra_words_after_else:
+    .throw('wrong # args: extra words after "else" clause in "if" command')
+
+nothing:
+    .return('')
 
 no_args:
-  .throw('wrong # args: no expression after "if" argument')
+    .throw('wrong # args: no expression after "if" argument')
 
-missing_script:
-  $S0 = 'wrong # args: no script following "' 
-  $I0 = counter
-  dec $I0
-  $S1  = argv[$I0]
-  $S0 .= $S1
-  $S0 .=  '" argument'
-  .throw ($S0)
+no_script:
+    dec $I0
+    $S0 = argv[$I0]
+    $S0 = 'wrong # args: no script following "' . $S0
+    $S0 = $S0 . '" argument'
+    .throw($S0)
 
-more_than_else:
-  .throw ('wrong # args: extra words after "else" clause in "if" command')
-
-missing_elseif:
-  .throw ('wrong # args: no expression after "elseif" argument')
-
+no_expression:
+    dec $I0
+    $S0 = argv[$I0]
+    $S0 = 'wrong # args: no expression after "' . $S0
+    $S0 = $S0 . '" argument'
+    .throw($S0)
 .end
