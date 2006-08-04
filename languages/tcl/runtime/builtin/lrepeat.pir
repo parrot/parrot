@@ -7,16 +7,20 @@
 .sub '&lrepeat'
   .param pmc argv :slurpy
 
-  # XXX Need error handling
+  .local int argc
+  argc = elements argv
+  if argc < 2 goto bad_args
 
-  .local int repeater # I hardly know 'er.
-  repeater = argv[0] 
+  .local pmc __integer
+  __integer = get_root_global ['_tcl'], '__integer'
+
+  .local int count
+  $P0   = argv[0]
+  count = __integer($P0)
+
+  if count < 1 goto must_have_count
    
   # convert the Array ireturned by foldup into a TclList.
-
-  .local int argc
-  argc = argv
- 
   .local pmc retval
   retval = new .TclList
  
@@ -25,7 +29,7 @@
 
   o_cnt = 1
 OUTER_LOOP:
-  if o_cnt > repeater goto OUTER_DONE
+  if o_cnt > count goto OUTER_DONE
   i_cnt = 1
 INNER_LOOP:
   if i_cnt >= argc goto INNER_DONE
@@ -39,4 +43,10 @@ INNER_DONE:
 OUTER_DONE:
 
   .return(retval)
+
+must_have_count:
+  .throw('must have a count of at least 1')
+
+bad_args:
+  .throw('wrong # args: should be "lrepeat positiveCount value ?value ...?"')
 .end
