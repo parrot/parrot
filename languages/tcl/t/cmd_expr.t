@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 194
+plan 196
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -16,6 +16,12 @@ eval_is {expr 3e2.0} \
  {can only e with an integer exponent}
 is [expr true]  true  {true}
 is [expr false] false {false}
+eval_is {expr trues}  \
+ {syntax error in expression "trues": variable references require preceding $} \
+ {trues}
+eval_is {expr falses} \
+ {syntax error in expression "falses": variable references require preceding $} \
+ {falses}
 
 eval_is {expr {}} {syntax error in expression "": premature end of expression}
 
