@@ -1,26 +1,18 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3;
-use Test::More;
+source lib/test_more.tcl
+plan 3
 
-language_output_is("tcl",<<'TCL',<<OUT,"gets - no args");
-  gets
-TCL
-wrong # args: should be "gets channelId ?varName?"
-OUT
+eval_is {gets} \
+  {wrong # args: should be "gets channelId ?varName?"} \
+  {no args}
+ 
+eval_is {gets a b c} \
+  {wrong # args: should be "gets channelId ?varName?"} \
+  {too many args}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "gets - too man args");
-  gets foo bar baz
-TCL
-wrong # args: should be "gets channelId ?varName?"
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"gets - bad channel ");
-  gets a
-TCL
-can not find channel named "a"
-OUT
+eval_is {gets #parrot} \
+  {can not find channel named "#parrot"} \
+  {bad channel}
 
 # XXX Need to test actually reading something in. 
