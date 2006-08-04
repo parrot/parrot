@@ -1,4 +1,4 @@
-# $Id: /parrot/offline/languages/js/config/makefiles/root.in 18 2006-08-02T16:25:54.727852Z tewk  $
+# $Id$
 
 # Setup some commands
 LN_S     = @lns@
