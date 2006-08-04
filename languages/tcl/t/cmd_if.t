@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple if");
@@ -53,6 +53,16 @@ language_output_is("tcl",<<'TCL',<<OUT,"simple if with then, elseif");
  }
 TCL
 blue
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'simple if with then, elseif with then');
+  if 0 then {
+    puts if
+  } elseif 1 then {
+    puts elseif
+  }
+TCL
+elseif
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple if with then, elseif, else");

@@ -55,6 +55,12 @@ elseif:
     if $I0 == argc goto no_script
 
     code = argv[$I0]
+    unless code == 'then' goto loop
+
+    inc $I0
+    if $I0 == argc goto no_script
+
+    code = argv[$I0]
     goto loop
 
 else:
