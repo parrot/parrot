@@ -284,7 +284,7 @@ err:
     push getopts, "debug"
     push getopts, "pairs"
     push getopts, "inv=s"
-    push getopts, "builtin=s"
+    push getopts, "builtin:s"	# optional
     push getopts, "nc"
     push getopts, "help"
 
@@ -413,7 +413,19 @@ ok:
     raw_given .= "8....61.9"
     b["san_a0626"] = raw_given
 
-    # wikipedia - the smallest (17 given) known sudoku
+    # sudoku-san 4th aug 2006 - atrocious  - Y-WING 
+    raw_given  = ".....1..."
+    raw_given .= "6..7....5"
+    raw_given .= ".82..49.."
+    raw_given .= ".734...8."
+    raw_given .= "........."
+    raw_given .= ".5...736."
+    raw_given .= "..16..23."
+    raw_given .= "9....5..1"
+    raw_given .= "...8....."
+    b["san_a0804"] = raw_given
+
+    # wikipedia - (one of ) the smallest (17 clues) known sudoku
     raw_given  = "1........"
     raw_given .= "..274...."
     raw_given .= "...5....4"
@@ -1321,10 +1333,11 @@ next:
     .local int C, c
     i_rcs = i_rcss[sq]
     (C, c) = self."y-wing-pair"(i_rcs, A, B)
-    unless C goto nope	# TODO row, col
+    unless C goto check_row	# TODO row, col
 	# convert the square coordinate to (x, y)
 	.local int cx, cy, bx, by, has_bc
 	(cx, cy) = square_to_xy(sq, c)	# AC
+	if x == cx goto try_row
 	# check col and row at AB for a BC pair
 	i_rcss = getattribute self, "i_cols"
 	i_rcs  = i_rcss[x]
@@ -1347,6 +1360,7 @@ next:
 	changed |= $I0
 	goto show_debug
     try_row:
+	if y == cy goto nope
 	i_rcss = getattribute self, "i_rows"
 	i_rcs  = i_rcss[y]
 	(has_bc, c) = self."y-wing-pair_BC"(i_rcs, B, C)
@@ -1362,7 +1376,7 @@ next:
 	changed = self."y-wing_inv"(i_rcs, C, start, end)
     show_debug:
 	$I0 = self."debug"()
-	unless $I0 goto nd
+	unless $I0 goto ex
 	    $S0 = "CHG"
 	    if changed goto chg_ok
 	    $S0 = "noC"
@@ -1388,8 +1402,30 @@ next:
 	    print_item by
 	    print_newline
 	    self."display"()
-    nd:
+	    goto ex
+
+check_row:
+    i_rcss = getattribute self, "i_rows"
+    i_rcs = i_rcss[y]
+    # XXX TODO check that A is in a forced pair
+    (C, c) = self."y-wing-pair"(i_rcs, A, B)
+    cx = c
+    cy = y
+    unless C goto check_col
+	i_rcss = getattribute self, "i_cols"
+	i_rcs  = i_rcss[x]
+	# XXX TODO check that B is in a forced pair
+	(has_bc, by) = self."y-wing-pair_BC"(i_rcs, B, C)
+	bx = cx
+	unless has_bc goto check_col
+	i_rcs  = i_rcss[cx]
+	changed = self."y-wing_inv"(i_rcs, C, by, by)
+	if changed goto show_debug
+
+check_col:
+    # TODO
 nope:
+ex:
     .return (changed)
 .end
 
