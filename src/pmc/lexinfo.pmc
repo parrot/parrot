@@ -135,8 +135,6 @@ The implementation of the Hash PMC is called.
             const INTVAL v_type = io->vtable->shift_integer(INTERP, io);
             Hash *hash;
 
-            /* XXX see src/pmc/hash.pmc */
-            info->extra_flags = EXTRA_IS_COUNT;
             assert(v_type == enum_hash_int);
             /* TODO make a better interface for hash creation
              * TODO create hash with needed types in the first place

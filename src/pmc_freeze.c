@@ -34,6 +34,9 @@ C<STRING> with a vtable.
 #include "parrot/parrot.h"
 #include <assert.h>
 
+/* default.pmc thawing of properties */
+void Parrot_default_thaw(Interp* , PMC* pmc, visit_info *info);
+
 /*
  * define this to 1 for testing
  */
@@ -956,10 +959,12 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info)
             pos = NULL;
     }
     if (pos) {
-        if (info->extra_flags) {
-            VTABLE_thaw(interpreter, pmc, info);
+        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
+            Parrot_default_thaw(interpreter, pmc, info);
             return;
         }
+        /* else maybe VTABLE_thaw ... but there is no other extra stuff */
+
 #if FREEZE_USE_NEXT_FOR_GC
         /*
          * the next_for_GC method doesn't keep track of repeated scalars

@@ -1053,14 +1053,6 @@ Used to unarchive the hash.
             const INTVAL k_type = io->vtable->shift_integer(INTERP, io);
             const INTVAL v_type = io->vtable->shift_integer(INTERP, io);
             Hash *hash;
-            /*
-             * XXX this is actually unused, but prevents bugs due to
-             *     thawing other PMC with properties, which is checking
-             *     EXTRA_IS_NULL.
-             *     It seems that f/t PMCs with properties isn't done in
-             *     a consistent order.
-             */
-            info->extra_flags = EXTRA_IS_COUNT;
 
             /* TODO make a better interface for hash creation
              * TODO create hash with needed size in the first place
