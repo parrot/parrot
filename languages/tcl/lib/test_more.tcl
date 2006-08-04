@@ -75,6 +75,17 @@ proc not_ok {value {description ""} {special {}}} {
     ok $value $description $special
 }
 
+proc pass {{description ""}} {
+  ok 1 $description
+}
+
+proc like {value regexp {description ""}} {
+   if ([regexp $regexp $value]) {
+     pass $description
+   } else {
+     is "STRING: $value" "REGEXP: $regexp" $description
+   }
+}
 
 # NOTE: This doesn't work in tcl-current, because we can't parse:
 # XXX : expr {"[eval {set a "aok"}]" ne "bork"}

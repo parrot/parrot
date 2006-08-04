@@ -1,35 +1,23 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+source lib/test_more.tcl
+plan 5
 
-language_output_is(tcl => << 'TCL', <<OUT, "time, not enough args");
- time
-TCL
-wrong # args: should be "time script ?count?"
-OUT
+eval_is {time} \
+  {wrong # args: should be "time command ?count?"} \
+  {no args}
 
-language_output_is(tcl => << 'TCL', <<OUT, "time, too many args");
- time a b c
-TCL
-wrong # args: should be "time script ?count?"
-OUT
+eval_is {time a b c} \
+  {wrong # args: should be "time command ?count?"} \
+  {too many args}
 
-language_output_is(tcl => << 'TCL', <<OUT, "time bad count arg");
- time {set a} 3.2
-TCL
-expected integer but got "3.2"
-OUT
+eval_is {time {set a} 3.2} \
+  {expected integer but got "3.2"} \
+  {float count}
 
-language_output_like(tcl => <<'TCL', '/\d+ microseconds per iteration\n/', 'check return value');
- puts [time { expr 2+2 }]
-TCL
+like [time {expr 2+2}] {\d+ microseconds per iteration} {return value}
 
-language_output_is(tcl => << 'TCL', <<OUT, "time verify code executed");
+eval_is {
  time {set a 2} 3 
- puts $a
-TCL
-2
-OUT
-
+ set a
+} 2 {verify code executed}
