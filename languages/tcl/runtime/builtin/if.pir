@@ -29,9 +29,13 @@
     $S0 = argv[$I0]
     unless $S0 == 'then' goto arg_next
 
+    # we have to do this check first so that "then" shows up in the error
+    inc $I0
+    if $I0 == argc goto no_script
+
+    dec $I0
     delete argv[$I0]
     dec argc
-    if $I0 == argc goto no_script
 arg_next:
     inc $I0
     if $I0 == argc goto arg_end
@@ -55,10 +59,14 @@ arg_elseif:
     if $I0 == argc goto no_script
     $S0 = argv[$I0]
     unless $S0 == 'then' goto arg_next
-    
+
+    # we have to do this check first so that "then" shows up in the error
+    inc $I0
+    if $I0 == argc goto no_script
+
+    dec $I0
     delete argv[$I0]
     dec argc
-    if $I0 == argc goto no_script
     goto arg_next
 
 arg_else:
