@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple if");
@@ -111,3 +111,10 @@ if 0 then {
 }
 TCL
 OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'if - expected boolean');
+if {"foo"} then {puts foo}
+TCL
+expected boolean value but got "foo"
+OUT
+
