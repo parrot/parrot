@@ -125,13 +125,13 @@ ok
 OUT
 
 language_output_is('tcl', <<'TCL', <<'OUT', 'if - no script following else');
-  if 1 {puts true} else
+  if {[puts foo]&&1} {puts true} else
 TCL
 wrong # args: no script following "else" argument
 OUT
 
 language_output_is('tcl', <<'TCL', <<'OUT', 'if - no expression after elseif');
-  if 1 {puts true} elseif
+  if {[puts foo]&&1} {puts true} elseif
 TCL
 wrong # args: no expression after "elseif" argument
 OUT
