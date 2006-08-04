@@ -298,7 +298,7 @@ throw an exception.
 =cut
 
 .sub __boolean
-    .param string value
+    .param pmc value
     
     if value == '1' goto true
     if value == '0' goto false
@@ -307,10 +307,21 @@ throw an exception.
     if value == 'yes' goto true
     if value == 'no'  goto false
 
-    $S0 = 'expected boolean value but got "'
-    $S0 .= value
-    $S0 .= '"'
+    .local pmc __number
+    __number = get_hll_global '__number'
+
+    push_eh error
+      value = __number(value)
+    clear_eh
+    .return(value)
+
+error:
+    $S0 = value
+    $S0 = 'expected boolean value but got "' . $S0
+    $S0 = $S0 . '"'
     .throw($S0)
+
+number:
 
 true:
     .return(1)
