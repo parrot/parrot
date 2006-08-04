@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple if");
@@ -134,5 +134,11 @@ language_output_is('tcl', <<'TCL', <<'OUT', 'if - no expression after elseif');
   if {[puts foo]&&1} {puts true} elseif
 TCL
 wrong # args: no expression after "elseif" argument
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'if - expression errors before [if] errors');
+  if {}
+TCL
+syntax error in expression "": premature end of expression
 OUT
 
