@@ -1,156 +1,150 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 18;
-use Test::More;
+source lib/test_more.tcl
+plan 18
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple if");
+eval_is {
+ set a ""
  if { 1 == 1 } {
-   puts true
+   set a true
  } {
-   puts false
+   set a false
  }
-TCL
-true
-OUT
+ set a
+} true {simple if}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple if with else");
+eval_is {
+ set a ""
  if { 1 == 1 } {
-   puts true
+   set a true
  } else {
-   puts false
+   set a false
  }
-TCL
-true
-OUT
+ set a
+} true {if/else}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple if with then");
+eval_is {
+ set a ""
  if { 1 != 1 } then {
-   puts true
+   set a true
  } {
-   puts false
+   set a false
  }
-TCL
-false
-OUT
+ set a
+} false {simple if with then}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple if with then, else");
+eval_is {
+ set a ""
  if { 1 == 1 } then {
-   puts true
+   set a true
  } else {
-   puts false
+   set a false
  }
-TCL
-true
-OUT
+ set a
+} true {simple if with then, else}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple if with then, elseif");
+eval_is {
+ set a ""
  if { 1 != 1 } then {
-   puts true
+   set a true
  } elseif { 2==2 } {
-   puts blue
+   set a blue
  }
-TCL
-blue
-OUT
+ set a
+} blue {if with then, elseif}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'simple if with then, elseif with then');
+eval_is {
+  set a ""
   if 0 then {
-    puts if
+    set a if
   } elseif 1 then {
-    puts elseif
+    set a elseif
   }
-TCL
-elseif
-OUT
+  set a
+} elseif {if with then, elseif with then}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple if with then, elseif, else");
+eval_is {
+ set a ""
  if { 1 != 1 } then {
-   puts true
+   set a true
  } elseif { 2 != 2 } {
-   puts blue
+   set a blue
  } else {
-   puts whee
+   set a whee
  }
-TCL
-whee
-OUT
+ set a
+} whee {if with then, elseif, else}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple if with elseif, implicit else");
+eval_is {
+ set a ""
  if { 1 != 1 } {
-   puts true
+   set a 1
  } elseif { 2 != 2 } {
-   puts blue
+   set a 2
  } {
-   puts whee
+   set a 3
  }
-TCL
-whee
-OUT
+ set a
+} 3 {if with elseif, implicit else}
 
-language_output_is("tcl",<<'TCL','',"simple if with implicit then, false");
+eval_is {
+ set a ""
  if { 1 != 1 } {
-   puts true
+   set a no
  }
-TCL
+ set a
+} {} {if with implicit then, false}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple if with implicit then, true");
+eval_is {
+ set a ""
  if { 1 == 1 } {
-   puts true
+   set a true
  }
-TCL
-true
-OUT
+ set a
+} true {if with implicit then, true}
 
-language_output_is("tcl", <<'TCL',<<OUT,"pathological elseif");
-if 0 then {
-  puts true
-} elseif 0 {
-  puts bar
-}
-TCL
-OUT
+eval_is {
+  set a ""
+  if 0 then {
+    set a then
+  } elseif 0 {
+    set a elseif
+  }
+  set a
+} {} {nothing is true}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'if - expected boolean');
-if {"foo"} then {puts foo}
-TCL
-expected boolean value but got "foo"
-OUT
+eval_is {
+  if {"foo"} then {error moo}
+} {expected boolean value but got "foo"} \
+  {expected boolean}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'if - numeric non-0 is true');
-  if 2 then {puts ok}
-TCL
-ok
-OUT
+eval_is {
+  set a ""
+  if 2 then {set a true}
+  set a
+} true {numeric non-0 is true}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'if - no script following else');
-  if {[puts foo]&&1} {puts true} else
-TCL
-wrong # args: no script following "else" argument
-OUT
+eval_is {
+  if {[error moo]&&1} {error oink} else
+} {wrong # args: no expression after "else" argument} \
+  {no expression after else, occurs before command invocation} \
+  {SKIP {doesn't pass in tclsh8.5...}}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'if - no expression after elseif');
-  if {[puts foo]&&1} {puts true} elseif
-TCL
-wrong # args: no expression after "elseif" argument
-OUT
+eval_is {
+  if {[error moo]&&1} {error oink} elseif
+} {wrong # args: no expression after "elseif" argument} \
+  {no expression after elseif, occurs before command invocation} \
+  {SKIP {doesn't pass in tclsh8.5...}}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'if - expression errors before [if] errors');
-  if {}
-TCL
-syntax error in expression "": premature end of expression
-OUT
+eval_is {if {}} \
+  {syntax error in expression "": premature end of expression} \
+  {expression errors before [if] errors}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'if - no script following "then"');
-  if 0 then
-TCL
-wrong # args: no script following "then" argument
-OUT
+eval_is {if 0 then} \
+  {wrong # args: no script following "then" argument} \
+  {no script following then}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'if - no script following "0"');
-  if 0
-TCL
-wrong # args: no script following "0" argument
-OUT
+eval_is {if 0} \
+  {wrong # args: no script following "0" argument} \
+  {no script following conditional}
 
