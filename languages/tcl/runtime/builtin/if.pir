@@ -12,9 +12,10 @@
 
     if argc == 0 goto no_args
 
-    .local pmc __expr, __script
-    __expr   = get_root_global ['_tcl'], '__expr'
-    __script = get_root_global ['_tcl'], '__script'
+    .local pmc __expr, __script, __boolean
+    __expr    = get_root_global ['_tcl'], '__expr'
+    __script  = get_root_global ['_tcl'], '__script'
+    __boolean = get_root_global ['_tcl'], '__boolean'
 
     .local string cond, code
     cond = argv[0]
@@ -30,7 +31,8 @@
 loop:
     $P0 = __expr(cond)
     $P1 = $P0()
-    unless $P1 goto next
+    $I1 = __boolean($P1)
+    unless $I1 goto next
     $P0 = __script(code)
     .return $P0()
 

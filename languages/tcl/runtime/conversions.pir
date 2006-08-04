@@ -290,6 +290,35 @@ return:
   .return(ns_name)
 .end
 
+=head2 _Tcl::__boolean
+
+Given a string, return its boolean value if it's a valid boolean. Otherwise,
+throw an exception.
+
+=cut
+
+.sub __boolean
+    .param string value
+    
+    if value == '1' goto true
+    if value == '0' goto false
+    if value == 'true'  goto true
+    if value == 'false' goto false
+    if value == 'yes' goto true
+    if value == 'no'  goto false
+
+    $S0 = 'expected boolean value but got "'
+    $S0 .= value
+    $S0 .= '"'
+    .throw($S0)
+
+true:
+    .return(1)
+
+false:
+    .return(0)
+.end
+
 =head2 _Tcl::__call_level
 
 Given a pmc containing the tcl-style call level, return an int-like pmc
