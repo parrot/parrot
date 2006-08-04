@@ -4,33 +4,32 @@ token program { <?statement>+ }
 
 rule statement { 
     | print <expression> ;              {{ $I0 = match['expression']
-                                          print $I0
-                                          print "\n" }}
-    | <var> = <expression> ;            {{ 
-                                          $P0 = match['expression']
-                                          $S0 = match['var']
-                                          set_global $S0, $P0 }}
+                                           print $I0
+					   print "\n" }}
+    | <var> = <expression> ;            {{ $P0 = match['expression']
+                                           $S0 = match['var']
+                                           set_global $S0, $P0 }}
 }
 
-rule expression { <value> [ \+ <value>  {{ $I0 = match['value';0]
-                                           $I1 = match['value';1]
+rule expression { <valor> [ \+ <valor>  {{ $I0 = match['valor';0]
+                                           $I1 = match['valor';1]
                                            $I0 += $I1
                                            .return ($I0) }}
-                          | - <value>   {{ $I0 = match['value';0]
-                                           $I1 = match['value';1]
+                          | - <valor>   {{ $I0 = match['valor';0]
+                                           $I1 = match['valor';1]
                                            $I0 -= $I1
                                            .return ($I0) }}
                           ]*
 }
 
-rule value { <number>   {{ $I0 = match['number']
+rule valor { <number>   {{ $I0 = match['number']
                            .return ($I0) }}
-            | <var> {{ $S0 = match['var']
-                       $P0 = get_global $S0
-                         $I0 = $P0
-                       .return($I0) }} 
+           | <var>      {{ $S0 = match['var']
+                           $P0 = get_global $S0
+                           $I0 = $P0
+                           .return($I0) }} 
 }
 
 token number { \d+ }
-token var { <[a..z]>+ }
+token var    { <[a..z]>+ }
 
