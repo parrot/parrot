@@ -1,32 +1,20 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 4;
-use Test::More;
+source lib/test_more.tcl
+plan 4
 
-language_output_is("tcl",<<'TCL',<<OUT,"eof no args");
-  eof
-TCL
-wrong # args: should be "eof channelId"
-OUT
+eval_is {eof} \
+  {wrong # args: should be "eof channelId"} \
+  {no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"eof too many args");
-  eof a b
-TCL
-wrong # args: should be "eof channelId"
-OUT
+eval_is {eof a b} \
+  {wrong # args: should be "eof channelId"} \
+  {too many args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"eof bad channelid");
-  eof smarmy
-TCL
-can not find channel named "smarmy"
-OUT
+eval_is {eof espn-ocho} \
+  {can not find channel named "espn-ocho"} \
+  {invalid channel}
 
-language_output_is("tcl",<<'TCL',<<OUT,"eof an open channel");
-  puts [eof stdin]
-TCL
-0
-OUT
+is [eof stdin] 0 {eof an open channel}
 
 # TODO: create test files and read from them, testing the eof condition.
