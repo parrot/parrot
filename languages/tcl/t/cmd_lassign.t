@@ -4,6 +4,8 @@ source lib/test_more.tcl
 plan 7
 
 diag "in 8.5a4, this error is for varname. This is probably a bug."
+# https://sourceforge.net/tracker/index.php?func=detail&aid=1534628&group_id=10894&atid=110894
+
 eval_is {lassign} \
   {wrong # args: should be "lassign list varName ?varName ...?"} \
   {no args}
