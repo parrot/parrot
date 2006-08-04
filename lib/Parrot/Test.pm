@@ -290,7 +290,7 @@ sub run_command {
         chdir $orig_dir;
     }
 
-    my $exit_code = $? >> 8;
+    my $exit_code = $?;
 
     close STDOUT             or die "Can't close    stdout" if $out;
     close STDERR             or die "Can't close    stderr" if $err;
@@ -298,7 +298,7 @@ sub run_command {
     open  STDOUT, ">&OLDOUT" or die "Can't restore  stdout" if $out;
     open  STDERR, ">&OLDERR" or die "Can't restore  stderr" if $err;
 
-    return $exit_code;
+    return ($exit_code & 0xFF) ? "[SIGNAL $exit_code]" : ($? >> 8);
 }
 
 
@@ -750,7 +750,7 @@ sub _generate_functions {
                                      'STDOUT' => $build_f,
                                      'STDERR' => $build_f);
             $builder->diag("'$cmd' failed with exit code $exit_code")
-        if $exit_code;
+                if $exit_code;
 
             if (! -e $exe_f) {
                 $builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
@@ -765,7 +765,8 @@ sub _generate_functions {
 
             my $meth = $c_test_map{$func};
             my $pass = $builder->$meth(slurp_file($out_f), $expected, $desc);
-            $builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code and not $pass;
+            $builder->diag("'$cmd' failed with exit code $exit_code")
+                if $exit_code and not $pass;
 
             unless($ENV{POSTMORTEM}) {
                 unlink $out_f;
