@@ -1,13 +1,35 @@
 RM_F			= @rm_f@
 PERL			= @perl@
-PARROT	    	= ../../parrot@exe@
+PARROT	    	= @build_dir@/parrot@exe@
 O				= @o@
 LOAD_EXT		= @load_ext@
+CC         		= @cc@
+CC_INC     		= @cc_inc@ -I@build_dir@/include
+C_LIBS     		= @libs@ 
+CC_SHARED  		= @cc_shared@
+CFLAGS     		= $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
+LINK_DYNAMIC  	= @link_dynamic@
+LINK       		= @link@
+LINKFLAGS  		= @linkflags@ @link_debug@ @ld_debug@
+LD         		= @ld@
+LDFLAGS    		= @ldflags@ @ld_debug@ 
+SHARE_EXT       = @share_ext@
+LD_SHARE_FLAGS  = @ld_share_flags@
 
 BUILD_PMC   	= $(PERL) @build_dir@/tools/build/dynpmc.pl
 SRC_PMC_DIR		= src/pmc
 DEST_PMC_DIR	= @build_dir@/runtime/parrot/dynext
 PMC_GROUP       = $(DEST_PMC_DIR)/bcg_group$(LOAD_EXT)
+LIB_BCG         = @build_dir@/blib/lib/libbcg$(SHARE_EXT)
+
+SRC_DIR         = src
+INCLUDE_DIR     = include
+
+BCG_H_FILES = \
+    $(INCLUDE_DIR)/bcg.h \
+
+BCG_O_FILES  = \
+	$(SRC_DIR)/bcg$(O) 
 
 PMCS = \
  bcg
@@ -22,12 +44,29 @@ PMC_GEN_FILES = \
 
 all: pmcs
 
-pmcs:
+$(BCG_O_FILES): $(BCG_H_FILES)
+
+$(LIB_BCG): $(BCG_O_FILES)
+	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ $(BCG_O_FILES)
+	
+pmcs: $(LIB_BCG)
 	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) generate $(PMCS)
 	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) compile $(PMCS)
 	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) linklibs $(PMCS)
 	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) copy "--destination=$(DEST_PMC_DIR)" \
 		 $(PMCS)
 
-clean:
+test: all
+	cd t && prove && cd ..
+
+testclean: 
+	$(RM_F) t/*.pir
+
+clean: testclean
 	$(RM_F) $(PMC_GEN_FILES)
+	$(RM_F) $(BCG_O_FILES)
+	$(RM_F) $(LIB_BCG)
+
+realclean: clean
+
+distclean: realclean
