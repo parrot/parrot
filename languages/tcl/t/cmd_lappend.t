@@ -1,42 +1,28 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
-use Test::More;
+source lib/test_more.tcl
+plan 5
 
-language_output_is("tcl",<<'TCL',<<OUT,"append nothing");
+eval_is {
   set a [list a b]
   lappend a 
-  puts $a
-TCL
-a b
-OUT
+  set a
+} {a b} {append nothing}
 
-language_output_is("tcl",<<'TCL',<<OUT,"append one");
+eval_is {
   set a [list a b]
   lappend a c
-  puts $a
-TCL
-a b c
-OUT
+  set a
+} {a b c} {append one}
 
-language_output_is("tcl",<<'TCL',<<OUT,"append multiple");
+eval_is {
   set a [list a b]
   lappend a c d e f g
-  puts $a
-TCL
-a b c d e f g
-OUT
+  set a
+} {a b c d e f g} {append multiple}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "new variable");
-  puts [lappend x 1]
-TCL
-1
-OUT
+is [lappend x 1] 1 {new variable}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'wrong # args error');
-  lappend
-TCL
-wrong # args: should be "lappend varName ?value value ...?"
-OUT
+eval_is {lappend} \
+  {wrong # args: should be "lappend varName ?value value ...?"} \
+  {no args}
