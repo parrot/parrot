@@ -41,7 +41,6 @@ sub output_is() {
     Parrot::Test::write_code_to_file( $code, $lang_f );
 
     my ($pycmd, $cmd, $pass, $dir);
-    my $exit_code = 0;
 
     $pycmd = "python  $lang_f";
     $cmd = "pirate $lang_f";
@@ -49,15 +48,16 @@ sub output_is() {
     # For some reason, if you redirect both STDERR and STDOUT here,
     # you get a 38M file of garbage. We'll temporarily assume everything
     # works and ignore stderr.
-    $exit_code = Parrot::Test::run_command($pycmd, STDOUT => $py_out_f);
+    my $python_exit_code = Parrot::Test::run_command($pycmd, STDOUT => $py_out_f);
     my $py_file = Parrot::Test::slurp_file($py_out_f);
-    my $pirate_file;
+    $self->{builder}->diag("'$pycmd' failed with exit code $python_exit_code")
+        if $python_exit_code and not $pass;
 
-    $exit_code |= Parrot::Test::run_command($cmd, STDOUT => $pirate_out_f);
-    $pirate_file = Parrot::Test::slurp_file($pirate_out_f);
+    my $pirate_exit_code = Parrot::Test::run_command($cmd, STDOUT => $pirate_out_f);
+    my $pirate_file = Parrot::Test::slurp_file($pirate_out_f);
     $pass = $self->{builder}->is_eq( $pirate_file, $py_file, $desc );
-    $self->{builder}->diag("'$cmd' failed with exit code $exit_code")
-    if $exit_code and not $pass;
+    $self->{builder}->diag("'$cmd' failed with exit code $pirate_exit_code")
+        if $pirate_exit_code and not $pass;
 
     unless ($ENV{POSTMORTEM}) {
         unlink $lang_f;
