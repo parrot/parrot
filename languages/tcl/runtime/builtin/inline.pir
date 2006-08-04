@@ -13,6 +13,8 @@
 
   .local int argc
   argc = argv
+  
+  if argc != 2 goto bad_args
 
   .local string language,code
 
@@ -27,6 +29,9 @@
 
   # XXX Should catch exceptions in the code and return the error message
   .return ('')
+
+bad_args:
+  .throw ('wrong # args: should be "inline language code"')
 
 fail:
   $S0 = 'invalid language "'
