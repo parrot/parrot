@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple if");
@@ -146,5 +146,11 @@ language_output_is('tcl', <<'TCL', <<'OUT', 'if - no script following "then"');
   if 0 then
 TCL
 wrong # args: no script following "then" argument
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'if - no script following "0"');
+  if 0
+TCL
+wrong # args: no script following "0" argument
 OUT
 
