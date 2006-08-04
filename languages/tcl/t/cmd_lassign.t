@@ -1,72 +1,39 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
-use Test::More;
+source lib/test_more.tcl
+plan 7
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad args, 0");
-  lassign
-TCL
-wrong # args: should be "lassign list varName ?varName ...?"
-OUT
+diag "in 8.5a4, this error is for varname. This is probably a bug."
+eval_is {lassign} \
+  {wrong # args: should be "lassign list varName ?varName ...?"} \
+  {no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad args, 1");
-  lassign {a b}
-TCL
-wrong # args: should be "lassign list varName ?varName ...?"
-OUT
+eval_is {lassign {a b}} \
+  {wrong # args: should be "lassign list varName ?varName ...?"} \
+  {one args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"assign list of two to one var");
-  puts [lassign {x y} a]
-  puts $a
-TCL
-y
-x
-OUT
+eval_is {
+  set b [lassign {x y} a]
+  list $a $b
+} {x y} {singleton with one leftover}
 
-language_output_is("tcl",<<'TCL',<<OUT,"assign list of three to one var");
-  puts [lassign {x y z} a]
-  puts $a
-TCL
-y z
-x
-OUT
+eval_is { 
+  set b [lassign {x y z} a]
+  list $a $b
+} {x {y z}} {singleton with two leftovers}
 
-language_output_is("tcl",<<'TCL',<<OUT,"assign list of three to two vars");
-  puts [lassign {x y z} a b]
-  puts $a
-  puts $b
-TCL
-z
-x
-y
-OUT
+eval_is {
+  set c [lassign {x y z} a b]
+  list $a $b $c
+} {x y z} {double with a leftover}
 
-language_output_is("tcl",<<'TCL',<<OUT,"assign list of three to three vars");
-  puts [lassign {x y z} a b c]
-  puts $a
-  puts $b
-  puts $c
-TCL
+eval_is {
+  set d [lassign {x y z} a b c]
+  list $a $b $c $d
+} {x y z {}} {triple, no leftovers}
 
-x
-y
-z
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"assign list of three to four vars");
-  puts [lassign {x y z} a b c d]
-  puts $a
-  puts $b
-  puts $c
-  puts $d
-TCL
-
-x
-y
-z
-
-OUT
-
+eval_is {
+  set e [lassign {x y z} a b c d]
+  list $a $b $c $d $e
+} {x y z {} {}} {4 variables, not enough values}
 
