@@ -8,63 +8,74 @@
 .sub '&lset'
   .param pmc argv :slurpy
 
-  .local int return_type, argc
-  .local pmc retval
-
-  argc = argv
+  .local int argc
+  argc = elements argv
   if argc < 2 goto wrong_args
 
-  .local string name
-  $P0  = argv[0]
-  name = $P0
+  .local string name, value
+  name  = argv[0]
+  value = pop argv
+  dec argc
 
-  .local pmc read, set
-  read = get_root_global ['_tcl'], '__read'
-  set  = get_root_global ['_tcl'], '__set'
+  .local pmc __read, __set
+  __read = get_root_global ['_tcl'], '__read'
+  __set  = get_root_global ['_tcl'], '__set'
 
-  retval = read(name)
+  .local pmc retval, list
+  list   = __read(name)
+  retval = list
 
-  .local int count
-  count = argv
-  if count == 2 goto replace
-  $P0 = argv[1]
-  $S0 = $P0
-  if $S0 == '' goto replace
+  # we removed the value, so this would be one now
+  if argc == 1 goto replace
 
 lset:
-  .local pmc __list
-  __list = get_root_global ['_tcl'], '__list'
-  retval = __list(retval)
+  .local pmc __list, _list_index
+  __list      = get_root_global ['_tcl'], '__list'
+  _list_index = get_root_global ['_tcl'], '_list_index'
 
-  .local int i, end
-  i   = 1
-  end = count - 2
-  .local pmc list
-  list = retval
-
-loop:
-  if i >= end goto loop_done
-
-  $I0 = argv[i]
-  $P0 = list[$I0]
+  unless argc == 2 goto iterate
+  $P0 = argv[1]
   $P0 = __list($P0)
-  list[$I0] = $P0
-  list      = $P0
+  $I0 = elements $P0
+  if $I0 == 0 goto replace
 
-  inc i
+iterate:
+  list = __list(list)
+  __set(name, list)
+  
+  .local pmc indices, prev
+  .local int outer_i
+  outer_i = 0
+outer_loop:
+  inc outer_i
+  if outer_i == argc goto done
+  indices = argv[outer_i]
+  indices = __list(indices)
+
+  $I0 = 0
+  $I1 = elements indices
+loop:
+  if $I0 == $I1 goto outer_loop
+
+  $P0 = indices[$I0]
+  $I2 = _list_index(list, $P0)
+  $S0 = $I2
+
+  prev = list
+  list = list[$I2]
+  list = __list(list)
+  prev[$I2] = list
+
+  inc $I0
   goto loop
 
-loop_done:
-  $I0 = argv[i]
-  $P0 = argv[-1]
-  list[$I0] = $P0
-  .return set(name, retval)
+done:
+  prev[$I2] = value
+  .return(retval)
 
 wrong_args:
   .throw ('wrong # args: should be "lset listVar index ?index...? value"')
 
 replace:
-  $P0 = argv[-1]
-  .return set(name, $P0)
-
+  .return __set(name, value)
 .end
