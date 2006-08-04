@@ -20,12 +20,15 @@
     # string expression with a Sub that represents it. and while we're at it,
     # strip out the "then"s.
 
+    # convert to the expression to a Sub
     $S0 = argv[0]
     $P0 = __expr($S0)
-    argv[0] = $P0
 
     $I0 = 1
     if $I0 == argc goto no_script
+
+    argv[0] = $P0
+
     $S0 = argv[$I0]
     unless $S0 == 'then' goto arg_next
 
@@ -51,12 +54,17 @@ arg_next:
 arg_elseif:
     inc $I0
     if $I0 == argc goto no_expression
+
+    # convert to the expression to a Sub
     $S0 = argv[$I0]
     $P0 = __expr($S0)
-    argv[$I0] = $P0
 
     inc $I0
     if $I0 == argc goto no_script
+
+    $I1 = $I0 - 1
+    argv[$I1] = $P0
+
     $S0 = argv[$I0]
     unless $S0 == 'then' goto arg_next
 
