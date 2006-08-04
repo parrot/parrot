@@ -1,36 +1,19 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
-use Test::More;
+source lib/test_more.tcl
+plan 7
 
-language_output_is("tcl",<<'TCL',<<OUT,"no elements");
-  puts [llength [list]]
-TCL
-0
-OUT
+eval_is {llength} \
+  {wrong # args: should be "llength list"} \
+  {no arg}
 
-language_output_is("tcl",<<'TCL',<<OUT,"one element");
-  puts [llength [list a]]
-TCL
-1
-OUT
+eval_is {llength a b} \
+  {wrong # args: should be "llength list"} \
+  {too many args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"two elements");
-  puts [llength [list a b]]
-TCL
-2
-OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"braces");
-  puts [llength [list a b {c {d e}}]]
-TCL
-3
-OUT
-
-language_output_is("tcl",<<'TCL',<<OUT,"spaces");
-  puts [llength [list a b "c {d e}"]]
-TCL
-3
-OUT
+is [llength [list]] 0 {no elements}
+is [llength [list a]] 1 {one elements}
+is [llength [list a b]] 2 {two elements}
+is [llength [list a b {c {d e}}]] 3 {braces}
+is [llength [list a b "c {d e}"]] 3 {spaces}
