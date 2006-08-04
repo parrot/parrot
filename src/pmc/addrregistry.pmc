@@ -10,11 +10,11 @@ src/pmc/addrregistry.pmc - A DOD Registry PMC
 
 The AddrRegistry class provides the equivalence of reference counts
 mainly for extenders and embeders of Parrot. The hash keys are the
-addressed of the key PMC, values are reference counts, i.e. the
+addresses of the key PMC, values are reference counts, i.e. the
 difference of (set_pmc_keyed - delete_pmc_keyed). If the reference
 goes to zero, the entry is deleted physically.
 
-Please not that you have to anchor an instance of AddrRegistry yourself
+Please note that you have to anchor an instance of AddrRegistry yourself
 e.g. with C<Parrot_register_pmc> if it isn't visible to Parrot.
 
 =head2 Functions
