@@ -1,42 +1,28 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
-use Test::More;
+source lib/test_more.tcl
+plan 5
 
-language_output_is("tcl",<<'TCL',<<OUT,"error no args");
-  error
-TCL
-wrong # args: should be "error message ?errorInfo? ?errorCode?"
-OUT
+eval_is {error} \
+  {wrong # args: should be "error message ?errorInfo? ?errorCode?"} \
+  {error no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error too many args");
-  error a b c d
-TCL
-wrong # args: should be "error message ?errorInfo? ?errorCode?"
-OUT
+eval_is {error a b c d} \
+  {wrong # args: should be "error message ?errorInfo? ?errorCode?"} \
+  {error too many args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple error");
-  error "dead"
-TCL
-dead
-OUT
+eval_is {error dead} dead {simple error}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error with info");
+eval_is {
+  global errorInfo
+  global errorCode
   catch { error "dead" eek }
-  puts $errorInfo
-  puts $errorCode
-TCL
-eek
-NONE
-OUT
+  list $errorInfo $errorCode
+} {eek NONE} {error with info}
 
-language_output_is("tcl",<<'TCL',<<OUT,"error with code");
+eval_is {
+  global errorInfo
+  global errorCode
   catch { error "dead" eek mouse}
-  puts $errorInfo
-  puts $errorCode
-TCL
-eek
-mouse
-OUT
+  list $errorInfo $errorCode
+} {eek mouse} {error with code}
