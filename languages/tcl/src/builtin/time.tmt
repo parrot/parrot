@@ -1,4 +1,4 @@
-[time script:script ?count:int=1?]
+[time command:script ?count:int=1?]
 
   $I0 = $count
   .local float t
@@ -6,7 +6,7 @@
 time_loop:
   if $I0 == 0 goto time_done
   
-  $script
+  $command
   
   dec $I0
   goto time_loop
