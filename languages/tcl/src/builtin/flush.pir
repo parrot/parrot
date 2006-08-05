@@ -90,8 +90,6 @@ END_PIR
 .return(register_num, pir_code)
 
 args_miscount:
-  pir_code = ".throw(\"wrong # args: should be flush \\\"channelId\\\"\")\n"
+  pir_code = ".throw(\"wrong # args: should be \\\"flush channelId\\\"\")\n"
   .return(register_num, pir_code)
-
 .end
-
