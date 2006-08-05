@@ -11,16 +11,57 @@ rule statement {
                                            set_global $S0, $P0 }}
 }
 
-rule expression { <valor> [ \+ <valor>  {{ $I0 = match['valor';0]
-                                           $I1 = match['valor';1]
-                                           $I0 += $I1
-                                           .return ($I0) }}
-                          | - <valor>   {{ $I0 = match['valor';0]
-                                           $I1 = match['valor';1]
-                                           $I0 -= $I1
-                                           .return ($I0) }}
-                          ]*
+rule expression { <valor> [ <add> | <sub> ]*
+##{{
+##'_dumper'(match)
+##}}
+
+{{
+
+$I0 = match['valor']
+##print $I0
+##print "\n"
+
+$I9 = defined match['add']
+unless $I9 goto sub_part 
+$P0 = match['add']
+.local pmc iter
+iter = new Iterator, $P0
+iter = 0
+
+iter_loop:
+unless iter, iter_end
+shift $P1, iter
+$I1 = $P1['valor']
+$I0 += $I1
+goto iter_loop
+iter_end:
+
+sub_part:
+$I9 = defined match['sub']
+unless $I9 goto end_part
+$P0 = match['sub']
+iter = new Iterator, $P0
+iter = 0
+
+iter_loop1:
+unless iter, iter_end1
+shift $P1, iter
+$I1 = $P1['valor']
+$I0 -= $I1
+goto iter_loop1
+iter_end1:
+
+end_part:
+##print $I0
+##print "\n"
+.return($I0)
+}}
+
 }
+
+rule add { \+ <valor> }
+rule sub { \- <valor> }
 
 rule valor { <number>   {{ $I0 = match['number']
                            .return ($I0) }}
