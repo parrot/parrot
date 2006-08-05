@@ -1,164 +1,160 @@
 #include <string.h>
-
 #include "bcg.h"
-#include "parrot/parrot.h"
+#include "bcg_private.h"
+#include "bcg_logger_private.h"
 
-BCG *
+/* Forward decleration for state management functions. */
+static void set_state(BCG_info * bcg_info, bcg_state state);
+static void unset_state(BCG_info * bcg_info, bcg_state state);
+static int in_state(BCG_info * bcg_info, bcg_state state);
+
+BCG_info *
 BCG_create(void)
 {
-    BCG *bcg;
+    BCG_info *bcg_info;
 
-    bcg = (BCG *)mem_sys_allocate(sizeof(BCG));
-    bcg->state = 0;
-    BCG_set_state(bcg, BCG_STATE_INIT);
-    return bcg;
+    bcg_info = (BCG_info *) mem_sys_allocate(sizeof(BCG_info));
+    bcg_info->state = 0;
+    set_state(bcg_info, BCG_STATE_INIT);
+    return bcg_info;
 }
 
 void
-BCG_destroy(BCG *bcg)
+BCG_destroy(BCG_info * bcg_info)
 {
-    mem_sys_free(bcg);
+    mem_sys_free(bcg_info);
 }
 
 void
-BCG_set_state(BCG *bcg, BCGState state)
+BCG_start_code_gen(BCG_info * bcg_info)
 {
-    bcg->state |= state;
-}
-
-void
-BCG_unset_state(BCG *bcg, BCGState state)
-{
-    bcg->state &= (~state);
-}
-
-int
-BCG_in_state(BCG *bcg, BCGState state)
-{
-    return state == (state & bcg->state);
-}
-
-void
-BCG_throw_exception(BCG *bcg, char *message)
-{
-    char *buffer = mem_sys_allocate(sizeof(char) * strlen(message));
-    strcpy(buffer, message);
-    bcg->error_msg = buffer;
-    BCG_THROW(bcg, BCG_EXCEPTION);
-}
-
-void
-BCG_start_code_gen(BCG *bcg)
-{
-    if (bcg->state != BCG_STATE_INIT) {
-        char message[] = "Expected BCG to be in INIT state.";
-        BCG_throw_exception(bcg, message);
+    if (bcg_info->state != BCG_STATE_INIT) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in INIT state.");
     }
 
-    BCG_set_state(bcg, BCG_STATE_IN_CODEGEN);
+    set_state(bcg_info, BCG_STATE_IN_CODEGEN);
 }
 
 void
-BCG_end_code_gen(BCG *bcg)
+BCG_end_code_gen(BCG_info * bcg_info)
 {
-    if (bcg->state != BCG_STATE_IN_CODEGEN) {
-        char message[] = "Expected BCG to be in IN_CODEGEN state.";
-        BCG_throw_exception(bcg, message);
+    if (bcg_info->state != BCG_STATE_IN_CODEGEN) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_CODEGEN state.");
     }
 
-    BCG_unset_state(bcg, BCG_STATE_IN_CODEGEN);
+    unset_state(bcg_info, BCG_STATE_IN_CODEGEN);
 }
 
 void
-BCG_start_sub(BCG *bcg, char *subName, char *pragma)
+BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)
 {
 
-    if (bcg->state != BCG_STATE_IN_CODEGEN) {
-        char message[] = "Expected BCG to be in IN_CODEGEN state.";
-        BCG_throw_exception(bcg, message);
+    if (bcg_info->state != BCG_STATE_IN_CODEGEN) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_CODEGEN state.");
     }
 
-    BCG_set_state(bcg, BCG_STATE_IN_SUB);
+    set_state(bcg_info, BCG_STATE_IN_SUB);
 }
 
 void
-BCG_end_sub(BCG *bcg)
+BCG_end_sub(BCG_info * bcg_info)
 {
-    if (!BCG_in_state(bcg, BCG_STATE_IN_SUB)) {
-        char message[] = "Expected BCG to be in IN_SUB state.";
-        BCG_throw_exception(bcg, message);
+    if (!in_state(bcg_info, BCG_STATE_IN_SUB)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_SUB state.");
     }
 
-    BCG_unset_state(bcg, BCG_STATE_IN_SUB);
+    unset_state(bcg_info, BCG_STATE_IN_SUB);
 }
 
 void
-BCG_start_call(BCG *bcg, char *subName)
+BCG_start_call(BCG_info * bcg_info, char *sub_name)
 {
-    if (!BCG_in_state(bcg, BCG_STATE_IN_SUB)) {
-        char message[] = "Expected BCG to be in IN_SUB state.";
-        BCG_throw_exception(bcg, message);
+    if (!in_state(bcg_info, BCG_STATE_IN_SUB)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_SUB state.");
     }
 
-    BCG_set_state(bcg, BCG_STATE_IN_CALL);
+    set_state(bcg_info, BCG_STATE_IN_CALL);
 }
 
 void
-BCG_end_call(BCG *bcg)
+BCG_end_call(BCG_info * bcg_info)
 {
-    if (!BCG_in_state(bcg, BCG_STATE_IN_CALL)) {
-        char message[] = "Expected BCG to be in IN_CALL state.";
-        BCG_throw_exception(bcg, message);
+    if (!in_state(bcg_info, BCG_STATE_IN_CALL)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_CALL state.");
     }
 
-    BCG_unset_state(bcg, BCG_STATE_IN_CALL);
+    unset_state(bcg_info, BCG_STATE_IN_CALL);
 }
 
 void
-BCG_start_op(BCG *bcg, char *op)
+BCG_start_op(BCG_info * bcg_info, char *op)
 {
-    if (!BCG_in_state(bcg, BCG_STATE_IN_SUB)) {
-        char message[] = "Expected BCG to be in IN_SUB state.";
-        BCG_throw_exception(bcg, message);
+    if (!in_state(bcg_info, BCG_STATE_IN_SUB)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_SUB state.");
     }
 
-    BCG_set_state(bcg, BCG_STATE_IN_OP);
+    set_state(bcg_info, BCG_STATE_IN_OP);
 }
 
 void
-BCG_end_op(BCG *bcg)
+BCG_end_op(BCG_info * bcg_info)
 {
-    if (!BCG_in_state(bcg, BCG_STATE_IN_OP)) {
-        char message[] = "Expected BCG to be in IN_CALL state.";
-        BCG_throw_exception(bcg, message);
+    if (!in_state(bcg_info, BCG_STATE_IN_OP)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_CALL state.");
     }
 
-    BCG_unset_state(bcg, BCG_STATE_IN_OP);
+    unset_state(bcg_info, BCG_STATE_IN_OP);
 }
 
 void
-BCG_var(BCG *bcg, char *varName, char varType)
+BCG_var(BCG_info * bcg_info, char *var_name, char var_type)
 {
-    if (!BCG_in_state(bcg, BCG_STATE_IN_OP)) {
-        char message[] = "Expected BCG to be in IN_OP state.";
-        BCG_throw_exception(bcg, message);
+    if (!in_state(bcg_info, BCG_STATE_IN_OP)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_OP state.");
     }
 }
 
 void
-BCG_val(BCG *bcg, char *val)
+BCG_val(BCG_info * bcg_info, char *val)
 {
-    if (!BCG_in_state(bcg, BCG_STATE_IN_OP)) {
-        char message[] = "Expected BCG to be in IN_OP state.";
-        BCG_throw_exception(bcg, message);
+    if (!in_state(bcg_info, BCG_STATE_IN_OP)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_OP state.");
     }
 }
 
 void
-BCG_label(BCG *bcg, char *label)
+BCG_label(BCG_info * bcg_info, char *label)
 {
-    if (!BCG_in_state(bcg, BCG_STATE_IN_SUB)) {
-        char message[] = "Expected BCG to be in IN_SUB state.";
-        BCG_throw_exception(bcg, message);
+    if (!in_state(bcg_info, BCG_STATE_IN_SUB)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_SUB state.");
     }
+}
+
+static void
+set_state(BCG_info * bcg_info, bcg_state state)
+{
+    bcg_info->state |= state;
+}
+
+static void
+unset_state(BCG_info * bcg_info, bcg_state state)
+{
+    bcg_info->state &= (~state);
+}
+
+static int
+in_state(BCG_info * bcg_info, bcg_state state)
+{
+    return state == (state & bcg_info->state);
 }

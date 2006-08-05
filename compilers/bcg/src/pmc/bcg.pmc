@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-bcg.pmc Byte Code Generator PMC
+bcg_info.pmc Byte Code Generator PMC
 
 =head1 DESCRIPTION
 
@@ -25,46 +25,46 @@ static INTVAL dynpmc_BCG;
 
 pmclass BCG dynpmc need_ext group bcg_group lib bcg {
 
-	void class_init() 
-	{
-    	if (pass) {
-    		dynpmc_BCG = Parrot_PMC_typenum(INTERP,"BCG");
-		}
-	}
+    void class_init() 
+    {
+        if (pass) {
+            dynpmc_BCG = Parrot_PMC_typenum(INTERP,"BCG");
+        }
+    }
 
 /*
 
 =item C<void init ()>
 
-This method creates a BCG PMC instance
+This method creates a BCG_info PMC instance
 
 =cut
 
 */   
     void init ()
-	{
-		BCG *bcg;
-		
-		PMC_struct_val(SELF) = NULL;
-		bcg=BCG_create();
-    	PMC_struct_val(SELF) = bcg;
-	}
+    {
+        BCG_info *bcg_info;
+        
+        PMC_struct_val(SELF) = NULL;
+        bcg_info=BCG_create();
+        PMC_struct_val(SELF) = bcg_info;
+    }
 
 /*
    
 =item C<void destroy ()>
 
-This method destroys BCG PMC instance.
-	
+This method destroys BCG_info PMC instance.
+    
 =cut
 
 */
     void destroy () 
-	{
-		if (PMC_struct_val(SELF)) {
-			BCG_destroy( (BCG*) PMC_struct_val(SELF));		
-			PMC_struct_val(SELF) = NULL;
-		}
+    {
+        if (PMC_struct_val(SELF)) {
+            BCG_destroy( (BCG_info*) PMC_struct_val(SELF));        
+            PMC_struct_val(SELF) = NULL;
+        }
     }
 
 /*
@@ -76,19 +76,19 @@ This method starts the code generation phase.
 =cut
 
 */   
-	METHOD void startCodeGen()
-	{
-		BCG *bcg;
-	
-		bcg = (BCG*) PMC_struct_val(SELF);
-		BCG_TRY(bcg) {
-			BCG_start_code_gen(bcg);
-		}
-		BCG_CATCH(BCG_EXCEPTION) {
-			 real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
-		}
-		BCG_END_TRY;
-	}
+    METHOD void startCodeGen()
+    {
+        BCG_info *bcg_info;
+    
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_start_code_gen(bcg_info);
+        }
+        BCG_CATCH(BCG_EXCEPTION) {
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+        }
+        BCG_END_TRY;
+    }
 /*
 
 =item C<void endCodeGen()>
@@ -98,20 +98,20 @@ This method concludes the code generation phase.
 =cut
 
 */   
-	METHOD void endCodeGen()
-	{
-		BCG *bcg;
+    METHOD void endCodeGen()
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_end_code_gen(bcg);
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_end_code_gen(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-				
-	}
+                
+    }
 
 /*
 
@@ -122,20 +122,20 @@ This method is called to generate byte code for start subroutine.
 =cut
 
 */   
-	METHOD void startSub(STRING *subName, STRING *pragma)
-	{
-		BCG *bcg;
+    METHOD void startSub(STRING *subName, STRING *pragma)
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_start_sub(bcg, string_to_cstring(INTERP, subName), 
-				string_to_cstring(INTERP, pragma));
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_start_sub(bcg_info, string_to_cstring(INTERP, subName), 
+                string_to_cstring(INTERP, pragma));
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 
 /*
 
@@ -146,19 +146,19 @@ This method is called to generate bytecode for end subroutine
 =cut
 
 */   
-	METHOD void endSub()
-	{
-		BCG *bcg;
+    METHOD void endSub()
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_end_sub(bcg); 
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_end_sub(bcg_info); 
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 /*
 
 =item C<void startCall(STRING *subName)>
@@ -168,19 +168,19 @@ This method generates code for a subroutine call.
 =cut
 
 */   
-	METHOD void startCall(STRING *subName)
-	{
-		BCG *bcg;
+    METHOD void startCall(STRING *subName)
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_start_call(bcg, string_to_cstring(INTERP, subName));
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_start_call(bcg_info, string_to_cstring(INTERP, subName));
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 
 /*
 
@@ -191,19 +191,19 @@ This method generated code for ending a subroutine call.
 =cut
 
 */
-	METHOD void endCall()
-	{
-		BCG *bcg;
+    METHOD void endCall()
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_end_call(bcg);
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_end_call(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 
 /*
 
@@ -214,19 +214,19 @@ This method generates code for an opertion.
 =cut
 
 */   
-	METHOD void startOp(STRING *op)
-	{
-		BCG *bcg;
+    METHOD void startOp(STRING *op)
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_start_op(bcg, string_to_cstring(INTERP, op));
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_start_op(bcg_info, string_to_cstring(INTERP, op));
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 
 /*
 
@@ -237,19 +237,19 @@ This method marks the end of an operation.
 =cut
 
 */
-	METHOD void endOp()
-	{
-		BCG *bcg;
+    METHOD void endOp()
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_end_op(bcg);
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_end_op(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 
 /*
 
@@ -260,19 +260,19 @@ This method generates bytecode for a variable.
 =cut
 
 */
-	METHOD void val(STRING *value)
-	{
-		BCG *bcg;
+    METHOD void val(STRING *value)
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_val(bcg, string_to_cstring(INTERP, value));
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_val(bcg_info, string_to_cstring(INTERP, value));
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 
 /*
 
@@ -283,19 +283,19 @@ This method generates bytecode for a constant.
 =cut
 
 */
-	METHOD void var(STRING *varName, STRING *type)
-	{
-		BCG *bcg;
+    METHOD void var(STRING *varName, STRING *type)
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_var(bcg, string_to_cstring(INTERP, varName), 'P');
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_var(bcg_info, string_to_cstring(INTERP, varName), 'P');
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 
 /*
 
@@ -306,19 +306,19 @@ This method generates bytecode for label.
 =cut
 
 */
-	METHOD void label(STRING *label)
-	{
-		BCG *bcg;
+    METHOD void label(STRING *label)
+    {
+        BCG_info *bcg_info;
 
-        bcg = (BCG*) PMC_struct_val(SELF);
-        BCG_TRY(bcg) {
-            BCG_label(bcg, string_to_cstring(INTERP, label));
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_TRY(bcg_info) {
+            BCG_label(bcg_info, string_to_cstring(INTERP, label));
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg->error_msg);
+             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-	}
+    }
 }
 /*
 

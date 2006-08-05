@@ -27,9 +27,12 @@ INCLUDE_DIR     = include
 
 BCG_H_FILES = \
     $(INCLUDE_DIR)/bcg.h \
+    $(SRC_DIR)/bcg_private.h \
+    $(SRC_DIR)/bcg_logger_private.h
 
 BCG_O_FILES  = \
-	$(SRC_DIR)/bcg$(O) 
+	$(SRC_DIR)/bcg_logger$(O) \
+	$(SRC_DIR)/bcg$(O)
 
 PMCS = \
  bcg
