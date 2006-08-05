@@ -59,7 +59,8 @@ loop:
 
   $P0 = indices[$I0]
   $I2 = _list_index(list, $P0)
-  $S0 = $I2
+  $I3 = elements list
+  if $I2 >= $I3 goto out_of_range
 
   prev = list
   list = list[$I2]
@@ -72,6 +73,9 @@ loop:
 done:
   prev[$I2] = value
   .return(retval)
+
+out_of_range:
+  .throw('list index out of range')
 
 wrong_args:
   .throw ('wrong # args: should be "lset listVar index ?index...? value"')

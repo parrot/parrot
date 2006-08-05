@@ -23,7 +23,7 @@
   $S0 = substr position, 0, 4
   if $S0 == 'end-' goto has_end
   push_eh bad_arg
-    retval = __number(position)
+    retval = __integer(position)
   clear_eh
   
   # if the number is greater than the number of elements
