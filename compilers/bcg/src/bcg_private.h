@@ -20,7 +20,6 @@ typedef struct bcg_info_private_t {
 
 typedef struct bcg_unit_t {
     char *name;
-    char
 } bcg_unit;
 
 #endif /* PARROT_BCG_PRIVATE_H_GUARD */
