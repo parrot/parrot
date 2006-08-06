@@ -99,7 +99,6 @@ runtime/conversions.pir \
 runtime/list.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \
-runtime/string.pir \
 runtime/variables.pir \
 src/compiler.pir \
 src/macros.pir \

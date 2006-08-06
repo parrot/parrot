@@ -51,9 +51,9 @@ no_args:
   $I0 = 0
   if argc == 2 goto first_do
   $S3 = argv[2]
-  .local pmc string_index
-  string_index = get_root_global ['_tcl'], '__string_index'
-  $I0 = string_index($S3,$S2)
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
+  $I0 = __index($S3,$S2)
 
 first_do:
   .local int index_1
@@ -81,9 +81,9 @@ bad_args:
   if argc == 2 goto last_do
   
   $S3 = argv[2]
-  .local pmc string_index
-  string_index = get_root_global ['_tcl'], '__string_index'
-  $I1 = string_index($S3,$S2)
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
+  $I1 = __index($S3,$S2)
 
   if $I1 > $I0 goto last_do
   $I0 = $I1
@@ -122,9 +122,9 @@ bad_args:
   if argc != 2 goto bad_index
   $S1 = argv[0]
   $S2 = argv[1]
-  .local pmc string_index
-  string_index = get_root_global ['_tcl'], '__string_index'
-  $I0 = string_index($S2,$S1)
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
+  $I0 = __index($S2,$S1)
   index_1 = length $S1
   inc index_1
   if $I0 > index_1 goto index_null
@@ -161,17 +161,17 @@ done:
   $I3 = $I1
   if argc == 1 goto tolower_do
 
-  .local pmc string_index
-  string_index = get_root_global ['_tcl'], '__string_index'
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
 
   $S2 = argv[1]
-  $I2 = string_index($S2, $S1)
+  $I2 = __index($S2, $S1)
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto tolower_do
   
   $S3 = argv[2]
-  $I3 = string_index($S3, $S1)
+  $I3 = __index($S3, $S1)
 
 tolower_do:
   if $I2 > $I1  goto tolower_return
@@ -214,17 +214,17 @@ bad_args:
   $I3 = $I1
   if argc == 1 goto toupper_do
 
-  .local pmc string_index
-  string_index = get_root_global ['_tcl'], '__string_index'
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
 
   $S2 = argv[1]
-  $I2 = string_index($S2, $S1)
+  $I2 = __index($S2, $S1)
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto toupper_do
   
   $S3 = argv[2]
-  $I3 = string_index($S3, $S1)
+  $I3 = __index($S3, $S1)
 
 toupper_do:
   if $I2 > $I1  goto toupper_return
@@ -266,17 +266,17 @@ bad_args:
   $I3 = $I1
   if argc == 1 goto totitle_do
 
-  .local pmc string_index
-  string_index = get_root_global ['_tcl'], '__string_index'
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
 
   $S2 = argv[1]
-  $I2 = string_index($S2, $S1)
+  $I2 = __index($S2, $S1)
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto totitle_do
   
   $S3 = argv[2]
-  $I3 = string_index($S3, $S1)
+  $I3 = __index($S3, $S1)
 
 totitle_do:
   if $I2 > $I1  goto totitle_return
@@ -344,12 +344,12 @@ bad_length:
   $I0 = length $S1
   dec $I0
 
-  .local pmc string_index
-  string_index = get_root_global ['_tcl'], '__string_index'
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
 
-  index_1 = string_index($S2,$S1)
+  index_1 = __index($S2,$S1)
 
-  $I2 = string_index($S3,$S1)
+  $I2 = __index($S3,$S1)
 
 range_do:
 ###  if index_1 > $I2 goto done   XXX no such label
@@ -729,8 +729,8 @@ bad_args:
   .local int len
   .local pmc retval
 
-  .local pmc string_index
-  string_index = get_root_global ['_tcl'], '__string_index'
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
 
   argc = argv
   if argc > 4 goto bad_args
@@ -740,10 +740,10 @@ bad_args:
   $S4 = ''
          
   $S2 = argv[1]
-  low = string_index($S2, $S1)
+  low = __index($S2, $S1)
 
   $S3 = argv[2]
-  high = string_index($S3, $S1)
+  high = __index($S3, $S1)
 
   if high < low goto replace_done
 

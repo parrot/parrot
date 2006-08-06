@@ -140,6 +140,7 @@ before_end:
   clear_eh
 
   $I1 = elements list
+  dec $I1
   $I0 = $I1 - $I0
   .return($I0)
 
@@ -150,6 +151,7 @@ after_end:
   clear_eh
 
   $I1 = elements list
+  dec $I1
   $I0 = $I1 + $I0
   .return($I0)
 
