@@ -22,9 +22,9 @@
   if argc == 3 goto arg_3
   if argc == 2 goto arg_2
  
-  errorInfo = new .TclString
+  errorInfo = new 'TclString'
   errorInfo = ''
-  errorCode = new .TclString
+  errorCode = new 'TclString'
   errorCode = 'NONE'
   goto finish
 
@@ -39,8 +39,10 @@ arg_2:
   errorInfo = argv[1]
 
 finish:
-  store_global '$errorInfo', errorInfo
-  store_global '$errorCode', errorCode
+  $P1 = get_hll_global '$errorInfo'
+  assign $P1, errorInfo
+  $P1 = get_hll_global '$errorCode'
+  assign $P1, errorCode
   $P0 = argv[0]
   .throw($P0)
 
