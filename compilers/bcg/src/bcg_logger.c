@@ -1,6 +1,5 @@
-#include <string.h>
 #include <stdarg.h>
-#include "bcg_logger_private.h"
+#include "bcg_logger.h"
 
 void
 bcg_throw_exception(BCG_info * bcg_info, const int code, const char *format,

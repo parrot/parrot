@@ -14,15 +14,14 @@
 #define BCG_EXCEPTION 1
 
 typedef struct bcg_info_t {
-    int state;                  /* The byte code generation state. */
-    Interp *interpreter;        /* Reference to parrot interpreter. */
+    Interp *interp;             /* Reference to parrot interpreter. */
     int error_code;             /* The BCG error code. */
     char *error_msg;            /* Error message. */
-    jmp_buf jump_location;      /* The loaction to jump to when exception occurs */
+    jmp_buf jump_location;      /* The loaction to jump on exception . */
+    void *private_info;         /* Private BCG information. */
 } BCG_info;
 
 /* BCG_info creation and destruction functions. */
-
 BCG_info *BCG_create(void);
 void BCG_destroy(BCG_info * bcg_info);
 
@@ -38,5 +37,10 @@ void BCG_end_op(BCG_info * bcg_info);
 void BCG_var(BCG_info * bcg_info, char *var_name, char var_type);
 void BCG_val(BCG_info * bcg_info, char *val);
 void BCG_label(BCG_info * bcg_info, char *label);
+
+/* Functions to manipulate the internals of BCG_info structure. */
+//void BCG_set_interpreter(BCG_info *bcg_info, Interp *interp);
+//char *BCG_get_error_message(BCG_info *bcg_info);
+//int BCG_get_error_code(BCG_info *bcg_info);
 
 #endif /* PARROT_BCG_H_GUARD */
