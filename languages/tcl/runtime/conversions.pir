@@ -114,6 +114,57 @@ not_integer:
   .throw($S0)
 .end
 
+=head2 _Tcl::__index
+
+=cut
+
+.sub __index
+  .param string index
+  .param pmc    list
+
+  if index == 'end' goto end
+
+  $S0 = substr index, 0, 4
+  if $S0 == 'end-' goto before_end
+  if $S0 == 'end+' goto after_end
+
+  push_eh bad_index
+    $I0 = __integer(index)
+  clear_eh
+  .return($I0)
+
+before_end:
+  $S0 = substr index, 4
+  push_eh bad_index
+    $I0 = __integer($S0)
+  clear_eh
+
+  $I1 = elements list
+  $I0 = $I1 - $I0
+  .return($I0)
+
+after_end:
+  $S0 = substr index, 4
+  push_eh bad_index
+    $I0 = __integer($S0)
+  clear_eh
+
+  $I1 = elements list
+  $I0 = $I1 + $I0
+  .return($I0)
+
+end:
+  $I0 = elements list
+  dec $I0
+  .return($I0)
+
+bad_index:
+  $S0 = 'bad index "'
+  $S0 .= index
+  $S0 .= '": must be integer?[+-]integer? or end?[+-]integer?'
+  .throw($S0)
+.end
+
 =head2 _Tcl::__channel
 
 Given a string, return the appropriate channel.

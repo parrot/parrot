@@ -29,9 +29,9 @@
   if argc == 1 goto replace
 
 lset:
-  .local pmc __list, _list_index
-  __list      = get_root_global ['_tcl'], '__list'
-  _list_index = get_root_global ['_tcl'], '_list_index'
+  .local pmc __list, __index
+  __list  = get_root_global ['_tcl'], '__list'
+  __index = get_root_global ['_tcl'], '__index'
 
   unless argc == 2 goto iterate
   $P0 = argv[1]
@@ -58,7 +58,7 @@ loop:
   if $I0 == $I1 goto outer_loop
 
   $P0 = indices[$I0]
-  $I2 = _list_index(list, $P0)
+  $I2 = __index($P0, list)
   $I3 = elements list
   if $I2 >= $I3 goto out_of_range
 
