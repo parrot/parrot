@@ -55,6 +55,8 @@ adding_expression
 
 multiplying_expression
   : NUMBER
+    |
+    '(' expression ')' -> expression
   ;
 
 NUMBER

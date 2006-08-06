@@ -18,12 +18,12 @@ use 5.006_001;
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
-use Parrot::Config qw(%PConfig);
+use Parrot::Config (); 
 use Parrot::Test;
 use Test::More;
 
-if ( $PConfig{has_python} ) {
-  plan tests => 83;
+if ( $Parrot::Config::PConfig{has_python} ) {
+  plan tests => 85;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
@@ -128,8 +128,10 @@ my @tests = (
        [ '2 % 2 + 4', '4' ],
 
        # parenthesis
-       [ '  ( 1 ) ', '1', 'one in parenthesis', with_past => 1, with_antlr3 => 0 ],
-       [ '  ( 1 + 2 ) * 3 ', '9' ],
+       [ '  ( 1 ) ', '1', 'one in parenthesis', with_past => 1, with_antlr3 => 1 ],
+       [ '  ( 1 + 2 ) - 3 ', '0', undef, with_antlr3 => 1 ],
+       [ '  ( 1 + 2 ) - ( 5  + 1 - 2 ) + 7 - ( 8 - 100 ) ', '98', undef, with_antlr3 => 1 ],
+       [ '  ( 1 + 2 ) * 3 ', '9', undef, with_antlr3 => 0 ],
        [ '  ( 1 * 2 ) * 3 ', '6' ],
        [ '  ( 1 * 2 ) + 3 ', '5' ],
        [ '  ( 1 * 2 ) + ( ( ( ( 3 + 4 ) + 5 ) * 6 ) * 7 ) ', '506' ],

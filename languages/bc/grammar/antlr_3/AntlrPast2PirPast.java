@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-03 21:53:45
+// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-06 23:38:39
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class AntlrPast2PirPast extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "STRING", "PLUS", "MINUS", "NUMBER", "INTEGER", "ML_COMMENT", "WS", "NEWLINE", "';'", "'quit'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "STRING", "PLUS", "MINUS", "NUMBER", "INTEGER", "ML_COMMENT", "WS", "NEWLINE", "';'", "'('", "')'", "'quit'"
     };
     public static final int INTEGER=9;
     public static final int MINUS=7;
