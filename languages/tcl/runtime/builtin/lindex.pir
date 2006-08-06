@@ -11,9 +11,9 @@
   argc = argv
   if argc < 1 goto bad_args
   
-  .local pmc __list, _list_index
-  __list      = get_root_global ['_tcl'], '__list'
-  _list_index = get_root_global ['_tcl'], '_list_index'
+  .local pmc __list, __index
+  __list  = get_root_global ['_tcl'], '__list'
+  __index = get_root_global ['_tcl'], '__index'
 
   .local pmc list
   list = argv[0]
@@ -40,7 +40,7 @@ select_loop:
   list = __list(list)
   
   $P0 = indices[$I1]
-  index = _list_index(list, $P0)
+  index = __index($P0, list)
   list  = list[index]
   
   inc $I1

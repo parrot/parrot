@@ -22,18 +22,19 @@
   .local pmc position
   position = shift argv
 
-  .local pmc list_index
-  list_index = get_root_global ['_tcl'], '_list_index'
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
 
-  ($P0,$I2) = list_index(the_list,position)
-  #linsert treats 'end' differently
-  if $I2 == 0 goto next
-  inc $P0
-
-next: 
   .local int the_index
-  the_index = $P0
+  the_index = __index(position, the_list)
 
+  #linsert treats 'end' differently
+  $S0 = substr position, 0, 3
+  unless $S0 == 'end' goto next
+
+  inc the_index
+  
+next:
   # XXX workaround, splice doesn't work on TclList <-> TclList.
   # Until that's fixed, splice Arrays, then post-covert to a TclList
   # This is a hideous hack.
