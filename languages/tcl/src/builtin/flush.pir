@@ -40,7 +40,7 @@
   # keep this comment, we need a newline!
   # generate code for accessing the "channels" variable in ParTcl 
   .local pmc channels, channel
-  channels = find_global 'channels'
+  channels = get_root_global ['_tcl'], 'channels'
 
   # find the specified channel
   channel = channels[channel_id]
