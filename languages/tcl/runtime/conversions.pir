@@ -418,6 +418,8 @@ get_integer:
   push_eh default
     parrot_level = __number(tcl_level)
   clear_eh
+
+  if parrot_level < 0 goto default
   parrot_level = orig_level - parrot_level
   goto bounds_check
  

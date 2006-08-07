@@ -24,9 +24,11 @@
   (new_call_level,defaulted) = __call_level($P0)
   if defaulted == 1 goto skip
   $P1 = shift argv
+  dec argc
 
 skip:
-  # XXX Need error handling.
+  $I0 = argc % 2
+  if $I0 == 1 goto bad_args
   
   # for each othervar/myvar pair, created a mapping from
  
