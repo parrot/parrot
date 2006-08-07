@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2006, The Perl Foundation.
 # $Id$
 
@@ -17,10 +17,11 @@ First tests in order to check infrastructure.
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'hello world');
@@ -59,5 +60,48 @@ extern function main()
 }
 CODE
 3
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'sieve', function => 'sieve');
+/* 
+ *  Eratosthenes Sieve prime number calculation
+ */
+extern function sieve ()
+{
+    var MAX_PRIME = 17;
+    var i;
+    var count = 0;
+    var flag = 0;
+    for (i = 0; i < MAX_PRIME; i++) {
+        flag |= (1 << i);   // set 
+    }
+    for (i = 0; i < MAX_PRIME; i++) {
+        if (flag & (1 << i)) {  // test
+            var prime = i + i + 3;
+            var k = i + prime;
+            while (k < MAX_PRIME) {
+                flag &= ~(1 << k);  // clear
+                k += prime;
+            }
+            count++;
+            Console.println(" prime " + count + " = " + prime);
+        }
+    }
+    Console.println("");
+    Console.println(count + " primes.");
+}
+CODE
+ prime 1 = 3
+ prime 2 = 5
+ prime 3 = 7
+ prime 4 = 11
+ prime 5 = 13
+ prime 6 = 17
+ prime 7 = 19
+ prime 8 = 23
+ prime 9 = 29
+ prime 10 = 31
+
+10 primes.
 OUT
 

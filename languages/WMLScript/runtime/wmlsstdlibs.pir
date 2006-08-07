@@ -52,7 +52,7 @@ See "WMLScript Standard Libraries Specification".
 
 =over 4
 
-=item C<find_lib>
+=item C<find_lib(int lindex, int findex)>
 
 helper for CALL_LIB* opcodes.
 
@@ -71,7 +71,7 @@ _handler:
     .return (not_implemented)
 .end
 
-=item C<find_lib_url>
+=item C<find_lib_url(string url, string function)>
 
 helper for CALL_URL* opcodes.
 
@@ -80,8 +80,101 @@ helper for CALL_URL* opcodes.
 .sub find_lib_url
     .param string url
     .param string function
-    .const .Sub not_implemented = "not_implemented"
-    .return (not_implemented)
+    .local pmc ex
+    .local string content
+    content = load_script(url)
+    unless content goto L1
+    .local pmc loader
+    .local pmc script
+    new loader, .WmlsBytecode
+    push_eh _handler_1
+    script = loader.load(content)
+    script['filename'] = url
+    .local string gen_pir
+    gen_pir = script.translate()
+    .local pmc pir_comp
+    .local pmc pbc_out
+    pir_comp = compreg 'PIR'
+    pbc_out = pir_comp(gen_pir)
+    $S0 = save_pbc(pbc_out, url)
+    load_bytecode $S0
+    clear_eh
+    push_eh _handler_2
+    .local pmc entry
+    $S0 = url
+    $S0 .= ':'
+    $S0 .= function
+    entry = global $S0
+    .return (entry)
+_handler_1:
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    print s
+    print "\n"
+    ex = new .Exception
+    $S0 = "verification failed (can't translate '"
+    $S0 .= url
+    $S0 .= "')"
+    ex["_message"] = $S0
+    throw ex
+_handler_2:
+    ex = new .Exception
+    $S0 = "external function '"
+    $S0 .= function
+    $S0 .= "' not found in '"
+    $S0 .= url
+    $S0 .= "'"
+    ex["_message"] = $S0
+    throw ex
+L1:
+    ex = new .Exception
+    $S0 = "unable to load compilation unit"
+    ex["_message"] = $S0
+    throw ex
+.end
+
+.sub load_script
+    .param string filename
+    .local pmc fh
+    .local string content
+    fh = open filename, '<'
+    if fh goto L1
+    $S0 = err
+    print "Can't open '"
+    print filename
+    print "' ("
+    print $S0
+    print ")\n"
+    content = ''
+    goto L2
+L1:
+    content = read fh, 65535
+    close fh
+L2:
+    .return (content) 
+.end
+
+.sub save_pbc
+    .param string pbc_out
+    .param string filename
+    .local string output
+    .local pmc fh
+    output = concat filename, '.pbc'
+    fh = open output, '>'
+    if fh goto L1
+    $S0 = err
+    print "Can't open '"
+    print output
+    print "' ("
+    print $S0
+    print ")\n"
+    goto L2
+L1:
+    print fh, pbc_out
+    close fh
+L2:
+    .return (output)
 .end
 
 =back        

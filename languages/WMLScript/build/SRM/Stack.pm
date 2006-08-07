@@ -31,15 +31,10 @@ sub post_translation {
     return q{};
 }
 
-# Label generation.
-sub gen_label {
-    # We'll emit a label for every single instruction.
-    return <<'PIR';
-    $S0 = ${PC}
-    ${INS} = concat "PC"
-    ${INS} = concat $S0
-    ${INS} = concat ": \n"
-PIR
+# Pre intruction (common) hook.
+sub pre_instruction {
+    # Nothing to do.
+    return q{};
 }
 
 # Pre and post stack operation (op class instructions) hooks.
@@ -51,7 +46,7 @@ sub pre_op {
 
     # Do code for each pop. Need to set up mv's and pop stuff off the stack
     # we're maintaining.
-    for my $pop_num (0..$pops - 1) {
+    for my $pop_num (0 .. $pops-1) {
         $pir .= <<"PIR";
     # Assign register name.
     \${STACK$pop_num} = "reg$register_num"
@@ -63,7 +58,7 @@ PIR
         $register_num++;
     }
 
-    for my $push_num (0..$pushes - 1) {
+    for my $push_num (0 .. $pushes-1) {
         $pir .= <<"PIR";
     # Assign register name.
     \${DEST$push_num} = "reg$register_num"
@@ -81,7 +76,7 @@ sub post_op {
     my $pir = q{};
 
     # Emit code to push stuff back onto the stack.
-    for my $push_num (0..$pushes - 1) {
+    for my $push_num (0 .. $pushes-1) {
         $pir .= <<"PIR";
     \${INS} = concat "  push s, "
     \${INS} = concat \${DEST$push_num}
@@ -102,7 +97,7 @@ sub pre_branch {
 
     # Do code for each pop. Need to set up mv's and pop stuff off the stack
     # we're maintaining.
-    for my $pop_num (0..$pops - 1) {
+    for my $pop_num (0 .. $pops-1) {
         $pir .= <<"PIR";
     # Assign register name.
     \${STACK$pop_num} = "reg$register_num"

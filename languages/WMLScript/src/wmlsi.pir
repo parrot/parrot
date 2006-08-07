@@ -11,7 +11,8 @@ wmlsi - WMLScript Interpreter
 
 =head1 DESCRIPTION
 
-B<wmlsi> translates a WMLScript bytecode file to Parrot PBC and runs it.
+B<wmlsi> translates a WMLScript bytecode file to Parrot PBC and calls
+C<function(params, ...)>.
 
 =head1 SEE ALSO
 

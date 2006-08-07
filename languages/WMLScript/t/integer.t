@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2006, The Perl Foundation.
 # $Id$
 
@@ -15,6 +15,7 @@ t/integer.t - WMLScript integer & conversion
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
@@ -238,7 +239,7 @@ extern function main()
 {
     var a = 7 div 0;
     Console.println(typeof a);
-}                7
+}
 CODE
 4
 OUT

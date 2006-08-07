@@ -336,9 +336,9 @@ MMD_WmlsBoolean: {
 MMD_WmlsFloat: {
             PMC * trans = Parrot_WmlsString_parseFloat(INTERP, SELF);
             if (trans->vtable->base_type == dynpmc_WmlsFloat) {
-                INTVAL result = VTABLE_get_number(INTERP, trans) - VTABLE_get_number(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
+                FLOATVAL result = VTABLE_get_number(INTERP, trans) - VTABLE_get_number(INTERP, value);
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
                 return dest;                              
             } 
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
@@ -458,9 +458,9 @@ MMD_WmlsBoolean: {
 MMD_WmlsFloat: {
             PMC * trans = Parrot_WmlsString_parseFloat(INTERP, SELF);
             if (trans->vtable->base_type == dynpmc_WmlsFloat) {
-                INTVAL result = VTABLE_get_number(INTERP, trans) * VTABLE_get_number(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
+                FLOATVAL result = VTABLE_get_number(INTERP, trans) * VTABLE_get_number(INTERP, value);
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
                 return dest;                              
             } 
             return pmc_new(INTERP, dynpmc_WmlsInvalid);

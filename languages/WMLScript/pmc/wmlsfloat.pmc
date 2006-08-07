@@ -71,10 +71,6 @@ pmclass WmlsFloat
 
 =back
 
-=head2 Methods
-
-=over 4
-
 =item C<void set_integer_native(INTVAL value)>
 
 =cut

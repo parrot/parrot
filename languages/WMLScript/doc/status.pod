@@ -50,7 +50,8 @@ Jonathan Worthington's work (see F<languages/dotnet/doc/contents.pod>).
 
 =head2 TODO
 
-opcodes SCAND & SCOR
+Find optimization (like Register or OptRegister) compatible with opcodes 
+SCAND & SCOR. These 2 opcodes pop one value and push one or two values.
 
 =head1 WMLScript PMC
 
@@ -73,14 +74,9 @@ There are five types in WMLScript, each of them is implemented by a PMC.
 
 =back
 
-=head2 TODO
-
-Conversion type.
-
 =head1 WMLScript Ops
 
-F<languages/WMLScript/ops/wmls.ops> defines new opcode or opcode with new
-signature.
+F<languages/WMLScript/ops/wmls.ops> defines opcode with new signature.
 
 =head1 WMLScript Standard Libraries
 
@@ -103,9 +99,7 @@ and implements some helpers.
 
 =head2 TODO
 
-All of these libraries are mostly incomplete.
-
-find_lib_url (CALL_URL helper) 
+Some of these libraries are incomplete.
 
 =head1 AUTHOR
 

@@ -189,7 +189,7 @@ sub validate_rule {
             }
         }
         elsif ($key eq 'class') {
-            if ($value !~ /^(op|load|store|branch|calling)$/) {
+            if ($value !~ /^(op|load|store|branch|calling|sc_op)$/) {
                 die "Invalid value for $key in rule $name\n";
             }
         }
@@ -296,6 +296,7 @@ sub generate_initial_code {
     $mv->{STACK0} = 'stack_0';
     $mv->{STACK1} = 'stack_1';
     $mv->{DEST0} = 'dest_0';
+    $mv->{DEST1} = 'dest_1';
     $mv->{CONST} = 'h_const';
 
     # Emit the dumper.
@@ -312,6 +313,7 @@ sub generate_initial_code {
     .local string stack_0
     .local string stack_1
     .local string dest_0
+    .local string dest_1
     .local string c_params
     .local string loadreg
     .local string storereg
@@ -348,11 +350,20 @@ LOOP:
 
 PIRCODE
 
+    # Emit pre instruction code.
+    $pir .= "### pre_instruction\n";
+    my $srm_instr = $srm->pre_instruction();
+    $pir .= sub_meta($srm_instr, $mv, 'pre_instruction');
+    $pir .= "### end pre_instruction\n\n";
+
     # Emit label generation code.
-    $pir .= "### gen_label\n";
-    my $srm_label = $srm->gen_label();
-    $pir .= sub_meta($srm_label, $mv, 'gen_label');
-    $pir .= "### end gen_label\n\n";
+    $pir .= <<'PIRCODE';
+    $S0 = pc
+    gen_pir = concat "PC"
+    gen_pir = concat $S0
+    gen_pir = concat ": \n"
+
+PIRCODE
 
     # Return generated code.
     return $pir;
@@ -553,6 +564,28 @@ PIRCODE
         $pir .= sub_meta($post_op, $mv, "post_op for rule $rule->{name}");
         $pir .= "### end post_op\n";
     }
+
+    if ($rule->{class} eq 'sc_op') {
+        # Now call pre_op and append code that it generates.
+        my $pre_op = $srm->pre_op($rule->{pop}, 2);
+        $pir .= "### pre_op\n";
+        $pir .= sub_meta($pre_op, $mv, "pre_op for rule $rule->{name}");
+        $pir .= "### end pre_op\n";
+
+        my $post_op = $srm->post_op($rule->{pop}, 1);
+        $mv->{__PUSH_1__}  = "### push 1\n";
+        $mv->{__PUSH_1__} .= sub_meta($post_op, $mv, "post_op for rule $rule->{name}");
+        $mv->{__PUSH_1__} .= "### end push 1";
+        push @localmv, '__PUSH_1__';
+        $post_op = $srm->post_op($rule->{pop}, 2);
+        $mv->{__PUSH_2__}  = "### push 2\n";
+        $mv->{__PUSH_2__} .= sub_meta($post_op, $mv, "post_op for rule $rule->{name}");
+        $mv->{__PUSH_2__} .= "### end push 2";
+        push @localmv, '__PUSH_2__';
+
+        $pir .= translation_code($rule, $mv);
+    }
+
 
     # Loads (load class).
     elsif ($rule->{class} eq 'load') {
@@ -802,13 +835,20 @@ PIRCODE
 # #####################################
 sub generate_final_code {
     my ($srm, $mv) = @_;
-    
+
     # Emit complete label.
+    # Emit label generation code.
     my $pir = <<'PIRCODE';
 COMPLETE:
 
+    $S0 = pc
+    gen_pir = concat "PC"
+    gen_pir = concat $S0
+    gen_pir = concat ": \n"
+
     gen_pir = concat "\n# END OF TRANSLATED BYTECODE\n\n"
 
+    # Insert constants.
     $P0 = iter h_const
     $S0 = "\n"
 L1_CST:
@@ -820,7 +860,6 @@ L1_CST:
 L2_CST:
     $S0 = concat "\n"
     gen_pir = concat $S0, gen_pir
-
 PIRCODE
 
     # SRM post translation code

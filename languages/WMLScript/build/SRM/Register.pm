@@ -31,18 +31,10 @@ sub post_translation {
     return q{};
 }
 
-# Label generation.
-sub gen_label {
-    # We'll emit a label for every single instruction. While we kinda find
-    # basic blocks, we don't discover backward branches until late to do
-    # otherwise. Also, putting a label everywhere doesn't hurt the final
-    # Parrot bytecode that is produced.
-    return <<'PIR';
-    $S0 = ${PC}
-    ${INS} = concat "PC"
-    ${INS} = concat $S0
-    ${INS} = concat ": \n"
-PIR
+# Pre intruction (common) hook.
+sub pre_instruction {
+    # Nothing to do.
+    return q{};
 }
 
 # Pre and post stack operation (op class instructions) hooks.
@@ -53,7 +45,7 @@ sub pre_op {
 
     # Do code for each pop. Need to set up mv's and pop stuff off the stack
     # we're maintaining.
-    for my $pop_num (0..$pops - 1) {
+    for my $pop_num (0 .. $pops-1) {
         $pir .= <<"PIR";
     # Set register name.
     \${STACK$pop_num} = "\$P"
@@ -65,7 +57,7 @@ PIR
     }
 
     # Do code for each push.
-    for my $push_num (0..$pushes - 1) {
+    for my $push_num (0 .. $pushes-1) {
         $pir .= <<"PIR";
     # Increment stack depth.
     inc stack_depth
@@ -93,7 +85,7 @@ sub pre_branch {
 
     # Do code for each pop. Need to set up mv's and pop stuff off the stack
     # we're maintaining.
-    for my $pop_num (0..$pops - 1) {
+    for my $pop_num (0 .. $pops-1) {
         $pir .= <<"PIR";
     # Set register name.
     \${STACK$pop_num} = "\$P"
