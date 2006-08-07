@@ -31,7 +31,7 @@ rule statement {
           |$<BEGIN>:=<'BEGIN'> \{ <compound_statement> \}
           |$<END>:=<'END'> \{ <compound_statement> \}
           |<expression> [$<MODIFIER>:=[<'if'>|<'unless'>|<'while'>|<'until'>] <expression>
-                        |<'rescue'> <statement>]?
+                        |$<rescue>:=<'rescue'> <statement>]?
 }
 
 ## We enter the operator precedance expression parser HERE
@@ -89,9 +89,8 @@ rule command_call_block { <command> <do_block> [[\.|\:\:] <operation2> <paren_ar
 
 rule command { 
           <operation> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
-#          |<primary_value> [\.|\:\:] <operation2> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
           |<atom> [\.|\:\:] <operation2> <command_args> [ \{ <block_param>? <compound_statement> \} ]?
-          |[<'raise'>|<'throw']|<'super'>|<'yield'>] <command_args>
+          |$<special_command_type>:=[<'raise'>|<'throw'>|<'super'>|<'yield'>] <command_args>
 }
 rule command_args {<paren_args>|<call_args>}
 rule paren_args {\( <call_args>? \)}

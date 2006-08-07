@@ -1,0 +1,241 @@
+=head1 NAME
+
+PIRGrammar -- A grammar for transforming an opcode syntax tree to PIR.
+
+=head1 SYNOPSYS
+
+  .sub _main :main
+      load_bytecode 'PIRGrammar.pir'
+      .local pmc grammar
+       grammar = new 'PIRGrammar'
+
+      # Build the PIR output
+      .local pmc pirbuilder
+      pirbuilder = grammar.apply(match)
+      .local pmc pir
+      pir = pirbuilder.get('result')
+
+      end
+  .end
+
+=head1 DESCRIPTION
+
+
+=cut
+
+grammar Cardinal::PIRGrammar is TGE::Grammar;
+
+transform root (Cardinal::POST::Ops) :language('PIR') {
+    .local pmc code
+    code = new 'PGE::CodeString'
+    self.'top_level_code'(code)
+    $P0 = tree.get('pir', node)
+    code .= $P0
+    .return (code)
+}
+
+transform pir (Cardinal::POST::Op) :language('PIR') {
+    $P0 = node.'pir'(self)
+    .return ($P0)
+}
+
+transform pir (Cardinal::POST::Label) :language('PIR') {
+    .local string code
+    .local string value
+    value = node.'value'()
+    code = '  '
+    code .= value
+    code .= ":\n"
+    .return (code)
+}
+
+transform pir (Cardinal::POST::Var) :language('PIR') {
+    .local string name
+    .local string scope
+    .local string value
+    .local pmc code
+    .local pmc block
+    .local int islvalue
+    name = node.'name'()
+    scope = node.'scope'()
+    value = node.'value'()
+    islvalue = node.'islvalue'()
+    block = self.'top_scope_stack'()
+    code = new 'PGE::CodeString'
+    if scope == 'lexical' goto generate_lexical
+    if scope == 'package' goto generate_package
+    if scope == 'parameter' goto generate_parameter
+    if scope == 'global' goto generate_package
+    goto generate_find
+  generate_parameter:
+    .local pmc varhash
+    varhash = block.'varhash'()
+    $I0 = exists varhash[name]
+    if $I0 goto generate_find
+    .local pmc prologue
+    .local string pname
+    pname = node.'paramname'()
+    prologue = block.'prologue'()
+    prologue.'emit'("    .param pmc %0", pname)
+    code.'emit'("    .lex '%0', %1", name, value)
+    code.'emit'("    %0 = %1", value, pname)
+    varhash[name] = node
+    goto end
+  generate_lexical:
+    .local pmc varhash
+    varhash = block.'varhash'()
+    $I0 = exists varhash[name]
+    if $I0 goto generate_find
+    ##    This is the first time to see a lexical, generate its .lex
+    code.'emit'("    .lex '%0', %1", name, value)
+    varhash[name] = node
+    goto end
+  generate_package:
+    if islvalue goto end
+    code.'emit'("    %0 = get_hll_global '%1'", value, name)
+    goto end
+  generate_find:
+    if islvalue goto end
+    code.'emit'("    %0 = find_name '%1'", value, name)
+  end:
+    .return (code)
+}
+
+transform pir (Cardinal::POST::Ops) :language('PIR') {
+    .local pmc code
+    .local pmc iter
+
+    code = new 'PGE::CodeString'
+    iter = node.'child_iter'()
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P1 = tree.'get'('pir', $P0)
+    code .= $P1
+    goto iter_loop
+  iter_end:
+    .return (code)
+}
+
+transform pir (Cardinal::POST::Assign) :language('PIR') {
+    .local pmc lnode
+    .local pmc rnode
+    .local pmc rvalue
+    lnode = node[0]
+    rnode = node[1]
+    
+    .local pmc name, value, scope, xvalue, code, varhash, block
+    name = lnode.'name'()
+    value = lnode.'value'()
+    scope = lnode.'scope'()
+    rvalue = rnode.'value'()
+    code = new 'PGE::CodeString'
+    block = self.'top_scope_stack'()
+    varhash = block.'varhash'()
+    $I0 = exists varhash[name]
+    if $I0 goto with_varhash_name
+    varhash[name] = lnode
+  with_varhash_name:
+    if scope == 'outerpackage' goto store_package
+    if scope == 'package' goto store_package
+    if scope == 'global' goto store_package
+  store_lexical:
+    code.'emit'("    store_lex '%0', %1", name, rvalue)
+    .return (code)
+  store_package:
+    code.'emit'("    set_hll_global '%0', %1", name, rvalue)
+    .return (code)
+}
+
+transform pir (Cardinal::POST::Call) :language('PIR') {
+    .local pmc code
+    .local string sub_name
+    .local string args
+    $P0 = node[0]
+    sub_name = $P0.'name'()
+    args = ""
+    code = new 'PGE::CodeString'
+    code.'emit'("    '%0'(%1)", sub_name, args)
+    .return (code)
+}
+
+transform pir (Cardinal::POST::Raw) :language('PIR') {
+    .local pmc code
+    $P1 = node.'raw'()
+    code = new 'PGE::CodeString'
+    code.'emit'("%0", $P1)
+    .return (code)
+    }
+
+transform pir (Cardinal::POST::Sub) :language('PIR') {
+    
+    ##   create a new (empty) variable hash and prologue for this sub
+    .local pmc varhash
+    .local pmc prologue
+    .local string subtype
+    
+    subtype = node.'subtype'()
+    varhash = new .Hash
+    node.'varhash'(varhash)
+    prologue = new 'PGE::CodeString'
+    node.'prologue'(prologue)
+
+    .local string name
+    .local string outerattr
+    .local pmc outer
+    name = node.'name'()
+    outer = node.'outer'()
+    outerattr = ''
+    $I0 = defined outer
+    if $I0 == 0 goto with_outerattr
+    outerattr = outer.'name'()
+    outerattr = concat ":outer('", outerattr
+    outerattr = concat outerattr, "')"
+  with_outerattr:
+    .local pmc code, iter, subcode
+    ## build the code for this sub
+    .local string adverbs
+    adverbs = node.'adverbs'()
+    prologue.'emit'("\n.sub '%0' %1 %2", name, outerattr, adverbs)
+    subcode = new 'PGE::CodeString'
+
+    $P2 = self.'scope_stack'()
+    push $P2, node
+    iter = node.'child_iter'()
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P1 = tree.'get'('pir', $P0)
+    subcode .= $P1
+    goto iter_loop
+  iter_end:
+    pop $P0, $P2
+    
+    .local string value
+    prologue = node.'prologue'()
+    subcode = concat prologue, subcode
+    value = node.'value'()
+    subcode.'emit'("    .return (%0)\n.end\n", value)
+    self.'add_sub'(subcode)
+    
+    ne subtype, 'begin', return
+    ##  generate the pir to locate this sub and return it
+    code = new 'PGE::CodeString'
+    code.'emit'("    '%0'()",  name)
+    .return (code)
+    return:
+    .return ("")
+}
+
+=head1 LICENSE
+
+Copyright (C) 2006, The Perl Foundation.
+
+This is free software; you may redistribute it and/or modify
+it under the same terms as Parrot.
+
+=head1 AUTHOR
+
+Kevin Tew <tewk@tewk.com>
+
+=cut

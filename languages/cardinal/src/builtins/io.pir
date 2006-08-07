@@ -10,6 +10,7 @@ src/builtins/io.pir - Cardinal builtins for I/O
 
 =cut
 
+.HLL 'Ruby', ''
 .namespace
 
 .sub 'puts'

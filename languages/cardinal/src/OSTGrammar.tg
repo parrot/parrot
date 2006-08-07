@@ -28,12 +28,37 @@ opcode syntax tree.
 grammar Cardinal::OSTGrammar is TGE::Grammar;
 
 transform root (ROOT) :language('PIR') {
+    .local pmc ops
+    .local pmc op
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+
     $P0 = new .Undef
-    store_global 'Cardinal::POST', '$?BLOCK', $P0
-    store_global 'Cardinal::PAST', '$?BLOCK', $P0
-    #tree.'outerpastblock'($P0)
-    #tree.'outerpostblock'($P0)
-    .return tree.'get'('post', node)
+    self.'post_scope_stack'($P0)
+    self.'past_scope_stack'($P0)
+
+    .local pmc load
+    load = new 'Cardinal::POST::Sub'
+    load.'init'('node'=>node, 'name'=>'__onload', 'adverbs'=>':load')
+
+    .local pmc main
+    main = new 'Cardinal::POST::Sub'
+    main.'init'('node'=>node, 'name'=>'main', 'adverbs'=>':main')
+
+    ops.'add_child'(main)
+    ops.'add_child'(load)
+    $P0 = tree.'get'('post', node)
+    .local pmc call_op
+    call_op = new 'Cardinal::POST::Call'
+    call_op.'init'($P0, 'node'=>node)
+
+    op = new 'Cardinal::POST::Op'
+    op.'init'("'languages/cardinal/src/builtins_gen.pir'", 'node'=>node, 'name'=>'load_bytecode')
+
+    main.'add_child'(op)
+    main.'add_child'(call_op)
+    ops.'add_child'($P0)
+    .return (ops)
 }
 
 transform post (Cardinal::PAST::Sub) :language('PIR') {
@@ -79,14 +104,15 @@ transform post (Cardinal::PAST::Block) :language('PIR') {
   with_name:
     .local pmc outerpost, outerpast
 
-    outerpost = find_global 'Cardinal::POST', '$?BLOCK'
-    outerpast = find_global 'Cardinal::PAST', '$?BLOCK'
+    outerpost = self.'post_scope_stack'()
+    outerpast = self.'past_scope_stack'()
 
     .local pmc post
     post = new 'Cardinal::POST::Sub'
     post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'subtype'=>blocktype)
-    store_global 'Cardinal::POST', '$?BLOCK', post
-    store_global 'Cardinal::PAST', '$?BLOCK', node
+    
+    self.'post_scope_stack'(post)
+    self.'past_scope_stack'(node)
 
     .local pmc iter
     iter = node.'child_iter'()
@@ -104,8 +130,8 @@ transform post (Cardinal::PAST::Block) :language('PIR') {
     value = clone value
     post.'value'(value)
 
-    store_global 'Cardinal::POST', '$?BLOCK', outerpost
-    store_global 'Cardinal::PAST', '$?BLOCK', outerpast
+    self.'post_scope_stack'(outerpost)
+    self.'past_scope_stack'(outerpast)
     
     ##   For immediate blocks, generate code to execute the block.
     $S0 = node.'blocktype'()
@@ -133,6 +159,44 @@ transform post (Cardinal::PAST::Stmts) :language('PIR') {
   iter_end:
     $P1 = $P1.'value'()
     ops.'value'($P1)
+    .return (ops)
+}
+
+transform post (Cardinal::PAST::Rescue_Stmt) :language('PIR') {
+    .local pmc op
+    .local pmc ops
+    .local pmc handlerlabel, posthandlerlabel
+
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+
+    handlerlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'exception_handler')
+    posthandlerlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'post_exception_handler')
+
+    op = new 'Cardinal::POST::Op'
+    op.'init'('node'=>node, 'name'=>'push_eh')
+    op.'add_child'(handlerlabel)
+    ops.'add_child'(op)
+    
+    $P0 = node.'try_stmt'()
+    $P0 = tree.get('post', $P0)
+    ops.'add_child'($P0)
+    
+    op = new 'Cardinal::POST::Op'
+    op.'init'('node'=>node, 'name'=>'clear_eh')
+    ops.'add_child'(op)
+    
+    op = new 'Cardinal::POST::Op'
+    op.'init'('node'=>node, 'name'=>'goto')
+    op.'add_child'(posthandlerlabel)
+    ops.'add_child'(op)
+    
+    ops.'add_child'(handlerlabel)
+    $P0 = node.'rescue_stmt'()
+    $P0 = tree.get('post', $P0)
+    ops.'add_child'($P0)
+    ops.'add_child'(posthandlerlabel)
+
     .return (ops)
 }
 
@@ -493,8 +557,7 @@ transform post (Cardinal::PAST::Var) :language('PIR') {
     if scope == 'parameter' goto with_name
 
     .local pmc outer
-    #outer = tree.'outer_block'()
-    outer = find_global 'Cardinal::PAST', '$?BLOCK'
+    outer = self.'past_scope_stack'()
 
   outer_loop:
     $I0 = isa outer, 'Cardinal::PAST::BLOCK'

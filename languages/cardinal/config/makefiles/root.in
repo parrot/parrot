@@ -50,12 +50,14 @@ GEN_PIR = \
   src/cardinal_grammar_gen.pir \
   src/ASTGrammar.pir \
   src/OSTGrammar.pir \
+  src/PIRGrammar.pir \
   src/builtins_gen.pir
 
 GEN_PBC = \
   src/CardinalGrammar.pbc \
   src/PGE2AST.pbc \
   src/AST2OST.pbc \
+  src/OST2PIR.pbc \
   src/PAST.pbc \
   src/POST.pbc
 
@@ -88,6 +90,12 @@ src/OSTGrammar.pir: src/OSTGrammar.tg
 
 src/AST2OST.pbc: src/AST2OST.pir src/OSTGrammar.pir src/preamble
 	$(PARROT) -o src/AST2OST.pbc --output-pbc src/AST2OST.pir 
+
+src/PIRGrammar.pir: src/PIRGrammar.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/PIRGrammar.pir src/PIRGrammar.tg
+
+src/OST2PIR.pbc: src/OST2PIR.pir src/PIRGrammar.pir src/preamble
+	$(PARROT) -o src/OST2PIR.pbc --output-pbc src/OST2PIR.pir 
 
 $(PMCDIR)/ruby_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
 	cd $(PMCDIR) && $(BUILD) generate $(PMCS)

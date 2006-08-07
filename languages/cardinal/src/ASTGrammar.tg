@@ -3,11 +3,11 @@ grammar Cardinal::ASTGrammar is TGE::Grammar;
 transform result (ROOT) :language('PIR') {
     debug_init
 
-    # Ask the child node for its result
     .local pmc past
     past = new 'Cardinal::PAST::Block'
-    past.'init'('node'=>node, 'name'=>'anon', 'blocktype'=>'block')
+    past.'init'('node'=>node, 'name'=>'top', 'blocktype'=>'block')
     store_global 'Cardinal::PAST', '$?BLOCK', past
+    self.'scope_stack'(past)
 
     .local pmc child
     $I0 = defined node['compound_statement']
@@ -125,11 +125,11 @@ transform result (Cardinal::Grammar::statement) :language('PIR') {
 
     result = new 'Cardinal::PAST::Stmt'
     result.'init'('node'=>node)
-    
+  
+    # alias
     $I0 = defined node['ALIAS']
     unless $I0 goto n1
     $S0 = node['ALIAS']
-    #child = tree.get('result', node, 'Cardinal::Grammar::alias')
     
     op = new 'Cardinal::PAST::Op'
     op.'init'('node'=>node, 'name'=>$S0)
@@ -152,11 +152,10 @@ transform result (Cardinal::Grammar::statement) :language('PIR') {
     unless $I0 == 2 goto back_reference
     $P2 = $P0[1]
     goto finish_GLOBAL_VARIABLE
-back_reference:
+  back_reference:
     $P2 = node['back_reference']
   finish_GLOBAL_VARIABLE:
     $P2 = tree.'get'('val', $P2, 'string')
-
 
   finish_alias:
     op.'add_child'($P1)
@@ -164,23 +163,26 @@ back_reference:
     result.'add_child'(op)
     .return (result)
 
+    # undef
   n1:
     $I0 = defined node['UNDEF']
     unless $I0 goto n2
     child = tree.get('result', node, 'Cardinal::Grammar::undef')
     .return (child)
 
+    # begin
   n2:
     $I0 = defined node['BEGIN']
     unless $I0 goto n3
     .local pmc begin_sub
     begin_sub = new 'Cardinal::PAST::Block'
-    begin_sub.'init'('node'=>node, 'name'=>'begin')
+    begin_sub.'init'('node'=>node, 'name'=>'begin', 'blocktype'=>'begin')
     $P0 = node['compound_statement']
     child = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
     begin_sub.'add_child'(child)
     .return (begin_sub)
 
+    # end
   n3:
     $I0 = defined node['END']
     unless $I0 goto n4
@@ -220,9 +222,18 @@ back_reference:
     .return (result)
 
   n5:
-    $I0 = defined node['RESCUE']
+    # rescue
+    $I0 = defined node['rescue']
     unless $I0 goto pass_through
-    $P4 = node['RESUCE']
+    
+    $I0 = defined node['statement']
+    unless $I0 goto err_no_tree
+    $P0 = node['statement'; 0]      
+    $P0 = tree.get('result', $P0, 'Cardinal::Grammar::statement')
+    
+    result = new 'Cardinal::PAST::Rescue_Stmt'
+    result.'init'('node'=>node, 'try_stmt'=>child, 'rescue_stmt'=>$P0)
+    .return (result)
 
   pass_through: 
     result.'add_child'(child)
@@ -398,40 +409,51 @@ transform result (Cardinal::Grammar::command_call) :language('PIR') {
 
 transform result (Cardinal::Grammar::command) :language('PIR') {
     .local pmc name
+    .local pmc result
     $I0 = defined node['operation']
-    unless $I0 goto err_no_name
-    $P1 = node['operation']
-    $S0 = tree.get('result', $P1, 'Cardinal::Grammar::operation')
+    unless $I0 goto try_atom
+    $P0 = node['operation']
+    $S0 = tree.get('result', $P0, 'Cardinal::Grammar::operation')
 
     # Check for args
     .local pmc args
     $I0 = defined node['command_args']
-    unless $I0 goto noargs
-    $P1 = node['command_args']
-    args = tree.get('result', $P1, 'Cardinal::Grammar::command_args')
-    if_null args, noargs
+    if $I0 goto get_operator_args
+    .return (name)
 
-    .local pmc result
+  try_atom:
+  try_special_command_type:
+    $I0 = defined node['special_command_type']
+    unless $I0 goto err_no_name
+    $P0 = node['special_command_type']
+    $S0 = $P0
     result = new 'Cardinal::PAST::Op'
     result.'init'('node'=>node, 'name'=>$S0)
-    
+    goto get_args
+
+
+  get_operator_args:
+    result = new 'Cardinal::PAST::Op'
+    result.'init'('node'=>node, 'name'=>$S0)
+  get_args:
+    $I0 = defined node['command_args']
+    $P0 = node['command_args']
+    args = tree.get('result', $P0, 'Cardinal::Grammar::command_args')
+    if_null args, noargs
+
     .local pmc iter
-    iter = new Iterator, args    # setup iterator for node
+    iter = new Iterator, args
     iter = 0
 
     iter_loop:
-    unless iter, iter_end         # while (entries) ...
+    unless iter, iter_end
     shift $P2, iter
-   
     result.'add_child'($P2)
-
     goto iter_loop
     iter_end:
 
-    .return (result)
-
   noargs:
-    .return (name)
+    .return (result)
 
   err_no_name:
     print "The command node doesn't contain a 'operation' match.\n"
@@ -473,10 +495,10 @@ transform result (Cardinal::Grammar::paren_args) :language('PIR') {
 }
 
 transform result (Cardinal::Grammar::call_args) :language('PIR') {
+    .local pmc child
     .local pmc result
     result = new .ResizablePMCArray
 
-    .local pmc child
     $I0 = defined node['call_args_positional']
     unless $I0 goto next_1
     $P0 = node['call_args_positional']
@@ -532,7 +554,6 @@ transform result (Cardinal::Grammar::call_args_positional) :language('PIR') {
 }
 
 transform result (Cardinal::Grammar::operation) :language('PIR') {
-  # Get IDENTIFIER or CONSTANT
     .local pmc name
     $I0 = defined node['IDENTIFIER']
     unless $I0 goto test_constant

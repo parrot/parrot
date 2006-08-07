@@ -37,6 +37,7 @@ compiler, see:
     load_bytecode 'languages/cardinal/src/CardinalGrammar.pbc'
     load_bytecode 'languages/cardinal/src/PGE2AST.pir'
     load_bytecode 'languages/cardinal/src/AST2OST.pir'
+    load_bytecode 'languages/cardinal/src/OST2PIR.pir'
     load_bytecode 'languages/cardinal/src/builtins_gen.pir'
 
     .local pmc _dumper
@@ -106,11 +107,15 @@ compiler, see:
   a4:
 
     .local int dump_src
+    .local int dump_src_early
+    .local int execute_debug
     $S0 = opts['dump-source']
     dump_src = isne $S0, ''
+    dump_src_early = dump_src
 
     $S0 = opts['execute']
-    eq $S0, '', a5
+    execute_debug = isne $S0, ''
+    unless execute_debug goto a5
     stopafter = 0
   a5:
 
@@ -124,6 +129,7 @@ compiler, see:
     dump_ast = 1
     dump_ost = 1
     dump_pir = 1
+    dump_src_early = 1
     dump_src = 1
     stopafter = 0
   after_dump_all:
@@ -188,8 +194,12 @@ compiler, see:
     # Match against the source
     .local pmc match
     .local pmc start_rule
+    
+    unless dump_src_early goto after_src_dump_early
+    print "\n\nSource dump:\n"
+    print source
+  after_src_dump_early:
 
-    $P99 = get_root_namespace [ 'parrot'; 'Cardinal::Grammar']
     start_rule = get_root_global [ 'parrot'; 'Cardinal::Grammar'], 'program'
     match = start_rule(source, 'grammar'=> 'Cardinal::Grammar')
 
@@ -244,20 +254,10 @@ compiler, see:
     .local pmc pirgrammar
     .local pmc pirbuilder
     .local pmc pir
-    #pirgrammar = new 'PIRGrammar'
-    #pirbuilder = pirgrammar.apply(ost)
-    #pir = pirbuilder.get('result')
-    #unless pir goto err_no_pir # if PIR not generated, stop
-
-    #unless dump_ast goto after_pir_dump
-    #print "\n\nPIR dump:\n"
-    #print pir
-    #after_pir_dump:
-    #eq stopafter, 4, end
-
-    # Compile the OST down to PIR
-    .local pmc pir
-    pir = ost.'root_pir'()
+    pirgrammar = new 'Cardinal::PIRGrammar'
+    pirbuilder = pirgrammar.apply(ost)
+    pir = pirbuilder.get('root')
+    unless pir goto err_no_pir # if PIR not generated, stop
 
     unless dump_src goto after_src_dump
     print "\n\nSource dump:\n"
@@ -271,10 +271,13 @@ compiler, see:
     eq stopafter, 4, end
 
     # Execute
+    unless execute_debug goto execute_only
+    print "\n\nExecution Result:\n"
+  execute_only:
     .local pmc pir_compiler
     .local pmc pir_compiled
     pir_compiler = compreg "PIR"
-    pir_compiled = pir_compiler( pir )
+    pir_compiled = pir_compiler(pir)
     pir_compiled()
     end
 

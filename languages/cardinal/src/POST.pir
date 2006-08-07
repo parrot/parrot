@@ -40,11 +40,15 @@ The base class of POST is Cardinal::PAST::Node -- see C<lib/CPAST.pir>
     addattribute $P0, 'subtype'
     addattribute $P0, 'varhash'
     addattribute $P0, 'prologue'
+    addattribute $P0, 'adverbs'
 
     $P0 = subclass base, 'Cardinal::POST::Op'
     $P0 = subclass base, 'Cardinal::POST::Ops'
     $P0 = subclass base, 'Cardinal::POST::Label'
     $P0 = subclass base, 'Cardinal::POST::Assign'
+    $P0 = subclass base, 'Cardinal::POST::Call'
+    $P0 = subclass base, 'Cardinal::POST::Raw'
+    addattribute $P0, 'raw'
 
 .end
 
@@ -92,8 +96,14 @@ PMC register (uninitialized) and use that.
 
 .namespace [ 'Cardinal::POST::Ops' ]
 
+.sub 'root_pir' :method
+    ##   build the pir for this node and its children
+    $P0 = self.'pir'(self)
+    .return ($P0)
+.end
+
 .sub 'pir' :method
-    .param pmc block
+    .param pmc grammar
     .local pmc code, iter
 
     code = new 'PGE::CodeString'
@@ -101,7 +111,7 @@ PMC register (uninitialized) and use that.
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter
-    $P1 = $P0.'pir'(block)
+    $P1 = $P0.'pir'(grammar)
     code .= $P1
     goto iter_loop
   iter_end:
@@ -198,6 +208,12 @@ and that is returned.
     .return self.'attr'('outer', outer, has_outer)
 .end
 
+.sub 'adverbs' :method
+    .param pmc subtype         :optional
+    .param int has_subtype     :opt_flag
+    .return self.'attr'('adverbs', subtype, has_subtype)
+.end
+
 .sub 'subtype' :method
     .param pmc subtype         :optional
     .param int has_subtype     :opt_flag
@@ -217,72 +233,12 @@ and that is returned.
 .end
 
 .sub 'root_pir' :method
-    ##   create a new CodeString for the subs
-    $P0 = new 'PGE::CodeString'
-    store_global 'Cardinal::POST', 'subpir', $P0
-
     ##   build the pir for this node and its children
-    self.'pir'(self)
-
-    ##   get the generated code and return it
-    $P0 = find_global 'Cardinal::POST', 'subpir'
+    ($P0, $P1) = self.'pir'(self)
     .return ($P0)
 .end
 
 
-.sub 'pir' :method
-    .param pmc block
-    .local string subtype
-    subtype = self.'subtype'()
-    if subtype != 'regex' goto standard_sub
-    .return self.'pir_regex'()
-
-  standard_sub:
-    ##   create a new (empty) variable hash and prologue for this sub
-    .local pmc varhash, prologue
-    varhash = new .Hash
-    self.'varhash'(varhash)
-    prologue = new 'PGE::CodeString'
-    self.'prologue'(prologue)
-
-    .local string name, outerattr
-    .local pmc outer
-    name = self.'name'()
-    outer = self.'outer'()
-    outerattr = ''
-    $I0 = defined outer
-    if $I0 == 0 goto with_outerattr
-    outerattr = outer.'name'()
-    outerattr = concat ":outer('", outerattr
-    outerattr = concat outerattr, "')"
-  with_outerattr:
-    .local pmc code, iter, subcode
-    ## build the code for this sub
-    prologue.'emit'("\n.sub '%0' %1", name, outerattr)
-    subcode = new 'PGE::CodeString'
-    iter = self.'child_iter'()
-  iter_loop:
-    unless iter goto iter_end
-    $P0 = shift iter
-    $P1 = $P0.'pir'(self)
-    subcode .= $P1
-    goto iter_loop
-  iter_end:
-    .local string value
-    prologue = self.'prologue'()
-    subcode = concat prologue, subcode
-    value = self.'value'()
-    subcode.'emit'("    .return (%0)\n.end\n", value)
-    ##   add the code to the current set of subs
-    $P0 = find_global 'Cardinal::POST', 'subpir'
-    subcode .= $P0
-    store_global 'Cardinal::POST', 'subpir', subcode
-
-    ##  generate the pir to locate this sub and return it
-    code = new 'PGE::CodeString'
-    code.'emit'("    %0 = find_name '%1'", value, name)
-    .return (code)
-.end
 
 .sub 'pir_regex' :method
     .local pmc p6regex, regexast, regexpir
@@ -293,14 +249,10 @@ and that is returned.
     regexast = self[0]
     regexpir = p6regex(regexast, 'name'=>name, 'grammar'=>'', 'target'=>'PIR')
 
-    $P0 = find_global 'Cardinal::POST', 'subpir'
-    regexpir .= $P0
-    store_global 'Cardinal::POST', 'subpir', regexpir
-
     .local pmc code
     code = new 'PGE::CodeString'
     code.'emit'("    %0 = find_name '%1'", value, name)
-    .return (code)
+    .return (regexpir, code)
 .end
 
 .sub '__dumplist' :method
@@ -437,7 +389,6 @@ and that is returned.
 .end
 
 .namespace [ 'Cardinal::POST::Assign' ]
-
 .sub 'value' :method
     ##   return the value of our left hand side as our value
     $P0 = self[0]
@@ -445,16 +396,16 @@ and that is returned.
     .return ($P0)
 .end
 
+.namespace [ 'Cardinal::POST::Call' ]
+.sub 'value' :method
+    .return ("")
+.end
 
-.sub 'pir' :method
-    .param pmc block
-    .local pmc rnode, rvalue
-    rnode = self[1]
-    rvalue = rnode.'value'()
-    .local pmc lnode
-    lnode = self[0]
-    $P0 = lnode.'assignpir'(block, rnode)
-    .return ($P0)
+.namespace [ 'Cardinal::POST::Raw' ]
+.sub 'raw' :method
+    .param string scope        :optional
+    .param int has_scope       :opt_flag
+    .return self.'attr'('raw', scope, has_scope)
 .end
 
 

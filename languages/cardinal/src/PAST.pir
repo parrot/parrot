@@ -19,6 +19,18 @@ needed for Ruby 1.9.  The currently defined ast nodes:
 .HLL 'Ruby', 'ruby_group'
 .namespace [ 'Cardinal::PAST' ]
 
+.macro kdump ( x )
+    .sym pmc it
+    it = get_root_global ['parrot'], '_dumper'
+    it(.x)
+.endm
+
+.macro kdump2 ( x, d)
+    .sym pmc it
+    it = get_root_global ['parrot'], '_dumper'
+    it(.x, .d)
+.endm
+
 .sub '__onload' :load
     .local pmc base
     base = newclass 'Cardinal::PAST::Node'
@@ -44,6 +56,10 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     $P0 = subclass base, 'Cardinal::PAST::Stmt'
     $P0 = subclass base, 'Cardinal::PAST::Stmts'
     $P0 = subclass base, 'Cardinal::PAST::Sub'
+
+    $P0 = subclass base, 'Cardinal::PAST::Rescue_Stmt'
+    addattribute $P0, 'try_stmt'
+    addattribute $P0, 'rescue_stmt'
 
     $P0 = new .Integer
     $P0 = 10
@@ -343,3 +359,21 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 .sub '__dumplist' :method
     .return ('name outer blocktype children vardecl')
 .end
+
+.namespace [ 'Cardinal::PAST::Rescue_Stmt' ]
+
+.sub '__dumplist' :method
+    .return ('name try_stmt rescue_stmt')
+.end
+
+.sub 'try_stmt' :method
+    .param pmc outer           :optional
+    .param int has_outer       :opt_flag
+    .return self.'attr'('try_stmt', outer, has_outer)
+.end
+.sub 'rescue_stmt' :method
+    .param pmc outer           :optional
+    .param int has_outer       :opt_flag
+    .return self.'attr'('rescue_stmt', outer, has_outer)
+.end
+

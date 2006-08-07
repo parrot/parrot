@@ -10,6 +10,7 @@ src/builtins/cmp.pir - Perl6 comparison builtins
 
 =cut
 
+.HLL 'Ruby', ''
 .namespace
 
 .sub 'infix:=='
