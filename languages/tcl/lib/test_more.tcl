@@ -113,11 +113,13 @@ proc diag {diagnostic} {
 # support tcltest.
 
 # A placeholder that simulates the real tcltest's exported test proc.
-proc test {num description code output args} {
-    if {$args eq ""} {
-      eval_is $code $output "$num $description"
+proc test {num description code args} {
+    if {[llength $args] == 0} {
+        fail "can't deal with this version of test yet."
+    } elseif {[llength $args] == 1} {
+        eval_is $code [lindex $args 0] "$num $description"
     } else {
-      fail "can't deal with this version of test yet."
+        fail "can't deal with this version of test yet."
     }
 }
 
