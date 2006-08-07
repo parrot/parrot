@@ -69,8 +69,6 @@ pmclass WmlsFloat
 
 /*
 
-=back
-
 =item C<void set_integer_native(INTVAL value)>
 
 =cut
