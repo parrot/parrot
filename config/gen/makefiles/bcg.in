@@ -10,9 +10,9 @@ CC_SHARED  	= @cc_shared@
 CFLAGS     	= $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
 LINK_DYNAMIC  	= @link_dynamic@
 LINK       	= @link@
-LINKFLAGS  	= @linkflags@ @link_debug@ @ld_debug@
+LINKFLAGS  	= @linkflags@ @link_debug@ @ld_debug@ 
 LD         	= @ld@
-LDFLAGS    	= @ldflags@ @ld_debug@ 
+LDFLAGS    	= @ldflags@ @ld_debug@ -L@build_dir@/blib/lib/ -lparrot
 SHARE_EXT       = @share_ext@
 LD_SHARE_FLAGS  = @ld_share_flags@
 
@@ -34,7 +34,9 @@ BCG_H_FILES = \
 BCG_O_FILES  = \
 	$(SRC_DIR)/bcg_logger$(O) \
 	$(SRC_DIR)/bcg$(O) \
-	$(SRC_DIR)/bcg_utils$(O)
+	$(SRC_DIR)/bcg_utils$(O) \
+	$(SRC_DIR)/bcg_op$(O) \
+	$(SRC_DIR)/bcg_unit$(O)
 
 PMCS = \
  bcg
