@@ -109,6 +109,7 @@ bad_args:
   .local pmc globber,rule,match
   globber = compreg 'PGE::Glob'
   $S1 = argv[0]
+  $S1 = '&' . $S1
   rule = globber($S1)
 pattern_loop:
   unless iterator goto pattern_end
@@ -119,7 +120,8 @@ pattern_loop:
   match = rule($S0)
   unless match goto pattern_loop
   $P0 = new .TclString
-  $P0 = $S0
+  $S1 = substr $S0, 1
+  $P0 = $S1
   push retval, $P0
 pattern_end:
   .return(retval)
@@ -127,7 +129,8 @@ pattern_end:
 loop:
   $S0 = shift iterator
   $P0 = new .TclString
-  $P0 = $S0
+  $S1 = substr $S0, 1
+  $P0 = $S1
   push retval, $P0
   if iterator goto loop
   .return(retval)
