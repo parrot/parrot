@@ -931,14 +931,15 @@ arg_nocase:
 
 arg_length:
   if size != -1 goto bad_args         
-  argc = argv
+  argc = elements argv
   if argc == 0 goto bad_args
-  $S4 = shift argv
-  # XXX switch this to use tcl's integer checker routines.
-  $I1 = is_integer $S4
-  if $I1 == 0 goto bad_args
-  size = $S4
-  if size < 0 goto bad_args         
+
+  .local pmc __integer
+  __integer = get_root_global ['_tcl'], '__integer'
+  $S4  = shift argv
+  size = __integer($S4)
+  # "if -length is negative, it is ignored"
+  if size < 0 goto args_processment         
   $S1 = substr $S1, 0, size
   $S2 = substr $S2, 0, size
   goto args_processment
