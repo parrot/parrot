@@ -194,6 +194,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/appendComp.t \
   t_tcl/assocd.t \
   t_tcl/case.t \
+  t_tcl/chan.t \
   t_tcl/cmdInfo.t \
   t_tcl/cmdIL.t  \
   t_tcl/concat.t \
@@ -202,16 +203,15 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/eval.t \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
-  t_tcl/get.t \
-  t_tcl/if.t \
-  t_tcl/incr.t \
   t_tcl/incr_old.t \
   t_tcl/indexObj.t \
   t_tcl/join.t \
+  t_tcl/lindex.t \
   t_tcl/link.t \
   t_tcl/linsert.t \
   t_tcl/llength.t \
   t_tcl/lrange.t \
+  t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
   t_tcl/lsetComp.t \
   t_tcl/notify.t \
@@ -219,11 +219,9 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/pid.t \
   t_tcl/platform.t \
   t_tcl/pwd.t \
-  t_tcl/registry.t \
   t_tcl/result.t \
   t_tcl/security.t \
   t_tcl/split.t \
-  t_tcl/stringComp.t \
   t_tcl/winConsole.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
@@ -231,17 +229,18 @@ RUNNABLE_TCL_TESTS = \
 # These test files die for various reasons. (or take too long to generate
 # any output, like expr.t)
 # In no particular order
+#t_tcl/get.t             t_tcl/if.t              t_tcl/incr.t
 #t_tcl/regexp.t          t_tcl/regexpComp.t      t_tcl/apply.t
 #t_tcl/info.t            t_tcl/rename.t          t_tcl/async.t
-#t_tcl/init.t            t_tcl/stack.t
+#t_tcl/init.t            t_tcl/stack.t           t_tcl/stringComp.t
 #t_tcl/switch.t          t_tcl/ioUtil.t          t_tcl/set.t
-#t_tcl/compile.t         t_tcl/load.t
-#t_tcl/subst.t           t_tcl/lrepeat.t         t_tcl/tcltest.t
+#t_tcl/compile.t         t_tcl/load.t            t_tcl/registry.t
+#t_tcl/subst.t           t_tcl/tcltest.t
 #t_tcl/misc.t            t_tcl/unixInit.t        t_tcl/encoding.t
 #t_tcl/trace.t           t_tcl/autoMkindex.t     t_tcl/interp.t
 #t_tcl/basic.t           t_tcl/safe.t            t_tcl/io.t
-#t_tcl/chan.t            t_tcl/scan.t            t_tcl/iogt.t
-#t_tcl/cmdAH.t           t_tcl/set_old.t         t_tcl/lindex.t
+#t_tcl/scan.t            t_tcl/iogt.t
+#t_tcl/cmdAH.t           t_tcl/set_old.t
 #t_tcl/thread.t          t_tcl/source.t          t_tcl/exec.t
 #t_tcl/binary.t          t_tcl/ioCmd.t           t_tcl/namespace.t
 #t_tcl/clock.t           t_tcl/socket.t          t_tcl/unknown.t
