@@ -16,6 +16,8 @@ linux-x86-gcc4.0.2           Y    Y    Y     Y   Y   Y    Y     ?  20060514
 linux-x86-gcc4.0.3           Y    Y    Y     Y   Y   Y    Y     ?  20060707
 linux-x86-gcc4.1.0           Y    Y    Y     Y   Y   Y    Y     Y  20060306
 linux-x86_64-gcc3.4.3    8   Y    -    -     Y   Y   Y    Y     ?  20060618
+linux-x86_64-gcc4.1.0    8   Y    -    -     Y   Y   Y    Y     ?  20060807
+linux-x86_64-gcc4.1.0    4   Y    -    -     Y   Y   Y    Y/2   ?  20060807
 sol8-sparc-cc           B    -    -    -     -   -   -    Y/997 ?  20060530
 sol10-sparc-cc_5.8      B    Y    -    -     Y   Y   Y    Y/6   ?  20060618
 sol10-sparc-gcc_4.0.2   B    Y    -    -     Y   Y   Y    Y/7   ?  20060618
@@ -36,6 +38,7 @@ Platform is "OS-processor-compiler" or a unique shortcut.
 B8 are Processor flags
 B   ... Processor is big endian
 8   ... opcode_t is 8 byte, i.e. a 64 bit machine
+4   ... opcode_t is 4 byte, --m=32 on a 64 bit machine
 
 CGoto ... CGoto runloop is supported
 JIT   ... JIT core is supported
