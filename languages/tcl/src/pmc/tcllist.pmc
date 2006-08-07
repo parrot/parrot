@@ -49,8 +49,6 @@ Class initialization. Caches the type id of various PMCs.
 
 Returns the list as a string
 
-=back
-
 =cut
 
 */
@@ -78,6 +76,8 @@ Returns the list as a string
 =item C<void assign_pmc(PMC *other)>
 
 Copy the contents of other to self.
+
+=back
 
 =cut
 
