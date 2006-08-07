@@ -23,7 +23,7 @@ use Parrot::Test;
 use Test::More;
 
 if ( $Parrot::Config::PConfig{has_python} ) {
-  plan tests => 85;
+  plan tests => 86;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
@@ -86,18 +86,18 @@ my @tests = (
        [ '-1', '-1', 'unary -', with_past => 1, ],
        [ '0', '0', '0 without sign',       with_past => 1, with_antlr3 => 1 ],
        [ '-0', '0', 'negative 0', with_past => 1, ],
-       [ '1', '1', undef, with_past => 1, ],
+       [ '1', '1', undef, with_past => 1, with_antlr3 => 1 ],
        [ '-10', '-10', undef, with_past => 1, ],
        [ '123456789', '123456789', undef, with_past => 1, with_antlr3 => 1 ],
        [ '-123456789', '-123456789', undef, with_past => 1, ],
-       [ '0001', '1', undef, with_past => 1, ],
+       [ '0001', '1', undef, with_past => 1, with_antlr3 => 1 ],
        [ '-0001', '-1', undef, with_past => 1 ],
 
        # floats
        [ '.1 + 1', '1.1', 'float with leading dot', with_antrl3 => 1 ],
        [ '-1.0001', '-1.0001' ], 
        [ '1.2', '1.2', undef, with_antlr3 => 1 ],     # prints 1.200000 in ANTLR3 version
-       [ '1.2 *2 - 2.0 + 3', '3.4', undef, with_antlr3 => 0 ],
+       [ '1.2 *2 - 2.0 + 3', '3.4', undef, with_antlr3 => 1 ],
 
        # binary PLUS
        [ '1 + 2', '3', 'two summands', with_antlr3 => 1 ],
@@ -113,34 +113,35 @@ my @tests = (
        [ '-1 + -2 - -4 + 10', '11' ],
 
        # multiplication
-       [ '2 * 2', '4' ],
+       [ '2 * 2', '4', undef, with_antlr3 => 1 ],
 
        # division
-       [ '2 / 2', '1' ],
+       [ '2 / 2', '1', undef, with_antlr3 => 1 ],
 
        # modulus
-       [ '2 % 2', '0' ],
+       [ '2 % 2', '0', undef, with_antlr3 => 1 ],
+       [ '3 % 2', '1', undef, with_antlr3 => 1 ],
 
        # precedence of mul, diff, mod
-       [ '2 / 2 + .1', '1.1' ],
-       [ '2 * 2 + .4', '4.4' ],
-       [ '.1 - 6 / 2', '-2.9' ],
-       [ '2 % 2 + 4', '4' ],
+       [ '2 / 2 + .1', '1.1', undef, with_antlr3 => 1 ],
+       [ '2 * 2 + .4', '4.4', undef, with_antlr3 => 1 ],
+       [ '.1 - 6 / 2', '-2.9', undef, with_antlr3 => 1 ],
+       [ '2 % 2 + 4', '4', undef, with_antlr3 => 1 ],
 
        # parenthesis
        [ '  ( 1 ) ', '1', 'one in parenthesis', with_past => 1, with_antlr3 => 1 ],
        [ '  ( 1 + 2 ) - 3 ', '0', undef, with_antlr3 => 1 ],
        [ '  ( 1 + 2 ) - ( 5  + 1 - 2 ) + 7 - ( 8 - 100 ) ', '98', undef, with_antlr3 => 1 ],
-       [ '  ( 1 + 2 ) * 3 ', '9', undef, with_antlr3 => 0 ],
-       [ '  ( 1 * 2 ) * 3 ', '6' ],
-       [ '  ( 1 * 2 ) + 3 ', '5' ],
-       [ '  ( 1 * 2 ) + ( ( ( ( 3 + 4 ) + 5 ) * 6 ) * 7 ) ', '506' ],
+       [ '  ( 1 + 2 ) * 3 ', '9', undef, with_antlr3 => 1 ],
+       [ '  ( 1 * 2 ) * 3 ', '6', undef, with_antlr3 => 1 ],
+       [ '  ( 1 * 2 ) + 3 ', '5' , undef, with_antlr3 => 1],
+       [ '  ( 1 * 2 ) + ( ( ( ( 3 + 4 ) + 5 ) * 6 ) * 7 ) ', '506', undef, with_antlr3 => 1 ],
 
        # semicolons
        [ '1; 2', [1, 2], 'two expressions seperated by a semicolon', with_past => 1, with_antlr3 => 1 ],
        [ '1+1+1; 2 + 2 + 2  ;  3 + 3 -1 + 3 +1', [3, 6, 9], '3 additive expression with semicolons', with_antlr3 => 1 ],
-       [ '1+1*1; 2+2*2', [2, 6] ],
-       [ '3-3/3; 4+4%4;  5-5+5', [2, 4, 5] ],
+       [ '1+1*1; 2+2*2', [2, 6], undef, with_antlr3 => 1 ],
+       [ '3-3/3; 4+4%4;  5-5+5', [2, 4, 5], undef, with_antlr3 => 1 ],
 
        # keyword quit
        [ "1; 2\nquit\n 3", [1, 2], 'int after quit', with_antlr3 => 1 ],

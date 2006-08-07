@@ -49,11 +49,16 @@ expression
 
 
 adding_expression
-  : multiplying_expression ( (PLUS^^ | MINUS^^) multiplying_expression)* 
+  : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression)* 
   ;
 
 
 multiplying_expression
+	: unary_expression ( ( MUL^^ | DIV^^ | MOD^^ ) unary_expression )*
+	;
+
+
+unary_expression
   : NUMBER
     |
     '(' expression ')' -> expression
@@ -78,6 +83,19 @@ PLUS
   : '+'
   ;
 
+MUL
+  : '*'
+  ;
+
+DIV
+  : '/'
+  ;
+
+MOD
+  : '%'
+  ;
+
+// quit is required, make testing easier
 // quit is required, make testing easier
 quit
   : 'quit'

@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-06 23:38:39
+// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-07 21:12:44
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -7,18 +7,21 @@ import java.util.ArrayList;
 
 public class AntlrPast2PirPast extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "STRING", "PLUS", "MINUS", "NUMBER", "INTEGER", "ML_COMMENT", "WS", "NEWLINE", "';'", "'('", "')'", "'quit'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "STRING", "PLUS", "MINUS", "MUL", "DIV", "MOD", "NUMBER", "INTEGER", "ML_COMMENT", "WS", "NEWLINE", "';'", "'('", "')'", "'quit'"
     };
-    public static final int INTEGER=9;
+    public static final int INTEGER=12;
+    public static final int MUL=8;
     public static final int MINUS=7;
+    public static final int NUMBER=11;
     public static final int EOF=-1;
-    public static final int WS=11;
-    public static final int NUMBER=8;
+    public static final int WS=14;
     public static final int STRING=5;
+    public static final int DIV=9;
     public static final int PLUS=6;
-    public static final int ML_COMMENT=10;
+    public static final int MOD=10;
+    public static final int ML_COMMENT=13;
     public static final int PROGRAM=4;
-    public static final int NEWLINE=12;
+    public static final int NEWLINE=15;
 
         public AntlrPast2PirPast(TreeNodeStream input) {
             super(input);
@@ -373,13 +376,13 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
     // $ANTLR start adding_expression
-    // grammar/antlr_3/antlr_past2pir_past.g:214:1: adding_expression[String reg_mother] : ( integer[ mother_for_int ] | ^(plus_or_minus= (PLUS|MINUS) adding_expression[reg] adding_expression[reg] ) ) ;
+    // grammar/antlr_3/antlr_past2pir_past.g:214:1: adding_expression[String reg_mother] : ( integer[ mother_for_int ] | ^(infix= (PLUS|MINUS|MUL|DIV|MOD) adding_expression[reg] adding_expression[reg] ) ) ;
     public void adding_expression(String reg_mother) throws RecognitionException {   
-        CommonTree plus_or_minus=null;
+        CommonTree infix=null;
 
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:215:5: ( ( integer[ mother_for_int ] | ^(plus_or_minus= (PLUS|MINUS) adding_expression[reg] adding_expression[reg] ) ) )
-            // grammar/antlr_3/antlr_past2pir_past.g:215:5: ( integer[ mother_for_int ] | ^(plus_or_minus= (PLUS|MINUS) adding_expression[reg] adding_expression[reg] ) )
+            // grammar/antlr_3/antlr_past2pir_past.g:215:5: ( ( integer[ mother_for_int ] | ^(infix= (PLUS|MINUS|MUL|DIV|MOD) adding_expression[reg] adding_expression[reg] ) ) )
+            // grammar/antlr_3/antlr_past2pir_past.g:215:5: ( integer[ mother_for_int ] | ^(infix= (PLUS|MINUS|MUL|DIV|MOD) adding_expression[reg] adding_expression[reg] ) )
             {
 
                   System.out.print( 
@@ -389,18 +392,18 @@ public class AntlrPast2PirPast extends TreeParser {
                   // Why can't I say:   integer[ reg_mother ] ???
                   String mother_for_int = reg_mother;
                 
-            // grammar/antlr_3/antlr_past2pir_past.g:223:5: ( integer[ mother_for_int ] | ^(plus_or_minus= (PLUS|MINUS) adding_expression[reg] adding_expression[reg] ) )
+            // grammar/antlr_3/antlr_past2pir_past.g:223:5: ( integer[ mother_for_int ] | ^(infix= (PLUS|MINUS|MUL|DIV|MOD) adding_expression[reg] adding_expression[reg] ) )
             int alt3=2;
             int LA3_0 = input.LA(1);
             if ( (LA3_0==NUMBER) ) {
                 alt3=1;
             }
-            else if ( ((LA3_0>=PLUS && LA3_0<=MINUS)) ) {
+            else if ( ((LA3_0>=PLUS && LA3_0<=MOD)) ) {
                 alt3=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("223:5: ( integer[ mother_for_int ] | ^(plus_or_minus= (PLUS|MINUS) adding_expression[reg] adding_expression[reg] ) )", 3, 0, input);
+                    new NoViableAltException("223:5: ( integer[ mother_for_int ] | ^(infix= (PLUS|MINUS|MUL|DIV|MOD) adding_expression[reg] adding_expression[reg] ) )", 3, 0, input);
 
                 throw nvae;
             }
@@ -416,20 +419,20 @@ public class AntlrPast2PirPast extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // grammar/antlr_3/antlr_past2pir_past.g:225:7: ^(plus_or_minus= (PLUS|MINUS) adding_expression[reg] adding_expression[reg] )
+                    // grammar/antlr_3/antlr_past2pir_past.g:225:7: ^(infix= (PLUS|MINUS|MUL|DIV|MOD) adding_expression[reg] adding_expression[reg] )
                     {
 
                             reg_num++;
                             String reg = "reg_" + reg_num;
                             System.out.print( 
                                 "                                                                \n"
-                              + "    # entering '( PLUS | MINUS ) adding_expression adding_expression'       \n"
+                              + "    # entering '( PLUS | MINUS | MUL | DIV ) adding_expression adding_expression'       \n"
                               + "      .sym pmc " + reg + "                                      \n"
                               + "      " + reg + " = new 'PAST::Op'                              \n"
                             );
                           
-                    plus_or_minus=(CommonTree)input.LT(1);
-                    if ( (input.LA(1)>=PLUS && input.LA(1)<=MINUS) ) {
+                    infix=(CommonTree)input.LT(1);
+                    if ( (input.LA(1)>=PLUS && input.LA(1)<=MOD) ) {
                         input.consume();
                         errorRecovery=false;
                     }
@@ -441,11 +444,11 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_adding_expression_in_adding_expression229);
+                    pushFollow(FOLLOW_adding_expression_in_adding_expression241);
                     adding_expression(reg);
                     _fsp--;
 
-                    pushFollow(FOLLOW_adding_expression_in_adding_expression232);
+                    pushFollow(FOLLOW_adding_expression_in_adding_expression244);
                     adding_expression(reg);
                     _fsp--;
 
@@ -453,13 +456,13 @@ public class AntlrPast2PirPast extends TreeParser {
                     match(input, Token.UP, null); 
 
                             System.out.print( 
-                                "      " + reg + ".'op'( 'infix:" + plus_or_minus.getText() + "' )   \n"
+                                "      " + reg + ".'op'( 'infix:" + infix.getText() + "' )   \n"
                               + "    reg_temp = new 'PAST::Exp'                                  \n"
                               + "    reg_temp.'add_child'( " + reg + " )                         \n"
                               + "      null " + reg + "                                          \n"
                               + "  " + reg_mother + ".'add_child'( reg_temp ) \n"
                               + "    null reg_temp                                               \n"
-                              + "    # leaving '( PLUS | MINUS ) adding_expression adding_expression'        \n"
+                              + "    # leaving '( PLUS | MINUS | MUL | DIV ) adding_expression adding_expression'        \n"
                             );
                           
 
@@ -491,14 +494,14 @@ public class AntlrPast2PirPast extends TreeParser {
  
 
     public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past65 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_gen_pir_past67 = new BitSet(new long[]{0x00000000000001E8L});
+    public static final BitSet FOLLOW_expression_in_gen_pir_past67 = new BitSet(new long[]{0x0000000000000FE8L});
     public static final BitSet FOLLOW_adding_expression_in_expression97 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_string_in_expression122 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STRING_in_string138 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_NUMBER_in_integer162 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_integer_in_adding_expression190 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_adding_expression221 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_adding_expression_in_adding_expression229 = new BitSet(new long[]{0x00000000000001C0L});
-    public static final BitSet FOLLOW_adding_expression_in_adding_expression232 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_adding_expression_in_adding_expression241 = new BitSet(new long[]{0x0000000000000FC0L});
+    public static final BitSet FOLLOW_adding_expression_in_adding_expression244 = new BitSet(new long[]{0x0000000000000008L});
 
 }

@@ -227,21 +227,21 @@ adding_expression[String reg_mother]
         String reg = "reg_" + reg_num;
         System.out.print( 
             "                                                                \n"
-          + "    # entering '( PLUS | MINUS ) adding_expression adding_expression'       \n"
+          + "    # entering '( PLUS | MINUS | MUL | DIV ) adding_expression adding_expression'       \n"
           + "      .sym pmc " + reg + "                                      \n"
           + "      " + reg + " = new 'PAST::Op'                              \n"
         );
       }
-      ^( plus_or_minus=( PLUS | MINUS ) adding_expression[reg] adding_expression[reg] )
+      ^( infix=( PLUS | MINUS | MUL | DIV | MOD ) adding_expression[reg] adding_expression[reg] )
       {
         System.out.print( 
-            "      " + reg + ".'op'( 'infix:" + $plus_or_minus.text + "' )   \n"
+            "      " + reg + ".'op'( 'infix:" + $infix.text + "' )   \n"
           + "    reg_temp = new 'PAST::Exp'                                  \n"
           + "    reg_temp.'add_child'( " + reg + " )                         \n"
           + "      null " + reg + "                                          \n"
           + "  " + $adding_expression.reg_mother + ".'add_child'( reg_temp ) \n"
           + "    null reg_temp                                               \n"
-          + "    # leaving '( PLUS | MINUS ) adding_expression adding_expression'        \n"
+          + "    # leaving '( PLUS | MINUS | MUL | DIV ) adding_expression adding_expression'        \n"
         );
       }
     )
