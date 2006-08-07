@@ -68,7 +68,7 @@ Given a PMC, get a number from it.
   .local pmc astgrammar, astbuilder, ast
   astgrammar = new 'TclExpr::PAST::Grammar'
   astbuilder = astgrammar.apply(match)
-  ast = astbuilder.get('result')
+  ast = astbuilder.get('past')
 
   .local string class
   .local pmc    value
@@ -229,7 +229,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     .local pmc astgrammar, astbuilder, ast
     astgrammar = new 'TclExpr::PAST::Grammar'
     astbuilder = astgrammar.apply(match)
-    ast = astbuilder.get('result')
+    ast = astbuilder.get('past')
 
   build_pir:
     .local pmc pirgrammar, pirbuilder

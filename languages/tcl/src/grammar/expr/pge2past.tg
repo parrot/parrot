@@ -1,6 +1,6 @@
 grammar TclExpr::PAST::Grammar is TGE::Grammar;
 
-transform result (ROOT) {
+transform past (ROOT) {
     $P0 = node['expr']
     if $P0 goto expression
     .return tree.get('dispatch', node, 'TclExpr::Grammar')
@@ -19,7 +19,7 @@ transform expression (TclExpr::Grammar) {
 transform dispatch (TclExpr::Grammar) {
     .local pmc child
 
-    # Ask the child node for its result.
+    # Ask the child node for its past.
 
     $P0 = node['boolean']
     if $P0 goto boolean
@@ -51,49 +51,49 @@ transform dispatch (TclExpr::Grammar) {
   .return(node)
  
 operator:
-    .return tree.get('result', node, 'operator')
+    .return tree.get('past', node, 'operator')
 
 function:
-    .return tree.get('result', $P0, 'function')
+    .return tree.get('past', $P0, 'function')
 
 subcommand:
-    .return tree.get('result', $P0, 'subcommand')
+    .return tree.get('past', $P0, 'subcommand')
 
 quoted:
-    .return tree.get('result', $P0, 'quoted')
+    .return tree.get('past', $P0, 'quoted')
 
 braced:
-    .return tree.get('result', $P0, 'braced')
+    .return tree.get('past', $P0, 'braced')
 
 number:
-    .return tree.get('result', $P0, 'number')
+    .return tree.get('past', $P0, 'number')
 
 boolean:
-    .return tree.get('result', $P0, 'boolean')
+    .return tree.get('past', $P0, 'boolean')
 
 constant:
-    .return tree.get('result', $P0, 'constant')
+    .return tree.get('past', $P0, 'constant')
 
 integer:
-    .return tree.get('result', $P0, 'integer')
+    .return tree.get('past', $P0, 'integer')
 
 has_float:
-    .return tree.get('result', $P0, 'float')
+    .return tree.get('past', $P0, 'float')
 
 scientific:
-    .return tree.get('result', $P0, 'scientific')
+    .return tree.get('past', $P0, 'scientific')
 
 variable:
-    .return tree.get('result', $P0, 'variable')
+    .return tree.get('past', $P0, 'variable')
 
 nested:
-    .return tree.get('result', $P0, 'nested')
+    .return tree.get('past', $P0, 'nested')
 }
 
 # Go through all the children of an operator and transform them.
 
-transform result (operator) {
-    # for each child of this operator, dispatch to get the result,
+transform past (operator) {
+    # for each child of this operator, dispatch to get the past,
     # use those as our children.
     .local pmc children, iter, past
     .local string name
@@ -129,7 +129,7 @@ transform result (operator) {
     .return tree.get('logical_or', node, 'PAST::Op')
 }
 
-transform result (function) {
+transform past (function) {
     .local string function_name
     .local pmc args
     .local int argc
@@ -189,40 +189,40 @@ too_many:
     .throw('too many arguments for math function')
 }
 
-transform result (boolean) {
-    .local pmc result
-    result = new 'PAST::Val'
-    result.set_node(node)
+transform past (boolean) {
+    .local pmc past
+    past = new 'PAST::Val'
+    past.set_node(node)
     
     $S0 = node
-    result['value'] = $S0
-    result['class'] = "TclConst"
-    .return(result)
+    past['value'] = $S0
+    past['class'] = "TclConst"
+    .return(past)
 }
 
-transform result (constant) {
-    .local pmc result
-    result = new 'PAST::Val'
-    result.set_node(node)
+transform past (constant) {
+    .local pmc past
+    past = new 'PAST::Val'
+    past.set_node(node)
     
     $S0 = node
-    result['value'] = $S0
-    result['class'] = "TclConst"
-    .return(result)
+    past['value'] = $S0
+    past['class'] = "TclConst"
+    .return(past)
 }
 
-transform result (braced) {
-    .local pmc result
-    result = new 'PAST::Val'
-    result.set_node(node)
+transform past (braced) {
+    .local pmc past
+    past = new 'PAST::Val'
+    past.set_node(node)
     
     $S0 = node[0]
-    result['value'] = $S0
-    result['class'] = "TclConst"
-    .return(result)
+    past['value'] = $S0
+    past['class'] = "TclConst"
+    .return(past)
 }
 
-transform result (number) {
+transform past (number) {
     $P0 = node['integer']
     if $P0 goto integer
     $P0 = node['float']
@@ -232,17 +232,17 @@ transform result (number) {
     .throw("invalid number type")
 
 integer:
-    .return tree.get('result', $P0, 'integer')
+    .return tree.get('past', $P0, 'integer')
 
 have_float:
-    .return tree.get('result', $P0, 'float')
+    .return tree.get('past', $P0, 'float')
 
 scientific:
-    .return tree.get('result', $P0, 'scientific')
+    .return tree.get('past', $P0, 'scientific')
 }
 
 
-transform result (nested) :language('PIR') {
+transform past (nested) :language('PIR') {
     .local pmc past
     $P0  = node['expression'; 'expr']
     past = tree.'get'('dispatch', $P0, 'TclExpr::Grammar')
@@ -250,10 +250,10 @@ transform result (nested) :language('PIR') {
 }
 
 
-transform result (scientific) {
-    .local pmc result
-    result = new 'PAST::Val'
-    result.set_node(node)
+transform past (scientific) {
+    .local pmc past
+    past = new 'PAST::Val'
+    past.set_node(node)
     
     $S0 = node[0]
     $N0 = $S0
@@ -263,16 +263,16 @@ transform result (scientific) {
     $N0 *= $N1
     
     $S0 = $N0
-    result['value'] = $S0
-    result['class'] = "TclFloat"
+    past['value'] = $S0
+    past['class'] = "TclFloat"
 
-    .return(result)
+    .return(past)
 }
 
-transform result (integer) {
-    .local pmc result
-    result = new 'PAST::Val'
-    result.set_node(node)
+transform past (integer) {
+    .local pmc past
+    past = new 'PAST::Val'
+    past.set_node(node)
 
     $P0 = node['octal']
     if $P0 goto octal
@@ -281,9 +281,9 @@ transform result (integer) {
 
   decimal:
     $S0 = node
-    result['value'] = $S0
-    result['class'] = "TclInt"
-    .return (result)
+    past['value'] = $S0
+    past['class'] = "TclInt"
+    .return (past)
  
   octal: 
      $S0 = node
@@ -307,9 +307,9 @@ transform result (integer) {
     goto octal_loop
   
   octal_done:
-    result['value'] = octal_value
-    result['class'] = "TclInt"
-    .return (result)
+    past['value'] = octal_value
+    past['class'] = "TclInt"
+    .return (past)
 
   hex:
     $S0 = node
@@ -341,24 +341,24 @@ transform result (integer) {
     goto hex_loop
 
   hex_done:
-    result['value'] = hex_value
-    result['class'] = "TclInt"
-    .return(result)
+    past['value'] = hex_value
+    past['class'] = "TclInt"
+    .return(past)
 
 }
 
-transform result (float) {
-    .local pmc result
-    result = new 'PAST::Val'
-    result.set_node(node)
+transform past (float) {
+    .local pmc past
+    past = new 'PAST::Val'
+    past.set_node(node)
 
     $S0 = node
-    result['value'] = $S0
-    result['class'] = "TclFloat"
-    .return (result)
+    past['value'] = $S0
+    past['class'] = "TclFloat"
+    .return (past)
 }
 
-transform result (quoted) {
+transform past (quoted) {
     .local pmc past
     $P0 = node['quoted_literal']
     $P0 = $P0.'get_array'()
@@ -373,7 +373,7 @@ transform result (quoted) {
     cnode = shift iter
     $S0 = cnode['type']
     if $S0 == 'str' goto cpast_str
-    cpast = tree.'get'('result', cnode, $S0)
+    cpast = tree.'get'('past', cnode, $S0)
     goto cpast_add
   cpast_str:
     $S0 = cnode
@@ -405,7 +405,7 @@ empty_string:
     .return(past)
 }
 
-transform result (subcommand) {
+transform past (subcommand) {
     .local pmc past
     past = new 'PAST::Command'
     past.set_node(node)
@@ -423,39 +423,39 @@ end:
     .return (past)
 }
 
-transform result (variable) {
-    .local pmc result
-    result = new 'PAST::Var'
-    result.set_node(node)
+transform past (variable) {
+    .local pmc past
+    past = new 'PAST::Var'
+    past.set_node(node)
     
     $S0 = node[0]
-    result['name'] = $S0
-    .return(result)
+    past['name'] = $S0
+    .return(past)
 }
 
 transform ternary (PAST::Op) {
-    .local pmc result
+    .local pmc past
 
-    result = new 'PAST::Cond'
-    result.set_node(node)
+    past = new 'PAST::Cond'
+    past.set_node(node)
 
     $P1 = node[0]
     $P2 = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
-    result.'add_child'($P2)
+    past.'add_child'($P2)
     $P1 = node[1]
     $P2 = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
-    result.'add_child'($P2)
+    past.'add_child'($P2)
     $P1 = node[2]
     $P2 = tree.'get'('dispatch', $P1, 'TclExpr::Grammar')
-    result.'add_child'($P2)
+    past.'add_child'($P2)
  
-    result['conditional'] = 1
+    past['conditional'] = 1
  
-    .return(result)
+    .return(past)
 }
 
 transform logical_and (PAST::Op) {
-    .local pmc result, true, false, A, B
+    .local pmc past, true, false, A, B
     .local pmc inner
 
     # Transform A && B into:
@@ -484,21 +484,21 @@ transform logical_and (PAST::Op) {
     inner['conditional'] = 1
 
     # Generate (A ? (...) : 0)
-    result = new 'PAST::Cond'
-    result.set_node(node)
+    past = new 'PAST::Cond'
+    past.set_node(node)
 
-    result.'add_child' (A)
+    past.'add_child' (A)
 
-    result.'add_child' (inner)
-    result.'add_child' (false)
+    past.'add_child' (inner)
+    past.'add_child' (false)
  
-    result['conditional'] = 1
+    past['conditional'] = 1
  
-    .return(result)
+    .return(past)
 }
 
 transform logical_or (PAST::Op) {
-    .local pmc result, true, false, A, B
+    .local pmc past, true, false, A, B
     .local pmc inner
 
     # Transform A || B into:
@@ -527,15 +527,15 @@ transform logical_or (PAST::Op) {
     inner['conditional'] = 1
 
     # Generate (A ? 1 : (...))
-    result = new 'PAST::Cond'
-    result.set_node(node)
+    past = new 'PAST::Cond'
+    past.set_node(node)
 
-    result.'add_child' (A)
+    past.'add_child' (A)
 
-    result.'add_child' (true)
-    result.'add_child' (inner)
+    past.'add_child' (true)
+    past.'add_child' (inner)
  
-    result['conditional'] = 1
+    past['conditional'] = 1
  
-    .return(result)
+    .return(past)
 }
