@@ -13,14 +13,14 @@ Functions are very similar to ops, so handle them similarly here.
 .HLL 'Tcl', ''
 .namespace ['tcl'; 'mathfunc']
 
-.sub 'rand'
+.sub '&rand'
 .end
 
 =head2 Unary Functions
 
 =cut
 
-.sub 'abs'
+.sub '&abs'
     .param pmc a
     
     .local pmc __number
@@ -39,7 +39,7 @@ is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'acos'
+.sub '&acos'
     .param pmc a
     
     .local pmc __number
@@ -63,7 +63,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'asin'
+.sub '&asin'
     .param pmc a
     
     .local pmc __number
@@ -87,7 +87,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'atan'
+.sub '&atan'
     .param pmc a
     
     .local pmc __number
@@ -111,10 +111,10 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'bool'
+.sub '&bool'
 .end
 
-.sub 'ceil'
+.sub '&ceil'
     .param pmc a
     
     .local pmc __number
@@ -135,7 +135,7 @@ is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'cos'
+.sub '&cos'
     .param pmc a
     
     .local pmc __number
@@ -159,7 +159,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'cosh'
+.sub '&cosh'
     .param pmc a
     
     .local pmc __number
@@ -183,7 +183,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'double'
+.sub '&double'
     .param pmc a
     
     .local pmc __number
@@ -203,7 +203,7 @@ is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'exp'
+.sub '&exp'
     .param pmc a
     
     .local pmc __number
@@ -227,10 +227,10 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'floor' 
+.sub '&floor' 
 .end
 
-.sub 'int'
+.sub '&int'
     .param pmc a
     
     .local pmc __number
@@ -250,7 +250,7 @@ is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'log'
+.sub '&log'
     .param pmc a
     
     .local pmc __number
@@ -279,7 +279,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'log10'
+.sub '&log10'
     .param pmc a
     
     .local pmc __number
@@ -308,7 +308,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'round'
+.sub '&round'
     .param pmc a
     
     .local pmc __number
@@ -334,7 +334,7 @@ is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'sin'
+.sub '&sin'
     .param pmc a
     
     .local pmc __number
@@ -358,7 +358,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'sinh'
+.sub '&sinh'
     .param pmc a
     
     .local pmc __number
@@ -382,7 +382,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'sqrt'
+.sub '&sqrt'
     .param pmc a
     
     .local pmc __number
@@ -410,10 +410,10 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'srand'
+.sub '&srand'
 .end
 
-.sub 'tan'
+.sub '&tan'
     .param pmc a
     
     .local pmc __number
@@ -437,7 +437,7 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'tanh'
+.sub '&tanh'
     .param pmc a
     
     .local pmc __number
@@ -461,14 +461,14 @@ is_string:
     .throw($S0)
 .end
 
-.sub 'wide'
+.sub '&wide'
 .end
 
 =head2 Binary Functions
 
 =cut
 
-.sub 'atan2'
+.sub '&atan2'
     .param pmc a
     .param pmc b
     
@@ -492,7 +492,7 @@ is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'fmod'
+.sub '&fmod'
     .param pmc a
     .param pmc b
     
@@ -520,7 +520,7 @@ is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'hypot'
+.sub '&hypot'
     .param pmc a
     .param pmc b
     
@@ -549,7 +549,7 @@ is_string:
     .throw("argument to math function didn't have numeric value")
 .end
 
-.sub 'pow'
+.sub '&pow'
     .param pmc a
     .param pmc b
     

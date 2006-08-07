@@ -107,7 +107,7 @@ transform pir (PAST::MathFunc) {
     .local pmc retval
     retval = pir.unique('$P')
     $S0    = node['mathfunc']
-    pir.emit("%0 = get_hll_global ['tcl'; 'mathfunc'], '%1'", retval, $S0)
+    pir.emit("%0 = get_hll_global ['tcl'; 'mathfunc'], '&%1'", retval, $S0)
     pir .= retval
     pir .= " = "
     pir .= retval
