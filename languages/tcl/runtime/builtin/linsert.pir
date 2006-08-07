@@ -69,7 +69,7 @@ LOOP_the_args:
   goto LOOP_the_args
 DONE_the_args:
 
-  argv_list = splice argv_copy, the_index, 0
+   splice argv_list, argv_copy, the_index, 0
 
   .local pmc retval
   retval = new .TclList
