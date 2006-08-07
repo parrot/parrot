@@ -35,6 +35,11 @@
   inc the_index
   
 next:
+  $I0 = elements the_list
+  if the_index <= $I0 goto convert_the_list
+
+  the_index = $I0
+
   # XXX workaround, splice doesn't work on TclList <-> TclList.
   # Until that's fixed, splice Arrays, then post-covert to a TclList
   # This is a hideous hack.
