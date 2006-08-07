@@ -21,9 +21,9 @@ sol10-sparc-cc_5.8      B    Y    -    -     Y   Y   Y    Y/6   ?  20060618
 sol10-sparc-gcc_4.0.2   B    Y    -    -     Y   Y   Y    Y/7   ?  20060618
 tru64-alpha-compaq_c6.5  8   ?    ?    ?     Y   ?   Y    Y/2   ?  20060203
 win32-x86-cygwin_1.5.18      Y    Y    -     Y   Y   Y*1  Y/2   ?  20060108
-win32-x86-mingw-gcc3.4.2     Y    Y    -     -   -   Y    Y/24  Y  20060609
-win32-x86-msvc_7.1           -    Y    -     -   -   Y    Y/13  ?  20060715
-win32-x86-msvc_8.0           -    Y    -     -   -   Y    Y/9   ?  20060715
+win32-x86-mingw-gcc3.4.2     Y    Y    -     -   -   Y    Y/26  Y  20060807
+win32-x86-msvc_7.1           -    Y    -     -   -   Y    Y/6   ?  20060806
+win32-x86-msvc_8.0           -    Y    -     -   -   Y    Y/9   ?  20060807
 
 ?   ... unknown or untested
 -   ... no
