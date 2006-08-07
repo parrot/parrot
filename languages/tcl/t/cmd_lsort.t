@@ -64,7 +64,7 @@ is [lsort -decreasing -integer -unique {10 2 30 5 0 -5 2}] \
   {30 10 5 2 0 -5} \
   {decreasing integer unique}
 
-is [lsort -dictionary {a10 B2 b1 a1 a2}] \
+eval_is {lsort -dictionary {a10 B2 b1 a1 a2}} \
   {a1 a2 a10 b1 B2} \
   {dictionary} \
   {TODO {no excuses!}}
