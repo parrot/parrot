@@ -1671,7 +1671,7 @@ list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
     if (n_items == 0)
         return;
     /* empty list */
-    if (!list->cap) {
+    if (idx >= (INTVAL)list->cap) {
         idx += n_items;
         list->length = idx;
         while (idx >= (INTVAL)list->cap)
