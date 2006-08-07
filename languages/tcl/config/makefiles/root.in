@@ -221,6 +221,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/security.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
+  t_tcl/unknown.t \
   t_tcl/winConsole.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
@@ -247,7 +248,7 @@ RUNNABLE_TCL_TESTS = \
 #t_tcl/get.t
 #
 # [expr issues]
-#t_tcl/if.t     - t_tcl/if....can't use non-numeric string as operand of "!"
+#t_tcl/if.t - can't use non-numeric string as operand of "!"
 #t_tcl/apply.t  - syntax error in expression "[info commands ::apply] eq {}": premature end of expression
 #t_tcl/async.t  - syntax error in expression "[info exists ::tcl_platform(threaded)] && $::tcl_platform(threaded)": premature end of expression
 #t_tcl/stack.t - expected boolean value but got "unix"
@@ -289,14 +290,12 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 #
 # invalid command name "subst"
 #t_tcl/misc.t
+#
 # extra characters after close-brace
 # t_tcl/encoding.t       t_tcl/namespace.t
 #
 # invalid command name "makeFile"
 #t_tcl/autoMkindex.t     t_tcl/iogt.t            t_tcl/env.t
-#
-# invalid command name "cleanupTests"
-#t_tcl/unknown.t
 #
 # Global 'normalize' not found
 #t_tcl/tm.t
