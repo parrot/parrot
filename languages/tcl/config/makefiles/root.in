@@ -199,6 +199,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/eval.t \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
+  t_tcl/if_old.t \
   t_tcl/incr_old.t \
   t_tcl/indexObj.t \
   t_tcl/join.t \
@@ -209,6 +210,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lrange.t \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
+  t_tcl/lset.t \
   t_tcl/lsetComp.t \
   t_tcl/notify.t \
   t_tcl/package.t \
@@ -218,46 +220,116 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/result.t \
   t_tcl/security.t \
   t_tcl/split.t \
+  t_tcl/stringComp.t \
   t_tcl/winConsole.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
 
-# These test files die for various reasons. (or take too long to generate
-# any output, like expr.t)
-# In no particular order
-#t_tcl/get.t             t_tcl/if.t              t_tcl/incr.t
-#t_tcl/regexp.t          t_tcl/regexpComp.t      t_tcl/apply.t
-#t_tcl/info.t            t_tcl/rename.t          t_tcl/async.t
-#t_tcl/init.t            t_tcl/stack.t           t_tcl/stringComp.t
-#t_tcl/switch.t          t_tcl/ioUtil.t          t_tcl/set.t
-#t_tcl/compile.t         t_tcl/load.t            t_tcl/registry.t
-#t_tcl/subst.t           t_tcl/tcltest.t
-#t_tcl/misc.t            t_tcl/unixInit.t        t_tcl/encoding.t
-#t_tcl/trace.t           t_tcl/autoMkindex.t     t_tcl/interp.t
-#t_tcl/basic.t           t_tcl/safe.t            t_tcl/io.t
-#t_tcl/scan.t            t_tcl/iogt.t
-#t_tcl/cmdAH.t           t_tcl/set_old.t
-#t_tcl/thread.t          t_tcl/source.t          t_tcl/exec.t
-#t_tcl/binary.t          t_tcl/ioCmd.t           t_tcl/namespace.t
-#t_tcl/clock.t           t_tcl/socket.t          t_tcl/unknown.t
-#t_tcl/dstring.t         t_tcl/lset.t            t_tcl/tm.t
-#t_tcl/dict.t            t_tcl/lsearch.t         t_tcl/timer.t
-#t_tcl/env.t             t_tcl/macOSXFCmd.t      t_tcl/unixFCmd.t
-#t_tcl/event.t           t_tcl/msgcat.t          t_tcl/unixNotfy.t
-#t_tcl/error.t           t_tcl/main.t            t_tcl/unixFile.t
-#t_tcl/execute.t         t_tcl/namespace_old.t   t_tcl/unload.t
-#t_tcl/compExpr.t        t_tcl/listObj.t         t_tcl/compExpr_old.t
-#t_tcl/fCmd.t            t_tcl/opt.t             t_tcl/utf.t
-#t_tcl/stringObj.t       t_tcl/expr.t            t_tcl/uplevel.t
-#t_tcl/fileName.t        t_tcl/util.t            t_tcl/if_old.t          
-#t_tcl/format.t          t_tcl/pkg.t             t_tcl/winDde.t
-#t_tcl/for.t             t_tcl/parseExpr.t       t_tcl/while.t
-#t_tcl/pkgMkIndex.t      t_tcl/proc.t            t_tcl/winFCmd.t
-#t_tcl/http.t            t_tcl/parseOld.t        t_tcl/while_old.t
-#t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/var.t
-#t_tcl/history.t         t_tcl/winFile.t         t_tcl/upvar.t
-#t_tcl/winPipe.t         t_tcl/proc_old.t        t_tcl/httpold.t         
-#t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t             
+# These test files die for various reasons.
+#
+# too slow:
+#
+#t_tcl/incr.t            t_tcl/regexp.t          t_tcl/regexp.t
+#t_tcl/set.t             t_tcl/tcltest.t         t_tcl/trace.t
+#t_tcl/interp.t          t_tcl/io.t              t_tcl/scan.t
+#t_tcl/set_old.t         t_tcl/ioCmd.t           t_tcl/dict.t
+#t_tcl/clock.t           t_tcl/exec.t            t_tcl/compExpr_old.t
+#t_tcl/execute.t         t_tcl/expr.t            t_tcl/fCmd.t
+#t_tcl/fileName.t        t_tcl/util.t            t_tcl/format.t
+#t_tcl/parseExpr.t       t_tcl/pkgMkIndex.t      t_tcl/winFCmd.t
+#t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/winPipe.t
+#t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t
+#
+# invalid command name "list" | can't rename "list": command doesn't exist
+#t_tcl/regexpComp.t      t_tcl/rename.t          t_tcl/basic.t
+#
+#add_1_const:Integer overflow '2'
+#t_tcl/get.t
+#
+# [expr issues]
+#t_tcl/if.t     - t_tcl/if....can't use non-numeric string as operand of "!"
+#t_tcl/apply.t  - syntax error in expression "[info commands ::apply] eq {}": premature end of expression
+#t_tcl/async.t  - syntax error in expression "[info exists ::tcl_platform(threaded)] && $::tcl_platform(threaded)": premature end of expression
+#t_tcl/stack.t - expected boolean value but got "unix"
+#t_tcl/compile.t - can't use non-numeric string as operand of "!"
+#t_tcl/load.t - syntax error in expression "![string match *pkga* $alreadyLoaded]": premature end of expression
+#t_tcl/registry.t - expected boolean value but got "win"
+#t_tcl/unixInit - syntax error in expression " ($tcl_platform(os) eq "Darwin") ? "^utf-8$" : "^iso8859-15?$"": premature end of expression
+#t_tcl/cmdAH.t - syntax error in expression " ![testConstraint win] || ([string index $tcl_platform(osVersion) 0] >= 5 && [lindex [file system [temporaryDirectory]] 1] eq "NTFS") ": extra tokens at end of expression
+#t_tcl/thread.t - expected boolean value but got "testthread"
+#t_tcl/binary.t -syntax error in expression "$tcl_platform(byteOrder) eq "bigEndian"": extra tokens at end of expression
+#t_tcl/socket.t - syntax error in expression "[info exists env(remoteServerIP)]": premature end of expression
+#t_tcl/dstring.t - expected boolean value but got "testdstring"
+#t_tcl/unixNotfy.t - syntax error in expression " (![info exist tcl_platform(threaded)] || !$tcl_platform(threaded)) && $tcl_platform(os) ne "Darwin" ": premature end of expression
+#t_tcl/main.t - syntax error in expression " [llength [package provide Tcltest]] && [package vsatisfies [package provide Tcltest] 8.4]": extra tokens at end of expression
+#t_tcl/unload.t - syntax error in expression "![string match *pkgua* $alreadyLoaded]": premature end of expression
+#t_tcl/compExpr.t - can't use non-numeric string as operand of "!"
+#t_tcl/for.t - can't use non-numeric string as operand of "!"
+t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcltest] == -1": premature end of expression
+#t_tcl/while.t -can't use non-numeric string as operand of "!"
+#t_tcl/var.t - syntax error in expression "[lsearch [namespace children] ::tcltest] == -1": premature end of expression
+#t_tcl/history.t         -expected boolean value but got "history"
+#t_tcl/winFile.t          -expected boolean value but got "testvolumetype"
+#
+# Null PMC access in name()
+#t_tcl/info.t            t_tcl/switch.t          t_tcl/lsearch.t
+#t_tcl/namespace_old.t   t_tcl/proc.t            t_tcl/http.t
+#t_tcl/while_old.t       t_tcl/proc_old.t
+#
+# Null PMC access in clone()
+#t_tcl/init.t            t_tcl/safe.t            t_tcl/source.t
+#t_tcl/pkg.t
+#
+# invalid command name "temporaryDirectory"
+#t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t      t_tcl/unixFCmd
+#t_tcl/unixFile.t
+#
+# Malformed string
+#t_tcl/subst.t
+#
+# invalid command name "subst"
+#t_tcl/misc.t
+# extra characters after close-brace
+# t_tcl/encoding.t       t_tcl/namespace.t
+#
+# invalid command name "makeFile"
+#t_tcl/autoMkindex.t     t_tcl/iogt.t            t_tcl/env.t
+#
+# invalid command name "cleanupTests"
+#t_tcl/unknown.t
+#
+# Global 'normalize' not found
+#t_tcl/tm.t
+#
+# Cannot get character of empty string
+#t_tcl/parseOld.t        t_tcl/upvar.t
+#
+# invalid command name "x"
+#t_tcl/timer.t
+#
+# invalid command name "update"
+#t_tcl/event.t
+#
+# can't read "envVars": no such variable
+#t_tcl/msgcat.t
+#
+# can't read "expected": no such variable
+#t_tcl/error.t           t_tcl/uplevel.t
+#
+# clone() not implemented in class 'Undef'
+#t_tcl/listObj.t
+#
+# can't read "::tcl::OptDescN": no such variable
+#t_tcl/opt.t
+#
+# invalid command name "bytestring"
+#t_tcl/utf.t
+#
+# syntax error, unexpected LABEL
+#t_tcl/stringObj.t
+#
+# bad option "script": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars
+#t_tcl/httpold.t
 
 tcl-test: t_tcl tcl.pbc
     # For now, just test the ones that ``work'' with test_more
