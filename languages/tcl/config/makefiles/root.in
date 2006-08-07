@@ -293,7 +293,7 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 # extra characters after close-brace
 # t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
 #
-# can't read "major": no such variable {{ foreach bug }}
+# can't read "major": no such variable {{ [foreach] bug }}
 #t_tcl/tm.t
 #
 # Cannot get character of empty string
@@ -305,7 +305,7 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 # invalid command name "update"
 #t_tcl/event.t
 #
-# can't read "envVars": no such variable
+# can't read "envVars": no such variable {{ [variable] bug }}
 #t_tcl/msgcat.t
 #
 # can't read "expected": no such variable
