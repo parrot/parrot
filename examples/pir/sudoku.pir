@@ -204,6 +204,7 @@ ok:
     disp."print"("init ok\n")
     $I0 = self."solve"()
     if $I0 == 1 goto nok
+    if $I0 == 0 goto nc_stop
 fin:
     self."display"()
     disp."print"("solved\n")
