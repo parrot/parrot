@@ -196,6 +196,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/concat.t \
   t_tcl/config.t \
   t_tcl/dcall.t \
+  t_tcl/env.t \
   t_tcl/eval.t \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
@@ -271,6 +272,7 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 #t_tcl/var.t - syntax error in expression "[lsearch [namespace children] ::tcltest] == -1": premature end of expression
 #t_tcl/history.t         -expected boolean value but got "history"
 #t_tcl/winFile.t          -expected boolean value but got "testvolumetype"
+#t_tcl/autoMkindex.t - syntax error in expression "[info exists auto_mkindex_parser::initCommands]": premature end of expression
 #
 # Null PMC access in name()
 #t_tcl/info.t            t_tcl/switch.t          t_tcl/lsearch.t
@@ -279,11 +281,8 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 #
 # Null PMC access in clone()
 #t_tcl/init.t            t_tcl/safe.t            t_tcl/source.t
-#t_tcl/pkg.t
-#
-# invalid command name "temporaryDirectory"
-#t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t      t_tcl/unixFCmd
-#t_tcl/unixFile.t
+#t_tcl/pkg.t             t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
+#t_tcl/unixFCmd          t_tcl/unixFile.t
 #
 # Malformed string
 #t_tcl/subst.t
@@ -292,10 +291,7 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 #t_tcl/misc.t
 #
 # extra characters after close-brace
-# t_tcl/encoding.t       t_tcl/namespace.t
-#
-# invalid command name "makeFile"
-#t_tcl/autoMkindex.t     t_tcl/iogt.t            t_tcl/env.t
+# t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
 #
 # Global 'normalize' not found
 #t_tcl/tm.t
