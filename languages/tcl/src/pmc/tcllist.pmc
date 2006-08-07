@@ -73,6 +73,28 @@ Returns the list as a string
         return value;
     }
 
+/*
+
+=item C<void assign_pmc(PMC *other)>
+
+Copy the contents of other to self.
+
+=cut
+
+*/
+
+    void assign_pmc (PMC *other) {
+        INTVAL size;
+        INTVAL i;
+
+        size = VTABLE_elements(INTERP,other);
+        DYNSELF.set_integer_native(size);
+        for(i = 0; i < size; i++) {
+            PMC* elem = VTABLE_get_pmc_keyed_int(INTERP, other, i);
+            DYNSELF.set_pmc_keyed_int(i, elem);
+        }
+    }
+
 }
 
 /*
