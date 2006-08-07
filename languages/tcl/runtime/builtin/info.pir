@@ -106,8 +106,6 @@ bad_args:
   retval = new .TclList
 
   if argc == 0 goto loop
-  load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Glob.pbc'
   .local pmc globber,rule,match
   globber = compreg 'PGE::Glob'
   $S1 = argv[0]
@@ -148,8 +146,6 @@ bad_args:
     null matching
     if argc ==0 goto done_setup
 
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Glob.pbc'
     $P1 = compreg 'PGE::Glob'
     .local string pattern
     pattern = argv[0]

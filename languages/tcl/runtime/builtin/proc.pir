@@ -29,9 +29,9 @@ Create a PIR sub on the fly for this user defined proc.
  
   .local pmc code, args_code, defaults
   .local string namespace
-  code      = new 'TclCodeString'
-  args_code = new 'TclCodeString'
-  defaults  = new 'TclCodeString'
+  code      = new 'PGE::CodeString'
+  args_code = new 'PGE::CodeString'
+  defaults  = new 'PGE::CodeString'
   namespace = ""
   if full_name == "" goto create
   

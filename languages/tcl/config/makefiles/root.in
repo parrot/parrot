@@ -130,7 +130,6 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 
 PBCS = \
 runtime/tcllib_temp.pbc \
-$(CLASSDIR)/tclcodestring.pbc \
 $(CLASSDIR)/tclcommand.pbc \
 $(CLASSDIR)/tclcommandlist.pbc \
 $(CLASSDIR)/tclconst.pbc \
@@ -154,9 +153,6 @@ runtime/tcllib_temp.pbc: $(PARROT) runtime/tcllib.pir runtime/builtins.pir
 
 $(CLASSDIR)/tclbinaryops.pbc: $(PARROT) $(CLASSDIR)/tclbinaryops.pir
 	$(PARROT) --output=$(CLASSDIR)/tclbinaryops.pbc $(CLASSDIR)/tclbinaryops.pir
-
-$(CLASSDIR)/tclcodestring.pbc: $(PARROT) $(CLASSDIR)/tclcodestring.pir
-	$(PARROT) --output=$(CLASSDIR)/tclcodestring.pbc $(CLASSDIR)/tclcodestring.pir
 
 $(CLASSDIR)/tclcommand.pbc: $(PARROT) $(CLASSDIR)/tclcommand.pir
 	$(PARROT) --output=$(CLASSDIR)/tclcommand.pbc $(CLASSDIR)/tclcommand.pir

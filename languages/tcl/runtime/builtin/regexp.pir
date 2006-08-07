@@ -16,7 +16,6 @@
    .local pmc tclARE, rule, match
 
    # XXX            "tclARE"
-   load_bytecode 'PGE.pbc'
    tclARE = compreg 'PGE::P5Regex'
 
    rule = tclARE(exp)

@@ -22,7 +22,7 @@ Define the attributes required for the class.
     .param int register_num
 
     .local pmc pir_code, index
-    pir_code = new 'TclCodeString'
+    pir_code = new 'PGE::CodeString'
     
     index = getattribute self, 'index'
     if null index goto not_array

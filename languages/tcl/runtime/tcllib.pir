@@ -59,6 +59,7 @@ providing a compreg-compatible method.
   # Load any dependant libraries.
   load_bytecode 'Getopt/Obj.pbc'
   load_bytecode 'PGE.pbc'
+  load_bytecode 'PGE/Glob.pbc'
   load_bytecode 'PGE/Util.pbc'
   load_bytecode 'TGE.pbc'
 

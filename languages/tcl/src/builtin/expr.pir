@@ -31,7 +31,7 @@ end:
   __expr = get_root_global ['_tcl'], '__expr'
 
   ($P0, $S0) = __expr(arg, 'pir_only'=>1)
-  pir = new 'TclCodeString'
+  pir = new 'PGE::CodeString'
   pir .= $P0
 
   pir.emit("  $P%0 = %1", register_num, $S0)

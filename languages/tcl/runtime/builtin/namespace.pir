@@ -152,7 +152,6 @@ bad_args:
   argc = argv
   if argc != 1 goto bad_args
 
-  load_bytecode 'PGE.pbc'
   .local pmc p6r,match
   p6r = compreg 'PGE::P6Regex'
   match = p6r("(.*)\\:\\:+<-[:]>*$$")
@@ -180,7 +179,6 @@ WHOLE:
   argc = argv
   if argc != 1 goto bad_args
 
-  load_bytecode 'PGE.pbc'
   .local pmc p6r,match
   p6r= compreg 'PGE::P6Regex'
   match = p6r("\\:\\:+(<-[:]>)$$")
@@ -228,7 +226,7 @@ bad_args:
 global_ns:
   .local pmc compile, code
   compile = get_root_global ['_tcl'], 'compile'
-  code = new 'TclCodeString'
+  code = new 'PGE::CodeString'
   $S0 = join " ", argv
   ($I0, $S0) = compile(1, $S0)
   $I0 = code.unique()
@@ -274,7 +272,6 @@ bad_args:
   if argc != 2 goto iterate
 
   .local pmc glob, pattern
-  load_bytecode 'PGE/Glob.pbc'
   glob        = compreg 'PGE::Glob'
   pattern     = argv[1]
   pattern     = glob(pattern)

@@ -242,7 +242,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     if pir_only goto only_pir
 
     .local pmc pir
-    pir = new 'TclCodeString'
+    pir = new 'PGE::CodeString'
 
     pir.emit(".HLL 'Tcl', ''")
     pir.emit(".namespace")

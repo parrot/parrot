@@ -34,11 +34,11 @@ Define the attributes required for the class.
    .local pmc pir_code, dynamic, error, inlined, invalid
    args     = ''
    arg_code = ''
-   pir_code = new 'TclCodeString'
-   inlined  = new 'TclCodeString'
-   dynamic  = new 'TclCodeString'
-   invalid  = new 'TclCodeString'
-   error    = new 'TclCodeString'
+   pir_code = new 'PGE::CodeString'
+   inlined  = new 'PGE::CodeString'
+   dynamic  = new 'PGE::CodeString'
+   invalid  = new 'PGE::CodeString'
+   error    = new 'PGE::CodeString'
 
    .local string retval
    # Generate partial code for each of our arguments
