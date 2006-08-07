@@ -293,7 +293,7 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 # extra characters after close-brace
 # t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
 #
-# Global 'normalize' not found
+# can't read "major": no such variable {{ foreach bug }}
 #t_tcl/tm.t
 #
 # Cannot get character of empty string

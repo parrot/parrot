@@ -13,7 +13,9 @@
   subcommand_name = shift argv
   .local pmc subcommand_proc
 
-  subcommand_proc = get_root_global ['_tcl';'helpers';'file'], subcommand_name
+  push_eh bad_args
+    subcommand_proc = get_root_global ['_tcl';'helpers';'file'], subcommand_name
+  clear_eh
   if_null subcommand_proc, bad_args
 
   .return subcommand_proc(argv)
@@ -30,6 +32,12 @@ few_args:
 
 .HLL '_Tcl', ''
 .namespace [ 'helpers'; 'file' ]
+
+.sub 'normalize' # XXX Stub for testing
+  .param pmc argv
+  $P0 = argv[0]
+  .return ($P0)
+.end
 
 .sub 'join'
   .param pmc argv
