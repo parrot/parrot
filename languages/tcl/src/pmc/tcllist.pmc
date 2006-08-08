@@ -84,14 +84,30 @@ Copy the contents of other to self.
 */
 
     void assign_pmc (PMC *other) {
-        INTVAL size;
-        INTVAL i;
+        STRING *array  = string_from_const_cstring(INTERP, "array", 5);
+        STRING *string = string_from_const_cstring(INTERP, "String", 6);
 
-        size = VTABLE_elements(INTERP,other);
-        DYNSELF.set_integer_native(size);
-        for(i = 0; i < size; i++) {
-            PMC* elem = VTABLE_get_pmc_keyed_int(INTERP, other, i);
-            DYNSELF.set_pmc_keyed_int(i, elem);
+        if (VTABLE_does(INTERP, other, array))
+        {
+            INTVAL size;
+            INTVAL i;
+
+            size = VTABLE_elements(INTERP,other);
+            DYNSELF.set_integer_native(size);
+            for(i = 0; i < size; i++) {
+                PMC* elem = VTABLE_get_pmc_keyed_int(INTERP, other, i);
+                DYNSELF.set_pmc_keyed_int(i, elem);
+            }
+        }
+        else if (VTABLE_isa(INTERP, other, string))
+        {
+            STRING *v = VTABLE_get_string(INTERP, other);
+            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
+            DYNSELF.set_string_native(v);
+        }
+        else
+        {
+            /* throw an error here */
         }
     }
 
