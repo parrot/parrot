@@ -61,7 +61,7 @@ adding_expression
 
 
 multiplying_expression
-  : unary_expression ( ( MUL^^ | DIV^^ | MOD^^ ) unary_expression )*
+  : unary_expression ( MUL_OP^^ unary_expression )*
   ;
 
 
@@ -96,12 +96,8 @@ PLUS
   : '+'
   ;
 
-MUL
-  : '*'
-  ;
-
-DIV
-  : '/'
+MUL_OP
+  : '*' | '/' | '%'
   ;
 
 INCR
@@ -110,10 +106,6 @@ INCR
 
 DECR
   : '--'
-  ;
-
-MOD
-  : '%'
   ;
 
 // quit is required, make testing easier

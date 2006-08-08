@@ -236,7 +236,7 @@ adding_expression[String reg_mother]
           + "      " + reg + " = new 'PAST::Op'                              \n"
         );
       }
-      ^( infix=( PLUS | MINUS | MUL | DIV | MOD ) adding_expression[reg] adding_expression[reg] )
+      ^( infix=( PLUS | MINUS | MUL_OP ) adding_expression[reg] adding_expression[reg] )
       {
         System.out.print( 
             "      " + reg + ".'op'( 'infix:" + $infix.text + "' )   \n"
