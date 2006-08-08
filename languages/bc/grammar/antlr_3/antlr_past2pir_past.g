@@ -133,7 +133,11 @@ expression[String reg_mother]
         + "          reg_expression_exp = new 'PAST::Exp'                    \n"
       );
     }
-    adding_expression["reg_expression_exp"]
+    (
+      adding_expression["reg_expression_exp"]
+      |
+      named_expression["reg_expression_exp"]
+    )
     {
       System.out.print( 
           "                                                                  \n"
@@ -248,6 +252,44 @@ adding_expression[String reg_mother]
     {
       System.out.print( 
           "  # leaving 'adding_expression'                                   \n"
+      );
+    }
+  ;
+
+named_expression[String reg_mother]
+  : {
+      System.out.print( 
+          "                                                                  \n"
+        + "  # entering 'named_expression'                                  \n"
+      );
+    }
+    ^( VAR LETTER )
+    {
+      reg_num++;
+      System.out.print( 
+          "                                                                     \n"
+        + "    # entering '( VAR LETTER )                                       \n"
+        + "    .sym pmc reg_exp_" + reg_num + "                                 \n"
+        + "    reg_exp_" + reg_num + " = new 'PAST::Exp'                        \n"
+        + "      .sym pmc reg_op_" + reg_num + "                                \n"
+        + "      reg_op_" + reg_num + " = new 'PAST::Op'                        \n"
+        + "      reg_op_" + reg_num + ".'op'( 'infix:=' )                       \n"
+        + "        .sym pmc reg_var_" + reg_num + "                             \n"
+        + "        reg_var_" + reg_num + " = new 'PAST::Var'                    \n"
+        + "        reg_var_" + reg_num + ".'varname'( '" + $LETTER.text + "' )   \n"
+        + "        reg_var_" + reg_num + ".'vartype'( 'scalar' )                \n"
+        + "        reg_var_" + reg_num + ".'scope'( 'global' )                  \n"
+        + "      reg_op_" + reg_num + ".'add_child'( reg_var_" + reg_num + " )  \n"
+        + "        .sym pmc reg_val_" + reg_num + "                             \n"
+        + "        reg_val_" + reg_num + " = new 'PAST::Val'                    \n"
+        + "        reg_val_" + reg_num + ".'value'( 0 )                         \n"
+        + "        reg_val_" + reg_num + ".'valtype'( 'int' )                   \n"
+        + "      reg_op_" + reg_num + ".'add_child'( reg_val_" + reg_num + " )  \n"
+        + "    reg_exp_" + reg_num + ".'add_child'( reg_op_" + reg_num + " )    \n"
+        + "# a quick hack to initialize 'a'                                     \n"
+        + "stmts.'add_child'( reg_exp_" + reg_num + " )                         \n"
+        + "  " + $named_expression.reg_mother + ".'add_child'( reg_var_" + reg_num + " ) \n"
+        + "    # leaving '(VAR LETTER)'                                         \n"
       );
     }
   ;

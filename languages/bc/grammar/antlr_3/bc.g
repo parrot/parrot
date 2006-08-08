@@ -20,6 +20,7 @@ options
 tokens 
 {
   PROGRAM;
+  VAR;
 } 
 
 
@@ -44,7 +45,13 @@ statement
   ;
 
 expression
-  : adding_expression
+  : named_expression
+    |
+    adding_expression
+  ;
+
+named_expression
+  : LETTER -> ^( VAR LETTER ) 
   ;
 
 
@@ -54,11 +61,17 @@ adding_expression
 
 
 multiplying_expression
-	: unary_expression ( ( MUL^^ | DIV^^ | MOD^^ ) unary_expression )*
-	;
+  : unary_expression ( ( MUL^^ | DIV^^ | MOD^^ ) unary_expression )*
+  ;
 
 
 unary_expression
+  : postfix_expression
+    |
+    ( INCR^^ | DECR^^ ) postfix_expression
+  ;
+
+postfix_expression
   : NUMBER
     |
     '(' expression ')' -> expression
@@ -89,6 +102,14 @@ MUL
 
 DIV
   : '/'
+  ;
+
+INCR
+  : '++'
+  ;
+
+DECR
+  : '--'
   ;
 
 MOD
@@ -129,3 +150,7 @@ STRING
   : '\"' ( ~'\"' )*  '\"'
   ;
 
+LETTER
+  : 'a'..'z'
+  ;
+  

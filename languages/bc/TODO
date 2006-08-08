@@ -4,6 +4,8 @@
 # Some tidbits on what is to do for Parrot bc.
 # See docs/parrot_bc.pod for visions.
 
+- Keep track of named variables and initialize them during execution
+
 - Get rid of ANTLR 2
 
 - Switch to C# backend, run with languages/dotnet
@@ -37,5 +39,3 @@
 
 - Testing
   - Find a test suite for bc
-
-- Provide pointers to bc Spec POSIX P1003.2/D11 draft Section 4.3
