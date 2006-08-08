@@ -37,6 +37,10 @@ transform root (ROOT) :language('PIR') {
     self.'post_scope_stack'($P0)
     self.'past_scope_stack'($P0)
 
+    .local pmc hll
+    hll = new 'Cardinal::POST::Raw'
+    hll.'init'('node'=>node, 'raw'=>".HLL 'Ruby', ''")
+
     .local pmc load
     load = new 'Cardinal::POST::Sub'
     load.'init'('node'=>node, 'name'=>'__onload', 'adverbs'=>':load')
@@ -45,6 +49,7 @@ transform root (ROOT) :language('PIR') {
     main = new 'Cardinal::POST::Sub'
     main.'init'('node'=>node, 'name'=>'main', 'adverbs'=>':main')
 
+    ops.'add_child'(hll)
     ops.'add_child'(main)
     ops.'add_child'(load)
     $P0 = tree.'get'('post', node)
@@ -551,30 +556,6 @@ transform post (Cardinal::PAST::Var) :language('PIR') {
     .local pmc post
     name = node.'name'()
     scope = node.'scope'()
-
-    if scope == 'package' goto with_name
-    if scope == 'lecical' goto with_name
-    if scope == 'parameter' goto with_name
-
-    .local pmc outer
-    outer = self.'past_scope_stack'()
-
-  outer_loop:
-    $I0 = isa outer, 'Cardinal::PAST::BLOCK'
-    unless $I0 goto with_name
-    $P0 = outer.'vardecl'(name)
-    $I0 = isa outer, 'Cardinal::PAST::Var'
-    unless $I0 goto outer_next
-    $S0 = $P0.'scope'()
-    ne $S0, 'outer', outer_end
-  outer_next:
-    outer = outer.'outer'()
-    goto outer_loop
-
-  outer_end:
-    scope .= $S0
-
-  with_name:
     post = new 'Cardinal::POST::Var'
     post.'init'('node'=>node, 'name'=>name, 'scope'=>scope)
     .return (post)

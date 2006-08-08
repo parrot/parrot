@@ -30,8 +30,8 @@ transform root (Cardinal::POST::Ops) :language('PIR') {
     code = new 'PGE::CodeString'
     self.'top_level_code'(code)
     $P0 = tree.get('pir', node)
-    code .= $P0
-    .return (code)
+    $P0 .= code
+    .return ($P0)
 }
 
 transform pir (Cardinal::POST::Op) :language('PIR') {
@@ -62,16 +62,13 @@ transform pir (Cardinal::POST::Var) :language('PIR') {
     islvalue = node.'islvalue'()
     block = self.'top_scope_stack'()
     code = new 'PGE::CodeString'
+
     if scope == 'lexical' goto generate_lexical
-    if scope == 'package' goto generate_package
     if scope == 'parameter' goto generate_parameter
-    if scope == 'global' goto generate_package
+    if scope == 'global' goto generate_global
     goto generate_find
+
   generate_parameter:
-    .local pmc varhash
-    varhash = block.'varhash'()
-    $I0 = exists varhash[name]
-    if $I0 goto generate_find
     .local pmc prologue
     .local string pname
     pname = node.'paramname'()
@@ -79,18 +76,12 @@ transform pir (Cardinal::POST::Var) :language('PIR') {
     prologue.'emit'("    .param pmc %0", pname)
     code.'emit'("    .lex '%0', %1", name, value)
     code.'emit'("    %0 = %1", value, pname)
-    varhash[name] = node
     goto end
+
   generate_lexical:
-    .local pmc varhash
-    varhash = block.'varhash'()
-    $I0 = exists varhash[name]
-    if $I0 goto generate_find
-    ##    This is the first time to see a lexical, generate its .lex
     code.'emit'("    .lex '%0', %1", name, value)
-    varhash[name] = node
     goto end
-  generate_package:
+  generate_global:
     if islvalue goto end
     code.'emit'("    %0 = get_hll_global '%1'", value, name)
     goto end
