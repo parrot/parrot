@@ -557,11 +557,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Test bad label()" );
     $P1.startCodeGen()
     $P1.startSub("main","main")
     $P1.startOp("set")
-    $P1.var("P1","pmc")
+    $P1.var("P1","string")
     $P1.val("bcg","string")
     $P1.endOp()
     $P1.startOp("print")
-    $P1.var("P1","pmc")
+    $P1.var("P1","string")
     $P1.endOp()
     $P1.endSub()
     $P1.endCodeGen()
@@ -574,6 +574,7 @@ catch:
 .end
 CODE
 _main:
-    set_p_sc P0, "bcg"
-    print_p P0
+    set_s_sc S0, "bcg"
+    print_s S0
+    end
 OUTPUT

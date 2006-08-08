@@ -40,4 +40,5 @@ emit_pasm(BCG_info * bcg_info)
         }
         unit = unit->next;
     }
+    printf("    end\n");
 }
