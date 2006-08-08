@@ -33,8 +33,8 @@
 
 	# Put in ops loader code.
 	pir_output = concat <<"PIR"
+.loadlib "dotnet_ops"
 .sub __LOAD_DOTNET_OPS :load
-	loadlib $P0, "dotnet_ops"
     loadlib $P0, "dotnet_runtime"
 .end
 PIR

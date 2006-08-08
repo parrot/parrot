@@ -9,10 +9,10 @@ use Test::More tests => 9;
 # Testing class for the managed pointer PMC and related ops. Note that this
 # does not consider translating any .NET code, just tests the functionality.
 is (run_pir(<<'PIR'), <<'OUTPUT', 'int reg');
+.loadlib "dotnet_ops"
 .sub main :main
 	.local int the_test
     .local pmc ptr
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Get the pointer.
@@ -42,10 +42,10 @@ Jonathan will be 21 years old tomorrow! :-O
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'float reg');
+.loadlib "dotnet_ops"
 .sub main :main
 	.local num the_test
     .local pmc ptr
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Get the pointer.
@@ -74,10 +74,10 @@ PIR
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'pmc reg');
+.loadlib "dotnet_ops"
 .sub main :main
 	.local pmc the_test
     .local pmc ptr
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Get the pointer.
@@ -110,10 +110,10 @@ PIR
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'int element');
+.loadlib "dotnet_ops"
 .sub main :main
 	.local int the_test
     .local pmc ptr, arr
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Set up an array.
@@ -144,10 +144,10 @@ PIR
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'float element');
+.loadlib "dotnet_ops"
 .sub main :main
 	.local num the_test
     .local pmc ptr, arr
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Set up an array.
@@ -178,9 +178,9 @@ PIR
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'pmc element');
+.loadlib "dotnet_ops"
 .sub main :main
     .local pmc ptr, arr, the_test
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Set up an array.
@@ -218,10 +218,10 @@ PIR
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'int field');
+.loadlib "dotnet_ops"
 .sub main :main
     .local int the_test
     .local pmc ptr, obj
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Set up an object with an integer field.
@@ -255,10 +255,10 @@ The monkey is now 21 years old.
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'float field');
+.loadlib "dotnet_ops"
 .sub main :main
     .local num the_test
     .local pmc ptr, obj
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Set up an object with a float field.
@@ -292,9 +292,9 @@ The monkey is now 1.82 meters tall.
 OUTPUT
 
 is (run_pir(<<'PIR'), <<'OUTPUT', 'pmc field');
+.loadlib "dotnet_ops"
 .sub main :main
     .local pmc the_test, ptr, obj
-	$P0 = loadlib "dotnet_ops"
     $P0 = loadlib "dotnet_runtime"
     
     # Set up an object with a field.
