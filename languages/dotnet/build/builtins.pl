@@ -74,7 +74,7 @@ close $fh;
 
 # This parses the input file, extracting each method.
 # ###################################################
-sub parse($) {
+sub parse {
     my $input = shift;
     my @methods = ();
     my $cur_method;
@@ -197,7 +197,7 @@ sub generate_bodies {
 
 # Usage message.
 # ##############
-sub usage() {
+sub usage {
     print <<USAGE;
 Usage:
   perl build/builtins.pl src/internal.methods --ouptput src/builtins.pir

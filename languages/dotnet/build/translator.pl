@@ -76,7 +76,7 @@ print "Currently able to translate " . scalar(@rules) . " out of 213 instruction
 
 # Parse rules file and build a data structure.
 # ############################################
-sub parse_rules($) {
+sub parse_rules {
     # Get filename and open the file.
     my $filename = shift;
     open my $fh, "< $filename" or die "Unable to open $filename: $!\n";
@@ -166,7 +166,7 @@ sub parse_rules($) {
 
 # Rule validator.
 # ###############
-sub validate_rule($) {
+sub validate_rule {
     my $rule = shift;
     
     # Flags we'll set as we go through key/value pairs.
@@ -299,12 +299,19 @@ sub validate_rule($) {
     if ($rule->{'class'} eq 'calling' && ($has_pop || $has_push)) {
         die "pop and push not allowed for class calling in rule $rule->{'name'}\n";
     }
+
+	# Set default values.
+	$rule->{'pop'} ||= 0;
+	$rule->{'push'} ||= 0;
+	$rule->{'instruction'} ||= "";
+	$rule->{'pir'} ||= "";
+	$rule->{'arguments'} = "" unless $has_args;
 }
 
 
 # Generate the translator initialization code.
 # ############################################
-sub generate_initial_pir($$$) {
+sub generate_initial_pir {
     my $srm = shift;
 	my $rules = shift;
 	my $mv = shift;
@@ -593,7 +600,7 @@ PIRCODE
 
 # Generate the dispatch table.
 # ############################
-sub generate_dispatch_table($$$) {
+sub generate_dispatch_table {
     my $srm = shift;
     my @rules = @{shift()};
     my $mv = shift;
@@ -668,7 +675,7 @@ PIRCODE
 
 # Binary dispatch table builder.
 # ##############################
-sub binary_dispatch_table(@) {
+sub binary_dispatch_table {
     my $prefix = shift;
     my @rules = @_;
     my $pir = "";
@@ -738,7 +745,7 @@ sub binary_dispatch_table(@) {
 
 # Generate translation code relating to a rule.
 # #############################################
-sub generate_rule_code($$$) {
+sub generate_rule_code {
 	my $srm = shift;
 	my $rule = shift;
 	my $mv = shift;
@@ -1259,7 +1266,7 @@ PIR
 
 # Instruction to PIR routine.
 # ###########################
-sub ins_to_pir($$) {
+sub ins_to_pir {
 	my $ins = shift;
 	my $mv = shift;
 	my $output;
@@ -1286,7 +1293,7 @@ sub ins_to_pir($$) {
 
 # Generate the translator trailer code.
 # #####################################
-sub generate_final_pir($$) {
+sub generate_final_pir {
     my $srm = shift;
     my $mv = shift;
     
@@ -1312,7 +1319,7 @@ TRANSPIR
 
 # Inserts auto-magically instantiated meta-variable locals.
 # #########################################################
-sub insert_automagicals($$) {
+sub insert_automagicals {
 	my $pir = shift;
 	my $mv = shift;
 
@@ -1335,7 +1342,7 @@ sub insert_automagicals($$) {
 
 # Substiture meta variables.
 # ##########################
-sub sub_meta($$) {
+sub sub_meta {
     my $pir = shift;
     my $mv = shift;
     my $code_source = shift;
@@ -1371,7 +1378,7 @@ sub sub_meta($$) {
 
 # Usage message.
 # ##############
-sub usage() {
+sub usage {
     print <<USAGE;
 Usage:
   perl build/translator.pl src/translation.rules --srm Stack \
