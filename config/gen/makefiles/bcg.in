@@ -29,14 +29,18 @@ BCG_H_FILES = \
     $(INCLUDE_DIR)/bcg.h \
     $(SRC_DIR)/bcg_private.h \
     $(SRC_DIR)/bcg_logger.h \
-    $(SRC_DIR)/bcg_utils.h
+    $(SRC_DIR)/bcg_utils.h \
+    $(SRC_DIR)/bcg_reg_alloc.h \
+    $(SRC_DIR)/bcg_emitter.h
 
 BCG_O_FILES  = \
 	$(SRC_DIR)/bcg_logger$(O) \
 	$(SRC_DIR)/bcg$(O) \
 	$(SRC_DIR)/bcg_utils$(O) \
 	$(SRC_DIR)/bcg_op$(O) \
-	$(SRC_DIR)/bcg_unit$(O)
+	$(SRC_DIR)/bcg_unit$(O) \
+        $(SRC_DIR)/bcg_reg_alloc_vanilla$(O) \
+        $(SRC_DIR)/bcg_emitter_pasm$(O)
 
 PMCS = \
  bcg

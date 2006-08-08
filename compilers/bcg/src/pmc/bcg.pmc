@@ -18,10 +18,12 @@ List of methods/operations defined over the PMC.
 
 */
 
+#include <string.h>
 #include "parrot/parrot.h"
 #include "bcg.h"
 
 static INTVAL dynpmc_BCG;
+static char get_data_type_from_cstring(Interp *interp, char *data_type);
 
 pmclass BCG dynpmc need_ext group bcg_group lib bcg {
 
@@ -253,20 +255,23 @@ This method marks the end of an operation.
 
 /*
 
-=item C<void var(STRING *name)>
+=item C<void val(STRING *name, STRING *type)>
 
 This method generates bytecode for a variable.
 
 =cut
 
 */
-    METHOD void val(STRING *value)
+    METHOD void val(STRING *value, STRING *type)
     {
         BCG_info *bcg_info;
+        char data_type;
 
+        data_type = get_data_type_from_cstring(INTERP, 
+                                            string_to_cstring(INTERP, type));
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
-            BCG_val(bcg_info, string_to_cstring(INTERP, value));
+            BCG_val(bcg_info, string_to_cstring(INTERP, value), data_type);
         }
         BCG_CATCH(BCG_EXCEPTION) {
              real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
@@ -276,7 +281,7 @@ This method generates bytecode for a variable.
 
 /*
 
-=item C<void val(STRING *value, STRING *type)>
+=item C<void var(STRING *value, STRING *type)>
 
 This method generates bytecode for a constant.
 
@@ -286,10 +291,13 @@ This method generates bytecode for a constant.
     METHOD void var(STRING *varName, STRING *type)
     {
         BCG_info *bcg_info;
+        char data_type;
 
+        data_type = get_data_type_from_cstring(INTERP, 
+                                            string_to_cstring(INTERP, type));
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
-            BCG_var(bcg_info, string_to_cstring(INTERP, varName), 'P');
+            BCG_var(bcg_info, string_to_cstring(INTERP, varName), data_type);
         }
         BCG_CATCH(BCG_EXCEPTION) {
              real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
@@ -319,7 +327,37 @@ This method generates bytecode for label.
         }
         BCG_END_TRY;
     }
+
+
+    METHOD void printPASM( )
+    {
+        BCG_info *bcg_info;
+
+        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        BCG_print_pasm(bcg_info);
+    }
 }
+
+static char
+get_data_type_from_cstring(Interp *interp, char *data_type)
+{
+    if (!strcmp(data_type, "pmc")) {
+        return 'P';
+    }
+    else if (!strcmp(data_type, "int")) {
+        return 'I';
+    }
+    else if (!strcmp(data_type, "number")) {
+        return 'N';
+    }
+    else if (!strcmp(data_type, "string")) {
+        return 'S';
+    }
+
+    real_exception(interp, NULL, E_Exception, "Invalid data type.");
+    return '\0';
+}
+
 /*
 
 =back

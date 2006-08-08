@@ -15,17 +15,6 @@ typedef enum bcg_state_t {
     BCG_STATE_IN_CALL = 1 << 3
 } bcg_state;
 
-typedef enum bcg_op_argtype_t {
-    BCG_OP_ARG_TYPE_CONST_INT = 1,
-    BCG_OP_ARG_TYPE_CONST_NUM = 2,
-    BCG_OP_ARG_TYPE_CONST_STR = 3,
-    BCG_OP_ARG_TYPE_CONST_PMC = 4,
-    BCG_OP_ARG_TYPE_VAR_INT = 10,
-    BCG_OP_ARG_TYPE_VAR_NUM = 20,
-    BCG_OP_ARG_TYPE_VAR_STR = 30,
-    BCG_OP_ARG_TYPE_VAR_PMC = 40
-} bcg_op_arg_type;
-
 typedef enum bcg_unit_pragma_t {
     BCG_UNIT_PRAGMA_NONE = 0,
     BCG_UNIT_PRAGMA_MAIN = 1,
@@ -34,17 +23,30 @@ typedef enum bcg_unit_pragma_t {
     BCG_UNIT_PRAGMA_INIT = 4
 } bcg_unit_pragma;
 
+typedef enum bcg_op_arg_type_t {
+    BCG_OP_ARG_VARIABLE = 0,
+    BCG_OP_ARG_CONSTANT = 1
+} bcg_op_arg_type;
+
+typedef enum bcg_op_type_t {
+    BCG_OP = 0,
+    BCG_OP_LABEL = 1
+} bcg_op_type;
+
 typedef struct bcg_op_arg_t {
-    int type;
+    int is_constant;
+    char data_type;
     char *name;
+    int reg_num;
 } bcg_op_arg;
 
 typedef struct bcg_op_t {
     char *name;
     int op_code;
+    int type;
     char *full_name;
     int op_arg_count;
-    bcg_op_arg *op_args[0];
+    bcg_op_arg *op_args[4]; /* TODO fix this constant. */
     struct bcg_op_t *prev;
     struct bcg_op_t *next;
 } bcg_op;
@@ -68,13 +70,14 @@ typedef struct bcg_info_private_t {
 
 /* Functions for Op Arguments. */
 bcg_op_arg *bcg_op_arg_create(BCG_info * bcg_info, char *name,
-                              bcg_op_arg_type type);
+                              bcg_op_arg_type type, char data_type);
 void bcg_op_arg_destroy(BCG_info * bcg_info, bcg_op_arg * op_arg);
 
 /* Functions for Ops. */
-bcg_op *bcg_op_create(BCG_info * bcg_info, char *name);
+bcg_op *bcg_op_create(BCG_info * bcg_info, char *name, bcg_op_type op_type);
 void bcg_op_destroy(BCG_info * bcg_info, bcg_op * op);
-void bcg_add_op_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg);
+void bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg);
+void bcg_op_resolve_full_name(BCG_info * bcg_info, bcg_op * op);
 
 /* Function for Byte Code Generation unit. */
 bcg_unit *bcg_unit_create(BCG_info * bcg_info, char *name, char *pragma);

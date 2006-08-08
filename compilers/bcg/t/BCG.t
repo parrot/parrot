@@ -5,7 +5,7 @@ use warnings;
 use lib qw( . ../../../lib);
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Test create BCG pmc" );
 .sub test :main
@@ -354,7 +354,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Test val()" );
     $P1.startCodeGen()
     $P1.startSub("main","main")
     $P1.startOp("print")
-	$P1.val("1")
+	$P1.val("1","int")
     $P1.endOp()
     $P1.endSub()
     $P1.endCodeGen()
@@ -374,7 +374,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Test bad val()" );
     new $P1, "BCG"
     $P1.startCodeGen()
     $P1.startSub("main","main")
-    $P1.val("1")
+    $P1.val("1","int")
     $P1.endSub()
     $P1.endCodeGen()
     end
@@ -393,7 +393,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Test bad val()" );
     push_eh catch
     new $P1, "BCG"
     $P1.startCodeGen()
-    $P1.val("1")
+    $P1.val("1","int")
     $P1.endCodeGen()
     end
 catch:
@@ -410,7 +410,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Test bad val()" );
     loadlib P1, "bcg_group"
     push_eh catch
     new $P1, "BCG"
-    $P1.val("1")
+    $P1.val("1","int")
     end
 catch:
     get_results '(0,0)', $P0, $S0
@@ -549,3 +549,31 @@ CODE
 Expected BCG to be in IN_SUB state.
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "Test bad label()" );
+.sub test :main
+    loadlib P1, "bcg_group"
+    push_eh catch
+    new $P1, "BCG"
+    $P1.startCodeGen()
+    $P1.startSub("main","main")
+    $P1.startOp("set")
+    $P1.var("P1","pmc")
+    $P1.val("bcg","string")
+    $P1.endOp()
+    $P1.startOp("print")
+    $P1.var("P1","pmc")
+    $P1.endOp()
+    $P1.endSub()
+    $P1.endCodeGen()
+    $P1.printPASM()
+    end
+catch:
+    get_results '(0,0)', $P0, $S0
+    print $S0
+    print "\n"
+.end
+CODE
+_main:
+    set_p_sc P0, "bcg"
+    print_p P0
+OUTPUT

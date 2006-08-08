@@ -23,6 +23,8 @@ List of methods imlemented in this file.
 #include "bcg.h"
 #include "bcg_private.h"
 #include "bcg_logger.h"
+#include "bcg_reg_alloc.h"
+#include "bcg_emitter.h"
 
 /* Forward decleration */
 
@@ -110,17 +112,22 @@ BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)
     set_state(bcg_info, BCG_STATE_IN_SUB);
     unit = bcg_unit_create(bcg_info, sub_name, pragma);
     bcg_info_add_unit(bcg_info, unit);
+    unit->symbol_table = bcg_hash_create(bcg_info);
 }
 
 void
 BCG_end_sub(BCG_info * bcg_info)
 {
+    bcg_unit *curr_unit;
+
     if (!in_state(bcg_info, BCG_STATE_IN_SUB)) {
         bcg_throw_exception(bcg_info, BCG_EXCEPTION,
                             "Expected BCG to be in IN_SUB state.");
     }
 
     unset_state(bcg_info, BCG_STATE_IN_SUB);
+    curr_unit = bcg_info_current_unit(bcg_info);
+    reg_alloc_vanilla(bcg_info, curr_unit);
 }
 
 void
@@ -158,23 +165,51 @@ BCG_start_op(BCG_info * bcg_info, char *op_name)
 
     set_state(bcg_info, BCG_STATE_IN_OP);
     curr_unit = bcg_info_current_unit(bcg_info);
-    op = bcg_op_create(bcg_info, op_name);
+    op = bcg_op_create(bcg_info, op_name, BCG_OP);
     bcg_unit_add_op(bcg_info, curr_unit, op);
 }
 
 void
 BCG_end_op(BCG_info * bcg_info)
 {
+    bcg_op *curr_op;
+
     if (!in_state(bcg_info, BCG_STATE_IN_OP)) {
         bcg_throw_exception(bcg_info, BCG_EXCEPTION,
                             "Expected BCG to be in IN_CALL state.");
     }
 
     unset_state(bcg_info, BCG_STATE_IN_OP);
+    curr_op = bcg_info_current_op(bcg_info);
+    bcg_op_resolve_full_name(bcg_info, curr_op);
 }
 
 void
 BCG_var(BCG_info * bcg_info, char *var_name, char var_type)
+{
+    bcg_unit *curr_unit;
+    bcg_op *curr_op;
+    bcg_op_arg *op_arg;
+
+    if (!in_state(bcg_info, BCG_STATE_IN_OP)) {
+        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
+                            "Expected BCG to be in IN_OP state.");
+    }
+
+    curr_unit = bcg_info_current_unit(bcg_info);
+    curr_op = bcg_info_current_op(bcg_info);
+    op_arg = bcg_hash_get(bcg_info, curr_unit->symbol_table, var_name);
+    if (op_arg == NULL) {
+        op_arg =
+            bcg_op_arg_create(bcg_info, var_name, BCG_OP_ARG_VARIABLE,
+                              var_type);
+    }
+    bcg_op_add_arg(bcg_info, curr_op, op_arg);
+    bcg_hash_put(bcg_info, curr_unit->symbol_table, var_name, op_arg);
+}
+
+void
+BCG_val(BCG_info * bcg_info, char *val, char val_type)
 {
     bcg_op *curr_op;
     bcg_op_arg *op_arg;
@@ -184,28 +219,31 @@ BCG_var(BCG_info * bcg_info, char *var_name, char var_type)
                             "Expected BCG to be in IN_OP state.");
     }
 
-    UNUSED(var_type);           /* TODO value the var_type. */
     curr_op = bcg_info_current_op(bcg_info);
-    op_arg = bcg_op_arg_create(bcg_info, var_name, BCG_OP_ARG_TYPE_VAR_PMC);
-    bcg_add_op_arg(bcg_info, curr_op, op_arg);
-}
-
-void
-BCG_val(BCG_info * bcg_info, char *val)
-{
-    if (!in_state(bcg_info, BCG_STATE_IN_OP)) {
-        bcg_throw_exception(bcg_info, BCG_EXCEPTION,
-                            "Expected BCG to be in IN_OP state.");
-    }
+    op_arg = bcg_op_arg_create(bcg_info, val, BCG_OP_ARG_CONSTANT, val_type);
+    bcg_op_add_arg(bcg_info, curr_op, op_arg);
 }
 
 void
 BCG_label(BCG_info * bcg_info, char *label)
 {
+    bcg_unit *curr_unit;
+    bcg_op *op;
+
     if (!in_state(bcg_info, BCG_STATE_IN_SUB)) {
         bcg_throw_exception(bcg_info, BCG_EXCEPTION,
                             "Expected BCG to be in IN_SUB state.");
     }
+
+    curr_unit = bcg_info_current_unit(bcg_info);
+    op = bcg_op_create(bcg_info, label, BCG_OP_LABEL);
+    bcg_unit_add_op(bcg_info, curr_unit, op);
+}
+
+void
+BCG_print_pasm(BCG_info * bcg_info)
+{
+    emit_pasm(bcg_info);
 }
 
 bcg_info_private *
@@ -251,20 +289,6 @@ bcg_info_add_unit(BCG_info * bcg_info, bcg_unit * unit)
     }
     bcg_info_priv->last_unit = unit;
 
-}
-
-bcg_unit *
-bcg_info_current_unit(BCG_info * bcg_info)
-{
-    bcg_info_private *bcg_info_priv = BCG_INFO_PRIV(bcg_info);
-    return bcg_info_priv->last_unit;
-}
-
-bcg_op *
-bcg_info_current_op(BCG_info * bcg_info)
-{
-    bcg_info_private *bcg_info_priv = BCG_INFO_PRIV(bcg_info);
-    return bcg_info_priv->last_unit->last_op;
 }
 
 static void

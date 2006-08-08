@@ -35,7 +35,7 @@ void BCG_end_call(BCG_info * bcg_info);
 void BCG_start_op(BCG_info * bcg_info, char *op);
 void BCG_end_op(BCG_info * bcg_info);
 void BCG_var(BCG_info * bcg_info, char *var_name, char var_type);
-void BCG_val(BCG_info * bcg_info, char *val);
+void BCG_val(BCG_info * bcg_info, char *val, char val_type);
 void BCG_label(BCG_info * bcg_info, char *label);
 
 /* Functions to manipulate the internals of BCG_info structure. */
@@ -43,4 +43,5 @@ void BCG_label(BCG_info * bcg_info, char *label);
 //char *BCG_get_error_message(BCG_info *bcg_info);
 //int BCG_get_error_code(BCG_info *bcg_info);
 
+void BCG_print_pasm(BCG_info *bcg_info);
 #endif /* PARROT_BCG_H_GUARD */

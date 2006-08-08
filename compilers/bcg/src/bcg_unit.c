@@ -23,8 +23,8 @@ bcg_unit_destroy(BCG_info * bcg_info, bcg_unit * unit)
 {
     bcg_op *op, *cur_op;
 
-    UNUSED(bcg_info);
     mem_sys_free(unit->name);
+    bcg_hash_destroy(bcg_info, unit->symbol_table);
 
     op = unit->first_op;
     while (!op) {
@@ -50,6 +50,13 @@ bcg_unit_add_op(BCG_info * bcg_info, bcg_unit * unit, bcg_op * op)
         op->prev = unit->last_op;
     }
     unit->last_op = op;
+}
+
+bcg_unit *
+bcg_info_current_unit(BCG_info * bcg_info)
+{
+    bcg_info_private *bcg_info_priv = BCG_INFO_PRIV(bcg_info);
+    return bcg_info_priv->last_unit;
 }
 
 static int
