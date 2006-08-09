@@ -89,10 +89,12 @@ $(C_BUILTIN)/return.pir \
 $(R_BUILTIN)/source.pir \
 $(R_BUILTIN)/split.pir \
 $(R_BUILTIN)/string.pir \
+$(C_BUILTIN)/subst.pir \
 $(R_BUILTIN)/switch.pir \
 $(C_BUILTIN)/trace.pir \
 $(R_BUILTIN)/unknown.pir \
 $(R_BUILTIN)/unset.pir \
+$(C_BUILTIN)/update.pir \
 $(R_BUILTIN)/uplevel.pir \
 $(R_BUILTIN)/upvar.pir \
 $(C_BUILTIN)/variable.pir \
@@ -199,6 +201,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/dcall.t \
   t_tcl/env.t \
   t_tcl/eval.t \
+  t_tcl/event.t \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
   t_tcl/if_old.t \
@@ -222,7 +225,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/security.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
-  t_tcl/unknown.t \
+  t_tcl/upvar.t \
   t_tcl/winConsole.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
@@ -278,48 +281,43 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 # Null PMC access in name()
 #t_tcl/info.t            t_tcl/switch.t          t_tcl/lsearch.t
 #t_tcl/namespace_old.t   t_tcl/proc.t            t_tcl/http.t
-#t_tcl/while_old.t       t_tcl/proc_old.t
+#t_tcl/while_old.t       t_tcl/proc_old.t        t_tcl/utf.t
 #
 # Null PMC access in clone()
 #t_tcl/init.t            t_tcl/safe.t            t_tcl/source.t
 #t_tcl/pkg.t             t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
-#t_tcl/unixFCmd          t_tcl/unixFile.t
+#t_tcl/unixFCmd          t_tcl/unixFile.t        t_tcl/misc.t
+# 
+# clone() not implemented in class 'Undef'
+#t_tcl/listObj.t
+# push_pmc() not implemented in class 'RetContinuation'
+#t_tcl/unknown.t
 #
-# Malformed string
+# Malformed string (http://rt.perl.org/rt3/Ticket/Display.html?id=40135)
 #t_tcl/subst.t
 #
-# invalid command name "subst"
-#t_tcl/misc.t
-#
-# extra characters after close-brace
+# extra characters after close-brace (These tests require {expand}[list])
 # t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
 #
 # can't read "major": no such variable {{ [foreach] bug }}
 #t_tcl/tm.t
 #
-# Cannot get character of empty string
-#t_tcl/parseOld.t        t_tcl/upvar.t
+# Cannot get character of empty string -
+#   {test 5.11? something cumulative, as the test runs fine by itself}
+#t_tcl/parseOld.t
 #
 # invalid command name "x"
 #t_tcl/timer.t
 #
-# invalid command name "update"
-#t_tcl/event.t
-#
 # can't read "envVars": no such variable {{ [variable] bug }}
 #t_tcl/msgcat.t
 #
-# can't read "expected": no such variable
+# can't read "expected": no such variable {{ probably due to the fact
+# that tests expect to be run at the top level }}
 #t_tcl/error.t           t_tcl/uplevel.t
-#
-# clone() not implemented in class 'Undef'
-#t_tcl/listObj.t
 #
 # can't read "::tcl::OptDescN": no such variable
 #t_tcl/opt.t
-#
-# invalid command name "bytestring"
-#t_tcl/utf.t
 #
 # syntax error, unexpected LABEL
 #t_tcl/stringObj.t

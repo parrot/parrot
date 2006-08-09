@@ -128,16 +128,15 @@ proc test {num description code args} {
     }
 }
 
-# XXX hacks to allow compilation.
+# XXX hacks to allow compilation of tests.
 
 # Constraints are like skip conditions that
 # can be specified by a particular invocation to test. Since we're ingoring
 # all the option params to test, we'll ignore this one two, and execute tests
 # when we shouldn't.
 
-proc testConstraint {args} {}
-
+proc testConstraint     {args} {}
 proc temporaryDirectory {args} {}
-proc makeFile {args} {}
-proc removeFile {args} {}
-
+proc makeFile           {args} {}
+proc removeFile         {args} {}
+proc bytestring         {args} {}
