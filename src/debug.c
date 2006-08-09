@@ -2497,7 +2497,7 @@ GDB_B(Interp *interpreter, char *s) {
         }
         newbreak->pc = pc;
         newbreak->id = *pc;
-        *pc = PARROT_OP_debug_brk;
+        *pc = PARROT_OP_trap;
         return nr;
     }
     return -1;

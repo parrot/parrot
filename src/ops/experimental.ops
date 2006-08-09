@@ -252,20 +252,24 @@ op classname(out PMC, invar PMC) :object_base {
 
 =over 4
 
-=item C<debug_brk>
+=item C<trap>
 
 Break into debugger. Implementation notes:
 
  - x86/gcc ... works with gdb
+ - ppc/gcc ... works with gdb, to proceed: gdb> p $pc = $pc + 4
  - TODO
 
 For other architectures, this is a C<noop>.
 
 =cut
 
-op debug_brk() {
+op trap() {
 #if defined(__GNUC__) && defined(i386)
     __asm__("int3");       /* opcode 0xcc */
+#endif
+#if defined(__GNUC__) && defined(PPC)
+    __asm__("trap");       /* opcode tr 31,0,0 */
 #endif
     goto NEXT();
 }
