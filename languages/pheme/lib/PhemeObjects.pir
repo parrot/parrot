@@ -8,6 +8,34 @@
 	addattribute cons_class, 'tail'
 .end
 
+.sub '__get_bool'
+	.return( 1 )
+.end
+
+.sub '__get_string' :method
+	.local pmc    head
+	.local string output
+	head    = self.'head'()
+
+	.local int head_defined
+	head_defined = defined head
+	unless head_defined goto return_it
+	output  = head
+
+	.local pmc tail
+	tail = self.'tail'()
+	
+	.local string tail_output
+	tail_output = tail
+	unless tail_output goto return_it
+
+	output .= ':'
+	output .= tail_output
+
+  return_it:
+	.return( output )
+.end
+
 .sub 'head' :method
 	.param pmc new_head  :optional
 	.param int have_head :opt_flag

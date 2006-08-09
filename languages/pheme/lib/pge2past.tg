@@ -6,6 +6,7 @@ transform result (ROOT) :language('PIR') {
 	specials = new .Hash
 	specials['define'] = 1
 	specials['quote']  = 1
+	specials['cond']   = 1
 
 	store_global 'specials', specials
 
@@ -217,6 +218,74 @@ transform quote (PAST::Exp) :language( 'PIR' ) {
 	unshift children, cons_op
 
 	.return( sibling )
+}
+
+transform cond (PAST::Exp) :language( 'PIR' ) {
+	.local pmc result
+	result = new 'PAST::Exp'
+
+	# cond takes a list of pairs
+	# ( condition to evaluate ) result
+	# rewrite so that there are no ops, only vals
+
+	.local pmc iter
+	iter = node.'child_iter'()
+
+	.local pmc child
+	.local pmc new_child
+
+	# first node is the 'cond' node
+	child   = shift iter
+	result.'add_child'( child )
+	$S0 = child.'op'()
+
+  iter_loop:
+	unless iter goto iter_end
+	child     = shift iter
+	new_child = tree.'get'( 'node_to_val', child )
+	result.'add_child'( new_child )
+	goto iter_loop
+  iter_end:
+
+	.return( result )
+}
+
+transform node_to_val (PAST::Exp) :language('PIR') {
+	.local pmc result
+	result = new 'PAST::Exp'
+
+	.local pmc iter
+	iter = node.'child_iter'()
+
+	.local pmc child
+	.local pmc new_child
+
+  iter_loop:
+	unless iter goto iter_end
+	child     = shift iter
+	new_child = tree.'get'( 'node_to_val', child )
+	result.'add_child'( new_child )
+	goto iter_loop
+  iter_end:
+
+	.return( result )
+}
+
+transform node_to_val (PAST::Op) :language('PIR') {
+	.local pmc    result
+	.local string value
+
+	result = new 'PAST::Val'
+	value  = node.'op'()
+
+	result.'value'( value )
+	result.'valtype'( 'literal' )
+
+	.return( result )
+}
+
+transform node_to_val (PAST::Val) :language('PIR') {
+	.return( node )
 }
 
 # XXX: almost certainly wrong
