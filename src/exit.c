@@ -61,28 +61,26 @@ Exit, calling any registered exit handlers.
 
 void
 Parrot_exit(Interp *interp, int status) {
+    handler_node_t * next, *node;
     /* call all the exit handlers */
-
-    /* Must write the loop this way to protect against an exit handler calling
-       exit and re-entering this function. */
 
     /* we are well "below" the runloop now, where lo_var_ptr
      * is set usually - exit handlers may run some resource-hungry
      * stuff like printing profile stats - a DOD run would kill
-     * resources - reset stacktop
-     *
-     * ARGH  --leo: this damned function doesn't have an interpreter arg
-     * XXX FIXME - API
-     *
-     * XXX FIXME - and what about multiple interpreters - the first exit
-     *             call would run all exit handlers
+     * resources - TODO reset stacktop or better disable GC
      */
-    while (interp->exit_handler_list) {
-        handler_node_t * const node = interp->exit_handler_list;
-
-        interp->exit_handler_list = interp->exit_handler_list->next;
+    node = interp->exit_handler_list;
+    /*
+     * we don't allow new exit_handlers being installed inside exit handlers
+     * - do we?
+     * and: interp->exit_handler_list is gone, after the last exit handler
+     *      (Parrot_really_destroy) has run  
+     */
+    while (node) {
+        next = node->next;
         (node->function)(interp, status, node->arg);
         mem_sys_free(node);
+        node = next;
     }
 
     exit(status);
