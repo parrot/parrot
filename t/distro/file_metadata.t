@@ -187,7 +187,7 @@ sub verify_attributes {
     }
  
     foreach my $file (@files) {
-        my $actual   = "$file - (" . $results->{$file} . ")"; 
+        my $actual   = "$file - (" . ($results->{$file} || '') . ")"; 
         my $platonic;
         if ($exact) {
             $platonic = "$file - ($expected)";
