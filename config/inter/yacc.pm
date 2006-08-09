@@ -94,8 +94,12 @@ sub runstep
                 return;
             }
 
-            unless (($prog_major >= $rmajor)
-                and ($prog_minor >= $rminor)) {
+            unless (
+		            $prog_major >= $rmajor
+
+		    or (    $prog_major == $rmajor
+			and $prog_minor >= $rminor )
+		   ) {
                 $self->set_result("found bison version $prog_version"
                         . " but at least $rmajor.$rminor is required");
                 return;

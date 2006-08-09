@@ -97,9 +97,16 @@ sub runstep
                 return;
             }
 
-            unless (($prog_major >= $rmajor)
-                and ($prog_minor >= $rminor)
-                and ($prog_patch >= $rpatch)) {
+            unless (
+		            $prog_major >= $rmajor
+
+		    or (    $prog_major == $rmajor
+			and $prog_minor >= $rminor )
+
+		    or (    $prog_major == $rmajor
+			and $prog_minor == $rminor
+			and $prog_patch >= $rpatch )
+		   ) {
                 $self->set_result("found flex version $prog_version"
                         . " but at least $rmajor.$rminor.$rpatch is required");
                 return;
