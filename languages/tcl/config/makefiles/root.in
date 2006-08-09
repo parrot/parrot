@@ -212,7 +212,6 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
   t_tcl/lset.t \
-  t_tcl/lsetComp.t \
   t_tcl/notify.t \
   t_tcl/package.t \
   t_tcl/pid.t \
@@ -241,6 +240,7 @@ RUNNABLE_TCL_TESTS = \
 #t_tcl/parseExpr.t       t_tcl/pkgMkIndex.t      t_tcl/winFCmd.t
 #t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/winPipe.t
 #t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t
+#t_tcl/lsetComp.t
 #
 # invalid command name "list" | can't rename "list": command doesn't exist
 #t_tcl/regexpComp.t      t_tcl/rename.t          t_tcl/basic.t
