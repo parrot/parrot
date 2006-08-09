@@ -26,7 +26,10 @@
 
   ($P0,$I2) = __index(first, the_list)
   first = $P0
+  if first >= 0 goto _last
+  first = 0
 
+ _last:
   .local pmc last
   last = argv[2]
 
@@ -59,6 +62,4 @@ LOOP:
   goto LOOP
 DONE:
   .return (retval)
-
-
 .end
