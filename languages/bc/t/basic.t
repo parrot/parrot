@@ -23,7 +23,7 @@ use Parrot::Test;
 use Test::More;
 
 if ( $Parrot::Config::PConfig{has_python} ) {
-  plan tests => 87;
+  plan tests => 88;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
@@ -149,12 +149,13 @@ my @tests = (
        # named expressions
        [ "a", [0], 'uninitialized a', with_antlr3 => 1, ],
        [ "a;b;c;d;x;y;z", [ (0) x 7 ], 'more uninitialized vars', with_antlr3 => 1, ],
-       [ "a; a = 1; a", [0,1], 'assign number to lexical' ],
-       [ 'a; b; a = 4; b = a; c = 1; "a = "; a;  "b = "; b;  "c = "; c', [ 0, 0, 'a = 4', 'b = 4', 'c = 1' ], 'assing lexical to lexical' ], 
+       [ "a; a = 1; a", [0,1], 'assign number to lexical', with_antlr3 => 1, ],
+       [ 'a; b; a = 4; b = 5; c = 6; "a = "; a;  "b = "; b;  "c = "; c', [ 0, 0, 'a = 4', 'b = 5', 'c = 6' ], 'assign several lexicals' ], 
+       [ 'a; b; a = 4; b = a; c = 1; "a = "; a;  "b = "; b;  "c = "; c', [ 0, 0, 'a = 4', 'b = 4', 'c = 1' ], 'assign lexical to lexical' ], 
 
        # increment and decrement 
-       [ "a; a = 1; a; ++a; a", [0,1,2,2], 'increment' ],
-       [ "a; a = 1; a; --a; a", [0,1,0,0], 'decrement' ],
+       [ "a; a = 1; a; ++a; a", [0,1,2,2], 'increment', with_antlr3 => 0, ],
+       [ "a; a = 1; a; --a; a", [0,1,0,0], 'decrement', with_antlr3 => 0, ],
 
        # If 
        [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition' ],

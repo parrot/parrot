@@ -45,7 +45,9 @@ statement
   ;
 
 expression
-  : named_expression
+  : named_expression ASSIGN_OP^^ expression 
+    |
+    named_expression
     |
     adding_expression
   ;
@@ -68,7 +70,7 @@ multiplying_expression
 unary_expression
   : postfix_expression
     |
-    ( INCR^^ | DECR^^ ) postfix_expression
+    INCR_DECR^^ postfix_expression
   ;
 
 postfix_expression
@@ -100,15 +102,14 @@ MUL_OP
   : '*' | '/' | '%'
   ;
 
-INCR
-  : '++'
+ASSIGN_OP
+  : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' 
   ;
 
-DECR
-  : '--'
+INCR_DECR
+  : '++' | '--'
   ;
 
-// quit is required, make testing easier
 // quit is required, make testing easier
 quit
   : 'quit'

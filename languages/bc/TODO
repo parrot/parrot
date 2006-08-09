@@ -4,6 +4,8 @@
 # Some tidbits on what is to do for Parrot bc.
 # See docs/parrot_bc.pod for visions.
 
+- Generate PRINT_OP and SAY_OP within the ANTLR3 AST
+
 - Keep track of named variables and initialize them during execution
 
 - Get rid of ANTLR 2

@@ -218,7 +218,11 @@ expression[String reg_mother]
     {
       String mother_for_string = $expression.reg_mother;
     }
-    string[ mother_for_string ]
+    (
+      string[ mother_for_string ]
+      |
+      assign[ mother_for_string ]
+    )
   ;
 
 string [ String reg_mother ]
@@ -228,7 +232,6 @@ string [ String reg_mother ]
       System.out.print(     
           "                                                                \n"
         + "# entering 'string'                                             \n"
-        + "# " + $STRING.text + "                                          \n"
         + "    reg_expression_stmt = new 'PAST::Stmt'                      \n"
         + "      reg_expression_topexp = new 'PAST::Exp'                   \n"
         + "        reg_expression_op = new 'PAST::Op'                      \n"
@@ -247,7 +250,33 @@ string [ String reg_mother ]
       );
     }
   ;
-  
+
+assign [ String reg_mother ]
+  : ^( ASSIGN_OP ^(VAR LETTER) NUMBER )
+    {
+      // TODO: strip String
+      System.out.print(     
+          "                                                                  \n"
+        + "    # entering 'ASSIGN_OP ^(VAR LETTER) NUMBER'                   \n"
+        + "      .sym pmc past_op                                            \n"
+        + "      past_op = new 'PAST::Op'                                    \n"
+        + "      past_op.'op'( 'infix:" + $ASSIGN_OP.text + "' )             \n"
+        + "        .sym pmc past_var                                         \n"
+        + "        past_var = new 'PAST::Var'                                \n"
+        + "        past_var.'varname'( '" + $LETTER.text + "' )              \n"
+        + "        past_var.'vartype'( 'scalar' )                            \n"
+        + "        past_var.'scope'( 'global' )                              \n"
+        + "      past_op.'add_child'( past_var )                             \n"
+        + "        .sym pmc past_val                                         \n"
+        + "        past_val = new 'PAST::Val'                                \n"
+        + "        past_val.'value'( " + $NUMBER.text + " )                  \n"
+        + "        past_val.'valtype'( 'int' )                               \n"
+        + "      past_op.'add_child'( past_val )                             \n"
+        + "    " + $assign.reg_mother + ".'add_child'( past_op )             \n"
+        + "    # leaving  'ASSIGN_OP named_expression NUMBER'                \n"
+      );
+    }
+  ;
 
 
 integer[ String reg_mother ]
