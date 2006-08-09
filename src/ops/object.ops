@@ -269,14 +269,14 @@ inline op subclass(out PMC, invar PMC) :object_classes {
   goto NEXT();
 }
 
-inline op subclass(out PMC, invar PMC, in STR) :object_base {
+inline op subclass(out PMC, invar PMC, in STR) :object_classes {
   PMC *name = pmc_new(interpreter, enum_class_String);
   VTABLE_set_string_native(interpreter, name, $3);
   $1 = VTABLE_subclass(interpreter, $2, name);
   goto NEXT();
 }
 
-inline op subclass(out PMC, invar PMC, in PMC) :object_base {
+inline op subclass(out PMC, invar PMC, in PMC) :object_classes {
   $1 = VTABLE_subclass(interpreter, $2, $3);
   goto NEXT();
 }
@@ -301,7 +301,7 @@ subclass is an anonymous subclass.
 
 =cut
 
-inline op subclass(out PMC, inconst PMC) :object_classes {
+op subclass(out PMC, inconst PMC) :object_classes {
   PMC *class = Parrot_class_lookup_p(interpreter, $2);
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
@@ -325,7 +325,7 @@ op subclass(out PMC, in STR) :object_classes {
 }
 
 
-inline op subclass(out PMC, inconst PMC, in STR) :object_base {
+op subclass(out PMC, inconst PMC, in STR) :object_classes {
   PMC *class = Parrot_class_lookup_p(interpreter, $2);
   PMC *subname_p;
   opcode_t *next = expr NEXT();
@@ -355,7 +355,7 @@ op subclass(out PMC, in STR, in STR) :object_classes {
 }
 
 
-inline op subclass(out PMC, inconst PMC, in PMC) :object_base {
+op subclass(out PMC, inconst PMC, in PMC) :object_classes {
   PMC *class = Parrot_class_lookup_p(interpreter, $2);
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
