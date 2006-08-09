@@ -72,6 +72,7 @@ $(R_BUILTIN)/linsert.pir \
 $(C_BUILTIN)/list.pir \
 $(R_BUILTIN)/lrange.pir \
 $(R_BUILTIN)/lrepeat.pir \
+$(R_BUILTIN)/lreplace.pir \
 $(C_BUILTIN)/lsearch.pir \
 $(R_BUILTIN)/lset.pir \
 $(R_BUILTIN)/lsort.pir \
