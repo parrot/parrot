@@ -8,7 +8,7 @@
     if $I0 == 0 goto error
     $P0 = getclass 'Cardinal::PIRGrammar'
     addattribute $P0, 'scope_stack'
-    addattribute $P0, 'top_level_code'
+    addattribute $P0, 'sub_stack'
     .return ()
 error:
     print "Cardinal::PIRGrammar class not found\n"
@@ -32,16 +32,37 @@ error:
 
 .sub 'add_sub' :method
     .param pmc subcode
-    $P0 = self.'top_level_code'()
-    $P0 .= subcode
+    $P0 = self.'sub_stack'()
+    push $P0, subcode
     .return ()
 .end
 
-.sub 'top_level_code' :method
+.sub 'gen_subs' :method
+    $S0 = ""
+    $P0 = self.'sub_stack'()
+    .local pmc iter
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $S1 = $P0
+    $S0 .= $S1
+    goto iter_loop
+  iter_end:
+    .return ($S0)
+.end
+
+.sub 'sub_stack' :method
     .param pmc attr           :optional
     .param int has_attr       :opt_flag
-    $P0 = self.'attr'('top_level_code', attr, has_attr)
-    .return ($P0)
+    .local pmc value
+    value = self.'attr'('sub_stack', attr, has_attr)
+    $I0 = defined value
+    if $I0 goto end
+    value = new .ResizablePMCArray
+    value = self.'attr'('sub_stack', value, 1)
+  end:
+    .return (value)
 .end
 
 .sub 'scope_stack' :method

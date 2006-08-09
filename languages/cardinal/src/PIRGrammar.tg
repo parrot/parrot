@@ -27,10 +27,9 @@ grammar Cardinal::PIRGrammar is TGE::Grammar;
 
 transform root (Cardinal::POST::Ops) :language('PIR') {
     .local pmc code
-    code = new 'PGE::CodeString'
-    self.'top_level_code'(code)
     $P0 = tree.get('pir', node)
-    $P0 .= code
+    $S0 = self.'gen_subs'()
+    $P0 .= $S0
     .return ($P0)
 }
 
@@ -142,8 +141,7 @@ transform pir (Cardinal::POST::Call) :language('PIR') {
     .local pmc code
     .local string sub_name
     .local string args
-    $P0 = node[0]
-    sub_name = $P0.'name'()
+    sub_name = node.'name'()
     args = ""
     code = new 'PGE::CodeString'
     code.'emit'("    '%0'(%1)", sub_name, args)
@@ -184,11 +182,14 @@ transform pir (Cardinal::POST::Sub) :language('PIR') {
     outerattr = concat outerattr, "')"
   with_outerattr:
     .local pmc code, iter, subcode
+    .local pmc subcode_parts
     ## build the code for this sub
     .local string adverbs
     adverbs = node.'adverbs'()
     prologue.'emit'("\n.sub '%0' %1 %2", name, outerattr, adverbs)
     subcode = new 'PGE::CodeString'
+    subcode_parts = new 'PGE::CodeString'
+    self.'add_sub'(subcode)
 
     $P2 = self.'scope_stack'()
     push $P2, node
@@ -197,17 +198,17 @@ transform pir (Cardinal::POST::Sub) :language('PIR') {
     unless iter goto iter_end
     $P0 = shift iter
     $P1 = tree.'get'('pir', $P0)
-    subcode .= $P1
+    subcode_parts .= $P1
     goto iter_loop
   iter_end:
     pop $P0, $P2
     
     .local string value
     prologue = node.'prologue'()
-    subcode = concat prologue, subcode
+    subcode .= prologue
+    subcode .= subcode_parts
     value = node.'value'()
     subcode.'emit'("    .return (%0)\n.end\n", value)
-    self.'add_sub'(subcode)
     
     ne subtype, 'begin', return
     ##  generate the pir to locate this sub and return it

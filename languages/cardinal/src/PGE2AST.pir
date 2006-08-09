@@ -105,13 +105,18 @@ error:
     pop block, $P0
     vdecl = block.'vardecl'(name)
     $I0 = isa vdecl, 'Cardinal::PAST::Var'
-    unless $I0 goto iter_loop
+    unless $I0 goto not_var
     unless $I1 == 1 goto not_local
     .return ('local')
   not_local:
     .return ('outer')
   iter_end:
     .return ('lexical')
+
+  not_var:
+    $I0 = isa vdecl, 'Cardinal::PAST::Block'
+    unless $I0 goto iter_loop
+    .return ('func')
 .end
 
 

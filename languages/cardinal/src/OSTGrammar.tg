@@ -53,9 +53,10 @@ transform root (ROOT) :language('PIR') {
     ops.'add_child'(main)
     ops.'add_child'(load)
     $P0 = tree.'get'('post', node)
+    $S0 = $P0.'name'()
     .local pmc call_op
     call_op = new 'Cardinal::POST::Call'
-    call_op.'init'($P0, 'node'=>node)
+    call_op.'init'('node'=>node, 'name'=>$S0)
 
     op = new 'Cardinal::POST::Op'
     op.'init'("'languages/cardinal/src/builtins_gen.pir'", 'node'=>node, 'name'=>'load_bytecode')
@@ -558,6 +559,15 @@ transform post (Cardinal::PAST::Var) :language('PIR') {
     scope = node.'scope'()
     post = new 'Cardinal::POST::Var'
     post.'init'('node'=>node, 'name'=>name, 'scope'=>scope)
+    .return (post)
+}
+
+transform post (Cardinal::PAST::FunctionCall) :language('PIR') {
+    .local string name
+    .local pmc post
+    name = node.'name'()
+    post = new 'Cardinal::POST::Call'
+    post.'init'('node'=>node, 'name'=>name)
     .return (post)
 }
 
