@@ -33,13 +33,16 @@ To prepare a release:
 
         e.  Make sure RESPONSIBLE_PARTIES is still accurate.
 
-        f.  Update PBC_COMPAT, perhaps by collapsing intra-release entries
+        f.  Run "perl t/harness t/distro/*.t", and either fix what those tests
+            complain about, or fix them so they don't complain.
+   
+        g.  Update PBC_COMPAT, perhaps by collapsing intra-release entries
             into a single entry naming the release.
 
-        g.  Run C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
+        h.  Run C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
             to update version and fingerprint in the native tests.
 
-        h.  Make sure everything works:
+        i.  Make sure everything works:
 
               $ make realclean
               $ perl Configure.pl ...
