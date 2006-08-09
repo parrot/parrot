@@ -2548,6 +2548,7 @@ store:
                 break;
 
             case PARROT_ARG_KC:
+            case PARROT_ARG_PC:
 #    if EXEC_CAPABLE
                 if (jit_info->objfile) {
                     emitm_pushl_m(jit_info->native_ptr, CONST(i));
