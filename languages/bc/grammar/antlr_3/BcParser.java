@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-08-09 00:03:10
+// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-08-09 22:58:49
 
 import org.antlr.runtime.*;
 import java.util.Stack;
