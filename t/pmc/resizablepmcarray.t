@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -1000,6 +1000,126 @@ ok 12 - indexing elements
 ok 13 - indexing elements
 OUTPUT
 
+my $splice_preamble = <<'END_TEMPLATE';
+.sub splice :main
+    P1 = new 'ResizablePMCArray'
+    P1[0] = 1
+    P1[1] = 2
+    P1[2] = 3
+    P1[3] = 4
+    P1[4] = 5
+END_TEMPLATE
+
+my $splice_postamble = <<'END_TEMPLATE';
+    P3 = new 'Iterator', P1
+  loop:
+    unless P3 goto loop_end
+    P4 = shift P3
+    print P4 
+    goto loop
+  loop_end:
+    print "\n"
+.end
+END_TEMPLATE
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice, complete replace');
+  $splice_preamble 
+  P2 = new 'ResizablePMCArray'
+  P2[0] = 'A'
+  P2[1] = 'B'
+  P2[2] = 'C'
+  P2[3] = 'D'
+  P2[4] = 'E'
+  splice P1, P2, 0, 5
+  $splice_postamble
+CODE
+ABCDE
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice, append');
+  $splice_preamble 
+  P2 = new 'ResizablePMCArray'
+  P2[0] = 'A'
+  P2[1] = 'B'
+  P2[2] = 'C'
+  P2[3] = 'D'
+  P2[4] = 'E'
+  splice P1, P2, 4, 0
+  $splice_postamble
+CODE
+12345ABCDE
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice, append-in-middle');
+  $splice_preamble
+  P2 = new 'ResizablePMCArray'
+  P2[0] = 'A'
+  P2[1] = 'B'
+  P2[2] = 'C'
+  P2[3] = 'D'
+  P2[4] = 'E'
+  splice P1, P2, 2, 0
+  $splice_postamble
+CODE
+123ABCDE45
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice, replace at beginning');
+  $splice_preamble 
+  P2 = new 'ResizablePMCArray'
+  P2[0] = 'A'
+  P2[1] = 'B'
+  P2[2] = 'C'
+  P2[3] = 'D'
+  P2[4] = 'E'
+  splice P1, P2, 0, 2
+  $splice_postamble
+CODE
+ABCDE345
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice, replace in middle');
+  $splice_preamble 
+  P2 = new 'ResizablePMCArray'
+  P2[0] = 'A'
+  P2[1] = 'B'
+  P2[2] = 'C'
+  P2[3] = 'D'
+  P2[4] = 'E'
+  splice P1, P2, 2, 2
+  $splice_postamble
+CODE
+12ABCDE5
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice, replace at end');
+  $splice_preamble 
+  P2 = new 'ResizablePMCArray'
+  P2[0] = 'A'
+  P2[1] = 'B'
+  P2[2] = 'C'
+  P2[3] = 'D'
+  P2[4] = 'E'
+  splice P1, P2, 3, 2
+  $splice_postamble
+CODE
+123ABCDE
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice with another type');
+  $splice_preamble 
+  P2 = new 'Array'
+  P2 = 5
+  P2[0] = 'A'
+  P2[1] = 'B'
+  P2[2] = 'C'
+  P2[3] = 'D'
+  P2[4] = 'E'
+  splice P1, P2, 3, 2
+  $splice_postamble
+CODE
+123ABCDE
+OUTPUT
 
 # don't forget to change the number of tests
 # vim: expandtab sw=4

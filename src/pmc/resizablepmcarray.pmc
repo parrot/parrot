@@ -630,6 +630,77 @@ Append the other array to this array.
         }
     }
 
+/*
+
+=item C<void splice(PMC* value, INTVAL offset, INTVAL count)>
+
+Replaces C<count> elements starting at C<offset> with the elements in
+C<value>.
+
+If C<count> is 0 then the elements in C<value> will be inserted after
+C<offset>.
+
+Note that the C<value> PMC can be of any of the various array types.
+
+Note that this implementation can be *VERY* inefficient as it manipulates
+everything via the VTABLE api.
+
+=cut
+
+*/
+
+    void splice(PMC* value, INTVAL offset, INTVAL count) {
+       INTVAL value_length, length;
+       INTVAL i,j, num_to_save;
+       PMC *element, *stack;
+
+       value_length = VTABLE_elements(INTERP,value);
+             length = VTABLE_elements(INTERP,SELF);
+
+       /* start from end? */
+        if (offset < 0)
+            offset += length;
+        if (offset < 0)
+            internal_exception(OUT_OF_BOUNDS, "illegal splice offset\n");
+
+        /* leave that many elements off the end of the array */
+        if (count < 0)
+            count += length - offset + 1;
+        if (count < 0)
+            count = 0;
+
+        num_to_save = length-(offset+count);
+        if (!count) num_to_save--;
+
+        stack = pmc_new(INTERP, SELF->vtable->base_type);
+
+        /* save off items that we'll need from the end... */
+        if (num_to_save > 0) {
+            for (i = 0; i < num_to_save; i++) {
+                element = SELF.pop_pmc();
+                VTABLE_set_pmc_keyed_int(INTERP, stack, i, element);
+            }
+        }
+
+       /* replace count items at offset with values */
+        for (i = j = 0; i < count && j < value_length; i++, j++) {
+            element = VTABLE_get_pmc_keyed_int(INTERP, value, j);
+            DYNSELF.set_pmc_keyed_int(offset+i, element);
+        }
+
+        /* if we still have values in value_list, insert them */
+        if (j < value_length) {
+            for (; j < value_length; i++, j++) {
+                element = VTABLE_get_pmc_keyed_int(INTERP, value, j);
+                DYNSELF.push_pmc(element);
+            }
+        }
+        
+        while (PMC_int_val(stack)) {
+            element = VTABLE_pop_pmc(INTERP, stack);
+            DYNSELF.push_pmc(element);
+        }
+    }
 }
 
 /*
