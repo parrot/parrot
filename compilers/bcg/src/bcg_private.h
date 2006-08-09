@@ -25,7 +25,8 @@ typedef enum bcg_unit_pragma_t {
 
 typedef enum bcg_op_arg_type_t {
     BCG_OP_ARG_VARIABLE = 0,
-    BCG_OP_ARG_CONSTANT = 1
+    BCG_OP_ARG_CONSTANT = 1,
+    BCG_OP_ARG_ADDRESS = 2
 } bcg_op_arg_type;
 
 typedef enum bcg_op_type_t {
@@ -46,7 +47,7 @@ typedef struct bcg_op_t {
     int type;
     char *full_name;
     int op_arg_count;
-    bcg_op_arg *op_args[4]; /* TODO fix this constant. */
+    bcg_op_arg **op_args;
     struct bcg_op_t *prev;
     struct bcg_op_t *next;
 } bcg_op;

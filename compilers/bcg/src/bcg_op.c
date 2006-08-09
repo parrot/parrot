@@ -57,8 +57,20 @@ bcg_op_destroy(BCG_info * bcg_info, bcg_op * op)
 void
 bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg)
 {
-    op->op_args[op->op_arg_count]=op_arg;
+    //op->op_args[op->op_arg_count]=op_arg;
     op->op_arg_count++;
+
+    if (op->op_arg_count == 1) {
+        op->op_args =
+            (bcg_op_arg **) mem_sys_allocate_zeroed(sizeof(bcg_op_arg *));
+    }
+    else {
+        op->op_args =
+            (bcg_op_arg **) mem_sys_realloc(op->op_args,
+                                            sizeof(bcg_op_arg *) *
+                                            (op->op_arg_count));
+    }
+    op->op_args[op->op_arg_count - 1] = op_arg;
 }
 
 void

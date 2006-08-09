@@ -18,9 +18,11 @@ reg_alloc_vanilla(BCG_info * bcg_info, bcg_unit * unit)
             bcg_op_arg *op_arg;
             for (i = 0; i < op->op_arg_count; i++) {
                 op_arg = op->op_args[i];
-                op_arg->reg_num =
-                    assig_reg_num(reg_count, op_arg->data_type,
-                                  op_arg->reg_num);
+                if (!op_arg->is_constant) {
+                    op_arg->reg_num =
+                        assig_reg_num(reg_count, op_arg->data_type,
+                                      op_arg->reg_num);
+                }
             }
         }
         op = op->next;
