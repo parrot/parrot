@@ -663,8 +663,8 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
     $P0 = self.'top_scope_stack'()
     block = new 'Cardinal::PAST::Block'
     block.'init'('node'=>node, 'blocktype'=>'begin', 'outer'=>$P0)
-    $P0 = node['body_statement']
 
+    $P0 = node['body_statement']
     self.'push_scope_stack'(block)
     child = tree.get('result', $P0, 'Cardinal::Grammar::body_statement')
     self.'pop_scope_stack'()
@@ -674,7 +674,7 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
 
   try_def:
     $I0 = defined node['def']
-    unless $I0 goto err_no_tree
+    unless $I0 goto try_class
     .local pmc function
     .local string function_name
     $P0 = node['function_name']
@@ -682,14 +682,12 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
 
     $P0 = self.'top_scope_stack'()
     function = new 'Cardinal::PAST::Block'
-    function.'init'('node'=>node, 'name'=>function_name, 'blocktype'=>function, 'outer'=>$P0)
+    function.'init'('node'=>node, 'name'=>function_name, 'blocktype'=>'function', 'outer'=>$P0)
     $P0 = node['function_prototype_arg_list']
     
     self.'add_to_current_block'(function_name, function)
 
-    self.'push_scope_stack'(function)
     child = tree.get('result', $P0, 'Cardinal::Grammar::function_prototype_arg_list')
-    self.'pop_scope_stack'()
     
     .local pmc iter
     iter = new .Iterator, child
@@ -701,15 +699,44 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
   iter_end1:
 
     $P0 = node['body_statement']
+    self.'push_scope_stack'(function)
     child = tree.get('result', $P0, 'Cardinal::Grammar::body_statement')
+    self.'pop_scope_stack'()
     function.'add_child'(child)
     .return (function)
+  
+  try_class:
+    $I0 = defined node['class']
+    unless $I0 goto err_no_tree
+
+    $P0 = self.'top_scope_stack'()
+    .local pmc class_block
+    class_block = new 'Cardinal::PAST::Block'
+    class_block.'init'('node'=>node, 'name'=>function_name, 'blocktype'=>'class', 'outer'=>$P0)
+
+    $I0 = defined node['class_path']
+    unless $I0 goto try_class
+    child = tree.get('result', $P0, 'Cardinal::Grammar::class_path')
+    class_block.'add_child'(child)
+
+    $I0 = defined node['superclass']
+    unless $I0 goto class_body
+    child = tree.get('result', $P0, 'Cardinal::Grammar::superclass')
+    class_block.'add_child'(child)
+
+  class_body:
+    $P0 = node['body_statement']
+    self.'push_scope_stack'(class_block)
+    child = tree.get('result', $P0, 'Cardinal::Grammar::body_statement')
+    self.'pop_scope_stack'()
+    class_block.'add_child'(child)
+    .return (class_block)
 
   done:
     .return (child)
 
   err_no_tree:
-    print "The atom node doesn't contain a 'luteral' or a 'string'  match.\n"
+    print "The atom node doesn't contain an appropriate match.\n"
     .kdump2(node, "atom")
     end
 }
@@ -753,6 +780,44 @@ transform result (Cardinal::Grammar::function_name) :language('PIR') {
   err_no_tree:
     print "The function_name node doesn't contain a the right component matchs.\n"
     .kdump2(node, 'function_name')
+    end
+}
+transform result (Cardinal::Grammar::class_path) :language('PIR') {
+    .local pmc result
+    .local pmc child
+    result = new 'Cardinal::PAST::Op'
+    result.'init'('node'=>node, 'name'=>'class_path')
+    
+    $I0 = defined node['starting_colons']
+    unless $I0 goto atoms
+    $P0 = node['starting_colons']
+    #result.'starting_colons'(1)
+
+  atoms:
+    $I0 = defined node['atom']
+    unless $I0 goto get_name
+    $P0 = node['atom']
+
+    .local pmc iter
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    $P1 = shift iter
+    child = tree.get('result', $P1, 'Cardinal::Grammar::atom')
+    result.'add_child'(child)
+    goto iter_loop
+  iter_end:
+
+  get_name:
+    $I0 = defined node['classname']
+    unless $I0 goto err_no_tree
+    $S0 = node['classname']
+
+    .return (result)
+
+  err_no_tree:
+    print "The class_path node doesn't contain a the right component matchs.\n"
+    .kdump(node)
     end
 }
 

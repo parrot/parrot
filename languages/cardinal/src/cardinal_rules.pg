@@ -158,7 +158,7 @@ rule left_hand_side {
 
 
 rule class_name {<IDENTIFIER>|<CONSTANT>}
-rule class_path {[\:\:]? [<atom> \:\:]* <class_name>}
+rule class_path {$<start_colons>:=[\:\:]? [<atom> \:\:]* <class_name>}
 
 #OLD_CLASS_NAME/PATH
 #rule class_name {<IDENTIFIER>|<CONSTANT>}
@@ -309,9 +309,9 @@ rule atom { <literal>
           |<'until'> <expression> <'do'>? <compound_statement> <'end'>
           |<'case'> <?terminators>? <expression> <?terminator>? [<WHEN> <expression> <then_clause> <compound_statement>]+ <else_clause>? <'end'>
           |<'for'> <for_variable> <'in'> <expression> <compound_statement> <'end'>
-          |<'class'> <class_path> <superclass> <'do'>? <body_statement> <'end'>
-          |<'class'> \<\< <expression> <term> <body_statement> <'end'>
-          |<'moldule'> <class_path> <body_statement> <'end'>
+          |$<class>:=<'class'> <class_path> <superclass> <'do'>? <body_statement> <'end'>
+          |$<class2>:=<'class'> \<\< <expression> <term> <body_statement> <'end'>
+          |$<module>:=<'module'> <class_path> <body_statement> <'end'>
           |$<def>:=<'def'> [singleton [\.|\:\:]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'>
           |<variable>
 }

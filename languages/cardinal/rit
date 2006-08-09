@@ -6,11 +6,17 @@ use warnings;
 
 my $PARROT = '../../parrot';
 my $CARDINAL = 'cardinal.pbc';
-my $CURRENT_TEST = 't/function_calls_1.rb';
-#my $CURRENT_TEST = 't/begin_end_block_1.rb';
+my $CURRENT_TEST = slurp_current_test();
 my $TRACE_ARGS = "";
 my $DEBUG_FLAGS = "";
 my $POST_PROC = "";
+
+sub slurp_current_test
+{
+  local $\;
+  open my $FH, "<.current_test";
+  <$FH>;
+}
 
 if ( @ARGV > 1 )
 {
