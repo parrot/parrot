@@ -22,8 +22,6 @@
 #include "pbc.h"
 #include "parser.h"
 
-#define IMCC_VERSION "0.4.5"
-
 static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
 static char optimizer_opt[20];
 
@@ -135,7 +133,6 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either\n\
 the GNU General Public License or the Artistic License for more details.\n\n");
 
-    printf("PASM/PIR compiler version " IMCC_VERSION ".\n\n");
     Parrot_exit(interp, 0);
 }
 
