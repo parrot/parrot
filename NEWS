@@ -1,5 +1,26 @@
 # $Id$
 
+New in 0.4.6
+
+- New languages: Ruby ("Cardinal"), Javascript ("ecmascript")
+- Updated languages: Tcl, dotnet, bc, Pheme, Punie, WMLScript
+- Updated compilers: PGE, TGE
+- IMCC updates:
+   + ".loadlib" directive expresses dependencies
+   + ".namespace" with no parameter goes to HLL root
+   + lexer is reentrant (reentrant grammar in progress)
+- Namespace improvements:
+   + new suite of opcodes to access namespaces and globals
+     ("find_global" and "store_global" will be phased out)
+   + namespace '' no longer means HLL root
+- Design document updates:
+    namespaces (pdd23), basic types (pdd17), embedding
+- Updated tool requirements for developers:
+    flex 2.5.33, bison 2.1, perl 5.6.1
+- New to-do list for people new to Parrot:
+    cage/todo.pod
+- The usual plethora of bugfixes and enhancements
+
 New in 0.4.5
 
 - unicode subroutine names
