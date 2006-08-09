@@ -1690,7 +1690,8 @@ install : installable
 
 release : MANIFEST MANIFEST.generated
 	[ -d parrot-$(VERSION) ] || ln -s $(CUR_DIR) parrot-$(VERSION)
-	cp MANIFEST MANIFEST.real
+	@$(RM_F) MANIFEST.real
+	mv MANIFEST MANIFEST.real
 	grep -v DEVELOPING MANIFEST.real > MANIFEST
 	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST)
 	mv MANIFEST.real MANIFEST
