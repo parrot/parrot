@@ -34,9 +34,9 @@ This is the B<highest> priority.
 
 =back
 
-=head1 CURRENT RELEASE (0.4.5)
+=head1 CURRENT RELEASE (0.4.6)
 
-Parrot 0.4.5 was released on June 19th, 2006. For a list of new and fixed
+Parrot 0.4.6 was released on August 8th, 2006. For a list of new and fixed
 feature see L<NEWS>.
 
 =head1 OVERVIEW
@@ -175,10 +175,6 @@ Spec out bytecode metadata system and introspection/modification system
 =item *
 
 Specify what we need to serialize continuations
-
-=item *
-
-Final namespace spec.
 
 =item *
 
