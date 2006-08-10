@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 196
+plan 197
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -223,6 +223,13 @@ foreach operator $ops_list {
     "can't use non-numeric floating-point value as operand of \"$operator\"" \
     "nan $operator nan" 
 }
+
+
+# variable expansions..
+eval_is {
+  set q(1) 2
+  expr {$q(1)}
+} 2 {array variables}
 
 # TD-    add tet   for ::tcl::mathfunc 
 
