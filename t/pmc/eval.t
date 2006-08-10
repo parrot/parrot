@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 21;
 
 =head1 NAME
 
@@ -627,6 +627,38 @@ pir_output_is(<<'CODE', <<'OUTPUT', "catch compile err: RT:#39892");
 EPIR
      $P0 = $P2($S0)
      $P0()
+     end
+handler:
+     print "ok\n"
+.end
+CODE
+ok
+OUTPUT
+
+open TEMP, ">temp.pir";
+END { unlink "temp.pir" };
+print TEMP <<PIR;
+  .sub foo
+     print a typo
+  .end
+PIR
+close TEMP;
+
+pir_output_like(<<'CODE', <<'OUTPUT', "compile err in load_bytecode");
+.sub main :main
+     load_bytecode "temp.pir"
+     print "never\n"
+     end
+.end
+CODE
+/undefined identifier/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "catch compile err in load_bytecode");
+.sub main :main
+     push_eh handler
+     load_bytecode "temp.pir"
+     print "never\n"
      end
 handler:
      print "ok\n"

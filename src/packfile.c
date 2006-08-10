@@ -3385,13 +3385,15 @@ Parrot_load_bytecode(Interp *interpreter, STRING *file_str)
 	PackFile_append_pbc(interpreter, filename);
     }
     else {
-	struct PackFile_ByteCode * const cs = IMCC_compile_file(interpreter, filename);
+        STRING *err;
+	struct PackFile_ByteCode * const cs = IMCC_compile_file_s(interpreter, 
+                filename, &err);
 	if (cs) {
 	    do_sub_pragmas(interpreter, cs, PBC_LOADED, NULL);
 	}
 	else
 	    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
-		"compiler returned NULL ByteCode '%Ss'", file_str);
+		"compiler returned NULL ByteCode '%Ss' - %Ss", file_str, err);
     }
     string_cstring_free(filename);
 }
