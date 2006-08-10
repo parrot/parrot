@@ -5527,7 +5527,6 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
     char *current;
     char *s;
     int len;
-    DECL_CONST_CAST;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
     UNUSED(valp);
