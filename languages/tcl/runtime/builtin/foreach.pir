@@ -5,33 +5,30 @@
   .param pmc argv :slurpy
   # Requires multiple of 3 args.
 
-  .local pmc compiler,pir_compiler,retval
+  .local pmc retval
 
   .local int call_level
   $P0 = get_root_global ['_tcl'], 'call_level'
   call_level = $P0
 
-  # Were we passed the right # of arguments? (2n+1)
-  $I1 = argv
-  if $I1 == 0 goto error
-  $I0 = $I1 % 2
-  if $I0 != 1 goto error
-
-  .local pmc __list, __set
-  __list = get_root_global ['_tcl'], '__list'
-  __set  = get_root_global ['_tcl'], '__set'
-
-  compiler     = get_root_global ['_tcl'], 'compile'
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
-
   .local int argc
-  argc = argv
+  argc = elements argv
+
+  # Were we passed the right # of arguments? (2n+1)
+  if argc == 0 goto bad_args
+  $I0 = argc % 2
+  if $I0 != 1 goto bad_args
+
+  .local pmc __list, __script, __set
+  __list   = get_root_global ['_tcl'], '__list'
+  __script = get_root_global ['_tcl'], '__script'
+  __set    = get_root_global ['_tcl'], '__set'
 
   # Compartmentalize our arguments
   .local pmc varnames, arglists
   .local string body
   varnames = new .TclList
-  arglists  = new .TclList
+  arglists = new .TclList
   varnames = argc
   arglists = argc
   .local pmc arg_num,arg_max,index_num
@@ -64,7 +61,6 @@ got_list:
   size_of = $P0
 
   inc arg_num
-
   inc index_num
 
   if max_size >= size_of goto arg_loop
@@ -72,8 +68,7 @@ got_list:
   goto arg_loop
 arg_done: 
   .local pmc parsed
-  ($I0,$P0) = compiler(0,body)
-  parsed = pir_compiler($I0,$P0)  
+  parsed = __script(body)
   register parsed
 
   .local pmc iterator
@@ -146,7 +141,6 @@ handle_continue:
 done:
   .return(retval)
 
-error:
+bad_args:
   .throw('wrong # args: should be "foreach varList list ?varList list ...? command"')
-
 .end
