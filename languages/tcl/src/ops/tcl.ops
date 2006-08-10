@@ -1,0 +1,51 @@
+/*
+** tcl.ops
+*/
+
+#include "parrot/dynext.h"
+#include "../../src/io/io_private.h"
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+tcl.ops 
+
+=cut
+
+=head1 DESCRIPTION
+
+A dynamic opcode library for tcl on parrot that provides a few opcodes
+that simplify PIR generation for tclPIR generation for tcl
+
+=cut
+
+=head1 Opcodes
+
+=over 4
+
+=item B<tcl_invoke>(out PMC, in PMC, (in PMC...))
+
+Attempt to run a builtin or user defined procedure. If the procedure doesn't
+exist, use $tcl_interactive to determine if a fallback to unknown is
+warranted (and then do that.)
+
+
+XXX: the implementation below is merely a placeholder, it currently tries
+to duplicate 'print STR' just to provide a shell.
+
+=cut
+
+op tcl_invoke(in STR) {
+    STRING * const s = $1;
+  if (s && string_length(interpreter, s)) {
+    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
+  }
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+# vim: sw=4

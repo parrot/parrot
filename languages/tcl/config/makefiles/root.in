@@ -5,16 +5,19 @@ PBC_MERGE = ../../pbc_merge@exe@
 
 C_BUILTIN = src/builtin
 R_BUILTIN = runtime/builtin
-BUILD     = $(PERL) @build_dir@/tools/build/dynpmc.pl
+PMCBUILD  = $(PERL) @build_dir@/tools/build/dynpmc.pl
+OPSBUILD  = $(PERL) @build_dir@/tools/build/dynoplibs.pl
 DESTDIR   = @build_dir@/runtime/parrot/dynext
 O         = @o@
 PMCDIR    = src/pmc
+OPSDIR    = src/ops
 CLASSDIR  = src/class
 LOAD_EXT  = @load_ext@
 
 PGE_DIR  = ../../compilers/pge
 TGE_DIR  = ../../compilers/tge
 
+OPSLIBS   = tcl
 PMCS = \
  tclobject \
  tclstring \
@@ -115,7 +118,7 @@ src/grammar/expr/pge2past.pir
 
 all: tcl.pbc
 
-tcl.pbc: $(PARROT) pmcs runtime/tcllib.pbc src/tclsh.pir
+tcl.pbc: $(PARROT) pmcs ops runtime/tcllib.pbc src/tclsh.pir
 	$(PARROT) --output=tcl.pbc src/tclsh.pir
 
 $(GENERATED_INLINES) : tools/gen_inline.pl
@@ -143,10 +146,16 @@ runtime/tcllib.pbc: $(PBC_MERGE) $(PBCS)
 	$(PBC_MERGE) -o runtime/tcllib.pbc $(PBCS)
 
 pmcs:
-	@cd $(PMCDIR) && $(BUILD) generate $(PMCS)
-	@cd $(PMCDIR) && $(BUILD) compile $(PMCS)
-	@cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
-	@cd $(PMCDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+
+ops:
+	@cd $(OPSDIR) && $(OPSBUILD) generate $(OPSLIBS)
+	@cd $(OPSDIR) && $(OPSBUILD) compile $(OPSLIBS)
+	@cd $(OPSDIR) && $(OPSBUILD) linklibs $(OPSLIBS)
+	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(DESTDIR)" $(OPSLIBS)
 
 runtime/builtins.pir: $(GENERATED_INLINES) $(DEPS) tools/gen_builtins.pl
 	$(PERL) tools/gen_builtins.pl > runtime/builtins.pir
