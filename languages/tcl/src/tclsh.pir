@@ -49,9 +49,10 @@
   tcl_interactive = new .Integer
   store_global '$tcl_interactive', tcl_interactive
 
-  .local pmc compiler,pir_compiler
+  .local pmc compiler, pir_compiler, __script
   compiler     = get_root_global ['_tcl'], 'compile'
   pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
+  __script     = get_root_global ['_tcl'], '__script'
 
   if argc > 1 goto open_file
 
@@ -71,8 +72,7 @@ input_loop:
   input_line .= $S0
   unless STDIN goto done
   push_eh loop_error
-    ($I0,$P1) = compiler(0,input_line)
-    $P2 = pir_compiler($I0,$P1)
+    $P2 = __script(input_line)
     retval = $P2()
   clear_eh
   # print out the result of the evaluation.
@@ -150,10 +150,7 @@ gotfile:
 
 run_file:
   push_eh file_error
-    ($I0,$S1) = compiler(0,contents)
-  clear_eh
-  $P2       = pir_compiler($I0,$S1)
-  push_eh file_error
+    $P2 = __script(contents)
     $P2()
   clear_eh
   goto done
@@ -170,20 +167,15 @@ oneliner:
   .local string tcl_code
   tcl_code = opt['e']
   if dump_only goto oneliner_dump
-  $P1 = get_root_global ['_tcl'], 'compile'
-  $P2 = get_root_global ['_tcl'], 'pir_compiler'
-  ($I0, $S1) = $P1(0,tcl_code)
-  $P3 = $P2($I0,$S1)
+  $P3 = __script(tcl_code)
   push_eh file_error
     $P3()
   clear_eh
   goto done
 
 oneliner_dump:
-  $P1 = get_root_global ['_tcl'], 'compile'
-  $P2 = get_root_global ['_tcl'], 'pir_compiler'
-  ($I0, $S1) = $P1(0,tcl_code)
-  $S2 = $P2($I0,$S1,1)
+  ($I0, $S1) = compiler(0,tcl_code)
+  $S2 = pir_compiler($I0,$S1,1)
   print $S2
 
 done:
@@ -220,7 +212,7 @@ got_prompt:
   $S0 = level
   varname .= $S0
 
-  .local pmc compiler,pir_compiler
+  .local pmc compiler, pir_compiler
   compiler     = get_root_global ['_tcl'], 'compile'
   pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
 
