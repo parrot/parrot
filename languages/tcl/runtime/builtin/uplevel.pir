@@ -13,22 +13,19 @@
   .local int argc
   argc = elements argv
   if argc == 0 goto bad_args
-  
-  .local string expr
-  .local int i
  
-  .local pmc compiler, pir_compiler, __call_level
-  compiler     = get_root_global ['_tcl'], 'compile'
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
-  __call_level = get_root_global ['_tcl'], '__call_level'
+  .local pmc __script, __call_level
+  __script        = get_root_global ['_tcl'], '__script'
+  __call_level    = get_root_global ['_tcl'], '__call_level'
 
   # save the old call level
-  .local pmc call_level, old_call_level
-  call_level     = get_root_global ['_tcl'], 'call_level'
-  old_call_level = clone call_level
+  .local pmc call_level, call_level_diff
+  call_level      = get_root_global ['_tcl'], 'call_level'
+  call_level_diff = get_root_global ['_tcl'], 'call_level_diff'
 
-  .local pmc new_call_level
+  .local pmc new_call_level, old_call_level
   new_call_level = argv[0]
+  old_call_level = clone call_level
  
   .local int defaulted 
   (new_call_level,defaulted) = __call_level(new_call_level)
@@ -37,36 +34,18 @@
   $P1 = shift argv # pop the call level argument 
 skip:
 
-  .local pmc call_level_diff, difference
-  call_level_diff = get_root_global ['_tcl'], 'call_level_diff'
+  .local pmc difference
   difference = new .Integer
   difference = old_call_level - new_call_level
-
-  expr = ''
-  i = 0
-  argc = argv
-
-loop:
-  if i == argc goto loop_done
-  $S0 = argv[i]
-  concat expr, $S0
-  inc i
-  if i == argc goto loop_done
-  concat expr,' '
-
-  goto loop
-
-loop_done:
 
   # Set the new level 
   assign call_level, new_call_level
   call_level_diff += difference
 
-  ($I0,$P0) = compiler(0,expr)
-  $P1 = pir_compiler($I0,$P0)
-
+  $S0 = join ' ', argv
+  $P0 = __script($S0)
   # can't quite tailcall this at the moment due to the hackish call_level
-  $P0 = $P1()
+  $P0 = $P0()
 
   #restore the old level
   call_level_diff -= difference
