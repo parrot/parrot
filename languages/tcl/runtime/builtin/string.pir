@@ -951,6 +951,30 @@ bad_args:
 
 .sub 'wordend'
   .param pmc argv
-  print "wordend\n"
-  .return()
+
+  .local int argc
+  argc = elements argv
+  if argc != 2 goto bad_args
+
+  .local string str
+  .local int    idx
+  str = argv[0]
+  idx = argv[1]
+
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
+  idx = __index(idx, str)
+
+  $I0 = length str
+  $I0 -= idx
+
+  $I0 = find_not_cclass .CCLASS_WORD, str, idx, $I0
+  unless $I0 == idx goto return
+  inc $I0
+
+return:
+  .return($I0)
+
+bad_args:
+  .throw('wrong # args: should be "string wordend string index"')
 .end

@@ -263,17 +263,13 @@ eval_is {string compare -length 4.2 aaabc aaabb} \
   {compare, float length}
 
 # [string wordend]
-is  [string wordend "foo bar baz" 0] 3 {wordend, from beginning} \
-  {TODO {not implemented}}
+is  [string wordend "foo bar baz" 0] 3 {wordend, from beginning}
 
-is [string wordend "foo bar99_baz" 5] 13 {wordend, numerics and underscores} \
-  {TODO {not implemented}}
+is [string wordend "foo bar99_baz" 5] 13 {wordend, numerics and underscores}
 
-is [string wordend "foo bar" 3] 4 {wordend, space} \
-  {TODO {not implemented}}
+is [string wordend "foo bar" 3] 4 {wordend, space}
 
 eval_is {string wordend} \
   {wrong # args: should be "string wordend string index"} \
-  {wordend too few args} \
-  {TODO {not implemented}}
+  {wordend too few args}
 
