@@ -192,7 +192,9 @@ GEN_MAKEFILES = \
     languages/bc/Makefile \
     languages/befunge/Makefile \
     languages/bf/Makefile \
+    languages/cardinal/Makefile \
     languages/cola/Makefile \
+    languages/ecmascript/Makefile \
     languages/HQ9plus/Makefile \
     languages/jako/Makefile \
     languages/lisp/Makefile \
@@ -207,9 +209,11 @@ GEN_MAKEFILES = \
     languages/punie/Makefile \
     languages/regex/Makefile \
     languages/scheme/Makefile \
+    languages/tap/Makefile \
     languages/tcl/Makefile \
     languages/tcl/examples/Makefile \
     languages/urm/Makefile \
+    languages/WMLScript/Makefile \
     languages/Zcode/Makefile \
     src/dynpmc/Makefile \
     src/dynoplibs/Makefile
