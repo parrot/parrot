@@ -102,11 +102,9 @@ body_end:
   .return ('')
 
 body_match:
-  .local pmc compiler,pir_compiler
-  compiler     = get_root_global ['_tcl'], 'compile'
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
-  ($I0,$S0) = compiler(0,code)
-  $P1 = pir_compiler($I0,$S0)
+  .local pmc __script
+  __script = get_root_global ['_tcl'], '__script'
+  $P1 = __script(code)
   .return $P1()
 
 bad_args:
