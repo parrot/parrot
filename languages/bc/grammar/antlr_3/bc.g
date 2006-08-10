@@ -14,12 +14,14 @@ options
 {
   output       = AST;
   ASTLabelType = CommonTree;
+  k            = 2;
 }
 
 
 tokens 
 {
   PROGRAM;
+  UNARY_MINUS;
   VAR;
 } 
 
@@ -70,7 +72,7 @@ multiplying_expression
 unary_expression
   : postfix_expression
     |
-    INCR_DECR^^ postfix_expression
+    MINUS postfix_expression -> ^( UNARY_MINUS postfix_expression )
   ;
 
 postfix_expression

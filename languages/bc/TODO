@@ -4,6 +4,8 @@
 # Some tidbits on what is to do for Parrot bc.
 # See docs/parrot_bc.pod for visions.
 
+- Find out how to construct trees with values ( UNARY_MINUS expression ) -> ( MUL -1 expression )
+
 - Generate PRINT_OP and SAY_OP within the ANTLR3 AST
 
 - Keep track of named variables and initialize them during execution

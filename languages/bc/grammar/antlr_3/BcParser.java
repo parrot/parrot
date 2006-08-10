@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-08-10 00:00:47
+// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-08-11 00:21:49
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -10,23 +10,24 @@ import org.antlr.runtime.tree.*;
 
 public class BcParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "VAR", "STRING", "ASSIGN_OP", "LETTER", "PLUS", "MINUS", "MUL_OP", "INCR_DECR", "NUMBER", "INTEGER", "ML_COMMENT", "WS", "NEWLINE", "';'", "'('", "')'", "'quit'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "UNARY_MINUS", "VAR", "STRING", "ASSIGN_OP", "LETTER", "PLUS", "MINUS", "MUL_OP", "NUMBER", "INTEGER", "INCR_DECR", "ML_COMMENT", "WS", "NEWLINE", "';'", "'('", "')'", "'quit'"
     };
-    public static final int INCR_DECR=12;
-    public static final int VAR=5;
+    public static final int INCR_DECR=15;
+    public static final int VAR=6;
     public static final int INTEGER=14;
-    public static final int ASSIGN_OP=7;
-    public static final int MINUS=10;
-    public static final int LETTER=8;
-    public static final int WS=16;
+    public static final int ASSIGN_OP=8;
+    public static final int MINUS=11;
+    public static final int LETTER=9;
+    public static final int UNARY_MINUS=5;
+    public static final int WS=17;
     public static final int NUMBER=13;
     public static final int EOF=-1;
-    public static final int STRING=6;
-    public static final int MUL_OP=11;
-    public static final int ML_COMMENT=15;
-    public static final int PLUS=9;
+    public static final int STRING=7;
+    public static final int MUL_OP=12;
+    public static final int ML_COMMENT=16;
+    public static final int PLUS=10;
     public static final int PROGRAM=4;
-    public static final int NEWLINE=17;
+    public static final int NEWLINE=18;
 
         public BcParser(TokenStream input) {
             super(input);
@@ -51,7 +52,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start program
-    // grammar/antlr_3/bc.g:27:1: program : ( input_item )+ quit -> ^( PROGRAM ( input_item )+ ) ;
+    // grammar/antlr_3/bc.g:29:1: program : ( input_item )+ quit -> ^( PROGRAM ( input_item )+ ) ;
     public program_return program() throws RecognitionException {   
         program_return retval = new program_return();
         retval.start = input.LT(1);
@@ -66,25 +67,25 @@ public class BcParser extends Parser {
         List list_input_item=new ArrayList();
 
         try {
-            // grammar/antlr_3/bc.g:28:5: ( ( input_item )+ quit -> ^( PROGRAM ( input_item )+ ) )
-            // grammar/antlr_3/bc.g:28:5: ( input_item )+ quit
+            // grammar/antlr_3/bc.g:30:5: ( ( input_item )+ quit -> ^( PROGRAM ( input_item )+ ) )
+            // grammar/antlr_3/bc.g:30:5: ( input_item )+ quit
             {
-            // grammar/antlr_3/bc.g:28:5: ( input_item )+
+            // grammar/antlr_3/bc.g:30:5: ( input_item )+
             int cnt1=0;
             loop1:
             do {
                 int alt1=2;
                 int LA1_0 = input.LA(1);
-                if ( (LA1_0==STRING||LA1_0==LETTER||(LA1_0>=INCR_DECR && LA1_0<=NUMBER)||LA1_0==19) ) {
+                if ( (LA1_0==STRING||LA1_0==LETTER||LA1_0==MINUS||LA1_0==NUMBER||LA1_0==20) ) {
                     alt1=1;
                 }
 
 
                 switch (alt1) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:28:5: input_item
+            	    // grammar/antlr_3/bc.g:30:5: input_item
             	    {
-            	    pushFollow(FOLLOW_input_item_in_program71);
+            	    pushFollow(FOLLOW_input_item_in_program96);
             	    input_item1=input_item();
             	    _fsp--;
 
@@ -102,7 +103,7 @@ public class BcParser extends Parser {
                 cnt1++;
             } while (true);
 
-            pushFollow(FOLLOW_quit_in_program74);
+            pushFollow(FOLLOW_quit_in_program99);
             quit2=quit();
             _fsp--;
 
@@ -112,14 +113,14 @@ public class BcParser extends Parser {
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 28:22: -> ^( PROGRAM ( input_item )+ )
+            // 30:22: -> ^( PROGRAM ( input_item )+ )
             {
-                // grammar/antlr_3/bc.g:28:25: ^( PROGRAM ( input_item )+ )
+                // grammar/antlr_3/bc.g:30:25: ^( PROGRAM ( input_item )+ )
                 {
                 CommonTree root_1 = (CommonTree)adaptor.nil();
                 root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(PROGRAM, "PROGRAM"), root_1);
 
-                // grammar/antlr_3/bc.g:28:36: ( input_item )+
+                // grammar/antlr_3/bc.g:30:36: ( input_item )+
                 {
                 int n_1 = list_input_item == null ? 0 : list_input_item.size();
                  
@@ -163,7 +164,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start input_item
-    // grammar/antlr_3/bc.g:32:1: input_item : semicolon_list ;
+    // grammar/antlr_3/bc.g:34:1: input_item : semicolon_list ;
     public input_item_return input_item() throws RecognitionException {   
         input_item_return retval = new input_item_return();
         retval.start = input.LT(1);
@@ -175,12 +176,12 @@ public class BcParser extends Parser {
 
 
         try {
-            // grammar/antlr_3/bc.g:33:5: ( semicolon_list )
-            // grammar/antlr_3/bc.g:33:5: semicolon_list
+            // grammar/antlr_3/bc.g:35:5: ( semicolon_list )
+            // grammar/antlr_3/bc.g:35:5: semicolon_list
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_semicolon_list_in_input_item99);
+            pushFollow(FOLLOW_semicolon_list_in_input_item124);
             semicolon_list3=semicolon_list();
             _fsp--;
 
@@ -210,7 +211,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start semicolon_list
-    // grammar/antlr_3/bc.g:36:1: semicolon_list : statement ( ';'! statement )* ;
+    // grammar/antlr_3/bc.g:38:1: semicolon_list : statement ( ';'! statement )* ;
     public semicolon_list_return semicolon_list() throws RecognitionException {   
         semicolon_list_return retval = new semicolon_list_return();
         retval.start = input.LT(1);
@@ -226,35 +227,35 @@ public class BcParser extends Parser {
         CommonTree char_literal5_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:37:5: ( statement ( ';'! statement )* )
-            // grammar/antlr_3/bc.g:37:5: statement ( ';'! statement )*
+            // grammar/antlr_3/bc.g:39:5: ( statement ( ';'! statement )* )
+            // grammar/antlr_3/bc.g:39:5: statement ( ';'! statement )*
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_statement_in_semicolon_list113);
+            pushFollow(FOLLOW_statement_in_semicolon_list138);
             statement4=statement();
             _fsp--;
 
             adaptor.addChild(root_0, statement4.tree);
-            // grammar/antlr_3/bc.g:37:15: ( ';'! statement )*
+            // grammar/antlr_3/bc.g:39:15: ( ';'! statement )*
             loop2:
             do {
                 int alt2=2;
                 int LA2_0 = input.LA(1);
-                if ( (LA2_0==18) ) {
+                if ( (LA2_0==19) ) {
                     alt2=1;
                 }
 
 
                 switch (alt2) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:37:17: ';'! statement
+            	    // grammar/antlr_3/bc.g:39:17: ';'! statement
             	    {
             	    CommonTree root_1 = (CommonTree)adaptor.nil();
 
             	    char_literal5=(Token)input.LT(1);
-            	    match(input,18,FOLLOW_18_in_semicolon_list117); 
-            	    pushFollow(FOLLOW_statement_in_semicolon_list120);
+            	    match(input,19,FOLLOW_19_in_semicolon_list142); 
+            	    pushFollow(FOLLOW_statement_in_semicolon_list145);
             	    statement6=statement();
             	    _fsp--;
 
@@ -295,7 +296,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start statement
-    // grammar/antlr_3/bc.g:41:1: statement : ( expression | STRING );
+    // grammar/antlr_3/bc.g:43:1: statement : ( expression | STRING );
     public statement_return statement() throws RecognitionException {   
         statement_return retval = new statement_return();
         retval.start = input.LT(1);
@@ -309,10 +310,10 @@ public class BcParser extends Parser {
         CommonTree STRING8_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:42:5: ( expression | STRING )
+            // grammar/antlr_3/bc.g:44:5: ( expression | STRING )
             int alt3=2;
             int LA3_0 = input.LA(1);
-            if ( (LA3_0==LETTER||(LA3_0>=INCR_DECR && LA3_0<=NUMBER)||LA3_0==19) ) {
+            if ( (LA3_0==LETTER||LA3_0==MINUS||LA3_0==NUMBER||LA3_0==20) ) {
                 alt3=1;
             }
             else if ( (LA3_0==STRING) ) {
@@ -320,17 +321,17 @@ public class BcParser extends Parser {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("41:1: statement : ( expression | STRING );", 3, 0, input);
+                    new NoViableAltException("43:1: statement : ( expression | STRING );", 3, 0, input);
 
                 throw nvae;
             }
             switch (alt3) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:42:5: expression
+                    // grammar/antlr_3/bc.g:44:5: expression
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_expression_in_statement137);
+                    pushFollow(FOLLOW_expression_in_statement162);
                     expression7=expression();
                     _fsp--;
 
@@ -339,12 +340,12 @@ public class BcParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // grammar/antlr_3/bc.g:44:5: STRING
+                    // grammar/antlr_3/bc.g:46:5: STRING
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     STRING8=(Token)input.LT(1);
-                    match(input,STRING,FOLLOW_STRING_in_statement149); 
+                    match(input,STRING,FOLLOW_STRING_in_statement174); 
                     STRING8_tree = (CommonTree)adaptor.create(STRING8);
                     adaptor.addChild(root_0, STRING8_tree);
 
@@ -375,7 +376,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start expression
-    // grammar/antlr_3/bc.g:47:1: expression : ( named_expression ASSIGN_OP^^ expression | named_expression | adding_expression );
+    // grammar/antlr_3/bc.g:49:1: expression : ( named_expression ASSIGN_OP^^ expression | named_expression | adding_expression );
     public expression_return expression() throws RecognitionException {   
         expression_return retval = new expression_return();
         retval.start = input.LT(1);
@@ -395,7 +396,7 @@ public class BcParser extends Parser {
         CommonTree ASSIGN_OP10_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:48:5: ( named_expression ASSIGN_OP^^ expression | named_expression | adding_expression )
+            // grammar/antlr_3/bc.g:50:5: ( named_expression ASSIGN_OP^^ expression | named_expression | adding_expression )
             int alt4=3;
             int LA4_0 = input.LA(1);
             if ( (LA4_0==LETTER) ) {
@@ -403,42 +404,42 @@ public class BcParser extends Parser {
                 if ( (LA4_1==ASSIGN_OP) ) {
                     alt4=1;
                 }
-                else if ( (LA4_1==STRING||LA4_1==LETTER||(LA4_1>=INCR_DECR && LA4_1<=NUMBER)||(LA4_1>=18 && LA4_1<=21)) ) {
+                else if ( (LA4_1==STRING||LA4_1==LETTER||LA4_1==MINUS||LA4_1==NUMBER||(LA4_1>=19 && LA4_1<=22)) ) {
                     alt4=2;
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("47:1: expression : ( named_expression ASSIGN_OP^^ expression | named_expression | adding_expression );", 4, 1, input);
+                        new NoViableAltException("49:1: expression : ( named_expression ASSIGN_OP^^ expression | named_expression | adding_expression );", 4, 1, input);
 
                     throw nvae;
                 }
             }
-            else if ( ((LA4_0>=INCR_DECR && LA4_0<=NUMBER)||LA4_0==19) ) {
+            else if ( (LA4_0==MINUS||LA4_0==NUMBER||LA4_0==20) ) {
                 alt4=3;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("47:1: expression : ( named_expression ASSIGN_OP^^ expression | named_expression | adding_expression );", 4, 0, input);
+                    new NoViableAltException("49:1: expression : ( named_expression ASSIGN_OP^^ expression | named_expression | adding_expression );", 4, 0, input);
 
                 throw nvae;
             }
             switch (alt4) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:48:5: named_expression ASSIGN_OP^^ expression
+                    // grammar/antlr_3/bc.g:50:5: named_expression ASSIGN_OP^^ expression
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_named_expression_in_expression162);
+                    pushFollow(FOLLOW_named_expression_in_expression187);
                     named_expression9=named_expression();
                     _fsp--;
 
                     adaptor.addChild(root_0, named_expression9.tree);
                     ASSIGN_OP10=(Token)input.LT(1);
-                    match(input,ASSIGN_OP,FOLLOW_ASSIGN_OP_in_expression164); 
+                    match(input,ASSIGN_OP,FOLLOW_ASSIGN_OP_in_expression189); 
                     ASSIGN_OP10_tree = (CommonTree)adaptor.create(ASSIGN_OP10);
                     root_0 = (CommonTree)adaptor.becomeRoot(ASSIGN_OP10_tree, root_0);
 
-                    pushFollow(FOLLOW_expression_in_expression167);
+                    pushFollow(FOLLOW_expression_in_expression192);
                     expression11=expression();
                     _fsp--;
 
@@ -447,11 +448,11 @@ public class BcParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // grammar/antlr_3/bc.g:50:5: named_expression
+                    // grammar/antlr_3/bc.g:52:5: named_expression
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_named_expression_in_expression180);
+                    pushFollow(FOLLOW_named_expression_in_expression205);
                     named_expression12=named_expression();
                     _fsp--;
 
@@ -460,11 +461,11 @@ public class BcParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // grammar/antlr_3/bc.g:52:5: adding_expression
+                    // grammar/antlr_3/bc.g:54:5: adding_expression
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_adding_expression_in_expression192);
+                    pushFollow(FOLLOW_adding_expression_in_expression217);
                     adding_expression13=adding_expression();
                     _fsp--;
 
@@ -496,7 +497,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start named_expression
-    // grammar/antlr_3/bc.g:55:1: named_expression : LETTER -> ^( VAR LETTER ) ;
+    // grammar/antlr_3/bc.g:57:1: named_expression : LETTER -> ^( VAR LETTER ) ;
     public named_expression_return named_expression() throws RecognitionException {   
         named_expression_return retval = new named_expression_return();
         retval.start = input.LT(1);
@@ -508,11 +509,11 @@ public class BcParser extends Parser {
         CommonTree LETTER14_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:56:5: ( LETTER -> ^( VAR LETTER ) )
-            // grammar/antlr_3/bc.g:56:5: LETTER
+            // grammar/antlr_3/bc.g:58:5: ( LETTER -> ^( VAR LETTER ) )
+            // grammar/antlr_3/bc.g:58:5: LETTER
             {
             LETTER14=(Token)input.LT(1);
-            match(input,LETTER,FOLLOW_LETTER_in_named_expression205); 
+            match(input,LETTER,FOLLOW_LETTER_in_named_expression230); 
             list_LETTER.add(LETTER14);
 
 
@@ -520,9 +521,9 @@ public class BcParser extends Parser {
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 56:12: -> ^( VAR LETTER )
+            // 58:12: -> ^( VAR LETTER )
             {
-                // grammar/antlr_3/bc.g:56:15: ^( VAR LETTER )
+                // grammar/antlr_3/bc.g:58:15: ^( VAR LETTER )
                 {
                 CommonTree root_1 = (CommonTree)adaptor.nil();
                 root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(VAR, "VAR"), root_1);
@@ -560,7 +561,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start adding_expression
-    // grammar/antlr_3/bc.g:60:1: adding_expression : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* ;
+    // grammar/antlr_3/bc.g:62:1: adding_expression : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* ;
     public adding_expression_return adding_expression() throws RecognitionException {   
         adding_expression_return retval = new adding_expression_return();
         retval.start = input.LT(1);
@@ -578,33 +579,44 @@ public class BcParser extends Parser {
         CommonTree MINUS17_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:61:5: ( multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* )
-            // grammar/antlr_3/bc.g:61:5: multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )*
+            // grammar/antlr_3/bc.g:63:5: ( multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* )
+            // grammar/antlr_3/bc.g:63:5: multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )*
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_multiplying_expression_in_adding_expression230);
+            pushFollow(FOLLOW_multiplying_expression_in_adding_expression255);
             multiplying_expression15=multiplying_expression();
             _fsp--;
 
             adaptor.addChild(root_0, multiplying_expression15.tree);
-            // grammar/antlr_3/bc.g:61:28: ( ( PLUS^^ | MINUS^^ ) multiplying_expression )*
+            // grammar/antlr_3/bc.g:63:28: ( ( PLUS^^ | MINUS^^ ) multiplying_expression )*
             loop6:
             do {
                 int alt6=2;
                 int LA6_0 = input.LA(1);
-                if ( ((LA6_0>=PLUS && LA6_0<=MINUS)) ) {
+                if ( (LA6_0==MINUS) ) {
+                    int LA6_6 = input.LA(2);
+                    if ( (LA6_6==MINUS||LA6_6==NUMBER) ) {
+                        alt6=1;
+                    }
+                    else if ( (LA6_6==20) ) {
+                        alt6=1;
+                    }
+
+
+                }
+                else if ( (LA6_0==PLUS) ) {
                     alt6=1;
                 }
 
 
                 switch (alt6) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:61:30: ( PLUS^^ | MINUS^^ ) multiplying_expression
+            	    // grammar/antlr_3/bc.g:63:30: ( PLUS^^ | MINUS^^ ) multiplying_expression
             	    {
             	    CommonTree root_1 = (CommonTree)adaptor.nil();
 
-            	    // grammar/antlr_3/bc.g:61:30: ( PLUS^^ | MINUS^^ )
+            	    // grammar/antlr_3/bc.g:63:30: ( PLUS^^ | MINUS^^ )
             	    int alt5=2;
             	    int LA5_0 = input.LA(1);
             	    if ( (LA5_0==PLUS) ) {
@@ -615,18 +627,18 @@ public class BcParser extends Parser {
             	    }
             	    else {
             	        NoViableAltException nvae =
-            	            new NoViableAltException("61:30: ( PLUS^^ | MINUS^^ )", 5, 0, input);
+            	            new NoViableAltException("63:30: ( PLUS^^ | MINUS^^ )", 5, 0, input);
 
             	        throw nvae;
             	    }
             	    switch (alt5) {
             	        case 1 :
-            	            // grammar/antlr_3/bc.g:61:32: PLUS^^
+            	            // grammar/antlr_3/bc.g:63:32: PLUS^^
             	            {
             	            CommonTree root_2 = (CommonTree)adaptor.nil();
 
             	            PLUS16=(Token)input.LT(1);
-            	            match(input,PLUS,FOLLOW_PLUS_in_adding_expression236); 
+            	            match(input,PLUS,FOLLOW_PLUS_in_adding_expression261); 
             	            PLUS16_tree = (CommonTree)adaptor.create(PLUS16);
             	            root_0 = (CommonTree)adaptor.becomeRoot(PLUS16_tree, root_0);
 
@@ -636,12 +648,12 @@ public class BcParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // grammar/antlr_3/bc.g:61:41: MINUS^^
+            	            // grammar/antlr_3/bc.g:63:41: MINUS^^
             	            {
             	            CommonTree root_2 = (CommonTree)adaptor.nil();
 
             	            MINUS17=(Token)input.LT(1);
-            	            match(input,MINUS,FOLLOW_MINUS_in_adding_expression241); 
+            	            match(input,MINUS,FOLLOW_MINUS_in_adding_expression266); 
             	            MINUS17_tree = (CommonTree)adaptor.create(MINUS17);
             	            root_0 = (CommonTree)adaptor.becomeRoot(MINUS17_tree, root_0);
 
@@ -653,7 +665,7 @@ public class BcParser extends Parser {
 
             	    }
 
-            	    pushFollow(FOLLOW_multiplying_expression_in_adding_expression246);
+            	    pushFollow(FOLLOW_multiplying_expression_in_adding_expression271);
             	    multiplying_expression18=multiplying_expression();
             	    _fsp--;
 
@@ -694,7 +706,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start multiplying_expression
-    // grammar/antlr_3/bc.g:65:1: multiplying_expression : unary_expression ( MUL_OP^^ unary_expression )* ;
+    // grammar/antlr_3/bc.g:67:1: multiplying_expression : unary_expression ( MUL_OP^^ unary_expression )* ;
     public multiplying_expression_return multiplying_expression() throws RecognitionException {   
         multiplying_expression_return retval = new multiplying_expression_return();
         retval.start = input.LT(1);
@@ -710,17 +722,17 @@ public class BcParser extends Parser {
         CommonTree MUL_OP20_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:66:5: ( unary_expression ( MUL_OP^^ unary_expression )* )
-            // grammar/antlr_3/bc.g:66:5: unary_expression ( MUL_OP^^ unary_expression )*
+            // grammar/antlr_3/bc.g:68:5: ( unary_expression ( MUL_OP^^ unary_expression )* )
+            // grammar/antlr_3/bc.g:68:5: unary_expression ( MUL_OP^^ unary_expression )*
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_unary_expression_in_multiplying_expression263);
+            pushFollow(FOLLOW_unary_expression_in_multiplying_expression288);
             unary_expression19=unary_expression();
             _fsp--;
 
             adaptor.addChild(root_0, unary_expression19.tree);
-            // grammar/antlr_3/bc.g:66:22: ( MUL_OP^^ unary_expression )*
+            // grammar/antlr_3/bc.g:68:22: ( MUL_OP^^ unary_expression )*
             loop7:
             do {
                 int alt7=2;
@@ -732,16 +744,16 @@ public class BcParser extends Parser {
 
                 switch (alt7) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:66:24: MUL_OP^^ unary_expression
+            	    // grammar/antlr_3/bc.g:68:24: MUL_OP^^ unary_expression
             	    {
             	    CommonTree root_1 = (CommonTree)adaptor.nil();
 
             	    MUL_OP20=(Token)input.LT(1);
-            	    match(input,MUL_OP,FOLLOW_MUL_OP_in_multiplying_expression267); 
+            	    match(input,MUL_OP,FOLLOW_MUL_OP_in_multiplying_expression292); 
             	    MUL_OP20_tree = (CommonTree)adaptor.create(MUL_OP20);
             	    root_0 = (CommonTree)adaptor.becomeRoot(MUL_OP20_tree, root_0);
 
-            	    pushFollow(FOLLOW_unary_expression_in_multiplying_expression270);
+            	    pushFollow(FOLLOW_unary_expression_in_multiplying_expression295);
             	    unary_expression21=unary_expression();
             	    _fsp--;
 
@@ -782,44 +794,45 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start unary_expression
-    // grammar/antlr_3/bc.g:70:1: unary_expression : ( postfix_expression | INCR_DECR^^ postfix_expression );
+    // grammar/antlr_3/bc.g:72:1: unary_expression : ( postfix_expression | MINUS postfix_expression -> ^( UNARY_MINUS postfix_expression ) );
     public unary_expression_return unary_expression() throws RecognitionException {   
         unary_expression_return retval = new unary_expression_return();
         retval.start = input.LT(1);
 
         CommonTree root_0 = null;
 
-        Token INCR_DECR23=null;
+        Token MINUS23=null;
         postfix_expression_return postfix_expression22 = null;
 
         postfix_expression_return postfix_expression24 = null;
 
-
-        CommonTree INCR_DECR23_tree=null;
+        List list_postfix_expression=new ArrayList();
+        List list_MINUS=new ArrayList();
+        CommonTree MINUS23_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:71:5: ( postfix_expression | INCR_DECR^^ postfix_expression )
+            // grammar/antlr_3/bc.g:73:5: ( postfix_expression | MINUS postfix_expression -> ^( UNARY_MINUS postfix_expression ) )
             int alt8=2;
             int LA8_0 = input.LA(1);
-            if ( (LA8_0==NUMBER||LA8_0==19) ) {
+            if ( (LA8_0==NUMBER||LA8_0==20) ) {
                 alt8=1;
             }
-            else if ( (LA8_0==INCR_DECR) ) {
+            else if ( (LA8_0==MINUS) ) {
                 alt8=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("70:1: unary_expression : ( postfix_expression | INCR_DECR^^ postfix_expression );", 8, 0, input);
+                    new NoViableAltException("72:1: unary_expression : ( postfix_expression | MINUS postfix_expression -> ^( UNARY_MINUS postfix_expression ) );", 8, 0, input);
 
                 throw nvae;
             }
             switch (alt8) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:71:5: postfix_expression
+                    // grammar/antlr_3/bc.g:73:5: postfix_expression
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_postfix_expression_in_unary_expression287);
+                    pushFollow(FOLLOW_postfix_expression_in_unary_expression312);
                     postfix_expression22=postfix_expression();
                     _fsp--;
 
@@ -828,20 +841,37 @@ public class BcParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // grammar/antlr_3/bc.g:73:5: INCR_DECR^^ postfix_expression
+                    // grammar/antlr_3/bc.g:75:5: MINUS postfix_expression
                     {
-                    root_0 = (CommonTree)adaptor.nil();
+                    MINUS23=(Token)input.LT(1);
+                    match(input,MINUS,FOLLOW_MINUS_in_unary_expression324); 
+                    list_MINUS.add(MINUS23);
 
-                    INCR_DECR23=(Token)input.LT(1);
-                    match(input,INCR_DECR,FOLLOW_INCR_DECR_in_unary_expression299); 
-                    INCR_DECR23_tree = (CommonTree)adaptor.create(INCR_DECR23);
-                    root_0 = (CommonTree)adaptor.becomeRoot(INCR_DECR23_tree, root_0);
-
-                    pushFollow(FOLLOW_postfix_expression_in_unary_expression302);
+                    pushFollow(FOLLOW_postfix_expression_in_unary_expression326);
                     postfix_expression24=postfix_expression();
                     _fsp--;
 
-                    adaptor.addChild(root_0, postfix_expression24.tree);
+                    list_postfix_expression.add(postfix_expression24.tree);
+
+                    // AST REWRITE
+                    int i_0 = 0;
+                    retval.tree = root_0;
+                    root_0 = (CommonTree)adaptor.nil();
+                    // 75:30: -> ^( UNARY_MINUS postfix_expression )
+                    {
+                        // grammar/antlr_3/bc.g:75:33: ^( UNARY_MINUS postfix_expression )
+                        {
+                        CommonTree root_1 = (CommonTree)adaptor.nil();
+                        root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(UNARY_MINUS, "UNARY_MINUS"), root_1);
+
+                        adaptor.addChild(root_1, list_postfix_expression.get(i_0));
+
+                        adaptor.addChild(root_0, root_1);
+                        }
+
+                    }
+
+
 
                     }
                     break;
@@ -869,7 +899,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start postfix_expression
-    // grammar/antlr_3/bc.g:76:1: postfix_expression : ( NUMBER | '(' expression ')' -> expression );
+    // grammar/antlr_3/bc.g:78:1: postfix_expression : ( NUMBER | '(' expression ')' -> expression );
     public postfix_expression_return postfix_expression() throws RecognitionException {   
         postfix_expression_return retval = new postfix_expression_return();
         retval.start = input.LT(1);
@@ -882,36 +912,36 @@ public class BcParser extends Parser {
         expression_return expression27 = null;
 
         List list_expression=new ArrayList();
+        List list_21=new ArrayList();
         List list_20=new ArrayList();
-        List list_19=new ArrayList();
         CommonTree NUMBER25_tree=null;
         CommonTree char_literal26_tree=null;
         CommonTree char_literal28_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:77:5: ( NUMBER | '(' expression ')' -> expression )
+            // grammar/antlr_3/bc.g:79:5: ( NUMBER | '(' expression ')' -> expression )
             int alt9=2;
             int LA9_0 = input.LA(1);
             if ( (LA9_0==NUMBER) ) {
                 alt9=1;
             }
-            else if ( (LA9_0==19) ) {
+            else if ( (LA9_0==20) ) {
                 alt9=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("76:1: postfix_expression : ( NUMBER | '(' expression ')' -> expression );", 9, 0, input);
+                    new NoViableAltException("78:1: postfix_expression : ( NUMBER | '(' expression ')' -> expression );", 9, 0, input);
 
                 throw nvae;
             }
             switch (alt9) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:77:5: NUMBER
+                    // grammar/antlr_3/bc.g:79:5: NUMBER
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     NUMBER25=(Token)input.LT(1);
-                    match(input,NUMBER,FOLLOW_NUMBER_in_postfix_expression315); 
+                    match(input,NUMBER,FOLLOW_NUMBER_in_postfix_expression349); 
                     NUMBER25_tree = (CommonTree)adaptor.create(NUMBER25);
                     adaptor.addChild(root_0, NUMBER25_tree);
 
@@ -919,27 +949,27 @@ public class BcParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // grammar/antlr_3/bc.g:79:5: '(' expression ')'
+                    // grammar/antlr_3/bc.g:81:5: '(' expression ')'
                     {
                     char_literal26=(Token)input.LT(1);
-                    match(input,19,FOLLOW_19_in_postfix_expression327); 
-                    list_19.add(char_literal26);
+                    match(input,20,FOLLOW_20_in_postfix_expression361); 
+                    list_20.add(char_literal26);
 
-                    pushFollow(FOLLOW_expression_in_postfix_expression329);
+                    pushFollow(FOLLOW_expression_in_postfix_expression363);
                     expression27=expression();
                     _fsp--;
 
                     list_expression.add(expression27.tree);
                     char_literal28=(Token)input.LT(1);
-                    match(input,20,FOLLOW_20_in_postfix_expression331); 
-                    list_20.add(char_literal28);
+                    match(input,21,FOLLOW_21_in_postfix_expression365); 
+                    list_21.add(char_literal28);
 
 
                     // AST REWRITE
                     int i_0 = 0;
                     retval.tree = root_0;
                     root_0 = (CommonTree)adaptor.nil();
-                    // 79:24: -> expression
+                    // 81:24: -> expression
                     {
                         adaptor.addChild(root_0, list_expression.get(i_0));
 
@@ -973,7 +1003,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start quit
-    // grammar/antlr_3/bc.g:114:1: quit : 'quit' ;
+    // grammar/antlr_3/bc.g:116:1: quit : 'quit' ;
     public quit_return quit() throws RecognitionException {   
         quit_return retval = new quit_return();
         retval.start = input.LT(1);
@@ -985,13 +1015,13 @@ public class BcParser extends Parser {
         CommonTree string_literal29_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:115:5: ( 'quit' )
-            // grammar/antlr_3/bc.g:115:5: 'quit'
+            // grammar/antlr_3/bc.g:117:5: ( 'quit' )
+            // grammar/antlr_3/bc.g:117:5: 'quit'
             {
             root_0 = (CommonTree)adaptor.nil();
 
             string_literal29=(Token)input.LT(1);
-            match(input,21,FOLLOW_21_in_quit514); 
+            match(input,22,FOLLOW_22_in_quit548); 
             string_literal29_tree = (CommonTree)adaptor.create(string_literal29);
             adaptor.addChild(root_0, string_literal29_tree);
 
@@ -1017,34 +1047,34 @@ public class BcParser extends Parser {
 
  
 
-    public static final BitSet FOLLOW_input_item_in_program71 = new BitSet(new long[]{0x0000000000283140L});
-    public static final BitSet FOLLOW_quit_in_program74 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_semicolon_list_in_input_item99 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_statement_in_semicolon_list113 = new BitSet(new long[]{0x0000000000040002L});
-    public static final BitSet FOLLOW_18_in_semicolon_list117 = new BitSet(new long[]{0x0000000000083140L});
-    public static final BitSet FOLLOW_statement_in_semicolon_list120 = new BitSet(new long[]{0x0000000000040002L});
-    public static final BitSet FOLLOW_expression_in_statement137 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_in_statement149 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_named_expression_in_expression162 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_ASSIGN_OP_in_expression164 = new BitSet(new long[]{0x0000000000083100L});
-    public static final BitSet FOLLOW_expression_in_expression167 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_named_expression_in_expression180 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_adding_expression_in_expression192 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LETTER_in_named_expression205 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression230 = new BitSet(new long[]{0x0000000000000602L});
-    public static final BitSet FOLLOW_PLUS_in_adding_expression236 = new BitSet(new long[]{0x0000000000083000L});
-    public static final BitSet FOLLOW_MINUS_in_adding_expression241 = new BitSet(new long[]{0x0000000000083000L});
-    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression246 = new BitSet(new long[]{0x0000000000000602L});
-    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression263 = new BitSet(new long[]{0x0000000000000802L});
-    public static final BitSet FOLLOW_MUL_OP_in_multiplying_expression267 = new BitSet(new long[]{0x0000000000083000L});
-    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression270 = new BitSet(new long[]{0x0000000000000802L});
-    public static final BitSet FOLLOW_postfix_expression_in_unary_expression287 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INCR_DECR_in_unary_expression299 = new BitSet(new long[]{0x0000000000082000L});
-    public static final BitSet FOLLOW_postfix_expression_in_unary_expression302 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NUMBER_in_postfix_expression315 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_19_in_postfix_expression327 = new BitSet(new long[]{0x0000000000083100L});
-    public static final BitSet FOLLOW_expression_in_postfix_expression329 = new BitSet(new long[]{0x0000000000100000L});
-    public static final BitSet FOLLOW_20_in_postfix_expression331 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_21_in_quit514 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_input_item_in_program96 = new BitSet(new long[]{0x0000000000502A80L});
+    public static final BitSet FOLLOW_quit_in_program99 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_semicolon_list_in_input_item124 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_statement_in_semicolon_list138 = new BitSet(new long[]{0x0000000000080002L});
+    public static final BitSet FOLLOW_19_in_semicolon_list142 = new BitSet(new long[]{0x0000000000102A80L});
+    public static final BitSet FOLLOW_statement_in_semicolon_list145 = new BitSet(new long[]{0x0000000000080002L});
+    public static final BitSet FOLLOW_expression_in_statement162 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_in_statement174 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_named_expression_in_expression187 = new BitSet(new long[]{0x0000000000000100L});
+    public static final BitSet FOLLOW_ASSIGN_OP_in_expression189 = new BitSet(new long[]{0x0000000000102A00L});
+    public static final BitSet FOLLOW_expression_in_expression192 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_named_expression_in_expression205 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_adding_expression_in_expression217 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LETTER_in_named_expression230 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression255 = new BitSet(new long[]{0x0000000000000C02L});
+    public static final BitSet FOLLOW_PLUS_in_adding_expression261 = new BitSet(new long[]{0x0000000000102800L});
+    public static final BitSet FOLLOW_MINUS_in_adding_expression266 = new BitSet(new long[]{0x0000000000102800L});
+    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression271 = new BitSet(new long[]{0x0000000000000C02L});
+    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression288 = new BitSet(new long[]{0x0000000000001002L});
+    public static final BitSet FOLLOW_MUL_OP_in_multiplying_expression292 = new BitSet(new long[]{0x0000000000102800L});
+    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression295 = new BitSet(new long[]{0x0000000000001002L});
+    public static final BitSet FOLLOW_postfix_expression_in_unary_expression312 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MINUS_in_unary_expression324 = new BitSet(new long[]{0x0000000000102000L});
+    public static final BitSet FOLLOW_postfix_expression_in_unary_expression326 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NUMBER_in_postfix_expression349 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_20_in_postfix_expression361 = new BitSet(new long[]{0x0000000000102A00L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression363 = new BitSet(new long[]{0x0000000000200000L});
+    public static final BitSet FOLLOW_21_in_postfix_expression365 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_22_in_quit548 = new BitSet(new long[]{0x0000000000000002L});
 
 }

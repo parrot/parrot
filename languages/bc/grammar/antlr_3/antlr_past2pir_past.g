@@ -67,12 +67,14 @@ gen_pir_past
         + "                                                                  \n"
         + "  .sym pmc reg_expression_stmt                                    \n"
         + "  .sym pmc reg_expression_topexp                                  \n"
-        + "  .sym pmc reg_expression_op                                      \n"
+        + "  .sym pmc reg_print_op                                           \n"
         + "  .sym pmc reg_expression_exp                                     \n"
         + "  .sym pmc reg_expression_stmt                                    \n"
         + "  .sym pmc reg_expression_newline                                 \n"
         + "                                                                  \n"
         + "  .sym pmc reg_temp                                               \n"
+        + "  .sym pmc reg_unary_val                                           \n"
+        + "  .sym pmc reg_unary_op                                            \n"
         + "                                                                  \n"
         + "  .sym pmc reg_adding_expression_op                               \n"
       );
@@ -179,36 +181,55 @@ expression[String reg_mother]
         + "  # entering 'expression'                                         \n"
         + "    reg_expression_stmt = new 'PAST::Stmt'                        \n"
         + "      reg_expression_topexp = new 'PAST::Exp'                     \n"
-        + "        reg_expression_op = new 'PAST::Op'                        \n"
-        + "        reg_expression_op.'op'( 'print' )                         \n"
+        + "        reg_print_op = new 'PAST::Op'                             \n"
+        + "        reg_print_op.'op'( 'print' )                              \n"
         + "          reg_expression_exp = new 'PAST::Exp'                    \n"
       );
     }
     (
-      adding_expression["reg_expression_exp"]
+      ( adding_expression["reg_expression_exp"] | named_expression["reg_expression_exp"] )
+      { 
+        System.out.print( 
+            "                                                                \n"
+          + "      reg_print_op.'add_child'( reg_expression_exp )            \n"
+        );
+      }
       |
-      named_expression["reg_expression_exp"]
+      ^( UNARY_MINUS ( adding_expression["reg_expression_exp"] | named_expression["reg_expression_exp"] ) )
+      { 
+        System.out.print( 
+            "                                                                \n"
+          + "   # multiply by -1                                             \n"
+          + "   reg_unary_op = new 'PAST::Op'                                \n"
+          + "   reg_unary_op.'op'( 'infix:*' )                               \n"
+          + "     reg_unary_val = new 'PAST::Val'                            \n"
+          + "     reg_unary_val.value( -1 )                                  \n"
+          + "     reg_unary_val.valtype( 'num' )                             \n"
+          + "   reg_unary_op.'add_child'( reg_unary_val )                    \n"
+          + "   reg_unary_op.'add_child'( reg_expression_exp )               \n"
+          + "      reg_print_op.'add_child'( reg_unary_op )                  \n"
+        );
+      }
     )
     {
       System.out.print( 
           "                                                                  \n"
-        + "        reg_expression_op.'add_child'( reg_expression_exp )       \n"
-        + "      reg_expression_topexp.'add_child'( reg_expression_op )      \n"
+        + "      reg_expression_topexp.'add_child'( reg_print_op      )      \n"
         + "    reg_expression_stmt.'add_child'( reg_expression_topexp )      \n"
         + "  " + $expression.reg_mother + ".'add_child'( reg_expression_stmt ) \n"
         + "                                                                  \n"
         + "  # Now print a newline                                           \n"
         + "    reg_expression_stmt = new 'PAST::Stmt'                        \n"
         + "      reg_expression_topexp = new 'PAST::Exp'                     \n"
-        + "        reg_expression_op = new 'PAST::Op'                        \n"
+        + "        reg_print_op = new 'PAST::Op'                        \n"
         + "          reg_expression_exp = new 'PAST::Exp'                    \n"
         + "            reg_expression_newline = new 'PAST::Val'              \n"
         + "            reg_expression_newline.value( '\\n' )                 \n"
         + "            reg_expression_newline.valtype( 'strqq' )             \n"
         + "          reg_expression_exp.'add_child'( reg_expression_newline )\n"
-        + "        reg_expression_op.'add_child'( reg_expression_exp )       \n"
-        + "        reg_expression_op.'op'( 'print' )                         \n"
-        + "      reg_expression_topexp.'add_child'( reg_expression_op )      \n"
+        + "        reg_print_op.'add_child'( reg_expression_exp )       \n"
+        + "        reg_print_op.'op'( 'print' )                         \n"
+        + "      reg_expression_topexp.'add_child'( reg_print_op )      \n"
         + "    reg_expression_stmt.'add_child'( reg_expression_topexp )      \n"
         + "  " + $expression.reg_mother + ".'add_child'( reg_expression_stmt )\n"
         + "  # leaving 'expression'                                          \n"
@@ -234,16 +255,16 @@ string [ String reg_mother ]
         + "# entering 'string'                                             \n"
         + "    reg_expression_stmt = new 'PAST::Stmt'                      \n"
         + "      reg_expression_topexp = new 'PAST::Exp'                   \n"
-        + "        reg_expression_op = new 'PAST::Op'                      \n"
-        + "        reg_expression_op.'op'( 'print' )                       \n"
+        + "        reg_print_op = new 'PAST::Op'                      \n"
+        + "        reg_print_op.'op'( 'print' )                       \n"
         + "          reg_expression_exp = new 'PAST::Exp'                  \n"
         + "            reg_temp = new 'PAST::Val'                          \n"
         + "            reg_temp.value( " + $STRING.text + " )              \n"
-        + "            reg_temp.valtype( 'strqq' )                           \n"
+        + "            reg_temp.valtype( 'strqq' )                         \n"
         + "          reg_expression_exp.'add_child'( reg_temp )            \n"
         + "          null reg_temp                                         \n"
-        + "        reg_expression_op.'add_child'( reg_expression_exp )     \n"
-        + "      reg_expression_topexp.'add_child'( reg_expression_op )    \n"
+        + "        reg_print_op.'add_child'( reg_expression_exp )     \n"
+        + "      reg_expression_topexp.'add_child'( reg_print_op )         \n"
         + "    reg_expression_stmt.'add_child'( reg_expression_topexp )    \n"
         + "  " + $string.reg_mother + ".'add_child'( reg_expression_stmt ) \n"
         + "# leaving 'string'                                              \n"
