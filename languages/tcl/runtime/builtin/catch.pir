@@ -8,22 +8,21 @@
   .param pmc argv :slurpy
  
   .local int argc 
-  argc = argv
+  argc = elements argv
 
   .local int retval
-  .local pmc code_retval,compiler,pir_compiler
+  .local pmc code_retval
   .local string varname,sigil_varname,code
 
-  compiler     = get_root_global ['_tcl'], 'compile'
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
+  .local pmc __script
+  __script = get_root_global ['_tcl'], '__script'
 
-  if argc == 0 goto badargs
-  if argc  > 2 goto badargs
+  if argc == 0 goto bad_args
+  if argc  > 2 goto bad_args
 
   code = argv[0]
   push_eh non_ok
-    ($I0,$P1) = compiler(0,code)
-    $P2 = pir_compiler($I0,$P1)
+    $P2 = __script(code)
     code_retval = $P2()
     retval = TCL_OK  # no exception => TCL_OK
   clear_eh
@@ -36,8 +35,7 @@ non_ok:
   .get_message(code_retval)
 
 got_retval:
-  #argc = argv # lost over function invoke?
-  if argc==1 goto done
+  if argc == 1 goto done
 
   varname = argv[1]
 
@@ -50,7 +48,6 @@ got_retval:
 done:
   .return(retval)
 
-badargs:
+bad_args:
   .throw ('wrong # args: should be "catch script ?resultVarName? ?optionVarName?"')
-
 .end
