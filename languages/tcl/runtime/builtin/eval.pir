@@ -10,36 +10,18 @@
 .sub '&eval'
   .param pmc argv :slurpy
  
-  .local string expr
   .local int argc
-  argc = argv
-  unless argc goto no_args
+  argc = elements argv
+  unless argc goto bad_args
  
-  .local int looper
- 
-  .local pmc compiler,pir_compiler
-  compiler     = get_root_global ['_tcl'], 'compile'
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
+  .local pmc __script
+  __script = get_root_global ['_tcl'], '__script'
 
-  expr = ''
-  looper = 0
-
-loop:
-  if looper == argc goto loop_done
-  $S0 = argv[looper]
-  concat expr, $S0
-  inc looper
-  if looper == argc goto loop_done
-  concat expr,' '
-
-  goto loop
-
-loop_done:
-  ($I0,$P1) = compiler(0,expr)
-  $P2 = pir_compiler($I0,$P1) 
+  .local string code
+  code = join ' ', argv
+  $P2  = __script(code)
   .return $P2()
 
-no_args:
+bad_args:
   .throw('wrong # args: should be "eval arg ?arg ...?"')
-
 .end
