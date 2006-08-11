@@ -173,6 +173,13 @@ other than the default, and multiple interpreters.
 
   .local pmc variable
 
+  # Some cases in the code allow a NULL pmc to show up here.
+  # This defensively converts them to an empty string.
+  unless_null value, got_value
+  value = new TclString
+  value = ''
+
+ got_value:
   # is this an array?
   # ends with )
   .local int char
