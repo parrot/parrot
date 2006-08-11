@@ -89,6 +89,7 @@ $(R_BUILTIN)/regexp.pir \
 $(C_BUILTIN)/regsub.pir \
 $(R_BUILTIN)/rename.pir \
 $(C_BUILTIN)/return.pir \
+$(R_BUILTIN)/return.pir \
 $(R_BUILTIN)/source.pir \
 $(R_BUILTIN)/split.pir \
 $(R_BUILTIN)/string.pir \
