@@ -19,10 +19,6 @@
   __script = get_root_global ['_tcl'], '__script'
 
   $P1 = argv[0] 
-  typeof type, $P1
-  if type != .ParrotIO goto file
-  handle = $P1
-  goto loop
 
 file:
   filename = $P1
@@ -32,7 +28,7 @@ file:
   contents = ''
  
 loop:
-  read chunk, handle, 1024
+  read chunk, handle, 2048
   if chunk == '' goto gotfile
   contents = contents . chunk
   goto loop
