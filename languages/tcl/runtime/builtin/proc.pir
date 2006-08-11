@@ -121,8 +121,8 @@ args_loop:
   args_code.emit("  $P1 = shift args")
   args_code.emit("  store_lex '$%0', $P1", $S0)
   
-  args_usage .= $S0
   args_usage .= " "
+  args_usage .= $S0
   goto args_next
 
 default_arg:
@@ -140,16 +140,15 @@ default_%0:
   store_lex '$%1', $P1
 END_PIR
 
-  args_usage .= "?"
+  args_usage .= " ?"
   args_usage .= $S0
-  args_usage .= "? "
+  args_usage .= "?"
 
 args_next:
   inc i
   goto args_loop
 
 args_loop_done:
-  chopn args_usage, 1
   chopn args_info,  1
 
   unless is_slurpy goto store_info
@@ -198,7 +197,7 @@ done_args:
   code.emit(<<"END_PIR", name, args_usage)
   goto ARGS_OK
 BAD_ARGS:
-  .throw('wrong # args: should be \"%0 %1\"')
+  .throw('wrong # args: should be \"%0%1\"')
 ARGS_OK:
   push_eh is_return
 END_PIR
