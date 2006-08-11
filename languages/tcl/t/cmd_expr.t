@@ -17,10 +17,10 @@ eval_is {expr 3e2.0} \
 is [expr true]  true  {true}
 is [expr false] false {false}
 eval_is {expr trues}  \
- {syntax error in expression "trues": variable references require preceding $} \
+ {syntax error in expression "trues": the word "trues" requires a preceding $ if it's a variable or function arguments if it's a function} \
  {trues}
 eval_is {expr falses} \
- {syntax error in expression "falses": variable references require preceding $} \
+ {syntax error in expression "falses": the word "falses" requires a preceding $ if it's a variable or function arguments if it's a function} \
  {falses}
 
 eval_is {expr {}} {syntax error in expression "": premature end of expression}
