@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 7;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"rename");
