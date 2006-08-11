@@ -246,6 +246,7 @@ SKIPPED_TCL_TESTS = \
   t_tcl/notify.t \
   t_tcl/pid.t \
   t_tcl/result.t \
+  t_tcl/while.t \
   t_tcl/winConsole.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
@@ -269,16 +270,24 @@ SKIPPED_TCL_TESTS = \
 #
 # invalid command name "list" | can't rename "list": command doesn't exist
 #t_tcl/regexpComp.t      t_tcl/rename.t          t_tcl/basic.t
+#t_tcl/for.t
 #
-#add_1_const:Integer overflow '2'
+# add_1_const:Integer overflow '2'
 #t_tcl/get.t
 #
+# FixedPMCArray: Can't resize!
+#t_tcl/if.t
+#
+# No such caller depth
+#t_tcl/compile.t
+#
+# test crashes:
+#t_tcl/compExpr.t
+#
 # [expr issues]
-#t_tcl/if.t - can't use non-numeric string as operand of "!"
 #t_tcl/apply.t  - syntax error in expression "[info commands ::apply] eq {}": premature end of expression
 #t_tcl/async.t  - syntax error in expression "[info exists ::tcl_platform(threaded)] && $::tcl_platform(threaded)": premature end of expression
 #t_tcl/stack.t - expected boolean value but got "unix"
-#t_tcl/compile.t - can't use non-numeric string as operand of "!"
 #t_tcl/load.t - syntax error in expression "![string match *pkga* $alreadyLoaded]": premature end of expression
 #t_tcl/registry.t - expected boolean value but got "win"
 #t_tcl/unixInit - syntax error in expression " ($tcl_platform(os) eq "Darwin") ? "^utf-8$" : "^iso8859-15?$"": premature end of expression
@@ -290,10 +299,7 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/unixNotfy.t - syntax error in expression " (![info exist tcl_platform(threaded)] || !$tcl_platform(threaded)) && $tcl_platform(os) ne "Darwin" ": premature end of expression
 #t_tcl/main.t - syntax error in expression " [llength [package provide Tcltest]] && [package vsatisfies [package provide Tcltest] 8.4]": extra tokens at end of expression
 #t_tcl/unload.t - syntax error in expression "![string match *pkgua* $alreadyLoaded]": premature end of expression
-#t_tcl/compExpr.t - can't use non-numeric string as operand of "!"
-#t_tcl/for.t - can't use non-numeric string as operand of "!"
 t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcltest] == -1": premature end of expression
-#t_tcl/while.t -can't use non-numeric string as operand of "!"
 #t_tcl/var.t - syntax error in expression "[lsearch [namespace children] ::tcltest] == -1": premature end of expression
 #t_tcl/history.t         -expected boolean value but got "history"
 #t_tcl/winFile.t          -expected boolean value but got "testvolumetype"
@@ -309,6 +315,7 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 #
 # clone() not implemented in class 'Undef'
 #t_tcl/listObj.t
+#
 # push_pmc() not implemented in class 'RetContinuation'
 #t_tcl/unknown.t
 #

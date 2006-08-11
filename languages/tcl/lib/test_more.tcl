@@ -135,8 +135,9 @@ proc test {num description code args} {
 # all the option params to test, we'll ignore this one two, and execute tests
 # when we shouldn't.
 
-proc testConstraint     {args} {}
-proc temporaryDirectory {args} {}
-proc makeFile           {args} {}
-proc removeFile         {args} {}
-proc bytestring         {args} {}
+proc testConstraint     {args} {return 0}
+proc temporaryDirectory {args} {return 0}
+proc makeFile           {args} {return 0}
+proc removeFile         {args} {return 0}
+proc bytestring         {args} {return 0}
+proc customMatch        {args} {return 0}
