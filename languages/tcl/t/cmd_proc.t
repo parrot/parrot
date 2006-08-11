@@ -81,7 +81,7 @@ language_output_is("tcl",<<'TCL',<<OUT,"bad varargs");
  }
  me 2
 TCL
-wrong # args: should be "me a b args"
+wrong # args: should be "me a b ..."
 OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"vararg");

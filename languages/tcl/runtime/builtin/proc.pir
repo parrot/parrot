@@ -153,7 +153,7 @@ args_loop_done:
   chopn args_info,  1
 
   unless is_slurpy goto store_info
-  args_usage .= " args"
+  args_usage .= " ..."
   args_info  .= " args"
 
 store_info:
