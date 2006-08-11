@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 200
+plan 218
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -107,19 +107,36 @@ is [expr 2||0] 1 {||}
 is [expr 0||2] 1 {||}
 is [expr 0||0] 0 {||}
 
-# invalid (string) operators for some unary ops
+# invalid (string) operands for some unary ops
 set ops_list [list - + ~ !]
 foreach operator $ops_list {
   eval_is "expr {${operator}\"a\"}" \
     "can't use non-numeric string as operand of \"$operator\"" \
     "string unary $operator" 
+  eval_is "expr {${operator}\"\"}" \
+    "can't use empty string as operand of \"$operator\"" \
+    "string unary $operator" 
 }
 
-# invalid (string) operators for some binary ops
+# invalid (string) operands for some binary ops
 set ops_list [list * / % + - << >> & | ^]
 foreach operator $ops_list {
   eval_is "expr {\"a\" $operator \"b\"}" \
     "can't use non-numeric string as operand of \"$operator\"" \
+    "string $operator" 
+  eval_is "expr {\"\" $operator \"\"}" \
+    "can't use empty string as operand of \"$operator\"" \
+    "string $operator" 
+}
+
+# invalid (string) operands for logical ops
+set logic_ops_list [list && ||]
+foreach operator $logic_ops_list {
+  eval_is "expr {\"a\" $operator \"b\"}" \
+    {expected boolean value but got "a"} \
+    "string $operator" 
+  eval_is "expr {\"\" $operator \"\"}" \
+    {expected boolean value but got ""} \
     "string $operator" 
 }
 
