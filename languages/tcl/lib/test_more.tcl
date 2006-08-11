@@ -49,6 +49,8 @@ proc is {value expected {description ""} {special {}}}  {
         set formatted_value [join [split $value "\n"] "\n# "]
         set formatted_expected [join [split $expected "\n"] "\n# "]
         if {$type ne "todo"} {
+            set formatted_value [join [split $value "\n"] "\n# "]
+            set formatted_expected [join [split $expected "\n"] "\n# "]
             diag "\n#     Failed test #$very_bad_global_variable_test_num\n#      got : '$formatted_value'\n# expected : '$formatted_expected'"
         }
         return 0
