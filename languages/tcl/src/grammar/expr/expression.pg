@@ -16,7 +16,7 @@ token term {
     | <function>
     | <nested>
     | <boolean>
-    | <[a..zA..Z]> <syntax_error: variable references require preceding $>
+    | <[a..zA..Z]> <syntax_error_variable_or_function>
 }
 
 ## used by term

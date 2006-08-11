@@ -110,3 +110,20 @@ fail:
 
     .throw($P0)
 .end
+
+.sub 'syntax_error_variable_or_function'
+    .param pmc    mob
+    .param pmc    adverbs :named :slurpy
+    
+    .local string target
+    $P0 = getattribute mob, '$.target'
+    target = $P0
+    
+    .local string msg
+    msg = 'the word "'
+    msg .= target
+    msg .= '" requires a preceding $ if '
+    msg .= "it's a variable or function arguments if it's a function"
+
+    .return syntax_error(mob, msg, adverbs)
+.end
