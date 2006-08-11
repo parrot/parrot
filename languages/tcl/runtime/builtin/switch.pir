@@ -4,10 +4,12 @@
 .sub '&switch'
   .param pmc argv :slurpy
   .local int argc
-  argc = argv
+  argc = elements argv
 
   .local pmc retval
   .local string mode
+  .local int nocase
+  nocase = 0
   mode = '-exact'
 
   if argc < 2 goto bad_args
@@ -22,9 +24,14 @@ flag_loop:
   if $S0 == '-exact' goto set_mode
   if $S0 == '-glob' goto set_mode
   if $S0 == '-regexp' goto set_mode
+  if $S0 == '-nocase' goto set_case
   if $S0 == '-matchvar' goto set_fvar
   if $S0 == '-indexvar' goto set_fvar
   branch bad_flag
+
+set_case:
+  nocase = 1
+  branch flag_loop
 
 set_mode:
   mode = $S0
@@ -67,7 +74,11 @@ exact_loop:
   unless body goto body_end
   pattern = shift body
   code = shift body
+  unless nocase goto exact_do
+  pattern = downcase pattern
+  code    = downcase code
 
+exact_do:
   if subject == pattern goto body_match
   branch exact_loop
 
@@ -78,7 +89,11 @@ glob_loop:
   unless body goto body_end
   pattern = shift body
   code = shift body
+  unless nocase goto glob_do
+  pattern = downcase pattern 
+  code    = downcase code
 
+ glob_do:
   (rule, $P1, $P2) = globber(pattern)
   $P0 = rule(subject)
   if $P0 goto body_match
@@ -91,6 +106,10 @@ regex_loop:
   unless body goto body_end
   pattern = shift body
   code = shift body
+  unless nocase goto re_do
+  pattern = downcase pattern 
+  code    = downcase code
+ re_do:
   rule  = tclARE(pattern)
   match = rule(subject)
   if match goto body_match
