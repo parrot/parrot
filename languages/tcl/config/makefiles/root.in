@@ -264,15 +264,18 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/set_old.t         t_tcl/ioCmd.t           t_tcl/dict.t
 #t_tcl/clock.t           t_tcl/exec.t            t_tcl/compExpr_old.t
 #t_tcl/execute.t         t_tcl/expr.t            t_tcl/fCmd.t
-#t_tcl/fileName.t        t_tcl/util.t            t_tcl/format.t
 #t_tcl/parseExpr.t       t_tcl/pkgMkIndex.t      t_tcl/winFCmd.t
 #t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/winPipe.t
 #t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t
 #t_tcl/lsetComp.t        t_tcl/lsearch.t         t_tcl/info.t
+#t_tcl/fileName.t        t_tcl/util.t            
 #
 # invalid command name "list" | can't rename "list": command doesn't exist
 #t_tcl/regexpComp.t      t_tcl/rename.t          t_tcl/basic.t
 #t_tcl/for.t
+#
+#MMD function __cmp not found for types (21, 74)
+#t/tcl_format.t
 #
 # add_1_const:Integer overflow '2'
 #t_tcl/get.t
