@@ -44,15 +44,26 @@ skip:
 
   $S0 = join ' ', argv
   $P0 = __script($S0)
-  # can't quite tailcall this at the moment due to the hackish call_level
-  $P0 = $P0()
+  # if we get an exception, we have to reset the environment
+  push_eh restore_and_rethrow
+    $P0 = $P0()
+  clear_eh
 
-  #restore the old level
+  # restore the old level
   call_level_diff -= difference
   assign call_level, old_call_level
 
 done:
   .return($P0)
+
+restore_and_rethrow:
+  .catch()
+
+  # restore the old level
+  call_level_diff -= difference
+  assign call_level, old_call_level
+
+  .rethrow()
 
 bad_args:
   .throw('wrong # args: should be "uplevel ?level? command ?arg ...?"')
