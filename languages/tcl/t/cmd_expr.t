@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 218
+plan 220
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -253,6 +253,14 @@ eval_is {
   set under_score0 3
   expr {$under_score0}
 } 3 {_, 0 in varnames}
+
+#command expansions
+eval_is {
+  expr {[list a] eq [list a]}
+} 1 {command expansion inside, list types.}
+eval_is {
+  expr {[set a a] eq [set b a]}
+} 1 {command expansion inside, string types}
 
 # TD-    add tet   for ::tcl::mathfunc 
 
