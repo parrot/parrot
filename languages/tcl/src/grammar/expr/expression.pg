@@ -46,7 +46,7 @@ token word {
 }
 
 token constant {
-    (<-[\]]>+)
+    (<[a..zA..Z0..9\:]>+)
 }
 
 token quoted { " <quoted_literal> " }
