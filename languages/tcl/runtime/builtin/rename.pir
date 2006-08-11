@@ -77,7 +77,15 @@ return:
   .return('')
 
 doesnt_exist:
+  if newName == '' goto cant_delete
+
   $S0 = "can't rename \""
+  $S0 .= oldName
+  $S0 .= "\": command doesn't exist"
+  .throw ($S0)
+
+cant_delete:
+  $S0 = "can't delete \""
   $S0 .= oldName
   $S0 .= "\": command doesn't exist"
   .throw ($S0)
