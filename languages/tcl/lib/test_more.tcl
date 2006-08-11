@@ -46,8 +46,6 @@ proc is {value expected {description ""} {special {}}}  {
     } {
         puts "not ok $num$description"
 
-        set formatted_value [join [split $value "\n"] "\n# "]
-        set formatted_expected [join [split $expected "\n"] "\n# "]
         if {$type ne "todo"} {
             set formatted_value [join [split $value "\n"] "\n# "]
             set formatted_expected [join [split $expected "\n"] "\n# "]
