@@ -57,7 +57,11 @@ token quoted { " <quoted_literal> " }
 token braced   { \{ ([ \\. | <braced> | <-[}]> ]*) \} }
 
 # XXX naive
-token variable { \$ (<[a..zA..Z0..9_:]>+) }
+token name { <[a..zA..Z0..9_:]>+ }
+token variable { \$ [
+| (<?name> \( <?name> \) )
+| (<?name>)
+]}
 
 token number { <scientific> | <float> | <integer> }
 
