@@ -29,9 +29,11 @@ proc is {value expected {description ""} {special {}}}  {
     incr  very_bad_global_variable_test_num 
     
     set num $very_bad_global_variable_test_num
+    set type ""
  
     if {[llength $special] == 2} {
         set description " - $description # $special"
+        set type [string tolower [lindex $special 0]]
     } else {
         if  {$description ne ""} {
             set description " - $description"
@@ -46,7 +48,9 @@ proc is {value expected {description ""} {special {}}}  {
 
         set formatted_value [join [split $value "\n"] "\n# "]
         set formatted_expected [join [split $expected "\n"] "\n# "]
-        diag "\n#     Failed test #$very_bad_global_variable_test_num\n#      got : '$formatted_value'\n# expected : '$formatted_expected'"
+        if {$type ne "todo"} {
+            diag "\n#     Failed test #$very_bad_global_variable_test_num\n#      got : '$formatted_value'\n# expected : '$formatted_expected'"
+        }
         return 0
     }
 }
