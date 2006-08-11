@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 56;
+use Parrot::Test tests => 57;
 use Parrot::Config;
 
 =head1 NAME
@@ -35,7 +35,7 @@ END_PASM
 
 
 END {
-    unlink($temp, 'temp.pbc');
+    unlink($temp, 'temp.pbc', 'temp.pasm');
 };
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
@@ -301,6 +301,20 @@ back
 OUTPUT
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
+
+pir_output_is(<<'CODE', <<'OUTPUT', "load_bytecode Sx");
+.sub main :main
+    $S0 = 'temp.pasm'
+    load_bytecode $S0
+    _sub1()
+    $S0 = 'temp.pbc'
+    load_bytecode $S0
+    _sub2()
+.end
+CODE
+in sub1
+in sub2
+OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode PBC call different subs, ret");
 .pcc_sub _main:
