@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 language_output_is("tcl", <<'TCL', <<'OUT', 'upvar $command');
@@ -47,5 +47,14 @@ language_output_is("tcl", <<'TCL', <<'OUT', "uplevel - from one lexical to anoth
   test
 TCL
 3
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'uplevel - reset environent on execption');
+  proc test {} {catch {uplevel #0 {error "foo"}}}
+  set a 4
+  test
+  puts $a
+TCL
+4
 OUT
 
