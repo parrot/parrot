@@ -89,11 +89,11 @@ is_string:
 .sub 'prefix:!' :multi(String)
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc __boolean
+    __boolean = get_root_global ['_tcl'], '__boolean'
 
     push_eh is_string
-      a = __number(a)
+      a = __boolean(a)
     clear_eh
 
     $I0 = a

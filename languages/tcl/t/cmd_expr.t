@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 198
+plan 199
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -26,11 +26,12 @@ eval_is {expr falses} \
 eval_is {expr {}} {syntax error in expression "": premature end of expression}
 
 # simple unary ops.
-is [expr -2]  -2 {unary -}
-is [expr +2]   2 {unary +}
-is [expr ~0]  -1 {unary ~}
-is [expr !2]   0 {unary !}
-is [expr !!2]  1 {double unary !}
+is [expr -2]   -2 {unary -}
+is [expr +2]    2 {unary +}
+is [expr ~0]   -1 {unary ~}
+is [expr !2]    0 {unary !}
+is [expr !true] 0 {unary ! - boolean}
+is [expr !!2]   1 {double unary !}
 
 # simple unary ops - stringified args
 is [expr {-"2"}]  -2 {unary -}
