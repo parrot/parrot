@@ -196,18 +196,12 @@ test:	tcl.pbc
 # Can only run a few of these cleanly with test_more at the moment.
 # eventually, as the list of commented out tests is smaller, just
 # run them all. For now - only run the ones that will report properly
-# to the harness.
+# to the harness (and pass at least one test)
+
 RUNNABLE_TCL_TESTS = \
   t_tcl/append.t \
   t_tcl/appendComp.t \
-  t_tcl/assocd.t \
-  t_tcl/case.t \
-  t_tcl/chan.t \
-  t_tcl/cmdInfo.t \
-  t_tcl/cmdIL.t  \
   t_tcl/concat.t \
-  t_tcl/config.t \
-  t_tcl/dcall.t \
   t_tcl/env.t \
   t_tcl/eval.t \
   t_tcl/event.t \
@@ -215,29 +209,47 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/for_old.t \
   t_tcl/if_old.t \
   t_tcl/incr_old.t \
-  t_tcl/indexObj.t \
   t_tcl/join.t \
   t_tcl/lindex.t \
-  t_tcl/link.t \
   t_tcl/linsert.t \
   t_tcl/llength.t \
   t_tcl/lrange.t \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
-  t_tcl/lset.t \
-  t_tcl/notify.t \
   t_tcl/package.t \
-  t_tcl/pid.t \
   t_tcl/platform.t \
+  t_tcl/proc.t \
+  t_tcl/proc_old.t \
   t_tcl/pwd.t \
-  t_tcl/result.t \
   t_tcl/security.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
+  t_tcl/switch.t \
   t_tcl/upvar.t \
+  t_tcl/utf.t \
+  t_tcl/while_old.t       
+
+# These tests parse but fail every test.
+FAILING_TCL_TESTS = \
+  t_tcl/case.t \
+  t_tcl/config.t
+
+# These tests parse but all are skipped due to harder [test] format.
+SKIPPED_TCL_TESTS = \
+  t_tcl/assocd.t \
+  t_tcl/chan.t \
+  t_tcl/cmdInfo.t \
+  t_tcl/dcall.t \
+  t_tcl/indexObj.t \
+  t_tcl/link.t \
+  t_tcl/lset.t \
+  t_tcl/notify.t \
+  t_tcl/pid.t \
+  t_tcl/result.t \
   t_tcl/winConsole.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
+
 
 # These test files die for various reasons.
 #
@@ -253,7 +265,7 @@ RUNNABLE_TCL_TESTS = \
 #t_tcl/parseExpr.t       t_tcl/pkgMkIndex.t      t_tcl/winFCmd.t
 #t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/winPipe.t
 #t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t
-#t_tcl/lsetComp.t
+#t_tcl/lsetComp.t        t_tcl/lsearch.t         t_tcl/info.t
 #
 # invalid command name "list" | can't rename "list": command doesn't exist
 #t_tcl/regexpComp.t      t_tcl/rename.t          t_tcl/basic.t
@@ -287,16 +299,14 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 #t_tcl/winFile.t          -expected boolean value but got "testvolumetype"
 #t_tcl/autoMkindex.t - syntax error in expression "[info exists auto_mkindex_parser::initCommands]": premature end of expression
 #
-# Null PMC access in name()
-#t_tcl/info.t            t_tcl/switch.t          t_tcl/lsearch.t
-#t_tcl/namespace_old.t   t_tcl/proc.t            t_tcl/http.t
-#t_tcl/while_old.t       t_tcl/proc_old.t        t_tcl/utf.t
+# Null PMC access in isa()
+#t_tcl/namespace_old.t
 #
 # Null PMC access in clone()
 #t_tcl/init.t            t_tcl/safe.t            t_tcl/source.t
 #t_tcl/pkg.t             t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
 #t_tcl/unixFCmd          t_tcl/unixFile.t        t_tcl/misc.t
-# 
+#
 # clone() not implemented in class 'Undef'
 #t_tcl/listObj.t
 # push_pmc() not implemented in class 'RetContinuation'
@@ -332,11 +342,11 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 #t_tcl/stringObj.t
 #
 # bad option "script": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars
-#t_tcl/httpold.t
+#t_tcl/http.t            t_tcl/httpold.t
 
 tcl-test: t_tcl tcl.pbc
     # For now, just test the ones that ``work'' with test_more
-	prove $(RUNNABLE_TCL_TESTS)
+	TEST_PROG_ARGS=-G prove $(RUNNABLE_TCL_TESTS)
 t_tcl:
 	$(PERL) tools/tcl_test.pl
 
