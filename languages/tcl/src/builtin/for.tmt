@@ -19,4 +19,5 @@ exception:
   .rethrow()
 
 done:
-  
+  $R = new .String
+  $R = ''
