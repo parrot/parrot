@@ -13,8 +13,10 @@ eval_is {
  set a
 } 1 {get}
 
-eval_is {expr $a} \
-  {can't read "a": no such variable} \
+eval_is {
+  catch {unset a}
+  set a
+} {can't read "a": no such variable} \
   {missing global}
 
 eval_is {
