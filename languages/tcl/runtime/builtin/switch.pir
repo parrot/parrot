@@ -58,12 +58,15 @@ body_from_list:
 
   $P0 = shift argv
   body = __list($P0)
-  branch got_body
+  goto got_body
 
 body_from_argv:
   body = argv
 
 got_body:
+  $I0 = elements body
+  $I0 = $I0 % 2
+  if $I0 == 1 goto extra_pattern
   .local string pattern, code
   if mode == '-exact' goto exact_mode
   if mode == '-glob' goto glob_mode
@@ -73,7 +76,6 @@ exact_mode:
 exact_loop:
   unless body goto body_end
   pattern = shift body
-  unless body goto extra_pattern
   code = shift body
   unless nocase goto exact_do
   pattern = downcase pattern

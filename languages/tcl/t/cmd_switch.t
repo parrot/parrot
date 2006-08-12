@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 17
+plan 19
 
 eval_is {switch} \
   {wrong # args: should be "switch ?switches? string pattern body ... ?default body?"} \
@@ -14,10 +14,6 @@ eval_is {switch a} \
 eval_is {switch -monkey a} \
   {bad option "-monkey": must be -exact, -glob, -indexvar, -matchvar, -nocase, -regexp, or --} \
   {bad flag, -monkey}
-
-eval_is {switch chr {a 1 b}} \
-  {extra switch pattern with no body} \
-  {pattern with no body}
 
 eval_is {
  set q 1
@@ -115,6 +111,10 @@ eval_is {
   set q
 } 3 {implied exact, choices in list}
 
+eval_is {switch a {a 1 b}} \
+  {extra switch pattern with no body} \
+  {implied exact, pattern with no body}
+
 eval_is {
   set q 1
   switch -glob ab {
@@ -146,4 +146,12 @@ eval_is {
   set q
 } 5 {-glob, no match, default}
 
+eval_is {switch -glob a {a 1 b}} \
+  {extra switch pattern with no body} \
+  {-glob, pattern with no body}
+
 # XXX Need -regexp tests 
+
+eval_is {switch -regexp a {a 1 b}} \
+  {extra switch pattern with no body} \
+  {-regexp, pattern with no body}
