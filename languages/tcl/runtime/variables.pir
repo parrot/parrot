@@ -269,8 +269,11 @@ Gets the actual variable from memory and returns it.
   call_level = $P1
   if call_level == 0 goto global_var
 
+  .local pmc call_chain, lexpad, variable
+  call_chain = get_root_global ['_tcl'], 'call_chain'
   push_eh notfound
-    value = find_lex_pdd20( name )
+    lexpad     = call_chain[-1]
+    value      = lexpad[name]
   clear_eh
   goto found
 
@@ -311,7 +314,10 @@ Sets the actual variable from memory.
   call_level = $P1
   if call_level == 0 goto global_var
 lexical_var:
-  store_lex_pdd20 ( name, value )
+  .local pmc call_chain, lexpad
+  call_chain   = get_root_global ['_tcl'], 'call_chain'
+  lexpad       = call_chain[-1]
+  lexpad[name] = value
   .return()
 
 coloned:
@@ -319,60 +325,5 @@ coloned:
 global_var:
   set_root_global ['tcl'], name, value
 
-  .return()
-.end
-
-.sub find_lex_pdd20
-  .param string variable_name
-
-  $P1 = get_root_global ['_tcl'], 'call_level_diff'
-  .local int pad_depth
-  pad_depth = $P1
-
-  .local pmc interp, lexpad, variable
-  .local int depth
-  interp = getinterp
-  depth = 2 # we know it's not us or our direct caller.
-
-get_lexpad:
-  # Is there a lexpad at this depth?
-  lexpad = interp['lexpad';depth]
-  unless_null lexpad, got_lexpad
-
-try_again:
-  inc depth
-  goto get_lexpad
-got_lexpad:
-  dec pad_depth
-  unless pad_depth < 0 goto try_again
-  variable = lexpad[variable_name]
-  .return(variable)
-.end
-
-.sub store_lex_pdd20
-  .param string variable_name
-  .param pmc variable
-
-  $P1 = get_root_global ['_tcl'], 'call_level_diff'
-  .local int pad_depth
-  pad_depth = $P1
-
-  .local pmc interp, lexpad, variable
-  .local int depth
-  interp = getinterp
-  depth = 2 # we know it's not us or our direct caller.
-
-get_lexpad:
-  # Is there a lexpad at this depth?
-  lexpad = interp['lexpad';depth]
-  unless_null lexpad, got_lexpad
-
-try_again:
-  inc depth
-  goto get_lexpad
-got_lexpad:
-  dec pad_depth
-  unless pad_depth < 0 goto try_again
-  lexpad[variable_name] = variable
   .return()
 .end

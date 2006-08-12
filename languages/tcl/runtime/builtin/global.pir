@@ -31,9 +31,10 @@ loop:
     $P1 = find_global sigil_varname
   clear_eh
 
-  .local pmc store_lex_pdd20
-  store_lex_pdd20 = get_root_global ['_tcl'], 'store_lex_pdd20'
-  store_lex_pdd20 (sigil_varname, $P1)
+  .local pmc call_chain, lexpad
+  call_chain = get_root_global ['_tcl'], 'call_chain'
+  lexpad     = call_chain[-1]
+  lexpad[sigil_varname] = $P1
 
 next:
   inc ii

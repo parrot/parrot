@@ -33,10 +33,8 @@ The new scheme (PDD20) for lexical vars means that to use the 'store_lex', and
 is, inside a sub that corresponds to a HLL block that introduces a new
 lexical scope. Tcl uses helper functions to figure out whether a particular
 '$a' is referring to a global or a lexical var. To keep our current
-flexibility (which may be too flexible), these lexical calls are now
-delegated to lib/variables.pir's find_lex_pdd20 and store_lex_pdd20, which
-query the interpreter to find the closest lexical pad and perform the
-stores/finds against that.
+flexibility, we keep track of the lexpads in the 'call_chain' variable and
+manually look up lexicals in the lexpads.
 
 This is in contrast to the previous way lexicals were implemented, which 
 let you call the _lex opcodes anywhere, as long as at some point in the past

@@ -82,9 +82,13 @@ create:
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
 
-  .local pmc call_level
+  .local pmc call_chain, call_level
+  call_chain = get_root_global ['_tcl'], 'call_chain'
   call_level = get_root_global ['_tcl'], 'call_level'
   inc call_level
+  $P0 = getinterp
+  $P0 = $P0['lexpad'; 0]
+  push call_chain, $P0
 END_PIR
 
   .local string args_usage, args_info
@@ -197,6 +201,7 @@ done_args:
   code.emit(<<"END_PIR", name, args_usage)
   goto ARGS_OK
 BAD_ARGS:
+  $P0 = pop call_chain
   dec call_level
   .throw('wrong # args: should be \"%0%1\"')
 ARGS_OK:
@@ -217,6 +222,7 @@ END_PIR
   code.emit(<<"END_PIR", body_reg)
   clear_eh
 was_ok:
+  $P0 = pop call_chain
   dec call_level
   .return($P%0)
 END_PIR
@@ -225,12 +231,12 @@ END_PIR
 is_return:
   .catch()
   .get_return_code($I0)
+  $P0 = pop call_chain
+  dec call_level
   if $I0 != TCL_RETURN goto not_return_nor_ok
   .get_message($P0)
-  dec call_level
   .return ($P0)
 not_return_nor_ok:
-  dec call_level
   .rethrow()
 .end
 END_PIR
