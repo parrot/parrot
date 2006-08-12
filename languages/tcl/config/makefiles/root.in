@@ -207,6 +207,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/env.t \
   t_tcl/eval.t \
   t_tcl/event.t \
+  t_tcl/error.t \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
   t_tcl/if.t \
@@ -215,6 +216,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/join.t \
   t_tcl/lindex.t \
   t_tcl/linsert.t \
+  t_tcl/listObj.t \
   t_tcl/llength.t \
   t_tcl/lrange.t \
   t_tcl/lrepeat.t \
@@ -229,9 +231,10 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/split.t \
   t_tcl/stringComp.t \
   t_tcl/switch.t \
+  t_tcl/unknown.t \
   t_tcl/upvar.t \
   t_tcl/utf.t \
-  t_tcl/while_old.t       
+  t_tcl/while_old.t
 
 # These tests parse but fail every test.
 FAILING_TCL_TESTS = \
@@ -270,22 +273,22 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/winPipe.t
 #t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t
 #t_tcl/lsetComp.t        t_tcl/lsearch.t         t_tcl/info.t
-#t_tcl/fileName.t        t_tcl/util.t            
+#t_tcl/fileName.t        t_tcl/util.t
 #
 # invalid command name "list" | can't rename "list": command doesn't exist
 #t_tcl/regexpComp.t      t_tcl/basic.t      t_tcl/for.t
 #
-#MMD function __cmp not found for types (21, 74)
+# MMD function __cmp not found for types (21, 74)
 #t/tcl_format.t
 #
 # add_1_const:Integer overflow '2'
 #t_tcl/get.t
 #
-# No such caller depth
-#t_tcl/compile.t
+# ResizablePMCArray: Can't pop from an empty array!
+#t_tcl/compExpr.t        t_tcl/namespace_old.t
 #
-# test crashes:
-#t_tcl/compExpr.t
+#bad option "level": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars
+#t_tcl/uplevel.t
 #
 # [expr issues]
 #t_tcl/apply.t  - syntax error in expression "[info commands ::apply] eq {}": premature end of expression
@@ -308,19 +311,10 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 #t_tcl/winFile.t          -expected boolean value but got "testvolumetype"
 #t_tcl/autoMkindex.t - syntax error in expression "[info exists auto_mkindex_parser::initCommands]": premature end of expression
 #
-# Null PMC access in isa()
-#t_tcl/namespace_old.t
-#
 # Null PMC access in clone()
 #t_tcl/init.t            t_tcl/safe.t            t_tcl/source.t
 #t_tcl/pkg.t             t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
 #t_tcl/unixFCmd          t_tcl/unixFile.t        t_tcl/misc.t
-#
-# clone() not implemented in class 'Undef'
-#t_tcl/listObj.t
-#
-# push_pmc() not implemented in class 'RetContinuation'
-#t_tcl/unknown.t
 #
 # Malformed string (http://rt.perl.org/rt3/Ticket/Display.html?id=40135)
 #t_tcl/subst.t
@@ -341,9 +335,8 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 # can't read "envVars": no such variable {{ [variable] bug }}
 #t_tcl/msgcat.t
 #
-# can't read "expected": no such variable {{ probably due to the fact
-# that tests expect to be run at the top level }}
-#t_tcl/error.t           t_tcl/uplevel.t
+# can't read "expected": no such variable
+#t_tcl/compile.t
 #
 # can't read "::tcl::OptDescN": no such variable
 #t_tcl/opt.t
