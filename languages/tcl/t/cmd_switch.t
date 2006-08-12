@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 19
+plan 20
 
 eval_is {switch} \
   {wrong # args: should be "switch ?switches? string pattern body ... ?default body?"} \
@@ -110,6 +110,14 @@ eval_is {
   }
   set q
 } 3 {implied exact, choices in list}
+
+eval_is {
+   switch -nocase C {
+     c       {set ok 1}
+     default {set ok 0}
+   }
+   set ok
+} 1 {implied exact, nocase subject}
 
 eval_is {switch a {a 1 b}} \
   {extra switch pattern with no body} \

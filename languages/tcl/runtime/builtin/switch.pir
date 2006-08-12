@@ -47,9 +47,12 @@ get_subj:
 skip_subj:
   .local string subject
   subject = $S0
+  unless nocase goto get_body
+  subject = downcase subject
 
+get_body:
   .local pmc body
-  argc = argv
+  argc = elements argv
   if argc != 1 goto body_from_argv
 
 body_from_list:
