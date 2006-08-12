@@ -197,6 +197,7 @@ done_args:
   code.emit(<<"END_PIR", name, args_usage)
   goto ARGS_OK
 BAD_ARGS:
+  dec call_level
   .throw('wrong # args: should be \"%0%1\"')
 ARGS_OK:
   push_eh is_return
