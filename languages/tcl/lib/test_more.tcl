@@ -62,6 +62,8 @@ proc eval_is {code expected {description ""} {special {}}}  {
     if {[llength $special] == 2} {
         set boolean [string compare -nocase [lindex $special 0] skip]
         if {! $boolean} {
+            global very_bad_global_variable_test_num
+            incr  very_bad_global_variable_test_num 
             puts "ok $very_bad_global_variable_test_num # $special"
             return 1
         }
