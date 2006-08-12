@@ -209,6 +209,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/event.t \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
+  t_tcl/if.t \
   t_tcl/if_old.t \
   t_tcl/incr_old.t \
   t_tcl/join.t \
@@ -223,6 +224,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/proc.t \
   t_tcl/proc_old.t \
   t_tcl/pwd.t \
+  t_tcl/rename.t \
   t_tcl/security.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
@@ -271,17 +273,13 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/fileName.t        t_tcl/util.t            
 #
 # invalid command name "list" | can't rename "list": command doesn't exist
-#t_tcl/regexpComp.t      t_tcl/rename.t          t_tcl/basic.t
-#t_tcl/for.t
+#t_tcl/regexpComp.t      t_tcl/basic.t      t_tcl/for.t
 #
 #MMD function __cmp not found for types (21, 74)
 #t/tcl_format.t
 #
 # add_1_const:Integer overflow '2'
 #t_tcl/get.t
-#
-# FixedPMCArray: Can't resize!
-#t_tcl/if.t
 #
 # No such caller depth
 #t_tcl/compile.t
