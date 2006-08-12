@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"return value");
@@ -160,3 +160,13 @@ language_output_is("tcl", <<'TCL', <<'OUT', "proc default - too many args");
 TCL
 wrong # args: should be "test ?a?"
 OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'proc - reset call_level on bad args');
+  proc test {} {}
+  set a 4
+  catch {test foo}
+  puts $a
+TCL
+4
+OUT
+

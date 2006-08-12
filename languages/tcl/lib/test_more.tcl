@@ -66,12 +66,7 @@ proc eval_is {code expected {description ""} {special {}}}  {
             return 1
         }
     }
-    # Ignore exceptions for the moment
-    # XXX This probably wants to be [uplevel #0 $code] for the tcl tests.
-    # XXX in the meantime, cheat and give them the global variables they
-    # want.
-    global errorCode errorInfo
-    catch {eval $code} actual
+    catch {uplevel #0 $code} actual
     is $actual $expected $description $special
 }
 
