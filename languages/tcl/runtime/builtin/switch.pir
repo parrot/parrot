@@ -73,6 +73,7 @@ exact_mode:
 exact_loop:
   unless body goto body_end
   pattern = shift body
+  unless body goto extra_pattern
   code = shift body
   unless nocase goto exact_do
   pattern = downcase pattern
@@ -125,6 +126,9 @@ body_match:
   __script = get_root_global ['_tcl'], '__script'
   $P1 = __script(code)
   .return $P1()
+
+extra_pattern:
+  .throw('extra switch pattern with no body')
 
 bad_args:
   .throw('wrong # args: should be "switch ?switches? string pattern body ... ?default body?"')
