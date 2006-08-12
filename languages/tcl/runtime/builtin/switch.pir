@@ -68,6 +68,7 @@ body_from_argv:
 
 got_body:
   $I0 = elements body
+  if $I0 == 0 goto bad_args_with_curlies
   $I0 = $I0 % 2
   if $I0 == 1 goto extra_pattern
   .local string pattern, code
@@ -137,6 +138,9 @@ extra_pattern:
 
 bad_args:
   .throw('wrong # args: should be "switch ?switches? string pattern body ... ?default body?"')
+
+bad_args_with_curlies:
+  .throw('wrong # args: should be "switch ?switches? string {pattern body ... ?default body?}"')
 
 bad_flag:
   $S1 = 'bad option "'
