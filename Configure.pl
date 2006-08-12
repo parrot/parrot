@@ -260,6 +260,17 @@ our @parrot_version = Parrot::BuildUtil::parrot_version();
 
 $OUTPUT_AUTOFLUSH = 1;
 
+# Install Option text was taken from:
+#
+# autoconf (GNU Autoconf) 2.59
+# Written by David J. MacKenzie and Akim Demaille.
+#
+# Copyright (C) 2003 Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.  There is NO
+# warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# Installation directories:
+
+
 # Handle options
 my %args;
 for (@ARGV) {
@@ -290,7 +301,6 @@ General Options:
    --verbose-step=N     Set verbose for step N only
    --verbose-step=regex Set verbose for step matching description
    --nomanicheck        Don't check the MANIFEST
-   --prefix             Set the installation prefix
 
    --ask                Have Configure ask for commonly-changed info
 
@@ -358,6 +368,34 @@ Other Options (may not be implemented):
                         parser and lexer.
    --miniparrot         Build parrot assuming only pure ANSI C is available
 
+Install Options:
+
+    --prefix=PREFIX         install architecture-independent files in PREFIX
+                            [/usr/local]
+    --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
+                            [PREFIX]
+
+    By default, `make install' will install all the files in
+    `/usr/local/bin', `/usr/local/lib' etc.  You can specify
+    an installation prefix other than `/usr/local' using `--prefix',
+    for instance `--prefix=\$HOME'.
+
+    For better control, use the options below.
+
+    Fine tuning of the installation directories:
+    --bindir=DIR            user executables [EPREFIX/bin]
+    --sbindir=DIR           system admin executables [EPREFIX/sbin]
+    --libexecdir=DIR        program executables [EPREFIX/libexec]
+    --datadir=DIR         read-only architecture-independent data [PREFIX/share]
+    --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+    --sharedstatedir=DIR   modifiable architecture-independent data [PREFIX/com]
+    --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+    --libdir=DIR            object code libraries [EPREFIX/lib]
+    --includedir=DIR        C header files [PREFIX/include]
+    --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+    --infodir=DIR           info documentation [PREFIX/info]
+    --mandir=DIR            man documentation [PREFIX/man]
+
 EOT
       exit;
     };
@@ -385,6 +423,7 @@ END
 my @steps = qw(
     init::manifest
     init::defaults
+    init::install
     init::miniparrot
     init::hints
     init::headers

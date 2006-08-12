@@ -24,7 +24,7 @@ use Parrot::Configure::Step;
 
 $description = q{Setting up Configure's default values};
 
-@args = qw(debugging optimize profile verbose prefix m);
+@args = qw(debugging optimize profile verbose m);
 
 sub runstep
 {
@@ -185,21 +185,6 @@ sub runstep
         # Extra flags needed for libnci_test.so
         ncilib_link_extra => '',
 
-    );
-
-    my $prefix = $conf->options->get('prefix');
-    unless (defined $prefix) {
-        my $VERSION = $conf->data->get('VERSION');
-        my $DEVEL   = $conf->data->get('DEVEL');
-        $prefix = "/usr/local";
-    }
-    $conf->data->set(
-        prefix      => $prefix,
-        exec_prefix => $prefix,
-        bin_dir     => $prefix . "/bin",
-        lib_dir     => $prefix . "/lib",
-        include_dir => $prefix . "/include",
-        doc_dir     => $prefix . "/share/doc/parrot",
     );
 
     # add profiling if needed

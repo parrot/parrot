@@ -1,5 +1,9 @@
 # $Id$
 
+New in 0.4.x
+
+- autoconf compatible install options
+
 New in 0.4.6
 
 - New languages: Ruby ("Cardinal"), Javascript ("ecmascript")
