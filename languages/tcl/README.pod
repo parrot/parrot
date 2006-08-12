@@ -63,7 +63,7 @@ See C<docs/> and C<TODO>
 
 =head2 Tcl Version
 
-Note that we are targetting Tcl's cvs-latest, which is 8.5.  This allows us
+Note that we are targetting Tcl's cvs-latest, which is 8.5 (a4).  This allows us
 to test against what will likely be state of the art by the time we approach
 completion. As we get closer to that day, we'll probably settle down and
 code against the most recent version (which hopefully won't be 9.x by then).
