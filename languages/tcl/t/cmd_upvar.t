@@ -26,6 +26,7 @@ eval_is {
   {variable already exists}
 
 eval_is {
+  catch {unset a}
   upvar 0 a(b) c
   array set a [list b 3]
   set c
@@ -62,5 +63,5 @@ eval_is {
 
 eval_is {
   upvar -1 a b
-} {wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"} \
+} {bad level "-1"} \
   {no negative level}
