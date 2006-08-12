@@ -54,10 +54,10 @@ save_chain_end:
   assign call_level, new_call_level
 
   $S0 = join ' ', argv
-  $P0 = __script($S0)
   # if we get an exception, we have to reset the environment
   .local pmc retval
   push_eh restore_and_rethrow
+    $P0 = __script($S0)
     retval = $P0()
   clear_eh
 
