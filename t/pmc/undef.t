@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 =head1 NAME
 
@@ -220,7 +220,6 @@ A Undef PMC is not a scalar.
 A Undef PMC is not a Scalar.
 OUTPUT
 
-
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
 .sub _main
@@ -239,4 +238,19 @@ CODE
 1
 0
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "verify clone works.");
+
+.sub _main
+    $P1 = new Undef
+    $P2 = clone $P1
+    $S0 = typeof $P2
+    print $S0
+    print "\n"
+.end
+CODE
+Undef
+OUTPUT
+
+
 

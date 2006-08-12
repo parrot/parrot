@@ -80,6 +80,10 @@ pmclass Undef extends default {
     void share () {
         /* see src/pmc/integer.pmc */
     }
+
+  PMC* clone() { 
+      return pmc_new(INTERP, SELF->vtable->base_type);
+  }
 }
 
 /*
