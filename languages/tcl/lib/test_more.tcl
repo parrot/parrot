@@ -30,10 +30,18 @@ proc is {value expected {description ""} {special {}}}  {
     
     set num $very_bad_global_variable_test_num
     set type ""
- 
+  
     if {[llength $special] == 2} {
-        set description " - $description # $special"
         set type [string tolower [lindex $special 0]]
+        if {$type eq "todo"} {
+            global env
+            set normal [array get env PARTCL_DEVTEST]
+            if {$normal ne {}} {
+                set type ""
+                set special ""
+            }
+        }
+        set description " - $description # $special"
     } else {
         if  {$description ne ""} {
             set description " - $description"
