@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 15
+plan 16
 
 eval_is {unset a} \
   {can't unset "a": no such variable} \
@@ -72,6 +72,14 @@ eval_is {
   unset foo bar
   list [catch {puts $foo}] [catch {puts $bar}]
 } {1 1} {unset multiple variables}
+
+eval_is {
+  catch {unset a}
+  set a [list 1 2 3 4]
+  unset a
+  set a
+} {can't read "a": no such variable} \
+  {unset list}
 
 eval_is {
   catch {unset a}

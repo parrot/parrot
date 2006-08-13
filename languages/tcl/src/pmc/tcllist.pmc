@@ -86,6 +86,7 @@ Copy the contents of other to self.
     void assign_pmc (PMC *other) {
         STRING *array  = string_from_const_cstring(INTERP, "array", 5);
         STRING *string = string_from_const_cstring(INTERP, "String", 6);
+        STRING *undef  = string_from_const_cstring(INTERP, "Undef", 5);
 
         if (VTABLE_does(INTERP, other, array))
         {
@@ -104,6 +105,10 @@ Copy the contents of other to self.
             STRING *v = VTABLE_get_string(INTERP, other);
             pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
             DYNSELF.set_string_native(v);
+        }
+        else if (VTABLE_isa(INTERP, other, undef))
+        {
+            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
         }
         else
         {

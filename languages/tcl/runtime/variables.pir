@@ -275,6 +275,9 @@ Gets the actual variable from memory and returns it.
     lexpad     = call_chain[-1]
     value      = lexpad[name]
   clear_eh
+  if null value goto found
+  $I0 = isa value, 'Undef'
+  if $I0 goto notfound
   goto found
 
 coloned:
@@ -284,6 +287,9 @@ global_var:
   push_eh notfound
     value = get_root_global ['tcl'], name
   clear_eh
+  if null value goto found
+  $I0 = isa value, 'Undef'
+  if $I0 goto notfound
   goto found
 
 notfound:

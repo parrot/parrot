@@ -75,10 +75,8 @@ scalar:
   var = find_var(name)
   if null var goto no_such_var
 
-  null var
-  .local pmc store_var
-  store_var = get_root_global ['_tcl'], '__store_var'
-  store_var(name, var)
+  $P1 = new .Undef
+  assign var, $P1
   # goto next
 
 next:

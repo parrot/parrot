@@ -105,6 +105,30 @@ XXX - Why is Hash's implementation insufficient here??
             return b->value;
         return VTABLE_get_pmc_keyed(INTERP, (PMC*)b->value, nextkey);
     }
+
+/*
+
+=item C<void assign_pmc(PMC *other)>
+
+Copy the contents of other to self.
+
+=cut
+
+*/
+
+    void assign_pmc (PMC *other) {
+        STRING *undef  = string_from_const_cstring(INTERP, "Undef", 5);
+
+        if (VTABLE_isa(INTERP, other, undef))
+        {
+            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
+        }
+        else
+        {
+            /* throw an error here */
+        }
+    }
+
 }
 
 /*
