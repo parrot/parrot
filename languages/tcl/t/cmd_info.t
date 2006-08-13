@@ -115,4 +115,5 @@ eval_is {
     lsort [info vars]
   }
   test 3 4
-} {a b c d} {info vars}
+} {a b c d} {info vars} \
+  {TODO "can't iterate DynLexPads atm"}

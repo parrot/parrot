@@ -236,7 +236,7 @@ iterate:
   .local pmc call_chain, lexpad
   call_chain = get_root_global ['_tcl'], 'call_chain'
   lexpad     = call_chain[-1]
-
+  .throw("[info vars] doesn't work because we can't iterate DynLexPads")
   .return('')
 
 bad_args:
