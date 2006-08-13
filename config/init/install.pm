@@ -72,7 +72,7 @@ sub runstep
 #  --sbindir=DIR          system admin executables [EPREFIX/sbin]
     my $sbindir = $conf->options->get('sbindir') || $eprefix . "/sbin";
 #  --libexecdir=DIR       program executables [EPREFIX/libexec]
-    my $sbindir = $conf->options->get('sbindir') || $eprefix . "/libexec";
+    my $libexecdir = $conf->options->get('libexecdir') || $eprefix . "/libexec";
 #  --datadir=DIR          read-only architecture-independent data [PREFIX/share]
     my $datadir = $conf->options->get('datadir') || $prefix . "/share";
 #  --sysconfdir=DIR       read-only single-machine data [PREFIX/etc]
@@ -100,6 +100,7 @@ sub runstep
         bin_dir         => $bindir, # deprecated
         bindir          => $bindir,
         sbindir         => $sbindir,
+        libexecdir      => $libexecdir,
         datadir         => $datadir,
         sysconfdir      => $sysconfdir,
         sharedstatedir  => $sharedstatedir,
