@@ -43,7 +43,7 @@ passed in won't be modified.  How terrible it would be if it was
 possible for C<strlen> to modify what gets passed in!
 
 The const on C<strlen>'s parameter also lets the compiler know that
-C<strlen> can't be initialzing what's passed in.  For example:
+C<strlen> can't be initializing what's passed in.  For example:
 
     char buffer[ MAX_LEN ];
 
@@ -64,10 +64,17 @@ Consting arrays makes all the values in the array non-modifiable.
         { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 You don't want to be able to do C<days_per_month[1] = 4;>, right?
+(We'll ignore that about 25% of the time you want C<days_per_month[1]>
+to be 29.)
 
 =head2 Mixing C<consts>
 
-Combining C<const>s on a pointer and its constants can get confusing.
+Combining C<const>s on a pointer and its contents can get confusing.
+It's important to know on which side of the asterisk that the
+C<const> lies.
+
+To the left of the asterisk, the characters are constant.  To the
+right of the asterisk, the pointer is constant.
 
 Note the difference between a pointer to constant characters:
 
@@ -96,3 +103,13 @@ or even an array of constant pointers to constant characters:
     const char * const days[] =
         { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
+If you see a declaration you don't understand, use C<cdecl>.  It's
+standard in many C compiler suites, and is freely available around
+the net.
+
+    $ cdecl
+    Type `help' or `?' for help
+    cdecl> explain const char * str;
+    declare str as pointer to const char
+    cdecl> explain char * const str;
+    declare str as const pointer to char
