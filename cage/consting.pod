@@ -49,14 +49,50 @@ C<strlen> can't be initialzing what's passed in.  For example:
 
     int n = strlen( buffer );
 
-The compiler knows that C<buffer> hasn't been initializing, and
+The compiler knows that C<buffer> hasn't been initialized, and
 that C<strlen> can't be initializing it, so the call to C<strlen>
 is on an uninitialized value.
 
-Similarly, the compiler assumes that if you've got a C<memset>-like
-function where the parameter is not const, that the function is
-actually initializing it.
+Without the const, the compiler assumes that the contents of any
+pointer are getting initialized or modified.
 
 =head2 C<const> arrays
 
+Consting arrays makes all the values in the array non-modifiable.
+
+    const int days_per_month[] =
+        { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+You don't want to be able to do C<days_per_month[1] = 4;>, right?
+
+=head2 Mixing C<consts>
+
+Combining C<const>s on a pointer and its constants can get confusing.
+
+Note the difference between a pointer to constant characters:
+
+    /* Pointer to constant characters */
+    const char *str = "Don't change me.";
+    str++;      /* legal, now points at "o" */
+    *str = "x"; /* not legal */
+
+and a constant pointer to characters:
+
+    /* Constant pointer to characters */
+    char * const str = buffer;
+    str++;      /* not legal */
+    *str = 'x'; /* buffer[0] is now 'x' */
+
+Note the difference between which side of the asterisk that the
+C<const> is on.
+
+You can also combine the two, with a constant pointer to constant
+characters:
+
+    const char * const str = "Don't change me";
+
+or even an array of constant pointers to constant characters:
+
+    const char * const days[] =
+        { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
