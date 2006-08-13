@@ -78,7 +78,7 @@ OUT
 language_output_is("tcl", <<'TCL', <<'OUT', "ceil(a)");
   expr ceil(a)
 TCL
-syntax error in expression "ceil(a)": variable references require preceding $
+syntax error in expression "ceil(a)": the word "ceil(a)" requires a preceding $ if it's a variable or function arguments if it's a function
 OUT
 
 language_output_is('tcl', <<'TCL', <<'OUT', 'ceil("a")');
