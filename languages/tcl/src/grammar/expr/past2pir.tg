@@ -158,6 +158,8 @@ transform pir (PAST::Cond) {
     .local string cond_result, then_result, else_result
 
     pir = new 'PGE::CodeString'
+    pir.emit('  .local pmc __boolean')
+    pir.emit('  __boolean = get_root_global ["_tcl"], "__boolean"')
 
     # This node has 3 children. generate PIR so that:
     # if node1 then node2 else node3
@@ -175,6 +177,7 @@ transform pir (PAST::Cond) {
     pir .= $S0
     cond_result = cond['ret']
 
+    pir.emit("  %0 = __boolean(%0)",    cond_result)
     pir.emit("  unless %0 goto else_%1", cond_result, label)
 
     then = children[1] 
