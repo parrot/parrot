@@ -25,7 +25,11 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
     .return(a)
 
 is_string:
+    if a == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"+\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"+\"")
 .end
 
 .sub 'prefix:+' :multi(pmc)
@@ -50,7 +54,11 @@ is_string:
     .return($N0)
 
 is_string:
+    if a == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"-\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"-\"")
 .end
 
 .sub 'prefix:-' :multi(pmc)
@@ -76,7 +84,11 @@ is_string:
     .return($I0)
 
 is_string:
+    if a == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"~\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"~\"")
 .end
 
 .sub 'prefix:~' :multi(pmc)
@@ -101,7 +113,11 @@ is_string:
     .return($I0)
 
 is_string:
+    if a == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"!\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"!\"")
 .end
 
 .sub 'prefix:!' :multi(pmc)
