@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 16
+plan 17
 
 eval_is {unset a} \
   {can't unset "a": no such variable} \
@@ -98,3 +98,12 @@ eval_is {
   set a
 } {can't read "a": no such variable} \
   {unset global}
+
+eval_is {
+  catch {unset a}
+  set a 1
+  upvar 0 a b
+  unset b
+  set b 2
+  set a
+} 2 {reset an unset upvar}
