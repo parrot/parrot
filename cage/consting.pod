@@ -22,12 +22,41 @@ that are set at the top of a block.  For example:
     array[max_elements++] = n;
     /* but you really meant array[max_elements] = n++; */
 
-Adding a C<const> qualifier means you can't accidentally modify C<max_elements>.
+Adding a C<const> qualifier means you can't accidentally modify
+C<max_elements>.
 
     const int max_elements = nusers * ELEMENTS_PER_USER;
 
-=head2 C<const> arrays
-
 =head2 C<const> pointers
+
+If a pointer is qualified as const, then its contents cannot be
+modified.  This lets the compiler protect you from doing naughty
+things to yourself.
+
+Here are two examples for functions you're familiar with:
+
+    int strlen( const char *str );
+    void memset( char *ptr, char value, int length );
+
+In the case of C<strlen>, the caller is guaranteed that any string
+passed in won't be modified.  How terrible it would be if it was
+possible for C<strlen> to modify what gets passed in!
+
+The const on C<strlen>'s parameter also lets the compiler know that
+C<strlen> can't be initialzing what's passed in.  For example:
+
+    char buffer[ MAX_LEN ];
+
+    int n = strlen( buffer );
+
+The compiler knows that C<buffer> hasn't been initializing, and
+that C<strlen> can't be initializing it, so the call to C<strlen>
+is on an uninitialized value.
+
+Similarly, the compiler assumes that if you've got a C<memset>-like
+function where the parameter is not const, that the function is
+actually initializing it.
+
+=head2 C<const> arrays
 
 
