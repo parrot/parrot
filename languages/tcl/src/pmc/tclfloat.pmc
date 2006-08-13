@@ -20,6 +20,7 @@ pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group hll Tcl 
         int check_flag;
         STRING * buff;
         STRING * dot;
+        STRING * e;
         STRING * dot_zero;
 
         buff = Parrot_sprintf_c(INTERP, "%.16vg",PMC_num_val(SELF));
@@ -30,8 +31,10 @@ pmclass TclFloat extends TclObject extends Float dynpmc group tcl_group hll Tcl 
          * on and return
          */
         dot = string_from_cstring(INTERP,".",1);
+        e   = string_from_cstring(INTERP,"e",1);
 
-        if (string_str_index(INTERP,buff,dot,0) == -1 ) {
+        if (string_str_index(INTERP,buff,dot,0) == -1
+         && string_str_index(INTERP,buff,e,0) == -1) {
             dot_zero = string_from_cstring(INTERP,".0",2);
             buff = string_append(INTERP, buff, dot_zero,0);
             return buff;
