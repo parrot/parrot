@@ -52,6 +52,7 @@ loop:
   inc counter
   new_var = argv[counter]
   
+  if new_call_level == 0 goto store_var
   $P0 = __find_var(new_var)
   if null $P0 goto store_var
   $S0 = 'variable "'
