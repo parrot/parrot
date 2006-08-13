@@ -163,7 +163,12 @@ empty_string:
     .return ($P0)
 
 is_string:
+    if a == '' goto empty_string
+    if b == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"*\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"*\"")
 .end
 
 .sub 'infix:/'
@@ -182,7 +187,12 @@ is_string:
     .return($P0)
 
 is_string:
+    if a == '' goto empty_string
+    if b == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"/\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"/\"")
 .end
 
 .sub 'infix:%'
@@ -207,7 +217,12 @@ is_string:
     .return($P0)
 
 is_string:
+    if a == '' goto empty_string
+    if b == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"%\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"%\"")
 
 is_float:
     .throw("can't use floating-point value as operand of \"%\"")
@@ -229,7 +244,12 @@ is_float:
     .return($P0)
 
 is_string:
+    if a == '' goto empty_string
+    if b == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"+\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"+\"")
 .end
 
 .sub 'infix:-'
@@ -248,7 +268,12 @@ is_string:
     .return($P0)
 
 is_string:
+    if a == '' goto empty_string
+    if b == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"-\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"-\"")
 .end
 
 # left shift
@@ -291,7 +316,12 @@ is_string:
     .return ($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"<<\"")
+    if a == '' goto empty_string
+    if b == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"<<\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"<<\"")
 
 is_float:
   .throw ("can't use floating-point value as operand of \"<<\"")
@@ -336,10 +366,15 @@ is_float:
     .return ($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \">>\"")
+    if a == '' goto empty_string
+    if b == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \">>\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \">>\"")
 
 is_float:
-  .throw ("can't use floating-point value as operand of \">>\"")
+    .throw ("can't use floating-point value as operand of \">>\"")
 .end
 
 # *ALL* operands
@@ -497,7 +532,12 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"&\"")
+    if a == '' goto empty_string
+    if b == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"&\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"&\"")
 .end
 
 .sub 'infix:&'     :multi(String, Integer)
@@ -516,7 +556,11 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"&\"")
+    if a == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"&\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"&\"")
 .end
 
 .sub 'infix:&'     :multi(Integer, String)
@@ -535,7 +579,11 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"&\"")
+    if b == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"&\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"&\"")
 .end
 
 .sub 'infix:&'     :multi(Float, String)
@@ -551,7 +599,11 @@ is_string:
     .throw("can't use floating-point value as operand of \"&\"")
 
 is_string:
+    if b == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"&\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"&\"")
 .end
 
 .sub 'infix:&'     :multi(String, Float)
@@ -567,7 +619,11 @@ is_string:
     .throw("can't use floating-point value as operand of \"&\"")
 
 is_string:
+    if a == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"&\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"&\"")
 .end
 
 .sub 'infix:&'     :multi(Float, pmc)
@@ -605,7 +661,12 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"^\"")
+    if a == '' goto empty_string
+    if b == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"^\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"^\"")
 .end
 
 .sub 'infix:^'     :multi(String, Integer)
@@ -624,7 +685,11 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"^\"")
+    if a == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"^\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"^\"")
 .end
 
 .sub 'infix:^'     :multi(Integer, String)
@@ -643,7 +708,11 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"^\"")
+    if b == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"^\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"^\"")
 .end
 
 .sub 'infix:^'     :multi(Float, String)
@@ -659,7 +728,11 @@ is_string:
     .throw("can't use floating-point value as operand of \"^\"")
 
 is_string:
+    if b == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"^\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"^\"")
 .end
 
 .sub 'infix:^'     :multi(String, Float)
@@ -675,7 +748,11 @@ is_string:
     .throw("can't use floating-point value as operand of \"^\"")
 
 is_string:
+    if a == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"^\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"^\"")
 .end
 
 .sub 'infix:^'     :multi(Float, pmc)
@@ -713,7 +790,12 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"|\"")
+    if a == '' goto empty_string
+    if b == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"|\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"|\"")
 .end
 
 .sub 'infix:|'     :multi(String, Integer)
@@ -732,7 +814,11 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"|\"")
+    if a == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"|\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"|\"")
 .end
 
 .sub 'infix:|'     :multi(Integer, String)
@@ -751,7 +837,11 @@ is_string:
   .return($I0)
 
 is_string:
-  .throw ("can't use non-numeric string as operand of \"|\"")
+    if b == '' goto empty_string
+    .throw ("can't use non-numeric string as operand of \"|\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"|\"")
 .end
 
 .sub 'infix:|'     :multi(Float, String)
@@ -767,7 +857,11 @@ is_string:
     .throw("can't use floating-point value as operand of \"|\"")
 
 is_string:
+    if b == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"|\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"|\"")
 .end
 
 .sub 'infix:|'     :multi(String, Float)
@@ -783,7 +877,11 @@ is_string:
     .throw("can't use floating-point value as operand of \"|\"")
 
 is_string:
+    if a == '' goto empty_string
     .throw("can't use non-numeric string as operand of \"|\"")
+
+empty_string:
+    .throw("can't use empty string as operand of \"|\"")
 .end
 
 .sub 'infix:|'     :multi(Float, pmc)
