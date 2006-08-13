@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 220
+plan 221
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -205,6 +205,11 @@ is [expr sinh("1")]       1.1752011936438014 {} $TODO
 is [expr sqrt("64")]      8.0
 is [expr tan("1")]        1.5574077246549023 {} $TODO
 is [expr tanh("1")]       0.7615941559557649
+
+eval_is {expr exp(exp(50))} \
+  {floating-point value too large to represent} \
+  {value too large to represent} \
+  {TODO unimplemented}
 
 # unary math functions, invalid string ops.
 set function_list \
