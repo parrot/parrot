@@ -20,8 +20,11 @@ eval_is {
 } 1 {upvar as alias in global scope}
 
 eval_is {
-  set b 1
-  upvar 0 a b
+  proc test {} {
+    set b 1
+    upvar 0 a b
+  }
+  test
 } {variable "b" already exists} \
   {variable already exists}
 
