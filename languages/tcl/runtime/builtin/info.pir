@@ -223,6 +223,26 @@ bad_args:
 
 .end
 
+.sub 'vars'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+
+  if argc == 0 goto iterate
+  if argc > 1  goto bad_args
+
+iterate:
+  .local pmc call_chain, lexpad
+  call_chain = get_root_global ['_tcl'], 'call_chain'
+  lexpad     = call_chain[-1]
+
+  .return('')
+
+bad_args:
+  .throw('wrong # args: should be "info vars ?pattern?"')
+.end
+
 #XXX sharedlibextension - should be able to pull this from parrot config.
 #XXX level - just return call level. (optional level is hard.)
 #XXX globals - should be doable. - just walk the "Tcl" namespace.
