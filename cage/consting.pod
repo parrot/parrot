@@ -1,0 +1,33 @@
+=head1 Why consting is good
+
+In Perl, we have the C<use constant> pragma to define unchanging
+values.  The L<Readonly> module extends this to allow arrays and
+hashes to be non-modifiable as well.
+
+In C, we have C<const> numbers and pointers, and using them wherever
+possible lets us put safety checks in our code, and the compiler
+will watch over our shoulders.
+
+=head2 C<const> numbers
+
+The easiest way to use the C<const> qualifier is by flagging numbers
+that are set at the top of a block.  For example:
+
+    int max_elements;
+
+    max_elements = nusers * ELEMENTS_PER_USER;
+
+    ...
+
+    array[max_elements++] = n;
+    /* but you really meant array[max_elements] = n++; */
+
+Adding a C<const> qualifier means you can't accidentally modify C<max_elements>.
+
+    const int max_elements = nusers * ELEMENTS_PER_USER;
+
+=head2 C<const> arrays
+
+=head2 C<const> pointers
+
+
