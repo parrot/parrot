@@ -232,6 +232,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/split.t \
   t_tcl/stringComp.t \
   t_tcl/unknown.t \
+  t_tcl/uplevel.t \
   t_tcl/upvar.t \
   t_tcl/utf.t \
   t_tcl/while.t \
@@ -296,9 +297,6 @@ SKIPPED_TCL_TESTS = \
 #
 # set_pmc_keyed() not implemented in class 'Integer'
 #t_tcl_switch.t
-#
-# bad option "level": must be args, body, cmdcount, commands, complete, ...
-#t_tcl/uplevel.t
 #
 # syntax error, unexpected $undefined
 #t_tcl/async.t            t_tcl/unixNotfy.t
