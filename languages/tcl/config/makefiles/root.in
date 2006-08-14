@@ -203,6 +203,7 @@ test:	tcl.pbc
 RUNNABLE_TCL_TESTS = \
   t_tcl/append.t \
   t_tcl/appendComp.t \
+  t_tcl/compExpr.t \
   t_tcl/concat.t \
   t_tcl/env.t \
   t_tcl/eval.t \
@@ -285,7 +286,7 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/get.t
 #
 # ResizablePMCArray: Can't pop from an empty array!
-#t_tcl/compExpr.t        t_tcl/namespace_old.t
+# t_tcl/namespace_old.t
 #
 #bad option "level": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars
 #t_tcl/uplevel.t
