@@ -117,8 +117,7 @@ eval_is {
   catch {unset a}
   array set a [list a {b c}]
   array get a
-} {a {b c}} {array get, insure list results} \
-  {TODO {currently using a string}}
+} {a {b c}} {array get, insure list results}
 
 eval_is {
   catch {unset a}
@@ -202,8 +201,7 @@ eval_is {
   catch {unset a}
   array set a [list {b c} a]
   array names a
-} {{b c}} {array names, insure list results} \
-  {TODO {currently using a string}}
+} {{b c}} {array names, insure list results}
 
 eval_is {array names a b c} \
   {bad option "b": must be -exact, -glob, or -regexp} \
