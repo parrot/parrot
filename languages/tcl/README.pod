@@ -54,8 +54,9 @@ for instructions.
 
 =head2 Test Suite
 
-To run the test suite, type C<make test>. Note - partcl is currently under
-heavy development. Some tests may fail.
+To run the test suite, type C<make test>. If any tests fail, try
+C<TEST_PROG_ARGS=-G make test>. Send the results of both to the mailing list
+C<parrot-porters@perl.org>.
 
 =head2 Documentation
 
