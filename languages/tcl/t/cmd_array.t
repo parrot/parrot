@@ -1,346 +1,265 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 46;
-use Test::More;
+source lib/test_more.tcl
+plan 46
 
-language_output_is("tcl",<<'TCL',<<OUT,"array, no args");
- array
-TCL
-wrong # args: should be "array option arrayName ?arg ...?"
-OUT
+eval_is {array}\
+  {wrong # args: should be "array option arrayName ?arg ...?"}\
+  {array, no args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array, good subcommand, no array");
- array exists
-TCL
-wrong # args: should be "array option arrayName ?arg ...?"
-OUT
+eval_is {array exists}\
+  {wrong # args: should be "array option arrayName ?arg ...?"}\
+  {array, good subcommand, no array}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array, bad subcommand, bad arary");
- array bork foo
-TCL
-bad option "bork": must be anymore, donesearch, exists, get, names, nextelement, set, size, startsearch, statistics, or unset
-OUT
+eval_is {array bork foo}\
+  {bad option "bork": must be anymore, donesearch, exists, get, names, nextelement, set, size, startsearch, statistics, or unset}\
+  {array, bad subcommand, bad arary}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array exists yes");
+eval_is {
  set b(c) 2
- puts [array exists b]
-TCL
-1
-OUT
+ array exists b
+} 1 {array exists yes}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array exists no");
+eval_is {
  set a 2
- puts [array exists a]
-TCL
-0
-OUT
+ array exists a
+} 0 {array exists no}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array exists missing");
- puts [array exists a]
-TCL
-0
-OUT
+eval_is {array exists q} 0 {array exists missing}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array exists too many args");
- puts [array exists a b]
-TCL
-wrong # args: should be "array exists arrayName"
-OUT
+eval_is {array exists a b}\
+  {wrong # args: should be "array exists arrayName"}\
+  {array exists too many args}
 
-language_output_is("tcl", <<'TCL', <<'OUT', "array exists lexical");
+eval_is {
   proc test {} {
       array set foo [list 1 2 3 4]
-      if {[array exists foo]} {puts ok}
+      return [array exists foo]
   }
   test
-TCL
-ok
-OUT
+} 1 {array exists lexical}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array size too many args");
- array size a b
-TCL
-wrong # args: should be "array size arrayName"
-OUT
+eval_is {array size a b}\
+  {wrong # args: should be "array size arrayName"}\
+  {array size too many args}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array size 1");
+eval_is {
+ catch {unset a}
  set a(1) 1
- puts [array size a]
-TCL
-1
-OUT
+ array size a
+} 1 {array size 1}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array size 2");
+eval_is {
+ catch {unset a}
  set a(1) 1; set a(2) 2
- puts [array size a]
-TCL
-2
-OUT
+ array size a
+} 2 {array size 2}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array size not array");
+eval_is {
+ catch {unset a}
  set a 1
- puts [array size a]
-TCL
-0
-OUT
+ array size a
+} 0 {array not array}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array set list");
+eval_is {
+ catch {unset a}
  array set a [list a b]
- puts $a(a)
-TCL
-b
-OUT
+ set a(a)
+} b {array set list}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array set multi list");
+eval_is {
+ catch {unset a}
  array set a [list a b c d e f]
- puts $a(a)
- puts $a(c)
- puts $a(e)
-TCL
-b
-d
-f
-OUT
+ list $a(a) $a(c) $a(e)
+} {b d f} {array set multi list}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array set preserve old values");
+eval_is {
+ catch {unset a}
  set a(a) b
  array set a [list c d e f]
- puts $a(a)
- puts $a(c)
- puts $a(e)
-TCL
-b
-d
-f
-OUT
+ list $a(a) $a(c) $a(e)
+} {b d f} {array set preserve old values}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array set");
+eval_is {
+ catch {unset a}
  array set a {a b}
- puts $a(a)
-TCL
-b
-OUT
+ set a(a)
+} b {array set}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array set multi");
+eval_is {
+ catch {unset a}
  array set a {a b c d e f}
- puts $a(a)
- puts $a(c)
- puts $a(e)
-TCL
-b
-d
-f
-OUT
+ list $a(a) $a(c) $a(e)
+} {b d f} {array set multi}
 
-language_output_is("tcl",<<'TCL',<<OUT,"array set uneven");
- array set a a
-TCL
-list must have an even number of elements
-OUT
+eval_is {array set a a}\
+  {list must have an even number of elements}\
+  {array set uneven}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"array set return value");
-  puts [array set a [list a b]]
-TCL
+eval_is {array set a [list a b]} \
+  {}\
+  {array set return value}
 
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"array set not array");
+eval_is {
+  catch {unset a}
   set a 44
   array set a {1 2 3 4}
-TCL
-can't set "a(1)": variable isn't array
-OUT
+} {can't set "a(1)": variable isn't array}\
+  {array set not array}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"array get");
+eval_is {
+  catch {unset a}
   array set a [list a b]
-  puts [array get a]
-TCL
-a b
-OUT
+  array get a
+} {a b} {array get}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"array get, with pattern");
+eval_is {
+  catch {unset a}
   array set a [list a b c d]
-  puts [array get a a]
-TCL
-a b
-OUT
+  array get a a
+} {a b} {array get with pattern}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"array get, with pattern");
+eval_is {
+  catch {unset a}
   array set a [list apple 1 orange 2 aardvark 3]
-  puts [array get a a*]
-TCL
-apple 1 aardvark 3
-OUT
+  lsort [array get a a*]
+} {1 3 aardvark apple}\
+  {array get, with pattern}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"array get, with bad pattern");
+eval_is {
+  catch {unset a}
   array set a [list apple 1 orange 2 aardvark 3]
-  puts [array get a zippy*]
-TCL
+  array get a zippy*
+} {} {array get, with bad pattern}
 
-OUT
+eval_is {
+  catch {unset a}
+  array get a
+} {} {array get, bad array}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"array get, bad array");
-  puts [array get a]
-TCL
+eval_is {
+  catch {unset a}
+  array get a a
+} {} {array get, bad array with pattern}
 
-OUT
+eval_is {array get a b c}\
+  {wrong # args: should be "array get arrayName ?pattern?"}\
+  {array get, too many args}
 
-language_output_is("tcl",<<'TCL',<<'OUT',"array get, bad array with pattern");
-  puts [array get a a]
-TCL
-
-OUT
-
-language_output_is("tcl",<<'TCL',<<'OUT',"array get, too many args");
-  array get a b c
-TCL
-wrong # args: should be "array get arrayName ?pattern?"
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array unset");
+eval_is {
+  catch {unset a}
   array set a [list a b]
-  puts [array unset a]
-  puts [array get a]
-TCL
+  list [array unset a] [array get a]
+} {{} {}} {array unset, effect & return value}
 
-
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array unset, with pattern");
+eval_is {
+  catch {unset a}
   array set a [list a b c d]
-  puts [array unset a a]
-  puts [array get a]
-TCL
+  list [array unset a a] [array get a]
+} {{} {c d}} {array unset, with pattern & return value}
 
-c d
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array unset, with pattern");
+eval_is {
+  catch {unset a}
   array set a [list apple 1 orange 2 aardvark 3]
-  puts [array unset a a*]
-  puts [array get a]
-TCL
+  list [array unset a a*] [array get a]
+} {{} {orange 2}} {array unset with pattern}
 
-orange 2
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array unset, with bad pattern");
+eval_is {
+  catch {unset a}
   array set a [list apple 1 orange 2 aardvark 3]
-  puts [array unset a zippy*]
-  puts [array get a]
-TCL
+  list [array unset a zippy*] [lsort [array get a]]
+} {{} {1 2 3 aardvark apple orange}}\
+  {array unset, with bad pattern}
 
-apple 1 orange 2 aardvark 3
-OUT
+eval_is {
+  catch {unset a}
+  array unset a
+} {} {array unset, bad array}
 
-language_output_is("tcl", <<'TCL', <<'OUT',"array unset, bad array");
-  puts [array unset badarray]
-TCL
+eval_is {
+  catch {unset a}
+  array unset a monkey*
+} {} {array unset, bad array, pattern}
 
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array unset, bad array, pattern");
-  puts [array unset badarray monkey*]
-TCL
-
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array unset, too many args");
+eval_is {
   array unset monkey my monkey monkey
-TCL
-wrong # args: should be "array unset arrayName ?pattern?"
-OUT
+} {wrong # args: should be "array unset arrayName ?pattern?"}\
+  {array unset, too many args}
 
+eval_is {
+  catch {unset a}
+  array names a
+} {} {array names, no array}
 
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, no array");
-  puts [array names a]
-TCL
+eval_is {array names a b c} \
+  {bad option "b": must be -exact, -glob, or -regexp} \
+  {array names, bad option} \
+  {SKIP {this test doesn't work in tclsh8.5...}}  
 
-OUT
+eval_is {array names a b c d}\
+  {wrong # args: should be "array names arrayName ?mode? ?pattern?"}\
+  {array names, too many args}
 
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, bad option");
-  array names a b c
-TCL
-bad option "b": must be -exact, -glob, or -regexp
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, too many args");
-  array names a b c d
-TCL
-wrong # args: should be "array names arrayName ?mode? ?pattern?"
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, no pattern");
+eval_is {
+  catch {unset a}
   set a(monkey) see
-  puts [array names a]
-TCL
-monkey
-OUT
+  array names a
+} {monkey} {array names, no pattern}
 
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, default glob pattern");
+eval_is {
+  catch {unset a}
   set a(monkey1) see
   set a(monkey2) do
-  puts [array names a monkey*]
-TCL
-monkey1 monkey2
-OUT
+  array names a monkey*
+} {monkey1 monkey2}\
+  {array names, default glob pattern}
 
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, default glob pattern failure");
+eval_is {
+  catch {unset a}
   set a(monkey1) see
   set a(monkey2) do
-  puts [array names a cat*]
-TCL
+  array names a cat*
+} {} {array names, default glob pattern failure}
 
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit glob pattern");
+eval_is {
+  catch {unset a}
   set a(monkey1) see
   set a(monkey2) do
-  puts [array names a -glob monkey*]
-TCL
-monkey1 monkey2
-OUT
+  array names a -glob monkey*
+} {monkey1 monkey2} {array names, explicit glob pattern}
 
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit glob pattern failure");
+eval_is {
+  catch {unset a}
   set a(monkey1) see
   set a(monkey2) do
-  puts [array names a -glob cat*]
-TCL
+  array names a -glob cat*
+} {} {array names, explicit glob pattern failure}
 
-OUT
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit exact match");
+eval_is {
+  catch {unset a}
   set a(monkey1) see
   set a(monkey2) do
-  puts [array names a -exact monkey1]
-TCL
-monkey1
-OUT
+  array names a -exact monkey1
+} {monkey1} {array names, explicit exact match}
 
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit exact match failure");
+eval_is {
+  catch {unset a}
   set a(monkey1) see
   set a(monkey2) do
-  puts [array names a -exact cat5]
-TCL
+  array names a -exact cat5
+} {} {array names, explicit exact match failure}
 
-OUT
-
-
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit regexp match");
+eval_is {
+  catch {unset a}
   set a(monkey1) see
   set a(monkey2) do
   set a(ferret)  don't
-  puts [array names a -regexp ^mon.*]
-TCL
-monkey1 monkey2
-OUT
+  array names a -regexp ^mon.*
+} {monkey1 monkey2} {array names, explicit regexp match}
 
-language_output_is("tcl", <<'TCL', <<'OUT',"array names, explicit regexp match failure");
+eval_is {
+  catch {unset a}
   set a(monkey1) see
   set a(monkey2) do
-  puts [array names a -regexp cat]
-TCL
-
-OUT
+  array names a -regexp cat
+} {} {array names, explicit regexp match failure}
