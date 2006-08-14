@@ -120,23 +120,23 @@ proto 'infix:>'  is precedence('10=') {...}
 proto 'infix:<=' is precedence('10=') {...}
 proto 'infix:>=' is precedence('10=') {...}
 
-proto 'infix:==' is precedence('9=') {...}
-proto 'infix:!=' is precedence('9=') {...}
+proto 'infix:==' is precedence('09=') {...}
+proto 'infix:!=' is precedence('09=') {...}
 
-proto 'infix:eq' is precedence('8=') {...}
-proto 'infix:ne' is precedence('8=') {...}
+proto 'infix:eq' is precedence('08=') {...}
+proto 'infix:ne' is precedence('08=') {...}
 
-proto 'infix:in' is precedence('7=') {...}
-proto 'infix:ni' is precedence('7=') {...}
+proto 'infix:in' is precedence('07=') {...}
+proto 'infix:ni' is precedence('07=') {...}
 
-proto 'infix:&'  is precedence('6=') {...}
+proto 'infix:&'  is precedence('06=') {...}
 
-proto 'infix:^'  is precedence('5=') {...}
+proto 'infix:^'  is precedence('05=') {...}
 
-proto 'infix:|'  is precedence('4=') {...}
+proto 'infix:|'  is precedence('04=') {...}
 
-proto 'infix:&&' is precedence('3=') {...}
+proto 'infix:&&' is precedence('03=') {...}
 
-proto 'infix:||' is precedence('2=') {...}
+proto 'infix:||' is precedence('02=') {...}
 
-proto 'ternary:? :' is precedence('1=') {...}
+proto 'ternary:? :' is precedence('01=') {...}

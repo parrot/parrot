@@ -98,8 +98,7 @@ is [expr 2!=1] 1 {!=, ne}
 
 # short circuting ops
 is [expr 2&&2] 1 {&&}
-is [expr {2>=2 && 2>=2}] 1 {&&} \
-   {TODO "precedence error"}
+is [expr {2>=2 && 2>=2}] 1 {&&}
 is [expr 2&&0] 0 {&&}
 is [expr 0&&2] 0 {&&}
 is [expr 0&&0] 0 {&&}
