@@ -243,8 +243,36 @@ bad_args:
   .throw('wrong # args: should be "info vars ?pattern?"')
 .end
 
+.sub 'level'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+
+  if argc == 0 goto current_level
+  if argc == 1 goto find_level
+
+  .throw('wrong # args: should be "info level ?number?"')
+
+current_level:
+  .local pmc call_chain
+  call_chain = get_root_global ['_tcl'], 'call_chain'
+  $I0 = elements call_chain
+  .return($I0)
+
+find_level:
+  .local pmc __integer, __call_level
+  __integer    = get_root_global ['_tcl'], '__integer'
+  __call_level = get_root_global ['_tcl'], '__call_level'
+  
+  .local pmc level
+  level = shift argv
+  level = __integer(level)
+  level = __call_level(level)
+  .return(level)
+.end
+
 #XXX sharedlibextension - should be able to pull this from parrot config.
-#XXX level - just return call level. (optional level is hard.)
 #XXX globals - should be doable. - just walk the "Tcl" namespace.
 #XXX default - watch out for return value and default value.
 #XXX cmdcount - not being tracked. :(
