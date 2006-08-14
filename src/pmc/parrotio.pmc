@@ -208,6 +208,25 @@ SYNOPSIS
         }
     }
 
+/*
+
+=item METHOD STRING* slurp(STRING* name);
+
+Slurp an (existing, disc) file named I<name> into a STRING result.
+
+Please note that this method isn't catching any failures yet.
+Usage:
+
+  .local pmc cl
+  cl = getclass 'ParrotIO'
+  $S1 = cl.'slurp'('the_file')
+
+The file will be opened, read, and closed.
+
+=cut
+
+*/
+
     METHOD STRING* slurp(STRING* name) {
         if (PObj_is_class_SET(SELF)) {
             /* called as class method - open, slurp, close file */
