@@ -208,6 +208,23 @@ SYNOPSIS
         }
     }
 
+    METHOD STRING* slurp(STRING* name) {
+        if (PObj_is_class_SET(SELF)) {
+            /* called as class method - open, slurp, close file */
+            char * const path = string_to_cstring(interpreter, name);
+            INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);
+            STRING* result;
+            PMC* pio = PIO_open(INTERP, NULL, path, "<");
+            string_cstring_free(path); 
+            /* TODO handle stdin */
+            result = PIO_reads(INTERP, pio, size);
+            PIO_close(INTERP, pio);
+            return result;
+        }
+        /* TODO */
+        return NULL;
+    }
+
 /*
 
 =item C<void class_init()>
