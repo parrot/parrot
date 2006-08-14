@@ -896,6 +896,7 @@ IMCC_int_from_reg(Interp *interpreter, SymReg *r)
     INTVAL i;
 
     UNUSED(interpreter);
+    errno = 0;
     if (r->type & VT_CONSTP)
         r = r->reg;
     if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X'))
@@ -910,7 +911,6 @@ IMCC_int_from_reg(Interp *interpreter, SymReg *r)
     /*
      * TODO
      * - is this portable?
-     * - reset errno first?
      * - there are some more atol()s in this file
      */
     if (errno == ERANGE)
