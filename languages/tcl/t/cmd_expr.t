@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 221
+plan 223
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -53,6 +53,10 @@ is [expr 16 >> 2]  4 {right shift}
 is [expr 5 & 6]    4 {&}
 is [expr 5 | 6]    7 {|}
 is [expr 5 ^ 6]    3 {^}
+
+set j 7
+is [expr {"$j"}]      7 {variables in quotes}
+is [expr {"[set j]"}] 7 {commands in quotes}
 
 # simple binary ops - stringified integers
 # XXX any eval_is's in this section are written that way because the 

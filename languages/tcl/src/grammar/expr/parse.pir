@@ -24,6 +24,7 @@ outer_loop:
     char = substr target, pos, 1
     if char == '"' goto end
     if char == '[' goto command
+    if char == '$' goto variable
 
 literal:
     litfrom = pos
@@ -58,7 +59,18 @@ command:
     inc pos
     $P0 = 'subcommand'(mob)
     $P0['type'] = 'subcommand'
-    mob[capt] = $P0
+    mob[capt]   = $P0
+    inc capt
+    pos = $P0.to()
+    goto outer_loop
+
+variable:
+    mpos = pos
+    inc pos
+    $P0 = 'variable'(mob)
+    unless $P0 goto literal
+    $P0['type'] = 'variable'
+    mob[capt]   = $P0
     inc capt
     pos = $P0.to()
     goto outer_loop
