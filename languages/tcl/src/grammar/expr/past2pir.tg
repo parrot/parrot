@@ -1,9 +1,27 @@
 grammar TclExpr::PIR::Grammar is TGE::Grammar;
 
 transform result (ROOT)  {
+    .local pmc pir
+    pir = new 'PGE::CodeString'
+
     $S0 = typeof node
     $P0 = tree.get('pir', node, $S0)
-    .return($P0)
+    pir .= $P0
+
+    .local pmc ret, label
+    ret   = node['ret']
+    label = pir.unique('expr_is_string')
+
+    pir.emit(<<'END_PIR', ret, label)
+  .local pmc __number
+  __number = get_root_global ['_tcl'], '__number'
+  push_eh %1
+    %0 = __number(%0)
+  clear_eh
+%1:
+END_PIR
+
+    .return(pir)
 }
 
 transform pir (PAST::Val) {

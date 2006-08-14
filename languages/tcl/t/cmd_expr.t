@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 225
+plan 228
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -59,6 +59,12 @@ is [expr {"$j"}]      7 {variables in quotes}
 is [expr {"#$j"}]    #7 {variables in quotes after literal}
 is [expr {"$"}]       $ {dollar-sign in quotes}
 is [expr {"[set j]"}] 7 {commands in quotes}
+
+# numification
+is [expr {"foo"}] foo {non-numeric string}
+is [expr {"0001234"}] 668 {string octal}
+set j 0001234
+is [expr {$j}] 668 {variable octal}
 
 # simple binary ops - stringified integers
 # XXX any eval_is's in this section are written that way because the 
