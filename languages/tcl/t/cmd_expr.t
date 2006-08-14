@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 228
+plan 229
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -59,6 +59,9 @@ is [expr {"$j"}]      7 {variables in quotes}
 is [expr {"#$j"}]    #7 {variables in quotes after literal}
 is [expr {"$"}]       $ {dollar-sign in quotes}
 is [expr {"[set j]"}] 7 {commands in quotes}
+
+eval_is {expr {1 ? 14 : [expr {}]}} 14 \
+  {make sure expr errors happen at runtime}
 
 # numification
 is [expr {"foo"}] foo {non-numeric string}

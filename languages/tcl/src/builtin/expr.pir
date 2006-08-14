@@ -30,7 +30,10 @@ end:
   .local pmc __expr
   __expr = get_root_global ['_tcl'], '__expr'
 
-  ($P0, $S0) = __expr(arg, 'pir_only'=>1)
+  # make sure errors happen at runtime
+  push_eh exception
+    ($P0, $S0) = __expr(arg, 'pir_only'=>1)
+  clear_eh
   pir = new 'PGE::CodeString'
   pir .= $P0
 
@@ -44,4 +47,18 @@ not_const:
 
 bad_args:
   .return(register_num, ".throw ('wrong # args: should be \"eval arg ?arg ...?\"')\n")
+
+exception:
+  .catch()
+  .get_message($S0)
+  $P0 = new .String
+  $P0 = $S0
+  $P0.replace('\', '\\')
+  $P0.replace('"', '\"')
+  $S0 = $P0
+  .local string error
+  error = ".throw(\""
+  error .= $S0
+  error .= "\")\n"
+  .return(register_num, error)
 .end
