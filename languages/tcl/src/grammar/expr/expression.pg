@@ -26,7 +26,7 @@ rule boolean { ( true | false ) <?wb> }
 rule nested { \( <expression> \) }
 
 # XXX EXTREMELY naive
-rule subcommand  { \[ [<command> ;?]+ \] }
+rule subcommand  { \[ [<command> ;?]* \] }
 
 token command {
       <comment>

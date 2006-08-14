@@ -412,6 +412,9 @@ transform past (subcommand) {
     
     .local pmc words, iter
     words = node['command'; 0; 'word']
+    $I0 = isa words, "None"
+    if $I0 goto empty
+
     iter  = new .Iterator, words
 loop:
     unless iter goto end
@@ -420,7 +423,14 @@ loop:
     past.'add_child'($P1)
     goto loop
 end:
-    .return (past)
+    .return(past)
+
+empty:
+    past = new 'PAST::Val'
+    past.set_node(node)
+    past['class'] = 'TclConst'
+    past['value'] = ''
+    .return(past)
 }
 
 transform past (variable) {

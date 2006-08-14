@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 229
+plan 230
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -289,6 +289,7 @@ eval_is {
 } 3 {_, 0 in varnames}
 
 #command expansions
+is [expr {[]}] {} {empty command}
 eval_is {
   expr {[list a] eq [list a]}
 } 1 {command expansion inside, list types.}
