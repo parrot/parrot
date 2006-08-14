@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 46
+plan 48
 
 eval_is {array}\
   {wrong # args: should be "array option arrayName ?arg ...?"}\
@@ -115,6 +115,13 @@ eval_is {
 
 eval_is {
   catch {unset a}
+  array set a [list a {b c}]
+  array get a
+} {a {b c}} {array get, insure list results} \
+  {TODO {currently using a string}}
+
+eval_is {
+  catch {unset a}
   array set a [list a b c d]
   array get a a
 } {a b} {array get with pattern}
@@ -190,6 +197,13 @@ eval_is {
   catch {unset a}
   array names a
 } {} {array names, no array}
+
+eval_is {
+  catch {unset a}
+  array set a [list {b c} a]
+  array names a
+} {{b c}} {array names, insure list results} \
+  {TODO {currently using a string}}
 
 eval_is {array names a b c} \
   {bad option "b": must be -exact, -glob, or -regexp} \
