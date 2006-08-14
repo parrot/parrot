@@ -217,11 +217,11 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/join.t \
   t_tcl/lindex.t \
   t_tcl/linsert.t \
-  t_tcl/listObj.t \
   t_tcl/llength.t \
   t_tcl/lrange.t \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
+  t_tcl/namespace_old.t \
   t_tcl/package.t \
   t_tcl/platform.t \
   t_tcl/proc.t \
@@ -231,10 +231,10 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/security.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
-  t_tcl/switch.t \
   t_tcl/unknown.t \
   t_tcl/upvar.t \
   t_tcl/utf.t \
+  t_tcl/while.t \
   t_tcl/while_old.t
 
 # These tests parse but fail every test.
@@ -248,24 +248,26 @@ SKIPPED_TCL_TESTS = \
   t_tcl/chan.t \
   t_tcl/cmdInfo.t \
   t_tcl/dcall.t \
+  t_tcl/dstring.t \
+  t_tcl/history.t \
   t_tcl/indexObj.t \
   t_tcl/link.t \
   t_tcl/lset.t \
   t_tcl/notify.t \
   t_tcl/pid.t \
+  t_tcl/registry.t \
   t_tcl/result.t \
-  t_tcl/while.t \
+  t_tcl/stack.t \
+  t_tcl/thread.t \
   t_tcl/winConsole.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
-
 
 # These test files die for various reasons.
 #
 # too slow:
 #
-#t_tcl/incr.t            t_tcl/regexp.t          t_tcl/regexp.t
-#t_tcl/set.t             t_tcl/tcltest.t         t_tcl/trace.t
+#t_tcl/regexp.t          t_tcl/tcltest.t         t_tcl/trace.t
 #t_tcl/interp.t          t_tcl/io.t              t_tcl/scan.t
 #t_tcl/set_old.t         t_tcl/ioCmd.t           t_tcl/dict.t
 #t_tcl/clock.t           t_tcl/exec.t            t_tcl/compExpr_old.t
@@ -274,10 +276,17 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/winPipe.t
 #t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t
 #t_tcl/lsetComp.t        t_tcl/lsearch.t         t_tcl/info.t
-#t_tcl/fileName.t        t_tcl/util.t
+#t_tcl/fileName.t        t_tcl/util.t            t_tcl/cmdAH.t
+#t_tcl/binary.t
 #
-# invalid command name "list" | can't rename "list": command doesn't exist
-#t_tcl/regexpComp.t      t_tcl/basic.t      t_tcl/for.t
+# too slow due to "260 locals"
+#t_tcl/incr.t            t_tcl/set.t
+#
+#can't delete "run": command doesn't exist
+#t_tcl/basic.t
+#
+# crash or no debug output generated.
+#t_tcl/for.t               t_tcl/apply.t
 #
 # MMD function __cmp not found for types (21, 74)
 #t/tcl_format.t
@@ -285,37 +294,38 @@ SKIPPED_TCL_TESTS = \
 # add_1_const:Integer overflow '2'
 #t_tcl/get.t
 #
-# ResizablePMCArray: Can't pop from an empty array!
-# t_tcl/namespace_old.t
+# set_pmc_keyed() not implemented in class 'Integer'
+#t_tcl_switch.t
 #
-#bad option "level": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars
+# bad option "level": must be args, body, cmdcount, commands, complete, ...
 #t_tcl/uplevel.t
 #
-# [expr issues]
-#t_tcl/apply.t  - syntax error in expression "[info commands ::apply] eq {}": premature end of expression
-#t_tcl/async.t  - syntax error in expression "[info exists ::tcl_platform(threaded)] && $::tcl_platform(threaded)": premature end of expression
-#t_tcl/stack.t - expected boolean value but got "unix"
-#t_tcl/load.t - syntax error in expression "![string match *pkga* $alreadyLoaded]": premature end of expression
-#t_tcl/registry.t - expected boolean value but got "win"
-#t_tcl/unixInit - syntax error in expression " ($tcl_platform(os) eq "Darwin") ? "^utf-8$" : "^iso8859-15?$"": premature end of expression
-#t_tcl/cmdAH.t - syntax error in expression " ![testConstraint win] || ([string index $tcl_platform(osVersion) 0] >= 5 && [lindex [file system [temporaryDirectory]] 1] eq "NTFS") ": extra tokens at end of expression
-#t_tcl/thread.t - expected boolean value but got "testthread"
-#t_tcl/binary.t -syntax error in expression "$tcl_platform(byteOrder) eq "bigEndian"": extra tokens at end of expression
-#t_tcl/socket.t - syntax error in expression "[info exists env(remoteServerIP)]": premature end of expression
-#t_tcl/dstring.t - expected boolean value but got "testdstring"
-#t_tcl/unixNotfy.t - syntax error in expression " (![info exist tcl_platform(threaded)] || !$tcl_platform(threaded)) && $tcl_platform(os) ne "Darwin" ": premature end of expression
-#t_tcl/main.t - syntax error in expression " [llength [package provide Tcltest]] && [package vsatisfies [package provide Tcltest] 8.4]": extra tokens at end of expression
-#t_tcl/unload.t - syntax error in expression "![string match *pkgua* $alreadyLoaded]": premature end of expression
-t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcltest] == -1": premature end of expression
-#t_tcl/var.t - syntax error in expression "[lsearch [namespace children] ::tcltest] == -1": premature end of expression
-#t_tcl/history.t         -expected boolean value but got "history"
-#t_tcl/winFile.t          -expected boolean value but got "testvolumetype"
-#t_tcl/autoMkindex.t - syntax error in expression "[info exists auto_mkindex_parser::initCommands]": premature end of expression
+# syntax error, unexpected $undefined
+#t_tcl/async.t            t_tcl/unixNotfy.t
+#
+# bad option "sharedlibextension": must be args, body, cmdcount, commands, ...
+#t_tcl/load.t             t_tcl/unload.t
+#
+# bad option "delete": must be atime, attributes, channels, copy, delete, ...
+#t_tcl/winFile.t
+#
+# invalid command name "skip"
+#t_tcl/unixInit.t
+#
+# bad option "script": must be args, body, cmdcount, commands, complete, ...
+#t_tcl/socket.t
+#
+# syntax error in expression "[info exists auto_mkindex_parser::initCommands]": premature end of expression
+#t_tcl/autoMkindex.t
 #
 # Null PMC access in clone()
 #t_tcl/init.t            t_tcl/safe.t            t_tcl/source.t
 #t_tcl/pkg.t             t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
 #t_tcl/unixFCmd          t_tcl/unixFile.t        t_tcl/misc.t
+#t_tcl/regexpComp.t
+#
+# Null PMC access in invoke()
+#t_tcl/main.t            t_tcl/var.t             t_tcl/winDde.t
 #
 # Malformed string (http://rt.perl.org/rt3/Ticket/Display.html?id=40135)
 #t_tcl/subst.t
@@ -339,13 +349,16 @@ t_tcl/winDde.t - syntax error in expression "[lsearch [namespace children] ::tcl
 # can't read "expected": no such variable
 #t_tcl/compile.t
 #
+# can't read "actual": no such variable
+#t_tcl/listObj.t
+#
 # can't read "::tcl::OptDescN": no such variable
 #t_tcl/opt.t
 #
-# syntax error, unexpected LABEL
+# syntax error, unexpected LABEL (the compiled PIR is truncated. memory issue?)
 #t_tcl/stringObj.t
 #
-# bad option "script": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars
+# bad option "script": must be args, body, cmdcount, commands, complete, ...
 #t_tcl/http.t            t_tcl/httpold.t
 
 tcl-test: t_tcl tcl.pbc
