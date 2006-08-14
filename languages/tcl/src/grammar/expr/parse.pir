@@ -34,6 +34,7 @@ literal_loop:
     char = substr target, pos, 1
     if char == '"' goto literal_end
     if char == '[' goto literal_end
+    if char == '$' goto literal_end
     if char == '\' goto backspace
     inc pos
     goto literal_loop
