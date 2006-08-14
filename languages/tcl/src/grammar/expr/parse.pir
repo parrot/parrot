@@ -68,7 +68,10 @@ variable:
     mpos = pos
     inc pos
     $P0 = 'variable'(mob)
+    dec pos
+    # if the $ isn't followed by a legal name char, it's just a $
     unless $P0 goto literal
+    inc pos
     $P0['type'] = 'variable'
     mob[capt]   = $P0
     inc capt
