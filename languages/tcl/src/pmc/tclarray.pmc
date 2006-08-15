@@ -108,6 +108,22 @@ XXX - Why is Hash's implementation insufficient here??
 
 /*
 
+=item C<void set_pmc(PMC *other)>
+
+An alias to assign_pmc to make other things happy before set_pmc is removed.
+
+=cut
+
+*/
+
+    void set_pmc (PMC *other) {
+        VTABLE_assign_pmc(INTERP, SELF, other);
+    }
+
+/*
+
+/*
+
 =item C<void assign_pmc(PMC *other)>
 
 Copy the contents of other to self.
@@ -117,15 +133,29 @@ Copy the contents of other to self.
 */
 
     void assign_pmc (PMC *other) {
+        STRING *hash   = string_from_const_cstring(INTERP, "hash", 4);
         STRING *undef  = string_from_const_cstring(INTERP, "Undef", 5);
 
-        if (VTABLE_isa(INTERP, other, undef))
+        if (VTABLE_does(INTERP, other, hash))
+        {
+            PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, other);
+
+            pmc_reuse(INTERP, SELF, SELF->vtable->base_type, 0);
+            while (VTABLE_get_bool(INTERP, iter))
+            {
+                STRING *key   = VTABLE_shift_string(INTERP, iter);
+                PMC    *value = VTABLE_get_pmc_keyed_str(INTERP, other, key);
+                VTABLE_set_pmc_keyed_str(INTERP, SELF, key, value);
+            }
+        }
+        else if (VTABLE_isa(INTERP, other, undef))
         {
             pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
         }
         else
         {
-            /* throw an error here */
+            real_exception(INTERP, NULL, E_TypeError,
+                           "unable to assign self to this type");
         }
     }
 

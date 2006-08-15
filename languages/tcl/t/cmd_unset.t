@@ -106,8 +106,7 @@ eval_is {
   unset b
   set b 2
   set a
-} 2 {reset an unset upvar} \
-  {TODO "resetting unset vars"}
+} 2 {reset an unset upvar}
 
 eval_is {
   catch {unset array}
@@ -116,8 +115,7 @@ eval_is {
   unset elem
   set elem 7
   set array(a)
-} 7 {reset an unset array elem upvar} \
-  {TODO "resetting unset vars"}
+} 7 {reset an unset array elem upvar}
 
 eval_is {
   catch {unset array}

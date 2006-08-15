@@ -124,7 +124,7 @@ array:
   unless null variable goto check_is_hash
 
   variable = new .TclArray
-  __store_var(var, variable)
+  variable = __store_var(var, variable)
   
 check_is_hash:
   $I0 = does variable, 'hash'
@@ -152,7 +152,7 @@ scalar:
 
 make_variable:
     variable = new .Undef
-    __store_var(name, variable)
+    variable = __store_var(name, variable)
     .return(variable)
 .end
 
@@ -184,10 +184,10 @@ other than the default, and multiple interpreters.
   # ends with )
   .local int char
   char = ord name, -1
-  if char != 41 goto find_scalar
+  if char != 41 goto create_scalar
   # contains a (
   char = index name, '('
-  if char == -1 goto find_scalar
+  if char == -1 goto create_scalar
 
 find_array:
   .local string var
@@ -212,7 +212,7 @@ find_array:
 
 create_array:
   array = new .TclArray
-  __store_var(var, array)
+  array = __store_var(var, array)
 
 set_array:
   variable = array[key]
@@ -229,20 +229,11 @@ cant_set_not_array:
   $S0 .= name
   $S0 .= "\": variable isn't array"
   .throw($S0)
-
-find_scalar:
-  .local pmc scalar
-  null scalar
-  scalar = __find_var(name)
-  if_null scalar, create_scalar
-  assign scalar, value
-  goto return_scalar
   
 create_scalar:
   __store_var(name, value)
 
 return_scalar:
-  $S0 = typeof value
   .return(value)
 .end
 
@@ -320,16 +311,33 @@ Sets the actual variable from memory.
   call_chain = get_root_global ['_tcl'], 'call_chain'
   call_level = elements call_chain
   if call_level == 0 goto global_var
+
 lexical_var:
   .local pmc lexpad
   lexpad       = call_chain[-1]
+
+  $P0 = lexpad[name]
+  if null $P0 goto lexical_is_null
+
+  assign $P0, value
+  .return($P0)
+
+lexical_is_null:
   lexpad[name] = value
-  .return()
+  .return(value)
 
 coloned:
   substr name, 1, 2, ''
 global_var:
-  set_root_global ['tcl'], name, value
+  push_eh global_not_undef
+    $P0 = get_root_global ['tcl'], name
+  clear_eh
+  if null $P0 goto global_not_undef
 
-  .return()
+  assign $P0, value
+  .return($P0)
+
+global_not_undef:
+  set_root_global ['tcl'], name, value
+  .return(value)
 .end

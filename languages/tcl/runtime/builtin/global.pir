@@ -33,10 +33,13 @@ loop:
     $P1 = get_hll_global sigil_varname
   clear_eh
   lexpad[sigil_varname] = $P1
-
-next:
   inc ii
   goto loop
+
+create_global:
+  $P1 = new .Undef
+  set_hll_global sigil_varname, $P1
+  goto has_global
   
 done:
   .return('')

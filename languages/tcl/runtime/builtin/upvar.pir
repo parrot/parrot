@@ -80,8 +80,20 @@ restore_chain_loop:
   goto restore_chain_loop
 restore_chain_end:
 
-  __set(new_var, $P1)
+  # because we don't want to use assign here (we want to provide a new
+  # alias, not use an existing one), do this work by hand
 
+  $S0 = '$' . new_var
+  if call_level goto lexical
+
+  set_hll_global $S0, $P1
+  inc counter
+  goto loop
+
+lexical:
+  say "lexical"
+  $P0 = call_chain[-1]
+  $P0[$S0] = $P1
   inc counter
   goto loop
  

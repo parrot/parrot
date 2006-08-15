@@ -50,10 +50,6 @@ TCL
 1 2 3
 OUT
 
-TODO: {
-
-local $TODO= "global doesn't deal if we haven't defined the global yet.";
-
 language_output_is("tcl",<<'TCL',<<OUT,"vivify global");
 proc j {} {
   global a
@@ -64,7 +60,6 @@ puts $a
 TCL
 1
 OUT
-}
 
 language_output_is("tcl",<<'TCL',<<'OUT',"changing value");
  set a 4
