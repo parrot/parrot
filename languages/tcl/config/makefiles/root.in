@@ -214,6 +214,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/get.t \
   t_tcl/if.t \
   t_tcl/if_old.t \
+  t_tcl/incr.t \
   t_tcl/incr_old.t \
   t_tcl/join.t \
   t_tcl/lindex.t \
@@ -230,6 +231,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/pwd.t \
   t_tcl/rename.t \
   t_tcl/security.t \
+  t_tcl/set.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
   t_tcl/switch.t \
