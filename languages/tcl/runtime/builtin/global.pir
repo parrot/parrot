@@ -29,9 +29,10 @@ loop:
   varname = argv[ii]
   sigil_varname = '$' . varname
 
-  push_eh next
+  push_eh create_global
     $P1 = get_hll_global sigil_varname
   clear_eh
+has_global:
   lexpad[sigil_varname] = $P1
   inc ii
   goto loop

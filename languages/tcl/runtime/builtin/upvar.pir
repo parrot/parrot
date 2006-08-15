@@ -16,6 +16,8 @@
   __call_level = get_root_global ['_tcl'], '__call_level'
   call_chain   = get_root_global ['_tcl'], 'call_chain'
   call_level   = elements call_chain
+  call_chain   = get_root_global ['_tcl'], 'call_chain'
+  call_level   = elements call_chain
 
   .local int new_call_level, defaulted
   $P0 = argv[0]
