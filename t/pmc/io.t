@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 
 =head1 NAME
 
@@ -736,7 +736,7 @@ Hello, world!
 string
 OUTPUT
 
-pir_output_is(<<'CODE', <<"OUTPUT", "PIO.slurp()");
+pir_output_is(<<'CODE', <<"OUTPUT", "PIO.slurp() - classmeth");
 .sub main :main
     $S0 = <<"EOS"
 line 1
@@ -749,6 +749,28 @@ EOS
     close pio
     cl = getclass 'ParrotIO'
     $S1 = cl.'slurp'('temp.file')
+    if $S0 == $S1 goto ok
+    print "not "
+ok:
+    print "ok\n"
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<"OUTPUT", "PIO.slurp() - object");
+.sub main :main
+    $S0 = <<"EOS"
+line 1
+line 2
+line 3
+EOS
+    .local pmc pio, pio2
+    pio = open	"temp.file", ">"
+    print pio, $S0
+    close pio
+    pio2 = open	"temp.file", "<"
+    $S1 = pio2.'slurp'('temp.file')
     if $S0 == $S1 goto ok
     print "not "
 ok:

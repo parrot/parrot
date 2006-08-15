@@ -215,24 +215,32 @@ SYNOPSIS
 Slurp an (existing, disc) file named I<name> into a STRING result.
 
 Please note that this method isn't catching any failures yet.
-Usage:
+
+Usage as class method:
 
   .local pmc cl
   cl = getclass 'ParrotIO'
-  $S1 = cl.'slurp'('the_file')
+  $S0 = cl.'slurp'('the_file')
 
 The file will be opened, read, and closed.
+
+Or with an openend file:
+
+  pio = open 'the_file', '<'
+  $S0 = pio.'slurp'('')
+
+This does B<not> close the file.
 
 =cut
 
 */
 
     METHOD STRING* slurp(STRING* name) {
+        STRING* result;
         if (PObj_is_class_SET(SELF)) {
             /* called as class method - open, slurp, close file */
             char * const path = string_to_cstring(interpreter, name);
             INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);
-            STRING* result;
             PMC* pio = PIO_open(INTERP, NULL, path, "<");
             string_cstring_free(path); 
             /* TODO handle stdin */
@@ -240,8 +248,21 @@ The file will be opened, read, and closed.
             PIO_close(INTERP, pio);
             return result;
         }
-        /* TODO */
-        return NULL;
+        else {
+            /* slurp open file */
+            STRING *part;
+            if (!PMC_data(SELF))
+                real_exception(interpreter, NULL, PIO_ERROR,
+                        "Cannot read line from empty filehandle");
+            result = NULL;
+            do {
+                part = PIO_reads(INTERP, SELF, 4096);
+                if (string_length(INTERP, part) == 0)
+                    break;
+                result = string_append(INTERP, result, part, 0);
+            } while (1);
+        }
+        return result;
     }
 
 /*
