@@ -231,6 +231,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/security.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
+  t_tcl/switch.t \
   t_tcl/unknown.t \
   t_tcl/uplevel.t \
   t_tcl/upvar.t \
@@ -294,9 +295,6 @@ SKIPPED_TCL_TESTS = \
 #
 # add_1_const:Integer overflow '2'
 #t_tcl/get.t
-#
-# set_pmc_keyed() not implemented in class 'Integer'
-#t_tcl_switch.t
 #
 # syntax error, unexpected $undefined
 #t_tcl/async.t            t_tcl/unixNotfy.t
