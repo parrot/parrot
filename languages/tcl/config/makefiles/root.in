@@ -282,9 +282,6 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/fileName.t        t_tcl/util.t            t_tcl/cmdAH.t
 #t_tcl/binary.t
 #
-# too slow due to "260 locals"
-#t_tcl/incr.t            t_tcl/set.t
-#
 #can't delete "run": command doesn't exist
 #t_tcl/basic.t
 #
