@@ -68,7 +68,7 @@ my @tests = (
        [ "/* line1 \n line2 \n line 3 */   -3  ", -3, 'multi line comment', with_antlr3 => 1 ],
 
        # Strings 
-       [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_antlr3 => 0 ],
+       [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_antlr3 => 1 ],
 
        # empty lines
        [ "\n-1", '-1', 'single newline', with_antlr3 => 1, ],
@@ -156,6 +156,8 @@ my @tests = (
        [ 'a = 4; b = a  + 1; "a = "; a;  "b = "; b ', [ 'a = 4', 'b = 5', ], 'assign lexical to expression with lexical', with_antlr3 => 1 ], 
 
        # increment and decrement 
+       [ "a = a + 1; a ; a", [1,1], undef, with_antlr3 => 1, ],
+       [ "++a; a", [1,1], undef, with_antlr3 => 0, ],
        [ "a; a = 1; a; ++a; a", [0,1,2,2], 'increment', with_antlr3 => 0, ],
        [ "a; a = 1; a; --a; a", [0,1,0,0], 'decrement', with_antlr3 => 0, ],
 
@@ -192,7 +194,7 @@ my @tests = (
        [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3] ],
    );
 
-# @tests = ( [ '1;', [1], 'lonely semicolon', with_antlr3 => 1, ], );
+# @tests = ( [ '++a; a', [1], undef, with_antlr3 => 1, ], );
 
 my @todo_tests
     = ( # floats

@@ -63,7 +63,7 @@ input_item
   ;
 
 semicolon_list 
-  : statement? ( (SEMICOLON!)+ statement? )*
+  : statement? ( SEMICOLON! statement? )*
   ;
 
 // TODO:  STRING -> ^( PRINT STRING )

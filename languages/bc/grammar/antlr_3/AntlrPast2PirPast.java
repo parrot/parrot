@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-15 14:34:55
+// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-15 15:59:16
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
