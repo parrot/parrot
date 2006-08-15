@@ -211,6 +211,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/error.t \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
+  t_tcl/get.t \
   t_tcl/if.t \
   t_tcl/if_old.t \
   t_tcl/incr_old.t \
@@ -292,9 +293,6 @@ SKIPPED_TCL_TESTS = \
 #
 # MMD function __cmp not found for types (21, 74)
 #t/tcl_format.t
-#
-# add_1_const:Integer overflow '2'
-#t_tcl/get.t
 #
 # syntax error, unexpected $undefined
 #t_tcl/async.t            t_tcl/unixNotfy.t
