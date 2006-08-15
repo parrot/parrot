@@ -28,7 +28,34 @@ tokens
 
 // TODO: Interactive mode when there is no 'quit'
 program 
-  : input_item+ Quit NEWLINE -> ^( PROGRAM input_item+)
+  : input_item+ Quit NEWLINE -> ^( PROGRAM 
+                                   ^( ASSIGN_OP ^(VAR LETTER["a"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["b"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["c"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["d"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["e"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["f"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["g"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["h"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["i"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["j"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["k"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["l"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["m"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["n"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["o"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["p"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["q"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["r"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["s"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["t"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["u"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["v"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["w"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["x"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["y"]) NUMBER["0"] )
+                                   ^( ASSIGN_OP ^(VAR LETTER["z"]) NUMBER["0"] )
+                                   input_item+)
   ;
 
 input_item 
@@ -50,6 +77,8 @@ statement
 
 expression
   : adding_expression
+    |
+    INCR_DECR named_expression -> ^( PLUS named_expression NUMBER["1"] )
   ;
 
 named_expression
