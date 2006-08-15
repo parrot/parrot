@@ -19,27 +19,17 @@
   if argc > 2 goto bad_args
 
   # get the array...
-  .local string name, full_name
+  .local string name
   name = argv[0]
-  full_name = '$' . name
 
   .local pmc array
-  .local int call_level
-  $P0 = get_root_global ['_tcl'], 'call_level'
-  call_level = $P0
-
   null array
-  push_eh catch_var
-  if call_level goto find_lex
-    array = find_global full_name
-    clear_eh
-    branch catch_var
-  find_lex:
-    array = find_lex full_name
-    clear_eh
-catch_var:
-  if_null array, not_array
 
+  .local pmc __find_var
+  __find_var = get_root_global ['_tcl'], '__find_var'
+  array      = __find_var(name)
+
+  if_null array, not_array
 
   # get the pattern
   .local string match_str

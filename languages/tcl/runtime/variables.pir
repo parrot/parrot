@@ -263,14 +263,14 @@ Gets the actual variable from memory and returns it.
 
   $S0 = substr name, 1, 2
   if $S0 == '::'     goto coloned
-  
+
+  .local pmc call_chain
   .local int call_level
-  $P1 = find_global 'call_level'
-  call_level = $P1
+  call_chain = get_root_global ['_tcl'], 'call_chain'
+  call_level = elements call_chain
   if call_level == 0 goto global_var
 
-  .local pmc call_chain, lexpad, variable
-  call_chain = get_root_global ['_tcl'], 'call_chain'
+  .local pmc lexpad, variable
   push_eh notfound
     lexpad     = call_chain[-1]
     value      = lexpad[name]
@@ -315,13 +315,13 @@ Sets the actual variable from memory.
   $S0 = substr name, 1, 2
   if $S0 == '::'     goto coloned
 
+  .local pmc call_chain
   .local int call_level
-  $P1 = find_global 'call_level'
-  call_level = $P1
+  call_chain = get_root_global ['_tcl'], 'call_chain'
+  call_level = elements call_chain
   if call_level == 0 goto global_var
 lexical_var:
-  .local pmc call_chain, lexpad
-  call_chain   = get_root_global ['_tcl'], 'call_chain'
+  .local pmc lexpad
   lexpad       = call_chain[-1]
   lexpad[name] = value
   .return()

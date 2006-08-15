@@ -19,13 +19,13 @@
   __call_level    = get_root_global ['_tcl'], '__call_level'
 
   # save the old call level
-  .local pmc call_chain, call_level
+  .local pmc call_chain
+  .local int call_level
   call_chain = get_root_global ['_tcl'], 'call_chain'
-  call_level = get_root_global ['_tcl'], 'call_level'
+  call_level = elements call_chain
 
-  .local pmc new_call_level, old_call_level
+  .local pmc new_call_level
   new_call_level = argv[0]
-  old_call_level = clone call_level
  
   .local int defaulted 
   (new_call_level,defaulted) = __call_level(new_call_level)
@@ -35,9 +35,8 @@
 skip:
 
   .local int difference
-  $P0 = new .Integer
-  $P0 = old_call_level - new_call_level
-  difference = $P0
+  $I0 = new_call_level
+  difference = call_level - $I0
 
   .local pmc saved_call_chain
   saved_call_chain = new .ResizablePMCArray
@@ -49,9 +48,6 @@ save_chain_loop:
   inc $I0
   goto save_chain_loop
 save_chain_end:
-
-  # Set the new level 
-  assign call_level, new_call_level
 
   $S0 = join ' ', argv
   # if we get an exception, we have to reset the environment
@@ -71,7 +67,6 @@ restore_and_rethrow:
 
 restore:
   # restore the old level
-  assign call_level, old_call_level
   $I0 = 0
 restore_chain_loop:
   if $I0 == difference goto restore_chain_end

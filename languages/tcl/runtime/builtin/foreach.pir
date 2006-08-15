@@ -7,10 +7,6 @@
 
   .local pmc retval
 
-  .local int call_level
-  $P0 = get_root_global ['_tcl'], 'call_level'
-  call_level = $P0
-
   .local int argc
   argc = elements argv
 

@@ -32,9 +32,6 @@
   
   array_name = shift argv
 
-  .local int call_level
-  $P0 = get_root_global ['_tcl'], 'call_level'
-  call_level = $P0
   null the_array
 
   .local pmc __find_var

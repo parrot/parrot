@@ -508,7 +508,10 @@ is_string:
 .sub 'infix:ne'    # string inequality
     .param pmc a
     .param pmc b
-    $I0 = isne a, b 
+
+    $S0 = a
+    $S1 = b
+    $I0 = isne $S0, $S1
     .return ($I0)
 .end
 

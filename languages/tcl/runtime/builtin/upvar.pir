@@ -11,15 +11,13 @@
   argc = elements argv
   if argc < 2 goto bad_args
   
-  .local pmc call_chain, call_level, __call_level
-  call_chain   = get_root_global ['_tcl'], 'call_chain'
-  call_level   = get_root_global ['_tcl'], 'call_level'
+  .local pmc __call_level, call_chain
+  .local int call_level
   __call_level = get_root_global ['_tcl'], '__call_level'
+  call_chain   = get_root_global ['_tcl'], 'call_chain'
+  call_level   = elements call_chain
 
-  .local pmc new_call_level, orig_call_level
-  orig_call_level = new .Integer
-  assign orig_call_level, call_level
-  .local int defaulted
+  .local int new_call_level, defaulted
   $P0 = argv[0]
   (new_call_level,defaulted) = __call_level($P0)
   if defaulted == 1 goto skip
@@ -41,9 +39,7 @@ skip:
   argc       = argv
   counter    = 0
   .local int difference
-  $P0 = new .Integer
-  $P0 = orig_call_level - new_call_level
-  difference = $P0
+  difference = call_level - new_call_level
 loop:
   if counter >= argc goto done
   
@@ -61,8 +57,6 @@ loop:
   .throw($S0)
 
 store_var:
-  assign call_level, new_call_level
-
   .local pmc saved_call_chain
   saved_call_chain = new .ResizablePMCArray
   $I0 = 0
@@ -77,7 +71,6 @@ save_chain_end:
   $P1 = __make(old_var)
 
   # restore the old level
-  assign call_level, orig_call_level
   $I0 = 0
 restore_chain_loop:
   if $I0 == difference goto restore_chain_end

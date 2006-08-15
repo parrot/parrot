@@ -165,10 +165,6 @@ env_loop_done:
   # call chain of lex pads (for upvar and uplevel)
   $P1 = new .ResizablePMCArray
   store_global 'call_chain', $P1
-  # calling level (for globals vs. lex)
-  $P1 = new .Integer
-  $P1 = 0
-  store_global 'call_level', $P1
 
   # Change counter: when something is compiled, it is compared to
   # This counter: if the counter hasn't changed since it was compiled,
