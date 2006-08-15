@@ -253,7 +253,7 @@ This does B<not> close the file.
             STRING *part;
             if (!PMC_data(SELF))
                 real_exception(interpreter, NULL, PIO_ERROR,
-                        "Cannot read line from empty filehandle");
+                        "Cannot slurp from empty filehandle");
             result = NULL;
             do {
                 part = PIO_reads(INTERP, SELF, 4096);
