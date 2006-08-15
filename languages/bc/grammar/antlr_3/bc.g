@@ -28,15 +28,15 @@ tokens
 
 // TODO: Interactive mode when there is no 'quit'
 program 
-  : input_item+ Quit -> ^( PROGRAM input_item+)
+  : input_item+ Quit NEWLINE -> ^( PROGRAM input_item+)
   ;
 
 input_item 
-  : semicolon_list
+  : semicolon_list NEWLINE!
   ;
 
 semicolon_list 
-  : statement ( ';'! statement )*
+  : statement? ( (SEMICOLON!)+ statement? )*
   ;
 
 // TODO:  STRING -> ^( PRINT STRING )
@@ -46,8 +46,6 @@ statement
     expression -> ^( SAY expression )
     |
     STRING -> ^( PRINT STRING )
-    |
-    Quit
   ;
 
 expression
@@ -104,6 +102,10 @@ MUL_OP
   : '*' | '/' | '%'
   ;
 
+SEMICOLON
+  : ';'
+  ;
+
 ASSIGN_OP
   : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' 
   ;
@@ -127,18 +129,16 @@ ML_COMMENT
 
 // ignore whitespace
 WS
-  : ( ' ' | '\t' | '\r' | '\n')+
+  : ( ' ' | '\t' )+
     {
       channel = 99;       // send into nirwana 
     }
   ;    
 
 // Windows and Unix style newlines
-fragment
 NEWLINE
   : ('\r')? '\n'+
   ;
-
 
 // String literals are everything in double quotes, no escaping
 STRING

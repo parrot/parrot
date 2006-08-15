@@ -22,13 +22,6 @@ use Parrot::Config ();
 use Parrot::Test;
 use Test::More;
 
-if ( $Parrot::Config::PConfig{has_python} ) {
-  plan tests => 92;
-}
-else {
-  plan skip_all => 'ANTLR2 based bc needs Python';
-}
-
 # A little helper to make setting up tests easier
 sub run_tests {
     my ( $tests ) = @_;
@@ -138,8 +131,13 @@ my @tests = (
        [ '  ( 1 * 2 ) + ( ( ( ( 3 + 4 ) + 5 ) * 6 ) * 7 ) ', '506', undef, with_antlr3 => 1, ],
 
        # semicolons
+       [ '; 1', [1], undef, with_antlr3 => 1, ],
+       [ ';;   ;1', [1], undef, with_antlr3 => 1, ],
        [ '1;', [1], 'semicolon at end of line', with_antlr3 => 1, ],
+       [ '1;;', [1], undef, with_antlr3 => 1, ],
+       [ '1;  ; ; ;;', [1], 'semicolon at end of line', with_antlr3 => 1, ],
        [ '1; 2', [1, 2], 'two expressions seperated by a semicolon', with_antlr3 => 1, ],
+       [ '1;;;;; ;    ; 2', [1, 2], undef, with_antlr3 => 1, ],
        [ '1+1+1; 2 + 2 + 2  ;  3 + 3 -1 + 3 +1', [3, 6, 9], '3 additive expression with semicolons', with_antlr3 => 1, ],
        [ '1+1*1; 2+2*2', [2, 6], undef, with_antlr3 => 1, ],
        [ '3-3/3; 4+4%4;  5-5+5', [2, 4, 5], undef, with_antlr3 => 1, ],
@@ -194,23 +192,29 @@ my @tests = (
        [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3] ],
    );
 
-# @tests = (
-#        [ 'a = 4; b = a  + 1; "a = "; a;  "b = "; b; ', [ 'a = 4', 'b = 5', ], 'assign lexical to expression with lexical', with_antlr3 => 1 ], 
-#    );
+# @tests = ( [ '1;', [1], 'lonely semicolon', with_antlr3 => 1, ], );
+
+my @todo_tests
+    = ( # floats
+        [ '.1', '.1', 'Parrot bc says 0.1', with_antlr3 => 1, ],
+        [ '-.1', '-.1', 'Parrot bc says -0.1', with_antlr3 => 1,],
+        [ '-1.0000001', '-1.0000001', 'probably limited precission of Float PMC', with_antlr3 => 1, ],
+
+        # keyword quit
+        [ "0\n1; 2; quit;  3", [ 0 ], 'is that correct in GNU bc?', with_antlr3 => 1, ],
+      );
+
+if ( $Parrot::Config::PConfig{has_python} ) {
+  plan tests => scalar(@tests) + scalar(@todo_tests);
+}
+else {
+  plan skip_all => 'ANTLR2 based bc needs Python';
+}
 
 run_tests(\@tests);
 
 TODO:
 {
     local $TODO = 'not implemented';
-    my @todo_tests = ( 
-           # floats
-           [ '.1', '.1', 'Parrot bc says 0.1', with_antlr3 => 1, ],
-           [ '-.1', '-.1', 'Parrot bc says -0.1', with_antlr3 => 1,],
-           [ '-1.0000001', '-1.0000001', 'probably limited precission of Float PMC', with_antlr3 => 1, ],
-
-           # keyword quit
-           [ "0\n1; 2; quit;  3", [ 0 ], 'is that correct in GNU bc?', with_antlr3 => 1, ],
-       );
     run_tests( \@todo_tests );
 }; 

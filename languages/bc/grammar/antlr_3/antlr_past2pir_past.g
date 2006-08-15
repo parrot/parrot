@@ -82,7 +82,7 @@ gen_pir_past
         + "  .sym pmc reg_adding_expression_op                               \n"
       );
     }
-    ^(PROGRAM expression["stmts"]+ )
+    ^(PROGRAM expression["stmts"]* )
     {
       System.out.print( 
           "                                                                  \n"

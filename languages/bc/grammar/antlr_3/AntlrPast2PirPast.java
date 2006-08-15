@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-14 11:59:18
+// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-15 13:19:33
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;import java.util.Stack;
@@ -7,27 +7,28 @@ import java.util.ArrayList;
 
 public class AntlrPast2PirPast extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PRINT", "PROGRAM", "SAY", "UNARY_MINUS", "VAR", "Quit", "ASSIGN_OP", "STRING", "LETTER", "PLUS", "MINUS", "MUL_OP", "NUMBER", "INTEGER", "INCR_DECR", "ML_COMMENT", "WS", "NEWLINE", "';'", "'('", "')'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PRINT", "PROGRAM", "SAY", "UNARY_MINUS", "VAR", "Quit", "NEWLINE", "SEMICOLON", "ASSIGN_OP", "STRING", "LETTER", "PLUS", "MINUS", "MUL_OP", "NUMBER", "INTEGER", "INCR_DECR", "ML_COMMENT", "WS", "'('", "')'"
     };
-    public static final int INCR_DECR=18;
-    public static final int MINUS=14;
-    public static final int LETTER=12;
-    public static final int WS=20;
-    public static final int NUMBER=16;
-    public static final int STRING=11;
-    public static final int MUL_OP=15;
+    public static final int INCR_DECR=20;
+    public static final int MINUS=16;
+    public static final int LETTER=14;
+    public static final int WS=22;
+    public static final int NUMBER=18;
+    public static final int STRING=13;
+    public static final int MUL_OP=17;
     public static final int Quit=9;
     public static final int PROGRAM=5;
-    public static final int NEWLINE=21;
+    public static final int NEWLINE=10;
     public static final int VAR=8;
-    public static final int ASSIGN_OP=10;
-    public static final int INTEGER=17;
+    public static final int ASSIGN_OP=12;
+    public static final int INTEGER=19;
     public static final int SAY=6;
     public static final int PRINT=4;
     public static final int UNARY_MINUS=7;
+    public static final int SEMICOLON=11;
     public static final int EOF=-1;
-    public static final int ML_COMMENT=19;
-    public static final int PLUS=13;
+    public static final int PLUS=15;
+    public static final int ML_COMMENT=21;
 
         public AntlrPast2PirPast(TreeNodeStream input) {
             super(input);
@@ -44,11 +45,11 @@ public class AntlrPast2PirPast extends TreeParser {
 
 
     // $ANTLR start gen_pir_past
-    // grammar/antlr_3/antlr_past2pir_past.g:21:1: gen_pir_past : ^( PROGRAM ( expression["stmts"] )+ ) ;
+    // grammar/antlr_3/antlr_past2pir_past.g:21:1: gen_pir_past : ^( PROGRAM ( expression["stmts"] )* ) ;
     public void gen_pir_past() throws RecognitionException {   
         try {
-            // grammar/antlr_3/antlr_past2pir_past.g:22:5: ( ^( PROGRAM ( expression[\"stmts\"] )+ ) )
-            // grammar/antlr_3/antlr_past2pir_past.g:22:5: ^( PROGRAM ( expression[\"stmts\"] )+ )
+            // grammar/antlr_3/antlr_past2pir_past.g:22:5: ( ^( PROGRAM ( expression[\"stmts\"] )* ) )
+            // grammar/antlr_3/antlr_past2pir_past.g:22:5: ^( PROGRAM ( expression[\"stmts\"] )* )
             {
 
                   System.out.println( 
@@ -115,41 +116,38 @@ public class AntlrPast2PirPast extends TreeParser {
                 
             match(input,PROGRAM,FOLLOW_PROGRAM_in_gen_pir_past65); 
 
-            match(input, Token.DOWN, null); 
-            // grammar/antlr_3/antlr_past2pir_past.g:85:15: ( expression[\"stmts\"] )+
-            int cnt1=0;
-            loop1:
-            do {
-                int alt1=2;
-                int LA1_0 = input.LA(1);
-                if ( (LA1_0==PRINT||LA1_0==SAY||LA1_0==ASSIGN_OP) ) {
-                    alt1=1;
-                }
+            if ( input.LA(1)==Token.DOWN ) {
+                match(input, Token.DOWN, null); 
+                // grammar/antlr_3/antlr_past2pir_past.g:85:15: ( expression[\"stmts\"] )*
+                loop1:
+                do {
+                    int alt1=2;
+                    int LA1_0 = input.LA(1);
+                    if ( (LA1_0==PRINT||LA1_0==SAY||LA1_0==ASSIGN_OP) ) {
+                        alt1=1;
+                    }
 
 
-                switch (alt1) {
-            	case 1 :
-            	    // grammar/antlr_3/antlr_past2pir_past.g:85:15: expression[\"stmts\"]
-            	    {
-            	    pushFollow(FOLLOW_expression_in_gen_pir_past67);
-            	    expression("stmts");
-            	    _fsp--;
+                    switch (alt1) {
+                	case 1 :
+                	    // grammar/antlr_3/antlr_past2pir_past.g:85:15: expression[\"stmts\"]
+                	    {
+                	    pushFollow(FOLLOW_expression_in_gen_pir_past67);
+                	    expression("stmts");
+                	    _fsp--;
 
 
-            	    }
-            	    break;
+                	    }
+                	    break;
 
-            	default :
-            	    if ( cnt1 >= 1 ) break loop1;
-                        EarlyExitException eee =
-                            new EarlyExitException(1, input);
-                        throw eee;
-                }
-                cnt1++;
-            } while (true);
+                	default :
+                	    break loop1;
+                    }
+                } while (true);
 
 
-            match(input, Token.UP, null); 
+                match(input, Token.UP, null); 
+            }
 
                   System.out.print( 
                       "                                                                  \n"
@@ -791,7 +789,7 @@ public class AntlrPast2PirPast extends TreeParser {
  
 
     public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past65 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_gen_pir_past67 = new BitSet(new long[]{0x0000000000000458L});
+    public static final BitSet FOLLOW_expression_in_gen_pir_past67 = new BitSet(new long[]{0x0000000000001058L});
     public static final BitSet FOLLOW_SAY_in_expression99 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_adding_in_expression103 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_UNARY_MINUS_in_expression151 = new BitSet(new long[]{0x0000000000000004L});
@@ -807,7 +805,7 @@ public class AntlrPast2PirPast extends TreeParser {
     public static final BitSet FOLLOW_NUMBER_in_integer328 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_integer_in_adding356 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_adding387 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_adding_in_adding399 = new BitSet(new long[]{0x000000000001E100L});
+    public static final BitSet FOLLOW_adding_in_adding399 = new BitSet(new long[]{0x0000000000078100L});
     public static final BitSet FOLLOW_adding_in_adding402 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_named_expression_in_adding429 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_VAR_in_named_expression464 = new BitSet(new long[]{0x0000000000000004L});
