@@ -69,6 +69,7 @@ my @tests = (
 
        # Strings 
        [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_antlr3 => 1 ],
+       [ qq{1;2;" asdf\n  jklm\n   rtzu\n"   ;  3    }, [ 1, 2, ' asdf', '  jklm', '   rtzu', 3 ], undef, with_antlr3 => 1 ],
 
        # empty lines
        [ "\n-1", '-1', 'single newline', with_antlr3 => 1, ],

@@ -12,6 +12,12 @@ options
   tokenVocab   = BcParser;      // Token file is found because of '-lib' option
 }
 
+
+@header 
+{
+  import java.util.regex.*;
+}
+
 @members
 {
   // used for generating unique register names
@@ -202,21 +208,21 @@ expression[String reg_mother]
 string [ String reg_mother ]
   : STRING
     {
-      // TODO: strip String
+      String escaped = $STRING.text.replaceAll( "\\n", "\\\\n" ).replaceAll( "\"", "'" );
       System.out.print(     
           "                                                                \n"
         + "# entering 'string'                                             \n"
         + "    reg_expression_stmt = new 'PAST::Stmt'                      \n"
         + "      reg_expression_topexp = new 'PAST::Exp'                   \n"
-        + "        reg_print_op = new 'PAST::Op'                      \n"
-        + "        reg_print_op.'op'( 'print' )                       \n"
+        + "        reg_print_op = new 'PAST::Op'                           \n"
+        + "        reg_print_op.'op'( 'print' )                            \n"
         + "          reg_expression_exp = new 'PAST::Exp'                  \n"
         + "            reg_temp = new 'PAST::Val'                          \n"
-        + "            reg_temp.value( " + $STRING.text + " )              \n"
+        + "            reg_temp.value( " + escaped + " )                 \n"
         + "            reg_temp.valtype( 'strqq' )                         \n"
         + "          reg_expression_exp.'add_child'( reg_temp )            \n"
         + "          null reg_temp                                         \n"
-        + "        reg_print_op.'add_child'( reg_expression_exp )     \n"
+        + "        reg_print_op.'add_child'( reg_expression_exp )          \n"
         + "      reg_expression_topexp.'add_child'( reg_print_op )         \n"
         + "    reg_expression_stmt.'add_child'( reg_expression_topexp )    \n"
         + "  " + $string.reg_mother + ".'add_child'( reg_expression_stmt ) \n"
