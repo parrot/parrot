@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-08-11 00:21:49
+// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-08-14 11:59:17
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -6,38 +6,40 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class BcParserLexer extends Lexer {
-    public static final int T21=21;
-    public static final int INCR_DECR=15;
-    public static final int MINUS=11;
-    public static final int LETTER=9;
+    public static final int INCR_DECR=18;
+    public static final int MINUS=14;
+    public static final int LETTER=12;
     public static final int T22=22;
-    public static final int WS=17;
-    public static final int NUMBER=13;
-    public static final int STRING=7;
-    public static final int MUL_OP=12;
-    public static final int T20=20;
-    public static final int PROGRAM=4;
-    public static final int NEWLINE=18;
-    public static final int VAR=6;
-    public static final int ASSIGN_OP=8;
-    public static final int INTEGER=14;
-    public static final int UNARY_MINUS=5;
+    public static final int WS=20;
+    public static final int NUMBER=16;
+    public static final int STRING=11;
+    public static final int T23=23;
+    public static final int MUL_OP=15;
+    public static final int Quit=9;
+    public static final int PROGRAM=5;
+    public static final int NEWLINE=21;
+    public static final int VAR=8;
+    public static final int ASSIGN_OP=10;
+    public static final int INTEGER=17;
+    public static final int SAY=6;
+    public static final int PRINT=4;
+    public static final int UNARY_MINUS=7;
     public static final int EOF=-1;
-    public static final int Tokens=23;
-    public static final int ML_COMMENT=16;
-    public static final int PLUS=10;
-    public static final int T19=19;
+    public static final int Tokens=25;
+    public static final int ML_COMMENT=19;
+    public static final int PLUS=13;
+    public static final int T24=24;
     public BcParserLexer() {;} 
     public BcParserLexer(CharStream input) {
         super(input);
     }
     public String getGrammarFileName() { return "grammar/antlr_3/bc.g"; }
 
-    // $ANTLR start T19
-    public void mT19() throws RecognitionException {
+    // $ANTLR start T22
+    public void mT22() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T19;
+            int type = T22;
             int start = getCharIndex();
             int line = getLine();
             int charPosition = getCharPositionInLine();
@@ -60,13 +62,13 @@ public class BcParserLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T19
+    // $ANTLR end T22
 
-    // $ANTLR start T20
-    public void mT20() throws RecognitionException {
+    // $ANTLR start T23
+    public void mT23() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T20;
+            int type = T23;
             int start = getCharIndex();
             int line = getLine();
             int charPosition = getCharPositionInLine();
@@ -89,13 +91,13 @@ public class BcParserLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T20
+    // $ANTLR end T23
 
-    // $ANTLR start T21
-    public void mT21() throws RecognitionException {
+    // $ANTLR start T24
+    public void mT24() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T21;
+            int type = T24;
             int start = getCharIndex();
             int line = getLine();
             int charPosition = getCharPositionInLine();
@@ -118,37 +120,7 @@ public class BcParserLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T21
-
-    // $ANTLR start T22
-    public void mT22() throws RecognitionException {
-        try {
-            ruleNestingLevel++;
-            int type = T22;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:6:7: ( 'quit' )
-            // grammar/antlr_3/bc.g:6:7: 'quit'
-            {
-            match("quit"); 
-
-
-            }
-
-
-
-                    if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
-                    }
-
-                        }
-        finally {
-            ruleNestingLevel--;
-        }
-    }
-    // $ANTLR end T22
+    // $ANTLR end T24
 
     // $ANTLR start NUMBER
     public void mNUMBER() throws RecognitionException {
@@ -541,6 +513,36 @@ public class BcParserLexer extends Lexer {
     }
     // $ANTLR end INCR_DECR
 
+    // $ANTLR start Quit
+    public void mQuit() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int type = Quit;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:118:5: ( 'quit' )
+            // grammar/antlr_3/bc.g:118:5: 'quit'
+            {
+            match("quit"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end Quit
+
     // $ANTLR start ML_COMMENT
     public void mML_COMMENT() throws RecognitionException {
         try {
@@ -836,7 +838,7 @@ public class BcParserLexer extends Lexer {
     // $ANTLR end LETTER
 
     public void mTokens() throws RecognitionException {
-        // grammar/antlr_3/bc.g:1:10: ( T19 | T20 | T21 | T22 | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | INCR_DECR | ML_COMMENT | WS | STRING | LETTER )
+        // grammar/antlr_3/bc.g:1:10: ( T22 | T23 | T24 | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | INCR_DECR | Quit | ML_COMMENT | WS | STRING | LETTER )
         int alt11=14;
         switch ( input.LA(1) ) {
         case ';':
@@ -847,14 +849,6 @@ public class BcParserLexer extends Lexer {
             break;
         case ')':
             alt11=3;
-            break;
-        case 'q':
-            int LA11_4 = input.LA(2);
-            if ( (LA11_4=='u') ) {
-                alt11=4;
-            }
-            else {
-                alt11=14;}
             break;
         case '.':
         case '0':
@@ -873,43 +867,43 @@ public class BcParserLexer extends Lexer {
         case 'D':
         case 'E':
         case 'F':
-            alt11=5;
+            alt11=4;
             break;
         case '-':
             switch ( input.LA(2) ) {
             case '=':
-                alt11=9;
+                alt11=8;
                 break;
             case '-':
-                alt11=10;
+                alt11=9;
                 break;
             default:
-                alt11=6;}
+                alt11=5;}
 
             break;
         case '+':
             switch ( input.LA(2) ) {
             case '+':
-                alt11=10;
-                break;
-            case '=':
                 alt11=9;
                 break;
+            case '=':
+                alt11=8;
+                break;
             default:
-                alt11=7;}
+                alt11=6;}
 
             break;
         case '*':
-            int LA11_8 = input.LA(2);
-            if ( (LA11_8=='=') ) {
-                alt11=9;
+            int LA11_7 = input.LA(2);
+            if ( (LA11_7=='=') ) {
+                alt11=8;
             }
             else {
-                alt11=8;}
+                alt11=7;}
             break;
         case '=':
         case '^':
-            alt11=9;
+            alt11=8;
             break;
         case '/':
             switch ( input.LA(2) ) {
@@ -917,19 +911,27 @@ public class BcParserLexer extends Lexer {
                 alt11=11;
                 break;
             case '=':
-                alt11=9;
+                alt11=8;
                 break;
             default:
-                alt11=8;}
+                alt11=7;}
 
             break;
         case '%':
-            int LA11_11 = input.LA(2);
-            if ( (LA11_11=='=') ) {
-                alt11=9;
+            int LA11_10 = input.LA(2);
+            if ( (LA11_10=='=') ) {
+                alt11=8;
             }
             else {
-                alt11=8;}
+                alt11=7;}
+            break;
+        case 'q':
+            int LA11_11 = input.LA(2);
+            if ( (LA11_11=='u') ) {
+                alt11=10;
+            }
+            else {
+                alt11=14;}
             break;
         case '\t':
         case '\n':
@@ -969,105 +971,105 @@ public class BcParserLexer extends Lexer {
             break;
         default:
             NoViableAltException nvae =
-                new NoViableAltException("1:1: Tokens : ( T19 | T20 | T21 | T22 | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | INCR_DECR | ML_COMMENT | WS | STRING | LETTER );", 11, 0, input);
+                new NoViableAltException("1:1: Tokens : ( T22 | T23 | T24 | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | INCR_DECR | Quit | ML_COMMENT | WS | STRING | LETTER );", 11, 0, input);
 
             throw nvae;
         }
 
         switch (alt11) {
             case 1 :
-                // grammar/antlr_3/bc.g:1:10: T19
-                {
-                mT19(); 
-
-                }
-                break;
-            case 2 :
-                // grammar/antlr_3/bc.g:1:14: T20
-                {
-                mT20(); 
-
-                }
-                break;
-            case 3 :
-                // grammar/antlr_3/bc.g:1:18: T21
-                {
-                mT21(); 
-
-                }
-                break;
-            case 4 :
-                // grammar/antlr_3/bc.g:1:22: T22
+                // grammar/antlr_3/bc.g:1:10: T22
                 {
                 mT22(); 
 
                 }
                 break;
-            case 5 :
-                // grammar/antlr_3/bc.g:1:26: NUMBER
+            case 2 :
+                // grammar/antlr_3/bc.g:1:14: T23
+                {
+                mT23(); 
+
+                }
+                break;
+            case 3 :
+                // grammar/antlr_3/bc.g:1:18: T24
+                {
+                mT24(); 
+
+                }
+                break;
+            case 4 :
+                // grammar/antlr_3/bc.g:1:22: NUMBER
                 {
                 mNUMBER(); 
 
                 }
                 break;
-            case 6 :
-                // grammar/antlr_3/bc.g:1:33: MINUS
+            case 5 :
+                // grammar/antlr_3/bc.g:1:29: MINUS
                 {
                 mMINUS(); 
 
                 }
                 break;
-            case 7 :
-                // grammar/antlr_3/bc.g:1:39: PLUS
+            case 6 :
+                // grammar/antlr_3/bc.g:1:35: PLUS
                 {
                 mPLUS(); 
 
                 }
                 break;
-            case 8 :
-                // grammar/antlr_3/bc.g:1:44: MUL_OP
+            case 7 :
+                // grammar/antlr_3/bc.g:1:40: MUL_OP
                 {
                 mMUL_OP(); 
 
                 }
                 break;
-            case 9 :
-                // grammar/antlr_3/bc.g:1:51: ASSIGN_OP
+            case 8 :
+                // grammar/antlr_3/bc.g:1:47: ASSIGN_OP
                 {
                 mASSIGN_OP(); 
 
                 }
                 break;
-            case 10 :
-                // grammar/antlr_3/bc.g:1:61: INCR_DECR
+            case 9 :
+                // grammar/antlr_3/bc.g:1:57: INCR_DECR
                 {
                 mINCR_DECR(); 
 
                 }
                 break;
+            case 10 :
+                // grammar/antlr_3/bc.g:1:67: Quit
+                {
+                mQuit(); 
+
+                }
+                break;
             case 11 :
-                // grammar/antlr_3/bc.g:1:71: ML_COMMENT
+                // grammar/antlr_3/bc.g:1:72: ML_COMMENT
                 {
                 mML_COMMENT(); 
 
                 }
                 break;
             case 12 :
-                // grammar/antlr_3/bc.g:1:82: WS
+                // grammar/antlr_3/bc.g:1:83: WS
                 {
                 mWS(); 
 
                 }
                 break;
             case 13 :
-                // grammar/antlr_3/bc.g:1:85: STRING
+                // grammar/antlr_3/bc.g:1:86: STRING
                 {
                 mSTRING(); 
 
                 }
                 break;
             case 14 :
-                // grammar/antlr_3/bc.g:1:92: LETTER
+                // grammar/antlr_3/bc.g:1:93: LETTER
                 {
                 mLETTER(); 
 

@@ -73,8 +73,11 @@ gen_pir_past
         + "  .sym pmc reg_expression_newline                                 \n"
         + "                                                                  \n"
         + "  .sym pmc reg_temp                                               \n"
-        + "  .sym pmc reg_unary_val                                           \n"
-        + "  .sym pmc reg_unary_op                                            \n"
+        + "                                                                  \n"
+        + "  .sym pmc reg_assign_lhs                                         \n"
+        + "                                                                  \n"
+        + "  .sym pmc reg_unary_val                                          \n"
+        + "  .sym pmc reg_unary_op                                           \n"
         + "                                                                  \n"
         + "  .sym pmc reg_adding_expression_op                               \n"
       );
@@ -186,30 +189,30 @@ expression[String reg_mother]
         + "          reg_expression_exp = new 'PAST::Exp'                    \n"
       );
     }
-    (
-      ( adding_expression["reg_expression_exp"] | named_expression["reg_expression_exp"] )
-      { 
-        System.out.print( 
-            "                                                                \n"
-          + "      reg_print_op.'add_child'( reg_expression_exp )            \n"
-        );
-      }
-      |
-      ^( UNARY_MINUS ( adding_expression["reg_expression_exp"] | named_expression["reg_expression_exp"] ) )
-      { 
-        System.out.print( 
-            "                                                                \n"
-          + "   # multiply by -1                                             \n"
-          + "   reg_unary_op = new 'PAST::Op'                                \n"
-          + "   reg_unary_op.'op'( 'infix:*' )                               \n"
-          + "     reg_unary_val = new 'PAST::Val'                            \n"
-          + "     reg_unary_val.value( -1 )                                  \n"
-          + "     reg_unary_val.valtype( 'num' )                             \n"
-          + "   reg_unary_op.'add_child'( reg_unary_val )                    \n"
-          + "   reg_unary_op.'add_child'( reg_expression_exp )               \n"
-          + "      reg_print_op.'add_child'( reg_unary_op )                  \n"
-        );
-      }
+    ^( SAY ( adding["reg_expression_exp"]
+             { 
+               System.out.print( 
+                   "                                                                \n"
+                 + "      reg_print_op.'add_child'( reg_expression_exp )            \n"
+               );
+             }
+             |
+             ^( UNARY_MINUS adding["reg_expression_exp"] )
+             { 
+               System.out.print( 
+                   "                                                                \n"
+                 + "   # multiply by -1                                             \n"
+                 + "   reg_unary_op = new 'PAST::Op'                                \n"
+                 + "   reg_unary_op.'op'( 'infix:*' )                               \n"
+                 + "     reg_unary_val = new 'PAST::Val'                            \n"
+                 + "     reg_unary_val.value( -1 )                                  \n"
+                 + "     reg_unary_val.valtype( 'num' )                             \n"
+                 + "   reg_unary_op.'add_child'( reg_unary_val )                    \n"
+                 + "   reg_unary_op.'add_child'( reg_expression_exp )               \n"
+                 + "      reg_print_op.'add_child'( reg_unary_op )                  \n"
+               );
+             }
+           )
     )
     {
       System.out.print( 
@@ -240,9 +243,9 @@ expression[String reg_mother]
       String mother_for_string = $expression.reg_mother;
     }
     (
-      string[ mother_for_string ]
+      ^( PRINT string[ mother_for_string ] )
       |
-      assign[ mother_for_string ]
+      ^( ASSIGN_OP assign[ mother_for_string ] )
     )
   ;
 
@@ -273,26 +276,29 @@ string [ String reg_mother ]
   ;
 
 assign [ String reg_mother ]
-  : ^( ASSIGN_OP ^(VAR LETTER) NUMBER )
+  : {
+      System.out.print( 
+          "                                                                  \n"
+        + "  # entering 'assign'                                             \n"
+        + "    reg_assign_lhs = new 'PAST::Exp'                              \n"
+      );
+    }
+    ^(VAR LETTER) adding["reg_assign_lhs"]
     {
       // TODO: strip String
       System.out.print(     
           "                                                                  \n"
-        + "    # entering 'ASSIGN_OP ^(VAR LETTER) NUMBER'                   \n"
+        + "    # entering 'ASSIGN_OP ^(VAR LETTER) adding'        \n"
         + "      .sym pmc past_op                                            \n"
         + "      past_op = new 'PAST::Op'                                    \n"
-        + "      past_op.'op'( 'infix:" + $ASSIGN_OP.text + "' )             \n"
+        + "      past_op.'op'( 'infix:=' )                                   \n"
         + "        .sym pmc past_var                                         \n"
         + "        past_var = new 'PAST::Var'                                \n"
         + "        past_var.'varname'( '" + $LETTER.text + "' )              \n"
         + "        past_var.'vartype'( 'scalar' )                            \n"
         + "        past_var.'scope'( 'global' )                              \n"
         + "      past_op.'add_child'( past_var )                             \n"
-        + "        .sym pmc past_val                                         \n"
-        + "        past_val = new 'PAST::Val'                                \n"
-        + "        past_val.'value'( " + $NUMBER.text + " )                  \n"
-        + "        past_val.'valtype'( 'int' )                               \n"
-        + "      past_op.'add_child'( past_val )                             \n"
+        + "      past_op.'add_child'( reg_assign_lhs )                       \n"
         + "    " + $assign.reg_mother + ".'add_child'( past_op )             \n"
         + "    # leaving  'ASSIGN_OP named_expression NUMBER'                \n"
       );
@@ -316,14 +322,14 @@ integer[ String reg_mother ]
     }
   ;
 
-adding_expression[String reg_mother]
+adding[String reg_mother]
   : {
       System.out.print( 
           "                                                                  \n"
-        + "  # entering 'adding_expression'                                  \n"
+        + "  # entering 'adding'                                  \n"
       );
-      // Why can't I say:   integer[ $adding_expression.reg_mother ] ???
-      String mother_for_int = $adding_expression.reg_mother;
+      // Why can't I say:   integer[ $adding.reg_mother ] ???
+      String mother_for_int = $adding.reg_mother;
     }
     ( integer[ mother_for_int ]
       |
@@ -332,27 +338,29 @@ adding_expression[String reg_mother]
         String reg = "reg_" + reg_num;
         System.out.print( 
             "                                                                \n"
-          + "    # entering '( PLUS | MINUS | MUL | DIV ) adding_expression adding_expression'       \n"
+          + "    # entering '( PLUS | MINUS | MUL | DIV ) adding adding'       \n"
           + "      .sym pmc " + reg + "                                      \n"
           + "      " + reg + " = new 'PAST::Op'                              \n"
         );
       }
-      ^( infix=( PLUS | MINUS | MUL_OP ) adding_expression[reg] adding_expression[reg] )
+      ^( infix=( PLUS | MINUS | MUL_OP ) adding[reg] adding[reg] )
       {
         System.out.print( 
             "      " + reg + ".'op'( 'infix:" + $infix.text + "' )   \n"
           + "    reg_temp = new 'PAST::Exp'                                  \n"
           + "    reg_temp.'add_child'( " + reg + " )                         \n"
           + "      null " + reg + "                                          \n"
-          + "  " + $adding_expression.reg_mother + ".'add_child'( reg_temp ) \n"
+          + "  " + $adding.reg_mother + ".'add_child'( reg_temp ) \n"
           + "    null reg_temp                                               \n"
-          + "    # leaving '( PLUS | MINUS | MUL | DIV ) adding_expression adding_expression'        \n"
+          + "    # leaving '( PLUS | MINUS | MUL | DIV ) adding adding'        \n"
         );
       }
+      |
+      named_expression[ mother_for_int ]
     )
     {
       System.out.print( 
-          "  # leaving 'adding_expression'                                   \n"
+          "  # leaving 'adding'                                   \n"
       );
     }
   ;

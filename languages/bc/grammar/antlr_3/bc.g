@@ -17,19 +17,19 @@ options
   k            = 2;
 }
 
-
 tokens 
 {
+  PRINT;
   PROGRAM;
+  SAY;
   UNARY_MINUS;
   VAR;
 } 
 
-
+// TODO: Interactive mode when there is no 'quit'
 program 
-  : input_item+ quit -> ^( PROGRAM input_item+)
+  : input_item+ Quit -> ^( PROGRAM input_item+)
   ;
-
 
 input_item 
   : semicolon_list
@@ -39,19 +39,19 @@ semicolon_list
   : statement ( ';'! statement )*
   ;
 
-
+// TODO:  STRING -> ^( PRINT STRING )
 statement
-  : expression
+  : named_expression ASSIGN_OP^^ expression
     |
-    STRING
+    expression -> ^( SAY expression )
+    |
+    STRING -> ^( PRINT STRING )
+    |
+    Quit
   ;
 
 expression
-  : named_expression ASSIGN_OP^^ expression 
-    |
-    named_expression
-    |
-    adding_expression
+  : adding_expression
   ;
 
 named_expression
@@ -63,11 +63,9 @@ adding_expression
   : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression)* 
   ;
 
-
 multiplying_expression
   : unary_expression ( MUL_OP^^ unary_expression )*
   ;
-
 
 unary_expression
   : postfix_expression
@@ -78,6 +76,8 @@ unary_expression
 postfix_expression
   : NUMBER
     |
+    named_expression
+    |     
     '(' expression ')' -> expression
   ;
 
@@ -113,7 +113,7 @@ INCR_DECR
   ;
 
 // quit is required, make testing easier
-quit
+Quit
   : 'quit'
   ;    
 

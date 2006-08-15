@@ -1,5 +1,12 @@
 # $Id$
 
+2006-08-14     Bernhard Schmalhofer
+        * Named variables in expressions.
+
+2006-08-13     Bernhard Schmalhofer
+        * Put the implicit print statments into the ANTLR AST.
+        * Remove generation of PAST with ANTLR2.
+
 2006-07-27     Bernhard Schmalhofer
         * Generate Java with ANTLR 3.0b3
         * Make '1 + 2 + 3' work 
