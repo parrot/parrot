@@ -91,7 +91,6 @@ restore_chain_end:
   goto loop
 
 lexical:
-  say "lexical"
   $P0 = call_chain[-1]
   $P0[$S0] = $P1
   inc counter
