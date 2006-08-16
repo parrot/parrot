@@ -391,7 +391,9 @@ got 8
 got 9
 OUTPUT
 
-=pod
+__END__
+# This test is disabled because it is a known bug and sometimes
+# passed and sometimes fails depending on timing.
 pir_output_is($library . <<'CODE', <<'OUTPUT', "Test 2 + detach + attempt to trigger thread death bugs");
 
 .sub adder
@@ -474,4 +476,3 @@ got 7
 got 8
 got 9
 OUTPUT
-=cut
