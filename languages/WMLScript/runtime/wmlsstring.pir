@@ -42,44 +42,44 @@ See "WMLScript Standard Libraries Specification", section 9 "String".
 
 =cut
 
-.loadlib "wmls_ops"
-.HLL "WMLScript", "wmls_group"
+.loadlib 'wmls_ops'
+.HLL 'WMLScript', 'wmls_group'
 
 
-.sub getString
+.sub 'getString'
     new $P0, .Hash
     
-    .const .Sub _string_length = "_string_length"
+    .const .Sub _string_length = '_string_length'
     $P0[0]  = _string_length
-    .const .Sub _string_isEmpty = "_string_isEmpty"
+    .const .Sub _string_isEmpty = '_string_isEmpty'
     $P0[1]  = _string_isEmpty
-    .const .Sub _string_charAt = "_string_charAt"
+    .const .Sub _string_charAt = '_string_charAt'
     $P0[2]  = _string_charAt
-    .const .Sub _string_subString = "_string_subString"
+    .const .Sub _string_subString = '_string_subString'
     $P0[3]  = _string_subString
-    .const .Sub _string_find = "_string_find"
+    .const .Sub _string_find = '_string_find'
     $P0[4]  = _string_find
-    .const .Sub _string_replace = "_string_replace"
+    .const .Sub _string_replace = '_string_replace'
     $P0[5]  = _string_replace
-    .const .Sub _string_elements = "_string_elements"
+    .const .Sub _string_elements = '_string_elements'
     $P0[6]  = _string_elements
-    .const .Sub _string_elementAt = "_string_elementAt"
+    .const .Sub _string_elementAt = '_string_elementAt'
     $P0[7]  = _string_elementAt
-    .const .Sub _string_removeAt = "_string_removeAt"
+    .const .Sub _string_removeAt = '_string_removeAt'
     $P0[8]  = _string_removeAt
-    .const .Sub _string_replaceAt = "_string_replaceAt"
+    .const .Sub _string_replaceAt = '_string_replaceAt'
     $P0[9]  = _string_replaceAt
-    .const .Sub _string_insertAt = "_string_insertAt"
+    .const .Sub _string_insertAt = '_string_insertAt'
     $P0[10] = _string_insertAt
-    .const .Sub _string_squeeze = "_string_squeeze"
+    .const .Sub _string_squeeze = '_string_squeeze'
     $P0[11] = _string_squeeze
-    .const .Sub _string_trim = "_string_trim"
+    .const .Sub _string_trim = '_string_trim'
     $P0[12] = _string_trim
-    .const .Sub _string_compare = "_string_compare"
+    .const .Sub _string_compare = '_string_compare'
     $P0[13] = _string_compare
-    .const .Sub _string_toString = "_string_toString"
+    .const .Sub _string_toString = '_string_toString'
     $P0[14] = _string_toString
-    .const .Sub _string_format = "_string_format"
+    .const .Sub _string_format = '_string_format'
     $P0[15] = _string_format
 
     .return ($P0)
@@ -102,10 +102,10 @@ Integer or invalid.
 
 =cut
 
-.sub _string_length :anon                                                                 
+.sub '_string_length' :anon                                                                 
     .param pmc str
     .local pmc ret
-    $I0 = isa str, "WmlsInvalid"
+    $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
     $S0 = str
     $I0 = length $S0
@@ -136,10 +136,10 @@ Boolean or invalid.
 
 =cut
 
-.sub _string_isEmpty :anon
+.sub '_string_isEmpty' :anon
     .param pmc str
     .local pmc ret
-    $I0 = isa str, "WmlsInvalid"
+    $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
     $S0 = str
     $I0 = length $S0
@@ -184,7 +184,7 @@ If index is out of range then an empty string (C<"">) is returned.
 
 =cut
 
-.sub _string_charAt :anon
+.sub '_string_charAt' :anon
     .param pmc str
     .param pmc index
     not_implemented()
@@ -226,7 +226,7 @@ If length <= 0 an empty string (C<"">) is returned.
 
 =cut
 
-.sub _string_subString :anon
+.sub '_string_subString' :anon
     .param pmc String
     .param pmc startIndex
     .param pmc length
@@ -263,7 +263,7 @@ If subString is an empty string (C<"">), an invalid value is returned.
 
 =cut
 
-.sub _string_find :anon
+.sub '_string_find' :anon
     .param pmc String
     .param pmc subString
     not_implemented()
@@ -301,7 +301,7 @@ If oldSubString is an empty string an C<invalid> value is returned.
 
 =cut
 
-.sub _string_replace :anon
+.sub '_string_replace' :anon
     .param pmc String
     .param pmc oldSubString
     .param pmc newSubString
@@ -335,7 +335,7 @@ Returns C<invalid> if the separator is an empty string.
 
 =cut
 
-.sub _string_elements :anon
+.sub '_string_elements' :anon
     .param pmc str
     .param pmc separator
     not_implemented()
@@ -375,7 +375,7 @@ Returns C<invalid> if the separator is an empty string.
 
 =cut
 
-.sub _string_elementAt :anon
+.sub '_string_elementAt' :anon
     .param pmc str
     .param pmc index
     .param pmc separator
@@ -414,7 +414,7 @@ Returns C<invalid> if the separator is an empty string.
 
 =cut
 
-.sub _string_removeAt :anon
+.sub '_string_removeAt' :anon
     .param pmc str
     .param pmc index
     .param pmc separator
@@ -455,7 +455,7 @@ Returns C<invalid> if the separator is an empty string.
 
 =cut
 
-.sub _string_replaceAt :anon
+.sub '_string_replaceAt' :anon
     .param pmc str
     .param pmc element
     .param pmc index
@@ -497,7 +497,7 @@ Returns C<invalid> if the separator is an empty string.
 
 =cut
 
-.sub _string_insertAt :anon
+.sub '_string_insertAt' :anon
     .param pmc str
     .param pmc element
     .param pmc index
@@ -525,7 +525,7 @@ String or invalid.
 
 =cut
 
-.sub _string_squeeze :anon
+.sub '_string_squeeze' :anon
     .param pmc str
     not_implemented()
 .end
@@ -550,7 +550,7 @@ String or invalid.
 
 =cut
 
-.sub _string_trim :anon
+.sub '_string_trim' :anon
     .param pmc str
     not_implemented()
 .end
@@ -579,7 +579,7 @@ Integer or invalid.
 
 =cut
 
-.sub _string_compare :anon
+.sub '_string_compare' :anon
     .param pmc string1
     .param pmc string2
     not_implemented()
@@ -605,7 +605,7 @@ String.
 
 =cut
 
-.sub _string_toString :anon
+.sub '_string_toString' :anon
     .param pmc value
     $S0 = value
     .local pmc ret
@@ -721,7 +721,7 @@ Illegal format specifier results in an C<invalid> return value.
 
 =cut
 
-.sub _string_format :anon
+.sub '_string_format' :anon
     .param pmc format
     .param pmc value
     not_implemented()

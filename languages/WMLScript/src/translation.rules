@@ -946,7 +946,7 @@ PIR
 code = 3B
 class = op
 pir = <<PIR
-    ${INS} = concat "  ${PTEMP0} = new .WmlsString, \"\"\n"
+    ${INS} = concat "  ${PTEMP0} = new .WmlsString, ''\n"
     ${INS} = concat "  .return (${PTEMP0})\n"
 PIR
 

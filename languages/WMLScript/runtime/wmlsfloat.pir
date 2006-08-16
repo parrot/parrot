@@ -16,28 +16,28 @@ See "WMLScript Standard Libraries Specification", section 8 "Float".
 
 =cut
 
-.loadlib "wmls_ops"
-.HLL "WMLScript", "wmls_group"
+.loadlib 'wmls_ops'
+.HLL 'WMLScript', 'wmls_group'
 
 
-.sub getFloat
+.sub 'getFloat'
     new $P0, .Hash
     
-    .const .Sub _float_int = "_float_int"
+    .const .Sub _float_int = '_float_int'
     $P0[0]  = _float_int
-    .const .Sub _float_floor = "_float_floor"
+    .const .Sub _float_floor = '_float_floor'
     $P0[1]  = _float_floor
-    .const .Sub _float_ceil = "_float_ceil"
+    .const .Sub _float_ceil = '_float_ceil'
     $P0[2]  = _float_ceil
-    .const .Sub _float_pow = "_float_pow"
+    .const .Sub _float_pow = '_float_pow'
     $P0[3]  = _float_pow
-    .const .Sub _float_round = "_float_round"
+    .const .Sub _float_round = '_float_round'
     $P0[4]  = _float_round
-    .const .Sub _float_sqrt = "_float_sqrt"
+    .const .Sub _float_sqrt = '_float_sqrt'
     $P0[5]  = _float_sqrt
-    .const .Sub _float_maxFloat = "_float_maxFloat"
+    .const .Sub _float_maxFloat = '_float_maxFloat'
     $P0[6]  = _float_maxFloat
-    .const .Sub _float_minFloat = "_float_minFloat"
+    .const .Sub _float_minFloat = '_float_minFloat'
     $P0[7]  = _float_minFloat
 
     .return ($P0)
@@ -61,15 +61,15 @@ Integer or invalid.
 
 =cut
 
-.sub _float_int :anon
+.sub '_float_int' :anon
     .param pmc value
     .local pmc ret
     $P0 = value
-    $I0 = isa value, "WmlsString"
+    $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
-    $P0 = value.parseNumber()
+    $P0 = value.'parseNumber'()
 L1:
-    $I0 = isa $P0, "WmlsInvalid"
+    $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $I0 = $P0
     new ret, .WmlsInteger
@@ -99,15 +99,15 @@ Integer or invalid.
 
 =cut
 
-.sub _float_floor :anon
+.sub '_float_floor' :anon
     .param pmc value
     .local pmc ret
     $P0 = value
-    $I0 = isa value, "WmlsString"
+    $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
-    $P0 = value.parseNumber()
+    $P0 = value.'parseNumber'()
 L1:
-    $I0 = isa $P0, "WmlsInvalid"
+    $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $N0 = $P0
     $I0 = floor $N0
@@ -138,15 +138,15 @@ Integer or invalid.
 
 =cut
 
-.sub _float_ceil :anon
+.sub '_float_ceil' :anon
     .param pmc value
     .local pmc ret
     $P0 = value
-    $I0 = isa value, "WmlsString"
+    $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
-    $P0 = value.parseNumber()
+    $P0 = value.'parseNumber'()
 L1:
-    $I0 = isa $P0, "WmlsInvalid"
+    $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $N0 = $P0
     $I0 = ceil $N0
@@ -186,24 +186,24 @@ If value1 < 0 and value2 is not an integer then C<invalid> is returned.
 
 =cut
 
-.sub _float_pow :anon
+.sub '_float_pow' :anon
     .param pmc value1
     .param pmc value2
     .local pmc ret
     $P1 = value1
-    $I0 = isa value1, "WmlsString"
+    $I0 = isa value1, 'WmlsString'
     unless $I0 goto L1
-    $P1 = value1.parseNumber()
+    $P1 = value1.'parseNumber'()
 L1:
-    $I0 = isa $P1, "WmlsInvalid"
+    $I0 = isa $P1, 'WmlsInvalid'
     if $I0 goto L2
     $N1 = $P1
     $P2 = value2
-    $I0 = isa value2, "WmlsString"
+    $I0 = isa value2, 'WmlsString'
     unless $I0 goto L3
-    $P2 = value2.parseNumber()
+    $P2 = value2.'parseNumber'()
 L3:
-    $I0 = isa $P2, "WmlsInvalid"
+    $I0 = isa $P2, 'WmlsInvalid'
     if $I0 goto L2
     $N2 = $P2
     unless $N1 == 0.0 goto L4
@@ -213,7 +213,7 @@ L3:
     goto L5
 L4:
     unless $N1 < 0.0 goto L6
-    $I0 = isa $P2, "WmlsFloat"
+    $I0 = isa $P2, 'WmlsFloat'
     if $I0 goto L2
 L6:
     $N0 = pow $N1, $N2
@@ -246,15 +246,15 @@ Integer or invalid.
 
 =cut
 
-.sub _float_round :anon
+.sub '_float_round' :anon
     .param pmc value
     .local pmc ret
     $P0 = value
-    $I0 = isa value, "WmlsString"
+    $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
-    $P0 = value.parseNumber()
+    $P0 = value.'parseNumber'()
 L1:
-    $I0 = isa $P0, "WmlsInvalid"
+    $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $N0 = $P0
     $N0 += 0.5
@@ -290,15 +290,15 @@ If value is a negative number then invalid is returned.
 
 =cut
 
-.sub _float_sqrt :anon
+.sub '_float_sqrt' :anon
     .param pmc value
     .local pmc ret
     $P0 = value
-    $I0 = isa value, "WmlsString"
+    $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
-    $P0 = value.parseNumber()
+    $P0 = value.'parseNumber'()
 L1:
-    $I0 = isa $P0, "WmlsInvalid"
+    $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $N0 = $P0
     if $N0 < 0.0 goto L2
@@ -326,7 +326,7 @@ Floating-point 3.40282347e+38.
 
 =cut
 
-.sub _float_maxFloat :anon
+.sub '_float_maxFloat' :anon
     .local pmc ret
     new ret, .WmlsFloat
     set ret, 3.40282347e+38
@@ -348,7 +348,7 @@ precision floating-point value: 1.17549435e-38.
 
 =cut
 
-.sub _float_minFloat :anon
+.sub '_float_minFloat' :anon
     .local pmc ret
     new ret, .WmlsFloat
     set ret, 1.17549435e-38

@@ -23,10 +23,10 @@ Francois Perrad.
 
 =cut
 
-.loadlib "wmls_ops"
+.loadlib 'wmls_ops'
 .HLL 'WMLScript', 'wmls_group'
 
-.sub main :main
+.sub 'main' :main
     .param pmc argv
     .local int argc
     .local string progname
@@ -60,27 +60,7 @@ USAGE:
     exit -1
 .end
 
-.sub load_script
-    .param string filename
-    .local pmc fh
-    .local string content
-    fh = open filename, '<'
-    if fh goto L1
-    $S0 = err
-    print "Can't open '"
-    print filename
-    print "' ("
-    print $S0
-    print ")\n"
-    content = ""
-    goto L2
-L1:
-    content = read fh, 65535
-    close fh
-L2:
-    .return (content) 
-.end
-
+.include 'languages/WMLScript/runtime/wmlsstdlibs.pir' 
 .include 'languages/WMLScript/src/script.pir' 
 .include 'languages/WMLScript/src/opcode.pir' 
     

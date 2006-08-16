@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-runtime/wmlsstdlib.pir - WMLScript standard libraries
+runtime/wmlsstdlibs.pir - WMLScript standard libraries
        
 =head1 DESCRIPTION
 
@@ -23,11 +23,11 @@ See "WMLScript Standard Libraries Specification".
 
 =cut
 
-.loadlib "wmls_ops"
-.HLL "WMLScript", "wmls_group"
+.loadlib 'wmls_ops'
+.HLL 'WMLScript', 'wmls_group'
 
-.sub _init :load :anon
-#    print "_init (wmlsstdlibs.pir)\n"
+.sub '__onload' :load :anon
+#    print "__onload (wmlsstdlibs.pir)\n"
     new $P0, .Hash
     $P1 = getLang()
     $P0[0] = $P1
@@ -38,13 +38,13 @@ See "WMLScript Standard Libraries Specification".
     $P1 = getConsole()
     $P0[99] = $P1
 
-    global "@stdlibs" = $P0
+    global '@stdlibs' = $P0
 .end
 
-.sub not_implemented
+.sub 'not_implemented'
     .local pmc ex
     ex = new .Exception
-    ex["_message"] =  "not implemented"
+    ex['_message'] =  "not implemented"
     throw ex
 .end
 
@@ -58,16 +58,16 @@ helper for CALL_LIB* opcodes.
 
 =cut
 
-.sub find_lib
+.sub 'find_lib'
     .param int lindex
     .param int findex
-    $P0 = global "@stdlibs"
+    $P0 = global '@stdlibs'
     push_eh _handler
     $P1 = $P0[lindex]
     $P2 = $P1[findex]
     .return ($P2)
 _handler:
-    .const .Sub not_implemented = "not_implemented"
+    .const .Sub not_implemented = 'not_implemented'
     .return (not_implemented)
 .end
 
@@ -77,7 +77,7 @@ helper for CALL_URL* opcodes.
 
 =cut
 
-.sub find_lib_url
+.sub 'find_lib_url'
     .param string url
     .param string function
     .local pmc ex
@@ -88,10 +88,10 @@ helper for CALL_URL* opcodes.
     .local pmc script
     new loader, .WmlsBytecode
     push_eh _handler_1
-    script = loader.load(content)
+    script = loader.'load'(content)
     script['filename'] = url
     .local string gen_pir
-    gen_pir = script.translate()
+    gen_pir = script.'translate'()
     .local pmc pir_comp
     .local pmc pbc_out
     pir_comp = compreg 'PIR'
@@ -116,7 +116,7 @@ _handler_1:
     $S0 = "verification failed (can't translate '"
     $S0 .= url
     $S0 .= "')"
-    ex["_message"] = $S0
+    ex['_message'] = $S0
     throw ex
 _handler_2:
     ex = new .Exception
@@ -125,16 +125,16 @@ _handler_2:
     $S0 .= "' not found in '"
     $S0 .= url
     $S0 .= "'"
-    ex["_message"] = $S0
+    ex['_message'] = $S0
     throw ex
 L1:
     ex = new .Exception
     $S0 = "unable to load compilation unit"
-    ex["_message"] = $S0
+    ex['_message'] = $S0
     throw ex
 .end
 
-.sub load_script
+.sub 'load_script'
     .param string filename
     .local pmc fh
     .local string content
@@ -155,7 +155,7 @@ L2:
     .return (content) 
 .end
 
-.sub save_pbc
+.sub 'save_pbc'
     .param string pbc_out
     .param string filename
     .local string output
@@ -175,6 +175,27 @@ L1:
     close fh
 L2:
     .return (output)
+.end
+
+.sub 'save_pir'
+    .param string gen_pir
+    .param string filename
+    .local string output
+    .local pmc fh
+    output = concat filename, '.pir'
+    fh = open output, '>'
+    if fh goto L1
+    $S0 = err
+    print "Can't open '"
+    print output
+    print "' ("
+    print $S0
+    print ")\n"
+    goto L2
+L1:
+    print fh, gen_pir
+    close fh
+L2:
 .end
 
 =back        

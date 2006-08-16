@@ -41,16 +41,18 @@ my $language = 'WMLScript';
 
 # Check that we have the WMLScript compiler.
 my $check = `wmlsc -h`;
-unless ($check =~ /wmlsc/) {
-    die "You need the WMLScript compiler in your path to build the test assemblies.\n";
+my $has_compiler = $check =~ /wmlsc/; 
+unless ($has_compiler) {
+    warn "You need the WMLScript compiler in your path to build the test assemblies.\n";
 }
 
 if ( grep {m/^--files$/} @ARGV ) {
 
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
-    push @files, glob( File::Spec->catfile( $dir, '*', '*.t' ) );
+    my @files = glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
+    push @files, glob( File::Spec->catfile( $dir, '*.t' ) )
+        if ($has_compiler);
     print join( "\n", @files );
     print "\n" if scalar(@files);
 }
@@ -65,13 +67,17 @@ else {
     else {
         ( undef, undef, my $current_dir )
             = File::Spec->splitpath( Cwd::getcwd() );
+        my $dir;
         if ( $current_dir eq 'languages' ) {
-            @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
-            push @files, glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+            $dir = File::Spec->catfile( $language, 't' );
         }
         elsif ( $current_dir eq $language ) {
-            @files = glob( File::Spec->catfile( 't', '*.t' ) );
-            push @files, glob( File::Spec->catfile( 't', '*', '*.t' ) );
+            $dir = 't';
+        }
+        if ($dir) { 
+            @files = glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
+            push @files, glob( File::Spec->catfile( $dir, '*.t' ) )
+                if ($has_compiler);
         }
     }
 

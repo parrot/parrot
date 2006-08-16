@@ -278,7 +278,7 @@ sub generate_initial_pir {
     return $pir = <<'PIRCODE';
 # THIS IS A GENERATED FILE! DO NOT EDIT!
 
-.namespace ["Wmls::Function"]
+.namespace ['Wmls::Function']
 
 PIRCODE
 }
@@ -301,7 +301,7 @@ sub generate_initial_code {
 
     # Emit the dumper.
     my $pir = <<'PIRCODE';
-.sub translate_code
+.sub 'translate_code'
     .param string code
     .param pmc script
     .local string gen_pir
@@ -377,7 +377,7 @@ sub generate_initial_dump {
 
     # Emit the dumper.
     my $pir = <<'PIRCODE';
-.sub dump_code
+.sub 'dump_code'
     .param string code
     .local int pc, next_pc, bc_length, cur_ic
     .local int inline

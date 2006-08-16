@@ -5,12 +5,12 @@ PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
 
 PMCBUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
 OPSBUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynoplibs.pl
-DESTDIR  = @build_dir@@slash@runtime@slash@parrot@slash@dynext
 LIBPATH  = runtime
 PMCDIR   = pmc
 OPSDIR   = ops
 O        = @o@
 LOAD_EXT = @load_ext@
+PARROT_DYNEXT = @build_dir@@slash@runtime@slash@parrot@slash@dynext
 
 SRM=Stack
 
@@ -41,6 +41,9 @@ PBCS = \
  $(LIBPATH)@slash@wmlsconsole.pbc \
  $(LIBPATH)@slash@wmlsstdlibs.pbc
 
+GEN_PIR = \
+ src@slash@opcode.pir \
+ src@slash@stdlibs.pir
 
 all: \
  pmc@slash@wmls_group$(LOAD_EXT) \
@@ -55,24 +58,24 @@ pmc@slash@wmls_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
-	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
 ops@slash@wmls_ops$(LOAD_EXT) : $(OPS_FILES)
 	@cd $(OPSDIR) && $(OPSBUILD) generate $(OPSLIB)
 	@cd $(OPSDIR) && $(OPSBUILD) compile $(OPSLIB)
 	@cd $(OPSDIR) && $(OPSBUILD) linklibs $(OPSLIB)
-	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(DESTDIR)" $(OPSLIB)
+	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(PARROT_DYNEXT)" $(OPSLIB)
 
-src@slash@wmlsd.pbc: src@slash@wmlsd.pir src@slash@script.pir src@slash@opcode.pir
+src@slash@wmlsd.pbc: src@slash@wmlsd.pir src@slash@script.pir $(GEN_PIR)
 	$(PARROT) -o src/wmlsd.pbc src/wmlsd.pir 
 
-src@slash@wmls2pir.pbc: src@slash@wmls2pir.pir src@slash@script.pir src@slash@opcode.pir src@slash@stdlibs.pir
-	$(PARROT) -o src/wmls2pir.pbc src/wmls2pir.pir 
+src@slash@wmls2pir.pbc: src@slash@wmls2pir.pir src@slash@script.pir $(GEN_PIR)
+	$(PARROT) -o src/wmls2pir.pbc src/wmls2pir.pir
 
-src@slash@wmls2pbc.pbc: src@slash@wmls2pbc.pir src@slash@script.pir src@slash@opcode.pir src@slash@stdlibs.pir
+src@slash@wmls2pbc.pbc: src@slash@wmls2pbc.pir src@slash@script.pir $(GEN_PIR)
 	$(PARROT) -o src/wmls2pbc.pbc src/wmls2pbc.pir 
 
-src@slash@wmlsi.pbc: src@slash@wmlsi.pir src@slash@script.pir src@slash@opcode.pir src@slash@stdlibs.pir
+src@slash@wmlsi.pbc: src@slash@wmlsi.pir src@slash@script.pir $(GEN_PIR)
 	$(PARROT) -o src/wmlsi.pbc src/wmlsi.pir 
 
 src@slash@opcode.pir: src@slash@translation.rules build@slash@translator.pl \
@@ -124,15 +127,11 @@ test:
 	cd .. && $(PERL) t/harness --languages=WMLScript
 
 testclean:
-	$(RM_F) "t/pmc/*.pir" "t/*.pir" "t/*.pbc" "t/*.wmls" "t/*.wmlsc" "t/*.out"
+	$(RM_F) "t/pmc/*.pir t/*.pir t/*.pbc t/*.wmls t/*.wmlsc t/*.out"
 
 CLEANERS = \
- "t/pmc/*.pir" \
- "t/*.pir" \
- "t/*.pbc" \
- "t/*.wmls" \
- "t/*.wmlsc" \
- "t/*.out" \
+ $(GEN_PIR) \
+ "src/*.pbc" \
  "$(PMCDIR)/*.dump" \
  "$(PMCDIR)/*.c" \
  "$(PMCDIR)/*.h" \
@@ -142,12 +141,9 @@ CLEANERS = \
  "$(OPSDIR)/*.h" \
  "$(OPSDIR)/*$(LOAD_EXT)" \
  "$(OPSDIR)/*$(O)" \
- "$(LIBPATH)/*.pbc" \
- "src/*.pbc" \
- "src/opcode.pir" \
- "src/stdlibs.pir"
+ "$(LIBPATH)/*.pbc"
 
-clean:
+clean: testclean
 	$(RM_F) $(CLEANERS)
 
 realclean: clean

@@ -13,16 +13,16 @@ See "WMLScript Reference UP.SDK R4.B3 - October 1999".
 
 =cut
 
-.loadlib "wmls_ops"
-.HLL "WMLScript", "wmls_group"
+.loadlib 'wmls_ops'
+.HLL 'WMLScript', 'wmls_group'
 
 
-.sub getConsole
+.sub 'getConsole'
     new $P0, .Hash
     
-    .const .Sub _console_print = "_console_print"
+    .const .Sub _console_print = '_console_print'
     $P0[0]  = _console_print
-    .const .Sub _console_println = "_console_println"
+    .const .Sub _console_println = '_console_println'
     $P0[1]  = _console_println
 
     .return ($P0)
@@ -44,10 +44,10 @@ Number or invalid.
 
 =cut
 
-.sub _console_print :anon
+.sub '_console_print' :anon
     .param pmc str
     .local pmc ret
-    $I0 = isa str, "WmlsInvalid"
+    $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
     $S0 = str
     print $S0
@@ -77,10 +77,10 @@ Number or invalid.
 
 =cut
 
-.sub _console_println :anon
+.sub '_console_println' :anon
     .param pmc str
     .local pmc ret
-    $I0 = isa str, "WmlsInvalid"
+    $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
     $S0 = str
     print $S0
