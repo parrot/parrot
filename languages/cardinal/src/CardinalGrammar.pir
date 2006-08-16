@@ -14,7 +14,7 @@ Cardinal::Grammar -- A grammar for parsing Ruby 1.8.4
       source = 'puts 1;'
 
       # Retrieve the start rule
-      start_rule = get_hll_namespace [ 'Cardinal'; 'Grammar', 'prog' ]
+      start_rule = get_root_global [ 'parrot'; 'Cardinal::Grammar'], 'program'
 
       # Parse the source and return a match object
       match = start_rule(source)
