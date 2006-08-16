@@ -267,10 +267,18 @@ Gets the actual variable from memory and returns it.
     value      = lexpad[name]
   clear_eh
   $I0 = isa value, 'None'
-  if $I0 goto notfound
+  if $I0 goto args_check
   $I0 = isa value, 'Undef'
-  if $I0 goto notfound
+  if $I0 goto args_check
   goto found
+
+args_check:
+  # args is special -- it doesn't show up in [info vars]
+  # unless you explicitly set it in your proc. but if you
+  # try to get it, it's always there.
+  unless name == '$args' goto notfound
+  value = lexpad['args']
+  .return(value)
 
 coloned:
     substr name, 1, 2, ''

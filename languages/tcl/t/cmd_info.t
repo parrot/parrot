@@ -115,8 +115,7 @@ eval_is {
     lsort [info vars]
   }
   test 3 4
-} {a b c d} {info vars} \
-  {TODO "broken because of args"}
+} {a b c d} {info vars}
 
 eval_is {
   proc test {a b} {

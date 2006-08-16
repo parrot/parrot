@@ -185,7 +185,7 @@ NO_SLURPY_ARGS:
   arg_list=new .TclString
   arg_list=''
 DONE:
-  lexpad['$args'] = arg_list
+  lexpad['args'] = arg_list
 END_PIR
 
 done_args:
