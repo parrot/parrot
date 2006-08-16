@@ -1293,20 +1293,22 @@ Recursively make the array read-only and shared.
         VTABLE_setprop(INTERP, ret, const_string(INTERP, "_ro"), true);
 
         /* XXX do something that deals better with sparse lists */
-        INTVAL i;
-        INTVAL max;
-        max = VTABLE_elements(INTERP, ret);
-        for (i = 0; i < max; ++i) {
-            PMC *value;
+        {
+            INTVAL i;
+            INTVAL max;
+            max = VTABLE_elements(INTERP, ret);
+            for (i = 0; i < max; ++i) {
+                PMC *value;
 
-            value = list_get(INTERP, PMC_data(ret), i, enum_type_PMC);
-            if (!PMC_IS_NULL(value)) {
-                PMC *new_value;
-                /* XXX do we need to clone first? */
-                new_value = VTABLE_share_ro(INTERP, value);
-                if (new_value != value) {
-                    list_assign(INTERP, PMC_data(ret), 
-                        i, new_value, enum_type_PMC);
+                value = list_get(INTERP, PMC_data(ret), i, enum_type_PMC);
+                if (!PMC_IS_NULL(value)) {
+                    PMC *new_value;
+                    /* XXX do we need to clone first? */
+                    new_value = VTABLE_share_ro(INTERP, value);
+                    if (new_value != value) {
+                        list_assign(INTERP, PMC_data(ret), 
+                            i, new_value, enum_type_PMC);
+                    }
                 }
             }
         }
