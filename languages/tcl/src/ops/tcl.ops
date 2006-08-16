@@ -45,7 +45,7 @@ inline op tcl_error(in PMC) {
   INTVAL TCL_ERROR = 1;
   PMC* exception = pmc_new(interpreter, enum_class_Exception);
 
-  VTABLE_set_pmc_keyed_int(interpreter, exception, 0, $1);
+  VTABLE_set_pmc_keyed_int(interpreter, exception, (INTVAL)0, $1);
   VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_ERROR);
   opcode_t * const ret = expr NEXT();
   opcode_t * const dest = (opcode_t *)
