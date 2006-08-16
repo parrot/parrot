@@ -6,7 +6,9 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test;
+
+plan $^O =~ /MSWin32/ ? (skip_all => 'broken on Win32') : tests => 4;
 
 =head1 NAME
 
