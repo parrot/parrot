@@ -842,7 +842,7 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
         info->last_type = *type = io->vtable->shift_integer(interpreter, io);
         if (*type <= 0)
             internal_exception(1, "Unknown PMC type to thaw %d", (int) *type);
-        if (*type >= interpreter->n_vtable_max) {
+        if (*type >= interpreter->n_vtable_max || !interpreter->vtables[*type]) {
             /* that ought to be a class */
             *type = enum_class_ParrotClass;
         }
@@ -1502,6 +1502,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
         Parrot_unblock_DOD(interpreter);
         Parrot_unblock_GC(interpreter);
     }
+    PackFile_destroy(interpreter, info.image_io->pf);
     mem_sys_free(info.image_io);
     return info.thaw_result;
 }
@@ -1543,6 +1544,7 @@ Parrot_freeze_at_destruct(Parrot_Interp interpreter, PMC* pmc)
     visit_loop_next_for_GC(interpreter, pmc, &info);
 
     Parrot_unblock_DOD(interpreter);
+    PackFile_destroy(interpreter, info.image_io->pf);
     mem_sys_free(info.image_io);
     return info.image;
 }
@@ -1580,6 +1582,7 @@ Parrot_freeze(Parrot_Interp interpreter, PMC* pmc)
 
     visit_loop_todo_list(interpreter, pmc, &info);
 
+    PackFile_destroy(interpreter, info.image_io->pf);
     mem_sys_free(info.image_io);
     return info.image;
 #endif

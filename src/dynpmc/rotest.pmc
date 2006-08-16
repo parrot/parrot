@@ -1,0 +1,24 @@
+/*
+ * Sample class used to verify read-only variant
+ * generation. For testing only.
+ */
+
+#include "parrot/parrot.h"
+
+pmclass ROTest dynpmc does scalar extends Integer {
+    void set_integer_native(INTVAL value) :read {
+    }
+    INTVAL get_integer() :write {
+        return 42;
+    }
+
+    METHOD INTVAL reader() {
+        return 43;
+    }
+
+    METHOD INTVAL writer(INTVAL ignored) :write {
+        UNUSED(ignored);
+        return 44;
+    }
+}
+

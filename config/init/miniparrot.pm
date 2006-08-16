@@ -59,6 +59,7 @@ sub runstep
         TEMP_jit_o         => '',
         TEMP_exec_h        => '',
         TEMP_exec_o        => '',
+        TEMP_atomic_o      => '',
         asmfun_o           => '',
         has___sighandler_t => undef,
         has_sigatomic_t    => undef,

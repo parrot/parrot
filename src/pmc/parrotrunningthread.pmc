@@ -1,0 +1,155 @@
+/*
+Copyright 2006 The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/parrotrunningthread.pmc -- Represents a running Parrot Thread.
+
+=head1 DESCRIPTION
+
+This type represents a running parrot thread.
+
+It provides the following methods:
+    - join
+    - detach
+    - kill
+
+Note that a running thread object becomes invalid when a thread
+finishes while detached or joined. Further operations on the
+object may have unexpected behavior, such as manipulating an 
+unrelated thread.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include <assert.h>
+
+
+pmclass ParrotRunningThread no_ro {
+
+/*
+
+=item C<void init()>
+
+Create a new, invalid handle to a running thread.
+
+=cut
+
+*/
+
+    void init() {
+        PMC_int_val(SELF) = -1;
+    }
+
+/*
+
+=item C<void init_pmc(PMC* tid)>
+
+Create a new running thread referring to the thread with
+the Thread ID specified in C<tid>.
+
+=cut
+
+*/
+
+    void init_pmc (PMC* tid) {
+        PMC_int_val(SELF) = VTABLE_get_integer(INTERP, tid);
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Return the thread ID of this thread.
+
+=cut
+
+*/
+
+    INTVAL get_integer() {
+        return PMC_int_val(SELF);
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL new_tid)>
+
+Change the thread ID we refer to to C<new_tid>.
+
+*/
+
+    void set_integer_native(INTVAL new_tid) {
+        PMC_int_val(SELF) = new_tid;
+    }
+/*
+
+=item C<METHOD PMC* join()>
+
+Join the thread, returning whatever its main method returns.
+
+=cut
+
+*/
+    METHOD PMC* join() {
+        PMC *ret;
+        ret = pt_thread_join(INTERP, PMC_int_val(SELF));
+        PMC_int_val(SELF) = -1; /* invalidate self */
+        return ret;
+    }
+
+/*
+
+=item C<METHOD void detach()>
+
+Detach the thread so it cannot be joined and will free its
+resources immediatelly when it exits.
+
+=cut
+
+*/
+
+    METHOD void detach() {
+        pt_thread_detach(PMC_int_val(SELF));
+    }
+
+/*
+
+=item C<METHOD void kill()>
+
+Terminate a running thread.
+
+=cut
+
+*/
+
+    METHOD void kill() {
+        pt_thread_kill(PMC_int_val(SELF));
+    }
+    
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

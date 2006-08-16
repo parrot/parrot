@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 16;
 
 =head1 NAME
 
@@ -262,3 +262,60 @@ CODE
 200
 0
 OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, ref, ref");
+	new P2, .Integer
+	new P1, .Ref, P2
+        set P1, 10
+        add P1, P1, P1
+        print P2
+        print "\n"
+	end
+CODE
+20
+OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, ref, int");
+        new P3, .Integer
+	new P2, .Integer
+	new P1, .Ref, P2
+        set P3, 12
+        set P1, 10
+        add P1, P1, P3
+        print P2
+        print "\n"
+	end
+CODE
+22
+OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, int, ref");
+        new P3, .Integer
+	new P2, .Integer
+	new P1, .Ref, P2
+        set P3, 12
+        set P1, 10
+        add P1, P3, P1
+        print P2
+        print "\n"
+	end
+CODE
+22
+OUTPUT
+
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, int, int");
+        new P3, .Integer
+	new P2, .Integer
+	new P1, .Ref, P2
+        set P3, 12
+        set P1, 10
+        add P1, P3, P3
+        print P2
+        print "\n"
+	end
+CODE
+24
+OUTPUT
+
+

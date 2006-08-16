@@ -47,6 +47,11 @@ void Parrot_reallocate_string(Interp *interpreter, STRING *, size_t tosize);
 void Parrot_initialize_memory_pools(Interp *);
 void Parrot_destroy_memory_pools(Interp *interpreter);
 
+void Parrot_merge_memory_pools(Interp *dest, Interp *source);
+
+/* XXX FIXME */
+int Parrot_in_memory_pool(Interp *interpreter, void *bufstart);
+
 void Parrot_go_collect(Interp *);
 
 struct Arenas {

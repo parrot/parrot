@@ -188,7 +188,8 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
 
 /*
 
-=item C<static void create_deleg_pmc_vtable(Interp *, PMC *class, STRING *name)>
+=item C<static void create_deleg_pmc_vtable(Interp *, PMC *class, PMC *class_name, 
+    int full)>
 
 Create a vtable that dispatches either to the contained PMC in the first
 attribute (deleg_pmc) or to an overridden method (delegate), depending
@@ -494,6 +495,8 @@ register_type(Interp *interpreter, PMC *name)
     INTVAL type;
     PMC * classname_hash, *item;
 
+    /* so pt_shared_fixup() can safely do a type lookup */
+    LOCK_INTERPRETER(interpreter);
     classname_hash = interpreter->class_hash;
 
     type = interpreter->n_vtable_max++;
@@ -505,6 +508,8 @@ register_type(Interp *interpreter, PMC *name)
     item = pmc_new(interpreter, enum_class_Integer);
     PMC_int_val(item) = type;
     VTABLE_set_pmc_keyed(interpreter, classname_hash, name, item);
+    UNLOCK_INTERPRETER(interpreter);
+
     return type;
 }
 
@@ -551,6 +556,10 @@ parrot_class_register(Interp* interpreter, PMC *name,
     new_vtable->class =  new_class;
     new_vtable->mro = mro;
 
+    /* XXX FIXME for now, we don't autogen. read-only variant */
+    new_vtable->ro_variant_vtable = NULL;
+    new_vtable->flags &= ~VTABLE_HAS_READONLY_FLAG;
+    
     /* Reset the init method to our instantiation method */
     new_vtable->init = Parrot_instantiate_object;
     new_vtable->init_pmc = Parrot_instantiate_object_init;
@@ -591,6 +600,11 @@ parrot_class_register(Interp* interpreter, PMC *name,
     new_vtable->base_type = new_type;
     new_vtable->mro = mro;
     new_vtable->class =  new_class;
+
+    /* XXX FIXME for now, we don't autogen. read-only variant */
+    new_vtable->ro_variant_vtable = NULL;
+    new_vtable->flags &= ~VTABLE_HAS_READONLY_FLAG;
+    
     set_attrib_num(new_class, (SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
             vtable_pmc = constant_pmc_new(interpreter, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
@@ -836,7 +850,7 @@ class_mro_merge(Interp* interpreter, PMC *seqs)
     PMC *res, *seq, *cand, *nseqs, *s;
     INTVAL i, j, k;
     cand = NULL; /* silence compiler uninit warning */
-
+    
     res = pmc_new(interpreter, enum_class_ResizablePMCArray);
     while (1) {
         nseqs = not_empty(interpreter, seqs);
@@ -892,7 +906,8 @@ create_class_mro(Interp* interpreter, PMC *class)
     bases = get_attrib_num(PMC_data(class), PCD_PARENTS);
     for (i = 0; i < VTABLE_elements(interpreter, bases); ++i) {
         PMC * const base = VTABLE_get_pmc_keyed_int(interpreter, bases, i);
-        PMC * const lmap = create_class_mro(interpreter, base);
+        PMC * const lmap = PObj_is_class_TEST(base) ?
+            create_class_mro(interpreter, base) : base->vtable->mro;
         VTABLE_push_pmc(interpreter, lall, lmap);
     }
     lparents = VTABLE_clone(interpreter, bases);
@@ -907,8 +922,26 @@ Parrot_add_parent(Interp* interpreter, PMC *class, PMC *parent)
 
     if (!PObj_is_class_TEST(class))
         internal_exception(1, "Class isn't a ParrotClass");
-    if (!PObj_is_class_TEST(parent))
+    if (!PObj_is_class_TEST(parent) && parent == parent->vtable->class) {
+        /* Permit inserting non-classes so at least thaw'ing classes
+         * is easy. Adding these parents after classes have been 
+         * subclassed is dangerous, however.
+         */
+        PMC *class_name;
+
+        if (ATTRIB_COUNT(class) != 0) {
+            internal_exception(1, "Subclassing built-in type too late");
+        }
+        Parrot_add_attribute(interpreter, class,
+            CONST_STRING(interpreter, "__value"));
+        class_name = pmc_new(interpreter, enum_class_String);
+        VTABLE_set_string_native(interpreter, class_name,
+            VTABLE_name(interpreter, class)); 
+        create_deleg_pmc_vtable(interpreter, class, class_name, 1);
+    } else if (!PObj_is_class_TEST(parent)) {
         internal_exception(1, "Parent isn't a ParrotClass");
+    }
+
 
     current_parent_array = get_attrib_num(PMC_data(class), PCD_PARENTS);
     VTABLE_push_pmc(interpreter, current_parent_array, parent);
@@ -1392,6 +1425,13 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
                 "Can't set non-core object attribs yet");
 
     class = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
+    if (PObj_is_PMC_shared_TEST(object)) {
+        /* XXX Shared objects have the 'wrong' class stored in them
+         * (because of the reference to the namespace and because it
+         * references PMCs that may go away),
+         * since we actually want one from the current interpreter. */
+        class = VTABLE_get_class(interpreter, object);
+    }
     class_array = (SLOTTYPE *)PMC_data(class);
     attr_hash = get_attrib_num(class_array, PCD_ATTRIBUTES);
     b = parrot_hash_get_bucket(interpreter,

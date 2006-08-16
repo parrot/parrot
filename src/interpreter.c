@@ -50,7 +50,7 @@ have the same number of elements since there is a one-to-one mapping.
 #include "parrot/dynext.h"
 
 
-static void setup_event_func_ptrs(Parrot_Interp interpreter);
+void Parrot_setup_event_func_ptrs(Parrot_Interp interpreter);
 
 /*
 
@@ -421,7 +421,7 @@ stop_prederef(Interp *interpreter)
         mem_sys_free(interpreter->evc_func_table);
         interpreter->evc_func_table = NULL;
     }
-    setup_event_func_ptrs(interpreter);
+    Parrot_setup_event_func_ptrs(interpreter);
 }
 
 #if EXEC_CAPABLE
@@ -698,7 +698,7 @@ runops_int(Interp *interpreter, size_t offset)
      * setup event function ptrs
      */
     if (!interpreter->save_func_table) {
-        setup_event_func_ptrs(interpreter);
+        Parrot_setup_event_func_ptrs(interpreter);
     }
 
     interpreter->resume_offset = offset;
@@ -790,7 +790,7 @@ runops_int(Interp *interpreter, size_t offset)
 /*
 
 =item C<static void
-setup_event_func_ptrs(Parrot_Interp interpreter)>
+Parrot_setup_event_func_ptrs(Parrot_Interp interpreter)>
 
 Setup a C<func_table> containing pointers (or addresses) of the
 C<check_event__> opcode.
@@ -801,8 +801,8 @@ TODO: Free it at destroy. Handle run-core changes.
 
 */
 
-static void
-setup_event_func_ptrs(Parrot_Interp interpreter)
+void
+Parrot_setup_event_func_ptrs(Parrot_Interp interpreter)
 {
     size_t i, n = interpreter->op_count;
     oplib_init_f init_func = get_op_lib_init(1, interpreter->run_core, NULL);
@@ -859,6 +859,20 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     op_info_t *new_info_table;
     size_t i, n_old, n_new, n_tot;
 
+    if (n_interpreters > 1) {
+        /* This is not supported because oplibs are always shared.
+         * If we mem_sys_reallocate() the op_func_table while another
+         * interpreter is running using that exact op_func_table,
+         * this will cause problems
+         * Also, the mapping from op name to op number is global even for
+         * dynops (!). The mapping is done by get_op in core_ops.c (even for
+         * dynops) and uses a global hash as a cache and relies on modifications
+         * to the static-scoped core_op_lib data structure to see dynops.
+         */
+        internal_exception(1, "loading a new dynoplib while more than "
+            "one thread is running is not supported.");
+    }
+
     if (!interpreter->all_op_libs)
         interpreter->all_op_libs = mem_sys_allocate(
                 sizeof(op_lib_t *) * (interpreter->n_libs + 1));
@@ -883,7 +897,7 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     /*
      * when called from yyparse, we have to set up the evc_func_table
      */
-    setup_event_func_ptrs(interpreter);
+    Parrot_setup_event_func_ptrs(interpreter);
 
     n_old = interpreter->op_count;
     n_new = lib->op_count;
@@ -1086,6 +1100,7 @@ notify_func_table(Parrot_Interp interpreter, void* table, int on)
         case PARROT_SLOW_CORE:      /* normal func core */
         case PARROT_FAST_CORE:      /* normal func core */
         case PARROT_CGOTO_CORE:      /* cgoto address list  */
+            assert(table);
             interpreter->op_func_table = table;
             break;
         case PARROT_CGP_CORE:
@@ -1115,6 +1130,7 @@ disable_event_checking(Parrot_Interp interpreter)
     /*
      * restore func table
      */
+    assert(interpreter->save_func_table);
     notify_func_table(interpreter, interpreter->save_func_table, 0);
 }
 
@@ -1140,6 +1156,7 @@ enable_event_checking(Parrot_Interp interpreter)
     /*
      * put table in place
      */
+    assert(interpreter->evc_func_table);
     notify_func_table(interpreter, interpreter->evc_func_table, 1);
 }
 

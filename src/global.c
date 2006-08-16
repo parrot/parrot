@@ -488,7 +488,7 @@ store_sub(Interp *interpreter, PMC *pmc_key, STRING *str_key, STRING *sub_name, 
         ns = Parrot_make_namespace_keyed(interpreter, ns, pmc_key);
     else if (str_key)
         ns = Parrot_make_namespace_keyed_str(interpreter, ns, str_key);
-
+    
     Parrot_store_global_n(interpreter, ns, sub_name, sub_pmc);
 
     /* TEMPORARY HACK - cache invalidation should be a namespace function */

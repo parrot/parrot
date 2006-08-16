@@ -68,6 +68,8 @@ PARROT_API STRING *readable_name(Parrot_Interp, PMC *);
 /* Objects, classes and PMCarrays all use the same data scheme:
  * PMC_data() holds a malloced array, PMC_int_val() is the size of it
  * this simplifies DOD mark a lot
+ *
+ * The active destroy flag is necessary to free the malloced array.
  */
 #define SLOTTYPE PMC*
 #define get_attrib_num(x, y)    ((PMC **)x)[y]
@@ -78,7 +80,10 @@ PARROT_API STRING *readable_name(Parrot_Interp, PMC *);
     } while (0)
 #define get_attrib_count(x)     PMC_int_val2(x)
 #define new_attrib_array() Dont_use
-#define set_attrib_flags(x) PObj_data_is_PMC_array_SET(x)
+#define set_attrib_flags(x) do { \
+        PObj_data_is_PMC_array_SET(x); \
+        PObj_active_destroy_SET(x); \
+    } while (0)
 #define set_attrib_array_size(o, y) do { \
     PMC_data(o) = mem_sys_allocate_zeroed((sizeof(PMC *)*(y))); \
     PMC_int_val(o) = y; \

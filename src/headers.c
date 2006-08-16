@@ -225,7 +225,6 @@ get_bufferlike_pool(Interp *interpreter, size_t buffer_size)
     return sized_pools[ (buffer_size - sizeof(Buffer)) / sizeof(void *) ];
 }
 
-
 /*
 
 =item C<PMC *
@@ -262,9 +261,7 @@ new_pmc_header(Interp *interpreter, UINTVAL flags)
 #endif
         pmc->pmc_ext = new_pmc_ext(interpreter);
         if (flags & PObj_is_PMC_shared_FLAG) {
-            PMC_sync(pmc) = mem_internal_allocate(sizeof(*PMC_sync(pmc)));
-            PMC_sync(pmc)->owner = interpreter;
-            MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
+            add_pmc_sync(interpreter, pmc);
         }
     }
     else
@@ -330,6 +327,28 @@ add_pmc_ext(Interp *interpreter, PMC *pmc)
     if (PObj_live_TEST(pmc))
         PObj_get_FLAGS(pmc) |= PObj_custom_GC_FLAG;
 #endif
+}
+
+/*
+
+=item C<PMC *
+add_pmc_sync(Interp *interpreter, PMC *pmc)>
+
+Adds a PMC_sync field to C<pmc>.
+
+=cut
+
+*/
+
+void
+add_pmc_sync(Interp *interpreter, PMC *pmc)
+{
+    if (!PObj_is_PMC_EXT_TEST(pmc)) {
+        add_pmc_ext(interpreter, pmc);
+    }
+    PMC_sync(pmc) = mem_internal_allocate(sizeof(*PMC_sync(pmc)));
+    PMC_sync(pmc)->owner = interpreter;
+    MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
 }
 
 /*
@@ -747,6 +766,113 @@ Parrot_destroy_header_pools(Interp *interpreter)
     }
     free_pool(interpreter, interpreter->arena_base->pmc_ext_pool);
     mem_internal_free(interpreter->arena_base->sized_header_pools);
+}
+
+/*
+=item C<void
+Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp)>
+
+Merge the header pools of C<source_interp> into those of C<dest_interp>.
+(Used to deal with shared objects left after interpreter destruction.
+
+=cut
+*/
+
+static void fix_pmc_syncs(Interp *dest_interp, 
+        struct Small_Object_Pool *pool) {
+    /* XXX largely copied from dod_sweep */
+    struct Small_Object_Arena *cur_arena;
+    UINTVAL object_size = pool->object_size;
+    size_t i;
+    size_t nm;
+    for (cur_arena = pool->last_Arena;
+            NULL != cur_arena; cur_arena = cur_arena->prev) {
+        Buffer *b = cur_arena->start_objects;
+
+#if ARENA_DOD_FLAGS
+        UINTVAL * dod_flags = cur_arena->dod_flags - 1;
+#endif
+        for (i = nm = 0; i < cur_arena->used; i++) {
+#if ARENA_DOD_FLAGS
+            if (! (i & ARENA_FLAG_MASK)) {
+                ++dod_flags;
+                /* if all are on free list, skip one bunch */
+                if (*dod_flags == ALL_FREE_MASK) {  /* all on free list */
+                    i += ARENA_FLAG_MASK;       /* + 1 in loop */
+                    b = (Buffer *)((char *)b + object_size*(ARENA_FLAG_MASK+1));
+                    continue;
+                }
+                nm = 0;
+            }
+            else
+                nm += 4;
+
+            if ((*dod_flags & (PObj_on_free_list_FLAG << nm)))
+                ; /* if its on free list, do nothing */
+            else
+#else
+            if (PObj_on_free_list_TEST(b))
+                ; /* if its on free list, do nothing */
+            else
+#endif
+            {
+                if (PObj_is_PMC_TEST(b)) {
+                    PMC *p = (PMC *)b;
+                    if (PObj_is_PMC_shared_TEST(p)) {
+                        PMC_sync(p)->owner = dest_interp;
+                    } else {
+                        /* fprintf(stderr, "BAD PMC: address=%p, base_type=%d\n",
+                                p, p->vtable->base_type); */
+                        assert(0);
+                    }
+                }
+            }
+
+            b = (Buffer *)((char *)b + object_size);
+        }
+    }
+}
+
+void
+Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp) {
+    struct Arenas *dest_arena;
+    struct Arenas *source_arena;
+    UINTVAL i;
+
+    dest_arena = dest_interp->arena_base;
+    source_arena = source_interp->arena_base;
+
+    /* heavily borrowed from forall_header_pools */
+
+    fix_pmc_syncs(dest_interp, source_arena->constant_pmc_pool);
+    Parrot_small_object_pool_merge(dest_interp, dest_arena->constant_pmc_pool,
+            source_arena->constant_pmc_pool);
+    fix_pmc_syncs(dest_interp, source_arena->pmc_pool);
+    Parrot_small_object_pool_merge(dest_interp, dest_arena->pmc_pool,
+            source_arena->pmc_pool);
+    Parrot_small_object_pool_merge(dest_interp, 
+            dest_arena->constant_string_header_pool,
+            source_arena->constant_string_header_pool);
+    Parrot_small_object_pool_merge(dest_interp,
+            dest_arena->pmc_ext_pool,
+            source_arena->pmc_ext_pool);
+
+    for (i = 0; i < source_arena->num_sized; ++i) {
+        if (!source_arena->sized_header_pools[i]) {
+            continue;
+        }
+
+        if (i >= dest_arena->num_sized ||
+            !dest_arena->sized_header_pools[i]) {
+            make_bufferlike_pool(dest_interp, i * sizeof(void *) 
+                + sizeof(Buffer));
+            assert(dest_arena->sized_header_pools[i]);
+        }
+
+        Parrot_small_object_pool_merge(dest_interp,
+            dest_arena->sized_header_pools[i],
+            source_arena->sized_header_pools[i]);
+    }
 }
 
 #if 0

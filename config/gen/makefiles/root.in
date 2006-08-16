@@ -314,7 +314,8 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Stream/Replay.pbc \
     $(LIBRARY_DIR)/Stream/Sub.pbc \
     $(LIBRARY_DIR)/Stream/Writer.pbc \
-    $(LIBRARY_DIR)/YAML/Parser/Syck.pbc
+    $(LIBRARY_DIR)/YAML/Parser/Syck.pbc \
+    $(LIBRARY_DIR)/STM.pbc
 # XXX Why don't these build?
 #    runtime/parrot/library/libpcre.pbc \
 #    runtime/parrot/library/Data/Replace.pbc \
@@ -407,6 +408,7 @@ INTERP_O_FILES = \
     @asmfun_o@ \
     @TEMP_cg_o@ \
     @TEMP_exec_o@ \
+    @TEMP_atomic_o@ \
     $(SRC_DIR)/charset$(O) \
     $(SRC_DIR)/encoding$(O) \
     $(SRC_DIR)/exceptions$(O) \
@@ -474,6 +476,8 @@ INTERP_O_FILES = \
     $(SRC_DIR)/extend_vtable$(O) \
     $(SRC_DIR)/revision$(O) \
     $(PF_DIR)/pf_items$(O) \
+    $(SRC_DIR)/stm/backend$(O) \
+    $(SRC_DIR)/stm/waitlist$(O) \
     @TEMP_gc_o@
 
 O_FILES = \
@@ -548,6 +552,11 @@ MAKE = @make_c@
 # arguments (etc) injected in the middle.
 # There is probably a better way to do this, but I can't work it out right now.
 .c$(O) :
+	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+
+# XXX probably should detect assembler, but right now this is only used on Sparc
+
+.s$(O) :
 	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 # XXX These obviously require parrot: had trouble adding parrot as a dependency

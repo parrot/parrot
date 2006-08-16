@@ -87,6 +87,8 @@ static opcode_t * pf_debug_unpack (Interp *,
         struct PackFile_Segment *self, opcode_t *);
 static void pf_debug_destroy (Interp*, struct PackFile_Segment *self);
 
+static struct PackFile_Constant **find_constants(Interp*, struct PackFile_ConstTable *);
+
 #define ROUND_16(val) ( ((val) & 0xf) ? 16 - ((val) & 0xf) : 0 )
 #define ALIGN_16(st, cursor) \
     do { \
@@ -363,11 +365,14 @@ static void
 mark_1_seg(Parrot_Interp interpreter, struct PackFile_ConstTable *ct)
 {
     opcode_t i;
+    struct PackFile_Constant **constants;
+
+    constants = find_constants(interpreter, ct);
     for (i = 0; i < ct->const_count; i++) {
-        switch (ct->constants[i]->type) {
+        switch (constants[i]->type) {
             case PFC_PMC:
                 {
-                PMC * const pmc = ct->constants[i]->u.key;
+                PMC * const pmc = constants[i]->u.key;
                 if (pmc)
                     pobject_lives(interpreter, (PObj *)pmc);
                 }
@@ -431,7 +436,7 @@ do_sub_pragmas(Interp *interpreter, struct PackFile_ByteCode *self,
     struct PackFile_ConstTable *ct = self->const_table;
 
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PackFile: do_sub_pragmas\n");
+    PIO_eprintf(NULL, "PackFile: do_sub_pragmas (action=%d)\n", action);
 #endif
 
     for (i = 0; i < ft->fixup_count; i++) {
@@ -2427,7 +2432,9 @@ Parrot_switch_to_cs(Interp *interpreter,
                 new_cs->base.name);
     }
     interpreter->code = new_cs;
-    CONTEXT(interpreter->ctx)->constants = new_cs->const_table->constants;
+    CONTEXT(interpreter->ctx)->constants = 
+        really ? find_constants(interpreter, new_cs->const_table) : new_cs->const_table->constants; 
+            /* new_cs->const_table->constants; */
     CONTEXT(interpreter->ctx)->pred_offset =
         new_cs->base.data - (opcode_t*) new_cs->prederef.code;
     new_cs->prev = cur_cs;
@@ -2456,6 +2463,122 @@ Parrot_pop_cs(Interp *interpreter)
     PackFile_remove_segment_by_name (interpreter,
             cur_cs->base.dir, cur_cs->base.name);
     /* FIXME delete returned segment */
+}
+
+/*
+
+=item C<static PackFile_Constant **
+find_constants(Interp *interpreter, struct PackFile_ConstTable *ct)>
+
+Find the constant table associated with a thread. For now, we need to copy
+constant tables because some entries aren't really constant; e.g.
+subroutines need to reference namespace pointers.
+
+=cut
+
+*/
+
+static struct PackFile_Constant *
+clone_constant(Interp *interpreter, struct PackFile_Constant *old_const) {
+    STRING * const _sub = interpreter->vtables[enum_class_Sub]->whoami;
+
+    if (old_const->type == PFC_PMC
+            && VTABLE_isa(interpreter, old_const->u.key, _sub)) {
+        struct PackFile_Constant *ret;
+        PMC *old_sub;
+        PMC *new_sub;
+        ret = mem_sys_allocate(sizeof(struct PackFile_Constant));
+
+        ret->type = old_const->type;
+
+        old_sub = old_const->u.key;
+        new_sub = Parrot_thaw_constants(interpreter,
+            Parrot_freeze(interpreter, old_sub));
+
+        PMC_sub(new_sub)->seg = PMC_sub(old_sub)->seg;
+        Parrot_store_sub_in_namespace(interpreter, new_sub);
+
+        ret->u.key = new_sub;
+
+        return ret;
+    } else {
+        return old_const;
+    }
+}
+
+static struct PackFile_Constant **
+find_constants(Interp *interpreter, struct PackFile_ConstTable *ct) {
+    if (!n_interpreters || !interpreter->thread_data || 
+            interpreter->thread_data->tid == 0) {
+        return ct->constants;
+    } else {
+        Hash *tables;
+        struct PackFile_Constant **new_consts;
+
+        assert(interpreter->thread_data);
+
+        if (!interpreter->thread_data->const_tables) {
+            interpreter->thread_data->const_tables = mem_sys_allocate(sizeof(Hash));
+            parrot_new_pointer_hash(interpreter, &interpreter->thread_data->const_tables);
+        }
+
+        tables = interpreter->thread_data->const_tables;
+
+        new_consts = parrot_hash_get(interpreter, tables, ct);
+
+        if (!new_consts) {
+            /* need to construct it */
+            struct PackFile_Constant **old_consts;
+            INTVAL i;
+            INTVAL const num_consts = ct->const_count;
+
+            old_consts = ct->constants;
+            new_consts = mem_sys_allocate(sizeof(struct PackFile_Constant*) * num_consts);
+
+            for (i = 0; i < num_consts; ++i) {
+                new_consts[i] = clone_constant(interpreter, old_consts[i]);
+            }
+
+            parrot_hash_put(interpreter, tables, ct, new_consts);
+        }
+
+        return new_consts;
+    }
+}
+
+void
+Parrot_destroy_constants(Interp *interpreter) {
+    UINTVAL i;
+    Hash *hash;
+    if (!interpreter->thread_data) {
+        return;
+    }
+
+    hash = interpreter->thread_data->const_tables;
+    
+    if (!hash) {
+        return;
+    }
+
+    for (i = 0; i <= hash->mask; ++i) {
+        HashBucket *bucket = hash->bi[i];
+        while (bucket) {
+            struct PackFile_ConstTable *const table = bucket->key;
+            struct PackFile_Constant **const orig_consts = table->constants;
+            struct PackFile_Constant **const consts = bucket->value;
+            INTVAL const const_count = table->const_count;
+            INTVAL i;
+            for (i = 0; i < const_count; ++i) {
+                if (consts[i] != orig_consts[i]) {
+                    mem_sys_free(consts[i]);
+                }
+            }
+            mem_sys_free(consts);
+            bucket = bucket->next;
+        }
+    }
+
+    parrot_hash_destroy(interpreter, hash);
 }
 
 /*

@@ -147,7 +147,18 @@ Return the class of this object.
     }
 
     PMC* get_class() {
-        return GET_CLASS(PMC_data(SELF), SELF);
+        if (!PObj_is_PMC_shared_TEST(SELF)) {
+            return GET_CLASS(PMC_data(SELF), SELF);
+        } else {
+            /* get the class object for this interpreter */
+            /* XXX this is rather a hack, it is, however, necessary: 
+             * otherwise we will be accessing the wrong interpreter's 
+             * namespace
+             */
+            int type_num = SELF->vtable->base_type;
+
+            return INTERP->vtables[type_num]->class;
+        }
     }
 
 /*
@@ -301,6 +312,42 @@ use fallback.
         }
         else
             return SUPER(key);
+    }
+
+    PMC* share_ro () {
+        PMC *ret;
+        PMC *true;
+        PMC **data;
+        INTVAL i, n;
+
+        if (PObj_is_PMC_shared_TEST(SELF))
+            return SELF;
+
+        ret = pt_shared_fixup(INTERP, SELF);
+        true = pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, true, 1);
+        VTABLE_setprop(INTERP, ret, CONST_STRING(interpreter, "_ro"), true);
+        PObj_is_PMC_shared_SET(SELF);
+
+        n = PMC_int_val(ret); 
+
+        data = (PMC **) PMC_data(ret);
+
+        for (i = POD_FIRST_ATTRIB; i < n; ++i)
+            data[i] = VTABLE_share_ro(INTERP, data[i]);
+
+        /* XXX This is perhaps not the best way to fix this up, but we
+         * need to ensure that the class object won't go away when this interpreter
+         * dies.
+         */
+        {
+            PMC *new_class;
+            new_class = ret->vtable->class;
+            assert(new_class);
+            assert(ret->vtable->share_ro == Parrot_ParrotObject_share_ro);
+            SET_CLASS((SLOTTYPE *) PMC_data(ret), ret, new_class);
+        }
+        return ret;
     }
 
 /*

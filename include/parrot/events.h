@@ -27,7 +27,8 @@ typedef enum {
     EVENT_TYPE_TERMINATE,
     EVENT_TYPE_EVENT_TERMINATE,
     EVENT_TYPE_CLASS_CHANGED,
-    EVENT_TYPE_SIGNAL
+    EVENT_TYPE_SIGNAL,
+    EVENT_TYPE_SUSPEND_FOR_GC
 } parrot_event_type_enum;
 
 /*
@@ -75,6 +76,7 @@ PARROT_API void Parrot_new_timer_event(Parrot_Interp, PMC*, FLOATVAL,
         FLOATVAL, int, PMC*, parrot_event_type_enum);
 PARROT_API void Parrot_del_timer_event(Parrot_Interp, PMC* timer);
 PARROT_API void Parrot_new_terminate_event(Parrot_Interp);
+PARROT_API void Parrot_new_suspend_for_gc_event(Parrot_Interp);
 PARROT_API void disable_event_checking(Parrot_Interp);
 PARROT_API void enable_event_checking(Parrot_Interp);
 

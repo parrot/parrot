@@ -486,6 +486,22 @@ aligned_string_size(STRING *buffer, size_t len)
     return len;
 }
 
+/* XXX FIXME used for hack in string.c*/
+int
+Parrot_in_memory_pool(Interp *interpreter, void *bufstart) {
+    struct Memory_Pool * const pool = interpreter->arena_base->memory_pool;
+    struct Memory_Block *cur_block;
+    cur_block = pool->top_block;
+    while (cur_block) {
+        if ((char *)bufstart >= cur_block->start && (char *) bufstart < cur_block->start 
+                + cur_block->size) {
+            return 1;
+        }
+        cur_block = cur_block->prev;
+    }
+    return 0;
+}
+
 
 /*
 
@@ -800,6 +816,52 @@ Parrot_destroy_memory_pools(Interp *interpreter)
 
         mem_internal_free(pool);
     }
+}
+
+/*
+
+=item C<void
+Parrot_merge_memory_pools(Interp *dest_interp, Interp *source_interp)>
+
+Merge the memory pools of C<source_interp> into C<dest_interp>.
+
+=cut
+
+*/
+
+static void merge_pools(struct Memory_Pool *dest, struct Memory_Pool *source)
+{
+    struct Memory_Block *cur_block;
+    struct Memory_Block *next_block;
+
+    cur_block = source->top_block;
+    while (cur_block) {
+        next_block = cur_block->prev;
+        if (cur_block->free == cur_block->size) {
+            mem_internal_free(cur_block);
+        } else {
+            cur_block->next = NULL;
+            cur_block->prev = dest->top_block;
+            dest->top_block = cur_block;
+            dest->total_allocated += cur_block->size;
+        }
+        cur_block = next_block;
+    }
+    dest->guaranteed_reclaimable += source->guaranteed_reclaimable;
+    dest->possibly_reclaimable += dest->possibly_reclaimable;
+
+    source->top_block = NULL;
+    source->total_allocated = source->guaranteed_reclaimable =
+        source->possibly_reclaimable = 0;
+}
+
+void
+Parrot_merge_memory_pools(Interp *dest_interp, Interp *source_interp)
+{
+    merge_pools(dest_interp->arena_base->constant_string_pool,
+                source_interp->arena_base->constant_string_pool);
+    merge_pools(dest_interp->arena_base->memory_pool,
+                source_interp->arena_base->memory_pool);
 }
 
 /*

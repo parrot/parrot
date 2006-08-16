@@ -1,0 +1,73 @@
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+extern int parrot_sparc_cas32(uint32_t *address, uint32_t old, uint32_t new);
+extern int parrot_sparc_cas64(uint64_t *address, uint64_t old, uint64_t new);
+
+#define DIAGNOSE() fprintf(stderr, "error at line %d: successp=%d/old=%llx/value=%llx\n", __LINE__, \
+			    successp, (unsigned long long) old, (unsigned long long) value)
+
+int main(void) {
+    {
+        int successp;
+        uint32_t value;
+        uint32_t old;
+        value = old = 42;
+
+        successp = parrot_sparc_cas32(&value, 41, 0xFFFFFFFFu);
+        if (successp || value == 0xFFFFFFFFu) {
+	    DIAGNOSE();
+            return EXIT_FAILURE;
+        }
+
+        successp = parrot_sparc_cas32(&value, old, 0xFFFFFFFFu);
+        if (!successp || value != 0xFFFFFFFFu) {
+	    DIAGNOSE();
+            return EXIT_FAILURE;
+        }
+
+        old = value;
+
+        successp = parrot_sparc_cas32(&value, old, 0);
+        if (!successp || value != 0) {
+	    DIAGNOSE();
+            return EXIT_FAILURE;
+        }
+    }
+
+    /* we'll only use the below functions if pointers are wide enough;
+     * and they don't work when pointers aren't wide enough
+     */
+    if (sizeof(void *) == sizeof(uint64_t))
+    {
+        int successp;
+        uint64_t value;
+        uint64_t old;
+        value = old = 42;
+
+        successp = parrot_sparc_cas64(&value, 41, 0x123456789abcdef0u);
+        if (successp || value == 0x123456789abcdef0u) {
+	    DIAGNOSE();
+            return EXIT_FAILURE;
+        }
+
+        successp = parrot_sparc_cas64(&value, old, 0x123456789abcdef0u);
+        if (!successp || value != 0x123456789abcdef0u) {
+	    DIAGNOSE();
+            return EXIT_FAILURE;
+        }
+
+        old = value;
+
+        successp = parrot_sparc_cas64(&value, old, 0);
+        if (!successp || value != 0) {
+	    DIAGNOSE();
+            return EXIT_FAILURE;
+        }
+    }
+
+    puts("ok");
+
+    return EXIT_SUCCESS;
+}

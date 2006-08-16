@@ -80,11 +80,29 @@ argument is not a PMC* but the C<classname> STRING.
         PObj_is_class_SET(SELF);
         /* turn on marking of the class_data array */
         PObj_data_is_PMC_array_SET(SELF);
+        /* turn on custom destruction since our PMC* array is
+           dynamically allocated */
+        PObj_active_destroy_SET(SELF);
     }
 
     void init_pmc (PMC* name) {
         SELF.init();
         Parrot_new_class(INTERP, SELF, name);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free the class's attribute array, if any. Also used by ParrotObjects.
+
+=cut
+
+*/
+    void destroy() {
+        if (ATTRIB_COUNT(SELF)) {
+            mem_sys_free(PMC_data(SELF));
+        }
     }
 
 /*
@@ -258,6 +276,7 @@ Create the class from the thawed parents and attributes array.
         PMC * class;
         PMC *parents, *attribs, *old;
         PMC **class_data;
+        int parent_not_class = 0;
 
         class = SELF;
         class_data = (PMC**)(PMC_data(class));
@@ -275,8 +294,13 @@ Create the class from the thawed parents and attributes array.
         /* TODO compare elements */
         if (!nold) {
             for (i = 0; i < n; ++i) {
-                Parrot_add_parent(INTERP, class,
-                        VTABLE_get_pmc_keyed_int(INTERP, parents, i));
+                PMC *parent_class = VTABLE_get_pmc_keyed_int(INTERP, parents, i);
+                if (!PObj_is_class_TEST(parent_class)) {
+                    assert(!parent_not_class);
+                    parent_not_class++;
+                    parent_class = parent_class->vtable->class;
+                }
+                Parrot_add_parent(INTERP, class, parent_class);
             }
         }
         /*
@@ -289,13 +313,17 @@ Create the class from the thawed parents and attributes array.
             n = 0;
         else
             n = VTABLE_elements(INTERP, attribs);
-        if (nold && n != nold)
+        if (nold != parent_not_class && n != nold)
             real_exception(INTERP, NULL, E_AssertionError,
                     "thawed class differs");
         /* TODO compare attribs */
 
-        if (!nold) {
-            for (i = 0; i < n; ++i) {
+        if (nold == parent_not_class) {
+            /* non-class parents already have an extra attribute for
+             * delegating, which will have already been created by 
+             * Parrot_add_parent() and must be first
+             */
+            for (i = parent_not_class ? 1 : 0; i < n; ++i) {
                 Parrot_add_attribute(INTERP, class,
                         VTABLE_get_string_keyed_int(INTERP, attribs, i));
             }

@@ -64,6 +64,13 @@ Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable)
 void
 Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable)
 {
+    /* XXX We sometimes get a type number allocated without any corresponding
+     * vtable. E.g. if you load perl_group, perlscalar is this way.
+     */
+    if (!vtable)
+        return;
+    if (vtable->ro_variant_vtable)
+        mem_sys_free(vtable->ro_variant_vtable);
     mem_sys_free(vtable);
 }
 

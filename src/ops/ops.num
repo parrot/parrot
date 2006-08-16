@@ -1262,3 +1262,9 @@ set_root_global_p_s_p          1231
 set_root_global_pc_s_p         1232
 set_root_global_p_sc_p         1233
 set_root_global_pc_sc_p        1234
+stm_start                      1235
+stm_validate_ic                1236
+stm_commit_ic                  1237
+stm_wait_ic                    1238
+stm_abort                      1239
+stm_depth_i                    1240

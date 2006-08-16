@@ -336,6 +336,8 @@ PARROT_API struct PackFile_ByteCode * Parrot_switch_to_cs(Interp *,
 PARROT_API void Parrot_switch_to_cs_by_nr(Interp *, opcode_t seg);
 PARROT_API void Parrot_pop_cs(Interp *);
 
+PARROT_API void Parrot_destroy_constants(Interp *);
+
 /*
 ** PackFile_Debug Functions:
 */

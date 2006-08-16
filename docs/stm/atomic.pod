@@ -1,0 +1,140 @@
+# Copyright: 2006 The Perl Foundation. All Rights Reserved. 
+# $Id$
+
+=head1 NAME
+
+docs/pdds/pdd??_atomic.pod - Atomic operations
+
+=head1 ABSTRACT
+
+This document defines a portable interface for accessing atomic operations
+from parrot backend code.
+
+=head1 VERSION
+
+ $Revision$
+
+=head1 DESCRIPTION
+
+Most architectures support atomic updates (read-and-write) to a memory
+location which do not require the overhead of ordinary locking, even on
+SMP systems. This document describes an interface for performing a set
+of such operations on pointers and integers (of some unspecified width
+which is at least 16 bits). All accesses below are guaranteed to be atomic with
+respect to each other.
+
+All of the below will be defined by C<parrot/atomic.h> with implementations
+in C<parrot/atomic/TYPE.h> and, should it be necessary to implement these
+outside of macros, C<atomic/TYPE.c>.
+
+=head2 Types
+
+=over 4
+
+=item B<Parrot_atomic_pointer>
+
+Holds a void * value. Must be accessed through macros only.
+
+=item B<Parrot_atomic_integer>
+
+Holds an integer which is at least 16 bits wide. Must be accessed
+through macros only.
+
+=back
+
+=head2 Macros for accessing atomic values
+
+=over 4
+
+=item B<PARROT_ATOMIC_PTR_INIT(a_ptr)>
+
+Initialize a Parrot_atomic_pointer. Must be called before any other use
+and cannot be used again on the value until PARROT_ATOMIC_PTR_DESTROY() is
+called. Does not guarantee that PARROT_ATOMIC_PTR_GET(a_ptr) will return any
+particular value.
+
+=item B<PARROT_ATOMIC_PTR_DESTROY(a_ptr)>
+
+Destroy any resources associated with a Parrot_atomic_pointer.
+
+=item B<PARROT_ATOMIC_PTR_GET(result, a_ptr)>
+
+Stores the pointer in C<a_ptr> into C<result>.
+
+=item B<PARROT_ATOMIC_PTR_SET(a_ptr, new_value)>
+
+Sets the value store in a Parrot_atomic_pointer to new_value.
+
+=item B<PARROT_ATOMIC_PTR_CAS(result, a_ptr, old_value, new_value)>
+
+``Compare-and-swap''. If the value in a_ptr was old_value, set it to
+new_value and assign true to result; otherwise assign false to result.
+(The result is not the return value of this macro so that it can be
+easily implemented without requiring a function call.)
+
+=item B<PARROT_ATOMIC_INT_INIT(a_int)>
+
+Initialize a Parrot_atomic_integer. Must be called before any other use and
+cannot be used again on the same value until PARROT_ATOMIC_INT_DESTROY() is
+called. Does not guarantee that PARROT_ATOMIC_INT_GET(a_int) will return any
+particular value.
+
+=item B<PARROT_ATOMIC_INT_GET(result, a_int)>
+
+Stores the integer in C<a_int> into C<result>.
+
+=item B<PARROT_ATOMIC_INT_SET(a_int, new_value)>
+
+Stores new_value.
+
+=item B<PARROT_ATOMIC_INT_CAS(result, a_int, old_value, new_value)>
+
+``Compare-and-swap''. Same as PARROT_ATOMIC_PTR_CAS but with integers.
+
+=item B<PARROT_ATOMIC_INT_INC(result, a_int)>
+
+Increment the integer atomically. Return the new value in result.
+
+=item B<PARROT_ATOMIC_INT_DEC(result, a_int)>
+
+Decrement the integer atomically. Return the new value in result.
+
+=back 
+
+=head2 Feature test macros
+
+=over 4
+
+=item B<PARROT_HAS_NATIVE_ATOMIC>
+
+Expands to a true value if this implementation has a native implementation of the
+atomic operations. Expands to false if the atomic operations are defined in
+terms of threading primitives. If false, the atomic operations should
+not be used if the implementors have written an alternative.
+ 
+This will always be 1 when parrot is compiled without threading support
+in which case the atomic operations will not actually be atomic.
+
+=item B<PARROT_HAS_ATOMIC_...>
+
+Defined (to a true value) only if the operation by that name is implemented.
+
+=back
+
+=head1 IMPLEMENTATION
+
+On most systems with native atomic operation support, Parrot_atomic_pointer and
+Parrot_atomic_integer will be a struct containing a single integer or
+pointer and ATOMIC_*_INIT will do nothing. For the fallback
+implementation the atomic types will be implemented in terms of a
+Parrot_mutex. Platform-specific implementations should not make Parrot_atomic_pointer
+or Parrot_atomic_integer a typedef for an integer or pointer type to prevent programmers 
+from accidentally violating encapsulation.
+ 
+=cut
+
+__END__ 
+Local Variables: 
+    fill-column:78
+End:
+vim: wrap textwidth=78

@@ -20,7 +20,7 @@ These are the vtable functions for the Iterator base class
 
 #include "parrot/parrot.h"
 
-pmclass Iterator {
+pmclass Iterator no_ro {
 
     void class_init() {
         if (pass) {

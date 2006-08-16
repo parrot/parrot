@@ -29,7 +29,7 @@ These are the vtable functions for the lexpad PMC.
  * pmc_val    ... LexInfo
  */
 
-pmclass LexPad does hash {
+pmclass LexPad does hash no_ro {
 
     void init() {
         real_exception(INTERP, NULL, INVALID_OPERATION,

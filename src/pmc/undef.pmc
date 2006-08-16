@@ -26,7 +26,7 @@ from there.
 #include "parrot/parrot.h"
 #define UNDEF_STRING_CLASS enum_class_String
 
-pmclass Undef extends default {
+pmclass Undef extends default no_ro {
 
   void set_pmc(PMC* other) {
     VTABLE_morph(INTERP, SELF, enum_class_Ref);
@@ -77,9 +77,17 @@ pmclass Undef extends default {
     return 0;
   }
 
-    void share () {
-        /* see src/pmc/integer.pmc */
+  void share () {
+    /* see src/pmc/integer.pmc */
+  }
+
+  PMC* share_ro () {
+    if (PObj_is_PMC_shared_TEST(SELF)) {
+        return SELF;
+    } else {
+        return pt_shared_fixup(INTERP, SELF);
     }
+  }
 
   PMC* clone() { 
       return pmc_new(INTERP, SELF->vtable->base_type);

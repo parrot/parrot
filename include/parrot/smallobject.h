@@ -170,6 +170,9 @@ void Parrot_append_arena_in_pool(Interp *, struct Small_Object_Pool *pool,
 void Parrot_add_to_free_list(Interp *, struct Small_Object_Pool *pool,
         struct Small_Object_Arena *arena, UINTVAL start, UINTVAL end);
 
+void Parrot_small_object_pool_merge(Interp *dest_interp,
+        struct Small_Object_Pool *dest, struct Small_Object_Pool *source);
+
 #endif /* PARROT_SMALLOBJECT_H_GUARD */
 
 /*

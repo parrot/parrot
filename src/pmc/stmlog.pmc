@@ -1,0 +1,43 @@
+/*
+Copyright (C) 2004, The Perl Foundation.
+$Id: vtablecache.pmc 13215 2006-07-09 00:31:40Z creiss $
+
+=head1 NAME
+
+src/pmc/stmlog.pmc -- Holds a transaction log that can be replayed
+
+=head1 DESCRIPTION
+
+This PMC class holds an STM transaction log that can be replayed.
+Replaying is only gaurenteed to be implemented enough to allow
+choice (Haskell `orElse`) to be implemented.
+
+This PMC will copy the current the transaction's log when it
+is initialized.
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass STMLog {
+
+    void init () {
+        PMC_struct_val(SELF) = Parrot_STM_extract(INTERP);
+        PObj_active_destroy_SET(SELF);
+        PObj_custom_mark_SET(SELF);
+    }
+
+    void destroy () {
+        Parrot_STM_destroy_extracted(INTERP, PMC_struct_val(SELF));
+    }
+
+    void mark () {
+        Parrot_STM_mark_extracted(INTERP, PMC_struct_val(SELF));
+    }
+
+    METHOD void replay() {
+        Parrot_STM_replay_extracted(INTERP, PMC_struct_val(SELF));
+    }
+}

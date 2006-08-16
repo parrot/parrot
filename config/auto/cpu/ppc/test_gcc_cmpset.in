@@ -1,0 +1,64 @@
+/*
+ * test for compare-and-set (x86 style) support with gcc-style inline ASM
+ */
+#include <assert.h> 
+#include <stdlib.h>
+
+/* #define DEBUG_CMPSET_TEST  */
+
+#include <stdio.h>
+
+inline static void *docmpset(void **ptr, void *old, void *new) {
+    void *tmp;
+    /* see http://www-128.ibm.com/developerworks/linux/library/pa-atom/ */
+    __asm__ __volatile__( /*%0 = tmp, %1 = ptr, %2 = old, %3 = new */
+        "1:  lwarx %0, 0, %1\n" /* tmp = *ptr, with reservation */
+        "    cmpw %2, %0\n" /* tmp == old ? */
+        "    bne 2f\n" /* no, flush reservation */
+        /* "    sync\n" -- XXX needed on PPC 405CR, see http://www.kegel.com/xgcc3/ppc405erratum77.html */
+        "    stwcx. %3, 0, %1\n" /* store new using reservation */
+        "    bne- 1b\n" /* spin on failure of reservation; - is branch prediction hint */
+        "    b 3f\n"
+        "2:  stwcx. %0, 0, %1\n" /* flush reserveration */
+        "3:  \n" /* end label */
+        : /* output */
+            "=&r"(tmp) 
+        : /* input */
+            "r"(ptr), "r"(old), "r"(new)
+        : /* clobber */
+            "memory"
+    );
+    return tmp;
+}
+
+int main(void) {
+    char dummy[] = "some string";
+    char *old;
+    char *new;
+    char *atomic;
+    atomic = dummy;
+    new = dummy + 1;
+    old = dummy;
+
+    old = docmpset((void **)&atomic, old, new);
+    
+
+#ifdef DEBUG_CMPSET_TEST
+    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, old, new);
+#endif
+    if (atomic != new) {
+        return EXIT_FAILURE;
+    }
+
+    old = docmpset((void **)&atomic, old, new);
+#ifdef DEBUG_CMPSET_TEST
+    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, old, new);
+#endif
+    if (old != new) {
+        return EXIT_FAILURE;
+    }
+
+    puts("ok");
+
+    return EXIT_SUCCESS;
+}

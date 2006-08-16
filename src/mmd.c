@@ -104,6 +104,11 @@ get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
     x_funcs = table->x;
     y_funcs = table->y;
 
+#if MMD_DEBUG
+    fprintf(stderr, "running function %d with left type=%u, right type=%u\n",
+        (int) func_nr, (unsigned) left_type, (unsigned) right_type);
+#endif
+
     func = NULL;
     assert(left_type >= 0);
     assert(right_type >=0 ||
@@ -159,11 +164,51 @@ get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC * right,
         INTVAL function, int *is_pmc)
 {
     UINTVAL left_type, right_type;
-    left_type = left->vtable->base_type;
-    right_type = right->vtable->base_type;
+    left_type = VTABLE_type(interpreter, left);
+    right_type = VTABLE_type(interpreter, right);
     return get_mmd_dispatch_type(interpreter, function, left_type, right_type,
             is_pmc);
 }
+
+/*
+
+=item C<static PMC*
+mmd_deref(Interp *interpreter, INTVAL function, PMC *value)>
+
+If C<value> is a reference-like PMC, dereference it so we can make an MMD
+call on the 'real' value.
+
+=cut
+
+*/
+
+static PMC *
+mmd_deref(Interp *interpreter, INTVAL function, PMC *value)
+{
+    if (VTABLE_type(interpreter, value) != value->vtable->base_type)
+        return VTABLE_get_pmc(interpreter, value);
+    else
+        return value;
+}
+
+/*
+
+=item C<static void
+mmd_ensure_writable(Interp *, INTVAL function, PMC *pmc)>
+
+Make sure C<pmc> is writable enough for C<function>.
+
+=cut
+
+*/
+
+static void
+mmd_ensure_writable(Interp *interpreter, INTVAL function, PMC *pmc) {
+    if (!PMC_IS_NULL(pmc) && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG))
+        real_exception(interpreter, 0, 1, "%s applied to read-only argument",
+            Parrot_MMD_method_name(interpreter, function));
+}
+
 
 /*
 
@@ -225,6 +270,9 @@ mmd_dispatch_p_ppp(Interp *interpreter,
     PMC *sub;
     int is_pmc;
 
+    left = mmd_deref(interpreter, func_nr, left);
+    right = mmd_deref(interpreter, func_nr, right);
+
     real_function = (mmd_f_p_ppp)get_mmd_dispatcher(interpreter,
             left, right, func_nr, &is_pmc);
 
@@ -248,8 +296,14 @@ mmd_dispatch_p_pip(Interp *interpreter,
 {
     int is_pmc;
 
-    const UINTVAL left_type = left->vtable->base_type;
-    const mmd_f_p_pip real_function =
+    UINTVAL left_type;
+    mmd_f_p_pip real_function;
+
+    left = mmd_deref(interpreter, func_nr, left);
+
+    left_type = left->vtable->base_type;
+    
+    real_function =
         (mmd_f_p_pip)get_mmd_dispatch_type(interpreter, func_nr, left_type, enum_type_INTVAL, &is_pmc);
 
     if (is_pmc) {
@@ -274,6 +328,8 @@ mmd_dispatch_p_pnp(Interp *interpreter,
     PMC *sub;
     int is_pmc;
     UINTVAL left_type;
+
+    left = mmd_deref(interpreter, func_nr, left);
 
     left_type = left->vtable->base_type;
     real_function = (mmd_f_p_pnp)get_mmd_dispatch_type(interpreter,
@@ -329,6 +385,12 @@ mmd_dispatch_v_pp(Interp *interpreter,
     PMC *sub;
     int is_pmc;
 
+
+    left = mmd_deref(interpreter, func_nr, left);
+    right = mmd_deref(interpreter, func_nr, right);
+
+    mmd_ensure_writable(interpreter, func_nr, left);
+
     real_function = (mmd_f_v_pp)get_mmd_dispatcher(interpreter,
             left, right, func_nr, &is_pmc);
 
@@ -349,6 +411,9 @@ mmd_dispatch_v_pi(Interp *interpreter,
     PMC *sub;
     int is_pmc;
     UINTVAL left_type;
+
+    left = mmd_deref(interpreter, func_nr, left);
+    mmd_ensure_writable(interpreter, func_nr, left);
 
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_pi)get_mmd_dispatch_type(interpreter,
@@ -371,6 +436,9 @@ mmd_dispatch_v_pn(Interp *interpreter,
     int is_pmc;
     UINTVAL left_type;
 
+    left = mmd_deref(interpreter, func_nr, left);
+    mmd_ensure_writable(interpreter, func_nr, left);
+
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_pn)get_mmd_dispatch_type(interpreter,
             func_nr, left_type, enum_type_FLOATVAL, &is_pmc);
@@ -392,7 +460,10 @@ mmd_dispatch_v_ps(Interp *interpreter,
     int is_pmc;
     UINTVAL left_type;
 
-    left_type = left->vtable->base_type;
+    left = mmd_deref(interpreter, func_nr, left);
+    mmd_ensure_writable(interpreter, func_nr, left);
+
+    left_type = VTABLE_type(interpreter, left);
     real_function = (mmd_f_v_ps)get_mmd_dispatch_type(interpreter,
             func_nr, left_type, enum_type_STRING, &is_pmc);
     if (is_pmc) {
@@ -425,6 +496,9 @@ mmd_dispatch_i_pp(Interp *interpreter,
     PMC *sub;
     int is_pmc;
     INTVAL ret;
+
+    left = mmd_deref(interpreter, func_nr, left);
+    right = mmd_deref(interpreter, func_nr, right);
 
     real_function = (mmd_f_i_pp)get_mmd_dispatcher(interpreter,
             left, right, func_nr, &is_pmc);

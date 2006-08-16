@@ -45,6 +45,7 @@ struct Small_Object_Pool *make_bufferlike_pool(Interp *interpreter, size_t unit_
 /* header creation functions */
 PMC *new_pmc_header(Interp *interpreter, UINTVAL flags);
 void add_pmc_ext(Interp *interpreter, PMC *pmc);
+void add_pmc_sync(Interp *interpreter, PMC *pmc);
 STRING *new_string_header(Interp *interpreter, UINTVAL flags);
 Buffer *new_buffer_header(Interp *interpreter);
 void *new_bufferlike_header(Interp *interpreter, size_t size);
@@ -72,6 +73,8 @@ int Parrot_forall_header_pools(Interp *, int, void *arg, pool_iter_fn func);
 /* miscellaneous functions */
 void Parrot_initialize_header_pools(Interp *);
 void Parrot_destroy_header_pools(Interp *interpreter);
+
+void Parrot_merge_header_pools(Interp *dest, Interp *source);
 
 #endif /* PARROT_HEADERS_H_GUARD */
 

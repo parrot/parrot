@@ -1,0 +1,115 @@
+#include "parrot/stm/backend.h"
+
+=pod
+
+=head1 NAME
+
+stm.ops -- Software transactional memory related ops
+
+=head1 DESCRIPTION
+
+Operations for software transactional memory. Includes all transaction
+manipulating flow-control, actual transacted data manipulation occurs
+through STMRef/STMVar PMCs.
+
+=head2 Parrot STM operations
+
+=over 4
+
+=cut
+
+VERSION = PARROT_VERSION;
+
+=item B<stm_start>()
+
+Start a new transaction.
+
+=cut
+
+inline op stm_start() {
+    Parrot_STM_start_transaction(interpreter);
+    goto NEXT();
+}
+
+=item B<stm_validate>(label INT)
+
+If the current transaction is invalid jump to $1; otherwise,
+excecution continues normally.
+
+If there is no active transaction, execution continues normally.
+
+=cut
+
+inline op stm_validate(labelconst INT) {
+    if (!Parrot_STM_validate(interpreter))
+        goto OFFSET($1);
+    goto NEXT();
+}
+
+=item B<stm_commit>(labelconst INT)
+
+Commits the most recently opened transaction. Jumps to $1 if the
+commit fails. (If the outer transaction is invalid, this should succeed
+always.)
+
+If stm_commit jumps to $1, then the transaction will have been aborted.
+
+=cut
+
+inline op stm_commit(labelconst INT) {
+    if (!Parrot_STM_commit(interpreter))
+        goto OFFSET($1); /* retry */
+    goto NEXT();
+}
+
+=item B<stm_wait>(label INT)
+
+Does what stm_wait does, but if the outer transaction is invalid after
+waiting or after the inner transaction is aborted, jumps to $1.
+
+(The jump is needed because otherwise the inner transaction may never succeed
+because the outer transaction constrains it to not see new values.) 
+
+=cut
+
+inline op stm_wait(labelconst INT) {
+    Parrot_STM_wait(interpreter);
+    if (!Parrot_STM_validate(interpreter))
+        goto OFFSET($1);
+    goto NEXT();
+}
+
+=item B<stm_abort>()
+
+Aborts the most recently opened transaction.
+
+=cut
+
+inline op stm_abort() {
+    Parrot_STM_abort(interpreter);
+    goto NEXT();
+}
+
+=item B<stm_depth>(out INT)
+
+Writes the number transactions active in this thread into $1.
+
+=cut
+
+inline op stm_depth(out INT) {
+    $1 = Parrot_STM_transaction_depth(interpreter);
+    goto NEXT();
+}
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2006 The Perl Foundation.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut

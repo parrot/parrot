@@ -1,0 +1,143 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id: tqueue.pmc 11501 2006-02-10 18:27:13Z particle $
+
+=head1 NAME
+
+XXX
+
+=head1 DESCRIPTION
+
+XXX
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+#include "parrot/stm/backend.h"
+
+#include <assert.h>
+
+/* we set need_ext here because we really want to have PMC sync structure;
+ * we set no_ro because we are logically read-only; one can't change which
+ * transactional object this references (though one can change that
+ * object)
+ */
+pmclass STMVar is_shared need_ext no_ro {
+/*
+
+=item C<void init()>
+
+...
+
+=cut
+
+*/
+    void init() {
+        PMC_struct_val(SELF) = NULL;
+        PMC_struct_val(SELF) = Parrot_STM_alloc(INTERP, PMCNULL);
+        PObj_custom_mark_SET(SELF);
+    }
+
+    void init_pmc(PMC* value) {
+        PMC_struct_val(SELF) = NULL;
+        if (   value->vtable->base_type == enum_class_STMRef
+            || value->vtable->base_type == enum_class_STMVar) {
+            PMC_struct_val(SELF) = PMC_struct_val(value);
+        } else {
+            PMC_struct_val(SELF) = Parrot_STM_alloc(INTERP, value);
+        }
+        PObj_custom_mark_SET(SELF);
+    }
+/*
+
+=item C<PMC *clone()>
+
+Return the STMVar PMC.
+
+=cut
+
+*/
+
+    PMC* clone() {
+        return SELF;
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark data associated with this transactional variable.
+
+=cut
+
+*/
+
+    void mark () {
+        assert(PObj_is_PMC_shared_TEST(SELF));
+        assert(PMC_sync(SELF)->owner == INTERP);
+        Parrot_STM_mark_pmc_handle(INTERP, PMC_struct_val(SELF));
+    }
+
+    METHOD PMC* get_read() {
+        return Parrot_STM_read(INTERP, PMC_struct_val(SELF));
+    }
+
+    METHOD PMC* get_update() {
+        return Parrot_STM_begin_update(INTERP, PMC_struct_val(SELF));
+    }
+
+    METHOD void set(PMC* new_value) {
+        Parrot_STM_write(INTERP, PMC_struct_val(SELF), new_value);
+    }
+
+    void freeze (visit_info *info) {
+        IMAGE_IO * const io = info->image_io;
+
+        SUPER(info);
+
+        Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_struct_val(SELF)); 
+    }
+
+    void thaw (visit_info *info) {
+        IMAGE_IO * const io = info->image_io;
+
+        SUPER(info);
+
+        PMC_struct_val(SELF) = 
+            Parrot_thaw_STM_PMC_handle(INTERP, io);
+
+        assert(PObj_is_PMC_shared_TEST(SELF));
+        assert(PMC_sync(SELF));
+    }
+
+    /* we can do this because we don't modify ourself in dangerous ways -- we are
+       always a reference to the same transactional variable.
+     */
+    PMC* share_ro () {
+        PMC *ret = pt_shared_fixup(INTERP, SELF);
+        return ret;
+    }
+}
+
+/*
+
+=back
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

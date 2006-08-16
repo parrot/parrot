@@ -541,7 +541,6 @@ Sets the length of the array to C<size>.
     void set_integer_native (INTVAL size) {
         list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
     }
-
 /*
 
 =item C<void set_integer_same(PMC* value)>
@@ -1261,8 +1260,61 @@ Used to unarchive the array.
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL)
+        if (info->extra_flags == EXTRA_IS_NULL) {
             DYNSELF.set_integer_native(io->vtable->shift_integer(INTERP, io));
+    }
+}
+
+/*
+
+=item C<void share_ro()>
+
+Recursively make the array read-only and shared.
+
+=cut
+
+*/
+    PMC* share_ro() {
+        PMC *true;
+        PMC *ret;
+
+        /* prevent infinite recursion */
+        if (PObj_is_PMC_shared_TEST(SELF)) {
+            real_exception(INTERP, NULL, INVALID_OPERATION, "share_ro on "
+                           "something that already is shared");
+        }
+
+        true = pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, true, 1);
+
+        ret = pt_shared_fixup(INTERP, SELF);
+
+        /* first set readonly */
+        VTABLE_setprop(INTERP, ret, const_string(INTERP, "_ro"), true);
+
+        /* XXX do something that deals better with sparse lists */
+        INTVAL i;
+        INTVAL max;
+        max = VTABLE_elements(INTERP, ret);
+        for (i = 0; i < max; ++i) {
+            PMC *value;
+
+            value = list_get(INTERP, PMC_data(ret), i, enum_type_PMC);
+            if (!PMC_IS_NULL(value)) {
+                PMC *new_value;
+                /* XXX do we need to clone first? */
+                new_value = VTABLE_share_ro(INTERP, value);
+                if (new_value != value) {
+                    list_assign(INTERP, PMC_data(ret), 
+                        i, new_value, enum_type_PMC);
+                }
+            }
+        }
+
+        /* XXX FIXME workaround lack of metadata sharing */
+        PMC_metadata(SELF) = NULL;
+
+        return ret;
     }
 }
 

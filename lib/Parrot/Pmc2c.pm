@@ -31,25 +31,7 @@ use base qw( Exporter );
 
 our @EXPORT_OK = qw(count_newlines gen_ret dont_edit dynext_load_code);
 
-our %writes;
-{
-  my @writes = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
-  @writes{@writes} = (1) x @writes;
-}
 use Text::Balanced 'extract_bracketed';
-
-=item C<does_write($method, $section)>
-
-Returns whether a method writes.
-
-=cut
-
-sub does_write($$) {
-    my ($meth, $section) = @_;
-
-    warn "no $meth\n" unless $section;
-    return exists $writes{$section} || $meth eq 'morph';
-}
 
 =item C<count_newlines($string)>
 
@@ -116,7 +98,7 @@ C<new()>, and C<$class> is C<Parrot::Pmc2c>.
 =cut
 
 my %special_class_name = map {($_,1)}
-    qw( Ref default Null delegate SharedRef deleg_pmc );
+    qw( STMRef Ref default Null delegate SharedRef deleg_pmc );
 
 sub class_name {
     my ($self, $class) = @_;
@@ -249,6 +231,28 @@ sub new {
 
 =over
 
+=item C<does_write($method)>
+
+Returns true if the vtable method C<$method> writes our value.
+
+=cut
+
+sub does_write {
+    my ($self, $method) = @_;
+
+    my $attrs;
+    if ($self->{has_method}{$method}) {
+        $attrs = $self->{methods}[$self->{has_method}{$method}]->{attrs};
+    } elsif ($self->{super}{$method}) {
+        $attrs = $self->{super_attrs}{$method};
+    }
+
+    return 1 if $attrs->{write};
+    return 0 if $attrs->{read};
+    
+    return $self->{attrs}{$method}{write};
+}
+
 =item C<line_directive($self,$line,$file)>
 
 Generates the C pre processor string for a #line directive, or an empty string
@@ -292,7 +296,8 @@ from C<init()>.
 
 =cut
 
-sub get_vtable_section() {
+# XXX FIXME unused?
+sub get_vtable_section {
     my $self = shift;
 
     #  make a hash of all method names containing vtable section
@@ -302,6 +307,80 @@ sub get_vtable_section() {
     }
 }
 
+=item C<get_vtable_attrs()>
+
+Creates a hash of all the methods names correspdoning to their attributes.
+Called from C<init()>
+
+=cut
+
+sub get_vtable_attrs {
+    my $self = shift;
+
+    my $vt = $self->{vtable};
+    foreach my $entry (@{ $vt->{methods} }) {
+        $self->{attrs}{$entry->{meth}} = $entry->{attr};
+    }
+}
+
+=item C<make_constlike($class, $type, $is_variant)>
+
+Create a variant for Const or RO.
+
+=cut
+
+sub make_constlike {
+    my ($self, $class, $type, $prefix)= @_;
+
+    $prefix = "$type" unless defined $prefix;
+
+    my $const = bless {}, ref($self) . "::$type";
+    {
+        # autogenerate for exotic types
+        # (XXX is this appropriate or do we want them to each
+        # be explicitly cleared to have the variant?)
+        no strict 'refs';
+        if (!@{ref($const) . '::ISA'}) {
+            @{ref($const) . '::ISA'} = "Parrot::Pmc2c::Standard::\u$type";
+        }
+    }
+    my @methods = @{ $self->{methods} };
+    # copy super
+    $const->{super} = { %{ $self->{super} } };
+    my $i;
+    # FIXME support getting implementations from central superclass instead 
+    # (e.g. some ro_fail pseudoclass that generates an exception)
+    foreach my $entry (@{ $self->{vtable}{methods} }) {
+        my $meth = $entry->{meth};
+        if ($self->does_write($meth)) {
+            $const->{has_method}{$meth} = $i++;
+            push @{ $const->{methods} }, {
+                meth => $meth,
+                type => $entry->{type},
+                parameters => $entry->{parameters},
+                loc => 'vtable',
+            };
+        } else {
+            if ($self->implements($meth)) {
+                $const->{super}{$meth} = $self->{class};
+            } else {
+                $const->{super}{$meth} = $self->{super}{$meth};
+            } 
+        }
+    }
+    # copy parent(s), prepend self as parrent
+    $const->{parents} = [ $self->{class}, @{ $self->{parents} } ];
+    # copy flags, set is_const
+    $const->{flags} = { %{ $self->{flags} } };
+    # set classname
+    $const->{class} = $prefix . $self->{class};
+    # and alias vtable
+    $const->{vtable} = $self->{vtable};
+    # set parentname
+    $const->{parentname} = $self->{class};
+    return $const;
+}
+
 =item C<make_const($class)>
 
 If the PMC had its C<const_too> flag set then this method is called in
@@ -309,46 +388,31 @@ C<init()> to to create the read-only set methods.
 
 =cut
 
-sub make_const() {
+sub make_const {
     my ($self, $class) = @_;
-
-    my $const = bless {}, $class . '::Const';
+    my $const = $self->make_constlike($class, 'Const');
     $self->{const} = $const;
-    my @methods = @{ $self->{methods} };
-    # copy super
-    $const->{super} = { %{ $self->{super} } };
-    my $i;
-    foreach my $entry (@methods) {
-	my $meth = $entry->{meth};
-	if (does_write($meth, $self->{all}{$meth})) {
-            # create methods if they write
-            $const->{has_method}{$meth} = $i++;
-	    push @{ $const->{methods} }, {
-		meth => "$meth",
-		type => $entry->{type},
-		parameters => $entry->{parameters},
-                loc => $entry->{loc}
-	    };
-	}
-        else {
-            # if not - they are inherited from $self
-            $const->{super}{$meth} = $self->{class};
-        }
-    }
-    # copy parent(s), prepend self as parrent
-    $const->{parents} = [ $self->{class}, @{ $self->{parents} } ];
-    # copy flags, set is_const
-    $const->{flags} = {is_const => 1, %{ $self->{flags} } };
+    $const->{flags}->{is_const} = 1;
     delete $const->{flags}{const_too};
     # set const in does
     $const->{flags}{does}{const} = 1;
-    # set classname
-    $const->{class} = "Const" . $self->{class};
-    # and alias vtable
-    $const->{vtable} = $self->{vtable};
-    # set parentname
-    $const->{parentname} = $self->{class};
+}
 
+=item C<make_ro($class)>
+
+If the PMC doesn't have C<const_too> set (FIXME?) then this method is called
+to create the read-only set methods and vtable variant.
+
+=cut
+
+sub make_ro {
+    my ($self, $class) = @_;
+    my $ro = $self->make_constlike($class, 'RO', '');
+    $self->{flags}{has_ro} = 1;
+    $self->{ro} = $ro;
+    delete $ro->{flags}->{has_ro};
+    $ro->{flags}->{is_ro} = 1;
+    $ro->{variant} = '_ro';
 }
 
 =item C<init($class)>
@@ -357,12 +421,42 @@ Initializes the instance. C<$class> is its class.
 
 =cut
 
-sub init() {
+sub init {
     my ($self, $class) = @_;
 
     $self->get_vtable_section();
+    $self->get_vtable_attrs();
     $self->make_const($class) if $self->{flags}{const_too};
+    $self->{flags}{no_ro} = 1 if $self->{flags}{abstract} 
+                              or $self->{flags}{singleton}
+                              or $self->{flags}{const_too};
+    if (!$self->{flags}{no_ro}) {
+        $self->make_ro;
+    }
 
+    if ($self->{flags}{singleton}) {
+        # Since singletons are shared between interpreters, we need
+        # to make special effort to use the right namespace for 
+        # method lookups. Note that this trick won't work if the
+        # singleton inherits from something else (because the
+        # MRO will still be shared).
+        unless ($self->implements('namespace') or 
+                    $self->{super}{'namespace'} ne 'default') {
+            push @{$self->{methods}}, {
+                meth => 'namespace',
+                parameters => '',
+                body => '{
+                    return INTERP->vtables[SELF->vtable->base_type]->_namespace;
+                }',
+                'loc' => 'vtable',
+                'mmds' => [],
+                'type' => 'PMC*',
+                'line' => 1,
+                attrs => {},
+            };
+            $self->{has_method}{namespace} = $#{$self->{methods}};
+        }
+    }
 }
 
 =item C<decl($classname, $method, $for_header)>
@@ -378,6 +472,7 @@ sub decl() {
     my $ret = $method->{type};
     my $meth= $method->{meth};
     my $args= $method->{parameters};
+    my $variant = $self->{variant} || "";
     $args = ", $args" if $args =~ /\S/;
     my ($export, $extern, $newl, $semi, $interp, $pmc);
     if ($for_header) {
@@ -397,7 +492,7 @@ sub decl() {
         $pmc = ' pmc';
     }
     return <<"EOC";
-$export$extern$ret${newl}Parrot_${classname}_$meth(Interp*$interp, PMC*$pmc$args)$semi
+$export$extern$ret${newl}Parrot_${classname}${variant}_$meth(Interp*$interp, PMC*$pmc$args)$semi
 EOC
 }
 
@@ -746,19 +841,113 @@ sub get_super_mmds {
     return $found ? @mmds : ();
 }
 
-=item C<init_func()>
+=item C<find_mmd_methods()>
 
-Returns the C code for the PMC's initialization method, or an empty
-string if the PMC has a C<no_init> flag.
+Returns three values:
+
+The first is an arrayref of <[ mmd_number, left, right, implementation_func]>
+suitable for initializing the MMD list.
+
+The second is a arrayref listing dynamic PMCs which will need to be looked up.
+
+The third is a list of C<[index, dynamic PMC]> pairs of right entries
+in the MMD table that will need to be resolved at runtime.
 
 =cut
 
-sub init_func() {
+sub find_mmd_methods {
     my $self = shift;
+    my $classname = $self->{class};
+    my (@mmds, @init_mmds, %init_mmds);
+    foreach my $method (@{ $self->{vtable}{methods}} ) {
+        my $meth = $method->{meth};
+        my $meth_name;
+        if (!$self->implements($meth)) {
+            my $class = $self->{super}{$meth};
+            next if $class =~ /^[A-Z]/ 
+                or $class eq 'default' or $class eq 'delegate';
+            $meth_name = "Parrot_${class}_$meth";
+        } else {
+            $meth_name = "Parrot_${classname}_$meth";
+        }
+        next unless $method->{mmd} =~ /MMD_/;
+        my ($func, $left, $right);
+        $func = $method->{mmd};
+        # dynamic PMCs need the runtime type
+        # which is passed in entry to class_init
+        $left = 0;  # set to 'entry' below in initialization loop.
+        $right = 'enum_type_PMC';
+        $right = 'enum_type_INTVAL'   if ($func =~ s/_INT$//);
+        $right = 'enum_type_FLOATVAL' if ($func =~ s/_FLOAT$//);
+        $right = 'enum_type_STRING'   if ($func =~ s/_STR$//);
+        if (exists $self->{super}{$meth}) {
+            push @mmds, $self->get_super_mmds($meth, $right, $func);
+        }
+        push @mmds, [ $func, $left, $right, $meth_name ];
+        foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
+            if ($self->pmc_is_dynpmc($variant->[0])) {
+                $right = 0;
+                push @init_mmds, [$#mmds + 1, $variant->[0]];
+                $init_mmds{$variant->[0]} = 1;
+            }
+            else {
+                $right = "enum_class_$variant->[0]";
+            }
+            $meth_name = $variant->[1] . '_' .$variant->[0];
+            push @mmds, [ $func, $left, $right, $meth_name];
+        }
+        $self->{mmds} = @mmds; # XXX?
+    }
+    return (\@mmds, \@init_mmds, [ keys %init_mmds ]);
+}
+
+=item C<find_vtable_methods()>
+
+Returns an arrayref containing the vtable methods in the order
+they appear in the vtable.
+
+=cut
+
+sub find_vtable_methods {
+    my $self = shift;
+    my $classname = $self->{class};
+    my $variant = $self->{variant} || "";
+    my (@meths, @mmds, @init_mmds, %init_mmds);
+    foreach my $method (@{ $self->{vtable}{methods}} ) {
+        my $meth = $method->{meth};
+        my $meth_name;
+        if ($self->implements($meth)) {
+            $meth_name = "Parrot_${classname}${variant}_$meth";
+        }
+        elsif (exists $self->{super}{$meth}) {
+            my $class = $self->{super}{$meth};
+            $meth_name = "Parrot_${class}_$meth";
+        }
+        else {
+            $meth_name = "Parrot_default_$meth";
+        }
+        # normal vtable method}
+        unless ($method->{mmd} =~ /MMD_/) {
+            push @meths, $meth_name;
+        }
+    }
+    return \@meths;
+}
+
+=item C<vtable_decl($name)>
+
+Returns the C code for the declaration of a vtable temporary named
+C<$name> with the functions for this class. 
+=cut
+
+sub vtable_decl {
+    my ($self, $name) = @_;
+
+    my $methods = $self->find_vtable_methods();
 
     my $cout = "";
     return "" if exists $self->{flags}{noinit};
-
+    
     # TODO gen C line comment
     my $classname = $self->{class};
     my $vtbl_flag =  $self->{flags}{const_too} ?
@@ -773,77 +962,17 @@ sub init_func() {
     if (exists $self->{flags}{is_shared}) {
         $vtbl_flag .= '|VTABLE_IS_SHARED_FLAG';
     }
-    my (@meths, @mmds, @init_mmds, %init_mmds);
-    foreach my $method (@{ $self->{vtable}{methods}} ) {
-        my $meth = $method->{meth};
-        my $meth_name;
-        my $defaulted = 0;
-        my $class = '';
-        if ($self->implements($meth)) {
-            $meth_name = "Parrot_${classname}_$meth";
-        }
-        elsif (exists $self->{super}{$meth}) {
-            $class = $self->{super}{$meth};
-            $meth_name = "Parrot_${class}_$meth";
-        }
-        else {
-            $defaulted = 1;
-            $meth_name = "Parrot_default_$meth";
-        }
-        # normal vtable method}
-        unless ($method->{mmd} =~ /MMD_/) {
-            push @meths, $meth_name;
-        }
-        $defaulted = 1 if $meth_name =~ /_default/;
-        $defaulted = 1 if $meth_name =~ /_delegate/;
-        $defaulted = 1 if $class =~ /^[A-Z]/;
-        # MMD method
-        if ($method->{mmd} =~ /MMD_/ && !$defaulted) {
-            my ($func, $left, $right);
-            $func = $method->{mmd};
-            # dynamic PMCs need the runtime type
-            # which is passed in entry to class_init
-            $left = 0;  # set to 'entry' below in initialization loop.
-            $right = 'enum_type_PMC';
-            $right = 'enum_type_INTVAL'   if ($func =~ s/_INT$//);
-            $right = 'enum_type_FLOATVAL' if ($func =~ s/_FLOAT$//);
-            $right = 'enum_type_STRING'   if ($func =~ s/_STR$//);
-            if (exists $self->{super}{$meth}) {
-                push @mmds, $self->get_super_mmds($meth, $right, $func);
-            }
-            push @mmds, [ $func, $left, $right, $meth_name ];
-            foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
-                if ($self->pmc_is_dynpmc($variant->[0])) {
-                    $right = 0;
-                    push @init_mmds, [$#mmds + 1, $variant->[0]];
-                    $init_mmds{$variant->[0]} = 1;
-                }
-                else {
-                    $right = "enum_class_$variant->[0]";
-                }
-                $meth_name = $variant->[1] . '_' .$variant->[0];
-                push @mmds, [ $func, $left, $right, $meth_name];
-            }
-            $self->{mmds} = @mmds;
-        }
+    if (exists $self->{flags}{is_ro}) {
+        $vtbl_flag .= '|VTABLE_IS_READONLY_FLAG';
     }
-    my $methlist = join(",\n        ", @meths);
-    my $mmd_list = join(",\n        ", map {
-        "{ $_->[0], $_->[1], $_->[2],
-                    (funcptr_t) $_->[3] }" } @mmds);
-    my $isa = join(" ", $classname, @{ $self->{parents} });
-    $isa =~ s/\s?default$//;
-    my $does = join(" ", keys(%{ $self->{flags}{does} }));
-    my $n = exists $self->{has_method}{class_init} ?
-                   $self->{has_method}{class_init} : -1;
-    my $class_init_code = $n >= 0 ? $self->{methods}[$n]{body} : "";
-    $class_init_code =~ s/INTERP/interp/g;
+    if (exists $self->{flags}{has_ro}) {
+        $vtbl_flag .= '|VTABLE_HAS_READONLY_FLAG';
+    }
+
     my $enum_name = $self->{flags}{dynpmc} ? -1 : "enum_class_$classname";
-    $cout .= <<"EOC";
-void
-Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
-{
-    const struct _vtable temp_base_vtable = {
+    my $methlist = join(",\n        ", @$methods);
+    $cout .= <<ENDOFCODE;
+    const struct _vtable $name = {
         NULL,	/* namespace */
         $enum_name,	/* base_type */
         NULL,	/* whoami */
@@ -852,12 +981,61 @@ Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
         NULL,   /* isa_str */
         NULL,   /* class */
         NULL,   /* mro */
+        NULL,   /* ro_variant_vtable */
         $methlist
     };
+ENDOFCODE
+    return $cout;
+}
+
+=item C<init_func()>
+
+Returns the C code for the PMC's initialization method, or an empty
+string if the PMC has a C<no_init> flag.
+
+=cut
+
+sub init_func() {
+    my $self = shift;
+
+    my $cout = "";
+    return "" if exists $self->{flags}{noinit};
+    my ($mmds, $init_mmds, $dyn_mmds) = $self->find_mmd_methods();
+    my $vtable_decl = $self->vtable_decl('temp_base_vtable');
+
+    my $classname = $self->{class};
+
+    my $mmd_list = join(",\n        ", map {
+        "{ $_->[0], $_->[1], $_->[2],
+                    (funcptr_t) $_->[3] }" } @$mmds);
+    my $isa = join(" ", $classname, @{ $self->{parents} });
+    $isa =~ s/\s?default$//;
+    my $does = join(" ", keys(%{ $self->{flags}{does} }));
+    my $n = exists $self->{has_method}{class_init} ?
+                   $self->{has_method}{class_init} : -1;
+    my $class_init_code = $n >= 0 ? $self->{methods}[$n]{body} : "";
+    $class_init_code =~ s/INTERP/interp/g;
+    my $enum_name = $self->{flags}{dynpmc} ? -1 : "enum_class_$classname";
+
+    my %extra_vt;
+
+    if ($self->{ro}) {
+        $extra_vt{ro} = $self->{ro};
+    }
+
+    $cout .= <<"EOC";
+void
+Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
+{
+$vtable_decl
 EOC
 
+    for my $k (keys %extra_vt) {
+        $cout .= $extra_vt{$k}->vtable_decl("temp_${k}_vtable");
+    }
+
     my $const = ($self->{flags}{dynpmc}) ? " " : " const ";
-    if (scalar @mmds) {
+    if (scalar @$mmds) {
         $cout .= <<"EOC";
 
    $const MMD_init _temp_mmd_init[] = {
@@ -878,8 +1056,14 @@ EOC
          */
         struct _vtable *vt_clone =
             Parrot_clone_vtable(interp, &temp_base_vtable);
-
 EOC
+    for my $k (keys %extra_vt) {
+        $cout .= <<"EOC";
+        struct _vtable *vt_${k}_clone =
+            Parrot_clone_vtable(interp, &temp_${k}_vtable);
+EOC
+    }
+
     # init vtable slot
     if ($self->{flags}{dynpmc}) {
         $cout .= <<"EOC";
@@ -902,6 +1086,22 @@ EOC
         vt_clone->does_str = CONST_STRING(interp, "$does");
 EOC
     }
+    for my $k (keys %extra_vt) {
+        $cout .= <<"EOC";
+        vt_${k}_clone->base_type = entry;
+        vt_${k}_clone->whoami = vt_clone->whoami;
+        vt_${k}_clone->isa_str = vt_clone->isa_str;
+        vt_${k}_clone->does_str = vt_clone->does_str;
+EOC
+    }
+
+    if ($extra_vt{ro}) {
+        $cout .= <<"EOC";
+        vt_clone->ro_variant_vtable = vt_ro_clone;
+        vt_ro_clone->ro_variant_vtable = vt_clone;
+EOC
+    }
+        
     $cout .= <<"EOC";
         interp->vtables[entry] = vt_clone;
 EOC
@@ -936,13 +1136,18 @@ EOC
 EOC
     # declare each nci method for this class
     foreach my $method (@{ $self->{methods} }) {
-      next unless $method->{loc} eq 'nci';
-      my $proto = proto($method->{type}, $method->{parameters});
-      $cout .= <<"EOC";
+        next unless $method->{loc} eq 'nci';
+        my $proto = proto($method->{type}, $method->{parameters});
+        $cout .= <<"EOC";
         enter_nci_method(interp, entry,
                 F2DPTR(Parrot_${classname}_$method->{meth}),
                 "$method->{meth}", "$proto");
 EOC
+        if ($method->{attrs}{write}) {
+            $cout .= <<"EOC";
+        Parrot_mark_method_writes(interp, entry, "$method->{meth}");
+EOC
+        }
     }
 
     # include any class specific init code from the .pmc file
@@ -956,14 +1161,14 @@ EOC
 EOC
 
     # declare auxiliary variables for dyncpmc IDs
-    foreach my $dynpmc (keys %init_mmds) {
+    foreach my $dynpmc (@$dyn_mmds) {
         next if $dynpmc eq $classname;
         $cout .= <<"EOC";
             int my_enum_class_$dynpmc = pmc_type(interp, string_from_const_cstring(interp, "$dynpmc", 0));
 EOC
     }
     # init MMD "right" slots with the dynpmc types
-    foreach my $entry (@init_mmds) {
+    foreach my $entry (@$init_mmds) {
         if ($entry->[1] eq $classname) {
             $cout .= <<"EOC";
             _temp_mmd_init[$entry->[0]].right = entry;
@@ -976,13 +1181,13 @@ EOC
         }
     }
     # just to be safe
-    foreach my $dynpmc (keys %init_mmds) {
+    foreach my $dynpmc (@$dyn_mmds) {
         next if $dynpmc eq $classname;
         $cout .= <<"EOC";
             assert(my_enum_class_$dynpmc != enum_class_default);
 EOC
     }
-    if (scalar @mmds) {
+    if (scalar @$mmds) {
         $cout .= <<"EOC";
 #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
             Parrot_mmd_register_table(interp, entry,
@@ -1021,6 +1226,9 @@ sub gen_c {
 	. $self->includes;
     my $l = count_newlines($cout);
     $cout .= $self->methods($l, $out_name);
+    if ($self->{ro}) {
+        $cout .= $self->{ro}->methods($l, $out_name);
+    }
     $cout .= $self->init_func;
     if ($self->{const}) {
         $cout .= $self->{const}->methods($l, $out_name);
@@ -1072,7 +1280,7 @@ of the output file we are generating.
 
 =cut
 
-sub gen_h() {
+sub gen_h {
     my ($self, $out_name) = @_;
 
     my $hout = dont_edit($self->{file});
@@ -1090,9 +1298,10 @@ EOH
 
     $hout .= $self->hdecls();
     if ($self->{const}) {
-        $self = $self->{const};
-        $hout .= "\n/* Const */\n";
-        $hout .= $self->hdecls();
+        $hout .= $self->{const}->hdecls();
+    }
+    if ($self->{ro}) {
+        $hout .= $self->{ro}->hdecls();
     }
     $hout .= <<"EOH";
 
@@ -1224,6 +1433,76 @@ EOC
 
 =back
 
+=head2 Parrot::Pmc2c::Standard::RO Instance Methods
+
+Returns the C code for the method body.
+
+=over 4
+
+=cut
+
+package Parrot::Pmc2c::Standard::RO;
+use base 'Parrot::Pmc2c::Standard';
+import Parrot::Pmc2c qw( gen_ret );
+
+=item C<implements($method)>
+
+Returns true if we implement C<$method>. This is true in the special
+case of C<find_method> and for all read-only methods.
+
+=cut
+
+sub implements {
+    my ($self, $method) = @_;
+    return 1 if $method eq 'find_method';
+    return $self->SUPER::implements($method);
+}
+
+=item C<body($method, $line, $out_name)>
+
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
+
+=cut
+
+sub body
+{
+    my ($self, $method, $line, $out_name) = @_;
+
+    my $meth = $method->{meth};
+    my $decl = $self->decl($self->{class}, $method, 0);
+    my $classname = $self->{class};
+    my $parentname = $self->{parentname};
+    my $ret = gen_ret($method);
+    my $cout;
+
+    if ($meth eq 'find_method') {
+        my $real_findmethod = 'Parrot_' 
+            . $self->{super}{find_method} . '_find_method';
+        $cout = <<"EOC";
+$decl {
+    PMC *const method = $real_findmethod(interpreter, pmc, method_name);
+    if (!PMC_IS_NULL(VTABLE_getprop(interpreter, method, const_string(interpreter, "write"))))
+        return PMCNULL;
+    else
+        return method;
+}
+EOC
+    } else {
+        $cout = <<"EOC";
+$decl {
+    internal_exception(WRITE_TO_CONSTCLASS,
+            "$meth() in read-only instance of $classname");
+    $ret
+}
+EOC
+    }
+    $cout;
+}
+
+=back
+
 =head2 Parrot::Pmc2c::Ref Instance Methods
 
 =over 4
@@ -1243,7 +1522,43 @@ Always true for vtables.
 sub implements
 {
     my ($self, $meth) = @_;
-    $self->implements_vtable($meth);
+    return $self->implements_vtable($meth);
+}
+
+=item C<prederef($method)>
+
+Returns C code to be executed before executing a delegated method.
+Default versions always returns an empty string.
+
+=cut
+
+sub prederef {
+    return '';
+}
+
+=item C<postderef($method)>
+
+Returns C code to be executed after executing a delegated method
+through this reference. Default version returns an empty string.
+
+=cut
+
+sub postderef
+{
+    return '';
+}
+
+=item C<raw_deref($method)>
+
+Returns C code that can be used to access the underlying PMC in the
+delegated methods. Defualt is PMC_pmc_val(pmc)
+
+=cut
+
+sub raw_deref
+{
+    my($self, $method) = @_;
+    return 'PMC_pmc_val(pmc)';
 }
 
 =item C<body($method, $line, $out_name)>
@@ -1267,20 +1582,38 @@ sub body
         my $n = $self->{has_method}{$meth};
         return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
     }
+    my $is_mmd = $method->{mmd} ne "-1";
     my $parameters = $method->{parameters};
     my $n=0;
     my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
     my $arg = '';
     $arg = ", ". join(' ', @args) if @args;
     $parameters = ", $parameters" if $parameters;
-    my $body = "VTABLE_$meth(interpreter, PMC_pmc_val(pmc)$arg)";
-    my $ret = gen_ret($method, $body);
+    my $body;
+    my $pre = $self->prederef($method);
+    my $post = $self->postderef($method);
+    my $deref = $self->raw_deref($method);
+    my $ret_def = '';
+    my $ret_assign = '';
+    my $ret = '';
+    if ($method->{type} ne 'void') {
+        $ret_def = $method->{type} . ' ret_val;';
+        $ret_assign = 'ret_val = ';
+        $ret = gen_ret($method, 'ret_val');
+    }
+    $body = <<EOC;
+    $pre
+    $ret_assign VTABLE_$meth(interpreter, $deref$arg);
+    $post
+EOC
     my $decl = $self->decl($self->{class}, $method, 0);
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive($line, "ref.c");
+    my $l = $self->line_directive($line, "\L$self->{class}.c");
     return <<EOC;
 $l
 $decl {
+    $ret_def
+$body
     $ret
 }
 
@@ -1289,92 +1622,76 @@ EOC
 
 =back
 
-=head2 Parrot::Pmc2c::SharedRef Instance Methods
+=cut
 
-C<SharedRef> is like C<Ref> but with locking.
+package Parrot::Pmc2c::STMRef;
+use base 'Parrot::Pmc2c::Ref';
+
+=head2 Parrot::Pmc2c::STMRef Instance Methods
+
+=over 4
+
+=cut
+
+sub prederef {
+    my ($self, $method) = @_;
+    my $name = $method->{meth};
+    my $code = '';
+    $code .= <<'EOC';
+    PMC *real_pmc;
+    Parrot_STM_PMC_handle handle;
+
+    assert(pmc->vtable->class != pmc);
+
+    handle = PMC_struct_val(pmc);
+EOC
+    if ($self->does_write($name)) { # XXX is this good enough?
+        $code .= <<'EOC';
+    real_pmc = Parrot_STM_begin_update(interpreter, handle);
+EOC
+    } else {
+        $code .= <<'EOC';
+    real_pmc = Parrot_STM_read(interpreter, handle);
+EOC
+    }
+}
+
+sub raw_deref {
+    return 'real_pmc';
+}
+
+=back
+
+=head2 Parrot::Pmc2c::SharedRef Instance Methods
 
 =over 4
 
 =cut
 
 package Parrot::Pmc2c::SharedRef;
-use base 'Parrot::Pmc2c';
+use base 'Parrot::Pmc2c::Ref';
 
-=item C<implements($method)>
+=item C<prederef($method)>
 
-Always true for vtables.
-
-=cut
-
-sub implements
-{
-    my ($self, $meth) = @_;
-    $self->implements_vtable($meth);
-}
-
-=item C<gen_ret($type)>
-
-Generate the C code for a C<return> statement.
+Returns code that will lock the PMC for calling the underlying
+implementation of $method.
 
 =cut
 
-sub gen_ret
-{
-    my ($self, $type) = @_;
-
-    return "ret_val = ";
+sub prederef {
+    my ($self, $method) = @_;
+    return 'LOCK_PMC(interpreter, pmc);'
 }
 
-=item C<body($method, $line, $out_name)>
+=item C<postderef($method)>
 
-Returns the C code for the method body. C<$line> is used to accumulate
-the number of lines, C<$out_name> is the name of the output file we are
-generating.
-
-Overrides the default implementation to perform locking.
+Returns the unlocking code.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
-
-    my $meth = $method->{meth};
-    # existing methods get emitted
-    if ($self->SUPER::implements($meth)) {
-        my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
-    }
-    my $parameters = $method->{parameters};
-    my $n=0;
-    my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
-    my $arg = '';
-    $arg = ", ". join(' ', @args) if @args;
-    $parameters = ", $parameters" if $parameters;
-    my $body = "VTABLE_$meth(interpreter, PMC_pmc_val(pmc)$arg)";
-    my $ret = '';
-    my $decl = $self->decl($self->{class}, $method, 0);
-    my $ret_def = '';
-    my $func_ret = '(void) ';
-    if ($method->{type} ne 'void') {
-        my $type = $method->{type};
-        $ret_def = "$type ret_val;";
-        $func_ret = $self->gen_ret($method->{type});
-        $ret = "return ret_val;";
-    }
-    # I think that these will be out by one - NWC
-    my $l = $self->line_directive($line, "sharedref.c");
-    return <<EOC;
-$l
-$decl {
-    $ret_def
-    LOCK_PMC(interpreter, pmc);
-    $func_ret$body;
-    UNLOCK_PMC(interpreter, pmc);
-    $ret
-}
-
-EOC
+sub postderef {
+    my ($self, $method) = @_;
+    return 'UNLOCK_PMC(interpreter, pmc);'
 }
 
 =back

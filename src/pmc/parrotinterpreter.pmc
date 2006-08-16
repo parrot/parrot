@@ -27,41 +27,100 @@ These are the vtable functions for the ParrotInterpreter base class
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/dynext.h"
 #include <assert.h>
 
 /*
 
 =item C<void
-clone_interpreter(PMC* dest, PMC* self)>
+clone_interpreter(Parrot_Interp dest, const Parrot_Interp source, 
+    Parrot_clone_flags)>
 
-Clones the interpreter.
+Clones the interpreter as specified by the flags.
 
 =cut
 
 */
 
 void
-clone_interpreter(PMC* dest, PMC* self)
+clone_interpreter(Parrot_Interp d, Parrot_Interp s, Parrot_clone_flags flags)
 {
+    /* we block DOD runs while cloning since C<d> is not yet running */
+    Parrot_block_DOD(d);
+    if (flags & PARROT_CLONE_RUNOPS) {
+        d->run_core = s->run_core;
+    }
+    if (flags & PARROT_CLONE_INTERP_FLAGS) {
+        d->flags = s->flags; /* XXX setting of IS_THREAD? */
+        d->debug_flags = s->debug_flags;
+    }
+    if (flags & PARROT_CLONE_HLL) {
+        /* we'd like to share the HLL data. Give it a PMC_sync structure
+           if it doesn't have one already */
+        add_pmc_sync(s, s->HLL_info);
+        d->HLL_info = s->HLL_info;
+        Parrot_regenerate_HLL_namespaces(d);
+    }
+    if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
+        INTVAL i;
+        INTVAL start;
+        INTVAL last_remove;
 
-    Parrot_Interp s = PMC_data(self);
-    Parrot_Interp d;
+        start = d->n_vtable_max;
 
-    d = PMC_data(dest);
+        /* copy type registrations to keep type numbers the same */
+        d->class_hash = Parrot_clone(d, s->class_hash);
+        d->n_vtable_max = s->n_vtable_max;
+        if (d->n_vtable_max > d->n_vtable_alloced) {
+            parrot_realloc_vtables(d);
+        }
 
-    /*
-     * copy over packfile - done currently in the runinterp opcode
-     * for multi-threading we have to generate separate
-     * profile data
-     */
-#if 0
-    pt_clone_code(d, s);
-#endif
-    /*
-     * set flags and run core
-     */
-    d->run_core = s->run_core;
-    d->flags = s->flags;
+        last_remove = s->n_vtable_max;
+        for (i = s->n_vtable_max - 1; i >= start; --i) {
+            if (s->vtables[i] && s->vtables[i]->class &&
+                PObj_is_class_TEST(s->vtables[i]->class)) {
+                STRING *class_name;
+                class_name = VTABLE_name(s, s->vtables[i]->class);
+                assert(VTABLE_exists_keyed_str(d, d->class_hash, class_name));
+                VTABLE_delete_keyed_str(d, d->class_hash, class_name);
+                if (last_remove == i + 1) {
+                    --d->n_vtable_max;
+                    last_remove = i;
+                }
+            }
+        }
+    }
+    if (flags & PARROT_CLONE_LIBRARIES) {
+        PMC *libs;
+        PMC *lib_iter;
+        INTVAL n, i;
+        libs = VTABLE_get_pmc_keyed_int(s, s->iglobals, IGLOBALS_DYN_LIBS);
+        lib_iter = VTABLE_get_iter(s, libs);
+
+        n = VTABLE_elements(s, libs);
+        for (i = 0; i < n; ++i) {
+            STRING * const key = VTABLE_shift_string(s, lib_iter);
+            PMC * const lib_pmc = VTABLE_get_pmc_keyed_str(s, libs, key);
+
+            (void) Parrot_clone_lib_into(d, s, lib_pmc); 
+        }
+    }
+    if (flags & PARROT_CLONE_CLASSES) {
+        INTVAL i;        for (i = 0; i < s->n_vtable_max; ++i) {
+            if (s->vtables[i] && s->vtables[i]->class &&
+                    PObj_is_class_TEST(s->vtables[i]->class)) {
+                /* Cloning the class into the new interpreter ought
+                 * to be sufficient to instantiate the class.
+                 */
+                (void) Parrot_clone(d, s->vtables[i]->class);
+            }  
+        }
+    }
+    if (flags & PARROT_CLONE_CODE)
+        pt_clone_code(d, s);
+    if (flags & PARROT_CLONE_GLOBALS)
+        pt_clone_globals(d, s);
+    Parrot_unblock_DOD(d);
 }
 
 
@@ -99,7 +158,7 @@ recursion_limit(Parrot_Interp interpreter, PMC *self, int l)
     return ret;
 }
 
-pmclass ParrotInterpreter need_ext {
+pmclass ParrotInterpreter need_ext no_ro {
 
 /*
 
@@ -121,29 +180,11 @@ Class initialization.
         int typ = enum_class_ParrotInterpreter;
 
         if (pass) {
-
-            /*
-             * thread start methods for threads type 1..3
-             */
-            enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_run_1), "thread1", "vJOP");
-            enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_run_2), "thread2", "vJOP");
-            enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_run_3), "thread3", "vJOP");
-
             /*
              * TODO unify and fix signatures
              */
             enter_nci_method(INTERP, typ,
                     F2DPTR(pt_thread_yield), "yield", "v");
-            enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_join), "join", "PJi");
-            enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_detach), "detach", "vi");
-            enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_kill), "kill", "vi");
-
             /*
              * misc functions
              */
@@ -171,6 +212,7 @@ Initializes the interpreter.
          */
         if (!PMC_data(SELF)) {
             create_interp(SELF, INTERP);
+            assert(PMC_data(SELF));
         }
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF) = NULL;
@@ -180,7 +222,9 @@ Initializes the interpreter.
 
 =item C<void init_pmc(PMC *parent)>
 
-Initializes a child interpreter with C<*parent>.
+Initializes a child interpreter with C<*parent> if C<parent> is
+a ParrotInterpreter instance. Otherwise takes the thread ID from
+C<parent> and uses that thread.
 
 =cut
 
@@ -188,7 +232,6 @@ Initializes a child interpreter with C<*parent>.
 
     void init_pmc (PMC *parent) {
         Parrot_Interp p = PMC_data(parent);
-
         if (!PMC_data(SELF)) {
             create_interp(SELF, p);
         }
@@ -441,7 +484,7 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 
     PMC* clone() {
         PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
-        clone_interpreter(dest, SELF);
+        clone_interpreter(PMC_data(dest), PMC_data(SELF), PARROT_CLONE_DEFAULT);
         return dest;
     }
 
@@ -614,4 +657,4 @@ Finish thawing.
  * End:
  *
  * vim: expandtab shiftwidth=4:
-*/
+    */

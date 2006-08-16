@@ -18,5 +18,9 @@ Parrot_init_lib(Interp *interpreter,
                 PMC *(*load_func)(Interp *),
                 void (*init_func)(Interp *, PMC *));
 
+/* for cloning live iterpreters to create new threads */
+PARROT_API PMC *
+Parrot_clone_lib_into(Interp *dest_interp, Interp *source_interp, PMC *lib_pmc);
+
 #endif /* PARROT_DYNEXT_H_GUARD */
 

@@ -83,6 +83,38 @@ STRING_compare(Parrot_Interp interp, void *a, void *b)
 
 /*
 
+=item C<static int
+pointer_compare(Parrot_Interp interp, void *a, void *b)>
+
+Compares the two pointers, returning 0 if they are identical
+
+=cut
+
+*/
+
+static int
+pointer_compare(Parrot_Interp interp, void *a, void *b) {
+    return a != b;
+}
+
+/*
+=item C<static size_t
+key_hash_pointer(Interp *interpreter, void *value, size_t seed)>
+
+Returns a hashvalue for a pointer.
+
+=cut
+*/
+
+static size_t
+key_hash_pointer(Interp *interpreter, void *value, size_t seed) {
+    return ((size_t) value) ^ seed;
+}
+
+
+
+/*
+
 =item C<static size_t
 key_hash_cstring(Interp *interpreter, void *value, size_t seed)>
 
@@ -620,6 +652,25 @@ parrot_new_pmc_hash_x(Interp *interpreter, PMC *container,
     init_hash(interpreter, hash, val_type, hkey_type,
             compare, keyhash);
 }
+
+/*
+
+=item C<void
+parrot_new_pointer_hash(Interp *interpreter, Hash **hptr)>
+
+Create a new HASH with void * keys and values.
+
+=cut
+*/
+
+void
+parrot_new_pointer_hash(Interp *interpreter, Hash **hptr)
+{
+   parrot_new_hash_x(interpreter, hptr, enum_type_ptr, Hash_key_type_ptr,
+                        pointer_compare, key_hash_pointer);
+}
+
+
 
 /*
 

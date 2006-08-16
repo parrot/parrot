@@ -22,7 +22,8 @@ typedef enum {
     enum_hash_int = enum_type_INTVAL,
     enum_hash_num = enum_type_FLOATVAL,
     enum_hash_string = enum_type_STRING,
-    enum_hash_pmc = enum_type_PMC
+    enum_hash_pmc = enum_type_PMC,
+    enum_hash_ptr = enum_type_ptr
 } HashEntryType;
 
 /*
@@ -45,7 +46,8 @@ typedef enum {
     Hash_key_type_int,
     Hash_key_type_cstring,
     Hash_key_type_STRING,
-    Hash_key_type_PMC
+    Hash_key_type_PMC,
+    Hash_key_type_ptr,
 } Hash_key_type;
 
 typedef struct _hashbucket {
@@ -77,6 +79,7 @@ void parrot_new_hash_x(Interp *, Hash**, PARROT_DATA_TYPES,
 void parrot_new_pmc_hash_x(Interp *, PMC*, PARROT_DATA_TYPES,
         Hash_key_type, hash_comp_fn, hash_hash_key_fn);
 PARROT_API void parrot_new_cstring_hash(Interp *interpreter, Hash **);
+PARROT_API void parrot_new_pointer_hash(Interp *interpreter, Hash **);
 
 PARROT_API PMC* Parrot_new_INTVAL_hash(Interp *interpreter, UINTVAL flags);
 

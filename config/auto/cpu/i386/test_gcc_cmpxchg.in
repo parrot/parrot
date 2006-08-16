@@ -1,0 +1,46 @@
+/*
+ * test for cmpxchg support with gcc-style inline ASM
+ */
+#include <assert.h> 
+#include <stdlib.h>
+
+#include <stdio.h>
+
+inline static void *docmpxchg(void **ptr, void *old, void *new) {
+    __asm__ __volatile__("lock\n"
+                         "cmpxchgl %1,%2" : "=a"(old) : "q"(new), "m"(*ptr), "0" (old) 
+                        : "memory");
+    return old;
+}
+
+int main(void) {
+    char dummy[] = "some string";
+    char *old;
+    char *new;
+    char *atomic;
+    atomic = dummy;
+    new = dummy + 1;
+    old = dummy;
+
+    old = docmpxchg((void **)&atomic, old, new);
+    
+
+#ifdef DEBUG_CMPXCHG_TEST
+    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, old, new);
+#endif
+    if (atomic != new) {
+        return EXIT_FAILURE;
+    }
+
+    old = docmpxchg((void **)&atomic, old, new);
+#ifdef DEBUG_CMPXCHG_TEST
+    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, old, new);
+#endif
+    if (old != new) {
+        return EXIT_FAILURE;
+    }
+
+    puts("ok");
+
+    return EXIT_SUCCESS;
+}

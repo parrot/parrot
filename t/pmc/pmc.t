@@ -116,6 +116,7 @@ while (my ($type, $id) = each %pmc_types) {
     next if $type eq "Iterator";   # these need an initializer
     next if $type eq "Enumerate";
     next if $type eq "Ref";
+    next if $type eq "STMRef";
     next if $type eq "SharedRef";
     next if $type eq "ParrotObject";
     next if $type eq "deleg_pmc";

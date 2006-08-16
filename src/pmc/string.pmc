@@ -863,6 +863,14 @@ Checks if the ascii STRING C<str> is just an integer.
         else
             return (INTVAL)(0);
     }
+
+    PMC* share_ro() {
+        PMC *ret;
+        ret = SUPER();
+        /* prevent wrong garbage collection */
+        PObj_is_shared_SET(PMC_str_val(SELF));
+        return ret;
+    }
 }
 
 /*

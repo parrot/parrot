@@ -1,0 +1,218 @@
+# Copyright (C) 2006 The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+Software Transactional Memory Frontend
+
+=head1 ABSTRACT
+
+Describes interfaces for Software Transactional Memory within Parrot.
+
+=head1 VERSION
+
+$Revision: 11771 $
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Software transactional memory provides a transaction-like interface to
+shared data. This document describes an interface through which Parrot's
+STM implementation can be used from PIR and PASM. Functionality necessary
+to start, commit, abort, and retry transactions and to wrap PMCs for
+transactional access is supplied.
+
+B<TODO>: Deal with issues like exceptions in the middle of transactions.
+(Presumably can be dealt with on top of what's already here)
+
+=head1 DEFINITIONS
+
+A B<transaction> is a sequence of a reads and writes from STM-controlled
+variables that appears, as far reads and writes to those variables
+are concerned, to happen either all at once or not at all. Transactions
+may, in actuality, need to be retried to perform that effect and the STM
+implementation makes no effort to ensure that each attempt does not have
+other side effects -- this functionality, if provided, is the responsibility
+of the language implementation. The effects of a transaction that has 
+committed will be seen by all future transactions, and no transaction
+will see the effects of an aborted transaction.
+
+A transaction is B<valid> only if an attempt to commit it might succeed.
+(Thus, an invalid transaction is guaranteed to fail to commit. A valid
+transaction will commit in the absence of activity in other threads.)
+
+Transactions can be nested. Nested transactions may be called inner 
+transactions below and the transactions enclosing them outer transactions.
+If an inner transaction commits, its effects are still not seen globally until
+the corresponding outer transaction commits.
+
+=head1 IMPLEMENTATION
+
+=head2 Ops
+
+Ops that require a transaction to be open will throw an exception
+if there is no transaction in progress. 
+
+=over 4
+
+=item stm_start
+
+Starts a transaction.
+
+=item stm_validate INVALID
+
+Jumps to the label INVALID if the current transaction is not valid.
+
+=item stm_commit RETRY
+
+Commits the most recently opened transaction. Jumps to RETRY if the
+commit fails. (If the outer transaction is invalid, this should succeed
+always.)
+
+=item stm_wait INVALID_OUTER
+
+Aborts the current transaction, then waits for some value it read
+to have changed.  If the outer transaction is invalid after
+waiting or after the inner transaction is aborted, jumps to INVALID_OUTER.
+If nested transactions are allowed, then either this variant should be used
+or the simpler stm_wait should be followed by an explicit stm_validate.
+
+(This check is needed because the inner transaction may never succeed because
+the outer transaction constrains it to not see new values.) 
+
+=item stm_abort
+
+Aborts the most recently opened transaction. Always succeeds (if there is such
+a transaction).
+
+=item stm_depth I<INT>
+
+Returns how deeply nested in transactions the current thread is. The number
+of transactions active in the current thread is assigned to the integer
+register (0 if the current thread is outside any transaction).
+
+=back
+
+=head2 STMVar PMC
+
+The STMVar type wraps a variable managed by the transactional system. Unlike
+STMRef (below), it does not attempt to make the transactions transparent. 
+
+STMVars are safe to pass between threads.
+
+=head3 Constructors
+
+=over 4
+
+=item new .STMVar
+
+Creates a new variable. Its initial value will be the NULL PMC.
+
+=item new .STMVar, Px
+
+If Px is an STMRef, creates an STMVar instance referring to the same variable
+as the STMRef. Otherwise, creates a new variable whose initial value Px.
+
+=back
+
+=head3 Methods
+
+=over 4
+
+=item get_read
+
+Returns some copy of the stored PMC for reading only. The PMC is not
+(guaranteed to be) protected from modification, but modifying it should be
+considered dangerous.
+
+=item get_update
+
+Returns some copy of the stored PMC suitable for modification. The value
+of the PMC at the time the transaction commits will be stored if the
+transaction commits. The PMC should not be used after the transaction commits.
+
+=item set(PMC)
+
+Sets the value of the stored PMC to the supplied PMC. This is safe to call
+if there is no active transaction.
+
+=back
+
+=head2 STMRef PMC
+
+The STMRef type is like Ref (that is, its default implementation of everything
+delegates) but is a reference to a variable managed by STM. Unlike, STMVar
+it provides transparent access to the underlying value. STMRef
+assumes that operations that do not ordinarily result in a write (e.g. get_keyed)
+will not result in a write. If this is not so, the below methods must be used.
+STMRefs can be passed between threads safely.
+
+STMRefs are safe to pass between threads.
+
+=head3 Constructors
+
+=over 4
+
+=item new Px, .STMRef
+
+Creates a new transactionally managed variable which initially contains
+a clone of Px.
+
+=item new Px, .STMRef, Py
+
+If Py is an STMVar, creates an STMRef referring the same variable as Py.
+Otherwise, creates a new STM-managed variable which initially contains
+a clone of Py.
+
+=back
+
+=head3 Reference operations
+
+=over 4
+
+=item setref ref, Px
+
+Changes the wrapped PMC without invoking the PMC's set, etc. methods.
+
+=item deref ref, Px
+
+Produces a copy of the value stored. The state of this copy as of the end
+of transaction will be reflected when the transaction commits. This copy
+should not be used after the transaction commits.
+
+=back
+
+=head1 STMLog PMC
+
+The STMLog PMC allows a transaction log to be saved in memory and then replayed
+later. Currently, only replaying for the purpose of then using C<stm_wait> is
+supported.
+
+=head3 Constructors
+
+=over 4
+
+=item new Px, .STMLog
+
+Copies the current transaction into C<Px>. If there is no active transaction, 
+C<Px> holds an empty transaction.
+
+=back
+
+=head3 Methods
+
+=over 4
+
+=item C<replay()>
+
+Replays the saved transaction log into the current transaction. It is an error
+to use this outside of a transaction. Replaying may invalidate the current
+transaction.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:

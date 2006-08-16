@@ -51,7 +51,7 @@ set_cstring_prop(Parrot_Interp interpreter, PMC *lib_pmc, const char *what,
 
 =item C<static void
 store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
-        STRING *type)>
+        STRING *type, STRING *lib_name)>
 
 Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 
@@ -61,16 +61,18 @@ Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 
 static void
 store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
-        STRING *type)
+        STRING *type, STRING *lib_name)
 {
     PMC * const iglobals = interpreter->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_DYN_LIBS);
+
     /*
      * remember path/file in props
      */
     set_cstring_prop(interpreter, lib_pmc, "_filename", path);  /* XXX */
     set_cstring_prop(interpreter, lib_pmc, "_type", type);
+    set_cstring_prop(interpreter, lib_pmc, "_lib_name", lib_name);
     VTABLE_set_pmc_keyed_str(interpreter, dyn_libs, path, lib_pmc);
 }
 
@@ -217,7 +219,7 @@ Parrot_init_lib(Interp *interpreter,
                 void (*init_func)(Interp *, PMC *))
 {
     PMC *lib_pmc = NULL;
-
+    
     if (load_func)
         lib_pmc = (*load_func)(interpreter);
 
@@ -240,38 +242,13 @@ Parrot_init_lib(Interp *interpreter,
     return lib_pmc;
 }
 
-PMC *
-Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
-{
+static PMC *
+run_init_lib(Interp *interpreter, void *handle, STRING *lib_name, STRING *wo_ext) {
     STRING *path, *load_func_name, *init_func_name, *type;
-    void * handle;
     PMC *(*load_func)(Interp *);
     void (*init_func)(Interp *, PMC *);
     char *cinit_func_name, *cload_func_name;
     PMC *lib_pmc;
-    STRING *lib_name, *wo_ext, *ext;	/* library stem without path or extension.  */
-
-    UNUSED(initializer);
-    /* Find the pure library name, without path or extension.  */
-    /*
-     * TODO move the class_count_mutex here
-     *
-     * LOCK()
-     */
-    lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
-    lib_pmc = is_loaded(interpreter, wo_ext);
-    if (lib_pmc) {
-	/* UNLOCK() */
-        return lib_pmc;
-    }
-    path = get_path(interpreter, lib, &handle, wo_ext, ext);
-    if (!path || !handle) {
-        /*
-         * XXX internal_exception? return PMCNULL?
-         * PMC Undef seems convenient, because it can be queried with get_bool()
-         */
-        return pmc_new(interpreter, enum_class_Undef);
-    }
 
     /*
      * work around gcc 3.3.3 and other problem with dynpmcs
@@ -308,9 +285,120 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     /*
      * remember lib_pmc in iglobals
      */
-    store_lib_pmc(interpreter, lib_pmc, wo_ext, type);
+    store_lib_pmc(interpreter, lib_pmc, wo_ext, type, lib_name);
     /* UNLOCK */
     Parrot_unblock_DOD(interpreter);
+
+    return lib_pmc;
+}
+
+static 
+STRING *clone_string_into(Interp *d, Interp *s, PMC *value) {
+    STRING *orig;
+    STRING *ret;
+    char *raw_str;
+    orig = VTABLE_get_string(s, value);
+    raw_str = string_to_cstring(s, orig);
+    ret = string_make_direct(d, raw_str, strlen(raw_str),
+            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+            PObj_constant_FLAG);
+    string_cstring_free(raw_str);
+    return ret;
+}
+
+static PMC *make_string_pmc(Interp *interp, STRING *string) {
+    PMC *ret;
+    ret = VTABLE_new_from_string(interp, 
+        interp->vtables[enum_class_String]->class,
+        string, PObj_constant_FLAG);
+    return ret;
+}
+
+PMC *
+Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
+    STRING *wo_ext;
+    STRING *lib_name;
+    STRING *type;
+    void *handle;
+
+    wo_ext = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc, 
+        const_string(s, "_filename")));
+    lib_name = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc, 
+        const_string(s, "_lib_name")));
+    handle = PMC_data(lib_pmc);
+
+    type = VTABLE_get_string(s, 
+        VTABLE_getprop(s, lib_pmc, const_string(s, "_type")));
+    if (0 == string_equal(s, type, const_string(s, "Ops"))) {
+        PMC *new_lib_pmc;
+        INTVAL i;
+
+        /* we can't clone oplibs in the normal way, since they're actually
+         * shared between interpreters dynop_register modifies the (statically
+         * allocated) op_lib_t structure from core_ops.c, for example.
+         * Anyways, if we hope to share bytecode at runtime, we need to have 
+         * them have identical opcodes anyways.
+         */
+        new_lib_pmc = constant_pmc_new(d, enum_class_ParrotLibrary);
+        PMC_data(new_lib_pmc) = handle;
+        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_filename"), 
+            make_string_pmc(d, wo_ext));
+        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_lib_name"), 
+            make_string_pmc(d, lib_name));
+        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_type"), 
+            make_string_pmc(d, const_string(d, "Ops")));
+
+        /* fixup d->all_op_libs, if necessary */
+        if (d->n_libs != s->n_libs) {
+            INTVAL i;
+            if (d->all_op_libs)
+                d->all_op_libs = mem_sys_realloc(d->all_op_libs,
+                    sizeof(op_lib_t *) * s->n_libs);
+            else
+                d->all_op_libs = mem_sys_allocate(sizeof(op_lib_t *) * 
+                    s->n_libs);
+            for (i = d->n_libs; i < s->n_libs; ++i)
+                d->all_op_libs[i] = s->all_op_libs[i];
+            d->n_libs = s->n_libs;
+        }
+
+        return new_lib_pmc;
+    } else {
+        return run_init_lib(d, handle, lib_name, wo_ext);
+    }
+}
+
+PMC *
+Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
+{
+    void * handle;
+    PMC *lib_pmc;
+    STRING *path;
+    STRING *lib_name, *wo_ext, *ext;	/* library stem without path or extension.  */
+
+    UNUSED(initializer);
+    /* Find the pure library name, without path or extension.  */
+    /*
+     * TODO move the class_count_mutex here
+     *
+     * LOCK()
+     */
+    lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
+    lib_pmc = is_loaded(interpreter, wo_ext);
+    if (lib_pmc) {
+	/* UNLOCK() */
+        return lib_pmc;
+    }
+    path = get_path(interpreter, lib, &handle, wo_ext, ext);
+    if (!path || !handle) {
+        /*
+         * XXX internal_exception? return PMCNULL?
+         * PMC Undef seems convenient, because it can be queried with get_bool()
+         */
+        return pmc_new(interpreter, enum_class_Undef);
+    }
+
+    lib_pmc = run_init_lib(interpreter, handle, lib_name, wo_ext);
     return lib_pmc;
 }
 

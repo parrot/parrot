@@ -20,7 +20,7 @@ These is an Iterator return [idx, item] tuples.
 
 #include "parrot/parrot.h"
 
-pmclass Enumerate extends Iterator {
+pmclass Enumerate extends Iterator no_ro {
 
     void init_pmc(PMC* iterable) {
         SUPER(iterable);

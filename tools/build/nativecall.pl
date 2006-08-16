@@ -82,7 +82,13 @@ my %proto_type =
        B => "void **",
        L => "long *",
        T => "char **",
+       '@'=>"PMC *", # slurpy array
      );
+
+# to fix up signatures that don't translate directly
+# to C function names
+my %fix_name =
+    ( '@' => 'xAT_' );
 
 my %other_decl =
      ( p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
@@ -175,6 +181,7 @@ my %sig_char =
        B => "S",
        v => "v",
        J => "",
+       '@'=>'@',
      );
 
 my $temp_cnt = 0;
@@ -477,7 +484,7 @@ sub make_arg {
     /J/ && do {
         return "interpreter";
     };
-    /[OP]/ && do {
+    /[OP\@]/ && do {
         push @{$temps_ref}, "PMC *t_$temp_num;";
         push @{$extra_preamble_ref},
             "t_$temp_num = GET_NCI_P($reg_num);";
@@ -508,6 +515,7 @@ sub print_function {
     my $return_data     = "$return_assign $final_assign" =~ /return_data/ ?
                               qq{$ret_type_decl return_data;} :
                               q{};
+    my $fix_params = join '', map { $fix_name{$_} || $_ } split //, $params;
 
     if (length $params) {
         my $proto = join ', ', map { $proto_type_ref->{$_} } split( '', $params );
@@ -533,9 +541,10 @@ sub print_function {
                                 . "$temp[$_]->[1];"
                         } @tempi);
         my $temp_out  = join("\n    ", map { "$temp[$_]->[1] = arg$_;"} @tempi);
+
         print NCI << "HEADER";
 static void
-pcf_${return}_$params(Interp *interpreter, PMC *self)
+pcf_${return}_$fix_params(Interp *interpreter, PMC *self)
 {
     typedef $ret_type (*func_t)($proto);
     func_t pointer;
@@ -578,7 +587,7 @@ HEADER
     }
 
     my ($key, $value) = (defined $params ?
-        ( "$return$params", "pcf_${return}_$params" ) :
+        ( "$return$params", "pcf_${return}_$fix_params" ) :
         ( "$return", "pcf_${return}" ));
 
     push @{$put_pointer_ref}, << "PUT_POINTER";

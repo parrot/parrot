@@ -48,7 +48,7 @@ enum {
 
 #define FPA_is_ns_ext PObj_private0_FLAG
 
-pmclass NameSpace extends Hash need_ext {
+pmclass NameSpace extends Hash need_ext no_ro {
 
 /*
 

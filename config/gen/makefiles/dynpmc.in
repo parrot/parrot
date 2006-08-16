@@ -15,6 +15,7 @@ O           = @o@
 PMCS = \
   dynlexpad \
   foo \
+  rotest \
 #CONDITIONED_LINE(has_gdbm):gdbmhash \
   match \
   matchrange \

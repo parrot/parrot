@@ -129,6 +129,11 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
              */
             struct Small_Object_Pool * const ext_pool =
                 interpreter->arena_base->pmc_ext_pool;
+            if (PObj_is_PMC_shared_TEST(pmc) && PMC_sync(pmc)) {
+                MUTEX_DESTROY(PMC_sync(pmc)->pmc_lock);
+                mem_internal_free(PMC_sync(pmc));
+                PMC_sync(pmc) = NULL;
+            }
             ext_pool->add_free_object(interpreter, ext_pool, pmc->pmc_ext);
         }
         pmc->pmc_ext = NULL;
@@ -220,7 +225,7 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
         if (vtable->flags & VTABLE_IS_SHARED_FLAG)
             flags |= PObj_is_PMC_shared_FLAG;
     }
-
+ 
     pmc = new_pmc_header(interpreter, flags);
     if (!pmc) {
         internal_exception(ALLOCATION_ERROR,
@@ -404,7 +409,6 @@ pmc_type(Interp* interpreter, STRING *name)
     if (!PMC_IS_NULL(item))
         return PMC_int_val((PMC*) item);
     return Parrot_get_datatype_enum(interpreter, name);
-
 }
 
 INTVAL
@@ -429,6 +433,15 @@ create_class_pmc(Interp *interpreter, INTVAL type)
      * create a constant PMC
      */
     PMC * const class = get_new_pmc_header(interpreter, type, PObj_constant_FLAG);
+    /* If we are a second thread, we may get the same object as the original
+     * because we have a singleton. Just set the singleton to be our class
+     * object, but don't mess with its vtable.
+     */
+    if ((interpreter->vtables[type]->flags & VTABLE_PMC_IS_SINGLETON)
+        && (class == class->vtable->class)) {
+        interpreter->vtables[type]->class = class;
+        return class;
+    }
     if (PObj_is_PMC_EXT_TEST(class)) {
         /* if the PMC has a PMC_EXT structure,
          * return it to the pool/arena
@@ -436,12 +449,16 @@ create_class_pmc(Interp *interpreter, INTVAL type)
          */
         struct Small_Object_Pool * const ext_pool =
             interpreter->arena_base->pmc_ext_pool;
+        if (PMC_sync(class))
+            mem_internal_free(PMC_sync(class));
         ext_pool->add_free_object(interpreter, ext_pool, class->pmc_ext);
     }
     class->pmc_ext = NULL;
     DOD_flag_CLEAR(is_special_PMC, class);
     PMC_pmc_val(class)   = (void*)0xdeadbeef;
     PMC_struct_val(class)= (void*)0xdeadbeef;
+
+    PObj_is_PMC_shared_CLEAR(class);
 
     interpreter->vtables[type]->class = class;
 
@@ -473,6 +490,9 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
         return;
     mro = pmc_new(interpreter, enum_class_ResizablePMCArray);
     vtable->mro = mro;
+    if (vtable->ro_variant_vtable) {
+        vtable->ro_variant_vtable->mro = mro;
+    }
     class_name = vtable->whoami;
     isa = vtable->isa_str;
     total = (INTVAL)string_length(interpreter, isa);

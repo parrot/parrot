@@ -116,6 +116,7 @@ allocating a new buffer.
 
 */
 
+extern int Parrot_in_memory_pool(Interp *, void *);
 STRING *
 Parrot_make_COW_reference(Interp *interpreter, STRING *s)
 {
@@ -138,6 +139,17 @@ Parrot_make_COW_reference(Interp *interpreter, STRING *s)
         PObj_COW_SET(s);
         copy_string_header(d, s);
         PObj_sysmem_CLEAR(d);
+#if 0
+        /* XXX FIXME hack to avoid cross-interpreter issue until it
+         * is fixed correctly. */
+        if (n_interpreters > 1 && PObj_is_movable_TESTALL(s) &&
+                !Parrot_in_memory_pool(interpreter, PObj_bufstart(s))) {
+            Parrot_unmake_COW(interpreter, d);
+            PIO_eprintf(interpreter, "cross-interpreter copy of "
+                                     "relocatable string '%Ss' into tid %d\n", d,
+                                     interpreter->thread_data->tid);
+        }
+#endif
     }
     return d;
 }

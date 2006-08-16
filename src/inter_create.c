@@ -250,7 +250,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
      * destruction.
      * Threaded interpreters are destructed when the thread ends
      */
-    if (!Interp_flags_TEST(interpreter, PARROT_IS_THREAD))
+    if (!Interp_flags_TEST(interpreter, PARROT_IS_THREAD)) 
         Parrot_on_exit(interpreter, Parrot_really_destroy, NULL);
 #endif
 
@@ -284,7 +284,7 @@ Parrot_destroy(Interp *interpreter)
 /*
 
 =item C<void
-Parrot_really_destroy(int exit_code, void *vinterp)>
+Parrot_really_destroy(Interp *interpreter, int exit_code, void *arg)>
 
 Waits for any threads to complete, then frees all allocated memory, and
 closes any open file handles, etc.
@@ -320,6 +320,13 @@ Parrot_really_destroy(Interp *interpreter, int exit_code, void *arg)
         interpreter->arena_base->GC_block_level = 0;
     Parrot_do_dod_run(interpreter, DOD_finish_FLAG);
 
+#if STM_PROFILE
+    if (interpreter->thread_data && interpreter->thread_data->stm_log &&
+            !interpreter->parent_interpreter &&
+                Interp_debug_TEST(interpreter, PARROT_THREAD_DEBUG_FLAG))
+        Parrot_STM_dump_profile(interpreter);
+#endif
+
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
      * so if such a PMC needs destroy, we got a memory leak, like for
@@ -347,8 +354,34 @@ Parrot_really_destroy(Interp *interpreter, int exit_code, void *arg)
                 Interp_flags_TEST(interpreter, PARROT_DESTROY_FLAG)))
         return;
 
+    if (interpreter->thread_data && interpreter->thread_data->stm_log) {
+        while (Parrot_STM_transaction_depth(interpreter) > 0) {
+            /* XXX */
+            fprintf(stderr, "interpreter %p had pending transaction on exit\n",
+                    interpreter);
+            Parrot_STM_abort(interpreter);
+        }
+#if STM_PROFILE
+        if (interpreter->parent_interpreter 
+            && interpreter->thread_data->state & THREAD_STATE_JOINED)
+            Parrot_STM_merge_profile(interpreter->parent_interpreter, interpreter);
+#endif
+        Parrot_STM_destroy(interpreter);
+    }
+
+    if (interpreter->parent_interpreter &&
+        interpreter->thread_data &&
+        (interpreter->thread_data->state & THREAD_STATE_JOINED)) {
+        Parrot_merge_header_pools(interpreter->parent_interpreter, interpreter);
+        Parrot_merge_memory_pools(interpreter->parent_interpreter, interpreter);
+    }
+
     if (interpreter->arena_base->de_init_gc_system)
         interpreter->arena_base->de_init_gc_system(interpreter);
+
+    /* copies of constant tables */
+    Parrot_destroy_constants(interpreter);
+
     /* buffer headers, PMCs */
     Parrot_destroy_header_pools(interpreter);
     /* memory pools in resources */

@@ -48,13 +48,24 @@ my $type_re = make_re('(?:(?:struct\s+)|(?:union\s+))?'.$ident_re.'\**');
 my $param_re = make_re($type_re.'\s+'.$ident_re);
 my $arglist_re = make_re('(?:'.$param_re.'(?:\s*,\s*'.$param_re.')*)?');
 my $method_re = make_re('^\s*('.$type_re.')\s+('.$ident_re.')\s*\(('.$arglist_re.')\)\s*$');
+my $attrs_re = make_re('(?::(\w+)\s*)*');
+my $attr_re = make_re(':(\w+)\s*');
 
+
+sub parse_attrs {
+    my $attrs = shift;
+    my $default = shift || {};
+
+    my $result = { %$default };
+    $result->{$1} = 1 while $attrs =~ /$attr_re/g;
+    return $result;
+} 
 
 =item C<parse_vtable($file)>
 
 Returns a reference to an array containing
 
-  [ return_type method_name parameters section MMD_type ]
+  [ return_type method_name parameters section MMD_type attributes ]
 
 for each vtable method defined in C<$file>. If C<$file> is unspecified it
 defaults to F<vtable.tbl>.  If it is not an MMD method, C<MMD_type> is -1.
@@ -69,22 +80,24 @@ sub parse_vtable {
         die "Can't open $file for reading: $!\n";
     my $section = 'MAIN';
 
+    my $default_attrs = {};
     while(<$fh>) {
-
         chomp;
 
         next if /^\s*#/ or /^\s*$/;
 
-    if (/^\[(\w+)\]/) {
-        $section = $1;
-    }
+        if (/^\[(\w+)\]\s*($attrs_re)/) {
+            $section = $1;
+            $default_attrs = parse_attrs($2);
+        }
         elsif (m/^\s*
             ($type_re)\s+
             ($ident_re)\s*
         \(($arglist_re)\)
-        (?:\s+(MMD_\w+))?\s*$/x) {
-        my $mmd = defined $4 ? $4 : -1;
-            push @{$vtable}, [ $1, $2, $3, $section, $mmd ];
+        (?:\s+(MMD_\w+))?\s*($attrs_re)$/x) {
+            my $mmd = defined $4 ? $4 : -1;
+
+            push @{$vtable}, [ $1, $2, $3, $section, $mmd, parse_attrs($5, $default_attrs) ];
         } else {
             die "Syntax error at $file line ".$fh->input_line_number()."\n";
         }
@@ -136,7 +149,9 @@ typedef enum {
     VTABLE_DATA_IS_PMC   = 0x08,
     VTABLE_PMC_IS_SINGLETON = 0x10,
     VTABLE_IS_SHARED_FLAG   = 0x20,
-    VTABLE_IS_CONST_PMC_FLAG = 0x40
+    VTABLE_IS_CONST_PMC_FLAG = 0x40,
+    VTABLE_HAS_READONLY_FLAG = 0x80,
+    VTABLE_IS_READONLY_FLAG = 0x100
 } vtable_flags_t;
 
 struct _vtable {
@@ -149,6 +164,8 @@ struct _vtable {
     PMC *class;              /* for PMCs: a PMC of that type
                                 for objects: the class PMC */
     PMC *mro;                /* array PMC of [class, parents ... ] */
+    struct _vtable *ro_variant_vtable; /* A varient of this vtable with the
+                                   opposite IS_READONLY flag */
     /* Vtable Functions */
 
 EOF
@@ -226,6 +243,7 @@ static const char * const Parrot_vtable_slot_names[] = {
     "",     /* space-separated list of classes */
     "",     /* class */
     "",     /* mro */
+    "",     /* ro_variant_vtable */
 
     /* Vtable Functions */
 EOM

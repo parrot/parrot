@@ -610,7 +610,7 @@ calc_offsets(Interp* interpreter, PMC* pmc, PMC *value, size_t toff)
     return toff;
 }
 
-pmclass UnManagedStruct extends default need_ext {
+pmclass UnManagedStruct extends default need_ext no_ro {
 
 /*
 

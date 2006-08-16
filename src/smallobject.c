@@ -209,7 +209,7 @@ Adds the memory between C<start> and C<end> to the free list.
 
 */
 
- void
+void
 Parrot_add_to_free_list(Interp *interpreter,
         struct Small_Object_Pool *pool,
         struct Small_Object_Arena *arena,
@@ -376,6 +376,7 @@ gc_ms_alloc_objects(Interp *interpreter, struct Small_Object_Pool *pool)
         end = 1024*2;
         assert(end < pool->objects_per_alloc);
     }
+    
     /* Hook up the new object block into the object pool */
     Parrot_append_arena_in_pool(interpreter, pool, new_arena, size);
 
@@ -499,6 +500,75 @@ Parrot_gc_ms_init(Interp* interpreter)
     arena_base->do_dod_run = Parrot_dod_ms_run;
     arena_base->de_init_gc_system = (void (*)(Interp*)) NULLfunc;
     arena_base->init_pool = gc_ms_pool_init;
+}
+
+/*
+
+=item C<void
+Parrot_small_object_pool_merge(Interp *interpreter, 
+            struct Small_Object_Pool *dest, struct Small_Object_Pool *source)>
+
+Merge C<source> into C<dest>.
+
+=cut
+
+*/
+
+void
+Parrot_small_object_pool_merge(Interp *interpreter, 
+        struct Small_Object_Pool *dest, struct Small_Object_Pool *source) {
+    struct Small_Object_Arena *cur_arena;
+    struct Small_Object_Arena *next_arena;
+    void **free_list_end;
+
+    /* XXX num_free_objects doesn't seem to be accounted correctly in, e.g.,
+     * the PMC_EXT pool.
+     */
+#if 0
+    if (source->num_free_objects == source->total_objects) {
+        return;
+    }
+#endif
+
+    /* assert(source->total_objects); */
+    assert(dest->object_size == source->object_size);
+    assert((dest->name == NULL && source->name == NULL) || 
+        0 == strcmp(dest->name, source->name));
+
+    dest->total_objects += source->total_objects;
+
+    /* append new free_list to old */
+    /* XXX this won't work with, e.g., gc_gms */
+    free_list_end = &dest->free_list;
+    while (*free_list_end) {
+        free_list_end = *free_list_end;
+    }
+    *free_list_end = source->free_list;
+
+    /* now append source arenas */
+    cur_arena = source->last_Arena;
+    while (cur_arena) {
+        size_t total_objects;
+        next_arena = cur_arena->prev;
+        cur_arena->next = cur_arena->prev = NULL;
+
+        total_objects = cur_arena->total_objects;
+
+        Parrot_append_arena_in_pool(interpreter, dest, cur_arena, 
+            cur_arena->total_objects);
+
+        cur_arena->total_objects = total_objects; /* XXX needed? */
+
+        cur_arena = next_arena;
+    }
+    
+    /* remove things from source */
+    /* XXX is this enough? */
+    source->last_Arena = NULL;
+    source->free_list = NULL;
+    source->total_objects = 0;
+    source->num_free_objects = 0;
+
 }
 /*
 

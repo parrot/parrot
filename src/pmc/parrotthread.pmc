@@ -47,14 +47,68 @@ and these methods:
 static void
 stop_GC(Interp* parent, Interp *thread)
 {
+#if 0
     Parrot_block_DOD(parent);
     Parrot_block_DOD(thread);
     Parrot_block_GC(parent);
     Parrot_block_GC(thread);
+#endif
+}
+
+/* XXX FIXME probably not the best interface [see also list post of
+   coke's]
+ */
+
+static INTVAL 
+do_thread_run(Interp *interpreter, PMC *thread, INTVAL clone_flags, PMC *sub, PMC *args) {
+    INTVAL tid;
+
+    tid = VTABLE_get_integer(interpreter, thread);
+    clone_interpreter(PMC_data(thread), interpreter, clone_flags);
+    interpreter->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
+    pt_thread_run(interpreter, thread, sub, args);
+    
+    pmc_reuse(interpreter, thread, enum_class_ParrotRunningThread, 0);
+    PObj_active_destroy_CLEAR(thread);
+    PObj_custom_mark_CLEAR(thread);
+    PMC_int_val(thread) = tid;
+    return tid;
+}
+
+static INTVAL
+do_thread_run_clone_default(Interp *interpreter, PMC *thread, PMC *sub, PMC *args) {
+    return do_thread_run(interpreter, thread, PARROT_CLONE_DEFAULT, sub, args);
 }
 
 
-pmclass ParrotThread extends ParrotInterpreter need_ext {
+pmclass ParrotThread extends ParrotInterpreter need_ext no_ro {
+
+/*
+
+=item C<thread_id = thread.'run'(CLONE_FLAGS, sub, args...)>
+
+Run the thread. This object is morphed into an appropriate ParrotRunningThread PMC.
+The CLONE_FLAGS are or'd together values taken from C<cloneflags.pasm>.
+
+=item C<thread_id = thread.'run_clone'(sub, args...)>
+
+Equivalent to calling run with PARROT_CLONE_DEFAULT.
+
+=cut
+
+*/
+
+    void class_init() {
+        int typ = enum_class_ParrotThread;
+
+        if (pass) {
+            enter_nci_method(INTERP, typ,
+                    F2DPTR(do_thread_run), "run", "IJOIP@"); 
+            /* XXX appropriate name given that this won't clone globals? */
+            enter_nci_method(INTERP, typ,
+                    F2DPTR(do_thread_run_clone_default), "run_clone", "IJOP@");
+        }
+    }
 
 /*
 

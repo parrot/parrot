@@ -6,16 +6,17 @@
 
 # INPLACE MMD variant must always be normal op + 1
 
-void init()
+void init() 
 # init must be first for JITed vtable meths
 void init_pmc(PMC* initializer)
 PMC* instantiate(PMC* sig)
 PMC* new_from_string(STRING* rep, INTVAL flags)
-void morph(INTVAL type)
+void morph(INTVAL type) :write
 void mark()
 void destroy()
 PMC* namespace()
 
+# XXX FIXME should this be marked as writing?
 PMC* getprop(STRING* key)
 void setprop(STRING* key, PMC* value)
 void delprop(STRING* key)
@@ -68,16 +69,16 @@ void* get_pointer_keyed(PMC* key)
 void* get_pointer_keyed_int(INTVAL key)
 void* get_pointer_keyed_str(STRING* key)
 
-[STORE]
+[STORE] :write
 void set_integer_native(INTVAL value)
-void set_integer_same(PMC* value)
-void set_integer_keyed(PMC* key, INTVAL value)
-void set_integer_keyed_int(INTVAL key, INTVAL value)
-void set_integer_keyed_str(STRING* key, INTVAL value)
+void set_integer_same(PMC* value) 
+void set_integer_keyed(PMC* key, INTVAL value) 
+void set_integer_keyed_int(INTVAL key, INTVAL value) 
+void set_integer_keyed_str(STRING* key, INTVAL value) 
 
-void set_number_native(FLOATVAL value)
-void set_number_same(PMC* value)
-void set_number_keyed(PMC* key, FLOATVAL value)
+void set_number_native(FLOATVAL value) 
+void set_number_same(PMC* value) 
+void set_number_keyed(PMC* key, FLOATVAL value) 
 void set_number_keyed_int(INTVAL key, FLOATVAL value)
 void set_number_keyed_str(STRING* key, FLOATVAL value)
 
@@ -108,25 +109,25 @@ void set_pointer_keyed_str(STRING* key, void* value)
 [FETCHSIZE]
 INTVAL elements()
 
-[POP]
+[POP] :write
 INTVAL pop_integer()
 FLOATVAL pop_float()
 STRING* pop_string()
 PMC* pop_pmc()
 
-[PUSH]
+[PUSH] :write
 void push_integer(INTVAL value)
 void push_float(FLOATVAL value)
 void push_string(STRING* value)
 void push_pmc(PMC* value)
 
-[SHIFT]
+[SHIFT] :write
 INTVAL shift_integer()
 FLOATVAL shift_float()
 STRING* shift_string()
 PMC* shift_pmc()
 
-[UNSHIFT]
+[UNSHIFT] :write
 void unshift_integer(INTVAL value)
 void unshift_float(FLOATVAL value)
 void unshift_string(STRING* value)
@@ -134,10 +135,11 @@ void unshift_pmc(PMC* value)
 
 ## void splice ???
 
-[SPLICE]
+[SPLICE] :write
 void splice(PMC* value, INTVAL offset, INTVAL count)
 
-[MATH]
+# XXX marking writing here?
+[MATH] 
 PMC* add(PMC* value, PMC* dest)             MMD_ADD
 PMC* add_int(INTVAL value, PMC* dest)       MMD_ADD_INT
 PMC* add_float(FLOATVAL value, PMC* dest)   MMD_ADD_FLOAT
@@ -202,14 +204,14 @@ void i_pow(PMC* value)                      MMD_I_POW
 void i_pow_int(INTVAL value)                MMD_I_POW_INT
 void i_pow_float(FLOATVAL value)            MMD_I_POW_FLOAT
 
-void increment()
-void decrement()
+void increment() :write
+void decrement() :write
 
 PMC* absolute(PMC* dest)
-void i_absolute()
+void i_absolute() :write
 
 PMC* neg(PMC* dest)
-void i_neg()
+void i_neg() :write
 
 [BITWISE]
 PMC* bitwise_or(PMC* value, PMC* dest)          MMD_BOR
@@ -249,10 +251,10 @@ void i_bitwise_xors(PMC* value)                 MMD_I_SXOR
 void i_bitwise_xors_str(STRING* value)          MMD_I_SXOR_STR
 
 PMC* bitwise_not(PMC* dest)
-void i_bitwise_not()
+void i_bitwise_not() :write
 
 PMC* bitwise_nots(PMC* dest)
-void i_bitwise_nots()
+void i_bitwise_nots() :write
 
 PMC* bitwise_shl(PMC* value, PMC* dest)         MMD_BSL
 PMC* bitwise_shl_int(INTVAL value, PMC* dest)   MMD_BSL_INT
@@ -290,7 +292,7 @@ PMC* logical_and(PMC* value, PMC* dest)      MMD_LAND
 PMC* logical_xor(PMC* value, PMC* dest)      MMD_LXOR
 
 PMC* logical_not(PMC* dest)
-void i_logical_not()
+void i_logical_not() :write
 
 
 [STRING]
@@ -320,7 +322,7 @@ INTVAL defined_keyed(PMC* key)
 INTVAL defined_keyed_int(INTVAL key)
 INTVAL defined_keyed_str(STRING* key)
 
-[DELETE]
+[DELETE] :write
 void delete_keyed(PMC* key)
 void delete_keyed_int(INTVAL key)
 void delete_keyed_str(STRING* key)
@@ -343,21 +345,23 @@ PMC* subclass(PMC* name)
 
 PMC* get_attr(INTVAL idx)
 PMC* get_attr_str(STRING* idx)
-void set_attr(INTVAL idx, PMC* value)
-void set_attr_str(STRING* idx, PMC* value)
+void set_attr(INTVAL idx, PMC* value) :write
+void set_attr_str(STRING* idx, PMC* value) :write
 
 PMC* get_class()
-void add_parent(PMC* parent)
+void add_parent(PMC* parent) :write
 void become_parent(PMC* class)
 INTVAL class_type()
-void add_method(STRING* method, PMC* sub_pmc)
-void remove_method(STRING* method)
+void add_method(STRING* method, PMC* sub_pmc) :write
+void remove_method(STRING* method) :write
 PMC* new_singleton()
 PMC* get_anonymous_subclass()
 
 void freeze(visit_info* info)
-void thaw  (visit_info* info)
-void thawfinish (visit_info* info)
+void thaw  (visit_info* info) :write
+void thawfinish (visit_info* info) :write
 void visit (visit_info* info)
 
 void share()
+
+PMC* share_ro()

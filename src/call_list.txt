@@ -41,6 +41,7 @@
 # special stuff
 # 0 - insert a NULL (pointer) - doesn't comsume a register
 # J - Parrot_Interp param
+# @ - slurpy array
 
 # Callback Things
 
@@ -339,6 +340,12 @@ v      JOI
 # Make lua stop panic'ing.
 P      JOI
 
+# ParrotThread creation
+i      JOP@
+I      JOP@
+I      JOIP@
+# other ParrotThread
+P      JO 
 
 # --- start mysqlclient library ---
 # Created from mysql.h using the following manual method:

@@ -372,15 +372,19 @@ sub _generate_functions {
         pbc_output_is      => 'is_eq',
         pbc_output_isnt    => 'isnt_eq',
         pbc_output_like    => 'like',
+        pbc_output_unlike  => 'unlike',
         pasm_output_is     => 'is_eq',
         pasm_output_isnt   => 'isnt_eq',
         pasm_output_like   => 'like',
+        pasm_output_unlike => 'unlike',
         past_output_is     => 'is_eq',
         past_output_isnt   => 'isnt_eq',
         past_output_like   => 'like',
+        past_output_unlike => 'unlike',
         pir_output_is      => 'is_eq',
         pir_output_isnt    => 'isnt_eq',
         pir_output_like    => 'like',
+        pir_output_unlike  => 'unlike', 
                           );
 
     foreach my $func ( keys %parrot_test_map ) {
@@ -522,6 +526,7 @@ sub _generate_functions {
         pir_2_pasm_is      => 'is_eq',
         pir_2_pasm_isnt    => 'isnt_eq',
         pir_2_pasm_like    => 'like',
+        pir_2_pasm_unlike  => 'unlike',
                               );
 
     foreach my $func ( keys %pir_2_pasm_test_map ) {

@@ -337,7 +337,8 @@ sub dump_default {
                 meth        => $entry->[1],
                 type        => $entry->[0],
                 section     => $entry->[3],
-                mmd         => $entry->[4]
+                mmd         => $entry->[4],
+                attr        => $entry->[5]
             };
     }
     $vtable{'has_method'} = \%meth_hash;
@@ -430,6 +431,36 @@ sub parse_flags {
     return $pre, $classname, \%flags;
 }
 
+=head2 my ($attrs) = parse_method_attrs($attr_string)
+
+Parse a list of method attribute and return an hash ref of them
+
+=cut
+
+sub parse_method_attrs {
+    my $flags = shift;
+    my %result;
+    ++$result{$1} while $flags =~ /:(\w+)/g;
+    return \%result;
+}
+
+=head2 inherit_attrs($super_attrs, $attrs)
+
+Modify $attrs to inherit attrs from $super_attrs as appropriate.
+
+=cut
+
+sub inherit_attrs {
+    my ($super_attrs, $attrs) = @_;
+    if (($super_attrs->{read} or $super_attrs->{write})
+            and not ($attrs->{read} or $attrs->{write})) {
+        $attrs->{read} = $super_attrs->{read}
+            if exists $super_attrs->{read};
+        $attrs->{write} = $super_attrs->{write}
+            if exists $super_attrs->{write};
+    }
+}
+
 =head2 my ($name, $attributes) = parse_pmc($code);
 
 Parse PMC code and return the class name and a hash ref of attributes.
@@ -453,6 +484,8 @@ sub parse_pmc {
         (\w+)           #method name
       \s*
         \( ([^\(]*) \)  #parameters
+    \s*
+    ((?::(\w+)\s*)*)    #method attrs
     }sx;
 
     my ($pre, $classname, $flags)   = parse_flags(\$code);
@@ -466,6 +499,7 @@ sub parse_pmc {
     while ($classblock =~ s/($signature_re)//) {
         $lineno += count_newlines($1);
         my ($flag, $type, $methodname, $parameters) = ($2,$3,$4,$5);
+        my $attrs                                   = parse_method_attrs($6);
         my ($methodblock, $rema)                    = extract_balanced($classblock);
 
         $methodblock = "" if $opt{nobody};
@@ -476,7 +510,8 @@ sub parse_pmc {
                 line        => $lineno,
                 type        => $type,
                 parameters  => $parameters,
-                loc         => "vtable"
+                loc         => "vtable",
+                attrs       => $attrs,
             };
         }
         else {
@@ -492,6 +527,7 @@ sub parse_pmc {
                     parameters  => $parameters,
                     loc         => $flag ? "nci" : "vtable",
                     mmds        => [ @mmds ],
+                    attrs       => $attrs,
                 };
         }
         $classblock = $rema;
@@ -584,6 +620,14 @@ sub gen_super_meths {
             if (exists ($self->{has_parent}{$pname}{$meth} )) {
                 $self->{super}{$meth} = $pname;
                 my $n = $self->{has_parent}{$pname}{$meth};
+                $self->{super_attrs}{$meth} = 
+                    $all->{$pname}{methods}[$n]{attrs};
+                if (exists $self->{has_method}{$meth}) {
+                    inherit_attrs(
+                        $self->{methods}[$self->{has_method}{$meth}]->{attrs},
+                        $self->{super_attrs}{$meth}
+                    );
+                }
                 my $super_mmd = $all->{$pname}{methods}[$n]{mmds};
                 if ($super_mmd && scalar @{ $super_mmd }) {
                     ##print "** @{ $super_mmd } **\n";

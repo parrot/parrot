@@ -154,7 +154,8 @@ my @default_tests = map {glob "t/$_/*.t"} qw( configure
                                               src
                                               tools
                                               perl
-                                              doc );
+                                              doc 
+                                              stm );
 # manifest.t was moved from t/perl to t/distro
 # codingstd.t was moved from t/perl to t/codingstd
 push @default_tests, 't/distro/manifest.t', 't/codingstd/cppcomments.t';

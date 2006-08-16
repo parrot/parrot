@@ -60,9 +60,9 @@ detail.
 
 =item B<pop_eh>
 
-Pop the most recently pushed exception handler off the exception handler stack.
+Pop the most recently pushed exception handler off the control stack.
 
-{{ TODO: Provide exception handler stack introspection. }}
+{{ TODO: Provide control stack introspection. }}
 
 =item B<throw I<EXCEPTION>>
 
@@ -96,8 +96,12 @@ that are more like warnings or notices than errors.
 Exception handlers can resume execution immediately after the C<throwcc>
 opcode by executing the C<handled> opcode, and then invoking the given
 continuation which they receive as a parameter.  That continuation must be
-invoked with no parameters; in other words, C<throwcc> never returns a
+invoked with no parameters; in other words, C<throwcc> may I<not> return a
 value.
+
+{{ TODO: Resuming immediately after the C<throw> opcode isn't quite
+flexible enough. Perl 6, for example, resumes control flow after the end
+of the block in which the exception was thrown. }}
 
 =item B<die [ I<MESSAGE> ]>
 
@@ -106,8 +110,8 @@ payload of I<MESSAGE>.  If I<MESSAGE> is a string register, the exception
 payload is a C<String> PMC containing I<MESSAGE>; if I<MESSAGE> is a PMC, it
 is used directly as the exception payload.
 
-The default when no I<MESSAGE> is given is "Fatal exception at LINE in
-FILE." followed by a backtrace.
+{{ TODO: What is the default when no I<MESSAGE> is given? Something like
+"Fatal exception at LINE in FILE." followed by a backtrace. }}
 
 If this exception is not handled, it results in Parrot returning an error
 indication and the stringification of I<MESSAGE> to its embedding environment.
@@ -139,51 +143,47 @@ handlers, in LIFO order:
 =over
 
 =item 1
-Find the topmost exception handler.
+Find the topmost exception handler
 
 =item 2
-Push an exception record somewhere, presumably on the exception handler
-stack.  The exception record contains a pointer to an exception handler
-block, an exception PMC, and (optionally) a continuation.
+Push an exception record somewhere, presumably on the control stack.
+The exception record contains a pointer to an exception handler block
+and an exception PMC (and possibly a continuation)
 
 =item 3
 Invoke the handler (note: this is still in the thrower's dynamic
-context).
+context)
 
 =back
 
-If the handler returns without calling C<handled>:
+If the handler returns normally:
 
 =over
 
 =item 1
-Find the "exception handling in progress" record.
+Find the "exception handling in progress" record
 
 =item 2
-Find the next exception handler.
+Find the next exception handler
 
 =item 3
-If the handler is found, invoke it.
-
+If the handler is found, invoke it
 
 =item 4
-If no handler is found, and the exception is non-fatal (such as a
-warning), and there is a continuation in the exception record (because
-the throwing opcode was C<throwcc>), invoke the continuation (resume
-execution). Whether to resume or die when an exception isn't handled is
-determined by the severity of the exception.
+Or if there is a continuation in the exception record
+(because the throwing opcode was C<throwcc>),
+invoke the ER's continuation (i.e. resume execution)
 
 =item 5
-Otherwise terminate program a la C<die>. 
+Otherwise terminate program a la C<die>
 
 =back
 
-When running an embedded Parrot interpreter, the interpreter does not
-immediately terminate on an unhandled exception, it merely returns
-control to the embedding program and stores the unhandled exception so
-that it may be queried by the embedding program. The embedding program
-may choose to handle the exception and continue execution by invoking
-the exception's continuation.
+{{ TODO: this isn't right, another option is a) invoke the handler, b)
+the handler calls handled, and c) invoke the continuation to resume
+because the exception was handled. The question of whether to resume or
+die when an exception is never handled is determined by the severity of
+the exception, not by the simple fact of having a continuation. }}
 
 
 When the C<handled> opcode is called:
@@ -191,11 +191,7 @@ When the C<handled> opcode is called:
 =over
 
 =item 1
-Pop and destroy the exception record.
-
-=item 2
-If there was a continuation in the exception record, invoke the
-continuation.
+Pop and destroy exception record
 
 =back
 
@@ -255,6 +251,10 @@ If an exception is a consequence of a previous exception, use the
 C<set_inner_exception()> method to store that previous exception
 as part of the exception object.
 
+{{ TODO: Should we use properties instead? ANR: I'm not sure what you
+mean by "an exception is a consequence of a previous exception".
+Example? }}
+
 =back
 
 =head2 Standard Parrot Exceptions
@@ -284,6 +284,8 @@ Generic base class for math errors.
 Division by zero (integer or float).  No payload.
 
 =item B<exception;domain>
+
+{{ TODO: How about calling these B<exception;input>? }}
 
 Generic base class for miscellaneous domain (input value) errors.  Payload is
 an array, the first element of which is the operation that failed (e.g. the
@@ -364,23 +366,10 @@ exist. C<find_name> throws an exception (or returns a Null PMC) if the
 name requested doesn't exist in a lexical, current, global, or built-in
 namespace.
 
-{{ TODO: "errorson" as specified is dynamically rather than lexically
-scoped; is this good? Probably not good. Let's revisit it when we get
-the basic exceptions functionality implemented. }}
-
-It's a little odd that so few opcodes throw exceptions (these are the
-ones that are documented, but a few others throw exceptions internally
-even though they aren't documented as doing so). It's worth considering
-either expanding the use of exceptions consistently throughout the
-opcode set, or eliminating exceptions from the opcode set entirely. The
-strategy for error handling should be consistent, whatever it is. [I
-like the way C<LexPad>s and the C<errorson> settings provide the option
-for exception-based or non-exception-based implementations, rather than
-forcing one or the other.]
-
-{{ NOTE: There are a couple of different factors here.  One is the
-ability to globally define the severity of certain exceptions or
-categories of exceptions without needing to define a handler for each
+{{ FIXME - "errorson" as specified is dynamically rather than lexically
+scoped; is this good? ANR: There are a couple of different factors here.
+One is the ability to globally define the severity of certain exceptions
+or categories of exceptions without needing to define a handler for each
 one. (e.g. Perl 6 may have pragmas to set how severe type-checking
 errors are. A simple "incompatible type" error may be fatal under one
 pragma, a resumable warning under another pragma, and completely silent
@@ -404,6 +393,16 @@ exceptional opcodes, instead of needing to be defined for each one. And,
 it still keeps the error information out-of-band, instead of mixing the
 error in with normal return values. }}
 
+It's a little odd that so few opcodes throw exceptions (these are the
+ones that are documented, but a few others throw exceptions internally
+even though they aren't documented as doing so). It's worth considering
+either expanding the use of exceptions consistently throughout the
+opcode set, or eliminating exceptions from the opcode set entirely. The
+strategy for error handling should be consistent, whatever it is. [I
+like the way C<LexPad>s and the C<errorson> settings provide the option
+for exception-based or non-exception-based implementations, rather than
+forcing one or the other.]
+
 =head2 Resuming after Exceptions
 
 Exceptions thrown by standard Parrot opcodes (like the one thrown by
@@ -417,6 +416,20 @@ resumable.
   $P0 = "something bad happened"
   $P1 = new ['parrot';'exception'], $P0  # create new exception object
   throw $P1                              # throw it
+
+=head2 Consequenses
+
+Exceptions are designed to work with the Parrot calling conventions.
+Since the return addresses of C<bsr> subroutine calls and exception
+handlers are both pushed onto the control stack, it's generally a bad
+idea to combine the two.
+
+{{ TODO: If this continues to be true, then we need a way to turn off
+all exceptions. A number of built-in opcodes throw exceptions. If there
+is no way to prevent this, then it is never safe to use the control
+stack for anything other than exceptions. Alternatively, we leave the
+control stack safe for more primitive control flow, and pick another
+strategy for exceptions. }}
 
 =head1 ATTACHMENTS
 

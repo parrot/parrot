@@ -155,10 +155,30 @@ Parrot_init_arg_sig(Interp *interpreter, parrot_context_t *ctx,
                 case 'O':
                 case 'P':
                     st->sig = PARROT_ARG_PMC; break;
+                case '@':
+                    st->sig = PARROT_ARG_PMC | PARROT_ARG_SLURPY_ARRAY; break;
+                case 'F':
+                    st->sig = PARROT_ARG_PMC | PARROT_ARG_FLATTEN; break;
             }
         }
     }
     return st->n > 0;
+}
+
+/* mark the source state as flattening with the passed
+ * PMC being flattened, and fetch the first arg from the flattened
+ * set.
+ */
+static void
+make_flattened(Interp *interpreter, struct call_state *st, PMC *p_arg)
+{
+    st->src.mode |= CALL_STATE_FLATTEN;
+    st->src.slurp = p_arg;
+    st->src.slurp_i = 0;
+    st->src.slurp_n = VTABLE_elements(interpreter, p_arg);
+    /* the -1 is because the :flat PMC itself doesn't count. */
+    st->n_actual_args += st->src.slurp_n-1;
+    Parrot_fetch_arg(interpreter, st);
 }
 
 static void
@@ -245,13 +265,7 @@ fetch_arg_pmc_op(Interp *interpreter, struct call_state *st)
             }
         }
 flatten:
-        st->src.mode |= CALL_STATE_FLATTEN;
-        st->src.slurp = p_arg;
-        st->src.slurp_i = 0;
-        st->src.slurp_n = VTABLE_elements(interpreter, p_arg);
-	/* the -1 is because the :flat PMC itself doesn't count. */
-        st->n_actual_args += st->src.slurp_n-1;
-        Parrot_fetch_arg(interpreter, st);
+        make_flattened(interpreter, st, p_arg);
         return;
     }
 
@@ -298,7 +312,11 @@ fetch_arg_pmc_sig(Interp *interpreter, struct call_state *st)
         va_list *ap = (va_list*)(st->src.u.sig.ap);
         UVal_pmc(st->val) = va_arg(*ap, PMC*);
     }
-    st->src.mode |= CALL_STATE_NEXT_ARG;
+    if (st->src.sig & PARROT_ARG_FLATTEN) {
+        make_flattened(interpreter, st, UVal_pmc(st->val));
+    } else {
+        st->src.mode |= CALL_STATE_NEXT_ARG;
+    }
 }
 
 static int
@@ -325,6 +343,10 @@ next_arg(Interp *interpreter, struct call_state_1 *st)
                 case 'O':
                 case 'P':
                     st->sig = PARROT_ARG_PMC; break;
+                case '@':
+                    st->sig = PARROT_ARG_PMC | PARROT_ARG_SLURPY_ARRAY; break;
+                case 'F':
+                    st->sig = PARROT_ARG_PMC | PARROT_ARG_FLATTEN; break;
             }
             break;
     }
@@ -337,13 +359,14 @@ fetch_arg_sig(Interp *interpreter, struct call_state *st)
     if (st->dest.mode & CALL_STATE_NEXT_ARG) {
         next_arg(interpreter, &st->dest);
     }
-    if (!st->src.n)
+    if (!st->src.n) {
         return;
+    }
     if (st->src.mode & CALL_STATE_NEXT_ARG) {
         if (!next_arg(interpreter, &st->src))
             return;
     }
-    switch (st->src.sig) {
+    switch (st->src.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             fetch_arg_int_sig(interpreter, st);
             break;
@@ -444,8 +467,21 @@ int
 Parrot_fetch_arg_nci(Interp *interpreter, struct call_state *st)
 {
     Parrot_fetch_arg(interpreter, st);
-    Parrot_convert_arg(interpreter, st);
-    st->dest.mode |= CALL_STATE_NEXT_ARG;
+    if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
+        PMC *slurped;
+        assert((st->dest.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC);
+        slurped = pmc_new(interpreter, enum_class_ResizablePMCArray);
+        while (!(st->dest.mode & CALL_STATE_END_x)) {
+            Parrot_convert_arg(interpreter, st);
+            st->dest.mode |= CALL_STATE_SLURP;
+            VTABLE_push_pmc(interpreter, slurped, UVal_pmc(st->val));
+            Parrot_fetch_arg(interpreter, st);
+        }
+        UVal_pmc(st->val) = slurped;
+    } else {
+        Parrot_convert_arg(interpreter, st);
+        st->dest.mode |= CALL_STATE_NEXT_ARG;
+    }
     return 1;
 }
 

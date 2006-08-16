@@ -23,6 +23,7 @@ OPS_FILES = \
 	$(OPS_DIR)/string.ops \
 	$(OPS_DIR)/sys.ops \
 	$(OPS_DIR)/var.ops \
+	$(OPS_DIR)/stm.ops \
 	$(GEN_OPSFILES)
 
 all:

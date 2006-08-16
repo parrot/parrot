@@ -116,20 +116,6 @@ These two methods must be implemented because they are not delegated.
 
 =over 4
 
-=item C<INTVAL type()>
-
-Returns the type of the PMC, not the type of the referenced PMC.
-
-=cut
-
-*/
-
-    INTVAL type() {
-        return SUPER();
-    }
-
-/*
-
 =item C<STRING *name()>
 
 Returns the name of the PMC, not the name of the referenced PMC.
