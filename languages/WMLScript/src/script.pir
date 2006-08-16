@@ -1,26 +1,26 @@
 
-.sub _init_script
+.sub '_init_script'
 #    print "_init_script (script.pir)\n"
-    $P0 = subclass "Hash", "Wmls::Script"
-    $P0 = subclass "Array", "Wmls::Constants"
-    $P0 = subclass "Integer", "Wmls::ConstantInteger"
-    $P0 = subclass "Float", "Wmls::ConstantFloat"
-    $P0 = subclass "String", "Wmls::ConstantUTF8String"
-    $P0 = subclass "String", "Wmls::ConstantEmptyString"
-    $P0 = subclass "String", "Wmls::ConstantString"
-    $P0 = subclass "Array", "Wmls::Pragmas"
-    $P0 = subclass "Hash", "Wmls::AccessDomain" 
-    $P0 = subclass "Hash", "Wmls::AccessPath" 
-    $P0 = subclass "Hash", "Wmls::UserAgentProperty" 
-    $P0 = subclass "Hash", "Wmls::UserAgentProperty&Scheme" 
-    $P0 = subclass "Array", "Wmls::Functions"
-    $P0 = subclass "Array", "Wmls::FunctionNameTable" 
-    $P0 = subclass "Hash", "Wmls::Function" 
+    $P0 = subclass 'Hash', 'Wmls::Script'
+    $P0 = subclass 'Array', 'Wmls::Constants'
+    $P0 = subclass 'Integer', 'Wmls::ConstantInteger'
+    $P0 = subclass 'Float', 'Wmls::ConstantFloat'   
+    $P0 = subclass 'String', 'Wmls::ConstantUTF8String'
+    $P0 = subclass 'String', 'Wmls::ConstantEmptyString'
+    $P0 = subclass 'String', 'Wmls::ConstantString'
+    $P0 = subclass 'Array', 'Wmls::Pragmas'
+    $P0 = subclass 'Hash', 'Wmls::AccessDomain' 
+    $P0 = subclass 'Hash', 'Wmls::AccessPath' 
+    $P0 = subclass 'Hash', 'Wmls::UserAgentProperty' 
+    $P0 = subclass 'Hash', 'Wmls::UserAgentProperty&Scheme' 
+    $P0 = subclass 'Array', 'Wmls::Functions'
+    $P0 = subclass 'Array', 'Wmls::FunctionNameTable' 
+    $P0 = subclass 'Hash', 'Wmls::Function' 
 .end
 
-.namespace ["Wmls::Script"]
+.namespace ['Wmls::Script']
 
-.sub dump :method
+.sub 'dump' :method
     .local string filename
     filename = self['filename']
     print "## file:"
@@ -89,19 +89,24 @@
     functions.dump()
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .local string pir
     pir = <<"PIRCODE"
-.loadlib "wmls_ops"
+.loadlib 'wmls_ops'
 .HLL 'WMLScript', 'wmls_group'
 
-.sub _init :load :anon
+.sub '__onload' :load :anon
 
   push_eh _handler
   $P0 = global '@stdlibs'
   goto L1
 _handler:
-  load_bytecode 'languages/WMLScript/runtime/wmlslib.pbc'
+#  load_bytecode 'languages/WMLScript/runtime/wmlslib.pbc'
+  load_bytecode 'languages/WMLScript/runtime/wmlslang.pbc'
+  load_bytecode 'languages/WMLScript/runtime/wmlsfloat.pbc'
+  load_bytecode 'languages/WMLScript/runtime/wmlsstring.pbc'
+  load_bytecode 'languages/WMLScript/runtime/wmlsconsole.pbc'
+  load_bytecode 'languages/WMLScript/runtime/wmlsstdlibs.pbc'
 L1:
 PIRCODE
 
@@ -116,10 +121,18 @@ PIRCODE
     $S0 = functions.translate(self)
     pir .= $S0
 
+    pir .= <<"PIRCODE"
+
+#.sub 'main' :main
+#  __onload()
+#  function0()
+#.end
+PIRCODE
+
     .return (pir)
 .end
 
-.sub get_nb_arg :method
+.sub 'get_nb_arg' :method
     .param int idx
     .local pmc functions
     functions = self['Functions']
@@ -130,9 +143,9 @@ PIRCODE
     .return (number_of_arguments)
 .end
 
-.namespace ["Wmls::Constants"]
+.namespace ['Wmls::Constants']
 
-.sub dump :method
+.sub 'dump' :method
     .local int nb
     .local int idx
     .local pmc constant
@@ -151,7 +164,7 @@ L1:
 L2:
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param int idx
     .local pmc constant
     constant = self[idx]
@@ -159,14 +172,14 @@ L2:
     .return ($S0)
 .end
 
-.namespace ["Wmls::ConstantInteger"]
+.namespace ['Wmls::ConstantInteger']
 
-.sub dump :method                                      
+.sub 'dump' :method                                      
     print "int "
     print self
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param int idx                                          
     .local string pir
     pir = "  .local pmc const"
@@ -183,14 +196,14 @@ L2:
     .return (pir)
 .end
 
-.namespace ["Wmls::ConstantFloat"]
+.namespace ['Wmls::ConstantFloat']
 
-.sub dump :method
+.sub 'dump' :method
     print "float "
     print self
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param int idx                                          
     .local string pir
     pir = "  .local pmc const"
@@ -207,9 +220,9 @@ L2:
     .return (pir)
 .end
 
-.namespace ["Wmls::ConstantUTF8String"]
+.namespace ['Wmls::ConstantUTF8String']
 
-.sub dump :method
+.sub 'dump' :method
     .local int len
     len = elements self
     print "string UTF8 ["
@@ -218,7 +231,7 @@ L2:
     print self
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param int idx                                          
     .local string pir
     pir = "  .local pmc const"
@@ -236,13 +249,13 @@ L2:
     .return (pir)
 .end
 
-.namespace ["Wmls::ConstantEmptyString"]
+.namespace ['Wmls::ConstantEmptyString']
 
-.sub dump :method
+.sub 'dump' :method
     print "empty string"
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param int idx                                          
     .local string pir
     pir = "  .local pmc const"
@@ -254,9 +267,9 @@ L2:
     .return (pir)
 .end
 
-.namespace ["Wmls::ConstantString"]
+.namespace ['Wmls::ConstantString']
 
-.sub dump :method
+.sub 'dump' :method
     .local int len
     len = elements self
     print "string ["
@@ -265,7 +278,7 @@ L2:
     print self
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param int idx                                          
     .local string pir
     pir = "  .local pmc const"
@@ -283,9 +296,9 @@ L2:
     .return (pir)
 .end
 
-.namespace ["Wmls::Pragmas"]
+.namespace ['Wmls::Pragmas']
 
-.sub dump :method
+.sub 'dump' :method
     .local int nb
     .local int idx
     .local pmc pragma
@@ -304,27 +317,27 @@ L1:
 L2:
 .end
 
-.namespace ["Wmls::AccessDomain"]
+.namespace ['Wmls::AccessDomain']
 
-.sub dump :method
+.sub 'dump' :method
     .local int access_domain_index
     access_domain_index = self['AccessDomainIndex']
     print "AccessDomain "
     print access_domain_index                                          
 .end
 
-.namespace ["Wmls::AccessPath"]
+.namespace ['Wmls::AccessPath']
 
-.sub dump :method                                          
+.sub 'dump' :method                                          
     .local int access_path_index
     access_path_index = self['AccessPathIndex']
     print "AccessPath "
     print access_path_index                                          
 .end
 
-.namespace ["Wmls::UserAgentProperty"]
+.namespace ['Wmls::UserAgentProperty']
 
-.sub dump :method                                          
+.sub 'dump' :method                                          
     .local int property_name_index
     property_name_index = self['PropertyNameIndex']
     .local int content_index
@@ -335,9 +348,9 @@ L2:
     print content_index                                         
 .end
 
-.namespace ["Wmls::UserAgentProperty&Scheme"]
+.namespace ['Wmls::UserAgentProperty&Scheme']
 
-.sub dump :method                                          
+.sub 'dump' :method                                          
     .local int property_name_index
     property_name_index = self['PropertyNameIndex']
     .local int content_index
@@ -352,9 +365,9 @@ L2:
     print scheme_index                                         
 .end
 
-.namespace ["Wmls::FunctionNameTable"]
+.namespace ['Wmls::FunctionNameTable']
 
-.sub dump :method                                          
+.sub 'dump' :method                                          
     print "## Function Name Table\n"
     .local int number_of_function_names
     number_of_function_names = elements self
@@ -384,7 +397,7 @@ L1:
 L2:
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param pmc script
     .local string namespace
     namespace = script['filename']
@@ -420,9 +433,9 @@ L2:
     .return (pir)
 .end
 
-.namespace ["Wmls::Functions"]
+.namespace ['Wmls::Functions']
 
-.sub dump :method
+.sub 'dump' :method
     .local int nb
     .local int idx
     .local pmc function
@@ -440,7 +453,7 @@ L1:
 L2:
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param pmc script
     .local string pir
     pir = "\n#\n# Functions\n#\n"
@@ -460,9 +473,9 @@ L2:
     .return (pir)
 .end
 
-.namespace ["Wmls::Function"]
+.namespace ['Wmls::Function']
 
-.sub dump :method                                          
+.sub 'dump' :method                                          
     .local int number_of_arguments
     number_of_arguments = self['NumberOfArguments']
     .local int number_of_local_variables
@@ -483,14 +496,14 @@ L2:
     dump_code(code_array)
 .end
 
-.sub translate :method
+.sub 'translate' :method
     .param pmc script
     .param int idx                                          
     .local string pir
-    pir = "\n.sub function"
+    pir = "\n.sub 'function"
     $S0 = idx
     pir .= $S0
-    pir .= " :anon\n"
+    pir .= "' :anon\n"
 
     .local int number_of_arguments
     number_of_arguments = self['NumberOfArguments']
