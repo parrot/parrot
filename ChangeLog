@@ -1,5 +1,12 @@
 #1 $Id$
 
+2006.08.16    creiss
+	Merged Software Transactional Memory branch into trunk, adds:
+	* several new opcodes whose names start with stm_
+	* read-only PMC support
+	* several new PMC types (whose names start with STM*)
+	* support for threads (again)
+
 2006.08.08    chip
 	* Released 0.4.6
 	See NEWS for more.
