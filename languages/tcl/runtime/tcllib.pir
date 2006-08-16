@@ -13,7 +13,6 @@ providing a compreg-compatible method.
 
 .HLL 'parrot', ''
 
-.loadlib 'dynlexpad'
 .loadlib 'tcl_ops'
 .include 'languages/tcl/src/macros.pir'
 .include 'cclass.pasm'

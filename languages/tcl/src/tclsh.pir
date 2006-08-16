@@ -4,15 +4,7 @@
 # Setup the information the interpreter needs to run,
 # then parse and interpret/compile the tcl code we were passed.
 
-#
-# the immediate sub gets run, before the .HLL_map below
-# is parsed, therefore the .DynLexPad constant is already
-# available
-#
-
-.loadlib 'dynlexpad'
 .HLL 'Tcl', 'tcl_group'
-.HLL_map .LexPad, .DynLexPad
 
 .include 'languages/tcl/src/returncodes.pir'
 .include 'languages/tcl/src/macros.pir'

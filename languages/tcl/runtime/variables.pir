@@ -266,7 +266,8 @@ Gets the actual variable from memory and returns it.
     lexpad     = call_chain[-1]
     value      = lexpad[name]
   clear_eh
-  if null value goto found
+  $I0 = isa value, 'None'
+  if $I0 goto notfound
   $I0 = isa value, 'Undef'
   if $I0 goto notfound
   goto found
@@ -317,7 +318,8 @@ lexical_var:
   lexpad       = call_chain[-1]
 
   $P0 = lexpad[name]
-  if null $P0 goto lexical_is_null
+  $I0 = isa $P0, 'None'
+  if $I0 goto lexical_is_null
 
   assign $P0, value
   .return($P0)

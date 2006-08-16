@@ -140,9 +140,7 @@ done_init:
 
   stub_code = <<'END_PIR'
 # src/compiler.pir :: pir_compiler (1)
-.loadlib 'dynlexpad'
 .HLL 'tcl', 'tcl_group'
-.HLL_map .LexPad, .DynLexPad
 .pragma n_operators 1
 .loadlib 'tcl_ops'
 .sub compiled_tcl_sub%i :anon :main

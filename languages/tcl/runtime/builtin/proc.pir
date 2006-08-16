@@ -70,9 +70,7 @@ create:
   code.emit(<<'END_PIR', namespace, name)
 .HLL 'tcl', 'tcl_group'
 .namespace %0
-.loadlib 'dynlexpad'
-.HLL_map .LexPad, .DynLexPad
-.sub '&%1' :lex
+.sub '&%1'
   .param pmc args :slurpy
   .include 'languages/tcl/src/returncodes.pir'
   .local pmc epoch, colons, split
@@ -80,11 +78,10 @@ create:
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
 
-  .local pmc call_chain
+  .local pmc call_chain, lexpad
   call_chain = get_root_global ['_tcl'], 'call_chain'
-  $P0 = getinterp
-  $P0 = $P0['lexpad'; 0]
-  push call_chain, $P0
+  lexpad = new .Hash
+  push call_chain, lexpad
 END_PIR
 
   .local string args_usage, args_info
@@ -119,7 +116,7 @@ args_loop:
   
   min = i + 1
   args_code.emit("  $P1 = shift args")
-  args_code.emit("  store_lex '$%0', $P1", $S0)
+  args_code.emit("  lexpad['$%0'] = $P1", $S0)
   
   args_usage .= " "
   args_usage .= $S0
@@ -129,7 +126,7 @@ default_arg:
     args_code.emit(<<'END_PIR', i, $S0, $S1)
   unless args goto default_%0
   $P1 = shift args
-  store_lex '$%1', $P1
+  lexpad['$%1'] = $P1
 END_PIR
 
     $S1 = arg[1]
@@ -137,7 +134,7 @@ END_PIR
 default_%0:
   $P1 = new TclString
   $P1 = '%2'
-  store_lex '$%1', $P1
+  lexpad['$%1'] = $P1
 END_PIR
 
   args_usage .= " ?"
@@ -188,7 +185,7 @@ NO_SLURPY_ARGS:
   arg_list=new .TclString
   arg_list=''
 DONE:
-  store_lex '$args', arg_list
+  lexpad['$args'] = arg_list
 END_PIR
 
 done_args:
