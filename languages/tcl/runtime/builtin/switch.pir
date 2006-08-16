@@ -78,7 +78,7 @@ got_body:
   $S0 = body[-2]
   $S0 = 'no body specified for pattern "' . $S0
   $S0 = $S0 . '"'
-  .throw($S0)
+  tcl_error $S0
 
 check_mode:
   .local string pattern, code
