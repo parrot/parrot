@@ -1,0 +1,207 @@
+# Copyright (C) 2006, The Perl Foundation.
+# $Id: lua51.pg $
+
+grammar Lua::Grammar
+
+rule start {
+        <chunk>
+        | <syntax_error>
+}
+
+rule chunk {
+        [<statement> [\;]?]*
+} 
+
+rule block {
+        <chunk> [<laststat> [\;]?]?
+}
+
+rule statement {
+        <'if'> <cond> <'then'> <block> [<'elseif'> <cond> <'then'> <block>]* [<'else'> <block>]? <'end'>
+        | <'while'> <expr> <'do'> <block> <'end'>
+        | <'do'> <block> <'end'>
+        | <'for'> [<fornum> | <forlist>] <'do'> <block> <'end'>
+        | <'repeat'> <block> <'until'> <cond>
+        | <'function'> <funcname> <funcbody>
+        | <'local'> <'function'> <Name> <funcbody>
+        | <'local'> <namelist> [\= <explist1>]?
+        | <exprstat>
+} 
+
+rule laststat {
+        <'return'> <explist1>?
+        | <'break'>
+}
+ 
+rule cond {
+        <expr>
+}                             
+
+rule fornum {
+        <Name> \= <expr> \, <expr> [\, <expr>]?
+} 
+
+rule forlist {
+        <namelist> <'in'> <explist1>
+} 
+
+rule namelist {
+        <Name> [\, <Name>]*
+}
+
+rule funcname {
+        <Name> [\. <Name>]* [\: <Name>]?
+}
+
+rule funcbody {
+        \( <parlist>? \) <chunk> <'end'>
+}
+
+rule parlist {
+        <namelist> [\, <'...'>]?
+        | <'...'>
+}
+
+rule exprstat {
+        <primaryexp> <assignment>?
+}
+
+rule assignment {
+        \, <primaryexp> <assignment>
+        | \= <explist1>
+}
+
+rule primaryexp {
+        <prefixexp> [\. <Name> | \[ <expr> \] | \: <Name> <funcargs> | <funcargs>]*
+}
+
+rule prefixexp {
+        <Name>
+        | \( <expr> \)
+}
+
+rule expr {
+        [<simpleexp> | <unop> <expr>] [<binop> <expr>]*
+}
+
+rule simpleexp {
+        <Number>
+        | <String>
+        | <'nil'>
+        | <'true'>
+        | <'false'>
+        | <'...'>
+        | <constructor>
+        | <'function'> <funcbody>
+        | <primaryexp>
+}
+
+rule explist1 {
+        <expr> [\, <expr>]*
+}
+
+rule funcargs {
+        \( <explist1>? \)
+        | <constructor>
+        | <String>
+}
+                       
+rule constructor {
+        \{ <fieldlist>? \}
+}
+
+rule fieldlist {
+        <field> [<fieldsep> <field>]* <fieldsep>?
+}
+
+rule field {
+        \[ <expr> \] \= <expr>
+        | <Name> \= <expr>
+        | <expr>
+}
+
+
+token fieldsep {
+        \,
+        |\;
+}
+
+token binop {
+        \+
+        |\-
+        |\*
+        |\/
+        |\%
+        |\^
+        |\.\.
+        |\<\=
+        |\<
+        |\>\=
+        |\>
+        |\=\=
+        |\~\=
+        |and
+        |or
+}
+
+token unop {
+        \-
+        |not
+        |\#
+}
+
+token Name {
+        <ident>
+}
+
+token String {
+        | \" <quoted_literal: "> \"
+        | \' <quoted_literal: '> \'
+#        | <long_string>        
+}
+
+token Number {
+        0 <[Xx]> <xdigit>+
+        | [<digit>+ [\. <digit>*]? | \. <digit>+] [<[Ee]> <[+\-]>? <digit>+]?
+}
+
+token ws {
+        [ \s+
+#        | <long_comment>
+        | \-\- \N*
+        ]*
+}
+
+token syntax_error {
+        <?PGE::Util::die Syntax error>
+}
+
+
+proto 'infix:^'     is precedence('=')
+                    is assoc('right')           { ... }
+
+proto 'prefix:not'  is looser('infix:^')        { ... }
+proto 'prefix:#'    is equiv('prefix:not')      { ... }
+proto 'prefix:-'    is equiv('prefix:not')      { ... }
+
+proto 'infix:*'     is looser('prefix:not')     { ... }
+proto 'infix:/'     is equiv('infix:*')         { ... }
+proto 'infix:%'     is equiv('infix:*')         { ... }
+
+proto 'infix:+'     is looser('infix:*')        { ... }
+proto 'infix:-'     is equiv('infix:+')         { ... }
+
+proto 'infix:..'    is looser('infix:+')
+                    is assoc('right')           { ... }
+
+proto 'infix:<'     is looser('infix:..')       { ... }
+proto 'infix:>'     is equiv('infix:<')         { ... }
+proto 'infix:<='    is equiv('infix:<')         { ... }
+proto 'infix:>='    is equiv('infix:<')         { ... }
+proto 'infix:~='    is equiv('infix:<')         { ... }
+proto 'infix:=='    is equiv('infix:<')         { ... }
+
+proto 'infix:and'   is looser('infix:<')        { ... }
+
+proto 'infix:or'    is looser('infix:and')      { ... }
+

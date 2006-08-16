@@ -1,0 +1,91 @@
+# Copyright (C) 2006, The Perl Foundation.
+# $Id: dumplex.tg $
+
+grammar Lua::DumpLex is TGE::Grammar;
+
+transform dump (ROOT) :language('PIR') {
+    $P0 = node['token']
+
+    .local pmc iter
+    iter = new .Iterator, $P0
+    iter = 0
+
+L1:
+    unless iter, L2
+    shift $P0, iter
+
+    $I0 = defined $P0['Name']
+    unless $I0 goto L3
+    $P1 = $P0['Name']
+    tree.get('dump', $P1, 'Lua::TestLex::Name')
+
+L3:
+    $I0 = defined $P0['String']
+    unless $I0 goto L4
+    $P1 = $P0['String']
+    tree.get('dump', $P1, 'Lua::TestLex::String')
+
+L4:
+    $I0 = defined $P0['Number']
+    unless $I0 goto L5
+    $P1 = $P0['Number']
+    tree.get('dump', $P1, 'Lua::TestLex::Number')
+
+L5:
+    $I0 = defined $P0['punctuator']
+    unless $I0 goto L6
+    $P1 = $P0['punctuator']
+    tree.get('dump', $P1, 'Lua::TestLex::punctuator')
+
+L6:
+    $I0 = defined $P0['reserved_words']
+    unless $I0 goto L7
+    $P1 = $P0['reserved_words']
+    tree.get('dump', $P1, 'Lua::TestLex::reserved_words')
+
+L7:
+    $I0 = defined $P0['ws']
+    unless $I0 goto L8
+    $P1 = $P0['ws']
+    tree.get('dump', $P1, 'Lua::TestLex::ws')
+
+L8:
+    goto L1
+L2:
+}
+
+transform dump (Lua::TestLex::reserved_words) :language('PIR') {
+    print "word:\t"
+    print node
+    print "\n"
+}
+
+transform dump (Lua::TestLex::punctuator) :language('PIR') {
+    print "punct:\t"
+    print node
+    print "\n"
+}
+
+transform dump (Lua::TestLex::Name) :language('PIR') {
+    $P0 = node['ident']
+    print "Name:\t"
+    print $P0
+    print "\n"
+}
+
+transform dump (Lua::TestLex::String) :language('PIR') {
+    print "String:\t"
+    print node
+    print "\n"
+}
+
+transform dump (Lua::TestLex::Number) :language('PIR') {
+    print "Number:\t"
+    print node
+    print "\n"
+}
+
+transform dump (Lua::TestLex::ws) :language('PIR') {
+    print "ws\n"
+}
+
