@@ -1111,7 +1111,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "__get_regs_used 2");
 
 
 CODE
-81101
+2301
 OUTPUT
 
 

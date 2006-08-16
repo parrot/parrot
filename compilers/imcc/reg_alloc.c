@@ -32,6 +32,7 @@ static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
 static void map_colors(IMC_Unit *, int x, unsigned int * graph, char colors[], int typ, int);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
 static void allocate_lexicals (Parrot_Interp, IMC_Unit *);
+static void vanilla_reg_alloc (Parrot_Interp, IMC_Unit *);
 static void allocate_non_volatile (Parrot_Interp, IMC_Unit *);
 #if 0
 static int neighbours(int node);
@@ -117,7 +118,7 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
      * all lexicals get a unique register
      */
     allocate_lexicals(interpreter, unit);
-
+     
     /* build CFG and life info, and optimize iteratively */
     do {
         first = 1;
@@ -136,18 +137,23 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
         }
 
         build_reglist(interpreter, unit);
-        life_analysis(interpreter, unit);
+        if (IMCC_INFO(interpreter)->allocator == IMCC_GRAPH_ALLOCATOR)
+            life_analysis(interpreter, unit);
         allocate_non_volatile(interpreter, unit);
     } while (!IMCC_INFO(interpreter)->dont_optimize &&
             optimize(interpreter, unit));
 
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_symreg(unit);
+    
     rebuild_reglist(interpreter, unit);
-    graph_coloring_reg_alloc(interpreter, unit);
+    if (IMCC_INFO(interpreter)->allocator == IMCC_VANILLA_ALLOCATOR) 
+        vanilla_reg_alloc (interpreter, unit);
+    else 
+        graph_coloring_reg_alloc(interpreter, unit);
 
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_instructions(interpreter, unit);
+        dump_instructions(interpreter, unit); 
 done:
     if (IMCC_INFO(interpreter)->verbose  ||
             (IMCC_INFO(interpreter)->debug & DEBUG_IMC)) {
@@ -774,6 +780,48 @@ allocate_uniq(Parrot_Interp interpreter, IMC_Unit *unit, int usage)
      *      if there are less registers than threshold
      *      just allocate all and be done with it
      */
+}
+
+static void
+vanilla_reg_alloc(Parrot_Interp interpreter, IMC_Unit *unit)
+{
+    char type[] = "INSP";
+    int i, j, reg_set, first_reg;
+    SymReg * r;
+    SymHash *hsh;
+    Set *avail;
+
+    UNUSED(interpreter);
+    hsh = &unit->hash;
+
+    /* Clear the pre-assigned colors. */
+    for (i = 0; i < hsh->size; i++) {
+        for (r = hsh->data[i]; r; r = r->next) {
+            if (r->type & VTREGISTER) /* TODO Ignore non-volatiles */
+                r->color=-1;
+        }
+    }
+
+    /* Assign new colors. */
+    for (j = 0; j < 4; j++) {
+        reg_set = type[j];
+        first_reg = first_avail(unit, reg_set, &avail);
+        for (i = 0; i < hsh->size; i++) {
+            for (r = hsh->data[i]; r; r = r->next) {
+                if (r->set != reg_set)
+                    continue;
+                if ((r->type & VTREGISTER) && (r->color == -1 ) 
+                        ) {
+                    if (set_contains(avail, first_reg))
+                        first_reg = first_avail(unit, reg_set, NULL);
+                    set_add(avail, first_reg);
+                    r->color = first_reg++;
+                }
+            }
+        }
+        set_free(avail);
+        unit->first_avail[j] = first_reg;
+    }
 }
 
 static void

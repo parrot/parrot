@@ -182,6 +182,11 @@ typedef enum _AsmState {
     AsmInYield
 } AsmState;
 
+typedef enum _imcc_reg_allocator_t {
+    IMCC_VANILLA_ALLOCATOR =0,
+    IMCC_GRAPH_ALLOCATOR
+}imcc_reg_allocator;
+
 PARROT_API void IMCC_push_parser_state(Interp*);
 PARROT_API void IMCC_pop_parser_state(Interp*, void *yyscanner);
 
@@ -196,6 +201,7 @@ typedef struct _imc_info_t {
     int IMCC_DEBUG;
     int gc_off;
     int write_pbc;
+    int allocator;
     SymReg* sr_return;
     AsmState asm_state;
     int optimizer_level;

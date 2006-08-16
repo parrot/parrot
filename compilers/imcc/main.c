@@ -313,6 +313,8 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                     IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
                 if (strchr(optimizer_opt, 'c'))
                     IMCC_INFO(interp)->optimizer_level |= OPT_SUB;
+
+                IMCC_INFO(interp)->allocator = IMCC_GRAPH_ALLOCATOR;
 #if 0
                 /* currently not ok due to different register allocation */
                 if (strchr(optimizer_opt, 'j')) {
@@ -510,7 +512,7 @@ main(int argc, char * argv[])
 
     imcc_init(interp);
     IMCC_ast_init(interp);
-
+    IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR; 
     sourcefile = parseflags(interp, &argc, &argv);
     output_file = interp->output_file;
 
