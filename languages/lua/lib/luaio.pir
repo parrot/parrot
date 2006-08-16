@@ -32,68 +32,68 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
 =cut
 
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
 
-.sub init_io :load :anon
+.sub 'init_io' :load :anon
 
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode 'languages/lua/lib/luaaux.pbc'
+#    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua I/O\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global "_G"
+    _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
     .local pmc _io
     _io = new .LuaTable
-    $P1 = "io"
+    $P1 = 'io'
     _lua__GLOBAL[$P1] = _io
 
-    .const .Sub _io_close = "_io_close"
-    $P1 = "close"
+    .const .Sub _io_close = '_io_close'
+    $P1 = 'close'
     _io[$P1] = _io_close
 
-    .const .Sub _io_flush = "_io_flush"
-    $P1 = "flush"
+    .const .Sub _io_flush = '_io_flush'
+    $P1 = 'flush'
     _io[$P1] = _io_flush
 
-    .const .Sub _io_input = "_io_input"
-    $P1 = "input"
+    .const .Sub _io_input = '_io_input'
+    $P1 = 'input'
     _io[$P1] = _io_input
 
-    .const .Sub _io_lines = "_io_lines"
-    $P1 = "lines"
+    .const .Sub _io_lines = '_io_lines'
+    $P1 = 'lines'
     _io[$P1] = _io_lines
 
-    .const .Sub _io_open = "_io_open"
-    $P1 = "open"
+    .const .Sub _io_open = '_io_open'
+    $P1 = 'open'
     _io[$P1] = _io_open
 
-    .const .Sub _io_output = "_io_output"
-    $P1 = "output"
+    .const .Sub _io_output = '_io_output'
+    $P1 = 'output'
     _io[$P1] = _io_output
 
-    .const .Sub _io_popen = "_io_popen"
-    $P1 = "popen"
+    .const .Sub _io_popen = '_io_popen'
+    $P1 = 'popen'
     _io[$P1] = _io_popen
 
-    .const .Sub _io_read = "_io_read"
-    $P1 = "read"
+    .const .Sub _io_read = '_io_read'
+    $P1 = 'read'
     _io[$P1] = _io_read
 
-    .const .Sub _io_tmpfile = "_io_tmpfile"
-    $P1 = "tmpfile"
+    .const .Sub _io_tmpfile = '_io_tmpfile'
+    $P1 = 'tmpfile'
     _io[$P1] = _io_tmpfile
 
-    .const .Sub _io_type = "_io_type"
-    $P1 = "type"
+    .const .Sub _io_type = '_io_type'
+    $P1 = 'type'
     _io[$P1] = _io_type
 
-    .const .Sub _io_write = "_io_write"
-    $P1 = "write"
+    .const .Sub _io_write = '_io_write'
+    $P1 = 'write'
     _io[$P1] = _io_write
 
     #
@@ -103,51 +103,51 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     .local pmc _file
     _file = new .LuaTable
 
-    .const .Sub _file_close = "_io_close"
-    $P1 = "close"
+    .const .Sub _file_close = '_io_close'
+    $P1 = 'close'
     _file[$P1] = _file_close
 
-    .const .Sub _file_flush = "_file_flush"
-    $P1 = "flush"
+    .const .Sub _file_flush = '_file_flush'
+    $P1 = 'flush'
     _file[$P1] = _file_flush
 
-    .const .Sub _file_lines = "_file_lines"
-    $P1 = "lines"
+    .const .Sub _file_lines = '_file_lines'
+    $P1 = 'lines'
     _file[$P1] = _file_lines
 
-    .const .Sub _file_read = "_file_read"
-    $P1 = "read"
+    .const .Sub _file_read = '_file_read'
+    $P1 = 'read'
     _file[$P1] = _file_read
 
-    .const .Sub _file_seek = "_file_seek"
-    $P1 = "seek"
+    .const .Sub _file_seek = '_file_seek'
+    $P1 = 'seek'
     _file[$P1] = _file_seek
 
-    .const .Sub _file_setvbuf = "_file_setvbuf"
-    $P1 = "setvbuf"
+    .const .Sub _file_setvbuf = '_file_setvbuf'
+    $P1 = 'setvbuf'
     _file[$P1] = _file_setvbuf
 
-    .const .Sub _file_write = "_file_write"
-    $P1 = "write"
+    .const .Sub _file_write = '_file_write'
+    $P1 = 'write'
     _file[$P1] = _file_write
 
-#    .const .Sub _file__tostring = "_file__tostring"
-#    $P1 = "__tostring"
+#    .const .Sub _file__tostring = '_file__tostring'
+#    $P1 = '__tostring'
 #    _file[$P1] = _file__tostring
 
     .local pmc _lua_mt_file
     _lua_mt_file = new .LuaTable
-    $P1 = "__index"
+    $P1 = '__index'
     _lua_mt_file[$P1] = _file
 
-    .const .Sub _file__tostring = "_file__tostring"
-    $P1 = "__tostring"
+    .const .Sub _file__tostring = '_file__tostring'
+    $P1 = '__tostring'
     _lua_mt_file[$P1] = _file__tostring
 
 
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global "_REGISTRY"
-    $P1 = "file"
+    _lua__REGISTRY = global '_REGISTRY'
+    $P1 = 'file'
     _lua__REGISTRY[$P1] = _lua_mt_file
 
 
@@ -156,29 +156,29 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     #
 
     .local pmc _lua__ENVIRON
-    _lua__ENVIRON = global "_ENVIRON"
+    _lua__ENVIRON = global '_ENVIRON'
     $P3 = new .LuaNumber
 
-    $P1 = "stdin"
+    $P1 = 'stdin'
     $P2 = getstdin
     $P0 = new .LuaUserdata, $P2
-    $P0."set_metatable"(_lua_mt_file)
+    $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 0
     _lua__ENVIRON[$P3] = $P0
 
-    $P1 = "stdout"
+    $P1 = 'stdout'
     $P2 = getstdout
     $P0 = new .LuaUserdata, $P2
-    $P0."set_metatable"(_lua_mt_file)
+    $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 1
     _lua__ENVIRON[$P3] = $P0
 
-    $P1 = "stderr"
+    $P1 = 'stderr'
     $P2 = getstderr
     $P0 = new .LuaUserdata, $P2
-    $P0."set_metatable"(_lua_mt_file)
+    $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 2
     _lua__ENVIRON[$P3] = $P0
@@ -186,12 +186,12 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 .end
 
 
-.sub getiofile :anon
+.sub 'getiofile' :anon
     .param int findex
     .local pmc _lua__ENVIRON
     .local pmc io
     .local pmc file 
-    _lua__ENVIRON = global "_ENVIRON"
+    _lua__ENVIRON = global '_ENVIRON'
     new io, .LuaNumber
     io = findex
     file = _lua__ENVIRON[io]
@@ -199,58 +199,58 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 .end 
 
 
-.sub getmode :anon
+.sub 'getmode' :anon
     .param string mode
     .local string ret
-    unless mode == "r" goto L1
-    ret = "<"
+    unless mode == 'r' goto L1
+    ret = '<'
     goto L0
 L1:
-    unless mode == "w" goto L2
-    ret = ">"
+    unless mode == 'w' goto L2
+    ret = '>'
     goto L0
 L2:
-    unless mode == "a" goto L3
-    ret = ">>"
+    unless mode == 'a' goto L3
+    ret = '>>'
     goto L0
 L3:
-    unless mode == "r+" goto L4
-    ret = "+<"
+    unless mode == 'r+' goto L4
+    ret = '+<'
     goto L0
 L4:
-    unless mode == "w+" goto L5
-    ret = "+>"
+    unless mode == 'w+' goto L5
+    ret = '+>'
     goto L0
 L5:
-    unless mode == "a+" goto L6
-    ret = "+>>"
+    unless mode == 'a+' goto L6
+    ret = '+>>'
     goto L0
 L6:
-    ret = ""
+    ret = ''
 L0:
     .return (ret)
 .end
 
 
-.sub newfile :anon
+.sub 'newfile' :anon
     .local pmc file
     .local pmc _lua__REGISTRY
     .local pmc mt
-    _lua__REGISTRY = global "_REGISTRY"
-    .const .LuaString key = "file"
+    _lua__REGISTRY = global '_REGISTRY'
+    .const .LuaString key = 'file'
     mt = _lua__REGISTRY[key]
     new file, .LuaUserdata
-    file."set_metatable"(mt)
+    file.'set_metatable'(mt)
     .return (file)
 .end
 
 
-.sub read_chars :anon
+.sub 'read_chars' :anon
     .param pmc f
     .param int n
     .local pmc ret
     $S0 = read f, n
-    unless $S0 == "" goto L1
+    unless $S0 == '' goto L1
     new ret, .LuaNil
     goto L2
 L1:
@@ -261,11 +261,11 @@ L2:
 .end
     
 
-.sub read_line :anon
+.sub 'read_line' :anon
     .param pmc f
     .local pmc ret
     $S0 = readline f
-    unless $S0 == "" goto L1
+    unless $S0 == '' goto L1
     new ret, .LuaNil
     goto L2
 L1:
@@ -277,19 +277,19 @@ L2:
 .end
 
 
-.sub setiofile :anon
+.sub 'setiofile' :anon
     .param int findex
     .param pmc file
     .local pmc _lua__ENVIRON
     .local pmc io
-    _lua__ENVIRON = global "_ENVIRON"
+    _lua__ENVIRON = global '_ENVIRON'
     new io, .LuaNumber
     io = findex
     _lua__ENVIRON[io] = file
 .end 
 
 
-.sub test_eof :anon
+.sub 'test_eof' :anon
     .param pmc f
     .local pmc ret
     $I1 = isfalse f
@@ -298,24 +298,24 @@ L2:
     goto L2
 L1:
     new ret, .LuaString
-    ret = ""
+    ret = ''
 L2:
     .return (ret)    
 .end
 
 
-.sub tofile :anon
+.sub 'tofile' :anon
     .param pmc file
     .local pmc mt
     .local pmc mt_file
     .local pmc ret
-    $I0 = isa file, "LuaUserdata"
+    $I0 = isa file, 'LuaUserdata'
     $S0 = typeof file
     unless $I0 goto L1
-    mt = file."get_metatable"()
+    mt = file.'get_metatable'()
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global "_REGISTRY"
-    .const .LuaString key = "file"
+    _lua__REGISTRY = global '_REGISTRY'
+    .const .LuaString key = 'file'
     mt_file = _lua__REGISTRY[key]
     unless mt == mt_file goto L1
     ret = getattribute file, 0
@@ -324,7 +324,7 @@ L2:
 L2:
     error("attempt to use a closed file")
 L1:
-    tag_error($S0, "file")    
+    tag_error($S0, 'file')    
 .end
 
 
@@ -335,7 +335,7 @@ file.
 
 =cut
 
-.sub _io_close :anon :outer(init_io)
+.sub '_io_close' :anon :outer(init_io)
     .param pmc file
     .local pmc ret
     unless_null file, L1
@@ -358,10 +358,10 @@ Equivalent to C<file:flush> over the default output file.
 
 =cut
 
-.sub _io_flush :anon :outer(init_io)
+.sub '_io_flush' :anon :outer(init_io)
     .local pmc file
     .local pmc ret
-    .const .LuaString key = "flush"
+    .const .LuaString key = 'flush'
     file = getiofile(1)
     $P0 = file[key]
     ret = $P0(file)
@@ -381,16 +381,16 @@ error code.
 
 =cut
 
-.sub _io_input :anon :outer(init_io)
+.sub '_io_input' :anon :outer(init_io)
     .param pmc file :optional
     .local pmc ret
     .local pmc f
     if_null file, L1
     unless file goto L1
-    $I1 = isa file, "LuaString"
+    $I1 = isa file, 'LuaString'
     unless $I1 goto L2
     $S1 = file
-    f = open $S1, "<"
+    f = open $S1, '<'
     unless_null f, L3
     argerror(file)
 L3:
@@ -428,18 +428,18 @@ NOT YET IMPLEMENTED (see file:lines).
 
 =cut
 
-.sub _io_lines :anon :outer(init_io)
+.sub '_io_lines' :anon :outer(init_io)
     .param pmc filename
     .local pmc file
     .local pmc f
     .local pmc ret
-    .const .LuaString key = "lines"
+    .const .LuaString key = 'lines'
     unless_null filename, L1
     file = getiofile(0)
     goto L3
 L1:
     $S1 = checkstring(filename)
-    f = open $S1, "<"
+    f = open $S1, '<'
     unless_null f, L2
     argerror($S1)
 L2:
@@ -494,15 +494,15 @@ in the standard C function C<fopen>.
 
 =cut
 
-.sub _io_open :anon :outer(init_io)
+.sub '_io_open' :anon :outer(init_io)
     .param pmc filename :optional
     .param pmc mode :optional
     .local pmc f
     .local pmc ret
     $S1 = checkstring(filename)
-    $S2 = optstring(mode, "r")
+    $S2 = optstring(mode, 'r')
     $S3 = getmode($S2)
-    if $S3 == "" goto L1
+    if $S3 == '' goto L1
     f = open $S1, $S3
     unless f goto L1
     ret = newfile()
@@ -513,7 +513,7 @@ L1:
     .local pmc msg
     new msg, .LuaString
     $S0 = err
-    concat $S1, ": "
+    concat $S1, ': '
     concat $S1, $S0
     msg = $S1
     .return (ret, msg)
@@ -526,16 +526,16 @@ Similar to C<io.input>, but operates over the default output file.
 
 =cut
 
-.sub _io_output :anon :outer(init_io)
+.sub '_io_output' :anon :outer(init_io)
     .param pmc file :optional
     .local pmc ret
     .local pmc f
     if_null file, L1
     unless file goto L1
-    $I1 = isa file, "LuaString"
+    $I1 = isa file, 'LuaString'
     unless $I1 goto L2
     $S1 = file
-    f = open $S1, ">"
+    f = open $S1, '>'
     unless_null f, L3
     argerror(file)
 L3:
@@ -564,7 +564,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_popen :anon :outer(init_io)
+.sub '_io_popen' :anon :outer(init_io)
     not_implemented()
 .end
 
@@ -577,11 +577,11 @@ STILL INCOMPLETE (see file:read).
 
 =cut
 
-.sub _io_read :anon :outer(init_io)
+.sub '_io_read' :anon :outer(init_io)
     .param pmc argv :slurpy
     .local pmc file
     .local pmc ret
-    .const .LuaString key = "read"
+    .const .LuaString key = 'read'
     file = getiofile(0)
     $P0 = file[key]
     ret = $P0(file, argv :flat)
@@ -598,7 +598,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _io_tmpfile :anon :outer(init_io)
+.sub '_io_tmpfile' :anon :outer(init_io)
     not_implemented()
 .end
 
@@ -611,17 +611,17 @@ handle, and B<nil> if C<obj> is not a file handle.
 
 =cut
 
-.sub _io_type :anon :outer(init_io)
+.sub '_io_type' :anon :outer(init_io)
     .param pmc obj :optional
     .local pmc mt
     .local pmc mt_file
     .local pmc f
     .local pmc ret
     checkany(obj)
-    mt = obj."get_metatable"()
+    mt = obj.'get_metatable'()
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global "_REGISTRY"
-    .const .LuaString key = "file"
+    _lua__REGISTRY = global '_REGISTRY'
+    .const .LuaString key = 'file'
     mt_file = _lua__REGISTRY[key]
     if mt == mt_file goto L1
     ret = new .LuaNil
@@ -633,7 +633,7 @@ L1:
     ret = "closed file"
     goto L3
 L2:
-    ret = "file"
+    ret = 'file'
 L3:
     .return (ret)
 .end
@@ -645,11 +645,11 @@ Equivalent to C<io.output():write>.
 
 =cut
 
-.sub _io_write :anon :outer(init_io)
+.sub '_io_write' :anon :outer(init_io)
     .param pmc argv :slurpy
     .local pmc file
     .local pmc ret
-    .const .LuaString key = "write"
+    .const .LuaString key = 'write'
     file = getiofile(1)
     $P0 = file[key]
     ret = $P0(file, argv :flat)
@@ -671,12 +671,12 @@ Saves any written data to C<file>.
 
 =cut
 
-.sub _file_flush :anon :outer(init_io)
+.sub '_file_flush' :anon :outer(init_io)
     .param pmc self
     .local pmc f
     .local pmc ret
     f = tofile(self)
-    f."flush"()
+    f.'flush'()
     new ret, .LuaBoolean
     ret = 1
     .return (ret)
@@ -697,7 +697,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_lines :anon :outer(init_io)
+.sub '_file_lines' :anon :outer(init_io)
     not_implemented()
 .end
 
@@ -741,7 +741,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub _file_read :anon :outer(init_io)
+.sub '_file_read' :anon :outer(init_io)
     .param pmc self
     .param pmc formats :slurpy
     .local pmc ret
@@ -762,7 +762,7 @@ L1:
 L2:
     unless i < narg goto L3
     format = formats[i]
-    $I0 = isa format, "LuaNumber"
+    $I0 = isa format, 'LuaNumber'
     unless $I0 goto L4
     .local int l
     l = format
@@ -776,16 +776,16 @@ L5:
     goto L6
 L4:
     $S0 = checkstring(format)
-    unless $S0 == "*n" goto L7
+    unless $S0 == '*n' goto L7
     not_implemented()
     goto L6
 L7:
-    unless $S0 == "*l" goto L8
+    unless $S0 == '*l' goto L8
     $P0 = read_line(f)
     ret[i] = $P0
     goto L6
 L8:
-    unless $S0 == "*a" goto L9
+    unless $S0 == '*a' goto L9
     $P0 = read_chars(f, 65535)
     ret[i] = $P0
     goto L6
@@ -833,7 +833,7 @@ position to the end of the file, and returns its size.
 
 =cut
 
-.sub _file_seek :anon :outer(init_io)
+.sub '_file_seek' :anon :outer(init_io)
     .param pmc self
     .param pmc whence :optional
     .param pmc offset :optional
@@ -843,10 +843,10 @@ position to the end of the file, and returns its size.
     tofile(self)
     new options, .Array
     options = 3
-    options[0] = "set"
-    options[1] = "cur"
-    options[2] = "end"
-    $S1 = optstring(whence, "cur")
+    options[0] = 'set'
+    options[1] = 'cur'
+    options[2] = 'end'
+    $S1 = optstring(whence, 'cur')
     $I1 = checkoption($S1, options)
     $I2 = optint(offset, 0)
     f = getattribute self, 0
@@ -887,7 +887,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _file_setvbuf :anon :outer(init_io)
+.sub '_file_setvbuf' :anon :outer(init_io)
     .param pmc self
     .param pmc mode :optional
     .param pmc size :optional
@@ -897,9 +897,9 @@ NOT YET IMPLEMENTED.
     tofile(self)
     new options, .Array
     options = 3
-    options[0] = "no"
-    options[1] = "full"
-    options[2] = "line"
+    options[0] = 'no'
+    options[1] = 'full'
+    options[2] = 'line'
     $S1 = checkstring(mode)
     $I1 = checkoption($S1, options)
     $I2 = optint(size, 512)
@@ -917,7 +917,7 @@ or C<string.format> before write.
 
 =cut
 
-.sub _file_write :anon :outer(init_io)
+.sub '_file_write' :anon :outer(init_io)
     .param pmc self
     .param pmc argv :slurpy
     .local pmc ret
@@ -931,7 +931,7 @@ or C<string.format> before write.
 L1:
     if i >= argc goto L2
     $P0 = argv[i]
-    $I0 = isa $P0, "LuaNumber"
+    $I0 = isa $P0, 'LuaNumber'
     unless $I0 goto L3
     print f, $P0
     goto L4 
@@ -948,7 +948,7 @@ L2:
 .end
 
 
-.sub _file__tostring :anon :outer(init_io)
+.sub '_file__tostring' :anon :outer(init_io)
     .param pmc self
     .local pmc f
     .local pmc ret

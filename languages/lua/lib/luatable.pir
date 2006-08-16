@@ -22,60 +22,60 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
 
 =cut
 
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
 
-.sub init_table :load :anon
+.sub 'init_table' :load :anon
 
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode 'languages/lua/lib/luaaux.pbc'
+#    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Table\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global "_G"
+    _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
     .local pmc _table
     _table = new .LuaTable
-    $P1 = "table"
+    $P1 = 'table'
     _lua__GLOBAL[$P1] = _table
 
-    .const .Sub _table_concat = "_table_concat"
-    $P1 = "concat"
+    .const .Sub _table_concat = '_table_concat'
+    $P1 = 'concat'
     _table[$P1] = _table_concat
 
-    .const .Sub _table_foreach = "_table_foreach"
-    $P1 = "foreach"
+    .const .Sub _table_foreach = '_table_foreach'
+    $P1 = 'foreach'
     _table[$P1] = _table_foreach
 
-    .const .Sub _table_foreachi = "_table_foreachi"
-    $P1 = "foreachi"
+    .const .Sub _table_foreachi = '_table_foreachi'
+    $P1 = 'foreachi'
     _table[$P1] = _table_foreachi
 
-    .const .Sub _table_getn = "_table_getn"
-    $P1 = "getn"
+    .const .Sub _table_getn = '_table_getn'
+    $P1 = 'getn'
     _table[$P1] = _table_getn
 
-    .const .Sub _table_insert = "_table_insert"
-    $P1 = "insert"
+    .const .Sub _table_insert = '_table_insert'
+    $P1 = 'insert'
     _table[$P1] = _table_insert
 
-    .const .Sub _table_maxn = "_table_maxn"
-    $P1 = "maxn"
+    .const .Sub _table_maxn = '_table_maxn'
+    $P1 = 'maxn'
     _table[$P1] = _table_maxn
 
-    .const .Sub _table_remove = "_table_remove"
-    $P1 = "remove"
+    .const .Sub _table_remove = '_table_remove'
+    $P1 = 'remove'
     _table[$P1] = _table_remove
 
-    .const .Sub _table_setn = "_table_setn"
-    $P1 = "setn"
+    .const .Sub _table_setn = '_table_setn'
+    $P1 = 'setn'
     _table[$P1] = _table_setn
 
-    .const .Sub _table_sort = "_table_sort"
-    $P1 = "sort"
+    .const .Sub _table_sort = '_table_sort'
+    $P1 = 'sort'
     _table[$P1] = _table_sort
 
 .end
@@ -91,7 +91,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
 
 =cut
 
-.sub _table_concat :anon :outer(init_table)
+.sub '_table_concat' :anon :outer(init_table)
     .param pmc table :optional
     .param pmc sep :optional
     .param pmc i :optional
@@ -100,20 +100,20 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     .local pmc value
     .local pmc ret
     .local int last
-    $S0 = optstring(sep, "")
-    checktype(table, "table")
+    $S0 = optstring(sep, '')
+    checktype(table, 'table')
     $I0 = optint(i, 1)
     $I1 = getn(table)
     last = optint(j, $I1)
-    $S1 = ""
+    $S1 = ''
     new idx, .LuaNumber 
 L2:
     unless $I0 <= last goto L3
     idx = $I0
-    value = table."rawget"(idx)
-    $I2 = isa value, "LuaString"
+    value = table.'rawget'(idx)
+    $I2 = isa value, 'LuaString'
     if $I2 goto L4
-    $I2 = isa value, "LuaNumber"
+    $I2 = isa value, 'LuaNumber'
     if $I2 goto L4
     argerror("table contains non-strings")
 L4:
@@ -144,14 +144,14 @@ B<DEPRECATED>
 
 =cut
 
-.sub _table_foreach :anon :outer(init_table)
+.sub '_table_foreach' :anon :outer(init_table)
     .param pmc table :optional
     .param pmc f :optional
     .local pmc idx
     .local pmc value
     .local pmc ret
-    checktype(table, "table")
-    checktype(f, "function")
+    checktype(table, 'table')
+    checktype(f, 'function')
     new idx, .LuaNil
 L1:
     (idx, value) = next(table, idx)
@@ -177,7 +177,7 @@ B<DEPRECATED>
 
 =cut
 
-.sub _table_foreachi :anon :outer(init_table)
+.sub '_table_foreachi' :anon :outer(init_table)
     .param pmc table :optional
     .param pmc f :optional
     .local pmc index
@@ -185,8 +185,8 @@ B<DEPRECATED>
     .local pmc ret
     .local int i
     .local int n
-    checktype(table, "table")
-    checktype(f, "function")
+    checktype(table, 'table')
+    checktype(f, 'function')
     n = getn(table)
     i = 0
     new index, .LuaNumber
@@ -194,7 +194,7 @@ L1:
     add i, 1
     unless i <= n goto L2
     index = i
-    value = table."rawget"(index)
+    value = table.'rawget'(index)
     (ret) = f(index, value) 
     $I0 = defined ret
     unless $I0 goto L1
@@ -212,11 +212,11 @@ B<DEPRECATED>
 
 =cut
 
-.sub _table_getn :anon :outer(init_table)
+.sub '_table_getn' :anon :outer(init_table)
     .param pmc table :optional
     .local pmc ret
-    checktype(table, "table")
-    ret = table."len"()
+    checktype(table, 'table')
+    ret = table.'len'()
     .return (ret)
 .end
 
@@ -230,7 +230,7 @@ inserts C<x> at the end of table C<t>.
 
 =cut
 
-.sub _table_insert :anon :outer(init_table)
+.sub '_table_insert' :anon :outer(init_table)
     .param pmc table :optional
     .param pmc arg2 :optional
     .param pmc arg3 :optional
@@ -239,7 +239,7 @@ inserts C<x> at the end of table C<t>.
     .local int e
     .local int pos
     new index, .LuaNumber
-    checktype(table, "table")
+    checktype(table, 'table')
     e = getn(table)
     inc e
     unless_null arg3, L1
@@ -256,10 +256,10 @@ L4:
     dec e
     unless e >= pos goto L2
     index = e
-    $P0 = table."rawget"(index)
+    $P0 = table.'rawget'(index)
     $I0 = e + 1
     index = $I0
-    table."rawset"(index, $P0)
+    table.'rawset'(index, $P0)
     goto L4
 L2:
     index = pos
@@ -277,19 +277,19 @@ STILL INCOMPLETE (see next in luapir.pir).
 
 =cut
 
-.sub _table_maxn :anon :outer(init_table)
+.sub '_table_maxn' :anon :outer(init_table)
     .param pmc table :optional
     .local pmc idx
     .local pmc value
     .local pmc max
-    checktype(table, "table")
+    checktype(table, 'table')
     new max, .LuaNumber
     max = 0
     new idx, .LuaNil
 L1:
     (idx, value) = next(table, idx)
     unless idx goto L2
-    $I0 = isa idx, "LuaNumber"
+    $I0 = isa idx, 'LuaNumber'
     unless $I0 goto L1
     unless idx > max goto L1 
     max = clone idx
@@ -309,14 +309,14 @@ table C<t>.
 
 =cut
 
-.sub _table_remove :anon :outer(init_table)
+.sub '_table_remove' :anon :outer(init_table)
     .param pmc table :optional
     .param pmc pos :optional
     .local pmc index
     .local pmc ret
     .local int e
     .local int ipos
-    checktype(table, "table")
+    checktype(table, 'table')
     e = getn(table)
     ipos = optint(pos, e)
     unless e <= 0 goto L1
@@ -326,20 +326,20 @@ L1:
     $I1 = e - 1
     new index, .LuaNumber
     index = ipos
-    ret = table."rawget"(index)
+    ret = table.'rawget'(index)
 L2:
     unless ipos < e goto L3
     $I2 = ipos + 1
     index = $I2
-    $P0 = table."rawget"(index)
+    $P0 = table.'rawget'(index)
     index = ipos
-    table."rawset"(index, $P0)
+    table.'rawset'(index, $P0)
     ipos = $I2
     goto L2
 L3:
     new $P0, .LuaNil
     index = e
-    table."rawset"(index, $P0)        
+    table.'rawset'(index, $P0)        
     .return (ret)
 .end
 
@@ -350,10 +350,10 @@ B<OBSOLETE>
 
 =cut
 
-.sub _table_setn :anon :outer(init_table)
+.sub '_table_setn' :anon :outer(init_table)
     .param pmc table :optional
     .param pmc n :optional
-    checktype(table, "table")
+    checktype(table, 'table')
     error("'setn' is obsolete")
 .end
 
@@ -374,31 +374,31 @@ NOT YET IMPLEMENTED (see auxsort).
 
 =cut
 
-.sub _table_sort :anon :outer(init_table)
+.sub '_table_sort' :anon :outer(init_table)
     .param pmc table :optional
     .param pmc comp :optional
     .local int n
-    checktype(table, "table")
+    checktype(table, 'table')
     n = getn(table)
     if_null comp, L1
     if comp goto L1
-    checktype(comp, "function")
+    checktype(comp, 'function')
     goto L2
 L1:    
-    .const .Sub lessthan = "lessthan"
+    .const .Sub lessthan = 'lessthan'
     comp = lessthan
 L2:
     auxsort(table, comp, n)
 .end
 
-.sub auxsort :anon
+.sub 'auxsort' :anon
     .param pmc table
     .param pmc comp
     .param int u
     not_implemented()
 .end
 
-.sub lessthan :anon
+.sub 'lessthan' :anon
     .param pmc l
     .param pmc r
     .local int ret

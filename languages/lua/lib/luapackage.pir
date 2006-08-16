@@ -16,56 +16,56 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
 
 =cut
 
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
 
-.sub init_package :load :anon
+.sub 'init_package' :load :anon
 
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode 'languages/lua/lib/luaaux.pbc'
+#    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Package\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global "_G"
+    _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
-    .const .Sub _lua_module = "_lua_module"
-    $P1 = "module"
+    .const .Sub _lua_module = '_lua_module'
+    $P1 = 'module'
     _lua__GLOBAL[$P1] = _lua_module
 
-    .const .Sub _lua_require = "_lua_require"
-    $P1 = "require"
+    .const .Sub _lua_require = '_lua_require'
+    $P1 = 'require'
     _lua__GLOBAL[$P1] = _lua_require
 
     .local pmc _package
     _package = new .LuaTable
-    $P1 = "package"
+    $P1 = 'package'
     _lua__GLOBAL[$P1] = _package
 
     $P0 = new .LuaString
-    $P1 = "cpath"
+    $P1 = 'cpath'
     _package[$P1] = $P0
 
     $P0 = new .LuaTable
-    $P1 = "loaded"
+    $P1 = 'loaded'
     _package[$P1] = $P0
 
-    .const .Sub _package_loadlib = "_package_loadlib"
-    $P1 = "loadlib"
+    .const .Sub _package_loadlib = '_package_loadlib'
+    $P1 = 'loadlib'
     _package[$P1] = _package_loadlib
 
     $P0 = new .LuaString
-    $P1 = "path"
+    $P1 = 'path'
     _package[$P1] = $P0
 
     $P0 = new .LuaTable
-    $P1 = "preloaded"
+    $P1 = 'preloaded'
     _package[$P1] = $P0
 
-    .const .Sub _package_seeall = "_package_seeall"
-    $P1 = "seeall"
+    .const .Sub _package_seeall = '_package_seeall'
+    $P1 = 'seeall'
     _package[$P1] = _package_seeall
 
 .end
@@ -99,7 +99,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_module :anon :outer(init_package)
+.sub '_lua_module' :anon :outer(init_package)
     .param pmc name :optional
     $S0 = checkstring(name)
     not_implemented()
@@ -128,7 +128,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _lua_require :anon :outer(init_package)
+.sub '_lua_require' :anon :outer(init_package)
     .param pmc packagename :optional
     $S0 = checkstring(packagename)
     not_implemented()
@@ -171,7 +171,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _package_loadlib :anon :outer(init_package)
+.sub '_package_loadlib' :anon :outer(init_package)
     not_implemented()
 .end
 
@@ -216,7 +216,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _package_seeall :anon :outer(init_package)
+.sub '_package_seeall' :anon :outer(init_package)
     not_implemented()
 .end
 

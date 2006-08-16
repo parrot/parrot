@@ -13,15 +13,15 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =cut
 
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
 
 =item C<argerror (extramsg)>
 
 =cut
 
-.sub argerror
+.sub 'argerror'
     .param string extramsg
     error(extramsg)
 .end
@@ -31,7 +31,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =cut
 
-.sub checkany
+.sub 'checkany'
     .param pmc arg
     unless_null arg, L1
     argerror("value expected")
@@ -43,22 +43,22 @@ L1:
 
 =cut
 
-.sub checkforloop
+.sub 'checkforloop'
     .param pmc start
     .param pmc limit
     .param pmc step
     .local pmc ret_start
-    ret_start = start."tonumber"()
+    ret_start = start.'tonumber'()
     if ret_start goto L1
     error("'for' initial value must be a number")
 L1:    
     .local pmc ret_limit
-    ret_limit = limit."tonumber"()
+    ret_limit = limit.'tonumber'()
     if ret_limit goto L2
     error("'for' limit must be a number")
 L2:    
     .local pmc ret_step
-    ret_step = step."tonumber"()
+    ret_step = step.'tonumber'()
     if ret_step goto L3
     error("'for' step must be a number")
 L3:    
@@ -70,21 +70,21 @@ L3:
 
 =cut
 
-.sub checknumber
+.sub 'checknumber'
     .param pmc arg
     .local float val
     $S0 = "no value"
     if_null arg, L0
     $S0 = typeof arg
-    $I0 = isa arg, "LuaNumber"
+    $I0 = isa arg, 'LuaNumber'
     unless $I0 goto L1
     val = arg
     .return (val)    
 L1:
-    $I0 = isa arg, "LuaString"
+    $I0 = isa arg, 'LuaString'
     unless $I0 goto L0
-    $P0 = arg."tonumber"()
-    $I0 = isa $P0, "LuaNumber"
+    $P0 = arg.'tonumber'()
+    $I0 = isa $P0, 'LuaNumber'
     unless $I0 goto L0
     val = $P0
     .return (val)
@@ -97,7 +97,7 @@ L0:
 
 =cut
 
-.sub checkoption
+.sub 'checkoption'
     .param string name
     .param pmc options
     .local int i
@@ -124,20 +124,20 @@ L2:
 
 =cut
 
-.sub checkstring
+.sub 'checkstring'
     .param pmc arg
     .local pmc val
     $S0 = "no value"
     if_null arg, L0
     $S0 = typeof arg
-    $I0 = isa arg, "LuaString"
+    $I0 = isa arg, 'LuaString'
     unless $I0 goto L1
     val = arg
     .return (val)    
 L1:
-    $I0 = isa arg, "LuaNumber"
+    $I0 = isa arg, 'LuaNumber'
     unless $I0 goto L0
-    val = arg."tostring"()
+    val = arg.'tostring'()
     .return (val)
 L0:
     tag_error($S0, "string")    
@@ -148,7 +148,7 @@ L0:
 
 =cut
 
-.sub checktype
+.sub 'checktype'
     .param pmc arg
     .param string type
     $S0 = "no value"       
@@ -165,11 +165,11 @@ L0:
 
 =cut
 
-.sub error
+.sub 'error'
     .param string message
     .local pmc ex
     ex = new .Exception
-    ex["_message"] =  message
+    ex['_message'] =  message
     throw ex
 .end
 
@@ -178,9 +178,9 @@ L0:
 
 =cut
 
-.sub getn
+.sub 'getn'
     .param pmc table
-    $P0 = table."len"()
+    $P0 = table.'len'()
     $I0 = $P0
     .return ($I0)
 .end
@@ -192,7 +192,7 @@ Support variable number of arguments function call.
 
 =cut
 
-.sub mkarg
+.sub 'mkarg'
     .param pmc argv
     .return (argv :flat)
 .end
@@ -202,7 +202,7 @@ Support variable number of arguments function call.
 
 =cut
 
-.sub next
+.sub 'next'
     .param pmc table
     .param pmc index
     .local pmc value
@@ -223,10 +223,10 @@ L2:
 
 =cut
 
-.sub not_implemented
+.sub 'not_implemented'
     .local pmc ex
     ex = new .Exception
-    ex["_message"] =  "not implemented"
+    ex['_message'] =  "not implemented"
     throw ex
 .end
 
@@ -235,7 +235,7 @@ L2:
 
 =cut
 
-.sub optint
+.sub 'optint'
     .param pmc arg
     .param int default
     if_null arg, L0
@@ -251,7 +251,7 @@ L0:
 
 =cut
 
-.sub optstring
+.sub 'optstring'
     .param pmc arg
     .param string default
     if_null arg, L0
@@ -267,7 +267,7 @@ L0:
 
 =cut
 
-.sub tag_error
+.sub 'tag_error'
     .param string got
     .param string expec
     $S0 = expec 
@@ -281,7 +281,7 @@ L0:
 
 =cut
 
-.sub tconstruct
+.sub 'tconstruct'
     .param pmc table
     .param pmc index
     .param pmc argv :slurpy

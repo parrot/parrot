@@ -11,21 +11,21 @@ package pirVisitor;
         bless $self, $class;
         my ($fh) = @_;
         $self->{fh}       = $fh;
-        $self->{prologue} = q{.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+        $self->{prologue} = q{.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
-.include "languages/lua/lib/luaaux.pir"
-.include "languages/lua/lib/luabasic.pir"
-.include "languages/lua/lib/luacoroutine.pir"
-.include "languages/lua/lib/luapackage.pir"
-.include "languages/lua/lib/luastring.pir"
-.include "languages/lua/lib/luatable.pir"
-.include "languages/lua/lib/luamath.pir"
-.include "languages/lua/lib/luaio.pir"
-.include "languages/lua/lib/luaos.pir"
-.include "languages/lua/lib/luadebug.pir"
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luapackage.pir'
+.include 'languages/lua/lib/luastring.pir'
+.include 'languages/lua/lib/luatable.pir'
+.include 'languages/lua/lib/luamath.pir'
+.include 'languages/lua/lib/luaio.pir'
+.include 'languages/lua/lib/luaos.pir'
+.include 'languages/lua/lib/luadebug.pir'
 
-.sub __start :main
+.sub '__start' :main
 #  print "start Lua\n"
   init_basic()
   init_coroutine()
@@ -41,15 +41,15 @@ package pirVisitor;
 #  PBC loader does not support LuaFunction
 #  
   
-#  load_bytecode "languages/lua/lib/luabasic.pbc"
-#  load_bytecode "languages/lua/lib/luacoroutine.pbc"
-#  load_bytecode "languages/lua/lib/luapackage.pbc"
-#  load_bytecode "languages/lua/lib/luastring.pbc"
-#  load_bytecode "languages/lua/lib/luatable.pbc"
-#  load_bytecode "languages/lua/lib/luamath.pbc"
-#  load_bytecode "languages/lua/lib/luaio.pbc"
-#  load_bytecode "languages/lua/lib/luaos.pbc"
-#  load_bytecode "languages/lua/lib/luadebug.pbc"
+#  load_bytecode 'languages/lua/lib/luabasic.pbc'
+#  load_bytecode 'languages/lua/lib/luacoroutine.pbc'
+#  load_bytecode 'languages/lua/lib/luapackage.pbc'
+#  load_bytecode 'languages/lua/lib/luastring.pbc'
+#  load_bytecode 'languages/lua/lib/luatable.pbc'
+#  load_bytecode 'languages/lua/lib/luamath.pbc'
+#  load_bytecode 'languages/lua/lib/luaio.pbc'
+#  load_bytecode 'languages/lua/lib/luaos.pbc'
+#  load_bytecode 'languages/lua/lib/luadebug.pbc'
   _main()
 .end
 
@@ -122,7 +122,7 @@ package pirVisitor;
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH}
-            "  $op->{result}->{symbol} = get_global \"$op->{arg1}\"\n";
+            "  $op->{result}->{symbol} = get_global '$op->{arg1}'\n";
     }
 
     sub visitFindLexOp {
@@ -130,7 +130,7 @@ package pirVisitor;
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH}
-            "  $op->{result}->{symbol} = find_lex \"$op->{arg1}->{symbol}\"\n";
+            "  $op->{result}->{symbol} = find_lex '$op->{arg1}->{symbol}'\n";
     }
 
     sub visitStoreLexOp {
@@ -138,7 +138,7 @@ package pirVisitor;
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH}
-            "  store_lex \"$op->{arg1}->{symbol}\", $op->{arg2}->{symbol}\n";
+            "  store_lex '$op->{arg1}->{symbol}', $op->{arg2}->{symbol}\n";
     }
 
     sub visitCloneOp {
@@ -236,7 +236,7 @@ package pirVisitor;
         }
         my @args = @{ $op->{arg2} };
         my $obj  = shift @args;
-        print {$FH} "$obj->{symbol}.$op->{arg1}(";
+        print {$FH} "$obj->{symbol}.'$op->{arg1}'(";
         my $first = 1;
         foreach (@args) {
             print {$FH} ", " unless ($first);
@@ -305,7 +305,7 @@ package pirVisitor;
         my ($dir) = @_;
         my $FH    = $self->{fh};
         print {$FH} "\n";
-        print {$FH} ".sub $dir->{result}->{symbol} :anon";
+        print {$FH} ".sub '$dir->{result}->{symbol}' :anon";
         if ( exists $dir->{outer} ) {
             print {$FH} " :outer($dir->{outer})";
         }
@@ -364,7 +364,7 @@ package pirVisitor;
         my ($dir) = @_;
         my $FH    = $self->{fh};
         print {$FH}
-            "  .lex \"$dir->{arg1}->{symbol}\", $dir->{arg1}->{symbol}\n";
+            "  .lex '$dir->{arg1}->{symbol}', $dir->{arg1}->{symbol}\n";
     }
 
     sub visitConstDir {

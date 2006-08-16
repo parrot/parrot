@@ -17,68 +17,68 @@ See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
 
 =cut
 
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
 
-.sub init_os :load :anon
+.sub 'init_os' :load :anon
 
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode 'languages/lua/lib/luaaux.pbc'
+#    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua OS\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global "_G"
+    _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
     .local pmc _os
     _os = new .LuaTable
-    $P1 = "os"
+    $P1 = 'os'
     _lua__GLOBAL[$P1] = _os
 
-    .const .Sub _os_clock = "_os_clock"
-    $P1 = "clock"
+    .const .Sub _os_clock = '_os_clock'
+    $P1 = 'clock'
     _os[$P1] = _os_clock
 
-    .const .Sub _os_date = "_os_date"
-    $P1 = "date"
+    .const .Sub _os_date = '_os_date'
+    $P1 = 'date'
     _os[$P1] = _os_date
 
-    .const .Sub _os_difftime = "_os_difftime"
-    $P1 = "difftime"
+    .const .Sub _os_difftime = '_os_difftime'
+    $P1 = 'difftime'
     _os[$P1] = _os_difftime
 
-    .const .Sub _os_execute = "_os_execute"
-    $P1 = "execute"
+    .const .Sub _os_execute = '_os_execute'
+    $P1 = 'execute'
     _os[$P1] = _os_execute
 
-    .const .Sub _os_exit = "_os_exit"
-    $P1 = "exit"
+    .const .Sub _os_exit = '_os_exit'
+    $P1 = 'exit'
     _os[$P1] = _os_exit
 
-    .const .Sub _os_getenv = "_os_getenv"
-    $P1 = "getenv"
+    .const .Sub _os_getenv = '_os_getenv'
+    $P1 = 'getenv'
     _os[$P1] = _os_getenv
 
-    .const .Sub _os_remove = "_os_remove"
-    $P1 = "remove"
+    .const .Sub _os_remove = '_os_remove'
+    $P1 = 'remove'
     _os[$P1] = _os_remove
 
-    .const .Sub _os_rename = "_os_rename"
-    $P1 = "rename"
+    .const .Sub _os_rename = '_os_rename'
+    $P1 = 'rename'
     _os[$P1] = _os_rename
 
-    .const .Sub _os_setlocale = "_os_setlocale"
-    $P1 = "setlocale"
+    .const .Sub _os_setlocale = '_os_setlocale'
+    $P1 = 'setlocale'
     _os[$P1] = _os_setlocale
 
-    .const .Sub _os_time = "_os_time"
-    $P1 = "time"
+    .const .Sub _os_time = '_os_time'
+    $P1 = 'time'
     _os[$P1] = _os_time
 
-    .const .Sub _os_tmpname = "_os_tmpname"
-    $P1 = "tmpname"
+    .const .Sub _os_tmpname = '_os_tmpname'
+    $P1 = 'tmpname'
     _os[$P1] = _os_tmpname
 
 .end
@@ -93,7 +93,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_clock :anon :outer(init_os)
+.sub '_os_clock' :anon :outer(init_os)
     .local pmc ret
     new ret, .LuaNumber
     not_implemented()
@@ -127,7 +127,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_date :anon :outer(init_os)
+.sub '_os_date' :anon :outer(init_os)
     .param pmc format :optional
     .param pmc time :optional
     $S0 = optstring(format, "%c")
@@ -145,7 +145,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_difftime :anon :outer(init_os)
+.sub '_os_difftime' :anon :outer(init_os)
     .param pmc t2 :optional
     .param pmc t1 :optional
     $I0 = checknumber(t2)
@@ -167,11 +167,11 @@ shell is available and zero otherwise.
 
 =cut
 
-.sub _os_execute :anon :outer(init_os)
+.sub '_os_execute' :anon :outer(init_os)
     .param pmc command :optional
     .local pmc ret
-    $S0 = optstring(command, "")
-    unless $S0 == "" goto L1
+    $S0 = optstring(command, '')
+    unless $S0 == '' goto L1
     $I0 = 1
     goto L2
 L1:
@@ -191,7 +191,7 @@ program. The default value for C<code> is the success code.
 
 =cut
 
-.sub _os_exit :anon :outer(init_os)
+.sub '_os_exit' :anon :outer(init_os)
     .param pmc code :optional
     $I0 = optint(code, 0)
     exit $I0
@@ -205,7 +205,7 @@ if the variable is not defined.
 
 =cut
 
-.sub _os_getenv :anon :outer(init_os)
+.sub '_os_getenv' :anon :outer(init_os)
     .param pmc varname :optional
     .local pmc ret
     $S0 = checkstring(varname)
@@ -229,14 +229,14 @@ describing the error.
 
 =cut
 
-.sub _os_remove :anon :outer(init_os)
+.sub '_os_remove' :anon :outer(init_os)
     .param pmc filename :optional
     .local pmc ret
     $S0 = checkstring(filename)
     $S1 = $S0
     new $P0, .OS
     push_eh _handler
-    $P0."rm"($S0)
+    $P0.'rm'($S0)
     new ret, .LuaBoolean
     ret = 1
     .return (ret)
@@ -246,7 +246,7 @@ _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
-    concat $S1, ": "
+    concat $S1, ': '
     concat $S1, s
     new nil, .LuaNil
     new msg, .LuaString
@@ -262,7 +262,7 @@ fails, it returns B<nil>, plus a string describing the error.
 
 =cut
 
-.sub _os_rename :anon :outer(init_os)
+.sub '_os_rename' :anon :outer(init_os)
     .param pmc oldname :optional
     .param pmc newname :optional
     .local pmc ret
@@ -271,7 +271,7 @@ fails, it returns B<nil>, plus a string describing the error.
     $S1 = checkstring(newname)
     new $P0, .File
     push_eh _handler
-    $P0."rename"($S0, $S1)
+    $P0.'rename'($S0, $S1)
     new ret, .LuaBoolean
     ret = 1
     .return (ret)
@@ -281,7 +281,7 @@ _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
-    concat $S2, ": "
+    concat $S2, ': '
     concat $S2, s
     new nil, .LuaNil
     new msg, .LuaString
@@ -302,10 +302,10 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_setlocale :anon :outer(init_os)
+.sub '_os_setlocale' :anon :outer(init_os)
     .param pmc locale :optional
     .param pmc category :optional
-    $S1 = optstring(category, "all")
+    $S1 = optstring(category, 'all')
     not_implemented()
 .end
 
@@ -327,19 +327,19 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub _os_time :anon :outer(init_os)
+.sub '_os_time' :anon :outer(init_os)
     .param pmc table :optional
     .local pmc ret
     if_null table, L0
     $S0 = typeof table
-    if $S0 != "nil" goto L1
+    if $S0 != 'nil' goto L1
 L0:
     $I0 = time
     new ret, .LuaNumber
     ret = $I0
     .return (ret)
 L1:
-    checktype(table, "table")
+    checktype(table, 'table')
     not_implemented()
 .end
 
@@ -354,7 +354,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _os_tmpname :anon :outer(init_os)
+.sub '_os_tmpname' :anon :outer(init_os)
     .local pmc ret
     new ret, .LuaString
     not_implemented()

@@ -18,48 +18,48 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 
 =cut
 
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
 
-.sub init_coroutine :load :anon
+.sub 'init_coroutine' :load :anon
 
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode 'languages/lua/lib/luaaux.pbc'
+#    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Coroutine\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global "_G"
+    _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
     .local pmc _coroutine
     _coroutine = new .LuaTable
-    $P1 = "coroutine"
+    $P1 = 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 
-    .const .Sub _coroutine_create = "_coroutine_create"
-    $P1 = "create"
+    .const .Sub _coroutine_create = '_coroutine_create'
+    $P1 = 'create'
     _coroutine[$P1] = _coroutine_create
 
-    .const .Sub _coroutine_resume = "_coroutine_resume"
-    $P1 = "resume"
+    .const .Sub _coroutine_resume = '_coroutine_resume'
+    $P1 = 'resume'
     _coroutine[$P1] = _coroutine_resume
 
-    .const .Sub _coroutine_running = "_coroutine_running"
-    $P1 = "running"
+    .const .Sub _coroutine_running = '_coroutine_running'
+    $P1 = 'running'
     _coroutine[$P1] = _coroutine_running
 
-    .const .Sub _coroutine_status = "_coroutine_status"
-    $P1 = "status"
+    .const .Sub _coroutine_status = '_coroutine_status'
+    $P1 = 'status'
     _coroutine[$P1] = _coroutine_status
 
-    .const .Sub _coroutine_wrap = "_coroutine_wrap"
-    $P1 = "wrap"
+    .const .Sub _coroutine_wrap = '_coroutine_wrap'
+    $P1 = 'wrap'
     _coroutine[$P1] = _coroutine_wrap
 
-    .const .Sub _coroutine_yield = "_coroutine_yield"
-    $P1 = "yield"
+    .const .Sub _coroutine_yield = '_coroutine_yield'
+    $P1 = 'yield'
     _coroutine[$P1] = _coroutine_yield
 
 .end
@@ -71,10 +71,10 @@ Returns this new coroutine, an object with type C<"thread">.
 
 =cut
 
-.sub _coroutine_create :anon :outer(init_coroutine)
+.sub '_coroutine_create' :anon :outer(init_coroutine)
     .param pmc f :optional
     .local pmc ret
-    checktype(f, "function")
+    checktype(f, 'function')
     ret = new .LuaThread, f
     .return (ret)
 .end
@@ -94,13 +94,13 @@ C<resume> returns B<false> plus the error message.
 
 =cut
 
-.sub _coroutine_resume :anon :outer(init_coroutine)
+.sub '_coroutine_resume' :anon :outer(init_coroutine)
     .param pmc co :optional
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc status
     new status, .LuaBoolean
-    checktype(co, "thread")
+    checktype(co, 'thread')
     push_eh _handler
     (ret :slurpy) = co(argv :flat)
     status = 1
@@ -125,7 +125,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_running :anon :outer(init_coroutine)
+.sub '_coroutine_running' :anon :outer(init_coroutine)
     not_implemented()
 .end
 
@@ -143,12 +143,12 @@ DUMMY IMPLEMENTATION.
 
 =cut
 
-.sub _coroutine_status :anon :outer(init_coroutine)
+.sub '_coroutine_status' :anon :outer(init_coroutine)
     .param pmc co :optional
     .local pmc ret
-    checktype(co, "thread")
+    checktype(co, 'thread')
     new ret, .LuaString 
-    ret = "suspended"
+    ret = 'suspended'
     .return (ret)
 .end
 
@@ -164,9 +164,9 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _coroutine_wrap :anon :outer(init_coroutine)
+.sub '_coroutine_wrap' :anon :outer(init_coroutine)
     .param pmc f :optional
-    checktype(f, "function")
+    checktype(f, 'function')
     not_implemented()
 .end
 
@@ -178,7 +178,7 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
 
 =cut
 
-.sub _coroutine_yield :anon :outer(init_coroutine)
+.sub '_coroutine_yield' :anon :outer(init_coroutine)
     .param pmc argv :slurpy
     .yield(argv)
 .end

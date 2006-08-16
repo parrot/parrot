@@ -28,93 +28,93 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
 =cut
 
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
 
-.sub init_string :load :anon
+.sub 'init_string' :load :anon
 
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode 'languages/lua/lib/luaaux.pbc'
+#    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua String\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global "_G"
+    _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
     .local pmc _string
     _string = new .LuaTable
-    $P1 = "string"
+    $P1 = 'string'
     _lua__GLOBAL[$P1] = _string
 
-    .const .Sub _string_byte = "_string_byte"
-    $P1 = "byte"
+    .const .Sub _string_byte = '_string_byte'
+    $P1 = 'byte'
     _string[$P1] = _string_byte
 
-    .const .Sub _string_char = "_string_char"
-    $P1 = "char"
+    .const .Sub _string_char = '_string_char'
+    $P1 = 'char'
     _string[$P1] = _string_char
 
-    .const .Sub _string_dump = "_string_dump"
-    $P1 = "dump"
+    .const .Sub _string_dump = '_string_dump'
+    $P1 = 'dump'
     _string[$P1] = _string_dump
 
-    .const .Sub _string_find = "_string_find"
-    $P1 = "find"
+    .const .Sub _string_find = '_string_find'
+    $P1 = 'find'
     _string[$P1] = _string_find
 
-    .const .Sub _string_format = "_string_format"
-    $P1 = "format"
+    .const .Sub _string_format = '_string_format'
+    $P1 = 'format'
     _string[$P1] = _string_format
 
-    .const .Sub _string_gmatch = "_string_gmatch"
-    $P1 = "gmatch"
+    .const .Sub _string_gmatch = '_string_gmatch'
+    $P1 = 'gmatch'
     _string[$P1] = _string_gmatch
 
-    .const .Sub _string_gsub = "_string_gsub"
-    $P1 = "gsub"
+    .const .Sub _string_gsub = '_string_gsub'
+    $P1 = 'gsub'
     _string[$P1] = _string_gsub
 
-    .const .Sub _string_len = "_string_len"
-    $P1 = "len"
+    .const .Sub _string_len = '_string_len'
+    $P1 = 'len'
     _string[$P1] = _string_len
 
-    .const .Sub _string_lower = "_string_lower"
-    $P1 = "lower"
+    .const .Sub _string_lower = '_string_lower'
+    $P1 = 'lower'
     _string[$P1] = _string_lower
 
-    .const .Sub _string_match = "_string_match"
-    $P1 = "match"
+    .const .Sub _string_match = '_string_match'
+    $P1 = 'match'
     _string[$P1] = _string_match
 
-    .const .Sub _string_rep = "_string_rep"
-    $P1 = "rep"
+    .const .Sub _string_rep = '_string_rep'
+    $P1 = 'rep'
     _string[$P1] = _string_rep
 
-    .const .Sub _string_reverse = "_string_reverse"
-    $P1 = "reverse"
+    .const .Sub _string_reverse = '_string_reverse'
+    $P1 = 'reverse'
     _string[$P1] = _string_reverse
 
-    .const .Sub _string_sub = "_string_sub"
-    $P1 = "sub"
+    .const .Sub _string_sub = '_string_sub'
+    $P1 = 'sub'
     _string[$P1] = _string_sub
 
-    .const .Sub _string_upper = "_string_upper"
-    $P1 = "upper"
+    .const .Sub _string_upper = '_string_upper'
+    $P1 = 'upper'
     _string[$P1] = _string_upper
 
 
     .local pmc _lua_mt_string
     _lua_mt_string = new .LuaTable
-    global "mt_string" = _lua_mt_string
-    $P1 = "__index"
+    global 'mt_string' = _lua_mt_string
+    $P1 = '__index'
     _lua_mt_string[$P1] = _string
 
 .end
 
 
-.sub posrelat :anon
+.sub 'posrelat' :anon
     .param int pos
     .param int len
     if pos >= 0 goto L0
@@ -134,7 +134,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub _string_byte :anon :outer(init_string)
+.sub '_string_byte' :anon :outer(init_string)
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -189,7 +189,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub _string_char :anon :outer(init_string)
+.sub '_string_char' :anon :outer(init_string)
     .param pmc argv :slurpy
     .local pmc ret
     .local int argc
@@ -198,7 +198,7 @@ Note that numerical codes are not necessarily portable across platforms.
     .local pmc curr
     .local string b
     .local string s
-    b = ""
+    b = ''
     argc = argv
     i = 0
 L1:
@@ -226,9 +226,9 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_dump :anon :outer(init_string)
+.sub '_string_dump' :anon :outer(init_string)
     .param pmc function :optional
-    checktype(function, "function")
+    checktype(function, 'function')
     not_implemented()
 .end
 
@@ -251,7 +251,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_find :anon :outer(init_string)
+.sub '_string_find' :anon :outer(init_string)
     .param pmc s :optional
     .param pmc pattern :optional
     .param pmc init :optional
@@ -293,7 +293,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_format :anon :outer(init_string)
+.sub '_string_format' :anon :outer(init_string)
     .param pmc formatstring :optional
     .param pmc argv :slurpy
     $S0 = checkstring(formatstring)
@@ -331,7 +331,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_gmatch :anon :outer(init_string)
+.sub '_string_gmatch' :anon :outer(init_string)
     .param pmc s :optional
     .param pmc pattern :optional
     $S0 = checkstring(s)
@@ -365,7 +365,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_gsub :anon :outer(init_string)
+.sub '_string_gsub' :anon :outer(init_string)
     .param pmc s :optional
     .param pmc pat :optional
     .param pmc repl :optional
@@ -386,7 +386,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 
 =cut
 
-.sub _string_len :anon :outer(init_string)
+.sub '_string_len' :anon :outer(init_string)
     .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
@@ -405,7 +405,7 @@ of what is an uppercase letter depends on the current locale.
 
 =cut
 
-.sub _string_lower :anon :outer(init_string)
+.sub '_string_lower' :anon :outer(init_string)
     .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
@@ -428,7 +428,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _string_match :anon :outer(init_string)
+.sub '_string_match' :anon :outer(init_string)
     .param pmc s :optional
     .param pmc pattern :optional
     .param pmc init :optional
@@ -447,7 +447,7 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 
 =cut
 
-.sub _string_rep :anon :outer(init_string)
+.sub '_string_rep' :anon :outer(init_string)
     .param pmc s :optional
     .param pmc n
     .local pmc ret
@@ -469,14 +469,14 @@ Returns a string that is the string C<s> reversed.
 
 =cut
 
-.sub _string_reverse :anon :outer(init_string)
+.sub '_string_reverse' :anon :outer(init_string)
     .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)
     $I0 = 0
     $I1 = length $S0
     dec $I1
-    $P0 = split "", $S0
+    $P0 = split '', $S0
 L1:
     unless $I0 < $I1 goto L2
     $S2 = $P0[$I0]
@@ -487,7 +487,7 @@ L1:
     dec $I1
     goto L1
 L2:    
-    $S1 = join "", $P0
+    $S1 = join '', $P0
     new ret, .LuaString
     ret = $S1
     .return (ret)
@@ -504,7 +504,7 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
 
 =cut
 
-.sub _string_sub :anon :outer(init_string)
+.sub '_string_sub' :anon :outer(init_string)
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -526,7 +526,7 @@ L1:
     $S1 = substr $S0, $I1, $I2
     goto L3
 L2:
-    $S1 = ""
+    $S1 = ''
 L3:    
     new ret, .LuaString
     ret = $S1
@@ -542,7 +542,7 @@ of what is a lowercase letter depends on the current locale.
 
 =cut
 
-.sub _string_upper :anon :outer(init_string)
+.sub '_string_upper' :anon :outer(init_string)
     .param pmc s :optional
     .local pmc ret
     $S0 = checkstring(s)

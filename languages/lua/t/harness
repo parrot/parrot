@@ -50,7 +50,7 @@ if ( grep {m/^--files$/} @ARGV ) {
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
     my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
-    push @files, glob( File::Spec->catfile( $dir, '*', '*.t' ) );
+    push @files, glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
 }
@@ -72,35 +72,33 @@ else {
     else {
         ( undef, undef, my $current_dir )
             = File::Spec->splitpath( Cwd::getcwd() );
+        my $dir;
         if ( $current_dir eq 'languages' ) {
-            @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
-            push @files,
-                glob( File::Spec->catfile( $language, 't', '*', '*.t' ) )
-                unless ($use_orig_lua);
+            $dir = File::Spec->catfile( $language, 't' );
         }
         elsif ( $current_dir eq $language ) {
-            @files = glob( File::Spec->catfile( 't', '*.t' ) );
-            push @files, glob( File::Spec->catfile( 't', '*', '*.t' ) )
+            $dir = 't';
+        }
+        if ($dir) {
+            @files = glob( File::Spec->catfile( $dir, '*.t' ) );
+            push @files, glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) )
                 unless ($use_orig_lua);
         }
     }
 
     if ($use_orig_lua) {
         $ENV{PARROT_LUA_TEST_PROG} = 'lua';
-        Test::Harness::runtests(@files) if scalar(@files);
     }
     elsif ($use_monkey) {
         $ENV{PARROT_LUA_TEST_PROG} = 'monkey';
-        Test::Harness::runtests(@files) if scalar(@files);
     }
     elsif ($use_lua2pir) {
         $ENV{PARROT_LUA_TEST_PROG} = 'lua2pir';
-        Test::Harness::runtests(@files) if scalar(@files);
     }
     else {
         $ENV{PARROT_LUA_TEST_PROG} = q{};
-        Test::Harness::runtests(@files) if scalar(@files);
     }
+    Test::Harness::runtests(@files) if scalar(@files);
 }
 
 =head1 HISTORY

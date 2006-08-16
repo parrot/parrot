@@ -27,80 +27,80 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
 
 =cut
 
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
 
 
-.sub init_debug :load :anon
+.sub 'init_debug' :load :anon
 
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    load_bytecode 'languages/lua/lib/luaaux.pbc'
+#    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Debug\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global "_G"
+    _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
     .local pmc _debug
     _debug = new .LuaTable
-    $P1 = "debug"
+    $P1 = 'debug'
     _lua__GLOBAL[$P1] = _debug
 
-    .const .Sub _debug_debug = "_debug_debug"
-    $P1 = "debug"
+    .const .Sub _debug_debug = '_debug_debug'
+    $P1 = 'debug'
     _debug[$P1] = _debug_debug
 
-    .const .Sub _debug_getfenv = "_debug_getfenv"
-    $P1 = "getfenv"
+    .const .Sub _debug_getfenv = '_debug_getfenv'
+    $P1 = 'getfenv'
     _debug[$P1] = _debug_getfenv
 
-    .const .Sub _debug_gethook = "_debug_gethook"
-    $P1 = "gethook"
+    .const .Sub _debug_gethook = '_debug_gethook'
+    $P1 = 'gethook'
     _debug[$P1] = _debug_gethook
 
-    .const .Sub _debug_getinfo = "_debug_getinfo"
-    $P1 = "getinfo"
+    .const .Sub _debug_getinfo = '_debug_getinfo'
+    $P1 = 'getinfo'
     _debug[$P1] = _debug_getinfo
 
-    .const .Sub _debug_getlocal = "_debug_getlocal"
-    $P1 = "getlocal"
+    .const .Sub _debug_getlocal = '_debug_getlocal'
+    $P1 = 'getlocal'
     _debug[$P1] = _debug_getlocal
 
-    .const .Sub _debug_getmetatable = "_debug_getmetatable"
-    $P1 = "getmetatable"
+    .const .Sub _debug_getmetatable = '_debug_getmetatable'
+    $P1 = 'getmetatable'
     _debug[$P1] = _debug_getmetatable
 
-    .const .Sub _debug_getregistry = "_debug_getregistry"
-    $P1 = "getregistry"
+    .const .Sub _debug_getregistry = '_debug_getregistry'
+    $P1 = 'getregistry'
     _debug[$P1] = _debug_getregistry
 
-    .const .Sub _debug_getupvalue = "_debug_getupvalue"
-    $P1 = "getupvalue"
+    .const .Sub _debug_getupvalue = '_debug_getupvalue'
+    $P1 = 'getupvalue'
     _debug[$P1] = _debug_getupvalue
 
-    .const .Sub _debug_setfenv = "_debug_setfenv"
-    $P1 = "setfenv"
+    .const .Sub _debug_setfenv = '_debug_setfenv'
+    $P1 = 'setfenv'
     _debug[$P1] = _debug_setfenv
 
-    .const .Sub _debug_sethook = "_debug_sethook"
-    $P1 = "sethook"
+    .const .Sub _debug_sethook = '_debug_sethook'
+    $P1 = 'sethook'
     _debug[$P1] = _debug_sethook
 
-    .const .Sub _debug_setlocal = "_debug_setlocal"
-    $P1 = "setlocal"
+    .const .Sub _debug_setlocal = '_debug_setlocal'
+    $P1 = 'setlocal'
     _debug[$P1] = _debug_setlocal
 
-    .const .Sub _debug_setmetatable = "_debug_setmetatable"
-    $P1 = "setmetatable"
+    .const .Sub _debug_setmetatable = '_debug_setmetatable'
+    $P1 = 'setmetatable'
     _debug[$P1] = _debug_setmetatable
 
-    .const .Sub _debug_setupvalue = "_debug_setupvalue"
-    $P1 = "setupvalue"
+    .const .Sub _debug_setupvalue = '_debug_setupvalue'
+    $P1 = 'setupvalue'
     _debug[$P1] = _debug_setupvalue
 
-    .const .Sub _debug_traceback = "_debug_traceback"
-    $P1 = "traceback"
+    .const .Sub _debug_traceback = '_debug_traceback'
+    $P1 = 'traceback'
     _debug[$P1] = _debug_traceback
 
 .end
@@ -120,7 +120,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_debug :anon :outer(init_debug)
+.sub '_debug_debug' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -133,7 +133,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getfenv :anon :outer(init_debug)
+.sub '_debug_getfenv' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -148,7 +148,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_gethook :anon :outer(init_debug)
+.sub '_debug_gethook' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -176,7 +176,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getinfo :anon :outer(init_debug)
+.sub '_debug_getinfo' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -197,7 +197,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getlocal :anon :outer(init_debug)
+.sub '_debug_getlocal' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -209,7 +209,7 @@ metatable.
 
 =cut
 
-.sub _debug_getmetatable :anon :outer(init_debug)
+.sub '_debug_getmetatable' :anon :outer(init_debug)
     .param pmc obj :optional
     .local pmc ret
     checkany(obj)
@@ -226,7 +226,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getregistry :anon :outer(init_debug)
+.sub '_debug_getregistry' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -241,7 +241,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_getupvalue :anon :outer(init_debug)
+.sub '_debug_getupvalue' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -254,7 +254,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_setfenv :anon :outer(init_debug)
+.sub '_debug_setfenv' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -298,7 +298,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_sethook :anon :outer(init_debug)
+.sub '_debug_sethook' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -316,7 +316,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_setlocal :anon :outer(init_debug)
+.sub '_debug_setlocal' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -328,18 +328,18 @@ be B<nil>).
 
 =cut
 
-.sub _debug_setmetatable :anon :outer(init_debug)
+.sub '_debug_setmetatable' :anon :outer(init_debug)
     .param pmc table :optional
     .param pmc metatable :optional
-    checktype(table, "table")
+    checktype(table, 'table')
     if_null metatable, L0
     $S0 = typeof metatable
-    if $S0 == "nil" goto L1
-    if $S0 == "table" goto L1
+    if $S0 == 'nil' goto L1
+    if $S0 == 'table' goto L1
 L0:
     argerror("nil or table expected")
 L1:
-    table."set_metatable"(metatable)
+    table.'set_metatable'(metatable)
     .return ()
 .end
 
@@ -354,7 +354,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_setupvalue :anon :outer(init_debug)
+.sub '_debug_setupvalue' :anon :outer(init_debug)
     not_implemented()
 .end
 
@@ -369,7 +369,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub _debug_traceback :anon :outer(init_debug)
+.sub '_debug_traceback' :anon :outer(init_debug)
     not_implemented()
 .end
 
