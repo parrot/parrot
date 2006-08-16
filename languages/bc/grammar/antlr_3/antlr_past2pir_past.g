@@ -145,30 +145,61 @@ expression[String reg_mother]
         + "          reg_expression_exp = new 'PAST::Exp'                    \n"
       );
     }
-    ^( SAY ( adding["reg_expression_exp"]
-             { 
-               System.out.print( 
-                   "                                                                \n"
-                 + "      reg_print_op.'add_child'( reg_expression_exp )            \n"
-               );
-             }
-             |
-             ^( UNARY_MINUS adding["reg_expression_exp"] )
-             { 
-               System.out.print( 
-                   "                                                                \n"
-                 + "   # multiply by -1                                             \n"
-                 + "   reg_unary_op = new 'PAST::Op'                                \n"
-                 + "   reg_unary_op.'op'( 'infix:*' )                               \n"
-                 + "     reg_unary_val = new 'PAST::Val'                            \n"
-                 + "     reg_unary_val.value( -1 )                                  \n"
-                 + "     reg_unary_val.valtype( 'num' )                             \n"
-                 + "   reg_unary_op.'add_child'( reg_unary_val )                    \n"
-                 + "   reg_unary_op.'add_child'( reg_expression_exp )               \n"
-                 + "      reg_print_op.'add_child'( reg_unary_op )                  \n"
-               );
-             }
-           )
+    ^( PRINT ( adding["reg_expression_exp"]
+               { 
+                 System.out.print( 
+                     "                                                                \n"
+                   + "      reg_print_op.'add_child'( reg_expression_exp )            \n"
+                 );
+               }
+               |
+               ^( UNARY_MINUS adding["reg_expression_exp"] )
+               { 
+                 System.out.print( 
+                     "                                                                \n"
+                   + "   # multiply by -1                                             \n"
+                   + "   reg_unary_op = new 'PAST::Op'                                \n"
+                   + "   reg_unary_op.'op'( 'infix:*' )                               \n"
+                   + "     reg_unary_val = new 'PAST::Val'                            \n"
+                   + "     reg_unary_val.value( -1 )                                  \n"
+                   + "     reg_unary_val.valtype( 'num' )                             \n"
+                   + "   reg_unary_op.'add_child'( reg_unary_val )                    \n"
+                   + "   reg_unary_op.'add_child'( reg_expression_exp )               \n"
+                   + "      reg_print_op.'add_child'( reg_unary_op )                  \n"
+                 );
+               }
+               |
+               NEWLINE
+               { 
+                 System.out.print(     
+                     "                                                                \n"
+                   + "# entering 'NEWLINE'                                            \n"
+                   + "            reg_temp = new 'PAST::Val'                          \n"
+                   + "            reg_temp.value( '\\n' )                             \n"
+                   + "            reg_temp.valtype( 'strqq' )                         \n"
+                   + "          reg_print_op.'add_child'( reg_temp )                  \n"
+                   + "          null reg_temp                                         \n"
+                   + "# leaving 'NEWLINE'                                             \n"
+                 );
+               }
+               |
+               STRING
+               {
+                 // In bc backslash has on special meaning, so s!/!//!
+                 // Write newlines as '\n', in to not break PIR. s!\n!\\n!
+                 String escaped = $STRING.text.replaceAll( "\\\\", "\\\\\\\\\\\\\\\\" ).replaceAll( "\\n", "\\\\\\\\n" );
+                 System.out.print(     
+                     "                                                                \n"
+                   + "# entering 'STRING'                                             \n"
+                   + "            reg_temp = new 'PAST::Val'                          \n"
+                   + "            reg_temp.value( " + escaped + " )                 \n"
+                   + "            reg_temp.valtype( 'strqq' )                         \n"
+                   + "          reg_print_op.'add_child'( reg_temp )                  \n"
+                   + "          null reg_temp                                         \n"
+                   + "# leaving 'STRING'                                              \n"
+                 );
+               }
+             )
     )
     {
       System.out.print( 
@@ -176,21 +207,6 @@ expression[String reg_mother]
         + "      reg_expression_topexp.'add_child'( reg_print_op      )      \n"
         + "    reg_expression_stmt.'add_child'( reg_expression_topexp )      \n"
         + "  " + $expression.reg_mother + ".'add_child'( reg_expression_stmt ) \n"
-        + "                                                                  \n"
-        + "  # Now print a newline                                           \n"
-        + "    reg_expression_stmt = new 'PAST::Stmt'                        \n"
-        + "      reg_expression_topexp = new 'PAST::Exp'                     \n"
-        + "        reg_print_op = new 'PAST::Op'                        \n"
-        + "          reg_expression_exp = new 'PAST::Exp'                    \n"
-        + "            reg_expression_newline = new 'PAST::Val'              \n"
-        + "            reg_expression_newline.value( '\\n' )                 \n"
-        + "            reg_expression_newline.valtype( 'strqq' )             \n"
-        + "          reg_expression_exp.'add_child'( reg_expression_newline )\n"
-        + "        reg_print_op.'add_child'( reg_expression_exp )       \n"
-        + "        reg_print_op.'op'( 'print' )                         \n"
-        + "      reg_expression_topexp.'add_child'( reg_print_op )      \n"
-        + "    reg_expression_stmt.'add_child'( reg_expression_topexp )      \n"
-        + "  " + $expression.reg_mother + ".'add_child'( reg_expression_stmt )\n"
         + "  # leaving 'expression'                                          \n"
       );
     }
@@ -199,38 +215,8 @@ expression[String reg_mother]
       String mother_for_string = $expression.reg_mother;
     }
     (
-      ^( PRINT string[ mother_for_string ] )
-      |
       ^( ASSIGN_OP assign[ mother_for_string ] )
     )
-  ;
-
-string [ String reg_mother ]
-  : STRING
-    {
-      // In bc backslash has on special meaning, so s!/!//!
-      // Write newlines as '\n', in to not break PIR. s!\n!\\n!
-      String escaped = $STRING.text.replaceAll( "\\\\", "\\\\\\\\\\\\\\\\" ).replaceAll( "\\n", "\\\\\\\\n" );
-      System.out.print(     
-          "                                                                \n"
-        + "# entering 'string'                                             \n"
-        + "    reg_expression_stmt = new 'PAST::Stmt'                      \n"
-        + "      reg_expression_topexp = new 'PAST::Exp'                   \n"
-        + "        reg_print_op = new 'PAST::Op'                           \n"
-        + "        reg_print_op.'op'( 'print' )                            \n"
-        + "          reg_expression_exp = new 'PAST::Exp'                  \n"
-        + "            reg_temp = new 'PAST::Val'                          \n"
-        + "            reg_temp.value( " + escaped + " )                 \n"
-        + "            reg_temp.valtype( 'strqq' )                         \n"
-        + "          reg_expression_exp.'add_child'( reg_temp )            \n"
-        + "          null reg_temp                                         \n"
-        + "        reg_print_op.'add_child'( reg_expression_exp )          \n"
-        + "      reg_expression_topexp.'add_child'( reg_print_op )         \n"
-        + "    reg_expression_stmt.'add_child'( reg_expression_topexp )    \n"
-        + "  " + $string.reg_mother + ".'add_child'( reg_expression_stmt ) \n"
-        + "# leaving 'string'                                              \n"
-      );
-    }
   ;
 
 assign [ String reg_mother ]

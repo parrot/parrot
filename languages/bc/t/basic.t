@@ -197,7 +197,7 @@ my @tests = (
        [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3] ],
    );
 
-#@tests = ( qq{1;2;" asdf\n  jklm\n   rtzu\n"   ;  3    }, [ 1, 2, ' asdf', '  jklm', '   rtzu', 3 ], undef, with_antlr3 => 1 ], );
+# @tests = ( [ '1', [ 1 ], 'positive int 1',                       with_antlr3 => 1  ], );
 
 my @todo_tests
     = ( # floats

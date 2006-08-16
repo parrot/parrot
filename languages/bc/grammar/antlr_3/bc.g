@@ -21,7 +21,6 @@ tokens
 {
   PRINT;
   PROGRAM;
-  SAY;
   UNARY_MINUS;
   VAR;
 } 
@@ -66,11 +65,10 @@ semicolon_list
   : statement? ( SEMICOLON! statement? )*
   ;
 
-// TODO:  STRING -> ^( PRINT STRING )
 statement
   : named_expression ASSIGN_OP^^ expression
     |
-    expression -> ^( SAY expression )
+    expression -> ^( PRINT expression ) ^( PRINT NEWLINE )
     |
     STRING -> ^( PRINT STRING )
   ;
