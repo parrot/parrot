@@ -4,7 +4,7 @@
 use warnings;
 use strict;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -391,9 +391,10 @@ got 8
 got 9
 OUTPUT
 
-__END__
 # This test is disabled because it is a known bug and sometimes
 # passed and sometimes fails depending on timing.
+SKIP: {
+    skip "TODO test that fails intermittently", 1;
 pir_output_is($library . <<'CODE', <<'OUTPUT', "Test 2 + detach + attempt to trigger thread death bugs");
 
 .sub adder
@@ -476,3 +477,4 @@ got 7
 got 8
 got 9
 OUTPUT
+}
