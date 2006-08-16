@@ -52,7 +52,8 @@ Return register_num is the register number that contains the result of this code
   .param int register_num
   .param pmc thing
 
-  .local string pir_code
+  .local pmc pir_code
+  pir_code = new 'PGE::CodeString'
 
   $I0 = can thing, "compile"
 
@@ -79,14 +80,11 @@ stringish:
   rquote = "\"" 
 set_args:
 
-   .local string template
-   template = <<"END_PIR"
+   pir_code.emit(<<"END_PIR", register_num, thing_type, lquote, $S0, rquote)
 # src/compiler.pir :: compile_dispatch
-$P%i = new .%s
-$P%i=%s%s%s
+$P%0=new .%1
+$P%0=%2%3%4
 END_PIR
-
-  .sprintf6(pir_code, template, register_num, thing_type, register_num, lquote, $S0, rquote)
  
   # PIR's compiler can't deal with the utf16 code is generated as a result
   # of the string manipulation that brings us to this point. So, we need
@@ -95,7 +93,8 @@ END_PIR
   # to where the upcasting is occuring instead of doing it once here. (XXX)
 
   $I0 = find_charset 'ascii'
-  pir_code = trans_charset $I0
+  $S0 = pir_code
+  trans_charset $S0, $I0
 
   .return(register_num,pir_code)
 
@@ -143,15 +142,15 @@ done_init:
 .HLL 'tcl', 'tcl_group'
 .pragma n_operators 1
 .loadlib 'tcl_ops'
-.sub compiled_tcl_sub%i :anon :main
+.sub compiled_tcl_sub%0 :anon :main
   load_bytecode 'languages/tcl/runtime/tcllib.pbc'
   .include "languages/tcl/src/macros.pir"
   .local pmc epoch, colons, split
   epoch  = get_root_global ['_tcl'], 'epoch'
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
-%s
-  .return ($P%i)
+%1
+  .return ($P%2)
 .end
 END_PIR
 
@@ -165,31 +164,35 @@ END_PIR
 .HLL 'tcl', 'tcl_group'
 # src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1
-.sub compiled_tcl_sub%i :anon
+.sub compiled_tcl_sub%0 :anon
 .include "languages/tcl/src/returncodes.pir"
   .local pmc epoch, colons, split
   epoch  = get_root_global ['_tcl'], 'epoch'
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
-%s
-  .return ($P%i)
+%1
+  .return ($P%2)
 .end
 END_PIR
 
 set_args:
   # The pir_code element above should always end in a \n, so we don't
   # need to add one explicitly before the .return
-
-  .sprintf3(pir_code, stub_code, compiled_num, pir_code, result_reg)
+ 
+  .local pmc temp_pir_code
+  temp_pir_code = new 'PGE::CodeString'
+  temp_pir_code.emit(stub_code, compiled_num, pir_code, result_reg)
+ 
 
   unless code_only goto compile_it
-  .return (pir_code)
+  $S0 = temp_pir_code
+  .return ($S0)
 
 compile_it:
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
 
-  $P0 = pir_compiler(pir_code)
+  $P0 = pir_compiler(temp_pir_code)
   .return($P0)
 .end
 
