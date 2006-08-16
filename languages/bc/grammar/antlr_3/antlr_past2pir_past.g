@@ -208,7 +208,9 @@ expression[String reg_mother]
 string [ String reg_mother ]
   : STRING
     {
-      String escaped = $STRING.text.replaceAll( "\\n", "\\\\n" ).replaceAll( "\"", "'" );
+      // In bc backslash has on special meaning, so s!/!//!
+      // Write newlines as '\n', in to not break PIR. s!\n!\\n!
+      String escaped = $STRING.text.replaceAll( "\\\\", "\\\\\\\\\\\\\\\\" ).replaceAll( "\\n", "\\\\\\\\n" );
       System.out.print(     
           "                                                                \n"
         + "# entering 'string'                                             \n"

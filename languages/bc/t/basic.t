@@ -69,6 +69,8 @@ my @tests = (
 
        # Strings 
        [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_antlr3 => 1 ],
+       [ q{1;2;"'a's'd'f'"   ;  3    }, [ 1, 2, "'a's'd'f'3" ], 'string with embedded single quote', with_antlr3 => 1 ],
+       [ q{1;2;"as\df"   ;  3    }, [ 1, 2, 'as\df3' ], 'string with embedded backslash', with_antlr3 => 1 ],
        [ qq{1;2;" asdf\n  jklm\n   rtzu\n"   ;  3    }, [ 1, 2, ' asdf', '  jklm', '   rtzu', 3 ], undef, with_antlr3 => 1 ],
 
        # empty lines
@@ -195,7 +197,7 @@ my @tests = (
        [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3] ],
    );
 
-# @tests = ( [ '++a; a', [1], undef, with_antlr3 => 1, ], );
+#@tests = ( qq{1;2;" asdf\n  jklm\n   rtzu\n"   ;  3    }, [ 1, 2, ' asdf', '  jklm', '   rtzu', 3 ], undef, with_antlr3 => 1 ], );
 
 my @todo_tests
     = ( # floats
@@ -206,6 +208,8 @@ my @todo_tests
         # keyword quit
         [ "0\n1; 2; quit;  3", [ 0 ], 'is that correct in GNU bc?', with_antlr3 => 1, ],
       );
+
+# @tests = ( [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_antlr3 => 1 ], );
 
 if ( $Parrot::Config::PConfig{has_python} ) {
   plan tests => scalar(@tests) + scalar(@todo_tests);
