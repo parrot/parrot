@@ -123,6 +123,7 @@ Parrot_STM_PMC_handle Parrot_STM_alloc(Interp *interp, PMC *pmc) {
     handle = new_bufferlike_header(interp, sizeof(handle_data));
     PObj_external_SET(&handle->buf);
     PObj_is_shared_SET(&handle->buf);
+    PARROT_ATOMIC_PTR_INIT(handle->owner_or_version);
     PARROT_ATOMIC_PTR_SET(handle->owner_or_version, UINTVAL2PTR(void *, 1)); /* XXX */
     handle->last_version = UINTVAL2PTR(void *, 1);
     handle->value = force_sharing(interp, pmc);
