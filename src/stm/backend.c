@@ -481,8 +481,6 @@ do_partial_abort(Interp *interp, STM_tx_log *log, STM_tx_log_sub *inner) {
 /* Does an abort. This is also used for inner transactions. */
 static void
 do_real_abort(Interp *interp, STM_tx_log *log, STM_tx_log_sub *inner) {
-    int i;
-
     STM_TRACE_SAFE("really aborting");
     do_partial_abort(interp, log, inner);
 
@@ -633,9 +631,8 @@ for verifying that any outer transaction is invalid after calling this.
  * assumes transcation is _not_ yet aborted.
  */
 static int setup_wait(Interp *interp, STM_tx_log *log) {
-    int i;
     int need_wait = 1;
-    STM_tx_log_sub *cursub;
+    int i;
 
     for (i = 0; need_wait && i <= log->last_read; ++i) {
         STM_read_record *read;
@@ -682,7 +679,6 @@ static int setup_wait(Interp *interp, STM_tx_log *log) {
 
 
 void Parrot_STM_wait(Interp *interp) {
-    int i;
     STM_tx_log *log;
     int need_wait;
 

@@ -215,7 +215,6 @@ Parrot_get_HLL_id(Interp* interpreter, STRING *hll_name)
 STRING *
 Parrot_get_HLL_name(Interp *interpreter, INTVAL id)
 {
-    INTVAL i;
     PMC * const hll_info = interpreter->HLL_info;
     INTVAL nelements;
     STRING *ret;

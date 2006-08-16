@@ -893,7 +893,6 @@ Get all threads to perform a GC run.
 static void 
 pt_suspend_all_for_gc(Parrot_Interp interp)
 {
-    int all_suspended;
     UINTVAL i;
 
     TRACE_THREAD("suspend_all_for_gc [interp=%p]", interp);

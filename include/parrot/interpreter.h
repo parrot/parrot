@@ -528,7 +528,7 @@ void *init_jit(Interp * interpreter, opcode_t *pc);
 PARROT_API void dynop_register(Interp * interpreter, PMC* op_lib);
 void do_prederef(void **pc_prederef, Interp * interpreter, int type);
 
-void clone_interpreter(Parrot_Interp dest, const Parrot_Interp self, Parrot_clone_flags flags);
+void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, Parrot_clone_flags flags);
 
 PARROT_API void enter_nci_method(Interp *, int type,
 		 void *func, const char *name, const char *proto);
