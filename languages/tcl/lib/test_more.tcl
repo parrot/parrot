@@ -136,10 +136,17 @@ proc test {num description code args} {
         # Put the skip here instead of in the test file to keep all our
         # hacks in one basket.
         if {
-            $num eq "get-2.4"   || 
-            $num eq "incr-1.14" ||
-            $num eq "incr-2.14" ||
-            $num eq "set-1.14"  ||
+            $num eq "execute-2.1"  || 
+            $num eq "execute-2.2"  || 
+            $num eq "get-2.4"      || 
+            $num eq "incr-1.14"    ||
+            $num eq "incr-2.14"    ||
+            $num eq "lsetComp-2.4" ||
+            $num eq "lsetComp-2.7" ||
+            $num eq "lsetComp-3.4" ||
+            $num eq "lsetComp-3.7" ||
+            $num eq "obj-32.1"     ||
+            $num eq "set-1.14"     ||
             $num eq "set-3.14"
            } {
             pass $full_desc [list SKIP "skip exploding test"]
@@ -155,7 +162,7 @@ proc test {num description code args} {
 
 # Constraints are like skip conditions that
 # can be specified by a particular invocation to test. Since we're ingoring
-# all the option params to test, we'll ignore this one two, and execute tests
+# all the option params to test, we'll ignore this one too, and execute tests
 # when we shouldn't.
 
 proc testConstraint     {args} {return 0}
@@ -164,3 +171,10 @@ proc makeFile           {args} {return 0}
 proc removeFile         {args} {return 0}
 proc bytestring         {args} {return 0}
 proc customMatch        {args} {return 0}
+proc testinfocmdcount   {args} {return 0}
+proc interpreter        {args} {return 0}
+proc pid                {args} {return 0}
+proc child              {args} {return 0}
+proc child-trusted      {args} {return 0}
+proc makeDirectory      {args} {return 0}
+set ::tcltest::verbose 0

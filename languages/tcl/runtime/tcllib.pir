@@ -83,6 +83,11 @@ env_loop:
 env_loop_done:
   set_root_global ['tcl'], '$env', tcl_env
 
+  # Set tcl_library: #XXX actually put a value here.
+  $P1 = new 'TclString'
+  $P1 = ''
+  set_root_global ['tcl'], '$tcl_library', $P1
+
   # keep track of names of file types.
   .local pmc filetypes
   filetypes = new .TclArray

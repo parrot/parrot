@@ -216,6 +216,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/if_old.t \
   t_tcl/incr.t \
   t_tcl/incr_old.t \
+  t_tcl/info.t \
   t_tcl/join.t \
   t_tcl/lindex.t \
   t_tcl/linsert.t \
@@ -223,6 +224,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lrange.t \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
+  t_tcl/lsetComp.t \
   t_tcl/namespace_old.t \
   t_tcl/package.t \
   t_tcl/platform.t \
@@ -257,13 +259,17 @@ SKIPPED_TCL_TESTS = \
   t_tcl/history.t \
   t_tcl/indexObj.t \
   t_tcl/link.t \
+  t_tcl/load.t \
   t_tcl/lset.t \
   t_tcl/notify.t \
+  t_tcl/obj.t \
   t_tcl/pid.t \
   t_tcl/registry.t \
   t_tcl/result.t \
+  t_tcl/socket.t \
   t_tcl/stack.t \
   t_tcl/thread.t \
+  t_tcl/unload.t \
   t_tcl/winConsole.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
@@ -272,41 +278,35 @@ SKIPPED_TCL_TESTS = \
 #
 # too slow:
 #
-#t_tcl/regexp.t          t_tcl/tcltest.t         t_tcl/trace.t
-#t_tcl/interp.t          t_tcl/io.t              t_tcl/scan.t
-#t_tcl/set_old.t         t_tcl/ioCmd.t           t_tcl/dict.t
-#t_tcl/clock.t           t_tcl/exec.t            t_tcl/compExpr_old.t
-#t_tcl/execute.t         t_tcl/expr.t            t_tcl/fCmd.t
-#t_tcl/parseExpr.t       t_tcl/pkgMkIndex.t      t_tcl/winFCmd.t
-#t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/winPipe.t
-#t_tcl/expr_old.t        t_tcl/reg.t             t_tcl/obj.t
-#t_tcl/lsetComp.t        t_tcl/lsearch.t         t_tcl/info.t
-#t_tcl/fileName.t        t_tcl/util.t            t_tcl/cmdAH.t
-#t_tcl/binary.t
+#t_tcl/tcltest.t         t_tcl/trace.t           t_tcl/interp.t
+#t_tcl/io.t              t_tcl/ioCmd.t           t_tcl/dict.t
+#t_tcl/clock.t           t_tcl/compExpr_old.t    t_tcl/expr.t
+#t_tcl/fCmd.t            t_tcl/parseExpr.t       t_tcl/winFCmd.t
+#t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/expr_old.t
+#t_tcl/reg.t             t_tcl/lsearch.t         t_tcl/fileName.t
+#t_tcl/util.t            t_tcl/cmdAH.t           t_tcl/binary.t
 #
-#can't delete "run": command doesn't exist
+# can't read "actual": variable is array
+#t_tcl/execute.t
+#
+# can't delete "run": command doesn't exist
 #t_tcl/basic.t
 #
 # crash or no debug output generated.
-#t_tcl/for.t               t_tcl/apply.t
+#t_tcl/for.t             t_tcl/apply.t           t_tcl/regexp.t
+#t_tcl/set_old.t
 #
 # MMD function __cmp not found for types (21, 74)
-#t/tcl_format.t
+#t/tcl_format.t          t_tcl/scan.t
 #
 # syntax error, unexpected $undefined
 #t_tcl/async.t            t_tcl/unixNotfy.t
 #
-# bad option "sharedlibextension": must be args, body, cmdcount, commands, ...
-#t_tcl/load.t             t_tcl/unload.t
-#
-# bad option "delete": must be atime, attributes, channels, copy, delete, ...
-#t_tcl/winFile.t
+# XXX: bad call to open
+#t_tcl/winFile.t          t_tcl/winPipe.t        t_tcl/exec.t
 #
 # invalid command name "skip"
 #t_tcl/unixInit.t
-#
-# bad option "script": must be args, body, cmdcount, commands, complete, ...
-#t_tcl/socket.t
 #
 # syntax error in expression "[info exists auto_mkindex_parser::initCommands]": premature end of expression
 #t_tcl/autoMkindex.t
@@ -325,6 +325,7 @@ SKIPPED_TCL_TESTS = \
 #
 # extra characters after close-brace (These tests require {expand}[list])
 # t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
+#t_tcl/pkgMkIndex.t
 #
 # can't read "major": no such variable {{ [foreach] bug }}
 #t_tcl/tm.t
@@ -351,7 +352,7 @@ SKIPPED_TCL_TESTS = \
 # syntax error, unexpected LABEL (the compiled PIR is truncated. memory issue?)
 #t_tcl/stringObj.t
 #
-# bad option "script": must be args, body, cmdcount, commands, complete, ...
+# couldn't read file "0/httpd": no such file or directory
 #t_tcl/http.t            t_tcl/httpold.t
 
 tcl-test: t_tcl tcl.pbc

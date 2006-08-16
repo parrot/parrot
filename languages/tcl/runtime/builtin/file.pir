@@ -339,3 +339,51 @@ bad_args:
   .throw('wrong # args: should be "file mtime name"')
 .end
 
+# XXX Stub for test parsing
+.sub 'dirname'
+  .param pmc argv
+  .return(0)
+.end
+
+# XXX Stub for test parsing
+.sub 'tail'
+  .param pmc argv
+  .return(0)
+.end
+
+# XXX Stub for test parsing
+.sub 'readable'
+  .param pmc argv
+  .return(0)
+.end
+
+# XXX Stub for test parsing
+.sub 'delete'
+  .param pmc argv
+  .return(0)
+.end
+
+# XXX Stub for test parsing
+.sub 'exists'
+  .param pmc argv
+  .return(0)
+.end
+
+# XXX Stub for test parsing
+.sub 'copy'
+  .param pmc argv
+  .return(0)
+.end
+
+
+
+
+
+
+
+
+
+
+
+
+
