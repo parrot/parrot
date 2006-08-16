@@ -24,8 +24,7 @@ eval_is {
  unset a(2)
  puts $a(2)
 } {can't read "a(2)": no such element in array} \
-  {set/unset array element} \
-  {TODO "TclConst won't morph into Undef"}
+  {set/unset array element}
 
 eval_is {
  set b(2) 2
@@ -125,8 +124,7 @@ eval_is {
   unset elem
   set array(a)
 } {can't read "array(a)": no such element in array} \
-  {unset array elem upvar} \
-  {TODO "TclConst won't morph into Undef"}
+  {unset array elem upvar}
 
 eval_is {
   catch {unset array}
