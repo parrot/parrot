@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 32
+plan 33
 
 eval_is {info} \
   {wrong # args: should be "info option ?arg arg ...?"} \
@@ -116,7 +116,17 @@ eval_is {
   }
   test 3 4
 } {a b c d} {info vars} \
-  {TODO "can't iterate DynLexPads atm"}
+  {TODO "broken because of args"}
+
+eval_is {
+  proc test {a b} {
+    set c 1
+    set d 2
+    set args 3
+    lsort [info vars]
+  }
+  test 3 4
+} {a args b c d} {info vars - with special args}
 
 eval_is {info level a b} \
   {wrong # args: should be "info level ?number?"} \

@@ -239,6 +239,20 @@ iterate:
   tcl_error "XXX [info vars] doesn't work because we can't iterate DynLexPads"
   .return('')
 
+  .local pmc    iter, retval
+  .local string elem
+  iter   = new .Iterator, lexpad
+  retval = new .TclList
+loop:
+  unless iter goto end
+  elem = shift iter
+  $S0 = substr elem, 0, 1, ''
+  unless $S0 == '$' goto loop
+  push retval, elem
+  goto loop
+end:
+  .return(retval)
+
 bad_args:
   tcl_error 'wrong # args: should be "info vars ?pattern?"'
 .end
