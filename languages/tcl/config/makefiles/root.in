@@ -355,7 +355,13 @@ runtime/builtins.pir \
 src/grammar/expr/expression.pir \
 src/grammar/expr/past2pir.pir \
 src/grammar/expr/pge2past.pir \
-$(GENERATED_INLINES)
+$(GENERATED_INLINES) \
+"$(OPSDIR)/*.c" \
+"$(OPSDIR)/*.h" \
+"$(OPSDIR)/*$(O)" \
+"$(OPSDIR)/*.bundle"
+
+# that last line should be cleaned up for x-platform.
 
 clean:
 	$(RM_F) $(CLEANERS)
