@@ -4,6 +4,8 @@
 # Setup the information the interpreter needs to run,
 # then parse and interpret/compile the tcl code we were passed.
 
+.loadlib 'tcl_ops'
+
 .HLL 'Tcl', 'tcl_group'
 
 .include 'languages/tcl/src/returncodes.pir'
@@ -151,7 +153,7 @@ badfile:
   $S0 = "couldn't read file \""
   $S0 = $S0 . filename
   $S0 = $S0 . '": no such file or directory'
-  .throw($S0)
+  tcl_error $S0
 
 oneliner:
   .set_tcl_argv()

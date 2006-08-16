@@ -84,9 +84,9 @@ bad_opt:
   $S1 = $P0
   $S0 .= $S1
   $S0 .= '": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -indices, -integer, -nocase, -real, or -unique'
-  .throw ($S0)
+  tcl_error $S0
 wrong_args:
-  .throw ('wrong # args: should be "lsort ?options? list"')
+  tcl_error 'wrong # args: should be "lsort ?options? list"'
 .end
 
 .HLL '_Tcl', ''

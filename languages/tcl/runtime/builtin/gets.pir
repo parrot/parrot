@@ -30,6 +30,6 @@ read a line from a channel
   .return (line)
 
 bad_args:
-  .throw('wrong # args: should be "gets channelId ?varName?"')
+  tcl_error 'wrong # args: should be "gets channelId ?varName?"'
 .end
 

@@ -1,7 +1,6 @@
 RM_F    = @rm_f@
 PERL    = @perl@
 PARROT  = ../../parrot@exe@
-PBC_MERGE = ../../pbc_merge@exe@
 
 C_BUILTIN = src/builtin
 R_BUILTIN = runtime/builtin
@@ -136,16 +135,15 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 .pg.pir :
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=$@ $<
 
-PBCS = \
-runtime/tcllib_temp.pbc \
-$(CLASSDIR)/tclcommand.pbc \
-$(CLASSDIR)/tclcommandlist.pbc \
-$(CLASSDIR)/tclconst.pbc \
-$(CLASSDIR)/tclvar.pbc \
-$(CLASSDIR)/tclword.pbc
+.pir.pbc :
+    $(PARROT) --output=$@ $<
 
-runtime/tcllib.pbc: $(PBC_MERGE) $(PBCS)
-	$(PBC_MERGE) -o runtime/tcllib.pbc $(PBCS)
+CLASSES = \
+  $(CLASSDIR)/tclcommand.pir \
+  $(CLASSDIR)/tclcommandlist.pir \
+  $(CLASSDIR)/tclconst.pir \
+  $(CLASSDIR)/tclvar.pir \
+  $(CLASSDIR)/tclword.pir 
 
 pmcs:
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
@@ -162,32 +160,8 @@ ops:
 runtime/builtins.pir: $(GENERATED_INLINES) $(DEPS) tools/gen_builtins.pl
 	$(PERL) tools/gen_builtins.pl > runtime/builtins.pir
 
-runtime/tcllib_temp.pbc: $(PARROT) runtime/tcllib.pir runtime/builtins.pir
-	$(PARROT) --output=runtime/tcllib_temp.pbc runtime/tcllib.pir
-
-$(CLASSDIR)/tclbinaryops.pbc: $(PARROT) $(CLASSDIR)/tclbinaryops.pir
-	$(PARROT) --output=$(CLASSDIR)/tclbinaryops.pbc $(CLASSDIR)/tclbinaryops.pir
-
-$(CLASSDIR)/tclcommand.pbc: $(PARROT) $(CLASSDIR)/tclcommand.pir
-	$(PARROT) --output=$(CLASSDIR)/tclcommand.pbc $(CLASSDIR)/tclcommand.pir
-
-$(CLASSDIR)/tclcommandlist.pbc: $(PARROT) $(CLASSDIR)/tclcommandlist.pir
-	$(PARROT) --output=$(CLASSDIR)/tclcommandlist.pbc $(CLASSDIR)/tclcommandlist.pir
-
-$(CLASSDIR)/tclconst.pbc: $(PARROT) $(CLASSDIR)/tclconst.pir
-	$(PARROT) --output=$(CLASSDIR)/tclconst.pbc $(CLASSDIR)/tclconst.pir
-
-$(CLASSDIR)/tclfunc.pbc: $(PARROT) $(CLASSDIR)/tclfunc.pir
-	$(PARROT) --output=$(CLASSDIR)/tclfunc.pbc $(CLASSDIR)/tclfunc.pir
-
-$(CLASSDIR)/tclops.pbc: $(PARROT) $(CLASSDIR)/tclops.pir
-	$(PARROT) --output=$(CLASSDIR)/tclops.pbc $(CLASSDIR)/tclops.pir
-
-$(CLASSDIR)/tclvar.pbc: $(PARROT) $(CLASSDIR)/tclvar.pir
-	$(PARROT) --output=$(CLASSDIR)/tclvar.pbc $(CLASSDIR)/tclvar.pir
-
-$(CLASSDIR)/tclword.pbc: $(PARROT) $(CLASSDIR)/tclword.pir
-	$(PARROT) --output=$(CLASSDIR)/tclword.pbc $(CLASSDIR)/tclword.pir
+runtime/tcllib.pbc: $(PARROT) runtime/tcllib.pir runtime/builtins.pir $(CLASSES)
+	$(PARROT) --output=runtime/tcllib.pbc runtime/tcllib.pir
 
 tclsh: $(PARROT) tcl.pbc
 	$(PARROT) --gc-debug tcl.pbc

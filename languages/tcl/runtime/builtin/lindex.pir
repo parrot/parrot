@@ -50,5 +50,5 @@ done:
   .return(list)
 
 bad_args:
-  .throw('wrong # args: should be "lindex list ?index...?"')
+  tcl_error 'wrong # args: should be "lindex list ?index...?"'
 .end

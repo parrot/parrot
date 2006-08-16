@@ -130,7 +130,7 @@ found_close_bracket:
   goto eat_space
 
 unmatched_open_brace:
-  .throw('unmatched open brace in list')
+  tcl_error 'unmatched open brace in list'
 
 done:
   .return(retval)

@@ -54,7 +54,7 @@
   msg = 'can not find channel named "'
   msg .= channel_id
   msg .= '"' 
-  .throw(msg)
+  tcl_error msg
 END_PIR
 
   inc register_num
@@ -84,12 +84,12 @@ channel_not_write_mode:
   msg = "channel \""
   msg .= channel_id
   msg .= "\" wasn't opened for writing"
-  .throw(msg)
+  tcl_error msg
 END_PIR
 
 .return(register_num, pir_code)
 
 args_miscount:
-  pir_code = ".throw(\"wrong # args: should be \\\"flush channelId\\\"\")\n"
+  pir_code = "tcl_error \"wrong # args: should be \\\"flush channelId\\\"\"\n"
   .return(register_num, pir_code)
 .end

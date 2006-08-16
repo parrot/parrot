@@ -46,7 +46,7 @@ not_const:
   .return(register_num, $P0)
 
 bad_args:
-  .return(register_num, ".throw ('wrong # args: should be \"eval arg ?arg ...?\"')\n")
+  .return(register_num, "tcl_error 'wrong # args: should be \"eval arg ?arg ...?\"'\n")
 
 exception:
   .catch()
@@ -57,8 +57,8 @@ exception:
   $P0.replace('"', '\"')
   $S0 = $P0
   .local string error
-  error = ".throw(\""
+  error = "tcl_error \""
   error .= $S0
-  error .= "\")\n"
+  error .= "\"\n"
   .return(register_num, error)
 .end

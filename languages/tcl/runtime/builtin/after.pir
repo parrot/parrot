@@ -15,6 +15,6 @@
   .return('')
 
 bad_args:
-  .throw('wrong # args: should be "after option ?arg arg ...?"')
+  tcl_error 'wrong # args: should be "after option ?arg arg ...?"'
 .end
 

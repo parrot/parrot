@@ -386,7 +386,7 @@ subcommand2:
   goto loop
 
 missing_quote:
-  .throw("missing quote")
+  tcl_error 'missing quote'
 
 check_chars:
   $I0 = pos + 1
@@ -398,7 +398,7 @@ check_chars:
   $I1 = exists chars[$I1]
   if $I1 == 1 goto save_end
  
-  .throw("extra characters after close-quote")
+  tcl_error 'extra characters after close-quote'
 
 save_end:
   $I0 = pos - start
@@ -462,7 +462,7 @@ right:
   goto loop
 
 missing_close_brace:
-  .throw ("missing close-brace")
+  tcl_error 'missing close-brace'
 
 check_chars:
   $I0 = pos + 1
@@ -474,7 +474,7 @@ check_chars:
   $I1 = exists chars[$I1]
   if $I1 == 1 goto done
  
-  .throw ("extra characters after close-brace")
+  tcl_error 'extra characters after close-brace'
 
 done:
   $I0 = pos - start
@@ -541,7 +541,7 @@ loop:
   .return(commands, pos)
 
 missing_bracket:
-  .throw("missing close-bracket")
+   tcl_error 'missing close-bracket'
 .end
 
 =item C<(pmc var, int pos) = get_variable(string tcl_code, int pos)>
@@ -619,10 +619,10 @@ failed:
   .return($P0, start)
 
 missing_paren:
-  .throw("missing paren")
+  tcl_error 'missing paren'
 
 missing_close_brace:
-  .throw("missing close-brace for variable name")
+  tcl_error 'missing close-brace for variable name'
   
 braces:
   inc pos

@@ -12,12 +12,12 @@
   argc = argv
 
   if argc != 0 goto badargs
-  pir_code = ".tcl_continue()\n"
+  pir_code = "tcl_continue\n"
   .return(register_num,pir_code)
 
 badargs:
   pir_code =<<"END_PIR"
-.throw('wrong # args: should be \"continue\"')
+tcl_error 'wrong # args: should be \"continue\"'
 END_PIR
 
   .return(register_num,pir_code)

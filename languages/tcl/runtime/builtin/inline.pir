@@ -31,11 +31,11 @@
   .return ('')
 
 bad_args:
-  .throw ('wrong # args: should be "inline language code"')
+  tcl_error 'wrong # args: should be "inline language code"'
 
 fail:
   $S0 = 'invalid language "'
   $S0 .= language
   $S0 .= '" specified'
-  .throw ($S0)
+  tcl_error $S0
 .end

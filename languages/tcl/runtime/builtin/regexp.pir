@@ -24,6 +24,6 @@
    .return match.__get_bool()
 
 badargs:
-  .throw('wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"')
+  tcl_error 'wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"'
 
 .end

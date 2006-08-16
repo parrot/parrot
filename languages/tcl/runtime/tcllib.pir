@@ -36,6 +36,12 @@ providing a compreg-compatible method.
 .include 'languages/tcl/src/compiler.pir'
 .include 'languages/tcl/src/parser.pir'
 
+# class files (HLL: _Tcl)
+.include 'languages/tcl/src/class/tclcommand.pir'
+.include 'languages/tcl/src/class/tclcommandlist.pir'
+.include 'languages/tcl/src/class/tclconst.pir'
+.include 'languages/tcl/src/class/tclvar.pir'
+.include 'languages/tcl/src/class/tclword.pir'
 
 # create the 'tcl' namespace -- see RT #39852
 # http://rt.perl.org/rt3/Ticket/Display.html?id=39852

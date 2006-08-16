@@ -222,7 +222,7 @@ err_command%0:
   $S0 = $P%1
   $S0 = concat 'invalid command name "', $S0
   $S0 .= '"'
-  .throw($S0)
+  tcl_error $S0
 END_PIR
 
    pir_code = ''

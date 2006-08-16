@@ -3,7 +3,7 @@
 */
 
 #include "parrot/dynext.h"
-#include "../../src/io/io_private.h"
+#include "parrot/string_funcs.h"
 
 VERSION = PARROT_VERSION;
 
@@ -18,30 +18,132 @@ tcl.ops
 A dynamic opcode library for tcl on parrot that provides a few opcodes
 that simplify PIR generation for tclPIR generation for tcl
 
+BUGS: pull out the TCL_ constants, as well as the code slot (#9) and the
+message slot (#0)
+
 =cut
 
-=head1 Opcodes
+=head1 Flow control opcodes
+
+These opcodes are used to generate exception return values. (Anything that
+isn't a TCL_OK)
 
 =over 4
 
-=item B<tcl_invoke>(out PMC, in PMC, (in PMC...))
+=item B<tcl_error>(in PMC)
 
-Attempt to run a builtin or user defined procedure. If the procedure doesn't
-exist, use $tcl_interactive to determine if a fallback to unknown is
-warranted (and then do that.)
+=item B<tcl_error>(in STR)
 
+=item B<tcl_error>(in INT, in PMC)
 
-XXX: the implementation below is merely a placeholder, it currently tries
-to duplicate 'print STR' just to provide a shell.
+Generate an exception condition for tcl. If no error code is specified,
+default to TCL_ERROR.
 
 =cut
 
-op tcl_invoke(in STR) {
-    STRING * const s = $1;
-  if (s && string_length(interpreter, s)) {
-    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
-  }
-  goto NEXT();
+inline op tcl_error(in PMC) {
+  INTVAL TCL_ERROR = 1;
+  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+
+  VTABLE_set_pmc_keyed_int(interpreter, exception, 0, $1);
+  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_ERROR);
+  opcode_t * const ret = expr NEXT();
+  opcode_t * const dest = (opcode_t *)
+      throw_exception(interpreter, exception, ret);
+  goto ADDRESS(dest);
+}
+
+inline op tcl_error(in STR) {
+  INTVAL TCL_ERROR = 1;
+  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+
+  VTABLE_set_string_keyed_int(interpreter, exception, 0, $1);
+  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_ERROR);
+  opcode_t * const ret = expr NEXT();
+  opcode_t * const dest = (opcode_t *)
+      throw_exception(interpreter, exception, ret);
+  goto ADDRESS(dest);
+}
+
+inline op tcl_error(in INT, in PMC) {
+  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+
+  VTABLE_set_pmc_keyed_int(interpreter, exception, 0, $2);
+  VTABLE_set_integer_keyed_int(interpreter, exception, 9, $1);
+  opcode_t * const ret = expr NEXT();
+  opcode_t * const dest = (opcode_t *)
+      throw_exception(interpreter, exception, ret);
+  goto ADDRESS(dest);
+}
+
+=item B<tcl_return>(in PMC)
+
+=item B<tcl_return>(in STR)
+
+Generate a TCL_RETURN, returning the specified value
+
+=cut
+
+inline op tcl_return(in PMC) {
+  INTVAL TCL_RETURN = 2;
+  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+
+  VTABLE_set_pmc_keyed_int(interpreter, exception, 0, $1);
+  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_RETURN);
+  opcode_t * const ret = expr NEXT();
+  opcode_t * const dest = (opcode_t *)
+      throw_exception(interpreter, exception, ret);
+  goto ADDRESS(dest);
+}
+
+inline op tcl_return(in STR) {
+  INTVAL TCL_RETURN = 2;
+  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+
+  VTABLE_set_string_keyed_int(interpreter, exception, 0, $1);
+  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_RETURN);
+  opcode_t * const ret = expr NEXT();
+  opcode_t * const dest = (opcode_t *)
+      throw_exception(interpreter, exception, ret);
+  goto ADDRESS(dest);
+}
+
+=item B<tcl_break>()
+
+Generate a TCL_BREAK
+
+=cut
+
+inline op tcl_break() {
+  INTVAL TCL_BREAK = 3;
+  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+  STRING* empty = string_make_empty(interpreter, enum_stringrep_one, 0);
+
+  VTABLE_set_string_keyed_int(interpreter, exception, 0, empty);
+  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_BREAK);
+  opcode_t * const ret = expr NEXT();
+  opcode_t * const dest = (opcode_t *)
+      throw_exception(interpreter, exception, ret);
+  goto ADDRESS(dest);
+}
+
+=item B<tcl_continue>()
+
+Generate a TCL_CONTINUE
+
+=cut
+
+inline op tcl_continue() {
+  INTVAL TCL_CONTINUE = 4;
+  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+  STRING* empty = string_make_empty(interpreter, enum_stringrep_one, 0);
+
+  VTABLE_set_string_keyed_int(interpreter, exception, 0, empty);
+  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_CONTINUE);
+  opcode_t * const ret = expr NEXT();
+  opcode_t * const dest = (opcode_t *)
+      throw_exception(interpreter, exception, ret);
+  goto ADDRESS(dest);
 }
 
 =back

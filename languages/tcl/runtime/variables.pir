@@ -53,13 +53,13 @@ bad_index:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= '": no such element in array'
-  .throw($S0)
+  tcl_error $S0
 
 cant_read_not_array:
   $S0 =  "can't read \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  .throw($S0)
+  tcl_error $S0
 
 scalar:
   variable = __find_var(name)
@@ -73,13 +73,13 @@ cant_read_array:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= '": variable is array'
-  .throw($S0)
+  tcl_error $S0
 
 no_such_variable:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= '": no such variable'
-  .throw($S0)
+  tcl_error $S0
 .end
 
 =head2 _Tcl::__make
@@ -143,7 +143,7 @@ cant_read_not_array:
   $S0 =  "can't read \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  .throw($S0)
+  tcl_error $S0
 
 scalar:
   variable = __find_var(name)
@@ -228,7 +228,7 @@ cant_set_not_array:
   $S0 =  "can't set \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  .throw($S0)
+  tcl_error $S0
   
 create_scalar:
   __store_var(name, value)

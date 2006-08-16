@@ -49,5 +49,5 @@ done:
   .return(retval)
 
 bad_args:
-  .throw ('wrong # args: should be "catch script ?resultVarName? ?optionVarName?"')
+  tcl_error 'wrong # args: should be "catch script ?resultVarName? ?optionVarName?"'
 .end

@@ -94,6 +94,6 @@ DONE2:
   .return (retval)
 
 wrong_args:
-  .throw ('wrong # args: should be "linsert list index element ?element ...?"')
+  tcl_error 'wrong # args: should be "linsert list index element ?element ...?"'
 
 .end

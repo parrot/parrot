@@ -36,7 +36,7 @@ Functions are very similar to ops, so handle them similarly here.
     .return (b)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 .sub '&acos'
@@ -60,7 +60,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&asin'
@@ -84,7 +84,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&atan'
@@ -108,7 +108,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&bool'
@@ -132,7 +132,7 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 .sub '&cos'
@@ -156,7 +156,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&cosh'
@@ -180,7 +180,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&double'
@@ -200,7 +200,7 @@ is_string:
     .return (ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 .sub '&exp'
@@ -224,7 +224,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&floor' 
@@ -247,7 +247,7 @@ is_string:
     .return ($P0)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 .sub '&log'
@@ -270,13 +270,13 @@ is_string:
     .return (ret)
 
 domain_error:
-    .throw('domain error: argument not in valid range')
+    tcl_error 'domain error: argument not in valid range'
 
 is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&log10'
@@ -299,13 +299,13 @@ is_string:
     .return (ret)
 
 domain_error:
-    .throw('domain error: argument not in valid range')
+    tcl_error 'domain error: argument not in valid range'
 
 is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&round'
@@ -331,7 +331,7 @@ neg:
     .return ($I0)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 .sub '&sin'
@@ -355,7 +355,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&sinh'
@@ -379,7 +379,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&sqrt'
@@ -401,13 +401,13 @@ is_string:
     .return (ret)
 
 domain_error:
-    .throw('domain error: argument not in valid range')
+    tcl_error 'domain error: argument not in valid range'
 
 is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&srand'
@@ -434,7 +434,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&tanh'
@@ -458,7 +458,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub '&wide'
@@ -489,7 +489,7 @@ is_string:
     .return(ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 .sub '&fmod'
@@ -514,10 +514,10 @@ is_string:
     .return (ret)
 
  domain_error:
-    .throw('domain error: argument not in valid range')
+    tcl_error 'domain error: argument not in valid range'
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 .sub '&hypot'
@@ -546,7 +546,7 @@ is_string:
     .return(ret)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 .sub '&pow'
@@ -569,5 +569,5 @@ is_string:
     .return($P0)
 
 is_string:
-    .throw("argument to math function didn't have numeric value")
+    tcl_error "argument to math function didn't have numeric value"
 .end

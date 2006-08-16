@@ -104,9 +104,8 @@ Every builtin command corresponds to an appropriately named file in C<src/builti
 or C<runtime/builtin>. Use a similar command as a template
 
 If the return value would be TCL_OK, then simply C<.return> the value from the
-sub. For any other return type, use one of the macros in C<src/macros.pir>:
-C<.throw>, etc. the value can be any simple register or a PMC, the calling
-conventions will auto-box as necessary.
+sub. For any other return type, use one of the custom ops defined in
+L<src/ops/tcl.ops>, e.g.: tcl_error.
 
 Before adding new functionality, add a test (or a test in an existing) file 
 in C<t/> - tests for C<puts>, for example, go in C<t/cmd_puts.t>. We are in the

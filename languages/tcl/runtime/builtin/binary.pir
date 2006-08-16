@@ -23,10 +23,10 @@ bad_args:
   $S0 .= subcommand_name
   $S0 .= '": must be format or scan'
 
-  .throw ($S0)
+  tcl_error $S0
 
 no_args:
-  .throw ('wrong # args: should be "binary option ?arg ...?"')
+  tcl_error 'wrong # args: should be "binary option ?arg ...?"'
 
 .end
 
@@ -120,7 +120,7 @@ which_format:
   if formatChar == 'A' goto format_A
   if formatChar == 'x' goto format_x
  
-  .throw('This error should never occur: must be missing a field specifier implementation.')
+  tcl_error 'XXX This error should never occur: must be missing a field specifier implementation.'
 
 format_a:
   .getBinaryArg()
@@ -186,14 +186,14 @@ end_format_loop:
   .return(outputString)
 
 bad_args:
-  .throw ('wrong # args: should be "binary format formatString ?arg arg ...?"')
+  tcl_error 'wrong # args: should be "binary format formatString ?arg arg ...?"'
 bad_field_specifier:
   $S0 = 'bad field specifier "'
   $S0 .= formatChar
   $S0 .= '"'
-  .throw ($S0)
+  tcl_error $S0
 out_of_args:
-  .throw ('not enough arguments for all format specifiers')
+  tcl_error 'not enough arguments for all format specifiers'
 
 .end
 
@@ -207,6 +207,6 @@ out_of_args:
   unless argc > 2 goto bad_args
 
 bad_args:
-  .throw ('wrong # args: should be "binary scan value formatString ?varName varName ...?"')
+  tcl_error 'wrong # args: should be "binary scan value formatString ?varName varName ...?"'
 
 .end

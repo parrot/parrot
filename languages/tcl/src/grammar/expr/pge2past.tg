@@ -183,10 +183,10 @@ has_argc:
     .return (past)
 
 too_few:
-    .throw('too few arguments for math function')
+    tcl_error 'too few arguments for math function'
 
 too_many:
-    .throw('too many arguments for math function')
+    tcl_error 'too many arguments for math function'
 }
 
 transform past (boolean) {
@@ -229,7 +229,7 @@ transform past (number) {
     if $P0 goto have_float
     $P0 = node['scientific']
     if $P0 goto scientific
-    .throw("invalid number type")
+    tcl_error 'invalid number type'
 
 integer:
     .return tree.get('past', $P0, 'integer')

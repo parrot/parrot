@@ -45,19 +45,19 @@ Define the attributes required for the class.
   $S1 = $P%0
   $S0 .= $S1
   $S0 .= ")\": no such element in array"
-  .throw($S0)
+  tcl_error $S0
 no_such_variable_%1:
   $S0 = "can't read \"%2("
   $S1 = $P%0
   $S0 .= $S1
   $S0 .= ")\": no such variable"
-  .throw($S0)
+  tcl_error $S0
 cant_read_not_array_%1:
   $S0 = "can't read \"%2("
   $S1 = $P%0
   $S0 .= $S1
   $S0 .= ")\": variable isn't array"
-  .throw($S0)
+  tcl_error $S0
 have_array_%1:
 END_PIR
     goto done

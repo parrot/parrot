@@ -35,10 +35,10 @@ bad_args:
   $S0 = 'bad option "'
   $S0 .= subcommand_name
   $S0 .= '": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which'
-  .throw ($S0)
+  tcl_error $S0
 
 no_args:
-  .throw ('wrong # args: should be "namespace subcommand ?arg ...?"')
+  tcl_error 'wrong # args: should be "namespace subcommand ?arg ...?"'
 
 .end
 
@@ -61,7 +61,7 @@ no_args:
   .return($S0)
 
 bad_args:
-  .throw ('wrong # args: should be "namespace current"')
+  tcl_error 'wrong # args: should be "namespace current"'
 .end
 
 .sub 'delete'
@@ -142,7 +142,7 @@ doesnt_exist:
   .return(0)
 
 bad_args:
-  .throw('wrong # args: should be "namespace exists name"' )
+  tcl_error 'wrong # args: should be "namespace exists name"'
 .end
 
 .sub 'qualifiers'
@@ -168,7 +168,7 @@ WHOLE:
   .return($S0)
 
   bad_args:
-  .throw ('wrong # args: should be "namespace qualifiers string"')
+   tcl_error 'wrong # args: should be "namespace qualifiers string"'
 
 .end
 
@@ -197,7 +197,7 @@ WHOLE:
   .return($P0)
 
 bad_args:
-  .throw ('wrong # args: should be "namespace tail string"')
+  tcl_error 'wrong # args: should be "namespace tail string"'
 
 .end
 
@@ -254,7 +254,7 @@ END_PIR
   .return()
 
 bad_args:
-  .throw('wrong # args: should be "namespace eval name arg ?arg...?"')  
+  tcl_error 'wrong # args: should be "namespace eval name arg ?arg...?"'
 .end
 
 .sub 'export'
@@ -331,13 +331,13 @@ end:
   .return(list)
 
 bad_args:
-  .throw('wrong # args: should be "namespace children ?name? ?pattern?"')
+  tcl_error 'wrong # args: should be "namespace children ?name? ?pattern?"'
 
 unknown_namespace:
   $S0 = argv[0]
   $S0 = 'unknown namespace "' . $S0
   $S0 = $S0 . '" in namespace children command'
-  .throw($S0)
+  tcl_error $S0
 .end
 
 .sub 'lc_cmp'
@@ -402,7 +402,7 @@ current_in_root:
   .return('')
 
 bad_args:
-  .throw('wrong # args: should be "namespace parent ?name?"')
+  tcl_error 'wrong # args: should be "namespace parent ?name?"'
 .end
 
 .sub 'which'

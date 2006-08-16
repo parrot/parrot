@@ -94,5 +94,5 @@ empty_done:
   .return($P1)
 
 bad_args:
-  .throw('wrong # args: should be "split string ?splitChars?"')
+  tcl_error 'wrong # args: should be "split string ?splitChars?"'
 .end

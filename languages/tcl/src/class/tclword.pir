@@ -87,5 +87,5 @@ concat_loop_done:
 # to compile code.
 
 .sub __get_string :method
-  .throw("Can't get a string from a TclWord")
+  tcl_error "Can't get a string from a TclWord"
 .end

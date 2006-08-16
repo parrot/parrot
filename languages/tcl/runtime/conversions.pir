@@ -82,7 +82,7 @@ done:
   .return(number)
 
 NaN:
-  .throw('Not a number!')
+  tcl_error 'Not a number!'
 .end
 
 =head2 _Tcl::__integer
@@ -111,7 +111,7 @@ not_integer:
   $S0 = 'expected integer but got "'
   $S0 .= $S1
   $S0 .= '"'
-  .throw($S0)
+  tcl_error $S0
 .end
 
 =head2 _Tcl::__index
@@ -164,7 +164,7 @@ bad_index:
   $S0 = 'bad index "'
   $S0 .= index
   $S0 .= '": must be integer?[+-]integer? or end?[+-]integer?'
-  .throw($S0)
+  tcl_error $S0
 .end
 
 =head2 _Tcl::__channel
@@ -190,7 +190,7 @@ bad_channel:
   $S0 = 'can not find channel named "'
   $S0 .= channelID
   $S0 .= '"'
- .throw($S0)
+  tcl_error $S0
 
 .end
 
@@ -263,13 +263,13 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     $S0 = expression
     $S0 = 'syntax error in expression "' . $S0
     $S0 = $S0 . '": premature end of expression'
-    .throw($S0) 
+    tcl_error $S0
 
   extra_tokens:
     $S0 = expression
     $S0 = 'syntax error in expression "' . $S0
     $S0 = $S0 . '": extra tokens at end of expression'
-    .throw($S0)
+    tcl_error $S0
 .end
 
 =head2 _Tcl::__script
@@ -373,7 +373,7 @@ error:
     $S0 = value
     $S0 = 'expected boolean value but got "' . $S0
     $S0 = $S0 . '"'
-    .throw($S0)
+    tcl_error $S0
 
 number:
 
@@ -445,5 +445,5 @@ bad_level:
   $S0 = tcl_level
   $S0 = "bad level \"" . $S0
   $S0 = $S0 . "\""
-  .throw($S0)
+  tcl_error $S0
 .end

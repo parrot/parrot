@@ -138,5 +138,5 @@ done:
   .return(retval)
 
 bad_args:
-  .throw('wrong # args: should be "foreach varList list ?varList list ...? command"')
+  tcl_error 'wrong # args: should be "foreach varList list ?varList list ...? command"'
 .end

@@ -161,6 +161,7 @@ END_PIR
   # conflicts with the parser itself.
 
   stub_code = <<'END_PIR'
+.loadlib 'tcl_ops'
 .HLL 'tcl', 'tcl_group'
 # src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1

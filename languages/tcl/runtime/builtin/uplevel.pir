@@ -78,6 +78,6 @@ restore_chain_end:
   ret
 
 bad_args:
-  .throw('wrong # args: should be "uplevel ?level? command ?arg ...?"')
+  tcl_error 'wrong # args: should be "uplevel ?level? command ?arg ...?"'
 .end
 

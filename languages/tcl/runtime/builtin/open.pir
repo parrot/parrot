@@ -26,9 +26,8 @@
   .return(channel_id)
  
 file_error:
-  .throw ('unable to open specified file')
+  tcl_error 'unable to open specified file'
  
 error:
-  .throw ('XXX: bad call to open')
-
+  tcl_error 'XXX: bad call to open'
 .end

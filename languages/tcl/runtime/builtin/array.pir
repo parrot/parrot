@@ -56,10 +56,10 @@ bad_args:
   $S0  = 'bad option "'
   $S0 .= subcommand_name
   $S0 .= '": must be anymore, donesearch, exists, get, names, nextelement, set, size, startsearch, statistics, or unset'
-  .throw($S0)
+  tcl_error $S0
 
 few_args:
-  .throw('wrong # args: should be "array option arrayName ?arg ...?"')
+  tcl_error 'wrong # args: should be "array option arrayName ?arg ...?"'
 
 .end
 
@@ -80,7 +80,7 @@ few_args:
   .return (is_array)
 
 bad_args:
-  .throw ('wrong # args: should be "array exists arrayName"')
+  tcl_error 'wrong # args: should be "array exists arrayName"'
 .end
 
 .sub 'size'
@@ -101,7 +101,7 @@ size_none:
   .return (0)
 
 bad_args:
-  .throw ('wrong # args: should be "array size arrayName"')
+  tcl_error 'wrong # args: should be "array size arrayName"'
 .end
 
 .sub 'set'
@@ -166,10 +166,10 @@ set_loop:
   .return ('')
 
 bad_args:
- .throw ('wrong # args: should be array set arrayName list')
+  tcl_error 'wrong # args: should be array set arrayName list'
 
 odd_args:
- .throw ('list must have an even number of elements')
+  tcl_error 'list must have an even number of elements'
 .end
 
 
@@ -233,10 +233,10 @@ push_end:
   .return(retval)
 
 bad_args:
-  .throw('wrong # args: should be "array get arrayName ?pattern?"')
+  tcl_error 'wrong # args: should be "array get arrayName ?pattern?"'
 
 not_array:
-  .throw('')
+  tcl_error '' # XXX Is this right? -coke
 .end
 
 .sub 'unset'
@@ -290,10 +290,10 @@ push_end:
 
 
 bad_args:
-  .throw('wrong # args: should be "array unset arrayName ?pattern?"')
+   tcl_error 'wrong # args: should be "array unset arrayName ?pattern?"'
 
 not_array:
-  .throw('')
+   tcl_error '' # XXX is this right? -coke
 .end
 
 .sub 'names'
@@ -332,16 +332,16 @@ skip_args:
   .return match_proc(the_array, pattern)
 
 bad_args:
-  .throw ('wrong # args: should be "array names arrayName ?mode? ?pattern?"')
+  tcl_error 'wrong # args: should be "array names arrayName ?mode? ?pattern?"'
 
 bad_mode:
   $S0 = 'bad option "'
   $S0 .= mode
   $S0 .= '": must be -exact, -glob, or -regexp'
-  .throw ($S0)
+  tcl_error $S0
 
 not_array:
-  .throw('')
+  tcl_error '' # is this right? -Coke
 .end
 
 .namespace [ 'helpers' ; 'array'; 'names_helper' ]

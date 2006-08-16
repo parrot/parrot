@@ -46,5 +46,5 @@ done:
   .return('')
 
 badargs:
-  .throw('wrong # args: should be "global varName ?varName ...?"')
+  tcl_error 'wrong # args: should be "global varName ?varName ...?"'
 .end

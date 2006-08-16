@@ -41,5 +41,5 @@ var_end:
   .return(list)
 
 bad_args:
-  .throw ('wrong # args: should be "lassign list varName ?varName ...?"')
+  tcl_error 'wrong # args: should be "lassign list varName ?varName ...?"'
 .end

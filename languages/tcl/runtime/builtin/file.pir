@@ -24,9 +24,9 @@ bad_args:
   $S0  = 'bad option "'
   $S0 .= subcommand_name
   $S0 .= '": must be atime, attributes, channels, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, link, lstat, mtime, mkdir, nativename, normalize, owned, pathtype, readable, readlink, rename, rootname, separator, size, split, stat, system, tail, type, volumes, or writable'
-  .throw ($S0)
+  tcl_error $S0
 few_args:
-  .throw('wrong # args: should be "file option ?arg ...?"')
+  tcl_error 'wrong # args: should be "file option ?arg ...?"'
 
 .end
 
@@ -78,7 +78,7 @@ name_loop_done:
   .return(result)
 
 bad_args:
-  .throw('wrong # args: should be "file join name ?name ...?"')
+  tcl_error 'wrong # args: should be "file join name ?name ...?"'
 .end
 
 .sub 'stat' 
@@ -142,9 +142,9 @@ no_file:
   $S0  = 'could not read "'
   $S0 .= file
   $S0 .= '": no such file or directory'
-  .throw($S0)
+  tcl_error $S0
 bad_args:
-  .throw('wrong # args: should be "file state name varName"')
+  tcl_error 'wrong # args: should be "file state name varName"'
 .end
 
 .sub 'isdirectory'
@@ -178,9 +178,9 @@ no_file:
   $S0  = 'could not read "'
   $S0 .= file
   $S0 .= '": no such file or directory'
-  .throw($S0)
+  tcl_error $S0
 bad_args:
-  .throw('wrong # args: should be "file isdirectory name"')
+  tcl_error 'wrong # args: should be "file isdirectory name"'
 
 .end
 
@@ -215,9 +215,9 @@ no_file:
   $S0  = 'could not read "'
   $S0 .= file
   $S0 .= '": no such file or directory'
-  .throw($S0)
+  tcl_error $S0
 bad_args:
-  .throw('wrong # args: should be "file isfile name"')
+  tcl_error 'wrong # args: should be "file isfile name"'
 
 .end
 
@@ -250,9 +250,9 @@ no_file:
   $S0  = 'could not read "'
   $S0 .= file
   $S0 .= '": no such file or directory'
-  .throw($S0)
+  tcl_error $S0
 bad_args:
-  .throw('wrong # args: should be "file type name"')
+  tcl_error 'wrong # args: should be "file type name"'
 .end
 
 .sub 'size'
@@ -278,9 +278,9 @@ no_file:
   $S0  = 'could not read "'
   $S0 .= file
   $S0 .= '": no such file or directory'
-  .throw($S0)
+  tcl_error $S0
 bad_args:
-  .throw('wrong # args: should be "file size name"')
+  tcl_error 'wrong # args: should be "file size name"'
 .end
 
 .sub 'atime'
@@ -306,9 +306,9 @@ no_file:
   $S0  = 'could not read "'
   $S0 .= file
   $S0 .= '": no such file or directory'
-  .throw($S0)
+  tcl_error $S0
 bad_args:
-  .throw('wrong # args: should be "file atime name"')
+  tcl_error 'wrong # args: should be "file atime name"'
 .end
 
 .sub 'mtime'
@@ -334,9 +334,9 @@ no_file:
   $S0  = 'could not read "'
   $S0 .= file
   $S0 .= '": no such file or directory'
-  .throw($S0)
+  tcl_error $S0
 bad_args:
-  .throw('wrong # args: should be "file mtime name"')
+  tcl_error 'wrong # args: should be "file mtime name"'
 .end
 
 # XXX Stub for test parsing

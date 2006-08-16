@@ -134,17 +134,17 @@ body_match:
   .return $P1()
 
 extra_pattern:
-  .throw('extra switch pattern with no body')
+  tcl_error 'extra switch pattern with no body'
 
 bad_args:
-  .throw('wrong # args: should be "switch ?switches? string pattern body ... ?default body?"')
+  tcl_error 'wrong # args: should be "switch ?switches? string pattern body ... ?default body?"'
 
 bad_args_with_curlies:
-  .throw('wrong # args: should be "switch ?switches? string {pattern body ... ?default body?}"')
+  tcl_error 'wrong # args: should be "switch ?switches? string {pattern body ... ?default body?}"'
 
 bad_flag:
   $S1 = 'bad option "'
   $S1 .= $S0
   $S1 .= '": must be -exact, -glob, -indexvar, -matchvar, -nocase, -regexp, or --'
-  .throw ($S1)
+  tcl_error $S1
 .end

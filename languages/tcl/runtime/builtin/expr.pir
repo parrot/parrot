@@ -30,5 +30,5 @@ loop_done:
   .return ($P2)
 
 no_args:
-  .throw('wrong # args: should be "expr arg ?arg ...?"')
+  tcl_error 'wrong # args: should be "expr arg ?arg ...?"'
 .end

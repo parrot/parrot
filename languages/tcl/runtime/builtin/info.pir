@@ -30,10 +30,10 @@ bad_subcommand:
   $S0 .= subcommand_name
   $S0 .= '": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars'
 
-  .throw ($S0)
+  tcl_error $S0
 
 bad_args:
-  .throw('wrong # args: should be "info option ?arg arg ...?"')
+  tcl_error 'wrong # args: should be "info option ?arg arg ...?"'
 .end
 
 .HLL '_Tcl', ''
@@ -59,10 +59,10 @@ no_args:
   $S0 = '"'
   $S0 .= procname
   $S0 .= "\" isn't a procedure"
-  .throw ($S0)
+  tcl_error $S0
 
 bad_args:
-  .throw ('wrong # args: should be "info args procname"')
+  tcl_error 'wrong # args: should be "info args procname"'
 .end
 
 .sub 'body'
@@ -85,10 +85,10 @@ no_body:
   $S0 = '"'
   $S0 .= procname
   $S0 .= "\" isn't a procedure"
-  .throw ($S0)
+  tcl_error $S0
 
 bad_args:
-  .throw ('wrong # args: should be "info body procname"')
+  tcl_error 'wrong # args: should be "info body procname"'
 .end
 
 .sub 'functions'
@@ -136,7 +136,7 @@ loop:
   .return(retval)
 
 bad_args:
-  .throw ('wrong # args: should be "info functions ?pattern?"')
+  tcl_error 'wrong # args: should be "info functions ?pattern?"'
 .end
 
 .sub 'commands'
@@ -180,7 +180,7 @@ bad_args:
     .return(result)
 
   bad_args:
-    .throw('wrong # args: should be "info commands ?pattern?"')
+    tcl_error 'wrong # args: should be "info commands ?pattern?"'
 
 .end
 
@@ -204,7 +204,7 @@ not_found:
   .return (0)
 
 bad_args:
-  .throw ('wrong # args: should be "info exists varName"')
+  tcl_error 'wrong # args: should be "info exists varName"'
 .end
 
 .sub 'tclversion'
@@ -219,7 +219,7 @@ bad_args:
   .return($P1)
 
 bad_args:
-  .throw ('wrong # args: should be "info tclversion"')
+  tcl_error 'wrong # args: should be "info tclversion"'
 
 .end
 
@@ -236,11 +236,11 @@ iterate:
   .local pmc call_chain, lexpad
   call_chain = get_root_global ['_tcl'], 'call_chain'
   lexpad     = call_chain[-1]
-  .throw("[info vars] doesn't work because we can't iterate DynLexPads")
+  tcl_error "XXX [info vars] doesn't work because we can't iterate DynLexPads"
   .return('')
 
 bad_args:
-  .throw('wrong # args: should be "info vars ?pattern?"')
+  tcl_error 'wrong # args: should be "info vars ?pattern?"'
 .end
 
 .sub 'level'
@@ -252,7 +252,7 @@ bad_args:
   if argc == 0 goto current_level
   if argc == 1 goto find_level
 
-  .throw('wrong # args: should be "info level ?number?"')
+  tcl_error 'wrong # args: should be "info level ?number?"'
 
 current_level:
   .local pmc call_chain

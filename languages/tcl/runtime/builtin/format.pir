@@ -24,5 +24,5 @@
   .return($S0)
 
 noargs:
-  .throw('wrong # args: should be "format formatString ?arg arg ...?"')
+  tcl_error 'wrong # args: should be "format formatString ?arg arg ...?"'
 .end

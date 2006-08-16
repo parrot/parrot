@@ -23,5 +23,5 @@
   .return $P2()
 
 bad_args:
-  .throw('wrong # args: should be "eval arg ?arg ...?"')
+  tcl_error 'wrong # args: should be "eval arg ?arg ...?"'
 .end

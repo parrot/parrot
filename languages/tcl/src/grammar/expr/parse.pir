@@ -96,7 +96,7 @@ fail:
     $S0 = 'expected integer but got "' . $S0
     $S0 = $S0 . '" (looks like invalid octal number)'
     
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub 'unknown_math_function'
@@ -107,7 +107,7 @@ fail:
     $S0 = 'unknown math function "' . $S0
     $S0 = $S0 . '"'
 
-    .throw($S0)
+    tcl_error $S0
 .end
 
 .sub 'syntax_error'
@@ -117,14 +117,13 @@ fail:
     
     .local pmc target
     target = getattribute mob, '$.target'
-    
-    $P0 = new 'TclString'
-    $P0 = 'syntax error in expression "'
-    $P0 .= target
-    $P0 .= '": '
-    $P0 .= msg
+   
+    $S0 = target
+    $S0 = 'syntax error in expression "' . $S0 
+    $S0 .= '": '
+    $S0 .= msg
 
-    .throw($P0)
+    tcl_error $S0
 .end
 
 .sub 'syntax_error_variable_or_function'

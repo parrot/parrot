@@ -195,7 +195,7 @@ done_args:
   goto ARGS_OK
 BAD_ARGS:
   $P0 = pop call_chain
-  .throw('wrong # args: should be \"%0%1\"')
+  tcl_error 'wrong # args: should be \"%0%1\"'
 ARGS_OK:
   push_eh is_return
 END_PIR
@@ -246,15 +246,15 @@ unknown_namespace:
   $S0 = "can't create procedure \""
   $S0 .= full_name
   $S0 .= '": unknown namespace'
-  .throw($S0)
+  tcl_error $S0
 
 too_many_fields:
   $S0 = arg
   $S1 = 'too many fields in argument specifier "'
   $S1 .= $S0
   $S1 .= '"'
-  .throw($S1)
+  tcl_error $S1
   
 error:
-  .throw('wrong # args: should be "proc name args body"')
+  tcl_error 'wrong # args: should be "proc name args body"'
 .end

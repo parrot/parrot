@@ -69,7 +69,7 @@ no_such_element:
   $S0 = "can't unset \""
   $S0 .= name
   $S0 .= '": no such element in array'
-  .throw($S0)
+  tcl_error $S0
 
 scalar:
   var = find_var(name)
@@ -91,6 +91,6 @@ no_such_var:
   $S0 = "can't unset \""
   $S0 .= name
   $S0 .= '": no such variable'
-  .throw($S0)
+  tcl_error $S0
 .end
 

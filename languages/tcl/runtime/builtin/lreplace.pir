@@ -44,5 +44,5 @@
     .return (list)
 
   bad_args:
-    .throw('wrong # args: should be "lreplace list first last ?element element ...?"')
+    tcl_error 'wrong # args: should be "lreplace list first last ?element element ...?"'
 .end

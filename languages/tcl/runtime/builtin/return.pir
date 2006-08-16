@@ -13,12 +13,12 @@
     if argc == 0 goto empty
     if argc == 1 goto onearg
 
-    .throw("XXX: bad call to return")
+    tcl_error "XXX: bad call to return"
 
 onearg:
     $P0 = argv[0]
-    .tcl_return($P0)
+    tcl_return $P0
 
 empty:
-    .tcl_return("")
+    tcl_return ''
 .end

@@ -103,11 +103,11 @@ done:
   .return(retval)
 
 bad_args:
-  .throw ('wrong # args: should be "parray arrayName ?pattern?"')
+  tcl_error 'wrong # args: should be "parray arrayName ?pattern?"'
 
 not_array:
   $S0 = '"'
   $S0 .= name
   $S0 .= "\" isn't an array"
-  .throw ($S0)
+  tcl_error $S0
 .end

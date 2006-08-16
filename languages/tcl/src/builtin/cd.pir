@@ -53,6 +53,6 @@ cd_it:
   .return(result_num,pir_code)
 
 bad_args:
-  pir_code = ".throw ('wrong # args: should be \"cd\ ?dirName?\"')\n"
+  pir_code = "tcl_error 'wrong # args: should be \"cd\ ?dirName?\"'\n"
   .return(register_num,pir_code)
 .end
