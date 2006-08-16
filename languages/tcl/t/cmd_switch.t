@@ -130,8 +130,7 @@ eval_is {
     default {set ok 0}
   }
   set ok
-} 1 {implied exact, fall-through} \
-    {TODO "can't handle fall-through yet"}
+} 1 {implied exact, fall-through}
 
 eval_is {
   switch a {
@@ -140,8 +139,7 @@ eval_is {
     c -
   }
 } {no body specified for pattern "c"} \
-  {implied exact, fall through the end} \
-  {TODO "can't handle fall-through yet"}
+  {implied exact, fall through the end}
 
 eval_is {switch a {a 1 b}} \
   {extra switch pattern with no body} \

@@ -71,6 +71,16 @@ got_body:
   if $I0 == 0 goto bad_args_with_curlies
   $I0 = $I0 % 2
   if $I0 == 1 goto extra_pattern
+
+  # check to make sure the last option isn't a fall-through
+  $S0 = body[-1]
+  unless $S0 == "-" goto check_mode
+  $S0 = body[-2]
+  $S0 = 'no body specified for pattern "' . $S0
+  $S0 = $S0 . '"'
+  .throw($S0)
+
+check_mode:
   .local string pattern, code
   if mode == '-exact' goto exact_mode
   if mode == '-glob' goto glob_mode
@@ -127,7 +137,11 @@ body_end:
 
   .return ('')
 
+fallthrough:
+  $S0  = shift body
+  code = shift body
 body_match:
+  if code == "-" goto fallthrough
   .local pmc __script
   __script = get_root_global ['_tcl'], '__script'
   $P1 = __script(code)
