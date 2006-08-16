@@ -61,7 +61,9 @@ array:
   
   $I0 = exists var[key]
   if $I0 == 0 goto no_such_element
-  delete var[key]
+  $P0 = var[key]
+  $P1 = new .Undef
+  assign $P0, $P1
   goto next
 
 no_such_element:

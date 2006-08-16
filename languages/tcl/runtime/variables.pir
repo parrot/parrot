@@ -46,7 +46,9 @@ array:
   unless $I0 goto cant_read_not_array
 
   variable = variable[key]
-  if_null variable, bad_index 
+  if_null variable, bad_index
+  $I0 = isa variable, 'Undef'
+  if $I0 goto bad_index
   .return(variable)
 
 bad_index:

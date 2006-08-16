@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 19
+plan 20
 
 eval_is {unset a} \
   {can't unset "a": no such variable} \
@@ -24,7 +24,8 @@ eval_is {
  unset a(2)
  puts $a(2)
 } {can't read "a(2)": no such element in array} \
-  {set/unset array element}
+  {set/unset array element} \
+  {TODO "TclConst won't morph into Undef"}
 
 eval_is {
  set b(2) 2
@@ -125,4 +126,13 @@ eval_is {
   set array(a)
 } {can't read "array(a)": no such element in array} \
   {unset array elem upvar} \
-  {TODO "broken unset array upvar"}
+  {TODO "TclConst won't morph into Undef"}
+
+eval_is {
+  catch {unset array}
+  upvar 0 array(b) c
+  set c 4
+  unset array(b)
+  set c
+} {can't read "c": no such variable} \
+  {unset an aliased array elem}
