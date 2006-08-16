@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 language_output_is("tcl", <<'TCL', <<'OUT', 'upvar $command');
@@ -15,6 +15,12 @@ OUT
 
 language_output_is("tcl", <<'TCL', <<'OUT', "uplevel - bad args");
   uplevel
+TCL
+wrong # args: should be "uplevel ?level? command ?arg ...?"
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'uplevel - bad args');
+  uplevel 0
 TCL
 wrong # args: should be "uplevel ?level? command ?arg ...?"
 OUT

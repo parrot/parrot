@@ -31,9 +31,12 @@
   (new_call_level,defaulted) = __call_level(new_call_level)
   if defaulted == 1 goto skip
 
-  $P1 = shift argv # pop the call level argument 
-skip:
+  # if we only have a level, then we don't have a command to run!
+  if argc == 1 goto bad_args
+  # pop the call level argument
+  $P1 = shift argv
 
+skip:
   .local int difference
   $I0 = new_call_level
   difference = call_level - $I0
@@ -80,4 +83,3 @@ restore_chain_end:
 bad_args:
   tcl_error 'wrong # args: should be "uplevel ?level? command ?arg ...?"'
 .end
-
