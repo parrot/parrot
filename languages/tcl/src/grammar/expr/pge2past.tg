@@ -41,8 +41,8 @@ transform dispatch (TclExpr::Grammar) {
     if $P0 goto function
     $P0 = node['subcommand']
     if $P0 goto subcommand
-    $P0 = node['variable']
-    if $P0 goto variable
+    $P0 = node['variable_substitution']
+    if $P0 goto variable_substitution
     $P0 = node['nested']
     if $P0 goto nested
     $P0 = node['type']
@@ -83,8 +83,8 @@ has_float:
 scientific:
     .return tree.get('past', $P0, 'scientific')
 
-variable:
-    .return tree.get('past', $P0, 'variable')
+variable_substitution:
+    .return tree.get('past', $P0, 'variable_substitution')
 
 nested:
     .return tree.get('past', $P0, 'nested')
@@ -433,13 +433,16 @@ empty:
     .return(past)
 }
 
-transform past (variable) {
+transform past (variable_substitution) {
     .local pmc past
     past = new 'PAST::Var'
     past.set_node(node)
     
     $S0 = node[0]
-    past['name'] = $S0
+    $P0 = node['index']
+    past['name']  = $S0
+    past['index'] = $P0
+
     .return(past)
 }
 

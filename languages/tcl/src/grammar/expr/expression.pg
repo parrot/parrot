@@ -48,8 +48,8 @@ token subcommand {
 
 
 token variable_substitution {
-    \$ [ \{ <-[}]> \}
-       | <name> [ \( $<index>:=( <substitution> | <-[[$\\)]>+ )+ \) ]?
+    \$ [ \{  ( <-[}]> )  \}
+       | (<?name>) [ \( $<index>:=( <substitution> | <-[[$\\)]>+ )+ \) ]?
        ]
 }
 
@@ -69,7 +69,7 @@ token term {
     | <quoted>
     | <braced>
     | <number>
-    | <variable>
+    | <variable_substitution>
     | <function>
     | <nested>
     | <boolean>
@@ -98,7 +98,7 @@ token word {
     <subcommand>
   | <quoted>
   | <braced>
-  | <variable>
+  | <variable_substitution>
   | <constant>
 }
 
@@ -112,14 +112,6 @@ token quoted { " <quoted_literal> " }
 # token quoted_literal { ... }
 
 token braced   { \{ ([ \\. | <braced> | <-[}]> ]*) \} }
-
-# XXX naive
-token name { <[a..zA..Z0..9_:]>+ }
-token variable { \$ [
-| (<?name> \( <?name> \) )
-| (<?name>)
-| \{ (<-[\}]>) \}
-]}
 
 token number { <scientific> | <float> | <integer> }
 

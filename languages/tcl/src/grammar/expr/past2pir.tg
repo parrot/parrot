@@ -66,13 +66,26 @@ transform pir (PAST::Var) {
     node['ret']    = ret
     node['istemp'] = 1
     
-    $S0 = node['name']
-    pir.emit(<<'END_PIR', ret, $S0)
+    .local pmc    index
+    .local string name
+    name  = node['name']
+    index = node['index']
+    if index goto array
+
+    pir.emit(<<'END_PIR', ret, name)
   .local pmc __read
   __read = get_root_global ['_tcl'], '__read'
   %0 = __read('%1')
 END_PIR
-    
+    .return(pir)
+
+array:
+    $S0 = join '', index
+    pir.emit(<<'END_PIR', ret, name, $S0)
+  .local pmc __read
+  __read = get_root_global ['_tcl'], '__read'
+  %0 = __read('%1(%2)')
+END_PIR
     .return(pir)
 }
 
