@@ -176,9 +176,7 @@ Returns the type of the element for C<*key>.
         HashBucket* const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
-            PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
-
-            return VTABLE_type(INTERP, none);
+            return 0;
         }
         return VTABLE_type(INTERP, (PMC*) b->value);
     }
@@ -200,9 +198,7 @@ Returns the type of the element for C<*key>.
         HashBucket* const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                             keystr);
         if (b == NULL) {
-            PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
-
-            return VTABLE_type(INTERP, none);
+            return 0;
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;
