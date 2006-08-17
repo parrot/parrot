@@ -25,8 +25,8 @@ transform dispatch (TclExpr::Grammar) {
     if $P0 goto boolean
     $P0 = node['constant']
     if $P0 goto constant
-    $P0 = node['braced']
-    if $P0 goto braced
+    $P0 = node['braced_word']
+    if $P0 goto braced_word
     $P0 = node['integer']
     if $P0 goto integer
     $P0 = node['float']
@@ -62,8 +62,8 @@ subcommand:
 quoted:
     .return tree.get('past', $P0, 'quoted')
 
-braced:
-    .return tree.get('past', $P0, 'braced')
+braced_word:
+    .return tree.get('past', $P0, 'braced_word')
 
 number:
     .return tree.get('past', $P0, 'number')
@@ -211,12 +211,13 @@ transform past (constant) {
     .return(past)
 }
 
-transform past (braced) {
+transform past (braced_word) {
     .local pmc past
     past = new 'PAST::Val'
     past.set_node(node)
-    
-    $S0 = node[0]
+
+    $P0 = node['PGE::Text::bracketed']
+    $S0 = $P0[0]
     past['value'] = $S0
     past['class'] = "TclConst"
     .return(past)

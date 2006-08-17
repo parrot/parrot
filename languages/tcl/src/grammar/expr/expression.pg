@@ -67,7 +67,7 @@ token backslash_substitution {
 token term {
       <subcommand>
     | <quoted>
-    | <braced>
+    | <braced_word>
     | <number>
     | <variable_substitution>
     | <function>
@@ -97,7 +97,7 @@ token comment {
 token word {
     <subcommand>
   | <quoted>
-  | <braced>
+  | <braced_word>
   | <variable_substitution>
   | <constant>
 }
@@ -110,8 +110,6 @@ token quoted { " <quoted_literal> " }
 
 # this is defined as a pir sub in src/grammar/expr/parse.pir
 # token quoted_literal { ... }
-
-token braced   { \{ ([ \\. | <braced> | <-[}]> ]*) \} }
 
 token number { <scientific> | <float> | <integer> }
 

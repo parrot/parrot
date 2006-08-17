@@ -66,6 +66,7 @@ providing a compreg-compatible method.
   load_bytecode 'Getopt/Obj.pbc'
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Glob.pbc'
+  load_bytecode 'PGE/Text.pbc'                                                                                                                                  
   load_bytecode 'PGE/Util.pbc'
   load_bytecode 'TGE.pbc'
 
@@ -216,6 +217,7 @@ env_loop_done:
   .return pir_compiler($I0,$S0)
 .end
 
+.HLL 'parrot', ''
 .include 'languages/tcl/src/grammar/expr/expression.pir'
 .include 'languages/tcl/src/grammar/expr/parse.pir'
 .include 'languages/tcl/src/grammar/expr/functions.pir'

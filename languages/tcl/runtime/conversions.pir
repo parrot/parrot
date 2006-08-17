@@ -44,7 +44,7 @@ Given a PMC, get a number from it.
   .local pmc parse
   .local pmc match
 
-  parse = get_root_global ['_tcl'; 'TclExpr::Grammar'], 'number'
+  parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'number'
   $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
   match = $P0(number, 0, 'TclExpr::Grammar')
   $I0 = find_not_cclass .CCLASS_WHITESPACE, str, 0, len
@@ -207,7 +207,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     .local pmc parse
     .local pmc match
 
-    parse = get_root_global ['_tcl'; 'TclExpr::Grammar'], 'expression'
+    parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'expression'
     $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
     match = $P0(expression, 0, 'TclExpr::Grammar')
     match.to(0)
