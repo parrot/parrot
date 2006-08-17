@@ -35,13 +35,13 @@ There are 4 applications :
 
 =over 4
 
-=item * F<languages/WMLScript/src/wmlsd.pir> : a disassembler
+=item * F<languages/WMLScript/wmlsd.pir> : a disassembler
 
-=item * F<languages/WMLScript/src/wmls2pir.pir> : a PIR translator
+=item * F<languages/WMLScript/wmls2pir.pir> : a PIR translator
 
-=item * F<languages/WMLScript/src/wmls2pbc.pir> : a PIR translator & PBC compiler
+=item * F<languages/WMLScript/wmls2pbc.pir> : a PIR translator & PBC compiler
 
-=item * F<languages/WMLScript/src/wmlsi.pir> : an interpreter
+=item * F<languages/WMLScript/wmlsi.pir> : an interpreter
 
 =back
 

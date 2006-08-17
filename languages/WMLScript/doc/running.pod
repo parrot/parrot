@@ -33,17 +33,17 @@ After building C<parrot> :
 
 =head1 Disassembling
 
-  ../../parrot src/wmlsd.pbc example.wmlsc
+  ../../parrot wmlsd.pir example.wmlsc
 
 =head1 Translating
 
-  ../../parrot src/wmls2pir.pbc example.wmlsc
+  ../../parrot wmls2pir.pir example.wmlsc
 
-  ../../parrot src/wmls2pbc.pbc example.wmlsc
+  ../../parrot wmls2pbc.pir example.wmlsc
 
 =head1 Interpreting
 
-  ../../parrot src/wmlsi.pbc example.wmlsc main
+  ../../parrot wmlsi.pir example.wmlsc main
 
 =head1 BUGS & LIMITATIONS
 
