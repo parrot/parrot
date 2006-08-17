@@ -50,6 +50,11 @@ Overrides the default to do nothing.
         PMCNULL = p;
     }
 
+    INTVAL does(STRING* what) {
+        /* XXX maybe a hack to get TGE running again */
+        return 0;
+    }
+
 }
 
 /*

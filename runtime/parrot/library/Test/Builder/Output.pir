@@ -56,12 +56,12 @@ STDERR by default.
 	.local pmc diag_output
 
 	output = args['output']
-	if output goto CHECK_ERROR_OUTPUT
+	unless null output goto CHECK_ERROR_OUTPUT
 	getstdout output
 
   CHECK_ERROR_OUTPUT:
 	diag_output = args['diag_output']
-	if diag_output goto SET_OUTPUT
+	unless null diag_output goto SET_OUTPUT
 	getstderr diag_output
 
   SET_OUTPUT:

@@ -24,6 +24,8 @@ These are the vtable functions for the PerlHash PMC.
  * We would get recursive marking of a deeply nested HoHoH...
  */
 
+static INTVAL _PerlUndef;
+
 pmclass PerlHash
     extends Hash
     need_ext
@@ -32,6 +34,19 @@ pmclass PerlHash
     group perl_group
     hll Perl
     maps Hash {
+
+    void class_init() {
+        _PerlUndef = pmc_type(INTERP, 
+                string_from_const_cstring(INTERP, "PerlUndef", 0));
+    }
+
+    PMC* get_pmc_keyed(PMC *key) {
+        PMC *result = SUPER(key);
+        if (PMC_IS_NULL(result))
+            return pmc_new(INTERP, _PerlUndef);
+        return result;
+    }
+    
 }
 
 /*

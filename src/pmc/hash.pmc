@@ -528,8 +528,7 @@ Returns the number of elements in the hash.
         HashBucket * const b =
             parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (b == NULL) {
-            /* XXX should store the undef for consistency */
-            return get_none_pmc(INTERP, SELF->vtable->base_type);
+            return PMCNULL;
         }
         return b->value;
     }
@@ -598,8 +597,7 @@ Returns the PMC value for the element at C<*key>.
         b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         keystr);
         if (b == NULL) {
-            /* XXX should store the undef for consistency */
-            return get_none_pmc(INTERP, SELF->vtable->base_type);
+            return PMCNULL;
         }
         nextkey = key_next(INTERP, key);
         if (!nextkey)

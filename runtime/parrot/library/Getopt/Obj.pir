@@ -278,16 +278,20 @@ optelse:
     goto endifelse
 array:
     $P0 = return[name]
+    if null $P0 goto not_set
     $I0 = typeof $P0
     unless $I0 != .ResizableStringArray goto endif_5
+not_set:
     $P0 = new .ResizableStringArray
 endif_5:
     push $P0, val
     goto endifelse
 hash:
     $P0 = return[name]
+    if null $P0 goto not_set_hash
     $I0 = typeof $P0
     unless $I0 != .Hash goto endif_7
+not_set_hash:
     $P0 = new .Hash
 endif_7:
     $I0 = index val, '='

@@ -643,8 +643,7 @@ OK2:  print "ok 2\n"
       print "not "
 OK3:  print "ok 3\n"
 
-      typeof S1, P0
-      eq S1, "None", OK4
+      if_null P0, OK4
       print "not "
 OK4:  print "ok 4\n"
       end

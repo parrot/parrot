@@ -145,7 +145,7 @@ Returns the TAP-compatible string representation of this test.
 	inc offset
 
 	number = args['number']
-	if number goto SET_NUMBER
+	unless null number goto SET_NUMBER
 	number = new .Integer
 	number = 0
 
@@ -154,7 +154,7 @@ Returns the TAP-compatible string representation of this test.
 	inc offset
 
 	diagnostic = args['diagnostic']
-	if diagnostic goto SET_DIAGNOSTIC
+	unless null diagnostic goto SET_DIAGNOSTIC
 	diagnostic = new .String
 	set diagnostic, '???'
 
@@ -163,7 +163,7 @@ Returns the TAP-compatible string representation of this test.
 	inc offset
 
 	description = args['description']
-	if description goto SET_DESCRIPTION
+	unless null description goto SET_DESCRIPTION
 	description = new .String
 	set description, ''
 

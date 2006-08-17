@@ -132,7 +132,9 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "delprop");
     print "\n"
     delprop P0, "de"
     getprop P3, "de", P0
-    print P3
+    if_null P3, ok
+    print "not deleted 'de' "
+ok:
     print "-\n"
     end
 CODE

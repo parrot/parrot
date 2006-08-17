@@ -134,9 +134,7 @@ This module defines the following public functions:
 	.local pmc output
 	output = self.'get_output'()
 
-	.local int size
-	size = output
-	ne size, 0, JOIN_LINES
+	unless_null output, JOIN_LINES
 	.return( '' )
 
   JOIN_LINES:
@@ -150,9 +148,7 @@ This module defines the following public functions:
 	.local pmc diagnostics
 	diagnostics = self.'get_diagnostics'()
 
-	.local int size
-	size = diagnostics
-	ne size, 0, JOIN_LINES
+	unless_null diagnostics, JOIN_LINES
 	.return( '' )
 
   JOIN_LINES:
