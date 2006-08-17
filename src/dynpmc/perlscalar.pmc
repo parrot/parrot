@@ -59,7 +59,6 @@ Morphs the scalar to the specified type.
                     string_from_const_cstring(interpreter, "PerlString", 0));
                 break;
             case enum_class_Undef:
-            case enum_class_None:
                 type = pmc_type(interpreter,
                     string_from_const_cstring(interpreter, "PerlUndef", 0));
                 break;

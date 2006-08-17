@@ -1,5 +1,9 @@
 #1 $Id$
 
+2006.08.18    leo
+	* remove the None PMC - if needed it can trivially be reimplemented
+	  in languages from r14189
+
 2006.08.16    creiss
 	Merged Software Transactional Memory branch into trunk, adds:
 	* several new opcodes whose names start with stm_
