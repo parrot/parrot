@@ -4,6 +4,7 @@ PARROT  = ../../parrot@exe@
 
 C_BUILTIN = src/builtin
 R_BUILTIN = runtime/builtin
+TCL_LIB   = library
 PMCBUILD  = $(PERL) @build_dir@/tools/build/dynpmc.pl
 OPSBUILD  = $(PERL) @build_dir@/tools/build/dynoplibs.pl
 DESTDIR   = @build_dir@/runtime/parrot/dynext
@@ -82,7 +83,6 @@ $(R_BUILTIN)/lsort.pir \
 $(R_BUILTIN)/namespace.pir \
 $(R_BUILTIN)/open.pir \
 $(C_BUILTIN)/package.pir \
-$(R_BUILTIN)/parray.pir \
 $(R_BUILTIN)/proc.pir \
 $(R_BUILTIN)/puts.pir \
 $(R_BUILTIN)/regexp.pir \
@@ -115,7 +115,8 @@ src/grammar/expr/functions.pir \
 src/grammar/expr/parse.pir \
 src/grammar/expr/operators.pir \
 src/grammar/expr/past2pir.pir \
-src/grammar/expr/pge2past.pir
+src/grammar/expr/pge2past.pir \
+$(TCL_LIB)/parray.tcl
 
 all: tcl.pbc
 
@@ -124,7 +125,7 @@ tcl.pbc: $(PARROT) pmcs ops runtime/tcllib.pbc src/tclsh.pir
 
 $(GENERATED_INLINES) : tools/gen_inline.pl
 
-.SUFFIXES : .pir .tmt .pg .tg
+.SUFFIXES : .pir .tmt .pg .tg .tcl
 
 .tmt.pir :
 	$(PERL) tools/gen_inline.pl $< > $@
@@ -137,6 +138,9 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 
 .pir.pbc :
     $(PARROT) --output=$@ $<
+
+.tcl.pir :
+	$(PARROT) tcl.pbc $< --pir > $@
 
 CLASSES = \
   $(CLASSDIR)/tclcommand.pir \
@@ -359,7 +363,8 @@ $(GENERATED_INLINES) \
 "$(OPSDIR)/*.c" \
 "$(OPSDIR)/*.h" \
 "$(OPSDIR)/*$(O)" \
-"$(OPSDIR)/*.bundle"
+"$(OPSDIR)/*.bundle" \
+"$(TCL_LIB)/*.pir"
 
 # that last line should be cleaned up for x-platform.
 

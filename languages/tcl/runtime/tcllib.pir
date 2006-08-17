@@ -91,21 +91,23 @@ env_loop_done:
   set_root_global ['tcl'], '$env', tcl_env
 
   # Set tcl_library:
-  .local pmc interp
+  .local pmc    interp
+  .local string slash
   interp = getinterp
   .include "iglobals.pasm"
   $P1 = interp[.IGLOBALS_CONFIG_HASH]
   $S0 = $P1['build_dir']
-  $S1 = $P1['slash']
-  $S0 .= $S1
+  slash = $P1['slash']
+  $S0 .= slash
   $S0 .= 'languages' 
-  $S0 .= $S1
+  $S0 .= slash
   $S0 .= 'tcl' 
-  $S0 .= $S1
+  $S0 .= slash
   $S0 .= 'library' 
-  $P1 = new 'TclString'
-  $P1 = $S0
-  set_root_global ['tcl'], '$tcl_library', $P1
+  .local pmc tcl_library
+  tcl_library = new 'TclString'
+  tcl_library = $S0
+  set_root_global ['tcl'], '$tcl_library', tcl_library
 
   # keep track of names of file types.
   .local pmc filetypes
@@ -234,3 +236,32 @@ env_loop_done:
 .include 'languages/tcl/src/grammar/expr/parse.pir'
 .include 'languages/tcl/src/grammar/expr/functions.pir'
 .include 'languages/tcl/src/grammar/expr/operators.pir'
+
+# Load the standard library
+.HLL 'Tcl', ''
+.namespace
+
+.sub __load_stdlib :load :anon
+  .include "iglobals.pasm"
+  .local pmc interp
+  interp = getinterp
+  $P1 = interp[.IGLOBALS_CONFIG_HASH]
+
+  .local string slash
+  slash = $P1['slash']
+
+  .local pmc tcl_library
+  tcl_library = get_global '$tcl_library'
+
+  $S0 = tcl_library
+  $S0 .= slash
+  $S0 .= 'parray.tcl'
+
+  .local pmc io, script
+  io = getclass 'ParrotIO'
+  $S0 = io.'slurp'($S0)
+
+  script = get_root_global ['_tcl'], '__script'
+  $P1 = script($S0)
+  $P1()
+.end
