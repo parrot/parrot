@@ -375,15 +375,14 @@ bad_args:
   .return(0)
 .end
 
+# XXX Stub for test parsing
+.sub 'rootname'
+  .param pmc argv
+  .return(0)
+.end
 
-
-
-
-
-
-
-
-
-
-
-
+# XXX Stub for test parsing
+.sub 'ext'
+  .param pmc argv
+  .return(0)
+.end

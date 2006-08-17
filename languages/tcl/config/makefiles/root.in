@@ -222,7 +222,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/while.t \
   t_tcl/while_old.t
 
-# These tests parse but fail every test.
+# These tests parse but fail (or skip) every test.
 FAILING_TCL_TESTS = \
   t_tcl/case.t \
   t_tcl/config.t
@@ -249,20 +249,30 @@ SKIPPED_TCL_TESTS = \
   t_tcl/thread.t \
   t_tcl/unload.t \
   t_tcl/winConsole.t \
+  t_tcl/winFCmd.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
-
 # These test files die for various reasons.
 #
 # too slow:
 #
-#t_tcl/tcltest.t         t_tcl/trace.t           t_tcl/interp.t
-#t_tcl/io.t              t_tcl/ioCmd.t           t_tcl/dict.t
-#t_tcl/clock.t           t_tcl/compExpr_old.t    t_tcl/expr.t
-#t_tcl/fCmd.t            t_tcl/parseExpr.t       t_tcl/winFCmd.t
-#t_tcl/fileSystem.t      t_tcl/parse.t           t_tcl/expr_old.t
-#t_tcl/reg.t             t_tcl/lsearch.t         t_tcl/fileName.t
-#t_tcl/util.t            t_tcl/cmdAH.t           t_tcl/binary.t
+#t_tcl/clock.t            t_tcl/expr.t 
+#Name 'prefix:!' not found
+#t_tcl/io.t
+#
+#[oops; continuation 0x34cbe18 of type 25 is trying to jump from runloop 59279 to runloop 1]
+#t_tcl/ioCmd.t
+#
+# can't read "tcl_platform(byteOrder)"
+#t_tcl/binary.t
+#
+# No such file or directory
+#t_tcl/fileSystem.t      t_tcl/tcltest.t          t_tcl/fCmd.t
+#t_tcl/fileName.t
+#
+# XXX This error should never occur
+#t_tcl/util.t            t_tcl/parseExpr.t        t_tcl/compExpr_old.t    
+#t_tcl/expr_old.t
 #
 # can't read "actual": variable is array
 #t_tcl/execute.t
@@ -272,7 +282,8 @@ SKIPPED_TCL_TESTS = \
 #
 # crash or no debug output generated.
 #t_tcl/for.t             t_tcl/apply.t           t_tcl/regexp.t
-#t_tcl/set_old.t
+#t_tcl/set_old.t         t_tcl/lsearch.t         t_tcl/dict.t
+#t_tcl/cmdAH.t           t_tcl/trace.t        
 #
 # MMD function __cmp not found for types (21, 74)
 #t/tcl_format.t          t_tcl/scan.t
@@ -293,10 +304,11 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/init.t            t_tcl/safe.t            t_tcl/source.t
 #t_tcl/pkg.t             t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
 #t_tcl/unixFCmd          t_tcl/unixFile.t        t_tcl/misc.t
-#t_tcl/regexpComp.t
+#t_tcl/regexpComp.t      t_tcl/parse.t           t_tcl/interp.t
 #
 # Null PMC access in invoke()
 #t_tcl/main.t            t_tcl/var.t             t_tcl/winDde.t
+#t_tcl/reg.t
 #
 # Malformed string (http://rt.perl.org/rt3/Ticket/Display.html?id=40135)
 #t_tcl/subst.t

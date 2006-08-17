@@ -177,4 +177,9 @@ proc pid                {args} {return 0}
 proc child              {args} {return 0}
 proc child-trusted      {args} {return 0}
 proc makeDirectory      {args} {return 0}
-namespace eval tcltest  {set verbose 0} 
+proc dict               {args} {return 0}
+namespace eval tcltest  {
+    set verbose 0
+    proc temporaryDirectory {args} {return 0}
+} 
+
