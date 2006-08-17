@@ -11,7 +11,7 @@ token tclcommand {
     | \# \N*
     | [ $<word>:=( <quoted_word>
                  | <braced_word>
-                 | ( <substitution> | <-[[$\\;\n\r\t ]>+ )+
+                 | ( <substitution> | \$ | <-[[$\\;\n\r\t ]>+ )+
                  ) \h*
       ]+
 }
@@ -25,7 +25,7 @@ token substitution {
 
 
 token quoted_word {
-    " ( <substitution> | <-[[$\\"]>+ )* "
+    " $<chunk>:=( <substitution> | \$ | <-[[$\\"]>+ )* "
 }
 
 
@@ -41,7 +41,7 @@ token subcommand {
     | \# \N*
     | [ $<word>:=( <quoted_word>
                  | <braced_word>
-                 | ( <substitution> | <-[[$\]\\\n\r\t ]>+ )+
+                 | $<chunk>:=( <substitution> | \$ | <-[[$\]\\\n\r\t ]>+ )+
                  ) \h*
       ]*
 }
@@ -49,7 +49,7 @@ token subcommand {
 
 token variable_substitution {
     \$ [ \{  ( <-[}]> )  \}
-       | (<?name>) [ \( $<index>:=( <substitution> | <-[[$\\)]>+ )+ \) ]?
+       | (<?name>) [ \( $<index>:=( <substitution> | \$ | <-[[$\\)]>+ )+ \) ]?
        ]
 }
 
@@ -65,11 +65,10 @@ token backslash_substitution {
 # Actual [expr] items
 
 token term {
-      <subcommand>
-    | <quoted>
+      <substitution>
+    | <quoted_word>
     | <braced_word>
     | <number>
-    | <variable_substitution>
     | <function>
     | <nested>
     | <boolean>
@@ -82,9 +81,6 @@ rule boolean { ( true | false ) <?wb> }
 
 rule nested { \( <expression> \) }
 
-# XXX EXTREMELY naive
-rule subcommand  { \[ [<command> ;?]* \] }
-
 token command {
       <comment>
     | <word> [<?ws>? <word>]*
@@ -96,7 +92,7 @@ token comment {
 
 token word {
     <subcommand>
-  | <quoted>
+  | <quoted_word>
   | <braced_word>
   | <variable_substitution>
   | <constant>
@@ -105,11 +101,6 @@ token word {
 token constant {
     (<[a..zA..Z0..9\:()\.%*+]>+)
 }
-
-token quoted { " <quoted_literal> " }
-
-# this is defined as a pir sub in src/grammar/expr/parse.pir
-# token quoted_literal { ... }
 
 token number { <scientific> | <float> | <integer> }
 

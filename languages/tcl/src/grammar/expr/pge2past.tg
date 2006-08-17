@@ -20,7 +20,11 @@ transform dispatch (TclExpr::Grammar) {
     .local pmc child
 
     # Ask the child node for its past.
-
+dispatch:
+    $P0 = node['chunk']
+    if $P0 goto chunks
+    $P0 = node['substitution']
+    if $P0 goto substitution
     $P0 = node['boolean']
     if $P0 goto boolean
     $P0 = node['constant']
@@ -35,21 +39,29 @@ transform dispatch (TclExpr::Grammar) {
     if $P0 goto scientific
     $P0 = node['number']
     if $P0 goto number
-    $P0 = node['quoted']
-    if $P0 goto quoted
+    $P0 = node['quoted_word']
+    if $P0 goto quoted_word
     $P0 = node['function']
     if $P0 goto function
     $P0 = node['subcommand']
     if $P0 goto subcommand
     $P0 = node['variable_substitution']
     if $P0 goto variable_substitution
+    $P0 = node['command_substitution']
+    if $P0 goto command_substitution
     $P0 = node['nested']
     if $P0 goto nested
     $P0 = node['type']
     if $P0 goto operator
-  
-  .return(node)
- 
+
+    say "Didn't know how to handle node:"
+    .dumper(node)
+    end
+
+chunks:
+    $P0 = node
+    goto quoted_word
+
 operator:
     .return tree.get('past', node, 'operator')
 
@@ -57,10 +69,11 @@ function:
     .return tree.get('past', $P0, 'function')
 
 subcommand:
+    $P0 = $P0[0]
     .return tree.get('past', $P0, 'subcommand')
 
-quoted:
-    .return tree.get('past', $P0, 'quoted')
+quoted_word:
+    .return tree.get('past', $P0, 'quoted_word')
 
 braced_word:
     .return tree.get('past', $P0, 'braced_word')
@@ -83,8 +96,16 @@ has_float:
 scientific:
     .return tree.get('past', $P0, 'scientific')
 
+substitution:
+    node = $P0
+    goto dispatch
+
 variable_substitution:
     .return tree.get('past', $P0, 'variable_substitution')
+
+command_substitution:
+    node = $P0
+    goto dispatch
 
 nested:
     .return tree.get('past', $P0, 'nested')
@@ -359,11 +380,11 @@ transform past (float) {
     .return (past)
 }
 
-transform past (quoted) {
+transform past (quoted_word) {
     .local pmc past
-    $P0 = node['quoted_literal']
-    $P0 = $P0.'get_array'()
-    if null $P0 goto empty_string
+    $P0 = node['chunk']
+    $I0 = isa $P0, 'None'
+    if $I0 goto empty_string
     
     .local pmc iter
     iter = new .Iterator, $P0
@@ -372,9 +393,10 @@ transform past (quoted) {
     unless iter goto iter_end
     .local pmc cnode, cpast
     cnode = shift iter
-    $S0 = cnode['type']
-    if $S0 == 'str' goto cpast_str
-    cpast = tree.'get'('past', cnode, $S0)
+    $I0 = exists cnode['substitution']
+    unless $I0 goto cpast_str
+    cnode = cnode['substitution']
+    cpast = tree.'get'('dispatch', cnode, 'TclExpr::Grammar')
     goto cpast_add
   cpast_str:
     $S0 = cnode
@@ -412,7 +434,7 @@ transform past (subcommand) {
     past.set_node(node)
     
     .local pmc words, iter
-    words = node['command'; 0; 'word']
+    words = node['word']
     $I0 = isa words, "None"
     if $I0 goto empty
 
