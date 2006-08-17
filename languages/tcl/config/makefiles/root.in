@@ -176,21 +176,17 @@ test:	tcl.pbc
 # Can only run a few of these cleanly with test_more at the moment.
 # eventually, as the list of commented out tests is smaller, just
 # run them all. For now - only run the ones that will report properly
-# to the harness (and pass at least one test)
+# to the harness (and pass at least one test), or those that have dubious
+# failure modes
 
 RUNNABLE_TCL_TESTS = \
-  t_tcl/append.t \
-  t_tcl/appendComp.t \
   t_tcl/compExpr.t \
   t_tcl/concat.t \
-  t_tcl/env.t \
   t_tcl/eval.t \
   t_tcl/event.t \
   t_tcl/error.t \
   t_tcl/expr_old.t \
-  t_tcl/foreach.t \
   t_tcl/for_old.t \
-  t_tcl/get.t \
   t_tcl/if.t \
   t_tcl/if_old.t \
   t_tcl/incr.t \
@@ -204,12 +200,12 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
   t_tcl/lsetComp.t \
-  t_tcl/namespace_old.t \
   t_tcl/package.t \
   t_tcl/platform.t \
   t_tcl/proc.t \
   t_tcl/proc_old.t \
   t_tcl/pwd.t \
+  t_tcl/regexp.t \
   t_tcl/rename.t \
   t_tcl/security.t \
   t_tcl/set.t \
@@ -222,7 +218,23 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/utf.t \
   t_tcl/util.t \
   t_tcl/while.t \
-  t_tcl/while_old.t
+  t_tcl/while_old.t \
+  $(SEGFAULTING_TCL_TESTS)
+
+# These tests segfault or exit before any tests are shown (apply.t)
+SEGFAULTING_TCL_TESTS = \
+  t_tcl/apply.t \
+  t_tcl/append.t \
+  t_tcl/appendComp.t \
+  t_tcl/cmdAH.t \
+  t_tcl/dict.t \
+  t_tcl/foreach.t \
+  t_tcl/for.t \
+  t_tcl/get.t \
+  t_tcl/lsearch.t \
+  t_tcl/namespace_old.t \
+  t_tcl/set_old.t \
+  t_tcl/trace.t
 
 # These tests parse but fail (or skip) every test.
 FAILING_TCL_TESTS = \
@@ -261,6 +273,9 @@ SKIPPED_TCL_TESTS = \
 #
 #t_tcl/clock.t            t_tcl/expr.t 
 #
+# can't read "env(test)": no such element in array
+#t_tcl/env.t
+#
 #Name 'prefix:!' not found
 #t_tcl/io.t
 #
@@ -282,11 +297,6 @@ SKIPPED_TCL_TESTS = \
 #
 # can't delete "run": command doesn't exist
 #t_tcl/basic.t
-#
-# crash or no debug output generated.
-#t_tcl/for.t             t_tcl/apply.t           t_tcl/regexp.t
-#t_tcl/set_old.t         t_tcl/lsearch.t         t_tcl/dict.t
-#t_tcl/cmdAH.t           t_tcl/trace.t        
 #
 # MMD function __cmp not found for types (21, 74)
 #t/tcl_format.t          t_tcl/scan.t
