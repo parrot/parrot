@@ -49,10 +49,10 @@ all: \
  pmc@slash@wmls_group$(LOAD_EXT) \
  ops@slash@wmls_ops$(LOAD_EXT) \
  $(LIBPATH)@slash@wmlslib.pbc \
- src@slash@wmlsd.pbc \
- src@slash@wmls2pir.pbc \
- src@slash@wmls2pbc.pbc \
- src@slash@wmlsi.pbc
+ wmlsd.pbc \
+ wmls2pir.pbc \
+ wmls2pbc.pbc \
+ wmlsi.pbc
 
 pmc@slash@wmls_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
@@ -66,17 +66,17 @@ ops@slash@wmls_ops$(LOAD_EXT) : $(OPS_FILES)
 	@cd $(OPSDIR) && $(OPSBUILD) linklibs $(OPSLIB)
 	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(PARROT_DYNEXT)" $(OPSLIB)
 
-src@slash@wmlsd.pbc: src@slash@wmlsd.pir src@slash@script.pir $(GEN_PIR)
-	$(PARROT) -o src/wmlsd.pbc src/wmlsd.pir 
+wmlsd.pbc: wmlsd.pir src@slash@script.pir $(GEN_PIR)
+	$(PARROT) -o wmlsd.pbc wmlsd.pir 
 
-src@slash@wmls2pir.pbc: src@slash@wmls2pir.pir src@slash@script.pir $(GEN_PIR)
-	$(PARROT) -o src/wmls2pir.pbc src/wmls2pir.pir
+wmls2pir.pbc: wmls2pir.pir src@slash@script.pir $(GEN_PIR)
+	$(PARROT) -o wmls2pir.pbc wmls2pir.pir
 
-src@slash@wmls2pbc.pbc: src@slash@wmls2pbc.pir src@slash@script.pir $(GEN_PIR)
-	$(PARROT) -o src/wmls2pbc.pbc src/wmls2pbc.pir 
+wmls2pbc.pbc: wmls2pbc.pir src@slash@script.pir $(GEN_PIR)
+	$(PARROT) -o wmls2pbc.pbc wmls2pbc.pir 
 
-src@slash@wmlsi.pbc: src@slash@wmlsi.pir src@slash@script.pir $(GEN_PIR)
-	$(PARROT) -o src/wmlsi.pbc src/wmlsi.pir 
+wmlsi.pbc: wmlsi.pir src@slash@script.pir $(GEN_PIR)
+	$(PARROT) -o wmlsi.pbc wmlsi.pir 
 
 src@slash@opcode.pir: src@slash@translation.rules build@slash@translator.pl \
  build@slash@SRM@slash@Stack.pm build@slash@SRM@slash@Register.pm
@@ -126,12 +126,21 @@ help:
 test:
 	cd .. && $(PERL) t/harness --languages=WMLScript
 
-testclean:
-	$(RM_F) "t/pmc/*.pir t/*.pir t/*.pbc t/*.wmls t/*.wmlsc t/*.out"
+TEST_CLEANERS = \
+ "t/pmc/*.pir" \
+ "t/*.pir" \
+ "t/*.pbc" \
+ "t/*.wmls" \
+ "t/*.wmlsc" \
+ "t/*.out"
 
-CLEANERS = \
+testclean:
+	$(RM_F) $(TEST_CLEANERS)
+
+BUILD_CLEANERS = \
  $(GEN_PIR) \
  "src/*.pbc" \
+ "*.pbc" \
  "$(PMCDIR)/*.dump" \
  "$(PMCDIR)/*.c" \
  "$(PMCDIR)/*.h" \
@@ -143,8 +152,8 @@ CLEANERS = \
  "$(OPSDIR)/*$(O)" \
  "$(LIBPATH)/*.pbc"
 
-clean: testclean
-	$(RM_F) $(CLEANERS)
+clean:
+	$(RM_F) $(BUILD_CLEANERS) $(TEST_CLEANERS)
 
 realclean: clean
 	$(RM_F) Makefile
