@@ -57,8 +57,7 @@ dispatch:
     end
 
 chunks:
-    $P0 = node
-    goto quoted_word
+    .return tree.get('past', $P0, 'array')
 
 operator:
     .return tree.get('past', node, 'operator')
@@ -383,9 +382,22 @@ transform past (quoted_word) {
     $P0 = node['chunk']
     $I0 = isa $P0, 'None'
     if $I0 goto empty_string
-    
+
+    .return tree.get('past', $P0, 'array')
+
+empty_string:
+    past = new 'PAST::Val'
+    past['node']  = node
+    past['class'] = 'TclConst'
+    past['value'] = ''
+
+    .return(past)
+}
+
+transform past (array) {
+    .local pmc past
     .local pmc iter
-    iter = new .Iterator, $P0
+    iter = new .Iterator, node
     null past
   iter_loop:
     unless iter goto iter_end
@@ -415,14 +427,6 @@ transform past (quoted_word) {
     past = $P0
     goto iter_loop
   iter_end:
-    .return(past)
-
-empty_string:
-    past = new 'PAST::Val'
-    past['node']  = node
-    past['class'] = 'TclConst'
-    past['value'] = ''
-
     .return(past)
 }
 
@@ -460,10 +464,16 @@ transform past (variable_substitution) {
     past.set_node(node)
     
     $S0 = node[0]
-    $P0 = node['index']
     past['name']  = $S0
-    past['index'] = $P0
 
+    $I0 = exists node['index']
+    if $I0 goto array
+    .return(past)
+
+array:
+    $P0 = node['index']
+    $P0 = tree.'get'('past', $P0, 'array')
+    past['index'] = $P0
     .return(past)
 }
 

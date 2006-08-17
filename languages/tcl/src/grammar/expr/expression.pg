@@ -42,7 +42,7 @@ token subcommand {
 }
 
 token variable_substitution {
-    \$ [ \{  ( <-[}]> )  \}
+    \$ [ \{  ( <-[}]>+ )  \}
        | (<?name>) [ \( $<index>:=( <substitution> | \$ | <-[[$\\)]>+ )+ \) ]?
        ]
 }

@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 231
+plan 232
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -60,6 +60,11 @@ is [expr {"$j"}]      7 {variables in quotes}
 is [expr {"#$j"}]    #7 {variables in quotes after literal}
 is [expr {"$"}]       $ {dollar-sign in quotes}
 is [expr {"[set j]"}] 7 {commands in quotes}
+eval_is {
+  set foo a
+  set hash(abar) 5
+  expr {$hash(${foo}bar)}
+} 5 {variables - complex arary index}
 
 eval_is {expr {1 ? 14 : [expr {}]}} 14 \
   {make sure expr errors happen at runtime}
