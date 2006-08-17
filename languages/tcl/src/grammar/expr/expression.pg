@@ -7,6 +7,63 @@ grammar TclExpr::Grammar;
 # XXX Some of the items here actually belong in the language grammar. 
 # (like command, quoted, etc.) Move them there when we use PGE for everything.
 
+token tclcommand {
+    | \# \N*
+    | [ $<word>:=( <quoted_word>
+                 | <braced_word>
+                 | ( <substitution> | <-[[$\\;\n\r\t ]>+ )+
+                 ) \h*
+      ]+
+}
+
+
+token substitution {
+    | <command_substitution>
+    | <variable_substitution>
+    | <backslash_substitution>
+}
+
+
+token quoted_word {
+    " ( <substitution> | <-[[$\\"]>+ )* "
+}
+
+
+token braced_word { <PGE::Text::bracketed: {}> }
+
+
+token command_substitution {
+    \[ <subcommand> [ <[\n;]> <subcommand> ]* \]
+}
+
+
+token subcommand {
+    | \# \N*
+    | [ $<word>:=( <quoted_word>
+                 | <braced_word>
+                 | ( <substitution> | <-[[$\]\\\n\r\t ]>+ )+
+                 ) \h*
+      ]*
+}
+
+
+token variable_substitution {
+    \$ [ \{ <-[}]> \}
+       | <name> [ \( $<index>:=( <substitution> | <-[[$\\)]>+ )+ \) ]?
+       ]
+}
+
+
+token backslash_substitution {
+    \\ [ x <[0..9a..fA..F]>+
+       | o <[0..7]>**{1..3}
+       | u <[0..9a..fA..F]>+
+       | .
+       ]
+}
+
+# Actual [expr] items
+
 token term {
       <subcommand>
     | <quoted>
