@@ -109,6 +109,11 @@ env_loop_done:
   tcl_library = $S0
   set_root_global ['tcl'], '$tcl_library', tcl_library
 
+  # set tcl_platform
+  $P1 = new 'TclArray'
+  $P1['platform'] = 'parrot'
+  set_root_global ['tcl'], '$tcl_platform', $P1
+
   # keep track of names of file types.
   .local pmc filetypes
   filetypes = new .TclArray
