@@ -19,9 +19,9 @@ systems that run on Win32, eg Cygwin.
 
 Native compilers include:
 
-       Borland C++ (bcc)		version xxx or later
-       Microsoft Visual C++ (cl)	version 13.10.3077 or later
-       MinGW32 with GCC (gcc)		version 3.4.2 or later
+       Borland C++ (bcc)                version xxx or later
+       Microsoft Visual C++ (cl)        version 13.10.3077 or later
+       MinGW32 with GCC (gcc)           version 3.4.2 or later
        Intel C++ (icl)                  version 8.0.48 works
 
 =head2 Setting Up Parrot
@@ -61,7 +61,7 @@ C:\usr\lib), add the F<bin> directory to C<PATH>, and tell
 Configure.pl to use it.
 
     mkdir C:\usr\lib
-    unzip icu-3.4-Win32-msvc7.1.zip -d C:\usr\lib
+    unzip icu-3.4.1-Win32-msvc7.1.zip -d C:\usr\lib
     mkdir C:\usr\lib\data
     set PATH=%PATH%;C:\usr\lib\icu\bin
     cd <parrot directory>
@@ -108,7 +108,7 @@ L<http://www.python.org/>
 
 Inno Setup is a I<free> installer for Windows programs.
 
-The latest release of Inno Setup at the time of writing is 5.1.4.
+The latest release of Inno Setup at the time of writing is 5.1.6.
 
 The HomePage is on L<http://www.jrsoftware.org/>.
 
@@ -223,6 +223,6 @@ This document borrows heavily from Perl's README.win32.
 
 GCC/mingw32 support was added in 0.1.2 (François Perrad).
 
-Last updated: 9 August 2005
+Last updated: 17 August 2006
 
 =cut
