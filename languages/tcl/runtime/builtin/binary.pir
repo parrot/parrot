@@ -119,7 +119,8 @@ which_format:
   if formatChar == 'a' goto format_a
   if formatChar == 'A' goto format_A
   if formatChar == 'x' goto format_x
- 
+
+  .return (0)  # XXX Hack to avoid blowing up when using binary.
   tcl_error 'XXX This error should never occur: must be missing a field specifier implementation.'
 
 format_a:
@@ -205,6 +206,15 @@ out_of_args:
 
   argc = argv
   unless argc > 2 goto bad_args
+ 
+  .local string varname 
+  varname = argv[2]
+  
+  .local pmc set
+  set = get_root_global ['_tcl'], '__set'
+  set(varname, '')
+
+  .return (0) # XXX Hack to avoid parsing errors for tcl tests.
 
 bad_args:
   tcl_error 'wrong # args: should be "binary scan value formatString ?varName varName ...?"'

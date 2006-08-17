@@ -187,6 +187,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/eval.t \
   t_tcl/event.t \
   t_tcl/error.t \
+  t_tcl/expr_old.t \
   t_tcl/foreach.t \
   t_tcl/for_old.t \
   t_tcl/get.t \
@@ -219,13 +220,15 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/uplevel.t \
   t_tcl/upvar.t \
   t_tcl/utf.t \
+  t_tcl/util.t \
   t_tcl/while.t \
   t_tcl/while_old.t
 
 # These tests parse but fail (or skip) every test.
 FAILING_TCL_TESTS = \
   t_tcl/case.t \
-  t_tcl/config.t
+  t_tcl/config.t \
+  t_tcl/parseExpr.t
 
 # These tests parse but all are skipped due to harder [test] format.
 SKIPPED_TCL_TESTS = \
@@ -257,6 +260,7 @@ SKIPPED_TCL_TESTS = \
 # too slow:
 #
 #t_tcl/clock.t            t_tcl/expr.t 
+#
 #Name 'prefix:!' not found
 #t_tcl/io.t
 #
@@ -270,9 +274,8 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/fileSystem.t      t_tcl/tcltest.t          t_tcl/fCmd.t
 #t_tcl/fileName.t
 #
-# XXX This error should never occur
-#t_tcl/util.t            t_tcl/parseExpr.t        t_tcl/compExpr_old.t    
-#t_tcl/expr_old.t
+# Didn't know how to handle node:
+#t_tcl/compExpr_old.t    
 #
 # can't read "actual": variable is array
 #t_tcl/execute.t
