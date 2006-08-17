@@ -14,8 +14,8 @@ eval_is {expr 2e17}  2e+17 {scientific in, scientific out}
 eval_is {expr 3e2.0} \
  {syntax error in expression "3e2.0": extra tokens at end of expression} \
  {can only e with an integer exponent}
-is [expr true]  true  {true}
-is [expr false] false {false}
+is [expr TrUe]  TrUe  {true}
+is [expr FaLsE] FaLsE {false}
 eval_is {expr trues}  \
  {syntax error in expression "trues": the word "trues" requires a preceding $ if it's a variable or function arguments if it's a function} \
  {trues}
