@@ -49,7 +49,7 @@ no_args:
   unless argc goto bad_args
 
   .local pmc binary_types
-  binary_types = find_global 'binary_types'
+  binary_types = get_root_global ['_tcl'], 'binary_types'
 
   .local string outputString,formatString
   outputString = binary:""
