@@ -27,8 +27,6 @@ dispatch:
     if $P0 goto substitution
     $P0 = node['boolean']
     if $P0 goto boolean
-    $P0 = node['constant']
-    if $P0 goto constant
     $P0 = node['braced_word']
     if $P0 goto braced_word
     $P0 = node['integer']

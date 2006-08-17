@@ -16,26 +16,21 @@ token tclcommand {
       ]+
 }
 
-
 token substitution {
     | <command_substitution>
     | <variable_substitution>
     | <backslash_substitution>
 }
 
-
 token quoted_word {
     " $<chunk>:=( <substitution> | \$ | <-[[$\\"]>+ )* "
 }
 
-
 token braced_word { <PGE::Text::bracketed: {}> }
-
 
 token command_substitution {
     \[ <subcommand> [ <[\n;]> <subcommand> ]* \]
 }
-
 
 token subcommand {
     | \# \N*
@@ -46,13 +41,11 @@ token subcommand {
       ]*
 }
 
-
 token variable_substitution {
     \$ [ \{  ( <-[}]> )  \}
        | (<?name>) [ \( $<index>:=( <substitution> | \$ | <-[[$\\)]>+ )+ \) ]?
        ]
 }
-
 
 token backslash_substitution {
     \\ [ x <[0..9a..fA..F]>+
@@ -80,27 +73,6 @@ token term {
 rule boolean { ( true | false ) <?wb> }
 
 rule nested { \( <expression> \) }
-
-token command {
-      <comment>
-    | <word> [<?ws>? <word>]*
-}
-
-token comment {
-  \# \N* \n?
-}
-
-token word {
-    <subcommand>
-  | <quoted_word>
-  | <braced_word>
-  | <variable_substitution>
-  | <constant>
-}
-
-token constant {
-    (<[a..zA..Z0..9\:()\.%*+]>+)
-}
 
 token number { <scientific> | <float> | <integer> }
 
