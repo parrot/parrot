@@ -258,10 +258,7 @@ Returns the size of the hash.
         HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
-            /* XXX Warning: use of uninitialized value */
-            PMC * const  none = get_none_pmc(INTERP, SELF->vtable->base_type);
-
-            return VTABLE_get_integer(INTERP, none);
+            return 0;
         }
         return VTABLE_get_integer(INTERP, (PMC*) b->value);
     }
@@ -304,10 +301,7 @@ Returns the integer value for the element at C<*key>.
         }
         b = parrot_hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
-            /* XXX Warning: use of uninitialized value */
-            PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
-
-            return VTABLE_get_integer(INTERP, none);
+            return 0;
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;
@@ -330,10 +324,7 @@ Returns the integer value for the element at C<*key>.
         HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
-
-            return VTABLE_get_number(INTERP, none);
+            return 0.0;
         }
         return VTABLE_get_number(INTERP, (PMC*) b->value);
     }
@@ -359,10 +350,7 @@ Returns the floating-point value for the element at C<*key>.
                                         keystr);
         PMC* nextkey;
         if (b == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            PMC * const none = get_none_pmc(INTERP, SELF->vtable->base_type);
-
-            return VTABLE_get_number(INTERP, none);
+            return 0.0;
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;

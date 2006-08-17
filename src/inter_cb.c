@@ -211,7 +211,8 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *user_data)
 
     sc = CONST_STRING(interpreter, "_synchronous");
     passed_synchronous = VTABLE_getprop(interpreter, user_data, sc);
-    if (passed_synchronous && VTABLE_get_bool(interpreter, passed_synchronous))
+    if (!PMC_IS_NULL(passed_synchronous) && 
+            VTABLE_get_bool(interpreter, passed_synchronous))
         synchronous = 1;
 
     /*
