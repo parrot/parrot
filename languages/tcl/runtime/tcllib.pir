@@ -90,9 +90,21 @@ env_loop:
 env_loop_done:
   set_root_global ['tcl'], '$env', tcl_env
 
-  # Set tcl_library: #XXX actually put a value here.
+  # Set tcl_library:
+  .local pmc interp
+  interp = getinterp
+  .include "iglobals.pasm"
+  $P1 = interp[.IGLOBALS_CONFIG_HASH]
+  $S0 = $P1['build_dir']
+  $S1 = $P1['slash']
+  $S0 .= $S1
+  $S0 .= 'languages' 
+  $S0 .= $S1
+  $S0 .= 'tcl' 
+  $S0 .= $S1
+  $S0 .= 'library' 
   $P1 = new 'TclString'
-  $P1 = ''
+  $P1 = $S0
   set_root_global ['tcl'], '$tcl_library', $P1
 
   # keep track of names of file types.
