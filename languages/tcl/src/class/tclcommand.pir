@@ -82,18 +82,14 @@ arg_const:
    push compiled_args, $P0
 
    $S0 = $P1
-   $I1 = charset $S0
-   $S1 = charsetname $I1
-   $S0 = escape $S0
+   $S1 = pir_code.'escape'($S0)
 
    arg_code .= reg
    arg_code .= " = new .String \n"
    arg_code .= reg
    arg_code .= ' = '
    arg_code .= $S1
-   arg_code .= ':"'
-   arg_code .= $S0
-   arg_code .= "\"\n"
+   arg_code .= "\n"
    inc ii
    goto arg_loop
 
