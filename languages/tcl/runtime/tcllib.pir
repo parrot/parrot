@@ -90,14 +90,26 @@ env_loop:
 env_loop_done:
   set_root_global ['tcl'], '$env', tcl_env
 
+  # set tcl_interactive
+  push_eh non_interactive
+    $P1 = get_root_global ['tcl'], '$tcl_interactive'
+  clear_eh
+  goto set_tcl_library 
+ non_interactive:
+  $P1 = new .TclInt
+  $P1 = 0
+  set_root_global ['tcl'], '$tcl_interactive', $P1
+
+ set_tcl_library:
   # Set tcl_library:
-  .local pmc    interp
+  .local pmc    interp, config
   .local string slash
   interp = getinterp
   .include "iglobals.pasm"
-  $P1 = interp[.IGLOBALS_CONFIG_HASH]
-  $S0 = $P1['build_dir']
-  slash = $P1['slash']
+  
+  config = interp[.IGLOBALS_CONFIG_HASH]
+  $S0 = config['build_dir']
+  slash = config['slash']
   $S0 .= slash
   $S0 .= 'languages' 
   $S0 .= slash
@@ -113,6 +125,14 @@ env_loop_done:
   $P1 = new 'TclArray'
   $P1['platform'] = 'parrot'
   set_root_global ['tcl'], '$tcl_platform', $P1
+  $I1 = config['bigendian']
+  if $I1 goto big_endian
+  $P1['byteOrder'] = 'littleEndian'
+  goto done_endian
+ big_endian:
+  $P1['byteOrder'] = 'bigEndian'
+
+ done_endian: 
 
   # keep track of names of file types.
   .local pmc filetypes
