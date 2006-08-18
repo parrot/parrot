@@ -39,7 +39,7 @@ c \n d			abc\015\012def	y	logical newline (\n)
 b \n c			abc\ndef	n	logical newline (\n)
 \N			a		y	not logical newline (\N)
 a \N c			abc		y	not logical newline (\N)
-\N			''		n 	not logical newline (\N)
+\N			''		n	not logical newline (\N)
 c \N d			abc\ndef	n	not logical newline (\N)
 c \N d			abc\012def	n	not logical newline (\N)
 c \N d			abc\015def	n	not logical newline (\N)
@@ -406,9 +406,9 @@ $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 4: <c @ 2>/	perl5 numbered captures $1
 $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
 :s $<key>:=[\w+] = $<val>:=[\S+]	 abc = 123	/mob<key>: <abc @ 1>/	named capture
 :s $<key>:=[\w+] = $<val>:=[\S+]	 abc = 123	/mob<val>: <123 @ 7>/	named capture
-:s (\w+) $<foo>:=(\w+) (\w+)	   	abc def ghi	/mob<foo>: <def @ 7>/	mixing named and unnamed capture
-:s (\w+) $<foo>:=(\w+) (\w+)	   	abc def ghi	/mob 1: <ghi @ 11>/	mixing named and unnamed capture
-<alpha> [ - <alpha> ]?	   		abc def ghi	/mob<alpha> 0: <a @ 3>/	multiple subrule captures in same scope
+:s (\w+) $<foo>:=(\w+) (\w+)		abc def ghi	/mob<foo>: <def @ 7>/	mixing named and unnamed capture
+:s (\w+) $<foo>:=(\w+) (\w+)		abc def ghi	/mob 1: <ghi @ 11>/	mixing named and unnamed capture
+<alpha> [ - <alpha> ]?			abc def ghi	/mob<alpha> 0: <a @ 3>/	multiple subrule captures in same scope
 [(.)$0]+				bookkeeper	y			backreference
 (\w+) <?ws> $0				hello hello	y			backreference at end of string
 [(.)$0]+				bookkeeper	/mob 0 0: <o @ 1>/	backref $1

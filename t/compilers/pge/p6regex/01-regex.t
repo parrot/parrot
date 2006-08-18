@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test tests => 494;
+use Parrot::Test tests => 498;
 use Parrot::Test::PGE;
 use Parrot::Config;
 
@@ -102,7 +102,7 @@ while (<TESTS>) {
         p6rule_is($target, $pattern, $description, @todo);
     } elsif ($result eq 'n') {
         p6rule_isnt($target, $pattern, $description, @todo);
-    }
+    } else { ok(0, "Invalid test result $result"); }
 }
 close TESTS;
 
