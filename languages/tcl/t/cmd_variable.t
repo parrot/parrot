@@ -2,7 +2,7 @@
 
 source lib/test_more.tcl
 
-plan 6
+plan 7
 
 eval_is {
   variable
@@ -36,4 +36,13 @@ eval_is {
 eval_is {variable foo(bar)} \
   {can't define "foo(bar)": name refers to an element in an array} \
   {variable with array} \
+  {TODO {can't handle this yet}}
+
+eval_is {
+  proc test {} {
+    variable x 5
+    set x
+  }
+  list [test] [set x]
+} {5 5} {variable is always about globals} \
   {TODO {can't handle this yet}}
