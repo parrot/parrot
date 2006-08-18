@@ -1759,7 +1759,7 @@ tags: tags.dummy
 	$(RM_F) tags
 	ctags \
 		--links=no --totals \
-		-R --exclude=blib --exclude=.svn --exclude=src/pmc/*.c \
+		-R --exclude=blib --exclude=.svn  \
 		--languages=c,perl --langmap=c:+.h,c:+.pmc \
 		$(CUR_DIR)
 	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_DIR)/*.ops
