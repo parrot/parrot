@@ -101,7 +101,7 @@ $(R_BUILTIN)/unset.pir \
 $(C_BUILTIN)/update.pir \
 $(R_BUILTIN)/uplevel.pir \
 $(R_BUILTIN)/upvar.pir \
-$(R_BUILTIN)/variable.pir \
+$(C_BUILTIN)/variable.pir \
 runtime/conversions.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \
@@ -211,6 +211,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/set.t \
   t_tcl/split.t \
   t_tcl/stringComp.t \
+  t_tcl/subst.t \
   t_tcl/switch.t \
   t_tcl/unknown.t \
   t_tcl/uplevel.t \
@@ -282,7 +283,7 @@ SKIPPED_TCL_TESTS = \
 #[oops; continuation 0x34cbe18 of type 25 is trying to jump from runloop 59279 to runloop 1]
 #t_tcl/ioCmd.t
 #
-# can't read "tcl_platform(byteOrder)"
+# extra switch pattern with no body
 #t_tcl/binary.t
 #
 # No such file or directory
@@ -322,9 +323,6 @@ SKIPPED_TCL_TESTS = \
 # Null PMC access in invoke()
 #t_tcl/main.t            t_tcl/var.t             t_tcl/winDde.t
 #t_tcl/reg.t
-#
-# Malformed string (http://rt.perl.org/rt3/Ticket/Display.html?id=40135)
-#t_tcl/subst.t
 #
 # extra characters after close-brace (These tests require {expand}[list])
 # t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
