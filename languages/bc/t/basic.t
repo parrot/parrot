@@ -164,9 +164,9 @@ my @tests = (
 
        # increment and decrement 
        [ "a = a + 1; a ; a", [1,1], undef, with_antlr3 => 1, ],
-       [ "++a; a", [1,1], undef, with_antlr3 => 0, ],
-       [ "a; a = 1; a; ++a; a", [0,1,2,2], 'increment', with_antlr3 => 0, ],
-       [ "a; a = 1; a; --a; a", [0,1,0,0], 'decrement', with_antlr3 => 0, ],
+       [ "++a; a", [1,1], undef, with_antlr3 => 1, ],
+       [ "a; a = 1; a; ++a; a", [0,1,2,2], 'increment', with_antlr3 => 1, ],
+       [ "a; a = 1; 1; --a; a", [0,1,0,0], 'decrement', with_antlr3 => 1, ],
 
        # If 
        [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition', with_antlr3 => 0, ],

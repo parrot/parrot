@@ -74,8 +74,6 @@ statement
 
 expression
   : adding_expression
-    |
-    INCR_DECR named_expression -> ^( PLUS named_expression NUMBER["1"] )
   ;
 
 named_expression
@@ -95,6 +93,10 @@ unary_expression
   : postfix_expression
     |
     MINUS postfix_expression -> ^( MUL_OP["*"] NUMBER["-1"] postfix_expression )
+    |
+    INCR named_expression -> ^( ASSIGN_OP ^(VAR LETTER["a"]) ^( PLUS["+"] ^(VAR LETTER["a"]) NUMBER["1"] ) )
+    |
+    DECR named_expression -> ^( ASSIGN_OP ^(VAR LETTER["a"]) ^( MINUS["-"] ^(VAR LETTER["a"]) NUMBER["1"] ) )
   ;
 
 postfix_expression
@@ -136,8 +138,12 @@ ASSIGN_OP
   : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' 
   ;
 
-INCR_DECR
-  : '++' | '--'
+INCR
+  : '++'
+  ;
+
+DECR
+  : '--'
   ;
 
 // quit is required, make testing easier

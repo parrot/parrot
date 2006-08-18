@@ -45,24 +45,17 @@ gen_pir_past
         + "  .sym pmc stmts                                                  \n"
         + "  stmts = new 'PAST::Stmts'                                       \n"
         + "                                                                  \n"
+        + "  .sym pmc reg_temp                                               \n"
+        + "                                                                  \n"
         + "  .sym pmc reg_expression_stmt                                    \n"
         + "  .sym pmc reg_expression_topexp                                  \n"
         + "  .sym pmc reg_print_op                                           \n"
         + "  .sym pmc reg_expression_exp                                     \n"
-        + "  .sym pmc reg_expression_stmt                                    \n"
-        + "  .sym pmc reg_expression_newline                                 \n"
-        + "                                                                  \n"
-        + "  .sym pmc reg_temp                                               \n"
         + "                                                                  \n"
         + "  .sym pmc reg_assign_lhs                                         \n"
-        + "                                                                  \n"
-        + "  .sym pmc reg_unary_val                                          \n"
-        + "  .sym pmc reg_unary_op                                           \n"
-        + "                                                                  \n"
-        + "  .sym pmc reg_adding_expression_op                               \n"
       );
     }
-    ^(PROGRAM expression["stmts"]* )
+    ^(PROGRAM node["stmts"]* )
     {
       System.out.print( 
           "                                                                  \n"
@@ -133,11 +126,11 @@ gen_pir_past
     }
   ;
 
-expression[String reg_mother]
+node[String reg_mother]
   : {
       System.out.print( 
           "                                                                  \n"
-        + "  # entering 'expression'                                         \n"
+        + "  # entering 'PRINT node'                                         \n"
         + "    reg_expression_stmt = new 'PAST::Stmt'                        \n"
         + "      reg_expression_topexp = new 'PAST::Exp'                     \n"
         + "        reg_print_op = new 'PAST::Op'                             \n"
@@ -145,145 +138,126 @@ expression[String reg_mother]
         + "          reg_expression_exp = new 'PAST::Exp'                    \n"
       );
     }
-    ^( PRINT ( adding["reg_expression_exp"]
-               { 
-                 System.out.print( 
-                     "                                                                \n"
-                   + "      reg_print_op.'add_child'( reg_expression_exp )            \n"
-                 );
-               }
-               |
-               NEWLINE
-               { 
-                 System.out.print(     
-                     "                                                                \n"
-                   + "# entering 'NEWLINE'                                            \n"
-                   + "            reg_temp = new 'PAST::Val'                          \n"
-                   + "            reg_temp.value( '\\n' )                             \n"
-                   + "            reg_temp.valtype( 'strqq' )                         \n"
-                   + "          reg_print_op.'add_child'( reg_temp )                  \n"
-                   + "          null reg_temp                                         \n"
-                   + "# leaving 'NEWLINE'                                             \n"
-                 );
-               }
-               |
-               STRING
-               {
-                 // In bc backslash has on special meaning, so s!/!//!
-                 // Write newlines as '\n', in to not break PIR. s!\n!\\n!
-                 String escaped = $STRING.text.replaceAll( "\\\\", "\\\\\\\\\\\\\\\\" ).replaceAll( "\\n", "\\\\\\\\n" );
-                 System.out.print(     
-                     "                                                                \n"
-                   + "# entering 'STRING'                                             \n"
-                   + "            reg_temp = new 'PAST::Val'                          \n"
-                   + "            reg_temp.value( " + escaped + " )                 \n"
-                   + "            reg_temp.valtype( 'strqq' )                         \n"
-                   + "          reg_print_op.'add_child'( reg_temp )                  \n"
-                   + "          null reg_temp                                         \n"
-                   + "# leaving 'STRING'                                              \n"
-                 );
-               }
-             )
-    )
-    {
+    ^( PRINT node["reg_expression_exp"] )
+    { 
       System.out.print( 
-          "                                                                  \n"
-        + "      reg_expression_topexp.'add_child'( reg_print_op      )      \n"
-        + "    reg_expression_stmt.'add_child'( reg_expression_topexp )      \n"
-        + "  " + $expression.reg_mother + ".'add_child'( reg_expression_stmt ) \n"
-        + "  # leaving 'expression'                                          \n"
+          "                                                                   \n"
+        + "      reg_print_op.'add_child'( reg_expression_exp )               \n"
+        + "      reg_expression_topexp.'add_child'( reg_print_op      )       \n"
+        + "    reg_expression_stmt.'add_child'( reg_expression_topexp )       \n"
+        + "  " + $node.reg_mother + ".'add_child'( reg_expression_stmt )      \n"
+        + "  # leaving 'PRINT node'                                           \n"
       );
     }
     |
     {
-      String mother_for_string = $expression.reg_mother;
-    }
-    (
-      ^( ASSIGN_OP assign[ mother_for_string ] )
-    )
-  ;
-
-assign [ String reg_mother ]
-  : {
       System.out.print( 
-          "                                                                  \n"
-        + "  # entering 'assign'                                             \n"
-        + "    reg_assign_lhs = new 'PAST::Exp'                              \n"
+          "                                                                   \n"
+        + "  # entering 'assign'                                              \n"
+        + "    reg_assign_lhs = new 'PAST::Exp'                               \n"
       );
     }
-    ^(VAR LETTER) adding["reg_assign_lhs"]
+    ^( ASSIGN_OP ^(VAR LETTER) node["reg_assign_lhs"] )
     {
       // TODO: strip String
       System.out.print(     
-          "                                                                  \n"
-        + "    # entering 'ASSIGN_OP ^(VAR LETTER) adding'        \n"
-        + "      .sym pmc past_op                                            \n"
-        + "      past_op = new 'PAST::Op'                                    \n"
-        + "      past_op.'op'( 'infix:=' )                                   \n"
-        + "        .sym pmc past_var                                         \n"
-        + "        past_var = new 'PAST::Var'                                \n"
-        + "        past_var.'varname'( '" + $LETTER.text + "' )              \n"
-        + "        past_var.'vartype'( 'scalar' )                            \n"
-        + "        past_var.'scope'( 'global' )                              \n"
-        + "      past_op.'add_child'( past_var )                             \n"
-        + "      past_op.'add_child'( reg_assign_lhs )                       \n"
-        + "    " + $assign.reg_mother + ".'add_child'( past_op )             \n"
-        + "    # leaving  'ASSIGN_OP named_expression NUMBER'                \n"
+          "                                                                   \n"
+        + "    # entering 'ASSIGN_OP ^(VAR LETTER) node'                      \n"
+        + "      .sym pmc past_op                                             \n"
+        + "      past_op = new 'PAST::Op'                                     \n"
+        + "      past_op.'op'( 'infix:=' )                                    \n"
+        + "        .sym pmc past_var                                          \n"
+        + "        past_var = new 'PAST::Var'                                 \n"
+        + "        past_var.'varname'( '" + $LETTER.text + "' )               \n"
+        + "        past_var.'vartype'( 'scalar' )                             \n"
+        + "        past_var.'scope'( 'global' )                               \n"
+        + "      past_op.'add_child'( past_var )                              \n"
+        + "      past_op.'add_child'( reg_assign_lhs )                        \n"
+        + "    " + $node.reg_mother + ".'add_child'( past_op )                \n"
+        + "    # leaving  'ASSIGN_OP named_expression NUMBER'                 \n"
       );
     }
-  ;
-
-
-adding[String reg_mother]
-  : NUMBER
+    |
+    NUMBER
     {
        System.out.print(     
-           "                                                               \n"
-         + "# entering 'NUMBER'                                            \n"
-         + "reg_temp = new 'PAST::Val'                                     \n"
-         + "reg_temp.value( " + $NUMBER.text + " )                         \n"
-         + "reg_temp.valtype( 'num' )                                      \n"
-         + $adding.reg_mother + ".'add_child'( reg_temp )                  \n"
-         + "null reg_temp                                                  \n"
-         + "# leaving 'NUMBER'                                             \n"
+           "                                                                  \n"
+         + "# entering 'NUMBER'                                               \n"
+         + "reg_temp = new 'PAST::Val'                                        \n"
+         + "reg_temp.value( " + $NUMBER.text + " )                            \n"
+         + "reg_temp.valtype( 'num' )                                         \n"
+         + $node.reg_mother + ".'add_child'( reg_temp )                       \n"
+         + "null reg_temp                                                     \n"
+         + "# leaving 'NUMBER'                                                \n"
        );
-     }
-     |
-     {
-       reg_num++;
-       String reg = "reg_" + reg_num;
-       System.out.print( 
-           "                                                                \n"
-         + "    # entering '( PLUS | MINUS | MUL_OP ) adding adding'       \n"
-         + "      .sym pmc " + reg + "                                      \n"
-         + "      " + reg + " = new 'PAST::Op'                              \n"
-       );
-     }
-     ^( infix=( PLUS | MINUS | MUL_OP ) adding[reg] adding[reg] )
-     {
-       System.out.print( 
-           "      " + reg + ".'op'( 'infix:" + $infix.text + "' )   \n"
-         + "    reg_temp = new 'PAST::Exp'                                  \n"
-         + "    reg_temp.'add_child'( " + reg + " )                         \n"
-         + "      null " + reg + "                                          \n"
-         + "  " + $adding.reg_mother + ".'add_child'( reg_temp ) \n"
-         + "    null reg_temp                                               \n"
-         + "    # leaving '( PLUS | MINUS | MUL | DIV ) adding adding'        \n"
-       );
-     }
-     |
-     ^( VAR LETTER )
-     {
-       System.out.print( 
-           "                                                                     \n"
-         + " # entering '( VAR LETTER )                                    \n"
-         + "    reg_temp = new 'PAST::Var'                                 \n"
-         + "    reg_temp.'varname'( '" + $LETTER.text + "' )               \n"
-         + "    reg_temp.'vartype'( 'scalar' )                             \n"
-         + "    reg_temp.'scope'( 'global' )                               \n"
-         + "  " + $adding.reg_mother + ".'add_child'( reg_temp ) \n"
-         + "    null reg_temp                                              \n"
-         + "  # leaving '(VAR LETTER)'                                     \n"
-       );
-     }
+    }
+    |
+    {
+      reg_num++;
+      String reg = "reg_" + reg_num;
+      System.out.print( 
+          "                                                                   \n"
+        + "    # entering '( PLUS | MINUS | MUL_OP ) node node'               \n"
+        + "      .sym pmc " + reg + "                                         \n"
+        + "      " + reg + " = new 'PAST::Op'                                 \n"
+      );
+    }
+    ^( infix=( PLUS | MINUS | MUL_OP ) node[reg] node[reg] )
+    {
+      System.out.print( 
+          "      " + reg + ".'op'( 'infix:" + $infix.text + "' )              \n"
+        + "    reg_temp = new 'PAST::Exp'                                     \n"
+        + "    reg_temp.'add_child'( " + reg + " )                            \n"
+        + "      null " + reg + "                                             \n"
+        + "  " + $node.reg_mother + ".'add_child'( reg_temp )                 \n"
+        + "    null reg_temp                                                  \n"
+        + "    # leaving '( PLUS | MINUS | MUL | DIV ) node node'             \n"
+      );
+    }
+    |
+    ^( VAR LETTER )
+    {
+      System.out.print( 
+          "                                                                   \n"
+        + " # entering '( VAR LETTER )                                        \n"
+        + "    reg_temp = new 'PAST::Var'                                     \n"
+        + "    reg_temp.'varname'( '" + $LETTER.text + "' )                   \n"
+        + "    reg_temp.'vartype'( 'scalar' )                                 \n"
+        + "    reg_temp.'scope'( 'global' )                                   \n"
+        + "  " + $node.reg_mother + ".'add_child'( reg_temp )                 \n"
+        + "    null reg_temp                                                  \n"
+        + "  # leaving '(VAR LETTER)'                                         \n"
+      );
+    }
+    |
+    NEWLINE
+    { 
+      System.out.print(     
+          "                                                                   \n"
+        + "# entering 'NEWLINE'                                               \n"
+        + "            reg_temp = new 'PAST::Val'                             \n"
+        + "            reg_temp.value( '\\n' )                                \n"
+        + "            reg_temp.valtype( 'strqq' )                            \n"
+        + "          " + $node.reg_mother + ".'add_child'( reg_temp )         \n"
+        + "          null reg_temp                                            \n"
+        + "# leaving 'NEWLINE'                                                \n"
+      );
+    }
+    |
+    STRING
+    {
+      // In bc backslash has on special meaning, so s!/!//!
+      // Write newlines as '\n', in to not break PIR. s!\n!\\n!
+      String escaped = $STRING.text.replaceAll( "\\\\", "\\\\\\\\\\\\\\\\" ).replaceAll( "\\n", "\\\\\\\\n" );
+      System.out.print(     
+          "                                                                   \n"
+        + "# entering 'STRING'                                                \n"
+        + "            reg_temp = new 'PAST::Val'                             \n"
+        + "            reg_temp.value( " + escaped + " )                      \n"
+        + "            reg_temp.valtype( 'strqq' )                            \n"
+        + "          " + $node.reg_mother + ".'add_child'( reg_temp )         \n"
+        + "          null reg_temp                                            \n"
+        + "# leaving 'STRING'                                                 \n"
+      );
+    }
   ;
