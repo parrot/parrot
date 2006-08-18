@@ -43,13 +43,9 @@ Like above, but use continuation $3 instead of creating a new continuation.
 
 Make a tailcall to method $2 with invocant $1.
 
-=item B<fetchmethod>(out PMC, invar PMC, in STR)
+=item B<DELETED_fetchmethod>(out PMC, invar PMC, in STR)
 
-Find the method $3 for object $2 and put it in $1.
-Throws a Method_Not_Found_Exception for a non-existent method.
-The returned PMC may be outdated, when the call is actually performed and
-changes to the underlying classes where made.
-
+Use B<find_method> instead.
 =cut
 
 op callmethodcc(invar PMC, in STR) :object_base {
@@ -163,14 +159,8 @@ op tailcallmethod(invar PMC, invar PMC) :object_base {
   goto ADDRESS(dest);
 }
 
-op fetchmethod(out PMC, invar PMC, in STR) {
-  opcode_t *next = expr NEXT();
-  $1 = VTABLE_find_method(interpreter, $2, $3);
-  if (!$1) {
-    real_exception(interpreter, next, METH_NOT_FOUND,
-        "Method '%Ss' not found", $3);
-  }
-  goto ADDRESS(next);
+op DELETED_fetchmethod(out PMC, invar PMC, in STR) {
+  goto NEXT();
 }
 
 =item B<addmethod>(invar PMC, in STR, invar PMC)

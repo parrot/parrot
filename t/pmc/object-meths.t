@@ -470,18 +470,18 @@ back in main
 OUTPUT
 }
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "fetchmethod");
+pasm_output_is(<<'CODE', <<'OUTPUT', "find_method");
     newclass P3, "Foo"
     find_type I0, "Foo"
     new P2, I0
 
     set S0, "meth"
-    fetchmethod P0, P2, S0
+    find_method P0, P2, S0
     print "main\n"
     callmethodcc P2, P0
     print "back\n"
     # check class
-    fetchmethod P0, P3, S0
+    find_method P0, P3, S0
     callmethodcc P3, P0
     print "back\n"
     end
@@ -498,10 +498,10 @@ in meth
 back
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "fetchmethod - unknown method");
+pasm_output_like(<<'CODE', <<'OUTPUT', "find_method - unknown method");
     newclass P2, "Foo"
     set S0, "nada"
-    fetchmethod P0, P2, S0
+    find_method P0, P2, S0
     print "nope\n"
     end
 CODE

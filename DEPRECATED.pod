@@ -6,6 +6,8 @@
 
 Use the C<find_method> opcode instead.
 
+TODO remove this para and DELETED_fetchmethod from ops.
+
 =back
 
 =head1 .imc file extension
@@ -42,16 +44,6 @@ PGE::P6Regex is now a registered compiler, and should be used like so:
    one now does  $P0 = compreg "PGE::P6Regex"
 
 This syntax is also true for PGE::Glob and PGE::P5Regex
-
-=item Subpragma syntax
-
-Subroutine attributes now use the colon syntax:
-
-  .sub foo method, @MULTI(x,y)    => .sub foo :method :multi(x,y)
-  .sub foo @ANON, @LOAD           => .sub foo :anon :load
-
-The new syntax uses no comma separators and all sub attributes are lower
-case and prefixed by a colon.
 
 =back
 

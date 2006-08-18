@@ -669,8 +669,8 @@ callmethod_p_p_p                638
 tailcallmethod_p_s              639
 tailcallmethod_p_sc             640
 tailcallmethod_p_p              641
-fetchmethod_p_p_s               642
-fetchmethod_p_p_sc              643
+DELETED_fetchmethod_p_p_s               642
+DELETED_fetchmethod_p_p_sc              643
 addmethod_p_s_p                 644
 addmethod_p_sc_p                645
 can_i_p_s                       646
