@@ -101,12 +101,7 @@
   $P0 = global '@stdlibs'
   goto L1
 _handler:
-#  load_bytecode 'languages/WMLScript/runtime/wmlslib.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlslang.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlsfloat.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlsstring.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlsconsole.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlsstdlibs.pbc'
+    load_bytecode 'languages/WMLScript/src/WMLScript.pbc'
 L1:
 PIRCODE
 

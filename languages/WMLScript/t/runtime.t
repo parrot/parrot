@@ -15,15 +15,12 @@ t/runtime.t - WMLScript Runtime Libraries
 use Parrot::Test tests => 2;
 use Test::More;
 
-TODO: {
-local $TODO = 'bug with pbc_merge ???';        
-
-pir_output_is( << 'CODE', << 'OUTPUT', 'wmlslib merged' );
+pir_output_is( << 'CODE', << 'OUTPUT', 'WMLScript.pbc' );
 .loadlib 'wmls_ops'
 .HLL 'WMLScript', 'wmls_group'
 
 .sub '_init' :anon
-  load_bytecode 'languages/WMLScript/runtime/wmlslib.pbc'
+  load_bytecode 'languages/WMLScript/src/WMLScript.pbc'
 .end
 
 .sub 'function0' :anon
@@ -52,18 +49,13 @@ PC4:
 CODE
 Hello World!
 OUTPUT
-}
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'alternate wmlslib' );
+pir_output_is( << 'CODE', << 'OUTPUT', 'alternate way' );
 .loadlib 'wmls_ops'
 .HLL 'WMLScript', 'wmls_group'
 
 .sub '_init' :anon
-  load_bytecode 'languages/WMLScript/runtime/wmlslang.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlsfloat.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlsstring.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlsconsole.pbc'
-  load_bytecode 'languages/WMLScript/runtime/wmlsstdlibs.pbc'
+  load_bytecode 'languages/WMLScript/src/wmlsstdlibs.pir'
 .end
 
 .sub 'function0' :anon

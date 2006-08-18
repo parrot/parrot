@@ -29,6 +29,7 @@ Francois Perrad.
 
 .sub 'main' :main
     .param pmc argv
+    load_bytecode 'languages/WMLScript/src/WMLScript.pbc'
     .local int argc
     .local string progname
     .local string filename
@@ -86,9 +87,4 @@ USAGE:
     printerr "Usage: parrot wmlsi.pbc filename entry\n"
     exit -1
 .end
-
-.include 'languages/WMLScript/runtime/wmlsstdlibs.pir' 
-.include 'languages/WMLScript/src/stdlibs.pir' 
-.include 'languages/WMLScript/src/script.pir' 
-.include 'languages/WMLScript/src/opcode.pir'
     

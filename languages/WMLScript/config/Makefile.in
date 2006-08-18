@@ -1,7 +1,6 @@
 RM_F    = @rm_f@
 PERL    = @perl@
 PARROT  = ..@slash@..@slash@parrot@exe@
-PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
 
 PMCBUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
 OPSBUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynoplibs.pl
@@ -38,8 +37,7 @@ PBCS = \
  $(LIBPATH)@slash@wmlslang.pbc \
  $(LIBPATH)@slash@wmlsfloat.pbc \
  $(LIBPATH)@slash@wmlsstring.pbc \
- $(LIBPATH)@slash@wmlsconsole.pbc \
- $(LIBPATH)@slash@wmlsstdlibs.pbc
+ $(LIBPATH)@slash@wmlsconsole.pbc
 
 GEN_PIR = \
  src@slash@opcode.pir \
@@ -48,11 +46,8 @@ GEN_PIR = \
 all: \
  pmc@slash@wmls_group$(LOAD_EXT) \
  ops@slash@wmls_ops$(LOAD_EXT) \
- $(LIBPATH)@slash@wmlslib.pbc \
- wmlsd.pbc \
- wmls2pir.pbc \
- wmls2pbc.pbc \
- wmlsi.pbc
+ src@slash@WMLScript.pbc \
+ $(PBCS)
 
 pmc@slash@wmls_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
@@ -66,17 +61,9 @@ ops@slash@wmls_ops$(LOAD_EXT) : $(OPS_FILES)
 	@cd $(OPSDIR) && $(OPSBUILD) linklibs $(OPSLIB)
 	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(PARROT_DYNEXT)" $(OPSLIB)
 
-wmlsd.pbc: wmlsd.pir src@slash@script.pir $(GEN_PIR)
-	$(PARROT) -o wmlsd.pbc wmlsd.pir 
-
-wmls2pir.pbc: wmls2pir.pir src@slash@script.pir $(GEN_PIR)
-	$(PARROT) -o wmls2pir.pbc wmls2pir.pir
-
-wmls2pbc.pbc: wmls2pbc.pir src@slash@script.pir $(GEN_PIR)
-	$(PARROT) -o wmls2pbc.pbc wmls2pbc.pir 
-
-wmlsi.pbc: wmlsi.pir src@slash@script.pir $(GEN_PIR)
-	$(PARROT) -o wmlsi.pbc wmlsi.pir 
+src@slash@WMLScript.pbc: src@slash@WMLScript.pir \
+ src@slash@script.pir src@slash@wmlsstdlibs.pir $(GEN_PIR) 
+	$(PARROT) -o src@slash@WMLScript.pbc src@slash@WMLScript.pir 
 
 src@slash@opcode.pir: src@slash@translation.rules build@slash@translator.pl \
  build@slash@SRM@slash@Stack.pm build@slash@SRM@slash@Register.pm
@@ -84,10 +71,7 @@ src@slash@opcode.pir: src@slash@translation.rules build@slash@translator.pl \
 	  src/translation.rules 
 
 src@slash@stdlibs.pir: src@slash@wmlslibs.cfg build@slash@stdlibs.pl
-	$(PERL) build\stdlibs.pl --output src\stdlibs.pir src\wmlslibs.cfg
-
-$(LIBPATH)@slash@wmlslib.pbc: $(PBCS)
-	$(PBC_MERGE) -o $(LIBPATH)@slash@wmlslib.pbc $(PBCS) 
+	$(PERL) build/stdlibs.pl --output src/stdlibs.pir src/wmlslibs.cfg
 
 $(LIBPATH)@slash@wmlslang.pbc: $(LIBPATH)@slash@wmlslang.pir
 	$(PARROT) --output=$(LIBPATH)@slash@wmlslang.pbc $(LIBPATH)@slash@wmlslang.pir
@@ -100,9 +84,6 @@ $(LIBPATH)@slash@wmlsstring.pbc: $(LIBPATH)@slash@wmlsstring.pir
 
 $(LIBPATH)@slash@wmlsconsole.pbc: $(LIBPATH)@slash@wmlsconsole.pir
 	$(PARROT) --output=$(LIBPATH)@slash@wmlsconsole.pbc $(LIBPATH)@slash@wmlsconsole.pir
-
-$(LIBPATH)@slash@wmlsstdlibs.pbc: $(LIBPATH)@slash@wmlsstdlibs.pir
-	$(PARROT) --output=$(LIBPATH)@slash@wmlsstdlibs.pbc $(LIBPATH)@slash@wmlsstdlibs.pir
 
 help:
 	@echo ""
@@ -140,7 +121,6 @@ testclean:
 BUILD_CLEANERS = \
  $(GEN_PIR) \
  "src/*.pbc" \
- "*.pbc" \
  "$(PMCDIR)/*.dump" \
  "$(PMCDIR)/*.c" \
  "$(PMCDIR)/*.h" \
