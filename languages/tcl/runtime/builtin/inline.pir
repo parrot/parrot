@@ -22,8 +22,7 @@
   code     = argv[1]
 
   $P1 = compreg language
-  $I1 = typeof $P1
-  if $I1 == .None goto fail
+  if null $P1 goto fail
   $P0 = $P1(code)
   $P0()
 

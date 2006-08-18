@@ -2,7 +2,7 @@ grammar TclExpr::PAST::Grammar is TGE::Grammar;
 
 transform past (ROOT) {
     $P0 = node['expr']
-    if $P0 goto expression
+    unless null $P0 goto expression
     .return tree.get('dispatch', node, 'TclExpr::Grammar')
 
 expression:
@@ -22,35 +22,35 @@ transform dispatch (TclExpr::Grammar) {
     # Ask the child node for its past.
 dispatch:
     $P0 = node['chunk']
-    if $P0 goto chunks
+    unless null $P0 goto chunks
     $P0 = node['substitution']
-    if $P0 goto substitution
+    unless null $P0 goto substitution
     $P0 = node['boolean']
-    if $P0 goto boolean
+    unless null $P0 goto boolean
     $P0 = node['braced_word']
-    if $P0 goto braced_word
+    unless null $P0 goto braced_word
     $P0 = node['integer']
-    if $P0 goto integer
+    unless null $P0 goto integer
     $P0 = node['float']
-    if $P0 goto has_float
+    unless null $P0 goto has_float
     $P0 = node['scientific']
-    if $P0 goto scientific
+    unless null $P0 goto scientific
     $P0 = node['number']
-    if $P0 goto number
+    unless null $P0 goto number
     $P0 = node['quoted_word']
-    if $P0 goto quoted_word
+    unless null $P0 goto quoted_word
     $P0 = node['function']
-    if $P0 goto function
+    unless null $P0 goto function
     $P0 = node['subcommand']
-    if $P0 goto subcommand
+    unless null $P0 goto subcommand
     $P0 = node['variable_substitution']
-    if $P0 goto variable_substitution
+    unless null $P0 goto variable_substitution
     $P0 = node['command_substitution']
-    if $P0 goto command_substitution
+    unless null $P0 goto command_substitution
     $P0 = node['nested']
-    if $P0 goto nested
+    unless null $P0 goto nested
     $P0 = node['type']
-    if $P0 goto operator
+    unless null $P0 goto operator
 
     say "Didn't know how to handle node:"
     .dumper(node)
@@ -160,11 +160,11 @@ has_argc:
     .local pmc past
     past = new 'PAST::MathFunc'
     $P0  = node['unary_function']
-    if $P0 goto unary
+    unless null $P0 goto unary
     $P0  = node['nullary_function']
-    if $P0 goto nullary
+    unless null $P0 goto nullary
     $P0  = node['binary_function']
-    if $P0 goto binary
+    unless null $P0 goto binary
  
   # never get here
 
@@ -243,11 +243,11 @@ transform past (braced_word) {
 
 transform past (number) {
     $P0 = node['integer']
-    if $P0 goto integer
+    unless null $P0 goto integer
     $P0 = node['float']
-    if $P0 goto have_float
+    unless null $P0 goto have_float
     $P0 = node['scientific']
-    if $P0 goto scientific
+    unless null $P0 goto scientific
     tcl_error 'invalid number type'
 
 integer:
@@ -294,9 +294,9 @@ transform past (integer) {
     past.set_node(node)
 
     $P0 = node['octal']
-    if $P0 goto octal
+    unless null $P0 goto octal
     $P0 = node['hex']
-    if $P0 goto hex
+    unless null $P0 goto hex
 
   decimal:
     $S0 = node
@@ -380,8 +380,7 @@ transform past (float) {
 transform past (quoted_word) {
     .local pmc past
     $P0 = node['chunk']
-    $I0 = isa $P0, 'None'
-    if $I0 goto empty_string
+    if null $P0 goto empty_string
 
     .return tree.get('past', $P0, 'array')
 
@@ -437,8 +436,7 @@ transform past (subcommand) {
     
     .local pmc words, iter
     words = node['word']
-    $I0 = isa words, "None"
-    if $I0 goto empty
+    if null words goto empty
 
     iter  = new .Iterator, words
 loop:

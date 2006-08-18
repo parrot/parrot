@@ -40,13 +40,13 @@ array:
   key = substr name, char, len
  
   variable = __find_var(var)
-  if_null variable, no_such_variable
+  if null variable goto no_such_variable
   
   $I0 = does variable, 'hash'
   unless $I0 goto cant_read_not_array
 
   variable = variable[key]
-  if_null variable, bad_index
+  if null variable goto bad_index
   $I0 = isa variable, 'Undef'
   if $I0 goto bad_index
   .return(variable)
@@ -65,7 +65,7 @@ cant_read_not_array:
 
 scalar:
   variable = __find_var(name)
-  if_null variable, no_such_variable
+  if null variable goto no_such_variable
   
   $I0 = does variable, 'hash'
   if $I0 goto cant_read_array
@@ -206,7 +206,7 @@ find_array:
   .local pmc array
   null array
   array = __find_var(var)
-  if_null array, create_array
+  if null array goto create_array
 
   $I0 = does array, 'hash'
   unless $I0 goto cant_set_not_array
@@ -268,8 +268,7 @@ Gets the actual variable from memory and returns it.
     lexpad     = call_chain[-1]
     value      = lexpad[name]
   clear_eh
-  $I0 = isa value, 'None'
-  if $I0 goto args_check
+  if null value goto args_check
   $I0 = isa value, 'Undef'
   if $I0 goto args_check
   goto found
@@ -328,8 +327,7 @@ lexical_var:
   lexpad       = call_chain[-1]
 
   $P0 = lexpad[name]
-  $I0 = isa $P0, 'None'
-  if $I0 goto lexical_is_null
+  if null $P0 goto lexical_is_null
 
   assign $P0, value
   .return($P0)
