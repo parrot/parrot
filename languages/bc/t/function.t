@@ -26,7 +26,7 @@ else {
   plan skip_all => 'ANTLR2 based bc needs Python';
 }
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block without newlines", with_past => 1 );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block without newlines", with_antlr3 => 0 );
 1; { 2 }
 quit
 END_CODE
@@ -34,7 +34,7 @@ END_CODE
 2
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with newlines", with_past => 1 );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with newlines", with_antlr3 => 0 );
 1 
 { 
   2 
@@ -48,7 +48,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with two statements", with_past => 1 );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with two statements", with_antlr3 => 0 );
 1 
 { 
   2 
@@ -63,7 +63,7 @@ END_CODE
 4
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with newlines" );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with newlines", with_antlr3 => 0, );
 1
 {
   2
@@ -80,7 +80,7 @@ END_CODE
 40
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "definition of a function" );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "definition of a function", with_antlr3 => 0, );
 1
 define e(x) {
   5
@@ -92,7 +92,7 @@ END_CODE
 2
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "no parameters" );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "no parameters", with_antlr3 => 0, );
 1
 define e() {
   6
@@ -104,7 +104,7 @@ END_CODE
 2
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "with auto parameters" );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "with auto parameters", with_antlr3 => 0, );
 1
 define e(x,y) {
   auto a,b
@@ -121,7 +121,7 @@ TODO:
 {
   local $TODO = 'not implemented';
 
-  language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "constant function", with_past => 1 );
+  language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "constant function", with_antlr3 => 0 );
 define e(x){
                return( 5 )
        }

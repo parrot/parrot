@@ -100,13 +100,15 @@ my @tests = (
        [ '1 + 2 + 3', '6', 'three summands', with_antlr3 => 1, ],
        [ '1 + 0 + 3', '4', 'three summands including 0', with_antlr3 => 1, ],
        [ '1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14', '105', 'Gauss was right', with_antlr3 => 1, ],
+       [ '-1 + 10', '9', 'negative int in expression', with_antlr3 => 1, ],
 
        # binary MINUS
        [ '2 - 1', '1', undef, with_antlr3 => 1, ],
        [ '1 - 1', '0', undef, with_antlr3 => 1, ],
        [ '1 - 2', '-1', undef, with_antlr3 => 1, ],
-       [ '-1 - -2', '1', undef, with_antlr3 => 0, ],
-       [ '-1 + -2 - -4 + 10', '11', undef, with_antlr3 => 0, ],
+       [ '-1 - -2', '1', undef, with_antlr3 => 1, ],
+       [ '-1 + -2 - -4 + 10', '11', undef, with_antlr3 => 1, ],
+       [ '- 1 - - 6 + 3 - 2', '6', undef, with_antlr3 => 1, ],
 
        # multiplication
        [ '2 * 2', '4', undef, with_antlr3 => 1, ],
@@ -127,6 +129,7 @@ my @tests = (
        # parenthesis
        [ '  ( 1 ) ', '1', 'one in parenthesis', with_antlr3 => 1, ],
        [ '  ( 1 + 2 ) - 3 ', '0', undef, with_antlr3 => 1, ],
+       [ ' - ( 1 + 2 ) - 3 ', '-6', undef, with_antlr3 => 1, ],
        [ '  ( 1 + 2 ) - ( 5  + 1 - 2 ) + 7 - ( 8 - 100 ) ', '98', undef, with_antlr3 => 1, ],
        [ '  ( 1 + 2 ) * 3 ', '9', undef, with_antlr3 => 1, ],
        [ '  ( 1 * 2 ) * 3 ', '6', undef, with_antlr3 => 1, ],
@@ -152,6 +155,7 @@ my @tests = (
        [ "a", [0], 'uninitialized a', with_antlr3 => 1, ],
        [ "a;b;c;d;x;y;z", [ (0) x 7 ], 'more uninitialized vars', with_antlr3 => 1, ],
        [ "a; a = 1; a", [0,1], 'assign number to lexical', with_antlr3 => 1, ],
+       [ "a = 11; -a", -11, 'assign number to lexical', with_antlr3 => 1, ],
        [ "a; a = 1 + 1; a", [0,2], 'assign number to expression', with_antlr3 => 1, ],
        [ 'a; b; a = 4; b = 5; c = 6; "a = "; a;  "b = "; b;  "c = "; c', [ 0, 0, 'a = 4', 'b = 5', 'c = 6' ], 'assign several lexicals', with_antlr3 => 1 ], 
        [ 'a; b; a = 4; b = a; c = 1; "a = "; a;  "b = "; b;  "c = "; c', [ 0, 0, 'a = 4', 'b = 4', 'c = 1' ], 'assign lexical to lexical', with_antlr3 => 1 ], 
@@ -165,39 +169,39 @@ my @tests = (
        [ "a; a = 1; a; --a; a", [0,1,0,0], 'decrement', with_antlr3 => 0, ],
 
        # If 
-       [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition' ],
-       [ "1; if ( 0 ) 2; 3", [1,3], 'if with a true condition' ],
-       [ "1; if ( 1 < 2 ) 2; 3", [1, 2, 3], 'if with a relational operator' ],
+       [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition', with_antlr3 => 0, ],
+       [ "1; if ( 0 ) 2; 3", [1,3], 'if with a true condition', with_antlr3 => 0, ],
+       [ "1; if ( 1 < 2 ) 2; 3", [1, 2, 3], 'if with a relational operator', with_antlr3 => 0, ],
 
        # If with '<'
-       [ "1; if ( 3 + 4 < 8*2 - 10 ) 2; 3", [1, 3] ],
-       [ "1; if ( 3 + 4 < 8*2 - 9 ) 2; 3", [1, 3] ],
-       [ "1; if ( 3 + 4 < 8*2 + 10 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 < 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 < 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 < 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
 
        # If with '<='
-       [ "1; if ( 3 + 4 <= 8*2 - 10 ) 2; 3", [1, 3] ],
-       [ "1; if ( 3 + 4 <= 8*2 - 9 ) 2; 3", [1, 2, 3] ],
-       [ "1; if ( 3 + 4 <= 8*2 + 10 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 <= 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 <= 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 <= 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
        # If with '==', still TODO
-       [ "1; if ( 3 + 4 == 8*2 - 10 ) 2; 3", [1, 3] ],
-       [ "1; if ( 3 + 4 == 8*2 - 9 ) 2; 3", [1, 2, 3] ],
-       [ "1; if ( 3 + 4 == 8*2 + 10 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 == 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 == 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 == 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
        # If with '!='
-       [ "1; if ( 3 + 4 != 8*2 - 10 ) 2; 3", [1, 2, 3] ],
-       [ "1; if ( 3 + 4 != 8*2 - 9 ) 2; 3", [1, 3] ],
-       [ "1; if ( 3 + 4 != 8*2 + 10 ) 2; 3", [1, 2, 3] ],
+       [ "1; if ( 3 + 4 != 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 != 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 != 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
        # If with '>='
-       [ "1; if ( 3 + 4 >= 8*2 - 10 ) 2; 3", [1, 2, 3] ],
-       [ "1; if ( 3 + 4 >= 8*2 - 9 ) 2; 3", [1, 2, 3] ],
-       [ "1; if ( 3 + 4 >= 8*2 + 10 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 >= 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 >= 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 >= 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
 
        # If with '>'
-       [ "1; if ( 3 + 4 > 8*2 - 10 ) 2; 3", [1, 2, 3] ],
-       [ "1; if ( 3 + 4 > 8*2 - 9 ) 2; 3", [1, 3] ],
-       [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3] ],
+       [ "1; if ( 3 + 4 > 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 > 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
    );
 
-# @tests = ( [ '1', [ 1 ], 'positive int 1',                       with_antlr3 => 1  ], );
+# @tests = ( [ q{-2 + 10}, 8, undef, with_antlr3 => 1 ], );
 
 my @todo_tests
     = ( # floats
@@ -209,7 +213,6 @@ my @todo_tests
         [ "0\n1; 2; quit;  3", [ 0 ], 'is that correct in GNU bc?', with_antlr3 => 1, ],
       );
 
-# @tests = ( [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', with_antlr3 => 1 ], );
 
 if ( $Parrot::Config::PConfig{has_python} ) {
   plan tests => scalar(@tests) + scalar(@todo_tests);

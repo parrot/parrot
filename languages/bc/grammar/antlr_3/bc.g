@@ -21,7 +21,6 @@ tokens
 {
   PRINT;
   PROGRAM;
-  UNARY_MINUS;
   VAR;
 } 
 
@@ -85,7 +84,7 @@ named_expression
 
 
 adding_expression
-  : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression)* 
+  : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* 
   ;
 
 multiplying_expression
@@ -95,7 +94,7 @@ multiplying_expression
 unary_expression
   : postfix_expression
     |
-    MINUS postfix_expression -> ^( UNARY_MINUS postfix_expression )
+    MINUS postfix_expression -> ^( MUL_OP["*"] NUMBER["-1"] postfix_expression )
   ;
 
 postfix_expression
