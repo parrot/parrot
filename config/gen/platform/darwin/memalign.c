@@ -5,23 +5,23 @@
 #include <mach/vm_map.h>
 #include <mach/mach_init.h>
 
-static unsigned log2int(unsigned x) { return (x<2) ? 0 : log2int (x>>1)+1; };
+static unsigned log2int(unsigned x) { return (x<2) ? 0 : log2int (x>>1)+1; }
 
-static unsigned roundDownPowerOf2(unsigned x) { return (1 << log2int(x)); };
+static unsigned roundDownPowerOf2(unsigned x) { return (1 << log2int(x)); }
 static unsigned roundUpPowerOf2(unsigned x)
 {
     static unsigned one = 1;
     unsigned log2Int = log2int(x);
     
     return ((one << log2Int) == x) ? x : (one << (log2Int + 1));
-};
+}
 
 static unsigned roundUpToPageBoundary(unsigned x)
 {
     unsigned roundedDown = trunc_page(x);
     
     return (roundedDown == x) ? x : (roundedDown + vm_page_size);
-};
+}
 
 typedef struct _memalign_marker_t {
                     vm_address_t start; 
