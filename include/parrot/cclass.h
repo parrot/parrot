@@ -25,7 +25,7 @@ enum_cclass_control = 0x0200,            /* control characters */
 enum_cclass_punctuation = 0x0400,        /* all except ' ', a-z, A-Z, 0-9 */
 enum_cclass_alphanumeric = 0x0800,       /* a-z, A-Z, 0-9 */
 enum_cclass_newline = 0x1000,            /* '\n', '\r' */
-enum_cclass_word = 0x2000,               /* a-z, A-Z, 0-9, '_'*/
+enum_cclass_word = 0x2000                /* a-z, A-Z, 0-9, '_'*/
 } PARROT_CCLASS_FLAGS;
 /* &end_gen */
 
