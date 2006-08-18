@@ -136,7 +136,9 @@ done_init:
   .local string stub_code
   # If someone wants to generate standalone code only, include
   # The library bits that they'll need.
-
+ 
+  # This stub code is also duplicated below, _and_ in [proc], and in [namespace],
+  # with perhaps slight diffs
   stub_code = <<'END_PIR'
 # src/compiler.pir :: pir_compiler (1)
 .HLL 'tcl', 'tcl_group'
@@ -145,10 +147,11 @@ done_init:
 .sub compiled_tcl_sub%0 :anon :main
   load_bytecode 'languages/tcl/runtime/tcllib.pbc'
   .include "languages/tcl/src/macros.pir"
-  .local pmc epoch, colons, split
+  .local pmc epoch, colons, split, unk, interactive :unique_reg
   epoch  = get_root_global ['_tcl'], 'epoch'
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
+  interactive = get_root_global ['tcl'], '$tcl_interactive'
 %1
   .return ($P%2)
 .end
@@ -166,10 +169,11 @@ END_PIR
 .pragma n_operators 1
 .sub compiled_tcl_sub%0 :anon
 .include "languages/tcl/src/returncodes.pir"
-  .local pmc epoch, colons, split
+  .local pmc epoch, colons, split, unk, interactive :unique_reg
   epoch  = get_root_global ['_tcl'], 'epoch'
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
+  interactive = get_root_global ['tcl'], '$tcl_interactive'
 %1
   .return ($P%2)
 .end

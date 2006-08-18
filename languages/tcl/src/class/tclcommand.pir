@@ -199,10 +199,7 @@ has_name:
 END_PIR
 
    invalid.emit(<<'END_PIR', label_num)
-  .local pmc interactive
-  interactive = get_root_global ['tcl'], '$tcl_interactive'
   unless interactive goto err_command%0
-  .local pmc unk
   unk=find_global '&unknown'
 END_PIR
 
