@@ -1,0 +1,404 @@
+=head1 NAME
+
+Software Transactional Memory internals
+
+=head1 VERSION
+
+$Revision$
+
+=head1 DESCRIPTION
+
+The STM implementation is based on Ennals' paper, see
+L<http://www.cambridge.intel-research.net/~rennals/052_Rob_Ennals.pdf>.
+Most of the internals of the STM implementation are contained in
+C<src/stm/backend.c> and C<src/stm/stm_internals.h>
+
+=head2 Shared PMCs
+
+Before any transaction is committed, the STM system calls the
+VTABLE method C<share_ro()> on the PMC to make it safe to share.
+This VTABLE method should make the PMC read-only and mark it as
+sharable. Doing this typically requires substantailly less effort
+(and less synchoronization) than making it safe to share a writable
+PMC. Implementations of this VTABLE method currently exist in the
+scalar, array, ParrotObject, STMVar, and STMRef PMC types. 
+C<share_ro()> returns a potentially different PMC that is the shared
+and read-only version.
+(The PMC is allowed to be relocated for a potentially different future 
+implementation, but the current implementation actually always returns
+the pmc it is called on.)
+
+Note that C<share_ro()> needs to share everything to which the PMC refers.
+PMCs not marked as shared may not be garbage collected correctly (i.e.
+freed when references to them still exist) if they are not always referenced
+through their 'owning' interpreter.
+
+To support this feature, pmc2c generates a second vtable for most types
+with the writing methods removed. (Generation of this second vtable
+can be disabled with the C<no_ro> PMC flag.) A pointer to this vtable
+is stored in the C<ro_variant_vtable> entry of the VTABLE structure.
+One can switch to this vtable by calling C<setprop()> to set the 
+"_ro" property to a true value. The implementation of C<setprop()>
+in C<default.pmc> performs the switch.
+
+Methods which are considered read-only point to automatically generated
+versions that call C<internal_exception()> in the read-only vtable.
+The notion of read-onlyness is obtained first from C<vtable.tbl>'s
+marking of methods with C<:write>. For MMD methods, it is guessed when
+a method will write a value based on the signature of the method,
+and if it would, then the check 
+C<(pmc->vtable->flags & VTABLE_IS_READONLY_FLAG)> is performed to see
+if the object is unsafe to write. (This is implemented by calls to
+C<mmd_ensure_writable> in C<mmd.c>.) For other methods, C<find_method>
+is overriden in the read-only variant to check the "write" property
+on the method that would be returned. (See also C<Parrot_mark_method_writes>
+in C<inter_misc.c>.) If it is set, then C<PMCNULL> is returned, 
+making the method lookup fail. 
+
+C<.pmc> files may mark vtable and NCI methods with the annotations
+C<:read> and C<:write> to override the default notion of whether or
+not they read and write. These values should be inherited properly.
+See C<src/dynpmc/rotest.pmc> for an example.
+
+C<share_ro()> implementations should also call C<pt_shared_fixup()>.
+Currently, C<pt_shared_fixup()> changes the vtable pointer to the equivalent
+one in the first interpreter, hopefully ensuring the vtable pointer will
+remain valid if the current interpreter exits. It also marks the PMC
+as shared so garbage collection will work properly on it. The PMC
+C<pt_shared_fixup()> returns is the one implementations of C<share_ro()>
+returns. Currently, this is the same PMC that is passed in.
+
+When a user of STM requests a writable copy of a PMC stored in an PMC handle
+a clone is made. C<local_pmc_copy> in C<src/stm/backend.c> performs
+the cloning using C<VTABLE_clone()> on some types where it is safe
+and C<Parrot_clone()> otherwise. (C<Parrot_clone()> is much slower
+than C<VTABLE_clone()> in most cases, but it not always a deep clone,
+or in the special case of Strings, safe to do from an interpreter other
+than the one in which the object was created.)
+
+Note that the PMC referred to by a PMC handle may still contain C<STMVar>s
+and C<STMRef>s, which should be preserved by C<local_pmc_copy()>; that is
+they will still refer to the same PMC handle. This allows
+structures like linked lists (where each node contains the value, and
+STMVars acting as next and previous pointers) and is safe because
+C<STMVar>s and C<STMRef>s are immutable in the sense that they cannot be
+made to point to a different PMC handle.
+
+=head2 PMC Handles
+
+STM wraps each PMC it manages with a 'PMC handle', which is a garbage-
+collectable structure. C<STMVar> and C<STMRef> PMCs contain a pointer
+to the PMC handle in their C<struct_val> field. A PMC handle's fields
+are as follows:
+
+     Parrot_atomic_pointer owner_or_version;
+
+If this pointer contains an odd memory address, it is a version number.
+If it contains an even memory address, it points to the transaction
+log of the current owner. Ownership of a PMC handle is only obtained
+when a write is planned and block other reads and writes so long as the
+owner is not aborted.
+
+(Note that, as this implies, the STM implementation assumes its
+subtransaction logs are aligned on a 2-byte boundary, at least.)
+
+     void * volatile last_version;
+
+This contains the last version number that was committed to this
+handle. It is always updated before C<owner_or_version> is.
+
+     PMC *value;
+
+This contains the current value of the wrapped PMC. This value
+should only be used after reading a version number (not owner
+address from C<owner_or_version>). This value may only be changed
+after setting C<owner_or_version> to point to a transaction log
+and marking the transaction as committed.
+  
+     STM_waitlist change_waitlist;
+
+This waitlist is signalled after writes are made and threads will
+add themselves to it after C<Parrot_STM_wait()> is called.
+
+=head2 Transaction Logs
+
+Transaction logs contain a list of values read and written by a thread.
+Currently, these lists are kept in (dynamically allocated) arrays.
+To support nested transactions, each level of nesting has its own small
+structure:
+
+ struct STM_tx_log sub {
+     Parrot_atomic_integer status;
+
+One of STM_STATUS_ACTIVE, STM_STATUS_ABORTED, or STM_STATUS_COMMITTED.
+An active transaction is one that may potentially commit. An aborted
+transaction is one that may never commit. A committed transaction has
+committed or is in the process of committing and can no longer be aborted.
+
+     Parrot_atomic_integer wait_length;
+
+Used for simple deadlock detection.
+
+     int first_write;
+     int first_read;
+
+The first read and first write record of this transaction. Note that these
+will be set even if the transaction has no reads or writes. The innermost
+transaction owns the write records between first_write and last_write
+(in C<struct STM_tx_log>) inclusive.
+
+ };
+
+The threads' entire transaction log is represented by a 
+C<struct STM_tx_log> structure:
+
+ struct STM_tx_log {
+     int depth;
+
+How many transactions are active in this thread. C<0> when no transaction
+is opened.
+
+     STM_tx_log_sub inner[STM_MAX_TX_DEPTH];
+
+Logs for individual nested transactions. 0 is the first used. 
+C<STM_MAX_TX_DEPTH> is the maximum transaction nesting depth, which is 
+currently 32.
+
+     int last_write;
+     int last_read;
+
+The last read and write record in use.
+
+     STM_write_record *writes;
+     int writes_alloced;
+     STM_read_record *reads;
+     int reads_alloced;
+
+Point to the actual read and write records. There should only be one
+read record active for any PMC handle. There may be multiple write
+records for a PMC handle because an inner transaction must create a new
+write record even if the outer transaction has one to support aborts.
+If there are multiple write records for a single PMC handle, only the
+last should be used. If there is both a write and read record,
+the value derived from the write record should be used.
+
+Note that a lot of linear searching through these record lists needs 
+to be done, so it would probably better if some other data structure
+were used, though there is likely to be little performance difference
+(or worse performance) when transactions are small.
+
+     struct waitlist_thread_data *waitlist_data;
+
+Used internally by the waitlist implementation in C<src/stm/waitlist.[ch]>
+
+  };
+
+To support saving and replaying logs through the STMLog PMC, a structure
+that merely holds read and write records and no status information exists.
+Note that because version numbers in this saved log are out-of-date, 
+replaying it is not likely to be useful.
+ 
+ struct STM_saved_tx_log {
+     int num_reads;
+     int num_writes;
+     STM_read_record *reads;
+     STM_write_record *writes;
+ };
+
+=head3 Read and write records
+
+Read and write record structures are currently identical and
+have the following fields:
+
+ Parrot_STM_PMC_handle handle;
+
+The handle to which this record refers.
+
+ void *saw_version;
+
+If we got the C<value> from an outer transaction's write record,
+then this may be the address of the the outer transaction's log.
+Otherwise: in read records, it is the value of C<owner_or_version> 
+just before we read C<value> from the PMC handle, and, in write records, 
+it is the value of C<owner_or_version> before we used
+C<PARROT_ATOMIC_PTR_CAS> to change it to point to our transaction log.
+
+ PMC *value;
+
+The value seen by the user of the transaction. For read records,
+this is taken directly from the PMC handle; for write records, it
+is whatever value we intend to write (but before we called
+C<VTABLE_share_ro()> on it).
+
+=head2 wait_for_version
+
+One of the most hackish routines in C<src/stm/backend.c> is 
+C<wait_for_version> which waits for a PMC handle's C<owner_or_version>
+field to become a version number. When C<owner_or_version> does not have
+a version number, that essentially means that the transaction it points to
+has an exclusive lock on the value. It does this with a busy wait, under
+the assumption that the thread it is waiting on will complete soon. For the
+sake of systems with few processors, it also calls C<YIELD> after 10 loops
+to give other programs a change to run. While waiting it does
+a number of other things:
+
+=over 4
+
+=item *
+
+Deadlock detection. Deadlocks are detected by having each thread
+keep a counter that is initially 0. Each time a thread waits, it reads
+this number from the transaction on which it is waiting, and if that
+number is less than or equal to its number, it changes its number to
+be one larger than the other. When a deadlock exists, these numbers
+will increase without bound. When C<wait_for_version> sees its number
+increase beyond the number of active threads, it aborts the competing
+transaction (using C<PARROT_ATOMIC_INT_CAS> to ensure the transaction 
+was previously active because it is not safe to aborted a 'committed' 
+transaction.)
+
+=item *
+
+Lock revokation. If a competing transaction marked as aborted but hasn't 
+set C<owner_for_version> to the old version number, C<wait_for_version>
+can do it for them using the C<last_version> field of the PMC handle.
+
+=item *
+
+Interrupts for garbage collection. C<wait_for_version> checks a flag that
+indicates the current thread has an event queued to stop it for garbage
+collection. If so, it runs C<pt_suspend_self_for_gc()> to assure that
+the garbage collection run occurs in a timely manner.
+
+=item *
+
+Detects if the current transaction is aborted. If the current
+transaction or any of its outer transactions are marked as aborted,
+C<wait_for_version> returns a bogus version number.
+
+=item *
+
+Aborts the current transaction if it waits an exceptionally long time.
+
+=back
+
+=head2 Creating read records
+
+Values are read from PMC handles as follows:
+
+First, the current transaction log is searched for an existing
+write or read record for the PMC handle in question. If one exists,
+the value stored in the record is returned.
+
+Otherwise a new read record is created, then the version number is read,
+then the value is read, then the version number is read again. This
+is retried until the version number read in both cases is the same.
+
+=head2 Creating write records
+
+The function C<find_write_record()> performs all the work involved in
+creating new write records. It first searches for an old write record
+in the innermost transaction. If there is one, it returns it. Otherwise,
+it searches for an outer write record or read record that refers
+to the value. If one is found, then the version number from 
+that record is used. Otherwise C<wait_for_version()> is called to get
+and potentially wait for the version number of the PMC handle. 
+After finding the version number C<PARROT_ATOMIC_PTR_CAS> is used to
+set the C<owner_or_version> field of the PMC handle to the current
+transaction. A new write record is then populated with the
+seen version and possibly a copy of the previously seen value.
+If the C<PARROT_ATOMIC_PTR_CAS> fails and C<wait_for_version> was used,
+C<find_write_record()> keeps trying unless the current transaction or
+some outer transaction is aborted. Otherwise, if C<PARROT_ATOMIC_PTR_CAS>
+fails, the current transaction is marked as aborted.
+
+=head2 Aborting transactions
+
+To abort a transaction, first C<PARROT_ATOMIC_INT_SET> is used to change
+the transaction's status field to C<STM_STATUS_ABORTED>. Then,
+C<PARROT_ATOMIC_PTR_CAS> is used to change the 
+C<owner_or_version> field of all PMC handles listed in the write records
+to the old version if the current transaction still owned them.
+(This work is done in the function C<do_partial_abort>.)
+
+Then (except on 'partial aborts' as occurs to outer transactions
+before C<STM_wait>) the current transaction depth is changed and the old
+read and write records silently discarded.
+
+=head2 Committing transactions
+
+To commit the outermost transaction, first C<PARROT_ATOMIC_INT_CAS>
+is used to change the status of the transaction from ACTIVE to
+COMMITTED. If this fails, the commit fails and the only explanation is
+that the transaction was aborted by some other thread. It is at this point
+that the transaction logically occurs if it commits at all. (The
+values may actually be written later, but any reads of them from
+this point on will see the new values.) 
+First, the transactions
+read records are checked against the PMC handles. If the version numbers
+do not match, the commit fails and the transaction is marked as aborted.
+(Since the version number was the same when the value was read initially
+and now, they must have been that when the transaction logically occured.)
+Otherwise, for each write record a new version number is created from the
+previous one. The PMC handle's C<last_version> is set to this. The
+C<value> field is set to the result of C<VTABLE_share_ro()> for the PMC
+in the write record. Then the C<owner_or_version> field is changed from
+a pointer to our transaction log to the new version number.
+(These tasks are done in the function C<do_real_commit>.)
+
+=head2 Merging transactions
+
+To 'commit' inner transactions, they are merged with their outer transaction.
+(This is done in the function C<merge_transactions>.) Currently,
+merges always succeed -- even if the inner transaction is aborted.
+It is necessary to either have the merges always succeed or support
+immediatelly retrying the outer transaction instead of retrying the
+inner transaction which may be unable to ever merge in the presence
+of an invalid outer transaction.
+If the inner transaction is aborted, then after a successful merge, the outer
+transaction will also be aborted. Merging is done by iterating through
+write records and updating the C<owner_or_version> field of the corresponding
+PMC handles (if the inner transaction still owns them) to point to
+the outer transaction. If this fails, the outer transaction will be aborted.
+If the inner transaction writes a value that the
+outer transaction also has a write record for, then the outer transaction's
+old write record is invalidated and the new write record inherits
+its C<saw_version> field. Then the depth of the log is changed, making
+the inner transaction's read and write records logically be owned
+by the outer transaction.
+
+=head2 Implementing STM_wait()
+
+STM_wait() aborts the current (potentially inner) transaction and waits until
+some value the transaction depends on has been changed. To do so,
+it first adds the current thread to the change waitlists for every 
+value it has a read or write record for (including values in outer
+transactions).  Then it aborts the innermost
+transaction and 'partially' aborts the outer transactions (merely
+removing itself as the owner of any write records). After being taken off
+one of the waitlists, it tries to recover ownership of its outer transaction's
+write records (using C<replay_writes()>) and verifies its read records are
+correct (since it is fairly likely that they will have become invalid).
+Outer transactions where this recovery and verification is not successful 
+are left as aborted.
+
+Immediately after adding itself to the waitlists and before actually waiting
+on them, the STM implementation verifies that the version number has changed
+from what is listed in C<saw_version>. For PMC handles whose 
+C<owner_or_version> field does not contain a verison number, it checks this
+against the C<last_version> field, which will contain the newer version if
+another transaction committed before the current one got ownership of the PMC
+handle. If the check shows the value already changed, then the waiting is
+skipped. Otherwise, the thread is signalled right after a new value is
+committed by the committing thread.
+
+The waitlist implementation (in C<src/stm/waitlist.c>) sets a flag
+in the per-thread data structure indicating that a thread has been signalled,
+so that if it is signalled anytime between calling the function to add itself
+to a wailist and calling the wait function, this will be detected.
+
+=head1 SEE ALSO
+
+C<docs/stm/thread-issues.pod>, C<docs/stm/stm-frontend.pod>
+
+=cut
