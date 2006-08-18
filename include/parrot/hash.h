@@ -47,7 +47,7 @@ typedef enum {
     Hash_key_type_cstring,
     Hash_key_type_STRING,
     Hash_key_type_PMC,
-    Hash_key_type_ptr,
+    Hash_key_type_ptr
 } Hash_key_type;
 
 typedef struct _hashbucket {
