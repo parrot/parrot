@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 =head1 NAME
 
@@ -226,6 +226,28 @@ pir_output_unlike($library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recur
 CODE
 /NOT OKAY/
 OUTPUT
+
+pir_output_unlike($library . <<'CODE', <<'OUTPUT', "Objects");
+.sub main :main
+    .local pmc fooclass
+    .local pmc foo
+
+    $P0 = new Integer
+    $P0 = 1
+
+    fooclass = newclass 'Foo'
+    addattribute fooclass, 'bar'
+    foo = new 'Foo' 
+    setattribute foo, 'bar', $P0
+    make_readonly(foo)
+    inc $P0
+    setattribute foo, 'bar', $P0
+    print "NOT OKAY\n"
+.end
+CODE
+/NOT OKAY/
+OUTPUT
+
 
 # XXX: should this work?
 {local $TODO = 1;

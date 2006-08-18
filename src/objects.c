@@ -210,8 +210,10 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
 
     PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class), PCD_OBJECT_VTABLE);
     VTABLE * const vtable           = PMC_struct_val(vtable_pmc);
+    VTABLE * const ro_vtable        = vtable->ro_variant_vtable;
     VTABLE * const deleg_pmc_vtable = interpreter->vtables[enum_class_deleg_pmc];
     VTABLE * const object_vtable    = interpreter->vtables[enum_class_ParrotObject];
+    VTABLE * const ro_object_vtable = object_vtable->ro_variant_vtable;
     VTABLE * const delegate_vtable  = interpreter->vtables[enum_class_delegate];
 
     memset(&meth_str, 0, sizeof(meth_str));
@@ -228,6 +230,9 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
              * the method exists; keep the ParrotObject aka delegate vtable slot
              */
             ((void **)vtable)[i] = ((void**)object_vtable)[i];
+            if (ro_vtable)
+                ((void **)ro_vtable)[i] = ((void**)ro_object_vtable)[i];
+
 #if 0
             PIO_eprintf(interpreter, "deleg_pmc class '%Ss' found '%s'\n",
                     class_name, meth);
@@ -238,10 +243,16 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
              * the method doesn't exist; put in the deleg_pmc vtable,
              * but only if ParrotObject hasn't overridden the method
              */
-            if (((void **)delegate_vtable)[i] == ((void**)object_vtable)[i])
+            if (((void **)delegate_vtable)[i] == ((void**)object_vtable)[i]) {
+                if (ro_vtable)
+                    ((void **)ro_vtable)[i] = ((void**)deleg_pmc_vtable)[i];
                 ((void **)vtable)[i] = ((void**)deleg_pmc_vtable)[i];
-            else
+            } else {
                 ((void **)vtable)[i] = ((void**)object_vtable)[i];
+                if (ro_vtable)
+                    ((void **)ro_vtable)[i] = ((void**)ro_object_vtable)[i];
+
+            }
         }
     }
 }
@@ -556,9 +567,9 @@ parrot_class_register(Interp* interpreter, PMC *name,
     new_vtable->class =  new_class;
     new_vtable->mro = mro;
 
-    /* XXX FIXME for now, we don't autogen. read-only variant */
-    new_vtable->ro_variant_vtable = NULL;
-    new_vtable->flags &= ~VTABLE_HAS_READONLY_FLAG;
+    if (parent_vtable->ro_variant_vtable)
+        new_vtable->ro_variant_vtable = 
+            Parrot_clone_vtable(interpreter, parent_vtable->ro_variant_vtable);
     
     /* Reset the init method to our instantiation method */
     new_vtable->init = Parrot_instantiate_object;
@@ -584,6 +595,14 @@ parrot_class_register(Interp* interpreter, PMC *name,
     /* attach namspace to vtable */
     new_vtable->_namespace = ns;
 
+    if (new_vtable->ro_variant_vtable) {
+        VTABLE * const ro_vt = new_vtable->ro_variant_vtable;
+        ro_vt->base_type = new_vtable->base_type;
+        ro_vt->class = new_vtable->class;
+        ro_vt->mro = new_vtable->mro;
+        ro_vt->_namespace = new_vtable->_namespace;
+    }
+
     /*
      * prepare object vtable - again that of the parent or
      * a ParrotObject vtable
@@ -597,19 +616,26 @@ parrot_class_register(Interp* interpreter, PMC *name,
         parent_vtable = interpreter->vtables[enum_class_ParrotObject];
 
     new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
+    if (parent_vtable->ro_variant_vtable)
+        new_vtable->ro_variant_vtable = 
+            Parrot_clone_vtable(interpreter, parent_vtable->ro_variant_vtable);
     new_vtable->base_type = new_type;
     new_vtable->mro = mro;
     new_vtable->class =  new_class;
 
-    /* XXX FIXME for now, we don't autogen. read-only variant */
-    new_vtable->ro_variant_vtable = NULL;
-    new_vtable->flags &= ~VTABLE_HAS_READONLY_FLAG;
-    
     set_attrib_num(new_class, (SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
             vtable_pmc = constant_pmc_new(interpreter, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
     /* attach namspace to object vtable too */
     new_vtable->_namespace = ns;
+
+    if (new_vtable->ro_variant_vtable) {
+        VTABLE * const ro_vt = new_vtable->ro_variant_vtable;
+        ro_vt->base_type = new_vtable->base_type;
+        ro_vt->class = new_vtable->class;
+        ro_vt->mro = new_vtable->mro;
+        ro_vt->_namespace = new_vtable->_namespace;
+    }
 }
 
 static PMC*
