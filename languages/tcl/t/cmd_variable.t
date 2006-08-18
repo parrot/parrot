@@ -2,12 +2,14 @@
 
 source lib/test_more.tcl
 
-plan 5
+plan 6
 
 eval_is {
   variable
 } {wrong # args: should be "variable ?name value...? name ?value?"} \
   {bad args}
+
+eval_is {variable foo} {} {variable's return value}
 
 eval_is {
   catch {unset foo}
