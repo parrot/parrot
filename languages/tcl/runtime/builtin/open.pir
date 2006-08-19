@@ -5,14 +5,24 @@
   .param pmc argv :slurpy
 
   .local pmc channel,next_channel_id,channels
-  .local string channel_id
+  .local string channel_id, access, pir_access
 
   .local int argc
-  argc = argv
-  if argc != 1 goto error
+  argc = elements argv
+
+  if argc == 0 goto error
+  if argc  > 3 goto error
 
   channel_id = argv[0] 
-  open channel, channel_id, '<'
+  access = argv[1]
+  pir_access = '<'
+  if access == '' goto done_access
+  if access == 'r' goto done_access
+  # XXX assume r & w are the only options for now.
+  pir_access = '>'
+
+ done_access:
+  open channel, channel_id, pir_access
   $I0 = typeof channel
   if $I0 == .Undef goto file_error
   channel_id = 'file'
@@ -29,5 +39,5 @@ file_error:
   tcl_error 'unable to open specified file'
  
 error:
-  tcl_error 'XXX: bad call to open'
+  tcl_error 'wrong # args: should be "open fileName ?access? ?permissions?"'
 .end
