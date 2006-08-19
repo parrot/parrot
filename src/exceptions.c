@@ -274,6 +274,10 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     /* flush interpreter output to get things printed in order */
     PIO_flush(interpreter, PIO_STDOUT(interpreter));
     PIO_flush(interpreter, PIO_STDERR(interpreter));
+    if (interpreter->debugger) {
+        PIO_flush(interpreter, PIO_STDOUT(interpreter->debugger));
+        PIO_flush(interpreter, PIO_STDERR(interpreter->debugger));
+    }
 
     m = string_to_cstring(interpreter, message);
     exit_status = print_location = 1;
