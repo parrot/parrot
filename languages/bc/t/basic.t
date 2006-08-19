@@ -169,8 +169,8 @@ my @tests = (
        [ "a; a = 1; 1; --a; a", [0,1,0,0], 'decrement', with_antlr3 => 1, ],
 
        # If 
-       [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition', with_antlr3 => 0, ],
-       [ "1; if ( 0 ) 2; 3", [1,3], 'if with a true condition', with_antlr3 => 0, ],
+       [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition', with_antlr3 => 1, ],
+       [ "1; if ( 0 ) 2; 3", [1,3], 'if with a false condition', with_antlr3 => 1, ],
        [ "1; if ( 1 < 2 ) 2; 3", [1, 2, 3], 'if with a relational operator', with_antlr3 => 0, ],
 
        # If with '<'

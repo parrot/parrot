@@ -19,12 +19,72 @@ options
 
 tokens 
 {
+  ARRAY;
   PRINT;
   PROGRAM;
   VAR;
 } 
 
+// Windows and Unix style newlines
+NEWLINE : ('\r')? '\n'+ ;
+
+// String literals are everything in double quotes, no escaping
+STRING : '\"' ( ~'\"' )*  '\"' ;
+
+LETTER : 'a'..'z' ;
+
+fragment
+INTEGER : ('0'..'9' | 'A' .. 'F' )+ ;
+
+NUMBER
+  : INTEGER ('.' INTEGER)?
+    |
+    '.' INTEGER
+  ;
+
+MINUS      : '-' ;
+PLUS       : '+' ;
+MUL_OP     : '*' | '/' | '%' ;
+SEMICOLON  : ';' ;
+ASSIGN_OP  : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' ;
+REL_OP     : '==' | '<=' | '>=' | '!=' | '<' | '>' ;
+INCR       : '++' ;
+DECR       : '--' ;
+
+// quit at the end of program is required, make testing easier
+Quit       : 'quit' ;    
+
+// TODO: handle these 
+Define     : 'define';
+Auto       : 'auto';
+
+If         : 'if';
+ 
+// TODO: handle these 
+KEYWORDS
+  : 'break'  | 'length' |
+    'return' | 'for'    | 'while' | 'sqrt' |
+    'scale'  | 'ibase'  | 'obase'
+  ;
+
+// ignore multiple-line comments
+ML_COMMENT
+  : '/*' ( options {greedy=false;} : . )* '*/'
+    {
+      channel = 99;       // send into nirwana 
+    }
+  ;
+
+// ignore whitespace
+WS
+  : ( ' ' | '\t' )+
+    {
+      channel = 99;       // send into nirwana 
+    }
+  ;    
+
 // TODO: Interactive mode when there is no 'quit'
+// There are 26 named var, currently all of them are initialized to 0
 program 
   : input_item+ Quit NEWLINE -> ^( PROGRAM 
                                    ^( ASSIGN_OP ^(VAR LETTER["a"]) NUMBER["0"] )
@@ -53,23 +113,38 @@ program
                                    ^( ASSIGN_OP ^(VAR LETTER["x"]) NUMBER["0"] )
                                    ^( ASSIGN_OP ^(VAR LETTER["y"]) NUMBER["0"] )
                                    ^( ASSIGN_OP ^(VAR LETTER["z"]) NUMBER["0"] )
-                                   input_item+)
+                                   input_item+
+                                )
   ;
 
 input_item 
   : semicolon_list NEWLINE!
+    |
+    function
   ;
 
 semicolon_list 
   : statement? ( SEMICOLON! statement? )*
   ;
 
+// TODO: use a semantic predicate, for deciding when not to print, ASSIGN_OP
 statement
   : named_expression ASSIGN_OP^^ expression
     |
     expression -> ^( PRINT expression ) ^( PRINT NEWLINE )
     |
     STRING -> ^( PRINT STRING )
+    | 
+    If '(' relational_expression ')' statement -> ^( If relational_expression statement )
+  ;
+
+// TODO: implement functions
+function
+  : Define
+  ;
+
+relational_expression 
+  : expression ( REL_OP expression )?
   ;
 
 expression
@@ -106,78 +181,3 @@ postfix_expression
     |     
     '(' expression ')' -> expression
   ;
-
-NUMBER
-  : INTEGER ('.' INTEGER)?
-    |
-    '.' INTEGER
-  ;
-
-fragment
-INTEGER
-  : ('0'..'9' | 'A' .. 'F' )+
-  ;
-
-MINUS
-  : '-'
-  ;
-
-PLUS
-  : '+'
-  ;
-
-MUL_OP
-  : '*' | '/' | '%'
-  ;
-
-SEMICOLON
-  : ';'
-  ;
-
-ASSIGN_OP
-  : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' 
-  ;
-
-INCR
-  : '++'
-  ;
-
-DECR
-  : '--'
-  ;
-
-// quit is required, make testing easier
-Quit
-  : 'quit'
-  ;    
-
-// ignore multiple-line comments
-ML_COMMENT
-  : '/*' ( options {greedy=false;} : . )* '*/'
-    {
-      channel = 99;       // send into nirwana 
-    }
-  ;
-
-// ignore whitespace
-WS
-  : ( ' ' | '\t' )+
-    {
-      channel = 99;       // send into nirwana 
-    }
-  ;    
-
-// Windows and Unix style newlines
-NEWLINE
-  : ('\r')? '\n'+
-  ;
-
-// String literals are everything in double quotes, no escaping
-STRING
-  : '\"' ( ~'\"' )*  '\"'
-  ;
-
-LETTER
-  : 'a'..'z'
-  ;
-  

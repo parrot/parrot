@@ -50,6 +50,7 @@ gen_pir_past
         + "  .sym pmc reg_expression_stmt                                    \n"
         + "  .sym pmc reg_expression_topexp                                  \n"
         + "  .sym pmc reg_print_op                                           \n"
+        + "  .sym pmc reg_if_op                                              \n"
         + "  .sym pmc reg_expression_exp                                     \n"
         + "                                                                  \n"
         + "  .sym pmc reg_assign_lhs                                         \n"
@@ -180,16 +181,16 @@ node[String reg_mother]
     |
     NUMBER
     {
-       System.out.print(     
-           "                                                                  \n"
-         + "# entering 'NUMBER'                                               \n"
-         + "reg_temp = new 'PAST::Val'                                        \n"
-         + "reg_temp.value( " + $NUMBER.text + " )                            \n"
-         + "reg_temp.valtype( 'num' )                                         \n"
-         + $node.reg_mother + ".'add_child'( reg_temp )                       \n"
-         + "null reg_temp                                                     \n"
-         + "# leaving 'NUMBER'                                                \n"
-       );
+      System.out.print(     
+          "                                                                  \n"
+        + "# entering 'NUMBER'                                               \n"
+        + "reg_temp = new 'PAST::Val'                                        \n"
+        + "reg_temp.value( " + $NUMBER.text + " )                            \n"
+        + "reg_temp.valtype( 'num' )                                         \n"
+        + $node.reg_mother + ".'add_child'( reg_temp )                       \n"
+        + "null reg_temp                                                     \n"
+        + "# leaving 'NUMBER'                                                \n"
+      );
     }
     |
     {
@@ -258,6 +259,32 @@ node[String reg_mother]
         + "          " + $node.reg_mother + ".'add_child'( reg_temp )         \n"
         + "          null reg_temp                                            \n"
         + "# leaving 'STRING'                                                 \n"
+      );
+    }
+    |
+    {
+      reg_num++;
+      String reg_exp   = "reg_expression_" + reg_num;
+      String reg_stmts = "reg_stmts_" + reg_num;
+      System.out.print( 
+          "    reg_expression_stmt = new 'PAST::Stmt'                         \n"
+        + "      reg_if_op = new 'PAST::Op'                                   \n"
+        + "      reg_if_op.'op'( 'if' )                                       \n"
+        + "        .sym pmc " + reg_exp + "                                   \n"
+        + "        " + reg_exp + " = new 'PAST::Exp'                          \n"
+        + "                                                                   \n"
+        + "        .sym pmc " + reg_stmts + "                                 \n"
+        + "        " + reg_stmts + " = new 'PAST::Stmts'                      \n"
+      );
+    }
+    ^( If node[reg_exp] node[reg_stmts]* )
+    {
+       // Create a node for If
+      System.out.print( 
+          "      reg_if_op.'add_child'( " + reg_exp + " )                     \n"
+        + "      reg_if_op.'add_child'( " + reg_stmts + " )                   \n"
+        + "  " + $node.reg_mother + ".'add_child'( reg_expression_stmt )      \n"
+        + "  # leaving 'If expression statement'            ^                 \n"
       );
     }
   ;
