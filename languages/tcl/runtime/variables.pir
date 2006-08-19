@@ -329,6 +329,8 @@ lexical_var:
   $P0 = lexpad[name]
   if null $P0 goto lexical_is_null
 
+  $I0 = typeof value
+  morph $P0, $I0
   assign $P0, value
   .return($P0)
 
@@ -344,6 +346,8 @@ global_var:
   clear_eh
   if null $P0 goto global_not_undef
 
+  $I0 = typeof value
+  morph $P0, $I0
   assign $P0, value
   .return($P0)
 
