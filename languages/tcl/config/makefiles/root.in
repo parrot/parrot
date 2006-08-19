@@ -187,6 +187,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/error.t \
   t_tcl/expr_old.t \
   t_tcl/for_old.t \
+  t_tcl/foreach.t \
   t_tcl/if.t \
   t_tcl/if_old.t \
   t_tcl/incr.t \
@@ -229,7 +230,6 @@ SEGFAULTING_TCL_TESTS = \
   t_tcl/appendComp.t \
   t_tcl/cmdAH.t \
   t_tcl/dict.t \
-  t_tcl/foreach.t \
   t_tcl/for.t \
   t_tcl/get.t \
   t_tcl/lsearch.t \
@@ -320,9 +320,11 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/unixFCmd          t_tcl/unixFile.t        t_tcl/misc.t
 #t_tcl/regexpComp.t      t_tcl/parse.t           t_tcl/interp.t
 #
+# missing close-bracket
+#t_tcl/main.t 
+#
 # Null PMC access in invoke()
-#t_tcl/main.t            t_tcl/var.t             t_tcl/winDde.t
-#t_tcl/reg.t
+#t_tcl/var.t             t_tcl/winDde.t          t_tcl/reg.t
 #
 # extra characters after close-brace (These tests require {expand}[list])
 # t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
@@ -338,7 +340,7 @@ SKIPPED_TCL_TESTS = \
 # invalid command name "x"
 #t_tcl/timer.t
 #
-# can't read "envVars": no such variable {{ [variable] bug }}
+# invalid command name "PowerSet" {{ probable nested namespace bug }}
 #t_tcl/msgcat.t
 #
 # can't read "expected": no such variable
