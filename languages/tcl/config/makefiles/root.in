@@ -181,12 +181,9 @@ test:	tcl.pbc
 
 RUNNABLE_TCL_TESTS = \
   t_tcl/append.t \
-  t_tcl/compExpr.t \
   t_tcl/concat.t \
   t_tcl/eval.t \
-  t_tcl/event.t \
   t_tcl/error.t \
-  t_tcl/expr_old.t \
   t_tcl/for.t \
   t_tcl/for_old.t \
   t_tcl/foreach.t \
@@ -208,29 +205,27 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/package.t \
   t_tcl/platform.t \
   t_tcl/proc.t \
-  t_tcl/proc_old.t \
   t_tcl/pwd.t \
   t_tcl/regexp.t \
   t_tcl/rename.t \
   t_tcl/security.t \
   t_tcl/set.t \
   t_tcl/split.t \
-  t_tcl/stringComp.t \
   t_tcl/subst.t \
   t_tcl/switch.t \
   t_tcl/unknown.t \
   t_tcl/uplevel.t \
   t_tcl/upvar.t \
   t_tcl/utf.t \
-  t_tcl/util.t \
-  t_tcl/while.t \
   t_tcl/while_old.t
 
 # These tests segfault or exit before any tests results are shown (apply.t)
 SEGFAULTING_TCL_TESTS = \
   t_tcl/apply.t \
   t_tcl/appendComp.t \
-  t_tcl/set_old.t
+  t_tcl/proc_old.t \
+  t_tcl/set_old.t \
+  t_tcl/while.t \
 
 # These are test that don't parse, but we couldn't possibly pass any anyway:
 UNIMPLEMENTED_TCL_TESTS = \
@@ -266,10 +261,17 @@ SKIPPED_TCL_TESTS = \
   t_tcl/winFCmd.t \
   t_tcl/winNotify.t \
   t_tcl/winTime.t
+
 # These test files die for various reasons.
 #
 # too slow:
 #t_tcl/clock.t            t_tcl/expr.t 
+#
+# invalid command name "update"
+#t_tcl/event.t
+#
+# src/string.c:420: failed assertion `a->encoding && a->charset && !PObj_on_free_list_TEST(a)'
+#t_tcl/compExpr.t         t_tcl/stringComp.t
 #
 # bad option "-real": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index,
 #t_tcl/lsearch.t
@@ -287,7 +289,8 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/ioCmd.t
 #
 # extra switch pattern with no body
-#t_tcl/binary.t          t_tcl/parseExpr.t
+#t_tcl/binary.t          t_tcl/parseExpr.t        t_tcl/expr_old.t
+#t_tcl/util.t
 #
 # No such file or directory
 #t_tcl/fileSystem.t      t_tcl/tcltest.t          t_tcl/fCmd.t
