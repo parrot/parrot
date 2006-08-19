@@ -1,10 +1,9 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 20
+plan 21
 
 is [lsort {}] {} {empty list}
-
 
 eval_is {lsort} \
   {wrong # args: should be "lsort ?options? list"} \
@@ -68,3 +67,7 @@ eval_is {lsort -dictionary {a10 B2 b1 a1 a2}} \
   {a1 a2 a10 b1 B2} \
   {dictionary} \
   {TODO {no excuses!}}
+
+eval_is {
+  lsort -real {4.28 5.65 6.20 7.66 7.6 2.4 8.5 0.4 7.6 6.3}
+} {0.4 2.4 4.28 5.65 6.20 6.3 7.6 7.6 7.66 8.5} {-real}

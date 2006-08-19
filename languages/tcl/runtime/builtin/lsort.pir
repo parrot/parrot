@@ -31,9 +31,13 @@ chew_flag:
   if $P0 == '-increasing' goto c_incr
   if $P0 == '-unique' goto c_uniq
   if $P0 == '-integer' goto c_int
-  # XXX dictionary, real, command etc necessary
+  if $P0 == '-real' goto c_real
+  # XXX dictionary, command etc necessary
   branch bad_opt
 
+c_real:
+  compare = get_root_global ['_tcl';'helpers';'lsort'], 'real'
+  branch chew_flag
 c_decr:
   decr = 1
   branch chew_flag
@@ -183,6 +187,26 @@ decreasing:
   __integer = get_root_global ['_tcl'], '__integer'
   s1 = __integer(s1)
   s2 = __integer(s2)
+
+  if is_decr goto decreasing
+  $I0 = cmp_num s1, s2
+  .return ($I0)
+
+decreasing:
+  $I0 = cmp_num s2, s1
+  .return ($I0)
+.end
+
+.sub 'real'
+  .param pmc s1
+  .param pmc s2
+  .param int is_decr
+
+  # check that they're actually integers.
+  .local pmc __integer
+  __integer = get_root_global ['_tcl'], '__number'
+  s1 = __number(s1)
+  s2 = __number(s2)
 
   if is_decr goto decreasing
   $I0 = cmp_num s1, s2

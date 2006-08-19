@@ -273,7 +273,7 @@ SKIPPED_TCL_TESTS = \
 # src/string.c:420: failed assertion `a->encoding && a->charset && !PObj_on_free_list_TEST(a)'
 #t_tcl/compExpr.t         t_tcl/stringComp.t
 #
-# bad option "-real": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index,
+# bad option "-dictionary": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index,
 #t_tcl/lsearch.t
 #
 # invalid command name "cd" (odd, since it *is* defined)
