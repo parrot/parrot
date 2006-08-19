@@ -185,9 +185,6 @@ OUT
   $ENV{pig}    = 'oink';
   $ENV{cowpig} = 'moink';
 
-SKIP: {
-  skip("pending parray fix", 1);
-
 language_output_is("tcl",<<'TCL',<<"OUT","reading environment variables");
   parray env
 TCL
@@ -196,7 +193,6 @@ env(cow)    = moo
 env(cowpig) = moink
 env(pig)    = oink
 OUT
-}
 }
 
 language_output_is("tcl", <<'TCL', <<'OUT', "args checking from inlined commands");

@@ -36,10 +36,7 @@ TCL
 a(ab) = first
 OUT
 
-SKIP: {
-  skip ('doesn\'t work yet?', 1);
-
-language_output_is("tcl",<<'TCL',<<OUT,"normal usage", skip=> "doesn't work yet.");
+language_output_is("tcl",<<'TCL',<<OUT,"normal usage");
   array set a [list z always ab first coco last]
   parray a
 TCL
@@ -47,4 +44,3 @@ a(ab)   = first
 a(coco) = last
 a(z)    = always
 OUT
-}
