@@ -214,12 +214,19 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
     n = VTABLE_elements(interpreter, paths);
     for (i = 0; i < n; ++i) {
         path = VTABLE_get_string_keyed_int(interpreter, paths, i);
-        if (string_length(interpreter, prefix)) {
+        if (string_length(interpreter, prefix) &&
+           !is_abs_path(interpreter,path)) {
             full_name = string_concat(interpreter, prefix, slash, 0);
             full_name = string_append(interpreter, full_name, path, 0);
         }
         else
             full_name = string_copy(interpreter, path);
+
+        /* make sure this path has a trailing slash before appending the file */
+        if (   string_index(interpreter, full_name, full_name->strlen - 1)
+            != string_index(interpreter, slash, 0))
+            full_name = string_append(interpreter, full_name, slash, 0);
+
         full_name = string_append(interpreter, full_name, file, 0);
         /* TODO create a string API that just does that
          *      a lot of ICU lib functions also need 0-terminated strings

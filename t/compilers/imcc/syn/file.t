@@ -5,9 +5,10 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+use File::Spec;
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -426,9 +427,62 @@ back again
 OUT
 }
 
+my @temp_files;
+SKIP:
+{
+  my $temp_dir = File::Spec->tmpdir();
+  my $td2      = File::Spec->catfile( $temp_dir, '.' );
+  substr( $td2, -1, 1, '' );
+
+  for my $file ( qw( with_slash without_slash ))
+  {
+      push @temp_files, File::Spec->catfile( $temp_dir, "${file}.pir" );
+
+      open( my $out_fh, '>', $temp_files[-1] ) or
+          skip("Cannot write temporary file to $temp_files[-1]", 2);
+
+      print {$out_fh} <<"TEMP_PIR";
+.sub $file
+    print "$file() called!\\n"
+.end
+TEMP_PIR
+  }
+
+  pir_output_is(<<"CODE", <<'OUT', "load PIR from added paths, minding slash");
+  .include 'iglobals.pasm'
+
+  .sub main :main
+      .local pmc interp
+      getinterp interp
+
+      .local pmc lib_paths
+      lib_paths = interp[.IGLOBALS_LIB_PATHS]
+
+      # XXX - hard-coded magic constant (should be PARROT_LIB_PATH_LIBRARY)
+      .local pmc include_paths
+      include_paths = lib_paths[1]
+
+      unshift include_paths, '$temp_dir'
+      load_bytecode 'with_slash.pir'
+
+      .local pmc dummy
+      dummy = shift include_paths
+      unshift include_paths, '$td2'
+      load_bytecode 'without_slash.pir'
+
+      with_slash()
+      without_slash()
+  .end
+CODE
+with_slash() called!
+without_slash() called!
+OUT
+}
+
 END
 {
   unlink $file;
   unlink "temp.pir";
   unlink "temp.pbc";
+  unlink @temp_files;
 }
