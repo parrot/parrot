@@ -47,7 +47,7 @@ The notion of read-onlyness is obtained first from C<vtable.tbl>'s
 marking of methods with C<:write>. For MMD methods, it is guessed when
 a method will write a value based on the signature of the method,
 and if it would, then the check 
-C<(pmc->vtable->flags & VTABLE_IS_READONLY_FLAG)> is performed to see
+C<<(pmc->vtable->flags & VTABLE_IS_READONLY_FLAG)>> is performed to see
 if the object is unsafe to write. (This is implemented by calls to
 C<mmd_ensure_writable> in C<mmd.c>.) For other methods, C<find_method>
 is overriden in the read-only variant to check the "write" property
@@ -167,7 +167,8 @@ currently 32.
      int last_write;
      int last_read;
 
-The last read and write record in use.
+The last read and write record in use. (-1 when no read or write records
+are in use.)
 
      STM_write_record *writes;
      int writes_alloced;
@@ -195,8 +196,8 @@ Used internally by the waitlist implementation in C<src/stm/waitlist.[ch]>
 
 To support saving and replaying logs through the STMLog PMC, a structure
 that merely holds read and write records and no status information exists.
-Note that because version numbers in this saved log are out-of-date, 
-replaying it is not likely to be useful.
+Note that because version numbers in this saved log are out-of-date, a
+replayed transaction is unlikely to commit.
  
  struct STM_saved_tx_log {
      int num_reads;
@@ -238,9 +239,9 @@ field to become a version number. When C<owner_or_version> does not have
 a version number, that essentially means that the transaction it points to
 has an exclusive lock on the value. It does this with a busy wait, under
 the assumption that the thread it is waiting on will complete soon. For the
-sake of systems with few processors, it also calls C<YIELD> after 10 loops
-to give other programs a change to run. While waiting it does
-a number of other things:
+sake of systems with few processors, it also calls C<YIELD> each
+iteration after 10 loops to give other programs a change to run.
+While waiting it does a number of other things:
 
 =over 4
 
@@ -301,16 +302,32 @@ creating new write records. It first searches for an old write record
 in the innermost transaction. If there is one, it returns it. Otherwise,
 it searches for an outer write record or read record that refers
 to the value. If one is found, then the version number from 
-that record is used. Otherwise C<wait_for_version()> is called to get
+that record is used. For write records this 'version number' is actually
+the address of the C<STM_tx_log_sub> structure for the outer transaction.
+If no version number can be derived from the transaction log,
+C<wait_for_version()> is called to get
 and potentially wait for the version number of the PMC handle. 
 After finding the version number C<PARROT_ATOMIC_PTR_CAS> is used to
 set the C<owner_or_version> field of the PMC handle to the current
 transaction. A new write record is then populated with the
 seen version and possibly a copy of the previously seen value.
-If the C<PARROT_ATOMIC_PTR_CAS> fails and C<wait_for_version> was used,
-C<find_write_record()> keeps trying unless the current transaction or
-some outer transaction is aborted. Otherwise, if C<PARROT_ATOMIC_PTR_CAS>
-fails, the current transaction is marked as aborted.
+If the C<PARROT_ATOMIC_PTR_CAS> fails and the version number
+came from C<wait_for_version()>, 
+C<find_write_record()> retries the C<wait_for_version()> and C<CAS> 
+until it suceeds or the transaction (or its outer transactions)
+are aborted.
+If the C<CAS> fails using a version number from the transaction log,
+the current transaction is marked as aborted.
+
+When C<find_write_record()> aborts the transaction or detects that it
+(or its outer transactions) are aborted, it will still create a write
+record if an appropriate one did not already exist.
+To prevent code from failing too spectacularly,
+if a copy of the old value is desired C<find_write_record()> uses
+the value pointed to by the PMC handle. Note that in these cases
+C<find_write_record()> may create a write record with a bogus
+C<saw_version> field, which should be fine since the transaction will never
+commit anyways.
 
 =head2 Aborting transactions
 
@@ -329,9 +346,10 @@ read and write records silently discarded.
 
 To commit the outermost transaction, first C<PARROT_ATOMIC_INT_CAS>
 is used to change the status of the transaction from ACTIVE to
-COMMITTED. If this fails, the commit fails and the only explanation is
-that the transaction was aborted by some other thread. It is at this point
-that the transaction logically occurs if it commits at all. (The
+COMMITTED. (If this fails, the commit fails and the only explanation is
+that the transaction was aborted by some other thread.) A transaction
+logically occurs at the point when its status changes to COMMITTED
+if it commits at all. (The
 values may actually be written later, but any reads of them from
 this point on will see the new values.) 
 First, the transactions
