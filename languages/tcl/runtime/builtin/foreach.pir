@@ -95,6 +95,7 @@ loop_inner:
   $I2 = iterator
   if $I1 <= $I2 goto empty_var
   value = $P0[$I2]
+  value = clone value
   __set(varname, value)
 
   got_one = 1
