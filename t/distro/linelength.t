@@ -68,6 +68,7 @@ sub check {
   my $ok = 1;
   open F, $f or die "Can't open file '$f'";
   while ($ok && ($_ = <F>)) {
+    chomp;
     $ok = 0 if length > $columns;
   }
   close F;
