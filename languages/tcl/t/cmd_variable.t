@@ -43,5 +43,4 @@ eval_is {
     set x
   }
   list [test] [set x]
-} {5 5} {variable is always about globals} \
-  {TODO {can't handle this yet}}
+} {5 5} {variable is always about globals}

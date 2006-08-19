@@ -11,8 +11,8 @@
     argc = elements argv
     if argc == 0 goto bad_args
 
-    .local pmc __set
-    __set = get_root_global ['_tcl'], '__set'
+    .local pmc __store_var
+    __store_var = get_root_global ['_tcl'], '__store_var'
 
     .local pmc iter, name, value
     iter = new .Iterator, argv
@@ -32,13 +32,19 @@ loop:
     tcl_error $S0
 
 store:
+    $S0 = name
+    $S0 = '$' . $S0
     unless iter goto no_value
     value = shift iter
-    __set(name, value)
+    # store as a lexical *and* a global
+    __store_var(name, value)
+    set_hll_global $S0, value
     goto loop
 no_value:
     value = new .Undef
-    __set(name, value)
+    # store as a lexical *and* a global
+    __store_var(name, value)
+    set_hll_global $S0, value
 end:
     .return('')
 
