@@ -2,8 +2,21 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Test::More;
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'multiple foreaches. seems to need puts to trigger.');
+  set names [list 1 2 3]
+  foreach name $names { puts $name }
+  foreach name $names { puts $name }
+TCL
+1
+2
+3
+1
+2
+3
+OUT
 
 language_output_is("tcl",<<'TCL',<<OUT,"leading spacex2 should be ok");
    puts Parsing
@@ -207,3 +220,4 @@ language_output_is('tcl', <<'TCL', <<'OUT', 'make sure list value can be overrid
 TCL
 2
 OUT
+
