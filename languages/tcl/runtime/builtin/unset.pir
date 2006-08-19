@@ -58,6 +58,8 @@ array:
  
   var = find_var(array_name)
   if null var goto no_such_var
+  $I0 = isa var, 'TclArray'
+  unless $I0 goto variable_isnt_array
   
   $I0 = exists var[key]
   if $I0 == 0 goto no_such_element
@@ -65,6 +67,13 @@ array:
   $P1 = new .Undef
   assign $P0, $P1
   goto next
+
+variable_isnt_array:
+  if nocomplain goto next
+  $S0 = "can't unset \""
+  $S0 .= name
+  $S0 .= "\": variable isn't array"
+  tcl_error $S0
 
 no_such_element:
   if nocomplain goto next

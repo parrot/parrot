@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 20
+plan 21
 
 eval_is {unset a} \
   {can't unset "a": no such variable} \
@@ -134,3 +134,10 @@ eval_is {
   set c
 } {can't read "c": no such variable} \
   {unset an aliased array elem}
+
+eval_is {
+  catch {unset a}
+  set a 55
+  unset a(f)
+} {can't unset "a(f)": variable isn't array} \
+  {variable isn't array}
