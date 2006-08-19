@@ -2,7 +2,7 @@
 
 source lib/test_more.tcl
 
-plan 7
+plan 8
 
 eval_is {
   variable
@@ -36,6 +36,12 @@ eval_is {
 eval_is {variable foo(bar)} \
   {can't define "foo(bar)": name refers to an element in an array} \
   {variable with array}
+
+eval_is {
+  variable foo( 4 foo) 4 foo(bar)baz 4
+  list [set foo(] [set foo)] [set foo(bar)baz]
+} {4 4 4} \
+  {these aren't arrays - they should work}
 
 eval_is {
   proc test {} {
