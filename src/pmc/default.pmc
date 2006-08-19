@@ -636,6 +636,21 @@ Defaults fall back to C<set_pmc> and C<set_string_native>.
     void assign_string_native (STRING* value) {
         DYNSELF.set_string_native(value);
     }
+
+/*
+
+=item C<void morph (INTVAL type)>
+
+Changes the PMC to a PMC of a new type
+
+=cut
+
+*/
+
+    void morph (INTVAL type) {
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
+
 /*
 
 =item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>
