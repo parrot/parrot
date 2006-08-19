@@ -11,7 +11,7 @@
   argc = elements argv
 
   # Were we passed the right # of arguments? (2n+1)
-  if argc == 0 goto bad_args
+  if argc <2 goto bad_args
   $I0 = argc % 2
   if $I0 != 1 goto bad_args
 
@@ -25,12 +25,12 @@
   .local string body
   varnames = new .TclList
   arglists = new .TclList
-  varnames = argc
-  arglists = argc
+
   .local pmc arg_num,arg_max,index_num
   arg_num = new .Integer
   arg_max = new .Integer
   index_num = new .Integer
+
   arg_num = 0 
   index_num = 0
 
@@ -140,4 +140,8 @@ done:
 
 bad_args:
   tcl_error 'wrong # args: should be "foreach varList list ?varList list ...? command"'
+
+#XXX need to actually call this
+bad_varlist:
+  tcl_error 'foreach varlist is empty'
 .end

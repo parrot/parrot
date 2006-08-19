@@ -140,6 +140,8 @@ proc test {num description code args} {
             $num eq "execute-2.2"  || 
             $num eq "expr-old-23.4"|| 
             $num eq "expr-old-23.5"|| 
+            $num eq "foreach-2.9"  ||
+            $num eq "foreach-3.1"  ||
             $num eq "get-2.4"      || 
             $num eq "incr-1.14"    ||
             $num eq "incr-2.14"    ||
