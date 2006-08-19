@@ -63,6 +63,8 @@ check($_) for (@files);
 
 sub check {
   my $f = shift;
+  my $g = $f;
+  $g =~ s!^$build_dir/!!;
   my $ok = 1;
   open F, $f or die "Can't open file '$f'";
   while ($ok && ($_ = <F>)) {
@@ -70,5 +72,5 @@ sub check {
   }
   close F;
 
-  ok($ok, "$f");
+  ok($ok, $g);
 }
