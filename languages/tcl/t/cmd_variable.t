@@ -35,8 +35,7 @@ eval_is {
 
 eval_is {variable foo(bar)} \
   {can't define "foo(bar)": name refers to an element in an array} \
-  {variable with array} \
-  {TODO {can't handle this yet}}
+  {variable with array}
 
 eval_is {
   proc test {} {

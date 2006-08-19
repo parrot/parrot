@@ -19,6 +19,19 @@
 loop:
     unless iter goto end
     name = shift iter
+
+    # check to see if name is an array
+    $S0  = substr name, -1, 1
+    unless $S0 == ')' goto store
+    $S0  = name
+    $I0  = index $S0, '('
+    if $I0 == -1 goto store
+    $S0 = name
+    $S0 = "can't define \"" . $S0
+    $S0 = $S0 . "\": name refers to an element in an array"
+    tcl_error $S0
+
+store:
     unless iter goto no_value
     value = shift iter
     __set(name, value)
