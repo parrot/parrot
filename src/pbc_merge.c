@@ -725,7 +725,7 @@ main(int argc, char **argv)
 
 The main function that grabs console input, reads in the packfiles
 provided they exist, hands them to another function that runs the
-merge process and finally writes out the produce packfile.
+merge process and finally writes out the produced packfile.
 
 */
 

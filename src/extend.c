@@ -528,7 +528,7 @@ Parrot_PMC_set_cstring_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
 Parrot_PMC_set_cstringn(Parrot_INTERP interp, Parrot_PMC pmc,
                         const char *value, Parrot_Int length)>
 
-Assign the passed-in length-noted string  to the passed-in PMC.
+Assign the passed-in length-noted string to the passed-in PMC.
 
 =cut
 
@@ -696,7 +696,7 @@ Parrot_free_cstring(char *string) {
 Parrot_call_sub(Parrot_INTERP interpreter, Parrot_PMC sub,
             const char *signature, ...)>
 
-Call a parrot subroutine the given function signature. The first char in
+Call a parrot subroutine with the given function signature. The first char in
 C<signature> denotes the return value. Next chars are arguments.
 
 The return value of this function can be void or a pointer type.

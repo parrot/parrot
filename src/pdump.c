@@ -34,8 +34,8 @@ Terse output.
 
 =item C<-o converted.pbc>
 
-Repacks a PBC file into platforms native binary format for better
-efficiency on reading non native PBCs.
+Repacks a PBC file into the platform's native binary format for better
+efficiency on reading non-native PBCs.
 
 =back
 
@@ -74,7 +74,7 @@ const_dump (Interp *interpreter, struct PackFile_Segment *segp)
 static void
 fixup_dump(Interp *interpreter, struct PackFile_Segment *segp)
 
-Dump the fix-up table.
+Dump the fixup table.
 
 */
 
@@ -170,7 +170,7 @@ static void help(void)
     printf("\t-d ... disassemble bytecode segments\n");
     printf("\t-h ... dump header only\n");
     printf("\t-t ... terse output\n");
-    printf("\n\t-o converted.pbc repacks a PBC file into platforms native\n");
+    printf("\n\t-o converted.pbc repacks a PBC file into the platform's native\n");
     printf("\t   binary format for better efficiency on reading "
            "non native PBCs\n");
     exit(0);
@@ -189,7 +189,7 @@ static struct longopt_opt_decl options[] = {
 int
 main(int argc, char **argv)
 
-The run loop. Process the command-line arguments and dumps accordingly.
+The run loop. Process the command-line arguments and dump accordingly.
 
 */
 
