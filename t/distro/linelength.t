@@ -39,7 +39,7 @@ my $build_dir = $PConfig{build_dir};
 my $manifest     = maniread("$build_dir/MANIFEST");
 my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
 
-foreach my $file (keys(%$manifest)) {
+foreach my $file (sort keys(%$manifest)) {
     $file = "$build_dir/$file";
     # skip binary files (including .pbc files)
     next if -B $file;
