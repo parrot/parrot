@@ -177,6 +177,8 @@ proc bytestring         {args} {return 0}
 proc customMatch        {args} {return 0}
 proc testinfocmdcount   {args} {return 0}
 proc interpreter        {args} {return 0}
+proc interp             {args} {return 0}
+proc safeInterp         {args} {return 0}
 proc pid                {args} {return 0}
 proc child              {args} {return 0}
 proc child-trusted      {args} {return 0}

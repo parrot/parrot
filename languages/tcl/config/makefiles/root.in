@@ -180,14 +180,17 @@ test:	tcl.pbc
 # failure modes
 
 RUNNABLE_TCL_TESTS = \
+  t_tcl/append.t \
   t_tcl/compExpr.t \
   t_tcl/concat.t \
   t_tcl/eval.t \
   t_tcl/event.t \
   t_tcl/error.t \
   t_tcl/expr_old.t \
+  t_tcl/for.t \
   t_tcl/for_old.t \
   t_tcl/foreach.t \
+  t_tcl/get.t \
   t_tcl/if.t \
   t_tcl/if_old.t \
   t_tcl/incr.t \
@@ -201,6 +204,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
   t_tcl/lsetComp.t \
+  t_tcl/namespace_old.t \
   t_tcl/package.t \
   t_tcl/platform.t \
   t_tcl/proc.t \
@@ -220,28 +224,22 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/utf.t \
   t_tcl/util.t \
   t_tcl/while.t \
-  t_tcl/while_old.t \
-  $(SEGFAULTING_TCL_TESTS)
+  t_tcl/while_old.t
 
-# These tests segfault or exit before any tests are shown (apply.t)
+# These tests segfault or exit before any tests results are shown (apply.t)
 SEGFAULTING_TCL_TESTS = \
   t_tcl/apply.t \
-  t_tcl/append.t \
   t_tcl/appendComp.t \
-  t_tcl/cmdAH.t \
-  t_tcl/dict.t \
-  t_tcl/for.t \
-  t_tcl/get.t \
-  t_tcl/lsearch.t \
-  t_tcl/namespace_old.t \
-  t_tcl/set_old.t \
-  t_tcl/trace.t
+  t_tcl/set_old.t
+
+# These are test that don't parse, but we couldn't possibly pass any anyway:
+UNIMPLEMENTED_TCL_TESTS = \
+  t_tcl/dict.t
 
 # These tests parse but fail (or skip) every test.
 FAILING_TCL_TESTS = \
   t_tcl/case.t \
-  t_tcl/config.t \
-  t_tcl/parseExpr.t
+  t_tcl/config.t
 
 # These tests parse but all are skipped due to harder [test] format.
 SKIPPED_TCL_TESTS = \
@@ -271,8 +269,13 @@ SKIPPED_TCL_TESTS = \
 # These test files die for various reasons.
 #
 # too slow:
-#
 #t_tcl/clock.t            t_tcl/expr.t 
+#
+# bad option "-real": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index,
+#t_tcl/lsearch.t
+#
+# invalid command name "cd" (odd, since it *is* defined)
+#t_tcl/cmdAH.t
 #
 # can't read "env(test)": no such element in array
 #t_tcl/env.t
@@ -284,7 +287,7 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/ioCmd.t
 #
 # extra switch pattern with no body
-#t_tcl/binary.t
+#t_tcl/binary.t          t_tcl/parseExpr.t
 #
 # No such file or directory
 #t_tcl/fileSystem.t      t_tcl/tcltest.t          t_tcl/fCmd.t
@@ -327,8 +330,8 @@ SKIPPED_TCL_TESTS = \
 #t_tcl/var.t             t_tcl/winDde.t          t_tcl/reg.t
 #
 # extra characters after close-brace (These tests require {expand}[list])
-# t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
-#t_tcl/pkgMkIndex.t
+#t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
+#t_tcl/pkgMkIndex.t     t_tcl/trace.t
 #
 # can't read "major": no such variable {{ [foreach] bug }}
 #t_tcl/tm.t
