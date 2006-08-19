@@ -294,7 +294,8 @@ Create the class from the thawed parents and attributes array.
         /* TODO compare elements */
         if (!nold) {
             for (i = 0; i < n; ++i) {
-                PMC *parent_class = VTABLE_get_pmc_keyed_int(INTERP, parents, i);
+                PMC *parent_class;
+                parent_class = VTABLE_get_pmc_keyed_int(INTERP, parents, i);
                 if (!PObj_is_class_TEST(parent_class)) {
                     assert(!parent_not_class);
                     parent_not_class++;
