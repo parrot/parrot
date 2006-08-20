@@ -126,7 +126,8 @@ imcc_version(Interp *interp)
     }
     printf("Copyright (C) 2001-2006, The Perl Foundation.\n\
 \n\
-Parrot may be copied only under the terms of either the Artistic License or the\n\
+Parrot may be copied only under the terms of either the Artistic License or the\
+\n\
 GNU General Public License, which may be found in the Parrot source kit.\n\
 \n\
 This program is distributed in the hope that it will be useful,\n\
@@ -523,7 +524,8 @@ main(int argc, char * argv[])
         strcpy(optimizer_opt, "0");
         IMCC_INFO(interp)->optimizer_level = 0;
 #else
-        /* won't even make with this: something with Data::Dumper and set_i_p_i*/
+        /* won't even make with this: something with Data::Dumper and
+         * set_i_p_i*/
         strcpy(optimizer_opt, "1");
         IMCC_INFO(interp)->optimizer_level = OPT_PRE;
 #endif

@@ -118,7 +118,7 @@ op_fullname(char * dest, const char * name, SymReg * args[],
             PIO_eprintf(NULL, " (key)%s", args[i]->name);
 #endif
             *dest++ = 'k';
-            if (args[i]->set == 'S' || args[i]->set == 'N' || args[i]->set == 'K') {
+            if (args[i]->set=='S' || args[i]->set=='N' || args[i]->set=='K') {
                 *dest++ = 'c';
                 continue;
             }
@@ -444,8 +444,9 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     }
     if (op < 0) {
         IMCC_fataly(interpreter, E_SyntaxError,
-            "The opcode '%s' (%s<%d>) was not found. Check the type and number of the arguments",
-            fullname, name, n);
+                    "The opcode '%s' (%s<%d>) was not found. "
+                    "Check the type and number of the arguments",
+                    fullname, name, n);
     }
     op_info = &interpreter->op_info_table[op];
 
@@ -862,7 +863,9 @@ register_compilers(Parrot_Interp interp)
     Parrot_compreg(interp, const_string(interp, "PIR"), imcc_compile_pir_ex);
     /* It looks like this isn't used anywhere yet */
     /* TODO: return a Eval PMc, instead of a packfile */
-    /* Parrot_compreg(interp, const_string(interp, "FILE"), imcc_compile_file ); */
+    /* Parrot_compreg(interp,
+                      const_string(interp, "FILE"), 
+                      imcc_compile_file ); */
 }
 
 static int
@@ -1081,14 +1084,16 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
                 nreg[1] = r[i+1];
                 nreg[2] = preg[n];
                 /* set p_k px */
-                ins = INS(interpreter, unit, str_dup("set"), 0, nreg, 3,KEY_BIT(1),0);
+                ins = INS(interpreter, unit, str_dup("set"),
+                          0, nreg, 3,KEY_BIT(1),0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 nreg[2] = r[i+1];
                 /* set py|z p_k */
-                INS(interpreter, unit, str_dup("set"), 0, nreg, 3, KEY_BIT(2), 1);
+                INS(interpreter, unit, str_dup("set"),
+                    0, nreg, 3, KEY_BIT(2), 1);
             }
             i++;
         }
@@ -1098,13 +1103,15 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
                 nreg[0] = r[i];
                 nreg[1] = preg[n];
                 /* set n, px */
-                ins = INS(interpreter, unit, str_dup("set"), 0, nreg, 2, 0, 0);
+                ins = INS(interpreter, unit, str_dup("set"),
+                          0, nreg, 2, 0, 0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 /* set px, n */
-                INS(interpreter, unit, str_dup("set"), 0, nreg, 2, 0, 1);
+                INS(interpreter, unit, str_dup("set"),
+                    0, nreg, 2, 0, 1);
             }
         }
     }

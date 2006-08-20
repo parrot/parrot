@@ -969,7 +969,8 @@ natural_preheader (IMC_Unit * unit, Loop_info* loop_info)
          edge; edge = edge->pred_next) {
         if (!set_contains(loop_info->loop, edge->from->index)) {
             if (preheader == -1 && 
-                unit->bb_list[edge->from->index]->succ_list->to->index == loop_info->header &&
+                unit->bb_list[edge->from->index]->succ_list->to->index 
+                == loop_info->header &&
                 !unit->bb_list[edge->from->index]->succ_list->succ_next)
             {
                 preheader = unit->bb_list[edge->from->index]->index;
@@ -1034,7 +1035,9 @@ mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
     exits = set_make(unit->n_basic_blocks);
     for (i = 1; i < unit->n_basic_blocks; i++) {
         if (set_contains(loop, i)) {
-            for (edge = unit->bb_list[i]->succ_list; edge; edge = edge->succ_next) {
+            for (edge = unit->bb_list[i]->succ_list; edge; 
+                 edge = edge->succ_next) 
+            {
                 if (!set_contains(loop, edge->to->index)) {
                     set_add(exits, i);
                 }
