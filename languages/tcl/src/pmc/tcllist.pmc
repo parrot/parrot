@@ -24,7 +24,7 @@ These are the vtable functions for the TclList base class
 
 static INTVAL dynpmc_TclInt;
 
-pmclass TclFloat    
+pmclass TclList
     dynpmc
     need_ext
     extends ResizablePMCArray
