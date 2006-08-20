@@ -86,7 +86,7 @@ $(C_BUILTIN)/package.pir \
 $(R_BUILTIN)/proc.pir \
 $(R_BUILTIN)/puts.pir \
 $(R_BUILTIN)/regexp.pir \
-$(C_BUILTIN)/regsub.pir \
+$(R_BUILTIN)/regsub.pir \
 $(R_BUILTIN)/rename.pir \
 $(C_BUILTIN)/return.pir \
 $(R_BUILTIN)/return.pir \
