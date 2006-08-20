@@ -46,7 +46,8 @@ print <<END;
  <!DOCTYPE language SYSTEM "language.dtd">
  <!-- Created automatically by kate_syntax.pl  $date -->
 
-<language name="IMCC" version="0.2" kateversion="2.0" section="Sources" extensions="*.imc;*.pasm" mimetype="">
+<language name="IMCC" version="0.2" kateversion="2.0"
+          section="Sources" extensions="*.imc;*.pasm" mimetype="">
 
   <highlighting>
 
@@ -117,10 +118,12 @@ print <<END;
       <context name="default" attribute="Normal Text" lineEndContext="#stay">
           <RegExpr attribute="Label" context="#stay" String="[_\\w]+\\:" />
           <keyword attribute="Op" context="#stay" String="ops" />
-          <keyword attribute="Special Directive" context="#stay" String="special_directives" />
+          <keyword attribute="Special Directive" context="#stay"
+                   String="special_directives" />
           <keyword attribute="Type" context="#stay" String="types" />
           <RegExpr attribute="Comment" context="#stay" String="#.*\$" />
-          <RegExpr attribute="Comment" context="pod" String="^\\=($pod_start_rx).*" />
+          <RegExpr attribute="Comment" context="pod"
+                   String="^\\=($pod_start_rx).*" />
           <HlCOct attribute="Octal" context="#stay" />
           <HlCHex attribute="Hex" context="#stay" />
           <Float attribute="Float" context="#stay" />
@@ -128,11 +131,15 @@ print <<END;
 END
 
 print <<END;
-          <RegExpr attribute="Register" context="#stay" String="[INSP](\\d|[12]\\d|3[01])" />
-          <RegExpr attribute="TempRegister" context="#stay" String="\\\$[INSP]\\d+" />
+          <RegExpr attribute="Register" context="#stay"
+                   String="[INSP](\\d|[12]\\d|3[01])" />
+          <RegExpr attribute="TempRegister" context="#stay"
+                   String="\\\$[INSP]\\d+" />
           <RegExpr attribute="String" context="string" String="'" />
-          <RegExpr attribute="String Interp" context="string_interp" String="&quot;" />
-          <RegExpr attribute="Identifier" context="#stay" String="[a-zA-Z_][\\w_]*" />
+          <RegExpr attribute="String Interp" context="string_interp"
+                   String="&quot;" />
+          <RegExpr attribute="Identifier" context="#stay"
+                   String="[a-zA-Z_][\\w_]*" />
       </context>
 
 END
@@ -154,7 +161,8 @@ print <<END;
 END
 
 print <<END;
-      <context name="string_interp" attribute="String Interp" lineEndContext="#pop">
+      <context name="string_interp" attribute="String Interp"
+               lineEndContext="#pop">
           <HlCStringChar attribute="SpChar" context="#stay" />
           <RegExpr attribute="String Interp" context="#pop" String="&quot;" />
       </context>
@@ -166,7 +174,8 @@ END
 print <<END;
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal" />
-      <itemData name="Op" defStyleNum="dsNormal" color="#000080" selColor="#ffffff" bold="0" italic="0" />
+      <itemData name="Op" defStyleNum="dsNormal" color="#000080"
+                selColor="#ffffff" bold="0" italic="0" />
       <itemData name="Special Directive" defStyleNum="dsKeyword" />
       <itemData name="Type" defStyleNum="dsDataType" />
       <itemData name="Comment" defStyleNum="dsComment" />
@@ -177,9 +186,11 @@ print <<END;
       <itemData name="Label" defStyleNum="dsKeyword" />
       <itemData name="Register" defStyleNum="dsDecVal" />
       <itemData name="TempRegister" defStyleNum="dsDecVal" />
-      <itemData name="String" defStyleNum="dsString" color="#FF6C6C" selColor="#FF6C6C" bold="0" italic="0" />
+      <itemData name="String" defStyleNum="dsString" color="#FF6C6C"
+                selColor="#FF6C6C" bold="0" italic="0" />
       <itemData name="String Interp" defStyleNum="dsString" />
-      <itemData name="Identifier" defStyleNum="dsDataType" color="#C00000" selColor="#C00000" bold="0" italic="0" />
+      <itemData name="Identifier" defStyleNum="dsDataType" color="#C00000"
+                selColor="#C00000" bold="0" italic="0" />
       <itemData name="SpChar" defStyleNum="dsChar" />
     </itemDatas>
 

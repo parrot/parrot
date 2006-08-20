@@ -212,7 +212,8 @@ usage(void)
 #ifdef HAVE_COMPUTED_GOTO
     const char* cgoto_info = "Deactivate computed goto";
 #else
-    const char* cgoto_info = "Deactivate computed goto (not available on this platform)";
+    const char* cgoto_info =
+        "Deactivate computed goto (not available on this platform)";
 #endif
 
     fprintf(stderr,
@@ -258,7 +259,8 @@ version(void)
             PARROT_ARCHNAME "\n\
 Copyright (C) 2001-2003, The Perl Foundation.\n\
 \n\
-Parrot may be copied only under the terms of either the Artistic License or the\n\
+Parrot may be copied only under the terms of either the Artistic License or the\
+\n\
 GNU General Public License, which may be found in the Parrot source kit.\n\
 \n\
 This program is distributed in the hope that it will be useful,\n\
