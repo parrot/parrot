@@ -58,7 +58,8 @@ enter_nci_method(Parrot_Interp interpreter, int type,
 /*
 
 =item C<void
-Parrot_mark_method_writes(Parrot_Interp interpreter, int type, const char *name)>
+Parrot_mark_method_writes(Parrot_Interp interpreter,
+                          int type, const char *name)>
 
 Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
 
@@ -66,20 +67,22 @@ Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
 
 */
 
-void
-Parrot_mark_method_writes(Parrot_Interp interpreter, int type, const char *name) {
+void Parrot_mark_method_writes(Parrot_Interp interpreter,
+                               int type, const char *name) {
     STRING *const str_name = const_string(interpreter, name);
     PMC *const pmc_true = pmc_new(interpreter, enum_class_Integer);
     PMC *const method = VTABLE_get_pmc_keyed_str(
         interpreter, interpreter->vtables[type]->_namespace, str_name);
     VTABLE_set_integer_native(interpreter, pmc_true, 1);
-    VTABLE_setprop(interpreter, method, const_string(interpreter, "write"), pmc_true);
+    VTABLE_setprop(interpreter, method, const_string(interpreter, "write"), 
+                   pmc_true);
 }
 
 /*
 
 =item C<void
-Parrot_compreg(Parrot_Interp interpreter, STRING *type, Parrot_compiler_func_t func);>
+Parrot_compreg(Parrot_Interp interpreter, STRING *type,
+               Parrot_compiler_func_t func);>
 
 Register a parser/compiler function.
 
@@ -87,8 +90,8 @@ Register a parser/compiler function.
 
 */
 
-void
-Parrot_compreg(Parrot_Interp interpreter, STRING *type, Parrot_compiler_func_t func)
+void Parrot_compreg(Parrot_Interp interpreter, STRING *type,
+                    Parrot_compiler_func_t func)
 {
     PMC *hash, *nci;
     PMC* iglobals = interpreter->iglobals;

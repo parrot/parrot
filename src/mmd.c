@@ -304,7 +304,9 @@ mmd_dispatch_p_pip(Interp *interpreter,
     left_type = left->vtable->base_type;
     
     real_function =
-        (mmd_f_p_pip)get_mmd_dispatch_type(interpreter, func_nr, left_type, enum_type_INTVAL, &is_pmc);
+        (mmd_f_p_pip)get_mmd_dispatch_type(interpreter, func_nr, 
+                                           left_type, enum_type_INTVAL, 
+                                           &is_pmc);
 
     if (is_pmc) {
         PMC * const sub = (PMC*)real_function;
@@ -902,7 +904,8 @@ wrap it into an NCI function to get the required function arguments passed.
 */
 
 PMC *
-mmd_vtfind(Parrot_Interp interpreter, INTVAL func_nr, INTVAL left, INTVAL right) {
+mmd_vtfind(Parrot_Interp interpreter, INTVAL func_nr, 
+           INTVAL left, INTVAL right) {
     int is_pmc;
     PMC *f;
     funcptr_t func = get_mmd_dispatch_type(interpreter,
@@ -934,7 +937,9 @@ static void mmd_sort_candidates(Interp *, PMC *arg_tuple, PMC *cl);
 
 /*
 
-=item C<PMC *Parrot_MMD_search_default_inline(Interp *, STRING *meth, STRING *signature, ...)>
+=item C<PMC *Parrot_MMD_search_default_inline(Interp *, 
+                                              STRING *meth, 
+                                              STRING *signature, ...)>
 
 Default implementation of MMD lookup. The signature contains the letters
 "INSP" for the argument types. B<PMC> arguments are given in the function call.
@@ -1251,7 +1256,9 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
 
 /*
 
-=item C<static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl, INTVAL start_at_parent)>
+=item C<static void mmd_search_classes(Interp *, STRING *meth, 
+                                       PMC *arg_tuple, PMC *cl,
+                                       INTVAL start_at_parent)>
 
 Search all the classes in all MultiSubs of the candidates C<cl> and return
 a list of all candidates. C<start_at_parent> is 0 to start at the class itself
@@ -1575,7 +1582,8 @@ mmd_is_hidden(Interp *interpreter, PMC *multi, PMC *cl)
 
 /*
 
-=item C<static int mmd_maybe_candidate(Interp *, PMC *pmc, PMC *arg_tuple, PMC *cl)>
+=item C<static int mmd_maybe_candidate(Interp *, PMC *pmc, 
+                                       PMC *arg_tuple, PMC *cl)>
 
 If the candidate C<pmc> is a Sub PMC, push it on the candidate list and
 return TRUE to stop further search.
@@ -1623,7 +1631,8 @@ mmd_maybe_candidate(Interp *interpreter, PMC *pmc, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static int mmd_search_lexical(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+=item C<static int mmd_search_lexical(Interp *, STRING *meth, 
+                                      PMC *arg_tuple, PMC *cl)>
 
 Search the current lexical pad for matching candidates. Return TRUE if the
 MMD search should stop.
@@ -1641,10 +1650,11 @@ mmd_search_lexical(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static int mmd_search_package(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+=item C<static int mmd_search_package(Interp *, STRING *meth,
+                                      PMC *arg_tuple, PMC *cl)>
 
-Search the current package namespace for matching candidates. Return TRUE if
-the MMD search should stop.
+Search the current package namespace for matching candidates. Return
+TRUE if the MMD search should stop.
 
 =cut
 
@@ -1665,7 +1675,8 @@ mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static int mmd_search_global(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+=item C<static int mmd_search_global(Interp *, STRING *meth, 
+                                     PMC *arg_tuple, PMC *cl)>
 
 Search the global namespace for matching candidates. Return TRUE if
 the MMD search should stop.
@@ -1689,7 +1700,8 @@ mmd_search_global(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static void mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+=item C<static void mmd_search_builtin(Interp *, STRING *meth, 
+                                       PMC *arg_tuple, PMC *cl)>
 
 Search the builtin namespace for matching candidates. This is the last
 search in all the namespaces.
@@ -1705,7 +1717,8 @@ mmd_get_ns(Interp *interpreter)
     PMC *ns;
 
     ns_name = CONST_STRING(interpreter, "__parrot_core");
-    ns = Parrot_get_namespace_keyed_str(interpreter, interpreter->root_namespace, ns_name);
+    ns = Parrot_get_namespace_keyed_str(interpreter, 
+                                        interpreter->root_namespace, ns_name);
     return ns;
 }
 
@@ -1716,7 +1729,8 @@ mmd_make_ns(Interp *interpreter)
     PMC *ns;
 
     ns_name = CONST_STRING(interpreter, "__parrot_core");
-    ns = Parrot_make_namespace_keyed_str(interpreter, interpreter->root_namespace, ns_name);
+    ns = Parrot_make_namespace_keyed_str(interpreter, 
+                                         interpreter->root_namespace, ns_name);
     return ns;
 }
 

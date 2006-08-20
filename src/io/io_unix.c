@@ -64,7 +64,8 @@ static PIOOFF_T  PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 static INTVAL    PIO_unix_isatty(PIOHANDLE fd);
-static ParrotIO * PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char*cmd, int flags);
+static ParrotIO * PIO_unix_pipe(theINTERP, ParrotIOLayer *l,
+                                const char*cmd, int flags);
 
 
 

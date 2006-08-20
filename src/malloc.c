@@ -268,10 +268,12 @@ static int slrelease(int *sl);
 static long getpagesize(void);
 static long getregionsize(void);
 static void *sbrk(long size);
-static void *mmap(void *ptr, long size, long prot, long type, long handle, long arg);
+static void *mmap(void *ptr, long size, long prot, long type, 
+                  long handle, long arg);
 static long munmap(void *ptr, long size);
 
-static void vminfo (unsigned long*free, unsigned long*reserved, unsigned long*committed);
+static void vminfo (unsigned long*free, unsigned long*reserved, 
+                    unsigned long*committed);
 static int cpuinfo (int whole, unsigned long*kernel, unsigned long*user);
 
 #endif
@@ -632,7 +634,8 @@ Void_t* memcpy();
 
 
 #ifdef LACKS_UNISTD_H
-#if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__) && !defined(__GNUC__)
+#if !defined(__FreeBSD__) && !defined(__OpenBSD__) &&
+    !defined(__NetBSD__) && !defined(__GNUC__)
 #if __STD_C
 extern Void_t*     sbrk(ptrdiff_t);
 #else
@@ -4398,7 +4401,9 @@ void cFREe(mem) Void_t *mem;
 #if __STD_C
 Void_t** iCALLOc(size_t n_elements, size_t elem_size, Void_t* chunks[])
 #else
-Void_t** iCALLOc(n_elements, elem_size, chunks) size_t n_elements; size_t elem_size; Void_t* chunks[];
+Void_t** iCALLOc(n_elements, elem_size, chunks) size_t n_elements; 
+                                                size_t elem_size;
+                                                Void_t* chunks[];
 #endif
 {
   size_t sz = elem_size; /* serves as 1-element array */
@@ -4413,7 +4418,9 @@ Void_t** iCALLOc(n_elements, elem_size, chunks) size_t n_elements; size_t elem_s
 #if __STD_C
 Void_t** iCOMALLOc(size_t n_elements, size_t sizes[], Void_t* chunks[])
 #else
-Void_t** iCOMALLOc(n_elements, sizes, chunks) size_t n_elements; size_t sizes[]; Void_t* chunks[];
+Void_t** iCOMALLOc(n_elements, sizes, chunks) size_t n_elements; 
+                                              size_t sizes[]; 
+Void_t* chunks[];
 #endif
 {
   return iALLOc(n_elements, sizes, 0, chunks);
@@ -4437,7 +4444,10 @@ static Void_t** iALLOc(size_t n_elements,
                        int opts,
                        Void_t* chunks[])
 #else
-static Void_t** iALLOc(n_elements, sizes, opts, chunks) size_t n_elements; size_t* sizes; int opts; Void_t* chunks[];
+static Void_t** iALLOc(n_elements, sizes, opts, chunks) size_t n_elements; 
+                                                        size_t* sizes; 
+                                                        int opts; 
+                                                        Void_t* chunks[];
 #endif
 {
   mstate av = get_malloc_state();
@@ -4949,7 +4959,9 @@ int mALLOPt(param_number, value) int param_number; int value;
 
 /* Wait for spin lock */
 static int slwait (int *sl) {
-    while (InterlockedCompareExchange ((void **) sl, (void *) 1, (void *) 0) != 0) 
+    while (InterlockedCompareExchange ((void **) sl, 
+                                       (void *) 1,
+                                       (void *) 0) != 0) 
 	    Sleep (0);
     return 0;
 }
@@ -4997,8 +5009,10 @@ typedef struct _region_list_entry {
 } region_list_entry;
 
 /* Allocate and link a region entry in the region list */
-static int region_list_append (region_list_entry **last, void *base_reserved, long reserve_size) {
-    region_list_entry *next = HeapAlloc (GetProcessHeap (), 0, sizeof (region_list_entry));
+static int region_list_append (region_list_entry **last, 
+                               void *base_reserved, long reserve_size) {
+    region_list_entry *next = HeapAlloc (GetProcessHeap (), 0, 
+                                         sizeof (region_list_entry));
     if (! next)
         return FALSE;
     next->top_allocated = (char *) base_reserved;
@@ -5054,9 +5068,11 @@ static void *sbrk (long size) {
     }
     /* Assert invariants */
     assert (g_last);
-    assert ((char *) g_last->top_reserved - g_last->reserve_size <= (char *) g_last->top_allocated &&
+    assert ((char *) g_last->top_reserved - g_last->reserve_size 
+            <= (char *) g_last->top_allocated &&
             g_last->top_allocated <= g_last->top_committed);
-    assert ((char *) g_last->top_reserved - g_last->reserve_size <= (char *) g_last->top_committed &&
+    assert ((char *) g_last->top_reserved - g_last->reserve_size 
+            <= (char *) g_last->top_committed &&
             g_last->top_committed <= g_last->top_reserved &&
             (unsigned) g_last->top_committed % g_pagesize == 0);
     assert ((unsigned) g_last->top_reserved % g_regionsize == 0);
@@ -5066,34 +5082,42 @@ static void *sbrk (long size) {
         /* Allocation size is the requested size */
         long allocate_size = size;
         /* Compute the size to commit */
-        long to_commit = (char *) g_last->top_allocated + allocate_size - (char *) g_last->top_committed;
+        long to_commit = (char *) g_last->top_allocated + allocate_size -
+            (char *) g_last->top_committed;
         /* Do we reach the commit limit? */
         if (to_commit > 0) {
             /* Round size to commit */
             long commit_size = CEIL (to_commit, g_my_pagesize);
             /* Compute the size to reserve */
-            long to_reserve = (char *) g_last->top_committed + commit_size - (char *) g_last->top_reserved;
+            long to_reserve = (char *) g_last->top_committed + commit_size - 
+                (char *) g_last->top_reserved;
             /* Do we reach the reserve limit? */
             if (to_reserve > 0) {
                 /* Compute the remaining size to commit in the current region */
-                long remaining_commit_size = (char *) g_last->top_reserved - (char *) g_last->top_committed;
+                long remaining_commit_size = (char *) g_last->top_reserved - 
+                    (char *) g_last->top_committed;
                 if (remaining_commit_size > 0) {
                     /* Assert preconditions */
                     assert ((unsigned) g_last->top_committed % g_pagesize == 0);
-                    assert (0 < remaining_commit_size && remaining_commit_size % g_pagesize == 0); {
+                    assert (0 < remaining_commit_size &&
+                            remaining_commit_size % g_pagesize == 0); {
                         /* Commit this */
-                        void *base_committed = VirtualAlloc (g_last->top_committed, remaining_commit_size,
-							                                 MEM_COMMIT, PAGE_READWRITE);
+                        void *base_committed = 
+                            VirtualAlloc(g_last->top_committed,
+                                         remaining_commit_size,
+                                         MEM_COMMIT, PAGE_READWRITE);
                         /* Check returned pointer for consistency */
                         if (base_committed != g_last->top_committed)
                             goto sbrk_exit;
                         /* Assert postconditions */
                         assert ((unsigned) base_committed % g_pagesize == 0);
 #ifdef TRACE
-                        PIO_printf (NULL, "Commit %p %d\n", base_committed, remaining_commit_size);
+                        PIO_printf (NULL, "Commit %p %d\n", base_committed, 
+                                    remaining_commit_size);
 #endif
                         /* Adjust the regions commit top */
-                        g_last->top_committed = (char *) base_committed + remaining_commit_size;
+                        g_last->top_committed = (char *) base_committed + 
+                            remaining_commit_size;
                     }
                 } {
                     /* Now we are going to search and reserve. */
@@ -5110,77 +5134,106 @@ static void *sbrk (long size) {
                         /* Start with the current region's top */
                         memory_info.BaseAddress = g_last->top_reserved;
                         /* Assert preconditions */
-                        assert ((unsigned) memory_info.BaseAddress % g_pagesize == 0);
-                        assert (0 < reserve_size && reserve_size % g_regionsize == 0);
-                        while (VirtualQuery (memory_info.BaseAddress, &memory_info, sizeof (memory_info))) {
+                        assert ((unsigned) memory_info.BaseAddress % 
+                                g_pagesize == 0);
+                        assert (0 < reserve_size && reserve_size % 
+                                g_regionsize == 0);
+                        while (VirtualQuery (memory_info.BaseAddress, 
+                                             &memory_info, 
+                                             sizeof (memory_info))) {
                             /* Assert postconditions */
-                            assert ((unsigned) memory_info.BaseAddress % g_pagesize == 0);
+                            assert ((unsigned) memory_info.BaseAddress %
+                                    g_pagesize == 0);
 #ifdef TRACE
-                            PIO_printf (NULL, "Query %p %d %s\n", memory_info.BaseAddress, memory_info.RegionSize, 
+                            PIO_printf (NULL, "Query %p %d %s\n", 
+                                        memory_info.BaseAddress, 
+                                        memory_info.RegionSize, 
                                     memory_info.State == MEM_FREE ? "FREE": 
-                                    (memory_info.State == MEM_RESERVE ? "RESERVED":
-                                     (memory_info.State == MEM_COMMIT ? "COMMITTED": "?")));
+                                    (memory_info.State == MEM_RESERVE ? 
+                                     "RESERVED":
+                                     (memory_info.State == MEM_COMMIT ? 
+                                      "COMMITTED": "?")));
 #endif
-                            /* Region is free, well aligned and big enough: we are done */
+                            /* Region is free, well aligned and big
+                             * enough: we are done */
                             if (memory_info.State == MEM_FREE &&
-                                (unsigned) memory_info.BaseAddress % g_regionsize == 0 &&
-                                memory_info.RegionSize >= (unsigned) reserve_size) {
+                                (unsigned) memory_info.BaseAddress % 
+                                g_regionsize == 0 
+                                &&
+                                memory_info.RegionSize >= (unsigned) 
+                                reserve_size) {
                                 found = TRUE;
                                 break;
                             }
                             /* From now on we can't get contiguous memory! */
                             contiguous = FALSE;
                             /* Recompute size to reserve */
-                            reserve_size = CEIL (allocate_size, g_my_regionsize);
-                            memory_info.BaseAddress = (char *) memory_info.BaseAddress + memory_info.RegionSize;
+                            reserve_size = CEIL (allocate_size,
+                                                 g_my_regionsize);
+                            memory_info.BaseAddress = 
+                                (char *) memory_info.BaseAddress + 
+                                memory_info.RegionSize;
                             /* Assert preconditions */
-                            assert ((unsigned) memory_info.BaseAddress % g_pagesize == 0);
-                            assert (0 < reserve_size && reserve_size % g_regionsize == 0);
+                            assert ((unsigned) memory_info.BaseAddress 
+                                    % g_pagesize == 0);
+                            assert (0 < reserve_size && reserve_size 
+                                    % g_regionsize == 0);
                         }
                         /* Search failed? */
                         if (! found) 
                             goto sbrk_exit;
                         /* Assert preconditions */
-                        assert ((unsigned) memory_info.BaseAddress % g_regionsize == 0);
-                        assert (0 < reserve_size && reserve_size % g_regionsize == 0);
+                        assert ((unsigned) memory_info.BaseAddress 
+                                % g_regionsize == 0);
+                        assert (0 < reserve_size && reserve_size 
+                                % g_regionsize == 0);
                         /* Try to reserve this */
-                        base_reserved = VirtualAlloc (memory_info.BaseAddress, reserve_size, 
-					                                  MEM_RESERVE, PAGE_NOACCESS);
+                        base_reserved = VirtualAlloc (memory_info.BaseAddress,
+                                                      reserve_size, 
+                                                      MEM_RESERVE, 
+                                                      PAGE_NOACCESS);
                         if (! base_reserved) {
                             int rc = GetLastError ();
                             if (rc != ERROR_INVALID_ADDRESS) 
                                 goto sbrk_exit;
                         }
-                        /* A null pointer signals (hopefully) a race condition with another thread. */
+                        /* A null pointer signals (hopefully) a race
+                         * condition with another thread. */
                         /* In this case, we try again. */
                     } while (! base_reserved);
                     /* Check returned pointer for consistency */
-                    if (memory_info.BaseAddress && base_reserved != memory_info.BaseAddress)
+                    if (memory_info.BaseAddress && 
+                        base_reserved != memory_info.BaseAddress)
                         goto sbrk_exit;
                     /* Assert postconditions */
                     assert ((unsigned) base_reserved % g_regionsize == 0);
 #ifdef TRACE
-                    PIO_printf (NULL, "Reserve %p %d\n", base_reserved, reserve_size);
+                    PIO_printf (NULL, "Reserve %p %d\n", base_reserved, 
+                                reserve_size);
 #endif
                     /* Did we get contiguous memory? */
                     if (contiguous) {
-                        long start_size = (char *) g_last->top_committed - (char *) g_last->top_allocated;
+                        long start_size = (char *) g_last->top_committed - 
+                            (char *) g_last->top_allocated;
                         /* Adjust allocation size */
                         allocate_size -= start_size;
                         /* Adjust the regions allocation top */
                         g_last->top_allocated = g_last->top_committed;
                         /* Recompute the size to commit */
-                        to_commit = (char *) g_last->top_allocated + allocate_size - (char *) g_last->top_committed;
+                        to_commit = (char *) g_last->top_allocated + 
+                            allocate_size - (char *) g_last->top_committed;
                         /* Round size to commit */
                         commit_size = CEIL (to_commit, g_my_pagesize);
                     } 
                     /* Append the new region to the list */
-                    if (! region_list_append (&g_last, base_reserved, reserve_size))
+                    if (! region_list_append (&g_last, base_reserved, 
+                                              reserve_size))
                         goto sbrk_exit;
                     /* Didn't we get contiguous memory? */
                     if (! contiguous) {
                         /* Recompute the size to commit */
-                        to_commit = (char *) g_last->top_allocated + allocate_size - (char *) g_last->top_committed;
+                        to_commit = (char *) g_last->top_allocated + 
+                            allocate_size - (char *) g_last->top_committed;
                         /* Round size to commit */
                         commit_size = CEIL (to_commit, g_my_pagesize);
                     }
@@ -5190,15 +5243,17 @@ static void *sbrk (long size) {
             assert ((unsigned) g_last->top_committed % g_pagesize == 0);
             assert (0 < commit_size && commit_size % g_pagesize == 0); {
                 /* Commit this */
-                void *base_committed = VirtualAlloc (g_last->top_committed, commit_size, 
-				    			                     MEM_COMMIT, PAGE_READWRITE);
+                void *base_committed = VirtualAlloc (g_last->top_committed, 
+                                                     commit_size, 
+                                                     MEM_COMMIT, 
+                                                     PAGE_READWRITE);
                 /* Check returned pointer for consistency */
                 if (base_committed != g_last->top_committed)
                     goto sbrk_exit;
                 /* Assert postconditions */
                 assert ((unsigned) base_committed % g_pagesize == 0);
 #ifdef TRACE
-                PIO_printf (NULL, "Commit %p %d\n", base_committed, commit_size);
+                PIO_printf(NULL, "Commit %p %d\n", base_committed, commit_size);
 #endif
                 /* Adjust the regions commit top */
                 g_last->top_committed = (char *) base_committed + commit_size;
@@ -5211,7 +5266,8 @@ static void *sbrk (long size) {
     } else if (size < 0) {
         long deallocate_size = - size;
         /* As long as we have a region to release */
-        while ((char *) g_last->top_allocated - deallocate_size < (char *) g_last->top_reserved - g_last->reserve_size) {
+        while ((char *) g_last->top_allocated - deallocate_size 
+               < (char *) g_last->top_reserved - g_last->reserve_size) {
             /* Get the size to release */
             long release_size = g_last->reserve_size;
             /* Get the base address */
@@ -5226,57 +5282,67 @@ static void *sbrk (long size) {
                 if (! rc)
                     goto sbrk_exit;
 #ifdef TRACE
-                PIO_printf (NULL, "Release %p %d\n", base_reserved, release_size);
+                PIO_printf(NULL, "Release %p %d\n", base_reserved,release_size);
 #endif
             }
             /* Adjust deallocation size */
-            deallocate_size -= (char *) g_last->top_allocated - (char *) base_reserved;
+            deallocate_size -=
+                (char *) g_last->top_allocated - (char *) base_reserved;
             /* Remove the old region from the list */
             if (! region_list_remove (&g_last))
                 goto sbrk_exit;
         } {
             /* Compute the size to decommit */
-            long to_decommit = (char *) g_last->top_committed - ((char *) g_last->top_allocated - deallocate_size);
+            long to_decommit = (char *) g_last->top_committed - 
+                ((char *) g_last->top_allocated - deallocate_size);
             if (to_decommit >= g_my_pagesize) {
                 /* Compute the size to decommit */
                 long decommit_size = FLOOR (to_decommit, g_my_pagesize);
                 /*  Compute the base address */
-                void *base_committed = (char *) g_last->top_committed - decommit_size;
+                void *base_committed = (char *) g_last->top_committed - 
+                    decommit_size;
                 /* Assert preconditions */
                 assert ((unsigned) base_committed % g_pagesize == 0);
                 assert (0 < decommit_size && decommit_size % g_pagesize == 0); {
                     /* Decommit this */
-                    int rc = VirtualFree ((char *) base_committed, decommit_size, 
-                                          MEM_DECOMMIT);
+                    int rc = VirtualFree((char *) base_committed, decommit_size,
+                                         MEM_DECOMMIT);
                     /* Check returned code for consistency */
                     if (! rc)
                         goto sbrk_exit;
 #ifdef TRACE
-                    PIO_printf (NULL, "Decommit %p %d\n", base_committed, decommit_size);
+                    PIO_printf (NULL, "Decommit %p %d\n", 
+                                base_committed, decommit_size);
 #endif
                 }
-                /* Adjust deallocation size and regions commit and allocate top */
-                deallocate_size -= (char *) g_last->top_allocated - (char *) base_committed;
+                /* Adjust deallocation size and regions commit and
+                 * allocate top */
+                deallocate_size -= (char *) g_last->top_allocated - 
+                    (char *) base_committed;
                 g_last->top_committed = base_committed;
                 g_last->top_allocated = base_committed;
             }
         }
         /* Adjust regions allocate top */
-        g_last->top_allocated = (char *) g_last->top_allocated - deallocate_size;
+        g_last->top_allocated = (char *)g_last->top_allocated - deallocate_size;
         /* Check for underflow */
-        if ((char *) g_last->top_reserved - g_last->reserve_size > (char *) g_last->top_allocated ||
+        if ((char *) g_last->top_reserved - g_last->reserve_size 
+            > (char *) g_last->top_allocated ||
             g_last->top_allocated > g_last->top_committed) {
             /* Adjust regions allocate top */
-            g_last->top_allocated = (char *) g_last->top_reserved - g_last->reserve_size;
+            g_last->top_allocated = (char *) g_last->top_reserved 
+                - g_last->reserve_size;
             goto sbrk_exit;
         }
         result = g_last->top_allocated;
     }
     /* Assert invariants */
     assert (g_last);
-    assert ((char *) g_last->top_reserved - g_last->reserve_size <= (char *) g_last->top_allocated &&
+    assert ((char *) g_last->top_reserved - g_last->reserve_size 
+            <= (char *) g_last->top_allocated &&
             g_last->top_allocated <= g_last->top_committed);
-    assert ((char *) g_last->top_reserved - g_last->reserve_size <= (char *) g_last->top_committed &&
+    assert ((char *) g_last->top_reserved - g_last->reserve_size 
+            <= (char *) g_last->top_committed &&
             g_last->top_committed <= g_last->top_reserved &&
             (unsigned) g_last->top_committed % g_pagesize == 0);
     assert ((unsigned) g_last->top_reserved % g_regionsize == 0);
@@ -5291,7 +5357,8 @@ sbrk_exit:
 }
 
 /* mmap for windows */
-static void *mmap (void *ptr, long size, long prot, long type, long handle, long arg) {
+static void *mmap (void *ptr, long size, long prot, long type, 
+                   long handle, long arg) {
     static long g_pagesize;
     static long g_regionsize;
 #ifdef TRACE
@@ -5365,11 +5432,13 @@ munmap_exit:
     return rc;
 }
 
-static void vminfo (CHUNK_SIZE_T  *free, CHUNK_SIZE_T  *reserved, CHUNK_SIZE_T  *committed) {
+static void vminfo (CHUNK_SIZE_T  *free, CHUNK_SIZE_T  *reserved, 
+                    CHUNK_SIZE_T  *committed) {
     MEMORY_BASIC_INFORMATION memory_info;
     memory_info.BaseAddress = 0;
     *free = *reserved = *committed = 0;
-    while (VirtualQuery (memory_info.BaseAddress, &memory_info, sizeof (memory_info))) {
+    while (VirtualQuery (memory_info.BaseAddress, &memory_info, 
+                         sizeof (memory_info))) {
         switch (memory_info.State) {
         case MEM_FREE:
             *free += memory_info.RegionSize;
@@ -5381,7 +5450,8 @@ static void vminfo (CHUNK_SIZE_T  *free, CHUNK_SIZE_T  *reserved, CHUNK_SIZE_T  
             *committed += memory_info.RegionSize;
             break;
         }
-        memory_info.BaseAddress = (char *) memory_info.BaseAddress + memory_info.RegionSize;
+        memory_info.BaseAddress = (char *) memory_info.BaseAddress + 
+            memory_info.RegionSize;
     }
 }
 

@@ -169,7 +169,8 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
      */
     ret = WSAStartup (2, &sockinfo);
     if (ret != 0) {
-        fprintf ( stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n", WSAGetLastError());
+        fprintf ( stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n",
+                  WSAGetLastError());
         return -4;
     }
 #endif
@@ -236,7 +237,8 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     /* Only files for now */
     flags |= PIO_F_FILE;
 
-    fd = CreateFile(spath, fAcc, fShare, NULL, fCreat, FILE_ATTRIBUTE_NORMAL, NULL);
+    fd = CreateFile(spath, fAcc, fShare, NULL, fCreat, 
+                    FILE_ATTRIBUTE_NORMAL, NULL);
     if (fd != INVALID_HANDLE_VALUE) {
         io = PIO_new(interpreter, type, flags, 0);
         io->fd = fd;
@@ -346,10 +348,13 @@ PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     /*
      * FlushFileBuffers won't work for console handles. From the MS help file:
      *
-     * Windows NT: The function fails if hFile is a handle to console output. That is because console output is not buffered.
-     * The function returns FALSE, and GetLastError returns ERROR_INVALID_HANDLE.
+     * Windows NT: The function fails if hFile is a handle to console
+     * output. That is because console output is not buffered.  The
+     * function returns FALSE, and GetLastError returns
+     * ERROR_INVALID_HANDLE.
      *
-     * Windows 9x: The function does nothing if hFile is a handle to console output. That is because console output is not buffered.
+     * Windows 9x: The function does nothing if hFile is a handle to
+     * console output. That is because console output is not buffered.
      * The function returns TRUE, but it does nothing.
      */
     return FlushFileBuffers(io->fd);
@@ -552,7 +557,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 }
 
 
-/*******************************************************************************************************/
+/****************************************************************************/
 
 #if PARROT_NET_DEVEL
 
@@ -604,10 +609,12 @@ PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
         io->remote.sin_port = sa.sin_port;
     }
 
-/*    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));*/
+    /*    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n",
+     *    io->fd, ntohs(io->remote.sin_port));*/
     if ((connect((SOCKET)io->fd, (struct sockaddr*)&io->remote,
                    sizeof(struct sockaddr))) != 0) {
-        PIO_eprintf(interpreter, "PIO_win32_connect: errno = %d\n", WSAGetLastError());
+        PIO_eprintf(interpreter, "PIO_win32_connect: errno = %d\n", 
+                    WSAGetLastError());
         return -1;
     }
 
@@ -753,8 +760,10 @@ PIO_win32_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
     io->local.sin_port = sa.sin_port;
     io->local.sin_family = AF_INET;
 
-    if ((bind((SOCKET)io->fd, (struct sockaddr *)&io->local, sizeof(struct sockaddr))) == -1) {
-        PIO_eprintf(interpreter, "PIO_win32_bind: errno = %d\n", WSAGetLastError());
+    if ((bind((SOCKET)io->fd, (struct sockaddr *)&io->local, 
+              sizeof(struct sockaddr))) == -1) {
+        PIO_eprintf(interpreter, "PIO_win32_bind: errno = %d\n",
+                    WSAGetLastError());
         return -1;
     }
 
@@ -805,7 +814,8 @@ PIO_win32_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
     newsize = sizeof (struct sockaddr);
 
-    newsock = accept((SOCKET)io->fd, (struct sockaddr *)&(newio->remote), &newsize);
+    newsock = accept((SOCKET)io->fd, (struct sockaddr *)&(newio->remote),
+                     &newsize);
     err_code = WSAGetLastError();
 
     if (err_code != 0) {
@@ -831,7 +841,7 @@ PIO_win32_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 #endif
 
 
-/************************************************************************************************************/
+/******************************************************************************/
 
 
 const ParrotIOLayerAPI pio_win32_layer_api = {

@@ -250,8 +250,8 @@ STRING *
 PIO_pop_layer_str(Interp *interpreter, PMC *pmc)
 {
     ParrotIOLayer * const layer = PIO_pop_layer(interpreter, pmc);
-    STRING * const ls = string_make(interpreter, layer->name, strlen(layer->name),
-            "iso-8859-1", 0);
+    STRING * const ls = string_make(interpreter, layer->name,
+                                    strlen(layer->name), "iso-8859-1", 0);
     mem_sys_free(layer);
     return ls;
 }

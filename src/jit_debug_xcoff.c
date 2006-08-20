@@ -8,7 +8,8 @@ src/jit_debug_xcoff.c - XCOFF stabs for JIT
 
 =head1 DESCRIPTION
 
-Write an XCOFF stabs file for JIT code. This file is based on F<src/jit_debug.c>.
+Write an XCOFF stabs file for JIT code. This file is based on
+F<src/jit_debug.c>.
 
 Stabs is a file format for information that describes a program to a
 debugger.

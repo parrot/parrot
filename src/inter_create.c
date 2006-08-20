@@ -190,7 +190,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     CONTEXT(interpreter->ctx)->user_stack = new_stack(interpreter, "User");
 
     /* And a control stack */
-    CONTEXT(interpreter->ctx)->control_stack = new_stack(interpreter, "Control");
+    CONTEXT(interpreter->ctx)->control_stack = new_stack(interpreter,
+                                                         "Control");
 
     /* clear context introspection vars */
     SET_NULL_P(CONTEXT(interpreter->ctx)->current_sub, PMC*);
@@ -364,7 +365,8 @@ Parrot_really_destroy(Interp *interpreter, int exit_code, void *arg)
 #if STM_PROFILE
         if (interpreter->parent_interpreter 
             && interpreter->thread_data->state & THREAD_STATE_JOINED)
-            Parrot_STM_merge_profile(interpreter->parent_interpreter, interpreter);
+            Parrot_STM_merge_profile(interpreter->parent_interpreter, 
+                                     interpreter);
 #endif
         Parrot_STM_destroy(interpreter);
     }

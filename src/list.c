@@ -46,9 +46,9 @@ better, what should be done.
 
 =back
 
-- list chunks don't have C<< ->start >> and C<< ->end >> fields. Instead the list has
-C<< ->start >>, which is start of first chunk, and C<< ->cap >>, the total usable
-capacity in the list.
+- list chunks don't have C<< ->start >> and C<< ->end >>
+fields. Instead the list has C<< ->start >>, which is start of first
+chunk, and C<< ->cap >>, the total usable capacity in the list.
 
 - number of items in chunks are not fixed, but there is a mode
 using same sized chunks
@@ -200,8 +200,8 @@ PARROT_API UINTVAL ld(UINTVAL x);
 static List_chunk *get_chunk(Interp *interpreter, List *list, UINTVAL *idx);
 static void split_chunk(Interp *interpreter, List *list,
         List_chunk *chunk, UINTVAL idx);
-static void
-  list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx);
+static void list_set(Interp *interpreter, List *list, void *item, INTVAL type,
+                     INTVAL idx);
 static void *list_item(Interp *interpreter, List *list, int type, INTVAL idx);
 static void list_append(Interp *interpreter, List *list, void *item,
         int type, UINTVAL idx);
@@ -278,10 +278,12 @@ list_dump(FILE *fp, List *list, INTVAL type)
                     switch (list->item_type) {
                     case enum_type_int:
                     case enum_type_short:
-                        printf("%d", (int)((int *) PObj_bufstart(&chunk->data))[i]);
+                        printf("%d", (int)((int *) 
+                                           PObj_bufstart(&chunk->data))[i]);
                         break;
                     case enum_type_char:
-                        printf("%c", (char)((char *) PObj_bufstart(&chunk->data))[i]);
+                        printf("%c", (char)((char *) 
+                                            PObj_bufstart(&chunk->data))[i]);
                         break;
                     }
                 }
@@ -418,7 +420,8 @@ rebuild_other(Interp *interpreter, List *list)
                         (char *) PObj_bufstart(&chunk->data),
                         (char *) PObj_bufstart(&chunk->data) +
                         (MAX_ITEMS - prev->items) * list->item_size,
-                        (chunk->items - (MAX_ITEMS - prev->items)) * list->item_size);
+                        (chunk->items - (MAX_ITEMS - prev->items))
+                                                        * list->item_size);
                 chunk->items = chunk->items - (MAX_ITEMS - prev->items);
                 prev->items = MAX_ITEMS;
             }
@@ -1089,7 +1092,8 @@ list_item(Interp *interpreter, List *list, int type, INTVAL idx)
 
     switch (type) {
     case enum_type_sized:
-        return (void *)&((char *) PObj_bufstart(&chunk->data))[idx * list->item_size];
+        return (void *)&((char *) 
+                         PObj_bufstart(&chunk->data))[idx * list->item_size];
         break;
     case enum_type_char:
         return (void *)&((char *) PObj_bufstart(&chunk->data))[idx];
@@ -1704,8 +1708,8 @@ list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
             new_chunk->next = rest;
             /* copy data over */
             mem_sys_memmove(
-                    (char *) PObj_bufstart(&rest->data),
-                    (char *) PObj_bufstart(&chunk->data) + idx * list->item_size,
+                    (char *)PObj_bufstart(&rest->data),
+                    (char *)PObj_bufstart(&chunk->data) + idx * list->item_size,
                     items * list->item_size);
         }
         else {

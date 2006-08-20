@@ -1381,7 +1381,8 @@ PIO_recv(theINTERP, PMC *pmc, STRING **buf)
 =item C<INTVAL
 PIO_send(theINTERP, PMC *pmc, STRING *buf)>
 
-Sends the message C<*buf> to the connected socket C<*pmc>.  Returns C<-1> if it cannot send the message.
+Sends the message C<*buf> to the connected socket C<*pmc>.  Returns
+C<-1> if it cannot send the message.
 
 =cut
 
@@ -1425,7 +1426,8 @@ PIO_connect(theINTERP, PMC *pmc, STRING *address)
 =item C<INTVAL
 PIO_bind(theINTERP, PMC *pmc, STRING *address)>
 
-Binds C<*pmc>'s socket to the local address and port specified by C<*address>.  Returns C<-1> on failure.
+Binds C<*pmc>'s socket to the local address and port specified by
+C<*address>.  Returns C<-1> on failure.
 
 =cut
 

@@ -31,11 +31,13 @@ static int next_arg(Interp *, struct call_state_1 *st);
 
 /*
 
-=item C<int Parrot_init_arg_nci(Interp *, struct call_state *st, const char *sig)>
+=item C<int Parrot_init_arg_nci(Interp *, 
+                                struct call_state *st, const char *sig)>
 
 Initialize the argument passing state C<call_state> for the given NCI signature.
 
-=item C<int Parrot_init_ret_nci(Interp *, struct call_state *st, const char *sig)>
+=item C<int Parrot_init_ret_nci(Interp *, 
+                                struct call_state *st, const char *sig)>
 
 Initialize the return value passing state C<call_state> for the given
 NCI signature.
@@ -1102,7 +1104,9 @@ init_call_stats(struct call_state *st)
 
 /*
 
-=item C<opcode_t * parrot_pass_args(Interp *, struct PackFile_ByteCode *dst_seg parrot_context_t *src_ctx, int what)>
+=item C<opcode_t * parrot_pass_args(Interp *, 
+                                    struct PackFile_ByteCode *dst_seg 
+                                    parrot_context_t *src_ctx, int what)>
 
 Main argument passing routine.
 

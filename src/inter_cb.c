@@ -199,7 +199,8 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *user_data)
 
     PMC *passed_interp;       /* the interp that originated the CB */
     PMC *passed_synchronous;  /* flagging synchronous execution */
-    int synchronous = 0;      /* cb is hitting this sub somewhen inmidst, or not */
+    int synchronous = 0;      /* cb is hitting this sub somewhen
+                               * inmidst, or not */
     STRING *sc;
     /*
      * 3) check interpreter ...
@@ -244,7 +245,8 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *user_data)
 /*
 
 =item C<void
-Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* external_data)>
+Parrot_run_callback(Parrot_Interp interpreter, 
+                    PMC* user_data, void* external_data)>
 
 Run a callback function. The PMC* user_data holds all
 necessary items in its properties.
@@ -254,7 +256,8 @@ necessary items in its properties.
 */
 
 void
-Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* external_data)
+Parrot_run_callback(Parrot_Interp interpreter, 
+                    PMC* user_data, void* external_data)
 {
     PMC *    signature;
     PMC *    sub;
@@ -328,7 +331,8 @@ case_I:
             param = string_from_cstring(interpreter, external_data, 0);
             break;
         default:
-            internal_exception(1, "unhandled signature char '%c' in run_cb", *p);
+            internal_exception(1, "unhandled signature char '%c' in run_cb", 
+                               *p);
     }
     pasm_sig[3] = '\0';
     Parrot_runops_fromc_args(interpreter, sub, pasm_sig,
