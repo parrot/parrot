@@ -201,6 +201,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
   t_tcl/lsetComp.t \
+  t_tcl/misc.t \
   t_tcl/namespace_old.t \
   t_tcl/package.t \
   t_tcl/platform.t \
@@ -234,9 +235,11 @@ UNIMPLEMENTED_TCL_TESTS = \
 # These tests parse but fail (or skip) every test.
 FAILING_TCL_TESTS = \
   t_tcl/case.t \
-  t_tcl/config.t
+  t_tcl/config.t \
+  t_tcl/init.t            
 
 # These tests parse but all are skipped due to harder [test] format.
+# interp skips all due to lack of [interp] command
 SKIPPED_TCL_TESTS = \
   t_tcl/assocd.t \
   t_tcl/chan.t \
@@ -250,6 +253,7 @@ SKIPPED_TCL_TESTS = \
   t_tcl/lset.t \
   t_tcl/notify.t \
   t_tcl/obj.t \
+  t_tcl/pkg.t \
   t_tcl/pid.t \
   t_tcl/registry.t \
   t_tcl/result.t \
@@ -267,8 +271,14 @@ SKIPPED_TCL_TESTS = \
 # too slow:
 #t_tcl/clock.t            t_tcl/expr.t 
 #
+# invalid command name "package"
+#t_tcl/safe.t             t_tcl/winPipe.t         t_tcl/unixInit.t
+#
 # invalid command name "update"
 #t_tcl/event.t
+#
+# invalid command name "cleanupTests" ( namespace import/tcltest combo issue)
+#t_tcl/parse.t            t_tcl/source.t
 #
 # src/string.c:420: failed assertion `a->encoding && a->charset && !PObj_on_free_list_TEST(a)'
 #t_tcl/compExpr.t         t_tcl/stringComp.t
@@ -276,8 +286,12 @@ SKIPPED_TCL_TESTS = \
 # bad option "-dictionary": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index,
 #t_tcl/lsearch.t
 #
+# bad option "command": must be args, body, cmdcount, commands, complete, 
+#t_tcl/interp.t
+#
 # invalid command name "cd" (odd, since it *is* defined)
-#t_tcl/cmdAH.t
+#t_tcl/cmdAH.t            t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
+#t_tcl/unixFile.t         t_tcl/unixFCmd          
 #
 # can't read "env(test)": no such element in array
 #t_tcl/env.t
@@ -290,14 +304,11 @@ SKIPPED_TCL_TESTS = \
 #
 # extra switch pattern with no body
 #t_tcl/binary.t          t_tcl/parseExpr.t        t_tcl/expr_old.t
-#t_tcl/util.t
+#t_tcl/util.t            t_tcl/scan.t             t_tcl/compExpr_old.t    
 #
 # No such file or directory
 #t_tcl/fileSystem.t      t_tcl/tcltest.t          t_tcl/fCmd.t
 #t_tcl/fileName.t
-#
-# Didn't know how to handle node:
-#t_tcl/compExpr_old.t    
 #
 # can't read "actual": variable is array
 #t_tcl/execute.t
@@ -305,26 +316,23 @@ SKIPPED_TCL_TESTS = \
 # can't delete "run": command doesn't exist
 #t_tcl/basic.t
 #
-# MMD function __cmp not found for types (21, 74)
-#t/tcl_format.t          t_tcl/scan.t
+# '-' is not a valid sprintf format
+#t_tcl/format.t
 #
-# syntax error, unexpected $undefined
-#t_tcl/async.t            t_tcl/unixNotfy.t
+# The opcode 'tcl_error' (tcl_error<0>) was not found
+#t_tcl/async.t
 #
-# XXX: bad call to open
-#t_tcl/winFile.t          t_tcl/winPipe.t        t_tcl/exec.t
+# bad option "exist": must be args, body, cmdcount, commands, complete ...
+#t_tcl/unixNotfy.t
 #
-# invalid command name "skip"
-#t_tcl/unixInit.t
+# syntax error in expression "[testConstraint nt] && $::tcl_platform(osVersion) >= 5.0": extra tokens at end of expression
+#t_tcl/winFile.t
+#
+# invalid command name "close"
+#t_tcl/exec.t
 #
 # syntax error in expression "[info exists auto_mkindex_parser::initCommands]": premature end of expression
 #t_tcl/autoMkindex.t
-#
-# Null PMC access in clone()
-#t_tcl/init.t            t_tcl/safe.t            t_tcl/source.t
-#t_tcl/pkg.t             t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
-#t_tcl/unixFCmd          t_tcl/unixFile.t        t_tcl/misc.t
-#t_tcl/regexpComp.t      t_tcl/parse.t           t_tcl/interp.t
 #
 # missing close-bracket
 #t_tcl/main.t 
@@ -338,6 +346,9 @@ SKIPPED_TCL_TESTS = \
 #
 # can't read "major": no such variable {{ [foreach] bug }}
 #t_tcl/tm.t
+#
+# can't read "result": no such variable
+#t_tcl/regexComp.t
 #
 # Cannot get character of empty string -
 #   {test 5.11? something cumulative, as the test runs fine by itself}
