@@ -1466,6 +1466,7 @@ string:
 
 int yyerror(void *yyscanner, Interp *interp, char * s)
 {
+    UNUSED(yyscanner);
     /* support bison 1.75, convert 'parse error to syntax error' */
     if (!memcmp(s, "parse", 5))
         IMCC_fataly(interp, E_SyntaxError, "syntax%s", s+5);
