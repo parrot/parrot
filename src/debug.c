@@ -2312,6 +2312,7 @@ the -t option.\n");
             PIO_eprintf(interpreter, "Print a list of available commands.\n");
             break;
         case 0:
+            /* C89: strings need to be 509 chars or less */
             PIO_eprintf(interpreter, "\
 List of commands:\n\
     disassemble -- disassemble the bytecode\n\
@@ -2323,7 +2324,8 @@ List of commands:\n\
     delete (d) -- delete a breakpoint\n\
     disable -- disable a breakpoint\n\
     enable  -- reenable a disabled breakpoint\n\
-    continue (c) -- continue the program execution\n\
+    continue (c) -- continue the program execution\n");
+            PIO_eprintf(interpreter, "\
     next (n) -- run the next instruction\n\
     eval (e) -- run an instruction\n\
     trace (t) -- trace the next instruction\n\
