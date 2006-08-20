@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: pod.t 12838 2006-05-30 14:19:10Z coke $
+# $Id$
 
 =head1 NAME
 
@@ -38,6 +38,12 @@ our %check_language = ( tcl => 1 );
 my $build_dir = $PConfig{build_dir};
 my $manifest     = maniread("$build_dir/MANIFEST");
 my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
+
+# Read some extra exceptions
+while (<DATA>) {
+  chomp;
+  $manifest_gen->{$_}++;
+}
 
 foreach my $file (sort keys(%$manifest)) {
   my $ffile = "$build_dir/$file";
@@ -87,3 +93,8 @@ sub check {
     ok($ok, "$g (line $l)")
   }
 }
+
+
+__DATA__
+compilers/imcc/imclexer.c
+compilers/imcc/imcparser.c
