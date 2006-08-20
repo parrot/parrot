@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-20 13:51:26
+// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-20 15:16:12
 
   import java.util.regex.*;
 
@@ -10,34 +10,41 @@ import java.util.ArrayList;
 
 public class AntlrPast2PirPast extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ARRAY", "PRINT", "PROGRAM", "STMTS", "VAR", "NEWLINE", "STRING", "LETTER", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "SEMICOLON", "ASSIGN_OP", "REL_OP", "INCR", "DECR", "Quit", "Define", "Auto", "If", "KEYWORDS", "ML_COMMENT", "WS", "'('", "')'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ARRAY", "PRINT", "PROGRAM", "STMTS", "VAR", "NEWLINE", "STRING", "LETTER", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "ASSIGN_OP", "REL_OP", "INCR", "DECR", "Define", "Break", "Quit", "Length", "Return", "For", "If", "While", "Sqrt", "Scale", "Ibase", "Obase", "Auto", "ML_COMMENT", "WS", "';'", "'('", "')'", "'{'", "'}'", "','", "'['", "']'"
     };
     public static final int MINUS=14;
     public static final int LETTER=11;
-    public static final int INCR=20;
+    public static final int INCR=19;
     public static final int ARRAY=4;
-    public static final int If=25;
-    public static final int WS=28;
-    public static final int DECR=21;
+    public static final int If=27;
+    public static final int WS=35;
+    public static final int DECR=20;
     public static final int NUMBER=13;
+    public static final int Break=22;
+    public static final int Sqrt=29;
     public static final int STRING=10;
+    public static final int Ibase=31;
+    public static final int Scale=30;
     public static final int MUL_OP=16;
-    public static final int Auto=24;
-    public static final int Define=23;
-    public static final int Quit=22;
-    public static final int STMTS=7;
+    public static final int Auto=33;
+    public static final int Define=21;
+    public static final int Quit=23;
     public static final int PROGRAM=6;
+    public static final int STMTS=7;
     public static final int NEWLINE=9;
     public static final int VAR=8;
-    public static final int ASSIGN_OP=18;
+    public static final int ASSIGN_OP=17;
     public static final int INTEGER=12;
-    public static final int KEYWORDS=26;
     public static final int PRINT=5;
-    public static final int SEMICOLON=17;
+    public static final int Obase=32;
+    public static final int While=28;
     public static final int EOF=-1;
-    public static final int REL_OP=19;
+    public static final int REL_OP=18;
     public static final int PLUS=15;
-    public static final int ML_COMMENT=27;
+    public static final int ML_COMMENT=34;
+    public static final int Length=24;
+    public static final int For=26;
+    public static final int Return=25;
 
         public AntlrPast2PirPast(TreeNodeStream input) {
             super(input);
@@ -100,7 +107,7 @@ public class AntlrPast2PirPast extends TreeParser {
                 do {
                     int alt1=2;
                     int LA1_0 = input.LA(1);
-                    if ( (LA1_0==PRINT||(LA1_0>=STMTS && LA1_0<=STRING)||(LA1_0>=NUMBER && LA1_0<=MUL_OP)||(LA1_0>=ASSIGN_OP && LA1_0<=REL_OP)||LA1_0==If) ) {
+                    if ( (LA1_0==PRINT||(LA1_0>=STMTS && LA1_0<=STRING)||(LA1_0>=NUMBER && LA1_0<=REL_OP)||LA1_0==If) ) {
                         alt1=1;
                     }
 
@@ -540,7 +547,7 @@ public class AntlrPast2PirPast extends TreeParser {
                         do {
                             int alt2=2;
                             int LA2_0 = input.LA(1);
-                            if ( (LA2_0==PRINT||(LA2_0>=STMTS && LA2_0<=STRING)||(LA2_0>=NUMBER && LA2_0<=MUL_OP)||(LA2_0>=ASSIGN_OP && LA2_0<=REL_OP)||LA2_0==If) ) {
+                            if ( (LA2_0==PRINT||(LA2_0>=STMTS && LA2_0<=STRING)||(LA2_0>=NUMBER && LA2_0<=REL_OP)||LA2_0==If) ) {
                                 alt2=1;
                             }
 
@@ -592,7 +599,7 @@ public class AntlrPast2PirPast extends TreeParser {
  
 
     public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past73 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_gen_pir_past75 = new BitSet(new long[]{0x00000000020DE7A8L});
+    public static final BitSet FOLLOW_node_in_gen_pir_past75 = new BitSet(new long[]{0x000000000807E7A8L});
     public static final BitSet FOLLOW_PRINT_in_node107 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_node_in_node109 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ASSIGN_OP_in_node138 = new BitSet(new long[]{0x0000000000000004L});
@@ -601,16 +608,16 @@ public class AntlrPast2PirPast extends TreeParser {
     public static final BitSet FOLLOW_node_in_node146 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_NUMBER_in_node167 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_node197 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node213 = new BitSet(new long[]{0x00000000020DE7A0L});
+    public static final BitSet FOLLOW_node_in_node213 = new BitSet(new long[]{0x000000000807E7A0L});
     public static final BitSet FOLLOW_node_in_node216 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_VAR_in_node239 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_LETTER_in_node241 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_NEWLINE_in_node261 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STRING_in_node279 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_If_in_node305 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node307 = new BitSet(new long[]{0x00000000020DE7A0L});
+    public static final BitSet FOLLOW_node_in_node307 = new BitSet(new long[]{0x000000000807E7A0L});
     public static final BitSet FOLLOW_node_in_node310 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STMTS_in_node339 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node341 = new BitSet(new long[]{0x00000000020DE7A8L});
+    public static final BitSet FOLLOW_node_in_node341 = new BitSet(new long[]{0x000000000807E7A8L});
 
 }

@@ -45,29 +45,30 @@ NUMBER
 
 MINUS      : '-' ;
 PLUS       : '+' ;
+
 MUL_OP     : '*' | '/' | '%' ;
-SEMICOLON  : ';' ;
 ASSIGN_OP  : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' ;
 REL_OP     : '==' | '<=' | '>=' | '!=' | '<' | '>' ;
 INCR       : '++' ;
 DECR       : '--' ;
+// TODO: handle these 
+Define     : 'define';
+Break      : 'break';
 
 // quit at the end of program is required, make testing easier
 Quit       : 'quit' ;    
 
-// TODO: handle these 
-Define     : 'define';
-Auto       : 'auto';
-
+Length     : 'length';
+Return     : 'return';
+For        : 'for';
 If         : 'if';
+While      : 'while';
+Sqrt       : 'sqrt';
+Scale      : 'scale';
+Ibase      : 'ibase';
+Obase      : 'obase';
+Auto       : 'auto';
  
-// TODO: handle these 
-KEYWORDS
-  : 'break'  | 'length' |
-    'return' | 'for'    | 'while' | 'sqrt' |
-    'scale'  | 'ibase'  | 'obase'
-  ;
-
 // ignore multiple-line comments
 ML_COMMENT
   : '/*' ( options {greedy=false;} : . )* '*/'
@@ -125,7 +126,11 @@ input_item
   ;
 
 semicolon_list 
-  : statement? ( SEMICOLON! statement? )*
+  : statement? ( ';'! statement? )*
+  ;
+
+statement_list     
+  : statement? ( ( NEWLINE | ';' ) statement? )*
   ;
 
 // TODO: use a semantic predicate, for deciding when not to print, ASSIGN_OP
@@ -141,11 +146,35 @@ statement
 
 // TODO: implement functions
 function
-  : Define
+  : Define LETTER '(' parameter_list? ')' '{' NEWLINE auto_define_list? statement_list '}'
+  ;
+
+parameter_list       
+  : LETTER
+    |
+    define_list ',' LETTER
+  ;
+
+auto_define_list
+  : Auto define_list ( NEWLINE | ';' )
+  ;
+
+define_list
+  : LETTER ( '[' ']' )? ( ',' LETTER ( '[' ']' )? )*
+  ;
+
+argument_list
+  : expression
+    |
+    LETTER '[' ']' ',' argument_list
   ;
 
 relational_expression 
   : expression ( REL_OP^^ expression )?
+  ;
+
+return_expression
+  : expression?
   ;
 
 expression
@@ -156,6 +185,7 @@ named_expression
   : LETTER -> ^( VAR LETTER ) 
   ;
 
+// The following are for getting precedence right
 
 adding_expression
   : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* 

@@ -27,8 +27,8 @@ sub run_tests {
     my ( $tests ) = @_;
 
     foreach ( @{$tests} ) {
-        die "invalid test" unless ref( $_ ) eq 'ARRAY';
-        die "invalid test" unless scalar(@{$_}) >= 2 || scalar(@{$_}) <= 5;
+        die 'invalid test' unless ref( $_ ) eq 'ARRAY';
+        die 'invalid test' unless scalar(@{$_}) >= 2 || scalar(@{$_}) <= 5;
         my ( $bc_code, $expected, $desc, %options ) = @{$_};
 
         # bc should not keep waiting for input 
@@ -36,7 +36,7 @@ sub run_tests {
 
         # expected input can be set up as array reference
         if ( ref $expected ) {
-            die "expected ARRAY reference" unless ref( $expected ) eq 'ARRAY';
+            die 'expected ARRAY reference' unless ref( $expected ) eq 'ARRAY';
             $expected = join( "\n", @{$expected} );
         }
 
@@ -68,9 +68,9 @@ my @tests = (
        [ "/* line1 \n line2 \n line 3 */   -3  ", -3, 'multi line comment', ],
 
        # Strings 
-       [ qq{1;2;"asdf"   ;  3    }, [ 1, 2, 'asdf3' ], 'string', ],
-       [ q{1;2;"'a's'd'f'"   ;  3    }, [ 1, 2, "'a's'd'f'3" ], 'string with embedded single quote', ],
-       [ q{1;2;"as\df"   ;  3    }, [ 1, 2, 'as\df3' ], 'string with embedded backslash', ],
+       [ '1;2;"asdf"   ;  3    ', [ 1, 2, 'asdf3' ], 'string', ],
+       [ q{1;2;"'a's'd'f'"   ;  3    }, [ 1, 2, q{'a's'd'f'3} ], 'string with embedded single quote', ],
+       [ '1;2;"as\df"   ;  3    ', [ 1, 2, 'as\df3' ], 'string with embedded backslash', ],
        [ qq{1;2;" asdf\n  jklm\n   rtzu\n"   ;  3    }, [ 1, 2, ' asdf', '  jklm', '   rtzu', 3 ], ],
 
        # empty lines
@@ -152,56 +152,58 @@ my @tests = (
        [ "1; 2\nquit\n 3", [1, 2], 'int after quit', ],
 
        # named expressions
-       [ "a", [0], 'uninitialized a', ],
-       [ "a;b;c;d;x;y;z", [ (0) x 7 ], 'more uninitialized vars', ],
-       [ "a; a = 1; a", [0,1], 'assign number to lexical', ],
-       [ "a = 11; -a", -11, 'assign number to lexical', ],
-       [ "a; a = 1 + 1; a", [0,2], 'assign number to expression', ],
+       [ 'a', [0], 'uninitialized a', ],
+       [ 'a;b;c;d;x;y;z', [ (0) x 7 ], 'more uninitialized vars', ],
+       [ 'a; a = 1; a', [0,1], 'assign number to lexical', ],
+       [ 'a = 11; -a', -11, 'assign number to lexical', ],
+       [ 'a; a = 1 + 1; a', [0,2], 'assign number to expression', ],
        [ 'a; b; a = 4; b = 5; c = 6; "a = "; a;  "b = "; b;  "c = "; c', [ 0, 0, 'a = 4', 'b = 5', 'c = 6' ], 'assign several lexicals' ], 
        [ 'a; b; a = 4; b = a; c = 1; "a = "; a;  "b = "; b;  "c = "; c', [ 0, 0, 'a = 4', 'b = 4', 'c = 1' ], 'assign lexical to lexical' ], 
        [ 'a  + 1', [ 1 ], 'expression with named', ], 
        [ 'a = 4; b = a  + 1; "a = "; a;  "b = "; b ', [ 'a = 4', 'b = 5', ], 'assign lexical to expression with lexical', ], 
 
        # increment and decrement 
-       [ "a = a + 1; a ; a", [1,1], ],
-       [ "++a; a", [1,1], ],
-       [ "a; a = 1; a; ++a; a", [0,1,2,2], 'increment', ],
-       [ "a; a = 1; 1; --a; a", [0,1,0,0], 'decrement', ],
+       [ 'a = a + 1; a ; a', [1,1], ],
+       [ '++k;', 1, ],
+       [ '--k;', -1, ],
+       [ '++a; a', [1,1], ],
+       [ 'a; a = 1; a; ++a; a', [0,1,2,2], 'increment', ],
+       [ 'a; a = 1; 1; --a; a', [0,1,0,0], 'decrement', ],
 
        # If 
-       [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition', ],
-       [ "1; if ( 0 ) 2; 3", [1,3], 'if with a false condition', ],
-       [ "1; if ( 1 < 2 ) 2; 3", [1, 2, 3], 'if with a relational operator', ],
+       [ '1; if ( 1 ) 2; 3', [1,2,3], 'if with a true condition', ],
+       [ '1; if ( 0 ) 2; 3', [1,3], 'if with a false condition', ],
+       [ '1; if ( 1 < 2 ) 2; 3', [1, 2, 3], 'if with a relational operator', ],
 
        # If with '<'
-       [ "1; if ( 3 + 4 < 8*2 - 10 ) 2; 3", [1, 3], ],
-       [ "1; if ( 3 + 4 < 8*2 - 9 ) 2; 3", [1, 3], ],
-       [ "1; if ( 3 + 4 < 8*2 + 10 ) 2; 3", [1, 2, 3], ],
+       [ '1; if ( 3 + 4 < 8*2 - 10 ) 2; 3', [1, 3], ],
+       [ '1; if ( 3 + 4 < 8*2 - 9 ) 2; 3', [1, 3], ],
+       [ '1; if ( 3 + 4 < 8*2 + 10 ) 2; 3', [1, 2, 3], ],
 
        # If with '<='
-       [ "1; if ( 3 + 4 <= 8*2 - 10 ) 2; 3", [1, 3], ],
-       [ "1; if ( 3 + 4 <= 8*2 - 9 ) 2; 3", [1, 2, 3], ],
-       [ "1; if ( 3 + 4 <= 8*2 + 10 ) 2; 3", [1, 2, 3], ],
+       [ '1; if ( 3 + 4 <= 8*2 - 10 ) 2; 3', [1, 3], ],
+       [ '1; if ( 3 + 4 <= 8*2 - 9 ) 2; 3', [1, 2, 3], ],
+       [ '1; if ( 3 + 4 <= 8*2 + 10 ) 2; 3', [1, 2, 3], ],
        # If with '=='
-       [ "1; if ( 3 + 4 == 8*2 - 10 ) 2; 3", [1, 3], ],
-       [ "1; if ( 3 + 4 == 8*2 - 9 ) 2; 3", [1, 2, 3], ],
-       [ "1; if ( 3 + 4 == 8*2 + 10 ) 2; 3", [1, 3], ],
+       [ '1; if ( 3 + 4 == 8*2 - 10 ) 2; 3', [1, 3], ],
+       [ '1; if ( 3 + 4 == 8*2 - 9 ) 2; 3', [1, 2, 3], ],
+       [ '1; if ( 3 + 4 == 8*2 + 10 ) 2; 3', [1, 3], ],
        # If with '!='
-       [ "1; if ( 3 + 4 != 8*2 - 10 ) 2; 3", [1, 2, 3], ],
-       [ "1; if ( 3 + 4 != 8*2 - 9 ) 2; 3", [1, 3], ],
-       [ "1; if ( 3 + 4 != 8*2 + 10 ) 2; 3", [1, 2, 3], ],
+       [ '1; if ( 3 + 4 != 8*2 - 10 ) 2; 3', [1, 2, 3], ],
+       [ '1; if ( 3 + 4 != 8*2 - 9 ) 2; 3', [1, 3], ],
+       [ '1; if ( 3 + 4 != 8*2 + 10 ) 2; 3', [1, 2, 3], ],
        # If with '>='
-       [ "1; if ( 3 + 4 >= 8*2 - 10 ) 2; 3", [1, 2, 3], ],
-       [ "1; if ( 3 + 4 >= 8*2 - 9 ) 2; 3", [1, 2, 3], ],
-       [ "1; if ( 3 + 4 >= 8*2 + 10 ) 2; 3", [1, 3], ],
+       [ '1; if ( 3 + 4 >= 8*2 - 10 ) 2; 3', [1, 2, 3], ],
+       [ '1; if ( 3 + 4 >= 8*2 - 9 ) 2; 3', [1, 2, 3], ],
+       [ '1; if ( 3 + 4 >= 8*2 + 10 ) 2; 3', [1, 3], ],
 
        # If with '>'
-       [ "1; if ( 3 + 4 > 8*2 - 10 ) 2; 3", [1, 2, 3], ],
-       [ "1; if ( 3 + 4 > 8*2 - 9 ) 2; 3", [1, 3], ],
-       [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3], ],
+       [ '1; if ( 3 + 4 > 8*2 - 10 ) 2; 3', [1, 2, 3], ],
+       [ '1; if ( 3 + 4 > 8*2 - 9 ) 2; 3', [1, 3], ],
+       [ '1; if ( 3 + 4 > 8*2 + 10 ) 2; 3', [1, 3], ],
    );
 
-# @tests = ( [ q{ 1 + 1; if ( 100 < 200 ) 300}, [2, 300] ], );
+# @tests = ( [ '++k', 1 ], );
 
 my @todo_tests
     = ( # floats
