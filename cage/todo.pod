@@ -194,7 +194,7 @@ From #parrot:
     with leo and I am going to send and email to p6i for deprecation
     of certain old features
 
-=head2 Helping other contributors hack their patches into Parrot-style industrial-strength C code.
+=head2 Help other contributors hack their patches into Parrot-style industrial-strength C code.
 
 From chip's comment at L<http://www.oreillynet.com/onlamp/blog/2006/07/calling_for_parrot_janitors.html>
 
@@ -204,7 +204,7 @@ From chip's comment at L<http://www.oreillynet.com/onlamp/blog/2006/07/calling_f
     be worked out. It'd be great if a Cage Cleaner could step up
     and help our new contributor bang the code into Parrotish form.
 
-=head2 Fixing usage of deprecated features
+=head2 Fix usage of deprecated features
 
 =over 4
 
@@ -215,6 +215,19 @@ usage of, the old C<interpinfo .INTERPINFO_NAMESPACE_ROOT> feature.  (Which
 can then be eliminated.)
 
 =back
+
+=head2 Clean up skipped tests
+
+Parrot has too many skipped tests.  Pick a test file with a skipped test,
+disable the skip() line, then make it pass.  The Parrot code may not compile,
+or you may have to modify it to bring it up to date.  The test may not even be
+useful anymore; we won't know until you try.
+
+If you can make it pass, great!
+
+If you can make it run, great!  Make it a TODO test instead.
+
+If neither, please report your findings so that everyone can decide what to do.
 
 =head1 See Also
 
