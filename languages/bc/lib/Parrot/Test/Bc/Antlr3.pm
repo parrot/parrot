@@ -1,12 +1,17 @@
 # $Id$
 
+=head1 NAME
+
+Parrot::Test::Bc::Antlr3 - Testing ANTLR3 implementation of Parrot Bc.
+
+=cut
+
 package Parrot::Test::Bc::Antlr3;
 
 use strict;
+use warnings;
 
 use base 'Parrot::Test::Bc';
-
-use Data::Dumper;
 
 sub get_out_fn {
     my $self = shift;
@@ -14,6 +19,7 @@ sub get_out_fn {
 
     return Parrot::Test::per_test( '_antlr3.out', $count );
 }
+
 
 sub get_test_prog {
     my $self = shift;
@@ -31,12 +37,11 @@ sub skip_why {
     my $self = shift;
     my ( $options ) = @_;
 
-    if ( $options->{with_antlr3} ) {
+    if ( ! exists $options->{with_antlr3} || $options->{with_antlr3} ) {
         return;
     } else {
         return 'Not implemented with ANTLR3';
     }
 }
  
-
 1;
