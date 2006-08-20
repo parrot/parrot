@@ -198,12 +198,12 @@ node[String reg_mother]
       String reg = "reg_" + reg_num;
       System.out.print( 
           "                                                                   \n"
-        + "    # entering '( PLUS | MINUS | MUL_OP ) node node'               \n"
+        + "    # entering '( PLUS | MINUS | MUL_OP | REL_OP ) node node'               \n"
         + "      .sym pmc " + reg + "                                         \n"
         + "      " + reg + " = new 'PAST::Op'                                 \n"
       );
     }
-    ^( infix=( PLUS | MINUS | MUL_OP ) node[reg] node[reg] )
+    ^( infix=( PLUS | MINUS | MUL_OP | REL_OP ) node[reg] node[reg] )
     {
       System.out.print( 
           "      " + reg + ".'op'( 'infix:" + $infix.text + "' )              \n"

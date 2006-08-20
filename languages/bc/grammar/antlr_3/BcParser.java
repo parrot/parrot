@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-08-20 13:02:26
+// $ANTLR 3.0b3 grammar/antlr_3/bc.g 2006-08-20 13:37:58
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -1153,7 +1153,7 @@ public class BcParser extends Parser {
     };
 
     // $ANTLR start relational_expression
-    // grammar/antlr_3/bc.g:147:1: relational_expression : expression ( REL_OP expression )? ;
+    // grammar/antlr_3/bc.g:147:1: relational_expression : expression ( REL_OP^^ expression )? ;
     public relational_expression_return relational_expression() throws RecognitionException {   
         relational_expression_return retval = new relational_expression_return();
         retval.start = input.LT(1);
@@ -1169,8 +1169,8 @@ public class BcParser extends Parser {
         CommonTree REL_OP22_tree=null;
 
         try {
-            // grammar/antlr_3/bc.g:148:5: ( expression ( REL_OP expression )? )
-            // grammar/antlr_3/bc.g:148:5: expression ( REL_OP expression )?
+            // grammar/antlr_3/bc.g:148:5: ( expression ( REL_OP^^ expression )? )
+            // grammar/antlr_3/bc.g:148:5: expression ( REL_OP^^ expression )?
             {
             root_0 = (CommonTree)adaptor.nil();
 
@@ -1179,7 +1179,7 @@ public class BcParser extends Parser {
             _fsp--;
 
             adaptor.addChild(root_0, expression21.tree);
-            // grammar/antlr_3/bc.g:148:16: ( REL_OP expression )?
+            // grammar/antlr_3/bc.g:148:16: ( REL_OP^^ expression )?
             int alt7=2;
             int LA7_0 = input.LA(1);
             if ( (LA7_0==REL_OP) ) {
@@ -1187,16 +1187,16 @@ public class BcParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:148:18: REL_OP expression
+                    // grammar/antlr_3/bc.g:148:18: REL_OP^^ expression
                     {
                     CommonTree root_1 = (CommonTree)adaptor.nil();
 
                     REL_OP22=(Token)input.LT(1);
                     match(input,REL_OP,FOLLOW_REL_OP_in_relational_expression2164); 
                     REL_OP22_tree = (CommonTree)adaptor.create(REL_OP22);
-                    adaptor.addChild(root_1, REL_OP22_tree);
+                    root_0 = (CommonTree)adaptor.becomeRoot(REL_OP22_tree, root_0);
 
-                    pushFollow(FOLLOW_expression_in_relational_expression2166);
+                    pushFollow(FOLLOW_expression_in_relational_expression2167);
                     expression23=expression();
                     _fsp--;
 
@@ -1251,7 +1251,7 @@ public class BcParser extends Parser {
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_adding_expression_in_expression2182);
+            pushFollow(FOLLOW_adding_expression_in_expression2183);
             adding_expression24=adding_expression();
             _fsp--;
 
@@ -1297,7 +1297,7 @@ public class BcParser extends Parser {
             // grammar/antlr_3/bc.g:156:5: LETTER
             {
             LETTER25=(Token)input.LT(1);
-            match(input,LETTER,FOLLOW_LETTER_in_named_expression2195); 
+            match(input,LETTER,FOLLOW_LETTER_in_named_expression2196); 
             list_LETTER.add(LETTER25);
 
 
@@ -1368,7 +1368,7 @@ public class BcParser extends Parser {
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_multiplying_expression_in_adding_expression2220);
+            pushFollow(FOLLOW_multiplying_expression_in_adding_expression2221);
             multiplying_expression26=multiplying_expression();
             _fsp--;
 
@@ -1411,7 +1411,7 @@ public class BcParser extends Parser {
             	            CommonTree root_2 = (CommonTree)adaptor.nil();
 
             	            PLUS27=(Token)input.LT(1);
-            	            match(input,PLUS,FOLLOW_PLUS_in_adding_expression2226); 
+            	            match(input,PLUS,FOLLOW_PLUS_in_adding_expression2227); 
             	            PLUS27_tree = (CommonTree)adaptor.create(PLUS27);
             	            root_0 = (CommonTree)adaptor.becomeRoot(PLUS27_tree, root_0);
 
@@ -1426,7 +1426,7 @@ public class BcParser extends Parser {
             	            CommonTree root_2 = (CommonTree)adaptor.nil();
 
             	            MINUS28=(Token)input.LT(1);
-            	            match(input,MINUS,FOLLOW_MINUS_in_adding_expression2231); 
+            	            match(input,MINUS,FOLLOW_MINUS_in_adding_expression2232); 
             	            MINUS28_tree = (CommonTree)adaptor.create(MINUS28);
             	            root_0 = (CommonTree)adaptor.becomeRoot(MINUS28_tree, root_0);
 
@@ -1438,7 +1438,7 @@ public class BcParser extends Parser {
 
             	    }
 
-            	    pushFollow(FOLLOW_multiplying_expression_in_adding_expression2236);
+            	    pushFollow(FOLLOW_multiplying_expression_in_adding_expression2237);
             	    multiplying_expression29=multiplying_expression();
             	    _fsp--;
 
@@ -1500,7 +1500,7 @@ public class BcParser extends Parser {
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_unary_expression_in_multiplying_expression2253);
+            pushFollow(FOLLOW_unary_expression_in_multiplying_expression2254);
             unary_expression30=unary_expression();
             _fsp--;
 
@@ -1522,11 +1522,11 @@ public class BcParser extends Parser {
             	    CommonTree root_1 = (CommonTree)adaptor.nil();
 
             	    MUL_OP31=(Token)input.LT(1);
-            	    match(input,MUL_OP,FOLLOW_MUL_OP_in_multiplying_expression2257); 
+            	    match(input,MUL_OP,FOLLOW_MUL_OP_in_multiplying_expression2258); 
             	    MUL_OP31_tree = (CommonTree)adaptor.create(MUL_OP31);
             	    root_0 = (CommonTree)adaptor.becomeRoot(MUL_OP31_tree, root_0);
 
-            	    pushFollow(FOLLOW_unary_expression_in_multiplying_expression2260);
+            	    pushFollow(FOLLOW_unary_expression_in_multiplying_expression2261);
             	    unary_expression32=unary_expression();
             	    _fsp--;
 
@@ -1625,7 +1625,7 @@ public class BcParser extends Parser {
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_postfix_expression_in_unary_expression2276);
+                    pushFollow(FOLLOW_postfix_expression_in_unary_expression2277);
                     postfix_expression33=postfix_expression();
                     _fsp--;
 
@@ -1637,10 +1637,10 @@ public class BcParser extends Parser {
                     // grammar/antlr_3/bc.g:171:5: MINUS postfix_expression
                     {
                     MINUS34=(Token)input.LT(1);
-                    match(input,MINUS,FOLLOW_MINUS_in_unary_expression2288); 
+                    match(input,MINUS,FOLLOW_MINUS_in_unary_expression2289); 
                     list_MINUS.add(MINUS34);
 
-                    pushFollow(FOLLOW_postfix_expression_in_unary_expression2290);
+                    pushFollow(FOLLOW_postfix_expression_in_unary_expression2291);
                     postfix_expression35=postfix_expression();
                     _fsp--;
 
@@ -1673,10 +1673,10 @@ public class BcParser extends Parser {
                     // grammar/antlr_3/bc.g:173:5: INCR named_expression
                     {
                     INCR36=(Token)input.LT(1);
-                    match(input,INCR,FOLLOW_INCR_in_unary_expression2316); 
+                    match(input,INCR,FOLLOW_INCR_in_unary_expression2317); 
                     list_INCR.add(INCR36);
 
-                    pushFollow(FOLLOW_named_expression_in_unary_expression2318);
+                    pushFollow(FOLLOW_named_expression_in_unary_expression2319);
                     named_expression37=named_expression();
                     _fsp--;
 
@@ -1734,10 +1734,10 @@ public class BcParser extends Parser {
                     // grammar/antlr_3/bc.g:175:5: DECR named_expression
                     {
                     DECR38=(Token)input.LT(1);
-                    match(input,DECR,FOLLOW_DECR_in_unary_expression2362); 
+                    match(input,DECR,FOLLOW_DECR_in_unary_expression2363); 
                     list_DECR.add(DECR38);
 
-                    pushFollow(FOLLOW_named_expression_in_unary_expression2364);
+                    pushFollow(FOLLOW_named_expression_in_unary_expression2365);
                     named_expression39=named_expression();
                     _fsp--;
 
@@ -1863,7 +1863,7 @@ public class BcParser extends Parser {
                     root_0 = (CommonTree)adaptor.nil();
 
                     NUMBER40=(Token)input.LT(1);
-                    match(input,NUMBER,FOLLOW_NUMBER_in_postfix_expression2409); 
+                    match(input,NUMBER,FOLLOW_NUMBER_in_postfix_expression2410); 
                     NUMBER40_tree = (CommonTree)adaptor.create(NUMBER40);
                     adaptor.addChild(root_0, NUMBER40_tree);
 
@@ -1875,7 +1875,7 @@ public class BcParser extends Parser {
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_named_expression_in_postfix_expression2421);
+                    pushFollow(FOLLOW_named_expression_in_postfix_expression2422);
                     named_expression41=named_expression();
                     _fsp--;
 
@@ -1887,16 +1887,16 @@ public class BcParser extends Parser {
                     // grammar/antlr_3/bc.g:183:5: '(' expression ')'
                     {
                     char_literal42=(Token)input.LT(1);
-                    match(input,29,FOLLOW_29_in_postfix_expression2438); 
+                    match(input,29,FOLLOW_29_in_postfix_expression2439); 
                     list_29.add(char_literal42);
 
-                    pushFollow(FOLLOW_expression_in_postfix_expression2440);
+                    pushFollow(FOLLOW_expression_in_postfix_expression2441);
                     expression43=expression();
                     _fsp--;
 
                     list_expression.add(expression43.tree);
                     char_literal44=(Token)input.LT(1);
-                    match(input,30,FOLLOW_30_in_postfix_expression2442); 
+                    match(input,30,FOLLOW_30_in_postfix_expression2443); 
                     list_30.add(char_literal44);
 
 
@@ -1957,27 +1957,27 @@ public class BcParser extends Parser {
     public static final BitSet FOLLOW_Define_in_function2146 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_expression_in_relational_expression2160 = new BitSet(new long[]{0x0000000000080002L});
     public static final BitSet FOLLOW_REL_OP_in_relational_expression2164 = new BitSet(new long[]{0x0000000020306800L});
-    public static final BitSet FOLLOW_expression_in_relational_expression2166 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_adding_expression_in_expression2182 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LETTER_in_named_expression2195 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression2220 = new BitSet(new long[]{0x000000000000C002L});
-    public static final BitSet FOLLOW_PLUS_in_adding_expression2226 = new BitSet(new long[]{0x0000000020306800L});
-    public static final BitSet FOLLOW_MINUS_in_adding_expression2231 = new BitSet(new long[]{0x0000000020306800L});
-    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression2236 = new BitSet(new long[]{0x000000000000C002L});
-    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression2253 = new BitSet(new long[]{0x0000000000010002L});
-    public static final BitSet FOLLOW_MUL_OP_in_multiplying_expression2257 = new BitSet(new long[]{0x0000000020306800L});
-    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression2260 = new BitSet(new long[]{0x0000000000010002L});
-    public static final BitSet FOLLOW_postfix_expression_in_unary_expression2276 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_unary_expression2288 = new BitSet(new long[]{0x0000000020002800L});
-    public static final BitSet FOLLOW_postfix_expression_in_unary_expression2290 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INCR_in_unary_expression2316 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_named_expression_in_unary_expression2318 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DECR_in_unary_expression2362 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_named_expression_in_unary_expression2364 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NUMBER_in_postfix_expression2409 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_named_expression_in_postfix_expression2421 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_29_in_postfix_expression2438 = new BitSet(new long[]{0x0000000020306800L});
-    public static final BitSet FOLLOW_expression_in_postfix_expression2440 = new BitSet(new long[]{0x0000000040000000L});
-    public static final BitSet FOLLOW_30_in_postfix_expression2442 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_relational_expression2167 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_adding_expression_in_expression2183 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LETTER_in_named_expression2196 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression2221 = new BitSet(new long[]{0x000000000000C002L});
+    public static final BitSet FOLLOW_PLUS_in_adding_expression2227 = new BitSet(new long[]{0x0000000020306800L});
+    public static final BitSet FOLLOW_MINUS_in_adding_expression2232 = new BitSet(new long[]{0x0000000020306800L});
+    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression2237 = new BitSet(new long[]{0x000000000000C002L});
+    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression2254 = new BitSet(new long[]{0x0000000000010002L});
+    public static final BitSet FOLLOW_MUL_OP_in_multiplying_expression2258 = new BitSet(new long[]{0x0000000020306800L});
+    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression2261 = new BitSet(new long[]{0x0000000000010002L});
+    public static final BitSet FOLLOW_postfix_expression_in_unary_expression2277 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MINUS_in_unary_expression2289 = new BitSet(new long[]{0x0000000020002800L});
+    public static final BitSet FOLLOW_postfix_expression_in_unary_expression2291 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INCR_in_unary_expression2317 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_named_expression_in_unary_expression2319 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DECR_in_unary_expression2363 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_named_expression_in_unary_expression2365 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NUMBER_in_postfix_expression2410 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_named_expression_in_postfix_expression2422 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_29_in_postfix_expression2439 = new BitSet(new long[]{0x0000000020306800L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression2441 = new BitSet(new long[]{0x0000000040000000L});
+    public static final BitSet FOLLOW_30_in_postfix_expression2443 = new BitSet(new long[]{0x0000000000000002L});
 
 }

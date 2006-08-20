@@ -145,7 +145,7 @@ function
   ;
 
 relational_expression 
-  : expression ( REL_OP expression )?
+  : expression ( REL_OP^^ expression )?
   ;
 
 expression

@@ -91,7 +91,7 @@ my @tests = (
 
        # floats
        [ '.1 + 1', '1.1', 'float with leading dot', with_antrl3 => 1, ],
-       [ '-1.0001', '-1.0001', undef, with_antlr3 => 0, ], 
+       [ '-1.0001', '-1.0001', undef, with_antlr3 => 1, ], 
        [ '1.2', '1.2', undef, with_antlr3 => 1, ],     # prints 1.200000 in ANTLR3 version
        [ '1.2 *2 - 2.0 + 3', '3.4', undef, with_antlr3 => 1, ],
 
@@ -171,37 +171,37 @@ my @tests = (
        # If 
        [ "1; if ( 1 ) 2; 3", [1,2,3], 'if with a true condition', with_antlr3 => 1, ],
        [ "1; if ( 0 ) 2; 3", [1,3], 'if with a false condition', with_antlr3 => 1, ],
-       [ "1; if ( 1 < 2 ) 2; 3", [1, 2, 3], 'if with a relational operator', with_antlr3 => 0, ],
+       [ "1; if ( 1 < 2 ) 2; 3", [1, 2, 3], 'if with a relational operator', with_antlr3 => 1, ],
 
        # If with '<'
-       [ "1; if ( 3 + 4 < 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 < 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 < 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 < 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 < 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 < 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
 
        # If with '<='
-       [ "1; if ( 3 + 4 <= 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 <= 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 <= 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 <= 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 <= 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 <= 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
        # If with '==', still TODO
-       [ "1; if ( 3 + 4 == 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 == 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 == 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 == 8*2 - 10 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 == 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 == 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
        # If with '!='
-       [ "1; if ( 3 + 4 != 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 != 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 != 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 != 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 != 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 != 8*2 + 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
        # If with '>='
-       [ "1; if ( 3 + 4 >= 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 >= 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 >= 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 >= 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 >= 8*2 - 9 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 >= 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
 
        # If with '>'
-       [ "1; if ( 3 + 4 > 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 > 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
-       [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 0, ],
+       [ "1; if ( 3 + 4 > 8*2 - 10 ) 2; 3", [1, 2, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 > 8*2 - 9 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
+       [ "1; if ( 3 + 4 > 8*2 + 10 ) 2; 3", [1, 3], undef, with_antlr3 => 1, ],
    );
 
-# @tests = ( [ q{-2 + 10}, 8, undef, with_antlr3 => 1 ], );
+# @tests = ( [ q{ 1 + 1; if ( 100 < 200 ) 300}, [2, 300], undef, with_antlr3 => 1 ], );
 
 my @todo_tests
     = ( # floats
