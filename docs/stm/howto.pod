@@ -1,0 +1,271 @@
+=head1 NAME
+
+docs/stm/howto.pod -- Using software transactional memory in Parrot
+
+=head1 DESCRIPTION
+
+The Parrot STM (software transactional memory) system provides
+transactional access to PMCs in a thread-safe way. Like database
+transactions, STM transactions logically occur either all at once or not
+at all. Note that the STM system only provides such gaurentees for reads
+and writes made on references to PMCs managed by STM. In practice, STM
+uses optimisitic concurrency control, meaning that STM may discover that
+a transaction is not valid after the code implementing it runs and need
+to rerun it. The STM-related side effects of the failed transaction will
+not be seen. It is your responsibility to prevent other side effects
+from occuring.
+
+=head2 STM-managed references
+
+STM provides two types of references to PMCs: STMVars, in which read
+and write operations are explicit, and STMRefs, which attempt to act
+like a 'normal' PMC. Their full interfaces are documented in
+C<docs/stm/stm_frontend.pod>. You can provide another thread with
+STMVar and STMRef instances you created by passing them as arguments
+to the thread's starting function or by passing them through an STMVar
+or STMRef.
+
+Operations on STMVar and STMRef that are not supposed to have the
+referenced PMC be written may use a read-only version of the PMC. This
+allows the STM implementation to avoid unneeded copying. Similarly, PMCs
+provided to STMRef's setref or STMVar's set may become the property of
+the STM implementation.
+
+=head2 What to put in STM-managed PMCs
+
+To provide isolation between transactions, STM frequently makes deep
+copies of the PMC it manages if write access is requested. It also makes
+no attempt to identify non-conflicting partial updates to a PMC.
+Consequently, it is unwise to place large datatypes in a single STM-
+managed reference; instead, it is better to use a data structure that
+makes wise use of STMVars and STMRefs internally. Then, the STM
+implementation will be able to allow most non-conflicting updates to the
+data structure to happen concurrently. When making deep copies of
+STMVars or STMRefs, they are left unchanged and still logically
+reference the same. Thus, one might represent a linked-list node as an
+object with the following fields:
+
+ LLNode {
+     next: STMVar referring to LLNode
+     prev: STMVar referring to LLNode
+     data_reference: STMVar to an arbitrary PMC
+ }
+
+It does not matter if deep copies are made of this object, since it will
+be left unchanged. And, more importantly, because modifying what the
+STMVar references does not modify the object as far as STM is concerned,
+one can ensure no copies are made by only reading the STMVars. In this
+case, updating the next and prev pointers would involve storing the new
+LLNode in the corresponding STMVar. An alternate strategy would be to
+represent each object as an STMVar that refers to an object with the
+following fields:
+
+ LLNode {
+     next: STMVar referring to LLNode
+     prev: STMVar referring to LLNode
+     data: arbitrary PMC
+ }
+
+In this case, updating the next and prev pointers would involve
+B<replacing> the next and prev fields with a different STMVar.
+
+Currently, the type of PMCs that can be safely referred to by STMVars or
+STMrefs is limited to some PMC types that can be marked shared and read-
+only and that can be deep copied easily. See also
+C<docs/stm/internals.pod> and C<docs/stm/thread-issues.pod> for more
+information.
+
+=head2 Sample runtime library and STM primitives
+
+For programming convenience and to serve as an example for other
+implementations a sample runtime library is provided in
+C<runtime/parrot/library/STM.pir>. This library makes use of
+continuations to implement the flow control constructs with subroutine
+calls. STM support more tightly integrated into a language might be able
+to provide the desired flow control without needing to capture explicit
+continuations (or use exceptions). Exception support is currently not
+present in the library because exception support was not stable at the
+time it was written. It is compiled to C<STM.pbc> and is contained
+entirely in the C<parrot;STM> namespace. The library is implemented
+using the STM opcodes documented in C<src/ops/stm.ops> and using the
+STMLog PMC type.
+
+=head2 Starting and ending transactions
+
+The runtime library C<transaction> runs a supplied subroutine (with
+optional supplied arugments) in a seperate transaction commiting the
+result. For example, (Perlish) psuedocode for inserting at the beginning
+of a linked list might look like this:
+
+ STM::transaction(sub {
+     my $old_head = $list.head.get_read();
+     my $new_head = LLNode.new($new_value)
+     $new_head.next.set($old_head);
+     if ($old_head) {
+         $old_head.prev.set($new_head);
+     } else {
+         $list.tail.set($new_head);
+     }
+     $list.head.set($new_head);
+ })
+
+The supplied closure will be run in a seperate transaction until it
+commits successfully. STM will guarentee that other threads see the
+transaction as taking place all at once (so, e.g., C<defined
+$list.head.get_read().prev.get_read()> will always be false in another
+thread's transaction).
+
+In simple cases, STM::transaction may be reduced to the PIR:
+
+ .sub transaction
+    .param pmc subtocall
+    .param pmc args :slurpy
+    .local pmc retval
+ start_label:
+    stm_start
+    retval = subtocall(args :flat)
+    stm_commit start_label # goes to start_label if commit fails
+    .return (retval)
+ .end  
+
+However, it is more complicated in order to support other operations
+mentioned below.
+
+One cannot use writing operations on an STMRef (except for setref) or
+the 'get_update' method on STMVar without an active transaction. For
+programming convenience, if other operations occur outside any
+transaction, it will be as if each operation occured in its own
+transaction. This, of course, is only suitable for situations where, if
+written out explicitly, there would be a transaction consisting of
+exactly one read or one write.
+
+=head2 Waiting for a change
+
+The library provides the powerful primitive C<retry()> to handle most
+cases like this. It is roughly equivalent to the PASM C<stm_wait
+abort_outer> followed by restarting the transaction with extra code at
+the label C<abort_outer> handling the special case of the outer
+transaction being invalid (see 'Nested transactions' below). For
+example, code that removes the last item from a linked list, waiting for
+one to be available could be written like this:
+
+ my $value = STM::transaction(sub {
+     my $tail = $list.tail.get_read();
+     STM::retry() unless $tail;
+     my $prev = $tail.prev.get_read();
+     $tail.set($prev);
+     if (!$prev) {
+         $list.head.set(undef);
+     }
+     return $tail.data;
+ });
+
+The STM system keeps tracks of all reads and writes attempted in a
+transaction so far, and retry() will abort the current transaction and
+wait for something it (or outer transactions, see below) read or wrote
+to have changed since its attempt at reading or writing it. It then
+restarts the transaction. This removes the need for explicit signalling
+when, as is common, a thread needs to wait for another thread to change
+something.
+
+=head2 Choosing from several choices
+
+As an extension of retry(), support is also provided for those cases
+where one may need to wait for several things at once. The function
+C<choice()> takes a list of subroutines and causes exactly one of them
+to be executed in its own transaction. Whenever any of these subroutines
+call C<retry()>, instead of forcing them to wait, C<choice()> will first
+try the others. If they all ask to retry, choice will merge them
+altogether and wait for any of the values any of the choices used to
+change. To avoid having one of the supplied subroutines see the effect
+of the other, it does by saving retrying transactions with the STMLog
+PMC then replaying them and retrying itself. For example one could
+remove a value on one of several (STM-using) lists using code like:
+
+ my $value = STM::choice(
+                sub { return $list1.removeTail() }, 
+                sub { return $list2.removeTail() },
+                ...
+             );   
+
+This will not block if either of the lists has a value available
+and will properly wait for either list to have a value available if
+both do not.
+
+=head2 Rolling back transactions
+
+For cases when one detects an error during a transaction, the runtime
+provides the function give_up() which tells transaction() to rollback
+(using the C<stm_abort> op) the transaction when it regains but still
+return whatever the subroutine did:
+
+ my $status = STM::transaction(sub {
+    my $fromFunds := $fromAccount.funds.get_update();
+    my $toFunds := $toAccount.funds.get_update();
+    $fromFunds -= $amount;
+    $toFunds += $amount;
+    if ($fromFunds < 0) {
+        STM::give_up();
+        return ERROR_INSUFFICENT_FUNDS;
+    }
+    return OKAY;
+ });
+
+An exceptions-aware implementation might rollback the transaction
+whenever certain exceptions are thrown and then rethrow the exception.
+
+=head2 Nested transactions
+
+Transactions can be nested arbitrarily. Transactions started earlier in
+a thread are called 'outer transactions' and ones started later (more
+deeply nested ones) are called 'inner transactions'. Inner transactions
+see all operations that have taken place so far in their outer
+transactions, and the inner transaction's effects are not seen until and
+unless the outer transaction commits. That is, when an inner transaction
+commits, it is just merged into the outer transaction. These semantics
+are intended to allow one to use functions that create transactions
+freely within other functions that use transactions. For example, if we
+had a list type where all the operations create transactions, we can
+still combine them into one larger transaction:
+
+ STM::transaction(sub {
+     $list.addHead($value1);
+     $list.addHead($value2);
+ });
+
+and be sure that C<$value1> is adjacent to C<$value2> in C<$list>. The
+nesting also works for retrying, so in the above example of C<choice()>
+it doesn't matter if C<removeTail()> starts its own transaction. One
+could even, for example, create a function
+
+ sub findValue {
+     return STM::choice(
+        sub { return ($list_foo.removeTail()) },
+        sub { return ($list_bar.removeTail()) },
+     );
+ }
+
+and then use it in something like:
+
+ my $value = STM::choice(
+    sub { findValue() }, 
+    sub { $other_list.removeTail() }
+ );
+
+In the implementation of the runtime library or equivalents some extra
+effort is needed to deal properly with nesting though this is
+transparent to the user. Most importantly, an inner transaction might
+fail to commit (and instead do something like call retry()) repeatedly
+because the outer transaction constrains it to seeing an outdated view
+of objects. To compensate for this, one must check ifthe outer
+transaction is invalid, which can be done explicitly using the
+C<stm_validate> op and which is always done by C<stm_wait>, and, if it
+is, rollback and restart the outer transaction.
+
+
+=head1 SEE ALSO
+
+C<src/ops/stm.ops>, C<docs/stm/stm_frontend.pod>,
+C<docs/stm/internals.pod>
+
+=cut
