@@ -856,8 +856,6 @@ CODE
 42.42
 OUTPUT
 
-SKIP: {
-	skip("bound method disabled", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "bound __add method");
 .sub main :main
     .local pmc d, l, r, m
@@ -866,14 +864,14 @@ pir_output_is(<<'CODE', <<'OUTPUT', "bound __add method");
     r = new Float
     l = 3
     r = 39.42
-    m = getattribute l, "__add"
-    m(r, d)
+    m = find_global 'Float', "__add"
+    d = m(r, l)
     print d
     print "\n"
     r = new Integer
     r = 39
-    m = getattribute l, "__add"
-    m(r, d)
+    m = find_global 'Integer', "__add"
+    d = m(r, l)
     print d
     print "\n"
     end
@@ -882,7 +880,6 @@ CODE
 42.42
 42
 OUTPUT
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
 .sub main :main
@@ -981,20 +978,20 @@ CODE
 2
 OUTPUT
 
-SKIP: {
-	skip("multi methods disabled - need pdd03 OO specs", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "mmd bug reported by Jeff");
 .namespace ['Foo']
 
-.sub bar method, :multi(Foo, string)
+.sub bar :method, :multi(Foo, string)
+    .param string arg
     print "string\n"
 .end
 
-.sub bar method, :multi(Foo, pmc)
+.sub bar :method, :multi(Foo, pmc)
+    .param pmc arg
     print "PMC\n"
 .end
 
-.sub bar method, :multi(Foo)
+.sub bar :method, :multi(Foo)
     print "nothing\n"
 .end
 
@@ -1008,7 +1005,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "mmd bug reported by Jeff");
 
     $P0.'bar'('Bar!')
 
-    $P1 = new PerlString
+    $P1 = new .String
     $P1 = "Bar!"
     $P0.'bar'($P1)
 
@@ -1019,7 +1016,6 @@ string
 PMC
 nothing
 OUTPUT
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "use a core func for an object");
 .sub main :main
