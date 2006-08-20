@@ -30,10 +30,9 @@ my $teetcl = 't_tcl';
 
 my @b= map {s/.*\/(.*)\.t/$1/; $_} (glob ("$teetcl/*.t"));
 
-my @keepers = qw(
-  appendComp basic cmdAH cmdIL cmdInfo cmdMZ compile config fileName fileSystem main misc 
-  parse parseExpr parseOld regexpComp utf util
-);
+my @keepers = qw( appendComp basic cmdAH cmdIL cmdInfo cmdMZ compile
+  config fileName fileSystem main misc parse parseExpr parseOld
+  regexpComp utf util );
 
 my %numtests;
 

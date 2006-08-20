@@ -1,4 +1,4 @@
-/*
+y/*
  * symreg.c
  *
  * XXX: SymReg stuff has become overused. SymReg should be for symbolic
@@ -182,7 +182,7 @@ add_pcc_arg(SymReg *r, SymReg * arg)
     int n = r->pcc_sub->nargs;
     r->pcc_sub->args = realloc(r->pcc_sub->args, (n + 1) * sizeof(SymReg *));
     r->pcc_sub->args[n] = arg;
-    r->pcc_sub->arg_flags = realloc(r->pcc_sub->arg_flags, (n + 1) * sizeof(int));
+    r->pcc_sub->arg_flags = realloc(r->pcc_sub->arg_flags, (n+1) * sizeof(int));
     r->pcc_sub->arg_flags[n] = arg->type;
     arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
     r->pcc_sub->nargs++;
@@ -203,7 +203,7 @@ add_pcc_result(SymReg *r, SymReg * arg)
     /* we can't keep the flags in the SymReg as the SymReg
      * maybe used with different flags for different calls
      */
-    r->pcc_sub->ret_flags = realloc(r->pcc_sub->ret_flags, (n + 1) * sizeof(int));
+    r->pcc_sub->ret_flags = realloc(r->pcc_sub->ret_flags, (n+1) * sizeof(int));
     r->pcc_sub->ret_flags[n] = arg->type;
     arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
     r->pcc_sub->nret++;

@@ -328,23 +328,28 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
     char *function = unit->instructions->r[0]->name;
 
     make_stat(unit, sets, cols);
-    IMCC_info(interpreter, 1, "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
-            function, imcsets[0], imcsets[1], imcsets[2], imcsets[3]);
-    IMCC_info(interpreter, 1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
-            ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
-            ostat.branch_branch);
-    IMCC_info(interpreter, 1, "\t%d branch_cond_loop\n",
-            ostat.branch_cond_loop);
+    IMCC_info(interpreter, 1,
+              "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
+              function, imcsets[0], imcsets[1], imcsets[2], imcsets[3]);
+    IMCC_info(interpreter, 1,
+              "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
+              ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
+              ostat.branch_branch);
+    IMCC_info(interpreter, 1, 
+              "\t%d branch_cond_loop\n",
+              ostat.branch_cond_loop);
     IMCC_info(interpreter, 1, "\t%d used once deleted\n",
-            ostat.used_once);
-    IMCC_info(interpreter, 1, "\t%d invariants_moved\n", ostat.invariants_moved);
+              ostat.used_once);
+    IMCC_info(interpreter, 1, "\t%d invariants_moved\n",
+              ostat.invariants_moved);
     IMCC_info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
-            sets[0], sets[1], sets[2], sets[3]);
-    IMCC_info(interpreter, 1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
-            cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1,
-            unit->n_spilled);
+              sets[0], sets[1], sets[2], sets[3]);
+    IMCC_info(interpreter, 1, 
+              "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
+              cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1,
+              unit->n_spilled);
     IMCC_info(interpreter, 1, "\t%d basic_blocks, %d edges\n",
-            unit->n_basic_blocks, edge_count(unit));
+              unit->n_basic_blocks, edge_count(unit));
 }
 
 /* sort list by line  nr */
@@ -397,8 +402,8 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     if (count == 0)
         return;
     if (count >= HASH_SIZE)
-        IMCC_warning(interpreter, "build_reglist", "probably too small HASH_SIZE"
-                " (%d symbols)\n", count);
+        IMCC_warning(interpreter, "build_reglist", 
+                     "probably too small HASH_SIZE (%d symbols)\n", count);
     unit->reglist = mem_sys_allocate_zeroed(count*sizeof(SymReg*));
 
     for (i = count = 0; i < HASH_SIZE; i++) {
@@ -765,7 +770,8 @@ update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     }
     /* now set life_info */
     free_life_info(unit, r);
-    r->life_info = mem_sys_allocate_zeroed(unit->n_basic_blocks*sizeof(Life_range*));
+    r->life_info = 
+        mem_sys_allocate_zeroed(unit->n_basic_blocks*sizeof(Life_range*));
     for (i=0; i < unit->n_basic_blocks; i++)
         make_life_range(r, i);
     l = r->life_info[ins->bbindex];
@@ -865,8 +871,8 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
 	}
         if (needs_fetch || needs_store) {
             /* update life info of prev sym */
-            update_life(interpreter, unit, ins, new_sym, needs_fetch, needs_store,
-                    old_sym != new_sym);
+            update_life(interpreter, unit, ins, new_sym, needs_fetch, 
+                        needs_store, old_sym != new_sym);
             /* if all symbols are in one basic_block, we need a new
              * symbol, so that the life_ranges are minimal
              * It would be nice, to detect, when changing the symbol
@@ -890,8 +896,9 @@ spill_registers(Parrot_Interp interpreter, IMC_Unit* unit, graph* G)
     int spilled=0, j;
     Instruction *spill_ins, *ins;
 
-    IMCC_debug(interpreter, DEBUG_REG, "spill_registers: spilling at least %d symbols\n",
-            G->k-MAX_COLOR);
+    IMCC_debug(interpreter, DEBUG_REG, 
+               "spill_registers: spilling at least %d symbols\n",
+               G->k-MAX_COLOR);
 
     /* first instruction should be ".sub" -- make sure we allocate P31
      * _after_ subroutine entry.  And after the "saveall", or any
@@ -1057,18 +1064,20 @@ apply_coloring(Interp* interpreter, IMC_Unit* unit, graph* G)
             assert(reglist[x]->color >= 0);
             assert(reglist[x]->color < MAX_COLOR);
             assert(reglist[x]->color == G->V[j].col-1);
-            IMCC_debug(interpreter, DEBUG_REG,"%d (reg==%ld):", x, reglist[x]->color);
+            IMCC_debug(interpreter, DEBUG_REG,"%d (reg==%ld):", x, 
+                       reglist[x]->color);
             for (k = 0; k < G->n; k++) {
                 int y=G->V[k].id;
                 if (ig_test(x, y, G->n, G->E)) {
-                    IMCC_debug(interpreter, DEBUG_REG," %d(c=%ld)",y, reglist[y]->color);
+                    IMCC_debug(interpreter, DEBUG_REG," %d(c=%ld)",y, 
+                               reglist[y]->color);
                     assert(reglist[x]->color != reglist[y]->color);
                 }
             }
             IMCC_debug(interpreter, DEBUG_REG, "\n");
         }
-        IMCC_debug(interpreter, DEBUG_REG, "\ncoloring applied and verified, for %d "
-                "node graph (Chi==%d).\n\n", G->n, G->k);
+        IMCC_debug(interpreter, DEBUG_REG, "\ncoloring applied and verified, "
+                   "for %d node graph (Chi==%d).\n\n", G->n, G->k);
     }
 #endif
 }
@@ -1099,7 +1108,8 @@ ig_init_graph(Interp* interpreter, IMC_Unit* unit, graph* G) {
         G->V[x].id = x;
         G->V[x].col = 0;  /* start uncolored */
         G->V[x].deg = 0;
-        G->V[x].in = 1;   /* Indicates the node is "in" the graph, not removed. */
+        G->V[x].in = 1;   /* Indicates the node is "in" the graph, not
+                           * removed. */
         for (y = 0; y < num_nodes; y++)
             if (ig_test(x, y, num_nodes, G->E))
                 G->V[x].deg++;    /* another neighbor of x is recorded */
@@ -1165,8 +1175,8 @@ ig_precolor(Interp* interpreter, IMC_Unit* unit, graph* G)
                             "cannot precolor spilled symbol");
             }
             u->col=c;
-            IMCC_debug(interpreter, DEBUG_REG, "PRECOLORing spilled node %d, %s, "
-                    "as color %d\n", x,unit->reglist[x]->name,c);
+            IMCC_debug(interpreter, DEBUG_REG, "PRECOLORing spilled node %d, "
+                       "%s, as color %d\n", x,unit->reglist[x]->name,c);
         }
         assert(0<=u->col && u->col<=MAX_COLOR); /*uncolored is okay*/
         if (u->col>G->k)
@@ -1275,8 +1285,9 @@ ig_color_node(Interp* interpreter, IMC_Unit* unit, graph* G, int j)
         u->col = c;
     }
     if (G->k < c) G->k = c;
-    IMCC_debug(interpreter, DEBUG_REG2, "ig_color_node:  node %d, receives col=%d\n",
-            u->id, u->col);
+    IMCC_debug(interpreter, DEBUG_REG2, 
+               "ig_color_node:  node %d, receives col=%d\n",
+               u->id, u->col);
     return c;
 }
 

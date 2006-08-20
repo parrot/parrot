@@ -88,10 +88,10 @@ sub convert_tests {
 ##
 sub checkout_tests {
     print "Checking out tests from CVS\n";
-    
-    my $rc = system <<"END_COMMAND";
-cvs -z3 -d :pserver:anonymous:\@tcl.cvs.sourceforge.net:/cvsroot/tcl co -d $DIR tcl/tests
-END_COMMAND
+
+    my $command = "cvs -z3 -d :pserver:anonymous:\@tcl.cvs.sourceforge.net:"
+                . "/cvsroot/tcl co -d $DIR tcl/tests";
+    my $rc = system $command;
 
     return ($rc == 0) ; # just care if it failed, not howm
 }
@@ -111,7 +111,8 @@ sub choose {
 ##
 ## %tests = extract_tests($string)
 ##
-## Extract the tests from the .test file. (test_name => [ $expl, $source, $out ])
+## Extract the tests from the .test file. 
+##    (test_name => [ $expl, $source, $out ])
 ##
 
 sub extract_tests {

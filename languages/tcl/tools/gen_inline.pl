@@ -8,7 +8,8 @@ gen_inline.pl
 
 =head1 SYNOPSIS
 
- %perl languages/tcl/tools/gen_inline.pl src/builtins/foo.tmt > src/builtins/foo.pir
+ %perl languages/tcl/tools/gen_inline.pl src/builtins/foo.tmt
+                                              > src/builtins/foo.pir
 
 =head1 DESCRIPTION
 
@@ -410,15 +411,17 @@ sub inlined_body {
         {
             my $name = $1;
             my $arg  = $args{$name};
-            
+
             if ($arg->{type}[-1] eq 'script' or $arg->{type}[-1] eq 'expr') {
                 $code .= emit("temp = a_${name}_%0()", 'loop_num');
-                
+
                 # if that's all there is, remove it
-                $line =~ s/^\s*a_${name}_%0\s*$//m or $line =~ s/a_${name}_%0/temp/;
+                $line =~ s/^\s*a_${name}_%0\s*$//m 
+                  or
+                    $line =~ s/a_${name}_%0/temp/;
             }
         }
-        
+
         # $R
         $line =~ s/\$R\b/\$P%1/g;
 
@@ -473,7 +476,8 @@ sub inlined_badargs {
     
     my $usage = create_usage(@args);
     my $code  = "bad_args: \n"
-              . "  .return(register, \"  tcl_error 'wrong # args: should be \\\"$cmd$usage\\\"' \\n\") \n";
+              . "  .return(register, \"  tcl_error 'wrong # args: should be "
+              . "\\\"$cmd$usage\\\"' \\n\") \n";
     
     return $code;
 }

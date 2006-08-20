@@ -29,7 +29,8 @@ static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
 static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
-static void map_colors(IMC_Unit *, int x, unsigned int * graph, char colors[], int typ, int);
+static void map_colors(IMC_Unit *, int x, unsigned int * graph, 
+                       char colors[], int typ, int);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
 static void allocate_lexicals (Parrot_Interp, IMC_Unit *);
 static void vanilla_reg_alloc (Parrot_Interp, IMC_Unit *);

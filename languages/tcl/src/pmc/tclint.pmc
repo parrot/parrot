@@ -43,7 +43,8 @@ pmclass TclInt
         FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (d == 0.0)
-            real_exception(INTERP, NULL, E_ZeroDivisionError, "float division by zero");
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                           "float division by zero");
 
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
