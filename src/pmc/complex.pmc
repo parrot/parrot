@@ -533,12 +533,14 @@ Set real or imag depending on key
 
 =item C<void set_string_native (STRING* value)>
 
-Parses the string C<value> into a complex number; raises an exception on failure.
+Parses the string C<value> into a complex number; raises an exception
+on failure.
 
 =item C<void set_pmc (PMC* value)>
 
-if C<value> is a Complex PMC then the complex number is set to its value; otherwise
-C<value>'s string representation is parsed with C<set_string_native()>.
+if C<value> is a Complex PMC then the complex number is set to its
+value; otherwise C<value>'s string representation is parsed with
+C<set_string_native()>.
 
 =item C<void set_integer_native (INTVAL value)>
 

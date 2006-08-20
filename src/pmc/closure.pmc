@@ -109,7 +109,8 @@ Invokes the closure.
             while (caller) {
                 if (caller->current_sub == outer_sub) {
                     cont = caller->current_cont;
-                    cont->vtable = interpreter->vtables[enum_class_Continuation];
+                    cont->vtable = 
+                        interpreter->vtables[enum_class_Continuation];
                     sub->outer_ctx = sub->ctx->outer_ctx = caller;
                     caller->ref_count++;
                     return next;

@@ -47,7 +47,8 @@ caller(Interp* interpreter, PMC * pmc)
 
 /*
 
-=item C<static void cant_do_method(Interp* interpreter, PMC * pmc, const char *methname)>
+=item C<static void cant_do_method(Interp* interpreter, PMC * pmc, 
+                                   const char *methname)>
 
 Throws an exception "$methname() not implemented in class '$class'", used by
 all unimplemented messages.
@@ -136,7 +137,7 @@ Set pending standard properties in C<prop_hash>.
 
 static void
 propagate_std_props(Interp *interpreter, PMC *self, PMC *prop_hash) {
-    if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)) {
+    if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
         PMC *pmc_true;
         pmc_true = pmc_new(interpreter, enum_class_Integer);
         PMC_int_val(pmc_true) = 1;
@@ -179,7 +180,8 @@ looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 static PMC*
 check_get_std_props(Interp *interpreter, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-        &&!string_compare(interpreter, key, string_from_cstring(interpreter, "_ro", 3))
+        &&!string_compare(interpreter, key, 
+                          string_from_cstring(interpreter, "_ro", 3))
         ) {
         PMC *ret_val;
         ret_val = pmc_new(interpreter, enum_class_Integer);
@@ -759,7 +761,8 @@ Returns whether the PMC is numerically equal to C<*value>.
 */
 
     INTVAL is_equal_num (PMC* value) {
-        return (VTABLE_get_number(INTERP, SELF) == VTABLE_get_number(INTERP, value));
+        return (VTABLE_get_number(INTERP, SELF) == 
+                VTABLE_get_number(INTERP, value));
     }
 
 /*
@@ -938,7 +941,8 @@ Look for NCI methods and properties.
          * XXX do we need that in the default object system?
          */
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
-             b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF), name);
+             b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF), 
+                                        name);
              if (b)
                  p = b->value;
         }

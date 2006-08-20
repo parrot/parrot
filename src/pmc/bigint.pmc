@@ -257,12 +257,14 @@ bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
 }
 
 static void
-bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self, 
+                              INTVAL value, PMC *dest)
 {
     mpz_mul_2exp(BN(dest), BN(self), value);
 }
 static void
-bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, 
+                              INTVAL value, PMC *dest)
 {
     mpz_tdiv_q_2exp(BN(dest), BN(self), value);
 }
@@ -442,7 +444,8 @@ bigint_bitwise_shl_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self, 
+                              INTVAL value, PMC *dest)
 {
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
@@ -455,7 +458,8 @@ bigint_bitwise_shr_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, 
+                              INTVAL value, PMC *dest)
 {
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
@@ -725,9 +729,9 @@ MMD_Integer: {
                 return dest;
             }
 MMD_DEFAULT: {
-                real_exception(INTERP, NULL, E_NotImplementedError, "unimp add");
-                return dest;
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp add");
+            return dest;
+        }
     }
 
     PMC* add_int(INTVAL value, PMC* dest) {
@@ -747,8 +751,8 @@ MMD_Integer: {
                 bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                real_exception(INTERP, NULL, E_NotImplementedError, "unimp add");
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp add");
+        }
     }
 
     void i_add_int (INTVAL value) {
@@ -778,9 +782,9 @@ MMD_Integer: {
                 return dest;
             }
 MMD_DEFAULT: {
-                real_exception(INTERP, NULL, E_NotImplementedError, "unimp sub");
-                return dest;
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp sub");
+            return dest;
+        }
     }
 
     PMC* subtract_int(INTVAL value, PMC* dest) {
@@ -800,8 +804,8 @@ MMD_Integer: {
                 bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                real_exception(INTERP, NULL, E_NotImplementedError, "unimp sub");
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp sub");
+        }
     }
 
     void i_subtract_int (INTVAL value) {
@@ -853,8 +857,8 @@ MMD_Integer: {
                 bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                real_exception(INTERP, NULL, E_NotImplementedError, "unimp mul");
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp mul");
+        }
     }
 
     void i_multiply_int (INTVAL value) {
@@ -1012,8 +1016,8 @@ MMD_Integer: {
                 bigint_mod_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                 real_exception(INTERP, NULL, E_NotImplementedError, "unimp mod");
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp mod");
+        }
     }
 
     void i_cmodulus(PMC* value) {
@@ -1024,8 +1028,8 @@ MMD_Integer: {
                 bigint_mod_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                 real_exception(INTERP, NULL, E_NotImplementedError, "unimp cmod");
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp cmod");
+        }
     }
 
 
@@ -1037,9 +1041,9 @@ MMD_Integer: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
             }
 MMD_DEFAULT: {
-                 real_exception(INTERP, NULL, E_NotImplementedError, "unimp cmp");
-                 return 0;
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp cmp");
+            return 0;
+        }
     }
 
     INTVAL is_equal(PMC* value) {
@@ -1050,9 +1054,9 @@ MMD_Integer: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
             }
 MMD_DEFAULT: {
-                 real_exception(INTERP, NULL, E_NotImplementedError, "unimp eq");
-                 return 0;
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp eq");
+            return 0;
+        }
     }
 
 /*
@@ -1126,7 +1130,9 @@ MMD_BigInt: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shl_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
+            bigint_bitwise_shl_bigint_int(INTERP, SELF, 
+                                          VTABLE_get_integer(INTERP, value), 
+                                          dest);
             return dest;
         }
 MMD_Integer: {
@@ -1134,7 +1140,8 @@ MMD_Integer: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value), 
+                                          dest);
             return dest;
          }
 MMD_DEFAULT: {
@@ -1155,14 +1162,17 @@ MMD_DEFAULT: {
 
     void i_bitwise_shl (PMC* value) {
 MMD_BigInt: {
-                bigint_bitwise_shl_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
+            bigint_bitwise_shl_bigint_int(INTERP, SELF, 
+                                          VTABLE_get_integer(INTERP, value), 
+                                          SELF);
             }
 MMD_Integer: {
-                bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
+            bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value), 
+                                          SELF);
              }
 MMD_DEFAULT: {
-                real_exception(INTERP, NULL, E_NotImplementedError, "unimp shl");
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp shl");
+        }
     }
 
     void i_bitwise_shl_int (INTVAL value) {
@@ -1193,7 +1203,9 @@ MMD_BigInt: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shr_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
+            bigint_bitwise_shr_bigint_int(INTERP, SELF, 
+                                          VTABLE_get_integer(INTERP, value), 
+                                          dest);
             return dest;
         }
 MMD_Integer: {
@@ -1201,7 +1213,8 @@ MMD_Integer: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), 
+                                          dest);
             return dest;
          }
 MMD_DEFAULT: {
@@ -1222,14 +1235,17 @@ MMD_DEFAULT: {
 
     void i_bitwise_shr (PMC* value) {
 MMD_BigInt: {
-                bigint_bitwise_shr_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
+            bigint_bitwise_shr_bigint_int(INTERP, SELF, 
+                                          VTABLE_get_integer(INTERP, value), 
+                                          SELF);
             }
 MMD_Integer: {
-                bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
-             }
+            bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), 
+                                          SELF);
+        }
 MMD_DEFAULT: {
-                real_exception(INTERP, NULL, E_NotImplementedError, "unimp shr");
-             }
+            real_exception(INTERP, NULL, E_NotImplementedError, "unimp shr");
+        }
     }
 
     void i_bitwise_shr_int (INTVAL value) {
