@@ -98,3 +98,5 @@ sub check {
 __DATA__
 compilers/imcc/imclexer.c
 compilers/imcc/imcparser.c
+compilers/ast/astlexer.c
+compilers/ast/astparser.c
