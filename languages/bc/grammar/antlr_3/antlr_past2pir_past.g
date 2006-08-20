@@ -265,26 +265,39 @@ node[String reg_mother]
     {
       reg_num++;
       String reg_exp   = "reg_expression_" + reg_num;
-      String reg_stmts = "reg_stmts_" + reg_num;
       System.out.print( 
-          "    reg_expression_stmt = new 'PAST::Stmt'                         \n"
+          "  # entering 'If node node                                         \n"
         + "      reg_if_op = new 'PAST::Op'                                   \n"
         + "      reg_if_op.'op'( 'if' )                                       \n"
         + "        .sym pmc " + reg_exp + "                                   \n"
         + "        " + reg_exp + " = new 'PAST::Exp'                          \n"
         + "                                                                   \n"
-        + "        .sym pmc " + reg_stmts + "                                 \n"
-        + "        " + reg_stmts + " = new 'PAST::Stmts'                      \n"
       );
     }
-    ^( If node[reg_exp] node[reg_stmts]* )
+    ^( If node["reg_if_op"] node["reg_if_op"] )
     {
        // Create a node for If
       System.out.print( 
-          "      reg_if_op.'add_child'( " + reg_exp + " )                     \n"
-        + "      reg_if_op.'add_child'( " + reg_stmts + " )                   \n"
-        + "  " + $node.reg_mother + ".'add_child'( reg_expression_stmt )      \n"
-        + "  # leaving 'If expression statement'            ^                 \n"
+          "  # entering 'STMTS node*'                                         \n"
+        + "  " + $node.reg_mother + ".'add_child'( reg_if_op )                \n"
+        + "  # leaving 'If node node                                          \n"
+      );
+    }
+    |
+    {
+      reg_num++;
+      String reg_stmts = "reg_stmts_" + reg_num;
+      System.out.print( 
+          "        .sym pmc " + reg_stmts + "                                 \n"
+        + "        " + reg_stmts + " = new 'PAST::Stmts'                      \n"
+      );
+    }
+    ^( STMTS node[reg_stmts]* )
+    {
+       // Create a node for If
+      System.out.print( 
+          "  " + $node.reg_mother + ".'add_child'( " + reg_stmts + " )        \n"
+        + "  # leaving 'STMTS node*'                                          \n"
       );
     }
   ;

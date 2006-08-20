@@ -22,6 +22,7 @@ tokens
   ARRAY;
   PRINT;
   PROGRAM;
+  STMTS;
   VAR;
 } 
 
@@ -135,7 +136,7 @@ statement
     |
     STRING -> ^( PRINT STRING )
     | 
-    If '(' relational_expression ')' statement -> ^( If relational_expression statement )
+    If '(' relational_expression ')' statement -> ^( If relational_expression ^( STMTS statement ) )
   ;
 
 // TODO: implement functions
