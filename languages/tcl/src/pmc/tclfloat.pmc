@@ -27,7 +27,6 @@ pmclass TclFloat
         UINTVAL buflen;
         int check_flag;
         STRING * buff;
-        STRING * format;
         STRING * dot;
         STRING * e;
         STRING * dot_zero;
@@ -40,8 +39,7 @@ pmclass TclFloat
         if (precision == 0)
             precision = 16; /* XXX hack to approximate right output.*/
 
-        format = Parrot_sprintf_c(INTERP, "%%.%ivg",precision);
-        buff   = Parrot_sprintf_c(INTERP, string_to_cstring(INTERP, format) ,PMC_num_val(SELF));
+        buff   = Parrot_sprintf_c(INTERP, "%.*vg", precision, PMC_num_val(SELF));
 
         /* 
          * this sprintf variant will return something that looks like
