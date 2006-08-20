@@ -43,7 +43,8 @@ trace_class_name(Interp *interpreter, PMC* pmc)
     STRING *class_name;
     if (PObj_is_class_TEST(pmc)) {
         SLOTTYPE * const class_array = PMC_data(pmc);
-        PMC * const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+        PMC * const class_name_pmc = get_attrib_num(class_array, 
+                                                    PCD_CLASS_NAME);
         class_name = PMC_str_val(class_name_pmc);
     }
     else

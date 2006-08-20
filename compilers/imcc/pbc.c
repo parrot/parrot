@@ -766,9 +766,10 @@ add_const_key(Interp *interpreter, opcode_t key[],
     interpreter->code->const_table->constants[k]->type = PFC_KEY;
     interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
     store_key_const(s_key, k);
-    IMCC_debug(interpreter, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n", s_key, k, size);
+    IMCC_debug(interpreter, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n", 
+               s_key, k, size);
     IMCC_debug(interpreter, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
-            key[0],key[1],key[2],key[3],key[4]);
+               key[0],key[1],key[2],key[3],key[4]);
     return k;
 }
 
@@ -1194,7 +1195,8 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->r[0] && ins->r[0]->pcc_sub) {
 #if IMC_TRACE
-            PIO_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n", ins->r[0]->name);
+            PIO_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n",
+                        ins->r[0]->name);
 #endif
             add_const_pmc_sub(interpreter, ins->r[0], oldsize,
                     oldsize+code_size);

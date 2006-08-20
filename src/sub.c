@@ -136,8 +136,10 @@ to the current context.
 struct Parrot_cont *
 new_continuation(Interp *interp, struct Parrot_cont *to)
 {
-    struct Parrot_cont * const cc = mem_sys_allocate(sizeof(struct Parrot_cont));
-    struct Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
+    struct Parrot_cont * const cc = 
+        mem_sys_allocate(sizeof(struct Parrot_cont));
+    struct Parrot_Context * const to_ctx =
+        to ? to->to_ctx : CONTEXT(interp->ctx);
 
     cc->to_ctx = to_ctx;
     cc->from_ctx = CONTEXT(interp->ctx);
@@ -169,7 +171,8 @@ Returns a new C<Parrot_cont> pointing to the current context.
 struct Parrot_cont *
 new_ret_continuation(Interp *interp)
 {
-    struct Parrot_cont * const cc = mem_sys_allocate(sizeof(struct Parrot_cont));
+    struct Parrot_cont * const cc =
+        mem_sys_allocate(sizeof(struct Parrot_cont));
     cc->to_ctx = CONTEXT(interp->ctx);
     cc->from_ctx = NULL;    /* filled in during a call */
     cc->runloop_id = 0;

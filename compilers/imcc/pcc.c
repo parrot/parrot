@@ -176,7 +176,7 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             unit->last_ins->n_r == 1 &&
             ( sub = unit->last_ins->r[0] ) &&
             sub->pcc_sub &&
-            !sub->pcc_sub->object &&                   /* s. src/inter_call.c:119 */
+            !sub->pcc_sub->object && /* s. src/inter_call.c:119 */
             (sub->pcc_sub->flags & isTAIL_CALL))
         return;
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
@@ -184,7 +184,8 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             strcmp(unit->last_ins->op, "exit") &&
             strcmp(unit->last_ins->op, "end") &&
             strcmp(unit->last_ins->op, "branch") &&
-            strcmp(unit->last_ins->op, "returncc") /* was adding rets multiple times... */
+            /* was adding rets multiple times... */
+            strcmp(unit->last_ins->op, "returncc") 
        ) {
         if (sub->pcc_sub->pragma & P_MAIN) {
             tmp = INS(interp, unit, "end", NULL, regs, 0, 0, 0);

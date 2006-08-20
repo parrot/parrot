@@ -211,7 +211,8 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
                     last->r[reg] = go;
-                    tmp = INS(interpreter, unit, (char*)neg_op, "", last->r, args, 0, 0);
+                    tmp = INS(interpreter, unit, (char*)neg_op, "", 
+                              last->r, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
@@ -865,7 +866,8 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
 
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 next = r->first_ins->next;
-/*                if (!next || !strcmp(next->r[0]->name, get_branch_reg(ins)->name))
+/*                if (!next || 
+                      !strcmp(next->r[0]->name, get_branch_reg(ins)->name))
                     break;*/
                 if (next &&
                       (next->type & IF_goto) &&
@@ -914,19 +916,23 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 start = r->first_ins;
                 found = 0;
-                for (edge = unit->bb_list[start->bbindex]->pred_list; edge; edge = edge->pred_next) {
+                for (edge = unit->bb_list[start->bbindex]->pred_list; 
+                     edge; edge = edge->pred_next)
+                {
                     if (edge->from->index == start->bbindex - 1) {
                         found = 1;
                         break;
                     }
                 }
-                /* if target block is not reached by falling into it from another block */
+                /* if target block is not reached by falling into it
+                 * from another block */
                 if (!found) {
                     /* move target block and its positional successors
                      * to follow block with unconditional jump
                      * (this could actually be in another block) */
                     for (end = start; end->next; end = end->next) {
-                        if ((end->type & IF_goto) && !strcmp(end->op, "branch")) {
+                        if ((end->type & IF_goto) && 
+                            !strcmp(end->op, "branch")) {
                             break;
                         }
                     }
@@ -1067,7 +1073,8 @@ branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
                             || cond->type & ITCALL) {
                         break;
                         /* just until we can copy set_args et al */
-                    } else if (cond->type & ITBRANCH && get_branch_regno(cond) >= 0) {
+                    } else if (cond->type & ITBRANCH && 
+                               get_branch_regno(cond) >= 0) {
                         found = 1;
                         break;
                     }
@@ -1152,7 +1159,8 @@ unused_label(Interp *interpreter, IMC_Unit * unit)
 #endif
             if (!used) {
                 ostat.deleted_labels++;
-                IMCC_debug(interpreter, DEBUG_OPT1, "block %d label %s deleted\n", i, lab->name);
+                IMCC_debug(interpreter, DEBUG_OPT1,
+                           "block %d label %s deleted\n", i, lab->name);
                 ostat.deleted_ins++;
                 ins = delete_ins(unit, ins, 1);
                 changed = 1;
@@ -1185,7 +1193,8 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
         /* this block isn't entered from anywhere */
         if (!bb->pred_list) {
             int bbi = bb->index;
-            IMCC_debug(interpreter, DEBUG_OPT1, "found dead block %d\n", bb->index);
+            IMCC_debug(interpreter, DEBUG_OPT1,
+                       "found dead block %d\n", bb->index);
             for (ins = bb->start; ins && ins->bbindex == bbi; ) {
                 IMCC_debug(interpreter, DEBUG_OPT1,
                         "\tins deleted (dead block) %I\n", ins);
@@ -1198,9 +1207,11 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
 
     /* Unreachable instructions */
 
-    for (last = unit->instructions, ins=last->next; last && ins; ins = ins->next) {
+    for (last = unit->instructions, ins=last->next; 
+         last && ins;
+         ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
-                !strcmp(last->op, "branch")) {
+            !strcmp(last->op, "branch")) {
             IMCC_debug(interpreter, DEBUG_OPT1,
                     "unreachable ins deleted (after branch) %I\n", ins);
             ins = delete_ins(unit, ins, 1);
@@ -1214,7 +1225,8 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch") &&
                 !strcmp(last->r[0]->name, ins->r[0]->name)) {
-            IMCC_debug(interpreter, DEBUG_OPT1, "dead branch deleted %I\n", ins);
+            IMCC_debug(interpreter, DEBUG_OPT1, 
+                       "dead branch deleted %I\n", ins);
             ins = delete_ins(unit, last, 1);
             ostat.deleted_ins++;
             changed++;
@@ -1241,7 +1253,8 @@ used_once(Parrot_Interp interpreter, IMC_Unit * unit)
         if (!r)
             continue;
         if (r->use_count == 1 && r->lhs_use_count == 1) {
-            IMCC_debug(interpreter, DEBUG_OPT2, "used once '%I' deleted\n", ins);
+            IMCC_debug(interpreter, DEBUG_OPT2, 
+                       "used once '%I' deleted\n", ins);
             ins = delete_ins(unit, ins, 1);
             ins = ins->prev ? ins->prev : unit->instructions;
             ostat.deleted_ins++;
@@ -1346,14 +1359,16 @@ _is_ins_save(IMC_Unit * unit, Instruction *check_ins,
 }
 
 static int
-is_ins_save(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, SymReg *r, int what)
+is_ins_save(Parrot_Interp interpreter, IMC_Unit * unit, 
+            Instruction *ins, SymReg *r, int what)
 {
     int save;
 
     reason = 0;
     save = _is_ins_save(unit, ins, r, what);
     if (!save && reason)
-        IMCC_debug(interpreter, DEBUG_OPT2, "ins not save var %s reason %d %I\n",
+        IMCC_debug(interpreter, DEBUG_OPT2, 
+                   "ins not save var %s reason %d %I\n",
                 r->name, reason, ins);
     return save;
 }

@@ -72,8 +72,9 @@ Link parrot dynamically.
 
 =item C<--m=32>
 
-Create a 32-bit executable on 64-architectures like x86_64. This option
-appends -m32 to compiler and linker programs and does s/lib64/lib/g on link flags.
+Create a 32-bit executable on 64-architectures like x86_64. This
+option appends -m32 to compiler and linker programs and does
+s/lib64/lib/g on link flags.
 
 This option is experimental. See F<config/init/defaults.pm> for more.
 

@@ -410,7 +410,8 @@ C<how_random> is ignored.
 INTVAL
 Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 {
-    return (INTVAL)( from + ((double)(to - from)) * Parrot_float_rand(how_random) );
+    return (INTVAL)( from + ((double)(to - from))
+                     * Parrot_float_rand(how_random) );
 }
 
 /*
@@ -512,12 +513,16 @@ Parrot_make_cpa(Interp *interpreter, PMC *array) {
        to actually have an array, even if the inbound array is
        completely empty
     */
-    char ** const out_array = mem_sys_allocate((sizeof(char *)) * (arraylen + 1));
+    char ** const out_array = mem_sys_allocate((sizeof(char *)) 
+                                               * (arraylen + 1));
     out_array[arraylen] = 0;
 
     /*    printf("String array has %i elements\n", arraylen);*/
     for (cur = 0; cur < arraylen; cur++) {
-        out_array[cur] = string_to_cstring(interpreter, VTABLE_get_string_keyed_int(interpreter, array, cur));
+        out_array[cur] =
+            string_to_cstring(interpreter, 
+                              VTABLE_get_string_keyed_int(interpreter, 
+                                                          array, cur));
         /*        printf("Offset %i is %s\n", cur, out_array[cur]);*/
     }
 

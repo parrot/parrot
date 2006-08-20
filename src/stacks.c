@@ -147,7 +147,8 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack /*NN*/, INTVAL depth)
 
     /* For negative depths, look from the bottom of the stack up. */
     if (depth < 0) {
-        depth = stack_height(interpreter, CONTEXT(interpreter->ctx)->user_stack) + depth;
+        depth = stack_height(interpreter,
+                             CONTEXT(interpreter->ctx)->user_stack) + depth;
         if (depth < 0)
             return NULL;
         offset = (size_t)depth;
@@ -181,7 +182,9 @@ element.
 */
 
 void
-rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p /*NN*/, INTVAL num_entries)
+rotate_entries(Interp *interpreter, 
+               Stack_Chunk_t **stack_p /*NN*/,
+               INTVAL num_entries)
 {
     Stack_Chunk_t *stack = *stack_p;
     Stack_Entry_t temp;

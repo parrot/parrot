@@ -104,7 +104,9 @@ dump_instructions(Interp *interpreter, IMC_Unit * unit)
     Basic_block *bb;
     int pc;
 
-    fprintf(stderr, "\nDumping the instructions status:\n-------------------------------\n");
+    fprintf(stderr, 
+            "\nDumping the instructions status:"
+            "\n-------------------------------\n");
     fprintf(stderr,
             "nins line blck deep flags\t    type opnr size   pc  X ins\n");
     for (pc = 0, ins = unit->instructions; ins; ins = ins->next) {
@@ -166,7 +168,8 @@ dump_loops(IMC_Unit * unit)
         fprintf(stderr,
                 "Loop %d, depth %d, size %d, header %d, preheader %d\n",
                 i, loop_info[i]->depth,
-                loop_info[i]->size, loop_info[i]->header, loop_info[i]->preheader);
+                loop_info[i]->size, loop_info[i]->header, 
+                loop_info[i]->preheader);
         fprintf(stderr, "  Contains blocks: ");
         for (j = 0; j < unit->n_basic_blocks; j++)
             if (set_contains(loop, j))

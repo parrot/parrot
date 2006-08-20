@@ -29,7 +29,8 @@ static void
 usage(FILE* fp)
 {
     fprintf(fp,
-    "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-O [level]] [-o FILE] <file>\n");
+            "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] "
+            "[-O [level]] [-o FILE] <file>\n");
 }
 
 static void

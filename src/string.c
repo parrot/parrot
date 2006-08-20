@@ -146,8 +146,9 @@ Parrot_make_COW_reference(Interp *interpreter, STRING *s)
                 !Parrot_in_memory_pool(interpreter, PObj_bufstart(s))) {
             Parrot_unmake_COW(interpreter, d);
             PIO_eprintf(interpreter, "cross-interpreter copy of "
-                                     "relocatable string '%Ss' into tid %d\n", d,
-                                     interpreter->thread_data->tid);
+                                     "relocatable string '%Ss' into tid %d\n",
+                        d,
+                        interpreter->thread_data->tid);
         }
 #endif
     }
@@ -337,8 +338,10 @@ Returs NULL, if no compatible string representation can be found.
 */
 
 CHARSET *
-string_rep_compatible (Interp *interpreter, STRING *a /*NN*/, const STRING *b /*NN*/,
-        ENCODING **e /*NN*/)
+string_rep_compatible (Interp *interpreter,
+                       STRING *a /*NN*/,
+                       const STRING *b /*NN*/,
+                       ENCODING **e /*NN*/)
 {
     if (a->encoding == b->encoding && a->charset == b->charset) {
         *e = a->encoding;
@@ -2470,7 +2473,8 @@ character classes. Returns 0 otherwise, or if the string is empty or NULL.
 */
 
 INTVAL
-Parrot_string_is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *s, UINTVAL offset)
+Parrot_string_is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, 
+                        STRING *s, UINTVAL offset)
 {
     if (!string_length(interpreter, s))
         return 0;
@@ -2478,7 +2482,8 @@ Parrot_string_is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *
 }
 
 INTVAL
-Parrot_string_find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *s, UINTVAL offset, UINTVAL count)
+Parrot_string_find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+                          STRING *s, UINTVAL offset, UINTVAL count)
 {
     if (!s)
         return -1;
@@ -2486,7 +2491,8 @@ Parrot_string_find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING
 }
 
 INTVAL
-Parrot_string_find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *s, UINTVAL offset, UINTVAL count)
+Parrot_string_find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+                              STRING *s, UINTVAL offset, UINTVAL count)
 {
     if (!s)
         return -1;

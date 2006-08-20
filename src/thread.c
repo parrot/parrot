@@ -66,7 +66,8 @@ make_local_copy(Parrot_Interp interpreter, Parrot_Interp from, PMC *arg)
 {
     PMC *ret_val;
     STRING *const _sub = interpreter->vtables[enum_class_Sub]->whoami;
-    STRING *const _multi_sub = interpreter->vtables[enum_class_MultiSub]->whoami;
+    STRING *const _multi_sub =
+        interpreter->vtables[enum_class_MultiSub]->whoami;
     if (PMC_IS_NULL(arg)) {
         ret_val = PMCNULL;
     } else if (PObj_is_PMC_shared_TEST(arg)) { 
@@ -110,7 +111,9 @@ Make a local copy of the corresponding array of arguments.
 */
 
 static PMC *
-make_local_args_copy(Parrot_Interp interpreter, Parrot_Interp old_interp, PMC *args)
+make_local_args_copy(Parrot_Interp interpreter,
+                     Parrot_Interp old_interp,
+                     PMC *args)
 {
     PMC *ret_val;
     INTVAL old_size;
@@ -163,7 +166,7 @@ PMC *pt_shared_fixup(Parrot_Interp interpreter, PMC *pmc) {
         PMC *vtable_cache;
 
         /* keep the original vtable from going away... */
-        vtable_cache = ((PMC**) PMC_data(pmc->vtable->class))[PCD_OBJECT_VTABLE];
+        vtable_cache = ((PMC**)PMC_data(pmc->vtable->class))[PCD_OBJECT_VTABLE];
         assert(vtable_cache->vtable->base_type == enum_class_VtableCache);
         add_pmc_sync(interpreter, vtable_cache);
         PObj_is_PMC_shared_SET(vtable_cache);
@@ -171,7 +174,8 @@ PMC *pt_shared_fixup(Parrot_Interp interpreter, PMC *pmc) {
         /* don't want the referenced class disappearing on us */
         LOCK_INTERPRETER(master);
         type_num = pmc->vtable->base_type;
-        SET_CLASS((SLOTTYPE*) PMC_data(pmc), pmc, master->vtables[type_num]->class);
+        SET_CLASS((SLOTTYPE*) PMC_data(pmc), pmc, 
+                  master->vtables[type_num]->class);
         UNLOCK_INTERPRETER(master);
     } else {
         /* TODO this will need to change for thread pools
@@ -301,7 +305,8 @@ pt_thread_wait(Parrot_Interp interp) {
         UNLOCK(interpreter_array_mutex);
         pt_suspend_self_for_gc(interp);
         LOCK(interpreter_array_mutex);
-        /* while we were GCing, whatever we were waiting on might have changed */
+        /* while we were GCing, whatever we were waiting on might have
+         * changed */
         return;
     }
     interp->thread_data->state |= THREAD_STATE_GC_WAKEUP;
@@ -355,10 +360,11 @@ thread_func(void *arg)
         except = interpreter->exceptions;
         /* XXX what should we really do here */
         PIO_eprintf(interpreter,
-            "Unhandled exception in thread with tid %d (message=%Ss, number=%d)\n",
-            interpreter->thread_data->tid,
-            except->msg,
-            except->error);
+                    "Unhandled exception in thread with tid %d "
+                    "(message=%Ss, number=%d)\n",
+                    interpreter->thread_data->tid,
+                    except->msg,
+                    except->error);
     } else {
         /* run normally */
         push_new_c_exception_handler(interpreter, &exp);
@@ -916,14 +922,16 @@ pt_suspend_all_for_gc(Parrot_Interp interp)
             continue;
         }
         if (is_suspended_for_gc(other_interp) &&
-                    other_interp != interp && 
-                    (other_interp->thread_data->state & THREAD_STATE_SUSPENDED_GC)) {
+            other_interp != interp && 
+            (other_interp->thread_data->state & THREAD_STATE_SUSPENDED_GC))
+        {
             int successp;
             /* this means that someone else already got this far,
              * so we have a suspend event in our queue to ignore
              */
             /* XXX still reachable? */
-            TRACE_THREAD("apparently someone else is doing it [%p]", other_interp);
+            TRACE_THREAD("apparently someone else is doing it [%p]",
+                         other_interp);
             fprintf(stderr, "??? found later (%p)\n", other_interp);
             successp = remove_queued_suspend_gc(interp);
             assert(successp);
@@ -1351,14 +1359,16 @@ pt_DOD_start_mark(Parrot_Interp interpreter)
      */
     LOCK(interpreter_array_mutex);
     if (interpreter->thread_data->state & THREAD_STATE_SUSPENDED_GC) {
-        assert(!(interpreter->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED));
+        assert(!(interpreter->thread_data->state & 
+                 THREAD_STATE_SUSPEND_GC_REQUESTED));
         TRACE_THREAD("already suspended...");
         UNLOCK(interpreter_array_mutex);
     } else if (block_level) {
         /* unthreaded collection */
         TRACE_THREAD("... but blocked");
         return; /* holding the lock */
-    } else if (interpreter->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
+    } else if (interpreter->thread_data->state & 
+               THREAD_STATE_SUSPEND_GC_REQUESTED) {
         while (remove_queued_suspend_gc(interpreter));
         interpreter->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
         interpreter->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
@@ -1434,7 +1444,8 @@ pt_DOD_stop_mark(Parrot_Interp interpreter)
         UNLOCK(interpreter_array_mutex);
         return;
     }
-    assert(!(interpreter->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED));
+    assert(!(interpreter->thread_data->state &
+             THREAD_STATE_SUSPEND_GC_REQUESTED));
     interpreter->thread_data->state &= ~THREAD_STATE_SUSPENDED_GC;
     while (remove_queued_suspend_gc(interpreter)) {
         /* XXX FIXME make this message never trigger */
@@ -1443,7 +1454,9 @@ pt_DOD_stop_mark(Parrot_Interp interpreter)
     TRACE_THREAD("%p: unlock", interpreter);
     UNLOCK(interpreter_array_mutex);
     TRACE_THREAD("wait to sweep");
-    pt_gc_wait_for_stage(interpreter, THREAD_GC_STAGE_MARK, THREAD_GC_STAGE_SWEEP);
+    pt_gc_wait_for_stage(interpreter,
+                         THREAD_GC_STAGE_MARK,
+                         THREAD_GC_STAGE_SWEEP);
 
 }
 

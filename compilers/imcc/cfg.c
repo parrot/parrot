@@ -259,8 +259,9 @@ invok:
                         if (!saves)
                             bb_add_edge(unit, bb,
                                     unit->bb_list[j+1]);
-                        IMCC_debug(interpreter, DEBUG_CFG, "\tand does saveall %s\n",
-                                saves ? "yes" : "no");
+                        IMCC_debug(interpreter, DEBUG_CFG, 
+                                   "\tand does saveall %s\n",
+                                   saves ? "yes" : "no");
                     }
                 }
                 else if (!strcmp(pred->from->end->op, "invoke")) {
@@ -269,15 +270,16 @@ invok:
                     goto invok;
                 }
                 if (!found)
-                    IMCC_debug(interpreter, DEBUG_CFG, "\tcalled from unknown!\n");
+                    IMCC_debug(interpreter, DEBUG_CFG, 
+                               "\tcalled from unknown!\n");
             }
         }
 
         last = bb;
     }
 
-    /* Decouple unreachable blocks (not the first block, with no predecessors)
-     * from the CFG
+    /* Decouple unreachable blocks (not the first block, with no
+     * predecessors) from the CFG
      */
     do {
         changes = 0;
@@ -303,7 +305,8 @@ invok:
 /* find the placement of the label, and link the two nodes */
 
 static void
-bb_findadd_edge(Parrot_Interp interpreter, IMC_Unit * unit, Basic_block *from, SymReg *label)
+bb_findadd_edge(Parrot_Interp interpreter, IMC_Unit * unit, 
+                Basic_block *from, SymReg *label)
 {
     Instruction *ins;
     SymReg *r = find_sym(interpreter, label->name);
@@ -758,7 +761,9 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
             if (i != b && set_contains(dominators[b], i)) {
                 wrong = 0;
                 for (runner = 0; runner < n; runner++) {
-                    if (runner != b && runner != i && set_contains(dominators[b], runner)) {
+                    if (runner != b && runner != i && 
+                        set_contains(dominators[b], runner)) 
+                    {
                         if (set_contains(dominators[runner], i)) {
                             wrong = 1;
                             break;
@@ -960,10 +965,13 @@ natural_preheader (IMC_Unit * unit, Loop_info* loop_info)
     int preheader = -1;
     Edge* edge;
 
-    for (edge = unit->bb_list[loop_info->header]->pred_list; edge; edge = edge->pred_next) {
+    for (edge = unit->bb_list[loop_info->header]->pred_list; 
+         edge; edge = edge->pred_next) {
         if (!set_contains(loop_info->loop, edge->from->index)) {
-            if (preheader == -1 && unit->bb_list[edge->from->index]->succ_list->to->index == loop_info->header &&
-                    !unit->bb_list[edge->from->index]->succ_list->succ_next) {
+            if (preheader == -1 && 
+                unit->bb_list[edge->from->index]->succ_list->to->index == loop_info->header &&
+                !unit->bb_list[edge->from->index]->succ_list->succ_next)
+            {
                 preheader = unit->bb_list[edge->from->index]->index;
                 continue;
             } else {
