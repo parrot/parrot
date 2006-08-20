@@ -11,7 +11,15 @@
 
 #include "parrot/parrot.h"
 
-pmclass TclInt extends TclObject extends Integer dynpmc group tcl_group hll Tcl maps Integer {
+pmclass TclInt
+    dynpmc
+    extends TclObject
+    extends Integer
+    does    integer
+    group   tcl_group
+    hll     Tcl
+    maps    Integer
+{
 
     /*
      * MMD Override:

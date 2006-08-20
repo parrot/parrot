@@ -51,7 +51,15 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 }
 
 
-pmclass TclArray extends Hash need_ext does hash dynpmc group tcl_group hll Tcl maps Hash {
+pmclass TclArray
+    need_ext 
+    dynpmc
+    extends Hash
+    does    hash 
+    group   tcl_group
+    hll     Tcl
+    maps    Hash
+{
 
 /*
 
