@@ -1,4 +1,4 @@
-y/*
+/*
  * symreg.c
  *
  * XXX: SymReg stuff has become overused. SymReg should be for symbolic

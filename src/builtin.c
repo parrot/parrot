@@ -128,7 +128,8 @@ static int find_builtin(Interp *interpreter, const char *func)
     __attribute__nonnull__(2);
 static int find_builtin_s(Interp *interpreter, STRING *func)
     __attribute__nonnull__(2);
-static int check_builtin_sig(Interp *interpreter, size_t i, const char *sig, int pass)
+static int check_builtin_sig(Interp *interpreter, size_t i, 
+                             const char *sig, int pass)
     __attribute__nonnull__(3);
 
 static int
@@ -158,7 +159,8 @@ find_builtin_s(Interp *interpreter, STRING *func /*NN*/)
 }
 
 static int
-check_builtin_sig(Interp *interpreter, size_t i, const char *sig /*NN*/, int pass)
+check_builtin_sig(Interp *interpreter, size_t i, 
+                  const char *sig /*NN*/, int pass)
 {
     const Builtins * const b = builtins + i;
     const char *p;

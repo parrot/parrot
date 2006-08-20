@@ -189,17 +189,18 @@ int BN_strip_tail_zeros(PINTD_ BIGNUM* victim, BN_CONTEXT*);
 int BN_round_up(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 int BN_round_down(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 int BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context);
-int
-BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context, BN_SAVE_PREC* restore);
-int
-BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context, BN_SAVE_PREC* restore);
-int BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
-int BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
+int BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, 
+                   BN_CONTEXT *context, BN_SAVE_PREC* restore);
+int BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, 
+                     BN_CONTEXT *context, BN_SAVE_PREC* restore);
+int BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, 
+            BN_CONTEXT *context);
+int BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, 
+                 BN_CONTEXT *context);
 int BN_align(PINTD_ BIGNUM* one, BIGNUM* two);
-INTVAL
-BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg);
-int
-BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context);
+INTVAL BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, 
+                   char *msg);
+int BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context);
 
 /* 
 
