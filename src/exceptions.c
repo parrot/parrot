@@ -194,7 +194,9 @@ void
 Parrot_pop_mark(Interp * interpreter, INTVAL mark)
 {
     do {
-        const Stack_Entry_t * const e = stack_entry(interpreter, CONTEXT(interpreter->ctx)->control_stack, 0);
+        const Stack_Entry_t * const e = 
+            stack_entry(interpreter, 
+                        CONTEXT(interpreter->ctx)->control_stack, 0);
         if (!e)
             internal_exception(1, "mark not found");
         (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
@@ -342,7 +344,8 @@ pop_exception(Interp * interpreter)
     struct Parrot_cont * cc;
 
     PMC * const handler =
-        stack_peek(interpreter, CONTEXT(interpreter->ctx)->control_stack, &type);
+        stack_peek(interpreter,
+                   CONTEXT(interpreter->ctx)->control_stack, &type);
 
     if (type != STACK_ENTRY_PMC ||
             handler->vtable->base_type != enum_class_Exception_Handler) {

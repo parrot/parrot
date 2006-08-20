@@ -114,7 +114,8 @@ Parrot_encoding_number(Interp *interpreter, STRING *encodingname)
 
     n = all_encodings->n_encodings;
     for (i = 0; i < n; ++i) {
-        if (!string_equal(interpreter, all_encodings->enc[i].name, encodingname))
+        if (!string_equal(interpreter, all_encodings->enc[i].name, 
+                          encodingname))
             return i;
     }
     return -1;

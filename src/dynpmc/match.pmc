@@ -214,7 +214,8 @@ has not completed yet.
 
         b = parrot_hash_get_bucket(INTERP, hash, input_key);
         if (!b) {
-            internal_exception(1, "Match: cannot get status of incomplete match");
+            internal_exception(1,
+                               "Match: cannot get status of incomplete match");
             return 0;
         }
 

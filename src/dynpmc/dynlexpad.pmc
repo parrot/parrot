@@ -8,7 +8,8 @@ src/dynpmc/dynlexpad.pmc - DynLexPad PMC
 
 =head1 DESCRIPTION
 
-DynLexPad provides a more dynamic lexpad that allows the addition of lexicals at runtime.
+DynLexPad provides a more dynamic lexpad that allows the addition of
+lexicals at runtime.
 
 =head2 Functions
 
@@ -164,7 +165,8 @@ Marks the lexpad hash as live.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd20_lecical_vars.pod>, F<src/pmc/lexpad.pmc>, F<src/pmc/lexinfo.pmc>.
+F<docs/pdds/pdd20_lecical_vars.pod>, F<src/pmc/lexpad.pmc>,
+F<src/pmc/lexinfo.pmc>.
 
 =cut
 

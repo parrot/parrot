@@ -125,19 +125,22 @@ validate(Interp *interpreter, STRING *source_string)
 }
 
 static INTVAL
-is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
+is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+          STRING *source_string, UINTVAL offset)
 {
     return 0;
 }
 
 static INTVAL
-find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+            STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }
 
 static INTVAL
-find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+                STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }

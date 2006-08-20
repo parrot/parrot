@@ -91,7 +91,8 @@ compose(Interp *interpreter, STRING *src)
     err = U_ZERO_ERROR;
     dest_len = unorm_normalize(src->strstart, src_len,
             UNORM_DEFAULT,      /* default is NFC */
-            0,                  /* options 0 default - no specific icu version */
+            0,                  /* options 0 default - no specific icu
+                                 * version */
             dest->strstart, dest_len,
             &err);
     dest->bufused = dest_len * sizeof(UChar);
@@ -100,7 +101,8 @@ compose(Interp *interpreter, STRING *src)
         Parrot_reallocate_string(interpreter, dest, dest->bufused);
         dest_len = unorm_normalize(src->strstart, src_len,
                 UNORM_DEFAULT,      /* default is NFC */
-                0,                  /* options 0 default - no specific icu version */
+                0,                  /* options 0 default - no specific
+                                     * icu version */
                 dest->strstart, dest_len,
                 &err);
         assert(U_SUCCESS(err));
@@ -427,7 +429,8 @@ u_iscclass(Interp *interpreter, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
 }
 
 static INTVAL
-is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
+is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+          STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
 
@@ -441,7 +444,8 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string,
 }
 
 static INTVAL
-find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+            STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
@@ -465,7 +469,8 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_strin
 }
 
 static INTVAL
-find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+                STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;

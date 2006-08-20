@@ -68,7 +68,8 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     extern PARROT_API char **Parrot_exec_rel_addr;
     extern PARROT_API int Parrot_exec_rel_count;
 
-    Parrot_exec_objfile_t * const obj = mem_sys_allocate_zeroed(sizeof(Parrot_exec_objfile_t));
+    Parrot_exec_objfile_t * const obj =
+        mem_sys_allocate_zeroed(sizeof(Parrot_exec_objfile_t));
     exec_init(obj);
     Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof(char *));
     obj->bytecode_header_size =
@@ -135,7 +136,8 @@ add_data_member(Parrot_exec_objfile_t *obj /*NN*/, void *src, size_t len)
         obj->data_size = (int *)mem_sys_allocate(sizeof(int));
     }
     else {
-        obj->data.code = (char *)mem_sys_realloc(obj->data.code, obj->data.size + len);
+        obj->data.code = (char *)mem_sys_realloc(obj->data.code,
+                                                 obj->data.size + len);
         nds = (int *)mem_sys_realloc(obj->data_size, (obj->data_count + 2) *
             sizeof(int));
         obj->data_size = nds;
@@ -195,7 +197,8 @@ Adds a symbol to the object file.
 */
 
 int
-Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/, const char *symbol /*NN*/, int stype)
+Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/, 
+                       const char *symbol /*NN*/, int stype)
 {
 
     int symbol_number = symbol_list_find(obj, symbol);
@@ -230,16 +233,17 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/, const char *symbol /*N
 }
 
 int *
-Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj /*NN*/, char *nptr,
-    const char *var, int offset, int disp)
+Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj /*NN*/, 
+                                     char *nptr, const char *var, int offset, 
+                                     int disp)
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_COM, var, disp);
     return (int *)offset;
 }
 
 void
-Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj /*NN*/, char *nptr,
-    const char *func_name)
+Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj /*NN*/, 
+                                      char *nptr, const char *func_name)
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_FUNC, func_name, 1);
 }

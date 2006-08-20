@@ -961,8 +961,9 @@ trace_mem_block(Interp *interpreter,
     const size_t pmc_min = get_min_pmc_address(interpreter);
     const size_t pmc_max = get_max_pmc_address(interpreter);
 
-    const size_t mask = find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
-            buffer_max > pmc_max ? buffer_max : pmc_max);
+    const size_t mask = 
+        find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
+                         buffer_max > pmc_max ? buffer_max : pmc_max);
 
     if (!lo_var_ptr || !hi_var_ptr)
         return;

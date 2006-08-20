@@ -111,15 +111,17 @@ Return path and handle of a dynamic lib, setting lib_name to just the filestem
 
 */
 
-static STRING *
-get_path(Interp *interpreter, STRING *lib, void **handle, STRING *wo_ext, STRING *ext)
+static STRING * get_path(Interp *interpreter, STRING *lib, void **handle, 
+                         STRING *wo_ext, STRING *ext)
 {
     STRING *path, *full_name;
     const char *err = NULL;    /* buffer returned from Parrot_dlerror */
 
     PMC * const iglobals = interpreter->iglobals;
-    PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interpreter, iglobals, IGLOBALS_LIB_PATHS);
-    PMC * const share_ext = VTABLE_get_pmc_keyed_int(interpreter, lib_paths, PARROT_LIB_DYN_EXTS);
+    PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interpreter, iglobals, 
+                                                     IGLOBALS_LIB_PATHS);
+    PMC * const share_ext = VTABLE_get_pmc_keyed_int(interpreter, lib_paths, 
+                                                     PARROT_LIB_DYN_EXTS);
 
     /*
      * first, try to add an extension to the file if it has none.
@@ -139,7 +141,8 @@ get_path(Interp *interpreter, STRING *lib, void **handle, STRING *wo_ext, STRING
 		    return path;
 		}
 		err = Parrot_dlerror();
-		Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG, "Couldn't load '%Ss': %s\n",
+		Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG, 
+                            "Couldn't load '%Ss': %s\n",
 			full_name, err ? err : "unknown reason");
 		return NULL;
 	    }
@@ -182,8 +185,9 @@ get_path(Interp *interpreter, STRING *lib, void **handle, STRING *wo_ext, STRING
     }
 #endif
     err = Parrot_dlerror();
-    Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG, "Couldn't load '%Ss': %s\n",
-            lib, err ? err : "unknown reason");
+    Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG,
+                "Couldn't load '%Ss': %s\n",
+                lib, err ? err : "unknown reason");
     return NULL;
 }
 
@@ -242,8 +246,8 @@ Parrot_init_lib(Interp *interpreter,
     return lib_pmc;
 }
 
-static PMC *
-run_init_lib(Interp *interpreter, void *handle, STRING *lib_name, STRING *wo_ext) {
+static PMC *run_init_lib(Interp *interpreter, void *handle, 
+                         STRING *lib_name, STRING *wo_ext) {
     STRING *path, *load_func_name, *init_func_name, *type;
     PMC *(*load_func)(Interp *);
     void (*init_func)(Interp *, PMC *);
@@ -374,7 +378,8 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     void * handle;
     PMC *lib_pmc;
     STRING *path;
-    STRING *lib_name, *wo_ext, *ext;	/* library stem without path or extension.  */
+    STRING *lib_name, *wo_ext, *ext;	/* library stem without path
+                                         * or extension.  */
 
     UNUSED(initializer);
     /* Find the pure library name, without path or extension.  */

@@ -329,7 +329,8 @@ again:
 
             if (!program_code) {
                 PIO_eprintf(interpreter,
-                            "Parrot VM: Could not reallocate buffer while reading packfile from PIO.\n");
+                            "Parrot VM: Could not reallocate buffer "
+                            "while reading packfile from PIO.\n");
                 return NULL;
             }
 
@@ -593,7 +594,9 @@ print_profile(Interp *interpreter, int status, void *p)
         RunProfile *profile = interpreter->profile;
         FLOATVAL empty = calibrate(interpreter);
 
-        PIO_printf(interpreter, " Code J Name                         Calls  Total/s       Avg/ms\n");
+        PIO_printf(interpreter, 
+                   " Code J Name                         "
+                   "Calls  Total/s       Avg/ms\n");
         for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
             UINTVAL n = profile->data[j].numcalls;
             profile->data[j].op = j;
