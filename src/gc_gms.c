@@ -267,19 +267,24 @@ Parrot_gc_gms_init(Interp* interpreter)
 
 =over 4
 
-=item C<static void gc_gms_add_free_object(Interp *, struct Small_Object_Pool *pool, void *to_add)>
+=item C<static void gc_gms_add_free_object(Interp *, 
+                                           struct Small_Object_Pool *pool,
+                                           void *to_add)>
 
 Unused. White (dead) objects are added in a bunch to the free_list.
 
-=item C<static void * gc_gms_get_free_object(Interp *, struct Small_Object_Pool *pool)>
+=item C<static void * gc_gms_get_free_object(Interp *, 
+                                             struct Small_Object_Pool *pool)>
 
 Get a new object off the free_list in the given pool.
 
-=item C<static void gc_gms_alloc_objects(Interp *, struct Small_Object_Pool *pool)>
+=item C<static void gc_gms_alloc_objects(Interp *, 
+                                         struct Small_Object_Pool *pool)>
 
 Allocate new objects for the given pool.
 
-=item C<static void gc_gms_more_objects(Interp *, struct Small_Object_Pool *pool)>
+=item C<static void gc_gms_more_objects(Interp *, 
+                                        struct Small_Object_Pool *pool)>
 
 Run a GC cycle or allocate new objects for the given pool.
 
@@ -456,7 +461,9 @@ gc_gms_get_free_object(Interp *interpreter,
 
 =over 4
 
-=item C<static Gc_gms_gen * gc_gms_create_gen(Interp *, struct Small_Object_Pool *pool, size_t gen_no)>
+=item C<static Gc_gms_gen * gc_gms_create_gen(Interp *,
+                                              struct Small_Object_Pool *pool,
+                                              size_t gen_no)>
 
 Create a generation structure for the given generation number.
 

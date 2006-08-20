@@ -377,9 +377,10 @@ Keys are assigned to buckets with the formula
 
 so when doubling the size of the hashtable, we know that every key is
 either already in the correct bucket, or belongs in the current bucket
-plus C<parrot_hash_size> (the old C<parrot_hash_size>). In fact, because the hashtable
-is always a power of two in size, it depends only on the next bit in the
-hash value, after the ones previously used.
+plus C<parrot_hash_size> (the old C<parrot_hash_size>). In fact,
+because the hashtable is always a power of two in size, it depends
+only on the next bit in the hash value, after the ones previously
+used.
 
 So we scan through all the buckets in order, moving the buckets that
 need to be moved. No bucket will be scanned twice, and the cache should

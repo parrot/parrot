@@ -156,10 +156,13 @@ Parrot_register_HLL(Interp *interpreter,
      * ns_hash to another type, if mappings provide one
      * XXX - FIXME
      */
-    ns_hash = Parrot_make_namespace_keyed_str(interpreter, interpreter->root_namespace, hll_name);
+    ns_hash = Parrot_make_namespace_keyed_str(interpreter, 
+                                              interpreter->root_namespace, 
+                                              hll_name);
 
     /* cache HLLs toplevel namespace */
-    VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, idx, ns_hash);
+    VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 
+                             idx, ns_hash);
 
     /* register HLL lib */
     name = constant_pmc_new_noinit(interpreter, enum_class_String);
@@ -358,8 +361,9 @@ Parrot_get_HLL_namespace(Interp *interpreter, int hll_id)
 =item C<void
 Parrot_regenerate_HLL_namespaces(Interp *interpreter)>
 
-Create all HLL namespaces that don't already exist. This is necessary when creating
-a new interpreter which is sharing an old interpreter's HLL_info.
+Create all HLL namespaces that don't already exist. This is necessary
+when creating a new interpreter which is sharing an old interpreter's
+HLL_info.
 
 =cut
 
@@ -371,26 +375,30 @@ Parrot_regenerate_HLL_namespaces(Interp *interpreter)
     INTVAL hll_id;
     INTVAL const n = VTABLE_elements(interpreter, interpreter->HLL_info);
 
-    /* start at one since the 'parrot' namespace should already have been created */
+    /* start at one since the 'parrot' namespace should already have
+     * been created */
     for (hll_id = 1; hll_id < n; ++hll_id) {
         PMC *ns_hash;
         ns_hash = VTABLE_get_pmc_keyed_int(interpreter,
                                 interpreter->HLL_namespace,
                                 hll_id);
-        if (PMC_IS_NULL(ns_hash) || ns_hash->vtable->base_type == enum_class_Undef) {
+        if (PMC_IS_NULL(ns_hash) ||
+            ns_hash->vtable->base_type == enum_class_Undef) 
+        {
             STRING *hll_name;
             hll_name = Parrot_get_HLL_name(interpreter, hll_id);
             if (!hll_name)
                 continue;
             hll_name = string_downcase(interpreter, hll_name);
-            /* XXX as in Parrot_register_HLL() this needs to be fixed to use the correct
-             * type of namespace. Its relatively easy to do that here since the typemap
-             * already exists, but it is not currently done for consistency.
+            /* XXX as in Parrot_register_HLL() this needs to be fixed
+             * to use the correct type of namespace. Its relatively
+             * easy to do that here since the typemap already exists,
+             * but it is not currently done for consistency.
              */
             ns_hash = Parrot_make_namespace_keyed_str(interpreter, 
                 interpreter->root_namespace, hll_name);
-            VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, hll_id,
-                ns_hash);
+            VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 
+                                     hll_id, ns_hash);
         }
     }
 }

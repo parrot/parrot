@@ -166,12 +166,15 @@ parrot_global_setup_2(Interp *interpreter)
     /* create the namespace root stash */
     interpreter->root_namespace = pmc_new(interpreter, enum_class_NameSpace);
 
-    interpreter->HLL_info = constant_pmc_new(interpreter, enum_class_ResizablePMCArray);
-    interpreter->HLL_namespace = constant_pmc_new(interpreter, enum_class_ResizablePMCArray);
+    interpreter->HLL_info = constant_pmc_new(interpreter, 
+                                             enum_class_ResizablePMCArray);
+    interpreter->HLL_namespace = constant_pmc_new(interpreter, 
+                                                  enum_class_ResizablePMCArray);
 
     Parrot_register_HLL(interpreter, const_string(interpreter, "parrot"), NULL);
 
-    parrot_ns = VTABLE_get_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 0);
+    parrot_ns = VTABLE_get_pmc_keyed_int(interpreter, 
+                                         interpreter->HLL_namespace, 0);
     CONTEXT(interpreter->ctx)->current_namespace = parrot_ns; 
 
     /* We need a class hash */

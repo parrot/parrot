@@ -191,7 +191,8 @@ make_bufferlike_pool(Interp *interpreter, size_t buffer_size)
     /* Expand the array of sized resource pools, if necessary */
     if (num_old <= idx) {
         UINTVAL num_new = idx + 1;
-        sized_pools = mem_internal_realloc(sized_pools, num_new * sizeof(void *));
+        sized_pools = mem_internal_realloc(sized_pools, 
+                                           num_new * sizeof(void *));
         memset(sized_pools + num_old, 0, sizeof(void *) * (num_new - num_old));
 
         interpreter->arena_base->sized_header_pools = sized_pools;
@@ -610,7 +611,8 @@ Parrot_initialize_header_pools(Interp *interpreter)
 
 /*
 
-=item C<int Parrot_forall_header_pools(Interp *, int flag, void *arg, pool_iter_fn)>
+=item C<int Parrot_forall_header_pools(Interp *, int flag, 
+                                       void *arg, pool_iter_fn)>
 
 Iterate through all header pools by calling the passed function. Returns
 zero if the iteration didn't stop or the returned value.
@@ -821,8 +823,9 @@ static void fix_pmc_syncs(Interp *dest_interp,
                     if (PObj_is_PMC_shared_TEST(p)) {
                         PMC_sync(p)->owner = dest_interp;
                     } else {
-                        /* fprintf(stderr, "BAD PMC: address=%p, base_type=%d\n",
-                                p, p->vtable->base_type); */
+                        /* fprintf(stderr, "BAD PMC: address=%p, 
+                                   base_type=%d\n",
+                                   p, p->vtable->base_type); */
                         assert(0);
                     }
                 }
