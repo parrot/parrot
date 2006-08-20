@@ -21,12 +21,12 @@ print " .HLL 'tcl', 'tcl_group'\n";
 print "  .include 'languages/tcl/$dynamic_dir/$_.pir'\n"
     for @dynamic_cmds;
 
-print <<'END_PIR';
-
-.HLL 'tcl', 'tcl_group'
-.namespace
-
-END_PIR
+#print <<'END_PIR';
+#
+#.HLL 'tcl', 'tcl_group'
+#.namespace
+#
+#END_PIR
 
 print "  .include 'languages/tcl/$static_dir/$_.pir'\n"
     for @static_cmds;
