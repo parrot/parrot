@@ -93,7 +93,7 @@ $(R_BUILTIN)/return.pir \
 $(R_BUILTIN)/source.pir \
 $(R_BUILTIN)/split.pir \
 $(R_BUILTIN)/string.pir \
-$(C_BUILTIN)/subst.pir \
+$(R_BUILTIN)/subst.pir \
 $(R_BUILTIN)/switch.pir \
 $(C_BUILTIN)/trace.pir \
 $(R_BUILTIN)/unknown.pir \
