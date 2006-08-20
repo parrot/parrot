@@ -7,6 +7,13 @@ blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.dylib                          [main]lib
 blib/lib/libparrot.so                             [main]lib
 blib/lib/libparrot.so.0.4.6                       [main]lib
+config/gen/cpu/i386/memcpy_mmx.c                  [main]
+config/gen/cpu/i386/memcpy_sse.c                  [main]
+config/gen/platform/ansi/dl.c                     [main]
+config/gen/platform/ansi/time.c                   [main]
+config/gen/platform/darwin/memalign.c             [main]
+config/gen/platform/generic/stat.c                [main]
+config/gen/platform/win32/stat.c                  [main]
 disassemble                                       [main]bin
 disassemble.exe                                   [main]bin
 docs/ops/bit.pod                                  [main]doc
