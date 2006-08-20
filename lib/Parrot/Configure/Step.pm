@@ -275,6 +275,9 @@ sub genfile
         }egx;
 
         if ($options{replace_slashes}) {
+            if ($line =~ m{/$}) {
+                die "$source:$.: line ends in a slash\n"
+            }
             $line =~ s{(/+)}{
                 my $len = length $1;
                 my $slash = $conf->data->get('slash');
