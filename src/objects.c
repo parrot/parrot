@@ -78,7 +78,8 @@ fail_if_exist(Interp *interpreter, PMC *name)
 static PMC *
 clone_array(Interp* interpreter, PMC *source_array)
 {
-    PMC * const new_array = pmc_new(interpreter, source_array->vtable->base_type);
+    PMC * const new_array = pmc_new(interpreter, 
+                                    source_array->vtable->base_type);
     const INTVAL count = VTABLE_elements(interpreter, source_array);
     INTVAL i;
 
@@ -162,10 +163,10 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
                     string_from_cstring(interpreter, "\0", 1),
                     0);
             for (offset = 0; offset < attr_count; offset++) {
-                STRING * const attr_name = VTABLE_get_string_keyed_int(interpreter, attribs,
-                        offset);
-                STRING * const full_name = string_concat(interpreter, partial_name,
-                        attr_name, 0);
+                STRING * const attr_name = 
+                    VTABLE_get_string_keyed_int(interpreter, attribs, offset);
+                STRING * const full_name = 
+                    string_concat(interpreter, partial_name, attr_name, 0);
                 /*
                  * store this attribute with short and full name
                  */
@@ -188,8 +189,8 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
 
 /*
 
-=item C<static void create_deleg_pmc_vtable(Interp *, PMC *class, PMC *class_name, 
-    int full)>
+=item C<static void create_deleg_pmc_vtable(Interp *, PMC *class, 
+                                            PMC *class_name, int full)>
 
 Create a vtable that dispatches either to the contained PMC in the first
 attribute (deleg_pmc) or to an overridden method (delegate), depending
@@ -208,11 +209,14 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
     STRING meth_str;
     DECL_CONST_CAST;
 
-    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class), PCD_OBJECT_VTABLE);
+    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class), 
+                                            PCD_OBJECT_VTABLE);
     VTABLE * const vtable           = PMC_struct_val(vtable_pmc);
     VTABLE * const ro_vtable        = vtable->ro_variant_vtable;
-    VTABLE * const deleg_pmc_vtable = interpreter->vtables[enum_class_deleg_pmc];
-    VTABLE * const object_vtable    = interpreter->vtables[enum_class_ParrotObject];
+    VTABLE * const deleg_pmc_vtable = 
+        interpreter->vtables[enum_class_deleg_pmc];
+    VTABLE * const object_vtable    = 
+        interpreter->vtables[enum_class_ParrotObject];
     VTABLE * const ro_object_vtable = object_vtable->ro_variant_vtable;
     VTABLE * const delegate_vtable  = interpreter->vtables[enum_class_delegate];
 
@@ -801,7 +805,8 @@ instantiate_object(Interp* interpreter, PMC *object, PMC *init)
     /*
      * put in the real vtable
      */
-    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
+    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), 
+                                            PCD_OBJECT_VTABLE);
     object->vtable = PMC_struct_val(vtable_pmc);
 
     /* Grab the attribute count from the parent */
@@ -1102,7 +1107,8 @@ mark_object_cache(Interp* interpreter)
 void
 init_object_cache(Interp* interpreter)
 {
-    Caches * const mc = interpreter->caches = mem_sys_allocate_zeroed(sizeof(*mc));
+    Caches * const mc = interpreter->caches = 
+        mem_sys_allocate_zeroed(sizeof(*mc));
     SET_NULL(mc->idx);
 }
 
@@ -1253,7 +1259,7 @@ debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)
         return;
     if (PObj_is_class_TEST(class)) {
         SLOTTYPE * const class_array = PMC_data(class);
-        PMC * const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+        PMC *const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
         class_name = PMC_str_val(class_name_pmc);
     }
     else
@@ -1576,8 +1582,8 @@ Parrot_class_offset(Interp* interpreter, PMC *object, STRING *class) {
 
 /*
 
-=item C<PMC *
-Parrot_find_class_constructor(Interp* interpreter, STRING *class, INTVAL classtoken)>
+=item C<PMC *Parrot_find_class_constructor(Interp* interpreter, 
+                                           STRING *class, INTVAL classtoken)>
 
 Find and return the constructor method PMC for the named sub. The
 classtoken is an identifier for the class used for fast lookup, or 0
@@ -1588,36 +1594,36 @@ undefined, is pretty likely
 
 */
 
-PMC *
-Parrot_find_class_constructor(Interp* interpreter, STRING *class, INTVAL classtoken)
+PMC *Parrot_find_class_constructor(Interp* interpreter, STRING *class, 
+                              INTVAL classtoken)
 {
     return NULL;
 }
 
-PMC *
-Parrot_find_class_destructor(Interp* interpreter, STRING *class, INTVAL classtoken)
+PMC *Parrot_find_class_destructor(Interp* interpreter, STRING *class, 
+                             INTVAL classtoken)
 {
     return NULL;
 }
 
-PMC *
-Parrot_find_class_fallback(Interp* interpreter, STRING *class, INTVAL classtoken)
+PMC *Parrot_find_class_fallback(Interp* interpreter, STRING *class, 
+                                INTVAL classtoken)
 {
     return NULL;
 }
 
-void
-Parrot_set_class_constructor(Interp* interpreter, STRING *class, INTVAL classtoken, STRING *method)
+void Parrot_set_class_constructor(Interp* interpreter, STRING *class, 
+                                  INTVAL classtoken, STRING *method)
 {
 }
 
-void
-Parrot_set_class_destructor(Interp* interpreter, STRING *class, INTVAL classtoken, STRING *method)
+void Parrot_set_class_destructor(Interp* interpreter, STRING *class, 
+                                 INTVAL classtoken, STRING *method)
 {
 }
 
-void
-Parrot_set_class_fallback(Interp* interpreter, STRING *class, INTVAL classtoken, STRING *method)
+void Parrot_set_class_fallback(Interp* interpreter, STRING *class, 
+                               INTVAL classtoken, STRING *method)
 {
 }
 

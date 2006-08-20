@@ -167,7 +167,8 @@ call_is_safe(Interp *interpreter, PMC *sub, opcode_t **set_args)
     PMC *called, *sig_results;
 
     opcode_t * pc = *set_args;
-    PMC * const sig_args = PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
+    PMC * const sig_args = 
+        PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
 
     /* ignore the signature for now */
     pc += 2 + SIG_ELEMS(sig_args);
@@ -314,8 +315,10 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags)
     opcode_t * const end   = base + PMC_sub(sub)->end_offs;
     /* TODO pass Sub */
 
-    Parrot_jit_info_t * jit_info = parrot_build_asm(interpreter, start, end, NULL,
-            JIT_CODE_SUB_REGS_ONLY | flags);
+    Parrot_jit_info_t * jit_info = 
+        parrot_build_asm(interpreter, 
+                         start, end, NULL,
+                         JIT_CODE_SUB_REGS_ONLY | flags);
     if (!jit_info)
         return NULLfunc;
     return (funcptr_t) jit_info->arena.start;

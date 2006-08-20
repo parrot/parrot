@@ -432,10 +432,11 @@ create_class_pmc(Interp *interpreter, INTVAL type)
      *
      * create a constant PMC
      */
-    PMC * const class = get_new_pmc_header(interpreter, type, PObj_constant_FLAG);
-    /* If we are a second thread, we may get the same object as the original
-     * because we have a singleton. Just set the singleton to be our class
-     * object, but don't mess with its vtable.
+    PMC * const class = get_new_pmc_header(interpreter, type, 
+                                           PObj_constant_FLAG);
+    /* If we are a second thread, we may get the same object as the
+     * original because we have a singleton. Just set the singleton to
+     * be our class object, but don't mess with its vtable.
      */
     if ((interpreter->vtables[type]->flags & VTABLE_PMC_IS_SINGLETON)
         && (class == class->vtable->class)) {

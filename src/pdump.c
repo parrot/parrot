@@ -170,7 +170,8 @@ static void help(void)
     printf("\t-d ... disassemble bytecode segments\n");
     printf("\t-h ... dump header only\n");
     printf("\t-t ... terse output\n");
-    printf("\n\t-o converted.pbc repacks a PBC file into the platform's native\n");
+    printf("\n\t-o converted.pbc repacks a PBC file into "
+           "the platform's native\n");
     printf("\t   binary format for better efficiency on reading "
            "non native PBCs\n");
     exit(0);

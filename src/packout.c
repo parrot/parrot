@@ -125,7 +125,7 @@ size_t
 PackFile_ConstTable_pack_size(Interp *interpreter, struct PackFile_Segment *seg)
 {
     opcode_t i;
-    struct PackFile_ConstTable * const self = (struct PackFile_ConstTable *) seg;
+    struct PackFile_ConstTable* const self = (struct PackFile_ConstTable *) seg;
     size_t size = 1;    /* const_count */
 
     for (i = 0; i < self->const_count; i++)
@@ -135,8 +135,9 @@ PackFile_ConstTable_pack_size(Interp *interpreter, struct PackFile_Segment *seg)
 
 /*
 
-=item C<opcode_t *
-PackFile_ConstTable_pack(Interp *, struct PackFile_Segment *seg, opcode_t *cursor)>
+=item C<opcode_t *PackFile_ConstTable_pack(Interp *, 
+                                           struct PackFile_Segment *seg,
+                                           opcode_t *cursor)>
 
 Pack the PackFile ConstTable into a contiguous region of memory.
 
@@ -165,7 +166,8 @@ PackFile_ConstTable_pack(Interp *interpreter,
     *cursor++ = self->const_count;
 
     for (i = 0; i < self->const_count; i++) {
-        cursor = PackFile_Constant_pack(interpreter, self->constants[i], cursor);
+        cursor = PackFile_Constant_pack(interpreter, 
+                                        self->constants[i], cursor);
     }
 
     return cursor;
@@ -202,7 +204,8 @@ find_in_const(Interp *interpreter, PMC *key, int type)
 /*
 
 =item C<opcode_t *
-PackFile_Constant_pack(Interp*, struct PackFile_Constant *self, opcode_t *cursor)>
+PackFile_Constant_pack(Interp*, struct PackFile_Constant *self, 
+                       opcode_t *cursor)>
 
 Pack a PackFile Constant into a contiguous region of memory.
 
@@ -274,11 +277,13 @@ PackFile_Constant_pack(Interp* interpreter,
                     break;
                 case KEY_number_FLAG:
                     *cursor++ = PARROT_ARG_NC | slice_bits;
-                    *cursor++ = find_in_const(interpreter, key, PFC_NUMBER);     /* Argh */
+                    /* Argh */
+                    *cursor++ = find_in_const(interpreter, key, PFC_NUMBER);
                     break;
                 case KEY_string_FLAG:
                     *cursor++ = PARROT_ARG_SC | slice_bits;
-                    *cursor++ = find_in_const(interpreter, key, PFC_STRING);     /* Argh */
+                    /* Argh */
+                    *cursor++ = find_in_const(interpreter, key, PFC_STRING);
                     break;
 
                 case KEY_integer_FLAG | KEY_register_FLAG:

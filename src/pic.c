@@ -105,7 +105,8 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 
 /*
 
-=item C<void parrot_PIC_alloc_store(Interp *, struct PackFile_ByteCode *, size_t n);>
+=item C<void parrot_PIC_alloc_store(Interp *, 
+                                    struct PackFile_ByteCode *, size_t n);>
 
 Initialize the PIC storage for the given code segment with the capacitiy of
 holding at least C<n> MIC entries. The PIC_store itself, room for C<n> MICs and
@@ -209,7 +210,8 @@ parrot_PIC_alloc_pic(Interp* interpreter)
     Parrot_PIC_store *new_store;
 
     if (store->usable < sizeof(Parrot_PIC)) {
-        size_t size = (size_t)(store->n_mics * POLYMORPHIC) * sizeof(Parrot_PIC);
+        size_t size = 
+            (size_t)(store->n_mics * POLYMORPHIC) * sizeof(Parrot_PIC);
         if (size == 0)
             size = 2 * sizeof(Parrot_PIC);
         new_store = mem_sys_allocate_zeroed(size + sizeof(Parrot_PIC_store));
@@ -233,7 +235,8 @@ parrot_PIC_alloc_pic(Interp* interpreter)
 
 /*
 
-=item C<void parrot_PIC_prederef(Interp *, opcode_t op, void **pc_pred, int type)>
+=item C<void parrot_PIC_prederef(Interp *, opcode_t op, 
+                                 void **pc_pred, int type)>
 
 Define either the normal prederef function or the PIC stub, if PIC for
 this opcode function is available. Called from C<do_prederef>.
