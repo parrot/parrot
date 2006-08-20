@@ -163,9 +163,47 @@ sub move_if_diff
 
 =item C<genfile($source, $target, %options)>
 
-Takes the specified source file, substitutes any sequences matching
-C</\$\{\w+\}/> for the given key's value in the configuration system's data,
-and writes the results to specified target file.
+Takes the specified source file, replacing entries like C<@FOO@> with
+C<FOO>'s value from the configuration system's data, and writes the results 
+to specified target file. 
+
+Respects the following options when manipulating files
+
+=over 4
+
+=item conditioned_lines
+
+If conditioned_lines is true, then lines in the file that begin with:
+C<#CONDITIONED_LINE(var):> are skipped if the var condition is false. Lines
+that begin with C<#INVERSE_CONDITIONED_LINE(var):> are skipped if
+the var condition is true.
+
+=item commentType
+
+This option takes has two possible values, C<#> or C</*>. If present and
+set to one of these two values, the generated file will contain a
+generated header that is commented out appropriately.
+
+=item ignorePattern
+
+A regular expression. Any lines in the file matching this expression are
+ignored when determining if the target file has changed (and should therefore
+be overwritten with a new copy).
+
+=item feature_file
+
+When feature_file is set to a true value, a lines beginning with C<#perl> 
+forces the remaining lines of the file to be evaluated as perl code. Before
+this evaluation occurs, any substitution of @@ values is performed on the 
+original text.
+
+=item replace_slashes
+
+If set to a true value, this causes any C</>'s in the file to automatically
+be replaced with an architecture appropriate slash. C</> or C<\>. This is
+a very helpful option when writing Makefiles.
+
+=back
 
 =cut
 
@@ -216,11 +254,6 @@ sub genfile
             last;
         }
         if ($options{conditioned_lines}) {
-
-            # Lines with "#CONDITIONED_LINE(var):..." are skipped if
-            # the "var" condition is false.
-            # Lines with "#INVERSE_CONDITIONED_LINE(var):..." are skipped if
-            # the "var" condition is true.
             if ($line =~ m/^#CONDITIONED_LINE\(([^)]+)\):(.*)/s) {
                 next unless $conf->data->get($1);
                 $line = $2;
