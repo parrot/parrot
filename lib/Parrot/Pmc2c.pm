@@ -973,9 +973,9 @@ sub vtable_decl {
     my $methlist = join(",\n        ", @$methods);
     $cout .= <<ENDOFCODE;
     const struct _vtable $name = {
-        NULL,	/* namespace */
-        $enum_name,	/* base_type */
-        NULL,	/* whoami */
+        NULL, /* namespace */
+        $enum_name, /* base_type */
+        NULL, /* whoami */
         $vtbl_flag, /* flags */
         NULL,   /* does_str */
         NULL,   /* isa_str */
@@ -1042,7 +1042,7 @@ EOC
         $mmd_list
     };
     /*  Dynamic PMCs need the runtime type
-	which is passed in entry to class_init.
+    which is passed in entry to class_init.
     */
 EOC
     }
@@ -1411,16 +1411,14 @@ EOC
     if ($meth eq 'morph') {
         $cout .= <<EOC;
     if (1 || Parrot_is_const_pmc(interpreter, pmc))
-	internal_exception(WRITE_TO_CONSTCLASS,
-		"$meth() in $classname");
+        internal_exception(WRITE_TO_CONSTCLASS, "$meth() in $classname");
     else
         Parrot_${parentname}_$meth(interpreter, pmc, type);
 EOC
     }
     else {
         $cout .= <<EOC;
-	internal_exception(WRITE_TO_CONSTCLASS,
-		"$meth() in $classname");
+        internal_exception(WRITE_TO_CONSTCLASS, "$meth() in $classname");
         $ret
 EOC
     }
@@ -1808,8 +1806,8 @@ sub body
     return <<EOC;
 $l
 ${decl} {
-	real_exception(interpreter, NULL, NULL_REG_ACCESS,
-		"Null PMC access in $meth()");
+    real_exception(interpreter, NULL, NULL_REG_ACCESS,
+        "Null PMC access in $meth()");
         $ret
 }
 

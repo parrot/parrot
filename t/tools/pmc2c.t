@@ -133,17 +133,14 @@ END_PMC
 vt_clone->does_str = CONST_STRING(interp, "nothing");
 END_C
 
-SKIP: {
-skip "Bah, fix these!", 4;
-
 pmc2c_output_like(<<'END_PMC',<<'END_C','need_ext');
 pmclass a need_ext { }
 END_PMC
     const struct _vtable temp_base_vtable = {
-        NULL,   /* namespace */
-        enum_class_a,   /* base_type */
-        NULL,   /* whoami */
-        0|VTABLE_PMC_NEEDS_EXT, /* flags */
+        NULL, /* namespace */
+        enum_class_a, /* base_type */
+        NULL, /* whoami */
+        0|VTABLE_PMC_NEEDS_EXT|VTABLE_HAS_READONLY_FLAG, /* flags */
 END_C
 
 pmc2c_output_like(<<'END_PMC',<<'END_C','const_too 1');
@@ -153,9 +150,9 @@ void
 Parrot_a_class_init(Parrot_Interp interp, int entry, int pass)
 {
     const struct _vtable temp_base_vtable = {
-        NULL,   /* namespace */
-        enum_class_a,   /* base_type */
-        NULL,   /* whoami */
+        NULL, /* namespace */
+        enum_class_a, /* base_type */
+        NULL, /* whoami */
         VTABLE_HAS_CONST_TOO, /* flags */
 END_C
 
@@ -167,9 +164,9 @@ void
 Parrot_Consta_class_init(Parrot_Interp interp, int entry, int pass)
 {
     const struct _vtable temp_base_vtable = {
-        NULL,   /* namespace */
-        enum_class_Consta,  /* base_type */
-        NULL,   /* whoami */
+        NULL, /* namespace */
+        enum_class_Consta, /* base_type */
+        NULL, /* whoami */
         VTABLE_IS_CONST_FLAG, /* flags */
 END_C
 
@@ -184,5 +181,3 @@ END_PMC
                     interp, pmc_id, enum_class_Integer, entry
                 );
 END_C
-
-}
