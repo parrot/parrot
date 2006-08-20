@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 232
+plan 235
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -303,7 +303,12 @@ eval_is {
   expr {[set a a] eq [set b a]}
 } 1 {command expansion inside, string types}
 
+
 # TD-    add tet   for ::tcl::mathfunc 
 
+# tcl_precision
+is [set tcl_precision 3; expr 1/3.] 0.333 { precision 3}
+is [set tcl_precision 7; expr 1/3.] 0.3333333 { precision 7}
+is [set tcl_precision 12; expr 1/3.] 0.333333333333 { precision 12}
 
 

@@ -106,7 +106,7 @@ env_loop_done:
   .local string slash
   interp = getinterp
   .include "iglobals.pasm"
-  
+
   config = interp[.IGLOBALS_CONFIG_HASH]
   $S0 = config['build_dir']
   slash = config['slash']
@@ -133,6 +133,11 @@ env_loop_done:
   $P1['byteOrder'] = 'bigEndian'
 
  done_endian: 
+
+  # Set default precision.
+  $P1 = new 'TclInt'
+  $P1 = 0
+  set_root_global ['tcl'], '$tcl_precision', $P1
 
   # keep track of names of file types.
   .local pmc filetypes
