@@ -259,8 +259,9 @@ Internal opcode used to jump from normal bytecode into a JITted version.
 =cut
 
 op enternative() {
-  goto ADDRESS(( run_native(interpreter, CUR_OPCODE, 
-                 interpreter->code->base.data) ));
+    opcode_t *addr = run_native(interpreter, CUR_OPCODE, 
+                 interpreter->code->base.data);
+  goto ADDRESS(addr); 
 }
 
 =back
