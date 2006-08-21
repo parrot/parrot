@@ -116,7 +116,7 @@ value:
    I2 = 3
    I0 = I1 <= I2   # I0 yields 0 (false)
 
-I can also use the short accumution-like operators, like C<+=>.
+I can also use the short accumulation-like operators, like C<+=>.
 
 Also, PIR allows an extended syntax for registers. If the register
 name is prefixed with a dollar sign, like C<$I1>, the parrot PIR
@@ -215,7 +215,7 @@ a high-level language.
 =head2 Named Arguments
 
 As some other languages as Python and Perl support named arguments,
-PIR support them as well.
+PIR supports them as well.
 
 As before, I need to use C<.param> for each named argument, but with one
 of the two following syntaxes:
@@ -225,7 +225,7 @@ of the two following syntaxes:
     .param int "bar" => b
 
 Both of these lines say the exact same thing: the subroutine will
-recieve an integer named "foo", and inside of the subroutine that
+receive an integer named "foo", and inside of the subroutine that
 integer will be known as "a".
 
 When calling the function, I need to pass the names of the
@@ -283,7 +283,7 @@ assign the string to the correct register type:
   $I1 = $S1
 
 With the PIR syntax shown in this article you should be able to start
-writting simple programs. Next article we will look into available
+writing simple programs. Next article we will look into available
 PMCs, and how they can be used.
 
 =head2 Author
