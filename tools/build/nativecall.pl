@@ -15,7 +15,7 @@ tools/build/nativecall.pl - Build up the native call routines
 This script creates the Native Call Interface file F<src/nci.c>. It
 parses a file of function signatures of the form:
 
-    <return-type-specifier><whitespace><parameter-type-specifiers>[<whitespace>][#<comment>]
+ <return-type-specifier><ws><parameter-type-specifiers>[<ws>][#<comment>]
     ...
 Empty lines and lines containing only whitespace or comment are ignored.
 The types specifiers are documented in F<src/call_list.txt>.
@@ -90,12 +90,15 @@ my %proto_type =
 my %fix_name =
     ( '@' => 'xAT_' );
 
-my %other_decl =
-     ( p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
-       t => "STRING *final_destination;"
-#      b => "Buffer *final_destination = new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
-#      B => "Buffer *final_destination = new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
-     );
+my %other_decl = 
+  (p => 
+   "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
+   t => "STRING *final_destination;"
+   #     b => "Buffer *final_destination =
+   #     new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
+   #     B => "Buffer *final_destination =
+   #     new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
+  );
 
 my %ret_type_decl =
      ( p => "void *",
@@ -119,7 +122,7 @@ my %ret_type_decl =
      );
 
 my %ret_assign =
-     ( p => "PMC_data(final_destination) = return_data;\n    set_nci_P(interpreter, &st, final_destination);",
+     ( p => "PMC_data(final_destination) = return_data;    set_nci_P(interpreter, &st, final_destination);",
        i => "set_nci_I(interpreter, &st, return_data);",
        I => "set_nci_I(interpreter, &st, return_data);",
        l => "set_nci_I(interpreter, &st, return_data);",

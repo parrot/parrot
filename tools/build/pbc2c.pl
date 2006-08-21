@@ -115,7 +115,8 @@ END_C
 
         $pc       = $new_pc;
 	$op_code  = unpack "x$offset l", $pf->byte_code;
-        $op       = $ops->op($op_code) || die "Can't find an op for opcode $op_code\n";
+        $op       = $ops->op($op_code) ||
+          die "Can't find an op for opcode $op_code\n";
 	$offset  += sizeof('op');
 	push @pc_list, $pc;
 	$opcodes{$pc}->{op} = $op;
@@ -202,7 +203,8 @@ FINDENTERN:
     }
 
     print<<END_C;
-static opcode_t* run_compiled(Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code);
+static opcode_t* run_compiled(Interp *interpreter,
+                              opcode_t *cur_opcode, opcode_t *start_code);
 
 #include "parrot/embed.h"
 
@@ -267,12 +269,14 @@ main(int argc, char **argv) {
 
     runops(interpreter, 0);
 /*
-    run_compiled(interpreter, (opcode_t *)program_code, (opcode_t *)program_code);
+    run_compiled(interpreter, (opcode_t *)program_code,
+                              (opcode_t *)program_code);
     */
     exit(0);
 }
 
-static opcode_t* run_compiled(Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code){
+static opcode_t* run_compiled(Interp *interpreter, opcode_t *cur_opcode,
+                                                   opcode_t *start_code) {
 
 switch_label:
     switch(cur_opcode - start_code) {

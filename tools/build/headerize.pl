@@ -7,7 +7,8 @@ use warnings;
 
 =head1 NAME
 
-tools/build/headerizer.pl - Generates the function header parts of .h files from .c files
+tools/build/headerizer.pl - Generates the function header parts of .h
+files from .c files
 
 =head1 SYNOPSIS
 
@@ -33,7 +34,8 @@ on the command line.
 
 * Support for multiple .c files pointing at the same .h file
 
-* Does NOT remove all blocks in the .h file, so if a .c file disappears, it's block is "orphaned" and will remain there.
+* Does NOT remove all blocks in the .h file, so if a .c file
+disappears, it's block is "orphaned" and will remain there.
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -140,7 +142,8 @@ sub function_components {
     $parms = $2;
     my @parms = split( /\s*,\s*/, $parms );
     for ( @parms ) {
-        /\S+\s+\S+/ || ($_ eq "...") || ($_ eq "void") || /theINTERP/ or die "Bad parms in $proto";
+      /\S+\s+\S+/ || ($_ eq "...") || ($_ eq "void") || /theINTERP/
+        or die "Bad parms in $proto";
     }
 
     my $static;
@@ -176,7 +179,8 @@ sub main {
 
         print "\n=== $cfile ===\n";
 
-        die "can't find HEADER directive in '$cfile'" unless $source =~ m#/\*\s+HEADER:\s+([^*]+?)\s+\*/#s;
+        die "can't find HEADER directive in '$cfile'" 
+          unless $source =~ m#/\*\s+HEADER:\s+([^*]+?)\s+\*/#s;
         my $hfile = $1;
         die "'$hfile' not found (referenced from '$cfile')" unless -f $hfile;
 

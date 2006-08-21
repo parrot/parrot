@@ -179,7 +179,8 @@ find sub {
     }
     return if $fail;
     for my $index ( 0 .. $#section ) {
-        my ($name, $p, $ext) = fileparse($_, @{ $suffix{ $section[ $index ] } });
+        my ($name, $p, $ext) =
+          fileparse($_, @{ $suffix{ $section[ $index ] } });
         next if ! $ext;
         $bench{ $name }{ $program[ $index ] } = $ext;
     }
@@ -239,8 +240,10 @@ for my $name ( sort keys %bench ) {
         if ( $bench{ $name }{ $prog } ) {
             my $start = $Get_Time{ $cfg{method} }->();
             system(
-                $ini->val($sect, 'exe') . " " . File::Spec->catdir( $cfg{bench_path}, $name . $bench{$name}{$prog})
-            );
+                $ini->val($sect, 'exe') . " " 
+                   . File::Spec->catdir( $cfg{bench_path}, $name
+                                         . $bench{$name}{$prog})
+                  );
             my $stop = $Get_Time{ $cfg{method} }->();
             my $used = $stop - $start;
             $base ||= $used;

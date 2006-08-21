@@ -116,10 +116,10 @@ foreach my $file (@ARGV) {
     system($cmd);
     
     if (%bad_fdecls) {
-        print STDERR "\nThe following function declarations appear to contain a newline\n";
-        print STDERR "between the return type and the function declaration.  This is not\n";
-        print STDERR "correctable by indent.  Some of these could even be in system header\n";
-        print STDERR "files.  If so, ignore them.  C::Scan is imperfect.\n\n";
+      print STDERR "\nThe following function declarations appear to contain a newline\n";
+      print STDERR "between the return type and the function declaration.  This is not\n";
+      print STDERR "correctable by indent.  Some of these could even be in system header\n";
+      print STDERR "files.  If so, ignore them.  C::Scan is imperfect.\n\n";
     
         foreach my $fdecl (sort keys %bad_fdecls) {
             $fdecl =~ s/^[\n\s]*//gm; $fdecl =~ s/[\n\s]*$//gm;

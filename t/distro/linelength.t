@@ -41,6 +41,8 @@ my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
 
 # Read some extra exceptions
 while (<DATA>) {
+  next if m!^#!;
+  next if m!^\s*$!;
   chomp;
   $manifest_gen->{$_}++;
 }
@@ -96,7 +98,14 @@ sub check {
 
 
 __DATA__
+# Lex and Bison generated
 compilers/imcc/imclexer.c
 compilers/imcc/imcparser.c
 compilers/ast/astlexer.c
 compilers/ast/astparser.c
+# Generators with big strings
+tools/dev/mk_inno.pl
+tools/build/jit2c.pl
+tools/build/nativecall.pl
+tools/dev/lib_deps.pl
+tools/dev/parrot_coverage.pl

@@ -28,7 +28,8 @@ while(<OPS>){
 
 close OPS or die "Noo.. $!";
 
-open JIT, '<', "jit/$ARGV[0]/core.jit" or die "Could not open jit/$ARGV[0]/core.jit: $!";
+open JIT, '<', "jit/$ARGV[0]/core.jit" or
+  die "Could not open jit/$ARGV[0]/core.jit: $!";
 
 while (<JIT>){
     if (my ($jit) = /^Parrot_(\S+)\s*\{\s*$/){

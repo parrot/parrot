@@ -57,7 +57,8 @@ File::Find::find({wanted => sub {
                   /\.da$/ && push @dafiles, $File::Find::name }}, $SRCDIR);
 
 my (%file_line_coverage, %file_branch_coverage, %file_call_coverage);
-my (%function_line_coverage, %function_branch_coverage, %function_call_coverage);
+my (%function_line_coverage, %function_branch_coverage,
+    %function_call_coverage);
 my (%real_filename);
 my %totals = (
     lines            => 0,
@@ -77,13 +78,14 @@ foreach my $da_file (@dafiles) {
     my $src_filename = $da_file;
     $src_filename =~ s/\.da$/.c/;
     
-    # gcov must be run from the directory that the compiler was invoked from.
-    # Currently, this is the parrot root directory.
-    # However, it also leaves it output file in this directory, which we need
-    # to move to the appropriate place, alongside the sourcefile that produced it.
-    # Hence, as soon as we know the true name of the object file being profiled, 
-    # we rename the gcov log file.
-    # The -o flag is necessary to help gcov locate it's basic block (.bb) files.
+    # gcov must be run from the directory that the compiler was
+    # invoked from.  Currently, this is the parrot root directory.
+    # However, it also leaves it output file in this directory, which
+    # we need to move to the appropriate place, alongside the
+    # sourcefile that produced it.  Hence, as soon as we know the true
+    # name of the object file being profiled, we rename the gcov log
+    # file.  The -o flag is necessary to help gcov locate it's basic
+    # block (.bb) files.
     my $cmd = "gcov -f -b -o $dirname $src_filename";
     print "Running $cmd\n" if $DEBUG;
     open (GCOVSUMMARY, "$cmd |") or die "Error invoking '$cmd': $!";
@@ -92,7 +94,8 @@ foreach my $da_file (@dafiles) {
     while (<GCOVSUMMARY>) {
         if (/^Creating (.*)\./) {
             my $path = "$dirname/$1";
-            rename($1, "$dirname/$1") or die("Couldn't rename $1 to $dirname/$1.");
+            rename($1, "$dirname/$1")
+              or die("Couldn't rename $1 to $dirname/$1.");
             $path =~ s/\Q$SRCDIR\E//g;
             $generated_files{$path} = $tmp;
             $tmp = '';

@@ -75,8 +75,9 @@ To see the internal data structures please run:
 
 =head2 Compiling PMCs
 
-First, the program determines the names of the .c and .h files from the
-basename of the .pmc file (e.g. F<perlint.pmc> -> F<perlint.c> and F<perlint.h>).
+First, the program determines the names of the .c and .h files from
+the basename of the .pmc file (e.g. F<perlint.pmc> -> F<perlint.c> and
+F<perlint.h>).
 
 Next, the file is searched for C</pmclass \w*/> which attempts to find the
 class being declared.
@@ -187,7 +188,8 @@ The High level language this PMC corresponds to.
 
 =item C<maps Type>
 
-The basic parrot PMC type that this PMC correspond to for C<.HLL> usage. For example:
+The basic parrot PMC type that this PMC correspond to for C<.HLL>
+usage. For example:
 
     pmcclass TclInt hll Tcl maps Integer
 
@@ -499,8 +501,8 @@ sub parse_pmc {
     while ($classblock =~ s/($signature_re)//) {
         $lineno += count_newlines($1);
         my ($flag, $type, $methodname, $parameters) = ($2,$3,$4,$5);
-        my $attrs                                   = parse_method_attrs($6);
-        my ($methodblock, $rema)                    = extract_balanced($classblock);
+        my $attrs                                 = parse_method_attrs($6);
+        my ($methodblock, $rema)                = extract_balanced($classblock);
 
         $methodblock = "" if $opt{nobody};
         if ($methodname eq 'class_init') {
@@ -879,7 +881,8 @@ sub gen_def {
 
         # Open the file to append to it.
         my $fh = open_file( ">>", $deffile );
-        print $fh "LIBRARY $group\nEXPORTS\n\tParrot_lib_${group}_load\n" unless $defexists;
+        print $fh "LIBRARY $group\nEXPORTS\n\tParrot_lib_${group}_load\n"
+             unless $defexists;
         print $fh "\t$_\n" foreach @{$groups{$group}};
         close $fh;
     }
@@ -927,7 +930,7 @@ sub main {
         "verbose+"      => \$opt{verbose},
         "library=s"     => \$opt{library},
     ) or exit(1);
-    unshift @include, ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/pmc/";
+    unshift @include, ".","$FindBin::Bin/../..","$FindBin::Bin/../../src/pmc/";
 
     if ( 0 == grep { $action{$_} } keys %action ) {
         die "No action specified!\n";

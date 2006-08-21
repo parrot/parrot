@@ -1,11 +1,13 @@
 #! perl
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 use warnings;
 use strict;
 
-my ($svnid) = '$Id$' =~ /^\$[iI][dD]:\s(.*)\$$/;
+my ($svnid) =
+  '$Id$'
+  =~ /^\$[iI][dD]:\s(.*)\$$/;
 
 =head1 NAME
 

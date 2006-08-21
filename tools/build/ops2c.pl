@@ -8,7 +8,8 @@ tools/build/ops2c.pl - Parser for .ops files
 
 =head1 SYNOPSIS
 
-    % perl tools/build/ops2c.pl trans [--help] [--no-lines] [--dynamic] [--core | input.ops [input2.ops ...]]
+    % perl tools/build/ops2c.pl trans [--help] [--no-lines] [--dynamic]
+                                      [--core | input.ops [input2.ops ...]]
        trans := C | CGoto | CGP | CSwitch | CPrederef
 
 For example:
@@ -582,7 +583,8 @@ static size_t hash_str(const char * str) {
 
 static void store_op(op_info_t *info, int full) {
     HOP * const p = mem_sys_allocate(sizeof(HOP));
-    const size_t hidx = hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
+    const size_t hidx =
+        hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
     p->info = info;
     p->next = hop[hidx];
     hop[hidx] = p;

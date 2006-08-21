@@ -4,7 +4,8 @@
 
 =head1 NAME
 
-tools/dev/check_source_standards.pl - Check conformancs of C source code to PDD 7
+tools/dev/check_source_standards.pl - Check conformancs of C source
+code to PDD 7
 
 =head1 SYNOPSIS
 
@@ -152,7 +153,8 @@ sub check_returns {
         next unless $_;
 
         if (/return\(/) {
-            warning($file, $line, "possible use of return(foo); rather than return foo;");
+          warning($file, $line, 
+                  "possible use of return(foo); rather than return foo;");
         }
     }
 }
@@ -170,7 +172,8 @@ sub check_line_length {
         next if /^\s*\".*\"(\);|,)?$/;
 
         if (length($_) > 79) {
-            warning($file, $line, "line more than 79 columns. (" . length($_) . ")");
+            warning($file, $line, 
+                    "line more than 79 columns. (" . length($_) . ")");
         }
     }
 }
@@ -248,9 +251,12 @@ sub check_code_indents {
                 # in other words)
                 my ($indent) = /^(\s*)/;
                 if ($indent =~ /\t/) {
-                    error($file, $line, "apparent non-4 space indenting (contains tab(s))");
+                    error($file, $line,
+                          "apparent non-4 space indenting (contains tab(s))");
                 } elsif (length($indent) != 4) {
-                    error($file, $line, "apparent non-4 space indenting (" . length($indent) . " spaces)");
+                    error($file, $line,
+                          "apparent non-4 space indenting ("
+                          . length($indent) . " spaces)");
                 }
             }
             $f = undef;
@@ -297,7 +303,9 @@ sub check_cpp_indents {
 
             my $indent = "  " x (@stack);
             if ($1 ne $indent) {
-                error($file, $line, "Improper indenting for \"$_\" (should be \"#$indent$2 $3\")\n");
+              error($file, $line,
+                    "Improper indenting for \"$_\" ".
+                    "(should be \"#$indent$2 $3\")\n");
             }
             push @stack, "#$2 $3";
 
@@ -308,14 +316,19 @@ sub check_cpp_indents {
             # back even with the opening brace.
             my $indent = "  " x (@stack-1);
             if ($1 ne $indent) {
-                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2\" because it is inside of " . (join ' > ', @stack) . ")\n")
+                error($file, $line, 
+                      "Improper indenting for \"$_\"\n".
+                      "(should be \"#$indent$2\" because it is inside of "
+                      . (join ' > ', @stack) . ")\n")
             }
             next;
         }
         if (/^\s*\#(\s*)(endif)/) {
             my $indent = "  " x (@stack-1);
             if ($1 ne $indent) {
-                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2\" because it is inside of " . (join ' > ', @stack) . ")\n")
+                error($file, $line, "Improper indenting for \"$_\"\n"
+                      . "(should be \"#$indent$2\" because it is inside of "
+                      . (join ' > ', @stack) . ")\n")
             }
 
             pop @stack;
@@ -328,7 +341,9 @@ sub check_cpp_indents {
         if (/^\s*\#(\s*)(.*)/) {
             my $indent = "  " x (@stack);
             if ($1 ne $indent) {
-                error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2\" because it is inside of " . (join ' > ', @stack) . ")\n")
+                error($file, $line, "Improper indenting for \"$_\"\n"
+                      . "(should be \"#$indent$2\" because it is inside of " 
+                      . (join ' > ', @stack) . ")\n")
             }
         }
     }
@@ -370,7 +385,10 @@ sub check_mandatory_boilerplate {
         if ($mismatch_at >= 0) {
             error($file, 0, "Ending boilerplate is missing.");
         } else {
-            error($file, (@$source+$mismatch_at), "Ending boilerplate incorrect.\n(mismatch at \"$source->[$mismatch_at]\" (should be \"$end_boilerplate[$mismatch_at]\")");
+            error($file, (@$source+$mismatch_at),
+                  "Ending boilerplate incorrect.\n"
+                  . "(mismatch at \"$source->[$mismatch_at]\" "
+                  . "(should be \"$end_boilerplate[$mismatch_at]\")");
         }
     }
 
@@ -405,12 +423,17 @@ sub check_manifest {
         my $filename_8dot3 = lc("$filebase.$extension");
 
         if (exists $files_in_dir_8dot3{$dirname}{$filename_8dot3}) {
-            error("MANIFEST", $line, "$_: 8.3 name collision with $files_in_dir_8dot3{$dirname}{$filename_8dot3} ($filename_8dot3)");
+            error("MANIFEST", $line, 
+                  "$_: 8.3 name collision with "
+                  . "$files_in_dir_8dot3{$dirname}{$filename_8dot3} "
+                  . "($filename_8dot3)");
         }
         $files_in_dir_8dot3{$dirname}{$filename_8dot3}=$_;
 
         if (exists $files_in_dir_nocase{$dirname}{lc($filename)}) {
-            error("MANIFEST", $line, "$_: case-insensitive collision with " . $files_in_dir_nocase{$dirname}{lc($filename)});
+            error("MANIFEST", $line,
+                  "$_: case-insensitive collision with " 
+                  . $files_in_dir_nocase{$dirname}{lc($filename)});
         }
         $files_in_dir_nocase{$dirname}{lc($filename)}=$_;
     }
@@ -423,19 +446,22 @@ sub check_manifest {
 sub info {
     my ($file, $line, $message) = @_;
 
-    print "$file:$line (INFO) " . Text::Wrap::wrap("", "        ", $message) . "\n";
+    print "$file:$line (INFO) "
+      . Text::Wrap::wrap("", "        ", $message) . "\n";
 }
 
 
 sub warning {
     my ($file, $line, $message) = @_;
 
-    print "$file:$line (WARNING) " . Text::Wrap::wrap("", "        ", $message) . "\n";
+    print "$file:$line (WARNING) "
+      . Text::Wrap::wrap("", "        ", $message) . "\n";
 }
 
 
 sub error {
     my ($file, $line, $message) = @_;
 
-    print "$file:$line (ERROR) " . Text::Wrap::wrap("", "        ", $message) . "\n";
+    print "$file:$line (ERROR) " .
+      Text::Wrap::wrap("", "        ", $message) . "\n";
 }
