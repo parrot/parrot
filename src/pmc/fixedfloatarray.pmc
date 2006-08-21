@@ -8,8 +8,8 @@ src/pmc/fixedfloatarray.pmc - fixed size array for floating point numbers only
 
 =head1 DESCRIPTION
 
-This class, FixedFloatArray, implements an array of fixed size, which stored FLOATVALs,
-it uses Float PMCs to do all necessary conversions
+This class, FixedFloatArray, implements an array of fixed size, which
+stored FLOATVALs, it uses Float PMCs to do all necessary conversions
 
 =head2 Functions
 

@@ -117,8 +117,9 @@ Mark data associated with this transactional variable.
         assert(PMC_sync(SELF));
     }
 
-    /* we can do this because we don't modify ourself in dangerous ways -- we are
-       always a reference to the same transactional variable.
+    /* we can do this because we don't modify ourself in dangerous
+       ways -- we are always a reference to the same transactional
+       variable.
      */
     PMC* share_ro () {
         PMC *ret = pt_shared_fixup(INTERP, SELF);

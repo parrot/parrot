@@ -8,8 +8,9 @@ src/pmc/resizableintegerarray.pmc - resizable array for integers only
 
 =head1 DESCRIPTION
 
-This class, ResizableIntegerArray, implements an array of resizable size, which stores INTVALs.
-It uses Integer PMCs for all of the conversions.
+This class, ResizableIntegerArray, implements an array of resizable
+size, which stores INTVALs.  It uses Integer PMCs for all of the
+conversions.
 
 =head2 Functions
 

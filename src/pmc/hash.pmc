@@ -155,8 +155,8 @@ Returns the type of the element for C<*key>.
 */
 
     INTVAL type_keyed_str (STRING* key) {
-        HashBucket* const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
+        HashBucket* const b = 
+            parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (b == NULL) {
             return 0;
         }
@@ -177,8 +177,8 @@ Returns the type of the element for C<*key>.
         PMC* valpmc;
         PMC* nextkey;
         STRING* const keystr = make_hash_key(INTERP, key);
-        HashBucket* const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                            keystr);
+        HashBucket* const b = 
+            parrot_hash_get_bucket(INTERP, (Hash*)PMC_struct_val(SELF), keystr);
         if (b == NULL) {
             return 0;
         }
@@ -233,8 +233,8 @@ Returns the size of the hash.
 */
 
     INTVAL get_integer_keyed_str (STRING* key) {
-        HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
+        HashBucket * const b = 
+            parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (b == NULL) {
             return 0;
         }
@@ -299,8 +299,8 @@ Returns the integer value for the element at C<*key>.
 */
 
     FLOATVAL get_number_keyed_str (STRING* key) {
-        HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
+        HashBucket * const b =
+            parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (b == NULL) {
             return 0.0;
         }
@@ -324,8 +324,8 @@ Returns the floating-point value for the element at C<*key>.
     FLOATVAL get_number_keyed (PMC* key) {
         PMC* valpmc;
         STRING* const keystr = make_hash_key(INTERP, key);
-        HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        keystr);
+        HashBucket * const b = 
+            parrot_hash_get_bucket(INTERP, (Hash*)PMC_struct_val(SELF), keystr);
         PMC* nextkey;
         if (b == NULL) {
             return 0.0;
@@ -410,8 +410,8 @@ Return a representation of the hash contents.
 */
 
     STRING* get_string_keyed_str (STRING* key) {
-        HashBucket * const b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
+        HashBucket * const b =
+            parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (b == NULL) {
 	    /*
 	     * TODO current behaviour of $S0 = hsh['no_such_key'] in
@@ -546,7 +546,8 @@ Returns the PMC value for the element at C<*key>.
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
         PMC_data(key) = (void *)INITBucketIndex;
         /* -1 for an empty hash, 0 for a non-empty hash.  */
-        PMC_int_val(key) = parrot_hash_size(INTERP, PMC_struct_val(SELF)) ? 0 : -1;
+        PMC_int_val(key) = 
+            parrot_hash_size(INTERP, PMC_struct_val(SELF)) ? 0 : -1;
         return iter;
     }
 
@@ -567,7 +568,8 @@ Returns the PMC value for the element at C<*key>.
                  * check if we really have Hash_key_type_int
                  */
                 if (hash->key_type == Hash_key_type_int) {
-                    const INTVAL i = (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
+                    const INTVAL i = (INTVAL)parrot_hash_get_idx(INTERP, 
+                                                                 hash, key);
                     result = pmc_new(INTERP, enum_class_Integer);
                     PMC_int_val(result) = i;
                 }

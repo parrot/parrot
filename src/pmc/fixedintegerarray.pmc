@@ -8,8 +8,8 @@ src/pmc/fixedintegerarray.pmc - fixed size array for integers only
 
 =head1 DESCRIPTION
 
-This class, FixedIntegerArray, implements an array of fixed size, which stored INTVALs,
-it uses Integer PMCs for all of the conversions
+This class, FixedIntegerArray, implements an array of fixed size,
+which stored INTVALs, it uses Integer PMCs for all of the conversions
 
 =head2 Functions
 

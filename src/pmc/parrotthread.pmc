@@ -59,8 +59,8 @@ stop_GC(Interp* parent, Interp *thread)
    coke's]
  */
 
-static INTVAL 
-do_thread_run(Interp *interpreter, PMC *thread, INTVAL clone_flags, PMC *sub, PMC *args) {
+static INTVAL do_thread_run(Interp *interpreter, PMC *thread, 
+                            INTVAL clone_flags, PMC *sub, PMC *args) {
     INTVAL tid;
 
     tid = VTABLE_get_integer(interpreter, thread);
@@ -75,8 +75,8 @@ do_thread_run(Interp *interpreter, PMC *thread, INTVAL clone_flags, PMC *sub, PM
     return tid;
 }
 
-static INTVAL
-do_thread_run_clone_default(Interp *interpreter, PMC *thread, PMC *sub, PMC *args) {
+static INTVAL do_thread_run_clone_default(Interp *interpreter, 
+                                          PMC *thread, PMC *sub, PMC *args) {
     return do_thread_run(interpreter, thread, PARROT_CLONE_DEFAULT, sub, args);
 }
 
@@ -87,8 +87,9 @@ pmclass ParrotThread extends ParrotInterpreter need_ext no_ro {
 
 =item C<thread_id = thread.'run'(CLONE_FLAGS, sub, args...)>
 
-Run the thread. This object is morphed into an appropriate ParrotRunningThread PMC.
-The CLONE_FLAGS are or'd together values taken from C<cloneflags.pasm>.
+Run the thread. This object is morphed into an appropriate
+ParrotRunningThread PMC.  The CLONE_FLAGS are or'd together values
+taken from C<cloneflags.pasm>.
 
 =item C<thread_id = thread.'run_clone'(sub, args...)>
 

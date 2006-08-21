@@ -337,8 +337,8 @@ use fallback.
             data[i] = VTABLE_share_ro(INTERP, data[i]);
 
         /* XXX This is perhaps not the best way to fix this up, but we
-         * need to ensure that the class object won't go away when this interpreter
-         * dies.
+         * need to ensure that the class object won't go away when
+         * this interpreter dies.
          */
         {
             PMC *new_class;

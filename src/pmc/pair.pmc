@@ -52,7 +52,8 @@ Class method to construct an Integer according to passed arguments.
         const int argcP = REG_INT(3);
         const int argcS = REG_INT(2);
 
-        return PMCNULL; /* XXX This looks wrong, since we skip all the following code */
+        return PMCNULL; /* XXX This looks wrong, since we skip all the
+                         * following code */
 
         SELF = pmc_new(INTERP, class->vtable->base_type);
         if (argcS == 1 && argcP == 1) {

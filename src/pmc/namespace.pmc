@@ -114,7 +114,8 @@ a NameSpace or a var, the NameSpace is returned.
 
     void set_pmc_keyed_str(STRING *key, PMC *value) {
         const int val_is_NS = value->vtable->base_type == enum_class_NameSpace;
-        HashBucket *b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
+        HashBucket *b =
+            parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         PMC *new_tuple = NULL;
 
         if (!b)
@@ -148,8 +149,10 @@ a NameSpace or a var, the NameSpace is returned.
             PMC_data(value)    = key;   /* and name */
 
             if (new_tuple) {
-                VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns,      value);
-                VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub, b->value);
+                VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns,      
+                                         value);
+                VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub, 
+                                         b->value);
                 b->value = new_tuple;
                 /* distinction from a plain FPA, which doesn't extend the
                  * namespace storage
