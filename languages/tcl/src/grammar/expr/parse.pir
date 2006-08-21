@@ -27,6 +27,14 @@ parse.pir - Parsing support subroutines for [expr]
     tcl_error $S0
 .end
 
+.sub 'error'
+    .param pmc    mob
+    .param string msg
+    .param pmc    adverbs :named :slurpy
+
+    tcl_error msg
+.end
+
 .sub 'syntax_error'
     .param pmc    mob
     .param string msg

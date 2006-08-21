@@ -7,11 +7,17 @@ grammar TclExpr::Grammar;
 # XXX Some of the items here actually belong in the language grammar. 
 # (like command, quoted, etc.) Move them there when we use PGE for everything.
 
-token tclcommand {
+token ws { \h* }
+
+token program {
+   <?ws> <command> [ <?ws> [\n|;] <?ws> <command> ]* <?ws>
+}
+
+token command {
     | \# \N*
     | [ $<word>:=( <quoted_word>
                  | <braced_word>
-                 | ( <substitution> | \$ | <-[[$\\;\n\r\t ]>+ )+
+                 | $<chunk>:=( <substitution> | \$ | <-[[$\\;\n\r\t ]>+ )+
                  ) \h*
       ]+
 }
@@ -29,7 +35,7 @@ token quoted_word {
 token braced_word { <PGE::Text::bracketed: {}> }
 
 token command_substitution {
-    \[ <subcommand> [ <[\n;]> <subcommand> ]* \]
+    \[ <subcommand> [ <[\n;]> <subcommand> ]* [ \] | <error: missing close-bracket> ]
 }
 
 token subcommand {
@@ -43,7 +49,7 @@ token subcommand {
 
 token variable_substitution {
     \$ [ \{  ( <-[}]>+ )  \}
-       | (<?name>) [ \( $<index>:=( <substitution> | \$ | <-[[$\\)]>+ )+ \) ]?
+       | ([\:\:]?<?name>) [ \( $<index>:=( <substitution> | \$ | <-[[$\\)]>+ )+ \) ]?
        ]
 }
 

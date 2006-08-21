@@ -21,6 +21,8 @@ transform dispatch (TclExpr::Grammar) {
 
     # Ask the child node for its past.
 dispatch:
+    $P0 = node['backslash_substitution']
+    unless null $P0 goto constant
     $P0 = node['chunk']
     unless null $P0 goto chunks
     $P0 = node['substitution']
@@ -41,8 +43,10 @@ dispatch:
     unless null $P0 goto quoted_word
     $P0 = node['function']
     unless null $P0 goto function
+    $P0 = node['command']
+    unless null $P0 goto program
     $P0 = node['subcommand']
-    unless null $P0 goto subcommand
+    unless null $P0 goto program
     $P0 = node['variable_substitution']
     unless null $P0 goto variable_substitution
     $P0 = node['command_substitution']
@@ -56,6 +60,9 @@ dispatch:
     .dumper(node)
     end
 
+program:
+    .return tree.get('past', $P0, 'program')
+
 chunks:
     .return tree.get('past', $P0, 'array')
 
@@ -64,10 +71,6 @@ operator:
 
 function:
     .return tree.get('past', $P0, 'function')
-
-subcommand:
-    $P0 = $P0[0]
-    .return tree.get('past', $P0, 'subcommand')
 
 quoted_word:
     .return tree.get('past', $P0, 'quoted_word')
@@ -145,6 +148,22 @@ transform past (operator) {
     .return tree.get('logical_and', node, 'PAST::Op')
   is_or:
     .return tree.get('logical_or', node, 'PAST::Op')
+}
+
+transform past (program) {
+    .local pmc past
+    past = new 'PAST::Program'
+
+    .local pmc iter
+    iter = new .Iterator, node
+loop:
+    unless iter goto end
+    $P0 = shift iter
+    $P0 = tree.'get'('past', $P0, 'command')
+    past.'add_child'($P0)
+    goto loop
+end:
+    .return(past)
 }
 
 transform past (function) {
@@ -429,7 +448,7 @@ transform past (array) {
     .return(past)
 }
 
-transform past (subcommand) {
+transform past (command) {
     .local pmc past
     past = new 'PAST::Command'
     past.set_node(node)

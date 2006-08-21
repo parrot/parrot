@@ -11,7 +11,7 @@ transform result (ROOT)  {
     .local pmc ret, label
     ret   = node['ret']
     label = pir.unique('expr_is_string')
-
+ 
     pir.emit(<<'END_PIR', ret, label)
   .local pmc __number
   __number = get_root_global ['_tcl'], '__number'
@@ -21,6 +21,24 @@ transform result (ROOT)  {
 %1:
 END_PIR
 
+    .return(pir)
+}
+
+transform pir (PAST::Program) {
+    .local string pir
+
+    .local pmc iter, child
+    iter = node.'child_iter'()
+loop:
+    unless iter goto end
+    child = shift iter
+    $P0 = tree.'get'('pir', child)
+    $S0 = $P0
+    pir .= $S0
+    goto loop
+end:
+    $S0 = child['ret']
+    node['ret'] = $S0
     .return(pir)
 }
 
@@ -181,10 +199,10 @@ transform pir (PAST::Command) {
     $S0 = join ", ", args
     
     pir.emit(<<'END_PIR', retval, name, $S0)
-  %0 = get_root_namespace
+  %0 = get_hll_namespace
   $S0 = %1
   $S0 = '&' . $S0
-  %0  = %0['tcl'; $S0]
+  %0  = %0[$S0]
   %0  = %0(%2)
 END_PIR
     node['ret'] = retval
