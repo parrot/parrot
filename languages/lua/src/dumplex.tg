@@ -67,16 +67,27 @@ transform dump (Lua::TestLex::punctuator) :language('PIR') {
 }
 
 transform dump (Lua::TestLex::Name) :language('PIR') {
-    $P0 = node['ident']
     print "Name:\t"
-    print $P0
+    print node
     print "\n"
 }
 
 transform dump (Lua::TestLex::String) :language('PIR') {
+    $I0 = defined node['quoted_literal']
+    unless $I0 goto L1
+    $P0 = node['quoted_literal']
     print "String:\t"
-    print node
+    print $P0
     print "\n"
+    goto L2
+L1:
+    $I0 = defined node['long_string']
+    unless $I0 goto L2
+    $P0 = node['long_string']
+    print "LongString:\t"
+    print $P0
+    print "\n"
+L2:
 }
 
 transform dump (Lua::TestLex::Number) :language('PIR') {

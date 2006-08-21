@@ -4,102 +4,87 @@
 grammar Lua::TestLex
 
 rule start {
-        <token>* 
-        | <syntax_error> 
+        | <token>*
+        | <error> 
 }
 
 rule token {
-        <punctuator>
+        |<punctuator>
         | <Name>
         | <reserved_words>
         | <String>
         | <Number>
-#        | <syntax_error> 
+#        | <?error> 
 }
 
 token punctuator {
-        \+
-        |\-
-        |\#
-        |\*
-        |\/
-        |\%
-        |\^
-        |\.\.\.
-        |\.\.
-        |\.
-        |\<\=
-        |\<
-        |\>\=
-        |\>
-        |\=\=
-        |\~\=
-        |\=
-        |\,
-        |\;
-        |\:
-        |\(
-        |\)
-        |\{
-        |\}
-        |\[
-        |\]        
-}
-
-token Name {
-#        <!reserved_words> <ident>
-        <ident>
+        | \+
+        | \-
+        | \#
+        | \*
+        | \/
+        | \%
+        | \^
+        | \.\.\.
+        | \.\.
+        | \.
+        | \<\=
+        | \<
+        | \>\=
+        | \>
+        | \=\=
+        | \~\=
+        | \=
+        | \,
+        | \;
+        | \:
+        | \(
+        | \)
+        | \{
+        | \}
+        | \[
+        | \]        
 }
 
 token reserved_words {
-        and
-        |break     
-        |do        
-        |else      
-        |elseif
-        |end
-        |false     
-        |for       
-        |function  
-        |if
-        |in        
-        |local     
-        |nil       
-        |not       
-        |or
-        |repeat    
-        |return    
-        |then      
-        |true      
-        |until     
-        |while
+        | and
+        | break     
+        | do        
+        | else      
+        | elseif
+        | end
+        | false     
+        | for       
+        | function  
+        | if
+        | in        
+        | local     
+        | nil       
+        | not       
+        | or
+        | repeat    
+        | return    
+        | then      
+        | true      
+        | until     
+        | while
 }
                  
-#token String {
-#        <PGE::Text::bracketed: '>
-#        | <PGE::Text::bracketed: ">
-##       | <long_string>        
-#}
-
 token String {
         | \" <quoted_literal: "> \"
         | \' <quoted_literal: '> \'
-#        | <long_string>        
+        | <long_string>        
 }
 
 token Number {
-        0 <[Xx]> <xdigit>+
-        | [<digit>+ [\. <digit>*]? | \. <digit>+] [<[Ee]> <[+\-]>? <digit>+]?
+        | 0 <[Xx]> <xdigit>+
+        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ] [ <[Ee]> <[+\-]>? <digit>+ ]?
 }
 
 token ws {
         [ \s+
-#        | <long_comment>
+        | \-\- <long_string>    # long_comment
         | \-\- \N*
         ]*
-}
-
-token syntax_error {
-        <?PGE::Util::die Syntax error>
 }
 

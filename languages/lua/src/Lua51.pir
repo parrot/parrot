@@ -57,7 +57,7 @@ L1:
 .end
 
 
-.namespace [ "Lua::Grammar" ]
+.namespace [ 'Lua::Grammar' ]
 .include 'languages/lua/src/parse.pir'
 
 .namespace [ 'Lua::Grammar' ]

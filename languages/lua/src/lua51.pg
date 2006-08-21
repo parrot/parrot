@@ -4,62 +4,120 @@
 grammar Lua::Grammar
 
 rule start {
-        <chunk>
-        | <syntax_error>
+        | <chunk>
+        | <error: syntax error>
 }
 
 rule chunk {
-        [<statement> [\;]?]*
+        [ <statement> [\;]? ]*
 } 
 
 rule block {
-        <chunk> [<laststat> [\;]?]?
+        <chunk> [ <laststat> [\;]? ]?
 }
 
 rule statement {
-        <'if'> <cond> <'then'> <block> [<'elseif'> <cond> <'then'> <block>]* [<'else'> <block>]? <'end'>
-        | <'while'> <expr> <'do'> <block> <'end'>
-        | <'do'> <block> <'end'>
-        | <'for'> [<fornum> | <forlist>] <'do'> <block> <'end'>
-        | <'repeat'> <block> <'until'> <cond>
-        | <'function'> <funcname> <funcbody>
-        | <'local'> <'function'> <Name> <funcbody>
-        | <'local'> <namelist> [\= <explist1>]?
+        | <ifstat>
+        | <whilestat>
+        | <dostat>
+        | <forstat>
+        | <repeatstat>
+        | <funcstat>
+        | <localfunc>
+        | <localstat>
         | <exprstat>
 } 
 
 rule laststat {
-        <'return'> <explist1>?
-        | <'break'>
+        | <returnstat>
+        | <breakstat>
 }
- 
+
+rule ifstat {
+        <ifthenblock> <elseifthenblock>* [ <'else'> <block> ]? <'end'>
+}
+
+rule ifthenblock {
+        | <'if'> <cond> <'then'> <block>
+        | <'if'> <cond> <error: 'then' expected>
+}
+
+rule elseifthenblock {
+        | <'elseif'> <cond> <'then'> <block>
+        | <'elseif'> <cond> <error: 'then' expected>
+}
+
 rule cond {
         <expr>
 }                             
 
+rule whilestat {
+        | <'while'> <expr> <'do'> <block> <'end'>
+        | <'while'> <expr> <error: 'do' expected>
+}
+
+rule dostat {
+        <'do'> <block> <'end'>
+}
+
+rule forstat {
+        | <'for'> [ <fornum> | <forlist> ]
+        | <'for'> <Name> <error: '=' or 'in' expected>
+}
+
 rule fornum {
-        <Name> \= <expr> \, <expr> [\, <expr>]?
+        | <Name> \= <expr> \, <expr> [ \, <expr> ]? <forbody>
+        | <Name> \= <expr> <error: ',' expected>
+        | <Name> <error: '=' expected>
 } 
 
 rule forlist {
-        <namelist> <'in'> <explist1>
+        | <namelist> <'in'> <explist1> <forbody>
+        | <namelist> <error: 'in' expected>
 } 
 
 rule namelist {
-        <Name> [\, <Name>]*
+        <Name> [ \, <Name> ]*
+}
+
+rule forbody {
+        | <'do'> <block> <'end'>
+        | <error: 'do' expected>
+}
+
+rule funcstat {
+        <'function'> <funcname> <funcbody>
 }
 
 rule funcname {
-        <Name> [\. <Name>]* [\: <Name>]?
+        <Name> [ \. <Name> ]* [ \: <Name> ]?
 }
 
 rule funcbody {
-        \( <parlist>? \) <chunk> <'end'>
+        | \( <parlist>? \) <chunk> <'end'>
+        | \( <parlist>? <error: ')' expected> 
+        | <error: '(' expected>
 }
 
 rule parlist {
-        <namelist> [\, <'...'>]?
+        | <namelist> [ \, <'...'> ]?
         | <'...'>
+}
+
+rule localfunc {
+        <'local'> <'function'> <Name> <funcbody>
+}
+
+rule localstat {
+        <'local'> <namelist> [ \= <explist1> ]?
+}
+
+rule returnstat {
+        <'return'> <explist1>?
+}
+
+rule breakstat {
+        <'break'>
 }
 
 rule exprstat {
@@ -67,25 +125,32 @@ rule exprstat {
 }
 
 rule assignment {
-        \, <primaryexp> <assignment>
+        | \, <primaryexp> <assignment>
         | \= <explist1>
+        | <error: '=' expected>
 }
 
 rule primaryexp {
-        <prefixexp> [\. <Name> | \[ <expr> \] | \: <Name> <funcargs> | <funcargs>]*
+        <prefixexp> [ \. <Name> | <index> | \: <Name> <funcargs> | <funcargs> ]*
+}
+
+rule index {
+        | \[ <expr> \]
+        | \[ <expr> <error: ']' expected>
 }
 
 rule prefixexp {
-        <Name>
+        | <Name>
         | \( <expr> \)
+        | <error: unexpected symbol>
 }
 
 rule expr {
-        [<simpleexp> | <unop> <expr>] [<binop> <expr>]*
+        [ <simpleexp> | <unop> <expr> ] [ <binop> <expr> ]*
 }
 
 rule simpleexp {
-        <Number>
+        | <Number>
         | <String>
         | <'nil'>
         | <'true'>
@@ -101,9 +166,10 @@ rule explist1 {
 }
 
 rule funcargs {
-        \( <explist1>? \)
+        | \( <explist1>? \)
         | <constructor>
         | <String>
+        | <error: function arguments expected>
 }
                        
 rule constructor {
@@ -111,69 +177,62 @@ rule constructor {
 }
 
 rule fieldlist {
-        <field> [<fieldsep> <field>]* <fieldsep>?
+        <field> [ <fieldsep> <field> ]* <fieldsep>?
 }
 
 rule field {
-        \[ <expr> \] \= <expr>
+        | <index> \= <expr>
+        | <index> <error: '=' expected>
         | <Name> \= <expr>
         | <expr>
 }
 
 
 token fieldsep {
-        \,
-        |\;
+        | \,
+        | \;
 }
 
 token binop {
-        \+
-        |\-
-        |\*
-        |\/
-        |\%
-        |\^
-        |\.\.
-        |\<\=
-        |\<
-        |\>\=
-        |\>
-        |\=\=
-        |\~\=
-        |and
-        |or
+        | \+
+        | \-
+        | \*
+        | \/
+        | \%
+        | \^
+        | \.\.
+        | \<\=
+        | \<
+        | \>\=
+        | \>
+        | \=\=
+        | \~\=
+        | and
+        | or
 }
 
 token unop {
-        \-
-        |not
-        |\#
-}
-
-token Name {
-        <ident>
+        | \-
+        | not
+        | \#
 }
 
 token String {
         | \" <quoted_literal: "> \"
         | \' <quoted_literal: '> \'
-#        | <long_string>        
+        | <long_string>        
 }
 
 token Number {
-        0 <[Xx]> <xdigit>+
-        | [<digit>+ [\. <digit>*]? | \. <digit>+] [<[Ee]> <[+\-]>? <digit>+]?
+        | 0 <[Xx]> <xdigit>+
+        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ] [ <[Ee]> <[+\-]>? <digit>+ ]?
 }
 
 token ws {
         [ \s+
-#        | <long_comment>
+        | \-\- <long_string>    # long_comment
         | \-\- \N*
         ]*
-}
-
-token syntax_error {
-        <?PGE::Util::die Syntax error>
 }
 
 

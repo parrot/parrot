@@ -36,7 +36,9 @@ C<test_lex> is a dumper for Lua 5.1 lexicography.
     start_rule = get_root_global [ 'parrot'; 'Lua::TestLex'], 'start'
     # Parse the source and return a match object
     .local pmc match
+    push_eh _handler
     match = start_rule(source, 'grammar'=> 'Lua::TestLex')
+    clear_eh
     # Dump
     .local pmc grammar
     grammar = new 'Lua::DumpLex'
@@ -48,6 +50,12 @@ L1:
 USAGE:
     printerr "Usage: parrot test_lex.pir script.lua\n"
     exit -1
+_handler:
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    print s
+    end
 .end
 
 .sub 'load_script' :anon
@@ -71,7 +79,7 @@ L2:
     .return (content) 
 .end
 
-.namespace [ "Lua::TestLex" ]
+.namespace [ 'Lua::TestLex' ]
 .include 'languages/lua/src/parse.pir'
 
 =head1 AUTHOR

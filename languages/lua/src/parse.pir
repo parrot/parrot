@@ -7,109 +7,147 @@ parse.pir - Parsing support subroutines
 =head2 DESCRIPTION
 
 This file contains support subroutines for parsing Lua programs.  
-Specialized parsing subroutines will appear here as the parser grows.
 
 =over 4
 
+=item C<Name>
+
+ident but not keywords
+
+=cut
+
+.sub 'Name'
+    .param pmc mob
+    .param pmc params :slurpy
+    
+    .local pmc kw
+    push_eh H1
+    kw = get_hll_global 'keyword'
+    clear_eh
+    goto L1
+H1:
+    kw = _const_keyword()
+    set_hll_global 'keyword', kw
+L1:
+
+    .local pmc ident
+    ident = get_hll_global ['PGE::Match'], 'ident'
+    mob = ident(mob, params)
+
+    $I0 = mob.'__get_bool'()
+    unless $I0 goto L2
+    $S0 = mob.'text'()
+    $I0 = exists kw[$S0]
+    unless $I0 goto L2
+    mob.'next'()
+L2:
+    .return (mob)
+.end
+
+.sub _const_keyword :anon
+    .local pmc kw
+    new kw, .Hash
+    kw['and'] = 1
+    kw['break'] = 1     
+    kw['do'] = 1        
+    kw['else'] = 1      
+    kw['elseif'] = 1
+    kw['end'] = 1
+    kw['false'] = 1     
+    kw['for'] = 1       
+    kw['function'] = 1  
+    kw['if'] = 1
+    kw['in'] = 1        
+    kw['local'] = 1     
+    kw['nil'] = 1       
+    kw['not'] = 1       
+    kw['or'] = 1
+    kw['repeat'] = 1    
+    kw['return'] = 1    
+    kw['then'] = 1      
+    kw['true'] = 1      
+    kw['until'] = 1     
+    kw['while'] = 1
+    .return (kw) 
+.end
+
 =item C<quoted_literal>
 
-Handles parsing of the various types of quoted literals.
+Handles parsing of quoted literals.
 
 =cut
 
 .sub 'quoted_literal'
-    .param pmc mob                                 # object to parse
-    .param string delim                            # string delimiter (XXX)
-    .param pmc adv             :slurpy :named      # adverbs
-
-    ##   XXX: This is a temporary hack to set adverbs based
-    ##   on the delimiter.  We'll remove this when we have full
-    ##   qq[...] adverb capability.
-    if delim == "'" goto q_string
-    adv['double'] = 1
-  q_string:
-    adv['single'] = 1
+    .param pmc mob
+    .param string delim
+    .param pmc adv :slurpy :named
 
     .local string target
     .local pmc mfrom, mpos
-    .local int pos
-    (mob, pos, target, mfrom, mpos) = mob.'new'(mob)
-
-    .local int capt, lastpos, delimlen
-    capt = 0
+    .local int pos, lastpos
+    (mob, target, mfrom, mpos) = mob.'newfrom'(mob)
+    pos = mfrom
     lastpos = length target
-    delimlen = length delim
 
-    .local string lstop
-    lstop = ''
-
-  outer_loop:
     .local string literal
-    .local int litfrom
     literal = ''
-    litfrom = pos
-    if pos >= lastpos goto fail
-    $S0 = substr target, pos, delimlen
-    if $S0 == delim goto outer_end
-
-  scan_literal_loop:
-    if pos >= lastpos goto fail
-    $S0 = substr target, pos, delimlen
-    if $S0 == delim goto scan_literal_end
+LOOP:
+    if pos < lastpos goto L1
+    error(mob, "unfinished string")
+L1:
     $S0 = substr target, pos, 1
-    $I0 = index lstop, $S0
-    if $I0 >= 0 goto scan_literal_end
-    if $S0 != "\\" goto scan_literal_1
-    inc pos
-    $S0 = substr target, pos, 1
-    $I0 = index '0123456789', $S0
-    if $I0 >= 0 goto scan_backslash_d
-    $I0 = index "abefnrtv", $S0
-    if $I0 < 0 goto scan_literal_1
-    $S0 = substr "\x07\x08\f\n\r\t\x0b", $I0, 1
-  scan_literal_1:
-    concat literal, $S0
-    inc pos
-    goto scan_literal_loop
-
-  ## parse \ddd
-  scan_backslash_d:
-    .local int base
-    base = 10
-    .local int decnum
-    decnum = 0
-    $S0 = substr target, pos, 1
-  scan_bxdo_chars_loop:
-    $S0 = substr target, pos, 1
-    $I0 = index '0123456789', $S0
-    if $I0 < 0 goto scan_bxdo_chars_end
-    if $I0 >= base goto scan_bxdo_chars_end
-    decnum *= base
-    decnum += $I0
-    inc pos
-    goto scan_bxdo_chars_loop
-  scan_bxdo_chars_end:
-    ##   add the character to the literal
-    $S1 = chr decnum
-    concat literal, $S1
-    goto scan_literal_loop
-
-  scan_literal_end:
-    ($P0, $P1, $P2, $P3, $P4) = mob.'new'(mob)
-    $P3 = litfrom
-    $P4 = pos
-    $P0.'value'(literal)
-    $P0['type'] = 'str'
-    mob[capt] = $P0
-    inc capt
-    goto outer_loop
-
-  outer_end:
+    if $S0 != delim goto L2
+    mob.'value'(literal)
     mpos = pos
     .return (mob)
-  fail:
-    mpos = -1
-    .return (mob)
+L2:
+    $I0 = index "\n\r", $S0
+    if $I0 < 0 goto L3
+    error(mob, "unfinished string")
+L3:
+    if $S0 != "\\" goto CONCAT
+    inc pos
+    if pos == lastpos goto LOOP # error
+    $S0 = substr target, pos, 1
+    $I0 = index 'abfnrtv', $S0
+    if $I0 < 0 goto L4
+    $S0 = substr "\x07\x08\f\n\r\t\x0b", $I0, 1
+    goto CONCAT
+L4:
+    $I0 = index "\n\r", $S0
+    if $I0 < 0 goto L5
+    $S0 = "\n"
+    goto CONCAT
+L5:
+    $I0 = index '0123456789', $S0
+    if $I0 < 0 goto CONCAT
+    inc pos
+    if pos == lastpos goto LOOP # error
+    $S0 = substr target, pos, 1
+    $I1 = index '0123456789', $S0
+    if $I1 < 0 goto L6
+    $I0 *= 10
+    $I0 += $I1
+    inc pos
+    if pos == lastpos goto LOOP # error
+    $S0 = substr target, pos, 1
+    $I1 = index '0123456789', $S0
+    if $I1 < 0 goto L6
+    $I0 *= 10
+    $I0 += $I1
+    goto L7
+L6:
+    dec pos
+L7:
+    if $I0 < 256 goto L8
+    error(mob, "escape sequence too large")
+L8:
+    $S0 = chr $I0
+
+CONCAT:
+    concat literal, $S0
+    inc pos
+    goto LOOP
 .end
 
 =item C<long_string>
@@ -118,13 +156,39 @@ TODO
 
 =cut
 
+.sub 'long_string'
+    .param pmc mob
+    .param pmc adv :slurpy :named
 
-=item C<long_comment>
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+    (mob, target, mfrom, mpos) = mob.'newfrom'(mob)
+    pos = mfrom
+    lastpos = length target
 
-TODO
+    .local string literal
+    literal = ''
+
+end:
+    .return (mob)
+.end
+
+=item C<error(PMC match, [, message [, ...]] )>
+
+Throws an exception at the current point in the match. If message
+doesn't end with a newline, also produces the line number and offset
+of the match.
 
 =cut
 
+.sub 'error'
+    .param pmc mob
+    .param pmc params :slurpy
+        
+    $P0 = get_hll_global ['PGE::Util'], 'die'
+    $P0(mob, params :flat)
+.end
 
 =back
 
