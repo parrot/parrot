@@ -44,6 +44,7 @@ Creates the C<PAST::*> classes.
 
     $P0 = subclass base, 'PAST::Command'
     $P0 = subclass base, 'PAST::Cond'
+    $P0 = subclass base, 'PAST::Expr'
     $P0 = subclass base, 'PAST::MathFunc'
     $P0 = subclass base, 'PAST::Op'
     $P0 = subclass base, 'PAST::Program'

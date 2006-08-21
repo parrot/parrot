@@ -10,8 +10,16 @@ expression:
 } 
 
 transform expression (TclExpr::Grammar) {
+    .local pmc past
+    past = new 'PAST::Expr'
+    
     node = node['expr']
-    .return tree.get('dispatch', node, 'TclExpr::Grammar')
+    past['node'] = node
+
+    $P0 = tree.get('dispatch', node, 'TclExpr::Grammar')
+    past['value'] = $P0
+
+    .return(past)
 }
 
 # Handle generic dispatch (needed at ROOT, and for things with kids.)

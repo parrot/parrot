@@ -1,12 +1,20 @@
 grammar TclExpr::PIR::Grammar is TGE::Grammar;
 
 transform result (ROOT)  {
+    $S0 = typeof node
+    .return tree.get('pir', node, $S0)
+}
+
+transform pir (PAST::Expr) {
     .local pmc pir
     pir = new 'PGE::CodeString'
 
-    $S0 = typeof node
-    $P0 = tree.get('pir', node, $S0)
+    .local pmc value
+    value = node['value']
+    $P0 = tree.get('pir', value)
     pir .= $P0
+    $S0 = value['ret']
+    node['ret'] = $S0
 
     .local pmc ret, label
     ret   = node['ret']
