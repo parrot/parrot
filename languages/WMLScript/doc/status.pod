@@ -94,7 +94,7 @@ Some of these libraries are implemented in :
 
 =back
 
-F<languages/WMLScript/runtime/wmlsstdlibs.pir> gives an unique entry point
+F<languages/WMLScript/src/wmlsstdlibs.pir> gives an unique entry point
 and implements some helpers.
 
 =head2 TODO

@@ -7,7 +7,7 @@ wmlsd - WMLScript Disassembler
 
 =head1 SYNOPSYS
 
- parrot wmlsd.pbc file.wmlsc
+ parrot wmlsd.pir file.wmlsc
 
 =head1 DESCRIPTION
 

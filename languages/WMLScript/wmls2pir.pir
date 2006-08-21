@@ -7,7 +7,7 @@ wmls2pir - WMLScript bytecode to Parrot PIR Translator
 
 =head1 SYNOPSYS
 
- parrot wmls2pir.pbc file.wmlsc
+ parrot wmls2pir.pir file.wmlsc
 
 =head1 DESCRIPTION
 

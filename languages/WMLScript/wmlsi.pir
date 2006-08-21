@@ -7,7 +7,7 @@ wmlsi - WMLScript Interpreter
 
 =head1 SYNOPSYS
 
- parrot wmlsi.pbc file.wmlsc function [params ...]
+ parrot wmlsi.pir file.wmlsc function [params ...]
 
 =head1 DESCRIPTION
 

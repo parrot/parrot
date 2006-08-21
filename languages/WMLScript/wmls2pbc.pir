@@ -7,7 +7,7 @@ wmls2pbc - WMLScript bytecode to Parrot PBC Translator
 
 =head1 SYNOPSYS
 
- parrot wmls2pbc.pbc file.wmlsc
+ parrot wmls2pbc.pir file.wmlsc
 
 =head1 DESCRIPTION
 
