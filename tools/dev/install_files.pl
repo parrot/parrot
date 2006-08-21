@@ -165,7 +165,7 @@ while(<>) {
     $meta =~ s/^\[(.*?)\]//;
     next unless $package; # Skip if this file belongs to no package
 
-    next unless $package =~ /main|library/;	# XXX -lt
+    next unless $package =~ /main|library/; # XXX -lt
 
     my %meta;
     @meta{split(/,/, $meta)} = ();
@@ -209,17 +209,17 @@ while(<>) {
 
 unless ($options{'dry-run'}) {
     for my $dir (map { $options{destdir} . $_ } keys %directories) {
-	unless (-d $dir) {
-	    # Make full path to the directory $dir
-	    my @dirs;
-	    while (! -d $dir) { # Scan up to nearest existing ancestor
-		unshift @dirs, $dir;
-		$dir = dirname($dir);
-	    }
-	    foreach (@dirs) {
-		mkdir($_, 0777) or die "mkdir $_: $!\n";
-	    }
-	}
+        unless (-d $dir) {
+            # Make full path to the directory $dir
+            my @dirs;
+            while (! -d $dir) { # Scan up to nearest existing ancestor
+                unshift @dirs, $dir;
+                $dir = dirname($dir);
+            }
+            foreach (@dirs) {
+                mkdir($_, 0777) or die "mkdir $_: $!\n";
+            }
+        }
     }
 }
 print("Installing ...\n");
@@ -227,13 +227,13 @@ foreach (@files, @installable_exe) {
     my ($src, $dest) = @$_;
     $dest = $options{destdir}.$dest;
     if ($options{'dry-run'}) {
-	print "$src -> $dest\n";
-	next;
+        print "$src -> $dest\n";
+        next;
     }
     else {
-	next unless -e $src;
-	copy($src, $dest) or die "copy $src to $dest: $!\n";
-	print "$dest\n";
+        next unless -e $src;
+        copy($src, $dest) or die "copy $src to $dest: $!\n";
+        print "$dest\n";
     }
     my $mode = (stat($src))[2];
     chmod $mode, $dest;
