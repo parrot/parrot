@@ -136,7 +136,8 @@ Parrot_reallocate(Interp *interpreter, void *from, size_t size)
         if (!size) {    /* realloc(3) does free, if size == 0 here */
             return PObj_bufstart(buffer);    /* do nothing */
         }
-        p = 1 + (INTVAL *)xrealloc((INTVAL *)PObj_bufstart(buffer) - 1, sizeof(INTVAL) + size);
+        p = 1 + (INTVAL *)xrealloc((INTVAL *)PObj_bufstart(buffer) - 1, 
+                                   sizeof(INTVAL) + size);
         if (size > oldlen)
             memset(p + oldlen, 0, size - oldlen);
     }

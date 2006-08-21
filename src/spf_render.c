@@ -558,7 +558,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                         case 'c':
                             targ = string_append(interpreter, targ,
                                                  obj->getchr(interpreter,
-                                                             info.type, obj), 0);
+                                                             info.type, obj), 
+                                                 0);
                             break;
 
                         case 'd':
@@ -665,7 +666,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             /* XXX lost precision if %Hg or whatever
                                */
                             {
-                                char * const tempstr = string_to_cstring(interpreter, ts);
+                                char * const tempstr = 
+                                    string_to_cstring(interpreter, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
@@ -698,7 +700,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             }
 #endif
 
-                            targ = string_append(interpreter, targ, cstr2pstr(tc), 0);
+                            targ = string_append(interpreter, targ, 
+                                                 cstr2pstr(tc), 0);
                             break;
 
                             /* STRINGS */
@@ -707,8 +710,10 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                              * to SPRINTF_OBJ, but for now, getstring_pmc  *
                              * is inlined and modified to call get_repr    */
                             if (obj->getstring == pmc_core.getstring) {
-                                PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
-                                    ((PMC *)obj->data), (obj->index));
+                                PMC * const tmp = 
+                                    VTABLE_get_pmc_keyed_int(interpreter,
+                                                             ((PMC *)obj->data),
+                                                             (obj->index));
 
                                 obj->index++;
                                 string = (VTABLE_get_repr(interpreter, tmp));
@@ -746,7 +751,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             }
                             else {
                                 internal_exception(INVALID_CHARACTER,
-                                                   "'%c' is not a valid sprintf format",
+                                                   "'%c' is not a valid "
+                                                   "sprintf format",
                                                    ch);
                             }
                         }

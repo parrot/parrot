@@ -50,7 +50,8 @@ contained_in_pool(Interp *interpreter,
     ptr = PObj_to_ARENA(ptr);
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        const ptrdiff_t ptr_diff = (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
+        const ptrdiff_t ptr_diff =
+            (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
 
         if (0 <= ptr_diff
                 && ptr_diff <

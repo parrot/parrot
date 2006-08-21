@@ -140,9 +140,9 @@ Cleanup dead context memory. Called by the gargabe collector.
 
 =item C<parrot_context_t* Parrot_alloc_context(Interp *, INTVAL *n_regs_used)>
 
-Allocate a new context and set the context pointer. Please note that the register
-usage C<n_regs_used> is not copied, just the pointer is stored.
-The function returns the new context.
+Allocate a new context and set the context pointer. Please note that
+the register usage C<n_regs_used> is not copied, just the pointer is
+stored.  The function returns the new context.
 
 =item C<parrot_context_t* Parrot_push_context(Interp *, INTVAL *n_regs_used)>
 
@@ -283,7 +283,8 @@ struct Parrot_Context *
 Parrot_push_context(Interp *interpreter, INTVAL *n_regs_used)
 {
     struct Parrot_Context * const old = CONTEXT(interpreter->ctx);
-    struct Parrot_Context * const ctx = Parrot_alloc_context(interpreter, n_regs_used);
+    struct Parrot_Context * const ctx = 
+        Parrot_alloc_context(interpreter, n_regs_used);
 
     ctx->caller_ctx = old;
     ctx->current_sub = old->current_sub;  /* doesn't change */

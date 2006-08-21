@@ -2,7 +2,8 @@
 #include "stm_internal.h"
 #include "stm_waitlist.h"
 
-#define WAITLIST_REMOVE_CHECK 0 /* if set, make sure removes really remove -- for debugging */
+#define WAITLIST_REMOVE_CHECK 0 /* if set, make sure removes really
+                                 * remove -- for debugging */
 
 static struct waitlist_thread_data *
 get_thread(Parrot_Interp interp) {
@@ -72,7 +73,8 @@ add_entry(STM_waitlist *waitlist, struct waitlist_entry *entry) {
         PARROT_ATOMIC_PTR_CAS(successp, waitlist->first, entry->next, entry);
     } while (!successp);
 #if WAITLIST_DEBUG
-    fprintf(stderr, "added %p(%p) to waitlist %p\n", entry, entry->thread->interp, waitlist);
+    fprintf(stderr, "added %p(%p) to waitlist %p\n", 
+            entry, entry->thread->interp, waitlist);
 #endif
 }
 
@@ -82,8 +84,10 @@ remove_first(STM_waitlist *waitlist, struct waitlist_entry *expect_first) {
     PARROT_ATOMIC_PTR_CAS(successp, waitlist->first, expect_first,
                         expect_first->next);
 #if WAITLIST_DEBUG
-    fprintf(stderr, "tried removing %p(%p) from beginning of waitlist %p, successp=%d\n",
-                expect_first, expect_first->thread->interp, waitlist, successp);
+    fprintf(
+        stderr, 
+        "tried removing %p(%p) from beginning of waitlist %p, successp=%d\n",
+        expect_first, expect_first->thread->interp, waitlist, successp);
 #endif
     return successp;
 }
@@ -159,7 +163,8 @@ waitlist_signal_one(struct waitlist_entry *who) {
     UNLOCK(thread->signal_mutex);
     COND_SIGNAL(*thread->signal_cond);
 #if WAITLIST_DEBUG
-    fprintf(stderr, "signalled entry %p: %p(%p)\n", who, thread, thread->interp);
+    fprintf(stderr, "signalled entry %p: %p(%p)\n", 
+            who, thread, thread->interp);
 #endif
     who->next = NULL;
     who->head = NULL;

@@ -493,8 +493,8 @@ Parrot_in_memory_pool(Interp *interpreter, void *bufstart) {
     struct Memory_Block *cur_block;
     cur_block = pool->top_block;
     while (cur_block) {
-        if ((char *)bufstart >= cur_block->start && (char *) bufstart < cur_block->start 
-                + cur_block->size) {
+        if ((char *)bufstart >= cur_block->start && 
+            (char *) bufstart < cur_block->start + cur_block->size) {
             return 1;
         }
         cur_block = cur_block->prev;
@@ -781,8 +781,10 @@ Parrot_initialize_memory_pools(Interp *interpreter)
     alloc_new_block(interpreter, POOL_SIZE, arena_base->memory_pool, "init");
 
     /* Constant strings - not compacted */
-    arena_base->constant_string_pool = new_memory_pool(POOL_SIZE, (compact_f)NULLfunc);
-    alloc_new_block(interpreter, POOL_SIZE, arena_base->constant_string_pool, "init");
+    arena_base->constant_string_pool = 
+        new_memory_pool(POOL_SIZE, (compact_f)NULLfunc);
+    alloc_new_block(interpreter, POOL_SIZE, 
+                    arena_base->constant_string_pool, "init");
 }
 
 /*

@@ -132,7 +132,8 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
         if (PIO_isatty(debugger, pio))
             PIO_setlinebuf(debugger, pio);
         else {
-            /* this is essential (100 x faster!)  and should probably be in init/open code */
+            /* this is essential (100 x faster!)  and should probably
+             * be in init/open code */
             PIO_setbuf(debugger, pio, 8192);
         }
     }

@@ -469,7 +469,8 @@ static INTVAL
 shift_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io)
 {
     const char * const start = (char*)io->image->strstart;
-    const INTVAL i = PF_fetch_integer(io->pf, (opcode_t**) &io->image->strstart);
+    const INTVAL i =
+        PF_fetch_integer(io->pf, (opcode_t**) &io->image->strstart);
 
     io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
@@ -510,7 +511,8 @@ static FLOATVAL
 shift_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io)
 {
     const char * const start = (char*)io->image->strstart;
-    const FLOATVAL f = PF_fetch_number(io->pf, (opcode_t**) &io->image->strstart);
+    const FLOATVAL f =
+        PF_fetch_number(io->pf, (opcode_t**) &io->image->strstart);
 
     io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
@@ -532,7 +534,8 @@ static STRING*
 shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)
 {
     char * const start = (char*)io->image->strstart;
-    STRING * const s =   PF_fetch_string(interpreter, io->pf, (opcode_t**) &io->image->strstart);
+    STRING * const s =
+        PF_fetch_string(interpreter, io->pf, (opcode_t**) &io->image->strstart);
 
     io->image->bufused -= ((char*)io->image->strstart - start);
     assert((int)io->image->bufused >= 0);
@@ -842,7 +845,8 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
         info->last_type = *type = io->vtable->shift_integer(interpreter, io);
         if (*type <= 0)
             internal_exception(1, "Unknown PMC type to thaw %d", (int) *type);
-        if (*type >= interpreter->n_vtable_max || !interpreter->vtables[*type]) {
+        if (*type >= interpreter->n_vtable_max || 
+            !interpreter->vtables[*type]) {
             /* that ought to be a class */
             *type = enum_class_ParrotClass;
         }

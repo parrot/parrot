@@ -761,7 +761,8 @@ reorder_move(int *graph, int node_count, int src, int prev, int depth,
 
 /*
 
-=item C<typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);>
+=item C<typedef int (*reg_move_func)(Interp*, unsigned char d,
+                                     unsigned char s, void *);>
 
 =item C<void Parrot_register_move(Interp *, int n_regs,
         unsigned char *dest_regs, unsigned char *src_regs,
