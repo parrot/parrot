@@ -26,11 +26,13 @@ If possible, they use the appropriate language type, specified with C<.HLL>.
 
 =item B<band>(inout INT, in INT)
 
-Set the bits of $1 according to the B<and> of the corresponding bits from $1 and $2.
+Set the bits of $1 according to the B<and> of the corresponding bits
+from $1 and $2.
 
 =item B<band>(out INT, in INT, in INT)
 
-Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
+Set the bits of $1 according to the B<and> of the corresponding bits
+from $2 and $3.
 
 =cut
 
@@ -46,11 +48,13 @@ inline op band(out INT, in INT, in INT) :base_core {
 
 =item B<bands>(inout STR, in STR)
 
-Set the bits of $1 according to the B<and> of the corresponding bits from $1 and $2.
+Set the bits of $1 according to the B<and> of the corresponding bits
+from $1 and $2.
 
 =item B<bands>(out STR, in STR, in STR)
 
-Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
+Set the bits of $1 according to the B<and> of the corresponding bits
+from $2 and $3.
 
 =cut
 
@@ -150,11 +154,13 @@ inline op n_bnots(out PMC, invar PMC) :base_core {
 
 =item B<bor>(inout INT, in INT)
 
-Set the bits of $1 according to the B<or> of the corresponding bits from $1 and $2.
+Set the bits of $1 according to the B<or> of the corresponding bits
+from $1 and $2.
 
 =item B<bor>(out INT, in INT, in INT)
 
-Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
+Set the bits of $1 according to the B<or> of the corresponding bits
+from $2 and $3.
 
 =cut
 
@@ -170,11 +176,13 @@ inline op bor(out INT, in INT, in INT) :base_core {
 
 =item B<bors>(inout STR, in STR)
 
-Set the bits of $1 according to the B<or> of the corresponding bits from $1 and $2.
+Set the bits of $1 according to the B<or> of the corresponding bits
+from $1 and $2.
 
 =item B<bors>(out STR, in STR, in STR)
 
-Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
+Set the bits of $1 according to the B<or> of the corresponding bits
+from $2 and $3.
 
 =cut
 
@@ -289,11 +297,13 @@ inline op rot(out INT, in INT, in INT, inconst INT) {
 
 =item B<bxor>(inout INT, in INT)
 
-Set the bits of $1 according to the B<xor> of the corresponding bits from $1 and $2.
+Set the bits of $1 according to the B<xor> of the corresponding bits
+from $1 and $2.
 
 =item B<bxor>(out INT, in INT, in INT)
 
-Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
+Set the bits of $1 according to the B<xor> of the corresponding bits
+from $2 and $3.
 
 =cut
 
@@ -309,11 +319,13 @@ inline op bxor(out INT, in INT, in INT) :base_core {
 
 =item B<bxors>(inout STR, in STR)
 
-Set the bits of $1 according to the B<xor> of the corresponding bits from $1 and $2.
+Set the bits of $1 according to the B<xor> of the corresponding bits
+from $1 and $2.
 
 =item B<bxors>(out STR, in STR, in STR)
 
-Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
+Set the bits of $1 according to the B<xor> of the corresponding bits
+from $2 and $3.
 
 =cut
 

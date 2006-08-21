@@ -296,9 +296,11 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
 
 =item B<sprintf>(out PMC, invar PMC, invar PMC)
 
-#=item B<sprintf>(out STR, in STR) [unimplemented] [[what is this op supposed to do? --jrieks]]
+#=item B<sprintf>(out STR, in STR) [unimplemented] [[what is this op
+# supposed to do? --jrieks]]
 
-#=item B<sprintf>(out PMC, invar PMC) [unimplemented] [[what is this op supposed to do? --jrieks]]
+#=item B<sprintf>(out PMC, invar PMC) [unimplemented] [[what is this
+# op supposed to do? --jrieks]]
 
 Sets $1 to the result of calling C<Parrot_psprintf> with the
 given format ($2) and arguments ($3, which should be an ordered
@@ -319,7 +321,8 @@ inline op sprintf(out STR, in STR, invar PMC) :base_core {
 
 inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
     $1->vtable->set_string_native(interpreter, $1,
-        Parrot_psprintf(interpreter, $2->vtable->get_string(interpreter, $2), $3)
+        Parrot_psprintf(interpreter, 
+                       $2->vtable->get_string(interpreter, $2), $3)
     );
     goto NEXT();
 }

@@ -64,6 +64,7 @@ foreach my $file (sort keys(%$manifest)) {
 
   push @files, $ffile if $file =~ m!\.c$!;
   push @files, $ffile if $file =~ m!\.pmc$!;
+  push @files, $ffile if $file =~ m!\.ops$!;
   # push @files, $ffile if $file =~ m!\.pl$!;
 }
 

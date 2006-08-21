@@ -869,7 +869,8 @@ inline op cosh(out NUM, in NUM) :base_math {
 
 =item B<exp>(out NUM, in NUM)
 
-Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm.
+Set $1 to I<e> raised to the power $2. I<e> is the base of the natural
+logarithm.
 
 =cut
 

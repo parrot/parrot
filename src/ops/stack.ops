@@ -184,22 +184,27 @@ Save register or constant $1 onto the user stack.
 
 inline op save(in INT) :base_core {
   INTVAL i = $1;
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
+  stack_push(interpreter, 
+             &CONTEXT(interpreter->ctx)->user_stack, &i, 
+             STACK_ENTRY_INT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in NUM) :base_core {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack,
+             &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(invar PMC) :base_core {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack,
+              $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in STR) :base_core {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack,
+             $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
@@ -212,7 +217,9 @@ Save a clone of register or constant $1 onto the user stack.
 =cut
 
 inline op savec(in STR) :base_core {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack, 
+             string_copy(interpreter, $1), 
+             STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
