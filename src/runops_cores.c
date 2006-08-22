@@ -111,6 +111,7 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
     static size_t dod, gc;
     struct Arenas *arena_base = interpreter->arena_base;
     Interp *debugger;
+    PMC* pio;
 
     dod = arena_base->dod_runs;
     gc = arena_base->collect_runs;
@@ -158,6 +159,8 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
             PIO_eprintf(debugger, "       GC\n");
         }
     }
+    pio = PIO_STDERR(debugger);
+    PIO_flush(debugger, pio);
     return pc;
 }
 

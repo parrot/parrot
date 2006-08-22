@@ -277,8 +277,8 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     PIO_flush(interpreter, PIO_STDOUT(interpreter));
     PIO_flush(interpreter, PIO_STDERR(interpreter));
     if (interpreter->debugger) {
-        PIO_flush(interpreter, PIO_STDOUT(interpreter->debugger));
-        PIO_flush(interpreter, PIO_STDERR(interpreter->debugger));
+        PIO_flush(interpreter->debugger, PIO_STDOUT(interpreter->debugger));
+        PIO_flush(interpreter->debugger, PIO_STDERR(interpreter->debugger));
     }
 
     m = string_to_cstring(interpreter, message);
