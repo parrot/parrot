@@ -6,37 +6,37 @@
 
 #include <stdio.h>
 
-inline static void *docmpxchg(void **ptr, void *old, void *new) {
+inline static void *docmpxchg(void **ptr, void *oldval, void *newval) {
     __asm__ __volatile__("lock\n"
-                         "cmpxchgl %1,%2" : "=a"(old) : "q"(new), "m"(*ptr), "0" (old) 
+                         "cmpxchgl %1,%2" : "=a"(oldval) : "q"(newval), "m"(*ptr), "0" (oldval) 
                         : "memory");
-    return old;
+    return oldval;
 }
 
 int main(void) {
     char dummy[] = "some string";
-    char *old;
-    char *new;
+    char *oldval;
+    char *newval;
     char *atomic;
     atomic = dummy;
-    new = dummy + 1;
-    old = dummy;
+    newval = dummy + 1;
+    oldval = dummy;
 
-    old = docmpxchg((void **)&atomic, old, new);
+    oldval = docmpxchg((void **)&atomic, oldval, newval);
     
 
 #ifdef DEBUG_CMPXCHG_TEST
-    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, old, new);
+    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, oldval, newval);
 #endif
-    if (atomic != new) {
+    if (atomic != newval) {
         return EXIT_FAILURE;
     }
 
-    old = docmpxchg((void **)&atomic, old, new);
+    oldval = docmpxchg((void **)&atomic, oldval, newval);
 #ifdef DEBUG_CMPXCHG_TEST
-    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, old, new);
+    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, oldval, newval);
 #endif
-    if (old != new) {
+    if (oldval != newval) {
         return EXIT_FAILURE;
     }
 

@@ -30,14 +30,14 @@ mem_free_executable(void *p)
  *   executable
  */
 void *
-mem_realloc_executable(void* old, size_t newsize)
+mem_realloc_executable(void* oldp, size_t newsize)
 {
     size_t pagesize = sysconf(_SC_PAGESIZE);
     size_t roundup = (newsize + pagesize - 1) & ~(pagesize-1);
-    void *new = realloc(old, roundup);
-    if (new != NULL) {
-        mprotect(new, roundup, PROT_READ|PROT_WRITE|PROT_EXEC);
+    void *newp = realloc(oldp, roundup);
+    if (newp != NULL) {
+        mprotect(newp, roundup, PROT_READ|PROT_WRITE|PROT_EXEC);
     }
-    return new;
+    return newp;
 }
 #endif

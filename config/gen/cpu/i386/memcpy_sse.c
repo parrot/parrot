@@ -69,10 +69,10 @@ int main(int argc, char *argv[]) {
 
     n = 640;	/* sizeof(reg_store) */
 
-    s = malloc(n);
+    s = (unsigned char *)malloc(n);
     for (i = 0; i < n; ++i)
 	s[i] = i & 0xff;
-    d = malloc(n);
+    d = (unsigned char *)malloc(n);
     for (i = 0; i < n; ++i)
 	d[i] = 0xff;
     Parrot_memcpy_aligned_sse(d, s, n);

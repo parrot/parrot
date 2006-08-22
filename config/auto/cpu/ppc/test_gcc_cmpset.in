@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-inline static void *docmpset(void **ptr, void *old, void *new) {
+inline static void *docmpset(void **ptr, void *oldval, void *newval) {
     void *tmp;
     /* see http://www-128.ibm.com/developerworks/linux/library/pa-atom/ */
     __asm__ __volatile__( /*%0 = tmp, %1 = ptr, %2 = old, %3 = new */
@@ -24,7 +24,7 @@ inline static void *docmpset(void **ptr, void *old, void *new) {
         : /* output */
             "=&r"(tmp) 
         : /* input */
-            "r"(ptr), "r"(old), "r"(new)
+            "r"(ptr), "r"(oldval), "r"(newval)
         : /* clobber */
             "memory"
     );
@@ -33,28 +33,28 @@ inline static void *docmpset(void **ptr, void *old, void *new) {
 
 int main(void) {
     char dummy[] = "some string";
-    char *old;
-    char *new;
+    char *oldval;
+    char *newval;
     char *atomic;
     atomic = dummy;
-    new = dummy + 1;
-    old = dummy;
+    newval = dummy + 1;
+    oldval = dummy;
 
-    old = docmpset((void **)&atomic, old, new);
+    oldval = docmpset((void **)&atomic, oldval, newval);
     
 
 #ifdef DEBUG_CMPSET_TEST
-    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, old, new);
+    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, oldval, newval);
 #endif
-    if (atomic != new) {
+    if (atomic != newval) {
         return EXIT_FAILURE;
     }
 
-    old = docmpset((void **)&atomic, old, new);
+    oldval = docmpset((void **)&atomic, oldval, newval);
 #ifdef DEBUG_CMPSET_TEST
-    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, old, new);
+    printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, oldval, newval);
 #endif
-    if (old != new) {
+    if (oldval != newval) {
         return EXIT_FAILURE;
     }
 
