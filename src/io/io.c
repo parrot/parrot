@@ -1011,6 +1011,9 @@ PIO_putps(theINTERP, PMC *pmc, STRING *s)
     ParrotIO * const io = PMC_data0(pmc);
     assert((unsigned long)l != 0xdeadbeefUL);
     assert(io != 0);
+
+    if (!s)
+        return 0;
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug - but not during tests */
     if (0 && GC_DEBUG(interpreter))
