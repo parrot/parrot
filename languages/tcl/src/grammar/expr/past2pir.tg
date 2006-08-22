@@ -70,7 +70,6 @@ transform pir (PAST::Val) {
     $S0 = node['value']
     if class == "TclFloat"  goto assign_float
     if class == "TclString" goto assign_string
-    if class == "TclConst"  goto assign_string
     goto assign_val
   assign_float:                                    
     $I0 = index $S0, '.'                           # XXX: '.' hack due to
@@ -82,9 +81,7 @@ transform pir (PAST::Val) {
     concat $S0, '.'
     goto assign_val
   assign_string:
-    $S0 = escape $S0
-    $S0 = concat '"', $S0
-    $S0 = concat $S0, '"'
+    $S0 = pir.escape($S0)
   assign_val:
     pir.emit('    assign %0, %1', ret, $S0)
   end:
