@@ -243,6 +243,9 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
     s = 1;
     len = PIO_eprintf(debugger, "%6vu ", (UINTVAL)(pc - code_start));
     if (strcmp(info->name, "infix") == 0) {
+        /* this should rather be MMD_opcode_name, which doesn't 
+         * exit yet
+         */
         len += PIO_eprintf(debugger, "%s",
                 Parrot_MMD_method_name(interpreter, pc[1]) + 2);
         s = 2;
