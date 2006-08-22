@@ -57,6 +57,10 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     addattribute $P0, 'blocktype'
     addattribute $P0, 'vardecl'
 
+    $P1 = subclass $P0, 'Cardinal::PAST::Class'
+    addattribute $P1, 'class_path'
+    addattribute $P1, 'superclass'
+
     $P0 = subclass base, 'Cardinal::PAST::Rescue_Stmt'
     addattribute $P0, 'try_stmt'
     addattribute $P0, 'rescue_stmt'

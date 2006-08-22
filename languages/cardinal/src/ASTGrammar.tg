@@ -105,6 +105,7 @@ transform result (Cardinal::Grammar::statements) :language('PIR') {
 
     err_no_tree:
     print "The statements node doesn't contain a 'statement' match.\n"
+    .kdump2(node, 'statements')
     end
 }
 
@@ -715,13 +716,17 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
     class_block.'init'('node'=>node, 'name'=>function_name, 'blocktype'=>'class', 'outer'=>$P0)
 
     $I0 = defined node['class_path']
-    unless $I0 goto try_class
+    unless $I0 goto err_no_tree
+    $P0 = node['class_path']
     child = tree.get('result', $P0, 'Cardinal::Grammar::class_path')
     class_block.'add_child'(child)
 
+
     $I0 = defined node['superclass']
-    unless $I0 goto class_body
+    unless $I0 goto err_no_tree
+    $P0 = node['superclass']
     child = tree.get('result', $P0, 'Cardinal::Grammar::superclass')
+    if_null child, class_body
     class_block.'add_child'(child)
 
   class_body:
@@ -778,7 +783,7 @@ transform result (Cardinal::Grammar::function_name) :language('PIR') {
     .return ($S0)
 
   err_no_tree:
-    print "The function_name node doesn't contain a the right component matchs.\n"
+    print "The function_name node doesn't contain a the right component matches.\n"
     .kdump2(node, 'function_name')
     end
 }
@@ -809,14 +814,43 @@ transform result (Cardinal::Grammar::class_path) :language('PIR') {
   iter_end:
 
   get_name:
-    $I0 = defined node['classname']
+    $I0 = defined node['class_name']
     unless $I0 goto err_no_tree
-    $S0 = node['classname']
+    $S0 = node['class_name']
 
     .return (result)
 
   err_no_tree:
-    print "The class_path node doesn't contain a the right component matchs.\n"
+    print "The class_path node doesn't contain a the right component matches.\n"
+    .kdump(node)
+    end
+}
+
+transform result (Cardinal::Grammar::superclass) :language('PIR') {
+    .local pmc result
+    .local pmc child
+    result = new 'Cardinal::PAST::Op'
+    result.'init'('node'=>node, 'name'=>'superclass')
+    
+    $I0 = defined node['expression']
+    unless $I0 goto try_error
+    $P0 = node['expression']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::expression')
+    .return (child)
+
+  try_error:
+    $I0 = defined node['error']
+    unless $I0 goto just_return
+    $P0 = node['error']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::error')
+    .return (child)
+
+  just_return:
+    null $P0
+    .return ($P0)
+
+  err_no_tree:
+    print "The superclass node doesn't contain a the right component matches.\n"
     .kdump(node)
     end
 }
@@ -833,7 +867,7 @@ transform result (Cardinal::Grammar::function_prototype_arg_list) :language('PIR
     .return ($P0)
 
   err_no_tree:
-    print "The function_prototype_arg_list node doesn't contain a the right component matchs.\n"
+    print "The function_prototype_arg_list node doesn't contain a the right component matches.\n"
     .kdump2(node, 'function_prototype_arg_list')
     end
 }
@@ -890,7 +924,7 @@ transform result (Cardinal::Grammar::function_prototype_args) :language('PIR') {
     .return (arg_list)
 
   err_no_tree:
-    print "The function_prototype_arg_list node doesn't contain a the right component matchs.\n"
+    print "The function_prototype_arg_list node doesn't contain a the right component matches.\n"
     .kdump2(node, 'function_prototype_arg_list')
     end
 }
@@ -940,7 +974,7 @@ transform result (Cardinal::Grammar::function_prototype_arg) :language('PIR') {
     .return (op)
 
   err_no_tree:
-    print "The function_prototype_arg node doesn't contain a the right component matchs.\n"
+    print "The function_prototype_arg node doesn't contain a the right component matches.\n"
     .kdump2(node, 'function_prototype_arg')
     end
 }
@@ -961,7 +995,7 @@ transform result (Cardinal::Grammar::function_prototype_optional_arg) :language(
     .return (op)
 
   err_no_tree:
-    print "The function_prototype_arg_list node doesn't contain a the right component matchs.\n"
+    print "The function_prototype_arg_list node doesn't contain a the right component matches.\n"
     .kdump2(node, 'function_prototype_arg_list')
     end
 }
@@ -979,7 +1013,7 @@ transform result (Cardinal::Grammar::function_prototype_rest_args) :language('PI
     .return (op)
 
   err_no_tree:
-    print "The function_prototype_arg_list node doesn't contain a the right component matchs.\n"
+    print "The function_prototype_arg_list node doesn't contain a the right component matches.\n"
     .kdump2(node, 'function_prototype_arg_list')
     end
 }
@@ -997,7 +1031,7 @@ transform result (Cardinal::Grammar::function_prototype_block_arg) :language('PI
     .return (op)
 
   err_no_tree:
-    print "The function_prototype_arg_list node doesn't contain a the right component matchs.\n"
+    print "The function_prototype_arg_list node doesn't contain a the right component matches.\n"
     .kdump2(node, 'function_prototype_arg_list')
     end
 }
@@ -1038,7 +1072,7 @@ transform result (Cardinal::Grammar::if_clause) :language('PIR') {
 
 
   err_no_tree:
-    print "The if_clause node doesn't contain a the right component matchs.\n"
+    print "The if_clause node doesn't contain a the right component matches.\n"
     .kdump2(node, 'if_clause')
     end
 }
@@ -1208,16 +1242,37 @@ transform result (Cardinal::Grammar::left_hand_side) :language('PIR') {
 
 transform result (Cardinal::Grammar::variable) :language('PIR') {
     $I0 = defined node['IDENTIFIER']
-    unless $I0 goto global_variable
+    unless $I0 goto constant_variable
     $S0 = node['IDENTIFIER']
     #$S0 = tree.get('result', $P0, 'Cardinal::Grammar::IDENTIFIER')
     goto case_end
 
+  constant_variable:
+    $I0 = defined node['CONSTANT']
+    unless $I0 goto global_variable
+    $S0 = node['CONSTANT']
+    #$S0 = tree.get('result', $P0, 'Cardinal::Grammar::CONSTANT')
+    goto case_end
+
   global_variable:
     $I0 = defined node['GLOBAL_VARIABLE']
-    unless $I0 goto true_bool
+    unless $I0 goto instance_variable
     $P0 = node['GLOBAL_VARIABLE']
     $P0 = tree.'get'('result', $P0, 'Cardinal::Grammar::GLOBAL_VARIABLE')
+    .return ($P0)
+
+  instance_variable:
+    $I0 = defined node['INSTANCE_VARIABLE']
+    unless $I0 goto class_variable
+    $P0 = node['INSTANCE_VARIABLE']
+    $P0 = tree.'get'('result', $P0, 'Cardinal::Grammar::INSTANCE_VARIABLE')
+    .return ($P0)
+
+  class_variable:
+    $I0 = defined node['CLASS_VARIABLE']
+    unless $I0 goto true_bool
+    $P0 = node['CLASS_VARIABLE']
+    $P0 = tree.'get'('result', $P0, 'Cardinal::Grammar::CLASS_VARIABLE')
     .return ($P0)
 
   true_bool:
@@ -1260,6 +1315,22 @@ transform result (Cardinal::Grammar::GLOBAL_VARIABLE) :language('PIR') {
     .local pmc result
     result = new 'Cardinal::PAST::Var'
     result.'init'('node'=>node, 'name'=> $S0, 'scope'=>'global')
+    .return (result)
+}
+
+transform result (Cardinal::Grammar::INSTANCE_VARIABLE) :language('PIR') {
+    $S0 = node
+    .local pmc result
+    result = new 'Cardinal::PAST::Var'
+    result.'init'('node'=>node, 'name'=> $S0, 'scope'=>'instance')
+    .return (result)
+}
+
+transform result (Cardinal::Grammar::CLASS_VARIABLE) :language('PIR') {
+    $S0 = node
+    .local pmc result
+    result = new 'Cardinal::PAST::Var'
+    result.'init'('node'=>node, 'name'=> $S0, 'scope'=>'class')
     .return (result)
 }
 

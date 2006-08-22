@@ -232,6 +232,7 @@ transform post (Cardinal::PAST::Op) :language('PIR') {
     #optable = get_hll_global [ 'Cardinal'; 'Grammar' ], '$optable'
     optable = get_root_global [ 'parrot'; 'Cardinal::Grammar' ], '$optable'
     optoken = optable[opname]
+    if_null optoken, no_optoken
     unless optoken goto no_optoken
     pasttype = optoken['pasttype']
   no_optoken:
@@ -252,6 +253,7 @@ transform postname (Cardinal::PAST::Op) :language('PIR') {
     optable = get_root_global [ 'parrot'; 'Cardinal::Grammar' ], '$optable'
     optoken = optable[opname]
   
+    if_null optoken, no_optoken
     unless optoken goto no_optoken
     postname = optoken['post']
   no_optoken:
@@ -297,6 +299,7 @@ transform simple (Cardinal::PAST::Op) :language('PIR') {
     #optable = get_hll_global [ 'Cardinal'; 'Grammar' ], '$optable'
     optable = get_root_global [ 'parrot'; 'Cardinal::Grammar' ], '$optable'
     optoken = optable[opname]
+    if_null optoken, without_opreturn
     unless optoken goto without_opreturn
     opreturn = optoken['returns']
 
@@ -304,6 +307,7 @@ transform simple (Cardinal::PAST::Op) :language('PIR') {
     $P0 = get_root_global ['parrot'; 'Cardinal'], 'CardinalParrotClassMap'
     unless $P0 goto without_opreturn
     opreturn = $P0[opreturn]
+    if_null optoken, without_opreturn
     unless opreturn goto without_opreturn
   without_opreturn:
     opreturn = '.Undef'

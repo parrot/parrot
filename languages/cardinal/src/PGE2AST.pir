@@ -104,6 +104,7 @@ error:
     unless $P0, iter_end
     pop block, $P0
     vdecl = block.'vardecl'(name)
+    if_null vdecl, iter_loop
     $I0 = isa vdecl, 'Cardinal::PAST::Var'
     unless $I0 goto not_var
     unless $I1 == 1 goto not_local

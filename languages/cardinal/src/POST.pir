@@ -308,8 +308,6 @@ and that is returned.
 
 .sub 'pir' :method
     .param pmc block
-    ##   if we already generated the code for this
-    ##   variable, we generate nothing here.
     .local string name, scope, value
     .local pmc code
     .local int islvalue
@@ -319,13 +317,16 @@ and that is returned.
     islvalue = self.'islvalue'()
     code = new 'PGE::CodeString'
     if scope == 'lexical' goto generate_lexical
-    if scope == 'package' goto generate_package
+    if scope == 'instance' goto generate_instance
+    if scope == 'class' goto generate_class
     if scope == 'parameter' goto generate_parameter
-    if scope == 'global' goto generate_package
+    if scope == 'global' goto generate_global
     goto generate_find
   generate_parameter:
     .local pmc varhash
     varhash = block.'varhash'()
+    ##   if we already generated the code for this
+    ##   variable, we generate nothing here.
     $I0 = exists varhash[name]
     if $I0 goto generate_find
     .local pmc prologue
@@ -346,7 +347,15 @@ and that is returned.
     code.'emit'("    .lex '%0', %1", name, value)
     varhash[name] = self
     goto end
-  generate_package:
+  generate_global:
+    if islvalue goto end
+    code.'emit'("    %0 = get_hll_global '%1'", value, name)
+    goto end
+  generate_instance:
+    if islvalue goto end
+    code.'emit'("    %0 = get_hll_global '%1'", value, name)
+    goto end
+  generate_class:
     if islvalue goto end
     code.'emit'("    %0 = get_hll_global '%1'", value, name)
     goto end
@@ -372,13 +381,19 @@ and that is returned.
     if $I0 goto with_varhash_name
     varhash[name] = self
   with_varhash_name:
-    if scope == 'outerpackage' goto store_package
-    if scope == 'package' goto store_package
-    if scope == 'global' goto store_package
+    if scope == 'instance' goto store_instance
+    if scope == 'class' goto store_class
+    if scope == 'global' goto store_global
   store_lexical:
     code.'emit'("    store_lex '%0', %1", name, xvalue)
     .return (code)
-  store_package:
+  store_instance:
+    code.'emit'("    set_hll_global '%0', %1", name, xvalue)
+    .return (code)
+  store_class:
+    code.'emit'("    set_hll_global '%0', %1", name, xvalue)
+    .return (code)
+  store_global:
     code.'emit'("    set_hll_global '%0', %1", name, xvalue)
     .return (code)
 .end
