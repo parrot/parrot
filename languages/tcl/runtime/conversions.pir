@@ -324,6 +324,7 @@ Given a chunk of tcl code, return a subroutine.
     pir = new 'PGE::CodeString'
 
     pir.emit(".HLL 'Tcl', ''")
+    pir.emit(".loadlib 'tcl_ops'")
     pir.emit(".namespace")
     pir.emit(".include 'languages/tcl/src/returncodes.pir'")
     pir.emit(".sub '_anon' :anon")
