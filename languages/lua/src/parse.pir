@@ -122,14 +122,12 @@ L5:
     $I0 = index '0123456789', $S0
     if $I0 < 0 goto CONCAT
     inc pos
-    if pos == lastpos goto LOOP # error
     $S0 = substr target, pos, 1
     $I1 = index '0123456789', $S0
     if $I1 < 0 goto L6
     $I0 *= 10
     $I0 += $I1
     inc pos
-    if pos == lastpos goto LOOP # error
     $S0 = substr target, pos, 1
     $I1 = index '0123456789', $S0
     if $I1 < 0 goto L6
@@ -152,8 +150,6 @@ CONCAT:
 
 =item C<long_string>
 
-TODO
-
 =cut
 
 .sub 'long_string'
@@ -167,11 +163,156 @@ TODO
     pos = mfrom
     lastpos = length target
 
+    .local int sep 
+    sep = 0
+    $S0 = substr target, pos, 1
+    if $S0 != '[' goto END
+    inc pos
+    (pos, sep) = _skip_sep(target, pos, '[')
+    if sep >= 0 goto L1
+    if sep == -1 goto END
+    error(mob, "invalid long string delimiter")
+L1:
+    inc pos
+    $S0 = substr target, pos, 1
+    $I0 = index "\n\r", $S0
+    if $I0 < 0 goto L2
+    inc pos
+L2:
+
     .local string literal
     literal = ''
+LOOP:
+    if pos < lastpos goto L3
+    error(mob, "unfinished long string")
+L3:
+    $S0 = substr target, pos, 1
+    if $S0 != '[' goto L4
+    inc pos
+    $S0 = substr target, pos, 1
+    if $S0 != '[' goto L5
+    error(mob, "nesting of [[...]] is deprecated")
+L5:
+    dec pos
+    goto CONCAT
+L4:
+    if $S0 != ']' goto L6
+    inc pos
+    ($I0, $I1) = _skip_sep(target, pos, ']')
+    if $I1 != sep goto L7
+    pos = $I0 + 1
+    mob.'value'(literal)
+    mpos = pos
+    goto END    
+L7:
+    dec pos
+    goto CONCAT
+L6:
+    $I0 = index "\n\r", $S0
+    if $I0 < 0 goto L8
+    $S0 = "\n"
+    goto CONCAT
+L8:
 
-end:
+CONCAT:
+    concat literal, $S0
+    inc pos
+    goto LOOP
+
+END:
     .return (mob)
+.end
+
+=item C<long_comment>
+
+=cut
+
+.sub 'long_comment'
+    .param pmc mob
+    .param pmc adv :slurpy :named
+
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+    (mob, target, mfrom, mpos) = mob.'newfrom'(mob)
+    pos = mfrom
+    lastpos = length target
+
+    .local int sep 
+    sep = 0
+    $S0 = substr target, pos, 1
+    if $S0 != '[' goto END
+    inc pos
+    (pos, sep) = _skip_sep(target, pos, '[')
+    if sep < 0 goto END
+    inc pos
+#    $S0 = substr target, pos, 1
+#    $I0 = index "\n\r", $S0
+#    if $I0 < 0 goto L2
+#    inc pos
+#L2:
+
+#    .local string literal
+#    literal = ''
+LOOP:
+    if pos < lastpos goto L3
+    error(mob, "unfinished long comment")
+L3:
+    $S0 = substr target, pos, 1
+    if $S0 != '[' goto L4
+    inc pos
+    $S0 = substr target, pos, 1
+    if $S0 != '[' goto L5
+    error(mob, "nesting of [[...]] is deprecated")
+L5:
+    dec pos
+    goto CONCAT
+L4:
+    if $S0 != ']' goto L6
+    inc pos
+    ($I0, $I1) = _skip_sep(target, pos, ']')
+    if $I1 != sep goto L7
+    pos = $I0 + 1
+#    mob.'value'(literal)
+    mpos = pos
+    goto END    
+L7:
+    dec pos
+    goto CONCAT
+L6:
+    $I0 = index "\n\r", $S0
+    if $I0 < 0 goto L8
+#    $S0 = "\n"
+    goto CONCAT
+L8:
+
+CONCAT:
+#    concat literal, $S0
+    inc pos
+    goto LOOP
+
+END:
+    .return (mob)
+.end
+
+.sub _skip_sep
+    .param string target
+    .param int pos
+    .param string delim
+    .local int count
+    count = 0
+L1:
+    $S0 = substr target, pos, 1
+    if $S0 != '=' goto L2
+    inc count
+    inc pos
+    goto L1
+L2:
+    if $S0 == delim goto L3
+    neg count
+    dec count
+L3:
+    .return (pos, count) 
 .end
 
 =item C<error(PMC match, [, message [, ...]] )>

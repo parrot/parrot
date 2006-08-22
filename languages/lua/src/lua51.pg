@@ -230,7 +230,7 @@ token Number {
 
 token ws {
         [ \s+
-        | \-\- <long_string>    # long_comment
+        | \-\- <long_comment>
         | \-\- \N*
         ]*
 }

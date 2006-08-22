@@ -75,6 +75,8 @@ foreach my $func ( keys %language_test_map ) {
             @test_prog = (
                 "perl -Ilanguages/lua languages/lua/luac.pl languages/${lang_fn}",
                 "$self->{parrot} --no-gc languages/${pir_fn}",
+#                "$self->{parrot} languages/lua/test_lex.pir languages/${lang_fn}",
+#                "$self->{parrot} languages/lua/luac.pir languages/${lang_fn}",
             );
         }
 

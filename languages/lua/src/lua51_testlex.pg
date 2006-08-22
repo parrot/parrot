@@ -9,11 +9,11 @@ rule start {
 }
 
 rule token {
-        |<punctuator>
         | <Name>
         | <reserved_words>
         | <String>
         | <Number>
+        | <punctuator>
 #        | <?error> 
 }
 
@@ -83,7 +83,7 @@ token Number {
 
 token ws {
         [ \s+
-        | \-\- <long_string>    # long_comment
+        | \-\- <long_comment>
         | \-\- \N*
         ]*
 }
