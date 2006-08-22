@@ -10,13 +10,14 @@ grammar TclExpr::Grammar;
 token ws { \h* }
 
 token program {
-   <?ws> <command> [ <?ws> [\n|;] <?ws> <command> ]* <?ws>
+   | $<constant>:=[^$]
+   | <[;\n\r\t ]>* <command> [ <?ws> <[\n;]> <?ws> <command>? ]* 
 }
 
 token command {
     | \# \N*
-    | [ $<word>:=( <quoted_word>
-                 | <braced_word>
+    | [ $<word>:=( <quoted_word> [<before [<[;\n\r\t ]>|$]> | <error: extra characters after close-quote> ]
+                 | <braced_word> [<before [<[;\n\r\t ]>|$]> | <error: extra characters after close-brace> ]
                  | $<chunk>:=( <substitution> | \$ | <-[[$\\;\n\r\t ]>+ )+
                  ) \h*
       ]+
@@ -35,14 +36,14 @@ token quoted_word {
 token braced_word { <PGE::Text::bracketed: {}> }
 
 token command_substitution {
-    \[ <subcommand> [ <[\n;]> <subcommand> ]* [ \] | <error: missing close-bracket> ]
+    \[ <[;\n\r\t ]>* <subcommand> [ <?ws> <[\n;]> <?ws> <subcommand>? ]* [ \] | <error: missing close-bracket> ]
 }
 
 token subcommand {
     | \# \N*
     | [ $<word>:=( <quoted_word>
                  | <braced_word>
-                 | $<chunk>:=( <substitution> | \$ | <-[[$\]\\\n\r\t ]>+ )+
+                 | $<chunk>:=( <substitution> | \$ | <-[[$\]\\;\n\r\t ]>+ )+
                  ) \h*
       ]*
 }

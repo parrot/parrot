@@ -31,6 +31,8 @@ transform dispatch (TclExpr::Grammar) {
 dispatch:
     $P0 = node['backslash_substitution']
     unless null $P0 goto constant
+    $P0 = node['constant']
+    unless null $P0 goto constant
     $P0 = node['chunk']
     unless null $P0 goto chunks
     $P0 = node['substitution']
@@ -240,8 +242,11 @@ transform past (boolean) {
     past.set_node(node)
     
     $S0 = node
+    $P0 = new 'TclConst'
+    $P0 = $S0
+    $S0 = $P0
     past['value'] = $S0
-    past['class'] = "TclConst"
+    past['class'] = "TclString"
     .return(past)
 }
 
@@ -251,8 +256,11 @@ transform past (constant) {
     past.set_node(node)
     
     $S0 = node
+    $P0 = new 'TclConst'
+    $P0 = $S0
+    $S0 = $P0
     past['value'] = $S0
-    past['class'] = "TclConst"
+    past['class'] = "TclString"
     .return(past)
 }
 
@@ -264,7 +272,7 @@ transform past (braced_word) {
     $P0 = node['PGE::Text::bracketed']
     $S0 = $P0[0]
     past['value'] = $S0
-    past['class'] = "TclConst"
+    past['class'] = "TclString"
     .return(past)
 }
 
@@ -414,7 +422,7 @@ transform past (quoted_word) {
 empty_string:
     past = new 'PAST::Val'
     past['node']  = node
-    past['class'] = 'TclConst'
+    past['class'] = 'TclString'
     past['value'] = ''
 
     .return(past)
@@ -436,9 +444,12 @@ transform past (array) {
     goto cpast_add
   cpast_str:
     $S0 = cnode
+    $P0 = new 'TclConst'
+    $P0 = $S0
+    $S0 = $P0
     cpast = new 'PAST::Val'
     cpast['node'] = node
-    cpast['class'] = 'TclConst'
+    cpast['class'] = 'TclString'
     cpast['value'] = $S0
   cpast_add:
     unless null past goto cpast_concat
@@ -478,7 +489,7 @@ end:
 empty:
     past = new 'PAST::Val'
     past.set_node(node)
-    past['class'] = 'TclConst'
+    past['class'] = 'TclString'
     past['value'] = ''
     .return(past)
 }

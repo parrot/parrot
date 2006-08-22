@@ -33,7 +33,15 @@ END_PIR
 }
 
 transform pir (PAST::Program) {
-    .local string pir
+    .local pmc pir
+    pir = new 'PGE::CodeString'
+
+    pir.emit(<<'END_PIR')
+  .local pmc colons, split, epoch
+  colons = get_root_global ['_tcl'], 'colons'
+  split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
+  epoch = get_root_global ['_tcl'], 'epoch'
+END_PIR
 
     .local pmc iter, child
     iter = node.'child_iter'()
@@ -187,11 +195,12 @@ transform pir (PAST::MathFunc) {
 }
 
 transform pir (PAST::Command) {
-    .local pmc args, iter, pir, reg
+    .local pmc args, children, iter, pir, reg
     
     pir  = new 'PGE::CodeString'
     args = new .ResizablePMCArray
-    iter = node.'child_iter'()
+    children = node.'get_children'()
+    iter = new .Iterator, children
   iter_loop: 
     unless iter goto iter_done
     $P1 = shift iter
@@ -199,19 +208,70 @@ transform pir (PAST::Command) {
     reg = $P1['ret']
     push args, reg
     pir .= $P0
+    pir.emit("%0 = clone %0", reg)
     goto iter_loop
   iter_done:
     .local pmc retval, name
     retval = pir.unique('$P')
     name = shift args
-    $S0 = join ", ", args
     
-    pir.emit(<<'END_PIR', retval, name, $S0)
-  %0 = get_hll_namespace
+    $S1 = pir.unique('invalid_')
+    $S2 = pir.unique('done_')
+    $S3 = pir.unique('dynamic_')
+
+    $P0 = shift children
+    $S0 = $P0['value']
+    push_eh dynamic
+      $P1 = get_root_global ['_tcl'; 'builtins'], $S0
+    clear_eh
+
+    .local pmc serno
+    .local int register_num
+    serno = get_root_global ['parrot'; 'PGE::CodeString'], "$!serno"
+    register_num = serno
+
+    (register_num, $P0) = $P1(register_num,children,args)
+    if null $P0 goto dynamic
+    serno = register_num
+
+    .local pmc epoch
+    epoch = get_root_global ['_tcl'], 'epoch'
+    pir.emit('  if epoch != %0 goto %1', epoch, $S3)
+    pir .= $P0
+    pir.emit('  %0 = $P%1', retval, register_num)
+    pir.emit('goto %0', $S2)
+
+dynamic:
+    $S0 = join ", ", args
+    $S4 = pir.unique('has_namespace')
+    $S5 = pir.unique('root_namespace')
+    pir.emit(<<'END_PIR', retval, name, $S0, $S1, $S2, $S3, $S4, $S5)
+%5:
   $S0 = %1
-  $S0 = '&' . $S0
-  %0  = %0[$S0]
+  $P0 = split(colons, $S0)
+  $S0 = ""
+  $I0 = elements $P0
+  if $I0 == 0 goto %7
+  $S0 = pop $P0
+  if $I0 == 1 goto %7
+  $S1 = shift $P0
+  if $S1 == "" goto %7
+  unshift $P0, $S1
+  %0 = get_namespace $P0
+  goto %6
+%7:
+  %0 = get_hll_namespace $P0
+%6:
+  $S1 = '&' . $S0
+  %0  = %0[$S1]
+  if null %0 goto %3
   %0  = %0(%2)
+  goto %4
+%3:
+  $S0 = 'invalid command name "' . $S0
+  $S0 .= '"'
+  tcl_error $S0
+%4:
 END_PIR
     node['ret'] = retval
     .return(pir)

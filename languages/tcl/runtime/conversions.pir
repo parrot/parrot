@@ -279,13 +279,73 @@ Given a chunk of tcl code, return a subroutine.
 =cut
 
 .sub __script
-  .param string code
-  
-  $P0 = get_root_global ['_tcl'], 'compile'
-  ($I0,$S0) = $P0(0,code)
-  $P2 = pir_compiler($I0,$S0)
-  
-  .return($P2)
+    .param string expression
+    .param int     pir_only :named('pir_only') :optional
+
+    .local pmc parse
+    .local pmc match
+
+    parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'program'
+    $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
+    match = $P0(expression, 0, 'TclExpr::Grammar')
+    match.to(0)
+    match = parse(match)
+    
+    # the following will dump out the match object
+    #load_bytecode 'dumper.pbc'
+    #load_bytecode 'PGE/Dumper.pbc'
+    #$P0 = get_root_global ['parrot'], '_dumper'
+    #$P0(match)
+ 
+    unless match goto premature_end
+    $I0 = length expression
+    $I1 = match.to()
+    .include 'cclass.pasm'
+    $I1 = find_not_cclass .CCLASS_WHITESPACE, expression, $I1, $I0
+    unless $I0 == $I1 goto extra_tokens
+
+    .local pmc astgrammar, astbuilder, ast
+    astgrammar = new 'TclExpr::PAST::Grammar'
+    astbuilder = astgrammar.apply(match)
+    ast = astbuilder.get('past')
+
+  build_pir:
+    .local pmc pirgrammar, pirbuilder
+    .local string result
+    pirgrammar = new 'TclExpr::PIR::Grammar'
+    pirbuilder = pirgrammar.'apply'(ast)
+    result = pirbuilder.get('result')
+
+    .local string ret
+    ret = ast['ret']
+    if pir_only goto only_pir
+
+    .local pmc pir
+    pir = new 'PGE::CodeString'
+
+    pir.emit(".HLL 'Tcl', ''")
+    pir.emit(".namespace")
+    pir.emit(".include 'languages/tcl/src/returncodes.pir'")
+    pir.emit(".sub '_anon' :anon")
+    pir .= result
+    pir.emit("  .return(%0)", ret)
+    pir.emit(".end")
+
+    $P1 = compreg 'PIR'
+    $P2 = $P1(pir)
+    .return ($P2)
+
+  only_pir:
+    .return(result, ret)
+
+  premature_end:
+    say expression
+    tcl_error "program doesn't match grammar"
+
+  extra_tokens:
+    $S0 = substr expression, $I1
+    $S0 = 'extra tokens at end of program: ' . $S0
+    tcl_error $S0
 .end
 
 =head2 _Tcl::__namespace

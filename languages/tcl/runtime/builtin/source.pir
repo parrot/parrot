@@ -34,6 +34,35 @@ loop:
   goto loop
 
 gotfile:
+  .local int len
+  len = length contents
+ 
+  # perform the backslash-newline substitution
+  $I0 = -1
+backslash_loop:
+  inc $I0
+  if $I0 >= len goto execute
+  $I1 = ord contents, $I0
+  if $I1 != 92 goto backslash_loop # \\
+  inc $I0
+  $I2 = $I0
+  $I1 = ord contents, $I2
+  if $I1 != 10 goto backslash_loop # \n
+space:
+  inc $I2
+  if $I0 >= len goto execute
+  $I1 = is_cclass .CCLASS_WHITESPACE, contents, $I2
+  if $I1 == 0 goto not_space
+  goto space
+not_space:
+  dec $I0
+  $I1 = $I2 - $I0
+  substr contents, $I0, $I1, " "
+  dec $I1
+  len -= $I1
+  goto backslash_loop
+
+execute:
   $P2 = __script(contents)
   .return $P2()
 
