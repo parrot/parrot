@@ -88,11 +88,27 @@ inline op chopn(out STR, in STR, in INT) :base_core {
 
 =item B<concat>(inout STR, in STR)
 
-Append the string in $2 to the string in $1.
+=item B<concat>(in PMC, in STR)
+
+=item B<concat>(in PMC, in PMC)
+
+Append the string in $2 to the string in $1. The C<PMC> versions are
+MMD operations.
 
 =item B<concat>(out STR, in STR, in STR)
 
-Append the string $3 to $2 and places the result into $1.
+=item B<concat>(in PMC, in PMC, in STR)
+
+=item B<concat>(in PMC, in PMC, in PMC)
+
+=item B<n_concat>(out PMC, in PMC, in STR)
+
+=item B<n_concat>(out PMC, in PMC, in PMC)
+
+Concatenate the strings $3 to $2 and places the result into $1.
+The C<PMC> versions are MMD operations. The C<n_> variants are
+creating a new result as usual. See also F<src/ops/math.ops> for 
+the general C<infix> and C<n_infix> syntax.
 
 =cut
 
@@ -110,7 +126,16 @@ inline op concat(out STR, in STR, in STR) :base_mem {
 
 =item B<repeat>(out STR, in STR, in INT)
 
+=item B<repeat>(in PMC, in PMC, in INT)
+
+=item B<repeat>(in PMC, in PMC, in PMC)
+
+=item B<n_repeat>(out PMC, in PMC, in INT)
+
+=item B<n_repeat>(out PMC, in PMC, in PMC)
+
 Repeats string $2 $3 times and stores result in $1.
+The C<PMC> versions are MMD operations.
 
 =cut
 

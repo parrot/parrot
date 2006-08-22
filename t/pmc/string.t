@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 43;
 
 =head1 NAME
 
@@ -334,6 +334,42 @@ zzz
 
 OUTPUT
 
+pasm_output_is(<<'CODE', <<OUTPUT, "n_repeat");
+	new P0, .String
+	set P0, "x"
+	new P1, .Integer
+	set P1, 12
+	n_repeat P2, P0, P1
+        print P2
+        print "\n"
+
+        set P0, "y"
+        new P1, .Float
+        set P1, 6.5
+        n_repeat P3, P0, P1
+        print P3
+        print "\n"
+
+        set P0, "z"
+        new P1, .String
+        set P1, "3"
+        n_repeat P4, P0, P1
+        print P4
+        print "\n"
+
+        set P0, "a"
+        new P1, .Undef
+        n_repeat P5, P0, P1
+        print P5
+        print "\n"
+
+	end
+CODE
+xxxxxxxxxxxx
+yyyyyy
+zzz
+
+OUTPUT
 pasm_output_is(<<'CODE', <<OUTPUT, "repeat_int");
 	new P0, .String
 	set P0, "x"
@@ -354,6 +390,23 @@ xxxxxxxxxxxx
 zazaza
 OUTPUT
 
+pasm_output_is(<<'CODE', <<OUTPUT, "n_repeat_int");
+	new P0, .String
+	set P0, "x"
+	set I1, 12
+	n_repeat P2, P0, I1
+        print P2
+        print "\n"
+
+        set P0, "za"
+        n_repeat P3, P0, 3
+        print P3
+        print "\n"
+	end
+CODE
+xxxxxxxxxxxx
+zazaza
+OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "if(String)");
         new P0, .String
@@ -447,6 +500,32 @@ bar
 str
 OUTPUT
 
+pasm_output_is(<<'CODE', <<OUTPUT, "n_concat");
+	new P0, .String
+	set P0, "foo"
+	n_concat	P1, P0, P0
+
+	print	P0
+	print "\n"
+	print	P1
+	print "\n"
+
+	new P0, .String
+	set P0, "foo"
+	n_concat P2, P0, "bar"
+
+	print	P0
+	print "\n"
+	print	P2
+	print "\n"
+
+	end
+CODE
+foo
+foofoo
+foo
+foobar
+OUTPUT
 pasm_output_is(<<'CODE', <<OUTPUT, "cmp");
 	new P1, .String
 	new P2, .String
