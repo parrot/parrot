@@ -77,10 +77,10 @@ $$ \n			\n		y	line beginnings and endings ($$)
 <[a..c]>+ | <[b..e]>+	bcd		y	alternation (|)
 <[a..d]>+ | <[c..e]>+	bcd		y	alternation (|)
 b|			bcd		/rule error/	alternation (|) - null right arg illegal
-|b			bcd		/Missing term/	TODO: alternation (|) - null left arg illegal
-|			bcd		/Missing term/	TODO: alternation (|) - null both args illegal
+|b			bcd		/Missing term/	alternation (|) - null left arg illegal
+|			bcd		/Missing term/	alternation (|) - null both args illegal
 \|			|		y	alternation (|) - literal must be escaped
-|			|		n	TODO: alternation (|) - literal must be escaped
+|			|		n	alternation (|) - literal must be escaped
 <[a..d]> & <[b..e]>	c		y	conjunction (&)
 <[a..d]> & <[d..e]>	c		n	conjunction (&)
 <[a..b]> & <[b..e]>	c		n	conjunction (&)
@@ -90,21 +90,21 @@ b|			bcd		/rule error/	alternation (|) - null right arg illegal
 <[a..c]>+ & <[b..e]>+	bcd		y	conjunction (&)
 <[a..d]>+ & <[c..e]>+	bcd		y	conjunction (&)
 b&			bcd		/rule error/	conjunction (&) - null right arg illegal
-&b			bcd		/Missing term/	TODO: conjunction (&) - null left arg illegal
-&			bcd		/Missing term/	TODO: conjunction (&) - null both args illegal
+&b			bcd		/Missing term/	conjunction (&) - null left arg illegal
+&			bcd		/Missing term/	conjunction (&) - null both args illegal
 \&			&		y	conjunction (&) - literal must be escaped
-&			&		n	TODO: conjunction (&) - literal must be escaped
-a&|b			a&|b		/Missing term/	TODO: alternation and conjunction (&|) - parse error
-a|&b			a|&b		/Missing term/	TODO: alternation and conjunction (|&) - parse error
+&			&		n	conjunction (&) - literal must be escaped
+a&|b			a&|b		/Missing term/	alternation and conjunction (&|) - parse error
+a|&b			a|&b		/Missing term/	alternation and conjunction (|&) - parse error
 |d|b			abc		y	leading alternation ignored
  |d|b			abc		y	leading alternation ignored
 |d |b			abc		y	leading alternation ignored
  | d | b		abc		y	leading alternation ignored
- b |  | d		abc		n	TODO: null pattern invalid
+ b |  | d		abc		n	null pattern invalid
 \pabc			pabc		y	retired metachars (\p)
-\p{InConsonant}		a		n	TODO: retired metachars (\p)
+\p{InConsonant}		a		n	retired metachars (\p)
 \Pabc			Pabc		y	retired metachars (\P)
-\P{InConsonant}		a		n	TODO: retired metachars (\P)
+\P{InConsonant}		a		n	retired metachars (\P)
 \Labc\E			LabcE		y	retired metachars (\L...\E)
 \LABC\E			abc		n	retired metachars (\L...\E)
 \Uabc\E			UabcE		y	retired metachars (\U...\E)
@@ -112,7 +112,7 @@ a|&b			a|&b		/Missing term/	TODO: alternation and conjunction (|&) - parse error
 \Qabc\E			QabcE		y	retired metachars (\Q...\E)
 \Qabc d?\E		abc d		n	retired metachars (\Q...\E)
 \Gabc			Gabc		y	retired metachars (\G)
-\1abc			1abc		y	TODO: retired metachars (\1)
+\1abc			1abc		y	retired metachars (\1)
 ^ \s+ $			\u0009\u0020\u00a0\u000a\u000b\u000c\u000d\u0085	y	0-255 whitespace (\s)
 ^ \h+ $			\u0009\u0020\u00a0	y	0-255 horizontal whitespace (\h)
 ^ \v+ $			\u000a\u000b\u000c\u000d\u0085	y	0-255 vertical whitespace (\v)
@@ -254,7 +254,7 @@ ab:::cd | gh:::ij	xyabghij	n	rule cut at top
 <[b..d]>		axxxef		n	character range
 <-[b..d]>		abcdef		y	negated character range
 <-[b..d]>		bbccdd		n	negated character range
-<-[d..b]>		bbccdd		/parse error/	TODO: illegal character range
+<-[d..b]>		bbccdd		/parse error/	illegal character range
 <[\-]>			ab-def		y	escaped hyphen
 <[\-]>			abcdef		n	escaped hyphen
 <-[\-]>			---x--		y	negated escaped hyphen
@@ -270,7 +270,7 @@ ab:::cd | gh:::ij	xyabghij	n	rule cut at top
 <-[+\-]>		---x--		y	negated escaped hyphen in range
 <-[+\-]>		------		n	negated escaped hyphen in range
 ^><[<]>			><		/rule error/	lt character class
-^<[>]><			><		y	TODO: gt character class
+^<[>]><			><		y	gt character class
 ^<[><]>**{2}		><		y	gt, lt character class
 ^<[<>]>**{2}		><		y	lt, gt  character class
 ^<-[><]>		><		n	not gt, lt character class
@@ -357,7 +357,7 @@ $ <after ^a>		a		y				lookbehind <after>
 <after x+>y		axxbxxyc	y				lookbehind <after>
 <[a..z]>+		az		y				metasyntax with leading + (<+...>)
 <+[a..z]>+		az		y				metasyntax with leading + (<+...>)
-<+alpha>+		az		y				TODO: metasyntax with leading + (<+...>)
+<+alpha>+		az		y				metasyntax with leading + (<+...>)
 
 <null>			''		y		null pattern (<null>)
 ^ <null>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<null>: < @ 0>/	null pattern (<null>)
@@ -504,15 +504,15 @@ foo -? bar			foo - bar	n	basic non-match
 :s foo -? bar			foo-bar		y	basic ws match \s* \s*
 :s foo -? bar			foobar		n	basic ws non-match
 :s()foo -? bar			foo - bar	n	basic ws match
-:s[]foo -? bar			foo - bar	y	TODO: basic ws match
+:s[]foo -? bar			foo - bar	y	basic ws match
 :s<?wb>foo -? bar		foo - bar	y	basic ws match with boundary modifier separation
 :s::foo -? bar			foo - bar	y	basic ws match with backtrack no-op modifier separation
 :s::(\w+) \:= (\S+)		dog := spot	/mob 0: <dog @ 0>/	sigspace and capture together
 :s::(\w+) \:= (\S+)		dog := spot	/mob 1: <spot @ 7>/	sigspace and capture together
-:perl5 \A.*? bcd\Q$\E..\z	a bcd$ef	y	TODO: perl5 syntax (:perl5)
+:perl5 \A.*? bcd\Q$\E..\z	a bcd$ef	y	perl5 syntax (:perl5)
 :x(6) \d			123456		y	repetition (:x)
 :x(3) \d			123456		y	repetition (:x)
 :x(0) \d			123456		y	repetition (:x)
 :nth(3) a \d			a1a2a3		y	nth occurance (:nth)
-:nth(4) a \d			a1a2a3		n	TODO: nth occurance (:nth)
-:nth(0) a \d			a1a2a3		n	TODO: nth occurance (:nth)
+:nth(4) a \d			a1a2a3		n	nth occurance (:nth)
+:nth(0) a \d			a1a2a3		n   nth occurance (:nth)
