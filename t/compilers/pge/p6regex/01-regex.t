@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test tests => 498;
+use Parrot::Test tests => 487;
 use Parrot::Test::PGE;
 use Parrot::Config;
 
@@ -82,7 +82,6 @@ while (<TESTS>) {
     $target =~ s/\\e/\e/g;
     $target =~ s/\\t/\t/g;
     $target =~ s/\\f/\f/g;
-    $target =~ s/\\(\d{3})/chr(oct($1))/eg;
     $target =~ s/\\x(..)/chr(hex($1))/eg;
 
     my @todo = ();
