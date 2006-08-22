@@ -83,13 +83,13 @@ This method enables Data::Dumper to work on Match objects.
     dumper."deleteIndent"()
 .end
 
-=item C<dump()>
+=item C<dump_str()>
 
 An alternate dump output for a Match object and all of its subcaptures.
 
 =cut
 
-.sub "dump" :method
+.sub "dump_str" :method
     .param string prefix       :optional           # name of match variable
     .param int has_prefix      :opt_flag
     .param string b1           :optional           # bracket open
@@ -107,20 +107,22 @@ An alternate dump output for a Match object and all of its subcaptures.
     if has_b1 goto start
     b1 = "["
   start:
-    print prefix
-    print ":"
+    .local string out
+    out = concat prefix, ':'
     unless self goto subpats
-    print " <"
-    print self
-    print " @ "
-    $I0 = self."from"()
-    print $I0
-    print "> "
+    out .= ' <'
+    $S0 = self
+    out .= $S0
+    out .= ' @ '
+    $S0 = self.'from'()
+    out .= $S0
+    out .= '> '
 
   subpats:
     $I0 = self
-    print $I0
-    print "\n"
+    $S0 = $I0
+    out .= $S0
+    out .= "\n"
     capt = getattribute self, "PGE::Match\x0@!capt"
     if_null capt, subrules
     spi = 0
@@ -146,7 +148,7 @@ An alternate dump output for a Match object and all of its subcaptures.
   subrules_1:
     unless iter goto end
     $S0 = shift iter
-    prefix1 = concat prefix, "<"
+    prefix1 = concat prefix, '<'
     concat prefix1, $S0
     concat prefix1, ">"
     $I0 = defined capt[$S0]
@@ -156,12 +158,13 @@ An alternate dump output for a Match object and all of its subcaptures.
     goto subrules_1
 
   dumper:
-    $I0 = isa $P0, "PGE::Match"
+    $I0 = isa $P0, 'PGE::Match'
     unless $I0 goto dumper_0
-    $P0."dump"(prefix1, b1, b2)
+    $S0 = $P0.'dump_str'(prefix1, b1, b2)
+    out .= $S0
     ret
   dumper_0:
-    $I0 = does $P0, "array"
+    $I0 = does $P0, 'array'
     unless $I0 goto dumper_3
     $I0 = 0
     $I1 = elements $P0
@@ -172,21 +175,55 @@ An alternate dump output for a Match object and all of its subcaptures.
     $S0 = $I0
     concat prefix2, $S0
     concat prefix2, b2
-    $P1."dump"(prefix2, b1, b2)
+    $S0 = $P1.'dump_str'(prefix2, b1, b2)
+    out .= $S0
     inc $I0
     goto dumper_1
   dumper_2:
     ret
   dumper_3:
-    print prefix1
-    print ": "
-    print $P0
-    print "\n"
+    out .= prefix1
+    out .= ': '
+    $S0 = $P0
+    out .= $S0
+    out .= "\n"
     ret
 
   end:
+    .return (out)
+.end
+
+
+=item C<dump()>
+
+An alternate dump output for a Match object and all of its subcaptures.
+Simply calls C<dump_str()> above and prints the results.
+
+=cut
+
+.sub "dump" :method
+    .param string prefix       :optional           # name of match variable
+    .param int has_prefix      :opt_flag
+    .param string b1           :optional           # bracket open
+    .param int has_b1          :opt_flag
+    .param string b2           :optional           # bracket close
+    .param int has_b2          :opt_flag
+
+    .local pmc capt
+    .local int spi, spc
+    .local pmc iter
+    .local string prefix1, prefix2
+
+    if has_b2 goto start
+    b2 = "]"
+    if has_b1 goto start
+    b1 = "["
+  start:
+    $S0 = self.'dump_str'(prefix, b1, b2)
+    print $S0
     .return ()
 .end
+
 
 =back
 
