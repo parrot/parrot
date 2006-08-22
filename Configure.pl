@@ -134,9 +134,17 @@ Use the given loader flags for shared libraries
 
 Specify which lexer to use.
 
+=item C<--flex_required=X.Y.Z>
+
+Override the minimum acceptable flex version.
+
 =item C<--yacc=(parser)>
 
 Specify which parser to use.
+
+=item C<--bison_required=X.Y>
+
+Override the minimum acceptable bison version.
 
 =item C<--define=val1[,val2]>
 
@@ -430,8 +438,8 @@ my @steps = qw(
     init::headers
     inter::progs
     inter::make
-);
-my @steps2 = qw(
+    inter::lex
+    inter::yacc
     auto::gcc
     auto::msvc
     init::optimize
@@ -488,9 +496,6 @@ my $conf = Parrot::Configure->new;
     $Parrot::Configure::Step::conf = $conf;
 }
 $conf->add_steps(@steps);
-$conf->add_step('inter::lex', require => '2.5.33');
-$conf->add_step('inter::yacc', require => '2.1');
-$conf->add_steps(@steps2);
 $conf->options->set(%args);
 # Run the actual steps
 $conf->runsteps or exit(1);

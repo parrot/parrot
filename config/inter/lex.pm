@@ -7,7 +7,8 @@ config/auto/lex.pm - lexical analyzer generator
 
 =head1 DESCRIPTION
 
-Determines whether C<lex> is installed and if it's actually C<flex>.
+Determines whether C<lex> is installed and if it's actually C<flex> of
+least the user-specified minimum version, defaulting to 2.5.33.
 
 =cut
 
@@ -26,9 +27,11 @@ $description = "Determining whether $util is installed";
 $prompt      = "Do you have a lexical analyzer generator like flex or lex?";
 @args        = qw( lex ask maintainer );
 
+my $default_required = '2.5.33';
+
 sub runstep
 {
-    my ($self, $conf, %p) = @_;
+    my ($self, $conf) = @_;
 
     my $verbose = $conf->options->get('verbose');
 
@@ -87,33 +90,34 @@ sub runstep
         my $prog_version = "$1.$2.$3";
 
         # is there a version requirement?
-        if (exists $p{require}) {
-            my ($rmajor, $rminor, $rpatch) =
-                $p{require} =~ /(\d+) \. (\d+) \. (\d+)/x;
-            unless ((defined $rmajor)
-                and (defined $rminor)
-                and (defined $rpatch)) {
-                $self->set_result("could not understand version requirement");
+        my $req = $conf->options->get('flex_required');
+        unless (defined $req) {
+            $req = $default_required;
+        }
+        if ($req) {
+            my ($rmajor, $rminor, $rpatch) = ($req =~ / ^ (\d+) \. (\d+) \. (\d+) $ /x);
+            unless (defined $rmajor) {
+                $self->set_result("could not understand flex version requirement");
                 return;
             }
 
             unless (
-		            $prog_major >= $rmajor
+                            $prog_major >= $rmajor
 
-		    or (    $prog_major == $rmajor
-			and $prog_minor >= $rminor )
+                    or (    $prog_major == $rmajor
+                        and $prog_minor >= $rminor )
 
-		    or (    $prog_major == $rmajor
-			and $prog_minor == $rminor
-			and $prog_patch >= $rpatch )
-		   ) {
+                    or (    $prog_major == $rmajor
+                        and $prog_minor == $rminor
+                        and $prog_patch >= $rpatch )
+                   ) {
                 $self->set_result("found flex version $prog_version"
                         . " but at least $rmajor.$rminor.$rpatch is required");
                 return;
             }
         }
 
-        $conf->data->set(prog_version => $prog_version);
+        $conf->data->set(flex_version => $prog_version);
         $self->set_result("flex $prog_version");
         $conf->data->set($util => $prog);
     } else {

@@ -7,7 +7,8 @@ config/auto/yacc.pm - parser generator
 
 =head1 DESCRIPTION
 
-Determines whether C<yacc> is installed and if it's actually C<bison>.
+Determines whether C<yacc> is installed and if it's actually C<bison> of at
+least the user-specified minimum version, defaulting to 2.1.
 
 =cut
 
@@ -26,10 +27,12 @@ $description = "Determining whether $util is installed";
 $prompt      = "Do you have a parser generator, like bison or yacc?";
 @args        = qw( yacc ask maintainer );
 
+my $default_required = '2.1';
+
 sub runstep
 {
-    my ($self, $conf, %p) = @_;
-    
+    my ($self, $conf) = @_;
+
     my $verbose = $conf->options->get('verbose');
 
     # undef means we don't have bison... default to not having bison
@@ -87,19 +90,23 @@ sub runstep
         my $prog_version = "$1.$2$3";
 
         # is there a version requirement?
-        if (exists $p{require}) {
-            my ($rmajor, $rminor) = $p{require} =~ /(\d+) \. (\d+) (\w)?/x;
-            unless ((defined $rmajor) and (defined $rminor)) {
-                $self->set_result("could not understand version requirement");
+        my $req = $conf->options->get('bison_required');
+        unless (defined $req) {
+            $req = $default_required;
+        }
+        if ($req) {
+            my ($rmajor, $rminor) = ($req =~ / ^ (\d+) \. (\d+) (\w)? $ /x);
+            unless (defined $rmajor) {
+                $self->set_result("could not understand bison version requirement");
                 return;
             }
 
             unless (
-		            $prog_major >= $rmajor
+                            $prog_major >= $rmajor
 
-		    or (    $prog_major == $rmajor
-			and $prog_minor >= $rminor )
-		   ) {
+                    or (    $prog_major == $rmajor
+                        and $prog_minor >= $rminor )
+                   ) {
                 $self->set_result("found bison version $prog_version"
                         . " but at least $rmajor.$rminor is required");
                 return;
