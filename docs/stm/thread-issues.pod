@@ -56,140 +56,154 @@ not for other cases.
 
 =item *
 
-B<VTABLE_clone> tends to make copy-on-write copies of strings. This is certainly sensible
-behavior, but without major changes to the string compactor, we cannot safely
-allocate COW copies of strings in an interpreter other than the one the original
-is in.
+B<VTABLE_clone> tends to make copy-on-write copies of strings. This is
+certainly sensible behavior, but without major changes to the string
+compactor, we cannot safely allocate COW copies of strings in an
+interpreter other than the one the original is in.
 
 =item *
 
-The generally recursive approach of B<VTABLE_clone> does not easily adapt to cloning
-data structures with cycles.
+The generally recursive approach of B<VTABLE_clone> does not easily
+adapt to cloning data structures with cycles.
 
 =back
 
 =head3 Parrot_clone
 
-C<Parrot_clone> is equivalent to C<Parrot_thaw(..., Parrot_freeze(...))>. This makes it
-consistently a deep clone. It, however, has issues:
+C<Parrot_clone> is equivalent to C<Parrot_thaw(...,
+Parrot_freeze(...))>. This makes it consistently a deep clone. It,
+however, has issues:
 
 =over 4
 
 =item *
 
-Shared PMCs should B<not> be copied and should continue to reference the same data structures;
-however, because it appears that their
-state might be saved to disk, they cannot even make it so they continue to reference the same
-data structure internally.
+Shared PMCs should B<not> be copied and should continue to reference
+the same data structures; however, because it appears that their state
+might be saved to disk, they cannot even make it so they continue to
+reference the same data structure internally.
 
 =item *
 
-Some PMC types do not survive the clone intact. For example, Sub PMCs are missing pointers
-to their code segment after cloning and to their current namespace stash. Continuation PMCs
-do not have any freeze/thawing implementation.
+Some PMC types do not survive the clone intact. For example, Sub PMCs
+are missing pointers to their code segment after cloning and to their
+current namespace stash. Continuation PMCs do not have any
+freeze/thawing implementation.
 
 =back
 
 =head2 PMC type numbers
 
 For dynamic PMC types and classes, new interpreters recieve a copy of
-their parents type name to number table. This is necessary because both
-C<VTABLE_clone> and C<Parrot_clone> depend on PMC numbers not changing to ensure
-proper cloning. A more proper solution would share these type numbers between
-interpreters and would, perhaps, share classes (though this is harder because
-classes may be changed at runtime).
+their parents type name to number table. This is necessary because
+both C<VTABLE_clone> and C<Parrot_clone> depend on PMC numbers not
+changing to ensure proper cloning. A more proper solution would share
+these type numbers between interpreters and would, perhaps, share
+classes (though this is harder because classes may be changed at
+runtime).
 
 =head2 Dynamic PMC libraries
 
-Dynamic PMC types are initialized in a new thread by recalling the library's initialization
-function with the new interpreter. Better implementations might provide a new callback
-for this or just copy the vtables themselves. They would also support sharing dynpmc
-library information between running threads, including loading a new dynamic PMC library
-while another thread is running.
+Dynamic PMC types are initialized in a new thread by recalling the
+library's initialization function with the new interpreter. Better
+implementations might provide a new callback for this or just copy the
+vtables themselves. They would also support sharing dynpmc library
+information between running threads, including loading a new dynamic
+PMC library while another thread is running.
 
 =head1 Dynamic Op libraries
 
-Dynamic oplibs are presently always shared. A file-global structure in core_ops.c
-is modified at runtime when oplibs are loaded and this structure is used for
-opname -> opnumber lookups exclusively. Also, interpreters always use the function
-pointer table placed in this structure. Consequently, new oplibs cannot be loaded
-when more than one thread is running. This last problem could be fixed by just making
-sure that function pointer tables are not free'd when they may be in use. Note
-that to support sharing of bytecode between threads it is important that all threads
-have the same set of op numbers.
+Dynamic oplibs are presently always shared. A file-global structure in
+core_ops.c is modified at runtime when oplibs are loaded and this
+structure is used for opname -> opnumber lookups exclusively. Also,
+interpreters always use the function pointer table placed in this
+structure. Consequently, new oplibs cannot be loaded when more than
+one thread is running. This last problem could be fixed by just making
+sure that function pointer tables are not free'd when they may be in
+use. Note that to support sharing of bytecode between threads it is
+important that all threads have the same set of op numbers.
 
-To support cloning dynamic oplibs into new threads, the current code just clones the
-library objects and gets the ops for 'free'. Note that this means that cloning
-of the dynamic ops cannot be disabled.
+To support cloning dynamic oplibs into new threads, the current code
+just clones the library objects and gets the ops for 'free'. Note that
+this means that cloning of the dynamic ops cannot be disabled.
 
 =head2 HLL type numbers
 
-The HLL type number mapping is currently cloned in a copy-on-write-like manner
-when a new thread is spawned. If adding new HLLs after a thread is spawned
-is to be supported, then HLL type information should be shared.
+The HLL type number mapping is currently cloned in a
+copy-on-write-like manner when a new thread is spawned. If adding new
+HLLs after a thread is spawned is to be supported, then HLL type
+information should be shared.
 
 =head2 Constant tables
 
-Each code segment has a constant table associated with it. Unfortunately, constant tables aren't:
+Each code segment has a constant table associated with
+it. Unfortunately, constant tables aren't:
 
 =over 4
 
 =item *
 
-Constant Sub PMCs stored in the constant tables have pointers to their current namespace PMC.
-This makes it impossible to share them between threads.
+Constant Sub PMCs stored in the constant tables have pointers to their
+current namespace PMC.  This makes it impossible to share them between
+threads.
 
 =item *
 
-Constant PMCs can have properties and thus mutable metadata hashes added to them.
+Constant PMCs can have properties and thus mutable metadata hashes
+added to them.
 
 =back
 
-To avoid the Sub PMC issue, the current implementation copies constant tables and manually
-copies each Sub PMC and sets its namespace stash pointer correctly. The metadata issue
-is not presently handled.
+To avoid the Sub PMC issue, the current implementation copies constant
+tables and manually copies each Sub PMC and sets its namespace stash
+pointer correctly. The metadata issue is not presently handled.
 
 =head2 Dead Object Destruction
 
-Only mark-and-sweep is supported for threads. Potentially shared objects are marked
-as such. When a thread is joined, shared objects owned by it are transferred to
-the joining thread. When a thread exits while detached and owns shared objects that
-are still reachable, incorrect behavior is likely.
+Only mark-and-sweep is supported for threads. Potentially shared
+objects are marked as such. When a thread is joined, shared objects
+owned by it are transferred to the joining thread. When a thread exits
+while detached and owns shared objects that are still reachable,
+incorrect behavior is likely.
 
-To allow shared PMCs to survive interpreter death, however, sharing a PMC should
-call C<pt_shared_fixup> which, most importantly, sets the vtable of the PMC to
-one from the first interpreter, avoiding problems when the other vtables are
-destroyed.
+To allow shared PMCs to survive interpreter death, however, sharing a
+PMC should call C<pt_shared_fixup> which, most importantly, sets the
+vtable of the PMC to one from the first interpreter, avoiding problems
+when the other vtables are destroyed.
 
-To mark shared objects correctly, all interpreters are stopped to perform
-a garbage collection run when one is requested and no interpreter has blocked
-DOD runs. If shared DOD runs are blocked, then a DOD run proceeds normally within
-the signle thread requesting it and objects marked as shared are not collected.
-(Note that it is thus important that objects referenced by shared objects be
-marked as shared.) Better performance might be achieved by not performed
-stop-the-world DOD runs as often as normal ones and/or using better 
+To mark shared objects correctly, all interpreters are stopped to
+perform a garbage collection run when one is requested and no
+interpreter has blocked DOD runs. If shared DOD runs are blocked, then
+a DOD run proceeds normally within the signle thread requesting it and
+objects marked as shared are not collected.  (Note that it is thus
+important that objects referenced by shared objects be marked as
+shared.) Better performance might be achieved by not performed
+stop-the-world DOD runs as often as normal ones and/or using better
 heuristics to determine when to perform a stop-the-world DOD run.
 
-To make sure that shared DOD runs can occur even though an interpreter is
-waiting for some condition the functions C<pt_thread_wait> and C<pt_thread_wait_with>
-are provided, which wait for C<< interpreter->thread_data->interp_cond >> 
-to be signalled and handle stop-the-world DOD run requests correctly. (The first
-variant assumes only C<interpreter_array_mutex> is held; the second assumes
-that a mutex passed as its second argument is held.) C<COND_WAIT> has not been
-redefined to use one of these.
+To make sure that shared DOD runs can occur even though an interpreter
+is waiting for some condition the functions C<pt_thread_wait> and
+C<pt_thread_wait_with> are provided, which wait for C<<
+interpreter->thread_data->interp_cond >> to be signalled and handle
+stop-the-world DOD run requests correctly. (The first variant assumes
+only C<interpreter_array_mutex> is held; the second assumes that a
+mutex passed as its second argument is held.) C<COND_WAIT> has not
+been redefined to use one of these.
 
 =head2 Sharing objects 
 
-To share ParrotObject-derived objects, the get_class() method of ParrotObject
-looks up the instance of the class in the current interpreter on a shared object.
-This is necessary because the class object contains a namespace pointer that is
-different in each interpreter.
+To share ParrotObject-derived objects, the get_class() method of
+ParrotObject looks up the instance of the class in the current
+interpreter on a shared object.  This is necessary because the class
+object contains a namespace pointer that is different in each
+interpreter.
 
 =head2 Singletons
 
-To support singleton PMCs, their C<namespace> method uses
-C<< interpreter->vtables[type]->_namespace >> so that we don't accidentally
-access the wrong subroutines. Because the mro is still shared, singleton
-PMC types can't safely inherit from classes which may have non-native methods.
+To support singleton PMCs, their C<namespace> method uses C<<
+interpreter->vtables[type]->_namespace >> so that we don't
+accidentally access the wrong subroutines. Because the mro is still
+shared, singleton PMC types can't safely inherit from classes which
+may have non-native methods.
 
 =cut

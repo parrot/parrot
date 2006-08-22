@@ -142,11 +142,11 @@ if there is no active transaction.
 =head2 STMRef PMC
 
 The STMRef type is like Ref (that is, its default implementation of everything
-delegates) but is a reference to a variable managed by STM. Unlike, STMVar
-it provides transparent access to the underlying value. STMRef
-assumes that operations that do not ordinarily result in a write (e.g. get_keyed)
-will not result in a write. If this is not so, the below methods must be used.
-STMRefs can be passed between threads safely.
+delegates) but is a reference to a variable managed by STM. Unlike, STMVar it
+provides transparent access to the underlying value. STMRef assumes that
+operations that do not ordinarily result in a write (e.g. get_keyed) will not
+result in a write. If this is not so, the below methods must be used.  STMRefs
+can be passed between threads safely.
 
 STMRefs are safe to pass between threads.
 

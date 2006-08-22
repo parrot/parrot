@@ -173,9 +173,10 @@ integer type constants are working for creating new PMCs.
 
 =item .HLL_map .CoreType, .UserType
 
-Whenever Parrot has to create PMCs inside C code on behalf of the running user
-program it consults the current type mapping for the executing HLL and creates
-a PMC of type I<.UserType> instead of I<.CoreType>, if such a mapping is defined.
+Whenever Parrot has to create PMCs inside C code on behalf of the
+running user program it consults the current type mapping for the
+executing HLL and creates a PMC of type I<.UserType> instead of
+I<.CoreType>, if such a mapping is defined.
 
 E.g. with this code snippet ...
 

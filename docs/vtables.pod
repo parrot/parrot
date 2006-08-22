@@ -74,9 +74,9 @@ F<src/pmc/> subdirectory; this is where all the built-in PMC classes live. (And
 a good source of examples to plunder even if you're not writing a core data
 type.)
 
-You should almost always start by running F<tools/dev/gen_class.pl> to generate a
-skeleton for the class. Let's generate a number type for the beautifully
-non-existent Fooby language:
+You should almost always start by running F<tools/dev/gen_class.pl> to
+generate a skeleton for the class. Let's generate a number type for
+the beautifully non-existent Fooby language:
 
     % perl tools/dev/gen_class.pl FoobyNumber > src/pmc/foobynumber.pmc
 

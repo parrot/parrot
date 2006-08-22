@@ -275,8 +275,8 @@ namespace PMC on success and a null PMC on failure.
 
 This method allows other HLLs to know one name (the HLL) and then work with
 that HLL's modules without having to know the name it chose for its namespace
-tree.  (If you really want to know the name, the get_name() method should work on
-the returned namespace PMC.)
+tree.  (If you really want to know the name, the get_name() method should work
+on the returned namespace PMC.)
 
 Note that this method is basically a convenience and/or performance hack, as
 it does the equivalent of C<get_root_namespace> followed by

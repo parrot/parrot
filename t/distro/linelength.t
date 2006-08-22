@@ -65,6 +65,7 @@ foreach my $file (sort keys(%$manifest)) {
   push @files, $ffile if $file =~ m!\.c$!;
   push @files, $ffile if $file =~ m!\.pmc$!;
   push @files, $ffile if $file =~ m!\.ops$!;
+  push @files, $ffile if $file =~ m!\.pod$!;
   # push @files, $ffile if $file =~ m!\.pl$!;
 }
 
@@ -110,3 +111,8 @@ tools/build/jit2c.pl
 tools/build/nativecall.pl
 tools/dev/lib_deps.pl
 tools/dev/parrot_coverage.pl
+# these ones includes a big URL
+cage/todo.pod
+docs/gettingstarted.pod
+docs/glossary.pod
+languages/LANGUAGES.STATUS.pod

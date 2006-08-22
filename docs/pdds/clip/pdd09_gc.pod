@@ -227,7 +227,8 @@ The GC subsystem has to provide these (possibly empty) macros:
 This macro is invoked when in aggregate C<agg> the element C<old> is getting
 overritten by C<new>. Both C<old> and C<new> may be NULL.
 
-=item C<DOD_WRITE_BARRIER_KEY(Interp*, PMC *agg, PMC *old, PObj *old_key, PMC *new, PObj *new_key)>
+=item C<DOD_WRITE_BARRIER_KEY(Interp*, PMC *agg, PMC *old, PObj
+*old_key, PMC *new, PObj *new_key)>
 
 Like above. Invoked when a hash key is inserted, possibly replacing an old
 key.

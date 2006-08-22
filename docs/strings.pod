@@ -44,7 +44,12 @@ data actually means.
 The most basic way of creating a string is through the function
 C<string_make_direct>:
 
-    STRING* string_make_direct(Interp *interpreter, const void *buffer, UINTVAL buflen, ENCODING *encoding, CHARSET *charset, UINTVAL flags)
+    STRING* string_make_direct(Interp*     interpreter,
+                               const void* buffer,
+                               UINTVAL     buflen,
+                               ENCODING*   encoding,
+                               CHARSET*    charset,
+                               UINTVAL     flags)
 
 In here you pass a pointer to a buffer of a given encoding, and the number of
 bytes in that buffer to examine, the encoding, the charset, and the initial
@@ -110,7 +115,11 @@ unlikely-sounding
 
 To retrieve a substring of the string, call
 
-    STRING* string_substr(Interp *, STRING* src, INTVAL offset, INTVAL length, STRING** dest)
+    STRING* string_substr(Interp*,
+                          STRING*    src,
+                          INTVAL     offset,
+                          INTVAL     length,
+                          STRING**   dest)
 
 The result will be placed in C<dest>.  (Passing in C<dest> avoids allocating a
 new string at runtime. If C<*dest> is a null pointer, a new string structure is
@@ -154,7 +163,11 @@ Otherwise the string will be true.
 
 To format output into a string, use
 
-    STRING* string_nprintf(Interp *, STRING* dest, INTVAL len, char* format, ...)
+    STRING* string_nprintf(Interp*,
+                           STRING*   dest,
+                           INTVAL    len,
+                           char*     format,
+                           ...)
 
 C<dest> may be a null pointer, in which case a new string will be created. If
 C<len> is zero, the behaviour becomes more C<sprintf>ish than C<snprintf>-like.

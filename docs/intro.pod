@@ -150,14 +150,14 @@ Parrot has an extensive regression test suite. This can be run by typing:
 Substituting make for the name of the make program on your platform. The output
 will look something like this:
 
-  C:\Perl\bin\perl.exe t\harness --gc-debug --running-make-test
-    t\library\*.t  t\op\*.t  t\pmc\*.t  t\run\*.t  t\native_pbc\*.t
-    imcc\t\*\*.t  t\dynpmc\*.t  t\p6rules\*.t t\src\*.t t\perl\*.t
-  t\library\dumper...............ok
-  t\library\getopt_long..........ok
-  ...
-  All tests successful, 4 test and 71 subtests skipped.
-  Files=163, Tests=2719, 192 wallclock secs ( 0.00 cusr +  0.00 csys =  0.00 CPU)
+ C:\Perl\bin\perl.exe t\harness --gc-debug --running-make-test
+   t\library\*.t  t\op\*.t  t\pmc\*.t  t\run\*.t  t\native_pbc\*.t
+   imcc\t\*\*.t  t\dynpmc\*.t  t\p6rules\*.t t\src\*.t t\perl\*.t
+ t\library\dumper...............ok
+ t\library\getopt_long..........ok
+ ...
+ All tests successful, 4 test and 71 subtests skipped.
+ Files=163, Tests=2719, 192 wallclock secs ( 0.00 cusr +  0.00 csys =  0.00 CPU)
 
 It is possible that a number of tests may fail. If this is a small number, then
 it is probably little to worry about, especially if you have the latest Parrot
@@ -202,10 +202,10 @@ register and then use that register with the print instruction.
       end
   .end
 
-Here we have stated exactly which register to use. However, by replacing C<S0>
-with C<$S0> we can delegate the choice of which register to use to Parrot.  It is
-also possible to use an C<=> notation instead of writing the C<set>
-instruction.
+Here we have stated exactly which register to use. However, by
+replacing C<S0> with C<$S0> we can delegate the choice of which
+register to use to Parrot.  It is also possible to use an C<=>
+notation instead of writing the C<set> instruction.
 
   .sub _main
       $S0 = "Hello world!\n"

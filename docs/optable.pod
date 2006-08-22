@@ -1,7 +1,9 @@
 # Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
-=head1 ***** WARNING ***** This is an ALPHA pod! The contents herein may not reflect reality. :)
+=head1 ***** WARNING *****
+
+=head1 This is an ALPHA pod! The contents herein may not reflect reality. :)
 
 =head1 NAME
 
@@ -13,17 +15,21 @@ $Revision$
 
 =head1 DESCRIPTION
 
-PGE::OPTable is the bottom up shift/reduce style parser component of the Parrot Grammar Engine (PGE) suite. PGE is a Parrot implementation of Perl6 rules.
+PGE::OPTable is the bottom up shift/reduce style parser component of the
+Parrot Grammar Engine (PGE) suite. PGE is a Parrot implementation of Perl6
+rules.
 
 =head1 FUTURE CONSIDERATIONS
 
 =over 4
 
-=item - Shift reduce application to more general grammar productions than just operators.
+=item - Shift reduce application to more general grammar productions than just
+operators.
 
 =item - Static state machine transition table generation.  (Optimization)
 
-=item - tighter and looser should work even when their argument operator hasn't been defined yet.
+=item - tighter and looser should work even when their argument operator
+hasn't been defined yet.
 
 =back
 
@@ -31,25 +37,47 @@ PGE::OPTable is the bottom up shift/reduce style parser component of the Parrot 
 
 =head2 "operator"
 
-An operator is a most often mathematical function usually taking one or two arguments(operands, also called terms) and returning a calculated result.  Operators are often characterized as ( pure, no side effects ).  Obvious exceptions to this rule are increment(++) and decrement(--) operators and assignment operators such as +=, *=, etc.
+An operator is a most often mathematical function usually taking one or two
+arguments(operands, also called terms) and returning a calculated result.
+Operators are often characterized as ( pure, no side effects ).  Obvious
+exceptions to this rule are increment(++) and decrement(--) operators and
+assignment operators such as +=, *=, etc.
 
-Operators which have one operand are called unary operators.  Unary operator symbols may appear in the prefix position (in front of the term) or in the postfix position(following the term.  Binary operators have two operators.  Binary operator symbols usually appear in the infix position between the two operands. Ternary operators also exist, such as the C style ternary conditional operator C< expression ? true case : false case>. See Synopsis 5 Rules for more information.
+Operators which have one operand are called unary operators.  Unary operator
+symbols may appear in the prefix position (in front of the term) or in the
+postfix position(following the term.  Binary operators have two operators.
+Binary operator symbols usually appear in the infix position between the two
+operands. Ternary operators also exist, such as the C style ternary
+conditional operator C< expression ? true case : false case>. See Synopsis 5
+Rules for more information.
 
 =head2 "expression"
 
-A expression is a combination of operators, operands(terms such as variables and values) and grouping symbols that describe a computation.  Expressions return a result.
+A expression is a combination of operators, operands(terms such as variables
+and values) and grouping symbols that describe a computation.  Expressions
+return a result.
 
 =head2 "term"
 
-A term is the atomic unit which a operator operates on.  Operand is the more formal mathematical term for term. :)  In OPTable parsed expressions a term is a variable or primitive value.
+A term is the atomic unit which a operator operates on.  Operand is the more
+formal mathematical term for term. :) In OPTable parsed expressions a term is
+a variable or primitive value.
 
 =head2 "precedence"
 
-Precedence is the order in which operators are evaluated.  Higher precedence operators are evaluated before lower precedence operators.
+Precedence is the order in which operators are evaluated.  Higher precedence
+operators are evaluated before lower precedence operators.
 
 =head2 "precedence level"
 
-Computer languages usually have a table of operator precedences.  Operators at the top of the table have higher precedence than those below.  Operators at the same vertical level in the table have equivalent or equal precedence.  An operators level in the table is called its precedence level.  OPTable uses integers to signify precedence.  The greater the OPTable precedence integer the higher the precedence level of the operator.  An operator with precedence level 22 has higher precedence that an operator with precedence level 5 and will be evaluated first.
+Computer languages usually have a table of operator precedences.  Operators at
+the top of the table have higher precedence than those below.  Operators at
+the same vertical level in the table have equivalent or equal precedence.  An
+operators level in the table is called its precedence level.  OPTable uses
+integers to signify precedence.  The greater the OPTable precedence integer
+the higher the precedence level of the operator.  An operator with precedence
+level 22 has higher precedence that an operator with precedence level 5 and
+will be evaluated first.
 
 =head2 "shift/reduce"
 
@@ -61,9 +89,15 @@ TODO
 
   proto OPERATOR_NAME ADVERBIAL_CLAUSES* { ... }
 
-The C<grammar> statement at the top of is the namespace in which the optable will be generated.  Written in Perl6 style the C<grammar> statement is translated by PGE into valid Parrot namespace syntax.
+The C<grammar> statement at the top of is the namespace in which the optable
+will be generated.  Written in Perl6 style the C<grammar> statement is
+translated by PGE into valid Parrot namespace syntax.
 
-The C<proto> statement declares a operator to be added to the precedence table and parser.  All operator attributes are defined using the Perl6 adverbial style of C<is ADVERB()>.  Adverbial clauses are separated by white space.  Adverbs can have 0-arity in which case they can be written without parenthesis.  Adverbial arguments are written comma separated in parenthesis.
+The C<proto> statement declares a operator to be added to the precedence table
+and parser.  All operator attributes are defined using the Perl6 adverbial
+style of C<is ADVERB()>.  Adverbial clauses are separated by white space.
+Adverbs can have 0-arity in which case they can be written without
+parenthesis.  Adverbial arguments are written comma separated in parenthesis.
 
 =head2 "Adverbial Precedence Clauses"
 
@@ -71,26 +105,42 @@ The C<proto> statement declares a operator to be added to the precedence table a
 
 =item - is precedence(PRECEDENCE_LEVEL_STRING)
 
-C<is precedence> takes a single string argument which contains the precedence level for the current operator that C<is precedence> is modifying.  The C<is precedence> argument string is formatted as a integer precedence level followed by equals sign. e.g. '22=' 
+C<is precedence> takes a single string argument which contains the precedence
+level for the current operator that C<is precedence> is modifying.  The C<is
+precedence> argument string is formatted as a integer precedence level
+followed by equals sign. e.g. '22='
 
 =item - is tighter(PREVIOUSLY_DEFINED_OPERATOR_NAME)
 
-C<is tighter> takes a B<previously> defined operator name as its single argument.  The argument operator's precedence level plus 1 is then used as the precedence level for the current operator that C<is tiger> is modifying.
+C<is tighter> takes a B<previously> defined operator name as its single
+argument.  The argument operator's precedence level plus 1 is then used as the
+precedence level for the current operator that C<is tiger> is modifying.
 
 =item - is looser(PREVIOUSLY_DEFINED_OPERATOR_NAME)
 
-C<is looser> takes a B<previously> defined operator name as its single argument.  The argument operator's precedence level minus 1 is then used as the precedence level for the current operator that C<is looser> is modifying.
+C<is looser> takes a B<previously> defined operator name as its single
+argument.  The argument operator's precedence level minus 1 is then used as
+the precedence level for the current operator that C<is looser> is modifying.
 
 =item - is equiv(PREVIOUSLY_DEFINED_OPERATOR_NAME)
 
-C<is equiv> takes a B<previously> defined operator name as its single argument.  The argument operator's precedence level is used as the precedence level for the current operator that C<is equiv> is modifying.
+C<is equiv> takes a B<previously> defined operator name as its single
+argument.  The argument operator's precedence level is used as the precedence
+level for the current operator that C<is equiv> is modifying.
 
 =item - is assoc(DESCRIPTION)
 
 DESCRIPTION can be one of 'list', 'left', 'right', 'non', or 'chain'.
 
-C<is assoc> declares the associativity of the operator.  The absence of a C<is assoc> adverb indicates that the operation is associative or that the order of evaluation of two or more instances of an operator in an expression is unimportant.
-C<'left'> signifies left association; evaluation should occur from the left.  Conversely, C<'right'> signifies right association; evaluation should occur from the right.  C<'non'> declares that this operator doesn't strongly associate to the left or right.  C<'list'> specifies that the operator is associated as a list context.  C<'chain'> declares chained association such as C<a = b = c = 10> or C< a < 10 < b>.
+C<is assoc> declares the associativity of the operator.  The absence of a C<is
+assoc> adverb indicates that the operation is associative or that the order of
+evaluation of two or more instances of an operator in an expression is
+unimportant.  C<'left'> signifies left association; evaluation should occur
+from the left.  Conversely, C<'right'> signifies right association; evaluation
+should occur from the right.  C<'non'> declares that this operator doesn't
+strongly associate to the left or right.  C<'list'> specifies that the
+operator is associated as a list context.  C<'chain'> declares chained
+association such as C<a = b = c = 10> or C< a < 10 < b>.
 
 
 =back
@@ -101,44 +151,61 @@ C<'left'> signifies left association; evaluation should occur from the left.  Co
 
 =item - is parsed()
 
-PGE::OPTable normally generates the parsing code for and operator based on the operator name which usually consists of the operators orientation followed by a colon and then the operator symbol. In Perl6 'infix:*' is an example operator name of the infix multiplication operator.  'infix:x' likewise represents the Perl6 repeat operator.
-The C<is parsed> adverb declares that this particular operator is parsed using the Perl6 match conforming method specified as the adverbs argument instead of auto-generated code based off of the operators name.
+PGE::OPTable normally generates the parsing code for and operator based on the
+operator name which usually consists of the operators orientation followed by
+a colon and then the operator symbol. In Perl6 'infix:*' is an example
+operator name of the infix multiplication operator.  'infix:x' likewise
+represents the Perl6 repeat operator.  The C<is parsed> adverb declares that
+this particular operator is parsed using the Perl6 match conforming method
+specified as the adverbs argument instead of auto-generated code based off of
+the operators name.
 
 =item - is pastrule()
 
-The C<is pastrule> adverb defines the pastrule attribute of a operator.  During later processing by the Tree Grammar Engine(TGE) compiler tool, the pastrule attribute can be used to specify custom TGE processing.
+The C<is pastrule> adverb defines the pastrule attribute of a operator.
+During later processing by the Tree Grammar Engine(TGE) compiler tool, the
+pastrule attribute can be used to specify custom TGE processing.
 
 TODO: needs concrete example
 
 =item - is post()
 
-The C<is post> adverb specifies the Parrot opcode that implements the semantics of this particular operator. C<is post('add')> is used to annotate the 'infix:+' operator in languages where the infix + symbol denotes addition.
+The C<is post> adverb specifies the Parrot opcode that implements the
+semantics of this particular operator. C<is post('add')> is used to annotate
+the 'infix:+' operator in languages where the infix + symbol denotes addition.
 
 =item - is expect()
 
-The C<is expect> adverb used to specify the hexadecimal identifier of the next token OPTable should expect???
+The C<is expect> adverb used to specify the hexadecimal identifier of the next
+token OPTable should expect???
 
 =item - is returns()
 
-The C<is returns> adverb specifies the type of the result for this operator.  TGE can use this attribute to construct correctly typed temporary to hold the intermediate results of operations for later use or combination. 
+The C<is returns> adverb specifies the type of the result for this operator.
+TGE can use this attribute to construct correctly typed temporary to hold the
+intermediate results of operations for later use or combination.
 
 =item - is pir()
 
-The C<is pir> adverb specifies a code generation emit string that can be used during code generation.  Parrot assembly is emitted as Parrot Intermediate Representation(PIR).  Hence the adverb name pir. The argument string is a format string, after the C style printf format string. C<%r> represents the result of the operation.  C<%0>, C<%1>, etc represent the operands of the operator.
-  
-  proto 'infix:~&' is equiv('infix:*')
-    is pir("    %r = bands %0, %1")
-    { ... }
+The C<is pir> adverb specifies a code generation emit string that can be used
+during code generation.  Parrot assembly is emitted as Parrot Intermediate
+Representation(PIR).  Hence the adverb name pir. The argument string is a
+format string, after the C style printf format string. C<%r> represents the
+result of the operation.  C<%0>, C<%1>, etc represent the operands of the
+operator.  proto 'infix:~&' is equiv('infix:*') is pir(" %r = bands %0, %1") {
+... }
 
 
 =item - is nullterm
 
-The C<is nullterm> adverb specifies that the operator is an 0-arity function that doesn't take any operands.
+The C<is nullterm> adverb specifies that the operator is an 0-arity function
+that doesn't take any operands.
 
 =item - is stop()
 TODO: needs help, stolen shamelessly from compilers/pge/PGE/OPTable.pir
 
-The C<is stop> adverb declares a string to be matched directly or a sub(rule) to be called to check for a match.
+The C<is stop> adverb declares a string to be matched directly or a sub(rule)
+to be called to check for a match.
 
 =back
 
@@ -165,7 +232,7 @@ None.
 
 =head1 REFERENCES
 
-  http://en.wikipedia.org/wiki/Order_of_operations  
+  http://en.wikipedia.org/wiki/Order_of_operations
   http://en.wikipedia.org/wiki/Associativity
   http://en.wikipedia.org/wiki/Bottom-up_parsing
   http://www.ozonehouse.com/mark/blog/code/PeriodicTable.html

@@ -58,12 +58,14 @@ underscores in them. Labels that begin with a dollar sign (the only valid spot
 in a label a dollar sign can appear) are private to the subroutine they appear
 in.
 
-Namespaces are noted with the C<.namespace> directive. It takes a single parameter,
-the name of the namespace, in the form of a multi-dimensional key.
+Namespaces are noted with the C<.namespace> directive. It takes a
+single parameter, the name of the namespace, in the form of a
+multi-dimensional key.
 
-Subroutine names are noted with the C<.sub> directive. It takes a single parameter,
-the name of the subroutine, which is added to the namespace's symbol table. Sub
-names may be any valid Unicode alphanumeric character and the underscore.
+Subroutine names are noted with the C<.sub> directive. It takes a
+single parameter, the name of the subroutine, which is added to the
+namespace's symbol table. Sub names may be any valid Unicode
+alphanumeric character and the underscore.
 
 Constants don't need to be named and put in a separate section of the assembly
 source. The assembler will take care of putting them in the appropriate part of
@@ -1010,7 +1012,10 @@ null-terminated C string before passing in)
 
 So the signature for, for example, this SDL routine:
 
-   int SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect);
+   int SDL_BlitSurface(SDL_Surface *src,
+                       SDL_Rect    *srcrect,
+                       SDL_Surface *dst,
+                       SDL_Rect    *dstrect);
 
 would be C<ipppp>, since it returns an integer and takes four pointers.
 Presumably previous calls would have set those pointers up properly.

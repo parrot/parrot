@@ -144,7 +144,8 @@ Assign the passed-in pointer to the passed-in PMC.
 Keyed version of C<Parrot_PMC_set_pointer>. Assigns C<value> to the PMC stored 
 at element <key> of the passed-in PMC.
 
-=item C<Parrot_PMC_set_pmc_intkey(interp, pmc, Parrot_PMC value, Parrot_Int key)>
+=item C<Parrot_PMC_set_pmc_intkey(interp, pmc, Parrot_PMC value,
+Parrot_Int key)>
 
 Assigns C<value> to the PMC stored at element <key> of the passed-in PMC.
 

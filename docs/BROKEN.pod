@@ -62,7 +62,8 @@ None at this time.
 
 =item * ResizableIntegerArray
 
-https://rt.perl.org/rt3//Ticket/Display.html?id=32374  # XXX This is the wrong ticket number.
+# XXX This is the wrong ticket number.
+https://rt.perl.org/rt3//Ticket/Display.html?id=32374
 
 =item * splice
 

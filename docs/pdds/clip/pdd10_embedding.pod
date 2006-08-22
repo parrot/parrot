@@ -7,7 +7,8 @@ docs/pdds/embedding.pod - Parrot's Embedding and Extending Interface
 
 =head1 ABSTRACT
 
-What we believe people will do when embedding and extending Parrot, why they do it, and how.
+What we believe people will do when embedding and extending Parrot, why they
+do it, and how.
 
 {{ NOTE: some of this will later move into pdds 11 & 12, but for now
 just want to get the stub checked in. }}
@@ -19,45 +20,103 @@ $Revision$
 =head1 DESCRIPTION
 
 Why embed:
-	- access to special features/libraries/languages Parrot provides
-	- need an interpreter for a DSL or existing language
-	- want to run Parrot on another platform or environment (dedicated
-	  hardware, in a web server, et cetera)
+
+=over 4
+
+=item - access to special features/libraries/languages Parrot provides
+
+=item - need an interpreter for a DSL or existing language
+
+=item - want to run Parrot on another platform or environment (dedicated
+hardware, in a web server, et cetera)
+
+=back
 
 Why extend:
-	- need something NCI doesn't provide
-	- writing a custom PMC
+
+=over 4
+
+=item - need something NCI doesn't provide
+
+=item - writing a custom PMC
+
+=back
 
 Philosophical rules:
-	- only ever use opaque pointers
-	- should be able to communicate through PMCs
-	- minimize conversions to and from C data
-		- perhaps macros; Ruby does this fairly well and Perl 5 does this
-		  poorly
-		- minimize the number of necessary functions
-		- probably can follow core Parrot code to some extent, but beware the
-		  Perl 5 problem
-			- do not expose Parrot internals that may change
-			- probably includes vtable methods on PMCs
+
+=over 4
+
+=item - only ever use opaque pointers
+
+=item - should be able to communicate through PMCs
+
+=item - minimize conversions to and from C data
+
+=over 4
+
+=item - perhaps macros; Ruby does this fairly well and Perl 5 does this
+poorly
+
+=item - minimize the number of necessary functions
+
+=item - probably can follow core Parrot code to some extent, but beware the
+Perl 5 problem
+
+=over 4
+
+=item - do not expose Parrot internals that may change
+
+=item - probably includes vtable methods on PMCs
+
+=back
+
+=back
+
+=back
 
 Gotchas:
-	- who handles signals?
-	- who owns file descriptors and other Unix resources?
-	- is there an exception boundary?
-	- namespace issues -- especially key related
-	- probably a continuation/control flow boundary
-	- packfiles and compilation units probably too much information for either
-	- do not let MMD and other implementation details escape
-	- okay to require some PBC/PIR/PASM for handling round-trip data
-	- Parrot should not spew errors to STDERR when embedded
-	- const_string() is a real pain, especially with necessary deallocation
-	- should be access to Parrot's event loop when embedded
-	- passing var args to Parrot subs likely painful
-		- perhaps macros/functions to add parameters to call
-		- build up a call signature somehow?
-		- some abstraction for a call frame?
 
-	- compiling code from a string should return the PMC Sub entry point (:main)
+=over 4
+
+=item - who handles signals?
+
+=item - who owns file descriptors and other Unix resources?
+
+=item - is there an exception boundary?
+
+=item - namespace issues -- especially key related
+
+=item - probably a continuation/control flow boundary
+
+=item - packfiles and compilation units probably too much information for
+either
+
+=item - do not let MMD and other implementation details escape
+
+=item - okay to require some PBC/PIR/PASM for handling round-trip data
+
+=item - Parrot should not spew errors to STDERR when embedded
+
+=item - const_string() is a real pain, especially with necessary deallocation
+
+=item - should be access to Parrot's event loop when embedded
+
+=item - passing var args to Parrot subs likely painful
+
+=over 4
+
+=item - perhaps macros/functions to add parameters to call
+
+=item - build up a call signature somehow?
+
+=item - some abstraction for a call frame?
+
+=back
+
+=item - compiling code from a string should return the PMC Sub entry point
+(:main)
+
+=back
 
 =head1 DEFINITIONS
 

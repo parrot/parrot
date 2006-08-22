@@ -266,7 +266,8 @@ mangled by Joshua Hoblitt.
 
 =head1 SEE ALSO
 
-L<Parrot::Configure>, L<Parrot::Configure::Data>, L<Parrot::Configure::Step>, L<Parrot::Configure::Step::Base>
+L<Parrot::Configure>, L<Parrot::Configure::Data>,
+L<Parrot::Configure::Step>, L<Parrot::Configure::Step::Base>
 
 =cut
 

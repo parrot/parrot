@@ -142,7 +142,8 @@ created as a Coroutine PMC:
 
 The sub C<bar> will return to the caller of C<foo>.
 
-=head2 How do I generate a sub call with a variable-length parameter list in PIR?
+=head2 How do I generate a sub call with a variable-length parameter
+list in PIR?
 
 If you have a variable amounts of arguments in an array, you can
 pass all items of that array with the C<:flat> directive.
@@ -154,7 +155,8 @@ pass all items of that array with the C<:flat> directive.
   foo(ar :flat)
   ...
 
-=head2 How to I retrieve the contents of a variable-length parameter list being passed to me?
+=head2 How to I retrieve the contents of a variable-length parameter
+list being passed to me?
 
 Use a slurpy array:
 
@@ -225,7 +227,8 @@ namespace names have a NULL char prepended to their name.
   .end
 
 
-=head2 How do I use lexical pads to have both a function scope and a global scope?
+=head2 How do I use lexical pads to have both a function scope and a
+global scope?
 
 Please refer to L<docs/pdds/pdd20_lexical_vars.pod> for details.
 

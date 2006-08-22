@@ -103,11 +103,13 @@ The optimizer loop works as follows:
 
 =item 2.  Build basic block info.
 
-=item 3.  Run all cfg_optimize() optimizations.  If one makes a change, go to step 1.
+=item 3.  Run all cfg_optimize() optimizations.  If one makes a
+change, go to step 1.
 
 =item 4.  Build all other CFG info (dominators, loops, life analysis).
 
-=item 5.  Run all optimize() optimizations.  If one makes a change, go to step 1.
+=item 5.  Run all optimize() optimizations.  If one makes a change, go
+to step 1.
 
 =back
 

@@ -107,13 +107,12 @@ Decrement the integer atomically. Return the new value in result.
 
 =item B<PARROT_HAS_NATIVE_ATOMIC>
 
-Expands to a true value if this implementation has a native implementation of the
-atomic operations. Expands to false if the atomic operations are defined in
-terms of threading primitives. If false, the atomic operations should
-not be used if the implementors have written an alternative.
- 
-This will always be 1 when parrot is compiled without threading support
-in which case the atomic operations will not actually be atomic.
+Expands to a true value if this implementation has a native implementation of
+the atomic operations. Expands to false if the atomic operations are defined
+in terms of threading primitives. If false, the atomic operations should not
+be used if the implementors have written an alternative.  This will always be
+1 when parrot is compiled without threading support in which case the atomic
+operations will not actually be atomic.
 
 =item B<PARROT_HAS_ATOMIC_...>
 
@@ -123,15 +122,13 @@ Defined (to a true value) only if the operation by that name is implemented.
 
 =head1 IMPLEMENTATION
 
-On most systems with native atomic operation support, Parrot_atomic_pointer and
-Parrot_atomic_integer will be a struct containing a single integer or
-pointer and ATOMIC_*_INIT will do nothing. For the fallback
-implementation the atomic types will be implemented in terms of a
-Parrot_mutex. Platform-specific implementations should not make Parrot_atomic_pointer
-or Parrot_atomic_integer a typedef for an integer or pointer type to prevent programmers 
-from accidentally violating encapsulation.
- 
-=cut
+On most systems with native atomic operation support, Parrot_atomic_pointer
+and Parrot_atomic_integer will be a struct containing a single integer or
+pointer and ATOMIC_*_INIT will do nothing. For the fallback implementation the
+atomic types will be implemented in terms of a Parrot_mutex. Platform-specific
+implementations should not make Parrot_atomic_pointer or Parrot_atomic_integer
+a typedef for an integer or pointer type to prevent programmers from
+accidentally violating encapsulation.  =cut
 
 __END__ 
 Local Variables: 

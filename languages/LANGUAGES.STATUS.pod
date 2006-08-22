@@ -133,8 +133,9 @@ Bernhard Schmalhofer
 
 =item Description
 
-Based on ANTLR and Python. ANTLR is needed only for maintainance, for generation of Python runtime files. 
-A new implementation with Java code generated with ANTLR 3 is under construction.
+Based on ANTLR and Python. ANTLR is needed only for maintainance, for
+generation of Python runtime files.  A new implementation with Java
+code generated with ANTLR 3 is under construction.
 
 =item Status
 
@@ -439,23 +440,24 @@ Gregor Purdy
 
 =item Description
 
-C/Perl like language, first compiler for Parrot. The intent is to have a block-structured
-language that is higher level than IMC, but still exposes the underlying virtual machine
-rather directly, in the hope that this will eventually be useful for coding extensions to
-the VM in a language more natural than IMC.
+C/Perl like language, first compiler for Parrot. The intent is to have
+a block-structured language that is higher level than IMC, but still
+exposes the underlying virtual machine rather directly, in the hope
+that this will eventually be useful for coding extensions to the VM in
+a language more natural than IMC.
 
 See also L<http://en.wikipedia.org/wiki/Jako_(programming)>.
 
 =item Status
 
-The compiler Works, and the language and examples include subroutines and global
-constants and variables. NCI also works.
-The Jako examples are tested during smoke testing.
-The 'queens' example currently has problems and is therefore not tested.
+The compiler Works, and the language and examples include subroutines
+and global constants and variables. NCI also works.  The Jako examples
+are tested during smoke testing.  The 'queens' example currently has
+problems and is therefore not tested.
 
-Has a low-tech hand-coded lexer and parser, and the ability to spit out the parse
-tree as XML for debugging. Syntax is a bit rigid, but includes forms that will
-be familiar to Perl programmers.
+Has a low-tech hand-coded lexer and parser, and the ability to spit
+out the parse tree as XML for debugging. Syntax is a bit rigid, but
+includes forms that will be familiar to Perl programmers.
 
 Part of languages smoke testing.
 
@@ -539,11 +541,12 @@ Klaas-Jan Stol
 
 =item Description
 
-Making Lua work on Parrot.
-Implemented in C. The lexer is built with Flex. The Parser is built with Bison.
-TreeCC is used to generate the code for creating the Abstract Syntax Tree.
+Making Lua work on Parrot.  Implemented in C. The lexer is built with
+Flex. The Parser is built with Bison.  TreeCC is used to generate the
+code for creating the Abstract Syntax Tree.
 
-There is also a Lua bytecode to PIR compiler at http://members.home.nl/joeijoei/lua2pir/
+There is also a Lua bytecode to PIR compiler at
+http://members.home.nl/joeijoei/lua2pir/
 
 =item Status
 
@@ -819,7 +822,8 @@ Unknown
 
 =item Location
 
-http://www.akbkhome.com/svn.php/PintCompiler http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html
+http://www.akbkhome.com/svn.php/PintCompiler
+http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html
 
 =back
 

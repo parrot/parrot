@@ -347,7 +347,9 @@ For example, this Pod source:
 
 produces this event structure:
 
-  <L content-implicit="yes" section="Basic BLOCKs and Switch Statements" to="perlsyn" type="pod">
+  <L content-implicit="yes"
+      section="Basic BLOCKs and Switch Statements" 
+      to="perlsyn" type="pod">
     "Basic BLOCKs and Switch Statements" in perlsyn
   </L>
 
@@ -900,14 +902,6 @@ merchantability or fitness for a particular purpose.
 =head1 AUTHOR
 
 Sean M. Burke C<sburke@cpan.org>
-
-
-=for notes
-Hm, my old podchecker version (1.2) says:
- *** WARNING: node 'http://search.cpan.org/' contains non-escaped | or / at line 38 in file Subclassing.pod
- *** WARNING: node 'http://lists.perl.org/showlist.cgi?name=pod-people' contains non-escaped | or / at line 41 in file Subclassing.pod
-Yes, L<...> is hard.
-
 
 =cut
 
