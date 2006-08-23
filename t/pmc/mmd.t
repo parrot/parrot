@@ -576,7 +576,7 @@ CODE
 PerlSt ok 2
 PerlSt ok 3
 String ok 4
-Name 'p' not found/
+Null PMC access in invoke\(\)/
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");

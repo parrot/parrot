@@ -162,7 +162,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "find_global Foo::bazz not found");
     print "ok\n"
 .end
 CODE
-/Global 'bazz' not found/
+/Null PMC access in invoke\(\)/
 OUTPUT
 
 # [this used to behave differently from the previous case.]
@@ -173,7 +173,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::bazz not found");
     print "ok\n"
 .end
 CODE
-/Global 'bazz' not found/
+/Null PMC access in invoke\(\)/
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash");
@@ -296,7 +296,7 @@ calling Foo::foo
   Foo::bar
   fie
 calling baz
-.*baz.*not found/
+Null PMC access in invoke\(\)/
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::bar");

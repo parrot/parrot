@@ -958,6 +958,9 @@ pir_output_like(<<'CODE', <<'OUTPUT', ':anon');
     print $I0
     print "\n"
     $P0 = global "foo"
+    unless null $P0 goto foo
+    print "nofoo\n"
+  foo:
 .end
 
 .sub "foo" :anon
@@ -973,7 +976,7 @@ CODE
 new
 ok
 1
-Global 'foo' not found/
+nofoo/
 OUTPUT
 
 open S, ">test_l1.pir" or die "Can't write test_l1.pir";
@@ -1231,7 +1234,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', 'unicode sub names');
+pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub names');
 .sub unicode:"\u7777"
     print "ok\n"
 .end
@@ -1240,10 +1243,12 @@ pir_output_like(<<'CODE', <<'OUTPUT', 'unicode sub names');
     # unicode:"\u7777" ends up as a string nicode:"\u7777
     # (or it did, in r12860)
     $P1 = find_name 'nicode:"\u7777'
-    $P1()
+    unless null $P1 goto bad
+    print "not found\n"
+  bad:
 .end
 CODE
-/Name 'nicode:"\\u7777' not found\n.*\n/
+not found
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'unicode sub constant');

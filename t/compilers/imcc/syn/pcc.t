@@ -449,19 +449,25 @@ CODE
 ok
 OUT
 
-pir_output_like(<<'CODE', <<'OUT', "\:anon doesn't install symbol 1");
+pir_output_is(<<'CODE', <<'OUT', "\:anon doesn't install symbol 1");
 .sub main :main
     .local pmc result
-    result= find_global 'anon'
+    result = find_global 'anon'
+    unless null result goto callit
+    result = find_global 'ok'
+  callit:
     result()
-    print "\n"
 .end
 
 .sub anon :anon
     print "not ok\n"
 .end
+
+.sub ok
+    print "ok\n"
+.end
 CODE
-/.*'anon'.*not found/
+ok
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "\:anon doesn't install symbol 2");
@@ -482,10 +488,13 @@ CODE
 ok
 OUT
 
-pir_output_like(<<'CODE', <<'OUT', "multiple \:anon subs with same name");
+pir_output_is(<<'CODE', <<'OUT', "multiple \:anon subs with same name");
 .sub main :main
     .local pmc result
     result= find_global 'anon'
+    unless null result goto callit
+    result = find_global 'ok'
+  callit:
     result()
 .end
 
@@ -496,8 +505,12 @@ pir_output_like(<<'CODE', <<'OUT', "multiple \:anon subs with same name");
 .sub anon :anon
     print "nok 2\n"
 .end
+
+.sub ok
+    print "ok\n"
+.end
 CODE
-/.*'anon'.*not found/
+ok
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax, no return values");

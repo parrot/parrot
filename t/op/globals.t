@@ -41,21 +41,10 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "get null global");
        get_global P1, S0
        end
 CODE
-/Tried to find null global/
+/Tried to get null global/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUT, "not found exception");
-	get_global P1, "no_such_global"
-	print "ok 1\n"
-	print P1
-	end
-CODE
-/Global 'no_such_global' not found/
-OUT
-
-pasm_output_is(<<'CODE', <<OUT, "not found - error turned off");
-        .include "errors.pasm"
-        errorsoff .PARROT_ERRORS_GLOBALS_FLAG
+pasm_output_is(<<'CODE', <<OUT, "not found null");
 	get_global P1, "no_such_global"
 	print "ok 1\n"
 	defined I0, P1
@@ -121,21 +110,10 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "Find null global");
        find_global P1, S0
        end
 CODE
-/Tried to find null global/
+/Tried to get null global/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUT, "not found exception");
-	find_global P1, "no_such_global"
-	print "ok 1\n"
-	print P1
-	end
-CODE
-/Global 'no_such_global' not found/
-OUT
-
-pasm_output_is(<<'CODE', <<OUT, "not found - error turned off");
-        .include "errors.pasm"
-        errorsoff .PARROT_ERRORS_GLOBALS_FLAG
+pasm_output_is(<<'CODE', <<OUT, "not found null");
 	find_global P1, "no_such_global"
 	print "ok 1\n"
 	defined I0, P1
@@ -164,4 +142,4 @@ Ook...BANG!
 OUT
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 11; }
+BEGIN { plan tests => 9; }

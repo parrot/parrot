@@ -119,7 +119,8 @@ lp:
     print "back "
     print P16
     print "\n"
-    find_global P17, "no_such"
+    null S0
+    find_global P17, S0
     if P16, lp
     print "done\n"
     end
@@ -171,7 +172,8 @@ corolp:
     find_global P17, "i"
     dec P17
     yield
-    find_global P17, "no_such"
+    null S0
+    find_global P17, S0
     branch corolp
 _catchc:
     get_results '(0, 0)' , P5, S0
@@ -207,7 +209,8 @@ corolp:
     find_global P17, "i"
     dec P17
     yield
-    find_global P17, "no_such"
+    null S0
+    find_global P17, S0
     branch corolp
 _catchc:
     print "catch coro\n"
@@ -244,7 +247,8 @@ corolp:
     find_global P17, "i"
     dec P17
     yield
-    find_global P17, "no_such"
+    null S0
+    find_global P17, S0
     branch corolp
 _catchc:
     get_results '(0, 0)' , P5, S0

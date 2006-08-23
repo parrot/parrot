@@ -378,9 +378,8 @@ Parrot_store_global_s(Interp *inter, STRING *str_key,
 =item C<PMC *
 Parrot_find_global_op(Interp *, PMC *ns, STRING *globalname, void *next)>
 
-If the global exists in the given namespace PMC, return it.  If not,
-either throw an exception or return a C<Null> PMC, depending on the
-interpreter's error settings.
+If the global exists in the given namespace PMC, return it.  If not, return
+PMCNULL.
 
 =cut
 
@@ -393,34 +392,31 @@ Parrot_find_global_op(Interp *interpreter, PMC *ns,
     PMC *res;
 
     if (!globalname)
-	internal_exception(1, "Tried to find null global.");
+	real_exception(interpreter, next, E_NameError,
+                       "Tried to get null global");
 
     res = Parrot_find_global_n(interpreter, ns, globalname);
-    if (!res) {
-        if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))
-            real_exception(interpreter, next, E_NameError,
-                           "Global '%Ss' not found",
-                           globalname);
+    if (!res)
         res = PMCNULL;
-    }
 
     return res;
 }
+
 
 /*
 
 =item C<PMC *
 Parrot_find_name_op(Interp *, STRING *name, void *next)>
 
-Find the given C<name> in lexicals, then the current namespace, then
-the HLL root namespace, and finally Parrot builtins.  If the name
-isn't found anywhere, then depending on the interpreter's errors
-setting, either throw an exception or return a C<Null> PMC .
+TODO - THIS IS BROKEN - it doesn't walk up the scopes yet - TODO
+
+Find the given C<name> in lexicals, then the current namespace, then the HLL
+root namespace, and finally Parrot builtins.  If the name isn't found
+anywhere, return PMCNULL.
 
 =cut
 
 */
-
 
 PMC *
 Parrot_find_name_op(Interp *interpreter, STRING *name, void *next)
@@ -461,12 +457,9 @@ Parrot_find_name_op(Interp *interpreter, STRING *name, void *next)
             return g;
     }
 
-    if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))
-        real_exception(interpreter, next, E_NameError,
-                "Name '%Ss' not found", name);
-
     return PMCNULL;
 }
+
 
 /*
  * store a subroutine
