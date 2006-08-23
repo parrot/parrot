@@ -717,7 +717,7 @@ first_avail(IMC_Unit *unit, int reg_set, Set **avail)
     n = unit->n_symbols;
     if (unit->max_color > n)
         n = unit->max_color;
-    allocated = set_make(n);
+    allocated = set_make(n + 1);
     hsh = &unit->hash;
     for (i = 0; i < hsh->size; i++) {
         for (r = hsh->data[i]; r; r = r->next) {

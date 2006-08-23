@@ -1,0 +1,244 @@
+# valgrind suppression file for 64bit parrot
+#
+# valgrind --suppressions=tools/dev/parrot_8.supp ./parrot xx.pasm
+#
+{
+   supp_1
+   Memcheck:Cond
+   fun:trace_mem_block
+   fun:trace_system_stack
+   fun:trace_system_areas
+   fun:Parrot_dod_trace_root
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+}
+{
+   supp_2
+   Memcheck:Cond
+   fun:trace_mem_block
+   fun:trace_system_stack
+   fun:trace_system_areas
+   fun:Parrot_dod_trace_root
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+}
+{
+   supp_3
+   Memcheck:Cond
+   fun:contained_in_pool
+   fun:is_pmc_ptr
+   fun:trace_mem_block
+   fun:trace_system_stack
+   fun:trace_system_areas
+   fun:Parrot_dod_trace_root
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+}
+{
+   supp_4
+   Memcheck:Value8
+   fun:pobject_lives
+   fun:trace_mem_block
+   fun:trace_system_stack
+   fun:trace_system_areas
+   fun:Parrot_dod_trace_root
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+}
+{
+   supp_5
+   Memcheck:Value8
+   fun:mark_special
+   fun:pobject_lives
+   fun:trace_mem_block
+   fun:trace_system_stack
+   fun:trace_system_areas
+   fun:Parrot_dod_trace_root
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+}
+{
+   supp_6
+   Memcheck:Cond
+   fun:contained_in_pool
+   fun:is_buffer_ptr
+   fun:trace_mem_block
+   fun:trace_system_stack
+   fun:trace_system_areas
+   fun:Parrot_dod_trace_root
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+}
+{
+   supp_7
+   Memcheck:Cond
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+   fun:pmc_new
+   fun:new_ret_continuation_pmc
+   fun:Parrot_Sub_invoke
+}
+{
+   supp_7
+   Memcheck:Value8
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+   fun:pmc_new
+   fun:new_ret_continuation_pmc
+   fun:Parrot_Sub_invoke
+}
+{
+   supp_8
+   Memcheck:Cond
+   fun:mark_special
+   fun:pobject_lives
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+   fun:pmc_new
+}
+{
+   supp_9
+   Memcheck:Value8
+   fun:mark_special
+   fun:pobject_lives
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+   fun:pmc_new
+}
+{
+   supp_10
+   Memcheck:Value8
+   fun:Parrot_Hash_mark
+   fun:Parrot_NameSpace_mark
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+   fun:pmc_new
+}
+{
+   supp_11
+   Memcheck:Cond
+   fun:mark_special
+   fun:pobject_lives
+   fun:parrot_mark_hash
+   fun:Parrot_Hash_mark
+   fun:Parrot_NameSpace_mark
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+}
+{
+   supp_12
+   Memcheck:Value8
+   fun:mark_special
+   fun:pobject_lives
+   fun:parrot_mark_hash
+   fun:Parrot_Hash_mark
+   fun:Parrot_NameSpace_mark
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+}
+{
+   supp_13
+   Memcheck:Value8
+   fun:Parrot_NameSpace_mark
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+   fun:pmc_new
+   fun:new_ret_continuation_pmc
+}
+{
+   supp_1
+   Memcheck:Value8
+   fun:Parrot_Continuation_mark
+   fun:Parrot_dod_trace_children
+   fun:trace_active_PMCs
+   fun:Parrot_dod_ms_run
+   fun:Parrot_do_dod_run
+   fun:more_traceable_objects
+   fun:gc_ms_get_free_object
+   fun:new_pmc_header
+   fun:get_new_pmc_header
+   fun:pmc_new_noinit
+   fun:Parrot_new_p_ic
+   fun:runops_slow_core
+}
