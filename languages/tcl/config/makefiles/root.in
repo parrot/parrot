@@ -106,9 +106,7 @@ runtime/conversions.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \
 runtime/variables.pir \
-src/compiler.pir \
 src/macros.pir \
-src/parser.pir \
 src/returncodes.pir \
 src/grammar/expr/expression.pir \
 src/grammar/expr/functions.pir \
@@ -143,11 +141,7 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 	$(PARROT) tcl.pbc $< --pir > $@
 
 CLASSES = \
-  $(CLASSDIR)/tclcommand.pir \
-  $(CLASSDIR)/tclcommandlist.pir \
-  $(CLASSDIR)/tclconst.pir \
-  $(CLASSDIR)/tclvar.pir \
-  $(CLASSDIR)/tclword.pir 
+  $(CLASSDIR)/tclconst.pir
 
 pmcs:
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)

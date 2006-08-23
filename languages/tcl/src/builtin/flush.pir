@@ -20,8 +20,6 @@
   # generate code that checks for the specified channel:
   # get the channel specified to be flushed
 
-  .local pmc compiler
-  compiler = get_root_global ['_tcl'], 'compile_dispatch'
   $S0 = register_num
   pir_code .= '$P'
   pir_code .= $S0

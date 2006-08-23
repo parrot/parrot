@@ -143,10 +143,7 @@ sub inlined_header {
   .param int register
   .param pmc raw_argv
   .param pmc argv
-    
-  .local pmc compiler
-  compiler = get_root_global ['_tcl'], 'compile_dispatch'
-  
+
   .local int argc
   .local string pir
   pir = ''

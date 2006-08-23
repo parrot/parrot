@@ -22,7 +22,7 @@ Create a PIR sub on the fly for this user defined proc.
   body      = argv[2]
 
   .local pmc pir_compiler, __script, __list, __namespace
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
+  pir_compiler = compreg "PIR"
   __script     = get_root_global ['_tcl'], '__script'
   __list       = get_root_global ['_tcl'], '__list'
   __namespace  = get_root_global ['_tcl'], '__namespace'

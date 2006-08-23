@@ -43,10 +43,8 @@
   tcl_interactive = new .Integer
   store_global '$tcl_interactive', tcl_interactive
 
-  .local pmc compiler, pir_compiler, __script
-  compiler     = get_root_global ['_tcl'], 'compile'
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
-  __script     = get_root_global ['_tcl'], '__script'
+  .local pmc __script
+  __script = get_root_global ['_tcl'], '__script'
 
   if argc > 1 goto open_file
 
@@ -165,11 +163,10 @@ not_space:
 execute_code:
   .set_tcl_argv()
   unless dump_only goto run_file  
-  push_eh file_error 
-    ($I0,$S0) = compiler(0,contents)
+  push_eh file_error
+    ($S0,$I0) = __script(contents, 'pir_only'=>1)
   clear_eh
-  $S1 = pir_compiler($I0,$S0,1)
-  print $S1
+  print $S0
   goto done
 
 run_file:
@@ -198,9 +195,8 @@ oneliner:
   goto done
 
 oneliner_dump:
-  ($I0, $S1) = compiler(0,tcl_code)
-  $S2 = pir_compiler($I0,$S1,1)
-  print $S2
+  ($I0, $S1) = __script(tcl_code, 'pir_only'=>1)
+  print $S1
 
 done:
   end
@@ -236,14 +232,12 @@ got_prompt:
   $S0 = level
   varname .= $S0
 
-  .local pmc compiler, pir_compiler
-  compiler     = get_root_global ['_tcl'], 'compile'
-  pir_compiler = get_root_global ['_tcl'], 'pir_compiler'
+  .local pmc __script
+  __script = get_root_global ['_tcl'], '__script'
 
   push_eh no_prompt
     $P0 = find_global varname
-    ($I0,$P1) = compiler(0,$P0)
-    $P2 = pir_compiler($I0,$P1)
+    $P2 = __script($P0)
     $P2()
   clear_eh
 

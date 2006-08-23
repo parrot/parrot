@@ -33,15 +33,9 @@ providing a compreg-compatible method.
 .include 'languages/tcl/runtime/list_to_string.pir'
 .include 'languages/tcl/runtime/string_to_list.pir'
 .include 'languages/tcl/runtime/variables.pir'
-.include 'languages/tcl/src/compiler.pir'
-.include 'languages/tcl/src/parser.pir'
 
 # class files (HLL: _Tcl)
-.include 'languages/tcl/src/class/tclcommand.pir'
-.include 'languages/tcl/src/class/tclcommandlist.pir'
 .include 'languages/tcl/src/class/tclconst.pir'
-.include 'languages/tcl/src/class/tclvar.pir'
-.include 'languages/tcl/src/class/tclword.pir'
 
 # create the 'tcl' namespace -- see RT #39852
 # http://rt.perl.org/rt3/Ticket/Display.html?id=39852
@@ -244,21 +238,6 @@ env_loop_done:
   $P1 = 0
   store_global 'compiled_num', $P1
 
-.end
-
-.sub _tcl_compile
-  .param string tcl_code
-
-  .local pmc compiled_num
-  compiled_num = find_global 'compiled_num'
-  inc compiled_num
-
-  .local pmc compiler,pir_compiler
-  compiler = find_global 'compile'
-  pir_compiler = find_global 'pir_compiler'
-
-  ($I0,$S0) = compiler(0,tcl_code)
-  .return pir_compiler($I0,$S0)
 .end
 
 .HLL 'parrot', ''

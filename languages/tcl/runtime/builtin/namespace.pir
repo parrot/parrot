@@ -225,11 +225,11 @@ bad_args:
   namespace .= "']"
 
 global_ns:
-  .local pmc compile, code
-  compile = get_root_global ['_tcl'], 'compile'
-  code = new 'PGE::CodeString'
+  .local pmc __script, code
+  __script = get_root_global ['_tcl'], '__script'
+  code     = new 'PGE::CodeString'
   $S0 = join " ", argv
-  ($I0, $S0) = compile(1, $S0)
+  ($S0, $I0) = __script($S0, 'pir_only'=>1)
   $I0 = code.unique()
   code.emit(<<'END_PIR', namespace, $S0, $I0)
 .HLL 'tcl', 'tcl_group'
