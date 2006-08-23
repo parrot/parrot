@@ -202,7 +202,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
 
 .sub __expr
     .param string expression
-    .param int     pir_only :named('pir_only') :optional
+    .param int    pir_only :named('pir_only') :optional
 
     .local pmc parse
     .local pmc match
@@ -279,15 +279,15 @@ Given a chunk of tcl code, return a subroutine.
 =cut
 
 .sub __script
-    .param string expression
-    .param int     pir_only :named('pir_only') :optional
+    .param string code
+    .param int    pir_only :named('pir_only') :optional
 
     .local pmc parse
     .local pmc match
 
     parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'program'
     $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
-    match = $P0(expression, 0, 'TclExpr::Grammar')
+    match = $P0(code, 0, 'TclExpr::Grammar')
     match.to(0)
     match = parse(match)
     
@@ -298,10 +298,10 @@ Given a chunk of tcl code, return a subroutine.
     #$P0(match)
  
     unless match goto premature_end
-    $I0 = length expression
+    $I0 = length code
     $I1 = match.to()
     .include 'cclass.pasm'
-    $I1 = find_not_cclass .CCLASS_WHITESPACE, expression, $I1, $I0
+    $I1 = find_not_cclass .CCLASS_WHITESPACE, code, $I1, $I0
     unless $I0 == $I1 goto extra_tokens
 
     .local pmc astgrammar, astbuilder, ast
@@ -340,11 +340,11 @@ Given a chunk of tcl code, return a subroutine.
     .return(result, ret)
 
   premature_end:
-    say expression
+    say code
     tcl_error "program doesn't match grammar"
 
   extra_tokens:
-    $S0 = substr expression, $I1
+    $S0 = substr code, $I1
     $S0 = 'extra tokens at end of program: ' . $S0
     tcl_error $S0
 .end
