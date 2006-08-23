@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,13 +20,13 @@ use Parrot::Test;
 use Test::More;
 
 if ( $PConfig{has_python} ) {
-  plan tests => 8;
+  plan tests => 9;
 }
 else {
   plan skip_all => 'ANTLR2 based bc needs Python';
 }
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block without newlines", with_antlr3 => 0 );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'block without newlines' );
 1; { 2 }
 quit
 END_CODE
@@ -34,7 +34,7 @@ END_CODE
 2
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with newlines", with_antlr3 => 0 );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'block with newlines' );
 1 
 { 
   2 
@@ -48,7 +48,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with two statements", with_antlr3 => 0 );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'block with two statements' );
 1 
 { 
   2 
@@ -63,7 +63,7 @@ END_CODE
 4
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "block with newlines", with_antlr3 => 0, );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'nested blocks' );
 1
 {
   2
@@ -80,7 +80,7 @@ END_CODE
 40
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "definition of a function", with_antlr3 => 0, );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'definition of a function' );
 1
 define e(x) {
   5
@@ -92,7 +92,7 @@ END_CODE
 2
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "no parameters", with_antlr3 => 0, );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'define without parameters' );
 1
 define e() {
   6
@@ -104,7 +104,19 @@ END_CODE
 2
 END_EXPECTED
 
-language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "with auto parameters", with_antlr3 => 0, );
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'define with one parameter' );
+1
+define e(a) {
+  6
+}
+2
+quit
+END_CODE
+1
+2
+END_EXPECTED
+
+language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'define function with auto parameters' );
 1
 define e(x,y) {
   auto a,b
@@ -121,7 +133,7 @@ TODO:
 {
   local $TODO = 'not implemented';
 
-  language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', "constant function", with_antlr3 => 0 );
+  language_output_is( 'bc', << 'END_CODE', << 'END_EXPECTED', 'constant function', with_antlr3 => 0 );
 define e(x){
                return( 5 )
        }

@@ -4,9 +4,9 @@
 # Some tidbits on what is to do for Parrot bc.
 # See docs/parrot_bc.pod for visions.
 
-- Semicolon is statement delimiter, not statement seperator
+- Find out about parameter_list
 
-- Find out how to construct trees with values ( UNARY_MINUS expression ) -> ( MUL -1 expression )
+- Really call functions
 
 - Keep track of named variables and initialize them during execution
 
@@ -15,8 +15,6 @@
 - Custom PMCs for Parrot bc
   - Decimal BigNum libraries
  
-- Handle newlines in strings
-
 - Print no output when there is a "quit" in the input item
 
 - 4.3.5.3: Honour locale settings from the environment

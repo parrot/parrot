@@ -20,6 +20,7 @@ options
 tokens 
 {
   ARRAY;
+  FUNCTION;
   PRINT;
   PROGRAM;
   STMTS;
@@ -130,7 +131,7 @@ semicolon_list
   ;
 
 statement_list     
-  : statement? ( ( NEWLINE | ';' ) statement? )*
+  : ( statement | NEWLINE! | ';'! )*
   ;
 
 // TODO: use a semantic predicate, for deciding when not to print, ASSIGN_OP
@@ -142,17 +143,18 @@ statement
     STRING -> ^( PRINT STRING )
     | 
     If '(' relational_expression ')' statement -> ^( If relational_expression ^( STMTS statement ) )
+    | 
+    '{'! statement_list '}'!
   ;
 
 // TODO: implement functions
 function
-  : Define LETTER '(' parameter_list? ')' '{' NEWLINE auto_define_list? statement_list '}'
+  : Define LETTER '(' parameter_list? ')' '{' NEWLINE auto_define_list? statement_list '}' -> ^( FUNCTION LETTER )
   ;
 
+// What is the difference between define_list and parameter_list ?
 parameter_list       
-  : LETTER
-    |
-    define_list ',' LETTER
+  : define_list
   ;
 
 auto_define_list

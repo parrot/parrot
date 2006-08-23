@@ -151,6 +151,11 @@ node[String reg_mother]
       );
     }
     |
+    ^( FUNCTION LETTER )
+    {
+      // do nothing for now
+    }
+    |
     {
       System.out.print( 
           "                                                                   \n"
