@@ -74,6 +74,9 @@ OUTPUT
 
 # XXX FIXME rework tests since we don't really have thread types?
 
+SKIP: {
+	skip 'busted on win32' => 2 if $^O eq 'MSWin32';
+
 pir_output_is(<<'CODE', <<'OUTPUT', "thread type 1");
 .sub main :main
     .local pmc threadfunc
@@ -153,6 +156,7 @@ main 10
 thread
 main 10
 OUTPUT
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "thread type 2");
 .sub main :main
