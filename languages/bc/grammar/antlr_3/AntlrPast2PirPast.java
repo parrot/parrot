@@ -1,4 +1,4 @@
-// $ANTLR 3.0b3 grammar/antlr_3/antlr_past2pir_past.g 2006-08-23 23:51:00
+// $ANTLR 3.0b4 grammar/antlr_3/antlr_past2pir_past.g 2006-08-24 22:45:21
 
   import java.util.regex.*;
 
