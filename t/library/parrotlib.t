@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 6;
 use Parrot::Config;
 
 
@@ -119,6 +119,4 @@ F<runtime/parrot/library/parrotlib.pir>
 =cut
 
 
-## remember to change the number of tests! :-)
-BEGIN { plan tests => 6; }
 

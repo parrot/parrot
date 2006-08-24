@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -45,5 +45,4 @@ world
 hello world
 OUTPUT
 
-BEGIN { plan tests => 1; }
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 15;
 
 
 =head1 NAME
@@ -713,5 +713,4 @@ F<runtime/parrot/library/Getopt/Obj.pir>
 
 =cut
 
-BEGIN { plan tests => 15; }
 

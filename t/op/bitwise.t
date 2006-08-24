@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 26;
 use Parrot::Config;
 
 
@@ -504,6 +504,4 @@ CODE
 6
 OUTPUT
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 26; }
 

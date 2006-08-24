@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 9;
 
 
 =head1 NAME
@@ -140,6 +140,3 @@ pir_output_is(<<'CODE', <<OUT, "find/store global with key");
 CODE
 Ook...BANG!
 OUT
-
-## remember to change the number of tests :-)
-BEGIN { plan tests => 9; }

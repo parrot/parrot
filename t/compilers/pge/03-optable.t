@@ -5,10 +5,8 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 35;
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 35; }
 
 optable_output_is('a', 'term:a',                    'Simple term');
 optable_output_is('a+b', 'infix:+(term:a, term:b)', 'Simple infix');

@@ -6,7 +6,7 @@ use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 26;
 
 
 =head1 NAME
@@ -967,5 +967,3 @@ OUTPUT
 # pir_output_is(<<'CODE', <<'OUTPUT', "dumping FloatValArray PMC");
 
 
-## remember to change the number of tests! :-)
-BEGIN { plan tests => 26; }

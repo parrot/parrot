@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 41;
 
 
 =head1 NAME
@@ -1094,5 +1094,3 @@ CODE
 42
 OUTPUT
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 41; }

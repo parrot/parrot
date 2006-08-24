@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 5;
 use Parrot::Test::PGE;
 
 
@@ -40,5 +40,3 @@ p6rule_throws('\X[',
 p6rule_throws(' :i a',
     qr/Too late for modifier/, 'whitespace before modifier', todo => 'not implemented');
 
-# remember to change the number of tests :-)
-BEGIN { plan tests => 5; }

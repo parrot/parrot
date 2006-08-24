@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 8;
 use Parrot::Test::PGE;
 
 
@@ -177,4 +177,3 @@ CODE
 -a-b-racad-a-b-ra
 OUT
 
-BEGIN { plan tests => 8; }

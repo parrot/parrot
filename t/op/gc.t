@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 22;
 
 
 =head1 NAME
@@ -786,6 +786,4 @@ F<examples/benchmarks/primes2.py>.
 =cut
 
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 22; }
 

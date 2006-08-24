@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 12;
 use Parrot::Test::PGE;
 
 
@@ -106,5 +106,3 @@ p6rule_is  ('{ a quoted "}" unbalanced right bracket} okay', $PTB);
 p6rule_is  ('{ quoted "}" unbalanced quotes (`}}}"""}}}}`)} okay', $PTB);
 
 
-# remember to change the number of tests :-)
-BEGIN { plan tests => 12; }

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 6;
 use Parrot::Test::PGE;
 
 
@@ -62,5 +62,3 @@ p6rule_like("1234xyz5678",
      }}}} ghi",
     qr/357/, "PIR closure modifying match");
  
-# remember to change the number of tests :-)
-BEGIN { plan tests => 6; }

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 6;
 
 
 =head1 NAME
@@ -161,6 +161,4 @@ called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 6; }
 

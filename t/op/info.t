@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 1;
 
 
 =head1 NAME
@@ -35,5 +35,3 @@ pasm_output_is(<<'CODE', 'yes', "find_type");
 CODE
 
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 1; }

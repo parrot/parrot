@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 23;
 
 
 =head1 NAME
@@ -229,6 +229,4 @@ pir_output_like( $CODE, <<'OUTPUT', "end of line handling");
 OUTPUT
 
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 23; }
 
