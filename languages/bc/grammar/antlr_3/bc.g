@@ -39,17 +39,16 @@ fragment
 INTEGER : ('0'..'9' | 'A' .. 'F' )+ ;
 
 NUMBER
-  : INTEGER ('.' INTEGER)?
-    |
-    '.' INTEGER
-  ;
+    : INTEGER ('.' INTEGER)?
+    | '.' INTEGER
+    ;
 
 MINUS      : '-' ;
 PLUS       : '+' ;
 
-MUL_OP     : '*' | '/' | '%' ;
-ASSIGN_OP  : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' ;
-REL_OP     : '==' | '<=' | '>=' | '!=' | '<' | '>' ;
+MUL_OP     : '*'  | '/'  | '%' ;
+ASSIGN_OP  : '='  | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' ;
+REL_OP     : '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 INCR       : '++' ;
 DECR       : '--' ;
 // TODO: handle these 
@@ -122,8 +121,7 @@ program
 
 input_item 
   : semicolon_list NEWLINE!
-    |
-    function
+  | function
   ;
 
 semicolon_list 
@@ -137,14 +135,10 @@ statement_list
 // TODO: use a semantic predicate, for deciding when not to print, ASSIGN_OP
 statement
   : named_expression ASSIGN_OP^^ expression
-    |
-    expression -> ^( PRINT expression ) ^( PRINT NEWLINE )
-    |
-    STRING -> ^( PRINT STRING )
-    | 
-    If '(' relational_expression ')' statement -> ^( If relational_expression ^( STMTS statement ) )
-    | 
-    '{'! statement_list '}'!
+  | expression -> ^( PRINT expression ) ^( PRINT NEWLINE )
+  | STRING -> ^( PRINT STRING )
+  | If '(' relational_expression ')' statement -> ^( If relational_expression ^( STMTS statement ) )
+  | '{'! statement_list '}'!
   ;
 
 // TODO: implement functions
@@ -167,8 +161,7 @@ define_list
 
 argument_list
   : expression
-    |
-    LETTER '[' ']' ',' argument_list
+  | LETTER '[' ']' ',' argument_list
   ;
 
 relational_expression 
@@ -199,18 +192,13 @@ multiplying_expression
 
 unary_expression
   : postfix_expression
-    |
-    MINUS postfix_expression -> ^( MUL_OP["*"] NUMBER["-1"] postfix_expression )
-    |
-    INCR named_expression -> ^( ASSIGN_OP ^(VAR LETTER["a"]) ^( PLUS["+"] ^(VAR LETTER["a"]) NUMBER["1"] ) )
-    |
-    DECR named_expression -> ^( ASSIGN_OP ^(VAR LETTER["a"]) ^( MINUS["-"] ^(VAR LETTER["a"]) NUMBER["1"] ) )
+  | MINUS postfix_expression -> ^( MUL_OP["*"] NUMBER["-1"] postfix_expression )
+  | INCR named_expression    -> ^( ASSIGN_OP ^(VAR LETTER["a"]) ^( PLUS["+"] ^(VAR LETTER["a"]) NUMBER["1"] ) )
+  | DECR named_expression    -> ^( ASSIGN_OP ^(VAR LETTER["a"]) ^( MINUS["-"] ^(VAR LETTER["a"]) NUMBER["1"] ) )
   ;
 
 postfix_expression
   : NUMBER
-    |
-    named_expression
-    |     
-    '(' expression ')' -> expression
+  | named_expression
+  | '(' expression ')' -> expression
   ;

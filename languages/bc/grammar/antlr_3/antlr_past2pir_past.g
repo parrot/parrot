@@ -150,13 +150,11 @@ node[String reg_mother]
         + "  # leaving 'PRINT node'                                           \n"
       );
     }
-    |
-    ^( FUNCTION LETTER )
+  | ^( FUNCTION LETTER )
     {
       // do nothing for now
     }
-    |
-    {
+  | {
       System.out.print( 
           "                                                                   \n"
         + "  # entering 'assign'                                              \n"
@@ -183,8 +181,7 @@ node[String reg_mother]
         + "    # leaving  'ASSIGN_OP named_expression NUMBER'                 \n"
       );
     }
-    |
-    NUMBER
+  | NUMBER
     {
       System.out.print(     
           "                                                                  \n"
@@ -197,8 +194,7 @@ node[String reg_mother]
         + "# leaving 'NUMBER'                                                \n"
       );
     }
-    |
-    {
+  | {
       reg_num++;
       String reg = "reg_" + reg_num;
       System.out.print( 
@@ -220,8 +216,7 @@ node[String reg_mother]
         + "    # leaving '( PLUS | MINUS | MUL | DIV ) node node'             \n"
       );
     }
-    |
-    ^( VAR LETTER )
+  | ^( VAR LETTER )
     {
       System.out.print( 
           "                                                                   \n"
@@ -235,8 +230,7 @@ node[String reg_mother]
         + "  # leaving '(VAR LETTER)'                                         \n"
       );
     }
-    |
-    NEWLINE
+  | NEWLINE
     { 
       System.out.print(     
           "                                                                   \n"
@@ -249,8 +243,7 @@ node[String reg_mother]
         + "# leaving 'NEWLINE'                                                \n"
       );
     }
-    |
-    STRING
+  | STRING
     {
       // In bc backslash has on special meaning, so s!/!//!
       // Write newlines as '\n', in to not break PIR. s!\n!\\n!
@@ -266,8 +259,7 @@ node[String reg_mother]
         + "# leaving 'STRING'                                                 \n"
       );
     }
-    |
-    {
+  | {
       reg_num++;
       String reg_exp   = "reg_expression_" + reg_num;
       System.out.print( 
@@ -288,8 +280,7 @@ node[String reg_mother]
         + "  # leaving 'If node node                                          \n"
       );
     }
-    |
-    {
+  | {
       reg_num++;
       String reg_stmts = "reg_stmts_" + reg_num;
       System.out.print( 
