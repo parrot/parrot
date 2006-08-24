@@ -17,9 +17,6 @@ Handles getting of various headers, and pool creation.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-#define GC_DEBUG_PMC_HEADERS_PER_ALLOC 1
-#define GC_DEBUG_BUFFER_HEADERS_PER_ALLOC 1
-#define GC_DEBUG_STRING_HEADERS_PER_ALLOC 1
 #ifndef GC_IS_MALLOC
 #  define PMC_HEADERS_PER_ALLOC 512
 #  define BUFFER_HEADERS_PER_ALLOC 256
@@ -85,8 +82,7 @@ Creates an new pool for PMCs and returns it.
 struct Small_Object_Pool *
 new_pmc_pool(Interp *interpreter)
 {
-    int num_headers = GC_DEBUG(interpreter) ?
-        GC_DEBUG_PMC_HEADERS_PER_ALLOC : PMC_HEADERS_PER_ALLOC;
+    int num_headers = PMC_HEADERS_PER_ALLOC;
     struct Small_Object_Pool *pmc_pool =
         new_small_object_pool(interpreter, sizeof(PMC), num_headers);
 
@@ -112,8 +108,7 @@ struct Small_Object_Pool *
 new_bufferlike_pool(Interp *interpreter,
         size_t actual_buffer_size)
 {
-    int num_headers = GC_DEBUG(interpreter) ?
-            GC_DEBUG_BUFFER_HEADERS_PER_ALLOC : BUFFER_HEADERS_PER_ALLOC;
+    int num_headers = BUFFER_HEADERS_PER_ALLOC;
     size_t buffer_size =
             (actual_buffer_size + sizeof(void *) - 1) & ~(sizeof(void *) - 1);
     struct Small_Object_Pool *pool =
@@ -162,8 +157,7 @@ new_string_pool(Interp *interpreter, INTVAL constant)
     }
     else
         pool = make_bufferlike_pool(interpreter, sizeof(STRING));
-    pool->objects_per_alloc = GC_DEBUG(interpreter) ?
-            GC_DEBUG_STRING_HEADERS_PER_ALLOC : STRING_HEADERS_PER_ALLOC;
+    pool->objects_per_alloc = STRING_HEADERS_PER_ALLOC;
     return pool;
 }
 
