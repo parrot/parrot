@@ -39,7 +39,7 @@ static STRING* make_hash_key(Interp* interpreter, PMC* key)
         return NULL;
     }
 
-    return string_concat(interpreter, 
+    return string_concat(interpreter,
             VTABLE_name(interpreter, key),
             VTABLE_get_string(interpreter, key), 0);
 }
@@ -133,13 +133,14 @@ Return the string "table".
 
 =item C<PMC* clone()>
 
-PMCs are always handled by-reference in Parrot. So, copying register contents only copies 
-the reference to the PMC. For LuaString, LuaNumber, LuaBoolean, this is not correct,
-as Lua has by-value semantics for these types. In order to be able to handle register
-"move" instructions, this should be implemented using clone(). However, LuaTable and LuaFunction
-do have by-reference semantics. As you don't know the type during compile-time of an object,
-just always use clone() to copy register contents. LuaTable and LuaFunction should therefore
-only clone the reference to themselves, not make a deep copy.
+PMCs are always handled by-reference in Parrot. So, copying register contents
+only copies the reference to the PMC. For LuaString, LuaNumber, LuaBoolean,
+this is not correct, as Lua has by-value semantics for these types. In order
+to be able to handle register "move" instructions, this should be implemented
+using clone(). However, LuaTable and LuaFunction do have by-reference
+semantics. As you don't know the type during compile-time of an object, just
+always use clone() to copy register contents. LuaTable and LuaFunction should
+therefore only clone the reference to themselves, not make a deep copy.
 
 =cut
 
@@ -167,10 +168,10 @@ C<table> accessor.
 
 A copy of the value is retrieved, otherwise, this could happen:
 
-	temp = table[key]
-	temp = <some other value>
-	temp2 = table[key]
-	# temp2 is now <some other value> due to the by-reference semantics of PMCs
+    temp = table[key]
+    temp = <some other value>
+    temp2 = table[key]
+    # temp2 is now <some other value> due to the by-reference semantics of PMCs
 
 =cut
 
@@ -185,13 +186,14 @@ A copy of the value is retrieved, otherwise, this could happen:
         keystr = make_hash_key(INTERP, key);
         retval = parrot_hash_get(INTERP, PMC_struct_val(SELF), keystr);
         if (retval == NULL) {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__index", 0));
-            if (metamethod != NULL) {
-                if (dynpmc_LuaTable == metamethod->vtable->base_type) {
-                    return VTABLE_get_pmc_keyed(INTERP, metamethod, key);
+            if (meth != NULL) {
+                if (dynpmc_LuaTable == meth->vtable->base_type) {
+                    return VTABLE_get_pmc_keyed(INTERP, meth, key);
                 } else {
-                    retval = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, key);
+                    retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                      SELF, key);
                 }
             }
         }
@@ -210,11 +212,11 @@ A copy of the value is retrieved, otherwise, this could happen:
 C<table> mutator.
 
 A copy of the value is stored, otherwise, this could happen:
- 
-	table[key] = value
-	value = <some other value>
-	temp = table[key]
-	# temp is now <some other value> due to the by-reference semantics of PMCs
+
+    table[key] = value
+    value = <some other value>
+    temp = table[key]
+    # temp is now <some other value> due to the by-reference semantics of PMCs
 
 =cut
 
@@ -229,20 +231,21 @@ A copy of the value is stored, otherwise, this could happen:
         hash = PMC_struct_val(SELF);
         keystr = make_hash_key(INTERP, key);
         if (NULL == parrot_hash_get(INTERP, hash, keystr)) {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__newindex", 0));
-            if (metamethod != NULL) {
-                if (dynpmc_LuaTable == metamethod->vtable->base_type) {
-                    VTABLE_set_pmc_keyed(INTERP, metamethod, key, value);
+            if (meth != NULL) {
+                if (dynpmc_LuaTable == meth->vtable->base_type) {
+                    VTABLE_set_pmc_keyed(INTERP, meth, key, value);
                 } else {
-                    Parrot_runops_fromc_args(INTERP, metamethod, "vPPP", SELF, key, value);
+                    Parrot_runops_fromc_args(INTERP, meth, "vPPP",
+                                             SELF, key, value);
                 }
                 return;
             }
         }
         if (dynpmc_LuaNil == value->vtable->base_type) {
             parrot_hash_delete(INTERP, hash, keystr);
-        } 
+        }
         else {
             PMC *newcopy = VTABLE_clone(INTERP, value);
             parrot_hash_put(INTERP, hash, keystr, newcopy);
@@ -270,11 +273,11 @@ Returns the number of elements in the hash.
 
 */
     void* invoke(void* next) {
-        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                 string_from_const_cstring(INTERP, "__call", 0));
-        if (metamethod != NULL) {
+        if (meth != NULL) {
             /* fix me */
-            PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PP", SELF);
+            PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
             if (NULL == retval) {
                 retval = pmc_new(INTERP, dynpmc_LuaNil);
             }
@@ -300,10 +303,11 @@ The C<==> operation. Compares reference (not in depth).
 */
     INTVAL is_equal (PMC* value) {
 MMD_LuaTable: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__eq", 0));
-            if (metamethod != NULL) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                       SELF, value);
                 if (NULL == retval) {
                     return (INTVAL)0;
                 }
@@ -311,7 +315,7 @@ MMD_LuaTable: {
             }
             if (SELF == value)
                 return (INTVAL)1;
-            else 
+            else
                 return (INTVAL)0;
         }
 MMD_DEFAULT: {
@@ -329,10 +333,11 @@ MMD_DEFAULT: {
     INTVAL cmp (PMC* value) {
 MMD_LuaTable: {
 #if 0
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__cmp", 0));
-            if (metamethod != NULL) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                       SELF, value);
                 if (retval != NULL) {
                     return (INTVAL)VTABLE_get_number(INTERP, retval);
                 }
@@ -341,24 +346,30 @@ MMD_LuaTable: {
             PMC *_lt = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__lt", 0));
             if (_lt != NULL) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP", SELF, value);
-                INTVAL r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+                PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+                                                       SELF, value);
+                INTVAL r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
+                                            : (INTVAL)0;
                 if (r) {
                     return (INTVAL)-1;
                 } else {
                     PMC *_le = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                              string_from_const_cstring(INTERP, "__le", 0));
                     if (_le != NULL) {
-                        retval = Parrot_runops_fromc_args(INTERP, _le, "PPP", SELF, value);
-                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+                        retval = Parrot_runops_fromc_args(INTERP, _le, "PPP",
+                                                          SELF, value);
+                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
+                                             : (INTVAL)0;
                         if (r) {
                             return (INTVAL)0;
                         } else {
                             return (INTVAL)1;
                         }
                     } else {
-                        retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP", value, SELF);
-                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+                        retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+                                                          value, SELF);
+                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
+                                             : (INTVAL)0;
                         if (r) {
                             return (INTVAL)1;
                         } else {
@@ -422,7 +433,7 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawequal (PMC* value) {
         PMC *retval;
-       
+
         retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (SELF->vtable->base_type == value->vtable->base_type
          && SELF == value)
@@ -474,7 +485,7 @@ MMD_DEFAULT: {
         keystr = make_hash_key(INTERP, key);
         if (dynpmc_LuaNil == value->vtable->base_type) {
             parrot_hash_delete(INTERP, hash, keystr);
-        } 
+        }
         else {
             PMC *newcopy = VTABLE_clone(INTERP, value);
             parrot_hash_put(INTERP, hash, keystr, newcopy);

@@ -4,8 +4,10 @@
 grammar Lua::TestLex
 
 rule start {
-        | <token>*
-        | <error> 
+        <token>* [ $ | <error>]
+#        | 
+#        [ <token> | <error> ]*
+#        | <error> 
 }
 
 rule token {
@@ -78,7 +80,8 @@ token String {
 
 token Number {
         | 0 <[Xx]> <xdigit>+
-        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ] [ <[Ee]> <[+\-]>? <digit>+ ]?
+        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ] 
+          [ <[Ee]> <[+\-]>? <digit>+ ]?
 }
 
 token ws {

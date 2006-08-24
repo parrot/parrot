@@ -131,7 +131,11 @@ rule assignment {
 }
 
 rule primaryexp {
-        <prefixexp> [ \. <Name> | <index> | \: <Name> <funcargs> | <funcargs> ]*
+        <prefixexp> [ \. <Name> 
+                    | <index> 
+                    | \: <Name> <funcargs> 
+                    | <funcargs> 
+                    ]*
 }
 
 rule index {
@@ -225,7 +229,8 @@ token String {
 
 token Number {
         | 0 <[Xx]> <xdigit>+
-        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ] [ <[Ee]> <[+\-]>? <digit>+ ]?
+        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ] 
+          [ <[Ee]> <[+\-]>? <digit>+ ]?
 }
 
 token ws {

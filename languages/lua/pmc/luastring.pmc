@@ -47,7 +47,7 @@ pmclass LuaString
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaNumber = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNumber", 0));
-        }           
+        }
     }
 
 /*
@@ -191,10 +191,10 @@ Sets the value of the string to that of the specified C<string>.
 
 */
     PMC* get_pmc_keyed (PMC* key) {
-        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                 string_from_const_cstring(INTERP, "__index", 0));
-        if (metamethod != NULL) {
-            return VTABLE_get_pmc_keyed(INTERP, metamethod, key);
+        if (meth != NULL) {
+            return VTABLE_get_pmc_keyed(INTERP, meth, key);
         }
         return pmc_new(INTERP, dynpmc_LuaNil);
     }
@@ -317,10 +317,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__add", 0));
-            if (metamethod != NULL) {
-                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == dest) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -362,10 +363,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__add", 0));
-            if (metamethod != NULL) {
-                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == SELF) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -388,7 +390,8 @@ MMD_DEFAULT: {
 MMD_LuaNumber: {
             PMC* n = SELF.tonumber();
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
-                return Parrot_LuaNumber_subtract_LuaNumber(INTERP, n, value, dest);
+                return Parrot_LuaNumber_subtract_LuaNumber(INTERP, n,
+                                                           value, dest);
             } else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                         "attempt to perform arithmetic on a %s value",
@@ -399,7 +402,8 @@ MMD_LuaNumber: {
 MMD_LuaString: {
             PMC* n = SELF.tonumber();
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
-                return Parrot_LuaNumber_subtract_LuaString(INTERP, n, value, dest);
+                return Parrot_LuaNumber_subtract_LuaString(INTERP, n,
+                                                           value, dest);
             } else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                         "attempt to perform arithmetic on a %s value",
@@ -408,10 +412,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__sub", 0));
-            if (metamethod != NULL) {
-                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == dest) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -453,10 +458,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__sub", 0));
-            if (metamethod != NULL) {
-                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == SELF) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -479,7 +485,8 @@ MMD_DEFAULT: {
 MMD_LuaNumber: {
             PMC* n = SELF.tonumber();
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
-                return Parrot_LuaNumber_multiply_LuaNumber(INTERP, n, value, dest);
+                return Parrot_LuaNumber_multiply_LuaNumber(INTERP, n,
+                                                           value, dest);
             } else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                         "attempt to perform arithmetic on a %s value",
@@ -490,7 +497,8 @@ MMD_LuaNumber: {
 MMD_LuaString: {
             PMC* n = SELF.tonumber();
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
-                return Parrot_LuaNumber_multiply_LuaString(INTERP, n, value, dest);
+                return Parrot_LuaNumber_multiply_LuaString(INTERP, n,
+                                                           value, dest);
             } else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                         "attempt to perform arithmetic on a %s value",
@@ -499,10 +507,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__mul", 0));
-            if (metamethod != NULL) {
-                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == dest) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -544,10 +553,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__mul", 0));
-            if (metamethod != NULL) {
-                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == SELF) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -570,7 +580,8 @@ MMD_DEFAULT: {
 MMD_LuaNumber: {
             PMC* n = SELF.tonumber();
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
-                return Parrot_LuaNumber_divide_LuaNumber(INTERP, n, value, dest);
+                return Parrot_LuaNumber_divide_LuaNumber(INTERP, n,
+                                                         value, dest);
             } else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                         "attempt to perform arithmetic on a %s value",
@@ -581,7 +592,8 @@ MMD_LuaNumber: {
 MMD_LuaString: {
             PMC* n = SELF.tonumber();
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
-                return Parrot_LuaNumber_divide_LuaString(INTERP, n, value, dest);
+                return Parrot_LuaNumber_divide_LuaString(INTERP, n,
+                                                         value, dest);
             } else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                         "attempt to perform arithmetic on a %s value",
@@ -590,10 +602,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__div", 0));
-            if (metamethod != NULL) {
-                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == dest) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -635,10 +648,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__div", 0));
-            if (metamethod != NULL) {
-                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == SELF) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -661,7 +675,8 @@ MMD_DEFAULT: {
 MMD_LuaNumber: {
             PMC* n = SELF.tonumber();
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
-                return Parrot_LuaNumber_modulus_LuaNumber(INTERP, n, value, dest);
+                return Parrot_LuaNumber_modulus_LuaNumber(INTERP, n,
+                                                          value, dest);
             } else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                         "attempt to perform arithmetic on a %s value",
@@ -672,7 +687,8 @@ MMD_LuaNumber: {
 MMD_LuaString: {
             PMC* n = SELF.tonumber();
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
-                return Parrot_LuaNumber_modulus_LuaString(INTERP, n, value, dest);
+                return Parrot_LuaNumber_modulus_LuaString(INTERP, n,
+                                                          value, dest);
             } else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                         "attempt to perform arithmetic on a %s value",
@@ -681,10 +697,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__mod", 0));
-            if (metamethod != NULL) {
-                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == dest) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -726,10 +743,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__mod", 0));
-            if (metamethod != NULL) {
-                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == SELF) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -772,10 +790,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__pow", 0));
-            if (metamethod != NULL) {
-                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == dest) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -817,10 +836,11 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__pow", 0));
-            if (metamethod != NULL) {
-                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == SELF) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -862,7 +882,7 @@ string is smaller, 0 if they are equal, and 1 if C<value>
 is smaller.
 
 Throws an exception unless C<value> is a LuaString.
-                                          
+
 =cut
 
 */
@@ -907,10 +927,11 @@ MMD_LuaString: {
             return dest;
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__concat", 0));
-            if (metamethod != NULL) {
-                dest = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == dest) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -942,10 +963,11 @@ MMD_LuaString: {
             DYNSELF.set_string_native(string_append(INTERP, s, v, 1));
         }
 MMD_DEFAULT: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, value,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
                     string_from_const_cstring(INTERP, "__concat", 0));
-            if (metamethod != NULL) {
-                SELF = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                SELF, value);
                 if (NULL == SELF) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
@@ -988,7 +1010,7 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawequal (PMC* value) {
         PMC *retval;
-       
+
         retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (SELF->vtable->base_type == value->vtable->base_type
          && 0 == string_equal(INTERP, PMC_str_val(SELF), PMC_str_val(value)))
@@ -1016,7 +1038,8 @@ MMD_DEFAULT: {
         s1 = string_to_cstring(INTERP, rep);
         d = strtod(s1, &s2);
         if (s1 != s2) {  /* at least one valid digit? */
-            while (isspace((unsigned char)(*s2))) s2++;  /* skip trailing spaces */
+            while (isspace((unsigned char)(*s2)))
+                s2++;  /* skip trailing spaces */
             if (*s2 == '\0') {  /* no invalid trailing characters? */
                 retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 PMC_num_val(retval) = d;
@@ -1045,7 +1068,8 @@ MMD_DEFAULT: {
         s1 = string_to_cstring(INTERP, rep);
         n = strtoul(s1, &s2, base);
         if (s1 != s2) {  /* at least one valid digit? */
-            while (isspace((unsigned char)(*s2))) s2++;  /* skip trailing spaces */
+            while (isspace((unsigned char)(*s2)))
+                s2++;  /* skip trailing spaces */
             if (*s2 == '\0') {  /* no invalid trailing characters? */
                 retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 PMC_num_val(retval) = n;

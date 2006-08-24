@@ -27,11 +27,11 @@ static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
 
-pmclass LuaUserdata 
+pmclass LuaUserdata
     extends LuaBase
     does scalar
-    dynpmc 
-    group lua_group 
+    dynpmc
+    group lua_group
     hll Lua {
 
 /* Class initialization. Caches constant strings that will be used later.
@@ -111,10 +111,10 @@ Marks the userdata as live.
 
 */
     PMC* get_pmc_keyed (PMC* key) {
-        PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                 string_from_const_cstring(INTERP, "__index", 0));
-        if (metamethod != NULL) {
-            return VTABLE_get_pmc_keyed(INTERP, metamethod, key);
+        if (meth != NULL) {
+            return VTABLE_get_pmc_keyed(INTERP, meth, key);
         }
         return pmc_new(INTERP, dynpmc_LuaNil);
     }
@@ -182,10 +182,11 @@ The C<==> operation. Compares reference (not in depth).
 */
     INTVAL is_equal (PMC* value) {
 MMD_LuaUserdata: {
-            PMC *metamethod = Parrot_LuaBase_find_metamethod(INTERP, SELF,
+            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__eq", 0));
-            if (metamethod != NULL) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, metamethod, "PPP", SELF, value);
+            if (meth != NULL) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                       SELF, value);
                 if (NULL == retval) {
                     return (INTVAL)0;
                 }
@@ -193,7 +194,7 @@ MMD_LuaUserdata: {
             }
             if (SELF == value)
                 return (INTVAL)1;
-            else 
+            else
                 return (INTVAL)0;
         }
 MMD_DEFAULT: {
@@ -237,7 +238,7 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawequal (PMC* value) {
         PMC *retval;
-       
+
         retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (SELF->vtable->base_type == value->vtable->base_type
          && SELF == value)

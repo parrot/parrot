@@ -65,7 +65,8 @@ information see F<src/pmc.c>.
               string_from_const_cstring(INTERP, "LuaNumber", 0)));
         expn = pmc_new(INTERP, pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNumber", 0)));
-        VTABLE_set_number_native(INTERP, y, frexp(VTABLE_get_number(INTERP, x), &e));
+        VTABLE_set_number_native(INTERP, y,
+              frexp(VTABLE_get_number(INTERP, x), &e));
         VTABLE_set_integer_native(INTERP, expn, e);
         retval = pmc_new(INTERP, enum_class_Array);
         VTABLE_set_integer_native(INTERP, retval, 2);
@@ -85,7 +86,8 @@ information see F<src/pmc.c>.
         PMC *retval = pmc_new(INTERP, pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNumber", 0)));
         VTABLE_set_number_native(INTERP, retval, 
-                ldexp(VTABLE_get_number(INTERP, x), VTABLE_get_integer(INTERP, expn)));
+              ldexp(VTABLE_get_number(INTERP, x),
+              VTABLE_get_integer(INTERP, expn)));
         return retval;
     }
 
@@ -106,7 +108,8 @@ information see F<src/pmc.c>.
               string_from_const_cstring(INTERP, "LuaNumber", 0)));
         d = pmc_new(INTERP, pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaNumber", 0)));
-        VTABLE_set_number_native(INTERP, y, modf(VTABLE_get_number(INTERP, x), &_d));
+        VTABLE_set_number_native(INTERP, y, 
+              modf(VTABLE_get_number(INTERP, x), &_d));
         VTABLE_set_number_native(INTERP, d, _d);
         retval = pmc_new(INTERP, enum_class_Array);
         VTABLE_set_integer_native(INTERP, retval, 2);
