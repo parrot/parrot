@@ -156,6 +156,7 @@ sub runstep
         commentType                                  => '#',
         replace_slashes                              => 1,
         conditioned_lines                            => 1,
+        expand_gmake_syntax                          => 1,
     );
     genfile(
         'languages/tcl/config/makefiles/examples.in' => 'languages/tcl/examples/Makefile',

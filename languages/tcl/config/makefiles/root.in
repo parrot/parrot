@@ -3,7 +3,6 @@ PERL    = @perl@
 PARROT  = ../../parrot@exe@
 
 C_BUILTIN = src/builtin
-R_BUILTIN = runtime/builtin
 TCL_LIB   = library
 PMCBUILD  = $(PERL) @build_dir@/tools/build/dynpmc.pl
 OPSBUILD  = $(PERL) @build_dir@/tools/build/dynoplibs.pl
@@ -18,6 +17,9 @@ PGE_DIR  = ../../compilers/pge
 TGE_DIR  = ../../compilers/tge
 
 OPSLIBS   = tcl
+
+# can't use $(wildcard) and friends for PMCS,, as these have to be in 
+# dependency order; with no duplicates. 
 PMCS = \
  tclobject \
  tclstring \
@@ -39,69 +41,26 @@ GENERATED_INLINES = \
  $(C_BUILTIN)/time.pir \
  $(C_BUILTIN)/while.pir
 
+RUNTIME_PIR = $(addprefix runtime/builtin/,$(notdir $(wildcard languages/tcl/runtime/builtin/*.pir)))
+
 DEPS = \
-$(R_BUILTIN)/after.pir \
-$(R_BUILTIN)/append.pir \
-$(R_BUILTIN)/array.pir \
 $(C_BUILTIN)/auto_execok.pir \
 $(C_BUILTIN)/auto_load.pir \
-$(R_BUILTIN)/binary.pir \
-$(R_BUILTIN)/catch.pir \
 $(C_BUILTIN)/cd.pir \
 $(C_BUILTIN)/close.pir \
-$(R_BUILTIN)/concat.pir \
 $(C_BUILTIN)/continue.pir \
-$(R_BUILTIN)/error.pir \
-$(R_BUILTIN)/eval.pir \
 $(C_BUILTIN)/exec.pir \
 $(C_BUILTIN)/expr.pir \
-$(R_BUILTIN)/expr.pir \
 $(C_BUILTIN)/fconfigure.pir \
-$(R_BUILTIN)/file.pir \
 $(C_BUILTIN)/flush.pir \
-$(R_BUILTIN)/foreach.pir \
-$(R_BUILTIN)/format.pir \
-$(R_BUILTIN)/gets.pir \
 $(C_BUILTIN)/glob.pir \
-$(R_BUILTIN)/global.pir \
-$(R_BUILTIN)/if.pir \
-$(R_BUILTIN)/info.pir \
-$(R_BUILTIN)/inline.pir \
 $(C_BUILTIN)/interp.pir \
-$(R_BUILTIN)/lappend.pir \
-$(R_BUILTIN)/lassign.pir \
-$(R_BUILTIN)/lindex.pir \
-$(R_BUILTIN)/linsert.pir \
 $(C_BUILTIN)/list.pir \
-$(R_BUILTIN)/list.pir \
-$(R_BUILTIN)/lrange.pir \
-$(R_BUILTIN)/lrepeat.pir \
-$(R_BUILTIN)/lreplace.pir \
 $(C_BUILTIN)/lsearch.pir \
-$(R_BUILTIN)/lset.pir \
-$(R_BUILTIN)/lsort.pir \
-$(R_BUILTIN)/namespace.pir \
-$(R_BUILTIN)/open.pir \
 $(C_BUILTIN)/package.pir \
-$(R_BUILTIN)/proc.pir \
-$(R_BUILTIN)/puts.pir \
-$(R_BUILTIN)/regexp.pir \
-$(R_BUILTIN)/regsub.pir \
-$(R_BUILTIN)/rename.pir \
 $(C_BUILTIN)/return.pir \
-$(R_BUILTIN)/return.pir \
-$(R_BUILTIN)/source.pir \
-$(R_BUILTIN)/split.pir \
-$(R_BUILTIN)/string.pir \
-$(R_BUILTIN)/subst.pir \
-$(R_BUILTIN)/switch.pir \
 $(C_BUILTIN)/trace.pir \
-$(R_BUILTIN)/unknown.pir \
-$(R_BUILTIN)/unset.pir \
 $(C_BUILTIN)/update.pir \
-$(R_BUILTIN)/uplevel.pir \
-$(R_BUILTIN)/upvar.pir \
-$(R_BUILTIN)/variable.pir \
 runtime/conversions.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \
@@ -114,7 +73,8 @@ src/grammar/expr/parse.pir \
 src/grammar/expr/operators.pir \
 src/grammar/expr/past2pir.pir \
 src/grammar/expr/pge2past.pir \
-$(TCL_LIB)/parray.tcl
+$(TCL_LIB)/parray.tcl \
+$(RUNTIME_PIR)
 
 all: tcl.pbc
 

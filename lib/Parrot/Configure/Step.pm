@@ -39,8 +39,8 @@ our $conf;
 
 our @EXPORT = ();
 our @EXPORT_OK = qw(prompt genfile copy_if_diff move_if_diff integrate
-                    cc_gen cc_build cc_run cc_clean cc_run_capture capture_output
-                    check_progs);
+                    cc_gen cc_build cc_run cc_clean cc_run_capture
+                    capture_output check_progs);
 our %EXPORT_TAGS = (
     inter => [ qw(prompt integrate) ],
     auto  => [ qw(cc_gen cc_build cc_run cc_clean cc_run_capture
@@ -167,7 +167,8 @@ Takes the specified source file, replacing entries like C<@FOO@> with
 C<FOO>'s value from the configuration system's data, and writes the results 
 to specified target file. 
 
-Respects the following options when manipulating files
+Respects the following options when manipulating files (Note: most of the
+replacement syntax assumes the source text is on a single line.)
 
 =over 4
 
@@ -202,6 +203,37 @@ original text.
 If set to a true value, this causes any C</>'s in the file to automatically
 be replaced with an architecture appropriate slash. C</> or C<\>. This is
 a very helpful option when writing Makefiles.
+
+=item expand_gmake_syntax
+
+If set to a true value, then certain types of gmake syntax will be expanded
+into their full equivalents. For example:
+
+ $(wildcard PATTERN)
+
+Will be replaced *at config time* with the list of files that match this
+pattern. Note! Be very careful when determining whether or not to disable
+this expansion during config time and letting gmake evaluate these: the
+config system itself may change state of the filesystem, causing the 
+directives to expand differently depending on when they're run. Another 
+potential issue to consider there is that most makefiles, while generated
+from the root directory, are *run* from a subdirectory. So relative path names
+become an issue.
+
+The gmake replacements are done repeatedly on a single line, so nested
+syntax works ok.
+
+=over 4 
+
+=item addprefix
+
+=item basename
+
+=item wildcard
+
+=item notdir
+
+=back
 
 =back
 
@@ -238,8 +270,10 @@ sub genfile
         print $out "\n"; # extra newline after header
     }
 
+
     # this loop can not be implemented as a foreach loop as the body
     # is dependant on <IN> being evaluated lazily
+ 
     while (my $line = <$in>) {
         # everything after the line starting with #perl is eval'ed
         if ($line =~ /^#perl/ && $options{feature_file}) {
@@ -263,6 +297,46 @@ sub genfile
             }
         }
 
+        # interpolate gmake-ish expansions..
+        if ($options{expand_gmake_syntax}) {
+            my $any_gmake;
+            GMAKES:
+            $any_gmake=0; 
+    
+            if ($line =~ s{\$ \( wildcard \s+ ([^)]+) \)}{
+                join (' ', glob $1)
+            }egx) {$any_gmake++}
+    
+            if ($line =~ s{\$ \( notdir \s+ ([^)]+) \)}{
+                join (' ',
+                    map { (File::Spec->splitpath($_))[2] }
+                        split(' ', $1)
+                )
+            }egx) {$any_gmake++}
+
+            # documented as removing any .-based suffix  
+            if ($line =~ s{\$ \( basename \s+ ([^)]+) \)}{
+                join (' ',
+                    map { 
+                        my @split = File::Spec->splitpath($_);
+                        $split[2] =~ s/\.[^.]*$//;
+                        File::Spec->catpath(@split);
+                    } split(' ', $1)
+                )
+            }egx) {$any_gmake++}
+    
+            if ($line =~ s{\$ \( addprefix \s+ ([^,]+) \s* , \s* ([^)]+) \)}{
+                my ($prefix,$list) = ($1, $2);
+                join (' ',
+                    map { $_ = $prefix . $_, $_ } 
+                        split(' ', $list)
+                )
+            }egx) {$any_gmake++}
+    
+            # we might have only gotten the innermost expression. try again.
+            goto GMAKES if $any_gmake;
+        }
+      
         # interoplate @foo@ values
         $line =~ s{ \@ (\w+) \@ }{
             if(defined(my $val=$conf->data->get($1))) {
@@ -472,7 +546,7 @@ F<test.err> during the execution, and deleted after the command's run.
 
 sub capture_output
 {
-    my $command = join " ", @_;
+    my $command = join ' ', @_;
 
     # disable STDERR
     open OLDERR, ">&STDERR";
