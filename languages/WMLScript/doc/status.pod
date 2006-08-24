@@ -10,8 +10,8 @@ WMLScript defines also an bytecode interpreter (stack based), a binary format.
 
 WMLScript is a part of the Wireless Application Protocol specifications.
 
-The complete specification are available on L<http://www.openmobilealliance.org/>
-(formerly L<http://www.wapforum.org/>)
+The complete specification are available on
+L<http://www.openmobilealliance.org/> (formerly L<http://www.wapforum.org/>)
 
 =over 4
 

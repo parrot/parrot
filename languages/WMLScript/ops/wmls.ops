@@ -47,13 +47,13 @@ inline op istrue(out PMC, invar PMC) :base_core {
         const_string(interpreter, "WmlsBoolean"));
     INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
         const_string(interpreter, "WmlsInvalid"));
-    INTVAL type = VTABLE_type(interpreter, $2); 
+    INTVAL type = VTABLE_type(interpreter, $2);
 
     if (type == dynpmc_WmlsInvalid) {
         $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
     }
     else {
-        INTVAL result = VTABLE_get_bool(interpreter, $2);                                  
+        INTVAL result = VTABLE_get_bool(interpreter, $2);
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result;
     }
@@ -78,7 +78,7 @@ inline op typeof(out PMC, invar PMC) :base_core {
         const_string(interpreter, "WmlsInvalid"));
     INTVAL dynpmc_WmlsString = pmc_type(interpreter,
         const_string(interpreter, "WmlsString"));
-    INTVAL type = VTABLE_type(interpreter, $2); 
+    INTVAL type = VTABLE_type(interpreter, $2);
     INTVAL result;
 
     if      (type == dynpmc_WmlsInteger) {
@@ -86,20 +86,20 @@ inline op typeof(out PMC, invar PMC) :base_core {
     }
     else if (type == dynpmc_WmlsFloat) {
         result = 1;
-    } 
+    }
     else if (type == dynpmc_WmlsString) {
         result = 2;
-    } 
+    }
     else if (type == dynpmc_WmlsBoolean) {
         result = 3;
-    } 
+    }
     else if (type == dynpmc_WmlsInvalid) {
         result = 4;
     }
     else {
-        real_exception(interpreter, NULL, NO_CLASS, 
+        real_exception(interpreter, NULL, NO_CLASS,
             "Attempt to typeof of a non-wmls type.");
-    } 
+    }
     $1 = pmc_new(interpreter, dynpmc_WmlsInteger);
     PMC_int_val($1) = result;
     goto NEXT();
@@ -125,7 +125,7 @@ inline op isgt(out PMC, invar PMC, invar PMC) {
     else {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result > 0;
-    }  
+    }
     goto NEXT();
 }
 
@@ -149,7 +149,7 @@ inline op isge(out PMC, invar PMC, invar PMC) {
     else {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result >= 0;
-    }  
+    }
     goto NEXT();
 }
 
@@ -173,7 +173,7 @@ inline op isle(out PMC, invar PMC, invar PMC) {
     else {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result <= 0;
-    }  
+    }
     goto NEXT();
 }
 
@@ -197,7 +197,7 @@ inline op islt(out PMC, invar PMC, invar PMC) {
     else {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result < 0;
-    }  
+    }
     goto NEXT();
 }
 
@@ -220,7 +220,7 @@ inline op iseq(out PMC, invar PMC, invar PMC) {
     else {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result;
-    }  
+    }
     goto NEXT();
 }
 
@@ -244,7 +244,7 @@ inline op isne(out PMC, invar PMC, invar PMC) {
     else {
         $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
         PMC_int_val($1) = !result;
-    }  
+    }
     goto NEXT();
 }
 
