@@ -31,7 +31,11 @@ use vars qw!@files!;
 
 diag "finding source files, this may take a while.";
 
-our %check_language = ( tcl => 1 );
+our %check_language = map {$_ => 1;} qw{
+    lua
+    tcl
+    WMLScript
+};
 
 # XXX this should really be using src_dir instead of build_dir but it
 # doesn't exist (yet)
