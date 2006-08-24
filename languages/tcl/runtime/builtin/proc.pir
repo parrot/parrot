@@ -53,9 +53,8 @@ root:
   # check to see if this is inlinable
   # if it is, we need to update the epoch
   $S0 = name
-  push_eh create
-    $P1 = get_root_global ['_tcl'; 'builtins'], $S0
-  clear_eh
+  $P1 = get_root_global ['_tcl'; 'builtins'], $S0
+  if null $P1 goto create
   
   .local pmc epoch
   epoch = get_root_global ['_tcl'], 'epoch'

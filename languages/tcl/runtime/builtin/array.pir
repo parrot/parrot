@@ -22,9 +22,8 @@
   .local pmc subcommand_proc
   null subcommand_proc
 
-  push_eh bad_args
-    subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'array'], subcommand_name
-  clear_eh
+  subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'array'], subcommand_name
+  if null subcommand_proc goto bad_args
 
   .local int is_array
   .local string array_name
@@ -322,10 +321,8 @@ skip_args:
   .local pmc match_proc
   null match_proc
 
-  push_eh bad_mode
-    match_proc = find_global [ 'helpers'; 'array'; 'names_helper' ], mode
-  clear_eh
-  if_null match_proc, bad_mode
+  match_proc = get_hll_global [ 'helpers'; 'array'; 'names_helper' ], mode
+  if null match_proc goto bad_mode
 
   if is_array == 0 goto not_array
 

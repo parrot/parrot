@@ -22,9 +22,8 @@
   .local pmc sub, args, builtin
 
   $S0 = '&' . oldName
-  push_eh doesnt_exist
-    sub = get_root_global ['tcl'], $S0
-  clear_eh
+  sub = get_root_global ['tcl'], $S0
+  if null sub goto doesnt_exist
 
   # if the newName is '', just delete the sub
   .local int delete_only
@@ -43,9 +42,8 @@ add_sub:
   # Create the new sub
   $S0 = '&' . newName
   # first check to make sure it doesn't already exist
-  push_eh set_new_sub
-    $P0 = get_root_global ['tcl'], $S0
-  clear_eh
+  $P0 = get_root_global ['tcl'], $S0
+  if null $P0 goto set_new_sub
 
   $S0 = "can't rename to \""
   $S0 .= newName
@@ -57,9 +55,8 @@ set_new_sub:
 
 
 delete_builtin:
-  push_eh delete_args
-    builtin = get_root_global ['_tcl'; 'builtins'], oldName
-  clear_eh
+  builtin = get_root_global ['_tcl'; 'builtins'], oldName
+  if null builtin goto delete_args
   
   $P0 = get_root_namespace ['_tcl'; 'builtins']
   delete $P0[oldName]

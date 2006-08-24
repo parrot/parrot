@@ -285,9 +285,7 @@ coloned:
     substr name, 1, 2, ''
 
 global_var:
-  push_eh notfound
-    value = get_root_global ['tcl'], name
-  clear_eh
+  value = get_root_global ['tcl'], name
   if null value goto found
   $I0 = isa value, 'Undef'
   if $I0 goto notfound
@@ -341,9 +339,7 @@ lexical_is_null:
 coloned:
   substr name, 1, 2, ''
 global_var:
-  push_eh global_not_undef
-    $P0 = get_root_global ['tcl'], name
-  clear_eh
+  $P0 = get_root_global ['tcl'], name
   if null $P0 goto global_not_undef
 
   $I0 = typeof value

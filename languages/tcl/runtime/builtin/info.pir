@@ -19,9 +19,8 @@
   .local pmc subcommand_proc
   null subcommand_proc
 
-  push_eh bad_subcommand
-    subcommand_proc = get_root_global ['_tcl';'helpers';'info'], subcommand_name
-  clear_eh
+  subcommand_proc = get_root_global ['_tcl';'helpers';'info'], subcommand_name
+  if null subcommand_proc goto bad_subcommand
 
   .return subcommand_proc(argv)
 

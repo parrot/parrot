@@ -218,9 +218,8 @@ transform pir (PAST::Command) {
 
     $P0 = shift children
     $S0 = $P0['value']
-    push_eh dynamic
-      $P1 = get_root_global ['_tcl'; 'builtins'], $S0
-    clear_eh
+    $P1 = get_root_global ['_tcl'; 'builtins'], $S0
+    if null $P1 goto dynamic
 
     .local pmc serno
     .local int register_num
