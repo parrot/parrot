@@ -686,20 +686,16 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 
             if (isdigit(c)) {
                 dig = c - '0';
-                if (dig >= base)
-                    break;
             }
             else if (c >= 'a' && c <= 'z') {
                 dig = c - 'a' + 10;
-                if (dig >= base)
-                    break;
             }
             else if (c >= 'A' && c <= 'Z') {
                 dig = c - 'A' + 10;
-                if (dig >= base)
-                    break;
             }
             else
+                break;
+            if (dig >= base)
                 break;
             i = i * base + dig;
             ++start;
