@@ -667,7 +667,9 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 */
 
     METHOD PMC* to_int(INTVAL base) {
-        PMC* result = pmc_new(INTERP, enum_class_Integer);
+        PMC* result = pmc_new(INTERP, 
+                Parrot_get_ctx_HLL_type(interpreter,
+                        enum_class_Integer));
         /* TODO verify encoding */
         const STRING* me = VTABLE_get_string(INTERP, SELF);
         const char *start = me->strstart;
