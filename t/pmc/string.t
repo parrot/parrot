@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 46;
 
 =head1 NAME
 
@@ -1289,7 +1289,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_string returns COW string")
+pir_output_is( <<'CODE', <<'OUTPUT', "get_string returns COW string");
 .sub main :main
   $P0 = new .String
   $P0 = "Foo"
@@ -1305,4 +1305,51 @@ pir_output_is( <<'CODE', <<'OUTPUT', "get_string returns COW string")
 CODE
 Foo
 Boo
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "to_int 1");
+.sub 'main' :main
+    .local pmc s
+    s = new .String
+    s = "123"
+    $I0 = s.to_int(10)
+    print $I0
+    print "\n"
+    s = "2a"
+    $I0 = s.to_int(16)
+    print $I0
+    print "\n"
+    s = "1001"
+    $I0 = s.to_int(2)
+    print $I0
+    print "\n"
+.end
+CODE
+123
+42
+9
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', "to_int 2");
+.sub 'main' :main
+    .local pmc s
+    s = new .String
+    s = "123"
+    $I0 = s.to_int(3)
+    print "never"
+.end
+CODE
+/invalid conversion to int - bad char 3/
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', "to_int 3");
+.sub 'main' :main
+    .local pmc s
+    s = new .String
+    s = "123"
+    $I0 = s.to_int(37)
+    print "never"
+.end
+CODE
+/invalid conversion to int - bad base 37/
 OUTPUT

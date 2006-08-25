@@ -651,6 +651,65 @@ Replace every occurrence of C<orig> with C<new>.
     }
 /*
 
+=item C<PMC* to_int(INTVAL base)>
+
+Return the integer equivalent of SELF, which is assumed to be a C<base>
+digit string. The String is assumed to be in an ascii-compatible encoding.
+The String is considered being unsigned, and no I<+> or I<-> chars are
+processed. C<base> has to be within [2..36].
+
+If any chars in the String aren't converted, an exception is thrown.
+
+TODO Currently overflow to BigInt is B<not> handled nor detected.
+
+=cut
+
+*/
+
+    METHOD PMC* to_int(INTVAL base) {
+        PMC* result = pmc_new(INTERP, enum_class_Integer);
+        /* TODO verify encoding */
+        const STRING* me = VTABLE_get_string(INTERP, SELF);
+        const char *start = me->strstart;
+        const char * const end = start + me->bufused;
+
+        UINTVAL i = 0;
+
+        if (base < 2 || base > 36)
+            real_exception(INTERP, NULL, E_ValueError,
+                    "invalid conversion to int - bad base %d", base);
+        while (start < end) {
+            const unsigned char c = *start;
+            int dig;
+
+            if (isdigit(c)) {
+                dig = c - '0';
+                if (dig >= base)
+                    break;
+            }
+            else if (c >= 'a' && c <= 'z') {
+                dig = c - 'a' + 10;
+                if (dig >= base)
+                    break;
+            }
+            else if (c >= 'A' && c <= 'Z') {
+                dig = c - 'A' + 10;
+                if (dig >= base)
+                    break;
+            }
+            else
+                break;
+            i = i * base + dig;
+            ++start;
+        }
+        if (start < end) 
+            real_exception(INTERP, NULL, E_ValueError,
+                    "invalid conversion to int - bad char %c", *start);
+        PMC_int_val(result) = i;
+        return result;
+    }
+/*
+
 =back
 
 =head2 Iterator Interface
