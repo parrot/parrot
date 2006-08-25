@@ -703,7 +703,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
         if (start < end) 
             real_exception(INTERP, NULL, E_ValueError,
                     "invalid conversion to int - bad char %c", *start);
-        PMC_int_val(result) = i;
+        VTABLE_set_integer_native(INTERP, result, i);
         return result;
     }
 /*
