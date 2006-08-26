@@ -312,8 +312,9 @@ my @op_funcs;
 my @op_func_table;
 my @cg_jump_table;
 my $index = 0;
-my ($prev_source, $prev_func_name, $prev_def);
+my ($prev_src, $prev_index);
 
+$prev_src = '';
 foreach my $op ($ops->ops) {
     my $func_name  = $op->func_name($trans);
     my $arg_types  = "$opsarraytype *, Interp *";
@@ -339,14 +340,26 @@ foreach my $op ($ops->ops) {
     $src    =~ s/\bops_addr\b/${bs}ops_addr/g;
 
     if ($suffix =~ /cg/) {
-	push @cg_jump_table, "        &&PC_$index,\n";
+	if ($prev_src eq $src) {
+	    push @cg_jump_table, "        &&PC_$prev_index,\n";
+	}
+	else {
+	    push @cg_jump_table, "        &&PC_$index,\n";
+	}
     }
     elsif ($suffix eq '') {
         push @op_func_table, sprintf("  %-50s /* %6ld */\n",
             "$func_name,", $index);
     }
-    $one_op .= "$definition $comment {\n$src}\n\n";
-    push @op_funcs, $one_op;
+    if ($prev_src eq $src) {
+	push @op_funcs, "$comment\n";
+    }
+    else {
+	$one_op .= "$definition $comment {\n$src}\n\n";
+	push @op_funcs, $one_op;
+	$prev_src = $src if ($suffix eq '_cgp' || $suffix eq '_switch');
+    }
+    $prev_index = $index;
     $index++;
 }
 
