@@ -358,8 +358,8 @@ foreach my $op ($ops->ops) {
 	$one_op .= "$definition $comment {\n$src}\n\n";
 	push @op_funcs, $one_op;
 	$prev_src = $src if ($suffix eq '_cgp' || $suffix eq '_switch');
+	$prev_index = $index;
     }
-    $prev_index = $index;
     $index++;
 }
 
