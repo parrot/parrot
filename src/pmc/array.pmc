@@ -67,57 +67,6 @@ static PMC* retval(Interp *interp, void *ret)
 /*
 
 =item C<static PMC*
-Parrot_Array_get_pmc_ptr(Interp *interp, List *list, INTVAL key)>
-
-Returns the PMC at index C<key> in C<*list>.
-
-=cut
-
-*/
-
-static PMC*
-Parrot_Array_get_pmc_ptr(Interp *interp, List *list, INTVAL key)
-{
-    return retval(interp, list_get(interp, list, key, enum_type_PMC));
-}
-
-/*
-
-=item C<static PMC*
-Parrot_Array_pop_pmc_ptr(Interp *interp, List *list)>
-
-Returns the last PMC in C<*list>.
-
-=cut
-
-*/
-
-static PMC*
-Parrot_Array_pop_pmc_ptr(Interp *interp, List *list)
-{
-    return retval(interp, list_pop(interp, list, enum_type_PMC));
-}
-
-/*
-
-=item C<static PMC*
-Parrot_Array_shift_pmc_ptr(Interp *interp, List *list)>
-
-Returns the first PMC in C<*list>.
-
-=cut
-
-*/
-
-static PMC*
-Parrot_Array_shift_pmc_ptr(Interp *interp, List *list)
-{
-    return retval(interp, list_shift(interp, list, enum_type_PMC));
-}
-
-/*
-
-=item C<static PMC*
 Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)>
 
 Returns a pointer to the element at index C<key> of C<*list>. If
@@ -359,7 +308,7 @@ Returns the integer value of the element at index C<key>.
     INTVAL get_integer_keyed_int (INTVAL key) {
         PMC* value;
 
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List*)PMC_data(SELF), key);
+        value = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_integer(INTERP, value);
     }
 
@@ -374,7 +323,7 @@ Returns the integer value of the element at index C<key>.
     INTVAL type_keyed_int (INTVAL key) {
         PMC* value;
 
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List*)PMC_data(SELF), key);
+        value = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_type(INTERP, value);
     }
 
@@ -416,7 +365,7 @@ Returns the float value of the element at index C<key>.
     FLOATVAL get_number_keyed_int (INTVAL key) {
         PMC* value;
 
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) PMC_data(SELF), key);
+        value = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_number(INTERP, value);
 
     }
@@ -459,7 +408,7 @@ Returns the string value of the element at index C<key>.
     STRING* get_string_keyed_int (INTVAL key) {
         PMC* value;
 
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) PMC_data(SELF), key);
+        value = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_string(INTERP, value);
     }
 
@@ -500,7 +449,7 @@ Returns the PMC value of the element at index C<key>.
 
     PMC* get_pmc_keyed_int (INTVAL key) {
 
-        return Parrot_Array_get_pmc_ptr(INTERP, (List *)PMC_data(SELF), key);
+        return retval(INTERP, list_get(INTERP, (List*)PMC_data(SELF), key, enum_type_PMC));
     }
 
 /*
@@ -890,7 +839,7 @@ Removes and returns an integer from the end of the array.
 */
 
     INTVAL pop_integer () {
-        PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) PMC_data(SELF));
+        PMC *ptr = DYNSELF.pop_pmc();
         return VTABLE_get_integer(INTERP, ptr);
     }
 
@@ -905,7 +854,7 @@ Removes and returns a float value from the end of the array.
 */
 
     FLOATVAL pop_float () {
-        PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) PMC_data(SELF));
+        PMC *ptr = DYNSELF.pop_pmc();
         return VTABLE_get_number(INTERP, ptr);
     }
 
@@ -920,7 +869,7 @@ Removes and returns a string from the end of the array.
 */
 
     STRING* pop_string () {
-        PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) PMC_data(SELF));
+        PMC *ptr = DYNSELF.pop_pmc();
         return VTABLE_get_string(INTERP, ptr);
     }
 
@@ -935,7 +884,7 @@ Removes and returns a PMC from the end of the array.
 */
 
     PMC* pop_pmc () {
-        return Parrot_Array_pop_pmc_ptr(INTERP, (List*) PMC_data(SELF));
+        return retval(INTERP, list_pop(INTERP, (List*)PMC_data(SELF), enum_type_PMC));
     }
 
 /*
@@ -949,7 +898,7 @@ Removes and returns an integer from the start of the array.
 */
 
     INTVAL shift_integer () {
-        PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) PMC_data(SELF));
+        PMC *ptr = DYNSELF.shift_pmc();
         return VTABLE_get_integer(INTERP, ptr);
     }
 
@@ -964,7 +913,7 @@ Removes and returns a float from the start of the array.
 */
 
     FLOATVAL shift_float () {
-        PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) PMC_data(SELF));
+        PMC *ptr = DYNSELF.shift_pmc();
         return VTABLE_get_number(INTERP, ptr);
     }
 
@@ -979,7 +928,7 @@ Removes and returns a string from the start of the array.
 */
 
     STRING* shift_string () {
-        PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) PMC_data(SELF));
+        PMC *ptr = DYNSELF.shift_pmc();
         return VTABLE_get_string(INTERP, ptr);
     }
 
@@ -994,7 +943,7 @@ Removes and returns a PMC from the start of the array.
 */
 
     PMC* shift_pmc () {
-        return Parrot_Array_shift_pmc_ptr(INTERP, (List*) PMC_data(SELF));
+        return retval(INTERP, list_shift(INTERP, (List*)PMC_data(SELF), enum_type_PMC));
     }
 
 /*
