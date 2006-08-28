@@ -1,9 +1,26 @@
-From Pat Eyler:
-Actually, cardinal was not the first Ruby on Parrot attempt
-I wrote a very small subset of Ruby on Parrot called Rabbit in 2000
-at the time, Parrot had no object support, so I was limited to string 
+During the years there were several efforts to bring Ruby to Parrot.
+
+Pat Eyler has made the first attempt.
+In 2000 he wrote a very small subset of Ruby on Parrot and called it Rabbit.
+At the time, Parrot had no object support, so he was limited to string 
 and numeric 'objects' and a small set of operators that posed as methods.
 Sadly, there is no extant copy of the code.
 
-Phil Tomson created the first version of Cardinal.
-http://rubyforge.org/projects/cardinal/
+Then, around 2002, Phil Tomson created the first incarnation of Cardinal. It lived
+as a RubyForge project in http://rubyforge.org/projects/cardinal/.
+At that time Parrot was still very much a moving target 
+and it was deemed by Phil Tomson to be a waste of time to put much effort 
+into Cardinal.
+
+A couple of years ago cardindal was reborn for a time due to the 
+efforts of Mark Sparshatt. But even then Parrot still proved to be too 
+much of a moving target, so not much happened. The fruits of 
+that effort are in http://rubyforge.org/projects/cardinal/.
+
+More recently Kevin Tew asked whether he could use the name Cardinal and Phil Tomson
+graciously accepted. The current incarnation of Cardinal lives in
+https://svn.perl.org/parrot/trunk/languages/cardinal and is based on PGE and TGE.
+
+Sources:
+- http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/207872
+- http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/29982

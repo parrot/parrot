@@ -228,7 +228,7 @@ Only generates PIR for hello world at the moment
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.6
 
 =item Location
 
