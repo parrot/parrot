@@ -224,14 +224,6 @@ Parrot.  The old perl6-internals list forwards to the new one.
 =head2 Pugs is going great shakes - why not just toss Parrot and run
 Perl 6 on Pugs?
 
-Audrey Tang, the lead on the Pugs project, notes that an
-B<unoptimized> Parrot is already 30% faster than the Haskell-based
-interpreter. Add compiler optimization and a few planned optimizations
-and Parrot will beat Pugs for speed hands down.  Audrey thinks that
-Pugs could be made faster with some Haskell compiler tricks, but it's
-harder work and less effective than the Parrot optimizations we
-already know how to do.
-
 Perl 5 is highly portable, and builds on around 50 different systems, many far
 removed from Unix or MS Windows. We'd like Perl 6 to be able run everywhere
 that Perl 5 runs, so we need to keep Parrot as portable as possible.  The
