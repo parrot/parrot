@@ -36,6 +36,7 @@ usage(FILE* fp)
 static void
 help_debug(void)
 {
+    /* split printf for C89 compliance on string length */
     printf(
     "--imcc-debug -d [Flags] ...\n"
     "    0002    lexer\n"
@@ -49,6 +50,8 @@ help_debug(void)
     "    2000    PBC constants\n"
     "    4000    PBC fixups\n"
     "\n"
+    );
+    printf(
     "--parrot-debug -D [Flags] ...\n"
     "    0001    memory statistics\n"
     "    0002    print backtrace on exception\n"
@@ -69,6 +72,7 @@ help_debug(void)
 static void
 help(void)
 {
+    /* split printf for C89 compliance on string length */
     printf(
     "parrot [Options] <file>\n"
     "  Options:\n"
@@ -85,7 +89,8 @@ help(void)
     "    -t --trace [flags]\n"
     "   <VM options>\n"
     "    -D --parrot-debug[=HEXFLAGS]\n"
-    "       --help-debug\n"
+    "       --help-debug\n");
+    printf(
     "    -w --warnings\n"
     "    -G --no-gc\n"
     "       --gc-debug\n"
