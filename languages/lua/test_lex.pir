@@ -18,7 +18,7 @@ C<test_lex> is a dumper for Lua 5.1 lexicography.
 .sub 'main' :main
     .param pmc argv
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Text.pbc'
+    load_bytecode 'PGE/Util.pbc'
     load_bytecode 'languages/lua/src/Lua51TestLex.pbc'
     load_bytecode 'languages/lua/src/LuaDumpLex.pbc'
     .local int argc
@@ -60,22 +60,18 @@ _handler:
 
 .sub 'load_script' :anon
     .param string filename
-    .local pmc fh
+    .local pmc pio
     .local string content
-    fh = open filename, '<'
-    if fh goto L1
+    pio = getclass 'ParrotIO'
+    content = pio.'slurp'(filename)
+    if content goto L1
     $S0 = err
-    print "Can't open '"
+    print "Can't slurp '"
     print filename
     print "' ("
     print $S0
     print ")\n"
-    content = ''
-    goto L2
 L1:
-    content = read fh, 65535
-    close fh
-L2:
     .return (content) 
 .end
 

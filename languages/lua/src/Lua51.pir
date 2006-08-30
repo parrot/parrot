@@ -31,7 +31,7 @@ compiler.
 
 .sub '__onload' :load
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Text.pbc'
+    load_bytecode 'PGE/Util.pbc'
     load_bytecode 'PGE/Dumper.pbc'
     load_bytecode 'dumper.pbc'
 #    load_bytecode 'TGE.pbc'
