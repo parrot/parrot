@@ -141,22 +141,18 @@ L1:
 
 .sub 'load_script'
     .param string filename
-    .local pmc fh
+    .local pmc pio
     .local string content
-    fh = open filename, '<'
-    if fh goto L1
+    pio = getclass 'ParrotIO'
+    content = pio.'slurp'(filename)
+    if content goto L1
     $S0 = err
-    print "Can't open '"
+    print "Can't slurp '"
     print filename
     print "' ("
     print $S0
     print ")\n"
-    content = ''
-    goto L2
 L1:
-    content = read fh, 65535
-    close fh
-L2:
     .return (content) 
 .end
 
