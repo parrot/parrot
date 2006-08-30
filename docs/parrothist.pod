@@ -1,0 +1,87 @@
+=head1 NAME
+
+parrothist - the parrot history records
+
+=head1 DESCRIPTION
+
+This document aims to record the parrot source code releases.
+
+=head1 INTRODUCTION
+
+Parrot history in brief...
+
+... ok, done!
+
+=head1 THE KEEPERS OF THE PUMPKIN
+
+Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg.
+
+=head2 PUMPKIN?
+
+[from Porting/pumpkin.pod in the Perl source code distribution]
+
+Chip Salzenberg gets credit for that, with a nod to his cow orker,
+David Croy.  We had passed around various names (baton, token, hot
+potato) but none caught on.  Then, Chip asked:
+
+[begin quote]
+
+   Who has the patch pumpkin?
+
+To explain:  David Croy once told me once that at a previous job,
+there was one tape drive and multiple systems that used it for backups.
+But instead of some high-tech exclusion software, they used a low-tech
+method to prevent multiple simultaneous backups: a stuffed pumpkin.
+No one was allowed to make backups unless they had the "backup pumpkin".
+
+[end quote]
+
+The name has stuck.  The holder of the pumpkin is sometimes called
+the pumpking (keeping the source afloat?) or the pumpkineer (pulling
+the strings?).
+
+=head1 THE RECORDS
+
+ Pump-  Release         Date            Notes
+ king                                   (by no means
+                                         comprehensive,
+                                         see Changes*
+                                         for details)
+ ===========================================================================
+
+ Simon   0.0.1          2001-Sep-10
+         0.0.2          2001-Oct-05
+         0.0.3          2001-Dec-08
+         0.0.4          2002-Mar-19
+
+ Jeff    0.0.5          2002-Apr-16
+         0.0.6          2002-Jun-04
+         0.0.7          2002-Jul-18
+         0.0.8          2002-Sep-01
+         0.0.8.1        2002-Sep-01
+
+ Steve   0.0.9          2002-Dec-19
+         0.0.10         2003-Mar-16
+         0.0.11         2003-Sep-20
+         0.0.11.2       2003-Sep-22
+
+ Leo     0.0.13         2003-Oct-31
+         0.1.0          2004-Feb-29
+         0.1.1          2004-Oct-09
+         0.1.2          2005-Mar-06
+         0.2.0          2005-May-08
+         0.2.1          2005-Jun-04
+         0.2.2          2005-Jul-03
+         0.2.3          2005-Aug-05
+         0.3.0          2005-Oct-01
+         0.3.1          2005-Nov-06
+         0.4.0          2005-Dec-04
+         0.4.1          2006-Jan-08
+         0.4.2          2006-Feb-22
+         0.4.3          2006-Apr-02
+         0.4.4          2006-May-14
+         0.4.5          2006-Jun-19
+
+ Chip    0.4.6          2006-Aug-08
+
+=cut
