@@ -237,7 +237,7 @@ This does B<not> close the file.
 
     METHOD STRING* slurp(STRING* name) {
         STRING* result;
-        if (PObj_is_class_SET(SELF)) {
+        if (!PMC_data0(SELF)) {
             /* called as class method - open, slurp, close file */
             char * const path = string_to_cstring(interpreter, name);
             INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);

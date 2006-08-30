@@ -770,7 +770,7 @@ EOS
     print pio, $S0
     close pio
     pio2 = open	"temp.file", "<"
-    $S1 = pio2.'slurp'('temp.file')
+    $S1 = pio2.'slurp'('dummy')
     if $S0 == $S1 goto ok
     print "not "
 ok:
