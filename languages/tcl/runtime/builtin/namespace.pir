@@ -228,9 +228,9 @@ global_ns:
   __script = get_root_global ['_tcl'], '__script'
   code     = new 'PGE::CodeString'
   $S0 = join " ", argv
-  ($S0, $I0) = __script($S0, 'pir_only'=>1)
+  ($S0, $S1) = __script($S0, 'pir_only'=>1)
   $I0 = code.unique()
-  code.emit(<<'END_PIR', namespace, $S0, $I0)
+  code.emit(<<'END_PIR', namespace, $S0, $I0, $S1)
 .HLL 'tcl', 'tcl_group'
 .namespace %0
 # src/compiler.pir :: pir_compiler (2)
@@ -243,16 +243,14 @@ global_ns:
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
   interactive = get_root_global ['tcl'], '$tcl_interactive'
   %1
-  .return()
+  .return(%3)
 .end
 END_PIR
   
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
   $P0 = pir_compiler(code)
-  $P0()
-  
-  .return()
+  .return $P0()
 
 bad_args:
   tcl_error 'wrong # args: should be "namespace eval name arg ?arg...?"'
