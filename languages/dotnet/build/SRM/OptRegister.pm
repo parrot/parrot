@@ -85,7 +85,7 @@ sub gen_label() {
     # clear up any lazy moves.
 	my $pir .= <<'PIR';
 ${PTEMP0} = prop_type_state[${PC}]
-if ${PTEMP0} == "" goto NOWT_TO_PROPOGATE
+if null ${PTEMP0} goto NOWT_TO_PROPOGATE
 PIR
     $pir .= _do_lazy_moves('_BDEST');
     $pir .= <<'PIR';

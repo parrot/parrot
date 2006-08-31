@@ -482,7 +482,7 @@ TRANS_LOOP:
     
     # If we have a stack type state propogated here, put it in place.
     ss = ss_propogate[pc]
-    if ss == "" goto NO_SS_PROP
+    if null ss goto NO_SS_PROP
     stypes = ss
 NO_SS_PROP:
 

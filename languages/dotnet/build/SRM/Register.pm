@@ -59,7 +59,7 @@ PIR
 	# that was propogated to this instruction.
 	$pir .= <<'PIR';
 ${PTEMP0} = prop_type_state[${PC}]
-if ${PTEMP0} == "" goto NOWT_TO_PROPOGATE
+if null ${PTEMP0} goto NOWT_TO_PROPOGATE
 stack_depth = prop_stack_depth[${PC}]
 NOWT_TO_PROPOGATE:
 PIR
