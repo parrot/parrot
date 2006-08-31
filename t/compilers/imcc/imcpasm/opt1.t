@@ -3,6 +3,7 @@
 # $Id$
 
 use strict;
+use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 78;
 
 # these tests are run with -O1 by TestCompiler and show

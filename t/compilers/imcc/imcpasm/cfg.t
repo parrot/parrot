@@ -3,6 +3,7 @@
 # $Id$
 
 use strict;
+use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 3;
 
 pir_2_pasm_is(<<'CODE', <<'OUT', "unreachable 1");
