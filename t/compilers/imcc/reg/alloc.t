@@ -3,6 +3,7 @@
 # $Id$
 
 use strict;
+use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 11;
 
 pir_output_is(<<'CODE', <<'OUT', "alligator");
