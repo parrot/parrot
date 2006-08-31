@@ -42,12 +42,6 @@
 #define MAX_TABLE                       0x2B
 
 
-/* Macro for checking if table is present in valid bit vector. */
-#define TablePresent(ass, t)            (t >= 32 ? \
-                                        (ass->valid_hi & (1 << (t - 32))) : \
-                                        (ass->valid_lo & (1 << t)))
-
-
 /* Table row length macros. */
 #define Table_Assembly_RL(ass)          (16 + (2 * ass->strings_ptr_size) + \
                                         ass->blobs_ptr_size)
