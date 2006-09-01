@@ -26,8 +26,9 @@ D: Building on various platforms.
 
 N: Alberto Manuel Brandao Simoes
 E: ambs@cpan.org
-D: Some random patches
+D: Named arguments support and recovery support on PIR parser
 S: Braga, Portugal
+W: http://alfarrabio.di.uminho.pt/~albie/
 
 N: Aldo Calpini
 D: Debugging tutorial
@@ -374,6 +375,9 @@ D: Win32, FreeBSD build fixes
 
 N: Nigelsandever
 D: Win32 patches
+
+N: Nuno Carvalho
+D: Help with PGE debugging
 
 N: OOLLEY kj
 D: Miscellaneous cleanup and PDD07-conformance
