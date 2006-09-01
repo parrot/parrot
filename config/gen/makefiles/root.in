@@ -1310,7 +1310,7 @@ compilers-clean :
 	$(MAKE) compilers/past clean
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
-	
+
 ###############################################################################
 #
 # editors targets:
