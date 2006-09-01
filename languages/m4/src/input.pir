@@ -99,16 +99,12 @@ TODO: open these files and complain when they don't or pass filehandles
   # TODO: this is badly broken, when there are multiple input files
   state['current_file'] = filename
 
-  .local pmc in
-  in = open filename, '<'
-  if in goto PROCESS_SINGLE_FILE
-    printerr filename
-    printerr " not found\n"
-    end
-  PROCESS_SINGLE_FILE:
   .local string input_string    # input file handle
-  input_string = read in, 50000
-  close in
+  .local pmc    pio
+  .local int    is_defined
+
+  pio = new 'ParrotIO'
+  input_string = pio.slurp( filename )
 
   # state['stack';'input'] has been created in input_init 
   # TODO: seperate input blocks for every file
