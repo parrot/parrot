@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 3
+plan 4
 
 eval_is {
  set result ""
@@ -28,3 +28,9 @@ eval_is {
   test
 } {invoked "continue" outside of a loop} \
   {continue outside of a loop}
+
+eval_is {
+  proc test {} {continue}
+  for {set i 0} {$i < 5} {incr i} {test}
+} {invoked "continue" outside of a loop} \
+  {continue in a proc called in a loop}
