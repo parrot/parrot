@@ -2,7 +2,7 @@
 
 source lib/test_more.tcl
 
-plan 3
+plan 4
 
 eval_is {
  for {set a 0} {$a < 20} {incr a} {
@@ -26,3 +26,8 @@ eval_is {
 } {invoked "break" outside of a loop} \
   {break outside of a loop}
 
+eval_is {
+  proc test {} {break}
+  for {set i 0} {$i < 5} {incr i} {test}
+} {invoked "break" outside of a loop} \
+  {break in a proc called in a loop}
