@@ -554,6 +554,7 @@ examples/pge/benchmarks/ambs1/Makefile                      [main]doc
 examples/pge/benchmarks/ambs1/ambs1.pg                      [main]doc
 examples/pge/benchmarks/ambs1/main.pir                      [main]doc
 examples/pge/benchmarks/ambs1/mktestcase                    [main]doc
+examples/pge/grammars/IO.pg                                 [main]doc
 examples/pge/grammars/PatchGrammar.pg                       [main]doc
 examples/pge/grammars/TAP.pg                                [main]doc
 examples/pge/grammars/bc.pg                                 [main]doc

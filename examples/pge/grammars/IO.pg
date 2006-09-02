@@ -1,0 +1,48 @@
+## grammar for the IO language
+## derived from http://www.iolanguage.com/docs/grammar/bnf/
+
+grammar IO;
+
+
+## messages
+token expression { <message> | <sctpad> }
+token message    { <wcpad>* <symbol> <scpad>* <arguments>* }
+token arguments  { <open> [ <argument> [ , <argument> ]* ]* <close> }
+token argument   { <wcpad>* <expression> <wcpad>* }
+
+## symbols
+token symbol     { <identifier> | <number> | <operator> | <quote> }
+token identifier { <':'>? [ <alpha> | <0..9> | <specialchar> ]+
+token specialchar{ <[:.-]> }
+token operator   { <[.'~!@$%^&*-+/={}[]|\<>?]> } #'
+
+## quotes
+token quote      { <monoquote> | <triquote> }
+token monoquote  { <PGE::Text::bracketed: "> }
+token triquote   { <PGE::Text::bracketed: """> }
+
+## spans
+token terminator { <seperator>? ; | \n | \r <seperator>? }
+token seperator  { <[ \f\t\v]> }
+token whitespace { <[ \f\r\t\v\n]> }
+token sctpad     { <seperator> | <comment> | <terminator> }
+token scpad      { <seperator> | <comment> }
+token wcpad      { <whitespace> | <comment> }
+
+## comments
+token comment    { <'/*'> .*? <'*/'>
+                 | <'//'> .*? \n
+                 | <'#'>  .*? \n
+                 }
+
+## numbers
+token number     { <hexnumber> | <decimal> }
+token hexnumber  { 0 <[xX]> <[0..9a..fA..F]>+ }
+token decimal    { \.? <[0..9]>+
+                 | <[0..9]>+ \. <[0..9]>+ [ e \-? <[0..9]> ]?
+                 }
+
+## characters
+token open       { <[\(\[\{]> }
+token close      { <[\)\]\}]> }
+
