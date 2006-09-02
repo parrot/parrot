@@ -1796,3 +1796,9 @@ smokeexec: all
 
 smoke-clean :
 	$(RM_F) smoke.html
+
+#
+# Local variables:
+# mode: makefile
+# End:
+#
