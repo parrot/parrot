@@ -13,6 +13,6 @@ use Parrot::Test tests => 1;
 
 # I am not sure if it is really important to support this, but at
 # least, we should not segfault when it happens :->
-pasm_output_is("print \"Hi\\n\"", <<'OUT', "No new line at end of file");
-Hi
+pasm_output_like("print \"Hi\\n\"", <<'OUT', "No new line at end of file");
+/^error:imcc:syntax error, unexpected EOM, expecting '\\n'/
 OUT
