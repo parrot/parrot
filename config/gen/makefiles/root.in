@@ -1760,7 +1760,7 @@ tags: tags.dummy
 	ctags \
 		--links=no --totals \
 		-R --exclude=blib --exclude=.svn  \
-		--languages=c,perl --langmap=c:+.h,c:+.pmc \
+		--languages=c,perl --langmap=c:+.h,c,l,y:+.pmc \
 		$(CUR_DIR)
 	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_DIR)/*.ops
 
