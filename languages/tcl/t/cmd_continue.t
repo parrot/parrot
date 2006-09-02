@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 2
+plan 3
 
 eval_is {
  set result ""
@@ -23,3 +23,8 @@ eval_is {
  list $a $result
 } {11 567891011} {continue from while}
 
+eval_is {
+  proc test {} {continue}
+  test
+} {invoked "continue" outside of a loop} \
+  {continue outside of a loop}
