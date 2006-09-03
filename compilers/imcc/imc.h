@@ -133,13 +133,17 @@ typedef enum {
 /* globals XXX */
 PARROT_API EXTERN int        line;	/* and line */
 
+#define PARROT_MAX_RECOVER_ERRORS 40 /* this is the number of times
+                                      * parrot will try to retry while
+                                      * compiling. */
+
 EXTERN enum {
-	OPT_NONE,
-	OPT_PRE,
-	OPT_CFG = 	0x002,
-	OPT_SUB = 	0x004,
-	OPT_PASM =      0x100,
-	OPT_J = 	0x200
+    OPT_NONE,
+    OPT_PRE,
+    OPT_CFG  = 0x002,
+    OPT_SUB  = 0x004,
+    OPT_PASM = 0x100,
+    OPT_J    = 0x200
 } enum_opt;
 
 /*
@@ -149,13 +153,13 @@ EXTERN enum {
  * XXX: Should this be part of the imc_info struct?
  */
 struct imcc_ostat {
-	int deleted_labels;
-	int if_branch;
-	int branch_branch;
-  int branch_cond_loop;
-	int invariants_moved;
-	int deleted_ins;
-	int used_once;
+    int deleted_labels;
+    int if_branch;
+    int branch_branch;
+    int branch_cond_loop;
+    int invariants_moved;
+    int deleted_ins;
+    int used_once;
 } ;
 
 EXTERN struct imcc_ostat ostat;

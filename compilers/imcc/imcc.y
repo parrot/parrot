@@ -29,16 +29,17 @@
 #define YYERROR_VERBOSE 1
 
 /*
- * we use a pure parser with the interpreter as a parameter
- * this still doesn't make the parser reentrant, there are too
- * many globals around.
- * These globals should go into one structure, which could be
- * attached to the interpreter
+ * we use a pure parser with the interpreter as a parameter this still
+ * doesn't make the parser reentrant, there are too many globals
+ * around.
+ *
+ * These globals should go into one structure, which could be attached
+ * to the interpreter
  */
 
 /*
- * Choosing instructions for Parrot is pretty easy since
- * many are polymorphic.
+ * Choosing instructions for Parrot is pretty easy since many are
+ * polymorphic.
  */
 
 
@@ -61,8 +62,6 @@ static int keyvec;
 static SymReg *regs[IMCC_MAX_STATIC_REGS];
 static int nargs;
 static int cnr;
-
-
 
 /*
  * MK_I: build and emitb instruction by INS
@@ -461,6 +460,7 @@ do_loadlib(Interp *interp, char *lib)
 %nonassoc CONCAT DOT
 %nonassoc  <t> POINTY
 
+ /* %locations */
 %pure_parser
 
 /* Note that we pass interp last, because Bison only passes
@@ -481,7 +481,7 @@ do_loadlib(Interp *interp, char *lib)
 %%
 
 program:
-     compilation_units                  { $$ = 0; }
+     compilation_units                  { if (yynerrs) YYABORT; $$ = 0; }
    ;
 
 compilation_units:
@@ -548,12 +548,12 @@ global:
 
 constdef:
      CONST { is_def=1; } type IDENTIFIER '=' const
-                { mk_const_ident(interp, $4, $3, $6, 1);is_def=0; }
+                { mk_const_ident(interp, $4, $3, $6, 1); is_def=0; }
    ;
 
 pmc_const:
      CONST { is_def=1; } INTC var_or_i '=' any_string
-                { $$ = mk_pmc_const(interp, cur_unit, $3, $4, $6);is_def=0; }
+                { $$ = mk_pmc_const(interp, cur_unit, $3, $4, $6); is_def=0; }
    ;
 any_string: 
      STRINGC 
@@ -566,11 +566,11 @@ pasmcode:
    ;
 
 pasmline:
-     labels  pasm_inst '\n'            { $$ = 0; }
-   | MACRO '\n'                        { $$ = 0; }
-   | FILECOMMENT                       { $$ = 0; }
-   | LINECOMMENT                       { $$ = 0; }
-   | class_namespace  { $$ = $1; }
+     labels  pasm_inst '\n'            { $$ = 0;  }
+   | MACRO '\n'                        { $$ = 0;  }
+   | FILECOMMENT                       { $$ = 0;  }
+   | LINECOMMENT                       { $$ = 0;  }
+   | class_namespace                   { $$ = $1; }
    | pmc_const
    | pragma
    ;
@@ -742,12 +742,8 @@ sub_body:
    ;
 
 pcc_sub:
-     PCC_SUB       { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
-     IDENTIFIER
-         {
-            iSUBROUTINE(interp, cur_unit, mk_sub_label(interp, $3));
-
-         }
+     PCC_SUB        { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
+     IDENTIFIER     { iSUBROUTINE(interp, cur_unit, mk_sub_label(interp, $3)); }
      sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
      sub_params
      sub_body  ESUB { $$ = 0; cur_call = NULL; }
@@ -1004,10 +1000,18 @@ label:
                    }
    ;
 
+
+
 instruction:
-      labels labeled_inst '\n'
+     labels labeled_inst '\n'
                    { $$ = $2; }
-    ;
+   | error '\n'
+                   { if (yynerrs >= PARROT_MAX_RECOVER_ERRORS) {
+                           IMCC_warning(interp, "Too much errors. Correct some first.\n");
+                           YYABORT;
+                       }
+                       yyerrok; } 
+   ;
 
 id_list : 
      id_list_id
@@ -1109,10 +1113,10 @@ classname:
    ;
 
 assignment:
-     target '=' var		{ $$ = MK_I(interp, cur_unit, "set", 2, $1, $3); }
-   | target '=' '!' var	{ $$ = MK_I(interp, cur_unit, "not", 2, $1, $4);}
-   | target '=' '-' var	{ $$ = MK_I(interp, cur_unit, "neg", 2, $1, $4);}
-   | target '=' '~' var	{ $$ = MK_I(interp, cur_unit, "bnot", 2, $1, $4);}
+     target '=' var		{ $$ = MK_I(interp, cur_unit, "set", 2, $1, $3);      }
+   | target '=' '!' var	        { $$ = MK_I(interp, cur_unit, "not", 2, $1, $4);      }
+   | target '=' '-' var	        { $$ = MK_I(interp, cur_unit, "neg", 2, $1, $4);      }
+   | target '=' '~' var	        { $$ = MK_I(interp, cur_unit, "bnot", 2, $1, $4);     }
    | target '=' var '+' var	{ $$ = MK_I(interp, cur_unit, "add", 3, $1, $3, $5);  }
    | target '=' var '-' var	{ $$ = MK_I(interp, cur_unit, "sub", 3, $1, $3, $5);  }
    | target '=' var '*' var	{ $$ = MK_I(interp, cur_unit, "mul", 3, $1, $3, $5);  }
@@ -1165,12 +1169,12 @@ assignment:
                         { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
    | target '=' ADDR IDENTIFIER
                         { $$ = MK_I(interp, cur_unit, "set_addr",
-                            2, $1, mk_label_address(interp, $4)); }
+                                    2, $1, mk_label_address(interp, $4)); }
    | target '=' GLOBALOP string
                         { $$ = MK_I(interp, cur_unit, "find_global",2,$1,$4);}
    | GLOBALOP string '=' var
                         { $$ = MK_I(interp, cur_unit, "store_global",2, $2,$4); }
-       /* NEW and is here because it is both PIR and PASM keywords so we
+       /* NEW is here because it is both PIR and PASM keywords so we
         * have to handle the token here (or badly hack the lexer). */
    | NEW target COMMA var
                         { $$ = MK_I(interp, cur_unit, "new", 2, $2, $4); }
@@ -1444,7 +1448,7 @@ reg:
    | NREG          {  $$ = mk_symreg(interp, $1, 'N'); }
    | SREG          {  $$ = mk_symreg(interp, $1, 'S'); }
    | PREG          {  $$ = mk_symreg(interp, $1, 'P'); }
-   | REG           {  $$ = mk_pasm_reg(interp, $1); }
+   | REG           {  $$ = mk_pasm_reg(interp, $1);    }
    ;
 
 const:
@@ -1456,23 +1460,49 @@ const:
 
 string:
      SREG          {  $$ = mk_symreg(interp, $1, 'S'); }
-   | STRINGC       {  $$ = mk_const(interp, $1, 'S'); }
+   | STRINGC       {  $$ = mk_const(interp, $1, 'S');  }
    ;
 
 
 /* The End */
 %%
 
+/* I need this prototype somewhere... */
+char *yyget_text (yyscan_t yyscanner );
+
+/* I do not like this function, but, atm, it is the only way I can
+ * make the code in yyerror work without segfault on some specific
+ * cases.
+ */
+int yyholds_char(yyscan_t yyscanner );
 
 int yyerror(void *yyscanner, Interp *interp, char * s)
 {
-    UNUSED(yyscanner);
-    /* support bison 1.75, convert 'parse error to syntax error' */
-    if (!memcmp(s, "parse", 5))
-        IMCC_fataly(interp, E_SyntaxError, "syntax%s", s+5);
-    else
-        IMCC_fataly(interp, E_SyntaxError, s);
-    /* fprintf(stderr, "last token = [%s]\n", yylval.s); */
+    /* If the error occurr in the end of the buffer (I mean, the last
+     * token was already read), yyget_text will return a pointer
+     * outside the bison buffer, and thus, not "accessible" by
+     * us. This means it may segfault. */
+    char *chr = yyget_text((yyscan_t)yyscanner);
+
+    /* IMCC_fataly(interp, E_SyntaxError, s); */
+    /* --- This was called before, not sure if I should call some
+           similar function that does not die like this one. */
+
+
+    /* Basically, if current token is a newline, it mean the error was
+     * before the newline, and thus, line is the line *after* the
+     * error.  
+     */
+    if (yyholds_char(yyscanner) && *chr == '\n') {
+        --line;
+        IMCC_warning(interp, "error:imcc:%s", s);
+        IMCC_print_inc(interp);
+        ++line;
+    } else {
+        IMCC_warning(interp, "error:imcc:%s", s);
+        IMCC_print_inc(interp);
+    }
+
     return 0;
 }
 

@@ -3731,7 +3731,7 @@ case 116:
 YY_RULE_SETUP
 #line 393 "compilers/imcc/imcc.l"
 {
-        int c;
+    int c;
 
     c = yylex(valp,yyscanner,interp);
     if (c != STRINGC) return c;
@@ -5315,7 +5315,7 @@ yylex_skip (YYSTYPE *valp, void *interp, const char *skip, void *yyscanner)
 
 static char*
 read_braced (YYSTYPE *valp, void *interp, const char *macro_name,
-    char *current, void *yyscanner)
+             char *current, void *yyscanner)
 {
     int c, count, len;
     YYSTYPE val;
@@ -5762,9 +5762,9 @@ IMCC_print_inc(Interp *interp)
 
     UNUSED(interp);
     if (frames && frames->is_macro)
-        fprintf(stderr, "\nin macro '.%s' line %d\n", frames->s.file, line);
+        fprintf(stderr, "\n\tin macro '.%s' line %d\n", frames->s.file, line);
     else
-        fprintf(stderr, "\nin file '%s' line %d\n", frames->s.file, line);
+        fprintf(stderr, "\n\tin file '%s' line %d\n", frames->s.file, line);
     old = frames->s.file;
     for (f = frames; f; f = (struct macro_frame_t *)f->s.next) {
         if (strcmp(f->s.file, old)) {
@@ -5790,9 +5790,15 @@ FILE* imc_yyin_get(void *yyscanner)
 	return(yyg->yyin_r);
 }
 
+int yyholds_char(yyscan_t yyscanner)
+{
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
+    return yyg->yy_hold_char != '\0';
+}
 
 /*
  * Local variables:
+ * mode: c
  * c-indentation-style: bsd
  * c-basic-offset: 4
  * indent-tabs-mode: nil

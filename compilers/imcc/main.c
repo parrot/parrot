@@ -638,7 +638,12 @@ main(int argc, char * argv[])
             IMCC_INFO(interp)->state->pasm_file = pasm_file;
             IMCC_TRY(IMCC_INFO(interp)->jump_buf, 
                      IMCC_INFO(interp)->error_code) {
-                yyparse(yyscanner, (void *) interp);
+                int retval;
+                retval = yyparse(yyscanner, (void *) interp);
+                if (retval) {
+                    /* fprintf(stderr, "** Parsing failed **\n"); */
+                    exit(1);
+                }
                 imc_compile_all_units(interp);
             }
             IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
