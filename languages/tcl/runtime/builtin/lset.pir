@@ -25,7 +25,6 @@
   .local pmc retval, list
   list = __read(name)
   list = __list(list)
-  __set(name, list)
   retval = list
 
   # we removed the value, so this would be one now
@@ -72,6 +71,7 @@ loop:
 
 done:
   prev[$I2] = value
+  __set(name, retval)
   .return(retval)
 
 out_of_range:
