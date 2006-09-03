@@ -1474,7 +1474,7 @@ char *yyget_text (yyscan_t yyscanner );
  * make the code in yyerror work without segfault on some specific
  * cases.
  */
-int yyholds_char(yyscan_t yyscanner );
+/* int yyholds_char(yyscan_t yyscanner ); */
 
 int yyerror(void *yyscanner, Interp *interp, char * s)
 {
@@ -1493,7 +1493,7 @@ int yyerror(void *yyscanner, Interp *interp, char * s)
      * before the newline, and thus, line is the line *after* the
      * error.  
      */
-    if (yyholds_char(yyscanner) && *chr == '\n') {
+    if (!at_eof(yyscanner) && *chr == '\n') {
         --line;
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);

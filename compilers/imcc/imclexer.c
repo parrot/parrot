@@ -5790,10 +5790,11 @@ FILE* imc_yyin_get(void *yyscanner)
 	return(yyg->yyin_r);
 }
 
-int yyholds_char(yyscan_t yyscanner)
+/* return true if scanner is at EOF */
+int at_eof(yyscan_t yyscanner) 
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    return yyg->yy_hold_char != '\0';
+    return yyg->yy_hold_char == '\0';
 }
 
 /*
