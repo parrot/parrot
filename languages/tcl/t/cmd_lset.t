@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 11
+plan 12
 
 eval_is {
   set a a
@@ -51,6 +51,12 @@ eval_is {
 eval_is {
   set a "a b c d"
   lset a end--1 e
+} {list index out of range} \
+  {list index out of range}
+
+eval_is {
+  set a "a b c d"
+  lset a -1 e
 } {list index out of range} \
   {list index out of range}
 

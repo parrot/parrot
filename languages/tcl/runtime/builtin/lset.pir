@@ -58,6 +58,7 @@ loop:
 
   $P0 = indices[$I0]
   $I2 = __index($P0, list)
+  if $I2 < 0 goto out_of_range
   $I3 = elements list
   if $I2 >= $I3 goto out_of_range
 
