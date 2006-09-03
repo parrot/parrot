@@ -41,12 +41,12 @@ L<http://www.cliff.biffle.org/esoterica/hq9plus.html>
     .local string code_fn
     code_fn = shift argv
 
-    # Get the input as a string, don't care about buffer overflow yet
-    .local pmc code_fh
-    code_fh = open code_fn, '<'
+    # Get the input as a string and keep copy for 'Q'
+    .local pmc pio
     .local string code_string, code_string_orig
-    code_string = read code_fh, 1000
-    concat code_string_orig, code_string
+    pio = new 'ParrotIO'
+    code_string_orig = pio.slurp( code_fn )
+    concat code_string, code_string_orig
 
     .local int accumulator
 
