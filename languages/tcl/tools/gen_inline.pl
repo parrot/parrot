@@ -400,7 +400,7 @@ sub inlined_body {
         # locals
         if (%locals) {
             my $locals = join '|', keys %locals;
-            $line =~ s/\b($locals)\b/$1_%0/g;
+            $line =~ s/\b($locals)\b(?!['"])/$1_%0/g; #'
         }
 
         # args
