@@ -62,7 +62,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'test_no_args');
 	obj = new [ "Testing" ; "Test" ]
 	obj.test_no_args()
     $P0 = new Integer
-    $P0 = find_global [ "Testing" ; "Test" ], "x"
+    $P0 = get_hll_global [ "Testing" ; "Test" ], "x"
 	print $P0
 	print "\n"
 .end
@@ -78,7 +78,7 @@ is (run_pir(<<'PIR'), <<'OUTPUT', 'test_args');
 	obj = new [ "Testing" ; "Test" ]
 	obj.test_args(10)
     $P0 = new Integer
-    $P0 = find_global [ "Testing" ; "Test" ], "y"
+    $P0 = get_hll_global [ "Testing" ; "Test" ], "y"
 	print $P0
 	print "\n"
 .end

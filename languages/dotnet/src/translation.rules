@@ -1425,7 +1425,7 @@ ${STEMP1} = method_call_mmd_box(${ASSEMBLY}, ${PTEMP2}, ${PARAMS})
 ${INS} = concat ${STEMP1}
 
 # Need to get class the method is in to generate name to look it up.
-${INS} = concat "$P1000000 = find_global "
+${INS} = concat "$P1000000 = get_hll_global "
 ${STEMP0} = namespace_to_key(${STEMP0})
 ${INS} = concat ${STEMP0}
 ${INS} = concat ", \""
@@ -1586,7 +1586,7 @@ ${INS} = concat "$P1000000 = new "
 ${PTEMP1} = ${DTYPES}[0]
 ${STEMP0} = ${PTEMP1}["reg_type_pmc"]
 ${INS} = concat ${STEMP0}
-${INS} = concat "\n$P1000000 = find_global "
+${INS} = concat "\n$P1000000 = get_hll_global "
 ${STEMP1} = namespace_to_key(${STEMP1})
 ${INS} = concat ${STEMP1}
 ${INS} = concat ", \""
@@ -1658,7 +1658,7 @@ ${STEMP0} = ${PTEMP1}["reg_type_pmc"]
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\n$P1000000 = "
 ${INS} = concat ${STACK0}
-${INS} = concat "\nstore_global "
+${INS} = concat "\nset_hll_global "
 ${INS} = concat ${STEMP1}
 ${INS} = concat ", \""
 ${STEMP0} = ${PTEMP0}
@@ -1689,7 +1689,7 @@ ${INS} = concat ${STEMP0}
 ${INS} = concat "\n"
 
 # Now emit instructions to find constructor.
-${INS} = concat "$P1000000 = find_global "
+${INS} = concat "$P1000000 = get_hll_global "
 ${INS} = concat ${STEMP0}
 ${INS} = concat ", \""
 ${STEMP0} = ${PTEMP0}
@@ -2823,7 +2823,7 @@ pir = <<PIR
 (${PTEMP0}, ${ITEMP0}, ${STEMP1}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
 
 # Build attribute access.
-${INS} = concat "$P1000000 = find_global "
+${INS} = concat "$P1000000 = get_hll_global "
 ${STEMP1} = namespace_to_key(${STEMP1})
 ${INS} = concat ${STEMP1}
 ${INS} = concat ", \""

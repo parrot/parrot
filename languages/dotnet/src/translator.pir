@@ -183,7 +183,7 @@ CEND:
     src = pir_output
     entry_meth = assembly.get_entry_method()
     entry_class = entry_meth.get_class()
-	pir_output = ".sub __ENTRY_POINT\n__DO_IMPORTS()\n$P0 = find_global \""
+	pir_output = ".sub __ENTRY_POINT\n__DO_IMPORTS()\n$P0 = get_hll_global \""
     tmp = entry_class.get_fullname()
     pir_output = concat tmp
     pir_output = concat "\", \""
@@ -319,7 +319,7 @@ FEND:
 
     # Add code to run constructor.
     pir_output = concat "push_eh FAILED\n"
-    pir_output = concat "$P0 = find_global "
+    pir_output = concat "$P0 = get_hll_global "
     tmp = namespace_to_key(internal_name)
     pir_output = concat tmp
     pir_output = concat ", \".cctor\"\n$P0()\n"

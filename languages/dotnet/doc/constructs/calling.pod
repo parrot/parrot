@@ -68,7 +68,7 @@ hold the return value, then a call to the method "factorial" in the class
 "Test" in the namespace "Testing" will translate to Parrot instructions as
 shown below.
 
-  $P1000000 = find_global "Testing.Test", "factorial"
+  $P1000000 = get_hll_global "Testing.Test", "factorial"
   $I0 = $P1000000($P1, $I2)
 
 =head3 The "callvirt" Instruction
