@@ -1,0 +1,33 @@
+[lrange list:list first last]
+
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
+
+  .local int from, to
+  from = __index($first, $list)
+  to   = __index($last,  $list)
+
+  if from < 0 goto set_first
+have_first:
+  $I0 = elements $list
+  if $I0 < to goto set_last
+
+  goto have_indices
+
+set_first:
+  from = 0
+  goto have_first
+
+set_last:
+  to = $I0 - 1
+
+have_indices:
+  $I0 = from
+  $R  = new .TclList
+loop:
+  if $I0 > to goto end
+  $P0 = $list[$I0]
+  push $R, $P0
+  inc $I0
+  goto loop
+end:
