@@ -1,10 +1,13 @@
 [for start:script test:expr next:script command:script]
 
+  .local pmc __boolean
+  __boolean = get_root_global ['_tcl'], '__boolean'
   $start
 loop:
-  $I0 = $test
+  $P0 = $test
+  $I0 = __boolean($P0)
   unless $I0 goto done
-  push_eh exception
+  push_eh command_exception
     $command
   clear_eh
 continue:
@@ -13,7 +16,7 @@ continue:
   clear_eh
   goto loop
   
-exception:
+command_exception:
   .catch()
   .get_return_code($I0)
   if $I0 == TCL_CONTINUE goto continue

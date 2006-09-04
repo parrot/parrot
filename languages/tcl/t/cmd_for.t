@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 9
+plan 10
 
 eval_is {
  set r ""
@@ -26,6 +26,10 @@ eval_is {
 
 is [for {set i 1} {$i < 4} {incr i} {}] {} \
   {[for] returns ''}
+
+eval_is {for {} {"foo"} {} {}} \
+  {expected boolean value but got "foo"} \
+  {boolean test}
 
 eval_is {for} \
   {wrong # args: should be "for start test next command"} \

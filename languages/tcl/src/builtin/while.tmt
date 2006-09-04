@@ -1,7 +1,10 @@
 [while test:expr command:script]
 
+  .local pmc __boolean
+  __boolean = get_root_global ['_tcl'], '__boolean'
 while_loop:
-  $I0 = $test
+  $P0 = $test
+  $I0 = __boolean($P0)
   unless $I0 goto while_loop_done
   
   push_eh while_loop_exception

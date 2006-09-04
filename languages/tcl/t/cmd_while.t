@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 5
+plan 6
 
 eval_is {while} \
   {wrong # args: should be "while test command"} \
@@ -14,6 +14,10 @@ eval_is {while we} \
 eval_is {while we wait outside} \
   {wrong # args: should be "while test command"} \
   {while too many args}
+
+eval_is {while {"foo"} {}} \
+  {expected boolean value but got "foo"} \
+  {boolean test}
 
 eval_is {
   set a 3
