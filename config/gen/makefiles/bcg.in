@@ -1,7 +1,8 @@
 RM_F		    = @rm_f@
 PERL		    = @perl@
 PARROT	    	= @build_dir@/parrot@exe@
-LIBPARROT       = @build_dir@/libparrot@a@
+#CONDITIONED_LINE(win32):LIBPARROT = @build_dir@/libparrot@a@
+#INVERSE_CONDITIONED_LINE(win32):LIBPARROT = @blib_dir@/libparrot@a@
 O		        = @o@
 LOAD_EXT	    = @load_ext@
 CC         	    = @cc@
