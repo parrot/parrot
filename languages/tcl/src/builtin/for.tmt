@@ -8,7 +8,9 @@ loop:
     $command
   clear_eh
 continue:
-  $next
+  push_eh exception
+    $next
+  clear_eh
   goto loop
   
 exception:
