@@ -19,8 +19,9 @@ sub runstep
             $libs =~ s/-ldl//;
         }
     }
-
-    $ccflags .= " -pipe -fno-common -Wno-long-double ";
+	
+	$ldflags .= " -L".$conf->data->get('build_dir')."/blib/lib";
+	$ccflags .= " -pipe -fno-common -Wno-long-double ";
     $ccflags =~ s/-flat_namespace\s*//;
     $ldflags =~ s/-flat_namespace\s*//;
     $ldflags .= " -flat_namespace ";

@@ -1,27 +1,25 @@
-RM_F		= @rm_f@
-PERL		= @perl@
+RM_F		    = @rm_f@
+PERL		    = @perl@
 PARROT	    	= @build_dir@/parrot@exe@
-O		= @o@
-LOAD_EXT	= @load_ext@
-CC         	= @cc@
-CC_INC     	= @cc_inc@ -I@build_dir@/include
-C_LIBS     	= @libs@ 
-CC_SHARED  	= @cc_shared@
-CFLAGS     	= $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
+O		        = @o@
+LOAD_EXT	    = @load_ext@
+CC         	    = @cc@
+CC_INC     	    = @cc_inc@ -I@build_dir@/include
+C_LIBS     	    = @libs@ 
+CC_SHARED  	    = @cc_shared@
+CFLAGS     	    = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
 LINK_DYNAMIC  	= @link_dynamic@
-LINK       	= @link@
-LINKFLAGS  	= @linkflags@ @link_debug@ @ld_debug@ 
-LD         	= @ld@
-LDFLAGS    	= @ldflags@ @ld_debug@ -L@build_dir@/blib/lib/ -lparrot
+LINK       	    = @link@
+LINKFLAGS  	    = @linkflags@ @link_debug@ @ld_debug@ 
+LD         	    = @ld@
+LDFLAGS    	    = @ldflags@ @ld_debug@ -L@build_dir@/blib/lib/ -lparrot
 SHARE_EXT       = @share_ext@
 LD_SHARE_FLAGS  = @ld_share_flags@
-
 BUILD_PMC   	= $(PERL) @build_dir@/tools/build/dynpmc.pl
-SRC_PMC_DIR	= src/pmc
+SRC_PMC_DIR	    = src/pmc
 DEST_PMC_DIR	= @build_dir@/runtime/parrot/dynext
 PMC_GROUP       = $(DEST_PMC_DIR)/bcg_group$(LOAD_EXT)
 LIB_BCG         = @build_dir@/blib/lib/libbcg$(SHARE_EXT)
-
 SRC_DIR         = src
 INCLUDE_DIR     = include
 
