@@ -206,9 +206,20 @@ file_error:
   .get_severity($I0)
   .include 'except_severity.pasm'
   if $I0 == .EXCEPT_EXIT goto exit_exception
+  .get_return_code($I0)
+  if $I0 == TCL_CONTINUE goto continue_outside_loop
+  if $I0 == TCL_BREAK    goto break_outside_loop
   .get_stacktrace($S0)
   print $S0
-  end 
+  end
+
+continue_outside_loop:
+  print "invoked \"continue\" outside of a loop\n"
+  end
+
+break_outside_loop:
+  print "invoked \"break\" outside of a loop\n"
+  end
 
 exit_exception:
   .rethrow() 
