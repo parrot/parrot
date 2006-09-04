@@ -101,6 +101,11 @@ sub makefiles
         replace_slashes                         => 1,
     );
     genfile(
+        'config/gen/makefiles/json.in'          => 'compilers/json/Makefile',
+        commentType                             => '#',
+        replace_slashes                         => 1
+    );
+    genfile(
         'config/gen/makefiles/dynpmc.in'        => 'src/dynpmc/Makefile',
         commentType                             => '#',
         replace_slashes                         => 1,

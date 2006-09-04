@@ -1,0 +1,27 @@
+PERL    = @perl@
+PARROT  = ../../parrot@exe@
+
+PGE_DIR  = ../../compilers/pge
+TGE_DIR  = ../../compilers/tge
+
+all: JSON.pbc
+
+.SUFFIXES :
+.SUFFIXES : .pir .pg .tg .pbc
+
+.tg.pir :
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
+
+.pg.pir :
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=$@ $<
+
+.pir.pbc :
+    $(PARROT) --output=$@ $<
+
+# specify this directly because make doesn't dig into deps...
+.pg.pbc :
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=$*.pir $<
+	$(PARROT) --output=$@ $*.pir
+
+clean :
+	@rm_f@ JSON.pbc JSON.pir
