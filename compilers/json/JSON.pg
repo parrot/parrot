@@ -4,9 +4,9 @@ grammar JSON;
 
 token object { \{ <members>?  \} }
 token array  { \[ <elements>? \] }
-token string { "<char>*" }
+token string { "    <char>*   "  }
 
-token members { <string> : <thing> [, <string> : <thing> ] * }
+token members { <string> \: <thing> [, <string> \: <thing> ]* }
 
 token elements { <thing> [, <thing> ] * }
 
@@ -21,7 +21,7 @@ token thing {
   | true
   | false
   | null
-  | <PGE::Util::die 'not a valid JSON value'>
+  | <?PGE::Util::die 'not a valid JSON value'>
 }
 
 # XXX Doesn't handle the "or-control" atm.
@@ -32,8 +32,8 @@ token char {
 }
 
 
-token number { 
- -? 
+token number {
+ -?
  [ <[0..9]> | <[1..9]> <[0..9]>+]
  [ \. <[0..9]>+ ]?
  [ <[Ee]> <[+\-]>? <[0..9]>+ ]?
