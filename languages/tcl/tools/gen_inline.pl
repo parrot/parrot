@@ -31,6 +31,7 @@ variable name, integer, channel, list, string, script, and expressions.
 # helper conversion subroutines
 our %conversions = (
     # type     subroutine
+    bool    => '__boolean',
     channel => '__channel',
     expr    => '__expr',
     int     => '__integer',
@@ -91,7 +92,7 @@ sub parse_usage {
     my $usage = shift;
     
     my @results;
-    my $types = join '|', qw(int string var list channel script expr);
+    my $types = join '|', keys %conversions;
     my $type  = qr{
         (\??)             # literal, optional ?
 
