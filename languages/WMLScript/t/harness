@@ -35,7 +35,13 @@ use lib '..';
 use Cwd();
 use Data::Dumper;
 use File::Spec;
+use Getopt::Long;
 use Test::Harness();
+
+my $opt_files;
+GetOptions(
+    'files' => \$opt_files,
+);
 
 my $language = 'WMLScript';
 
@@ -46,7 +52,7 @@ unless ($has_compiler) {
     warn "You need the WMLScript compiler in your path to build the test assemblies.\n";
 }
 
-if ( grep {m/^--files$/} @ARGV ) {
+if ($opt_files) {
 
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
