@@ -20,22 +20,22 @@ ident but not keywords
     .param pmc mob
     .param pmc params :slurpy
     
-    .local pmc kw
-    push_eh H1
-    kw = get_hll_global 'keyword'
-    clear_eh
-    goto L1
-H1:
-    kw = _const_keyword()
-    set_hll_global 'keyword', kw
-L1:
-
     .local pmc ident
     ident = get_hll_global ['PGE::Match'], 'ident'
     mob = ident(mob, params)
 
     $I0 = mob.'__get_bool'()
     unless $I0 goto L2
+    .local pmc kw
+    push_eh H1
+    kw = get_hll_global 'keyword'
+    $I0 = kw        # heisenbug ???
+    clear_eh
+    goto L1
+H1:
+    kw = _const_keyword()
+    set_hll_global 'keyword', kw
+L1:
     $S0 = mob.'text'()
     $I0 = exists kw[$S0]
     unless $I0 goto L2

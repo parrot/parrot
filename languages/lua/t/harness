@@ -41,29 +41,32 @@ use lib '..';
 use Cwd();
 use Data::Dumper;
 use File::Spec;
+use Getopt::Long;
 use Test::Harness();
 
 my $language = 'lua';
 
-if ( grep {m/^--files$/} @ARGV ) {
+my $opt_files;
+my ($use_orig_lua, $use_monkey, $use_lua2pir);
+GetOptions(
+    'files' => \$opt_files,
+    'use-lua' => \$use_orig_lua,
+    'use-monkey' => \$use_monkey,
+    'use-lua2pir' => $use_lua2pir, 
+);
+
+if ( $opt_files ) {
 
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
-    push @files, glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
+    my @files = glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
+    push @files, glob( File::Spec->catfile( $dir, '*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
 }
 else {
     my @files;
 
-    # TODO: use Getopt::Long or such
-    my $use_orig_lua = ( grep {m/^--use-lua$/} @ARGV )     ? 1 : 0;
-    my $use_monkey   = ( grep {m/^--use-monkey$/} @ARGV )  ? 1 : 0;
-    my $use_lua2pir  = ( grep {m/^--use-lua2pir$/} @ARGV ) ? 1 : 0;
-    @ARGV = grep { !m/^--use-lua$/ } @ARGV;
-    @ARGV = grep { !m/^--use-monkey$/ } @ARGV;
-    @ARGV = grep { !m/^--use-lua2pir$/ } @ARGV;
     if ( scalar(@ARGV) ) {
 
         # Someone specified tests for me to run.
