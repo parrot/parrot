@@ -1,0 +1,41 @@
+# From http://www.json.org/
+
+grammar JSON;
+
+rule object { \{ <members>?  \} }
+rule array  { \[ <elements>? \] }
+rule string { "    <char>*   "  }
+
+rule members { <string> : <thing> [, <string> : <thing> ] * }
+
+rule elements { <thing> [, <thing> ] * }
+
+# XXX This should be called 'value', but...
+# RT#40069: [PGE] "value" can't be used as a rule name.
+
+rule thing {
+  | <string>
+  | <number>
+  | <object>
+  | <array>
+  | true
+  | false
+  | null
+  | <PGE::Util::die 'not a valid JSON value'>
+}
+
+# XXX Doesn't handle the "or-control" atm.
+rule char {
+  <-[\\"]>
+}
+
+#| <-["\]>
+#| \\ <["\\/bfnrt]>
+#| \u <[0..9a..fA..F]>**{4}
+
+rule number { 
+ -? 
+ [ <[0..9]> | <[1..9]> <[0..9]>+]
+ [ \. <[0..9]>+ ]?
+ [ <[Ee]> <[+\-]>? <[0..9]>+ ]?
+}
