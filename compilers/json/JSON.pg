@@ -2,22 +2,22 @@
 
 grammar JSON;
 
-rule object { \{ <members>?  \} }
-rule array  { \[ <elements>? \] }
-rule string { "    <char>*   "  }
+token object { \{ <members>?  \} }
+token array  { \[ <elements>? \] }
+token string { "<char>*" }
 
-rule members { <string> : <thing> [, <string> : <thing> ] * }
+token members { <string> : <thing> [, <string> : <thing> ] * }
 
-rule elements { <thing> [, <thing> ] * }
+token elements { <thing> [, <thing> ] * }
 
 # XXX This should be called 'value', but...
 # RT#40069: [PGE] "value" can't be used as a rule name.
 
-rule thing {
-  | <string>
-  | <number>
+token thing {
   | <object>
   | <array>
+  | <string>
+  | <number>
   | true
   | false
   | null
@@ -25,15 +25,14 @@ rule thing {
 }
 
 # XXX Doesn't handle the "or-control" atm.
-rule char {
-  <-[\\"]>
+token char {
+  | \\<["\\/bfnrt]>
+  | \\u<[0..9a..fA..F]>**{4}
+  | <-[\\"]>
 }
 
-#| <-["\]>
-#| \\ <["\\/bfnrt]>
-#| \u <[0..9a..fA..F]>**{4}
 
-rule number { 
+token number { 
  -? 
  [ <[0..9]> | <[1..9]> <[0..9]>+]
  [ \. <[0..9]>+ ]?
