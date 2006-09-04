@@ -95,10 +95,11 @@ sub makefiles
         commentType                             => '#',
         replace_slashes                         => 1
     );
-	genfile(
+    genfile(
         'config/gen/makefiles/bcg.in'     		=> 'compilers/bcg/Makefile',
         commentType                             => '#',
         replace_slashes                         => 1,
+        conditioned_lines                       => 1
     );
     genfile(
         'config/gen/makefiles/json.in'          => 'compilers/json/Makefile',
