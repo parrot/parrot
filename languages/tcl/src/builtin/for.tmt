@@ -8,7 +8,7 @@ loop:
     $command
   clear_eh
 continue:
-  push_eh exception
+  push_eh next_exception
     $next
   clear_eh
   goto loop
@@ -18,6 +18,12 @@ exception:
   .get_return_code($I0)
   if $I0 == TCL_CONTINUE goto continue
   if $I0 == TCL_BREAK    goto done
+  .rethrow()
+
+next_exception:
+  .catch()
+  .get_return_code($I0)
+  if $I0 == TCL_BREAK goto done
   .rethrow()
 
 done:
