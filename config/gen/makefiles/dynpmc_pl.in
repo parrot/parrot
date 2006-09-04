@@ -51,6 +51,7 @@ our $PMC2C = "$PERL $PATHQUOTE" . q[@build_dir@@slash@tools@slash@build@slash@pm
 sub compile_cmd {
     my ($target, $source) = @_;
 
+    # XXX Reference to BGC - need long term solution for passing in include paths
     return
         "$CC $CFLAGS " .
         '@cc_o_out@' . $target . " " .
@@ -74,6 +75,9 @@ sub partial_link_cmd {
         $extraLibs =~ s/blib/..\\blib/g;
         $extraLibs =~ s/\Q$(A)\E/.lib/g;
         $liblist .= ' ' . $extraLibs;
+        
+        # Also note that we may need to look in the Parrot blib directory.
+        $liblist .= qq{ /LIBPATH:"@build_dir@/blib/lib"};
     } else {
         $liblist = join( ' ', map { "-l$_" } keys %$libs );
     }
@@ -182,6 +186,11 @@ sub gather_groups_and_libs {
  
         # there can be many libs
         my %libs = %{ $class->{flags}{lib} || {} };
+        if ($^O eq 'MSWin32') {
+            my %newlibs = ();
+            $newlibs{"lib$_"} = $libs{$_} for keys %libs;
+            %libs = %newlibs;
+        }
         $pmc_libs{$pmc} = \%libs;
 
         # There should be at most a single group

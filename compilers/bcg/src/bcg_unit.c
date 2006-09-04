@@ -1,5 +1,4 @@
 #include <string.h>
-#include "parrot/parrot.h"
 #include "bcg.h"
 #include "bcg_private.h"
 #include "bcg_logger.h"

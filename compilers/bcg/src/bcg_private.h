@@ -1,7 +1,6 @@
 #ifndef PARROT_BCG_PRIVATE_H_GUARD
 #define PARROT_BCG_PRIVATE_H_GUARD
 
-#include "parrot/parrot.h"
 #include "bcg.h"
 #include "bcg_utils.h"
 

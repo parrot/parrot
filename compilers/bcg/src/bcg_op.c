@@ -1,8 +1,7 @@
 #include <ctype.h>
 #include <string.h>
-#include "parrot/parrot.h"
-#include "bcg_private.h"
 #include "bcg.h"
+#include "bcg_private.h"
 
 bcg_op_arg *
 bcg_op_arg_create(BCG_info * bcg_info, char *name, bcg_op_arg_type type,
