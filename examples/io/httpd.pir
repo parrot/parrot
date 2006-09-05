@@ -7,25 +7,59 @@ examples/io/httpd.pir - HTTP server
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/io/httpd.pir
+  $ ./parrot examples/io/httpd.pir
 
 =head1 DESCRIPTION
 
 A very tiny HTTP-Server. It currently only understands the GET method.
-It's a nice way of testing pretty much all io functions.
+It's a nice way of testing pretty much all IO functions.
+By default (and not yet configurable) it binds to localhost:1234. 
 
-By default it binds to localhost:1234, and serves the HTML Documentation
+=head2 Serving Parrot Docs
+
+If no filename is given it serves the HTML documentation
 in ./docs/html. Make sure you have built them with
 
-    % make html
+  $ make html
 
 After that you can browse the documentation with
 
-    http://localhost:1234
+  http://localhost:1234
 
 which redirects to
 
-    http://localhost:1234/docs/html/index.html
+  http://localhost:1234/docs/html/index.html
+
+=head2 Serving Other HTML Files
+
+If a html file is present in the request, this file will be served:
+
+  http://localhost:1234/index.html
+
+This will sent F<./index.html> from the directory, where F<httpd.pir>
+was started.
+
+=head2 CGI
+
+If the file extension is C<.pir> or C<.pbc>, this file will be loaded
+below the directory F<cgi-pir> and the function C<cgi_main> will be
+invoked with the query as an argument. 
+This functions should return a plain string, which will be sent to the
+browser.
+
+TODO specifiy the argument to F<cgi_main>.
+
+  $ cat cgi-pir/foo.pir
+  .sub cgi_main
+    # .param pmc query		# TODO  
+    .return ("<p>foo</p>")      # in practice use a full <html>doc</html>
+  .end
+
+The browser request:  
+
+  http://localhost:1234/foo.pir?q=no_yet
+
+will serve, whatever the C<cgi_main> function returned.
 
 =head1 TODO
 
@@ -60,6 +94,7 @@ The code was heavily hacked by bernhard and leo.
     .local string doc_root
     doc_root = "."
 
+    # TODO provide sys/socket constants
     socket sock, 2, 1, 6	# PF_INET, SOCK_STREAM, tcp
     unless sock goto ERR_NO_SOCKET
 
@@ -68,6 +103,7 @@ The code was heavily hacked by bernhard and leo.
     port = 1234
     address = sockaddr port, "localhost"
     ret = bind sock, address
+    if ret == -1 goto ERR_bind
     $S0 = port
     print "Running webserver on port "
     print $S0
@@ -131,6 +167,9 @@ SERVE_REQ:
     goto NEXT
 
 SERVE_GET:
+    .local int is_cgi
+    (is_cgi, file_content, len) = check_cgi(url)
+    if is_cgi goto SERVE_blob
     # decode the url
     url = urldecode(url)
 
@@ -149,8 +188,11 @@ SERVE_file:
     fp = open url, "<"
     unless fp goto SERVE_404
     len = stat url, .STAT_FILESIZE
-
     read file_content, fp, len
+
+SERVE_blob:
+    # TODO make more subs
+    # takes: file_content, len
     rep = "HTTP/1.x 200 OK"
     rep .= CRLF
     rep .= "Server: Parrot-httpd/0.1"
@@ -161,6 +203,7 @@ SERVE_file:
     rep .= CRLFCRLF
     rep .= file_content
     send ret, work, rep
+    # TODO provide a log method
     print "served file '"
     print url
     print "'\n"
@@ -210,6 +253,9 @@ ERR_NO_SOCKET:
     print "Could not open socket.\n"
     print "Did you enable PARROT_NET_DEVEL in include/io_private.h?\n"
     end
+ERR_bind:
+    print "bind failed\n"
+    # fall through
 END:
     close sock
     end
@@ -266,8 +312,47 @@ END:
    .return( out )
 .end
 
-
 .sub hex_to_int
     .param pmc hex
     .return hex.'to_int'(16)
 .end
+
+.sub check_cgi
+    .param string url
+    $I0 = index url, ".pir"
+    if $I0 > 0 goto cgi_1
+    $I0 = index url, ".pbc"
+    if $I0 > 0 goto cgi_1
+    .return (0, '', 0)
+cgi_1:
+    # file.pir?foo=1+bar=2
+    $I0 = index url, '?'
+    if $I0 == -1 goto no_query
+    .local string file, query
+    file = substr url, 0, $I0
+    inc $I0
+    query = substr url, $I0
+    # TODO split into a hash, then decode parts
+    query = urldecode(query)
+    goto have_query
+no_query:
+    file = url
+    query = ''
+have_query:
+    # escape %
+    file = urldecode(file)
+    print "CGI: '"
+    print file
+    print "' Q: '"
+    print query
+    print "'\n"
+    file = "cgi-pir/" . file
+    # TODO stat the file
+    load_bytecode file
+    .local string result
+    # TODO catch ex
+    result = 'cgi_main'(query)
+    $I0 = length result
+    .return (1, result, $I0)
+.end
+
