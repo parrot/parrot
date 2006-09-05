@@ -27,20 +27,17 @@ which redirects to
 
     http://localhost:1234/docs/html/index.html
 
-Currently the URL isn't decoded, so the docs get served only partially.
-
-Make sure that C<PARROT_NET_DEVEL> is set to 1 in F<io/io_private.h> when
-parrot is built or the network layer won't exist.
-
 =head1 TODO
 
 make it work on W32/IE
 
-Transcode the received string to ascci, in order to have access to an implemented 'index' op.
+Transcode the received string to ascci, in order to have access to an
+implemented 'index' op.
 
 =head1 AUTHOR
 
-Markus Amsler - <markus.amsler@oribi.org> 
+Original author is Markus Amsler - <markus.amsler@oribi.org> 
+The code was heavily hacked by bernhard and leo.
 
 =cut
 
@@ -63,14 +60,21 @@ Markus Amsler - <markus.amsler@oribi.org>
     .local string doc_root
     doc_root = "."
 
-    socket sock, 2, 1, 0
+    socket sock, 2, 1, 6	# PF_INET, SOCK_STREAM, tcp
     unless sock goto ERR_NO_SOCKET
 
     # Pack a sockaddr_in structure with IP and port
-    address = sockaddr 1234, "localhost"
+    .local int port
+    port = 1234
+    address = sockaddr port, "localhost"
     ret = bind sock, address
-    print "Running webserver on port 1234 of localhost.\n"
-    print "The Parrot documentation can now be accessed at http://localhost:1234 .\n"
+    $S0 = port
+    print "Running webserver on port "
+    print $S0
+    print " of localhost.\n"
+    print "The Parrot documentation can now be accessed at http://localhost:"
+    print $S0
+    print "\n"
     print "Be sure that the HTML docs have been generated with 'make html'.\n"
 
 NEXT:
@@ -111,11 +115,11 @@ SERVE_REQ:
 # split is not implemented, so parse it the old way
 # GET the method and file
     index occ1, req, " "
-    add occ1, occ1, 1
+    inc occ1
     index occ2, req, " ", occ1
-    sub len, occ1, 1
+    len = occ1 - 1
     substr meth, req, 0, len
-    sub len, occ2, occ1
+    len = occ2 - occ1
     substr url, req, occ1, len
 
     if meth == "GET" goto SERVE_GET
@@ -220,12 +224,12 @@ END:
     .local int rest
     ret = ""
 NEXT_CHAR:
-    mod rest, n, 10
-    sub n, n, rest
-    div n, n, 10
-    add rest, 48, rest
+    rest = n % 10
+    n -= rest
+    n /= 10
+    rest += 48
     chr char, rest
-    concat ret, char, ret
+    ret .= char
     if n > 0 goto NEXT_CHAR
 
     .return( ret )
@@ -248,15 +252,15 @@ START:
     char_out = char_in
     if char_in != "%" goto INC_IN
     # OK this was a escape character, next two are hexadecimal
-    add pos_in, 1, pos_in
+    inc pos_in
     substr hex, in, pos_in, 2
     c_out = hex_to_int (hex)
     chr char_out, c_out
-    add pos_in, 1, pos_in
+    inc pos_in
 
 INC_IN:
     concat out, char_out
-    add pos_in, 1, pos_in
+    inc pos_in
     goto START
 END:
    .return( out )
@@ -264,41 +268,6 @@ END:
 
 
 .sub hex_to_int
-    .param string hex
-
-    hex = upcase hex
-
-    .local int len, num_offset, chr_offset, result
-
-    num_offset = ord '0', 0
-    chr_offset = ord 'A', 0
-
-    len = length hex
-
-    result = 0
-    $I0 = 0
-  LOOP:
-    unless $I0 < len goto RETURN
-    $I1 = ord hex, $I0
-    if $I1 < chr_offset goto HAVE_NUMBER
-
-  HAVE_CHAR:
-    $I1 -= chr_offset
-    $I1 += 10
-    goto CALC
-
-  HAVE_NUMBER:
-    $I1 -= num_offset
-
-  CALC:
-    result *= 16
-    result += $I1
-    inc $I0
-
-    goto LOOP
-
-  RETURN:
-    print result
-    print "\n"
-    .return(result)
+    .param pmc hex
+    .return hex.'to_int'(16)
 .end
