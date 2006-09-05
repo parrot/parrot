@@ -276,19 +276,17 @@ use "XXX", else use the external bug tracking system.
 =head2 Smart Editor Style Support
 
 All developers using Emacs must ensure that their Emacs instances load the
-elisp source file F<tools/dev/parrot.el> before opening Parrot source files.
-This may be done by adding this line to F<.emacs>:
+elisp source file F<editor/parrot.el> before opening Parrot source files.
+See L<editor/README.pod> for instructions.
 
-    (load-file "/<path-to-parrot>/tools/dev/parrot.el")
-
-All source files must end with an editor instruction block:
+All source files must end with an editor instruction coda:
 
 =over 4
 
 =item *
 
 C source files, and files largely consisting of C (e.g. yacc, lex, PMC, and
-opcode source files), must end with this block:
+opcode source files), must end with this coda:
 
    /*
     * Local variables:
@@ -299,7 +297,7 @@ opcode source files), must end with this block:
 
 =item *
 
-Perl source files must end with this block:
+Perl source files must end with this coda:
 
     # Local Variables:
     #   mode: cperl

@@ -28,12 +28,33 @@ your vimrc.
 =head2 Kate
 
 There is a syntax file for the KDE editor Kate, but it is not built by default.
- make imc.kate
+Run:
+
+   make imc.kate
+
 in C<editor/> to build it.
 
 TODO: How do we install Kate syntax files?
 
 =head2 Emacs
+
+=over 4
+
+=item * Editing the Parrot VM source
+
+In this directory is a F<parrot.el> describing the c-mode and cperl-mode
+changes modifications required to edit the Parrot source code.  To install
+the Parrot mode support copy C<parrot.el> to a directory where Emacs looks
+for external packages and add the following to your C<~/.emacs> file:
+
+    (load "parrot")
+
+Alternatively, if you're an active Parrot developer, you may wish to add
+this to your .emacs instead, to automatically track future changes:
+
+    (load-file "/<path-to-parrot>/editor/parrot.el")
+
+=item * Editing PASM source files
 
 Included here is an Emacs mode for editing pasm files, in C<pasm.el>.
 
@@ -57,6 +78,8 @@ Additionally, you might want to add:
 
 to C<~/.emacs> as this seems to prevent the odd behavior that is noted when 
 using tabs in the pasm mode.
+
+=back
 
 =head2 TAGS file
 
