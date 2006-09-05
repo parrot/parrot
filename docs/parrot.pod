@@ -23,9 +23,6 @@ points are:
 An introductory article on what Parrot is and how to do some interesting things
 with it.
 
-(Note that this was originally written around the time of Parrot v0.0.2, and is
-in need of some updating).
-
 =item F<overview.pod>
 
 An overview of the Parrot architecture and design.

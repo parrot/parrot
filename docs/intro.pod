@@ -196,7 +196,7 @@ contains the C<end> instruction, which causes the interpreter to terminate.
 We can modify hello.pir to first store the string C<Hello world!\n> in a
 register and then use that register with the print instruction.
 
-  .sub _main
+  .sub main :main
       set S0, "Hello world!\n"
       print S0
       end
@@ -207,7 +207,7 @@ replacing C<S0> with C<$S0> we can delegate the choice of which
 register to use to Parrot.  It is also possible to use an C<=>
 notation instead of writing the C<set> instruction.
 
-  .sub _main
+  .sub main :main
       $S0 = "Hello world!\n"
       print $S0
       end
@@ -216,7 +216,7 @@ notation instead of writing the C<set> instruction.
 To make PIR even more readable, named registers can be used. These are later
 mapped to real numbered registers.
 
-  .sub _main
+  .sub main :main
       .local string hello
       hello = "Hello world!\n"
       print hello
@@ -251,7 +251,7 @@ replacing them with a label at the start of the instructions.
 This example introduces some more instructions and PIR syntax. Lines starting
 with a C<#> are comments.
 
-  .sub _main
+  .sub main :main
       # State the number of squares to sum.
       .local int maxnum
       maxnum = 10
@@ -315,7 +315,7 @@ programming is one place where using goto is not bad form!
 In this example we define a factorial function and recursively call it to
 compute factorial.
 
-  .sub _fact
+  .sub fact
       # Get input parameter.
       .param int n
 
@@ -328,7 +328,7 @@ compute factorial.
 
   recurse:
       $I0 = n - 1
-      result = _fact($I0)
+      result = fact($I0)
       result *= n
 
   return:
@@ -336,13 +336,13 @@ compute factorial.
   .end
 
 
-  .sub _main :main
+  .sub main :main
       .local int f, i
 
       # We'll do factorial 0 to 10.
       i = 0
   loop:
-      f = _fact(i)
+      f = fact(i)
 
       print "Factorial of "
       print i
@@ -357,12 +357,6 @@ compute factorial.
       end
   .end
 
-Let's look at the C<_fact> sub first. A point that was glossed over earlier is
-why the names of subroutines all start with an underscore. This is done simply
-as a way of showing that the label is global rather than scoped to a particular
-subroutine. This is significant as the label is then visible to other
-subroutines.
-
 The first line, C<.param int n>, specifies that this subroutine takes one
 integer parameter and that we'd like to refer to the register it was passed in
 by the name C<n> for the rest of the sub.
@@ -370,7 +364,7 @@ by the name C<n> for the rest of the sub.
 Much of what follows has been seen in previous examples, apart from the line
 reading:
 
-  result = _fact($I0)
+  result = fact($I0)
 
 This single line of PIR actually represents quite a few lines of PASM. First,
 the value in register C<$I0> is moved into the appropriate register for it to
