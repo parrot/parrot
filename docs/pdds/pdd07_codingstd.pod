@@ -3,12 +3,8 @@
 
 =head1 NAME
 
-docs/pdds/pdd07_codingstd.pod - Conventions and Guidelines for Parrot Source  
+docs/pdds/pdd07_codingstd.pod - Conventions and Guidelines for Parrot Source
 Code
-
-=head1 VERSION
-
-$Revision$
 
 =head1 ABSTRACT
 
@@ -23,63 +19,21 @@ newcomers, due to such things as inconsistent or obscure variable naming
 conventions, lack of comments in the source code, and so on.  We don't intend
 to make the same mistake when writing Parrot. Hence this document.
 
-We define three classes of conventions:
+We define three classes of conventions. Those that say I<must> are mandatory,
+and code will not be accepted (apart from in exceptional circumstances) unless
+it follows these rules. Those that say I<should> are strong guidelines that
+should normally be followed unless there is a sensible reason to do otherwise. 
+Finally, those that say I<may>, are tentative suggestions to be used at your
+discretion.
 
-=over 4
-
-=item I<"must">
-
-Items labelled I<must> are mandatory; and code will not be accepted (apart
-from in exceptional circumstances) unless it obeys them.
-
-=item I<"should">
-
-Items labelled I<should> are strong guidelines that should normally be
-followed unless there is a sensible reason to do otherwise.
-
-=item I<"may">
-
-Items labelled I<may> are tentative suggestions to be used at your discretion.
-
-=back
-
-Note that since Parrot is substantially implemented in C, these rules apply to
-C language source code unless otherwise specified.
+Note this particular PDD makes some recommendations that are specific to the C
+programming language. This does not preclude Parrot  (or Perl 6) being
+implemented in other languages, but in this case,  additional PDDs may need to
+be authored for the extra language-specific  features.
 
 =head1 IMPLEMENTATION
 
-
-=head2 Language Standards and Portability
-
-=over 4
-
-=item *
-
-C code must generally depend on only those language and library features
-specified by the ISO C89 standard.
-
-In addition, C code may assume that any pointer value can be coerced to an
-integral type (no smaller than typedef C<INTVAL> in Parrot), then back to its
-original type, without loss.
-
-C code that makes assumptions beyond these must depend on the configuration
-system, either to not compile an entire non-portable source where it will not
-work, or to provide an appropriate #ifdef macro.
-
-{{ TODO: Enumerate all other non-C89 assumptions that Parrot depends on. }}
-
-=item *
-
-Perl code must be written for Perl 5.6.1 and all later versions.
-
-Perl code may use features not available in Perl 5.6.1 only if it is not vital
-to Parrot, and if it uses C<$^O> and C<$]> to degrade or fail gracefully when
-it is run where the features it depends on are not available.
-
-=back
-
-
-=head2 Code Formatting
+=head2 Coding style
 
 The following I<must> apply:
 
@@ -87,167 +41,81 @@ The following I<must> apply:
 
 =item *
 
-Source line width is limited to 100 characters.  Exceptions can be made for
-technical requirements, but not for style reasons.  And please bear in mind
-that very long lines I<can> be hard to read.
+4 column indents for code and 2 column indents for nested CPP #directives. All
+indentation must consist of spaces, no tabs (for ease of patching).
+
+There are two exceptions to the CPP indenting- neither PARROT_IN_CORE nor the
+outermost _GUARD #ifdefs cause the level of indenting to increase.
+
+To ensure that tabs aren't inadvertently used for indentation, the following
+boilerplate code must appear at the bottom of each source file. (This rule may
+be rescinded if I'm ever threatened with a lynching....)
+
+   /*
+    * Local variables:
+    * c-indentation-style: bsd
+    * c-basic-offset: 4
+    * indent-tabs-mode: nil
+    * End:
+    *
+    * vim: expandtab shiftwidth=4:
+    */
+
 
 =item *
 
-Indentation must consist only of spaces.  (Tab characters just complicate
-things.)
+Any other tabs are assumed to be on an 8-character boundary.
 
 =item *
 
-C and Perl code must be indented four columns per nesting level.
+ANSI C function prototypes
 
 =item *
 
-Preprocessor #directives must be indented two columns per nesting level, with
-two exceptions: neither PARROT_IN_CORE nor the outermost _GUARD #ifdefs cause
-the level of indenting to increase.
+"K&R" style for indenting control constructs: ie the closing C<}> should line
+up with the opening C<if> etc.
 
 =item *
 
-Labels (including case labels) must be outdented two columns relative to the
-code they label.
+When a conditional spans multiple lines, the opening C<{> must line up with the
+C<if> or C<while>, or be at the end-of-line otherwise.
 
 =item *
 
-Closing braces for control structures must line up vertically with the start
-of the control structures; e.g. C<}> that closes an C<if> must line up with the
-C<if>.
+Uncuddled C<else>s: ie avoid  C<} else {>
 
 =item *
 
-Long lines, when split, must use at least one extra level of indentation on
-the continued line.
+C-style comments only (C</* comment */>).  Not all C compilers handle
+C++-style comments.
 
 =item *
 
-Cuddled C<else>s are forbidden: i.e. avoid  C<} else {> .
+Mark places that need to be revisited with XXX (and preferably your initials
+too), and revisit often!
+
+=item *
+
+In function definitions, the name starts in column 0, with the return type on
+the previous line.
+
+=item *
+
+However, in function declarations (in header files) the return type is kept on
+the same line.
+
+=item *
+
+Variable names should be included for all function parameters in the function
+declarations.  These names should match the parameters in the function
+definition.
+
+=item *
+
+Single space after keywords that are followed by C<()>, eg C<return (x+y)*2>,
+but no space between function name and following C<()>, eg C<z = foo(x+y)*2>
 
 =back
-
-
-The following I<should> apply:
-
-=over 4
-
-=item *
-
-In function definitions, the function name must be on the left margin, with
-the return type on the previous line.
-
-=item *
-
-In function declarations (e.g. in header files), the function name must be on
-the same line as the return type.
-
-=item *
-
-There should be one space between C keywords and following open parentheses,
-e.g. C<return (x+y)*2>.
-
-There should be no space between function names and following open parentheses,
-e.g. C<z = foo(x+y)*2>
-
-=item *
-
-Use patterns of formatting to indicate patterns of semantics.  Similar items
-should look similar, as the language permits.  Note that some dimensions of
-similarity are incidental, not worth emphasizing; e.g. "these are all ints".
-
-=item *
-
-Binary operators (except C<.> and C<< -> >>) should have at least one space on
-either side; there should be no space between unary operators and their
-operands; parentheses should not have space immediately after the opening
-parenthesis nor immediately before the closing parenthesis; commas should have
-at least one space after, but not before; e.g.:
-
-        x = (a-- + b) * f(c, d / e.f)
-
-=item *
-
-Use vertical alignment for clarity of parallelism.  Compare this (bad):
-
-     foo = 1 + 100;
-     x = 100 + 1;
-     whatever = 100 + 100;
-
-... to this (good):
-
-     foo      =   1 + 100;
-     x        = 100 +   1;
-     whatever = 100 + 100;
-
-=item *
-
-Do not routinely put single statements in statement blocks.
-
-(Note that formatting consistency trumps this rule.  For example, a long
-C<if>/C<else if> chain is easier to read if all (or none) of the conditional
-code is in blocks.)
-
-=item *
-
-Return values should not be parenthesized without need.  It may be necessary
-to parenthesize a long return expression so that a smart editor will properly
-indent it.
-
-{{ TODO: Modify parrot.el so this rule is no longer required. }}
-
-=item *
-
-When assignming inside a conditional, use extra parentheses,
-e.g. C<if (a && (b = c)) ...> or C<if ((a = b)) ...>.
-
-=item *
-
-When splitting a long line at a binary operator (other than comma), the split
-should be I<before> the operator, so that the continued line looks like one.
-
-=item *
-
-When splitting a long line inside parentheses (or brackets), the continuation
-should be indented to the right of the innermost unclosed punctuation, e.g.:
-
-    z = foo(bar + baz(something_very_long_here
-                       * something_else_very_long),
-            corge);
-
-=back
-
-
-=head2 Code Structure
-
-The following I<must> apply:
-
-=over 4
-
-=item *
-
-C code must use C-style comments only, i.e. C</* comment */>.  (Not all C
-compilers handle C++-style comments.)
-
-=item *
-
-All functions must have prototypes in scope at the point of use.  Prototypes
-for extern functions must appear only in header files.  If static functions
-are defined before use, their definitions serve as prototypes.
-
-=item *
-
-Parameters in function prototypes must be named.  These names should match the
-parameters in the function definition.
-
-=item *
-
-Variable names must be included for all function parameters in the function
-declarations.
-
-=back
-
 
 The following I<should> apply
 
@@ -255,74 +123,212 @@ The following I<should> apply
 
 =item *
 
-Avoid double negatives, e.g. C<#ifndef NO_FEATURE_FOO>.
+Do not exceed 79 columns
 
 =item *
 
-Do not compare directly against NULL, 0, or FALSE.  Instead, write a boolean
-test, e.g. C<if (!foo) ...>.
-
-(Note: C<PMC*> values should be checked for nullity with the C<PMC_IS_NULL>
-macro, unfortunately leading to violations of the double-negative rule.)
+C<return foo;> rather than C<return (foo);>
 
 =item *
 
-Avoid dependency on "FIXME" and "TODO" labels; if a bug must be fixed soon,
-use "XXX", else use the external bug tracking system.
+C<if (!foo) ...> rather than C<if (foo == FALSE) ...> etc.
+
+=item *
+
+Avoid assignments in conditionals, but if they're unavoidable, use Extra paren,
+e.g. C<if (a && (b = c)) ...>
+
+=item *
+
+Avoid double negatives, eg C<#ifndef NO_FEATURE_FOO>
+
+=item *
+
+Binary operators should have a space on either side; parentheses should not
+have space immediately after the opening paren nor immediately before the
+closing paren, commas should have space after but not before, eg
+
+        x = (a + b) * f(c, d / e)
+
+=item *
+
+Long lines should be split before an operator so that it is immediately obvious
+when scanning the LHS of the code that this has happened, and two extra levels
+of indent should be used.
+
+=item *
+
+and/or split on matching parens, with the content on separate line(s) and with
+one extra indent:
+
+    do_arbitrary_function(
+        list_of_parameters_with_long_names, or_complex_subexpression(
+            of_more_params, or_expressions + 1
+        )
+    );
 
 =back
 
+To enforce the spacing, indenting, and bracing guidelines mentioned above, the
+following arguments to GNU Indent should be used:
 
-=head2 Smart Editor Style Support
+   -kr -nce -sc -cp0 -l79 -lc79 -psl -nut -cdw -ncs -lps
 
-All developers using Emacs must ensure that their Emacs instances load the
-elisp source file F<tools/dev/parrot.el> before opening Parrot source files.
-This may be done by adding this line to F<.emacs>:
+This expands out to:
 
-    (load-file "/<path-to-parrot>/tools/dev/parrot.el")
+=over
 
-All source files must end with an editor instruction block:
+=item -nbad
 
-=over 4
+Do not force blank lines after declarations.
 
-=item *
+=item -bap
 
-C source files, and files largely consisting of C (e.g. yacc, lex, PMC, and
-opcode source files), must end with this block:
+Force blank lines after procedure bodies.
 
-   /*
-    * Local variables:
-    *   c-file-style: "parrot"
-    * End:
-    * vim: expandtab shiftwidth=4:
-    */
+=item -bbo
 
-=item *
+Prefer to break long lines before boolean operators.
 
-Perl source files must end with this block:
+=item -nbc
 
-    # Local Variables:
-    #   mode: cperl
-    #   cperl-indent-level: 4
-    #   fill-column: 100
-    # End:
-    # vim: expandtab shiftwidth=4:
+Do not force newlines after commas in declarations
+
+=item -br
+
+Put braces on line with if, etc.
+
+=item -brs
+
+Put braces on struct declaration line.
+
+=item -c33
+
+Put comments to the right of code in column 33 (not recommended)
+
+=item -cd33
+
+Put declaration comments to the right of code in column 33
+
+=item -ncdb
+
+Do not put comment delimiters on blank lines.
+
+=item -nce
+
+Do not cuddle } and else.
+
+=item -cdw
+
+Do cuddle do { } while.
+
+=item -ci4
+
+Continuation indent of 4 spaces
+
+=item -cli0
+
+Case label indent of 0 spaces
+
+=item -ncs
+
+Do not put a space after a cast operator.
+
+=item -d0
+
+Set indentation of comments not to the right of code to 0 spaces.
+
+=item -di1
+
+Put declaration variables 1 space after their types
+
+=item -nfc1
+
+Do not format comments in the first column as  normal.
+
+=item -nfca
+
+Do not format any comments
+
+=item -hnl
+
+Prefer to break long lines at the position of newlines in the input.
+
+=item -i4
+
+4-space indents
+
+=item -ip0
+
+Indent parameter types in old-style function definitions by 0 spaces.
+
+=item -l79
+
+maximum line length for non-comment lines is 79 spaces.
+
+=item -lc79
+
+maximum line length for comment lines is 79 spaces.
+
+=item -lp
+
+maximum line length for non-comment lines is 79 spaces.
+
+=item -npcs
+
+Do not put a space after the function in function calls.
+
+=item -nprs
+
+Do not put a space after every ´(´ and before every ´)´.
+
+=item -saf
+
+Put a space after each for.
+
+=item -sai
+
+Put a space after each if.
+
+=item -saw
+
+Put a space after each while.
+
+=item -sc
+
+Put the `*´ character at the left of comments.
+
+=item -nsob
+
+Do not swallow optional blank lines.
+
+=item -nss
+
+Do not force a space before the semicolon  after  certain statements
+
+=item -nut
+
+Use spaces instead of tabs.
+
+=item -lps
+
+Leave space between `#´ and preprocessor directive.
+
+=item -psl
+
+Put the type of a procedure on the line before its name. (.c files), or
+
+=item -npsl
+
+Leave a procedure declaration's return type alone (.h files)
 
 =back
 
-{{ XXX - Proper formatting and syntax coloring of C code under Emacs requires
-that Emacs know about typedefs.  We should provide a simple script to update a
-list of typedefs, and parrot.el should read it or contain it. }}
+Please note that it is also necessary to include all typedef types with the
+"-T" option to ensure that everything is formatted properly.
 
-
-
-=head2 CHIP HAS EDITED THIS FAR INTO THE FILE
-
-  +-------------------------------------------------------+
-    Everything below this point must still be reviewed
-  +-------------------------------------------------------+
-
-
+A script (F<tools/dev/run_indent.pl>) is provided which runs F<indent> 
+properly automatically.
 
 =head2 Naming conventions
 
@@ -900,6 +906,8 @@ Daniel Grisinger. The section on naming conventions grew from some suggestions
 by Paolo Molaro <lupus@lettere.unipd.it>. Other snippets came from various
 P5Pers. The rest of it is probably my fault.
 
+=head1 VERSION
+
 =head2 CURRENT
 
    Maintainer: Dave Mitchell <davem@fdgroup.com>
@@ -919,9 +927,4 @@ Based on an earlier draft which covered only code comments.
 
 None. First version
 
-=cut
 
-# Local Variables:
-#   fill-column:78
-# End:
-# vim: expandtab shiftwidth=4:
