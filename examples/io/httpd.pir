@@ -31,8 +31,8 @@ which redirects to
 
 make it work on W32/IE
 
-Transcode the received string to ascci, in order to have access to an
-implemented 'index' op.
+Transcode the received string to ascii, in order to have access to an
+implemented 'index' op. Or just use unicode instead.
 
 =head1 AUTHOR
 
