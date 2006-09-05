@@ -63,3 +63,10 @@ pmclass TclString
         return 0; /* XXX Throw exception about invalid boolean type. */
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+*/

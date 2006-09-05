@@ -69,3 +69,10 @@ pmclass TclObject dynpmc group tcl_group {
         PMC_str_val(SELF) = string_copy(INTERP, value);
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+*/

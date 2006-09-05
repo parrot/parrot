@@ -150,4 +150,9 @@ inline op tcl_continue() {
 
 =cut
 
-# vim: sw=4
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+*/
