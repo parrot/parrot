@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 
 =head1 NAME
 
@@ -780,3 +780,18 @@ CODE
 ok
 OUTPUT
 unlink("temp.file");
+
+pir_output_like(<<'CODE', <<"OUTPUT", "stat failed");
+.sub main :main
+    .local pmc pio
+    .local int len
+    .include "stat.pasm"
+    .local string f
+    f = 'no_such_file'
+    len = stat f, .STAT_FILESIZE
+    print "never\n"
+.end
+CODE
+/stat failed:/
+OUTPUT
+
