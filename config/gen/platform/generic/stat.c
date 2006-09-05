@@ -27,11 +27,15 @@ Parrot_stat_info_intval(Interp* interpreter, STRING *file, INTVAL thing)
 
     /* Everything needs the result of stat, so just go do it */
     status = stat(filename, &statbuf);
+    if (thing == STAT_EXISTS)
+	return status == 0;
+    if (status == -1) {
+	const char *err = strerror(errno);
+	real_exception(interpreter, NULL, E_IOError,
+		"stat failed: %s", err);
+    }
 
     switch (thing) {
-	case STAT_EXISTS:
-	    result = (status == 0);
-	    break;
 	case STAT_FILESIZE:
 	    result = statbuf.st_size;
 	    break;
@@ -98,11 +102,15 @@ Parrot_fstat_info_intval(Interp* interpreter, INTVAL file, INTVAL thing)
 
     /* Everything needs the result of stat, so just go do it */
     status = fstat(file, &statbuf);
+    if (thing == STAT_EXISTS)
+	return status == 0;
+    if (status == -1) {
+	const char *err = strerror(errno);
+	real_exception(interpreter, NULL, E_IOError,
+		"stat failed: %s", err);
+    }
 
     switch (thing) {
-	case STAT_EXISTS:
-	    result = (status == 0);
-	    break;
 	case STAT_FILESIZE:
 	    result = statbuf.st_size;
 	    break;
