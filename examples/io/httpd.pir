@@ -47,17 +47,22 @@ invoked with the query as an argument.
 This functions should return a plain string, which will be sent to the
 browser.
 
-TODO specifiy the argument to F<cgi_main>.
+F<cgi_main> is called with 3 arguments: a todo/reserved PMC, a string
+with the original query and a Hash, with C<key=value> items split by
+C<'+'>. C<key> and C<value> are already C<urldecoded>.
 
   $ cat cgi-pir/foo.pir
   .sub cgi_main
-    # .param pmc query		# TODO  
+    .param pmc reserved         # TODO
+    .param string query		# all after '?':  "foo=1+bar=A"
+    .param pmc query_hash       # Hash { foo=>'1', bar=>'A' }
     .return ("<p>foo</p>")      # in practice use a full <html>doc</html>
+                                # unless serving XMLHttpRequest's
   .end
 
 The browser request:  
 
-  http://localhost:1234/foo.pir?q=no_yet
+  http://localhost:1234/foo.pir?foo=1+bar=%61
 
 will serve, whatever the C<cgi_main> function returned.
 
@@ -281,7 +286,7 @@ NEXT_CHAR:
     .return( ret )
 .end
 
-
+# convert %xx to char 
 .sub urldecode
     .param string in
 
@@ -317,6 +322,7 @@ END:
     .return hex.'to_int'(16)
 .end
 
+# if file is *.pir or *.pbc run it as CGI
 .sub check_cgi
     .param string url
     $I0 = index url, ".pir"
@@ -329,15 +335,18 @@ cgi_1:
     $I0 = index url, '?'
     if $I0 == -1 goto no_query
     .local string file, query
+    .local pmc query_hash
     file = substr url, 0, $I0
     inc $I0
     query = substr url, $I0
     # TODO split into a hash, then decode parts
+    query_hash = make_query_hash(query)
     query = urldecode(query)
     goto have_query
 no_query:
     file = url
     query = ''
+    query_hash = new .Hash
 have_query:
     # escape %
     file = urldecode(file)
@@ -350,9 +359,41 @@ have_query:
     # TODO stat the file
     load_bytecode file
     .local string result
+    null $P0	# not yet
     # TODO catch ex
-    result = 'cgi_main'(query)
+    result = 'cgi_main'($P0, query, query_hash)
     $I0 = length result
     .return (1, result, $I0)
 .end
 
+# split query at '+', make hash from foo=bar items
+.sub make_query_hash
+    .param string query		# the unescapced one
+    .local pmc query_hash, items
+    .local string kv, k, v
+    query_hash = new .Hash
+    items = split '+', query
+    .local int i, n
+    i = 0
+    n = elements items
+lp_items:
+    kv = items[i]
+    $I0 = index kv, "="
+    if $I0 == -1 goto no_val
+    k = substr kv, 0, $I0
+    inc $I0
+    v = substr kv, $I0
+    v = urldecode(v)
+    goto set_val
+no_val:
+    k = kv
+    v = 1
+set_val:
+    k = urldecode(k)
+    query_hash[k] = v
+
+next_item:
+    inc i
+    if i < n goto lp_items
+    .return (query_hash)
+.end
