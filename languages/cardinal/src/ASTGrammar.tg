@@ -63,28 +63,13 @@ transform result (Cardinal::Grammar::body_statement) :language('PIR') {
 
 transform result (Cardinal::Grammar::compound_statement) :language('PIR') {
     .local pmc child
-    $I0 = defined node['statements']
-    unless $I0 goto err_no_tree
-    $P0 = node['statements']
-    $P0 = $P0[0]
-
-    child = tree.get('result', $P0, 'Cardinal::Grammar::statements')
-
-    .return (child)
-
-  err_no_tree:
-    print "The compound_statement node doesn't contain a 'statements' match.\n"
-    end
-}
-
-transform result (Cardinal::Grammar::statements) :language('PIR') {
-    .local pmc child
     .local pmc result
     result = new 'Cardinal::PAST::Stmts'
     result.'init'('node'=>node)
+    #.kdump2(node, 'compound_statement')
 
     $I0 = defined node['statement']
-    unless $I0 goto err_no_tree
+    unless $I0 goto no_statement
     $P0 = node['statement']      
     
     .local pmc iter
@@ -103,7 +88,10 @@ transform result (Cardinal::Grammar::statements) :language('PIR') {
   iter_end:
     .return (result)
 
-    err_no_tree:
+  no_statement:
+    .return ()
+
+  err_no_tree:
     print "The statements node doesn't contain a 'statement' match.\n"
     .kdump2(node, 'statements')
     end
@@ -207,7 +195,7 @@ transform result (Cardinal::Grammar::statement) :language('PIR') {
   n4:
     # if | unless | while | until
     $I0 = defined node['expression']
-    unless $I0 goto err_no_tree
+    unless $I0 goto n6
     $P0 = node['expression']      
     $P1 = $P0[0]
     child = tree.get('result', $P1, 'Cardinal::Grammar::expression')
@@ -244,6 +232,14 @@ transform result (Cardinal::Grammar::statement) :language('PIR') {
     result = new 'Cardinal::PAST::Rescue_Stmt'
     result.'init'('node'=>node, 'try_stmt'=>child, 'rescue_stmt'=>$P0)
     .return (result)
+
+  n6:
+    $I0 = defined node['lang_statements']
+    unless $I0 goto err_no_tree
+    $P0 = node['lang_statements']      
+    $P0 = tree.get('result', $P0, 'Cardinal::Grammar::lang_statements')
+    .return ($P0)
+
 
   pass_through: 
     result.'add_child'(child)
@@ -652,12 +648,22 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
 
   try_if_clause:
     $I0 = defined node['if_clause']
-    unless $I0 goto try_begin
+    unless $I0 goto err_no_tree
     $P0 = node['if_clause']
     child = tree.get('result', $P0, 'Cardinal::Grammar::if_clause')
     goto done
 
-  try_begin:
+done:
+    .return (child)
+
+err_no_tree:
+    print "The atom node doesn't contain an appropriate match.\n"
+    .kdump2(node, "atom")
+    end
+}
+    
+transform result (Cardinal::Grammar::lang_statements) :language('PIR') {
+    .local pmc child
     $I0 = defined node['begin']
     unless $I0 goto try_def
     .local pmc block
@@ -708,11 +714,11 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
   
   try_class:
     $I0 = defined node['class']
-    unless $I0 goto err_no_tree
+    unless $I0 goto try_module
 
     $P0 = self.'top_scope_stack'()
     .local pmc class_block
-    class_block = new 'Cardinal::PAST::Block'
+    class_block = new 'Cardinal::PAST::Class'
     class_block.'init'('node'=>node, 'name'=>function_name, 'blocktype'=>'class', 'outer'=>$P0)
 
     $I0 = defined node['class_path']
@@ -737,12 +743,32 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
     class_block.'add_child'(child)
     .return (class_block)
 
-  done:
-    .return (child)
+  try_module:
+    $I0 = defined node['module']
+    unless $I0 goto err_no_tree
+
+    $P0 = self.'top_scope_stack'()
+    .local pmc module_block
+    module_block = new 'Cardinal::PAST::Module'
+    module_block.'init'('node'=>node, 'name'=>function_name, 'blocktype'=>'module', 'outer'=>$P0)
+
+    $I0 = defined node['class_path']
+    unless $I0 goto err_no_tree
+    $P0 = node['class_path']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::class_path')
+    module_block.'add_child'(child)
+
+  module_body:
+    $P0 = node['body_statement']
+    self.'push_scope_stack'(module_block)
+    child = tree.get('result', $P0, 'Cardinal::Grammar::body_statement')
+    self.'pop_scope_stack'()
+    module_block.'add_child'(child)
+    .return (module_block)
 
   err_no_tree:
-    print "The atom node doesn't contain an appropriate match.\n"
-    .kdump2(node, "atom")
+    print "The lang_statements node doesn't contain an appropriate match.\n"
+    .kdump2(node, "lang_statements")
     end
 }
 
@@ -834,7 +860,7 @@ transform result (Cardinal::Grammar::superclass) :language('PIR') {
     
     $I0 = defined node['expression']
     unless $I0 goto try_error
-    $P0 = node['expression']
+    $P0 = node['expression'; 0]
     child = tree.get('result', $P0, 'Cardinal::Grammar::expression')
     .return (child)
 

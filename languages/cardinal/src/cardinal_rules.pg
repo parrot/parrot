@@ -2,8 +2,9 @@ grammar Cardinal::Grammar
 
 ##Ruby Whitespace rule
 token ws {
-    [ <[\ \t]>
-    | ^^ \# \N*\n*
+    [ <[\ \t]> ## spaces and tabs
+    | ^^ \# \N*\n* ## beginning of line coments
+    | \# \N*\n* ## end of line comments
     ]*
 }
 
@@ -16,20 +17,20 @@ regex pod_comment {
 }
 
 
-rule program { <compound_statement> }
+rule program { {{ debug_init }} <compound_statement> }
 
 rule body_statement { <compound_statement> <rescue_clause>? <else_clause>? <ensure_clause>? }
 
-rule compound_statement { <statements>? <?terminators>? }
+rule compound_statement { <?terminators>?  [ <statement> <?terminators> ]* <statement>? <?terminators>? }
 
-rule statements {<?terminators>? [<statement> <?terminators>* ]* <statement>? }
 
 rule statement {
           $<ALIAS>:=<'alias'> [ <function_item> <function_item>
-                    |<GLOBAL_VARIABLE> [<GLOBAL_VARIABLE>|<back_reference>]]
+                              |<GLOBAL_VARIABLE> [<GLOBAL_VARIABLE>|<back_reference>]]
           |$<UNDEF>:=<'undef'> <undef_list>
           |$<BEGIN>:=<'BEGIN'> \{ <compound_statement> \}
           |$<END>:=<'END'> \{ <compound_statement> \}
+          |<lang_statements>
           |<expression> [$<MODIFIER>:=[<'if'>|<'unless'>|<'while'>|<'until'>] <expression>
                         |$<rescue>:=<'rescue'> <statement>]?
 }
@@ -290,7 +291,11 @@ rule atom { <literal>
           |\:\: <CONSTANT>
           |\[ <array_reference_args>? \]
           |\{ <assoc_list> \}
-          
+          #|<lang_statements>
+          |<variable>
+}
+
+rule lang_statements {
           |<'return'>
           |<'break'> 
           |<'next'>
@@ -301,7 +306,6 @@ rule atom { <literal>
 #          |<operation> <brace_block> # put this in method call
 #          |<method_call> <brace_block>?
           |\-\> <lambda>
-          
           |$<begin>:=<'begin'> <body_statement> <'end'>
           |<if_clause>
           |<'unless'> <expression> <then_clause> <compound_statement> <else_clause>? <'end'>
@@ -312,14 +316,12 @@ rule atom { <literal>
           |$<class>:=<'class'> <class_path> <superclass> <'do'>? <body_statement> <'end'>
           |$<class2>:=<'class'> \<\< <expression> <term> <body_statement> <'end'>
           |$<module>:=<'module'> <class_path> <body_statement> <'end'>
-          |$<def>:=<'def'> [singleton [\.|\:\:]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'>
-          |<variable>
+          |$<def>:=<'def'> [<singleton> [\.|\:\:]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'> 
 }
 
 rule if_clause {
           $<if>:=<'if'> <expression> <then_clause> <compound_statement> <elsif_clause>* <else_clause>? <?end_clause> 
           }
-#rule end_clause { {{print "e1\n"}} <?terminator>? {{print "e2\n"}} {{match.dump()}} <'end'> {{print "e3\n"}} <?terminator>? {{print "e4\n"}} }
 rule end_clause { <?terminator>? <'end'> <?terminator>? }
 rule elsif_clause {<'elsif'> <expression> <then_clause> <compound_statement>}
 rule else_clause {<'else'> <compound_statement>}
@@ -377,20 +379,16 @@ rule regexp { \/ <xstring_contents> \/ }
 rule words { \%w\{ [<string_contents> <ws>]* \} }
 rule qwords { \%q\{ [<string_contents> <ws>]* \} }
 
-token symbol { \:<sym> }
-token sym { <funciton_name>|<ivar>|<gvar>|<cvar> }
-token dsymbol { \: <xstring_contents> }
+token symbol { \: [<function_name>|<INSTANCE_VARIABLE>|<GLOBAL_VARIABLE>|<CLASS_VARIABLE>] }
+token dsymbol { \: <[:alpha:]><[:alphanumeric:]>*  }
 token numeric { <FLOAT> | \-<FLOAT> | \-<INTEGER> | <INTEGER> }
 token variable { <IDENTIFIER>|<INSTANCE_VARIABLE>|<GLOBAL_VARIABLE>|<CONSTANT>|<CLASS_VARIABLE>|<'nil'>|<'self'>|<'true'>|<'false'>|<'__FILE__'>|<'__LINE__'> }
 token back_reference { <NTH_REF> | <BACK_REF> }
-rule superclass { 
-          <?terminator>
-          | [<expression>|<error>] <?terminator>
-}
+rule superclass { [\< <expression>]? <?terminator> }
 
 rule function_prototype_arg_list {
           \( <function_prototype_args>? <?rparen> #\)
-          | <function_prototype_args>? <?terminator>
+          | <function_prototype_args>? <?terminator> 
 }
 
 rule function_prototype_args {
@@ -427,7 +425,7 @@ rule assoc {
 token trailer {[\n|\,]?}
 token newline {\n}
 token terminator {\;|\n} 
-rule terminators {<?terminator> [\;]*}
+rule terminators { <?terminator>* }
 
 token rparen { <newline>? \) }
 token rbracket { <newline>? \] }
