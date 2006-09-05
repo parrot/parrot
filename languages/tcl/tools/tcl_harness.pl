@@ -82,3 +82,9 @@ system $cmd;
 print "we are skipping $total_skipped total tests.\n";
 print "(-clock ($clock_skipped) -deprecated ($deprecated))\n";
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
