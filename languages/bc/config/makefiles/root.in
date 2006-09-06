@@ -48,13 +48,13 @@ help:
 test: test-python test-posix test-java
 
 test-python: build-python
-	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-python
+	- cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-python
 
 test-posix: build-posix 
-	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-posix
+	- cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-posix
 
 test-java: 
-	cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-java
+	- cd .. && $(PERL) -I../lib -I bc/lib bc/t/harness --with-java
 
 # For smoke testing build only the Implementation in Python
 build: build-python
