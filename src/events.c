@@ -107,10 +107,17 @@ static int pipe_fds[2];
 /* 
  * a structure to communicate with the io_thread
  */
+typedef enum {
+    IO_THR_MSG_NONE,
+    IO_THR_MSG_TERMINATE,
+    IO_THR_MSG_ADD_SELECT_RD
+} io_thread_msg_type;
+
 typedef struct {
-    int command;
-    void *data;
+    io_thread_msg_type command;
+    parrot_event *ev;
 } io_thread_msg;
+
 
 #define MSG_SIZE (sizeof(io_thread_msg))
 
@@ -347,6 +354,7 @@ Parrot_schedule_event(Parrot_Interp interpreter, parrot_event* ev)
             break;
         case EVENT_TYPE_CALL_BACK:
         case EVENT_TYPE_SIGNAL:
+        case EVENT_TYPE_IO:
             entry->type = QUEUE_ENTRY_TYPE_EVENT;
             unshift_entry(event_queue, entry);
             break;
@@ -656,13 +664,49 @@ the wait sets.
 */
 
 #ifndef WIN32
+typedef struct {
+    int n;
+    parrot_event **events;
+} pending_io_events;
+
+static void
+store_io_event(pending_io_events *ios, parrot_event *ev)
+{
+    if (!ios->n) {
+        ios->events = mem_sys_allocate(sizeof(ev));
+    }
+    else {
+        ios->events = mem_sys_realloc(ios->events, (1 + ios->n) * sizeof(ev));
+    }
+    ios->events[ios->n] = ev;
+    ++ios->n;
+}
+
+static void
+io_thread_ready_rd(pending_io_events *ios, int ready_rd)
+{
+    int i;
+
+    for (i = 0; i < ios->n; ++i) {
+        if (i == ready_rd) {
+            parrot_event * const ev = ios->events[i];
+            Parrot_schedule_event(ev->interp, ev);
+            break;
+        }
+    }
+}
+
 static void*
 io_thread(void *data)
 {
     QUEUE* event_q = (QUEUE*) data;
     fd_set rfds, wfds, act_rfds, act_wfds;
-    int n_highest;
+    int n_highest, i;
     int running = 1;
+    pending_io_events ios;
+
+    ios.n = 0;
+    /* remember pending io events */
 
     FD_ZERO(&act_rfds);
     FD_ZERO(&act_wfds);
@@ -705,42 +749,54 @@ io_thread(void *data)
 
                 }
                 break;
+            case 0:     /* timeout - can't happen */
+                break;
             default:
-                if (retval > 0) {
-                    edebug((stderr, "IO ready\n"));
-                    if (FD_ISSET(PIPE_READ_FD, &rfds)) {
-                        io_thread_msg buf;
-                        /*
-                         * a command arrived
-                         */
-                        edebug((stderr, "msg arrived\n"));
-                        if (read(PIPE_READ_FD, &buf, MSG_SIZE) != MSG_SIZE)
-                            internal_exception(1,
-                                    "read error from msg pipe");
-                        switch (buf.command) {
-                            case 'e':
-                                running = 0;
-                                break;
-                            /* TODO */
-                            case 'r':
-                                /* insert fd in buf[1] into rfds */
-                            case 'w':
-                                /* insert fd in buf[1] into wfds */
-                            case 'R':
-                                /* delete fd in buf[1] from rfds */
-                            case 'W':
-                                /* delete fd in buf[1] from wfds */
-                                break;
-                            default:
+                edebug((stderr, "IO ready\n"));
+                for (i = 0; i < n_highest; ++i) {
+                    if (FD_ISSET(i, &rfds)) {
+                        if (i == PIPE_READ_FD) {
+                            io_thread_msg buf;
+                            /*
+                             * a command arrived
+                             */
+                            edebug((stderr, "msg arrived\n"));
+                            if (read(PIPE_READ_FD, &buf, MSG_SIZE) != MSG_SIZE)
                                 internal_exception(1,
-                                        "unhandled msg in pipe");
-                                break;
-                        }
+                                        "read error from msg pipe");
+                            switch (buf.command) {
+                                case IO_THR_MSG_TERMINATE:
+                                    running = 0;
+                                    break;
+                                case IO_THR_MSG_ADD_SELECT_RD: 
+                                    {
+                                        PMC *pio = buf.ev->u.io_event.pio;
+                                        int fd = PIO_getfd(NULL, pio);
+                                        if (FD_ISSET(fd, &act_rfds))
+                                            break;
+                                        FD_SET(fd, &act_rfds);
+                                        if (fd >= n_highest)
+                                            n_highest = fd + 1;
+                                        store_io_event(&ios, buf.ev);
+                                    }
+                                    break;
+                                    /* TODO */
+                                default:
+                                    internal_exception(1,
+                                            "unhandled msg in pipe");
+                                    break;
+                            }
 
+                        }
+                        else {
+                            /* one of the io_event fds is ready */
+                            io_thread_ready_rd(&ios, i);
+                            break;
+                        }
                     }
-                    /* TODO check fds */
-                    break;
                 }
+                /* TODO check fds */
+                break;
         }
     }
     edebug((stderr, "IO thread terminated\n"));
@@ -768,12 +824,39 @@ stop_io_thread(void)
     /*
      * tell IO thread to stop
      */
-    buf.command = 'e';
+    buf.command = IO_THR_MSG_TERMINATE;
 #ifndef WIN32
     if (write(PIPE_WRITE_FD, &buf, MSG_SIZE) != MSG_SIZE)
         internal_exception(1, "msg pipe write failed");
 #endif
 }
+
+/* XXX move to header */
+void Parrot_event_add_io_event(Interp*, 
+        PMC* pio, PMC* sub, PMC* data, INTVAL which);
+
+void
+Parrot_event_add_io_event(Interp* interpreter, 
+        PMC* pio, PMC* sub, PMC* data, INTVAL which)
+{
+    parrot_event *event;
+    io_thread_msg buf;
+
+    event = mem_sys_allocate(sizeof(parrot_event));
+    event->type        = EVENT_TYPE_IO;
+    event->interp      = interpreter;
+    event->u.io_event.pio       = pio;
+    event->u.io_event.handler   = sub;
+    event->u.io_event.user_data = data;
+
+    buf.command = which;
+    buf.ev      = event;
+#ifndef WIN32
+    if (write(PIPE_WRITE_FD, &buf, MSG_SIZE) != MSG_SIZE)
+        internal_exception(1, "msg pipe write failed");
+#endif
+}
+
 
 /*
 
@@ -1147,6 +1230,15 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             Parrot_run_callback(interpreter, event->u.call_back.cbi,
                     event->u.call_back.external_data);
             break;
+        case EVENT_TYPE_IO:
+            edebug((stderr, "starting io handler\n"));
+            Parrot_runops_fromc_args(interpreter, 
+                    event->u.io_event.handler,
+                    "vPP",
+                    event->u.io_event.pio,
+                    event->u.io_event.user_data
+                    );
+            break;
         case EVENT_TYPE_SLEEP:
             interpreter->sleeping = 0;
             break;
@@ -1158,7 +1250,10 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             fprintf(stderr, "Unhandled event type %d\n", event->type);
             break;
     }
-    mem_sys_free(event);
+    if (event->type != EVENT_TYPE_IO) {
+        /* IO events are reused, timer events are dup'ed */
+        mem_sys_free(event);
+    }
     return next;
 }
 

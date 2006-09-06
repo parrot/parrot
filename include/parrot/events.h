@@ -69,6 +69,7 @@ typedef struct {
         int                     signal;         /* for EVENT_TYPE_SIGNAL */
         parrot_timer_event      timer_event;    /* for EVENT_TYPE_TIMER */
         _call_back_info         call_back;      /* CALL_BACKs */
+        parrot_io_event         io_event;       /* EVENT_TYPE_IO */
     } u;
 } parrot_event;
 

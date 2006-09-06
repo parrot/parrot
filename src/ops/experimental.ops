@@ -443,6 +443,17 @@ inline op new(out PMC, invar PMC) :object_classes {
     goto NEXT();
 }
 
+=item B<add_io_event>(invar PMC, invar PMC, invar PMC, inconst INT)
+
+Call the sub $2 for PIO $1 with user data $3 on ready state of $4. XXX The
+only handled $4 = IO_THR_MSG_ADD_SELECT_RD aka 2 for now.
+
+=cut
+
+op add_io_event(invar PMC, invar PMC, invar PMC, inconst INT) {
+    Parrot_event_add_io_event(interpreter, $1, $2, $3, $4);
+    goto NEXT();
+}
 =back
 
 =head1 COPYRIGHT

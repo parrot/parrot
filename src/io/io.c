@@ -1139,7 +1139,7 @@ PIO_getfd(theINTERP, PMC *pmc)
         return io->fd;
     }
 
-    return (PIOHANDLE)0;
+    return (PIOHANDLE)0;        /* XXX that's plain wrong --leo */
 }
 
 /*
