@@ -659,17 +659,17 @@ static void*
 io_thread(void *data)
 {
     QUEUE* event_q = (QUEUE*) data;
-    fd_set rfds, wfds;
+    fd_set rfds, wfds, act_rfds, act_wfds;
     int n_highest;
     int running = 1;
 
-    FD_ZERO(&rfds);
-    FD_ZERO(&wfds);
+    FD_ZERO(&act_rfds);
+    FD_ZERO(&act_wfds);
     UNUSED(event_q);
     /*
      * Watch the reader end of the pipe for messages
      */
-    FD_SET(PIPE_READ_FD, &rfds);
+    FD_SET(PIPE_READ_FD, &act_rfds);
     n_highest = PIPE_READ_FD + 1;
     /*
      * all signals that we shall handle here have to be unblocked
@@ -677,7 +677,10 @@ io_thread(void *data)
      */
     Parrot_unblock_signal(SIGHUP);
     while (running) {
-        int retval = select(n_highest, &rfds, &wfds, NULL, NULL);
+        int retval;
+        rfds = act_rfds;
+        wfds = act_wfds;
+        retval = select(n_highest, &rfds, &wfds, NULL, NULL);
         switch (retval) {
             case -1:
                 if (errno == EINTR) {
