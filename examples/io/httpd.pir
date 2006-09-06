@@ -73,6 +73,10 @@ make it work on W32/IE
 Transcode the received string to ascii, in order to have access to an
 implemented 'index' op. Or just use unicode instead.
 
+=head1 SEE ALSO
+
+RFC2616
+
 =head1 AUTHOR
 
 Original author is Markus Amsler - <markus.amsler@oribi.org> 
@@ -118,8 +122,8 @@ The code was heavily hacked by bernhard and leo.
     print "\n"
     print "Be sure that the HTML docs have been generated with 'make html'.\n"
 
+    listen ret, sock, 1
 NEXT:
-    listen ret, sock, 5
     accept work, sock
     req = ""
 MORE:
@@ -153,13 +157,14 @@ MORE:
 SERVE_REQ:
 #    print "Request:\n"
 #    print req
-# split is not implemented, so parse it the old way
-# GET the method and file
+#    print "*******\n"
+
+# parse
+# GET the_file HTTP*
     index occ1, req, " "
+    substr meth, req, 0, occ1
     inc occ1
     index occ2, req, " ", occ1
-    len = occ1 - 1
-    substr meth, req, 0, len
     len = occ2 - occ1
     substr url, req, occ1, len
 
@@ -198,7 +203,7 @@ SERVE_file:
 SERVE_blob:
     # TODO make more subs
     # takes: file_content, len
-    rep = "HTTP/1.x 200 OK"
+    rep = "HTTP/1.1 200 OK"
     rep .= CRLF
     rep .= "Server: Parrot-httpd/0.1"
     rep .= CRLF
@@ -216,7 +221,7 @@ SERVE_blob:
     goto NEXT
 
 SERVE_docroot:
-    rep = 'HTTP1/1 301 Moved Permamently'
+    rep = 'HTTP/1.1 301 Moved Permamently'
     rep .= CRLF
     rep .= 'Location: /docs/html/index.html'
     rep .= CRLF
