@@ -641,16 +641,16 @@ transform result (Cardinal::Grammar::atom) :language('PIR') {
 
   try_variable:
     $I0 = defined node['variable']
-    unless $I0 goto try_if_clause
+    unless $I0 goto try_expression 
     $P0 = node['variable']
     child = tree.get('result', $P0, 'Cardinal::Grammar::variable')
     goto done
 
-  try_if_clause:
-    $I0 = defined node['if_clause']
+  try_expression:
+    $I0 = defined node['expression']
     unless $I0 goto err_no_tree
-    $P0 = node['if_clause']
-    child = tree.get('result', $P0, 'Cardinal::Grammar::if_clause')
+    $P0 = node['expression']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::expression')
     goto done
 
 done:
@@ -665,7 +665,7 @@ err_no_tree:
 transform result (Cardinal::Grammar::lang_statements) :language('PIR') {
     .local pmc child
     $I0 = defined node['begin']
-    unless $I0 goto try_def
+    unless $I0 goto try_if_clause
     .local pmc block
     $P0 = self.'top_scope_stack'()
     block = new 'Cardinal::PAST::Block'
@@ -678,6 +678,13 @@ transform result (Cardinal::Grammar::lang_statements) :language('PIR') {
 
     block.'add_child'(child)
     .return (block)
+  
+  try_if_clause:
+    $I0 = defined node['if_clause']
+    unless $I0 goto try_def
+    $P0 = node['if_clause']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::if_clause')
+    .return (child)
 
   try_def:
     $I0 = defined node['def']

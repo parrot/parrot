@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 3;
 
 language_output_is('cardinal', <<'CODE', <<'OUT', 'pre code comment');
 # Pre comments
