@@ -17,7 +17,7 @@ C<Parrot::Distribution> knows all kinds of stuff about the contents of
 the distribution.
 
 This is a subclass of C<Parrot::Docs::Directory> so that it can be used
-to build the HTML docs. There may come a time when it is necessary to 
+to build the HTML docs. There may come a time when it is necessary to
 make C<file_class()> and C<directory_class()> dynamic so that different
 file methods can be used depending on the circumstances.
 
@@ -41,6 +41,7 @@ use Parrot::Configure::Step qw(capture_output);
 use Parrot::Docs::Directory;
 use base qw(Parrot::Docs::Directory);
 
+
 =item C<new()>
 
 Searches up the file system tree from the current working directory
@@ -59,20 +60,21 @@ my $dist;
 sub new
 {
     my $self = shift;
-    
+
     return $dist if defined $dist;
-    
+
     my $path = '.';
-    
+
     while ( $self = $self->SUPER::new($path) ) {
-        return $dist = $self if $self->file_exists_with_name('README') and 
+        return $dist = $self if $self->file_exists_with_name('README') and
                                 $self->file_with_name('README')->read =~ /^This is Parrot/os;
-        
+
         $path = $self->parent_path();
     }
-    
+
     die "Failed to find Parrot distribution root\n";
 }
+
 
 =back
 
@@ -91,7 +93,7 @@ This is not really a complete list, for example F<icu> is ignored.
 sub c_source_file_directories
 {
     my $self = shift;
-    
+
     return
         $self->directory_with_name('compilers')->directory_with_name('ast'),
         $self->directory_with_name('compilers')->directory_with_name('imcc'),
@@ -104,6 +106,7 @@ sub c_source_file_directories
     ;
 }
 
+
 =item C<c_source_file_with_name($name)>
 
 Returns the C source file with the specified name.
@@ -114,19 +117,20 @@ sub c_source_file_with_name
 {
     my $self = shift;
     my $name = shift || return;
-    
+
     $name .= '.c' unless $name =~ /\.[Cc]$/o;
-    
+
     foreach my $dir ($self->c_source_file_directories)
     {
         return $dir->file_with_name($name)
             if $dir->file_exists_with_name($name);
     }
-    
+
     print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
 
     return;
 }
+
 
 =item C<c_header_file_directories()>
 
@@ -139,13 +143,14 @@ Currently only F<include/parrot>.
 sub c_header_file_directories
 {
     my $self = shift;
-    
+
     return
         $self->directory_with_relative_path('compilers/ast'),
         $self->directory_with_relative_path('compilers/imcc'),
         $self->directory_with_relative_path('include/parrot'),
     ;
 }
+
 
 =item C<c_header_file_with_name($name)>
 
@@ -157,17 +162,18 @@ sub c_header_file_with_name
 {
     my $self = shift;
     my $name = shift || return;
-    
+
     $name .= '.h' unless $name =~ /\.[Hh]$/o;
-    
+
     foreach my $dir ($self->c_header_file_directories)
     {
         return $dir->file_with_name($name)
             if $dir->file_exists_with_name($name);
     }
-    
+
     return;
 }
+
 
 =item C<file_for_perl_module($module)>
 
@@ -181,19 +187,20 @@ sub file_for_perl_module
     my $module = shift || return;
 
     my @path = split '::', $module;
-    
+
     $module = pop @path;
     $module .= '.pm';
-    
+
     my $dir = $self->existing_directory_with_name('lib');
-    
+
     foreach my $name (@path)
     {
         return unless $dir = $dir->existing_directory_with_name($name);
     }
-    
+
     return $dir->existing_file_with_name($module);
 }
+
 
 =item C<docs_directory()>
 
@@ -204,9 +211,10 @@ Returns the documentation directory.
 sub docs_directory
 {
     my $self = shift;
-    
+
     return $self->existing_directory_with_name('docs');
 }
+
 
 =item C<html_docs_directory()>
 
@@ -217,9 +225,10 @@ Returns the HTML documentation directory.
 sub html_docs_directory
 {
     my $self = shift;
-    
+
     return $self->docs_directory->directory_with_name('html');
 }
+
 
 =item C<delete_html_docs()>
 
@@ -230,9 +239,10 @@ Deletes the HTML documentation directory.
 sub delete_html_docs
 {
     my $self = shift;
-    
+
     return $self->html_docs_directory->delete();
 }
+
 
 =item C<gen_manifest_skip>
 
@@ -245,7 +255,7 @@ sub gen_manifest_skip {
    # manicheck.pl is probably only useful for checked out revisions
    # Checkout is done either with svn or svk
    my $svn_cmd;
-   if (defined $Parrot::Revision::svn_entries 
+   if (defined $Parrot::Revision::svn_entries
             && $Parrot::Revision::svn_entries =~ m/\.svn/) {
        $svn_cmd = 'svn';
    } else {
@@ -255,17 +265,17 @@ sub gen_manifest_skip {
    # Find all directories in the Parrot distribution
    my %dir_list  = map { my $dir = ( File::Spec->splitpath( $_ ) )[1];
                          $dir =~ s!\.svn/$!!;
-                         $dir => 1 
+                         $dir => 1
                        } keys %{ ExtUtils::Manifest::manifind() };
    my @skip;     # regular expressions for files to skip
    foreach my $dir ( sort keys %dir_list ) {
        next if $dir =~ m/\.svn/;
-       next if ( $dir && ! -d $dir ); 
+       next if ( $dir && ! -d $dir );
 
        my $patterns = capture_output( "$svn_cmd propget svn:ignore $dir" );
        # TODO: escape chars that are special in regular expressions
        push @skip, qq{# generated from svn:ignore of '$dir'},
-           map { 
+           map {
                my $end = $dir_list{ $dir . $_} ? '$' : '/'; # ignore file or dir
                s/\./\\./g;                  # . is simply a dot
                s/\*/.*/g;                   # * is any amount of chars
@@ -276,6 +286,7 @@ sub gen_manifest_skip {
 
     return \@skip;
 }
+
 
 =back
 
