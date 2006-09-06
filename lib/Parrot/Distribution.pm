@@ -67,7 +67,7 @@ sub new
 
     while ( $self = $self->SUPER::new($path) ) {
         return $dist = $self if $self->file_exists_with_name('README') and
-                                $self->file_with_name('README')->read =~ /^This is Parrot/os;
+            $self->file_with_name('README')->read =~ m/^This is Parrot/os;
 
         $path = $self->parent_path();
     }
@@ -86,8 +86,6 @@ sub new
 
 Returns the directories which contain C source files.
 
-This is not really a complete list, for example F<icu> is ignored.
-
 =cut
 
 sub c_source_file_directories
@@ -95,14 +93,17 @@ sub c_source_file_directories
     my $self = shift;
 
     return
-        $self->directory_with_name('compilers')->directory_with_name('ast'),
-        $self->directory_with_name('compilers')->directory_with_name('imcc'),
-        $self->directory_with_name('examples')->directory_with_name('c'),
-        $self->directory_with_name('src'),
-        $self->directory_with_name('src/encodings'),
-        $self->directory_with_name('src/io'),
-        $self->directory_with_name('src/ops'),
-        $self->directory_with_name('src/packfile'),
+        map $self->directory_with_name($_) =>
+            map("compilers/$_" => qw<ast bcg/src bcg/src/pmc imcc>),
+            'config/gen/cpu/i386',
+            map("config/gen/platform/$_" =>
+                qw<aix ansi cygwin darwin generic
+                ia64 netbsd openbsd solaris win32>),
+            map("examples/$_" => qw<c compilers mops nci>),
+            'src',
+            map("src/$_" =>
+                qw<atomic charset dynoplibs dynpmc
+                encodings io ops packfile pmc stm>),
     ;
 }
 
@@ -145,9 +146,20 @@ sub c_header_file_directories
     my $self = shift;
 
     return
-        $self->directory_with_relative_path('compilers/ast'),
-        $self->directory_with_relative_path('compilers/imcc'),
-        $self->directory_with_relative_path('include/parrot'),
+        map $self->directory_with_name($_) =>
+            map("compilers/$_" => qw<ast bcg/include imcc>),
+            'config/gen/platform',
+            map("config/gen/platform/$_" =>
+                qw<aix ansi cygwin darwin generic
+                ia64 netbsd openbsd solaris win32>),
+            'include/parrot',
+            map("include/parrot/$_" => qw<atomic oplib stm>),
+            'src',
+            map("src/$_" =>
+                qw<atomic charset dynoplibs dynpmc
+                encodings io ops packfile pmc stm>),
+            map("src/jit/$_" =>
+                qw<alpha arm hppa i386 ia64 mips ppc skeleton sun4>),
     ;
 }
 
