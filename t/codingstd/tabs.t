@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More;
+use Test::More tests => 1;
 use Parrot::Distribution;
 
 
@@ -15,14 +15,15 @@ t/codingstd/tabs.t - checks for tab indents in C source and headers
 
 =head1 SYNOPSIS
 
-    % prove t/codingstd/tabs.t [file ...]
+    # test all files
+    % prove t/codingstd/tabs.t
+
+    # test specific files
+    % perl t/codingstd/tabs.t src/foo.c include/parrot/bar.h
 
 =head1 DESCRIPTION
 
-Checks that the indicated file(s) do not use tabs to indent.
-
-If no file(s) are specified, checks the Parrot C source and header files for
-tab indents.
+Checks that files do not use tabs to indent.
 
 =head1 SEE ALSO
 
@@ -31,38 +32,36 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 
+my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : source_files();
-
-plan tests => scalar @files;
+my @tabs;
 
 foreach my $file (@files) {
-    open FILE, "<$file" or die "Unable to open '$file' for reading: $!";
+    open my $fh, '<',$file
+        or die "Cannot open '$file' for reading: $!\n";
 
-    my @tabs;
-    LINE:
-    while (<FILE>) {
+    my $tabcount;
+    while (<$fh>) {
         next unless /^ *\t/;
         push @tabs, "tab in leading whitespace, file '$file', line $.\n";
-        if (@tabs >= 5) {
+        if (++$tabcount >= 5) {
             push @tabs, "skipping remaining lines (you get the idea)\n";
-            last LINE;
+            last;
         }
     }
-    close FILE;
-
-    is(scalar(@tabs), 0, "file '$file' does not use tabs")
-      or diag(@tabs);
+    close $fh;
 }
 
+ok(!scalar(@tabs), "tabs in leading whitespace")
+    or diag(@tabs);
 
 exit;
 
 
 sub source_files {
-    my $dist = Parrot::Distribution->new;
     return map { $_->path } (
-        map($_->files_of_type('C code'),   $dist->c_source_file_directories),
-        map($_->files_of_type('C header'), $dist->c_header_file_directories),
+        map($_->files_of_type('C code'),   $DIST->c_source_file_directories),
+        map($_->files_of_type('C header'), $DIST->c_header_file_directories),
     );
 }
 

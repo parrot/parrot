@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More;
+use Test::More tests => 1;
 use Parrot::Distribution;
 
 
@@ -15,7 +15,11 @@ t/codingstd/fixme.t - checks for "FIXME" and similar notes in C source and heade
 
 =head1 SYNOPSIS
 
+    # test all files
     % prove t/codingstd/fixme.t
+
+    # test specific files
+    % perl t/codingstd/fixme.t src/foo.c include/parrot/bar.h
 
 =head1 DESCRIPTION
 
@@ -26,37 +30,39 @@ following strings:
     TODO
     XXX
 
+=head1 SEE ALSO
+
+L<docs/pdds/pdd07_codingstd.pod>
+
 =cut
 
 
+my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : source_files();
-
-plan tests => scalar @files;
-
+my @fixme;
 
 foreach my $file (@files) {
-    open FILE, "<$file" or die "Unable to open '$file' for reading: $!";
+    open my $fh, '<', $file
+        or die "Cannot open '$file' for reading: $!\n";
 
-    my @matches;
-    while (<FILE>) {
+    while (<$fh>) {
         next unless /(FIXME|XXX|TODO)/;
-        push @matches, "file '$file', line $.: $1\n";
+        push @fixme, "file '$file', line $.: $1\n";
     }
-    close FILE;
-
-    is(scalar(@matches), 0, "file '$file' has no FIXME strings")
-      or diag(@matches);
+    close $fh;
 }
+
+ok(!scalar(@fixme), 'FIXME strings')
+    or diag("FIXME strings found in " . scalar @fixme . " files:\n@fixme");
 
 
 exit;
 
 
 sub source_files {
-    my $dist = Parrot::Distribution->new;
     return map { $_->path } (
-        map($_->files_of_type('C code'),   $dist->c_source_file_directories),
-        map($_->files_of_type('C header'), $dist->c_header_file_directories),
+        map($_->files_of_type('C code'),   $DIST->c_source_file_directories),
+        map($_->files_of_type('C header'), $DIST->c_header_file_directories),
     );
 }
 
