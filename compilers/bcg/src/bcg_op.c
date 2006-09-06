@@ -56,7 +56,7 @@ bcg_op_destroy(BCG_info * bcg_info, bcg_op * op)
 void
 bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg)
 {
-    //op->op_args[op->op_arg_count]=op_arg;
+    /* op->op_args[op->op_arg_count]=op_arg; */
     op->op_arg_count++;
 
     if (op->op_arg_count == 1) {

@@ -40,9 +40,9 @@ PARROT_DYNEXT_EXPORT void BCG_val(BCG_info * bcg_info, char *val, char val_type)
 PARROT_DYNEXT_EXPORT void BCG_label(BCG_info * bcg_info, char *label);
 
 /* Functions to manipulate the internals of BCG_info structure. */
-//void BCG_set_interpreter(BCG_info *bcg_info, Interp *interp);
-//char *BCG_get_error_message(BCG_info *bcg_info);
-//int BCG_get_error_code(BCG_info *bcg_info);
+/* void BCG_set_interpreter(BCG_info *bcg_info, Interp *interp); */
+/* char *BCG_get_error_message(BCG_info *bcg_info); */
+/* int BCG_get_error_code(BCG_info *bcg_info); */
 
 PARROT_DYNEXT_EXPORT void BCG_print_pasm(BCG_info *bcg_info);
 #endif /* PARROT_BCG_H_GUARD */
