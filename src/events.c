@@ -103,13 +103,16 @@ static int sig_int, sig_hup;
 static int pipe_fds[2];
 #define PIPE_READ_FD  pipe_fds[0]
 #define PIPE_WRITE_FD pipe_fds[1]
-/*
- * msgs are 3 ints sized
- * buf[0] = command
- * buf[1] = fd or better a parrot_event ptr or such
- * buf[2] = NL
+
+/* 
+ * a structure to communicate with the io_thread
  */
-#define MSG_SIZE (3*sizeof(int))
+typedef struct {
+    int command;
+    void *data;
+} io_thread_msg;
+
+#define MSG_SIZE (sizeof(io_thread_msg))
 
 /*
 
@@ -706,15 +709,15 @@ io_thread(void *data)
                 if (retval > 0) {
                     edebug((stderr, "IO ready\n"));
                     if (FD_ISSET(PIPE_READ_FD, &rfds)) {
-                        int buf[3];
+                        io_thread_msg buf;
                         /*
                          * a command arrived
                          */
                         edebug((stderr, "msg arrived\n"));
-                        if (read(PIPE_READ_FD, buf, MSG_SIZE) != MSG_SIZE)
+                        if (read(PIPE_READ_FD, &buf, MSG_SIZE) != MSG_SIZE)
                             internal_exception(1,
                                     "read error from msg pipe");
-                        switch (buf[0]) {
+                        switch (buf.command) {
                             case 'e':
                                 running = 0;
                                 break;
@@ -761,15 +764,13 @@ Tell the IO thread to stop.
 static void
 stop_io_thread(void)
 {
-    int buf[3];
+    io_thread_msg buf;
     /*
      * tell IO thread to stop
      */
-    buf[0] = 'e';
-    buf[1] = -1;
-    buf[2] = '\n';
+    buf.command = 'e';
 #ifndef WIN32
-    if (write(PIPE_WRITE_FD, buf, MSG_SIZE) != MSG_SIZE)
+    if (write(PIPE_WRITE_FD, &buf, MSG_SIZE) != MSG_SIZE)
         internal_exception(1, "msg pipe write failed");
 #endif
 }
