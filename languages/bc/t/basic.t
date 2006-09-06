@@ -11,16 +11,17 @@ Very basic checks.
 
 =cut
 
+# pragmata
 use strict;
 use warnings;
-use 5.006_001;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
+use Test::More;
+
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More;
 
 # A little helper to make setting up tests easier
 sub run_tests {

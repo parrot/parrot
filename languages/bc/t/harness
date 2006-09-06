@@ -31,13 +31,15 @@ Otherwise I run the tests that were passed on the command line.
 
 =cut
 
+# pragmata
 use strict;
+use warnings;
 use lib '..';
 
-use Cwd();
+use Cwd             ();
 use Data::Dumper;
 use File::Spec;
-use Test::Harness();
+use Test::Harness   ();
 
 my $language = 'bc';
 
@@ -77,16 +79,16 @@ if ( grep { m/^--files$/ } @ARGV ) {
 
     # XXX There should be a better to indicate which implementation should be used
     if ( $with_posix ) {
-       $ENV{'PARROT_BC_TEST_MODULE'} = 'Parrot::Test::Bc::Posix';
+       $ENV{PARROT_BC_TEST_MODULE} = 'Parrot::Test::Bc::Posix';
     }
     elsif ( $with_java ) {
-       $ENV{'PARROT_BC_TEST_MODULE'} = 'Parrot::Test::Bc::Antlr3';
+       $ENV{PARROT_BC_TEST_MODULE} = 'Parrot::Test::Bc::Antlr3';
     }
     elsif ( $with_python ) {
-       $ENV{'PARROT_BC_TEST_MODULE'} = 'Parrot::Test::Bc::Antlr2';
+       $ENV{PARROT_BC_TEST_MODULE} = 'Parrot::Test::Bc::Antlr2';
     }
     else {
-       $ENV{'PARROT_BC_TEST_MODULE'} = 'Parrot::Test::Bc::Antlr2';
+       $ENV{PARROT_BC_TEST_MODULE} = 'Parrot::Test::Bc::Antlr2';
     }
 
     Test::Harness::runtests( @files ) if scalar( @files );

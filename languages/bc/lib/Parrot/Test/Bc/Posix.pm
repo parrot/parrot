@@ -2,7 +2,9 @@
 
 package Parrot::Test::Bc::Posix;
 
+# pragmata
 use strict;
+use warnings;
 
 use base 'Parrot::Test::Bc';
 

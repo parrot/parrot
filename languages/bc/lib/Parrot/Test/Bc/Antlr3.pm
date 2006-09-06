@@ -8,6 +8,7 @@ Parrot::Test::Bc::Antlr3 - Testing ANTLR3 implementation of Parrot Bc.
 
 package Parrot::Test::Bc::Antlr3;
 
+# pragmata
 use strict;
 use warnings;
 
