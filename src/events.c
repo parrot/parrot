@@ -395,7 +395,7 @@ Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     FLOATVAL now = Parrot_floatval_time();
     ev->type = typ;
-    ev->data = timer;
+    ev->u.timer_event.timer = timer;
     ev->u.timer_event.abs_time = now + diff;
     ev->u.timer_event.interval = interval;
     ev->u.timer_event.repeat   = repeat;
@@ -451,7 +451,8 @@ Parrot_del_timer_event(Parrot_Interp interpreter, PMC* timer)
     for (entry = event_queue->head; entry; entry = entry->next) {
         if (entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT) {
             event = entry->data;
-            if (event->interp == interpreter && event->data == timer) {
+            if (event->interp == interpreter 
+                    && event->u.timer_event.timer == timer) {
                 event->u.timer_event.interval = 0.0;
                 event->type = EVENT_TYPE_NONE;
                 break;
@@ -477,7 +478,6 @@ Parrot_new_terminate_event(Parrot_Interp interpreter)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     ev->type = EVENT_TYPE_TERMINATE;
-    ev->data = NULL;
     Parrot_schedule_event(interpreter, ev);
 }
 
@@ -497,7 +497,6 @@ Parrot_new_suspend_for_gc_event(Parrot_Interp interpreter) {
     QUEUE_ENTRY *qe;
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     ev->type = EVENT_TYPE_SUSPEND_FOR_GC;
-    ev->data = NULL;
     qe = mem_sys_allocate(sizeof(QUEUE_ENTRY));
     qe->next = NULL;
     qe->data = ev;
@@ -523,7 +522,6 @@ Parrot_kill_event_loop(void)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     ev->type = EVENT_TYPE_EVENT_TERMINATE;
-    ev->data = NULL;
     Parrot_schedule_event(NULL, ev);
 }
 

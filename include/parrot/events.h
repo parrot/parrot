@@ -20,7 +20,6 @@ typedef enum {
     EVENT_TYPE_EVENT,
     EVENT_TYPE_IO,
     EVENT_TYPE_MSG,
-    EVENT_TYPE_ASYNC_IO,
     EVENT_TYPE_TIMER,
     EVENT_TYPE_CALL_BACK,
     EVENT_TYPE_SLEEP,
@@ -39,7 +38,22 @@ typedef struct {
     FLOATVAL                    interval;
     int                         repeat; /* 0 = once, -1 = forever */
     PMC*                        sub;    /* handler sub */
+    PMC*                        timer;  /* a .Timer PMC */
 } parrot_timer_event;
+
+/* TODO export to pasm */
+typedef enum {
+    EV_IO_NONE,                 /* invalidated */
+    EV_IO_SELECT_RD,            /* rd is ready for read */
+    EV_IO_SELECT_WR             /* rd is ready for write */
+} parrot_io_event_enum;
+
+typedef struct {
+    parrot_io_event_enum        action; /* read, write, ... */
+    PMC*                        pio;
+    PMC*                        handler;
+    PMC*                        user_data;
+} parrot_io_event;
 
 typedef struct {
     PMC*                        cbi;    /* callback info */
@@ -50,7 +64,6 @@ typedef struct {
     parrot_event_type_enum      type;
     Parrot_Interp               interp;
     /* event_func_t                event_func; unused */
-    void*                       data;
     union {
         STRING*                 msg;            /* for testing only */
         int                     signal;         /* for EVENT_TYPE_SIGNAL */
