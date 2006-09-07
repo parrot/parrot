@@ -12,7 +12,7 @@ transform result (ROOT) {
     result = node['ret']
     pir.emit('    .return (%0)',result)
     pir.emit('.end')
-   
+
    .return(pir)
 } 
 
@@ -54,7 +54,10 @@ transform pir (thing) {
     .return (pir)
 
   got_object:
-    .return ('#XXX')
+    pir = tree.'get'('pir', sub_node, 'object')
+    $S0 = sub_node['ret']
+    node['ret'] = $S0
+    .return (pir)
 
   got_array:
     pir = tree.'get'('pir', sub_node, 'array')
@@ -89,10 +92,54 @@ transform pir (thing) {
     .return(pir)
 }
 
-#transform pir (object) {
+transform pir (object) {
+    .local pmc pir
+    pir = new 'PGE::CodeString'
+    .local string result, child_result, key_result
+    result = pir.unique('$P')
+    pir.emit('    %0 = new .Hash', result)
+    
+    .local pmc items
+
+    items = node['members']
+    if null items goto end
+
+    items = items[0]
+
+    .local pmc keys
+    keys  = items['string']
+    items = items['thing']
+
+    .local pmc iter, key_iter, child, key
+    key_iter = new .Iterator, keys
+    iter     = new .Iterator, items
+
+    # the two iters should be in lockstep as a result of the PGE grammar
+loop:
+    unless iter goto end
+    child = shift iter
+    $P0 = tree.'get'('pir', child, 'thing')
+    $S0 = $P0
+    pir .= $S0 
+    child_result = child['ret']
+
+    key   = shift key_iter
+    $P0 = tree.'get'('pir', key, 'string')
+    $S0 = $P0
+    pir .= $S0 
+    key_result = key['ret']
+
+    pir.emit('    %0[%1] = %2', result, key_result, child_result)
+
+
+    goto loop
+end:
+    node['ret'] = result
+
+   .return (pir) 
+}
 
 transform pir (array) {
-
     .local pmc pir
     pir = new 'PGE::CodeString'
     .local string result, child_result
@@ -103,11 +150,9 @@ transform pir (array) {
 
 
     items = node['elements']
-    unless items goto end
-    $I0 = elements items
-    unless $I0 goto end
-    items = items[0]
+    if null items goto end
 
+    items = items[0]
     items = items['thing']
 
     .local pmc iter, child
@@ -128,6 +173,7 @@ end:
 
    .return (pir) 
 }
+
 
 # XXX doesn't handle any special cases.
 transform pir (string) {

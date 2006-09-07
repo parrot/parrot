@@ -6,7 +6,7 @@ use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 
 =head1 NAME
 
@@ -67,7 +67,8 @@ OUT
 json_dump_is(<<'JSON', <<'OUT', 'empty array', todo=>'parse error');
 []
 JSON
-"JSON" => [ ]
+"JSON" => ResizablePMCArray (size:0) [
+]
 OUT
 
 json_dump_is(<<'JSON', <<'OUT', 'simple array');
@@ -78,6 +79,24 @@ JSON
     2,
     3
 ]
+OUT
+
+#json_dump_is(<<'JSON', <<'OUT', 'empty object', todo=>'parse error');
+json_dump_is(<<'JSON', <<'OUT', 'empty object');
+{}
+JSON
+"JSON" => Hash {
+}
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'simple object');
+{"one":1,"two":2,"three":3}
+JSON
+"JSON" => Hash {
+    "one" => 1,
+    "three" => 3,
+    "two" => 2
+}
 OUT
 
 # XXX Need many more tests, exercising all aspects of http://www.json.org/
