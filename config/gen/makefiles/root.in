@@ -185,6 +185,7 @@ GEN_MAKEFILES = \
     compilers/pge/Makefile \
     compilers/tge/Makefile \
     compilers/bcg/Makefile \
+    compilers/json/Makefile \
     editor/Makefile \
     languages/Makefile \
     languages/amber/Makefile \
@@ -1285,6 +1286,7 @@ compilers.dummy : $(PARROT)
 	$(MAKE) compilers/past
 	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
+	$(MAKE) compilers/json
 
 languages : languages.dummy
 
@@ -1310,6 +1312,7 @@ compilers-clean :
 	$(MAKE) compilers/past clean
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
+	$(MAKE) compilers/json clean
 
 ###############################################################################
 #
@@ -1354,7 +1357,8 @@ RUNCORE_TEST_FILES = \
     t/compilers/pge/p6rules/*.t \
     t/compilers/tge/*.t \
     t/library/*.t \
-    t/examples/*.t
+    t/examples/*.t \
+    t/compilers/json/*.t
 SRC_TEST_FILES = \
     t/src/*.t
 TOOLS_TEST_FILES = \
