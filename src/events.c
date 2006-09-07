@@ -44,7 +44,6 @@ static const char *ev_names[] = {
     "EVENT_TYPE_EVENT",
     "EVENT_TYPE_IO",
     "EVENT_TYPE_MSG",
-    "EVENT_TYPE_ASYNC_IO",
     "EVENT_TYPE_TIMER",
     "EVENT_TYPE_CALL_BACK",
     "EVENT_TYPE_SLEEP",
@@ -685,11 +684,15 @@ store_io_event(pending_io_events *ios, parrot_event *ev)
 static void
 io_thread_ready_rd(pending_io_events *ios, int ready_rd)
 {
-    int i;
+    int i, j;
 
     for (i = 0; i < ios->n; ++i) {
         if (i == ready_rd) {
             parrot_event * const ev = ios->events[i];
+            /* remove from event list */
+            for (j = i; j < ios->n - 1; ++j)
+                ios->events[j] = ios->events[j+1];
+            --ios->n;
             Parrot_schedule_event(ev->interp, ev);
             break;
         }
@@ -772,8 +775,10 @@ io_thread(void *data)
                                     {
                                         PMC *pio = buf.ev->u.io_event.pio;
                                         int fd = PIO_getfd(NULL, pio);
-                                        if (FD_ISSET(fd, &act_rfds))
+                                        if (FD_ISSET(fd, &act_rfds)) {
+                                            mem_sys_free(buf.ev);
                                             break;
+                                        }
                                         FD_SET(fd, &act_rfds);
                                         if (fd >= n_highest)
                                             n_highest = fd + 1;
@@ -789,7 +794,13 @@ io_thread(void *data)
 
                         }
                         else {
-                            /* one of the io_event fds is ready */
+                            /* 
+                             * one of the io_event fds is ready 
+                             * remove from active set, as we don't
+                             * want to fire again during io_handler
+                             * invocation
+                             */
+                            FD_CLR(i, &act_rfds);
                             io_thread_ready_rd(&ios, i);
                             break;
                         }
@@ -1250,10 +1261,7 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             fprintf(stderr, "Unhandled event type %d\n", event->type);
             break;
     }
-    if (event->type != EVENT_TYPE_IO) {
-        /* IO events are reused, timer events are dup'ed */
-        mem_sys_free(event);
-    }
+    mem_sys_free(event);
     return next;
 }
 

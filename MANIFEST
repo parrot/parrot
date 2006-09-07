@@ -499,6 +499,7 @@ examples/benchmarks/vpm.rb                                  [main]doc
 examples/c/test_main.c                                      [main]doc
 examples/compilers/Makefile                                 [main]doc
 examples/compilers/japhc.c                                  [main]doc
+examples/io/async_select.pir                                [main]doc
 examples/io/echo_client.pir                                 [main]doc
 examples/io/http.pir                                        [main]doc
 examples/io/httpd.pir                                       [main]doc
