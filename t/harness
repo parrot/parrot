@@ -148,6 +148,7 @@ my @default_tests = map {glob "t/$_/*.t"} qw( configure
                                               compilers/pge/p5regex
                                               compilers/pge/p6regex
                                               compilers/tge
+                                              compilers/json
                                               library
                                               examples
                                               run
