@@ -6,7 +6,7 @@ use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -28,6 +28,24 @@ JSON
 "JSON" => ""
 OUT
 
+json_dump_is(<<'JSON', <<'OUT', 'string');
+"json"
+JSON
+"JSON" => "json"
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'integer');
+1
+JSON
+"JSON" => 1
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'float');
+3.14
+JSON
+"JSON" => 3.14
+OUT
+
 json_dump_is(<<'JSON', <<'OUT', 'null');
 null
 JSON
@@ -46,16 +64,32 @@ JSON
 "JSON" => 0
 OUT
 
+json_dump_is(<<'JSON', <<'OUT', 'empty array', todo=>'parse error');
+[]
+JSON
+"JSON" => [ ]
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'simple array');
+[1,2,3]
+JSON
+"JSON" => ResizablePMCArray (size:3) [
+    1,
+    2,
+    3
+]
+OUT
+
 # XXX Need many more tests, exercising all aspects of http://www.json.org/
 
 sub json_dump_is {
-    my ($code, $dumped, $reason) = @_;
+    my ($code, $dumped, $reason, %args) = @_;
 
     chomp $code;
     $code =~ s{("|\\)}{\\$1}g;
     $code =~ s{\n}{\\n}g;
 
-    return pir_output_is(<<"END_PIR", $dumped, $reason);
+    return pir_output_is(<<"END_PIR", $dumped, $reason, %args);
 
 .sub test :main
     load_bytecode 'compilers/json/JSON.pbc'

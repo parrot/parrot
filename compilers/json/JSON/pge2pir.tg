@@ -57,7 +57,10 @@ transform pir (thing) {
     .return ('#XXX')
 
   got_array:
-    .return ('#XXX')
+    pir = tree.'get'('pir', sub_node, 'array')
+    $S0 = sub_node['ret']
+    node['ret'] = $S0
+    .return (pir)
 
   got_true:
     pir = new 'PGE::CodeString'
@@ -87,7 +90,44 @@ transform pir (thing) {
 }
 
 #transform pir (object) {
-#transform pir (array) {
+
+transform pir (array) {
+
+    .local pmc pir
+    pir = new 'PGE::CodeString'
+    .local string result, child_result
+    result = pir.unique('$P')
+    pir.emit('    %0 = new .ResizablePMCArray', result)
+    
+    .local pmc items
+
+
+    items = node['elements']
+    unless items goto end
+    $I0 = elements items
+    unless $I0 goto end
+    items = items[0]
+
+    items = items['thing']
+
+    .local pmc iter, child
+    iter = new .Iterator, items
+
+loop:
+    unless iter goto end
+    child = shift iter
+    $P0 = tree.'get'('pir', child, 'thing')
+    $S0 = $P0
+    pir .= $S0 
+
+    child_result = child['ret']
+    pir.emit('    push %0, %1', result, child_result)
+    goto loop
+end:
+    node['ret'] = result
+
+   .return (pir) 
+}
 
 # XXX doesn't handle any special cases.
 transform pir (string) {

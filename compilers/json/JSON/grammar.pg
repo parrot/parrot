@@ -24,10 +24,10 @@ token thing {
   | <?PGE::Util::die 'not a valid JSON value'>
 }
 
+# XXX need to add "except control char" to the final charclass here.
 token char {
   | \\<["\\/bfnrt]>
   | \\u<xdigit>**{4}
-  | <cntrl>
   | <-[\\"]>
 }
 
