@@ -271,23 +271,11 @@ END:
     end
 .end
 
-
 .sub to_string
-    .param int n
+    .param pmc args :slurpy
 
     .local string ret
-    .local string char
-    .local int rest
-    ret = ""
-NEXT_CHAR:
-    rest = n % 10
-    n -= rest
-    n /= 10
-    rest += 48
-    chr char, rest
-    ret .= char
-    if n > 0 goto NEXT_CHAR
-
+    ret = sprintf "%d", args 
     .return( ret )
 .end
 

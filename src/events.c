@@ -680,22 +680,23 @@ store_io_event(pending_io_events *ios, parrot_event *ev)
         ios->alloced <<= 1;
         ios->events = mem_sys_realloc(ios->events, (ios->alloced * sizeof(ev)));
     }
-    ios->events[ios->n] = ev;
-    ++ios->n;
+    ios->events[ios->n++] = ev;
 }
 
 static void
 io_thread_ready_rd(pending_io_events *ios, int ready_rd)
 {
-    int i, j;
+    int i;
 
     for (i = 0; i < ios->n; ++i) {
-        if (i == ready_rd) {
-            parrot_event * const ev = ios->events[i];
+        parrot_event * const ev = ios->events[i];
+        PMC * const pio = ev->u.io_event.pio;
+        const int fd = PIO_getfd(NULL, pio);
+        if (fd == ready_rd) {
             /* remove from event list */
-            for (j = i; j < ios->n - 1; ++j)
-                ios->events[j] = ios->events[j+1];
             --ios->n;
+            for (; i < ios->n; ++i)
+                ios->events[i] = ios->events[i+1];
             Parrot_schedule_event(ev->interp, ev);
             break;
         }
@@ -806,7 +807,6 @@ io_thread(void *data)
                              */
                             FD_CLR(i, &act_rfds);
                             io_thread_ready_rd(&ios, i);
-                            break;
                         }
                     }
                 }
