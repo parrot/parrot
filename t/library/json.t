@@ -32,8 +32,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an empty string');
     s = ''
 
     $S0 = _json( s, 0 )
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -48,8 +47,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of a non-empty string');
     s = 'abcdeABCDE01234$%^&*'
 
     $S0 = _json( s, 0 )
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -62,10 +60,9 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of a string with simple escapes');
 .sub test :main
     .local string s
     s = "abcde\\ABCDE\"01234\n$%^&*"
-    # XXX more escapes need to be tested; see http://www.crockford.com/JSON/
+    # XXX more escapes need to be tested; see http://www.json.org/
     $S0 = _json( s, 0 )
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -79,24 +76,19 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of some integers');
     .local int i
     i = 0
     $S0 = _json( i, 0 )
-    print $S0
-    print "\n"
+    say $S0
     i = 35
     $S0 = _json( i, 0 )
-    print $S0
-    print "\n"
+    say $S0
     i = -42
     $S0 = _json( i, 0 )
-    print $S0
-    print "\n"
+    say $S0
     i = 2147483647
     $S0 = _json( i, 0 )
-    print $S0
-    print "\n"
+    say $S0
     i = -2147483648
     $S0 = _json( i, 0 )
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -114,20 +106,16 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of some numbers');
     .local num n
     n = 0.0
     $S0 = _json( n )
-    print $S0
-    print "\n"
+    say $S0
     n = 2.50
     $S0 = _json( n )
-    print $S0
-    print "\n"
+    say $S0
     n = -42.0
     $S0 = _json( n )
-    print $S0
-    print "\n"
+    say $S0
     n = 4.5e1
     $S0 = _json( n )
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -183,8 +171,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an array');
     array[9] = 9
 
     $S0 = _json( array, 0 )
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -327,8 +314,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of hash');
     hash["delta"] = "DELTA"
 
     $S0 = _json( hash, 0 )
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -415,8 +401,7 @@ pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of nested structure');
     world["some_country"] = country
 
     $S0 = _json( world, 0 )
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -432,16 +417,14 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of String PMCs');
     s = new .String
     s = ''
     $S0 = _json( s, 0 )
-    print $S0
-    print "\n"
+    say $S0
     $S0 = _json( s, 1 )
     print $S0
 
     s = new .String
     s = "12345\"67890"
     $S0 = _json( s, 0 )
-    print $S0
-    print "\n"
+    say $S0
     $S0 = _json( s, 1 )
     print $S0
 .end
@@ -462,16 +445,14 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of Integer PMCs');
     i = new .Integer
     i = 0
     $S0 = _json( i, 0 )
-    print $S0
-    print "\n"
+    say $S0
     $S0 = _json( i, 1 )
     print $S0
 
     i = new .Integer
     i = -42
     $S0 = _json( i, 0 )
-    print $S0
-    print "\n"
+    say $S0
     $S0 = _json( i, 1 )
     print $S0
 .end
@@ -492,16 +473,14 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of Boolean PMCs');
     b = new .Boolean
     b = 0
     $S0 = _json( b, 0 )
-    print $S0
-    print "\n"
+    say $S0
     $S0 = _json( b, 1 )
     print $S0
 
     b = new .Boolean
     b = 1
     $S0 = _json( b, 0 )
-    print $S0
-    print "\n"
+    say $S0
     $S0 = _json( b, 1 )
     print $S0
 .end
@@ -521,15 +500,13 @@ pir_output_is(<<'CODE', <<'OUT', 'Create JSON of null and .Undef');
     null n
 
     $S0 = _json( n, 0 )
-    print $S0
-    print "\n"
+    say $S0
     $S0 = _json( n, 1 )
     print $S0
 
     n = new .Undef
     $S0 = _json( n, 0 )
-    print $S0
-    print "\n"
+    say $S0
     $S0 = _json( n, 1 )
     print $S0
 .end
@@ -541,21 +518,16 @@ null
 null
 OUT
 
-SKIP: {
-skip('_json_to_pmc: Not implemented',4);
-
 # no. 19
 pir_output_is(<<'CODE', <<'OUT', 'Decode JSON empty string');
 
 .sub test :main
     $P0 = _json_to_pmc( '""' )
     $S0 = typeof $P0
-    print $S0
-    print "\n"
+    say $S0
 
     $S0 = $P0
-    print $S0
-    print "\n"
+    say $S0
 
 .end
 .include 'library/JSON.pir'
@@ -571,9 +543,9 @@ pir_output_is(<<'CODE', <<'OUT', 'Decode JSON null');
     $P0 = _json_to_pmc( 'null' )
     if_null $P0, ok
 
-    print "not "
+    print 'not '
 ok:
-    print "ok\n"
+    say 'ok
 .end
 .include 'library/JSON.pir'
 CODE
@@ -586,12 +558,10 @@ pir_output_is(<<'CODE', <<'OUT', 'Decode JSON true');
 .sub test :main
     $P0 = _json_to_pmc( 'true' )
     $S0 = typeof $P0
-    print $S0
-    print "\n"
+    say $S0
 
     $S0 = $P0
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
@@ -605,20 +575,13 @@ pir_output_is(<<'CODE', <<'OUT', 'Decode JSON false');
 .sub test :main
     $P0 = _json_to_pmc( 'false' )
     $S0 = typeof $P0
-    print $S0
-    print "\n"
+    say $S0
 
     $S0 = $P0
-    print $S0
-    print "\n"
+    say $S0
 .end
 .include 'library/JSON.pir'
 CODE
 .Boolean
 0
 OUT
-
-}
-
-
-
