@@ -64,7 +64,7 @@ JSON
 "JSON" => 0
 OUT
 
-json_dump_is(<<'JSON', <<'OUT', 'empty array', todo=>'parse error');
+json_dump_is(<<'JSON', <<'OUT', 'empty array');
 []
 JSON
 "JSON" => ResizablePMCArray (size:0) [

@@ -3,7 +3,7 @@
 grammar JSON;
 
 rule  object { \{ <members>?  \} }
-rule  array  { \[ <elements>? \] }
+rule  array  { \[ \] | \[ <elements> \] }
 token string { "    <char>*   "  }
 
 rule  members { <string> \: <thing> [, <string> \: <thing> ]* }

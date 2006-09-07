@@ -152,12 +152,10 @@ transform pir (array) {
     items = node['elements']
     if null items goto end
 
-    items = items[0]
     items = items['thing']
 
     .local pmc iter, child
     iter = new .Iterator, items
-
 loop:
     unless iter goto end
     child = shift iter
