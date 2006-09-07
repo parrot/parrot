@@ -81,7 +81,6 @@ JSON
 ]
 OUT
 
-#json_dump_is(<<'JSON', <<'OUT', 'empty object', todo=>'parse error');
 json_dump_is(<<'JSON', <<'OUT', 'empty object');
 {}
 JSON
