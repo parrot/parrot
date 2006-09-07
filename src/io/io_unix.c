@@ -879,25 +879,22 @@ Send the message C<*s> to C<*io>'s connected socket.
 static INTVAL
 PIO_unix_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)
 {
-    int error, bytes, byteswrote, maxwrite;
+    int error, bytes, byteswrote;
 
     UNUSED(layer);
     UNUSED(interpreter);
     bytes = s->bufused;
     byteswrote = 0;
-    maxwrite = 2048;
 AGAIN:
     /*
      * Ignore encoding issues for now.
      */
     if ((error = send(io->fd, (char *)s->strstart + byteswrote,
-                    s->bufused, 0)) >= 0) {
+                    bytes, 0)) >= 0) {
         byteswrote += error;
-        if (byteswrote >= bytes) {
+        bytes -= error;
+        if (!bytes) {
             return byteswrote;
-        }
-        else if (bytes - byteswrote < maxwrite) {
-            maxwrite = bytes - byteswrote;
         }
         goto AGAIN;
     }
@@ -942,11 +939,7 @@ PIO_unix_recv(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING **s)
     UNUSED(layer);
 AGAIN:
     if ((error = recv(io->fd, buf, 2048, 0)) >= 0) {
-        if (error > 0)
-            bytesread += error;
-        else {
-            close(io->fd);
-        }
+        bytesread += error;
         /* The charset should probably be 'binary', but right now httpd.imc
          * only works with 'ascii'
          */

@@ -665,17 +665,20 @@ the wait sets.
 #ifndef WIN32
 typedef struct {
     int n;
+    int alloced;
     parrot_event **events;
 } pending_io_events;
 
 static void
 store_io_event(pending_io_events *ios, parrot_event *ev)
 {
-    if (!ios->n) {
-        ios->events = mem_sys_allocate(sizeof(ev));
+    if (!ios->alloced) {
+        ios->events = mem_sys_allocate(16 * sizeof(ev));
+        ios->alloced = 16;
     }
-    else {
-        ios->events = mem_sys_realloc(ios->events, (1 + ios->n) * sizeof(ev));
+    else if (ios->n == ios->alloced - 1) {
+        ios->alloced <<= 1;
+        ios->events = mem_sys_realloc(ios->events, (ios->alloced * sizeof(ev)));
     }
     ios->events[ios->n] = ev;
     ++ios->n;
@@ -709,6 +712,7 @@ io_thread(void *data)
     pending_io_events ios;
 
     ios.n = 0;
+    ios.alloced = 0;
     /* remember pending io events */
 
     FD_ZERO(&act_rfds);
