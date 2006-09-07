@@ -53,6 +53,8 @@ sub new
             'compilers/post' ),
         $self->new_group( 'BCG', 'Byte Code Generation',
             'compilers/bcg' ),
+        $self->new_group( 'JSON', 'JavaScript Object Notation',
+            'compilers/json' ),
     );
 }
 
