@@ -4,19 +4,12 @@ JSON.pir - PIR implementation of JSON data interchange format.
 
 =head1 SYNOPSIS
 
- # generate a JSON representation of a PMC.
+Use the C<_json> method to generate a JSON representation of a PMC.
+
+ .include 'library/JSON.pir'
  $S0 = _json( $P0 )
 
- # generate a PMC from a JSON representation:
- $P1 = _json_to_pmc( "[1,2,3]" ) 
- #$P1 is now a array-like container PMC with three Integer elements.
-
- .end
- .include 'library/JSON.pir'
-
-=head1 DESCRIPTION
-
-PIR implementation of JSON
+To generate a PMC from a JSON string, see L<compilers/json/JSON.pir>.
 
 =cut
 
@@ -369,21 +362,6 @@ done:
 .include  'library/Data/Escape.pir'
 .include  'library/Data/Sort.pir'
 
-=item (pmc) = _json_to_pmc(string)
-
-Given a JSON string, return a PMC that represents that data.
-
-=over 4
-
-=item string
-
-Required. A JSON data string.
-
-=back
-
-The following PMCs are used when unmarshalling a JSON string:
-ResizablePMCArray, Hash, String, Integer, Float, Boolean, Null.
-
 =back
 
 =head1 TODO
@@ -392,14 +370,8 @@ ResizablePMCArray, Hash, String, Integer, Float, Boolean, Null.
 
 =item 1
 
-implement _jsan_to_pmc - Jerry Gay was rolling some PGE to do the
-heavy lifting here.
-
-=item 2
-
 Thunk a better way to deal with the maximum recursion depth exception (Or make it official)
 
 =back
 
 =cut
-

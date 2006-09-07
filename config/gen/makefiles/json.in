@@ -6,22 +6,20 @@ TGE_DIR  = ../../compilers/tge
 
 all: JSON.pbc
 
-.SUFFIXES :
-.SUFFIXES : .pir .pg .tg .pbc
+JSON.pbc : JSON/grammar.pbc JSON/pge2pir.pbc JSON.pir
+	$(PARROT) --output=JSON.pbc JSON.pir
 
-.tg.pir :
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
+JSON/grammar.pbc : JSON/grammar.pir
+	$(PARROT) --output=$@ $<
 
-.pg.pir :
+JSON/grammar.pir : JSON/grammar.pg
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=$@ $<
 
-.pir.pbc :
-    $(PARROT) --output=$@ $<
+JSON/pge2pir.pbc : JSON/pge2pir.pir
+	$(PARROT) --output=$@ $<
 
-# specify this directly because make doesn't dig into deps...
-.pg.pbc :
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=$*.pir $<
-	$(PARROT) --output=$@ $*.pir
+JSON/pge2pir.pir : JSON/pge2pir.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
 
 clean :
-	@rm_f@ JSON.pbc JSON.pir
+	@rm_f@ "JSON/*.pbc" "JSON/*.pir" JSON.pbc

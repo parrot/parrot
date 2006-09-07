@@ -6,23 +6,21 @@ use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 22;
-
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
-t/library/json.t - test JSON library
+t/compilers/json/from_parrot.t - test parrot to JSON conversion.
 
 =head1 SYNOPSIS
 
-    % prove t/library/json.t
+    % prove t/compilers/json/from_parrot.t
 
 =head1 DESCRIPTION
 
-Tests JSON->Parrot and Parrot->JSON conversions.
+Tests JSON->Parrot conversions.
 
 =cut
-
 
 # no. 1
 pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an empty string');
@@ -516,72 +514,4 @@ null
 null
 null
 null
-OUT
-
-# no. 19
-pir_output_is(<<'CODE', <<'OUT', 'Decode JSON empty string');
-
-.sub test :main
-    $P0 = _json_to_pmc( '""' )
-    $S0 = typeof $P0
-    say $S0
-
-    $S0 = $P0
-    say $S0
-
-.end
-.include 'library/JSON.pir'
-CODE
-String
-
-OUT
-
-# no. 20
-pir_output_is(<<'CODE', <<'OUT', 'Decode JSON null');
-
-.sub test :main
-    $P0 = _json_to_pmc( 'null' )
-    if_null $P0, ok
-
-    print 'not '
-ok:
-    say 'ok
-.end
-.include 'library/JSON.pir'
-CODE
-ok
-OUT
-
-# no. 21
-pir_output_is(<<'CODE', <<'OUT', 'Decode JSON true');
-
-.sub test :main
-    $P0 = _json_to_pmc( 'true' )
-    $S0 = typeof $P0
-    say $S0
-
-    $S0 = $P0
-    say $S0
-.end
-.include 'library/JSON.pir'
-CODE
-.Boolean
-1
-OUT
-
-# no. 22
-pir_output_is(<<'CODE', <<'OUT', 'Decode JSON false');
-
-.sub test :main
-    $P0 = _json_to_pmc( 'false' )
-    $S0 = typeof $P0
-    say $S0
-
-    $S0 = $P0
-    say $S0
-.end
-.include 'library/JSON.pir'
-CODE
-.Boolean
-0
 OUT

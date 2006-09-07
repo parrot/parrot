@@ -1,0 +1,114 @@
+grammar JSON::PIR is TGE::Grammar;
+
+transform result (ROOT) {
+    .local pmc pir
+    .local string result
+ 
+    $S0 = tree.'get'('pir', node, 'thing')
+
+    pir = new 'PGE::CodeString'
+    pir.emit('.sub anon :anon')
+    pir.emit($S0)
+    result = node['ret']
+    pir.emit('    .return (%0)',result)
+    pir.emit('.end')
+   
+   .return(pir)
+} 
+
+transform pir (thing) {
+
+    .local pmc sub_node, transform_result
+    .local pmc pir, result
+    .local string value
+
+    sub_node = node['string']
+    unless null sub_node goto got_string
+   
+    sub_node = node['number']
+    unless null sub_node goto got_number
+
+    sub_node = node['object']
+    unless null sub_node goto got_object 
+
+    sub_node = node['array']
+    unless null sub_node goto got_array 
+
+    value = node
+    if value == 'true'  goto got_true
+    if value == 'false' goto got_false
+    if value == 'null'  goto got_null
+
+    .return ('') # should never reach this.
+
+  got_number:
+    pir = tree.'get'('pir', sub_node, 'number')
+    $S0 = sub_node['ret']
+    node['ret'] = $S0
+    .return (pir)
+
+  got_string:
+    pir = tree.'get'('pir', sub_node, 'string')
+    $S0 = sub_node['ret']
+    node['ret'] = $S0
+    .return (pir)
+
+  got_object:
+    .return ('#XXX')
+
+  got_array:
+    .return ('#XXX')
+
+  got_true:
+    pir = new 'PGE::CodeString'
+    result = pir.unique('$P')
+    $S0 = node
+    pir.emit('    %0 = new .Boolean', result)
+    pir.emit('    %0 = 1', result, $S0)
+    node['ret'] = result
+    .return(pir)
+
+  got_false:
+    pir = new 'PGE::CodeString'
+    result = pir.unique('$P')
+    $S0 = node
+    pir.emit('    %0 = new .Boolean', result)
+    pir.emit('    %0 = 0', result, $S0)
+    node['ret'] = result
+    .return(pir)
+
+  got_null:
+    pir = new 'PGE::CodeString'
+    result = pir.unique('$P')
+    $S0 = node
+    pir.emit('    null %0', result)
+    node['ret'] = result
+    .return(pir)
+}
+
+#transform pir (object) {
+#transform pir (array) {
+
+# XXX doesn't handle any special cases.
+transform pir (string) {
+    .local pmc pir, result
+    pir = new 'PGE::CodeString'
+    result = pir.unique('$P')
+    $S0 = node
+    pir.emit('    %0 = new .String', result)
+    pir.emit('    %0 = %1', result, $S0)
+    node['ret'] = result
+   .return(pir)
+}
+
+# XXX doesn't handle any special cases.
+transform pir (number) {
+    .local pmc pir, result
+    pir = new 'PGE::CodeString'
+    result = pir.unique('$P')
+    $S0 = node
+    pir.emit('    %0 = new .Integer', result)
+    pir.emit('    %0 = %1', result, $S0)
+    node['ret'] = result
+   .return(pir)
+}

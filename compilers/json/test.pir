@@ -9,32 +9,17 @@
 
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pbc'
-  load_bytecode 'compilers/json/JSON.pir'  #the json grammar file
+  load_bytecode 'compilers/json/JSON.pbc'
+  
+  .local pmc JSON
+  JSON = compreg "JSON"
+  $S0 = argv[1]
+  $P1 = JSON($S0)
 
-   .local pmc parse, match
-   parse = get_root_global ['parrot'; 'JSON'], 'thing'
-   if_null parse, bad_parser
-
-   $P0 = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
-   $S0 = argv[1]
-   match = $P0($S0)
-   match.to(0)
-   match = parse(match)
-   unless match goto failed
- 
    load_bytecode 'dumper.pbc'
-   load_bytecode 'PGE/Dumper.pbc'
-   $S0 = typeof match
-   say $S0
-   $P0 = get_root_global ['parrot'], '_dumper'
-   $P0(match)
+   _dumper($P1)
    end
-  failed:
-   say "that's not a JSON value"
-   end
-  bad_parser:
-   say "can't find JSON.."  
-   end
+
   bad_args:
    say "must specify a single arg."
    end
