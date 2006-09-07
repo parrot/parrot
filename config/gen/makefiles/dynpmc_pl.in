@@ -69,7 +69,7 @@ sub partial_link_cmd {
         # Need to put various libraries in the link line.
         $liblist = join( ' ', map { "$_.lib" } keys %$libs );
         if ($CC =~ /gcc/i) {
-            $liblist =~ s/gdbm\.lib/-llibgdbm/i;
+            $liblist =~ s/libgdbm\.lib/-llibgdbm/i;
         }
         my $extraLibs = '@libs@ @icu_shared@';
         $extraLibs =~ s/blib/..\\blib/g;
@@ -77,8 +77,14 @@ sub partial_link_cmd {
         $liblist .= ' ' . $extraLibs;
         
         # Also note that we may need to look in the Parrot blib directory.
-        $liblist .= qq{ /LIBPATH:"@build_dir@/blib/lib"};
-    } else {
+        if ($CC =~ /gcc/i) {
+            $liblist .= qq{ -Wl,-L "@build_dir@/blib/lib"};
+        }
+        else {
+            $liblist .= qq{ /LIBPATH:"@build_dir@/blib/lib"};
+        }
+    }
+    else {
         $liblist = join( ' ', map { "-l$_" } keys %$libs );
     }
 
@@ -213,7 +219,8 @@ sub modtime {
 
     if (defined $ago) {
         return $NOW - $ago;
-    } else {
+    } 
+    else {
         return;
     }
 }
