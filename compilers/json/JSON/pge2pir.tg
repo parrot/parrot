@@ -164,7 +164,7 @@ transform pir (string) {
     .local pmc pir, result
     pir = new 'PGE::CodeString'
     result = pir.unique('$P')
-    $S0 = node
+    $S0 = node[0]
     $S1 = pir.escape($S0)
     pir.emit('    %0 = new .String', result)
     pir.emit('    %0 = %1', result, $S1)
