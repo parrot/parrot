@@ -19,7 +19,7 @@ Tests all source files for the limit of C<n> columns.
 use strict;
 use warnings;
 
-our $columns = 80;
+our $columns = 100;
 
 use lib qw! . lib ../lib ../../lib !;
 

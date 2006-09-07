@@ -119,10 +119,12 @@ while (my ($type, $id) = each %pmc_types) {
     next if $type eq "STMRef";
     next if $type eq "SharedRef";
     next if $type eq "ParrotObject";
+    next if $type eq "ParrotThread";
     next if $type eq "deleg_pmc";
     next if $type eq "BigInt";
     next if $type eq "LexInfo";
     next if $type eq "LexPad";
+    next if $type eq "Slice";
     my $set_ro = ($type =~ /^Const\w+/) ? <<EOPASM : '';
     new P10, .Integer
     set P10, 1
