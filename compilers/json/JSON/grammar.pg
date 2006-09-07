@@ -2,11 +2,11 @@
 
 grammar JSON;
 
-token object { \{ <members>?  \} }
-token array  { \[ <elements>? \] }
+rule  object { \{ <members>?  \} }
+rule  array  { \[ <elements>? \] }
 token string { "    <char>*   "  }
 
-token members { <string> \: <thing> [, <string> \: <thing> ]* }
+rule  members { <string> \: <thing> [, <string> \: <thing> ]* }
 
 token elements { <thing> [, <thing> ]* }
 
