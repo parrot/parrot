@@ -10,16 +10,16 @@ JSON.pbc : JSON/grammar.pbc JSON/pge2pir.pbc JSON.pir
 	$(PARROT) --output=JSON.pbc JSON.pir
 
 JSON/grammar.pbc : JSON/grammar.pir
-	$(PARROT) --output=$@ $<
+	$(PARROT) --output=JSON/grammar.pbc JSON/grammar.pir
 
 JSON/grammar.pir : JSON/grammar.pg
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=$@ $<
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=JSON/grammar.pir JSON/grammar.pg
 
 JSON/pge2pir.pbc : JSON/pge2pir.pir
-	$(PARROT) --output=$@ $<
+	$(PARROT) --output=JSON/pge2pir.pbc JSON/pge2pir.pir
 
 JSON/pge2pir.pir : JSON/pge2pir.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=JSON/pge2pir.pir JSON/pge2pir.tg
 
 clean :
 	@rm_f@ "JSON/*.pbc" "JSON/*.pir" JSON.pbc
