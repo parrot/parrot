@@ -4,7 +4,7 @@ grammar JSON;
 
 rule  object { \{ <members>?  \} }
 rule  array  { \[ \] | \[ <elements> \] }
-token string { "    <char>*   "  }
+token string { " (<char>*) " }
 
 rule  members { <string> \: <thing> [, <string> \: <thing> ]* }
 
