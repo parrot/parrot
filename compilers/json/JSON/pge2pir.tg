@@ -165,8 +165,9 @@ transform pir (string) {
     pir = new 'PGE::CodeString'
     result = pir.unique('$P')
     $S0 = node
+    $S1 = pir.escape($S0)
     pir.emit('    %0 = new .String', result)
-    pir.emit('    %0 = %1', result, $S0)
+    pir.emit('    %0 = %1', result, $S1)
     node['ret'] = result
    .return(pir)
 }
