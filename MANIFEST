@@ -503,6 +503,7 @@ examples/io/async_select.pir                                [main]doc
 examples/io/echo_client.pir                                 [main]doc
 examples/io/http.pir                                        [main]doc
 examples/io/httpd.pir                                       [main]doc
+examples/io/httpd2.pir                                      [main]doc
 examples/io/net_smtp.pasm                                   [main]doc
 examples/io/pioctl.pasm                                     [main]doc
 examples/io/pipe2.pir                                       [main]doc
