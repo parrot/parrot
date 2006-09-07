@@ -8,7 +8,7 @@ token string { "    <char>*   "  }
 
 token members { <string> \: <thing> [, <string> \: <thing> ]* }
 
-token elements { <thing> [, <thing> ] * }
+token elements { <thing> [, <thing> ]* }
 
 # XXX This should be called 'value', but...
 # RT#40069: [PGE] "value" can't be used as a rule name.
