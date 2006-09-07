@@ -856,6 +856,11 @@ Parrot_event_add_io_event(Interp* interpreter,
     event = mem_sys_allocate(sizeof(parrot_event));
     event->type        = EVENT_TYPE_IO;
     event->interp      = interpreter;
+    /* 
+     * TODO dod_register these PMCs as long as the event system
+     *      owns these 3
+     *      unregister, when event is passed to interp again
+     */
     event->u.io_event.pio       = pio;
     event->u.io_event.handler   = sub;
     event->u.io_event.user_data = data;
