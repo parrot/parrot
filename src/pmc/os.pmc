@@ -23,6 +23,10 @@ files and directories.
 #include <direct.h>
 #endif
 
+#ifndef WIN32
+#include <dirent.h>
+#endif
+
 #include "parrot/parrot.h"
 
 /* XXX Check if we need to deallocate strerror strings */
@@ -433,8 +437,50 @@ idea to do the same with parrot.
 #endif
     }
 
-}
 
+/*
+
+=item C<PMC* readdir(STRING* path)>
+
+reads entries from a directory.
+
+=cut
+
+*/
+    METHOD PMC* readdir(STRING* path) {
+#ifndef WIN32
+        DIR *dir ;
+        struct dirent *dirent;
+        PMC *array;
+        char *cpath = string_to_cstring(interpreter, path);
+        STRING *retval ;
+
+        dir = opendir(cpath);
+        string_cstring_free(cpath);
+        if (dir == NULL)
+        {
+            char *errmsg = strerror(errno);
+            real_exception(interpreter, NULL, E_SystemError, errmsg);
+        }
+
+        array = pmc_new(interpreter, enum_class_ResizableStringArray);
+        while ((dirent = readdir(dir)) != NULL)
+        {
+            retval = string_from_cstring(interpreter, dirent->d_name, 0) ;
+            VTABLE_push_string(interpreter, array, retval);
+        }
+
+        closedir(dir);
+
+        return array ;
+#else
+        real_exception(interpreter, NULL, E_NotImplementedError,
+                "Win32 is not POSIX. Need win32 developer!");
+#endif
+    }
+
+
+}
 /*
 
 =back

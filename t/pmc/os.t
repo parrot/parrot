@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -193,6 +193,24 @@ CODE
 
 }
 
+# test readdir
+unless ($MSWin32)
+{
+   opendir IN, '.' ;
+   my @entries = readdir IN ;
+   closedir IN ;
+   my $entries = join(' ', @entries)."\n" ;
+   pir_output_is(<<'CODE', $entries, 'Test OS.readdir');
+.sub main :main
+    $P1 = new .OS
+    $P2 = $P1.readdir('.')
+    
+    $S0 = join ' ', $P2
+    print $S0
+    print "\n"
+.end
+CODE
+}
 
 # test lstat
 
