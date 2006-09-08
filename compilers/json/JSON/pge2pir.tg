@@ -158,21 +158,45 @@ end:
    .return (pir) 
 }
 
-
-# XXX doesn't handle any special cases.
 transform pir (string) {
-    .local pmc pir, result
+    .local pmc pir, result, children, iter, child
+    .local string tmp
+    tmp = ''
     pir = new 'PGE::CodeString'
+    children = node['char']
+    if null children goto loop_end
+    iter = new .Iterator, children 
+  loop:
+    push_eh loop_end
+      child = shift iter
+    clear_eh
+    unless child goto loop_end
+    $S0 = child
+    $I0 = length $S0
+    if $I0 == 1 goto char
+    if $I0 == 2 goto escape
+  unicode:
+    $P1 = new .String
+    $S1 = substr $S0, 2, 4
+    $P1 = $S1
+    $I0 = $P1.to_int(16)
+    $S0 = chr $I0 
+    goto char
+  escape:
+    $S0 = substr $S0, 1, 1
+  char:
+    tmp .= $S0
+    goto loop
+  loop_end:
+
     result = pir.unique('$P')
-    $S0 = node[0]
-    $S1 = pir.escape($S0)
+    $S1 = pir.escape(tmp)
     pir.emit('    %0 = new .String', result)
     pir.emit('    %0 = %1', result, $S1)
     node['ret'] = result
    .return(pir)
 }
 
-# XXX doesn't handle any special cases.
 transform pir (number) {
     .local pmc pir, result
     pir = new 'PGE::CodeString'
