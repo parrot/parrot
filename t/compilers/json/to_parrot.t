@@ -497,35 +497,37 @@ JSON
 }
 OUT
 
-json_dump_is(<<'JSON', <<'OUT', 'random object/array example',todo=>'TODO parse error');
-{[],{[],{}},"str":true,{"a":"1",{},"b":"2"},[true],false,{[],"d":3}}
+json_dump_is(<<'JSON', <<'OUT', 'random object/array example');
+[[],[{},{}],{"str":true},{"a":"1","b":{},"c":"2"},[true],false,{"e":[],"d":3}]
 JSON
-"JSON" => Hash {
+"JSON" => ResizablePMCArray (size:7) [
     ResizablePMCArray (size:0) [
     ],
-    Hash {
-        ResizablePMCArray (size:0) [
-        ],
+    ResizablePMCArray (size:2) [
+        Hash {
+        },
         Hash {
         }
+    ],
+    Hash {
+        "str" => 1
     },
-    "str" => null,
     Hash {
-        "a" => 1,
-        "b" => 2,
-        Hash {
-        }
+        "a" => "1",
+        "b" => Hash {
+        },
+        "c" => "2"
     },
     ResizablePMCArray (size:1) [
         1
     ],
     0,
     Hash {
-        ResizablePMCArray (size:0) [
-        ],
-        "d" => 3
+        "d" => 3,
+        "e" => ResizablePMCArray (size:0) [
+        ]
     }
-}
+]
 OUT
 
 # XXX Need many more tests, exercising all aspects of http://www.json.org/
