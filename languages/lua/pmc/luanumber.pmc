@@ -258,7 +258,8 @@ MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 return Parrot_LuaNumber_add_LuaNumber(INTERP, SELF, n, dest);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -299,7 +300,8 @@ MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 Parrot_LuaNumber_i_add_LuaNumber(INTERP, SELF, n);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -342,7 +344,8 @@ MMD_LuaString: {
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 return Parrot_LuaNumber_subtract_LuaNumber(INTERP, SELF,
                                                            n, dest);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -383,7 +386,8 @@ MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 Parrot_LuaNumber_i_subtract_LuaNumber(INTERP, SELF, n);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -426,7 +430,8 @@ MMD_LuaString: {
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 return Parrot_LuaNumber_multiply_LuaNumber(INTERP, SELF,
                                                            n, dest);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -467,7 +472,8 @@ MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 Parrot_LuaNumber_i_multiply_LuaNumber(INTERP, SELF, n);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -510,7 +516,8 @@ MMD_LuaString: {
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 return Parrot_LuaNumber_divide_LuaNumber(INTERP, SELF,
                                                          n, dest);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -551,7 +558,8 @@ MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 Parrot_LuaNumber_i_divide_LuaNumber(INTERP, SELF, n);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -596,7 +604,8 @@ MMD_LuaString: {
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 return Parrot_LuaNumber_modulus_LuaNumber(INTERP, SELF,
                                                           n, dest);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -639,7 +648,8 @@ MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 Parrot_LuaNumber_i_modulus_LuaNumber(INTERP, SELF, n);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -681,7 +691,8 @@ MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 return Parrot_LuaNumber_pow_LuaNumber(INTERP, SELF, n, dest);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                       "attempt to perform arithmetic on a %s value",
                       string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
@@ -722,7 +733,8 @@ MMD_LuaString: {
             PMC* n = Parrot_LuaString_tonumber(INTERP, value);
             if (VTABLE_isa(INTERP, n, const_string(INTERP, "LuaNumber"))) {
                 Parrot_LuaNumber_i_pow_LuaNumber(INTERP, SELF, n);
-            } else {
+            } 
+            else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to perform arithmetic on a %s value",
                     string_to_cstring(INTERP, VTABLE_name(INTERP, value)));

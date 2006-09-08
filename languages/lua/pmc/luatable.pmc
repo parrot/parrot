@@ -191,7 +191,8 @@ A copy of the value is retrieved, otherwise, this could happen:
             if (meth != NULL) {
                 if (dynpmc_LuaTable == meth->vtable->base_type) {
                     return VTABLE_get_pmc_keyed(INTERP, meth, key);
-                } else {
+                } 
+                else {
                     retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                       SELF, key);
                 }
@@ -236,7 +237,8 @@ A copy of the value is stored, otherwise, this could happen:
             if (meth != NULL) {
                 if (dynpmc_LuaTable == meth->vtable->base_type) {
                     VTABLE_set_pmc_keyed(INTERP, meth, key, value);
-                } else {
+                } 
+                else {
                     Parrot_runops_fromc_args(INTERP, meth, "vPPP",
                                              SELF, key, value);
                 }
@@ -352,7 +354,8 @@ MMD_LuaTable: {
                                             : (INTVAL)0;
                 if (r) {
                     return (INTVAL)-1;
-                } else {
+                } 
+                else {
                     PMC *_le = Parrot_LuaBase_find_metamethod(INTERP, SELF,
                              string_from_const_cstring(INTERP, "__le", 0));
                     if (_le != NULL) {
@@ -362,17 +365,20 @@ MMD_LuaTable: {
                                              : (INTVAL)0;
                         if (r) {
                             return (INTVAL)0;
-                        } else {
+                        } 
+                        else {
                             return (INTVAL)1;
                         }
-                    } else {
+                    } 
+                    else {
                         retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
                                                           value, SELF);
                         r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
                                              : (INTVAL)0;
                         if (r) {
                             return (INTVAL)1;
-                        } else {
+                        } 
+                        else {
                             return (INTVAL)0;
                         }
                     }
@@ -503,7 +509,8 @@ MMD_DEFAULT: {
         if (dynpmc_LuaNil == meta->vtable->base_type) {
             VTABLE_delprop(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__metatable", 0));
-        } else {
+        } 
+        else {
             VTABLE_setprop(INTERP, SELF,
                     string_from_const_cstring(INTERP, "__metatable", 0),
                     meta);

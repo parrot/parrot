@@ -538,7 +538,8 @@ Common implementation (use C<__tostring> or C<get_string>).
             if (NULL == retval) {
                 retval = pmc_new(INTERP, dynpmc_LuaNil);
             }
-        } else {
+        } 
+        else {
             retval = pmc_new(INTERP, dynpmc_LuaString);
             PMC_str_val(retval) = VTABLE_get_string(INTERP, SELF);
         }
