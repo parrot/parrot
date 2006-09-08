@@ -33,6 +33,18 @@ documentation at L<http://www.json.org/>.
 
     $P1 = get_global '__compiler'
     compreg "JSON", $P1
+
+    $P1 = new .Hash
+    $P1['\"'] = '"'
+    $P1['\\'] = "\\"
+    $P1['\/'] = '/'
+    $P1['\b'] = "\b"
+    $P1['\f'] = "\f"
+    $P1['\n'] = "\n"
+    $P1['\r'] = "\r"
+    $P1['\t'] = "\t"
+
+    set_root_global [ 'JSON' ], '$escapes', $P1
 .end
 
 .sub '__compiler'
