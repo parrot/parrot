@@ -242,7 +242,7 @@ JSON
 ]
 OUT
 
-json_dump_is(<<'JSON', <<'OUT', 'array of boolean objects',todo=>'TODO parse error');
+json_dump_is(<<'JSON', <<'OUT', 'array of boolean objects',todo=>'TODO RPA converts null child to undef.');
 [false,true,null]
 JSON
 "JSON" => ResizablePMCArray (size:3) [
