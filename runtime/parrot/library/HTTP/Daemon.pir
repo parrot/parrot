@@ -56,7 +56,7 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
     setattribute self, 'opts', opts
     active = new .ResizablePMCArray
     setattribute self, 'active', active
-    $P0 = new .ResizablePMCArray
+    $P0 = new .ResizableStringArray
     setattribute self, 'to_log', $P0
 
     # create socket
@@ -113,8 +113,24 @@ add_lp:
     add_io_event $P0, req_handler, self, 2
     inc i
     if i < n goto add_lp
+    # while idle dump the logfile
+    self.'_write_logs'()
     sleep 0.1
     goto loop
+.end
+
+.sub '_write_logs' :method
+    .local pmc to_log
+    to_log = getattribute self, 'to_log'
+    .local int n
+loop:
+    # log can fill, while we are running here
+    n = elements to_log
+    unless n goto ex
+    $S0 = shift to_log
+    print $S0
+    goto loop
+ex:
 .end
 
 .sub '__get_bool' :method
@@ -155,7 +171,11 @@ do_debug:
     push args, "\n"
     fmt = repeat "%Ss", n
     res = sprintf fmt, args
-    print res
+    .local pmc to_log
+    to_log = getattribute self, 'to_log'
+    # Yay! The fun of any async server
+    # write to log when we idling
+    push to_log, res
 .end
 
 # reguest handler sub - not a method
