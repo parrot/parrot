@@ -17,7 +17,7 @@
   $P1 = JSON($S0)
 
    load_bytecode 'dumper.pbc'
-   _dumper($P1)
+   _dumper($P1, "JSON")
    end
 
   bad_args:
