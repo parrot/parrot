@@ -81,7 +81,7 @@ JSON
 ]
 OUT
 
-json_dump_is(<<'JSON', <<'OUT', 'simple array (check white spaces)',todo=>'parse error');
+json_dump_is(<<'JSON', <<'OUT', 'simple array (check white spaces)');
 [    1 , 2    ,  3   ]
 JSON
 "JSON" => ResizablePMCArray (size:3) [
