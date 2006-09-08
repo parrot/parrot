@@ -19,6 +19,7 @@ Leopold Toetsch <lt@toetsch.at> - some code base on httpd.pir.
     opts = new .Hash
     opts['LocalPort'] = 1234
     opts['LocalAddr'] = 'localhost'
+    opts['debug']     =  0
     clid = find_type ['HTTP'; 'Daemon']
     d = new clid, opts
     unless d goto err

@@ -32,11 +32,19 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
 
 .sub '_onload' :load
     .local pmc cl
+    # server clsass
     cl = newclass ['HTTP'; 'Daemon']
     addattribute cl, 'socket'	# pio where httpd is listening
     addattribute cl, 'opts'     # options TBdoced
-    addattribute cl, 'active'   # list of active pios
+    addattribute cl, 'active'   # list of active ClientConns
     addattribute cl, 'to_log'   # list of strings to be logged
+    
+    # client connection
+    # XXX this should subclass ParrotIO but opcode or PIO code 
+    # just doesn't work with classes
+    cl = newclass ['HTTP'; 'Daemon'; 'ClientConn']
+    addattribute cl, 'socket'	# the connected pio
+    addattribute cl, 'server'	# whom are we working for
 .end
 
 .namespace ['HTTP'; 'Daemon']
@@ -77,6 +85,8 @@ port_ok:
 addr_ok:
     opts['LocalAddr'] = adr
     opts['LocalPort'] = port
+    $P0 = args['debug']
+    opts['debug'] = $P0
 
     # bind
     .local string i_addr
@@ -88,7 +98,13 @@ addr_ok:
     # listen
     res = listen sock, 1
     if res == -1 goto err_listen
-    push active, sock
+
+    # add connection
+    $I0 = find_type ['HTTP'; 'Daemon'; 'ClientConn']
+    .local pmc conn
+    conn = new $I0, sock
+    conn.'server'(self)
+    push active, conn
     .return()
 
 err_listen:    
@@ -110,20 +126,7 @@ loop:
     goto loop
 .end
 
-# add select even to all active pios
-.sub '_select_active' :method
-    .local pmc active
-    .local int i, n
-    .const .Sub req_handler = "req_handler"
-    active = getattribute self, 'active'
-    n = elements active
-    i = 0
-add_lp:
-    $P0 = active[i]
-    add_io_event $P0, req_handler, self, 2	# XXX magic 2
-    inc i
-    if i < n goto add_lp
-.end
+# === server utils
 
 .sub '_write_logs' :method
     .local pmc to_log
@@ -184,14 +187,34 @@ do_debug:
     push to_log, res
 .end
 
+# === connection handling
+
+# add select even to all active pios
+.sub '_select_active' :method
+    .local pmc active, conn, sock
+    .local int i, n
+    .const .Sub req_handler = "req_handler"
+    active = getattribute self, 'active'
+    n = elements active
+    i = 0
+add_lp:
+    conn = active[i]
+    sock = conn.'socket'()
+    add_io_event sock, req_handler, conn, 2	# XXX magic 2
+    inc i
+    if i < n goto add_lp
+.end
+
 # accept new connection and add to active
 .sub 'new_conn' :method
-
-    .local pmc active, orig, work
+    .local pmc active, orig, work, conn
     active = getattribute self, 'active'
-    orig = active[0]
+    orig   = getattribute self, 'socket'
     accept work, orig
-    push active, work
+    $I0 = find_type ['HTTP'; 'Daemon'; 'ClientConn']
+    conn = new $I0, work
+    conn.'server'(self)
+    push active, conn
     self.'debug'("accept new conn\n")
 .end
 
@@ -199,9 +222,10 @@ do_debug:
 .sub 'del_conn' :method
     .param pmc work
 
-    .local pmc active, orig
+    .local pmc active, orig, sock
     .local int i, n
-    close work
+    sock = getattribute work, 'socket'
+    close sock
     active = getattribute self, 'active'
 loop:
     n = elements active
@@ -211,7 +235,6 @@ rem_lp:
     eq_addr $P0, work, del_it
     inc i
     if i < n goto rem_lp
-    goto not_found
 del_it:
     delete active[i]
     .return()
@@ -219,12 +242,13 @@ not_found:
     self.'debug'("connection not found to delete\n")
 .end
 
-# if work is the original httpd socket, it's a new connection
+# if work is the original httpd conn, it's a new connection
 .sub 'exists_conn' :method
     .param pmc work
 
-    .local pmc orig
-    orig = getattribute self, 'socket'
+    .local pmc active, orig
+    active = getattribute self, 'active'
+    orig = active[0]
     ne_addr work, orig, yes
     .return (0)
 yes:
@@ -235,34 +259,41 @@ yes:
 # this is called from the async select code, i.e from the event
 # subsystem
 .sub req_handler
-    .param pmc work
-    .param pmc self
+    .param pmc work	# a pio
+    .param pmc conn     # Conn obj
 
-    $I0 = self.'exists_conn'(work)
+    .local pmc srv
+
+    srv = conn.'server'()
+    $I0 = srv.'exists_conn'(conn)
     if $I0 goto do_read
-    .return self.'new_conn'()
+    .return srv.'new_conn'()
 
 do_read:    
-    self.'_handle_request'(work)
+    conn.'_handle_request'()
 .end
 
-.sub '_handle_request' :method
-    .param pmc work
 
-    .local pmc fp
+.namespace ['HTTP'; 'Daemon'; 'ClientConn']
+
+.sub '_handle_request' :method
+
+    .local pmc fp, srv, work
     .local int ret
     .local string buf, req, rep, temp
     .local string meth, url, file_content
     .local int len, pos, occ1, occ2, do_close
 
-    self.'debug'("reading from work\n")
+    srv = self.'server'()
+    work = self.'socket'()
+    srv.'debug'("reading from work\n")
     req = ""
     do_close = 0
 MORE:
     recv ret, work, buf
     ## read buf, work, 8192
     ## ret = length buf
-    self.'debug'("**read ", ret, " bytes\n")
+    srv.'debug'("**read ", ret, " bytes\n")
 
     if ret >= 0 goto no_close
     do_close = 1
@@ -293,19 +324,19 @@ SERVE_REQ:
 
     if meth == "GET" goto SERVE_GET
 
-    self.'debug'("unknown method:'", meth, "'\n")
+    srv.'debug'("unknown method:'", meth, "'\n")
 DONE:
     if do_close goto close_it
     .return()
 close_it:
-    self.'debug'("******* closed work\n")
+    srv.'debug'("******* closed work\n")
     .local int i, n
-    self.'del_conn'(work)
+    srv.'del_conn'(self)
     .return()
 
 SERVE_GET:
     .local int is_cgi
-    self.'debug'("req url: ", url, "\n")
+    srv.'debug'("req url: ", url, "\n")
     (is_cgi, file_content, len) = check_cgi(url)
     if is_cgi goto SERVE_blob
     # decode the url
@@ -340,12 +371,12 @@ SERVE_blob:
     rep .= CRLF
     rep .= "Content-Length: "
     temp = to_string (len)
-    self.'debug'("Content-Length: ", temp, "\n")
+    srv.'debug'("Content-Length: ", temp, "\n")
     rep .= temp
     rep .= CRLFCRLF
     rep .= file_content
     send ret, work, rep
-    self.'log'(200, ", ", url)
+    srv.'log'(200, ", ", url)
     goto DONE
 
 SERVE_docroot:
@@ -361,7 +392,7 @@ SERVE_docroot:
     concat rep, CRLFCRLF
     concat rep, file_content
     send ret, work, rep
-    self.'log'(301, ", ", url, " - Redirect to 'docs/html/index.hmtl'")
+    srv.'log'(301, ", ", url, " - Redirect to 'docs/html/index.hmtl'")
     goto DONE
 
 SERVE_favicon:
@@ -380,7 +411,7 @@ SERVE_404:
     rep .= 'Content-Type: text/plain'
     rep .= CRLFCRLF
     rep .= $S0
-    self.'log'(404, ", ", url)
+    srv.'log'(404, ", ", url)
     send ret, work, rep
     goto DONE
 .end
@@ -501,3 +532,25 @@ next_item:
     if i < n goto lp_items
     .return (query_hash)
 .end
+
+.sub __init :method
+    .param pmc sock
+    setattribute self, 'socket', sock
+.end
+
+.sub 'socket' :method
+    $P0 = getattribute self, 'socket'
+    .return ($P0)
+.end
+
+.sub 'server' :method
+    .param pmc sv      :optional
+    .param int has_sv  :opt_flag
+    if has_sv goto set_it
+    sv = getattribute self, 'server'
+    .return (sv)
+set_it:
+    setattribute self, 'server', sv
+.end
+
+
