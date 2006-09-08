@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-t/distro/linelength.t - Test code lines length
+t/codingstd/linelength.t - Test code lines length
 
 =head1 SYNOPSIS
 
-	% prove t/distro/linelength.t
+	% prove t/codingstd/linelength.t
 
 =head1 DESCRIPTION
 
