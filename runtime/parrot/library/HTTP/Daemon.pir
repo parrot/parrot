@@ -33,10 +33,10 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
 .sub '_onload' :load
     .local pmc cl
     cl = newclass ['HTTP'; 'Daemon']
-    addattribute cl, 'socket'
-    addattribute cl, 'opts'
-    addattribute cl, 'active'
-    addattribute cl, 'to_log'
+    addattribute cl, 'socket'	# pio where httpd is listening
+    addattribute cl, 'opts'     # options TBdoced
+    addattribute cl, 'active'   # list of active pios
+    addattribute cl, 'to_log'   # list of strings to be logged
 .end
 
 .namespace ['HTTP'; 'Daemon']
@@ -100,23 +100,29 @@ err_sock:
 .end
 
 .sub 'run' :method
-    .const .Sub req_handler = "req_handler"
     print "running\n"
-    .local pmc active
-    active = getattribute self, 'active'
-    .local int i, n
+
 loop:
-    n = elements active
-    i = 0
-add_lp:
-    $P0 = active[i]
-    add_io_event $P0, req_handler, self, 2
-    inc i
-    if i < n goto add_lp
+    self.'_select_active'()
     # while idle dump the logfile
     self.'_write_logs'()
     sleep 0.1
     goto loop
+.end
+
+# add select even to all active pios
+.sub '_select_active' :method
+    .local pmc active
+    .local int i, n
+    .const .Sub req_handler = "req_handler"
+    active = getattribute self, 'active'
+    n = elements active
+    i = 0
+add_lp:
+    $P0 = active[i]
+    add_io_event $P0, req_handler, self, 2	# XXX magic 2
+    inc i
+    if i < n goto add_lp
 .end
 
 .sub '_write_logs' :method
@@ -178,26 +184,77 @@ do_debug:
     push to_log, res
 .end
 
+# accept new connection and add to active
+.sub 'new_conn' :method
+
+    .local pmc active, orig, work
+    active = getattribute self, 'active'
+    orig = active[0]
+    accept work, orig
+    push active, work
+    self.'debug'("accept new conn\n")
+.end
+
+# remove work from active connections and close it
+.sub 'del_conn' :method
+    .param pmc work
+
+    .local pmc active, orig
+    .local int i, n
+    close work
+    active = getattribute self, 'active'
+loop:
+    n = elements active
+    i = 0
+rem_lp:
+    $P0 = active[i]
+    eq_addr $P0, work, del_it
+    inc i
+    if i < n goto rem_lp
+    goto not_found
+del_it:
+    delete active[i]
+    .return()
+not_found:
+    self.'debug'("connection not found to delete\n")
+.end
+
+# if work is the original httpd socket, it's a new connection
+.sub 'exists_conn' :method
+    .param pmc work
+
+    .local pmc orig
+    orig = getattribute self, 'socket'
+    ne_addr work, orig, yes
+    .return (0)
+yes:
+    .return (1)
+.end
+
 # reguest handler sub - not a method
+# this is called from the async select code, i.e from the event
+# subsystem
 .sub req_handler
     .param pmc work
     .param pmc self
 
-    .local pmc fp, orig, active
+    $I0 = self.'exists_conn'(work)
+    if $I0 goto do_read
+    .return self.'new_conn'()
+
+do_read:    
+    self.'_handle_request'(work)
+.end
+
+.sub '_handle_request' :method
+    .param pmc work
+
+    .local pmc fp
     .local int ret
     .local string buf, req, rep, temp
     .local string meth, url, file_content
     .local int len, pos, occ1, occ2, do_close
 
-    active = getattribute self, 'active'
-    orig = active[0]
-    ne_addr work, orig, do_read
-    self.'debug'("accept new conn\n")
-    accept work, orig
-    push active, work
-    .return()
-
-do_read:    
     self.'debug'("reading from work\n")
     req = ""
     do_close = 0
@@ -243,21 +300,7 @@ DONE:
 close_it:
     self.'debug'("******* closed work\n")
     .local int i, n
-    close work
-loop:
-    n = elements active
-    i = 0
-rem_lp:
-    $P0 = active[i]
-    eq_addr $P0, work, del_it
-    inc i
-    if i < n goto rem_lp
-    goto not_found
-del_it:
-    delete active[i]
-    .return()
-not_found:
-    self.'debug'("nothing found to splice???\n")
+    self.'del_conn'(work)
     .return()
 
 SERVE_GET:
