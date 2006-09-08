@@ -6,7 +6,7 @@ use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 41;
 
 =head1 NAME
 
@@ -81,6 +81,17 @@ JSON
 ]
 OUT
 
+json_dump_is(<<'JSON', <<'OUT', 'simple array (check white spaces)',todo=>'parse error');
+[    1 , 2    ,  3   ]
+JSON
+"JSON" => ResizablePMCArray (size:3) [
+    1,
+    2,
+    3
+]
+OUT
+
+
 json_dump_is(<<'JSON', <<'OUT', 'array of empty arrays');
 [[],[],[]]
 JSON
@@ -93,6 +104,20 @@ JSON
     ]
 ]
 OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'array of empty arrays (check white spaces)');
+[    []  ,  [] , []     ]
+JSON
+"JSON" => ResizablePMCArray (size:3) [
+    ResizablePMCArray (size:0) [
+    ],
+    ResizablePMCArray (size:0) [
+    ],
+    ResizablePMCArray (size:0) [
+    ]
+]
+OUT
+
 
 json_dump_is(<<'JSON', <<'OUT', 'array of arrays of integers');
 [[1,2,3],[1,2,3],[1,2,3]]
@@ -149,6 +174,19 @@ JSON
 ]
 OUT
 
+json_dump_is(<<'JSON', <<'OUT', 'array of empty objects (check white spaces)');
+[    {} , {}  , {}    ]
+JSON
+"JSON" => ResizablePMCArray (size:3) [
+    Hash {
+    },
+    Hash {
+    },
+    Hash {
+    }
+]
+OUT
+
 json_dump_is(<<'JSON', <<'OUT', 'array of objects with one element');
 [{"one":1},{"two":2},{"three":3}]
 JSON
@@ -164,6 +202,23 @@ JSON
     }
 ]
 OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'array of objects with one element (white space check)');
+[  { "one"  : 1 }  , {    "two"    :  2 } , {"three"  : 3} ]
+JSON
+"JSON" => ResizablePMCArray (size:3) [
+    Hash {
+        "one" => 1
+    },
+    Hash {
+        "two" => 2
+    },
+    Hash {
+        "three" => 3
+    }
+]
+OUT
+
 
 json_dump_is(<<'JSON', <<'OUT', 'array of objects with multiple elements');
 [{"one":1,"two":2,"three":3},{"one":1,"two":2,"three":3},{"one":1,"two":2,"three":3}]
@@ -233,6 +288,17 @@ JSON
 }
 OUT
 
+json_dump_is(<<'JSON', <<'OUT', 'object with strings (white space check)',todo=>'parse error');
+{  "one" : "string a"    ,   "two"  :  "string b" , "three"   : "string c"    }
+JSON
+"JSON" => Hash {
+    "one" => "string a",
+    "three" => "string c",
+    "two" => "string b"
+}
+OUT
+
+
 json_dump_is(<<'JSON', <<'OUT', 'object with one empty object');
 {"one":{}}
 JSON
@@ -275,6 +341,19 @@ JSON
     }
 }
 OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'object with one object of various element with strings (check white spaces)',todo=>'parse error');
+{   "one" :  { "one" :   "string a" , "two"  : "string b"  ,  "three" :  "string c"   }    }
+JSON
+"JSON" => Hash {
+    "one" => Hash {
+        "one" => "string a",
+        "three" => "string c",
+        "two" => "string b"
+    }
+}
+OUT
+
 
 json_dump_is(<<'JSON', <<'OUT', 'object with more than one empty object');
 {"one":{},"two":{},"three":{}}
