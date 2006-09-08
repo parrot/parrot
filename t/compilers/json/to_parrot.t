@@ -288,7 +288,7 @@ JSON
 }
 OUT
 
-json_dump_is(<<'JSON', <<'OUT', 'object with strings (white space check)',todo=>'parse error');
+json_dump_is(<<'JSON', <<'OUT', 'object with strings (white space check)');
 {  "one" : "string a"    ,   "two"  :  "string b" , "three"   : "string c"    }
 JSON
 "JSON" => Hash {
@@ -342,7 +342,7 @@ JSON
 }
 OUT
 
-json_dump_is(<<'JSON', <<'OUT', 'object with one object of various element with strings (check white spaces)',todo=>'parse error');
+json_dump_is(<<'JSON', <<'OUT', 'object with one object of various element with strings (check white spaces)');
 {   "one" :  { "one" :   "string a" , "two"  : "string b"  ,  "three" :  "string c"   }    }
 JSON
 "JSON" => Hash {
