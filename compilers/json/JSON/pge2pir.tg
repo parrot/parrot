@@ -183,7 +183,8 @@ transform pir (string) {
     $S0 = chr $I0 
     goto char
   escape:
-    $S0 = substr $S0, 1, 1
+    $P0 = get_root_global [ 'JSON' ],  '$escapes'
+    $S0 = $P0[$S0]
   char:
     tmp .= $S0
     goto loop
