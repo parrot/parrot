@@ -45,6 +45,14 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
     cl = newclass ['HTTP'; 'Daemon'; 'ClientConn']
     addattribute cl, 'socket'	# the connected pio
     addattribute cl, 'server'	# whom are we working for
+    addattribute cl, 'close'	# needs closing after req is handled
+
+    # TODO split into new file, if more mature
+    cl = newclass ['HTTP'; 'Message']
+    addattribute cl, 'headers'	# hash
+    addattribute cl, 'content'	# string
+
+    cl = subclass cl, ['HTTP'; 'Request']
 .end
 
 .namespace ['HTTP'; 'Daemon']
@@ -262,7 +270,7 @@ yes:
     .param pmc work	# a pio
     .param pmc conn     # Conn obj
 
-    .local pmc srv
+    .local pmc srv, req
 
     srv = conn.'server'()
     $I0 = srv.'exists_conn'(conn)
@@ -270,67 +278,90 @@ yes:
     .return srv.'new_conn'()
 
 do_read:    
-    conn.'_handle_request'()
+    req = conn.'get_request'()
+    $S0 = req.'method'()
+    if $S0 == 'GET' goto serve_get
+    printerr 'unknown method: '
+    printerr $S0
+    .return()
+serve_get:
+    .local string file
+    file = req.'uri'()
+    conn.'send_file_response'(file)
 .end
 
 
 .namespace ['HTTP'; 'Daemon'; 'ClientConn']
 
-.sub '_handle_request' :method
+.sub 'get_request' :method
 
-    .local pmc fp, srv, work
-    .local int ret
-    .local string buf, req, rep, temp
-    .local string meth, url, file_content
-    .local int len, pos, occ1, occ2, do_close
+    .local pmc srv, req
+    .local string req_str
 
     srv = self.'server'()
-    work = self.'socket'()
     srv.'debug'("reading from work\n")
-    req = ""
-    do_close = 0
-MORE:
-    recv ret, work, buf
-    ## read buf, work, 8192
-    ## ret = length buf
-    srv.'debug'("**read ", ret, " bytes\n")
+    req_str = self.'_read'()
+    $I0 = find_type ['HTTP'; 'Request']
+    $P0 = new .String
+    $P0 = req_str
+    req = new $I0, $P0
+    .return (req)
+.end
 
-    if ret >= 0 goto no_close
+.sub '_read' :method
+    .local int res, do_close, pos
+    .local string buf, req
+    .local pmc sock, srv
+
+    srv = self.'server'()
+    req = ''
+    do_close = 0
+    sock = self.'socket'()
+    # TODO keep a buffer and a state in Conn
+    # check method, read Content-Length if needed and read
+    # until message is complete
+MORE:
+    res = recv sock, buf
+    srv.'debug'("**read ", res, " bytes\n")
+    if res > 0 goto not_empty
+
+    if res >= 0 goto no_close
     do_close = 1
 no_close:
-    if ret <= 0 goto close_it
+not_empty:
     concat req, buf
     index pos, req, CRLFCRLF
-    if pos >= 0 goto SERVE_REQ
+    if pos >= 0 goto have_hdr
     index pos, req, LFLF
-    if pos >= 0 goto SERVE_REQ
+    if pos >= 0 goto have_hdr
     index pos, req, CRCR
-    if pos >= 0 goto SERVE_REQ
+    if pos >= 0 goto have_hdr
     goto MORE
+have_hdr:
+    $P0 = getattribute self, 'close'
+    $P0 = do_close
+    .return (req)
+.end
 
-SERVE_REQ:
-#    print "Request:\n"
-#    print req
-#    print "*******\n"
+.sub 'send_file_response' :method
+    .param string url
 
-# parse
-# GET the_file HTTP*
-    index occ1, req, " "
-    substr meth, req, 0, occ1
-    inc occ1
-    index occ2, req, " ", occ1
-    len = occ2 - occ1
-    substr url, req, occ1, len
+    .local string file_content, rep, temp
+    .local int len, res
+    .local pmc srv, fp, sock
 
-    if meth == "GET" goto SERVE_GET
+    srv = self.'server'()
+    sock = self.'socket'()
+    goto SERVE_GET
 
-    srv.'debug'("unknown method:'", meth, "'\n")
 DONE:
+    .local int do_close
+    $P0 = getattribute self, 'close'
+    do_close = $P0
     if do_close goto close_it
     .return()
 close_it:
     srv.'debug'("******* closed work\n")
-    .local int i, n
     srv.'del_conn'(self)
     .return()
 
@@ -354,7 +385,7 @@ SERVE_GET:
 SERVE_file:
     # try to open the file in url
     .local string doc_root
-    doc_root = "."
+    doc_root = "."	# XXX
     concat url, doc_root, url
     fp = open url, "<"
     unless fp goto SERVE_404
@@ -375,7 +406,7 @@ SERVE_blob:
     rep .= temp
     rep .= CRLFCRLF
     rep .= file_content
-    send ret, work, rep
+    res = send sock, rep
     srv.'log'(200, ", ", url)
     goto DONE
 
@@ -391,7 +422,7 @@ SERVE_docroot:
     concat rep, temp
     concat rep, CRLFCRLF
     concat rep, file_content
-    send ret, work, rep
+    res = send sock, rep
     srv.'log'(301, ", ", url, " - Redirect to 'docs/html/index.hmtl'")
     goto DONE
 
@@ -412,7 +443,7 @@ SERVE_404:
     rep .= CRLFCRLF
     rep .= $S0
     srv.'log'(404, ", ", url)
-    send ret, work, rep
+    res = send sock, rep
     goto DONE
 .end
 
@@ -536,6 +567,8 @@ next_item:
 .sub __init :method
     .param pmc sock
     setattribute self, 'socket', sock
+    $P0 = new .Boolean
+    setattribute self, 'close', $P0
 .end
 
 .sub 'socket' :method
@@ -554,3 +587,94 @@ set_it:
 .end
 
 
+.namespace ['HTTP'; 'Message']
+.sub __init :method
+    .param pmc init
+    $P0 = new .Hash
+    setattribute self, 'headers', $P0
+    $P0 = new .String
+    setattribute self, 'content', $P0
+    $I0 = isa init, "String"
+    if $I0 goto parse_it
+    printerr "wrong init data in HTTP::Message.new()\n"
+    exit 1
+parse_it:
+    self.'_parse_str'(init)
+.end
+
+.sub 'headers' :method
+    $P0 = getattribute self, 'headers'
+    .return ($P0)
+.end
+
+.sub '_parse_str' :method
+    .param string buf
+    .local int eol, len, pos, sp
+    .local string line, rest, key, value
+    .local pmc hdrs
+
+    hdrs = getattribute self, 'headers'
+    len = length buf
+    pos = 0
+loop:
+    if pos >= len goto done
+    eol = index buf, "\r", pos
+    if eol != -1 goto is_cr
+    eol = index buf, "\n", pos
+is_cr:
+    if pos == eol goto rest_is_content
+    line = substr buf, pos, eol
+    sp =  index line, ' ', pos
+    key = substr line, pos, sp
+    inc sp
+    $I0 = eol - sp
+    value = substr line, sp, $I0
+    # TODO continuation lines, multiple entries
+    # TODO normalize keys
+    hdrs[key] = value
+    inc eol
+    $S0 = buf[eol]
+    if $S0 != "\n" goto no_nl
+    inc eol
+no_nl:
+    pos = eol
+    goto loop
+
+rest_is_content:
+    inc pos
+    $S0 = buf[pos]
+    if $S0 != "\n" goto set_content
+    inc pos
+set_content:
+    rest = substr buf, pos
+
+    $P0 = getattribute self, 'content'
+    $P0 = rest
+
+done:
+.end
+
+.namespace ['HTTP'; 'Request']
+.sub 'method' :method
+    .local pmc hdrs
+    hdrs = self.'headers'()
+    $I0 = exists hdrs['GET']
+    unless $I0 goto no_get
+    .return ('GET')
+no_get:
+    .return ('')
+.end
+
+.sub 'uri' :method
+    .local pmc hdrs, ar
+    .local string val
+    hdrs = self.'headers'()
+    $I0 = exists hdrs['GET']
+    unless $I0 goto no_get
+    val = hdrs['GET']
+    ar = split ' ', val
+    $P0 = ar[0]
+    .return ($P0)
+no_get:
+    .return ('')
+.end
