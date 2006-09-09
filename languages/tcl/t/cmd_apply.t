@@ -2,13 +2,23 @@
 
 source lib/test_more.tcl
 
-plan 6
+plan 8
 
 set TODO {TODO {not implemented yet}}
 
 eval_is {apply foo} \
   {can't interpret "foo" as a lambda expression} \
   {bad lambda expression} \
+  $TODO
+
+eval_is {apply {foo bar baz bit}} \
+  {can't interpret "foo bar baz bit" as a lambda expression} \
+  {bad lamdba expression} \
+  $TODO
+
+eval_is {apply {foo bar baz}} \
+  {cannot find namespace "::baz"} \
+  {namespace doesn't exist} \
   $TODO
 
 eval_is {apply} \
