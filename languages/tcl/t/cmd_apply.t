@@ -13,8 +13,7 @@ eval_is {apply foo} \
 
 eval_is {apply} \
   {wrong # args: should be "apply lambdaExpr ?arg1 arg2 ...?"} \
-  {too few args} \
-  $TODO
+  {too few args}
 
 eval_is {apply {{foo {bar 2} {baz 3}}  bar}} \
   {wrong # args: should be "apply {{foo {bar 2} {baz 3}}  bar} foo ?bar? ?baz?"} \
