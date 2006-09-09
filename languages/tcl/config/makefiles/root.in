@@ -136,6 +136,7 @@ test:	tcl.pbc
 
 RUNNABLE_TCL_TESTS = \
   t_tcl/append.t \
+  t_tcl/apply.t \
   t_tcl/concat.t \
   t_tcl/eval.t \
   t_tcl/error.t \
@@ -175,9 +176,8 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/utf.t \
   t_tcl/while_old.t
 
-# These tests segfault or exit before any tests results are shown (apply.t)
+# These tests segfault or exit before any tests results are shown
 SEGFAULTING_TCL_TESTS = \
-  t_tcl/apply.t \
   t_tcl/appendComp.t \
   t_tcl/proc_old.t \
   t_tcl/set_old.t \
