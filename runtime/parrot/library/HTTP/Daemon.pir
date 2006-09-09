@@ -394,15 +394,16 @@ close_it:
 
 SERVE_GET:
     .local int is_cgi
+    .local pmc resp
+    $I0 = find_type ['HTTP'; 'Response']
+    resp = new $I0
+
     srv.'debug'("req url: ", url, "\n")
     (is_cgi, file_content, len) = check_cgi(url)
     if is_cgi goto SERVE_blob
     # decode the url
     url = urldecode(url)
 
-    .local pmc resp
-    $I0 = find_type ['HTTP'; 'Response']
-    resp = new $I0
 
     # redirect instead of serving index.html
     if url == "/" goto SERVE_docroot
@@ -510,29 +511,23 @@ END:
 # if file is *.pir or *.pbc run it as CGI
 .sub check_cgi
     .param string url
-    $I0 = index url, ".pir"
-    if $I0 > 0 goto cgi_1
-    $I0 = index url, ".pbc"
-    if $I0 > 0 goto cgi_1
+    .local int pos
+    # file.pir?foo=1+bar=2
+    pos = index url, '.pir?'
+    if pos > 0 goto cgi_1
+    pos = index url, '.pbc?'
+    if pos > 0 goto cgi_1
     .return (0, '', 0)
 cgi_1:
-    # file.pir?foo=1+bar=2
-    $I0 = index url, '?'
-    if $I0 == -1 goto no_query
     .local string file, query
     .local pmc query_hash
-    file = substr url, 0, $I0
-    inc $I0
-    query = substr url, $I0
+    pos += 4
+    file = substr url, 0, pos
+    inc pos
+    query = substr url, pos
     # TODO split into a hash, then decode parts
     query_hash = make_query_hash(query)
     query = urldecode(query)
-    goto have_query
-no_query:
-    file = url
-    query = ''
-    query_hash = new .Hash
-have_query:
     # escape %
     file = urldecode(file)
     #self.'debug'("CGI: '", file, "' Q: '", query, "'\n")
