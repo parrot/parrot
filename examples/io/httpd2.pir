@@ -23,9 +23,13 @@ Leopold Toetsch <lt@toetsch.at> - some code base on httpd.pir.
     clid = find_type ['HTTP'; 'Daemon']
     d = new clid, opts
     unless d goto err
+    push_eh ignore
     d.'run'()
+ignore:
+    d.'shutdown'()
     end
 err:
     printerr "Starting failed\n"
+    exit 1
 .end
 

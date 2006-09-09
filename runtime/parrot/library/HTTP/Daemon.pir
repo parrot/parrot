@@ -52,7 +52,9 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
     addattribute cl, 'headers'	# hash
     addattribute cl, 'content'	# string
 
-    cl = subclass cl, ['HTTP'; 'Request']
+    # Message subclasses
+    $P0 = subclass cl, ['HTTP'; 'Request']
+    $P0 = subclass cl, ['HTTP'; 'Response']
 .end
 
 .namespace ['HTTP'; 'Daemon']
@@ -121,6 +123,11 @@ err_bind:
 err_sock:
     $P0 = new .Undef
     setattribute self, 'socket', $P0
+.end
+
+.sub 'socket' :method
+    $P0 = getattribute self, 'socket'
+    .return ($P0)
 .end
 
 .sub 'run' :method
@@ -250,6 +257,19 @@ not_found:
     self.'debug'("connection not found to delete\n")
 .end
 
+# close all sockets
+# this needs enabling of SIGHUP in src/events.c but still doesn't
+# help against FIN_WAIT2 / TIME_WAIT state of connections
+.sub 'shutdown' :method
+    .local pmc active, sock
+    active = getattribute self, 'active'
+rem_lp:
+    $P0 = pop active
+    sock = $P0.'socket'()
+    close sock
+    if active goto rem_lp
+.end
+
 # if work is the original httpd conn, it's a new connection
 .sub 'exists_conn' :method
     .param pmc work
@@ -302,9 +322,8 @@ serve_get:
     srv.'debug'("reading from work\n")
     req_str = self.'_read'()
     $I0 = find_type ['HTTP'; 'Request']
-    $P0 = new .String
-    $P0 = req_str
-    req = new $I0, $P0
+    req = new $I0
+    req.'parse'(req_str)
     .return (req)
 .end
 
@@ -373,14 +392,15 @@ SERVE_GET:
     # decode the url
     url = urldecode(url)
 
+    .local pmc resp
+    $I0 = find_type ['HTTP'; 'Response']
+    resp = new $I0
+
     # redirect instead of serving index.html
     if url == "/" goto SERVE_docroot
 
     # Those little pics in the URL field or in tabs
     if url == "/favicon.ico" goto SERVE_favicon
-
-    # try to server a file
-    goto SERVE_file
 
 SERVE_file:
     # try to open the file in url
@@ -396,52 +416,40 @@ SERVE_file:
 SERVE_blob:
     # TODO make more subs
     # takes: file_content, len
-    rep = "HTTP/1.1 200 OK"
-    rep .= CRLF
-    rep .= "Server: Parrot-httpd/0.2"
-    rep .= CRLF
-    rep .= "Content-Length: "
+    resp.'code'(200)
     temp = to_string (len)
-    srv.'debug'("Content-Length: ", temp, "\n")
-    rep .= temp
-    rep .= CRLFCRLF
-    rep .= file_content
+    resp.'header'('Server' => 'Parrot-httpd/0.2', 'Content-Length' => temp)
+    resp.'content'(file_content)
+    rep = resp.'as_string'()
     res = send sock, rep
     srv.'log'(200, ", ", url)
     goto DONE
 
 SERVE_docroot:
-    rep = 'HTTP/1.1 301 Moved Permamently'
-    rep .= CRLF
-    rep .= 'Location: /docs/html/index.html'
-    rep .= CRLF
-    rep .= 'Content-Length: '
     file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>." 
     length len, file_content
     temp = to_string (len)
-    concat rep, temp
-    concat rep, CRLFCRLF
-    concat rep, file_content
+    resp.'code'(301)
+    resp.'header'('Location' => '/docs/html/index.html')
+    resp.'header'('Server' => 'Parrot-httpd/0.2', 'Content-Length' => temp)
+    resp.'content'(file_content)
+    rep = resp.'as_string'()
     res = send sock, rep
     srv.'log'(301, ", ", url, " - Redirect to 'docs/html/index.hmtl'")
     goto DONE
 
 SERVE_favicon:
-    url = urldecode( '/docs/resources/favicon.ico')
+    url = '/docs/resources/favicon.ico'
     goto SERVE_file
 
 SERVE_404:
+    resp.'code'(404)
     $S0 = '404 Not found'
     $I0 = length $S0
-    rep = 'HTTP/1.1 404 Not Found'
-    rep .= CRLF
-    rep .= 'Content-Length: '
-    $S1 = $I0
-    rep .= $S1
-    rep .= CRLF
-    rep .= 'Content-Type: text/plain'
-    rep .= CRLFCRLF
-    rep .= $S0
+    temp = $I0
+    resp.'header'('Server' => 'Parrot-httpd/0.2', 'Content-Length' => temp)
+    resp.'content'($S0)
+    rep = resp.'as_string'()
     srv.'log'(404, ", ", url)
     res = send sock, rep
     goto DONE
@@ -589,17 +597,10 @@ set_it:
 
 .namespace ['HTTP'; 'Message']
 .sub __init :method
-    .param pmc init
-    $P0 = new .Hash
+    $P0 = new .OrderedHash
     setattribute self, 'headers', $P0
     $P0 = new .String
     setattribute self, 'content', $P0
-    $I0 = isa init, "String"
-    if $I0 goto parse_it
-    printerr "wrong init data in HTTP::Message.new()\n"
-    exit 1
-parse_it:
-    self.'_parse_str'(init)
 .end
 
 .sub 'headers' :method
@@ -607,7 +608,17 @@ parse_it:
     .return ($P0)
 .end
 
-.sub '_parse_str' :method
+.sub 'content' :method
+    .param string c    :optional
+    .param int has_c   :opt_flag
+    $P0 = getattribute self, 'content'
+    if has_c goto set_it
+    .return ($P0)
+set_it:
+    $P0 = c
+.end
+
+.sub 'parse' :method
     .param string buf
     .local int eol, len, pos, sp
     .local string line, rest, key, value
@@ -669,12 +680,82 @@ no_get:
     .local pmc hdrs, ar
     .local string val
     hdrs = self.'headers'()
-    $I0 = exists hdrs['GET']
-    unless $I0 goto no_get
-    val = hdrs['GET']
+    val = hdrs[0]
     ar = split ' ', val
     $P0 = ar[0]
     .return ($P0)
-no_get:
-    .return ('')
 .end
+
+.namespace ['HTTP'; 'Response']
+
+.sub 'header' :method
+    .param pmc init   :slurpy :named
+    .local pmc it, hdrs
+    hdrs = getattribute self, 'headers'
+    it = iter init
+loop:
+    unless it goto ex
+    $S0 = shift it
+    if $S0 != 'code' goto other
+    self.'code'($S0)
+    goto loop
+other:
+    $P0 = init[$S0]
+    hdrs[$S0] = $P0
+    goto loop
+ex:
+.end
+
+.sub 'code' :method
+    .param string ccc 
+    .const string proto = 'HTTP/1.1 '
+
+    .local string line
+    .local pmc hdrs
+    line = proto
+    line .= ccc
+    if ccc != '200' goto no_200
+    line .= ' OK'
+    goto fin
+no_200:
+    if ccc != '301' goto no_301
+    line .= ' Moved Permamently'
+    goto fin
+no_301:
+    if ccc != '404' goto no_404
+    line .= ' Not Found'
+    goto fin
+no_404:
+    line .= " ??"
+fin:
+    line .= CRLF
+    hdrs = getattribute self, 'headers'
+    hdrs[0] = line
+.end
+
+.sub 'as_string' :method
+    .local pmc hdrs, content, it
+    .local string line, k, v
+    hdrs = getattribute self, 'headers'
+    content = getattribute self, 'content'
+    it = iter hdrs
+    # resp status
+    k = shift it
+    line = it[k]
+loop:
+    unless it goto done
+    k = shift it
+    v = hdrs[k]
+    line .= k
+    line .= ': '
+    line .= v
+    line .= CRLF
+    goto loop
+done:
+    line .= CRLF
+    $S0 = content
+    line .= $S0
+    .return (line)
+.end
+
+
