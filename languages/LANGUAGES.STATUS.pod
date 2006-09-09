@@ -854,6 +854,32 @@ http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo
 =back
 
 
+=head2 Plumhead
+
+=over 4
+
+=item Author
+
+Bernhard Schmalhofer
+
+=item Description
+
+A toy implementation of PHP. Playing with XSLT.
+
+=item Status
+
+Not in Parrot SVN yet.
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+=back
+
+
+
 =head2 Pugs
 
 =over 4

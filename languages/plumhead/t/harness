@@ -1,0 +1,101 @@
+# $Id: harness 11501 2006-02-10 18:27:13Z particle $
+
+=head1 NAME
+
+languages/plumhead/t/harness - A harness for Plumhead
+
+=head1 SYNOPSIS
+
+  cd languages && perl -I../lib plumhead/t/harness --files
+
+  cd languages && perl -I../lib plumhead/t/harness 
+
+  cd languages && perl -I../lib plumhead/t/harness --with-php
+
+  cd languages && perl -I../lib plumhead/t/harness --with-phc-to-past
+
+  cd languages && perl -I../lib plumhead/t/harness \
+                   plumhead/t/hello.t 
+
+=head1 DESCRIPTION
+
+If I'm called with a single
+argument of "--files", I just return a list of files to process.
+This list is one per line, and is relative to the languages dir.
+
+If I'm called with no args, I run the complete suite.
+
+Otherwise I run the tests that were passed on the command line.
+
+=cut
+
+# pragmata
+use strict;
+use warnings;
+use lib '..';
+
+use Cwd                   ();
+use Data::Dumper;
+use File::Spec;
+use Test::Harness         ();
+
+my $language = 'plumhead';
+
+if ( grep { m/^--files$/ } @ARGV ) {
+    # Only the Makefile in 'parrot/languages' uses --files
+    my $dir = File::Spec->catfile( $language, 't' );
+    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
+    print join( "\n", @files );
+    print "\n" if scalar(@files);
+} else { 
+    my @files;
+    # TODO: use Getopt::Long or such
+    my $with_php = ( grep { m/^--with-php$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--with-php$/ } @ARGV;
+
+    my $with_phc_to_past = ( grep { m/^--with-phc-to-past$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--with-phc-to-past$/ } @ARGV;
+
+    if ( scalar(@ARGV) ) {
+        # Someone specified tests for me to run.
+        @files = grep { -f $_ } @ARGV
+    } else {
+        ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+        if ( $current_dir eq 'languages' ) {
+            @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
+        }
+        elsif ( $current_dir eq $language ) {
+            @files = glob( File::Spec->catfile( 't', '*.t' ) );
+        }
+        else {
+            die "Where am I?";
+        }
+    }
+
+    # XXX There should be a better to indicate which implementation should be used
+    if ( $with_php ) {
+       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::PHP';
+    }
+    elsif ( $with_phc_to_past ) {
+       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Phc2Past';
+    }
+    else {
+       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Phc2Past';
+    }
+
+    Test::Harness::runtests( @files ) if scalar( @files );
+}
+
+=head1 HISTORY
+
+Mostly taken from bc/t/harness.
+
+=head1 SEE ALSO
+
+  F<languages/bc/t/harness>
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
+
+=cut

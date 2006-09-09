@@ -1,0 +1,2 @@
+PHC emitts XML, XSLT creates PIR that sets up PAST.
+

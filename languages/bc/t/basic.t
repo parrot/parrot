@@ -69,6 +69,7 @@ my @tests = (
        [ "/* line1 \n line2 \n line 3 */   -3  ", -3, 'multi line comment', ],
 
        # Strings 
+       [ qq{"Hello, World!\n"}, [ 'Hello, World!' ], 'hello', ],
        [ '1;2;"asdf"   ;  3    ', [ 1, 2, 'asdf3' ], 'string', ],
        [ q{1;2;"'a's'd'f'"   ;  3    }, [ 1, 2, q{'a's'd'f'3} ], 'string with embedded single quote', ],
        [ '1;2;"as\df"   ;  3    ', [ 1, 2, 'as\df3' ], 'string with embedded backslash', ],
