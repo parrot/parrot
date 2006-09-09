@@ -8,13 +8,11 @@ set TODO {TODO {not implemented yet}}
 
 eval_is {apply foo} \
   {can't interpret "foo" as a lambda expression} \
-  {bad lambda expression} \
-  $TODO
+  {bad lambda expression}
 
 eval_is {apply {foo bar baz bit}} \
   {can't interpret "foo bar baz bit" as a lambda expression} \
-  {bad lamdba expression} \
-  $TODO
+  {bad lamdba expression}
 
 eval_is {apply {foo bar baz}} \
   {cannot find namespace "::baz"} \
