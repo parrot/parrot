@@ -1,0 +1,613 @@
+#taken from n869.pdf
+#google for n869
+
+grammar C99
+rule ws {
+  \s+
+  | \/\/ <-[\n]>* \n
+  | \/\* [<-[\*]>|<[\*]><-[\/]>]* \*\/
+}
+
+rule c99_token {
+  <keyword>
+  |<identifier>
+  |<constant>
+  |<string_literal>
+  |<punctuator>
+}
+
+rule preprocessing_token {
+  <header_name>
+  |<identifier>
+  |<pp_number>
+  |<character_constant>
+  |<string_literal>
+  |<punctuator>
+  |<universal_character_name>
+  | \S+ #non whitespace
+}
+
+token keyword {
+  auto
+  |break
+  |case
+  |char
+  |const
+  |continue
+  |default
+  |do
+  |double
+  |else
+  |enum
+  |extern
+  |float
+  |for
+  |goto
+  |if
+  |inline
+  |int
+  |long
+  |register
+  |restrict
+  |return
+  |short
+  |signed
+  |sizeof
+  |static
+  |struct
+  |switch
+  |typedef
+  |union
+  |unsigned
+  |void
+  |volatile
+  |while
+  |_Bool
+  |_Complex
+  |_Imaginary
+}
+
+#identifiers
+token identifier { <identifier_nondigit> [<identifier_nondigit>|<digit>]* }
+
+token identifier_nondigit { <[a..zA..Z_]> | <universal_character_name> }
+token digit { \d }
+
+#universal character names
+token universal_character_name {
+  \\u<hexdigit>**{4}
+  |\\U<hexdigit>**{8}
+}
+
+#constants
+token constant {
+  <integer_constant>
+  |<floating_constant>
+  |<enumeration_constant>
+  |<character_constant>
+}
+
+token integer_constant { 
+  <decimal_constant> <integer_sufffix>?
+  <octal_constant> <integer_sufffix>?
+  <hexadecimal_constant> <integer_sufffix>?
+}
+
+token decimal_constant { <[1..9]><digit>* }
+token octal_constant { [0x|0X]<hexdigit>+ }
+token hexdigit { <[0..9a..fA..F]> }
+
+token integer_suffix {
+  <[uU]><[lL]>?
+  |<[uU]>[ll|LL]
+  |<[lL]><[uU]>?
+  |[ll|LL]<[uU]>? 
+}
+
+token floating_constant { 
+  <decimal_floating_constant>
+  |<hexadecimal_floating_constant>
+}
+
+token decimal_floating_constant {
+  <fractional_constant> <exponent_part>? <floating_suffix>?
+  <digit_sequence> <exponent_part> <floating_suffix>?
+}
+
+token hexadecimal_floating_constant {
+  <hexadecimal_prefix> <hexadecimal_franctional_constant> <binary_exponent_part> <floating_suffix>
+  |<hexadecimal_prefix> <hexadecimal_digit_constant> <binary_exponent_part> <floating_suffix>
+}
+
+token fractional_constant {
+  <digit_sequence>? \. <digit_sequence>
+  |<digit_sequence> \.
+}
+
+token exponent_part {
+  <[eE]> <[\+\-]>? <digit_sequence>
+}
+
+token digit_sequence { \d+ }
+
+token hexadecimal_floating_constant {
+  <hexadecimal_digit_sequence>? \. <hexadecimal_digit_sequence>
+  |<hexadecimal_digit_sequence>? \.
+}
+
+token binary_exponent_part {
+  <[pP]> <[\+\-]>? <digit_sequence>
+}
+
+token hexadecimal_digit_sequence { <hexadecimal_digit>+ }
+
+token floating_suffix { <[flfL]> }
+
+token enumeration_constant { identifier }
+
+token character_constant { <[L]>?\'<c_char>+\' }
+
+token <c_char> { <-['\n]> | <escape_sequence> }
+
+token escape_sequence {
+  <simple_escape_sequence>
+  |<octal_escape_sequence>
+  |<hexadecimal_escape_sequence>
+  |<universal_character_name>
+}
+
+token simple_escape_sequence {
+  \\'
+  |\\"
+  |\\\?
+  |\\\\
+  |\\a
+  |\\b
+  |\\f
+  |\\n
+  |\\r
+  |\\t
+  |\\v
+}
+
+token octal_escape_sequence {
+  \\ <octal_digit>**{1..3}
+}
+
+token hexadecimal_escape_sequence {
+  \\x <hexadecimal_digit>+
+}
+
+token string_literal { <[L]>?\"<s_char>*\" }
+
+token s_char { <-["\n]> | <escape_sequence> }
+
+token punctuator {
+  \[
+  |\]
+  |\{
+  |\}
+  |\.
+  |\-\>
+  |\+\+
+  |\-\-
+  |\*
+  |\*
+  |\+
+  |\-
+  |\~
+  |\!
+  |\/
+  |\%
+  |\<\<
+  |\>\>
+  |\<
+  |\>
+  |\<\=
+  |\>\=
+  |\=\=
+  |\!\=
+  |\^
+  |\|
+  |\&\&
+  |\|\|
+  |\?
+  |\:
+  |\;
+  |\.\.\.
+  |\=
+  |\*\=
+  |\/\=
+  |\%\=
+  |\+\=
+  |\-\=
+  |\<\<\=
+  |\>\>\=
+  |\&\=
+  |\^\=
+  |\|\=
+  |\,
+  |\#
+  |\#\#
+  |\<\:
+  |\:\>
+  |\<\%
+  |\%\>
+  |\%\:
+  |\%\:\%\:
+}
+
+token header_name {
+  \<<h_char>+\>
+  |\"<q_char>+\"
+}
+
+token h_char { <-[\n>]> }
+token q_char { <-[\n"]> }
+
+token pp_number {
+  [.]?\d+ [<[eEpP]> <[\+\-]>|<identifer_nondigit>|\.|\d]?
+}
+
+#declarations
+rule delcaration { <declaration_specifiers> <init_declarator_list>? ; }
+
+rule declaration_specifiers {
+ [ <storage_class_specifier>
+  | <type_specifier>
+  | <type_qualifier>
+  | <function_spcifier>
+ ]+
+}
+
+rule init_declarator_list { init_declarator [ , <init_declarator> ]* }
+
+rule init_declarator { <declaratpr> [ = <initializer ]? }
+
+token storage_class_specifier {
+  typedef
+  |extern
+  |static
+  |auto
+  |register
+}
+
+token type_specifier {
+  void
+  |char
+  |short
+  |int
+  |long
+  |float
+  |double
+  |signed
+  |unsigned
+  |_Bool
+  |_Complex
+  |_Imaginary
+  |<struct_or_uninion_spcifier>
+  |<enum_specifier>
+  |<typedef_name>
+}
+
+rule struct_or_uninion_spcifier {
+  [struct|union] [<idientifer>|<identifier>? \{ <struct_declaration>+ \} ]
+}
+
+rule struct_declaration { [<type_specifier>|<type_qualifier>]+ <struct_declarator>+ ; }
+
+rule struct_declarator { <declarator> | <declarator>? : <constant_expression> }
+
+rule enum_specifier { enum [ <identifier>? \{ <enumerator> [ , <enumerator> ]+ [,]? \}| <identifier> ] }
+
+rule enumerator { <enumeration_constant> [ = <constant_expression> ]? }
+
+token type_qualifier { 
+  const
+  |restrict
+  |volatile
+}
+
+token function_specifier { inlline }
+
+rule declarator { <pointer>? <direct_declataror> }
+
+rule direct_declataror { 
+  [ <identifier> | \( <declarator> \) ] 
+  [
+    \[ <assignment_expression>? \]
+    | \[ \* \] 
+    | \( <parameter_type_list> \)
+    | \( <identifier_list>? \)
+  ]*
+}
+
+rule pointer { [\* <type_qualifier>+ ]+ }
+
+rule parameter_type_list { <parameter_declaration> [, <parameter_declaration> ]* [, \.\.\.]? }
+
+rule parameter_declaration { <declaration_specifiers> [<declarator> | <abstract_declatator> ]? }
+
+rule identifier_list { <identifier> [, <identifier>]* }
+
+rule type_name { <specifier_qualifier_list> <abstract_declatator>? }
+
+rule abstract_declatator {
+  <pointer>? <direct_abstract_declarator>
+  |<pointer>
+}
+
+rule direct_abstract_declarator {
+  [
+    \( <abstract_declatator> \) 
+    | \[ <assignment_expression>? \]
+    | \( <parameter_type_list> \) 
+  ] 
+  <direct_abstract_declarator_1>*
+}
+
+rule direct_abstract_declarator_1 {
+  \[ <assignment_expression>? \]
+  |\[ * \]
+  | \( <parameter_type_list> \)
+}
+
+rule typedef_name { <identifier> }
+
+rule initializer { <assignment_expression> | \{ <initializer_list> [,]? \} }
+
+rule initializer_list { <designation>? <initializer> [, <designation>? <initializer> ]* }
+
+rule designation { <designator>+ = }
+
+rule designator { 
+  \[ <constant_expression> \]
+  | \. <identifier>
+}
+
+rule statement {
+  <labeled_statement>
+  |<compound_statement>
+  |<expression_statement>
+  |<selection_statement>
+  |<iteration_statement>
+  |<jump_statement>
+}
+
+rule labeled_statement {
+  [
+  <identifier> :
+  | case <constant_expression> :
+  | default : 
+  ] <statement>
+}
+
+rule compound_statement { \{ [<declaration>|<statement>]* \} }
+
+rule expression_statement { <expression>? ; }
+
+rule selection_statement {
+  if \( <expresssion> \) <statement> [else <statement>]?
+  | switch \( <expression> \) <statement>
+}
+
+rule iteration_statement {
+  while \( <expression> \) <statement>
+  |do <statement> while \( <expression> \) ;
+  |for \( [ <expression>? ; <expression>? ; <expression>? | <declaration> <expression>? ; <expression>? ] \) <statement>
+}
+
+rule jump_statement {
+  goto <identifier> ;
+  |continue ;
+  |break ;
+  |return <expression>? ;
+}
+
+rule translation_unit { [<function_definition> | <declaration> ]+ }
+
+rule function_definition { <declaration_specifiers> <declarator> <declaration>* <compound_statement> }
+
+rule prereprocessing_file { <group> }
+
+rule group {
+  [
+  |<pp_tokens>? <newline>
+  |<if_section>
+  |<control_line>
+  ]*
+}
+
+rule if_section { <if_group> <elif_group>* <else_group> <endif_line> }
+
+rule if_group {
+  \# if <constant_expression> <new_line> <group>?
+  |\# ifdef <identifer> <new_line> <group>?
+  |\# ifndef <identifier> <new_line> <group>?
+}
+
+rule elif_group { \# elif <constant_expression> <new_line> <group>? }
+rule else_group { \# else <new_line> <group>? }
+rule endif_line { \# endif <newl_line> }
+
+rule control_line {
+  \# include <pp_tokens> <newl_line>
+  |\# define [ 
+    <identifier>
+    | <identifier_p> [ <identifier_list>? [, \.\.\.]? | [ \.\.\.] ] \) 
+    ] <pp_tokens>? <newl_line>
+  |\# undefine <identifier_> <newl_line>
+  |\# line <pp_tokens> <newl_line>
+  |\# error <pp_tokens>? <newl_line>
+  |\# pragma <pp_tokens>? <newl_line>
+  |\# <newl_line>
+}
+
+rule pp_tokens { <preprocessing_token>+ }
+
+token new_line { \n }
+
+token primary_expression {
+  <identifier>
+  |<constant>
+  |<string_literal>
+  |\( <expression> \)
+}
+
+proto 'term:' is precedence('22=')
+    is parsed(primary_expression)
+    is pastrule('past_term') { ... }
+
+
+## autoincrement
+proto 'postfix:++' is precedence('20=') { ... }
+proto 'postcircumfix:[]' is equiv('postfix:++') { ... }
+#rule postfix_expression { <postfix_expression> \[ <expression> \] }
+proto 'postcircumfix:()' is equiv('postfix:++') { ... }
+#rule postfix_expression { <postfix_expression> \( [ <assignment_expression> [, <assignment_expression>]* ]? \) }
+proto 'postfix:.' is equiv('postfix:++') { ... }
+#rule postfix_expression { <postfix_expression> . <identifier> }
+proto 'postfix:->' is equiv('postfix:++') { ... }
+#rule postfix_expression { <postfix_expression> \-\> <identifier> }
+proto 'postfix:--' is equiv('postfix:++') { ... }
+proto 'postfix:--' is equiv('postfix:++') { ... }
+rule postfix_expression { \( <type_name> \) \{ <initializer_list> [,]? \} }
+
+
+## exponentiation
+proto 'infix:**' is precedence('19=') { ... }
+
+## unary-expression
+proto 'prefix:++' is precedenc('18=') { ... }
+proto 'prefix:--' is equiv('prefix:++') { ... }
+proto 'prefix:&' is equiv('prefix:++') { ... }
+proto 'prefix:*' is equiv('prefix:++') { ... }
+proto 'prefix:+' is equiv('prefix:++') { ... }
+proto 'prefix:-' is equiv('prefix:++') { ... }
+proto 'prefix:~' is equiv('prefix:++') { ... }
+proto 'prefix:!' is equiv('prefix:++') { ... }
+proto 'prefix:sizeof' is equiv('prefix:++') { ... }
+proto 'prefix:sizeof' is equiv('prefix:++') { ... }
+#rule unary_expression { sizeof  <unary_expression> }
+#rule unary_expression { sizeof [\( <type_name> \) ] }
+
+## cast-expression
+proto 'precircumfix:()' is precedence('17=') {...}
+#rule cast_expression { [\( <type_name> \) ]* <unary_expression> }
+
+## multiplicative
+proto 'infix:*' is precedence('16=')
+    is post('mul')
+    { ... }
+
+proto 'infix:/' is equiv('infix:*')
+    is post('div')
+    { ... }
+
+proto 'infix:%' is equiv('infix:*')
+    is post('mod')
+    { ... }
+
+## additive
+proto 'infix:+' is precedence('16=')
+    is post('add')
+    { ... }
+
+proto 'infix:-' is equiv('infix:+')
+    is post('sub')
+    { ... }
+
+
+## shift-expression
+proto 'infix:<<' is precedence('15=') { ... }
+proto 'infix:>>' is precedence('15=') { ... }
+
+
+## relational-expression
+## chaining binary
+proto 'infix:<' is equiv('14=') is assoc('chain')
+    is pasttype('chain')
+    { ... }
+
+proto 'infix:<=' is equiv('infix:<')
+    is pasttype('chain')
+    { ... }
+
+proto 'infix:>' is equiv('infix:<')
+    is pasttype('chain')
+    { ... }
+
+proto 'infix:>=' is equiv('infix:<')
+    is pasttype('chain')
+    { ... }
+
+# equality-expression
+proto 'infix:==' is precedence('13=') is assoc('chain')
+    is pasttype('chain')
+    { ... }
+
+proto 'infix:!=' is equiv('infix:==')
+    is pasttype('chain')
+    { ... }
+
+
+proto 'infix:&' is precedence('12=') { ... }
+proto 'infix:^' is precedence('11=') { ... }
+proto 'infix:|' is precedence('10=') { ... }
+
+proto 'infix:&&' is precedence('09=')
+    is pasttype('cond') 
+    { ... }
+
+proto 'infix:||' is precedence('08=')
+    is pasttype('cond') 
+    { ... }
+
+## ternary
+#proto 'ternary:? :' is precedence('07=') is assoc('right')
+#    is pasttype('cond') 
+#    is parsed('conditional_expression')
+#    { ... }
+
+rule conditional_expression {
+  <operator_precedence_parser>
+  |<operator_precedence_parser> \? <expression> : <conditional_expression>
+}
+
+rule assignment_expression { 
+  <conditional_expression> 
+  | <unary_expression> [<assignment_operator> <unary_expression>]+
+}
+
+token assignment_operator {
+  \*\=
+  |\/\=
+  |\%\=
+  |\+\=
+  |\-\=
+  |\<\<\=
+  |\>\>\=
+  |\&\=
+  |\^\=
+  |\|\=
+}
+
+rule expression { <assignment_expression> [, <assignment_expression> ] }
+rule constant_expression { <conditional_expression> }
+
+## assignment
+#proto 'infix:=' is precedence('06=') is assoc('right')
+#    is parsed('assignment_expression')
+#    is pasttype('assign') 
+#    { ... }
+
+#proto 'infix:*=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:/=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:%=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:+=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:-=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:<<=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:>>=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:&=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:^=' is equiv('infix:=') is parsed('assignment_expression') { ... }
+#proto 'infix:|=' is equiv('infix:=') is parsed('assignment_expression') { ... }

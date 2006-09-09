@@ -67,6 +67,12 @@ sub runstep
         conditioned_lines                            => 1,
     );
     genfile(
+        'languages/c99/config/makefiles/root.in' => 'languages/c99/Makefile',
+        commentType                                  => '#',
+        replace_slashes                              => 1,
+        conditioned_lines                            => 1,
+    );
+    genfile(
         'languages/cola/config/makefiles/root.in'    => 'languages/cola/Makefile',
         commentType                                  => '#',
         replace_slashes                              => 1,

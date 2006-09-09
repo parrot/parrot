@@ -208,6 +208,32 @@ C<languages/bf>
 
 =back
 
+=head2 c99
+
+=over 4
+
+=item Author
+
+Kevin Tew
+
+=item Description
+
+PGE grammar for C99
+
+=item Status
+
+Parser is pretty complete.
+Needs optok help.
+
+=item Last verified with parrot version
+
+0.4.6
+
+=item Location
+
+C<languages/c99>
+
+=back
 
 =head2 Cardinal
 
@@ -224,7 +250,7 @@ Implementation of Ruby CVS Head 1.9
 =item Status
 
 Parser is pretty complete.
-Only generates PIR for hello world at the moment
+Generates PIR for basic Ruby programs
 
 =item Last verified with parrot version
 

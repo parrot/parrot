@@ -291,7 +291,8 @@ D: yield and other PIR improvements
 N: Kevin Falcone
 
 N: Kevin Tew
-D: Cardinal(Ruby on Parrot), ECMAScript parser, ECMAScript parser
+D: Cardinal(Ruby on Parrot), ECMAScript PGE grammar, 
+D: Python PGE grammar, C99 PGE Grammar
 D: Various Config Fixes, Compiler Warnings, etc
 
 N: Klaas-Jan Stol
@@ -385,6 +386,10 @@ D: Miscellaneous cleanup and PDD07-conformance
 N: Patrick R. Michaud
 D: Parrot Grammar Engine, Perl 6 pumpking, APL
 E: pmichaud@pobox.com
+
+N: Pat Eyler
+D: Ruby recursive expression support.
+E: pat.eyler@gmail.com
 
 N: Peter Gibbs
 D: String subsystem
