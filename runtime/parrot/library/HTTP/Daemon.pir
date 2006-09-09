@@ -204,7 +204,7 @@ do_debug:
 
 # === connection handling
 
-# add select even to all active pios
+# add select event to all active pios
 .sub '_select_active' :method
     .local pmc active, conn, sock
     .local int i, n
@@ -375,7 +375,7 @@ have_hdr:
     .param string url
 
     .local string file_content, temp
-    .local int len, res
+    .local int len
     .local pmc srv, fp
 
     srv = self.'server'()
@@ -432,6 +432,8 @@ SERVE_blob:
     srv.'log'(200, ", ", url)
     goto DONE
 
+# TODO next 2 only if running w/ --parrot-docs 
+# set doc_root
 SERVE_docroot:
     file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>." 
     length len, file_content
