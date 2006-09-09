@@ -649,7 +649,7 @@ section, then the top-of-file comment already satisfies this requirement.
 =item Per-entity comments
 
 Every non-local named entity, be it a function, variable, structure, macro or
-whatever, must have an accompanying comment explaining it's purpose.  This
+whatever, must have an accompanying comment explaining its purpose.  This
 comment must be in the special format described below, in order to allow
 automatic extraction by tools - for example, to generate per API man pages,
 B<perldoc -f> style utilities and so on.
@@ -886,7 +886,7 @@ cluttering the main source with zillions of #ifdefs.
 
 And remember to document it.
 
-Loosely speaking, Perl tends to optimism for speed rather than space, so you
+Loosely speaking, Perl tends to optimize for speed rather than space, so you
 may want to code for speed first, then tweak to reclaim some space while not
 affecting performance.
 
