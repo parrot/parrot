@@ -151,6 +151,13 @@ bad_args:
     $P1 = compreg 'PGE::Glob'
     .local string pattern
     pattern = argv[0]
+
+    # cheat and just remove a leading "::" for now
+    $S0 = substr pattern, 0, 2
+    if $S0 != "::" goto create_glob
+    $S0 = substr pattern, 0, 2, ''
+
+  create_glob:
     matching = $P1(pattern)
 
   done_setup:
