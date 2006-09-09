@@ -362,15 +362,23 @@ have_hdr:
     .return (req)
 .end
 
+.sub 'send_response' :method
+    .param pmc resp
+    .local string rep
+    .local pmc sock
+    sock = self.'socket'()
+    rep = resp.'as_string'()
+    $I0 = send sock, rep	# XXX don't ignore
+.end
+
 .sub 'send_file_response' :method
     .param string url
 
-    .local string file_content, rep, temp
+    .local string file_content, temp
     .local int len, res
-    .local pmc srv, fp, sock
+    .local pmc srv, fp
 
     srv = self.'server'()
-    sock = self.'socket'()
     goto SERVE_GET
 
 DONE:
@@ -420,8 +428,7 @@ SERVE_blob:
     temp = to_string (len)
     resp.'header'('Server' => 'Parrot-httpd/0.2', 'Content-Length' => temp)
     resp.'content'(file_content)
-    rep = resp.'as_string'()
-    res = send sock, rep
+    self.'send_response'(resp)
     srv.'log'(200, ", ", url)
     goto DONE
 
@@ -433,8 +440,7 @@ SERVE_docroot:
     resp.'header'('Location' => '/docs/html/index.html')
     resp.'header'('Server' => 'Parrot-httpd/0.2', 'Content-Length' => temp)
     resp.'content'(file_content)
-    rep = resp.'as_string'()
-    res = send sock, rep
+    self.'send_response'(resp)
     srv.'log'(301, ", ", url, " - Redirect to 'docs/html/index.hmtl'")
     goto DONE
 
@@ -449,9 +455,8 @@ SERVE_404:
     temp = $I0
     resp.'header'('Server' => 'Parrot-httpd/0.2', 'Content-Length' => temp)
     resp.'content'($S0)
-    rep = resp.'as_string'()
+    self.'send_response'(resp)
     srv.'log'(404, ", ", url)
-    res = send sock, rep
     goto DONE
 .end
 
