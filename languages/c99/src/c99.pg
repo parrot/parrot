@@ -1,110 +1,88 @@
 #taken from n869.pdf
 #google for n869
 
-grammar C99
+## A.1 Lexical grammar
+grammar C99;
+
+## A.1.1 Lexical elements
 rule ws {
-  \s+
-  | \/\/ <-[\n]>* \n
-  | \/\* [<-[\*]>|<[\*]><-[\/]>]* \*\/
+  | \s+
+  | <'//'> <-[\n]>* \n
+  | <'/*'> [<-[\*]>|<[\*]><-[\/]>]* <'*/'>
 }
 
 rule c99_token {
-  <keyword>
-  |<identifier>
-  |<constant>
-  |<string_literal>
-  |<punctuator>
+  | <keyword>
+  | <identifier>
+  | <constant>
+  | <string_literal>
+  | <punctuator>
 }
 
 rule preprocessing_token {
-  <header_name>
-  |<identifier>
-  |<pp_number>
-  |<character_constant>
-  |<string_literal>
-  |<punctuator>
-  |<universal_character_name>
-  | \S+ #non whitespace
+  | <header_name>
+  | <identifier>
+  | <pp_number>
+  | <character_constant>
+  | <string_literal>
+  | <punctuator>
+  | <universal_character_name>
+  | \S+ #non-whitespace
 }
 
+## A.1.2 Keywords
 token keyword {
-  auto
-  |break
-  |case
-  |char
-  |const
-  |continue
-  |default
-  |do
-  |double
-  |else
-  |enum
-  |extern
-  |float
-  |for
-  |goto
-  |if
-  |inline
-  |int
-  |long
-  |register
-  |restrict
-  |return
-  |short
-  |signed
-  |sizeof
-  |static
-  |struct
-  |switch
-  |typedef
-  |union
-  |unsigned
-  |void
-  |volatile
-  |while
-  |_Bool
-  |_Complex
-  |_Imaginary
+  | auto      | enum      | restrict  | unsigned
+  | break     | extern    | return    | void
+  | case      | float     | short     | volatile
+  | char      | for       | signed    | while
+  | const     | goto      | sizeof    | _Bool
+  | continue  | if        | static    | _Complex
+  | default   | inline    | struct    | _Imaginary
+  | do        | int       | switch
+  | double    | long      | typedef
+  | else      | register  | union
+
 }
 
-#identifiers
-token identifier { <identifier_nondigit> [<identifier_nondigit>|<digit>]* }
+## A.1.3 Identifiers
+token identifier { <identifier_nondigit> [ <identifier_nondigit> | \d ]* }
 
 token identifier_nondigit { <[a..zA..Z_]> | <universal_character_name> }
-token digit { \d }
 
-#universal character names
+## A.1.4 Universal character names
 token universal_character_name {
-  \\u<hexdigit>**{4}
-  |\\U<hexdigit>**{8}
+  | <'\u'> <xdigit>**{4}
+  | <'\U'> <xdigit>**{8}
 }
 
-#constants
+## A.1.5 Constants
 token constant {
-  <integer_constant>
-  |<floating_constant>
-  |<enumeration_constant>
-  |<character_constant>
+  | <integer_constant>
+  | <floating_constant>
+  | <enumeration_constant>
+  | <character_constant>
 }
 
-token integer_constant { 
-  <decimal_constant> <integer_sufffix>?
-  <octal_constant> <integer_sufffix>?
-  <hexadecimal_constant> <integer_sufffix>?
+token integer_constant {
+  [ <decimal_constant>
+  | <octal_constant>
+  | <hexadecimal_constant>
+  ] <integer_sufffix>?
 }
 
-token decimal_constant { <[1..9]><digit>* }
-token octal_constant { [0x|0X]<hexdigit>+ }
-token hexdigit { <[0..9a..fA..F]> }
+token decimal_constant     { <[1..9]> \d*       }
+token octal_constant       { 0 <[0..7]>+        }
+token hexadecimal_constant { 0 <[xX]> <xdigit>+ }
 
 token integer_suffix {
-  <[uU]><[lL]>?
-  |<[uU]>[ll|LL]
-  |<[lL]><[uU]>?
-  |[ll|LL]<[uU]>? 
+  | <[uU]> <[lL]>?
+  | <[uU]> [ll|LL]
+  | <[lL]> <[uU]>?
+  | [ll|LL]<[uU]>?
 }
 
-token floating_constant { 
+token floating_constant {
   <decimal_floating_constant>
   |<hexadecimal_floating_constant>
 }
@@ -115,13 +93,15 @@ token decimal_floating_constant {
 }
 
 token hexadecimal_floating_constant {
-  <hexadecimal_prefix> <hexadecimal_franctional_constant> <binary_exponent_part> <floating_suffix>
-  |<hexadecimal_prefix> <hexadecimal_digit_constant> <binary_exponent_part> <floating_suffix>
+  | <hexadecimal_prefix> <hexadecimal_fractional_constant>
+      <binary_exponent_part> <floating_suffix>
+  | <hexadecimal_prefix> <hexadecimal_digit_constant>
+      <binary_exponent_part> <floating_suffix>
 }
 
 token fractional_constant {
-  <digit_sequence>? \. <digit_sequence>
-  |<digit_sequence> \.
+  | <digit_sequence>? \. <digit_sequence>
+  | <digit_sequence> \.
 }
 
 token exponent_part {
@@ -130,7 +110,7 @@ token exponent_part {
 
 token digit_sequence { \d+ }
 
-token hexadecimal_floating_constant {
+token hexadecimal_fractional_constant {
   <hexadecimal_digit_sequence>? \. <hexadecimal_digit_sequence>
   |<hexadecimal_digit_sequence>? \.
 }
@@ -139,158 +119,88 @@ token binary_exponent_part {
   <[pP]> <[\+\-]>? <digit_sequence>
 }
 
-token hexadecimal_digit_sequence { <hexadecimal_digit>+ }
+token hexadecimal_digit_sequence { <xdigit>+ }
 
-token floating_suffix { <[flfL]> }
+token floating_suffix { <[fFlL]> }
 
-token enumeration_constant { identifier }
+token enumeration_constant { <identifier> }
 
-token character_constant { <[L]>?\'<c_char>+\' }
+token character_constant { <[L]>? \' <c_char>+ \' }
 
-token <c_char> { <-['\n]> | <escape_sequence> }
+token <c_char> { <-['\\\n]> | <escape_sequence> }
 
 token escape_sequence {
-  <simple_escape_sequence>
-  |<octal_escape_sequence>
-  |<hexadecimal_escape_sequence>
-  |<universal_character_name>
+  \\
+  [ <['"?\\abfnrtv]>
+  | <octal_digit>**[1..3]
+  | x <xdigit>+
+  | <universal_character_name>
 }
 
-token simple_escape_sequence {
-  \\'
-  |\\"
-  |\\\?
-  |\\\\
-  |\\a
-  |\\b
-  |\\f
-  |\\n
-  |\\r
-  |\\t
-  |\\v
-}
+## A.1.6 String literals
+token string_literal { <[L]>? " <s_char>* " }
 
-token octal_escape_sequence {
-  \\ <octal_digit>**{1..3}
-}
+token s_char { <-[\\"\n]> | <escape_sequence> }
 
-token hexadecimal_escape_sequence {
-  \\x <hexadecimal_digit>+
-}
-
-token string_literal { <[L]>?\"<s_char>*\" }
-
-token s_char { <-["\n]> | <escape_sequence> }
-
+## A.1.7 Punctuators
 token punctuator {
-  \[
-  |\]
-  |\{
-  |\}
-  |\.
-  |\-\>
-  |\+\+
-  |\-\-
-  |\*
-  |\*
-  |\+
-  |\-
-  |\~
-  |\!
-  |\/
-  |\%
-  |\<\<
-  |\>\>
-  |\<
-  |\>
-  |\<\=
-  |\>\=
-  |\=\=
-  |\!\=
-  |\^
-  |\|
-  |\&\&
-  |\|\|
-  |\?
-  |\:
-  |\;
-  |\.\.\.
-  |\=
-  |\*\=
-  |\/\=
-  |\%\=
-  |\+\=
-  |\-\=
-  |\<\<\=
-  |\>\>\=
-  |\&\=
-  |\^\=
-  |\|\=
-  |\,
-  |\#
-  |\#\#
-  |\<\:
-  |\:\>
-  |\<\%
-  |\%\>
-  |\%\:
-  |\%\:\%\:
+  | \[        | \]        | <[(){}.]>   | <'->'>
+  | <'++'>    | <'--'>    | <[&*+\-~!/%]>
+  | <'<<'>    | <'>>'>    | <[<>]>
+  | <'<='>    | <'>='>    | <'=='>   | <'!='>
+  | <[^|]>    | <'&&'>    | <'||'>
+  | <[?:;]>   | <'...'>
+  | [ <[*/%+\-&^|]> | <'<<'> | <'>>'> ] <'='>
+  | <[,#]>    | <'##'>
+  | <'<:'>    | <':>'>    | <'<%'>   | <'%>'>   | <'%:'>   | <'%:%:'>
 }
 
+## A.1.8 Header names
 token header_name {
-  \<<h_char>+\>
-  |\"<q_char>+\"
+  | \< <h_char>+ \>
+  | " <q_char>+ "
 }
 
 token h_char { <-[\n>]> }
 token q_char { <-[\n"]> }
 
+## A.1.9 Preprocessing numbers
+## XXX: i think this one is wrong
 token pp_number {
-  [.]?\d+ [<[eEpP]> <[\+\-]>|<identifer_nondigit>|\.|\d]?
+  \.? \d+
+  [ <[eEpP]> <[\+\-]> | <identifer_nondigit> | \. | \d ]?
 }
 
-#declarations
-rule delcaration { <declaration_specifiers> <init_declarator_list>? ; }
+## A.2 Phrase structure grammar
+## A.2.1 Expressions
+## XXX: see below
 
-rule declaration_specifiers {
- [ <storage_class_specifier>
+## A.2.2 Declarations
+rule delcaration { <declaration_specifier>+ <init_declarator_list>? ; }
+
+rule declaration_specifier {
+  | <storage_class_specifier>
   | <type_specifier>
   | <type_qualifier>
   | <function_spcifier>
- ]+
 }
 
 rule init_declarator_list { init_declarator [ , <init_declarator> ]* }
 
-rule init_declarator { <declaratpr> [ = <initializer ]? }
+rule init_declarator { <declarator> [ = <initializer> ]? }
 
-token storage_class_specifier {
-  typedef
-  |extern
-  |static
-  |auto
-  |register
-}
+token storage_class_specifier { typedef | extern | static | auto | register }
 
 token type_specifier {
-  void
-  |char
-  |short
-  |int
-  |long
-  |float
-  |double
-  |signed
-  |unsigned
-  |_Bool
-  |_Complex
-  |_Imaginary
-  |<struct_or_uninion_spcifier>
-  |<enum_specifier>
-  |<typedef_name>
+  | void      | char    | short     | int
+  | long      | float   | double    | signed
+  | unsigned  | _Bool   | _Complex  | _Imaginary
+  | <struct_or_union_specifier>
+  | <enum_specifier>
+  | <typedef_name>
 }
 
-rule struct_or_uninion_spcifier {
+rule struct_or_union_specifier {
   [struct|union] [<idientifer>|<identifier>? \{ <struct_declaration>+ \} ]
 }
 
@@ -302,21 +212,17 @@ rule enum_specifier { enum [ <identifier>? \{ <enumerator> [ , <enumerator> ]+ [
 
 rule enumerator { <enumeration_constant> [ = <constant_expression> ]? }
 
-token type_qualifier { 
-  const
-  |restrict
-  |volatile
-}
+token type_qualifier { const | restrict  | volatile }
 
-token function_specifier { inlline }
+token function_specifier { inline }
 
-rule declarator { <pointer>? <direct_declataror> }
+rule declarator { <pointer>? <direct_declarator> }
 
-rule direct_declataror { 
-  [ <identifier> | \( <declarator> \) ] 
+rule direct_declarator {
+  [ <identifier> | \( <declarator> \) ]
   [
     \[ <assignment_expression>? \]
-    | \[ \* \] 
+    | \[ \* \]
     | \( <parameter_type_list> \)
     | \( <identifier_list>? \)
   ]*
