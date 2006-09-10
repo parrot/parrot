@@ -18,7 +18,7 @@
     <li>HTML slide source</li>
 </ul>
 <h1>How Does It Work?</h1>
-<h2>httpd2</h2>
+<h2>httpd2.pir</h2>
 <p><i>httpd2.pir</i> is a tiny web server, using the <tt>['HTTP';
     'Daemon']</tt> class, which supports the <i>GET</i> method
    and <i>CGI</i>.
@@ -27,7 +27,15 @@
 <p>The primary webpage of the presention. It uses <i>JavaScript</i> to
 process keyboard events and <i>XMLHttpRequest</i> to send requests to
 the web server. The result of the query is placed into the webpage.</p>
+<p><i>index.html</i> could of course be named differently, it's just
+the start page of the presentation.</p>
 <h1>httpd2</h1>
+<p>well...</p>
+<h1>httpd2.pir</h1>
+<p>is a small example using:</p>
+<pre>
+  load_bytecode 'HTTP/Daemon.pbc'
+</pre>
 <h2>[ HTTP; Daemon]</h2>
 <p>The webserver is using he asynchronous event system of parrot to
 accept multiple client requests and serve results. It writes it's log
