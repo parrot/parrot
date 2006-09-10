@@ -38,6 +38,7 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
     addattribute cl, 'opts'     # options TBdoced
     addattribute cl, 'active'   # list of active ClientConns
     addattribute cl, 'to_log'   # list of strings to be logged
+    addattribute cl, 'doc_root' # where to serve files from
     
     # client connection
     # XXX this should subclass ParrotIO but opcode or PIO code 
@@ -69,13 +70,16 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
 .sub __init :method
     .param pmc args
 
-    .local pmc opts, active
-    opts = new .Hash
-    setattribute self, 'opts', opts
+    .local pmc active
+    
+    setattribute self, 'opts', args
     active = new .ResizablePMCArray
     setattribute self, 'active', active
     $P0 = new .ResizableStringArray
     setattribute self, 'to_log', $P0
+    $P0 = new .String
+    $P0 = '.'
+    setattribute self, 'doc_root', $P0
 
     # create socket
     .local pmc sock
@@ -86,17 +90,7 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
     .local int port
     .local string adr
     port = args['LocalPort']
-    if port goto port_ok
-    port = 80
-port_ok:
     adr = args['LocalAddr']
-    if adr goto addr_ok
-    adr = 'localhost'
-addr_ok:
-    opts['LocalAddr'] = adr
-    opts['LocalPort'] = port
-    $P0 = args['debug']
-    opts['debug'] = $P0
 
     # bind
     .local string i_addr
@@ -128,6 +122,21 @@ err_sock:
 .sub 'socket' :method
     $P0 = getattribute self, 'socket'
     .return ($P0)
+.end
+
+.sub 'opts' :method
+    $P0 = getattribute self, 'opts'
+    .return ($P0)
+.end
+.sub 'url' :method
+    .param string doc_root :optional
+    .param int has_dr      :opt_flag
+    $P0 = getattribute self, 'doc_root'
+    if has_dr goto set_it
+    $S0 = $P0
+    .return ($S0)
+set_it:
+    $P0 = doc_root
 .end
 
 .sub 'run' :method
@@ -343,10 +352,7 @@ MORE:
     res = recv sock, buf
     srv.'debug'("**read ", res, " bytes\n")
     if res > 0 goto not_empty
-
-    if res >= 0 goto no_close
     do_close = 1
-no_close:
 not_empty:
     concat req, buf
     index pos, req, CRLFCRLF
@@ -394,28 +400,44 @@ close_it:
 
 SERVE_GET:
     .local int is_cgi
-    .local pmc resp
+    .local pmc resp, opts
+    .local string doc_root
+
+    srv.'debug'("req url: ", url, "\n")
+
     $I0 = find_type ['HTTP'; 'Response']
     resp = new $I0
 
-    srv.'debug'("req url: ", url, "\n")
+    opts = srv.'opts'()
+    $I0 = opts['parrot-docs']
+    if $I0 goto parrot_docs
+
+    if url != "/" goto no_sl
+    url = '/index.html'
+no_sl:
+    goto normal
+
+parrot_docs:
+    if url == "/" goto SERVE_docroot
+
+    # Those little pics in the URL field or in tabs
+    # XXX only in parrot mode
+    if url != "/favicon.ico" goto no_fav
+    url = '../resources/favicon.ico'
+    goto SERVE_file
+no_fav:
+
+normal:
+    doc_root = srv.'url'()
+    concat url, doc_root, url
+
     (is_cgi, file_content, len) = check_cgi(url)
     if is_cgi goto SERVE_blob
     # decode the url
     url = urldecode(url)
 
-
-    # redirect instead of serving index.html
-    if url == "/" goto SERVE_docroot
-
-    # Those little pics in the URL field or in tabs
-    if url == "/favicon.ico" goto SERVE_favicon
-
 SERVE_file:
     # try to open the file in url
-    .local string doc_root
-    doc_root = "."	# XXX
-    concat url, doc_root, url
     fp = open url, "<"
     unless fp goto SERVE_404
     len = stat url, .STAT_FILESIZE
@@ -433,10 +455,8 @@ SERVE_blob:
     srv.'log'(200, ", ", url)
     goto DONE
 
-# TODO next 2 only if running w/ --parrot-docs 
-# set doc_root
 SERVE_docroot:
-    file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>." 
+    file_content = "Please go to <a href='docs/html/index.html'>Parrot Document ation</a>."
     length len, file_content
     temp = to_string (len)
     resp.'code'(301)
@@ -446,10 +466,6 @@ SERVE_docroot:
     self.'send_response'(resp)
     srv.'log'(301, ", ", url, " - Redirect to 'docs/html/index.hmtl'")
     goto DONE
-
-SERVE_favicon:
-    url = '/docs/resources/favicon.ico'
-    goto SERVE_file
 
 SERVE_404:
     resp.'code'(404)
