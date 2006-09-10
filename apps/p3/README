@@ -21,5 +21,10 @@ FILES:
                         files from below doc root
   cgi-pir/slides.pir  ... creates the slides
 
+CAVEATS:
+
+Caused by the absence of a working parrot event sytem on Win32, httpd2 and
+therefore P3 will not work on sayed platform - sorry.
+
 --leo  
 
