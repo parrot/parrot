@@ -33,14 +33,12 @@ the web server. The result of the query is placed into the webpage.</p>
 accept multiple client requests and serve results. It writes it's log
 file during idle time.</p>
 <p>Starting it with some options is as simple as this:</p>
-<blockquote>
 <pre>
   .local pmc d, opts
   $I0 = find_type ['HTTP'; 'Daemon']
   d = new $I0, opts
   d.'run'()
 </pre>
-</blockquote>
 <h2>CGI</h2>
 <p>A <i>URI</i> like <i>page.pir?q...</i> <b>load_bytecode</b>s
 <i>cgi-pir/page.pir</i> and runs a subroutine <i>cgi-main</i>. The
