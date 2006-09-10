@@ -146,7 +146,7 @@ loop:
     self.'_select_active'()
     # while idle dump the logfile
     self.'_write_logs'()
-    sleep 0.1
+    sleep 0.5
     goto loop
 .end
 
@@ -308,10 +308,14 @@ yes:
 
 do_read:    
     req = conn.'get_request'()
+    unless req goto close_it
     $S0 = req.'method'()
     if $S0 == 'GET' goto serve_get
     printerr 'unknown method: '
     printerr $S0
+    printerr "\n"
+close_it:
+    srv.'del_conn'(conn)
     .return()
 serve_get:
     .local string file
@@ -353,6 +357,7 @@ MORE:
     srv.'debug'("**read ", res, " bytes\n")
     if res > 0 goto not_empty
     do_close = 1
+    if res <= 0 goto done
 not_empty:
     concat req, buf
     index pos, req, CRLFCRLF
@@ -363,6 +368,8 @@ not_empty:
     if pos >= 0 goto have_hdr
     goto MORE
 have_hdr:
+    # TODO read content if any
+done:
     $P0 = getattribute self, 'close'
     $P0 = do_close
     .return (req)
@@ -684,6 +691,7 @@ done:
 .end
 
 .namespace ['HTTP'; 'Request']
+
 .sub 'method' :method
     .local pmc hdrs
     hdrs = self.'headers'()
@@ -692,6 +700,13 @@ done:
     .return ('GET')
 no_get:
     .return ('')
+.end
+
+.sub __get_bool :method
+    .local pmc hdrs
+    hdrs = self.'headers'()
+    $I0 = elements hdrs
+    .return ($I0)
 .end
 
 .sub 'uri' :method
