@@ -1,2 +1,46 @@
-PHC emitts XML, XSLT creates PIR that sets up PAST.
+# $Id$
 
+=head1 NAME
+ 
+Plumhead - Introduction
+
+=head1 What is Plumhead?
+
+An incomplete implementation of PHP on Parrot.
+Plumead is short for Plum-headed Parakeet.
+
+=head1 Goals
+
+Show an example for using XSLT for creating PAST.
+
+=head1 Implementation
+
+Take XML output from PHC. XSLT creates PIR that sets up PAST.
+
+=head1 Author
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<http://phpcompiler.org/>
+
+=item L<http://en.wikipedia.org/wiki/Document_Object_Model>
+
+=item L<http://en.wikipedia.org/wiki/Abstract_syntax_tree>
+
+=item L<http://en.wikipedia.org/wiki/XSLT>
+
+=item L<http://search.cpan.org/dist/parrot/docs/glossary.pod>
+
+=item L<http://perl.overmeer.net/xml-compile/>
+
+=item L<http://en.wikipedia.org/wiki/Plum-headed_parakeet>
+
+=item L<http://www.parrotcode.org/docs/compiler_tools.html>
+
+=back
+
+=cut
