@@ -34,6 +34,11 @@ err:
     .local int n, p, pos1, pos2
     .local string tag
     n = 0
+    pos1 = index slides, '<body', 0
+    if pos1 == -1 goto nobody
+    pos1 += 6
+    goto loop
+nobody:
     pos1 = 0
 loop:
     (pos1, p, $S0) = _next_tag(slides, pos1)
