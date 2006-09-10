@@ -48,8 +48,10 @@ loop2:
     if part == n goto serve_it
     if tag == 'ul' goto loop2
     if tag == 'ol' goto loop2
+    if tag == 'blockquote' goto loop2
     inc n
     if tag == 'p' goto loop2
+    if tag == 'pre' goto loop2
     if tag == 'h2' goto loop2
     if tag == 'h3' goto loop2
     if tag == 'li' goto loop2
