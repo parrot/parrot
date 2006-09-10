@@ -28,6 +28,12 @@ RELEASE_INSTRUCTIONS                                        []
 RESPONSIBLE_PARTIES                                         [main]doc
 TODO                                                        [main]doc
 VERSION                                                     []
+apps/p3/README                                              [apps/p3] 
+apps/p3/cgi-pir/slides.pir                                  [apps/p3] 
+apps/p3/index.html                                          [apps/p3] 
+apps/p3/p3p.html                                            [apps/p3] 
+apps/p3/parrot.small.png                                    [apps/p3] 
+apps/p3/slides.js                                           [apps/p3] 
 cage/consting.pod                                           []
 cage/todo.pod                                               []
 compilers/ast/README                                        []

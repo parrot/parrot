@@ -23,6 +23,11 @@ Leopold Toetsch <lt@toetsch.at> - some code base on httpd.pir.
     d = new clid, opts
     unless d goto err
     push_eh ignore
+    $S0 = opts['url']
+    if $S0 goto has_url
+    $S0 = '.'
+has_url:
+    d.'url'($S0)
     d.'run'()
 ignore:
     d.'shutdown'()
@@ -40,6 +45,7 @@ err:
     push getopts, 'host|h=s'
     push getopts, 'debug|d'
     push getopts, 'help|h'
+    push getopts, 'url=s'
     push getopts, 'parrot-docs'
     arg0 = shift args
     opts = getopts.'get_options'(args)

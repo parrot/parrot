@@ -438,7 +438,7 @@ normal:
     doc_root = srv.'url'()
     concat url, doc_root, url
 
-    (is_cgi, file_content, len) = check_cgi(url)
+    (is_cgi, file_content, len) = self.'check_cgi'(url)
     if is_cgi goto SERVE_blob
     # decode the url
     url = urldecode(url)
@@ -532,7 +532,7 @@ END:
 .end
 
 # if file is *.pir or *.pbc run it as CGI
-.sub check_cgi
+.sub check_cgi :method
     .param string url
     .local int pos
     # file.pir?foo=1+bar=2
@@ -558,9 +558,8 @@ cgi_1:
     # TODO stat the file
     load_bytecode file
     .local string result
-    null $P0	# not yet
     # TODO catch ex
-    result = 'cgi_main'($P0, query, query_hash)
+    result = 'cgi_main'(self, query, query_hash)
     $I0 = length result
     .return (1, result, $I0)
 .end

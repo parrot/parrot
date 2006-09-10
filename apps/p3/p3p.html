@@ -1,0 +1,51 @@
+<h1>Parrot Proudly Presents</h1>
+<h2>PPP - aka P3</h2>
+<h1>Parrot Presentation Program</h1>
+<h3>P3 Keywords:</h3>
+<ul>
+    <li>Parrot</li>
+    <li>['HTTP'; 'Daemon']</li>
+    <li>Ajax*</li>
+    <ul>
+	<li>* look Ma - no XML at all</li>
+    </ul>
+    <li>HTML slide source</li>
+</ul>
+<h1>How Does It Work?</h1>
+<h2>httpd2</h2>
+<p><i>httpd2.pir</i> is a tiny web server, using the <tt>['HTTP';
+    'Daemon']</tt> class, which supports the <i>GET</i> method
+   and <i>CGI</i>.
+</p>
+<h2>index.html</h2>
+<p>The primary webpage of the presention. It uses <i>JavaScript</i> to
+process keyboard events and <i>XMLHttpRequest</i> to send requests to
+the web server. The result of the query is placed into the webpage.</p>
+<h1>Navigation</h1> 
+<ul>
+    <li>&lt;space&gt; - next page</li>
+    <li>&lt;left arrow&gt; - previous page</li>
+    <li>&lt;right arrow&gt; - next page</li>
+    <li>\d+ &lt;enter&gt; - goto page</li>
+</ul>
+<h1>httpd2</h1>
+<h2>[ HTTP; Daemon]</h2>
+<p>The webserver is using he asynchronous event system of parrot to
+accept multiple client requests and serve results. It writes it's log
+file during idle time.</p>
+<h2>CGI</h2>
+<p>A <i>URI</i> like <i>page.pir?q...</i> <b>load_bytecode</b>s
+<i>cgi-pir/page.pir</i> and runs a subroutine <i>cgi-main</i>. The
+result is of course sent back to the browser.</p>
+<h1>cgi-pir/slides.pir</h1>
+<p>This is the actual presentation program, processing the
+<i>.html</i> source of the presentation. It delivers spliced parts
+according to the browser request.</p>
+<h1>Slides</h1>
+<p>Slides are taken from one <i>.html</i> page. The tag
+<i>&lt;h1&gt;</i> starts a
+new slide page, other top-level tags are placed beyond the previous
+one after <i>&lt;space&gt;</i> was pressed. Look at the source code of this
+file :)</p>
+<h1>Questions?</h1>
+</body>

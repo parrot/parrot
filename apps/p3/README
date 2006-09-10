@@ -1,0 +1,25 @@
+P3 - Parrot Presentation Program
+
+This is a small slide presenter, I'm currently developing.
+
+Check the presentation (p3p.html) or just run it:
+
+1) Start the webserver
+
+  $ ../../parrot ../../examples/io/httpd2.pir
+
+2) Point your web browser to
+
+  http://localhost:1234/  
+
+FILES:
+
+  index.html   ... default start page with P3 configuration
+  slides.js    ... AJAXish requests and JS events
+  p3p.html     ... the slides presenting P3
+  parrot.small.png  ... unfortunately a copy, but httpd2 can't serve
+                        files from below doc root
+  cgi-pir/slides.pir  ... creates the slides
+
+--leo  
+
