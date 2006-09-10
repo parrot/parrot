@@ -4,7 +4,7 @@ This is a small slide presenter, I'm currently developing.
 
 Check the presentation (p3p.html) or just run it:
 
-1) Start the webserver
+1) Start the webserver inside the apps/p3 directory:
 
   $ ../../parrot ../../examples/io/httpd2.pir
 
