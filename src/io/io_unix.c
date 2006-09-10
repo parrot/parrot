@@ -666,9 +666,10 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     }
     string_cstring_free(s);
 
+    sa.sin_family = family;
     sa.sin_port = htons(port);
 
-    return string_make(interpreter, &sa, sizeof(struct sockaddr),
+    return string_make(interpreter, &sa, sizeof(struct sockaddr_in),
             "binary", 0);
 }
 
@@ -786,6 +787,7 @@ PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
     memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr_in));
     io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
     io->local.sin_port = sa.sin_port;
+    io->local.sin_family = sa.sin_family;
 
     if ((bind(io->fd, (struct sockaddr *)&io->local,
                     sizeof(struct sockaddr_in))) == -1) {
