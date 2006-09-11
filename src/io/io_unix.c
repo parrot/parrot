@@ -709,7 +709,6 @@ PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
         io->remote.sin_family = fam;
         return io;
     }
-    perror("socket:");
     return 0;
 }
 
@@ -734,11 +733,6 @@ PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
         memcpy(&io->remote, PObj_bufstart(r), sizeof(struct sockaddr_in));
     }
 AGAIN:
-#if PIO_TRACE
-    PIO_eprintf(interpreter,
-            "connect: fd = %d port = %d\n",
-            io->fd, ntohs(io->remote.sin_port));
-#endif
     if ((connect(io->fd, (struct sockaddr*)&io->remote,
                     sizeof(struct sockaddr_in))) != 0) {
         switch(errno) {
@@ -748,17 +742,7 @@ AGAIN:
                 goto AGAIN;
             case EISCONN:
                 return 0;
-            case ECONNREFUSED:
-#if PIO_TRACE
-                PIO_eprintf(interpreter,
-                        "PIO_unix_connect: connect refused\n");
-#endif
-            case EINVAL:
             default:
-#if PIO_TRACE
-                PIO_eprintf(interpreter,
-                        "PIO_unix_connect: errno = %d\n", errno);
-#endif
                 return -1;
         }
     }
@@ -789,9 +773,6 @@ PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 
     if ((bind(io->fd, (struct sockaddr *)&io->local,
                     sizeof(struct sockaddr_in))) == -1) {
-        fprintf(stderr, "bind: errno=%d ret=-1 fd = %d port = %d\n",
-             errno, (int)io->fd, (int)ntohs(io->local.sin_port));
-        perror("bind");
         return -1;
     }
 
@@ -816,8 +797,6 @@ PIO_unix_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)
     UNUSED(layer);
     UNUSED(interpreter);
     if ((listen(io->fd, sec)) == -1) {
-        fprintf(stderr, "listen: errno=%d ret=-1 fd = %d port = %d\n",
-             errno, (int)io->fd, (int)ntohs(io->local.sin_port));
         return -1;
     }
     return 0;
@@ -848,8 +827,6 @@ PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     if ((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
                           &addrlen)) == -1)
     {
-        fprintf(stderr, "accept: errno=%d", errno);
-        /* Didn't get far enough, free the io */
         mem_sys_free(newio);
         return NULL;
     }
@@ -911,6 +888,7 @@ AGAIN:
                 goto AGAIN;
 #endif
             case EPIPE:
+                /* XXX why close it here and not below */
                 close(io->fd);
                 return -1;
             default:
@@ -945,12 +923,6 @@ AGAIN:
          * only works with 'ascii'
          */
         *s = string_make(interpreter, buf, bytesread, "ascii", 0);
-        if (!*s) {
-            PANIC("PIO_recv: Failed to allocate string");
-        }
-#if PIO_TRACE
-        PIO_eprintf(interpreter, "PIO_unix_revc: %d bytes\n", bytesread);
-#endif
         return bytesread;
     } else {
         switch (errno) {
@@ -964,17 +936,12 @@ AGAIN:
                 goto AGAIN;
 #endif
             case ECONNRESET:
+                /* XXX why close it on err return result is -1 anyway */
                 close(io->fd);
-#if PIO_TRACE
-                PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
-#endif
                 *s = string_make_empty(interpreter, enum_stringrep_one, 0);
                 return -1;
             default:
                 close(io->fd);
-#if PIO_TRACE
-                PIO_eprintf(interpreter, "recv: errno = %d\n", errno);
-#endif
                 *s = string_make_empty(interpreter, enum_stringrep_one, 0);
                 return -1;
         }
@@ -993,6 +960,8 @@ Returns a 1 | 2 | 4 (read, write, error) value.
 
 This is not equivalent to any speficic POSIX or BSD socket call, however
 it is a useful, common primitive.
+
+Not at all usefule --leo.
 
 Also, a buffering layer above this may choose to reimpliment by checking
 the read buffer.
@@ -1065,7 +1034,6 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
     UNUSED(flags);
 
     if ((err = pipe(fds)) < 0) {
-        perror("pipe");
         return NULL;
     }
 

@@ -113,6 +113,10 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
 
 err_listen:    
 err_bind:
+    err $I0
+    err $S0, $I0
+    printerr $S0
+    printerr "\n"
     close sock
 err_sock:
     $P0 = new .Undef
