@@ -51,7 +51,7 @@ for (1..50) {
 $test_3_pir_code .= ".end\n";
 
 pir_output_like($test_3_pir_code, <<'OUT', "check parser recovery patience.");
-/Too much errors. Correct some first.\n$/
+/Too many errors. Correct some first.\n$/
 OUT
 
 
