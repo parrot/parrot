@@ -349,7 +349,7 @@ Return a failed match if the stoptoken is found.
     if $I0 < 2 goto term_literal
   term_charlist:
     (mob, $P99, $P99, $P0) = mob.newfrom(0, 'PGE::Exp::EnumCharList')
-    mob.'value'(initchar)
+    mob.'result_object'(initchar)
     mob['isnegated'] = isnegated
     $P0 = pos
     .return (mob)
@@ -415,7 +415,7 @@ Return a failed match if the stoptoken is found.
     $S0 = substr target, litstart, $I0
     $S0 = concat initchar, $S0
     (mob, $S99, $P99, $P0) = mob.newfrom(0, 'PGE::Exp::Literal')
-    mob.'value'($S0)
+    mob.'result_object'($S0)
     $P0 = pos
     .return (mob)
 
@@ -789,7 +789,7 @@ Extract an enumerated character list.
     if $S0 != "]>" goto err_bracket
     pos += 2
     mpos = pos
-    mob.'value'(charlist)
+    mob.'result_object'(charlist)
     goto end
   err_bracket:
     parse_error(mob, pos, "Unescaped ']' in charlist")
@@ -833,8 +833,8 @@ Parses <'...'> literals.
     goto literal_iter
   literal_end:
     pos += 2
-    mob.value(lit)
-    mob.to(pos)
+    mob.'result_object'(lit)
+    mob.'to'(pos)
     .return (mob)
   literal_error:
     parse_error(mob, pos, "No closing '> in quoted literal")
@@ -870,14 +870,14 @@ Parse a modifier.
     $I1 = pos - $I0
     $S0 = substr target, $I0, $I1
     mob['key'] = $S0
-    mob.'value'(value)
+    mob.'result_object'(value)
     $S0 = substr target, pos, 1
     if $S0 != '(' goto end
     $I0 = pos + 1
     pos = index target, ')', pos
     $I1 = pos - $I0
     $S0 = substr target, $I0, $I1
-    mob.'value'($S0)
+    mob.'result_object'($S0)
     inc pos
   end:
     ### XXX pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
@@ -908,7 +908,7 @@ Parse a modifier.
     if $I0 < pos goto err_noclose
     $I1 = $I0 - pos
     $S1 = substr target, pos, $I1
-    mob.'value'($S1)
+    mob.'result_object'($S1)
     pos = $I0 + len
     mpos = pos
     .return (mob)
@@ -1337,7 +1337,7 @@ Parse a modifier.
     closure_fn = closure_pp[lang]
     $S1 = self
     $S1 = closure_fn($S1)
-    self.'value'($S1)
+    self.'result_object'($S1)
   end:
     .return (self)
 .end

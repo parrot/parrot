@@ -338,7 +338,7 @@ tree as a PIR code object that can be compiled.
     $S0 = exp0
     $S1 = exp1
     concat $S0, $S1
-    exp0.'value'($S0)
+    exp0.'result_object'($S0)
     goto concat_lit_loop
   concat_lit_shift:
     inc j
@@ -1332,12 +1332,12 @@ tree as a PIR code object that can be compiled.
           mpos = pos
           ($P0 :optional, $I0 :opt_flag) = $P1(mob)
           if $I0 == 0 goto %1
-          mob.'value'($P0)
+          mob.'result_object'($P0)
           push ustack, pos
           bsr succeed
           pos = pop ustack
           null $P0
-          mob.'value'($P0)
+          mob.'result_object'($P0)
           goto fail
         CODE
     .return ()

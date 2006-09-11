@@ -18,7 +18,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
     addattribute base, '$.pos'                     # current match position
     addattribute base, '&!corou'                   # match's corou
     addattribute base, '@!capt'                    # subpattern captures
-    addattribute base, '$!value'                   # return value
+    addattribute base, '$!result'                  # result object
 
     .return ()
 .end
@@ -269,24 +269,24 @@ Returns the portion of the target string matched by this object.
 .end
 
 
-=item C<value([pmc value])>
+=item C<result_object([pmc obj])>
 
-Returns or sets the "return value" for the match object.  If no 
-return value has been explicitly set (by an embedded closure), 
+Returns or sets the "result object" for the match object.  If no 
+result object has been explicitly set (by an embedded closure), 
 return the substring that was matched by this match object.
 
 =cut
 
-.sub 'value' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    if has_value == 0 goto get
-    setattribute self, '$!value', value
+.sub 'result_object' :method
+    .param pmc obj             :optional
+    .param int has_obj         :opt_flag
+    if has_obj == 0 goto get
+    setattribute self, '$!result', obj
   get:
-    value = getattribute self, '$!value'
-    if null value goto value_text
-    .return (value)
-  value_text:
+    obj = getattribute self, '$!result'
+    if null obj goto result_text
+    .return (obj)
+  result_text:
     $S0 = self.'text'()
     .return ($S0)
 .end
@@ -308,7 +308,7 @@ the position of the match object to C<cutvalue>.
     setattribute self, '$.target', $P0
     setattribute self, '&!corou', $P0
     setattribute self, '@!capt', $P0
-    setattribute self, '$!value', $P0
+    setattribute self, '$!result', $P0
     .local pmc iter
     iter = new .Iterator, self
   iter_loop:
@@ -342,7 +342,7 @@ Returns the integer value of this match.
 =cut
 
 .sub '__get_integer' :method
-    $I0 = self.'value'()
+    $I0 = self.'result_object'()
     .return ($I0)
 .end
 
@@ -353,7 +353,7 @@ Returns the numeric value of this match.
 =cut
 
 .sub '__get_number' :method
-    $N0 = self.'value'()
+    $N0 = self.'result_object'()
     .return ($N0)
 .end
 
@@ -364,7 +364,7 @@ Returns the portion of the target string matched by this object.
 =cut
 
 .sub '__get_string' :method
-    $S0 = self.'value'()
+    $S0 = self.'result_object'()
     .return ($S0)
 .end
 
