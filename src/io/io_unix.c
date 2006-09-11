@@ -643,6 +643,11 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     int family = AF_INET;
 
     char * s = string_to_cstring(interpreter, addr);
+    /*
+     * due to a bug in OS/X, we've to zero the struct
+     * else bind is failing erratically
+     */
+    memset(&sa, 0, sizeof(sa));
 #ifdef PARROT_DEF_INET_ATON
     if (inet_aton(s, &sa.sin_addr) != 0) {
 #else
@@ -725,10 +730,7 @@ PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
     UNUSED(interpreter);
 
     if (r) {
-        struct sockaddr_in sa;
-        memcpy(&sa, PObj_bufstart(r), sizeof(struct sockaddr));
-        io->remote.sin_addr.s_addr = sa.sin_addr.s_addr;
-        io->remote.sin_port = sa.sin_port;
+        memcpy(&io->remote, PObj_bufstart(r), sizeof(struct sockaddr_in));
     }
 AGAIN:
 #if PIO_TRACE
@@ -777,22 +779,18 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 static INTVAL
 PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 {
-    struct sockaddr_in sa;
-
     UNUSED(layer);
     UNUSED(interpreter);
     if (!l)
         return -1;
 
-    memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr_in));
-    io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
-    io->local.sin_port = sa.sin_port;
-    io->local.sin_family = sa.sin_family;
+    memcpy(&io->local, PObj_bufstart(l), sizeof(struct sockaddr_in));
 
     if ((bind(io->fd, (struct sockaddr *)&io->local,
                     sizeof(struct sockaddr_in))) == -1) {
         fprintf(stderr, "bind: errno=%d ret=-1 fd = %d port = %d\n",
              errno, (int)io->fd, (int)ntohs(io->local.sin_port));
+        perror("bind");
         return -1;
     }
 
