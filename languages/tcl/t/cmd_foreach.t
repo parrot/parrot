@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 11
+plan 12
 
 eval_is {foreach} \
   {wrong # args: should be "foreach varList list ?varList list ...? command"} \
@@ -10,6 +10,10 @@ eval_is {foreach} \
 eval_is {foreach a b q {puts $a}} \
   {wrong # args: should be "foreach varList list ?varList list ...? command"} \
   {uneven # of args}
+
+eval_is {foreach {} {a b c} {puts foo}} \
+  {foreach varlist is empty} \
+  {empty varList}
 
 eval_is {
   set r ""
