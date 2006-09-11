@@ -105,7 +105,7 @@ Description of the test.
     .local string description # user-facing description of the test.
 
     # How many tests to run?
-    test.'plan'(487)
+    test.'plan'(491)
 
     # Which of these tests are TODO? 
     # XXX This needs to be filled back in.
@@ -128,22 +128,22 @@ Description of the test.
     todo_tests[120] = 1
     todo_tests[121] = 1
     todo_tests[240] = 1
-    todo_tests[256] = 1
-    todo_tests[293] = 1
-    todo_tests[294] = 1
-    todo_tests[295] = 1
-    todo_tests[304] = 1
-    todo_tests[337] = 1
-    todo_tests[358] = 1
-    todo_tests[359] = 1
-    todo_tests[360] = 1
-    todo_tests[382] = 1
-    todo_tests[383] = 1
-    todo_tests[384] = 1
-    todo_tests[476] = 1
-    todo_tests[481] = 1
-    todo_tests[486] = 1
-    todo_tests[487] = 1
+    todo_tests[260] = 1
+    todo_tests[297] = 1
+    todo_tests[298] = 1
+    todo_tests[299] = 1
+    todo_tests[308] = 1
+    todo_tests[341] = 1
+    todo_tests[362] = 1
+    todo_tests[363] = 1
+    todo_tests[364] = 1
+    todo_tests[386] = 1
+    todo_tests[387] = 1
+    todo_tests[388] = 1
+    todo_tests[480] = 1
+    todo_tests[485] = 1
+    todo_tests[490] = 1
+    todo_tests[491] = 1
      
     # Which of these tests are SKIP?
     if has_icu goto done_icu

@@ -245,6 +245,7 @@ ab:::cd | gh:::ij	xyabghij	n	rule cut at top
 <-[b..d]>		abcdef		y	negated character range
 <-[b..d]>		bbccdd		n	negated character range
 <-[d..b]>		bbccdd		/parse error/	illegal character range
+<[-]>			ab-def		/parse error/	unescaped hyphen
 <[\-]>			ab-def		y	escaped hyphen
 <[\-]>			abcdef		n	escaped hyphen
 <-[\-]>			---x--		y	negated escaped hyphen
@@ -259,6 +260,9 @@ ab:::cd | gh:::ij	xyabghij	n	rule cut at top
 <-[\-+]>		------		n	negated escaped hyphen in range
 <-[+\-]>		---x--		y	negated escaped hyphen in range
 <-[+\-]>		------		n	negated escaped hyphen in range
+<[\\]>			\\			y	escaped backslash
+<[\]]>			]			y	escaped close bracket
+<[\]>			\\]]		/parse error/	unescaped backslash (or no closing brace)
 ^><[<]>			><		/rule error/	lt character class
 ^<[>]><			><		y	gt character class
 ^<[><]>**{2}		><		y	gt, lt character class

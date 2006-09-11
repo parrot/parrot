@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Parrot::Test::PGE;
 
 
@@ -81,5 +81,10 @@ p6rule_isnt('whence',
     ],
     "<commit> in nested subrule");
 
-
+p6rule_is  ('"abcd"',
+        [
+           [ char => '<-[\\"]>' ],
+           [ _MASTER => '" <char>* "' ],
+        ],
+        "negated charclass in subrule");
 
