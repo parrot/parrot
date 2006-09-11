@@ -53,6 +53,3 @@ $test_3_pir_code .= ".end\n";
 pir_output_like($test_3_pir_code, <<'OUT', "check parser recovery patience.");
 /Too many errors. Correct some first.\n$/
 OUT
-
-
-
