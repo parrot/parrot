@@ -172,6 +172,14 @@ replacement syntax assumes the source text is on a single line.)
 
 =over 4
 
+=item makefile
+
+If set to a true value, this flag sets (unless overriden) C<commentType>
+to '#', C<replace_slashes> to enabled, and C<conditioned_lines> to enabled.
+
+If the name of the file being generated ends in C<Makefile>, this option
+defaults to true.
+
 =item conditioned_lines
 
 If conditioned_lines is true, then lines in the file that begin with:
@@ -246,6 +254,16 @@ sub genfile
     open my $in, '<', $source or die "Can't open $source: $!";
 
     open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
+
+    if (! exists $options{makefile} && $target =~ m/makefile$/i) {
+        $options{makefile} = 1;
+    }
+
+    if ($options{makefile}) {
+      exists $options{commentType}       or $options{commentType} = '#';
+      exists $options{replace_slashes}   or $options{replace_slashes} = 1;
+      exists $options{conditioned_lines} or $options{conditioned_lines} = 1;
+    }
 
     if ($options{commentType}) {
         my @comment = (

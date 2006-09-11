@@ -62,12 +62,17 @@ sub makefiles
 {
     my ($self, $conf) = @_;
 
-    genfile(
-        'config/gen/makefiles/root.in'          => 'Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1,
-        conditioned_lines                       => 1
-    );
+    genfile('config/gen/makefiles/root.in'      => 'Makefile');
+  
+    genfile('config/gen/makefiles/past.in'      => 'compilers/past/Makefile');
+    genfile('config/gen/makefiles/pge.in'       => 'compilers/pge/Makefile');
+    genfile('config/gen/makefiles/tge.in'       => 'compilers/tge/Makefile');
+    genfile('config/gen/makefiles/bcg.in'       => 'compilers/bcg/Makefile');
+    genfile('config/gen/makefiles/json.in'      => 'compilers/json/Makefile');
+    genfile('config/gen/makefiles/dynpmc.in'    => 'src/dynpmc/Makefile');
+    genfile('config/gen/makefiles/dynoplibs.in' => 'src/dynoplibs/Makefile');
+    genfile('config/gen/makefiles/editor.in'    => 'editor/Makefile');
+
     genfile(
         'config/gen/makefiles/dynpmc_pl.in'     => 'tools/build/dynpmc.pl',
         commentType                             => '#',
@@ -79,48 +84,6 @@ sub makefiles
         commentType                             => '#',
         replace_slashes                         => 0,
         conditioned_lines                       => 1
-    );
-    genfile(
-        'config/gen/makefiles/past.in'          => 'compilers/past/Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1
-    );
-    genfile(
-        'config/gen/makefiles/pge.in'           => 'compilers/pge/Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1
-    );
-    genfile(
-        'config/gen/makefiles/tge.in'           => 'compilers/tge/Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1
-    );
-    genfile(
-        'config/gen/makefiles/bcg.in'     		=> 'compilers/bcg/Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1,
-        conditioned_lines                       => 1
-    );
-    genfile(
-        'config/gen/makefiles/json.in'          => 'compilers/json/Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1
-    );
-    genfile(
-        'config/gen/makefiles/dynpmc.in'        => 'src/dynpmc/Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1,
-        conditioned_lines                       => 1
-    );
-    genfile(
-        'config/gen/makefiles/dynoplibs.in'     => 'src/dynoplibs/Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1
-    );
-    genfile(
-        'config/gen/makefiles/editor.in'        => 'editor/Makefile',
-        commentType                             => '#',
-        replace_slashes                         => 1
     );
     genfile(
         'config/gen/makefiles/parrot.pc.in'     => 'parrot.pc'
