@@ -316,11 +316,10 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Stream/Sub.pbc \
     $(LIBRARY_DIR)/Stream/Writer.pbc \
     $(LIBRARY_DIR)/YAML/Parser/Syck.pbc \
-    $(LIBRARY_DIR)/STM.pbc
-# XXX Why don't these build?
-#    runtime/parrot/library/libpcre.pbc \
-#    runtime/parrot/library/Data/Replace.pbc \
-#    runtime/parrot/library/postgres.pbc \
+    $(LIBRARY_DIR)/STM.pbc \
+    $(LIBRARY_DIR)/libpcre.pbc \
+    $(LIBRARY_DIR)/Data/Replace.pbc \
+    $(LIBRARY_DIR)/postgres.pbc \
 
 # the dependencies of $(SRC_DIR)/jit_emit.h are done explicitely
 # including this file in GEN_HEADERS causes unnecessary recompile of all

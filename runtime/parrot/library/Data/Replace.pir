@@ -93,6 +93,7 @@ CANT_REPLACE:
 
     # find a Data::Replace method with the name of the type to replace
     typeof name, where
+    .include 'errors.pasm'
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
     find_global temp, "Data::Replace", name
     errorson .PARROT_ERRORS_GLOBALS_FLAG
