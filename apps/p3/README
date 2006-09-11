@@ -1,6 +1,6 @@
 P3 - Parrot Presentation Program
 
-This is a small slide presenter, I'm currently developing.
+This is a small slide presenter I'm currently developing.
 
 Check the presentation (p3p.html) or just run it:
 
@@ -10,7 +10,7 @@ Check the presentation (p3p.html) or just run it:
 
 2) Point your web browser to
 
-  http://localhost:1234/  
+  http://localhost:1234/
 
 FILES:
 
@@ -24,7 +24,7 @@ FILES:
 CAVEATS:
 
 Caused by the absence of a working parrot event sytem on Win32, httpd2 and
-therefore P3 will not work on sayed platform - sorry.
+therefore P3 will not work on said platform - sorry.
 
---leo  
+--leo
 
