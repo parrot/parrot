@@ -159,7 +159,7 @@ CODE
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function min 0' );
-print(math.min())                                                      
+print(math.min())
 CODE
 /number expected/
 OUTPUT

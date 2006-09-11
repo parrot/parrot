@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/iterator.t - Lua iterators 
+t/iterator.t - Lua iterators
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,7 @@ t/iterator.t - Lua iterators
 
 =head1 DESCRIPTION
 
-See "Programming in Lua", section 7 "Iterators and the Generic for". 
+See "Programming in Lua", section 7 "Iterators and the Generic for".
 
 =cut
 
@@ -34,7 +34,7 @@ function list_iter (t)
                else
                    return nil
                end
-           end 
+           end
 end
 
 t = {10, 20, 30}

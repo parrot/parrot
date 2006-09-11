@@ -172,7 +172,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaNil
-    print pmc1                 
+    print pmc1
     print "\n"
     $P0 = pmc1."tostring"()
     print $P0

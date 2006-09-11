@@ -59,7 +59,7 @@ USAGE:
     print $S0
     print ")\n"
 L1:
-    .return (content) 
+    .return (content)
 .end
 
 =head1 AUTHOR

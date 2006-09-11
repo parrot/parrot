@@ -221,7 +221,7 @@ returns the total memory in use by Lua (in Kbytes).
 
 =item B<"step">
 
-performs a garbage-collection step. The step C<"size"> is controlled 
+performs a garbage-collection step. The step C<"size"> is controlled
 by C<arg> (larger values mean more steps) in a non-specified way.
 If you want to control the step size you must tune experimentally the value
 of C<arg>. Returns B<true> if the step finished a collection cycle.
@@ -232,10 +232,10 @@ sets C<arg>/100 as the new value for the I<pause> of the collector.
 
 =item B<"setstepmul">
 
-sets C<arg>/100 as the new value for the I<step multiplier> of the collector. 
-    
+sets C<arg>/100 as the new value for the I<step multiplier> of the collector.
+
 =back
-    
+
 NOT YET IMPLEMENTED.
 
 =cut
@@ -271,8 +271,8 @@ NOT YET IMPLEMENTED.
 Terminates the last protected function called and returns C<message> as the
 error message. Function C<error> never returns.
 
-Usually, C<error> adds some information about the error position at the 
-beginning of the message. The C<level> argument specifies how to get the 
+Usually, C<error> adds some information about the error position at the
+beginning of the message. The C<level> argument specifies how to get the
 error position. With level 1 (the default), the error position is where the
 C<error> function was called. Level 2 points the error to where the function
 that called C<error> was called; and so on. Passing a level 0 avoids the
@@ -346,7 +346,7 @@ the construction
 will iterate over the pairs (C<1,t[1]>), (C<2,t[2]>), ..., up to the first
 integer key with a nil value in the table.
 
-See C<next> for the caveats of modifying the table during its traversal. 
+See C<next> for the caveats of modifying the table during its traversal.
 
 =cut
 
@@ -390,7 +390,7 @@ returns B<nil> plus the error message. The environment of the returned
 function is the global environment.
 
 C<chunkname> is used as the chunk name for error messages and debug
-information. 
+information.
 
 NOT YET IMPLEMENTED.
 
@@ -446,7 +446,7 @@ next index of the table and its associated value. When called
 with B<nil> as its second argument, C<next> returns an initial index
 and its associated value. When called with the last index, or with
 B<nil> in an empty table, C<next> returns B<nil>. If the second argument is
-absent, then it is interpreted as B<nil>. In particular, you can use 
+absent, then it is interpreted as B<nil>. In particular, you can use
 C<next(t)> to check whether a table is empty.
 
 Lua has no declaration of fields. There is no difference between a field
@@ -457,7 +457,7 @@ in numeric order, use a numerical for or the C<ipairs> function.)
 
 The behavior of C<next> is I<undefined> if, during the traversal, you assign
 any value to a non-existent field in the table. You may however modify
-existing fields. In particular, you may clear existing fields. 
+existing fields. In particular, you may clear existing fields.
 
 STILL INCOMPLETE (see next in luapir.pir).
 
@@ -471,9 +471,9 @@ STILL INCOMPLETE (see next in luapir.pir).
     checktype(table, 'table')
     (idx, value) = next(table, index)
     unless idx goto L1
-    .return (idx, value) 
+    .return (idx, value)
 L1:
-    .return (idx)	# nil                               
+    .return (idx)	# nil
 .end
 
 
@@ -533,7 +533,7 @@ _handler:
     .local string s
     .local pmc msg
     .get_results (e, s)
-    status = 0    
+    status = 0
     new msg, .LuaString
     msg = s
     .return (status, msg)
@@ -630,7 +630,7 @@ B<nil>, and C<value> is any Lua value.
 
 If C<index> is a number, returns all arguments after argument number C<index>.
 Otherwise, C<index> must be the string C<"#">, and C<select> returns the
-total number of extra arguments it received. 
+total number of extra arguments it received.
 
 =cut
 
@@ -659,7 +659,7 @@ L1:
 L2:
     unless i > n goto L3
     i = n
-L3:    
+L3:
     if 1 <= i goto L4
     argerror("index out of range")
 L4:
@@ -675,7 +675,7 @@ L5:
     inc i
     inc $I1
     goto L5
-L6:    
+L6:
     .return (ret :flat)
 .end
 
@@ -687,7 +687,7 @@ function or a number that specifies the function at that stack level: Level
 1 is the function calling C<setfenv>. C<setfenv> returns the given function.
 
 As a special case, when C<f> is 0 C<setfenv> changes the environment of the
-running thread. In this case, C<setfenv> returns no values. 
+running thread. In this case, C<setfenv> returns no values.
 
 NOT YET IMPLEMENTED.
 
@@ -708,7 +708,7 @@ other types from Lua.) If metatable is B<nil>, removes the metatable of the
 given table. If the original metatable has a C<"__metatable"> field, raises
 an error.
 
-This function returns table. 
+This function returns table.
 
 =cut
 
@@ -753,7 +753,7 @@ unsigned integers are accepted.
 =cut
 
 .sub '_lua_tonumber' :anon :outer(init_basic)
-    .param pmc e :optional 
+    .param pmc e :optional
     .param pmc base :optional
     .local pmc ret
     checkany(e)
@@ -836,7 +836,7 @@ length operator.
     .local int e
     .local int n
     checktype(list, 'table')
-    $I0 = getn(list)                                   
+    $I0 = getn(list)
     $I1 = optint(i, 1)
     e = optint(j, $I0)
     n = e - $I1
@@ -846,7 +846,7 @@ length operator.
     new index, .LuaNumber
     index = $I1
     idx = 0
-L0:    
+L0:
     unless idx < n goto L1
     $P0 = list.'rawget'(index)
     ret[idx] = $P0
@@ -869,7 +869,7 @@ the error, calls the C<err> function with the original error object, and
 returns a status code. Its first result is the status code (a boolean), which
 is true if the call succeeds without errors. In this case, C<xpcall> also
 returns all results from the call, after this first result. In case of any
-error, C<xpcall> returns false plus the result from C<err>. 
+error, C<xpcall> returns false plus the result from C<err>.
 
 =cut
 
@@ -890,12 +890,12 @@ _handler:
     .local pmc msg
     status = 0
     $S0 = typeof err
-    unless $S0 == 'Sub' goto L0    
+    unless $S0 == 'Sub' goto L0
     .get_results (e)
     (ret :slurpy) = err(e)
     .return (status, ret :flat)
 L0:
-    .return (status)    
+    .return (status)
 .end
 
 =back

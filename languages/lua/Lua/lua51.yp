@@ -164,7 +164,7 @@ stat
         }
 				funcname	funcbody
         {
-            my $var = BuildVariable( $_[0], $_[3] ); 
+            my $var = BuildVariable( $_[0], $_[3] );
             BuildAssigns( $_[0], [$var], [ $_[4] ] );
         }
 |	LOCAL	FUNCTION
@@ -259,7 +259,7 @@ varlist1
 :	varlist1	','	var
         {
             [
-                @{ $_[1] }, 
+                @{ $_[1] },
                 BuildVariable( $_[0], $_[3] ),
             ];
         }

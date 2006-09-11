@@ -39,8 +39,8 @@ PBCS = \
 GEN_PIR = \
  src@slash@lua51_grammar_gen.pir \
  src@slash@lua51_testlex_gen.pir \
- src@slash@dumplex_gen.pir 
- 
+ src@slash@dumplex_gen.pir
+
 GEN_PBC = \
  src@slash@Lua51.pbc \
  src@slash@Lua51TestLex.pbc \

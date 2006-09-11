@@ -187,17 +187,17 @@ function createClass (...)
 
     -- prepare 'c' to be the metatable of its instance
     c.__index = c
-    
+
     -- define a new constructor for this new class
     function c:new (o)
         o = o or {}
         setmetatable(o, c)
         return o
     end
-    
+
     -- return new class
     return c
-end    
+end
 
 Account = {balance = 0}
 function Account:deposit (v)
@@ -230,7 +230,7 @@ OUT
 language_output_is( 'lua', <<'CODE', <<'OUT', 'privacy' );
 function newAccount (initialBalance)
     local self = {balance = initialBalance}
-    
+
     local withdraw = function (v)
                          self.balance = self.balance - v
                      end
@@ -240,7 +240,7 @@ function newAccount (initialBalance)
                     end
 
     local getBalance = function () return self.balance end
-    
+
     return {
         withdraw = withdraw,
         deposit = deposit,

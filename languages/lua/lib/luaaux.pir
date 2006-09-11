@@ -51,17 +51,17 @@ L1:
     ret_start = start.'tonumber'()
     if ret_start goto L1
     error("'for' initial value must be a number")
-L1:    
+L1:
     .local pmc ret_limit
     ret_limit = limit.'tonumber'()
     if ret_limit goto L2
     error("'for' limit must be a number")
-L2:    
+L2:
     .local pmc ret_step
     ret_step = step.'tonumber'()
     if ret_step goto L3
     error("'for' step must be a number")
-L3:    
+L3:
     .return (ret_start, ret_limit, ret_step)
 .end
 
@@ -79,7 +79,7 @@ L3:
     $I0 = isa arg, 'LuaNumber'
     unless $I0 goto L1
     val = arg
-    .return (val)    
+    .return (val)
 L1:
     $I0 = isa arg, 'LuaString'
     unless $I0 goto L0
@@ -89,7 +89,7 @@ L1:
     val = $P0
     .return (val)
 L0:
-    tag_error($S0, "number")    
+    tag_error($S0, "number")
 .end
 
 
@@ -107,7 +107,7 @@ L0:
 L1:
     unless i < n goto L2
     $S0 = options[i]
-    unless $S0 == name goto L3    
+    unless $S0 == name goto L3
     .return (i)
 L3:
     inc i
@@ -116,7 +116,7 @@ L2:
     $S1 = "invalid option '"
     concat $S1, name
     concat $S1, "'"
-    argerror($S1)    
+    argerror($S1)
 .end
 
 
@@ -133,14 +133,14 @@ L2:
     $I0 = isa arg, 'LuaString'
     unless $I0 goto L1
     val = arg
-    .return (val)    
+    .return (val)
 L1:
     $I0 = isa arg, 'LuaNumber'
     unless $I0 goto L0
     val = arg.'tostring'()
     .return (val)
 L0:
-    tag_error($S0, "string")    
+    tag_error($S0, "string")
 .end
 
 
@@ -151,9 +151,9 @@ L0:
 .sub 'checktype'
     .param pmc arg
     .param string type
-    $S0 = "no value"       
+    $S0 = "no value"
     if_null arg, L0
-    $S0 = typeof arg       
+    $S0 = typeof arg
     if $S0 != type goto L0
     .return ()
 L0:
@@ -213,7 +213,7 @@ L1:
     inc index
     value = table[index]
     unless value goto L2
-    .return (index, value)    
+    .return (index, value)
 L2:
     .return (value)		# nil
 .end
@@ -270,7 +270,7 @@ L0:
 .sub 'tag_error'
     .param string got
     .param string expec
-    $S0 = expec 
+    $S0 = expec
     concat $S0, " expected, got "
     concat $S0, got
     argerror($S0)

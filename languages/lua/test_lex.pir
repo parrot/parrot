@@ -72,7 +72,7 @@ _handler:
     print $S0
     print ")\n"
 L1:
-    .return (content) 
+    .return (content)
 .end
 
 .namespace [ 'Lua::TestLex' ]

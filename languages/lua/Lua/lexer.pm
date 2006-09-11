@@ -162,7 +162,7 @@ sub _SingleQuoteStringLexer {
                 and $str .= "\x0b",    # vertical tab
                 last;
             s/^\\([0-9]{1,3})//
-                and $str .= chr $1, 
+                and $str .= chr $1,
                 last;
 
             s/^\\//

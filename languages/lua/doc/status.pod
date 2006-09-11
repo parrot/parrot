@@ -110,7 +110,7 @@ Currently, C<file> in I/O library is an C<userdata>.
 
 =item * thread F<languages/lua/pmc/luathread.pmc>
 
-This type is used to implement coroutines. 
+This type is used to implement coroutines.
 
 =item * table F<languages/lua/pmc/luatable.pmc>
 
@@ -118,14 +118,14 @@ This type is I<the> data structure of the language.
 
 =back
 
-F<languages/lua/pmc/luabase.pmc> provides an abstract base class for some 
+F<languages/lua/pmc/luabase.pmc> provides an abstract base class for some
 Lua types (nil, boolean, number, string, table).
 
 F<languages/lua/pmc/lua.pmc> is a singleton PMC what holds some static methods.
 
 =head2 BUGS
 
-Lua PMC have problems with the Parrot garbage collector : used objects are 
+Lua PMC have problems with the Parrot garbage collector : used objects are
 released by the GC (infant mortality ?).
 
 So, use the option C<--no-gc>.
@@ -138,7 +138,7 @@ Weak table, weak reference.
 
 =head2 IMPROVEMENT
 
-C<table> with a mixed array and hash. 
+C<table> with a mixed array and hash.
 
 =head1 Lua Standard Libraries
 
@@ -172,16 +172,16 @@ F<languages/lua/lib/luaaux.pir> is the equivalent of Auxiliary Library.
 
 Except math library, all of these libraries are incomplete.
 
-And the coroutine library does not work. 
+And the coroutine library does not work.
 
 =head2 KNOWN PROBLEMS
 
-Currently, these libraries are included as PIR file (not loaded as bytecode 
-PBC) because HLL support for Sub/Closure is incomplete with PBC.   
+Currently, these libraries are included as PIR file (not loaded as bytecode
+PBC) because HLL support for Sub/Closure is incomplete with PBC.
 
 =head1 Next Milestones
 
-Understand how work PGE & TGE and write an interpreter in PIR. 
+Understand how work PGE & TGE and write an interpreter in PIR.
 
 =head1 Related Projects
 
@@ -198,9 +198,9 @@ A Lua to PIR compiler implemented in C
 A Lua bytecode to PIR compiler
 
 =back
- 
-See L<http://members.home.nl/joeijoei/>. 
- 
+
+See L<http://members.home.nl/joeijoei/>.
+
 =head1 AUTHOR
 
 Francois Perrad.

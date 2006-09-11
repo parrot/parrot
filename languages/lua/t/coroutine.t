@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/coroutine.t - Lua coroutines 
+t/coroutine.t - Lua coroutines
 
 =head1 SYNOPSIS
 
@@ -14,7 +14,7 @@ t/coroutine.t - Lua coroutines
 
 See "Lua 5.0 Reference Manual", section 2.10 "Coroutines".
 
-See "Programming in Lua", section 9 "Coroutines". 
+See "Programming in Lua", section 9 "Coroutines".
 
 =cut
 
@@ -67,8 +67,8 @@ language_output_like( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
         print("hi")
     end)
-    
-print(co)    
+
+print(co)
 CODE
 /(thread: [0-9A-Fa-f]{8}|\s*)/
 OUT
@@ -81,9 +81,9 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
         print("hi")
     end)
-    
+
 print(coroutine.status(co))
-coroutine.resume(co)    
+coroutine.resume(co)
 print(coroutine.status(co))
 CODE
 suspended
@@ -99,19 +99,19 @@ co = coroutine.create(function ()
             coroutine.yield()
         end
     end)
-    
-coroutine.resume(co)    
+
+coroutine.resume(co)
 print(coroutine.status(co))
-coroutine.resume(co)    
-coroutine.resume(co)    
-coroutine.resume(co)    
-coroutine.resume(co)    
-coroutine.resume(co)    
-coroutine.resume(co)    
-coroutine.resume(co)    
-coroutine.resume(co)    
-coroutine.resume(co)    
-coroutine.resume(co)    
+coroutine.resume(co)
+coroutine.resume(co)
+coroutine.resume(co)
+coroutine.resume(co)
+coroutine.resume(co)
+coroutine.resume(co)
+coroutine.resume(co)
+coroutine.resume(co)
+coroutine.resume(co)
+coroutine.resume(co)
 print(coroutine.resume(co))
 CODE
 co	1
@@ -133,8 +133,8 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function (a,b,c)
         print("co", a,b,c)
     end)
-    
-coroutine.resume(co, 1,2,3)    
+
+coroutine.resume(co, 1,2,3)
 CODE
 co	1	2	3
 OUT
@@ -144,8 +144,8 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function (a,b)
         coroutine.yield(a + b, a - b)
     end)
-    
-print(coroutine.resume(co, 20, 10))    
+
+print(coroutine.resume(co, 20, 10))
 CODE
 true	30	10
 OUT
@@ -155,9 +155,9 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
         print("co", coroutine.yield())
     end)
-    
-coroutine.resume(co)    
-coroutine.resume(co, 4, 5)    
+
+coroutine.resume(co)
+coroutine.resume(co, 4, 5)
 CODE
 co	4	5
 OUT
@@ -167,8 +167,8 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
         return 6, 7
     end)
-    
-print(coroutine.resume(co))    
+
+print(coroutine.resume(co))
 CODE
 true	6	7
 OUT

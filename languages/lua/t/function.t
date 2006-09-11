@@ -93,7 +93,7 @@ CODE
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'call by value' );
-function f (n) 
+function f (n)
     n = n - 1
     return n
 end
@@ -112,7 +112,7 @@ OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'call by ref' );
 function f (t)
-    local n = table.getn(t) 
+    local n = table.getn(t)
     t[n+1] = "end"
     return t
 end
@@ -131,7 +131,7 @@ OUT
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
 local function g(a, b, ...)
     local arg = {...}
-    print(a, b, #arg, arg[1], arg[2]) 
+    print(a, b, #arg, arg[1], arg[2])
 end
 
 g(3)
@@ -146,7 +146,7 @@ OUT
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
 local function g(a, b, ...)
     local c, d, e = ...
-    print(a, b, c, d, e) 
+    print(a, b, c, d, e)
 end
 
 g(3)
@@ -160,7 +160,7 @@ OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'var args' );
 local function g(a, b, ...)
-    print(a, b, ...) 
+    print(a, b, ...)
 end
 
 g(3)
@@ -193,7 +193,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', 'orphan break' );
 function f()
     print "before"
     do
-        print "inner" 
+        print "inner"
         break
     end
     print "after"

@@ -5,7 +5,7 @@ Using Lua on Parrot
 
 =head1 In brief
 
-Currently, C<luac.pl> is a Lua 5.1 compiler written in Perl5 (with 
+Currently, C<luac.pl> is a Lua 5.1 compiler written in Perl5 (with
 Parse::Yapp). This compiler produces PIR code.
 
 =head1 Building

@@ -18,7 +18,7 @@ The string library provides all its functions inside the table C<string>.
 It also sets a metatable for strings where the C<__index> field points to
 the metatable itself. Therefore, you can use the string functions in
 object-oriented style. For instance, C<string.byte(s, i)> can be written as
-C<s:byte(i)>. 
+C<s:byte(i)>.
 
 See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
@@ -152,7 +152,7 @@ Note that numerical codes are not necessarily portable across platforms.
 L0:
     unless pose > l goto L1
     pose = l
-L1:    
+L1:
     unless posi > pose goto L2
     .return ()
 L2:
@@ -170,7 +170,7 @@ L3:
     dec $I0
     $I1 = ord $S0, $I0
     new $P0, .LuaNumber
-    $P0 = $I1 
+    $P0 = $I1
     ret[i] = $P0
     inc i
     goto L3
@@ -245,7 +245,7 @@ operation, with no characters in C<pattern> being considered "magic". Note
 that if C<plain> is given, then C<init> must be given as well.
 
 If the pattern has captures, then in a successful match the captured values
-are also returned, after the two indices. 
+are also returned, after the two indices.
 
 NOT YET IMPLEMENTED.
 
@@ -287,7 +287,7 @@ will produce the string:
 The options C<c>, C<d>, C<E>, C<e>, C<f>, C<g>, C<G>, C<i>, C<o>, C<u>, C<X>,
 and C<x> all expect a number as argument, whereas C<q> and C<s> expect a string.
 
-This function does not accept string values containing embedded zeros. 
+This function does not accept string values containing embedded zeros.
 
 NOT YET IMPLEMENTED.
 
@@ -486,7 +486,7 @@ L1:
     inc $I0
     dec $I1
     goto L1
-L2:    
+L2:
     $S1 = join '', $P0
     new ret, .LuaString
     ret = $S1
@@ -527,7 +527,7 @@ L1:
     goto L3
 L2:
     $S1 = ''
-L3:    
+L3:
     new ret, .LuaString
     ret = $S1
     .return (ret)

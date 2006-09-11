@@ -360,7 +360,7 @@ function Cplx.mt.__eq (a, b)
     if type(b) ~= "table" then
         b = Cplx.new(b, 0)
     end
-    return (a.re == b.re) and (b.im == b.im) 
+    return (a.re == b.re) and (b.im == b.im)
 end
 
 c1 = Cplx.new(2, 0)
@@ -406,7 +406,7 @@ function Cplx.mt.__lt (a, b)
     end
     local ra = a.re*a.re + a.im*a.im
     local rb = b.re*b.re + b.im*b.im
-    return ra < rb 
+    return ra < rb
 end
 
 function Cplx.mt.__le (a, b)
@@ -418,7 +418,7 @@ function Cplx.mt.__le (a, b)
     end
     local ra = a.re*a.re + a.im*a.im
     local rb = b.re*b.re + b.im*b.im
-    return ra <= rb 
+    return ra <= rb
 end
 
 function Cplx.mt.__cmp (a, b)
@@ -483,7 +483,7 @@ function Cplx.mt.__lt (a, b)
     end
     local ra = a.re*a.re + a.im*a.im
     local rb = b.re*b.re + b.im*b.im
-    return ra < rb 
+    return ra < rb
 end
 
 c1 = Cplx.new(2, 0)
@@ -532,7 +532,7 @@ c1("a")
 r = c1("a", "b", "c")
 print(r)
 CODE
-Cplx.__call (2,0), 
+Cplx.__call (2,0),
 Cplx.__call (2,0), a
 Cplx.__call (2,0), a, b, c
 true
@@ -655,7 +655,7 @@ local mt = {
         print("*access to element " .. tostring(k))
         return _t[k]  -- access the original table
     end,
-   
+
     __newindex = function (t,k,v)
         print("*update of element " .. tostring(k) ..
                              " to " .. tostring(v))
@@ -681,7 +681,7 @@ local mt = {
         print("*access to element " .. tostring(k))
         return t[index][k]  -- access the original table
     end,
-   
+
     __newindex = function (t,k,v)
         print("*update of element " .. tostring(k) ..
                              " to " .. tostring(v))
@@ -722,7 +722,7 @@ end
 days = readOnly{"Sunday", "Monday", "Tuesday", "Wednesday",
         "Thurday", "Friday", "Saturday"}
 
-print(days[1])        
+print(days[1])
 CODE
 Sunday
 OUT
@@ -743,7 +743,7 @@ end
 days = readOnly{"Sunday", "Monday", "Tuesday", "Wednesday",
         "Thurday", "Friday", "Saturday"}
 
-days[2] = "Noday"        
+days[2] = "Noday"
 CODE
 /attempt to update a read-only table/
 OUT
@@ -755,7 +755,7 @@ setmetatable(_G, {
     end,
     __index = function (_, n)
         error("attempt to read undeclared variable" .. n, 2)
-    end, 
+    end,
 })
 
 a = 1
@@ -774,7 +774,7 @@ setmetatable(_G, {
     end,
     __index = function (_, n)
         error("attempt to read undeclared variable" .. n, 2)
-    end, 
+    end,
 })
 
 declare "a"

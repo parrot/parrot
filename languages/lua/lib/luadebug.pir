@@ -10,7 +10,7 @@ lib/luadebug.pir - Lua Debug Library
 This library provides the functionality of the debug interface to Lua programs.
 You should exert care when using this library. The functions provided here
 should be used exclusively for debugging and similar tasks, such as profiling.
-Please resist the temptation to use them as a usual programming tool: 
+Please resist the temptation to use them as a usual programming tool:
 They can be very slow.
 Moreover, several of its functions violate some assumptions about Lua code
 (e.g., that variables local to a function cannot be accessed from outside
@@ -18,7 +18,7 @@ or that userdata metatables cannot be changed by Lua code) and therefore can
 compromise otherwise secure code.
 
 All functions in this library are provided inside the C<debug> table.
- 
+
 See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
 
 =head2 Functions
@@ -168,9 +168,9 @@ C<what> is to get all information available. If present, the option `C<f>´
 adds a field named C<func> with the function itself.
 
 For instance, the expression C<debug.getinfo(1,"n").name> returns a name of
-the current function, if a reasonable name can be found, and 
+the current function, if a reasonable name can be found, and
 C<debug.getinfo(print)> returns a table with all available information about
-the C<print> function. 
+the C<print> function.
 
 NOT YET IMPLEMENTED.
 
@@ -191,7 +191,7 @@ given index, and raises an error when called with a C<level> out of range.
 (You can call C<debug.getinfo> to check whether the level is valid.)
 
 Variable names starting with `C<(>´ (open parentheses) represent internal
-variables (loop control variables, temporaries, and C function locals). 
+variables (loop control variables, temporaries, and C function locals).
 
 NOT YET IMPLEMENTED.
 
@@ -278,7 +278,7 @@ The hook is called every time Lua returns from a function;
 
 The hook is called every time Lua enters a new line of code.
 
-=back 
+=back
 
 With a C<count> different from zero, the hook is called after every C<count>
 instructions.
@@ -292,7 +292,7 @@ number as its second parameter. Inside a hook, you can call C<getinfo> with
 level 2 to get more information about the running function (level 0 is the
 C<getinfo> function, and level 1 is the hook function), unless the event is
 C<"tail return">. In this case, Lua is only simulating the return, and a call
-to C<getinfo> will return invalid data. 
+to C<getinfo> will return invalid data.
 
 NOT YET IMPLEMENTED.
 

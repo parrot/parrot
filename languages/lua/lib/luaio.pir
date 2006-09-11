@@ -190,13 +190,13 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     .param int findex
     .local pmc _lua__ENVIRON
     .local pmc io
-    .local pmc file 
+    .local pmc file
     _lua__ENVIRON = global '_ENVIRON'
     new io, .LuaNumber
     io = findex
     file = _lua__ENVIRON[io]
     .return (file)
-.end 
+.end
 
 
 .sub 'getmode' :anon
@@ -259,7 +259,7 @@ L1:
 L2:
     .return (ret)
 .end
-    
+
 
 .sub 'read_line' :anon
     .param pmc f
@@ -286,21 +286,21 @@ L2:
     new io, .LuaNumber
     io = findex
     _lua__ENVIRON[io] = file
-.end 
+.end
 
 
 .sub 'test_eof' :anon
     .param pmc f
     .local pmc ret
     $I1 = isfalse f
-    unless $I1 goto L1    
+    unless $I1 goto L1
     new ret, .LuaNil
     goto L2
 L1:
     new ret, .LuaString
     ret = ''
 L2:
-    .return (ret)    
+    .return (ret)
 .end
 
 
@@ -324,7 +324,7 @@ L2:
 L2:
     error("attempt to use a closed file")
 L1:
-    tag_error($S0, 'file')    
+    tag_error($S0, 'file')
 .end
 
 
@@ -339,7 +339,7 @@ file.
     .param pmc file
     .local pmc ret
     unless_null file, L1
-    file = getiofile(1) 
+    file = getiofile(1)
 L1:
     .local pmc f
     f = tofile(file)
@@ -404,7 +404,7 @@ L2:
     goto L1
 L1:
     ret = getiofile(0)
-    .return (ret) 
+    .return (ret)
 .end
 
 
@@ -548,7 +548,7 @@ L2:
     setiofile(1, file)
 L1:
     ret = getiofile(1)
-    .return (ret) 
+    .return (ret)
 .end
 
 
@@ -558,7 +558,7 @@ Starts program C<prog> in a separated process and returns a file handle that
 you can use to read data from this program (if C<mode> is C<"r">, the default)
 or to write data to this program (if C<mode> is C<"w">).
 
-This function is system dependent and is not available on all platforms. 
+This function is system dependent and is not available on all platforms.
 
 NOT YET IMPLEMENTED.
 
@@ -766,7 +766,7 @@ L2:
     unless $I0 goto L4
     .local int l
     l = format
-    unless l == 0 goto L5 
+    unless l == 0 goto L5
     $P0 = test_eof(f)
     ret[i] = $P0
     goto L6
@@ -790,7 +790,7 @@ L8:
     ret[i] = $P0
     goto L6
 L9:
-    argerror("invalid format")        
+    argerror("invalid format")
 L6:
     inc i
     goto L2
@@ -876,7 +876,7 @@ buffer is full (or when you explicitly flush the file).
 =item B<"line">
 
 line buffering; output is buffered until a newline is output
-or there is any input from some special files (such as a terminal device). 
+or there is any input from some special files (such as a terminal device).
 
 =back
 
@@ -934,7 +934,7 @@ L1:
     $I0 = isa $P0, 'LuaNumber'
     unless $I0 goto L3
     print f, $P0
-    goto L4 
+    goto L4
 L3:
     $S0 = checkstring($P0)
     print f, $S0
@@ -959,9 +959,9 @@ L2:
     $S1 = self
     $S1 = substr $S1, 10, 8
     concat $S0, $S1
-    concat $S0, ")"   
-    goto L2 
-L1:    
+    concat $S0, ")"
+    goto L2
+L1:
     $S0 = "file (closed)"
 L2:
     ret = $S0

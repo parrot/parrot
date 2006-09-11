@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/closure.t - Lua closures 
+t/closure.t - Lua closures
 
 =head1 SYNOPSIS
 
@@ -14,7 +14,7 @@ t/closure.t - Lua closures
 
 See "Lua 5.0 Reference Manual", section 2.6 "Visibility Rules".
 
-See "Programming in Lua", section 6.1 "Closures". 
+See "Programming in Lua", section 6.1 "Closures".
 
 =cut
 

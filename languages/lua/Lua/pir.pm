@@ -36,11 +36,11 @@ package pirVisitor;
   init_io()
   init_os()
   init_debug()
-  
+
 #
 #  PBC loader does not support LuaFunction
-#  
-  
+#
+
 #  load_bytecode 'languages/lua/lib/luabasic.pbc'
 #  load_bytecode 'languages/lua/lib/luacoroutine.pbc'
 #  load_bytecode 'languages/lua/lib/luapackage.pbc'

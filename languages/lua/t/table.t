@@ -29,7 +29,7 @@ use Parrot::Test tests => 11;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function concat' );
-t = {"a","b","c","d","e"} 
+t = {"a","b","c","d","e"}
 print(table.concat(t))
 print(table.concat(t,","))
 print(table.concat(t,",",2))
@@ -44,28 +44,28 @@ b,c,d
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function concat (number)' );
-t = {"a","b",3,"d","e"} 
+t = {"a","b",3,"d","e"}
 print(table.concat(t,","))
 CODE
 a,b,3,d,e
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function concat (out of range)' );
-t = {"a","b","c","d","e"} 
+t = {"a","b","c","d","e"}
 print(table.concat(t,",",2,7))
 CODE
 /table contains non-strings/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function concat (non-string)' );
-t = {"a","b",true,"d","e"} 
+t = {"a","b",true,"d","e"}
 print(table.concat(t,","))
 CODE
 /table contains non-strings/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreach (array)' );
-t = {"a","b","c"} 
+t = {"a","b","c"}
 table.foreach(t, print)
 CODE
 1	a
@@ -74,7 +74,7 @@ CODE
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreachi' );
-t = {"a","b","c"} 
+t = {"a","b","c"}
 table.foreachi(t, print)
 CODE
 1	a
@@ -134,7 +134,7 @@ language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function remove' );
 t = {}
 a = table.remove(t)
 print(a)
-t = {"a","b","c","d","e"} 
+t = {"a","b","c","d","e"}
 a = table.remove(t)
 print(a)
 print(table.concat(t,","))
@@ -160,7 +160,7 @@ b
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function setn' );
-a = {}                                    
+a = {}
 table.setn(a, 10000)
 CODE
 /'setn' is obsolete/

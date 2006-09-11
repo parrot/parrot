@@ -12,7 +12,7 @@ all its functions inside the table C<table>.
 
 Most functions in the table library assume that the table represents an
 array or a list. For these functions, when we talk about the "length" of a
-table we mean the result of the length operator. 
+table we mean the result of the length operator.
 
 See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
 
@@ -106,7 +106,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     $I1 = getn(table)
     last = optint(j, $I1)
     $S1 = ''
-    new idx, .LuaNumber 
+    new idx, .LuaNumber
 L2:
     unless $I0 <= last goto L3
     idx = $I0
@@ -121,7 +121,7 @@ L4:
     concat $S1, $S2
     unless $I0 != last goto L5
     concat $S1, $S0
-L5:    
+L5:
     add $I0, 1
     goto L2
 L3:
@@ -159,7 +159,7 @@ L1:
     (ret) = f(idx, value)
     $I0 = defined ret
     unless $I0 goto L1
-    .return (ret)       
+    .return (ret)
 L2:
     .return ()
 .end
@@ -195,16 +195,16 @@ L1:
     unless i <= n goto L2
     index = i
     value = table.'rawget'(index)
-    (ret) = f(index, value) 
+    (ret) = f(index, value)
     $I0 = defined ret
     unless $I0 goto L1
-    .return (ret)       
+    .return (ret)
 L2:
     .return ()
 .end
 
 
-=item C<table.getn (table)>       
+=item C<table.getn (table)>
 
 Returns the size of a table.
 
@@ -247,7 +247,7 @@ inserts C<x> at the end of table C<t>.
     value = arg2
     goto L2
 L1:
-    pos = checknumber(arg2)    
+    pos = checknumber(arg2)
     unless pos > e goto L3
     e = pos
 L3:
@@ -291,11 +291,11 @@ L1:
     unless idx goto L2
     $I0 = isa idx, 'LuaNumber'
     unless $I0 goto L1
-    unless idx > max goto L1 
+    unless idx > max goto L1
     max = clone idx
     goto L1
 L2:
-    .return (max)       
+    .return (max)
 .end
 
 
@@ -322,7 +322,7 @@ table C<t>.
     unless e <= 0 goto L1
     new ret, .LuaNil
     .return (ret)
-L1:      
+L1:
     $I1 = e - 1
     new index, .LuaNumber
     index = ipos
@@ -339,7 +339,7 @@ L2:
 L3:
     new $P0, .LuaNil
     index = e
-    table.'rawset'(index, $P0)        
+    table.'rawset'(index, $P0)
     .return (ret)
 .end
 
@@ -368,7 +368,7 @@ will be true after the sort). If C<comp> is not given, then the standard Lua
 operator C<<> is used instead.
 
 The sort algorithm is I<not> stable; that is, elements considered equal by
-the given order may have their relative positions changed by the sort. 
+the given order may have their relative positions changed by the sort.
 
 NOT YET IMPLEMENTED (see auxsort).
 
@@ -384,7 +384,7 @@ NOT YET IMPLEMENTED (see auxsort).
     if comp goto L1
     checktype(comp, 'function')
     goto L2
-L1:    
+L1:
     .const .Sub lessthan = 'lessthan'
     comp = lessthan
 L2:

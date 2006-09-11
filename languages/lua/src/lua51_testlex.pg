@@ -5,9 +5,9 @@ grammar Lua::TestLex
 
 rule start {
         <token>* [ $ | <error>]
-#        | 
+#        |
 #        [ <token> | <error> ]*
-#        | <error> 
+#        | <error>
 }
 
 rule token {
@@ -16,7 +16,7 @@ rule token {
         | <String>
         | <Number>
         | <punctuator>
-#        | <?error> 
+#        | <?error>
 }
 
 token punctuator {
@@ -45,42 +45,42 @@ token punctuator {
         | \{
         | \}
         | \[
-        | \]        
+        | \]
 }
 
 token reserved_words {
         | and
-        | break     
-        | do        
-        | else      
+        | break
+        | do
+        | else
         | elseif
         | end
-        | false     
-        | for       
-        | function  
+        | false
+        | for
+        | function
         | if
-        | in        
-        | local     
-        | nil       
-        | not       
+        | in
+        | local
+        | nil
+        | not
         | or
-        | repeat    
-        | return    
-        | then      
-        | true      
-        | until     
+        | repeat
+        | return
+        | then
+        | true
+        | until
         | while
 }
-                 
+
 token String {
         | \" <quoted_literal: "> \"
         | \' <quoted_literal: '> \'
-        | <long_string>        
+        | <long_string>
 }
 
 token Number {
         | 0 <[Xx]> <xdigit>+
-        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ] 
+        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ]
           [ <[Ee]> <[+\-]>? <digit>+ ]?
 }
 

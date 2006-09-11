@@ -380,7 +380,7 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawequal (PMC* value) {
         PMC *retval;
-       
+
         retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if ( SELF->vtable->base_type == value->vtable->base_type
          && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs

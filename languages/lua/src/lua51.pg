@@ -10,7 +10,7 @@ rule start {
 
 rule chunk {
         [ <statement> [\;]? ]*
-} 
+}
 
 rule block {
         <chunk> [ <laststat> [\;]? ]?
@@ -26,7 +26,7 @@ rule statement {
         | <localfunc>
         | <localstat>
         | <exprstat>
-} 
+}
 
 rule laststat {
         | <returnstat>
@@ -39,21 +39,21 @@ rule ifstat {
 
 rule ifthenblock {
         | <'if'> <cond> <'then'> <block>
-        | <'if'> <cond> <error: 'then' expected>
+#        | <'if'> <cond> <error: 'then' expected>
 }
 
 rule elseifthenblock {
         | <'elseif'> <cond> <'then'> <block>
-        | <'elseif'> <cond> <error: 'then' expected>
+#        | <'elseif'> <cond> <error: 'then' expected>
 }
 
 rule cond {
         <expr>
-}                             
+}
 
 rule whilestat {
         | <'while'> <expr> <'do'> <block> <'end'>
-        | <'while'> <expr> <error: 'do' expected>
+#        | <'while'> <expr> <error: 'do' expected>
 }
 
 rule dostat {
@@ -62,19 +62,19 @@ rule dostat {
 
 rule forstat {
         | <'for'> [ <fornum> | <forlist> ]
-        | <'for'> <Name> <error: '=' or 'in' expected>
+#        | <'for'> <Name> <error: '=' or 'in' expected>
 }
 
 rule fornum {
         | <Name> \= <expr> \, <expr> [ \, <expr> ]? <forbody>
-        | <Name> \= <expr> <error: ',' expected>
-        | <Name> <error: '=' expected>
-} 
+#        | <Name> \= <expr> <error: ',' expected>
+#        | <Name> <error: '=' expected>
+}
 
 rule forlist {
         | <namelist> <'in'> <explist1> <forbody>
-        | <namelist> <error: 'in' expected>
-} 
+#        | <namelist> <error: 'in' expected>
+}
 
 rule namelist {
         <Name> [ \, <Name> ]*
@@ -82,7 +82,13 @@ rule namelist {
 
 rule forbody {
         | <'do'> <block> <'end'>
-        | <error: 'do' expected>
+#        | <'do'> <block> <error: 'end' expected>
+#        | <error: 'do' expected>
+}
+
+rule repeatstat {
+        | <'repeat'> <block> <'until'> <exp>
+#        | <'repeat'> <block> <error: 'until' expected>
 }
 
 rule funcstat {
@@ -94,9 +100,10 @@ rule funcname {
 }
 
 rule funcbody {
-        | \( <parlist>? \) <chunk> <'end'>
-        | \( <parlist>? <error: ')' expected> 
-        | <error: '(' expected>
+        | \( \) <chunk> <'end'>
+        | \( <parlist> \) <chunk> <'end'>
+#        | \( <parlist>? <error: ')' expected>
+#        | <error: '(' expected>
 }
 
 rule parlist {
@@ -127,26 +134,26 @@ rule exprstat {
 rule assignment {
         | \, <primaryexp> <assignment>
         | \= <explist1>
-        | <error: '=' expected>
+#        | <error: '=' expected>
 }
 
 rule primaryexp {
-        <prefixexp> [ \. <Name> 
-                    | <index> 
-                    | \: <Name> <funcargs> 
-                    | <funcargs> 
+        <prefixexp> [ \. <Name>
+                    | <index>
+                    | \: <Name> <funcargs>
+                    | <funcargs>
                     ]*
 }
 
 rule index {
         | \[ <expr> \]
-        | \[ <expr> <error: ']' expected>
+#        | \[ <expr> <error: ']' expected>
 }
 
 rule prefixexp {
         | <Name>
         | \( <expr> \)
-        | <error: unexpected symbol>
+#        | <error: unexpected symbol>
 }
 
 rule expr {
@@ -170,14 +177,17 @@ rule explist1 {
 }
 
 rule funcargs {
-        | \( <explist1>? \)
+        | \( \)
+        | \( <explist1> \)
+#        | \( <error: function arguments expected>
         | <constructor>
         | <String>
         | <error: function arguments expected>
 }
-                       
+
 rule constructor {
-        \{ <fieldlist>? \}
+        | \{ \}
+        | \{ <fieldlist> \}
 }
 
 rule fieldlist {
@@ -186,7 +196,7 @@ rule fieldlist {
 
 rule field {
         | <index> \= <expr>
-        | <index> <error: '=' expected>
+#        | <index> <error: '=' expected>
         | <Name> \= <expr>
         | <expr>
 }
@@ -224,12 +234,12 @@ token unop {
 token String {
         | \" <quoted_literal: "> \"
         | \' <quoted_literal: '> \'
-        | <long_string>        
+        | <long_string>
 }
 
 token Number {
         | 0 <[Xx]> <xdigit>+
-        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ] 
+        | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ]
           [ <[Ee]> <[+\-]>? <digit>+ ]?
 }
 

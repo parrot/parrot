@@ -18,14 +18,14 @@ functions:
     math.rad     math.random  math.randomseed           math.sin
     math.sinh    math.sqrt    math.tan     math.tanh
 
-plus a variable C<math.pi> and a variable C<math.huge>, with the value 
+plus a variable C<math.pi> and a variable C<math.huge>, with the value
 C<HUGE_VAL>. Most of these functions are only interfaces to the corresponding
 functions in the C library. All trigonometric functions work in radians. The
 functions C<math.deg> and C<math.rad> convert between radians and degrees.
 
 The function C<math.max> returns the maximum value of its numeric arguments.
 Similarly, C<math.min> computes the minimum. Both can be used with 1, 2, or
-more arguments. 
+more arguments.
 
 The function C<math.modf> corresponds to the C<modf> C function. It returns
 two values: The integral part and the fractional part of its argument.
@@ -363,7 +363,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     argc = argv
     unless argc == 0 goto L0
     tag_error("no value", 'number')
-L0:    
+L0:
     curr = argv[0]
     dmax = checknumber(curr)
     i = 1
@@ -394,7 +394,7 @@ L3:
     argc = argv
     unless argc == 0 goto L0
     tag_error("no value", 'number')
-L0:    
+L0:
     curr = argv[0]
     dmin = checknumber(curr)
     i = 1
@@ -471,7 +471,7 @@ L1:
     inc $I0
     ret = $I0
     goto L2
-L3: 
+L3:
     if extra goto L5
     l = checknumber(arg1)
     u = checknumber(arg2)
@@ -488,7 +488,7 @@ L4:
 L5:
     error("wrong number of arguments")
 L2:
-    .return (ret)    
+    .return (ret)
 .end
 
 

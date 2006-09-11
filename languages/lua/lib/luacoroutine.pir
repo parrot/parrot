@@ -110,7 +110,7 @@ _handler:
     .local string s
     .local pmc msg
     .get_results (e, s)
-    status = 0    
+    status = 0
     new msg, .LuaString
     msg = s
     .return (status, msg)
@@ -136,7 +136,7 @@ Returns the status of coroutine C<co>, as a string: C<"running">, if the
 coroutine is running (that is, it called C<status>); C<"suspended">, if the
 coroutine is suspended in a call to yield, or if it has not started running
 yet; C<"normal"> if the coroutine is active but not running (that is, it has
-resumed another coroutine); and C<"dead"> if the coroutine has finished its 
+resumed another coroutine); and C<"dead"> if the coroutine has finished its
 body function, or if it has stopped with an error.
 
 DUMMY IMPLEMENTATION.
@@ -147,7 +147,7 @@ DUMMY IMPLEMENTATION.
     .param pmc co :optional
     .local pmc ret
     checktype(co, 'thread')
-    new ret, .LuaString 
+    new ret, .LuaString
     ret = 'suspended'
     .return (ret)
 .end

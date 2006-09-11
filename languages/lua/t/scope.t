@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/scope.t - Lua scope 
+t/scope.t - Lua scope
 
 =head1 SYNOPSIS
 
@@ -14,7 +14,7 @@ t/scope.t - Lua scope
 
 See "Lua 5.0 Reference Manual", section 2.6 "Visibility Rules".
 
-See "Programming in Lua", section 4.2 "Local Variables and Blocks". 
+See "Programming in Lua", section 4.2 "Local Variables and Blocks".
 
 =cut
 

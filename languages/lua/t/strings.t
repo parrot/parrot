@@ -244,7 +244,7 @@ true
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '"1" < "0"' );
-print("1" < "0")                                       
+print("1" < "0")
 CODE
 false
 OUT
@@ -292,7 +292,7 @@ CODE
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', '"1" < 0' );
-print("1" < 0)                                       
+print("1" < 0)
 CODE
 /attempt to compare \w+ with \w+/
 OUT

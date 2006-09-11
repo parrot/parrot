@@ -186,7 +186,7 @@ sub BuildTable {
     my @opcodes1 = ();
     my @opcodes2 = ();
     my $result   = new_tmp( $parser, 'pmc', 'table' );
-    push @opcodes1, new LocalDir( $parser, 
+    push @opcodes1, new LocalDir( $parser,
         'result' => $result,
     );
     push @opcodes1, new NewOp( $parser,
@@ -436,7 +436,7 @@ sub BuildAssigns {
         my $assign = $var->[2];
         if ( $assign->isa('AssignOp') ) {
             $assign->configure(
-                'arg1' => $expr->[0], 
+                'arg1' => $expr->[0],
             );
         }
         else {

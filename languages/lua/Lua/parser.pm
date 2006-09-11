@@ -100,7 +100,7 @@ sub YYData {
 	or	$$self{USER}={};
 
 	$$self{USER};
-	
+
 }
 
 sub YYErrok {
@@ -386,7 +386,7 @@ sub _Parse {
                 $$check eq 'ERROR'
             or  do {
 #DBG>				$debug & 0x04
-#DBG>			and	print STDERR 
+#DBG>			and	print STDERR
 #DBG>				    "go to state $$states[$$stack[-1][0]]{GOTOS}{$lhs}.\n";
 
 #DBG>				$debug & 0x10
@@ -3049,7 +3049,7 @@ sub
 sub
 #line 166 "Lua\lua51.yp"
 {
-            my $var = BuildVariable( $_[0], $_[3] ); 
+            my $var = BuildVariable( $_[0], $_[3] );
             BuildAssigns( $_[0], [$var], [ $_[4] ] );
         }
 	],
@@ -3187,7 +3187,7 @@ sub
 #line 260 "Lua\lua51.yp"
 {
             [
-                @{ $_[1] }, 
+                @{ $_[1] },
                 BuildVariable( $_[0], $_[3] ),
             ];
         }

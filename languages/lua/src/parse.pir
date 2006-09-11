@@ -6,7 +6,7 @@ parse.pir - Parsing support subroutines
 
 =head2 DESCRIPTION
 
-This file contains support subroutines for parsing Lua programs.  
+This file contains support subroutines for parsing Lua programs.
 
 =over 4
 
@@ -19,7 +19,7 @@ ident but not keywords
 .sub 'Name'
     .param pmc mob
     .param pmc params :slurpy
-    
+
     .local pmc ident
     ident = get_hll_global ['PGE::Match'], 'ident'
     mob = ident(mob, params)
@@ -48,27 +48,27 @@ L2:
     .local pmc kw
     new kw, .Hash
     kw['and'] = 1
-    kw['break'] = 1     
-    kw['do'] = 1        
-    kw['else'] = 1      
+    kw['break'] = 1
+    kw['do'] = 1
+    kw['else'] = 1
     kw['elseif'] = 1
     kw['end'] = 1
-    kw['false'] = 1     
-    kw['for'] = 1       
-    kw['function'] = 1  
+    kw['false'] = 1
+    kw['for'] = 1
+    kw['function'] = 1
     kw['if'] = 1
-    kw['in'] = 1        
-    kw['local'] = 1     
-    kw['nil'] = 1       
-    kw['not'] = 1       
+    kw['in'] = 1
+    kw['local'] = 1
+    kw['nil'] = 1
+    kw['not'] = 1
     kw['or'] = 1
-    kw['repeat'] = 1    
-    kw['return'] = 1    
-    kw['then'] = 1      
-    kw['true'] = 1      
-    kw['until'] = 1     
+    kw['repeat'] = 1
+    kw['return'] = 1
+    kw['then'] = 1
+    kw['true'] = 1
+    kw['until'] = 1
     kw['while'] = 1
-    .return (kw) 
+    .return (kw)
 .end
 
 =item C<quoted_literal>
@@ -163,7 +163,7 @@ CONCAT:
     pos = mfrom
     lastpos = length target
 
-    .local int sep 
+    .local int sep
     sep = 0
     $S0 = substr target, pos, 1
     if $S0 != '[' goto END
@@ -203,7 +203,7 @@ L4:
     pos = $I0 + 1
     mob.'value'(literal)
     mpos = pos
-    goto END    
+    goto END
 L7:
     dec pos
     goto CONCAT
@@ -238,7 +238,7 @@ END:
     pos = mfrom
     lastpos = length target
 
-    .local int sep 
+    .local int sep
     sep = 0
     $S0 = substr target, pos, 1
     if $S0 != '[' goto END
@@ -275,7 +275,7 @@ L4:
     pos = $I0 + 1
 #    mob.'value'(literal)
     mpos = pos
-    goto END    
+    goto END
 L7:
     dec pos
     goto CONCAT
@@ -312,7 +312,7 @@ L2:
     neg count
     dec count
 L3:
-    .return (pos, count) 
+    .return (pos, count)
 .end
 
 =item C<error(PMC match, [, message [, ...]] )>
@@ -326,7 +326,7 @@ of the match.
 .sub 'error'
     .param pmc mob
     .param pmc params :slurpy
-        
+
     $P0 = get_hll_global ['PGE::Util'], 'die'
     $P0(mob, params :flat)
 .end

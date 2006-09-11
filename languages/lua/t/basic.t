@@ -74,11 +74,11 @@ language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function next (array)' );
 t = {"a","b","c"}
 a = next(t, nil)
 print(a)
-a = next(t, 1) 
+a = next(t, 1)
 print(a)
-a = next(t, 2) 
+a = next(t, 2)
 print(a)
-a = next(t, 3) 
+a = next(t, 3)
 print(a)
 CODE
 1

@@ -258,7 +258,7 @@ MMD_DEFAULT: {
     METHOD void set_metatable(PMC *meta) {
         if (dynpmc_LuaNil == meta->vtable->base_type) {
             PMC_struct_val(SELF) = NULL;
-        } 
+        }
         else {
             PMC_struct_val(SELF) = meta;
         }
