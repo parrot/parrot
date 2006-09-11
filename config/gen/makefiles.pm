@@ -39,7 +39,7 @@ sub cflags
 
     genfile(
         'config/gen/makefiles/CFLAGS.in' => 'CFLAGS',
-        commentType                      => '#'
+        comment_type                     => '#'
     );
 
     open(CFLAGS, ">> CFLAGS") or die "open >> CFLAGS: $!";
@@ -75,13 +75,13 @@ sub makefiles
 
     genfile(
         'config/gen/makefiles/dynpmc_pl.in'     => 'tools/build/dynpmc.pl',
-        commentType                             => '#',
+        comment_type                            => '#',
         replace_slashes                         => 0,
         conditioned_lines                       => 1
     );
     genfile(
         'config/gen/makefiles/dynoplibs_pl.in'  => 'tools/build/dynoplibs.pl',
-        commentType                             => '#',
+        comment_type                            => '#',
         replace_slashes                         => 0,
         conditioned_lines                       => 1
     );
@@ -101,12 +101,7 @@ sub makefiles
 
         $conf->data->set(pod => $pod);
 
-        genfile(
-            'config/gen/makefiles/docs.in'  => 'docs/Makefile',
-            commentType                     => '#',
-            replace_slashes                 => 1,
-            conditioned_lines               => 1
-        );
+        genfile('config/gen/makefiles/docs.in'  => 'docs/Makefile');
 
         $conf->data->set(pod => undef);
 
