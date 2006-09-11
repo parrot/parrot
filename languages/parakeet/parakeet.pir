@@ -10,7 +10,7 @@
 .macro CPROMPT "... " .endm
 
 .const int Space = 32
-.const int Tab = 9
+.const int Tab   = 9
 
 # Registers used by machine.  These are hardwired to a register and
 # all core words expect them in these places.  User words compiled in
@@ -122,13 +122,13 @@
   .PUSHI(0)
 .endm
 
-# ints
+# set .TOS to an Integer PMC of value x
 
 .macro getInt(x)
     lt .x, 0, .$createInt
     lt .x, .NumInts, .$fetchInt
   .local $createInt:
-    .TOS = new .PerlInt
+    .TOS = new .Integer
     .TOS = .x
     goto .$End
   .local $fetchInt:
@@ -153,7 +153,7 @@
 # add words
 
 .macro addCore(name, lbl, doc)
-  $P1 = new .PerlString
+  $P1 = new .String
   $P1 = .doc
   .getInt(.__CORE)
   $P0 = .TOS
@@ -271,35 +271,37 @@
 ##
 ##########################################################
 
-.sub _main :main
-  .param PerlArray argv
+.sub main :main
+  .param pmc argv
 
-  .STACK = new .PerlArray
-  .CSTACK = new .PerlArray
-  .INTS = new .PerlArray
-  .FLAGS = new .PerlHash
-  .BODY = ""
-  .LOAD = ""
+  .STACK  = new .ResizablePMCArray
+  .CSTACK = new .ResizablePMCArray
+  .INTS   = new .ResizablePMCArray
+  .FLAGS  = new .Hash
+  .BODY   = ""
+  .LOAD   = ""
 
   .FLAGS["interactive"] = 1  # is the interpreter interactive?
-  .FLAGS["seeing"] = 0       # print PIR blocks before compiling
-
-  .ITMP = argv
+  .FLAGS["seeing"]      = 0  # print PIR blocks before compiling
 
   # name of the program
   .local string program_name
   program_name = shift argv
 
-  if .ITMP > 1 goto OpenFile
+  # optional filename with parakeet code
+  .local int argc
+  argc = argv
+  if argc > 1 goto OpenFile
+
   getstdin .STDIN
 
   # turn off output buffering
-
   getstdout $P0
   $P0."setbuf"(0)
 
   goto GotInput
 
+  # A file was passed in the commandline
   OpenFile:
 
   .FLAGS["interactive"] = 0
@@ -313,10 +315,12 @@
   .NAMESPACE = ""
   .LEVEL = 0
 
+  # TODO set_eh now also takes a label
   newsub $P0, .Exception_Handler, _handler
   set_eh $P0
 
-   new_pad .LEVEL
+  # TODO new_pad is gone
+  new_pad .LEVEL
 
   compreg .PIRC, "PIR"
 
@@ -325,7 +329,7 @@
 
   .ITMP = 0
   _fillInts:
-    $P0 = new .PerlInt
+    $P0 = new .Integer
     $P0 = .ITMP
     .INTS[.ITMP] = $P0
     inc .ITMP
@@ -544,12 +548,13 @@
 #    print .CURR
 
   gotString:
-    .emit(".TOS = new .PerlString\n.TOS = \"")
+    .emit(".TOS = new .String\n.TOS = \"")
     .emit(.CURR)
     .emit("\"\n.PUSH\n")
     goto Next
 
   Word:
+    # TODO: push_eh now can take a label
     newsub $P1, .Exception_Handler, _var_not_found
     set_eh $P1
 
@@ -603,7 +608,7 @@
 
   _handler:
     print "An Exception was thrown: "
-    set S0, P5["_message"]	# P5 is the exception object
+    set S0, P5["_message"]	# TODO: P5 is no longer the exception object
     print S0
     print "\n"
     .LEVEL = 0
@@ -705,6 +710,7 @@
     save .BODY
 
     inc .LEVEL
+    # TODO new_pad is gone
     new_pad .LEVEL
 
     newclass .KLASS, .CURR
@@ -722,7 +728,8 @@
     bsr CollectWord
 
     inc .LEVEL
-   new_pad .LEVEL
+    # TODO new_pad is gone
+    new_pad .LEVEL
 
     unless .LEVEL > 0 goto _FUNC1
     save .KLASS
@@ -742,6 +749,7 @@
     bsr CollectWord
 
     inc .LEVEL
+    # TODO new_pad is gone
     new_pad .LEVEL
 
     save .MODE
@@ -773,7 +781,7 @@
 
     .SEEING
     compile $P0, .PIRC, .BODY
-    $P1 = new .PerlString
+    $P1 = new .String
     $P1 = .BODY
 
     setprop $P0, "__asm__", $P1
@@ -812,7 +820,7 @@
   _ENDCLASS:
     .SEEING
     compile $P0, .PIRC, .BODY
-    $P1 = new .PerlString
+    $P1 = new .String
     $P1 = .BODY
 
     setprop .KLASS, "__asm__", $P1
@@ -825,7 +833,7 @@
     pop_pad
     setprop .KLASS, "__dict__", $P1
 
-    $P1 = new .PerlInt
+    $P1 = new .Integer
     $P1 = .__CLASS
     setprop .KLASS, "__type__", $P1
 
@@ -1039,14 +1047,14 @@
     .NEXT
 
   _READLINE:
-    .emit(".TOS = new .PerlString\n")
+    .emit(".TOS = new .String\n")
     .emit("readline $S0, .STDIN\n")
     .emit(".TOS = $S0\n")
     .emit(".PUSH\n")
     .NEXT
 
   _READ:
-    .emit(".TOS = new .PerlString\n")
+    .emit(".TOS = new .String\n")
     .emit("read $S0, .STDIN\n")
     .emit(".TOS = $S0\n")
     .emit(".PUSH\n")
@@ -1104,7 +1112,7 @@
     .emit(".POP2\n")
     .emit("push .CSTACK, .NOS\n")
     .emit("push .CSTACK, .TOS\n")
-    .emit("$P0 = new .PerlInt\nstore_lex -1, \"")
+    .emit("$P0 = new .Integer\nstore_lex -1, \"")
     .emit(.CURR)
     .emit("\", $P0\n")
     .emit("find_lex $P0, \"")
@@ -1112,7 +1120,7 @@
     .emit("\"\nassign $P0, .TOS\n")
     save .CURR
 
-    $P0 = new .PerlInt
+    $P0 = new .Integer
     .getInt(.__VAR)
     setprop $P0, "__type__", .TOS
     store_lex -1, .CURR, $P0
