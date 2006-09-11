@@ -137,8 +137,7 @@ list_element_followed_by:
   inc $I1
   $I0 = len - $I1
   $I0 = find_cclass .CCLASS_WHITESPACE, str, $I1, $I0
-  $I0 = len - $I0
-  dec $I0
+  $I0 = $I0 - $I1
   $S0 = substr str, $I1, $I0
   $S0 = 'list element in braces followed by "' . $S0
   $S0 = $S0 . '" instead of space'
