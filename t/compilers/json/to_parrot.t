@@ -6,7 +6,7 @@ use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 51;
 
 =head1 NAME
 
@@ -34,16 +34,64 @@ JSON
 "JSON" => "json"
 OUT
 
-json_dump_is(<<'JSON', <<'OUT', 'integer');
+json_dump_is(<<'JSON', <<'OUT', 'number int');
 1
 JSON
 "JSON" => 1
 OUT
 
-json_dump_is(<<'JSON', <<'OUT', 'float');
+json_dump_is(<<'JSON', <<'OUT', 'number int minus');
+-1
+JSON
+"JSON" => -1
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'number int frac');
 3.14
 JSON
 "JSON" => 3.14
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'number int frac minus');
+-3.14
+JSON
+"JSON" => -3.14
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'number int exp');
+1e+11
+JSON
+"JSON" => 1e+11
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'number int exp');
+2e-12
+JSON
+"JSON" => 2e-12
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'number int exp minus');
+-1e+11
+JSON
+"JSON" => -1e+11
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'number int exp minus');
+-2e-12
+JSON
+"JSON" => -2e-12
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'number int frac exp');
+3.14e+10
+JSON
+"JSON" => 3.14e+10
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'number int frac exp minus');
+-3.14e+10
+JSON
+"JSON" => -3.14e+10
 OUT
 
 json_dump_is(<<'JSON', <<'OUT', 'null');
@@ -495,6 +543,56 @@ JSON
     "three" => null,
     "two" => 0
 }
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'example taken from the RFC');
+{"Image":{"Width":800,"Height":600,"Title":"View from 15th Floor","Thumbnail":{"Url":"http://www.example.com/image/481989943","Height":125,"Width":"100"},"IDs":[116, 943, 234, 38793]}}
+JSON
+"JSON" => Hash {
+    "Image" => Hash {
+        "Height" => 600,
+        "IDs" => ResizablePMCArray (size:4) [
+            116,
+            943,
+            234,
+            38793
+        ],
+        "Thumbnail" => Hash {
+            "Height" => 125,
+            "Url" => "http://www.example.com/image/481989943",
+            "Width" => "100"
+        },
+        "Title" => "View from 15th Floor",
+        "Width" => 800
+    }
+}
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'another example taken from the RFC',todo=>'check number precision');
+[{"precision":"zip","Latitude":37.7668,"Longitude":-122.3959,"Address":"","City":"SAN FRANCISCO","State":"CA","Zip":"94107","Country":"US"},{"precision":"zip","Latitude":37.371991,"Longitude":-122.026020,"Address":"","City":"SUNNYVALE", "State":"CA", "Zip":"94085", "Country":"US"}]
+JSON
+"JSON" => ResizablePMCArray (size:2) [
+    Hash {
+        "Address" => "",
+        "City" => "SAN FRANCISCO",
+        "Country" => "US",
+        "Latitude" => 37.7668,
+        "Longitude" => -122.3959,
+        "State" => "CA",
+        "Zip" => "94107",
+        "precision" => "zip"
+    },
+    Hash {
+        "Address" => "",
+        "City" => "SUNNYVALE",
+        "Country" => "US",
+        "Latitude" => 37.371991,
+        "Longitude" => -122.026020,
+        "State" => "CA",
+        "Zip" => "94085",
+        "precision" => "zip"
+    }
+]
 OUT
 
 json_dump_is(<<'JSON', <<'OUT', 'random object/array example');
