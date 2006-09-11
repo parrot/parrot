@@ -5,8 +5,6 @@
   .param pmc argv :slurpy
   # Requires multiple of 3 args.
 
-  .local pmc retval
-
   .local int argc
   argc = elements argv
 
@@ -87,7 +85,7 @@ empty_var:
   # Handle [break] and [continue]
 execute_command:
   push_eh handle_continue
-    retval = command()
+    command()
   clear_eh
   goto next_iteration
 
@@ -100,7 +98,7 @@ handle_continue:
   .rethrow()
  
 done:
-  .return(retval)
+  .return('')
 
 bad_args:
   tcl_error 'wrong # args: should be "foreach varList list ?varList list ...? command"'
