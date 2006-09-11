@@ -9,3 +9,20 @@ pre     {
   white-space: pre;
 }
 
+html, body {
+    margin:0;
+    padding:0.5em;
+    height:98%;
+    overflow:hidden;
+}
+
+#content {
+    height:92%;
+}
+
+#footer {
+    position:fixed;
+    bottom:0px
+    height:5%;
+    font-size: 50%;
+}

@@ -18,25 +18,29 @@
     <li>HTML slide source</li>
 </ul>
 <h1>How Does It Work?</h1>
-<h2>httpd2.pir</h2>
-<p><i>httpd2.pir</i> is a tiny web server, using the <tt>['HTTP';
-    'Daemon']</tt> class, which supports the <i>GET</i> method
-   and <i>CGI</i>.
-</p>
+<h2>Web browser</h2>
+<p>Any recent browser (Konqueror, Firefox, Safari) with JavaScript
+enabled will do. You load the start page of the presentation:</p>
 <h2>index.html</h2>
 <p>The primary webpage of the presention. It uses <i>JavaScript</i> to
 process keyboard events and <i>XMLHttpRequest</i> to send requests to
 the web server. The result of the query is placed into the webpage.</p>
 <p><i>index.html</i> could of course be named differently, it's just
 the start page of the presentation.</p>
+<pre>
+    &lt;div id="content"&gt;Presentation goes here&lt;/div&gt;
+</pre>
 <h1>httpd2</h1>
 <p>well...</p>
 <h1>httpd2.pir</h1>
-<p>is a small example using:</p>
+<p><i>httpd2.pir</i> is a tiny web server, using the <tt>['HTTP';
+    'Daemon']</tt> class, which supports the <i>GET</i> method
+   and <i>CGI</i>.
+</p>
 <pre>
   load_bytecode 'HTTP/Daemon.pbc'
 </pre>
-<h2>[ HTTP; Daemon]</h2>
+<h1>[ HTTP; Daemon]</h1>
 <p>The webserver is using the asynchronous event system of parrot to
 accept multiple client requests and serve results. It writes its log
 file during idle time.</p>
@@ -61,6 +65,10 @@ according to the browser request.</p>
 new slide page, other top-level tags are placed beyond the previous
 one after <i>&lt;space&gt;</i> was pressed. Look at the source code of this
 file :)</p>
+<pre>
+&lt;h1&gt;Slides&lt;/h1&gt;
+&lt;p&gt;Slides are taken from one &lt;i&gt;.html&lt;/i&gt; page. ...&lt;p&gt;
+</pre>
 <h1>Navigation</h1> 
 <ul>
     <li>&lt;space&gt; - next page</li>
