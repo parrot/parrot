@@ -651,7 +651,8 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 #ifdef PARROT_DEF_INET_ATON
     if (inet_aton(s, &sa.sin_addr) != 0) {
 #else
-    if (inet_pton(family, s, &sa.sin_addr) != 0) {
+    /* positive retval is success */
+    if (inet_pton(family, s, &sa.sin_addr) > 0) {
 #endif
         /* Success converting numeric IP */
     }
