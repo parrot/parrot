@@ -32,7 +32,7 @@ sub runstep
     my @languages = qw{
         APL amber bc befunge bf cardinal c99 cola ecmascript HQ9plus
         jako lisp lua m4 ook parrot_compiler perl6 pheme pugs punie regex 
-        scheme tap urm ZCode
+        scheme tap urm Zcode
     };
 
     foreach my $language (@languages) {
