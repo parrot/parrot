@@ -110,8 +110,12 @@ left_bracket:
   goto find_close_bracket
 right_bracket:
   dec depth
-  if depth == 0 goto found_close_bracket
-  goto find_close_bracket
+  unless depth == 0 goto find_close_bracket
+
+  $I0 = $I1 + 1
+  if $I0 >= len goto found_close_bracket
+  $I0 = is_cclass .CCLASS_WHITESPACE, str, $I0
+  unless $I0 goto list_element_followed_by
 
 found_close_bracket:
   # length -- if we have "{ }", pos and $I0 should both be 1
@@ -128,6 +132,17 @@ found_close_bracket:
   push retval, $P0
   
   goto eat_space
+
+list_element_followed_by:
+  inc $I1
+  $I0 = len - $I1
+  $I0 = find_cclass .CCLASS_WHITESPACE, str, $I1, $I0
+  $I0 = len - $I0
+  dec $I0
+  $S0 = substr str, $I1, $I0
+  $S0 = 'list element in braces followed by "' . $S0
+  $S0 = $S0 . '" instead of space'
+  tcl_error $S0
 
 unmatched_open_brace:
   tcl_error 'unmatched open brace in list'

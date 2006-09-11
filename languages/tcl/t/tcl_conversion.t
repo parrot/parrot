@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"{} conversion to list");
@@ -32,4 +32,10 @@ TCL
 3
 b c
 d
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', '\S after }');
+lindex {{a b}3 4} 1
+TCL
+list element in braces followed by "3" instead of space
 OUT
