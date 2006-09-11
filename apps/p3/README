@@ -21,10 +21,21 @@ FILES:
                         files from below doc root
   cgi-pir/slides.pir  ... creates the slides
 
-CAVEATS:
+CAVEATS - Win32:
 
-Caused by the absence of a working parrot event sytem on Win32, httpd2 and
-therefore P3 will not work on said platform - sorry.
+Caused by the absence of a working parrot event sytem on Win32, httpd2
+doesn't work yet on parrot. But using httpd.pir and an explicit start
+page ...:
+
+1) Start the webserver inside the apps/p3 directory:
+
+  $ ../../parrot ../../examples/io/httpd.pir
+
+2) Point your web browser to
+
+  http://localhost:1234/index.html
+
+... should do it.  
 
 --leo
 
