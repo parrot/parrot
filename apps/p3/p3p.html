@@ -47,11 +47,11 @@ file during idle time.</p>
   d = new $I0, opts
   d.'run'()
 </pre>
-<h2>CGI</h2>
+<h1>CGI</h1>
 <p>A <i>URI</i> like <i>page.pir?q...</i> <b>load_bytecode</b>s
 <i>cgi-pir/page.pir</i> and runs a subroutine <i>cgi-main</i>. The
 result is of course sent back to the browser.</p>
-<h1>cgi-pir/slides.pir</h1>
+<h2>cgi-pir/slides.pir</h2>
 <p>This is the actual presentation program, processing the
 <i>.html</i> source of the presentation. It delivers spliced parts
 according to the browser request.</p>
@@ -73,5 +73,6 @@ file :)</p>
     <dt>Why another PP?</dt>
     <dd>It's fun, it's almost parrot only, it's useful, and fully dynamic.</dd>
 </dl>
+<!-- end - simplifies eof detection -->
 </body>
 </html>

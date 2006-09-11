@@ -42,9 +42,10 @@ nobody:
     pos1 = 0
 loop:
     (pos1, p, $S0) = _next_tag(slides, pos1)
+    if p == -1 goto serve_eof	# at eof
 loop2:
     (pos2, p, tag) = _next_tag(slides, p)
-    if $S0 == '' goto serve_eof	# at eof
+    if p == -1 goto serve_eof	# at eof
     if part == n goto serve_it
     if tag == 'ul' goto loop2
     if tag == 'ol' goto loop2
@@ -62,10 +63,10 @@ loop2:
     goto loop
 
 serve_eof:
-    $S0 = '<p>The End ('
+    $S0 = '<h1>ENOMORESLIDES - <sub>'
     $S1 = part
     $S0 .= $S1
-    $S0 .= ')</p>'
+    $S0 .= '</sub></h1>'
     goto ret_it
 serve_it:
     $I0 = pos2 - pos1
@@ -90,9 +91,10 @@ loop:
     p1 = p + 1
     $S0 = slides[p1]
     if $S0 == '/' goto ignore
-    # got open tag - ignore <b>, <i>, <tt> ...
+    # got open tag - ignore <b>, <i>, <tt>, <sup>, <sub> ...
     if $S0 == 'b' goto ignore
     if $S0 == 'i' goto ignore
+    if $S0 == 's' goto ignore
     if $S0 == 't' goto ignore
     pos1 = p
     p = index slides, '>', p1
@@ -106,7 +108,7 @@ ignore:
     pos1 = p1
     goto loop
 eof:
-    p = length slides
+    p = index slides, '</body>', pos1
     .return (pos1, p, '')
 .end
 
