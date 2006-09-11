@@ -95,46 +95,46 @@ sub prompt
     return integrate($value, $input);
 }
 
-=item C<file_checksum($filename, $ignorePattern)>
+=item C<file_checksum($filename, $ignore_pattern)>
 
 Creates a checksum for the specified file. This is used to compare files.
 
-Any lines matching the regular expression specified by C<$ignorePattern> are
+Any lines matching the regular expression specified by C<$ignore_pattern> are
 not included in the checksum.
 
 =cut
 
 sub file_checksum
 {
-    my ($filename, $ignorePattern) = @_;
+    my ($filename, $ignore_pattern) = @_;
     open(my $file, '<', $filename) or die "Can't open $filename: $!";
     my $sum = 0;
     while (<$file>) {
-        next if defined($ignorePattern) && /$ignorePattern/;
+        next if defined($ignore_pattern) && /$ignore_pattern/;
         $sum += unpack("%32C*", $_);
     }
     close($file) or die "Can't close $filename: $!";
     return $sum;
 }
 
-=item C<copy_if_diff($from, $to, $ignorePattern)>
+=item C<copy_if_diff($from, $to, $ignore_pattern)>
 
 Copies the file specified by C<$from> to the location specified by C<$to> if
 it's contents have changed.
 
-The regular expression specified by C<$ignorePattern> is passed to
+The regular expression specified by C<$ignore_pattern> is passed to
 C<file_checksum()> when comparing the files.
 
 =cut
 
 sub copy_if_diff
 {
-    my ($from, $to, $ignorePattern) = @_;
+    my ($from, $to, $ignore_pattern) = @_;
 
     # Don't touch the file if it didn't change (avoid unnecessary rebuilds)
     if (-r $to) {
-        my $from_sum = file_checksum($from, $ignorePattern);
-        my $to_sum   = file_checksum($to,   $ignorePattern);
+        my $from_sum = file_checksum($from, $ignore_pattern);
+        my $to_sum   = file_checksum($to,   $ignore_pattern);
         return if $from_sum == $to_sum;
     }
 
@@ -147,7 +147,7 @@ sub copy_if_diff
     return 1;
 }
 
-=item C<move_if_diff($from, $to, $ignorePattern)>
+=item C<move_if_diff($from, $to, $ignore_pattern)>
 
 Moves the file specified by C<$from> to the location specified by C<$to> if
 it's contents have changed.
@@ -156,8 +156,8 @@ it's contents have changed.
 
 sub move_if_diff
 {
-    my ($from, $to, $ignorePattern) = @_;
-    copy_if_diff($from, $to, $ignorePattern);
+    my ($from, $to, $ignore_pattern) = @_;
+    copy_if_diff($from, $to, $ignore_pattern);
     unlink $from;
 }
 
@@ -193,7 +193,7 @@ This option takes has two possible values, C<#> or C</*>. If present and
 set to one of these two values, the generated file will contain a
 generated header that is commented out appropriately.
 
-=item ignorePattern
+=item ignore_pattern
 
 A regular expression. Any lines in the file matching this expression are
 ignored when determining if the target file has changed (and should therefore
@@ -385,7 +385,7 @@ sub genfile
     close($in)  or die "Can't close $source: $!";
     close($out) or die "Can't close $target: $!";
 
-    move_if_diff("$target.tmp", $target, $options{ignorePattern});
+    move_if_diff("$target.tmp", $target, $options{ignore_pattern});
 }
 
 =item C<_run_command($command, $out, $err)>
