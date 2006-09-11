@@ -165,6 +165,7 @@ sub MANIFEST {
         m[^runtime/]      ? '[library]' :
         m[^tools/docs/]   ? '[devel]' :
         m[^tools/dev/]    ? '[devel]' :
+        m[^(apps/\w+)/]   ? "[$1]" :
         '[]';
     }
     push @MANI, sprintf("%- 59s %s\n", $File::Find::name, $loc);
