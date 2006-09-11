@@ -3425,7 +3425,7 @@ yyreduce:
   case 159:
 #line 1009 "compilers/imcc/imcc.y"
     { if (yynerrs >= PARROT_MAX_RECOVER_ERRORS) {
-                           IMCC_warning(interp, "Too much errors. Correct some first.\n");
+                           IMCC_warning(interp, "Too many errors. Correct some first.\n");
                            YYABORT;
                        }
                        yyerrok; }
