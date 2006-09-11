@@ -60,7 +60,7 @@ ast_compile_past(Parrot_Interp interp, const char *src_string)
         interp->imc_info->state->next = NULL;
     IMCC_INFO(interp)->state->pasm_file = 0;
     IMCC_INFO(interp)->state->file = name;
-    line = 1;
+    IMCC_INFO(interp)->line = 1;
     AST_scan_string(src_string);
     ASTparse(interp);
     top_node = interp->imc_info->top_node;

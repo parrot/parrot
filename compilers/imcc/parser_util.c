@@ -351,7 +351,7 @@ var_arg_ins(Interp *interpreter, IMC_Unit * unit, char *name,
     ins->opsize = n + 1;
 
     if (emit)
-        emitb(unit, ins);
+        emitb(interpreter, unit, ins);
     return ins;
 }
 
@@ -553,7 +553,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         ++IMCC_INFO(interpreter)->has_compile;
 found_ins:
     if (emit)
-        emitb(unit, ins);
+        emitb(interpreter, unit, ins);
     return ins;
 }
 
@@ -784,7 +784,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = fullname;
     ext = strrchr(fullname, '.');
-    line = 1;
+    IMCC_INFO(interp)->line = 1;
     /*
      * the string_compare() called from pmc_type() triggers DOD
      * which can destroy packfiles under construction
@@ -1120,7 +1120,7 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
     /* emit the operand */
     INS(interpreter, unit, name, 0, preg, 3, 0, 1);
     /* emit the LHS op */
-    emitb(unit, ins);
+    emitb(interpreter, unit, ins);
     return ins;
 }
 

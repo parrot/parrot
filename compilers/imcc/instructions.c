@@ -434,7 +434,7 @@ move_ins(IMC_Unit * unit, Instruction *ins, Instruction *to)
 
 /* Emit a single instruction into the current unit buffer. */
 Instruction *
-emitb(IMC_Unit * unit, Instruction * i)
+emitb(Interp * interp, IMC_Unit * unit, Instruction * i)
 {
 
     if (!unit || !i)
@@ -446,7 +446,7 @@ emitb(IMC_Unit * unit, Instruction * i)
         i->prev = unit->last_ins;
 	unit->last_ins = i;
     }
-    i->line = line - 1;         /* lexer is in next line already */
+    i->line = IMCC_INFO(interp)->line - 1;         /* lexer is in next line already */
     return i;
 }
 

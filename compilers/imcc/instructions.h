@@ -83,13 +83,13 @@ Instruction * _mk_instruction(const char *,const char *, int n, SymReg **, int);
 #endif
 Instruction * INS(Interp *, struct _IMC_Unit *, char * name,
 	const char *fmt, SymReg **regs, int nargs, int keyv, int emit);
-Instruction * INS_LABEL(struct _IMC_Unit *, SymReg * r0, int emit);
+Instruction * INS_LABEL(Interp * interp, struct _IMC_Unit *, SymReg * r0, int emit);
 
 Instruction * iNEW(Interp *, struct _IMC_Unit *, SymReg * r0, char * type,
 	SymReg *init, int emit);
 Instruction * iNEWSUB(Interp *, struct _IMC_Unit *, SymReg * r0, int type,
 	SymReg *init, int emit);
-Instruction * emitb(struct _IMC_Unit *, Instruction *);
+Instruction * emitb(Interp * interp, struct _IMC_Unit *, Instruction *);
 
 int instruction_reads(Instruction *, SymReg *);
 int instruction_writes(Instruction *, SymReg *);

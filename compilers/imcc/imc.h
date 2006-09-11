@@ -92,7 +92,7 @@ void free_reglist(IMC_Unit *);
  */
 PARROT_API void imcc_init(Parrot_Interp interpreter);
 int check_op(Interp *, char * fullname, char *op, SymReg *r[],
-    int narg, int keyvec);
+  int narg, int keyvec);
 int is_op(Interp *, char *);
 char *str_dup(const char *);
 char *str_cat(const char *, const char *);
@@ -131,7 +131,7 @@ typedef enum {
 } _imc_pragmas;
 
 /* globals XXX */
-PARROT_API EXTERN int        line;	/* and line */
+/* PARROT_API EXTERN int        line;	*/ /* and line */ 
 
 #define PARROT_MAX_RECOVER_ERRORS 40 /* this is the number of times
                                       * parrot will try to retry while
@@ -219,6 +219,8 @@ typedef struct _imc_info_t {
     jmp_buf jump_buf;               /* The jump for error  handling */
     int error_code;                 /* The Error code. */
     STRING * error_message;         /* The Error message */
+
+    int line;                   /* current line number */
 } imc_info_t;
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)

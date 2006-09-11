@@ -70,7 +70,7 @@ static void define_macro(Interp *interp, char *name, struct params_t *params,
 static struct macro_t *find_macro(Interp *interp, const char *name);
 static void scan_string (struct macro_frame_t *frame, const char *expansion, void *yyscanner);
 static void scan_file (Interp* interp, struct macro_frame_t *frame, FILE *, void *yyscanner);
-static void destroy_frame (struct macro_frame_t *frame, void *yyscanner);
+static int destroy_frame (struct macro_frame_t *frame, void *yyscanner);
 static int yylex_skip (YYSTYPE *valp, void *interp, const char *skip, void *yyscanner);
 
 static int read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner);
@@ -159,7 +159,7 @@ SP              [ ]
          */
 
         /* Newline in the heredoc. Realloc and cat on. */
-        ++line;
+        IMCC_INFO(interp)->line++;
         heredoc_content = mem_sys_realloc(heredoc_content,
                                           strlen(heredoc_content) +
                                           strlen(yytext) + 2);
@@ -218,13 +218,13 @@ SP              [ ]
     }
 <cmt4>.*{EOL} { 
         yy_pop_state(yyscanner);
-        line++; 
+        IMCC_INFO(interp)->line++; 
     }
 <INITIAL,emit>{EOL} {
         if (expect_pasm == 2)
             BEGIN(INITIAL);
         expect_pasm = 0;
-        line++;
+        IMCC_INFO(interp)->line++;
         return '\n';
     }
 <INITIAL,emit># { 
@@ -236,7 +236,7 @@ SP              [ ]
         else
             yy_pop_state(yyscanner);
         expect_pasm = 0;
-        line++;
+        IMCC_INFO(interp)->line++;
         return '\n';
     }
 
@@ -256,9 +256,9 @@ SP              [ ]
     }
 
 <INITIAL,emit,macro>^"="            { in_pod = 1; yy_push_state(pod, yyscanner); }
-<pod>^"=cut"{EOL}    { in_pod = 0; yy_pop_state(yyscanner); ++line; }
+<pod>^"=cut"{EOL}    { in_pod = 0; yy_pop_state(yyscanner); IMCC_INFO(interp)->line++; }
 <pod>.*         { /*ignore*/ }
-<pod>{EOL}      { ++line; }
+<pod>{EOL}      { IMCC_INFO(interp)->line++; }
 
 ".sym"          return(LOCAL);
 <INITIAL,emit>".lex"          return(LEXICAL);
@@ -375,7 +375,7 @@ SP              [ ]
            "Constant names must be identifiers");
 
     cur_macro_name = valp->s;
-    start_line = line;
+    start_line = IMCC_INFO(interp)->line;
 
     c = yylex_skip(valp, interp, " ", yyscanner);
         if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
@@ -558,7 +558,7 @@ SP              [ ]
 <macro>".endm"         DUP_AND_RET(valp, ENDM);
 
 <macro>{WS}*{EOL} {
-        line++;
+        IMCC_INFO(interp)->line++;
         DUP_AND_RET(valp, '\n');
     }
 
@@ -633,7 +633,7 @@ new_frame (Interp* interp)
 
     tmp = mem_sys_allocate_zeroed(sizeof(struct macro_frame_t));
     tmp->label = ++label;
-    tmp->s.line = line;
+    tmp->s.line = IMCC_INFO(interp)->line;
     tmp->s.handle = NULL;
     if (frames) {
         tmp->s.pasm_file = frames->s.pasm_file;
@@ -656,11 +656,11 @@ scan_string (struct macro_frame_t *frame, const char *expansion, void *yyscanner
     yy_scan_string(expansion, yyscanner);
 }
 
-static void
+static int
 destroy_frame (struct macro_frame_t *frame, void *yyscanner)
 {
     YY_BUFFER_STATE buffer;
-    int i;
+    int i, ret = 0;
 
     buffer = frame->buffer;
 
@@ -671,7 +671,7 @@ destroy_frame (struct macro_frame_t *frame, void *yyscanner)
     if (frame->heredoc_rest)
         mem_sys_free(frame->heredoc_rest);
     else
-        line = frame->s.line;
+        ret = frame->s.line;
     /* FIXME if frame->s.file was allocated free it */
 
     mem_sys_free(frame);
@@ -679,6 +679,8 @@ destroy_frame (struct macro_frame_t *frame, void *yyscanner)
     if (buffer != NULL) {
         yy_switch_to_buffer(buffer, yyscanner);
     }
+
+    return ret;
 }
 
 static int
@@ -805,7 +807,7 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
                 "Macro names must be identifiers");
 
     cur_macro_name = valp->s;
-    start_line = line;
+    start_line = IMCC_INFO(interp)->line++;
     memset(&params, 0, sizeof(struct params_t));
 
     /* white space is allowed between macro and opening paren) */
@@ -990,7 +992,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
             }
         }
 
-        line = m->line;
+        IMCC_INFO(interp)->line = m->line;
         scan_string(frame, m->expansion, yyscanner);
         return 1;
     }
@@ -1046,7 +1048,7 @@ scan_file (Interp* interp, struct macro_frame_t *frame, FILE *file, void *yyscan
     frames = frame;
     IMCC_INFO(interp)->state = (struct parser_state_t *) frames;
 
-    line = 1;
+    IMCC_INFO(interp)->line = 1;
 
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE, yyscanner), yyscanner);
 }
@@ -1059,19 +1061,23 @@ IMCC_push_parser_state(Interp* interp)
     frame = new_frame(interp);
     frame->s.next = (struct parser_state_t*)frames;
     frames = frame;
-    frame->s.line = line = 1;
+    frame->s.line = IMCC_INFO(interp)->line = 1;
     IMCC_INFO(interp)->state = (struct parser_state_t *) frames;
 }
 
 static void
 pop_parser_state(Interp* interp, void *yyscanner)
 {
+    int l;
     struct macro_frame_t *tmp;
     tmp = frames;
     if (tmp) {
         if (tmp->s.handle) fclose (tmp->s.handle);
         frames = (struct macro_frame_t*) frames->s.next;
-        destroy_frame(tmp, yyscanner);
+        l = destroy_frame(tmp, yyscanner);
+        if (l) {
+            IMCC_INFO(interp)->line = l;
+        }
     }
     IMCC_INFO(interp)->state = (struct parser_state_t *) frames;
 }
@@ -1148,9 +1154,9 @@ IMCC_print_inc(Interp *interp)
 
     UNUSED(interp);
     if (frames && frames->is_macro)
-        fprintf(stderr, "\n\tin macro '.%s' line %d\n", frames->s.file, line);
+        fprintf(stderr, "\n\tin macro '.%s' line %d\n", frames->s.file, IMCC_INFO(interp)->line);
     else
-        fprintf(stderr, "\n\tin file '%s' line %d\n", frames->s.file, line);
+        fprintf(stderr, "\n\tin file '%s' line %d\n", frames->s.file, IMCC_INFO(interp)->line);
     old = frames->s.file;
     for (f = frames; f; f = (struct macro_frame_t *)f->s.next) {
         if (strcmp(f->s.file, old)) {

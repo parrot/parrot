@@ -992,7 +992,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
             assert(args <= 3);
             
             r = mk_local_label(interp, str_dup(label));
-            tmp = INS_LABEL(unit, r, 0);
+            tmp = INS_LABEL(interp, unit, r, 0);
             insert_ins(unit, cond, tmp);
             
             

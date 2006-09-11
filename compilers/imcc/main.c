@@ -669,7 +669,7 @@ main(int argc, char * argv[])
 
         fclose(imc_yyin_get(yyscanner));
 
-        IMCC_info(interp, 1, "%ld lines compiled.\n", line);
+        IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
         if (per_pbc)
             PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     }

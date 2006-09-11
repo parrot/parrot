@@ -174,7 +174,7 @@ static void clear_state(void)
     keyvec = 0;
 }
 
-Instruction * INS_LABEL(IMC_Unit * unit, SymReg * r0, int emit)
+Instruction * INS_LABEL(Interp * interp, IMC_Unit * unit, SymReg * r0, int emit)
 {
 
     Instruction *ins;
@@ -183,24 +183,24 @@ Instruction * INS_LABEL(IMC_Unit * unit, SymReg * r0, int emit)
     ins->type = ITLABEL;
     r0->first_ins = ins;
     if (emit)
-        emitb(unit, ins);
+        emitb(interp, unit, ins);
     return ins;
 }
 
-static Instruction * iLABEL(IMC_Unit * unit, SymReg * r0) {
-    Instruction *i = INS_LABEL(unit, r0, 1);
-    i->line = line;
+static Instruction * iLABEL(Interp *interp, IMC_Unit * unit, SymReg * r0) {
+    Instruction *i = INS_LABEL(interp, unit, r0, 1);
+    i->line = IMCC_INFO(interp)->line;
     clear_state();
     return i;
 }
 
 static Instruction * iSUBROUTINE(Interp *interp, IMC_Unit * unit, SymReg * r) {
     Instruction *i;
-    i =  iLABEL(unit, r);
+    i =  iLABEL(interp, unit, r);
     r->type = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
     cur_call = r;
-    i->line = line;
+    i->line = IMCC_INFO(interp)->line;
     add_namespace(interp, unit);
     return i;
 }
@@ -257,7 +257,7 @@ IMCC_create_itcall_label(Interp* interpreter)
 
     sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
     r = mk_pcc_sub(interpreter, str_dup(name), 0);
-    i = iLABEL(cur_unit, r);
+    i = iLABEL(interpreter, cur_unit, r);
     cur_call = r;
     i->type = ITCALL | ITPCCSUB;
     return i;
@@ -313,7 +313,7 @@ begin_return_or_yield(Interp *interp, int yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, cnr++);
     interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
-    i = iLABEL(cur_unit, interp->imc_info->sr_return);
+    i = iLABEL(interp, cur_unit, interp->imc_info->sr_return);
     i->type = yield ? ITPCCSUB | ITLABEL | ITPCCYIELD : ITPCCSUB | ITLABEL ;
     interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
 }
@@ -762,7 +762,7 @@ pcc_sub_call:
              * sub SymReg.
              * This is used below to append args & results
              */
-            i = iLABEL(cur_unit, r);
+            i = iLABEL(interp, cur_unit, r);
             cur_call = r;
             i->type = ITPCCSUB;
             /*
@@ -996,7 +996,7 @@ _labels:
 
 label:
      LABEL         {
-                     $$ = iLABEL(cur_unit, mk_local_label(interp, $1));
+         $$ = iLABEL(interp, cur_unit, mk_local_label(interp, $1));
                    }
    ;
 
@@ -1494,10 +1494,10 @@ int yyerror(void *yyscanner, Interp *interp, char * s)
      * error.  
      */
     if (!at_eof(yyscanner) && *chr == '\n') {
-        --line;
+        IMCC_INFO(interp)->line--;
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);
-        ++line;
+        IMCC_INFO(interp)->line++;
     } else {
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);

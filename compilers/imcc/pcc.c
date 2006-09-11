@@ -372,7 +372,7 @@ recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
     sprintf(buf, "%s@0", this_sub->name); 
     if ( (label = find_sym(interp, buf)) == NULL) {
         label = mk_local_label(interp, str_dup(buf));
-        tmp_ins = INS_LABEL(unit, label, 0);
+        tmp_ins = INS_LABEL(interp, unit, label, 0);
         insert_ins(unit, get_params, tmp_ins);
     }
     free(buf);

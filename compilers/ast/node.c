@@ -702,7 +702,7 @@ exp_Function(Interp* interpreter, nodeType *p)
     params = name->next;
     body = params->next;
     sub = mk_sub_address(interpreter, str_dup(name->u.r->name));
-    ins = INS_LABEL(cur_unit, sub, 1);
+    ins = INS_LABEL(interpreter, cur_unit, sub, 1);
 
     ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
     add_namespace(interpreter, cur_unit);
@@ -766,13 +766,13 @@ exp_If(Interp* interpreter, nodeType *p)
         /*
          * insert label for next test
          */
-        INS_LABEL(cur_unit, else_label, 1);
+        INS_LABEL(interpreter, cur_unit, else_label, 1);
     }
     /* final else block if present */
     if (else_ && else_->expand)
         else_->expand(interpreter, else_);
     /* endif label */
-    INS_LABEL(cur_unit, endif_label, 1);
+    INS_LABEL(interpreter, cur_unit, endif_label, 1);
 
     return NULL;
 }
@@ -850,7 +850,7 @@ exp_PCC_Sub(Interp* interpreter, nodeType *p)
     if (!cur_unit)
         IMCC_fatal(interpreter, 1, "exp_PCC_Sub: no cur_unit");
     sub = mk_sub_label(interpreter, str_dup("pcc_sub"));
-    ins = INS_LABEL(cur_unit, sub, 1);
+    ins = INS_LABEL(interpreter, cur_unit, sub, 1);
 
     ins->r[0]->type = VT_PCC_SUB;
     ins->r[0]->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
@@ -884,7 +884,7 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
     if (!cur_unit)
         IMCC_fatal(interpreter, 1, "exp_Py_Module: no cur_unit");
     sub = mk_sub_label(interpreter, str_dup("__main__"));
-    ins = INS_LABEL(cur_unit, sub, 1);
+    ins = INS_LABEL(interpreter, cur_unit, sub, 1);
 
     ins->r[0] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
     add_namespace(interpreter, cur_unit);
