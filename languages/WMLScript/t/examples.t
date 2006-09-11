@@ -63,7 +63,7 @@ CODE
 OUT
 
 language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'sieve', function => 'sieve');
-/* 
+/*
  *  Eratosthenes Sieve prime number calculation
  */
 extern function sieve ()
@@ -73,7 +73,7 @@ extern function sieve ()
     var count = 0;
     var flag = 0;
     for (i = 0; i < MAX_PRIME; i++) {
-        flag |= (1 << i);   // set 
+        flag |= (1 << i);   // set
     }
     for (i = 0; i < MAX_PRIME; i++) {
         if (flag & (1 << i)) {  // test

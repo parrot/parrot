@@ -65,7 +65,7 @@ L2:
     $S0 = shift argv
     new $P0, .WmlsString
     $P0 = $S0
-    push params, $P0 
+    push params, $P0
     goto L2
 L3:
     .local pmc entry
@@ -87,4 +87,4 @@ USAGE:
     printerr "Usage: parrot wmlsi.pbc filename entry\n"
     exit -1
 .end
-    
+

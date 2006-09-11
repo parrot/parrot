@@ -4,7 +4,7 @@
 =head1 NAME
 
 src/wmlsstdlibs.pir - WMLScript standard libraries
-       
+
 =head1 DESCRIPTION
 
 See "WMLScript Standard Libraries Specification".
@@ -153,7 +153,7 @@ L1:
     print $S0
     print ")\n"
 L1:
-    .return (content) 
+    .return (content)
 .end
 
 .sub 'save_pbc'
@@ -199,8 +199,8 @@ L1:
 L2:
 .end
 
-=back        
-        
+=back
+
 =head1 AUTHORS
 
 Francois Perrad.

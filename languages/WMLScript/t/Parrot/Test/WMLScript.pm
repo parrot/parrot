@@ -47,7 +47,7 @@ foreach my $func ( keys %language_test_map ) {
 
         my $cflags = $options{cflags} || q{};
         my $function = $options{function} || 'main';
-        my $params = $options{params} || q{}; 
+        my $params = $options{params} || q{};
 
         # flatten filenames (don't use directories)
         my $lang_fn = Parrot::Test::per_test( '.wmls', $count );

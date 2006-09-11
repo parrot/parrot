@@ -62,13 +62,13 @@ ops@slash@wmls_ops$(LOAD_EXT) : $(OPS_FILES)
 	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(PARROT_DYNEXT)" $(OPSLIB)
 
 src@slash@WMLScript.pbc: src@slash@WMLScript.pir \
- src@slash@script.pir src@slash@wmlsstdlibs.pir $(GEN_PIR) 
-	$(PARROT) -o src@slash@WMLScript.pbc src@slash@WMLScript.pir 
+ src@slash@script.pir src@slash@wmlsstdlibs.pir $(GEN_PIR)
+	$(PARROT) -o src@slash@WMLScript.pbc src@slash@WMLScript.pir
 
 src@slash@opcode.pir: src@slash@translation.rules build@slash@translator.pl \
  build@slash@SRM@slash@Stack.pm build@slash@SRM@slash@Register.pm
 	$(PERL) build/translator.pl --output src/opcode.pir --srm $(SRM) \
-	  src/translation.rules 
+	  src/translation.rules
 
 src@slash@stdlibs.pir: src@slash@wmlslibs.cfg build@slash@stdlibs.pl
 	$(PERL) build/stdlibs.pl --output src/stdlibs.pir src/wmlslibs.cfg

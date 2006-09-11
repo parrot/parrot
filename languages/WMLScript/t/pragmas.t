@@ -3,7 +3,7 @@
 # $Id$
 
 =head1 NAME
-                    
+
 t/pragmas.t - WMLScript Pragmas
 
 =head1 SYNOPSIS

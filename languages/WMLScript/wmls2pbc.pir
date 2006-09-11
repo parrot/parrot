@@ -67,4 +67,4 @@ USAGE:
     printerr "Usage: parrot wmls2pir.pbc filename\n"
     exit -1
 .end
-    
+

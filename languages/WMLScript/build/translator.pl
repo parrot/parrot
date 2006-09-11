@@ -81,7 +81,7 @@ sub parse_rules {
 
     open my $fh, '<', $filename
         or die "Unable to open $filename: $!\n";
-    
+
     # We'll store an array of hashes containing the data.
     my @rules = ();
     my $rule;
@@ -96,7 +96,7 @@ sub parse_rules {
 
         # If it's a blank line or a comemnt line, skip it.
         next if !$in_heredoc && /^\s*#|^\s*$/;
-        
+
         # Is this a new rule?
         if (!$in_heredoc && /^\s*\[([\w\.]+)\]\s*$/) {
             # If we have a current rule...
@@ -128,7 +128,7 @@ sub parse_rules {
         elsif (!$in_heredoc && $rule && /^\s*(\w+)\s*=\s*(.+?)\s*$/) {
             if (exists $rule->{$1}) {
                 die "Duplicate value for $rule->{$1} in rule $rule->{name}\n";
-            } 
+            }
             # Stash key and value.
             $rule->{$1} = $2;
         }
@@ -137,7 +137,7 @@ sub parse_rules {
         elsif ($in_heredoc && /^$heredoc_terminator\s*$/) {
             if (exists $rule->{$heredoc_key}) {
                 die "Duplicate value for $rule->{$heredoc_key} in rule $rule->{name}\n";
-            } 
+            }
             # Stash key/value pair away and unset heredoc flag.
             $rule->{$heredoc_key} = $heredoc_value;
             $in_heredoc = 0;
@@ -176,7 +176,7 @@ sub parse_rules {
 sub validate_rule {
     my ($rule) = @_;
 
-    my $name = $rule->{name};    
+    my $name = $rule->{name};
 
     # Iterate over keys and do validation.
     while (my ($key, $value) = each %{$rule}) {
@@ -321,16 +321,16 @@ sub generate_initial_code {
     new h_const, .Hash
     .local pmc constants
     constants = script['Constants']
-    
+
     gen_pir = <<"PIR"
   ${AUTO_MAGICALS}
 PIR
 
     bc_length = length code
-    next_pc = 0    
-    
+    next_pc = 0
+
 PIRCODE
-    
+
     # SRM pre translation code.
     $pir .= "### pre_translation\n";
     my $srm_pt = $srm->pre_translation();
@@ -386,8 +386,8 @@ sub generate_initial_dump {
     .local int arg_3
 
     bc_length = length code
-    next_pc = 0    
-    
+    next_pc = 0
+
 LOOP:
     pc = next_pc
     if pc >= bc_length goto COMPLETE
@@ -396,7 +396,7 @@ LOOP:
     cur_ic = ord $S0
 
 PIRCODE
-    
+
     # Return generated code.
     return $pir;
 }
@@ -406,7 +406,7 @@ PIRCODE
 # ############################
 sub generate_dispatch_table {
     my ($srm, $rules, $mv) = @_;
-    
+
     my %hash;
     my @sorted_rules;
     foreach (@{$rules}) {
@@ -432,7 +432,7 @@ BDISPATCH_NOT_FOUND:
     $S0 = cur_ic
     msg = concat $S0
     msg = concat ")"
-    ex["_message"] = msg 
+    ex["_message"] = msg
     throw ex
 
 PIRCODE
@@ -453,14 +453,14 @@ sub binary_dispatch_table {
     if (scalar(@rules) <= 3) {
         foreach (@rules) {
             if (exists $_->{inline}) {
-                my $mask = sprintf("0x%2X", 0xFF ^ hex($_->{inline}));  
+                my $mask = sprintf("0x%2X", 0xFF ^ hex($_->{inline}));
                 $pir .= "    \$I0 = cur_ic & $mask\n";
                 $pir .= "    if \$I0 == 0x$_->{code} goto ${prefix}_$_->{name}\n";
             } else {
                 $pir .= "    if cur_ic == 0x$_->{code} goto ${prefix}_$_->{name}\n";
             }
         }
-        
+
         # If we don't branch at any of them, we've got an unknown op.
         $pir .= "    goto ${prefix}_NOT_FOUND\n";
     }
@@ -546,7 +546,7 @@ PIRCODE
         push @localmv, "ARG$arg_num";
         $arg_num ++;
     }
-    
+
     # Now we split based upon the class.
     # Operations (op class).
     if ($rule->{class} eq 'op') {
@@ -594,7 +594,7 @@ PIRCODE
         }
         elsif ($rule->{pir} !~ /\$\{DEST0\}/) {
             die "pir must use \${DEST0} in rule $rule->{name}\n";
-        } 
+        }
 
         # Now call pre_load and append code that it generates.
         my $pre_load = $srm->pre_load();
@@ -622,7 +622,7 @@ PIRCODE
         }
         else {
             die "pir must use \${STOREREG} in rule $rule->{name}\n";
-        } 
+        }
 
         # Now call pre_store and append code that it generates.
         my $pre_store = $srm->pre_store();
@@ -697,11 +697,11 @@ sub translation_code {
     # to generate it from the "to generate" instruction directive.
     my $pir = "### translation\n";
     if ($rule->{pir}) {
-        $pir .= sub_meta($rule->{pir}, $mv, 
+        $pir .= sub_meta($rule->{pir}, $mv,
             "pir for rule $rule->{name}");
     }
     elsif ($rule->{instruction}) {
-        $pir .= sub_meta(ins_to_pir($rule->{instruction}), $mv, 
+        $pir .= sub_meta(ins_to_pir($rule->{instruction}), $mv,
             "pir for rule $rule->{name}");
     }
     else {
@@ -709,7 +709,7 @@ sub translation_code {
     }
     $pir .= "\n" unless $pir =~ /\n$/;
     $pir .= "### end translation\n";
-        
+
     return $pir;
 }
 
@@ -733,7 +733,7 @@ sub ins_to_pir {
         "\"\n    \${INS} = concat $1\n    \${INS} = concat \""
     /ge;
     $ins = "    \${INS} = concat \"  $ins\"\n";
-    
+
     # Return PIR.
     return $ins;
 }
@@ -785,7 +785,7 @@ PIRCODE
         }
         $arg_num ++;
     }
-    
+
     # Emit code to dump.
     $pir .= "    print \"$rule->{name}\"\n";
 
@@ -817,7 +817,7 @@ PIRCODE
 
 # Generate the dumper trailer code.
 # #################################
-sub generate_final_dump {    
+sub generate_final_dump {
     # Emit complete label.
     # Emit the end of the dumper.
     my $pir = <<'PIRCODE';
@@ -889,7 +889,7 @@ sub insert_automagicals {
         'I' =>  'int',
         'N' =>  'num',
         'S' =>  'string',
-        'P' =>  'pmc',  
+        'P' =>  'pmc',
     );
 
     # Loop over keys to look for automagicals and build up declaration list.

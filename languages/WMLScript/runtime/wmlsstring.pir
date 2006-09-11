@@ -34,7 +34,7 @@ A White space character is one of the following characters:
 
 =item * CR : Carriage Return
 
-=back 
+=back
 
 See "WMLScript Standard Libraries Specification", section 9 "String".
 
@@ -48,7 +48,7 @@ See "WMLScript Standard Libraries Specification", section 9 "String".
 
 .sub 'getString'
     new $P0, .Hash
-    
+
     .const .Sub _string_length = '_string_length'
     $P0[0]  = _string_length
     .const .Sub _string_isEmpty = '_string_isEmpty'
@@ -102,7 +102,7 @@ Integer or invalid.
 
 =cut
 
-.sub '_string_length' :anon                                                                 
+.sub '_string_length' :anon
     .param pmc str
     .local pmc ret
     $I0 = isa str, 'WmlsInvalid'
@@ -115,9 +115,9 @@ Integer or invalid.
 L1:
     new ret, .WmlsInvalid
 L2:
-    .return (ret) 
+    .return (ret)
 .end
-                         
+
 
 =head2 C<isEmpty(string)>
 
@@ -147,14 +147,14 @@ Boolean or invalid.
     ret = 0
     if $I0 goto L2
     ret = 1
-L2:    
+L2:
     goto L3
 L1:
     new ret, .WmlsInvalid
 L3:
-    .return (ret) 
+    .return (ret)
 .end
-                         
+
 
 =head2 C<charAt(string, index)>
 

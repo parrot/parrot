@@ -158,7 +158,7 @@ PIR
 code = 60
 class = calling
 inline = 07
-nb_arg = script.get_nb_arg(${INLINE}) 
+nb_arg = script.get_nb_arg(${INLINE})
 pir = <<PIR
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -522,7 +522,7 @@ pir = <<PIR
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
     ${INS} = concat " = clone const_es\n"
-    $I0 = exists ${CONST}['const_es'] 
+    $I0 = exists ${CONST}['const_es']
     if $I0 goto L1_${CURIC}
     $S0 = "  .local pmc const_es\n  new const_es, .WmlsString, ''\n"
     ${CONST}['const_es'] = $S0

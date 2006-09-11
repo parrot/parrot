@@ -36,10 +36,10 @@ sub parse_cfg {
 
     open my $fh, '<', $filename
         or die "Unable to open $filename: $!\n";
-    
+
     my $lib = {};
     my $func;
-    
+
     while (<$fh>) {
         if      (/^#.*$/) {
 #           warn "Comment $_";
@@ -62,7 +62,7 @@ sub parse_cfg {
     }
 
     close $fh;
-    
+
     return $lib;
 }
 
@@ -86,12 +86,12 @@ PIRCODE
         my ($name, $h_lib) = @{$lib};
         $pir .= "\n    # $name\n";
         $pir .= "    lib = new .Hash\n";
-        
+
         while (my ($num_func, $func) = each %{$h_lib}) {
             my ($name, $nb) = @{$func};
             $pir .= "    lib[$num_func] = $nb\t# $name\n";
         }
-        
+
         $pir .= "    stdlibs[$num_lib] = lib\n";
     }
 
@@ -108,7 +108,7 @@ PIRCODE
     stdlib = global "stdlibs"
     $P0 = stdlib[lib]
     $I0 = $P0[func]
-    .return ($I0) 
+    .return ($I0)
 .end
 PIRCODE
 

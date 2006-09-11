@@ -26,7 +26,7 @@ static INTVAL dynpmc_WmlsInteger;
 static INTVAL dynpmc_WmlsInvalid;
 
 pmclass WmlsInvalid
-    extends Undef 
+    extends Undef
     does scalar
     dynpmc
     group wmls_group

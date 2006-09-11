@@ -22,7 +22,7 @@ See "WMLScript Standard Libraries Specification", section 8 "Float".
 
 .sub 'getFloat'
     new $P0, .Hash
-    
+
     .const .Sub _float_int = '_float_int'
     $P0[0]  = _float_int
     .const .Sub _float_floor = '_float_floor'
@@ -88,7 +88,7 @@ L3:
 
 Returns the greatest integer value that is not greater than the given value. If
 the value is already an integer, the result is the value itself.
-    
+
 =head3 PARAMETERS
 
 value = Number
@@ -167,7 +167,7 @@ L3:
 Returns an implementation-dependent approximation to the result of raising
 value1 to the power of value2. If value1 is a negative number then value2
 must be an integer.
-    
+
 =head3 PARAMETERS
 
 value1 = Number

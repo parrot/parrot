@@ -36,7 +36,7 @@ PC1:  # CALL_LIB_S
   $P0 = P_temp_0($P0)
 PC3:  # POP
   # just pop
-PC4: 
+PC4:
 
   new $P0, .WmlsString, ''
   .return ($P0)
@@ -71,7 +71,7 @@ PC1:  # CALL_LIB_S
   $P0 = P_temp_0($P0)
 PC3:  # POP
   # just pop
-PC4: 
+PC4:
 
   new $P0, .WmlsString, ''
   .return ($P0)

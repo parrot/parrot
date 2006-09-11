@@ -7,7 +7,7 @@ Using WMLScript Translator
 
 The language WMLScript is a subset of ECMAScript (ie JavaScript).
 
-A WMLScript Compiler is available on CPAN : 
+A WMLScript Compiler is available on CPAN :
 L<http://search.cpan.org/search?query=wmls&mode=dist>.
 
 =head1 Building
@@ -28,7 +28,7 @@ After building C<parrot> :
     {
         Console.println("Hello World!");
     }
-    
+
   wmlsc example.wmls
 
 =head1 Disassembling

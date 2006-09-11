@@ -31,7 +31,7 @@ function f()
 extern function main()
 {
     Console.println("out");
-    f();    
+    f();
     Console.println("end");
 }
 CODE

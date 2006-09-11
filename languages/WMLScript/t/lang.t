@@ -311,7 +311,7 @@ extern function main()
     a = Lang.isInt(3.14);
     Console.println(a);
 
-    a = Lang.isInt(true);          
+    a = Lang.isInt(true);
     Console.println(a);
 
     a = Lang.isInt(invalid);

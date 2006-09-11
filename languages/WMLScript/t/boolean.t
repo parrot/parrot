@@ -186,7 +186,7 @@ CODE
 3
 0
 OUT
-                                                         
+
 language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'true ^ invalid', cflags => '-On');
 extern function main()
 {
@@ -208,7 +208,7 @@ CODE
 7
 0
 OUT
-                                                         
+
 language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'true div 2', cflags => '-On');
 extern function main()
 {

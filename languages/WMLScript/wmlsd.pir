@@ -60,4 +60,4 @@ USAGE:
     printerr "Usage: parrot wmlsd.pbc filename\n"
     exit -1
 .end
-    
+

@@ -28,7 +28,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 && 2', cflags => '-On');
 extern function main()
 {
     var a = 3 && 2;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -41,7 +41,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '1 && 0', cflags => '-On');
 extern function main()
 {
     var a = 1 && 0;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -54,7 +54,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '1 && invalid', cflags => '-
 extern function main()
 {
     var a = 1 && invalid;
-    
+
     Console.println(typeof a);
 }
 CODE
@@ -65,7 +65,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '0 && 2', cflags => '-On');
 extern function main()
 {
     var a = 0 && 2;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -78,7 +78,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '0 && 0', cflags => '-On');
 extern function main()
 {
     var a = 0 && 0;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -91,7 +91,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '0 && invalid', cflags => '-
 extern function main()
 {
     var a = 0 && invalid;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -104,7 +104,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'invalid && 2', cflags => '-
 extern function main()
 {
     var a = invalid && 2;
-    
+
     Console.println(typeof a);
 }
 CODE
@@ -115,7 +115,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'invalid && 0', cflags => '-
 extern function main()
 {
     var a = invalid && 0;
-    
+
     Console.println(typeof a);
 }
 CODE
@@ -126,7 +126,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'invalid && invalid', cflags
 extern function main()
 {
     var a = invalid && invalid;
-    
+
     Console.println(typeof a);
 }
 CODE
@@ -137,7 +137,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 || 2', cflags => '-On');
 extern function main()
 {
     var a = 3 || 2;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -150,7 +150,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '1 || 0', cflags => '-On');
 extern function main()
 {
     var a = 1 || 0;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -163,7 +163,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '1 || invalid', cflags => '-
 extern function main()
 {
     var a = 1 || invalid;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -176,7 +176,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '0 || 2', cflags => '-On');
 extern function main()
 {
     var a = 0 || 2;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -189,7 +189,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '0 || 0', cflags => '-On');
 extern function main()
 {
     var a = 0 || 0;
-    
+
     Console.println(a);
     Console.println(typeof a);
 }
@@ -202,7 +202,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', '0 || invalid', cflags => '-
 extern function main()
 {
     var a = 0 || invalid;
-    
+
     Console.println(typeof a);
 }
 CODE
@@ -213,7 +213,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'invalid || 2', cflags => '-
 extern function main()
 {
     var a = invalid || 2;
-    
+
     Console.println(typeof a);
 }
 CODE
@@ -224,7 +224,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'invalid || 0', cflags => '-
 extern function main()
 {
     var a = invalid || 0;
-    
+
     Console.println(typeof a);
 }
 CODE
@@ -235,7 +235,7 @@ language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'invalid || invalid', cflags
 extern function main()
 {
     var a = invalid || invalid;
-    
+
     Console.println(typeof a);
 }
 CODE

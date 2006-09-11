@@ -47,7 +47,7 @@ my $language = 'WMLScript';
 
 # Check that we have the WMLScript compiler.
 my $check = `wmlsc -h`;
-my $has_compiler = $check =~ /wmlsc/; 
+my $has_compiler = $check =~ /wmlsc/;
 unless ($has_compiler) {
     warn "You need the WMLScript compiler in your path to build the test assemblies.\n";
 }
@@ -80,7 +80,7 @@ else {
         elsif ( $current_dir eq $language ) {
             $dir = 't';
         }
-        if ($dir) { 
+        if ($dir) {
             @files = glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
             push @files, glob( File::Spec->catfile( $dir, '*.t' ) )
                 if ($has_compiler);

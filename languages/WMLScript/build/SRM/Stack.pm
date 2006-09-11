@@ -17,7 +17,7 @@ sub new {
 sub pre_translation {
     # We need to emit PIR that sets up a dummy stack.
     return <<'PIR';
-    ${INS} = concat <<"PIRCODE"
+    ${INS} = concat <<'PIRCODE'
   .local pmc reg0, reg1, reg2
   .local pmc s
   new s, .ResizablePMCArray

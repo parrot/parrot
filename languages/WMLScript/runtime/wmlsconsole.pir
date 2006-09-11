@@ -19,7 +19,7 @@ See "WMLScript Reference UP.SDK R4.B3 - October 1999".
 
 .sub 'getConsole'
     new $P0, .Hash
-    
+
     .const .Sub _console_print = '_console_print'
     $P0[0]  = _console_print
     .const .Sub _console_println = '_console_println'
@@ -58,7 +58,7 @@ Number or invalid.
 L1:
     new ret, .WmlsInvalid
 L2:
-    .return (ret)    
+    .return (ret)
 .end
 
 
@@ -92,7 +92,7 @@ Number or invalid.
 L1:
     new ret, .WmlsInvalid
 L2:
-    .return (ret)    
+    .return (ret)
 .end
 
 

@@ -22,7 +22,7 @@ See "WMLScript Standard Libraries Specification", section 7 "Lang".
 
 .sub 'getLang'
     new $P0, .Hash
-    
+
     .const .Sub _lang_abs = '_lang_abs'
     $P0[0]  = _lang_abs
     .const .Sub _lang_min = '_lang_min'
@@ -107,9 +107,9 @@ Compare the numbers to select the smaller one.
 =item *
 
 If the values are equal then the first value is selected.
-    
+
 =back
-    
+
 =head3 PARAMETERS
 
 value1 = Number
@@ -135,7 +135,7 @@ L1:
     $I0 = isa value2, 'WmlsString'
     unless $I0 goto L2
     $P2 = value2.'parseNumber'()
-L2:        
+L2:
     $P0 = isle $P1, $P2
     $I0 = isa $P0, 'WmlsInvalid'
     unless $I0 goto L3
@@ -203,7 +203,7 @@ L1:
     $I0 = isa value2, 'WmlsString'
     unless $I0 goto L2
     $P2 = value2.'parseNumber'()
-L2:        
+L2:
     $P0 = isge $P1, $P2
     $I0 = isa $P0, 'WmlsInvalid'
     unless $I0 goto L3
@@ -322,7 +322,7 @@ L1:
     new ret, .WmlsFloat
     set ret, $I0
     goto L2
-L3:    
+L3:
     new ret, .WmlsInvalid
 L2:
     .return (ret)
@@ -359,8 +359,8 @@ L1:
     $I0 = isa value, 'WmlsInvalid'
     unless $I0 goto L2
     new ret, .WmlsInvalid
-    .return (ret) 
-L2:                                             
+    .return (ret)
+L2:
     new ret, .WmlsBoolean
     $I0 = isa value, 'WmlsInteger'
     set ret, $I0
@@ -500,7 +500,7 @@ None (this function ends the interpretation).
     exit $I0
 L1:
     $I0 = value
-    exit $I0                                            
+    exit $I0
 .end
 
 
