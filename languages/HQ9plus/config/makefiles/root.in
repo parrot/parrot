@@ -3,7 +3,7 @@
 # Makefile for languages/HQ9plus
 
 # Setup of some commands
-PARROT         = ..@slash@..@slash@parrot@exe@
+PARROT         = ../../parrot@exe@
 PERL           = @perl@
 RM_RF          = @rm_rf@
 

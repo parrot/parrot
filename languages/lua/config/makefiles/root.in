@@ -1,16 +1,16 @@
 RM_F    = @rm_f@
 PERL    = @perl@
-PARROT  = ..@slash@..@slash@parrot@exe@
-PBC_MERGE = ..@slash@..@slash@pbc_merge@exe@
-PGE      = $(PARROT) ..@slash@..@slash@compilers@slash@pge@slash@pgc.pir
-TGE      = $(PARROT) ..@slash@..@slash@compilers@slash@tge@slash@tgc.pir
+PARROT  = ../../parrot@exe@
+PBC_MERGE = ../../pbc_merge@exe@
+PGE      = $(PARROT) ../../compilers/pge/pgc.pir
+TGE      = $(PARROT) ../../compilers/tge/tgc.pir
 
 LIBPATH  = lib
-BUILD    = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
+BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
 O        = @o@
 CLASSDIR = pmc
 LOAD_EXT = @load_ext@
-PARROT_DYNEXT = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 PMCS = \
  lua \
@@ -25,47 +25,47 @@ PMCS = \
  luauserdata
 
 PBCS = \
- $(LIBPATH)@slash@luabasic.pbc \
- $(LIBPATH)@slash@luacoroutine.pbc \
- $(LIBPATH)@slash@luapackage.pbc \
- $(LIBPATH)@slash@luastring.pbc \
- $(LIBPATH)@slash@luatable.pbc \
- $(LIBPATH)@slash@luamath.pbc \
- $(LIBPATH)@slash@luaio.pbc \
- $(LIBPATH)@slash@luaos.pbc \
- $(LIBPATH)@slash@luadebug.pbc \
- $(LIBPATH)@slash@luaaux.pbc
+ $(LIBPATH)/luabasic.pbc \
+ $(LIBPATH)/luacoroutine.pbc \
+ $(LIBPATH)/luapackage.pbc \
+ $(LIBPATH)/luastring.pbc \
+ $(LIBPATH)/luatable.pbc \
+ $(LIBPATH)/luamath.pbc \
+ $(LIBPATH)/luaio.pbc \
+ $(LIBPATH)/luaos.pbc \
+ $(LIBPATH)/luadebug.pbc \
+ $(LIBPATH)/luaaux.pbc
 
 GEN_PIR = \
- src@slash@lua51_grammar_gen.pir \
- src@slash@lua51_testlex_gen.pir \
- src@slash@dumplex_gen.pir
+ src/lua51_grammar_gen.pir \
+ src/lua51_testlex_gen.pir \
+ src/dumplex_gen.pir
 
 GEN_PBC = \
- src@slash@Lua51.pbc \
- src@slash@Lua51TestLex.pbc \
- src@slash@LuaDumpLex.pbc
+ src/Lua51.pbc \
+ src/Lua51TestLex.pbc \
+ src/LuaDumpLex.pbc
 
-all: pmcs $(PBCS) $(GEN_PBC) Lua@slash@parser.pm
+all: pmcs $(PBCS) $(GEN_PBC) Lua/parser.pm
 
-src@slash@lua51_grammar_gen.pir: src@slash@lua51.pg
-	$(PGE) --output=src@slash@lua51_grammar_gen.pir src@slash@lua51.pg
+src/lua51_grammar_gen.pir: src/lua51.pg
+	$(PGE) --output=src/lua51_grammar_gen.pir src/lua51.pg
 
-src@slash@Lua51.pbc: src@slash@Lua51.pir src@slash@lua51_grammar_gen.pir src@slash@parse.pir
-	$(PARROT) -o src@slash@Lua51.pbc --output-pbc src@slash@Lua51.pir
+src/Lua51.pbc: src/Lua51.pir src/lua51_grammar_gen.pir src/parse.pir
+	$(PARROT) -o src/Lua51.pbc --output-pbc src/Lua51.pir
 
 
-src@slash@lua51_testlex_gen.pir: src@slash@lua51_testlex.pg
-	$(PGE) --output=src@slash@lua51_testlex_gen.pir src@slash@lua51_testlex.pg
+src/lua51_testlex_gen.pir: src/lua51_testlex.pg
+	$(PGE) --output=src/lua51_testlex_gen.pir src/lua51_testlex.pg
 
-src@slash@Lua51TestLex.pbc: src@slash@lua51_testlex_gen.pir
-	$(PARROT) -o src@slash@Lua51TestLex.pbc --output-pbc src@slash@lua51_testlex_gen.pir
+src/Lua51TestLex.pbc: src/lua51_testlex_gen.pir
+	$(PARROT) -o src/Lua51TestLex.pbc --output-pbc src/lua51_testlex_gen.pir
 
-src@slash@dumplex_gen.pir: src@slash@dumplex.tg
-	$(TGE) --output=src@slash@dumplex_gen.pir src@slash@dumplex.tg
+src/dumplex_gen.pir: src/dumplex.tg
+	$(TGE) --output=src/dumplex_gen.pir src/dumplex.tg
 
-src@slash@LuaDumpLex.pbc: src@slash@dumplex_gen.pir
-	$(PARROT) -o src@slash@LuaDumpLex.pbc --output-pbc src@slash@dumplex_gen.pir
+src/LuaDumpLex.pbc: src/dumplex_gen.pir
+	$(PARROT) -o src/LuaDumpLex.pbc --output-pbc src/dumplex_gen.pir
 
 
 pmcs:
@@ -74,37 +74,37 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
-$(LIBPATH)@slash@luabasic.pbc: $(LIBPATH)@slash@luabasic.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luabasic.pbc $(LIBPATH)@slash@luabasic.pir
+$(LIBPATH)/luabasic.pbc: $(LIBPATH)/luabasic.pir
+	$(PARROT) --output=$(LIBPATH)/luabasic.pbc $(LIBPATH)/luabasic.pir
 
-$(LIBPATH)@slash@luacoroutine.pbc: $(LIBPATH)@slash@luacoroutine.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luacoroutine.pbc $(LIBPATH)@slash@luacoroutine.pir
+$(LIBPATH)/luacoroutine.pbc: $(LIBPATH)/luacoroutine.pir
+	$(PARROT) --output=$(LIBPATH)/luacoroutine.pbc $(LIBPATH)/luacoroutine.pir
 
-$(LIBPATH)@slash@luapackage.pbc: $(LIBPATH)@slash@luapackage.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luapackage.pbc $(LIBPATH)@slash@luapackage.pir
+$(LIBPATH)/luapackage.pbc: $(LIBPATH)/luapackage.pir
+	$(PARROT) --output=$(LIBPATH)/luapackage.pbc $(LIBPATH)/luapackage.pir
 
-$(LIBPATH)@slash@luastring.pbc: $(LIBPATH)@slash@luastring.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luastring.pbc $(LIBPATH)@slash@luastring.pir
+$(LIBPATH)/luastring.pbc: $(LIBPATH)/luastring.pir
+	$(PARROT) --output=$(LIBPATH)/luastring.pbc $(LIBPATH)/luastring.pir
 
-$(LIBPATH)@slash@luatable.pbc: $(LIBPATH)@slash@luatable.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luatable.pbc $(LIBPATH)@slash@luatable.pir
+$(LIBPATH)/luatable.pbc: $(LIBPATH)/luatable.pir
+	$(PARROT) --output=$(LIBPATH)/luatable.pbc $(LIBPATH)/luatable.pir
 
-$(LIBPATH)@slash@luamath.pbc: $(LIBPATH)@slash@luamath.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luamath.pbc $(LIBPATH)@slash@luamath.pir
+$(LIBPATH)/luamath.pbc: $(LIBPATH)/luamath.pir
+	$(PARROT) --output=$(LIBPATH)/luamath.pbc $(LIBPATH)/luamath.pir
 
-$(LIBPATH)@slash@luaio.pbc: $(LIBPATH)@slash@luaio.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luaio.pbc $(LIBPATH)@slash@luaio.pir
+$(LIBPATH)/luaio.pbc: $(LIBPATH)/luaio.pir
+	$(PARROT) --output=$(LIBPATH)/luaio.pbc $(LIBPATH)/luaio.pir
 
-$(LIBPATH)@slash@luaos.pbc: $(LIBPATH)@slash@luaos.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luaos.pbc $(LIBPATH)@slash@luaos.pir
+$(LIBPATH)/luaos.pbc: $(LIBPATH)/luaos.pir
+	$(PARROT) --output=$(LIBPATH)/luaos.pbc $(LIBPATH)/luaos.pir
 
-$(LIBPATH)@slash@luadebug.pbc: $(LIBPATH)@slash@luadebug.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luadebug.pbc $(LIBPATH)@slash@luadebug.pir
+$(LIBPATH)/luadebug.pbc: $(LIBPATH)/luadebug.pir
+	$(PARROT) --output=$(LIBPATH)/luadebug.pbc $(LIBPATH)/luadebug.pir
 
-$(LIBPATH)@slash@luaaux.pbc: $(LIBPATH)@slash@luaaux.pir
-	$(PARROT) --output=$(LIBPATH)@slash@luaaux.pbc $(LIBPATH)@slash@luaaux.pir
+$(LIBPATH)/luaaux.pbc: $(LIBPATH)/luaaux.pir
+	$(PARROT) --output=$(LIBPATH)/luaaux.pbc $(LIBPATH)/luaaux.pir
 
-Lua@slash@parser.pm: Lua@slash@lua51.yp
+Lua/parser.pm: Lua/lua51.yp
 	yapp -s -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp
 
 help:

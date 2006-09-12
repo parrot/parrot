@@ -515,10 +515,10 @@ INSTALLABLEPBCMERGE = $(CUR_DIR)/installable_pbc_merge$(EXE)
 INSTALLABLEPDB      = $(CUR_DIR)/installable_pdb$(EXE)
 
 # Libraries
-LIBPARROT_STATIC    = @blib_dir@@slash@@libparrot_static@
+LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
 #CONDITIONED_LINE(darwin):export DYLD_LIBRARY_PATH := @blib_dir@:$(DYLD_LIBRARY_PATH)
 #CONDITIONED_LINE(win32):LIBPARROT_SHARED  = @libparrot_shared@
-#INVERSE_CONDITIONED_LINE(win32):LIBPARROT_SHARED  = @blib_dir@@slash@@libparrot_shared@
+#INVERSE_CONDITIONED_LINE(win32):LIBPARROT_SHARED  = @blib_dir@/@libparrot_shared@
 
 # This line controls whether a static or shared library is built
 LIBPARROT           = @libparrot@

@@ -4,39 +4,39 @@
 LN_S     = @lns@
 PERL     = @perl@
 RM_RF    = @rm_rf@
-PARROT   = ..@slash@..@slash@parrot@exe@
-PGE_DIR   = ..@slash@..@slash@compilers@slash@pge
+PARROT   = ../../parrot@exe@
+PGE_DIR   = ../../compilers/pge
 CP       = @cp@
 
 # Where to put things
-PARROT_LIBRARY    = ..@slash@..@slash@runtime@slash@parrot@slash@library
+PARROT_LIBRARY    = ../../runtime/parrot/library
 
 # the default target
-all: $(PARROT_LIBRARY)@slash@TGE.pbc
+all: $(PARROT_LIBRARY)/TGE.pbc
 
-$(PARROT_LIBRARY)@slash@TGE.pbc: TGE.pbc
+$(PARROT_LIBRARY)/TGE.pbc: TGE.pbc
 	$(CP) TGE.pbc $(PARROT_LIBRARY)
 
-TGE.pbc: TGE.pir TGE@slash@Rule.pbc TGE@slash@Parser.pbc TGE@slash@Grammar.pbc TGE@slash@Compiler.pbc TGE@slash@Tree.pbc
+TGE.pbc: TGE.pir TGE/Rule.pbc TGE/Parser.pbc TGE/Grammar.pbc TGE/Compiler.pbc TGE/Tree.pbc
 	$(PARROT) -o TGE.pbc --output-pbc TGE.pir 
 
-TGE@slash@Rule.pbc: TGE@slash@Rule.pir
-	$(PARROT) -o TGE@slash@Rule.pbc --output-pbc TGE@slash@Rule.pir 
+TGE/Rule.pbc: TGE/Rule.pir
+	$(PARROT) -o TGE/Rule.pbc --output-pbc TGE/Rule.pir 
 
-TGE@slash@Tree.pbc: TGE@slash@Tree.pir
-	$(PARROT) -o TGE@slash@Tree.pbc --output-pbc TGE@slash@Tree.pir 
+TGE/Tree.pbc: TGE/Tree.pir
+	$(PARROT) -o TGE/Tree.pbc --output-pbc TGE/Tree.pir 
 
-TGE@slash@Grammar.pbc: TGE@slash@Grammar.pir
-	$(PARROT) -o TGE@slash@Grammar.pbc --output-pbc TGE@slash@Grammar.pir 
+TGE/Grammar.pbc: TGE/Grammar.pir
+	$(PARROT) -o TGE/Grammar.pbc --output-pbc TGE/Grammar.pir 
 
-TGE@slash@Compiler.pbc: TGE@slash@Compiler.pir
-	$(PARROT) -o TGE@slash@Compiler.pbc --output-pbc TGE@slash@Compiler.pir 
+TGE/Compiler.pbc: TGE/Compiler.pir
+	$(PARROT) -o TGE/Compiler.pbc --output-pbc TGE/Compiler.pir 
 
-TGE@slash@Parser.pbc: TGE@slash@Parser.pir
-	$(PARROT) -o TGE@slash@Parser.pbc --output-pbc TGE@slash@Parser.pir 
+TGE/Parser.pbc: TGE/Parser.pir
+	$(PARROT) -o TGE/Parser.pbc --output-pbc TGE/Parser.pir 
 
-TGE@slash@Parser.pir: TGE@slash@Parser.pg
-	$(PARROT) $(PGE_DIR)@slash@pgc.pir --output=TGE@slash@/Parser.pir TGE@slash@/Parser.pg
+TGE/Parser.pir: TGE/Parser.pg
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=TGE//Parser.pir TGE//Parser.pg
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -59,20 +59,20 @@ help:
 	@echo ""
 
 test: all
-	prove -r ..@slash@..@slash@t@slash@compilers@slash@tge
+	prove -r ../../t/compilers/tge
 
 testclean:
-	$(RM_RF) "..@slash@..@slash@t@slash@compilers@slash@tge@slash@*.pir"
+	$(RM_RF) "../../t/compilers/tge/*.pir"
 
 clean: testclean
 	$(RM_RF) TGE.pbc \
-	TGE@slash@Rule.pbc \
-	TGE@slash@Parser.pir \
-	TGE@slash@Parser.pbc \
-	TGE@slash@Tree.pbc \
-	TGE@slash@Grammar.pbc \
-	TGE@slash@Compiler.pbc \
-	$(PARROT_LIBRARY)@slash@TGE.pbc \
+	TGE/Rule.pbc \
+	TGE/Parser.pir \
+	TGE/Parser.pbc \
+	TGE/Tree.pbc \
+	TGE/Grammar.pbc \
+	TGE/Compiler.pbc \
+	$(PARROT_LIBRARY)/TGE.pbc \
 
 realclean: clean
 	$(RM_RF) Makefile

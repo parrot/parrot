@@ -1,4 +1,4 @@
-PARROT = ..@slash@..@slash@..@slash@parrot@exe@
+PARROT = ../../../parrot@exe@
 PARROT_ARRGS = --gc-debug
 
 default:
@@ -6,11 +6,11 @@ default:
 	@echo "to run an interactive tclsh, type 'make tclsh'"
 
 %:%.tcl
-	$(PARROT) $(PARROT_ARRGS)  ..@slash@tcl.pbc $@.tcl
+	$(PARROT) $(PARROT_ARRGS)  ../tcl.pbc $@.tcl
 
 tclsh:
-	$(PARROT) $(PARROT_ARRGS) ..@slash@tcl.pbc
+	$(PARROT) $(PARROT_ARRGS) ../tcl.pbc
 
 # (for development testing)
 test:
-	$(PARROT) -tf $(PARROT_ARRGS) ..@slash@tcl.pbc foo.tcl
+	$(PARROT) -tf $(PARROT_ARRGS) ../tcl.pbc foo.tcl

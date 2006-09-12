@@ -1,15 +1,15 @@
 RM_F    = @rm_f@
 PERL    = @perl@
-PARROT  = ..@slash@..@slash@parrot@exe@
+PARROT  = ../../parrot@exe@
 
-PMCBUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynpmc.pl
-OPSBUILD = $(PERL) @build_dir@@slash@tools@slash@build@slash@dynoplibs.pl
+PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
+OPSBUILD = $(PERL) @build_dir@/tools/build/dynoplibs.pl
 LIBPATH  = runtime
 PMCDIR   = pmc
 OPSDIR   = ops
 O        = @o@
 LOAD_EXT = @load_ext@
-PARROT_DYNEXT = @build_dir@@slash@runtime@slash@parrot@slash@dynext
+PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 SRM=Stack
 
@@ -22,68 +22,68 @@ PMCS = \
  wmlsbytecode
 
 PMC_FILES = \
- $(PMCDIR)@slash@wmlsinteger.pmc \
- $(PMCDIR)@slash@wmlsfloat.pmc \
- $(PMCDIR)@slash@wmlsstring.pmc \
- $(PMCDIR)@slash@wmlsboolean.pmc \
- $(PMCDIR)@slash@wmlsinvalid.pmc \
- $(PMCDIR)@slash@wmlsbytecode.pmc
+ $(PMCDIR)/wmlsinteger.pmc \
+ $(PMCDIR)/wmlsfloat.pmc \
+ $(PMCDIR)/wmlsstring.pmc \
+ $(PMCDIR)/wmlsboolean.pmc \
+ $(PMCDIR)/wmlsinvalid.pmc \
+ $(PMCDIR)/wmlsbytecode.pmc
 
-OPS_FILES = $(OPSDIR)@slash@wmls.ops
+OPS_FILES = $(OPSDIR)/wmls.ops
 
 OPSLIB    = wmls
 
 PBCS = \
- $(LIBPATH)@slash@wmlslang.pbc \
- $(LIBPATH)@slash@wmlsfloat.pbc \
- $(LIBPATH)@slash@wmlsstring.pbc \
- $(LIBPATH)@slash@wmlsconsole.pbc
+ $(LIBPATH)/wmlslang.pbc \
+ $(LIBPATH)/wmlsfloat.pbc \
+ $(LIBPATH)/wmlsstring.pbc \
+ $(LIBPATH)/wmlsconsole.pbc
 
 GEN_PIR = \
- src@slash@opcode.pir \
- src@slash@stdlibs.pir
+ src/opcode.pir \
+ src/stdlibs.pir
 
 all: \
- pmc@slash@wmls_group$(LOAD_EXT) \
- ops@slash@wmls_ops$(LOAD_EXT) \
- src@slash@WMLScript.pbc \
+ pmc/wmls_group$(LOAD_EXT) \
+ ops/wmls_ops$(LOAD_EXT) \
+ src/WMLScript.pbc \
  $(PBCS)
 
-pmc@slash@wmls_group$(LOAD_EXT) : $(PMC_FILES)
+pmc/wmls_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
-ops@slash@wmls_ops$(LOAD_EXT) : $(OPS_FILES)
+ops/wmls_ops$(LOAD_EXT) : $(OPS_FILES)
 	@cd $(OPSDIR) && $(OPSBUILD) generate $(OPSLIB)
 	@cd $(OPSDIR) && $(OPSBUILD) compile $(OPSLIB)
 	@cd $(OPSDIR) && $(OPSBUILD) linklibs $(OPSLIB)
 	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(PARROT_DYNEXT)" $(OPSLIB)
 
-src@slash@WMLScript.pbc: src@slash@WMLScript.pir \
- src@slash@script.pir src@slash@wmlsstdlibs.pir $(GEN_PIR)
-	$(PARROT) -o src@slash@WMLScript.pbc src@slash@WMLScript.pir
+src/WMLScript.pbc: src/WMLScript.pir \
+ src/script.pir src/wmlsstdlibs.pir $(GEN_PIR)
+	$(PARROT) -o src/WMLScript.pbc src/WMLScript.pir
 
-src@slash@opcode.pir: src@slash@translation.rules build@slash@translator.pl \
- build@slash@SRM@slash@Stack.pm build@slash@SRM@slash@Register.pm
+src/opcode.pir: src/translation.rules build/translator.pl \
+ build/SRM/Stack.pm build/SRM/Register.pm
 	$(PERL) build/translator.pl --output src/opcode.pir --srm $(SRM) \
 	  src/translation.rules
 
-src@slash@stdlibs.pir: src@slash@wmlslibs.cfg build@slash@stdlibs.pl
+src/stdlibs.pir: src/wmlslibs.cfg build/stdlibs.pl
 	$(PERL) build/stdlibs.pl --output src/stdlibs.pir src/wmlslibs.cfg
 
-$(LIBPATH)@slash@wmlslang.pbc: $(LIBPATH)@slash@wmlslang.pir
-	$(PARROT) --output=$(LIBPATH)@slash@wmlslang.pbc $(LIBPATH)@slash@wmlslang.pir
+$(LIBPATH)/wmlslang.pbc: $(LIBPATH)/wmlslang.pir
+	$(PARROT) --output=$(LIBPATH)/wmlslang.pbc $(LIBPATH)/wmlslang.pir
 
-$(LIBPATH)@slash@wmlsfloat.pbc: $(LIBPATH)@slash@wmlsfloat.pir
-	$(PARROT) --output=$(LIBPATH)@slash@wmlsfloat.pbc $(LIBPATH)@slash@wmlsfloat.pir
+$(LIBPATH)/wmlsfloat.pbc: $(LIBPATH)/wmlsfloat.pir
+	$(PARROT) --output=$(LIBPATH)/wmlsfloat.pbc $(LIBPATH)/wmlsfloat.pir
 
-$(LIBPATH)@slash@wmlsstring.pbc: $(LIBPATH)@slash@wmlsstring.pir
-	$(PARROT) --output=$(LIBPATH)@slash@wmlsstring.pbc $(LIBPATH)@slash@wmlsstring.pir
+$(LIBPATH)/wmlsstring.pbc: $(LIBPATH)/wmlsstring.pir
+	$(PARROT) --output=$(LIBPATH)/wmlsstring.pbc $(LIBPATH)/wmlsstring.pir
 
-$(LIBPATH)@slash@wmlsconsole.pbc: $(LIBPATH)@slash@wmlsconsole.pir
-	$(PARROT) --output=$(LIBPATH)@slash@wmlsconsole.pbc $(LIBPATH)@slash@wmlsconsole.pir
+$(LIBPATH)/wmlsconsole.pbc: $(LIBPATH)/wmlsconsole.pir
+	$(PARROT) --output=$(LIBPATH)/wmlsconsole.pbc $(LIBPATH)/wmlsconsole.pir
 
 help:
 	@echo ""

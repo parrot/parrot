@@ -1,6 +1,6 @@
 RM_F = @rm_f@
 PERL = @perl@
-PARROT = ..@slash@..@slash@parrot@exe@
+PARROT = ../../parrot@exe@
 
 all: build
 

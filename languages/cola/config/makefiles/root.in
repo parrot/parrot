@@ -1,7 +1,7 @@
 #
 # Makefile for languages/cola
 #
-PARROT  = ..@slash@..@slash@parrot@exe@
+PARROT  = ../../parrot@exe@
 PERL    = @perl@
 RM_F    = @rm_f@
 RM_RF   = @rm_rf@

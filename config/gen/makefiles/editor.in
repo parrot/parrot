@@ -50,7 +50,7 @@ vim-install: pir.vim
 imc.kate: imcc.xml
 
 imcc.xml:
-	$(PERL) kate_syntax.pl '..@slash@' > imcc.xml
+	$(PERL) kate_syntax.pl '../' > imcc.xml
 
 vim-uninstall:
 	$(RM_F) "$(VIM_SYN_DIR)/pir.vim"
