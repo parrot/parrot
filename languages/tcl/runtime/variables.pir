@@ -186,10 +186,10 @@ other than the default, and multiple interpreters.
   # ends with )
   .local int char
   char = ord name, -1
-  if char != 41 goto create_scalar
+  if char != 41 goto scalar
   # contains a (
   char = index name, '('
-  if char == -1 goto create_scalar
+  if char == -1 goto scalar
 
 find_array:
   .local string var
@@ -231,12 +231,22 @@ cant_set_not_array:
   $S0 .= name
   $S0 .= "\": variable isn't array"
   tcl_error $S0
-  
+
+scalar:
+  $P0 = __find_var(name)
+  if null $P0 goto create_scalar
+  $I0 = does $P0, 'hash'
+  if $I0 goto cant_set_array
+
 create_scalar:
   __store_var(name, value)
-
-return_scalar:
   .return(value)
+
+cant_set_array:
+  $S0 =  "can't set \""
+  $S0 .= name
+  $S0 .= "\": variable is array"
+  tcl_error $S0
 .end
 
 =head2 _Tcl::__find_var
