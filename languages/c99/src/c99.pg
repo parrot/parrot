@@ -1,5 +1,5 @@
 #taken from n869.pdf
-#google for n869
+#google for n869.pdf
 
 ## A.1 Lexical grammar
 grammar C99;
@@ -46,9 +46,10 @@ token keyword {
 }
 
 ## A.1.3 Identifiers
-token identifier { <identifier_nondigit> [ <identifier_nondigit> | \d ]* }
+#token identifier { <identifier_nondigit> [ <identifier_nondigit> | \d ]* }
+token identifier { <identifier_nondigit> [ <identifier_nondigit> | <digit> ]* }
 
-token identifier_nondigit { <[a..zA..Z_]> | <universal_character_name> }
+token identifier_nondigit { <alpha+[_]> | <universal_character_name> }
 
 ## A.1.4 Universal character names
 token universal_character_name {
@@ -71,7 +72,8 @@ token integer_constant {
   ] <integer_sufffix>?
 }
 
-token decimal_constant     { <[1..9]> \d*       }
+token decimal_constant     { <[1..9]> <digit>   }
+#token decimal_constant     { <[1..9]> \d*       }
 token octal_constant       { 0 <[0..7]>+        }
 token hexadecimal_constant { 0 <[xX]> <xdigit>+ }
 
@@ -81,20 +83,21 @@ token integer_suffix {
 }
 
 token floating_constant {
-  <decimal_floating_constant>
-  |<hexadecimal_floating_constant>
+  | <decimal_floating_constant>
+  | <hexadecimal_floating_constant>
 }
 
 token decimal_floating_constant {
-  <fractional_constant> <exponent_part>? <floating_suffix>?
-  <digit_sequence> <exponent_part> <floating_suffix>?
+  [ <fractional_constant> <exponent_part>?
+  | <digit_sequence> <exponent_part> 
+  ] <floating_suffix>?
 }
 
 token hexadecimal_floating_constant {
-  | <hexadecimal_prefix> <hexadecimal_fractional_constant>
-      <binary_exponent_part> <floating_suffix>
-  | <hexadecimal_prefix> <hexadecimal_digit_constant>
-      <binary_exponent_part> <floating_suffix>
+  <hexadecimal_prefix> 
+  [ <hexadecimal_fractional_constant>
+  | <hexadecimal_digit_constant>
+  ] <binary_exponent_part> <floating_suffix>?
 }
 
 token fractional_constant {
@@ -106,11 +109,12 @@ token exponent_part {
   <[eE]> <[\+\-]>? <digit_sequence>
 }
 
-token digit_sequence { \d+ }
+#token digit_sequence { \d+ }
+token digit_sequence { <digit>+ }
 
 token hexadecimal_fractional_constant {
-  <hexadecimal_digit_sequence>? \. <hexadecimal_digit_sequence>
-  |<hexadecimal_digit_sequence>? \.
+  | <hexadecimal_digit_sequence>? \. <hexadecimal_digit_sequence>
+  | <hexadecimal_digit_sequence> \.
 }
 
 token binary_exponent_part {
@@ -133,12 +137,13 @@ token escape_sequence {
   | <octal_digit>**[1..3]
   | x <xdigit>+
   | <universal_character_name>
+  ]
 }
 
 ## A.1.6 String literals
 token string_literal { <[L]>? " <s_char>* " }
 
-token s_char { <-[\\"\n]> | <escape_sequence> }
+token s_char { <-["\\\n]> | <escape_sequence> }
 
 ## A.1.7 Punctuators
 token punctuator {
@@ -163,14 +168,9 @@ token h_char { <-[\n>]> }
 token q_char { <-[\n"]> }
 
 ## A.1.9 Preprocessing numbers
-## XXX: i think this one is wrong
-token pp_number {
-  \.? \d+
-  [ <[eEpP]> <[\+\-]> | <identifer_nondigit> | \. | \d ]?
-}
+token pp_number { \.? \d [ \d | <identifer_nondigit> | <[eEpP]> <[\+\-]> | \. ]* }
 
 ## A.2 Phrase structure grammar
-## A.2.1 Expressions
 ## XXX: see below
 
 ## A.2.2 Declarations
@@ -219,20 +219,20 @@ rule declarator { <pointer>? <direct_declarator> }
 rule direct_declarator {
   [ <identifier> | \( <declarator> \) ]
   [
-    \[ <assignment_expression>? \]
+    | \[ <assignment_expression>? \]
     | \[ \* \]
     | \( <parameter_type_list> \)
     | \( <identifier_list>? \)
   ]*
 }
 
-rule pointer { [\* <type_qualifier>+ ]+ }
+rule pointer { [\* <type_qualifier>* ]+ }
 
-rule parameter_type_list { <parameter_declaration> [, <parameter_declaration> ]* [, \.\.\.]? }
+rule parameter_type_list { <parameter_declaration> [ , <parameter_declaration> ]* [ , <'...'>]? }
 
-rule parameter_declaration { <declaration_specifiers> [<declarator> | <abstract_declatator> ]? }
+rule parameter_declaration { <declaration_specifiers> [ <declarator> | <abstract_declatator> ]? }
 
-rule identifier_list { <identifier> [, <identifier>]* }
+rule identifier_list { <identifier> [ , <identifier> ]* }
 
 rule type_name { <specifier_qualifier_list> <abstract_declatator>? }
 
@@ -243,7 +243,7 @@ rule abstract_declatator {
 
 rule direct_abstract_declarator {
   [
-    \( <abstract_declatator> \) 
+    | \( <abstract_declatator> \) 
     | \[ <assignment_expression>? \]
     | \( <parameter_type_list> \) 
   ] 
@@ -251,8 +251,8 @@ rule direct_abstract_declarator {
 }
 
 rule direct_abstract_declarator_1 {
-  \[ <assignment_expression>? \]
-  |\[ * \]
+  | \[ <assignment_expression>? \]
+  | \[ * \]
   | \( <parameter_type_list> \)
 }
 
@@ -265,17 +265,18 @@ rule initializer_list { <designation>? <initializer> [, <designation>? <initiali
 rule designation { <designator>+ = }
 
 rule designator { 
-  \[ <constant_expression> \]
+  | \[ <constant_expression> \]
   | \. <identifier>
 }
 
+## A.2.3 Statements
 rule statement {
-  <labeled_statement>
-  |<compound_statement>
-  |<expression_statement>
-  |<selection_statement>
-  |<iteration_statement>
-  |<jump_statement>
+  | <labeled_statement>
+  | <compound_statement>
+  | <expression_statement>
+  | <selection_statement>
+  | <iteration_statement>
+  | <jump_statement>
 }
 
 rule labeled_statement {
@@ -285,19 +286,19 @@ rule labeled_statement {
   ] <statement>
 }
 
-rule compound_statement { \{ [<declaration>|<statement>]* \} }
+rule compound_statement { \{ [ <declaration> | <statement> ]* \} }
 
 rule expression_statement { <expression>? ; }
 
 rule selection_statement {
-  if \( <expresssion> \) <statement> [else <statement>]?
+  | if \( <expresssion> \) <statement> [else <statement>]?
   | switch \( <expression> \) <statement>
 }
 
 rule iteration_statement {
-  while \( <expression> \) <statement>
-  |do <statement> while \( <expression> \) ;
-  |for \( [ <expression>? ; <expression>? ; <expression>? | <declaration> <expression>? ; <expression>? ] \) <statement>
+  | while \( <expression> \) <statement>
+  | do <statement> while \( <expression> \) ;
+  | for \( [ <expression>? ; <expression>? ; <expression>? | <declaration> <expression>? ; <expression>? ] \) <statement>
 }
 
 rule jump_statement {
@@ -307,25 +308,30 @@ rule jump_statement {
   | return <expression>? ;
 }
 
-rule translation_unit { [<function_definition> | <declaration> ]+ }
+
+## A.2.4 External definitions
+rule translation_unit { [ <function_definition> | <declaration> ]+ }
 
 rule function_definition { <declaration_specifiers> <declarator> <declaration>* <compound_statement> }
 
+
+## A.3 preprocessing directives
 rule prereprocessing_file { <group> }
 
 rule group {
   [ <pp_tokens>? <newline>
   | <if_section>
   | <control_line>
-  ]*
+  ]+ 
 }
 
-rule if_section { <if_group> <elif_group>* <else_group> <endif_line> }
+rule if_section { <if_group> <elif_group>* <else_group>? <endif_line> }
 
 rule if_group {
-  \# if <constant_expression> <new_line> <group>?
-  |\# ifdef <identifer> <new_line> <group>?
-  |\# ifndef <identifier> <new_line> <group>?
+  [ \# if <constant_expression>
+  | \# ifdef <identifer>
+  | \# ifndef <identifier> 
+  ] <new_line> <group>?
 }
 
 rule elif_group { \# elif <constant_expression> <new_line> <group>? }
@@ -333,22 +339,26 @@ rule else_group { \# else <new_line> <group>? }
 rule endif_line { \# endif <newl_line> }
 
 rule control_line {
-  \# include <pp_tokens> <newl_line>
-  |\# define [ 
-    <identifier>
-    | <identifier_p> [ <identifier_list>? [, \.\.\.]? | [ \.\.\.] ] \) 
+  | \# include <pp_tokens> <newl_line>
+  | \# define
+    [ <identifier>
+    | <identifier_p> [ <identifier_list> [, \.\.\.]? | [ \.\.\.] ]? \) 
     ] <pp_tokens>? <newl_line>
-  |\# undefine <identifier_> <newl_line>
-  |\# line <pp_tokens> <newl_line>
-  |\# error <pp_tokens>? <newl_line>
-  |\# pragma <pp_tokens>? <newl_line>
-  |\# <newl_line>
+  | \# undefine <identifier_> <newl_line>
+  | \# line <pp_tokens> <newl_line>
+  | \# error <pp_tokens>? <newl_line>
+  | \# pragma <pp_tokens>? <newl_line>
+  | \# <newl_line>
 }
+
+token identifier_p { <identifier> \( }
 
 rule pp_tokens { <preprocessing_token>+ }
 
 token new_line { \n }
 
+
+## A.2.1 Expressions
 token primary_expression {
   | <identifier>
   | <constant>
