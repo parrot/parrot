@@ -243,6 +243,12 @@ error_defined:
     print "Nonlinear attribute: you have two or more ways to "
     print "assign a value to the attribute '"
     print name
+    print "' on node type '"
+    $S1 = typeof node
+    print $S1
+    print "' with rule name '"
+    $P4 = getattribute rule, "action"
+    print $P4
     print "' near grammar line "
     $P7 = getattribute rule, "line"
     print $P7
