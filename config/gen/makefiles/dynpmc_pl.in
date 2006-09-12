@@ -192,7 +192,7 @@ sub gather_groups_and_libs {
  
         # there can be many libs
         my %libs = %{ $class->{flags}{lib} || {} };
-        if ($^O eq 'MSWin32') {
+        if ($^O eq 'MSWin32' && $CC =~ /^gcc/i) {
             my %newlibs = ();
             $newlibs{"lib$_"} = $libs{$_} for keys %libs;
             %libs = %newlibs;
