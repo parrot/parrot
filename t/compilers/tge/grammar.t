@@ -6,8 +6,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 
 use Test::More;
-use Parrot::Test tests => 2;
-
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -263,6 +262,58 @@ after transform, the value of the left-most leaf is: 1
 before transform, the value of the right-most leaf is: 9
 after transform, the value of the right-most leaf is: 1
 OUT
+
+
+TODO: {
+local $TODO = "unresolved bug";
+
+pir_output_is(<<'CODE', <<'OUT', 'two rules of the same name can apply to the same node, when called with a different dummy type');
+
+.sub _main :main
+    load_bytecode 'TGE.pbc'
+
+    # Load the grammar in a string
+    .local string source
+    source = <<'GRAMMAR'
+    grammar TreeMin is TGE::Grammar;
+
+    transform tiddlywinks (ROOT) :language('PIR') { 
+        say 'in tiddlywinks'
+        tree.'get'('twister', node, 'pingpong')
+        tree.'get'('twister', node, 'pongpong')
+    }
+    transform twister (pingpong) :language('PIR') { 
+        say 'in first twister'
+    }
+    transform twister (pongpong) :language('PIR') { 
+        say 'in second twister'
+    }
+GRAMMAR
+
+
+    .local object testing
+    testing = new .Hash
+
+    # Compile a grammar from the source 
+    .local pmc grammar
+    $P1 = new 'TGE::Compiler'
+    grammar = $P1.'compile'(source)
+
+    # Apply the grammar to the test tree
+    .local pmc AGI
+    AGI = grammar.apply(testing)
+
+    # Retrieve the value of a top level attribute
+    $P4 = AGI.get('tiddlywinks')
+    end
+.end
+
+CODE
+in tiddlywinks
+in first twister
+in second twister
+OUT
+}
 
 =head1 AUTHOR
 
