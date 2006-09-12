@@ -82,12 +82,13 @@ escape:
   $P0 = new .String
   $P0 = $S0
   
-  $P0.'replace'("\\", "\\\\")
-  $P0.'replace'('}', "\\}")
-  $P0.'replace'('{', "\\{")
-  $P0.'replace'(' ', "\\ ")
-  $P0.'replace'(']', "\\]")
-  $P0.'replace'('"', "\\\"")
+  $P0.'replace'('\', '\\')
+  $P0.'replace'('}', '\}')
+  $P0.'replace'('{', '\{')
+  $P0.'replace'(' ', '\ ')
+  $P0.'replace'('[', '\[')
+  $P0.'replace'(']', '\]')
+  $P0.'replace'('"', '\"')
   
   $S0 = $P0 
   goto append_elem
