@@ -35,6 +35,7 @@ transform root (ROOT) :language('PIR') {
 
     $P0 = new .Undef
     self.'post_scope_stack'($P0)
+    $P0 = new .Undef
     self.'past_scope_stack'($P0)
 
     .local pmc hll
@@ -61,8 +62,37 @@ transform root (ROOT) :language('PIR') {
     op = new 'Cardinal::POST::Op'
     op.'init'("'languages/cardinal/src/builtins_gen.pir'", 'node'=>node, 'name'=>'load_bytecode')
 
+    .local pmc BEGIN_blocks
+    BEGIN_blocks = new 'Cardinal::POST::Ops'
+    BEGIN_blocks.'init'('node'=>node)
+    .local pmc iter
+    .local pmc blocks 
+    blocks = self.'push_BEGIN_block'()
+    iter = new .Iterator, blocks
+  iter_loop:
+    unless iter, iter_end
+      shift $P1, iter
+      BEGIN_blocks.'add_child'($P1)
+      goto iter_loop
+  iter_end:
+
+    .local pmc END_blocks
+    END_blocks = new 'Cardinal::POST::Ops'
+    END_blocks.'init'('node'=>node)
+    blocks = self.'push_END_block'()
+    iter = new .Iterator, blocks
+    set iter, .ITERATE_FROM_END
+  iter_loop1:
+    unless iter, iter_end1
+      pop $P1, iter
+      END_blocks.'add_child'($P1)
+      goto iter_loop1
+  iter_end1:
+
+    main.'add_child'(BEGIN_blocks)
     main.'add_child'(op)
     main.'add_child'(call_op)
+    main.'add_child'(END_blocks)
     ops.'add_child'($P0)
     .return (ops)
 }
@@ -103,13 +133,14 @@ transform post (Cardinal::PAST::Sub) :language('PIR') {
 transform post (Cardinal::PAST::Block) :language('PIR') {
     .local string name, blocktype
     name = node.'name'()
+
     blocktype = node.'blocktype'()
     if name > '' goto with_name
     name = concat '_', blocktype
     name = node.'unique'(name)
   with_name:
-    .local pmc outerpost, outerpast
 
+    .local pmc outerpost, outerpast
     outerpost = self.'post_scope_stack'()
     outerpast = self.'past_scope_stack'()
 
@@ -139,9 +170,17 @@ transform post (Cardinal::PAST::Block) :language('PIR') {
     self.'post_scope_stack'(outerpost)
     self.'past_scope_stack'(outerpast)
     
-    ##   For immediate blocks, generate code to execute the block.
-    $S0 = node.'blocktype'()
-    if $S0 != 'immediate' goto end
+    .local pmc call_op
+    call_op = new 'Cardinal::POST::Call'
+    call_op.'init'('node'=>node, 'name'=>name)
+
+    unless blocktype == 'BEGIN' goto not_begin
+    self.'push_BEGIN_block'(call_op)
+  not_begin:
+    unless blocktype == 'END' goto not_end
+    self.'push_END_block'(call_op)
+  not_end:
+    unless blocktype == 'immediate' goto end
     $P0 = post
     post = post.'new'('Cardinal::POST::Ops', $P0, 'node'=>node)
     post.'add_child_new'('Cardinal::POST::Op', post, 'name'=>$P0, 'node'=>node)
@@ -408,6 +447,40 @@ transform loop (Cardinal::PAST::Op) :language('PIR') {
     exprpost = tree.'get'('post', exprpast)
     ops.'add_child'(exprpost)
     ops.'add_child_new'('Cardinal::POST::Op', exprpost, loopendlabel, 'name'=>newopname)
+
+    bodypost = tree.'get'('post', bodypast)
+    ops.'add_child'(bodypost)
+    ops.'add_child_new'('Cardinal::POST::Op', looplabel, 'name'=>'goto')
+    ops.'add_child'(loopendlabel)
+    .return (ops)
+}
+
+transform post (Cardinal::PAST::WhileUntil) :language('PIR') {
+    .local pmc ops
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local string opname
+    .local string newopname
+    opname = node.'name'()
+    newopname = 'unless'
+    unless opname == 'until' goto its_a_while
+    newopname = 'if'
+    its_a_while:
+
+    .local pmc testpast, bodypast
+    .local pmc testpost, bodypost
+    testpast = node[0]
+    bodypast = node[1]
+
+    .local pmc looplabel, loopendlabel
+    looplabel = ops.'new'('Cardinal::POST::Label', 'name'=>'loop')
+    loopendlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'loop_end')
+
+    ops.'add_child'(looplabel)
+    testpost = tree.'get'('post', testpast)
+    ops.'add_child'(testpost)
+    ops.'add_child_new'('Cardinal::POST::Op', testpost, loopendlabel, 'name'=>newopname)
 
     bodypost = tree.'get'('post', bodypast)
     ops.'add_child'(bodypost)

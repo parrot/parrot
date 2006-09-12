@@ -45,6 +45,7 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     $P0 = subclass base, 'Cardinal::PAST::Stmts'
     $P0 = subclass base, 'Cardinal::PAST::Sub'
     $P0 = subclass base, 'Cardinal::PAST::FunctionCall'
+    $P0 = subclass base, 'Cardinal::PAST::WhileUntil'
 
     $P0 = subclass base, 'Cardinal::PAST::Val'
     addattribute $P0, 'valtype'

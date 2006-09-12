@@ -42,19 +42,19 @@ rule expression {<operator_precedence_parser>}
 rule expression_term {<assignment>}
 
 rule assignment {
-          <left_hand_side> (<'='>) [<command_call>|<expression>|<multiple_right_hand_side>|<expression> <'rescue'> <expression>]
-          |<multiple_left_hand_side> (<'='>) [<command_call>|<expression>|<multiple_right_hand_side>]
+          <left_hand_side> (<'='>) [<expression>|<multiple_right_hand_side>|<expression> <'rescue'> <expression>|<command_call>]
+          |<multiple_left_hand_side> (<'='>) [|<expression>|<multiple_right_hand_side>|<command_call>]
 
           #|<left_hand_side <ASSIGN_OP> [<command_call>|<expression>]
 
-          |<variable> <ASSIGN_OP> [<command_call>|<expression>]
+          |<variable> <ASSIGN_OP> [<expression>|<command_call>]
 
           |<atom> [
-                    [\[ <call_args>? \] |\. [<IDENTIFIER>|<CONSTANT>]] <ASSIGN_OP> [<command_call>|<expression>]
-                    |\:\: <IDENTIFIER> <ASSIGN_OP> <command_call>
-                    |\:\: [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> <expression>]
+                    [\[ <call_args>? \] |\. [<IDENTIFIER>|<CONSTANT>]] <ASSIGN_OP> [<expression>|<command_call>]
+                    |\:\: [<IDENTIFIER>|<CONSTANT>] <ASSIGN_OP> <expression>
+                    |\:\: <IDENTIFIER> <ASSIGN_OP> <command_call>]
 
-          |<back_reference> <ASSIGN_OP> [<command_call>|<expression>]
+          |<back_reference> <ASSIGN_OP> [<expression>|<command_call>]
 
           |\:\: <CONSTANT> <ASSIGN_OP> <expression>
 
@@ -295,7 +295,7 @@ rule atom { <literal>
           |<variable>
 }
 
-rule lang_statements {
+rule lang_statements { 
           |<'return'>
           |<'break'> 
           |<'next'>
@@ -308,11 +308,11 @@ rule lang_statements {
           |\-\> <lambda>
           |$<begin>:=<'begin'> <body_statement> <'end'>
           |<if_clause>
-          |<'unless'> <expression> <then_clause> <compound_statement> <else_clause>? <'end'>
-          |<'while'> <expression> <'do'>? <compound_statement> <'end'>
-          |<'until'> <expression> <'do'>? <compound_statement> <'end'>
-          |<'case'> <?terminators>? <expression> <?terminator>? [<WHEN> <expression> <then_clause> <compound_statement>]+ <else_clause>? <'end'>
-          |<'for'> <for_variable> <'in'> <expression> <compound_statement> <'end'>
+          |$<unless>:=<'unless'> <expression> <then_clause> <compound_statement> <else_clause>? <'end'>
+          |$<while_until>:=<'while'> <expression> <'do'>? <compound_statement> <'end'>
+          |$<while_until>:=<'until'> <expression> <'do'>? <compound_statement> <'end'>
+          |$<case>:=<'case'> <?terminators>? <expression> <?terminator>? [<WHEN> <expression> <then_clause> <compound_statement>]+ <else_clause>? <'end'>
+          |$<for>:=<'for'> <for_variable> <'in'> <expression> <compound_statement> <'end'>
           |$<class>:=<'class'> <class_path> <superclass> <'do'>? <body_statement> <'end'>
           |$<class2>:=<'class'> \<\< <expression> <term> <body_statement> <'end'>
           |$<module>:=<'module'> <class_path> <body_statement> <'end'>

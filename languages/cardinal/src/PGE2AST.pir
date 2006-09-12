@@ -2,6 +2,7 @@
 
 .include 'languages/cardinal/src/preamble'
 .include 'languages/cardinal/src/ASTGrammar.pir'
+.include "iterator.pasm"
 
 .sub '__onload' :load
     $I0 = find_type 'Cardinal::ASTGrammar'
@@ -86,28 +87,28 @@ error:
     end
 .end
 
-.include "iterator.pasm"
-
 .sub 'variable_scope' :method
     .param pmc name
     .local pmc value
     .local pmc stack
     .local pmc block
     .local pmc vdecl
+    .local pmc iter
+    .local int scope_depth
 
     stack = self.'scope_stack'()
-    new $P0, .Iterator, stack
-    set $P0, .ITERATE_FROM_END
-    $I1 = 0
+    new iter, .Iterator, stack
+    set iter, .ITERATE_FROM_END
+    scope_depth = 0
   iter_loop:
-    $I1 += 1
-    unless $P0, iter_end
-    pop block, $P0
+    scope_depth += 1
+    unless iter, iter_end
+    pop block, iter
     vdecl = block.'vardecl'(name)
     if_null vdecl, iter_loop
     $I0 = isa vdecl, 'Cardinal::PAST::Var'
     unless $I0 goto not_var
-    unless $I1 == 1 goto not_local
+    unless scope_depth == 1 goto not_local
     .return ('local')
   not_local:
     .return ('outer')

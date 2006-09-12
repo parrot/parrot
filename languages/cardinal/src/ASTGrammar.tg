@@ -258,12 +258,7 @@ transform result (Cardinal::Grammar::expression) :language('PIR') {
     unless $I0 goto err_no_tree
     $P0 = node['operator_precedence_parser']
     child = tree.get('result', $P0, 'Cardinal::Grammar::operator_precedence_parser')
-
-    .local pmc result 
-    result = new 'Cardinal::PAST::Exp'
-    result.'init'('node'=>node)
-    result.'add_child'(child) 
-    .return (result)
+    .return (child)
 
   err_no_tree:
     print "The expression node doesn't contain a 'operator_precedence_parser' match.\n"
@@ -681,9 +676,52 @@ transform result (Cardinal::Grammar::lang_statements) :language('PIR') {
   
   try_if_clause:
     $I0 = defined node['if_clause']
-    unless $I0 goto try_def
+    unless $I0 goto try_while_until_statement
     $P0 = node['if_clause']
     child = tree.get('result', $P0, 'Cardinal::Grammar::if_clause')
+    .return (child)
+
+  try_while_until_statement:
+    .local pmc test
+    .local pmc body
+    .local pmc result
+
+    $I0 = defined node['while_until']
+    unless $I0 goto while_err_no_tree
+    $P0 = node['while_until']
+    $S0 = $P0
+
+    result = new 'Cardinal::PAST::WhileUntil'
+    result.'init'('node'=>node, 'name'=>$S0)
+  
+    $I0 = defined node['expression']
+    unless $I0 goto while_err_no_tree
+    $P0 = node['expression']
+    test = tree.get('result', $P0, 'Cardinal::Grammar::expression')
+    result.add_child(test)
+
+    $I0 = defined node['compound_statement']
+    unless $I0 goto while_err_no_tree
+    $P0 = node['compound_statement']
+    body = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
+    result.add_child(body)
+
+    .return (result)             
+  
+  while_err_no_tree:
+    print "The while or until node doesn't contain an appropriate match.\n"
+    .kdump2(node, "while_statement")
+    end
+
+#    $I0 = defined node['while_until']
+#    unless $I0 goto try_for_statement
+#    child = tree.get('result', node, 'Cardinal::Grammar::while_until_statement')
+#    .return (child)
+
+  try_for_statement:
+    $I0 = defined node['for']
+    unless $I0 goto try_def
+    child = tree.get('result', node, 'Cardinal::Grammar::for')
     .return (child)
 
   try_def:
@@ -776,6 +814,74 @@ transform result (Cardinal::Grammar::lang_statements) :language('PIR') {
   err_no_tree:
     print "The lang_statements node doesn't contain an appropriate match.\n"
     .kdump2(node, "lang_statements")
+    end
+}
+
+transform result (Cardinal::Grammar::while_until_statement) :language('PIR') {
+    .local pmc test
+    .local pmc body
+    .local pmc result
+
+    $I0 = defined node['while_until']
+    unless $I0 goto err_no_tree
+    $P0 = node['while_until']
+    $S0 = $P0
+
+    result = new 'Cardinal::PAST::WhileUntil'
+    result.'init'('node'=>node, 'name'=>$S0)
+  
+    $I0 = defined node['expression']
+    unless $I0 goto err_no_tree
+    $P0 = node['expression']
+    test = tree.get('result', $P0, 'Cardinal::Grammar::expression')
+    result.add_child(test)
+
+    $I0 = defined node['compound_statement']
+    unless $I0 goto err_no_tree
+    $P0 = node['compound_statement']
+    body = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
+    result.add_child(body)
+
+    .return (result)             
+  
+  err_no_tree:
+    print "The while or until node doesn't contain an appropriate match.\n"
+    .kdump2(node, "while_statement")
+    end
+}
+
+transform result (Cardinal::Grammar::for_statement) :language('PIR') {
+    .local pmc var
+    .local pmc test
+    .local pmc body
+    .local pmc result
+
+    result = new 'Cardinal::PAST::For'
+    result.'init'('node'=>node)
+  
+    $I0 = defined node['for_variable']
+    unless $I0 goto err_no_tree
+    $P0 = node['for_variable']
+    var = tree.get('result', $P0, 'Cardinal::Grammar::for_variable')
+    result.add_child(var)
+
+    $I0 = defined node['expression']
+    unless $I0 goto err_no_tree
+    $P0 = node['expression']
+    test = tree.get('result', $P0, 'Cardinal::Grammar::expression')
+    result.add_child(test)
+
+    $I0 = defined node['compound_statement']
+    unless $I0 goto err_no_tree
+    $P0 = node['compound_statement']
+    body = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
+    result.add_child(body)
+
+    .return (result)             
+  
+  err_no_tree:
+    print "The while or until node doesn't contain an appropriate match.\n"
+    .kdump2(node, "while_statement")
     end
 }
 
@@ -1377,6 +1483,7 @@ transform result (Cardinal::Grammar::CLASS_VARIABLE) :language('PIR') {
 
 transform op (expr) :language('PIR') {
     .local pmc result
+    .local string type
     $S1 = node["type"]
     result = new 'Cardinal::PAST::Op'
     result.'init'('node'=>node, 'name'=>$S1)
@@ -1388,10 +1495,19 @@ transform op (expr) :language('PIR') {
   iter_loop:
     unless iter, iter_end
     shift $P2, iter
-    $P3 = tree.get('term', $P2, 'expr')
-    if null $P3 goto iter_loop
-    result.'add_child'($P3)
-    goto iter_loop
+    
+    type = $P2["type"]
+    if type == 'term:' goto transform_term
+      # else
+      $P3 = tree.get('op', $P2, 'expr')
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
+    transform_term:
+      $P3 = tree.get('term', $P2, 'expr')
+      if null $P3 goto iter_loop
+      result.'add_child'($P3)
+      goto iter_loop
   iter_end:
 
     .return (result)
@@ -1425,6 +1541,7 @@ transform term (expr) :language('PIR') {
 
   err_too_many:
     print "error: Currently, 'term' nodes should have only one child.\n"
+    .kdump2(node, 'term')
     end
 }
 
