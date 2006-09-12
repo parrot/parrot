@@ -24,50 +24,66 @@
   command  = pop argv
   command  = __script(command)
 
-  .local int max_elems
-  max_elems = 0
+  .local int iterations
+  iterations = 0
   .local pmc iter
   iter = new .Iterator, argv
 arg_loop:
   unless iter goto arg_done
 
-  $P0 = shift iter
-  $P0 = __list($P0)
-  $I0 = elements $P0
+  .local pmc varList, list
+  varList = shift iter
+  varList = __list(varList)
+  list    = shift iter
+  list    = __list(list)
+
+  $I0 = elements varList
   if $I0 == 0 goto bad_varlist
-  push varLists, $P0
 
-  $P0 = shift iter
-  $P0 = __list($P0)
-  push lists, $P0
+  $I1 = elements list
+  $N0 = $I0
+  $N1 = $I1
+  $N0 = $N1 / $N0
+  $I0 = ceil $N0
 
-  $I0 = elements $P0
-  if max_elems >= $I0 goto arg_loop
-  max_elems = $I0
+  list = new .Iterator, list
+  push varLists, varList
+  push lists, list
+  
+  if $I0 <= iterations goto arg_loop
+  iterations = $I0
   goto arg_loop
 arg_done:
 
-  .local int iteration
+ .local int iteration
   iteration = -1
 next_iteration:
   inc iteration
-  if iteration >= max_elems goto done
+  if iteration >= iterations goto done
   
   .local int counter, elems
   counter = -1
   elems   = elements varLists
-next_variable:
+next_varList:
   inc counter
   if counter >= elems goto execute_command
 
-  .local string varname
-  .local pmc value
+  .local pmc varList, list
+  varList = varLists[counter]
+  list    = lists[counter]
 
-  varname = varLists[counter]
-  $P0 = lists[counter]
-  $I1 = elements $P0
-  if $I1 <= iteration goto empty_var
-  value = $P0[iteration]
+  $I0 = -1
+  $I1 = elements varList
+next_variable:
+  inc $I0
+  if $I0 >= $I1 goto next_varList
+
+  .local string varname
+  varname = varList[$I0]
+
+  .local pmc value
+  unless list goto empty_var
+  value = shift list
   value = clone value
   push_eh couldnt_set
     __set(varname, value)
@@ -75,10 +91,10 @@ next_variable:
   goto next_variable
 
 empty_var:
-  $P0 = new .TclString
-  $P0 = ''
+  value = new .TclString
+  value = ''
   push_eh couldnt_set
-    __set(varname, $P0)
+    __set(varname, value)
   clear_eh
   goto next_variable
  

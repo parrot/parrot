@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 14
+plan 15
 
 eval_is {foreach} \
   {wrong # args: should be "foreach varList list ?varList list ...? command"} \
@@ -80,3 +80,10 @@ eval_is {
 eval_is {
   foreach name {a b c d} { aputs }
 } {invalid command name "aputs"} {inner exception}
+
+is [
+    set x {}
+    foreach {c n} {a 1 b 2 c} {append x "$c = $n;"}
+    set x
+] {a = 1;b = 2;c = ;} \
+  {multiple index variables}
