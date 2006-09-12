@@ -32,6 +32,8 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
 
 =head1 Class HTTP; Daemon
 
+A HTTP server class.
+
 =head2 Functions
 
 =over
@@ -93,7 +95,8 @@ at the pio.
 
 =item __init(args)
 
-Object initializer, takes a hash argument to intialize attributes.
+Object initializer, takes a hash argument to initialize attributes,
+which are:
 
 =over
 
@@ -487,10 +490,16 @@ serve_get:
     conn.'send_file_response'(file)
 .end
 
+=back
+
+=cut
+
 
 .namespace ['HTTP'; 'Daemon'; 'ClientConn']
 
-=head1 Class HTTP; Daemon
+=head1 Class HTTP; Daemon; ClientConn
+
+A class abstracting client connections.
 
 =head2 Methods
 
@@ -628,6 +637,11 @@ Send the response back to the client. Argument is a response object.
 Slurp the C<url> and send the response back to the client.
 TODO doc CGI urls.
 
+=item check_cgi(url)
+
+Check if a request url is a CGI request. If yes, return the reulst of the
+CGI invocation.
+
 =cut
 
 .sub 'send_response' :method
@@ -749,9 +763,20 @@ SERVE_404:
 
 =item to_string
 
-=item urldecode
+Doomed.
+
+=item urldecode(s)
+
+Return %-unescaped string of url string.
 
 =item hex_to_int
+
+Called from above to convert a hex string to integer.
+
+=item make_query_hash
+
+Split a query string at '+' and return a hash of foo=bar items.
+The hash keys and values are urldecoded already.
 
 =cut
 
@@ -867,13 +892,37 @@ next_item:
 
 =back
 
+.namespace ['HTTP'; 'Message']
+
 =head1 Class HTTP;Message
 
-TBD
+Base class for Request and Response Messages.
+
+=head2 Methods
+
+=over
+
+=item __init()
+
+Create a new Message object.
+
+=item headers()
+
+Return an OrderedHash of message headers.
+
+=item content(?s?)
+
+Set or get the message contents.
+
+=item parse(s)
+
+Parse the given request string into C<header> and C<content>
+attributes of the Message object.
+
+=back
 
 =cut
 
-.namespace ['HTTP'; 'Message']
 .sub __init :method
     $P0 = new .OrderedHash
     setattribute self, 'headers', $P0
@@ -943,14 +992,31 @@ set_content:
 done:
 .end
 
+.namespace ['HTTP'; 'Request']
 
-=head1 Class HTTP;Request
+=head1 Class HTTP;Request isa HTTP;Message
 
-TBD
+Handles client requests.
+
+=head2 Methods
+
+=over
+
+=item method()
+
+Return the request method. Currently just 'GET' or '' is returned.
+
+=item __get_bool()
+
+Returns true, if the request has at least one header.
+
+=item uri()
+
+Return the uri of the request.
+
+=back
 
 =cut
-
-.namespace ['HTTP'; 'Request']
 
 .sub 'method' :method
     .local pmc hdrs
@@ -981,23 +1047,18 @@ no_get:
 
 .namespace ['HTTP'; 'Response']
 
-.sub 'header' :method
-    .param pmc init   :slurpy :named
-    .local pmc it, hdrs
-    hdrs = getattribute self, 'headers'
-    it = iter init
-loop:
-    unless it goto ex
-    $S0 = shift it
-    if $S0 != 'code' goto other
-    self.'code'($S0)
-    goto loop
-other:
-    $P0 = init[$S0]
-    hdrs[$S0] = $P0
-    goto loop
-ex:
-.end
+=head1 Class HTTP;Response isa HTTP;Message
+
+=head2 Methods
+
+=over
+
+=item code(c)
+
+Create initial code response line. This has to be called first to
+crate header response items.
+
+=cut
 
 .sub 'code' :method
     .param string ccc 
@@ -1026,6 +1087,39 @@ fin:
     hdrs[0] = line
 .end
 
+=item header(h => v, ...)
+
+Append the given keyed items to the response headers. 
+
+XXX shall this be actually push_header?
+
+=cut
+
+.sub 'header' :method
+    .param pmc init   :slurpy :named
+    .local pmc it, hdrs
+    hdrs = getattribute self, 'headers'
+    it = iter init
+loop:
+    unless it goto ex
+    $S0 = shift it
+    if $S0 != 'code' goto other
+    self.'code'($S0)
+    goto loop
+other:
+    $P0 = init[$S0]
+    hdrs[$S0] = $P0
+    goto loop
+ex:
+.end
+
+=item as_string()
+
+Return stringified version of the response object, ready for returning
+to client.
+
+=cut
+
 .sub 'as_string' :method
     .local pmc hdrs, content, it
     .local string line, k, v
@@ -1051,4 +1145,4 @@ done:
     .return (line)
 .end
 
-
+=back
