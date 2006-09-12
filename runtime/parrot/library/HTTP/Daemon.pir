@@ -30,6 +30,23 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
 
 =cut
 
+=head1 Class HTTP; Daemon
+
+=head2 Functions
+
+=over
+
+=item _onload
+
+Called from I<load_bytecode> to create used classes.
+
+=item req_handler(pio, conn)
+
+Called from the asynchronous select code, when data are ready to read
+at the pio.
+
+=cut
+
 .sub '_onload' :load
     .local pmc cl
     # server clsass
@@ -67,6 +84,38 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
 .const string CRCR     = "\r\r"
 
 .include "stat.pasm"
+
+=back
+
+=head2 Methods
+
+=over
+
+=item __init(args)
+
+Object initializer, takes a hash argument to intialize attributes.
+
+=over
+
+=item LocalPort
+
+Port number to listen.
+
+=item LocalAddr
+
+Address name or IP number to listen.
+
+=item debug
+
+Turn on internal diagnostic messages, printed to stderr.
+
+=item parrot-docs
+
+Redirect to and serve files from F<docs/html>.
+
+=back
+
+=cut
 
 .sub __init :method
     .param pmc args
@@ -120,6 +169,20 @@ err_sock:
     setattribute self, 'socket', $P0
 .end
 
+=item socket()
+
+Get connected server socket.
+
+=item opts()
+
+Get server options.
+
+=item url(?init?)
+
+Get or set server url, aka document root
+
+=cut
+
 .sub 'socket' :method
     $P0 = getattribute self, 'socket'
     .return ($P0)
@@ -129,6 +192,7 @@ err_sock:
     $P0 = getattribute self, 'opts'
     .return ($P0)
 .end
+
 .sub 'url' :method
     .param string doc_root :optional
     .param int has_dr      :opt_flag
@@ -139,6 +203,27 @@ err_sock:
 set_it:
     $P0 = doc_root
 .end
+
+=item __get_bool()
+
+Vtable method, called from the C<if> or C<unless> opcode. Returns
+true, if the daemon object is listening on a socket, that is if the
+initialization went ok.
+
+=cut
+
+.sub '__get_bool' :method
+    $P0 = getattribute self, 'socket'
+    $I0 = istrue $P0
+    .return ($I0)
+.end
+
+
+=item run()
+
+Main server runloop.
+
+=cut
 
 .sub 'run' :method
     print "running\n"
@@ -154,6 +239,13 @@ loop:
 
 # === server utils
 
+=item _write_logs()
+
+Called from server runloop. Write log files (currently to stdout
+only).
+
+=cut
+
 .sub '_write_logs' :method
     .local pmc to_log
     to_log = getattribute self, 'to_log'
@@ -166,11 +258,12 @@ loop:
 ex:
 .end
 
-.sub '__get_bool' :method
-    $P0 = getattribute self, 'socket'
-    $I0 = istrue $P0
-    .return ($I0)
-.end
+=item debug(...)
+
+If debugging is on, concat passed arguments and write that string to
+stderr.
+
+=cut
 
 .sub 'debug' :method
     .param pmc args :slurpy
@@ -188,6 +281,12 @@ do_debug:
     res = sprintf fmt, args
     printerr res	
 .end
+
+=item log(...)
+
+Concat passed arguments and schedule the string for logging.
+
+=cut
 
 .sub 'log' :method
     .param pmc args :slurpy
@@ -213,7 +312,13 @@ do_debug:
 
 # === connection handling
 
-# add select event to all active pios
+=item _select_active()
+
+Create a select event for all active connections. Called from server
+runnloop.
+
+=cut
+
 .sub '_select_active' :method
     .local pmc active, conn, sock
     .local int i, n
@@ -229,6 +334,13 @@ add_lp:
     inc i
     if i < n goto add_lp
 .end
+
+=item _del_stale_conns()
+
+Not yet used method to delete old connections for the active set.
+Called from server runnloop.
+
+=cut
 
 .sub '_del_stale_conns' :method
     .local int n, now, last
@@ -253,6 +365,25 @@ keep_it:
     goto loop
 done:
 .end
+
+=item new_conn(pio)
+
+Add C<pio> to the list of active connections.
+
+
+=item accept_conn()
+
+Accept a new connection and call C<new_conn> on the accepted socket.
+
+=item del_conn(conn)
+
+Delete connection from the active list
+
+=item exists_conn(conn)
+
+Return true, if the given connection is already active.
+
+=cut
 
 # add coket to active connections
 .sub 'new_conn' :method
@@ -324,6 +455,7 @@ yes:
     .return (1)
 .end
 
+
 # reguest handler sub - not a method
 # this is called from the async select code, i.e from the event
 # subsystem
@@ -358,6 +490,18 @@ serve_get:
 
 .namespace ['HTTP'; 'Daemon'; 'ClientConn']
 
+=head1 Class HTTP; Daemon
+
+=head2 Methods
+
+=over
+
+=item __init(pio)
+
+Create a new connection object with the given socket pio.
+
+=cut
+
 .sub __init :method
     .param pmc sock
     setattribute self, 'socket', sock
@@ -369,13 +513,26 @@ serve_get:
     setattribute self, 'time_stamp', $P0
 .end
 
+=item socket()
+
+Get connection socket.
+
 # get socket
 .sub 'socket' :method
     $P0 = getattribute self, 'socket'
     .return ($P0)
 .end
 
-# get/set server
+=item server(?srv?)
+
+Get or set server object.
+
+=item timestamp(?ticks?)
+
+Get or set the timestamp of this connection.
+
+=cut
+
 .sub 'server' :method
     .param pmc sv      :optional
     .param int has_sv  :opt_flag
@@ -397,7 +554,13 @@ set_it:
     $P0 = ts
 .end
 
-# read client request, return Request obj
+=item get_request
+
+Read client request, return Request obj. Currently only C<GET> is
+supported.
+
+=cut
+
 .sub 'get_request' :method
 
     .local pmc srv, req
@@ -415,6 +578,11 @@ set_it:
     .return (req)
 .end
 
+=item _read
+
+Internal method to read from the client. It returns a request string.
+
+=cut
 
 .sub '_read' :method
     .local int res, do_close, pos
@@ -450,6 +618,17 @@ done:
     $P0 = do_close
     .return (req)
 .end
+
+=item send_respons(resp)
+
+Send the response back to the client. Argument is a response object.
+
+=item send_file_respons(url)
+
+Slurp the C<url> and send the response back to the client.
+TODO doc CGI urls.
+
+=cut
 
 .sub 'send_response' :method
     .param pmc resp
@@ -562,6 +741,20 @@ SERVE_404:
     goto DONE
 .end
 
+=back
+
+=head2 Utility functions
+
+=over
+
+=item to_string
+
+=item urldecode
+
+=item hex_to_int
+
+=cut
+
 # util functions
 .sub to_string
     .param pmc args :slurpy
@@ -672,6 +865,13 @@ next_item:
     .return (query_hash)
 .end
 
+=back
+
+=head1 Class HTTP;Message
+
+TBD
+
+=cut
 
 .namespace ['HTTP'; 'Message']
 .sub __init :method
@@ -742,6 +942,13 @@ set_content:
 
 done:
 .end
+
+
+=head1 Class HTTP;Request
+
+TBD
+
+=cut
 
 .namespace ['HTTP'; 'Request']
 
