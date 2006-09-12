@@ -79,8 +79,9 @@ loop_error:
   .local string exception_msg
   .get_message(exception_msg)
   # Are we just missing a close-foo?
-  if exception_msg == 'missing close-brace' goto input_loop_continue2
-  if exception_msg == "missing quote"       goto input_loop_continue2
+  if exception_msg == 'missing close-brace'   goto input_loop_continue2
+  if exception_msg == 'missing close-bracket' goto input_loop_continue2
+  if exception_msg == "missing quote"         goto input_loop_continue2
   
 loop_error_real:
   .get_stacktrace($S0)
