@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is("tcl",<<'TCL', <<'OUT',"all");
@@ -83,4 +83,13 @@ language_output_is("tcl", <<'TCL', <<'OUT', '" in []s in ""s in [expr]');
 puts [expr {4*"[llength "]"]"}]
 TCL
 4
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', '\n after last command');
+puts [
+    set x {}
+    set x 3
+]
+TCL
+3
 OUT

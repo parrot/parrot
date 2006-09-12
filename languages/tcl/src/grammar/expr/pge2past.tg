@@ -115,7 +115,14 @@ variable_substitution:
 
 command_substitution:
     node = $P0
-    goto dispatch
+    $P0 = node['subcommand']
+    unless null $P0 goto program
+
+    # we have an empty command substitution []
+    $P0 = new 'PAST::Val'
+    $P0['class'] = 'TclConst'
+    $P0['value'] = ''
+    .return($P0)
 
 nested:
     .return tree.get('past', $P0, 'nested')

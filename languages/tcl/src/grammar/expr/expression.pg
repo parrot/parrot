@@ -34,7 +34,8 @@ token quoted_word {
 token braced_word { <PGE::Text::bracketed: {}> }
 
 token command_substitution {
-    \[ <[;\n\r\t ]>* <subcommand> [ <?ws> <[\n;]> <?ws> <subcommand>? ]* [ \] | <error: missing close-bracket> ]
+    \[ \]
+  | \[ <[;\n\r\t ]>* <subcommand> [ <?ws> <[\n;]> <?ws> <subcommand>? ]* [ \] | <error: missing close-bracket> ]
 }
 
 token subcommand {
@@ -43,7 +44,7 @@ token subcommand {
                  | <braced_word>
                  | $<chunk>:=( <substitution> | \$ | <-[[$\]\\;\n\r\t ]>+ )+
                  ) \h*
-      ]*
+      ]+
 }
 
 token variable_substitution {
