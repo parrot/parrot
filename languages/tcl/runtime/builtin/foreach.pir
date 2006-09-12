@@ -69,13 +69,17 @@ next_variable:
   if $I1 <= iteration goto empty_var
   value = $P0[iteration]
   value = clone value
-  __set(varname, value)
+  push_eh couldnt_set
+    __set(varname, value)
+  clear_eh
   goto next_variable
 
 empty_var:
   $P0 = new .TclString
   $P0 = ''
-  __set(varname, $P0)
+  push_eh couldnt_set
+    __set(varname, $P0)
+  clear_eh
   goto next_variable
  
   # Loop until all elements are consumed. If any of the lists that were
@@ -99,6 +103,12 @@ handle_continue:
  
 done:
   .return('')
+
+couldnt_set:
+  $S0 =  "couldn't set loop variable: \""
+  $S0 .= varname
+  $S0 .= "\""
+  tcl_error $S0
 
 bad_args:
   tcl_error 'wrong # args: should be "foreach varList list ?varList list ...? command"'

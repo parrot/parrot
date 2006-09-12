@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 13
+plan 14
 
 eval_is {foreach} \
   {wrong # args: should be "foreach varList list ?varList list ...? command"} \
@@ -15,6 +15,13 @@ eval_is {foreach {} {a b c} {puts foo}} \
   {foreach varlist is empty} \
   {empty varList}
 
+eval_is {
+    array set a {}
+    foreach a {1 2 3 4} {puts $a}
+} {couldn't set loop variable: "a"} \
+  {couldn't set loop variable}
+
+unset -nocomplain a
 is [foreach a {1 2 3 4} {set a}] {} {return value}
 
 eval_is {
