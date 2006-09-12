@@ -47,6 +47,7 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
     addattribute cl, 'socket'	# the connected pio
     addattribute cl, 'server'	# whom are we working for
     addattribute cl, 'close'	# needs closing after req is handled
+    addattribute cl, 'time_stamp'  # timestamp for timeout
 
     # TODO split into new file, if more mature
     cl = newclass ['HTTP'; 'Message']
@@ -104,11 +105,7 @@ Leopold Toetsch <lt@toetsch.at> - some code based on httpd.pir.
     if res == -1 goto err_listen
 
     # add connection
-    $I0 = find_type ['HTTP'; 'Daemon'; 'ClientConn']
-    .local pmc conn
-    conn = new $I0, sock
-    conn.'server'(self)
-    push active, conn
+    self.'new_conn'(sock)
     .return()
 
 err_listen:    
@@ -147,6 +144,7 @@ set_it:
     print "running\n"
 
 loop:
+    ## self.'_del_stale_conns'()
     self.'_select_active'()
     # while idle dump the logfile
     self.'_write_logs'()
@@ -159,11 +157,9 @@ loop:
 .sub '_write_logs' :method
     .local pmc to_log
     to_log = getattribute self, 'to_log'
-    .local int n
 loop:
     # log can fill, while we are running here
-    n = elements to_log
-    unless n goto ex
+    unless to_log goto ex
     $S0 = shift to_log
     print $S0
     goto loop
@@ -229,21 +225,53 @@ add_lp:
     conn = active[i]
     sock = conn.'socket'()
     add_io_event sock, req_handler, conn, 2	# XXX magic 2
+    ## self.'debug'('**select ', i, "\n")
     inc i
     if i < n goto add_lp
 .end
 
-# accept new connection and add to active
-.sub 'new_conn' :method
-    .local pmc active, orig, work, conn
+.sub '_del_stale_conns' :method
+    .local int n, now, last
+    .local pmc active, conn, sock
+
+    now = time 
     active = getattribute self, 'active'
-    orig   = getattribute self, 'socket'
-    accept work, orig
+    n = elements active
+    dec n
+loop:
+    unless n goto done
+    conn = active[n]
+    last = conn.'time_stamp'()
+    $I0 = now - last
+    if $I0 < 10 goto keep_it	# TODO ops var
+    sock = conn.'socket'()
+    close sock
+    delete active[n]
+    self.'debug'('del stale conn ', n, "\n")
+keep_it:
+    dec n
+    goto loop
+done:
+.end
+
+# add coket to active connections
+.sub 'new_conn' :method
+    .param pmc sock
+    .local pmc active, conn
+    active = getattribute self, 'active'
     $I0 = find_type ['HTTP'; 'Daemon'; 'ClientConn']
-    conn = new $I0, work
+    conn = new $I0, sock
     conn.'server'(self)
     push active, conn
-    self.'debug'("accept new conn\n")
+    self.'debug'("new conn\n")
+.end
+
+# accept new connection and add to active
+.sub 'accept_conn' :method
+    .local pmc orig, work
+    orig   = getattribute self, 'socket'
+    accept work, orig
+    self.'new_conn'(work)
 .end
 
 # remove work from active connections and close it
@@ -308,7 +336,7 @@ yes:
     srv = conn.'server'()
     $I0 = srv.'exists_conn'(conn)
     if $I0 goto do_read
-    .return srv.'new_conn'()
+    .return srv.'accept_conn'()
 
 do_read:    
     req = conn.'get_request'()
@@ -330,11 +358,54 @@ serve_get:
 
 .namespace ['HTTP'; 'Daemon'; 'ClientConn']
 
+.sub __init :method
+    .param pmc sock
+    setattribute self, 'socket', sock
+    $P0 = new .Boolean
+    setattribute self, 'close', $P0
+    $P0 = new .Integer
+    time $I0
+    $P0 = $I0
+    setattribute self, 'time_stamp', $P0
+.end
+
+# get socket
+.sub 'socket' :method
+    $P0 = getattribute self, 'socket'
+    .return ($P0)
+.end
+
+# get/set server
+.sub 'server' :method
+    .param pmc sv      :optional
+    .param int has_sv  :opt_flag
+    if has_sv goto set_it
+    sv = getattribute self, 'server'
+    .return (sv)
+set_it:
+    setattribute self, 'server', sv
+.end
+
+# get/set timestamp
+.sub 'time_stamp' :method
+    .param int ts      :optional
+    .param int has_ts  :opt_flag
+    $P0 = getattribute self, 'time_stamp'
+    if has_ts goto set_it
+    .return ($P0)
+set_it:
+    $P0 = ts
+.end
+
+# read client request, return Request obj
 .sub 'get_request' :method
 
     .local pmc srv, req
     .local string req_str
 
+    .local int now
+    now = time
+    self.'time_stamp'(now)
     srv = self.'server'()
     srv.'debug'("reading from work\n")
     req_str = self.'_read'()
@@ -343,6 +414,7 @@ serve_get:
     req.'parse'(req_str)
     .return (req)
 .end
+
 
 .sub '_read' :method
     .local int res, do_close, pos
@@ -598,28 +670,6 @@ next_item:
     inc i
     if i < n goto lp_items
     .return (query_hash)
-.end
-
-.sub __init :method
-    .param pmc sock
-    setattribute self, 'socket', sock
-    $P0 = new .Boolean
-    setattribute self, 'close', $P0
-.end
-
-.sub 'socket' :method
-    $P0 = getattribute self, 'socket'
-    .return ($P0)
-.end
-
-.sub 'server' :method
-    .param pmc sv      :optional
-    .param int has_sv  :opt_flag
-    if has_sv goto set_it
-    sv = getattribute self, 'server'
-    .return (sv)
-set_it:
-    setattribute self, 'server', sv
 .end
 
 
