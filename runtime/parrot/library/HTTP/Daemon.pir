@@ -1056,7 +1056,7 @@ no_get:
 =item code(c)
 
 Create initial code response line. This has to be called first to
-crate header response items.
+create header response items.
 
 =cut
 
