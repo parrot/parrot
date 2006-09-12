@@ -41,49 +41,6 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
     $P0 = getclass 'PGE::Grammar'
     $P1 = subclass $P0, 'PunieGrammar'
 
-    .local pmc optable
-    .local pmc term
-    $I0 = find_type "PGE::OPTable"
-    optable = new $I0
-    store_global "PunieGrammar", "$optable", optable
-
-    optable.newtok('infix:+', 'precedence'=>'=')
-    optable.newtok("infix:-", 'equiv'=>"infix:+")
-    optable.newtok("infix:.", 'equiv'=>"infix:+")
-    optable.newtok("infix:*", 'tighter'=>"infix:+")
-    optable.newtok("infix:/", 'equiv'=>"infix:*")
-    optable.newtok("infix:%", 'equiv'=>"infix:*")
-    optable.newtok("infix:x", 'equiv'=>"infix:*")
-
-    optable.newtok("infix:<<", 'looser'=>"infix:+")
-    optable.newtok("infix:>>", 'equiv'=>"infix:<<")
-
-    optable.newtok("infix:<",  'looser'=>"infix:<<", 'assoc'=>'non')
-    optable.newtok("infix:>",  'equiv'=>"infix:<", 'assoc'=>'non')
-    optable.newtok("infix:<=", 'equiv'=>"infix:<", 'assoc'=>'non')
-    optable.newtok("infix:>=", 'equiv'=>"infix:<", 'assoc'=>'non')
-    optable.newtok("infix:lt", 'equiv'=>"infix:<", 'assoc'=>'non')
-    optable.newtok("infix:gt", 'equiv'=>"infix:<", 'assoc'=>'non')
-    optable.newtok("infix:le", 'equiv'=>"infix:<", 'assoc'=>'non')
-    optable.newtok("infix:ge", 'equiv'=>"infix:<", 'assoc'=>'non')
-
-    optable.newtok("infix:==", 'looser'=>"infix:<", 'assoc'=>'non')
-    optable.newtok("infix:!=", 'equiv'=>"infix:==", 'assoc'=>'non')
-    optable.newtok("infix:eq", 'equiv'=>"infix:==", 'assoc'=>'non')
-    optable.newtok("infix:ne", 'equiv'=>"infix:==", 'assoc'=>'non')
-
-    optable.newtok("infix:&", 'looser'=>"infix:==", 'assoc'=>'left')
-    optable.newtok("infix:|", 'looser'=>"infix:&",  'assoc'=>'left')
-    optable.newtok("infix:^", 'equiv'=>"infix:|",   'assoc'=>'left')
-
-    optable.newtok("infix:&&", 'looser'=>"infix:|",  'assoc'=>'left')
-    optable.newtok("infix:||", 'looser'=>"infix:&&", 'assoc'=>'left')
-
-    optable.newtok("infix:=",  'looser'=>"infix:||")
-
-    term = find_global "PunieGrammar", "term"
-    optable.newtok("term:", 'tighter'=>"infix:+", 'parsed'=>term)
-
 .end
 
 # Pull in the compiled grammar

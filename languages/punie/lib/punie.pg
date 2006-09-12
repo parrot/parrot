@@ -59,3 +59,38 @@ token ws {
     | \# \N*
     ]*
 }
+
+proto infix:+ is precedence('=') {...}
+proto infix:- is equiv('infix:+') {...}
+proto infix:. is equiv('infix:+') {...}
+proto infix:* is tighter('infix:+') {...}
+proto infix:/ is equiv('infix:*') {...}
+proto infix:% is equiv('infix:*') {...}
+proto infix:x is equiv('infix:*') {...}
+
+proto infix:<< is looser('infix:+') {...}
+proto infix:>> is equiv('infix:<<') {...}
+
+proto infix:<  is looser('infix:<<') is assoc('non') {...}
+proto infix:>  is equiv('infix:<')   is assoc('non') {...}
+proto infix:<= is equiv('infix:<')   is assoc('non') {...}
+proto infix:>= is equiv('infix:<')   is assoc('non') {...}
+proto infix:lt is equiv('infix:<')   is assoc('non') {...}
+proto infix:gt is equiv('infix:<')   is assoc('non') {...}
+proto infix:le is equiv('infix:<')   is assoc('non') {...}
+proto infix:ge is equiv('infix:<')   is assoc('non') {...}
+
+proto infix:== is looser('infix:<') is assoc('non') {...}
+proto infix:!= is equiv('infix:==') is assoc('non') {...}
+proto infix:eq is equiv('infix:==') is assoc('non') {...}
+proto infix:ne is equiv('infix:==') is assoc('non') {...}
+
+proto infix:& is looser('infix:==') is assoc('left') {...}
+proto infix:| is looser('infix:&')  is assoc('left') {...}
+proto infix:^ is equiv('infix:|')   is assoc('left') {...}
+
+proto infix:&& is looser('infix:|')  is assoc('left') {...}
+proto infix:|| is looser('infix:&&') is assoc('left') {...}
+
+proto infix:= is looser('infix:||') {...}
+proto term: is tighter('infix:+') is parsed(&term) { ... }
