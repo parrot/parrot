@@ -29,8 +29,17 @@ select_elem:
 
   $P0 = argv[$I0]
   .local pmc indices
-  indices = __list($P0)
-  
+  push_eh not_a_list
+    indices = __list($P0)
+  clear_eh
+  goto select
+
+not_a_list:
+  indices = new .FixedPMCArray
+  indices = 1
+  indices[0] = $P0
+
+select:
   .local int index
   .local int elems
   elems = elements indices

@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 9
+plan 10
 
 is [lindex {}] {} {no list, no indices}
 is [lindex {a b c}] {a b c} {list, no indices}
@@ -18,3 +18,7 @@ eval_is {lindex} \
 eval_is {lindex a bogus} \
   {bad index "bogus": must be integer?[+-]integer? or end?[+-]integer?} \
   {non numeric index}
+
+eval_is {lindex {1 2 3} \{} \
+  "bad index \"{\": must be integer?\[+-]integer? or end?\[+-]integer?" \
+  {try bad lists as indices}
