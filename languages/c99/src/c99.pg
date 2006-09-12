@@ -7,8 +7,8 @@ grammar C99;
 ## A.1.1 Lexical elements
 rule ws {
   | \s+
-  | <'//'> <-[\n]>* \n
-  | <'/*'> [<-[\*]>|<[\*]><-[\/]>]* <'*/'>
+  | <'//'> \N* \n
+  | <'/*'> .*? <'*/'>
 }
 
 rule c99_token {
@@ -76,10 +76,8 @@ token octal_constant       { 0 <[0..7]>+        }
 token hexadecimal_constant { 0 <[xX]> <xdigit>+ }
 
 token integer_suffix {
-  | <[uU]> <[lL]>?
-  | <[uU]> [ll|LL]
-  | <[lL]> <[uU]>?
-  | [ll|LL]<[uU]>?
+  | <[uU]> [ll?|LL?]?
+  | [ll?|LL?] <[uU]>?
 }
 
 token floating_constant {
@@ -281,10 +279,9 @@ rule statement {
 }
 
 rule labeled_statement {
-  [
-  <identifier> :
-  | case <constant_expression> :
-  | default : 
+  [ <identifier> \:
+  | case <constant_expression> \:
+  | default \:
   ] <statement>
 }
 
@@ -304,10 +301,10 @@ rule iteration_statement {
 }
 
 rule jump_statement {
-  goto <identifier> ;
-  |continue ;
-  |break ;
-  |return <expression>? ;
+  | goto <identifier> ;
+  | continue ;
+  | break ;
+  | return <expression>? ;
 }
 
 rule translation_unit { [<function_definition> | <declaration> ]+ }
@@ -317,10 +314,9 @@ rule function_definition { <declaration_specifiers> <declarator> <declaration>* 
 rule prereprocessing_file { <group> }
 
 rule group {
-  [
-  |<pp_tokens>? <newline>
-  |<if_section>
-  |<control_line>
+  [ <pp_tokens>? <newline>
+  | <if_section>
+  | <control_line>
   ]*
 }
 
@@ -354,10 +350,10 @@ rule pp_tokens { <preprocessing_token>+ }
 token new_line { \n }
 
 token primary_expression {
-  <identifier>
-  |<constant>
-  |<string_literal>
-  |\( <expression> \)
+  | <identifier>
+  | <constant>
+  | <string_literal>
+  | \( <expression> \)
 }
 
 proto 'term:' is precedence('22=')
@@ -371,7 +367,7 @@ proto 'postcircumfix:[]' is equiv('postfix:++') { ... }
 #rule postfix_expression { <postfix_expression> \[ <expression> \] }
 proto 'postcircumfix:()' is equiv('postfix:++') { ... }
 #rule postfix_expression { <postfix_expression> \( [ <assignment_expression> [, <assignment_expression>]* ]? \) }
-proto 'postfix:.' is equiv('postfix:++') { ... }
+proto 'infix:.' is equiv('postfix:++') { ... }
 #rule postfix_expression { <postfix_expression> . <identifier> }
 proto 'postfix:->' is equiv('postfix:++') { ... }
 #rule postfix_expression { <postfix_expression> \-\> <identifier> }
@@ -398,6 +394,7 @@ proto 'prefix:sizeof' is equiv('prefix:++') { ... }
 #rule unary_expression { sizeof [\( <type_name> \) ] }
 
 ## cast-expression
+## XXX: PGE doesn't have a precircumfix:() function (yet?)
 proto 'precircumfix:()' is precedence('17=') {...}
 #rule cast_expression { [\( <type_name> \) ]* <unary_expression> }
 
