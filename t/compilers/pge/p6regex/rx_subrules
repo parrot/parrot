@@ -53,5 +53,6 @@ a<!wb>			abc\ndef\n-==\nghi	y	\w\w nonword boundary
 <?dot>+		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <. @ 17>/	<?dot>+
 <ident>			2+3 ab2		/mob<ident>: <ab2 @ 4>/		capturing builtin <ident>
 <name>			ab::cd::x3::42	/mob<name>: <ab::cd::x3 @ 0>/	capturing builtin <name>
++<alnum+[_]>	ident_1				y	union of character classes
 
 ## vim: noexpandtab tabstop=4 shiftwidth=4
