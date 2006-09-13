@@ -49,7 +49,7 @@ token keyword {
 #token identifier { <identifier_nondigit> [ <identifier_nondigit> | \d ]* }
 token identifier { <identifier_nondigit> [ <identifier_nondigit> | <digit> ]* }
 
-token identifier_nondigit { <alpha+[_]> | <universal_character_name> }
+token identifier_nondigit { <alpha> | <[_]> | <universal_character_name> }
 
 ## A.1.4 Universal character names
 token universal_character_name {
@@ -134,7 +134,7 @@ token <c_char> { <-['\\\n]> | <escape_sequence> }
 token escape_sequence {
   \\
   [ <['"?\\abfnrtv]>
-  | <octal_digit>**[1..3]
+  | <octal_digit>**{1..3}
   | x <xdigit>+
   | <universal_character_name>
   ]
@@ -359,54 +359,77 @@ token new_line { \n }
 
 
 ## A.2.1 Expressions
-token primary_expression {
+rule primary_expression {
   | <identifier>
   | <constant>
   | <string_literal>
   | \( <expression> \)
 }
 
-proto 'term:' is precedence('22=')
-    is parsed(primary_expression)
-    is pastrule('past_term') { ... }
+rule postfix_expression {
+  [ <primary_expression> 
+  | \( <type_name> \) \{ <initializer_list> [\,]? \} ]
 
+  [ <'++'>
+  | <'--'>
+  | \[ <expression> \]
+  | \( [ <assignment_expression> [ \, <assignment_expression> ]* ]? \)
+  | \. <identifier>
+  | <'->'> <identifier>
+  | \( <type_name> \) \{ <initializer_list> [\,]? \}
+  ]*
+}
 
-## autoincrement
-proto 'postfix:++' is precedence('20=') { ... }
-proto 'postcircumfix:[]' is equiv('postfix:++') { ... }
+rule unary_expression {
+  [<'++'>|<'--'>|<'sizeof'>]? 
+
+  [ <postfix_expression>
+  | $unary_op:=<[&*+\-~!]> <cast_expression>
+  | <'sizeof'> \( <type_name> \)
+  ]
+}
+
+rule cast_expression {  [ \( <type_name> \) ]* <unary_expression> }
+
+#proto 'term:' is precedence('22=')
+#    is parsed(primary_expression)
+#    is pastrule('past_term') { ... }
+
+## postfix expressions
+#proto 'postfix:++' is precedence('20=') { ... }
+#proto 'postcircumfix:[]' is equiv('postfix:++') { ... }
 #rule postfix_expression { <postfix_expression> \[ <expression> \] }
-proto 'postcircumfix:()' is equiv('postfix:++') { ... }
-#rule postfix_expression { <postfix_expression> \( [ <assignment_expression> [, <assignment_expression>]* ]? \) }
-proto 'infix:.' is equiv('postfix:++') { ... }
+#proto 'postcircumfix:()' is equiv('postfix:++') { ... }
+#rule postfix_expression { <postfix_expression> \( [ <assignment_expression> [\, <assignment_expression>]* ]? \) }
+#proto 'infix:.' is equiv('postfix:++') { ... }
 #rule postfix_expression { <postfix_expression> . <identifier> }
-proto 'postfix:->' is equiv('postfix:++') { ... }
+#proto 'infix:->' is equiv('postfix:++') { ... }
 #rule postfix_expression { <postfix_expression> \-\> <identifier> }
-proto 'postfix:--' is equiv('postfix:++') { ... }
-proto 'postfix:--' is equiv('postfix:++') { ... }
-rule postfix_expression { \( <type_name> \) \{ <initializer_list> [,]? \} }
-
-
-## exponentiation
-proto 'infix:**' is precedence('19=') { ... }
+#proto 'postfix:--' is equiv('postfix:++') { ... }
+#rule postfix_expression { \( <type_name> \) \{ <initializer_list> [,]? \} }
 
 ## unary-expression
-proto 'prefix:++' is precedenc('18=') { ... }
-proto 'prefix:--' is equiv('prefix:++') { ... }
-proto 'prefix:&' is equiv('prefix:++') { ... }
-proto 'prefix:*' is equiv('prefix:++') { ... }
-proto 'prefix:+' is equiv('prefix:++') { ... }
-proto 'prefix:-' is equiv('prefix:++') { ... }
-proto 'prefix:~' is equiv('prefix:++') { ... }
-proto 'prefix:!' is equiv('prefix:++') { ... }
-proto 'prefix:sizeof' is equiv('prefix:++') { ... }
-proto 'prefix:sizeof' is equiv('prefix:++') { ... }
+#proto 'prefix:++' is precedenc('18=') { ... }
+#proto 'prefix:--' is equiv('prefix:++') { ... }
+#proto 'prefix:&' is equiv('prefix:++') { ... }
+#proto 'prefix:*' is equiv('prefix:++') { ... }
+#proto 'prefix:+' is equiv('prefix:++') { ... }
+#proto 'prefix:-' is equiv('prefix:++') { ... }
+#proto 'prefix:~' is equiv('prefix:++') { ... }
+#proto 'prefix:!' is equiv('prefix:++') { ... }
+#proto 'prefix:sizeof' is equiv('prefix:++') { ... }
+#proto 'prefix:sizeof' is equiv('prefix:++') { ... }
 #rule unary_expression { sizeof  <unary_expression> }
 #rule unary_expression { sizeof [\( <type_name> \) ] }
 
 ## cast-expression
 ## XXX: PGE doesn't have a precircumfix:() function (yet?)
-proto 'precircumfix:()' is precedence('17=') {...}
+#proto 'precircumfix:()' is precedence('17=') {...}
 #rule cast_expression { [\( <type_name> \) ]* <unary_expression> }
+
+proto 'term:' is precedence('22=')
+    is parsed(cast_expression)
+    is pastrule('cast_expression') { ... }
 
 ## multiplicative
 proto 'infix:*' is precedence('16=')
@@ -482,27 +505,30 @@ proto 'infix:||' is precedence('08=')
 #    is parsed('conditional_expression')
 #    { ... }
 
-rule conditional_expression {
-  <operator_precedence_parser>
-  |<operator_precedence_parser> \? <expression> : <conditional_expression>
-}
+rule operator_precedence_parser { {{ 
+  .local pmc optable
+  .local pmc match_result
+  #optable = get_hll_namespace ['Cardinal'; 'Grammar']
+  optable = get_root_global [ 'parrot'; 'C99'], '$optable'
+  match_result = optable."parse"(match)
+  .return (match_result)
+}} }
 
-rule assignment_expression { 
-  <conditional_expression> 
-  | <unary_expression> [<assignment_operator> <unary_expression>]+
-}
+rule conditional_expression { <operator_precedence_parser> [ \? <expression> : <operator_precedence_parser> ]* }
+
+rule assignment_expression { [ <unary_expression> <assignment_operator> ]* <constant_expression> }
 
 token assignment_operator {
-  \*\=
-  |\/\=
-  |\%\=
-  |\+\=
-  |\-\=
-  |\<\<\=
-  |\>\>\=
-  |\&\=
-  |\^\=
-  |\|\=
+  | <'*='>
+  | <'/='>
+  | <'%='>
+  | <'+='>
+  | <'-='>
+  | <'<<='>
+  | <'>>='>
+  | <'&='>
+  | <'^='>
+  | <'|='>
 }
 
 rule expression { <assignment_expression> [, <assignment_expression> ] }

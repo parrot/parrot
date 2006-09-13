@@ -46,8 +46,8 @@ all: c99.pbc #$(PMCDIR)/c99_group$(LOAD_EXT)
 #  src/builtins/cmp.pir \
 #  src/builtins/io.pir
 
-#GEN_PIR = \
-#  src/c99_grammar_gen.pir \
+GEN_PIR = \
+  src/c99_grammar_gen.pir
 #  src/ASTGrammar.pir \
 #  src/OSTGrammar.pir \
 #  src/builtins_gen.pir
@@ -59,9 +59,7 @@ all: c99.pbc #$(PMCDIR)/c99_group$(LOAD_EXT)
 #  src/PAST.pbc \
 #  src/POST.pbc
 
-#c99.pbc: c99.pir $(GEN_PIR) $(GEN_PBC)
-#	$(PARROT) -o c99.pbc --output-pbc c99.pir 
-c99.pbc: c99.pir src/c99_grammar_gen.pir
+c99.pbc: c99.pir $(GEN_PIR) $(GEN_PBC)
 	$(PARROT) -o c99.pbc --output-pbc c99.pir 
 
 #src/PAST.pbc: src/PAST.pir
