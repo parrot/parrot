@@ -142,8 +142,8 @@ EOF_SIMPLE_GRAMMAR
     # define todo tests
     # if test is to be tagged TODO set todo_test[test_number] = 1
     # also add why with todo_desc[test_number] = <reason>
-    todo_tests[10] = 1
-    todo_desc[10] = 'bug in PGE'
+    # todo_tests[10] = 1
+    # todo_desc[10] = 'bug in PGE'
 
     # set the number of grammars to run
     n_grammars = elements grammar

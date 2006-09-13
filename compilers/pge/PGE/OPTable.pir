@@ -167,7 +167,8 @@ Adds (or replaces) a syntactic category's defaults.
     if $I0 goto with_expectclose
     $I0 = 0x0202
   with_expectclose:
-    self.'newtok'($S0, 'equiv' => name, 'expect'=>$I0)
+    $I1 = token['nows']
+    self.'newtok'($S0, 'equiv' => name, 'expect'=>$I0, 'nows'=>$I1)
   with_close:
 
   add_key:
