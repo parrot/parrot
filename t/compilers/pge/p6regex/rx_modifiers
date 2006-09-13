@@ -97,3 +97,5 @@ foo -? bar			foo - bar	n	basic non-match
 :nth(4) a \d			a1a2a3		n	nth occurance (:nth)
 :nth(0) a \d			a1a2a3		n	nth occurance (:nth)
 :s^[\d+ ]* abc			11 12 13 abc	y	<?ws> before closing bracket
+
+## vim: noexpandtab tabstop=4 shiftwidth=4

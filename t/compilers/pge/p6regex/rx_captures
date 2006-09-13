@@ -44,3 +44,5 @@ $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
 [(.)$0]+				bookkeeper	/mob 0 1: <k @ 3>/	backref $1
 [(.)$0]+				bookkeeper	/mob 0 2: <e @ 5>/	backref $1
 (.)*x					123x		/mob: <123x @ 0>/	repeated dot capture
+
+## vim: noexpandtab tabstop=4 shiftwidth=4

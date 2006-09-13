@@ -201,3 +201,5 @@ a\d+f			abcdef		n	digit
 ab\d+cdef		ab42cdef	y	digit
 a\D+f			abcdef		y	not digit
 a\D+f			ab0cdef		n	not digit
+
+## vim: noexpandtab tabstop=4 shiftwidth=4

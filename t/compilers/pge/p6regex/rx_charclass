@@ -43,3 +43,5 @@
 <'... --- ...'>		...---...	n	literal match (\')
 <'ab\'>cd'>		ab'>cd		y	literal match with quote
 <'ab\\cd'>		ab\x5ccd	y	literal match with backslash
+
+## vim: noexpandtab tabstop=4 shiftwidth=4
