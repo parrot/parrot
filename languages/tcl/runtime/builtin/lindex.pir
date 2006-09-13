@@ -50,6 +50,11 @@ select_loop:
   
   $P0 = indices[$I1]
   index = __index($P0, list)
+
+  $I2 = elements list
+  if index >= $I2 goto empty
+  if index < 0    goto empty
+
   list  = list[index]
   
   inc $I1
@@ -57,6 +62,9 @@ select_loop:
 
 done:
   .return(list)
+
+empty:
+  .return('')
 
 bad_args:
   tcl_error 'wrong # args: should be "lindex list ?index...?"'
