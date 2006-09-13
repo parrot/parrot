@@ -79,6 +79,11 @@ quote_backslash:
   $I1 += 2
   goto quote_loop
 found_quote:
+  $I0 = $I1 + 1
+  if $I0 >= len goto found_close_bracket
+  $I0 = is_cclass .CCLASS_WHITESPACE, str, $I0
+  unless $I0 goto elem_in_quotes_followed
+
   $I0 = $I1 - pos
   $S0 = substr str, pos, $I0
   
@@ -89,6 +94,16 @@ found_quote:
   pos = $I1
   inc pos
   goto eat_space
+
+elem_in_quotes_followed:
+  inc $I1
+  $I0 = len - $I1
+  $I0 = find_cclass .CCLASS_WHITESPACE, str, $I1, $I0
+  $I0 = $I0 - $I1
+  $S0 = substr str, $I1, $I0
+  $S0 = 'list element in quotes followed by "' . $S0
+  $S0 = $S0 . '" instead of space'
+  tcl_error $S0
 
 list:
   .local int depth
@@ -115,7 +130,7 @@ right_bracket:
   $I0 = $I1 + 1
   if $I0 >= len goto found_close_bracket
   $I0 = is_cclass .CCLASS_WHITESPACE, str, $I0
-  unless $I0 goto list_element_followed_by
+  unless $I0 goto elem_in_braces_followed
 
 found_close_bracket:
   # length -- if we have "{ }", pos and $I0 should both be 1
@@ -133,7 +148,7 @@ found_close_bracket:
   
   goto eat_space
 
-list_element_followed_by:
+elem_in_braces_followed:
   inc $I1
   $I0 = len - $I1
   $I0 = find_cclass .CCLASS_WHITESPACE, str, $I1, $I0
