@@ -1,0 +1,45 @@
+<[c]>			abcdef		y	character class
+<[dcb]>**{3}		abcdef		y	repeated character class
+^<[a]>			abcdef		y	anchored character class
+<-[e]>			abcdef		y	negated character class
+^<[a]>?			abcdef		y	anchored optional character class
+<-[e]>?			abcdef		y	negated optional character class
+<-[dcb]>**{3}		abcdef		n	repeated negated character class
+^<-[e]>			abcdef		y	anchored negated character class
+^<-[a]>			abcdef		n	anchored negated character class
+<[b..d]>		abcdef		y	character range
+<[b..d]>		abxxef		y	character range
+<[b..d]>		axcxef		y	character range
+<[b..d]>		axxdef		y	character range
+<[b..d]>		axxxef		n	character range
+<-[b..d]>		abcdef		y	negated character range
+<-[b..d]>		bbccdd		n	negated character range
+<-[d..b]>		bbccdd		n	negated (illegal) character range
+<[-]>			ab-def		/parse error/	unescaped hyphen
+<[\-]>			ab-def		y	escaped hyphen
+<[\-]>			abcdef		n	escaped hyphen
+<-[\-]>			---x--		y	negated escaped hyphen
+<-[\-]>			------		n	negated escaped hyphen
+<[\-+]>			ab-def		y	escaped hyphen in range
+<[\-+]>			ab+def		y	escaped hyphen in range
+<[\-+]>			abcdef		n	escaped hyphen in range
+<[+\-]>			ab-def		y	escaped hyphen in range
+<[+\-]>			ab+def		y	escaped hyphen in range
+<[+\-]>			abcdef		n	escaped hyphen in range
+<-[\-+]>		---x--		y	negated escaped hyphen in range
+<-[\-+]>		------		n	negated escaped hyphen in range
+<-[+\-]>		---x--		y	negated escaped hyphen in range
+<-[+\-]>		------		n	negated escaped hyphen in range
+<["\\]>			\\			y	escaped backslash
+<[\]]>			]			y	escaped close bracket
+<[\]>			\\]]		/parse error/	unescaped backslash (or no closing brace)
+^\><[<]>			><		y	lt character class
+^<[>]>\<			><		y	gt character class
+^<[><]>**{2}		><		y	gt, lt character class
+^<[<>]>**{2}		><		y	lt, gt  character class
+^<-[><]>		><		n	not gt, lt character class
+^<-[<>]>		><		n	not lt, gt  character class
+<'... --- ...'>		... --- ...	y	literal match (\')
+<'... --- ...'>		...---...	n	literal match (\')
+<'ab\'>cd'>		ab'>cd		y	literal match with quote
+<'ab\\cd'>		ab\x5ccd	y	literal match with backslash

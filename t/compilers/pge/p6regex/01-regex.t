@@ -27,16 +27,16 @@ an empty string.
 =item result
 
 The expected result of the match. Either C<y> or for a successful match, C<n>
-for a failed one. Otherwise the output is expected to begin and end with 
+for a failed one. Otherwise the output is expected to begin and end with
 C</>.
 
 This result is used in one of two ways: If an exception is thrown by the
 match, the result must be contained in the exception's message. If the match
-succeeds, then the message must be contained in a dump of the match object. 
+succeeds, then the message must be contained in a dump of the match object.
 
 =item test id
 
-A unique test identifier. This allows us to track TODO/SKIP information in 
+A unique test identifier. This allows us to track TODO/SKIP information in
 *this* file instead of the associated test file, which lets us easily
 share the tests across implementations of perl6's regex engine.
 
@@ -48,7 +48,7 @@ Description of the test.
 
 =head1 SYNOPSIS
 
-	% prove t/compilers/pge/01-regex.t
+    % prove t/compilers/pge/01-regex.t
 
 =cut
 
@@ -62,17 +62,27 @@ Description of the test.
     .local pmc test       # the test harness object.
                test = new 'Test::Builder'
 
-    .local pmc todo_tests # Keys indicate tests ID; values reasons.
+    .local pmc todo_tests # keys indicate test file; values test number.
                todo_tests = new 'Hash'
 
-    .local pmc skip_tests # Keys indicate tests ID; values reasons.
+    .local pmc skip_tests # keys indicate tests ID; values reasons.
                skip_tests = new 'Hash'
 
-    .local pmc test_files # Values are test file names to run.
-               test_files = new 'ResizablePMCArray'
-          push test_files, 't/compilers/pge/p6regex/regex_tests'
+    .local string test_dir # the directory containing tests
+                  test_dir = 't/compilers/pge/p6regex/'
 
-    .local pmc interp     # A Handle to our interpreter object.
+    .local pmc test_files # values are test file names to run.
+               test_files = new 'ResizablePMCArray'
+
+    push test_files, 'rx_metachars'
+    push test_files, 'rx_backtrack'
+    push test_files, 'rx_charclass'
+    push test_files, 'rx_subrules'
+    push test_files, 'rx_lookarounds'
+    push test_files, 'rx_captures'
+    push test_files, 'rx_modifiers'
+
+    .local pmc interp     # a handle to our interpreter object.
                interp = getinterp
 
     .local pmc config
@@ -81,16 +91,16 @@ Description of the test.
     .local int has_icu    # flag indicating precense of icu
                has_icu = config['has_icu']
 
-    .local pmc p6rule     # The perl6 regex compiler
+    .local pmc p6rule     # the perl6 regex compiler
                p6rule = compreg 'PGE::P6Regex'
 
     .local pmc file_iterator # iterate over list of files..
-               file_iterator = new 'Iterator', test_files 
+               file_iterator = new 'Iterator', test_files
 
     .local int test_number   # the number of the test we're running
                test_number = 0
 
-    # These vars are in the loops below
+    # these vars are in the loops below
     .local pmc file_handle   # currently open file.
     .local string test_file  # name of the current test file
     .local string test_line  # one line of one test file, a single test
@@ -104,57 +114,106 @@ Description of the test.
     .local string result      # expected result of this test. (y/n/...)
     .local string description # user-facing description of the test.
 
-    # How many tests to run?
-    test.'plan'(491)
+    # how many tests to run?
+    # XXX: this should be summed automatically from test_files data
+    #      until then, it's set to no plan
+    test.'plan'('no_plan')
 
-    # Which of these tests are TODO? 
-    # XXX This needs to be filled back in.
-    todo_tests [78] = 1
-    todo_tests [79] = 1
-    todo_tests [81] = 1
-    todo_tests [91] = 1
-    todo_tests [92] = 1
-    todo_tests [94] = 1
-    todo_tests [95] = 1
-    todo_tests [96] = 1
-    todo_tests[101] = 1
-    todo_tests[103] = 1
-    todo_tests[105] = 1
-    todo_tests[113] = 1
-    todo_tests[114] = 1
-    todo_tests[115] = 1
-    todo_tests[116] = 1
-    todo_tests[119] = 1
-    todo_tests[120] = 1
-    todo_tests[121] = 1
-    todo_tests[240] = 1
-    todo_tests[260] = 1
-    todo_tests[297] = 1
-    todo_tests[298] = 1
-    todo_tests[299] = 1
-    todo_tests[308] = 1
-    todo_tests[341] = 1
-    todo_tests[362] = 1
-    todo_tests[363] = 1
-    todo_tests[364] = 1
-    todo_tests[386] = 1
-    todo_tests[387] = 1
-    todo_tests[388] = 1
-    todo_tests[480] = 1
-    todo_tests[485] = 1
-    todo_tests[490] = 1
-    todo_tests[491] = 1
-     
-    # Which of these tests are SKIP?
+    # set todo information
+    .local pmc todo_info
+    .local string test_file
+
+    test_file = 'rx_metachars'
+    bsr reset_todo_info
+    todo_info[78]  = 1
+    todo_info[79]  = 1
+    todo_info[81]  = 1
+    todo_info[91]  = 1
+    todo_info[92]  = 1
+    todo_info[94]  = 1
+    todo_info[95]  = 1
+    todo_info[96]  = 1
+    todo_info[101] = 1
+    todo_info[103] = 1
+    todo_info[105] = 1
+    todo_info[113] = 1
+    todo_info[114] = 1
+    todo_info[115] = 1
+    todo_info[116] = 1
+    todo_info[119] = 1
+    todo_info[120] = 1
+    todo_info[121] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_charclass'
+    bsr reset_todo_info
+    todo_info[17] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_subrules'
+    bsr reset_todo_info
+    todo_info[29] = 1
+    todo_info[30] = 1
+    todo_info[31] = 1
+    todo_info[40] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_lookarounds'
+    bsr reset_todo_info
+    todo_info[20] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_captures'
+    bsr reset_todo_info
+    todo_info[14] = 1
+    todo_info[15] = 1
+    todo_info[16] = 1
+    todo_info[38] = 1
+    todo_info[39] = 1
+    todo_info[40] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_modifiers'
+    bsr reset_todo_info
+    todo_info[86] = 1
+    todo_info[91] = 1
+    todo_info[96] = 1
+    todo_info[97] = 1
+    todo_tests[test_file] = todo_info
+
+    branch set_skip
+
+  reset_todo_info:
+    todo_info = new .Hash
+    ret
+
+  set_skip:
+    # set skip information
+    .local pmc skip_info
+
     if has_icu goto done_icu
-    # XXX This test # needs to be verified.
-    skip_tests[121] = 'no ICU'
-  done_icu:
-   
 
- outer_loop:
+    test_file = 'rx_metachars'
+    bsr reset_skip_info
+    skip_info[121] = 'no ICU'
+    skip_tests[test_file] = skip_info
+    branch done_icu
+
+  reset_skip_info:
+    skip_info = new .Hash
+    ret
+
+  done_icu:
+  outer_loop:
     unless file_iterator goto end_outer_loop
-    test_file = shift file_iterator
+    .local string test_name
+                  test_name = shift file_iterator
+    # local test number in test file
+    .local int local_test_number
+               local_test_number = 0
+
+    # append the test directory and filename
+    test_file = test_dir . test_name
 
     # Open the test file
     file_handle = open test_file, '<'
@@ -164,7 +223,7 @@ Description of the test.
     # loop over the file, one at a time.
 
   loop:
-    # read in the file one line at a time..
+    # read in the file one line at a time...
     $I0 = file_handle.'eof'()
     if $I0 goto end_loop
 
@@ -173,7 +232,8 @@ Description of the test.
     # skip lines without tabs
     $I0 = index test_line, "\t"
     if $I0 == -1 goto loop
-    inc test_number 
+    inc test_number
+    inc local_test_number
 
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
@@ -205,15 +265,27 @@ Description of the test.
     # chop (description)
     substr description, -1, 1, ''
 
+    # prepend test filename and line number to description
+    $S0  = '['
+    $S0 .= test_name
+    $S0 .= ':'
+    $S1 = local_test_number
+    $S0 .= $S1
+    $S0 .= '] '
+    description = concat $S0, description
+
     if target != "''" goto got_target
     target = ''
-  
-  got_target: 
+
+  got_target:
     target = backslash_escape (target)
     result = backslash_escape (result)
 
     # Should this test be skipped?
-    $I0 = exists skip_tests[test_number]
+    $I0 = exists skip_tests[test_name]
+    unless $I0 goto not_skip
+    $P0 = skip_tests[test_name]
+    $I0 = exists $P0[local_test_number]
     unless $I0 goto not_skip
     test.'skip'(1, description)
     goto loop
@@ -221,7 +293,7 @@ Description of the test.
   not_skip:
     push_eh thrown
       rule =  p6rule(pattern)
-      unless_null rule, match_it 
+      unless_null rule, match_it
       $P1 = new 'Exception'
       $P1[0] = 'rule error'
       throw $P1
@@ -248,7 +320,7 @@ Description of the test.
     if $S0 != "/" goto bad_line
     substr result, 0, 1, ''
     substr result, -1, 1, ''
- 
+
     $I0 = index $S1, result
     if $I0 == -1 goto is_nok
     # goto is_ok
@@ -260,7 +332,10 @@ Description of the test.
     ok = 0
 
   emit_test:
-    $I0 = exists todo_tests[test_number]
+    $I0 = exists todo_tests[test_name]
+    unless $I0 goto not_todo
+    $P0 = todo_tests[test_name]
+    $I0 = exists $P0[local_test_number]
     unless $I0 goto not_todo
     test.'todo'(ok,description)
     goto loop
@@ -305,7 +380,6 @@ Description of the test.
 .end
 
 # given a 2 digit string, convert to appropriate chr() value.
-
 .sub hex_chr
     .param string hex
 

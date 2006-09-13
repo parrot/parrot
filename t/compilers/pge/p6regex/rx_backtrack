@@ -1,0 +1,20 @@
+a* a			bazaar		y	control
+a*:a			bazaar		n	basic
+^[a|b]*  aba		abbabbababba	y	control
+^[a|b]*: aba		abbabbababba	n	outside a group
+\d+:			123abc		y	cut on character class shortcut
+\d+:			abc		n	cut on character class shortcut
+[ if    not | ify ]	verify		y	control
+[ if :: not | ify ]	verify		n	inside a group
+  if :: not | ify	verify		n	the default all group
+[ if :  not | ify ]	verify		y	simple backtrack still works
+[ if :: not | ify ] | verify	verify	y	rule continues
+[ when     ever ] | whence	whence	y	full backtrack failure
+[ when ::: ever ] | whence	whence	n	full backtrack failure
+ab::cd | gh::ij		xyabghij	y	group cut at top
+ab:::cd | gh:::ij	xyabghij	n	rule cut at top
+[ab::cd | gh::ij]	xyabghij	y	group cut in group
+[ab:::cd | gh:::ij]	xyabghij	n	rule cut in group
+[ ab | abc ]: de	xyzabcde	n	no backtrack into group
+( ab | abc ): de	xyzabcde	n	no backtrack into subpattern
+[ when <commit> ever ] | whence	whence	n	full backtrack failure
