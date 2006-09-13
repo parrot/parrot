@@ -195,8 +195,8 @@ Description of the test.
 
     test_file = 'rx_metachars'
     bsr reset_skip_info
-    skip_info[121] = 'no ICU'
-    skip_tests[test_file] = skip_info
+    # skip_info[121] = 'no ICU'
+    # skip_tests[test_file] = skip_info
     branch done_icu
 
   reset_skip_info:
