@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is("tcl",<<'TCL',<<OUT,"{} conversion to list");
@@ -62,4 +62,16 @@ language_output_is('tcl', <<'TCL', <<'OUT', '[ in list');
   puts [list \{\[]
 TCL
 \{\[
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', '\" in "" in list');
+  puts [lindex {"a \" b"} 0]
+TCL
+a " b
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', '\" in {} in list');
+  puts [lindex {{a \" b}} 0]
+TCL
+a \" b
 OUT

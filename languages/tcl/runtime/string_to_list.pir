@@ -20,7 +20,7 @@ eat_space:
 loop:
   if pos >= len goto done
   
-  # check if the first char is a {
+  # check if the first char is a { or a "
   $I0 = ord str, pos
   if $I0 == 123 goto list
   if $I0 == 34  goto quote
@@ -80,14 +80,15 @@ quote_backslash:
   goto quote_loop
 found_quote:
   $I0 = $I1 + 1
-  if $I0 >= len goto found_close_bracket
+  if $I0 >= len goto found_close_quote
   $I0 = is_cclass .CCLASS_WHITESPACE, str, $I0
   unless $I0 goto elem_in_quotes_followed
 
+found_close_quote:
   $I0 = $I1 - pos
   $S0 = substr str, pos, $I0
   
-  $P0 = new .String
+  $P0 = new 'TclConst'
   $P0 = $S0
   push retval, $P0
   
@@ -141,7 +142,7 @@ found_close_bracket:
   pos += $I0
   pos += 1
   
-  $I0 = find_type 'TclConst'
+  $I0 = find_type 'TclString'
   $P0 = new $I0
   $P0 = $S0
   push retval, $P0
