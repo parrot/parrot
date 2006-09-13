@@ -577,9 +577,7 @@ transform result (Cardinal::Grammar::operation) :language('PIR') {
 transform result (Cardinal::Grammar::IDENTIFIER) :language('PIR') {
     .local pmc result
 
-    $I0 = defined node[0]
-    unless $I0 goto err_no_tree
-    $S0 = node[0]
+    $S0 = node
 
     result = new 'Cardinal::PAST::Val'
     result.'init'('node'=>node, 'name'=>$S0, 'valtype'=>'identifier')
