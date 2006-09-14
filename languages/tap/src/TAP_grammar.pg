@@ -3,34 +3,41 @@
 
 grammar TAP::Grammar;
 
-## this grammar parses TAP format
+## Ovid's TAP grammar, translated, corrected, and rendered idiomatic
+## NOTE: not yet extended to deal with 'Bail out!' etc.
+token tap         { <plan> <lines> | <lines> <plan> <comment>* }
+token plan        { <'1..'> \d+ \n }
+token lines       { <line>+ }
+token line        { <test> | <comment> }
+token test        {
+    <status>
+    [ <' '> (<[1..9]> \d*) ]?              ## assumes a single space, not \h+
+    \h* <description>? \h* <directive>? \n
+                  }
+token status      { <'not '>? <'ok'> }
+token description { <after \h> <-[#\n]>+ }
+token directive   { <after \h> <'# '> [:i todo | skip ] \N* }
+token comment     { <'#'> \N* \n }
 
-token output {
-    | ^ <plan> <tap_line>+  [ $ | <?syntax_error> ]
-    | ^ <tap_line>+ <plan>? [ $ | <?syntax_error> ]
-}
+=for comment
 
-token plan { <'1..'> \d+ \n }
-token tap_line { <tap> \n }
-token tap { <test_result> | <diagnostic> | <bail_out> }
+## Ovid's TAP grammar, original
+digit              ::= [:digit:]
+character          ::= ([:print:] - "\n")
+positiveInteger    ::= ( digit - '0' ) {digit}
+nonNegativeInteger ::= digit {digit}
 
-token test_result { <status> <test_result_extra>? }
-token test_result_extra {
-    <?sp> [ <directive> | <test_num> <test_num_extra>? ]
-}
-token test_num_extra {
-    <?sp> [ <directive> | <description> <directive>? ]
-}
+tap         ::= plan tests | tests plan {comment}
+plan        ::= '1..' nonNegativeInteger "\n"
+lines       ::= line {lines}
+line        ::= (comment | test) "\n"
+tests       ::= test {test}
+test        ::= status positiveInteger? description? directive?
+status      ::= 'not '? 'ok '
+description ::= (character - (digit '#')) {character - '#'}
+directive   ::= '#' ( 'TODO' | 'SKIP' ) ' ' {character}
+comment     ::= '#' {character}
 
-token diagnostic { \# \N* }
-token bail_out { <'Bail out!'> \N* }
-
-token status { <'not ok'> | <'ok'> }
-token test_num { \d+ }
-token description { <-[\#\n]>+ } # eats trailing spaces!
-token directive { \# <?sp> <directive_word> \N* }
-token directive_word { [:ignorecase skip | todo ] }
-
-token syntax_error { <?PGE::Util::die: Syntax error> }
+=end
 
 ## vim: expandtab sw=4
