@@ -53,6 +53,13 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     $P0 = subclass base, 'Cardinal::PAST::Var'
     addattribute $P0, 'scope'
 
+    $P1 = subclass $P0, 'Cardinal::PAST::PositionalParameter'
+    addattribute $P1, 'type'
+    $P1 = subclass $P0, 'Cardinal::PAST::OptionalParameter'
+    addattribute $P1, 'default_value'
+    $P1 = subclass $P0, 'Cardinal::PAST::RestParameter'
+    $P1 = subclass $P0, 'Cardinal::PAST::BlockParameter'
+
     $P0 = subclass base, 'Cardinal::PAST::Block'
     addattribute $P0, 'outer'
     addattribute $P0, 'blocktype'
@@ -321,6 +328,46 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 .sub '__dumplist' :method
     .return ('name scope')
+.end
+
+
+.namespace [ 'Cardinal::PAST::PositionalParameter' ]
+
+.sub 'type' :method
+    .param string scope      :optional
+    .param int has_scope     :opt_flag
+    .return self.'attr'('type', scope, has_scope)
+.end
+
+.sub '__dumplist' :method
+    .return ('name type')
+.end
+
+
+.namespace [ 'Cardinal::PAST::OptionalParameter' ]
+
+.sub 'default_value' :method
+    .param string scope      :optional
+    .param int has_scope     :opt_flag
+    .return self.'attr'('default_value', scope, has_scope)
+.end
+
+.sub '__dumplist' :method
+    .return ('name default_value')
+.end
+
+
+.namespace [ 'Cardinal::PAST::RestParameter' ]
+
+.sub '__dumplist' :method
+    .return ('name')
+.end
+
+
+.namespace [ 'Cardinal::PAST::BlockParameter' ]
+
+.sub '__dumplist' :method
+    .return ('name')
 .end
 
 

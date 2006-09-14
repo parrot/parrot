@@ -13,7 +13,7 @@ func1
 CODE
 OUT
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'end block test');
+language_output_is('cardinal', <<'CODE', <<'OUT', 'function call with one positional parameter');
 def func1( a )
   puts a
 end

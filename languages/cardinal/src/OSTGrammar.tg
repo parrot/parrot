@@ -639,6 +639,46 @@ transform post (Cardinal::PAST::Var) :language('PIR') {
     .return (post)
 }
 
+transform post (Cardinal::PAST::PositionalParameter) :language('PIR') {
+    .local string name
+    .local string type
+    .local pmc post
+    name = node.'name'()
+    type = node.'type'()
+    post = new 'Cardinal::POST::Var'
+    post.'init'('node'=>node, 'name'=>name, 'scope'=>'parameter')
+    .return (post)
+}
+
+transform post (Cardinal::PAST::OptionalParameter) :language('PIR') {
+    .local string name
+    .local pmc default_value 
+    .local pmc post
+    name = node.'name'()
+    default_value = node.'default_value'()
+    post = new 'Cardinal::POST::Var'
+    post.'init'('node'=>node, 'name'=>name, 'scope'=>'parameter')
+    .return (post)
+}
+
+transform post (Cardinal::PAST::RestParameter) :language('PIR') {
+    .local string name
+    .local pmc post
+    name = node.'name'()
+    post = new 'Cardinal::POST::Var'
+    post.'init'('node'=>node, 'name'=>name, 'scope'=>'parameter')
+    .return (post)
+}
+
+transform post (Cardinal::PAST::BlockParameter) :language('PIR') {
+    .local string name
+    .local pmc post
+    name = node.'name'()
+    post = new 'Cardinal::POST::Var'
+    post.'init'('node'=>node, 'name'=>name, 'scope'=>'parameter')
+    .return (post)
+}
+
 transform post (Cardinal::PAST::FunctionCall) :language('PIR') {
     .local string name
     .local pmc post

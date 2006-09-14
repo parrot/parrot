@@ -402,9 +402,19 @@ rule function_prototype_arg_list {
 }
 
 rule function_prototype_args {
-  [<function_prototype_arg> \,]* [<function_prototype_optinal_arg> \,]* [<function_prototype_rest_args>[\, <function_prototype_arg>]* \,]? <function_prototype_block_arg>?
+  | <function_prototype_positional_arg_list> [\, <function_prototype_rest_args>]? [\, <function_prototype_optional_arg_list>]? [\, <function_prototype_block_arg>]?
+  | <function_prototype_rest_args> [\, <function_prototype_optional_arg_list>]? [\, <function_prototype_block_arg>]?
+  | <function_prototype_optional_arg_list> [\, <function_prototype_block_arg>]?
+  | <function_prototype_block_arg>
+#  | [<function_prototype_optional_arg> \,]* [<function_prototype_rest_args>[\, <function_prototype_arg>]* \,]? <function_prototype_block_arg>?
 }
 
+rule function_prototype_positional_arg_list { <function_prototype_arg> [ \, <function_prototype_arg> ]* } 
+rule function_prototype_optional_arg_list { <function_prototype_optional_arg> [ \, <function_prototype_optional_arg> ]* } 
+
+rule function_prototype_optional_arg { <IDENTIFIER> \= <expression> }
+rule function_prototype_rest_args {\* <IDENTIFIER>}
+rule function_prototype_block_arg {\& <IDENTIFIER>}
 token function_prototype_arg {
   | <CONSTANT>
   | <INSTANCE_VARIABLE>
@@ -412,10 +422,6 @@ token function_prototype_arg {
   | <CLASS_VARIABLE>
   | <IDENTIFIER>
 }
-
-rule function_prototype_optinal_arg {<IDENTIFIER> \= <expression>}
-rule function_prototype_rest_args {\* <IDENTIFIER>}
-rule function_prototype_block_arg {\, \& <IDENTIFIER>}
 
 rule singleton { 
   | <variable>
