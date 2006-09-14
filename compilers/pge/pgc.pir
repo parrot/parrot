@@ -162,10 +162,19 @@ OPTIONS
     $S0 = "<?ident> [ \:\: <?ident> ]*"
     p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'name')
 
-    $S0 = '[ \# \N* | \s+ ]* :::'
+    $S0 = '[ \# \N* | \s+ | <?pod_comment> ]* :::'
     p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'ws')
 
-   $S0 = <<'      END_ARG_RULE'
+    $S0 = <<'      END_POD_COMMENT_RULE'
+      ^^ = [ [ cut \h*: | end [\h\N*]? ]
+           | for [ \h\N+: ] \n [ \N+\n ]*:
+           | \w\N*: \n .*? \n = [ cut \h*: | end [\h\N*:]? ]
+           ]
+           [\n|$]
+      END_POD_COMMENT_RULE
+    p6regex($S0, 'grammar'=>'PGE::P6Grammar', 'name'=>'pod_comment')
+
+    $S0 = <<'      END_ARG_RULE'
          ' (<-[']>*:) '
       |  " (<-["]>*:) "
       | \( (<-[)]>*:) \)
@@ -302,7 +311,7 @@ OPTIONS
   end:
     .return ()
 .end
-   
+
 .sub 'regex_stmt'
     .param pmc stmt
     .param pmc namespace
