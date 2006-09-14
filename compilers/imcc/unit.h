@@ -13,6 +13,19 @@ typedef enum {
     IMC_HAS_SELF	= 0x10
 } IMC_Unit_Type;
 
+/*
+ * Optimization statistics -- we track the number of times each of these
+ * optimizations is performed.
+ */
+struct imcc_ostat {
+    int deleted_labels;
+    int if_branch;
+    int branch_branch;
+    int branch_cond_loop;
+    int invariants_moved;
+    int deleted_ins;
+    int used_once;
+} ;
 
 typedef struct _IMC_Unit {
     IMC_Unit_Type type;
@@ -48,6 +61,9 @@ typedef struct _IMC_Unit {
     int first_avail[4];	/* INSP */
     SymReg *outer;
     PMC *sub_pmc;	/* this sub */
+
+    struct imcc_ostat ostat;
+
 } IMC_Unit;
 
 

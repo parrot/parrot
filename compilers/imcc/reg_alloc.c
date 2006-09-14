@@ -238,10 +238,8 @@ imc_stat_init(IMC_Unit * unit)
         unit->n_regs_used[j] = -1;
         unit->first_avail[j] = 0;
     }
-    /*
-     * TODO move statistic into unit
-     */
-    memset(&ostat, 0, sizeof(ostat));
+
+    memset(&(unit->ostat), 0, sizeof(struct imcc_ostat));
 }
 
 /* and final */
@@ -263,16 +261,16 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
             unit->n_vars_used[0], unit->n_vars_used[1],
             unit->n_vars_used[2], unit->n_vars_used[3]);
     IMCC_info(interpreter, 1,
-            "\t%d labels, %d lines deleted, "
-            "%d if_branch, %d branch_branch\n",
-            ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
-            ostat.branch_branch);
+              "\t%d labels, %d lines deleted, "
+              "%d if_branch, %d branch_branch\n",
+              unit->ostat.deleted_labels, unit->ostat.deleted_ins, 
+              unit->ostat.if_branch, unit->ostat.branch_branch);
     IMCC_info(interpreter, 1, "\t%d branch_cond_loop\n",
-            ostat.branch_cond_loop);
+              unit->ostat.branch_cond_loop);
     IMCC_info(interpreter, 1, "\t%d used once deleted\n",
-            ostat.used_once);
+              unit->ostat.used_once);
     IMCC_info(interpreter, 1, "\t%d invariants_moved\n",
-            ostat.invariants_moved);
+              unit->ostat.invariants_moved);
     IMCC_info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
             sets[0], sets[1], sets[2], sets[3]);
     IMCC_info(interpreter, 1,

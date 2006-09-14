@@ -220,9 +220,9 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
                     free_ins(tmp);
 
                     /* delete branch */
-                    ostat.deleted_ins++;
+                    unit->ostat.deleted_ins++;
                     ins = delete_ins(unit, ins, 1);
-                    ostat.if_branch++;
+                    unit->ostat.if_branch++;
                     changed = 1;
                 }
             } /* label found */
@@ -876,7 +876,7 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
                     IMCC_debug(interpreter, DEBUG_OPT1,
                             "found branch to branch '%s' %I\n",
                             r->first_ins->r[0]->name, next);
-                    ostat.branch_branch++;
+                    unit->ostat.branch_branch++;
                     ins->r[get_branch_regno(ins)] = next->r[0];
                     changed = 1;
                 }
@@ -950,7 +950,7 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
                                 "found branch to reorganize '%s' %I\n",
                                 r->first_ins->r[0]->name, ins);
                         /* unconditional jump can be eliminated */
-                        ostat.deleted_ins++;
+                        unit->ostat.deleted_ins++;
                         ins = delete_ins(unit, ins, 1);
                         return 1;
                     }
@@ -1017,7 +1017,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
             branch->r[0]->name, get_branch_reg(cond)->name, label);
 
             subst_ins(unit, branch, tmp, 1);
-            ostat.branch_cond_loop++;
+            unit->ostat.branch_cond_loop++;
             changed = 1;
         }
         
@@ -1158,10 +1158,10 @@ unused_label(Interp *interpreter, IMC_Unit * unit)
             }
 #endif
             if (!used) {
-                ostat.deleted_labels++;
+                unit->ostat.deleted_labels++;
                 IMCC_debug(interpreter, DEBUG_OPT1,
                            "block %d label %s deleted\n", i, lab->name);
-                ostat.deleted_ins++;
+                unit->ostat.deleted_ins++;
                 ins = delete_ins(unit, ins, 1);
                 changed = 1;
             }
@@ -1199,7 +1199,7 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
                 IMCC_debug(interpreter, DEBUG_OPT1,
                         "\tins deleted (dead block) %I\n", ins);
                 ins = delete_ins(unit, ins, 1);
-                ostat.deleted_ins++;
+                unit->ostat.deleted_ins++;
                 changed++;
             }
         }
@@ -1215,7 +1215,7 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
             IMCC_debug(interpreter, DEBUG_OPT1,
                     "unreachable ins deleted (after branch) %I\n", ins);
             ins = delete_ins(unit, ins, 1);
-            ostat.deleted_ins++;
+            unit->ostat.deleted_ins++;
             changed++;
         }
         /*
@@ -1228,7 +1228,7 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
             IMCC_debug(interpreter, DEBUG_OPT1, 
                        "dead branch deleted %I\n", ins);
             ins = delete_ins(unit, last, 1);
-            ostat.deleted_ins++;
+            unit->ostat.deleted_ins++;
             changed++;
         }
         last = ins;
@@ -1257,8 +1257,8 @@ used_once(Parrot_Interp interpreter, IMC_Unit * unit)
                        "used once '%I' deleted\n", ins);
             ins = delete_ins(unit, ins, 1);
             ins = ins->prev ? ins->prev : unit->instructions;
-            ostat.deleted_ins++;
-            ostat.used_once++;
+            unit->ostat.deleted_ins++;
+            unit->ostat.used_once++;
             opt++;
         }
     }

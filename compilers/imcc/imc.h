@@ -146,24 +146,6 @@ EXTERN enum {
     OPT_J    = 0x200
 } enum_opt;
 
-/*
- * Optimization statistics -- we track the number of times each of these
- * optimizations is performed.
- *
- * XXX: Should this be part of the imc_info struct?
- */
-struct imcc_ostat {
-    int deleted_labels;
-    int if_branch;
-    int branch_branch;
-    int branch_cond_loop;
-    int invariants_moved;
-    int deleted_ins;
-    int used_once;
-} ;
-
-EXTERN struct imcc_ostat ostat;
-
 struct nodeType_t;
 
 /*
@@ -220,6 +202,7 @@ typedef struct _imc_info_t {
     int error_code;                 /* The Error code. */
     STRING * error_message;         /* The Error message */
 
+    /* some values that were global... */
     int line;                   /* current line number */
 } imc_info_t;
 

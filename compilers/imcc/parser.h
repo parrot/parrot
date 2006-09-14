@@ -60,6 +60,8 @@ Instruction * multi_keyed(Interp *interpreter, IMC_Unit *, char *name,
 extern void compile_file(Interp *interp, FILE *file, void *);
 extern void compile_string(Interp *interp, char *, void *);
 
+int at_eof(yyscan_t yyscanner);
+
 #endif /* PARROT_IMCC_PARSER_H_GUARD */
 
 /*
