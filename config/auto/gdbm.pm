@@ -67,7 +67,7 @@ sub runstep
         if ($test eq "gdbm is working.\n") {
             $has_gdbm = 1;
             print " (yes) " if $verbose;
-            $self->result('yes');
+            $self->set_result('yes');
         }
     }
     unless ($has_gdbm) {
