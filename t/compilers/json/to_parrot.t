@@ -6,7 +6,7 @@ use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 52;
+use Parrot::Test tests => 60;
 
 =head1 NAME
 
@@ -32,6 +32,56 @@ json_dump_is(<<'JSON', <<'OUT', 'string');
 "json"
 JSON
 "JSON" => "json"
+OUT
+
+json_isnt('a', 'strings need quotes');
+
+json_dump_is(<<'JSON', <<'OUT', 'string with backslash "');
+"\"json\""
+JSON
+"JSON" => "\"json\""
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'string with backslash \\');
+"\\json\\"
+JSON
+"JSON" => "\\json\\"
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'string with /');
+"\/json\/"
+JSON
+"JSON" => "/json/"
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'string with backslash b');
+"\bjson\b"
+JSON
+"JSON" => "\bjson\b"
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'string with backslash f');
+"\fjson\f"
+JSON
+"JSON" => "\fjson\f"
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'string with backslash n');
+"\njson\n"
+JSON
+"JSON" => "\njson\n"
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'string with backslash r');
+"\rjson\r"
+JSON
+"JSON" => "\rjson\r"
+OUT
+
+json_dump_is(<<'JSON', <<'OUT', 'string with backslash t');
+"\tjson\t"
+JSON
+"JSON" => "\tjson\t"
 OUT
 
 json_dump_is(<<'JSON', <<'OUT', 'number int');
@@ -628,7 +678,6 @@ JSON
 ]
 OUT
 
-json_isnt('a', 'strings need quotes');
 
 # XXX Need many more tests, exercising all aspects of http://www.json.org/
 
