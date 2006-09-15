@@ -342,6 +342,7 @@ Introspection interface. C<key> can be:
   "sub"            ... return Sub object of this subroutine
   "continuation"   ... return Continuation PMC
   "lexpad"         ... return lexpad PMC for this sub
+  "namespace"      ... return namespace PMC for this sub
   "outer"          ... return outer sub of this closure
   "<item>"; level  ... same for caller <level>
   "outer"; "<item>"  ... same for outer level 1
@@ -412,6 +413,9 @@ Introspection interface. C<key> can be:
         s = CONST_STRING(interpreter, "lexpad");
         if (string_equal(interpreter, item, s) == 0)
             return ctx->lex_pad;
+        s = CONST_STRING(interpreter, "namespace");
+        if (string_equal(interpreter, item, s) == 0)
+            return ctx->current_namespace;
         s = CONST_STRING(interpreter, "continuation");
         if (string_equal(interpreter, item, s) == 0)
             return VTABLE_clone(interpreter, ctx->current_cont);
