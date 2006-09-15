@@ -490,6 +490,20 @@ pmclass BigInt {
 
 =over 4
 
+=item C<METHOD STRING* version()>
+
+Return GMP version string "x.y.z".
+
+=cut
+
+*/
+
+    METHOD STRING* version() {
+        return string_from_cstring(INTERP, gmp_version, 0);
+    }
+
+/*
+
 =item C<PMC* instantiate(PMC* sig)>
 
 Object constructor. SELF is a BigInt Class object. Return a new

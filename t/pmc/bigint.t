@@ -31,6 +31,46 @@ else {
     plan skip_all => "No BigInt Lib configured";
 }
 
+my $vers_check = <<'EOP';
+.sub main :main
+    .local pmc b, ar
+    .local string v
+    .local int ma, mi, pa
+    b = new .BigInt
+    v = b.'version'()
+    ar = split '.', v
+    ma = ar[0]
+    mi = ar[1]
+    pa = ar[2]
+    if ma >= 4 goto ge_4
+warn:
+    print 'GMP version ' 
+    print v
+    print " is buggy with huge digit multiply - please upgrade\n"
+    end
+ge_4:
+   if mi >= 2 goto ok
+   if mi == 0 goto warn
+   # test 4.1.x
+   if pa >= 4 goto ok
+   goto warn
+   end
+ok:
+.end
+EOP
+
+if ($PConfig{gmp}) {
+    # argh
+    my $parrot = '.' . $PConfig{slash} . 'parrot' . $PConfig{exe};
+    my $test = 'temp_gmp_vers.pir';
+    open O, ">$test";
+    print O $vers_check;
+    close O;
+    my $warn = `$parrot $test`;
+    diag $warn if $warn;
+    unlink $test;
+};
+
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
 	save	N0
@@ -81,6 +121,8 @@ pasm_output_is(<<'CODE', <<'OUT', "create");
 CODE
 ok
 OUT
+
+
 
 pasm_output_is(<<'CODE', <<'OUT', "set/get int");
    new P0, .BigInt
