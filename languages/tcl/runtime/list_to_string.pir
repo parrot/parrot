@@ -17,7 +17,6 @@ loop:
   if i >= elems goto done
   $P0 = list[i]
   $S0 = $P0
-  $S0 = clone $S0
 
 check_list:
   .local int count
@@ -69,7 +68,7 @@ check_right_bracket:
   if $I0 != -1 goto escape
 
 check_backslash:
-  $I0 = index $S0, "\\"
+  $I0 = index $S0, '\'
   if $I0 != -1 goto escape
 
 check_quotes:
@@ -83,6 +82,13 @@ escape:
   $P0 = $S0
   
   $P0.'replace'('\', '\\')
+  $P0.'replace'("\t", '\t')
+  $P0.'replace'("\f", '\f')
+  $P0.'replace'("\n", '\n')
+  $P0.'replace'("\r", '\r')
+  $P0.'replace'("\v", '\v')
+  $P0.'replace'(';', '\:')
+  $P0.'replace'('$', '\$')
   $P0.'replace'('}', '\}')
   $P0.'replace'('{', '\{')
   $P0.'replace'(' ', '\ ')
