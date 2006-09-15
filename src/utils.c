@@ -22,10 +22,23 @@ Opcode helper functions that don't really fit elsewhere.
 
 #include "parrot/parrot.h"
 
-#define GRAPH_ELEMENT(PTR,REGS,X,Y)  (PTR)[((Y) * ((REGS) + 3)) + (X)]
-#define ROOT_VERTEX(PTR,REGS,Y)      GRAPH_ELEMENT(PTR,REGS,REGS+0,Y)
-#define REG_MOVE_VAL(PTR,REGS,Y)     GRAPH_ELEMENT(PTR,REGS,REGS+1,Y)
-#define CYCLE_NODE(PTR,REGS,Y)        GRAPH_ELEMENT(PTR,REGS,REGS+2,Y)
+/* Parrot_register_move companion functions i and data */
+typedef struct {
+    unsigned char *dest_regs;
+    unsigned char *src_regs;
+    unsigned char temp_reg;
+    int* nb_succ;
+    int* backup;
+    int* reg_to_index;
+    Interp * interpreter;
+    reg_move_func mov;
+    reg_move_func mov_alt;
+    void *info;
+} parrot_prm_context;
+
+void rec_climb_back_and_mark(int regindex, parrot_prm_context* c);
+void process_cycle_without_exit(int regindex, parrot_prm_context* c);
+void move_reg(int from, int dest, parrot_prm_context* c);
 
 /*
 
@@ -638,126 +651,100 @@ Parrot_byte_rindex(Interp *interpreter, const STRING *base,
 }
 
 /*
-  
-=item C<static int
-find_first_indegree(int *graph,int node_count, int dest)>
-  
-Finds the first indegree for the given node.
-   
-=cut
-      
-*/
-static int
-find_first_indegree(int *graph, int node_count, int dest)
-{
-    int i = 0;
-    for (i = 0; i < node_count; i++) {
-        if (GRAPH_ELEMENT(graph, node_count, i, dest) > 0) {
-            return i;
-        }
-    }
-    return -1;
-}
 
-/*
+=item C<void rec_climb_back_and_mark(int node_index, parrot_prm_context* c)>
+
+Recursive function, used by Parrot_register_move to 
+climb back the graph of register moves operations.
+
+The node must have a predecessor: it is implicit because if a node has
+a node_index, it must have a predecessor because the node_index are the
+index of registers in dest_regs[] array, so by definition they have
+a corrsponding src_regs register.
+
+Then it emits the move operation with its predecessor, or its backup
+if already used/visited.
+
+Then continues the climbing if the predecessor was not modified, anf in that
+case marks it, and set node_index as its backup.
+
+  node_index  ... the index of a destination (i.e. with a pred.) register
+  c           ... the graph and all the needed params : the context
+
+=cut
  
-=item C<static int
-find_root(int *graph ,int node_count, int src, int dest)>
-          
-Finds the root vertex of the graph.
-
-=cut
-
 */
-static int
-find_root(int *graph, int node_count, int src, int dest)
-{
-    int in_degree;
-    if (GRAPH_ELEMENT(graph, node_count, src, dest) == 2) {
-        CYCLE_NODE(graph, node_count, dest) = 1;    
-        GRAPH_ELEMENT(graph, node_count, src, dest) = 1;
-        return dest;
-    }
-    ROOT_VERTEX(graph, node_count, src) = 0;
-    GRAPH_ELEMENT(graph, node_count, src, dest) = 2;
-    in_degree = find_first_indegree(graph, node_count, src);
-    if (in_degree == -1) {
-        ROOT_VERTEX(graph, node_count, dest) = 0;
-        GRAPH_ELEMENT(graph, node_count, src, dest) = 1;
-        return src;
-    }
-    return find_root(graph, node_count, in_degree, src);
-}
-
-/*
-
-=item C<static void
-emit_mov(reg_move_func mov, Interp *interpreter, void *info, int emit,
-          int emit_temp, int dest, int src, int temp, int * map)>
-          
+void
+rec_climb_back_and_mark(int node_index, parrot_prm_context* c) {
+    int pred, pred_index, src, node;
    
-Emit the move instructions
-  
-=cut
-       
-*/
-static void
-emit_mov(reg_move_func mov, Interp * interpreter, void *info, int emit,
-         int emit_temp, int dest, int src, int temp)
-{
-    if (emit > -1) {
-        if (emit_temp) {
-            mov(interpreter, dest, temp, info);
-        }
-        else if (src != dest) {
-            mov(interpreter, dest, src, info);
+    node = c->dest_regs[node_index];
+    pred = c->src_regs[node_index];
+    pred_index = c->reg_to_index[pred];
+    
+    if ( pred_index < 0 ) { /* pred has no predecessor */
+        move_reg(pred, node, c);
+    } else { /* pred has a predecessor, so may be processed */
+        src = c->backup[pred_index];
+        if (  src < 0 ) { /* not visited */
+            move_reg(pred, node, c);
+            c->backup[pred_index] = node; /* marks pred*/
+            rec_climb_back_and_mark(pred_index, c);
+        } else { /* already visited, use backup instead */
+            move_reg(src, node, c);
         }
     }
 }
 
+
 /*
+
+=item C<void process_cycle_without_exit(int node_index, parrot_prm_context* c)>
+
+Recursive function, used by Parrot_register_move to handle the case
+of cycles without exits, that are cycles of move ops between registers
+where each register has exactly one predecessor and one successor
+
+For instance: 1-->2, 2-->3, 3-->1
+
+  node_index  ... the index of a destination (i.e. with a pred.) register
+  c           ... the graph and all the needed params : the context
+
+=cut
+ */
+
+void
+process_cycle_without_exit(int node_index, parrot_prm_context* c) {
+    int pred, pred_index, src_index;
+    int alt = 0;
  
-=item C<static int
-reorder_move(int *graph, INT node_count, int *map, INT * val,
-             int src, int prev, int depth, reg_move_func mov,
-             Interp *interpreter, void *info, int temp)>
-                          
-   
-This method reorders the move operations.OA
-   
-=cut
-       
-*/
-static int
-reorder_move(int *graph, int node_count, int src, int prev, int depth, 
-            reg_move_func mov, Interp * interpreter, void *info, int temp)
-{
-    int i, x;
-    REG_MOVE_VAL(graph, node_count, src) = 1;
-  
-    for (i = 0; i < node_count; i++) {
-        if (GRAPH_ELEMENT(graph, node_count, src, i) > 0) {
-            if (REG_MOVE_VAL(graph, node_count, i) == 1) {
-                emit_mov(mov, interpreter, info, prev, 0, i, src, temp);
-                emit_mov(mov, interpreter, info, prev, depth <= 1, src, prev,
-                         temp);
-                return 1;
-            }
-            if (REG_MOVE_VAL(graph, node_count, i) != 2) {
-                depth++;
-                x = reorder_move(graph, node_count, i, src, depth,
-                                     mov, interpreter, info, temp);
-                depth--;
-                emit_mov(mov, interpreter, info, prev,
-                         x && (depth <= 1), src, prev, temp);
-                return x;
-            }
-        }
-    }
-    REG_MOVE_VAL(graph, node_count, src) = 2;
-    emit_mov(mov, interpreter, info, prev, 0, src, prev, temp);
-    return 0;
+    pred = c->src_regs[node_index];
+    /* pred_index has to be defined cause we are in a cycle so each node has a pred*/
+    pred_index = c->reg_to_index[pred];
+
+    /* let's try the alternate move function*/
+    if (NULL != c->mov_alt)         
+        alt = c->mov_alt(c->interpreter, c->dest_regs[node_index], pred, c->info);
+
+    if ( 0 == alt ) { /* use temp reg */
+        move_reg(c->dest_regs[node_index],c->temp_reg, c);
+        c->backup[node_index] = c->temp_reg;
+    } else 
+        c->backup[node_index] = c->dest_regs[node_index];
+
+    rec_climb_back_and_mark(node_index, c);
 }
+
+/*
+ should be self-speaking
+ */
+
+void 
+move_reg(int from, int dest, parrot_prm_context* c) {
+   /* fprintf(stderr,"move %i ==> %i\n",from,dest);*/
+    c->mov(c->interpreter, dest, from, c->info);
+}
+
 
 /*
 
@@ -815,6 +802,7 @@ Talked to Leo and he said those cases are not likely (Vishal Soni).
 2. I1->I2 I3->I2
 
 TODO: Add tests for the above conditions.
+
 =cut
   
 */
@@ -824,53 +812,83 @@ Parrot_register_move(Interp * interpreter, int n_regs,
                      unsigned char temp_reg,
                      reg_move_func mov, reg_move_func mov_alt, void *info)
 {
-    int i, uniq_reg_cnt;
-    int *reg_move_graph;
-    uniq_reg_cnt=0;
-
+    int i,index;
+    int max_reg = 0;
+    int* nb_succ = NULL;
+    int* backup = NULL;
+    int* reg_to_index = NULL;
+    parrot_prm_context c;
+      
     if (n_regs == 0)
         return;
 
-    for (i = 0; i < n_regs; i++) {
-        if (src_regs[i] > uniq_reg_cnt) {
-            uniq_reg_cnt=src_regs[i];
-        }
-        
-        if (dest_regs[i] > uniq_reg_cnt) {
-            uniq_reg_cnt=dest_regs[i];
-        }   
+    if (n_regs == 1) {
+        if (src_regs[0] != dest_regs[0])
+            mov(interpreter, dest_regs[0], src_regs[0], info);
+        return;
     }
-    uniq_reg_cnt++;
     
-    reg_move_graph = (int *)
-        mem_sys_allocate_zeroed(sizeof(int) * uniq_reg_cnt *
-                                (uniq_reg_cnt + 3));
-
+    c.interpreter = interpreter;
+    c.info = info;
+    c.mov = mov;
+    c.mov_alt = mov_alt;
+    c.src_regs = src_regs;
+    c.dest_regs = dest_regs;
+    c.temp_reg = temp_reg;
+    
+    /* compute max_reg, the max reg number + 1 */
     for (i = 0; i < n_regs; i++) {
-        GRAPH_ELEMENT(reg_move_graph, uniq_reg_cnt, src_regs[i],
-                      dest_regs[i]) = 1;
-        ROOT_VERTEX(reg_move_graph, uniq_reg_cnt,
-                    find_root(reg_move_graph, uniq_reg_cnt, src_regs[i],
-                              dest_regs[i])) = 1;
-        GRAPH_ELEMENT(reg_move_graph, uniq_reg_cnt, src_regs[i],
-                      dest_regs[i]) = 1;
+        if (src_regs[i] > max_reg) 
+            max_reg = src_regs[i];
+        if (dest_regs[i] > max_reg) 
+            max_reg = dest_regs[i];
     }
-    for (i = 0; i < uniq_reg_cnt; i++) {
-        if (ROOT_VERTEX(reg_move_graph, uniq_reg_cnt, i) > 0) {
-            if (GRAPH_ELEMENT(reg_move_graph, uniq_reg_cnt, i, i) == 1) {
-                /* mov(interpreter, i, i, info); */
-            }
-            else {
-                if (CYCLE_NODE(reg_move_graph, uniq_reg_cnt, i)) {
-                    mov(interpreter, temp_reg, i, info);
-                }
-                reorder_move(reg_move_graph, uniq_reg_cnt, i, -1, 0, mov,
-                         interpreter, info, temp_reg);
-            }
+    ++max_reg;
+
+    
+    /* allocate space for data structures */
+    /* NOTA: data structures could be kept allocated somewhere waiting to get reused...*/
+    c.nb_succ = nb_succ = (int*)mem_sys_allocate_zeroed(sizeof(int) * n_regs);
+    c.backup = backup = (int*)mem_sys_allocate(sizeof(int) * n_regs);
+    c.reg_to_index = reg_to_index = (int*)mem_sys_allocate(sizeof(int) * max_reg);
+
+    /* init backup array */
+    for (i = 0; i < n_regs; i++) 
+        backup[i] = -1;
+
+    /* fill in the conversion array between a register number and its index */
+    for (i = 0; i < max_reg; i++)
+        reg_to_index[i] = -1;
+    for (i = 0; i < n_regs; i++) {
+        index = dest_regs[i];
+        if (index != src_regs[i]) /* get rid of self-assignment */
+            reg_to_index[index] = i;
+    }
+
+    /* count the nb of successors for each reg index */
+    for (i = 0; i < n_regs; i++) {
+        index = reg_to_index[ src_regs[i] ];
+        if ( index >= 0 ) /* not interested in the wells that have no preds */
+            nb_succ[ index ]++;
+    }
+    /* process each well if any */
+    for (i = 0; i < n_regs; i++) {
+        if ( 0 == nb_succ[i] ) { /* a well */
+            rec_climb_back_and_mark(i, &c); 
         }
     }
 
-    mem_sys_free(reg_move_graph);
+    /* process remaining dest registers not processed */
+    /* remaining nodes are members of cycles without exits */
+    for (i = 0; i < n_regs; i++) {
+        if ( 0 < nb_succ[i] && 0 > backup[i] ) { /* not a well nor visited*/
+            process_cycle_without_exit(i, &c);
+        }
+    }
+        
+    mem_sys_free(nb_succ);
+    mem_sys_free(reg_to_index);
+    mem_sys_free(backup);
 }
 
 
