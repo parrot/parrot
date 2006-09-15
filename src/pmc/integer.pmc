@@ -1026,6 +1026,7 @@ TODO Complex and BigInt rhs.
 
     PMC* pow_int (INTVAL b, PMC* dest) {
         const INTVAL a = DYNSELF.get_integer();
+        const INTVAL orig_b = b;
         INTVAL r;
 
         if (b < 0)
@@ -1038,7 +1039,7 @@ TODO Complex and BigInt rhs.
                 if (b & 1) {
                     r *= temp;
                     if (r / temp != prev) {
-                        return overflow(INTERP, SELF, b, dest, MMD_POW);
+                        return overflow(INTERP, SELF, orig_b, dest, MMD_POW);
                     }
                 }
                 b >>= 1;
@@ -1047,7 +1048,7 @@ TODO Complex and BigInt rhs.
                 prev = temp;
                 temp *= temp;
                 if (prev != 0 && temp / prev != prev) {
-                    return overflow(INTERP, SELF, b, dest, MMD_POW);
+                    return overflow(INTERP, SELF, orig_b, dest, MMD_POW);
                 }
             }
         }

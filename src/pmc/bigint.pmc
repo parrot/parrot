@@ -152,6 +152,13 @@ bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
 }
 
 static void
+bigint_pow_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    mpz_pow_ui(BN(dest), BN(self), value);
+}
+
+static void
 int_check_divide_zero(Interp *interpreter, INTVAL value)
 {
     if (value == 0) {
@@ -370,6 +377,13 @@ bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 }
 static void
 bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        "no bigint lib loaded");
+}
+static void
+bigint_pow_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
@@ -867,6 +881,21 @@ MMD_DEFAULT: {
 
     void i_multiply_float (FLOATVAL value) {
         real_exception(INTERP, NULL, E_NotImplementedError, "unimp mul");
+    }
+
+    PMC* pow_int(INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        bigint_pow_bigint_int(INTERP, SELF, value, dest);
+        return dest;
+    }
+
+    PMC* pow(PMC* value, PMC* dest) {
+        /* XXX only Integer RHS currently */
+        INTVAL r = VTABLE_get_integer(INTERP, value);
+        return SELF.pow_int(r, dest);
     }
 
     PMC* divide(PMC* value, PMC* dest) {
