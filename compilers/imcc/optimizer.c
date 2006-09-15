@@ -862,7 +862,7 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
     /* reset statistic globals */
     for (ins = unit->instructions; ins; ins = ins->next) {
           if (get_branch_regno(ins) >= 0) {
-            r = get_sym(get_branch_reg(ins)->name);
+              r = get_sym(interpreter, get_branch_reg(ins)->name);
 
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 next = r->first_ins->next;
@@ -912,7 +912,7 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
         ins = unit->bb_list[i]->end;
         /* if basic block ends with unconditional jump */
         if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
-            r = get_sym(ins->r[0]->name);
+            r = get_sym(interpreter, ins->r[0]->name);
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 start = r->first_ins;
                 found = 0;
@@ -978,7 +978,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
         found = 0;
         for (count = 1; count != 999; ++count) {
             sprintf(label, "%s_post%d", branch->r[0]->name, count);
-            if (get_sym(label) == 0) {
+            if (get_sym(interp, label) == 0) {
                 found = 1;
                 break;
             }
@@ -1057,7 +1057,7 @@ branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
             /* get `end` label */
             end = ins->next;
             /* get `start` label */
-            r = get_sym(ins->r[0]->name);
+            r = get_sym(interpreter, ins->r[0]->name);
 
             if (end && (end->type & ITLABEL) &&
                 r && (r->type & VTADDRESS) && r->first_ins) {
@@ -1082,7 +1082,7 @@ branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
 
                 if (found) {
                     char *lbl = get_branch_reg(cond)->name;
-                    r = get_sym(lbl);
+                    r = get_sym(interpreter, lbl);
                     if (r && (r->type & VTADDRESS) && r->first_ins == end) {
                         /* the current ins is replaced - remember prev
                          * and set ins again after the changes

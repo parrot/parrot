@@ -21,7 +21,7 @@ struct _IMC_Unit;
 
 typedef struct nodeType_t* (*node_opt_t)    (struct nodeType_t*);
 typedef struct _SymReg*    (*node_expand_t) (Interp*, struct nodeType_t*);
-typedef struct nodeType_t* (*node_create_t) (int, struct nodeType_t*,
+typedef struct nodeType_t* (*node_create_t) (Interp*, int, struct nodeType_t*,
 					       struct nodeType_t*);
 typedef void               (*node_dump_t)   (struct nodeType_t*, int level);
 typedef context_type       (*node_context_t)(struct nodeType_t*, context_type);

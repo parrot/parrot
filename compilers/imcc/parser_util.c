@@ -510,12 +510,12 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
     }
     else if (!strcmp(name, "yield")) {
-        cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1 |ITPCCYIELD;
+        IMCC_INFO(interpreter)->cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1 |ITPCCYIELD;
     }
     else if (!strncmp(name, "invoke", 6) ||
             !strncmp(name, "callmethod", 10)) {
-        if (cur_unit->type & IMC_PCCSUB)
-            cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
+        if (IMCC_INFO(interpreter)->cur_unit->type & IMC_PCCSUB)
+            IMCC_INFO(interpreter)->cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
     }
     /* set up branch flags */
     /*
@@ -668,7 +668,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
         IMCC_INFO(interp) = imc_info->prev;
         mem_sys_free(imc_info);
         imc_info = IMCC_INFO(interp);
-        cur_unit = imc_info->last_unit;
+        IMCC_INFO(interp)->cur_unit = imc_info->last_unit;
         cur_namespace = imc_info->cur_namespace;
     }
     else
@@ -1067,7 +1067,7 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
         /* make a new P symbol */
         while (1) {
             sprintf(buf, "$P%d", ++p);
-            if (get_sym(buf) == 0)
+            if (get_sym(interpreter, buf) == 0)
                 break;
         }
         preg[n] = mk_symreg(interpreter, str_dup(buf), 'P');

@@ -69,7 +69,7 @@ imc_compile_all_units(Interp *interp)
 void
 imc_compile_unit(Interp *interp, IMC_Unit * unit) {
     /* Not much here for now except the allocator */
-    cur_unit = unit;
+    IMCC_INFO(interp)->cur_unit = unit;
 
     imc_reg_alloc(interp, unit);
     emit_flush(interp, NULL, unit);
@@ -142,7 +142,7 @@ imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
         imc_compile_unit(interp, unit);
 #endif
     }
-    cur_unit = NULL;
+    IMCC_INFO(interp)->cur_unit = NULL;
 }
 
 static void

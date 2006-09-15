@@ -48,8 +48,6 @@
  */
 static SymReg *cur_obj, *cur_call;
 static char *adv_named_id = NULL;
-int cur_pmc_type;      /* used in mk_ident */
-IMC_Unit * cur_unit;
 SymReg *cur_namespace; /* ugly hack for mk_address */
 
 /*
@@ -71,6 +69,11 @@ static int cnr;
  * or just
  *   op
  *
+ *
+ *  NOTE: Most usage of this function is with
+ *        IMCC_INFO(interpreter)->cur_unit, but there are some
+ *        exceptions. Thus, we can't easily factorize that piece of
+ *        code.
  */
 static Instruction *
 MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
@@ -257,7 +260,7 @@ IMCC_create_itcall_label(Interp* interpreter)
 
     sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
     r = mk_pcc_sub(interpreter, str_dup(name), 0);
-    i = iLABEL(interpreter, cur_unit, r);
+    i = iLABEL(interpreter, IMCC_INFO(interpreter)->cur_unit, r);
     cur_call = r;
     i->type = ITCALL | ITPCCSUB;
     return i;
@@ -296,8 +299,8 @@ IMCC_itcall_sub(Interp* interp, SymReg* sub)
     }
     if (cur_call->pcc_sub->sub->pmc_type == enum_class_NCI)
         cur_call->pcc_sub->flags |= isNCI;
-    if (cur_unit->type == IMC_PCCSUB)
-        cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
+    if (IMCC_INFO(interp)->cur_unit->type == IMC_PCCSUB)
+        IMCC_INFO(interp)->cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
 }
 
 static void
@@ -305,7 +308,7 @@ begin_return_or_yield(Interp *interp, int yield)
 {
     Instruction *i, *ins;
     char name[128];
-    ins = cur_unit->instructions;
+    ins = IMCC_INFO(interp)->cur_unit->instructions;
     if(!ins || !ins->r[0] || !(ins->r[0]->type & VT_PCC_SUB))
         IMCC_fataly(interp, E_SyntaxError,
               "yield or return directive outside pcc subroutine\n");
@@ -313,7 +316,7 @@ begin_return_or_yield(Interp *interp, int yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, cnr++);
     interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
-    i = iLABEL(interp, cur_unit, interp->imc_info->sr_return);
+    i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, interp->imc_info->sr_return);
     i->type = yield ? ITPCCSUB | ITLABEL | ITPCCYIELD : ITPCCSUB | ITLABEL ;
     interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
 }
@@ -493,9 +496,15 @@ compilation_unit:
      class_namespace  { $$ = $1; }
    | constdef      { $$ = $1; }
    | global        { $$ = $1; }
-   | sub           { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
-   | pcc_sub       { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
-   | emit          { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
+   | sub           { $$ = $1; 
+                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit); 
+                     IMCC_INFO(interp)->cur_unit = 0; }
+   | pcc_sub       { $$ = $1;
+                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
+                     IMCC_INFO(interp)->cur_unit = 0; }
+   | emit          { $$ = $1;
+                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
+                     IMCC_INFO(interp)->cur_unit = 0; }
    | MACRO '\n'    { $$ = 0; }
    | pragma        { $$ = 0; }
    | '\n'          { $$ = 0; }
@@ -553,7 +562,7 @@ constdef:
 
 pmc_const:
      CONST { is_def=1; } INTC var_or_i '=' any_string
-                { $$ = mk_pmc_const(interp, cur_unit, $3, $4, $6); is_def=0; }
+                { $$ = mk_pmc_const(interp, IMCC_INFO(interp)->cur_unit, $3, $4, $6); is_def=0; }
    ;
 any_string: 
      STRINGC 
@@ -577,21 +586,21 @@ pasmline:
 
 pasm_inst:         { clear_state(); }
      PARROT_OP pasm_args
-                   { $$ = INS(interp, cur_unit, $2,0,regs,nargs,keyvec,1);
+                   { $$ = INS(interp, IMCC_INFO(interp)->cur_unit, $2,0,regs,nargs,keyvec,1);
                      free($2); }
    | PCC_SUB
                    {
-                    imc_close_unit(interp, cur_unit);
-                    cur_unit = imc_open_unit(interp, IMC_PASM);
+                    imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
+                    IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PASM);
                     }
      sub_proto LABEL
                     {
-                     $$ = iSUBROUTINE(interp, cur_unit,
+                     $$ = iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit,
                                 mk_sub_label(interp, $4));
                      cur_call->pcc_sub->pragma = $3;
                    }
    | PNULL var
-                   {  $$ =MK_I(interp, cur_unit, "null", 1, $2); }
+                   {  $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, $2); }
    | LEXICAL STRINGC COMMA REG
                    {
                        SymReg *r = mk_pasm_reg(interp, $4);
@@ -605,7 +614,7 @@ pasm_args:
    ;
 
 emit:
-     EMIT          { cur_unit = imc_open_unit(interp, IMC_PASM); }
+     EMIT          { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PASM); }
      opt_pasmcode
      EOM           { /*
                       if (optimizer_level & OPT_PASM)
@@ -626,13 +635,13 @@ class_namespace:
                     int re_open = 0;
                     $$ = 0;
                     if (IMCC_INFO(interp)->state->pasm_file && cur_namespace) {
-                        imc_close_unit(interp, cur_unit);
+                        imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
                         re_open = 1;
                     }
                     IMCC_INFO(interp)->cur_namespace = $2;
                     cur_namespace = $2;
                     if (re_open)
-                        cur_unit = imc_open_unit(interp, IMC_PASM);
+                        IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PASM);
                 }
    ;
 
@@ -644,11 +653,11 @@ maybe_ns:
 sub:
      SUB
         {
-           cur_unit = imc_open_unit(interp, IMC_PCCSUB);
+           IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PCCSUB);
         }
      sub_label_op_c
         {
-          iSUBROUTINE(interp, cur_unit, $3);
+          iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, $3);
         }
      sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
      sub_params
@@ -695,10 +704,10 @@ multi: MULTI '(' multi_types ')'  { $$ = 0; }
    ;
 
 outer: OUTER '(' STRINGC ')'
-                     { $$ = 0; cur_unit->outer =
+                     { $$ = 0; IMCC_INFO(interp)->cur_unit->outer =
                      mk_sub_address_fromc(interp, $3); }
     | OUTER '(' IDENTIFIER ')'
-                     { $$ = 0; cur_unit->outer =
+                     { $$ = 0; IMCC_INFO(interp)->cur_unit->outer =
                      mk_const(interp, $3, 'S'); }
    ;
 
@@ -742,8 +751,8 @@ sub_body:
    ;
 
 pcc_sub:
-     PCC_SUB        { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
-     IDENTIFIER     { iSUBROUTINE(interp, cur_unit, mk_sub_label(interp, $3)); }
+     PCC_SUB        { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
+     IDENTIFIER     { iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, mk_sub_label(interp, $3)); }
      sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
      sub_params
      sub_body  ESUB { $$ = 0; cur_call = NULL; }
@@ -762,14 +771,14 @@ pcc_sub_call:
              * sub SymReg.
              * This is used below to append args & results
              */
-            i = iLABEL(interp, cur_unit, r);
+            i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, r);
             cur_call = r;
             i->type = ITPCCSUB;
             /*
              * if we are inside a pcc_sub mark the sub as doing a
              * sub call; the sub is in r[0] of the first ins
              */
-            r1 = cur_unit->instructions->r[0];
+            r1 = IMCC_INFO(interp)->cur_unit->instructions->r[0];
             if (r1 && r1->pcc_sub)
                 r1->pcc_sub->calls_a_sub |= 1;
          }
@@ -996,7 +1005,7 @@ _labels:
 
 label:
      LABEL         {
-         $$ = iLABEL(interp, cur_unit, mk_local_label(interp, $1));
+         $$ = iLABEL(interp, IMCC_INFO(interp)->cur_unit, mk_local_label(interp, $1));
                    }
    ;
 
@@ -1080,12 +1089,12 @@ labeled_inst:
                            cur_call->pcc_sub->flags |= isTAIL_CALL;
                            cur_call = NULL;
                         }
-   | GOTO label_op { $$ = MK_I(interp, cur_unit, "branch",1, $2); }
+   | GOTO label_op { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch",1, $2); }
    | PARROT_OP vars
-                   { $$ = INS(interp, cur_unit, $1, 0, regs, nargs, keyvec, 1);
+                   { $$ = INS(interp, IMCC_INFO(interp)->cur_unit, $1, 0, regs, nargs, keyvec, 1);
                                           free($1); }
    | PNULL var
-                   {  $$ =MK_I(interp, cur_unit, "null", 1, $2); }
+                   {  $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, $2); }
    | sub_call      {  $$ = 0; cur_call = NULL; }
    | pcc_sub_call  {  $$ = 0; }
    | pcc_ret
@@ -1104,7 +1113,7 @@ type:
 classname:
    IDENTIFIER
          {
-            if (( cur_pmc_type = pmc_type(interp,
+             if (( IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
                   string_from_cstring(interp, $1, 0))) <= 0) {
                 IMCC_fataly(interp, E_SyntaxError,
                    "Unknown PMC type '%s'\n", $1);
@@ -1113,75 +1122,93 @@ classname:
    ;
 
 assignment:
-     target '=' var		{ $$ = MK_I(interp, cur_unit, "set", 2, $1, $3);      }
-   | target '=' '!' var	        { $$ = MK_I(interp, cur_unit, "not", 2, $1, $4);      }
-   | target '=' '-' var	        { $$ = MK_I(interp, cur_unit, "neg", 2, $1, $4);      }
-   | target '=' '~' var	        { $$ = MK_I(interp, cur_unit, "bnot", 2, $1, $4);     }
-   | target '=' var '+' var	{ $$ = MK_I(interp, cur_unit, "add", 3, $1, $3, $5);  }
-   | target '=' var '-' var	{ $$ = MK_I(interp, cur_unit, "sub", 3, $1, $3, $5);  }
-   | target '=' var '*' var	{ $$ = MK_I(interp, cur_unit, "mul", 3, $1, $3, $5);  }
-   | target '=' var POW var	{ $$ = MK_I(interp, cur_unit, "pow", 3, $1, $3, $5);  }
-   | target '=' var '/' var	{ $$ = MK_I(interp, cur_unit, "div", 3, $1, $3, $5);  }
-   | target '=' var FDIV var	{ $$ = MK_I(interp, cur_unit, "fdiv", 3, $1, $3, $5); }
-   | target '=' var '%' var	{ $$ = MK_I(interp, cur_unit, "mod", 3, $1, $3, $5);  }
-   | target '=' var CONCAT var	{ $$ = MK_I(interp, cur_unit, "concat", 3, $1,$3,$5); }
-   | target '=' var RELOP_EQ var    { $$ = MK_I(interp, cur_unit, "iseq", 3, $1, $3, $5); }
-   | target '=' var RELOP_NE var    { $$ = MK_I(interp, cur_unit, "isne", 3, $1, $3, $5); }
-   | target '=' var RELOP_GT var    { $$ = MK_I(interp, cur_unit, "isgt", 3, $1, $3, $5); }
-   | target '=' var RELOP_LT var    { $$ = MK_I(interp, cur_unit, "islt", 3, $1, $3, $5); }
-   | target '=' var RELOP_LTE var   { $$ = MK_I(interp, cur_unit, "isle", 3, $1, $3, $5); }
-   | target '=' var RELOP_GTE var   { $$ = MK_I(interp, cur_unit, "isge", 3, $1, $3, $5); }
+     target '=' var	      
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set", 2, $1, $3);      }
+   | target '=' '!' var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "not", 2, $1, $4);      }
+   | target '=' '-' var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "neg", 2, $1, $4);      }
+   | target '=' '~' var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bnot", 2, $1, $4);     }
+   | target '=' var '+' var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "add", 3, $1, $3, $5);  }
+   | target '=' var '-' var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "sub", 3, $1, $3, $5);  }
+   | target '=' var '*' var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "mul", 3, $1, $3, $5);  }
+   | target '=' var POW var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "pow", 3, $1, $3, $5);  }
+   | target '=' var '/' var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "div", 3, $1, $3, $5);  }
+   | target '=' var FDIV var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "fdiv", 3, $1, $3, $5); }
+   | target '=' var '%' var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "mod", 3, $1, $3, $5);  }
+   | target '=' var CONCAT var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 3, $1,$3,$5); }
+   | target '=' var RELOP_EQ var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "iseq", 3, $1, $3, $5); }
+   | target '=' var RELOP_NE var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "isne", 3, $1, $3, $5); }
+   | target '=' var RELOP_GT var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "isgt", 3, $1, $3, $5); }
+   | target '=' var RELOP_LT var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "islt", 3, $1, $3, $5); }
+   | target '=' var RELOP_LTE var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "isle", 3, $1, $3, $5); }
+   | target '=' var RELOP_GTE var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "isge", 3, $1, $3, $5); }
    | target '=' var SHIFT_LEFT var
-                        { $$ = MK_I(interp, cur_unit, "shl", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "shl", 3, $1, $3, $5);  }
    | target '=' var SHIFT_RIGHT var
-                        { $$ = MK_I(interp, cur_unit, "shr", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "shr", 3, $1, $3, $5);  }
    | target '=' var SHIFT_RIGHT_U var
-                        { $$ = MK_I(interp, cur_unit, "lsr", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "lsr", 3, $1, $3, $5);  }
    | target '=' var LOG_AND var
-                        { $$ = MK_I(interp, cur_unit, "and", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "and", 3, $1, $3, $5);  }
    | target '=' var LOG_OR var
-                        { $$ = MK_I(interp, cur_unit, "or", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "or", 3, $1, $3, $5);   }
    | target '=' var LOG_XOR var
-                        { $$ = MK_I(interp, cur_unit, "xor", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "xor", 3, $1, $3, $5);  }
    | target '=' var '&' var
-                        { $$ = MK_I(interp, cur_unit, "band", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "band", 3, $1, $3, $5); }
    | target '=' var '|' var
-                        { $$ = MK_I(interp, cur_unit, "bor", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bor", 3, $1, $3, $5);  }
    | target '=' var '~' var
-                        { $$ = MK_I(interp, cur_unit, "bxor", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bxor", 3, $1, $3, $5); }
    | target '=' var '[' keylist ']'
-                        { $$ = iINDEXFETCH(interp, cur_unit, $1, $3, $5); }
+            { $$ = iINDEXFETCH(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $5); }
    | target '[' keylist ']' '=' var
-                        { $$ = iINDEXSET(interp, cur_unit, $1, $3, $6); }
+            { $$ = iINDEXSET(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $6); }
    | target '=' NEW classname COMMA var
-                        { $$ = iNEW(interp, cur_unit, $1, $4, $6, 1); }
+            { $$ = iNEW(interp, IMCC_INFO(interp)->cur_unit, $1, $4, $6, 1); }
    | target '=' NEW classname '[' keylist ']'
-                        { $$ = iNEW(interp, cur_unit, $1, $4, $6, 1); }
+            { $$ = iNEW(interp, IMCC_INFO(interp)->cur_unit, $1, $4, $6, 1); }
    | target '=' NEW classname
-                        { $$ = iNEW(interp, cur_unit, $1, $4, NULL, 1); }
+            { $$ = iNEW(interp, IMCC_INFO(interp)->cur_unit, $1, $4, NULL, 1); }
    | target '=' NEW var
-                        { $$ = MK_I(interp, cur_unit, "new", 2, $1, $4); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 2, $1, $4); }
    | target '=' NEW '[' keylist ']'
-                        { $$ = MK_I(interp, cur_unit, "new", 2, $1, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 2, $1, $5); }
    | target '=' NEW var COMMA var
-                        { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
    | target '=' NEW var '[' keylist ']'
-                        { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
    | target '=' ADDR IDENTIFIER
-                        { $$ = MK_I(interp, cur_unit, "set_addr",
-                                    2, $1, mk_label_address(interp, $4)); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set_addr",
+                        2, $1, mk_label_address(interp, $4)); }
    | target '=' GLOBALOP string
-                        { $$ = MK_I(interp, cur_unit, "find_global",2,$1,$4);}
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "find_global",2,$1,$4);}
    | GLOBALOP string '=' var
-                        { $$ = MK_I(interp, cur_unit, "store_global",2, $2,$4); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "store_global",2, $2,$4); }
        /* NEW is here because it is both PIR and PASM keywords so we
         * have to handle the token here (or badly hack the lexer). */
    | NEW target COMMA var
-                        { $$ = MK_I(interp, cur_unit, "new", 2, $2, $4); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 2, $2, $4); }
    | NEW target COMMA var COMMA var
-                        { $$ = MK_I(interp, cur_unit, "new", 3, $2, $4, $6); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $2, $4, $6); }
    | NEW target COMMA var '[' keylist ']'
-                        { $$ = MK_I(interp, cur_unit, "new", 3, $2, $4, $6); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $2, $4, $6); }
      /* Subroutine call the short way */
    | target  '=' sub_call
          {
@@ -1202,7 +1229,7 @@ assignment:
    | op_assign
    | func_assign
    | target '=' PNULL
-                   {  $$ =MK_I(interp, cur_unit, "null", 1, $1); }
+        {  $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, $1); }
    ;
 
 get_results: GET_RESULTS { $$ = IMCC_create_itcall_label(interp);
@@ -1212,36 +1239,36 @@ get_results: GET_RESULTS { $$ = IMCC_create_itcall_label(interp);
 
 op_assign:
      target PLUS_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "add", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "add", 2, $1, $3); }
    | target MINUS_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "sub", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "sub", 2, $1, $3); }
    | target MUL_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "mul", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "mul", 2, $1, $3); }
    | target DIV_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "div", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "div", 2, $1, $3); }
    | target MOD_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "mod", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "mod", 2, $1, $3); }
    | target FDIV_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "fdiv", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "fdiv", 2, $1, $3); }
    | target CONCAT_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "concat", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 2, $1, $3); }
    | target BAND_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "band", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "band", 2, $1, $3); }
    | target BOR_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "bor", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bor", 2, $1, $3); }
    | target BXOR_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "bxor", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bxor", 2, $1, $3); }
    | target SHR_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "shr", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "shr", 2, $1, $3); }
    | target SHL_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "shl", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "shl", 2, $1, $3); }
    | target SHR_U_ASSIGN var
-                   { $$ = MK_I(interp, cur_unit, "lsr", 2, $1, $3); }
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "lsr", 2, $1, $3); }
    ;
 
 func_assign:
    target '=' PARROT_OP pasm_args
-                   { $$ = func_ins(interp, cur_unit, $1, $3,
+                   { $$ = func_ins(interp, IMCC_INFO(interp)->cur_unit, $1, $3,
                                    regs,nargs,keyvec,1);
                      free($3);
                    }
@@ -1332,21 +1359,21 @@ targetlist:
 
 if_statement:
      IF var relop var GOTO label_op
-                   {  $$ =MK_I(interp, cur_unit, $3, 3, $2, $4, $6); }
+      { $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, $3, 3, $2, $4, $6); }
    | UNLESS var relop var GOTO label_op
-                   {  $$ =MK_I(interp, cur_unit, inv_op($3), 3, $2,$4, $6); }
+      { $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, inv_op($3), 3, $2,$4, $6); }
    | IF PNULL var GOTO label_op
-                   {  $$ = MK_I(interp, cur_unit, "if_null", 2, $3, $5); }
+      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if_null", 2, $3, $5); }
    | UNLESS PNULL var GOTO label_op
-                   {  $$ = MK_I(interp, cur_unit, "unless_null", 2, $3, $5); }
+      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless_null", 2, $3, $5); }
    | IF var GOTO label_op
-                   {  $$ = MK_I(interp, cur_unit, "if", 2, $2, $4); }
+      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if", 2, $2, $4); }
    | UNLESS var GOTO label_op
-                   {  $$ = MK_I(interp, cur_unit, "unless",2, $2, $4); }
+      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless",2, $2, $4); }
    | IF var COMMA label_op
-                   {  $$ = MK_I(interp, cur_unit, "if", 2, $2, $4); }
+      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if", 2, $2, $4); }
    | UNLESS var COMMA label_op
-                   {  $$ = MK_I(interp, cur_unit, "unless", 2, $2, $4); }
+      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless", 2, $2, $4); }
    ;
 
 relop:

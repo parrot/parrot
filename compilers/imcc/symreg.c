@@ -240,7 +240,7 @@ SymReg *
 mk_pasm_reg(Interp *interp, char * name)
 {
     SymReg * r;
-    if ((r = _get_sym(&cur_unit->hash, name))) {
+    if ((r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name))) {
 	free(name);
         return r;
     }
@@ -270,7 +270,6 @@ mk_fullname(const char * name)
     return _mk_fullname(namespace, name);
 }
 
-extern int cur_pmc_type;
 /* Makes a new identifier */
 SymReg *
 mk_ident(Interp *interp, char * name, int t)
@@ -288,8 +287,8 @@ mk_ident(Interp *interp, char * name, int t)
     r->type = VTIDENTIFIER;
     free(name);
     if (t == 'P') {
-        r->pmc_type = cur_pmc_type;
-        cur_pmc_type = 0;
+        r->pmc_type = IMCC_INFO(interp)->cur_pmc_type;
+        IMCC_INFO(interp)->cur_pmc_type = 0;
     }
     return r;
 }
@@ -366,7 +365,7 @@ mk_const_ident(Interp *interp,
     else {
         if (t == 'P') {
             r = mk_ident(interp, name, t);
-            return mk_pmc_const_2(interp, cur_unit, r, val);
+            return mk_pmc_const_2(interp, IMCC_INFO(interp)->cur_unit, r, val);
         }
         r = mk_ident(interp, name, t);
     }
@@ -470,7 +469,7 @@ SymReg *
 mk_address(Interp *interp, char * name, int uniq)
 {
     SymReg * s;
-    SymHash *h = *name == '_' ? &IMCC_INFO(interp)->ghash : &cur_unit->hash;
+    SymHash *h = *name == '_' ? &IMCC_INFO(interp)->ghash : &IMCC_INFO(interp)->cur_unit->hash;
     s = _mk_address(interp, h, name, uniq);
     if (*name == '_')
        s->usage |= U_FIXUP;
@@ -577,7 +576,8 @@ link_keys(Interp *interp, int nargs, SymReg * keys[], int force)
     int i, len, any_slice;
     char *key_str;
     /* namespace keys are global consts - no cur_unit */
-    SymHash *h = cur_unit ? &cur_unit->hash : &IMCC_INFO(interp)->ghash;
+    SymHash *h = IMCC_INFO(interp)->cur_unit ? 
+        &IMCC_INFO(interp)->cur_unit->hash : &IMCC_INFO(interp)->ghash;
 
     if (nargs == 0)
         IMCC_fataly(interp, E_SyntaxError,
@@ -730,9 +730,9 @@ _store_symreg(SymHash *hsh, SymReg * r)
 }
 
 void
-store_symreg(SymReg * r)
+store_symreg(Interp * interp, SymReg * r)
 {
-    _store_symreg(&cur_unit->hash, r);
+    _store_symreg(&IMCC_INFO(interp)->cur_unit->hash, r);
 }
 
 /* Gets a symbol from the hash */
@@ -753,9 +753,9 @@ _get_sym(SymHash * hsh, const char * name)
 
 /* Gets a symbol from the current unit symbol table */
 SymReg *
-get_sym(const char * name)
+get_sym(Interp *interp, const char * name)
 {
-    return _get_sym(&cur_unit->hash, name);
+    return _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 }
 
 /* find a symbol hash or ghash */
@@ -786,8 +786,8 @@ _find_sym(Interp *interp, Namespace * nspace, SymHash * hsh,
 SymReg *
 find_sym(Interp *interp, const char * name)
 {
-    if (cur_unit)
-        return _find_sym(interp, namespace, &cur_unit->hash, name);
+    if (IMCC_INFO(interp)->cur_unit)
+        return _find_sym(interp, namespace, &IMCC_INFO(interp)->cur_unit->hash, name);
     return NULL;
 }
 

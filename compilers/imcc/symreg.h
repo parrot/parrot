@@ -180,9 +180,9 @@ SymReg * mk_pasm_reg(Interp*, char *);
 
 
 void free_sym(SymReg *r);
-void store_symreg(SymReg * r);
+void store_symreg(Interp* interpreter, SymReg * r);
 SymReg * find_sym(Interp *, const char * name);
-SymReg * get_sym(const char * name);
+SymReg * get_sym(Interp* interpreter, const char * name);
 SymReg* get_pasm_reg(Interp* interpreter, char *name);
 SymReg* get_const(Interp *interpreter, const char *name, int type);
 SymReg * _get_sym(SymHash *hash, const char * name);

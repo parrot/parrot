@@ -130,21 +130,18 @@ typedef enum {
   PR_N_OPERATORS = 0x01
 } _imc_pragmas;
 
-/* globals XXX */
-/* PARROT_API EXTERN int        line;	*/ /* and line */ 
-
 #define PARROT_MAX_RECOVER_ERRORS 40 /* this is the number of times
                                       * parrot will try to retry while
                                       * compiling. */
 
-EXTERN enum {
+typedef enum _enum_opt {
     OPT_NONE,
     OPT_PRE,
     OPT_CFG  = 0x002,
     OPT_SUB  = 0x004,
     OPT_PASM = 0x100,
     OPT_J    = 0x200
-} enum_opt;
+} enum_opt_t;
 
 struct nodeType_t;
 
@@ -169,9 +166,9 @@ typedef enum _AsmState {
 } AsmState;
 
 typedef enum _imcc_reg_allocator_t {
-    IMCC_VANILLA_ALLOCATOR =0,
+    IMCC_VANILLA_ALLOCATOR = 0,
     IMCC_GRAPH_ALLOCATOR
-}imcc_reg_allocator;
+} imcc_reg_allocator;
 
 PARROT_API void IMCC_push_parser_state(Interp*);
 PARROT_API void IMCC_pop_parser_state(Interp*, void *yyscanner);
@@ -180,6 +177,7 @@ typedef struct _imc_info_t {
     struct _imc_info_t *prev;
     IMC_Unit * imc_units;
     IMC_Unit * last_unit;
+    IMC_Unit * cur_unit;
     int n_comp_units;
     int imcc_warn;
     int verbose;
@@ -204,15 +202,13 @@ typedef struct _imc_info_t {
 
     /* some values that were global... */
     int line;                   /* current line number */
+    int cur_pmc_type;           
 } imc_info_t;
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)
 
 #define IMC_TRACE 0
 #define IMC_TRACE_HIGH 0
-
-
-extern IMC_Unit * cur_unit;
 
 /*
  * ast interface

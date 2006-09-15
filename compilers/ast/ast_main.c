@@ -95,7 +95,7 @@ ast_compile_past(Parrot_Interp interp, const char *src_string)
         interp->imc_info = imc_info->prev;
         mem_sys_free(imc_info);
         imc_info = interp->imc_info;
-        cur_unit = imc_info->last_unit;
+        IMCC_INFO(interp)->cur_unit = imc_info->last_unit;
     }
     else
         imc_cleanup(interp);

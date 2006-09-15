@@ -472,13 +472,14 @@ SP              [ ]
             valp->sr = r;
             return VAR;
         }
-                if (cur_unit && cur_unit->instructions &&
-                        (r = cur_unit->instructions->r[0]) &&
-                        r->pcc_sub) {
+        if (IMCC_INFO(interp)->cur_unit &&
+            IMCC_INFO(interp)->cur_unit->instructions &&
+            (r = IMCC_INFO(interp)->cur_unit->instructions->r[0]) &&
+            r->pcc_sub) {
                     if ((r->pcc_sub->pragma & P_METHOD) &&
                         !strcmp(yytext, "self")) {
                         valp->sr  = mk_ident(interp, str_dup("self"), 'P');
-                        cur_unit->type |= IMC_HAS_SELF;
+                        IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
                         return VAR;
                     }
                 }

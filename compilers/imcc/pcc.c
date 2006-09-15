@@ -35,7 +35,7 @@ get_pasm_reg(Interp* interp, char *name)
 {
     SymReg *r;
 
-    if ((r = _get_sym(&cur_unit->hash, name)))
+    if ((r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name)))
         return r;
     return mk_pasm_reg(interp, str_dup(name));
 }
@@ -152,7 +152,7 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * if this sub isa method, unshift 'self' as first param
      */
     if (sub->pcc_sub->pragma & P_METHOD) {
-        SymReg *self = get_sym("self");
+        SymReg *self = get_sym(interp, "self");
         if (!self) {
             self = mk_symreg(interp, str_dup("self"), 'P');
             self->type = VTIDENTIFIER;
