@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 use Parrot::Config;
 
 =head1 NAME
@@ -789,4 +789,22 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Namespace.get_global() with array ('')");
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Namespace introspection");
+.sub main :main
+    .local pmc f
+    f = get_hll_global ['Foo'], 'dummy'
+    f()
+.end
+.namespace ['Foo']
+.sub dummy
+    .local pmc interp, ns_caller
+    interp = getinterp
+    ns_caller = interp['namespace'; 1]
+    print ns_caller
+    print "\n"
+.end
+CODE
+parrot
 OUTPUT
