@@ -203,6 +203,8 @@ typedef struct _imc_info_t {
     /* some values that were global... */
     int line;                   /* current line number */
     int cur_pmc_type;           
+    SymReg *cur_call;
+    SymReg *cur_obj;
 } imc_info_t;
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)

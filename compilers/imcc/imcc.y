@@ -46,7 +46,7 @@
 /*
  * Some convenient vars
  */
-static SymReg *cur_obj, *cur_call;
+/* static SymReg *cur_obj , *cur_call; */
 static char *adv_named_id = NULL;
 SymReg *cur_namespace; /* ugly hack for mk_address */
 
@@ -202,7 +202,7 @@ static Instruction * iSUBROUTINE(Interp *interp, IMC_Unit * unit, SymReg * r) {
     i =  iLABEL(interp, unit, r);
     r->type = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
-    cur_call = r;
+    IMCC_INFO(interp)->cur_call = r;
     i->line = IMCC_INFO(interp)->line;
     add_namespace(interp, unit);
     return i;
@@ -261,7 +261,7 @@ IMCC_create_itcall_label(Interp* interpreter)
     sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
     r = mk_pcc_sub(interpreter, str_dup(name), 0);
     i = iLABEL(interpreter, IMCC_INFO(interpreter)->cur_unit, r);
-    cur_call = r;
+    IMCC_INFO(interpreter)->cur_call = r;
     i->type = ITCALL | ITPCCSUB;
     return i;
 }
@@ -290,15 +290,15 @@ mk_sub_address_u(Interp *interp, char * name)
 void
 IMCC_itcall_sub(Interp* interp, SymReg* sub)
 {
-    cur_call->pcc_sub->sub = sub;
-    if (cur_obj) {
-        if (cur_obj->set != 'P')
+    IMCC_INFO(interp)->cur_call->pcc_sub->sub = sub;
+    if (IMCC_INFO(interp)->cur_obj) {
+        if (IMCC_INFO(interp)->cur_obj->set != 'P')
             IMCC_fataly(interp, E_SyntaxError, "object isn't a PMC");
-        cur_call->pcc_sub->object = cur_obj;
-        cur_obj = NULL;
+        IMCC_INFO(interp)->cur_call->pcc_sub->object = IMCC_INFO(interp)->cur_obj;
+        IMCC_INFO(interp)->cur_obj = NULL;
     }
-    if (cur_call->pcc_sub->sub->pmc_type == enum_class_NCI)
-        cur_call->pcc_sub->flags |= isNCI;
+    if (IMCC_INFO(interp)->cur_call->pcc_sub->sub->pmc_type == enum_class_NCI)
+        IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isNCI;
     if (IMCC_INFO(interp)->cur_unit->type == IMC_PCCSUB)
         IMCC_INFO(interp)->cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
 }
@@ -597,7 +597,7 @@ pasm_inst:         { clear_state(); }
                     {
                      $$ = iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit,
                                 mk_sub_label(interp, $4));
-                     cur_call->pcc_sub->pragma = $3;
+                     IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $3;
                    }
    | PNULL var
                    {  $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, $2); }
@@ -659,9 +659,9 @@ sub:
         {
           iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, $3);
         }
-     sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
+     sub_proto '\n' { IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5; }
      sub_params
-     sub_body  ESUB { $$ = 0; cur_call = NULL; }
+     sub_body  ESUB { $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
    ;
 
 sub_params:
@@ -669,9 +669,9 @@ sub_params:
    | '\n'                               { $$ = 0; }
    | sub_params sub_param '\n'          { 
          if (adv_named_id) {
-             add_pcc_named_param(interp,cur_call,adv_named_id,$2);
+             add_pcc_named_param(interp,IMCC_INFO(interp)->cur_call,adv_named_id,$2);
              adv_named_id = NULL;
-         } else add_pcc_param(cur_call, $2);
+         } else add_pcc_param(IMCC_INFO(interp)->cur_call, $2);
    }
    ;
 
@@ -712,9 +712,9 @@ outer: OUTER '(' STRINGC ')'
    ;
 
 multi_types:
-     /* empty */     { add_pcc_multi(cur_call, NULL); }
-   | multi_types COMMA multi_type { $$ = 0; add_pcc_multi(cur_call, $3); }
-   | multi_type      { $$ = 0;  add_pcc_multi(cur_call, $1);}
+     /* empty */     { add_pcc_multi(IMCC_INFO(interp)->cur_call, NULL); }
+   | multi_types COMMA multi_type { $$ = 0; add_pcc_multi(IMCC_INFO(interp)->cur_call, $3); }
+   | multi_type      { $$ = 0;  add_pcc_multi(IMCC_INFO(interp)->cur_call, $1);}
    ;
 
 multi_type:
@@ -753,9 +753,9 @@ sub_body:
 pcc_sub:
      PCC_SUB        { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
      IDENTIFIER     { iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, mk_sub_label(interp, $3)); }
-     sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
+     sub_proto '\n' { IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5; }
      sub_params
-     sub_body  ESUB { $$ = 0; cur_call = NULL; }
+     sub_body  ESUB { $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
    ;
 
 pcc_sub_call:
@@ -772,7 +772,7 @@ pcc_sub_call:
              * This is used below to append args & results
              */
             i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, r);
-            cur_call = r;
+            IMCC_INFO(interp)->cur_call = r;
             i->type = ITPCCSUB;
             /*
              * if we are inside a pcc_sub mark the sub as doing a
@@ -787,18 +787,18 @@ pcc_sub_call:
      pcc_call
      opt_label
      pcc_results
-     PCC_END       { $$ = 0; cur_call = NULL; }
+     PCC_END       { $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
    ;
 
 opt_label:
-     /* empty */   { $$ = NULL;  cur_call->pcc_sub->label = 0; }
-   | label '\n'    { $$ = NULL;  cur_call->pcc_sub->label = 1; }
+     /* empty */   { $$ = NULL;  IMCC_INFO(interp)->cur_call->pcc_sub->label = 0; }
+   | label '\n'    { $$ = NULL;  IMCC_INFO(interp)->cur_call->pcc_sub->label = 1; }
    ;
 
 opt_invocant:
      /* empty */   { $$ = NULL; }
    | INVOCANT var '\n'
-                   { $$ = NULL;  cur_call->pcc_sub->object = $2; }
+                   { $$ = NULL;  IMCC_INFO(interp)->cur_call->pcc_sub->object = $2; }
    ;
 
 sub_proto:
@@ -826,34 +826,34 @@ proto:
 pcc_call:
      PCC_CALL var COMMA var '\n'
          {
-            add_pcc_sub(cur_call, $2);
-            add_pcc_cc(cur_call, $4);
+            add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
+            add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
          }
    | PCC_CALL var '\n'
-         {  add_pcc_sub(cur_call, $2); }
+         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, $2); }
    | NCI_CALL var '\n'
          {
-            add_pcc_sub(cur_call, $2);
-            cur_call->pcc_sub->flags |= isNCI;
+            add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
+            IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isNCI;
          }
    | METH_CALL target '\n'
-         {  add_pcc_sub(cur_call, $2); }
+         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, $2); }
    | METH_CALL STRINGC '\n'
-         {  add_pcc_sub(cur_call, mk_const(interp, $2,'S')); }
+         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2,'S')); }
    | METH_CALL target COMMA var '\n'
-         {  add_pcc_sub(cur_call, $2);
-            add_pcc_cc(cur_call, $4);
+         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
+            add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
          }
    | METH_CALL STRINGC COMMA var '\n'
-         {  add_pcc_sub(cur_call, mk_const(interp, $2,'S'));
-            add_pcc_cc(cur_call, $4);
+         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2,'S'));
+            add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
          }
    ;
 
 
 pcc_args:
      /* empty */                       {  $$ = 0; }
-   | pcc_args pcc_arg '\n'             {  add_pcc_arg(cur_call, $2); }
+   | pcc_args pcc_arg '\n'             {  add_pcc_arg(IMCC_INFO(interp)->cur_call, $2); }
    ;
 
 pcc_arg:
@@ -863,7 +863,7 @@ pcc_arg:
 
 pcc_results:
      /* empty */                       {  $$ = 0; }
-   | pcc_results pcc_result '\n'       {  if($2) add_pcc_result(cur_call, $2); }
+   | pcc_results pcc_result '\n'       {  if($2) add_pcc_result(IMCC_INFO(interp)->cur_call, $2); }
    ;
 
 pcc_result:
@@ -1086,8 +1086,8 @@ labeled_inst:
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
                     { mk_const_ident(interp, $4, $3, $6, 1);is_def=0; }
    | RETURN  sub_call   { $$ = NULL;
-                           cur_call->pcc_sub->flags |= isTAIL_CALL;
-                           cur_call = NULL;
+                           IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
+                           IMCC_INFO(interp)->cur_call = NULL;
                         }
    | GOTO label_op { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch",1, $2); }
    | PARROT_OP vars
@@ -1095,7 +1095,7 @@ labeled_inst:
                                           free($1); }
    | PNULL var
                    {  $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, $2); }
-   | sub_call      {  $$ = 0; cur_call = NULL; }
+   | sub_call      {  $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
    | pcc_sub_call  {  $$ = 0; }
    | pcc_ret
    | /* none */                        { $$ = 0;}
@@ -1213,7 +1213,7 @@ assignment:
    | target  '=' sub_call
          {
             add_pcc_result($3->r[0], $1);
-            cur_call = NULL;
+            IMCC_INFO(interp)->cur_call = NULL;
             $$ = 0;
          }
    | '('
@@ -1223,7 +1223,7 @@ assignment:
       targetlist  ')' '=' the_sub '(' arglist ')'
          {
            IMCC_itcall_sub(interp, $6);
-           cur_call = NULL;
+           IMCC_INFO(interp)->cur_call = NULL;
          }
    | get_results
    | op_assign
@@ -1282,9 +1282,9 @@ the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1); }
                             IMCC_fataly(interp, E_SyntaxError,
                                   "Sub isn't a PMC");
                      }
-       | target ptr sub_label_op  { cur_obj = $1; $$ = $3; }
-       | target ptr STRINGC    { cur_obj = $1; $$ = mk_const(interp, $3, 'S'); }
-       | target ptr target     { cur_obj = $1; $$ = $3; }
+       | target ptr sub_label_op  { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
+       | target ptr STRINGC    { IMCC_INFO(interp)->cur_obj = $1; $$ = mk_const(interp, $3, 'S'); }
+       | target ptr target     { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
    ;
 
 ptr:    POINTY { $$=0; }
@@ -1305,19 +1305,19 @@ arglist:
      /* empty */             {  $$ = 0; }
    | arglist COMMA arg       {  $$ = 0; 
        if (adv_named_id) {
-           add_pcc_named_arg(interp, cur_call, adv_named_id, $3);
+           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, adv_named_id, $3);
            adv_named_id = NULL;
-       } else add_pcc_arg(cur_call, $3); 
+       } else add_pcc_arg(IMCC_INFO(interp)->cur_call, $3); 
    }
    | arg                     {  $$ = 0; 
        if (adv_named_id) {
-           add_pcc_named_arg(interp, cur_call,adv_named_id,$1);
+           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,adv_named_id,$1);
            adv_named_id = NULL;
-       } else add_pcc_arg(cur_call, $1);
+       } else add_pcc_arg(IMCC_INFO(interp)->cur_call, $1);
    }
    | arglist COMMA STRINGC ADV_ARROW var { $$ = 0;
-                                     add_pcc_named_arg(interp,cur_call,$3,$5);}
-   | STRINGC ADV_ARROW var { $$ = 0; add_pcc_named_arg(interp,cur_call,$1,$3);}
+                                     add_pcc_named_arg(interp,IMCC_INFO(interp)->cur_call,$3,$5);}
+   | STRINGC ADV_ARROW var { $$ = 0; add_pcc_named_arg(interp,IMCC_INFO(interp)->cur_call,$1,$3);}
    ;
 
 arg:
@@ -1342,18 +1342,18 @@ targetlist:
      targetlist COMMA result { 
          $$ = 0;
          if (adv_named_id) {
-             add_pcc_named_result(interp,cur_call,adv_named_id,$3);
+             add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,adv_named_id,$3);
              adv_named_id = NULL;
-         } else add_pcc_result(cur_call, $3); }
+         } else add_pcc_result(IMCC_INFO(interp)->cur_call, $3); }
    | targetlist COMMA STRINGC ADV_ARROW target { 
-        add_pcc_named_result(interp,cur_call,$3,$5); }
+        add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,$3,$5); }
    | result                  { 
        $$ = 0;
        if (adv_named_id) {
-           add_pcc_named_result(interp,cur_call,adv_named_id,$1);
+           add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,adv_named_id,$1);
            adv_named_id = NULL;
-       } else add_pcc_result(cur_call, $1); }
-   | STRINGC ADV_ARROW target { add_pcc_named_result(interp,cur_call,$1,$3); }
+       } else add_pcc_result(IMCC_INFO(interp)->cur_call, $1); }
+   | STRINGC ADV_ARROW target { add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,$1,$3); }
    | /* empty */             {  $$ = 0; }
    ;
 
