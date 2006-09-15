@@ -65,10 +65,6 @@ check_backslash:
   $I0 = index str, '\'
   if $I0 != -1 goto escape
 
-check_quotes:
-  $I0 = index str, '"'
-  if $I0 != -1 goto escape
-
   # {}'d constructs
 check_spaces:
   $I0 = find_cclass .CCLASS_WHITESPACE, str, 0, chars
