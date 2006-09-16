@@ -151,7 +151,7 @@ association such as C<a = b = c = 10> or C< a < 10 < b>.
 
 =item - is parsed()
 
-PGE::OPTable normally generates the parsing code for and operator based on the
+PGE::OPTable normally generates the parsing code for an operator based on the
 operator name which usually consists of the operators orientation followed by
 a colon and then the operator symbol. In Perl6 'infix:*' is an example
 operator name of the infix multiplication operator.  'infix:x' likewise
