@@ -232,8 +232,8 @@ impossible on small systems. So by going with Pugs and GHC we'd be sacrificing
 portability.
 
 As well, other languages apart from Perl 6 are being targeted to Parrot.
-Significant parts of Python, TCL, Perl 5, and Basic have already been
-implemented and others are on the way. Running multiple languages on the same
+Significant parts of Python, Tcl, and Basic have already been implemented,
+and others are on the way. Running multiple languages on the same
 Parrot engine allows them to be cross-language compatible-- in other words, one
 targeted language could directly invoke the methods of another at the bytecode
 level.
@@ -258,14 +258,17 @@ crazy...
 
 =head2 OK, so Parrot is fast... Pugs can back-end to Parrot, right?
 
-Yes (though at this time, that's in the early stages). Still, the ultimate goal
-is for Perl 6 to be self-hosting (that is, written in itself) in order to
-improve introspection, debugger capabilities, compile-time semantic modulation,
-etc. For this reason, Pugs-on-Haskell will probably be the compiler that first
-compiles the ultimate Perl 6 compiler, but thereafter the Haskell-based
-interpreter will no longer be the primary reference implementation. This is
-documented by the Pugs team at
-L<http://svn.perl.org/perl6/pugs/trunk/docs/01Overview.html>
+There was an early attempt for Pugs to target Parrot, but at the moment
+it is not actively maintained; instead, look into the F<languages/perl6/>
+directory in the Parrot source tree for an implementation that does not
+depend on either GHC or Perl 5's runtime.
+
+Still, the ultimate goal is for the Perl 6 compiler to be self-hosting
+(that is, written in itself) in order to improve introspection, debugger
+capabilities and compile-time semantic modulation.
+
+See L<http://dev.perl.org/perl6/doc/design/syn/S01.html#Project_Plan>
+for further discussions on Perl 6's project plan.
 
 =head1 PARROT AND PERL
 
