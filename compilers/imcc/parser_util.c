@@ -4,8 +4,11 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
+ * Copyright (C) 2002-2006, The Perl Foundation.
  *
  * parser support functions
+ *
+ * $Id$
  *
  */
 
@@ -29,6 +32,8 @@ static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, char *name,
                                SymReg **r);
 
 /*
+ * FIXME:
+ *
  * used in -D20 to print files with the output of every PIR compilation
  * this can't be attached to the interpreter or packfile because it has to be
  * absolutely global to prevent the files from being overwritten.
@@ -570,9 +575,14 @@ extern SymReg *cur_namespace; /* s. imcc.y */
 
 
 int
-do_yylex_init (yyscan_t* yyscanner)
+do_yylex_init (Interp* interp, yyscan_t* yyscanner)
 {
-    return yylex_init(yyscanner);
+    int retval;
+    retval = yylex_init(yyscanner);
+    /* This way we can get the interpreter via yyscanner */
+    if (!retval) yyset_extra(interp, *yyscanner);
+
+    return retval;
 }
 
 PMC *
@@ -592,7 +602,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     INTVAL regs_used[4] = {3,3,3,3};
     void *yyscanner;
 
-    do_yylex_init ( &yyscanner );
+    do_yylex_init ( interp, &yyscanner );
 
     /*
      * we create not yet anchored PMCs - e.g. Subs: turn off DOD
@@ -625,7 +635,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
         IMCC_INFO(interp)->state->next = NULL;
     IMCC_INFO(interp)->state->pasm_file = pasm_file;
     IMCC_INFO(interp)->state->file = name;
-    expect_pasm = 0;
+    IMCC_INFO(interp)->expect_pasm = 0;
     Parrot_push_context(interp, regs_used);
 
     compile_string(interp, const_cast(s), yyscanner);
@@ -794,7 +804,8 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
 
     if (ext && strcmp (ext, ".pasm") == 0) {
         void *yyscanner;
-        do_yylex_init ( &yyscanner );
+        do_yylex_init ( interp, &yyscanner );
+
 
         IMCC_INFO(interp)->state->pasm_file = 1;
         /* see imcc.l */
@@ -807,7 +818,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
     }
     else {
         void *yyscanner;
-        do_yylex_init ( &yyscanner );
+        do_yylex_init ( interp, &yyscanner );
 
         IMCC_INFO(interp)->state->pasm_file = 0;
         compile_file(interp, fp, yyscanner);

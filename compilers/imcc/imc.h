@@ -205,6 +205,39 @@ typedef struct _imc_info_t {
     int cur_pmc_type;           
     SymReg *cur_call;
     SymReg *cur_obj;
+    char *adv_named_id;
+
+    /* Lex globals */
+    int in_pod;
+    char *heredoc_end;
+    char *heredoc_content;
+    char *cur_macro_name;
+
+    int expect_pasm;
+    struct macro_frame_t *frames;
+
+    /* this is just a sign that we suck.  that's all. */
+    char temp_buffer[4096];
+    /* I really do not like this temporary buffer. It makes the
+     * structure big. -- ambs */
+
+    /*
+     * XXX: The use of a cstring hash is good, pretty much.  But we're never
+     * clearing the hash, ever, which is bad, pretty much.
+     */
+    Hash *macros;
+
+    /*
+     * these are used for constructing one INS
+     */
+#define IMCC_MAX_STATIC_REGS 100
+    SymReg *regs[IMCC_MAX_STATIC_REGS];
+    int nkeys;
+    SymReg *keys[IMCC_MAX_FIX_REGS]; /* TODO key overflow check */
+    int keyvec;
+    int cnr;
+    int nargs;
+    int in_slice;
 } imc_info_t;
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)

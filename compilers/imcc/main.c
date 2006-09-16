@@ -399,7 +399,7 @@ do_pre_process(Parrot_Interp interp)
     YYSTYPE val;
     void *yyscanner;
 
-    do_yylex_init ( &yyscanner );
+    do_yylex_init ( interp, &yyscanner );
 
     IMCC_push_parser_state(interp);
     while ( (c = yylex(&val, interp, yyscanner)) ) {
@@ -508,11 +508,11 @@ main(int argc, char * argv[])
     Interp *interp;
     void *yyscanner;
 
-    do_yylex_init ( &yyscanner );
-
     Parrot_set_config_hash();
 
     interp = Parrot_new(NULL);
+
+    do_yylex_init ( interp, &yyscanner );
 
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);
