@@ -499,7 +499,11 @@ Return GMP version string "x.y.z".
 */
 
     METHOD STRING* version() {
+#ifdef PARROT_HAS_GMP
         return string_from_cstring(INTERP, gmp_version, 0);
+#else
+        return const_string(INTERP, "0.0.0");
+#endif
     }
 
 /*
