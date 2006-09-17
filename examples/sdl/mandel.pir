@@ -100,7 +100,8 @@ print:
     $I0 = k % pal_elems
     raw_c = raw_palette[$I0]
     $I0 = offs_y + x
-    # raw_pixels[$I0] = raw_c
+    # main_screen.'draw_pixel'(x, y, raw_c)
+    # -> opt
     raw_surface[ 'pixels'; 'array'; $I0 ] = raw_c
     inc x
     if x < w goto loop_x
@@ -209,7 +210,7 @@ Runtimes w/ unoptimized parrot,  plain runcore x86_64 AMD X2@2000
 
   Original version based on sdl/raw_pixels   21s
   Create raw_palette                         12s
-  Prefetch raw_surface                        6s
+  Prefetch raw_surface                       10s
 
 =head1 SEE ALSO
 
