@@ -399,7 +399,7 @@ MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
 
 static Instruction*
 mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
-        char *type, SymReg *left, char *constant)
+             char *type, SymReg *left, char *constant)
 {
     int type_enum = atoi(type);
     SymReg *rhs;
@@ -410,8 +410,8 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
         if (IMCC_INFO(interp)->state->pasm_file) {
             IMCC_fataly(interp, E_SyntaxError,
-            "Ident as PMC constant",
-                " %s\n", left->name);
+                        "Ident as PMC constant",
+                        " %s\n", left->name);
         }
         left->type = VTIDENTIFIER;
         left->set = 'P';
@@ -425,19 +425,19 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
         constant[len - 1] = '\0';
         strcpy(name, constant + 1);
         free(constant);
-    }
-    else
+    } else {
         name = constant;
+    }
     switch (type_enum) {
-        case enum_class_Sub:
-        case enum_class_Coroutine:
-            rhs = mk_const(interp, name, 'p');
-            if (!ascii)
-                rhs->type |= VT_ENCODED;  
-            r[1] = rhs;
-            rhs->pmc_type = type_enum;
-            rhs->usage = U_FIXUP;
-            return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+    case enum_class_Sub:
+    case enum_class_Coroutine:
+        rhs = mk_const(interp, name, 'p');
+        if (!ascii)
+            rhs->type |= VT_ENCODED;  
+        r[1] = rhs;
+        rhs->pmc_type = type_enum;
+        rhs->usage = U_FIXUP;
+        return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
     }
     rhs = mk_const(interp, name, 'P');
     r[1] = rhs;
@@ -447,7 +447,7 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
 
 static Instruction*
 func_ins(Parrot_Interp interp, IMC_Unit *unit, SymReg *lhs, char *op,
-           SymReg ** r, int n, int keyv, int emit)
+         SymReg ** r, int n, int keyv, int emit)
 {
     int i;
     /* shift regs up by 1 */
@@ -506,7 +506,7 @@ static Instruction * iSUBROUTINE(Interp *interp, IMC_Unit * unit, SymReg * r) {
  */
 static Instruction *
 iINDEXFETCH(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1,
-    SymReg * r2)
+            SymReg * r2)
 {
     if(r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
         SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
@@ -604,7 +604,7 @@ begin_return_or_yield(Interp *interp, int yield)
     ins = IMCC_INFO(interp)->cur_unit->instructions;
     if(!ins || !ins->r[0] || !(ins->r[0]->type & VT_PCC_SUB))
         IMCC_fataly(interp, E_SyntaxError,
-              "yield or return directive outside pcc subroutine\n");
+                    "yield or return directive outside pcc subroutine\n");
     if(yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d", 

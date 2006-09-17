@@ -2,6 +2,9 @@
  * print debug info of various structures
  *
  * handle info/error/warning messages from imcc
+ *
+ * $Id$
+ *
  */
 
 
@@ -298,6 +301,7 @@ dump_liveness_status_var(IMC_Unit * unit, SymReg* r)
 }
 
 extern int ig_test(int i, int j, int N, unsigned int* graph); /* reg_alloc.c */
+
 void
 dump_interference_graph(IMC_Unit * unit)
 {
