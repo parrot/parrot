@@ -383,7 +383,8 @@ ret_pmc(Interp* interpreter, PMC* pmc, char *p, int type, INTVAL idx)
             return ret;
         default:
             real_exception(interpreter, NULL, E_TypeError,
-                    "returning unhandled pmc type in struct");
+                    "returning unhandled pmc type (%d) in struct",
+                    type);
     }
     return NULL;
 }

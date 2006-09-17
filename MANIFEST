@@ -600,6 +600,7 @@ examples/sdl/blue_font.pir                                  [devel]
 examples/sdl/blue_rect.pir                                  [devel]
 examples/sdl/bounce_parrot_logo.pir                         [devel]
 examples/sdl/lcd/clock.pir                                  [devel]
+examples/sdl/mandel.pir                                     [devel]
 examples/sdl/minesweeper/README                             [main]doc
 examples/sdl/minesweeper/eventhandler.pir                   [main]doc
 examples/sdl/minesweeper/field.pir                          [main]doc

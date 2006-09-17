@@ -521,6 +521,32 @@ draw:
 	surface[ 'pixels'; 'array'; offset ] = color
 .end
 
+=item pixels()
+
+Return the raw pixels array of the surface. It can be filled with raw
+colors like this:
+
+  .local pmc surface, pixels
+  .local int offset, x, y, raw_color
+  pixels  = surface.'pixels'()
+  offset  = surface.'width'()
+  ...
+  $I0 = offset * y
+  $I0 .= x
+  pixels[$I0] = raw_color
+
+See also B<draw_pixels()> above for locking/unlocking the surface and
+how to fetch raw colors.
+
+=cut
+
+.sub pixels :method
+    .local pmc surface
+    surface = self.'surface'()
+    $P0 = surface['pixels'; 'array']
+    .return ($P0)
+.end
+
 =item convert_red()
 
 A helper method to convert the red component of any color to work with this
