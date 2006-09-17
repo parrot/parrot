@@ -571,7 +571,7 @@ found_ins:
  *
  */
 extern void* yy_scan_string(const char *);
-extern SymReg *cur_namespace; /* s. imcc.y */
+/* extern SymReg *cur_namespace; -- s. imcc.y */
 
 
 int
@@ -619,7 +619,6 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     sprintf(name, "EVAL_" INTVAL_FMT, ++eval_nr);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
-    cur_namespace = NULL;
     IMCC_INFO(interp)->cur_namespace = NULL;
     /* spit out the sourcefile */
     if (Interp_debug_TEST(interp, PARROT_EVAL_DEBUG_FLAG)) {
@@ -679,7 +678,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
         mem_sys_free(imc_info);
         imc_info = IMCC_INFO(interp);
         IMCC_INFO(interp)->cur_unit = imc_info->last_unit;
-        cur_namespace = imc_info->cur_namespace;
+        IMCC_INFO(interp)->cur_namespace = imc_info->cur_namespace;
     }
     else
         imc_cleanup(interp);
@@ -787,7 +786,6 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
     fprintf(stderr, "parser_util.c: imcc_compile_file '%s'\n", fullname);
 #endif
 
-    cur_namespace = NULL;
     IMCC_INFO(interp)->cur_namespace = NULL;
     interp->code = NULL;
 

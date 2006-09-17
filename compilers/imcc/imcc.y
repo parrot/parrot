@@ -44,7 +44,7 @@
  * Some convenient vars
  */
 /* FIXME: Remove this global variable... */
-SymReg *cur_namespace; /* ugly hack for mk_address */
+/* SymReg *cur_namespace;  ugly hack for mk_address */
 
 /*
  * MK_I: build and emitb instruction by INS
@@ -623,12 +623,11 @@ class_namespace:
                 {
                     int re_open = 0;
                     $$ = 0;
-                    if (IMCC_INFO(interp)->state->pasm_file && cur_namespace) {
+                    if (IMCC_INFO(interp)->state->pasm_file && IMCC_INFO(interp)->cur_namespace) {
                         imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
                         re_open = 1;
                     }
                     IMCC_INFO(interp)->cur_namespace = $2;
-                    cur_namespace = $2;
                     if (re_open)
                         IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PASM);
                 }

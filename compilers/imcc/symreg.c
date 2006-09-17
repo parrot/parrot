@@ -398,23 +398,23 @@ mk_const(Interp *interp, char * name, int t)
     return _mk_const(h, name, t);
 }
 
-extern SymReg *cur_namespace; /* ugly hack for mk_address */
+/*extern SymReg *cur_namespace; -- ugly hack for mk_address */
 
 /*
  * add namespace to sub if any
  * */
 static char *
-add_ns(char *name)
+add_ns(Interp *interp, char *name)
 {
     int len, l;
     char *ns_name, *p;
 
-    if (!cur_namespace || (l = strlen(cur_namespace->name)) <= 2)
+    if (!IMCC_INFO(interp)->cur_namespace || (l = strlen(IMCC_INFO(interp)->cur_namespace->name)) <= 2)
         return name;
     /* TODO keyed syntax */
     len = strlen(name) + l  + 4;
     ns_name = mem_sys_allocate(len);
-    strcpy(ns_name, cur_namespace->name);
+    strcpy(ns_name, IMCC_INFO(interp)->cur_namespace->name);
     *ns_name = '_';
     ns_name[l - 1] = '\0';
     strcat(ns_name, "@@@");
@@ -444,7 +444,7 @@ _mk_address(Interp *interp, SymHash *hsh, char * name, int uniq)
         return r;
     }
     if (uniq == U_add_uniq_sub)
-        name = add_ns(name);
+        name = add_ns(interp, name);
 
     if (uniq && (r = _get_sym(hsh, name)) &&
             r->type == VTADDRESS &&
