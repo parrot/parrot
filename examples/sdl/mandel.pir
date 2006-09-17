@@ -203,14 +203,23 @@ leo
 
 =head1 OPTIMIZATIONS
 
-Runtimes w/ unoptimized parrot,  plain runcore x86_64 AMD X2@2000
+Runtimes for x86_64 AMD X2@2000
 600 x 400 pixels,  200 iterations, 2s delay subtracted
 
 =head2 Algorithm optimizations
 
+Plain runcore and unoptimized parrot:
+
   Original version based on sdl/raw_pixels   21s
   Create raw_palette                         12s
-  Prefetch raw_surface                       10s
+  Prefetch raw_surface                       10s        [1]
+
+=head2 Parrot based optimizations
+
+JIT runcore and optimized parrot gives for above timing(s):
+
+  [1]                                         1.1s
+
 
 =head1 SEE ALSO
 
