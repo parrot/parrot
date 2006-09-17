@@ -131,6 +131,7 @@ compiler, see:
     dump_pir = 1
     dump_src_early = 1
     dump_src = 1
+    execute_debug = 1
     stopafter = 0
   after_dump_all:
     
@@ -270,6 +271,10 @@ compiler, see:
     after_pir_dump:
     eq stopafter, 4, end
 
+    # dump pir to file
+    $S0 = concat filename, ".pir.out"
+    _spew_file($S0, pir)
+
     # Execute
     unless execute_debug goto execute_only
     print "\n\nExecution Result:\n"
@@ -321,6 +326,23 @@ compiler, see:
     filehandle = open filename, "<"
     unless filehandle goto err_no_file
     $S1 = read filehandle, 65535
+    close filehandle
+    .return ($S1)
+
+  err_no_file:
+    print "Unable to open file "
+    print filename
+    print "\n"
+    end
+.end
+
+.sub _spew_file
+    .param string filename
+    .param string contents
+    .local pmc filehandle
+    filehandle = open filename, ">"
+    unless filehandle goto err_no_file
+    print filehandle, contents
     close filehandle
     .return ($S1)
 

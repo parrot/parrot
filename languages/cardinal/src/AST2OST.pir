@@ -12,6 +12,7 @@
     addattribute $P0, 'past_scope_stack'
     addattribute $P0, 'BEGIN_blocks'
     addattribute $P0, 'END_blocks'
+    addattribute $P0, 'namespaces'
     .return ()
 error:
     print "Cardinal::OSTGrammar class not found\n"
@@ -70,6 +71,22 @@ error:
     if $I0 goto test_value
     stack = new .ResizablePMCArray
     stack = self.'attr'('END_blocks', stack, 1)
+  test_value:
+    unless has_value goto end
+    push stack, value
+  end:
+    .return (stack)
+.end
+
+.sub 'push_namespace'     :method
+    .param pmc value      :optional
+    .param int has_value  :opt_flag
+    .local pmc stack 
+    stack = self.'attr'('namespaces', 0, 0)
+    $I0 = defined stack
+    if $I0 goto test_value
+    stack = new .ResizablePMCArray
+    stack = self.'attr'('namespaces', stack, 1)
   test_value:
     unless has_value goto end
     push stack, value

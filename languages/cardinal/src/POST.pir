@@ -27,6 +27,8 @@ The base class of POST is Cardinal::PAST::Node -- see C<lib/CPAST.pir>
     $P0 = getclass 'Cardinal::PAST::Node'
     base = subclass $P0, 'Cardinal::POST::Node'
     addattribute base, 'value'
+    
+    $P0 = subclass base, 'Cardinal::POST::Namespace'
 
     $P0 = subclass base, 'Cardinal::POST::Val'
     addattribute $P0, 'valtype'
@@ -41,6 +43,7 @@ The base class of POST is Cardinal::PAST::Node -- see C<lib/CPAST.pir>
     addattribute $P0, 'varhash'
     addattribute $P0, 'prologue'
     addattribute $P0, 'adverbs'
+    addattribute $P0, 'subs'
 
     $P0 = subclass base, 'Cardinal::POST::Op'
     $P0 = subclass base, 'Cardinal::POST::Ops'
@@ -49,6 +52,7 @@ The base class of POST is Cardinal::PAST::Node -- see C<lib/CPAST.pir>
     $P0 = subclass base, 'Cardinal::POST::Call'
     $P0 = subclass base, 'Cardinal::POST::Raw'
     addattribute $P0, 'raw'
+    $P0 = subclass base, 'Cardinal::POST::NOP'
 
 .end
 
@@ -208,10 +212,51 @@ and that is returned.
     .return self.'attr'('outer', outer, has_outer)
 .end
 
+
+.sub 'add_to_adverbs' :method
+    .param pmc adverb
+    $P0 = self.'adverbs'()
+    $I0 = defined $P0
+    if $I0 goto exists
+    $P0 = new .String
+    goto append
+  exists:
+    $P0 .= " "
+  append:
+    $P0 .= adverb
+.end
+
+.sub ':load' :method
+    .param pmc value
+    .return self.'add_to_adverbs'(':load')
+.end
+
+.sub ':main' :method
+    .param pmc value
+    .return self.'add_to_adverbs'(':main')
+.end
+
+.sub ':method' :method
+    .param pmc value
+    .return self.'add_to_adverbs'(':method')
+.end
+
 .sub 'adverbs' :method
     .param pmc subtype         :optional
     .param int has_subtype     :opt_flag
     .return self.'attr'('adverbs', subtype, has_subtype)
+.end
+
+.sub 'subs' :method
+    $P0 = self.'push_sub'()
+    .return ($P0)
+.end
+
+.sub 'append_subs' :method
+    .param pmc arg
+    $P0 = self.'push_sub'()
+    $P0.'append'(arg)
+    .return ()
 .end
 
 .sub 'subtype' :method
@@ -238,8 +283,6 @@ and that is returned.
     .return ($P0)
 .end
 
-
-
 .sub 'pir_regex' :method
     .local pmc p6regex, regexast, regexpir
     .local string name, value
@@ -253,6 +296,22 @@ and that is returned.
     code = new 'PGE::CodeString'
     code.'emit'("    %0 = find_name '%1'", value, name)
     .return (regexpir, code)
+.end
+
+.sub 'push_sub'     :method
+    .param pmc value      :optional
+    .param int has_value  :opt_flag
+    .local pmc stack 
+    stack = self.'attr'('subs', 0, 0)
+    $I0 = defined stack
+    if $I0 goto test_value
+    stack = new .ResizablePMCArray
+    stack = self.'attr'('subs', stack, 1)
+  test_value:
+    unless has_value goto end
+    push stack, value
+  end:
+    .return (stack)
 .end
 
 .sub '__dumplist' :method
@@ -422,5 +481,22 @@ and that is returned.
     .param int has_scope       :opt_flag
     .return self.'attr'('raw', scope, has_scope)
 .end
+
+.sub 'push_namespace'     :method
+    .param pmc value      :optional
+    .param int has_value  :opt_flag
+    .local pmc stack 
+    stack = self.'attr'('namespaces', 0, 0)
+    $I0 = defined stack
+    if $I0 goto test_value
+    stack = new .ResizablePMCArray
+    stack = self.'attr'('namespaces', stack, 1)
+  test_value:
+    unless has_value goto end
+    push stack, value
+  end:
+    .return (stack)
+.end
+
 
 

@@ -732,8 +732,16 @@ transform result (Cardinal::Grammar::lang_statements) :language('PIR') {
     function_name = tree.get('result', $P0, 'Cardinal::Grammar::function_name')
 
     $P0 = self.'top_scope_stack'()
+    $S0 = $P0.'blocktype'()
+    .local string function_blocktype
+    
+    function_blocktype = 'function'
+    unless $S0 == 'class' goto is_function
+      function_blocktype = 'method'
+    is_function:
+    
     function = new 'Cardinal::PAST::Block'
-    function.'init'('node'=>node, 'name'=>function_name, 'blocktype'=>'function', 'outer'=>$P0)
+    function.'init'('node'=>node, 'name'=>function_name, 'blocktype'=>function_blocktype, 'outer'=>$P0)
     $P0 = node['function_prototype_arg_list']
     
     self.'add_to_current_block'(function_name, function)
@@ -772,7 +780,7 @@ transform result (Cardinal::Grammar::lang_statements) :language('PIR') {
     unless $I0 goto err_no_tree
     $P0 = node['class_path']
     child = tree.get('result', $P0, 'Cardinal::Grammar::class_path')
-    class_block.'add_child'(child)
+    class_block.'class_path'(child)
 
 
     $I0 = defined node['superclass']
@@ -932,13 +940,13 @@ transform result (Cardinal::Grammar::function_name) :language('PIR') {
 transform result (Cardinal::Grammar::class_path) :language('PIR') {
     .local pmc result
     .local pmc child
-    result = new 'Cardinal::PAST::Op'
+    result = new 'Cardinal::PAST::ClassPath'
     result.'init'('node'=>node, 'name'=>'class_path')
     
     $I0 = defined node['starting_colons']
     unless $I0 goto atoms
     $P0 = node['starting_colons']
-    #result.'starting_colons'(1)
+    result.'starting_colons'(1)
 
   atoms:
     $I0 = defined node['atom']
@@ -959,6 +967,7 @@ transform result (Cardinal::Grammar::class_path) :language('PIR') {
     $I0 = defined node['class_name']
     unless $I0 goto err_no_tree
     $S0 = node['class_name']
+    result.'add_child'($S0)
 
     .return (result)
 

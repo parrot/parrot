@@ -29,39 +29,31 @@ grammar Cardinal::OSTGrammar is TGE::Grammar;
 
 transform root (ROOT) :language('PIR') {
     .local pmc ops
-    .local pmc op
+    .local pmc post
     ops = new 'Cardinal::POST::Ops'
     ops.'init'('node'=>node)
 
-    $P0 = new .Undef
-    self.'post_scope_stack'($P0)
+    .local pmc subcollector
+    subcollector = new 'Cardinal::POST::Sub'
+    subcollector.init('node'=>node)
+    self.'post_scope_stack'(subcollector)
     $P0 = new .Undef
     self.'past_scope_stack'($P0)
 
+#hll statement
     .local pmc hll
     hll = new 'Cardinal::POST::Raw'
     hll.'init'('node'=>node, 'raw'=>".HLL 'Ruby', ''")
 
+#__onload
     .local pmc load
     load = new 'Cardinal::POST::Sub'
     load.'init'('node'=>node, 'name'=>'__onload', 'adverbs'=>':load')
 
-    .local pmc main
-    main = new 'Cardinal::POST::Sub'
-    main.'init'('node'=>node, 'name'=>'main', 'adverbs'=>':main')
+#traverse AST
+    post = tree.'get'('post', node)
 
-    ops.'add_child'(hll)
-    ops.'add_child'(main)
-    ops.'add_child'(load)
-    $P0 = tree.'get'('post', node)
-    $S0 = $P0.'name'()
-    .local pmc call_op
-    call_op = new 'Cardinal::POST::Call'
-    call_op.'init'('node'=>node, 'name'=>$S0)
-
-    op = new 'Cardinal::POST::Op'
-    op.'init'("'languages/cardinal/src/builtins_gen.pir'", 'node'=>node, 'name'=>'load_bytecode')
-
+#BEGIN BLOCKS
     .local pmc BEGIN_blocks
     BEGIN_blocks = new 'Cardinal::POST::Ops'
     BEGIN_blocks.'init'('node'=>node)
@@ -76,6 +68,7 @@ transform root (ROOT) :language('PIR') {
       goto iter_loop
   iter_end:
 
+#END BLOCKS
     .local pmc END_blocks
     END_blocks = new 'Cardinal::POST::Ops'
     END_blocks.'init'('node'=>node)
@@ -89,11 +82,39 @@ transform root (ROOT) :language('PIR') {
       goto iter_loop1
   iter_end1:
 
+#build main
+    .local pmc main
+    main = new 'Cardinal::POST::Sub'
+    main.'init'('node'=>node, 'name'=>'main', 'adverbs'=>':main')
+
+    .local pmc call_op
+    $S0 = node.'name'()
+
+    call_op = new 'Cardinal::POST::Call'
+    call_op.'init'('node'=>node, 'name'=>$S0)
+
+    .local pmc builtins
+    builtins = new 'Cardinal::POST::Op'
+    builtins.'init'("'languages/cardinal/src/builtins_gen.pir'", 'node'=>node, 'name'=>'load_bytecode')
     main.'add_child'(BEGIN_blocks)
-    main.'add_child'(op)
+    main.'add_child'(builtins)
     main.'add_child'(call_op)
     main.'add_child'(END_blocks)
-    ops.'add_child'($P0)
+
+#top level subs
+    .local pmc subs
+    subs = subcollector.'subs'()
+
+#namespaces/classes
+    .local pmc namespaces
+    namespaces = self.'push_namespace'()
+   
+#build up top level ops 
+    ops.'add_child'(hll)
+    ops.'add_child'(main)
+    ops.'add_child'(load)
+    ops.'append_children'(subs)
+    ops.'append_children'(namespaces)
     .return (ops)
 }
 
@@ -131,7 +152,8 @@ transform post (Cardinal::PAST::Sub) :language('PIR') {
 }
 
 transform post (Cardinal::PAST::Block) :language('PIR') {
-    .local string name, blocktype
+    .local string name
+    .local string blocktype
     name = node.'name'()
 
     blocktype = node.'blocktype'()
@@ -169,6 +191,10 @@ transform post (Cardinal::PAST::Block) :language('PIR') {
 
     self.'post_scope_stack'(outerpost)
     self.'past_scope_stack'(outerpast)
+
+    outerpost.'push_sub'(post)
+    $P0 = post.'subs'()
+    outerpost.'append_subs'($P0)
     
     .local pmc call_op
     call_op = new 'Cardinal::POST::Call'
@@ -177,15 +203,83 @@ transform post (Cardinal::PAST::Block) :language('PIR') {
     unless blocktype == 'BEGIN' goto not_begin
     self.'push_BEGIN_block'(call_op)
   not_begin:
-    unless blocktype == 'END' goto not_end
+    unless blocktype == 'END' goto begin
     self.'push_END_block'(call_op)
-  not_end:
-    unless blocktype == 'immediate' goto end
-    $P0 = post
-    post = post.'new'('Cardinal::POST::Ops', $P0, 'node'=>node)
-    post.'add_child_new'('Cardinal::POST::Op', post, 'name'=>$P0, 'node'=>node)
+  begin:
+    if blocktype == 'begin' goto call_block
+    if blocktype == 'immediate' goto call_block
+    goto end
+    
+  call_block:
+    .return(call_op)
   end:
-    .return (post)
+    $P0 = new 'Cardinal::POST::NOP'
+    $P0.'init'('node'=>node)
+    .return ($P0)
+}
+
+transform post (Cardinal::PAST::Class) :language('PIR') {
+    .local pmc classpath
+    .local pmc namespace
+    .local pmc ops
+
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+
+    classpath = node.'class_path'()
+    $P0 = classpath.'children'()
+
+    namespace = new 'Cardinal::POST::Namespace'
+    namespace.'init'('node'=>node, 'name'=>$P0)
+    self.'push_namespace'(namespace)
+    
+    .local string classname
+    .local string classbodyname
+    .local string blocktype
+    classname = classpath.name()
+
+    blocktype = node.'blocktype'()
+    classbodyname .= classname
+    classbodyname .= '_body'
+
+    .local pmc outerpost, outerpast
+    outerpost = self.'post_scope_stack'()
+    outerpast = self.'past_scope_stack'()
+
+    .local pmc post
+    post = new 'Cardinal::POST::Sub'
+    post.'init'('node'=>node, 'name'=>classbodyname, 'outer'=>outerpost, 'subtype'=>'class_body')
+    
+    self.'post_scope_stack'(post)
+    self.'past_scope_stack'(node)
+
+    .local pmc iter
+    iter = node.'child_iter'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cpast, cpost
+    cpast = shift iter
+    cpost = tree.'get'('post', cpast)
+    post.'add_child'(cpost)
+    goto iter_loop
+  iter_end:
+
+    .local pmc value
+    value = cpost.'value'()
+    value = clone value
+    post.'value'(value)
+
+    self.'post_scope_stack'(outerpost)
+    self.'past_scope_stack'(outerpast)
+    
+    .local pmc call_op
+    call_op = new 'Cardinal::POST::Call'
+    call_op.'init'('node'=>node, 'name'=>classbodyname)
+
+    namespace.'add_child'(post)
+    $P0 = post.'subs'()
+    namespace.'append_children'($P0)
+    .return (call_op)
 }
 
 transform post (Cardinal::PAST::Stmts) :language('PIR') {

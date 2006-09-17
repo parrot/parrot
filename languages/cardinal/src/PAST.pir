@@ -65,12 +65,13 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     addattribute $P0, 'blocktype'
     addattribute $P0, 'vardecl'
 
-    $P1 = subclass $P0, 'Cardinal::PAST::Class'
-    addattribute $P1, 'class_path'
-    addattribute $P1, 'superclass'
-
     $P1 = subclass $P0, 'Cardinal::PAST::Module'
     addattribute $P1, 'class_path'
+
+    $P2 = subclass $P1, 'Cardinal::PAST::Class'
+    addattribute $P2, 'superclass'
+
+    $P0 = subclass base, 'Cardinal::PAST::ClassPath'
 
     $P0 = subclass base, 'Cardinal::PAST::Rescue_Stmt'
     addattribute $P0, 'try_stmt'
@@ -144,6 +145,14 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     array = getattribute self, 'children'
     push array, child
     .return ()
+  .end
+
+.sub 'append_children' :method
+    .param pmc children
+    .local pmc array
+    array = getattribute self, 'children'
+    array.'append'(children)
+    .return ()
 .end
 
 
@@ -177,6 +186,12 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     .return self.'attr'('name', name, has_name)
 .end
 
+.sub 'children' :method
+#    .param pmc value :optional
+#    .param int has_value        :opt_flag
+    null $P0
+    .return self.'attr'('children', $P0, 0)
+.end
 
 .sub 'node' :method
     .param pmc node
@@ -414,6 +429,16 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 .sub '__dumplist' :method
     .return ('name outer blocktype children vardecl')
 .end
+
+.namespace [ 'Cardinal::PAST::Module' ]
+
+.sub 'class_path' :method
+    .param pmc outer           :optional
+    .param int has_outer       :opt_flag
+    .return self.'attr'('class_path', outer, has_outer)
+.end
+
+.namespace [ 'Cardinal::PAST::Class' ]
 
 .namespace [ 'Cardinal::PAST::Rescue_Stmt' ]
 
