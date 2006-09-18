@@ -22,6 +22,8 @@ To run this file, run the following command from the Parrot directory:
   <but-left> ... zoom in, center at click
   <but-mid>  ... center at click
   <but-right> .. zoom out, center at click
+  <keypad+>  ... increase bailout limit by 100
+  <keypad->  ... decrease bailout limit by 100
 
 =cut
 
@@ -77,6 +79,7 @@ ex:
     addattribute cl, 'raw_palette'
     addattribute cl, 'event'
     addattribute cl, 'event_handler'
+    addattribute cl, 'limit'
     # instantiate, seel also __init below
     app = new 'Mandel'
     .return (app)
@@ -111,6 +114,9 @@ ex:
     $P0 = new .Float
     $P0 = scale
     setattribute self, 'scale', $P0
+    $P0 = new .Integer
+    $P0 = 200
+    setattribute self, 'limit', $P0
 
     .local pmc rect, main_screen
     main_screen = self.'surface'()
@@ -189,9 +195,20 @@ get:
     .return (s)
 .end
 
+.sub 'limit' :method
+    .param int l     :optional
+    .param int has_l   :opt_flag
+    $P0 = getattribute self, 'limit'
+    unless has_l goto get
+    $P0 = l
+get:
+    l = $P0
+    .return (l)
+.end
+
 .sub 'calc' :method
     .local pmc main_screen, raw_palette, rect, raw_surface
-    .local int w, h, x, y, pal_elems, raw_c, k
+    .local int w, h, x, y, pal_elems, raw_c, k, limit
     .local float xstart, ystart, scale
     # fetch the SDL::Surface representing the main window
     main_screen = self.'surface'()
@@ -201,6 +218,7 @@ get:
     xstart = self.'xstart'()
     ystart = self.'ystart'()
     scale =  self.'scale'()
+    limit =  self.'limit'()
     raw_palette = getattribute self, 'raw_palette'
     rect        = getattribute self, 'rect'
     pal_elems = elements raw_palette
@@ -246,7 +264,7 @@ loop_k:
     $N1 = zz + ZZ
     if $N1 > 4.0 goto set_pix
     inc k
-    if k < 200 goto loop_k	# iterations
+    if k < limit goto loop_k	# iterations
     k = 0
 set_pix:
     $I0 = k % pal_elems
@@ -381,7 +399,7 @@ loop_b:
     r += 36
     if r <= 255 goto loop_r
     .const .Sub by_bright = "bright"
-    # palette.'sort'(by_bright)
+    palette.'sort'(by_bright)
     .return (palette)
 .end
 
@@ -412,6 +430,7 @@ loop:
     end
 .end
 
+# reset to default
 .sub key_down_r :method
     .param pmc app
     app.'xstart'(-2.0)
@@ -419,7 +438,31 @@ loop:
     app.'xend'(1.0)
     app.'yend'(1.0)
     app.'scale'(200)
+    app.'limit'(200)
     app.'calc'()
+.end
+
+# keypad +/- change bailout limit
+.sub key_down_kp_plus :method
+    .param pmc app
+    .local int limit
+    limit = app.'limit'()
+    limit += 100
+    app.'limit'(limit)
+    print "limit +\n"
+    app.'calc'()
+.end
+
+.sub key_down_kp_minus :method
+    .param pmc app
+    .local int limit
+    limit = app.'limit'()
+    if limit <= 100 goto ignore
+    limit -= 100
+    app.'limit'(limit)
+    print "limit -\n"
+    app.'calc'()
+ignore:
 .end
 
 .sub mouse_button_up :method
