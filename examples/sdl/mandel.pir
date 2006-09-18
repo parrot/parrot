@@ -20,52 +20,54 @@ To run this file, run the following command from the Parrot directory:
     load_bytecode "library/SDL/Color.pir"
 
     # create an SDL::App object
-    .local pmc app
-    .local int w, h
-    .local float scale
-    app = new 'SDL::App'
-    # mandelbrot set is witdh [-2, 0.25] heigth [ -1, 1]
-    # round up, scale *200
-    scale = 0.005 # 1/200 XXX
-    w = 600
-    h = 400
-    app.'init'( 'height' => h, 'width' => w, 'bpp' => 0, 'flags' => 1 )
+    .local pmc app, cl
+    cl = subclass 'SDL::App', 'Mandel'
+    addattribute cl, 'xstart'
+    addattribute cl, 'ystart'
+    addattribute cl, 'scale'
+    addattribute cl, 'rect'
+    addattribute cl, 'raw_palette'
+    app = new 'Mandel'
+    app.'calc'()
+    # show off for a bit then exit
+    sleep 2
+    app.'quit'()
+.end    
 
+.namespace ['Mandel']
+.sub 'calc' :method
+    .local pmc main_screen, raw_palette, rect, raw_surface
+    .local int w, h, x, y, pal_elems, raw_c, k
+    .local float xstart, ystart, scale
     # fetch the SDL::Surface representing the main window
-    .local pmc main_screen
-    main_screen = app.'surface'()
-
-    # create an SDL::Rect representing the entire main screen
-    .local pmc rect
-    rect = new 'SDL::Rect'
-    rect.'init'( 'height' => h, 'width' => w, 'x' => 0, 'y' => 0 )
-
-    .local pmc palette, raw_palette, black
-    (palette, raw_palette) = create_palette(main_screen)
-    # draw the background
-    black = palette[0]
-    main_screen.'fill_rect'( rect, black )
-    main_screen.'update_rect'( rect )
+    main_screen = self.'surface'()
+    h = main_screen.'height'()
+    w = main_screen.'width'()
     # lock the raw framebuffer
-    main_screen.'lock'()
-    .local int x, y, pal_elems, raw_c, k
+    $P0 = getattribute self, 'xstart'
+    xstart = $P0
+    $P0 = getattribute self, 'ystart'
+    ystart = $P0
+    $P0 = getattribute self, 'scale'
+    scale = $P0
+    raw_palette = getattribute self, 'raw_palette'
+    rect        = getattribute self, 'rect'
     pal_elems = elements raw_palette
-    y = 0
-    .local float z, Z, t, c, C, zz, ZZ
-    # surface prefetch opt
-    .local pmc raw_surface
-    .local int offset, offs_y
+    # prefetch raw_surface
     raw_surface = main_screen.'surface'()
-    offset = main_screen.'width'()
+    # start calculation
+    .local float z, Z, t, c, C, zz, ZZ
+    .local int offs_y
+    main_screen.'lock'()
+    y = 0
 loop_y:
-    offs_y = offset * y
+    offs_y = w * y
+    C = y / scale	# Im c part
+    C += ystart
     x = 0
-    C = y * scale	# Im c part
-    C -= 1.0        # ystart
-    # draw hoizontal lines
 loop_x:
-    c = x * scale   # re c part
-    c -= 2.0        # xstart 
+    c = x / scale   # re c part
+    c += xstart 
     z = 0
     Z = 0
     k = 0
@@ -75,10 +77,11 @@ loop_x:
     zz = z * z
     ZZ = Z * Z
 loop_k:
+    # z = zz - ZZ + c
     t = zz - ZZ
     t += c
 
-    # Z = 2*z*Z + i
+    # Z = 2*z*Z + C
     Z *= 2.0
     Z *= z
     Z += C
@@ -109,10 +112,45 @@ print:
     if y < h goto loop_y
 
     main_screen.'unlock'()
+.end
 
-    # show off for a bit then exit
-    sleep 2
-    app.'quit'()
+.sub __init :method
+    .local int w, h
+    .local float scale, xstart, ystart
+    # mandelbrot set is witdh [-2, 0.25] heigth [ -1, 1]
+    # round up, scale *200
+    xstart = -2.0
+    ystart = -1.0
+    scale = 200
+    w = 600
+    h = 400
+    self.'init'( 'height' => h, 'width' => w, 'bpp' => 0, 'flags' => 1 )
+    $P0 = new .Float
+    $P0 = xstart
+    setattribute self, 'xstart', $P0
+    $P0 = new .Float
+    $P0 = ystart
+    setattribute self, 'ystart', $P0
+    $P0 = new .Float
+    $P0 = scale
+    setattribute self, 'scale', $P0
+
+    .local pmc rect, main_screen
+    main_screen = self.'surface'()
+
+    # create an SDL::Rect representing the entire main screen
+    .local pmc rect
+    rect = new 'SDL::Rect'
+    rect.'init'( 'height' => h, 'width' => w, 'x' => 0, 'y' => 0 )
+
+    setattribute self, 'rect', rect
+    .local pmc palette, raw_palette, black
+    (palette, raw_palette) = create_palette(main_screen)
+    setattribute self, 'raw_palette', raw_palette
+    # draw the background
+    black = palette[0]
+    main_screen.'fill_rect'( rect, black )
+    main_screen.'update_rect'( rect )
 .end
 
 # sort by adding raw r+g+b values
@@ -172,11 +210,11 @@ b0:
 #    print_newline
     col.'init'( 'r' => $I0, 'g' => $I1, 'b' => $I2 )
     push palette, col
-    b += 32
+    b += 36
     if b <= 255 goto loop_b
-    g += 32
+    g += 36
     if g <= 255 goto loop_g
-    r += 32
+    r += 36
     if r <= 255 goto loop_r
     .const .Sub by_bright = "bright"
     # palette.'sort'(by_bright)
