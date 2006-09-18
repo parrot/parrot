@@ -68,14 +68,14 @@ loop_y:
 loop_x:
     c = x / scale   # re c part
     c += xstart 
-    z = 0
-    Z = 0
+    z = 0.0
+    Z = 0.0   # Z(0) = 0
     k = 0
     # iteration loop, calculate
     # Z(k+1) = Z(k)^2 + c
     # bailout if abs(Z) > 2 or iteration limit of k is exceeded
-    zz = z * z
-    ZZ = Z * Z
+    zz = 0.0  # z*z
+    ZZ = 0.0  # Z*Z
 loop_k:
     # z = zz - ZZ + c
     t = zz - ZZ
@@ -93,11 +93,11 @@ loop_k:
     zz = z * z
     ZZ = Z * Z
     $N1 = zz + ZZ
-    if $N1 > 4.0 goto print
+    if $N1 > 4.0 goto set_pix
     inc k
     if k < 200 goto loop_k	# iterations
     k = 0
-print:	
+set_pix:
     $I0 = k % pal_elems
     raw_c = raw_palette[$I0]
     $I0 = offs_y + x
@@ -106,7 +106,7 @@ print:
     raw_surface[ 'pixels'; 'array'; $I0 ] = raw_c
     inc x
     if x < w goto loop_x
-    # update the screen on each iteration
+    # update the screen on each line
     main_screen.'update_rect'( rect )
     inc y
     if y < h goto loop_y
@@ -145,7 +145,8 @@ print:
 
     setattribute self, 'rect', rect
     .local pmc palette, raw_palette, black
-    (palette, raw_palette) = create_palette(main_screen)
+    palette = self.'create_palette'()
+    raw_palette = self.'create_rawpalette'(palette)
     setattribute self, 'raw_palette', raw_palette
     # draw the background
     black = palette[0]
@@ -178,37 +179,21 @@ print:
     .return ($I0)
 .end
 
-# create a 9x9x9 palette, also return raw_palette with surface colors
-.sub create_palette
-    .param pmc main_screen
-    .local pmc palette, col
+# create a 8x8x8 palette
+.sub create_palette :method
+    .local pmc palette, col, main_screen
+    main_screen = self.'surface'()
     .local int r, g, b, color_type
     find_type  color_type, 'SDL::Color'
     palette = new .ResizablePMCArray
-    r = -1
+    r = 0
 loop_r:
-    $I0 = r
-    if $I0 > 0 goto r0
-    $I0 = 0
-r0:
-    g = -1
+    g = 0
 loop_g:    
-    $I1 = g
-    if $I1 > 0 goto g0
-    $I1 = 0
-g0:
-    b = -1
+    b = 0
 loop_b:    
-    $I2 = b
-    if $I2 > 0 goto b0
-    $I2 = 0
-b0:
     col = new color_type
-#    print_item $I0
-#    print_item $I1
-#    print_item $I2
-#    print_newline
-    col.'init'( 'r' => $I0, 'g' => $I1, 'b' => $I2 )
+    col.'init'( 'r' => r, 'g' => g, 'b' => b )
     push palette, col
     b += 36
     if b <= 255 goto loop_b
@@ -218,9 +203,16 @@ b0:
     if r <= 255 goto loop_r
     .const .Sub by_bright = "bright"
     # palette.'sort'(by_bright)
+    .return (palette)
+.end
+
+# create raw_palette with surface colors
+.sub create_rawpalette :method
+    .param pmc palette
     .local int i, n, raw_c
+    .local pmc raw_palette, col, main_screen
+    main_screen = self.'surface'()
     n = elements palette
-    .local pmc raw_palette
     raw_palette = new .FixedIntegerArray
     raw_palette = n
     i = 0
@@ -230,7 +222,7 @@ loop:
     raw_palette[i] = raw_c
     inc i
     if i < n goto loop
-    .return (palette, raw_palette)
+    .return (raw_palette)
 .end
 
 =head1 AUTHOR
