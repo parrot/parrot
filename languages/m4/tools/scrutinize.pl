@@ -30,3 +30,10 @@ use 5.006;
 use Test::Perl::Critic -profile => 'tools/perlcriticrc';
 
 all_critic_ok();
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

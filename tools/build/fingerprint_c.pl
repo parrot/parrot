@@ -95,3 +95,10 @@ PackFile_write_fingerprint (void *cursor)
 EOF
 
 } # endif DEVELOPING
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

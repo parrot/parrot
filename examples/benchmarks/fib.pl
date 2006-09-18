@@ -33,3 +33,10 @@ print "fib($N) = ", fib($N), "\n";
 F<examples/benchmarks/fib.pir>.
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

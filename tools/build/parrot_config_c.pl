@@ -102,3 +102,10 @@ Parrot_set_config_hash(void)
     Parrot_set_config_hash_internal(parrot_config, sizeof(parrot_config));
 }
 EOF
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

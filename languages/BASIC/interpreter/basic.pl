@@ -111,3 +111,10 @@ close(T);
 unlink "basic.pbc";
 system("../../../parrot -o basic.pbc merged_basic.pasm");
 system("../../../parrot basic.pbc");
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

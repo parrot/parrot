@@ -52,3 +52,10 @@ print foreach @not_jitted;
 print 'Not jitted: ', scalar @not_jitted;
 print 'Jitted: ', scalar @jitted;
 print 'Total ops: ', scalar @ops;
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

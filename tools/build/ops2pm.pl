@@ -421,4 +421,9 @@ sub load_op_map_files {
 
 exit 0;
 
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
 # vim: expandtab shiftwidth=4:

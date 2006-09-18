@@ -53,3 +53,10 @@ system( './parrot languages/plumhead/t/hello_1.pir' );
 =head1 AUTHOR
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

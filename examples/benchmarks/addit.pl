@@ -44,3 +44,10 @@ F<examples/benchmarks/addit.pasm>, F<examples/benchmarks/addit.pir>,
 F<examples/benchmarks/addit2.pir>.
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

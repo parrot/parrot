@@ -262,3 +262,10 @@ sub Longest {
     $_[0] = $_[1] and return if ! defined $_[0];
     $_[0] = $_[1] if $_[1] > $_[0];
 }
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

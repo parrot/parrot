@@ -63,3 +63,10 @@ print OUT vtbl_macros($vtable);
 
 print OUT "\n#endif\n";
 
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -66,3 +66,10 @@ F<examples/benchmarks/arriter.pir>,
 F<examples/benchmarks/arriter_o1.pir>.
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

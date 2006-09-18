@@ -51,3 +51,10 @@ F<examples/benchmarks/stress2.pl>,
 F<examples/benchmarks/stress3.pasm>.
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

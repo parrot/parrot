@@ -116,3 +116,10 @@ while (my ($package, $files) = each %FILES) {
     close MANIFEST;
     print "Wrote $manifest\n";
 }
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

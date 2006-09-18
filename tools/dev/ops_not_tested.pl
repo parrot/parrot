@@ -84,4 +84,9 @@ print "" . (scalar @opcodes_c_tested) . " out of " . (scalar keys %opcodes_c)
                                       . " are not tested! ("
                                       . int($percent) . "%)\n";
 
-## vim: expandtab sw=4
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

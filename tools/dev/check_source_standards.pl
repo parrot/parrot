@@ -465,3 +465,10 @@ sub error {
     print "$file:$line (ERROR) " .
       Text::Wrap::wrap("", "        ", $message) . "\n";
 }
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -32,3 +32,10 @@ for my $i (0..99_999) {
 F<examples/benchmarks/shared_ref.pasm>.
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

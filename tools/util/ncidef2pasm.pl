@@ -219,3 +219,10 @@ sub def_line {
   print OUTPUT "dlfunc P2, P1, '$name', '$signature'\n";
   print OUTPUT "store_global '${cur_package}::${name}', P2\n";
 }
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

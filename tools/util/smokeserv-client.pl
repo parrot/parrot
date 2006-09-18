@@ -97,3 +97,10 @@ sub setup_compression {
   eval { require Compress::Zlib; debug "Gzip compression on\n" } and
     $compress = sub { Compress::Zlib::memGzip(shift) };
 }
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

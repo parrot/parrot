@@ -106,3 +106,10 @@ for my $rule (@$trees) {
 }
 
 $driver->output_footer(*OUTPUT);
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

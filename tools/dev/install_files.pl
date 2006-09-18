@@ -238,3 +238,10 @@ foreach (@files, @installable_exe) {
     my $mode = (stat($src))[2];
     chmod $mode, $dest;
 }
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

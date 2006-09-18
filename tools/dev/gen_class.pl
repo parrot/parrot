@@ -8,7 +8,7 @@ tools/dev/gen_class.pl - Create a template PMC file
 
 =head1 SYNOPSIS
 
-	% perl tools/dev/gen_class.pl Foo > src/pmc/Foo.pmc
+    % perl tools/dev/gen_class.pl Foo > src/pmc/Foo.pmc
 
 =head1 DESCRIPTION
 
@@ -19,8 +19,8 @@ information on adding a new PMC to Parrot.
 To see what a minimal PMC looks like, create a PMC template and compile
 it to C.
 
-	% perl tools/dev/gen_class.pl Foo > src/pmc/foo.pmc
-	% perl tools/build/pmc2c.pl -c src/pmc/foo.pmc
+    % perl tools/dev/gen_class.pl Foo > src/pmc/foo.pmc
+    % perl tools/build/pmc2c.pl -c src/pmc/foo.pmc
 
 =head1 SEE ALSO
 
@@ -39,11 +39,11 @@ use Parrot::Vtable;
 my $vtbl = parse_vtable("$FindBin::Bin/../../vtable.tbl");
 
 my $classname = shift
-	or die "No classname given!\n";
+    or die "No classname given!\n";
 
 
 ## emit file header
-print <<EOF;
+print <<"EOF";
 /* ${classname}.pmc
  *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
@@ -65,18 +65,25 @@ EOF
 
 ## emit method bodies
 for (@$vtbl) {
-	my ($retval, $methname, $args) = @$_;
-	if ($methname eq 'type' || $methname eq 'name' || $methname =~ /prop/) {
-		# default.pmc handles these
-		next;
-	}
+    my ($retval, $methname, $args) = @$_;
+    if ($methname eq 'type' || $methname eq 'name' || $methname =~ /prop/) {
+        # default.pmc handles these
+        next;
+    }
 
-	print "    $retval $methname ($args) {\n";
-	if($retval ne 'void') {
-		print "        return ($retval)0;\n";
-	}
-	print "    }\n\n";
+    print "    $retval $methname ($args) {\n";
+    if($retval ne 'void') {
+        print "        return ($retval)0;\n";
+    }
+    print "    }\n\n";
 }
 
 ## emit file footer
 print "}\n";
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

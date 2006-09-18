@@ -247,3 +247,10 @@ sub clip_excess_lines {
 	if $_[0] =~ tr/\n/\n/ > $cnt;
     return undef;
 }
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

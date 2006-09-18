@@ -31,3 +31,10 @@ my $docs = Parrot::Docs::Section::Parrot->new;
 $docs->write_docs($silent, $delete);
 
 exit 0;
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

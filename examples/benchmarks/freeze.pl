@@ -53,3 +53,10 @@ print "array size ", scalar(@b), "\n";
 F<examples/benchmarks/freeze.pasm>.
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

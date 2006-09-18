@@ -31,3 +31,10 @@ my $b = B->new();
 
 print "fib($N) = ", $b->fib($N), "\n";
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

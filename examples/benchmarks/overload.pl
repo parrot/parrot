@@ -20,3 +20,10 @@ my $b = Foo->new(6);
 my $r;
 for my $i (1..500_000) { $r = $a * $b }
 print "$r\n";
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
