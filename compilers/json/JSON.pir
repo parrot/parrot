@@ -7,11 +7,11 @@ JSON (JavaScript Object Notation) is a lightweight data-interchange format.
 =head1 SYNOPSIS
 
 Given a valid JSON string, the compiler will return a PMC containing the
-appropriate PMC. For example:
+appropriate values. For example:
 
  .local pmc JSON
  JSON = compreg 'JSON'
- $P0 = JSON("[1,2,3]")
+ $P0 = JSON('[1,2,3]')
 
 Will create a pmc that C<does> array, contains the values 1, 2, and 3, and 
 store it in register C<$P0>.
