@@ -184,6 +184,19 @@ types.
 
 =item * mouse_button_up
 
+Synopsis for mouse event handler:
+  
+  .sub mouse_button_up :method
+    .param pmc event
+    .param pmc args
+
+    .local int b, x, y
+    event = event.'event'( 'MouseButton' )
+    b = event['state']    # 1 = left, 2 = middle, 3 = right
+    x = event['x']
+    y = event['y']
+    ...
+
 =item * joy_axis_motion
 
 =item * joy_ball_motion
@@ -364,3 +377,4 @@ the Perl 6 Internals mailing list.
 Copyright (C) 2004-2006, The Perl Foundation.
 
 =cut
+
