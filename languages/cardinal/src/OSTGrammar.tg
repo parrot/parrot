@@ -43,7 +43,8 @@ transform root (ROOT) :language('PIR') {
 #hll statement
     .local pmc hll
     hll = new 'Cardinal::POST::Raw'
-    hll.'init'('node'=>node, 'raw'=>".HLL 'Ruby', ''")
+    #hll.'init'('node'=>node, 'raw'=>".HLL 'Ruby', ''")
+    hll.'init'('node'=>node, 'raw'=>".HLL 'Ruby', 'ruby_group'")
 
 #__onload
     .local pmc load
@@ -162,13 +163,19 @@ transform post (Cardinal::PAST::Block) :language('PIR') {
     name = node.'unique'(name)
   with_name:
 
+    .local string adverbs
+    adverbs = ''
+    ne blocktype, 'method', not_method
+    adverbs = ':method'
+  not_method:
+
     .local pmc outerpost, outerpast
     outerpost = self.'post_scope_stack'()
     outerpast = self.'past_scope_stack'()
 
     .local pmc post
     post = new 'Cardinal::POST::Sub'
-    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'subtype'=>blocktype)
+    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'subtype'=>blocktype, 'adverbs'=>adverbs)
     
     self.'post_scope_stack'(post)
     self.'past_scope_stack'(node)
@@ -575,6 +582,50 @@ transform post (Cardinal::PAST::WhileUntil) :language('PIR') {
     testpost = tree.'get'('post', testpast)
     ops.'add_child'(testpost)
     ops.'add_child_new'('Cardinal::POST::Op', testpost, loopendlabel, 'name'=>newopname)
+
+    bodypost = tree.'get'('post', bodypast)
+    ops.'add_child'(bodypost)
+    ops.'add_child_new'('Cardinal::POST::Op', looplabel, 'name'=>'goto')
+    ops.'add_child'(loopendlabel)
+    .return (ops)
+}
+
+transform post (Cardinal::PAST::For) :language('PIR') {
+    .local pmc ops
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local pmc varpast, expressionpast, bodypast
+    .local pmc varpost, expressionpost, bodypost
+    varpast = node[0]
+    expressionpast = node[1]
+    bodypast = node[2]
+
+    .local pmc looplabel, loopendlabel
+    looplabel = ops.'new'('Cardinal::POST::Label', 'name'=>'loop')
+    loopendlabel = ops.'new'('Cardinal::POST::Label', 'name'=>'loop_end')
+    
+    varpost = tree.'get'('post', varpast)
+    varpost.'islvalue'(1)
+
+    $P0 = node.'unique'('iter')
+    $S0 = $P0
+    $S0 = concat '    .local pmc ', $S0
+    .local pmc itervar
+    itervar = new 'Cardinal::POST::Raw'
+    itervar.'init'('node'=>node, 'raw'=>$S0)
+    ops.'add_child'(itervar)
+
+    expressionpost = tree.'get'('post', expressionpast)
+    ops.'add_child'(expressionpost)
+    $P1 = expressionpost.'value'()
+    ops.'add_child_new'('Cardinal::POST::Op', $P0, '.Iterator', $P1, 'name'=>'new')
+    ops.'add_child_new'('Cardinal::POST::Op', $P0, '0', 'name'=>'set')
+
+    ops.'add_child'(looplabel)
+    ops.'add_child_new'('Cardinal::POST::Op', $P0, loopendlabel, 'name'=>'unless')
+    ops.'add_child'(varpost)
+    ops.'add_child_new'('Cardinal::POST::Op', varpost, $P0, 'name'=>'shift')
 
     bodypost = tree.'get'('post', bodypast)
     ops.'add_child'(bodypost)

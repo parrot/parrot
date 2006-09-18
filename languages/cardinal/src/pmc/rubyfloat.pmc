@@ -14,7 +14,7 @@
 #include <assert.h>
 
 
-pmclass RubyFloat extends RubyObject extends Float dynpmc group ruby_group hll Cardinal maps Float {
+pmclass RubyFloat extends Float extends RubyObject dynpmc group ruby_group hll Cardinal maps Float {
 
     STRING* get_string () {
         UINTVAL buflen;

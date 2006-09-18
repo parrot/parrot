@@ -10,7 +10,7 @@ src/builtins/inplace.pir - Inplace assignments
 
 =cut
 
-.HLL 'Ruby', ''
+.HLL 'Ruby', 'ruby_group'
 .namespace
 
 ## assignment

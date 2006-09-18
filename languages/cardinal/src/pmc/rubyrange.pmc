@@ -1,0 +1,43 @@
+/* RubyRange.pmc
+ *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  SVN Info
+ *     $Id: rubyrange.pmc 13648 2006-07-30 14:42:30Z coke $
+ *  Overview:
+ *     These are the vtable functions for the RubyRange base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass RubyRange need_ext extends Slice dynpmc group ruby_group hll Ruby {
+
+    METHOD PMC* interpret() {
+        return SELF;
+    }
+
+    PMC* get_pmc_keyed(PMC* key) {
+        parrot_range_t *r = PMC_struct_val(key);
+        PMC *res = PMC_pmc_val(SELF);
+        if (!res) {
+            res = constant_pmc_new(INTERP, enum_class_Integer);
+            PMC_int_val(res) = RVal_int(r->cur);
+            return res;
+        }
+        PMC_int_val(res) = RVal_int(r->cur);
+        return res;
+    }
+
+}
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

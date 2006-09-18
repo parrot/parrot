@@ -11,7 +11,7 @@
 
 #include "parrot/parrot.h"
 
-pmclass RubyComplex extends RubyObject extends Complex dynpmc group ruby_group hll Ruby maps Complex {
+pmclass RubyComplex extends Complex extends RubyObject dynpmc group ruby_group hll Ruby maps Complex {
 
     METHOD PMC* interpret() {
         return SELF;

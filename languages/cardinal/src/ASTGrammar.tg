@@ -720,8 +720,44 @@ transform result (Cardinal::Grammar::lang_statements) :language('PIR') {
   try_for_statement:
     $I0 = defined node['for']
     unless $I0 goto try_def
-    child = tree.get('result', node, 'Cardinal::Grammar::for')
-    .return (child)
+
+    .local pmc var
+    .local pmc test
+    .local pmc body
+    .local pmc result
+
+    result = new 'Cardinal::PAST::For'
+    result.'init'('node'=>node)
+  
+    $I0 = defined node['for_variable']
+    unless $I0 goto for_err_no_tree
+    $P0 = node['for_variable']
+    var = tree.get('result', $P0, 'Cardinal::Grammar::for_variable')
+    result.add_child(var)
+
+    $I0 = defined node['expression']
+    unless $I0 goto for_err_no_tree
+    $P0 = node['expression']
+    test = tree.get('result', $P0, 'Cardinal::Grammar::expression')
+    result.add_child(test)
+
+    $I0 = defined node['compound_statement']
+    unless $I0 goto for_err_no_tree
+    $P0 = node['compound_statement']
+    body = tree.get('result', $P0, 'Cardinal::Grammar::compound_statement')
+    result.add_child(body)
+
+    .return (result)             
+  
+  for_err_no_tree:
+    print "The for node doesn't contain an appropriate match.\n"
+    .kdump2(node, "while_statement")
+    end
+
+#    $I0 = defined node['for']
+#    unless $I0 goto try_def
+#    child = tree.get('result', node, 'Cardinal::Grammar::for')
+#    .return (child)
 
   try_def:
     $I0 = defined node['def']
@@ -893,6 +929,28 @@ transform result (Cardinal::Grammar::for_statement) :language('PIR') {
   err_no_tree:
     print "The for node doesn't contain an appropriate match.\n"
     .kdump2(node, "while_statement")
+    end
+}
+
+transform result (Cardinal::Grammar::for_variable) :language('PIR') {
+    .local pmc var
+
+    $I0 = defined node['left_hand_side']
+    unless $I0 goto err_no_tree
+    $P0 = node['left_hand_side']
+    var = tree.get('result', $P0, 'Cardinal::Grammar::left_hand_side')
+    .return (var)
+
+    $I0 = defined node['multiple_left_hand_side']
+    unless $I0 goto err_no_tree
+    $P0 = node['multiple_left_hand_side']
+    var = tree.get('result', $P0, 'Cardinal::Grammar::multiple_left_hand_side')
+
+    .return (var)
+  
+  err_no_tree:
+    print "The for_variable node doesn't contain an appropriate match.\n"
+    .kdump2(node, "for_variable")
     end
 }
 

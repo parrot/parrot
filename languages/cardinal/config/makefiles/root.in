@@ -29,7 +29,8 @@ PMCS = \
   rubycomplex \
   rubyfixnum \
   rubyfloat \
-  rubystring
+  rubystring \
+  rubyrange
 
 PMC_SOURCES = \
   $(PMCDIR)/rubyobject.pmc \
@@ -39,12 +40,14 @@ PMC_SOURCES = \
   $(PMCDIR)/rubycomplex.pmc \
   $(PMCDIR)/rubyfixnum.pmc \
   $(PMCDIR)/rubyfloat.pmc \
-  $(PMCDIR)/rubystring.pmc
+  $(PMCDIR)/rubystring.pmc \
+  $(PMCDIR)/rubyrange.pmc
 
 BUILTINS_PIR = \
   src/builtins/assign.pir \
   src/builtins/cmp.pir \
-  src/builtins/io.pir
+  src/builtins/io.pir \
+  src/builtins/ranges.pir
 
 GEN_PIR = \
   src/cardinal_grammar_gen.pir \
