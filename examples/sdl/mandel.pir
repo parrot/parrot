@@ -15,9 +15,13 @@ To run this file, run the following command from the Parrot directory:
 
   --quit, -q      ... quit immediately (useful for benchmarking)
 
-=head1 KEYBOARD COMMANDS
+=head1 KEYBOARD/MOUSE COMMANDS
 
-  q  ... quit application
+  q          ... quit application
+  r          ... reset to intial coors and scale
+  <but-left> ... zoom in, center at click
+  <but-mid>  ... center at click
+  <but-right> .. zoom out, center at click
 
 =cut
 
@@ -66,6 +70,8 @@ ex:
     cl = subclass 'SDL::App', 'Mandel'
     addattribute cl, 'xstart'
     addattribute cl, 'ystart'
+    addattribute cl, 'xend'
+    addattribute cl, 'yend'
     addattribute cl, 'scale'
     addattribute cl, 'rect'
     addattribute cl, 'raw_palette'
@@ -97,6 +103,12 @@ ex:
     $P0 = ystart
     setattribute self, 'ystart', $P0
     $P0 = new .Float
+    $P0 = 1.0 # XXX calc from above
+    setattribute self, 'xend', $P0
+    $P0 = new .Float
+    $P0 = 1.0
+    setattribute self, 'yend', $P0
+    $P0 = new .Float
     $P0 = scale
     setattribute self, 'scale', $P0
 
@@ -121,6 +133,62 @@ ex:
     self.'init_events'()
 .end
 
+# accessors for some attribs
+.sub 'xstart' :method
+    .param float x     :optional
+    .param int has_x   :opt_flag
+    $P0 = getattribute self, 'xstart'
+    unless has_x goto get
+    $P0 = x
+get:
+    x = $P0
+    .return (x)
+.end
+
+.sub 'ystart' :method
+    .param float y     :optional
+    .param int has_y   :opt_flag
+    $P0 = getattribute self, 'ystart'
+    unless has_y goto get
+    $P0 = y
+get:
+    y = $P0
+    .return (y)
+.end
+
+.sub 'xend' :method
+    .param float x     :optional
+    .param int has_x   :opt_flag
+    $P0 = getattribute self, 'xend'
+    unless has_x goto get
+    $P0 = x
+get:
+    x = $P0
+    .return (x)
+.end
+
+.sub 'yend' :method
+    .param float y     :optional
+    .param int has_y   :opt_flag
+    $P0 = getattribute self, 'yend'
+    unless has_y goto get
+    $P0 = y
+get:
+    y = $P0
+    .return (y)
+.end
+
+.sub 'scale' :method
+    .param float s     :optional
+    .param int has_s   :opt_flag
+    $P0 = getattribute self, 'scale'
+    unless has_s goto get
+    $P0 = s
+get:
+    s = $P0
+    .return (s)
+.end
+
 .sub 'calc' :method
     .local pmc main_screen, raw_palette, rect, raw_surface
     .local int w, h, x, y, pal_elems, raw_c, k
@@ -130,12 +198,9 @@ ex:
     h = main_screen.'height'()
     w = main_screen.'width'()
     # lock the raw framebuffer
-    $P0 = getattribute self, 'xstart'
-    xstart = $P0
-    $P0 = getattribute self, 'ystart'
-    ystart = $P0
-    $P0 = getattribute self, 'scale'
-    scale = $P0
+    xstart = self.'xstart'()
+    ystart = self.'ystart'()
+    scale =  self.'scale'()
     raw_palette = getattribute self, 'raw_palette'
     rect        = getattribute self, 'rect'
     pal_elems = elements raw_palette
@@ -198,6 +263,61 @@ set_pix:
     if y < h goto loop_y
 
     main_screen.'unlock'()
+.end
+
+.sub 'recalc' :method
+    .param int x
+    .param int y
+    .param int but
+    .local int w, h
+    .local float xstart, ystart, xend, yend, scale, fx, fy, dx, dy
+    .local float ds, mx, my, dx2, dy2
+    .local pmc main_screen
+    main_screen = self.'surface'()
+    h = main_screen.'height'()
+    w = main_screen.'width'()
+    xstart = self.'xstart'()
+    ystart = self.'ystart'()
+    xend = self.'xend'()
+    yend = self.'yend'()
+    scale =  self.'scale'()
+    # use x,y as center of new calculation
+    dx = xend - xstart
+    dy = yend - ystart
+    # relative factor of new midpoint
+    fx = x / w   # 0..1
+    fy = y / h
+    fx -= 0.5    # -0.5 .. +0.5
+    fy -= 0.5
+    fx *= dx     # cvt to mandel coors
+    fy *= dy
+    dx2 = dx / 2.0
+    dy2 = dy / 2.0
+    mx = xstart + dx2    # midpoint
+    my = ystart + dy2
+    mx += fx             # new midpoint
+    my += fy
+    ds = 1.0
+    if but == 1 goto zoom_in
+    if but == 2 goto done
+    ds = 0.5
+    goto done
+zoom_in:    
+    ds = 2.0
+done:
+    dx2 /= ds
+    dy2 /= ds
+    xstart = mx - dx2
+    ystart = my - dy2
+    self.'xstart'(xstart)
+    self.'ystart'(ystart)
+    xend = mx + dx2
+    yend = my + dy2
+    self.'xend'(xend)
+    self.'yend'(yend)
+    scale *= ds
+    self.'scale'(scale)
+    self.'calc'()
 .end
 
 # init event system
@@ -290,6 +410,28 @@ loop:
     .param pmc app
     app.'quit'()
     end
+.end
+
+.sub key_down_r :method
+    .param pmc app
+    app.'xstart'(-2.0)
+    app.'ystart'(-1.0)
+    app.'xend'(1.0)
+    app.'yend'(1.0)
+    app.'scale'(200)
+    app.'calc'()
+.end
+
+.sub mouse_button_up :method
+    .param pmc event
+    .param pmc app
+
+    .local int b, x, y
+    event = event.'event'( 'MouseButton' )
+    b = event['state']
+    x = event['x']
+    y = event['y']
+    app.'recalc'(x, y, b)
 .end
 
 =head1 AUTHOR
