@@ -111,10 +111,9 @@ Integer or invalid.
     $I0 = length $S0
     new ret, .WmlsInteger
     ret = $I0
-    goto L2
+    .return (ret)
 L1:
     new ret, .WmlsInvalid
-L2:
     .return (ret)
 .end
 
@@ -148,10 +147,9 @@ Boolean or invalid.
     if $I0 goto L2
     ret = 1
 L2:
-    goto L3
+    .return (ret)
 L1:
     new ret, .WmlsInvalid
-L3:
     .return (ret)
 .end
 
@@ -165,8 +163,6 @@ index of the given string.
 
 If the index is of type floating-point, Float.int() is first used to calculate the
 actual integer index.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -187,7 +183,28 @@ If index is out of range then an empty string (C<"">) is returned.
 .sub '_string_charAt' :anon
     .param pmc str
     .param pmc index
-    not_implemented()
+    .local pmc ret
+    $I0 = isa str, 'WmlsInvalid'
+    if $I0 goto L1
+    $I0 = isa index, 'WmlsInteger'
+    if $I0 goto L2
+    $I0 = isa index, 'WmlsFloat'
+    if $I0 goto L2
+    goto L1
+L2:
+    $S0 = str
+    $I0 = length $S0
+    $I1 = index
+    new ret, .WmlsString
+    if $I1 < 0 goto L3
+    if $I1 >= $I0 goto L3
+    $S1 = substr $S0, $I1, 1
+    ret = $S1 
+L3:
+    .return (ret)
+L1:
+    new ret, .WmlsInvalid
+    .return (ret)
 .end
 
 
@@ -203,8 +220,6 @@ the string, the length is replaced with the number of remaining characters.
 
 If the startIndex or the length is of type floating-point, Float.int() is first used to
 calculate the actual integer value.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -229,8 +244,39 @@ If length <= 0 an empty string (C<"">) is returned.
 .sub '_string_subString' :anon
     .param pmc String
     .param pmc startIndex
-    .param pmc length
-    not_implemented()
+    .param pmc Length
+    .local pmc ret
+    $I0 = isa String, 'WmlsInvalid'
+    if $I0 goto L1
+    $I0 = isa startIndex, 'WmlsInteger'
+    if $I0 goto L2
+    $I0 = isa startIndex, 'WmlsFloat'
+    if $I0 goto L2
+    goto L1
+L2:
+    $I0 = isa Length, 'WmlsInteger'
+    if $I0 goto L3
+    $I0 = isa Length, 'WmlsFloat'
+    if $I0 goto L3
+    goto L1
+L3:
+    $S0 = String
+    $I0 = length $S0
+    $I1 = startIndex
+    if $I1 >= 0 goto L4
+    $I1 = 0
+L4:
+    new ret, .WmlsString
+    if $I1 >= $I0 goto L5
+    $I2 = Length
+    if $I2 <= 0 goto L5
+    $S1 = substr $S0, $I1, $I2
+    ret = $S1 
+L5:
+    .return (ret)
+L1:
+    new ret, .WmlsInvalid
+    .return (ret)
 .end
 
 
@@ -244,8 +290,6 @@ requested subString. If no match is found integer value -1 is returned.
 Two strings are defined to match when they are identical. Characters with
 multiple possible representations match only if they have the same
 representation in both strings. No case folding is performed.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -266,7 +310,22 @@ If subString is an empty string (C<"">), an invalid value is returned.
 .sub '_string_find' :anon
     .param pmc String
     .param pmc subString
-    not_implemented()
+    .local pmc ret
+    $I0 = isa String, 'WmlsInvalid'
+    if $I0 goto L1
+    $I0 = isa subString, 'WmlsInvalid'
+    if $I0 goto L1
+    $S0 = String
+    $S1 = subString
+    $I1 = length $S1
+    if $I1 == 0 goto L1
+    $I0 = index $S0, $S1
+    new ret, .WmlsInteger
+    ret = $I0
+    .return (ret)
+L1:
+    new ret, .WmlsInvalid
+    .return (ret)
 .end
 
 
@@ -305,7 +364,26 @@ If oldSubString is an empty string an C<invalid> value is returned.
     .param pmc String
     .param pmc oldSubString
     .param pmc newSubString
-    not_implemented()
+    .local pmc ret
+    $I0 = isa String, 'WmlsInvalid'
+    if $I0 goto L1
+    $I0 = isa oldSubString, 'WmlsInvalid'
+    if $I0 goto L1
+    $I0 = isa newSubString, 'WmlsInvalid'
+    if $I0 goto L1
+    $S0 = String
+    $S1 = oldSubString
+    $I1 = length $S1
+    if $I1 == 0 goto L1
+    $S2 = newSubString
+    $P0 = split $S1, $S0
+    $S0 = join $S2, $P0    
+    new ret, .WmlsString
+    ret = $S0
+    .return (ret)
+L1:
+    new ret, .WmlsInvalid
+    .return (ret)
 .end
 
 
@@ -316,8 +394,6 @@ If oldSubString is an empty string an C<invalid> value is returned.
 Returns the number of elements in the given string separated by the given
 separator. Empty string ("") is a valid element (thus, this function can never
 return a value that is less or equal to zero).
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -338,7 +414,29 @@ Returns C<invalid> if the separator is an empty string.
 .sub '_string_elements' :anon
     .param pmc str
     .param pmc separator
-    not_implemented()
+    .local pmc ret
+    $I0 = isa str, 'WmlsInvalid'
+    if $I0 goto L1
+    $I0 = isa separator, 'WmlsInvalid'
+    if $I0 goto L1
+    $S0 = str
+    $S1 = separator
+    $I1 = length $S1
+    if $I1 == 0 goto L1
+    $S1 = substr $S1, 0, 1
+    new ret, .WmlsInteger
+    $I0 = length $S0
+    if $I0 != 0 goto L2
+    ret = 1
+    .return (ret)
+L2:
+    $P0 = split $S1, $S0
+    $I0 = elements $P0
+    ret = $I0
+    .return (ret)
+L1:
+    new ret, .WmlsInvalid
+    .return (ret)
 .end
 
 
@@ -354,8 +452,6 @@ string is returned.
 
 If the index is of type floating-point, Float.int() is first used to calculate the
 actual index value.
-
-NOT YET IMPLEMENTED.
 
 =head3 PARAMETERS
 
@@ -379,7 +475,42 @@ Returns C<invalid> if the separator is an empty string.
     .param pmc str
     .param pmc index
     .param pmc separator
-    not_implemented()
+    .local pmc ret
+    $I0 = isa str, 'WmlsInvalid'
+    if $I0 goto L1
+    $I0 = isa index, 'WmlsInteger'
+    if $I0 goto L2
+    $I0 = isa index, 'WmlsFloat'
+    if $I0 goto L2
+    goto L1
+L2:
+    $I0 = isa separator, 'WmlsInvalid'
+    if $I0 goto L1
+    $S0 = str
+    $I1 = index
+    if $I1 >= 0 goto L3
+    $I1 = 0
+L3:
+    $S2 = separator
+    $I2 = length $S2
+    if $I2 == 0 goto L1
+    $S2 = substr $S2, 0, 1
+    new ret, .WmlsString
+    $I0 = length $S0
+    if $I0 != 0 goto L4
+    .return (ret)
+L4:
+    $P0 = split $S2, $S0
+    $I0 = elements $P0
+    if $I1 < $I0 goto L5 
+    $I1 = $I0 - 1
+L5:
+    $S0 = $P0[$I1]
+    ret = $S0
+    .return (ret)
+L1:
+    new ret, .WmlsInvalid
+    .return (ret)
 .end
 
 
@@ -565,8 +696,6 @@ relation is based on the relation of the character codes in the native
 character set. The return value is -1 if string1 is less than string2, 0 if string1
 is identical to string2 or 1 if string1 is greater than string2.
 
-NOT YET IMPLEMENTED.
-
 =head3 PARAMETERS
 
 String1 = String
@@ -582,7 +711,27 @@ Integer or invalid.
 .sub '_string_compare' :anon
     .param pmc string1
     .param pmc string2
-    not_implemented()
+    .local pmc ret
+    $I0 = isa string1, 'WmlsInvalid'
+    if $I0 goto L1
+    $I0 = isa string2, 'WmlsInvalid'
+    if $I0 goto L1
+    $S1 = string1
+    $S2 = string2
+    new ret, .WmlsInteger
+    if $S1 >= $S2 goto L2
+    ret = -1
+    .return (ret)
+L2:
+    if $S1 > $S2 goto L3
+    ret = 0
+    .return (ret)
+L3:       
+    ret = 1
+    .return (ret)
+L1:
+    new ret, .WmlsInvalid
+    .return (ret)
 .end
 
 
