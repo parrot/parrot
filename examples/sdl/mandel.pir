@@ -51,7 +51,7 @@ To run this file, run the following command from the Parrot directory:
     .local int x, y, pal_elems, raw_c, k
     pal_elems = elements raw_palette
     y = 0
-    .local float r, i, z, Z, t, c, C
+    .local float z, Z, t, c, C, zz, ZZ
     # surface prefetch opt
     .local pmc raw_surface
     .local int offset, offs_y
@@ -68,31 +68,29 @@ loop_x:
     c -= 2.0        # xstart 
     z = 0
     Z = 0
-    r = c
-    i = C
     k = 0
     # iteration loop, calculate
     # Z(k+1) = Z(k)^2 + c
     # bailout if abs(Z) > 2 or iteration limit of k is exceeded
+    zz = z * z
+    ZZ = Z * Z
 loop_k:
-    $N1 = z * z
-    $N2 = Z * Z
-    t = $N1 - $N2
-    t += r
+    t = zz - ZZ
+    t += c
 
     # Z = 2*z*Z + i
-    Z = 2 * Z
-    Z = z * Z
-    Z += i
+    Z *= 2.0
+    Z *= z
+    Z += C
 
     # z = t
     z = t
 
     # if (z*z + Z*Z > 4) break;
-    $N1 = z * z
-    $N2 = Z * Z
-    $N1 += $N2
-    if $N1 > 4 goto print
+    zz = z * z
+    ZZ = Z * Z
+    $N1 = zz + ZZ
+    if $N1 > 4.0 goto print
     inc k
     if k < 200 goto loop_k	# iterations
     k = 0
@@ -213,13 +211,18 @@ Plain runcore and unoptimized parrot:
   Original version based on sdl/raw_pixels   21s
   Create raw_palette                         12s
   Prefetch raw_surface                       10s        [1]
+  Optimize calculation loop (zz, ZZ)          9s        [2] 
 
 =head2 Parrot based optimizations
 
-JIT runcore and optimized parrot gives for above timing(s):
+Optimized build
 
-  [1]                                         1.1s
-
+  [2] plain runcore 64 bit                    3.0s
+  [2] -C    runcore 64 bit                    1.5s
+  [2] plain runcore 32 bit                    3.6s
+  [2] -C    runcore 32 bit                    1.6s
+  [1] -j                                      1.1s
+  [2] -j                                      0.8s
 
 =head1 SEE ALSO
 
