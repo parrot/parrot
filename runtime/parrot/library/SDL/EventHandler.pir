@@ -246,9 +246,9 @@ At the very least, you should override C<quit()>.
 
 .end
 
-.sub mouse_button_up
+.sub mouse_button_up :method
+	.param pmc event
 	.param pmc event_args
-
 .end
 
 .sub joy_axis_motion :method

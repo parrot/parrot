@@ -9,17 +9,59 @@ sdl/mandel.pir - Display Mandelbrot Set Using SDL
 
 To run this file, run the following command from the Parrot directory:
 
-  $ ./parrot examples/sdl/mandel.pir
+  $ ./parrot examples/sdl/mandel.pir [ options ]
+
+=head2 Options
+
+  --quit, -q      ... quit immediately (useful for benchmarking)
+
+=head1 KEYBOARD COMMANDS
+
+  q  ... quit application
 
 =cut
 
 .sub _main :main
-    # first load the necessary libraries
+    .param pmc argv
+    .local pmc opts, app, event, handler
+    'load_libs'()
+    opts = 'get_opts'(argv)
+    app  = 'make_app'()
+    app.'calc'()
+    $I0 = opts['quit']
+    if $I0 goto ex
+    event = getattribute app, 'event'
+    handler = getattribute app, 'event_handler'
+    event.'process_events'(handler, app)
+ex:
+    app.'quit'()
+.end    
+
+# utils
+.sub 'load_libs'    
+    # load the necessary libraries
     load_bytecode "library/SDL/App.pir"
     load_bytecode "library/SDL/Rect.pir"
     load_bytecode "library/SDL/Color.pir"
+    load_bytecode "library/SDL/EventHandler.pir"
+    load_bytecode "library/SDL/Event.pir"
+    load_bytecode "library/Getopt/Obj.pir"
+.end
 
-    # create an SDL::App object
+# cmd line processing
+.sub 'get_opts'
+    .param pmc argv
+    .local pmc opts, getopts
+    getopts = new 'Getopt::Obj'
+    push getopts, "quit|q"
+    $S0 = shift argv
+    opts = getopts."get_options"(argv)
+    .return (opts)
+.end
+
+# create the application
+.sub 'make_app'
+    # create an SDL::App subclass
     .local pmc app, cl
     cl = subclass 'SDL::App', 'Mandel'
     addattribute cl, 'xstart'
@@ -27,14 +69,58 @@ To run this file, run the following command from the Parrot directory:
     addattribute cl, 'scale'
     addattribute cl, 'rect'
     addattribute cl, 'raw_palette'
+    addattribute cl, 'event'
+    addattribute cl, 'event_handler'
+    # instantiate, seel also __init below
     app = new 'Mandel'
-    app.'calc'()
-    # show off for a bit then exit
-    sleep 2
-    app.'quit'()
+    .return (app)
 .end    
 
 .namespace ['Mandel']
+
+# init the Mandel app instance
+.sub __init :method
+    .local int w, h
+    .local float scale, xstart, ystart
+    # mandelbrot set is witdh [-2, 0.25] heigth [ -1, 1]
+    # round up, scale *200
+    xstart = -2.0
+    ystart = -1.0
+    scale = 200
+    w = 600
+    h = 400
+    self.'init'( 'height' => h, 'width' => w, 'bpp' => 0, 'flags' => 1 )
+    $P0 = new .Float
+    $P0 = xstart
+    setattribute self, 'xstart', $P0
+    $P0 = new .Float
+    $P0 = ystart
+    setattribute self, 'ystart', $P0
+    $P0 = new .Float
+    $P0 = scale
+    setattribute self, 'scale', $P0
+
+    .local pmc rect, main_screen
+    main_screen = self.'surface'()
+
+    # create an SDL::Rect representing the entire main screen
+    .local pmc rect
+    rect = new 'SDL::Rect'
+    rect.'init'( 'height' => h, 'width' => w, 'x' => 0, 'y' => 0 )
+    setattribute self, 'rect', rect
+
+    .local pmc palette, raw_palette, black
+    palette = self.'create_palette'()
+    raw_palette = self.'create_rawpalette'(palette)
+    setattribute self, 'raw_palette', raw_palette
+    # draw the background
+    black = palette[0]
+    main_screen.'fill_rect'( rect, black )
+    main_screen.'update_rect'( rect )
+
+    self.'init_events'()
+.end
+
 .sub 'calc' :method
     .local pmc main_screen, raw_palette, rect, raw_surface
     .local int w, h, x, y, pal_elems, raw_c, k
@@ -114,44 +200,17 @@ set_pix:
     main_screen.'unlock'()
 .end
 
-.sub __init :method
-    .local int w, h
-    .local float scale, xstart, ystart
-    # mandelbrot set is witdh [-2, 0.25] heigth [ -1, 1]
-    # round up, scale *200
-    xstart = -2.0
-    ystart = -1.0
-    scale = 200
-    w = 600
-    h = 400
-    self.'init'( 'height' => h, 'width' => w, 'bpp' => 0, 'flags' => 1 )
-    $P0 = new .Float
-    $P0 = xstart
-    setattribute self, 'xstart', $P0
-    $P0 = new .Float
-    $P0 = ystart
-    setattribute self, 'ystart', $P0
-    $P0 = new .Float
-    $P0 = scale
-    setattribute self, 'scale', $P0
+# init event system
+.sub 'init_events' :method
+    .local pmc event, args, event_handler
+    event = new 'SDL::Event'
+    event.'init'()
+    setattribute self, 'event', event
 
-    .local pmc rect, main_screen
-    main_screen = self.'surface'()
-
-    # create an SDL::Rect representing the entire main screen
-    .local pmc rect
-    rect = new 'SDL::Rect'
-    rect.'init'( 'height' => h, 'width' => w, 'x' => 0, 'y' => 0 )
-
-    setattribute self, 'rect', rect
-    .local pmc palette, raw_palette, black
-    palette = self.'create_palette'()
-    raw_palette = self.'create_rawpalette'(palette)
-    setattribute self, 'raw_palette', raw_palette
-    # draw the background
-    black = palette[0]
-    main_screen.'fill_rect'( rect, black )
-    main_screen.'update_rect'( rect )
+    $P0 = subclass 'SDL::EventHandler', ['Mandel'; 'EventHandler']
+    event_handler = new ['Mandel'; 'EventHandler']
+    event_handler.'init'(self)	# XXX unused
+    setattribute self, 'event_handler', event_handler
 .end
 
 # sort by adding raw r+g+b values
@@ -223,6 +282,14 @@ loop:
     inc i
     if i < n goto loop
     .return (raw_palette)
+.end
+
+.namespace ['Mandel'; 'EventHandler']
+
+.sub key_down_q :method
+    .param pmc app
+    app.'quit'()
+    end
 .end
 
 =head1 AUTHOR
