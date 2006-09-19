@@ -521,10 +521,14 @@ draw:
 	surface[ 'pixels'; 'array'; offset ] = color
 .end
 
-=item pixels()
+=item pixels([new_pixels)
+
+Get or set raw pixels array.
 
 Return the raw pixels array of the surface. It can be filled with raw
 colors like this:
+
+XXX TODO this doesn't work due to restriction in ManagedStruct code.
 
   .local pmc surface, pixels
   .local int offset, x, y, raw_color
@@ -535,15 +539,21 @@ colors like this:
   $I0 .= x
   pixels[$I0] = raw_color
 
+XXX TODO this doesn't work due to restriction in ManagedStruct code.
+
 See also B<draw_pixels()> above for locking/unlocking the surface and
 how to fetch raw colors.
 
 =cut
 
 .sub pixels :method
+    .param pmc new_pixels   :optional
+    .param int has_pixels   :opt_flag
+
     .local pmc surface
-    surface = self.'surface'()
-    $P0 = surface['pixels'; 'array']
+    ## surface = self.'surface'()
+    ## $P0 = surface['pixels'; 'array']
+    null $P0
     .return ($P0)
 .end
 
