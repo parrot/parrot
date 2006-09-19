@@ -48,8 +48,8 @@ SDL::EventHandler - base class for application-specific SDL event handlers
 	find_type event_type, 'SDL::Event'
 	event = new event_type
 
-	# ... and wait for events
-	event.wait_event( event_handler, handler_args )
+	# ... and process events
+	event.'process_events'( event_handler, handler_args )
 
 =head1 DESCRIPTION
 
@@ -96,6 +96,19 @@ if one exists.  Otherwise, does nothing.
 Override this if you want to change the way dispatching happens or to do
 something different for I<all> key down events.  In general, you will probably
 want to override the C<key_down_*> methods instead.
+
+XXX The I<*> above i.e. the actually key_name isn't really documented.
+But:
+
+  $ perldoc SDL::Event
+
+might be helpful (for now), if you remove I<SDLK_> and lowercase the
+remainder - sorry.
+
+  .sub key_down_q         # 'q' key
+  .sub key_down_down      # <down> arrow key
+  .sub key_down_kp_plus   # <keypad-plus> key
+  ...
 
 =cut
 
