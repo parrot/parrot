@@ -61,4 +61,4 @@ clean: \
 Parrot-Embed : Parrot-Embed.dummy
 
 Parrot-Embed.dummy:
-	- cd ext/Parrot-Embed && $(PERL) Build.PL && $(PERL) Build
+	- cd Parrot-Embed && $(PERL) Build.PL && $(PERL) Build
