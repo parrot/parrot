@@ -89,10 +89,10 @@ PARROT_API STRING *readable_name(Parrot_Interp, PMC *);
 } while (0)
 
 /*
- * class = 1st element in object array
+ * class marocs
  */
 
-#  define ATTRIB_COUNT(obj) PMC_int_val2(obj)
+#  define CLASS_ATTRIB_COUNT(cl) PMC_int_val2(cl)
 #  define SET_CLASS(arr, obj, cl) \
        obj->vtable->class = cl
 #  define GET_CLASS(arr, obj) \

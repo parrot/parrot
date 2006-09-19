@@ -389,18 +389,59 @@ ok 1
 ok 2
 OUTPUT
 
-# This needs a better test...
-pasm_output_is(<<'CODE', <<'OUTPUT', "addattribute subclass - same name");
+pir_output_is(<<'CODE', <<'OUTPUT', "addattribute subclass - same name");
+.sub main :main
     newclass P1, "Foo"
     addattribute P1, "i"
     addattribute P1, "j"
     subclass P2, P1, "Bar"
-    addattribute P2, "i"
     addattribute P2, "j"
+    addattribute P2, "k"
     print "ok 1\n"
-    end
+    .local pmc o
+    o = new 'Bar'
+    $I0 = classoffset o, 'Foo'
+    $P0 = getattribute o, $I0
+    print_item $P0
+    inc $I0
+    $P0 = getattribute o, $I0
+    print_item $P0
+    $I0 = classoffset o, 'Bar'
+    $P0 = getattribute o, $I0
+    print_item $P0
+    inc $I0
+    $P0 = getattribute o, $I0
+    print_item $P0
+    print_newline
+    $P0 = getattribute o, 'i'
+    print_item $P0
+    $P0 = getattribute o, "Foo\0j"
+    print_item $P0
+    $P0 = getattribute o, 'j'
+    print_item $P0
+    $P0 = getattribute o, 'k'
+    print_item $P0
+    print_newline
+.end
+.namespace ['Bar']
+.sub __init :method
+    $P0 = new .String
+    $P0 = 'Foo.i'
+    setattribute self, "Foo\0i", $P0
+    $P0 = new .String
+    $P0 = 'Foo.j'
+    setattribute self, "Foo\0j", $P0
+    $P0 = new .String
+    $P0 = 'Bar.j'
+    setattribute self, "Bar\0j", $P0
+    $P0 = new .String
+    $P0 = 'Bar.k'
+    setattribute self, "Bar\0k", $P0
+.end
 CODE
 ok 1
+Foo.i Foo.j Bar.j Bar.k
+Foo.i Foo.j Bar.j Bar.k
 OUTPUT
 
 pasm_output_like(<<'CODE', <<'OUTPUT', "classoffset: normal operation");

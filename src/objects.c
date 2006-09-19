@@ -183,7 +183,7 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
 #endif
 
     /* And note the totals */
-    ATTRIB_COUNT(class) = cur_offset;
+    CLASS_ATTRIB_COUNT(class) = cur_offset;
     Parrot_unblock_DOD(interpreter);
 }
 
@@ -352,7 +352,8 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     /* We will have five entries in this array */
 
     /* We have the same number of attributes as our parent */
-    ATTRIB_COUNT(child_class) = parent_is_class ? ATTRIB_COUNT(base_class) : 0;
+    CLASS_ATTRIB_COUNT(child_class) = parent_is_class 
+            ? CLASS_ATTRIB_COUNT(base_class) : 0;
 
     /* Our parent class array has a single member in it */
     parents = pmc_new(interpreter, enum_class_ResizablePMCArray);
@@ -808,7 +809,7 @@ instantiate_object(Interp* interpreter, PMC *object, PMC *init)
     object->vtable = PMC_struct_val(vtable_pmc);
 
     /* Grab the attribute count from the class */
-    attrib_count = ATTRIB_COUNT(class);
+    attrib_count = CLASS_ATTRIB_COUNT(class);
 
     /* Build the array that hangs off the new object */
     /* First presize it */
@@ -951,7 +952,7 @@ Parrot_add_parent(Interp* interpreter, PMC *class, PMC *parent)
          */
         PMC *class_name;
 
-        if (ATTRIB_COUNT(class) != 0) {
+        if (CLASS_ATTRIB_COUNT(class) != 0) {
             internal_exception(1, "Subclassing built-in type too late");
         }
         Parrot_add_attribute(interpreter, class,
@@ -1386,13 +1387,11 @@ Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)
      * TODO check if someone is trying to add attributes to a parent class
      * while there are already child class attrs
      */
-    idx = VTABLE_elements(interpreter, attr_hash);
-    idx /= 2;
+    idx = CLASS_ATTRIB_COUNT(class)++;
     VTABLE_set_integer_keyed_str(interpreter, attr_hash,
             attr, idx);
     VTABLE_set_integer_keyed_str(interpreter, attr_hash,
             full_attr_name, idx);
-    ATTRIB_COUNT(class)++;
     return idx;
 }
 

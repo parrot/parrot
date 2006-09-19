@@ -75,7 +75,7 @@ argument is not a PMC* but the C<classname> STRING.
 
     void init () {
         /* No attributes to start with */
-        PMC_int_val(SELF) = ATTRIB_COUNT(SELF) = 0;
+        PMC_int_val(SELF) = CLASS_ATTRIB_COUNT(SELF) = 0;
         /* But we are a class, really */
         PObj_is_class_SET(SELF);
         /* turn on marking of the class_data array */
@@ -100,7 +100,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 
 */
     void destroy() {
-        if (ATTRIB_COUNT(SELF)) {
+        if (PMC_int_val(SELF)) {
             mem_sys_free(PMC_data(SELF));
         }
     }
