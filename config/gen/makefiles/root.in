@@ -187,6 +187,7 @@ GEN_MAKEFILES = \
     compilers/bcg/Makefile \
     compilers/json/Makefile \
     editor/Makefile \
+    ext/Makefile \
     languages/Makefile \
     languages/amber/Makefile \
     languages/APL/Makefile \

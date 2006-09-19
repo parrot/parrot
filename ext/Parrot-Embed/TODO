@@ -1,0 +1,6 @@
+TODO:
+	- move tests into ../../t during build ?
+	- update with new embedding strategy
+	- make Parrot::Interpreter and Parrot::PMC objects
+	- create methods on those objects
+	- allow more signatures on call_sub()

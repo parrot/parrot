@@ -1,0 +1,22 @@
+Parrot::Embed
+-------------
+
+This is the first version of an embedding interface to use Parrot from Perl 5.
+
+Be afraid.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    perl ./Build
+    perl ./Build test
+    perl ./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 The Perl Foundation/chromatic
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Parrot itself.

@@ -1,0 +1,5 @@
+TYPEMAP
+Parrot_Interp   	T_PTR
+Parrot_PackFile 	T_PTR
+Parrot_STRING   	T_PTR
+Parrot_PMC          T_PTR

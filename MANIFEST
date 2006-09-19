@@ -222,6 +222,7 @@ config/gen/makefiles/dynoplibs_pl.in                        []
 config/gen/makefiles/dynpmc.in                              []
 config/gen/makefiles/dynpmc_pl.in                           []
 config/gen/makefiles/editor.in                              []
+config/gen/makefiles/ext.in                                 []
 config/gen/makefiles/json.in                                []
 config/gen/makefiles/languages.in                           []
 config/gen/makefiles/parrot.pc.in                           []
@@ -671,6 +672,16 @@ examples/tge/branch/branch.g                                [main]doc
 examples/tge/branch/lib/Branch.pir                          [main]doc
 examples/tge/branch/lib/Leaf.pir                            [main]doc
 examples/tge/branch/transform.pir                           [main]doc
+ext/Parrot-Embed/t/embed.t                                  [devel]
+ext/Parrot-Embed/t/greet.pir                                [devel]
+ext/Parrot-Embed/lib/Parrot/Embed.xs                        [devel]
+ext/Parrot-Embed/lib/Parrot/Embed.pm                        [devel]
+ext/Parrot-Embed/Changes                                    [devel]
+ext/Parrot-Embed/MANIFEST                                   [devel]
+ext/Parrot-Embed/typemap                                    [devel]
+ext/Parrot-Embed/Build.PL                                   [devel]
+ext/Parrot-Embed/README                                     [devel]
+ext/Parrot-Embed/TODO                                       [devel]
 include/parrot/atomic.h                                     [main]include
 include/parrot/atomic/fallback.h                            [main]include
 include/parrot/atomic/gcc_pcc.h                             [main]include

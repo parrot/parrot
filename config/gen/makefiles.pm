@@ -86,6 +86,11 @@ sub makefiles
         conditioned_lines                       => 1
     );
     genfile(
+        'config/gen/makefiles/ext.in'           => 'ext/Makefile',
+        commentType                             => '#',
+        replace_slashes                         => 1
+    );
+    genfile(
         'config/gen/makefiles/parrot.pc.in'     => 'parrot.pc'
     );
 

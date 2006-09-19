@@ -120,9 +120,11 @@ D: TAP language author, and Parrot Bug fixes
 E: cdolan@cpan.org
 
 N: chromatic
-D: SDL library and examples; Test::Builder; test suite cleanup; Pheme
+D: SDL library and examples; PIR Test::*; test suite cleanup
+D: Parrot::Embed; Pheme
 D: lead philosopher -- "Why doesn't this work?"
 E: chromatic@wgz.org
+W: http://wgz.org/chromatic/
 
 N: Clayton O'Neill
 D: Fix for parrot linking issue on Solaris 8
