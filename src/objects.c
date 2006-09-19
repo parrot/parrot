@@ -105,7 +105,6 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
     INTVAL cur_offset;
     SLOTTYPE *class_slots;
     PMC *attr_offset_hash;
-    PMC *class_offset_hash;
     PMC *mro;
     STRING *classname;
     INTVAL n_class;
@@ -124,9 +123,6 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
     class_slots = PMC_data(class);
     attr_offset_hash = pmc_new(interpreter, enum_class_Hash);
     set_attrib_num(class, class_slots, PCD_ATTRIBUTES, attr_offset_hash);
-
-    class_offset_hash = pmc_new(interpreter, enum_class_Hash);
-    set_attrib_num(class, class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
 
     mro = class->vtable->mro;
     n_mro = VTABLE_elements(interpreter, mro);
@@ -148,13 +144,6 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
                     get_attrib_num(class_slots, PCD_CLASS_NAME));
         attribs = get_attrib_num(class_slots, PCD_CLASS_ATTRIBUTES);
         attr_count = VTABLE_elements(interpreter, attribs);
-        /* Note the current offset as where this class'
-               attributes start */
-        if (attr_count || !n_class) {
-            VTABLE_set_integer_keyed_str(interpreter,
-                    class_offset_hash, classname,
-                    cur_offset);
-        }
         if (attr_count) {
             INTVAL offset;
 
@@ -1368,21 +1357,6 @@ Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)
         internal_exception(1, "Attribute '%s' already exists", c_error);
         string_cstring_free(c_error);
     }
-#if 0
-    if (VTABLE_exists_keyed_str(interpreter, attr_hash, attr)) {
-        /* make old short name invisible */
-        static int anon_count;
-        STRING *mangled;
-        INTVAL old_idx = VTABLE_get_integer_keyed_str(interpreter,
-                attr_hash, attr);
-        VTABLE_delete_keyed_str(interpreter, attr_hash, attr);
-
-        mangled = Parrot_sprintf_c(interpreter, "%Ss%c%canon_%d",
-                attr, 0, 0, ++anon_count);
-        VTABLE_set_integer_keyed_str(interpreter, attr_hash,
-                mangled, old_idx);
-    }
-#endif
     /*
      * TODO check if someone is trying to add attributes to a parent class
      * while there are already child class attrs
@@ -1536,36 +1510,31 @@ Parrot_set_attrib_by_str(Interp* interpreter, PMC *object,
 
 INTVAL
 Parrot_class_offset(Interp* interpreter, PMC *object, STRING *class) {
-    PMC *offset_hash;
-    PMC *class_pmc;
-    INTVAL offset;
-    HashBucket *b;
+    PMC *class_pmc, *mro, *attribs;
+    INTVAL offset, i, n, attr_count;
 
     if (!PObj_is_object_TEST(object))
         internal_exception(1, "Not an object");
     class_pmc = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
-    offset_hash = get_attrib_num((SLOTTYPE *)PMC_data(class_pmc),
-                                 PCD_ATTRIB_OFFS);
-#if 0
-    if (VTABLE_exists_keyed_str(interpreter, offset_hash, class)) {
-        offset = VTABLE_get_integer_keyed_str(interpreter, offset_hash, class);
+    /* unroll common case - object is this class */
+    attribs = get_attrib_num(PMC_data(class_pmc), PCD_CLASS_ATTRIBUTES);
+    attr_count = VTABLE_elements(interpreter, attribs);
+    offset = PMC_int_val(object) - attr_count;
+    if (!string_equal(interpreter, VTABLE_name(interpreter, class_pmc), class))
+        return offset;
+    /* now check mro */
+    mro = class_pmc->vtable->mro;
+    n = VTABLE_elements(interpreter, mro);
+    for (i = 1; i < n; ++i) {
+        class_pmc = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
+        attribs = get_attrib_num(PMC_data(class_pmc), PCD_CLASS_ATTRIBUTES);
+        attr_count = VTABLE_elements(interpreter, attribs);
+        offset -= attr_count;
+        if (!string_equal(interpreter, 
+                    VTABLE_name(interpreter, class_pmc), class))
+            return offset;
     }
-    else {
-        offset = -1;
-    }
-#else
-    /*
-     * cheat a bit--the offset_hash is a Hash PMC
-     */
-    b = parrot_hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(offset_hash), class);
-    if (!b)
-        offset = -1;
-    else {
-        return PMC_int_val((PMC*)b->value);
-    }
-#endif
-    return offset;
+    return -1;  /* error is catched in opcode */
 }
 
 /*

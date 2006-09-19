@@ -21,7 +21,6 @@
 typedef enum {
     PCD_PARENTS,        /* An array of immediate parents */
     PCD_CLASS_NAME,     /* A String PMC */
-    PCD_ATTRIB_OFFS,    /* class => offset hash */
     PCD_ATTRIBUTES,      /* class::attrib => offset hash */
     PCD_CLASS_ATTRIBUTES, /* Class attribute array */
     PCD_OBJECT_VTABLE,   /* Vtable PMC that holds the vtable for
