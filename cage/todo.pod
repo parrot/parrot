@@ -194,8 +194,7 @@ From #parrot:
     with leo and I am going to send and email to p6i for deprecation
     of certain old features
 
-=head2 Help other contributors hack their patches into Parrot-style
-industrial-strength C code.
+=head2 Help other contributors hack their patches into Parrot-style industrial-strength C code.
 
 From chip's comment at
 L<http://www.oreillynet.com/onlamp/blog/2006/07/calling_for_parrot_janitors.html>
