@@ -29,12 +29,6 @@ typedef enum {
     PCD_MAX
 } PARROT_CLASS_DATA_ENUM;
 
-typedef enum {
-    POD_CLASS,          /* class PMC of object */
-    POD_CLASS_NAME,     /* A String PMC */
-    POD_FIRST_ATTRIB    /* attributes start here */
-} PARROT_OBJECT_DATA_ENUM;
-
 PARROT_API PMC *Parrot_single_subclass(Parrot_Interp, PMC *, PMC *);
 PARROT_API void Parrot_new_class(Parrot_Interp, PMC *, PMC *);
 PARROT_API PMC *Parrot_class_lookup(Parrot_Interp, STRING *);
@@ -99,10 +93,10 @@ PARROT_API STRING *readable_name(Parrot_Interp, PMC *);
  */
 
 #  define ATTRIB_COUNT(obj) PMC_int_val2(obj)
-#  define SET_CLASS(arr, obj, class) \
-       set_attrib_num(obj, arr, POD_CLASS, class)
+#  define SET_CLASS(arr, obj, cl) \
+       obj->vtable->class = cl
 #  define GET_CLASS(arr, obj) \
-       get_attrib_num(arr, POD_CLASS)
+       obj->vtable->class
 
 #endif /* PARROT_OBJECTS_H_GUARD */
 /*

@@ -1996,7 +1996,7 @@ sub body
 $l
 $decl {
     SLOTTYPE *attrib_array = PMC_data(pmc);
-    PMC *attr = get_attrib_num(attrib_array, POD_FIRST_ATTRIB);
+    PMC *attr = get_attrib_num(attrib_array, 0);
     $ret
 }
 

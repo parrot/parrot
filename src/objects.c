@@ -153,7 +153,7 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
         if (attr_count || !n_class) {
             VTABLE_set_integer_keyed_str(interpreter,
                     class_offset_hash, classname,
-                    cur_offset + POD_FIRST_ATTRIB);
+                    cur_offset);
         }
         if (attr_count) {
             INTVAL offset;
@@ -729,7 +729,7 @@ do_initcall(Interp* interpreter, PMC* class, PMC *object, PMC *init)
             attr = pmc_new_noinit(interpreter,
                     parent_class->vtable->base_type);
             obj_data = PMC_data(object);
-            set_attrib_num(object, obj_data, POD_FIRST_ATTRIB, attr);
+            set_attrib_num(object, obj_data, 0, attr);
             VTABLE_init(interpreter, attr);
             continue;
         }
@@ -798,8 +798,6 @@ instantiate_object(Interp* interpreter, PMC *object, PMC *init)
 {
     SLOTTYPE *new_object_array;
     INTVAL attrib_count, i;
-    SLOTTYPE *class_array;
-    PMC *class_name;
 
     PMC * const class = object->vtable->class;
     /*
@@ -809,27 +807,20 @@ instantiate_object(Interp* interpreter, PMC *object, PMC *init)
                                             PCD_OBJECT_VTABLE);
     object->vtable = PMC_struct_val(vtable_pmc);
 
-    /* Grab the attribute count from the parent */
+    /* Grab the attribute count from the class */
     attrib_count = ATTRIB_COUNT(class);
-
-    class_array = PMC_data(class);
-    class_name = get_attrib_num(class_array, PCD_CLASS_NAME);
 
     /* Build the array that hangs off the new object */
     /* First presize it */
-    set_attrib_array_size(object,
-                          attrib_count + POD_FIRST_ATTRIB);
+    set_attrib_array_size(object, attrib_count);
     new_object_array = PMC_data(object);
 
     /* fill with PMCNULL, so that access doesn't segfault */
-    for (i = POD_FIRST_ATTRIB; i < attrib_count + POD_FIRST_ATTRIB; ++i)
+    for (i = 0; i < attrib_count; ++i)
         set_attrib_num(object, new_object_array, i, PMCNULL);
 
     /* turn marking on */
     set_attrib_flags(object);
-    /* 0 - class PMC, 1 - class name */
-    SET_CLASS(new_object_array, object, class);
-    set_attrib_num(object, new_object_array, POD_CLASS_NAME, class_name);
 
     /* We are an object now */
     PObj_is_object_SET(object);
@@ -1433,7 +1424,7 @@ Parrot_get_attrib_by_num(Interp* interpreter, PMC *object, INTVAL attrib)
     SLOTTYPE * const attrib_array = PMC_data(object);
     const INTVAL attrib_count = PMC_int_val(object);
 
-    if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
+    if (attrib >= attrib_count || attrib < 0) {
         real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute #%d", (int)attrib);
     }
@@ -1498,7 +1489,6 @@ PMC *
 Parrot_get_attrib_by_str(Interp* interpreter, PMC *object, STRING *attr)
 {
     return Parrot_get_attrib_by_num(interpreter, object,
-                POD_FIRST_ATTRIB +
                 attr_str_2_num(interpreter, object, attr));
 }
 
@@ -1528,7 +1518,7 @@ Parrot_set_attrib_by_num(Interp* interpreter, PMC *object,
     SLOTTYPE * const attrib_array = PMC_data(object);
     const INTVAL attrib_count = PMC_int_val(object);
 
-    if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
+    if (attrib >= attrib_count || attrib < 0) {
         real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute #%d", (int)attrib);
     }
@@ -1541,7 +1531,6 @@ Parrot_set_attrib_by_str(Interp* interpreter, PMC *object,
 {
 
     Parrot_set_attrib_by_num(interpreter, object,
-                POD_FIRST_ATTRIB +
                 attr_str_2_num(interpreter, object, attr),
                 value);
 }
