@@ -12,3 +12,10 @@ void Parrot_platform_init_code(void);
 #pragma warning( disable: 4505 ) /* disables 'unreferenced local function has
                                   * been removed' warnings in header files */
 #endif /* defined(_MSC_VER) */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

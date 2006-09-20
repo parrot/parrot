@@ -41,3 +41,10 @@ mem_realloc_executable(void* oldp, size_t newsize)
     return newp;
 }
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

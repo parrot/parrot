@@ -67,3 +67,10 @@ Parrot_asctime_r(const struct tm *tm, char *buffer)
 {
     return asctime_r(tm, buffer, 26);
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

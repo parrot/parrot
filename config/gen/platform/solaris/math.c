@@ -47,3 +47,10 @@ Parrot_signbit_l(long double x)
    return u.i[2] < 0;
 }
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

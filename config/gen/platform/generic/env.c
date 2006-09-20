@@ -47,3 +47,10 @@ Parrot_getenv(const char *name, int *free_it)
     *free_it = 0;
     return getenv(name);
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

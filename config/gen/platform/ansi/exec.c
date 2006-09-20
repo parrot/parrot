@@ -19,3 +19,10 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
 void Parrot_Exec_OS_Comman(Parrot_Interp interpreter, STRING *command) {
   internal_exception(NOSPAWN, "Exec not implemented");
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

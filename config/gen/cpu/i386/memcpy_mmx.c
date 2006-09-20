@@ -94,3 +94,10 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 #endif /* PARROT_CONFIG_TEST */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

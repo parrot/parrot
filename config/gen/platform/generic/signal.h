@@ -18,3 +18,10 @@
 
     Parrot_sighandler_t Parrot_set_sighandler(int s, Parrot_sighandler_t f);
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

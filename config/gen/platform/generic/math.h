@@ -20,3 +20,10 @@
 #  endif
 
 #define Parrot_is_nzero(x) ((x) == 0.0 && signbit(x))
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

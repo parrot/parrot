@@ -185,3 +185,11 @@ Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command)
 	}
 }
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

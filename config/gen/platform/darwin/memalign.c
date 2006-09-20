@@ -126,3 +126,10 @@ Parrot_free_memalign(void *p)
         fprintf(stderr, "Parrot_free_memalign(%p) failed!\n", p);
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

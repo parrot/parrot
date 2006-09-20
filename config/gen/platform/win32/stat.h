@@ -21,3 +21,10 @@
 #ifndef S_ISDIR
 #  define S_ISDIR(m) ((m & S_IFMT) == S_IFDIR)
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

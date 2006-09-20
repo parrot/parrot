@@ -80,3 +80,10 @@ int main(int argc, char *argv[]) {
 }
 #endif @* PARROT_CONFIG_TEST *@
 INTERFACE*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

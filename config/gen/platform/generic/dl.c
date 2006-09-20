@@ -65,3 +65,10 @@ Parrot_dlclose(void *handle)
     return -1;
 #endif
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

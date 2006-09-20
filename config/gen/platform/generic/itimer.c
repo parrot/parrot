@@ -56,3 +56,10 @@ new_sys_timer_ms()
 
 #else
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

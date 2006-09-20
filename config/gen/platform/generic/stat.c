@@ -123,3 +123,10 @@ Parrot_stat_info_string(Interp* interpreter, STRING *filename, INTVAL thing)
 {
     return NULL;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

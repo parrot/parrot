@@ -34,3 +34,10 @@ Parrot_free_memalign(void *p)
 {
     free(p);
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
