@@ -134,10 +134,7 @@ PARROT_API STRING * Parrot_get_datatype_name(Parrot_Interp, INTVAL );
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

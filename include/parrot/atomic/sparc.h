@@ -84,12 +84,10 @@ typedef struct {
 #define PARROT_ATOMIC_INT_INC(result, a) parrot_sparc_atomic_int_add(result, a,  1)
 
 #endif
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

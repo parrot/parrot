@@ -103,10 +103,7 @@ PARROT_API Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *e
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

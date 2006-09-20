@@ -30,3 +30,10 @@ enum_cclass_word = 0x2000                /* a-z, A-Z, 0-9, '_'*/
 /* &end_gen */
 
 #endif /* PARROT_CCLASS_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

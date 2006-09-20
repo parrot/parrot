@@ -121,12 +121,10 @@ PARROT_API const char * Parrot_encoding_c_name(Interp *, INTVAL number_of_encodi
     ((ENCODING *)src->encoding)->iter_init(i, src, iter)
 
 #endif /* PARROT_ENCODING_H_GUARD */
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

@@ -84,12 +84,10 @@ typedef struct {
 #endif /* PARROT_HAS_THREADS */
 
 #endif /* PARROT_ATOMIC_H_GAURD */
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

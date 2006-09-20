@@ -142,10 +142,7 @@ PARROT_API PMC* string_split(Interp *, STRING *del, STRING *s);
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

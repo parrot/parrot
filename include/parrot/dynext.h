@@ -24,3 +24,11 @@ Parrot_clone_lib_into(Interp *dest_interp, Interp *source_interp, PMC *lib_pmc);
 
 #endif /* PARROT_DYNEXT_H_GUARD */
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

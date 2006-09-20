@@ -49,10 +49,7 @@ PARROT_API FLOATVAL Parrot_stat_info_floatval(Parrot_Interp, STRING *, INTVAL);
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

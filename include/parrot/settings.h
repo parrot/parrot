@@ -100,3 +100,10 @@
 #define PARROT_I386_JIT_CGP 0
 
 #endif /* PARROT_SETTINGS_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

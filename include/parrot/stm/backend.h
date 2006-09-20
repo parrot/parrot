@@ -54,3 +54,10 @@ void Parrot_STM_mark_extracted(Interp *interp, void *);
 void Parrot_STM_destroy_extracted(Interp *interp, void *);
 
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

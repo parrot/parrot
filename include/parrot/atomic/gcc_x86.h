@@ -107,12 +107,10 @@ inline static long parrot_i386_xadd(volatile long *l, long amount)
     } while (0)
 
 #endif
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

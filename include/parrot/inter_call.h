@@ -134,10 +134,7 @@ INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

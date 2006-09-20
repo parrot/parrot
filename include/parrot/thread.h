@@ -195,10 +195,7 @@ PARROT_API void Parrot_shared_DOD_unblock(Parrot_Interp);
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

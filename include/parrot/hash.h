@@ -101,10 +101,7 @@ PARROT_API void* parrot_hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

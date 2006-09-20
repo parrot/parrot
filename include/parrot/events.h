@@ -104,10 +104,7 @@ PARROT_API void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */
