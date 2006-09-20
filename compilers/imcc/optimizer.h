@@ -7,3 +7,11 @@ void post_optimize(Interp *, IMC_Unit *);
 
 #endif /* PARROT_IMCC_OPTIMIZER_H_GUARD */
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

@@ -1379,10 +1379,7 @@ ig_color_graph(Interp* interpreter, IMC_Unit* unit, graph* G) {
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

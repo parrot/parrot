@@ -266,10 +266,7 @@ Instruction * IMCC_subst_constants(Interp *, IMC_Unit * unit, char *name,
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

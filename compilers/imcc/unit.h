@@ -72,3 +72,11 @@ void imc_close_unit(Parrot_Interp, IMC_Unit *);
 
 #endif /* PARROT_IMCC_UNIT_H_GUARD */
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

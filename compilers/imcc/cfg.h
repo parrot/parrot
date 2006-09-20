@@ -64,3 +64,11 @@ int edge_count(struct _IMC_Unit *);
 
 #endif /* PARROT_CFG_H_GUARD */
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

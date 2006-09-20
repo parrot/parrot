@@ -68,3 +68,10 @@ int IMCC_find_node_nr(const char *name);
 
 
 #endif /* PARROT_AST_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

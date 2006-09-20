@@ -42,3 +42,10 @@ emit_pasm(BCG_info * bcg_info)
     }
     printf("    end\n");
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -83,3 +83,10 @@ get_pargma_type(BCG_info * bcg_info, char *pragma)
     }
     return -1;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

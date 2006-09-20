@@ -46,3 +46,10 @@ PARROT_DYNEXT_EXPORT void BCG_label(BCG_info * bcg_info, char *label);
 
 PARROT_DYNEXT_EXPORT void BCG_print_pasm(BCG_info *bcg_info);
 #endif /* PARROT_BCG_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

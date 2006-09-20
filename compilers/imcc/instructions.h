@@ -129,3 +129,11 @@ PARROT_API void close_comp_unit(Parrot_Interp);
 
 #endif /* PARROT_IMCC_INSTRUCTIONS_H_GUARD */
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

@@ -30,3 +30,10 @@ bcg_hash_get(BCG_info * bcg_info, bcg_hash * hash, char *key)
 
     return parrot_hash_get(bcg_info->interp, hash, const_cast(key));
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

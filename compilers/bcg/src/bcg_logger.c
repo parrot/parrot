@@ -18,3 +18,10 @@ bcg_throw_exception(BCG_info * bcg_info, const int code, const char *format,
     bcg_info->error_code = code;
     BCG_THROW(bcg_info, code);
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -103,3 +103,10 @@ bcg_info_current_op(BCG_info * bcg_info)
     bcg_info_private *bcg_info_priv = BCG_INFO_PRIV(bcg_info);
     return bcg_info_priv->last_unit->last_op;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
