@@ -183,3 +183,10 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
     sub_data->name = string_from_cstring(interpreter, "JaPHC", 0);
     return sub;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

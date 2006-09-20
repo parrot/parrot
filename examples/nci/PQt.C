@@ -140,3 +140,10 @@ F<docs/pdds/pdd03_calling_conventions.pod>.
 =cut
 
 */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
