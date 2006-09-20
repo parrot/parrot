@@ -123,6 +123,18 @@ static STRING * get_path(Interp *interpreter, STRING *lib, void **handle,
     PMC * const share_ext = VTABLE_get_pmc_keyed_int(interpreter, lib_paths, 
                                                      PARROT_LIB_DYN_EXTS);
 
+    if ( lib == NULL) {
+        *handle = Parrot_dlopen(NULL);
+        if (*handle) {
+            return "";
+        }
+        err = Parrot_dlerror();
+        Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG,
+                    "Couldn't dlopen(NULL): %s\n",
+                    err ? err : "unknown reason");
+        return NULL;
+    }
+
     /*
      * first, try to add an extension to the file if it has none.
      */
@@ -260,19 +272,23 @@ static PMC *run_init_lib(Interp *interpreter, void *handle,
      */
     Parrot_block_DOD(interpreter);
     /* get load_func */
-    load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load",
-                                      lib_name);
-    cload_func_name = string_to_cstring(interpreter, load_func_name);
-    load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle,
-                cload_func_name));
-    string_cstring_free(cload_func_name);
-    /* get init_func */
-    init_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_init",
-                                      lib_name);
-    cinit_func_name = string_to_cstring(interpreter, init_func_name);
-    init_func = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(handle,
-                cinit_func_name));
-    string_cstring_free(cinit_func_name);
+    if ( lib_name != NULL) {
+        load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load",
+                                          lib_name);
+        cload_func_name = string_to_cstring(interpreter, load_func_name);
+        load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle,
+                    cload_func_name));
+        string_cstring_free(cload_func_name);
+        /* get init_func */
+        init_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_init",
+                                          lib_name);
+        cinit_func_name = string_to_cstring(interpreter, init_func_name);
+        init_func = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(handle,
+                    cinit_func_name));
+        string_cstring_free(cinit_func_name);
+    } else {
+        load_func = init_func = NULL;
+    }
 
     lib_pmc = Parrot_init_lib(interpreter, load_func, init_func);
 
@@ -388,7 +404,12 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
      *
      * LOCK()
      */
-    lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
+    if ( lib == NULL) {
+        wo_ext = "";
+        lib_name = NULL;
+    } else {
+        lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
+    }
     lib_pmc = is_loaded(interpreter, wo_ext);
     if (lib_pmc) {
 	/* UNLOCK() */

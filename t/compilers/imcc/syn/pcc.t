@@ -366,12 +366,14 @@ last
 OUT
 
 SKIP: {
-  skip("cant do NCI on $^O", 1) unless ($^O =~ /linux/ || $^O =~ /darwin/);
+  skip("cant do NCI on $^O", 1) unless ($^O =~ /linux|darwin|bsd/);
 pir_output_is(<<'CODE', <<'OUT', "nci");
 .sub test :main
-    .local pmc FABS, NULL
+    .local pmc FABS, LIB
+    .local string NULL
     null NULL
-    dlfunc FABS, NULL, "fabs", "dd"
+    LIB = loadlib NULL
+    dlfunc FABS, LIB, "fabs", "dd"
     .local float d, r
     d = -42
     r = FABS(d)
