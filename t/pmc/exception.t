@@ -433,11 +433,12 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC");
 .end
 
 .sub action
-    print "never\n"
+    print "unwind\n"
 .end
 CODE
 main
 foo
+unwind
 back
 OUTPUT
 
@@ -459,35 +460,16 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC, ret");
 .end
 
 .sub action
-    print "never\n"
+    print "unwind\n"
 .end
 CODE
 main
 foo
+unwind
 back
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "register corruption - implicit P5");
-.sub main :main
-    null P0
-    null P1
-    null P2
-    null P3
-    I0 = 1
-    I1 = 2
-    push_eh coke
-    $P0 = global 'no coke'
-coke:
-    print_item I0
-    print_item I1
-    print_newline
-.end
-CODE
-1 2
-OUTPUT
-
-## this is broken; continuation calling does not execute actions when unwinding.
-pir_output_is(<<'CODE', <<'OUTPUT', 'cleanup global:  continuation', todo => 'bug');
+pir_output_is(<<'CODE', <<'OUTPUT', 'cleanup global:  continuation');
 .sub main :main
 	.local pmc outer, cont
 	outer = new String
@@ -735,13 +717,10 @@ pir_output_like(<<'CODE', <<'OUTPUT', "pushaction - throw in main");
 .end
 CODE
 /^main
-at_exit, flag = 1
 No exception handler/
 OUTPUT
 
-# creating the Closure converts RetContinuation to Continuations
-# which dont trigger acction handlers
-pir_output_is(<<'CODE', <<'OUTPUT', "pushaction as closure", todo => 'Continuation');
+pir_output_is(<<'CODE', <<'OUTPUT', "pushaction as closure");
 .sub main :main
     .local pmc a
     .lex 'a', a
@@ -768,6 +747,38 @@ CODE
 main
 at_exit, flag = 0
 a = 42
+OUTPUT
+
+# exception handlers are still run in an inferior runloop, which messes up
+# nonlocal exit from within handlers.
+pir_output_like(<<'CODE', <<'OUTPUT', "pushaction: error while handling error", todo => 'runloop shenanigans');
+.sub main :main
+    push_eh h
+    print "main\n"
+    .const .Sub at_exit = "exit_handler"
+    pushaction at_exit
+    $P1 = new .Exception
+    throw $P1
+    print "never 1\n"
+h:
+    ## this is never actually reached, because exit_handler throws an unhandled
+    ## exception before the handler is entered.
+    print "in outer handler\n"
+.end
+
+.sub exit_handler :outer(main)
+    .param int flag
+    print_item "at_exit, flag ="
+    print_item flag
+    print_newline
+    $P2 = new .Exception
+    throw $P2
+    print "never 2\n"
+.end
+CODE
+/^main
+at_exit, flag = 1
+No exception handler/
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "exit_handler via exit exception");

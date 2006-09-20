@@ -76,55 +76,19 @@ the GC gets at them.
 
 =item C<void *invoke(void *next)>
 
-Restores the "context" by calling the superclass's C<invoke()> and places
-the frame pointer in the stack frame cache.
+Transfers control to the calling context, and frees the current context.
 
 =cut
 
 */
 
     void* invoke (void* next) {
-        Stack_Chunk_t *ctr_stack, *stack_now;
         struct Parrot_cont * cc = PMC_cont(SELF);
-        parrot_context_t *caller_ctx;
-        struct PackFile_ByteCode *seg;   /* bytecode segment */
-        /*
-        * unwind control stack
-        */
-        stack_now = CONTEXT(INTERP->ctx)->control_stack;
-        caller_ctx = cc->to_ctx;
-        ctr_stack = caller_ctx->control_stack;
-        while (stack_now != ctr_stack) {
-            if (!stack_now || !ctr_stack)
-                internal_exception(1, "Control stack damaged");
-            /*
-             * this automagically runs all pushed action
-             * handler during pop - see cleanup stuff
-             * in stack_pop
-             */
-            (void)stack_pop(INTERP, &stack_now,
-                            NULL, NO_STACK_ENTRY_TYPE);
-        }
+        parrot_context_t *from_ctx = cc->from_ctx;
+        struct PackFile_ByteCode * const seg = cc->seg;
 
-        /* debug print before context is switched */
-        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
-            Interp *tracer;
-
-            PMC *to_sub = caller_ctx->current_sub;
-            PMC *from_sub = cc->from_ctx->current_sub;
-
-            tracer = interpreter->debugger ? 
-                interpreter->debugger : interpreter;
-            PIO_eprintf(tracer, "# Back in sub '%Ss' from '%Ss'\n",
-                    Parrot_full_sub_name(INTERP, to_sub),
-                    Parrot_full_sub_name(INTERP, from_sub));
-        }
-        CONTEXT(INTERP->ctx) = caller_ctx;
-        INTERP->ctx.bp = caller_ctx->bp;
-        INTERP->ctx.bp_ps = caller_ctx->bp_ps;
-        next = cc->address;
-        Parrot_free_context(INTERP, cc->from_ctx, 1);
-        seg = cc->seg;
+	next = SUPER(next);
+	Parrot_free_context(INTERP, from_ctx, 1);
 #ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
         mem_sys_free(cc);
@@ -147,7 +111,6 @@ the frame pointer in the stack frame cache.
          */
         cc->to_ctx = NULL;
 #endif
-        INTERP->current_args = NULL;
         if (INTERP->code != seg) {
             Parrot_switch_to_cs(INTERP, seg, 1);
         }

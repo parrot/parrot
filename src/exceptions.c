@@ -226,53 +226,28 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     STRING *message;
     char *m;
     int exit_status, print_location;
+    int depth = 0;
+    Stack_Entry_t *e;
+
     /* for now, we don't check the exception class and we don't
-     * look for matching handlers
+     * look for matching handlers.  [this is being redesigned anyway.]
      */
     message = VTABLE_get_string_keyed_int(interpreter, exception, 0);
-    do {
-        PMC *cleanup_sub = NULL;
-        Stack_Entry_t * const e = stack_entry(interpreter,
-                CONTEXT(interpreter->ctx)->control_stack, 0);
-
-        if (!e)
-            break;
-        if (e->entry_type == STACK_ENTRY_ACTION) {
-            /*
-             * Disable automatic cleanup routine execution in stack_pop so that
-             * we can run the action subroutine manually with an INTVAL argument
-             * of 1.  Note that we have to run the sub AFTER it has been popped,
-             * lest a new error in the sub cause an infinite loop.
-             */
-            cleanup_sub = UVal_pmc(e->entry);
-            e->cleanup = STACK_CLEANUP_NULL;
-        }
-        (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
-                        NULL, e->entry_type);
-        if (cleanup_sub) {
-            /* Now it's safe to run. */
-            Parrot_runops_fromc_args(interpreter, cleanup_sub, "vI", 1);
-        }
+    /* [TODO: replace quadratic search with something linear, hopefully without
+       trashing abstraction layers.  -- rgr, 17-Sep-06.] */
+    while ((e = stack_entry(interpreter,
+                            CONTEXT(interpreter->ctx)->control_stack,
+                            depth))) {
         if (e->entry_type == STACK_ENTRY_PMC) {
-            /*
-             * During interpreter creation there is an initial context
-             * and the context of :main, created by runops_fromc_args
-             * Therefore, it seems, we have the main context twice
-             * and an exception handler in main can catch the same
-             * exception twich e.g. after rethrow
-             *
-             * The same problem can arise after a tailcall.
-             *
-             * So invalidate entry_type.
-             */
-            e->entry_type = NO_STACK_ENTRY_TYPE;
             handler = UVal_pmc(e->entry);
             if (handler && handler->vtable->base_type ==
                     enum_class_Exception_Handler) {
                 return handler;
             }
         }
-    } while (1);
+        depth++;
+    }
+
     /* flush interpreter output to get things printed in order */
     PIO_flush(interpreter, PIO_STDOUT(interpreter));
     PIO_flush(interpreter, PIO_STDERR(interpreter));
