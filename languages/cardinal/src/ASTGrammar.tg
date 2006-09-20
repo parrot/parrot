@@ -1000,6 +1000,8 @@ transform result (Cardinal::Grammar::class_path) :language('PIR') {
     .local pmc child
     result = new 'Cardinal::PAST::ClassPath'
     result.'init'('node'=>node, 'name'=>'class_path')
+    $S0 = node
+    result.'class_name'($S0)
     
     $I0 = defined node['starting_colons']
     unless $I0 goto atoms

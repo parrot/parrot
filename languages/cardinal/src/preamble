@@ -74,3 +74,24 @@
     .local $iter_end:
 .endm
 
+.macro gen_accessor(x)
+.sub .x :method
+  .param pmc value           :optional
+  .param int has_value       :opt_flag
+  .return self.'attr'(.x, value, has_value)
+.end
+.endm
+
+.macro gen_get_accessor(x)
+.sub .x :method
+    null $P0
+    .return self.'attr'(.x, $P0, 0)
+.end
+.endm
+
+.macro gen_dumplist(x)
+.sub '__dumplist' :method
+    .return (.x)
+.end
+.endm
+

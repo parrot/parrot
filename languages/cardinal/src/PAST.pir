@@ -16,20 +16,11 @@ needed for Ruby 1.9.  The currently defined ast nodes:
 =over 4
 
 =cut
+
+.include 'languages/cardinal/src/preamble'
+
 .HLL 'Ruby', 'ruby_group'
 .namespace [ 'Cardinal::PAST' ]
-
-.macro kdump ( x )
-    .sym pmc it
-    it = get_root_global ['parrot'], '_dumper'
-    it(.x)
-.endm
-
-.macro kdump2 ( x, d)
-    .sym pmc it
-    it = get_root_global ['parrot'], '_dumper'
-    it(.x, .d)
-.endm
 
 .sub '__onload' :load
     .local pmc base
@@ -73,6 +64,8 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     addattribute $P2, 'superclass'
 
     $P0 = subclass base, 'Cardinal::PAST::ClassPath'
+    addattribute $P0, 'starting_colons'
+    addattribute $P0, 'class_name'
 
     $P0 = subclass base, 'Cardinal::PAST::Rescue_Stmt'
     addattribute $P0, 'try_stmt'
@@ -166,26 +159,10 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     .return ($P0)
 .end
 
-
-.sub 'source' :method
-    .param string source       :optional
-    .param int has_source      :opt_flag
-    .return self.'attr'('source', source, has_source)
-.end
-
-
-.sub 'pos' :method
-    .param int pos             :optional
-    .param int has_pos         :opt_flag
-    .return self.'attr'('pos', pos, has_pos)
-.end
-
-
-.sub 'name' :method
-    .param string name         :optional
-    .param int has_name        :opt_flag
-    .return self.'attr'('name', name, has_name)
-.end
+.gen_accessor('source')
+.gen_accessor('pos')
+.gen_accessor('name')
+.gen_get_accessor('children')
 
 .sub 'children' :method
 #    .param pmc value :optional
@@ -314,80 +291,32 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 
 .namespace [ 'Cardinal::PAST::Op' ]
-
-
-.sub '__dumplist' :method
-    .return ('name children')
-.end
-
+.gen_dumplist('name children')
 
 .namespace [ 'Cardinal::PAST::Val' ]
-
-.sub 'valtype' :method
-    .param string valtype      :optional
-    .param int has_valtype     :opt_flag
-    .return self.'attr'('valtype', valtype, has_valtype)
-.end
-
-.sub '__dumplist' :method
-    .return ('name valtype')
-.end
-
+.gen_accessor('valtype')
+.gen_dumplist('name valtype')
 
 .namespace [ 'Cardinal::PAST::Var' ]
-
-.sub 'scope' :method
-    .param string scope      :optional
-    .param int has_scope     :opt_flag
-    .return self.'attr'('scope', scope, has_scope)
-.end
-
-.sub '__dumplist' :method
-    .return ('name scope')
-.end
-
+.gen_accessor('scope')
+.gen_dumplist('name scope')
 
 .namespace [ 'Cardinal::PAST::PositionalParameter' ]
-
-.sub 'type' :method
-    .param string scope      :optional
-    .param int has_scope     :opt_flag
-    .return self.'attr'('type', scope, has_scope)
-.end
-
-.sub '__dumplist' :method
-    .return ('name type')
-.end
-
+.gen_accessor('type')
+.gen_dumplist('name type')
 
 .namespace [ 'Cardinal::PAST::OptionalParameter' ]
-
-.sub 'default_value' :method
-    .param string scope      :optional
-    .param int has_scope     :opt_flag
-    .return self.'attr'('default_value', scope, has_scope)
-.end
-
-.sub '__dumplist' :method
-    .return ('name default_value')
-.end
-
+.gen_accessor('default_value')
+.gen_dumplist('name default_value')
 
 .namespace [ 'Cardinal::PAST::RestParameter' ]
 
-.sub '__dumplist' :method
-    .return ('name')
-.end
-
-
 .namespace [ 'Cardinal::PAST::BlockParameter' ]
 
-.sub '__dumplist' :method
-    .return ('name')
-.end
-
-
 .namespace [ 'Cardinal::PAST::Block' ]
+.gen_accessor('outer')
+.gen_accessor('blocktype')
+.gen_dumplist('name outer blocktype children vardecl')
 
 .sub '__init' :method
     null $P0
@@ -395,18 +324,6 @@ counting at 10 (so that the values 0..9 can be considered "safe").
     $P0 = new .Hash
     setattribute self, 'vardecl', $P0
     .return ()
-.end
-
-.sub 'outer' :method
-    .param pmc outer           :optional
-    .param int has_outer       :opt_flag
-    .return self.'attr'('outer', outer, has_outer)
-.end
-
-.sub 'blocktype' :method
-    .param pmc blocktype       :optional
-    .param int has_blocktype   :opt_flag
-    .return self.'attr'('blocktype', blocktype, has_blocktype)
 .end
 
 .sub 'vardecl' :method
@@ -427,34 +344,18 @@ counting at 10 (so that the values 0..9 can be considered "safe").
     .return (value)
 .end
 
-.sub '__dumplist' :method
-    .return ('name outer blocktype children vardecl')
-.end
 
 .namespace [ 'Cardinal::PAST::Module' ]
-
-.sub 'class_path' :method
-    .param pmc outer           :optional
-    .param int has_outer       :opt_flag
-    .return self.'attr'('class_path', outer, has_outer)
-.end
+.gen_accessor('class_path')
 
 .namespace [ 'Cardinal::PAST::Class' ]
 
+.namespace [ 'Cardinal::PAST::ClassPath' ]
+.gen_accessor('class_name')
+.gen_accessor('starting_colons')
+
 .namespace [ 'Cardinal::PAST::Rescue_Stmt' ]
-
-.sub '__dumplist' :method
-    .return ('name try_stmt rescue_stmt')
-.end
-
-.sub 'try_stmt' :method
-    .param pmc outer           :optional
-    .param int has_outer       :opt_flag
-    .return self.'attr'('try_stmt', outer, has_outer)
-.end
-.sub 'rescue_stmt' :method
-    .param pmc outer           :optional
-    .param int has_outer       :opt_flag
-    .return self.'attr'('rescue_stmt', outer, has_outer)
-.end
+.gen_accessor('try_stmt')
+.gen_accessor('rescue_stmt')
+.gen_dumplist('name try_stmt rescue_stmt')
 

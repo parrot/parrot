@@ -19,6 +19,7 @@ The base class of POST is Cardinal::PAST::Node -- see C<lib/CPAST.pir>
 =over 4
 
 =cut
+.include 'languages/cardinal/src/preamble'
 
 .namespace [ 'Cardinal::POST' ]
 
@@ -66,11 +67,7 @@ The base class of POST is Cardinal::PAST::Node -- see C<lib/CPAST.pir>
     .return ()
 .end
 
-.sub 'name' :method
-    .param pmc name            :optional
-    .param int has_name        :opt_flag
-    .return self.'attr'('name', name, has_name)
-.end
+.gen_accessor('name')
   
 =item C<Cardinal::POST::Node::value()>
 
@@ -205,12 +202,17 @@ and that is returned.
 
 
 .namespace [ 'Cardinal::POST::Sub' ]
+.gen_accessor('outer')
+.gen_accessor('subtype')
+.gen_accessor('varhash')
+.gen_accessor('prologue')
 
-.sub 'outer' :method
-    .param pmc outer           :optional
-    .param int has_outer       :opt_flag
-    .return self.'attr'('outer', outer, has_outer)
+.macro gen_adverb_accessor(x)
+.sub .x :method
+    .param pmc value
+    .return self.'add_to_adverbs'(.x)
 .end
+.endm
 
 
 .sub 'add_to_adverbs' :method
@@ -226,20 +228,9 @@ and that is returned.
     $P0 .= adverb
 .end
 
-.sub ':load' :method
-    .param pmc value
-    .return self.'add_to_adverbs'(':load')
-.end
-
-.sub ':main' :method
-    .param pmc value
-    .return self.'add_to_adverbs'(':main')
-.end
-
-.sub ':method' :method
-    .param pmc value
-    .return self.'add_to_adverbs'(':method')
-.end
+.gen_adverb_accessor(':load')
+.gen_adverb_accessor(':main')
+.gen_adverb_accessor(':method')
 
 .sub 'adverbs' :method
     .param pmc subtype         :optional
@@ -257,24 +248,6 @@ and that is returned.
     $P0 = self.'push_sub'()
     $P0.'append'(arg)
     .return ()
-.end
-
-.sub 'subtype' :method
-    .param pmc subtype         :optional
-    .param int has_subtype     :opt_flag
-    .return self.'attr'('subtype', subtype, has_subtype)
-.end
-
-.sub 'varhash' :method
-    .param pmc varhash         :optional
-    .param int has_varhash     :opt_flag
-    .return self.'attr'('varhash', varhash, has_varhash)
-.end
-
-.sub 'prologue' :method
-    .param pmc prologue         :optional
-    .param int has_prologue     :opt_flag
-    .return self.'attr'('prologue', prologue, has_prologue)
 .end
 
 .sub 'root_pir' :method
@@ -319,37 +292,15 @@ and that is returned.
 .end
 
 .namespace [ 'Cardinal::POST::Val' ]
-
-.sub 'value' :method
-    .param string value        :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('value', value, has_value)
-.end
-
-.sub 'valtype' :method
-    .param string valtype      :optional
-    .param int has_valtype     :opt_flag
-    .return self.'attr'('valtype', valtype, has_valtype)
-.end
-
-.sub '__dumplist' :method
-    .return ('name value valtype')
-.end
+.gen_accessor('value')
+.gen_accessor('valtype')
+.gen_dumplist('name value valtype')
 
 
 .namespace [ 'Cardinal::POST::Var' ]
-
-.sub 'scope' :method
-    .param string scope        :optional
-    .param int has_scope       :opt_flag
-    .return self.'attr'('scope', scope, has_scope)
-.end
-
-.sub 'islvalue' :method
-    .param int islvalue        :optional
-    .param int has_islvalue    :opt_flag
-    .return self.'attr'('islvalue', islvalue, has_islvalue)
-.end
+.gen_accessor('scope')
+.gen_accessor('islvalue')
+.gen_dumplist('name scope value')
 
 .sub 'paramname' :method
     .local string name
@@ -458,10 +409,6 @@ and that is returned.
 .end
     
 
-.sub '__dumplist' :method
-    .return ('name scope value')
-.end
-
 .namespace [ 'Cardinal::POST::Assign' ]
 .sub 'value' :method
     ##   return the value of our left hand side as our value
@@ -476,27 +423,5 @@ and that is returned.
 .end
 
 .namespace [ 'Cardinal::POST::Raw' ]
-.sub 'raw' :method
-    .param string scope        :optional
-    .param int has_scope       :opt_flag
-    .return self.'attr'('raw', scope, has_scope)
-.end
-
-.sub 'push_namespace'     :method
-    .param pmc value      :optional
-    .param int has_value  :opt_flag
-    .local pmc stack 
-    stack = self.'attr'('namespaces', 0, 0)
-    $I0 = defined stack
-    if $I0 goto test_value
-    stack = new .ResizablePMCArray
-    stack = self.'attr'('namespaces', stack, 1)
-  test_value:
-    unless has_value goto end
-    push stack, value
-  end:
-    .return (stack)
-.end
-
-
+.gen_accessor('raw')
 

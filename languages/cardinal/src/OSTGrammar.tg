@@ -240,13 +240,13 @@ transform post (Cardinal::PAST::Class) :language('PIR') {
     namespace.'init'('node'=>node, 'name'=>$P0)
     self.'push_namespace'(namespace)
     
-    .local string classname
+    .local string class_name
     .local string classbodyname
     .local string blocktype
-    classname = classpath.name()
+    class_name = classpath.'class_name'()
 
     blocktype = node.'blocktype'()
-    classbodyname .= classname
+    classbodyname .= class_name
     classbodyname .= '_body'
 
     .local pmc outerpost, outerpast
@@ -259,6 +259,19 @@ transform post (Cardinal::PAST::Class) :language('PIR') {
     
     self.'post_scope_stack'(post)
     self.'past_scope_stack'(node)
+
+    .local pmc op
+    .local pmc op1
+    .local pmc op1_value
+    op1 = new 'Cardinal::POST::Op'
+    op1_value = op1.'value'()
+    op1.'init'(op1_value, "'RubyClass'", 'node'=>node, 'name'=>'getclass')
+    post.'add_child'(op1)
+    op = new 'Cardinal::POST::Op'
+    $S0 = concat "'", class_name
+    $S0 .= "'"
+    op.'init'(op1, $S0, 'node'=>node, 'name'=>'subclass')
+    post.'add_child'(op)
 
     .local pmc iter
     iter = node.'child_iter'()
