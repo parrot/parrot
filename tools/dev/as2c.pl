@@ -14,6 +14,8 @@ $cmd  = "cc -c $src.c -Wall -O3 -fomit-frame-pointer -DNDEBUG -Wa,-a > $src.s";
 &create_s($cmd);
 &parse_s("$src.s");
 &add_glue("$src.c");
+&print_coda();
+
 
 sub print_header {
     my $s = shift;
@@ -27,6 +29,18 @@ sub print_header {
 
 EOT
 }
+
+sub print_coda {
+    print <<EOT;
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+*/
+EOT
+}
+
 sub create_s {
     my $cmd = shift;
     my $r = system($cmd);
