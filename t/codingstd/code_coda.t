@@ -34,29 +34,44 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 
+my $coda = <<'CODA';
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+CODA
+
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : source_files();
 my @comments;
 
 foreach my $file ( @files ) {
     my $buf;
-    my $path = $file->path;
+    my $path;
+
+    ## get the full path of the file
+    # if we have command line arguments, the file is the full path
+    if (@ARGV) {
+        $path = $file;
+    }
+    # otherwise, use the relevant Parrot:: path method
+    else {
+        $path = $file->path;
+    }
+
+    # slurp in the file
     open(my $fh, '<', $path)
         or die "Cannot open '$path' for reading: $!\n";
     {
         local $/;
         $buf = <$fh>;
     }
+
+    # append to the comments array if the code doesn't match
     push @comments => "$path\n"
-        unless $buf =~ m{\Q
-/*
- * Local variables:
- *   c-file-style: "parrot"
- * End:
- * vim: expandtab shiftwidth=4:
- */\E
- \n* \z
-    }x;
+        unless $buf =~ m{\Q$coda\E\n*\z};
 }
 
 ok(!scalar(@comments), 'C code coda')
