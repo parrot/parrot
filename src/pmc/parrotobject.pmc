@@ -12,8 +12,6 @@ A Parrot Object is reasonably simple. Its data pointer points to an
 array with the attributes of the object in it. The int cache value holds
 the attribute count of this instance.
 
-=back
-
 The object is actually constructed by the instantiation code in
 F<src/objects.c>, at least for right now.
 
