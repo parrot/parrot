@@ -14,6 +14,7 @@ To run this file, run the following command from the Parrot directory:
 =head2 Options
 
   --quit, -q      ... quit immediately (useful for benchmarking)
+  --threads       ... non-working code to run 2 calculation threads 
 
 =head1 KEYBOARD/MOUSE COMMANDS
 
@@ -32,7 +33,7 @@ To run this file, run the following command from the Parrot directory:
     .local pmc opts, app, event, handler
     'load_libs'()
     opts = 'get_opts'(argv)
-    app  = 'make_app'()
+    app  = 'make_app'(opts)
     app.'calc'()
     $I0 = opts['quit']
     if $I0 goto ex
@@ -60,6 +61,7 @@ ex:
     .local pmc opts, getopts
     getopts = new 'Getopt::Obj'
     push getopts, "quit|q"
+    push getopts, "threads"
     $S0 = shift argv
     opts = getopts."get_options"(argv)
     .return (opts)
@@ -67,6 +69,7 @@ ex:
 
 # create the application
 .sub 'make_app'
+    .param pmc opts
     # create an SDL::App subclass
     .local pmc app, cl
     cl = subclass 'SDL::App', 'Mandel'
@@ -80,8 +83,10 @@ ex:
     addattribute cl, 'event'
     addattribute cl, 'event_handler'
     addattribute cl, 'limit'
+    addattribute cl, 'opts'
     # instantiate, seel also __init below
     app = new 'Mandel'
+    setattribute app, 'opts', opts
     .return (app)
 .end    
 
@@ -225,10 +230,63 @@ get:
     # prefetch pixels
     pixels = main_screen.'pixels'()
     # start calculation
-    .local float z, Z, t, c, C, zz, ZZ
-    .local int offs_y
+    .local pmc args
+    args = new .FixedPMCArray
+    set args, 10
+    args[0] = w
+    args[1] = xstart
+    args[2] = ystart
+    args[3] = scale
+    args[4] = limit
+    args[5] = pal_elems
+    args[6] = raw_palette
+    args[7] = pixels
+    args[8] = main_screen
+    args[9] = rect
+    $P0 = getattribute self, 'opts'
+    $I0 = $P0['threads']
+    unless $I0 goto plain
     main_screen.'lock'()
-    y = 0
+    .local pmc thr
+    .local int h2
+    h2 = h / 2
+    thr = new .ParrotThread
+    .const .Sub raw_calc_f = 'raw_calc'
+    .include 'cloneflags.pasm'
+    .local int flags
+    flags  = .PARROT_CLONE_CODE
+    flags |= .PARROT_CLONE_CLASSES
+    thr.'run'(flags, raw_calc_f, h2, h, args)
+    raw_calc(0, h2, args)
+    thr.join()
+    main_screen.'unlock'()
+    .return()
+plain:
+    main_screen.'lock'()
+    raw_calc(0, h, args)
+    main_screen.'unlock'()
+.end
+
+.sub raw_calc
+    .param int y0
+    .param int h
+    .param pmc args
+
+    .local int w, x, y, pal_elems, raw_c, k, limit, offs_y
+    .local float xstart, ystart, scale
+    .local pmc raw_palette, pixels, main_screen, rect
+    .local float z, Z, t, c, C, zz, ZZ
+    w = args[0]
+    xstart = args[1]
+    ystart = args[2]
+    scale =  args[3]
+    limit =  args[4]
+    pal_elems = args[5]
+    raw_palette = args[6]
+    pixels = args[7]
+    main_screen = args[8]
+    rect = args[9]
+    y = y0
 loop_y:
     offs_y = w * y
     C = y / scale	# Im c part
@@ -279,7 +337,6 @@ set_pix:
     inc y
     if y < h goto loop_y
 
-    main_screen.'unlock'()
 .end
 
 .sub 'recalc' :method
