@@ -750,7 +750,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                                  */
                             }
                             else {
-                                internal_exception(INVALID_CHARACTER,
+                                real_exception(interpreter, NULL, INVALID_CHARACTER,
                                                    "'%c' is not a valid "
                                                    "sprintf format",
                                                    ch);
