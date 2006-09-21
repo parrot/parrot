@@ -1,5 +1,5 @@
 #!./parrot -G
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -9,9 +9,9 @@ t/compilers/pge/p6regex/01-regex.t  -- Basic P6 Regex tests
 =head1 DESCRIPTION
 
 These tests are based on L<http://dev.perl.org/perl6/doc/design/syn/S05.html>.
-Individual tests are stored in the C<regex_tests*> files in the same
-directory; There is one test per line: each test consists of the following
-(separated by one *or more* tabs) columns:
+Individual tests are stored in the C<rx_*> files in the same directory;
+There is one test per line: each test consists of the following
+columns (separated by one *or more* tabs):
 
 =over 4
 
@@ -88,7 +88,7 @@ Description of the test.
     .local pmc config
                config = interp[.IGLOBALS_CONFIG_HASH]
 
-    .local int has_icu    # flag indicating precense of icu
+    .local int has_icu    # flag indicating presense of icu
                has_icu = config['has_icu']
 
     .local pmc p6rule     # the perl6 regex compiler
