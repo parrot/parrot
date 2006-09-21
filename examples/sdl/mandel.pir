@@ -207,7 +207,7 @@ get:
 .end
 
 .sub 'calc' :method
-    .local pmc main_screen, raw_palette, rect, raw_surface
+    .local pmc main_screen, raw_palette, rect, pixels
     .local int w, h, x, y, pal_elems, raw_c, k, limit
     .local float xstart, ystart, scale
     # fetch the SDL::Surface representing the main window
@@ -222,8 +222,8 @@ get:
     raw_palette = getattribute self, 'raw_palette'
     rect        = getattribute self, 'rect'
     pal_elems = elements raw_palette
-    # prefetch raw_surface
-    raw_surface = main_screen.'surface'()
+    # prefetch pixels
+    pixels = main_screen.'pixels'()
     # start calculation
     .local float z, Z, t, c, C, zz, ZZ
     .local int offs_y
@@ -270,9 +270,8 @@ set_pix:
     $I0 = k % pal_elems
     raw_c = raw_palette[$I0]
     $I0 = offs_y + x
-    # main_screen.'draw_pixel'(x, y, raw_c)
-    # -> opt
-    raw_surface[ 'pixels'; 'array'; $I0 ] = raw_c
+    # main_screen.'draw_pixel'(x, y, raw_c) --> 
+    pixels[0; $I0] = raw_c
     inc x
     if x < w goto loop_x
     # update the screen on each line
@@ -494,6 +493,7 @@ Plain runcore and unoptimized parrot:
   Create raw_palette                         12s
   Prefetch raw_surface                       10s        [1]
   Optimize calculation loop (zz, ZZ)          9s        [2] 
+  use raw pixels array                                  [3]  
 
 =head2 Parrot based optimizations
 
@@ -505,6 +505,7 @@ Optimized build
   [2] -C    runcore 32 bit                    1.6s
   [1] -j                                      1.1s
   [2] -j                                      0.8s
+  [3] -j                                      0.5s
 
 =head1 SEE ALSO
 
