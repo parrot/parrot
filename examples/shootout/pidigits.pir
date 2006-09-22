@@ -6,6 +6,7 @@
 #
 # by Leopold Toetsch
 # not really optimized yet
+# modified by Karl Forner to set a default value of N=27 (shootout test default) 
 
 #def gen_x():
 #    return imap(lambda k: (k, 4*k + 2, 0, 2*k + 1), count(1))
@@ -145,11 +146,16 @@ end_loop2:
 #main()
 
 .sub main :main
-    .param pmc argv
-    $S0 = argv[1]
-    .local int i, N, width
-    width = 10
-    N = $S0
+	.param pmc argv
+	.local int argc, i, N, width
+
+	N = 27
+	argc = argv
+	if argc == 1 goto default
+	$S0 = argv[1]
+	N = $S0
+default:
+     width = 10
     null i
 loop:
     $P0 = pi_digits()

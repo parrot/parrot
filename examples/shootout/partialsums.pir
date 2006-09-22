@@ -3,6 +3,7 @@
 # partialsums N  (N = 2500000 for shootout)
 #
 # By Joshua Isom
+# changed default value to N=25000 (shootout test default) Karl Forner
 
 .sub main :main
 	.param pmc argv
@@ -12,7 +13,7 @@
 	parray = new .FixedFloatArray
 	parray = 1
 	$I0 = argv
-	n = 2500000
+	n = 25000
 	unless $I0 == 2 goto argok
 	$S0 = argv[1]
 	n = $S0

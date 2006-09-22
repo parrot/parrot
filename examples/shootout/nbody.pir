@@ -4,6 +4,7 @@
 # 
 # Contributed by Joshua Isom
 # speed up  from 1m25 to 6s by Leopold Toetsch
+# changed default value to 1000 to match shootout default (karl)
 
 .const int x = 0
 .const int y = 1
@@ -35,7 +36,7 @@
 	.param pmc argv
 	.local int argc, n, nbodies
 	argc = argv
-	n = 1000000
+	n = 1000
 	unless argc > 1 goto argsok
 	$S0 = argv[1]
 	n = $S0

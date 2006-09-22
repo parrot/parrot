@@ -3,6 +3,8 @@
 # nsieve-bits N  (N = 9 for shootout)
 # by Leopold Toetsch
 # modified by Joshua Isom
+# modified by Karl Forner to accept shootout default value of N=2
+
 
 # set bits - this might be cheating see nsieve-bits-2 for resetting bits
 
@@ -31,11 +33,16 @@ not_p:
 .end
 .sub main :main
     .param pmc argv
-    $S0 = argv[1]
-    .local int i, j, N, M, count
+    .local int argc, i, j, N, M, count
 	.local pmc flags
+
+	argc = argv
+	N = 2
+	if argc == 1 goto default
+    $S0 = argv[1]
+	N = $S0
+default:
     flags = new .FixedBooleanArray
-    N = $S0
 	M = 1 << N
 	M *= 10000
 	flags = M

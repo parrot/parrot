@@ -3,6 +3,7 @@
 # nsieve N  (N = 9 for shootout)
 # by Leopold Toetsch
 # modified by Joshua Isom
+# modified by Karl Forner to accept shootout default value of N=2
 
 .sub primes_in_range
 	.param int M
@@ -32,10 +33,15 @@ not_p:
 .sub main :main
     .param pmc argv
 	.local pmc flags
-    flags = new .FixedBooleanArray
+	.local int argc, i, j, N, M, count
+
+	flags = new .FixedBooleanArray
+	N = 2
+	argc = argv
+	if argc == 1 goto default 
     $S0 = argv[1]
-    .local int i, j, N, M, count
-    N = $S0
+	N = $S0
+default:
     M = 1 << N
     M *= 10000
 	flags = M

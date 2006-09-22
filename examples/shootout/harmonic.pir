@@ -8,6 +8,9 @@ examples/shootout/harmonic.pir - Partial sum of Harmonic series
 
 =head1 DESCRIPTION
 
+Seemed to be deprecated, no longer found on shootout site (Karl), 
+so could not find an expected output file.
+
 Translated from C code by Greg Buchholz into PIR
 by Peter Baylies <pbaylies@gmail.com>.
 

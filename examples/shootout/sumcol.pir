@@ -2,6 +2,7 @@
 #
 # ./parrot -j sumcol.pir < sum8M
 # by Joshua Isom
+# N.B. it is called the sum-file benchmark on the computer shootout (KF)
 
 .sub main :main
 	.local pmc stdin

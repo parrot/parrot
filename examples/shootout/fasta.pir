@@ -2,6 +2,8 @@
 #
 # fasta.pir N         (N = 2500000 for shootout)
 # by Joshua Isom
+# modified by karl : fixed bug in default value (N=1000) assignment
+
 
 # 48.2 sec on AMD@2000/512K cache
 
@@ -162,14 +164,13 @@ endfor:
 	stdout = getstdout
 	stdout.'setbuf'(40960)
 	$I0 = argv
-	unless $I0 > 2 goto argsok
+	if $I0 > 1 goto argsok
 	n = 1000
 	goto argsdone
 argsok:
 	$S0 = argv[1]
 	n = $S0
 argsdone:
-
 	.local pmc iub
 	iub = new .FixedPMCArray
 	iub = 15

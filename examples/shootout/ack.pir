@@ -1,4 +1,8 @@
 #!./parrot -Oc -Cj
+# OUTPUT="Ack(3, 9) = 4093\n"
+#
+# RQ (Karl)
+# Seems to be an old benchmark, now deprecated by the shootout
 #
 # ackermann - ack(3, 9) is default 
 # shootout runs ack(3, 11)

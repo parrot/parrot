@@ -2,6 +2,8 @@
 #
 # fannkuch.pir N         (N = 9 for shootout)
 # by Joshua Isom
+# modified by karl : default value of N=7 to match shootout output
+
 
 .sub fannkuch
 	.param int n
@@ -106,7 +108,11 @@ while_1:
 .sub main :main
 	.param pmc argv
 	.local int argc
+	argc = elements argv
+	$S0 = "7"
+	if argc == 1 goto default
 	$S0 = argv[1]
+default:
 	$I0 = $S0
 	$I1 = fannkuch($I0)
 	print "Pfannkuchen("

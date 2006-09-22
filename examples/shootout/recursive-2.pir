@@ -6,12 +6,14 @@
 # use less registers (leo) 
 # time ./parrot -Oc -Cj recursive-2.pir 11
 # real 2.32 s   (AMD X2@2000)
+# modified default value to n=3. Karl Forner
+
 
 .sub main :main
     .param pmc argv
     .local int argc, n
     argc = argv
-    n = 1
+    n = 3 
     unless argc == 2 goto argsok
     $S0 = argv[1]
     n = $S0

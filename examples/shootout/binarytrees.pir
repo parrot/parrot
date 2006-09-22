@@ -2,6 +2,7 @@
 #
 # binarytrees.pir N         (N = 16 for shootout)
 # by Joshua Isom, modified by Leopold Toetsch
+# modified by karl : default value of N=10 to match shootout output
 
 .sub itemcheck
 	.param pmc node
@@ -50,10 +51,16 @@ endif:
 
 .sub main :main
 	.param pmc argv
+	.local int argc
 	.local int N, dep, mindepth, maxdepth, stretchdepth
 	.local pmc stretchtree, longlivedtree, tmptree
+
+	argc = elements argv
+	N = 10
+	if argc == 1 goto default
 	$S0 = argv[1]
 	N = $S0
+default:
 	mindepth = 4
 	unless N < 6 goto else
 	maxdepth = mindepth + 2

@@ -3,6 +3,8 @@
 # nsieve-bits-2 N  (N = 9 for shootout)
 # by Leopold Toetsch
 # reset bits
+# modified by Karl Forner to accept shootout default value of N=2
+
 
 .sub primes_in_range
     .param int M
@@ -35,10 +37,15 @@ not_p:
     .return (count)
 .end
 .sub main :main
-    .param pmc argv
+	.param pmc argv
+	.local int argc, i, j, N, M, count
+
+	N = 2
+	argc = argv
+	if argc == 1 goto default
     $S0 = argv[1]
-    .local int i, j, N, M, count
-    N = $S0
+	N = $S0
+default:
     null i
     null j
 loop:

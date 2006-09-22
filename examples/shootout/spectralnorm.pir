@@ -2,6 +2,7 @@
 #
 # spectralnorm.pir N         (N = 100 for shootout)
 # by Michal Jurosz
+# modified by Karl Forner to accept shootout default value of N=100
 
 .sub eval_A
 	.param int i
@@ -99,10 +100,14 @@ endfor_i:
 
 .sub main :main
 	.param pmc argv
-	$S0 = argv[1]
-	.local int N
-	N = $S0
+	.local int argc, N
 
+	N = 100
+	argc = argv
+	if argc == 1 goto default
+	$S0 = argv[1]
+	N = $S0
+default:
 	.local pmc u, v
 	u = new .FixedFloatArray
 	u = N

@@ -2,12 +2,14 @@
 #
 # ./parrot -C takfp.pir N         (N = 10 for shootout)
 # by Joshua Isom
+# changed default value to N=7 (shootout default before being deprecated)
+# anyway N=10 froze my laptop. Karl Forner
 
 .sub main :main
 	.param pmc argv
 	.local int argc, n
 	argc = argv
-	n = 1
+	n = 7
 	unless argc == 2 goto argsok
 	$S0 = argv[1]
 	n = $S0

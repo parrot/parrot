@@ -6,3 +6,10 @@ The first line:
   #!./parrot -j
 
 is indicating the prefered because fastest runcore for that benchmark.
+
+If you want your PIR program (toto.pir) to be automatically tested (by t/examples/shootout.t) : 
+just  put the expected output file along, call it toto.pir.output
+If you need an input file, to be read from stdin, call it toto.pir.input
+Karl Forner
+
+
