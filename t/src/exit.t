@@ -16,7 +16,7 @@ t/src/exit.t - Exiting
 
 =head1 SYNOPSIS
 
-	% prove t/src/exit.t
+    % prove t/src/exit.t
 
 =head1 DESCRIPTION
 
@@ -29,22 +29,26 @@ c_output_is(<<'CODE', <<'OUTPUT', "on_exit - interpreter");
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
 
-void ex1(Parrot_Interp interp, int x, void*p)
+void
+ex1(Parrot_Interp interp, int x, void*p)
 {
     printf("ex1\n");
 }
 
-void ex2(Parrot_Interp interp, int x, void*p)
+void
+ex2(Parrot_Interp interp, int x, void*p)
 {
     printf("ex2\n");
 }
 
-void ex3(Parrot_Interp interp, int x, void*p)
+void
+ex3(Parrot_Interp interp, int x, void*p)
 {
     PIO_printf(interp, "ex3\n");
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     Interp *     interpreter;
 
@@ -63,4 +67,3 @@ ex3
 ex2
 ex1
 OUTPUT
-1;

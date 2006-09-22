@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -16,7 +16,7 @@ t/src/basic.t - Basics
 
 =head1 SYNOPSIS
 
-	% prove t/src/basic.t
+    % prove t/src/basic.t
 
 =head1 DESCRIPTION
 
@@ -26,23 +26,27 @@ Tests C<printf> and C<internal_exception> functions.
 
 
 c_output_is(<<'CODE', <<'OUTPUT', "hello world");
-        #include <stdio.h>
+    #include <stdio.h>
 
-        int main(int argc, char* argv[]) {
-                printf("Hello, World!\n");
-              exit(0);
-        }
+    int
+    main(int argc, char* argv[])
+    {
+        printf("Hello, World!\n");
+        exit(0);
+    }
 CODE
 Hello, World!
 OUTPUT
 
 c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
-        #include <parrot/parrot.h>
-        #include <parrot/exceptions.h>
+    #include <parrot/parrot.h>
+    #include <parrot/exceptions.h>
 
-        int main(int argc, char* argv[]) {
-                internal_exception(0, "Blow'd Up(tm)"); /* ' */
-        }
+    int
+    main(int argc, char* argv[])
+    {
+         internal_exception(0, "Blow'd Up(tm)"); /* ' */
+    }
 CODE
 Blow'd Up(tm)
 OUTPUT
@@ -55,7 +59,8 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parrot_run_native");
 
 static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     Interp *     interpreter;
 
@@ -75,7 +80,7 @@ int main(int argc, char* argv[])
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     UNUSED(cur_op);
     UNUSED(start);
@@ -91,5 +96,3 @@ main
 ok
 back
 OUTPUT
-
-1;

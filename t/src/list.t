@@ -16,7 +16,7 @@ t/src/list.t - List Subsystem
 
 =head1 SYNOPSIS
 
-	% prove t/src/list.t
+     % prove t/src/list.t
 
 =head1 DESCRIPTION
 
@@ -30,11 +30,13 @@ my $main = <<'CODE';
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
 
-static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+static opcode_t *
+the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
 int exit_value = 0;
 
-int main(int argc, char* argv[])
+int 
+main(int argc, char* argv[])
 {
     Parrot_Interp interpreter = Parrot_new(NULL);
     if (!interpreter) {
@@ -67,18 +69,18 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 
     list = list_new(interpreter, enum_type_int);
     if (list == NULL) {
-	PIO_eprintf(interpreter, "list creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "list creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     for (i = 0, x = 32; x < 43; x++, i++) {
-	list_push(interpreter, list, INTVAL2PTR(void*, x) ,enum_type_int);
-	j = *(int*) list_get(interpreter, list, i, enum_type_int);
-	if (i < 10)
-	    ;
-	else
-	    PIO_eprintf(interpreter, "The answer is %d.\n", j);
+        list_push(interpreter, list, INTVAL2PTR(void*, x) ,enum_type_int);
+        j = *(int*) list_get(interpreter, list, i, enum_type_int);
+        if (i < 10)
+            ;
+        else
+            PIO_eprintf(interpreter, "The answer is %d.\n", j);
     }
 
     /* test various data types */
@@ -159,8 +161,8 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     /* delete test */
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 20; i++) {
-	int c = 'a' + i;
-	list_push(interpreter, list, (void*) c, enum_type_char);
+        int c = 'a' + i;
+        list_push(interpreter, list, (void*) c, enum_type_char);
     }
     list_delete(interpreter, list, 1, 1);
     list_delete(interpreter, list, 1, 4);
@@ -169,8 +171,8 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 26; i++) {
-	int c = 'a' + i;
-	list_push(interpreter, list, (void*) c, enum_type_char);
+        int c = 'a' + i;
+        list_push(interpreter, list, (void*) c, enum_type_char);
     }
     list_delete(interpreter, list, 1, 20);
     j = *(char*) list_get(interpreter, list, 1, enum_type_char);
@@ -178,22 +180,22 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 26; i++) {
-	int c = 'a' + i;
-	list_push(interpreter, list, (void*) c, enum_type_char);
+        int c = 'a' + i;
+        list_push(interpreter, list, (void*) c, enum_type_char);
     }
     list_delete(interpreter, list, 2, 30);
     for (i = 0; i < 26; i++) {
-	int c = 'A' + i;
-	list_push(interpreter, list, (void*) c, enum_type_char);
+        int c = 'A' + i;
+        list_push(interpreter, list, (void*) c, enum_type_char);
     }
     j = *(char*) list_get(interpreter, list, 6, enum_type_char);
     PIO_eprintf(interpreter, "delete 3 %s\n", (j == 'E' && list_length(interpreter, list) == 28)
-	? "ok" : "nok");
+        ? "ok" : "nok");
 
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 5; i++) {
-	int c = 'a' + i;
-	list_push(interpreter, list, (void*) c, enum_type_char);
+        int c = 'a' + i;
+        list_push(interpreter, list, (void*) c, enum_type_char);
     }
     list_assign(interpreter, list, 2000 ,(void*)'Y', enum_type_char);
     list_assign(interpreter, list, 4000 ,(void*)'Z', enum_type_char);
@@ -201,13 +203,13 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     list_delete(interpreter, list, 2, 996);
     j = *(char*) list_get(interpreter, list, -1, enum_type_char);
     PIO_eprintf(interpreter, "delete 4 %s\n", (j == 'Z' && list_length(interpreter, list) == 5)
-	? "ok" : "nok");
+        ? "ok" : "nok");
 #if 0
     /* insert */
     PIO_eprintf(interpreter, "\nnew list(0..5), shift\n");
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 6; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+        list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
     list_shift(interpreter, list, enum_type_char);
     list_dump(0, list, 0);
     PIO_eprintf(interpreter, "insert(2, 5)\n");
@@ -228,14 +230,14 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 6; i++) {
-	int c = 'a' + i;
-	list_push(interpreter, list, (void*) c, enum_type_char);
+        int c = 'a' + i;
+        list_push(interpreter, list, (void*) c, enum_type_char);
     }
     list_shift(interpreter, list, enum_type_char);
     list_insert(interpreter, list, 0, 3);
     for (i = 0; i < 5; i++) {
-	int c = 'A' + i;
-	list_assign(interpreter, list, i, (void*) c, enum_type_char);
+        int c = 'A' + i;
+        list_assign(interpreter, list, i, (void*) c, enum_type_char);
     }
     j = *(char*) list_get(interpreter, list, 0, enum_type_char);
     PIO_eprintf(interpreter, "insert 2 %s\n", (j == 'A') ? "ok" : "nok");
@@ -244,7 +246,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     PIO_eprintf(interpreter, "\nnew list(0..5)\n");
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 6; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+        list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
     list_dump(0, list, 0);
     PIO_eprintf(interpreter, "insert(5, 3)\n");
     list_insert(interpreter, list, 5, 3);
@@ -257,7 +259,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     PIO_eprintf(interpreter, "\nnew list(0..5)\n");
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 6; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+        list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
     list_dump(0, list, 0);
     PIO_eprintf(interpreter, "insert(6, 3)\n");
     list_insert(interpreter, list, 6, 3);
@@ -279,7 +281,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     PIO_eprintf(interpreter, "\nnew list(0..25)\n");
     list = list_new(interpreter, enum_type_char);
     for (i = 0; i < 26; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+        list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
     PIO_eprintf(interpreter, "set_length(4)\n");
     list_set_length(interpreter, list, 4);
     list_dump(0, list, 0);
@@ -349,23 +351,23 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     PIO_eprintf(interpreter, "ok 1\n");
 
     for (j = 0; j < 5; j++) {
-	for (i = 0; i < 100; i++)
-	    buf[i] = j;
-	list_assign(interpreter, list, j, buf, enum_type_sized);
+        for (i = 0; i < 100; i++)
+            buf[i] = j;
+        list_assign(interpreter, list, j, buf, enum_type_sized);
     }
     for (j = 4; j >= 0; j--) {
-	char *p = (char *) list_get(interpreter, list, j, enum_type_sized);
-	ok = 1;
-	for (i = 0; i < 100; i++)
-	    if (p[i] != j) {
-		ok = 0;
-		break;
-	    }
+        char *p = (char *) list_get(interpreter, list, j, enum_type_sized);
+        ok = 1;
+        for (i = 0; i < 100; i++)
+            if (p[i] != j) {
+                ok = 0;
+                break;
+            }
     }
     if (ok)
-	PIO_eprintf(interpreter, "ok 2\n");
+        PIO_eprintf(interpreter, "ok 2\n");
     else
-	PIO_eprintf(interpreter, "failed 2: i=%d j=%d\n", i, j);
+        PIO_eprintf(interpreter, "failed 2: i=%d j=%d\n", i, j);
 
     return NULL;
 }
@@ -374,4 +376,3 @@ ok 1
 ok 2
 OUTPUT
 # TODO
-1;

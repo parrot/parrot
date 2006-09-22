@@ -16,7 +16,7 @@ t/src/compiler.t - Compile and run a PIR program from C.
 
 =head1 SYNOPSIS
 
-	% prove t/src/compiler.t
+    % prove t/src/compiler.t
 
 =head1 DESCRIPTION
 
@@ -84,7 +84,7 @@ main(int margc, char *margv[])
     Parrot_Interp interpreter;
     struct PackFile *pf;
     int argc = 1;
-	char *argv[] = { "test", NULL };
+    char *argv[] = { "test", NULL };
 
     struct PackFile_Segment *seg;
 
@@ -224,6 +224,7 @@ compile_run(Parrot_Interp interpreter, const char *src, STRING *type, int argc,
     Parrot_runcode(interpreter, argc, argv);
     return NULL;
 }
+
 static opcode_t *
 run(Parrot_Interp interpreter, int argc, char *argv[])
 {
@@ -314,6 +315,7 @@ compile_run(Parrot_Interp interpreter, const char *src, STRING *type, int argc,
     /* and go */
     Parrot_runcode(interpreter, argc, argv);
 }
+
 static opcode_t *
 run(Parrot_Interp interpreter, int argc, char *argv[])
 {
@@ -404,6 +406,7 @@ compile_run(Parrot_Interp interpreter, const char *src, STRING *type, int argc,
     /* and go */
     Parrot_runcode(interpreter, argc, argv);
 }
+
 static opcode_t *
 run(Parrot_Interp interpreter, int argc, char *argv[])
 {
@@ -494,6 +497,7 @@ compile_run(Parrot_Interp interpreter, const char *src, STRING *type, int argc,
     /* and go */
     Parrot_runcode(interpreter, argc, argv);
 }
+
 static opcode_t *
 run(Parrot_Interp interpreter, int argc, char *argv[])
 {

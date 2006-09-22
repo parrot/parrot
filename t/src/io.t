@@ -16,7 +16,7 @@ t/src/io.t - IO Subsystem
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/src/io.t
+    % perl -Ilib t/src/io.t
 
 =head1 DESCRIPTION
 
@@ -29,24 +29,24 @@ $/=undef; # slurp mode
 
 sub setup
 {
-	my $name = @_ ? shift : "temp.file";
-	my $content = @_ ? shift : "This is a test\n";
+    my $name = @_ ? shift : "temp.file";
+    my $content = @_ ? shift : "This is a test\n";
 
-	open(FILE, ">$name") or die "Failed to create $name";
-        binmode FILE;
-	print FILE $content;
-	close(FILE);
+    open(FILE, ">$name") or die "Failed to create $name";
+    binmode FILE;
+    print FILE $content;
+    close(FILE);
 
-	unlink("does_not_exist") if -e "does_not_exist";
+    unlink("does_not_exist") if -e "does_not_exist";
 }
 
 sub teardown
 {
-	my $name = @_ ? shift : "temp.file";
+    my $name = @_ ? shift : "temp.file";
 
-	my $delete_counter;
-	unlink($name) while( -e $name and 3 > $delete_counter++ and sleep 1);
-	die "Failed to delete $name" if -e $name;
+    my $delete_counter;
+    unlink($name) while( -e $name and 3 > $delete_counter++ and sleep 1);
+    die "Failed to delete $name" if -e $name;
 }
 
 my $main = <<'CODE';
@@ -55,7 +55,8 @@ my $main = <<'CODE';
 
 static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     Parrot_Interp interpreter = Parrot_new(NULL);
     if (!interpreter) {
@@ -75,7 +76,7 @@ CODE
 c_output_is($main . <<'CODE', <<'OUTPUT', "hello world");
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PIO_printf(interpreter, "Hello, World!\n");
 
@@ -90,7 +91,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "write");
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
     char *p;
@@ -121,7 +122,7 @@ close FILE;
 c_output_is($main . <<'CODE', <<'OUTPUT', 'read');
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
     char buf[1024];
@@ -141,7 +142,7 @@ the_test(Interp *interpreter,
     do {
         len = PIO_read(interpreter, io, buf, 3);
         buf[len] = '\0';
-	/* dont write trailing spaces */
+        /* dont write trailing spaces */
         PIO_printf(interpreter, "%d: %s\n", len, len ? buf : "EOF");
     } while (len > 0);
 
@@ -163,7 +164,7 @@ OUTPUT
 c_output_is($main . <<'CODE', '', 'append');
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
 
@@ -187,7 +188,7 @@ close FILE;
 c_output_is($main . <<'CODE', <<'OUTPUT', 'readline');
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
     INTVAL len;
@@ -219,27 +220,27 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_parse_open_flags");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     char *flags[] = {"<", ">", ">>", "+<", "+>",
-		     "", ";-)", "<<<<<<<<<", "+", "<-:"};
+                     "", ";-)", "<<<<<<<<<", "+", "<-:"};
     INTVAL expected[] = {PIO_F_READ,
-			 (PIO_F_WRITE | PIO_F_TRUNC),
-			 (PIO_F_WRITE | PIO_F_APPEND),
-			 (PIO_F_WRITE | PIO_F_READ),
-			 (PIO_F_WRITE | PIO_F_READ | PIO_F_TRUNC),
-			 0, 0, 0, 0, 0};
+                         (PIO_F_WRITE | PIO_F_TRUNC),
+                         (PIO_F_WRITE | PIO_F_APPEND),
+                         (PIO_F_WRITE | PIO_F_READ),
+                         (PIO_F_WRITE | PIO_F_READ | PIO_F_TRUNC),
+                         0, 0, 0, 0, 0};
     INTVAL got;
     int i;
 
     for (i = 0; i < 10; i++) {
-	got = PIO_parse_open_flags(flags[i]);
+        got = PIO_parse_open_flags(flags[i]);
 
-	if ( got != expected[i] ) {
-	    PIO_printf(interpreter,
-		       "\"%s\" should have parsed to %i not %i\n",
-		       flags[i], expected[i], got);
-	}
+        if ( got != expected[i] ) {
+            PIO_printf(interpreter,
+                       "\"%s\" should have parsed to %i not %i\n",
+                       flags[i], expected[i], got);
+        }
     }
 
     PIO_printf(interpreter, "done\n");
@@ -257,28 +258,28 @@ setup();
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_open");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     char *file[] = {"", "temp.file", "does_not_exist"};
     char *flags[] = {"<", ">", ">>", "+<", "+>", "", ";-)"};
     int expected[][7] = {
-    	{0, 0, 0, 0, 0, 0, 0},
-    	{1, 1, 1, 1, 1, 0, 0},
-    	{0, 1, 1, 1, 1, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 0, 0},
+            {0, 1, 1, 1, 1, 0, 0},
     };
     PMC *io;
     int i, j;
 
     for (i = 0; i < 3; i++) {
-	for (j = 0; j < 7; j++) {
-	    io = PIO_open(interpreter, NULL, file[i], flags[j]);
+        for (j = 0; j < 7; j++) {
+            io = PIO_open(interpreter, NULL, file[i], flags[j]);
 
-	    if ( (PIO_eof(interpreter, io) ? 0:1) != expected[i][j] ) {
-		PIO_printf(interpreter,
-			   "\"%s\" \"%s\" should%s have opened\n",
-			   file[i], flags[j], expected[i][j] ? "" : " not");
-	    }
-	}
+            if ( (PIO_eof(interpreter, io) ? 0:1) != expected[i][j] ) {
+                PIO_printf(interpreter,
+                           "\"%s\" \"%s\" should%s have opened\n",
+                           file[i], flags[j], expected[i][j] ? "" : " not");
+            }
+        }
     }
 
     PIO_printf(interpreter, "done\n");
@@ -298,7 +299,7 @@ setup("temp.file", "This is a test.");
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     int len[] = {0, 9, 5, 100};
     char *str[] = {"", "This is a", " test", "."};
@@ -309,8 +310,8 @@ the_test(Interp *interpreter,
     io = PIO_open(interpreter, NULL, "temp.file", "<");
 
     if ( PIO_eof(interpreter, io) ) {
-	PIO_printf(interpreter, "PIO_open failed\n");
-	return NULL;
+        PIO_printf(interpreter, "PIO_open failed\n");
+        return NULL;
     }
 
     for (i = 0; i < 4; i++) {
@@ -322,12 +323,12 @@ the_test(Interp *interpreter,
 
         if ( n != strlen(str[i]) ) {
             PIO_printf(interpreter,
-		       "read: %i expected: %i\n", n, strlen(str[i]));
+                       "read: %i expected: %i\n", n, strlen(str[i]));
         }
 
         if ( strcmp(buffer, str[i]) ) {
             PIO_printf(interpreter,
-		       "should have read \"%s\" not \"%s\"", str[i], buffer);
+                       "should have read \"%s\" not \"%s\"", str[i], buffer);
         }
 
         /* buffer no longer needed */
@@ -351,7 +352,7 @@ setup("temp.file", ("x" x 65533) . "yz");
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read larger file");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
     char *buffer;
@@ -359,8 +360,8 @@ the_test(Interp *interpreter,
     io = PIO_open(interpreter, NULL, "temp.file", "<");
 
     if ( !io ) {
-	PIO_printf(interpreter, "PIO_open failed\n");
-	return NULL;
+        PIO_printf(interpreter, "PIO_open failed\n");
+        return NULL;
     }
 
     buffer = malloc(65536 * sizeof(char));
@@ -384,7 +385,7 @@ setup("temp.file", ("x" x 65536) . "yz");
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read larger chunk when the buffer is not-empty");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
     char *buffer;
@@ -392,8 +393,8 @@ the_test(Interp *interpreter,
     io = PIO_open(interpreter, NULL, "temp.file", "<");
 
     if ( !io ) {
-	PIO_printf(interpreter, "PIO_open failed\n");
-	return NULL;
+        PIO_printf(interpreter, "PIO_open failed\n");
+        return NULL;
     }
 
     buffer = malloc(65536 * sizeof(char));
@@ -418,7 +419,7 @@ setup("temp.file", "words\n" x 10000);
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_tell: read larger chunk when the buffer is not-empty");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
     char *buf;
@@ -426,8 +427,8 @@ the_test(Interp *interpreter,
     io = PIO_open(interpreter, NULL, "temp.file", "<");
 
     if ( !io ) {
-	PIO_printf(interpreter, "PIO_open failed\n");
-	return NULL;
+        PIO_printf(interpreter, "PIO_open failed\n");
+        return NULL;
     }
 
     buf = malloc(65536 * sizeof(char));
@@ -453,19 +454,19 @@ teardown();
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_write");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
 
     io = PIO_open(interpreter, NULL, "temp.file", ">");
 
     if ( !io ) {
-	PIO_printf(interpreter, "PIO_open failed\n");
-	return NULL;
+        PIO_printf(interpreter, "PIO_open failed\n");
+        return NULL;
     }
 
     PIO_printf(interpreter,
-	       "%i\n", PIO_write(interpreter, io, "This is a test\n", 15));
+               "%i\n", PIO_write(interpreter, io, "This is a test\n", 15));
 
     return NULL;
 }
@@ -481,15 +482,15 @@ setup();
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_close");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
 
     if ( !io ) {
-	PIO_printf(interpreter, "PIO_open failed\n");
-	return NULL;
+        PIO_printf(interpreter, "PIO_open failed\n");
+        return NULL;
     }
 
     PIO_printf(interpreter, "%i\n", PIO_close(interpreter, io));
@@ -507,7 +508,7 @@ teardown;
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_make_offset");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     INTVAL intval[] = {0, 1, -1, 100, -100};
     PIOOFF_T expected[] = {0, 1, -1, 100, -100};
@@ -517,10 +518,10 @@ the_test(Interp *interpreter,
     for (i = 0; i < 5; i++) {
         offset = PIO_make_offset(intval[i]);
 
-	if ( offset != expected[i] ) {
+        if ( offset != expected[i] ) {
             PIO_printf(interpreter,
-		       "offset for %i should have been %i not %i\n",
-		       intval[i], (int)expected[i], (int)offset);
+                       "offset for %i should have been %i not %i\n",
+                       intval[i], (int)expected[i], (int)offset);
         }
     }
 
@@ -541,13 +542,13 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_seek");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     INTVAL fixture[][3] = {
-	{1, SEEK_SET},
-	{2, SEEK_CUR},
-	{-2, SEEK_CUR},
-	{-3, SEEK_END}
+        {1, SEEK_SET},
+        {2, SEEK_CUR},
+        {-2, SEEK_CUR},
+        {-3, SEEK_END}
     };
     PMC *io;
     char *buffer;
@@ -574,7 +575,7 @@ the_test(Interp *interpreter,
         }
         else {
             PIO_printf(interpreter,
-		       "seek %i %i failed\n", fixture[i][0], fixture[i][1]);
+                       "seek %i %i failed\n", fixture[i][0], fixture[i][1]);
         }
     }
 
@@ -594,7 +595,7 @@ teardown();
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_fdopen");
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     char *flags[] = {"<", ">", ">>", "+<", "+>", "", ";-)"};
     int expected[] = {1, 1, 1, 1, 1, 0, 0};
@@ -603,8 +604,7 @@ the_test(Interp *interpreter,
     PIOHANDLE fd;
     PMC *io;
 
-    for (i = 0; i < 7; i++)
-    {
+    for (i = 0; i < 7; i++) {
         iostdout = PIO_STDOUT(interpreter);
         fd = PIO_getfd(interpreter, iostdout);
         io = PIO_fdopen(interpreter, NULL, fd, flags[i]);
@@ -612,8 +612,8 @@ the_test(Interp *interpreter,
         if ( ( io != NULL ) != expected[i] )
         {
             PIO_printf(interpreter,
-		       "stdout should%s have opened with \"%s\" flags\n",
-		       expected[i] ? "" : " not", flags[i]);
+                       "stdout should%s have opened with \"%s\" flags\n",
+                       expected[i] ? "" : " not", flags[i]);
         }
     }
 
@@ -630,7 +630,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', 'stdio-layer');
 static opcode_t*
 the_test(Interp *interpreter,
-	 opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     extern ParrotIOLayer pio_stdio_layer;
 
@@ -653,7 +653,7 @@ setup("temp.file", "Hello World!");
 c_output_is($main . <<'CODE', <<'OUTPUT', 'peek');
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+        opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
     char peekbuf[1024], readbuf[1024];

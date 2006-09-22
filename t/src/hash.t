@@ -16,7 +16,7 @@ t/src/hash.t - Hashes
 
 =head1 SYNOPSIS
 
-	% prove t/src/hash.t
+    % prove t/src/hash.t
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_new_hash");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     STRING *key;
@@ -62,9 +62,9 @@ the_test(Interp *interpreter,
     parrot_new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     PIO_eprintf(interpreter, "ok\n");
@@ -80,7 +80,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_put");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     STRING *key;
@@ -95,9 +95,9 @@ the_test(Interp *interpreter,
     parrot_new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -118,7 +118,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     STRING *key;
@@ -131,9 +131,9 @@ the_test(Interp *interpreter,
     parrot_new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -155,7 +155,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with NULL key");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     STRING *key;
@@ -168,9 +168,9 @@ the_test(Interp *interpreter,
     parrot_new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     /*
@@ -200,7 +200,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with empty string key
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     STRING *key;
@@ -213,9 +213,9 @@ the_test(Interp *interpreter,
     parrot_new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     key = string_from_cstring(interpreter, "", 0);
@@ -239,7 +239,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with big key");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     PMC *h;
@@ -255,9 +255,9 @@ the_test(Interp *interpreter,
     i = pmc_new(interpreter, enum_class_Integer);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     big = calloc(BIGLEN, sizeof(char));
@@ -282,7 +282,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_size");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     STRING *key;
@@ -294,9 +294,9 @@ the_test(Interp *interpreter,
     parrot_new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -327,7 +327,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_delete");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     STRING *key;
@@ -339,9 +339,9 @@ the_test(Interp *interpreter,
     parrot_new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -377,7 +377,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_clone");
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     Hash *hash2;
@@ -390,9 +390,9 @@ the_test(Interp *interpreter,
     parrot_new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	PIO_eprintf(interpreter, "hash creation failed\n");
-	exit_value = 1;
-	return NULL;
+        PIO_eprintf(interpreter, "hash creation failed\n");
+        exit_value = 1;
+        return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -422,7 +422,7 @@ my $code_setup = <<'CODE';
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     PMC *hash, *iter;
     STRING *k;
@@ -440,12 +440,12 @@ my $code_loop_top = <<'CODE';
     iter = VTABLE_get_iter(interpreter, hash);
 
     for (;;) {
-	b = VTABLE_get_bool(interpreter, iter);
-	if (!b)
-	    break;
-	k = VTABLE_shift_string(interpreter, iter);
-	v = VTABLE_get_integer_keyed_str(interpreter, hash, k);
-	/* a few keys are in add order */
+        b = VTABLE_get_bool(interpreter, iter);
+        if (!b)
+            break;
+        k = VTABLE_shift_string(interpreter, iter);
+        v = VTABLE_get_integer_keyed_str(interpreter, hash, k);
+        /* a few keys are in add order */
 
 CODE
 
@@ -470,14 +470,14 @@ c_output_is($main . $code_setup . <<'CODE1' . $code_loop_top . <<'CODE2' . $code
     VTABLE_set_integer_keyed_str(interpreter, hash, k, 30);
 
 CODE1
-	PIO_eprintf(interpreter, "%vd", v);
+        PIO_eprintf(interpreter, "%vd", v);
 CODE2
 102030
 ok
 OUTPUT
 
 c_output_is($main . $code_setup . $code_loop_top . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration on empty hash");
-	PIO_eprintf(interpreter, "%p,%vd", k, v);
+        PIO_eprintf(interpreter, "%p,%vd", k, v);
 CODE2
 
 ok

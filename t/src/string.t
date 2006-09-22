@@ -17,7 +17,7 @@ t/src/string.t - String tests
 
 =head1 SYNOPSIS
 
-	% prove t/src/string.t
+    % prove t/src/string.t
 
 =head1 DECSRIPTION
 
@@ -35,7 +35,8 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parrot_run_native");
 
 static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     Interp *     interpreter;
 
@@ -55,17 +56,17 @@ int main(int argc, char* argv[])
 
 static opcode_t*
 the_test(Interp *interpreter,
-	opcode_t *cur_op, opcode_t *start)
+         opcode_t *cur_op, opcode_t *start)
 {
     STRING *s;
     UINTVAL length;
-	unsigned char string_data[] = {0x82, 0xB7, 0x82, 0xB5}; /* sushi */
-	
+    unsigned char string_data[] = {0x82, 0xB7, 0x82, 0xB5}; /* sushi */
+    
     UNUSED(cur_op);
     UNUSED(start);
 
     s = string_make(interpreter, string_data, sizeof(string_data), "shift_jis", 0);
-	length = string_length(interpreter, s);
+    length = string_length(interpreter, s);
 
     /* tests go here */
     PIO_eprintf(interpreter, "length = %d\n", (int)length);
@@ -85,4 +86,3 @@ ok
 back
 OUTPUT
 }
-1;

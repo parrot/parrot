@@ -16,7 +16,7 @@ t/src/sprintf.t - Name
 
 =head1 SYNOPSIS
 
-	% prove t/src/sprintf.t
+    % prove t/src/sprintf.t
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,8 @@ Tests the various C<Parrot_sprintf_*> functions.
 c_output_like(<<'CODE', <<'OUTPUT', "xxxVAL_FMT");
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-int main(int argc, char* argv[]) {
+int
+main(int argc, char* argv[]) {
     Parrot_Interp interpreter = Parrot_new(NULL);
     PIO_printf(interpreter, INTVAL_FMT "\n", (INTVAL) 42);
     PIO_printf(interpreter, FLOATVAL_FMT "\n", (FLOATVAL) 42.0);
@@ -46,7 +47,8 @@ c_output_is(<<'CODE', <<'OUTPUT', "hello world");
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-int do_test(Interp* interpreter) {
+int
+do_test(Interp* interpreter) {
     STRING *S;
     PMC *pmc;
     INTVAL ival;
@@ -151,23 +153,23 @@ int do_test(Interp* interpreter) {
     S = Parrot_sprintf_c(interpreter, "== %08vd\n", (INTVAL)ival);
     printf("%08d %s", (int) ival,
            string_to_cstring(interpreter, S));
-     /* test string_nprintf() */
-     {
- 	STRING *S2;
- 	ival = 1000000;
- 	S = string_nprintf(interpreter, NULL, 0, "== %d\n", (int) ival);
- 	printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
- 	S2 = string_from_cstring(interpreter,"Parrot", 0);
- 	S = string_nprintf(interpreter, S2, 0, "== %d\n", (int) ival);
- 	printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
- 	printf("%s\n", (S == S2) ? "ok" : "different?!?");
- 	S = string_nprintf(interpreter, NULL, 42, "== %d\n", (int) ival);
- 	printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
- 	S = string_nprintf(interpreter, NULL, 6, "== %d\n", (int) ival);
- 	printf("100 %s\n", string_to_cstring(interpreter, S));
- 	S = string_nprintf(interpreter, S2, 6, "== %d\n", (int) ival);
- 	printf("100 %s\n", string_to_cstring(interpreter, S));
-     }
+    /* test string_nprintf() */
+    {
+        STRING *S2;
+        ival = 1000000;
+        S = string_nprintf(interpreter, NULL, 0, "== %d\n", (int) ival);
+        printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
+        S2 = string_from_cstring(interpreter,"Parrot", 0);
+        S = string_nprintf(interpreter, S2, 0, "== %d\n", (int) ival);
+        printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
+        printf("%s\n", (S == S2) ? "ok" : "different?!?");
+        S = string_nprintf(interpreter, NULL, 42, "== %d\n", (int) ival);
+        printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
+        S = string_nprintf(interpreter, NULL, 6, "== %d\n", (int) ival);
+        printf("100 %s\n", string_to_cstring(interpreter, S));
+        S = string_nprintf(interpreter, S2, 6, "== %d\n", (int) ival);
+        printf("100 %s\n", string_to_cstring(interpreter, S));
+    }
 
     /* Test we've not left junk behind on the stack */
     S = Parrot_sprintf_c(interpreter, "That's all, %s\n", "folks!");
@@ -176,7 +178,8 @@ int do_test(Interp* interpreter) {
     return 0;
 }
 
-int main(int argc, char* argv[]) {
+int
+main(int argc, char* argv[]) {
     Interp * interpreter;
 
     interpreter = Parrot_new(NULL);
