@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 2);
+plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 3);
 
 
 =head1 NAME
@@ -124,5 +124,37 @@ character 1 = 97
 character 2 = 98
 character 3 = 99
 character 4 = 100
+back in main()
+OUTPUT
+
+c_output_is($main . <<'CODE', <<'OUTPUT',  'string_bitwise_or()');
+
+static opcode_t*
+the_test(Interp *interpreter, opcode_t *cur_op, opcode_t *start)
+{
+    STRING   *string_a, *string_b, *string_c;
+    UINTVAL  length;
+    unsigned char string_data[] = {0x61, 0x62, 0x63, 0x64}; /* 'abcd' */
+    
+    UNUSED(cur_op);
+    UNUSED(start);
+
+    string_a = string_make(interpreter, string_data, 1, "ascii", 0);
+    string_b = string_make(interpreter, string_data+1, 1, "ascii", 0);
+    string_c = NULL;
+    string_bitwise_or(interpreter, string_a, string_b, &string_c);
+
+    /* tests go here */
+    PIO_eprintf(interpreter, "%d | %d = %d\n",
+            (int)string_ord(interpreter, string_a, 0),
+            (int)string_ord(interpreter, string_b, 0),
+            (int)string_ord(interpreter, string_c, 0));
+
+    return NULL; /* always return 0 or bad things may happen */
+}
+
+CODE
+calling the_test() in main()
+97 | 98 = 99
 back in main()
 OUTPUT

@@ -1408,7 +1408,7 @@ do { \
 FUNCDOC:
 
 Performs a bitwise C<OR> on two Parrot string, performing type and
-encoding conversions if necessary. If the second string is not C<NULL>
+encoding conversions if necessary. If the third string is not C<NULL>
 then it is reused, otherwise a new Parrot string is created.
 
 */
