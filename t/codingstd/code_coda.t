@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 1;
+use Test::More tests => 2;
 use Parrot::Distribution;
 
 
@@ -45,7 +45,8 @@ CODA
 
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : source_files();
-my @comments;
+my @no_coda;
+my @extra_coda;
 
 foreach my $file ( @files ) {
     my $buf;
@@ -69,14 +70,24 @@ foreach my $file ( @files ) {
         $buf = <$fh>;
     }
 
-    # append to the comments array if the code doesn't match
-    push @comments => "$path\n"
+    # append to the no_coda array if the code doesn't match
+    push @no_coda => "$path\n"
         unless $buf =~ m{\Q$coda\E\n*\z};
+
+    # append to the extra_coda array if coda-like text appears more than once
+    my $vim_many   =()= $buf =~ m{^ \s* \*? \s* vim: \s* $}gmx;
+    my $emacs_many =()= $buf =~ m{^ \s* \*? \s* Local variables: \s* $}gmx;
+    push @extra_coda => "$path\n"
+        if $vim_many > 1 || $emacs_many > 1;
 }
 
-ok(!scalar(@comments), 'C code coda')
-    or diag("C code coda missing in ".scalar @comments." files:\n@comments");
+ok(!scalar(@no_coda), 'C code coda present')
+    or diag("C code coda missing in "
+        . scalar @no_coda . " files:\n@no_coda");
 
+ok(!scalar(@extra_coda), 'C code coda appears only once')
+    or diag("C code coda repeating in "
+        . scalar @extra_coda . " files:\n@extra_coda");
 
 exit;
 
@@ -94,4 +105,10 @@ sub perl_files {
     );
 }
 
-## vim: expandtab sw=4
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
+
