@@ -153,7 +153,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     clear_eh
 
     # prepend test filename and line number to description
-    description = 'build_test_desc'( description, test_name, local_test_number )
+    description = 'build_test_desc'( description, template )
 
     if data != "''" goto got_data
     data = ''
@@ -385,13 +385,9 @@ tag 'all' is allowed for todo tests that should fail on any system
 .sub 'build_test_desc'
     .param string desc
     .param string testname
-    .param string testnum
 
     $S0  = '['
     $S0 .= testname
-    $S0 .= ':'
-    $S1 = testnum
-    $S0 .= $S1
     $S0 .= '] '
 
     desc = concat $S0, desc
