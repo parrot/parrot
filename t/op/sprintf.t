@@ -168,7 +168,8 @@ tag 'all' is allowed for todo tests that should fail on any system
     $P0 = skip_tests[test_name]
     $I0 = exists $P0[local_test_number]
     unless $I0 goto not_skip
-    test.'skip'(1, description)
+    $S0 = $P0[local_test_number]
+    test.'skip'(1, $S0)
     goto loop
 
   not_skip:
@@ -300,8 +301,8 @@ tag 'all' is allowed for todo tests that should fail on any system
 
     bsr reset_skip_info
     test_file = 'sprintf_tests'
-    skip_info[14] = 1
-    skip_info[15] = 1
+    skip_info[14] = 'unknown reason'
+    skip_info[15] = 'unknown reason'
 
     $I0 = 45
     $I1 = 235
@@ -309,6 +310,11 @@ tag 'all' is allowed for todo tests that should fail on any system
 
     $I0 = 259
     $I1 = 264
+    bsr set_skip_loop
+
+    $I0 = 252
+    $I1 = 297
+    $S0 = '%v unsupported'
     bsr set_skip_loop
 
     skip_tests[test_file] = skip_info
@@ -321,10 +327,14 @@ tag 'all' is allowed for todo tests that should fail on any system
 
   set_skip_loop:
     if $I0 > $I1 goto end_loop
-    skip_info[$I0] = 1
+    if $S0 != '' goto set_skip_info
+    $S0 = 'unknown reason'
+  set_skip_info:
+    skip_info[$I0] = $S0
     $I0 += 1
     goto set_skip_loop
   end_loop:
+    $S0 = ''
     ret
 .end
 
