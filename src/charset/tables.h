@@ -23,3 +23,10 @@
 extern const PARROT_CCLASS_FLAGS Parrot_ascii_typetable[256];
 extern const PARROT_CCLASS_FLAGS Parrot_iso_8859_1_typetable[256];
 #endif /* PARROT_CHARSET_TABLES_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -322,12 +322,10 @@ void *Parrot_jit_build_call_func(Interp *, PMC *, String *);
 
 #endif /* PARROT_JIT_H_GUARD */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

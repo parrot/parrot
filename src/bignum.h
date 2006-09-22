@@ -201,12 +201,10 @@ int BN_set_inf(PINTD_ BIGNUM* bn);
 int BN_really_zero(PINTD_ BIGNUM* bn, int);
 
 #endif /* PARROT_TYPES_BIGNUM_H_GUARD */
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

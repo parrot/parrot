@@ -768,3 +768,10 @@ ia64_sync_cache (void *_start, void *_end)
 #  endif
 
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

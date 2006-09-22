@@ -16,12 +16,10 @@
 CHARSET *Parrot_charset_binary_init(Interp *);
 
 #endif /* PARROT_CHARSET_BINARY_H_GUARD */
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

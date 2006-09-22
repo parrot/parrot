@@ -5635,3 +5635,10 @@ History:
          structure of old version,  but most details differ.)
 
 */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

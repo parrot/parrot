@@ -1951,12 +1951,10 @@ F<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
 
 */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

@@ -3149,10 +3149,7 @@ L<https://rt.perl.org/rt3/Ticket/Display.html?id=36330>
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

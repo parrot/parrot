@@ -1386,12 +1386,10 @@ Parrot_jit_init(Interp *interpreter)
 #endif /* JIT_EMIT == 0 */
 #endif /* PARROT_PPC_JIT_EMIT_H_GUARD */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

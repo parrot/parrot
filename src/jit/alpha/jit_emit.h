@@ -548,12 +548,10 @@ Parrot_jit_extend_arena(Parrot_jit_info_t *jit_info)
 #endif /* JIT_EMIT */
 #endif /* PARROT_ALPHA_JIT_EMIT_H_GUARD */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

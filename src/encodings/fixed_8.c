@@ -226,16 +226,15 @@ Parrot_encoding_fixed_8_init(Interp *interpreter)
     return return_encoding;
 }
 
+
+
+
+
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
-
-
-
+ */
 

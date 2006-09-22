@@ -777,12 +777,10 @@ C<<PF_size_<type>()>> - return the needed size in C<opcode_t> units.
 
 */
 
+
 /*
-* Local variables:
-* c-indentation-style: bsd
-* c-basic-offset: 4
-* indent-tabs-mode: nil
-* End:
-*
-* vim: expandtab shiftwidth=4:
-*/
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

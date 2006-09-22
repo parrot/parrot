@@ -147,3 +147,10 @@ typedef struct STM_saved_tx_log STM_saved_tx_log;
 STM_tx_log *Parrot_STM_tx_log_get(Interp *interp);
 
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

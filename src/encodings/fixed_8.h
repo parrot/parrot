@@ -28,12 +28,10 @@ static UINTVAL bytes(Interp *interpreter, STRING *source_string);
 ENCODING *Parrot_encoding_fixed_8_init(Interp *interpreter);
 
 #endif /* PARROT_ENCODING_FIXED_8_H_GUARD */
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

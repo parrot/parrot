@@ -299,3 +299,10 @@ Parrot_STM_waitlist_destroy_thread(Parrot_Interp interp) {
     MUTEX_DESTROY(thr->signal_mutex);
     mem_sys_free(thr);
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -76,12 +76,10 @@ offset_fixup(Parrot_exec_objfile_t *obj)
 
 #endif /* PARROT_PPC_EXEC_DEP_H_GUARD */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

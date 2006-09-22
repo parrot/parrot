@@ -16,12 +16,10 @@
 ENCODING *Parrot_encoding_utf8_init(Interp *);
 
 #endif /* PARROT_ENCODING_UTF8_H_GUARD */
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

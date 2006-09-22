@@ -484,12 +484,10 @@ sync_cache (void *_start, void *_end)
 #endif /* JIT_EMIT == 0 */
 #endif /* PARROT_MIPS_JIT_EMIT_H_GUARD */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

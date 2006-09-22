@@ -53,3 +53,10 @@ void Parrot_STM_waitlist_wait(Parrot_Interp);
 void Parrot_STM_waitlist_destroy_thread(Parrot_Interp);
 
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

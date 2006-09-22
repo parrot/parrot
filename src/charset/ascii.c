@@ -499,12 +499,10 @@ charset_cvt_ascii_to_iso_8859_1(Interp *interpreter, STRING *src, STRING *dest)
     src->charset = Parrot_iso_8859_1_charset_ptr;
     return src;
 }
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

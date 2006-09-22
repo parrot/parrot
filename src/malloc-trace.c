@@ -214,3 +214,10 @@ void cfree(void *mem)
  *    "gcc -Wall -O -fpic -shared -o malloc-trace.so malloc-trace.c"
  * End:
  */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

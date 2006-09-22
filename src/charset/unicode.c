@@ -570,12 +570,10 @@ Parrot_charset_unicode_init(Interp *interpreter)
     return return_set;
 }
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

@@ -970,12 +970,10 @@ Initial version by leo (2004.08.12 - 2004.08.15)
 
 */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
- * vim: expandtab shiftwidth=4 tw=72:
-*/
+ * vim: expandtab shiftwidth=4:
+ */

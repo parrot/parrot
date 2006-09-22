@@ -4096,12 +4096,10 @@ Parrot_jit_init(Interp *interpreter)
 #  undef INT_REGISTERS_TO_MAP
 #endif /* PARROT_I386_JIT_EMIT_H_GUARD */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

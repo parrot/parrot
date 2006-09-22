@@ -102,3 +102,11 @@ F<src/pbc.c>, F<include/parrot/pbc.h>.
 
 */
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

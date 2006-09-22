@@ -82,3 +82,10 @@ const PARROT_CCLASS_FLAGS Parrot_iso_8859_1_typetable[256] = {
 0x28c6, 0x28c6, 0x28c6, 0x28c6, 0x28c6, 0x28c6, 0x28c6, 0x04c0, /* 240-247 */
 0x28c6, 0x28c6, 0x28c6, 0x28c6, 0x28c6, 0x28c6, 0x28c6, 0x28c6, /* 248-255 */
 };
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
