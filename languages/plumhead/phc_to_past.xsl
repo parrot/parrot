@@ -90,10 +90,7 @@
 # entering 'STRING'                                                
             .sym string decoded
             decoded = dec_sub( "<xsl:value-of select="." />" )
-            # This is "Hello, World!\n", so there is exactly one newline
-            .sym int    index_of_newline
-            index_of_newline = index decoded, "\n"
-            substr decoded, index_of_newline, 1, '\n'
+            decoded = escape decoded
             reg_temp = new 'PAST::Val'                             
             reg_temp.value( decoded ) 
             reg_temp.valtype( 'strqq' )                            
