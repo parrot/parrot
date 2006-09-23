@@ -75,6 +75,13 @@ foreach my $script (@shootouts) {
     if ($shebang =~ /^\#.+parrot\s+(.+)$/) {
         $args = $1; # parrot options
     }
+    unless ($PConfig{jitcapable}) {
+        $args =~ s/-j/-C/;
+        $args =~ s/-Cj/-C/;
+    }
+    unless ($PConfig{cg_flag} =~ /HAVE/) {
+        $args =~ s/-C//;
+    }
 
     # look for input files
     my $input = "$file$INPUT_EXT";
