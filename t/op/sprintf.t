@@ -51,7 +51,7 @@ by space consisting of a $^O optionally trailed with :osvers. In the
 latter case, all os-levels below that are expected to fail. A special
 tag 'all' is allowed for todo tests that should fail on any system
 
->%G<   >1234567e96<  >1.23457E+102<   >exponent too big skip: os390<
+>%GE<gt>   >1234567e96<  >1.23457E+102<   >exponent too big skip: os390<
 >%.0g< >-0.0<        >-0<             >No minus skip: MSWin32 VMS hpux:10.20<
 >%d<   >4<           >1<              >4 != 1 skip: all<
 
