@@ -126,7 +126,7 @@ static STRING * get_path(Interp *interpreter, STRING *lib, void **handle,
     if ( lib == NULL) {
         *handle = Parrot_dlopen(NULL);
         if (*handle) {
-            return "";
+            return string_from_const_cstring(interpreter, "", 0);
         }
         err = Parrot_dlerror();
         Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG,
@@ -287,7 +287,8 @@ static PMC *run_init_lib(Interp *interpreter, void *handle,
                     cinit_func_name));
         string_cstring_free(cinit_func_name);
     } else {
-        load_func = init_func = NULL;
+        load_func = (void *)NULL;
+		init_func = NULL;
     }
 
     lib_pmc = Parrot_init_lib(interpreter, load_func, init_func);
@@ -405,7 +406,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
      * LOCK()
      */
     if ( lib == NULL) {
-        wo_ext = "";
+        wo_ext   = string_from_const_cstring(interpreter, "", 0);
         lib_name = NULL;
     } else {
         lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
