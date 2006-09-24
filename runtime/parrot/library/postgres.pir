@@ -1,6 +1,11 @@
-.pcc_sub __postgres_init :load
+.sub __postgres_init :load
 
 loadlib $P1, 'libpq'
+if $P1 goto has_lib
+$P2 = new .Exception
+$P2[0] = 'error loading libpg - loadlib failed'
+throw $P2
+has_lib:
 dlfunc $P2, $P1, 'PQconnectStart', 'pt'
 store_global 'PostgreSQL::PQconnectStart', $P2
 dlfunc $P2, $P1, 'PQconnectPoll', 'ip'
@@ -184,7 +189,5 @@ store_global 'PostgreSQL::PQmblen', $P2
 dlfunc $P2, $P1, 'PQenv2encoding', 'i'
 store_global 'PostgreSQL::PQenv2encoding', $P2
 
-.pcc_begin_return
-.pcc_end_return
 .end
 

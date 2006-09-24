@@ -22,9 +22,16 @@ Test Parrot's libpg interface.
     load_bytecode 'Test/Builder.pir'
     .local pmc test       
     test = new 'Test::Builder'
-    test.'plan'(N_TESTS)
+    push_eh no_pg
     load_bytecode 'postgres.pir'
+    test.'plan'(N_TESTS)
     test.'ok'(1, 'load_bytecode')
+    test.'finish'()
+    end
+no_pg:	
+    .local pmc ex, msg
+    .get_results(ex, msg)
+    test.'BAILOUT'(msg)
     test.'finish'()
 .end
 
