@@ -4,13 +4,13 @@
 
 # This is the starting point for translating a method.
 .sub trans_method
-	.param pmc assembly
-	.param pmc class
-	.param pmc meth
-	.param int real_method
+    .param pmc assembly
+    .param pmc class
+    .param pmc meth
+    .param int real_method
     .param int trace
-	.local pmc rettype, ptypes, ltypes, ex
-	.local string pir_output, name, pir_params, pir_multi, pir_locals, pir_body, ns
+    .local pmc rettype, ptypes, ltypes, ex
+    .local string pir_output, name, pir_params, pir_multi, pir_locals, pir_body, ns
     .local int flags, impl_flags, static_check, abstract_check, runtime_check
 
     # Check if method is static, abstract and/or runtime provided.
@@ -22,22 +22,22 @@
 
     # Get details of parameter info and multi-method dispatch markup.
     ns = class.get_fullname()
-	(rettype, ptypes, pir_params, pir_multi) = trans_method_params(assembly, meth, ns)
+    (rettype, ptypes, pir_params, pir_multi) = trans_method_params(assembly, meth, ns)
     
-	# Emit top of method.
-	pir_output = ".sub \""
-	name = meth
-	pir_output = concat name
-	pir_output = concat "\""
-	if real_method == 0 goto ISMETHOD
+    # Emit top of method.
+    pir_output = ".sub \""
+    name = meth
+    pir_output = concat name
+    pir_output = concat "\""
+    if real_method == 0 goto ISMETHOD
     if static_check == 0 goto ISMETHOD
     goto ENDTOPSTUB
 ISMETHOD:
-	pir_output = concat " :method"
+    pir_output = concat " :method"
 ENDTOPSTUB:
     pir_output = concat " :multi("
     pir_output = concat pir_multi
-	pir_output = concat ")\n"
+    pir_output = concat ")\n"
 
     # Emit trace message.
     unless trace goto NOTRACE
@@ -54,7 +54,7 @@ NOTRACE:
 NOT_RUNTIME:
 
     # Add in parameters.
-	pir_output = concat pir_params
+    pir_output = concat pir_params
 
     # If it's an abstract method, need to throw an exception if it's called
     # then not bother with locals, the instruction translator etc.
@@ -67,51 +67,51 @@ PIR
     goto METHOD_END
 NOT_ABSTRACT:
 
-	# Locals.
-	(ltypes, pir_locals) = trans_method_locals(assembly, meth)
-	pir_output = concat pir_locals
+    # Locals.
+    (ltypes, pir_locals) = trans_method_locals(assembly, meth)
+    pir_output = concat pir_locals
 
     # Need to set arg0 = self if it's an instance method.
     if static_check != 0 goto NOSELF
     pir_output = concat ".local pmc arg0\narg0 = self\n"
 NOSELF:
 
-	# Body.
-	pir_body = trans_instructions(assembly, class, meth, ptypes, ltypes, rettype, trace)
-	pir_output = concat pir_body
+    # Body.
+    pir_body = trans_instructions(assembly, class, meth, ptypes, ltypes, rettype, trace)
+    pir_output = concat pir_body
 
-	# Emit end of method.
+    # Emit end of method.
 METHOD_END:
-	pir_output = concat ".end\n\n"
-	
-	# Return generated string.
-	.return (pir_output)
+    pir_output = concat ".end\n\n"
+    
+    # Return generated string.
+    .return (pir_output)
 .end
 
 
 # This translates the method parameters signature.
 .sub trans_method_params
-	.param pmc assembly
-	.param pmc meth
+    .param pmc assembly
+    .param pmc meth
     .param string self_ns
     .param int no_pir :optional
-	.local int sig_pos, sig_type
-	.local string sig_data
-	.local pmc signature, classes, class, ex
-	.local int flags, param_count, i, static_check, this_offset, type, token
+    .local int sig_pos, sig_type
+    .local string sig_data
+    .local pmc signature, classes, class, ex
+    .local int flags, param_count, i, static_check, this_offset, type, token
     .local int class_type, class_id, explicit_check, vararg_check
-	.local string pir_output, pir_multi, pir_mmdunbox, param_reg_type, tmp
-	.local pmc rettype, ptypes, ptype
+    .local string pir_output, pir_multi, pir_mmdunbox, param_reg_type, tmp
+    .local pmc rettype, ptypes, ptype
 
-	# Get signature.
-	sig_pos = meth.get_signature()
-	sig_data = assembly.get_blob(sig_pos)
-	sig_type = find_type "DotNetSignature"
-	signature = new sig_type
-	signature = sig_data
+    # Get signature.
+    sig_pos = meth.get_signature()
+    sig_data = assembly.get_blob(sig_pos)
+    sig_type = find_type "DotNetSignature"
+    signature = new sig_type
+    signature = sig_data
 
-	# Get flags.
-	flags = signature.read_uint8()
+    # Get flags.
+    flags = signature.read_uint8()
     
     # Check if it's a static method, has this specified explicitly or is
     # var arg.
@@ -119,26 +119,26 @@ METHOD_END:
     explicit_check = band flags, 0x40
     vararg_check = band flags, 0x7
 
-	# Get number of parameters.
-	param_count = signature.read_compressed()
+    # Get number of parameters.
+    param_count = signature.read_compressed()
 
-	# Return type.
-	rettype = get_signature_RetType_or_Param(signature)
-	annotate_reg_type(rettype)
+    # Return type.
+    rettype = get_signature_RetType_or_Param(signature)
+    annotate_reg_type(rettype)
 
-	# Create parameter types array.
-	ptypes = new .ResizablePMCArray
+    # Create parameter types array.
+    ptypes = new .ResizablePMCArray
 
     # If it's an instance method and explicit not set, add "this" to the list.
     this_offset = 0
     pir_multi = ""
     if static_check == 0 goto NOSELF
     if explicit_check != 0 goto NOSELF
-	ptype = new Hash
-	ptype["type"] = 0x1C
-	ptype["byref"] = 0
-	annotate_reg_type(ptype)
-	push ptypes, ptype
+    ptype = new Hash
+    ptype["type"] = 0x1C
+    ptype["byref"] = 0
+    annotate_reg_type(ptype)
+    push ptypes, ptype
     this_offset = 1
 
     # Also generate MMD entry.
@@ -146,29 +146,29 @@ METHOD_END:
     pir_multi = concat self_ns
 NOSELF:
 
-	# Loop over parameters and produce list.
-	i = 0
-	pir_output = ""
+    # Loop over parameters and produce list.
+    i = 0
+    pir_output = ""
     pir_mmdunbox = ""
 PARAM:
-	if i >= param_count goto ENDPARAM
-	
-	# Emit first bit of PIR.
-	pir_output = concat "    .param "
-	
-	# Parameter type.
-	ptype = get_signature_RetType_or_Param(signature)
-	annotate_reg_type(ptype)
-	push ptypes, ptype
-	param_reg_type = ptype["reg_type_long"]
-	pir_output = concat param_reg_type
+    if i >= param_count goto ENDPARAM
+    
+    # Emit first bit of PIR.
+    pir_output = concat "    .param "
+    
+    # Parameter type.
+    ptype = get_signature_RetType_or_Param(signature)
+    annotate_reg_type(ptype)
+    push ptypes, ptype
+    param_reg_type = ptype["reg_type_long"]
+    pir_output = concat param_reg_type
 
-	# Emit argument name.
-	pir_output = concat " arg"
-	$I0 = i + this_offset
-	$S0 = $I0
-	pir_output = concat $S0
-	pir_output = concat "\n"
+    # Emit argument name.
+    pir_output = concat " arg"
+    $I0 = i + this_offset
+    $S0 = $I0
+    pir_output = concat $S0
+    pir_output = concat "\n"
 
     # Emit MMD info.
     if pir_multi == "" goto NOCOMMA
@@ -228,10 +228,10 @@ MMD_R4:
     pir_multi = concat "\"@@DOTNET_MMDBOX_R4\""
     goto MMD_DONE
 MMD_DONE:
-	
-	# Loop.
-	inc i
-	goto PARAM
+    
+    # Loop.
+    inc i
+    goto PARAM
 ENDPARAM:
 
     # If it's var arg, add slurply parameter too.
@@ -239,88 +239,88 @@ ENDPARAM:
     pir_output = concat ".param pmc varargs :slurpy\n"
 NOT_VARARG:
 
-	# Return stuff.
+    # Return stuff.
     pir_output = concat pir_mmdunbox
-	.return(rettype, ptypes, pir_output, pir_multi)
+    .return(rettype, ptypes, pir_output, pir_multi)
 .end
 
 
 # This translates the method's locals signature.
 .sub trans_method_locals
-	.param pmc assembly
-	.param pmc meth
-	.local int sig_pos, sig_type
-	.local string sig_data
-	.local pmc bc, signature, ex
-	.local int sig_type, count, i, type
-	.local string pir_output :unique_reg
+    .param pmc assembly
+    .param pmc meth
+    .local int sig_pos, sig_type
+    .local string sig_data
+    .local pmc bc, signature, ex
+    .local int sig_type, count, i, type
+    .local string pir_output :unique_reg
     .local string param_reg_type
-	.local pmc ltypes, ltype
+    .local pmc ltypes, ltype
 
-	pir_output = ""
-	ltypes = new .ResizablePMCArray
+    pir_output = ""
+    ltypes = new .ResizablePMCArray
 
-	# Get signature.
-	bc = meth.get_bytecode()
-	sig_pos = bc.get_locals_sig()
-	if sig_pos == 0 goto EXIT
-	sig_data = assembly.get_blob(sig_pos)
-	sig_type = find_type "DotNetSignature"
-	signature = new sig_type
-	signature = sig_data
+    # Get signature.
+    bc = meth.get_bytecode()
+    sig_pos = bc.get_locals_sig()
+    if sig_pos == 0 goto EXIT
+    sig_data = assembly.get_blob(sig_pos)
+    sig_type = find_type "DotNetSignature"
+    signature = new sig_type
+    signature = sig_data
 
-	# Ensure it's a local sig. XXX Right thing to do when it's not?
-	sig_type = signature.read_uint8()
-	if sig_type == 0x7 goto SIG_OK
+    # Ensure it's a local sig. XXX Right thing to do when it's not?
+    sig_type = signature.read_uint8()
+    if sig_type == 0x7 goto SIG_OK
     ex = new .Exception
     ex["_message"] = "Locals signature is not a locals signature."
     throw ex
 SIG_OK:
 
-	# Read locals count.
-	count = signature.read_compressed()
+    # Read locals count.
+    count = signature.read_compressed()
 
-	# Loop over local variabless.
-	i = 0
+    # Loop over local variabless.
+    i = 0
 LOCAL:
-	if i == count goto EXIT
+    if i == count goto EXIT
 
-	# Emit first bit of PIR.
-	pir_output = concat "    .local "
-	
-	# Parameter type.
-	ltype = get_signature_Local(signature)
-	annotate_reg_type(ltype)
-	push ltypes, ltype
-	param_reg_type = ltype["reg_type_long"]
-	pir_output = concat param_reg_type
+    # Emit first bit of PIR.
+    pir_output = concat "    .local "
+    
+    # Parameter type.
+    ltype = get_signature_Local(signature)
+    annotate_reg_type(ltype)
+    push ltypes, ltype
+    param_reg_type = ltype["reg_type_long"]
+    pir_output = concat param_reg_type
 
-	# Emit argument name.
-	pir_output = concat " local"
-	$S0 = i
-	pir_output = concat $S0
-	pir_output = concat "\n"
+    # Emit argument name.
+    pir_output = concat " local"
+    $S0 = i
+    pir_output = concat $S0
+    pir_output = concat "\n"
 
     # If it's a value type, need to instantiate it.
     type = ltype["type"]
     if type != 0x11 goto NOT_VT
     type = ltype["token"]
     pir_output = concat "local"
-	pir_output = concat $S0
-	pir_output = concat " = new "
+    pir_output = concat $S0
+    pir_output = concat " = new "
     ($P0, $S0) = class_info_from_sig(assembly, type)
     $S0 = namespace_to_key($S0)
     pir_output = concat $S0
     pir_output = concat "\n"
 NOT_VT:
-	
-	# Loop.
-	inc i
-	goto LOCAL
+    
+    # Loop.
+    inc i
+    goto LOCAL
 
-	# Return.
+    # Return.
 EXIT:
-	.return (ltypes, pir_output)
+    .return (ltypes, pir_output)
 .end
 
 

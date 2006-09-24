@@ -45,9 +45,9 @@
     .local pmc in_a, in_b
     .local string rtype
     .const int ELEMENT_TYPE_I8 = 0x0A
-	.const int ELEMENT_TYPE_U8 = 0x0B
-	.const int ELEMENT_TYPE_I = 0x18
-	.const int ELEMENT_TYPE_U = 0x19
+    .const int ELEMENT_TYPE_U8 = 0x0B
+    .const int ELEMENT_TYPE_I = 0x18
+    .const int ELEMENT_TYPE_U = 0x19
     .const int ELEMENT_TYPE_CLASS = 0x12
 
     # Get type hashes for inputs.

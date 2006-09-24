@@ -5,13 +5,13 @@
 
 # This sub is the way translation from .NET to PIR is started.
 .sub dotnet_to_pir
-	.param string filename
+    .param string filename
     .param int continue
     .param int standalone
     .param int trace
-	.local string pir_output, src, summary, tmp, emsg
-	.local pmc assembly, classes, class_order, type, e, entry_meth, entry_class
-	.local int is_dll, i, max_class, class_id, total_types, done_types
+    .local string pir_output, src, summary, tmp, emsg
+    .local pmc assembly, classes, class_order, type, e, entry_meth, entry_class
+    .local int is_dll, i, max_class, class_id, total_types, done_types
 
     # Instantiate a new assembly class.
     loadlib $P0, "dotnet"
@@ -25,14 +25,14 @@
     # Load the escaper library, which we will be using.
     load_bytecode "library/Data/Escape.pir"
 
-	# Initialize PIR output string.
-	pir_output = ""
+    # Initialize PIR output string.
+    pir_output = ""
 
     # Output HLL directive.
     pir_output = concat ".HLL 'dotnet', ''\n"
 
-	# Put in ops loader code.
-	pir_output = concat <<"PIR"
+    # Put in ops loader code.
+    pir_output = concat <<"PIR"
 .loadlib "dotnet_ops"
 .sub __LOAD_DOTNET_OPS :load
     loadlib $P0, "dotnet_runtime"
@@ -85,7 +85,7 @@ PIR
 .sub __FAKE_SYSTEM_OBJECT :load
     $I0 = find_type [ "System" ; "Object" ]
     if $I0 goto EXISTS
-	$P0 = newclass [ "System" ; "Object" ]
+    $P0 = newclass [ "System" ; "Object" ]
 EXISTS:
 .end
 .sub ".ctor" :method
@@ -99,7 +99,7 @@ NO_STANDALONE_CLASSES:
 .sub __FAKE_SYSTEM_EXCEPTION :load
     $I0 = find_type [ "System" ; "Exception" ]
     if $I0 goto EXISTS
-	$P0 = newclass [ "System" ; "Exception" ]
+    $P0 = newclass [ "System" ; "Exception" ]
 EXISTS:
 .end
 .sub ".ctor" :method
@@ -127,44 +127,44 @@ EXISTS:
 .sub __FAKE_SYSTEM_VALUETYPE :load
     $I0 = find_type [ "System" ; "ValueType" ]
     if $I0 goto EXISTS
-	$P0 = newclass [ "System" ; "ValueType" ]
+    $P0 = newclass [ "System" ; "ValueType" ]
 EXISTS:
 .end
 .namespace [ "System" ; "Enum" ]
 .sub __FAKE_SYSTEM_ENUM :load
     $I0 = find_type [ "System" ; "Enum" ]
     if $I0 goto EXISTS
-	$P0 = newclass [ "System" ; "Enum" ]
+    $P0 = newclass [ "System" ; "Enum" ]
 EXISTS:
 .end
 PIR
 
-	# Translate global stuff.
-	# XXX TODO: Translate globals.
+    # Translate global stuff.
+    # XXX TODO: Translate globals.
 
-	# Translate each class according to the ordering.
-	classes = assembly.get_classes()
+    # Translate each class according to the ordering.
+    classes = assembly.get_classes()
     class_order = assembly.get_class_order()
-	max_class = elements classes
-	i = 0
+    max_class = elements classes
+    i = 0
     total_types = 0
     done_types = 0
 CLOOP:
-	if i >= max_class goto CEND
+    if i >= max_class goto CEND
     inc total_types
     class_id = class_order[i]
-	type = classes[class_id]
+    type = classes[class_id]
     if continue == 0 goto NO_EH
     push_eh trans_failure_handler
 NO_EH:
-	src = trans_class(assembly, type, trace)
-	pir_output = concat src
+    src = trans_class(assembly, type, trace)
+    pir_output = concat src
     inc done_types
     if continue == 0 goto RESUME
     clear_eh
 RESUME:
-	inc i
-	goto CLOOP
+    inc i
+    goto CLOOP
 trans_failure_handler:
     .get_results (e, emsg)
     # Emit trace message.
@@ -177,13 +177,13 @@ NOTRACE:
     goto RESUME
 CEND:
 
-	# If it's an EXE, do entry point stuff.
+    # If it's an EXE, do entry point stuff.
     is_dll = assembly."is_dll"()
-	if is_dll > 0 goto ISEXE
+    if is_dll > 0 goto ISEXE
     src = pir_output
     entry_meth = assembly.get_entry_method()
     entry_class = entry_meth.get_class()
-	pir_output = ".sub __ENTRY_POINT\n__DO_IMPORTS()\n$P0 = get_hll_global \""
+    pir_output = ".sub __ENTRY_POINT\n__DO_IMPORTS()\n$P0 = get_hll_global \""
     tmp = entry_class.get_fullname()
     pir_output = concat tmp
     pir_output = concat "\", \""
@@ -204,8 +204,8 @@ ISEXE:
     summary = concat filename
     summary = concat "\n"
 
-	# Return output.
-	.return (pir_output, summary)
+    # Return output.
+    .return (pir_output, summary)
 .end
 
 
@@ -244,20 +244,20 @@ AR_LOOP_END:
 
 # This sub translates an individual class.
 .sub trans_class
-	.param pmc assembly
-	.param pmc class
+    .param pmc assembly
+    .param pmc class
     .param int trace
-	.local string pir_output, name, namespace, internal_name, tmp, p_name, name_key
-	.local pmc fields, field, methods, meth, ex, int_types, int_ids
-	.local int i, max_field, max_method, parent_id, parent_type
+    .local string pir_output, name, namespace, internal_name, tmp, p_name, name_key
+    .local pmc fields, field, methods, meth, ex, int_types, int_ids
+    .local int i, max_field, max_method, parent_id, parent_type
     .local int flags, is_interface, is_abstract, num_interfaces, done_init
 
     done_init = 0
-	
-	# Get class name and namespace and build combo of them.
-	name = class
-	namespace = class.get_namespace()
-	internal_name = class.get_fullname()
+    
+    # Get class name and namespace and build combo of them.
+    name = class
+    namespace = class.get_namespace()
+    internal_name = class.get_fullname()
 
     # Emit trace message.
     unless trace goto NOTRACE
@@ -266,19 +266,19 @@ AR_LOOP_END:
     printerr "\n"
 NOTRACE:
 
-	# Emit a namespace directive.
+    # Emit a namespace directive.
     name_key = namespace_to_key(internal_name)
-	pir_output = concat ".namespace "
-	pir_output = concat name_key
-	pir_output = concat "\n\n"
+    pir_output = concat ".namespace "
+    pir_output = concat name_key
+    pir_output = concat "\n\n"
 
-	# Emit start of on load type setup.
-	pir_output = concat ".sub \"__onload\" :load\n"
+    # Emit start of on load type setup.
+    pir_output = concat ".sub \"__onload\" :load\n"
     pir_output = concat "    .local pmc type, parent\n"
     pir_output = concat "     push_eh FAILED\n" # XXX Ignoring missing parents
-	pir_output = concat "    type = newclass "
-	pir_output = concat name_key
-	pir_output = concat "\n"
+    pir_output = concat "    type = newclass "
+    pir_output = concat name_key
+    pir_output = concat "\n"
 
     # Add any interfaces that this class implements.
     int_types = class.get_interface_types()
@@ -304,17 +304,17 @@ END_INT_LOOP:
     pir_output = concat tmp
 NO_PARENT:
 
-	# Emit field list.
-	fields = class.get_fields()
-	max_field = elements fields
+    # Emit field list.
+    fields = class.get_fields()
+    max_field = elements fields
     i = 0
 FLOOP:
-	if i >= max_field goto FEND
+    if i >= max_field goto FEND
     field = fields[i]
-	tmp = trans_field(assembly, class, field)
-	pir_output = concat tmp
-	inc i
-	goto FLOOP
+    tmp = trans_field(assembly, class, field)
+    pir_output = concat tmp
+    inc i
+    goto FLOOP
 FEND:
 
     # Add code to run constructor.
@@ -324,8 +324,8 @@ FEND:
     pir_output = concat tmp
     pir_output = concat ", \".cctor\"\n$P0()\n"
 
-	# This is the end of the on load type setup sub.
-	pir_output = concat "FAILED:\n.end\n\n"
+    # This is the end of the on load type setup sub.
+    pir_output = concat "FAILED:\n.end\n\n"
 
     # If it's an interface, emit code to prevent it being instantiated.
     flags = class.get_flags()
@@ -381,21 +381,21 @@ VAL_TYPE:
     done_init = 1
 NOT_VAL_TYPE:
 
-	# Emit methods.
-	methods = class.get_methods()
-	max_method = elements methods
+    # Emit methods.
+    methods = class.get_methods()
+    max_method = elements methods
     i = 0
 MLOOP:
-	if i >= max_method goto MEND
+    if i >= max_method goto MEND
     meth = methods[i]
-	tmp = trans_method(assembly, class, meth, 1, trace)
-	pir_output = concat tmp
-	inc i
-	goto MLOOP
+    tmp = trans_method(assembly, class, meth, 1, trace)
+    pir_output = concat tmp
+    inc i
+    goto MLOOP
 MEND:
 
-	# Return PIR that was generated.
-	.return (pir_output)
+    # Return PIR that was generated.
+    .return (pir_output)
 .end
 
 
@@ -448,26 +448,26 @@ PARENT_DONE:
 
 # This translates a field into an addattribute op.
 .sub trans_field
-	.param pmc assembly
-	.param pmc class
-	.param pmc field
+    .param pmc assembly
+    .param pmc class
+    .param pmc field
     .local int flags, static
-	.local string pir_output, name
+    .local string pir_output, name
 
     # Check it's an instance field.
     flags = field.get_flags()
     static = band flags, 0x10
     if static != 0 goto STATIC
 
-	# Generate add attribute instruction provided it's an instance field.
-	name = field
-	pir_output = "    addattribute type, \""
-	pir_output = concat name
-	pir_output = concat "\"\n"
-	
-	# Return generated string.
+    # Generate add attribute instruction provided it's an instance field.
+    name = field
+    pir_output = "    addattribute type, \""
+    pir_output = concat name
+    pir_output = concat "\"\n"
+    
+    # Return generated string.
 STATIC:
-	.return (pir_output)
+    .return (pir_output)
 .end
 
 
@@ -480,16 +480,16 @@ STATIC:
     .local int i, sig_id, type, flags, static
     .local string pir_output, init_body, clone_body, name, sig_data
     .const int ELEMENT_TYPE_I1 = 0x04
-	.const int ELEMENT_TYPE_U1 = 0x05
-	.const int ELEMENT_TYPE_I2 = 0x06
-	.const int ELEMENT_TYPE_U2 = 0x07
-	.const int ELEMENT_TYPE_I4 = 0x08
-	.const int ELEMENT_TYPE_U4 = 0x09
-	.const int ELEMENT_TYPE_R4 = 0x0C
-	.const int ELEMENT_TYPE_R8 = 0x0D
-	.const int ELEMENT_TYPE_I = 0x18
-	.const int ELEMENT_TYPE_U = 0x19
-	.const int ELEMENT_TYPE_VALUETYPE = 0x11
+    .const int ELEMENT_TYPE_U1 = 0x05
+    .const int ELEMENT_TYPE_I2 = 0x06
+    .const int ELEMENT_TYPE_U2 = 0x07
+    .const int ELEMENT_TYPE_I4 = 0x08
+    .const int ELEMENT_TYPE_U4 = 0x09
+    .const int ELEMENT_TYPE_R4 = 0x0C
+    .const int ELEMENT_TYPE_R8 = 0x0D
+    .const int ELEMENT_TYPE_I = 0x18
+    .const int ELEMENT_TYPE_U = 0x19
+    .const int ELEMENT_TYPE_VALUETYPE = 0x11
 
     # The __init method needs to zero or null out any attributes.
     # The __clone method needs to clone each attribute.
