@@ -12,11 +12,12 @@ t/library/pg.t  -- Postgres Tests
 
 =head1 DESCRIPTION
 
-Test Parrot's libpg interface.
+Test Parrot's libpg interface. The test is using the user's default
+table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 1
+.const int N_TESTS = 4
 
 .sub main :main
     load_bytecode 'Test/Builder.pir'
@@ -26,6 +27,14 @@ Test Parrot's libpg interface.
     load_bytecode 'postgres.pir'
     test.'plan'(N_TESTS)
     test.'ok'(1, 'load_bytecode')
+    load_bytecode 'Pg.pir'
+    test.'ok'(1, 'load_bytecode Pg')
+    .local pmc cl, con, res
+    cl = getclass 'Pg'
+    test.'ok'(1, 'Pg class exists')
+    res = cl.'connectdb'('')           # assume table = user is present
+    $I0 = isa res, ['Pg'; 'Conn']
+    test.'ok'($I0, 'conn isa Pg;Conn')
     test.'finish'()
     end
 no_pg:	
