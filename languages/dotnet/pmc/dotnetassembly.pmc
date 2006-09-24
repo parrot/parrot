@@ -1597,7 +1597,8 @@ static void sort_classes(Interp *INTERP, struct dotnet_assembly *ass)
 
             /* Checked inherited class parent type is not a reference or is
                in the list already. */
-            if (type->parent_type == 0 && !class_flags[type->parent_id - 2])
+            if (type->parent_id != 0 && type->parent_type == 0 && 
+                !class_flags[type->parent_id - 2])
             {
                 have_all_parents = 0;
             }
@@ -1633,10 +1634,12 @@ static void sort_classes(Interp *INTERP, struct dotnet_assembly *ass)
     }
 
     /* If we iternated num_classes + 1 times, we failed to complete the sort.
-       Throw our toys out of the pram. Oh, and an exception. */
-    if (iters == num_classes + 1)
+       Throw our toys out of the pram. Oh, and an exception. Also do this if
+       we did not order all classes. */
+    if (iters == num_classes + 1 || done != num_classes)
         real_exception(INTERP, NULL, E_StandardError, 
             "Unable to order inheritance/interfaces.");
+    
 
     /* Put sorted list in place. */
     ass->class_order = target_list;
@@ -1797,7 +1800,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
     {
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
-		PMC_struct_val(SELF) = NULL;
+        PMC_struct_val(SELF) = NULL;
     }
 
 
