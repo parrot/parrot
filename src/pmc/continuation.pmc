@@ -324,6 +324,7 @@ destination to continue execution.
         CONTEXT(INTERP->ctx) = to_ctx;
         INTERP->ctx.bp = to_ctx->bp;
         INTERP->ctx.bp_ps = to_ctx->bp_ps;
+	to_ctx->control_stack = stack_target;
         if (ret_continuation_p) {
             /* RetContinuation arg passing is handled elsewhere. */
             return pc;

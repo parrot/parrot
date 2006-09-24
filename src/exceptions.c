@@ -322,8 +322,9 @@ pop_exception(Interp * interpreter)
         stack_peek(interpreter,
                    CONTEXT(interpreter->ctx)->control_stack, &type);
 
-    if (type != STACK_ENTRY_PMC ||
-            handler->vtable->base_type != enum_class_Exception_Handler) {
+    if (! handler
+            || type != STACK_ENTRY_PMC
+            || handler->vtable->base_type != enum_class_Exception_Handler) {
         real_exception(interpreter, NULL, E_RuntimeError,
                 "No exception to pop.");
     }

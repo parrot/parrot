@@ -181,7 +181,6 @@ tag 'all' is allowed for todo tests that should fail on any system
     $P1[0] = 'sprintf error'
     throw $P1
   sprintf_ok:
-    clear_eh
 
     if expected == actual goto is_ok
     goto is_nok
