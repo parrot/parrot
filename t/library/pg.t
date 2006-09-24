@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 4
+.const int N_TESTS = 7
 
 .sub main :main
     load_bytecode 'Test/Builder.pir'
@@ -32,9 +32,16 @@ table, which should be created by your sysadmin.
     .local pmc cl, con, res
     cl = getclass 'Pg'
     test.'ok'(1, 'Pg class exists')
-    res = cl.'connectdb'('')           # assume table = user is present
-    $I0 = isa res, ['Pg'; 'Conn']
-    test.'ok'($I0, 'conn isa Pg;Conn')
+    con = cl.'connectdb'('')           # assume table = user is present
+    $I0 = isa con, ['Pg'; 'Conn']
+    test.'ok'($I0, 'con isa Pg;Conn')
+    $I0 = istrue con
+    test.'ok'($I0, 'con is true after connect')
+# TODO
+    con.'finish'()
+    test.'ok'(1, 'con.finish()')
+    $I0 = isfalse con
+    test.'ok'($I0, 'con is false after finish')
     test.'finish'()
     end
 no_pg:	

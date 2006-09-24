@@ -52,6 +52,7 @@ A class method that returns a new connection object.
     con = connectdb(args)
     $I0 = find_type ['Pg';'Conn']
     o_con = new  $I0, con
+    # TODO verify success
     .return (o_con)
 .end
 
@@ -71,3 +72,31 @@ Takes a C<PGconn> structure as argument and returns a Pg;Conn object.
     .param pmc con
     setattribute self, 'con', con
 .end
+
+.sub __get_bool :method
+    .local pmc con
+    con = getattribute self, 'con'
+    $I0 = typeof con
+    $I1 = isne $I0, .Undef
+    .return ($I1)
+.end
+
+=item finish()
+
+Finish the connection. The connection attribute is set to .undef
+thereafter and inaccessible then.
+
+=cut
+
+.sub 'finish' :method
+    .local pmc con, finish
+    con = getattribute self, 'con'
+    # XXX this really is looking ugly
+    # XXX and what happens if Pg is loaded from another HLL?
+    finish = get_root_global ['parrot';'Pg'], 'PQfinish'
+    finish(con)
+    con = new .Undef
+    setattribute self, 'con', con
+.end
+
+
