@@ -797,7 +797,7 @@ inline op net_conv_i2(out INT, in INT) :base_core {
 }
 
 inline op net_conv_i2(out INT, in NUM) :base_core {
-	$1 = (Parrot_Int2) $2;
+	$1 = (Parrot_Int2) ((Parrot_Int4) $2);
 	goto NEXT();
 }
 
