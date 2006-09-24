@@ -63,16 +63,16 @@ dlfunc $P2, $P1, 'PQuntrace', 'vp'
 store_global 'PostgreSQL::PQuntrace', $P2
 dlfunc $P2, $P1, 'PQexec', 'ppt'
 store_global 'PostgreSQL::PQexec', $P2
-dlfunc $P2, $P1, 'PQexecParams', 'pptiLTLLi'
-store_global 'PostgreSQL::PQexecParams', $P2
-dlfunc $P2, $P1, 'PQexecPrepared', 'pptit33i'
-store_global 'PostgreSQL::PQexecPrepared', $P2
+# TODO dlfunc $P2, $P1, 'PQexecParams', 'pptippppi'
+# TODO store_global 'PostgreSQL::PQexecParams', $P2
+# TODO dlfunc $P2, $P1, 'PQexecPrepared', 'pptit33i'
+# TODO store_global 'PostgreSQL::PQexecPrepared', $P2
 dlfunc $P2, $P1, 'PQsendQuery', 'ipt'
 store_global 'PostgreSQL::PQsendQuery', $P2
-dlfunc $P2, $P1, 'PQsendQueryParams', 'iptiit33i'
-store_global 'PostgreSQL::PQsendQueryParams', $P2
-dlfunc $P2, $P1, 'PQsendQueryPrepared', 'iptit33i'
-store_global 'PostgreSQL::PQsendQueryPrepared', $P2
+# TODO dlfunc $P2, $P1, 'PQsendQueryParams', 'iptiit33i'
+# TODO store_global 'PostgreSQL::PQsendQueryParams', $P2
+# TODO dlfunc $P2, $P1, 'PQsendQueryPrepared', 'iptit33i'
+# TODO store_global 'PostgreSQL::PQsendQueryPrepared', $P2
 dlfunc $P2, $P1, 'PQgetResult', 'pp'
 store_global 'PostgreSQL::PQgetResult', $P2
 dlfunc $P2, $P1, 'PQisBusy', 'ip'
@@ -181,7 +181,7 @@ dlfunc $P2, $P1, 'lo_export', 'ipit'
 store_global 'PostgreSQL::lo_export', $P2
 dlfunc $P2, $P1, 'PQmblen', 'iti'
 store_global 'PostgreSQL::PQmblen', $P2
-dlfunc $P2, $P1, 'PQenv2encoding', 'iv'
+dlfunc $P2, $P1, 'PQenv2encoding', 'i'
 store_global 'PostgreSQL::PQenv2encoding', $P2
 
 .pcc_begin_return
