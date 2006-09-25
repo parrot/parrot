@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Pg.pir - OO interface to libgp
+Pg.pir - OO interface to libpg
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,7 @@ is_ok:
 
 =item __init(con)
 
-Takes a C<PGconn> structure as argument and returns a Pg;Conn object.
+Object initializer. Takes a C<PGconn> structure.
 
 =cut
 
@@ -136,15 +136,22 @@ Execute the SQL command and return a Pg;Result object.
 
 =cut
 
-.sub 'exec' :method
-    .param string cmd
-    .local pmc con, exec, res, o_res
-    con = getattribute self, 'con'
-    exec = get_root_global ['parrot';'Pg'], 'PQexec'
-    res = exec(con, cmd)
+# result creation helper
+.sub mk_res
+    .param pmc res
+    .local pmc o_res
     $I0 = find_type ['Pg';'Result']
     o_res = new $I0, res
     .return (o_res)
+.end
+
+.sub 'exec' :method
+    .param string cmd
+    .local pmc con, exec, res
+    con = getattribute self, 'con'
+    exec = get_root_global ['parrot';'Pg'], 'PQexec'
+    res = exec(con, cmd)
+    .return mk_res(res)
 .end
 
 .include "datatypes.pasm"
@@ -152,7 +159,7 @@ Execute the SQL command and return a Pg;Result object.
 =item res = con.'execParams'(str, val, ...)
 
 Execute the SQL command and return a Pg;Result object. All values
-are considered being text - there's no provision to usae binary data.
+are considered being text - there's no provision to use binary data.
 
 =cut
 
@@ -162,7 +169,6 @@ are considered being text - there's no provision to usae binary data.
     .local int i, n
     .local pmc str, vals
     n = elements values
-    # we don't handle binary
     str = new .OrderedHash
     push str, .DATATYPE_CSTR
     push str, n
@@ -183,16 +189,15 @@ done:
 .sub 'execParams' :method
     .param string cmd
     .param pmc values  :slurpy
-    .local pmc con, exec, res, o_res, nil, vals
+    .local pmc con, exec, res, nil, vals
     .local int n
     con = getattribute self, 'con'
     exec = get_root_global ['parrot';'Pg'], 'PQexecParams'
     nil = new .ManagedStruct
     (n, vals) = mk_struct(values)
+    # we don't handle binary
     res = exec(con, cmd, n, nil, vals, nil, nil, 0)
-    $I0 = find_type ['Pg';'Result']
-    o_res = new $I0, res
-    .return (o_res)
+    .return mk_res(res)
 .end
 
 =item res = con.'prepare'(name, query, nparams)
@@ -205,35 +210,31 @@ Prepare a query for execution with B<execPrepared>
     .param string name
     .param string query
     .param int nparams
-    .local pmc con, f, res, o_res, nil
+    .local pmc con, f, res, nil
     con = getattribute self, 'con'
     f = get_root_global ['parrot';'Pg'], 'PQprepare'
     nil = new .ManagedStruct
     res = f(con, name, query, nparams, nil)
-    $I0 = find_type ['Pg';'Result']
-    o_res = new $I0, res
-    .return (o_res)
+    .return mk_res(res)
 .end
 
 =item res = con.'execPrepared'(name, val, ...)
 
-Execute a prepated query.
+Execute a prepared query.
 
 =cut
 
 .sub 'execPrepared' :method
     .param string name
     .param pmc values :slurpy
-    .local pmc con, f, res, o_res, nil, vals
+    .local pmc con, f, res, nil, vals
     .local int n
     con = getattribute self, 'con'
     f = get_root_global ['parrot';'Pg'], 'PQexecPrepared'
     nil = new .ManagedStruct
     (n, vals) = mk_struct(values)
     res = f(con, name, n, vals, nil, nil, 0)
-    $I0 = find_type ['Pg';'Result']
-    o_res = new $I0, res
-    .return (o_res)
+    .return mk_res(res)
 .end
 
 =item $P0 = con.'setNoticeReceiver'(cb, arg)
@@ -270,7 +271,7 @@ Install a notice receiver callback. The callback will be called as
 
 =item __init(res)
 
-Takes a C<PGresult> structure as argument and returns a Pg;Result object.
+Object initializer. Takes a C<PGresult> structure.
 
 =cut
 
