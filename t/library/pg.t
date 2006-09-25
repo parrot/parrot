@@ -17,11 +17,14 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 8
+.const int N_TESTS = 12
 
 ## XXX
 ## .include 'postgres.pasm'
 .const int CONNECTION_OK = 0
+
+.const int PGRES_COMMAND_OK = 1
+.const int PGRES_TUPLES_OK = 2
 
 .sub main :main
     load_bytecode 'Test/Builder.pir'
@@ -46,7 +49,19 @@ table, which should be created by your sysadmin.
     $I0 = con.'status'()
     $I1 = iseq $I0, CONNECTION_OK 
     test.'ok'($I1, 'con.status() == CONNECTION_OK ')
+    res = con.'exec'('BEGIN')
+    test.'ok'(1, 'exec BEGIN called')
+    $I0 = isa res, ['Pg'; 'Result']
+    test.'ok'($I0, 'res isa Pg;Result')
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'res.resultStatus() == PGRES_COMMAND_OK ')
+    res.'clear'()
 # TODO
+    res = con.'exec'('ABORT')
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'ABORT succeeded')
     con.'finish'()
     test.'ok'(1, 'con.finish()')
     $I0 = isfalse con

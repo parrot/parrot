@@ -34,6 +34,9 @@ See F<libpg> for details.
     # XXX the hasa 'con' is suboptimal
     cl = newclass ['Pg'; 'Conn']  # Pg connection class
     addattribute cl, 'con'
+
+    cl = newclass ['Pg'; 'Result']  # Pg Result class
+    addattribute cl, 'res'
 .end
 
 =head2 Connection Construction
@@ -92,7 +95,7 @@ Takes a C<PGconn> structure as argument and returns a Pg;Conn object.
     .return ($I1)
 .end
 
-=item status()
+=item $I0 = con.'status'()
 
 Return the connection status.
 
@@ -106,7 +109,7 @@ Return the connection status.
     .return ($I0)
 .end
 
-=item finish()
+=item con.'finish'()
 
 Finish the connection. The connection attribute is set to .undef
 thereafter and inaccessible then.
@@ -124,4 +127,77 @@ thereafter and inaccessible then.
     setattribute self, 'con', con
 .end
 
+=item res = con.'exec'(str)
 
+Execute the SQL command and return a Pg;Result object.
+
+=cut
+
+.sub 'exec' :method
+    .param string cmd
+    .local pmc con, exec, res, o_res
+    con = getattribute self, 'con'
+    exec = get_root_global ['parrot';'Pg'], 'PQexec'
+    res = exec(con, cmd)
+    $I0 = find_type ['Pg';'Result']
+    o_res = new $I0, res
+    .return (o_res)
+.end
+
+=back
+
+=cut
+
+.namespace ['Pg'; 'Result']
+
+=head2 Result Methods
+
+=over
+
+=item __init(res)
+
+Takes a C<PGresult> structure as argument and returns a Pg;Result object.
+
+=cut
+
+.sub __init :method
+    .param pmc res
+    setattribute self, 'res', res
+.end
+
+=item $I0 = res.'resultStatus'()
+
+Return the status of the result.
+
+=cut
+
+.sub 'resultStatus' :method
+    .local pmc res, st
+    res = getattribute self, 'res'
+    st = get_root_global ['parrot';'Pg'], 'PQresultStatus'
+    $I0 = st(res)
+    .return ($I0)
+.end
+
+=item res.'clear'()
+
+Clear the result structure.
+
+XXX TODO this should be an object finalizer XXX
+
+=cut
+
+.sub 'clear' :method
+    .local pmc res, clear
+    res = getattribute self, 'res'
+    clear = get_root_global ['parrot';'Pg'], 'PQclear'
+    clear(res)
+    null res
+    setattribute self, 'res', res
+.end
+
+
+
+=back
+
+=cut
