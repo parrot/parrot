@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Pg.pir - OO interface to libpg
+Pg.pir - OO interface to libpq
 
 =head1 SYNOPSIS
 
@@ -18,9 +18,9 @@ Pg.pir - OO interface to libpg
 
 =head1 DESCRIPTION
 
-The Pg library provides an OO interface to libpg functions.
+The Pg library provides an OO interface to libpq functions.
 
-See F<libpg> for details.
+See F<libpq> for details.
 
 =cut
 
