@@ -190,5 +190,7 @@ store_global 'PQmblen', $P2
 dlfunc $P2, $P1, 'PQenv2encoding', 'i'
 store_global 'PQenv2encoding', $P2
 
+dlfunc $P2, $P1, 'PQsetNoticeReceiver', 'pppP'
+store_global 'PQsetNoticeReceiver', $P2
 .end
 

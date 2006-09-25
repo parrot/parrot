@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 21
+.const int N_TESTS = 22
 
 ## XXX
 ## .include 'postgres.pasm'
@@ -57,6 +57,9 @@ table, which should be created by your sysadmin.
     $I1 = iseq $I0, PGRES_COMMAND_OK
     test.'ok'($I1, 'res.resultStatus() == PGRES_COMMAND_OK ')
     res.'clear'()
+    # install a notice receiver to silent the CREATE
+    .const .Sub cb = 'notice'
+    $P0 = con.'setNoticeReceiver'(cb, test)
     # create a temp table
     res = con.'exec'(<<'EOT')
 CREATE TEMP TABLE parrot_tbl (
@@ -127,3 +130,10 @@ no_pg:
     test.'finish'()
 .end
 
+# notice receiver callback function
+.sub 'notice'
+    .param pmc test
+    .param pmc res
+    test.'ok'(1, 'notice receiver called')
+    # res ought to be a PGresult struct
+.end

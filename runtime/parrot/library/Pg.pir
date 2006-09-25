@@ -144,6 +144,28 @@ Execute the SQL command and return a Pg;Result object.
     .return (o_res)
 .end
 
+=item $P0 = con.'setNoticeReceiver'(cb, arg)
+
+Install a notice receiver callback. The callback will be called as
+
+  .sub 'notice'
+    .param pmc arg
+    .param pmc res
+    
+
+=cut
+
+.sub 'setNoticeReceiver' :method
+    .param pmc the_sub
+    .param pmc arg
+    .local pmc con, cb, f
+    cb = new_callback the_sub, arg, "vUp"
+    f = get_root_global ['parrot';'Pg'], 'PQsetNoticeReceiver'
+    con = getattribute self, 'con'
+    $P0 = f(con, cb, arg)
+    .return ($P0)
+.end
+
 =back
 
 =cut

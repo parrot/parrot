@@ -261,6 +261,7 @@ p	ptii33i
 p	ptit33i
 i	ptit33i
 i	ptiit33i
+p       ppP
 
 # The following are used by library/pcre.pir
 p	tiB3P
