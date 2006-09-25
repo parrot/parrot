@@ -62,6 +62,11 @@ table, which should be created by your sysadmin.
     $I0 = res.'resultStatus'()
     $I1 = iseq $I0, PGRES_COMMAND_OK
     test.'ok'($I1, 'ABORT succeeded')
+    null res
+    # this calls __finalize, but there isn't a good way to test this
+    # because any references to the object would prevent destruction
+    #'
+    sweep 1
     con.'finish'()
     test.'ok'(1, 'con.finish()')
     $I0 = isfalse con

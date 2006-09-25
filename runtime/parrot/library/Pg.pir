@@ -163,6 +163,30 @@ Takes a C<PGresult> structure as argument and returns a Pg;Result object.
 .sub __init :method
     .param pmc res
     setattribute self, 'res', res
+    need_finalize self
+.end
+
+=item __finalize()
+
+Object finalizer. Calls self.'clear'().
+
+=cut
+
+.sub __finalize :method
+    self.'clear'()
+.end
+
+=item r = res.'PGresult'()
+
+Return the raw PGresult structure. You probably don't need this
+function.
+
+=cut
+
+.sub PGresult :method
+    .local pmc res
+    res = getattribute self, 'res'
+    return (res)
 .end
 
 =item $I0 = res.'resultStatus'()
@@ -181,19 +205,21 @@ Return the status of the result.
 
 =item res.'clear'()
 
-Clear the result structure.
-
-XXX TODO this should be an object finalizer XXX
+Clear the result structure. You don't have to explicitely call this
+method. If a result object is no longer alive, the GC will call
+__finalize(), which wil clear the object.
 
 =cut
 
 .sub 'clear' :method
     .local pmc res, clear
     res = getattribute self, 'res'
+    if null res goto done
     clear = get_root_global ['parrot';'Pg'], 'PQclear'
     clear(res)
     null res
     setattribute self, 'res', res
+done:
 .end
 
 

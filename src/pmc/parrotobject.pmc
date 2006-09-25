@@ -59,6 +59,45 @@ C<Parrot_instantiate_object()>.
 
 /*
 
+=item C<void destroy()>
+
+Call the '__finalize' method if it exists.
+
+=cut
+
+*/
+
+    void destroy() {
+        PMC* class;
+        PMC* meth, *ns;
+        STRING* fin;
+
+        /* XXX have a better way to check for dead objects or classes
+         */
+        if ((UINTVAL)SELF->vtable == 0xdeadbeef)
+            return;
+        class = SELF->vtable->class;
+        if ((UINTVAL)class->vtable == 0xdeadbeef)
+            return;
+        if (PObj_get_FLAGS(SELF) & PObj_need_finalize_FLAG) {
+            fin = CONST_STRING(INTERP, "__finalize");
+            ns = VTABLE_namespace(interpreter, class);
+            meth = VTABLE_get_pmc_keyed_str(interpreter, ns, fin);
+            if (!PMC_IS_NULL(meth)) {
+                /*
+                   TODO
+                   - catch exceptions
+                   - run some safe mode
+                 */
+                Parrot_run_meth_fromc_args(interpreter, meth, 
+                        SELF, fin, "v");
+            }
+        }
+        SUPER();
+    }
+
+/*
+
 =item C<STRING *name()>
 
 Shortcut for .class().name()

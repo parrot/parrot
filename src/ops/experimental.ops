@@ -454,6 +454,21 @@ op add_io_event(invar PMC, invar PMC, invar PMC, inconst INT) {
     Parrot_event_add_io_event(interpreter, $1, $2, $3, $4);
     goto NEXT();
 }
+
+=item B<need_finalize(invar PMC)
+
+The ParrotObject $1 needs the __finalize method during GC.
+
+=cut
+
+op need_finalize(invar PMC) {
+    PMC* pmc = $1;
+    if (PObj_is_object_TEST(pmc)) {
+	PObj_get_FLAGS(pmc) |= PObj_need_finalize_FLAG;
+    }
+    goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

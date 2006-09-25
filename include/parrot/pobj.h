@@ -260,8 +260,8 @@ typedef enum PObj_enum {
      * array of PObjs
      */
     PObj_data_is_PMC_array_FLAG = 1 << 24,
-    /* unused */
-    PObj_is_unused_ptr_FLAG = 1 << 25,
+    /* call object finalizer */
+    PObj_need_finalize_FLAG = 1 << 25,
     /* a PMC that needs special handling in DOD, i.e one that has either:
      * - metadata
      * - data_is_PMC_array_FLAG
