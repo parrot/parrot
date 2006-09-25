@@ -7,11 +7,14 @@ Pg.pir - OO interface to libgp
 
 =head1 SYNOPSIS
 
-  .local pmc pg, conn, res
+  .local pmc pg, con, res
   pg = getclass 'Pg'
-  conn = pg.'connectdb'('dbname = db')
-  res = conn.'exec'('SELECT * from tab')
-  # TODO
+  con = pg.'connectdb'('dbname = db')
+  res = con.'exec'('SELECT * from tab')
+  n = res.'ntuples'()
+  m = res.'nfields'()
+  ...
+  val = res.'getvalue'(i, j)
 
 =head1 DESCRIPTION
 
@@ -43,7 +46,7 @@ See F<libpg> for details.
 
 =over
 
-=item Pg::connectdb('var=val var=val ...')
+=item con = Pg::connectdb('var=val var=val ...')
 
 A class method that returns a new connection object.
 
@@ -149,7 +152,7 @@ Execute the SQL command and return a Pg;Result object.
 =item res = con.'execParams'(str, val, ...)
 
 Execute the SQL command and return a Pg;Result object. All values
-are considered as text - there's no provision to usae binary data.
+are considered being text - there's no provision to usae binary data.
 
 =cut
 
