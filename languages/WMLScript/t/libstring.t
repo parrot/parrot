@@ -21,7 +21,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 24;
 use Test::More;
 
 language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.length');
@@ -400,6 +400,126 @@ My
 2
 OUT
 
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.removeAt');
+extern function main()
+{
+    var a = "A A; B C D";
+    var s = " ";
+    var b = String.removeAt(a, 1, s);
+    Console.println(b);
+    Console.println(typeof b);
+
+    var c = String.removeAt(a, 0, ";");
+    Console.println(c);
+    Console.println(typeof c);
+
+    var d = String.removeAt(a, 14, ";");
+    Console.println(d);
+    Console.println(typeof d);
+}
+CODE
+A B C D
+2
+ B C D
+2
+A A
+2
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.replaceAt');
+extern function main()
+{
+    var a = "B C; E";
+    var s = " ";
+    var b = String.replaceAt(a, "A", 0, s);
+    Console.println(b);
+    Console.println(typeof b);
+
+    var c = String.replaceAt(a, "F", 5, ";");
+    Console.println(c);
+    Console.println(typeof c);
+}
+CODE
+A C; E
+2
+B C;F
+2
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.insertAt');
+extern function main()
+{
+    var a = "B C; E";
+    var s = " ";
+    var b = String.insertAt(a, "A", 0, s);
+    Console.println(b);
+    Console.println(typeof b);
+
+    var c = String.insertAt(a, "X", 3, s);
+    Console.println(c);
+    Console.println(typeof c);
+
+    var d = String.insertAt(a, "D", 1, ";");
+    Console.println(d);
+    Console.println(typeof d);
+
+    var e = String.insertAt(a, "F", 5, ";");
+    Console.println(e);
+    Console.println(typeof e);
+}
+CODE
+A B C; E
+2
+B C; E X
+2
+B C;D; E
+2
+B C; E;F
+2
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.squeeze');
+extern function main()
+{
+    var a = "Hello";
+    var b = " Bye   Jon . \r\n See you!  ";
+
+    var c = String.squeeze(a);
+    Console.println(c);
+    Console.println(typeof c);
+
+    var d = String.squeeze(b);
+    Console.println(d);
+    Console.println(typeof d);
+}
+CODE
+Hello
+2
+ Bye Jon . See you! 
+2
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.trim');
+extern function main()
+{
+    var a = "Hello";
+    var b = " Bye   Jon .  See you!  ";
+
+    var c = String.trim(a);
+    Console.println(c);
+    Console.println(typeof c);
+
+    var d = String.trim(b);
+    Console.println(d);
+    Console.println(typeof d);
+}
+CODE
+Hello
+2
+Bye   Jon .  See you!
+2
+OUT
+
 language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.compare');
 extern function main()
 {
@@ -471,6 +591,70 @@ str
 3.14
 2
 invalid
+2
+OUT
+
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.format');
+extern function main()
+{
+    var a = 45;
+    var b = -45;
+    var c = "now";
+    var d = 1.2345678;
+    var e = String.format("e: %6d", a);
+    Console.println(e);
+    Console.println(typeof e);
+
+    var f = String.format("%6d", b);
+    Console.println(f);
+    Console.println(typeof f);
+
+    var g = String.format("%6.4d", a); // g = "  0045"
+//    Console.println(g);
+//    Console.println(typeof g);
+
+    var h = String.format("%6.4d", b); // h = " -0045"
+//    Console.println(h);
+//    Console.println(typeof h);
+
+    var i = String.format("Do it %s", c);
+    Console.println(i);
+    Console.println(typeof i);
+
+    var j = String.format("%3f", d); // j = "1.2345678"
+//    Console.println(j);
+//    Console.println(typeof j);
+
+    var k = String.format("%10.2f%%", d);
+    Console.println(k);
+    Console.println(typeof k);
+
+//    var l = String.format("%3f %2f.", d); // l = "1.234568 ."
+//    Console.println(l);
+//    Console.println(typeof l);
+
+    var m = String.format("%.0d", 0); // m = ""
+//    Console.println(m);
+//    Console.println(typeof m);
+
+    var n = String.format("%7d", "Int"); // n = invalid
+//    Console.println(n);
+//    Console.println(typeof n);
+
+    var o = String.format("%s", true); // o = "true"
+    Console.println(o);
+    Console.println(typeof o);
+}
+CODE
+e:     45
+2
+   -45
+2
+Do it now
+2
+      1.23%
+2
+true
 2
 OUT
 
