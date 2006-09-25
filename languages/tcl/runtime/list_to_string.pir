@@ -84,7 +84,7 @@ escape:
   $P0.'replace'("\n", '\n')
   $P0.'replace'("\r", '\r')
   $P0.'replace'("\v", '\v')
-  $P0.'replace'(';', '\:')
+  $P0.'replace'(';', '\;')
   $P0.'replace'('$', '\$')
   $P0.'replace'('}', '\}')
   $P0.'replace'('{', '\{')
