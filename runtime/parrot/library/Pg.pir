@@ -226,6 +226,14 @@ done:
 
 Return the amount of tuples in the result.
 
+=item $I0 = res.'nfields'()
+
+Return the amount of fields in the result.
+
+=item $S0 = res.'fname'(c)
+
+Return the name of the c-th field in the result.
+
 =cut
 
 .sub 'ntuples' :method
@@ -234,6 +242,23 @@ Return the amount of tuples in the result.
     nt = get_root_global ['parrot';'Pg'], 'PQntuples'
     $I0 = nt(res)
     .return ($I0)
+.end
+
+.sub 'nfields' :method
+    .local pmc res, nf
+    res = getattribute self, 'res'
+    nf = get_root_global ['parrot';'Pg'], 'PQnfields'
+    $I0 = nf(res)
+    .return ($I0)
+.end
+
+.sub 'fname' :method
+    .param int c
+    .local pmc res, f
+    res = getattribute self, 'res'
+    f = get_root_global ['parrot';'Pg'], 'PQfname'
+    $S0 = f(res, c)
+    .return ($S0)
 .end
 
 =item v = res.'getvalue'(r, c)

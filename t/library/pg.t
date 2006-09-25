@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 18
+.const int N_TESTS = 21
 
 ## XXX
 ## .include 'postgres.pasm'
@@ -86,6 +86,17 @@ EOT
     $I0 = res.'ntuples'()
     $I1 = iseq $I0, 1
     test.'ok'($I1, 'res.ntuples == 1')
+    $I0 = res.'nfields'()
+    $I1 = iseq $I0, 3
+    test.'ok'($I1, 'res.nfields == 3')
+    # check field name
+    $S0 = res.'fname'(1)
+    $I1 = iseq $S0, "foo"
+    test.'ok'($I1, 'res.fname(1) == "foo"')
+    $S0 = res.'fname'(2)
+    $I1 = iseq $S0, "bar"
+    test.'ok'($I1, 'res.fname(1) == "bar"')
+    # check vals
     $S0 = res.'getvalue'(0, 1)
     $I1 = iseq $S0, 'a'
     test.'ok'($I1, 'getvalue(0, 1) == "a"')
