@@ -191,11 +191,10 @@ no_pg:
     test.'ok'($I1, 'notice callback got a struct')
 
     .local pmc st
-    test.'skip'(1,  'notice result is still ok')
-    .return()
-# XXX for some strange reason it is PGRES_EMPTY_QUERY now
     st = get_root_global ['parrot';'Pg'], 'PQresultStatus'
     $I0 = st(res)
+# XXX for some strange reason it is PGRES_EMPTY_QUERY sometimes
+# actually it seems to depend on the timing, when the cb is called
     $I1 = iseq $I0, PGRES_COMMAND_OK
-    test.'ok'($I1, 'notice result is still ok')
+    test.'todo'($I1, 'notice result is still ok')
 .end
