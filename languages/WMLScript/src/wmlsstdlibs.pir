@@ -104,12 +104,13 @@ helper for CALL_URL* opcodes.
     $S0 = save_pbc(pbc_out, url)
     load_bytecode $S0
     clear_eh
-    push_eh _handler_2
+#    push_eh _handler_2
     .local pmc entry
     $S0 = url
     $S0 .= ':'
     $S0 .= function
     entry = global $S0
+    if_null entry, _handler_2
     .return (entry)
 _handler_1:
     .local pmc e
