@@ -144,6 +144,45 @@ Execute the SQL command and return a Pg;Result object.
     .return (o_res)
 .end
 
+.include "datatypes.pasm"
+
+=item res = con.'execParams'(str, val, ...)
+
+Execute the SQL command and return a Pg;Result object. All values
+are considered as text - there's no provision to usae binary data.
+
+=cut
+
+.sub 'execParams' :method
+    .param string cmd
+    .param pmc values  :slurpy
+    .local pmc con, exec, res, o_res, nil, vals, str
+    .local int i, n
+    con = getattribute self, 'con'
+    exec = get_root_global ['parrot';'Pg'], 'PQexecParams'
+    nil = new .ManagedStruct
+    n = elements values
+    # we don't handle binary
+    str = new .OrderedHash
+    push str, .DATATYPE_CSTR
+    push str, n
+    push str, 0
+    vals = new .ManagedStruct
+    assign vals, str
+    i = 0
+loop:
+    if i >= n goto done
+    $S0 = values[i]
+    vals[0; i] = $S0
+    inc i
+    goto loop
+done:
+    res = exec(con, cmd, n, nil, vals, nil, nil, 0)
+    $I0 = find_type ['Pg';'Result']
+    o_res = new $I0, res
+    .return (o_res)
+.end
+
 =item $P0 = con.'setNoticeReceiver'(cb, arg)
 
 Install a notice receiver callback. The callback will be called as

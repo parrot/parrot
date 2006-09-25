@@ -69,8 +69,8 @@ dlfunc $P2, $P1, 'PQuntrace', 'vp'
 store_global 'PQuntrace', $P2
 dlfunc $P2, $P1, 'PQexec', 'ppt'
 store_global 'PQexec', $P2
-# TODO dlfunc $P2, $P1, 'PQexecParams', 'pptippppi'
-# TODO store_global 'PQexecParams', $P2
+dlfunc $P2, $P1, 'PQexecParams', 'pptippppi'
+store_global 'PQexecParams', $P2
 # TODO dlfunc $P2, $P1, 'PQexecPrepared', 'pptit33i'
 # TODO store_global 'PQexecPrepared', $P2
 dlfunc $P2, $P1, 'PQsendQuery', 'ipt'
