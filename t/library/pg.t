@@ -17,7 +17,13 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 7
+.const int N_TESTS = 8
+
+## XXX
+## .include 'postgres.pasm'
+.const int CONNECTION_OK = 0
+
+.include 'postgres.pasm'
 
 .sub main :main
     load_bytecode 'Test/Builder.pir'
@@ -39,6 +45,9 @@ table, which should be created by your sysadmin.
     test.'ok'($I0, 'con isa Pg;Conn')
     $I0 = istrue con
     test.'ok'($I0, 'con is true after connect')
+    $I0 = con.'status'()
+    $I1 = iseq $I0, CONNECTION_OK 
+    test.'ok'($I1, 'con.status() == CONNECTION_OK ')
 # TODO
     con.'finish'()
     test.'ok'(1, 'con.finish()')

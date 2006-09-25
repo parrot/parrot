@@ -21,6 +21,11 @@ See F<libpg> for details.
 
 =cut
 
+## TODO generate includes from libpq-fe.h
+## .include 'postgres.pasm'
+
+.const int CONNECTION_OK = 0
+
 .sub __load :load
     .local pmc cl
     load_bytecode "postgres.pir"         # TODO .pbc
@@ -52,7 +57,13 @@ A class method that returns a new connection object.
     con = connectdb(args)
     $I0 = find_type ['Pg';'Conn']
     o_con = new  $I0, con
-    # TODO verify success
+    # verify success
+    .local int ok
+    ok = o_con.'status'()
+    if ok == CONNECTION_OK goto is_ok
+    con = new .Undef
+    o_con.'__init'(con)
+is_ok:
     .return (o_con)
 .end
 
@@ -79,6 +90,20 @@ Takes a C<PGconn> structure as argument and returns a Pg;Conn object.
     $I0 = typeof con
     $I1 = isne $I0, .Undef
     .return ($I1)
+.end
+
+=item status()
+
+Return the connection status.
+
+=cut
+
+.sub 'status' :method
+    .local pmc con, st
+    con = getattribute self, 'con'
+    st = get_root_global ['parrot';'Pg'], 'PQstatus'
+    $I0 = st(con)
+    .return ($I0)
 .end
 
 =item finish()
