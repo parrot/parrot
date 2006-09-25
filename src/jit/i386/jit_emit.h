@@ -3590,6 +3590,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int cur_op = *jit_info->cur_op;
+    static int check;
 
     if (cur_op >= jit_op_count()) {
         cur_op = CORE_OPS_wrapper__;
@@ -3599,6 +3600,17 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
      * we use the interpreter already on stack and only push the
      * cur_op
      */
+
+    if ((++check & 0x7) == 0) {
+        /*
+         * every 8 ??? normal ops, we emit a check for event processing
+         */
+        emitm_pushl_i(jit_info->native_ptr, CORE_OPS_check_events);
+
+        call_func(jit_info,
+            (void (*)(void))interpreter->op_func_table[CORE_OPS_check_events]);
+        emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
+    }
     emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
 
     call_func(jit_info,
