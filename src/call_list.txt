@@ -256,12 +256,10 @@ i	Ji
 
 # Oddball ones for postgres
 p	ptippppi    PQexecParams
-p	pi33ipi
-p	ptii33i
-p	ptit33i
-i	ptit33i
-i	ptiit33i
-p       ppP
+p	pi33ipi     PQfn
+p	pttip       PQprepage
+p	ptipppi     PQexecPrepared
+p       ppP         PQsetNoticeReceiver
 
 # The following are used by library/pcre.pir
 p	tiB3P

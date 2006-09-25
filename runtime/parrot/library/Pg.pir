@@ -156,14 +156,10 @@ are considered being text - there's no provision to usae binary data.
 
 =cut
 
-.sub 'execParams' :method
-    .param string cmd
-    .param pmc values  :slurpy
-    .local pmc con, exec, res, o_res, nil, vals, str
+.sub mk_struct
+    .param pmc values
     .local int i, n
-    con = getattribute self, 'con'
-    exec = get_root_global ['parrot';'Pg'], 'PQexecParams'
-    nil = new .ManagedStruct
+    .local pmc str, vals
     n = elements values
     # we don't handle binary
     str = new .OrderedHash
@@ -180,12 +176,52 @@ loop:
     inc i
     goto loop
 done:
+    .return (n, vals)
+.end
+
+.sub 'execParams' :method
+    .param string cmd
+    .param pmc values  :slurpy
+    .local pmc con, exec, res, o_res, nil, vals
+    .local int n
+    con = getattribute self, 'con'
+    exec = get_root_global ['parrot';'Pg'], 'PQexecParams'
+    nil = new .ManagedStruct
+    (n, vals) = mk_struct(values)
     res = exec(con, cmd, n, nil, vals, nil, nil, 0)
     $I0 = find_type ['Pg';'Result']
     o_res = new $I0, res
     .return (o_res)
 .end
 
+.sub 'prepare' :method
+    .param string name
+    .param string query
+    .param int nparams
+    .local pmc con, f, res, o_res, nil
+    con = getattribute self, 'con'
+    f = get_root_global ['parrot';'Pg'], 'PQprepare'
+    nil = new .ManagedStruct
+    res = f(con, name, query, nparams, nil)
+    $I0 = find_type ['Pg';'Result']
+    o_res = new $I0, res
+    .return (o_res)
+.end
+
+.sub 'execPrepared' :method
+    .param string name
+    .param pmc values :slurpy
+    .local pmc con, f, res, o_res, nil, vals
+    .local int n
+    con = getattribute self, 'con'
+    f = get_root_global ['parrot';'Pg'], 'PQexecPrepared'
+    nil = new .ManagedStruct
+    (n, vals) = mk_struct(values)
+    res = f(con, name, n, vals, nil, nil, 0)
+    $I0 = find_type ['Pg';'Result']
+    o_res = new $I0, res
+    .return (o_res)
+.end
 =item $P0 = con.'setNoticeReceiver'(cb, arg)
 
 Install a notice receiver callback. The callback will be called as

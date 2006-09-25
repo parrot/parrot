@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 28
+.const int N_TESTS = 33
 
 ## XXX
 ## .include 'postgres.pasm'
@@ -127,6 +127,35 @@ EOT
     $S0 = res.'getvalue'(1, 2)
     $I1 = iseq $S0, 'd'
     test.'ok'($I1, 'getvalue(1, 2) == "d"')
+    # prepare
+    res = con.'prepare'('ins2', <<'EOT', 2)
+INSERT INTO parrot_tbl (foo, bar) VALUES($1, $2)
+EOT
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'prepare PGRES_COMMAND_OK ')
+
+    res = con.'execPrepared'('ins2', 'e', 'f')
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'execPrepared PGRES_COMMAND_OK ')
+    res = con.'exec'(<<'EOT')
+SELECT * FROM parrot_tbl
+EOT
+    $I0 = res.'ntuples'()
+    $I1 = iseq $I0, 3
+    test.'ok'($I1, 'res.ntuples == 3')
+
+    res = con.'execPrepared'('ins2', 'g', 'h')
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'execPrepared PGRES_COMMAND_OK ')
+    res = con.'exec'(<<'EOT')
+SELECT * FROM parrot_tbl
+EOT
+    $I0 = res.'ntuples'()
+    $I1 = iseq $I0, 4
+    test.'ok'($I1, 'res.ntuples == 4')
     # done
     res = con.'exec'('ABORT')
     $I0 = res.'resultStatus'()
