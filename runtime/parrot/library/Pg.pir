@@ -121,7 +121,7 @@ function except for calling PQ* code directly.
 .sub PGconn :method
     .local pmc con
     con = getattribute self, 'con'
-    return (con)
+    .return (con)
 .end
 
 =item $I0 = con.'status'()

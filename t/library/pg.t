@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 42
+.const int N_TESTS = 43
 
 ## XXX
 ## .include 'postgres.pasm'
@@ -49,6 +49,13 @@ table, which should be created by your sysadmin.
     $I0 = con.'status'()
     $I1 = iseq $I0, CONNECTION_OK 
     test.'ok'($I1, 'con.status() == CONNECTION_OK ')
+    # PGconn
+    $P0 = con.'PGconn'()
+    $P1 = get_root_global ['parrot';'Pg'], 'PQstatus'
+    $I0 = $P1($P0)
+    $I1 = iseq $I0, CONNECTION_OK 
+    test.'ok'($I1, 'status(PGconn) == CONNECTION_OK ')
+    # exec
     res = con.'exec'('BEGIN')
     test.'ok'(1, 'exec BEGIN called')
     $I0 = isa res, ['Pg'; 'Result']
