@@ -79,6 +79,7 @@ Number or invalid.
 .sub '_lang_abs' :anon
     .param pmc value
     .local pmc ret
+    ret = clone value
     ret = abs value
     .return (ret)
 .end
