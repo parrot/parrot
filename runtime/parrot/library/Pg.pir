@@ -16,11 +16,24 @@ Pg.pir - OO interface to libpq
   ...
   val = res.'getvalue'(i, j)
 
+
+=head1 ABSTRACT
+
+The Pg library provides an OO interface to libpq functions - the C
+interface to PostgreSQL.
+
+See "Chapter 28. libpq - C Library" for details or the tests
+in F<t/library/pg.t>.
+
+=head1 AUTHOR
+
+Leopold "leo" Toetsch <lt(at)toetsch.at>
+
 =head1 DESCRIPTION
 
-The Pg library provides an OO interface to libpq functions.
-
-See F<libpq> for details.
+Pg.pir is a thin wrapper around F<postgres.pir> - the NCI functions of
+the C<libpq> library. It's roughly divided into 3 parts, represented
+by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 
 =cut
 
@@ -96,6 +109,19 @@ Object initializer. Takes a C<PGconn> structure.
     $I0 = typeof con
     $I1 = isne $I0, .Undef
     .return ($I1)
+.end
+
+=item c = res.'PGconn'()
+
+Return the raw PGconn structure. You probably don't need this
+function except for calling PQ* code directly.
+
+=cut
+
+.sub PGconn :method
+    .local pmc con
+    con = getattribute self, 'con'
+    return (con)
 .end
 
 =item $I0 = con.'status'()
@@ -294,7 +320,7 @@ Object finalizer. Calls self.'clear'().
 =item r = res.'PGresult'()
 
 Return the raw PGresult structure. You probably don't need this
-function.
+function except for calling PQ* code directly.
 
 =cut
 
