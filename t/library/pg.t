@@ -23,8 +23,6 @@ table, which should be created by your sysadmin.
 ## .include 'postgres.pasm'
 .const int CONNECTION_OK = 0
 
-.include 'postgres.pasm'
-
 .sub main :main
     load_bytecode 'Test/Builder.pir'
     .local pmc test       
