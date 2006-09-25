@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 22
+.const int N_TESTS = 24
 
 ## XXX
 ## .include 'postgres.pasm'
@@ -136,4 +136,13 @@ no_pg:
     .param pmc res
     test.'ok'(1, 'notice receiver called')
     # res ought to be a PGresult struct
+    $I0 = typeof res
+    $I1 = iseq $I0, .UnManagedStruct
+    test.'ok'($I1, 'notice callback got a struct')
+
+    .local pmc st
+    st = get_root_global ['parrot';'Pg'], 'PQresultStatus'
+    $I0 = st(res)
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'notice result is still ok')
 .end
