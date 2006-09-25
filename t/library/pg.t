@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 36
+.const int N_TESTS = 42
 
 ## XXX
 ## .include 'postgres.pasm'
@@ -165,6 +165,30 @@ EOT
     $I0 = res.'ntuples'()
     $I1 = iseq $I0, 4
     test.'ok'($I1, 'res.ntuples == 4')
+    res = con.'exec'(<<'EOT')
+INSERT INTO parrot_tbl (foo) VALUES('i')
+EOT
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'insert row PGRES_COMMAND_OK ')
+    res = con.'exec'(<<'EOT')
+SELECT * FROM parrot_tbl
+EOT
+    $I0 = res.'ntuples'()
+    $I1 = iseq $I0, 5
+    test.'ok'($I1, 'res.ntuples == 5')
+    $S0 = res.'getvalue'(4, 1)
+    $I1 = iseq $S0, 'i'
+    test.'ok'($I1, 'getvalue(4, 1) == "i"')
+    $S0 = res.'getvalue'(4, 2)
+    $I1 = iseq $S0, ''
+    test.'ok'($I1, 'getvalue(4, 2) == ""')
+    $I0 = res.'getisnull'(4, 1)
+    $I1 = iseq $I0, 0
+    test.'ok'($I1, 'getisnull(4, 1) == 0')
+    $I0 = res.'getisnull'(4, 2)
+    $I1 = iseq $I0, 1
+    test.'ok'($I1, 'getisnull(4, 2) == 1')
     # done
     res = con.'exec'('ABORT')
     $I0 = res.'resultStatus'()

@@ -392,6 +392,10 @@ Return the number of the field or -1.
 
 Return result value from row r and column c.
 
+=item $I0 = res.'getisnull'(r, c)
+
+Return true if the result value at (r,c) is NULL.
+
 =cut
 
 .sub 'getvalue' :method
@@ -402,6 +406,16 @@ Return result value from row r and column c.
     gv = get_root_global ['parrot';'Pg'], 'PQgetvalue'
     $S0 = gv(res, r, c)
     .return ($S0)
+.end
+
+.sub 'getisnull' :method
+    .param int r
+    .param int c
+    .local pmc res, f
+    res = getattribute self, 'res'
+    f = get_root_global ['parrot';'Pg'], 'PQgetisnull'
+    $I0 = f(res, r, c)
+    .return ($I0)
 .end
 
 =back
