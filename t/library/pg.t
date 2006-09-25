@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 33
+.const int N_TESTS = 36
 
 ## XXX
 ## .include 'postgres.pasm'
@@ -99,6 +99,15 @@ EOT
     $S0 = res.'fname'(2)
     $I1 = iseq $S0, "bar"
     test.'ok'($I1, 'res.fname(1) == "bar"')
+    $I0 = res.'fnumber'('id')
+    $I1 = iseq $I0, 0
+    test.'ok'($I1, 'res.fnumber("id") == 0')
+    $I0 = res.'fnumber'('bar')
+    $I1 = iseq $I0, 2
+    test.'ok'($I1, 'res.fnumber("bar") == 2')
+    $I0 = res.'fnumber'('no_such_col_name')
+    $I1 = iseq $I0, -1
+    test.'ok'($I1, 'res.fnumber("no_such_col_name") == -1')
     # check vals
     $S0 = res.'getvalue'(0, 1)
     $I1 = iseq $S0, 'a'

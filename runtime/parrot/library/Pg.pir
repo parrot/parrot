@@ -348,6 +348,10 @@ Return the amount of fields in the result.
 
 Return the name of the c-th field in the result.
 
+=item $I0 = res.'fnumber'(col_name)
+
+Return the number of the field or -1.
+
 =cut
 
 .sub 'ntuples' :method
@@ -373,6 +377,15 @@ Return the name of the c-th field in the result.
     f = get_root_global ['parrot';'Pg'], 'PQfname'
     $S0 = f(res, c)
     .return ($S0)
+.end
+
+.sub 'fnumber' :method
+    .param string c
+    .local pmc res, f
+    res = getattribute self, 'res'
+    f = get_root_global ['parrot';'Pg'], 'PQfnumber'
+    $I0 = f(res, c)
+    .return ($I0)
 .end
 
 =item v = res.'getvalue'(r, c)
