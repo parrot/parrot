@@ -17,7 +17,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 12
+.const int N_TESTS = 18
 
 ## XXX
 ## .include 'postgres.pasm'
@@ -57,6 +57,41 @@ table, which should be created by your sysadmin.
     $I1 = iseq $I0, PGRES_COMMAND_OK
     test.'ok'($I1, 'res.resultStatus() == PGRES_COMMAND_OK ')
     res.'clear'()
+    # create a temp table
+    res = con.'exec'(<<'EOT')
+CREATE TEMP TABLE parrot_tbl (
+    id     serial,
+    foo    text,
+    bar    text
+);
+EOT
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'table created PGRES_COMMAND_OK ')
+    # add a row
+    res = con.'exec'(<<'EOT')
+INSERT INTO parrot_tbl (foo, bar) VALUES('a', 'b')
+EOT
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_COMMAND_OK
+    test.'ok'($I1, 'inset row PGRES_COMMAND_OK ')
+    # get all
+    res = con.'exec'(<<'EOT')
+SELECT * FROM parrot_tbl
+EOT
+    $I0 = res.'resultStatus'()
+    $I1 = iseq $I0, PGRES_TUPLES_OK
+    test.'ok'($I1, 'select * PGRES_TUPLES_OK ')
+    # check tuples
+    $I0 = res.'ntuples'()
+    $I1 = iseq $I0, 1
+    test.'ok'($I1, 'res.ntuples == 1')
+    $S0 = res.'getvalue'(0, 1)
+    $I1 = iseq $S0, 'a'
+    test.'ok'($I1, 'getvalue(0, 1) == "a"')
+    $S0 = res.'getvalue'(0, 2)
+    $I1 = iseq $S0, 'b'
+    test.'ok'($I1, 'getvalue(0, 2) == "b"')
 # TODO
     res = con.'exec'('ABORT')
     $I0 = res.'resultStatus'()

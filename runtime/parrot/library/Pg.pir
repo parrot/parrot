@@ -222,7 +222,35 @@ __finalize(), which wil clear the object.
 done:
 .end
 
+=item $I0 = res.'ntuples'()
 
+Return the amount of tuples in the result.
+
+=cut
+
+.sub 'ntuples' :method
+    .local pmc res, nt
+    res = getattribute self, 'res'
+    nt = get_root_global ['parrot';'Pg'], 'PQntuples'
+    $I0 = nt(res)
+    .return ($I0)
+.end
+
+=item v = res.'getvalue'(r, c)
+
+Return result value from row r and column c.
+
+=cut
+
+.sub 'getvalue' :method
+    .param int r
+    .param int c
+    .local pmc res, gv
+    res = getattribute self, 'res'
+    gv = get_root_global ['parrot';'Pg'], 'PQgetvalue'
+    $S0 = gv(res, r, c)
+    .return ($S0)
+.end
 
 =back
 

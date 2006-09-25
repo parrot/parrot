@@ -88,6 +88,7 @@ Call the '__finalize' method if it exists.
                    TODO
                    - catch exceptions
                    - run some safe mode
+                   - run all finalizers in mro order?
                  */
                 Parrot_run_meth_fromc_args(interpreter, meth, 
                         SELF, fin, "v");
