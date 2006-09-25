@@ -156,6 +156,7 @@ are considered being text - there's no provision to usae binary data.
 
 =cut
 
+# helper to create the char* array
 .sub mk_struct
     .param pmc values
     .local int i, n
@@ -194,6 +195,12 @@ done:
     .return (o_res)
 .end
 
+=item res = con.'prepare'(name, query, nparams)
+
+Prepare a query for execution with B<execPrepared>
+
+=cut
+
 .sub 'prepare' :method
     .param string name
     .param string query
@@ -207,6 +214,12 @@ done:
     o_res = new $I0, res
     .return (o_res)
 .end
+
+=item res = con.'execPrepared'(name, val, ...)
+
+Execute a prepated query.
+
+=cut
 
 .sub 'execPrepared' :method
     .param string name
@@ -222,6 +235,7 @@ done:
     o_res = new $I0, res
     .return (o_res)
 .end
+
 =item $P0 = con.'setNoticeReceiver'(cb, arg)
 
 Install a notice receiver callback. The callback will be called as
