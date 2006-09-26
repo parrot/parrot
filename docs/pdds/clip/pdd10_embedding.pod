@@ -23,11 +23,11 @@ Why embed:
 
 =over 4
 
-=item - access to special features/libraries/languages Parrot provides
+=item * access to special features/libraries/languages Parrot provides
 
-=item - need an interpreter for a DSL or existing language
+=item * need an interpreter for a DSL or existing language
 
-=item - want to run Parrot on another platform or environment (dedicated
+=item * want to run Parrot on another platform or environment (dedicated
 hardware, in a web server, et cetera)
 
 =back
@@ -36,9 +36,9 @@ Why extend:
 
 =over 4
 
-=item - need something NCI doesn't provide
+=item * need something NCI doesn't provide
 
-=item - writing a custom PMC
+=item * writing a custom PMC
 
 =back
 
@@ -46,27 +46,37 @@ Philosophical rules:
 
 =over 4
 
-=item - only ever use opaque pointers
+=item * only ever use opaque pointers
 
-=item - should be able to communicate through PMCs
+=item * should be able to communicate through PMCs
 
-=item - minimize conversions to and from C data
+=item * minimize conversions to and from C data
 
 =over 4
 
-=item - perhaps macros; Ruby does this fairly well and Perl 5 does this
+=item * perhaps macros; Ruby does this fairly well and Perl 5 does this
 poorly
 
-=item - minimize the number of necessary functions
+=item * minimize the number of necessary functions
 
-=item - probably can follow core Parrot code to some extent, but beware the
+=item * probably can follow core Parrot code to some extent, but beware the
 Perl 5 problem
 
 =over 4
 
-=item - do not expose Parrot internals that may change
+=item * do not expose Parrot internals that may change
 
-=item - probably includes vtable methods on PMCs
+=over 4
+
+=item * minimize the number of headers used
+
+=item * minimize the number of Parrot types exposed
+
+=item * follow boundaries similar to those of PIR where possible
+
+=back
+
+=item * probably includes vtable methods on PMCs
 
 =back
 
@@ -78,43 +88,50 @@ Gotchas:
 
 =over 4
 
-=item - who handles signals?
+=item * who handles signals?
 
-=item - who owns file descriptors and other Unix resources?
+=item * who owns file descriptors and other Unix resources?
 
-=item - is there an exception boundary?
+=item * is there an exception boundary?
 
-=item - namespace issues -- especially key related
+=item * namespace issues -- especially key related
 
-=item - probably a continuation/control flow boundary
+=item * probably a continuation/control flow boundary
 
-=item - packfiles and compilation units probably too much information for
+=item * packfiles and compilation units probably too much information for
 either
 
-=item - do not let MMD and other implementation details escape
+=item * do not let MMD and other implementation details escape
 
-=item - okay to require some PBC/PIR/PASM for handling round-trip data
+=item * okay to require some PBC/PIR/PASM for handling round-trip data
 
-=item - Parrot should not spew errors to STDERR when embedded
+=item * Parrot should not spew errors to STDERR when embedded
 
-=item - const_string() is a real pain, especially with necessary deallocation
+=item * who allocates and deallocates resources passed through the boundary
+level?
 
-=item - should be access to Parrot's event loop when embedded
+=item * should be access to Parrot's event loop when embedded
 
-=item - passing var args to Parrot subs likely painful
+=item * passing var args to Parrot subs likely painful
 
 =over 4
 
-=item - perhaps macros/functions to add parameters to call
+=item * perhaps macros/functions to add parameters to call
 
-=item - build up a call signature somehow?
+=item * build up a call signature somehow?
 
-=item - some abstraction for a call frame?
+=item * some abstraction for a call frame?
 
 =back
 
-=item - compiling code from a string should return the PMC Sub entry point
+=item * compiling code from a string should return the PMC Sub entry point
 (:main)
+
+=item * are there still directory path, loading, and deployment issues?
+
+=item * how do dynamic oplibs and custom PMCs interact?
+
+=item * what's the best way to handle character sets and Unicode?
 
 =back
 
@@ -132,9 +149,101 @@ has control.  The necessary interfaces should stay the same.
 
 Implementation details.
 
+Simplicity is the main goal; it should be almost trivial to embed Parrot in an
+existing application.  It must be trivial to do the right thing; the APIs must
+make it so much easier to work correctly than to make mistakes.  This means, in
+particular, that:
+
+=over 4
+
+=item * it should never be possible to crash or corrupt the interpreter when
+following the interface as documented
+
+=item * each API call or element should have a single purpose
+
+=item * names must be consistent in the API documentation and the examples
+
+=item * it I<should> be possible to embed Parrot I<within> Parrot through NCI,
+as a test both of the sanity of the external interface as well as NCI
+
+=back
+
+=head2 Working with Interpreters
+
+It is the external code's duty to create, manage, and destroy interpreters.
+
+C<Parrot_new( NULL )> returns an opaque pointer to a new interpreter:
+
+	Parrot_Interp Parrot_new(Parrot_Interp parent);
+
+C<parent> can be NULL for the I<first> interpreter created.  All subsequent
+calls to this function should pass an existing interpreter.
+
+I<Note: it is not clear what happens if you fail to do so; is there a way to
+detect this in the interface and give a warning?>
+
+C<Parrot_destroy ( interp )> destroys an interpreter and frees its resources.
+
+	void Parrot_destroy(Parrot_Interp);
+
+I<Note: It is not clear what happens if this interpreter has active children.>
+
+=head2 Working with Source Code and PBC Files
+
+Perhaps the most common case for working with code is loading it from an
+external file.  This may often be PBC, but it must also be possible to load
+code with any registered compiler.  This I<must> be a single-stage operation:
+
+	Parrot_PMC Parrot_load_bytecode( Parrot_Interp, const char *filepath );
+
+	Parrot_PMC Parrot_load_hll_code( Parrot_Interp, const char *compiler,
+	                                                const char *filepath );
+
+The PMC returned will be the Sub PMC representing the entry point into the
+code.  That is, it will be the PMC representing the C<:main> subroutine, if one
+exists, or the first subroutine in the file.
+
+If there is an error -- such that the file does not exist, the compiler is
+unknown, or there was a compilation or invalid bytecode error -- the PMC should
+be an Exception PMC instead.
+
+I<Note: I suppose NULL would work as well; it might be more C-like.  Continue
+considering.>
+
+I<Note also: the current C<Parrot_readbc()> and C<Parrot_loadbc()> exposes the
+details of packfiles to the external API and uses two operations to perform a
+single logical operation.>
+
+I<Note: it may be worth reconsidering these names, if C<Parrot_load_bytecode()>
+can load PBC, PIR, and PASM files without having a compiler named explicitly.>
+
+Compiling source code generated or read from the host application is also
+possible:
+
+	 Parrot_PMC Parrot_compile_string( Parrot_Interp, const char *compiler,
+                                                      const char *code );
+
+The potential return values are the same as for loading code from disk.
+
+I<Note: this declaration should move from F<interpreter.h> to F<embed.h>.>
+
+=head2 Working with PMCs
+
+TBD.
+
+=head2 Calling Functions
+
+TBD.
+
+=head2 Calling Opcodes
+
+TBD.
+
 =head1 LANGUAGE NOTES
 
-Notes on application to high-level languages. (optional)
+It should be possible to register a compiler for an HLL with an interpreter
+such that it is possible to load source code written in that language or pass
+source code to an interpreter successfully.
 
 =head1 ATTACHMENTS
 
