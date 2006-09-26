@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2005, The Perl Foundation.
 # $Id$
 
@@ -66,7 +66,6 @@ package Parrot::Op;
 
 use strict;
 use warnings;
-
 
 =item C<new($code, $type, $name, $args, $argdirs, $labels, $flags)>
 

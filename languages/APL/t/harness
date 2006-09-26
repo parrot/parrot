@@ -1,6 +1,7 @@
-#! perl -w
+#! perl
 
 use strict;
+use warnings;
 
 use Test::Harness;
 use File::Spec;

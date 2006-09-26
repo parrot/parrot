@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
@@ -15,6 +15,9 @@ t/stress/gc.t - Garbage Collection
 Tests garbage collection.
 
 =cut
+
+use strict;
+use warnings;
 
 use Parrot::Test tests => 1;
 use Test::More;

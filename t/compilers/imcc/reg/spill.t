@@ -1,8 +1,9 @@
-#!perl -w
+#!perl
 # Copyright (C) 2001-2005, The Perl Foundation.
 # $Id$
 
 use strict;
+use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 9;
 
