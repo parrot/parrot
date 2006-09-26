@@ -13,20 +13,6 @@ Parrot's I/O subsystem.
 
 $Revision$
 
-=head1 SYNOPSIS
-
-    open P0, "data.txt", ">"
-    print P0, "sample data\n"
-    close P0
-
-    open P1, "data.txt", "<"
-    S0 = read P1, 12
-    P2 = getstderr
-    print P2, S0
-    close P1
-
-    ...
-
 =head1 DEFINITIONS
 
 A "stream" allows input or output operations on a source/destination
@@ -35,18 +21,18 @@ such as a file, keyboard, or text console. Streams are also called
 
 =head1 DESCRIPTION
 
-This is a draft document defining Parrot's I/O subsystem, for both
-streams and network I/O. Parrot has both synchronous and asynchronous
-I/O operations. This section describes the interface, and the
+This document defines Parrot's I/O subsystem, for both streams and
+network I/O. Parrot has both synchronous and asynchronous I/O
+operations. This section describes the interface, and the
 L<IMPLEMENTATION> section provides more details on general
 implementation questions and error handling. 
 
 The signatures for the asynchronous operations are nearly identical to
 the synchronous operations, but the asynchronous operations take an
 additional argument for a callback, and the only return value from the
-asynchronous operations is a status object. The callbacks take the
-status object as their first argument, and any return values as their
-remaining arguments. 
+asynchronous operations is a status object. When the callbacks invoked,
+they are passed the status object as their sole argument. Any return
+values from the operation are stored within the status object.
 
 The listing below says little about whether the opcodes return error
 information. For now assume that they can either return a status object,
@@ -262,7 +248,7 @@ See the system documentation for C<poll> to see the constants for event
 types and return status.
 
 This opcode is inherently synchronous (poll is "synchronous I/O
-multiplexing"), but it can retreive status information from a stream or
+multiplexing"), but it can retrieve status information from a stream or
 socket object whether the object is being used synchronously or
 asynchronously.
 
@@ -522,48 +508,36 @@ type of shutdown:
 The Parrot I/O subsystem uses a per-interpreter stack to provide a
 layer-based approach to I/O. Each layer implements a subset of the
 C<ParrotIOLayerAPI> vtable. To find an I/O function, the layer stack is
-searched downwards until a non-NULL function pointer is found for
-that particular slot.
+searched downwards until a non-NULL function pointer is found for that
+particular slot. [We need to look into the implementation of IO layers
+for simplifications.]
 
 =head2 Synchronous and Asynchronous Operations
 
-Currently, Parrot only implements synchronous I/O operations.
-Asynchronous operations are essentially the same as the synchronous
-operations, but each asynchronous operation runs in its own thread.
+Currently, Parrot only implements synchronous I/O operations. For the
+1.0 release the asynchronous operations will be implemented separately
+from the synchronous ones. [Eventually there may be an implementation
+that uses one variant to implement the other, but it's not an immediate
+priority.]
 
-Note: this is a deviation from the existing plan, which had all I/O
-operations run internally as asynchronous, and the synchronous
-operations as a compatibility layer on top of the asynchronous
-operations. This conceptual simplification means that all I/O operations
-are possible without threading support (for example, in a stripped-down
-version of Parrot running on a PDA). [Asynchronous operations don't have
-to use Parrot threads, they could use some alternate threading
-implementation. But it's overkill to develop two threading
-implementations. If Parrot threads turn out to be too heavyweight, we
-may want to look into a lighter weight variation for asynchronous
-operations.]
-
-The asynchronous I/O implementation will use Parrot's I/O layer
-architecture so some platforms can take advantage of their built-in
-asynchronous operations instead of using Parrot threads.
+Asynchronous operations don't use Parrot threads, they use a
+light-weight concurrency model for asynchronous operations. The
+asynchronous I/O implementation will use Parrot's I/O layer architecture
+so some platforms can take advantage of their built-in asynchronous
+operations instead of using Parrot's concurrency implementation.
 
 Communication between the calling code and the asynchronous operation
 thread will be handled by a shared status object. The operation thread
 will update the status object whenever the status changes, and the
-calling code can check the status object at any time. [Twisted has an
-interesting variation on this, in that it replaces the status object
-with the returned result of the asynchronous call when the call is
-complete. That is probably too confusing, but we might give the status
-object a reference to the returned result.]
+calling code can check the status object at any time. The status object
+contains a reference to the returned result of an asynchronous I/O call.
 
-The current strategy for differentating the synchronous calls from
-asynchronous ones relies on the presence of a callback argument in the
-asynchronous calls. If we wanted asynchronous calls that don't supply
-callbacks (perhaps if the user wants to manually check later if the
-operation succeded) we would need another strategy to differentiate the
-two. This is probably enough of a fringe case that we don't need to
-provide opcodes for it, provided they can access the functionality via
-methods on ParrotIO objects.
+Synchronous opcodes are differentiated from asynchronous opcodes by the
+presence of a callback argument in the asynchronous calls.  Asynchronous
+calls that don't supply callbacks (perhaps if the user wants to manually
+check later if the operation succeded) are enough of a fringe case that
+they don't need opcodes. They can access the functionality via methods
+on ParrotIO objects.
 
 =head2 Error Handling
 
@@ -573,67 +547,43 @@ of the call, -1 or a system error code if unsuccessful. Other I/O
 opcodes (such as C<getfd> and C<accept>) have various different
 strategies for error notification, and others have no way of marking
 errors at all. We want to unify all I/O opcodes so they use a consistent
-strategy for error notification. There are several options in how we do
-this.
+strategy for error notification. 
 
-=head3 Integer status codes
+=head3 Synchronous operations
 
-One approach is to have every I/O operation return an integer status
-code indicating success or failure. This approach has the advantage of
-being lightweight: returning a single additional integer is cheap. The
-disadvantage is that it's not very flexible: the only way to look for
-errors is to check the integer return value, possibly comparing it to a
-predefined set of error constants.
+Synchronous I/O operations return an integer status code indicating
+success or failure in addition to their ordinary return value(s). This
+approach has the advantage of being lightweight: returning a single
+additional integer is cheap. 
+
+[Discuss: should synchronous operations take the same error handling
+strategy as asynchronous ones?]
+
+
+=head3 Asynchronous operations
+
+Asynchronous I/O operations return a status object. The status object
+contains an integer status code, string status/error message, and
+boolean success value.
+
+An error callback may be set on a status object, though it isn't
+required. This callback will be invoked if the asynchronous operation
+terminates in an error condition. The error callback takes one argument,
+which is the status object containing all information about the failed
+call. If no error callback is set, then the standard callback will be
+invoked, and the user will need to check for error conditions in the
+status object as the first operation of the handler code.
 
 =head3 Exceptions
 
-Another option is to have all I/O operations throw exceptions on errors.
-The advantage is that it keeps the error tracking information
-out-of-band, so it doesn't affect the arguments or return values of the
-calls (some opcodes that have a return value plus an integer status code
-have odd looking signatures). One disadvantage of this approach is that
-it forces all users to handle exceptions from I/O operations even if
-they aren't using exceptions otherwise. 
+At some point in the future, I/O objects may also provide a way to throw
+exceptions on error conditions. This feature will be enabled by calling
+a method on the I/O object to set an internal flag.  The exception
+throwing will be implemented as a method call on the status object.
 
-A more significant disadvantage is that exeptions don't work well with
-asynchronous operations. Exception handlers are set for a particular
-dynamic scope, but with an asynchronous operation, by the time an
-exception is thrown execution has already left the dynamic scope where
-the exception handler was set. [Though, this partly depends on how
-exceptions are implemented.]
-
-=head3 Error callbacks
-
-A minor variation on the exceptions option is to pass an error callback
-into each I/O opcode. This solves the problem of asynchronous operations
-because the operation has its own custom error handling code rather than
-relying on an exception handler in its dynamic scope.
-
-The disadvantage is that the user has to define a custom error handler
-routine for every call. It also doesn't cope well with cases where
-multiple different kinds of errors may be returned by a single opcode.
-(The one error handler would have to cope with all possible types of
-errors.) There is an easier way.
-
-=head3 Hybrid solution
-
-Another option is to return a status object from each I/O operation. The
-status object could be used to get an integer status code, string
-status/error message, or boolean success value. It could also provide a
-method to throw an exception on error conditions. There could even be a
-global option (or an option set on a particular I/O object) that tells
-Parrot to always throw exceptions on errors in synchronous I/O
-operations, implemented by calling this method on the status object
-before returning from the I/O opcode.
-
-The advantages are that this works well with asynchronous and
-synchronous operations, and provides flexibility for multiple different
-uses.  Also, something like a status object will be needed anyway to
-allow users to check on the status of a particular asynchronous call in
-progress, so this is a nice unification.
-
-The disadvantage is that a status object involves more overhead than a
-simple integer status code.
+Note that exception handlers for asynchronous I/O operations will likely
+have to be set at a global scope because execution will have left the
+dynamic scope of the I/O call by the time the error occurs.
 
 =head2 IPv6 Support
 
@@ -677,74 +627,6 @@ string.
 See the relevant IETF RFCs: "Application Aspects of IPv6 Transition"
 (http://www.ietf.org/rfc/rfc4038.txt) and "Basic Socket Interface
 Extensions for IPv6" (http://www.ietf.org/rfc/rfc3493.txt).
-
-=head2 Excerpt
-
-[Below is an excerpt from "Perl 6 and Parrot Essentials", included to
-seed discussion.]
-
-Parrot's base I/O system is fully asynchronous I/O with callbacks and
-per-request private data. Since this is massive overkill in many cases,
-we have a plain vanilla synchronous I/O layer that your programs can use
-if they don't need the extra power.
-
-Asynchronous I/O is conceptually pretty simple. Your program makes an
-I/O request. The system takes that request and returns control to your
-program, which keeps running. Meanwhile the system works on satisfying
-the I/O request. When the request is satisfied, the system notifies
-your program in some way. Since there can be multiple requests
-outstanding, and you can't be sure exactly what your program will be
-doing when a request is satisfied, programs that make use of
-asynchronous I/O can be complex.
-
-Synchronous I/O is even simpler. Your program makes a request to the
-system and then waits until that request is done. There can be only
-one request in process at a time, and you always know what you're
-doing (waiting) while the request is being processed. It makes your
-program much simpler, since you don't have to do any sort of
-coordination or synchronization.
-
-The big benefit of asynchronous I/O systems is that they generally
-have a much higher throughput than a synchronous system. They move
-data around much faster--in some cases three or four times faster.
-This is because the system can be busy moving data to or from disk
-while your program is busy processing data that it got from a previous
-request.
-
-For disk devices, having multiple outstanding requests--especially on
-a busy system--allows the system to order read and write requests to
-take better advantage of the underlying hardware. For example, many
-disk devices have built-in track buffers. No matter how small a
-request you make to the drive, it always reads a full track. With
-synchronous I/O, if your program makes two small requests to the same
-track, and they're separated by a request for some other data, the
-disk will have to read the full track twice. With asynchronous I/O, on
-the other hand, the disk may be able to read the track just once, and
-satisfy the second request from the track buffer.
-
-Parrot's I/O system revolves around a request. A request has three
-parts: a buffer for data, a completion routine, and a piece of data
-private to the request. Your program issues the request, then goes about
-its business. When the request is completed, Parrot will call the
-completion routine, passing it the request that just finished. The
-completion routine extracts out the buffer and the private data, and
-does whatever it needs to do to handle the request. If your request
-doesn't have a completion routine, then your program will have to
-explicitly check to see if the request was satisfied.
-
-Your program can choose to sleep and wait for the request to finish,
-essentially blocking. Parrot will continue to process events while
-your program is waiting, so it isn't completely unresponsive. This is
-how Parrot implements synchronous I/O--it issues the asynchronous
-request, then immediately waits for that request to complete.
-
-The reason we made Parrot's I/O system asynchronous by default was
-sheer pragmatism. Network I/O is all asynchronous, as is GUI
-programming, so we knew we had to deal with asynchrony in some form.
-It's also far easier to make an asynchronous system pretend to be
-synchronous than it is the other way around. We could have decided to
-treat GUI events, network I/O, and file I/O all separately, but there
-are plenty of systems around that demonstrate what a bad idea that is.
 
 =head1 ATTACHMENTS
 
