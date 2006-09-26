@@ -336,7 +336,7 @@ foreach my $op ($ops->ops) {
     }
 
     my $src = $op->source($trans);
-    $src    =~ s/\bop_lib\b/${bs}op_lib/;
+    $src    =~ s/\bop_lib\b/${bs}op_lib/g;
     $src    =~ s/\bops_addr\b/${bs}ops_addr/g;
 
     if ($suffix =~ /cg/) {
@@ -376,12 +376,12 @@ if ($suffix =~ /cgp/) {
     print SOURCE <<END_C;
 #ifdef __GNUC__
 # ifdef I386
-    else if (cur_opcode == (opcode_t *) 1)
+    else if (cur_opcode == (void **) 1)
     asm ("jmp *4(%ebp)");	/* jump to ret addr, used by JIT */
 # endif
 #endif
     _reg_base = (char*)interpreter->ctx.bp.regs_i;
-    goto *((void *)*cur_opcode);
+    goto **cur_opcode;
 
 END_C
 } elsif ($suffix =~ /cg/) {

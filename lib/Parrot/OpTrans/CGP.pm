@@ -57,16 +57,28 @@ sub core_prefix
     return "cgp_";
 }
 
+sub opsarraytype 
+{ 
+    return 'void*' 
+};
 =item C<defines()>
 
 Returns the C C<#define> macros required by the ops.
 
 =cut
 
+sub run_core_func_decl
+{
+    my ($self, $core) = @_;
+
+    return "void ** " .
+        $self->core_prefix .
+        "$core(void **cur_op, Parrot_Interp interpreter)";
+}
 sub defines
 {
     return <<END;
-#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->code->prederef.code))
+#define REL_PC ((size_t)(cur_opcode - interpreter->code->prederef.code))
 #define CUR_OPCODE ((opcode_t*)cur_opcode + CONTEXT(interpreter->ctx)->pred_offset)
 
 #  define opcode_to_prederef(i, op) \\
@@ -96,11 +108,10 @@ sub goto_address
     }
     else
     {
-        return "if ((opcode_t *) $addr == 0)
+        return "if ($addr == 0)
 	  return 0;
    _reg_base = (char*)interpreter->ctx.bp.regs_i;
-   goto *((void*)*(cur_opcode = (opcode_t *)
-	opcode_to_prederef(interpreter, $addr)))";
+   goto **(cur_opcode = opcode_to_prederef(interpreter, $addr))";
   }
 }
 
@@ -115,7 +126,7 @@ sub goto_offset
 {
     my ($self, $offset) = @_;
 
-    return "goto *((void*)*(cur_opcode += $offset))";
+    return "goto **(cur_opcode += $offset)";
 }
 
 =item C<goto_pop()>
@@ -129,8 +140,8 @@ sub goto_pop
 {
     my ($self) = @_;
 
-    return "goto *((void*)* (cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,
-	(opcode_t*)pop_dest(interpreter))))";
+    return "goto **(cur_opcode = opcode_to_prederef(interpreter,
+	(opcode_t*)pop_dest(interpreter)))";
 }
 
 sub run_core_func_start
@@ -142,10 +153,10 @@ sub run_core_func_start
      * (gdb) disas l_ops_addr[1191] l_ops_addr[1192]
      */
 #if defined(__GNUC__) && defined(I386) && defined(PARROT_CGP_REGS)
-    register opcode_t *cur_opcode asm ("esi") = cur_op;
+    register void **   cur_opcode asm ("esi") = cur_op;
     register char *   _reg_base   asm ("edi");
 #else
-    opcode_t *cur_opcode = cur_op;
+    void **cur_opcode = cur_op;
     char * _reg_base;
 #endif
 

@@ -634,7 +634,7 @@ runops_cgp(Interp *interpreter, opcode_t *pc)
     void **pc_prederef;
     init_prederef(interpreter, PARROT_CGP_CORE);
     pc_prederef = interpreter->code->prederef.code + (pc - code_start);
-    pc = cgp_core((opcode_t*)pc_prederef, interpreter);
+    pc = (opcode_t*) cgp_core(pc_prederef, interpreter);
     return pc;
 #else
     PIO_eprintf(interpreter,

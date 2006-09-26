@@ -74,7 +74,7 @@ Parrot_MIC* parrot_PIC_alloc_mic(Interp*, size_t n);
 Parrot_PIC* parrot_PIC_alloc_pic(Interp*);
 
 void parrot_pic_find_infix_v_pp(Interp *, PMC *left, PMC *right,
-                Parrot_MIC *mic, opcode_t *cur_opcode);
+                Parrot_MIC *mic, void **cur_opcode);
 void * parrot_pic_opcode(Interp *, INTVAL op);
 
 typedef int (*arg_pass_f)(Interp *, PMC *sig,

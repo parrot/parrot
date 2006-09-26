@@ -642,7 +642,7 @@ parrot_pic_move(Interp* interpreter, Parrot_MIC *mic)
 
 void
 parrot_pic_find_infix_v_pp(Interp *interpreter, PMC *left, PMC *right,
-                Parrot_MIC *mic, opcode_t *cur_opcode)
+                Parrot_MIC *mic, void **cur_opcode)
 {
     funcptr_t func;
     int is_pmc;
@@ -670,7 +670,7 @@ parrot_pic_find_infix_v_pp(Interp *interpreter, PMC *left, PMC *right,
     func = get_mmd_dispatch_type(interpreter,
             mic->m.func_nr, left_type, right_type, &is_pmc);
     if (is_pmc) {
-        size_t offs = cur_opcode - (opcode_t*)interpreter->code->prederef.code;
+        size_t offs = cur_opcode - interpreter->code->prederef.code;
         opcode_t* real_op = interpreter->code->base.data + offs + 1;
         /* set prederef code address to orig slot for now
          */

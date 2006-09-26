@@ -276,14 +276,16 @@ inline op pic_callr__(inconst PMC) :pic {
     for (i = 0; i < n_args; ++i) {
         switch (sig_bits[i]) {
             case PARROT_ARG_INTVAL:
-                args[1 + i] = (void*)*(INTVAL*)(_reg_base + cur_opcode[2 + i]);
+                args[1 + i] = (void*)*(INTVAL*)(_reg_base +
+                        ((opcode_t*)cur_opcode)[2 + i]);
                 break;
             case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
             case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
                 args[1 + i] = (void**)cur_opcode[2 + i];
                 break;
             case PARROT_ARG_FLOATVAL:
-                args[1 + i] = (_reg_base + cur_opcode[2 + i]);
+                args[1 + i] = (_reg_base + 
+                        ((opcode_t*)cur_opcode)[2 + i]);
                 break;
             default:
                 internal_exception(1, "unhandled sig_bits");

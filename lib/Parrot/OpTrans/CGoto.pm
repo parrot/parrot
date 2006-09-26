@@ -320,14 +320,14 @@ Returns the run core C code for section after the address table.
 sub run_core_after_addr_table
 {
     my ($self, $bs) = @_;
-
+    my $t = $self->opsarraytype;
     return <<END_C;
 
     if (!${bs}ops_addr)
 	${bs}ops_addr = l_ops_addr;
     if (cur_opcode == 0) {
         DECL_CONST_CAST;
-        return (opcode_t *)const_cast(${bs}ops_addr);
+        return ($t*)const_cast(${bs}ops_addr);
     }
 END_C
 }
