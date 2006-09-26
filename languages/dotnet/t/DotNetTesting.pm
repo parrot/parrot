@@ -25,7 +25,7 @@ sub compile_cs {
 	
 	# Attempt to compile.
 	my $kind = $file_name =~ /\.dll$/ ? '-target:library' : '';
-	my $output = `mcs -out:$file_name $kind $opt $file_name.cs`;
+	my $output = `mcs -warn:0 -out:$file_name $kind $opt $file_name.cs`;
 	if ($output) {
 		print "compile_cs failed:\n$output";
 		return 0;
