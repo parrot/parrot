@@ -20,6 +20,8 @@ available.
 
 =cut
 
+.include 'io_thr_msg.pasm'
+
 .sub main :main
     .local pmc handler, pio, data, pio_out
     .local string idles
@@ -35,7 +37,7 @@ available.
     i = 0
 spin:
     # the IO event is inactive, after it fired, just reattach always
-    add_io_event pio, handler, data,  2	# XXX TODO magic num
+    add_io_event pio, handler, data, .IO_THR_MSG_ADD_SELECT_RD 
     sleep 0.2
     $S0 = idles[i]
     inc i

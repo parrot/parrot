@@ -86,6 +86,7 @@ at the pio.
 .const string CRCR     = "\r\r"
 
 .include "stat.pasm"
+.include 'io_thr_msg.pasm'
 
 =back
 
@@ -332,7 +333,7 @@ runnloop.
 add_lp:
     conn = active[i]
     sock = conn.'socket'()
-    add_io_event sock, req_handler, conn, 2	# XXX magic 2
+    add_io_event sock, req_handler, conn, .IO_THR_MSG_ADD_SELECT_RD 
     ## self.'debug'('**select ', i, "\n")
     inc i
     if i < n goto add_lp
@@ -525,6 +526,8 @@ Create a new connection object with the given socket pio.
 =item socket()
 
 Get connection socket.
+
+=cut
 
 # get socket
 .sub 'socket' :method
@@ -891,6 +894,8 @@ next_item:
 .end
 
 =back
+
+=cut
 
 .namespace ['HTTP'; 'Message']
 
