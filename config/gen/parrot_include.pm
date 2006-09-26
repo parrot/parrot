@@ -27,6 +27,7 @@ my @files = qw(
     include/parrot/core_pmcs.h
     include/parrot/datatypes.h
     include/parrot/enums.h
+    include/parrot/events.h
     include/parrot/exceptions.h
     include/parrot/interpreter.h
     include/parrot/io.h

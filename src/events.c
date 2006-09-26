@@ -106,12 +106,6 @@ static int pipe_fds[2];
 /* 
  * a structure to communicate with the io_thread
  */
-typedef enum {
-    IO_THR_MSG_NONE,
-    IO_THR_MSG_TERMINATE,
-    IO_THR_MSG_ADD_SELECT_RD
-} io_thread_msg_type;
-
 typedef struct {
     io_thread_msg_type command;
     parrot_event *ev;
@@ -845,10 +839,6 @@ stop_io_thread(void)
         internal_exception(1, "msg pipe write failed");
 #endif
 }
-
-/* XXX move to header */
-void Parrot_event_add_io_event(Interp*, 
-        PMC* pio, PMC* sub, PMC* data, INTVAL which);
 
 void
 Parrot_event_add_io_event(Interp* interpreter, 

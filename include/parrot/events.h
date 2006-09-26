@@ -100,6 +100,17 @@ PARROT_API void Parrot_run_callback(Parrot_Interp, PMC* cbi, void*ext);
 PARROT_API void Parrot_kill_event_loop(void);
 PARROT_API void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);
 
+/* &gen_from_enum(io_thr_msg.pasm) */
+typedef enum {
+    IO_THR_MSG_NONE,
+    IO_THR_MSG_TERMINATE,
+    IO_THR_MSG_ADD_SELECT_RD
+} io_thread_msg_type;
+/* &end_gen */
+
+PARROT_API void Parrot_event_add_io_event(Interp*, 
+        PMC* pio, PMC* sub, PMC* data, INTVAL which);
+
 #endif /* PARROT_EVENTS_H_GUARD */
 
 /*
