@@ -27,6 +27,10 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
             {
                 pobject_lives(INTERP, (PObj*)mp->pmc);
             }
+            if (mp->type == PTR_TYPE_FIELD && mp->name)
+            {
+                pobject_lives(INTERP, (PObj*)mp->name);
+            }
         }
     }
 
