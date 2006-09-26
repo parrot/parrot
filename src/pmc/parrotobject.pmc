@@ -90,8 +90,7 @@ Call the '__finalize' method if it exists.
                    - run some safe mode
                    - run all finalizers in mro order?
                  */
-                Parrot_run_meth_fromc_args(interpreter, meth, 
-                        SELF, fin, "v");
+                Parrot_runops_fromc_args_event(interpreter, meth, "vP", SELF);
             }
         }
         SUPER();

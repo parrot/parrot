@@ -474,6 +474,7 @@ void runops(Interp *, size_t offset);
 void runops_int(Interp *, size_t offset);
 PARROT_API parrot_context_t* Parrot_runops_fromc(Interp *, PMC *sub);
 PARROT_API void* Parrot_runops_fromc_args(Interp *, PMC *sub, const char *sig, ...);
+PARROT_API void* Parrot_runops_fromc_args_event(Interp *, PMC *sub, const char *sig, ...);
 PARROT_API INTVAL Parrot_runops_fromc_args_reti(Interp *, PMC *, const char *, ...);
 PARROT_API FLOATVAL Parrot_runops_fromc_args_retf(Interp *, PMC *, const char *, ...);
 

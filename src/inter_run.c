@@ -254,6 +254,14 @@ Signatures are similar to NCI:
     S ... STRING*
     P ... PMC*
 
+=item C<void *
+Parrot_runops_fromc_args_event(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)>
+
+Run code from within event handlers. This variant deals with some reentrency
+issues. It also should do sanity checks, if e.g. the handler subroutine
+didn't return properly.
+
 =cut
 
 */
@@ -289,6 +297,36 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
     return set_retval(interpreter, *sig, ctx);
 }
 
+void *
+Parrot_runops_fromc_args_event(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)
+{
+    va_list args;
+    parrot_context_t *ctx;
+    opcode_t *cargs, *params, *returns;
+    PMC *cont;
+    void *retval;
+    /*
+     * running code from event handlers isn't fully reentrant due to
+     * these interpreter variables - mainly related to calls
+     */
+    cargs   = interpreter->current_args;
+    params  = interpreter->current_params;
+    returns = interpreter->current_returns;
+    cont    = interpreter->current_cont;
+    /* what else ? */
+
+    va_start(args, sig);
+    ctx = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    va_end(args);
+    retval = set_retval(interpreter, *sig, ctx);
+
+    interpreter->current_args     = cargs;
+    interpreter->current_params   = params;
+    interpreter->current_returns  = returns;
+    interpreter->current_cont     = cont;
+    return retval;
+}
 
 INTVAL
 Parrot_runops_fromc_args_reti(Parrot_Interp interpreter, PMC *sub,

@@ -335,7 +335,7 @@ case_I:
                                *p);
     }
     pasm_sig[3] = '\0';
-    Parrot_runops_fromc_args(interpreter, sub, pasm_sig,
+    Parrot_runops_fromc_args_event(interpreter, sub, pasm_sig,
             user_data, param);
 }
 /*
