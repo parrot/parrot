@@ -132,8 +132,13 @@ inline op wrapper__() :internal {
 }
 
 inline op prederef__() :internal {
+    opcode_t *this = CUR_OPCODE;
+    if (interpreter->run_core & PARROT_CGOTO_CORE) {
+	/* must be CGP then - check for events in not yet prederefed code */
+	this = CHECK_EVENTS(interpreter, this);
+    }
     do_prederef((void**)cur_opcode, interpreter, op_lib.core_type);
-    goto OFFSET(0);
+    goto ADDRESS(this);	/* force this being a branch op */
 }
 
 inline op reserved(inconst INT) {

@@ -1104,6 +1104,7 @@ notify_func_table(Parrot_Interp interpreter, void* table, int on)
             interpreter->op_func_table = table;
             break;
         case PARROT_CGP_CORE:
+        case PARROT_CGP_JIT_CORE:
             turn_ev_check(interpreter, on);
             break;
         default:
@@ -1156,7 +1157,6 @@ enable_event_checking(Parrot_Interp interpreter)
     /*
      * put table in place
      */
-    assert(interpreter->evc_func_table);
     notify_func_table(interpreter, interpreter->evc_func_table, 1);
 }
 
