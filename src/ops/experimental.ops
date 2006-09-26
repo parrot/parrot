@@ -455,7 +455,7 @@ op add_io_event(invar PMC, invar PMC, invar PMC, inconst INT) {
     goto NEXT();
 }
 
-=item B<need_finalize(invar PMC)
+=item B<need_finalize>(invar PMC)
 
 The ParrotObject $1 needs the __finalize method during GC.
 
