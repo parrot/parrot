@@ -14,6 +14,7 @@ dynamic PMCs.
 =cut
 
 use strict;
+use warnings;
 
 use File::Copy qw(copy);
 
@@ -244,6 +245,8 @@ sub generate_dump {
         run("$PMC2C --dump $pmc.pmc")
           or die "pmc2c dump failed ($?)\n";
     }
+
+    return;
 }
 
 sub generate_c {
@@ -253,6 +256,8 @@ sub generate_c {
         run("$PMC2C --c $pmc.pmc")
           or die "pmc2c code generation failed ($?)\n";
     }
+
+    return;
 }
 
 sub compile {
@@ -260,11 +265,11 @@ sub compile {
 
     $dest_stem ||= $src_stem;
     if (needs_build("$dest_stem$O", "$src_stem.c")) {
-        run(compile_cmd("$dest_stem$O", "$src_stem.c"))
+        return run(compile_cmd("$dest_stem$O", "$src_stem.c"))
           or die "compile $src_stem.c failed ($?)\n";
     }
     else {
-        1;
+        return 1;
     }
 }
 
@@ -273,10 +278,10 @@ sub partial_link {
 
     my @sources = map { "$_$O" } @$stems;
     if (needs_build("$group$LOAD_EXT", @sources)) {
-        run(partial_link_cmd("$group$LOAD_EXT", $libs, \@sources))
+        return run(partial_link_cmd("$group$LOAD_EXT", $libs, \@sources))
           or die "partial link $group$LOAD_EXT failed ($?)\n";
     }
     else {
-        1;
+        return 1;
     }
 }

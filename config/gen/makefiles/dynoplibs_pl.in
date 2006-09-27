@@ -183,6 +183,8 @@ sub generate_c {
                 or die "ops2c code generation failed ($?)\n";
         }
     }
+
+    return;
 }
 
 sub compile {
@@ -190,11 +192,11 @@ sub compile {
 
     $dest_stem ||= $src_stem;
     if (needs_build("$dest_stem$O", "$src_stem.c")) {
-        run(compile_cmd("$dest_stem$O", "$src_stem.c"))
+        return run(compile_cmd("$dest_stem$O", "$src_stem.c"))
           or die "compile $src_stem.c failed ($?)\n";
     }
     else {
-        1;
+        return 1;
     }
 }
 
@@ -202,11 +204,11 @@ sub partial_link {
     my ($libs, $stem) = @_;
 
     if (needs_build("$stem$LOAD_EXT", "$stem$O")) {
-        run(partial_link_cmd("$stem$LOAD_EXT", $libs, [ "$stem$O" ]))
+        return run(partial_link_cmd("$stem$LOAD_EXT", $libs, [ "$stem$O" ]))
           or die "partial link $stem$LOAD_EXT failed ($?)\n";
     }
     else {
-        1;
+        return 1;
     }
 }
 
