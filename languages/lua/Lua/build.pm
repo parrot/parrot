@@ -2,6 +2,7 @@
 package Lua::parser;
 
 use strict;
+use warnings;
 
 use Lua::opcode;
 use Lua::symbtab;
@@ -67,6 +68,7 @@ sub PushScopeF {
     unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{lex_num};
     $parser->YYData->{lex_num} = 0;
 ##    warn "PushScopeF\n";
+    return;
 }
 
 sub PopScopeF {
@@ -82,6 +84,7 @@ sub PopScopeF {
     $parser->YYData->{_G} = $g;
 ##    warn "PopScopeF\n";
     PopScope($parser);
+    return;
 }
 
 sub PushScope {
@@ -91,6 +94,7 @@ sub PushScope {
     $parser->YYData->{symbtab} = new SymbTabVar($parser);
     $parser->YYData->{lex_num} ++;
 ##    warn "PushScope\n";
+    return;
 }
 
 sub PopScope {
@@ -100,6 +104,7 @@ sub PopScope {
     $parser->YYData->{symbtab} = $symbtab;
     $parser->YYData->{lex_num} ++;
 ##    warn "PopScope\n";
+    return;
 }
 
 sub Insert {
@@ -115,6 +120,7 @@ sub InsertList {
     for my $var ( @{$vars} ) {
         Insert( $parser, $var );
     }
+    return;
 }
 
 sub BuildLiteral {
@@ -1230,6 +1236,7 @@ sub BuildParam {
 sub PrepareMethod {
     my ($parser) = @_;
     $parser->YYData->{self} = BuildParam( $parser, 'self' );
+    return;
 }
 
 sub BuildFunctionBody {
@@ -1309,6 +1316,7 @@ sub BuildMain {
         }
         unshift @{ $parser->YYData->{functs} }, \@opcodes;
     }
+    return;
 }
 
 1;

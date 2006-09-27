@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 
 package Lua::symbtab;
 {
@@ -42,7 +43,7 @@ use base qw(Lua::symbtab);
                     }
                 }
             }
-            return undef;
+            return;
         }
     }
 
@@ -54,6 +55,7 @@ use base qw(Lua::symbtab);
         unless ( exists $self->{table}{$symb} ) {
             $self->{table}{$symb} = $defn;
         }
+        return;
     }
 
     sub LookupU {
@@ -76,7 +78,7 @@ use base qw(Lua::symbtab);
                 }
             }
         }
-        return undef;
+        return;
     }
 
     sub LookupS {
@@ -86,7 +88,7 @@ use base qw(Lua::symbtab);
             my $defn = $self->{table}{$symb};
             return $defn;
         }
-        return undef;
+        return;
     }
 
 }
@@ -105,7 +107,7 @@ use base qw(Lua::symbtab);
             return $defn;
         }
         else {
-            return undef;
+            return;
         }
     }
 
@@ -113,6 +115,7 @@ use base qw(Lua::symbtab);
         my $self = shift;
         my ( $symb, $defn ) = @_;
         $self->{table}{$symb} = $defn;
+        return;
     }
 
 }

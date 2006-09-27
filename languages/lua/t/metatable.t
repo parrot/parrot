@@ -19,6 +19,7 @@ See "Programming in Lua", section 13 "Metatables and Metamethods".
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

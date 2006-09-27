@@ -17,6 +17,9 @@ Tests C<LuaNumber> PMC
 
 =cut
 
+use strict;
+use warnings;
+
 use Parrot::Test tests => 11;
 use Test::More;
 

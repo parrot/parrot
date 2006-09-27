@@ -17,6 +17,7 @@ See "Programming in Lua", section 2.5 "Tables".
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

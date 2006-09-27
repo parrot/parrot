@@ -18,6 +18,7 @@ Tests Lua Operating System Library
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

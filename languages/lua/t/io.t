@@ -18,6 +18,7 @@ Tests Lua Input/Output Library
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

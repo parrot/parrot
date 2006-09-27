@@ -15,6 +15,7 @@ t/number.t - Lua number & coercion
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

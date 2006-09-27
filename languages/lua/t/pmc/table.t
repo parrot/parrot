@@ -17,6 +17,9 @@ Tests C<LuaTable> PMC
 
 =cut
 
+use strict;
+use warnings;
+
 use Parrot::Test tests => 12;
 use Test::More;
 

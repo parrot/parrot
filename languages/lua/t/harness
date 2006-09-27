@@ -36,6 +36,7 @@ Otherwise I run the tests that were passed on the command line.
 =cut
 
 use strict;
+use warnings;
 use lib '..';
 
 use Cwd();
@@ -52,7 +53,7 @@ GetOptions(
     'files' => \$opt_files,
     'use-lua' => \$use_orig_lua,
     'use-monkey' => \$use_monkey,
-    'use-lua2pir' => $use_lua2pir,
+    'use-lua2pir' => \$use_lua2pir,
 );
 
 if ( $opt_files ) {

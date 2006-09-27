@@ -17,6 +17,7 @@ See "Lua 5.1 Reference Manual", section 2.1 "Lexical Conventions".
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

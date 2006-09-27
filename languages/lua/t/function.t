@@ -19,6 +19,7 @@ See "Programming in Lua", section 5 "Functions".
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

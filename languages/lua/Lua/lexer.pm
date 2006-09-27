@@ -1,11 +1,12 @@
 #
 #
-#	Lexer module
+#   Lexer module
 #
 
 package Lua::parser;
 
 use strict;
+use warnings;
 
 #use Math::BigFloat;
 
@@ -26,6 +27,7 @@ sub Error {
         $parser->YYData->{lineno}, ': ', $msg
         if ( exists $parser->YYData->{verbose_error}
         and $parser->YYData->{verbose_error} );
+    return;
 }
 
 sub Warning {
@@ -45,6 +47,7 @@ sub Warning {
         $parser->YYData->{lineno}, ': ', $msg
         if ( exists $parser->YYData->{verbose_warning}
         and $parser->YYData->{verbose_warning} );
+    return;
 }
 
 sub Info {
@@ -64,6 +67,7 @@ sub Info {
         $parser->YYData->{lineno}, ': ', $msg
         if ( exists $parser->YYData->{verbose_info}
         and $parser->YYData->{verbose_info} );
+    return;
 }
 
 sub _DoubleQuoteStringLexer {
@@ -343,6 +347,7 @@ sub _InitLexico {
     );
 
     $parser->YYData->{keyword} = \%keywords;
+    return;
 }
 
 1;

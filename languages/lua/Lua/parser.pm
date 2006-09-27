@@ -100,7 +100,7 @@ sub YYData {
 	or	$$self{USER}={};
 
 	$$self{USER};
-
+	
 }
 
 sub YYErrok {
@@ -386,7 +386,7 @@ sub _Parse {
                 $$check eq 'ERROR'
             or  do {
 #DBG>				$debug & 0x04
-#DBG>			and	print STDERR
+#DBG>			and	print STDERR 
 #DBG>				    "go to state $$states[$$stack[-1][0]]{GOTOS}{$lhs}.\n";
 
 #DBG>				$debug & 0x10
@@ -3752,6 +3752,7 @@ sub
 package Lua::parser;
 
 use strict;
+use warnings;
 
 use Lua::lexer;
 use Lua::build;
@@ -3762,7 +3763,7 @@ sub Run {
     my $parser = shift;
     my ($srcname) = @_;
 
-    open $parser->YYData->{fh}, $srcname
+    open $parser->YYData->{fh}, '<', $srcname
         or die "can't open $srcname ($!).\n";
 
     $parser->YYData->{shebang} = 1;
@@ -3798,6 +3799,7 @@ sub Run {
     delete $parser->{RULES};
     delete $parser->{STATES};
     delete $parser->{STACK};
+    return;
 }
 
 sub Generate {
@@ -3827,6 +3829,7 @@ sub Generate {
         }
     }
     close $FH;
+    return;
 }
 
 

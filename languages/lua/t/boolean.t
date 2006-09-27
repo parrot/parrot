@@ -15,6 +15,7 @@ t/boolean.t - Lua boolean & coercion
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

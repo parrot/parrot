@@ -15,6 +15,7 @@ t/functions.t - Lua function & coercion
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

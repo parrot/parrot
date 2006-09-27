@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 
 package Lua::opcode;
 {
@@ -41,7 +42,7 @@ package Lua::opcode;
         }
         warn "Please implement a function 'visit", ref $self, "' in '",
             ref $visitor, "'.\n";
-        return undef;
+        return;
     }
 
 }

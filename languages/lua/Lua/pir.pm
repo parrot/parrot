@@ -1,5 +1,6 @@
 
 use strict;
+use warnings;
 
 package pirVisitor;
 {
@@ -63,6 +64,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}\n";
+        return;
     }
 
     sub visitBinaryOp {
@@ -77,6 +79,7 @@ package pirVisitor;
             print {$FH}
                 "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
         }
+        return;
     }
 
     sub visitRelationalOp {
@@ -85,6 +88,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
+        return;
     }
 
     sub visitAssignOp {
@@ -92,6 +96,7 @@ package pirVisitor;
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH} "  $op->{result}->{symbol} = $op->{arg1}->{symbol}\n";
+        return;
     }
 
     sub visitKeyedGetOp {
@@ -100,6 +105,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  $op->{result}->{symbol} = $op->{arg1}->{symbol}\[$op->{arg2}->{symbol}\]\n";
+        return;
     }
 
     sub visitKeyedSetOp {
@@ -108,6 +114,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  $op->{result}->{symbol}\[$op->{arg1}->{symbol}\] = $op->{arg2}->{symbol}\n";
+        return;
     }
 
     sub visitIncrOp {
@@ -115,6 +122,7 @@ package pirVisitor;
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH} "  inc $op->{result}->{symbol}\n";
+        return;
     }
 
     sub visitGetGlobalOp {
@@ -123,6 +131,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  $op->{result}->{symbol} = get_global '$op->{arg1}'\n";
+        return;
     }
 
     sub visitFindLexOp {
@@ -131,6 +140,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  $op->{result}->{symbol} = find_lex '$op->{arg1}->{symbol}'\n";
+        return;
     }
 
     sub visitStoreLexOp {
@@ -139,6 +149,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  store_lex '$op->{arg1}->{symbol}', $op->{arg2}->{symbol}\n";
+        return;
     }
 
     sub visitCloneOp {
@@ -147,6 +158,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  $op->{result}->{symbol} = clone $op->{arg1}->{symbol}\n";
+        return;
     }
 
     sub visitNewOp {
@@ -160,6 +172,7 @@ package pirVisitor;
         else {
             print {$FH} "  new $op->{result}->{symbol}, $op->{arg1}\n";
         }
+        return;
     }
 
     sub visitNewClosureOp {
@@ -168,6 +181,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  $op->{result}->{symbol} = newclosure $op->{arg1}->{symbol}\n";
+        return;
     }
 
     sub visitNoOp {
@@ -176,6 +190,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
 
         #    print {$FH} "  noop\n";
+        return;
     }
 
     sub visitToBoolOp {
@@ -183,6 +198,7 @@ package pirVisitor;
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH} "  $op->{result}->{symbol} = $op->{arg1}->{symbol}\n";
+        return;
     }
 
     sub visitCallOp {
@@ -214,6 +230,7 @@ package pirVisitor;
             $first = 0;
         }
         print {$FH} ")\n";
+        return;
     }
 
     sub visitCallMethOp {
@@ -247,6 +264,7 @@ package pirVisitor;
             $first = 0;
         }
         print {$FH} ")\n";
+        return;
     }
 
     sub visitBranchIfOp {
@@ -261,6 +279,7 @@ package pirVisitor;
             print {$FH}
                 "  if $op->{arg1}->{symbol} goto $op->{result}->{symbol}\n";
         }
+        return;
     }
 
     sub visitBranchUnlessOp {
@@ -275,6 +294,7 @@ package pirVisitor;
             print {$FH}
                 "  unless $op->{arg1}->{symbol} goto $op->{result}->{symbol}\n";
         }
+        return;
     }
 
     sub visitBranchUnlessNullOp {
@@ -283,6 +303,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH}
             "  unless_null $op->{arg1}->{symbol}, $op->{result}->{symbol}\n";
+        return;
     }
 
     sub visitBranchOp {
@@ -290,6 +311,7 @@ package pirVisitor;
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH} "  goto $op->{result}->{symbol}\n";
+        return;
     }
 
     sub visitLabelOp {
@@ -298,6 +320,7 @@ package pirVisitor;
         my $FH   = $self->{fh};
         print {$FH} "\n";
         print {$FH} "$op->{arg1}->{symbol}:\n";
+        return;
     }
 
     sub visitSubDir {
@@ -310,6 +333,7 @@ package pirVisitor;
             print {$FH} " :outer($dir->{outer})";
         }
         print {$FH} "\n";
+        return;
     }
 
     sub visitEndDir {
@@ -318,6 +342,7 @@ package pirVisitor;
         my $FH    = $self->{fh};
         print {$FH} ".end\n";
         print {$FH} "\n";
+        return;
     }
 
     sub visitParamDir {
@@ -332,6 +357,7 @@ package pirVisitor;
             print {$FH}
                 "  .param $dir->{result}->{type} $dir->{result}->{symbol} :optional\n";
         }
+        return;
     }
 
     sub visitReturnDir {
@@ -349,6 +375,7 @@ package pirVisitor;
             $first = 0;
         }
         print {$FH} ")\n";
+        return;
     }
 
     sub visitLocalDir {
@@ -357,6 +384,7 @@ package pirVisitor;
         my $FH    = $self->{fh};
         print {$FH}
             "  .local $dir->{result}->{type} $dir->{result}->{symbol}\n";
+        return;
     }
 
     sub visitLexDir {
@@ -365,6 +393,7 @@ package pirVisitor;
         my $FH    = $self->{fh};
         print {$FH}
             "  .lex '$dir->{arg1}->{symbol}', $dir->{arg1}->{symbol}\n";
+        return;
     }
 
     sub visitConstDir {
@@ -373,6 +402,7 @@ package pirVisitor;
         my $FH    = $self->{fh};
         print {$FH}
             "  .const .$dir->{type} $dir->{result}->{symbol} = \"$dir->{arg1}\"\n";
+        return;
     }
 
 }

@@ -19,6 +19,7 @@ See "Programming in Lua", section 4.2 "Local Variables and Blocks".
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

@@ -17,6 +17,7 @@ First tests in order to check infrastructure.
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

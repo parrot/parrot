@@ -26,6 +26,9 @@ Yet another constructor.
 
 =cut
 
+use strict;
+use warnings;
+
 sub new {
     return bless {};
 }
