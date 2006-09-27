@@ -29,7 +29,7 @@ foreach my $func ( keys %language_test_map ) {
   *{"Parrot::Test::Tcl::$func"} = sub ($$;$) {
 
     my ($self, $code, $output, $desc) = @_;
-  
+
     $count = $self->{builder}->current_test + 1;
 
     $desc = $language unless $desc;
@@ -69,20 +69,21 @@ foreach my $func ( keys %language_test_map ) {
     my $exit_code = 0;
     my $pass = 0;
 
-    my $executable = File::Spec->join($path_to_parrot,$self->{parrot}) . 
+    my $executable = File::Spec->join($path_to_parrot,$self->{parrot}) .
     " $args " . File::Spec->join($path_to_tcl, 'tcl.pbc');
     if (defined($ENV{PARROT_TCLSH})) {
       $executable = $ENV{PARROT_TCLSH};
     }
     $cmd = "$executable $lang_f";
 
-    $exit_code = Parrot::Test::run_command($cmd, #CD => $self->{relpath},
-					   STDOUT => $out_f, STDERR => $out_f);
-  
+    $exit_code = Parrot::Test::run_command(
+        $cmd, #CD => $self->{relpath}, STDOUT => $out_f, STDERR => $out_f
+    );
+
     unless ($pass) {
       my $file = Parrot::Test::slurp_file($out_f);
       my $builder_func = $language_test_map{$func};
-    
+
       {
         no strict 'refs';
 
