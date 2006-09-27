@@ -146,7 +146,7 @@ sub wanted {
 
     $File::Find::name =~ s[^\./][];
     -d and push @dirs, $File::Find::name;
-    -f and -e ".svn/text-base/$_.svn-base" and MANIFEST();
+    return -f and -e ".svn/text-base/$_.svn-base" and MANIFEST();
 }
 
 sub MANIFEST {
