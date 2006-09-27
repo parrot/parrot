@@ -15,6 +15,7 @@ t/invalid.t - WMLScript invalid & conversion
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

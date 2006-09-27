@@ -15,6 +15,7 @@ t/float.t - WMLScript floating-point & conversion
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

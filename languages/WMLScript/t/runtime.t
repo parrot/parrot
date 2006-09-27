@@ -12,6 +12,8 @@ t/runtime.t - WMLScript Runtime Libraries
 
 =cut
 
+use strict;
+use warnings;
 use Parrot::Test tests => 2;
 use Test::More;
 

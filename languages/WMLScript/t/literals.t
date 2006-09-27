@@ -17,6 +17,7 @@ See "WMLScript Specification", section 6.1.5 "Literals".
 =cut
 
 use strict;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 

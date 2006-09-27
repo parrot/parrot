@@ -17,6 +17,8 @@ Tests C<WmlsInteger> PMC
 
 =cut
 
+use strict;
+use warnings;
 use Parrot::Test tests => 10;
 use Test::More;
 

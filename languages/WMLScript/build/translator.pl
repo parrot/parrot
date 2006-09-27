@@ -269,6 +269,7 @@ sub validate_rule {
 
     $rule->{pop} = 0 unless (exists $rule->{pop});
     $rule->{push} = 0 unless (exists $rule->{push});
+    return;
 }
 
 
@@ -515,7 +516,8 @@ PIRCODE
         $mv->{INLINE} = 'inline';
         push @localmv, 'INLINE';
     }
-    my @args = split(/,\s*/, $rule->{arguments})
+    my @args;
+    @args = split(/,\s*/, $rule->{arguments})
         if (exists $rule->{arguments});
     my $arg_num = 1;
     foreach (@args) {
@@ -757,7 +759,8 @@ PIRCODE
     inline = cur_ic & 0x$rule->{inline}
 PIRCODE
     }
-    my @args = split(/,\s*/, $rule->{arguments})
+    my @args;
+    @args = split(/,\s*/, $rule->{arguments})
         if (exists $rule->{arguments});
     my $arg_num = 1;
     foreach (@args) {

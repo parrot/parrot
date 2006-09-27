@@ -3,10 +3,9 @@
 # virtual registers numbered by depth. This eliminates the need for a stack.
 
 use strict;
+use warnings;
 
 package SRM::Register;
-
-#use base qw(SRM::Base);
 
 # Constructor. Just base this class on a hash.
 sub new {

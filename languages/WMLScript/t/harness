@@ -30,6 +30,7 @@ Otherwise I run the tests that were passed on the command line.
 =cut
 
 use strict;
+use warnings;
 use lib '..';
 
 use Cwd();

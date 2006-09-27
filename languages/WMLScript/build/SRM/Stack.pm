@@ -2,10 +2,9 @@
 # Stack emulation stack to register mapper. Simple and stupid.
 
 use strict;
+use warnings;
 
 package SRM::Stack;
-
-#use base qw(SRM::Base);
 
 # Constructor. Just base this class on a hash.
 sub new {
