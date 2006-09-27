@@ -19,7 +19,7 @@ my $header = <<'EOH';
 */
 EOH
 
-open OUT, ">include/parrot/extend_vtable.h" or die $!;
+open OUT, '>', 'include/parrot/extend_vtable.h' or die $!;
 
 print OUT $header, <<'EOF';
 
@@ -43,7 +43,7 @@ EOF
 
 close OUT or die $!;
 
-open OUT, ">src/extend_vtable.c" or die $!;
+open OUT, '>', 'src/extend_vtable.c' or die $!;
 
 print OUT $header, <<'EOF';
 

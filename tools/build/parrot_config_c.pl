@@ -72,7 +72,7 @@ else {
 
     my $image_file = $install_parrot ?
         'install_config.fpmc' : 'runtime/parrot/include/config.fpmc';
-    open F, $image_file or die "Can't read '$image_file': $!";
+    open F, '<', $image_file or die "Can't read '$image_file': $!";
     my $image;
     local $/;
     binmode F;

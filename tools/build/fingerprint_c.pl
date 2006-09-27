@@ -27,7 +27,7 @@ use lib 'lib';
 use Digest::Perl::MD5 qw(md5_hex);
 
 my $compat_file = 'PBC_COMPAT';
-open IN, $compat_file or die "Can't read $compat_file";
+open IN, '<', $compat_file or die "Can't read $compat_file";
 my @lines = <IN>;
 close IN;
 

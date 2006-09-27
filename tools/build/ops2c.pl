@@ -234,10 +234,10 @@ if (!$dynamic_flag && ! -d $incdir) {
     mkdir($incdir, 0755) or die "ops2c.pl: Could not mkdir $incdir $!!\n";
 }
 
-open HEADER, ">$header"
+open HEADER, '>', $header
     or die "ops2c.pl: Cannot open header file '$header' for writing: $!!\n";
 
-open SOURCE, ">$source"
+open SOURCE, '>', $source
     or die "ops2c.pl: Cannot open source file '$source' for writing: $!!\n";
 
 
@@ -421,10 +421,10 @@ if ($trans->can("run_core_finish")) {
 #
 
 close(SOURCE);
-open(SOURCE, "<$source") || die "Error re-reading $source: $!\n";
+open(SOURCE, '<', $source) || die "Error re-reading $source: $!\n";
 my $line = 0; while (<SOURCE>) { $line++; } $line+=2;
 close(SOURCE);
-open(SOURCE, ">>$source") || die "Error appending to $source: $!\n";
+open(SOURCE, '>>', $source) || die "Error appending to $source: $!\n";
 unless ($nolines_flag) {
     my $source_escaped = $source;
     $source_escaped =~ s|\.temp||;

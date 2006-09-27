@@ -33,7 +33,7 @@ use Parrot::Vtable;
 
 my $vtable = parse_vtable();
 
-open OUT, ">include/parrot/vtable.h" or die $!;
+open OUT, '>', 'include/parrot/vtable.h' or die $!;
 
 print OUT <<'EOF';
 /* ex: set ro:

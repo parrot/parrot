@@ -61,7 +61,7 @@ sub hash_val {
 
 sub read_all {
     if (-e $outfile) {
-        open IN, "<$outfile";
+        open IN, '<', $outfile;
         while (<IN>) {
             # len hashval "string"
             if (/(\d+)\s+(0x[\da-hA-H]+)\s+"(.*)"/) {
@@ -74,7 +74,7 @@ sub read_all {
 }
 
 sub process_cfile {
-    open IN, $infile or die "Can't read '$infile': $!";
+    open IN, '<', $infile or die "Can't read '$infile': $!";
 
     my $line = 0;
     print <<"HEADER";
@@ -237,7 +237,7 @@ DATA
   }
 }
 
-open IN, $infile;
+open IN, '<', $infile;
 
 my $line = 0;
 while (<IN>) {

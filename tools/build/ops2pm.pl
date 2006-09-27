@@ -199,7 +199,7 @@ for(@{$ops->{OPS}}) {
 if (! -d $moddir) {
     mkdir($moddir, 0755) or die "$0: Could not mkdir $moddir: $!!\n";
 }
-open MODULE, ">$module"
+open MODULE, '>', $module
   or die "$0: Could not open module file '$module' for writing: $!!\n";
 
 
@@ -265,7 +265,7 @@ my $inc_dir = "include/parrot/oplib";
 if (! -d $inc_dir) {
     mkdir($inc_dir, 0755) or die "ops2pm.pl: Could not mkdir $inc_dir: $!\n";
 }
-open OUT, ">$inc_f" or die "Can't write $inc_f: $!";
+open OUT, '>', $inc_f or die "Can't write $inc_f: $!";
 
 print OUT <<END_C;
 /* ex: set ro:
@@ -334,7 +334,7 @@ sub renum_op_map_file {
     my ($name, $number, @lines, %seen, %fixed, $fix);
     local *OP;
     $fix = 1;
-    open OP, "< $file" or die "Can't open $file, error $!";
+    open OP, '<', $file or die "Can't open $file, error $!";
     while (<OP>) {
         push @lines, $_ if $fix;
         chomp;
@@ -348,7 +348,7 @@ sub renum_op_map_file {
         $fixed{$name} = $number if ($fix);
     }
     close OP;
-    open OP, "> $file" or die "Can't open $file, error $!";
+    open OP, '>', $file or die "Can't open $file, error $!";
     print OP @lines;
     my ($n);
     #
