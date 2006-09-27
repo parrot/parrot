@@ -307,7 +307,7 @@ sub find_file {
     die "can't find file '$file' in path '", join("', '", @$include), "'"
         if $die_unless_found;
 
-    undef;
+    return;
 }
 
 =head2 dump_default()
@@ -349,6 +349,8 @@ sub dump_default {
     $Dumper->Indent(3);
     print $vtd $Dumper->Dump();
     close $vtd;
+
+    return;
 }
 
 =head2 my ($balanced, $remaining) = extract_balanced($code);
@@ -387,6 +389,8 @@ sub extract_balanced {
         }
     }
     die "Badly balanced" if $balance;
+
+    return;
 }
 
 
@@ -461,6 +465,7 @@ sub inherit_attrs {
         $attrs->{write} = $super_attrs->{write}
             if exists $super_attrs->{write};
     }
+    return;
 }
 
 =head2 my ($name, $attributes) = parse_pmc($code);
@@ -586,6 +591,8 @@ sub gen_parent_list {
             push @{ $class->{parents} }, $parent;
         }
     }
+
+    return;
 }
 
 =head2 dump_1_pmc($file);
@@ -657,6 +664,8 @@ sub gen_super_meths {
                 'default';
         }
     }
+
+    return;
 }
 
 
@@ -675,6 +684,8 @@ sub add_defaulted {
         my $meth = $e->{meth};
         $class->{super}{$meth} = 'default';
     }
+
+    return;
 }
 
 =head2 dump_is_newer($file);
@@ -749,6 +760,8 @@ sub dump_pmc {
         print $fh $Dumper->Dump;
         close $fh;
     }
+
+    return;
 }
 
 =head2 read_dump( [$dir1, $dir2], $file );
@@ -771,7 +784,7 @@ sub read_dump {
     die $@ if $@;
 
     close $fh;
-    $class;
+    return $class;
 }
 
 
@@ -794,6 +807,8 @@ sub print_tree {
         print_tree($include, $depth + 1, lc("$_.pmc"))
             for keys %{$class->{flags}{extends}};
     }
+
+    return;
 }
 
 =head2 gen_c( [$dir1, $dir2], $file1, $file2, ... )
@@ -810,6 +825,8 @@ sub gen_c {
     Parrot::Pmc2c::Library
         ->new( \%opt, read_dump($include, "vtable.pmc"), %pmcs )
         ->write_all_files;
+
+    return;
 }
 
 =head2 gen_def( [$dir1, $dir2], \%pmc )
@@ -886,6 +903,8 @@ sub gen_def {
         print $fh "\t$_\n" foreach @{$groups{$group}};
         close $fh;
     }
+
+    return;
 }
 
 =cut
@@ -957,6 +976,8 @@ sub main {
     if ( $action{gen_c} ) {
         gen_c(\@include, @ARGV);
     }
+ 
+    return;
 }
 
 # Local Variables:

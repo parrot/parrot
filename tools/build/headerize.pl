@@ -234,6 +234,8 @@ sub main {
         close FILE;
         print "Wrote '$hfile'\n";
     } # for %files
+
+    return;
 }
 
 # Local Variables:

@@ -366,6 +366,8 @@ sub renum_op_map_file {
         }
     }
     close OP;
+
+    return;
 }
 
 sub load_op_map_files {

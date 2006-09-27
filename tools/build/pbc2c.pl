@@ -72,6 +72,8 @@ sub dump_const_table {
 
         $constant_num++;
     }
+
+    return;
 }
 
 
