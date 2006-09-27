@@ -85,13 +85,13 @@ sub check {
 
   my $ok = 1;
 
-  open F, '<', $f or die "Can't open file '$f'";
-  while ($ok && ($_ = <F>)) {
+  open my $fh, '<', $f or die "Can't open file '$f'";
+  while ($ok && ($_ = <$fh>)) {
     chomp;
     $ok = 0 if length > $columns;
   }
   $l = $.; # save the line number for future reference
-  close F;
+  close $fh;
 
   # if not ok, print the line where the bug was first found, for
   # easier correction;
