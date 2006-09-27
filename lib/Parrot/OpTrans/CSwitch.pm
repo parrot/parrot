@@ -160,7 +160,9 @@ Returns the C code prior to the run core function.
 
 sub run_core_func_start
 {
+    my $type = __PACKAGE__;
     return <<END_C;
+/* run_core_func_start - $0 -> $type */
 #if defined(__GNUC__) && defined(I386) && defined(PARROT_SWITCH_REGS)
     register void **   cur_opcode asm ("esi") = cur_op;
     register char *   _reg_base   asm ("edi");

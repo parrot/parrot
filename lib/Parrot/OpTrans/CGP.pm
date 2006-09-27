@@ -68,7 +68,9 @@ sub defines
     my ($self, $pred_def);
     $self = shift;
     $pred_def = $self->SUPER::defines();
+    my $type = __PACKAGE__;
     return $pred_def . <<END;
+/* defines - $0 -> $type */
 #  define opcode_to_prederef(i, op)   \\
      (void**) (op   - CONTEXT(i->ctx)->pred_offset) 
 END
@@ -130,7 +132,9 @@ sub goto_pop
 
 sub run_core_func_start
 {
+    my $type = __PACKAGE__;
     return <<END_C;
+/* run_core_func_start - $0 -> $type */
     /* at least gcc 2.95.2 miscompiles set_args - %edi
      * is used for the vtable call and _reg_base is clobbered
      * # if 1191 := PARROT_OP_set_args_pc
