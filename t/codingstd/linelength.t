@@ -85,7 +85,7 @@ sub check {
 
   my $ok = 1;
 
-  open F, $f or die "Can't open file '$f'";
+  open F, '<', $f or die "Can't open file '$f'";
   while ($ok && ($_ = <F>)) {
     chomp;
     $ok = 0 if length > $columns;
@@ -96,9 +96,9 @@ sub check {
   # if not ok, print the line where the bug was first found, for
   # easier correction;
   if ($ok) {
-    ok($ok, $g)
+    return ok($ok, $g)
   } else {
-    ok($ok, "$g (line $l)")
+    return ok($ok, "$g (line $l)")
   }
 }
 
