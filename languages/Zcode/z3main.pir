@@ -6,12 +6,13 @@
 #
 #####################################################
 
+.loadlib "myops_ops"
+
 .sub "zm_init"
   newclass $P0, "Zmachine"
   addattribute $P0, "file"
   addattribute $P0, "image"
   addattribute $P0, "opts"
-  load_bytecode "library/Data/Escape.pir"
   .return($P0)
 .end
 

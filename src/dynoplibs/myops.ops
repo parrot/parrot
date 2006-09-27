@@ -101,6 +101,18 @@ op alarm(in NUM, in NUM, in PMC) {
     goto NEXT();
 }
 
+=item B<conv_u2>(inout INT)
+
+Conversion of a two byte unsigned int to an INT.
+Formerly in dotgnu.ops. Used only in ./languages/Zcode/z3main.pir.
+
+=cut
+
+inline op conv_u2(inout INT) :base_core {
+  $1 = (INTVAL)((Parrot_UInt2)($1));
+  goto NEXT();
+}
+
 =back
 
 =cut

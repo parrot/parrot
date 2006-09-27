@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Parrot::Config;
 
 
@@ -27,7 +27,7 @@ Tests the sample dynamic op library "myops".
 my $is_ms_win32 = $^O =~ m!MSWin32!;
 my $is_mingw    = $is_ms_win32 && grep { $PConfig{cc} eq $_ } qw(gcc gcc.exe);
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "fortytwo");
+pir_output_is(<<'CODE', <<'OUTPUT', 'fortytwo');
 .loadlib "myops_ops"
 .sub main :main
     $I0 = fortytwo
@@ -179,3 +179,37 @@ F
 F
 F
 OUTPUT
+
+pasm_output_is(<<'CODE', <<OUTPUT, "conv_u2_i");
+
+.loadlib "myops_ops"
+
+    set I0, 32767
+    conv_u2 I0
+    print I0
+    print "\n"
+    inc I0
+    conv_u2 I0
+    print I0
+    print "\n"
+    set I0, 65535
+    conv_u2 I0
+    print I0
+    print "\n"
+    inc I0
+    conv_u2 I0
+    print I0
+    print "\n"
+    dec I0
+    conv_u2 I0
+    print I0
+    print "\n"
+    end
+CODE
+32767
+32768
+65535
+0
+65535
+OUTPUT
+

@@ -13,7 +13,6 @@ OPS_FILES = \
     $(OPS_DIR)/bit.ops \
     $(OPS_DIR)/cmp.ops \
     $(OPS_DIR)/debug.ops \
-    $(OPS_DIR)/dotgnu.ops \
     $(OPS_DIR)/io.ops \
     $(OPS_DIR)/math.ops \
     $(OPS_DIR)/object.ops \

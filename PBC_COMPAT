@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2006.09.23	bernhard	remove ops from dotgnu.ops
 2006.08.18	leo	removed None PMC from parrot core
 2006.08.16	creiss	added STM opcodes
 2006.08.08	chip	released 0.4.6
