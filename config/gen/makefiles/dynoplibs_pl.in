@@ -50,7 +50,7 @@ our $OPS2C = "$PERL -I $PATHQUOTE" .
              q[@build_dir@@slash@lib] .
              "$PATHQUOTE $PATHQUOTE" .
              q[@build_dir@@slash@tools@slash@build@slash@ops2c.pl] .
-			 $PATHQUOTE;
+             $PATHQUOTE;
 our %cores = (
     C       => '',
 #CONDITIONED_LINE(cg_flag):   CGP     => '_cgp',
@@ -103,43 +103,43 @@ my ($mode, @oplibs) = @ARGV;
 
 if ($mode eq 'generate') {
     # Convert X.ops -> ops_X.c, ops_X_cgp.c, ops_X_cg.c and ops_X_switch.c
-	my $core;
+    my $core;
     generate_c($_) foreach (@oplibs);
 } 
 elsif ($mode eq 'compile') {
     # Convert X.c -> X.o for all X.c
-	my $core_suffix;
-	foreach $core_suffix (values %cores) {
-		compile($_ . "_ops$core_suffix") foreach (@oplibs);
-	}
+    my $core_suffix;
+    foreach $core_suffix (values %cores) {
+        compile($_ . "_ops$core_suffix") foreach (@oplibs);
+    }
 } 
 elsif ($mode eq 'linklibs') {
-	# Convert X.o -> X.so
-	my $core_suffix;
-	foreach $core_suffix (values %cores) {
-		partial_link({}, $_ . "_ops$core_suffix") foreach (@oplibs);
-	}
+    # Convert X.o -> X.so
+    my $core_suffix;
+    foreach $core_suffix (values %cores) {
+        partial_link({}, $_ . "_ops$core_suffix") foreach (@oplibs);
+     }
 } 
 elsif ($mode eq 'copy') {
-	# Copy *.so -> destination, where destination is the first
+    # Copy *.so -> destination, where destination is the first
     # argument, given as --destination=DIRECTORY
     shift(@oplibs) =~ /--destination=(.*)/
       or die "copy command requires destination";
     my $dest = $1;
 
-	my $core_suffix;
+    my $core_suffix;
     foreach $core_suffix (values %cores) {
-		foreach (@oplibs) {
-			my $src = $_ . "_ops$core_suffix$LOAD_EXT";
-	        copy($src, $dest)
-			    or die "Copy $src failed ($?)\n";
-	
-		    # Execute permissions on libraries is especially important on
-			# some platforms
-	        if ($^O eq 'hpux' or $^O eq 'cygwin') {
-		        chmod 0755, "$dest@slash@$src";
-			}
-		}
+        foreach (@oplibs) {
+            my $src = $_ . "_ops$core_suffix$LOAD_EXT";
+            copy($src, $dest)
+                or die "Copy $src failed ($?)\n";
+
+            # Execute permissions on libraries is especially important on
+            # some platforms
+            if ($^O eq 'hpux' or $^O eq 'cygwin') {
+                chmod 0755, "$dest@slash@$src";
+            }
+        }
     }
 }
 else {
@@ -176,13 +176,13 @@ sub needs_build {
 
 sub generate_c {
     my ($oplib) = @_;
-	
-	foreach (keys %cores) {
-		if (needs_build($oplib . "_ops$cores{$_}.c", "$oplib.ops")) {
-			run("$OPS2C $_ --dynamic $oplib.ops")
-	          or die "ops2c code generation failed ($?)\n";
-		}
-	}
+
+    foreach (keys %cores) {
+        if (needs_build($oplib . "_ops$cores{$_}.c", "$oplib.ops")) {
+            run("$OPS2C $_ --dynamic $oplib.ops")
+                or die "ops2c code generation failed ($?)\n";
+        }
+    }
 }
 
 sub compile {
