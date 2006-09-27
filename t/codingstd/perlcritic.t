@@ -21,8 +21,9 @@ use warnings;
 
 use lib qw(. lib ../lib ../../lib);
 
-use Test::More;
 use ExtUtils::Manifest qw(maniread);
+use File::Find;
+use Test::More;
 
 BEGIN {
     eval 'use Perl::Critic';
@@ -34,15 +35,27 @@ BEGIN {
 
 my @files;
 
+my $file_match = qr/\.(?:pm|pl|t)$/;
+
 if (!@ARGV) {
     my $manifest = maniread('MANIFEST');
 
     foreach my $file (keys(%$manifest)) {
-        next unless $file =~ /\.(?:pm|pl|t)$/;
+        next unless $file =~ $file_match;
         push @files, $file;
     }
 } else {
-    @files = @ARGV;
+    # if we're passed a directory, find all the matching files
+    # under that directory. Otherwise just try to parse the given file.
+    foreach my $file (@ARGV) {
+        (-d $file)
+             ? find(sub {
+                            if ($File::Find::name =~ $file_match) {
+                                push @files, $File::Find::name; 
+                            }
+                        }, $file)
+             : push @files, $file;
+    }
 }
 
 plan tests => scalar @files;
