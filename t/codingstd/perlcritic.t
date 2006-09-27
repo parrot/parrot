@@ -20,60 +20,66 @@ BEGIN {
     }
 }
 
-my (@files, @policies);
+my ( @files, @policies );
 
 while (@ARGV) {
     my $arg = $ARGV[0];
-    if ($arg eq '--') {
-        shift @ARGV; # discard
+    if ( $arg eq '--' ) {
+        shift @ARGV;    # discard
         last;
     }
-    if ($arg =~ /^--(.*)/) {
-        push @policies, $1;  
-        shift @ARGV; # discard
-    } else {
+    if ( $arg =~ /^--(.*)/ ) {
+        push @policies, $1;
+        shift @ARGV;    # discard
+    }
+    else {
         last;
     }
 }
 
-if (!@ARGV) {
+if ( !@ARGV ) {
     my $manifest = maniread('MANIFEST');
 
-    foreach my $file (keys(%$manifest)) {
+    foreach my $file ( keys(%$manifest) ) {
         next unless is_perl($file);
         push @files, $file;
     }
-} else {
-    # does the first 
+}
+else {
 
+    # does the first
 
     # if we're passed a directory, find all the matching files
     # under that directory.
 
     # use $_ for the check below, as File::Find chdirs on us.
     foreach my $file (@ARGV) {
-        (-d $file)
-             ? find(sub {
-                            if (is_perl($_)) {
-                                push @files, $File::Find::name; 
-                            }
-                        }, $file)
-             : push @files, $file;
+        ( -d $file )
+            ? find(
+            sub {
+                if ( is_perl($_) ) {
+                    push @files, $File::Find::name;
+                }
+            },
+            $file
+            )
+            : push @files, $file;
     }
 }
 
-if (scalar @files) {
+if ( scalar @files ) {
     plan tests => scalar @files;
-} else {
+}
+else {
     exit;
 }
 
 # By default, don't complain about anything.
-my $critic = Perl::Critic->new(-exclude => [qr/.*/]);
+my $critic = Perl::Critic->new( -exclude => [qr/.*/] );
 
 # Add in the few cases we should care about.
 # For a list of available policies, perldoc Perl::Critic
-if (! @policies) {
+if ( !@policies ) {
     @policies = qw{
         TestingAndDebugging::RequireUseStrict
         TestingAndDebugging::RequireUseWarnings
@@ -94,12 +100,13 @@ if (! @policies) {
     );
 
     # Give a diag to let users know if this is doing anything, how to repeat.
-    my $tidy_conf = 'tools/util/pirtidy.conf';
+    my $tidy_conf = 'tools/util/perltidy.conf';
     eval "require Perl::Tidy";
     if ($@) {
         diag "Perl::Tidy not installed, silently ignoring tidy failures.";
-    } else {
-        diag "Using $tidy_conf for Perl::Tidy settings"; 
+    }
+    else {
+        diag "Using $tidy_conf for Perl::Tidy settings";
     }
 
     $critic->add_policy(
@@ -109,16 +116,16 @@ if (! @policies) {
 }
 
 foreach my $policy (@policies) {
-    $critic->add_policy(-policy => $policy) or die;
+    $critic->add_policy( -policy => $policy ) or die;
 }
 
-
-foreach my $file (sort @files) {
+foreach my $file ( sort @files ) {
     my @violations = $critic->critique($file);
-    my $output = join("\n", @violations);
+    my $output     = join( "\n", @violations );
+
     # Remove the PBP references to avoid morbid verbosity.
     $output =~ s/See page.*//g;
-    is ($output, '', $file);
+    is( $output, '', $file );
 }
 
 # Since .t files might be written in any language, we can't *just* check the
@@ -126,12 +133,12 @@ foreach my $file (sort @files) {
 sub is_perl {
     my $filename = shift;
 
-    if (! -f $filename) {
+    if ( !-f $filename ) {
         return 0;
     }
- 
-    # modules and perl scripts should be tested.. 
-    if ($filename =~ /\.(?:pm|pl)$/) {
+
+    # modules and perl scripts should be tested..
+    if ( $filename =~ /\.(?:pm|pl)$/ ) {
         return 1;
     }
 
@@ -141,7 +148,7 @@ sub is_perl {
     my $line = <$file_handle>;
     close $file_handle;
 
-    if ($line && $line =~ /^#!.*perl/) {
+    if ( $line && $line =~ /^#!.*perl/ ) {
         return 1;
     }
 
