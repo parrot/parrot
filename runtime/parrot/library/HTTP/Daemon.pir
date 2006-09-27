@@ -778,7 +778,7 @@ Called from above to convert a hex string to integer.
 
 =item make_query_hash
 
-Split a query string at '+' and return a hash of foo=bar items.
+Split a query string at '&' and return a hash of foo=bar items.
 The hash keys and values are urldecoded already.
 
 =cut
@@ -832,7 +832,7 @@ END:
 .sub check_cgi :method
     .param string url
     .local int pos
-    # file.pir?foo=1+bar=2
+    # file.pir?foo=1&bar=2
     pos = index url, '.pir?'
     if pos > 0 goto cgi_1
     pos = index url, '.pbc?'
@@ -861,13 +861,13 @@ cgi_1:
     .return (1, result, $I0)
 .end
 
-# split query at '+', make hash from foo=bar items
+# split query at '&', make hash from foo=bar items
 .sub make_query_hash
     .param string query		# the unescapced one
     .local pmc query_hash, items
     .local string kv, k, v
     query_hash = new .Hash
-    items = split '+', query
+    items = split '&', query
     .local int i, n
     i = 0
     n = elements items

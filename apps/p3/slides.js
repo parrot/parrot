@@ -33,7 +33,7 @@ function send_p(d) {
     var cgi = document.getElementById('cgi');
     var slides = document.getElementById('slides');
     page_str = cgi.firstChild.nodeValue + "?f=" + slides.firstChild.nodeValue +
-	"+p=" + page.toString();
+	"&p=" + page.toString();
     send_req(page_str);
 }
 
