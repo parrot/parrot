@@ -376,6 +376,8 @@ docs/pdds/clip/pdd19_pir.pod                                [main]doc
 docs/pdds/clip/pdd22_io.pod                                 [main]doc
 docs/pdds/clip/pdd24_events.pod                             [main]doc
 docs/pdds/clip/pdd25_threads.pod                            [main]doc
+docs/pdds/clip/pddXX_cstruct.pod                            [main]doc
+docs/pdds/clip/pddXX_pmc.pod                                [main]doc
 docs/pdds/pdd00_pdd.pod                                     [main]doc
 docs/pdds/pdd03_calling_conventions.pod                     [main]doc
 docs/pdds/pdd07_codingstd.pod                               [main]doc

@@ -1,0 +1,295 @@
+# Copyright (C) 2001-2006, The Perl Foundation.
+# $Id:$
+
+=head1 NAME
+
+docs/pdds/pddXX_pmc.pod - PMCs
+
+=head1 STATUS
+
+Proposal
+
+=head1 VERSION
+
+$Revision:$
+
+=head1 ABSTRACT
+
+This document defines Parrot Magic Cookies (PMCs).
+
+[[ maybe rename PMC to PO (Parrot Objects) or such to reduce confusion
+with Perl5's PMC (compiled .pm files). ]]
+
+=head1 TERMINOLOGY
+
+This document uses C<OPMC>, when speaking of "old" PMCs of Parrot
+Version 0.4.6 or less. C<PMC> is the new layout as proposed in this
+document.
+
+An C<attribute> is otherwise also known as a C<field> or structure
+element, but I'm using C<attribute> here because the difference of
+PMCs and Parrot Objects should be minimized.
+
+=head1 DESCRIPTION
+
+PMCs are Parrot's low-level objects implemented in C. PMCs are small
+non-resizable variable-sized structures. The C<PMC> itself is the
+common part of all PMCs. The per-PMC payload holds PMC-specific
+attributes.
+
+=head2 PMC Layout
+
+  +---------------+
+  |   vtable      |	# common PMC attribute
+  +---------------+
+  |   flags       |     # common PMC attribute
+  +---------------+
+  |   attrib_1    |     # "user" defined part 
+  |   ...         |
+  +---------------+
+
+  #define THE_PMC \
+    struct _vtable* vtable; \
+    UINTVAL flags
+
+An Integer Value PMC could be defined with:
+
+  struct VInt_PMC {
+    THE_PMC;
+    INTVAL val;
+  };
+
+Such PMC definitions are typically private to the F<.pmc> files. All
+access to PMCs shall be through VTABLE functions or methods. OTOH some
+widely used PMCs might export their attributes for public use and are
+then part of the Parrot API.
+
+A typical C<VInt> vtable function would look like this:
+
+  INTVAL get_integer()
+    VInt_PMC *me = (VInt_PMC*)SELF;     # [1]
+    return me->val;
+  }
+
+The C<OPMC> can be defined in terms of a PMC by rearranging the
+structure elements.
+
+[1] The PMC compiler could provide this line automagically and define
+a convenience variable C<ME> similar to the current C<SELF>.
+
+=head2 PMC creation
+
+PMCs are created via C<VTABLE_new> or variants of C<_new>. It's up to
+the PMC to initialize it's attributes. C<new> is a class method, i.e.
+it's called with the PMC's C<class> as C<SELF>.
+
+  PMC* new() {
+    VInt_PMC *me = new_bufferlike_header(INTERP, sizeof(VInt_PMC));
+    me->val = 0;
+    return (PMC*)me;
+  }
+
+[[ rename C<new_bufferlike_header> to something more meaningful ]]
+
+=head3 Optimization
+
+The vtable can provide a pointer to the sized header pool to possibly
+speedup allocation.
+
+=head3 OPMC vs. PMC creation
+
+PMCs with a non-default C<new> method are PMCs, The old scheme via
+C<pmc_new> and C<VTABLE_init> provides a fallback of creating C<OPMCs>.
+
+=head1 Additional PMC attributes
+
+=head2 pmc->_next_for_GC  / opmc->pmc_ext->_next_for_GC  
+
+All PMCs that refer to other PMCs have a 3rd mandatory attribute
+C<_next_for_GC>, used for garbage collection, The presence of this
+attribute is signaled by the flag bit C<PObj_is_PMC_EXT_FLAG>.
+
+  +---------------+
+  |   vtable      |	
+  +---------------+
+  |   flags       |
+  +---------------+
+  | _next_for_GC  |
+  +---------------+
+  |   ...         |
+  +---------------+
+
+=head2 Properties opmc->pmc_ext->_metadata  
+
+PMCs do not support properties universally, If properties are still
+desired, these can be implemented in one of the following ways:
+
+[[ TODO define something canonical ]]
+
+=head3 Per PMC type
+
+Each PMC that wants this extra hash can just provide an attribute for
+it and implement the property vtable functions.
+
+=head3 interpreter->prop_hash
+
+This will be a Hash, indexed by the PMC's address, containing the property
+Hash. An additional flag can be provided, if such a property hash
+exists for a PMC. During collection of a PMC, this hash is invalidated
+too.
+
+=head3 PropRef
+
+A transparent C<Ref> PMC can point to a structure holding the original
+PMC and the property Hash.
+
+=head2 Locking or opmc->pmc_ext->_synchronize
+
+PMCs do no support locking universally. Creating sharable PMCs at
+runtime (from standard PMCs) is again done by transparent Refs like
+C<SharedRef> or C<STMRef>.
+
+=head2 Shared PMCs
+
+If needed, we can define shared PMCs by allocating the C<_Sync>
+structure in front of the PMC:
+
+  +---------------+
+  |   struct      |	
+  |   _Sync       |	
+  +---------------+ <--- pmc points here
+  |   vtable      |	
+  +---------------+
+  |   flags       |
+  +---------------+
+
+This works of course only, if PMCs are created as C<shared> in the
+first place. The presence of the C<_Sync> structure is stated by a PMC
+flag bit.
+
+=head2 PMCs and morphing 
+
+PMCs (like current OPMCs), which may morph themselves, and thereby
+change their vtable and the meaning of their attributes shall use a
+union of the desired attributes, e.g.:
+
+  struct Integer_PMC {
+    THE_PMC;
+    union {
+      INTVAL int_val;
+      FLOATVAL num_val;
+      STRING *str_val;
+    } u;
+  };
+
+=head1 ATTACHMENTS
+
+(none)
+
+=head1 REFERENCES
+
+  TODO pdd02_vtables.pod
+  TODO pddXX_interfaces.pod
+  TODO pddXX_classes.pod
+  TODO pddXX_objects.pod
+  TODO pddXX_cstruct.pod   [2]
+
+[2] PMCs need a class object that defines their attributes to properly
+allow subclassing. The attribute definition is held by a C<CStruct>
+PMC, the meta class of all Parrot PMCs. It's a list of attribute
+names, their types, and possibly the offsets in the PMC structure. See
+also the C<UnManangedStruct> PMC.
+
+=head1 RATIONAL
+
+Current OPMCs are too rigid: mostly either too small or too big. A lot
+of information is hanging off secondary malloced structures like
+C<PMC_sub> in the C<Sub> OPMC.
+
+But more importantly, OPMCs don't properly allow subclassing. E.g.
+
+  cl = subclass 'Hash', 'PGE::Match'
+
+is currently done by creating a C<ParrotClass>. When instantiate, this
+is a "hidden" C<__value> element as first attribute, which is a
+pointer to the hash parent PMC. This is creating internal structures
+which aren't compatible, because the object attributes are differently
+arranged. That is, above subclassing is mainly: C<PGE::Match> I<hasa>
+C<Hash> instead of I<isa>, when it comes to attribute relationship.
+
+This limitation prevents further implementation of already (at least
+partially) documented APIs, like the C<Compiler> one.
+
+A C<Compiler> object is either a Parrot C<Sub> like C<PGE::P6Regex> or
+a builtin that is C<NCI> compiler like C<PIR>. But C<Sub> and C<NCI>
+objects are that different that even currently needed attributes aren't
+consistently arranged (e.g. C<multi_sig> or C<namespace_stash>).
+Creating proper compiler objects like C<PIR_Compiler> with common and
+needed C<Compiler> attributes isn't possible now.
+
+[[ Well, with another one or two indirections all can be implemented,
+but that's just adding to code complexity. ]]
+
+Please note that the mentioned C<Compiler> PMC ist just one of many
+PMCs that exhibit the same problem.
+
+In combination with a proper metaclass for PMCs, PMCs and "real"
+Parrot objects should be able to work together seemlessly.
+
+=head1 PERFORMANCE CONSIDERATIONS
+
+Due to reduced memory consumption and reduced allocation of secondary
+helper structures, this change will very likely speed up Parrot
+performance slightly to moderate. No negative performance impact is
+forseeable due to these changes.
+
+=head1 IMPLEMENTATION
+
+Parrot core needs very little changes to be able to deal with
+differently sized PMCs. All the GC infrastructure is already there for
+C<Buffer_like> objects, which are managed in sized header pools.
+
+Changing PMCs to the new scheme can be done as needed and isn't
+mandatory.
+
+C<OPMCs> attribute access is currently already done through C macros,
+like C<PMC_int_val> or C<PMC_struct_val>. These macros can cast the
+passed pointer to C<(OPMC*)>, so that all these C<OPMCs> will still be
+working. New PMCs shall use explicit and more verbose attribute names,
+which don't collide with present C<OPMC> attributes.
+
+There'll be no implications to existing PASM or PIR code nor to
+existing dynamic PMCs.
+
+=head1 ALTERNATIVE PMC IMPLEMENTATIONS
+
+I've in another document (F<PMC.pod>) already layed out a PMC scheme
+optimized for generational garbage collection. The PMC layout is using
+also differently but fixed sized user parts of PMCs, but these are
+subject of one more indirection. If we see the need for optimized GC,
+this PMC scheme can still be implemented. We probably could take
+provisions that such a change is not too intrusive by cleverly using
+the PMC compiler and/or C macros like the proposed C<ME> in [1] above.
+
+The payload of PMCs in this scheme is hanging off a C<pmc_body>
+pointer:
+
+  +---------------+
+  |   pmc_body    |  --> body (buffer) memory
+  +---------------+
+  |   vtable      |
+  +---------------+
+  |   flags       |
+  +---------------+
+
+The implementation of C<PMC> might take into consideration that the PMC
+layout could change further.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+
+vim: expandtab sw=2 tw=70:

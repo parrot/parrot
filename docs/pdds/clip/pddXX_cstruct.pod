@@ -1,0 +1,324 @@
+=head1 TITLE
+
+C Structure Class
+
+=head1 STATUS
+
+Proposal.
+
+=head1 AUTHOR
+
+Leopold Toetsch
+
+=head1 ABSTRACT
+
+The ParrotClass PMC is the default implementation (and the meta class)
+of parrot's HLL classes. It provides attribute access and (TODO)
+introspection of attribute names. It is also handling method
+dispatch and inheritance.
+
+C structures used all over in parrot (PMCs) and user-visible C
+structures provided by the C<{Un,}ManagedStruct> PMC dont't have this
+flexibility.
+
+The proposed C<CStruct> PMC is trying to bridge this gap.
+
+=head1 DESCRIPTION
+
+The C<CStruct> PMC is the class PMC of classes, which are not
+based on PMC-only attributes but on the general case of a C structure.
+That is, the C<CStruct> is actually the parent class of
+C<ParrotClass>, which is a PMC-only special case. And it is the
+theoretical ancestor class of all PMCs (including itself :).
+
+The relationship of C<CStruct> to other PMCs is like this:
+
+                PASM/PIR code         C code
+  Class         ParrotClass           CStruct
+  Object        ParrotObject          *ManagedStruct
+                                      (other PMCs) 
+
+That is, it is the missing piece of already existing PMCs. The current
+*ManagedStruct PMCs are providing the class and object functionality in
+one and the same PMC (as BTW all other existing PMCs are doing). But
+this totally prevents proper inheritance and reusability of such PMCs.
+
+The C<CStruct> class provides the necessary abstract backings to get
+rid of current limitations.
+
+=head1 SYNTAX BITS
+
+=head2 Constructing a CStruct
+
+A typical C structure:
+
+  struct foo {
+    int a;
+    char b;
+  };
+
+could be created in PIR with:
+
+  cs = subclass 'CStruct', 'foo'   # or maybe  cs = new_c_class 'foo'
+  addattribute cs, 'a'
+  addattribute cs, 'b'
+
+The semantics of a C struture are the same as of a Parrot Class.
+But we need the types of the attributes too:
+
+Handwavingly TBD 1)
+
+with ad-hoc existing syntax:
+
+  .include "datatypes.pasm"
+  cs['a'] = .DATATYPE_INT
+  cs['b'] = .DATATYPE_CHAR
+
+Handwavingly TBD 2)
+
+with new variants of the C<addattribute> opcode:
+  
+  addattribute cs, 'a', .DATATYPE_INT
+  addattribute cs, 'b', .DATATYPE_CHAR
+
+Probably desired and with not much effort TBD 3):
+
+  addattribute(s) cs, <<'DEF'
+    int a;
+    char b;
+  DEF   
+
+The possible plural in the opcode name would match semantics, but it is not
+necessary. The syntax is just using Parrot's here documents to define
+all the attributes and types.
+
+  addattribute(s) cs, <<'DEF'
+    int "a";
+    char "b";
+  DEF   
+
+The generalization of arbitrary attribute names would of course be
+possible too, but isn't likely needed.
+
+=head2 Syntax variant
+
+  cs = subclass 'CStruct', <<'DEF
+    struct foo {
+      int a;
+      char b;
+    };
+  DEF
+
+I.e. create all in one big step.
+
+=head2 Object creation and attribute usage
+
+This is straight forward and conforming to current ParrotObjects:
+
+  o = new 'foo'                 # a ManagedStruct instance
+  setattribute o, 'a', 4711
+  setattribute o, 'b', 22
+  ...
+
+The only needed extension would be C<{get,set}attribute> variants with
+natural types.
+
+Even (with nice to have IMCC syntax sugar):
+
+  o.a = 4711    # setattribute
+  o.b = 22
+  $I0 = o.a     # getattribute
+
+=head2 Nested Structures
+
+  foo_cs = subclass 'CStruct', 'foo'
+  addattribute(s) foo_cs, <<'DEF'
+    int a;
+    char b;
+  DEF   
+  bar_cs = subclass 'CStruct', 'bar'
+  addattribute(s) bar_cs, <<'DEF'
+    double x;
+    foo foo;        # the foo class is already defined
+    foo *fptr;
+  DEF   
+  o = new 'bar'
+  setattribute o, 'x', 3.14
+  setattribute o, ['foo'; 'a'], 4711         # o.foo.a = 4711
+  setattribute o, ['fptr'; 'b'], 255
+
+Attribute access is similar to current *ManagedStruct's hash syntax
+but with a syntax matching ParrotObjects.
+
+=head2 Array Structures Elements
+
+  foo_cs = subclass 'CStruct', 'foo'
+  addattribute(s) foo_cs, <<'DEF'
+    int a;
+    char b[100];
+  DEF   
+
+=head2 Possible future extemsios
+
+  cs = subclass 'CStruct', 'todo'
+  addattribute(s) foo_cs, <<'DEF'
+    union {              # union keyword
+      int a;
+      double b;
+    } u;  
+    char b[100]  :ro;    # attributes like r/o     
+  DEF   
+
+=head2 Managed vs. Unmanaged Structs
+
+The term "managed" in current structure usage defines the owner of the
+structure memory. C<ManagedStruct> means that parrot is the owner of
+the memory and that GC will eventually free the structure memory. This
+is typically used when C structures are created in parrot and passed
+into external C code.
+
+C<UnManagedStruct> means that there's some external owner of the
+structure memory. Such structures are typically return results of 
+external code.
+
+E.g.:
+
+  $P0 = some_c_func()          # UnManagedStruct result
+  assign $P0, foo_cs           # assign a structure class to it 
+
+  o = new 'foo_cs'             # ManagedStruct instance
+  setattribute o, 'a', 100
+  setattribute o, ['b'; 99], 255  # set last elem
+
+=head1 RATIONAL
+
+Parrot as the planned interpreter glue language should have access to
+all possible C libraries and structures. It has to abstract the
+low-level bindings in a HLL independant way and should still be able to
+communicate all information "upstairs" to the HLL users.
+
+But it's not HLL usage only, parrot itself is already suffering from
+lack of abstraction at PMC level.
+
+=head2 Inheritance
+
+I've implemented an OO-ified HTTP server named F<httpd2.pir>. The
+C<HTTP::Connection> class ought to be a subclass of C<ParrotIO> (we
+don't have a base socket class, but ParrotIO would do it for now).
+This kind of inheritance isn't possible. The implementation is now a
+connection B<hasa> ParrotIO, instead of B<isa>. It's of course losing
+all inheritance with that which leads to delegation code and work
+arounds.
+
+The same workarounds are all over F<SDL/*> classes. There are
+I<layout> helpers and raw structure accessores and what not. Please
+read the code. It's really not a problem of the implementation (which is
+totally fine) it's just the lack of usability of parrot (when it comes
+to native structures (or PMCs)).
+
+All these experiments to use a C structures or a PMC as base class are
+ending with a C<has> relationship instead of the natural C<isa>.
+Any useful OO-ish abstraction is lost and is leading to clumsy code,
+and - no - implementing interfaces/traits/mixins can't help here, as
+these are all based on the abstraction, which is described here.
+
+=head2 Inheritance and attribute access
+
+This proposal alone doesn't solve all inheritance problems. It is also
+needed that the memory layout of PMCs and ParrotObjects deriving from
+PMCs is the same. E.g.
+
+  cl = subclass 'Integer', 'MyInt'
+
+The C<int_val> attribute of the core C<Integer> type is located in the
+C<cache> union of the PMC. The integer item in the subclass is hanging
+off the C<data> array of attributes and worse it is a PMC too, not a
+natural int. This not only causes additional indirections (see
+F<deleg_pmc.pmc>) but also negatively impacts C<Integer> PMCs, as all
+access to the C<int_val> has to be indirected through C<get_integer()>
+or C<set_integer_native()> to be able to deal with subclassed integers.
+
+Again the implementation of above is: MyInt B<hasa> Integer, instead of
+the desired B<isa> int_val.
+
+With the abstraction of a C<CStruct> describing the C<Integer> PMC and
+with differently sized PMCs, we can create an object layout, where the
+C<int_val> attribute of C<Integer> and C<MyInt> are at the same
+location and of the same type.
+
+Given this (internal) definition of the C<Integer> PMC:
+
+  intpmc_cl = subclass 'CStruct', 'Integer'
+  addattribute(s) intpmc_cl, <<'DEF'
+    INTVAL int_val;            # PMC internals are hidden
+  DEF   
+
+we can transparently subclass it as C<MyInt>, as all the needed
+information is present in the C<CStruct intpmc_cl> class.
+
+=head2 Introspection, PMCs and more
+
+  cc = subclass 'CStruct', 'Complex'
+  addattribute(s) cc, <<'DEF'
+    FLOATVAL re; 
+    FLOATVAL im; 
+  DEF   
+
+This is the (hypothetical) description of a C<Complex> PMC class. An
+equivalent syntax can be translated by the PMC compiler to achieve the
+same result.
+
+This definition of the attributes of that PMC provides automagically
+access to all the information stored in the PMC. All such access is
+currently hand-crafted in the F<complex.pmc>.  Not only that this
+accessor code could be abandoned (and unified with common syntax),
+all possible classes inheriting from that PMC could use this
+information.
+
+=head1 Implementation
+
+C<CStruct> is basically yet another PMC and can be implemented and put
+to functionality without any interference with existing code. It is
+also orthogonal with possible PMC layout changes.
+
+The internals of C<CStruct> can vastly reuse code from F<src/objects.c>
+to deal with inheritance or object instantiation. The main difference
+is that attributes have additionally a type attached to it and
+consequently that the attribute offsets are calculated differently
+depending on type, alignment, and padding. These calculations are
+already done in F<unmanagedstruct.pmc>.
+
+C<CStruct> classes can be attached to existing PMCs gradually (and by
+far not all PMCs need that abstract backing). But think e.g. of the
+C<Sub> PMC. Attaching a C<CStruct> to it, would instantly give access
+to all it's attributes and vastly simplify introspection.
+
+Only the final step ("Inheritance and attribute access") needs all
+parts to play together.
+
+=head1 All together now
+
+=over
+
+=item Differently sized PMCs
+
+Provide the flexible PMC layout.
+
+=item CStruct classes
+
+Are describing the structure of PMCs (or any C structure).
+
+=item R/O vtables
+
+Prohibit modification of readonly PMCs like the C<Sub> PMC. These are
+already coded within the C<STM> project.
+
+=back
+
+=head1 SEE ALSO
+
+pddXX_pmc.pod (proposal for a flexible PMC layout)
+
+=cut
+
+vim: expandtab sw=2 tw=70:
