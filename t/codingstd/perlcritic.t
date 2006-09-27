@@ -87,10 +87,24 @@ if (! @policies) {
         Subroutines::RequireFinalReturn
     };
 
-    # Do this one manually - requires an option.
+    # Add these policies manually - requires an option.
     $critic->add_policy(
         -policy => 'CodeLayout::ProhibitHardTabs',
         -config => { allow_leading_tabs => 0 }
+    );
+
+    # Give a diag to let users know if this is doing anything, how to repeat.
+    my $tidy_conf = 'tools/util/pirtidy.conf';
+    eval "require Perl::Tidy";
+    if ($@) {
+        diag "Perl::Tidy not installed, silently ignoring tidy failures.";
+    } else {
+        diag "Using $tidy_conf for Perl::Tidy settings"; 
+    }
+
+    $critic->add_policy(
+        -policy => 'CodeLayout::RequireTidyCode',
+        -config => { perltidyrc => $tidy_conf },
     );
 }
 
