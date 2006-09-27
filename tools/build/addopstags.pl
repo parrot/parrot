@@ -8,7 +8,7 @@ tools/build/addopstags.pl - add src/ops/*.ops to tags
 
 =head1 SYNOPSIS
 
-	perl tools/build/addopstags.pl src/ops/*.ops
+ perl tools/build/addopstags.pl src/ops/*.ops
 
 =head1 DESCRIPTION
 
@@ -22,13 +22,13 @@ my @tags;
 
 # Pull ops tags
 while (<>) {
-	if (/\bop \s+ (\w+) \s* \(/x) {
-		next if $seen{$1}++;
-	# tag file excmd xflags
-	push @tags, join( "\t", $1, $ARGV, qq{$.;"}, "f" ) . "\n";
-	}
+    if (/\bop \s+ (\w+) \s* \(/x) {
+        next if $seen{$1}++;
+        # tag file excmd xflags
+        push @tags, join( "\t", $1, $ARGV, qq{$.;"}, "f" ) . "\n";
+    }
 } continue {
-	close ARGV if eof;           # reset $.
+    close ARGV if eof;           # reset $.
 }
 
 # Pull existing tags

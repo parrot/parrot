@@ -130,8 +130,8 @@ my %seen;
 
 for $file (@ARGV) {
     if ($seen{$file}) {
-	print STDERR "$0: Ops file '$file' mentioned more than once!\n";
-	next;
+        print STDERR "$0: Ops file '$file' mentioned more than once!\n";
+        next;
     }
     $seen{$file} = 1;
 
@@ -145,9 +145,9 @@ for $file (@ARGV) {
 
     # mark experimental ops
     if ($experimental) {
-	for $_ (@{$temp_ops->{OPS}}) {
-	    $_->{experimental} = 1;
-	}
+        for $_ (@{$temp_ops->{OPS}}) {
+            $_->{experimental} = 1;
+        }
     }
 
     push @{$ops->{OPS}}, @{$temp_ops->{OPS}};
@@ -182,14 +182,14 @@ $real_ops->version($ops->version);
 # verify opcode numbers
 my $seq = 0;
 for(@{$ops->{OPS}}) {
-    next if ($_->{CODE} < 0);	# skip
+    next if ($_->{CODE} < 0);  # skip
     my $opname = $_->full_name;
     my $n = $ParrotOps::optable{$opname} ;
     if ($n != $_->{CODE}) {
-	die "op $opname: number mismatch: ops.num $n vs. core.ops $_->{CODE}";
+        die "op $opname: number mismatch: ops.num $n vs. core.ops $_->{CODE}";
     }
     if ($seq != $_->{CODE}) {
-	die "op $opname: sequence mismatch: ops.num $seq vs. core.ops $_->{CODE}";
+        die "op $opname: sequence mismatch: ops.num $seq vs. core.ops $_->{CODE}";
     }
     push @{$real_ops->{OPS}}, $_;
     ++$seq;
@@ -309,18 +309,18 @@ close OUT;
 sub find_op_number {
     my ($opname, $experimental) = @_;
     if (exists $ParrotOps::optable{$opname}) {
-	return $ParrotOps::optable{$opname};
+        return $ParrotOps::optable{$opname};
     } elsif (exists $ParrotOps::skiptable{$opname}) {
-	return -1;
+        return -1;
     } elsif ($experimental) {
-	my $n = $ParrotOps::optable{$opname} = ++$ParrotOps::max_op_num;
-	warn "$opname\t$n\texperimental, not in ops.num\n"
-	  if -e "DEVELOPING";
-	return $n;
+        my $n = $ParrotOps::optable{$opname} = ++$ParrotOps::max_op_num;
+        warn "$opname\t$n\texperimental, not in ops.num\n"
+          if -e "DEVELOPING";
+        return $n;
     } else {
-	warn "$opname\t\tSKIPPED: not in ops.num nor ops.skip\n"
-	  if -e "DEVELOPING";
-	return -1;
+        warn "$opname\t\tSKIPPED: not in ops.num nor ops.skip\n"
+          if -e "DEVELOPING";
+       return -1;
     }
 }
 
@@ -387,10 +387,10 @@ sub load_op_map_files {
     next unless $_;
     ($name, $number) = split(/\s+/, $_);
     if ($prev + 1 != $number) {
-	    die "hole in ops.num before #$number";
+        die "hole in ops.num before #$number";
     }
     if (exists $ParrotOps::optable{$name}) {
-	    die "duplicate opcode $name and $number";
+        die "duplicate opcode $name and $number";
     }
     $prev = $number;
     $ParrotOps::optable{$name} = $number;
@@ -410,7 +410,7 @@ sub load_op_map_files {
     next unless $_;
     ($name) = split(/\s+/, $_);
     if (exists $ParrotOps::optable{$name}) {
-	die "skipped opcode is also in $num_file";
+        die "skipped opcode is also in $num_file";
     }
     $ParrotOps::skiptable{$name} = 1;
   }

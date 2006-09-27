@@ -8,7 +8,7 @@ tools/build/vtable_h.pl - Create the vtable header
 
 =head1 SYNOPSIS
 
-	% perl tools/build/vtable_h.pl
+ % perl tools/build/vtable_h.pl
 
 =head1 DESCRIPTION
 

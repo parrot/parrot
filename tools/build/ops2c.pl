@@ -325,11 +325,11 @@ foreach my $op ($ops->ops) {
     my $one_op     = "";
 
     if ($suffix =~ /cg/) {
-	$definition = "PC_$index:";
-	$comment    = "/* ". $op->full_name() ." */";
+        $definition = "PC_$index:";
+        $comment    = "/* ". $op->full_name() ." */";
     } elsif ($suffix =~ /switch/) {
-	$definition = "case $index:";
-	$comment    = "/* ". $op->full_name() ." */";
+        $definition = "case $index:";
+        $comment    = "/* ". $op->full_name() ." */";
     }
     else {
         $definition = "$prototype;\n$opsarraytype *\n$func_name ($args)";
@@ -340,25 +340,25 @@ foreach my $op ($ops->ops) {
     $src    =~ s/\bops_addr\b/${bs}ops_addr/g;
 
     if ($suffix =~ /cg/) {
-	if ($prev_src eq $src) {
-	    push @cg_jump_table, "        &&PC_$prev_index,\n";
-	}
-	else {
-	    push @cg_jump_table, "        &&PC_$index,\n";
-	}
+        if ($prev_src eq $src) {
+            push @cg_jump_table, "        &&PC_$prev_index,\n";
+        }
+        else {
+            push @cg_jump_table, "        &&PC_$index,\n";
+        }
     }
     elsif ($suffix eq '') {
         push @op_func_table, sprintf("  %-50s /* %6ld */\n",
             "$func_name,", $index);
     }
     if ($prev_src eq $src) {
-	push @op_funcs, "$comment\n";
+        push @op_funcs, "$comment\n";
     }
     else {
-	$one_op .= "$definition $comment {\n$src}\n\n";
-	push @op_funcs, $one_op;
-	$prev_src = $src if ($suffix eq '_cgp' || $suffix eq '_switch');
-	$prev_index = $index;
+        $one_op .= "$definition $comment {\n$src}\n\n";
+        push @op_funcs, $one_op;
+        $prev_src = $src if ($suffix eq '_cgp' || $suffix eq '_switch');
+        $prev_index = $index;
     }
     $index++;
 }
@@ -377,7 +377,7 @@ if ($suffix =~ /cgp/) {
 #ifdef __GNUC__
 # ifdef I386
     else if (cur_opcode == (void **) 1)
-    asm ("jmp *4(%ebp)");	/* jump to ret addr, used by JIT */
+    asm ("jmp *4(%ebp)");  /* jump to ret addr, used by JIT */
 # endif
 #endif
     _reg_base = (char*)interpreter->ctx.bp.regs_i;

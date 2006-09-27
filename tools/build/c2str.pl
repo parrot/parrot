@@ -48,28 +48,28 @@ process_cfile();
 close ALL;
 
 sub hash_val {
-	my $h = Math::BigInt->new('+0');
-	my $s = shift;
-	for (my $i = 0; $i < length($s); ++$i) {
-		$h += $h << 5;
-		$h &= 0xffffffff;
-		$h += ord substr($s, $i, 1);
-		$h &= 0xffffffff;
-	}
-	return sprintf("0x%x", $h);
+    my $h = Math::BigInt->new('+0');
+    my $s = shift;
+    for (my $i = 0; $i < length($s); ++$i) {
+        $h += $h << 5;
+        $h &= 0xffffffff;
+        $h += ord substr($s, $i, 1);
+        $h &= 0xffffffff;
+    }
+    return sprintf("0x%x", $h);
 }
 
 sub read_all {
     if (-e $outfile) {
-	open IN, "<$outfile";
-	while (<IN>) {
-	    # len hashval "string"
-	    if (/(\d+)\s+(0x[\da-hA-H]+)\s+"(.*)"/) {
-		push @all_strings, [$1, $2, $3];
-		$known_strings{$3} = scalar @all_strings;
-	    }
-	}
-	close(IN);
+        open IN, "<$outfile";
+        while (<IN>) {
+            # len hashval "string"
+            if (/(\d+)\s+(0x[\da-hA-H]+)\s+"(.*)"/) {
+                push @all_strings, [$1, $2, $3];
+                $known_strings{$3} = scalar @all_strings;
+            }
+        }
+        close(IN);
     }
 }
 
@@ -99,46 +99,46 @@ HEADER
     # are used.
     my %lines_seen;
     while (<IN>) {
-	if (m/^\s*#\s*line\s+(\d+)/) {
-	    # #line directive
-	    $line = $1 - 1;
-	    next;
-	}
-	$line++;
-	next if m/^\s*#/; # otherwise ignore preprocessor
-	next unless s/.*\bCONST_STRING\s*\(\w+\s*,//;
+        if (m/^\s*#\s*line\s+(\d+)/) {
+            # #line directive
+            $line = $1 - 1;
+            next;
+        }
+        $line++;
+        next if m/^\s*#/; # otherwise ignore preprocessor
+        next unless s/.*\bCONST_STRING\s*\(\w+\s*,//;
 
-	if ($lines_seen{$line}++) {
-	    die "Seen line $line before in $infile - can't continue";
-	}
+        if ($lines_seen{$line}++) {
+            die "Seen line $line before in $infile - can't continue";
+        }
 
-	# TODO maybe cope with escaped \"
-	my $cnt = tr/"/"/;
-	die "bogus CONST_STRING at line $line" unless $cnt == 2;
+        # TODO maybe cope with escaped \"
+        my $cnt = tr/"/"/;
+        die "bogus CONST_STRING at line $line" unless $cnt == 2;
 
-	my $str = extract_delimited; # $_, '"';
-	$str = substr $str, 1, -1;
-	## print STDERR "** '$str' $line\n";
-	my $n;
-	if ($n = $known_strings{$str}) {
-	    if ($this_file_seen{$str}) {
-		print "#define _CONST_STRING_$line _CONST_STRING_",
-		    $this_file_seen{$str}, "\n";
-	    }
-	    else {
-		print "#define _CONST_STRING_$line $n\n";
-	    }
-	    $this_file_seen{$str} = $line;
-	    next;
-	}
-	my $len = length $str;
-	my $hashval = hash_val($str);
-	push @all_strings, [$len, $hashval, $str];
-	$n = scalar @all_strings;
-	$known_strings{$str} = $n;
-	$this_file_seen{$str} = $line;
-	print "#define _CONST_STRING_$line $n\n";
-	print ALL qq!$len\t$hashval\t"$str"\n!;
+        my $str = extract_delimited; # $_, '"';
+        $str = substr $str, 1, -1;
+        ## print STDERR "** '$str' $line\n";
+        my $n;
+        if ($n = $known_strings{$str}) {
+            if ($this_file_seen{$str}) {
+                print "#define _CONST_STRING_$line _CONST_STRING_",
+                $this_file_seen{$str}, "\n";
+            }
+            else {
+                print "#define _CONST_STRING_$line $n\n";
+            }
+            $this_file_seen{$str} = $line;
+            next;
+        }
+        my $len = length $str;
+        my $hashval = hash_val($str);
+        push @all_strings, [$len, $hashval, $str];
+        $n = scalar @all_strings;
+        $known_strings{$str} = $n;
+        $this_file_seen{$str} = $line;
+        print "#define _CONST_STRING_$line $n\n";
+        print ALL qq!$len\t$hashval\t"$str"\n!;
     }
     close(IN);
 }
@@ -162,11 +162,11 @@ static const struct _cstrings {
     Parrot_UInt4 hash_val;
     const char *string;
 } parrot_cstrings[] = {
-	{ 0, 0, "" },
+    { 0, 0, "" },
 HEADER
     my @all;
     for my $s (@all_strings) {
-	push @all, qq!\t{$s->[0], $s->[1], "$s->[2]"}!;
+        push @all, qq!\t{$s->[0], $s->[1], "$s->[2]"}!;
     }
     print OUT join(",\n", @all);
     print OUT <<HEADER;
