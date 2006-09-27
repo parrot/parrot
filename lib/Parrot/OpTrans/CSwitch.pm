@@ -77,7 +77,9 @@ sub defines
     my ($self, $pred_def);
     $self = shift;
     $pred_def = $self->SUPER::defines();
+    my $type = __PACKAGE__;
     return $pred_def . <<END;
+/* defines - $0 -> $type */
 #  define opcode_to_prederef(i, op)   (op ? \\
      (void**) (op   - CONTEXT(i->ctx)->pred_offset) : NULL)
 /*

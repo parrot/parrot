@@ -1149,7 +1149,7 @@ $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
 
 $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_DIR)/core_ops_switch.c 
 
-$(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm
+$(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm lib/Parrot/OpTrans/CPrederef.pm 
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
 
 @TEMP_cg_c@

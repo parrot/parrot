@@ -34,7 +34,9 @@ Returns the C C<#define> macros required by the ops.
 
 sub defines
 {
+    my $type = __PACKAGE__;
     return <<END;
+/* defines - $0 -> $type */
 #define REL_PC ((size_t)(cur_opcode - interpreter->code->prederef.code))
 #define CUR_OPCODE \\
     ((opcode_t*)cur_opcode + CONTEXT(interpreter->ctx)->pred_offset)
@@ -81,9 +83,12 @@ sub run_core_func_decl
 {
     my ($self, $core) = @_;
 
-    return "void ** " .
-        $self->core_prefix .
-        "$core(void **cur_op, Parrot_Interp interpreter)";
+    my $type = __PACKAGE__;
+    my $prefix = $self->core_prefix;
+    return <<END;
+/* run_core_func_decl - $0 -> $type */
+void ** $prefix$core(void **cur_op, Parrot_Interp interpreter)
+END
 }
 
 
