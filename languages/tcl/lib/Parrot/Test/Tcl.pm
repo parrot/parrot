@@ -77,7 +77,8 @@ foreach my $func ( keys %language_test_map ) {
     $cmd = "$executable $lang_f";
 
     $exit_code = Parrot::Test::run_command(
-        $cmd, #CD => $self->{relpath}, STDOUT => $out_f, STDERR => $out_f
+        $cmd, STDOUT => $out_f, STDERR => $out_f,
+        #CD => $self->{relpath},
     );
 
     unless ($pass) {
