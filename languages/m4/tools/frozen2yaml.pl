@@ -21,13 +21,13 @@ use YAML;
 
 # local Modules
 
-
 # Create a parser that outputs an Array
 $::RD_ERRORS = 1;
 $::RD_WARN   = 1;
 $::RD_HINT   = 1;
+
 #$::RD_TRACE  = 1;
-$::RD_TRACE  = undef;
+$::RD_TRACE = undef;
 my $frozen_parser = Parse::RecDescent->new( << 'END_GRAMMAR' );
 
 {
@@ -92,17 +92,17 @@ END_GRAMMAR
 # Slurp in the frozen-state file
 my $frozen;
 {
-  $/ = undef;
-  $frozen = <>;
+    $/      = undef;
+    $frozen = <>;
 }
+
 #print Dump( $frozen );
 
 # Parse the freeze-state
-my $symtab = $frozen_parser->frozen( $frozen );
+my $symtab = $frozen_parser->frozen($frozen);
 
-# Dump the parsed data as YAML 
-print Dump( $symtab );
-
+# Dump the parsed data as YAML
+print Dump($symtab);
 
 =head1 SEE ALSO
 
