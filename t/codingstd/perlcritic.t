@@ -93,7 +93,7 @@ $critic->add_policy(
     -config => { allow_leading_tabs => 0 }
 );
 
-foreach my $file (@files) {
+foreach my $file (sort @files) {
     my @violations = $critic->critique($file);
     my $output = join("\n", @violations);
     # Remove the PBP references to avoid morbid verbosity.
