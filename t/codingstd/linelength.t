@@ -8,7 +8,7 @@ t/codingstd/linelength.t - Test code lines length
 
 =head1 SYNOPSIS
 
-	% prove t/codingstd/linelength.t
+ % prove t/codingstd/linelength.t
 
 =head1 DESCRIPTION
 
