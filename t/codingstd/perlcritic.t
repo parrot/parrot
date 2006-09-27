@@ -22,6 +22,7 @@ use warnings;
 use lib qw(. lib ../lib ../../lib);
 
 use ExtUtils::Manifest qw(maniread);
+use Fatal qw(open);
 use File::Find;
 use Test::More;
 
@@ -35,22 +36,22 @@ BEGIN {
 
 my @files;
 
-my $file_match = qr/\.(?:pm|pl|t)$/;
-
 if (!@ARGV) {
     my $manifest = maniread('MANIFEST');
 
     foreach my $file (keys(%$manifest)) {
-        next unless $file =~ $file_match;
+        next unless is_perl($file);
         push @files, $file;
     }
 } else {
     # if we're passed a directory, find all the matching files
-    # under that directory. Otherwise just try to parse the given file.
+    # under that directory.
+
+    # use $_ for the check below, as File::Find chdirs on us.
     foreach my $file (@ARGV) {
         (-d $file)
              ? find(sub {
-                            if ($File::Find::name =~ $file_match) {
+                            if (is_perl($_)) {
                                 push @files, $File::Find::name; 
                             }
                         }, $file)
@@ -58,7 +59,11 @@ if (!@ARGV) {
     }
 }
 
-plan tests => scalar @files;
+if (scalar @files) {
+    plan tests => scalar @files;
+} else {
+    exit;
+}
 
 # By default, don't complain about anything.
 my $critic = Perl::Critic->new(-exclude => [qr/.*/]);
@@ -94,4 +99,31 @@ foreach my $file (@files) {
     # Remove the PBP references to avoid morbid verbosity.
     $output =~ s/See page.*//g;
     is ($output, '', $file);
+}
+
+# Since .t files might be written in any language, we can't *just* check the
+# filename to see if something should be treated as perl.
+sub is_perl {
+    my $filename = shift;
+
+    if (! -f $filename) {
+        return 0;
+    }
+ 
+    # modules and perl scripts should be tested.. 
+    if ($filename =~ /\.(?:pm|pl)$/) {
+        return 1;
+    }
+
+    # Now let's check to see if there's a perl shebang.
+
+    open my $file_handle, '<', $filename or die "eek";
+    my $line = <$file_handle>;
+    close $file_handle;
+
+    if ($line =~ /^#!.*perl/) {
+        return 1;
+    }
+
+    return 0;
 }
