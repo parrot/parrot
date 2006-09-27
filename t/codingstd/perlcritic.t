@@ -57,6 +57,10 @@ else {
         ( -d $file )
             ? find(
             sub {
+                if ( -d $_ and $_ eq '.svn' ) {
+                    $File::Find::prune = 1;
+                    return;
+                }
                 if ( is_perl($_) ) {
                     push @files, $File::Find::name;
                 }
