@@ -2,20 +2,6 @@
 # Copyright (C) 2001-2006, The Perl Foundation.
 # $Id: /parrot/offline/t/codingstd/linelength.t 1005 2006-09-08T13:11:47.473258Z wcoleda  $
 
-=head1 NAME
-
-t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
-
-=head1 SYNOPSIS
-
- % prove t/codingstd/perlcritic.t
-
-=head1 DESCRIPTION
-
-Tests all source files for some very specific perl coding violations
-
-=cut
-
 use strict;
 use warnings;
 
@@ -34,7 +20,21 @@ BEGIN {
     }
 }
 
-my @files;
+my (@files, @policies);
+
+while (@ARGV) {
+    my $arg = $ARGV[0];
+    if ($arg eq '--') {
+        shift @ARGV; # discard
+        last;
+    }
+    if ($arg =~ /^--(.*)/) {
+        push @policies, $1;  
+        shift @ARGV; # discard
+    } else {
+        last;
+    }
+}
 
 if (!@ARGV) {
     my $manifest = maniread('MANIFEST');
@@ -44,6 +44,9 @@ if (!@ARGV) {
         push @files, $file;
     }
 } else {
+    # does the first 
+
+
     # if we're passed a directory, find all the matching files
     # under that directory.
 
@@ -70,28 +73,31 @@ my $critic = Perl::Critic->new(-exclude => [qr/.*/]);
 
 # Add in the few cases we should care about.
 # For a list of available policies, perldoc Perl::Critic
-my @policies = qw{
-    TestingAndDebugging::RequireUseStrict
-    TestingAndDebugging::RequireUseWarnings
-    Variables::ProhibitConditionalDeclarations
-    InputOutput::ProhibitTwoArgOpen
-    InputOutput::ProhibitBarewordFileHandles
-    NamingConventions::ProhibitAmbiguousNames
-    Subroutines::ProhibitBuiltinHomonyms
-    Subroutines::ProhibitExplicitReturnUndef
-    Subroutines::ProhibitSubroutinePrototypes
-    Subroutines::RequireFinalReturn
-};
+if (! @policies) {
+    @policies = qw{
+        TestingAndDebugging::RequireUseStrict
+        TestingAndDebugging::RequireUseWarnings
+        Variables::ProhibitConditionalDeclarations
+        InputOutput::ProhibitTwoArgOpen
+        InputOutput::ProhibitBarewordFileHandles
+        NamingConventions::ProhibitAmbiguousNames
+        Subroutines::ProhibitBuiltinHomonyms
+        Subroutines::ProhibitExplicitReturnUndef
+        Subroutines::ProhibitSubroutinePrototypes
+        Subroutines::RequireFinalReturn
+    };
 
-foreach my $policy (@policies) {
-    $critic->add_policy(-policy => $policy);
+    # Do this one manually - requires an option.
+    $critic->add_policy(
+        -policy => 'CodeLayout::ProhibitHardTabs',
+        -config => { allow_leading_tabs => 0 }
+    );
 }
 
-# Do this one manually - requires an option.
-$critic->add_policy(
-    -policy => 'CodeLayout::ProhibitHardTabs',
-    -config => { allow_leading_tabs => 0 }
-);
+foreach my $policy (@policies) {
+    $critic->add_policy(-policy => $policy) or die;
+}
+
 
 foreach my $file (sort @files) {
     my @violations = $critic->critique($file);
@@ -121,9 +127,42 @@ sub is_perl {
     my $line = <$file_handle>;
     close $file_handle;
 
-    if ($line =~ /^#!.*perl/) {
+    if ($line && $line =~ /^#!.*perl/) {
         return 1;
     }
 
     return 0;
 }
+
+__END__
+
+=head1 NAME
+
+t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
+
+=head1 SYNOPSIS
+
+ % prove t/codingstd/perlcritic.t
+
+=head1 DESCRIPTION
+
+Tests all perl source files for some very specific perl coding violations.
+
+Optionally specify directories or files on the command line to test B<only>
+those files, otherwise all files in the C<MANIFEST> will be checked.
+
+By default, this script will validate the specified files against a default
+set of policies. To run the test for a B<specific> Rule, specify it on the
+command line before any other files, as:
+
+ perl t/codingstd/perlcritic.t --TestingAndDebugging::RequireUseWarnings
+
+This will, for example, use B<only> that policy (see L<Perl::Critic> for
+more information on policies) when examining files from the manifest.
+
+=head1 BUGS AND LIMITATIONS
+
+There's no way to specify options to policies when they are specified on the
+command line.
+
+=cut
