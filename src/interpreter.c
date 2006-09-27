@@ -662,7 +662,7 @@ runops_switch(Interp *interpreter, opcode_t *pc)
     void **pc_prederef;
     init_prederef(interpreter, PARROT_SWITCH_CORE);
     pc_prederef = interpreter->code->prederef.code + (pc - code_start);
-    pc = switch_core((opcode_t*)pc_prederef, interpreter);
+    pc = (opcode_t*) switch_core(pc_prederef, interpreter);
     return pc;
 }
 

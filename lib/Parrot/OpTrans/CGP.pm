@@ -57,38 +57,22 @@ sub core_prefix
     return "cgp_";
 }
 
-sub opsarraytype 
-{ 
-    return 'void*' 
-};
 =item C<defines()>
 
 Returns the C C<#define> macros required by the ops.
 
 =cut
 
-sub run_core_func_decl
-{
-    my ($self, $core) = @_;
-
-    return "void ** " .
-        $self->core_prefix .
-        "$core(void **cur_op, Parrot_Interp interpreter)";
-}
 sub defines
 {
-    return <<END;
-#define REL_PC ((size_t)(cur_opcode - interpreter->code->prederef.code))
-#define CUR_OPCODE ((opcode_t*)cur_opcode + CONTEXT(interpreter->ctx)->pred_offset)
-
-#  define opcode_to_prederef(i, op) \\
-     ((void**) (op - CONTEXT(i->ctx)->pred_offset))
-
-#define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
-
+    my ($self, $pred_def);
+    $self = shift;
+    $pred_def = $self->SUPER::defines();
+    return $pred_def . <<END;
+#  define opcode_to_prederef(i, op)   \\
+     (void**) (op   - CONTEXT(i->ctx)->pred_offset) 
 END
 }
-
 =item C<goto_address($address)>
 
 Transforms the C<goto ADDRESS($address)> macro in an ops file into the

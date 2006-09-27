@@ -74,16 +74,12 @@ Returns the C C<#define> macros required by the ops.
 
 sub defines
 {
-    return <<END;
-#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->code->prederef.code))
-#define CUR_OPCODE ((opcode_t*)cur_opcode + CONTEXT(interpreter->ctx)->pred_offset)
-
+    my ($self, $pred_def);
+    $self = shift;
+    $pred_def = $self->SUPER::defines();
+    return $pred_def . <<END;
 #  define opcode_to_prederef(i, op)   (op ? \\
      (void**) (op   - CONTEXT(i->ctx)->pred_offset) : NULL)
-
-
-#define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
-
 /*
  * if we are using CHECK_EVENTS elsewhere this macro should (again)
  * be in includes/parrot/event.h
@@ -119,7 +115,7 @@ sub goto_address
     {
   	    return <<EOC;
 	    {
-	       cur_opcode = (opcode_t *) opcode_to_prederef(interpreter, $addr);
+	       cur_opcode = opcode_to_prederef(interpreter, $addr);
 	       goto SWITCH_RELOAD;
             }
 EOC
@@ -150,23 +146,8 @@ sub goto_pop
 {
     my ($self) = @_;
     return "{ opcode_t *dest = (opcode_t*)pop_dest(interpreter);
-              cur_opcode = (opcode_t*)opcode_to_prederef(interpreter, dest);
+              cur_opcode = opcode_to_prederef(interpreter, dest);
 	      goto SWITCH_AGAIN; }";
-}
-
-=item C<run_core_func_decl($core)>
-
-Returns the C code for the run core function declaration.
-
-=cut
-
-sub run_core_func_decl
-{
-    my ($self, $core) = @_;
-
-    return "opcode_t * " .
-        $self->core_prefix .
-        "$core(opcode_t *cur_op, Parrot_Interp interpreter)";
 }
 
 =item C<run_core_func_start()>
@@ -179,10 +160,10 @@ sub run_core_func_start
 {
     return <<END_C;
 #if defined(__GNUC__) && defined(I386) && defined(PARROT_SWITCH_REGS)
-    register opcode_t *cur_opcode asm ("esi") = cur_op;
+    register void **   cur_opcode asm ("esi") = cur_op;
     register char *   _reg_base   asm ("edi");
 #else
-    opcode_t *cur_opcode = cur_op;
+    void ** cur_opcode = cur_op;
     char * _reg_base;
 #endif
 
@@ -193,7 +174,7 @@ SWITCH_AGAIN:
     cur_opcode = CHECK_EVENTS(interpreter, cur_opcode);
     if (!cur_opcode)
         break;
-    switch (*cur_opcode) {
+    switch (*(opcode_t*)cur_opcode) {
 END_C
 }
 
@@ -210,7 +191,7 @@ sub run_core_split
 
     return <<END_C;
     default:
-    switch (*cur_opcode) {
+    switch (*(opcode_t*)cur_opcode) {
 END_C
 }
 
@@ -226,8 +207,9 @@ sub run_core_finish
     my $bs = $base . $self->suffix . '_';
     my $c = <<END_C;
 	default:
-	    if (*cur_opcode >= 0 && *cur_opcode < (opcode_t)${bs}op_lib.op_count) {
-		*cur_opcode = CORE_OPS_wrapper__;
+	    if (*(opcode_t*)cur_opcode >= 0 && 
+	        *(opcode_t*)cur_opcode < (opcode_t)${bs}op_lib.op_count) {
+		*(opcode_t*)cur_opcode = CORE_OPS_wrapper__;
 		continue;
 	    }
 	    internal_exception(1, "illegal opcode in switch core\\n");

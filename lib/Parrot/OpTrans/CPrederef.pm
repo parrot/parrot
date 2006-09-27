@@ -9,7 +9,8 @@ Parrot::OpTrans::CPrederef - C Predereferenced Transform
 =head1 DESCRIPTION
 
 C<Parrot::OpTrans::CPrederef> inherits from C<Parrot::OpTrans::C>
-to provide predereferenced register addressing run loop.
+to provide basic functionality for predereferenced run loops (switch,
+CGP).
 
 =head2 Instance Methods
 
@@ -25,30 +26,6 @@ use warnings;
 use Parrot::OpTrans;
 use base qw( Parrot::OpTrans::C );
 
-=item C<core_type()>
-
-The core type is C<PARROT_PREDEREF_CORE>.
-
-=cut
-
-sub core_type
-{
-    return 'PARROT_PREDEREF_CORE';
-}
-
-=item C<prefix()>
-
-The prefix is C<'Parrot_pred_'>.
-
-This is used in C<Parrot::Op>'s C<func_name()>.
-
-=cut
-
-sub prefix
-{
-    return 'Parrot_pred_';
-}
-
 =item C<defines()>
 
 Returns the C C<#define> macros required by the ops.
@@ -59,47 +36,11 @@ sub defines
 {
     return <<END;
 #define REL_PC ((size_t)(cur_opcode - interpreter->code->prederef.code))
-#define CUR_OPCODE ((opcode_t*)cur_opcode + CONTEXT(interpreter->ctx)->pred_offset)
-
-#if 0
-static opcode_t* prederef_to_opcode(Interp* interpreter,
-                                           void** prederef_addr)
-{
-    INTVAL offset_in_ops;
-    if (prederef_addr == NULL) return NULL;
-    offset_in_ops = prederef_addr - interpreter->code->prederef.code;
-    return (opcode_t*) interpreter->code->base.data + offset_in_ops;
-}
-
-static void** opcode_to_prederef(Interp* interpreter,
-                                        opcode_t* opcode_addr)
-{
-    INTVAL offset_in_ops;
-    if (opcode_addr == NULL) return NULL;
-    offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->base.data;
-    return interpreter->code->prederef.code + offset_in_ops;
-}
-#else
-#  define prederef_to_opcode(i, pred) (pred ? \\
-     ((opcode_t*)pred + CONTEXT(i->ctx)->pred_offset) : NULL)
-#  define opcode_to_prederef(i, op)   (op ? \\
-     (void**) (op   - CONTEXT(i->ctx)->pred_offset) : NULL)
-#endif
-
+#define CUR_OPCODE \\
+    ((opcode_t*)cur_opcode + CONTEXT(interpreter->ctx)->pred_offset)
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
 
 END
-}
-
-=item C<suffix()>
-
-The suffix is C<'_prederef'>.
-
-=cut
-
-sub suffix
-{
-    return "_prederef";
 }
 
 =item C<opsarraytype()>
@@ -113,74 +54,38 @@ sub opsarraytype
     return 'void *'
 };
 
-=item C<gen_goto($where)>
+=item expr_address($addr)
 
-TODO - This is the same implementation as in C<Parrot::OpTrans>. It
-should not be duplicated.
+=item expr_address($offset)
+
+=item expr_pop()
+
+Create various address parts.
 
 =cut
 
-sub gen_goto
-{
-    my ($self, $where_str) = @_;
-    return "return $where_str";
+sub expr_address {
+    my ($self, $addr) = @_;
+    return "opcode_to_prederef(interpreter, $addr)";
 }
-
-=item C<expr_pop()>
-
-Addresses on the stack are pointers into the bytecode array, and so
-must be converted to pointers into the prederef array.
-
-=cut
-
-sub expr_pop
-{
+sub expr_offset {
+    my ($self, $offset) = @_;
+    return "CUR_OPCODE + $offset";
+}
+sub expr_pop {
     my ($self) = @_;
     return "opcode_to_prederef(interpreter, pop_dest(interpreter))";
 }
 
-=item C<expr_address($address)>
-
-Same logic as C<expr_pop()>.
-
-=cut
-
-sub expr_address
+sub run_core_func_decl
 {
-    my ($self, $addr) = @_;
-    return "opcode_to_prederef(interpreter, $addr)";
+    my ($self, $core) = @_;
+
+    return "void ** " .
+        $self->core_prefix .
+        "$core(void **cur_op, Parrot_Interp interpreter)";
 }
 
-=item C<expr_offset($offset)>
-
-=item C<goto_offset($offset)>
-
-=item C<goto_address($address)>
-
-CPrederef is funky in that expr OFFSET(n) uses a pointer to the
-original bytecode, but goto OFFSET(n) returns a pointer into the
-prederef array. (see expr_pop(), above, for a description of why this
-works.)
-
-=cut
-
-sub expr_offset
-{
-    my ($self, $offset) = @_;
-    return "CUR_OPCODE + $offset";
-}
-
-sub goto_offset
-{
-    my ($self, $offset) = @_;
-    return "return cur_opcode + $offset";
-}
-
-sub goto_address
-{
-    my ($self, $addr) = @_;
-    return "return opcode_to_prederef(interpreter,  (opcode_t *)$addr)";
-}
 
 =item C<access_arg($type, $num, $op)>
 
