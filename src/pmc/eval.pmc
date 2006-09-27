@@ -247,7 +247,13 @@ for writing to disc and later loading via C<load_bytecode>.
             adr += 16 - ((size_t)adr & 0xf);
             res->strstart = adr;
         }
+        /* We block DOD while doing the packing, since GC run during a pack
+           has been observed to cause problems. There may be a Better Fix.
+           See RT #40410 for example of the problem (note on line that
+           segfaults, it is *cursor that is pointing to dealloced memory). */
+        Parrot_block_DOD(INTERP);
         PackFile_pack(INTERP, pf, res->strstart);
+        Parrot_unblock_DOD(INTERP);
         /* now remove all segments from directory again and destroy
          * the packfile
          */
