@@ -141,9 +141,15 @@ sub is_perl {
         return 0;
     }
 
-    # modules and perl scripts should be tested..
+    # modules and perl scripts should always be tested..
     if ( $filename =~ /\.(?:pm|pl)$/ ) {
         return 1;
+    }
+
+    # test files (.t) and configure (.in) files might need testing.
+    # ignore everything else.
+    if ( $filename !~ /\.(?:t|in)$/ ) {
+        return 0;
     }
 
     # Now let's check to see if there's a perl shebang.
