@@ -145,58 +145,43 @@ Note that in this section only, offsets and lengths are in bytes.
   |        |        |    0x00 - IEEE 754 8 byte double                       |
   |        |        |    0x01 - i386 little endian 12 byte long double       |
   +--------+--------+--------------------------------------------------------+
-  | 11     | 1      | Major version number of the earliest version of Parrot |
-  |        |        | that should be able to run this file. For example, if  |
-  |        |        | Parrot 0.9.5 was the first Parrot that was able to     |
-  |        |        | run this bytecode file properly, this byte would       |
-  |        |        | have the value 0.                                      |
+  | 11     | 1      | Major version number of the version of Parrot that     |
+  |        |        | wrote this bytecode file. For example, if Parrot 0.9.5 |
+  |        |        | wrote it,this byte would have the value 0.             |
   +--------+--------+--------------------------------------------------------+
-  | 12     | 1      | Minor version number of the earliest version of Parrot |
-  |        |        | that should be able to run this file. For example, if  |
-  |        |        | Parrot 0.9.5 was the first Parrot that was able to     |
-  |        |        | run this bytecode file properly, this byte would       |
-  |        |        | have the value 9.                                      |
+  | 12     | 1      | Minor version number of the version of Parrot that     |
+  |        |        | wrote this bytecode file. For example, if Parrot 0.9.5 |
+  |        |        | wrote it,this byte would have the value 9.             |
   +--------+--------+--------------------------------------------------------+
-  | 13     | 1      | Patch version number of the earliest version of Parrot |
-  |        |        | that should be able to run this file. For example, if  |
-  |        |        | Parrot 0.9.5 was the first Parrot that was able to     |
-  |        |        | run this bytecode file properly, this byte would       |
-  |        |        | have the value 5.                                      |
+  | 13     | 1      | Patch version number of the version of Parrot that     |
+  |        |        | wrote this bytecode file. For example, if Parrot 0.9.5 |
+  |        |        | wrote it,this byte would have the value 5.             |
   +--------+--------+--------------------------------------------------------+
-  | 14     | 10     | Opcode fingerprint. This stores the fingerprint of the |
-  |        |        | opcodes that the Parrot this packfile was written by   |
-  |        |        | was built with. This enables detection of packfiles    |
-  |        |        | that can not be run by the version of Parrot reading   |
-  |        |        | the file.                                              |
-  |        |        |                                                        |
-  |        |        | The fingerprint is computed by taking the MD5 hash of  |
-  |        |        | the file PBC_COMPAT, a file in the Parrot repository   |
-  |        |        | that is only updated when an incompatible change is    |
-  |        |        | made to the Packfile format, for example renumbering   |
-  |        |        | operation codes.                                       |
-  |        |        |                                                        |
-  |        |        | This need only be checked when running a development   |
-  |        |        | version of Parrot. Release versions should choose to   |
-  |        |        | accept or decline a PBC file based only on the major,  |
-  |        |        | minor and patch version numbers.                       |
+  | 14     | 1      | Major version number of the bytecode file format. See  |
+  |        |        | the section below on bytecode file format version      |
+  |        |        | numbers.                                               |
   +--------+--------+--------------------------------------------------------+
-  | 24     | 1      | The type of the UUID associated with this packfile.    |
+  | 15     | 1      | Minor version number of the bytecode file format. See  |
+  |        |        | the section below on bytecode file format version      |
+  |        |        | numbers.                                               |
+  +--------+--------+--------------------------------------------------------+
+  | 16     | 1      | The type of the UUID associated with this packfile.    |
   |        |        | Must be one of:                                        |
   |        |        |    0x00 - No UUID                                      |
   |        |        |    0x01 - MD5                                          |
   +--------+--------+--------------------------------------------------------+
-  | 25     | 1      | Length of the UUID associated with this packfile. May  |
+  | 17     | 1      | Length of the UUID associated with this packfile. May  |
   |        |        | be zero if the type of the UUID is 0x00. Maximum       |
   |        |        | value is 255.                                          |
   +--------+--------+--------------------------------------------------------+
-  | 26     | u      | A UUID of u bytes in length, where u was specified as  |
+  | 18     | u      | A UUID of u bytes in length, where u was specified as  |
   |        |        | the length of the UUID in the previous field. Be sure  |
   |        |        | that UUIDs are stored and read as strings. The UUID is |
   |        |        | computed by applying the hash function specified in    |
   |        |        | the UUID type field over the entire packfile not       |
   |        |        | including this header and the trailing zero padding.   |
   +--------+--------+--------------------------------------------------------+
-  | 26 + u | n      | Zero-padding to make the total header length a         |
+  | 18 + u | n      | Zero-padding to make the total header length a         |
   |        |        | multiple of 16 bytes in length.                        |
   |        |        |    n = u % 16 == 0 ? 0 : 16 - (u % 16)                 |
   +--------+--------+--------------------------------------------------------+
@@ -205,6 +190,33 @@ Everything beyond the header is an opcode, with word length and byte ordering
 as defined in the header. If the word length and byte ordering of the machine
 that is reading the PBC file do not match these, it needs to transform the
 words making up the rest of the packfile.
+
+=head4 Bytecode File Version Numbers
+
+The bytecode file version number exists to decouple the format of the bytecode
+file from the version of the Parrot implementation that is reading/writing it.
+It has a major and a minor part.
+
+The major version number should be incremented whenever there is a change to
+the layout of bytecode files. This includes new segments, changes to segment
+headers or changes to the format of the data held within a segment.
+
+The minor version number should be incremented in all other cases when a
+change is made that means a previous version of Parrot would not be able to
+run the program encoded in the packfile. This is mostly opcode re-numbering or
+the addition of new opcodes.
+
+{{ QUESTION: Should this also include changes to the core PMC types? }}
+
+A single version of Parrot can support reading and writing of more than one
+bytecode file format. In fact, once Parrot is in production use it will be
+preferable to write as early a bytecode format as is possible, to allow the
+greatest compatibility with previous Parrots.
+
+These versions will be listed in the PBC_COMPAT file, sorted with the latest
+version first. in the format:
+
+MAJOR.MINOR DATE DESCRIPTION
 
 
 =head3 Directory Format Header
@@ -305,7 +317,8 @@ an individual entry.
 
 The default segment has no additional headers. It will, if possible, be memory
 mapped. More than one may exist in the packfile, and they are identified by
-name.
+name. They may be used for storing any data that does not fit into any other
+segment, for example the source code from a high level language.
 
 
 =head3 Bytecode Segment
@@ -496,7 +509,9 @@ The first word in the segment supplies the number of keys.
   |        |        |    n                                                   |
   +--------+--------+--------------------------------------------------------+
 
-Following this are n annotation key entries, which take the following format.
+Following this are n annotation key entries. There is one entry per key (such
+as "line" or "file"), but the bytecode may be annotated many times with that
+key. Key entries take the following format.
 
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |
@@ -547,6 +562,9 @@ A packfile will be represented in memory by Parrot as a tree of PMCs. These
 will provide a programatic way to construct and walk packfiles, both for the
 Parrot internals and from programs running on the Parrot VM.
 
+{{ QUESTION: Will the CStruct PMC make it into Parrot? If so, we may want to
+change the interface of these PMCs to take advantage of it. }}
+
 
 =head3 Packfile.pmc
 
@@ -577,6 +595,8 @@ keys are:
 =item version_major
 =item version_minor
 =item version_patch
+=item bytecode_major
+=item bytecode_minor
 =item uuid_type
 =item uuid_length
 =back
@@ -587,7 +607,6 @@ Used to get data about fields in the header that have a string value. Valid
 keys are:
 
 =over 4
-=item opcodefingerprint
 =item uuid
 =back
 
@@ -632,7 +651,8 @@ Packs the segment into the on-disk format and returns a string holding it.
 
 Takes the packed representation for a segment of the given type and then
 unpacks it, setting this PMC to represent that segment as a result of the
-unpacking (provided it is successfully unpacked).
+unpacking. If an error occurs during the unpacking process, an exception will
+be thrown.
 
 
 =head3 PackfileDirectory.pmc (isa PackfileSegment)
@@ -669,7 +689,7 @@ directory. If a segment of the given name already exists in the directory, it
 will be replaced with the supplied PMC.
 
 
-=head3 DefaultSegment.pmc (isa PackfileSegment)
+=head3 RawSegment.pmc (isa PackfileSegment)
 
 This PMC presents a segment of a packfile as an array of integers. This is the
 lowest possible level of access to a segment, and covers both the default and
@@ -683,7 +703,8 @@ fields in the header for a specific type of segment.
 
 =head4 set_integer_keyed_int (v-table)
 
-Stores an integer at the specified offset into the segment.
+Stores an integer at the specified offset into the segment. Will throw an
+exception if the segment is memory mapped.
 
 =head4 elements (v-table)
 
@@ -943,3 +964,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+
