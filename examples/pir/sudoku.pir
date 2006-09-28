@@ -1346,6 +1346,9 @@ next:
 	unless has_bc goto try_row
 	bx = x
 	by = c
+	# but B have to be in a different square too
+	$I0 = square_of(bx, by)
+	if sq == $I0 goto try_row
 	.local int start, end
 	# invalidate col x in sqr(x,y)
 	sq = square_of(x, y)
