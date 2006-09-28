@@ -97,7 +97,7 @@ all the attributes and types.
     char "b";
   DEF   
 
-The generalization of arbitrary attribute names would of course be
+The generalization of quoted attribute names would of course be
 possible too, but isn't likely needed.
 
 =head2 Syntax variant
@@ -139,13 +139,13 @@ Even (with nice to have IMCC syntax sugar):
   bar_cs = subclass 'CStruct', 'bar'
   addattribute(s) bar_cs, <<'DEF'
     double x;
-    foo foo;        # the foo class is already defined
-    foo *fptr;
+    foo cfoo;              # contained foo structure
+    foo *fptr;             # a pointer to a foo struct
   DEF   
   o = new 'bar'
-  setattribute o, 'x', 3.14
-  setattribute o, ['foo'; 'a'], 4711         # o.foo.a = 4711
-  setattribute o, ['fptr'; 'b'], 255
+  setattribute o, 'x', 3.14                   # C-ish equivalent:
+  setattribute o, ['cfoo'; 'a'], 4711         # o.foo.a = 4711
+  setattribute o, ['fptr'; 'b'], 255          # o.fptr->b = 255
 
 Attribute access is similar to current *ManagedStruct's hash syntax
 but with a syntax matching ParrotObjects.
@@ -157,6 +157,8 @@ but with a syntax matching ParrotObjects.
     int a;
     char b[100];
   DEF   
+
+Access to array elements automatically does bounds checking.
 
 =head2 Possible future extemsios
 
