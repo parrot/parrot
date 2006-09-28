@@ -414,7 +414,7 @@ ok:
     raw_given .= "8....61.9"
     b["san_a0626"] = raw_given
 
-    # sudoku-san 4th aug 2006 - atrocious  - Y-WING 
+    # sudoku-san 4th aug 2006 - atrocious  - Y-WING
     raw_given  = ".....1..."
     raw_given .= "6..7....5"
     raw_given .= ".82..49.."
@@ -791,7 +791,7 @@ nosp:
     if bits == 2 goto isa_pair
     print ".."
     goto nxt_x
-isa_pair:    
+isa_pair:
     i = 1
 bit_loop:
     el >>= 1        # bits start at 1
@@ -1264,8 +1264,8 @@ next:
     if x < 9 goto loop
     .return (0,0)
 .end
-    
-# look for another pair BC 
+
+# look for another pair BC
 # return 0/1 and the position in i_rcs
 .sub "y-wing-pair_BC" :method
     .param pmc i_rcs
@@ -2273,7 +2273,7 @@ that in square 2 we have a unique '7' at row 0, col 7:
   +---------+---------+---------+
 
 Now the tests in "create_inv_n" invalidate illegal positions
-due to multiple-blocking and other tests are likely to proceed.  
+due to multiple-blocking and other tests are likely to proceed.
 
 =head2 Y-WING
 
@@ -2283,13 +2283,13 @@ Given this suduku:
 
 # "unsolvable" 3 - Y-Wing
   . . . 8 . . . . 6
-  . . 1 6 2 . 4 3 . 
-  4 . . . 7 1 . . 2 
-  . . 7 2 . . . 8 . 
-  . . . . 1 . . . . 
-  . 1 . . . 6 2 . . 
-  1 . . 7 3 . . . 4 
-  . 2 6 . 4 8 1 . . 
+  . . 1 6 2 . 4 3 .
+  4 . . . 7 1 . . 2
+  . . 7 2 . . . 8 .
+  . . . . 1 . . . .
+  . 1 . . . 6 2 . .
+  1 . . 7 3 . . . 4
+  . 2 6 . 4 8 1 . .
   3 . . . . 5 . . .
 
 It started backtracking at:
