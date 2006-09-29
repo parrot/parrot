@@ -44,21 +44,6 @@ pmclass RubyFloat extends Float extends RubyObject dynpmc group ruby_group hll C
 }
 
 /*
-
-   =item C<STRING* get_string()>
-
-   Returns a Parrot string representation of the number.
-
-   =cut
-
-   */
-STRING* get_string () {
-    FLOATVAL f = PMC_num_val(SELF);
-    return Parrot_sprintf_c(INTERP, RUBY_NUMBER_FMT, f);
-}
-
-
-/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
