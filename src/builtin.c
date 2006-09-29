@@ -135,12 +135,28 @@ static int check_builtin_sig(Interp *interpreter, size_t i,
 static int
 find_builtin(Interp *interpreter, const char *func /*NN*/)
 {
-    size_t i;
-
-    /* TODO either hash or use binsearch */
-    for (i = 0; i < N_BUILTINS; ++i) {
-        if (strcmp(func, builtins[i].c_name) == 0)
+    int low  = 0;
+    int high = N_BUILTINS - 1;
+    
+    /* binary search */
+    while (low <= high)
+    {
+        int i   = (low + high) / 2;
+        int cmp = strcmp(func, builtins[i].c_name);
+        
+        if (!cmp)
+        {
+            /* we have to loop here because there is currently more than one
+               entry for the 'say' opcode and we depend on having the first
+               one so we can check signatures. --mdiep */
+            while (i>0 && strcmp(func, builtins[i-1].c_name) == 0)
+                i--;
             return i;
+        }
+        else if (cmp > 0)
+            low  = i + 1;
+        else if (cmp < 0)
+            high = i - 1;
     }
     return -1;
 }
