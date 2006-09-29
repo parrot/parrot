@@ -119,9 +119,6 @@ Parrot_init_builtins(Interp *interpreter)
         builtins[i].namespace = const_string(interpreter,
                 builtins[i].c_ns);
     }
-    /*
-     * TODO create a hash
-     */
 }
 
 static int find_builtin(Interp *interpreter, const char *func)
@@ -164,12 +161,21 @@ find_builtin(Interp *interpreter, const char *func /*NN*/)
 static int
 find_builtin_s(Interp *interpreter, STRING *func /*NN*/)
 {
-    size_t i;
-
-    /* TODO either hash or use binsearch */
-    for (i = 0; i < N_BUILTINS; ++i) {
-        if (string_equal(interpreter, func, builtins[i].meth_name) == 0)
+    int low  = 0;
+    int high = N_BUILTINS - 1;
+    
+    /* binary search */
+    while (low <= high)
+    {
+        int i   = (low + high) / 2;
+        int cmp = string_compare(interpreter, func, builtins[i].meth_name);
+        
+        if (!cmp)
             return i;
+        else if (cmp > 0)
+            low  = i + 1;
+        else if (cmp < 0)
+            high = i - 1;
     }
     return -1;
 }
