@@ -102,6 +102,7 @@ transform pir (Cardinal::POST::Ops) :language('PIR') {
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter
+    .kdump2($P0,'PIR')
     $P1 = tree.'get'('pir', $P0)
     code .= $P1
     goto iter_loop
@@ -164,29 +165,8 @@ transform pir (Cardinal::POST::Namespace) :language('PIR') {
 
     code = new 'PGE::CodeString'
     code .= "\n.namespace [ "
-    
-    .local pmc name
-    name = node.'name'()
-    iter = new Iterator, name
-    .local int second_flag 
-    second_flag = 0
-  iter_loop1:
-    unless iter goto iter_end1
-    $P0 = shift iter
-    $S0 = $P0 
-    unless second_flag goto first
-    code .= "; "
-    goto emit
-  first:
-    second_flag = 1
-  emit:
-#    code.'emit'("'%0'; ", $S0)
-    code .= "'"
+    $S0 = node.'get_pir_name'()
     code .= $S0
-    code .= "' "
-    goto iter_loop1
-  iter_end1:
-    
     code .= " ]\n"
 
     iter = node.'child_iter'()
@@ -199,6 +179,11 @@ transform pir (Cardinal::POST::Namespace) :language('PIR') {
   iter_end:
 
     .return (code)
+}
+
+transform pir (Cardinal::POST::NamespaceLookup) :language('PIR') {
+    $P0 = node.'pir'(self)
+    .return ($P0)
 }
 
 transform pir (Cardinal::POST::Sub) :language('PIR') {

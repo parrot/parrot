@@ -22,6 +22,7 @@ PMCDIR   = src/pmc
 all: cardinal.pbc $(PMCDIR)/ruby_group$(LOAD_EXT)
 
 PMCS = \
+  rubyclass \
   rubyobject \
   rubyinteger \
   rubyhash \
@@ -33,6 +34,7 @@ PMCS = \
   rubyrange
 
 PMC_SOURCES = \
+  $(PMCDIR)/rubyclass.pmc \
   $(PMCDIR)/rubyobject.pmc \
   $(PMCDIR)/rubyinteger.pmc \
   $(PMCDIR)/rubyhash.pmc \

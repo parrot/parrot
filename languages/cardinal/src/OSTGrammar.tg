@@ -292,14 +292,23 @@ transform post (Cardinal::PAST::Class) :language('PIR') {
     self.'post_scope_stack'(outerpost)
     self.'past_scope_stack'(outerpast)
     
-    .local pmc call_op
-    call_op = new 'Cardinal::POST::Call'
-    call_op.'init'('node'=>node, 'name'=>classbodyname)
+    .local pmc body_call_ops
+    body_call_ops = new 'Cardinal::POST::Ops'
+    body_call_ops.'init'('node'=>node)
+    $P0 = new 'Cardinal::POST::NamespaceLookup'
+    $P0 .'init'('node'=>node, 'namespace'=>namespace, 'item'=>classbodyname)
+    $P1 = $P0.'value'()
+    body_call_ops.'add_child'($P0)
+    $P0 = new 'Cardinal::POST::Op'
+    $S0 = $P1
+    $S0 .= "()"
+    $P0 .'init'('node'=>node, 'name'=>$S0)
+    body_call_ops.'add_child'($P0)
 
     namespace.'add_child'(post)
     $P0 = post.'subs'()
     namespace.'append_children'($P0)
-    .return (call_op)
+    .return (body_call_ops)
 }
 
 transform post (Cardinal::PAST::Stmts) :language('PIR') {

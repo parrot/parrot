@@ -54,6 +54,8 @@ The base class of POST is Cardinal::PAST::Node -- see C<lib/CPAST.pir>
     $P0 = subclass base, 'Cardinal::POST::Raw'
     addattribute $P0, 'raw'
     $P0 = subclass base, 'Cardinal::POST::NOP'
+    $P0 = subclass base, 'Cardinal::POST::NamespaceLookup'
+    addattribute $P0, 'item'
 
 .end
 
@@ -424,4 +426,65 @@ and that is returned.
 
 .namespace [ 'Cardinal::POST::Raw' ]
 .gen_accessor('raw')
+
+.namespace [ 'Cardinal::POST::Namespace' ]
+
+.sub 'get_pir_name' :method
+    .local pmc name
+    .local pmc iter
+    .local string code
+    name = self.'name'()
+    iter = new Iterator, name
+    .local int second_flag 
+    second_flag = 0
+  iter_loop1:
+    unless iter goto iter_end1
+    $P0 = shift iter
+    $S0 = $P0 
+    unless second_flag goto first
+    code .= "; "
+    goto emit
+  first:
+    second_flag = 1
+  emit:
+#    code.'emit'("'%0'; ", $S0)
+    code .= "'"
+    code .= $S0
+    code .= "' "
+    goto iter_loop1
+  iter_end1:
+  .return (code)
+.end
+
+.namespace [ 'Cardinal::POST::NamespaceLookup' ]
+.sub 'pir' :method
+    .param pmc block
+    .local pmc item
+    .local pmc name
+    .local pmc value
+    item = self.'item'()
+    name = self.'name'()
+    value = self.'value'()
+
+    .local pmc code
+    code = new 'PGE::CodeString'
+    $S0 = "'"
+    $S1 = item
+    $S0 .= $S1
+    $S0 .= "'"
+    #code.'emit'('    %r = get_hll_namespace [ %n ; %i ]', 'r'=>value, 'n'=>name, 'i'=>$S0)
+    code.'emit'('    %r = get_hll_namespace [ %n]', 'r'=>value, 'n'=>name)
+    code.'emit'('    %r = %r[ %i ]', 'r'=>value, 'i'=>$S0)
+    .return (code)
+.end
+
+.gen_accessor('item')
+.gen_dumplist('name value item')
+
+.sub 'namespace' :method
+    .param pmc namespace
+    $S0 = namespace.'get_pir_name'()
+    self.'name'($S0)
+    .return ()
+.end
 
