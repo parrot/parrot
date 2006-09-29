@@ -106,7 +106,7 @@ $(PMCDIR)/ruby_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
 	cd $(PMCDIR) && $(BUILD) generate $(PMCS)
 	cd $(PMCDIR) && $(BUILD) compile $(PMCS)
 	cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
-#	cd $(PMCDIR) && $(BUILD) copy --destination=$(PARROT_DYNEXT) $(PMCS)
+	cd $(PMCDIR) && $(BUILD) copy --destination=$(PARROT_DYNEXT) $(PMCS)
 
 src/builtins_gen.pir: $(BUILTINS_PIR)
 	$(CAT) $(BUILTINS_PIR) >src/builtins_gen.pir
