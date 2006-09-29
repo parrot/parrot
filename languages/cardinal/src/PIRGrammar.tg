@@ -102,7 +102,6 @@ transform pir (Cardinal::POST::Ops) :language('PIR') {
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter
-    .kdump2($P0,'PIR')
     $P1 = tree.'get'('pir', $P0)
     code .= $P1
     goto iter_loop
