@@ -95,6 +95,7 @@ if ( !@policies ) {
         Subroutines::ProhibitExplicitReturnUndef
         Subroutines::ProhibitSubroutinePrototypes
         Subroutines::RequireFinalReturn
+        CodeLayout::UseParrotCoda
     };
 
     # Add these policies manually - requires an option.
