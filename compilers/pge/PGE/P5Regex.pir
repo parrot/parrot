@@ -80,37 +80,38 @@
     set_hll_global ["PGE::P5Regex"], "$optable", optable
 
     $P0 = get_hll_global ["PGE::P5Regex"], "parse_lit"
-    optable.addtok("term:", "", "nows", $P0)
-    optable.addtok("term:\\b", "term:", "nows", "PGE::Exp::Anchor")
-    optable.addtok("term:\\B", "term:", "nows", "PGE::Exp::Anchor")
-    optable.addtok("term:^", "term:", "nows", "PGE::Exp::Anchor")
-    optable.addtok("term:$", "term:", "nows", "PGE::Exp::Anchor")
+    optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.addtok("term:\\d", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\D", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\s", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\S", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\w", "term:", "nows", "PGE::Exp::CCShortcut")
-    optable.addtok("term:\\W", "term:", "nows", "PGE::Exp::CCShortcut")
+    optable.newtok('term:\\b', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok('term:\\B', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok('term:^',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok('term:$',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
 
-    optable.addtok("circumfix:( )", "term:", "nows,nullterm", 'PGE::Exp::CGroup')
-    optable.addtok("circumfix:(?: )", "term:", "nows,nullterm", 'PGE::Exp::Group')
+    optable.newtok('term:\\d', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\\D', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\\s', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\\S', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\\w', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\\W', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
 
-    $P0 = get_hll_global ["PGE::P5Regex"], "parse_enumclass"
-    optable.addtok("term:[", "", "nows", $P0)
-    optable.addtok("term:.", "", "nows", $P0)
+    optable.newtok('circumfix:( )',   'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::CGroup')
+    optable.newtok('circumfix:(?: )', 'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::Group')
 
-    $P0 = get_hll_global ["PGE::P5Regex"], "parse_quant"
-    optable.addtok("postfix:*", "<term:", "left,nows", $P0)
-    optable.addtok("postfix:+", "postfix:*", "left,nows", $P0)
-    optable.addtok("postfix:?", "postfix:*", "left,nows", $P0)
-    optable.addtok("postfix:{", "postfix:*", "left,nows", $P0)
+    $P0 = get_hll_global ['PGE::P5Regex'], 'parse_enumclass'
+    optable.newtok('term:[', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:.', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.addtok("infix:", "<postfix:*", "right,nows", "PGE::Exp::Concat")
-    optable.addtok("infix:|", "<infix:", "left,nows", "PGE::Exp::Alt")
+    $P0 = get_hll_global ['PGE::P5Regex'], 'parse_quant'
+    optable.newtok('postfix:*', 'looser'=>'term:', 'left'=>1, 'nows', 'parsed'=>$P0)
+    optable.newtok('postfix:+', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('postfix:?', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('postfix:{', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
 
-    optable.addtok("close:}", "<infix:|", "nows")            # XXX: hack
-    optable.addtok("close:]", "close:}", "nows")             # XXX: hack
+    optable.newtok('infix:',  'looser'=>'postfix:*', 'right'=>1, 'nows'=>1, 'match'=>'PGE::Exp::Concat')
+    optable.newtok('infix:|', 'looser'=>'infix:',    'left'=>1,  'nows'=>1, 'match'=>'PGE::Exp::Alt')
+
+    optable.newtok('close:}', 'looser'=>'infix:|', 'nows'=>1)            # XXX: hack
+    optable.newtok('close:]', 'equiv'=>'close:}',  'nows'=>1)            # XXX: hack
 
     $P0 = get_hll_global ["PGE::P5Regex"], "compile_p5regex"
     compreg "PGE::P5Regex", $P0
