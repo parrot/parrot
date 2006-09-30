@@ -61,7 +61,23 @@ C<Parrot_instantiate_object()>.
 
 =item C<void destroy()>
 
-Call the '__finalize' method if it exists.
+Call the '__finalize' method if it exists and destruct the object.
+
+XXX Finalization from within the C<destroy> method is of course
+wrong. The finalization code could resurrect the object, by e.g.
+storing it into some structure. But as destruction is also done in
+this step, the stored object is unusable (in best case) or even
+recycled to a new PMC. All access to such a zombie would be really
+interesting.
+
+TODO 
+
+  - create a tobe_finalized list in the GC
+  - don't destroy these objects immediately
+  - create a dedicated finalize vtable
+  - run the finalization code after GC has finished
+  - run all finalizers in MRO order
+  - postpone destruction to the next GC cycle
 
 =cut
 
