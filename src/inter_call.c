@@ -27,7 +27,7 @@ subroutines.
 
 
 
-static int next_arg(Interp *, struct call_state_1 *st);
+static int next_arg(Interp *, struct call_state_item *st);
 
 /*
 
@@ -85,13 +85,13 @@ Parrot_init_ret_nci(Interp *interpreter, struct call_state *st,
 /*
 
 =item C<int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,
-        const char *sig, void *ap, struct call_state_1 *st)>
+        const char *sig, void *ap, struct call_state_item *st)>
 
 Initialize argument transfer with given code segment (holding the
 const_table), registers, function signature, and arguments.
 
 =item C<int Parrot_init_arg_op(Interp *, parrot_context_t *ctx,
-        opcode_t *pc, struct call_state_1 *st)>
+        opcode_t *pc, struct call_state_item *st)>
 
 Initialize argument transfer with given context registers, and opcode
 location of a get_ or set_ argument opcode.
@@ -107,7 +107,7 @@ These functions return 0, if no arguments are present, or 1 on success.
 
 int
 Parrot_init_arg_op(Interp *interpreter, parrot_context_t *ctx,
-        opcode_t *pc, struct call_state_1 *st)
+        opcode_t *pc, struct call_state_item *st)
 {
     PMC *sig_pmc;
 
@@ -131,7 +131,7 @@ Parrot_init_arg_op(Interp *interpreter, parrot_context_t *ctx,
 
 int
 Parrot_init_arg_sig(Interp *interpreter, parrot_context_t *ctx,
-        const char *sig, void *ap, struct call_state_1 *st)
+        const char *sig, void *ap, struct call_state_item *st)
 
 {
     st->i = 0;
@@ -322,7 +322,7 @@ fetch_arg_pmc_sig(Interp *interpreter, struct call_state *st)
 }
 
 static int
-next_arg(Interp *interpreter, struct call_state_1 *st)
+next_arg(Interp *interpreter, struct call_state_item *st)
 {
     st->i++;
     if (st->i >= st->n) {
@@ -1022,6 +1022,12 @@ store_opt:
                         st->name, UVal_pmc(st->val));
                 break;
 
+            case CALL_STATE_NAMED_x|CALL_STATE_x_NAMED|CALL_STATE_x_END: 
+                /* XXX: this state doesn't properly reflect what's going on */
+                real_exception(interpreter, NULL, 0,
+                        "positional inside named args at position %i",
+                        st->src.i-1);
+                break;
             default:
                 real_exception(interpreter, NULL, 0,
                         "Unhandled process_args state 0x%x",

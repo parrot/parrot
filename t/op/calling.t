@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 93;
+use Parrot::Test tests => 95;
 
 
 =head1 NAME
@@ -2412,4 +2412,30 @@ CODE
 OUTPUT
 
 
+pir_output_like(<<'CODE', <<'OUTPUT', "unexpected positional arg");
+.sub 'main'
+    'foo'('abc', 'def', 'ghi'=>1)
+.end
+
+.sub 'foo'
+    .param string name
+    .param pmc args :slurpy :named
+.end
+CODE
+/positional inside named args at position 2/
+OUTPUT
+
+
+pir_output_like(<<'CODE', <<'OUTPUT', "unexpected positional arg");
+.sub 'main'
+    'foo'('abc', 'def'=>1, 'ghi', 'jkl'=>1)
+.end
+
+.sub 'foo'
+    .param string name
+    .param pmc args :slurpy :named
+.end
+CODE
+/positional inside named args at position 3/
+OUTPUT
 

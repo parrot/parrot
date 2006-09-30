@@ -51,7 +51,7 @@ enum call_state_mode {
 
 };
 
-struct call_state_1 {
+struct call_state_item {
     int mode;       /* from_sig, from_set_ops, flatten ...*/
     union {
         struct {
@@ -73,8 +73,8 @@ struct call_state_1 {
 };
 
 struct call_state {
-    struct call_state_1 src;
-    struct call_state_1 dest;
+    struct call_state_item src;
+    struct call_state_item dest;
     UnionVal val;
     int n_actual_args;  /* arguments incl. flatten */
     int optionals;      /* sum of optionals */
@@ -86,10 +86,10 @@ struct call_state {
 };
 
 PARROT_API int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,
-        const char *sig, void *ap, struct call_state_1 *st);
+        const char *sig, void *ap, struct call_state_item *st);
 
 PARROT_API int Parrot_init_arg_op(Interp *, parrot_context_t *ctx,
-        opcode_t *pc, struct call_state_1 *st);
+        opcode_t *pc, struct call_state_item *st);
 
 PARROT_API int Parrot_init_arg_nci(Interp *, struct call_state *st, const char *sig);
 PARROT_API int Parrot_init_ret_nci(Interp *, struct call_state *st, const char *sig);
