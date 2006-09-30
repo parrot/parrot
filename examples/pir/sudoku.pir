@@ -2377,6 +2377,39 @@ Here is starts backtracking. A possible improvement would be:
 
 See also std331.sud
 
+=head2 TODO Generalization
+
+A Sudoku has 2 dimensions and 3 connected views (row, column, and
+square). There are 1-dim tests, which work for all views. 2-dim tests
+are a bit more tricky to generalize and not yet done properly.
+
+Basically: as only 2 dimensions are independant, all these tests can
+work on 2 of 3 views:
+
+  square, row
+  square, column
+  row, columm
+
+Now the problem is, how to generalize the possible other direction.
+Let's call it the 'neighbour'. A neighbour is always 'towards' the
+second view. A row has 9 column neighbours and 3
+square neighbours. A square has 3 row and 3 column neighbours.
+(Maybe neighbour is a bad term as it does contain itself).
+
+C<scan_dbl> can now easily be reviewed and generalized:
+
+For all neighbours (n): If in the view (v0) a digit is valid in only
+one of (n)'s views: giving (v1), this digit is invalid in the
+complement of the intersection (v0 & v1).
+
+NB: it seems to be simpler to just hack the code as to utter the
+idea in $human_lang.
+
+This is trivial if these views are (row, column) as the intersection
+is just one point, but it is the generalization of the 'inv_1' code.
+
+Another example of a 2-dim test is of course Y-Wing.
+
 =cut
 
 # vim: ft=imc sw=4:
