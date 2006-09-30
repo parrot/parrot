@@ -15,14 +15,6 @@
 
 #include "parrot/config.h"
 
-/*
- * if define below is 1 (see include/parrot/settings.h)
- *
- * live, on_free_list, special_PMC are kept in the pools arenas
- * this needs aligned memory
- */
-
-
 typedef union UnionVal {
     struct {                                  /* One Buffer structure */
         void *     _bufstart;
@@ -46,8 +38,6 @@ typedef union UnionVal {
 #define UVal_int2(u)      (u)._i._int_val2
 #define UVal_num(u)       (u)._num_val
 #define UVal_str(u)       (u)._string_val
-#define UVal_bufstart(u)  (u)._b._bufstart
-#define UVal_buflen(u)    (u)._b._buflen
 
 /* BEGIN DEPRECATED UVAL ACCESSOR MACROS */
 #define num_val _num_val
