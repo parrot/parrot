@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 
 =head1 NAME
 
@@ -805,4 +805,34 @@ handler:
 CODE
 at_exit
 a = 42
+OUTPUT
+
+## Regression test for r14697.  This probably won't be needed when PDD23 is
+## fully implemented.
+pir_output_like(<<'CODE', <<'OUTPUT', "invoke handler in calling sub");
+## This tests that error handlers are out of scope when invoked (necessary for
+## rethrow) when the error is signalled in another sub.
+.sub main :main
+	push_eh handler
+	broken()
+	print "not reached.\n"
+handler:
+	.local pmc exception
+	.get_results (exception, $S0)
+	print "in handler.\n"
+	print $S0
+	print "\n"
+	rethrow exception
+.end
+
+.sub broken
+	$P0 = new .Exception
+	$P0["_message"] = "something broke"
+	throw $P0
+.end
+CODE
+/\Ain handler.
+something broke
+something broke
+current inst/
 OUTPUT
