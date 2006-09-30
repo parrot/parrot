@@ -6,34 +6,11 @@
 struct Small_Object_Arena {
     size_t used;
     size_t total_objects;
-#if ARENA_DOD_FLAGS
-    size_t object_size;     /* size in bytes of an individual pool item */
-    UINTVAL * dod_flags;
-    struct Small_Object_Pool * pool;
-    size_t live_objects;
-#endif /* ARENA_DOD_FLAGS */
     struct Small_Object_Arena *prev;
     struct Small_Object_Arena *next;
     void *start_objects;
 };
 
-#if ARENA_DOD_FLAGS
-/*
- * objects on the free list are overlaid with
- * this data structure just for resetting
- * the on_free_list FLAG cheaper
- *
- * this structure should not be bigger then a PMC
- */
-typedef struct {
-    void *free_list_ptr;        /* generic free list ptr */
-    size_t object_buflen_dont_use;
-    UINTVAL object_flags_dont_use;
-    UINTVAL *arena_dod_flag_ptr;/* ptr to the dod flag nibble */
-    int flag_shift;         /* shift inside dod_flags */
-} Dead_PObj;
-
-#endif /* ARENA_DOD_FLAGS */
 
 struct Small_Object_Pool;
 

@@ -590,36 +590,15 @@ cleanup_next_for_GC_pool(Parrot_Interp interpreter,
 {
     struct Small_Object_Arena *arena;
 
-#if ARENA_DOD_FLAGS
-    UINTVAL *dod_flags;
-    UINTVAL nm;
-#endif
-
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         PMC *p = arena->start_objects;
         UINTVAL i;
 
-#if ARENA_DOD_FLAGS
-        dod_flags = arena->dod_flags - 1;
-        nm = 0;
-#endif
         for (i = 0; i < arena->used; i++) {
-#if ARENA_DOD_FLAGS
-            if (! (i & ARENA_FLAG_MASK)) {
-                ++dod_flags;
-                nm = 0;
-            }
-            else
-                nm += 4;
-            if (!(*dod_flags & (PObj_on_free_list_FLAG << nm)))
-                if (p->pmc_ext)
-                    PMC_next_for_GC(p) = NULL;
-#else
             if (!PObj_on_free_list_TEST(p)) {
                 if (p->pmc_ext)
                     PMC_next_for_GC(p) = NULL;
             }
-#endif
             p = (PMC *)((char *)p + sizeof(PMC));
         }
     }
@@ -1015,51 +994,6 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info)
         list_unshift(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
 }
 
-#if ARENA_DOD_FLAGS
-
-/*
-
-=item C<static UINTVAL
-id_from_pmc(Parrot_Interp interpreter, PMC* pmc)>
-
-Creates and returns a unique id (tag) for a PMC. This is the object
-number in the PMCs arena(s) shifted left by 2. Starts at C<1<<2>. 0 is a
-C<NULLPMC>.
-
-=cut
-
-*/
-
-static UINTVAL
-id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
-{
-    UINTVAL id = 1;     /* first PMC in first arena */
-    struct Small_Object_Arena *arena, *pmc_arena;
-    struct Small_Object_Pool *pool;
-
-    pool = interpreter->arena_base->pmc_pool;
-    pmc_arena = GET_ARENA( (PObj*) pmc);
-
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        if (arena == pmc_arena) {
-            id += GET_OBJ_N(arena, (PObj*) pmc);
-            return id << 2;     /* lo bits are flags */
-        }
-        id += arena->total_objects;
-    }
-    pool = interpreter->arena_base->constant_pmc_pool;
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        if (arena == pmc_arena) {
-            id += GET_OBJ_N(arena, (PObj*) pmc);
-            return id << 2;
-        }
-        id += arena->total_objects;
-    }
-    internal_exception(1, "Couldn't find PMC in arenas");
-    return -1;
-}
-
-#else
 
 static UINTVAL
 id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
@@ -1096,8 +1030,6 @@ id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
     internal_exception(1, "Couldn't find PMC in arenas");
     return -1;
 }
-
-#endif
 
 /*
 

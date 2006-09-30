@@ -248,13 +248,10 @@ accurate. This avoids copying of dead buffer memory.
   ------------------------------------------------------------------------
   operation            stop-the-world     incremental       incremental
   time per DOD cycle   unbounded          bounded           bounded
-  size overhead        1.125 words    1)  1.125 words       2 words
+  size overhead        1 word             1 word            2 words
   time overhead        O(2*live + dead)   O(2*live + dead)  O(live)   2)
 
 Notes:
-
-  1) with ARENA_DOD_FLAGS for aggregates; only one nibble for
-     non-aggregates, 32-bit system assumed
 
   2) it should be possible to mark containers at once by using the
      information of the from-space pointers and tracking changes

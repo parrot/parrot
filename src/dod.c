@@ -132,64 +132,6 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
 }
 
 #if !PARROT_GC_GMS
-#  if ARENA_DOD_FLAGS
-
-/*
-
-=item C<void pobject_lives(Interp *interpreter, PObj *obj)>
-
-Tag C<obj> as alive.
-
-Used by the GC system when tracing the root set, and used by the PMC GC
-handling routines to tag their individual pieces if they have private
-ones.
-
-=cut
-
-*/
-void
-pobject_lives(Interp *interpreter, PObj *obj)
-{
-
-    struct Small_Object_Arena * const arena = GET_ARENA(obj);
-    const size_t n = GET_OBJ_N(arena, obj);
-    const size_t ns = n >> ARENA_FLAG_SHIFT;
-    const UINTVAL nm = (n & ARENA_FLAG_MASK) << 2;
-    UINTVAL * const dod_flags = arena->dod_flags + ns;
-    if (*dod_flags & ((PObj_on_free_list_FLAG | PObj_live_FLAG) << nm))
-        return;
-
-#ifdef DEBUG_DOD_CONSTS
-    if (PObj_is_PMC_TEST(obj) &&
-            ((PMC*)obj)->vtable->base_type != enum_class_SArray &&
-            ((PMC*)obj)->vtable->base_type != enum_class_Null
-            )
-        assert(!PObj_constant_TEST(obj));
-#endif
-
-    ++arena->live_objects;
-    *dod_flags |= PObj_live_FLAG << nm;
-
-#if GC_VERBOSE
-        if (PObj_report_TEST(obj)) {
-            fprintf(stderr, "GC: PMC %p live\n", obj);
-        }
-#endif
-    if (*dod_flags & (PObj_is_special_PMC_FLAG << nm)) {
-        /* All PMCs that need special treatment are handled here.
-         * For normal PMCs, we don't touch the PMC memory itself
-         * so that caches stay clean.
-         */
-#if GC_VERBOSE
-        if (PObj_report_TEST(obj)) {
-            fprintf(stderr, "GC: PMC %p special\n", obj);
-        }
-#endif
-        mark_special(interpreter, (PMC*) obj);
-    }
-}
-
-#  else
 
 /* XXX This should really use the same header, with different guts #ifdeffed */
 void
@@ -240,7 +182,6 @@ pobject_lives(Interp *interpreter, PObj *obj)
 #endif
 }
 
-#  endif
 #endif  /* PARROT_GC_GMS */
 
 /*
@@ -426,11 +367,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
         /*
          * clearing the flag is much more expensive then testing
          */
-        if (!PObj_needs_early_DOD_TEST(current)
-#if ARENA_DOD_FLAGS
-                && PObj_high_priority_DOD_TEST(current)
-#endif
-           )
+        if (!PObj_needs_early_DOD_TEST(current))
             PObj_high_priority_DOD_CLEAR(current);
 
         /* mark properties */
@@ -567,102 +504,6 @@ used_cow(Interp *interpreter, struct Small_Object_Pool *pool, int cleanup)
 }
 #endif /* GC_IS_MALLOC */
 
-#if ARENA_DOD_FLAGS
-
-/*
-
-=item C<static void
-clear_live_counter(Interp *interpreter,
-        struct Small_Object_Pool *pool)>
-
-Clear the live counter.
-
-=cut
-
-*/
-
-static void
-clear_live_counter(Interp *interpreter,
-        struct Small_Object_Pool *pool)
-{
-    struct Small_Object_Arena *arena;
-    for (arena = pool->last_Arena; arena; arena = arena->prev)
-        arena->live_objects = 0;
-}
-
-# define REDUCE_ARENAS 0
-
-#  if REDUCE_ARENAS
-/* -lt:
- * count free objects per arena
- * - if we find more then one totally unused arena
- *   free all but one arena - this is the only possibility to
- *   reduce the amount of free objects.
- *
- * doesn't really work or speed things up - disabled
- */
-# define REDUCE_ARENA_DEBUG 0
-
-#if REDUCE_ARENA_DEBUG
-#define debug(x) printf x
-#else
-#define debug(x)
-#endif
-
-/*
-
-=item C<static void
-reduce_arenas(Interp *interpreter,
-        struct Small_Object_Pool *pool, UINTVAL free_arenas)>
-
-Reduce the number of memory arenas by freeing any that have no live
-objects.
-
-=cut
-
-*/
-
-static void
-reduce_arenas(Interp *interpreter,
-        struct Small_Object_Pool *pool, UINTVAL free_arenas)
-{
-    struct Small_Object_Arena *arena, *next, *prev;
-    int i;
-    PObj * o;
-
-    /* debugging stuff */
-    for (i = 0, arena = pool->last_Arena; arena; arena = arena->prev)
-        i++;
-    debug(("\ttotal %d arenas - ", i));
-
-    for (next = arena = pool->last_Arena; arena; ) {
-        prev = arena->prev;
-        if (arena->live_objects == 0) {
-            if (--free_arenas <= 0)
-                break;
-            next->prev = prev;
-            pool->total_objects -= arena->used;
-#if ! ARENA_DOD_FLAGS
-            mem_sys_free(arena->start_objects);
-	    arena->start_objects = 0;
-#endif
-            mem_sys_free(arena);
-
-        }
-        else {
-            next = arena;
-        }
-        arena = prev;
-    }
-    for (i = 0, arena = pool->last_Arena; arena; arena = arena->prev)
-        i++;
-    debug(("now %d arenas\n", i));
-
-}
-
-#  endif
-#endif
-
 /*
 
 =item C<void
@@ -706,46 +547,14 @@ Parrot_dod_sweep(Interp *interpreter,
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         Buffer *b = cur_arena->start_objects;
 
-#if ARENA_DOD_FLAGS
-        UINTVAL * dod_flags = cur_arena->dod_flags - 1;
-#endif
         for (i = nm = 0; i < cur_arena->used; i++) {
-#if ARENA_DOD_FLAGS
-            if (! (i & ARENA_FLAG_MASK)) {
-                /* reset live bits for previous bunch of objects */
-                if (i)
-                    *dod_flags &= ~ALL_LIVE_MASK;
-                ++dod_flags;
-                /* if all are on free list, skip one bunch */
-                if (*dod_flags == ALL_FREE_MASK) {  /* all on free list */
-                    i += ARENA_FLAG_MASK;       /* + 1 in loop */
-                    b = (Buffer *)((char *)b + object_size*(ARENA_FLAG_MASK+1));
-                    continue;
-                }
-                nm = 0;
-            }
-            else
-                nm += 4;
-
-            /* If it's not live or on the free list, put it on the free list.
-             * Note that it is technically possible to have a Buffer be both
-             * on_free_list and live, because of our conservative stack-walk
-             * collection. We must be wary of this case. */
-            if ((*dod_flags & (PObj_on_free_list_FLAG << nm)))
-                ; /* if its on free list, do nothing */
-            else if ((*dod_flags & (PObj_live_FLAG << nm)))
-#else
             if (PObj_on_free_list_TEST(b))
                 ; /* if its on free list, do nothing */
-            else if (PObj_live_TEST(b))
-#endif
-            {
+            else if (PObj_live_TEST(b)) {
                 /* its live */
                 total_used++;
-#if !ARENA_DOD_FLAGS
                 PObj_live_CLEAR(b);
                 PObj_get_FLAGS(b) &= ~PObj_custom_GC_FLAG;
-#endif
             }
             else {
                 /* it must be dead */
@@ -776,6 +585,8 @@ Parrot_dod_sweep(Interp *interpreter,
                     PMC *p = (PMC*)b;
 
                     /* then destroy it here
+                     *
+                     * TODO collect objects with finalizers
                     */
                     if (PObj_needs_early_DOD_TEST(p))
                         --arena_base->num_early_DOD_PMCs;
@@ -846,56 +657,14 @@ Parrot_dod_sweep(Interp *interpreter,
 #endif
                     PObj_buflen(b) = 0;
                 }
-#if ARENA_DOD_FLAGS
-                *dod_flags |= PObj_on_free_list_FLAG << nm;
-                if (pool->object_size >= sizeof(Dead_PObj)) {
-                    ((Dead_PObj*)b)->arena_dod_flag_ptr = dod_flags;
-                    ((Dead_PObj*)b)->flag_shift = nm;
-                }
-#else
                 PObj_flags_SETTO((PObj *)b, PObj_on_free_list_FLAG);
-#endif
                 pool->add_free_object(interpreter, pool, b);
             }
 next:
             b = (Buffer *)((char *)b + object_size);
         }
-#if ARENA_DOD_FLAGS
-        /* reset live bits on last bunch of objects */
-        *dod_flags &= ~ALL_LIVE_MASK;
-#  if REDUCE_ARENAS
-        /* not strictly only for ARENA_DOD_FLAGS, but
-         * live_objects is only defined there
-         */
-        if ( (cur_arena->live_objects = total_used - old_total_used) == 0)
-            ++free_arenas;
-        old_total_used = total_used;
-#  endif
-#endif
     }
     pool->num_free_objects = pool->total_objects - total_used;
-#if ARENA_DOD_FLAGS
-#  if REDUCE_ARENAS
-#define REPLENISH_LEVEL_FACTOR 0.3
-    if (free_arenas > 1) {
-        debug(("pool %s: %d free_arenas\n", pool->name, (int)free_arenas));
-        pool->replenish_level =
-            (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
-        i = 0;
-        while (pool->num_free_objects - i * pool->last_Arena->used *
-                REPLENISH_LEVEL_FACTOR > pool->replenish_level &&
-                i < free_arenas)
-            ++i;
-        debug(("\t may free %d\n", (int)i));
-        reduce_arenas(interpreter, pool, i-1);
-        pool->replenish_level =
-            (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
-        pool->num_free_objects = pool->total_objects - total_used;
-        pool->skip = 0;
-    }
-#  undef debug
-#  endif
-#endif
 }
 
 #ifndef PLATFORM_STACK_WALK
@@ -1019,25 +788,14 @@ clear_live_bits(Parrot_Interp interpreter,
         struct Small_Object_Pool * const pool) {
     struct Small_Object_Arena *arena;
     UINTVAL i;
-#if !ARENA_DOD_FLAGS
     const UINTVAL object_size = pool->object_size;
-#endif
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-#if ARENA_DOD_FLAGS
-        UINTVAL * dod_flags = arena->dod_flags;
-        for (i = 0; i < arena->used; i += (ARENA_FLAG_MASK+1)) {
-            /* reset live bits for a bunch of objects */
-            *dod_flags &= ~ALL_LIVE_MASK;
-            ++dod_flags;
-        }
-#else
         Buffer *b = arena->start_objects;
         for (i = 0; i < arena->used; i++) {
             PObj_live_CLEAR(b);
             b = (Buffer *)((char *)b + object_size);
         }
-#endif
     }
 
 }
@@ -1127,23 +885,11 @@ void
 Parrot_dod_ms_run_init(Interp *interpreter)
 {
     struct Arenas * const arena_base = interpreter->arena_base;
-#if ARENA_DOD_FLAGS
-    int j;
-#endif
 
     arena_base->dod_trace_ptr = NULL;
     arena_base->dod_mark_start = NULL;
     arena_base->num_early_PMCs_seen = 0;
     arena_base->num_extended_PMCs = 0;
-#if ARENA_DOD_FLAGS
-    clear_live_counter(interpreter, arena_base->pmc_pool);
-    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-        struct Small_Object_Pool * const header_pool =
-            arena_base->sized_header_pools[j];
-        if (header_pool)
-            clear_live_counter(interpreter, header_pool);
-    }
-#endif
 }
 
 static int

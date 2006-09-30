@@ -242,18 +242,10 @@ new_pmc_header(Interp *interpreter, UINTVAL flags)
     pool = flags & PObj_constant_FLAG ?
         interpreter->arena_base->constant_pmc_pool :
         interpreter->arena_base->pmc_pool;
-#if ARENA_DOD_FLAGS
-    assert(sizeof(Dead_PObj) <= sizeof(PMC));
-#endif
     pmc = pool->get_free_object(interpreter, pool);
     /* clear flags, set is_PMC_FLAG */
     if (flags & PObj_is_PMC_EXT_FLAG) {
-#if ARENA_DOD_FLAGS
-        *((Dead_PObj*)pmc)->arena_dod_flag_ptr |=
-            (PObj_is_special_PMC_FLAG << ((Dead_PObj*)pmc)->flag_shift);
-#else
         flags |= PObj_is_special_PMC_FLAG;
-#endif
         pmc->pmc_ext = new_pmc_ext(interpreter);
         if (flags & PObj_is_PMC_shared_FLAG) {
             add_pmc_sync(interpreter, pmc);
@@ -695,13 +687,8 @@ free_pool(Interp *interpreter, struct Small_Object_Pool *pool)
     struct Small_Object_Arena *cur_arena, *next;
     for (cur_arena = pool->last_Arena; cur_arena;) {
         next = cur_arena->prev;
-#if ARENA_DOD_FLAGS
-        mem_internal_free(cur_arena->dod_flags);
-        Parrot_free_memalign(cur_arena);
-#else
         mem_internal_free(cur_arena->start_objects);
         mem_internal_free(cur_arena);
-#endif
         cur_arena = next;
     }
     mem_internal_free(pool);
@@ -785,33 +772,10 @@ static void fix_pmc_syncs(Interp *dest_interp,
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         Buffer *b = cur_arena->start_objects;
 
-#if ARENA_DOD_FLAGS
-        UINTVAL * dod_flags = cur_arena->dod_flags - 1;
-#endif
         for (i = nm = 0; i < cur_arena->used; i++) {
-#if ARENA_DOD_FLAGS
-            if (! (i & ARENA_FLAG_MASK)) {
-                ++dod_flags;
-                /* if all are on free list, skip one bunch */
-                if (*dod_flags == ALL_FREE_MASK) {  /* all on free list */
-                    i += ARENA_FLAG_MASK;       /* + 1 in loop */
-                    b = (Buffer *)((char *)b + object_size*(ARENA_FLAG_MASK+1));
-                    continue;
-                }
-                nm = 0;
-            }
-            else
-                nm += 4;
-
-            if ((*dod_flags & (PObj_on_free_list_FLAG << nm)))
-                ; /* if its on free list, do nothing */
-            else
-#else
             if (PObj_on_free_list_TEST(b))
                 ; /* if its on free list, do nothing */
-            else
-#endif
-            {
+            else {
                 if (PObj_is_PMC_TEST(b)) {
                     PMC *p = (PMC *)b;
                     if (PObj_is_PMC_shared_TEST(p)) {

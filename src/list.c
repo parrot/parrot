@@ -1404,129 +1404,6 @@ Mark the list and its contents as live.
 
 */
 
-#if ARENA_DOD_FLAGS
-/*
- * when a big array is filled one by one
- * *and* when these are plain scalars or strings
- * we can use the arena->dod_flags to mark
- * the whole chunk faster
- */
-static void
-mark_chunk(Interp *interpreter, List_chunk *chunk, int obj_size)
-{
-    UINTVAL i;
-    PObj **pp = ((PObj **) PObj_bufstart(&chunk->data));
-    PObj *p = *pp;
-    PObj *next = pp[1];
-    int dist;
-    i = 0;
-    if (p && next && (( dist = (char*)next - (char*)p ) == obj_size ||
-                -dist == obj_size)) {
-        /* we have a first object and a next one - calculate its
-         * arena values see also src/dod.c
-         */
-        struct Small_Object_Arena *arena = GET_ARENA(p);
-        size_t n = GET_OBJ_N(arena, p);
-        size_t ns = n >> ARENA_FLAG_SHIFT;
-        UINTVAL nm = (n & ARENA_FLAG_MASK) << 2;
-        UINTVAL *dod_flags = arena->dod_flags + ns;
-        int up = dist > 0;
-        for (; i < chunk->items; ++i) {
-            if (*dod_flags &
-                    ((PObj_on_free_list_FLAG | PObj_live_FLAG) << nm)) {
-                /* its live or free - do nothing */
-            }
-            else if (*dod_flags & (PObj_is_special_PMC_FLAG << nm)) {
-                /* mark it normal */
-                pobject_lives(interpreter, p);
-            }
-            else {
-                /* set live bit */
-                *dod_flags |= PObj_live_FLAG << nm;
-                ++arena->live_objects;
-            }
-            /* now as long as the next if adjacent in the objects
-             * arena, we increment or decrement the dod flags and
-             * continue marking here directly
-             */
-            p = next;
-            ++pp;
-            next = pp[1];
-            if (up) {
-                if ((char*)next - (char*)p != obj_size) {
-                    ++i;
-                    goto slow;
-                }
-                nm += 4;
-                ++n;
-                if (! (n & ARENA_FLAG_MASK)) {
-                    ++dod_flags;
-                    if ((*dod_flags & ALL_SPECIAL_MASK) ==
-                            ALL_SPECIAL_MASK) {
-                        /* found a bunch of special_PMCs */
-                        ++i;
-                        goto slow;
-                    }
-                    nm = 0;
-                }
-            }
-            else {
-                if ((char*)p - (char*)next != obj_size) {
-                    ++i;
-                    goto slow;
-                }
-                if (! (n & ARENA_FLAG_MASK)) {
-                    --dod_flags;
-                    if ((*dod_flags & ALL_SPECIAL_MASK) ==
-                            ALL_SPECIAL_MASK) {
-                        ++i;
-                        goto slow;
-                    }
-                    nm = ((n-1) & ARENA_FLAG_MASK) << 2;
-                }
-                else {
-                    nm -= 4;
-                    assert((int)nm >= 0);
-                }
-                --n;
-            }
-        }
-    }
-    else {
-slow:
-        /* do it the plain way */
-        for ( ; i < chunk->items; ++i, ++pp) {
-            if (*pp)
-                pobject_lives(interpreter, *pp);
-        }
-    }
-}
-
-void
-list_mark(Interp *interpreter, List *list)
-{
-    List_chunk *chunk;
-    UINTVAL i;
-    int obj_size;
-    if (list->item_type == enum_type_PMC)
-        obj_size = sizeof(PMC);
-    else
-        obj_size = sizeof(STRING);
-
-    for (chunk = list->first; chunk; chunk = chunk->next) {
-        pobject_lives(interpreter, (PObj *)chunk);
-        if (list->item_type == enum_type_PMC ||
-                list->item_type == enum_type_STRING) {
-            if (!(chunk->flags & sparse)) {
-                mark_chunk(interpreter, chunk, obj_size);
-            }
-        }
-    }
-    pobject_lives(interpreter, (PObj *)list);
-    if (list->user_data)
-        pobject_lives(interpreter, (PObj *) list->user_data);
-}
-#else
 void
 list_mark(Interp *interpreter, List *list)
 {
@@ -1552,7 +1429,7 @@ list_mark(Interp *interpreter, List *list)
     if (list->user_data)
         pobject_lives(interpreter, (PObj *) list->user_data);
 }
-#endif
+
 /*
 
 =item C<void
