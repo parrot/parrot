@@ -125,6 +125,11 @@ foreach my $policy (@policies) {
 }
 
 foreach my $file ( sort @files ) {
+    if (! -r $file) {
+        diag "skipping invalid file: $file\n";
+        next;
+    }
+
     my @violations = $critic->critique($file);
     my $output     = join( "\n", @violations );
 
