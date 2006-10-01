@@ -5,7 +5,7 @@ use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 18;
 use Test::More;
 
-language_output_is("tcl",<<'TCL',<<OUT,"return value");
+language_output_is( "tcl", <<'TCL', <<OUT, "return value" );
  set a [proc me {} {
   puts 2
  }]
@@ -16,7 +16,7 @@ TCL
 
 OUT
 
-language_output_is("tcl",<<'TCL',<<'OUT',"return value from user-defined command");
+language_output_is( "tcl", <<'TCL', <<'OUT', "return value from user-defined command" );
  proc foo {} {
    append x {foo bar}
  }
@@ -25,7 +25,7 @@ TCL
 foo bar
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"noarg");
+language_output_is( "tcl", <<'TCL', <<OUT, "noarg" );
  proc me {} {
   puts 2
  }
@@ -34,7 +34,7 @@ TCL
 2
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"onearg");
+language_output_is( "tcl", <<'TCL', <<OUT, "onearg" );
  proc me {a} {
   puts $a
  }
@@ -43,7 +43,7 @@ TCL
 2
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"twoarg");
+language_output_is( "tcl", <<'TCL', <<OUT, "twoarg" );
  proc me {a b} {
   puts $a
   puts $b
@@ -54,7 +54,7 @@ TCL
 3
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"too many args");
+language_output_is( "tcl", <<'TCL', <<OUT, "too many args" );
  proc me {a b} {
   puts $a
   puts $b
@@ -64,7 +64,7 @@ TCL
 wrong # args: should be "me a b"
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"too few args");
+language_output_is( "tcl", <<'TCL', <<OUT, "too few args" );
  proc me {a b} {
   puts $a
   puts $b
@@ -74,14 +74,14 @@ TCL
 wrong # args: should be "me a b"
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'bad args - expected none');
+language_output_is( 'tcl', <<'TCL', <<'OUT', 'bad args - expected none' );
   proc test {} {}
   test foo bar
 TCL
 wrong # args: should be "test"
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad varargs");
+language_output_is( "tcl", <<'TCL', <<OUT, "bad varargs" );
  proc me {a b args} {
   puts $a
   puts $b
@@ -91,7 +91,7 @@ TCL
 wrong # args: should be "me a b ..."
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"vararg");
+language_output_is( "tcl", <<'TCL', <<OUT, "vararg" );
  proc me {a args} {
   puts $a
   puts $args
@@ -102,7 +102,7 @@ TCL
 3 4 5 6
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"vararg empty");
+language_output_is( "tcl", <<'TCL', <<OUT, "vararg empty" );
  proc me {a args} {
   puts $a
   puts $args
@@ -113,7 +113,7 @@ TCL
 
 OUT
 
-language_output_is("tcl", <<'TCL', <<'OUT', "redefined inlinable builtin");
+language_output_is( "tcl", <<'TCL', <<'OUT', "redefined inlinable builtin" );
   proc incr {varName} {puts $varName}
   proc test {} { incr a }
   test
@@ -121,14 +121,14 @@ TCL
 a
 OUT
 
-language_output_is("tcl", <<'TCL', <<'OUT', "unknown namespace");
+language_output_is( "tcl", <<'TCL', <<'OUT', "unknown namespace" );
   proc a::b {} {puts a::b}
   a::b
 TCL
 can't create procedure "a::b": unknown namespace
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"default args");
+language_output_is( "tcl", <<'TCL', <<OUT, "default args" );
  proc me {{a 2}} {
   puts $a
  }
@@ -139,7 +139,7 @@ TCL
 7
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"bad default args");
+language_output_is( "tcl", <<'TCL', <<OUT, "bad default args" );
  proc me {{a 2 3}} {
   puts $a
  }
@@ -147,21 +147,21 @@ TCL
 too many fields in argument specifier "a 2 3"
 OUT
 
-language_output_is("tcl", <<'TCL', <<'OUT', "proc test {{a 2} b}");
+language_output_is( "tcl", <<'TCL', <<'OUT', "proc test {{a 2} b}" );
   proc test {{a 2} b} {puts $a; puts $b}
   test 3
 TCL
 wrong # args: should be "test ?a? b"
 OUT
 
-language_output_is("tcl", <<'TCL', <<'OUT', "proc default - too many args");
+language_output_is( "tcl", <<'TCL', <<'OUT', "proc default - too many args" );
   proc test {{a 2}} {puts $a}
   test 3 4
 TCL
 wrong # args: should be "test ?a?"
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'proc - reset call_level on bad args');
+language_output_is( 'tcl', <<'TCL', <<'OUT', 'proc - reset call_level on bad args' );
   proc test {} {}
   set a 4
   catch {test foo}

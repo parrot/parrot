@@ -7,31 +7,31 @@ use Test::More;
 
 # XXX:  Missing channelId tests.
 
-language_output_is("tcl",<<'TCL',<<OUT,"no args");
+language_output_is( "tcl", <<'TCL', <<OUT, "no args" );
  puts
 TCL
 wrong # args: should be "puts ?-nonewline? ?channelId? string"
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"too many args");
+language_output_is( "tcl", <<'TCL', <<OUT, "too many args" );
  puts a b c d
 TCL
 wrong # args: should be "puts ?-nonewline? ?channelId? string"
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"-nonewline");
+language_output_is( "tcl", <<'TCL', <<OUT, "-nonewline" );
   puts -nonewline whee\n
 TCL
 whee
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"normal");
+language_output_is( "tcl", <<'TCL', <<OUT, "normal" );
  puts whee
 TCL
 whee
 OUT
 
-language_output_is("tcl", <<'TCL', <<'OUT', "puts stdout ok");
+language_output_is( "tcl", <<'TCL', <<'OUT', "puts stdout ok" );
   puts stdout ok
 TCL
 ok

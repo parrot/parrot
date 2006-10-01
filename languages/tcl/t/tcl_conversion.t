@@ -5,7 +5,7 @@ use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 10;
 use Test::More;
 
-language_output_is("tcl",<<'TCL',<<OUT,"{} conversion to list");
+language_output_is( "tcl", <<'TCL', <<OUT, "{} conversion to list" );
   puts [llength {a 
   "a b"   
   		b {b c}		  c {c d}
@@ -14,7 +14,7 @@ TCL
 6
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"\"\" conversion to list");
+language_output_is( "tcl", <<'TCL', <<OUT, "\"\" conversion to list" );
   puts [llength "a 
   \"a b\"   
   		b {b c}		  c {c d}
@@ -23,7 +23,7 @@ TCL
 6
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"\"\" conversion to list");
+language_output_is( "tcl", <<'TCL', <<OUT, "\"\" conversion to list" );
   set a "a {b c}  d"
   puts [llength $a]
   puts [lindex $a 1]
@@ -34,43 +34,43 @@ b c
 d
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '\S after }');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '\S after }' );
 lindex {{a b}3 4} 1
 TCL
 list element in braces followed by "3" instead of space
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '\S after }');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '\S after }' );
 lindex {{a b}3} 1
 TCL
 list element in braces followed by "3" instead of space
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '\S after "');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '\S after "' );
 lindex {"a b"3 4} 1
 TCL
 list element in quotes followed by "3" instead of space
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '\S after "');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '\S after "' );
 lindex {"a b"3} 1
 TCL
 list element in quotes followed by "3" instead of space
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '[ in list');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '[ in list' );
   puts [list \{\[]
 TCL
 \{\[
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '\" in "" in list');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '\" in "" in list' );
   puts [lindex {"a \" b"} 0]
 TCL
 a " b
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '\" in {} in list');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '\" in {} in list' );
   puts [lindex {{a \" b}} 0]
 TCL
 a \" b

@@ -5,7 +5,7 @@ use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 use Test::More;
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple return with value");
+language_output_is( "tcl", <<'TCL', <<OUT, "simple return with value" );
  proc joe {} {
    set a 10
    return $a
@@ -16,7 +16,7 @@ TCL
 10
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"simple return with no value");
+language_output_is( "tcl", <<'TCL', <<OUT, "simple return with no value" );
  proc joe {} {
    return
  }

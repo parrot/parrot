@@ -6,7 +6,7 @@ use Parrot::Test tests => 7;
 use Test::More;
 use vars qw($TODO);
 
-language_output_is("tcl",<<'TCL',<<OUT,"missing unreferenced global");
+language_output_is( "tcl", <<'TCL', <<OUT, "missing unreferenced global" );
   proc a {} {
     global q
     puts "ok"
@@ -16,7 +16,7 @@ TCL
 ok
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"missing global");
+language_output_is( "tcl", <<'TCL', <<OUT, "missing global" );
   proc a {} {
     global q
     puts $q
@@ -26,7 +26,7 @@ TCL
 can't read "q": no such variable
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"one global");
+language_output_is( "tcl", <<'TCL', <<OUT, "one global" );
   proc a {} {
     global q
     puts $q
@@ -37,7 +37,7 @@ TCL
 2
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"few globals");
+language_output_is( "tcl", <<'TCL', <<OUT, "few globals" );
   proc a {} {
     global q r s
     puts "$q $r $s"
@@ -50,7 +50,7 @@ TCL
 1 2 3
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"vivify global");
+language_output_is( "tcl", <<'TCL', <<OUT, "vivify global" );
 proc j {} {
   global a
   set a 1
@@ -61,7 +61,7 @@ TCL
 1
 OUT
 
-language_output_is("tcl",<<'TCL',<<'OUT',"changing value");
+language_output_is( "tcl", <<'TCL', <<'OUT', "changing value" );
  set a 4
  proc inca2 {} {
   global a
@@ -75,7 +75,7 @@ TCL
 6
 OUT
 
-language_output_is("tcl",<<'TCL',<<OUT,"nonvivifying global");
+language_output_is( "tcl", <<'TCL', <<OUT, "nonvivifying global" );
 proc j {} {
   global a
 }

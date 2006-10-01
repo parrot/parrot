@@ -5,7 +5,7 @@ use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 7;
 use Test::More;
 
-language_output_is("tcl",<<TCL,<<'OUT',"regexp no args");
+language_output_is( "tcl", <<TCL, <<'OUT', "regexp no args" );
 regexp
 TCL
 wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"
@@ -13,228 +13,226 @@ OUT
 
 # http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm
 
-regexp_is  ("asdf","asdf","literal, t");
-regexp_isnt("asdf","fdsa","literal, f");
+regexp_is( "asdf", "asdf", "literal, t" );
+regexp_isnt( "asdf", "fdsa", "literal, f" );
 
-regexp_is  ("a*","bbb",   "*, true");
-regexp_is  ("a*","bab",   "*, true");
-regexp_is  ("a*","baab",  "*, true");
-regexp_is  ("a*","baaab", "*, true");
+regexp_is( "a*", "bbb",   "*, true" );
+regexp_is( "a*", "bab",   "*, true" );
+regexp_is( "a*", "baab",  "*, true" );
+regexp_is( "a*", "baaab", "*, true" );
 
-  # +
-  
-  # ?
+# +
 
-  # {m}
+# ?
 
-  # {m,}
+# {m}
 
-  # {m,n}
+# {m,}
 
-  # *?
+# {m,n}
 
-  # +?
+# *?
 
-  # {m}?
+# +?
 
-  # {m,}?
+# {m}?
 
-  # {m,n}?
+# {m,}?
 
-  # m,n - restricted to 0, 255
+# {m,n}?
 
-  #(re)
+# m,n - restricted to 0, 255
 
-  #(?:re) 
+#(re)
 
-  #()
+#(?:re)
 
-  #(?:)
+#()
 
-  #[]
+#(?:)
 
-  #[^]
+#[]
 
-  #[a-z]
+#[^]
 
-  #[a-c-e] (boom)
+#[a-z]
 
-  #[:joe:]
+#[a-c-e] (boom)
 
-  #[[:<:]]
+#[:joe:]
 
-  #[[:>:]]
+#[[:<:]]
 
-  #.
+#[[:>:]]
 
-  #\k
+#.
 
-  #\c
+#\k
 
-  #{
+#\c
 
-  #x
+#{
 
-  #^
+#x
 
-  #$
+#^
 
-  #(?=re)
+#$
 
-  #(?!re)
+#(?=re)
 
-  # Re may NOT end with \
+#(?!re)
 
-  # \a
+# Re may NOT end with \
 
-  # \b
+# \a
 
-  # \B
+# \b
 
-  # \cX
+# \B
 
-  # \e
+# \cX
 
-  # \f
+# \e
 
-  # \n
+# \f
 
-  # \r
+# \n
 
-  # \t
+# \r
 
-  # \uwxyz
+# \t
 
-  # \Ustuvwxyz
+# \uwxyz
 
-  # \v
+# \Ustuvwxyz
 
-  # \xhhh 
+# \v
 
-  # \0
+# \xhhh
 
-  # \xy
-  
-  # \xyz
+# \0
 
-  # \d
-  
-  # \s
+# \xy
 
-  # \w
+# \xyz
 
-  # \D
+# \d
 
-  # \S
+# \s
 
-  # \W
+# \w
 
-  # Interaction of [] and \d: e.g. [a-c\d] vs. [a-c\D]
+# \D
 
-  # \A
+# \S
 
-  # \m
+# \W
 
-  # \M
+# Interaction of [] and \d: e.g. [a-c\d] vs. [a-c\D]
 
-  # \y
+# \A
 
-  # \Y
+# \m
 
-  # \Z
+# \M
 
-  # \m
+# \y
 
-  # \mnn
+# \Y
 
-  # ***  (ARE)
+# \Z
 
-  # ***= (literal)
+# \m
 
-  # (?b)
+# \mnn
 
-  # (?c)
+# ***  (ARE)
 
-  # (?e)
+# ***= (literal)
 
-  # (?i)
+# (?b)
 
-  # (?m)
+# (?c)
 
-  # (?n)
+# (?e)
 
-  # (?p)
+# (?i)
 
-  # (?q)
+# (?m)
 
-  # (?s)
+# (?n)
 
-  # (?t)
+# (?p)
 
-  # (?w)
+# (?q)
 
-  # (?x)
+# (?s)
 
-  # Match earliest.
+# (?t)
 
-  # Match longest
+# (?w)
 
-  # BRE: |
+# (?x)
 
-  # BRE: +
+# Match earliest.
 
-  # BRE: ?
+# Match longest
 
-  # BRE: \{
+# BRE: |
 
-  # BRE: \}
+# BRE: +
 
-  # BRE: \(
+# BRE: ?
 
-  # BRE: \)
+# BRE: \{
 
-  # BRE: ^
+# BRE: \}
 
-  # BRE: $
+# BRE: \(
 
-  # BRE: *
+# BRE: \)
 
-  # BRE: \<
+# BRE: ^
 
-  # BRE: \>
+# BRE: $
 
-  # -expanded
+# BRE: *
 
-  # -indices
+# BRE: \<
 
-  # -line
+# BRE: \>
 
-  # -linestop
+# -expanded
 
-  # -lineanchor
+# -indices
 
-  # -nocase
+# -line
 
-  # -all
+# -linestop
 
-  # -inline
+# -lineanchor
 
-  # -start
+# -nocase
 
-  # --
+# -all
 
+# -inline
 
+# -start
 
-# Helper 
+# --
 
-sub regexp_is   { regexp_check(@_,1) }
-sub regexp_isnt { regexp_check(@_,0) }
+# Helper
+
+sub regexp_is   { regexp_check( @_, 1 ) }
+sub regexp_isnt { regexp_check( @_, 0 ) }
 
 sub regexp_check {
 
-  my ($pattern,$string,$reason,$flag) = @_;
+    my ( $pattern, $string, $reason, $flag ) = @_;
 
-  language_output_is("tcl",<<"TCL",<<"OUT", $reason);
+    language_output_is( "tcl", <<"TCL", <<"OUT", $reason );
   
 puts [regexp {$pattern} {$string}]
 
