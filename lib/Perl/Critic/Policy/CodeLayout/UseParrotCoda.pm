@@ -63,7 +63,6 @@ sub violates {
         if ( $last_coda_line ne $last_actual_line ) {
             my $sev = $self->get_severity();
 
-            #return Perl::Critic::Violation->new( $desc, $expl, $doc, $sev );
             return Perl::Critic::Violation->new( $desc, $expl, $last_node, $sev );
         }
     }
