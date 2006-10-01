@@ -125,7 +125,7 @@ foreach my $policy (@policies) {
 }
 
 foreach my $file ( sort @files ) {
-    if (! -r $file) {
+    if ( !-r $file ) {
         diag "skipping invalid file: $file\n";
         next;
     }
