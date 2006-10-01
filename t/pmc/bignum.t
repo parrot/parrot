@@ -1,3 +1,4 @@
+#!perl
 # $Id$
 
 =head1 NAME
