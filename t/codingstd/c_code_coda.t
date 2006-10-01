@@ -95,10 +95,6 @@ sub source_files {
     );
 }
 
-sub perl_files {
-    return ( map( $_->files_of_type('Perl code'), $DIST->perl_file_directories ), );
-}
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
