@@ -32,3 +32,9 @@ TCL
 couldn't read file "hopefullynonexistantfile.tcl": no such file or directory
 OUT
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -508,3 +508,10 @@ language_output_is( "tcl", <<'TCL', <<'OUT', 'complicated expression required fo
 TCL
 1
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

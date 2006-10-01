@@ -36,3 +36,10 @@ language_output_is( "tcl", <<'TCL', <<'OUT', "puts stdout ok" );
 TCL
 ok
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

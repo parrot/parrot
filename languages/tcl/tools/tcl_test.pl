@@ -14,9 +14,9 @@ use File::Spec;
 use Getopt::Std;
 use Test::Harness;
 
-$|=1;
+$| = 1;
 
-our ($opt_u, $opt_h, $opt_c);
+our ( $opt_u, $opt_h, $opt_c );
 getopts('uhc');
 
 =head1 NAME
@@ -49,11 +49,11 @@ main();
 ## main()
 ##
 sub main {
-    usage() and exit if $opt_h;
+    usage()          and exit            if $opt_h;
     checkout_tests() and convert_tests() if not -d $DIR;
     update_tests()   and convert_tests() if $opt_u;
     convert_tests() if $opt_c;
-    return run_tests(grep {-f $_} @ARGV); 
+    return run_tests( grep { -f $_ } @ARGV );
 }
 
 ##
@@ -66,12 +66,15 @@ sub convert_tests {
     my @files = glob( File::Spec->catfile( $DIR, '*.test' ) );
     for my $file (@files) {
         my $test = substr $file, 0, -3;
+
         # parrot's getopt dislikes filenames with - in them.
         $test =~ s/-/_/g;
         system("rm $test") if -e $test;
 
         open my $ffh, '<', $file;
-        my $test_src = extract_tests( do{local $/=undef;<$ffh>} );
+        my $test_src = extract_tests(
+            do { local $/ = undef; <$ffh> }
+        );
         close $ffh;
 
         warn "Extracting tests for $file\n";
@@ -89,11 +92,12 @@ sub convert_tests {
 sub checkout_tests {
     print "Checking out tests from CVS\n";
 
-    my $command = "cvs -z3 -d :pserver:anonymous:\@tcl.cvs.sourceforge.net:"
-                . "/cvsroot/tcl co -d $DIR tcl/tests";
+    my $command =
+          "cvs -z3 -d :pserver:anonymous:\@tcl.cvs.sourceforge.net:"
+        . "/cvsroot/tcl co -d $DIR tcl/tests";
     my $rc = system $command;
 
-    return ($rc == 0) ; # just care if it failed, not howm
+    return ( $rc == 0 );    # just care if it failed, not howm
 }
 
 ##
@@ -111,56 +115,57 @@ sub choose {
 ##
 ## %tests = extract_tests($string)
 ##
-## Extract the tests from the .test file. 
+## Extract the tests from the .test file.
 ##    (test_name => [ $expl, $source, $out ])
 ##
 
 sub extract_tests {
-    my ($source) = shift ;
+    my ($source) = shift;
 
     # This is a bit unweildy.
 
-    my @removes = (<<'END_TCL',
+    my @removes = (
+        <<'END_TCL',
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest
     namespace import -force ::tcltest::*
 }
 END_TCL
-    <<'END_TCL',
+        <<'END_TCL',
 package require tcltest 2
 namespace import -force ::tcltest::*
 END_TCL
-    <<'END_TCL',
+        <<'END_TCL',
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest 2
     namespace import -force ::tcltest::*
 }
 END_TCL
-    <<'END_TCL',
+        <<'END_TCL',
 if {[catch {package require tcltest 2.1}]} {
     puts stderr "Skipping tests in [info script]. tcltest 2.1 required."
     return
 }
 END_TCL
-    <<'END_TCL',
+        <<'END_TCL',
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest 2.1
     namespace import -force ::tcltest::*
 }
 END_TCL
-    <<'END_TCL',
+        <<'END_TCL',
 ::tcltest::cleanupTests
 return
 END_TCL
-    <<'END_TCL',
+        <<'END_TCL',
 cleanupTests
 return
 END_TCL
-    <<'END_TCL',
+        <<'END_TCL',
 ::tcltest::cleanupTests
 return 
 END_TCL
-    <<'END_TCL',
+        <<'END_TCL',
 ::tcltest::cleanupTests
 flush stdout
 return
@@ -187,11 +192,12 @@ END_CLEANUP
 ## Run the tests.
 ##
 sub run_tests {
-    my (@files) = @_ ? @_ : glob File::Spec->catfile( $DIR, '*.t' ) ;
+    my (@files) = @_ ? @_ : glob File::Spec->catfile( $DIR, '*.t' );
 
     if (@files) {
         return runtests(@files);
-    } else {  
+    }
+    else {
         return;
     }
 }
@@ -218,7 +224,7 @@ sub unescape {
 sub update_tests {
     print "Updating tests from CVS\n";
     system "(cd $DIR && cvs -Q up *.test)";
-    
+
     return;
 }
 

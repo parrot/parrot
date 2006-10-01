@@ -30,3 +30,10 @@ language_output_is( "tcl", <<'TCL', <<'OUT', "command: global explicit (not enou
 TCL
 invalid command name ":puts"
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -26,3 +26,10 @@ wrong # args: should be "exit ?returnCode?"
 OUT
 
 # TODO: should check return value of exit, also
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
