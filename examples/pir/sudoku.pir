@@ -462,6 +462,18 @@ ok:
     raw_given .= "..581...."
     b["std018"] = raw_given
 
+    # "unsolvable" 3 - Y-Wing
+    raw_given  = "...8....6"
+    raw_given .= "..162.43."
+    raw_given .= "4...71..2"
+    raw_given .= "..72...8."
+    raw_given .= "....1...."
+    raw_given .= ".1...62.."
+    raw_given .= "1..73...4"
+    raw_given .= ".26.481.."
+    raw_given .= "3....5..."
+    b["uns3"] = raw_given
+
     .return (b)
 .end
 
@@ -533,7 +545,9 @@ err:
     die 3, 100
 
 len_err:
-    printerr "length != 81\n"
+    printerr "length != 81 found : "
+    printerr i
+    printerr "\n"
     die 3, 100
 .end
 
@@ -1161,12 +1175,12 @@ err:
 # 0  ... no change
 # 1  ... changes
 .sub adv_scan :method
-    $I0 = self."y-wing"()
+    $I0 = self."y_wing"()
     # TODO try more stuff
     .return ($I0)
 .end
 
-.sub "y-wing" :method
+.sub "y_wing" :method
     # scan for pairs all over
     .local int x, y, bits, el, res
     .local pmc i_rows, i_row
@@ -1180,7 +1194,7 @@ loop_x:
     el = i_row[x]
     bits = bits0(el)
     if bits != 2 goto nxt_x
-    $I0 = self."check_y-wing"(x, y, el)
+    $I0 = self."check_y_wing"(x, y, el)
     res |= $I0
 nxt_x:
     inc x
@@ -1241,7 +1255,7 @@ next:
 
 # look for another pair AC (A,C != B)
 # return C and the position in i_rcs
-.sub "y-wing-pair" :method
+.sub "y_wing-pair" :method
     .param pmc i_rcs
     .param int A
     .param int not_B
@@ -1267,7 +1281,7 @@ next:
 
 # look for another pair BC
 # return 0/1 and the position in i_rcs
-.sub "y-wing-pair_BC" :method
+.sub "y_wing-pair_BC" :method
     .param pmc i_rcs
     .param int B
     .param int C
@@ -1295,7 +1309,7 @@ next:
 
 # invalidate C from the given [start,end] range#
 # return 1 if something changed
-.sub "y-wing_inv" :method
+.sub "y_wing_inv" :method
     .param pmc i_rcs
     .param int C
     .param int start
@@ -1320,7 +1334,7 @@ next:
 
 # find C for A B
 # and invalidate C if found
-.sub "find_C_y-wing_1" :method
+.sub "find_C_y_wing_1" :method
     .param int x
     .param int y
     .param int A
@@ -1333,7 +1347,7 @@ next:
     sq = square_of(x, y)	# TODO reuse this func
     .local int C, c
     i_rcs = i_rcss[sq]
-    (C, c) = self."y-wing-pair"(i_rcs, A, B)
+    (C, c) = self."y_wing-pair"(i_rcs, A, B)
     unless C goto check_row	# TODO row, col
 	# convert the square coordinate to (x, y)
 	.local int cx, cy, bx, by, has_bc
@@ -1342,7 +1356,7 @@ next:
 	# check col and row at AB for a BC pair
 	i_rcss = getattribute self, "i_cols"
 	i_rcs  = i_rcss[x]
-	(has_bc, c) = self."y-wing-pair_BC"(i_rcs, B, C)
+	(has_bc, c) = self."y_wing-pair_BC"(i_rcs, B, C)
 	unless has_bc goto try_row
 	bx = x
 	by = c
@@ -1354,20 +1368,20 @@ next:
 	sq = square_of(x, y)
 	($I0, start) = square_to_xy(sq, 0)
 	end = start + 2
-	changed = self."y-wing_inv"(i_rcs, C, start, end)
+	changed = self."y_wing_inv"(i_rcs, C, start, end)
 	# invalidate col x at BC
 	i_rcs  = i_rcss[cx]
 	sq = square_of(bx, by)
 	($I0, start) = square_to_xy(sq, 0)
 	end = start + 2
-	$I0 = self."y-wing_inv"(i_rcs, C, start, end)
+	$I0 = self."y_wing_inv"(i_rcs, C, start, end)
 	changed |= $I0
 	goto show_debug
     try_row:
 	if y == cy goto nope
 	i_rcss = getattribute self, "i_rows"
 	i_rcs  = i_rcss[y]
-	(has_bc, c) = self."y-wing-pair_BC"(i_rcs, B, C)
+	(has_bc, c) = self."y_wing-pair_BC"(i_rcs, B, C)
 	unless has_bc goto nope
 	bx = c
 	by = y
@@ -1377,7 +1391,7 @@ next:
 	sq = square_of(bx, by)
 	($I0, start) = square_to_xy(sq, 0)
 	end = start + 2
-	changed = self."y-wing_inv"(i_rcs, C, start, end)
+	changed = self."y_wing_inv"(i_rcs, C, start, end)
     show_debug:
 	$I0 = self."debug"()
 	unless $I0 goto ex
@@ -1412,18 +1426,18 @@ check_row:
     i_rcss = getattribute self, "i_rows"
     i_rcs = i_rcss[y]
     # XXX TODO check that A is in a forced pair
-    (C, c) = self."y-wing-pair"(i_rcs, A, B)
+    (C, c) = self."y_wing-pair"(i_rcs, A, B)
     cx = c
     cy = y
     unless C goto check_col
 	i_rcss = getattribute self, "i_cols"
 	i_rcs  = i_rcss[x]
 	# XXX TODO check that B is in a forced pair
-	(has_bc, by) = self."y-wing-pair_BC"(i_rcs, B, C)
+	(has_bc, by) = self."y_wing-pair_BC"(i_rcs, B, C)
 	bx = cx
 	unless has_bc goto check_col
 	i_rcs  = i_rcss[cx]
-	changed = self."y-wing_inv"(i_rcs, C, by, by)
+	changed = self."y_wing_inv"(i_rcs, C, by, by)
 	if changed goto show_debug
 
 check_col:
@@ -1434,22 +1448,22 @@ ex:
 .end
 
 # find C for A, or B
-.sub "find_C_y-wing" :method
+.sub "find_C_y_wing" :method
     .param int x
     .param int y
     .param int A
     .param int B
 
     .local int changed
-    changed = self."find_C_y-wing_1"(x, y, A, B)
+    changed = self."find_C_y_wing_1"(x, y, A, B)
     unless changed goto not_A
     .return (changed)
 not_A:
-    .return self."find_C_y-wing_1"(x, y, B, A)
+    .return self."find_C_y_wing_1"(x, y, B, A)
 .end
 
 # check, if we find another pair with 1 digit in common with el
-.sub "check_y-wing" :method
+.sub "check_y_wing" :method
     .param int x
     .param int y
     .param int el
@@ -1462,7 +1476,7 @@ not_A:
     # now find another pair in
     # - another *this* row, col, or square
     # - AC or BC giving another unique element C
-    .return self."find_C_y-wing"(x, y, A, B)
+    .return self."find_C_y_wing"(x, y, A, B)
 .end
 
 # the quare y has a uniq digit at x - set it
@@ -2383,7 +2397,7 @@ A Sudoku has 2 dimensions and 3 connected views (row, column, and
 square). There are 1-dim tests, which work for all views. 2-dim tests
 are a bit more tricky to generalize and not yet done properly.
 
-Basically: as only 2 dimensions are independant, all these tests can
+Basically: as only 2 views are independant, all these tests can
 work on 2 of 3 views:
 
   square, row
