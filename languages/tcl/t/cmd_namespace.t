@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
+use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+
 use Parrot::Test tests => 36;
 use Test::More;
 use vars qw($TODO);

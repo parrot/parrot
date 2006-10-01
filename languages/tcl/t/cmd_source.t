@@ -1,18 +1,20 @@
 #!/usr/bin/perl
 
 use strict;
+use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+
 use Parrot::Test tests => 2;
 use Test::More;
 
 # prolly not portable, patches welcome.
-my $source_filename = "tmp.tcl";
-open( TMP, ">$source_filename" ) or die $!;
-print TMP <<'EOF';
+my $source_filename = 'tmp.tcl';
+open( my $tmpfile, '>', $source_filename ) or die $!;
+print {$tmpfile} <<'EOF';
  set a 10
  puts $b
 EOF
-close(TMP);
+close $tmpfile;
 
 language_output_is( "tcl", <<TCL, <<OUT, "simple source" );
  set b 20

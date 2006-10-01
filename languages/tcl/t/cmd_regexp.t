@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
+use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+
 use Parrot::Test tests => 7;
 use Test::More;
 
@@ -225,8 +227,15 @@ regexp_is( "a*", "baaab", "*, true" );
 
 # Helper
 
-sub regexp_is   { regexp_check( @_, 1 ) }
-sub regexp_isnt { regexp_check( @_, 0 ) }
+sub regexp_is {
+    regexp_check( @_, 1 );
+    return;
+}
+
+sub regexp_isnt {
+    regexp_check( @_, 0 );
+    return;
+}
 
 sub regexp_check {
 
@@ -239,6 +248,8 @@ puts [regexp {$pattern} {$string}]
 TCL
 $flag
 OUT
+
+    return;
 }
 
 # Local Variables:
