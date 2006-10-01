@@ -1040,11 +1040,12 @@ nxt_x1:
     $I0 = elements empty_2
     unless $I0 goto ret
 done:
-    .local int d1, d2, pos_msk
+    .local int d1, d2, pos_msk, changed
     pos_msk = empty_2[0]   # positions 1 based
     d1 =      empty_2[1]   # 0 based
     d2 =      empty_2[2]   # 0 based
     x = 0
+    changed = 0
 lpx3:
     $I0 = 2 << x
     $I0 &= pos_msk
@@ -1056,7 +1057,12 @@ lpx3:
        if n == d2 goto nxt_n3
        # invalidate all but d1, d2 at the 2 positions
        $I0 = 2 << n
+       $I1 = e1
+       $I1 &= $I0
+       if $I1 goto no_c
        e1 |= $I0
+       changed = 1
+    no_c:
     nxt_n3:
        inc n
        if n < 9 goto lpn3
@@ -1066,6 +1072,7 @@ nxt_x3:
     $I0 = self."debug"()
     unless $I0 goto ret
 
+    unless changed goto ret
     # reuse array for debug reports
     unshift empty_2, y
     unshift empty_2, what
