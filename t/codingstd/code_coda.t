@@ -9,7 +9,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 2;
 use Parrot::Distribution;
 
-
 =head1 NAME
 
 t/codingstd/code_coda.t - checks for editor hint coda in source
@@ -33,7 +32,6 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-
 my $coda = <<'CODA';
 /*
  * Local variables:
@@ -48,7 +46,7 @@ my @files = @ARGV ? @ARGV : source_files();
 my @no_coda;
 my @extra_coda;
 
-foreach my $file ( @files ) {
+foreach my $file (@files) {
     my $buf;
     my $path;
 
@@ -57,13 +55,14 @@ foreach my $file ( @files ) {
     if (@ARGV) {
         $path = $file;
     }
+
     # otherwise, use the relevant Parrot:: path method
     else {
         $path = $file->path;
     }
 
     # slurp in the file
-    open(my $fh, '<', $path)
+    open( my $fh, '<', $path )
         or die "Cannot open '$path' for reading: $!\n";
     {
         local $/;
@@ -75,34 +74,29 @@ foreach my $file ( @files ) {
         unless $buf =~ m{\Q$coda\E\n*\z};
 
     # append to the extra_coda array if coda-like text appears more than once
-    my $vim_many   =()= $buf =~ m{^ \s* \*? \s* vim: \s* $}gmx;
-    my $emacs_many =()= $buf =~ m{^ \s* \*? \s* Local variables: \s* $}gmx;
+    my $vim_many   = () = $buf =~ m{^ \s* \*? \s* vim: \s* $}gmx;
+    my $emacs_many = () = $buf =~ m{^ \s* \*? \s* Local variables: \s* $}gmx;
     push @extra_coda => "$path\n"
         if $vim_many > 1 || $emacs_many > 1;
 }
 
-ok(!scalar(@no_coda), 'C code coda present')
-    or diag("C code coda missing in "
-        . scalar @no_coda . " files:\n@no_coda");
+ok( !scalar(@no_coda), 'C code coda present' )
+    or diag( "C code coda missing in " . scalar @no_coda . " files:\n@no_coda" );
 
-ok(!scalar(@extra_coda), 'C code coda appears only once')
-    or diag("C code coda repeating in "
-        . scalar @extra_coda . " files:\n@extra_coda");
+ok( !scalar(@extra_coda), 'C code coda appears only once' )
+    or diag( "C code coda repeating in " . scalar @extra_coda . " files:\n@extra_coda" );
 
 exit;
 
-
 sub source_files {
     return (
-        map($_->files_of_type('C code'),   $DIST->c_source_file_directories),
-        map($_->files_of_type('C header'), $DIST->c_header_file_directories),
+        map( $_->files_of_type('C code'),   $DIST->c_source_file_directories ),
+        map( $_->files_of_type('C header'), $DIST->c_header_file_directories ),
     );
 }
 
 sub perl_files {
-    return (
-        map($_->files_of_type('Perl code'), $DIST->perl_file_directories),
-    );
+    return ( map( $_->files_of_type('Perl code'), $DIST->perl_file_directories ), );
 }
 
 # Local Variables:

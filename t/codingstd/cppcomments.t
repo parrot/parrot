@@ -9,7 +9,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 1;
 use Parrot::Distribution;
 
-
 =head1 NAME
 
 t/codingstd/cppcomments.t - checks for C++ style comments
@@ -32,7 +31,6 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : source_files();
 my @comments;
@@ -54,23 +52,20 @@ foreach my $file (@files) {
             }{}gsx;
 
     if ( $buf =~ m{ ( .*? // .* ) }x ) {
-            push( @comments, "$path: $1\n" );
+        push( @comments, "$path: $1\n" );
     }
 }
 
-ok(!scalar(@comments), 'C++ style comments')
-  or diag("C++ comments found in ".scalar @comments." files:\n@comments");
-
+ok( !scalar(@comments), 'C++ style comments' )
+    or diag( "C++ comments found in " . scalar @comments . " files:\n@comments" );
 
 exit;
 
-
 sub source_files {
     return (
-        map($_->files_of_type('C code'),   $DIST->c_source_file_directories),
-        map($_->files_of_type('C header'), $DIST->c_header_file_directories),
+        map( $_->files_of_type('C code'),   $DIST->c_source_file_directories ),
+        map( $_->files_of_type('C header'), $DIST->c_header_file_directories ),
     );
 }
-
 
 ## vim: expandtab sw=4
