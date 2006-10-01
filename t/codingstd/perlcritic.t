@@ -178,6 +178,13 @@ sub is_perl {
     return 0;
 }
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
+
 __END__
 
 =head1 NAME
