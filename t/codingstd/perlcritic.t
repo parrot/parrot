@@ -108,16 +108,23 @@ if ( !@policies ) {
     my $tidy_conf = 'tools/util/perltidy.conf';
     eval "require Perl::Tidy";
     if ($@) {
-        diag "Perl::Tidy not installed, silently ignoring tidy failures.";
+        diag "Perl::Tidy not installed, skipping tidy checks.";
     }
     else {
         diag "Using $tidy_conf for Perl::Tidy settings";
-    }
 
-    $critic->add_policy(
-        -policy => 'CodeLayout::RequireTidyCode',
-        -config => { perltidyrc => $tidy_conf },
-    );
+        eval "use Perl::Critic::Policy::CodeLayout::RequireTidyCode 0.2";
+        if ($@) {
+            diag
+                "need Perl::Critic::Policy::CodeLayout::RequireTidyCode 0.2, skipping tidy checks.";
+        }
+        else {
+            $critic->add_policy(
+                -policy => 'CodeLayout::RequireTidyCode',
+                -config => { perltidyrc => $tidy_conf },
+            );
+        }
+    }
 }
 
 foreach my $policy (@policies) {
