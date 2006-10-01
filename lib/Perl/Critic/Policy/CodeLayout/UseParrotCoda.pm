@@ -11,8 +11,7 @@ our $VERSION = '0.1';
 $VERSION = eval $VERSION;    ## no critic
 
 my $desc = q{Missing properly located perl coda for parrot source};
-my $expl =
-    q{According to PDD07, all perl source in parrot must contain a comment coda};
+my $expl = q{According to PDD07, all perl source in parrot must contain a comment coda};
 
 #----------------------------------------------------------------------------
 
@@ -41,8 +40,8 @@ sub violates {
 
     my $last_node = pop @elements;
 
-    # Skip (optional) __END__ block...
-    if ( ref $last_node eq "PPI::Statement::End" ) {
+    # Skip (optional) __END__ || __DATA blocks...
+    while ( ref $last_node eq 'PPI::Statement::End' || ref $last_node eq 'PPI::Statement::Data' ) {
         $last_node = pop @elements;
     }
 
@@ -63,6 +62,7 @@ sub violates {
         chomp $last_actual_line;
         if ( $last_coda_line ne $last_actual_line ) {
             my $sev = $self->get_severity();
+
             #return Perl::Critic::Violation->new( $desc, $expl, $doc, $sev );
             return Perl::Critic::Violation->new( $desc, $expl, $last_node, $sev );
         }
@@ -94,10 +94,6 @@ Perl::Critic::Policy::CodeLayout::UseParrotCoda
 
 The pumpking has declared that all parrot source code must include a series of
 comments at the end of the source. These comments may be followed by optional
-whitespace and an C<__END__> block.
-
-=head1 BUGS AND LIMITATIONS
-
-Doesn't respect C<__DATA__> blocks at the moment.
+whitespace and a C<__END__> or C<__DATA__> blocks.
 
 =cut
