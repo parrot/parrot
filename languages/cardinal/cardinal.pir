@@ -16,6 +16,7 @@ bytecode (actually to PIR, at first). For more on the ideas behind the
 compiler, see:
 
 =cut
+#.HLL 'Ruby', ''
 .HLL 'Ruby', 'ruby_group'
 .include 'errors.pasm'
 .include 'library/dumper.pir'
@@ -38,7 +39,10 @@ compiler, see:
     load_bytecode 'languages/cardinal/src/PGE2AST.pir'
     load_bytecode 'languages/cardinal/src/AST2OST.pir'
     load_bytecode 'languages/cardinal/src/OST2PIR.pir'
+
+    #needed to run compiled tests
     load_bytecode 'languages/cardinal/src/builtins_gen.pir'
+    load_bytecode 'languages/cardinal/runtime/cardinallib.pbc'
 
     .local pmc _dumper
     .local pmc getopts
@@ -279,11 +283,7 @@ compiler, see:
     unless execute_debug goto execute_only
     print "\n\nExecution Result:\n"
   execute_only:
-    .local pmc pir_compiler
-    .local pmc pir_compiled
-    pir_compiler = compreg "PIR"
-    pir_compiled = pir_compiler(pir)
-    pir_compiled()
+    cardinal_exec(pir)
     end
 
   err_match_fail:
@@ -307,6 +307,17 @@ compiler, see:
   end:
     exit 0
 .end
+
+#.HLL 'Ruby', 'ruby_group'
+.sub cardinal_exec
+    .param pmc code
+    .local pmc pir_compiler
+    .local pmc pir_compiled
+    pir_compiler = compreg "PIR"
+    pir_compiled = pir_compiler(code)
+    pir_compiled()
+.end
+#.HLL 'Ruby', ''
 
 # Read in the source from a file
 .sub _get_source

@@ -41,9 +41,11 @@ transform root (ROOT) :language('PIR') {
     self.'past_scope_stack'($P0)
 
 #hll statement
+    .local pmc dumper
+    dumper = new 'Cardinal::POST::Raw'
+    dumper.'init'('node'=>node, 'raw'=>".include 'library/dumper.pir'")
     .local pmc hll
     hll = new 'Cardinal::POST::Raw'
-    #hll.'init'('node'=>node, 'raw'=>".HLL 'Ruby', ''")
     hll.'init'('node'=>node, 'raw'=>".HLL 'Ruby', 'ruby_group'")
 
 #__onload
@@ -94,11 +96,14 @@ transform root (ROOT) :language('PIR') {
     call_op = new 'Cardinal::POST::Call'
     call_op.'init'('node'=>node, 'name'=>$S0)
 
-    .local pmc builtins
-    builtins = new 'Cardinal::POST::Op'
-    builtins.'init'("'languages/cardinal/src/builtins_gen.pir'", 'node'=>node, 'name'=>'load_bytecode')
     main.'add_child'(BEGIN_blocks)
-    main.'add_child'(builtins)
+    .local pmc includes
+    includes = new 'Cardinal::POST::Op'
+    includes.'init'("'languages/cardinal/src/builtins_gen.pir'", 'node'=>node, 'name'=>'load_bytecode')
+    main.'add_child'(includes)
+    includes = new 'Cardinal::POST::Op'
+    includes.'init'("'languages/cardinal/runtime/cardinallib.pbc'", 'node'=>node, 'name'=>'load_bytecode')
+    main.'add_child'(includes)
     main.'add_child'(call_op)
     main.'add_child'(END_blocks)
 
@@ -111,6 +116,7 @@ transform root (ROOT) :language('PIR') {
     namespaces = self.'push_namespace'()
    
 #build up top level ops 
+    #ops.'add_child'(dumper)
     ops.'add_child'(hll)
     ops.'add_child'(main)
     ops.'add_child'(load)
@@ -260,18 +266,22 @@ transform post (Cardinal::PAST::Class) :language('PIR') {
     self.'post_scope_stack'(post)
     self.'past_scope_stack'(node)
 
-    .local pmc op
-    .local pmc op1
-    .local pmc op1_value
-    op1 = new 'Cardinal::POST::Op'
-    op1_value = op1.'value'()
-    op1.'init'(op1_value, "'RubyClass'", 'node'=>node, 'name'=>'getclass')
-    post.'add_child'(op1)
-    op = new 'Cardinal::POST::Op'
+    #register new class in parent namespace
+    .local pmc getclass_op
+    .local pmc subclass_op
+    .local pmc set_hll_global_op
+    getclass_op = new 'Cardinal::POST::Op'
+    getclass_op.'init'(getclass_op, "'RubyClass'", 'node'=>node, 'name'=>'getclass')
+    post.'add_child'(getclass_op)
     $S0 = concat "'", class_name
     $S0 .= "'"
-    op.'init'(op1, $S0, 'node'=>node, 'name'=>'subclass')
-    post.'add_child'(op)
+    subclass_op = new 'Cardinal::POST::Op'
+    subclass_op.'init'(subclass_op, getclass_op, $S0, 'node'=>node, 'name'=>'subclass')
+    post.'add_child'(subclass_op)
+
+    set_hll_global_op = new 'Cardinal::POST::Op'
+    set_hll_global_op.'init'($S0, subclass_op, 'node'=>node, 'name'=>'set_hll_global')
+    post.'add_child'(set_hll_global_op)
 
     .local pmc iter
     iter = node.'child_iter'()
@@ -853,6 +863,40 @@ transform post (Cardinal::PAST::FunctionCall) :language('PIR') {
     post = new 'Cardinal::POST::Call'
     post.'init'('node'=>node, 'name'=>name)
     .return (post)
+}
+
+transform post (Cardinal::PAST::MethodCall) :language('PIR') {
+    .local pmc obj
+    .local pmc opost
+    .local pmc ops
+    .local pmc post
+    .local pmc call
+
+
+    ops = new 'Cardinal::POST::Ops'
+    ops.'init'('node'=>node)
+    
+    obj = node[0]
+    opost = tree.'get'('post', obj)
+    ops.'add_child'(opost)
+
+    $P0 = node[1]
+    $S1 = $P0
+
+    $S0 = ops.'value'()
+    $S0 .= ' = '
+    $S2 = opost.'value'()
+    $S0 .= $S2
+    $S0 .= '.'
+    $S0 .= "'"
+    $S0 .= $S1 
+    $S0 .= "'"
+    $S0 .= '()'
+
+    call = new 'Cardinal::POST::Op'
+    call.'init'('node'=>node, 'name'=>$S0)
+    ops.'add_child'(call)
+    .return (ops)
 }
 
 =head1 LICENSE

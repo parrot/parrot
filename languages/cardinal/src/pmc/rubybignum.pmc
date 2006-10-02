@@ -11,7 +11,13 @@
 
 #include "parrot/parrot.h"
 
-pmclass RubyBignum extends BigInt extends RubyObject dynpmc group ruby_group hll Ruby maps BigInt {
+pmclass RubyBignum 
+        extends BigInt 
+        extends RubyObject 
+        dynpmc 
+        group ruby_group 
+        hll Ruby 
+        maps BigInt {
 
     METHOD PMC* interpret() {
         return SELF;

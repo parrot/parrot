@@ -23,15 +23,40 @@ rule body_statement { <compound_statement> <rescue_clause>? <else_clause>? <ensu
 rule compound_statement { <?terminators>? [ <statement> <?terminators> ]* <statement>? <?terminators>? }
 
 rule statement {
-  |$<ALIAS>:=<'alias'> [ <function_item> <function_item>
-                       | <GLOBAL_VARIABLE> [ <GLOBAL_VARIABLE> | <back_reference> ] ]
-  |$<UNDEF>:=<'undef'> <undef_list>
-  |$<BEGIN>:=<'BEGIN'> \{ <compound_statement> \}
-  |$<END>:=<'END'> \{ <compound_statement> \}
-  |<lang_statements>
-  |<expression> [$<MODIFIER>:=[<'if'>|<'unless'>|<'while'>|<'until'>] <expression>
+  | $<ALIAS>:=<'alias'>  [ | <function_item>   <function_item>
+                          | <GLOBAL_VARIABLE> [ <GLOBAL_VARIABLE> | <back_reference> ] ]
+  | $<UNDEF>:=<'undef'> <undef_list>
+  | $<BEGIN>:=<'BEGIN'> \{ <compound_statement> \}
+  | $<END>:=<'END'> \{ <compound_statement> \}
+  | <lang_statements>
+  | <expression> [$<MODIFIER>:=[<'if'>|<'unless'>|<'while'>|<'until'>] <expression>
                 |$<rescue>:=<'rescue'> <statement>]?
 }
+
+rule lang_statements { 
+  | $<return>:=<'return'>
+  | $<break>:=<'break'> 
+  | $<next>:=<'next'>
+  | $<redo>:=<'redo'>
+  | $<retry>:=<'retry'>
+  | $<yield>:=<'yield'> [\( <call_args>? <rparen>]? #\)
+  | $<defined>:=<'defined'> <newline>? \( <expression> <rparen> #\)
+#  |<operation> <brace_block> # put this in method call
+#  |<method_call> <brace_block>?
+  | $<lambda>:=<'->'> <lambda>
+  | $<begin>:=<'begin'> <body_statement> <'end'>
+  | <if_clause>
+  | $<unless>:=<'unless'> <expression> <then_clause> <compound_statement> <else_clause>? <'end'>
+  | $<while_until>:=<'while'> <expression> <'do'>? <compound_statement> <'end'>
+  | $<while_until>:=<'until'> <expression> <'do'>? <compound_statement> <'end'>
+  | $<case>:=<'case'> <?terminators>? <expression> <?terminator>? [<WHEN> <expression> <then_clause> <compound_statement>]+ <else_clause>? <'end'>
+  | $<for>:=<'for'> <for_variable> <'in'> <expression> <compound_statement> <'end'>
+  | $<class>:=<'class'> <class_path> <superclass> <'do'>? <body_statement> <'end'>
+  | $<class2>:=<'class'> <'<<'> <expression> <term> <body_statement> <'end'>
+  | $<module>:=<'module'> <class_path> <body_statement> <'end'>
+  | $<def>:=<'def'> [<singleton> [<'.'>|<'::'>]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'> 
+}
+
 
 ## We enter the operator precedance expression parser HERE
 rule expression { <operator_precedence_parser> }
@@ -57,7 +82,8 @@ rule assignment {
   | \:\: <CONSTANT> <ASSIGN_OP> <expression>
 
   | [\!]? <command_call>
-  | <primary>
+  | <method_call> <brace_block>?
+  | <atom>
 }
 
 token ASSIGN_OP {
@@ -77,20 +103,24 @@ token ASSIGN_OP {
   | <'**='>
 }
 
+  #<operation> [<paren_args> <brace_block>?|<brace_block>]
 rule method_call { 
-  <operation> [<paren_args> <brace_block>?|<brace_block>]
-
-  | <atom> [[<'.'>|<'::'>][<operation2> <paren_args>? <brace_block>? | <paren_args><brace_block>? ]
-           | <'::'> <operation3> <brace_block>?
-           | \[ <call_args>? <rbracket> <brace_block>? ]
+  | <atom> 
+    [
+      | [<'.'>|<'::'>][<operation2> <paren_args>? <brace_block>? | <paren_args> <brace_block>? ]
+      | <'::'> <operation3> <brace_block>?
+      #| \[ <call_args>? <rbracket> <brace_block>? ]
+      |  <call_args>? <rbracket> <brace_block>? 
+    ]
   | <'super'> <paren_args> <brace_block>?
 }
 
 rule method_call_block { 
- | \{ <block_parameter>? <compound_statement> \}
- | <'do'> <block_parameter>? <compound_statement> <'end'>
+ | <brace_block>
+ | <do_block>
 }
 
+rule brace_block {  \{ <block_parameter>? <compound_statement> \} }
 rule do_block { <'do'> <block_parameter>? <compound_statement> <'end'> }
 
 rule command_call { 
@@ -280,52 +310,24 @@ rule multiple_right_hand_side {
   | \* <expression>
 }
 
-rule primary {
-  | <atom>[<'::'><CONSTANT>]?
-#  | <operation> <brace_block> # put this in method call         
-#  | <method_call> <brace_block>?
-}
-
 rule atom { 
-  | <literal>
-  | <string>
-  | <xstring>
-  | <regexp>
-  | <words>
-  | <qwords>
-  | <back_reference>
-  | <FID>
-  | \( <expression> <rparen>
-  | \( <compound_statement> \)
-  | \:\: <CONSTANT>
-  | \[ <array_reference_args>? \]
-  | \{ <assoc_list> \}
-  #|<lang_statements>
-  | <variable>
-}
-
-rule lang_statements { 
-  | <'return'>
-  | <'break'> 
-  | <'next'>
-  | <'redo'>
-  | <'retry'>
-  | <'yield'> [\( <call_args>? <rparen>]? #\)
-  | <'defined'> <newline>? \( <expression> <rparen> #\)
-#  |<operation> <brace_block> # put this in method call
-#  |<method_call> <brace_block>?
-  | <'->'> <lambda>
-  | $<begin>:=<'begin'> <body_statement> <'end'>
-  | <if_clause>
-  | $<unless>:=<'unless'> <expression> <then_clause> <compound_statement> <else_clause>? <'end'>
-  | $<while_until>:=<'while'> <expression> <'do'>? <compound_statement> <'end'>
-  | $<while_until>:=<'until'> <expression> <'do'>? <compound_statement> <'end'>
-  | $<case>:=<'case'> <?terminators>? <expression> <?terminator>? [<WHEN> <expression> <then_clause> <compound_statement>]+ <else_clause>? <'end'>
-  | $<for>:=<'for'> <for_variable> <'in'> <expression> <compound_statement> <'end'>
-  | $<class>:=<'class'> <class_path> <superclass> <'do'>? <body_statement> <'end'>
-  | $<class2>:=<'class'> <'<<'> <expression> <term> <body_statement> <'end'>
-  | $<module>:=<'module'> <class_path> <body_statement> <'end'>
-  | $<def>:=<'def'> [<singleton> [<'.'>|<'::'>]]? <function_name> <function_prototype_arg_list> <body_statement> <'end'> 
+  [
+    | <literal>
+    | <string>
+    | <xstring>
+    #| <regexp>
+    | <words>
+    | <qwords>
+    | <back_reference>
+    | <FID>
+    | \( <expression> <rparen>
+    | \( <compound_statement> \)
+    | \:\: <CONSTANT>
+    | \[ <array_reference_args>? \]
+    | \{ <assoc_list> \}
+    #|<lang_statements>
+    | <variable>
+    ][<'::'><CONSTANT>]?
 }
 
 rule if_clause {
@@ -447,7 +449,7 @@ rule undef_list { [<fitem> \,]* <fitem> }
 
 token LABEL { \: <IDENTIFIER> }
 token INTEGER { 
-  | <DECIMAL> 
+  | <?DECIMAL> 
   | 0 [<[0..7]> | _]* <[0..7]>
   | 0 <[xX]> $hex:=[[ <xdigit> | _ ]* <xdigit> ]
   | 0 <[bB]> $bin:=[[ <[01]> | _ ]* <[01]> ]
@@ -455,10 +457,10 @@ token INTEGER {
 }
 
 token FLOAT {
-  <DECIMAL> 
+  <?DECIMAL> 
   [ 
-    |\. <DIGITS> <EXPONENT>?
-    | <EXPONENT>
+    |\. <?DIGITS> <?EXPONENT>?
+    | <?EXPONENT>
   ]
 }
 token DECIMAL { 0 | <[1..9]> [ [_]? <digit> ]*  }
@@ -466,10 +468,10 @@ token DIGITS { <digit> [ [_]? <digit>]* }
 token EXPONENT { <[eE]>  <[+\-]>? <DIGITS> }
 #Identifiers
 token ident { [ <alnum> | _ ] }
-token CONSTANT { <upper> <ident>* }        #starts with an uppercase letter eg Class and Module names
-token IDENTIFIER { <!reserved_words> [ <lower> | _ ] <ident>* }  #starts with a lowercase letter eg variables
+token CONSTANT { <?upper> <?ident>* }        #starts with an uppercase letter eg Class and Module names
+token IDENTIFIER { <!reserved_words> [ <?lower> | _ ] <?ident>* }  #starts with a lowercase letter eg variables
 token SYMBOL { \:<SYMBOL_NAME> }
-token SYMBOL_NAME { <ident>+ }
+token SYMBOL_NAME { <?ident>+ }
 
 token GLOBAL_VARIABLE {\$[<[~*$?!@/\\;,.=:<>"]>|<IDENTIFIER>|<CONSTANT>]}
 token CLASS_VARIABLE { <'@@'><IDENTIFIER> }

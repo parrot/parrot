@@ -24,8 +24,10 @@ static INTVAL dynpmc_RubyString;
 static INTVAL dynpmc_RubyFloat;
 static INTVAL dynpmc_RubyInteger;
 
-pmclass RubyClass dynpmc group ruby_group {
-
+pmclass RubyClass 
+        dynpmc 
+        group ruby_group 
+{
     void class_init() {
         if (pass) {
             dynpmc_RubyString = pmc_type(INTERP,
@@ -51,6 +53,7 @@ pmclass RubyClass dynpmc group ruby_group {
 		type = dynpmc_RubyFloat;
 		break;
 	}
+
 	pmc_reuse(INTERP, SELF, type, 0);
     }
 

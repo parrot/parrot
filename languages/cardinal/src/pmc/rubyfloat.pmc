@@ -15,7 +15,14 @@
 
 #define RUBY_NUMBER_FMT		("%.14g")
 
-pmclass RubyFloat extends Float extends RubyObject dynpmc group ruby_group hll Cardinal maps Float {
+pmclass RubyFloat 
+        extends Float 
+        extends RubyObject 
+        does float
+        dynpmc 
+        group ruby_group 
+        hll Cardinal 
+        maps Float {
 
     STRING* get_string () {
         UINTVAL buflen;

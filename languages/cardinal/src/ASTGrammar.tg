@@ -351,18 +351,25 @@ transform result (Cardinal::Grammar::assignment) :language('PIR') {
     child2 = tree.get('result', $P0, 'Cardinal::Grammar::expression')
     goto build_assignment
 
-   try_command:
+  try_command:
     $I0 = defined node['command_call']
-    unless $I0 goto try_primary
+    unless $I0 goto try_method_call
     $P0 = node['command_call']
     child = tree.get('result', $P0, 'Cardinal::Grammar::command_call')
     goto single_item
+
+  try_method_call:
+    $I0 = defined node['method_call']
+    unless $I0 goto try_atom
+    $P0 = node['method_call']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::method_call')
+    goto single_item
   
-  try_primary:
-    $I0 = defined node['primary']
+  try_atom:
+    $I0 = defined node['atom']
     unless $I0 goto err_no_tree
-    $P0 = node['primary']
-    child = tree.get('result', $P0, 'Cardinal::Grammar::primary')
+    $P0 = node['atom']
+    child = tree.get('result', $P0, 'Cardinal::Grammar::atom')
     goto single_item
   
 
@@ -405,6 +412,35 @@ transform result (Cardinal::Grammar::command_call) :language('PIR') {
 
   err_no_tree:
     print "The command_call node doesn't contain a 'command' match.\n"
+    end
+}
+
+transform result (Cardinal::Grammar::method_call) :language('PIR') {
+    .local pmc child
+    .local pmc child2
+
+    $I0 = defined node['atom']
+    unless $I0 goto err_no_tree
+    $P0 = node['atom']
+    $S0 = node['atom']
+    #child = tree.get('result', $P0, 'Cardinal::Grammar::atom')
+    child = new 'Cardinal::PAST::Var'
+    child.'init'('node'=>node, 'name'=> $S0, 'scope'=>'exists')
+    
+    $I0 = defined node['operation2']
+    unless $I0 goto err_no_tree
+    $P0 = node['operation2']
+    child2 = tree.get('result', $P0, 'Cardinal::Grammar::operation2')
+
+    .local pmc result
+    result = new 'Cardinal::PAST::MethodCall'
+    result.'init'('node'=>node, 'name'=>child2)
+    result.'add_child'(child)
+    result.'add_child'(child2)
+    .return (result)
+
+  err_no_tree:
+    print "The method_call node doesn't contain a match.\n"
     end
 }
 
@@ -574,6 +610,34 @@ transform result (Cardinal::Grammar::operation) :language('PIR') {
     end
 }
 
+transform result (Cardinal::Grammar::operation2) :language('PIR') {
+.local pmc name
+
+    $I0 = defined node['IDENTIFIER']
+    unless $I0 goto test_constant
+    $P0 = node['IDENTIFIER']
+    name = tree.get('result', $P0, 'Cardinal::Grammar::IDENTIFIER')
+    .return (name)
+
+  test_constant:
+    $I0 = defined node['CONSTANT']
+    unless $I0 goto test_op
+    $P0 = node['CONSTANT']
+    name = tree.get('result', $P0, 'Cardinal::Grammar::CONSTANT')
+    .return (name)
+
+  test_op:
+    $I0 = defined node['op']
+    unless $I0 goto err_no_name
+    $P0 = node['op']
+    name = tree.get('result', $P0, 'Cardinal::Grammar::op')
+    .return (name)
+  
+  err_no_name:
+    print "The PGE operation2 node doesn't contain a 'IDENTIFIER', 'CONSTANT', or a 'op' match.\n"
+    end
+}
+
 transform result (Cardinal::Grammar::IDENTIFIER) :language('PIR') {
     .local pmc result
 
@@ -603,17 +667,16 @@ transform result (Cardinal::Grammar::CONSTANT) :language('PIR') {
     end
 }
 
-transform result (Cardinal::Grammar::primary) :language('PIR') {
-    .local pmc child
-    $I0 = defined node['atom']
-    unless $I0 goto err_no_tree
-    $P0 = node['atom']
-    child = tree.get('result', $P0, 'Cardinal::Grammar::atom')
+transform result (Cardinal::Grammar::op) :language('PIR') {
+    $S0 = node
 
-    .return (child)
+    .local pmc result
+    result = new 'Cardinal::PAST::Val'
+    result.'init'('node'=>node, 'name'=>$S0, 'valtype'=>'op')      
+    .return (result)             
 
   err_no_tree:
-    print "The primary node doesn't contain a 'atom' match.\n"
+    print "The op node doesn't contain an 'op' match.\n"
     end
 }
 

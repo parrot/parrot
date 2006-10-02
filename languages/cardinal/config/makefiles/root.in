@@ -19,7 +19,7 @@ PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 PMCDIR   = src/pmc
 
 # the default target
-all: cardinal.pbc $(PMCDIR)/ruby_group$(LOAD_EXT)
+all: gen_tests cardinal.pbc $(PMCDIR)/ruby_group$(LOAD_EXT)
 
 PMCS = \
   rubyclass \
@@ -66,7 +66,10 @@ GEN_PBC = \
   src/PAST.pbc \
   src/POST.pbc
 
-cardinal.pbc: cardinal.pir $(GEN_PIR) $(GEN_PBC)
+RUNTIME_COMPONENTS = \
+  runtime/parts/rubyclass.pir
+
+cardinal.pbc: cardinal.pir runtime/cardinallib.pbc $(GEN_PIR) $(GEN_PBC)
 	$(PARROT) -o cardinal.pbc --output-pbc cardinal.pir 
 
 src/PAST.pbc: src/PAST.pir
@@ -111,6 +114,11 @@ $(PMCDIR)/ruby_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
 src/builtins_gen.pir: $(BUILTINS_PIR)
 	$(CAT) $(BUILTINS_PIR) >src/builtins_gen.pir
 
+runtime/runtime.pir: $(RUNTIME_COMPONENTS) tools/gen_runtime.pl
+	$(PERL) tools/gen_runtime.pl > runtime/runtime.pir
+
+runtime/cardinallib.pbc: $(PARROT) runtime/cardinallib.pir runtime/runtime.pir $(CLASSES)
+	$(PARROT) --output=runtime/cardinallib.pbc runtime/cardinallib.pir
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -131,6 +139,11 @@ help:
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
 	@echo ""
+
+gen_tests:
+	@mv Parrot_gen Parrot
+	-@t/harness > /dev/null 2>&1
+	@mv Parrot Parrot_gen
 
 test: all
 	$(PERL) -Isrc -I../../src t/harness

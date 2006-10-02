@@ -15,8 +15,14 @@
 
 static STRING *true, *false, *yes, *no;
 
-pmclass RubyString extends String dynpmc group ruby_group hll Ruby maps String {
-
+pmclass RubyString 
+        extends String 
+        does string
+        dynpmc 
+        group ruby_group 
+        hll Ruby 
+        maps String 
+{
     void class_init () {
         PMC *string_anchor;
         INTVAL fixedstringarray_typenum;

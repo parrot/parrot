@@ -29,7 +29,15 @@ This is the Hash PMC for the Ruby implementation.
 #include "parrot/parrot.h"
 
 
-pmclass RubyHash extends Hash extends RubyObject need_ext does hash dynpmc group ruby_group hll Ruby maps Hash {
+pmclass RubyHash 
+        extends Hash 
+        extends RubyObject 
+        does hash 
+        need_ext 
+        dynpmc 
+        group ruby_group 
+        hll Ruby 
+        maps Hash {
 }
 
 

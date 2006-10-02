@@ -11,12 +11,18 @@
 
 #include "parrot/parrot.h"
 
-pmclass RubyInteger extends Integer extends RubyObject dynpmc group ruby_group hll Ruby maps Integer {
-
+pmclass RubyInteger 
+        extends Integer 
+        extends RubyObject 
+        does integer
+        dynpmc 
+        group ruby_group 
+        hll Ruby 
+        maps Integer 
+{
     METHOD PMC* interpret() {
         return SELF;
     }
-    
 }
 
 
