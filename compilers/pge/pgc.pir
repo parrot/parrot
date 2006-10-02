@@ -408,7 +408,7 @@ OPTIONS
     .local string trait, arg
     trait = t['trait']
     $P0 = t['arg']
-    unless $P0 goto trait_arg_1
+    if null $P0 goto trait_arg_1
     $P0 = $P0[0]
     arg = $P0[0]
     if trait != 'parsed' goto trait_arg
