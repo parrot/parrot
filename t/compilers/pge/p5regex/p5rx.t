@@ -42,11 +42,11 @@ Modifiers can be put after the closing C<'>.
 Column 2 contains the string to be matched.
 
 Column 3 contains the expected result:
-    y	expect a match
-    n	expect no match
-    c	expect an error
-    B	test exposes a known bug in Perl, should be skipped
-    b	test exposes a known bug in Perl, should be skipped if noamp
+    y    expect a match
+    n    expect no match
+    c    expect an error
+    B    test exposes a known bug in Perl, should be skipped
+    b    test exposes a known bug in Perl, should be skipped if noamp
 
 Columns 4 and 5 are used only if column 3 contains C<y> or C<c>.
 
@@ -68,7 +68,7 @@ Column 6, if present, contains a description of what is being tested.
 
 my @file_path = split m{/}, 't/compilers/pge/p5regex/re_tests';
 open my $test_file, catfile($PConfig{build_dir}, @file_path)
-	or die "Can't open ".catfile ($PConfig{build_dir}, @file_path);
+    or die "Can't open ".catfile ($PConfig{build_dir}, @file_path);
 
 ## figure out how many tests there are
 1 while (<$test_file>);
@@ -133,18 +133,18 @@ my @skip_tests = (
 );
 
 while (<$test_file>) {
-	chomp;
-	s/\r//g;
+    chomp;
+    s/\r//g;
     { # ignore message of undefined variable.
         no warnings;
-	    s/(\$\{\w+\})/$1/eeg;
+        s/(\$\{\w+\})/$1/eeg;
     }
-	my ($pattern, $subject, $result, $repl, $expect,  $description ) =
-		split /\t/ => $_, 6;
+    my ($pattern, $subject, $result, $repl, $expect,  $description ) =
+        split /\t/ => $_, 6;
 
-	$pattern  =  replace_special_vars( $pattern );
-	$subject  =  replace_special_vars( $subject );
-	$expect   =  replace_special_vars( $expect  );
+    $pattern  =  replace_special_vars( $pattern );
+    $subject  =  replace_special_vars( $subject );
+    $expect   =  replace_special_vars( $expect  );
 
 
     my @todo = ();
@@ -152,11 +152,11 @@ while (<$test_file>) {
         push @todo, todo => find_reason_for(@todo_tests);
     }
 
-	if (grep {$_ eq $.} @skip_tests) {
-		skip_test($description, $subject, $pattern, $result, $repl, $expect, find_reason_for(@skip_tests), @todo);
-	} else {
-		do_test($description, $subject, $pattern, $result, $repl, $expect, @todo);
-	}
+    if (grep {$_ eq $.} @skip_tests) {
+        skip_test($description, $subject, $pattern, $result, $repl, $expect, find_reason_for(@skip_tests), @todo);
+    } else {
+        do_test($description, $subject, $pattern, $result, $repl, $expect, @todo);
+    }
 }
 
 close $test_file;
@@ -164,32 +164,32 @@ close $test_file;
 exit;
 
 sub skip_test {
-	my ($description, $subject, $pattern, $result, $repl, $expect, $skip, @todo) = @_;
-	SKIP: {
-		skip $skip => 1;
-		do_test($description, $subject, $pattern, $result, $repl, $expect, @todo);
-	}
+    my ($description, $subject, $pattern, $result, $repl, $expect, $skip, @todo) = @_;
+    SKIP: {
+        skip $skip => 1;
+        do_test($description, $subject, $pattern, $result, $repl, $expect, @todo);
+    }
 }
 
 sub do_test {
-	my ($description, $subject, $pattern, $result, $repl, $expect, @todo) = @_;
-	$result =~ s/b//i;
-	if ($result !~ /[cynBb]/) {
-		diag "Ill-formed test case: $subject\t$pattern\t$result\t$repl\t$expect";
-		return;
-	}
-	## create the test from the template
-	my $pir_code = p5rx_template();
+    my ($description, $subject, $pattern, $result, $repl, $expect, @todo) = @_;
+    $result =~ s/b//i;
+    if ($result !~ /[cynBb]/) {
+        diag "Ill-formed test case: $subject\t$pattern\t$result\t$repl\t$expect";
+        return;
+    }
+    ## create the test from the template
+    my $pir_code = p5rx_template();
 
-	my $results  = generate_pir_for_results( $repl );
+    my $results  = generate_pir_for_results( $repl );
 
-	$pir_code    =~ s/<<SUBJECT>>/$subject/g;
-	$pir_code    =~ s/<<PATTERN>>/$pattern/g;
-	$pir_code    =~ s/<<EXPECT>>/$expect/g;
-	$pir_code    =~ s/<<REPL>>/$repl/g;
-	$pir_code    =~ s/<<RESULTS>>/$results/g;
+    $pir_code    =~ s/<<SUBJECT>>/$subject/g;
+    $pir_code    =~ s/<<PATTERN>>/$pattern/g;
+    $pir_code    =~ s/<<EXPECT>>/$expect/g;
+    $pir_code    =~ s/<<REPL>>/$repl/g;
+    $pir_code    =~ s/<<RESULTS>>/$results/g;
 
-	pir_output_is( $pir_code, $expect, $description, @todo );
+    pir_output_is( $pir_code, $expect, $description, @todo );
 
 }
 
@@ -203,27 +203,27 @@ sub find_reason_for {
 
 sub p5rx_template
 {
-	return <<'P5RX';
+    return <<'P5RX';
 .sub 'PGE_Test' :main
-	.local pmc p5rx_compile
-	load_bytecode "PGE.pbc"
-	load_bytecode "PGE/Dumper.pir"
-	load_bytecode "PGE/Text.pir"
-	p5rx_compile = compreg "PGE::P5Regex"
+    .local pmc p5rx_compile
+    load_bytecode "PGE.pbc"
+    load_bytecode "PGE/Dumper.pir"
+    load_bytecode "PGE/Text.pir"
+    p5rx_compile = compreg "PGE::P5Regex"
 
-	.local string target
-	.local string pattern
-	.local pmc rulesub
-	.local pmc match
-	target = <<'TARGET'
+    .local string target
+    .local string pattern
+    .local pmc rulesub
+    .local pmc match
+    target = <<'TARGET'
 <<SUBJECT>>
 TARGET
-	chopn target, 1
+    chopn target, 1
 
-	pattern = <<'PATTERN'
+    pattern = <<'PATTERN'
 <<PATTERN>>
 PATTERN
-	chopn pattern, 1
+    chopn pattern, 1
 
 =for comment
 
@@ -237,18 +237,18 @@ repl    = <<REPL>>
 
 =cut
 
-	rulesub = p5rx_compile(pattern)
-	match = rulesub(target)
-	unless match goto Match_fail
+    rulesub = p5rx_compile(pattern)
+    match = rulesub(target)
+    unless match goto Match_fail
 
   Match_success:
-	eq '-', '<<REPL>>', Match_no_check
+    eq '-', '<<REPL>>', Match_no_check
 
 <<RESULTS>>
 
   Match_no_check:
   Match_fail:
-	print "-"
+    print "-"
   Match_end:
 .end
 P5RX
@@ -257,95 +257,101 @@ P5RX
 
 sub generate_pir_for_results
 {
-	my( $repl ) = @_;
-	my $replace_me = $repl;
-	my @results;
+    my( $repl ) = @_;
+    my $replace_me = $repl;
+    my @results;
 
-	my $tokens = {
-		'\$\&' => <<'Match_whole',
-	$S0 = match
-	print $S0
+    my $tokens = {
+        '\$\&' => <<'Match_whole',
+    $S0 = match
+    print $S0
 Match_whole
 
-		'\$\-\[0\]' => <<'Match_whole_from',
-	$I0 = match.'from'()
-	print $I0
+        '\$\-\[0\]' => <<'Match_whole_from',
+    $I0 = match.'from'()
+    print $I0
 Match_whole_from
 
-		'\$\+\[0\]' => <<'Match_whole_to',
-	$I0 = match.'to'()
-	print $I0
+        '\$\+\[0\]' => <<'Match_whole_to',
+    $I0 = match.'to'()
+    print $I0
 Match_whole_to
 
-		'\$(\d+)' => <<"Match_backref",
-	\$P0 = match[<<I>>]
-	\$S0 = \$P0
-	print \$S0
+        '\$(\d+)' => <<"Match_backref",
+    \$P0 = match[<<I>>]
+    \$S0 = \$P0
+    print \$S0
 Match_backref
 
-		'\$\-\[([123456789]+)\]' => <<"Match_backref_from",
-	\$P0 = match[<<I>>]
-	\$I0 = \$P0\.'from'()
-	print \$I0
+        '\$\-\[([123456789]+)\]' => <<"Match_backref_from",
+    \$P0 = match[<<I>>]
+    \$I0 = \$P0\.'from'()
+    print \$I0
 Match_backref_from
 
-		'\$\+\[([123456789]+)\]' => <<"Match_backref_to",
-	\$P0 = match[<<I>>]
-	\$I0 = \$P0\.'to'()
-	print \$I0
+        '\$\+\[([123456789]+)\]' => <<"Match_backref_to",
+    \$P0 = match[<<I>>]
+    \$I0 = \$P0\.'to'()
+    print \$I0
 Match_backref_to
 
-		'-' => <<'Match_hyphen',
-	print '-'
+        '-' => <<'Match_hyphen',
+    print '-'
 Match_hyphen
-	};
+    };
 
 
-	## don't process  more than this many tokens (prevent runaway while loop)
-	my $max_tokens = 10;
-	my $tok_count = 0;
+    ## don't process  more than this many tokens (prevent runaway while loop)
+    my $max_tokens = 10;
+    my $tok_count = 0;
 
-	while( length $replace_me and $tok_count < $max_tokens)
-	{
-		for my $tok ( sort {length $b <=> length $a} keys %$tokens )
-		{
-			my $rx = qr/(?x) ^ ( $tok ) /;
+    while( length $replace_me and $tok_count < $max_tokens)
+    {
+        for my $tok ( sort {length $b <=> length $a} keys %$tokens )
+        {
+            my $rx = qr/(?x) ^ ( $tok ) /;
 
-			my $tok_code;
-			if( $replace_me   =~ s/$rx// )
-			{
-				my $index     =  defined $2 ? $2 - 1 : 0;
-				my $tok_code  =  $tokens->{$tok};
-				$tok_code     =~ s/<<I>>/$index/g;
+            my $tok_code;
+            if( $replace_me   =~ s/$rx// )
+            {
+                my $index     =  defined $2 ? $2 - 1 : 0;
+                my $tok_code  =  $tokens->{$tok};
+                $tok_code     =~ s/<<I>>/$index/g;
 
-				push @results => $tok_code;
-				last;
-			}
-		}
-		$tok_count++;
-		push @results => "## unknown or too many tokens: $replace_me";
-	}
-	push @results    => "\tgoto Match_end";
+                push @results => $tok_code;
+                last;
+            }
+        }
+        $tok_count++;
+        push @results => "## unknown or too many tokens: $replace_me";
+    }
+    push @results    => "\tgoto Match_end";
 
-	return join "\n" => @results;
+    return join "\n" => @results;
 }
 
 
 ## replacement vars for special characters
 sub replace_special_vars
 {
-	my $string =  shift;
+    my $string =  shift;
 
-	my $bang   =  sprintf "\\%03o", ord "!"; # \41 would not be portable.
-	my $ffff   =  chr(0xff) x 2;
-	my $nulnul =  "\0" x 2;
+    my $bang   =  sprintf "\\%03o", ord "!"; # \41 would not be portable.
+    my $ffff   =  chr(0xff) x 2;
+    my $nulnul =  "\0" x 2;
 
-	$string    =~ s/(\$\{\w+\})/$1/eeg;
-	$string    =~ s/\\n/\n/g;
-	$string    =~ s/\$\{bang\}/$bang/eeg;
-	$string    =~ s/\$\{ffff\}/$ffff/eeg;
-	$string    =~ s/\$\{nulnul\}/$nulnul/eeg;
+    $string    =~ s/(\$\{\w+\})/$1/eeg;
+    $string    =~ s/\\n/\n/g;
+    $string    =~ s/\$\{bang\}/$bang/eeg;
+    $string    =~ s/\$\{ffff\}/$ffff/eeg;
+    $string    =~ s/\$\{nulnul\}/$nulnul/eeg;
 
-	return $string;
+    return $string;
 }
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
