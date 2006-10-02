@@ -136,7 +136,6 @@ main(int argc, char *argv[])
     PDB_t *pdb;
     void *yyscanner;
 
-    do_yylex_init ( &yyscanner );
 
     /*Parrot_set_config_hash();  TODO link with cfg */
     debugger = Parrot_new(NULL);
@@ -152,6 +151,8 @@ main(int argc, char *argv[])
     Parrot_block_GC(interpreter);
     imcc_init(interpreter);
     IMCC_ast_init(interpreter);
+
+    do_yylex_init ( interpreter, &yyscanner );
 
     if (argc < 2) {
         fprintf(stderr, "Usage: pdb programfile [program-options]\n");
