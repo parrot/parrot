@@ -111,10 +111,19 @@
     optable.newtok('infix:|', 'looser'=>'infix:',    'left'=>1,  'nows'=>1, 'match'=>'PGE::Exp::Alt')
 
     optable.newtok('close:}', 'looser'=>'infix:|', 'nows'=>1)            # XXX: hack
-    optable.newtok('close:]', 'equiv'=>'close:}',  'nows'=>1)            # XXX: hack
 
     $P0 = get_hll_global ["PGE::P5Regex"], "compile_p5regex"
     compreg "PGE::P5Regex", $P0
+.end
+
+
+.sub 'parse_error'
+    .param pmc mob
+    .param int pos
+    .param string message
+    print message
+    exit 1
+    .return ()
 .end
 
 
@@ -130,17 +139,22 @@
     pos = $P0
     lastpos = length target
     initchar = substr target, pos, 1
+    unless initchar == '*' goto initchar_ok
+    parse_error(mob, pos, "Quantifier follows nothing")
+
+  initchar_ok:
     if initchar == ')' goto end
     inc pos
     if initchar != "\\" goto term_literal
-
   term_backslash:
     initchar = substr target, pos, 1
     inc pos
+    if pos <= lastpos goto term_backslash_ok
+    parse_error(mob, pos, "Search pattern not terminated")
+  term_backslash_ok:
     $I0 = index "nrteab", initchar
     if $I0 < 0 goto term_literal
     initchar = substr "\n\r\t\e\a\b", $I0, 1
-    
   term_literal:
     litstart = pos
     litlen = 0
@@ -148,6 +162,7 @@
     if pos >= lastpos goto term_literal_end
     $S0 = substr target, pos, 1
     $I0 = index "[](){}*?+\\|^$.", $S0
+    # if not in circumfix:( ) throw error on end paren
     if $I0 >= 0 goto term_literal_end
     inc pos
     inc litlen
@@ -293,6 +308,7 @@
     isrange = 0
     $I2 = ord charlist, -1
     $I0 = ord $S0
+    if $I0 < $I2 goto err_range
   addrange_1:
     inc $I2
     if $I2 > $I0 goto scan
@@ -314,11 +330,20 @@
     mpos = pos
     mob.'result_object'(charlist)
     .return (mob)
-    
+
   err_close:
-    parse_error(mob, pos, "No closing ']' for enumerated character list")
+    parse_error(mob, pos, "Unmatched [")
+  err_range:
+    $S0 = 'Invalid [] range "'
+    $S1 = chr $I2
+    $S0 .= $S1
+    $S0 .= '-'
+    $S1 = chr $I0
+    $S0 .= $S1
+    $S0 .= '"'
+    parse_error(mob, pos, $S0)
 .end
-    
+
 
 .namespace [ "PGE::Exp" ]
 
