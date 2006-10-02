@@ -421,6 +421,20 @@ Parrot_fetch_arg(Interp *interpreter, struct call_state *st)
             return 0;
         }
     }
+#if 0
+    /* NOT YET
+     * e.g.
+     * $ make
+     * ../../parrot pgc.pir  --output=PGE/builtins_gen.pir PGE/builtins.pg
+     * positional inside named args
+     * ...
+     */
+
+    if ((st->dest.mode & CALL_STATE_NAMED_x) && !(st->src.sig & PARROT_ARG_NAME))
+        real_exception(interpreter, NULL, E_ValueError,
+                "positional inside named args");
+#endif
+
     if (st->src.mode & CALL_STATE_FLATTEN) {
         if (st->src.slurp_i < st->src.slurp_n) {
             PMC *elem;

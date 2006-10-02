@@ -102,7 +102,7 @@
     optable.newtok('term:.', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = get_hll_global ['PGE::P5Regex'], 'parse_quant'
-    optable.newtok('postfix:*', 'looser'=>'term:', 'left'=>1, 'nows', 'parsed'=>$P0)
+    optable.newtok('postfix:*', 'looser'=>'term:', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('postfix:+', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('postfix:?', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('postfix:{', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
