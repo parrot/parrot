@@ -33,7 +33,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'continuations preserve bsr/ret state.', todo => "BUG: continuations don't preserve the control_stack.");
+pir_output_is(<<'CODE', <<'OUT', 'continuations preserve bsr/ret state.');
 ## Here is a trace of execution, keyed by labels.
 ##   L1:  bsr to rtn1
 ## rtn1:  create a continuation that directs us to L6, and (we expect) captures

@@ -87,6 +87,8 @@ Marks the continuation as live.
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc->to_ctx)
             mark_context(INTERP, cc->to_ctx);
+        if (cc->dynamic_state)
+            mark_register_stack(INTERP, cc->dynamic_state);
     }
 
 /*
@@ -133,6 +135,7 @@ Creates and returns a clone of the continuation.
         PObj_custom_mark_destroy_SETALL(ret);
         cc = new_continuation(INTERP, cc_self);
         cc->runloop_id = cc_self->runloop_id;
+        cc->dynamic_state = cc_self->dynamic_state;
         PMC_struct_val(ret) = cc;
         PMC_pmc_val(ret) = PMC_pmc_val(SELF);
         return ret;
@@ -170,7 +173,8 @@ Sets the pointer to the return instruction.
 
         PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
         cc->address = value;
-        cc->runloop_id = interpreter->current_runloop_id;
+        cc->dynamic_state = CONTEXT(INTERP->ctx)->control_stack;
+        cc->runloop_id = INTERP->current_runloop_id;
         if (pos && *pos == PARROT_OP_get_results_pc) {
             cc->current_results = pos;
         }
@@ -224,7 +228,9 @@ destination to continue execution.
 
     void* invoke (void* next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
-        Stack_Chunk_t *stack_target;
+        Stack_Chunk_t *stack_target = cc->dynamic_state;
+        Stack_Chunk_t *corresponding_target;
+        int stack_delta = 0;
         parrot_context_t *from_ctx = CONTEXT(INTERP->ctx);
         parrot_context_t *to_ctx   = cc->to_ctx;
         opcode_t *pc = cc->address;
@@ -260,36 +266,36 @@ destination to continue execution.
                            "Continuation invoked after deactivation.");
         }
 
-        /* figure out how far to unwind. */
-        if (exception_continuation_p) {
-            /* if we are an exception handler, then we must pop ourself and
-               everything above. */
-            stack_target = from_ctx->control_stack;
-            while (stack_target
-                   && UVal_pmc(((Stack_Entry_t *)STACK_DATAP(stack_target))->entry) != SELF) {
-                stack_target = stack_target->prev;
-            }
-            if (! stack_target) {
-                internal_exception(ERROR_STACK_EMPTY,
-                                   "Can't find handler on control stack!");
-            }
-            /* move down one more to pop the EH itself. */
-            stack_target = stack_target->prev;
-        }
-        else {
-            stack_target = to_ctx->control_stack;
-        }
-
         /*
-	 * unwind control stack
-	 */
-        while (from_ctx->control_stack != stack_target) {
+         * rewind control stack
+         */
+        if (from_ctx->control_stack != stack_target) {
+            /* compute the "stack delta", which is a measure of how much
+               unwinding we have to do.  if negative, we have to pop that many
+               entries; if positive, we are going back up the stack.
+               [bug: this is not true rewinding.  -- rgr, 30-Sep-06.]
+            */
+            stack_delta
+                = ((int) stack_height(interpreter, stack_target)
+                   - (int) stack_height(interpreter, from_ctx->control_stack));
+        }
+        /* descend down the target stack until we get to the same depth. */
+        corresponding_target = stack_target;
+        while (stack_delta > 0) {
+            corresponding_target = corresponding_target->prev;
+            stack_delta--;
+        }
+        /* both stacks are now at the same depth.  pop from both until we reach
+           their common ancestor. */
+        while (from_ctx->control_stack != corresponding_target) {
             PMC *cleanup_sub = NULL;
             Stack_Entry_t *e;
 
             if (! from_ctx->control_stack)
                 internal_exception(1, "Control stack damaged");
             e = stack_entry(interpreter, from_ctx->control_stack, 0);
+            if (! e)
+                internal_exception(1, "Control stack damaged");
             if (e->entry_type == STACK_ENTRY_ACTION) {
                 /*
                  * Disable automatic cleanup routine execution in stack_pop so
@@ -308,7 +314,12 @@ destination to continue execution.
                 Parrot_runops_fromc_args(interpreter, cleanup_sub,
                                          "vI", exception_continuation_p);
             }
+            corresponding_target = corresponding_target->prev;
         }
+        /* run back up the target stack to our destination.  [when we support
+           dynamic binding (e.g.), we will have to traverse back up, and will
+           therefore need to keep track on the way down.  -- rgr, 30-Sep-06.] */
+        to_ctx->control_stack = stack_target;
 
         /* debug print before context is switched */
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
@@ -324,7 +335,6 @@ destination to continue execution.
         CONTEXT(INTERP->ctx) = to_ctx;
         INTERP->ctx.bp = to_ctx->bp;
         INTERP->ctx.bp_ps = to_ctx->bp_ps;
-	to_ctx->control_stack = stack_target;
         if (ret_continuation_p) {
             /* RetContinuation arg passing is handled elsewhere. */
             return pc;

@@ -143,6 +143,7 @@ new_continuation(Interp *interp, struct Parrot_cont *to)
 
     cc->to_ctx = to_ctx;
     cc->from_ctx = CONTEXT(interp->ctx);
+    cc->dynamic_state = NULL;
     cc->runloop_id = 0;
     CONTEXT(interp->ctx)->ref_count++;
     if (to) {
@@ -175,6 +176,7 @@ new_ret_continuation(Interp *interp)
         mem_sys_allocate(sizeof(struct Parrot_cont));
     cc->to_ctx = CONTEXT(interp->ctx);
     cc->from_ctx = NULL;    /* filled in during a call */
+    cc->dynamic_state = NULL;
     cc->runloop_id = 0;
     cc->seg = interp->code;
     cc->current_results = NULL;

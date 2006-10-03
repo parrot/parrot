@@ -114,6 +114,7 @@ typedef struct Parrot_cont {
     struct PackFile_ByteCode *seg;   /* bytecode segment */
     opcode_t *address;               /* start of bytecode, addr to continue */
     struct Parrot_Context *to_ctx;   /* pointer to dest context */
+    struct Stack_Chunk *dynamic_state; /* dest dynamic state */
     /* a Continuation keeps the from_ctx alive */
     struct Parrot_Context *from_ctx;  /* sub, this cont is returning from */
     opcode_t *current_results;    /* ptr into code with get_results opcode
