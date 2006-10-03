@@ -360,7 +360,6 @@ docs/pdds/clip/pdd02_vtables.pod                            [main]doc
 docs/pdds/clip/pdd04_datatypes.pod                          [main]doc
 docs/pdds/clip/pdd05_opfunc.pod                             [main]doc
 docs/pdds/clip/pdd06_pasm.pod                               [main]doc
-docs/pdds/clip/pdd07_codingstd.pod                          [main]doc
 docs/pdds/clip/pdd08_keys.pod                               [main]doc
 docs/pdds/clip/pdd09_gc.pod                                 [main]doc
 docs/pdds/clip/pdd10_embedding.pod                          [main]doc
