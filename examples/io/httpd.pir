@@ -89,35 +89,42 @@ The code was heavily hacked by bernhard and leo.
 .const string LFLF     = "\n\n"
 .const string CRCR     = "\r\r"
 
+.const string SERVER_NAME = "Parrot-httpd/0.1"
+
 .include "stat.pasm"
 
 .sub main :main
     .local pmc sock, work, fp
     .local pmc fp               # read requested files from disk
-    .local string address
+    .local int port
+    .local string address, host
     .local string buf, req, rep, temp
     .local string meth, url, file_content
     .local int ret
-    .local int len, pos, occ1, occ2
+    .local int len, pos, occ1, occ2, dotdot
 
     .local string doc_root
     doc_root = "."
+    host = "localhost"
+    port = 1234
 
     # TODO provide sys/socket constants
     socket sock, 2, 1, 6	# PF_INET, SOCK_STREAM, tcp
     unless sock goto ERR_NO_SOCKET
 
     # Pack a sockaddr_in structure with IP and port
-    .local int port
-    port = 1234
-    address = sockaddr port, "localhost"
+    address = sockaddr port, host
     ret = bind sock, address
     if ret == -1 goto ERR_bind
     $S0 = port
     print "Running webserver on port "
     print $S0
-    print " of localhost.\n"
-    print "The Parrot documentation can now be accessed at http://localhost:"
+    print " of "
+    print host
+    print ".\n"
+    print "The Parrot documentation can now be accessed at http://"
+    print host
+    print ":"
     print $S0
     print "\n"
     print "Be sure that the HTML docs have been generated with 'make html'.\n"
@@ -180,8 +187,13 @@ SERVE_GET:
     .local int is_cgi
     (is_cgi, file_content, len) = check_cgi(url)
     if is_cgi goto SERVE_blob
+
     # decode the url
     url = urldecode(url)
+
+    # Security: Don't allow access to the parent dir
+    index dotdot, url, ".."
+    if dotdot >= 0 goto SERVE_404
 
     # redirect instead of serving index.html
     if url == "/" goto SERVE_docroot
@@ -189,7 +201,7 @@ SERVE_GET:
     # Those little pics in the URL field or in tabs
     if url == "/favicon.ico" goto SERVE_favicon
 
-    # try to server a file
+    # try to serve a file
     goto SERVE_file
 
 SERVE_file:
@@ -205,7 +217,8 @@ SERVE_blob:
     # takes: file_content, len
     rep = "HTTP/1.1 200 OK"
     rep .= CRLF
-    rep .= "Server: Parrot-httpd/0.1"
+    rep .= "Server: "
+    rep .= SERVER_NAME
     rep .= CRLF
     rep .= "Content-Length: "
     temp = to_string (len)
@@ -223,6 +236,9 @@ SERVE_blob:
 SERVE_docroot:
     rep = 'HTTP/1.1 301 Moved Permamently'
     rep .= CRLF
+    rep .= "Server: "
+    rep .= SERVER_NAME
+    rep .= CRLF
     rep .= 'Location: /docs/html/index.html'
     rep .= CRLF
     rep .= 'Content-Length: '
@@ -233,7 +249,7 @@ SERVE_docroot:
     concat rep, CRLFCRLF
     concat rep, file_content
     send ret, work, rep
-    print "Redirect to 'docs/html/index.hmtl'\n"
+    print "Redirect to 'docs/html/index.html'\n"
     close work
     goto NEXT
 
@@ -244,7 +260,10 @@ SERVE_favicon:
 SERVE_404:
     $S0 = '404 Not found'
     $I0 = length $S0
-    rep = 'HTTP1/1 404 Not Found'
+    rep = 'HTTP/1.1 404 Not Found'
+    rep .= CRLF
+    rep .= "Server: "
+    rep .= SERVER_NAME
     rep .= CRLF
     rep .= 'Content-Length: '
     $S1 = $I0
@@ -343,6 +362,14 @@ no_query:
 have_query:
     # escape %
     file = urldecode(file)
+
+    # Security: Don't allow access to the parent dir
+    .local int dotdot
+    index dotdot, file, ".."
+    if dotdot < 0 goto cgi_file
+    .return (0, '', 0)
+
+cgi_file:
     print "CGI: '"
     print file
     print "' Q: '"
