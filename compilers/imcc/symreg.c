@@ -109,7 +109,9 @@ mk_symreg(Interp *interp, char * name, int t)
 char *
 symreg_to_str(SymReg * s)
 {
-    char buf[8192];
+    /* NOTE: the below magic number encompasses all the quoted strings which may be included in the
+     * sprintf output */
+    char *buf = (char *) malloc(250 + strlen(s->name));
     int t = s->type;
     sprintf(buf, "symbol [%s]  set [%c]  color [" INTVAL_FMT "]  type [",
                  s->name, s->set, s->color);
@@ -125,7 +127,7 @@ symreg_to_str(SymReg * s)
     if (t & VT_OPTIONAL)  { strcat(buf, "VT_OPTIONAL ");  }
     if (t & VT_NAMED)     { strcat(buf, "VT_NAMED ");  }
     strcat(buf, "]");
-    return str_dup(buf);
+    return buf;
 }
 
 
