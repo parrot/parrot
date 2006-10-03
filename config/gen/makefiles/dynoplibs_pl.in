@@ -22,23 +22,23 @@ use File::Copy qw(copy);
 # (eg FreeBSD) have ""s embedded in their substution values. q[] is used in
 # some places as Win32 paths have \'s in, which qq[] treats as escape sequences.
 # Config stuff
-our $CC = qq[@cc@ -c];
-our $LD = qq[@ld@];
-our $LDFLAGS = qq[@ldflags@ @ld_debug@];
-our $LD_LOAD_FLAGS = qq[@ld_load_flags@];
+our $CC = q[@cc@ -c];
+our $LD = q[@ld@];
+our $LDFLAGS = q[@ldflags@ @ld_debug@];
+our $LD_LOAD_FLAGS = q[@ld_load_flags@];
 our $PERL = q[@perl@];
-our $LOAD_EXT = qq[@load_ext@];
-our $O = qq[@o@];
-our $CFLAGS = qq[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@];
+our $LOAD_EXT = q[@load_ext@];
+our $O = q[@o@];
+our $CFLAGS = q[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@];
 
-our $LIBPARROT = qq[];
+our $LIBPARROT = q[];
 #CONDITIONED_LINE(parrot_is_shared):$LIBPARROT = q[@libparrot_ldflags@];
 
 # Here comes some stuff for Win32.
-our $PATHQUOTE = '';
+our $PATHQUOTE = q[];
 if ($^O eq 'MSWin32') {
     # Paths need quoting as they may contain spaces.
-    $PATHQUOTE = '"';
+    $PATHQUOTE = q["];
 
     unless ($CC =~ /gcc/i) {
         $LIBPARROT = '@build_dir@/libparrot@a@';
@@ -52,7 +52,7 @@ our $OPS2C = "$PERL -I $PATHQUOTE" .
              q[@build_dir@@slash@tools@slash@build@slash@ops2c.pl] .
              $PATHQUOTE;
 our %cores = (
-    C       => '',
+    C       => q[],
 #CONDITIONED_LINE(cg_flag):   CGP     => '_cgp',
 #CONDITIONED_LINE(cg_flag):   CGoto   => '_cg',
     CSwitch => '_switch'
