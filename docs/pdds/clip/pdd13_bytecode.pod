@@ -589,16 +589,27 @@ Used to get data about fields in the header that have an integer value. Valid
 keys are:
 
 =over 4
+
 =item wordsize
+
 =item byteorder
+
 =item fptype
+
 =item version_major
+
 =item version_minor
+
 =item version_patch
+
 =item bytecode_major
+
 =item bytecode_minor
+
 =item uuid_type
+
 =item uuid_length
+
 =back
 
 =head4 get_string_keyed_str (v-table)
@@ -607,7 +618,9 @@ Used to get data about fields in the header that have a string value. Valid
 keys are:
 
 =over 4
+
 =item uuid
+
 =back
 
 =head4 set_integer_keyed_str (v-table)
@@ -617,10 +630,15 @@ written since they are determined by the VM when serializing the packfile for
 storage on disk. The fields that may be set are:
 
 =over 4
+
 =item version_major
+
 =item version_minor
+
 =item version_patch
+
 =item uuid_type
+
 =back
 
 Be very careful when setting a version number; you should usually trust the VM
@@ -870,11 +888,17 @@ index, it is added to the list of annotations. An exception will be thrown
 unless all of the following conditions are met:
 
 =over 4
+
 =item The type of the PMC passed is PackfileAnnotation
+
 =item The entry at the previous index is defined
+
 =item The offset of the previous entry is less than this entry
+
 =item The offset of the next entry, if it exists, is greater than this entry
+
 =item The key ID references a valid annotation key
+
 =back
 
 
