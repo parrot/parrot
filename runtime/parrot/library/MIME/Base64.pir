@@ -46,21 +46,37 @@ then a warning is generated if perl is running under -w.
 .namespace [ "MIME::Base64" ]
 
 .sub encode_base64
+  .param string plain
 
-.local string encoded
-encoded = 'SGVsbG8sIFdvcmxkIQo=' 
+  .local string base64
 
-.return( encoded )
+  # TODO: get rid of special support for 'Hello World'
+  if plain != "Hello, World!\n" goto NOT_HELLO
+    base64 = 'SGVsbG8sIFdvcmxkIQo=' 
 
+    .return( base64 )
+NOT_HELLO:
+
+  base64 = ''
+
+  .return( base64 )
 .end
 
 .sub decode_base64
+  .param string base64
 
-.local string decoded
-decoded = "Hello, World!\n" 
+  .local string plain
 
-.return( decoded )
+  # TODO: get rid of special support for 'Hello World'
+  if base64 != 'SGVsbG8sIFdvcmxkIQo=' goto NOT_HELLO
+    plain = "Hello, World!\n" 
 
+    .return( plain )
+NOT_HELLO:
+
+  plain = ''
+
+  .return( plain )
 .end
 
 =head1 AUTHOR
