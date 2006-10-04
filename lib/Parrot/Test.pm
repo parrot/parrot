@@ -359,7 +359,7 @@ sub path_to_parrot {
 }
 
 # 
-# private methods, should not be used by Modules inherition from Parrot::Test
+# private methods, should not be used by Modules inheriting from Parrot::Test
 #
 
 sub _generate_functions {
