@@ -354,6 +354,7 @@ docs/overview.pod                                           [main]doc
 docs/parrot.pod                                             [main]doc
 docs/parrotbyte.pod                                         [main]doc
 docs/parrothist.pod                                         [main]doc
+docs/pcc_state.pod                                          [main]doc
 docs/pdds/README                                            [main]doc
 docs/pdds/clip/pdd01_overview.pod                           [main]doc
 docs/pdds/clip/pdd02_vtables.pod                            [main]doc

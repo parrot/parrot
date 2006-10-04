@@ -1,0 +1,87 @@
+=head1 parrot calling conventions state table
+
+this document expresses the calling conventions as outlined in PDD03 in table
+format. this is a work in progress, which, when finished, should assist in
+creating an exhaustive test suite for calling conventions.
+
+
+          |                          DEST                         |      |
+          |          unnamed          |           named         *3|      |
+          |   required  |   optional  |   required  |   optional  |      |
+          |      |    *1|      |    *1|      |    *1|      |    *1|      |
+          | nrml | slrp | nrml | slrp | nrml | slrp | nrml | slrp | END  |
+  ------------------------------------------------------------------------
+          |      |      |      |      |      |      |      |      |      |
+     nrml |  P1  |  P2  |  P1  |  P2  |      |      |      |      |  E1  |
+   u      |      |      |      |      |      |      |      |      |      |
+   n----------------------------------------------------------------------
+   n  *1,2|      |      |      |      |      |      |      |      |      |
+   a flat |  P3  |  P3  |  P3  |  P3  |      |      |      |      |  E2  |
+   m      |      |      |      |      |      |      |      |      |      |
+   e----------------------------------------------------------------------
+   d    *1|      |      |      |      |      |      |      |      |      |
+     mayb |  P1  |  X1  |  P1  |  X1  |      |      |      |      |  E2  |
+  S       |      |      |      |      |      |      |      |      |      |
+  R-----------------------------------------------------------------------
+  C       |      |      |      |      |      |      |      |      |      |
+     nrml |      |      |      |      |      |      |      |      |  E1  |
+          |      |      |      |      |      |      |      |      |      |
+   n----------------------------------------------------------------------
+   a    *3|      |      |      |      |      |      |      |      |      |
+   m flat |  E5  |  E5  |  E5  |  E5  |      |      |      |      |  E2  |
+   e      |      |      |      |      |      |      |      |      |      |
+   d----------------------------------------------------------------------
+          |      |      |      |      |      |      |      |      |      |
+     mayb |  E4  |  E4  |  E4  |  E4  |  E4  |  E4  |  E4  |  E4  |  E2  |
+          |      |      |      |      |      |      |      |      |      |
+  ------------------------------------------------------------------------
+          |      |      |      |      |      |      |      |      |      |
+      END |  E3  |  D1  |  D1  |  D1  |  E3  |  D1  |  D1  |  D1  |  D1  |
+          |      |      |      |      |      |      |      |      |      |
+  ------------------------------------------------------------------------
+
+
+=head2 Glossary
+
+=over 4
+
+=item  Flag Values
+
+  nrml  no flags   (src: val & 0x03a0 = 0; dest: val & 0x0260 = 0)
+  slrp  SLURPY     (val & 0x0020 = 1)
+  flat  FLAT       (val & 0x0020 = 1)
+  mayb  MAYBE_FLAT (val & 0x0040 = 1)
+
+=item  Passing
+
+  P1  pass as-is, next state
+  P2  pass as-is, next src
+  P3  pass contents as array items, next 
+
+=item  Expressions
+
+  X1  if(src pmc is aggregate or reference to aggregate)
+        if dest is array, pass as flat
+        if test is hash, pass as pairs
+
+=item  Errors
+
+  E1  overflow
+  E2  overflow if aggregate is not empty
+  E3  underflow
+  E4  MAYBE_FLAT may not be combined with NAMED
+  E5  named parameter passed, unnamed expected
+
+=item  Done
+
+  D1  done
+
+=item Notes
+
+  *1  pmc only
+  *2  error unless pmc is aggregate or reference to aggregate
+  *3  pmc or string constant only
+
+=back
+
+=cut
