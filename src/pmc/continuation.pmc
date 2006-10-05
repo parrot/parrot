@@ -88,7 +88,7 @@ Marks the continuation as live.
         if (cc->to_ctx)
             mark_context(INTERP, cc->to_ctx);
         if (cc->dynamic_state)
-            mark_register_stack(INTERP, cc->dynamic_state);
+            mark_stack(INTERP, cc->dynamic_state);
     }
 
 /*
