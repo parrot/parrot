@@ -74,8 +74,8 @@ foreach my $file (@files) {
         unless $buf =~ m{\Q$coda\E\n*\z};
 
     # append to the extra_coda array if coda-like text appears more than once
-    my $vim_many   = () = $buf =~ m{^ \s* \*? \s* vim: \s* $}gmx;
-    my $emacs_many = () = $buf =~ m{^ \s* \*? \s* Local variables: \s* $}gmx;
+    my $vim_many   = () = $buf =~ m{^ \s* \*? \s* vim: \s*}gmx;
+    my $emacs_many = () = $buf =~ m{^ \s* \*? \s* Local variables: \s*}gmx;
     push @extra_coda => "$path\n"
         if $vim_many > 1 || $emacs_many > 1;
 }
