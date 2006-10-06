@@ -12,7 +12,7 @@ creating an exhaustive test suite for calling conventions.
           | nrml | slrp | nrml | slrp | nrml | slrp | nrml | slrp | END  |
   ------------------------------------------------------------------------
           |      |      |      |      |      |      |      |      |      |
-     nrml |  P1  |  P2  |  P1  |  P2  |      |      |      |      |  E1  |
+     nrml |  P1  |  P2  |  P1  |  P2  |  E6  |  E6  |  E6  |  E6  |  E1  |
    u      |      |      |      |      |      |      |      |      |      |
    n----------------------------------------------------------------------
    n  *1,2|      |      |      |      |      |      |      |      |      |
@@ -24,7 +24,7 @@ creating an exhaustive test suite for calling conventions.
   S       |      |      |      |      |      |      |      |      |      |
   R-----------------------------------------------------------------------
   C       |      |      |      |      |      |      |      |      |      |
-     nrml |      |      |      |      |      |      |      |      |  E1  |
+     nrml |  E5  |  E5  |  E5  |  E5  |      |      |      |      |  E1  |
           |      |      |      |      |      |      |      |      |      |
    n----------------------------------------------------------------------
    a    *3|      |      |      |      |      |      |      |      |      |
@@ -71,6 +71,7 @@ creating an exhaustive test suite for calling conventions.
   E3  underflow
   E4  MAYBE_FLAT may not be combined with NAMED
   E5  named parameter passed, unnamed expected
+  E6  unnamed parameter passed, named expected
 
 =item  Done
 
