@@ -2,13 +2,15 @@
 #google for n869.pdf
 
 ## A.1 Lexical grammar
-grammar C99;
+grammar C99::Grammar;
 
 ## A.1.1 Lexical elements
-rule ws {
-  | \s+
+token ws {
+  [
   | <'//'> \N* \n
   | <'/*'> .*? <'*/'>
+  | \s+
+  ]*
 }
 
 rule c99_token {
@@ -19,15 +21,17 @@ rule c99_token {
   | <punctuator>
 }
 
-rule preprocessing_token {
+token pound { <'\#'> }
+
+regex preprocessing_token {
   | <header_name>
   | <identifier>
   | <pp_number>
   | <character_constant>
   | <string_literal>
-  | <punctuator>
+  | <!pound> <punctuator>
   | <universal_character_name>
-  | \S+ #non-whitespace
+  | <-[# \r\n\t]>\S* ## <-[#]-\S>\S* ##non-whitespace
 }
 
 ## A.1.2 Keywords
@@ -47,7 +51,7 @@ token keyword {
 
 ## A.1.3 Identifiers
 #token identifier { <identifier_nondigit> [ <identifier_nondigit> | \d ]* }
-token identifier { <identifier_nondigit> [ <identifier_nondigit> | <digit> ]* }
+token identifier { <?identifier_nondigit> [ <?identifier_nondigit> | <?digit> ]* }
 
 token identifier_nondigit { <alpha> | <[_]> | <universal_character_name> }
 
@@ -91,6 +95,11 @@ token decimal_floating_constant {
   [ <fractional_constant> <exponent_part>?
   | <digit_sequence> <exponent_part> 
   ] <floating_suffix>?
+}
+
+token hexadecimal_prefix
+{
+  0 <[xX]>
 }
 
 token hexadecimal_floating_constant {
@@ -160,27 +169,27 @@ token punctuator {
 
 ## A.1.8 Header names
 token header_name {
-  | \< <h_char>+ \>
-  | " <q_char>+ "
+  | \< $name:=<?h_char>+ \>
+  | " $name:=<?q_char>+ "
 }
 
 token h_char { <-[\n>]> }
 token q_char { <-[\n"]> }
 
 ## A.1.9 Preprocessing numbers
-token pp_number { \.? \d [ \d | <identifer_nondigit> | <[eEpP]> <[\+\-]> | \. ]* }
+token pp_number { \.? \d [ \d | <identifier_nondigit> | <[eEpP]> <[\+\-]> | \. ]* }
 
 ## A.2 Phrase structure grammar
 ## XXX: see below
 
 ## A.2.2 Declarations
-rule delcaration { <declaration_specifier>+ <init_declarator_list>? ; }
+rule declaration { <declaration_specifier>+ <init_declarator_list>? ; }
 
 rule declaration_specifier {
   | <storage_class_specifier>
   | <type_specifier>
   | <type_qualifier>
-  | <function_spcifier>
+  | <function_specifier>
 }
 
 rule init_declarator_list { init_declarator [ , <init_declarator> ]* }
@@ -189,7 +198,7 @@ rule init_declarator { <declarator> [ = <initializer> ]? }
 
 token storage_class_specifier { typedef | extern | static | auto | register }
 
-token type_specifier {
+rule type_specifier {
   | void      | char    | short     | int
   | long      | float   | double    | signed
   | unsigned  | _Bool   | _Complex  | _Imaginary
@@ -199,7 +208,7 @@ token type_specifier {
 }
 
 rule struct_or_union_specifier {
-  [struct|union] [<idientifer>|<identifier>? \{ <struct_declaration>+ \} ]
+  [ $struct:=<'struct'> | $union:=<'union'> ] [ <identifier> | <identifier>? \{ <struct_declaration>+ \} ]
 }
 
 rule struct_declaration { [<type_specifier>|<type_qualifier>]+ <struct_declarator>+ ; }
@@ -230,7 +239,7 @@ rule pointer { [\* <type_qualifier>* ]+ }
 
 rule parameter_type_list { <parameter_declaration> [ , <parameter_declaration> ]* [ , <'...'>]? }
 
-rule parameter_declaration { <declaration_specifiers> [ <declarator> | <abstract_declatator> ]? }
+rule parameter_declaration { <declaration_specifier>+ [ <declarator> | <abstract_declatator> ]? }
 
 rule identifier_list { <identifier> [ , <identifier> ]* }
 
@@ -312,50 +321,70 @@ rule jump_statement {
 ## A.2.4 External definitions
 rule translation_unit { [ <function_definition> | <declaration> ]+ }
 
-rule function_definition { <declaration_specifiers> <declarator> <declaration>* <compound_statement> }
+rule function_definition { <declaration_specifier>+ <declarator> <declaration>* <compound_statement> }
 
 
 ## A.3 preprocessing directives
-rule prereprocessing_file { <group> }
+token wsnws {
+  <?ws_minus_n>? \n <?ws>?
+}
 
-rule group {
-  [ <pp_tokens>? <newline>
+regex prereprocessing_file { <group> }
+
+regex group {
+  [ 
   | <if_section>
   | <control_line>
+  | <source_line>? <?wsnws>
   ]+ 
 }
 
-rule if_section { <if_group> <elif_group>* <else_group>? <endif_line> }
-
-rule if_group {
-  [ \# if <constant_expression>
-  | \# ifdef <identifer>
-  | \# ifndef <identifier> 
-  ] <new_line> <group>?
+regex source_line {
+  <?pp_tokens>
 }
 
-rule elif_group { \# elif <constant_expression> <new_line> <group>? }
-rule else_group { \# else <new_line> <group>? }
-rule endif_line { \# endif <newl_line> }
 
-rule control_line {
-  | \# include <pp_tokens> <newl_line>
-  | \# define
-    [ <identifier>
-    | <identifier_p> [ <identifier_list> [, \.\.\.]? | [ \.\.\.] ]? \) 
-    ] <pp_tokens>? <newl_line>
-  | \# undefine <identifier_> <newl_line>
-  | \# line <pp_tokens> <newl_line>
-  | \# error <pp_tokens>? <newl_line>
-  | \# pragma <pp_tokens>? <newl_line>
-  | \# <newl_line>
+rule if_section { <if_group> <elif_group>* <else_group>? <endif_line> }
+
+token ws_minus_n
+{
+  [
+  | <'//'> \N* \n
+  | <'/*'> .*? <'*/'>
+  | \t 
+  | <' '>
+  ## | <\s-<[\n]>
+  ]*
+}
+
+regex if_group {
+  [ 
+  | \# <?ws>? $ifndef:=<'ifndef'> <?ws> <identifier>
+  | \# <?ws>? $ifdef:=<'ifdef'> <?ws> <identifier>
+  | \# <?ws>? $if:=<'if'> <?ws> <constant_expression>
+  ] <?wsnws> <group>?
+}
+
+regex elif_group { \# <?ws> $elif:=<'elif'> <?ws> <constant_expression> <?wsnws> <group>? }
+regex else_group { \# <?ws> $else:=<'else'> <?wsnws> <group>? }
+regex endif_line { \# <?ws> $endif:=<'endif'> <?wsnws> }
+regex control_line {
+  | \# <?ws>? $include:=<'include'> <?ws_minus_n> <pp_tokens> <?wsnws>
+  | \# <?ws>? $define:=<'define'> <?ws>
+    [ 
+      | <identifier>
+      | <identifier_p> [ <identifier_list> [, \.\.\.]? | [ \.\.\.] ]? \) 
+    ] <?ws_minus_n>? <pp_tokens>?
+  | \# ?<ws>? $undefine:=<'undefine'> <?ws_minus_n> <identifier> <?wsnws>
+  | \# ?<ws>? $line:=<'line'> <?ws_minus_n> <pp_tokens> <?wsnws>
+  | \# ?<ws>? $error:=<'error'> <?ws_minus_n> <pp_tokens>? <?wsnws>
+  | \# ?<ws>? $pragma:=<'pragma'> <?ws_minus_n> <pp_tokens>? <?wsnws>
+  | \# <?wsnws>
+
 }
 
 token identifier_p { <identifier> \( }
-
-rule pp_tokens { <preprocessing_token>+ }
-
-token new_line { \n }
+regex pp_tokens { <preprocessing_token> [<?ws_minus_n> <preprocessing_token>]* }
 
 
 ## A.2.1 Expressions
