@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 use Parrot::Config;
 
 =head1 NAME
@@ -807,4 +807,88 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Namespace introspection");
 .end
 CODE
 parrot
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Nested namespace introspection");
+.sub main :main
+	.local string no_symbol
+
+	.local pmc foo_ns
+	foo_ns = get_hll_namespace [ 'Foo' ]
+	$S0    = foo_ns
+	print "Found namespace: "
+	print $S0
+	print "\n"
+
+	.local pmc bar_ns
+	bar_ns = foo_ns.find_namespace( 'Bar' )
+	$S0    = bar_ns
+	print "Found nested namespace: "
+	print $S0
+	print "\n"
+
+	.local pmc baz_ns
+	baz_ns    = bar_ns.find_namespace( 'Baz' )
+	no_symbol = 'Baz'
+
+	.local int is_defined
+	is_defined = defined baz_ns
+	if is_defined goto oops
+	goto find_symbols
+
+  oops:
+	print "Found non-null '"
+	print no_symbol
+	print "'\n"
+	.return()
+
+  find_symbols:
+	.local pmc a_sub
+	a_sub = bar_ns.find_sub( 'a_sub' )
+	$S0   = a_sub
+	a_sub()
+	print "Found sub: "
+	print $S0
+	print "\n"
+
+	.local pmc some_sub
+	some_sub  = bar_ns.find_sub( 'some_sub' )
+	no_symbol = 'some_sub'
+
+	is_defined = defined some_sub
+	if is_defined goto oops
+
+	.local pmc a_var
+	a_var    = bar_ns.find_var( 'a_var' )
+	print "Found var: "
+	print a_var
+	print "\n"
+
+	.local pmc some_var
+	some_var    = bar_ns.find_var( 'some_var' )
+	no_symbol = 'some_var'
+
+	is_defined = defined some_var
+	if is_defined goto oops
+
+.end
+
+.namespace ['Foo']
+
+.sub some_sub
+.end
+
+.namespace [ 'Foo'; 'Bar' ]
+
+.sub a_sub
+	.local pmc some_var
+	some_var = new .String
+	some_var = 'a string PMC'
+	store_global [ 'Foo'; 'Bar' ], 'a_var', some_var
+.end
+CODE
+Found namespace: Foo
+Found nested namespace: Bar
+Found sub: parrot;Foo;Bar;a_sub
+Found var: a string PMC
 OUTPUT

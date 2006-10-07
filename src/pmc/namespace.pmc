@@ -331,6 +331,72 @@ Returns the name of the namespace as an array of strings.
 
         return ar;
     }
+/*
+
+=item C<METHOD PMC* find_namespace(STRING* name)>
+
+Return the namespace with the given name.
+
+=cut
+
+*/
+
+    METHOD PMC* find_namespace(STRING* key) {
+        STRING *s_ns = CONST_STRING(INTERP, "NameSpace");
+        PMC *ns = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+
+        if (!ns)
+            return PMCNULL;
+
+        /* it's a NameSpace */
+        if (VTABLE_isa(INTERP, ns, s_ns))
+            return ns;
+
+		return PMCNULL;
+    }
+
+/*
+
+=item C<METHOD PMC* find_sub(STRING* name)>
+
+Return the Sub PMC with the given name.
+
+=cut
+
+*/
+
+    METHOD PMC* find_sub(STRING* key) {
+        STRING *s_sub = CONST_STRING(INTERP, "Sub");
+        PMC *sub = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+
+        if (!sub)
+            return PMCNULL;
+
+        /* it's a Sub */
+        if (VTABLE_isa(INTERP, sub, s_sub))
+            return sub;
+
+		return PMCNULL;
+    }
+
+/*
+
+=item C<METHOD PMC* find_var(STRING* name)>
+
+Return the PMC with the given name.
+
+=cut
+
+*/
+
+    METHOD PMC* find_var(STRING* key) {
+        PMC *val = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+
+        if (!val)
+            return PMCNULL;
+
+        return val;
+    }
 
 /*
 
