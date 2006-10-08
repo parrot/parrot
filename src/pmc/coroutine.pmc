@@ -201,7 +201,17 @@ Swaps the "context".
             /* switch back to last remembered code seg and context */
             wanted_seg = co->caller_seg;
             ccont = co->ctx->current_cont;
-            CONTEXT(INTERP->ctx) = ctx = PMC_cont(ccont)->to_ctx;
+            ctx = PMC_cont(ccont)->to_ctx;
+            if (! ctx) {
+                /* This still isn't quite right, but it beats segfaulting.  See
+                   the "Call an exited coroutine" case in t/pmc/coroutine.t; the
+                   problem is that the defunct coroutine yields up one more
+                   result before we get here.  -- rgr, 7-Oct-06.
+                */
+                real_exception(INTERP, NULL, E_Exception,
+                               "Cannot resume dead coroutine.");
+            }
+            CONTEXT(INTERP->ctx) = ctx;
             INTERP->ctx.bp = ctx->bp;
             INTERP->ctx.bp_ps = ctx->bp_ps;
         }

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 =head1 NAME
 
@@ -307,6 +307,28 @@ ex:
     if x <= 4 goto iloop
 .end
 CODE
+
+pir_output_like(<<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far.');
+.sub main :main
+    .local pmc c
+    c = global "coro"
+loop:
+    $P0 = c()
+    print $P0
+    goto loop
+.end
+.sub coro
+    .local pmc x
+    x = new Integer
+    x = 0
+    iloop:
+        .yield (x)
+        x = x + 1
+    if x <= 4 goto iloop
+.end
+CODE
+/\A01234Cannot resume dead coroutine/
+OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
