@@ -36,39 +36,28 @@ END_CODA
 sub violates {
     my ( $self, $elem, $doc ) = @_;
 
-    my @elements = $doc->children();
-
-    my $last_node = pop @elements;
-
-    # Skip (optional) __END__ || __DATA blocks...
-    while ( ref $last_node eq 'PPI::Statement::End' || ref $last_node eq 'PPI::Statement::Data' ) {
-        $last_node = pop @elements;
-    }
-
-    # Skip any (optional) terminating whitespace...
-    while ( ref $last_node eq "PPI::Token::Whitespace" ) {
-        $last_node = pop @elements;
-    }
-
-    # Put back the node we peeked at.
-    push @elements, $last_node;
-
     my @coda_lines = split /\n/, $CODA;
 
-    while (@coda_lines) {
-        my $last_coda_line = pop @coda_lines;
-        $last_node = pop @elements;
+    my $last_node;
+    for ($last_node = $doc->last_element;
+         $last_node && @coda_lines;
+         $last_node = $last_node->previous_sibling) {
+
+        # Skip (optional) __END__ || __DATA blocks...
+        next if ( $last_node->isa('PPI::Statement::End') );
+        next if ( $last_node->isa('PPI::Statement::Data') );
+        next if ( $last_node->isa('PPI::Token::Whitespace') );
+        last if ( !$last_node->isa('PPI::Token::Comment') );
+
+        my $last_coda_line = $coda_lines[-1];
         my $last_actual_line = $last_node->content;
         chomp $last_actual_line;
-        if ( $last_coda_line ne $last_actual_line ) {
-            my $sev = $self->get_severity();
-
-            return Perl::Critic::Violation->new( $desc, $expl, $last_node, $sev );
-        }
+        last if ( $last_coda_line ne $last_actual_line );
+        pop @coda_lines;
     }
 
-    # We made it through all the coda lines, it must be ok.
-    return;
+    return if ( !@coda_lines ); # We made it through all the coda lines
+    return $self->violation( $desc, $expl, $last_node || $doc );
 }
 
 1;

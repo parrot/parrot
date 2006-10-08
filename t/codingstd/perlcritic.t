@@ -13,14 +13,15 @@ use File::Find;
 use Test::More;
 
 BEGIN {
-    eval 'use Perl::Critic';
+    eval { require Test::Perl::Critic; };
     if ($@) {
-        print "1..1\nok 1 # skip Perl::Critic not installed\n";
-        exit;
+        plan skip_all => 'Test::Perl::Critic not installed';
     }
 }
 
-my ( @files, @policies );
+my $perl_tidy_conf = 'tools/util/perltidy.conf';
+
+my ( @files, %policies );
 
 while (@ARGV) {
     my $arg = $ARGV[0];
@@ -29,7 +30,7 @@ while (@ARGV) {
         last;
     }
     if ( $arg =~ /^--(.*)/ ) {
-        push @policies, $1;
+        $policies{$1} = 1;
         shift @ARGV;    # discard
     }
     else {
@@ -79,57 +80,45 @@ else {
 }
 
 # By default, don't complain about anything.
-my $critic = Perl::Critic->new( -exclude => [qr/.*/] );
+my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
 
 # Add in the few cases we should care about.
 # For a list of available policies, perldoc Perl::Critic
-if ( !@policies ) {
-    @policies = qw{
-        TestingAndDebugging::RequireUseStrict
-        TestingAndDebugging::RequireUseWarnings
-        Variables::ProhibitConditionalDeclarations
-        InputOutput::ProhibitTwoArgOpen
-        InputOutput::ProhibitBarewordFileHandles
-        NamingConventions::ProhibitAmbiguousNames
-        Subroutines::ProhibitBuiltinHomonyms
-        Subroutines::ProhibitExplicitReturnUndef
-        Subroutines::ProhibitSubroutinePrototypes
-        Subroutines::RequireFinalReturn
-        CodeLayout::UseParrotCoda
-    };
-
-    # Add these policies manually - requires an option.
-    $critic->add_policy(
-        -policy => 'CodeLayout::ProhibitHardTabs',
-        -config => { allow_leading_tabs => 0 }
+if ( !keys %policies ) {
+    %policies = (
+        'TestingAndDebugging::RequireUseStrict'      => 1,
+        'TestingAndDebugging::RequireUseWarnings'    => 1,
+        'Variables::ProhibitConditionalDeclarations' => 1,
+        'InputOutput::ProhibitTwoArgOpen'            => 1,
+        'InputOutput::ProhibitBarewordFileHandles'   => 1,
+        'NamingConventions::ProhibitAmbiguousNames'  => 1,
+        'Subroutines::ProhibitBuiltinHomonyms'       => 1,
+        'Subroutines::ProhibitExplicitReturnUndef'   => 1,
+        'Subroutines::ProhibitSubroutinePrototypes'  => 1,
+        'Subroutines::RequireFinalReturn'            => 1,
+        'CodeLayout::UseParrotCoda'                  => 1,
+        'CodeLayout::ProhibitHardTabs'               => { allow_leading_tabs => 0 },
+        'CodeLayout::RequireTidyCode'                => { perltidyrc => $perl_tidy_conf },
     );
 
     # Give a diag to let users know if this is doing anything, how to repeat.
-    my $tidy_conf = 'tools/util/perltidy.conf';
-    eval "require Perl::Tidy";
-    if ($@) {
-        diag "Perl::Tidy not installed, skipping tidy checks.";
-    }
-    else {
-        diag "Using $tidy_conf for Perl::Tidy settings";
-
-        eval "use Perl::Critic::Policy::CodeLayout::RequireTidyCode 0.2";
-        if ($@) {
-            diag
-                "need Perl::Critic::Policy::CodeLayout::RequireTidyCode 0.2, skipping tidy checks.";
-        }
-        else {
-            $critic->add_policy(
-                -policy => 'CodeLayout::RequireTidyCode',
-                -config => { perltidyrc => $tidy_conf },
-            );
-        }
+    eval { require Perl::Tidy; };
+    if ( !$@ ) {
+        diag "Using $perl_tidy_conf for Perl::Tidy settings";
     }
 }
 
-foreach my $policy (@policies) {
-    $critic->add_policy( -policy => $policy ) or die;
+foreach my $policy ( keys %policies ) {
+    $config->add_policy(
+        -policy => $policy,
+        ref $policies{$policy} ? ( -config => $policies{$policy} ) : (),
+    ) or die;
 }
+
+Test::Perl::Critic->import(
+    -format => '[%p] %m at %l,%c',
+    -config => $config
+);
 
 foreach my $file ( sort @files ) {
     if ( !-r $file ) {
@@ -137,12 +126,7 @@ foreach my $file ( sort @files ) {
         next;
     }
 
-    my @violations = $critic->critique($file);
-    my $output     = join( "\n", @violations );
-
-    # Remove the PBP references to avoid morbid verbosity.
-    $output =~ s/See page.*//g;
-    is( $output, '', $file );
+    Test::Perl::Critic::critic_ok($file);
 }
 
 # Since .t files might be written in any language, we can't *just* check the
