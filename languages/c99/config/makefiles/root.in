@@ -47,20 +47,23 @@ all: c99.pbc #$(PMCDIR)/c99_group$(LOAD_EXT)
 #  src/builtins/io.pir
 
 GEN_PIR = \
-	src/c99_grammar_gen.pir
-#  src/ASTGrammar.pir \
+	src/c99_grammar_gen.pir \
+  src/CPP_ASTGrammar.pir \
 #  src/OSTGrammar.pir \
 #  src/builtins_gen.pir
 
 GEN_PBC = \
-	src/c99_PGE.pbc
-#  src/PGE2AST.pbc \
+	src/c99_grammar_gen.pbc \
+	src/c99_PGE.pbc \
+  src/CPP_PGE2AST.pbc \
+  src/CPP_PASTNodes.pbc
 #  src/AST2OST.pbc \
-#  src/PAST.pbc \
 #  src/POST.pbc
 
 c99.pbc: c99.pir $(GEN_PIR) $(GEN_PBC)
 	$(PARROT) -o c99.pbc --output-pbc c99.pir 
+
+.SUFFIXES : .pir .pg .tg .pbc
 
 .pir.pbc: 
 	$(PARROT) -o $@ --output-pbc $< 
@@ -71,14 +74,14 @@ src/c99_grammar_gen.pir: src/c99.pg
 src/c99_grammar_gen.pbc: src/c99_grammar_gen.pir
 	$(PARROT) -o src/c99_grammar_gen.pbc --output-pbc src/c99_grammar_gen.pir 
 
-#src/CardinalGrammar.pbc: src/CardinalGrammar.pir src/c99_grammar_gen.pir
-#	$(PARROT) -o src/CardinalGrammar.pbc --output-pbc src/CardinalGrammar.pir 
+src/c99_PGE.pbc: src/c99_PGE.pir src/c99_grammar_gen.pir
+	$(PARROT) -o src/c99_PGE.pbc --output-pbc src/c99_PGE.pir 
 
-#src/ASTGrammar.pir: src/ASTGrammar.tg
-#	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/ASTGrammar.pir src/ASTGrammar.tg
+src/CPP_ASTGrammar.pir: src/CPP_ASTGrammar.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/CPP_ASTGrammar.pir src/CPP_ASTGrammar.tg
 
-#src/PGE2AST.pbc: src/PGE2AST.pir src/ASTGrammar.pir src/preamble
-#	$(PARROT) -o src/PGE2AST.pbc --output-pbc src/PGE2AST.pir 
+src/CPP_PGE2AST.pbc: src/CPP_PGE2AST.pir src/CPP_ASTGrammar.pir src/preamble
+	$(PARROT) -o src/CPP_PGE2AST.pbc --output-pbc src/CPP_PGE2AST.pir 
 
 #src/OSTGrammar.pir: src/OSTGrammar.tg
 #	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/OSTGrammar.pir src/OSTGrammar.tg

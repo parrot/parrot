@@ -30,11 +30,12 @@ c99 -- A parser for c99
     print "Parrot C99 Compiler\n"
 
     load_bytecode 'languages/c99/src/c99_PGE.pbc'
-    #load_bytecode 'languages/c99/src/PAST.pir'
-    #load_bytecode 'languages/c99/src/POST.pir'
-    #load_bytecode 'languages/c99/src/PGE2AST.pir'
-    #load_bytecode 'languages/c99/src/AST2OST.pir'
-    #load_bytecode 'languages/c99/src/OST2PIR.pir'
+    load_bytecode 'languages/c99/src/CPP_PGE2AST.pbc'
+    load_bytecode 'languages/c99/src/CPP_PASTNodes.pbc'
+    #load_bytecode 'languages/c99/src/CPP_POST.pbc'
+    #load_bytecode 'languages/c99/src/CPP_PGE2AST.pbc'
+    #load_bytecode 'languages/c99/src/CPP_AST2OST.pbc'
+    #load_bytecode 'languages/c99/src/CPP_OST2PIR.pbc'
 
     .local pmc _dumper
     .local pmc getopts
@@ -55,10 +56,16 @@ c99 -- A parser for c99
     .local string target
     .local int dump_src_early
     .local int dump_pge
+    .local int dump_ast
     
     .local pmc c99_compiler
     .local string filename
     .local string source
+    
+    stopafter = 10
+    dump_src_early = 1
+    dump_pge = 1
+    dump_ast = 1
 
    c99_compiler = compreg 'C99'
     
@@ -111,7 +118,25 @@ c99 -- A parser for c99
     _dumper(parse_tree, "C99 PGE Parse Tree Dump")
   after_pge_dump:
     eq stopafter, 1, end
-    end
+    
+    # "Traverse" the parse tree
+    .local pmc grammar
+    .local pmc astbuilder
+    .local pmc ast
+    grammar = new 'C99::CPP::ASTGrammar'
+    astbuilder = grammar.apply(parse_tree)
+    ast = astbuilder.get('result')
+    $I0 = defined ast
+    unless $I0 goto err_no_ast 
+
+    unless dump_ast goto after_ast_dump
+    print "\n\nAST tree dump:\n"
+    _dumper(ast)
+    #ast.'dump'()
+  after_ast_dump:
+    eq stopafter, 2, end
+
+    exit 0
 
 
   err_parse_fail:

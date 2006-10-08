@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+# $Id: /parrot/offline/languages/cardinal/t/harness 2 2006-09-24T18:45:23.994513Z svm  $
+
+use FindBin;
+use lib qw( . lib ../lib ../../lib ../../lib );
+use Parrot::Test::Harness language => 'C99';
+

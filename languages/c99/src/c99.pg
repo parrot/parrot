@@ -169,8 +169,8 @@ token punctuator {
 
 ## A.1.8 Header names
 token header_name {
-  | \< $name:=<?h_char>+ \>
-  | " $name:=<?q_char>+ "
+  | \< $<name:>=<?h_char>+ \>
+  | " $<name>:=<?q_char>+ "
 }
 
 token h_char { <-[\n>]> }
@@ -208,7 +208,7 @@ rule type_specifier {
 }
 
 rule struct_or_union_specifier {
-  [ $struct:=<'struct'> | $union:=<'union'> ] [ <identifier> | <identifier>? \{ <struct_declaration>+ \} ]
+  [ $<struct>:=<'struct'> | $<union>:=<'union'> ] [ <identifier> | <identifier>? \{ <struct_declaration>+ \} ]
 }
 
 rule struct_declaration { [<type_specifier>|<type_qualifier>]+ <struct_declarator>+ ; }
@@ -331,12 +331,12 @@ token wsnws {
 
 regex prereprocessing_file { <group> }
 
-regex group {
-  [ 
+regex group { <group_line>+ }
+
+regex group_line {
   | <if_section>
   | <control_line>
-  | <source_line>? <?wsnws>
-  ]+ 
+  | <source_line>? $<wsnws>:=<?wsnws>
 }
 
 regex source_line {
@@ -359,26 +359,26 @@ token ws_minus_n
 
 regex if_group {
   [ 
-  | \# <?ws>? $ifndef:=<'ifndef'> <?ws> <identifier>
-  | \# <?ws>? $ifdef:=<'ifdef'> <?ws> <identifier>
-  | \# <?ws>? $if:=<'if'> <?ws> <constant_expression>
+  | \# <?ws>? $<ifndef>:=<'ifndef'> <?ws> <identifier>
+  | \# <?ws>? $<ifdef>:=<'ifdef'> <?ws> <identifier>
+  | \# <?ws>? $<if>:=<'if'> <?ws> <constant_expression>
   ] <?wsnws> <group>?
 }
 
-regex elif_group { \# <?ws> $elif:=<'elif'> <?ws> <constant_expression> <?wsnws> <group>? }
-regex else_group { \# <?ws> $else:=<'else'> <?wsnws> <group>? }
-regex endif_line { \# <?ws> $endif:=<'endif'> <?wsnws> }
+regex elif_group { \# <?ws> $<elif>:=<'elif'> <?ws> <constant_expression> <?wsnws> <group>? }
+regex else_group { \# <?ws> $<else>:=<'else'> <?wsnws> <group>? }
+regex endif_line { \# <?ws> $<endif>:=<'endif'> <?wsnws> }
 regex control_line {
-  | \# <?ws>? $include:=<'include'> <?ws_minus_n> <pp_tokens> <?wsnws>
-  | \# <?ws>? $define:=<'define'> <?ws>
+  | \# <?ws>? $<include>:=<'include'> <?ws_minus_n> $<value>:=<pp_tokens> <?wsnws>
+  | \# <?ws>? $<define>:=<'define'> <?ws>
     [ 
-      | <identifier>
-      | <identifier_p> [ <identifier_list> [, \.\.\.]? | [ \.\.\.] ]? \) 
-    ] <?ws_minus_n>? <pp_tokens>?
-  | \# ?<ws>? $undefine:=<'undefine'> <?ws_minus_n> <identifier> <?wsnws>
-  | \# ?<ws>? $line:=<'line'> <?ws_minus_n> <pp_tokens> <?wsnws>
-  | \# ?<ws>? $error:=<'error'> <?ws_minus_n> <pp_tokens>? <?wsnws>
-  | \# ?<ws>? $pragma:=<'pragma'> <?ws_minus_n> <pp_tokens>? <?wsnws>
+      | $<define_name>:=<identifier>
+      | $<define_function>:=(<identifier_p> [ <identifier_list> [, \.\.\.]? | [ \.\.\.] ]? \)) 
+    ] <?ws_minus_n>? $<value>:=<pp_tokens>?
+  | \# ?<ws>? $<undefine>:=<'undefine'> <?ws_minus_n> <identifier> <?wsnws>
+  | \# ?<ws>? $<line>:=<'line'> <?ws_minus_n> $<value>:=<pp_tokens> <?wsnws>
+  | \# ?<ws>? $<error>:=<'error'> <?ws_minus_n> $<value>:=<pp_tokens>? <?wsnws>
+  | \# ?<ws>? $<pragma>:=<'pragma'> <?ws_minus_n> $<value>:=<pp_tokens>? <?wsnws>
   | \# <?wsnws>
 
 }
@@ -413,7 +413,7 @@ rule unary_expression {
   [<'++'>|<'--'>|<'sizeof'>]? 
 
   [ <postfix_expression>
-  | $unary_op:=<[&*+\-~!]> <cast_expression>
+  | $<unary_op>:=<[&*+\-~!]> <cast_expression>
   | <'sizeof'> \( <type_name> \)
   ]
 }

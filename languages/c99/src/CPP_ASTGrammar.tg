@@ -1,0 +1,336 @@
+grammar C99::CPP::ASTGrammar is TGE::Grammar;
+
+transform result (ROOT) :language('PIR') {
+    debug_init
+    
+    .local pmc child
+    $I0 = defined node['group']
+    unless $I0 goto err_no_tree
+    $P0 = node['group']
+    child = tree.get('result', $P0, 'C99::CPP::ASTGrammar::group')
+    .return (child)
+
+  err_no_tree:
+    print "The top-level node doesn't contain an 'group' match.\n"
+    end
+}
+
+transform result (C99::CPP::ASTGrammar::group) :language('PIR') {
+    .local pmc child
+    .local pmc result
+    result = new 'C99::CPP::PAST::Node'
+    result.'init'()
+
+    $I0 = defined node['group_line']
+    unless $I0 goto err_no_tree
+    $P0 = node['group_line']
+
+    .local pmc iter
+    iter = new Iterator, $P0
+  iter_loop:
+    unless iter, iter_end
+    $P1 = shift iter
+    child = tree.get('result', $P1, 'C99::CPP::ASTGrammar::group_line')
+    result.add_child(child)
+    goto iter_loop
+ iter_end:
+    .return (result)
+
+  err_no_tree:
+    $S0 = "The group node doesn't contain an 'group_line' match.\n"
+    print $S0
+    .kdump(node)
+    print $S0
+    end
+}
+
+transform result (C99::CPP::ASTGrammar::group_line) :language('PIR') {
+    .local pmc child
+
+    $I0 = defined node['if_section']
+    unless $I0 goto control_line
+    $P1 = node['if_section']
+    child = tree.get('result', $P1, 'C99::CPP::ASTGrammar::if_section')
+    .return (child)
+
+   control_line:
+     $I0 = defined node['control_line']
+    unless $I0 goto source_line
+    $P1 = node['control_line']
+    child = tree.get('result', $P1, 'C99::CPP::ASTGrammar::control_line')
+    .return (child)
+
+  source_line:
+    $I0 = defined node['source_line']
+    unless $I0 goto wsnws
+    $S0 = node
+    child = new 'C99::CPP::PAST::SOURCE_LINE'
+    child .'init'('line'=>$S0)
+    .return (child)
+
+  wsnws:
+    $I0 = defined node['wsnws']
+    unless $I0 goto err_no_tree
+    $S0 = node
+    child = new 'C99::CPP::PAST::WSNWS'
+    child .'init'('line'=>$S0)
+    .return (child)
+
+   err_no_tree:
+    $S0 = "The group_line node doesn't contain an 'if_section' match.\n"
+    print $S0
+    .kdump(node)
+    print $S0
+    end
+}
+
+transform result (C99::CPP::ASTGrammar::if_section) :language('PIR') {
+    .local pmc child
+    .local pmc result
+    result = new 'C99::CPP::PAST::IF_SECTION'
+    result.'init'('node'=>node)
+
+    $I0 = defined node['if_group']
+    unless $I0 goto err_no_tree
+    $P0 = node['if_group']
+    child = tree.get('result', $P0, 'C99::CPP::ASTGrammar::if_group')
+    result.add_child(child)
+    
+    .local pmc iter
+    $I0 = defined node['elif_group']
+    unless $I0 goto else_group
+    $P0 = node['elif_group']
+    iter = new Iterator, $P0
+  iter_loop:
+    unless iter, iter_end
+    $P1 = shift iter
+    child = tree.get('result', $P1, 'C99::CPP::ASTGrammar::elif_group')
+    result.add_child(child)
+    goto iter_loop
+
+  else_group:
+    $I0 = defined node['else_group']
+    unless $I0 goto return
+    $P0 = node['else_group']
+    child = tree.get('result', $P0, 'C99::CPP::ASTGrammar::else_group')
+    result.add_child(child)
+  iter_end:
+
+  return:
+    .return (result)
+
+  err_no_tree:
+    $S0 = "The if_section node doesn't contain an 'if*_group' match.\n"
+    print $S0 
+    .kdump(node)
+    print $S0
+    end
+}
+
+transform result (C99::CPP::ASTGrammar::if_group) :language('PIR') {
+    .local pmc result
+
+    $I0 = defined node['ifndef']
+    unless $I0 goto ifdef_lbl
+    result = new 'C99::CPP::PAST::IFNDEF'
+    result.'init'('node'=>node)
+    goto parts
+
+  ifdef_lbl:
+    $I0 = defined node['ifdef']
+    unless $I0 goto if_lbl
+    $P0 = node['ifdef']
+    result = new 'C99::CPP::PAST::IFDEF'
+    result.'init'('node'=>node)
+    goto parts
+
+  if_lbl:
+    $I0 = defined node['if']
+    unless $I0 goto err_no_tree
+    $P0 = node['if']
+    result = new 'C99::CPP::PAST::IF'
+    result.'init'('node'=>node)
+    goto parts
+
+  parts:
+    $I0 = defined node['identifier']
+    unless $I0 goto constant_expression
+    $P0 = node['identifier']
+    $S0 = $P0
+    result.'line'($S0)
+  constant_expression:
+    $I0 = defined node['constant_expression']
+    unless $I0 goto group
+    $P0 = node['constant_expression']
+    $S0 = $P0
+    result.'line'($S0)
+  group:
+    $I0 = defined node['group']
+    unless $I0 goto err_no_tree
+    $P0 = node['group' ; 0]
+    $P1= tree.get('result', $P0, 'C99::CPP::ASTGrammar::group')
+    $P2 = $P1.'children'()
+    result.'append_children'($P2)
+    .return (result)
+
+
+  err_no_tree:
+    $S0 = "The if_group node doesn't contain an 'if*' match.\n"
+    print $S0
+    .kdump(node)
+    print $S0
+    end
+}
+
+transform result (C99::CPP::ASTGrammar::elif_group) :language('PIR') {
+    .local pmc result
+
+    $I0 = defined node['elif']
+    unless $I0 goto err_no_tree
+    result = new 'C99::CPP::PAST::ELIF'
+    result.'init'('node'=>node)
+
+    $I0 = defined node['constant_expression']
+    unless $I0 goto err_no_tree
+    $P0 = node['constant_expression']
+    $S0 = $P0
+    result.'line'($S0)
+  group:
+    $I0 = defined node['group']
+    unless $I0 goto err_no_tree
+    $P0 = node['group' ; 0]
+    $P1= tree.get('result', $P0, 'C99::CPP::ASTGrammar::group')
+    $P2 = $P1.'children'()
+    result.'append_children'($P2)
+    .return (result)
+
+
+  err_no_tree:
+    $S0 = "The elif_group node doesn't contain an 'if*' match.\n"
+    print $S0
+    .kdump(node)
+    print $S0
+    end
+}
+
+transform result (C99::CPP::ASTGrammar::elif_group) :language('PIR') {
+    .local pmc result
+
+    $I0 = defined node['elif']
+    unless $I0 goto err_no_tree
+    result = new 'C99::CPP::PAST::ELIF'
+    result.'init'('node'=>node)
+
+    $I0 = defined node['group']
+    unless $I0 goto err_no_tree
+    $P0 = node['group' ; 0]
+    $P1= tree.get('result', $P0, 'C99::CPP::ASTGrammar::group')
+    $P2 = $P1.'children'()
+    result.'append_children'($P2)
+    .return (result)
+
+
+  err_no_tree:
+    $S0 = "The elif_group node doesn't contain an 'if*' match.\n"
+    print $S0
+    .kdump(node)
+    print $S0
+    end
+}
+
+transform result (C99::CPP::ASTGrammar::control_line) :language('PIR') {
+    .local pmc child
+    .local pmc result
+
+    $I0 = defined node['include']
+    unless $I0 goto define_function_lbl
+    result = new 'C99::CPP::PAST::INCLUDE'
+    result.'init'('node'=>node)
+    bsr pp_tokens
+    .return (result)
+
+  define_function_lbl:
+    $I0 = defined node['define_function']
+    unless $I0 goto define_lbl
+    result = new 'C99::CPP::PAST::DEFINE_FUNCTION'
+    result.'init'('node'=>node)
+    $P0 = node['define_function']
+    $S0 = $P0
+    result.'name'($S0)
+    bsr pp_tokens
+    .return (result)
+
+  define_lbl:
+    $I0 = defined node['define']
+    unless $I0 goto undefine_lbl
+    result = new 'C99::CPP::PAST::DEFINE'
+    result.'init'('node'=>node)
+    $I0 = defined node['define_name']
+    unless $I0 goto no_id
+    $P0 = node['define_name']
+    $S0 = $P0
+    result.'name'($S0)
+  no_id:
+    bsr pp_tokens
+    .return (result)
+
+  undefine_lbl:
+    $I0 = defined node['undefine']
+    unless $I0 goto line_lbl
+    result = new 'C99::CPP::PAST::UNDEFINE'
+    bsr pp_tokens
+    .return (result)
+
+  line_lbl:
+    $I0 = defined node['line']
+    unless $I0 goto error_lbl
+    result = new 'C99::CPP::PAST::LINE'
+    result.'init'('node'=>node)
+    bsr pp_tokens
+    .return (result)
+
+  error_lbl:
+    $I0 = defined node['error']
+    unless $I0 goto pragma_lbl
+    result = new 'C99::CPP::PAST::ERROR'
+    result.'init'('node'=>node)
+    bsr pp_tokens
+    .return (result)
+
+  pragma_lbl:
+    $I0 = defined node['pragma']
+    unless $I0 goto err_no_tree
+    result = new 'C99::CPP::PAST::PRAGMA'
+    result.'init'('node'=>node)
+    bsr pp_tokens
+    .return (result)
+
+  pp_tokens:
+    $I0 = defined node['value']
+    unless $I0 goto notoks1
+    $P0 = node['value']
+    $S0 = $P0
+    result.'line'($S0)
+    notoks1:
+    ret
+
+  err_no_tree:
+    print "The control_line node doesn't contain an appropriate match.\n"
+    print $S0
+    .kdump(node)
+    print $S0
+    end
+}
+
+=head1 LICENSE
+
+Copyright (C) 2006, The Perl Foundation.
+
+This is free software; you may redistribute it and/or modify
+it under the same terms as Parrot.
+
+=head1 AUTHOR
+
+Kevin Tew <tewk@tewk.com>
+
+=cut

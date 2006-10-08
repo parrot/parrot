@@ -1,0 +1,97 @@
+.macro kdump ( x )
+    .sym pmc it
+    it = get_root_global ['parrot'], '_dumper'
+    it(.x)
+.endm
+
+.macro kdump2 ( x, d)
+    .sym pmc it
+    it = get_root_global ['parrot'], '_dumper'
+    it(.x, .d)
+.endm
+
+.macro dump_root
+    .sym string it
+    .sym pmc ns
+    ns = get_root_namespace [ 'parrot'; 'Cardinal::Grammar' ]
+    .sym pmc iter
+    iter = new Iterator, ns
+    set iter, 0
+    .local $iter_loop:
+    unless iter, .$iter_end
+    shift it, iter
+    print it
+    print "\n"
+    goto .$iter_loop
+    .local $iter_end:
+.endm
+
+.macro dump_hll
+    .sym string it
+    .sym pmc ns
+    ns = get_hll_namespace
+    .sym pmc iter
+    iter = new Iterator, ns
+    set iter, 0
+    .local $iter_loop:
+    unless iter, .$iter_end
+    shift it, iter
+    print it
+    print "\n"
+    goto .$iter_loop
+    .local $iter_end:
+.endm
+
+.macro dump_hll2
+    .sym string it
+    .sym pmc ns
+    ns = get_hll_namespace
+    .sym pmc iter
+    iter = new Iterator, ns
+    set iter, 0
+    .local $iter_loop:
+    unless iter, .$iter_end
+    shift it, iter
+    print it
+    print "\n"
+    goto .$iter_loop
+    .local $iter_end:
+.endm
+
+.macro dump_current
+    .sym string it
+    .sym pmc ns
+    ns = get_namespace
+    .sym pmc iter
+    iter = new Iterator, ns
+    set iter, 0
+    .local $iter_loop:
+    unless iter, .$iter_end
+    shift it, iter
+    print it
+    print "\n"
+    goto .$iter_loop
+    .local $iter_end:
+.endm
+
+.macro gen_accessor(x)
+.sub .x :method
+  .param pmc value           :optional
+  .param int has_value       :opt_flag
+  .return self.'attr'(.x, value, has_value)
+.end
+.endm
+
+.macro gen_get_accessor(x)
+.sub .x :method
+    null $P0
+    .return self.'attr'(.x, $P0, 0)
+.end
+.endm
+
+.macro gen_dumplist(x)
+.sub '__dumplist' :method
+    .return (.x)
+.end
+.endm
+
