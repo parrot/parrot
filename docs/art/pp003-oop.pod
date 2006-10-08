@@ -92,7 +92,7 @@ So now that I've created a C<Dog> class, how do I add methods
 to it?  Remember before when I talked about namespaces?  Well,
 that's the answer.  To add methods to a class, you create a
 namespace with the same name as the class and then put your
-subroutines in that namespace. Parrot also provides a syntactic
+subroutines in that namespace. PIR also provides a syntactic
 marker to let everyone know these subroutines are methods.  When
 declaring the subroutine add the C<:method> modifier after the
 subroutine name.  Here's a familiar example to anyone who has
@@ -143,6 +143,44 @@ tell Parrot to create a class and as a side effect,
 namespaces with the same name as the class may be used to
 store methods for that class.
 
+One thing you may notice about method calls is that the
+method names are quoted. Why is that?  In the current design,
+quoting the method name is the only way to avoid ambiguity
+between actual method names and local variables that contain the
+method name.
+
+=head3 Example 4: variable methods
+
+    .namespace [ 'Foo' ]
+
+    .sub foo :method
+        print "foo\n"
+    .end
+
+    .sub bar :method
+        print "bar\n"
+    .end
+
+    .namespace
+
+    .sub _ :main
+        $P0 = newclass "Foo"
+        .local pmc f
+        f = new "Foo"
+
+        .local string m
+        m = "foo"
+        f.m()
+        m = "bar"
+        f.m()
+    .end
+
+There has been some discussion of changing the syntax
+slightly so that when a variable is used for the method
+name, it is designated in some way so that the common case
+of calling a normal method name does not need to be quoted,
+but as of this writing, no such change has happened.
+
 =head2 But where do I store my stuff?
 
 So far I've talked about namespaces and creating classes
@@ -166,7 +204,7 @@ So, say I wanted to give my barnyard animals names (I'll
 illustrate with just one animal and you can infer how to do the
 same for the rest):
 
-=head3 Example 4: Naming my animals
+=head3 Example 5: Naming my animals
 
     .namespace [ "Dog" ]
 
@@ -241,7 +279,7 @@ class called "Animal" that contains the "name" attribute and
 C<getname> Then, to create new animals, I just inherit from
 the Animal base class like so:
 
-=head3 Example 5: inheriting
+=head3 Example 6: inheriting
 
     ...
     $P0 = newclass "Animal"
@@ -271,11 +309,11 @@ there are more opcodes for richer object oriented behavior
 available in Parrot.  This article only covers the basics.  For
 more information see parrot/docs/pdds/pdd15_objects.pod.
 
-At the end of this article is a complete listing of the
-final program that gives my barnyard animals voices.
-There are many improvements that can be made to this code
-so take this opportunity to experiment and learn more
-about OOP in Parrot.
+At the end of this article is a more complete listing of the
+program that gives my barnyard animals voices. There are
+many improvements that can be made to this code so take this
+opportunity to read and experiment and learn more about OOP
+in Parrot.
 
 =head2 Acknowledgements 
 
@@ -308,22 +346,32 @@ Jonathan Scott Duff
         print $P0
     .end
 
+    .sub speak :method
+        .local string name, sound
+        name = self.'getname'()
+        sound = self.'sound'()
+        print name
+        print " says "
+        print sound
+        print "\n"
+    .end
+
     .namespace [ "Cow" ]
 
-    .sub speak :method
-        print "Moo"
+    .sub sound :method
+        .return( "moo" )
     .end
 
     .namespace [ "Dog" ]
 
-    .sub speak :method
-        print "Woof"
+    .sub sound :method
+        .return( "woof" )
     .end
 
     .namespace [ "Pig" ]
 
-    .sub speak :method
-        print "Oink"
+    .sub sound :method
+        .return( "oink" )
     .end
 
     .namespace
@@ -344,20 +392,9 @@ Jonathan Scott Duff
         pig   = new "Pig"
         pig.'setname'("Porky")
         
-        cow.'getname'()
-        print " says "
         cow.'speak'()
-        print "\n"
-
-        dog.'getname'()
-        print " says "
         dog.'speak'()
-        print "\n"
-
-        pig.'getname'()
-        print " says "
         pig.'speak'()
-        print "\n"
     .end
 
 =cut
