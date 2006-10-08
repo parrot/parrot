@@ -7,9 +7,9 @@ use Parrot::Test tests => 1;
 use Test::More;
 
 TODO: {
-local $TODO = 'unimplemented feature';
+    local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'op.list');
+    language_output_is( 'punie', <<'EOC', <<'OUT', 'op.list' );
 #!./perl
 
 # $Header: op.list,v 1.0 87/12/18 13:13:50 root Exp $
@@ -61,3 +61,10 @@ ok 11
 OUT
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

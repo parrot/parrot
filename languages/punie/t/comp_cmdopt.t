@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
 use Test::More;
 
-language_output_is('punie', <<'EOC', <<'OUT', 'short circuiting AND');
+language_output_is( 'punie', <<'EOC', <<'OUT', 'short circuiting AND' );
 $x = 1;
 if (1 && $x) { print "ok 9\n";} else { print "not ok 9\n";}
 if (0 && $x) { print "not ok 10\n";} else { print "ok 10\n";}
@@ -33,7 +33,7 @@ ok 27
 ok 28
 OUT
 
-language_output_is('punie', <<'EOC', <<'OUT', 'short circuiting OR');
+language_output_is( 'punie', <<'EOC', <<'OUT', 'short circuiting OR' );
 $x = 1;
 if (1 || $x) { print "ok 13\n";} else { print "not ok 13\n";}
 if (0 || $x) { print "ok 14\n";} else { print "not ok 14\n";}
@@ -60,11 +60,10 @@ ok 31
 ok 32
 OUT
 
-
 TODO: {
-local $TODO = 'unimplemented feature';
+    local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'comp.cmdopt');
+    language_output_is( 'punie', <<'EOC', <<'OUT', 'comp.cmdopt' );
 #!./perl
 
 # $Header: comp.cmdopt,v 1.0 87/12/18 13:12:19 root Exp $
@@ -194,3 +193,10 @@ ok 40
 OUT
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

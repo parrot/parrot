@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 use Test::More;
 
-language_output_is('punie', <<'CODE', <<'OUT', 'a do block');
+language_output_is( 'punie', <<'CODE', <<'OUT', 'a do block' );
 do{
     print "ok 7\n";
     print "ok 8\n";
@@ -19,9 +19,9 @@ ok 9
 OUT
 
 TODO: {
-local $TODO = 'unimplemented feature';
+    local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'op.do');
+    language_output_is( 'punie', <<'EOC', <<'OUT', 'op.do' );
 #!./perl
 
 # $Header: op.do,v 1.0 87/12/18 13:13:20 root Exp $
@@ -70,3 +70,10 @@ ok 8
 OUT
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

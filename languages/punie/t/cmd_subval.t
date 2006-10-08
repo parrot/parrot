@@ -7,9 +7,9 @@ use Parrot::Test tests => 1;
 use Test::More;
 
 TODO: {
-local $TODO = 'unimplemented feature';
+    local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'cmd.subval');
+    language_output_is( 'punie', <<'EOC', <<'OUT', 'cmd.subval' );
 #!./perl
 
 # $Header: cmd.subval,v 1.0 87/12/18 13:12:12 root Exp $
@@ -79,3 +79,10 @@ ok 12
 OUT
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

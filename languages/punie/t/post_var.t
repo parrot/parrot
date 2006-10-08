@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
 
-pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
+pir_output_is( <<'CODE', <<'OUT', 'set attributes via method' );
 .sub _main
     load_bytecode 'languages/punie/lib/POST.pir'
     .local pmc node
@@ -30,7 +30,7 @@ foo
 bar
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'dump node structure in visual format');
+pir_output_is( <<'CODE', <<'OUT', 'dump node structure in visual format' );
 .sub _main
     load_bytecode 'languages/punie/lib/POST.pir'
     .local pmc node
@@ -52,7 +52,7 @@ CODE
 }
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'generate a temporary variable');
+pir_output_is( <<'CODE', <<'OUT', 'generate a temporary variable' );
 .sub _main
     load_bytecode 'languages/punie/lib/POST.pir'
     .local pmc node
@@ -69,3 +69,10 @@ CODE
 $P1
 $P2
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

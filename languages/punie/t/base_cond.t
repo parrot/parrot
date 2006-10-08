@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 use Test::More;
 
-language_output_is('punie', <<'CODE', <<'OUT', 'simple comparisons');
+language_output_is( 'punie', <<'CODE', <<'OUT', 'simple comparisons' );
 
 $x = 4;
 
@@ -55,9 +55,9 @@ ok 18
 OUT
 
 TODO: {
-local $TODO = 'unimplemented feature';
+    local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'base.cond');
+    language_output_is( 'punie', <<'EOC', <<'OUT', 'base.cond' );
 #!./perl
 
 # $Header: base.cond,v 1.0 87/12/18 13:11:41 root Exp $
@@ -87,3 +87,10 @@ ok 4
 OUT
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

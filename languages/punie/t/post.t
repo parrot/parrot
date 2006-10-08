@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
 
-pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
+pir_output_is( <<'CODE', <<'OUT', 'load the libraries' );
 .sub _main
     load_bytecode 'languages/punie/lib/POST.pir'
 .end
@@ -13,15 +13,15 @@ CODE
 OUT
 
 foreach my $module (qw(Sub Ops)) {
-my $code = <<'CODE'
+    my $code = <<'CODE'
 .sub _main
     load_bytecode 'languages/punie/lib/POST.pir'
     .local pmc node
 CODE
-;
+        ;
 
-$code .= "    node = new 'POST::$module'\n";
-$code .= <<'CODE'
+    $code .= "    node = new 'POST::$module'\n";
+    $code .= <<'CODE'
     $P0 = new .String
     $P0 = 'bar'
     node.'source'('foo')
@@ -41,12 +41,19 @@ $code .= <<'CODE'
     .return ()
 .end
 CODE
-;
+        ;
 
-pir_output_is($code, <<'OUT', "set attributes for POST::$module via method");
+    pir_output_is( $code, <<'OUT', "set attributes for POST::$module via method" );
 foo
 42
 bar
 OUT
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

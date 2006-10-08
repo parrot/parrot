@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 5;
 use Test::More;
 
-language_output_is('punie', <<'CODE', <<'OUT', 'simple conditionals');
+language_output_is( 'punie', <<'CODE', <<'OUT', 'simple conditionals' );
 if (1) {
   print "ok 1\n";
 }
@@ -24,7 +24,7 @@ ok 1
 ok 2
 OUT
 
-language_output_is('punie', <<'CODE', <<'OUT', 'else/elsif conditionals');
+language_output_is( 'punie', <<'CODE', <<'OUT', 'else/elsif conditionals' );
 if (1) {
   print "ok 1\n";
 } elsif (0) {
@@ -50,7 +50,7 @@ ok 2
 ok 3
 OUT
 
-language_output_is('punie', <<'CODE', <<'OUT', 'conditional expression');
+language_output_is( 'punie', <<'CODE', <<'OUT', 'conditional expression' );
 if (1 + 1) {
   print "ok 1\n";
 }
@@ -58,14 +58,14 @@ CODE
 ok 1
 OUT
 
-language_output_is('punie', <<'CODE', <<'OUT', 'conditional with variable');
+language_output_is( 'punie', <<'CODE', <<'OUT', 'conditional with variable' );
 $x = 'test';
 if ($x) { print "ok 1\n"; } else { print "not ok 1\n";}
 CODE
 ok 1
 OUT
 
-language_output_is('punie', <<'EOC', <<'OUT', 'base.if');
+language_output_is( 'punie', <<'EOC', <<'OUT', 'base.if' );
 #!./perl
 
 # $Header: base.if,v 1.0 87/12/18 13:11:45 root Exp $
@@ -84,3 +84,9 @@ ok 1
 ok 2
 OUT
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -6,16 +6,16 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 use Test::More;
 
-language_output_is('punie', <<'CODE', <<'OUT', 'a simple label');
+language_output_is( 'punie', <<'CODE', <<'OUT', 'a simple label' );
 label1: print "ok 1\n";
 CODE
 ok 1
 OUT
 
 TODO: {
-local $TODO = 'unimplemented feature';
+    local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'op.goto');
+    language_output_is( 'punie', <<'EOC', <<'OUT', 'op.goto' );
 #!./perl
 
 # $Header: op.goto,v 1.0 87/12/18 13:13:40 root Exp $
@@ -59,3 +59,10 @@ ok 3
 OUT
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

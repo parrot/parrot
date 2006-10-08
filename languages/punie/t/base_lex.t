@@ -7,9 +7,9 @@ use Parrot::Test tests => 1;
 use Test::More;
 
 TODO: {
-local $TODO = 'unimplemented feature';
+    local $TODO = 'unimplemented feature';
 
-language_output_is('punie', <<'EOC', <<'OUT', 'base.lex');
+    language_output_is( 'punie', <<'EOC', <<'OUT', 'base.lex' );
 #!./perl
 
 # $Header: base.lex,v 1.0.1.1 88/01/28 10:37:00 root Exp $
@@ -54,3 +54,10 @@ ok 6
 OUT
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
