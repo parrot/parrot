@@ -1,13 +1,8 @@
-package Parrot::Embed;
-
-use strict;
-use warnings;
+package Parrot::PMC;
 
 our $VERSION = '0.02';
 
-use base 'DynaLoader';
-
-Parrot::Embed->bootstrap( $VERSION );
+use Parrot::Embed;
 
 1;
 
@@ -15,7 +10,7 @@ __END__
 
 =head1 NAME
 
-Parrot::Embed - use Parrot from Perl 5
+Parrot::PMC - access to a Parrot PMC from Perl 5
 
 =head1 VERSION
 
@@ -23,11 +18,15 @@ Version 0.02
 
 =head1 SYNOPSIS
 
-This module embeds libparrot in Perl 5 programs.  You can load Parrot bytecode,
-compile your own code, and call Parrot subroutines and send and receive values
-to them.
+	# find a subroutine to invoke
+	my $sub_pmc       = $interp->find_global( 'some_parrot_sub' );
+	my $other_sub_pmc = $interp->find_global( 'another_sub', 'NameSpace' );
 
-Do consider using C<Parrot::Interpreter> first however.
+	# invoke the subroutine
+	my $result_pmc    = $interp->invoke( $sub_pmc, $signature, @args );
+
+	# get the values out of it
+	my $string_val    = $result_pmc->get_string( $interp );
 
 =head1 AUTHOR
 

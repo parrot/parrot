@@ -1,6 +1,10 @@
 TODO:
 	- move tests into ../../t during build ?
 	- update with new embedding strategy
-	- make Parrot::Interpreter and Parrot::PMC objects
-	- create methods on those objects
 	- allow more signatures on call_sub()
+	- fill in method documentation for Parrot::Interpreter and Parrot::PMC
+	- store parent interpreter in Parrot::PMC objects
+	- allow invoke() on appropriate Parrot::PMC objects directly
+	- bless Parrot::PMC objects into appropriate subclasses if possible
+	- allow overloading magic on Parrot::PMC objects
+	- improve tests for failure conditions

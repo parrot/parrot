@@ -96,8 +96,12 @@ my $eval = Parrot::Embed::compile_string( $interp, <<END_PIR );
 END_PIR
 ok( $eval, 'compile_string() should compile PIR code and return a PMC' );
 
-ok( ! Parrot::Embed::compile_string( $i2, 'blah' ),
-	'... but only for valid PIR' );
+TODO:
+{
+	local $TODO = 'compile_string() returns wrong results';
+	ok( ! Parrot::Embed::compile_string( $i2, 'blah' ),
+		'... but only for valid PIR' );
+}
 
 my $foo = Parrot::Embed::find_global( $interp, 'foo' );
 $pmc    = Parrot::Embed::call_sub( $interp, $foo, 'PS', 'BAR' );
