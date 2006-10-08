@@ -19,13 +19,8 @@ Test MIME::Base64.
     load_bytecode 'Test/More.pir'
     load_bytecode 'MIME/Base64.pir'
  
-    .local pmc enc_sub, dec_sub
-    enc_sub = find_global "MIME::Base64", 'encode_base64'
-    dec_sub = find_global "MIME::Base64", 'decode_base64'
-    
     .local pmc plan, is
     plan = find_global "Test::More", 'plan'
-    is   = find_global "Test::More", 'is'
     
     plan(4)
 
@@ -40,13 +35,12 @@ Test MIME::Base64.
     .param string comment
 
     .local pmc enc_sub, dec_sub
-    enc_sub = find_global "MIME::Base64", 'encode_base64'
-    dec_sub = find_global "MIME::Base64", 'decode_base64'
+    enc_sub = get_global [ "MIME"; "Base64" ], 'encode_base64'
+    dec_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
     
     .local pmc plan, is
     is   = find_global 'Test::More', 'is'
     
-
     .local string result_encode, comment_encode
     result_encode = enc_sub( plain )
     comment_encode = 'encode: ' . comment 

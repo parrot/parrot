@@ -43,7 +43,7 @@ then a warning is generated if perl is running under -w.
 
 =cut
 
-.namespace [ "MIME::Base64" ]
+.namespace [ "MIME"; "Base64" ]
 
 .sub init :load
 
@@ -67,8 +67,8 @@ then a warning is generated if perl is running under -w.
         six_to_eight[six]   = eight
         inc six
     if six < 64 goto START_1
-    store_global 'MIME::Base64', 'eight_to_six', eight_to_six
-    store_global 'MIME::Base64', 'six_to_eight', six_to_eight
+    set_global 'eight_to_six', eight_to_six
+    set_global 'six_to_eight', six_to_eight
 .end
 
 .sub encode_base64
