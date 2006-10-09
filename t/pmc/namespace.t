@@ -912,17 +912,18 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_root_namespace "Foo"');
 .sub main :main
     .local pmc foo_ns
-    foo_ns = get_root_namespace [ "Foo" ]
+    foo_ns = get_root_namespace [ "foo" ]
     .local int is_defined
     is_defined = defined foo_ns
     unless is_defined goto NO_NAMESPACE_FOUND
-        print "Found root namespace 'Foo'.\n"
+        print "Found root namespace 'foo'.\n"
     NO_NAMESPACE_FOUND:
 .end
-
-.namespace [ "NotFoo" ]
+.HLL 'Foo', ''
+.sub dummy
+.end
 CODE
-Found root namespace 'Foo'.
+Found root namespace 'foo'.
 OUTPUT
 
 
