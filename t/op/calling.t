@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 95;
+use Parrot::Test tests => 96;
 
 
 =head1 NAME
@@ -2440,3 +2440,24 @@ CODE
 /positional inside named args at position 3/
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments" );
+.sub 'main' :main
+	.local pmc args
+	args = new .Hash
+	args['foo'] = 1
+	args['bar'] = 2
+
+	bar_only( args :flat :named )
+.end
+
+.sub 'bar_only'
+	.param string bar  :named( 'bar' )
+	.param pmc    args :named :slurpy
+
+	print "Have bar: "
+	print bar
+	print "\n"
+.end
+CODE
+Have bar: 2
+OUTPUT
