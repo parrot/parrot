@@ -50,6 +50,15 @@ sub runstep {
     print " ($generated) " if $verbose;
     print("\n") if defined $verbose && $verbose == 2;
 
+    my $coda = <<'CODA';
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+CODA
+
     # headers are merged into platform.h
     my @headers = qw/
         io.h
@@ -88,13 +97,20 @@ END_HERE
             local $/ = undef;
             print("\t$header_file\n") if defined $verbose && $verbose == 2;
             open IN_H, "< $header_file" or die "Can't open $header_file: $!";
+
+	    # slurp in the header file
+	    my $in_h = <IN_H>;
+
+	    # remove the (in this case) superfluous coda
+	    $in_h =~ s{\Q$coda\E\n*\z}{}xgs;
+
             print PLATFORM_H <<"END_HERE";
 /*
 ** $header_file:
 */
 #line 1 "$header_file"
 END_HERE
-            print PLATFORM_H <IN_H>, "\n\n";
+            print PLATFORM_H $in_h, "\n\n";
             close IN_H;
         }
 
@@ -127,6 +143,12 @@ END_HERE
 
     print PLATFORM_H <<'END_HERE';
 #endif
+END_HERE
+
+    # append the C code coda to the generated file
+    print PLATFORM_H <<"END_HERE";
+
+$coda
 END_HERE
 
     close PLATFORM_H;
@@ -162,13 +184,20 @@ END_HERE
     if (-e "config/gen/platform/$platform/begin.c") {
         local $/ = undef;
         open IN_C, "< config/gen/platform/$platform/begin.c" or die "Can't open begin.c: $!";
+
+	# slurp in the C file
+	my $in_c = <IN_C>;
+
+	# remove the (in this case) superfluous coda
+	$in_c =~ s{\Q$coda\E\n*\z}{}xgs;
+
         print PLATFORM_C <<"END_HERE";
 /*
 ** begin.c
 */
 #line 1 "config/gen/platform/$platform/begin.c"
 END_HERE
-        print PLATFORM_C <IN_C>, "\n\n";
+        print PLATFORM_C $in_c, "\n\n";
         close IN_C;
     }
 
@@ -188,13 +217,20 @@ END_HERE
             local $/ = undef;
             print("\t$impl_file\n") if defined $verbose && $verbose == 2;
             open IN_C, "< $impl_file" or die "Can't open $impl_file: $!";
+
+	    # slurp in the C file
+	    my $in_c = <IN_C>;
+
+	    # remove the (in this case) superfluous coda
+	    $in_c =~ s{\Q$coda\E\n*\z}{}xgs;
+
             print PLATFORM_C <<"END_HERE";
 /*
 ** $impl_file:
 */
 #line 1 "$impl_file"
 END_HERE
-            print PLATFORM_C <IN_C>, "\n\n";
+            print PLATFORM_C $in_c, "\n\n";
             close IN_C;
         }
     }
@@ -216,6 +252,12 @@ END_HERE
             close IN_C;
         }
     }
+
+    # append the C code coda to the generated file
+    print PLATFORM_C <<"END_HERE";
+
+$coda
+END_HERE
 
     close PLATFORM_C;
 
