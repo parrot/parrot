@@ -213,7 +213,8 @@ clear_regs(Interp *interpreter, parrot_context_t *ctx)
         for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
             CTX_REG_NUM(ctx, i) = -99.9;
         }
-    } else {
+    } 
+    else {
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
             CTX_REG_INT(ctx, i) = -888;
         }

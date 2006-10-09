@@ -720,7 +720,8 @@ PackFile_add_segment (Interp* interpreter, struct PackFile_Directory *dir,
             mem_sys_realloc(dir->segments,
                     sizeof (struct PackFile_Segment *) *
                     (dir->num_segments+1));
-    } else {
+    } 
+    else {
         dir->segments = mem_sys_allocate(sizeof (struct PackFile_Segment *) *
                 (dir->num_segments+1));
     }
@@ -1451,7 +1452,8 @@ directory_unpack (Interp *interpreter,
             mem_sys_realloc (dir->segments,
                              sizeof(struct PackFile_Segment *) * 
                              dir->num_segments);
-    } else {
+    } 
+    else {
         dir->segments =
             mem_sys_allocate(sizeof(struct PackFile_Segment *) * 
                              dir->num_segments);
@@ -2519,7 +2521,8 @@ clone_constant(Interp *interpreter, struct PackFile_Constant *old_const) {
         ret->u.key = new_sub;
 
         return ret;
-    } else {
+    } 
+    else {
         return old_const;
     }
 }
@@ -2529,7 +2532,8 @@ find_constants(Interp *interpreter, struct PackFile_ConstTable *ct) {
     if (!n_interpreters || !interpreter->thread_data || 
             interpreter->thread_data->tid == 0) {
         return ct->constants;
-    } else {
+    } 
+    else {
         Hash *tables;
         struct PackFile_Constant **new_consts;
 
@@ -2864,7 +2868,8 @@ PackFile_FixupTable_new_entry(Interp *interpreter,
         self->fixups =
             mem_sys_realloc(self->fixups, self->fixup_count *
                             sizeof(struct PackFile_FixupEntry *));
-    } else {
+    } 
+    else {
         self->fixups =
             mem_sys_allocate(sizeof(struct PackFile_FixupEntry *));
     }

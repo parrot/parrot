@@ -328,12 +328,14 @@ static int merge_transactions(Interp *interp, STM_tx_log *log,
         }
         PARROT_ATOMIC_INT_SET(inner->status, STM_STATUS_ABORTED);
         return 0;
-    } else if (need_abort) {
+    } 
+    else if (need_abort) {
         /* leave as merged, abort the outer transaction since it is
          * now invalid */
         PARROT_ATOMIC_INT_SET(outer->status, STM_STATUS_ABORTED);
         return 1;
-    } else {
+    } 
+    else {
         return 1;
     }
 }
@@ -344,7 +346,8 @@ static PMC *force_sharing(Interp *interp, PMC *pmc) {
         ret = VTABLE_share_ro(interp, pmc);
         assert(PObj_is_PMC_shared_TEST(ret));
         return ret;
-    } else {
+    } 
+    else {
         return PMCNULL;
     }
 }
@@ -585,7 +588,8 @@ int Parrot_STM_commit(Interp *interp) {
             get_sublog(log, log->depth - 1), cursub, 1);
         assert(successp); /* should always return true, since we pass
                              1 for the always argument */
-    } else
+    } 
+    else
         successp = do_real_commit(interp, log);
 
     if (!successp) {
@@ -1113,7 +1117,8 @@ static STM_write_record *find_write_record(Interp *interp, STM_tx_log *log,
                 write->saw_version = read->saw_version;
                 PARROT_ATOMIC_PTR_CAS(successp, handle->owner_or_version, 
                     read->saw_version, cursub);
-            } else  {
+            } 
+            else  {
                 assert(outersub);
                 STM_TRACE("... from outer transaction's write record");
                 PARROT_ATOMIC_PTR_GET(write->saw_version, 
@@ -1130,7 +1135,8 @@ static STM_write_record *find_write_record(Interp *interp, STM_tx_log *log,
                 write->value = PMCNULL;
             else
                 write->value = local_pmc_copy(interp, old_value);
-        } else {
+        } 
+        else {
             STM_TRACE("don't have old value");
             /* avoiding creating write records when we are actually aborted
              * XXX in the future we will do this by throwing an exception to
@@ -1145,7 +1151,8 @@ static STM_write_record *find_write_record(Interp *interp, STM_tx_log *log,
                                           write->saw_version, cursub);
                 } while (!successp && !is_aborted(log));
                 STM_TRACE("... and acquired it");
-            } else {
+            } 
+            else {
                 STM_TRACE("... but already aborted anyways");
                 write->saw_version = NULL;
             }

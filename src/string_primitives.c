@@ -195,7 +195,8 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                         workchar += codepoint - 'a' + 10;
                     } else if (codepoint >= 'A' && codepoint <= 'F') {
                         workchar += codepoint - 'A' + 10;
-                    } else {
+                    } 
+                    else {
                         internal_exception(UNIMPLEMENTED,
                                 "Illegal escape sequence inside {}");
                     }
@@ -203,7 +204,8 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                 if (*offset == len)
                     internal_exception(UNIMPLEMENTED,
                             "Illegal escape sequence no '}'");
-            } else {
+            } 
+            else {
                 internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
             }
             ++*offset;
@@ -216,10 +218,12 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                     workchar += codepoint - 'a' + 10;
                 } else if (codepoint >= 'A' && codepoint <= 'F') {
                     workchar += codepoint - 'A' + 10;
-                } else {
+                } 
+                else {
                     return workchar;
                 }
-            } else {
+            } 
+            else {
                 return workchar;
             }
             ++*offset;
@@ -228,7 +232,8 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
             if (codepoint >= 'A' && codepoint <= 'Z') {
                 workchar = codepoint - 'A' + 1;
-            } else {
+            } 
+            else {
                 internal_exception(UNIMPLEMENTED, "Illegal escape sequence");
             }
             ++*offset;
@@ -245,11 +250,13 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                         workchar += codepoint - 'a' + 10;
                     } else if (codepoint >= 'A' && codepoint <= 'F') {
                         workchar += codepoint - 'A' + 10;
-                    } else {
+                    } 
+                    else {
                         internal_exception(UNIMPLEMENTED,
                                 "Illegal escape sequence in uxxx escape");
                     }
-                } else {
+                } 
+                else {
                     internal_exception(UNIMPLEMENTED,
                         "Illegal escape sequence in uxxx escape - too short");
                 }
@@ -268,11 +275,13 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                         workchar += codepoint - 'a' + 10;
                     } else if (codepoint >= 'A' && codepoint <= 'F') {
                         workchar += codepoint - 'A' + 10;
-                    } else {
+                    } 
+                    else {
                         internal_exception(UNIMPLEMENTED,
                                 "Illegal escape sequence in Uxxx escape");
                     }
-                } else {
+                } 
+                else {
                     internal_exception(UNIMPLEMENTED,
                         "Illegal escape sequence in uxxx escape - too short");
                 }
@@ -293,10 +302,12 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                 codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
                 if (codepoint >= '0' && codepoint <= '7') {
                     workchar += codepoint - '0';
-                } else {
+                } 
+                else {
                     return workchar;
                 }
-            } else {
+            } 
+            else {
                 return workchar;
             }
             ++*offset;
@@ -305,10 +316,12 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                 codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
                 if (codepoint >= '0' && codepoint <= '7') {
                     workchar += codepoint - '0';
-                } else {
+                } 
+                else {
                     return workchar;
                 }
-            } else {
+            } 
+            else {
                 return workchar;
             }
             ++*offset;

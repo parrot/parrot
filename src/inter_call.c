@@ -316,7 +316,8 @@ fetch_arg_pmc_sig(Interp *interpreter, struct call_state *st)
     }
     if (st->src.sig & PARROT_ARG_FLATTEN) {
         make_flattened(interpreter, st, UVal_pmc(st->val));
-    } else {
+    } 
+    else {
         st->src.mode |= CALL_STATE_NEXT_ARG;
     }
 }
@@ -494,7 +495,8 @@ Parrot_fetch_arg_nci(Interp *interpreter, struct call_state *st)
             Parrot_fetch_arg(interpreter, st);
         }
         UVal_pmc(st->val) = slurped;
-    } else {
+    } 
+    else {
         Parrot_convert_arg(interpreter, st);
         st->dest.mode |= CALL_STATE_NEXT_ARG;
     }
@@ -1188,7 +1190,8 @@ parrot_pass_args(Interp *interpreter,  parrot_context_t *src_ctx,
     if (what == PARROT_OP_get_results_pc) {
         if (!PARROT_ERRORS_test(interpreter, PARROT_ERRORS_RESULT_COUNT_FLAG))
             err_check = 0;
-    } else {
+    } 
+    else {
         if (!PARROT_ERRORS_test(interpreter, PARROT_ERRORS_PARAM_COUNT_FLAG))
             err_check = 0;
     }

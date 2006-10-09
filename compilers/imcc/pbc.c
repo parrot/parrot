@@ -1171,7 +1171,8 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 mem_sys_realloc(interpreter->code->base.data, bytes);
             interpreter->code->pic_index->data =
                 mem_sys_realloc(interpreter->code->pic_index->data, bytes/2);
-        } else {
+        } 
+        else {
             interpreter->code->base.data = mem_sys_allocate(bytes);
             interpreter->code->pic_index->data = mem_sys_allocate(bytes/2);
         }

@@ -684,13 +684,15 @@ rec_climb_back_and_mark(int node_index, parrot_prm_context* c) {
     
     if ( pred_index < 0 ) { /* pred has no predecessor */
         move_reg(pred, node, c);
-    } else { /* pred has a predecessor, so may be processed */
+    } 
+    else { /* pred has a predecessor, so may be processed */
         src = c->backup[pred_index];
         if (  src < 0 ) { /* not visited */
             move_reg(pred, node, c);
             c->backup[pred_index] = node; /* marks pred*/
             rec_climb_back_and_mark(pred_index, c);
-        } else { /* already visited, use backup instead */
+        } 
+        else { /* already visited, use backup instead */
             move_reg(src, node, c);
         }
     }

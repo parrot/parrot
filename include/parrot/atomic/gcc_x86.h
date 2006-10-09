@@ -53,7 +53,8 @@ inline static void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
     do { \
         if (expect == parrot_i386_cmpxchg(&(a).val, expect, update)) { \
             result = 1; \
-        } else { \
+        } \
+        else { \
             result = 0; \
         } \
     } while (0)
@@ -76,7 +77,8 @@ inline static void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
                 (void * volatile *) &(a).val, \
                 (void *) expect, (void *) update)) { \
             result = 1; \
-        } else { \
+        } \
+        else { \
             result = 0; \
         } \
     } while (0)

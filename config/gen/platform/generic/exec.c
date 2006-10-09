@@ -26,7 +26,8 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command)
         pid_t returnstat;
         returnstat = waitpid(child, &status, 0);
         return status;
-    } else {
+    } 
+    else {
         /* child. Be horribly profligate with memory, since we're
            about to be something else */
         int status;
@@ -60,7 +61,8 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
         pid_t returnstat;
         returnstat = waitpid(child, &status, 0);
         return status;
-    } else {
+    } 
+    else {
         /* child. Be horribly profligate with memory, since we're
            about to be something else */
         int status, i;

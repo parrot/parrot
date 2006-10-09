@@ -51,7 +51,8 @@ open_log_file()
 		while(--s>cmdline && *s!='/');
 		if(*s == '/') s++;
 		sprintf(name, LOG_NAME ".%.12s.%d", s, pid);
-	} else {
+	} 
+        else {
 		sprintf(name, LOG_NAME ".%d", pid);
 	}
 #else

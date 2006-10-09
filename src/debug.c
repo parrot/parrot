@@ -2043,7 +2043,8 @@ PDB_extend_const_table(Interp *interpreter)
         interpreter->code->const_table->constants =
             mem_sys_realloc(interpreter->code->const_table->constants,
                             k * sizeof(struct PackFile_Constant *));
-    } else {
+    } 
+    else {
         interpreter->code->const_table->constants =
             mem_sys_allocate(k * sizeof(struct PackFile_Constant *));
     }

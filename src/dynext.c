@@ -286,7 +286,8 @@ static PMC *run_init_lib(Interp *interpreter, void *handle,
         init_func = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(handle,
                     cinit_func_name));
         string_cstring_free(cinit_func_name);
-    } else {
+    } 
+    else {
         load_func = (void *)NULL;
 		init_func = NULL;
     }
@@ -384,7 +385,8 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
         }
 
         return new_lib_pmc;
-    } else {
+    } 
+    else {
         return run_init_lib(d, handle, lib_name, wo_ext);
     }
 }
@@ -408,7 +410,8 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     if ( lib == NULL) {
         wo_ext   = string_from_const_cstring(interpreter, "", 0);
         lib_name = NULL;
-    } else {
+    } 
+    else {
         lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
     }
     lib_pmc = is_loaded(interpreter, wo_ext);

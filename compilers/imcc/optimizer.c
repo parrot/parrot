@@ -539,7 +539,8 @@ constant_propagation(Interp *interpreter, IMC_Unit * unit)
                                             " reduced to %I\n", tmp);
                                     ins2 = prev->next;
                                 }
-                            } else {
+                            } 
+                            else {
                                 op = check_op(interpreter, fullname, ins2->op,
                                     ins2->r, ins2->n_r, ins2->keys);
                                 if (op < 0) {

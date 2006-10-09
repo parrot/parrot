@@ -780,7 +780,8 @@ static void fix_pmc_syncs(Interp *dest_interp,
                     PMC *p = (PMC *)b;
                     if (PObj_is_PMC_shared_TEST(p)) {
                         PMC_sync(p)->owner = dest_interp;
-                    } else {
+                    } 
+                    else {
                         /* fprintf(stderr, "BAD PMC: address=%p, 
                                    base_type=%d\n",
                                    p, p->vtable->base_type); */

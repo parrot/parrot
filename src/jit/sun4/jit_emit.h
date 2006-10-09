@@ -876,7 +876,8 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
             case PARROT_ARG_IC:
                 if (emitm_simm13_const(pi)) {
                     emitm_mov_i(jit_info->native_ptr, pi, emitm_o(rdx));
-                } else {
+                } 
+                else {
                     emitm_sethi(jit_info->native_ptr, emitm_hi22(pi), emitm_o(rdx));
                     emitm_or_i(jit_info->native_ptr, emitm_o(rdx), emitm_lo10(pi), emitm_o(rdx));
                 }
@@ -1118,7 +1119,8 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     /* PMC* pmc_new_noinit(Interp *interpreter, INTVAL base_type) */
     if (emitm_simm13_const(i2)) {
         emitm_mov_i(jit_info->native_ptr, i2, emitm_o(1));
-    } else {
+    } 
+    else {
         emitm_sethi(jit_info->native_ptr, emitm_hi22(i2), emitm_o(1));
         emitm_or_i(jit_info->native_ptr, emitm_o(1), emitm_lo10(i2), emitm_o(1));
     }

@@ -611,7 +611,8 @@ mmd_add_function(Interp *interpreter,
             interpreter->binop_mmd_funcs =
                 mem_sys_realloc(interpreter->binop_mmd_funcs,
                                 (func_nr + 1) * sizeof(MMD_table));
-        } else {
+        } 
+        else {
             interpreter->binop_mmd_funcs =
                 mem_sys_allocate((func_nr + 1) * sizeof(MMD_table));
         }

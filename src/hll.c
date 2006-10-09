@@ -225,7 +225,8 @@ Parrot_get_HLL_name(Interp *interpreter, INTVAL id)
     nelements = VTABLE_elements(interpreter, hll_info);
     if (id < 0 || id >= nelements) {
         ret = NULL;
-    } else {
+    } 
+    else {
         PMC *entry;
         PMC *name_pmc;
         START_READ_HLL_INFO(interpreter, hll_info);

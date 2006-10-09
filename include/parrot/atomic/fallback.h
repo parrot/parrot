@@ -74,7 +74,8 @@ typedef struct {
             void * orig = (a).val; \
             (a).val = update; \
             result = 1; \
-        } else { \
+        } \
+        else { \
             result = 0; \
         } \
         UNLOCK((a).lock); \
@@ -87,7 +88,8 @@ typedef struct {
             INTVAL orig = (a).val; \
             (a).val = update; \
             result = 1; \
-        } else { \
+        } \
+        else { \
             result = 0; \
         } \
         UNLOCK((a).lock); \

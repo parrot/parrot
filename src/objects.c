@@ -240,7 +240,8 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
                 if (ro_vtable)
                     ((void **)ro_vtable)[i] = ((void**)deleg_pmc_vtable)[i];
                 ((void **)vtable)[i] = ((void**)deleg_pmc_vtable)[i];
-            } else {
+            } 
+            else {
                 ((void **)vtable)[i] = ((void**)object_vtable)[i];
                 if (ro_vtable)
                     ((void **)ro_vtable)[i] = ((void**)ro_object_vtable)[i];
@@ -1192,7 +1193,8 @@ Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
     if (type >= mc->mc_size) {
         if (mc->idx) {
             mc->idx = mem_sys_realloc(mc->idx, sizeof(UINTVAL*) * (type + 1));
-        } else {
+        } 
+        else {
             mc->idx = mem_sys_allocate(sizeof(UINTVAL*) * (type + 1));
         }
         for (i = mc->mc_size; i <= type; ++i)

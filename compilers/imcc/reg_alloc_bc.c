@@ -1050,7 +1050,8 @@ apply_coloring(Interp* interpreter, IMC_Unit* unit, graph* G)
             reglist[x]->color = G->V[j].col - 1;
             IMCC_debug(interpreter, DEBUG_REG2,"APPLY node %d, reg=%ld\n",
                     x, reglist[x]->color);
-        } else {
+        } 
+        else {
             IMCC_fatal(interpreter, 1,"apply_coloring",
                     "wants to use too high reg num");
         }
@@ -1276,7 +1277,8 @@ ig_color_node(Interp* interpreter, IMC_Unit* unit, graph* G, int j)
     if (u->col && avail[u->col]) {
         c = u->col;
         assert(avail[u->col]);   /* verify no conflict */
-    } else {
+    } 
+    else {
         if (u->col)
             IMCC_debug(interpreter, DEBUG_REG,
                     "WARNING - ig_color_node: cannot give requested color to "

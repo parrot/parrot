@@ -841,7 +841,8 @@ static void merge_pools(struct Memory_Pool *dest, struct Memory_Pool *source)
         next_block = cur_block->prev;
         if (cur_block->free == cur_block->size) {
             mem_internal_free(cur_block);
-        } else {
+        } 
+        else {
             cur_block->next = NULL;
             cur_block->prev = dest->top_block;
             dest->top_block = cur_block;

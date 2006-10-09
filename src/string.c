@@ -315,7 +315,8 @@ string_make_empty(Interp *interpreter,
     if (representation == enum_stringrep_one) {
         s->charset = PARROT_DEFAULT_CHARSET;
         s->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, s);;
-    } else {
+    } 
+    else {
         internal_exception(INVALID_CHARTYPE, "Unsupported representation");
     }
 

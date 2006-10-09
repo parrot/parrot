@@ -384,7 +384,8 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
 
     if (edge->from->succ_list == edge) {
         edge->from->succ_list = edge->succ_next;
-    } else {
+    } 
+    else {
         for (prev = edge->from->succ_list; prev; prev = prev->succ_next) {
             if (prev->succ_next == edge) {
                 prev->succ_next = edge->succ_next;
@@ -394,7 +395,8 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
 
     if (edge->to->pred_list == edge) {
         edge->to->pred_list = edge->pred_next;
-    } else {
+    } 
+    else {
         for (prev = edge->to->pred_list; prev; prev = prev->pred_next) {
             if (prev->pred_next == edge) {
                 prev->pred_next = edge->pred_next;
@@ -405,7 +407,8 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
     if (unit->edge_list == edge) {
         unit->edge_list = edge->next;
 	free(edge);
-    } else {
+    } 
+    else {
         for (prev = unit->edge_list; prev; prev = prev->next) {
             if (prev->next == edge) {
                 prev->next = edge->next;
@@ -699,7 +702,8 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
     for (i = 1; i < n; i++) {
         if (unit->bb_list[i]->pred_list) {
             dominators[i] = set_make_full(n);
-        } else {
+        } 
+        else {
             dominators[i] = set_make(n);
             set_add(dominators[i], i);
         }
@@ -975,7 +979,8 @@ natural_preheader (IMC_Unit * unit, Loop_info* loop_info)
             {
                 preheader = unit->bb_list[edge->from->index]->index;
                 continue;
-            } else {
+            } 
+            else {
                 return -1;
             }
         }

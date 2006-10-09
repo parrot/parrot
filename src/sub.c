@@ -287,7 +287,8 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
     s = PMC_sub(sub);
     if (PMC_IS_NULL(s->namespace_stash)) {
         return s->name;
-    } else {
+    } 
+    else {
         PMC *ns_array;
         STRING *j;
 
@@ -341,7 +342,8 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
     if (PMC_IS_NULL(sub->namespace)) {
         info->nsname = string_from_cstring(interpreter, "", 0);
         info->fullname = info->subname;
-    } else {
+    } 
+    else {
         info->nsname = VTABLE_get_string(interpreter, sub->namespace);
         info->fullname = Parrot_full_sub_name(interpreter, ctx->current_sub);
     }

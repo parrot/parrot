@@ -57,7 +57,8 @@ typedef struct {
             if (expect == orig) { \
                 ATOMIC_SET(a, update); \
                 result = 1; \
-            } else { \
+            } \
+            else { \
                 result = 0; \
             } \
         } while (0)
@@ -73,7 +74,8 @@ typedef struct {
             if (expect == orig) { \
                 ATOMIC_SET(a, update); \
                 result = 1; \
-            } else { \
+            } \
+            else { \
                 result = 0; \
             } \
         } while (0)

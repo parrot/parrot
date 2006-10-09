@@ -71,7 +71,8 @@ inline static long parrot_ppc_add(volatile long *val, long what)
     do { \
         if (parrot_ppc_cmpset(&(a).val, expect, update) == expect) { \
             result = 1; \
-        } else { \
+        } \
+        else { \
             result = 0; \
         } \
     } while (0)
@@ -98,7 +99,8 @@ typedef struct {
                 (void * volatile *) &(a).val, (void *) expect, \
                 (void *) update) == (void *) expect) { \
             result = 1; \
-        } else { \
+        } \
+        else { \
             result = 0; \
         } \
     } while (0)

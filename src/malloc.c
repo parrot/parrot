@@ -5471,7 +5471,8 @@ static int cpuinfo (int whole, CHUNK_SIZE_T  *kernel, CHUNK_SIZE_T  *user) {
         *kernel = (CHUNK_SIZE_T) (kernel64 / 10000);
         *user = (CHUNK_SIZE_T) (user64 / 10000);
         return TRUE;
-    } else {
+    } 
+    else {
         __int64 creation64, exit64, kernel64, user64;
         int rc = GetThreadTimes (GetCurrentThread (), 
                                  (FILETIME *) &creation64,  

@@ -89,7 +89,8 @@ make_local_copy(Parrot_Interp interpreter, Parrot_Interp from, PMC *arg)
         ret_val = Parrot_clone(interpreter, arg);
         PMC_sub(ret_val)->seg = PMC_sub(arg)->seg;
         Parrot_store_sub_in_namespace(interpreter, ret_val);
-    } else {
+    } 
+    else {
         ret_val = Parrot_clone(interpreter, arg);
     }
     return ret_val;
@@ -177,7 +178,8 @@ PMC *pt_shared_fixup(Parrot_Interp interpreter, PMC *pmc) {
         SET_CLASS((SLOTTYPE*) PMC_data(pmc), pmc, 
                   master->vtables[type_num]->class);
         UNLOCK_INTERPRETER(master);
-    } else {
+    } 
+    else {
         /* TODO this will need to change for thread pools
          * XXX should we have a seperate interpreter for this?
          */
@@ -278,7 +280,8 @@ pt_thread_wait_with(Parrot_Interp interp, Parrot_mutex *mutex) {
         } while (interp->thread_data->state & THREAD_STATE_SUSPENDED_GC);
         UNLOCK(interpreter_array_mutex);
         LOCK(*mutex);
-    } else {
+    } 
+    else {
         UNLOCK(interpreter_array_mutex);
     }
 }
@@ -365,7 +368,8 @@ thread_func(void *arg)
                     interpreter->thread_data->tid,
                     except->msg,
                     except->error);
-    } else {
+    } 
+    else {
         /* run normally */
         push_new_c_exception_handler(interpreter, &exp);
         Parrot_unblock_DOD(interpreter);
@@ -459,7 +463,8 @@ pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns) {
                 VTABLE_set_pmc_keyed_str(d, dest_ns, key, sub_ns);
             }
             pt_ns_clone(d, sub_ns, s, val);
-        } else {
+        } 
+        else {
             PMC *dval;
             dval = VTABLE_get_pmc_keyed_str(d, dest_ns, key);
             if (PMC_IS_NULL(dval)) {
@@ -829,7 +834,8 @@ pt_gc_wait_for_stage(Parrot_Interp interp, thread_gc_stage_enum from_stage,
         info->gc_stage = to_stage;
         info->num_reached = 0;
         COND_BROADCAST(info->gc_cond);
-    } else {
+    } 
+    else {
         do {
             COND_WAIT(info->gc_cond, interpreter_array_mutex);
         } while (info->gc_stage != to_stage);
@@ -879,7 +885,8 @@ pt_suspend_one_for_gc(Parrot_Interp interp) {
         TRACE_THREAD("just waking it up");
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
         COND_SIGNAL(interp->thread_data->interp_cond);
-    } else {
+    } 
+    else {
         TRACE_THREAD("queuing event");
         interp->thread_data->state |= THREAD_STATE_SUSPEND_GC_REQUESTED;
         Parrot_new_suspend_for_gc_event(interp);
@@ -987,7 +994,8 @@ pt_suspend_self_for_gc(Parrot_Interp interp)
     }
     if (!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC)) {
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
-    } else {
+    } 
+    else {
         TRACE_THREAD("no need to set suspended\n");
     }
     UNLOCK(interpreter_array_mutex);
@@ -1067,7 +1075,8 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
             dod_register_pmc(parent, parent_ret);
             Parrot_unblock_DOD(parent);
             retval = parent_ret;
-        } else {
+        } 
+        else {
             retval = PMCNULL;
         }
         interpreter_array[tid] = NULL;
@@ -1374,7 +1383,8 @@ pt_DOD_start_mark(Parrot_Interp interpreter)
         interpreter->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
         TRACE_THREAD("%p: detected request", interpreter);
         UNLOCK(interpreter_array_mutex);
-    } else { 
+    } 
+    else { 
         /* we need to stop the world */
         TRACE_THREAD("stop the world");
         UNLOCK(interpreter_array_mutex);
