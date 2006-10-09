@@ -125,13 +125,10 @@ Returns a random floating-point number in the range C<0.0..1.0>.
 
 */
 
+
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
-
+ */

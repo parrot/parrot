@@ -41,3 +41,10 @@ pmclass STMLog {
         Parrot_STM_replay_extracted(INTERP, PMC_struct_val(SELF));
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -34,3 +34,10 @@ pmclass PugsAny
         return retval ? pugs_bool_true : pugs_bool_false;
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

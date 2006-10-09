@@ -546,10 +546,7 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
-*/
+ */

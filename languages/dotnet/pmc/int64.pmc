@@ -62,3 +62,10 @@ pmclass Int64 dynpmc group dotnet_runtime {
     }
 }
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

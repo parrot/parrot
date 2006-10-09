@@ -22,3 +22,10 @@ pmclass ROTest dynpmc does scalar extends Integer {
     }
 }
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
