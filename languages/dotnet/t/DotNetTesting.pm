@@ -1,13 +1,22 @@
 # Some utility subs for aiding the test process.
 # ##############################################
+
 package DotNetTesting;
+
 use strict;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(compile_cs translate run_pir);
 
+use File::Spec;
+
+use Parrot::Test   ();
 require "config/N2PConfig.pm";
+
+# globals
+my $path_to_parrot = Parrot::Test::path_to_parrot();
+my $parrot = File::Spec->catfile( $path_to_parrot, 'parrot' );
 
 # This compiles C# code to an exe/dll.
 # ####################################
@@ -43,12 +52,12 @@ sub translate($$) {
 	my $out_name = shift;
 	
 	# Attempt to translate.
-	my $output = `$N2PConfig::parrot net2pbc.pbc -q -s -p $net_name > $out_name.pir`;
+	my $output = `$parrot $path_to_parrot/languages/dotnet/net2pbc.pbc -q -s -p $net_name > $out_name.pir`;
 	if ($output) {
 		print "translate failed:\n$output";
 		return 0;
 	}
-	$output = `$N2PConfig::parrot -o $out_name $out_name.pir`;
+	$output = `$parrot -o $out_name $out_name.pir`;
 	unlink "$out_name.pir";
 	if ($output) {
 		print "translate failed:\n$output";
@@ -69,7 +78,7 @@ sub run_pir($) {
 	close $fh;
 
 	# Run and get output.
-	my $output = `$N2PConfig::parrot __temp__.pir`;
+	my $output = `$parrot __temp__.pir`;
 
 	# Clean up file and return output.
 	unlink "__temp__.pir";

@@ -1,12 +1,15 @@
-#!perl -w
+#!perl 
 
-use Test::More;
-use DotNetTesting;
 use strict;
+use warnings;
+use lib qw( lib ../lib ../../lib dotnet dotnet/t );
+
+use DotNetTesting;
 
 use Test::More tests => 2;
 
-## Testing class for this file.
+## Testing class for this file.t';
+#
 die unless compile_cs("t.dll", <<'CSHARP');
 namespace Testing
 {

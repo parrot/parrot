@@ -1,12 +1,15 @@
-#!perl -w
+#!perl 
 
-use Test::More;
-use DotNetTesting;
 use strict;
+use warnings;
+use lib qw( lib ../lib ../../lib dotnet dotnet/t );
+
+use DotNetTesting;
 
 use Test::More tests => 9;
 
-# Testing class for the managed pointer PMC and related ops. Note that this
+# Testing class for the managed pointer PMC and related ops. Note that thist';
+#
 # does not consider translating any .NET code, just tests the functionality.
 is (run_pir(<<'PIR'), <<'OUTPUT', 'int reg');
 .loadlib "dotnet_ops"

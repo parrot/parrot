@@ -1,12 +1,15 @@
-#!perl -w
+#!perl 
 
-use Test::More;
-use DotNetTesting;
 use strict;
+use warnings;
+use lib qw( lib ../lib ../../lib dotnet dotnet/t );
+
+use DotNetTesting;
 
 use Test::More tests => 5;
 
-## Testing classes for this file.
+## Testing classes for this file.t';
+#
 die unless compile_cs("external.dll", <<'CSHARP');
 namespace ExportsStuff
 {
