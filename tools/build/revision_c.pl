@@ -50,6 +50,12 @@ int Parrot_config_revision(void)
     return ${Parrot::Revision::config};
 }
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
 EOF
 
 # Local Variables:

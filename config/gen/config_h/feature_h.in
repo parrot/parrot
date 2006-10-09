@@ -146,8 +146,18 @@ my $has_socklen_t = @has_socklen_t@;
 #define PARROT_HAS_SOCKLEN_T $has_socklen_t
 END_PRINT
 
-print OUT <<'END_PRINT'
+print OUT <<'END_PRINT';
 
 
 #endif
+END_PRINT
+
+print OUT <<"END_PRINT";
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
 END_PRINT

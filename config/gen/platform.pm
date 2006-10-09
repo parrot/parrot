@@ -151,6 +151,17 @@ END_HERE
 $coda
 END_HERE
 
+    # append the C code coda
+    print PLATFORM_H <<"END_HERE";
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+END_HERE
+
     close PLATFORM_H;
 
     # implementation files are merged into platform.c

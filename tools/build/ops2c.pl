@@ -281,6 +281,17 @@ if ($trans->can("run_core_func_decl")) {
 }
 my $bs = "${base}${suffix}_";
 
+# append the C code coda
+print HEADER <<END_C;
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+END_C
+
 print SOURCE $preamble;
 print SOURCE <<END_C;
 #include "$include"
@@ -723,6 +734,17 @@ $load_func(Parrot_Interp interpreter)
 END_C
 
 }
+
+# append the C code coda
+print SOURCE <<END_C;
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+END_C
 
 close SOURCE;
 my $final = $source;

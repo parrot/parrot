@@ -96,6 +96,17 @@ EOF
 
 } # endif DEVELOPING
 
+# append the C code coda
+print << "EOF";
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+EOF
+
 # Local Variables:
 # mode: cperl
 # cperl-indent-level: 4

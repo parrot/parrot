@@ -174,6 +174,18 @@ HEADER
 };
 
 HEADER
+
+    # append the C code coda
+    print OUT <<HEADER;
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+HEADER
+
     close OUT;
 }
 

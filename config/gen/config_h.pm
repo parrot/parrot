@@ -118,6 +118,17 @@ EOF
         }
     }
 
+    # append the C code coda
+    print HH <<EOF;
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+EOF
+
     close HH;
 
     move_if_diff("$hh.tmp", $hh);

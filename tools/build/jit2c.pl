@@ -456,6 +456,17 @@ if ($genfile =~ /jit_cpu.c/) {
 EOC
 }
 
+# append the C code coda
+print JITCPU <<"EOC";
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+EOC
+
 print("jit2c: JITed $njit (+ $vjit vtable) of $core_numops ops\n");
 
 sub make_subs {

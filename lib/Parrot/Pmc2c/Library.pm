@@ -120,6 +120,7 @@ sub gen_h {
     $hout .= <<"EOH";
 Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter);
 EOH
+    $hout .= $self->c_code_coda;
 
     return $hout;
 }
@@ -138,6 +139,7 @@ sub gen_c {
     $cout .= dynext_load_code($self->{opt}{library},
                               map { $_->{class} => $_ }
                               values %{$self->{pmcs}} );
+    $cout .= $self->c_code_coda;
 
     return $cout;
 }
@@ -163,6 +165,26 @@ EOC
 #include "pmc_$name.h"
 EOC
     }
+    "$cout\n";
+}
+
+=item C<c_code_coda()>
+
+Returns the Parrot C code coda
+
+=cut
+
+sub c_code_coda() {
+    my $self = shift;
+    my $cout = "";
+    $cout .= <<"EOC";
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+EOC
     "$cout\n";
 }
 

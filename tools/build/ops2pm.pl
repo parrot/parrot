@@ -298,6 +298,16 @@ print OUT <<END_C;
 #endif
 
 END_C
+
+# append the C code coda
+print OUT <<END_C;
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+END_C
 close OUT;
 
 

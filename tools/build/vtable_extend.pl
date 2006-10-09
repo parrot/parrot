@@ -41,6 +41,17 @@ print OUT <<'EOF';
 #endif
 EOF
 
+# append the C code coda
+print OUT <<'EOF';
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+EOF
+
 close OUT or die $!;
 
 open OUT, '>', 'src/extend_vtable.c' or die $!;

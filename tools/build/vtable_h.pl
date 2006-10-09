@@ -63,6 +63,16 @@ print OUT vtbl_macros($vtable);
 
 print OUT "\n#endif\n";
 
+# append the C code coda
+print OUT <<"EOC";
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+EOC
 
 # Local Variables:
 # mode: cperl

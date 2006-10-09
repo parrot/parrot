@@ -103,6 +103,17 @@ Parrot_set_config_hash(void)
 }
 EOF
 
+# append the C code coda
+print << "EOC";
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+EOC
+
 # Local Variables:
 # mode: cperl
 # cperl-indent-level: 4

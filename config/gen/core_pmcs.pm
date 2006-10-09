@@ -64,6 +64,13 @@ END_H
 };
 
 /* &end_gen */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
 END_H
 
     close OUT;
@@ -132,6 +139,13 @@ END_C
     print OUT "    register_pmc(interp, registry, enum_class_$_);\n" foreach (@pmcs);
     print OUT <<'END_C';
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
 END_C
 
     close OUT;

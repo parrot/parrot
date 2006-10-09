@@ -243,6 +243,17 @@ while (<>) {
 
 print_tail( \@put_pointer );
 
+# append the C code coda
+print NCI << "EOC";
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+EOC
+
 close NCI;
 
 
