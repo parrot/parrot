@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 40;
 use Parrot::Config;
 
 =head1 NAME
@@ -15,7 +15,7 @@ t/pmc/namespace.t - Namespaces
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/namespace.t
+    % prove t/pmc/namespace.t
 
 =head1 DESCRIPTION
 
@@ -892,3 +892,53 @@ Found nested namespace: Bar
 Found sub: parrot;Foo;Bar;a_sub
 Found var: a string PMC
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_root_namespace');
+.sub main :main
+    .local pmc root_ns
+    root_ns = get_root_namespace
+    .local int is_defined
+    is_defined = defined root_ns
+    unless is_defined goto NO_NAMESPACE_FOUND
+        print "Found root namespace.\n"
+    NO_NAMESPACE_FOUND:
+.end
+CODE
+Found root namespace.
+OUTPUT
+
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_root_namespace "Foo"');
+.sub main :main
+    .local pmc foo_ns
+    foo_ns = get_root_namespace [ "Foo" ]
+    .local int is_defined
+    is_defined = defined foo_ns
+    unless is_defined goto NO_NAMESPACE_FOUND
+        print "Found root namespace 'Foo'.\n"
+    NO_NAMESPACE_FOUND:
+.end
+
+.namespace [ "NotFoo" ]
+CODE
+Found root namespace 'Foo'.
+OUTPUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_root_namespace "Foo", not there');
+.sub main :main
+    .local pmc foo_ns
+    foo_ns = get_root_namespace [ "Foo" ]
+    .local int is_defined
+    is_defined = defined foo_ns
+    if is_defined goto NAMESPACE_FOUND
+        print "Didn't find root namespace 'Foo'.\n"
+    NAMESPACE_FOUND:
+.end
+
+.namespace [ "NotFoo" ]
+CODE
+Didn't find root namespace 'Foo'.
+OUTPUT
+
