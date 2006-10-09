@@ -186,6 +186,58 @@ sub c_header_file_with_name
     return;
 }
 
+=item C<pmc_source_file_directories()>
+
+Returns the directories which contain PMC source files.
+
+=cut
+
+sub pmc_source_file_directories
+{
+    my $self = shift;
+
+    return
+        map $self->directory_with_name($_) =>
+	    'compilers/bcg/src/pmc',
+	    'languages/APL/src/pmc',
+	    'languages/WMLScript/pmc',
+	    'languages/amber/lib/kernel/pmc',
+	    'languages/cardinal/src/pmc',
+	    'languages/dotnet/pmc',
+	    'languages/lua/pmc',
+	    'languages/perl6/src/pmc',
+	    'languages/pugs/pmc',
+	    'languages/python/pmc',
+	    'languages/tcl/src/pmc',
+            map("src/$_" => qw<dynpmc pmc>),
+            't/tools',
+    ;
+}
+
+
+=item C<pmc_source_file_with_name($name)>
+
+Returns the PMC source file with the specified name.
+
+=cut
+
+sub pmc_source_file_with_name
+{
+    my $self = shift;
+    my $name = shift || return;
+
+    $name .= '.pmc';
+
+    foreach my $dir ($self->pmc_source_file_directories)
+    {
+        return $dir->file_with_name($name)
+            if $dir->file_exists_with_name($name);
+    }
+
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+
+    return;
+}
 
 =item C<file_for_perl_module($module)>
 
