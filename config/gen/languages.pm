@@ -32,7 +32,7 @@ sub runstep
     my @languages = qw{
         APL amber bc befunge bf cardinal c99 cola ecmascript HQ9plus
         jako lisp lua m4 ook parrot_compiler perl6 pheme pugs punie regex 
-        scheme tap urm Zcode
+        scheme tap urm WMLScript Zcode
     };
 
     foreach my $language (@languages) {
@@ -41,7 +41,6 @@ sub runstep
     }
 
     genfile('languages/tcl/config/makefiles/examples.in' => 'languages/tcl/examples/Makefile');
-    genfile('languages/WMLScript/config/Makefile.in'     => 'languages/WMLScript/Makefile');
 
     genfile(
         'languages/tcl/config/makefiles/root.in'     => 'languages/tcl/Makefile',
