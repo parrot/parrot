@@ -290,6 +290,7 @@ SP              [ ]
 <emit,INITIAL>".loadlib"      return(LOADLIB); 
 
 ":flat"         return(ADV_FLAT);
+":maybe_flat"   return(ADV_MAYBE_FLAT);
 ":slurpy"       return(ADV_SLURPY);
 ":optional"     return(ADV_OPTIONAL);
 ":opt_flag"     return(ADV_OPT_FLAG);

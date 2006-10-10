@@ -77,6 +77,9 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
         if (arg_flags[i] & VT_FLAT) {
             flags |= PARROT_ARG_FLATTEN;
         }
+        else if (arg_flags[i] & VT_MAYBE_FLAT) {
+            flags |= PARROT_ARG_MAYBE_FLATTEN;
+        }
         if (arg_flags[i] & VT_OPTIONAL) {
             flags |= PARROT_ARG_OPTIONAL;
         }
