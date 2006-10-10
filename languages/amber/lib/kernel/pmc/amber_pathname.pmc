@@ -294,10 +294,7 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

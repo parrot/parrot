@@ -64,10 +64,7 @@ pmclass Amber_TABLE need_ext extends Hash extends Amber_DEFAULT does hash dynpmc
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */
