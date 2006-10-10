@@ -22,10 +22,11 @@ Test MIME::Base64.
     .local pmc plan, is
     plan = find_global "Test::More", 'plan'
     
-    plan(4)
+    plan(6)
 
     test_pair( "Hello, World!\n", "SGVsbG8sIFdvcmxkIQo=", 'hello' )
-    test_pair( '', '', 'empty string' )
+    test_pair( "", "", 'empty string' )
+    test_pair( "a", "YQ==", 'a' )
 
 .end
 
