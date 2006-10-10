@@ -128,7 +128,7 @@ co	9
 co	10
 false	cannot resume dead coroutine
 OUT
-
+}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function (a,b,c)
@@ -140,6 +140,9 @@ CODE
 co	1	2	3
 OUT
 
+
+TODO: {
+local $TODO = 'coroutine';
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function (a,b)
@@ -162,7 +165,7 @@ coroutine.resume(co, 4, 5)
 CODE
 co	4	5
 OUT
-
+}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
@@ -173,5 +176,4 @@ print(coroutine.resume(co))
 CODE
 true	6	7
 OUT
-}
 
