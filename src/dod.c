@@ -240,6 +240,9 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     ctx = CONTEXT(interpreter->ctx);
     mark_context(interpreter, ctx);
 
+    /* mark the dynamic environment. */
+    mark_stack(interpreter, interpreter->dynamic_env);
+
     /*
      * mark vtable->data
      *

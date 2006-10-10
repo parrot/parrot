@@ -138,15 +138,15 @@ Add the exception handler on the stack.
 
 =item C<void Parrot_push_action(Interp * interpreter, PMC *sub)>
 
-Push an action handler onto the control stack.
+Push an action handler onto the dynamic environment.
 
 =item C<void Parrot_push_mark(Interp * interpreter, INTVAL mark)>
 
-Push a cleanup mark onto the control stack.
+Push a cleanup mark onto the dynamic environment.
 
 =item C<void Parrot_pop_mark(Interp * interpreter, INTVAL mark)>
 
-Pop items off the control stack up to the mark.
+Pop items off the dynamic environment up to the mark.
 
 =cut
 
@@ -157,8 +157,8 @@ push_exception(Interp * interpreter, PMC *handler)
 {
     if (handler->vtable->base_type != enum_class_Exception_Handler)
         PANIC("Tried to set_eh a non Exception_Handler");
-    stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, handler,
-            STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+    stack_push(interpreter, &interpreter->dynamic_env, handler,
+               STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
 
 static void
@@ -179,27 +179,26 @@ Parrot_push_action(Interp * interpreter, PMC *sub)
                 const_string(interpreter, "Sub"))) {
         internal_exception(1, "Tried to push a non Sub PMC action");
     }
-    stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, sub,
-            STACK_ENTRY_ACTION, run_cleanup_action);
+    stack_push(interpreter, &interpreter->dynamic_env, sub,
+               STACK_ENTRY_ACTION, run_cleanup_action);
 }
 
 void
 Parrot_push_mark(Interp * interpreter, INTVAL mark)
 {
-    stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, &mark,
-            STACK_ENTRY_MARK, STACK_CLEANUP_NULL);
+    stack_push(interpreter, &interpreter->dynamic_env, &mark,
+               STACK_ENTRY_MARK, STACK_CLEANUP_NULL);
 }
 
 void
 Parrot_pop_mark(Interp * interpreter, INTVAL mark)
 {
     do {
-        const Stack_Entry_t * const e = 
-            stack_entry(interpreter, 
-                        CONTEXT(interpreter->ctx)->control_stack, 0);
+        const Stack_Entry_t * const e
+            = stack_entry(interpreter, interpreter->dynamic_env, 0);
         if (!e)
             internal_exception(1, "mark not found");
-        (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->control_stack,
+        (void)stack_pop(interpreter, &interpreter->dynamic_env,
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_MARK) {
             if (UVal_int(e->entry) == mark)
@@ -235,9 +234,7 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     message = VTABLE_get_string_keyed_int(interpreter, exception, 0);
     /* [TODO: replace quadratic search with something linear, hopefully without
        trashing abstraction layers.  -- rgr, 17-Sep-06.] */
-    while ((e = stack_entry(interpreter,
-                            CONTEXT(interpreter->ctx)->control_stack,
-                            depth))) {
+    while ((e = stack_entry(interpreter, interpreter->dynamic_env, depth))) {
         if (e->entry_type == STACK_ENTRY_PMC) {
             handler = UVal_pmc(e->entry);
             if (handler && handler->vtable->base_type ==
@@ -318,9 +315,8 @@ pop_exception(Interp * interpreter)
     Stack_entry_type type;
     struct Parrot_cont * cc;
 
-    PMC * const handler =
-        stack_peek(interpreter,
-                   CONTEXT(interpreter->ctx)->control_stack, &type);
+    PMC * const handler
+        = stack_peek(interpreter, interpreter->dynamic_env, &type);
 
     if (! handler
             || type != STACK_ENTRY_PMC
@@ -333,9 +329,8 @@ pop_exception(Interp * interpreter)
         real_exception(interpreter, NULL, E_RuntimeError,
                 "No exception to pop.");
     }
-    (void)stack_pop(interpreter, 
-                    &CONTEXT(interpreter->ctx)->control_stack, NULL,
-                    STACK_ENTRY_PMC);
+    (void)stack_pop(interpreter, &interpreter->dynamic_env,
+                    NULL, STACK_ENTRY_PMC);
 }
 
 /*

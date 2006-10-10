@@ -39,7 +39,6 @@ mark_context(Interp* interpreter, parrot_context_t* ctx)
     int i;
 
     mark_stack(interpreter, ctx->user_stack);
-    mark_stack(interpreter, ctx->control_stack);
     mark_register_stack(interpreter, ctx->reg_stack);
     obj = (PObj*)ctx->current_sub;
     if (obj)
@@ -205,6 +204,7 @@ new_coroutine(Interp *interp)
 
     co->seg = interp->code;
     co->ctx = NULL;
+    co->dynamic_state = NULL;
     return co;
 }
 

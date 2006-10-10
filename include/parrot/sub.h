@@ -105,6 +105,7 @@ typedef struct Parrot_coro {
 
     struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
     opcode_t *address;        /* next address to run - toggled each time */
+    struct Stack_Chunk *dynamic_state; /* next dynamic state */
 } * parrot_coro_t;
 
 #define PMC_coro(pmc) 		  ((parrot_coro_t)PMC_struct_val(pmc))

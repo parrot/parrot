@@ -189,9 +189,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* Need a user stack */
     CONTEXT(interpreter->ctx)->user_stack = new_stack(interpreter, "User");
 
-    /* And a control stack */
-    CONTEXT(interpreter->ctx)->control_stack = new_stack(interpreter,
-                                                         "Control");
+    /* And a dynamic environment stack */
+    interpreter->dynamic_env = new_stack(interpreter, "DynamicEnv");
 
     /* clear context introspection vars */
     SET_NULL_P(CONTEXT(interpreter->ctx)->current_sub, PMC*);
@@ -417,7 +416,7 @@ Parrot_really_destroy(Interp *interpreter, int exit_code, void *arg)
     (void) PARROT_CORE_OPLIB_INIT(0);
 
     stack_destroy(CONTEXT(interpreter->ctx)->user_stack);
-    stack_destroy(CONTEXT(interpreter->ctx)->control_stack);
+    stack_destroy(interpreter->dynamic_env);
 
     destroy_context(interpreter);
 

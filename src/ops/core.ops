@@ -208,7 +208,7 @@ stack for later returning.
 =cut
 
 inline op bsr (label INT) :base_core,check_event {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, 
+  stack_push(interpreter, &interpreter->dynamic_env, 
              expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto OFFSET($1);
 }
@@ -235,7 +235,7 @@ location onto the call stack for later returning.
 
 inline op jsr(label INT) :base_core,check_event {
   opcode_t * loc;
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->control_stack, 
+  stack_push(interpreter, &interpreter->dynamic_env, 
              expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   loc = INTVAL2PTR(opcode_t *, $1);
   goto ADDRESS(loc);
@@ -688,17 +688,17 @@ and throw it.
 
 =item B<pushmark>(in INT)
 
-Push a mark labeled $1 onto the control stack.
+Push a mark labeled $1 onto the dynamic environment.
 
 =item B<popmark>(in INT)
 
-Pop all items off the control stack to the given mark.
+Pop all items off the dynamic environment to the given mark.
 
 =item B<pushaction>(invar PMC)
 
-Push the given Sub PMC $1 onto the control stack. If the control stack
-is unwound due to a C<popmark>, subroutine return, or an exception, the
-subroutine will be invoked with an integer argument: C<0> means a normal
+Push the given Sub PMC $1 onto the dynamic environment.  If the dynamic
+environment is unwound due to a C<popmark>, subroutine return, or an exception,
+the subroutine will be invoked with an integer argument: C<0> means a normal
 return; C<1> means an exception has been raised.
 
 =cut

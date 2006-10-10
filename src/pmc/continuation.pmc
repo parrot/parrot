@@ -173,7 +173,7 @@ Sets the pointer to the return instruction.
 
         PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
         cc->address = value;
-        cc->dynamic_state = CONTEXT(INTERP->ctx)->control_stack;
+        cc->dynamic_state = INTERP->dynamic_env;
         cc->runloop_id = INTERP->current_runloop_id;
         if (pos && *pos == PARROT_OP_get_results_pc) {
             cc->current_results = pos;
@@ -267,9 +267,9 @@ destination to continue execution.
         }
 
         /*
-         * rewind control stack
+         * Rewind the dynamic environment.
          */
-        if (from_ctx->control_stack != stack_target) {
+        if (interpreter->dynamic_env != stack_target) {
             /* compute the "stack delta", which is a measure of how much
                unwinding we have to do.  if negative, we have to pop that many
                entries; if positive, we are going back up the stack.
@@ -277,7 +277,7 @@ destination to continue execution.
             */
             stack_delta
                 = ((int) stack_height(interpreter, stack_target)
-                   - (int) stack_height(interpreter, from_ctx->control_stack));
+                   - (int) stack_height(interpreter, interpreter->dynamic_env));
         }
         /* descend down the target stack until we get to the same depth. */
         corresponding_target = stack_target;
@@ -287,13 +287,13 @@ destination to continue execution.
         }
         /* both stacks are now at the same depth.  pop from both until we reach
            their common ancestor. */
-        while (from_ctx->control_stack != corresponding_target) {
+        while (interpreter->dynamic_env != corresponding_target) {
             PMC *cleanup_sub = NULL;
             Stack_Entry_t *e;
 
-            if (! from_ctx->control_stack)
+            if (! interpreter->dynamic_env)
                 internal_exception(1, "Control stack damaged");
-            e = stack_entry(interpreter, from_ctx->control_stack, 0);
+            e = stack_entry(interpreter, interpreter->dynamic_env, 0);
             if (! e)
                 internal_exception(1, "Control stack damaged");
             if (e->entry_type == STACK_ENTRY_ACTION) {
@@ -307,7 +307,7 @@ destination to continue execution.
                 cleanup_sub = UVal_pmc(e->entry);
                 e->cleanup = STACK_CLEANUP_NULL;
             }
-            (void)stack_pop(INTERP, &from_ctx->control_stack,
+            (void)stack_pop(INTERP, &interpreter->dynamic_env,
                             NULL, NO_STACK_ENTRY_TYPE);
             if (cleanup_sub) {
                 /* Now it's safe to run. */
@@ -319,7 +319,7 @@ destination to continue execution.
         /* run back up the target stack to our destination.  [when we support
            dynamic binding (e.g.), we will have to traverse back up, and will
            therefore need to keep track on the way down.  -- rgr, 30-Sep-06.] */
-        to_ctx->control_stack = stack_target;
+        interpreter->dynamic_env = stack_target;
 
         /* debug print before context is switched */
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {

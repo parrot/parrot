@@ -132,6 +132,7 @@ Swaps the "context".
         struct Parrot_coro * co = PMC_coro(SELF);
         parrot_context_t *caller_ctx;
         struct PackFile_ByteCode *wanted_seg;
+        struct Stack_Chunk *state;
         opcode_t * dest = co->address;
         parrot_context_t *ctx;
         PMC *ccont;
@@ -157,6 +158,7 @@ Swaps the "context".
              */
             Parrot_alloc_context(INTERP, co->n_regs_used);
             co->ctx = ctx = CONTEXT(INTERP->ctx);
+            co->dynamic_state = interpreter->dynamic_env;
             ctx->caller_ctx = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
             ctx->current_sub = SELF;
@@ -192,6 +194,9 @@ Swaps the "context".
             ccont = ctx->current_cont;
             ctx->caller_ctx = PMC_cont(ccont)->to_ctx = CONTEXT(INTERP->ctx);
             /* set context to coro context */
+            state = interpreter->dynamic_env;
+            interpreter->dynamic_env = co->dynamic_state;
+            co->dynamic_state = state;
             CONTEXT(INTERP->ctx) = ctx;
             INTERP->ctx.bp = ctx->bp;
             INTERP->ctx.bp_ps = ctx->bp_ps;
@@ -211,6 +216,9 @@ Swaps the "context".
                 real_exception(INTERP, NULL, E_Exception,
                                "Cannot resume dead coroutine.");
             }
+            state = interpreter->dynamic_env;
+            interpreter->dynamic_env = co->dynamic_state;
+            co->dynamic_state = state;
             CONTEXT(INTERP->ctx) = ctx;
             INTERP->ctx.bp = ctx->bp;
             INTERP->ctx.bp_ps = ctx->bp_ps;
@@ -239,6 +247,8 @@ Marks the coroutine as live.
         struct Parrot_coro *c = PMC_coro(SELF);
         if (c && c->ctx)
             mark_context(INTERP, c->ctx);
+        if (c && c->dynamic_state)
+            mark_stack(INTERP, c->dynamic_state);
         SUPER();
     }
 }

@@ -240,7 +240,6 @@ init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
         ctx->constants = old->constants;
         ctx->reg_stack = old->reg_stack;     /* XXX move into interpreter? */
         ctx->user_stack = old->user_stack;   /* XXX move into interpreter? */
-        ctx->control_stack = old->control_stack;
         ctx->warns = old->warns;
         ctx->errors = old->errors;
         ctx->trace_flags = old->trace_flags;

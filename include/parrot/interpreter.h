@@ -212,7 +212,6 @@ typedef struct Parrot_Context {
     struct Stack_Chunk *reg_stack;      /* register stack */
 
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
-    struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
     PMC      *lex_pad;                  /* LexPad PMC */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
     UINTVAL warns;             /* Keeps track of what warnings
@@ -346,6 +345,8 @@ struct parrot_interp_t {
 
     PDB_t *pdb;                               /* Debug system */
     Interp * debugger;                        /* trace / debug interpreter */  
+
+    struct Stack_Chunk *dynamic_env;          /* current dynamic environment */
 
     void *lo_var_ptr;                         /* Pointer to memory on runops system stack */
 
