@@ -32,26 +32,28 @@ Note: These tests would benefit from judicial application of Iterators.
 =cut
 
 my $cmd = -d '.svn' ? 'svn' : 'svk';
+
 # how many files to check at a time. May have to lower this when we run
 # this on systems with finicky command lines.
-my $chunk_size = 100; 
+my $chunk_size = 100;
 
 # get files listed in MANIFEST
 my @manifest_files =
-	sort keys %{maniread( catfile $PConfig{build_dir}, 'MANIFEST' )};
+    sort keys %{ maniread( catfile $PConfig{build_dir}, 'MANIFEST' ) };
 
 ## all test files have "text/plain" mime-type. Assume anything in the
 ## repository with a .t is test file.
 
-my $mime_types = get_attribute('svn:mime-type', @manifest_files);
+my $mime_types = get_attribute( 'svn:mime-type', @manifest_files );
 
 TEST_MIME: {
-	# find test files
-	my $test_suffix = '.t';
-	my @test_files = grep { m/\Q$test_suffix\E$/} @manifest_files;
-    verify_attributes('svn:mime-type', 'text/plain', 0, $mime_types, \@test_files);
- 
-} # TEST_MIME
+
+    # find test files
+    my $test_suffix = '.t';
+    my @test_files = grep { m/\Q$test_suffix\E$/ } @manifest_files;
+    verify_attributes( 'svn:mime-type', 'text/plain', 0, $mime_types, \@test_files );
+
+}    # TEST_MIME
 
 ## keyword expansion should be set for any manifest files with an explicit
 ## mime type of text/plain. Assume a default of text/plain if not specified
@@ -61,19 +63,20 @@ KEYWORD_EXP: {
     # we only want those files whose mime types that start with text/plain
 
     my @plain_files;
-    foreach my $file (keys %$mime_types) {
-        if (!defined($mime_types->{$file}) ||
-            $mime_types->{$file} =~ qr{^text/plain}) {
+    foreach my $file ( keys %$mime_types ) {
+        if ( !defined( $mime_types->{$file} )
+            || $mime_types->{$file} =~ qr{^text/plain} )
+        {
 
             push @plain_files, $file;
         }
     }
 
-    my $keywords = get_attribute ('svn:keywords', @plain_files);
+    my $keywords = get_attribute( 'svn:keywords', @plain_files );
 
-    verify_attributes('svn:keywords', 'Author Date Id Revision', 1, $keywords);
+    verify_attributes( 'svn:keywords', 'Author Date Id Revision', 1, $keywords );
 
-} # KEYWORD_EXP
+}    # KEYWORD_EXP
 
 =for skip
 
@@ -113,10 +116,10 @@ COPYRIGHT: {
 =cut
 
 BEGIN {
-	unless( $Parrot::Revision::svn_entries or `svk ls .` )
-	{ plan skip_all => 'not a working copy'; }
-	else
-	{ plan 'no_plan' };
+    unless ( $Parrot::Revision::svn_entries or `svk ls .` ) {
+        plan skip_all => 'not a working copy';
+    }
+    else { plan 'no_plan' }
 }
 
 exit;
@@ -137,11 +140,11 @@ sub at_a_time {
 
     my $pos = 0;
 
-    while ($pos < @list) {
+    while ( $pos < @list ) {
         my $start = $pos;
-        my $end   = $pos+$count-1;
-        if ($end >= @list) { $end = @list -1};
-        my @sublist = @list[$start..$end];
+        my $end   = $pos + $count - 1;
+        if ( $end >= @list ) { $end = @list - 1 }
+        my @sublist = @list[ $start .. $end ];
         $sub->(@sublist);
         $pos += $count;
     }
@@ -156,45 +159,52 @@ sub get_attribute {
     diag "Collecting $attribute attributes...\n";
 
     my %results;
-    map {$results{$_}=undef} @list;
+    map { $results{$_} = undef } @list;
 
-    at_a_time($chunk_size, sub {
-        my @partial_list = @_;
+    at_a_time(
+        $chunk_size,
+        sub {
+            my @partial_list = @_;
 
-        foreach my $result (qx($cmd pg $attribute @partial_list)) {
-            # This RE may be a little wonky.
-            if ($result =~ m{(.*) - (.*)}) {
-                $results{$1} = $2;
+            foreach my $result (qx($cmd pg $attribute @partial_list)) {
+
+                # This RE may be a little wonky.
+                if ( $result =~ m{(.*) - (.*)} ) {
+                    $results{$1} = $2;
+                }
             }
-        }
-    
-    }, @list);
+
+        },
+        @list
+    );
     return \%results;
 }
 
 sub verify_attributes {
-    my $attribute = shift;  # name of the attribute
-    my $expected  = shift;  # the expected value
-    my $exact     = shift;  # should this be an exact match?
-    my $results   = shift;  # the results hash ref: file -> value
-    my $files     = shift;  # an arrayref of files we care about. (undef->all)
+    my $attribute = shift;    # name of the attribute
+    my $expected  = shift;    # the expected value
+    my $exact     = shift;    # should this be an exact match?
+    my $results   = shift;    # the results hash ref: file -> value
+    my $files     = shift;    # an arrayref of files we care about. (undef->all)
 
     my @files;
-    if (defined($files)) {
+    if ( defined($files) ) {
         @files = @$files;
-    } else {
+    }
+    else {
         @files = keys %$results;
     }
 
-    foreach my $file (sort @files) {
-        my $actual   = "$file - (" . ($results->{$file} || '') . ")"; 
+    foreach my $file ( sort @files ) {
+        my $actual = "$file - (" . ( $results->{$file} || '' ) . ")";
         my $platonic;
         if ($exact) {
             $platonic = "$file - ($expected)";
-            is ($actual, $platonic, "$file ($attribute)")
-        } else {
+            is( $actual, $platonic, "$file ($attribute)" );
+        }
+        else {
             $platonic = qr{^$file - \($expected};
-            like ($actual, $platonic, "$file ($attribute)")
+            like( $actual, $platonic, "$file ($attribute)" );
         }
     }
 }
