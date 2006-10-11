@@ -604,7 +604,7 @@ sub rewrite_nci_method ($$$) {
 
     local $_ = $_[2];
     # Rewrite SELF -> pmc, INTERP -> interpreter
-    s/SELF/pmc/g;
+    s/\bSELF\b/pmc/g;
     s/\bINTERP\b/interpreter/g;
 
     return $_;
@@ -628,47 +628,47 @@ sub rewrite_vtable_method ($$$$$) {
     my $supermethod = "Parrot_" . $super_table->{$method} . "_$method";
 
     # Rewrite DYNSUPER(args)
-    s/DYNSUPER          # Macro: DYNSUPER
+    s/\bDYNSUPER\b          # Macro: DYNSUPER
       \(\s*(.*?)\)      # capture argument list
      /"interpreter->vtables[$supertype].$method(" . full_arguments($1) . ')'/xeg;
 
     # Rewrite OtherClass.SUPER(args...)
     s/(\w+)             # capture OtherClass
-      \.SUPER           # Macro: SUPER
+      \.SUPER\b           # Macro: SUPER
       \(\s*(.*?)\)      # capture argument list
      /"Parrot_${1}_$method(" . full_arguments($2) . ')'/xeg;
 
     # Rewrite SUPER(args...)
-    s/SUPER             # Macro: SUPER
+    s/\bSUPER\b             # Macro: SUPER
       \(\s*(.*?)\)      # capture argument list
      /"$supermethod(" . full_arguments($1) . ')'/xeg;
 
     # Rewrite DYNSELF.other_method(args...)
-    s/DYNSELF           # Macro: DYNSELF
+    s/\bDYNSELF\b           # Macro: DYNSELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
      /"pmc->vtable->$1(" . full_arguments($2) . ')'/xeg;
 
     # Rewrite DYNSELF(args...). See comments above.
-    s/DYNSELF           # Macro: DYNSELF
+    s/\bDYNSELF\b           # Macro: DYNSELF
       \(\s*(.*?)\)      # capture argument list
      /"pmc->vtable->$method(" . full_arguments($1) . ')'/xeg;
 
     # Rewrite OtherClass.SELF.other_method(args...)
     s/(\w+)             # OtherClass
-      \.SELF            # Macro SELF
+      \.\bSELF\b            # Macro SELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
      /"Parrot_${1}_$2(" . full_arguments($3) . ')'/xeg;
 
     # Rewrite SELF.other_method(args...)
-    s/SELF              # Macro SELF
+    s/\bSELF\b              # Macro SELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
      /"Parrot_${class}_$1(".full_arguments($2).")"/xeg;
 
     # Rewrite SELF -> pmc, INTERP -> interpreter
-    s/SELF/pmc/g;
+    s/\bSELF\b/pmc/g;
     s/\bINTERP\b/interpreter/g;
 
     # now use macros for all rewritten stuff
