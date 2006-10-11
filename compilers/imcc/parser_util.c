@@ -763,6 +763,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
     char *ext;
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;
+    STRING *fs;
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants()
      */
@@ -776,7 +777,6 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
         IMCC_INFO(interp) = imc_info;
     }
 
-    STRING *fs;
     fs = string_make(interp, fullname, strlen(fullname), NULL, 0);
     if (Parrot_stat_info_intval(interp, fs, STAT_ISDIR)) {
         IMCC_fatal(interp, E_IOError,
