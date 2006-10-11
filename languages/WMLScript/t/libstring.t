@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: libstring.t 14550 2006-09-11 13:59:28Z fperrad $
+# $Id$
 
 =head1 NAME
 

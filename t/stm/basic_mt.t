@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2006 The Perl Foundation.
-# $Id: ref.t 12842 2006-05-30 16:52:42Z creiss $
+# $Id$
 
 use strict;
 use warnings;

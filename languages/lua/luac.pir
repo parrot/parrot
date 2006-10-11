@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: luac.pir $
+# $Id$
 
 =head1 NAME
 

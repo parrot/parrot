@@ -1,4 +1,4 @@
-## $Id: parse.pir $
+## $Id$
 
 =head1 TITLE
 

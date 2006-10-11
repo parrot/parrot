@@ -11,7 +11,7 @@ Describes interfaces for Software Transactional Memory within Parrot.
 
 =head1 VERSION
 
-$Revision: 11771 $
+$Revision$
 
 =head1 SYNOPSIS
 

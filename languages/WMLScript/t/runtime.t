@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: runtime.t 13503 2006-07-24 15:26:45Z ambs $
+# $Id$
 
 =head1 NAME
 

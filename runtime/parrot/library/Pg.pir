@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: pg.t 14701 2006-09-24 18:11:28Z leo $
+# $Id$
 
 =head1 NAME
 

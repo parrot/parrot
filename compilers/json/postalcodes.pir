@@ -1,6 +1,6 @@
 #!../../parrot
 # Copyright (C) 2001-2003, The Perl Foundation.
-# $Id: /parrot/offline/examples/io/http.pir 2 2006-08-01T20:22:43.009903Z svm  $
+# $Id$
 
 =head1 NAME
 

@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: /parrot/offline/t/codingstd/linelength.t 1005 2006-09-08T13:11:47.473258Z wcoleda  $
+# $Id$
 
 use strict;
 use warnings;

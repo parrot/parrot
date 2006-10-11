@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: WMLScript.pir 14175 2006-08-17 14:26:37Z fperrad $
+# $Id$
 
 .loadlib 'wmls_ops'
 .HLL 'WMLScript', 'wmls_group'

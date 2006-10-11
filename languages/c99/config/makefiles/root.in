@@ -1,4 +1,4 @@
-# $Id: root.in 13823 2006-08-04 05:37:01Z coke $
+# $Id$
 
 # Setup some commands
 LN_S     = @lns@

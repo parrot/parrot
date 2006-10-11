@@ -1,5 +1,5 @@
 # Copyright: 2001-2006 The Perl Foundation.  All Rights Reserved.
-# $Id: cpu.pm 2 2006-05-24 14:46:19Z svm $
+# $Id$
 
 =head1 NAME
 

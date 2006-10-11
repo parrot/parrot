@@ -1,5 +1,5 @@
 # Copyright (C) 2001-2005, The Perl Foundation.
-# $Id: defaults.pm 13597 2006-07-27 16:31:35Z leo $
+# $Id$
 
 =head1 NAME
 

@@ -1,4 +1,4 @@
-## $Id: cmp.pir 13897 2006-08-07 15:21:04Z tewk $
+## $Id$
 
 =head1 NAME
 

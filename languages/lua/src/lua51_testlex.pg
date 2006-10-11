@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: lua51_testlex.pg $
+# $Id$
 
 grammar Lua::TestLex
 

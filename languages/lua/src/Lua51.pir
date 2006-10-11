@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: Lua51.pir $
+# $Id$
 
 =head1 TITLE
 

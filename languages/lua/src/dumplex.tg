@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: dumplex.tg $
+# $Id$
 
 grammar Lua::DumpLex is TGE::Grammar;
 

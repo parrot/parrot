@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: echo_client.pir 12835 2006-05-30 13:32:26Z coke $
+# $Id$
 
 =head1 NAME
 

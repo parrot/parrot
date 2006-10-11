@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: httpd.pir 14438 2006-09-06 11:59:32Z leo $
+# $Id$
 
 =head1 NAME
 

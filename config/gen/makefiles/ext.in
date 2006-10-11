@@ -1,4 +1,4 @@
-# $Id: /parrotcode/offline/config/gen/makefiles/languages.in 19764 2006-08-03T18:17:04.907999Z chromatic  $
+# $Id$
 
 # setup of commands
 @make_set_make@

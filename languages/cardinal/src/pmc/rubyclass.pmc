@@ -1,7 +1,7 @@
 /* rubyclass.pmc
  *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
- *     $Id: /parrot/offline/languages/cardinal/src/pmc/rubyclass.pmc 2 2006-09-24T18:45:23.994513Z svm  $
+ *     $Id$
  *  Overview:
  *     These are the vtable functions for the rubyclass base class
  *  Data Structure and Algorithms:
