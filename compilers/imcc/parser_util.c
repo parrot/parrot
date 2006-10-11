@@ -776,6 +776,14 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
         IMCC_INFO(interp) = imc_info;
     }
 
+    STRING *fs;
+    fs = string_make(interp, fullname, strlen(fullname), NULL, 0);
+    if (Parrot_stat_info_intval(interp, fs, STAT_ISDIR)) {
+        IMCC_fatal(interp, E_IOError,
+                "imcc_compile_file: '%s' is a directory\n", fullname);
+        return NULL;
+    }
+
     if (!(fp = fopen(fullname, "r"))) {
         IMCC_fatal(interp, E_IOError,
                 "imcc_compile_file: couldn't open '%s'\n", fullname);
