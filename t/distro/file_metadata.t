@@ -148,6 +148,8 @@ sub at_a_time {
         $sub->(@sublist);
         $pos += $count;
     }
+
+    return;
 }
 
 # Given an attribute and a list of files, return a hashref
@@ -207,4 +209,13 @@ sub verify_attributes {
             like( $actual, $platonic, "$file ($attribute)" );
         }
     }
+
+    return;
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
