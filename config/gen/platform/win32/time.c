@@ -7,7 +7,11 @@
 INTVAL
 Parrot_intval_time(void)
 {
-    return time(NULL);
+#if INTVAL_SIZE <= 4
+	return _time32(NULL);
+#else
+    return _time64(NULL);
+#endif
 }
 
 /*

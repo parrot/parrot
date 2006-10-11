@@ -104,7 +104,11 @@ Changes the current working directory to the one specified by C<path>.
     METHOD void chdir(STRING *path) {
         int error;
         char *cpath = string_to_cstring(interpreter, path);
+#ifdef WIN32
+        error = _chdir(cpath);
+#else 
         error = chdir(cpath);
+#endif
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
@@ -478,6 +482,7 @@ reads entries from a directory.
 #else
         real_exception(interpreter, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need win32 developer!");
+        return NULL;
 #endif
     }
 

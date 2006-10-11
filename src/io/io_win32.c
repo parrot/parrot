@@ -666,7 +666,7 @@ AGAIN:
                 goto AGAIN;
 #endif
             case EPIPE:
-                close((SOCKET)io->fd);
+                _close((SOCKET)io->fd);
                 return -1;
             default:
                 return -1;
@@ -700,7 +700,7 @@ AGAIN:
         if (error > 0)
             bytesread += error;
         else {
-            close((SOCKET)io->fd);
+            _close((SOCKET)io->fd);
         }
         /* The charset should probably be 'binary', but right now httpd.imc
          * only works with 'ascii'
@@ -721,13 +721,13 @@ AGAIN:
             case WSAEWOULDBLOCK:
                 goto AGAIN;
             case WSAECONNRESET:
-                close((SOCKET)io->fd);
+                _close((SOCKET)io->fd);
 #if PIO_TRACE
                 PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
 #endif
                 return -1;
             default:
-                close((SOCKET)io->fd);
+                _close((SOCKET)io->fd);
 #if PIO_TRACE
                 PIO_eprintf(interpreter, "recv: errno = %d\n", err);
 #endif
