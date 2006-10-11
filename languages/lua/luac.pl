@@ -43,6 +43,13 @@ unless ( exists $parser->YYData->{nb_error} ) {
     $parser->Generate();
 }
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
+
 __END__
 
 =head1 NAME
@@ -75,10 +82,3 @@ Francois Perrad
 
 =cut
 
-
-# Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
