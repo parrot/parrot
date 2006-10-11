@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: /parrot/offline/languages/cardinal/t/harness 2 2006-09-24T18:45:23.994513Z svm  $
+# $Id$
 
 use FindBin;
 use lib qw( . lib ../lib ../../lib ../../lib );

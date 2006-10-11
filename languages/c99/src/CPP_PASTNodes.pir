@@ -1,4 +1,4 @@
-## $Id: /parrot/offline/languages/cardinal/src/PAST.pir 136 2006-10-02T14:16:26.459770Z tewk  $
+## $Id$
 
 =head1 NAME
 

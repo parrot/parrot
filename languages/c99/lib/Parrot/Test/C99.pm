@@ -1,4 +1,4 @@
-# $Id: C99.pm 13519 2006-07-24 22:23:24Z tewk $
+# $Id$
 
 package Parrot::Test::C99;
 
