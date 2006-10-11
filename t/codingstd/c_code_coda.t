@@ -11,19 +11,19 @@ use Parrot::Distribution;
 
 =head1 NAME
 
-t/codingstd/code_coda.t - checks for editor hint coda in source
+t/codingstd/c_code_coda.t - checks for editor hint coda in C source
 
 =head1 SYNOPSIS
 
     # test all files
-    % prove t/codingstd/code_coda.t
+    % prove t/codingstd/c_code_coda.t
 
     # test specific files
-    % perl t/codingstd/code_coda.t src/foo.c include/parrot/bar.h
+    % perl t/codingstd/c_code_coda.t src/foo.c include/parrot/bar.h
 
 =head1 DESCRIPTION
 
-Checks that all source files have the proper editor hints coda,
+Checks that all C language source files have the proper editor hints coda,
 as specified in PDD07.
 
 =head1 SEE ALSO
@@ -92,7 +92,7 @@ sub source_files {
     return (
         map( $_->files_of_type('C code'),   $DIST->c_source_file_directories ),
         map( $_->files_of_type('C header'), $DIST->c_header_file_directories ),
-        map( $_->files_of_type('PMC code'),   $DIST->pmc_source_file_directories ),
+        map( $_->files_of_type('PMC code'), $DIST->pmc_source_file_directories ),
     );
 }
 
