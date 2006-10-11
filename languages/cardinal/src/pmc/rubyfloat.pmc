@@ -34,7 +34,8 @@ pmclass RubyFloat
         while (buflen) {
                if (string_index(INTERP,buff,buflen-1) == '0') {
                        buflen--;
-               } else {
+               }
+               else {
                        break;
                }
         }

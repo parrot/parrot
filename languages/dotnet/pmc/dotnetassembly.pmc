@@ -322,7 +322,8 @@ static int load_pe_file(Interp *INTERP, FILE *in, struct dotnet_assembly *ass)
         /* Found header. Seek to it and return success. */
         fseek(in, cli_header_filepos, SEEK_SET);
         return 1;
-    } else {
+    }
+    else {
         /* Couldn't locate the CLI header. */
         real_exception(INTERP, NULL, E_StandardError, 
             "Cannot locate CLI header in PE file");
@@ -365,7 +366,8 @@ static int load_cli_header(Interp *INTERP, FILE *in, struct dotnet_assembly *ass
         /* Found metadata root. Seek to it and return success. */
         fseek(in, metadata_filepos, SEEK_SET);
         return 1;
-    } else {
+    }
+    else {
         /* Couldn't locate the metadata root. */
         real_exception(INTERP, NULL, E_StandardError, 
             "Cannot locate CLI metadata root");
@@ -2032,7 +2034,8 @@ pmclass DotNetAssembly dynpmc group dotnet {
                      (ass->user_strings[i+2] << 8) +
                      ass->user_strings[i+3];
             start = i + 4;
-        } else {
+        }
+        else {
             real_exception(INTERP, NULL, E_StandardError, 
                "Unable to decode user string length");
             return NULL;
@@ -2091,7 +2094,8 @@ pmclass DotNetAssembly dynpmc group dotnet {
             length = ((ass->blobs[i] & 0x1F) << 24) + (ass->blobs[i+1] << 16) +
                      (ass->blobs[i+2] << 8) + ass->blobs[i+3];
             start = i + 4;
-        } else {
+        }
+        else {
             real_exception(INTERP, NULL, E_StandardError, 
                "Unable to decode blob length");
             return NULL;

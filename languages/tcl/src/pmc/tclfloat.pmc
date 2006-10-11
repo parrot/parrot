@@ -64,7 +64,8 @@ pmclass TclFloat
                if (string_index(INTERP,buff,buflen-1) == '0') {
                        buflen--;
                        check_flag = 1;
-               } else {
+               }
+               else {
                        break;
                }
         }

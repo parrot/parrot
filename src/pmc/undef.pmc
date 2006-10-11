@@ -84,7 +84,8 @@ pmclass Undef extends default no_ro {
   PMC* share_ro () {
     if (PObj_is_PMC_shared_TEST(SELF)) {
         return SELF;
-    } else {
+    }
+    else {
         return pt_shared_fixup(INTERP, SELF);
     }
   }

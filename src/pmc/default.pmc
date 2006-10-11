@@ -187,7 +187,8 @@ check_get_std_props(Interp *interpreter, PMC *self, STRING *key) {
         ret_val = pmc_new(interpreter, enum_class_Integer);
         PMC_int_val(ret_val) = 1;
         return ret_val;
-    } else
+    }
+    else
         return PMCNULL;
 }
 
@@ -365,7 +366,8 @@ Sets the property for C<*key> to C<*value>.
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
             VTABLE_set_pmc_keyed_str(INTERP,
                 PMC_metadata(SELF), key, value);
-        } else {
+        }
+        else {
             PMC *prop;
 
             prop = make_prop_hash(INTERP, SELF);

@@ -103,7 +103,8 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
                 index++;
             }
             (void) closedir(dp);
-        } else {
+        }
+        else {
             real_exception(
                 INTERP, NULL, E_IOError,
                 "PATHNAME.entry_names: couldn't read directory"
@@ -136,7 +137,8 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
                 }
             }
             (void) closedir(dp);
-        } else {
+        }
+        else {
             real_exception(
                 INTERP, NULL, E_IOError,
                 "PATHNAME.file_names: couldn't read directory"
@@ -178,7 +180,8 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
                 }
             }
             (void) closedir(dp);
-        } else {
+        }
+        else {
             real_exception(
                 INTERP, NULL, E_IOError,
                 "PATHNAME.file_names: couldn't read directory"
@@ -196,7 +199,8 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
         if (dp != NULL) {
             VTABLE_set_integer_native(INTERP, result, 1);
             (void) closedir(dp);
-        } else {
+        }
+        else {
             VTABLE_set_integer_native(INTERP, result, 0);
         }
         return result;
@@ -239,7 +243,8 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
                 }
             }
             (void) closedir(dp);
-        } else {
+        }
+        else {
             real_exception(
                 INTERP, NULL, E_IOError,
                 "PATHNAME.subdirectory_names: couldn't read directory"
@@ -281,7 +286,8 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
                 }
             }
             (void) closedir(dp);
-        } else {
+        }
+        else {
             real_exception(
                 INTERP, NULL, E_IOError,
                 "PATHNAME.subdirectory_pathnames: couldn't read directory"

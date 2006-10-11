@@ -68,7 +68,8 @@ static STRING* fetch_string(Interp* interp, PMC* matchobj, PMC* val)
 {
     if (val->vtable->base_type == MatchRange_type_id) {
         return match_range(interp, matchobj, val);
-    } else {
+    }
+    else {
         return VTABLE_get_string(interp, val);
     }
 }
@@ -78,7 +79,8 @@ static INTVAL fetch_integer(Interp* interp, PMC* matchobj, PMC* val)
     if (val->vtable->base_type == MatchRange_type_id) {
         STRING* valstr = match_range(interp, matchobj, val);
         return string_to_int(interp, valstr);
-    } else {
+    }
+    else {
         return VTABLE_get_integer(interp, val);
     }
 }

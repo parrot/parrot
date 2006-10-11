@@ -110,7 +110,8 @@ Returns true if there are more elements to return
         push_new_c_exception_handler(INTERP, INTERP->exceptions);
         if (!setjmp(INTERP->exceptions->destination)) {
             PMC_struct_val(SELF) = PyGen_next(INTERP, SELF);
-        } else {
+        }
+        else {
             Parrot_exception *exception = INTERP->exceptions;
             if (exception->error != E_StopIteration) {
                 rethrow_c_exception(INTERP);

@@ -340,7 +340,8 @@ Sets the integer value of the element at index C<key> to C<value>.
 
         if ( value ) {
             sd[key/BITS_PER_CHAR] |= ( 1 << ( key % BITS_PER_CHAR ) );
-        } else {
+        }
+        else {
             sd[key/BITS_PER_CHAR] &= ( ~ ( 1 << ( key % BITS_PER_CHAR ) ) );
         }
     }

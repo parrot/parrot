@@ -83,7 +83,8 @@ Returns the current working directory.
             scwd = string_from_cstring(interpreter, cwd, strlen(cwd));
             mem_sys_free(cwd);
             return scwd;
-        } else {
+        }
+        else {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
             return NULL;
@@ -142,7 +143,8 @@ C<path>.
                 char *errmsg = strerror(errno);
                 real_exception(interpreter, NULL, E_SystemError, errmsg);
             }
-        } else {
+        }
+        else {
             error = remove(cpath);
             string_cstring_free(cpath);
             if (error) {

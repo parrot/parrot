@@ -177,7 +177,8 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     INTVAL get_integer_keyed (PMC* key) {
         if (key_type(INTERP, key) == KEY_integer_FLAG) {
             return SELF.get_integer_keyed_int(PMC_int_val(key));
-        } else {
+        }
+        else {
             STRING* s = VTABLE_get_string(INTERP, key);
             return DYNSELF.get_integer_keyed_str(s);
         }
@@ -303,7 +304,8 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
     void set_integer_keyed (PMC* key, INTVAL value) {
         if (key_type(INTERP, key) == KEY_integer_FLAG) {
             SELF.set_integer_keyed_int(PMC_int_val(key), value);
-        } else {
+        }
+        else {
             STRING* s = VTABLE_get_string(INTERP, key);
             DYNSELF.set_integer_keyed_str(s, value);
         }

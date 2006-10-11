@@ -575,7 +575,8 @@ Return whether the object has an attribute with the given name.
                 VTABLE_get_string(INTERP, name));
             if (attr && VTABLE_defined(INTERP, attr))
                 VTABLE_set_integer_native(INTERP, ret, 1);
-        } else {
+        }
+        else {
             if (INTERP->exceptions->error != E_AttributeError) {
                 handle_exception(INTERP);
             }

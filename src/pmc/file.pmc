@@ -103,7 +103,8 @@ Returns a true value (1) if the supplied path is a directory.
 
         if (S_ISDIR(info.st_mode)) {
             return 1;
-        } else {
+        }
+        else {
             return 0;
         }
     }
@@ -134,7 +135,8 @@ Returns a true value (1) if the supplied path is a plain file.
 
         if (S_ISREG(info.st_mode)) {
             return 1;
-        } else {
+        }
+        else {
             return 0;
         }
     }
@@ -165,7 +167,8 @@ Returns a true value (1) if the supplied path is a link.
 
         if (S_ISLNK(info.st_mode)) {
             return 1;
-        } else {
+        }
+        else {
             return 0;
         }
 #endif
@@ -212,12 +215,14 @@ free to change or give me hints on how to change it. -- ambs
                     }
                 }
                 fclose(target);
-            } else {
+            }
+            else {
                 char *errmsg = strerror(errno);
                 real_exception(interpreter, NULL, E_SystemError, errmsg);
             }
             fclose(source);
-        } else {
+        }
+        else {
             char *errmsg = strerror(errno);
             real_exception(interpreter, NULL, E_SystemError, errmsg);
         }

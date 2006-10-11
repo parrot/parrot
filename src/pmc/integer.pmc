@@ -1106,7 +1106,8 @@ MMD_String: {
                 const INTVAL idiff =
                     PMC_int_val(SELF) - VTABLE_get_integer(INTERP, value);
                 return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
-            } else {
+            }
+            else {
                 return fdiff > 0 ? 1 : -1;
             }
         }
@@ -1140,7 +1141,8 @@ MMD_String: {
                 const INTVAL idiff =
                     PMC_int_val(SELF) - VTABLE_get_integer(INTERP, value);
                 return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
-            } else {
+            }
+            else {
                 return fdiff > 0 ? 1 : -1;
             }
         }

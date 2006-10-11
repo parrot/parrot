@@ -74,7 +74,8 @@ find_or_die(Interp* interpreter, PMC *pmc, STRING *meth) {
                         get_attrib_num((SLOTTYPE *)PMC_data(class),
                             PCD_CLASS_NAME)))
                 );
-        } else {
+        }
+        else {
             real_exception(interpreter, NULL, E_LookupError,
                 "Can't find method '%s' - erroneous PMC",
                 string_to_cstring(interpreter, meth)

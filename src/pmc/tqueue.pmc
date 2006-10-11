@@ -197,7 +197,8 @@ Adds the thread C<*item> to the end of the queue.
         if (queue->tail) {
             queue->tail->next = entry;
             queue->tail = entry;
-        } else {
+        }
+        else {
             queue->head = entry;
             queue->tail = entry;
         }

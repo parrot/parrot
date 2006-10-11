@@ -534,7 +534,8 @@ C<value>.
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
             DYNSELF.set_number_keyed_int(k, value);
-        } else {
+        }
+        else {
             PMC* box;
 
             box = SELF.get_pmc_keyed_int(k);
@@ -627,7 +628,8 @@ Sets the PMC at index C<key> to C<value>.
         nextkey = key_next(INTERP, key);
         if (!nextkey) {
             DYNSELF.set_pmc_keyed_int(k, value);
-        } else {
+        }
+        else {
             PMC* box;
 
             box = SELF.get_pmc_keyed_int(k);

@@ -50,7 +50,8 @@ pmclass STMVar is_shared need_ext no_ro {
         if (   value->vtable->base_type == enum_class_STMRef
             || value->vtable->base_type == enum_class_STMVar) {
             PMC_struct_val(SELF) = PMC_struct_val(value);
-        } else {
+        }
+        else {
             PMC_struct_val(SELF) = Parrot_STM_alloc(INTERP, value);
         }
         PObj_custom_mark_SET(SELF);

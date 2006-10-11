@@ -184,7 +184,8 @@ Return the class of this object.
     PMC* get_class() {
         if (!PObj_is_PMC_shared_TEST(SELF)) {
             return GET_CLASS(PMC_data(SELF), SELF);
-        } else {
+        }
+        else {
             /* get the class object for this interpreter */
             /* XXX this is rather a hack, it is, however, necessary: 
              * otherwise we will be accessing the wrong interpreter's 
