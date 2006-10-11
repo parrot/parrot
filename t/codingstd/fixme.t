@@ -59,6 +59,9 @@ sub source_files {
     return map { $_->path } (
         map( $_->files_of_type('C code'),   $DIST->c_source_file_directories ),
         map( $_->files_of_type('C header'), $DIST->c_header_file_directories ),
+        map( $_->files_of_type('PMC code'), $DIST->pmc_source_file_directories ),
+        map( $_->files_of_type('Yacc file'), $DIST->yacc_source_file_directories ),
+        map( $_->files_of_type('Lex file'), $DIST->lex_source_file_directories ),
     );
 }
 

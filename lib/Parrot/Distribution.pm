@@ -239,6 +239,94 @@ sub pmc_source_file_with_name
     return;
 }
 
+=item C<yacc_source_file_directories()>
+
+Returns the directories which contain yacc source files.
+
+=cut
+
+sub yacc_source_file_directories
+{
+    my $self = shift;
+
+    return
+        map $self->directory_with_name($_) =>
+	    'compilers/ast/',
+	    'compilers/imcc/',
+	    'languages/cola/',
+	    'languages/lua/doc',
+	    'languages/regex/lib/Regex',
+    ;
+}
+
+
+=item C<yacc_source_file_with_name($name)>
+
+Returns the yacc source file with the specified name.
+
+=cut
+
+sub yacc_source_file_with_name
+{
+    my $self = shift;
+    my $name = shift || return;
+
+    $name .= '.y';
+
+    foreach my $dir ($self->yacc_source_file_directories)
+    {
+        return $dir->file_with_name($name)
+            if $dir->file_exists_with_name($name);
+    }
+
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+
+    return;
+}
+
+=item C<lex_source_file_directories()>
+
+Returns the directories which contain lex source files.
+
+=cut
+
+sub lex_source_file_directories
+{
+    my $self = shift;
+
+    return
+        map $self->directory_with_name($_) =>
+	    'compilers/ast/',
+	    'compilers/imcc/',
+	    'languages/cola/',
+    ;
+}
+
+
+=item C<lex_source_file_with_name($name)>
+
+Returns the lex source file with the specified name.
+
+=cut
+
+sub lex_source_file_with_name
+{
+    my $self = shift;
+    my $name = shift || return;
+
+    $name .= '.l';
+
+    foreach my $dir ($self->lex_source_file_directories)
+    {
+        return $dir->file_with_name($name)
+            if $dir->file_exists_with_name($name);
+    }
+
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+
+    return;
+}
+
 =item C<file_for_perl_module($module)>
 
 Returns the Perl module file for the specified module.
@@ -357,4 +445,5 @@ sub gen_manifest_skip {
 =cut
 
 1;
+
 
