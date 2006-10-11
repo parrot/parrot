@@ -49,7 +49,7 @@ TEST_MIME: {
 	# find test files
 	my $test_suffix = '.t';
 	my @test_files = grep { m/\Q$test_suffix\E$/} @manifest_files;
-    verify_attributes('mime-type', 'text/plain', 0, $mime_types, \@test_files);
+    verify_attributes('svn:mime-type', 'text/plain', 0, $mime_types, \@test_files);
  
 } # TEST_MIME
 
@@ -185,8 +185,8 @@ sub verify_attributes {
     } else {
         @files = keys %$results;
     }
- 
-    foreach my $file (@files) {
+
+    foreach my $file (sort @files) {
         my $actual   = "$file - (" . ($results->{$file} || '') . ")"; 
         my $platonic;
         if ($exact) {
