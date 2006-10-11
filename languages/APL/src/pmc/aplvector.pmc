@@ -124,11 +124,15 @@ Returns a vector-like PMC containing the shape of this PMC.
             * we use our own type here. Perhaps a better way to 
             * specify it?
             */
-            //array_t = pmc_type(INTERP, 
-                //string_from_const_cstring(INTERP, "APLVector", 0)
-            //);
+            /*
+            array_t = pmc_type(INTERP, 
+                string_from_const_cstring(INTERP, "APLVector", 0)
+            );
+            */
             shape = pmc_new(INTERP,VTABLE_type(INTERP,SELF));
-//#array_t);
+            /*
+#array_t);
+            */
             VTABLE_set_integer_native(INTERP, shape, 1);
             VTABLE_set_integer_keyed_int(INTERP,shape,0,
                 VTABLE_get_integer(INTERP, SELF)

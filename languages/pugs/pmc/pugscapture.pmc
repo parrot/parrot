@@ -35,7 +35,9 @@ typedef struct siva {
 } siva;
 
 static PMC* intret;
-// STRING * parrot_hash_get_idx(Interp *interpreter, Hash *hash, PMC * key);
+/*
+STRING * parrot_hash_get_idx(Interp *interpreter, Hash *hash, PMC * key);
+*/
 static PMC* undef_pmc;
 
 /*
