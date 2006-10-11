@@ -19,7 +19,7 @@ t/distro/file_metadata.t - verify file metadata matches expectations
 
 =head1 SYNOPSIS
 
-	% prove t/distro/file_metadata.t
+ % prove t/distro/file_metadata.t
 
 =head1 DESCRIPTION
 
@@ -83,33 +83,33 @@ KEYWORD_EXP: {
 # When unskipped, rewrite to use get_attribute()...
 
 SKIP: {
-	skip 'custom svn keywords not yet supported' => 1;
+    skip 'custom svn keywords not yet supported' => 1;
 ## Copyright keyword
 COPYRIGHT: {
-	my $readme = catfile( $PConfig{build_dir}, 'README' );
-	open my $IN, '<' => $readme
-		or die qq|can't open $readme: $!|;
+    my $readme = catfile( $PConfig{build_dir}, 'README' );
+    open my $IN, '<' => $readme
+        or die qq|can't open $readme: $!|;
 
-	my $official_copyright;
-	while( <$IN> )
-	{
-		next unless m/^Parrot is (Copyright .*)/;
-		$official_copyright = $1;
-		last;
-	}
-	fail('official copyright not found') and last COPYRIGHT
-		unless length $official_copyright;
+    my $official_copyright;
+    while( <$IN> )
+    {
+        next unless m/^Parrot is (Copyright .*)/;
+        $official_copyright = $1;
+        last;
+    }
+    fail('official copyright not found') and last COPYRIGHT
+        unless length $official_copyright;
 
-	@cmd = qw(pg Copyright);
+    @cmd = qw(pg Copyright);
 
-	$msg = 'Copyright property matches official copyright';
-	diag $msg;
+    $msg = 'Copyright property matches official copyright';
+    diag $msg;
 
-	is(
-		sub{ my $r = qx($cmd @cmd $_); chomp $r; "$_: $r" }->(),
-		"$_: $official_copyright",
-		"$msg ($_)"
-	) for @manifest_files;
+    is(
+        sub{ my $r = qx($cmd @cmd $_); chomp $r; "$_: $r" }->(),
+        "$_: $official_copyright",
+        "$msg ($_)"
+    ) for @manifest_files;
 } # COPYRIGHT
 } # SKIP
 
