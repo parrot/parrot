@@ -87,8 +87,8 @@ Transfers control to the calling context, and frees the current context.
         parrot_context_t *from_ctx = cc->from_ctx;
         struct PackFile_ByteCode * const seg = cc->seg;
 
-	next = SUPER(next);
-	Parrot_free_context(INTERP, from_ctx, 1);
+        next = SUPER(next);
+        Parrot_free_context(INTERP, from_ctx, 1);
 #ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
         mem_sys_free(cc);

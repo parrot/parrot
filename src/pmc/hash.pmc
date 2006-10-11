@@ -413,12 +413,12 @@ Return a representation of the hash contents.
         HashBucket * const b =
             parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (b == NULL) {
-	    /*
-	     * TODO current behaviour of $S0 = hsh['no_such_key'] in
-	     *      PGE and possibly more code needs an empty STRING
-	     *      (--leo) 
-	     */ 
-	    return string_make_empty(INTERP,enum_stringrep_one,0);
+            /*
+             * TODO current behaviour of $S0 = hsh['no_such_key'] in
+             *      PGE and possibly more code needs an empty STRING
+             *      (--leo) 
+             */ 
+            return string_make_empty(INTERP,enum_stringrep_one,0);
         }
         return VTABLE_get_string(INTERP, (PMC*) b->value);
     }
@@ -458,12 +458,12 @@ Returns the string value for the element at C<*key>.
         }
         b = parrot_hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
-	    /*
-	     * TODO current behaviour of $S0 = hsh['no_such_key'] in
-	     *      PGE and possibly more code needs an empty STRING
-	     *      (--leo) 
-	     */ 
-	    return string_make_empty(INTERP,enum_stringrep_one,0);
+            /*
+             * TODO current behaviour of $S0 = hsh['no_such_key'] in
+             *      PGE and possibly more code needs an empty STRING
+             *      (--leo) 
+             */ 
+            return string_make_empty(INTERP,enum_stringrep_one,0);
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;

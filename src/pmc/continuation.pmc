@@ -240,7 +240,7 @@ destination to continue execution.
         int ret_continuation_p
             = SELF->vtable->base_type == enum_class_RetContinuation;
 
-	if (interpreter->current_runloop_id != cc->runloop_id
+        if (interpreter->current_runloop_id != cc->runloop_id
             /* it's ok if we are exiting to "runloop 0"; there is no such
                runloop, but the only continuation that thinks it came from
                runloop 0 is for the return from the initial sub call. */
@@ -249,11 +249,11 @@ destination to continue execution.
                outer frame, exiting to the inner run loop does the right thing,
                since it normally returns to the next outer runloop anyway.  */
             && ! ret_continuation_p) {
-	    fprintf(stderr, "[oops; continuation %p of type %d "
+            fprintf(stderr, "[oops; continuation %p of type %d "
                     "is trying to jump from runloop %d to runloop %d]\n",
-		    SELF, (int) SELF->vtable->base_type,
+                    SELF, (int) SELF->vtable->base_type,
                     interpreter->current_runloop_id, cc->runloop_id);
-	}
+        }
 #if CTX_LEAK_DEBUG
         if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             fprintf(stderr,

@@ -14,46 +14,46 @@
 pmclass SubProxy dynpmc need_ext extends Sub {
 
     void init() {
-	SUPER();
-	PObj_get_FLAGS(SELF) |= PObj_private0_FLAG;
+        SUPER();
+        PObj_get_FLAGS(SELF) |= PObj_private0_FLAG;
     }
 
     void set_pmc(PMC *key) {
-	PMC_data(SELF) = key;
+        PMC_data(SELF) = key;
     }
 
     void* invoke (void* next) {
-	if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
-	    PMC* key = PMC_data(SELF);
-	    STRING* file;
-	    PMC* rsub, *sub;
-	    char *s;
+        if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
+            PMC* key = PMC_data(SELF);
+            STRING* file;
+            PMC* rsub, *sub;
+            char *s;
 
-	    if (!key)
-		internal_exception(1, "SubProxy: no key");
+            if (!key)
+                internal_exception(1, "SubProxy: no key");
 
-	    file = key_string(INTERP, key);
-	    if (!file)
-		internal_exception(1, "SubProxy: no file");
-	    sub = key_next(INTERP, key);
-	    if (!sub)
-		internal_exception(1, "SubProxy: no sub");
-	    Parrot_load_bytecode(INTERP, file);
-	    rsub = VTABLE_get_pmc_keyed(INTERP,
-		    INTERP->root_namespace, sub);
+            file = key_string(INTERP, key);
+            if (!file)
+                internal_exception(1, "SubProxy: no file");
+            sub = key_next(INTERP, key);
+            if (!sub)
+                internal_exception(1, "SubProxy: no sub");
+            Parrot_load_bytecode(INTERP, file);
+            rsub = VTABLE_get_pmc_keyed(INTERP,
+                    INTERP->root_namespace, sub);
 
-	    if (!VTABLE_defined(INTERP, rsub))
-		internal_exception(1, "SubProxy: sub not found");
+            if (!VTABLE_defined(INTERP, rsub))
+                internal_exception(1, "SubProxy: sub not found");
 
-	    PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
-	    ((parrot_sub_t)(PMC_sub(SELF))) ->seg =
-		    ((parrot_sub_t)(PMC_sub(rsub))) ->seg;
-	    ((parrot_sub_t)(PMC_sub(SELF))) ->start_offs =
-		    ((parrot_sub_t)(PMC_sub(rsub))) ->start_offs;
-	    ((parrot_sub_t)(PMC_sub(SELF))) ->end_offs =
-		    ((parrot_sub_t)(PMC_sub(rsub))) ->end_offs;
-	}
-	return SUPER(next);
+            PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
+            ((parrot_sub_t)(PMC_sub(SELF))) ->seg =
+                    ((parrot_sub_t)(PMC_sub(rsub))) ->seg;
+            ((parrot_sub_t)(PMC_sub(SELF))) ->start_offs =
+                    ((parrot_sub_t)(PMC_sub(rsub))) ->start_offs;
+            ((parrot_sub_t)(PMC_sub(SELF))) ->end_offs =
+                    ((parrot_sub_t)(PMC_sub(rsub))) ->end_offs;
+        }
+        return SUPER(next);
     }
 }
 

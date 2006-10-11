@@ -455,7 +455,7 @@ static int load_cli_streams(Interp *INTERP, FILE *in, struct dotnet_assembly *as
    (Not a macro; stupid C compilers moan about invalid shift sizes. */
 int TablePresent(struct dotnet_assembly *ass, int t)
 {
-	return t >= 32 ?
+        return t >= 32 ?
         (ass->valid_hi & (1 << (t - 32))) :
         (ass->valid_lo & (1 << t));
 }
@@ -1865,7 +1865,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
         destroy_dotnet_assembly(PMC_struct_val(SELF));
     }
 
-	
+        
     /* The load method. */
     METHOD void load()
     {
@@ -2057,7 +2057,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
         struct dotnet_assembly *ass = PMC_struct_val(SELF);
         unsigned int length;
         unsigned int start;
-		STRING *out;
+                STRING *out;
 
         /* If we don't have an assembly, throw an esception and leave. */
         if (ass == NULL)
@@ -2106,15 +2106,15 @@ pmclass DotNetAssembly dynpmc group dotnet {
         }
 
         /* Return string containing blob. */
-		out = string_from_cstring(INTERP, ass->blobs + start, length);
-		if (out == NULL)
+                out = string_from_cstring(INTERP, ass->blobs + start, length);
+                if (out == NULL)
         {
             real_exception(INTERP, NULL, E_StandardError, 
                "Unable to create blob string");
             return NULL;
         }
-		else
-			return out;
+                else
+                        return out;
     }
 
 

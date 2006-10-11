@@ -38,11 +38,11 @@ pmclass DotNetMemberRefMetadata dynpmc group dotnet {
     {
         /* Tell the GC about stuff we're holding on to. */
         struct dotnet_memberref *c = PMC_struct_val(SELF);
-		if (c)
-		{
-			if (c->str_name)
-				pobject_lives(INTERP, (PObj*)c->str_name);
-		}
+                if (c)
+                {
+                        if (c->str_name)
+                                pobject_lives(INTERP, (PObj*)c->str_name);
+                }
     }
 
 
@@ -59,7 +59,7 @@ pmclass DotNetMemberRefMetadata dynpmc group dotnet {
 
 
     /* Get the location of the signature blob for this member. */
-	METHOD int get_signature()
+        METHOD int get_signature()
     {
         struct dotnet_memberref *c = PMC_struct_val(SELF);
 
@@ -76,7 +76,7 @@ pmclass DotNetMemberRefMetadata dynpmc group dotnet {
 
 
     /* Get the type of "class" that the member belongs to. */
-	METHOD int get_class_type()
+        METHOD int get_class_type()
     {
         struct dotnet_memberref *c = PMC_struct_val(SELF);
 
@@ -93,7 +93,7 @@ pmclass DotNetMemberRefMetadata dynpmc group dotnet {
 
 
     /* Get the id of "class" that the member belongs to. */
-	METHOD int get_class_id()
+        METHOD int get_class_id()
     {
         struct dotnet_memberref *c = PMC_struct_val(SELF);
 

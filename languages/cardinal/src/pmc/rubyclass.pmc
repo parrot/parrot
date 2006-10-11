@@ -42,19 +42,19 @@ pmclass RubyClass
     void morph (INTVAL type) {
         if (SELF->vtable->base_type == type)
             return;
-	switch (type) {
-	    case enum_class_String:
-		type = dynpmc_RubyString;
-		break;
-	    case enum_class_Integer:
-		type = dynpmc_RubyInteger;
-		break;
-	    case enum_class_Float:
-		type = dynpmc_RubyFloat;
-		break;
-	}
+        switch (type) {
+            case enum_class_String:
+                type = dynpmc_RubyString;
+                break;
+            case enum_class_Integer:
+                type = dynpmc_RubyInteger;
+                break;
+            case enum_class_Float:
+                type = dynpmc_RubyFloat;
+                break;
+        }
 
-	pmc_reuse(INTERP, SELF, type, 0);
+        pmc_reuse(INTERP, SELF, type, 0);
     }
 
     void set_integer_native (INTVAL value) {

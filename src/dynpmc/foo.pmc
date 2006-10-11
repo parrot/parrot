@@ -8,22 +8,22 @@
 pmclass Foo dynpmc does scalar extends Integer {
 
     INTVAL get_integer() {
-	return 42;
+        return 42;
     }
 
     PMC* subtract (PMC* value, PMC* dest) {
 MMD_Integer: {
-	if (!dest)
-	    dest = pmc_new(INTERP, SELF->vtable->base_type);
-	VTABLE_set_integer_native(INTERP, dest, 144);
-	return dest;
-	}
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, 144);
+        return dest;
+        }
 MMD_DEFAULT: {
-	if (!dest)
-	    dest = pmc_new(INTERP, SELF->vtable->base_type);
-	VTABLE_set_integer_native(INTERP, dest, 244);
-	return dest;
-	}
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, 244);
+        return dest;
+        }
     }
 }
 

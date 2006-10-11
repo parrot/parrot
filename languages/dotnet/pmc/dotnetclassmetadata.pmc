@@ -38,25 +38,25 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
     {
         /* Tell the GC about stuff we're holding on to. */
         struct dotnet_class *c = PMC_struct_val(SELF);
-		if (c)
-		{
-			if (c->parent)
-				pobject_lives(INTERP, (PObj*)c->parent);
-			if (c->str_name)
-				pobject_lives(INTERP, (PObj*)c->str_name);
-			if (c->str_namespace)
-				pobject_lives(INTERP, (PObj*)c->str_namespace);
+                if (c)
+                {
+                        if (c->parent)
+                                pobject_lives(INTERP, (PObj*)c->parent);
+                        if (c->str_name)
+                                pobject_lives(INTERP, (PObj*)c->str_name);
+                        if (c->str_namespace)
+                                pobject_lives(INTERP, (PObj*)c->str_namespace);
             if (c->str_fullname)
-				pobject_lives(INTERP, (PObj*)c->str_fullname);
-			if (c->fields)
-				pobject_lives(INTERP, (PObj*)c->fields);
+                                pobject_lives(INTERP, (PObj*)c->str_fullname);
+                        if (c->fields)
+                                pobject_lives(INTERP, (PObj*)c->fields);
             if (c->methods)
-				pobject_lives(INTERP, (PObj*)c->methods);
-			if (c->interface_types)
-				pobject_lives(INTERP, (PObj*)c->interface_types);
+                                pobject_lives(INTERP, (PObj*)c->methods);
+                        if (c->interface_types)
+                                pobject_lives(INTERP, (PObj*)c->interface_types);
             if (c->interface_ids)
-				pobject_lives(INTERP, (PObj*)c->interface_ids);
-		}
+                                pobject_lives(INTERP, (PObj*)c->interface_ids);
+                }
     }
 
 
@@ -73,7 +73,7 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
 
 
     /* Get the namespace of the class. */
-	METHOD STRING* get_namespace()
+        METHOD STRING* get_namespace()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 
@@ -90,7 +90,7 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
 
 
     /* Get the fully qualified name of the class. */
-	METHOD STRING* get_fullname()
+        METHOD STRING* get_fullname()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 
@@ -107,7 +107,7 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
 
 
     /* Get the flags of the class. */
-	METHOD int get_flags()
+        METHOD int get_flags()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 
@@ -123,8 +123,8 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
     }
 
 
-	/* Get a PMC array of fields belonging to the class. */
-	METHOD PMC* get_fields()
+        /* Get a PMC array of fields belonging to the class. */
+        METHOD PMC* get_fields()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 
@@ -135,17 +135,17 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
                "Invalid DotNetClassMetadata PMC");
             return NULL;
         }
-		else if (c->fields == NULL)
-		{
-			return pmc_new(INTERP, enum_class_FixedPMCArray);
-		}
+                else if (c->fields == NULL)
+                {
+                        return pmc_new(INTERP, enum_class_FixedPMCArray);
+                }
         else
             return c->fields;
     }
 
 
     /* Get a PMC array of methods belonging to the class. */
-	METHOD PMC* get_methods()
+        METHOD PMC* get_methods()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 
@@ -156,17 +156,17 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
                "Invalid DotNetClassMetadata PMC");
             return NULL;
         }
-		else if (c->methods == NULL)
-		{
-			return pmc_new(INTERP, enum_class_FixedPMCArray);
-		}
+                else if (c->methods == NULL)
+                {
+                        return pmc_new(INTERP, enum_class_FixedPMCArray);
+                }
         else
             return c->methods;
     }
     
 
     /* Get the id of the class that this one inherits. */
-	METHOD int get_parent_id()
+        METHOD int get_parent_id()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 
@@ -184,7 +184,7 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
 
     /* Get the type of the class that this one inherits. This is either a
        type defined in this module or a reference to another module. */
-	METHOD int get_parent_type()
+        METHOD int get_parent_type()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 
@@ -201,7 +201,7 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
 
 
     /* Get the array of ids of the interfaces this class implements. */
-	METHOD PMC* get_interface_ids()
+        METHOD PMC* get_interface_ids()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 
@@ -218,7 +218,7 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
 
 
     /* Get the array of types of the interfaces this class implements. */
-	METHOD PMC* get_interface_types()
+        METHOD PMC* get_interface_types()
     {
         struct dotnet_class *c = PMC_struct_val(SELF);
 

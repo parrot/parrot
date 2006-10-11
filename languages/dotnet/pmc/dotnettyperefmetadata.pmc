@@ -38,13 +38,13 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
     {
         /* Tell the GC about stuff we're holding on to. */
         struct dotnet_typeref *c = PMC_struct_val(SELF);
-		if (c)
-		{
-			if (c->str_name)
-				pobject_lives(INTERP, (PObj*)c->str_name);
-			if (c->str_namespace)
-				pobject_lives(INTERP, (PObj*)c->str_namespace);
-		}
+                if (c)
+                {
+                        if (c->str_name)
+                                pobject_lives(INTERP, (PObj*)c->str_name);
+                        if (c->str_namespace)
+                                pobject_lives(INTERP, (PObj*)c->str_namespace);
+                }
     }
 
 
@@ -61,7 +61,7 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
 
 
     /* Get the namespace of the referenced type. */
-	METHOD STRING* get_namespace()
+        METHOD STRING* get_namespace()
     {
         struct dotnet_typeref *c = PMC_struct_val(SELF);
 
@@ -78,7 +78,7 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
 
 
     /* Get the resolution scope. */
-	METHOD int get_resolution_scope()
+        METHOD int get_resolution_scope()
     {
         struct dotnet_typeref *c = PMC_struct_val(SELF);
 

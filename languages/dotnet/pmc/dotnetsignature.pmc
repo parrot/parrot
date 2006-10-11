@@ -12,7 +12,7 @@ pmclass DotNetSignature dynpmc group dotnet {
     void init()
     {
         PObj_active_destroy_SET(SELF);
-		PMC_struct_val(SELF) = NULL;
+                PMC_struct_val(SELF) = NULL;
     }
 
 

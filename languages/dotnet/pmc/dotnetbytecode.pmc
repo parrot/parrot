@@ -77,7 +77,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     }
 
 
-	/* Get length of bytecode. */
+        /* Get length of bytecode. */
     METHOD int get_length()
     {
         struct dotnet_bytecode *bc = PMC_struct_val(SELF);

@@ -352,7 +352,7 @@ Return the namespace with the given name.
         if (VTABLE_isa(INTERP, ns, s_ns))
             return ns;
 
-		return PMCNULL;
+                return PMCNULL;
     }
 
 /*
@@ -376,7 +376,7 @@ Return the Sub PMC with the given name.
         if (VTABLE_isa(INTERP, sub, s_sub))
             return sub;
 
-		return PMCNULL;
+                return PMCNULL;
     }
 
 /*
