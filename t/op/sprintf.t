@@ -161,6 +161,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     data_hash['2**32-1'] = 0xffffffff
     $N0 = pow 2, 38
     data_hash['2**38'] = $N0
+    data_hash["'string'"] = 'string'
 
     $I0 = exists data_hash[data]
     unless $I0 goto got_data
@@ -329,15 +330,28 @@ tag 'all' is allowed for todo tests that should fail on any system
     skip_info[161] = 'harness needs support for * modifier'
     skip_info[166] = 'harness needs support for * modifier'
     skip_info[193] = 'perl5-specific test'
+    skip_info[200] = 'perl5-specific test'
+    skip_info[201] = 'perl5-specific test'
+    skip_info[202] = 'parrot extension (%p)'
+    skip_info[204] = 'parrot extension (%r)'
+    skip_info[210] = 'harness needs support for * modifier'
+    skip_info[214] = 'harness needs support for * modifier'
+    skip_info[233] = 'harness needs support for * modifier'
+    skip_info[234] = 'perl5-specific extension (%v...)'
+    skip_info[235] = 'perl5-specific extension (%v...)'
 
-    $I0 = 259
-    $I1 = 264
+    $S0 = 'perl5-specific test'
+    $I0 = 238
+    $I1 = 251
     bsr set_skip_loop
 
+    $S0 = 'perl5-specific extension (%v...)'
     $I0 = 252
-    $I1 = 297
-    $S0 = '%v unsupported'
+    $I1 = 298
     bsr set_skip_loop
+
+    skip_info[307] = 'perl5-specific extension (%v...)'
+    skip_info[308] = 'perl5-specific extension (%v...)'
 
     skip_tests[test_file] = skip_info
 
