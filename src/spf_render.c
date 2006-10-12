@@ -196,6 +196,14 @@ handle_flags(Interp *interpreter,
     return str;
 }
 
+static STRING* str_append_w_flags(Interp *interpreter,
+        STRING* dest, SpfInfo info, STRING* src, STRING *prefix)
+{
+    src = handle_flags(interpreter, info, src, 1, prefix);
+    dest = string_append(interpreter, dest, src, 0);
+    return dest;
+}
+
 /*
 
 =item C<static void
@@ -558,85 +566,66 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                         case 'c':
                             ts = string_chr(interpreter,
                                  obj->getint(interpreter, info.type, obj)); 
-                            ts = handle_flags(interpreter, &info, ts, 1, NULL);
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, NULL);
                             break;
 
                         case 'd':
                         case 'i':
                             theint = obj->getint(interpreter, info.type, obj);
                             ts = int_to_str(interpreter, tc, theint, 10);
-
-                            ts = handle_flags(interpreter, &info, ts, 1, NULL);
-
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, NULL);
                             break;
 
                         case 'o':
                             theint = obj->getint(interpreter, info.type, obj);
                             ts = int_to_str(interpreter, tc, theint, 8);
-
                             prefix = CONST_STRING(interpreter, "0");
-                            ts = handle_flags(interpreter, &info,
-                                    ts, 1, prefix);
-
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, prefix);
                             break;
 
                         case 'x':
                             theuint = obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 16, 0);
-
                             prefix = CONST_STRING(interpreter, "0x");
-                            ts = handle_flags(interpreter, &info,
-                                    ts, 1, prefix);
-
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, prefix);
                             break;
 
                         case 'X':
                             theuint =
                                 obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 16, 0);
-
                             prefix = CONST_STRING(interpreter, "0X");
-                            ts = handle_flags(interpreter, &info,
-                                    ts, 1, prefix);
-
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, prefix);
                             break;
 
                         case 'b':
                             theuint =
                                 obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 2, 0);
-
                             prefix = CONST_STRING(interpreter, "0b");
-                            ts = handle_flags(interpreter, &info,
-                                    ts, 1, prefix);
-
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, prefix);
                             break;
 
                         case 'B':
                             theint = obj->getint(interpreter, info.type, obj);
                             ts = int_to_str(interpreter, tc, theint, 2);
-
                             prefix = CONST_STRING(interpreter, "0B");
-                            ts = handle_flags(interpreter, &info,
-                                    ts, 1, prefix);
-
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, prefix);
                             break;
 
                         case 'u':
                             theuint =
                                 obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 10, 0);
-
-                            ts = handle_flags(interpreter, &info, ts, 1, NULL);
-
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, NULL);
                             break;
 
                         case 'p':
@@ -645,10 +634,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                                        (HUGEINTVAL) (size_t) ptr, 16, 0);
 
                             prefix = CONST_STRING(interpreter, "0x");
-                            ts = handle_flags(interpreter, &info,
-                                    ts, 1, prefix);
-
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = str_append_w_flags(interpreter, targ,
+                                    &info, ts, prefix);
                             break;
 
                             /* FLOATS - We cheat on these and use snprintf. */
