@@ -1308,8 +1308,29 @@ EOH
 #endif
 
 EOH
+    $hout .= $self->c_code_coda();
     $hout;
 }
+
+
+=item C<c_code_coda()>
+
+Returns the Parrot C code coda (PDD07)
+
+=cut
+
+sub c_code_coda() {
+    return <<'EOC';
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+
+EOC
+}
+
 
 =item C<implements($method)>
 
