@@ -155,16 +155,16 @@ tag 'all' is allowed for todo tests that should fail on any system
     # prepend test filename and line number to description
     description = 'build_test_desc'( description, template )
 
-    if data == "''" goto data_null
-    if data == '2**32-1' goto data_ffffffff
-    goto got_data
+    .local pmc data_hash
+    data_hash = new .Hash
+    data_hash["''"] = ''
+    data_hash['2**32-1'] = 0xffffffff
+    $N0 = pow 2, 38
+    data_hash['2**38'] = $N0
 
-  data_null:
-    data = ''
-    goto got_data
-
-  data_ffffffff:
-    data = 0xffffffff
+    $I0 = exists data_hash[data]
+    unless $I0 goto got_data
+    data = data_hash[data]
 
   got_data:
 #    data     = backslash_escape (data)
@@ -323,8 +323,12 @@ tag 'all' is allowed for todo tests that should fail on any system
     $I1 = 99
     bsr set_skip_loop
 
-    skip_info[114] = 'needs support for * modifier'
-    skip_info[131] = 'needs support for * modifier'
+    skip_info[114] = 'harness needs support for * modifier'
+    skip_info[131] = 'harness needs support for * modifier'
+    skip_info[141] = 'harness needs support for * modifier'
+    skip_info[161] = 'harness needs support for * modifier'
+    skip_info[166] = 'harness needs support for * modifier'
+    skip_info[193] = 'perl5-specific test'
 
     $I0 = 259
     $I1 = 264
