@@ -210,7 +210,6 @@ sub pmc_source_file_directories
 	    'languages/python/pmc',
 	    'languages/tcl/src/pmc',
             map("src/$_" => qw<dynpmc pmc>),
-            't/tools',
     ;
 }
 
