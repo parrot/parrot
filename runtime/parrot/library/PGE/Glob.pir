@@ -33,6 +33,8 @@ or the resulting PIR code (target='PIR').
     target = adverbs['target']
 
     .local pmc match
+    null match
+    if source == '' goto analyze
     $P0 = find_global 'PGE::Grammar', 'glob'
     match = $P0(source)
     if target != 'parse' goto check
@@ -50,14 +52,18 @@ or the resulting PIR code (target='PIR').
   analyze:
     .local pmc exp, pad
     exp = new 'PGE::Exp::Concat'
+    $I0 = 1
     $P0 = new 'PGE::Exp::Anchor'
     $P0.'result_object'('^')
     exp[0] = $P0
+    if null match goto analyze_1
     $P0 = match['expr']
-    exp[1] = $P0
+    exp[$I0] = $P0
+    inc $I0
+  analyze_1:
     $P0 = new 'PGE::Exp::Anchor'
     $P0.'result_object'('$')
-    exp[2] = $P0
+    exp[$I0] = $P0
     if target != 'exp' goto pir
     .return (exp)
 

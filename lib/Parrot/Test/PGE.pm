@@ -326,9 +326,8 @@ sub _generate_glob_for {
         .sub _PGE_Test
             .local pmc glob_compile
             load_bytecode "PGE.pbc"
-            load_bytecode "PGE/Glob.pir"
-            load_bytecode "PGE/Dumper.pir"
-            load_bytecode "PGE/Text.pir"
+            load_bytecode "PGE/Glob.pbc"
+            load_bytecode "PGE/Text.pbc"
             glob_compile = compreg "PGE::Glob"
 
             .local string target
@@ -339,7 +338,7 @@ sub _generate_glob_for {
             .local pmc exp
             target = unicode:"$target"
             pattern = "$pattern"
-            (rulesub, code, exp) = glob_compile(pattern)
+            rulesub = glob_compile(pattern)
             match = rulesub(target)
             unless match goto match_fail
           match_success:
