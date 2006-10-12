@@ -556,11 +556,10 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                         switch (ch) {
                             /* INTEGERS */
                         case 'c':
-                            targ = string_append(interpreter, targ,
-                                        string_chr(interpreter,
-                                                 obj->getint(interpreter,
-                                                             info.type, obj)), 
-                                                 0);
+                            ts = string_chr(interpreter,
+                                 obj->getint(interpreter, info.type, obj)); 
+                            ts = handle_flags(interpreter, &info, ts, 1, NULL);
+                            targ = string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'd':
