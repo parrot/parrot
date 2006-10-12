@@ -155,8 +155,16 @@ tag 'all' is allowed for todo tests that should fail on any system
     # prepend test filename and line number to description
     description = 'build_test_desc'( description, template )
 
-    if data != "''" goto got_data
+    if data == "''" goto data_null
+    if data == '2**32-1' goto data_ffffffff
+    goto got_data
+
+  data_null:
     data = ''
+    goto got_data
+
+  data_ffffffff:
+    data = 0xffffffff
 
   got_data:
 #    data     = backslash_escape (data)
@@ -300,12 +308,23 @@ tag 'all' is allowed for todo tests that should fail on any system
 
     bsr reset_skip_info
     test_file = 'sprintf_tests'
-    skip_info[14] = 'unknown reason'
-    skip_info[15] = 'unknown reason'
+    skip_info[5] = 'parrot extension (%B)'
+    skip_info[7] = 'perl5-specific extension (%D)'
+    skip_info[9] = 'perl5-specific extension (%F)'
+    skip_info[16] = 'parrot extension (%H)'
+    skip_info[20] = 'parrot extension (%L)'
+    skip_info[23] = 'perl5-specific extension (%O)'
+    skip_info[24] = 'parrot extension (%P)'
+    skip_info[27] = 'parrot extension (%S)'
+    skip_info[29] = 'perl5-specific extension (%U)'
 
-    $I0 = 45
-    $I1 = 235
+    $S0 = 'perl5-specific extension (%v...)'
+    $I0 = 71
+    $I1 = 99
     bsr set_skip_loop
+
+    skip_info[114] = 'needs support for * modifier'
+    skip_info[131] = 'needs support for * modifier'
 
     $I0 = 259
     $I1 = 264
@@ -348,6 +367,8 @@ tag 'all' is allowed for todo tests that should fail on any system
 
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
+    # remove the trailing newline from record
+    chopn record, 1
     $P1 = split "\t", record
     $I0 = elements $P1 # length of array
     .local int tab_number
@@ -375,7 +396,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     if description == '' goto get_description
 
     # chop (description)
-    substr description, -1, 1, ''
+    # substr description, -1, 1, ''
 
   return:
     .return ( template, data, expected, description )
