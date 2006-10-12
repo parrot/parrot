@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 28;
 use Parrot::Test::PGE;
 
 
@@ -21,7 +21,14 @@ t/library/pge_globs.t - Parrot Grammar Engine tests of globs
 =cut
 
 
-# 1-6
+## literal match
+pgeglob_is  ('', '', 'literal: empty string, empty pattern');
+pgeglob_isnt('0', '', 'literal: empty pattern');
+pgeglob_isnt('', '0', 'literal: empty string');
+pgeglob_is  ('abc', 'abc', 'literal');
+pgeglob_isnt('abc', 'abd', 'literal');
+
+## wildcards
 pgeglob_is  ('bznza', 'b?n*a', "glob wildcards");
 pgeglob_is  ('bana', 'b?n*a', "glob wildcards");
 pgeglob_isnt('bnana', 'b?n*a', "glob wildcards");
@@ -29,25 +36,27 @@ pgeglob_is  ('bnan', '?n?*', "glob wildcards");
 pgeglob_is  ('ana', '?n?*', "glob wildcards");
 pgeglob_isnt('an', '?n?*', "glob wildcards");
 
-# 7
-pgeglob_is  ('orange','[go]range','glob enumerated characters');
-pgeglob_is  ('grange','[go]range','glob enumerated characters');
-pgeglob_isnt('ggrange','[go]range','glob enumerated characters');
-pgeglob_isnt('borange','[go]range','glob enumerated characters');
-pgeglob_isnt('arange','[go]range','glob enumerated characters');
-pgeglob_is  ('a','[^0-9]','glob enumerated characters');
-pgeglob_isnt('4','[^0-9]','glob enumerated characters');
-pgeglob_isnt('0','[^0-9]','glob enumerated characters');
-pgeglob_isnt('9','[^0-9]','glob enumerated characters');
-pgeglob_isnt('4a','[^0-9]','glob enumerated characters');
-pgeglob_isnt('aa','[^0-9]','glob enumerated characters');
+## enumerated chars
+pgeglob_is  ('orange', '[go]range', 'glob enumerated characters');
+pgeglob_is  ('grange', '[go]range', 'glob enumerated characters');
+pgeglob_isnt('ggrange', '[go]range', 'glob enumerated characters');
+pgeglob_isnt('borange', '[go]range', 'glob enumerated characters');
+pgeglob_isnt('arange', '[go]range', 'glob enumerated characters');
+pgeglob_is  ('a', '[^0-9]', 'glob enumerated characters');
+pgeglob_isnt('4', '[^0-9]', 'glob enumerated characters');
+pgeglob_isnt('0', '[^0-9]', 'glob enumerated characters');
+pgeglob_isnt('9', '[^0-9]', 'glob enumerated characters');
+pgeglob_isnt('4a', '[^0-9]', 'glob enumerated characters');
+pgeglob_isnt('aa', '[^0-9]', 'glob enumerated characters');
+pgeglob_is  ('_','[A-z]', '_ is between A and z');
 
+## empty string
 pgeglob_is  ('', '*', 'glob empty string');
 pgeglob_isnt('', '?', 'glob empty string');
 pgeglob_isnt('', '[0]', 'glob empty string');
 pgeglob_isnt('', '[^0]', 'glob empty string');
 
-# 22 
+## alternate
 pir_output_is(<<'CODE', <<'OUT', "Glob, alternate");
 
 .sub _main
@@ -140,5 +149,4 @@ ok9
 ok10
 ok11
 OUT
-
 
