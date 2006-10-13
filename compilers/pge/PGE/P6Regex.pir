@@ -546,11 +546,11 @@ combinations.
   quant_suffix:
     suffix = substr target, suffixpos, 2
     if suffix == ':?' goto quant_eager
-    if suffix == ':+' goto quant_greedy
+    if suffix == ':!' goto quant_greedy
   quant_suffix_1:
     suffix = substr target, suffixpos, 1
     if suffix == '?' goto quant_eager
-    if suffix == '+' goto quant_greedy
+    if suffix == '!' goto quant_greedy
     if suffix != ':' goto quant_set
   quant_none:
     mob['backtrack'] = PGE_BACKTRACK_NONE

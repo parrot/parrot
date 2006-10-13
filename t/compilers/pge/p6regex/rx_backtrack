@@ -19,4 +19,7 @@ ab:::cd | gh:::ij	xyabghij	n	rule cut at top
 ( ab | abc ): de	xyzabcde	n	no backtrack into subpattern
 [ when <commit> ever ] | whence	whence	n	full backtrack failure
 
+:ratchet a* a		bazaar		n	ratchet modifier
+:ratchet a*! a		bazaar		y	force backtracking !
+
 ## vim: noexpandtab tabstop=4 shiftwidth=4
