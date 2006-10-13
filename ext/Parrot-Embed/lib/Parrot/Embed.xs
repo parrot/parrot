@@ -7,6 +7,26 @@
 #include "parrot/extend.h"
 
 typedef Parrot_Interp Parrot_Interpreter;
+typedef struct PMC_struct
+{
+	Parrot_Interp interp;
+	Parrot_PMC    pmc;
+} PMC_struct;
+
+PMC_struct*
+make_pmc( Parrot_Interp interp, Parrot_PMC pmc )
+{
+	PMC_struct *pmc_struct;
+	if (pmc == NULL)
+		return NULL;
+
+	New( 0, pmc_struct, 1, PMC_struct );
+
+	pmc_struct->interp = interp;
+	pmc_struct->pmc    = pmc;
+
+	return pmc_struct;
+}
 
 MODULE = Parrot::Embed PACKAGE = Parrot::Interpreter
 
@@ -62,6 +82,7 @@ INIT:
 	SV            * namespace;
 	Parrot_STRING   p_namespace;
 	Parrot_STRING   p_global;
+	Parrot_PMC      pmc;
 CODE:
 	if ( items < 2 || items > 3 )
 	{
@@ -79,24 +100,12 @@ CODE:
 	if (namespace  != &PL_sv_undef )
 	{
 		p_namespace = const_string( interp, SvPVX( namespace ) );
-		RETVAL      = Parrot_find_global_s( interp, p_namespace, p_global );
+		pmc         = Parrot_find_global_s( interp, p_namespace, p_global );
 	}
 	else
-		RETVAL      = Parrot_find_global_cur( interp, p_global );
-OUTPUT:
-	RETVAL
+		pmc         = Parrot_find_global_cur( interp, p_global );
 
-Parrot_PMC
-invoke( interp, Sub_PMC, signature, argument )
-	Parrot_Interpreter   interp
-	Parrot_PMC           Sub_PMC
-	const char         * signature
-	const char         * argument
-INIT:
-	Parrot_STRING   arg_string;
-CODE:
-	arg_string = const_string( interp, argument );
-	RETVAL     = Parrot_call_sub( interp, Sub_PMC, signature, arg_string );
+	RETVAL = make_pmc( interp, pmc );
 OUTPUT:
 	RETVAL
 
@@ -121,12 +130,30 @@ CODE:
 
 MODULE = Parrot::Embed PACKAGE = Parrot::PMC
 
-char *
-get_string( pmc, interp )
-	Parrot_PMC         pmc
-	Parrot_Interpreter interp
+Parrot_PMC
+invoke( pmc, signature, argument )
+	PMC_struct * pmc
+	const char * signature
+	const char * argument
+INIT:
+	Parrot_PMC    pmc_actual;
+	Parrot_PMC    out_pmc;
+	Parrot_Interp interp;
+	Parrot_STRING arg_string;
 CODE:
-	RETVAL = Parrot_PMC_get_cstring( interp, pmc );
+	pmc_actual = pmc->pmc;
+	interp     = pmc->interp;
+	arg_string = const_string( interp, argument );
+	out_pmc    = Parrot_call_sub( interp, pmc_actual, signature, arg_string );
+	RETVAL     = make_pmc( interp, out_pmc );
+OUTPUT:
+	RETVAL
+
+char *
+get_string( pmc )
+	PMC_struct* pmc
+CODE:
+	RETVAL = Parrot_PMC_get_cstring( pmc->interp, pmc->pmc );
 OUTPUT:
 	RETVAL
 

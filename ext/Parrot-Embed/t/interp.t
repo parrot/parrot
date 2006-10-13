@@ -56,11 +56,11 @@ isnt( $$global_greet, $$else_greet,
 ok( ! $interp->find_global( 'goat', 'Elsewhere' ),
 	'... but again, not if there is no global of that name there' );
 
-can_ok( $module, 'invoke'            );
-my $pmc = $interp->invoke( $global_greet, 'PS', 'Bob' );
+can_ok( $global_greet, 'invoke'            );
+my $pmc = $global_greet->invoke( 'PS', 'Bob' );
 ok( $pmc, 'call_sub() should return a PMC, given that signature' );
 
-is( $pmc->get_string( $interp ), 'Hello, Bob!',
+is( $pmc->get_string(), 'Hello, Bob!',
 	'... containing a string returned in the PMC' );
 
 can_ok( $module, 'compile'      );
@@ -85,11 +85,10 @@ TODO:
 	ok( ! $interp->compile( 'blah' ), '... but only for valid PIR' );
 }
 
-$pmc    = $interp->invoke( $else_greet, 'P', '' );
-is( $pmc->get_string( $interp ), 'Hiya!',
-	'... calling the passed-in subroutine' );
+$pmc    = $else_greet->invoke( 'P', '' );
+is( $pmc->get_string(), 'Hiya!', '... calling the passed-in subroutine' );
 
 my $foo = $interp->find_global( 'foo' );
-$pmc    = $interp->invoke( $foo, 'PS', 'BAR' );
-is( $pmc->get_string( $interp ), 'BAR FOO ',
+$pmc    = $foo->invoke( 'PS', 'BAR' );
+is( $pmc->get_string(), 'BAR FOO ',
 	'... and compiled sub should work just like any other Sub pmc' );
