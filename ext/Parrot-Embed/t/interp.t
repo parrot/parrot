@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 31;
 use File::Spec;
 
 my $hello_pbc = File::Spec->catfile( 't', 'greet.pbc' );
@@ -92,3 +92,13 @@ my $foo = $interp->find_global( 'foo' );
 $pmc    = $foo->invoke( 'PS', 'BAR' );
 is( $pmc->get_string(), 'BAR FOO ',
 	'... and compiled sub should work just like any other Sub pmc' );
+
+{
+	my $die_interp = $module->new( $interp );
+	eval { $die_interp->load_file( $hello_pbc ) };
+	$foo = $die_interp->find_global( 'greet' );
+}
+
+$pmc    = $foo->invoke( 'PS', 'out of scope' );
+is( $pmc->get_string(), 'Hello, out of scope!',
+		'... even if interpreter object has gone out of scope' );

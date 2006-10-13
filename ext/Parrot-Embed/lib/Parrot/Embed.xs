@@ -6,6 +6,8 @@
 #include "parrot/embed.h"
 #include "parrot/extend.h"
 
+#define get_interp( i ) INT2PTR( Parrot_Interpreter, SvIV( SvRV( (SV*)i ) ) )
+	
 typedef Parrot_Interp Parrot_Interpreter;
 typedef struct PMC_struct
 {
@@ -114,11 +116,13 @@ compile( interp, code )
 	Parrot_Interpreter interp
 	char * code
 INIT:
-	STRING *code_type;
-	STRING *error;
+	STRING     *code_type;
+	STRING     *error;
+	Parrot_PMC  out_pmc;
 CODE:
 	code_type = const_string( interp, "PIR" );
-	RETVAL    = Parrot_compile_string( interp, code_type, code, &error );
+	out_pmc   = Parrot_compile_string( interp, code_type, code, &error );
+	RETVAL    = make_pmc( ST(0), out_pmc );
 OUTPUT:
 	RETVAL
 
