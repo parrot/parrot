@@ -330,27 +330,27 @@ Specific exceptions to throw for specific errors.
 
   foo(1, i)                       # 2 positional arguments
   foo(x, ar :flat, y)             # flattening array
-  foo(p, 'q' => q)                # named argument
-  foo(p, q :named('q'))           # the same
+  foo(p, 'key' => value)          # named argument
+  foo(p, value :named('key'))     # the same
   foo(kw :named :flat)            # a flattening hash
 
 =head2 Parameters
 
   .param int i                    # positional parameter
   .param pmc argv :slurpy         # slurpy array
-  .param pmc qu :named('q')       # named parameter
+  .param pmc value :named('key')  # named parameter
   .param int x :optional          # optional parameter
   .param int has_x :opt_flag      # flag 0/1 x was passed
   .param pmc kw :slurpy :named    # slurpy hash
 
 =head2 Return Values
 
-  .return (i, ar: flat, q :named('q') )
+  .return (i, ar: flat, value :named('key') )
 
 =head2 Call Results
 
   x = foo()                       # single result
-  (i, j :optional, ar :slurpy, q :named('q') ) = foo()
+  (i, j :optional, ar :slurpy, value :named('key') ) = foo()
 
 =head1 ATTACHMENTS
 
