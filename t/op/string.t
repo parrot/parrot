@@ -1827,7 +1827,7 @@ MAIN:
     bsr NEWARYI
     bsr PRINTF
 
-    set S1, "+1 == %+vu\n"
+    set S1, "1 == %+vu\n"
     set I0, 1
     bsr NEWARYI
     bsr PRINTF
@@ -1837,7 +1837,7 @@ MAIN:
     bsr NEWARYI
     bsr PRINTF
 
-    set S1, "+001 == %+0.3u\n"
+    set S1, "001 == %+0.3u\n"
     set I0, 1
     bsr NEWARYI
     bsr PRINTF
@@ -1888,9 +1888,9 @@ Hello, Hello, Pa!
 -255 == -255
 +123 == +123
 256 == 256
-+1 == +1
+1 == 1
 001 == 001
-+001 == +001
+001 == 001
 0.500000 == 0.500000
 0.500 == 0.500
 0.001 == 0.001

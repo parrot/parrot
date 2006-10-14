@@ -121,8 +121,14 @@ handle_flags(Interp *interpreter,
     UINTVAL len = string_length(interpreter, str);
 
     if (is_int_type) {
+        if (info->flags & FLAG_PREC && info->prec == 0 &&
+                len == 1 &&
+                string_ord(interpreter, str, 0) == '0') {
+            string_chopn(interpreter, str, len, 1);
+            len = 0;
+        }
         /* +, space */
-        if (string_ord(interpreter, str, 0) != '-') {
+        if (!len || string_ord(interpreter, str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
                 STRING * const cs = CONST_STRING(interpreter, "+");
                 str = string_concat(interpreter, cs , str, 0);
@@ -158,10 +164,15 @@ handle_flags(Interp *interpreter,
     }
     else {
         /* string precision */
-        if (info->flags & FLAG_PREC && info->prec < len) {
-            string_chopn(interpreter, str, -(INTVAL)(info->prec), 1);
-            len = info->prec;
+        if (info->flags & FLAG_PREC && info->prec == 0) {
+            string_chopn(interpreter, str, len, 1);
+            len = 0;
         }
+        else 
+            if (info->flags & FLAG_PREC && info->prec < len) {
+                string_chopn(interpreter, str, -(INTVAL)(info->prec), 1);
+                len = info->prec;
+            }
     }
 
     if ((info->flags & FLAG_WIDTH) && info->width > len) {
@@ -227,7 +238,6 @@ gen_sprintf_call(Interp *interpreter, char *out,
     int i = 0;
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
-    STRING *ts;
     out[i++] = '%';
     if (info->flags) {
         if (info->flags & FLAG_MINUS) {
@@ -251,13 +261,7 @@ gen_sprintf_call(Interp *interpreter, char *out,
         if (info->width > PARROT_SPRINTF_BUFFER_SIZE - 1) {
             info->width = PARROT_SPRINTF_BUFFER_SIZE;
         }
-        ts = uint_to_str(interpreter, tc, info->width, 10, 0);
-        {
-            char * const tempstr = string_to_cstring(interpreter, ts);
-            strcpy(out + i, tempstr);
-            string_cstring_free(tempstr);
-        }
-        i = strlen(out);
+        i += sprintf(out + i, "%u", (unsigned)info->width);
     }
 
     if (info->flags & FLAG_PREC) {
@@ -266,15 +270,10 @@ gen_sprintf_call(Interp *interpreter, char *out,
         }
 
         out[i++] = '.';
-        ts = uint_to_str(interpreter, tc, info->prec, 10, 0);
-        {
-            char * const tempstr = string_to_cstring(interpreter, ts);
-            strcpy(out + i, tempstr);
-            string_cstring_free(tempstr);
-        }
-        i = strlen(out);
+        i += sprintf(out + i, "%u", (unsigned)info->prec);
     }
-
+    if (thingy == 'd' || thingy == 'i' ||thingy == 'u')
+        out[i++] = 'l';
     out[i++] = thingy;
     out[i] = 0;
 }
@@ -572,14 +571,6 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                                     &info, ts, NULL);
                             break;
 
-                        case 'd':
-                        case 'i':
-                            theint = obj->getint(interpreter, info.type, obj);
-                            ts = int_to_str(interpreter, tc, theint, 10);
-                            targ = str_append_w_flags(interpreter, targ,
-                                    &info, ts, NULL);
-                            break;
-
                         case 'o':
                             theint = obj->getint(interpreter, info.type, obj);
                             ts = int_to_str(interpreter, tc, theint, 8);
@@ -636,9 +627,29 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                         case 'u':
                             theuint =
                                 obj->getuint(interpreter, info.type, obj);
-                            ts = uint_to_str(interpreter, tc, theuint, 10, 0);
-                            targ = str_append_w_flags(interpreter, targ,
-                                    &info, ts, NULL);
+                            theint = theuint;
+                            goto do_sprintf;
+                        case 'd':
+                        case 'i':
+                            theint = obj->getint(interpreter, info.type, obj);
+do_sprintf:
+                            gen_sprintf_call(interpreter, tc, &info, ch);
+                            ts = cstr2pstr(tc);
+                            {
+                                char * const tempstr = 
+                                    string_to_cstring(interpreter, ts);
+
+#ifdef PARROT_HAS_SNPRINTF
+                                snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
+                                         tempstr, theint);
+#else
+                                /* the buffer is 4096, so no problem here */
+                                sprintf(tc, tempstr, theint);
+#endif
+                                string_cstring_free(tempstr);
+                            }
+                            targ = string_append(interpreter, targ, 
+                                                 cstr2pstr(tc), 0);
                             break;
 
                         case 'p':

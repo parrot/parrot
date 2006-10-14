@@ -401,8 +401,9 @@ tag 'all' is allowed for todo tests that should fail on any system
     data           = $P1[tab_number]
     inc tab_number
     if data == '' goto get_data
+    expected = ''
   get_expected:
-    if tab_number >= $I0 goto bad_line
+    if tab_number >= $I0 goto empty_expected
     expected       = $P1[tab_number]
     inc tab_number
     if expected == '' goto get_expected
@@ -417,6 +418,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     # substr description, -1, 1, ''
 
   return:
+  empty_expected:
     .return ( template, data, expected, description )
 
   no_desc:
