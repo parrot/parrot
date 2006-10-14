@@ -272,8 +272,13 @@ gen_sprintf_call(Interp *interpreter, char *out,
         out[i++] = '.';
         i += sprintf(out + i, "%u", (unsigned)info->prec);
     }
-    if (thingy == 'd' || thingy == 'i' ||thingy == 'u')
+    if (thingy == 'd' || thingy == 'i' ||thingy == 'u') {
+        /* theu?int isa HUGEU?INTVAL aka long long 
+         * the 'll' modifier is specced in susv3 - hopefully all our
+         * compilers support it too */
         out[i++] = 'l';
+        out[i++] = 'l';
+    }
     out[i++] = thingy;
     out[i] = 0;
 }
