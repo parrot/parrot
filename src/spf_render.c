@@ -142,7 +142,8 @@ handle_flags(Interp *interpreter,
         }
         /* XXX sharp + fill ??? */
 
-        /* precision */
+#if 0
+        /* precision - only for floats, which is handled elsewhere */
         if (info->flags & FLAG_PREC) {
             info->flags |= FLAG_WIDTH;
             if (string_ord(interpreter, str, 0) == '-' ||
@@ -153,6 +154,7 @@ handle_flags(Interp *interpreter,
                 info->width = info->prec;
             }
         }
+#endif
     }
     else {
         /* string precision */
@@ -165,7 +167,7 @@ handle_flags(Interp *interpreter,
     if ((info->flags & FLAG_WIDTH) && info->width > len) {
         STRING *fill;
 
-        if (info->flags & FLAG_ZERO) {
+        if ((info->flags & FLAG_ZERO) && !(info->flags & FLAG_MINUS)) {
             fill = CONST_STRING(interpreter, "0");
         }
         else {
