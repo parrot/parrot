@@ -582,6 +582,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             theint = obj->getint(interpreter, info.type, obj);
                             ts = int_to_str(interpreter, tc, theint, 8);
                             prefix = CONST_STRING(interpreter, "0");
+                            /* unsigned conversion - no plus */
+                            info.flags &= ~FLAG_PLUS;
                             targ = str_append_w_flags(interpreter, targ,
                                     &info, ts, prefix);
                             break;
@@ -590,6 +592,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             theuint = obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 16, 0);
                             prefix = CONST_STRING(interpreter, "0x");
+                            /* unsigned conversion - no plus */
+                            info.flags &= ~FLAG_PLUS;
                             targ = str_append_w_flags(interpreter, targ,
                                     &info, ts, prefix);
                             break;
@@ -598,7 +602,10 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             theuint =
                                 obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 16, 0);
+                            ts = string_upcase(interpreter, ts);
                             prefix = CONST_STRING(interpreter, "0X");
+                            /* unsigned conversion - no plus */
+                            info.flags &= ~FLAG_PLUS;
                             targ = str_append_w_flags(interpreter, targ,
                                     &info, ts, prefix);
                             break;
@@ -608,6 +615,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                                 obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 2, 0);
                             prefix = CONST_STRING(interpreter, "0b");
+                            /* unsigned conversion - no plus */
+                            info.flags &= ~FLAG_PLUS;
                             targ = str_append_w_flags(interpreter, targ,
                                     &info, ts, prefix);
                             break;
@@ -616,6 +625,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             theint = obj->getint(interpreter, info.type, obj);
                             ts = int_to_str(interpreter, tc, theint, 2);
                             prefix = CONST_STRING(interpreter, "0B");
+                            /* unsigned conversion - no plus */
+                            info.flags &= ~FLAG_PLUS;
                             targ = str_append_w_flags(interpreter, targ,
                                     &info, ts, prefix);
                             break;
