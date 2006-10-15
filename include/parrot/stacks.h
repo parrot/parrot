@@ -93,6 +93,7 @@ PARROT_API void *stack_peek(Interp *interpreter, Stack_Chunk_t *stack,
 PARROT_API Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry)
     __attribute__nonnull__(2);
 
+void Parrot_dump_dynamic_environment(Interp *, struct Stack_Chunk *);
 
 
 #define ERROR_STACK_EMPTY 1

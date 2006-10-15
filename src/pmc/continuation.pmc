@@ -161,7 +161,8 @@ Assign context.
 
 =item C<void set_pointer(void *value)>
 
-Sets the pointer to the return instruction.
+Sets the pointer to the return instruction.  Also captures the current
+dynamic state, and the descriptor address for any returned values.
 
 =cut
 
@@ -171,7 +172,6 @@ Sets the pointer to the return instruction.
         opcode_t *pos = value;
         struct Parrot_cont * cc = PMC_cont(SELF);
 
-        PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
         cc->address = value;
         cc->dynamic_state = INTERP->dynamic_env;
         cc->runloop_id = INTERP->current_runloop_id;
@@ -314,7 +314,17 @@ destination to continue execution.
                 Parrot_runops_fromc_args(interpreter, cleanup_sub,
                                          "vI", exception_continuation_p);
             }
-            corresponding_target = corresponding_target->prev;
+
+            /* Keep corresponding_target in sync.  If stack_delta is negative,
+             * then dynamic_env is still above it; otherwise, we must step
+             * corresponding_target backwards as well.
+	     */
+            if (stack_delta < 0) {
+                stack_delta++;
+            }
+            else {
+                corresponding_target = corresponding_target->prev;
+            }
         }
         /* run back up the target stack to our destination.  [when we support
            dynamic binding (e.g.), we will have to traverse back up, and will
@@ -325,8 +335,9 @@ destination to continue execution.
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
             PMC *sub = to_ctx->current_sub;
 
-            PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",
-                    Parrot_full_sub_name(INTERP, sub));
+            PIO_eprintf(INTERP, "# Back in sub '%Ss', env %p\n",
+                        Parrot_full_sub_name(INTERP, sub),
+                        interpreter->dynamic_env);
         }
 
         /*

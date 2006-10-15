@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -193,5 +193,43 @@ unwinding
 something happened
 current instr/
 OUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'partial unwinding');
+## This is a regression test for a bug which unwound the stack prematurely.  If
+## it recurs, the action pushed in main will be triggered incorrectly by the
+## test3 RetContinuation, which must unwind the stack to pop (only!) the error
+## handler.  In that case, "unwinding" will appear before "leaving test2".
+.sub _test_1 :main
+	.const .Sub $P42 = "test_1_action"
+	newclosure $P43, $P42
+	pushmark 43
+	pushaction $P43
+	test2()
+	popmark 43
+	print "popped\n"
+.end
+.sub test_1_action :outer('_test_1')
+	print "unwinding\n"
+.end
+.sub test2
+	print "in test2\n"
+	test3()
+	print "leaving test2\n"
+	.return ()
+.end
+.sub test3
+	print "in test3\n"
+	push_eh eh
+	.return ()
+eh:
+	print "error\n"
+.end
+CODE
+in test2
+in test3
+leaving test2
+unwinding
+popped
+OUTPUT
 
 # end of tests.
