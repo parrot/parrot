@@ -386,8 +386,12 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
         if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             /* can't probably PIO_eprintf here */
             parrot_sub_t doomed = PMC_sub(ctxp->current_sub);
+            
             fprintf(stderr, "[free  ctx %p of sub '%s']\n",
-                    ctxp, (char*)doomed->name->strstart);
+                    ctxp,
+                    (doomed->name == 0xdeadbeef
+                     ? "???"
+                     : (char*)doomed->name->strstart));
         }
 #endif
         ptr = ctxp;
