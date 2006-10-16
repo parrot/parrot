@@ -34,7 +34,8 @@ my $builder = $class->new(
     license             => 'perl',
     dist_author         => 'chromatic <chromatic@wgz.org>',
     dist_version_from   => 'lib/Parrot/Embed.pm',
-    build_requires => {
+    build_requires =>
+	{
         'Test::More' => 0,
     },
     add_to_cleanup      => [ 'Parrot-Embed-*' ],

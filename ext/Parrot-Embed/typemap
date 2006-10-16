@@ -4,10 +4,20 @@ Parrot_PackFile 	T_PTR
 Parrot_STRING   	T_PTR
 
 Parrot_PMC          T_PTROBJ_PARROT
-Parrot_Interpreter	T_PTROBJ_PARROT
-PMC_struct*			T_PTROBJ_PARROT_PMC
+Parrot_Interpreter  T_PTROBJ_PARROT
+Interpreter_struct*	T_PTROBJ_PARROT_STRUCT
+PMC_struct*			T_PTROBJ_PARROT_STRUCT
 
 INPUT
+T_PTROBJ_PARROT_STRUCT
+	if (sv_derived_from($arg, \"${ (my $type = $ntype) =~ s/^(\w+)_struct.*$/Parrot::$1/; \$type}\"))
+	{
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, tmp);
+	}
+	else
+		croak(\"$var is not of type Parrot::$ntype\")
+
 T_PTROBJ_PARROT
 	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\"))
 	{
@@ -16,15 +26,6 @@ T_PTROBJ_PARROT
 	}
 	else
 		croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
-
-T_PTROBJ_PARROT_PMC
-	if (sv_derived_from($arg, \"Parrot::PMC\"))
-	{
-		IV tmp = SvIV((SV*)SvRV($arg));
-		$var = INT2PTR($type, tmp);
-	}
-	else
-		croak(\"$var is not of type Parrot::PMC\")
 
 OUTPUT
 T_PTROBJ_PARROT

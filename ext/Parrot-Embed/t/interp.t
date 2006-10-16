@@ -58,7 +58,7 @@ ok( ! $interp->find_global( 'goat', 'Elsewhere' ),
 
 can_ok( $global_greet, 'invoke'            );
 my $pmc = $global_greet->invoke( 'PS', 'Bob' );
-ok( $pmc, 'call_sub() should return a PMC, given that signature' );
+ok( $pmc, 'invoke() should return a PMC, given that signature' );
 
 is( $pmc->get_string(), 'Hello, Bob!',
 	'... containing a string returned in the PMC' );
