@@ -128,8 +128,8 @@ has 'num' => (
     is => 'ro', isa => 'Str',
     lazy => 1, default => sub{
         my $self= shift;
-# XXX: shouldn't break encapsulation here, but can't get it working otherwise
-        ($_)= $self->name =~ m|$self->{prefix}(\d+).*$self->{extension}$|; $_
+        my $pre= $self->prefix;
+        ($_)= $self->name =~ m|$pre(\d+).*$|; $_ || ''
     },
 );
 
@@ -144,10 +144,8 @@ has 'extension' => ( is => 'ro', isa => 'Str', default => '.pod' );
 has 'prefix' => ( is => 'ro', isa => 'Str', required => 1, );
 
 has 'files' => (
-    is => 'ro', isa => 'ArrayRef',
-# XXX: why isn't this constraint working? is it evaluated too early?
-#    is => 'ro', isa => subtype => ArrayRef
-#        => where { (blessed($_) && $_->isa('PodFile') || return) for @$_; 1 },
+    is => 'ro', isa => subtype( 'ArrayRef'
+        => where { (blessed($_) && $_->isa('PodFile') || return) for @$_; 1 } ),
     lazy => 1, default => sub{
         my $self= shift;
         return [ map { SpecFile->new( filename => $_, prefix => $self->prefix  ) }
@@ -164,12 +162,12 @@ extends 'File';
 override 'extension' => sub{ '.t' };
 
 has 'smartlinks' => (
-    is => 'rw', isa => subtype => ArrayRef
+    is => 'rw', isa => subtype 'ArrayRef'
         => where { (blessed($_) && $_->isa('SmartLink') || return) for @$_; 1 },
 );
 
 has 'tests' => (
-    is => 'rw', isa => subtype ArrayRef
+    is => 'rw', isa => subtype 'ArrayRef'
         => where { (blessed($_) && $_->isa('TestInfo') || return) for @$_; 1 },
 );
 
@@ -275,9 +273,8 @@ has 'specfiles' => (
 );
 
 has 'testfiles' => (
-    is => 'ro', isa => 'ArrayRef',
-#    is => 'ro', isa => subtype => ArrayRef
-#        => where { (blessed($_) && $_->isa('TestFile') || return) for @$_; 1 },
+    is => 'ro', isa => subtype( 'ArrayRef'
+        => where { (blessed($_) && $_->isa('TestFile') || return) for @$_; 1 } ),
     lazy => 1, default => sub{
         my $self= shift;
         [ map { TestFile->new( filename => $_ ) } glob @ARGV ]

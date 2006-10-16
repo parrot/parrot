@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Parrot::Test 'no_plan'; #tests => 11;
+use Parrot::Test 'no_plan'; #tests => 34;
 use Test::More;
 
 
@@ -36,6 +36,10 @@ BEGIN { use_ok 'SmartLink' or die };
 {
     diag 'SmartLink';
     my $link= 'L<S05/bar/baz quux>';
+
+    eval{ my $l= SmartLink->new; };
+    like( $@, '/^Attribute \(.*? is required/', '->new requires one or more attributes' );
+
     my $l= SmartLink->new( link => $link );
 
     isa_ok( $l, 'SmartLink' );
@@ -51,6 +55,10 @@ BEGIN { use_ok 'SmartLink' or die };
 {
     diag 'PodFile';
     my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
+
+    eval{ my $p= PodFile->new; };
+    like( $@, '/^Attribute \(.*?\) is required/', '->new requires one or more attributes' );
+
     my $p= PodFile->new( filename => $fn );
 
     isa_ok( $p, 'PodFile' );
@@ -65,6 +73,10 @@ BEGIN { use_ok 'SmartLink' or die };
     diag 'SpecFile';
     my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
     my $pre= 'pdd';
+
+    eval{ my $s= SpecFile->new; };
+    like( $@, '/^Attribute \(.*?\) is required/', '->new requires one or more attributes' );
+
     my $s= SpecFile->new( filename => $fn, prefix => $pre );
 
     isa_ok( $s, 'SpecFile' );
@@ -72,12 +84,26 @@ BEGIN { use_ok 'SmartLink' or die };
     is( $s->path, 'docs/pdds/', '->path returns file path' );
     is( $s->extension, '.pod', '->extension returns C<.pod>' );
     is( $s->num, '03', '->num returns spec number' );
+
+    $s= SpecFile->new( filename => '3.pod', prefix => '' );
+    is( $s->name, '3', '->name returns "3"' );
+    is( $s->prefix, '', '->prefix returns empty string' );
+    is( $s->num, '3', '->num returns spec number' );
+
+    $s= SpecFile->new( filename => 'S.pod', prefix => 'S' );
+    is( $s->name, 'S', '->name returns "S"' );
+    is( $s->prefix, 'S', '->prefix returns "S"' );
+    is( $s->num, '', '->num returns empty string' );
 }
 
 {
     diag 'SpecFiles';
     my $root= 'docs/pdds/';
     my $pre= 'pdd';
+
+    eval{ my $s= SpecFiles->new; };
+    like( $@, '/^Attribute \(.*?\) is required/', '->new requires one or more attributes' );
+
     my $s= SpecFiles->new( prefix => $pre, root => $root );
 
     isa_ok( $s, 'SpecFiles' );
@@ -94,6 +120,10 @@ BEGIN { use_ok 'SmartLink' or die };
 {
     diag 'TestFile';
     my $fn= 't/util/smartlinks.t';
+
+    eval{ my $t= TestFile->new; };
+    like( $@, '/^Attribute \(.*?\) is required/', '->new requires one or more attributes' );
+
     my $t= TestFile->new( filename => $fn );
 
     isa_ok( $t, 'TestFile' );
