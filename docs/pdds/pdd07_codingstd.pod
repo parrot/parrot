@@ -199,7 +199,7 @@ indent it.
 
 =item *
 
-When assignming inside a conditional, use extra parentheses,
+When assigning inside a conditional, use extra parentheses,
 e.g. C<if (a && (b = c)) ...> or C<if ((a = b)) ...>.
 
 =item *
