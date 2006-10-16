@@ -1,0 +1,113 @@
+#! perl
+# Copyright (C) 2006, The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+t/tools/smartlinks.t - test the smartlink generator
+
+=head1 SYNOPSIS
+
+    % prove t/tools/smartlinks.t
+
+=head1 DESCRIPTION
+
+Tests the C<smartlinks.pl> utility by exersizing different options,
+processing example test files and spec documents, and examining
+the output.
+
+We never actually check the *full* output of the utility.
+We simply check several smaller components to avoid a test file
+that is far too unweildy.
+
+=cut
+
+
+use strict;
+use warnings;
+use lib qw( . lib ../lib ../../lib );
+
+use Parrot::Test 'no_plan'; #tests => 11;
+use Test::More;
+
+
+BEGIN { use_ok 'SmartLink' or die };
+
+{
+    diag 'SmartLink';
+    my $link= 'L<S05/bar/baz quux>';
+    my $l= SmartLink->new( link => $link );
+
+    isa_ok( $l, 'SmartLink' );
+    is( $l->link, $link, '->link returns full link text' );
+    is( $l->doc, 'S05', '->doc returns document identifier' );
+    is( $l->section, 'bar', '->section returns document section' );
+    is( $l->docprefix, 'S', '->docprefix returns document prefix' );
+    is( $l->docnum, '05', '->docnum returns documnt number' );
+    is_deeply( $l->keyphrases, [qw/baz quux/],
+        '->keyphrases returns array of keyphrases' );
+}
+
+{
+    diag 'PodFile';
+    my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
+    my $p= PodFile->new( filename => $fn );
+
+    isa_ok( $p, 'PodFile' );
+    is( $p->filename, $fn, '->filename returns given filename' );
+    is( $p->name, 'pdd03_calling_conventions', '->name returns file basename' );
+    is( $p->path, 'docs/pdds/', '->path returns file path' );
+    is( $p->extension, '.pod', '->extension returns C<.pod>' );
+    # TODO: ->tree
+}
+
+{
+    diag 'SpecFile';
+    my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
+    my $pre= 'pdd';
+    my $s= SpecFile->new( filename => $fn, prefix => $pre );
+
+    isa_ok( $s, 'SpecFile' );
+    is( $s->name, 'pdd03_calling_conventions', '->name returns file basename' );
+    is( $s->path, 'docs/pdds/', '->path returns file path' );
+    is( $s->extension, '.pod', '->extension returns C<.pod>' );
+    is( $s->num, '03', '->num returns spec number' );
+}
+
+{
+    diag 'SpecFiles';
+    my $root= 'docs/pdds/';
+    my $pre= 'pdd';
+    my $s= SpecFiles->new( prefix => $pre, root => $root );
+
+    isa_ok( $s, 'SpecFiles' );
+    is( $s->root, $root, '->root returns spec file directory' );
+    is( $s->extension, '.pod', '->extension returns file extension' );
+    is( $s->prefix, $pre, '->prefix returns spec file prefix' );
+    is( ref $s->files, 'ARRAY', '->files is an array reference' );
+
+    ok( ( grep {$_->name eq 'pdd07_codingstd'} @{$s->files} ),
+        '->files contains a known spec file' );
+    # TODO: many more ->files tests
+}
+
+{
+    diag 'TestFile';
+    my $fn= 't/util/smartlinks.t';
+    my $t= TestFile->new( filename => $fn );
+
+    isa_ok( $t, 'TestFile' );
+    is( $t->filename, $fn, '->filename returns given filename' );
+    is( $t->name, 'smartlinks', '->name returns file basename' );
+    is( $t->path, 't/util/', '->path returns file path' );
+    is( $t->extension, '.t', '->extension returns C<.pod>' );
+    # TODO: ->tests, ->smartlinks
+}
+
+# TODO: Test
+# TODO: TestInfo
+# TODO: SmartLinkServer
+# TODO: main
+# TODO: end-to-end testing
+
+# vim: shiftwidth=4 expandtab:
