@@ -260,7 +260,7 @@ Parrot_init_lib(Interp *interpreter,
 
 static PMC *run_init_lib(Interp *interpreter, void *handle, 
                          STRING *lib_name, STRING *wo_ext) {
-    STRING *path, *load_func_name, *init_func_name, *type;
+    STRING *load_func_name, *init_func_name, *type;
     PMC *(*load_func)(Interp *);
     void (*init_func)(Interp *, PMC *);
     char *cinit_func_name, *cload_func_name;
@@ -353,7 +353,6 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
         VTABLE_getprop(s, lib_pmc, const_string(s, "_type")));
     if (0 == string_equal(s, type, const_string(s, "Ops"))) {
         PMC *new_lib_pmc;
-        INTVAL i;
 
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically

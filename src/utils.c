@@ -717,7 +717,7 @@ For instance: 1-->2, 2-->3, 3-->1
 
 void
 process_cycle_without_exit(int node_index, parrot_prm_context* c) {
-    int pred, pred_index, src_index;
+    int pred, pred_index;
     int alt = 0;
  
     pred = c->src_regs[node_index];

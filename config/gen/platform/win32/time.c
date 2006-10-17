@@ -1,3 +1,4 @@
+
 #include <time.h>
 
 /*
@@ -7,7 +8,7 @@
 INTVAL
 Parrot_intval_time(void)
 {
-#ifdef _MSC_VER
+#if _MSC_VER >= 1400
 #if INTVAL_SIZE <= 4
     return _time32(NULL);
 #else

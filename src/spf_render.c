@@ -236,7 +236,6 @@ gen_sprintf_call(Interp *interpreter, char *out,
                  SpfInfo info, int thingy)
 {
     int i = 0;
-    char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
     out[i++] = '%';
     if (info->flags) {
