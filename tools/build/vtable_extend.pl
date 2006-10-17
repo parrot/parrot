@@ -54,7 +54,7 @@ EOF
 
 close $OUT or die $!;
 
-open my $OUT, '>', 'src/extend_vtable.c' or die $!;
+open $OUT, '>', 'src/extend_vtable.c' or die $!;
 
 print $OUT $header, <<'EOF';
 

@@ -432,7 +432,7 @@ if ($trans->can("run_core_finish")) {
 #
 
 close($SOURCE);
-open(my $SOURCE, '<', $source) || die "Error re-reading $source: $!\n";
+open($SOURCE, '<', $source) || die "Error re-reading $source: $!\n";
 my $line = 0; while (<$SOURCE>) { $line++; } $line+=2;
 close($SOURCE);
 open($SOURCE, '>>', $source) || die "Error appending to $source: $!\n";

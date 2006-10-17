@@ -21,6 +21,7 @@ F<include/parrot/config.h>
 
 use warnings;
 use strict;
+use lib qw{lib . ../lib ../../ lib};
 use Parrot::Revision;
 
 print <<"EOF";

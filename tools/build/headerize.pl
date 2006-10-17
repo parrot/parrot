@@ -229,7 +229,7 @@ sub main {
                 or die "no HEADERIZER markers for '$cfile' found in '$hfile'";
         } # for %cfiles
 
-        open my $FILE, '>', $hfile or die "couldn't write '$hfile': $!";
+        open $FILE, '>', $hfile or die "couldn't write '$hfile': $!";
         print $FILE $header;
         close $FILE;
         print "Wrote '$hfile'\n";

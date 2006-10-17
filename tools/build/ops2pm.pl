@@ -343,7 +343,6 @@ sub renum_op_map_file {
         $file = "src/ops/ops.num";
     }
     my ($name, $number, @lines, %seen, %fixed, $fix);
-    local *OP;
     $fix = 1;
     open my $OP, '<', $file or die "Can't open $file, error $!";
     while (<$OP>) {
@@ -359,7 +358,7 @@ sub renum_op_map_file {
         $fixed{$name} = $number if ($fix);
     }
     close $OP;
-    open my $OP, '>', $file or die "Can't open $file, error $!";
+    open $OP, '>', $file or die "Can't open $file, error $!";
     print $OP @lines;
     my ($n);
     #

@@ -99,7 +99,7 @@ HEADER
     # There is a chance that the same __LINE__ will reoccur if #line directives
     # are used.
     my %lines_seen;
-    while (<IN>) {
+    while (<$IN>) {
         if (m/^\s*#\s*line\s+(\d+)/) {
             # #line directive
             $line = $1 - 1;
