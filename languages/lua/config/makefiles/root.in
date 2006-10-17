@@ -21,7 +21,6 @@ PMCS = \
  luanumber \
  luastring \
  luatable \
- luathread \
  luauserdata
 
 PBCS = \

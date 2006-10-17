@@ -23,6 +23,9 @@ use warnings;
 use Parrot::Test tests => 8;
 use Test::More;
 
+SKIP: {
+    skip("will be reused with the future implementation", 8);
+
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, "lua_group"
@@ -188,6 +191,7 @@ CODE
 nil
 nil
 OUTPUT
+}
 
 # Local Variables:
 #   mode: cperl
