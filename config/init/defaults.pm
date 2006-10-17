@@ -21,6 +21,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Config;
 use FindBin;    # see build_dir
 use Parrot::Configure::Step;
+use Cwd qw(abs_path);
 
 $description = q{Setting up Configure's default values};
 
@@ -35,7 +36,7 @@ sub runstep
         debugging => $conf->options->get('debugging') ? 1 : 0,
         optimize  => '',
         verbose   => $conf->options->get('verbose'),
-        build_dir => $FindBin::Bin,
+        build_dir => abs_path($FindBin::Bin),
 
         # Compiler -- used to turn .c files into object files.
         # (Usually cc or cl, or something like that.)
