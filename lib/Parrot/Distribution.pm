@@ -198,17 +198,17 @@ sub pmc_source_file_directories
 
     return
         map $self->directory_with_name($_) =>
-	    'compilers/bcg/src/pmc',
-	    'languages/APL/src/pmc',
-	    'languages/WMLScript/pmc',
-	    'languages/amber/lib/kernel/pmc',
-	    'languages/cardinal/src/pmc',
-	    'languages/dotnet/pmc',
-	    'languages/lua/pmc',
-	    'languages/perl6/src/pmc',
-	    'languages/pugs/pmc',
-	    'languages/python/pmc',
-	    'languages/tcl/src/pmc',
+            'compilers/bcg/src/pmc',
+            'languages/APL/src/pmc',
+            'languages/WMLScript/pmc',
+            'languages/amber/lib/kernel/pmc',
+            'languages/cardinal/src/pmc',
+            'languages/dotnet/pmc',
+            'languages/lua/pmc',
+            'languages/perl6/src/pmc',
+            'languages/pugs/pmc',
+            'languages/python/pmc',
+            'languages/tcl/src/pmc',
             map("src/$_" => qw<dynpmc pmc>),
     ;
 }
@@ -250,11 +250,11 @@ sub yacc_source_file_directories
 
     return
         map $self->directory_with_name($_) =>
-	    'compilers/ast/',
-	    'compilers/imcc/',
-	    'languages/cola/',
-	    'languages/lua/doc',
-	    'languages/regex/lib/Regex',
+            'compilers/ast/',
+            'compilers/imcc/',
+            'languages/cola/',
+            'languages/lua/doc',
+            'languages/regex/lib/Regex',
     ;
 }
 
@@ -295,9 +295,9 @@ sub lex_source_file_directories
 
     return
         map $self->directory_with_name($_) =>
-	    'compilers/ast/',
-	    'compilers/imcc/',
-	    'languages/cola/',
+            'compilers/ast/',
+            'compilers/imcc/',
+            'languages/cola/',
     ;
 }
 
