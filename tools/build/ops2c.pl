@@ -128,7 +128,7 @@ my %arg_dir_mapping = (
 # Look at the command line options
 #
 sub Usage {
-    pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+    return pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
 }
 
 my ( $nolines_flag, $help_flag, $dynamic_flag, $core_flag );
@@ -234,10 +234,10 @@ if (!$dynamic_flag && ! -d $incdir) {
     mkdir($incdir, 0755) or die "ops2c.pl: Could not mkdir $incdir $!!\n";
 }
 
-open HEADER, '>', $header
+open my $HEADER, '>', $header
     or die "ops2c.pl: Cannot open header file '$header' for writing: $!!\n";
 
-open SOURCE, '>', $source
+open my $SOURCE, '>', $source
     or die "ops2c.pl: Cannot open source file '$source' for writing: $!!\n";
 
 
@@ -261,11 +261,11 @@ END_C
 my $mmp_v = "${major_version}_${minor_version}_${patch_version}";
 my $init_func = "Parrot_DynOp_${base}${suffix}_$mmp_v";
 
-print HEADER $preamble;
+print $HEADER $preamble;
 if ($dynamic_flag) {
-    print HEADER "#define PARROT_IN_EXTENSION\n";
+    print $HEADER "#define PARROT_IN_EXTENSION\n";
 }
-print HEADER <<END_C;
+print $HEADER <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
 
@@ -277,12 +277,12 @@ my $cg_func = $trans->core_prefix . $base;
 
 if ($trans->can("run_core_func_decl")) {
     my $run_core_func = $trans->run_core_func_decl($base);
-    print HEADER "$run_core_func;\n";
+    print $HEADER "$run_core_func;\n";
 }
 my $bs = "${base}${suffix}_";
 
 # append the C code coda
-print HEADER <<END_C;
+print $HEADER <<END_C;
 
 /*
  * Local variables:
@@ -292,8 +292,8 @@ print HEADER <<END_C;
  */
 END_C
 
-print SOURCE $preamble;
-print SOURCE <<END_C;
+print $SOURCE $preamble;
+print $SOURCE <<END_C;
 #include "$include"
 
 ${defines}
@@ -303,16 +303,16 @@ END_C
 
 my $text = $ops->preamble($trans);
 $text =~ s/\bops_addr\b/${bs}ops_addr/g;
-print SOURCE $text;
+print $SOURCE $text;
 
 
 if ($trans->can("ops_addr_decl")) {
-    print SOURCE $trans->ops_addr_decl($bs);
+    print $SOURCE $trans->ops_addr_decl($bs);
 }
 if ($trans->can("run_core_func_decl")) {
-    print SOURCE $trans->run_core_func_decl($base);
-    print SOURCE "\n{\n";
-    print SOURCE $trans->run_core_func_start;
+    print $SOURCE $trans->run_core_func_decl($base);
+    print $SOURCE "\n{\n";
+    print $SOURCE $trans->run_core_func_start;
 }
 
 #
@@ -375,16 +375,16 @@ foreach my $op ($ops->ops) {
 }
 
 if ($suffix =~ /cg/) {
-    print SOURCE @cg_jump_table;
-    print SOURCE <<END_C;
+    print $SOURCE @cg_jump_table;
+    print $SOURCE <<END_C;
         NULL
     };
 END_C
-    print SOURCE $trans->run_core_after_addr_table($bs);
+    print $SOURCE $trans->run_core_after_addr_table($bs);
 }
 
 if ($suffix =~ /cgp/) {
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
 #ifdef __GNUC__
 # ifdef I386
     else if (cur_opcode == (void **) 1)
@@ -396,7 +396,7 @@ if ($suffix =~ /cgp/) {
 
 END_C
 } elsif ($suffix =~ /cg/) {
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
 goto *${bs}ops_addr[*cur_opcode];
 
 END_C
@@ -404,7 +404,7 @@ END_C
 
 
 
-print SOURCE <<END_C;
+print $SOURCE <<END_C;
 /*
 ** Op Function Definitions:
 */
@@ -417,13 +417,13 @@ END_C
 my $CORE_SPLIT = 300;
 for (my $i = 0; $i < @op_funcs; $i++) {
     if ($i && $i % $CORE_SPLIT == 0 && $trans->can("run_core_split")) {
-        print SOURCE $trans->run_core_split($base);
+        print $SOURCE $trans->run_core_split($base);
     }
-    print SOURCE $op_funcs[$i];
+    print $SOURCE $op_funcs[$i];
 }
 
 if ($trans->can("run_core_finish")) {
-    print SOURCE $trans->run_core_finish($base);
+    print $SOURCE $trans->run_core_finish($base);
 }
 
 
@@ -431,16 +431,16 @@ if ($trans->can("run_core_finish")) {
 # reset #line in the SOURCE file.
 #
 
-close(SOURCE);
-open(SOURCE, '<', $source) || die "Error re-reading $source: $!\n";
-my $line = 0; while (<SOURCE>) { $line++; } $line+=2;
-close(SOURCE);
-open(SOURCE, '>>', $source) || die "Error appending to $source: $!\n";
+close($SOURCE);
+open(my $SOURCE, '<', $source) || die "Error re-reading $source: $!\n";
+my $line = 0; while (<$SOURCE>) { $line++; } $line+=2;
+close($SOURCE);
+open($SOURCE, '>>', $source) || die "Error appending to $source: $!\n";
 unless ($nolines_flag) {
     my $source_escaped = $source;
     $source_escaped =~ s|\.temp||;
     $source_escaped =~ s|(\\)|$1$1|g; # escape backslashes
-    print SOURCE qq{#line $line "$source_escaped"\n};
+    print $SOURCE qq{#line $line "$source_escaped"\n};
 }
 
 
@@ -454,7 +454,7 @@ $getop = '( int (*)(const char *, int) )NULL';
 
 if ($suffix eq '') {
     $op_func = "${bs}op_func_table";
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
 
 INTVAL ${bs}numops${suffix} = $num_ops;
 
@@ -465,9 +465,9 @@ INTVAL ${bs}numops${suffix} = $num_ops;
 static op_func${suffix}_t ${op_func}\[$num_entries] = {
 END_C
 
-    print SOURCE @op_func_table;
+    print $SOURCE @op_func_table;
 
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
   (op_func${suffix}_t)0  /* NULL function pointer */
 };
 
@@ -481,7 +481,7 @@ if ($suffix eq '') {
 #
 # Op Info Table:
 #
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
 
 /*
 ** Op Info Table:
@@ -517,7 +517,7 @@ END_C
         ) . " }";
         my $flags      = 0;
 
-        print SOURCE <<END_C;
+        print $SOURCE <<END_C;
   { /* $index */
     /* type $type, */
     "$name",
@@ -535,7 +535,7 @@ END_C
 
         $index++;
     }
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
 };
 
 END_C
@@ -550,7 +550,7 @@ if ($suffix eq '' && !$dynamic_flag) {
             "please increase hash_size ($hash_size) in tools/build/ops2c.pl " .
             "to a prime number > ", $tot *1.2, "\n";
     }
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
 
 /*
 ** Op lookup function:
@@ -657,12 +657,12 @@ END_C
 
 }
 else {
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
 static void hop_deinit(void) {}
 END_C
 }
 
-print SOURCE <<END_C;
+print $SOURCE <<END_C;
 
 /*
 ** op lib descriptor:
@@ -695,7 +695,7 @@ if ($trans->can("init_set_dispatch")) {
     $init_set_dispatch = $trans->init_set_dispatch($bs);
 }
 
-print SOURCE <<END_C;
+print $SOURCE <<END_C;
 op_lib_t *
 $init_func(long init) {
     /* initialize and return op_lib ptr */
@@ -718,7 +718,7 @@ END_C
 
 if ($dynamic_flag) {
     my $load_func = "Parrot_lib_${base}_ops${suffix}_load";
-    print SOURCE <<END_C;
+    print $SOURCE <<END_C;
 /*
  * dynamic lib load function - called once
  */
@@ -736,7 +736,7 @@ END_C
 }
 
 # append the C code coda
-print SOURCE <<END_C;
+print $SOURCE <<END_C;
 
 /*
  * Local variables:
@@ -746,7 +746,7 @@ print SOURCE <<END_C;
  */
 END_C
 
-close SOURCE;
+close $SOURCE;
 my $final = $source;
 $final =~ s/\.temp//;
 rename $source, $final;
@@ -754,8 +754,8 @@ rename $source, $final;
 exit 0;
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

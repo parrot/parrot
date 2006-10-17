@@ -72,12 +72,12 @@ else {
 
     my $image_file = $install_parrot ?
         'install_config.fpmc' : 'runtime/parrot/include/config.fpmc';
-    open F, '<', $image_file or die "Can't read '$image_file': $!";
+    open my $F, '<', $image_file or die "Can't read '$image_file': $!";
     my $image;
     local $/;
-    binmode F;
-    $_ = <F>;
-    close F;
+    binmode $F;
+    $_ = <$F>;
+    close $F;
 
     my @c = split '';
     die "'$image_file' is truncated. Remove it and rerun make\n" if !@c;
@@ -115,8 +115,8 @@ print << "EOC";
 EOC
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

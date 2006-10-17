@@ -19,9 +19,9 @@ my $header = <<'EOH';
 */
 EOH
 
-open OUT, '>', 'include/parrot/extend_vtable.h' or die $!;
+open my $OUT, '>', 'include/parrot/extend_vtable.h' or die $!;
 
-print OUT $header, <<'EOF';
+print $OUT $header, <<'EOF';
 
 /*
 Copyright (C) 2005, The Perl Foundation.
@@ -34,15 +34,15 @@ Copyright (C) 2005, The Perl Foundation.
 
 EOF
 
-print OUT $protos;
+print $OUT $protos;
 
-print OUT <<'EOF';
+print $OUT <<'EOF';
 
 #endif
 EOF
 
 # append the C code coda
-print OUT <<'EOF';
+print $OUT <<'EOF';
 
 /*
  * Local variables:
@@ -52,11 +52,11 @@ print OUT <<'EOF';
  */
 EOF
 
-close OUT or die $!;
+close $OUT or die $!;
 
-open OUT, '>', 'src/extend_vtable.c' or die $!;
+open my $OUT, '>', 'src/extend_vtable.c' or die $!;
 
-print OUT $header, <<'EOF';
+print $OUT $header, <<'EOF';
 
 /*
 Copyright (C) 2001-2003, 2005, The Perl Foundation. 
@@ -122,9 +122,9 @@ can.
 
 EOF
 
-print OUT $funcs;
+print $OUT $funcs;
 
-print OUT <<'EOF';
+print $OUT <<'EOF';
 /*
 
 =back
@@ -149,11 +149,11 @@ Initial version by Dan Sugalski.
  */
 EOF
 
-close OUT or die $!;
+close $OUT or die $!;
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

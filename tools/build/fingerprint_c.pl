@@ -27,9 +27,9 @@ use lib 'lib';
 use Digest::Perl::MD5 qw(md5_hex);
 
 my $compat_file = 'PBC_COMPAT';
-open IN, '<', $compat_file or die "Can't read $compat_file";
-my @lines = <IN>;
-close IN;
+open my $IN, '<', $compat_file or die "Can't read $compat_file";
+my @lines = <$IN>;
+close $IN;
 
 my $len = 10;
 my $fingerprint = md5_hex join "\n", grep { ! /^#/ } @lines;
@@ -108,8 +108,8 @@ print << "EOF";
 EOF
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

@@ -64,7 +64,7 @@ sub compile_cmd {
 
 sub partial_link_cmd {
     my ($target, $libs, $sources) = @_;
-    
+
     my $liblist;
     if ($^O =~ /mswin32/i) {
         # Need to put various libraries in the link line.
@@ -76,7 +76,7 @@ sub partial_link_cmd {
         $extraLibs =~ s/blib/..\\blib/g;
         $extraLibs =~ s/\Q$(A)\E/.lib/g;
         $liblist .= ' ' . $extraLibs;
-        
+
         # Also note that we may need to look in the Parrot blib directory.
         if ($CC =~ /gcc/i) {
             $liblist .= qq{ -Wl,-L "@build_dir@/blib/lib"};
@@ -108,7 +108,7 @@ if ($mode eq 'generate') {
     generate_dump($_) foreach (@pmcs);
     generate_c($_) foreach (@pmcs);
 
-    my ($group_files, $group_libs, $pmc_group, $pmc_libs) = 
+    my ($group_files, $group_libs, $pmc_group, $pmc_libs) =
         gather_groups_and_libs(@pmcs);
 
     while (my ($group, $pmcs) = each %$group_files) {
@@ -118,9 +118,9 @@ if ($mode eq 'generate') {
               or die "pmc2c library creation failed ($?)\n";
         }
     }
-} 
+}
 elsif ($mode eq 'compile') {
-    my ($group_files, $group_libs, $pmc_group, $pmc_libs) = 
+    my ($group_files, $group_libs, $pmc_group, $pmc_libs) =
         gather_groups_and_libs(@pmcs);
 
     # Convert X.c -> X.o for all X.c
@@ -133,7 +133,7 @@ elsif ($mode eq 'compile') {
     }
 } 
 elsif ($mode eq 'linklibs') {
-    my ($group_files, $group_libs, $pmc_group, $pmc_libs) = 
+    my ($group_files, $group_libs, $pmc_group, $pmc_libs) =
         gather_groups_and_libs(@pmcs);
 
     # Convert lib-GROUP.so + A.so + B.so ... -> GROUP.so
@@ -153,7 +153,7 @@ elsif ($mode eq 'copy') {
       or die "copy command requires destination";
     my $dest = $1;
 
-    my ($group_files, $group_libs, $pmc_group, $pmc_libs) = 
+    my ($group_files, $group_libs, $pmc_group, $pmc_libs) =
         gather_groups_and_libs(@pmcs);
     my @ungrouped_pmcs = grep { ! exists $pmc_group->{$_} } @pmcs;
 
@@ -190,7 +190,7 @@ sub gather_groups_and_libs {
     for my $pmc (@pmcs) {
         our $class;
         require "$pmc.dump";
- 
+
         # there can be many libs
         my %libs = %{ $class->{flags}{lib} || {} };
         if ($^O eq 'MSWin32' && $CC =~ /^gcc/i) {
@@ -285,3 +285,11 @@ sub partial_link {
         return 1;
     }
 }
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

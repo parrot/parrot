@@ -32,18 +32,18 @@ while (<>) {
 }
 
 # Pull existing tags
-open T, '<', 'tags';
+open my $T, '<', 'tags';
 push @tags, <T>;
-close T;
+close $T;
 
 # Spit 'em out sorted
-open T, '>', 'tags';
-print T sort @tags;
-close T;
+open my $T, '>', 'tags';
+print $T sort @tags;
+close $T;
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

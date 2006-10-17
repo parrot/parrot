@@ -976,13 +976,13 @@ sub main {
     if ( $action{gen_c} ) {
         gen_c(\@include, @ARGV);
     }
- 
+
     return;
 }
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

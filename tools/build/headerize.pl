@@ -198,9 +198,9 @@ sub main {
     for my $hfile ( sort keys %files ) {
         my $cfiles = $files{$hfile};
 
-        open FILE, '<', $hfile or die "couldn't read '$hfile': $!";
-        my $header = do {local $/=undef; <FILE>};  # slurp
-        close FILE;
+        open my $FILE, '<', $hfile or die "couldn't read '$hfile': $!";
+        my $header = do {local $/=undef; <$FILE>};  # slurp
+        close $FILE;
 
         for my $cfile ( sort keys %$cfiles ) {
             my $funcs = $cfiles->{$cfile};
@@ -229,9 +229,9 @@ sub main {
                 or die "no HEADERIZER markers for '$cfile' found in '$hfile'";
         } # for %cfiles
 
-        open FILE, '>', $hfile or die "couldn't write '$hfile': $!";
-        print FILE $header;
-        close FILE;
+        open my $FILE, '>', $hfile or die "couldn't write '$hfile': $!";
+        print $FILE $header;
+        close $FILE;
         print "Wrote '$hfile'\n";
     } # for %files
 
@@ -239,8 +239,8 @@ sub main {
 }
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

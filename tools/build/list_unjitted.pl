@@ -5,8 +5,8 @@ use strict;
 
 unless (1 == scalar @ARGV){
     print "Must give a directory as an argument.\nPossible options are:";
-    opendir DIR, 'jit' or die $!;
-    while (my $dir = readdir DIR){
+    opendir my $DIR, 'jit' or die $!;
+    while (my $dir = readdir $DIR){
         next if $dir =~ /^\./ or $dir eq '\.svn';
         print $dir;
     }
@@ -16,9 +16,9 @@ unless (1 == scalar @ARGV){
 my @ops;
 my @jitted;
 
-open OPS, '<', 'ops/ops.num' or die "Damn can not open 'ops/ops.num': $!";
+open my $OPS, '<', 'ops/ops.num' or die "Damn can not open 'ops/ops.num': $!";
 
-while(<OPS>){
+while(<$OPS>){
     next if /^\s*#/ or /^\s*$/;
     if (my ($op) = /(\S+)\s+\d+/){
         push @ops, $op;
@@ -26,17 +26,17 @@ while(<OPS>){
     else { die "Misformated line: $.";}
 }
 
-close OPS or die "Noo.. $!";
+close $OPS or die "Noo.. $!";
 
-open JIT, '<', "jit/$ARGV[0]/core.jit" or
+open my $JIT, '<', "jit/$ARGV[0]/core.jit" or
   die "Could not open jit/$ARGV[0]/core.jit: $!";
 
-while (<JIT>){
+while (<$JIT>){
     if (my ($jit) = /^Parrot_(\S+)\s*\{\s*$/){
         push @jitted, $jit;
     }
 }
-close JIT or die "Noo.. $!";
+close $JIT or die "Noo.. $!";
 
 my @not_jitted;
 
@@ -54,8 +54,8 @@ print 'Jitted: ', scalar @jitted;
 print 'Total ops: ', scalar @ops;
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
