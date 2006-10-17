@@ -1,6 +1,7 @@
 package SmartLink;
 use Moose;
 use Moose::Util::TypeConstraints;
+use Text::Balanced qw/extract_multiple extract_quotelike/;
 
 ## links are like
 # L<doc> or L<doc/section> or L<doc//keyphrases> or L<doc/section/keyphrases>
@@ -26,7 +27,20 @@ has 'section' => (
 has 'keyphrases' => (
     is => 'ro', isa => 'ArrayRef',
     lazy => 1, default => sub{
-        ($_)= shift->link =~ m|^L<.*?/.*?/([^>]+)|; [split ' ' => $_]
+        ($_)= shift->link =~ m|^L<.*?/.*?/([^>]+)|;
+        [
+            extract_multiple($_, [
+                sub{
+                    do{
+                        my @a= (extract_quotelike($_[0]))[5,1];
+                        $_[0]= $a[1]; $a[0];
+                    } or do{
+                        my @a= split ' ', $_[0], 2;
+                        $_[0]= $a[1]; $a[0];
+                    }
+                },
+            ])
+        ]
     },
     predicate => 'has_keyphrases',
 );

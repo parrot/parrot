@@ -35,7 +35,7 @@ BEGIN { use_ok 'SmartLink' or die };
 
 {
     diag 'SmartLink';
-    my $link= 'L<S05/bar/baz quux>';
+    my $link= q{L<S05/bar/baz quux>};
 
     eval{ my $l= SmartLink->new; };
     like( $@, '/^Attribute \(.*? is required/', '->new requires one or more attributes' );
@@ -49,6 +49,18 @@ BEGIN { use_ok 'SmartLink' or die };
     is( $l->docprefix, 'S', '->docprefix returns document prefix' );
     is( $l->docnum, '05', '->docnum returns documnt number' );
     is_deeply( $l->keyphrases, [qw/baz quux/],
+        '->keyphrases returns array of keyphrases' );
+
+    $link= q{L<S05/bar/a b 'c d e' f g "h'i j" k>};
+    $l= SmartLink->new( link => $link );
+
+    isa_ok( $l, 'SmartLink' );
+    is( $l->link, $link, '->link returns full link text' );
+    is( $l->doc, 'S05', '->doc returns document identifier' );
+    is( $l->section, 'bar', '->section returns document section' );
+    is( $l->docprefix, 'S', '->docprefix returns document prefix' );
+    is( $l->docnum, '05', '->docnum returns documnt number' );
+    is_deeply( $l->keyphrases, ['a', 'b', 'c d e', 'f', 'g', "h'i j", 'k'],
         '->keyphrases returns array of keyphrases' );
 }
 
