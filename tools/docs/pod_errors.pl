@@ -26,26 +26,26 @@ my $ignore = shift || '^(icu)$';
 
 foreach my $file ($dir->files(1, $ignore))
 {
-	next unless $file->contains_pod;
-	next unless $file->num_pod_errors;
-	
-	my $errors = $file->pod_errors;
-	
-	print "\n",
-		$file->path, 
-		' has ', 
-		$file->num_pod_errors, 
-		' error',
-		$file->num_pod_errors != 1 ? 's' : '', 
-		":\n",
-		$errors;
+    next unless $file->contains_pod;
+    next unless $file->num_pod_errors;
+
+    my $errors = $file->pod_errors;
+
+    print "\n",
+        $file->path,
+        ' has ',
+        $file->num_pod_errors,
+        ' error',
+        $file->num_pod_errors != 1 ? 's' : '',
+        ":\n",
+        $errors;
 }
 
 exit 0;
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
