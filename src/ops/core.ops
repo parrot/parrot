@@ -1162,7 +1162,11 @@ $2 is either a NCI PMC with signature C<pIt> or a PASM Sub.
 =item B<new_callback>(out PMC, invar PMC, invar PMC, in STR)
 
 Create a callback stub $1 for PASM subroutine $2 with userdata $3 and
-function signature $4.
+callback function signature $4. Only 2 argument signatures with
+signature chars I<U[1iscpt]> or I<[1iscpt]U>  are handled currently.
+But these cover a lot of callback signatures. Please note that the
+userdata PMC I<U> has to be handled transparently by the caller of
+the callback function.
 
 =cut
 
