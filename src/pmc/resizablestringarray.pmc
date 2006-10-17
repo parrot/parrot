@@ -39,8 +39,14 @@ Returns the Parrot string value of the element at index C<key>.
     STRING* get_string_keyed_int (INTVAL key) {
         STRING **data;
         if (key < 0)
-            real_exception(INTERP, NULL, E_IndexError,
-                "ResizableStringArray: index out of bounds!");
+        {
+            INTVAL size = DYNSELF.elements();
+            if (key < -size)
+                real_exception(INTERP, NULL, E_IndexError,
+                    "ResizableStringArray: index out of bounds!");
+            else
+                key += size;
+        }
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 
 =head1 NAME
 
@@ -598,7 +598,7 @@ OUTPUT
 #'
 
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "aerobics", todo => 'not yet working');
+pasm_output_is(<<'CODE', <<'OUTPUT', "aerobics");
         new P0, .ResizableStringArray
         set I10, 10000
 
@@ -1002,10 +1002,21 @@ current instr\.:/
 OUTPUT
 # '
 
-pasm_output_like(<< 'CODE', << 'OUTPUT', "Retrieving from negative index");
+pasm_output_is(<<'CODE', <<'OUTPUT', 'Retrieving from negative index (in bounds)');
      new P0, .ResizableStringArray
-     set P0, 100
+     set P0[0], 100
      set S0, P0[-1]
+     print S0
+     print "\n"
+     end
+CODE
+100
+OUTPUT
+
+pasm_output_like(<< 'CODE', << 'OUTPUT', 'Retrieving from negative index (out of bounds)');
+     new P0, .ResizableStringArray
+     set P0[0], 100
+     set S0, P0[-2]
      end
 CODE
 /ResizableStringArray: index out of bounds!
