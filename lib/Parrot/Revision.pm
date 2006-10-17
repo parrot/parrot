@@ -31,30 +31,29 @@ sub __get_revision {
     my $ent = ".svn/entries";
 
     my $revision;
-    # code taken from pugs/util/version_h.pl rev 859
-    if (-r $ent) {
-        $svn_entries = $ent;
-        open my $FH, '<', $svn_entries or die $!;
-        while (<$FH>) {
+    # code taken from pugs/util/version_h.pl rev 14410
+    if (my @svn_info = qx/svn info/ and $? == 0) {
+        if (my ($line) = grep /^Revision:/, @svn_info) {
+            ($revision) = $line =~ / (\d+)$/;
+        }
+    }
+    elsif (-r $svn_entries) {
+        open FH, $svn_entries or die "Unable to open file ($svn_entries). Aborting. Error returned was: $!";
+        while (<FH>) {
             /^ *committed-rev=.(\d+)./ or next;
             $revision = $1;
             last;
         }
-        close $FH;
+        close FH;
     }
-    elsif (my @info = qx/svk info/ and $? == 0) {
-        if (my ($line) = grep /(?:file|svn|https?)\b/, @info) {
+    elsif (my @svk_info = qx/svk info/ and $? == 0) {
+        if (my ($line) = grep /(?:file|svn|https?)\b/, @svk_info) {
             ($revision) = $line =~ / (\d+)$/;
-        } else {
-	    my ($source_line) = grep /^(Copied|Merged) From/, @info;
-	    my ($depot_line)  = grep /^Depot Path/, @info;
-
-            if (    my ($source_depot) = $source_line =~ m{From: (.*?), Rev\. \d+}
-		and my ($depot_root)   = $depot_line  =~ m{^Depot Path: (/[^/]*)} )
-	    {
-                $source_depot = $depot_root.$source_depot; # convert /svk/trunk to //svk/trunk
-                if (my @info = qx/svk info $source_depot/ and $? == 0) {
-                    if (my ($line) = grep /(?:file|svn|https?)\b/, @info) {
+        } elsif (my ($source_line) = grep /^(Copied|Merged) From/, @svk_info) {
+            if (my ($source_depot) = $source_line =~ /From: (.*?), Rev\. \d+/) {
+                $source_depot = '/'.$source_depot; # convert /svk/trunk to //svk/trunk
+                if (my @svk_info = qx/svk info $source_depot/ and $? == 0) {
+                    if (my ($line) = grep /(?:file|svn|https?)\b/, @svk_info) {
                         ($revision) = $line =~ / (\d+)$/;
                     }
                 }
