@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -337,6 +337,21 @@ CODE
 7
 255
 ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "get_repr");
+.sub main
+    new $P0, .FixedIntegerArray, "(1, 17,42,0,77,0b111,    0Xff)"
+    set $I0, $P0
+    print $I0
+    print "\n"
+    get_repr $S0, $P0
+    print $S0
+    print "\n"
+.end
+CODE
+7
+[ 1, 17, 42, 0, 77, 7, 255 ]
 OUTPUT
 
 

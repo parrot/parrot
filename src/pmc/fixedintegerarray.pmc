@@ -312,6 +312,34 @@ Returns the Parrot string value of the element at index C<key>.
         temp = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_string(INTERP, temp);
     }
+    
+/*
+
+=item C<STRING *get_repr()>
+
+Returns the Parrot string representation C<key>.
+
+=cut
+
+*/
+
+    STRING* get_repr () {
+        STRING *res;
+        INTVAL j, n;
+        PMC *val;
+
+        res = string_from_cstring(INTERP, "[ ", 0);
+        n = VTABLE_elements(INTERP, SELF);
+        for (j = 0; j < n; ++j) {
+            val = SELF.get_pmc_keyed_int(j);
+            res = string_append(INTERP, res, VTABLE_get_repr(INTERP, val), 0);
+            if (j < n - 1)
+                res = string_append(INTERP, res, const_string(INTERP, ", "), 0);
+        }
+        res = string_append(INTERP, res, const_string(INTERP, " ]"), 0);
+        return res;
+    }
+
 
 /*
 

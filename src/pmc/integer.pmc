@@ -238,6 +238,9 @@ Returns the string value of the integer.
     STRING* get_string () {
         return string_from_int(INTERP, PMC_int_val(SELF));
     }
+    STRING* get_repr() {
+        return string_from_int(INTERP, PMC_int_val(SELF));
+    }
 
 /*
 
