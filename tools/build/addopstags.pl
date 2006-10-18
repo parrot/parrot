@@ -33,11 +33,11 @@ while (<>) {
 
 # Pull existing tags
 open my $T, '<', 'tags';
-push @tags, <T>;
+push @tags, <$T>;
 close $T;
 
 # Spit 'em out sorted
-open my $T, '>', 'tags';
+open $T, '>', 'tags';
 print $T sort @tags;
 close $T;
 
