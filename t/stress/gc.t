@@ -19,6 +19,7 @@ Tests garbage collection.
 use strict;
 use warnings;
 
+use lib qw(lib . ../lib ../../lib);
 use Parrot::Test tests => 1;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);

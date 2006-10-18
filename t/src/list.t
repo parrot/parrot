@@ -376,3 +376,10 @@ ok 1
 ok 2
 OUTPUT
 # TODO
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

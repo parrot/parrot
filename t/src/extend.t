@@ -395,8 +395,8 @@ Wibble
 OUTPUT
 
 my $temp = 'temp';;
-open S, ">$temp.pasm" or die "Can't write $temp.pasm";
-print S <<'EOF';
+open my $S, '>', "$temp.pasm" or die "Can't write $temp.pasm";
+print $S <<'EOF';
   .pcc_sub _sub1:
   get_params "()"
   printerr "in sub1\n"
@@ -409,7 +409,7 @@ print S <<'EOF';
   set_returns "()"
   returncc
 EOF
-close S;
+close $S;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
@@ -472,8 +472,8 @@ hello in sub2
 back
 OUTPUT
 
-open S, ">$temp.pasm" or die "Can't write $temp.pasm";
-print S <<'EOF';
+open $S, '>', "$temp.pasm" or die "Can't write $temp.pasm";
+print $S <<'EOF';
   .pcc_sub _sub1:
   get_params "()"
   printerr "in sub1\n"
@@ -481,7 +481,7 @@ print S <<'EOF';
   printerr "never\n"
   returncc
 EOF
-close S;
+close $S;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
@@ -543,8 +543,8 @@ caught
 back
 OUTPUT
 
-open S, ">$temp.pir" or die "Can't write $temp.pir";
-print S <<'EOF';
+open $S, '>', "$temp.pir" or die "Can't write $temp.pir";
+print $S <<'EOF';
 .sub main :main
     .param pmc argv
 
@@ -561,7 +561,7 @@ print S <<'EOF';
     end
 .end
 EOF
-close S;
+close $S;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pir");
 
@@ -648,3 +648,9 @@ OUTPUT
 
 unlink "$temp.pasm", "$temp.pir", "$temp.pbc" unless $ENV{POSTMORTEM};
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

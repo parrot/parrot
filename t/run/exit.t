@@ -65,3 +65,9 @@ open STDOUT, ">&OLDOUT" or die qq|Cannot restore stdout: $!|;
 close OLDOUT or die qq|Cannot close OLDOUT: $!|;
 close OLDERR or die qq|Cannot close OLDERR: $!|;
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

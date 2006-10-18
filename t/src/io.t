@@ -32,10 +32,10 @@ sub setup
     my $name = @_ ? shift : "temp.file";
     my $content = @_ ? shift : "This is a test\n";
 
-    open(FILE, ">$name") or die "Failed to create $name";
-    binmode FILE;
-    print FILE $content;
-    close(FILE);
+    open(my $FILE, '>', "$name") or die "Failed to create $name";
+    binmode $FILE;
+    print $FILE $content;
+    close($FILE);
 
     unlink("does_not_exist") if -e "does_not_exist";
 }
@@ -111,11 +111,11 @@ CODE
 Hello, World!
 OUTPUT
 
-open FILE, "temp.file";
-is(<FILE>, <<DATA, 'file content');
+open my $FILE, '<', "temp.file";
+is(<$FILE>, <<DATA, 'file content');
 Hello, World!
 DATA
-close FILE;
+close $FILE;
 
 ###############################################################################
 
@@ -176,12 +176,12 @@ the_test(Interp *interpreter,
 }
 CODE
 
-open FILE, "temp.file";
-is(<FILE>, <<'DATA', 'file content');
+open $FILE, '<', "temp.file";
+is(<$FILE>, <<'DATA', 'file content');
 Hello, World!
 Parrot flies.
 DATA
-close FILE;
+close $FILE;
 
 ###############################################################################
 
@@ -697,3 +697,10 @@ peek = '', read = ''
 OUTPUT
 
 teardown("temp.file");
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

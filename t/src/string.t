@@ -158,3 +158,10 @@ calling the_test() in main()
 97 | 98 = 99
 back in main()
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
