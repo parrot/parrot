@@ -3,8 +3,8 @@ Parrot_Interp   	T_PTR
 Parrot_PackFile 	T_PTR
 Parrot_STRING   	T_PTR
 
-Parrot_PMC          T_PTROBJ_PARROT
-Parrot_Interpreter  T_PTROBJ_PARROT
+Parrot_PMC			T_PTROBJ_PARROT
+Parrot_Interp		T_PTROBJ_PARROT
 Interpreter_struct*	T_PTROBJ_PARROT_STRUCT
 PMC_struct*			T_PTROBJ_PARROT_STRUCT
 

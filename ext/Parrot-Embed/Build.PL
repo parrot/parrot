@@ -19,7 +19,6 @@ my $class = Module::Build->subclass(
 		my \$old_dir = cwd();
 		chdir 't';
 
-		print "\$old_dir\n";
 		system(qw( $parrot -o greet.pbc greet.pir ) ) == 0
 			or die "Cannot compile PBC for test: \$?";
 

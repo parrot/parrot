@@ -51,17 +51,19 @@ make_pmc( SV* interp, Parrot_PMC pmc )
 	pmc_struct->interp = interp;
 	pmc_struct->pmc    = pmc;
 
+	Parrot_register_pmc( get_interp( interp ), pmc );
+
 	return pmc_struct;
 }
 
 MODULE = Parrot::Embed PACKAGE = Parrot::Interpreter
 
-Parrot_Interpreter
+Parrot_Interp
 new( class, ... )
 	char * class
-INIT:
+PREINIT:
 	SV *parent_sv = NULL;
-	Parrot_Interpreter parent;
+	Parrot_Interp parent;
 	Parrot_Interp interp;
 	Parrot_PackFile pf;
 CODE:
@@ -88,10 +90,10 @@ CODE:
 
 bool
 load_file( interp, filename )
-	Interpreter_struct *interp;
+	Interpreter_struct *interp
 	char *filename
-INIT:
-	Parrot_Interpreter real_interp;
+PREINIT:
+	Parrot_Interp real_interp;
 	Parrot_PackFile pf;
 CODE:
 	real_interp = interp->interp;
@@ -109,7 +111,7 @@ Parrot_PMC
 find_global( interp, global, ... )
 	Interpreter_struct *interp
 	char *global
-INIT:
+PREINIT:
 	Parrot_Interp   real_interp;
 	SV            * namespace;
 	Parrot_STRING   p_namespace;
@@ -146,7 +148,7 @@ Parrot_PMC
 compile( interp, code )
 	Interpreter_struct *interp
 	char * code
-INIT:
+PREINIT:
 	Parrot_Interp  real_interp;
 	STRING        *code_type;
 	STRING        *error;
@@ -175,7 +177,7 @@ invoke( pmc, signature, argument )
 	PMC_struct * pmc
 	const char * signature
 	const char * argument
-INIT:
+PREINIT:
 	Parrot_PMC    pmc_actual;
 	Parrot_PMC    out_pmc;
 	Parrot_Interp interp;
@@ -200,8 +202,12 @@ OUTPUT:
 void
 DESTROY( pmc )
 	PMC_struct *pmc
+PREINIT:
+	Parrot_Interp interp;
 CODE:
-	if ( get_interp( pmc->interp ) != NULL )
-		SvREFCNT_dec( pmc->interp );
+	interp = get_interp( pmc->interp );
 
-	Parrot_destroy( pmc->pmc );
+	if ( interp != NULL )
+		SvREFCNT_dec( interp );
+
+	Parrot_unregister_pmc( interp, pmc->pmc );
