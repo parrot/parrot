@@ -8,7 +8,7 @@ t/doc/pod.t - Pod document syntax tests
 
 =head1 SYNOPSIS
 
-	% prove t/doc/pod.t
+    % prove t/doc/pod.t
 
 =head1 DESCRIPTION
 
@@ -60,3 +60,10 @@ foreach my $file (keys(%$manifest), keys(%$manifest_gen)) {
 
 plan tests => scalar @docs;
 Test::Pod::pod_file_ok( $_ ) foreach @docs;
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

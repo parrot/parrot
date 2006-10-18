@@ -14,7 +14,7 @@ t/perl/opcode-doc.t - check opcode documentation
 
 =head1 SYNOPSIS
 
-	% prove t/perl/opcode-doc.t
+    % prove t/perl/opcode-doc.t
 
 =head1 DESCRIPTION
 
@@ -28,9 +28,9 @@ my @docerr;
 sub slurp {
     my ($filename) = @_;
 
-    open FILE, "< $filename" or die "can't open '$filename' for reading";
-    my @file = <FILE>;
-    close FILE;
+    open my $FILE, '<', "$filename" or die "can't open '$filename' for reading";
+    my @file = <$FILE>;
+    close $FILE;
     return @file;
 }
 
@@ -42,7 +42,7 @@ sub analyse {
     foreach my $op ( keys %$ops ) {
         my $args = $ops->{$op};
         next if $op =~ /^DELETED/;
-        next if $op =~ /^isgt/;	# doced but rewritten
+        next if $op =~ /^isgt/;    # doced but rewritten
         next if $op =~ /^isge/;
         foreach my $arg ( keys %$args ) {
             my $e = $args->{$arg};
@@ -71,8 +71,8 @@ sub check_op_doc {
             if ($item =~ /^([BC])\<(.*)\>\s*\((.*?)\)/) {
                 print "$filename:$lineno: use B<...> instead of C<...>\n"
                     if $1 eq "C";
-		my ($op, $args) = ($2, $3);
-		$args =~ s!\s*/\*.*?\*/!!;  # del C comment in args
+                my ($op, $args) = ($2, $3);
+                $args =~ s!\s*/\*.*?\*/!!;  # del C comment in args
                 $op{$op}{$args}{doc} = $lineno;
                 $op{$op}{$args}{status} |= 1;
             }
@@ -89,3 +89,10 @@ foreach my $file ( <ops/*.ops> ) {
 }
 
 ok(!@docerr, 'opcode documentation') or diag("Opcode documentation errors:\n@docerr");
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

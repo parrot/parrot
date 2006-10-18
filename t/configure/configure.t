@@ -259,10 +259,17 @@ can_ok('Parrot::Configure', qw(
     my $pc = Parrot::Configure->new;
 
     # send warnings to stdout
-    open STDERR, ">&STDOUT" or die "Can't dup STDOUT: $!";
+    open *STDERR, '>', "&STDOUT" or die "Can't dup STDOUT: $!";
 
     $pc->add_step('test::step::stepfail');
     my $ret = $pc->runsteps;
     print "\n";
     is($ret, undef, "->runsteps() returns undef on failure");
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -531,3 +531,10 @@ can_ok('Parrot::Configure::Data', qw(
     is($flag1, 0, "->deltrigger() doesn't activate the stacked callback");
     is($flag2, 0, "->deltrigger() doesn't activate the stacked callback");
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

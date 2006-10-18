@@ -82,7 +82,7 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
     my $redir = File::Spec->devnull;
 
     # copy file descriptors
-    open OLDERR, ">&STDERR";
+    open *OLDERR, '>', "&STDERR";
     $fromfile->close();
     $tofile->close();
 
@@ -91,15 +91,15 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
     ok(! -e "$fromfname", "move_if_diff() moved differing file");
 
     # redirect STDERR for the test below
-    close STDERR;
-    open STDERR, $redir;
+    close *STDERR;
+    open *STDERR, '<', $redir;
 
     ok(-e "$tofname", "move_if_diff() moved differing file");
 
     # restore STDERR
-    close STDERR;
-    open STDERR, ">&OLDERR";
-    close OLDERR;
+    close *STDERR;
+    open *STDERR, '>', "&OLDERR";
+    close *OLDERR;
 }
 
 # genfile()
@@ -167,3 +167,10 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
     is(Parrot::Configure::Step::_slurp($fname), "foo" x 1000,
         "_slurp() slurped the file");
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

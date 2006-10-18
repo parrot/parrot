@@ -99,3 +99,10 @@ sub list_diff
             [ sort grep { $elem{$_} > 0 } keys %elem ],
            );
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

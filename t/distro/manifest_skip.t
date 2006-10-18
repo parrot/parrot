@@ -20,7 +20,7 @@ t/distro/manifest_skip.t - sanity check the MANIFEST.SKIP file
 
 =head1 SYNOPSIS
 
-	% prove t/distro/manifest_skip.t
+    % prove t/distro/manifest_skip.t
 
 =head1 DESCRIPTION
 
@@ -44,9 +44,9 @@ SKIP:
     my $dist = Parrot::Distribution->new();
     my @from_svn = grep { $_ && $_ !~ m/^#/ } @{ $dist->gen_manifest_skip() };
     unshift @from_svn, '\B\.svn\b', '^debian$', '^debian/';   # added in gen_manifest_skip.pl
-    open( MANIFEST_SKIP, '<', $manifest_skip ) or die "Can't open $manifest_skip: $!";
-    my @from_manifest_skip = grep { $_ ne "\n" && $_ !~ m/^#/ } ( <MANIFEST_SKIP> );
-    close( MANIFEST_SKIP );
+    open( *MANIFEST_SKIP, '<', $manifest_skip ) or die "Can't open $manifest_skip: $!";
+    my @from_manifest_skip = grep { $_ ne "\n" && $_ !~ m/^#/ } ( <*MANIFEST_SKIP> );
+    close( *MANIFEST_SKIP );
     chomp(@from_manifest_skip);
     my ($svn_miss, $manifest_skip_miss) = list_diff(\@from_svn, \@from_manifest_skip);
     # print Dumper( $svn_miss, $manifest_skip_miss, \@from_svn, \@from_manifest_skip);
@@ -77,6 +77,13 @@ sub list_diff {
     grep { $elem{$_}-- } @$b;
 
     return ( [ sort grep { $elem{$_} < 0 } keys %elem ],
-	     [ sort grep { $elem{$_} > 0 } keys %elem ] );
+         [ sort grep { $elem{$_} > 0 } keys %elem ] );
 }
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

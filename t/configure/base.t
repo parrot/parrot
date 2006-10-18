@@ -65,3 +65,10 @@ isa_ok($testpkg->new, $testpkg);
     isa_ok($teststep->set_result('baz'), $testpkg);
     is($teststep->result, 'baz', "->set_result() changed the result value");
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

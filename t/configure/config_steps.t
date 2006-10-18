@@ -32,3 +32,10 @@ plan tests => scalar @steps;
 foreach my $step (@steps) {
     require_ok($step);
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
