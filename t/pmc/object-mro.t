@@ -326,3 +326,10 @@ pir_output_like(<<'CODE', <<'OUTPUT', "mro error 1");
 CODE
 /inconsisten class hierarchy/
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

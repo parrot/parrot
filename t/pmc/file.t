@@ -274,3 +274,10 @@ ok 1 - file exists
 ok 2 - directory exists
 ok 3 - file does not exist
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

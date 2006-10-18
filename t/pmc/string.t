@@ -1353,3 +1353,10 @@ pir_output_like( <<'CODE', <<'OUTPUT', "to_int 3");
 CODE
 /invalid conversion to int - bad base 37/
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

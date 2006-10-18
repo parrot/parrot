@@ -29,6 +29,9 @@ L<https://rt.perl.org/rt3/Ticket/Display.html?id=36330>
 
 =cut
 
+use strict;
+use warnings;
+
 use Test::More skip_all => 'No BigNum support yet.';
 
 my ($test, $one, $two, $result, $prec, $round, $maxexp,
@@ -285,3 +288,10 @@ ENDOFUSAGE
     # XXX Capture STDOUT
     runtest($_[0], $_[1], $ops{$ARGV[2]}, $_[3], $round{$_[4]}, $_[5]);
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

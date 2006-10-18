@@ -137,9 +137,9 @@ rmdir $xpto if -d $xpto; # this way next test doesn't fail if this one does
 
 # test stat
 
-open X, ">xpto";
-print X "xpto";
-close X;
+open my $X, '>', "xpto";
+print $X "xpto";
+close $X;
 
 my $stat;
 
@@ -338,3 +338,10 @@ OUT
   ok( $nl > 1, "hard link was really created");
   unlink "xpto" if -f "xpto"
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

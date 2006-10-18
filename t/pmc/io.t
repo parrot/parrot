@@ -25,11 +25,11 @@ Tests the Parrot IO operations.
 sub file_content_is {
     my ($file, $content, $name) = @_;
     local $/=undef; # slurp mode
-    open FOO, "temp.file";
+    open my $FOO, '<', "temp.file";
 
-    is(<FOO>, $content, $name);
+    is(<$FOO>, $content, $name);
 
-    close FOO;
+    close $FOO;
 }
 
 TODO: {
@@ -230,9 +230,9 @@ OUTPUT
 }
 
 # It would be very embarrassing if these didnt work...
-open FOO, ">temp.file";
-print FOO "2\n1\n";
-close FOO;
+open my $FOO, '>', "temp.file" or die "can't open 'temp.file': $!";
+print $FOO "2\n1\n";
+close $FOO;
 pasm_output_is(<<'CODE', <<'OUTPUT', "open and readline");
 	open P0, "temp.file"
 	set S0, ""
@@ -247,8 +247,8 @@ CODE
 2
 OUTPUT
 
-open FOO, ">temp.file";  # Clobber previous contents
-close FOO;
+open $FOO, '>', "temp.file";  # Clobber previous contents
+close $FOO;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "open & print");
        set I0, -12
@@ -274,8 +274,8 @@ CODE
 -122.200000FooBar
 OUTPUT
 
-open FOO, ">temp.file";  # Clobber previous contents
-close FOO;
+open $FOO, '>', "temp.file";  # Clobber previous contents
+close $FOO;
 
 # write to file opened for reading
 pasm_output_is(<<'CODE', <<'OUTPUT', "3-arg open");
@@ -618,9 +618,9 @@ CODE
 /some crazy exception/
 OUT
 
-open FOO, ">temp.file";  # write utf8
-print FOO "T\xc3\xb6tsch\n";
-close FOO;
+open $FOO, '>', "temp.file";  # write utf8
+print $FOO "T\xc3\xb6tsch\n";
+close $FOO;
 
 pir_output_is(<<'CODE', <<"OUTPUT", "utf8 read layer");
 .sub main :main
@@ -795,3 +795,10 @@ CODE
 /stat failed:/
 OUTPUT
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -191,13 +191,13 @@ in sub
 back
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open my $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
   .pcc_sub _sub1:
   print "in sub1\n"
   end
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub");
 .pcc_sub _main:
@@ -220,13 +220,13 @@ found sub
 in sub1
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
   .pcc_sub _sub1:
   print "in sub1\n"
   returncc
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub, ret");
 .pcc_sub _main:
@@ -250,8 +250,8 @@ in sub1
 back
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
   .pcc_sub _sub1:
   print "in sub1\n"
   returncc
@@ -259,7 +259,7 @@ print S <<'EOF';
   print "in sub2\n"
   returncc
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode call different subs, ret");
 .pcc_sub _main:
@@ -419,13 +419,13 @@ CODE
 ok
 OUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
   .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load');
 .pcc_sub _main:
@@ -439,15 +439,15 @@ in sub1
 back
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
   .pcc_sub _error:
   print "error\n"
   .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub');
 .pcc_sub _main:
@@ -475,8 +475,8 @@ in sub1
 back
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
   .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
@@ -484,7 +484,7 @@ print S <<'EOF';
   print "in sub2\n"
   returncc
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first");
 .pcc_sub _main:
@@ -522,8 +522,8 @@ in sub2
 back
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
   .pcc_sub _sub1:
   print "in sub1\n"
   returncc
@@ -531,7 +531,7 @@ print S <<'EOF';
   print "in sub2\n"
   returncc
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second");
 .pcc_sub _main:
@@ -569,8 +569,8 @@ in sub1
 back
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
   .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
@@ -578,7 +578,7 @@ print S <<'EOF';
   print "in sub2\n"
   returncc
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both");
 .pcc_sub _main:
@@ -682,15 +682,15 @@ CODE
 OUTPUT
 
 $temp = "temp.pir";
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
 .emit
   .pcc_sub :load _sub1:
   print "in sub1\n"
   returncc
 .eom
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load first sub - pir');
 .pcc_sub _main:
@@ -704,8 +704,8 @@ in sub1
 back
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
 .emit
   .pcc_sub _foo:
   print "error\n"
@@ -718,7 +718,7 @@ print S <<'EOF';
   returncc
 .eom
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode :load second sub - pir');
 .pcc_sub _main:
@@ -732,8 +732,8 @@ in sub1
 back
 OUTPUT
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
 .emit
   .pcc_sub _foo:
   print "error\n"
@@ -742,7 +742,7 @@ print S <<'EOF';
   returncc
 .eom
 EOF
-close S;
+close $S;
 
 pasm_output_is(<<'CODE', <<'OUTPUT', 'load_bytecode no :load - pir');
 .pcc_sub _main:
@@ -979,8 +979,8 @@ ok
 nofoo/
 OUTPUT
 
-open S, ">test_l1.pir" or die "Can't write test_l1.pir";
-print S <<'EOF';
+open $S, '>', "test_l1.pir" or die "Can't write test_l1.pir";
+print $S <<'EOF';
 .sub l11 :load
     print "l11\n"
 .end
@@ -989,10 +989,10 @@ print S <<'EOF';
     print "l12\n"
 .end
 EOF
-close S;
+close $S;
 
-open S, ">test_l2.pir" or die "Can't write test_l2.pir";
-print S <<'EOF';
+open $S, '>', "test_l2.pir" or die "Can't write test_l2.pir";
+print $S <<'EOF';
 .sub l21 :load
     print "l21\n"
 .end
@@ -1001,7 +1001,7 @@ print S <<'EOF';
     print "l22\n"
 .end
 EOF
-close S;
+close $S;
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o test_l1.pbc test_l1.pir");
 system(".$PConfig{slash}parrot$PConfig{exe} -o test_l2.pbc test_l2.pir");
@@ -1310,3 +1310,10 @@ pir_output_like(<<'CODE', qr/Null PMC access in invoke()/, 'invoking null pmc');
     $P0()
 .end
 CODE
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

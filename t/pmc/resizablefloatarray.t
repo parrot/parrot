@@ -496,3 +496,10 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "unshift float");
 CODE
 2 20.2 10.1
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

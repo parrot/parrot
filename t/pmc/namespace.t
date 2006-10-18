@@ -516,8 +516,8 @@ END {
     unlink("$temp_a.pir", "$temp_a.pbc", "$temp_b.pir", "$temp_b.pbc");
 };
 
-open S, ">$temp_a.pir" or die "Can't write $temp_a.pir";
-print S <<'EOF';
+open my $S, '>', "$temp_a.pir" or die "Can't write $temp_a.pir";
+print $S <<'EOF';
 .HLL "Foo", ""
 .namespace ["Foo_A"]
 .sub loada :load
@@ -529,10 +529,10 @@ print S <<'EOF';
 .sub A
 .end
 EOF
-close S;
+close $S;
 
-open S, ">$temp_b.pir" or die "Can't write $temp_b.pir";
-print S <<'EOF';
+open $S, '>', "$temp_b.pir" or die "Can't write $temp_b.pir";
+print $S <<'EOF';
 .namespace ["Foo_B"]
 .sub loadb :load
     $P0 = find_global "Foo_B", "B"
@@ -543,7 +543,7 @@ print S <<'EOF';
 .end
 EOF
 
-close S;
+close $S;
 
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp_a.pbc $temp_a.pir");
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp_b.pbc $temp_b.pir");
@@ -594,8 +594,8 @@ END {
     unlink($temp_a);
 };
 
-open S, '>', $temp_a or die "Can't write $temp_a";
-print S <<'EOF';
+open $S, '>', $temp_a or die "Can't write $temp_a";
+print $S <<'EOF';
 .HLL 'eek', ''
 
 .sub foo :load :anon
@@ -609,7 +609,7 @@ print S <<'EOF';
   print $P0
 .end
 EOF
-close S;
+close $S;
 
 pir_output_is(<<'CODE', <<'OUTPUT', ":anon subs still get default namespace");
 .HLL 'cromulent', ''
@@ -662,14 +662,14 @@ ok
 OUTPUT
 }
 
-open S, ">$temp_b.pir" or die "Can't write $temp_b.pir";
-print S <<'EOF';
+open $S, '>', "$temp_b.pir" or die "Can't write $temp_b.pir";
+print $S <<'EOF';
 .HLL 'B', ''
 .sub b_foo
     print "b_foo\n"
 .end
 EOF
-close S;
+close $S;
 
 pir_output_is(<<"CODE", <<'OUTPUT', "export_to");
 .HLL 'A', ''
@@ -943,3 +943,10 @@ CODE
 Didn't find root namespace 'Foo'.
 OUTPUT
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -237,8 +237,8 @@ OUTPUT
 my $temp = "temp.pir";
 END { unlink $temp; };
 
-open S, ">$temp" or die "Can't write $temp";
-print S <<'EOF';
+open my $S, '>', "$temp" or die "Can't write $temp";
+print $S <<'EOF';
 .sub Integer_divide_Integer
     .param pmc left
     .param pmc right
@@ -247,7 +247,7 @@ print S <<'EOF';
     .return(lhs)
 .end
 EOF
-close S;
+close $S;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub");
 
@@ -946,8 +946,8 @@ OUTPUT
 ## my $temp = "temp.pir";
 ## END { unlink $temp; };
 
-open P, ">$temp" or die "can't write $temp";
-print P <<'EOF';
+open my $P, '>', "$temp" or die "can't write $temp";
+print $P <<'EOF';
 .sub __add :multi(Integer, Integer)
     .param pmc l
     .param pmc r
@@ -959,7 +959,7 @@ print P <<'EOF';
     .return($P0)
 .end
 EOF
-close P;
+close $P;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "override builtin n_add");
 .sub main
@@ -1295,3 +1295,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "autoboxing on multis");
 CODE
 BMU autobox type: String
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

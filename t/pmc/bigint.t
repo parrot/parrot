@@ -63,9 +63,9 @@ if ($PConfig{gmp}) {
     # argh
     my $parrot = '.' . $PConfig{slash} . 'parrot' . $PConfig{exe};
     my $test = 'temp_gmp_vers.pir';
-    open O, ">$test";
-    print O $vers_check;
-    close O;
+    open my $O, '>', "$test" or die "can't open $test: $!";
+    print $O $vers_check;
+    close $O;
     my $warn = `$parrot $test`;
     diag $warn if $warn;
     unlink $test;
@@ -928,3 +928,10 @@ nok:
 CODE
 ok
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

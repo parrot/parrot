@@ -635,14 +635,14 @@ CODE
 ok
 OUTPUT
 
-open TEMP, ">temp.pir";
+open my $TEMP, '>', "temp.pir" or die "can't open 'temp.pir': $!";
 END { unlink "temp.pir" };
-print TEMP <<PIR;
+print $TEMP <<PIR;
   .sub foo
      print a typo
   .end
 PIR
-close TEMP;
+close $TEMP;
 
 pir_output_like(<<'CODE', <<'OUTPUT', "compile err in load_bytecode");
 .sub main :main
@@ -666,3 +666,10 @@ handler:
 CODE
 ok
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
