@@ -5,7 +5,8 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage;
 
-use Data::Dumper; $Data::Dumper::Indent= 1;
+use lib 'lib';
+use SmartLink;
 
 
 ## process command-line optional arguments
@@ -29,6 +30,8 @@ mkdir $o{outdir}
 
 ## retrieve/compile smartlink-related data
 my $sls= SmartLinkServer->new;
+
+use Data::Dumper; $Data::Dumper::Indent= 1;
 print Dumper $sls->testfiles;
 
 ## TODO: scan test files; collect smartlinks and positional info.
@@ -60,4 +63,9 @@ Jerry Gay a.k.a. particle, E<jerry.gay@gmail.com>
 
 =cut
 
-## vim: shiftwidth=4 expandtab
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
