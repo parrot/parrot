@@ -23,7 +23,7 @@ typedef struct PMC_struct
 } PMC_struct;
 
 Interpreter_struct*
-make_interp( SV* parent, Parrot_Interp interp )
+make_interp( SV *parent, Parrot_Interp interp )
 {
 	Interpreter_struct *interp_struct;
 	if (interp == NULL)
@@ -39,7 +39,7 @@ make_interp( SV* parent, Parrot_Interp interp )
 }
 
 PMC_struct*
-make_pmc( SV* interp, Parrot_PMC pmc )
+make_pmc( SV *interp, Parrot_PMC pmc )
 {
 	PMC_struct *pmc_struct;
 	if (pmc == NULL)
@@ -60,7 +60,7 @@ MODULE = Parrot::Embed PACKAGE = Parrot::Interpreter
 
 Parrot_Interp
 new( class, ... )
-	char * class
+	char *class
 PREINIT:
 	SV *parent_sv = NULL;
 	Parrot_Interp parent;
@@ -112,11 +112,11 @@ find_global( interp, global, ... )
 	Interpreter_struct *interp
 	char *global
 PREINIT:
-	Parrot_Interp   real_interp;
-	SV            * namespace;
-	Parrot_STRING   p_namespace;
-	Parrot_STRING   p_global;
-	Parrot_PMC      pmc;
+	Parrot_Interp  real_interp;
+	SV            *namespace;
+	Parrot_STRING  p_namespace;
+	Parrot_STRING  p_global;
+	Parrot_PMC     pmc;
 CODE:
 	if ( items < 2 || items > 3 )
 	{
@@ -174,9 +174,9 @@ MODULE = Parrot::Embed PACKAGE = Parrot::PMC
 
 PMC_struct*
 invoke( pmc, signature, argument )
-	PMC_struct * pmc
-	const char * signature
-	const char * argument
+	PMC_struct *pmc
+	const char *signature
+	const char *argument
 PREINIT:
 	Parrot_PMC    pmc_actual;
 	Parrot_PMC    out_pmc;
@@ -193,7 +193,7 @@ OUTPUT:
 
 char *
 get_string( pmc )
-	PMC_struct* pmc
+	PMC_struct *pmc
 CODE:
 	RETVAL = Parrot_PMC_get_cstring( get_interp( pmc->interp ), pmc->pmc );
 OUTPUT:
