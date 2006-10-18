@@ -32,12 +32,13 @@ sub __get_revision {
 
     my $revision;
     # code taken from pugs/util/version_h.pl rev 14410
-    if (my @svn_info = qx/svn info/ and $? == 0) {
+    my $nul = File::Spec->devnull; 
+    if (my @svn_info = qx/svn info 2>$nul/ and $? == 0) {
         if (my ($line) = grep /^Revision:/, @svn_info) {
             ($revision) = $line =~ / (\d+)$/;
         }
     }
-    elsif (-r $svn_entries) {
+    elsif ( defined $svn_entries and -r $svn_entries) {
         open FH, $svn_entries or die "Unable to open file ($svn_entries). Aborting. Error returned was: $!";
         while (<FH>) {
             /^ *committed-rev=.(\d+)./ or next;
