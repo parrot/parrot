@@ -107,7 +107,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-Parrot_PMC
+PMC_struct*
 find_global( interp, global, ... )
 	Interpreter_struct *interp
 	char *global
@@ -144,7 +144,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-Parrot_PMC
+PMC_struct*
 compile( interp, code )
 	Interpreter_struct *interp
 	char * code
@@ -172,7 +172,7 @@ CODE:
 
 MODULE = Parrot::Embed PACKAGE = Parrot::PMC
 
-Parrot_PMC
+PMC_struct*
 invoke( pmc, signature, argument )
 	PMC_struct * pmc
 	const char * signature

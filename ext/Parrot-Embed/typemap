@@ -30,3 +30,6 @@ T_PTROBJ_PARROT
 OUTPUT
 T_PTROBJ_PARROT
 	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", (void*)$var);
+
+T_PTROBJ_PARROT_STRUCT
+	sv_setref_pv($arg, \"${ (my $type = $ntype) =~ s/^(\w+)_struct.*$/Parrot::$1/; \$type}\", (void*)$var);
