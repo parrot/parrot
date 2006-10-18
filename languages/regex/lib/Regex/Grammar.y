@@ -10,7 +10,7 @@ sub tokenize {
     my @types;
     my $state = 0;
     my $depth = 0;
-    for my $c (split(//, $data)) {
+    for my $c (split(m{}, $data)) {
         if ($state == 0) {
             if ($c eq '\\') {
                 $state = 1;
