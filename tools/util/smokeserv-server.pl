@@ -38,27 +38,28 @@ my $t = do { local $/; <DATA> };
 my $CGI = new CGI;
 
 #sub handle_request {
-	#my ($self, $CGI) = @_;
+    #my ($self, $CGI) = @_;
 
-	if ($CGI->url(-path => 1) =~ /html$/) {
-	    print $CGI->header;
-	    my $file = $CGI->url(-absolute => 1, -path => 1);
-	    my $basehttpdir = BASEHTTPDIR;
-	    $file =~ s!^$basehttpdir!!;
-	    die "Invalid File"
-		if $file =~ m!/|\.\.!;
-	    if (-e BASEDIR . "/" . $file) {
-		open my $f, "<", BASEDIR . "/" . $file or die $!;
-		print do { local $/; <$f> };
-	    }
+    if ($CGI->url(-path => 1) =~ /html$/) {
+        print $CGI->header;
+        my $file = $CGI->url(-absolute => 1, -path => 1);
+        my $basehttpdir = BASEHTTPDIR;
+        $file =~ s!^$basehttpdir!!;
+        die "Invalid File"
+        if $file =~ m!/|\.\.!;
+        if (-e BASEDIR . "/" . $file) {
+        open my $f, "<", BASEDIR . "/" . $file or die $!;
+        print do { local $/; <$f> };
+        }
 
-	} else {
-		if($CGI->param("upload")) {
-		  eval { process_upload($CGI) };
-		} else {
-		  eval { process_list($CGI) };
-		}
-	} 
+    }
+    else {
+        if($CGI->param("upload")) {
+          eval { process_upload($CGI) };
+        } else {
+          eval { process_list($CGI) };
+        }
+    }
 #HSS }
 #HSS __PACKAGE__->new->run(host => "192.168.2.249");
 
@@ -201,8 +202,8 @@ sub process_list {
   my $category = sub {
     return sprintf "%s / %s runcore on %s-%s-%s",
       $_[0]->{DEVEL} eq "devel" ? "repository snapshot" : "release",
-	  runcore2human($_[0]->{runcore}),
-	  $_[0]->{cpuarch},
+      runcore2human($_[0]->{runcore}),
+      $_[0]->{cpuarch},
       $_[0]->{osname},
       $_[0]->{cc},
   };
@@ -236,10 +237,10 @@ sub process_list {
       name       => $_,
       categories => $branches{$_},
     }} sort {
-		($a eq "trunk" ? -1 : 0) ||
-		($b eq "trunk" ? 1 : 0) ||
-		($a cmp $b)
-	} keys %branches
+        ($a eq "trunk" ? -1 : 0) ||
+        ($b eq "trunk" ? 1 : 0) ||
+        ($a cmp $b)
+    } keys %branches
   ]);
   print $tmpl->output;
 }
@@ -261,31 +262,31 @@ sub pack_smoke {
 sub unpack_smoke {
   my $name = shift;
 
-  /^parrot-smoke-([\d\.]+)	#  1 VERSION
-                -(\w+)		#  2 DEVEL
-                -r(\d+)		#  3 revision
-                -([\w\-]+)	#  4 branch
-               --([\w\d]+)	#  5 cpuarch
-                -([\w\d]+)	#  6 osname
-                -([\w\d]+)	#  7 cc
-                -(\w+)		#  8 runcore
-               --(\d+)		#  9 timestamp
-                -(\d+)		# 10 duration
-               --(\d+)		# 11	total
-                -(\d+)		# 12	ok
-                -(\d+)		# 13	failed
-                -(\d+)		# 14	todo
-                -(\d+)		# 15	skipped
-                -(\d+)		# 16	unexpected
-               --([a-f0-9]+)	# 17    harness_args
-               --([a-f0-9]+)	# 18	id
+  /^parrot-smoke-([\d\.]+)      #  1 VERSION
+                -(\w+)          #  2 DEVEL
+                -r(\d+)         #  3 revision
+                -([\w\-]+)      #  4 branch
+               --([\w\d]+)      #  5 cpuarch
+                -([\w\d]+)      #  6 osname
+                -([\w\d]+)      #  7 cc
+                -(\w+)          #  8 runcore
+               --(\d+)          #  9 timestamp
+                -(\d+)          # 10 duration
+               --(\d+)          # 11 total
+                -(\d+)          # 12 ok
+                -(\d+)          # 13 failed
+                -(\d+)          # 14 todo
+                -(\d+)          # 15 skipped
+                -(\d+)          # 16 unexpected
+               --([a-f0-9]+)    # 17 harness_args
+               --([a-f0-9]+)    # 18 id
    .html$/x
     and return {
-	  VERSION       => $1,
-	  DEVEL         => $2,
+      VERSION       => $1,
+      DEVEL         => $2,
       revision      => $3,
-	  branch		=> $4,
-	  cpuarch       => $5,
+      branch        => $4,
+      cpuarch       => $5,
       osname        => $6,
       cc            => $7,
       runcore       => $8,
@@ -309,7 +310,7 @@ sub unpack_smoke {
         unexpect    => $16,
       }],
       percentage    => sprintf("%.02f", $12 / ($11||1) * 100),
-	  harness_args  => pack("H*", $17),
+      harness_args  => pack("H*", $17),
       id            => $18,
       filename      => $name,
       link          => BASEHTTPDIR . $name, 
@@ -319,12 +320,12 @@ sub unpack_smoke {
 
 sub runcore2human {
   my %runcore = (
-	  goto => "computed goto",
-	  jit => "JIT",
-	  cgp =>  "CGP",
-	  switch => "switch",
-	  fast => "fast",
-	  default => "default",
+    goto => "computed goto",
+    jit => "JIT",
+    cgp =>  "CGP",
+    switch => "switch",
+    fast => "fast",
+    default => "default",
   );
 
   $runcore{$_[0]};
@@ -421,11 +422,11 @@ __DATA__
       var elem     = document.getElementById("details_"  + id),
           expander = document.getElementById("expander_" + id);
       if(elem.className == "details") {
-	elem.className = "";  /* hack? */
-	expander.innerHTML = "&laquo;";
+        elem.className = "";  /* hack? */
+        expander.innerHTML = "&laquo;";
       } else {
-	elem.className = "details";
-	expander.innerHTML = "&raquo;";
+        elem.className = "details";
+        expander.innerHTML = "&raquo;";
       }
     }
   //]]></script>
@@ -445,10 +446,10 @@ __DATA__
   <p>
     Submitting your own smoke is easy,
   </p>
-    
+
   <pre class="indent2">$ make smoke
 </pre>
-    
+
   <p>
     should suffice. To test the languages that are shipped with parrot, change
     to the languages directory and issue the same command.
@@ -458,8 +459,8 @@ __DATA__
     Note that old smoke reports are automatically deleted, so you may not want
     to link directly to a smoke.
   </p>
-    
-  <p> 
+
+  <p>
     Note: Timezone is UTC.<br />
   </p>
 
@@ -477,29 +478,29 @@ __DATA__
               </tmpl_if>
             </td>
             <td class="leftsep"><tmpl_var name=timestamp></td>
-			<td class="leftsep"><tmpl_var name=harness_args></td>
+            <td class="leftsep"><tmpl_var name=harness_args></td>
             <td class="leftsep num"><tmpl_var name=duration></td>
             <td class="leftsep num"><tmpl_var name=percentage>&nbsp;%&nbsp;ok</td>
-	    <tmpl_loop name=summary>
-	      <td class="leftsep num tests_total"><tmpl_var name=total>:</td>
-	      <td class="num tests_ok"><tmpl_var name=ok>,</td>
-	      <td class="num tests_failed"><tmpl_var name=failed>,</td>
-	      <td class="num tests_todo"><tmpl_var name=todo>,</td>
-	      <td class="num tests_skipped"><tmpl_var name=skipped>,</td>
-	      <td class="num tests_unexpect"><tmpl_var name=unexpect></td>
-	    </tmpl_loop>
-	    <td><span title="Details" class="expander" onclick="toggle_visibility('<tmpl_var name=id>')" id="expander_<tmpl_var name=id>">&raquo;</span></td>
-	    <td><a style="text-decoration: none" href="<tmpl_var name=link>" title="Full smoke report">&raquo;</a></td>
+        <tmpl_loop name=summary>
+          <td class="leftsep num tests_total"><tmpl_var name=total>:</td>
+          <td class="num tests_ok"><tmpl_var name=ok>,</td>
+          <td class="num tests_failed"><tmpl_var name=failed>,</td>
+          <td class="num tests_todo"><tmpl_var name=todo>,</td>
+          <td class="num tests_skipped"><tmpl_var name=skipped>,</td>
+          <td class="num tests_unexpect"><tmpl_var name=unexpect></td>
+        </tmpl_loop>
+        <td><span title="Details" class="expander" onclick="toggle_visibility('<tmpl_var name=id>')" id="expander_<tmpl_var name=id>">&raquo;</span></td>
+        <td><a style="text-decoration: none" href="<tmpl_var name=link>" title="Full smoke report">&raquo;</a></td>
           </tr>
           <tr class="details" id="details_<tmpl_var name=id>">
             <td colspan="12" class="indent3">
               <tmpl_loop name=summary>
                 <span class="tests_total"><tmpl_var name=total> test cases</span>:<br />
-		<span class="tests_ok"><tmpl_var name=ok> ok</span>,
-		<span class="tests_failed"><tmpl_var name=failed> failed</span>,
-		<span class="tests_todo"><tmpl_var name=todo> todo</span>,<br />
+                <span class="tests_ok"><tmpl_var name=ok> ok</span>,
+                <span class="tests_failed"><tmpl_var name=failed> failed</span>,
+                <span class="tests_todo"><tmpl_var name=todo> todo</span>,<br />
                 <span class="tests_skipped"><tmpl_var name=skipped> skipped</span> and
-		<span class="tests_unexpect"><tmpl_var name=unexpect> unexpectedly succeeded</span>
+                <span class="tests_unexpect"><tmpl_var name=unexpect> unexpectedly succeeded</span>
               </tmpl_loop><br />
               <a href="<tmpl_var name=link>" title="Full smoke report">View full smoke report</a>
             </td>
@@ -512,8 +513,8 @@ __DATA__
 </html>
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

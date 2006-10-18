@@ -6,7 +6,6 @@ use warnings;
 use Fatal qw( open close );
 
 use lib 'lib';
-
 use Parrot::PIR::Formatter;
 
 my $extension = 'tdy';
@@ -66,10 +65,9 @@ Missing all of the perltidy-ish geeknobs and options.
 
 =cut
 
-
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

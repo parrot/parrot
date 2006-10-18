@@ -11,7 +11,7 @@ generate a parrot wrapper for the named library (or libraries). Its
 format is simple, and looks like:
 
   [package]
-  ncurses 
+  ncurses
 
   [lib]
   libform.so
@@ -164,10 +164,10 @@ my ($cur_package, $line, $cur_section);
 
 # Our dispatch table
 my (%dispatch) = (
-		  package => \&package_line,
-		  lib => \&lib_line,
-		  defs => \&def_line,
-		 );
+    package => \&package_line,
+    lib => \&lib_line,
+    defs => \&def_line,
+);
 
 while ($line = <INPUT>) {
 
@@ -221,8 +221,8 @@ sub def_line {
 }
 
 # Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# fill-column: 100
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
