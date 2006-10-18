@@ -20,46 +20,67 @@ Tests C<LuaThread> PMC
 use strict;
 use warnings;
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 7;
 use Test::More;
 
-SKIP: {
-    skip("will be reused with the future implementation", 8);
-
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaThread"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
+
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luastring.pir'
+
+.sub '__start' :main
+  init_basic()
+  init_coroutine()
+  init_string()
+  _main()
+.end
+.sub '_main'
+    .const .Sub F1 = "f1"
+    find_type $I0, "thread"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new $I0, F1 
     .local int bool1
-    bool1 = isa pmc1, "scalar"
+    bool1 = isa pmc1, "Parrot::Coroutine"
     print bool1
     print "\n"
-    bool1 = isa pmc1, "Sub"
-    print bool1
-    print "\n"
-    bool1 = isa pmc1, "Coroutine"
-    print bool1
-    print "\n"
-    bool1 = isa pmc1, "LuaThread"
+    bool1 = isa pmc1, "thread"
     print bool1
     print "\n"
     end
 .end
+.sub 'f1'
+    print "f1()\n"
+    end
+.end
 CODE
-0
-1
 1
 1
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaThread"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
+
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luastring.pir'
+
+.sub '__start' :main
+  init_basic()
+  init_coroutine()
+  init_string()
+  _main()
+.end
+.sub '_main'
+    .const .Sub F1 = "f1"
+    find_type $I0, "thread"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new $I0, F1 
     .local string str1
     str1 = classname pmc1
     print str1
@@ -69,19 +90,41 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
     print "\n"
     end
 .end
+.sub 'f1'
+    print "f1()\n"
+    end
+.end
 CODE
 thread
 thread
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaThread"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
+
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luastring.pir'
+
+.sub '__start' :main
+  init_basic()
+  init_coroutine()
+  init_string()
+  _main()
+.end
+.sub '_main'
+    .const .Sub F1 = "f1"
+    find_type $I0, "thread"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new $I0, F1 
     print pmc1
     print "\n"
+    end
+.end
+.sub 'f1'
+    print "f1()\n"
     end
 .end
 CODE
@@ -89,40 +132,61 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaThread"
-    .local pmc pmc1
-    pmc1 = new $I0
-    .local int bool1
-    bool1 = istrue pmc1
-    print bool1
-    print "\n"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
+
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luastring.pir'
+
+.sub '__start' :main
+  init_basic()
+  init_coroutine()
+  init_string()
+  _main()
+.end
+.sub '_main'
     .const .Sub F1 = "f1"
-    pmc1 = F1
+    find_type $I0, "thread"
+    .local pmc pmc1
+    pmc1 = new $I0, F1 
+    .local int bool1
     bool1 = istrue pmc1
     print bool1
     print "\n"
     end
 .end
-.sub f1
+.sub 'f1'
     print "f1()\n"
     end
 .end
 CODE
 1
-1
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
-.sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaThread"
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
+
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luastring.pir'
+
+.sub '__start' :main
+  init_basic()
+  init_coroutine()
+  init_string()
+  _main()
+.end
+.sub '_main'
+    .const .Sub F1 = "f1"
+    find_type $I0, "thread"
     .local pmc pmc1
-    pmc1 = new $I0
-    find_type $I0, "LuaBoolean"
+    pmc1 = new $I0, F1 
     .local pmc pmc2
-    pmc2 = new $I0
+    pmc2 = new .LuaBoolean
     pmc2 = not pmc1
     print pmc2
     print "\n"
@@ -132,36 +196,35 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
     print "\n"
     end
 .end
+.sub 'f1'
+    print "f1()\n"
+    end
+.end
 CODE
 false
 boolean
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL "Lua", "lua_group"
-.sub _main
-    .const .Sub F1 = "f1"
-    .local pmc pmc1
-    pmc1 = new .LuaThread, F1
-    .local int bool1
-    bool1 = isa pmc1, "LuaThread"
-    print bool1
-    print "\n"
-    end
-.end
-.sub f1
-    print "f1()\n"
-    end
-.end
-CODE
-1
-OUTPUT
-
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL "Lua", "lua_group"
-.sub _main
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
+
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luastring.pir'
+
+.sub '__start' :main
+  init_basic()
+  init_coroutine()
+  init_string()
+  _main()
+.end
+.sub '_main'
+    .const .Sub F1 = "f1"
+    find_type $I0, "thread"
     .local pmc pmc1
-    pmc1 = new .LuaThread
+    pmc1 = new $I0, F1 
     print pmc1
     print "\n"
     $P0 = pmc1."tostring"()
@@ -170,28 +233,52 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
     $S0 = typeof $P0
     print $S0
     print "\n"
+    end
+.end
+.sub 'f1'
+    print "f1()\n"
+    end
 .end
 CODE
 /thread: [0-9A-Fa-f]{8}\nthread: [0-9A-Fa-f]{8}\nstring/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL "Lua", "lua_group"
-.sub _main
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
+
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luastring.pir'
+
+.sub '__start' :main
+  init_basic()
+  init_coroutine()
+  init_string()
+  _main()
+.end
+.sub '_main'
+    .const .Sub F1 = "f1"
+    find_type $I0, "thread"
     .local pmc pmc1
-    pmc1 = new .LuaThread
+    pmc1 = new $I0, F1 
     $P0 = pmc1."tonumber"()
     print $P0
     print "\n"
     $S0 = typeof $P0
     print $S0
     print "\n"
+    end
+.end
+.sub 'f1'
+    print "f1()\n"
+    end
 .end
 CODE
 nil
 nil
 OUTPUT
-}
 
 # Local Variables:
 #   mode: cperl

@@ -62,7 +62,8 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     $P1 = 'yield'
     _coroutine[$P1] = _coroutine_yield
 
-    $P0 = subclass 'FixedPMCArray', 'thread'
+    load_bytecode 'Parrot/Coroutine.pir'
+    $P0 = subclass 'Parrot::Coroutine', 'thread'
 .end
 
 =item C<coroutine.create (f)>
@@ -76,7 +77,8 @@ Returns this new coroutine, an object with type C<"thread">.
     .param pmc f :optional
     .local pmc ret
     checktype(f, 'function')
-    ret = coroutine_create(f)
+    find_type $I0, 'thread'
+    ret = new $I0, f
     .return (ret)
 .end
 
@@ -101,9 +103,9 @@ C<resume> returns B<false> plus the error message.
     .local pmc ret
     .local pmc status
     new status, .LuaBoolean
-#    checktype(co, 'thread')
+    checktype(co, 'thread')
     push_eh _handler
-    (ret :slurpy) = coroutine_resume(co, argv :flat)
+    (ret :slurpy) = co.'resume'(argv :flat)
     status = 1
     .return (status, ret :flat)
 _handler:
@@ -147,7 +149,7 @@ DUMMY IMPLEMENTATION.
 .sub '_coroutine_status' :anon :outer(init_coroutine)
     .param pmc co :optional
     .local pmc ret
-#    checktype(co, 'thread')
+    checktype(co, 'thread')
     new ret, .LuaString
     ret = 'suspended'
     .return (ret)
@@ -183,127 +185,65 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc co   # current coroutine ?
-    (ret :slurpy) = coroutine_yield(co, argv :flat)
+    (ret :slurpy) = co.'yield'(argv :flat)
     .return (ret :flat)
 .end
 
-### Coroutine implementation.
 
-## Coroutine slots:
-##
-##  0.  Coroutine state:  1 is new or valid, 0 is dead.
-##  1.  Initial sub.
-##  2.  Continuation to which to return when yielding.
-##  3.  Continuation from which to resume.
+.namespace ['thread']
 
-.include "interpinfo.pasm"
-
-.sub 'coroutine_create' :anon
-    .param pmc sub
-
-    .local pmc coro, state
-#    find_type $I0, 'thread'
-#    coro = new $I0
-    coro = new .FixedPMCArray
-    coro = 4
-    state = new .Undef
-    state = 1
-    coro[0] = state
-    coro[1] = sub
-    .return (coro)
+.sub '__clone' :method
+    .local pmc ret
+    ret = self  # fixme
+    .return (ret)
 .end
 
-## Invoke the coroutine.
-.sub 'coroutine_resume' :anon
-    .param pmc coro
-    .param pmc args :slurpy
-
-    ## Decide whether we're dead.
-    .local pmc state
-    state = coro[0]
-    unless state goto dead
-
-    ## Decide where to go.  If we've never been invoked before, we need to
-    ## call the sub.
-    .local pmc entry
-    entry = coro[3]
-    unless null entry goto doit
-    entry = coro[1]
-
-doit:
-    ## Remember where to return when we yield.
-    .local pmc cc
-    cc = interpinfo .INTERPINFO_CURRENT_CONT
-    coro[2] = cc
-
-    ## Call the entry with our args.  Most of the time, it will yield (by
-    ## calling our continuation for us) instead of returning directly.
-    .local pmc result
-    (result :slurpy) = entry(args :flat)
-    ## If we returned normally, then the coroutine is dead.
-    state = 0
-    ## Note that the value of coro[2] will normally have been changed
-    ## magically behind our backs by a subsequent yield/resume, so we can't
-    ## just return directly.
-    cc = coro[2]
-    .return cc(result :flat)
-
-dead:
-    ## Complain about zombie creation.
-    .local pmc error
-    error = new .Exception
-    error['_message'] = "Can't reanimate a dead coroutine.\n"
-    throw error
+.sub '__get_integer' :method
+    $I0 = 0     # fixme
+    .return ($I0) 
 .end
 
-## Return values to the calling thread.
-.sub 'coroutine_yield' :anon
-    .param pmc coro
-    .param pmc args :slurpy
-
-    ## Remember where to go when we are resumed.
-    .local pmc cc
-    cc = interpinfo .INTERPINFO_CURRENT_CONT
-    coro[3] = cc
-
-    ## Return to the coro caller.
-    cc = coro[2]
-    .return cc(args :flat)
+.sub '__get_string' :method
+    new $P0, .Array
+    $P0 = 1
+    $P0[0] = self
+    $S0 = sprintf "thread: %08X", $P0
+    .return ($S0)
 .end
 
-#.namespace ['thread']
-#
-#.sub '__get_string' :method
-#    $S0 = sprintf "thread: %08X", self
-#    .return ($S0)
-#.end
-#
-#.sub '__get_bool' :method
-#    $I0 = 1
-#    .return ($I0)
-#.end
-#
-#.sub 'rawequal' :method
-#    .param pmc value
-#    .local pmc ret
-#    new ret, .LuaBoolean
-#    not_implemented()
-#    .return (ret)
-#.end
-#
-#.sub 'tonumber' :method
-#    .local pmc ret
-#    new ret, .LuaNil
-#    .return (ret)
-#.end
-#
-#.sub 'tostring' :method
-#    .local pmc ret
-#    new ret, .LuaString
-#    $S0 = self.__get_string()
-#    ret = $S0
-#    .return (ret)
-#.end
+.sub '__get_bool' :method
+    $I0 = 1
+    .return ($I0)
+.end
+
+.sub '__logical_not' :method
+    .param pmc dummy
+    .local pmc ret
+    new ret, .LuaBoolean
+    .return (ret)
+.end
+
+.sub 'rawequal' :method
+    .param pmc value
+    .local pmc ret
+    new ret, .LuaBoolean
+    not_implemented()
+    .return (ret)
+.end
+
+.sub 'tonumber' :method
+    .local pmc ret
+    new ret, .LuaNil
+    .return (ret)
+.end
+
+.sub 'tostring' :method
+    .local pmc ret
+    new ret, .LuaString
+    $S0 = self.__get_string()
+    ret = $S0
+    .return (ret)
+.end
 
 =back
 

@@ -71,7 +71,7 @@ co = coroutine.create(function ()
 
 print(co)
 CODE
-/(thread: [0-9A-Fa-f]{8}|\s*)/
+/thread: [0-9A-Fa-f]{8}/
 OUT
 
 
