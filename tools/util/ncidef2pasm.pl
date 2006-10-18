@@ -152,11 +152,11 @@ if (!defined $to_file) {
   $to_file .= ".pasm";
 }
 
-open INPUT, "<$from_file" or die "Can't open up $from_file, error $!";
-open OUTPUT, ">$to_file" or die "Can't open up $to_file, error $!";
+open my $INPUT, '<', "$from_file" or die "Can't open up $from_file, error $!";
+open my $OUTPUT, '>', "$to_file" or die "Can't open up $to_file, error $!";
 
 # To start, save all the registers, just in case
-print OUTPUT "saveall\n";
+print $OUTPUT "saveall\n";
 
 
 my @libs;
@@ -169,7 +169,7 @@ my (%dispatch) = (
     defs => \&def_line,
 );
 
-while ($line = <INPUT>) {
+while ($line = <$INPUT>) {
 
   # Throw away trailing newlines, comments, and whitespace. If the
   # line's empty, then off to the next line
@@ -190,9 +190,9 @@ while ($line = <INPUT>) {
 }
 
 # Put the registers back and end
-print OUTPUT "restoreall\n";
-print OUTPUT "end\n";
-close OUTPUT;
+print $OUTPUT "restoreall\n";
+print $OUTPUT "end\n";
+close $OUTPUT;
 
 sub package_line {
   my $line = shift;
@@ -208,7 +208,7 @@ sub package_line {
 
 sub lib_line {
   my $line = shift;
-  print OUTPUT "loadlib P1, '$line'\n";
+  print $OUTPUT "loadlib P1, '$line'\n";
 }
 
 sub def_line {
@@ -216,8 +216,8 @@ sub def_line {
   my ($return_type, $name, @params) = split ' ', $line;
   unshift @params, $return_type;
   my $signature = join("", @params);
-  print OUTPUT "dlfunc P2, P1, '$name', '$signature'\n";
-  print OUTPUT "store_global '${cur_package}::${name}', P2\n";
+  print $OUTPUT "dlfunc P2, P1, '$name', '$signature'\n";
+  print $OUTPUT "store_global '${cur_package}::${name}', P2\n";
 }
 
 # Local Variables:
