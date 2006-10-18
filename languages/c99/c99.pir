@@ -32,6 +32,7 @@ c99 -- A parser for c99
     load_bytecode 'languages/c99/src/c99_PGE.pbc'
     load_bytecode 'languages/c99/src/CPP_PGE2AST.pbc'
     load_bytecode 'languages/c99/src/CPP_PASTNodes.pbc'
+    load_bytecode 'languages/c99/src/CPP_AST2Constants.pbc'
     #load_bytecode 'languages/c99/src/CPP_POST.pbc'
     #load_bytecode 'languages/c99/src/CPP_PGE2AST.pbc'
     #load_bytecode 'languages/c99/src/CPP_AST2OST.pbc'
@@ -46,10 +47,14 @@ c99 -- A parser for c99
     getopts = new 'Getopt::Obj'
     getopts.'notOptStop'(1)
     push getopts, 'target=s'
+    push getopts, 'constants'
     opts = getopts.'get_options'(args)
 
     $S0 = opts['help']
     if $S0 goto usage
+    .local int constants
+    constants = opts['constants']
+
 
     .local int stopafter
     .local string dump
@@ -57,6 +62,7 @@ c99 -- A parser for c99
     .local int dump_src_early
     .local int dump_pge
     .local int dump_ast
+    .local int dump_constants
     
     .local pmc c99_compiler
     .local string filename
@@ -66,6 +72,7 @@ c99 -- A parser for c99
     dump_src_early = 1
     dump_pge = 1
     dump_ast = 1
+    dump_constants = 1
 
    c99_compiler = compreg 'C99'
     
@@ -135,6 +142,24 @@ c99 -- A parser for c99
     #ast.'dump'()
   after_ast_dump:
     eq stopafter, 2, end
+    
+  unless constants goto after_constants_dump
+    # "Traverse" the parse tree
+    .local pmc grammar
+    .local pmc constantsbuilder
+    .local pmc constants_out
+    grammar = new 'C99::CPP::Constants::ConstantsGrammar'
+    constantsbuilder = grammar.apply(ast)
+    constants_out = constantsbuilder.get('root')
+    $I0 = defined constants_out
+    unless $I0 goto err_no_constants
+
+    unless dump_constants goto after_constants_dump
+    print "\n\nConstants dump:\n"
+    print constants_out
+    print "\n"
+  after_constants_dump:
+    eq stopafter, 2, end
 
     exit 0
 
@@ -147,6 +172,10 @@ c99 -- A parser for c99
 
   err_no_ast:
     print "Unable to construct AST.\n"
+    exit -2
+
+  err_no_constants:
+    print "Unable to construct Constants.\n"
     exit -2
 
   err_no_ost:
