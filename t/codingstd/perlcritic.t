@@ -95,7 +95,9 @@ if ( !keys %policies ) {
         'Subroutines::ProhibitBuiltinHomonyms'       => 1,
         'Subroutines::ProhibitExplicitReturnUndef'   => 1,
         'Subroutines::ProhibitSubroutinePrototypes'  => 1,
-        'Subroutines::RequireFinalReturn'            => 1,
+#40564 [TODO] fix perlcritic Subroutines::RequireFinalReturn policy
+# below commented out because it does not ignore subs which 'exit' or 'die'
+#        'Subroutines::RequireFinalReturn'            => 1,
         'CodeLayout::UseParrotCoda'                  => 1,
         'CodeLayout::ProhibitHardTabs'               => { allow_leading_tabs => 0 },
         'CodeLayout::RequireTidyCode'                => { perltidyrc => $perl_tidy_conf },
@@ -162,13 +164,6 @@ sub is_perl {
     return 0;
 }
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
-
 __END__
 
 =head1 NAME
@@ -201,3 +196,10 @@ There's no way to specify options to policies when they are specified on the
 command line.
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
