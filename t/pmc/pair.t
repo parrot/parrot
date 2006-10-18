@@ -14,7 +14,7 @@ t/pmc/pair.t - pair tests
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/pair.t
+    % prove t/pmc/pair.t
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ key 42 2 key 42
 OUT
 
 SKIP: {
-	skip("instantiate disabled", 1);
+    skip("instantiate disabled", 1);
 pir_output_is(<<'CODE', <<'OUT', 'instantiate, assign');
 .sub main :main
     .local pmc cl, p, kv, k, v

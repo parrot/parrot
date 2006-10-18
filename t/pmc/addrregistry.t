@@ -15,7 +15,7 @@ t/pmc/addrregistry.t - test AddrRegistry PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/addrregistry.t
+    % prove t/pmc/addrregistry.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the AddrRegistry PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .AddrRegistry
-	print "ok 1\n"
+    new P0, .AddrRegistry
+    print "ok 1\n"
 .end
 CODE
 ok 1

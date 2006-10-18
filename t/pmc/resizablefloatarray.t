@@ -14,7 +14,7 @@ t/pmc/resizablefloatarray.t - ResizableFloatArray PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/resizablefloatarray.t
+    % prove t/pmc/resizablefloatarray.t
 
 =head1 DESCRIPTION
 

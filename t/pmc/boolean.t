@@ -14,7 +14,7 @@ t/pmc/boolean.t - Boolean Ops
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/boolean.t
+    % prove t/pmc/boolean.t
 
 =head1 DESCRIPTION
 
@@ -25,12 +25,12 @@ type combinations.
 
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "Initialization, and integer tests");
-	new P0,.Boolean
+    new P0,.Boolean
 
-	set I0, P0
-	eq I0,0,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
+    set I0, P0
+    eq I0,0,OK_1
+    print "not "
+OK_1:    print "ok 1\n"
 
         set I0, 1
         set P0, I0
@@ -231,7 +231,7 @@ ok 9
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "neg");
-	new P0, .Boolean
+    new P0, .Boolean
         new P1, .Boolean
 
         set P0, 1

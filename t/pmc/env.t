@@ -15,7 +15,7 @@ t/pmc/env.t - System Environment
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/env.t
+    % prove t/pmc/env.t
 
 =head1 DESCRIPTION
 
@@ -93,8 +93,8 @@ OUT
 
 SKIP:
 {
-	skip 'iterator not available on win32' => 1
-		if 'MSWin32' eq $^O;
+    skip 'iterator not available on win32' => 1
+        if 'MSWin32' eq $^O;
 pasm_output_is(<<'CODE', <<OUT, "iterate");
     new P0, .Env
     set P0["PARROT_1"], "hello"

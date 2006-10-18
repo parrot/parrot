@@ -27,7 +27,7 @@ t/pmc/file.t - Files functions
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/file.t
+    % prove t/pmc/file.t
 
 =head1 DESCRIPTION
 
@@ -111,7 +111,7 @@ OUT
 SKIP: {
     skip "Links not available under Windows", 1 if $MSWin32;
 
-	my $lotpx = catfile( $xpto, 'lotpx' );
+    my $lotpx = catfile( $xpto, 'lotpx' );
     symlink $otpx, $lotpx;
 
     # test is_link
@@ -146,7 +146,7 @@ OUT
 SKIP: {
     skip "Links not available under Windows", 1 if $MSWin32;
 
-	my $xptol = catdir( $xpto, 'xptol' );
+    my $xptol = catdir( $xpto, 'xptol' );
     symlink $xpto, $xptol;
 
     # test is_link
@@ -246,7 +246,7 @@ pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
        \$I1 = \$P1.'exists'( '$otpxcopy' )
 
        if \$I1 goto file_exists
-	   print "not "
+       print "not "
 
   file_exists:
        print "ok 1 - file exists\\n"
@@ -254,7 +254,7 @@ pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
        \$I1 = \$P1.'exists'( '$xpto' )
 
        if \$I1 goto dir_exists
-	   print "not "
+       print "not "
 
   dir_exists:
        print "ok 2 - directory exists\\n"
@@ -262,7 +262,7 @@ pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
        \$I1 = \$P1.'exists'( '$bad_file' )
 
        if \$I1 == 0 goto file_does_not_exist
-	   print "not "
+       print "not "
 
   file_does_not_exist:
        print "ok 3 - file does not exist\\n"

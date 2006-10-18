@@ -14,7 +14,7 @@ t/pmc/orderedhash.t - Ordered Hash
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/orderedhash.t
+    % prove t/pmc/orderedhash.t
 
 =head1 DESCRIPTION
 

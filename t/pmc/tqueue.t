@@ -14,7 +14,7 @@ t/pmc/tqueue.t - Thread Queue
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/tqueue.t
+    % prove t/pmc/tqueue.t
 
 =head1 DESCRIPTION
 

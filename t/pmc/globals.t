@@ -14,7 +14,7 @@ t/pmc/globals.t - Globals and Namespaces
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/globals.t
+    % prove t/pmc/globals.t
 
 =head1 DESCRIPTION
 

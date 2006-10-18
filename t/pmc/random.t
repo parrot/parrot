@@ -15,7 +15,7 @@ t/pmc/random.t - test the Random PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/random.t
+    % prove t/pmc/random.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the Random PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .Random
-	print "ok 1\n"
+    new P0, .Random
+    print "ok 1\n"
 .end
 CODE
 ok 1

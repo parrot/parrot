@@ -15,7 +15,7 @@ t/pmc/nci.t - test the Native Call Interface
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/nci.t
+    % prove t/pmc/nci.t
 
 =head1 DESCRIPTION
 

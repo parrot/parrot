@@ -14,7 +14,7 @@ t/pmc/ro.t -- tests read-only value support
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/ro.t
+    % prove t/pmc/ro.t
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,7 @@ t/pmc/sharedref.t - test the SharedRef PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/sharedref.t
+    % prove t/pmc/sharedref.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the SharedRef PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .SharedRef
-	print "ok 1\n"
+    new P0, .SharedRef
+    print "ok 1\n"
 .end
 CODE
 ok 1

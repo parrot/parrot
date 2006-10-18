@@ -15,7 +15,7 @@ t/pmc/parrotinterpreter.t - test the ParrotInterpreter PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/parrotinterpreter.t
+    % prove t/pmc/parrotinterpreter.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the ParrotInterpreter PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .ParrotInterpreter
-	print "ok 1\n"
+    new P0, .ParrotInterpreter
+    print "ok 1\n"
 .end
 CODE
 ok 1

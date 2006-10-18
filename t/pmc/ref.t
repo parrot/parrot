@@ -14,7 +14,7 @@ t/pmc/ref.t - Reference PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/ref.t
+    % prove t/pmc/ref.t
 
 =head1 DESCRIPTION
 
@@ -23,51 +23,51 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 =cut
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "new ref");
-	new P2, .Integer
-	new P1, .Ref, P2
-	print "ok 1\n"
-	end
+    new P2, .Integer
+    new P1, .Ref, P2
+    print "ok 1\n"
+    end
 CODE
 ok 1
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "inc ref");
-	new P2, .Integer
-	new P1, .Ref, P2
-	inc P1
-	print P1
-	print P2
-	print "\n"
-	end
+    new P2, .Integer
+    new P1, .Ref, P2
+    inc P1
+    print P1
+    print P2
+    print "\n"
+    end
 CODE
 11
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "dec ref");
-	new P2, .Integer
+    new P2, .Integer
         set P2, 2
-	new P1, .Ref, P2
-	dec P1
-	print P1
-	print P2
-	print "\n"
-	end
+    new P1, .Ref, P2
+    dec P1
+    print P1
+    print P2
+    print "\n"
+    end
 CODE
 11
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "deref");
-	new P2, .Integer
-	new P1, .Ref, P2
-	print "ok 1\n"
-	deref P3, P1
-	typeof S0, P1
-	print S0
-	print "\n"
-	typeof S0, P3
-	print S0
-	print "\n"
-	end
+    new P2, .Integer
+    new P1, .Ref, P2
+    print "ok 1\n"
+    deref P3, P1
+    typeof S0, P1
+    print S0
+    print "\n"
+    typeof S0, P3
+    print S0
+    print "\n"
+    end
 CODE
 ok 1
 Ref
@@ -75,22 +75,22 @@ Integer
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "setref ref");
-	new P2, .Integer
-	new P3, .Float
-	set P3, 0.5
-	new P1, .Ref, P2
-	inc P1
-	print P1
-	print "\n"
-	setref P1, P3
-	inc P1
-	print P1
-	print "\n"
-	print P2
-	print "\n"
-	print P3
-	print "\n"
-	end
+    new P2, .Integer
+    new P3, .Float
+    set P3, 0.5
+    new P1, .Ref, P2
+    inc P1
+    print P1
+    print "\n"
+    setref P1, P3
+    inc P1
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    print P3
+    print "\n"
+    end
 CODE
 1
 1.5
@@ -101,22 +101,22 @@ OUTPUT
 TODO: {
     local $TODO = 'pending new Ref semantic';
 pasm_output_is(<<'CODE', <<'OUTPUT', "assign ref");
-	new P2, .Integer
-	new P3, .Float
+    new P2, .Integer
+    new P3, .Float
         set P2, 0
-	set P3, 0.5
-	new P1, .Ref, P2
-	assign P1, 1
-	print P1
-	print "\n"
-	assign P1, P3
-	print P1
-	print "\n"
-	print P2
-	print "\n"
-	print P3
-	print "\n"
-	end
+    set P3, 0.5
+    new P1, .Ref, P2
+    assign P1, 1
+    print P1
+    print "\n"
+    assign P1, P3
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    print P3
+    print "\n"
+    end
 CODE
 1
 0.5
@@ -126,21 +126,21 @@ OUTPUT
 }
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "typeof SharedRef");
-	new P2, .Integer
-	new P1, .SharedRef, P2
-	print "ok 1\n"
-	set P1, 4711
-	print P1
-	print "\n"
-	typeof S0, P1
-	print S0
-	print "\n"
-	set P1, "hello\n"
-	typeof S0, P1
-	print S0
-	print "\n"
-	print P1
-	end
+    new P2, .Integer
+    new P1, .SharedRef, P2
+    print "ok 1\n"
+    set P1, 4711
+    print P1
+    print "\n"
+    typeof S0, P1
+    print S0
+    print "\n"
+    set P1, "hello\n"
+    typeof S0, P1
+    print S0
+    print "\n"
+    print P1
+    end
 CODE
 ok 1
 4711
@@ -150,12 +150,12 @@ hello
 OUTPUT
 
 pasm_output_like(<<'CODE', <<'OUTPUT', "deref SharedRef");
-	new P2, .Integer
-	new P1, .SharedRef, P2
-	print "ok 1\n"
-	deref P3, P1
-	print "never\n"
-	end
+    new P2, .Integer
+    new P1, .SharedRef, P2
+    print "ok 1\n"
+    deref P3, P1
+    print "never\n"
+    end
 CODE
 /ok 1
 deref not allowed/
@@ -201,23 +201,23 @@ CODE
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "set/get int");
-	new P2, .Integer
-	new P1, .Ref, P2
+    new P2, .Integer
+    new P1, .Ref, P2
         set P1, 10
         print P2
         print "\n"
         set I0, P1
         print I0
         print "\n"
-	end
+    end
 CODE
 10
 10
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "set/get float");
-	new P2, .Float
-	new P1, .Ref, P2
+    new P2, .Float
+    new P1, .Ref, P2
         set P1, 12.5
         set N0, P2
         set N1, 12.5
@@ -228,15 +228,15 @@ OK1:    print "ok 1\n"
         eq N2, N1, OK2
         print "not"
 OK2:    print "ok 2\n"
-	end
+    end
 CODE
 ok 1
 ok 2
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "push/pop");
-	new P2, .ResizableIntegerArray
-	new P1, .Ref, P2
+    new P2, .ResizableIntegerArray
+    new P1, .Ref, P2
         push P1, 200
         push P1, -3
         set I0, P1
@@ -254,7 +254,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "push/pop");
         set I0, P1
         print I0
         print "\n"
-	end
+    end
 CODE
 2
 2
@@ -264,41 +264,41 @@ CODE
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, ref, ref");
-	new P2, .Integer
-	new P1, .Ref, P2
+    new P2, .Integer
+    new P1, .Ref, P2
         set P1, 10
         add P1, P1, P1
         print P2
         print "\n"
-	end
+    end
 CODE
 20
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, ref, int");
         new P3, .Integer
-	new P2, .Integer
-	new P1, .Ref, P2
+    new P2, .Integer
+    new P1, .Ref, P2
         set P3, 12
         set P1, 10
         add P1, P1, P3
         print P2
         print "\n"
-	end
+    end
 CODE
 22
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, int, ref");
         new P3, .Integer
-	new P2, .Integer
-	new P1, .Ref, P2
+    new P2, .Integer
+    new P1, .Ref, P2
         set P3, 12
         set P1, 10
         add P1, P3, P1
         print P2
         print "\n"
-	end
+    end
 CODE
 22
 OUTPUT
@@ -306,14 +306,14 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, int, int");
         new P3, .Integer
-	new P2, .Integer
-	new P1, .Ref, P2
+    new P2, .Integer
+    new P1, .Ref, P2
         set P3, 12
         set P1, 10
         add P1, P3, P3
         print P2
         print "\n"
-	end
+    end
 CODE
 24
 OUTPUT

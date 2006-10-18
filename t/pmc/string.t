@@ -14,7 +14,7 @@ t/pmc/string.t - Strings
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/string.t
+    % prove t/pmc/string.t
 
 =head1 DESCRIPTION
 

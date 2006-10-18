@@ -14,7 +14,7 @@ t/pmc/object-meths.t - Object Methods
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/object-meths.t
+    % prove t/pmc/object-meths.t
 
 =head1 DESCRIPTION
 

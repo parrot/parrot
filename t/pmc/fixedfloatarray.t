@@ -14,7 +14,7 @@ t/pmc/fixedfloatarray.t - FixedFloatArray PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/fixedfloatarray.t
+    % prove t/pmc/fixedfloatarray.t
 
 =head1 DESCRIPTION
 
@@ -25,60 +25,60 @@ out-of-bounds test. Checks INT and PMC keys.
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
-	save	N0
-	save	N1
-	save	N2
+    save	N0
+    save	N1
+    save	N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	gt	N2, 0.000001, .$FPEQNOK
+    set	N0, .J
+    set	N1, .K
+    sub	N2, N1,N0
+    abs	N2, N2
+    gt	N2, 0.000001, .$FPEQNOK
 
-	restore N2
-	restore	N1
-	restore	N0
-	branch	.L
+    restore N2
+    restore	N1
+    restore	N0
+    branch	.L
 .local $FPEQNOK:
-	restore N2
-	restore	N1
-	restore	N0
+    restore N2
+    restore	N1
+    restore	N0
 .endm
 .macro fp_ne(	J,K,L)
-	save	N0
-	save	N1
-	save	N2
+    save	N0
+    save	N1
+    save	N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	lt	N2, 0.000001, .$FPNENOK
+    set	N0, .J
+    set	N1, .K
+    sub	N2, N1,N0
+    abs	N2, N2
+    lt	N2, 0.000001, .$FPNENOK
 
-	restore	N2
-	restore	N1
-	restore	N0
-	branch	.L
+    restore	N2
+    restore	N1
+    restore	N0
+    branch	.L
 .local $FPNENOK:
-	restore	N2
-	restore	N1
-	restore	N0
+    restore	N2
+    restore	N1
+    restore	N0
 .endm
 ENDOFMACRO
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
-	new P0,.FixedFloatArray
+    new P0,.FixedFloatArray
 
-	set I0,P0
-	eq I0,0,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
+    set I0,P0
+    eq I0,0,OK_1
+    print "not "
+OK_1:    print "ok 1\n"
 
-	set P0,1
-	set I0,P0
-	eq I0,1,OK_2
-	print "not "
-OK_2:	print "ok 2\n"
+    set P0,1
+    set I0,P0
+    eq I0,1,OK_2
+    print "not "
+OK_2:    print "ok 2\n"
 
         end
 CODE
@@ -87,12 +87,12 @@ ok 2
 OUTPUT
 
 pasm_output_like(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
-	new P0, .FixedFloatArray
+    new P0, .FixedFloatArray
 
-	set I0,P0
-	set P0,1
-	set P0,2
-	print "Should have gotten an exception\n "
+    set I0,P0
+    set P0,1
+    set P0,2
+    print "Should have gotten an exception\n "
 
 
         end
@@ -106,25 +106,25 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .FixedFloatArray
         set P0, 1
 
-	set P0[0],-7
-	set I0,P0[0]
-	eq I0,-7,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
+    set P0[0],-7
+    set I0,P0[0]
+    eq I0,-7,OK_1
+    print "not "
+OK_1:    print "ok 1\n"
 
-	set P0[0],3.7
-	set N0,P0[0]
-	eq N0,3.7,OK_2
-	print "not "
-OK_2:	print "ok 2\n"
+    set P0[0],3.7
+    set N0,P0[0]
+    eq N0,3.7,OK_2
+    print "not "
+OK_2:    print "ok 2\n"
 
-	set P0[0],"17.2"
-	set S0,P0[0]
-	eq S0,"17.2",OK_3
-	print "not "
-OK_3:	print "ok 3\n"
+    set P0[0],"17.2"
+    set S0,P0[0]
+    eq S0,"17.2",OK_3
+    print "not "
+OK_3:    print "ok 3\n"
 
-	end
+    end
 CODE
 ok 1
 ok 2
@@ -135,25 +135,25 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .FixedFloatArray
         set P0, 2
 
-	set P0[1], -7
-	set I0, P0[1]
-	eq I0,-7,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
+    set P0[1], -7
+    set I0, P0[1]
+    eq I0,-7,OK_1
+    print "not "
+OK_1:    print "ok 1\n"
 
-	set P0[1], 3.7
-	set N0, P0[1]
-	eq N0,3.7,OK_2
-	print "not "
-OK_2:	print "ok 2\n"
+    set P0[1], 3.7
+    set N0, P0[1]
+    eq N0,3.7,OK_2
+    print "not "
+OK_2:    print "ok 2\n"
 
-	set P0[1],"17.1"
-	set S0, P0[1]
-	eq S0,"17.1",OK_3
-	print "not "
-OK_3:	print "ok 3\n"
+    set P0[1],"17.1"
+    set S0, P0[1]
+    eq S0,"17.1",OK_3
+    print "not "
+OK_3:    print "ok 3\n"
 
-	end
+    end
 CODE
 ok 1
 ok 2
@@ -165,9 +165,9 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .FixedFloatArray
         set P0, 1
 
-	set P0[1], -7
+    set P0[1], -7
 
-	end
+    end
 CODE
 /FixedFloatArray: index out of bounds!
 current instr\.:/
@@ -177,8 +177,8 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .FixedFloatArray
         set P0, 1
 
-	set I0, P0[1]
-	end
+    set I0, P0[1]
+    end
 CODE
 /FixedFloatArray: index out of bounds!
 current instr\.:/
@@ -301,14 +301,14 @@ ok
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "Truth");
-	new P0, .FixedFloatArray
+    new P0, .FixedFloatArray
         unless P0, OK1
-	print "not "
-OK1:	print "ok 1\n"
+    print "not "
+OK1:    print "ok 1\n"
         set P0, 1
         if P0, OK2        
-	print "not "
-OK2:	print "ok 2\n"
+    print "not "
+OK2:    print "ok 2\n"
         end
 CODE
 ok 1

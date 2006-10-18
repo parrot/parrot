@@ -14,7 +14,7 @@ t/pmc/delegate.t - Method Delegation
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/delegate.t
+    % prove t/pmc/delegate.t
 
 =head1 DESCRIPTION
 

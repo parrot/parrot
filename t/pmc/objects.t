@@ -14,7 +14,7 @@ t/pmc/objects.t - Objects
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/objects.t
+    % prove t/pmc/objects.t
 
 =head1 DESCRIPTION
 
@@ -1734,7 +1734,7 @@ Foo
 OUTPUT
 
 SKIP: {
-	skip("instantiate disabled", 2);
+    skip("instantiate disabled", 2);
 pasm_output_is(<<'CODE', <<'OUTPUT', "instantiate");
     subclass P2, "Integer", "Foo"
     set I0, 0
@@ -1781,7 +1781,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "instantiate - PIR");
     $P0 = val
     setattribute obj, $I1, $P0
     .pcc_begin_return
-	.return obj
+    .return obj
     .pcc_end_return
 .end
 CODE
@@ -2156,7 +2156,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering");
 .end
 .namespace ['Foo';'Bar']
 .sub __init :method
-	print "__init Bar\n"
+    print "__init Bar\n"
 .end
 CODE
 __init Bar

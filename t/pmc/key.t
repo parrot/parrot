@@ -14,7 +14,7 @@ t/pmc/key.t - Keys
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/key.t
+    % prove t/pmc/key.t
 
 =head1 DESCRIPTION
 

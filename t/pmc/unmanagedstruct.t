@@ -15,7 +15,7 @@ t/pmc/unmanagedstruct.t - test the UnManagedStruct PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/unmanagedstruct.t
+    % prove t/pmc/unmanagedstruct.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the UnManagedStruct PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .UnManagedStruct
-	print "ok 1\n"
+    new P0, .UnManagedStruct
+    print "ok 1\n"
 .end
 CODE
 ok 1

@@ -15,7 +15,7 @@ t/pmc/lexpad.t - test LexPad PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/lexpad.t
+    % prove t/pmc/lexpad.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the LexPad PMC.
 
 pir_output_like(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .LexPad
-	print "ok 1\n"
+    new P0, .LexPad
+    print "ok 1\n"
 .end
 CODE
 /don't create me like this

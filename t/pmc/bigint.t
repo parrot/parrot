@@ -476,17 +476,17 @@ OUTPUT
 {
     my ($a, $b, $c, $d, $e);
     if ($PConfig{intvalsize} == 8) {
-        $a = '9223372036854775806';	# 2**63-2
+        $a = '9223372036854775806';    # 2**63-2
         $b =                   '1';
         $c = '9223372036854775807'; # still Integer
         $d = '9223372036854775808'; # no more Integer
         $e = '9223372036854775809'; # still no more Integer
     } elsif ($PConfig{intvalsize} == 4) {
-        $a = '2147483646';		# 2**31-2
+        $a = '2147483646';        # 2**31-2
         $b =          '1';
-        $c = '2147483647';		# still Integer
-        $d = '2147483648';		# no more PerlInt
-        $e = '2147483649';		# still no more PerlInt
+        $c = '2147483647';        # still Integer
+        $d = '2147483648';        # no more PerlInt
+        $e = '2147483649';        # still no more PerlInt
     } else {
         die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
     }
@@ -655,14 +655,14 @@ forever:
     d1 = n_fdiv a1, b1
 yield_loop:
     unless d == d1 goto end_yield
-	.yield(d)
-	$P4 = n_mod a, b
-	a = n_mul $P4, 10
-	$P5 = n_mod a1, b1
-	a1 = n_mul $P5, 10
-	d = n_fdiv a, b
-	d1 = n_fdiv a1, b1
-	goto yield_loop
+    .yield(d)
+    $P4 = n_mod a, b
+    a = n_mul $P4, 10
+    $P5 = n_mod a1, b1
+    a1 = n_mul $P5, 10
+    d = n_fdiv a, b
+    d1 = n_fdiv a1, b1
+    goto yield_loop
 end_yield:
     goto forever
 .end
@@ -677,7 +677,7 @@ loop:
     inc i
     $I0 = i % 50
     if $I0 goto no_nl
-	print "\n"
+    print "\n"
 no_nl:
     if i < 1000 goto loop
     print "\n"

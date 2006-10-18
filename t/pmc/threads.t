@@ -14,7 +14,7 @@ t/pmc/threads.t - Threads
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/threads.t
+    % prove t/pmc/threads.t
 
 =head1 DESCRIPTION
 
@@ -41,8 +41,8 @@ if ($^O eq "cygwin" ) {
     my @uname = split / /, qx'uname -v';
 
     if ($uname[0] eq "2004-09-04" ) {
-	plan skip_all => "This cygwin version is known to fail the thread tests";
-	exit;
+    plan skip_all => "This cygwin version is known to fail the thread tests";
+    exit;
     }
 }
 if ($platforms{$^O}) {
@@ -75,7 +75,7 @@ OUTPUT
 # XXX FIXME rework tests since we don't really have thread types?
 
 SKIP: {
-	skip 'busted on win32' => 2 if $^O eq 'MSWin32';
+    skip 'busted on win32' => 2 if $^O eq 'MSWin32';
 
 pir_output_is(<<'CODE', <<'OUTPUT', "thread type 1");
 .sub main :main
@@ -104,7 +104,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "thread type 1");
                # initialized to anything in particular
     print "\n"
     set I3, 0   # no retval
-    returncc	# ret and be done with thread
+    returncc    # ret and be done with thread
 .end
 # output from threads could be reversed
 CODE
@@ -147,7 +147,7 @@ loop:
                # initialized to anything in particular
     print "\n"
     set I3, 0   # no retval
-    returncc	# ret and be done with thread
+    returncc    # ret and be done with thread
 .end
 # output from threads could be reversed
 CODE
@@ -205,7 +205,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'thread - kill');
 .sub main :main
     .local pmc threadsub
     .local pmc thread
-    bounds 1	# assert slow core -S and -g are fine too
+    bounds 1    # assert slow core -S and -g are fine too
     threadsub = global "foo"
     thread = new .ParrotThread
     $I0 = thread
@@ -287,7 +287,7 @@ CODE
 OUTPUT
 
 SKIP: {
-	skip("detatch broken on $^O", 1) if ($^O =~ /MSWin32/);
+    skip("detatch broken on $^O", 1) if ($^O =~ /MSWin32/);
 pir_output_like(<<'CODE', <<'OUTPUT', "detach");
 .sub main :main
     .local pmc foo

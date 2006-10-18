@@ -14,7 +14,7 @@ t/pmc/prop.t - Properties
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/prop.t
+    % prove t/pmc/prop.t
 
 =head1 DESCRIPTION
 

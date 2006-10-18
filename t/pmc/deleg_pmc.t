@@ -15,7 +15,7 @@ t/pmc/deleg_pmc.t - test deleg_pmc PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/deleg_pmc.t
+    % prove t/pmc/deleg_pmc.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the deleg_pmc PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .deleg_pmc
-	print "ok 1\n"
+    new P0, .deleg_pmc
+    print "ok 1\n"
 .end
 CODE
 ok 1

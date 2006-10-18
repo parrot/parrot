@@ -14,7 +14,7 @@ t/pmc/object-mro.t - Object Methods Resolution Order
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/object-mro.t
+    % prove t/pmc/object-mro.t
 
 =head1 DESCRIPTION
 

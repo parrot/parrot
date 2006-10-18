@@ -26,49 +26,49 @@ well.
 =cut
 
 pasm_output_is(<<CODE, <<OUTPUT, "Initial Hash tests");
-	new	P0, .Hash
+    new	P0, .Hash
 
-	set	P0["foo"], -7
-	set	P0["bar"], 3.5
-	set	P0["baz"], "value"
+    set	P0["foo"], -7
+    set	P0["bar"], 3.5
+    set	P0["baz"], "value"
 
-	set	I0, P0["foo"]
-	set	N0, P0["bar"]
-	set	S0, P0["baz"]
+    set	I0, P0["foo"]
+    set	N0, P0["bar"]
+    set	S0, P0["baz"]
 
-	eq	I0,-7,OK_1
-	print	"not "
-OK_1:	print	"ok 1\\n"
-	eq	N0,3.500000,OK_2
-	print	N0
-OK_2:	print	"ok 2\\n"
-	eq	S0,"value",OK_3
-	print	S0
-OK_3:	print	"ok 3\\n"
+    eq	I0,-7,OK_1
+    print	"not "
+OK_1:    print	"ok 1\\n"
+    eq	N0,3.500000,OK_2
+    print	N0
+OK_2:    print	"ok 2\\n"
+    eq	S0,"value",OK_3
+    print	S0
+OK_3:    print	"ok 3\\n"
 
         set     S1, "oof"
         set     S2, "rab"
         set     S3, "zab"
 
-	set	P0[S1], 7
-	set	P0[S2], -3.5
-	set	P0[S3], "VALUE"
+    set	P0[S1], 7
+    set	P0[S2], -3.5
+    set	P0[S3], "VALUE"
 
-	set	I0, P0[S1]
-	set	N0, P0[S2]
-	set	S0, P0[S3]
+    set	I0, P0[S1]
+    set	N0, P0[S2]
+    set	S0, P0[S3]
 
-	eq	I0,7,OK_4
-	print	"not "
-OK_4:	print	"ok 4\\n"
-	eq	N0,-3.500000,OK_5
-	print	N0
-OK_5:	print	"ok 5\\n"
-	eq	S0,"VALUE",OK_6
-	print	S0
-OK_6:	print	"ok 6\\n"
+    eq	I0,7,OK_4
+    print	"not "
+OK_4:    print	"ok 4\\n"
+    eq	N0,-3.500000,OK_5
+    print	N0
+OK_5:    print	"ok 5\\n"
+    eq	S0,"VALUE",OK_6
+    print	S0
+OK_6:    print	"ok 6\\n"
 
-	end
+    end
 CODE
 ok 1
 ok 2
@@ -79,21 +79,21 @@ ok 6
 OUTPUT
 
 pasm_output_is(<<'CODE', <<OUTPUT, "more than one Hash");
-	new P0, .Hash
-	set S0, "key"
-	set P0[S0], 1
+    new P0, .Hash
+    set S0, "key"
+    set P0[S0], 1
 
         new P1, .Hash
         set S1, "another_key"
         set P1[S1], 2
 
-	set I0, P0[S0]
-	set I1, P1[S1]
+    set I0, P0[S0]
+    set I1, P1[S1]
 
-	print I0
-	print "\n"
-	print I1
-	print "\n"
+    print I0
+    print "\n"
+    print I1
+    print "\n"
         end
 CODE
 1
@@ -101,65 +101,65 @@ CODE
 OUTPUT
 
 pasm_output_is(<<'CODE', <<OUTPUT, "hash keys with nulls in them");
-	new P0, .Hash
-	set S0, "parp\0me"
-	set S1, "parp\0you"
+    new P0, .Hash
+    set S0, "parp\0me"
+    set S1, "parp\0you"
 
-	set P0[S0], 1		# $P0{parp\0me} = 1
-	set P0[S1], 2		# $P0{parp\0you} = 2
+    set P0[S0], 1		# $P0{parp\0me} = 1
+    set P0[S1], 2		# $P0{parp\0you} = 2
 
-	set I0, P0[S0]
-	set I1, P0[S1]
+    set I0, P0[S0]
+    set I1, P0[S1]
 
-	print I0
-	print "\n"
-	print I1
-	print "\n"
-	end
+    print I0
+    print "\n"
+    print I1
+    print "\n"
+    end
 CODE
 1
 2
 OUTPUT
 
 pasm_output_is(<<'CODE', <<OUTPUT, "nearly the same hash keys");
-	new P0, .Hash
-	set S0, "a\0"
-	set S1, "\0a"
+    new P0, .Hash
+    set S0, "a\0"
+    set S1, "\0a"
 
-	set P0[S0], 1
-	set P0[S1], 2
+    set P0[S0], 1
+    set P0[S1], 2
 
-	set I0, P0[S0]
-	set I1, P0[S1]
+    set I0, P0[S0]
+    set I1, P0[S1]
 
-	print I0
-	print "\n"
-	print I1
-	print "\n"
+    print I0
+    print "\n"
+    print I1
+    print "\n"
 
-	end
+    end
 CODE
 1
 2
 OUTPUT
 
 pasm_output_is(<<'CODE', <<OUTPUT, "The same hash keys");
-	new P0, .Hash
-	set S0, "Happy"
-	set S1, "Happy"
+    new P0, .Hash
+    set S0, "Happy"
+    set S1, "Happy"
 
-	set P0[S0], 1
-	set I0, P0[S0]
-	print I0
-	print "\n"
+    set P0[S0], 1
+    set I0, P0[S0]
+    print I0
+    print "\n"
 
-	set P0[S1], 2
-	set I1, P0[S1]
+    set P0[S1], 2
+    set I1, P0[S1]
 
-	print I1
-	print "\n"
+    print I1
+    print "\n"
 
-	end
+    end
 CODE
 1
 2
@@ -173,32 +173,32 @@ pasm_output_is(<<'CODE', <<OUTPUT, "key that hashes to zero");
         set S0, "key2"
         set P0[S0], 1
         set I0, P0[S0]
-	print I0
-	print "\n"
-	end
+    print I0
+    print "\n"
+    end
 CODE
 1
 OUTPUT
 
 pasm_output_is(<<'CODE', <<OUTPUT, "size of the hash");
-	new P0, .Hash
+    new P0, .Hash
 
-	set P0["0"], 1
-	set I0, P0
-	print I0
-	print "\n"
+    set P0["0"], 1
+    set I0, P0
+    print I0
+    print "\n"
 
-	set P0["1"], 1
-	set I0, P0
-	print I0
-	print "\n"
+    set P0["1"], 1
+    set I0, P0
+    print I0
+    print "\n"
 
-	set P0["0"], 1
-	set I0, P0
-	print I0
-	print "\n"
+    set P0["0"], 1
+    set I0, P0
+    print I0
+    print "\n"
 
-	end
+    end
 CODE
 1
 2
@@ -206,7 +206,7 @@ CODE
 OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "stress test: loop(set, check)");
-	new	P0, .Hash
+    new	P0, .Hash
 
         set I0, 200
         set S0, "mikey"
@@ -279,91 +279,91 @@ OUTPUT
 ## stuff them in, and check periodically that we can pull selected ones out.
 pir_output_is(<<'CODE', <<OUTPUT, "stress test: lots of keys");
 .sub set_multiple_keys
-	.param pmc hash
+    .param pmc hash
         .param int key_index
         .param int step
-	.param int count
+    .param int count
 
 again:
-	if count <= 0 goto ret
-	S0 = key_index
-	S1 = concat "key", S0
-	S2 = concat "value", S0
-	hash[S1] = S2
-	key_index = key_index + step
-	count = count - 1
-	goto again
+    if count <= 0 goto ret
+    S0 = key_index
+    S1 = concat "key", S0
+    S2 = concat "value", S0
+    hash[S1] = S2
+    key_index = key_index + step
+    count = count - 1
+    goto again
 ret:
 .end
 
 .sub print_multiple_keys
-	.param pmc hash
+    .param pmc hash
         .param int key_index
         .param int step
-	.param int count
+    .param int count
 
 again:
-	if count <= 0 goto ret
-	S0 = key_index
-	S1 = concat "key", S0
-	print S1
-	print " => "
-	I2 = exists hash[S1]
-	if I2 goto print_value
-	print "(undef)"
-	goto print_end
+    if count <= 0 goto ret
+    S0 = key_index
+    S1 = concat "key", S0
+    print S1
+    print " => "
+    I2 = exists hash[S1]
+    if I2 goto print_value
+    print "(undef)"
+    goto print_end
 print_value:
-	S2 = hash[S1]
-	print S2
+    S2 = hash[S1]
+    print S2
 print_end:
-	print "\n"
-	key_index = key_index + step
-	count = count - 1
-	goto again
+    print "\n"
+    key_index = key_index + step
+    count = count - 1
+    goto again
 ret:
 .end
 
 .sub delete_multiple_keys
-	.param pmc hash
-	.param int key_index
-	.param int step
-	.param int count
+    .param pmc hash
+    .param int key_index
+    .param int step
+    .param int count
 
 again:
-	if count <= 0 goto ret
-	S0 = key_index
-	S1 = concat "key", S0
-	delete hash[S1]
-	key_index = key_index + step
-	count = count - 1
-	goto again
+    if count <= 0 goto ret
+    S0 = key_index
+    S1 = concat "key", S0
+    delete hash[S1]
+    key_index = key_index + step
+    count = count - 1
+    goto again
 ret:
 .end
 
 .sub _main :main
-	new	P30, .Hash
-	print "round 1\n"
-	I29 = 1
-	I30 = 1000
-	I31 = 1000
-	set_multiple_keys(P30, I29, I30, I31)
-	I20 = 3
-	print_multiple_keys(P30, I29, I30, I20)
-	print "round 2\n"
-	I21 = 100000
-	set_multiple_keys(P30, I21, I30, I31)
-	print_multiple_keys(P30, I29, I30, I20)
-	print_multiple_keys(P30, I21, I30, I20)
-	print "round 3\n"
-	I22 = 50000
-	set_multiple_keys(P30, I22, I29, I22)
-	print_multiple_keys(P30, I29, I30, I20)
-	print_multiple_keys(P30, I22, I30, I20)
-	print "round 4\n"
-	delete_multiple_keys(P30, I22, I29, I22)
-	print_multiple_keys(P30, I29, I30, I20)
-	print_multiple_keys(P30, I22, I30, I20)
-	print "done.\n"
+    new	P30, .Hash
+    print "round 1\n"
+    I29 = 1
+    I30 = 1000
+    I31 = 1000
+    set_multiple_keys(P30, I29, I30, I31)
+    I20 = 3
+    print_multiple_keys(P30, I29, I30, I20)
+    print "round 2\n"
+    I21 = 100000
+    set_multiple_keys(P30, I21, I30, I31)
+    print_multiple_keys(P30, I29, I30, I20)
+    print_multiple_keys(P30, I21, I30, I20)
+    print "round 3\n"
+    I22 = 50000
+    set_multiple_keys(P30, I22, I29, I22)
+    print_multiple_keys(P30, I29, I30, I20)
+    print_multiple_keys(P30, I22, I30, I20)
+    print "round 4\n"
+    delete_multiple_keys(P30, I22, I29, I22)
+    print_multiple_keys(P30, I29, I30, I20)
+    print_multiple_keys(P30, I22, I30, I20)
+    print "done.\n"
 .end
 CODE
 round 1
@@ -396,7 +396,7 @@ OUTPUT
 
 # Check all values after setting all of them
 pasm_output_is(<<CODE, <<OUTPUT, "stress test: loop(set), loop(check)");
-	new	P0, .Hash
+    new	P0, .Hash
 
         set I0, 200
         set S0, "mikey"
@@ -1270,22 +1270,22 @@ pasm_output_is(<< 'CODE', << 'OUTPUT', "mutating the lookup string");
     set P0["ab"], "two"
     set P0["abc"], "three"
 
-	set S0, "a"
+    set S0, "a"
     set S1, P0[S0]
-	print S1
-	print "\n"
+    print S1
+    print "\n"
 
-	concat S0, "b"
+    concat S0, "b"
     set S1, P0[S0]
-	print S1
-	print "\n"
+    print S1
+    print "\n"
 
-	concat S0, "c"
+    concat S0, "c"
     set S1, P0[S0]
-	print S1
-	print "\n"
+    print S1
+    print "\n"
 
-	end
+    end
 CODE
 one
 two

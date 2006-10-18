@@ -14,7 +14,7 @@ t/pmc/sarray.t - Simple Array
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/sarray.t
+    % prove t/pmc/sarray.t
 
 =head1 DESCRIPTION
 

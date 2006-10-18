@@ -14,7 +14,7 @@ t/pmc/resizablebooleanarray.t - testing the ResizableBooleanArray PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/resizablebooleanarray.t
+    % prove t/pmc/resizablebooleanarray.t
 
 =head1 DESCRIPTION
 

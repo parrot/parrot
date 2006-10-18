@@ -935,13 +935,13 @@ CODE
     my $descr = ':immediate, :postcomp';
     if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ )
     {
-	pir_output_is( $code, <<'OUT', $descr);
+    pir_output_is( $code, <<'OUT', $descr);
 initial
 initial
 main
 OUT
     } else {
-	pir_output_is( $code, <<'OUT', $descr);
+    pir_output_is( $code, <<'OUT', $descr);
 initial
 initial
 main

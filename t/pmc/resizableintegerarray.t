@@ -14,7 +14,7 @@ t/pmc/resizableintegerarray.t - ResizableIntegerArray PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/ResizableIntegerArray.t
+    % prove t/pmc/ResizableIntegerArray.t
 
 =head1 DESCRIPTION
 

@@ -80,15 +80,15 @@ ending
 OUTPUT
 
 pasm_output_like(<<'CODE', <<'OUTPUT', "illegal min newpmc");
-	new P0, 0
-	end
+    new P0, 0
+    end
 CODE
 /Illegal PMC enum \(0\) in new/
 OUTPUT
 
 pasm_output_like(<<"CODE", <<'OUTPUT', "illegal max newpmc");
-	new P0, $max_pmc
-	end
+    new P0, $max_pmc
+    end
 CODE
 /Illegal PMC enum \(\d+\) in new/
 OUTPUT
@@ -179,17 +179,17 @@ All names and ids ok.
 OUTPUT
 
 pasm_output_like(<<'CODE', <<'OUTPUT', 'find_method');
-	new P1, .Integer
-	find_method P0, P1, "no_such_meth"
-	end
+    new P1, .Integer
+    find_method P0, P1, "no_such_meth"
+    end
 CODE
 /Method 'no_such_meth' not found/
 OUTPUT
 
 pasm_output_like(<<'CODE', <<'OUTPUT', "new with a native type");
         new P1, .INTVAL
-	print "never\n"
-	end
+    print "never\n"
+    end
 CODE
 /(unknown macro|unexpected DOT)/
 OUTPUT

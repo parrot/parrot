@@ -14,7 +14,7 @@ t/pmc/signal.t - Signal Handling
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/signal.t
+    % prove t/pmc/signal.t
 
 =head1 DESCRIPTION
 
@@ -54,21 +54,21 @@ sub parrot_pids {
 
 sub send_SIGHUP {
     $SIG{ALRM} = sub {
-	# get PID of parrot
+    # get PID of parrot
        my @ps = parrot_pids;
-	die 'no output from ps' unless @ps;
-	# the IO thread parrot process
-	# on linux 2.2.x there are 4 processes, last is the IO thread
+    die 'no output from ps' unless @ps;
+    # the IO thread parrot process
+    # on linux 2.2.x there are 4 processes, last is the IO thread
         # posix compliant threads have exactly one PID for parrot
-	my $io_thread = pop @ps;
-	if ($io_thread =~ /^\s*(\d+)/) {
-	    $pid = $1;
-	    # send a
-	    kill 'SIGHUP', $pid;
-	}
-	else {
-	    die 'no pid found for parrot';
-	}
+    my $io_thread = pop @ps;
+    if ($io_thread =~ /^\s*(\d+)/) {
+        $pid = $1;
+        # send a
+        kill 'SIGHUP', $pid;
+    }
+    else {
+        die 'no pid found for parrot';
+    }
     };
     alarm 1;
 }
@@ -78,7 +78,7 @@ sub check_running {
     my @ps = parrot_pids;
     my $thread = pop @ps;
     if ($thread =~ /^\s*(\d+)/ && $1 == $pid) {
-	ok(0, "parrot $pid still running");
+    ok(0, "parrot $pid still running");
     }
     else {
         ok(1, 'parrot stopped');

@@ -15,7 +15,7 @@ t/pmc/retcontinuation.t - test the RetContinuation PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/retcontinuation.t
+    % prove t/pmc/retcontinuation.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the RetContinuation PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .RetContinuation
-	print "ok 1\n"
+    new P0, .RetContinuation
+    print "ok 1\n"
 .end
 CODE
 ok 1

@@ -14,7 +14,7 @@ t/pmc/coroutines.t - Coroutines
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/coroutines.t
+    % prove t/pmc/coroutines.t
 
 =head1 DESCRIPTION
 

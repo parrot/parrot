@@ -16,7 +16,7 @@ t/pmc/config.t - Builtin Config
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/config.t
+    % prove t/pmc/config.t
 
 =head1 DESCRIPTION
 

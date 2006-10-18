@@ -14,7 +14,7 @@ t/pmc/undef.t - Undef PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/undef.t
+    % prove t/pmc/undef.t
 
 =head1 DESCRIPTION
 
@@ -27,8 +27,8 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "morph to string");
         new P1, .Undef
         set P0, "foo"
         concat  P1, P0, P0
-	print P1
-	print "\n"
+    print P1
+    print "\n"
         end
 CODE
 foofoo

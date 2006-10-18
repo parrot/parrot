@@ -14,7 +14,7 @@ t/pmc/sys.t - System Tests
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/sys.t
+    % prove t/pmc/sys.t
 
 =head1 DESCRIPTION
 

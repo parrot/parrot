@@ -15,7 +15,7 @@ t/pmc/complex.t - Complex Numbers
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/complex.t
+    % prove t/pmc/complex.t
 
 =head1 DESCRIPTION
 
@@ -27,44 +27,44 @@ Tests the Complex PMC.
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
-	save	N0
-	save	N1
-	save	N2
+    save	N0
+    save	N1
+    save	N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	gt	N2, 0.000001, .$FPEQNOK
+    set	N0, .J
+    set	N1, .K
+    sub	N2, N1,N0
+    abs	N2, N2
+    gt	N2, 0.000001, .$FPEQNOK
 
-	restore N2
-	restore	N1
-	restore	N0
-	branch	.L
+    restore N2
+    restore	N1
+    restore	N0
+    branch	.L
 .local $FPEQNOK:
-	restore N2
-	restore	N1
-	restore	N0
+    restore N2
+    restore	N1
+    restore	N0
 .endm
 .macro fp_ne(	J,K,L)
-	save	N0
-	save	N1
-	save	N2
+    save	N0
+    save	N1
+    save	N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	lt	N2, 0.000001, .$FPNENOK
+    set	N0, .J
+    set	N1, .K
+    sub	N2, N1,N0
+    abs	N2, N2
+    lt	N2, 0.000001, .$FPNENOK
 
-	restore	N2
-	restore	N1
-	restore	N0
-	branch	.L
+    restore	N2
+    restore	N1
+    restore	N0
+    branch	.L
 .local $FPNENOK:
-	restore	N2
-	restore	N1
-	restore	N0
+    restore	N2
+    restore	N1
+    restore	N0
 .endm
 ENDOFMACRO
 
@@ -73,74 +73,74 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "String parsing");
     new P0, .Complex
     new P1, .String
 
-	set P0, "4"
-	print P0
+    set P0, "4"
+    print P0
     print "\n"
 
-	set P0, "3.14"
-	print P0
+    set P0, "3.14"
+    print P0
     print "\n"
 
-	set P0, ".5"
-	print P0
+    set P0, ".5"
+    print P0
     print "\n"
 
-	set P0, "-13"
-	print P0
+    set P0, "-13"
+    print P0
     print "\n"
 
-	set P0, "-.3"
-	print P0
+    set P0, "-.3"
+    print P0
     print "\n"
 
-	set P0, "i"
-	print P0
+    set P0, "i"
+    print P0
     print "\n"
 
-	set P0, "-i"
-	print P0
+    set P0, "-i"
+    print P0
     print "\n"
 
-	set P0, ".3i"
-	print P0
+    set P0, ".3i"
+    print P0
     print "\n"
 
-	set P0, "2 + 3i"
-	print P0
+    set P0, "2 + 3i"
+    print P0
     print "\n"
 
-	set P0, "4 + 3.5i"
-	print P0
+    set P0, "4 + 3.5i"
+    print P0
     print "\n"
 
-	set P0, "2 + .1 i"
-	print P0
+    set P0, "2 + .1 i"
+    print P0
     print "\n"
 
-	set P0, "10 - i"
-	print P0
+    set P0, "10 - i"
+    print P0
     print "\n"
 
-	set P0, "5 - .3i"
-	print P0
+    set P0, "5 - .3i"
+    print P0
     print "\n"
 
-	set P1, "-4-i"
-	assign P0, P1
-	print P0
+    set P1, "-4-i"
+    assign P0, P1
+    print P0
     print "\n"
 
-	set P1, "- 20 - .5 i"
-	assign P0, P1
-	print P0
+    set P1, "- 20 - .5 i"
+    assign P0, P1
+    print P0
     print "\n"
 
-	set P1, "-13 +2i"
-	assign P0, P1
-	print P0
+    set P1, "-13 +2i"
+    assign P0, P1
+    print P0
     print "\n"
 
-	end
+    end
 CODE
 4+0i
 3.14+0i
@@ -184,9 +184,9 @@ CODE
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "add");
-	new P0, .Complex
-	new P1, .Complex
-	new P2, .Float
+    new P0, .Complex
+    new P1, .Complex
+    new P2, .Float
         new P3, .Integer
 
     set P0, "1 + i"
@@ -250,9 +250,9 @@ CODE
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "subtract");
-	new P0, .Complex
-	new P1, .Complex
-	new P2, .Float
+    new P0, .Complex
+    new P1, .Complex
+    new P2, .Float
         new P3, .Integer
 
     set P0, "1 + i"
@@ -316,9 +316,9 @@ CODE
 OUTPUT
 
 pasm_output_is(<< 'CODE', << 'OUTPUT', "multiply");
-	new P0, .Complex
-	new P1, .Complex
-	new P2, .Float
+    new P0, .Complex
+    new P1, .Complex
+    new P2, .Float
         new P3, .Integer
 
     set P0, "2 + 3i"
@@ -377,9 +377,9 @@ CODE
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "divide");
-	new P0, .Complex
-	new P1, .Complex
-	new P2, .Float
+    new P0, .Complex
+    new P1, .Complex
+    new P2, .Float
 
     set P0, "2 + 3i"
     div P0, P0, P0
@@ -822,16 +822,16 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sprintf with a complex");
 .macro DoIt(fmt, number)
-	c = .number
-	$S0 = sprintf .fmt, c
-	print $S0
+    c = .number
+    $S0 = sprintf .fmt, c
+    print $S0
 .endm
 .sub main :main
-	.local pmc c, c2
-	c = new .Complex
-	.DoIt("%d%+di\n", "1.35+35.1i")
-	.DoIt("%.3f%+.3fi\n", "0+3.141592653589793i")
-	.DoIt("%.3f%+.3fi\n", "0+i")
+    .local pmc c, c2
+    c = new .Complex
+    .DoIt("%d%+di\n", "1.35+35.1i")
+    .DoIt("%.3f%+.3fi\n", "0+3.141592653589793i")
+    .DoIt("%.3f%+.3fi\n", "0+i")
 .end
 CODE
 1+35i
@@ -841,28 +841,28 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "pow with complex numbers");
 .macro DoIt(base, power)
-	c = .base
-	c2 = .power
-	c3 = pow c, c2
-	$S0 = sprintf "%.6f%+.6fi\n", c3
-	print $S0
+    c = .base
+    c2 = .power
+    c3 = pow c, c2
+    $S0 = sprintf "%.6f%+.6fi\n", c3
+    print $S0
 .endm
 .sub main :main
-	.local pmc c, c2, c3
-	c = new .Complex
-	c2 = new .Complex
-	c3 = new .Complex
-	.DoIt("i", "i")
-	.DoIt("i", "2")
-	.DoIt("2i", "2")
-	.DoIt("2+2i", "2+2i")
-	.DoIt("i", "0.5i")
-	.DoIt(2, "2i")
-	c2 = new .Integer
-	.DoIt("2i", 2)
-	.DoIt("2", 4)
-	c2 = new .Float
-	.DoIt("2i", 0.5)
+    .local pmc c, c2, c3
+    c = new .Complex
+    c2 = new .Complex
+    c3 = new .Complex
+    .DoIt("i", "i")
+    .DoIt("i", "2")
+    .DoIt("2i", "2")
+    .DoIt("2+2i", "2+2i")
+    .DoIt("i", "0.5i")
+    .DoIt(2, "2i")
+    c2 = new .Integer
+    .DoIt("2i", 2)
+    .DoIt("2", 4)
+    c2 = new .Float
+    .DoIt("2i", 0.5)
 .end
 CODE
 0.207880+0.000000i
@@ -879,18 +879,18 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "sqrt of complex numbers");
 .macro DoIt(val)
     c = .val
-	c2 = sqrt c
-	print c2
-	print "\n"
+    c2 = sqrt c
+    print c2
+    print "\n"
 .endm
 .sub main :main
-	.local pmc c, c2
+    .local pmc c, c2
     c = new .Complex
-	.DoIt("4")
-	.DoIt("i")
-	.DoIt("2i")
-	.DoIt("2+2i")
-	.DoIt("1+i")
+    .DoIt("4")
+    .DoIt("i")
+    .DoIt("2i")
+    .DoIt("2+2i")
+    .DoIt("1+i")
 .end
 CODE
 2+0i
@@ -902,36 +902,36 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0");
 .macro PrintIt(fmt, number)
-	c = .number
-	$S0 = sprintf .fmt, c
-	print $S0
+    c = .number
+    $S0 = sprintf .fmt, c
+    print $S0
 .endm
 .sub main :main
-	.local pmc c, c2, c3
+    .local pmc c, c2, c3
     c = new .Complex
     c2 = new .Complex
     c3 = new .Complex
-	# e^(pi * i) + 1 = 0
-	$N0 = atan 1
-	$N0 *= 4
-	c[0] = 0.0
-	c[1] = $N0
-	c2 = c.exp()
-	c2 += 1.0
+    # e^(pi * i) + 1 = 0
+    $N0 = atan 1
+    $N0 *= 4
+    c[0] = 0.0
+    c[1] = $N0
+    c2 = c.exp()
+    c2 += 1.0
         .PrintIt("%.3f%+.3fi\n", c2) 
 
-	# another e^(pi * i) + 1 = 0
-	c = new .Complex
-	c2 = new .Complex
-	$N0 = exp 1
-	c[0] = $N0
-	c[1] = 0.0
-	$N0 = atan 1
-	$N0 *= 4
-	c2[0] = 0.0
-	c2[1] = $N0
-	c3 = pow c, c2
-	c3 += 1.0
+    # another e^(pi * i) + 1 = 0
+    c = new .Complex
+    c2 = new .Complex
+    $N0 = exp 1
+    c[0] = $N0
+    c[1] = 0.0
+    $N0 = atan 1
+    $N0 *= 4
+    c2[0] = 0.0
+    c2[1] = $N0
+    c3 = pow c, c2
+    c3 += 1.0
         .PrintIt("%.3f%+.3fi\n", c3) 
 .end
 CODE
@@ -945,120 +945,120 @@ OUTPUT
 # Need to find some formal spec for when to return -0.0...
 #use Math::Complex;
 #foreach my $func (qw(
-#	ln exp sqrt
-#	sin   cos   tan   cot   sec   csc
-#	asin  acos  atan  acot  asec  acsc
-#	sinh  cosh  tanh  coth  sech  csch
-#	)) {
-#	#asinh acosh atanh acoth asech acsch
-#	my $fmt = '"%f%+fi"';
-#	my $fmtg = '"%g%+gi"';
+#    ln exp sqrt
+#    sin   cos   tan   cot   sec   csc
+#    asin  acos  atan  acot  asec  acsc
+#    sinh  cosh  tanh  coth  sech  csch
+#    )) {
+#    #asinh acosh atanh acoth asech acsch
+#    my $fmt = '"%f%+fi"';
+#    my $fmtg = '"%g%+gi"';
 #
-#	my $code = << "END";
+#    my $code = << "END";
 #pir_output_is(<< 'CODE', << 'OUTPUT', "$func of complex numbers");
 #.macro DoIt(val, res)
-#	if .res == 'Math::Complex Error' goto .\$ok
-#	c = .val
-#	c2 = c.$func()
-#	str = sprintf $fmt, c2
-#	unless str != .res goto .\$ok
-#	print "\\n$func("
-#	print .val
-#	print ")\\n\\t\\tgot\\t"
-#	print str
-#	print "\\n\\t\\tnot\\t"
-#	print .res
-#	print "\\n"
+#    if .res == 'Math::Complex Error' goto .\$ok
+#    c = .val
+#    c2 = c.$func()
+#    str = sprintf $fmt, c2
+#    unless str != .res goto .\$ok
+#    print "\\n$func("
+#    print .val
+#    print ")\\n\\t\\tgot\\t"
+#    print str
+#    print "\\n\\t\\tnot\\t"
+#    print .res
+#    print "\\n"
 #.local \$ok:
 #.endm
 #.sub main :main
-#	.local pmc c, c2
-#	.local string str
-#	c = new .Complex
-#	c2 = new .Complex
+#    .local pmc c, c2
+#    .local string str
+#    c = new .Complex
+#    c2 = new .Complex
 #END
-#	foreach my $num (
-#		[-2.0, 0.0],
-#		[-1.0, 0.0],
-#		[-0.5, 0.0],
-#		[ 0.5, 0.0],
-#		[ 1.0, 0.0],
-#		[ 2.0, 0.0],
+#    foreach my $num (
+#        [-2.0, 0.0],
+#        [-1.0, 0.0],
+#        [-0.5, 0.0],
+#        [ 0.5, 0.0],
+#        [ 1.0, 0.0],
+#        [ 2.0, 0.0],
 #
-#		[0.0, -2.0],
-#		[0.0, -1.0],
-#		[0.0, -0.5],
-#		[0.0,  0.5],
-#		[0.0,  1.0],
-#		[0.0,  2.0],
+#        [0.0, -2.0],
+#        [0.0, -1.0],
+#        [0.0, -0.5],
+#        [0.0,  0.5],
+#        [0.0,  1.0],
+#        [0.0,  2.0],
 #
-#		[ 0, 0],
-#		[ 2, 3], [ 2, -3],
-#		[-2, 3], [-2, -3],
-#	) {
-#		my $a;
-#		# Eval in case Math::Complex wants to die
-#		eval "\$a = $func($num->[0] + ($num->[1] * i))";
-#		if ($@) {
-#			$code .= sprintf "\t.DoIt($fmtg, 'Math::Complex Error')\n",
-#				$num->[0], $num->[1];
-#		}
-#		else {
-#			$code .= sprintf "\t.DoIt($fmtg, $fmt)\n",
-#				$num->[0], $num->[1],
-#				Re($a), Im($a);
-#		}
-#	}
-#	$code .= <<END;
-#	print "done\\n"
+#        [ 0, 0],
+#        [ 2, 3], [ 2, -3],
+#        [-2, 3], [-2, -3],
+#    ) {
+#        my $a;
+#        # Eval in case Math::Complex wants to die
+#        eval "\$a = $func($num->[0] + ($num->[1] * i))";
+#        if ($@) {
+#            $code .= sprintf "\t.DoIt($fmtg, 'Math::Complex Error')\n",
+#                $num->[0], $num->[1];
+#        }
+#        else {
+#            $code .= sprintf "\t.DoIt($fmtg, $fmt)\n",
+#                $num->[0], $num->[1],
+#                Re($a), Im($a);
+#        }
+#    }
+#    $code .= <<END;
+#    print "done\\n"
 #.end
 #CODE
 #done
 #OUTPUT
 #
 #END
-#	#eval $code;
-#	print STDERR $code;
+#    #eval $code;
+#    print STDERR $code;
 #}
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "ln of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.ln()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nln("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.ln()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nln("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "0.693147+3.141593i")
-	.DoIt("-1+0i", "0.000000+3.141593i")
-	.DoIt("-0.5+0i", "-0.693147+3.141593i")
-	.DoIt("0.5+0i", "-0.693147+0.000000i")
-	.DoIt("1+0i", "0.000000+0.000000i")
-	.DoIt("2+0i", "0.693147+0.000000i")
-	.DoIt("0-2i", "0.693147-1.570796i")
-	.DoIt("0-1i", "0.000000-1.570796i")
-	.DoIt("0-0.5i", "-0.693147-1.570796i")
-	.DoIt("0+0.5i", "-0.693147+1.570796i")
-	.DoIt("0+1i", "0.000000+1.570796i")
-	.DoIt("0+2i", "0.693147+1.570796i")
-	.DoIt("0+0i", "-inf+0.000000i")
-	.DoIt("2+3i", "1.282475+0.982794i")
-	.DoIt("2-3i", "1.282475-0.982794i")
-	.DoIt("-2+3i", "1.282475+2.158799i")
-	.DoIt("-2-3i", "1.282475-2.158799i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "0.693147+3.141593i")
+    .DoIt("-1+0i", "0.000000+3.141593i")
+    .DoIt("-0.5+0i", "-0.693147+3.141593i")
+    .DoIt("0.5+0i", "-0.693147+0.000000i")
+    .DoIt("1+0i", "0.000000+0.000000i")
+    .DoIt("2+0i", "0.693147+0.000000i")
+    .DoIt("0-2i", "0.693147-1.570796i")
+    .DoIt("0-1i", "0.000000-1.570796i")
+    .DoIt("0-0.5i", "-0.693147-1.570796i")
+    .DoIt("0+0.5i", "-0.693147+1.570796i")
+    .DoIt("0+1i", "0.000000+1.570796i")
+    .DoIt("0+2i", "0.693147+1.570796i")
+    .DoIt("0+0i", "-inf+0.000000i")
+    .DoIt("2+3i", "1.282475+0.982794i")
+    .DoIt("2-3i", "1.282475-0.982794i")
+    .DoIt("-2+3i", "1.282475+2.158799i")
+    .DoIt("-2-3i", "1.282475-2.158799i")
+    print "done\n"
 .end
 CODE
 done
@@ -1066,42 +1066,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "exp of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.exp()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nexp("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.exp()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nexp("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "0.135335+0.000000i")
-	.DoIt("-1+0i", "0.367879+0.000000i")
-	.DoIt("-0.5+0i", "0.606531+0.000000i")
-	.DoIt("0.5+0i", "1.648721+0.000000i")
-	.DoIt("1+0i", "2.718282+0.000000i")
-	.DoIt("2+0i", "7.389056+0.000000i")
-	.DoIt("0-2i", "-0.416147-0.909297i")
-	.DoIt("0-1i", "0.540302-0.841471i")
-	.DoIt("0-0.5i", "0.877583-0.479426i")
-	.DoIt("0+0.5i", "0.877583+0.479426i")
-	.DoIt("0+1i", "0.540302+0.841471i")
-	.DoIt("0+2i", "-0.416147+0.909297i")
-	.DoIt("0+0i", "1.000000+0.000000i")
-	.DoIt("2+3i", "-7.315110+1.042744i")
-	.DoIt("2-3i", "-7.315110-1.042744i")
-	.DoIt("-2+3i", "-0.133981+0.019099i")
-	.DoIt("-2-3i", "-0.133981-0.019099i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "0.135335+0.000000i")
+    .DoIt("-1+0i", "0.367879+0.000000i")
+    .DoIt("-0.5+0i", "0.606531+0.000000i")
+    .DoIt("0.5+0i", "1.648721+0.000000i")
+    .DoIt("1+0i", "2.718282+0.000000i")
+    .DoIt("2+0i", "7.389056+0.000000i")
+    .DoIt("0-2i", "-0.416147-0.909297i")
+    .DoIt("0-1i", "0.540302-0.841471i")
+    .DoIt("0-0.5i", "0.877583-0.479426i")
+    .DoIt("0+0.5i", "0.877583+0.479426i")
+    .DoIt("0+1i", "0.540302+0.841471i")
+    .DoIt("0+2i", "-0.416147+0.909297i")
+    .DoIt("0+0i", "1.000000+0.000000i")
+    .DoIt("2+3i", "-7.315110+1.042744i")
+    .DoIt("2-3i", "-7.315110-1.042744i")
+    .DoIt("-2+3i", "-0.133981+0.019099i")
+    .DoIt("-2-3i", "-0.133981-0.019099i")
+    print "done\n"
 .end
 CODE
 done
@@ -1109,42 +1109,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sqrt of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.sqrt()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nsqrt("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.sqrt()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nsqrt("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "0.000000+1.414214i")
-	.DoIt("-1+0i", "0.000000+1.000000i")
-	.DoIt("-0.5+0i", "0.000000+0.707107i")
-	.DoIt("0.5+0i", "0.707107+0.000000i")
-	.DoIt("1+0i", "1.000000+0.000000i")
-	.DoIt("2+0i", "1.414214+0.000000i")
-	.DoIt("0-2i", "1.000000-1.000000i")
-	.DoIt("0-1i", "0.707107-0.707107i")
-	.DoIt("0-0.5i", "0.500000-0.500000i")
-	.DoIt("0+0.5i", "0.500000+0.500000i")
-	.DoIt("0+1i", "0.707107+0.707107i")
-	.DoIt("0+2i", "1.000000+1.000000i")
-	.DoIt("0+0i", "0.000000+0.000000i")
-	.DoIt("2+3i", "1.674149+0.895977i")
-	.DoIt("2-3i", "1.674149-0.895977i")
-	.DoIt("-2+3i", "0.895977+1.674149i")
-	.DoIt("-2-3i", "0.895977-1.674149i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "0.000000+1.414214i")
+    .DoIt("-1+0i", "0.000000+1.000000i")
+    .DoIt("-0.5+0i", "0.000000+0.707107i")
+    .DoIt("0.5+0i", "0.707107+0.000000i")
+    .DoIt("1+0i", "1.000000+0.000000i")
+    .DoIt("2+0i", "1.414214+0.000000i")
+    .DoIt("0-2i", "1.000000-1.000000i")
+    .DoIt("0-1i", "0.707107-0.707107i")
+    .DoIt("0-0.5i", "0.500000-0.500000i")
+    .DoIt("0+0.5i", "0.500000+0.500000i")
+    .DoIt("0+1i", "0.707107+0.707107i")
+    .DoIt("0+2i", "1.000000+1.000000i")
+    .DoIt("0+0i", "0.000000+0.000000i")
+    .DoIt("2+3i", "1.674149+0.895977i")
+    .DoIt("2-3i", "1.674149-0.895977i")
+    .DoIt("-2+3i", "0.895977+1.674149i")
+    .DoIt("-2-3i", "0.895977-1.674149i")
+    print "done\n"
 .end
 CODE
 done
@@ -1152,42 +1152,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sin of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.sin()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nsin("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.sin()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nsin("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-0.909297+0.000000i")
-	.DoIt("-1+0i", "-0.841471+0.000000i")
-	.DoIt("-0.5+0i", "-0.479426+0.000000i")
-	.DoIt("0.5+0i", "0.479426+0.000000i")
-	.DoIt("1+0i", "0.841471+0.000000i")
-	.DoIt("2+0i", "0.909297+0.000000i")
-	.DoIt("0-2i", "0.000000-3.626860i")
-	.DoIt("0-1i", "0.000000-1.175201i")
-	.DoIt("0-0.5i", "0.000000-0.521095i")
-	.DoIt("0+0.5i", "0.000000+0.521095i")
-	.DoIt("0+1i", "0.000000+1.175201i")
-	.DoIt("0+2i", "0.000000+3.626860i")
-	.DoIt("0+0i", "0.000000+0.000000i")
-	.DoIt("2+3i", "9.154499-4.168907i")
-	.DoIt("2-3i", "9.154499+4.168907i")
-	.DoIt("-2+3i", "-9.154499-4.168907i")
-	.DoIt("-2-3i", "-9.154499+4.168907i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-0.909297+0.000000i")
+    .DoIt("-1+0i", "-0.841471+0.000000i")
+    .DoIt("-0.5+0i", "-0.479426+0.000000i")
+    .DoIt("0.5+0i", "0.479426+0.000000i")
+    .DoIt("1+0i", "0.841471+0.000000i")
+    .DoIt("2+0i", "0.909297+0.000000i")
+    .DoIt("0-2i", "0.000000-3.626860i")
+    .DoIt("0-1i", "0.000000-1.175201i")
+    .DoIt("0-0.5i", "0.000000-0.521095i")
+    .DoIt("0+0.5i", "0.000000+0.521095i")
+    .DoIt("0+1i", "0.000000+1.175201i")
+    .DoIt("0+2i", "0.000000+3.626860i")
+    .DoIt("0+0i", "0.000000+0.000000i")
+    .DoIt("2+3i", "9.154499-4.168907i")
+    .DoIt("2-3i", "9.154499+4.168907i")
+    .DoIt("-2+3i", "-9.154499-4.168907i")
+    .DoIt("-2-3i", "-9.154499+4.168907i")
+    print "done\n"
 .end
 CODE
 done
@@ -1195,42 +1195,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "cos of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.cos()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\ncos("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.cos()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\ncos("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-0.416147+0.000000i")
-	.DoIt("-1+0i", "0.540302+0.000000i")
-	.DoIt("-0.5+0i", "0.877583+0.000000i")
-	.DoIt("0.5+0i", "0.877583+0.000000i")
-	.DoIt("1+0i", "0.540302+0.000000i")
-	.DoIt("2+0i", "-0.416147+0.000000i")
-	.DoIt("0-2i", "3.762196+0.000000i")
-	.DoIt("0-1i", "1.543081+0.000000i")
-	.DoIt("0-0.5i", "1.127626+0.000000i")
-	.DoIt("0+0.5i", "1.127626+0.000000i")
-	.DoIt("0+1i", "1.543081+0.000000i")
-	.DoIt("0+2i", "3.762196+0.000000i")
-	.DoIt("0+0i", "1.000000+0.000000i")
-	.DoIt("2+3i", "-4.189626-9.109228i")
-	.DoIt("2-3i", "-4.189626+9.109228i")
-	.DoIt("-2+3i", "-4.189626+9.109228i")
-	.DoIt("-2-3i", "-4.189626-9.109228i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-0.416147+0.000000i")
+    .DoIt("-1+0i", "0.540302+0.000000i")
+    .DoIt("-0.5+0i", "0.877583+0.000000i")
+    .DoIt("0.5+0i", "0.877583+0.000000i")
+    .DoIt("1+0i", "0.540302+0.000000i")
+    .DoIt("2+0i", "-0.416147+0.000000i")
+    .DoIt("0-2i", "3.762196+0.000000i")
+    .DoIt("0-1i", "1.543081+0.000000i")
+    .DoIt("0-0.5i", "1.127626+0.000000i")
+    .DoIt("0+0.5i", "1.127626+0.000000i")
+    .DoIt("0+1i", "1.543081+0.000000i")
+    .DoIt("0+2i", "3.762196+0.000000i")
+    .DoIt("0+0i", "1.000000+0.000000i")
+    .DoIt("2+3i", "-4.189626-9.109228i")
+    .DoIt("2-3i", "-4.189626+9.109228i")
+    .DoIt("-2+3i", "-4.189626+9.109228i")
+    .DoIt("-2-3i", "-4.189626-9.109228i")
+    print "done\n"
 .end
 CODE
 done
@@ -1238,42 +1238,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "tan of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.tan()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\ntan("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.tan()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\ntan("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "2.185040+0.000000i")
-	.DoIt("-1+0i", "-1.557408+0.000000i")
-	.DoIt("-0.5+0i", "-0.546302+0.000000i")
-	.DoIt("0.5+0i", "0.546302+0.000000i")
-	.DoIt("1+0i", "1.557408+0.000000i")
-	.DoIt("2+0i", "-2.185040-0.000000i")
-	.DoIt("0-2i", "0.000000-0.964028i")
-	.DoIt("0-1i", "0.000000-0.761594i")
-	.DoIt("0-0.5i", "0.000000-0.462117i")
-	.DoIt("0+0.5i", "0.000000+0.462117i")
-	.DoIt("0+1i", "0.000000+0.761594i")
-	.DoIt("0+2i", "0.000000+0.964028i")
-	.DoIt("0+0i", "0.000000+0.000000i")
-	.DoIt("2+3i", "-0.003764+1.003239i")
-	.DoIt("2-3i", "-0.003764-1.003239i")
-	.DoIt("-2+3i", "0.003764+1.003239i")
-	.DoIt("-2-3i", "0.003764-1.003239i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "2.185040+0.000000i")
+    .DoIt("-1+0i", "-1.557408+0.000000i")
+    .DoIt("-0.5+0i", "-0.546302+0.000000i")
+    .DoIt("0.5+0i", "0.546302+0.000000i")
+    .DoIt("1+0i", "1.557408+0.000000i")
+    .DoIt("2+0i", "-2.185040-0.000000i")
+    .DoIt("0-2i", "0.000000-0.964028i")
+    .DoIt("0-1i", "0.000000-0.761594i")
+    .DoIt("0-0.5i", "0.000000-0.462117i")
+    .DoIt("0+0.5i", "0.000000+0.462117i")
+    .DoIt("0+1i", "0.000000+0.761594i")
+    .DoIt("0+2i", "0.000000+0.964028i")
+    .DoIt("0+0i", "0.000000+0.000000i")
+    .DoIt("2+3i", "-0.003764+1.003239i")
+    .DoIt("2-3i", "-0.003764-1.003239i")
+    .DoIt("-2+3i", "0.003764+1.003239i")
+    .DoIt("-2-3i", "0.003764-1.003239i")
+    print "done\n"
 .end
 CODE
 done
@@ -1281,41 +1281,41 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "cot of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.cot()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\ncot("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.cot()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\ncot("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "0.457658+0.000000i")
-	.DoIt("-1+0i", "-0.642093-0.000000i")
-	.DoIt("-0.5+0i", "-1.830488-0.000000i")
-	.DoIt("0.5+0i", "1.830488+0.000000i")
-	.DoIt("1+0i", "0.642093+0.000000i")
-	.DoIt("2+0i", "-0.457658+0.000000i")
-	.DoIt("0-2i", "0.000000+1.037315i")
-	.DoIt("0-1i", "0.000000+1.313035i")
-	.DoIt("0-0.5i", "0.000000+2.163953i")
-	.DoIt("0+0.5i", "0.000000-2.163953i")
-	.DoIt("0+1i", "0.000000-1.313035i")
-	.DoIt("0+2i", "0.000000-1.037315i")
-	.DoIt("2+3i", "-0.003740-0.996758i")
-	.DoIt("2-3i", "-0.003740+0.996758i")
-	.DoIt("-2+3i", "0.003740-0.996758i")
-	.DoIt("-2-3i", "0.003740+0.996758i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "0.457658+0.000000i")
+    .DoIt("-1+0i", "-0.642093-0.000000i")
+    .DoIt("-0.5+0i", "-1.830488-0.000000i")
+    .DoIt("0.5+0i", "1.830488+0.000000i")
+    .DoIt("1+0i", "0.642093+0.000000i")
+    .DoIt("2+0i", "-0.457658+0.000000i")
+    .DoIt("0-2i", "0.000000+1.037315i")
+    .DoIt("0-1i", "0.000000+1.313035i")
+    .DoIt("0-0.5i", "0.000000+2.163953i")
+    .DoIt("0+0.5i", "0.000000-2.163953i")
+    .DoIt("0+1i", "0.000000-1.313035i")
+    .DoIt("0+2i", "0.000000-1.037315i")
+    .DoIt("2+3i", "-0.003740-0.996758i")
+    .DoIt("2-3i", "-0.003740+0.996758i")
+    .DoIt("-2+3i", "0.003740-0.996758i")
+    .DoIt("-2-3i", "0.003740+0.996758i")
+    print "done\n"
 .end
 CODE
 done
@@ -1323,42 +1323,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sec of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.sec()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nsec("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.sec()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nsec("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-2.402998-0.000000i")
-	.DoIt("-1+0i", "1.850816+0.000000i")
-	.DoIt("-0.5+0i", "1.139494+0.000000i")
-	.DoIt("0.5+0i", "1.139494+0.000000i")
-	.DoIt("1+0i", "1.850816+0.000000i")
-	.DoIt("2+0i", "-2.402998-0.000000i")
-	.DoIt("0-2i", "0.265802+0.000000i")
-	.DoIt("0-1i", "0.648054+0.000000i")
-	.DoIt("0-0.5i", "0.886819+0.000000i")
-	.DoIt("0+0.5i", "0.886819+0.000000i")
-	.DoIt("0+1i", "0.648054+0.000000i")
-	.DoIt("0+2i", "0.265802+0.000000i")
-	.DoIt("0+0i", "1.000000+0.000000i")
-	.DoIt("2+3i", "-0.041675+0.090611i")
-	.DoIt("2-3i", "-0.041675-0.090611i")
-	.DoIt("-2+3i", "-0.041675-0.090611i")
-	.DoIt("-2-3i", "-0.041675+0.090611i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-2.402998-0.000000i")
+    .DoIt("-1+0i", "1.850816+0.000000i")
+    .DoIt("-0.5+0i", "1.139494+0.000000i")
+    .DoIt("0.5+0i", "1.139494+0.000000i")
+    .DoIt("1+0i", "1.850816+0.000000i")
+    .DoIt("2+0i", "-2.402998-0.000000i")
+    .DoIt("0-2i", "0.265802+0.000000i")
+    .DoIt("0-1i", "0.648054+0.000000i")
+    .DoIt("0-0.5i", "0.886819+0.000000i")
+    .DoIt("0+0.5i", "0.886819+0.000000i")
+    .DoIt("0+1i", "0.648054+0.000000i")
+    .DoIt("0+2i", "0.265802+0.000000i")
+    .DoIt("0+0i", "1.000000+0.000000i")
+    .DoIt("2+3i", "-0.041675+0.090611i")
+    .DoIt("2-3i", "-0.041675-0.090611i")
+    .DoIt("-2+3i", "-0.041675-0.090611i")
+    .DoIt("-2-3i", "-0.041675+0.090611i")
+    print "done\n"
 .end
 CODE
 done
@@ -1366,41 +1366,41 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "csc of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.csc()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\ncsc("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.csc()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\ncsc("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-1.099750-0.000000i")
-	.DoIt("-1+0i", "-1.188395-0.000000i")
-	.DoIt("-0.5+0i", "-2.085830-0.000000i")
-	.DoIt("0.5+0i", "2.085830+0.000000i")
-	.DoIt("1+0i", "1.188395+0.000000i")
-	.DoIt("2+0i", "1.099750+0.000000i")
-	.DoIt("0-2i", "0.000000+0.275721i")
-	.DoIt("0-1i", "0.000000+0.850918i")
-	.DoIt("0-0.5i", "0.000000+1.919035i")
-	.DoIt("0+0.5i", "0.000000-1.919035i")
-	.DoIt("0+1i", "0.000000-0.850918i")
-	.DoIt("0+2i", "0.000000-0.275721i")
-	.DoIt("2+3i", "0.090473+0.041201i")
-	.DoIt("2-3i", "0.090473-0.041201i")
-	.DoIt("-2+3i", "-0.090473+0.041201i")
-	.DoIt("-2-3i", "-0.090473-0.041201i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-1.099750-0.000000i")
+    .DoIt("-1+0i", "-1.188395-0.000000i")
+    .DoIt("-0.5+0i", "-2.085830-0.000000i")
+    .DoIt("0.5+0i", "2.085830+0.000000i")
+    .DoIt("1+0i", "1.188395+0.000000i")
+    .DoIt("2+0i", "1.099750+0.000000i")
+    .DoIt("0-2i", "0.000000+0.275721i")
+    .DoIt("0-1i", "0.000000+0.850918i")
+    .DoIt("0-0.5i", "0.000000+1.919035i")
+    .DoIt("0+0.5i", "0.000000-1.919035i")
+    .DoIt("0+1i", "0.000000-0.850918i")
+    .DoIt("0+2i", "0.000000-0.275721i")
+    .DoIt("2+3i", "0.090473+0.041201i")
+    .DoIt("2-3i", "0.090473-0.041201i")
+    .DoIt("-2+3i", "-0.090473+0.041201i")
+    .DoIt("-2-3i", "-0.090473-0.041201i")
+    print "done\n"
 .end
 CODE
 done
@@ -1408,42 +1408,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "asin of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.asin()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nasin("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.asin()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nasin("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-1.570796+1.316958i")
-	.DoIt("-1+0i", "-1.570796-0.000000i")
-	.DoIt("-0.5+0i", "-0.523599-0.000000i")
-	.DoIt("0.5+0i", "0.523599-0.000000i")
-	.DoIt("1+0i", "1.570796-0.000000i")
-	.DoIt("2+0i", "1.570796-1.316958i")
-	.DoIt("0-2i", "0.000000-1.443635i")
-	.DoIt("0-1i", "0.000000-0.881374i")
-	.DoIt("0-0.5i", "0.000000-0.481212i")
-	.DoIt("0+0.5i", "0.000000+0.481212i")
-	.DoIt("0+1i", "0.000000+0.881374i")
-	.DoIt("0+2i", "0.000000+1.443635i")
-	.DoIt("0+0i", "0.000000-0.000000i")
-	.DoIt("2+3i", "0.570653+1.983387i")
-	.DoIt("2-3i", "0.570653-1.983387i")
-	.DoIt("-2+3i", "-0.570653+1.983387i")
-	.DoIt("-2-3i", "-0.570653-1.983387i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-1.570796+1.316958i")
+    .DoIt("-1+0i", "-1.570796-0.000000i")
+    .DoIt("-0.5+0i", "-0.523599-0.000000i")
+    .DoIt("0.5+0i", "0.523599-0.000000i")
+    .DoIt("1+0i", "1.570796-0.000000i")
+    .DoIt("2+0i", "1.570796-1.316958i")
+    .DoIt("0-2i", "0.000000-1.443635i")
+    .DoIt("0-1i", "0.000000-0.881374i")
+    .DoIt("0-0.5i", "0.000000-0.481212i")
+    .DoIt("0+0.5i", "0.000000+0.481212i")
+    .DoIt("0+1i", "0.000000+0.881374i")
+    .DoIt("0+2i", "0.000000+1.443635i")
+    .DoIt("0+0i", "0.000000-0.000000i")
+    .DoIt("2+3i", "0.570653+1.983387i")
+    .DoIt("2-3i", "0.570653-1.983387i")
+    .DoIt("-2+3i", "-0.570653+1.983387i")
+    .DoIt("-2-3i", "-0.570653-1.983387i")
+    print "done\n"
 .end
 CODE
 done
@@ -1451,42 +1451,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "acos of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.acos()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nacos("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.acos()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nacos("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "3.141593-1.316958i")
-	.DoIt("-1+0i", "3.141593-0.000000i")
-	.DoIt("-0.5+0i", "2.094395-0.000000i")
-	.DoIt("0.5+0i", "1.047198-0.000000i")
-	.DoIt("1+0i", "0.000000-0.000000i")
-	.DoIt("2+0i", "0.000000+1.316958i")
-	.DoIt("0-2i", "1.570796+1.443635i")
-	.DoIt("0-1i", "1.570796+0.881374i")
-	.DoIt("0-0.5i", "1.570796+0.481212i")
-	.DoIt("0+0.5i", "1.570796-0.481212i")
-	.DoIt("0+1i", "1.570796-0.881374i")
-	.DoIt("0+2i", "1.570796-1.443635i")
-	.DoIt("0+0i", "1.570796-0.000000i")
-	.DoIt("2+3i", "1.000144-1.983387i")
-	.DoIt("2-3i", "1.000144+1.983387i")
-	.DoIt("-2+3i", "2.141449-1.983387i")
-	.DoIt("-2-3i", "2.141449+1.983387i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "3.141593-1.316958i")
+    .DoIt("-1+0i", "3.141593-0.000000i")
+    .DoIt("-0.5+0i", "2.094395-0.000000i")
+    .DoIt("0.5+0i", "1.047198-0.000000i")
+    .DoIt("1+0i", "0.000000-0.000000i")
+    .DoIt("2+0i", "0.000000+1.316958i")
+    .DoIt("0-2i", "1.570796+1.443635i")
+    .DoIt("0-1i", "1.570796+0.881374i")
+    .DoIt("0-0.5i", "1.570796+0.481212i")
+    .DoIt("0+0.5i", "1.570796-0.481212i")
+    .DoIt("0+1i", "1.570796-0.881374i")
+    .DoIt("0+2i", "1.570796-1.443635i")
+    .DoIt("0+0i", "1.570796-0.000000i")
+    .DoIt("2+3i", "1.000144-1.983387i")
+    .DoIt("2-3i", "1.000144+1.983387i")
+    .DoIt("-2+3i", "2.141449-1.983387i")
+    .DoIt("-2-3i", "2.141449+1.983387i")
+    print "done\n"
 .end
 CODE
 done
@@ -1494,40 +1494,40 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "atan of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.atan()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\natan("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.atan()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\natan("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-1.107149+0.000000i")
-	.DoIt("-1+0i", "-0.785398+0.000000i")
-	.DoIt("-0.5+0i", "-0.463648+0.000000i")
-	.DoIt("0.5+0i", "0.463648+0.000000i")
-	.DoIt("1+0i", "0.785398+0.000000i")
-	.DoIt("2+0i", "1.107149+0.000000i")
-	.DoIt("0-2i", "-1.570796-0.549306i")
-	.DoIt("0-0.5i", "-0.000000-0.549306i")
-	.DoIt("0+0.5i", "-0.000000+0.549306i")
-	.DoIt("0+2i", "-1.570796+0.549306i")
-	.DoIt("0+0i", "-0.000000+0.000000i")
-	.DoIt("2+3i", "1.409921+0.229073i")
-	.DoIt("2-3i", "1.409921-0.229073i")
-	.DoIt("-2+3i", "-1.409921+0.229073i")
-	.DoIt("-2-3i", "-1.409921-0.229073i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-1.107149+0.000000i")
+    .DoIt("-1+0i", "-0.785398+0.000000i")
+    .DoIt("-0.5+0i", "-0.463648+0.000000i")
+    .DoIt("0.5+0i", "0.463648+0.000000i")
+    .DoIt("1+0i", "0.785398+0.000000i")
+    .DoIt("2+0i", "1.107149+0.000000i")
+    .DoIt("0-2i", "-1.570796-0.549306i")
+    .DoIt("0-0.5i", "-0.000000-0.549306i")
+    .DoIt("0+0.5i", "-0.000000+0.549306i")
+    .DoIt("0+2i", "-1.570796+0.549306i")
+    .DoIt("0+0i", "-0.000000+0.000000i")
+    .DoIt("2+3i", "1.409921+0.229073i")
+    .DoIt("2-3i", "1.409921-0.229073i")
+    .DoIt("-2+3i", "-1.409921+0.229073i")
+    .DoIt("-2-3i", "-1.409921-0.229073i")
+    print "done\n"
 .end
 CODE
 done
@@ -1535,39 +1535,39 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "acot of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.acot()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nacot("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.acot()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nacot("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-0.463648+0.000000i")
-	.DoIt("-1+0i", "-0.785398+0.000000i")
-	.DoIt("-0.5+0i", "-1.107149+0.000000i")
-	.DoIt("0.5+0i", "1.107149+0.000000i")
-	.DoIt("1+0i", "0.785398+0.000000i")
-	.DoIt("2+0i", "0.463648+0.000000i")
-	.DoIt("0-2i", "-0.000000+0.549306i")
-	.DoIt("0-0.5i", "-1.570796+0.549306i")
-	.DoIt("0+0.5i", "-1.570796-0.549306i")
-	.DoIt("0+2i", "-0.000000-0.549306i")
-	.DoIt("2+3i", "0.160875-0.229073i")
-	.DoIt("2-3i", "0.160875+0.229073i")
-	.DoIt("-2+3i", "-0.160875-0.229073i")
-	.DoIt("-2-3i", "-0.160875+0.229073i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-0.463648+0.000000i")
+    .DoIt("-1+0i", "-0.785398+0.000000i")
+    .DoIt("-0.5+0i", "-1.107149+0.000000i")
+    .DoIt("0.5+0i", "1.107149+0.000000i")
+    .DoIt("1+0i", "0.785398+0.000000i")
+    .DoIt("2+0i", "0.463648+0.000000i")
+    .DoIt("0-2i", "-0.000000+0.549306i")
+    .DoIt("0-0.5i", "-1.570796+0.549306i")
+    .DoIt("0+0.5i", "-1.570796-0.549306i")
+    .DoIt("0+2i", "-0.000000-0.549306i")
+    .DoIt("2+3i", "0.160875-0.229073i")
+    .DoIt("2-3i", "0.160875+0.229073i")
+    .DoIt("-2+3i", "-0.160875-0.229073i")
+    .DoIt("-2-3i", "-0.160875+0.229073i")
+    print "done\n"
 .end
 CODE
 done
@@ -1575,41 +1575,41 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "asec of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.asec()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nasec("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.asec()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nasec("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "2.094395-0.000000i")
-	.DoIt("-1+0i", "3.141593-0.000000i")
-	.DoIt("-0.5+0i", "3.141593-1.316958i")
-	.DoIt("0.5+0i", "0.000000+1.316958i")
-	.DoIt("1+0i", "0.000000-0.000000i")
-	.DoIt("2+0i", "1.047198-0.000000i")
-	.DoIt("0-2i", "1.570796-0.481212i")
-	.DoIt("0-1i", "1.570796-0.881374i")
-	.DoIt("0-0.5i", "1.570796-1.443635i")
-	.DoIt("0+0.5i", "1.570796+1.443635i")
-	.DoIt("0+1i", "1.570796+0.881374i")
-	.DoIt("0+2i", "1.570796+0.481212i")
-	.DoIt("2+3i", "1.420411+0.231335i")
-	.DoIt("2-3i", "1.420411-0.231335i")
-	.DoIt("-2+3i", "1.721182+0.231335i")
-	.DoIt("-2-3i", "1.721182-0.231335i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "2.094395-0.000000i")
+    .DoIt("-1+0i", "3.141593-0.000000i")
+    .DoIt("-0.5+0i", "3.141593-1.316958i")
+    .DoIt("0.5+0i", "0.000000+1.316958i")
+    .DoIt("1+0i", "0.000000-0.000000i")
+    .DoIt("2+0i", "1.047198-0.000000i")
+    .DoIt("0-2i", "1.570796-0.481212i")
+    .DoIt("0-1i", "1.570796-0.881374i")
+    .DoIt("0-0.5i", "1.570796-1.443635i")
+    .DoIt("0+0.5i", "1.570796+1.443635i")
+    .DoIt("0+1i", "1.570796+0.881374i")
+    .DoIt("0+2i", "1.570796+0.481212i")
+    .DoIt("2+3i", "1.420411+0.231335i")
+    .DoIt("2-3i", "1.420411-0.231335i")
+    .DoIt("-2+3i", "1.721182+0.231335i")
+    .DoIt("-2-3i", "1.721182-0.231335i")
+    print "done\n"
 .end
 CODE
 done
@@ -1617,41 +1617,41 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "acsc of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.acsc()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nacsc("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.acsc()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nacsc("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-0.523599-0.000000i")
-	.DoIt("-1+0i", "-1.570796-0.000000i")
-	.DoIt("-0.5+0i", "-1.570796+1.316958i")
-	.DoIt("0.5+0i", "1.570796-1.316958i")
-	.DoIt("1+0i", "1.570796-0.000000i")
-	.DoIt("2+0i", "0.523599-0.000000i")
-	.DoIt("0-2i", "0.000000+0.481212i")
-	.DoIt("0-1i", "0.000000+0.881374i")
-	.DoIt("0-0.5i", "0.000000+1.443635i")
-	.DoIt("0+0.5i", "0.000000-1.443635i")
-	.DoIt("0+1i", "0.000000-0.881374i")
-	.DoIt("0+2i", "0.000000-0.481212i")
-	.DoIt("2+3i", "0.150386-0.231335i")
-	.DoIt("2-3i", "0.150386+0.231335i")
-	.DoIt("-2+3i", "-0.150386-0.231335i")
-	.DoIt("-2-3i", "-0.150386+0.231335i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-0.523599-0.000000i")
+    .DoIt("-1+0i", "-1.570796-0.000000i")
+    .DoIt("-0.5+0i", "-1.570796+1.316958i")
+    .DoIt("0.5+0i", "1.570796-1.316958i")
+    .DoIt("1+0i", "1.570796-0.000000i")
+    .DoIt("2+0i", "0.523599-0.000000i")
+    .DoIt("0-2i", "0.000000+0.481212i")
+    .DoIt("0-1i", "0.000000+0.881374i")
+    .DoIt("0-0.5i", "0.000000+1.443635i")
+    .DoIt("0+0.5i", "0.000000-1.443635i")
+    .DoIt("0+1i", "0.000000-0.881374i")
+    .DoIt("0+2i", "0.000000-0.481212i")
+    .DoIt("2+3i", "0.150386-0.231335i")
+    .DoIt("2-3i", "0.150386+0.231335i")
+    .DoIt("-2+3i", "-0.150386-0.231335i")
+    .DoIt("-2-3i", "-0.150386+0.231335i")
+    print "done\n"
 .end
 CODE
 done
@@ -1659,42 +1659,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sinh of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.sinh()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nsinh("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.sinh()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nsinh("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-3.626860+0.000000i")
-	.DoIt("-1+0i", "-1.175201+0.000000i")
-	.DoIt("-0.5+0i", "-0.521095+0.000000i")
-	.DoIt("0.5+0i", "0.521095+0.000000i")
-	.DoIt("1+0i", "1.175201+0.000000i")
-	.DoIt("2+0i", "3.626860+0.000000i")
-	.DoIt("0-2i", "-0.000000-0.909297i")
-	.DoIt("0-1i", "0.000000-0.841471i")
-	.DoIt("0-0.5i", "0.000000-0.479426i")
-	.DoIt("0+0.5i", "0.000000+0.479426i")
-	.DoIt("0+1i", "0.000000+0.841471i")
-	.DoIt("0+2i", "-0.000000+0.909297i")
-	.DoIt("0+0i", "0.000000+0.000000i")
-	.DoIt("2+3i", "-3.590565+0.530921i")
-	.DoIt("2-3i", "-3.590565-0.530921i")
-	.DoIt("-2+3i", "3.590565+0.530921i")
-	.DoIt("-2-3i", "3.590565-0.530921i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-3.626860+0.000000i")
+    .DoIt("-1+0i", "-1.175201+0.000000i")
+    .DoIt("-0.5+0i", "-0.521095+0.000000i")
+    .DoIt("0.5+0i", "0.521095+0.000000i")
+    .DoIt("1+0i", "1.175201+0.000000i")
+    .DoIt("2+0i", "3.626860+0.000000i")
+    .DoIt("0-2i", "-0.000000-0.909297i")
+    .DoIt("0-1i", "0.000000-0.841471i")
+    .DoIt("0-0.5i", "0.000000-0.479426i")
+    .DoIt("0+0.5i", "0.000000+0.479426i")
+    .DoIt("0+1i", "0.000000+0.841471i")
+    .DoIt("0+2i", "-0.000000+0.909297i")
+    .DoIt("0+0i", "0.000000+0.000000i")
+    .DoIt("2+3i", "-3.590565+0.530921i")
+    .DoIt("2-3i", "-3.590565-0.530921i")
+    .DoIt("-2+3i", "3.590565+0.530921i")
+    .DoIt("-2-3i", "3.590565-0.530921i")
+    print "done\n"
 .end
 CODE
 done
@@ -1702,42 +1702,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "cosh of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.cosh()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\ncosh("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.cosh()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\ncosh("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "3.762196-0.000000i")
-	.DoIt("-1+0i", "1.543081-0.000000i")
-	.DoIt("-0.5+0i", "1.127626-0.000000i")
-	.DoIt("0.5+0i", "1.127626+0.000000i")
-	.DoIt("1+0i", "1.543081+0.000000i")
-	.DoIt("2+0i", "3.762196+0.000000i")
-	.DoIt("0-2i", "-0.416147-0.000000i")
-	.DoIt("0-1i", "0.540302-0.000000i")
-	.DoIt("0-0.5i", "0.877583-0.000000i")
-	.DoIt("0+0.5i", "0.877583+0.000000i")
-	.DoIt("0+1i", "0.540302+0.000000i")
-	.DoIt("0+2i", "-0.416147+0.000000i")
-	.DoIt("0+0i", "1.000000+0.000000i")
-	.DoIt("2+3i", "-3.724546+0.511823i")
-	.DoIt("2-3i", "-3.724546-0.511823i")
-	.DoIt("-2+3i", "-3.724546-0.511823i")
-	.DoIt("-2-3i", "-3.724546+0.511823i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "3.762196-0.000000i")
+    .DoIt("-1+0i", "1.543081-0.000000i")
+    .DoIt("-0.5+0i", "1.127626-0.000000i")
+    .DoIt("0.5+0i", "1.127626+0.000000i")
+    .DoIt("1+0i", "1.543081+0.000000i")
+    .DoIt("2+0i", "3.762196+0.000000i")
+    .DoIt("0-2i", "-0.416147-0.000000i")
+    .DoIt("0-1i", "0.540302-0.000000i")
+    .DoIt("0-0.5i", "0.877583-0.000000i")
+    .DoIt("0+0.5i", "0.877583+0.000000i")
+    .DoIt("0+1i", "0.540302+0.000000i")
+    .DoIt("0+2i", "-0.416147+0.000000i")
+    .DoIt("0+0i", "1.000000+0.000000i")
+    .DoIt("2+3i", "-3.724546+0.511823i")
+    .DoIt("2-3i", "-3.724546-0.511823i")
+    .DoIt("-2+3i", "-3.724546-0.511823i")
+    .DoIt("-2-3i", "-3.724546+0.511823i")
+    print "done\n"
 .end
 CODE
 done
@@ -1745,42 +1745,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "tanh of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.tanh()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\ntanh("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.tanh()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\ntanh("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-0.964028+0.000000i")
-	.DoIt("-1+0i", "-0.761594+0.000000i")
-	.DoIt("-0.5+0i", "-0.462117+0.000000i")
-	.DoIt("0.5+0i", "0.462117+0.000000i")
-	.DoIt("1+0i", "0.761594+0.000000i")
-	.DoIt("2+0i", "0.964028+0.000000i")
-	.DoIt("0-2i", "0.000000+2.185040i")
-	.DoIt("0-1i", "0.000000-1.557408i")
-	.DoIt("0-0.5i", "0.000000-0.546302i")
-	.DoIt("0+0.5i", "0.000000+0.546302i")
-	.DoIt("0+1i", "0.000000+1.557408i")
-	.DoIt("0+2i", "0.000000-2.185040i")
-	.DoIt("0+0i", "0.000000+0.000000i")
-	.DoIt("2+3i", "0.965386-0.009884i")
-	.DoIt("2-3i", "0.965386+0.009884i")
-	.DoIt("-2+3i", "-0.965386-0.009884i")
-	.DoIt("-2-3i", "-0.965386+0.009884i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-0.964028+0.000000i")
+    .DoIt("-1+0i", "-0.761594+0.000000i")
+    .DoIt("-0.5+0i", "-0.462117+0.000000i")
+    .DoIt("0.5+0i", "0.462117+0.000000i")
+    .DoIt("1+0i", "0.761594+0.000000i")
+    .DoIt("2+0i", "0.964028+0.000000i")
+    .DoIt("0-2i", "0.000000+2.185040i")
+    .DoIt("0-1i", "0.000000-1.557408i")
+    .DoIt("0-0.5i", "0.000000-0.546302i")
+    .DoIt("0+0.5i", "0.000000+0.546302i")
+    .DoIt("0+1i", "0.000000+1.557408i")
+    .DoIt("0+2i", "0.000000-2.185040i")
+    .DoIt("0+0i", "0.000000+0.000000i")
+    .DoIt("2+3i", "0.965386-0.009884i")
+    .DoIt("2-3i", "0.965386+0.009884i")
+    .DoIt("-2+3i", "-0.965386-0.009884i")
+    .DoIt("-2-3i", "-0.965386+0.009884i")
+    print "done\n"
 .end
 CODE
 done
@@ -1788,41 +1788,41 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "coth of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.coth()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\ncoth("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.coth()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\ncoth("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-1.037315-0.000000i")
-	.DoIt("-1+0i", "-1.313035-0.000000i")
-	.DoIt("-0.5+0i", "-2.163953-0.000000i")
-	.DoIt("0.5+0i", "2.163953-0.000000i")
-	.DoIt("1+0i", "1.313035-0.000000i")
-	.DoIt("2+0i", "1.037315-0.000000i")
-	.DoIt("0-2i", "0.000000-0.457658i")
-	.DoIt("0-1i", "0.000000+0.642093i")
-	.DoIt("0-0.5i", "0.000000+1.830488i")
-	.DoIt("0+0.5i", "0.000000-1.830488i")
-	.DoIt("0+1i", "0.000000-0.642093i")
-	.DoIt("0+2i", "0.000000+0.457658i")
-	.DoIt("2+3i", "1.035747+0.010605i")
-	.DoIt("2-3i", "1.035747-0.010605i")
-	.DoIt("-2+3i", "-1.035747+0.010605i")
-	.DoIt("-2-3i", "-1.035747-0.010605i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-1.037315-0.000000i")
+    .DoIt("-1+0i", "-1.313035-0.000000i")
+    .DoIt("-0.5+0i", "-2.163953-0.000000i")
+    .DoIt("0.5+0i", "2.163953-0.000000i")
+    .DoIt("1+0i", "1.313035-0.000000i")
+    .DoIt("2+0i", "1.037315-0.000000i")
+    .DoIt("0-2i", "0.000000-0.457658i")
+    .DoIt("0-1i", "0.000000+0.642093i")
+    .DoIt("0-0.5i", "0.000000+1.830488i")
+    .DoIt("0+0.5i", "0.000000-1.830488i")
+    .DoIt("0+1i", "0.000000-0.642093i")
+    .DoIt("0+2i", "0.000000+0.457658i")
+    .DoIt("2+3i", "1.035747+0.010605i")
+    .DoIt("2-3i", "1.035747-0.010605i")
+    .DoIt("-2+3i", "-1.035747+0.010605i")
+    .DoIt("-2-3i", "-1.035747-0.010605i")
+    print "done\n"
 .end
 CODE
 done
@@ -1830,42 +1830,42 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "sech of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.sech()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\nsech("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.sech()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\nsech("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "0.265802+0.000000i")
-	.DoIt("-1+0i", "0.648054+0.000000i")
-	.DoIt("-0.5+0i", "0.886819+0.000000i")
-	.DoIt("0.5+0i", "0.886819-0.000000i")
-	.DoIt("1+0i", "0.648054-0.000000i")
-	.DoIt("2+0i", "0.265802-0.000000i")
-	.DoIt("0-2i", "-2.402998+0.000000i")
-	.DoIt("0-1i", "1.850816+0.000000i")
-	.DoIt("0-0.5i", "1.139494+0.000000i")
-	.DoIt("0+0.5i", "1.139494-0.000000i")
-	.DoIt("0+1i", "1.850816-0.000000i")
-	.DoIt("0+2i", "-2.402998-0.000000i")
-	.DoIt("0+0i", "1.000000-0.000000i")
-	.DoIt("2+3i", "-0.263513-0.036212i")
-	.DoIt("2-3i", "-0.263513+0.036212i")
-	.DoIt("-2+3i", "-0.263513+0.036212i")
-	.DoIt("-2-3i", "-0.263513-0.036212i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "0.265802+0.000000i")
+    .DoIt("-1+0i", "0.648054+0.000000i")
+    .DoIt("-0.5+0i", "0.886819+0.000000i")
+    .DoIt("0.5+0i", "0.886819-0.000000i")
+    .DoIt("1+0i", "0.648054-0.000000i")
+    .DoIt("2+0i", "0.265802-0.000000i")
+    .DoIt("0-2i", "-2.402998+0.000000i")
+    .DoIt("0-1i", "1.850816+0.000000i")
+    .DoIt("0-0.5i", "1.139494+0.000000i")
+    .DoIt("0+0.5i", "1.139494-0.000000i")
+    .DoIt("0+1i", "1.850816-0.000000i")
+    .DoIt("0+2i", "-2.402998-0.000000i")
+    .DoIt("0+0i", "1.000000-0.000000i")
+    .DoIt("2+3i", "-0.263513-0.036212i")
+    .DoIt("2-3i", "-0.263513+0.036212i")
+    .DoIt("-2+3i", "-0.263513+0.036212i")
+    .DoIt("-2-3i", "-0.263513-0.036212i")
+    print "done\n"
 .end
 CODE
 done
@@ -1873,41 +1873,41 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "csch of complex numbers");
 .macro DoIt(val, res)
-	c = .val
-	c2 = c.csch()
-	str = sprintf "%f%+fi", c2
-	unless str != .res goto .$ok
-	print "\ncsch("
-	print .val
-	print ")\n\t	got\t"
-	print str
-	print "\n\t\tnot\t"
-	print .res
-	print "\n"
+    c = .val
+    c2 = c.csch()
+    str = sprintf "%f%+fi", c2
+    unless str != .res goto .$ok
+    print "\ncsch("
+    print .val
+    print ")\n\t	got\t"
+    print str
+    print "\n\t\tnot\t"
+    print .res
+    print "\n"
 .local $ok:
 .endm
 .sub main :main
-	.local pmc c, c2
-	.local string str
-	c = new .Complex
-	c2 = new .Complex
-	.DoIt("-2+0i", "-0.275721-0.000000i")
-	.DoIt("-1+0i", "-0.850918-0.000000i")
-	.DoIt("-0.5+0i", "-1.919035-0.000000i")
-	.DoIt("0.5+0i", "1.919035-0.000000i")
-	.DoIt("1+0i", "0.850918-0.000000i")
-	.DoIt("2+0i", "0.275721-0.000000i")
-	.DoIt("0-2i", "-0.000000+1.099750i")
-	.DoIt("0-1i", "0.000000+1.188395i")
-	.DoIt("0-0.5i", "0.000000+2.085830i")
-	.DoIt("0+0.5i", "0.000000-2.085830i")
-	.DoIt("0+1i", "0.000000-1.188395i")
-	.DoIt("0+2i", "-0.000000-1.099750i")
-	.DoIt("2+3i", "-0.272549-0.040301i")
-	.DoIt("2-3i", "-0.272549+0.040301i")
-	.DoIt("-2+3i", "0.272549-0.040301i")
-	.DoIt("-2-3i", "0.272549+0.040301i")
-	print "done\n"
+    .local pmc c, c2
+    .local string str
+    c = new .Complex
+    c2 = new .Complex
+    .DoIt("-2+0i", "-0.275721-0.000000i")
+    .DoIt("-1+0i", "-0.850918-0.000000i")
+    .DoIt("-0.5+0i", "-1.919035-0.000000i")
+    .DoIt("0.5+0i", "1.919035-0.000000i")
+    .DoIt("1+0i", "0.850918-0.000000i")
+    .DoIt("2+0i", "0.275721-0.000000i")
+    .DoIt("0-2i", "-0.000000+1.099750i")
+    .DoIt("0-1i", "0.000000+1.188395i")
+    .DoIt("0-0.5i", "0.000000+2.085830i")
+    .DoIt("0+0.5i", "0.000000-2.085830i")
+    .DoIt("0+1i", "0.000000-1.188395i")
+    .DoIt("0+2i", "-0.000000-1.099750i")
+    .DoIt("2+3i", "-0.272549-0.040301i")
+    .DoIt("2-3i", "-0.272549+0.040301i")
+    .DoIt("-2+3i", "0.272549-0.040301i")
+    .DoIt("-2-3i", "0.272549+0.040301i")
+    print "done\n"
 .end
 CODE
 done

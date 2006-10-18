@@ -15,7 +15,7 @@ t/pmc/enumerate.t - test Enumerate PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/enumerate.t
+    % prove t/pmc/enumerate.t
 
 =head1 DESCRIPTION
 
@@ -26,9 +26,9 @@ Tests the Enumerate PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P1, .Array
-	new P0, .Enumerate, P1
-	print "ok 1\n"
+    new P1, .Array
+    new P0, .Enumerate, P1
+    print "ok 1\n"
 .end
 CODE
 ok 1

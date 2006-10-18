@@ -15,7 +15,7 @@ t/pmc/exception_handler.t - test Exception_Handler PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/exception_handler.t
+    % prove t/pmc/exception_handler.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the Exception_Handler PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .Exception_Handler
-	print "ok 1\n"
+    new P0, .Exception_Handler
+    print "ok 1\n"
 .end
 CODE
 ok 1

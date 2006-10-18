@@ -15,7 +15,7 @@ t/pmc/null.t - test Null PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/null.t
+    % prove t/pmc/null.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the Null PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .Null
-	print "ok 1\n"
+    new P0, .Null
+    print "ok 1\n"
 .end
 CODE
 ok 1

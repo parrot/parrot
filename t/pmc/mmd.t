@@ -420,8 +420,8 @@ pir_output_is(<<'CODE', <<'OUT', "MMD on argument count");
     .param string opt
     .param string s
     if opt != '-twice' goto no_twice
-	print s
-	print s
+    print s
+    print s
     .return()
 no_twice:
     print s
@@ -1201,21 +1201,21 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "keyed class name and multi");
 .sub main :main
-	.local pmc class
-	newclass class, [ 'Some'; 'Class' ]
+    .local pmc class
+    newclass class, [ 'Some'; 'Class' ]
 
-	.local int class_type
-	class_type = find_type [ 'Some'; 'Class' ]
+    .local int class_type
+    class_type = find_type [ 'Some'; 'Class' ]
 
     .local pmc instance
-	instance = new class_type
+    instance = new class_type
 
-	.local string name
-	name = typeof instance
+    .local string name
+    name = typeof instance
 
-	print "Type: "
-	print name
-	print "\n"
+    print "Type: "
+    print name
+    print "\n"
     end
 .end
 CODE
@@ -1224,16 +1224,16 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "keyed class name and multi");
 .sub main :main
-	.local pmc class
-	newclass class, [ 'Some'; 'Class' ]
+    .local pmc class
+    newclass class, [ 'Some'; 'Class' ]
 
-	.local int class_type
-	class_type = find_type [ 'Some'; 'Class' ]
+    .local int class_type
+    class_type = find_type [ 'Some'; 'Class' ]
 
     .local pmc instance
-	instance = new class_type
+    instance = new class_type
 
-	foo( instance )
+    foo( instance )
     end
 .end
 
@@ -1271,26 +1271,26 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "autoboxing on multis");
 .sub box_me_up :multi(string)
-	.param string first
-	.param pmc    second
+    .param string first
+    .param pmc    second
 
-	.local string promoted_type
-	promoted_type = typeof second
-	print "BMU autobox type: "
-	print promoted_type
-	print "\n"
+    .local string promoted_type
+    promoted_type = typeof second
+    print "BMU autobox type: "
+    print promoted_type
+    print "\n"
 .end
 
 .sub box_me_up :multi()
-	print "BMU no autobox, so sad\n"
+    print "BMU no autobox, so sad\n"
 .end
 
 .sub box_me_up :multi(int, int)
-	print "BMU inty, so bad\n"
+    print "BMU inty, so bad\n"
 .end
 
 .sub main :main
-	box_me_up( 'foo', 'bar' )
+    box_me_up( 'foo', 'bar' )
 .end
 CODE
 BMU autobox type: String

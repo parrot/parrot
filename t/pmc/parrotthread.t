@@ -15,7 +15,7 @@ t/pmc/parrotthread.t - test the ParrotThread PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/parrotthread.t
+    % prove t/pmc/parrotthread.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the ParrotThread PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .ParrotThread
-	print "ok 1\n"
+    new P0, .ParrotThread
+    print "ok 1\n"
 .end
 CODE
 ok 1

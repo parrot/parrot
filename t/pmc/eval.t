@@ -14,7 +14,7 @@ t/pmc/eval.t - Dynamic Code Evaluation
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/eval.t
+    % prove t/pmc/eval.t
 
 =head1 DESCRIPTION
 
@@ -23,13 +23,13 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 =cut
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "eval_sc");
-	compreg P1, "PASM"	# get compiler
-	set_args "(0)", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
-	get_results "(0)", P0
-	invokecc P1			# compile
-	invokecc P0			# eval code P0
-	print "back again\n"
-	end
+    compreg P1, "PASM"	# get compiler
+    set_args "(0)", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
+    get_results "(0)", P0
+    invokecc P1			# compile
+    invokecc P0			# eval code P0
+    print "back again\n"
+    end
 CODE
 in eval
 back again
@@ -248,7 +248,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM in PIR");
 
             # PAST
             pasm_source .= "set S1, 'Parrot_AST( PCC_Sub( Stmts( Py_Print( Const(8) ) Py_Print_nl() ) ) )'\n"
-	    pasm_source .= "set_args \"(0)\", S1\n"
+            pasm_source .= "set_args \"(0)\", S1\n"
             pasm_source .= "get_results \"(0)\", P6\n"
             pasm_source .= "invokecc P1\n"
         # PASM
@@ -258,7 +258,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM in PIR");
         pasm_source .= "invokecc P6\n"
         pasm_source .= "invokecc P6\n"
         pasm_source .= "print \"PASM: after\\n\"\n"
-	pasm_source .= "set_returns \"()\"\n"
+        pasm_source .= "set_returns \"()\"\n"
         pasm_source .= "returncc\n"
 
     # PIR
@@ -475,7 +475,7 @@ hello from foo_1
 OUTPUT
 
 END {
-	unlink "temp.pbc", "temp2.pbc", "temp.file";
+    unlink "temp.pbc", "temp2.pbc", "temp.file";
 };
 
 pir_output_is(<<'CODE', <<'OUTPUT', "eval.freeze");
@@ -596,10 +596,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_pmc_keyed_int");
     .local pmc e, s, compi
     code = <<"EOC"
     .sub foo
-	noop
+    noop
     .end
     .sub bar
-	noop
+    noop
     .end
 EOC
     compi = compreg "PIR"

@@ -15,7 +15,7 @@ t/pmc/parrotobject.t - test the ParrotObject PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/parrotobject.t
+    % prove t/pmc/parrotobject.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the ParrotObject PMC.
 
 pir_output_like(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .ParrotObject
-	print "ok 1\n"
+    new P0, .ParrotObject
+    print "ok 1\n"
 .end
 CODE
 /Can't create new ParrotObjects - use the registered class instead

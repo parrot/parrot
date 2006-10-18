@@ -14,7 +14,7 @@ t/pmc/builtin.t - Builtin Methods
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/builtin.t
+    % prove t/pmc/builtin.t
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,7 @@ t/pmc/lexinfo.t - test LexInfo PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/lexinfo.t
+    % prove t/pmc/lexinfo.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the LexInfo PMC.
 
 pir_output_like(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .LexInfo
-	print "ok 1\n"
+    new P0, .LexInfo
+    print "ok 1\n"
 .end
 CODE
 /don't create me like this

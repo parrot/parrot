@@ -15,7 +15,7 @@ t/pmc/vtablecache.t - test VtableCache
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/vtablecache.t
+    % prove t/pmc/vtablecache.t
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ Tests the VtableCache PMC.
 
 pir_output_is(<<'CODE', <<'OUT', 'new');
 .sub 'test' :main
-	new P0, .VtableCache
-	print "ok 1\n"
+    new P0, .VtableCache
+    print "ok 1\n"
 .end
 CODE
 ok 1

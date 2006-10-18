@@ -14,7 +14,7 @@ t/pmc/exception.t - Exception Handling
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/exception.t
+    % prove t/pmc/exception.t
 
 =head1 DESCRIPTION
 
@@ -370,52 +370,52 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'cleanup global:  continuation');
 .sub main :main
-	.local pmc outer, cont
-	outer = new String
-	outer = "Outer value\n"
-	store_global "Foo::Bar", "test", outer
-	new cont, .Continuation
-	set_addr cont, endcont
-	store_global "Foo::Bar", "exit", cont
-	show_value()
-	test1()
-	print "skipped.\n"
+    .local pmc outer, cont
+    outer = new String
+    outer = "Outer value\n"
+    store_global "Foo::Bar", "test", outer
+    new cont, .Continuation
+    set_addr cont, endcont
+    store_global "Foo::Bar", "exit", cont
+    show_value()
+    test1()
+    print "skipped.\n"
 endcont:
-	show_value()
+    show_value()
 .end
 .sub test1
-	.local pmc test1_binding, old_value, cleanup
-	.lex "old_value", old_value
-	test1_binding = new String
-	test1_binding = "Inner value\n"
-	old_value = find_global "Foo::Bar", "test"
-	.const .Sub test1_cleanup_sub = "test1_cleanup"
-	cleanup = newclosure test1_cleanup_sub
-	pushaction cleanup
-	store_global "Foo::Bar", "test", test1_binding
-	show_value()
-	test2()
-	show_value()
+    .local pmc test1_binding, old_value, cleanup
+    .lex "old_value", old_value
+    test1_binding = new String
+    test1_binding = "Inner value\n"
+    old_value = find_global "Foo::Bar", "test"
+    .const .Sub test1_cleanup_sub = "test1_cleanup"
+    cleanup = newclosure test1_cleanup_sub
+    pushaction cleanup
+    store_global "Foo::Bar", "test", test1_binding
+    show_value()
+    test2()
+    show_value()
 .end
 .sub test1_cleanup :outer(test1)
-	.local pmc old_value
-	print "[in test1_cleanup]\n"
-	find_lex old_value, "old_value"
-	store_global "Foo::Bar", "test", old_value
+    .local pmc old_value
+    print "[in test1_cleanup]\n"
+    find_lex old_value, "old_value"
+    store_global "Foo::Bar", "test", old_value
 .end
 .sub test2
-	.local pmc test2_binding, exit
-	test2_binding = new String
-	test2_binding = "Innerer value\n"
-	store_global "Foo::Bar", "test", test2_binding
-	show_value()
-	exit = find_global "Foo::Bar", "exit"
-	exit()
+    .local pmc test2_binding, exit
+    test2_binding = new String
+    test2_binding = "Innerer value\n"
+    store_global "Foo::Bar", "test", test2_binding
+    show_value()
+    exit = find_global "Foo::Bar", "exit"
+    exit()
 .end
 .sub show_value
-	.local pmc value
-	value = find_global "Foo::Bar", "test"
-	print value
+    .local pmc value
+    value = find_global "Foo::Bar", "test"
+    print value
 .end
 CODE
 Outer value
@@ -427,57 +427,57 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'cleanup global:  throw');
 .sub main :main
-	.local pmc outer
-	outer = new String
-	outer = "Outer value\n"
-	store_global "Foo::Bar", "test", outer
-	push_eh eh
-	show_value()
-	test1()
-	print "skipped.\n"
+    .local pmc outer
+    outer = new String
+    outer = "Outer value\n"
+    store_global "Foo::Bar", "test", outer
+    push_eh eh
+    show_value()
+    test1()
+    print "skipped.\n"
 eh:
-	.local pmc exception
-	.get_results (exception, $S0)
-	print "Error: "
-	print exception
-	print "\n"
+    .local pmc exception
+    .get_results (exception, $S0)
+    print "Error: "
+    print exception
+    print "\n"
 last:
-	show_value()
+    show_value()
 .end
 .sub test1
-	.local pmc test1_binding, old_value, cleanup
-	.lex "old_value", old_value
-	test1_binding = new String
-	test1_binding = "Inner value\n"
-	old_value = find_global "Foo::Bar", "test"
-	.const .Sub test1_cleanup_sub = "test1_cleanup"
-	cleanup = newclosure test1_cleanup_sub
-	pushaction cleanup
-	store_global "Foo::Bar", "test", test1_binding
-	show_value()
-	test2()
-	show_value()
+    .local pmc test1_binding, old_value, cleanup
+    .lex "old_value", old_value
+    test1_binding = new String
+    test1_binding = "Inner value\n"
+    old_value = find_global "Foo::Bar", "test"
+    .const .Sub test1_cleanup_sub = "test1_cleanup"
+    cleanup = newclosure test1_cleanup_sub
+    pushaction cleanup
+    store_global "Foo::Bar", "test", test1_binding
+    show_value()
+    test2()
+    show_value()
 .end
 .sub test1_cleanup :outer(test1)
-	.local pmc old_value
-	print "[in test1_cleanup]\n"
-	find_lex old_value, "old_value"
-	store_global "Foo::Bar", "test", old_value
+    .local pmc old_value
+    print "[in test1_cleanup]\n"
+    find_lex old_value, "old_value"
+    store_global "Foo::Bar", "test", old_value
 .end
 .sub test2
-	.local pmc test2_binding, exit
-	test2_binding = new String
-	test2_binding = "Innerer value\n"
-	store_global "Foo::Bar", "test", test2_binding
-	show_value()
-	exit = new Exception
-	exit["_message"] = "something happened"
-	throw exit
+    .local pmc test2_binding, exit
+    test2_binding = new String
+    test2_binding = "Innerer value\n"
+    store_global "Foo::Bar", "test", test2_binding
+    show_value()
+    exit = new Exception
+    exit["_message"] = "something happened"
+    throw exit
 .end
 .sub show_value
-	.local pmc value
-	value = find_global "Foo::Bar", "test"
-	print value
+    .local pmc value
+    value = find_global "Foo::Bar", "test"
+    print value
 .end
 CODE
 Outer value
@@ -491,9 +491,9 @@ OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', 'clear_eh out of context (1)');
 .sub main :main
-	pushmark 1
-	clear_eh
-	print "no exceptions.\n"
+    pushmark 1
+    clear_eh
+    print "no exceptions.\n"
 .end
 CODE
 /No exception to pop./
@@ -501,26 +501,26 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'clear_eh out of context (2)');
 .sub main :main
-	.local pmc outer, cont
-	push_eh handler
-	test1()
-	print "skipped.\n"
-	goto done
+    .local pmc outer, cont
+    push_eh handler
+    test1()
+    print "skipped.\n"
+    goto done
 handler:
-	.local pmc exception
-	.get_results (exception, $S0)
-	print "Error: "
-	print $S0
-	print "\n"
+    .local pmc exception
+    .get_results (exception, $S0)
+    print "Error: "
+    print $S0
+    print "\n"
 done:
-	print "done.\n"
+    print "done.\n"
 .end
 .sub test1
-	.local pmc exit
-	print "[in test1]\n"
-	## clear_eh is illegal here, and signals an exception.
-	clear_eh
-	print "[cleared]\n"
+    .local pmc exit
+    print "[in test1]\n"
+    ## clear_eh is illegal here, and signals an exception.
+    clear_eh
+    print "[cleared]\n"
 .end
 CODE
 [in test1]
@@ -646,22 +646,22 @@ pir_output_like(<<'CODE', <<'OUTPUT', "invoke handler in calling sub");
 ## This tests that error handlers are out of scope when invoked (necessary for
 ## rethrow) when the error is signalled in another sub.
 .sub main :main
-	push_eh handler
-	broken()
-	print "not reached.\n"
+    push_eh handler
+    broken()
+    print "not reached.\n"
 handler:
-	.local pmc exception
-	.get_results (exception, $S0)
-	print "in handler.\n"
-	print $S0
-	print "\n"
-	rethrow exception
+    .local pmc exception
+    .get_results (exception, $S0)
+    print "in handler.\n"
+    print $S0
+    print "\n"
+    rethrow exception
 .end
 
 .sub broken
-	$P0 = new .Exception
-	$P0["_message"] = "something broke"
-	throw $P0
+    $P0 = new .Exception
+    $P0["_message"] = "something broke"
+    throw $P0
 .end
 CODE
 /\Ain handler.

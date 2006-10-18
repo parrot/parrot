@@ -355,11 +355,11 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "can get_as_base()");
 .sub main :main
-	$P0 = new Integer
-	$P0 = 42
-	$I0 = can $P0, 'get_as_base'
-	if $I0, OK
-	print "not "
+    $P0 = new Integer
+    $P0 = 42
+    $I0 = can $P0, 'get_as_base'
+    if $I0, OK
+    print "not "
 OK: print "ok\n"
 .end
 CODE
@@ -368,13 +368,13 @@ OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "get_as_base() bounds check");
 .sub main :main
-	$P0 = new .Integer
-	$P0 = 42
+    $P0 = new .Integer
+    $P0 = 42
 
-	$S0 = $P0.'get_as_base'(1)
+    $S0 = $P0.'get_as_base'(1)
 
-	print $S0
-	print "\n"
+    print $S0
+    print "\n"
 .end
 CODE
 /get_as_base: base out of bounds
@@ -383,13 +383,13 @@ OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "get_as_base() bounds check");
 .sub main :main
-	$P0 = new .Integer
-	$P0 = 42
+    $P0 = new .Integer
+    $P0 = 42
 
-	$S0 = $P0.'get_as_base'(37)
+    $S0 = $P0.'get_as_base'(37)
 
-	print $S0
-	print "\n"
+    print $S0
+    print "\n"
 .end
 CODE
 /get_as_base: base out of bounds
@@ -398,13 +398,13 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(10)");
 .sub main :main
-	$P0 = new .Integer
-	$P0 = 42
+    $P0 = new .Integer
+    $P0 = 42
 
-	$S0 = $P0.'get_as_base'(10)
+    $S0 = $P0.'get_as_base'(10)
 
-	print $S0
-	print "\n"
+    print $S0
+    print "\n"
 .end
 CODE
 42
@@ -412,47 +412,47 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(various)");
 .sub main :main
-	$P0 = new .Integer
-	$P0 = 42
+    $P0 = new .Integer
+    $P0 = 42
 
-	$S0 = $P0.'get_as_base'(2)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(2)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(3)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(3)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(5)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(5)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(7)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(7)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(11)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(11)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(13)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(13)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(17)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(17)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(19)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(19)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(23)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(23)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(29)
-	bsr PRINT
+    $S0 = $P0.'get_as_base'(29)
+    bsr PRINT
 
-	$S0 = $P0.'get_as_base'(31)
-	bsr PRINT
-	goto END
+    $S0 = $P0.'get_as_base'(31)
+    bsr PRINT
+    goto END
 
 PRINT:
-	print $S0
-	print "\n"
-	ret
+    print $S0
+    print "\n"
+    ret
 END:
 .end
 CODE

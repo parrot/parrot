@@ -365,14 +365,14 @@ pir_output_is(<<'CODE', <<'OUT', "latin1 namespace, global");
 .namespace [ iso-8859-1:"François" ]
 
 .sub '__init'
-	print "latin1 namespaces are fun\n"
+    print "latin1 namespaces are fun\n"
 .end
 
 .namespace
 
 .sub 'main' :main
-	$P0 = find_global iso-8859-1:"François", '__init'
-	$P0()
+    $P0 = find_global iso-8859-1:"François", '__init'
+    $P0()
 .end
 CODE
 latin1 namespaces are fun
@@ -382,14 +382,14 @@ pir_output_is(<<'CODE', <<'OUT', "unicode namespace, global");
 .namespace [ unicode:"Fran\xe7ois" ]
 
 .sub '__init'
-	print "unicode namespaces are fun\n"
+    print "unicode namespaces are fun\n"
 .end
 
 .namespace
 
 .sub 'main' :main
-	$P0 = find_global unicode:"Fran\xe7ois", '__init'
-	$P0()
+    $P0 = find_global unicode:"Fran\xe7ois", '__init'
+    $P0()
 .end
 CODE
 unicode namespaces are fun
@@ -637,7 +637,7 @@ OUTPUT
 SKIP:
 {
     skip("immediate test, doesn't with -r (from .pbc)", 1)
-	if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ );
+        if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ );
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global in current");
 .HLL 'bork', ''
@@ -811,65 +811,65 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Nested namespace introspection");
 .sub main :main
-	.local string no_symbol
+    .local string no_symbol
 
-	.local pmc foo_ns
-	foo_ns = get_hll_namespace [ 'Foo' ]
-	$S0    = foo_ns
-	print "Found namespace: "
-	print $S0
-	print "\n"
+    .local pmc foo_ns
+    foo_ns = get_hll_namespace [ 'Foo' ]
+    $S0    = foo_ns
+    print "Found namespace: "
+    print $S0
+    print "\n"
 
-	.local pmc bar_ns
-	bar_ns = foo_ns.find_namespace( 'Bar' )
-	$S0    = bar_ns
-	print "Found nested namespace: "
-	print $S0
-	print "\n"
+    .local pmc bar_ns
+    bar_ns = foo_ns.find_namespace( 'Bar' )
+    $S0    = bar_ns
+    print "Found nested namespace: "
+    print $S0
+    print "\n"
 
-	.local pmc baz_ns
-	baz_ns    = bar_ns.find_namespace( 'Baz' )
-	no_symbol = 'Baz'
+    .local pmc baz_ns
+    baz_ns    = bar_ns.find_namespace( 'Baz' )
+    no_symbol = 'Baz'
 
-	.local int is_defined
-	is_defined = defined baz_ns
-	if is_defined goto oops
-	goto find_symbols
+    .local int is_defined
+    is_defined = defined baz_ns
+    if is_defined goto oops
+    goto find_symbols
 
   oops:
-	print "Found non-null '"
-	print no_symbol
-	print "'\n"
-	.return()
+    print "Found non-null '"
+    print no_symbol
+    print "'\n"
+    .return()
 
   find_symbols:
-	.local pmc a_sub
-	a_sub = bar_ns.find_sub( 'a_sub' )
-	$S0   = a_sub
-	a_sub()
-	print "Found sub: "
-	print $S0
-	print "\n"
+    .local pmc a_sub
+    a_sub = bar_ns.find_sub( 'a_sub' )
+    $S0   = a_sub
+    a_sub()
+    print "Found sub: "
+    print $S0
+    print "\n"
 
-	.local pmc some_sub
-	some_sub  = bar_ns.find_sub( 'some_sub' )
-	no_symbol = 'some_sub'
+    .local pmc some_sub
+    some_sub  = bar_ns.find_sub( 'some_sub' )
+    no_symbol = 'some_sub'
 
-	is_defined = defined some_sub
-	if is_defined goto oops
+    is_defined = defined some_sub
+    if is_defined goto oops
 
-	.local pmc a_var
-	a_var    = bar_ns.find_var( 'a_var' )
-	print "Found var: "
-	print a_var
-	print "\n"
+    .local pmc a_var
+    a_var    = bar_ns.find_var( 'a_var' )
+    print "Found var: "
+    print a_var
+    print "\n"
 
-	.local pmc some_var
-	some_var    = bar_ns.find_var( 'some_var' )
-	no_symbol = 'some_var'
+    .local pmc some_var
+    some_var    = bar_ns.find_var( 'some_var' )
+    no_symbol = 'some_var'
 
-	is_defined = defined some_var
-	if is_defined goto oops
+    is_defined = defined some_var
+    if is_defined goto oops
 
 .end
 
@@ -881,10 +881,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Nested namespace introspection");
 .namespace [ 'Foo'; 'Bar' ]
 
 .sub a_sub
-	.local pmc some_var
-	some_var = new .String
-	some_var = 'a string PMC'
-	store_global [ 'Foo'; 'Bar' ], 'a_var', some_var
+    .local pmc some_var
+    some_var = new .String
+    some_var = 'a string PMC'
+    store_global [ 'Foo'; 'Bar' ], 'a_var', some_var
 .end
 CODE
 Found namespace: Foo

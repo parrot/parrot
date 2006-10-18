@@ -14,7 +14,7 @@ t/pmc/timer.t - Timer PMCs
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/timer.t
+    % prove t/pmc/timer.t
 
 =head1 DESCRIPTION
 

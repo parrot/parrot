@@ -14,7 +14,7 @@ t/pmc/resizablestringarray.t - ResizableStringArray PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/ResizableStringArray.t
+    % prove t/pmc/ResizableStringArray.t
 
 =head1 DESCRIPTION
 

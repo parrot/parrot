@@ -14,7 +14,7 @@ t/pmc/resizablepmcarray.t - testing the ResizablePMCArray PMC
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/resizablepmcarray.t
+    % prove t/pmc/resizablepmcarray.t
 
 =head1 DESCRIPTION
 

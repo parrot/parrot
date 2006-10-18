@@ -14,7 +14,7 @@ t/pmc/io.t - IO Ops
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/io.t
+    % prove t/pmc/io.t
 
 =head1 DESCRIPTION
 
@@ -85,28 +85,28 @@ OUTPUT
 };
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "open/close");
-	open P0, "temp.file", ">"
-	print P0, "a line\n"
-	close P0
-	open P0, "temp.file", "<"
-	read S0, P0, 20
-	print S0
-	end
+    open P0, "temp.file", ">"
+    print P0, "a line\n"
+    close P0
+    open P0, "temp.file", "<"
+    read S0, P0, 20
+    print S0
+    end
 CODE
 a line
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "timely destruction");
-	interpinfo I0, 2	# DOD runs
-	open P0, "temp.file", ">"
+    interpinfo I0, 2	# DOD runs
+    open P0, "temp.file", ">"
         needs_destroy P0
-	print P0, "a line\n"
-	null P0			# kill it
-	sweep 0			# a lazy DOD has to close the PIO
-	open P0, "temp.file", "<"
-	read S0, P0, 20
-	print S0
-	end
+    print P0, "a line\n"
+    null P0			# kill it
+    sweep 0			# a lazy DOD has to close the PIO
+    open P0, "temp.file", "<"
+    read S0, P0, 20
+    print S0
+    end
 CODE
 a line
 OUTPUT
@@ -114,15 +114,15 @@ OUTPUT
 pasm_output_is(<<'CODE', <<'OUTPUT', "getfd/fdopen");
         getstdout P0
         getfd I0, P0
-	fdopen P1, I0, ">"
-	defined I0, P1
-	unless I0, nok
-	print P1, "ok\n"
-	close P1
-	end
+    fdopen P1, I0, ">"
+    defined I0, P1
+    unless I0, nok
+    print P1, "ok\n"
+    close P1
+    end
 nok:
-	print "fdopen failed\n"
-	end
+    print "fdopen failed\n"
+    end
 CODE
 ok
 OUTPUT
@@ -130,14 +130,14 @@ OUTPUT
 pasm_output_is(<<'CODE', <<'OUTPUT', "fdopen - no close");
         getstdout P0
         getfd I0, P0
-	fdopen P1, I0, ">"
-	defined I0, P1
-	unless I0, nok
-	print P1, "ok\n"
-	end
+    fdopen P1, I0, ">"
+    defined I0, P1
+    unless I0, nok
+    print P1, "ok\n"
+    end
 nok:
-	print "fdopen failed\n"
-	end
+    print "fdopen failed\n"
+    end
 CODE
 ok
 OUTPUT
@@ -145,33 +145,33 @@ OUTPUT
 unlink "no_such_file" if (-e "no_such_file");
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "get_bool");
-	open P0, "no_such_file", "<"
-	unless P0, ok1
-	print "Huh: 'no_such_file' exists? - not "
+    open P0, "no_such_file", "<"
+    unless P0, ok1
+    print "Huh: 'no_such_file' exists? - not "
 ok1:
-	print "ok 1\n"
-	open P0, "temp.file", "<"
-	if P0, ok2
-	print "not "
-ok2:	print "ok 2\n"
-	read S0, P0, 1024
-	read S0, P0, 1024
-	unless P0, ok3
-	print "not "
-ok3:	print "ok 3\n"
-	defined I0, P0
-	if I0, ok4
-	print "not "
-ok4:	print "ok 4\n"
-	close P0
-	defined I0, P0		# closed file is still defined
-	if I0, ok5
-	print "not "
-ok5:	print "ok 5\n"
-	unless P0, ok6		# but false
-	print "not "
-ok6:	print "ok 6\n"
-	end
+    print "ok 1\n"
+    open P0, "temp.file", "<"
+    if P0, ok2
+    print "not "
+ok2:    print "ok 2\n"
+    read S0, P0, 1024
+    read S0, P0, 1024
+    unless P0, ok3
+    print "not "
+ok3:    print "ok 3\n"
+    defined I0, P0
+    if I0, ok4
+    print "not "
+ok4:    print "ok 4\n"
+    close P0
+    defined I0, P0		# closed file is still defined
+    if I0, ok5
+    print "not "
+ok5:    print "ok 5\n"
+    unless P0, ok6		# but false
+    print "not "
+ok6:    print "ok 6\n"
+    end
 CODE
 ok 1
 ok 2
@@ -183,18 +183,18 @@ OUTPUT
 
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "read on invalid fh should throw exception");
-	open P0, "no_such_file", "<"
-	unless P0, ok1
-	print "Huh: 'no_such_file' exists? - not "
+    open P0, "no_such_file", "<"
+    unless P0, ok1
+    print "Huh: 'no_such_file' exists? - not "
 ok1:
-	print "ok 1\n"
+    print "ok 1\n"
 
         push_eh _readline_handler
         readline S0, P0 # Currently segfaults
         print "not "
 _readline_handler:
         print "ok 2\n"
-	branch fin
+    branch fin
 
         push_eh _read_handler
         read S0, P0, 1
@@ -219,11 +219,11 @@ OUTPUT
 SKIP: {
     skip ("clone not finished yet", 1);
 pasm_output_is(<<'CODE', <<'OUTPUT', "clone");
-	open P0, "temp.file", "<"
-	clone P1, P0
-	read S0, P1, 1024
-	print S0
-	end
+    open P0, "temp.file", "<"
+    clone P1, P0
+    read S0, P1, 1024
+    print S0
+    end
 CODE
 a line
 OUTPUT
@@ -234,14 +234,14 @@ open my $FOO, '>', "temp.file" or die "can't open 'temp.file': $!";
 print $FOO "2\n1\n";
 close $FOO;
 pasm_output_is(<<'CODE', <<'OUTPUT', "open and readline");
-	open P0, "temp.file"
-	set S0, ""
-	set S1, ""
-	readline S0, P0
-	readline S1, P0
-	print S1
-	print S0
-	end
+    open P0, "temp.file"
+    set S0, ""
+    set S1, ""
+    readline S0, P0
+    readline S1, P0
+    print S1
+    print S0
+    end
 CODE
 1
 2

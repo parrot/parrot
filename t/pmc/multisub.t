@@ -14,7 +14,7 @@ t/pmc/multisub.t - Multi Sub PMCs
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/multisub.t
+    % prove t/pmc/multisub.t
 
 =head1 DESCRIPTION
 
