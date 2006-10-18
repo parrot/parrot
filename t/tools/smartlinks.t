@@ -152,4 +152,10 @@ BEGIN { use_ok 'SmartLink' or die };
 # TODO: main
 # TODO: end-to-end testing
 
-# vim: shiftwidth=4 expandtab:
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

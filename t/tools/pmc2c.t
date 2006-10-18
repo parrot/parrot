@@ -43,7 +43,7 @@ sub pmc2c_output_like {
   open my $c_fh, '<', $c_file; 
   my $c_output = do { local $/ = undef; <$c_fh> };
   close $c_fh;
-  
+
   unless (ref $c) {
     chomp $c;
     $c = qr{\Q$c\E};
@@ -181,3 +181,11 @@ END_PMC
                     interp, pmc_id, enum_class_Integer, entry
                 );
 END_C
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

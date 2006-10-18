@@ -38,9 +38,9 @@ if (-e $PBCMERGE) {
 sub pir_to_pbc {
     my ($name, $pir) = @_;
 
-    open FILE, "> t$PConfig{slash}tools$PConfig{slash}$name.pir";
-    print FILE $pir;
-    close FILE;
+    open my $FILE, '>', "t$PConfig{slash}tools$PConfig{slash}$name.pir";
+    print $FILE $pir;
+    close $FILE;
     system("$PARROT -o t$PConfig{slash}tools$PConfig{slash}$name.pbc t$PConfig{slash}tools$PConfig{slash}$name.pir");
 }
 
@@ -152,3 +152,10 @@ PIR
     pbc_merge("pbc_merge_t4", "pbc_merge_t4_1", "pbc_merge_t4_2");
     is(run_pbc("pbc_merge_t4"), "spray");
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
