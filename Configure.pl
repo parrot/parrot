@@ -52,6 +52,10 @@ Tells Configure.pl not to run the MANIFEST check.
 
 Sets the location where parrot will be installed.
 
+=item C<--step==>
+
+execute a single configure step
+
 =item C<--ask>
 
 This turns on the user prompts.
@@ -310,6 +314,8 @@ General Options:
    --verbose-step=N     Set verbose for step N only
    --verbose-step=regex Set verbose for step matching description
    --nomanicheck        Don't check the MANIFEST
+   --step=(gen::languages)
+                        Execute a single configure step
 
    --ask                Have Configure ask for commonly-changed info
 
@@ -497,8 +503,17 @@ my $conf = Parrot::Configure->new;
 }
 $conf->add_steps(@steps);
 $conf->options->set(%args);
-# Run the actual steps
-$conf->runsteps or exit(1);
+
+if ( exists $args{step} ) {
+  $conf->data()->slurp();
+  $conf->runstep($args{step});
+  print "\n";
+  exit(0);
+}
+else {
+  # Run the actual steps
+  $conf->runsteps or exit(1);
+}
 
 # tell users what to do next
 my $make = $conf->data->get('make');

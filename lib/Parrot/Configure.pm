@@ -197,74 +197,110 @@ sub runsteps
 
     my $n = 0; # step number
     foreach my $task ($self->steps) {
-        my $step_name   = $task->step;
-        my @step_params = @{$task->params};
-
         $n++;
+        $self->_runstep($task, $verbose, $verbose_step, $ask, $n);
+    }
+    return $self;
+}
 
-        eval "use $step_name;";
-        die $@ if $@;
+=item * C<runstep()>
 
-        my $step = $step_name->new;
+The invoking
+L<Parrot::Configure> object is passed as the first argument to each steps
+C<runstep()> method followed by any parameters that were registered for that
+step.
 
-        # XXX This works. but is probably not a good design.
-        # Using $step->description() would be nicer   
-        my $description = $step->description();
-        $description = "" unless defined $description;
+Accepts no arguments and returns a L<Parrot::Configure> object.
 
-        # set per step verbosity
-        if (defined $verbose_step) {
+=cut
 
-            # by step number
-            if ($verbose_step =~ /^\d+$/ && $n == $verbose_step) {
-                $self->options->set(verbose => 2);
-            }
 
-            # by description
-            elsif ($description =~ /$verbose_step/) {
-                $self->options->set(verbose => 2);
-            }
+sub runstep
+{
+    my $self = shift;
+    my $taskname = shift;
+
+    my ($verbose, $verbose_step, $ask) =
+    $self->options->get(qw(verbose verbose-step ask));
+
+    for my $task ($self->steps()) {
+        if ( $task->{"Parrot::Configure::Task::step"} eq $taskname ) {
+            $self->_runstep($task, $verbose, $verbose_step, $ask, 1);
+        }
+    }
+}
+
+sub _runstep
+{
+    my $self = shift;
+    my $task = shift;
+
+    my ($verbose, $verbose_step, $ask, $n) = @_;
+
+    my $step_name   = $task->step;
+    my @step_params = @{$task->params};
+
+
+    eval "use $step_name;";
+    die $@ if $@;
+
+    my $step = $step_name->new;
+
+    # XXX This works. but is probably not a good design.
+    # Using $step->description() would be nicer   
+    my $description = $step->description();
+    $description = "" unless defined $description;
+
+    # set per step verbosity
+    if (defined $verbose_step) {
+
+        # by step number
+        if ($verbose_step =~ /^\d+$/ && $n == $verbose_step) {
+            $self->options->set(verbose => 2);
         }
 
-        # XXX cc_build uses this verbose setting, why?
-        $self->data->set(verbose => $verbose) if $n > 2;
-
-        print "\n", $description, '...';
-        print "\n" if $verbose && $verbose == 2;
-
-        my $ret; # step return value
-        eval {
-            if (@step_params) {
-                $ret = $step->runstep($self, @step_params);
-            } else {
-                $ret = $step->runstep($self);
-            }
-        };
-        if ($@) {
-            carp "\nstep $step_name died during execution: $@\n";
-            return;
+        # by description
+        elsif ($description =~ /$verbose_step/) {
+            $self->options->set(verbose => 2);
         }
-
-        # did the step return itself?
-        eval { $ret->can('result'); };
-        # if not, report the result and return
-        if ($@) {
-            my $result = $step->result || 'no result returned';
-            carp "\nstep $step_name failed: " . $result;
-            return;
-        }
-
-        my $result = $step->result || 'done';
-
-        print "..." if $verbose && $verbose == 2;
-        print "." x (71 - length($description) - length($result));
-        print "$result." unless $step =~ m{^inter/} && $ask;
-
-        # reset verbose value for the next step
-        $self->options->set(verbose => $verbose);
     }
 
-    return $self;
+    # XXX cc_build uses this verbose setting, why?
+    $self->data->set(verbose => $verbose) if $n > 2;
+
+    print "\n", $description, '...';
+    print "\n" if $verbose && $verbose == 2;
+
+    my $ret; # step return value
+    eval {
+        if (@step_params) {
+            $ret = $step->runstep($self, @step_params);
+        } else {
+            $ret = $step->runstep($self);
+        }
+    };
+    if ($@) {
+        carp "\nstep $step_name died during execution: $@\n";
+        return;
+    }
+
+    # did the step return itself?
+    eval { $ret->can('result'); };
+    # if not, report the result and return
+    if ($@) {
+        my $result = $step->result || 'no result returned';
+        carp "\nstep $step_name failed: " . $result;
+        return;
+    }
+
+    my $result = $step->result || 'done';
+
+    print "..." if $verbose && $verbose == 2;
+    print "." x (71 - length($description) - length($result));
+    print "$result." unless $step =~ m{^inter/} && $ask;
+
+    # reset verbose value for the next step
+    $self->options->set(verbose => $verbose);
 }
 
 =back
