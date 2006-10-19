@@ -15,6 +15,7 @@ Test MIME::Base64.
 Test cases taken from base64.t of MIME::Base64.
 
 =cut
+.include "library/dumper.pir"
 
 .sub main :main
     load_bytecode 'Test/More.pir'
@@ -26,18 +27,18 @@ Test cases taken from base64.t of MIME::Base64.
     .local pmc plan, is, ok
     plan = find_global "Test::More", 'plan'
     ok = find_global "Test::More", 'ok'
-#    plan(552)
+    plan(552)
 ######################
 # ETOOMANYERROS
-    plan(1)
-    ok(0, 'too many errors - skipped')
-    end
+#   plan(1)
+#   ok(0, 'too many errors - skipped')
+#   end
 #######################
     .local pmc JSON
     JSON = compreg "JSON"
 
-    .local pmc encode_tests, decode_tests
-    encode_tests = JSON( <<'END_JSON' )
+    .local pmc encode_decode_tests, decode_tests
+    encode_decode_tests = JSON( <<'END_JSON' )
 [ ["Hello, World!\n","SGVsbG8sIFdvcmxkIQo="],
   ["\u0000","AA=="],
   ["\u0001","AQ=="],
@@ -87,16 +88,16 @@ Test cases taken from base64.t of MIME::Base64.
   ["-","LQ=="],
   [".","Lg=="],
   ["/","Lw=="],
-  [0,"MA=="],
-  [1,"MQ=="],
-  [2,"Mg=="],
-  [3,"Mw=="],
-  [4,"NA=="],
-  [5,"NQ=="],
-  [6,"Ng=="],
-  [7,"Nw=="],
-  [8,"OA=="],
-  [9,"OQ=="],
+  ["0","MA=="],
+  ["1","MQ=="],
+  ["2","Mg=="],
+  ["3","Mw=="],
+  ["4","NA=="],
+  ["5","NQ=="],
+  ["6","Ng=="],
+  ["7","Nw=="],
+  ["8","OA=="],
+  ["9","OQ=="],
   [":","Og=="],
   [";","Ow=="],
   ["<","PA=="],
@@ -333,9 +334,9 @@ END_JSON
     .local pmc test_iterator, test_case
     .local string plain, base64, comment, comment_cnt
 
-    test_iterator = new 'Iterator', encode_tests
-    enc_loop:
-        unless test_iterator goto enc_loop_end
+    test_iterator = new 'Iterator', encode_decode_tests
+    enc_dec_loop:
+        unless test_iterator goto enc_dec_loop_end
         test_case   = shift test_iterator
         plain       = shift test_case
         base64      = shift test_case
@@ -348,8 +349,8 @@ END_JSON
         concat comment, comment_cnt
         test_decode( plain, base64, comment )
         inc cnt
-    goto enc_loop
-    enc_loop_end:
+    goto enc_dec_loop
+    enc_dec_loop_end:
 
     test_iterator = new 'Iterator', decode_tests
     dec_loop:
@@ -392,6 +393,9 @@ END_JSON
     .local pmc dec_sub
     dec_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
     
+    .local pmc eight_to_six
+    eight_to_six = get_global 'eight_to_six'
+
     .local pmc is
     is   = find_global 'Test::More', 'is'
     

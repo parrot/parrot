@@ -49,9 +49,10 @@ then a warning is generated if perl is running under -w.
 
 .sub init :load
 
-    # printable 8bit chars for 6 bit ints 
+    # Base64 encoded strings are made of printable 8bit long chars,
+    # of which each carries 6 bit worth of information
     .local string printables
-    printables = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    printables = ascii:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
     # TODO: find saner names
     .local pmc six_to_eight, eight_to_six
@@ -60,12 +61,13 @@ then a warning is generated if perl is running under -w.
     eight_to_six = new .FixedIntegerArray
     eight_to_six = 256     # 2 ** 8
 
-    # TODO: find easier way to initialize
+    # TODO: find easier way to initialize with undef or so
+    eight_to_six[0] = 0
     .local int i
-    i = 0
+    i = 1
     START_2:
     if i >= 256 goto END_2
-        eight_to_six[i] = 0
+        eight_to_six[i] = -1
 	inc i
     goto START_2
     END_2:
@@ -192,7 +194,7 @@ then a warning is generated if perl is running under -w.
         tmp_int_1 = ord base64, i
 	inc i
 	tmp_int_2 = eight_to_six[tmp_int_1]
-	if tmp_int_2 == 0 goto START_5
+	if tmp_int_2 == -1 goto START_5
 	s_tmp_1 = chr tmp_int_1
 	concat base64_cleaned, s_tmp_1
     goto START_5
@@ -203,7 +205,7 @@ then a warning is generated if perl is running under -w.
     len_mod_4 = len % 4
 
     # make sure that there are dummy bits beyond
-    concat base64_cleaned, "\0\0\0"
+    concat base64_cleaned, ascii:"\0\0\0"
 
     .local int    eight_0, eight_1, eight_2
     .local int    six_0, six_1, six_2, six_3
@@ -225,6 +227,7 @@ then a warning is generated if perl is running under -w.
         tmp_int_1 = ord base64_cleaned, i  
 	six_3 = eight_to_six[tmp_int_1]
 	inc i
+
 
         # (f64[t.charAt(i)]<<2) | (f64[t.charAt(i+1)]>>4)
         shl tmp_int_1, six_0, 2
