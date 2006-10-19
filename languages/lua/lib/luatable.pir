@@ -25,9 +25,11 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
+.include 'languages/lua/lib/luaaux.pir'
 
 .sub 'init_table' :load :anon
 
+    load_bytecode 'languages/lua/lib/luabasic.pir'
 #    load_bytecode 'languages/lua/lib/luaaux.pbc'
 #    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
@@ -91,7 +93,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
 
 =cut
 
-.sub '_table_concat' :anon :outer(init_table)
+.sub '_table_concat' :anon
     .param pmc table :optional
     .param pmc sep :optional
     .param pmc i :optional
@@ -144,7 +146,7 @@ B<DEPRECATED>
 
 =cut
 
-.sub '_table_foreach' :anon :outer(init_table)
+.sub '_table_foreach' :anon
     .param pmc table :optional
     .param pmc f :optional
     .local pmc idx
@@ -177,7 +179,7 @@ B<DEPRECATED>
 
 =cut
 
-.sub '_table_foreachi' :anon :outer(init_table)
+.sub '_table_foreachi' :anon
     .param pmc table :optional
     .param pmc f :optional
     .local pmc index
@@ -212,7 +214,7 @@ B<DEPRECATED>
 
 =cut
 
-.sub '_table_getn' :anon :outer(init_table)
+.sub '_table_getn' :anon
     .param pmc table :optional
     .local pmc ret
     checktype(table, 'table')
@@ -230,7 +232,7 @@ inserts C<x> at the end of table C<t>.
 
 =cut
 
-.sub '_table_insert' :anon :outer(init_table)
+.sub '_table_insert' :anon
     .param pmc table :optional
     .param pmc arg2 :optional
     .param pmc arg3 :optional
@@ -277,7 +279,7 @@ STILL INCOMPLETE (see next in luapir.pir).
 
 =cut
 
-.sub '_table_maxn' :anon :outer(init_table)
+.sub '_table_maxn' :anon
     .param pmc table :optional
     .local pmc idx
     .local pmc value
@@ -309,7 +311,7 @@ table C<t>.
 
 =cut
 
-.sub '_table_remove' :anon :outer(init_table)
+.sub '_table_remove' :anon
     .param pmc table :optional
     .param pmc pos :optional
     .local pmc index
@@ -350,7 +352,7 @@ B<OBSOLETE>
 
 =cut
 
-.sub '_table_setn' :anon :outer(init_table)
+.sub '_table_setn' :anon
     .param pmc table :optional
     .param pmc n :optional
     checktype(table, 'table')
@@ -374,7 +376,7 @@ NOT YET IMPLEMENTED (see auxsort).
 
 =cut
 
-.sub '_table_sort' :anon :outer(init_table)
+.sub '_table_sort' :anon
     .param pmc table :optional
     .param pmc comp :optional
     .local int n

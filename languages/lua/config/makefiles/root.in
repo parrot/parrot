@@ -16,6 +16,7 @@ PMCS = \
  lua \
  luabase \
  luaboolean \
+ luaclosure \
  luafunction \
  luanil \
  luanumber \

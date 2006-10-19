@@ -21,13 +21,15 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
+.include 'languages/lua/lib/luaaux.pir'
 
 .sub 'init_coroutine' :load :anon
-
-#    load_bytecode 'languages/lua/lib/luaaux.pbc'
-#    load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/lib/luabasic.pir'
 
 #    print "init Lua Coroutine\n"
+
+    load_bytecode 'Parrot/Coroutine.pir'
+    $P0 = subclass 'Parrot::Coroutine', 'thread'
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
@@ -62,8 +64,6 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     $P1 = 'yield'
     _coroutine[$P1] = _coroutine_yield
 
-    load_bytecode 'Parrot/Coroutine.pir'
-    $P0 = subclass 'Parrot::Coroutine', 'thread'
 .end
 
 =item C<coroutine.create (f)>
@@ -73,10 +73,14 @@ Returns this new coroutine, an object with type C<"thread">.
 
 =cut
 
-.sub '_coroutine_create' :anon :outer(init_coroutine)
+.sub '_coroutine_create' :anon
     .param pmc f :optional
     .local pmc ret
     checktype(f, 'function')
+    $I0 = isa f, 'LuaClosure'
+    if $I0 goto L1
+    argerror('Lua function expected')
+L1:
     find_type $I0, 'thread'
     ret = new $I0, f
     .return (ret)
@@ -97,7 +101,7 @@ C<resume> returns B<false> plus the error message.
 
 =cut
 
-.sub '_coroutine_resume' :anon :outer(init_coroutine)
+.sub '_coroutine_resume' :anon
     .param pmc co :optional
     .param pmc argv :slurpy
     .local pmc ret
@@ -128,7 +132,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_coroutine_running' :anon :outer(init_coroutine)
+.sub '_coroutine_running' :anon
     not_implemented()
 .end
 
@@ -146,7 +150,7 @@ DUMMY IMPLEMENTATION.
 
 =cut
 
-.sub '_coroutine_status' :anon :outer(init_coroutine)
+.sub '_coroutine_status' :anon
     .param pmc co :optional
     .local pmc ret
     checktype(co, 'thread')
@@ -167,9 +171,10 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_coroutine_wrap' :anon :outer(init_coroutine)
+.sub '_coroutine_wrap' :anon
     .param pmc f :optional
-    checktype(f, 'function')
+    .local pmc ret
+    ret = _coroutine_wrap(f)
     not_implemented()
 .end
 
@@ -181,7 +186,7 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
 
 =cut
 
-.sub '_coroutine_yield' :anon :outer(init_coroutine)
+.sub '_coroutine_yield' :anon
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc co   # current coroutine ?

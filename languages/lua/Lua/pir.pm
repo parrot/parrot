@@ -16,27 +16,18 @@ package pirVisitor;
 .HLL 'Lua', 'lua_group'
 
 .include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
-.include 'languages/lua/lib/luacoroutine.pir'
-.include 'languages/lua/lib/luapackage.pir'
-.include 'languages/lua/lib/luastring.pir'
-.include 'languages/lua/lib/luatable.pir'
-.include 'languages/lua/lib/luamath.pir'
-.include 'languages/lua/lib/luaio.pir'
-.include 'languages/lua/lib/luaos.pir'
-.include 'languages/lua/lib/luadebug.pir'
 
 .sub '__start' :main
 #  print "start Lua\n"
-  init_basic()
-  init_coroutine()
-  init_package()
-  init_string()
-  init_table()
-  init_math()
-  init_io()
-  init_os()
-  init_debug()
+  load_bytecode 'languages/lua/lib/luabasic.pir'
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/luapackage.pir'
+  load_bytecode 'languages/lua/lib/luastring.pir'
+  load_bytecode 'languages/lua/lib/luatable.pir'
+  load_bytecode 'languages/lua/lib/luamath.pir'
+  load_bytecode 'languages/lua/lib/luaio.pir'
+  load_bytecode 'languages/lua/lib/luaos.pir'
+  load_bytecode 'languages/lua/lib/luadebug.pir'
 
 #
 #  PBC loader does not support LuaFunction

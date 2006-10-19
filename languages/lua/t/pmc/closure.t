@@ -1,32 +1,32 @@
 #! perl -w
-# Copyright (C) 2005-2006, The Perl Foundation.
-# $Id$
+# Copyright (C) 2006, The Perl Foundation.
+# $Id: closure.t 14891 2006-10-11 10:24:50Z fperrad $
 
 =head1 NAME
 
-t/pmc/function.t - LuaFunction
+t/pmc/closure.t - LuaClosure
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/function.t
+    % perl -I../../lib t/pmc/closure.t
 
 =head1 DESCRIPTION
 
-Tests C<LuaFunction> PMC
-(implemented in F<languages/lua/pmc/luafunction.pmc>).
+Tests C<LuaClosure> PMC
+(implemented in F<languages/lua/pmc/luaclosure.pmc>).
 
 =cut
 
 use strict;
 use warnings;
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 9;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    find_type $I0, "LuaClosure"
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
@@ -39,7 +39,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
     bool1 = isa pmc1, "Closure"
     print bool1
     print "\n"
-    bool1 = isa pmc1, "LuaFunction"
+    bool1 = isa pmc1, "LuaClosure"
     print bool1
     print "\n"
     end
@@ -47,14 +47,14 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 CODE
 0
 1
-0
+1
 1
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    find_type $I0, "LuaClosure"
     .local pmc pmc1
     pmc1 = new $I0
     .local string str1
@@ -66,7 +66,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
     print "\n"
     end
 .end
-.sub f1
+.sub f1 :outer(_main)
     print "f1()\n"
     end
 .end
@@ -78,7 +78,7 @@ OUTPUT
 pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
     loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    find_type $I0, "LuaClosure"
     .local pmc pmc1
     pmc1 = new $I0
     print pmc1
@@ -92,7 +92,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    find_type $I0, "LuaClosure"
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
@@ -106,7 +106,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
     print "\n"
     end
 .end
-.sub f1
+.sub f1 :outer(_main)
     print "f1()\n"
     end
 .end
@@ -118,7 +118,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
     loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    find_type $I0, "LuaClosure"
     .local pmc pmc1
     pmc1 = new $I0
     find_type $I0, "LuaBoolean"
@@ -141,16 +141,16 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL "Lua", "lua_group"
 .sub _main
-#    .const .LuaFunction F1 = "f1"
+#    .const .LuaClosure F1 = "f1"
     .const .Sub pmc1 = "f1"
     .local int bool1
-    bool1 = isa pmc1, "LuaFunction"
+    bool1 = isa pmc1, "LuaClosure"
     print bool1
     print "\n"
     pmc1()
     end
 .end
-.sub f1
+.sub f1 :outer(_main)
     print "f1()\n"
     .return ()
 .end
@@ -165,11 +165,11 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
     .local pmc pmc1
     pmc1 = test()
     .local int bool1
-    bool1 = isa pmc1, "LuaFunction"
+    bool1 = isa pmc1, "LuaClosure"
     print bool1
     print "\n"
 .end
-.sub test
+.sub test :outer(_main)
     .const .Sub T = "test"
     .return (T)
 .end
@@ -181,7 +181,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaFunction
+    pmc1 = new .LuaClosure
     print pmc1
     print "\n"
     $P0 = pmc1."tostring"()
@@ -199,7 +199,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL "Lua", "lua_group"
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaFunction
+    pmc1 = new .LuaClosure
     $P0 = pmc1."tonumber"()
     print $P0
     print "\n"
@@ -212,33 +212,35 @@ nil
 nil
 OUTPUT
 
-TODO: {
-local $TODO = 'PBC loader does not support LuaFunction';
-
-pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
-
-.include "languages/lua/lib/luaaux.pir"
-
-.sub __start :main
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
-    _main()
-.end
-
-.sub _main :anon
-    .local pmc tmp_0
-    tmp_0 = find_global "_G"
-    .const .LuaString cst_1 = "print"
-    .local pmc tmp_1
-    tmp_1 = tmp_0[cst_1]
-    tmp_1(tmp_1)
-.end
-CODE
-/function: [0-9A-Fa-f]{8}/
-OUTPUT
-}
+#TODO: {
+#local $TODO = 'PBC loader does not support LuaClosure';
+#
+#pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
+#.namespace [ "Lua" ]
+#.HLL "Lua", "lua_group"
+#
+##.include "languages/lua/lib/luaaux.pir"
+##.include "languages/lua/lib/luabasic.pir"
+#
+#.sub __start :main
+##    init_basic()
+##    load_bytecode "languages/lua/lib/luaaux.pbc"
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#    _main()
+#.end
+#
+#.sub _main :anon
+#    .local pmc tmp_0
+#    tmp_0 = find_global "_G"
+#    .const .LuaString cst_1 = "print"
+#    .local pmc tmp_1
+#    tmp_1 = tmp_0[cst_1]
+#    tmp_1(tmp_1)
+#.end
+#CODE
+#/function: [0-9A-Fa-f]{8}/
+#OUTPUT
+#}
 
 # Local Variables:
 #   mode: cperl

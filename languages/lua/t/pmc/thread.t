@@ -27,15 +27,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
-.include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
-.include 'languages/lua/lib/luacoroutine.pir'
-.include 'languages/lua/lib/luastring.pir'
-
 .sub '__start' :main
-  init_basic()
-  init_coroutine()
-  init_string()
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
   _main()
 .end
 .sub '_main'
@@ -65,15 +58,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
-.include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
-.include 'languages/lua/lib/luacoroutine.pir'
-.include 'languages/lua/lib/luastring.pir'
-
 .sub '__start' :main
-  init_basic()
-  init_coroutine()
-  init_string()
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
   _main()
 .end
 .sub '_main'
@@ -103,15 +89,8 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
-.include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
-.include 'languages/lua/lib/luacoroutine.pir'
-.include 'languages/lua/lib/luastring.pir'
-
 .sub '__start' :main
-  init_basic()
-  init_coroutine()
-  init_string()
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
   _main()
 .end
 .sub '_main'
@@ -135,15 +114,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
-.include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
-.include 'languages/lua/lib/luacoroutine.pir'
-.include 'languages/lua/lib/luastring.pir'
-
 .sub '__start' :main
-  init_basic()
-  init_coroutine()
-  init_string()
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
   _main()
 .end
 .sub '_main'
@@ -169,15 +141,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
-.include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
-.include 'languages/lua/lib/luacoroutine.pir'
-.include 'languages/lua/lib/luastring.pir'
-
 .sub '__start' :main
-  init_basic()
-  init_coroutine()
-  init_string()
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
   _main()
 .end
 .sub '_main'
@@ -209,15 +174,8 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
-.include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
-.include 'languages/lua/lib/luacoroutine.pir'
-.include 'languages/lua/lib/luastring.pir'
-
 .sub '__start' :main
-  init_basic()
-  init_coroutine()
-  init_string()
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
   _main()
 .end
 .sub '_main'
@@ -247,15 +205,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
-.include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
-.include 'languages/lua/lib/luacoroutine.pir'
-.include 'languages/lua/lib/luastring.pir'
-
 .sub '__start' :main
-  init_basic()
-  init_coroutine()
-  init_string()
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
   _main()
 .end
 .sub '_main'

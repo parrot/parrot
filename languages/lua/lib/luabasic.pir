@@ -20,6 +20,7 @@ See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
 .namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
 
+.include 'languages/lua/lib/luaaux.pir'
 
 .sub 'init_basic' :load :anon
 
@@ -183,7 +184,7 @@ message; when absent, it defaults to "assertion failed!"
 
 =cut
 
-.sub '_lua_assert' :anon :outer(init_basic)
+.sub '_lua_assert' :anon
     .param pmc v :optional
     .param pmc message :optional
     checkany(v)
@@ -240,7 +241,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lua_collectgarbage' :anon :outer(init_basic)
+.sub '_lua_collectgarbage' :anon
     .param pmc opt :optional
     $S0 = checkstring(opt)
     not_implemented()
@@ -259,7 +260,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lua_dofile' :anon :outer(init_basic)
+.sub '_lua_dofile' :anon
     .param pmc filename :optional
     $S0 = optstring(filename, "")
     not_implemented()
@@ -282,7 +283,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub '_lua_error' :anon :outer(init_basic)
+.sub '_lua_error' :anon
     .param pmc message :optional
     .param pmc level :optional
     $I0 = optint(level, 1)
@@ -305,7 +306,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lua_getfenv' :anon :outer(init_basic)
+.sub '_lua_getfenv' :anon
     not_implemented()
 .end
 
@@ -318,7 +319,7 @@ Otherwise, returns the metatable of the given object.
 
 =cut
 
-.sub '_lua_getmetatable' :anon :outer(init_basic)
+.sub '_lua_getmetatable' :anon
     .param pmc obj :optional
     .local pmc ret
     checkany(obj)
@@ -350,7 +351,7 @@ See C<next> for the caveats of modifying the table during its traversal.
 
 =cut
 
-.sub '_lua_ipairs' :anon :outer(init_basic)
+.sub '_lua_ipairs' :anon
     .param pmc t :optional
     .param pmc i :optional
     checktype(t, 'table')
@@ -396,7 +397,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lua_load' :anon :outer(init_basic)
+.sub '_lua_load' :anon
     not_implemented()
 .end
 
@@ -410,7 +411,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lua_loadfile' :anon :outer(init_basic)
+.sub '_lua_loadfile' :anon
     .param pmc filename :optional
     $S0 = optstring(filename, '')
     not_implemented()
@@ -429,7 +430,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lua_loadstring' :anon :outer(init_basic)
+.sub '_lua_loadstring' :anon
     .param pmc s :optional
     .param pmc chunkname :optional
     $S0 = checkstring(s)
@@ -463,7 +464,7 @@ STILL INCOMPLETE (see next in luapir.pir).
 
 =cut
 
-.sub '_lua_next' :anon :outer(init_basic)
+.sub '_lua_next' :anon
     .param pmc table :optional
     .param pmc index :optional
     .local pmc idx
@@ -492,7 +493,7 @@ STILL INCOMPLETE (see next).
 
 =cut
 
-.sub '_lua_pairs' :anon :outer(init_basic)
+.sub '_lua_pairs' :anon
     .param pmc t :optional
     checktype(t, 'table')
     .local pmc _G
@@ -517,7 +518,7 @@ In case of any error, C<pcall> returns B<false> plus the error message.
 
 =cut
 
-.sub '_lua_pcall' :anon :outer(init_basic)
+.sub '_lua_pcall' :anon
     .param pmc f :optional
     .param pmc argv :slurpy
     .local pmc ret
@@ -549,7 +550,7 @@ debugging. For formatted output, use C<string.format>.
 
 =cut
 
-.sub '_lua_print' :anon :outer(init_basic)
+.sub '_lua_print' :anon
     .param pmc argv :slurpy
     .local int argc
     .local int i
@@ -577,7 +578,7 @@ Returns a boolean.
 
 =cut
 
-.sub '_lua_rawequal' :anon :outer(init_basic)
+.sub '_lua_rawequal' :anon
     .param pmc v1 :optional
     .param pmc v2 :optional
     .local pmc ret
@@ -595,7 +596,7 @@ C<table> must be a table; C<index> is any value different from B<nil>.
 
 =cut
 
-.sub '_lua_rawget' :anon :outer(init_basic)
+.sub '_lua_rawget' :anon
     .param pmc table :optional
     .param pmc index :optional
     .local pmc ret
@@ -614,7 +615,7 @@ B<nil>, and C<value> is any Lua value.
 
 =cut
 
-.sub '_lua_rawset' :anon :outer(init_basic)
+.sub '_lua_rawset' :anon
     .param pmc table :optional
     .param pmc index :optional
     .param pmc value :optional
@@ -634,7 +635,7 @@ total number of extra arguments it received.
 
 =cut
 
-.sub '_lua_select' :anon :outer(init_basic)
+.sub '_lua_select' :anon
     .param pmc index :optional
     .param pmc argv :slurpy
     .local pmc ret
@@ -693,7 +694,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lua_setfenv' :anon :outer(init_basic)
+.sub '_lua_setfenv' :anon
     .param pmc f :optional
     .param pmc table :optional
     checktype(table, 'table')
@@ -712,7 +713,7 @@ This function returns table.
 
 =cut
 
-.sub '_lua_setmetatable' :anon :outer(init_basic)
+.sub '_lua_setmetatable' :anon
     .param pmc table :optional
     .param pmc metatable :optional
     checktype(table, 'table')
@@ -752,7 +753,7 @@ unsigned integers are accepted.
 
 =cut
 
-.sub '_lua_tonumber' :anon :outer(init_basic)
+.sub '_lua_tonumber' :anon
     .param pmc e :optional
     .param pmc base :optional
     .local pmc ret
@@ -785,7 +786,7 @@ as its result.
 
 =cut
 
-.sub '_lua_tostring' :anon :outer(init_basic)
+.sub '_lua_tostring' :anon
     .param pmc e :optional
     .local pmc ret
     checkany(e)
@@ -803,7 +804,7 @@ C<"userdata">.
 
 =cut
 
-.sub '_lua_type' :anon :outer(init_basic)
+.sub '_lua_type' :anon
     .param pmc v :optional
     .local pmc ret
     checkany(v)
@@ -826,7 +827,7 @@ length operator.
 
 =cut
 
-.sub '_lua_unpack' :anon :outer(init_basic)
+.sub '_lua_unpack' :anon
     .param pmc list :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -873,7 +874,7 @@ error, C<xpcall> returns false plus the result from C<err>.
 
 =cut
 
-.sub '_lua_xpcall' :anon :outer(init_basic)
+.sub '_lua_xpcall' :anon
     .param pmc f :optional
     .param pmc err :optional
     .local pmc ret
