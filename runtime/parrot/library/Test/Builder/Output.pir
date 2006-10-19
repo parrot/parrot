@@ -133,11 +133,11 @@ unescaped newlines.
 
   END_LOOP:
   	push lines, message
+
+	# loop from 0 to index of final element,
+	# so keep i less than num_lines
 	.local int num_lines
 	num_lines = lines
-
-	# loop from 0 to index of final element
-	dec num_lines
 
 	.local int i
 	i = 0
