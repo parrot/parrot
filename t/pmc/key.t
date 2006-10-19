@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -57,6 +57,20 @@ CODE
 123
 OUT
 
+pasm_output_is(<<'CODE', <<'OUT', 'extract int from string keys');
+new P0, .ResizableStringArray
+push P0, "ok 1\n"
+push P0, "ok 2\n"
+set S0, 0
+set P1, P0[S0]
+print P1
+set P1, P0["1"]
+print P1
+end
+CODE
+ok 1
+ok 2
+OUT
 
 # Local Variables:
 #   mode: cperl
