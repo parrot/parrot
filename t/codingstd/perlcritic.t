@@ -21,7 +21,7 @@ BEGIN {
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
 
-my ( @files, %policies );
+my ( @files, %policies, $list_policies );
 
 while (@ARGV) {
     my $arg = $ARGV[0];
@@ -29,13 +29,56 @@ while (@ARGV) {
         shift @ARGV;    # discard
         last;
     }
-    if ( $arg =~ /^--(.*)/ ) {
+    if ( $arg eq '--list' ) {
+        $list_policies = 1;
+        shift @ARGV;    # discard
+    }
+    elsif ( $arg =~ /^--(.*)/ ) {
         $policies{$1} = 1;
         shift @ARGV;    # discard
     }
     else {
         last;
     }
+}
+
+# By default, don't complain about anything.
+my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
+
+# Add in the few cases we should care about.
+# For a list of available policies, perldoc Perl::Critic
+if ( !keys %policies ) {
+    %policies = (
+        'TestingAndDebugging::RequireUseStrict'      => 1,
+        'TestingAndDebugging::RequireUseWarnings'    => 1,
+        'Variables::ProhibitConditionalDeclarations' => 1,
+        'InputOutput::ProhibitTwoArgOpen'            => 1,
+        'InputOutput::ProhibitBarewordFileHandles'   => 1,
+        'NamingConventions::ProhibitAmbiguousNames'  => 1,
+        'Subroutines::ProhibitBuiltinHomonyms'       => 1,
+        'Subroutines::ProhibitExplicitReturnUndef'   => 1,
+        'Subroutines::ProhibitSubroutinePrototypes'  => 1,
+        'CodeLayout::UseParrotCoda'                  => 1,
+        'CodeLayout::ProhibitHardTabs'               => { allow_leading_tabs => 0 },
+        'CodeLayout::RequireTidyCode'                => { perltidyrc => $perl_tidy_conf },
+
+        #40564 [TODO] fix perlcritic Subroutines::RequireFinalReturn policy
+        # below commented out because it does not ignore subs which 'exit'
+        # or 'die'
+        # 'Subroutines::RequireFinalReturn'            => 1,
+    );
+
+    # Give a diag to let users know if this is doing anything, how to repeat.
+    eval { require Perl::Tidy; };
+    if ( !$@ ) {
+        diag "Using $perl_tidy_conf for Perl::Tidy settings";
+    }
+}
+
+if ($list_policies) {
+    use Data::Dumper;
+    warn Dumper( \%policies );
+    exit;
 }
 
 if ( !@ARGV ) {
@@ -79,42 +122,12 @@ else {
     exit;
 }
 
-# By default, don't complain about anything.
-my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
-
-# Add in the few cases we should care about.
-# For a list of available policies, perldoc Perl::Critic
-if ( !keys %policies ) {
-    %policies = (
-        'TestingAndDebugging::RequireUseStrict'      => 1,
-        'TestingAndDebugging::RequireUseWarnings'    => 1,
-        'Variables::ProhibitConditionalDeclarations' => 1,
-        'InputOutput::ProhibitTwoArgOpen'            => 1,
-        'InputOutput::ProhibitBarewordFileHandles'   => 1,
-        'NamingConventions::ProhibitAmbiguousNames'  => 1,
-        'Subroutines::ProhibitBuiltinHomonyms'       => 1,
-        'Subroutines::ProhibitExplicitReturnUndef'   => 1,
-        'Subroutines::ProhibitSubroutinePrototypes'  => 1,
-#40564 [TODO] fix perlcritic Subroutines::RequireFinalReturn policy
-# below commented out because it does not ignore subs which 'exit' or 'die'
-#        'Subroutines::RequireFinalReturn'            => 1,
-        'CodeLayout::UseParrotCoda'                  => 1,
-        'CodeLayout::ProhibitHardTabs'               => { allow_leading_tabs => 0 },
-        'CodeLayout::RequireTidyCode'                => { perltidyrc => $perl_tidy_conf },
-    );
-
-    # Give a diag to let users know if this is doing anything, how to repeat.
-    eval { require Perl::Tidy; };
-    if ( !$@ ) {
-        diag "Using $perl_tidy_conf for Perl::Tidy settings";
-    }
-}
-
 foreach my $policy ( keys %policies ) {
     $config->add_policy(
         -policy => $policy,
         ref $policies{$policy} ? ( -config => $policies{$policy} ) : (),
-    ) or die;
+        )
+        or die;
 }
 
 Test::Perl::Critic->import(
@@ -189,6 +202,11 @@ command line before any other files, as:
 
 This will, for example, use B<only> that policy (see L<Perl::Critic> for
 more information on policies) when examining files from the manifest.
+
+If you just wish to get a listing of the polices that will be checked
+without actually running them, use:
+
+ perl t/codingstd/perlcritic.t --list
 
 =head1 BUGS AND LIMITATIONS
 
