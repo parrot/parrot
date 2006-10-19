@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -65,6 +65,21 @@ set S0, 0
 set P1, P0[S0]
 print P1
 set P1, P0["1"]
+print P1
+end
+CODE
+ok 1
+ok 2
+OUT
+
+pasm_output_is(<<'CODE', <<'OUT', 'extract string from int keys');
+new P0, .Hash
+set P0['1'], "ok 1\n"
+set P0['2'], "ok 2\n"
+set I0, 1
+set P1, P0[I0]
+print P1
+set P1, P0[2]
 print P1
 end
 CODE
