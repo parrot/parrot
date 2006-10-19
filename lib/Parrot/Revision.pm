@@ -22,6 +22,7 @@ package Parrot::Revision;
 
 use strict;
 use warnings;
+use File::Spec;
 
 
 our $svn_entries = undef;
