@@ -289,6 +289,7 @@ INTVAL
 key_integer(Interp *interpreter, PMC *key)
 {
     PMC *reg;
+    STRING *s_reg;
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_hash_iterator_FLAGS:
@@ -299,8 +300,14 @@ key_integer(Interp *interpreter, PMC *key)
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = REG_PMC(PMC_int_val(key));
         return VTABLE_get_integer(interpreter, reg);
+    case KEY_string_FLAG:
+        return string_to_int(interpreter, PMC_str_val(key));
+    case KEY_string_FLAG | KEY_register_FLAG:
+        s_reg = REG_STR(PMC_int_val(key));
+        return string_to_int(interpreter, s_reg);
     default:
-        return VTABLE_get_integer(interpreter,  key);
+        internal_exception(1, "no key conversion found");
+        return 0;
     }
 }
 
