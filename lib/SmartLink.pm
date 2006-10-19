@@ -4,30 +4,69 @@ use Moose::Util::TypeConstraints;
 use Text::Balanced qw/extract_multiple extract_quotelike/;
 
 ## links are like
-# L<doc> or L<doc/section> or L<doc//keyphrases> or L<doc/section/keyphrases>
+# L<doc> or L<doc/section> or L<doc/section/keyphrases>
 subtype PodLink => as Str => where { m|^L<([^/]+)(\/([^/]*)){0,2}>| };
 
 has 'link' => ( is => 'ro', isa => 'PodLink', required => 1, );
 
 has 'doc' => (
-    is => 'ro', isa => 'Str',
+    is => 'ro', isa => 'Doc',
     lazy => 1, default => sub{
-        ($_)= shift->link =~ m|^L<([^/]+)|; $_
+        ($_)= shift->link =~ m|^L<([^/]+)|;
+        Doc->new( id => $_ )
     },
 );
 
 has 'section' => (
     is => 'ro', isa => 'Str',
     lazy => 1, default => sub{
-        ($_)= shift->link =~ m|^L<.*?/([^/]+)|; $_
+        ($_)= shift->link =~ m|^L<.*?/([^/]+)|;
+        length $_
+            or die qq{'section' can't be empty!\n} ;
+        $_
     },
     predicate => 'has_section',
 );
 
 has 'keyphrases' => (
-    is => 'ro', isa => 'ArrayRef',
+    is => 'ro', isa => 'Keyphrase',
     lazy => 1, default => sub{
         ($_)= shift->link =~ m|^L<.*?/.*?/([^>]+)|;
+        Keyphrase->new( string => $_ );
+    },
+    predicate => 'has_keyphrases',
+);
+
+
+package Doc;
+use Moose;
+
+has 'id' => ( is => 'ro', isa => 'Str', required => 1, );
+
+has 'prefix' => (
+    is => 'ro', isa => 'Str',
+    lazy => 1, default => sub{
+        ($_)= shift->id =~ m|^(\D+)|; $_
+    },
+);
+
+has 'num' => (
+    is => 'ro', isa => 'Str',
+    lazy => 1, default => sub{
+        ($_)= shift->id =~ m|(\d+)$|; $_
+    },
+);
+
+
+package Keyphrase;
+use Moose;
+use Text::Balanced qw/extract_multiple extract_quotelike/;
+
+has 'string' => ( is => 'ro', isa => 'Str', required => 1, );
+
+has 'list' => (
+    is => 'ro', isa => 'ArrayRef',
+    lazy => 1, default => sub{
         [
             extract_multiple($_, [
                 sub{
@@ -41,21 +80,6 @@ has 'keyphrases' => (
                 },
             ])
         ]
-    },
-    predicate => 'has_keyphrases',
-);
-
-has 'docprefix' => (
-    is => 'ro', isa => 'Str',
-    lazy => 1, default => sub{
-        ($_)= shift->doc =~ m|^(\D+)|; $_
-    },
-);
-
-has 'docnum' => (
-    is => 'ro', isa => 'Str',
-    lazy => 1, default => sub{
-        ($_)= shift->doc =~ m|(\d+)$|; $_
     },
 );
 
@@ -90,6 +114,20 @@ has 'extension' => (
     },
 );
 
+has 'filehandle' => ( is => 'ro', isa => 'FileHandle', );
+has 'mode' => ( is => 'ro', isa => 'Str', );
+
+sub open {
+    my $self= shift;
+    my( $mode )= @_;
+    open $self->{filehandle}, $mode => $self->filename
+        or die qq{can't open } . $self->filename . qq{: $!};
+    $self->{mode}= $mode;
+    $self->filehandle
+}
+
+sub close { }
+
 
 package PodFile;
 use Moose;
@@ -103,8 +141,7 @@ has 'tree' => (
     lazy => 1, default => sub {
         my $self= shift;
 
-        open my $in, '<' => $self->filename
-            or die qq{can't open } . $self->filename . qq{ for reading: $!$/};
+        my $in= $self->open( '<' );
 
         my $tree= {};
         my $section;
@@ -130,6 +167,8 @@ has 'tree' => (
         $tree;
     },
 );
+
+sub parse { shift->tree }
 
 
 package SpecFile;
@@ -274,29 +313,130 @@ _EOC_
     },
 );
 
+## XXX: works for me, probably not for all
 has 'specroot' => (
-    is => 'ro', isa => 'HashRef',
-    default => sub{ { PDD => '', S => '' } },
+    is => 'rw', isa => 'HashRef',
+    default => sub{
+        { PDD => 'docs/pdds', S => '../../perl6/doc/trunk/design/syn' }
+    },
 );
 
 has 'specfiles' => (
-    is => 'ro', isa => 'SpecFiles',
+    is => 'ro', isa => subtype( 'HashRef'
+        => where {
+            for my $key ( keys %$_ ) {
+                return unless blessed($$_{$key})
+                    && $$_{$key}->isa('SpecFiles')
+                    && $$_{$key}->prefix eq $key;
+            }
+            1
+        },
+    ),
     lazy => 1, default => sub{
         my $self= shift;
+        my %hash;
+        for( keys %{ $self->specroot } ) {
+            $hash{$_}= SpecFiles->new(
+                prefix => $_, root => ${ $self->specroot }{$_}
+            );
+        }
+        \%hash
     },
 );
 
 has 'testfiles' => (
     is => 'ro', isa => subtype( 'ArrayRef'
-        => where { (blessed($_) && $_->isa('TestFile') || return) for @$_; 1 } ),
+        => where { (blessed($_) && $_->isa('TestFile') || return) for @$_; 1 }
+    ),
     lazy => 1, default => sub{
         my $self= shift;
-        [ map { TestFile->new( filename => $_ ) } glob @ARGV ]
+        [ map { TestFile->new( filename => $_ ) } <@ARGV> ]
     },
 );
+
+has 'linktree' => (
+    is => 'ro', isa => 'LinkTree',
+    lazy => 1, default => sub{
+        my $self= shift;
+        my $tree= LinkTree->new;
+
+        for my $file (@{$self->testfiles}) {
+            my $in= $file->open( '<' );
+
+            my( $setter, $from, $to );
+            my $link;
+            while(<$in>) {
+                chomp;
+                my $new_from;
+                if( /^ \s* \#+? \s* (L<.*>) \s* $/xo ) {
+                    $link= SmartLink->new( link => $1 );
+                    $new_from = $.;
+                    $to = $. - 1;
+                }
+                ## XXX: eliminated two-line smartlink for ease of implementation
+                else { next; }
+
+                ## XXX: this logic seems contorted, nay, buggy
+                if ($from and $from == $to) {
+                    my $old_setter = $setter;
+                    my $old_from = $from;
+                    $setter = sub {
+                        $tree->add_link( $link, $file, $_[0], $_[1] );
+                        $old_setter->($old_from, $_[1]);
+                    };
+                } else {
+                    $setter->($from, $to) if $setter and $from;
+                    $setter = sub {
+                        $tree->add_link($link, $file, $_[0], $_[1] );
+                    };
+                }
+                $from = $new_from;
+
+                $setter->( $from, $. ) if $setter and $from;
+                $file->close;
+            }
+        }
+        $tree
+    },
+);
+
+sub emit {
+    my $self= shift;
+}
+
+
+package LinkTree;
+use Moose;
+
+has 'tree' => ( is => 'rw', isa => 'HashRef', default => sub{ {} }, );
+
+sub add_link {
+    my $self= shift;
+    my( $link, $file, $from, $to )= @_;
+    my $tree= $self->tree;
+
+    $tree->{$link->doc->id} ||= {};
+    $tree->{$link->doc->id}{$link->section} ||= [];
+
+    push @{ $tree->{$link->doc->id}{$link->section} } => [
+        $link->keyphrases->string,
+        [ $file->name, $from, $to ],
+    ];
+    $self->inc_link_count;
+    $tree
+}
+
+has 'count' => ( is => 'rw', isa => 'Int', default => 0 );
+
+sub inc_link_count { my $self= shift; $self->count( $self->count + 1 ); }
 
 
 $_^=~ { AUTHOR => 'particle' };
 
 
-## vim: shiftwidth=4 expandtab
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

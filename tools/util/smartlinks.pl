@@ -32,11 +32,16 @@ mkdir $o{outdir}
 my $sls= SmartLinkServer->new;
 
 use Data::Dumper; $Data::Dumper::Indent= 1;
-print Dumper $sls->testfiles;
 
-## TODO: scan test files; collect smartlinks and positional info.
-## TODO: relate and store smartlink info with test filenames and line numbers
-## TODO: process spec files, integrate smartlink info, emit html
+## scan test files; collect smartlinks and positional info.
+## relate and store smartlink info with test filenames and line numbers
+print Dumper $sls->linktree;
+
+## process spec files
+#print Dumper $sls->specfiles;
+#print Dumper $sls->specfiles->{PDD}->files->[2]->tree;
+
+## TODO: integrate smartlink info, emit html
 
 
 __END__
