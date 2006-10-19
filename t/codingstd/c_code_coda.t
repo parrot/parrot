@@ -32,6 +32,8 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
+## L<PDD07/Smart Editor Style Support/"C source files, and files largely consisting of C" "must end with this coda">
+
 my $coda = <<'CODA';
 /*
  * Local variables:
