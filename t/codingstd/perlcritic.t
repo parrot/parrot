@@ -13,7 +13,7 @@ use File::Find;
 use Test::More;
 
 BEGIN {
-    eval { require Test::Perl::Critic; };
+    eval { use Test::Perl::Critic (-verbose => 7); };
     if ($@) {
         plan skip_all => 'Test::Perl::Critic not installed';
     }
@@ -77,6 +77,7 @@ if ( !keys %policies ) {
 
 if ($list_policies) {
     use Data::Dumper;
+    $Data::Dumper::Indent = 1;
     warn Dumper( \%policies );
     exit;
 }
