@@ -171,6 +171,26 @@ sub keys
     return keys %{$self->{c}};
 }
 
+=item C<slurp()>
+
+Slurps in Parrot::Config data from previous configure.
+
+Accepts no arguments.
+
+=cut
+
+sub slurp()
+{
+  my $self = shift;
+  
+  my $res = eval {
+    use Parrot::Config;
+    \%PConfig
+  };
+
+  $self->{c} = $res;
+}
+
 =item C<dump()>
 
 Provides a L<Data::Dumper> serialized string of the objects key/value pairs
