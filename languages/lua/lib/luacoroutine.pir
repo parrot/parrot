@@ -24,11 +24,13 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 .include 'languages/lua/lib/luaaux.pir'
 
 .sub 'init_coroutine' :load :anon
-    load_bytecode 'languages/lua/lib/luabasic.pir'
+
+#    load_bytecode 'languages/lua/lib/luaaux.pbc'
+    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Coroutine\n"
 
-    load_bytecode 'Parrot/Coroutine.pir'
+    load_bytecode 'Parrot/Coroutine.pbc'
     $P0 = subclass 'Parrot::Coroutine', 'thread'
 
     .local pmc _lua__GLOBAL

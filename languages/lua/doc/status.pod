@@ -89,7 +89,7 @@ Try to use Parse::RecDescent (the original Lua uses a LL parser).
 =head1 Lua PMC
 
 There are eight basic types in Lua, each of them is implemented by a PMC,
-except 'thread'.
+except C<thread>.
 
 =over 4
 
@@ -176,11 +176,6 @@ F<languages/lua/lib/luaaux.pir> is the equivalent of Auxiliary Library.
 Except math library, all of these libraries are incomplete.
 
 And the coroutine library does not work.
-
-=head2 KNOWN PROBLEMS
-
-Currently, these libraries are included as PIR file (not loaded as bytecode
-PBC) because HLL support for Sub/Closure is incomplete with PBC.
 
 =head1 Next Milestones
 

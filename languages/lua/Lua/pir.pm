@@ -19,29 +19,17 @@ package pirVisitor;
 
 .sub '__start' :main
 #  print "start Lua\n"
-  load_bytecode 'languages/lua/lib/luabasic.pir'
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
-  load_bytecode 'languages/lua/lib/luapackage.pir'
-  load_bytecode 'languages/lua/lib/luastring.pir'
-  load_bytecode 'languages/lua/lib/luatable.pir'
-  load_bytecode 'languages/lua/lib/luamath.pir'
-  load_bytecode 'languages/lua/lib/luaio.pir'
-  load_bytecode 'languages/lua/lib/luaos.pir'
-  load_bytecode 'languages/lua/lib/luadebug.pir'
 
-#
-#  PBC loader does not support LuaFunction
-#
-
-#  load_bytecode 'languages/lua/lib/luabasic.pbc'
+  load_bytecode 'languages/lua/lib/luabasic.pbc'
 #  load_bytecode 'languages/lua/lib/luacoroutine.pbc'
-#  load_bytecode 'languages/lua/lib/luapackage.pbc'
-#  load_bytecode 'languages/lua/lib/luastring.pbc'
-#  load_bytecode 'languages/lua/lib/luatable.pbc'
-#  load_bytecode 'languages/lua/lib/luamath.pbc'
-#  load_bytecode 'languages/lua/lib/luaio.pbc'
-#  load_bytecode 'languages/lua/lib/luaos.pbc'
-#  load_bytecode 'languages/lua/lib/luadebug.pbc'
+  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/luapackage.pbc'
+  load_bytecode 'languages/lua/lib/luastring.pbc'
+  load_bytecode 'languages/lua/lib/luatable.pbc'
+  load_bytecode 'languages/lua/lib/luamath.pbc'
+  load_bytecode 'languages/lua/lib/luaio.pbc'
+  load_bytecode 'languages/lua/lib/luaos.pbc'
+  load_bytecode 'languages/lua/lib/luadebug.pbc'
   _main()
 .end
 

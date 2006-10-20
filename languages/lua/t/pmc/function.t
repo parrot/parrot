@@ -212,9 +212,6 @@ nil
 nil
 OUTPUT
 
-TODO: {
-local $TODO = 'PBC loader does not support LuaFunction';
-
 pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
 .namespace [ "Lua" ]
 .HLL "Lua", "lua_group"
@@ -238,7 +235,6 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
 CODE
 /function: [0-9A-Fa-f]{8}/
 OUTPUT
-}
 
 # Local Variables:
 #   mode: cperl

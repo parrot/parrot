@@ -29,9 +29,8 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
 
 .sub 'init_table' :load :anon
 
-    load_bytecode 'languages/lua/lib/luabasic.pir'
 #    load_bytecode 'languages/lua/lib/luaaux.pbc'
-#    load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Table\n"
 

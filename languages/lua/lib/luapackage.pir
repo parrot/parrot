@@ -23,9 +23,8 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
 
 .sub 'init_package' :load :anon
 
-    load_bytecode 'languages/lua/lib/luabasic.pir'
 #    load_bytecode 'languages/lua/lib/luaaux.pbc'
-#    load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Package\n"
 

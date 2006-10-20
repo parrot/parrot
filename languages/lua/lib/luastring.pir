@@ -35,9 +35,8 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
 .sub 'init_string' :load :anon
 
-    load_bytecode 'languages/lua/lib/luabasic.pir'
 #    load_bytecode 'languages/lua/lib/luaaux.pbc'
-#    load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua String\n"
 
