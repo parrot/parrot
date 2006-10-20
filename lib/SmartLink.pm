@@ -83,6 +83,18 @@ has 'list' => (
     },
 );
 
+has 'regex' => (
+    is => 'ro', isa => 'Str',
+    lazy => 1, default => sub{
+        join '.+?' => map {
+            my $key= quotemeta $_;
+            $key =~ s/^\w/\\b$&/;
+            $key =~ s/\w$/$&\\b/;
+            $key;
+        } @{[ shift->list ]};
+    },
+);
+
 
 package File;
 use Moose;
@@ -201,7 +213,7 @@ has 'files' => (
         => where { (blessed($_) && $_->isa('PodFile') || return) for @$_; 1 } ),
     lazy => 1, default => sub{
         my $self= shift;
-        return [ map { SpecFile->new( filename => $_, prefix => $self->prefix  ) }
+        [ map { SpecFile->new( filename => $_, prefix => $self->prefix  ) }
             glob catfile( $self->root, $self->prefix . '*' . $self->extension )]
     },
 );
@@ -249,7 +261,7 @@ use Moose;
 use Moose::Util::TypeConstraints;
 
 has 'specmap' => (
-    is => 'ro', isa => 'HashRef', default => sub{ return {
+    is => 'ro', isa => 'HashRef', default => sub{ {
         'PDD' => {reverse qw(
             00 pdd          01 overview    02 vtables   03 calling_conventions
             04 datatypes    05 opfunc      06 pasm      07 codingstd
@@ -400,6 +412,31 @@ has 'linktree' => (
     },
 );
 
+has 'mergetree' =>(
+    is => 'ro', isa => 'HashRef',
+    lazy => 1, default => sub{
+        my $self= shift;
+        my $tree= {};
+        for my $spectype ( keys %{ $self->specfiles } ) {
+            my $specs= $self->specfiles_of_type( $spectype );
+            $specs= $specs->files;
+            for my $spec ( @$specs ) {
+                my $linkdoc= $self->linktree->get_doc( $spec->name );
+                warn $spec->name; # XXX: FIXME: TODO:
+                next unless $linkdoc;
+                $spec->{_sections}++
+            }
+        }
+        $tree
+    },
+);
+
+sub specfiles_of_type {
+    my $self= shift;
+    my( $type )= @_;
+    $self->specfiles->{$type}
+}
+
 sub emit {
     my $self= shift;
 }
@@ -410,25 +447,58 @@ use Moose;
 
 has 'tree' => ( is => 'rw', isa => 'HashRef', default => sub{ {} }, );
 
+has 'count' => ( is => 'rw', isa => 'Int', default => 0 );
+
+sub inc_link_count { my $self= shift; $self->count( $self->count + 1 ); }
+
+sub get_doc { return shift->{shift} }
+
+sub get_link_doc {
+    my $self= shift;
+    my( $link )= @_;
+    $self->tree->{$link->doc->id}
+        if defined $self->tree->{$link->doc->id};
+}
+
+sub get_link_section {
+    my $self= shift;
+    my( $link )= @_;
+    my $doc= $self->get_link_doc( $link );
+    $doc->{$link->section}
+        if defined $doc and defined $doc->{$link->section};
+}
+
+sub add_link_doc {
+    my $self= shift;
+    my( $link )= @_;
+    $self->tree->{$link->doc->id}= {}
+        unless $self->get_link_doc( $link );
+}
+
+sub add_link_section {
+    my $self= shift;
+    my( $link )= @_;
+    $self->add_link_doc( $link );
+    my $doc= $self->get_link_doc( $link );
+    $doc->{$link->section}= []
+        unless defined $doc->{$link->section};
+}
+
 sub add_link {
     my $self= shift;
     my( $link, $file, $from, $to )= @_;
     my $tree= $self->tree;
 
-    $tree->{$link->doc->id} ||= {};
-    $tree->{$link->doc->id}{$link->section} ||= [];
+    $self->add_link_section( $link );
+    my $section= $self->get_link_section( $link );
 
-    push @{ $tree->{$link->doc->id}{$link->section} } => [
+    push @$section => [
         $link->keyphrases->string,
         [ $file->name, $from, $to ],
     ];
     $self->inc_link_count;
     $tree
 }
-
-has 'count' => ( is => 'rw', isa => 'Int', default => 0 );
-
-sub inc_link_count { my $self= shift; $self->count( $self->count + 1 ); }
 
 
 $_^=~ { AUTHOR => 'particle' };

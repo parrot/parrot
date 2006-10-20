@@ -35,13 +35,14 @@ use Data::Dumper; $Data::Dumper::Indent= 1;
 
 ## scan test files; collect smartlinks and positional info.
 ## relate and store smartlink info with test filenames and line numbers
-print Dumper $sls->linktree;
+#print Dumper $sls->linktree;
 
 ## process spec files
 #print Dumper $sls->specfiles;
-#print Dumper $sls->specfiles->{PDD}->files->[2]->tree;
+#print Dumper $sls->specfiles_of_type('PDD')->files->[2]->tree;
 
 ## TODO: integrate smartlink info, emit html
+print Dumper $sls->mergetree
 
 
 __END__
