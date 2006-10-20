@@ -237,7 +237,7 @@ can_ok('Parrot::Configure', qw(
     cmp_ok($test::step::stepparams::self, 'ne', $test::step::stepparams::conf,
         '$self and $conf params are not the same object');
     is_deeply(\@test::step::stepparams::params, [24, qw( bar baz bong ), 42],
-        "proper additional parameters were passed to ->runstep()");
+        'proper additional parameters were passed to ->runstep()');
 }
 
 {
@@ -256,15 +256,15 @@ can_ok('Parrot::Configure', qw(
 
     package main;
 
-    my $pc = Parrot::Configure->new;
+    my $pc = Parrot::Configure->new();
 
     # send warnings to stdout
     open *STDERR, '>', "&STDOUT" or die "Can't dup STDOUT: $!";
 
     $pc->add_step('test::step::stepfail');
-    my $ret = $pc->runsteps;
+    my $ret = $pc->runsteps();
     print "\n";
-    is($ret, undef, "->runsteps() returns undef on failure");
+    is( ref $ret, 'Parrot::Configure', '->runsteps() returns even on failure a Parrot::Configure instance' );
 }
 
 # Local Variables:
