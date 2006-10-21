@@ -32,21 +32,28 @@ Log::Log4perl->easy_init( { level    => $DEBUG,
 
 my $logger = Log::Log4perl->get_logger();
 
-my $phc_str = `phc --dump-ast-xml languages/plumhead/t/hello_1.php`;
+my ( $php_fn ) = @ARGV;
+
+# Generate the PHP AST as XML
+my $phc_str = `phc --dump-ast-xml $php_fn`;
 $logger->debug( $phc_str );
 
-my $parser = XML::LibXML->new();
-my $xslt = XML::LibXSLT->new();
+my $parser      = XML::LibXML->new();
+my $xslt        = XML::LibXSLT->new();
   
 my $phc_ast     = $parser->parse_string( $phc_str );
 my $phc_to_past = $parser->parse_file( 'languages/plumhead/phc_to_past.xsl' );
 my $transform   = $xslt->parse_stylesheet( $phc_to_past );
 my $past        = $transform->transform( $phc_ast );
 
-open ( my $pir_fh, '>', 'languages/plumhead/t/hello_1.pir' );
+my $pir_fn = $php_fn;
+$pir_fn =~ s/ \. .* //;
+$pir_fn .= '.pir';
+
+open my $pir_fh, '>', $pir_fn or die "Can't open $pir_fn: $!";
 print {$pir_fh} $transform->output_string( $past );
 
-system( './parrot languages/plumhead/t/hello_1.pir' );
+system "./parrot $pir_fn";
 
 =head1 SEE ALSO
 
