@@ -29,15 +29,16 @@ END_HERE
 );
 
 my $builder = $class->new(
-    module_name         => 'Parrot::Embed',
-    license             => 'perl',
-    dist_author         => 'chromatic <chromatic@wgz.org>',
-    dist_version_from   => 'lib/Parrot/Embed.pm',
-    build_requires =>
+	module_name         => 'Parrot::Embed',
+	license             => 'perl',
+	dist_author         => 'chromatic <chromatic@wgz.org>',
+	dist_version_from   => 'lib/Parrot/Embed.pm',
+	build_requires =>
 	{
-        'Test::More' => 0,
-    },
-    add_to_cleanup      => [ 'Parrot-Embed-*' ],
+		'Test::More'         => 0,
+		'ExtUtils::CBuilder' => 0,
+	},
+	add_to_cleanup      => [ 'Parrot-Embed-*' ],
 	extra_compiler_flags => $cflags,
 	extra_linker_flags   => $lflags,
 );
@@ -84,9 +85,11 @@ sub get_flags_from_parrot_src
 		chomp;
 		last unless /\S/;
 		my ($var, $value) =  split(/: /, $_);
-		$value            =~ s/{(\w+)}/$vars{$1}/g;
+		$value            =~ s/\${(\w+)}/$vars{$1}/g;
 		$vars{$var}       =  $value;
 	}
+
+	$vars{Cflags} .= ' -I' . File::Spec->catdir( $updir, $updir, 'include' );
 
 	return @vars{qw( Cflags Libs )};
 }

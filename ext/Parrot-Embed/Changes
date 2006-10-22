@@ -3,6 +3,7 @@ Revision history for Parrot-Embed
 0.02	Fri Oct 13 22:14:45 UTC 2006
 	- made Parrot::Interpreter and Parrot::PMC objects
 	- attempted to make GC and refcounts work correctly
+	- fix in-tree build (hopefully)
 
 0.01    Date/time
     -	First version, released on an unsuspecting world.
