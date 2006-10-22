@@ -558,11 +558,11 @@ op set_returns(inconst PMC) {
 	/* else it's from runops_fromc */
 	parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx;
 	if (! caller_ctx) {
-	    real_exception(interpreter, NULL, INVALID_OPERATION,
-			   "null caller_ctx for ccont %p", ccont);
+	    /* there is no point calling real_exception here, because
+	       PDB_backtrace can't deal with a missing to_ctx either. */
+	    internal_exception(1, "No caller_ctx for continuation %p.", ccont);
 	}
-	parrot_pass_args(interpreter, ctx, caller_ctx,
-		PARROT_OP_get_results_pc);
+	parrot_pass_args(interpreter, ctx, caller_ctx, PARROT_OP_get_results_pc);
     }
     argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);
