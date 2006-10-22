@@ -306,8 +306,8 @@ key_integer(Interp *interpreter, PMC *key)
         s_reg = REG_STR(PMC_int_val(key));
         return string_to_int(interpreter, s_reg);
     default:
-        internal_exception(1, "no key conversion found");
-        return 0;
+        /* TODO check for slice_FLAGs */
+        return VTABLE_get_integer(interpreter, key);
     }
 }
 
