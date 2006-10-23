@@ -25,6 +25,8 @@ PMCS = \
  luauserdata
 
 PBCS = \
+ $(LIBPATH)/thread.pbc \
+ $(LIBPATH)/luaaux.pbc \
  $(LIBPATH)/luabasic.pbc \
  $(LIBPATH)/luacoroutine.pbc \
  $(LIBPATH)/luapackage.pbc \
@@ -33,8 +35,7 @@ PBCS = \
  $(LIBPATH)/luamath.pbc \
  $(LIBPATH)/luaio.pbc \
  $(LIBPATH)/luaos.pbc \
- $(LIBPATH)/luadebug.pbc \
- $(LIBPATH)/luaaux.pbc
+ $(LIBPATH)/luadebug.pbc
 
 GEN_PIR = \
  src/lua51_grammar_gen.pir \
@@ -74,6 +75,12 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
+$(LIBPATH)/thread.pbc: $(LIBPATH)/thread.pir
+	$(PARROT) --output=$(LIBPATH)/thread.pbc $(LIBPATH)/thread.pir
+
+$(LIBPATH)/luaaux.pbc: $(LIBPATH)/luaaux.pir
+	$(PARROT) --output=$(LIBPATH)/luaaux.pbc $(LIBPATH)/luaaux.pir
+
 $(LIBPATH)/luabasic.pbc: $(LIBPATH)/luabasic.pir
 	$(PARROT) --output=$(LIBPATH)/luabasic.pbc $(LIBPATH)/luabasic.pir
 
@@ -100,9 +107,6 @@ $(LIBPATH)/luaos.pbc: $(LIBPATH)/luaos.pir
 
 $(LIBPATH)/luadebug.pbc: $(LIBPATH)/luadebug.pir
 	$(PARROT) --output=$(LIBPATH)/luadebug.pbc $(LIBPATH)/luadebug.pir
-
-$(LIBPATH)/luaaux.pbc: $(LIBPATH)/luaaux.pir
-	$(PARROT) --output=$(LIBPATH)/luaaux.pbc $(LIBPATH)/luaaux.pir
 
 Lua/parser.pm: Lua/lua51.yp
 	yapp -s -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp

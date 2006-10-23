@@ -110,7 +110,7 @@ This type allows OO extension.
 
 Currently, C<file> in I/O library is an C<userdata>.
 
-=item * thread
+=item * thread F<languages/lua/lib/thread.pir>
 
 This type is used to implement coroutines.
 The current implementation use the library Parrot::Coroutine.

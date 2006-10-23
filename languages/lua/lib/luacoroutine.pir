@@ -25,13 +25,11 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 
 .sub 'init_coroutine' :load :anon
 
+    load_bytecode 'languages/lua/lib/thread.pir'
 #    load_bytecode 'languages/lua/lib/luaaux.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Coroutine\n"
-
-    load_bytecode 'Parrot/Coroutine.pbc'
-    $P0 = subclass 'Parrot::Coroutine', 'thread'
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
@@ -194,62 +192,6 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
     .local pmc co   # current coroutine ?
     (ret :slurpy) = co.'yield'(argv :flat)
     .return (ret :flat)
-.end
-
-
-.namespace ['thread']
-
-.sub '__clone' :method
-    .local pmc ret
-    ret = self  # fixme
-    .return (ret)
-.end
-
-.sub '__get_integer' :method
-    $I0 = 0     # fixme
-    .return ($I0) 
-.end
-
-.sub '__get_string' :method
-    new $P0, .Array
-    $P0 = 1
-    $P0[0] = self
-    $S0 = sprintf "thread: %08X", $P0
-    .return ($S0)
-.end
-
-.sub '__get_bool' :method
-    $I0 = 1
-    .return ($I0)
-.end
-
-.sub '__logical_not' :method
-    .param pmc dummy
-    .local pmc ret
-    new ret, .LuaBoolean
-    .return (ret)
-.end
-
-.sub 'rawequal' :method
-    .param pmc value
-    .local pmc ret
-    new ret, .LuaBoolean
-    not_implemented()
-    .return (ret)
-.end
-
-.sub 'tonumber' :method
-    .local pmc ret
-    new ret, .LuaNil
-    .return (ret)
-.end
-
-.sub 'tostring' :method
-    .local pmc ret
-    new ret, .LuaString
-    $S0 = self.__get_string()
-    ret = $S0
-    .return (ret)
 .end
 
 =back

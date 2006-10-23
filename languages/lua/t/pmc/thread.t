@@ -12,15 +12,15 @@ t/pmc/thread.t - LuaThread
 
 =head1 DESCRIPTION
 
-Tests C<LuaThread> PMC
-(implemented in F<languages/lua/pmc/luathread.pmc>).
+Tests Lua C<thread> type
+(implemented in F<languages/lua/lib/thread.pir>).
 
 =cut
 
 use strict;
 use warnings;
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -28,7 +28,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/thread.pir'
   _main()
 .end
 .sub '_main'
@@ -59,7 +59,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/thread.pir'
   _main()
 .end
 .sub '_main'
@@ -90,7 +90,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/thread.pir'
   _main()
 .end
 .sub '_main'
@@ -115,7 +115,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/thread.pir'
   _main()
 .end
 .sub '_main'
@@ -142,7 +142,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/thread.pir'
   _main()
 .end
 .sub '_main'
@@ -175,7 +175,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/thread.pir'
   _main()
 .end
 .sub '_main'
@@ -206,7 +206,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/thread.pir'
   _main()
 .end
 .sub '_main'
@@ -230,6 +230,35 @@ CODE
 nil
 nil
 OUTPUT
+
+TODO: {
+local $TODO = 'pb with MMD function';
+
+pir_output_like( << 'CODE', << 'OUTPUT', 'check __add' );
+.namespace [ 'Lua' ]
+.HLL 'Lua', 'lua_group'
+
+.sub '__start' :main
+  load_bytecode 'languages/lua/lib/thread.pir'
+  _main()
+.end
+.sub '_main'
+    .const .LuaNumber cst1 = "3.14"
+    .const .Sub F1 = "f1"
+    find_type $I0, "thread"
+    .local pmc pmc1
+    pmc1 = new $I0, F1 
+    $P0 = add pmc1, cst1
+    end
+.end
+.sub 'f1'
+    print "f1()\n"
+    end
+.end
+CODE
+/attempt to perform arithmetic on a thread value/
+OUTPUT
+}
 
 # Local Variables:
 #   mode: cperl

@@ -19,10 +19,10 @@ package pirVisitor;
 
 .sub '__start' :main
 #  print "start Lua\n"
+  load_bytecode 'languages/lua/lib/thread.pir'
 
   load_bytecode 'languages/lua/lib/luabasic.pbc'
-#  load_bytecode 'languages/lua/lib/luacoroutine.pbc'
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
+  load_bytecode 'languages/lua/lib/luacoroutine.pbc'
   load_bytecode 'languages/lua/lib/luapackage.pbc'
   load_bytecode 'languages/lua/lib/luastring.pbc'
   load_bytecode 'languages/lua/lib/luatable.pbc'
