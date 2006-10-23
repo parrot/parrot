@@ -203,10 +203,20 @@ headers or changes to the format of the data held within a segment.
 
 The minor version number should be incremented in all other cases when a
 change is made that means a previous version of Parrot would not be able to
-run the program encoded in the packfile. This is mostly opcode re-numbering or
-the addition of new opcodes.
+run the program encoded in the packfile. This includes:
 
-{{ QUESTION: Should this also include changes to the core PMC types? }}
+=over 4
+
+=item Opcode renumbering
+
+=item Addition of new opcodes and removal of existing ones
+
+=item Addition of new core PMCs and removal of existing ones
+
+=item Changes to the interface (externally visible behaviour) of an opcode or
+PMC
+
+=back
 
 A single version of Parrot can support reading and writing of more than one
 bytecode file format. In fact, once Parrot is in production use it will be
@@ -294,6 +304,7 @@ an individual entry.
   |        |        |    0x04 - Bytecode Segment                             |
   |        |        |    0x05 - Annotations Segment                          |
   |        |        |    0x06 - PIC Data Segment                             |
+  |        |        |    0x07 - Dependencies Segment                         |
   +--------+--------+--------------------------------------------------------+
   | 1      | n      | The name of the segment, as a (NULL terminated) ASCII  |
   |        |        | C string. This must be padded with trailing NULL       |
@@ -407,11 +418,17 @@ the start of the constant including its type.
   +--------+--------+--------------------------------------------------------+
   | 1      | 1      | Flags, copied from the string structure.               |
   +--------+--------+--------------------------------------------------------+
-  | 2      | 1      | Character set, copied from the string structure.       |
+  | 2      | 1      | Character set; either the index of a built-in one or a |
+  |        |        | dynamically loaded one whose index is in a range given |
+  |        |        | in the dependencies table.                             |
   +--------+--------+--------------------------------------------------------+
-  | 3      | 1      | Length of the string data in bytes.                    |
+  | 3      | 1      | Encoding, either the index of a built-in one or a      |
+  |        |        | dynamically loaded one whose index is in a range given |
+  |        |        | in the dependencies table.                             |
   +--------+--------+--------------------------------------------------------+
-  | 4      | n      | String data with trailing zero padding as required.    |
+  | 4      | 1      | Length of the string data in bytes.                    |
+  +--------+--------+--------------------------------------------------------+
+  | 5      | n      | String data with trailing zero padding as required.    |
   +--------+--------+--------------------------------------------------------+
 
 =head4 PMC Constants
@@ -593,6 +610,60 @@ for that key with another annotation. This means that if 20 instructions make
 up the compiled form of a single line of code, only one line annotation is
 required. Note that this also implies that annotations must be placed in
 the same order as the instructions.
+
+
+=head3 Dependencies Segment
+
+This segment holds a table of external and possibly dynamically loaded items
+that are needed for this packfile to run. This includes:
+
+=over 4
+
+=item Dynamic PMC libraries (.loadlib)
+
+=item Dynamic opcode libraries (.loadlib)
+
+=item Dynamically loaded string encoding
+
+=item Dynamically loaded character set
+
+=back
+
+The segment starts with the number of entries in the table.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Number of entries in the dependencies table.           |
+  |        |        |    n                                                   |
+  +--------+--------+--------------------------------------------------------+
+
+Following this are n entries of variable length, taking the following format.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Number of entries in the dependencies table.           |
+  |        |        |    0x00 - Dynamic PMC Library                          |
+  |        |        |    0x01 - Dynamic Opcode Library                       |
+  |        |        |    0x02 - Dynamically Loaded String Encoding           |
+  |        |        |    0x03 - Dynamically Loaded Character Set             |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | n      | A hint for finding and loading the resource; usually   |
+  |        |        | the name of the dynamic library, but possibly a full   |
+  |        |        | path too. Given as an ASCII NULL-terminated string,    |
+  |        |        | zero-padded to a full word.                            |
+  +--------+--------+--------------------------------------------------------+
+  | n + 1  | 1      | The lowest index for the given type of resource that   |
+  |        |        | is contained in this dependency. For example, if this  |
+  |        |        | entry was for a dynamic opcode library containing ops  |
+  |        |        | numbered 5000 through 5042, this entry would be 5000.  |
+  +--------+--------+--------------------------------------------------------+
+  | n + 2  | 1      | The highest index for the given type of resource that  |
+  |        |        | is contained in this dependency. For example, if this  |
+  |        |        | entry was for a dynamic opcode library containing ops  |
+  |        |        | numbered 5000 through 5042, this entry would be 5042.  |
+  +--------+--------+--------------------------------------------------------+
 
 
 
