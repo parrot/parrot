@@ -333,6 +333,11 @@ MMD_LuaFunction: {
                     "attempt to compare two function values");
             return (INTVAL)0;
         }
+MMD_LuaClosure: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare two function values");
+            return (INTVAL)0;
+        }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to compare function with %s",

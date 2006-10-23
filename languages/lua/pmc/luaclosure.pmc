@@ -310,7 +310,7 @@ Throws an exception.
 
 */
     INTVAL is_equal (PMC* value) {
-MMD_LuaFunction: {
+MMD_LuaClosure: {
             return (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
                 && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg;
         }
@@ -328,6 +328,11 @@ MMD_DEFAULT: {
 */
     INTVAL cmp (PMC* value) {
 MMD_LuaFunction: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare two function values");
+            return (INTVAL)0;
+        }
+MMD_LuaClosure: {
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to compare two function values");
             return (INTVAL)0;
