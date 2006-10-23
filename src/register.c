@@ -389,7 +389,7 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
             
             fprintf(stderr, "[free  ctx %p of sub '%s']\n",
                     ctxp,
-                    (doomed->name == 0xdeadbeef
+                    (doomed->name == (void*)0xdeadbeef
                      ? "???"
                      : (char*)doomed->name->strstart));
         }
