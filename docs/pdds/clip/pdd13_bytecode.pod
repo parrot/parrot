@@ -179,7 +179,7 @@ Note that in this section only, offsets and lengths are in bytes.
   |        |        | that UUIDs are stored and read as strings. The UUID is |
   |        |        | computed by applying the hash function specified in    |
   |        |        | the UUID type field over the entire packfile not       |
-  |        |        | including this header and the trailing zero padding.   |
+  |        |        | including this header and its trailing zero padding.   |
   +--------+--------+--------------------------------------------------------+
   | 18 + u | n      | Zero-padding to make the total header length a         |
   |        |        | multiple of 16 bytes in length.                        |
@@ -496,9 +496,21 @@ key/value pairs associated with it. These can be retrived at runtime. High
 level languages can use annotations to store file names, line numbers, column
 numbers and any other data, for debug purposes or otherwise, that they need.
 
-The segment comes in two parts: a list of annotation keys (such as "line" and
-"file"), followed by a list of indexes into the bytecode stream and key/value
-pairings (from instruction 235, the annotation "line" has value "42").
+The segment comes in three parts:
+
+=over 4
+
+=item A list of annotation keys (for example, "line" and "file").
+
+=item An annotation groups table, used to group together annotations for a
+particular HLL source file (an annotation group starting clears all active
+annotations, so they will not spill over between source files; it also
+allows for faster lookup of annotations).
+
+=item A list of indexes into the bytecode stream and key/value pairings (for
+example, starting at instruction 235, the annotation "line" has value "42").
+
+=back
 
 The first word in the segment supplies the number of keys.
 
@@ -524,6 +536,33 @@ key. Key entries take the following format.
   |        |        |    0x01 - String Constant                              |
   |        |        |    0x02 - Number Constant                              |
   |        |        |    0x03 - PMC Constant                                 |
+  +--------+--------+--------------------------------------------------------+
+
+The annotation groups table comes next. This starts with a single integer to
+specify the numbe of entries in the table.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Number of annotation group entries that follow.        |
+  |        |        |    n                                                   |
+  +--------+--------+--------------------------------------------------------+
+
+A group entry maps an offset in the bytecode segment to an offset in the list
+of annotations (that is, offset 0 refers to the first word following this
+table). The list of offsets into the bytecode segment (and by the definition
+of this segment, the offsets into the annotations list) must be in ascending
+order.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Offset into the bytecode segment where the             |
+  |        |        | instructions for a particular high level source file   |
+  |        |        | start.                                                 |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Offset into the annotations list specifying where the  |
+  |        |        | annotations for the given instruction start.           |
   +--------+--------+--------------------------------------------------------+
 
 The rest of the segment is made up of a sequence of instructions to key and
@@ -552,7 +591,8 @@ Note that the value of an annotation with a particular key is taken to apply
 to all following instructions up to the point of a new value being specified
 for that key with another annotation. This means that if 20 instructions make
 up the compiled form of a single line of code, only one line annotation is
-required.
+required. Note that this also implies that annotations must be placed in
+the same order as the instructions.
 
 
 
