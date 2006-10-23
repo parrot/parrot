@@ -171,6 +171,26 @@ sub keys
     return keys %{$self->{c}};
 }
 
+=item C<slurp()>
+
+Slurps in Parrot::Config data from previous configure.
+
+Accepts no arguments.
+
+=cut
+
+sub slurp()
+{
+  my $self = shift;
+  my $res = eval "no strict; use Parrot::Config; \\%PConfig";
+
+  if (not defined $res) {
+   die "You cannot use --step until you have completed the full configure process\n"; 
+  }
+  $self->{c} = $res;
+}
+
+
 =item C<dump()>
 
 Provides a L<Data::Dumper> serialized string of the objects key/value pairs
