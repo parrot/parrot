@@ -136,38 +136,18 @@ $args .= ' --run-exec'    if $run_exec;
 $ENV{TEST_PROG_ARGS} = $args;
 
 # Pass in a list of tests to run on the command line, else run all the tests.
-my @default_tests = map {glob "t/$_/*.t"} qw( configure
-                                              compilers/imcc/*
-                                              op
-                                              pmc
-                                              native_pbc
-                                              dynpmc
-                                              dynoplibs
-                                              compilers/past
-                                              compilers/pge
-                                              compilers/pge/p5regex
-                                              compilers/pge/p6regex
-                                              compilers/tge
-                                              compilers/json
-                                              library
-                                              examples
-                                              run
-                                              src
-                                              tools
-                                              perl
-                                              doc 
-                                              stm );
-# manifest.t was moved from t/perl to t/distro
-# codingstd.t was moved from t/perl to t/codingstd
+my @default_tests = map {glob "t/$_/*.t"} qw(
+    configure compilers/imcc/* op pmc native_pbc dynpmc dynoplibs
+    compilers/past compilers/pge compilers/pge/p5regex compilers/pge/p6regex
+    compilers/tge compilers/json library examples run src tools perl doc stm
+);
 push @default_tests, 't/distro/manifest.t';
 
 # collect the coding standard tests (that we want to run) together and
 # append them to the list of default tests
-my @coding_std_tests = map { "t/codingstd/$_" } qw( c_code_coda.t
-                                                    cppcomments.t
-                                                    cuddled_else.t
-                                                    tabs.t
-                                                    );
+my @coding_std_tests = map { "t/codingstd/$_" } qw(
+    c_code_coda.t cppcomments.t cuddled_else.t tabs.t
+);
 push @default_tests, @coding_std_tests;
 
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
@@ -176,22 +156,15 @@ unless ($html) {
     Test::Harness::runtests(@tests);
 } else {
     my @smoke_config_vars = qw(
-      osname
-      archname
-      cc
-      build_dir
-      cpuarch
-      revision
-      VERSION
-      optimize
-      DEVEL
+        osname archname cc build_dir cpuarch revision VERSION optimize DEVEL
     );
 
     eval {
         require Test::TAP::HTMLMatrix;
         require Test::TAP::Model::Visual;
     };
-    die "You must have Test::TAP::HTMLMatrix installed.\n\n$EVAL_ERROR" if $EVAL_ERROR;
+    die "You must have Test::TAP::HTMLMatrix installed.\n\n$EVAL_ERROR"
+        if $EVAL_ERROR;
 
     ## FIXME: ###
     # This is a temporary solution until Test::TAP::Model version
