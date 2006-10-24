@@ -35,15 +35,26 @@ my @files = @ARGV ? @ARGV : source_files();
 my @tabs;
 
 foreach my $file (@files) {
-    open my $fh, '<', $file
-        or die "Cannot open '$file' for reading: $!\n";
+    my $path;
 
-    my $tabcount;
+    ## get the full path of the file
+    # if we have the files on the command line, the file is the full path
+    if (@ARGV) {
+        $path = $file;
+    }
+
+    # otherwise, use the Parrot::Doc::File::path method
+    else {
+        $path = $file->path;
+    }
+
+    open my $fh, '<', $path
+        or die "Cannot open '$path' for reading: $!\n";
+
+    # search each line for leading tabs
     while (<$fh>) {
-        next unless /^ *\t/;
-        push @tabs, "tab in leading whitespace, file '$file', line $.\n";
-        if ( ++$tabcount >= 5 ) {
-            push @tabs, "skipping remaining lines (you get the idea)\n";
+        if ($_ =~ m/^ *\t/) {
+            push @tabs => "$path\n";
             last;
         }
     }
@@ -51,12 +62,13 @@ foreach my $file (@files) {
 }
 
 ok( !scalar(@tabs), "tabs in leading whitespace" )
-    or diag(@tabs);
+    or diag("Found tab in leading whitespace in " . scalar(@tabs)
+        . " files.  Files affected:\n@tabs");
 
 exit;
 
 sub source_files {
-    return map { $_->path } (
+    return (
         map( $_->files_of_type('C code'),   $DIST->c_source_file_directories ),
         map( $_->files_of_type('C header'), $DIST->c_header_file_directories ),
         map( $_->files_of_type('PMC code'), $DIST->pmc_source_file_directories ),
