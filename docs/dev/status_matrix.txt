@@ -1,0 +1,38 @@
+                       Req.  API   Stub  Subsys  Compl  Compr   x86    x86   x86   ppc   ppc 
+                       spec  Des.  Func  Stubs   Tests  Tests  linux  win32  osx  linux  osx  sparc
+---------------------------------------------------------------------------------------------------
+Common vtable format         
+Calling conventions     jg    jg    jg    jg                    jg     jg     jg   jg    jg    jg
+Internal data types
+Opcode functions
+Assembly language             jg    jg    jg                    jg     jg     jg   jg    jg    jg
+Index aggregate PMCs           
+Garbage collection            jg    jg    jg
+Embedding
+Extension system
+Bytecode                      jg    jg    jg                    jg     jg     jg   jg    jg    jg
+Big numbers
+Objects and classes
+NCI
+Basic PMC types
+Security infrastr.
+PIR                     jg    jg    jg    jg                    jg     jg     jg   jg    jg    jg
+Lexical variables       jg    jg    jg    jg                    jg     jg     jg   jg    jg    jg
+Namespaces              jg    jg    jg    jg                    jg     jg     jg   jg    jg    jg
+IO
+Exceptions              jg
+Threads                                                                *1       
+STM                     jg    jg    jg    jg                           *1
+Configure               jg                                      jg     jg     jg   jg    jg    jg
+Build                         jg                                jg     jg     jg   jg    jg    jg
+Test                    jg    jg    jg    jg                    jg     jg     jg   jg    jg    jg
+
+
+Notes:
+   1.  Currently broken (jg)
+
+
+Column descriptions:
+  Subsys stubs:  incomplete implementations, often in advance of not-complete specs
+
+
