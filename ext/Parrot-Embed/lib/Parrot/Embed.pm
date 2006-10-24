@@ -27,7 +27,8 @@ This module embeds libparrot in Perl 5 programs.  You can load Parrot bytecode,
 compile your own code, and call Parrot subroutines and send and receive values
 to them.
 
-Do consider using C<Parrot::Interpreter> first however.
+Do consider using L<Parrot::Interpreter> first however.  See also
+L<Parrot::PMC>.
 
 =head1 AUTHOR
 
