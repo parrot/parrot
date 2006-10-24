@@ -33,9 +33,9 @@ typedef struct Stack_Chunk {
     void * dummy;   /* force 8 byte align for mmx and sse moves */
 #endif
     union { /* force appropriate alignment of 'data' */
-	void *data;
+        void *data;
 #ifndef I386
-	double d_dummy;         /* align double values on stack */
+        double d_dummy;         /* align double values on stack */
 #endif
     } u;
 } Stack_Chunk_t;

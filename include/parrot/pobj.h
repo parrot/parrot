@@ -21,7 +21,7 @@ typedef union UnionVal {
         size_t     _buflen;
     } _b;
     struct {                                  /* or two pointers, both are defines */
-        DPOINTER * _struct_val;      
+        DPOINTER * _struct_val;
         PMC *      _pmc_val;
     } _ptrs;
     struct {

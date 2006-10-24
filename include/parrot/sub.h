@@ -57,58 +57,58 @@ typedef struct Parrot_sub {
     size_t   start_offs;        /* sub entry in ops from seg->base.data */
     size_t   end_offs;
 
-    INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
-    PMC      *namespace;        /* where this Sub is in - this is either
-                                   a String or a [Key] and describes
-                                   the relative path in the NameSpace  
-                                */
-    PMC      *namespace_stash;  /* the actual hash, HLL::namespace */
-    STRING   *name;             /* name of the sub */
-    PMC      *multi_signature;  /* list of types for MMD */
-    INTVAL   n_regs_used[4];	/* INSP in PBC */
+    INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
+    PMC      *namespace;         /* where this Sub is in - this is either
+                                  * a String or a [Key] and describes
+                                  * the relative path in the NameSpace  
+                                  */
+    PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
+    STRING   *name;              /* name of the sub */
+    PMC      *multi_signature;   /* list of types for MMD */
+    INTVAL   n_regs_used[4];     /* INSP in PBC */
 
-    PMC      *lex_info;         /* LexInfo PMC */
-    PMC      *outer_sub;        /* :outer for closures */
-    PMC      *eval_pmc;         /* eval container / NULL */
-    parrot_context_t *ctx;      /* the context this sub is in */
+    PMC      *lex_info;          /* LexInfo PMC */
+    PMC      *outer_sub;         /* :outer for closures */
+    PMC      *eval_pmc;          /* eval container / NULL */
+    parrot_context_t *ctx;       /* the context this sub is in */
 
     /* - end common */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
 } * parrot_sub_t;
 
-#define PMC_sub(pmc)		  ((parrot_sub_t)PMC_struct_val(pmc))
+#define PMC_sub(pmc) ((parrot_sub_t)PMC_struct_val(pmc))
 
 /* the first entries must match Parrot_sub, so we can cast
  * these two to the other type
  */
 typedef struct Parrot_coro {
     struct PackFile_ByteCode *seg;      /* bytecode segment */
-    size_t   start_offs;        /* sub entry in ops from seg->base.data */
+    size_t   start_offs;         /* sub entry in ops from seg->base.data */
     size_t   end_offs;
 
-    INTVAL   HLL_id;            /* see src/hll.c XXX or per segment? */
-    PMC      *namespace;        /* where this Sub is in - this is either
-                                   a String or a [Key] and describes
-                                   the relative path in the NameSpace  
-                                */
-    PMC      *namespace_stash;  /* the actual hash, HLL::namespace */
-    STRING   *name;             /* name of the sub */
-    PMC      *multi_signature;  /* list of types for MMD */
-    INTVAL   n_regs_used[4];	/* INSP in PBC */
+    INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
+    PMC      *namespace;         /* where this Sub is in - this is either
+                                  * a String or a [Key] and describes
+                                  * the relative path in the NameSpace
+                                  */
+    PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
+    STRING   *name;              /* name of the sub */
+    PMC      *multi_signature;   /* list of types for MMD */
+    INTVAL   n_regs_used[4];     /* INSP in PBC */
 
-    PMC      *lex_info;         /* LexInfo PMC */
-    PMC      *outer_sub;        /* :outer for closures */
-    PMC      *eval_pmc;         /* eval container / NULL */
-    struct Parrot_Context  *ctx;          /* coroutine context */
+    PMC      *lex_info;          /* LexInfo PMC */
+    PMC      *outer_sub;         /* :outer for closures */
+    PMC      *eval_pmc;          /* eval container / NULL */
+    struct Parrot_Context  *ctx; /* coroutine context */
 
     /* - end common */
 
     struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
-    opcode_t *address;        /* next address to run - toggled each time */
+    opcode_t *address;           /* next address to run - toggled each time */
     struct Stack_Chunk *dynamic_state; /* next dynamic state */
 } * parrot_coro_t;
 
-#define PMC_coro(pmc) 		  ((parrot_coro_t)PMC_struct_val(pmc))
+#define PMC_coro(pmc) ((parrot_coro_t)PMC_struct_val(pmc))
 
 typedef struct Parrot_cont {
     /* continuation destination */
@@ -117,13 +117,13 @@ typedef struct Parrot_cont {
     struct Parrot_Context *to_ctx;   /* pointer to dest context */
     struct Stack_Chunk *dynamic_state; /* dest dynamic state */
     /* a Continuation keeps the from_ctx alive */
-    struct Parrot_Context *from_ctx;  /* sub, this cont is returning from */
-    opcode_t *current_results;    /* ptr into code with get_results opcode
-                                    full continuation only */
+    struct Parrot_Context *from_ctx; /* sub, this cont is returning from */
+    opcode_t *current_results;       /* ptr into code with get_results opcode
+                                        full continuation only */
     int runloop_id;                  /* id of the creating runloop. */
 } * parrot_cont_t;
 
-#define PMC_cont(pmc)		  ((parrot_cont_t)PMC_struct_val(pmc))
+#define PMC_cont(pmc) ((parrot_cont_t)PMC_struct_val(pmc))
 
 struct Parrot_Context_info {
     STRING* subname;

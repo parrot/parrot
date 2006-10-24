@@ -21,7 +21,7 @@ void string_set_data_directory(const char *dir);
 
 /* Convert from any supported encoding, into our internal format */
 void string_fill_from_buffer(Interp *interpreter,
-	const void *buffer, UINTVAL len, const char *encoding_name, STRING *s);
+        const void *buffer, UINTVAL len, const char *encoding_name, STRING *s);
 
 /* Utility method which knows how to uwind a single escape sequence */
 typedef Parrot_UInt2 (*Parrot_unescape_cb)(Parrot_Int4 offset, void *context);

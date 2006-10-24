@@ -32,18 +32,18 @@ typedef struct List_chunk {
 typedef struct List {
     Buffer chunk_list;          /* pointers to chunks */
     UINTVAL length;             /* number of items in list */
-    UINTVAL start;		/* offset, where array[0] is */
+    UINTVAL start;              /* offset, where array[0] is */
     PMC * container;            /* the Array PMC */
-    int item_type;	        /* item type */
-    int item_size;		/* item size */
-    int items_per_chunk;	/* override defaults */
+    int item_type;              /* item type */
+    int item_size;              /* item size */
+    int items_per_chunk;        /* override defaults */
     UINTVAL cap;                /* list capacity in items */
     int grow_policy;            /* fixed / variable len */
     UINTVAL collect_runs;       /* counter, when chunklist was built */
     UINTVAL n_chunks;           /* number of chunks */
-    PMC * user_data;		/* e.g. multiarray dimensions */
-    List_chunk *first;	        /* first chunk holding data */
-    List_chunk *last;	        /* last chunk */
+    PMC * user_data;            /* e.g. multiarray dimensions */
+    List_chunk *first;          /* first chunk holding data */
+    List_chunk *last;           /* last chunk */
 } List;
 
 typedef enum {
@@ -60,13 +60,13 @@ typedef enum {
 
 
 #ifdef LIST_TEST
-#  define MIN_ITEMS 4		/* smallest chunk can hold */
-#  define LD_MAX 4                /* log2(MAX_ITEMS) */
-#  define MAX_ITEMS 16  	        /* biggest chunk can hold */
+#  define MIN_ITEMS 4           /* smallest chunk can hold */
+#  define LD_MAX 4              /* log2(MAX_ITEMS) */
+#  define MAX_ITEMS 16          /* biggest chunk can hold */
 #else
-#  define MIN_ITEMS 16		/* smallest chunk can hold */
-#  define LD_MAX 10               /* log2(MAX_ITEMS) */
-#  define MAX_ITEMS 1024  	/* biggest chunk can hold */
+#  define MIN_ITEMS 16          /* smallest chunk can hold */
+#  define LD_MAX 10             /* log2(MAX_ITEMS) */
+#  define MAX_ITEMS 1024        /* biggest chunk can hold */
 #endif /* LIST_TEST */
 #define MAX_MASK (MAX_ITEMS-1)
 

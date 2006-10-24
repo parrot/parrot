@@ -21,12 +21,12 @@
  */
 typedef struct Parrot_pic_lru_t {
     union {
-        INTVAL type;			/* for MMD left << 16 | right type */
+        INTVAL type;                    /* for MMD left << 16 | right type */
         PMC *signature;                 /* arg passing signature */
     } u;
     union {
-        funcptr_t real_function; 	/* the actual C code */
-        PMC *sub; 			/* or a Sub PMC */
+        funcptr_t real_function;        /* the actual C code */
+        PMC *sub;                       /* or a Sub PMC */
         PMC **pattr;                    /* attribute location */
     } f;
 } Parrot_PIC_lru;
@@ -36,7 +36,7 @@ typedef struct Parrot_pic_lru_t {
  */
 typedef struct Parrot_pic_t {
     Parrot_PIC_lru lru[3];              /* PIC - three more cache entries */
-    INTVAL miss_count;			/* how many misses */
+    INTVAL miss_count;                  /* how many misses */
 } Parrot_PIC;
 
 /*
@@ -46,7 +46,7 @@ typedef struct Parrot_mic_t {
     Parrot_PIC_lru lru;                 /* MIC - one cache */
     union {
         STRING *method;                 /* for callmethod */
-        INTVAL func_nr;			/* MMD function number */
+        INTVAL func_nr;                 /* MMD function number */
         STRING *attribute;              /* obj.attribute */
         PMC *sig;                       /* arg passing */
     } m;
@@ -58,11 +58,11 @@ typedef struct Parrot_mic_t {
  * PackFile_ByteCode segment
  */
 typedef struct Parrot_pic_store_t {
-    struct Parrot_pic_store_t *prev;	/* prev pic_store */
-    size_t usable;			/* size of usable memory: */
-    Parrot_PIC *pic;		        /* from rear */
-    Parrot_MIC *mic;			/* idx access to allocated MICs */
-    size_t n_mics;			/* range check, debugging mainly */
+    struct Parrot_pic_store_t *prev;    /* prev pic_store */
+    size_t usable;                      /* size of usable memory: */
+    Parrot_PIC *pic;                    /* from rear */
+    Parrot_MIC *mic;                    /* idx access to allocated MICs */
+    size_t n_mics;                      /* range check, debugging mainly */
 } Parrot_PIC_store;
 
 /* more or less private interfaces */
@@ -82,7 +82,7 @@ typedef int (*arg_pass_f)(Interp *, PMC *sig,
 
 int parrot_pic_check_sig(Interp *, PMC *sig1, PMC *sig2, int *type);
 int parrot_pic_is_safe_to_jit(Interp *, PMC *sub,
-	PMC *sig_args, PMC *sig_results, int *flags);
+        PMC *sig_args, PMC *sig_results, int *flags);
 
 funcptr_t  parrot_pic_JIT_sub(Interp *, PMC *sub, int flags);
 

@@ -206,16 +206,16 @@ typedef struct Parrot_Context {
     Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */
-    INTVAL *n_regs_used;	        /* INSP in PBC points to Sub */
+    INTVAL *n_regs_used;                /* INSP in PBC points to Sub */
     size_t regs_mem_size;               /* memory occupied by registers */
-    int ref_count;                   /* how often refered to */
+    int ref_count;                      /* how often refered to */
     struct Stack_Chunk *reg_stack;      /* register stack */
 
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     PMC      *lex_pad;                  /* LexPad PMC */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
     UINTVAL warns;             /* Keeps track of what warnings
-                                 * have been activated */
+                                * have been activated */
     UINTVAL errors;            /* fatals that can be turned off */
     UINTVAL trace_flags;
     UINTVAL recursion_depth;    /* Sub call recursion depth */
@@ -232,7 +232,7 @@ typedef struct Parrot_Context {
     opcode_t *current_pc;       /* program counter of Sub invocation */
     PMC *current_namespace;     /* The namespace we're currently in */
     INTVAL current_HLL;         /* see also src/hll.c */
-    opcode_t *current_results;   /* ptr into code with get_results opcode */
+    opcode_t *current_results;  /* ptr into code with get_results opcode */
     /* deref the constants - we need it all the time */
     struct PackFile_Constant ** constants;
     /* code->prederefed.code - code->base.data in opcodes 
@@ -276,7 +276,7 @@ struct Interp_Context {
 #define CONTEXT(ctx) ((ctx).state)
 
 #define CHUNKED_CTX_MEM 0           /* no longer works, but will be reinstated
-                                       some day; see src/register.c for details.
+                                     * some day; see src/register.c for details.
                                     */
 
 typedef struct _context_mem {
@@ -425,9 +425,9 @@ typedef enum {
     IGLOBALS_ARGV_LIST,
     IGLOBALS_NCI_FUNCS,
     IGLOBALS_INTERPRETER,       /* this interpreter as ParrotInterpreter PMC */   
-    IGLOBALS_DYN_LIBS,		/* Hash of ParrotLibrary loaded dynamic ext */
+    IGLOBALS_DYN_LIBS,          /* Hash of ParrotLibrary loaded dynamic ext */
     IGLOBALS_CONFIG_HASH,
-    IGLOBALS_LIB_PATHS,		/* LoL of search paths and dynamic ext */
+    IGLOBALS_LIB_PATHS,         /* LoL of search paths and dynamic ext */
     IGLOBALS_PBC_LIBS,          /* Hash of load_bytecode cde */    
 
     IGLOBALS_SIZE
@@ -533,7 +533,7 @@ void do_prederef(void **pc_prederef, Interp * interpreter, int type);
 void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, Parrot_clone_flags flags);
 
 PARROT_API void enter_nci_method(Interp *, int type,
-		 void *func, const char *name, const char *proto);
+        void *func, const char *name, const char *proto);
 PARROT_API void Parrot_mark_method_writes(Interp *, int type, const char *name);
 
 void Parrot_setup_event_func_ptrs(Parrot_Interp interpreter);

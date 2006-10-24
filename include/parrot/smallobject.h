@@ -60,8 +60,8 @@ typedef struct _gc_gms_hdr_list {
  * all objects belong to one generation
  */
 typedef struct _gc_gms_gen {
-    UINTVAL gen_no;		        /* generation number */
-    UINTVAL timely_destruct_obj_sofar; 	/* sum up to this generation */
+    UINTVAL gen_no;                     /* generation number */
+    UINTVAL timely_destruct_obj_sofar;  /* sum up to this generation */
     UINTVAL black_color;                /* live color of this generation */
     struct _gc_gms_hdr *first;          /* first header in this generation */
     struct _gc_gms_hdr *last;           /* last header in this generation */

@@ -71,8 +71,8 @@ void clear_cow(Interp *interpreter,
 #if PARROT_GC_GMS
 #  define pobject_lives(i, o) do { \
     if (!PObj_live_TEST(o) && \
-	    PObj_to_GMSH(o)->gen->gen_no >= i->gc_generation) \
-	parrot_gc_gms_pobject_lives(i, o); \
+            PObj_to_GMSH(o)->gen->gen_no >= i->gc_generation) \
+        parrot_gc_gms_pobject_lives(i, o); \
   } while (0)
 
 PARROT_API void parrot_gc_gms_pobject_lives(Interp* interpreter, PObj *obj);

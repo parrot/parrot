@@ -88,7 +88,7 @@ typedef HANDLE Parrot_thread;
      do { \
        WaitForSingleObject( t, INFINITE ); \
        GetExitCodeThread( t,(LPDWORD)&(ret) ); \
-	   CloseHandle( t ); \
+       CloseHandle( t ); \
      } while (0)
 
 #  define DETACH(t) CloseHandle( t )

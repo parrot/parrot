@@ -66,7 +66,7 @@ Parrot_Int Parrot_PMC_get_intval_pmckey(Parrot_INTERP, Parrot_PMC, Parrot_PMC);
 Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_Float Parrot_PMC_get_numval(Parrot_INTERP, Parrot_PMC);
 Parrot_Float Parrot_PMC_get_numval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-char *Parrot_PMC_get_cstring(Parrot_INTERP, Parrot_PMC);
+PARROT_API char *Parrot_PMC_get_cstring(Parrot_INTERP, Parrot_PMC);
 char *Parrot_PMC_get_cstring_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 char *Parrot_PMC_get_cstringn(Parrot_INTERP, Parrot_PMC, Parrot_Int *);
 char *Parrot_PMC_get_cstringn_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int *, Parrot_Int);
@@ -95,7 +95,7 @@ PARROT_API Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, const char *);
 
 void Parrot_free_cstring(char *);
 
-void *        Parrot_call_sub(Parrot_INTERP, Parrot_PMC, const char *, ...);
+PARROT_API void * Parrot_call_sub(Parrot_INTERP, Parrot_PMC, const char *, ...);
 Parrot_Int    Parrot_call_sub_ret_int(Parrot_INTERP, Parrot_PMC,
                     const char *, ...);
 Parrot_Float  Parrot_call_sub_ret_float(Parrot_INTERP, Parrot_PMC,
