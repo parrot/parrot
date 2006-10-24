@@ -159,7 +159,16 @@ my @default_tests = map {glob "t/$_/*.t"} qw( configure
                                               stm );
 # manifest.t was moved from t/perl to t/distro
 # codingstd.t was moved from t/perl to t/codingstd
-push @default_tests, 't/distro/manifest.t', 't/codingstd/cppcomments.t';
+push @default_tests, 't/distro/manifest.t';
+
+# collect the coding standard tests (that we want to run) together and
+# append them to the list of default tests
+my @coding_std_tests = map { "t/codingstd/$_" } qw( c_code_coda.t
+                                                    cppcomments.t
+                                                    cuddled_else.t
+                                                    tabs.t
+                                                    );
+push @default_tests, @coding_std_tests;
 
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 
@@ -251,3 +260,11 @@ Leo Toetsch stole F<languages/perl6/t/harness> for F<imcc/t/harness>.
 Bernhard Schmalhofer merged F<imcc/t/harness> back into F<t/harness>.
 
 =cut
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
