@@ -21,20 +21,27 @@ use warnings;
 
 our $columns = 100;
 
-use lib qw! . lib ../lib ../../lib !;
+use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use ExtUtils::Manifest qw!maniread!;
+use ExtUtils::Manifest qw( maniread );
 
-use vars qw!@files!;
+use vars qw( @files );
 
 diag "finding source files, this may take a while.";
 
 our %check_language = map { $_ => 1; } qw{
-    lua
-    tcl
+    APL
     WMLScript
+    amber
+    cardinal
+    dotnet
+    lua
+    perl6
+    pugs
+    python
+    tcl
 };
 
 # XXX this should really be using src_dir instead of build_dir but it
@@ -45,8 +52,8 @@ my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
 
 # Read some extra exceptions
 while (<DATA>) {
-    next if m!^#!;
-    next if m!^\s*$!;
+    next if m{^#};
+    next if m{^\s*$};
     chomp;
     $manifest_gen->{$_}++;
 }
@@ -62,15 +69,15 @@ foreach my $file ( sort keys(%$manifest) ) {
     next if exists( $manifest_gen->{$file} );
 
     # I could make this other way, but this way is more flexible
-    next if ( $ffile =~ m!^$build_dir/languages/([^/]+)/!
+    next if ( $ffile =~ m{^$build_dir/languages/([^/]+)/}
         && !$check_language{$1} );
 
-    push @files, $ffile if $file =~ m!\.c$!;
-    push @files, $ffile if $file =~ m!\.pmc$!;
-    push @files, $ffile if $file =~ m!\.ops$!;
-    push @files, $ffile if $file =~ m!\.pod$!;
+    push @files, $ffile if $file =~ m{\.c$};
+    push @files, $ffile if $file =~ m{\.pmc$};
+    push @files, $ffile if $file =~ m{\.ops$};
+    push @files, $ffile if $file =~ m{\.pod$};
 
-    # push @files, $ffile if $file =~ m!\.pl$!;
+    # push @files, $ffile if $file =~ m{\.pl$};
 }
 
 plan tests => scalar @files;
@@ -81,7 +88,7 @@ sub check {
     my $l;    # will hold the first line to be corrected
 
     my $g = $f;    # will hold the file to be corrected with relative path;
-    $g =~ s!^$build_dir/!!;
+    $g =~ s{^$build_dir/}{};
 
     my $ok = 1;
 
@@ -122,7 +129,7 @@ tools/build/jit2c.pl
 tools/build/nativecall.pl
 tools/dev/lib_deps.pl
 tools/dev/parrot_coverage.pl
-# these ones includes a big URL
+# these ones include a big URL
 cage/todo.pod
 docs/gettingstarted.pod
 docs/glossary.pod
