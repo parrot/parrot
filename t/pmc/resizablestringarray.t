@@ -1,6 +1,6 @@
 #!./parrot
 
-.const int NUM_OF_TESTS = 171
+.const int NUM_OF_TESTS = 173
 
 .sub main :main
     load_bytecode 'library/Test/More.pir'
