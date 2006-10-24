@@ -15,7 +15,7 @@ IMCC_fatal(Interp *interp, int code, const char *fmt, ...)
 {
     va_list ap;
     UNUSED(code);
-    
+
     va_start(ap, fmt);
     IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);
     va_end(ap);
@@ -40,7 +40,7 @@ void
 IMCC_fatal_standalone(Interp *interp, int code, const char *fmt, ...)
 {
     va_list ap;
-    
+
     va_start(ap, fmt);
     imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
@@ -81,7 +81,7 @@ IMCC_info(Parrot_Interp interp, int level, const char *fmt, ...)
     va_list ap;
 
     if(level > IMCC_INFO(interp)->verbose)
-	return;
+        return;
 
     va_start(ap, fmt);
     imcc_vfprintf(interp, stderr, fmt, ap);
@@ -94,7 +94,7 @@ IMCC_debug(Parrot_Interp interp, int level, const char *fmt, ...)
     va_list ap;
 
     if ( !(level & IMCC_INFO(interp)->debug))
-	return;
+        return;
     va_start(ap, fmt);
     imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
@@ -107,25 +107,25 @@ dump_instructions(Interp *interpreter, IMC_Unit * unit)
     Basic_block *bb;
     int pc;
 
-    fprintf(stderr, 
+    fprintf(stderr,
             "\nDumping the instructions status:"
             "\n-------------------------------\n");
     fprintf(stderr,
             "nins line blck deep flags\t    type opnr size   pc  X ins\n");
     for (pc = 0, ins = unit->instructions; ins; ins = ins->next) {
-	bb = unit->bb_list[ins->bbindex];
+        bb = unit->bb_list[ins->bbindex];
 
-	if (bb) {
-	     fprintf(stderr, "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
-		     ins->index, ins->line, bb->index, bb->loop_depth,
+        if (bb) {
+             fprintf(stderr, "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
+                     ins->index, ins->line, bb->index, bb->loop_depth,
                      ins->flags, (ins->type & ~ITEXT), ins->opnum,
                      ins->opsize, pc, ins->type & ITEXT ? 'X' : ' ');
-	}
-	else {
-	     fprintf(stderr, "\t");
-	}
+        }
+        else {
+             fprintf(stderr, "\t");
+        }
 
-	imcc_fprintf(interpreter, stderr, "%I\n", ins);
+        imcc_fprintf(interpreter, stderr, "%I\n", ins);
         pc += ins->opsize;
     }
     fprintf(stderr, "\n");
@@ -140,16 +140,16 @@ dump_cfg(IMC_Unit * unit)
 
     fprintf(stderr, "\nDumping the CFG:\n-------------------------------\n");
     for (i=0; i < unit->n_basic_blocks; i++) {
-	bb = unit->bb_list[i];
-	fprintf(stderr, "%d (%d)\t -> ", bb->index, bb->loop_depth);
-	for (e=bb->succ_list; e != NULL; e=e->succ_next) {
-	    fprintf(stderr, "%d ", e->to->index);
-	}
-	fprintf(stderr, "\t\t <- ");
-	for (e=bb->pred_list; e != NULL; e=e->pred_next) {
-	    fprintf(stderr, "%d ", e->from->index);
-	}
-	fprintf(stderr, "\n");
+        bb = unit->bb_list[i];
+        fprintf(stderr, "%d (%d)\t -> ", bb->index, bb->loop_depth);
+        for (e=bb->succ_list; e != NULL; e=e->succ_next) {
+            fprintf(stderr, "%d ", e->to->index);
+        }
+        fprintf(stderr, "\t\t <- ");
+        for (e=bb->pred_list; e != NULL; e=e->pred_next) {
+            fprintf(stderr, "%d ", e->from->index);
+        }
+        fprintf(stderr, "\n");
     }
 
     fprintf(stderr, "\n");
@@ -171,7 +171,7 @@ dump_loops(IMC_Unit * unit)
         fprintf(stderr,
                 "Loop %d, depth %d, size %d, header %d, preheader %d\n",
                 i, loop_info[i]->depth,
-                loop_info[i]->size, loop_info[i]->header, 
+                loop_info[i]->size, loop_info[i]->header,
                 loop_info[i]->preheader);
         fprintf(stderr, "  Contains blocks: ");
         for (j = 0; j < unit->n_basic_blocks; j++)
@@ -231,9 +231,9 @@ dump_symreg(IMC_Unit * unit)
         fprintf(stderr, "%s %c\t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%x\n",
                 r->name,
                 r->usage & U_NON_VOLATILE ? 'P' : ' ',
-		    r->first_ins->index, r->last_ins->index,
-		    r->first_ins->bbindex, r->last_ins->bbindex,
-		    r->set,
+                r->first_ins->index, r->last_ins->index,
+                r->first_ins->bbindex, r->last_ins->bbindex,
+                r->set,
                 (int)r->color, r->want_regno,
                 r->use_count, r->lhs_use_count,
                 r->reg ? r->reg->name : "",
@@ -272,12 +272,12 @@ dump_liveness_status_var(IMC_Unit * unit, SymReg* r)
     for (i=0; i<unit->n_basic_blocks; i++) {
         l = r->life_info[i];
 
-	if (l->flags & LF_lv_all) {
-		fprintf(stderr, "\n\t%i:ALL\t", i);
-	}
-	else if (l->flags & LF_lv_inside) {
+    if (l->flags & LF_lv_all) {
+        fprintf(stderr, "\n\t%i:ALL\t", i);
+    }
+    else if (l->flags & LF_lv_inside) {
             fprintf(stderr, "\n\t%i:INSIDE", i);
-	}
+    }
 
         if (l->flags & LF_lv_in)
             fprintf(stderr, "\n\t%i: IN\t", i);
@@ -285,17 +285,17 @@ dump_liveness_status_var(IMC_Unit * unit, SymReg* r)
             fprintf(stderr, "\n\t%i: OUT\t", i);
         else if (l->first_ins)
             fprintf(stderr, "\n\t%i: INS\t", i);
-	if (l->flags & LF_use)
+    if (l->flags & LF_use)
             fprintf(stderr, "u ");
         else if (l->flags & LF_def)
             fprintf(stderr, "d ");
         else
             fprintf(stderr, "  ");
 
-	if(l->first_ins) {
+    if(l->first_ins) {
             fprintf(stderr, "[%d,%d]\t", l->first_ins->index,
                     l->last_ins->index);
-	}
+    }
     }
     fprintf(stderr, "\n");
 }
@@ -341,15 +341,15 @@ dump_dominators(IMC_Unit * unit)
     fprintf(stderr, "\nDumping the Dominators Tree:"
             "\n-------------------------------\n");
     for (i=0; i < unit->n_basic_blocks; i++) {
-	fprintf (stderr, "%2d <- (%2d)", i, unit->idoms[i]);
+    fprintf (stderr, "%2d <- (%2d)", i, unit->idoms[i]);
 
-	for(j=0; j < unit->n_basic_blocks; j++) {
-            if (set_contains(unit->dominators[i], j)) {
-		fprintf(stderr, " %2d", j);
-	    }
-	}
+    for(j=0; j < unit->n_basic_blocks; j++) {
+        if (set_contains(unit->dominators[i], j)) {
+            fprintf(stderr, " %2d", j);
+        }
+    }
 
-	fprintf(stderr, "\n");
+    fprintf(stderr, "\n");
     }
 
     fprintf(stderr, "\n");
@@ -363,15 +363,15 @@ dump_dominance_frontiers(IMC_Unit * unit)
     fprintf(stderr, "\nDumping the Dominance Frontiers:"
             "\n-------------------------------\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
-	fprintf (stderr, "%2d <-", i);
+        fprintf (stderr, "%2d <-", i);
 
-	for(j = 0; j < unit->n_basic_blocks; j++) {
+        for(j = 0; j < unit->n_basic_blocks; j++) {
             if (set_contains(unit->dominance_frontiers[i], j)) {
-		fprintf(stderr, " %2d", j);
-	    }
-	}
+                fprintf(stderr, " %2d", j);
+            }
+        }
 
-	fprintf(stderr, "\n");
+        fprintf(stderr, "\n");
     }
 
     fprintf(stderr, "\n");

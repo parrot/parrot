@@ -132,10 +132,10 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 
             if (addr)
                 addr->last_ins = ins;
-            /* 
+            /*
              * ignore set_addr - no new basic block
              */
-            if (!strcmp(ins->op, "set_addr")) 
+            if (!strcmp(ins->op, "set_addr"))
                 continue;
             if (ins->next)
                 bb = make_basic_block(interpreter, unit, ins->next);
@@ -259,7 +259,7 @@ invok:
                         if (!saves)
                             bb_add_edge(unit, bb,
                                     unit->bb_list[j+1]);
-                        IMCC_debug(interpreter, DEBUG_CFG, 
+                        IMCC_debug(interpreter, DEBUG_CFG,
                                    "\tand does saveall %s\n",
                                    saves ? "yes" : "no");
                     }
@@ -270,7 +270,7 @@ invok:
                     goto invok;
                 }
                 if (!found)
-                    IMCC_debug(interpreter, DEBUG_CFG, 
+                    IMCC_debug(interpreter, DEBUG_CFG,
                                "\tcalled from unknown!\n");
             }
         }
@@ -305,7 +305,7 @@ invok:
 /* find the placement of the label, and link the two nodes */
 
 static void
-bb_findadd_edge(Parrot_Interp interpreter, IMC_Unit * unit, 
+bb_findadd_edge(Parrot_Interp interpreter, IMC_Unit * unit,
                 Basic_block *from, SymReg *label)
 {
     Instruction *ins;
@@ -339,8 +339,8 @@ blocks_are_connected(Basic_block *from, Basic_block *to)
 {
     Edge *pred;
     for (pred = to->pred_list; pred != NULL; pred=pred->pred_next) {
-	if (pred->from == from)
-	    return 1; /*already linked*/
+        if (pred->from == from)
+            return 1; /*already linked*/
     }
     return 0;
 }
@@ -351,7 +351,7 @@ bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
 {
     Edge *e;
     if (blocks_are_connected(from, to))
-	return;
+        return;
 
     /* we assume that the data is correct, and thus if the edge is not
        on the predecessors of 'from', it won't be on the successors
@@ -370,10 +370,10 @@ bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
     /* memory housekeeping */
     e->next = 0;
     if (unit->edge_list == 0)
-	unit->edge_list = e;
+        unit->edge_list = e;
     else {
-	e->next = unit->edge_list;
-	unit->edge_list = e;
+        e->next = unit->edge_list;
+        unit->edge_list = e;
     }
 }
 
@@ -384,7 +384,7 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
 
     if (edge->from->succ_list == edge) {
         edge->from->succ_list = edge->succ_next;
-    } 
+    }
     else {
         for (prev = edge->from->succ_list; prev; prev = prev->succ_next) {
             if (prev->succ_next == edge) {
@@ -395,7 +395,7 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
 
     if (edge->to->pred_list == edge) {
         edge->to->pred_list = edge->pred_next;
-    } 
+    }
     else {
         for (prev = edge->to->pred_list; prev; prev = prev->pred_next) {
             if (prev->pred_next == edge) {
@@ -406,13 +406,13 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
 
     if (unit->edge_list == edge) {
         unit->edge_list = edge->next;
-	free(edge);
-    } 
+        free(edge);
+    }
     else {
         for (prev = unit->edge_list; prev; prev = prev->next) {
             if (prev->next == edge) {
                 prev->next = edge->next;
-	        free(edge);
+                free(edge);
             }
         }
     }
@@ -423,9 +423,9 @@ free_edge(IMC_Unit * unit)
 {
     Edge *e, *next;
     for (e = unit->edge_list; e; ) {
-	next = e->next;
-	free(e);
-	e = next;
+        next = e->next;
+        free(e);
+        e = next;
     }
     unit->edge_list = 0;
 }
@@ -469,13 +469,13 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
      * that can be obtained locally */
 
     for (i=0; i < unit->n_basic_blocks; i++) {
-	analyse_life_block(interpreter, unit->bb_list[i], r);
+        analyse_life_block(interpreter, unit->bb_list[i], r);
     }
 
     /* Now we need to consider the relations between blocks */
 
     for (i=0; i < unit->n_basic_blocks; i++) {
-	if (r->life_info[i]->flags & LF_use) {
+        if (r->life_info[i]->flags & LF_use) {
             Instruction *ins, *prev;
 
             ins = unit->bb_list[i]->start;
@@ -497,13 +497,13 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
                     r->usage |= U_NON_VOLATILE;
             }
 
-	    /* This block uses r, so it must be live at
-	       the beginning */
-	    r->life_info[i]->flags |= LF_lv_in;
+            /* This block uses r, so it must be live at
+               the beginning */
+            r->life_info[i]->flags |= LF_lv_in;
 
-	    /* propagate this info to every predecessor */
-	    propagate_need (unit->bb_list[i], r, i);
-	}
+            /* propagate this info to every predecessor */
+            propagate_need (unit->bb_list[i], r, i);
+        }
     }
 }
 
@@ -551,7 +551,7 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
         }
         /*
          * if we have a setp_ind opcode, it may write all PMC
-         * registers 
+         * registers
          */
         if (ins->opnum == PARROT_OP_setp_ind_i_p && r->set == 'P') {
             r->usage |= U_NON_VOLATILE;
@@ -603,7 +603,7 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
     }
 
     if (!l->last_ins)
-	l->last_ins = l->first_ins;
+        l->last_ins = l->first_ins;
 
     /* l->last can later be extended if it turns out
      * that another block needs the value resulting from this
@@ -627,20 +627,20 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
        its predecessors themselves */
 
     for (edge=bb->pred_list; edge!=NULL; edge=edge->pred_next) {
-	pred = edge->from;
-	l = r->life_info[pred->index];
+        pred = edge->from;
+        l = r->life_info[pred->index];
 
-	if (l->flags & LF_lv_out) {
-	    /* this node has already been visited. Ignore it */
-	}
-	else {
+        if (l->flags & LF_lv_out) {
+            /* this node has already been visited. Ignore it */
+        }
+        else {
             l->flags |= LF_lv_out;
-	    l->last_ins = pred->end;
+            l->last_ins = pred->end;
 
-	    if (! (l->flags & LF_def) ) {
-		l->flags |= LF_lv_in;
-		l->first_ins = pred->start;
-		l->last_ins  = pred->end;
+            if (! (l->flags & LF_def) ) {
+                l->flags |= LF_lv_in;
+                l->first_ins = pred->start;
+                l->last_ins  = pred->end;
                 /* we arrived at block 0
                  *
                  * emit a warning if -w
@@ -663,9 +663,9 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
                             r->name, function, ins->line);
                 }
 #endif
-	        propagate_need(pred, r, i);
-	    }
-	}
+                propagate_need(pred, r, i);
+            }
+        }
     }
 }
 
@@ -702,7 +702,7 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
     for (i = 1; i < n; i++) {
         if (unit->bb_list[i]->pred_list) {
             dominators[i] = set_make_full(n);
-        } 
+        }
         else {
             dominators[i] = set_make(n);
             set_add(dominators[i], i);
@@ -765,8 +765,8 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
             if (i != b && set_contains(dominators[b], i)) {
                 wrong = 0;
                 for (runner = 0; runner < n; runner++) {
-                    if (runner != b && runner != i && 
-                        set_contains(dominators[b], runner)) 
+                    if (runner != b && runner != i &&
+                        set_contains(dominators[b], runner))
                     {
                         if (set_contains(dominators[runner], i)) {
                             wrong = 1;
@@ -940,15 +940,15 @@ find_loops (Parrot_Interp interpreter, IMC_Unit * unit)
 
     IMCC_info(interpreter, 2, "find_loops\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
-	dom = unit->dominators[i];
+        dom = unit->dominators[i];
 
-	for (edge=unit->bb_list[i]->succ_list;
+        for (edge=unit->bb_list[i]->succ_list;
                 edge != NULL; edge=edge->succ_next) {
-	    succ_index = edge->to->index;
+            succ_index = edge->to->index;
 
-	    if (set_contains(dom, succ_index) ) {
-		mark_loop(interpreter, unit, edge);
-	    }
+            if (set_contains(dom, succ_index) ) {
+                mark_loop(interpreter, unit, edge);
+            }
         }
     }
 
@@ -969,17 +969,17 @@ natural_preheader (IMC_Unit * unit, Loop_info* loop_info)
     int preheader = -1;
     Edge* edge;
 
-    for (edge = unit->bb_list[loop_info->header]->pred_list; 
+    for (edge = unit->bb_list[loop_info->header]->pred_list;
          edge; edge = edge->pred_next) {
         if (!set_contains(loop_info->loop, edge->from->index)) {
-            if (preheader == -1 && 
-                unit->bb_list[edge->from->index]->succ_list->to->index 
+            if (preheader == -1 &&
+                unit->bb_list[edge->from->index]->succ_list->to->index
                 == loop_info->header &&
                 !unit->bb_list[edge->from->index]->succ_list->succ_next)
             {
                 preheader = unit->bb_list[edge->from->index]->index;
                 continue;
-            } 
+            }
             else {
                 return -1;
             }
@@ -1040,8 +1040,8 @@ mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
     exits = set_make(unit->n_basic_blocks);
     for (i = 1; i < unit->n_basic_blocks; i++) {
         if (set_contains(loop, i)) {
-            for (edge = unit->bb_list[i]->succ_list; edge; 
-                 edge = edge->succ_next) 
+            for (edge = unit->bb_list[i]->succ_list; edge;
+                 edge = edge->succ_next)
             {
                 if (!set_contains(loop, edge->to->index)) {
                     set_add(exits, i);
@@ -1092,13 +1092,13 @@ search_predecessors_not_in(Basic_block *node, Set* s)
    Basic_block *pred;
 
    for (edge = node->pred_list; edge != NULL; edge = edge->pred_next) {
-	pred = edge->from;
+        pred = edge->from;
 
-	if (! set_contains(s, pred->index) ) {
-	   set_add(s, pred->index);
-	   pred->loop_depth++;
-	   search_predecessors_not_in (pred, s);
-	}
+        if (! set_contains(s, pred->index) ) {
+           set_add(s, pred->index);
+           pred->loop_depth++;
+           search_predecessors_not_in (pred, s);
+        }
    }
 
 }

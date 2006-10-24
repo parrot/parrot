@@ -83,7 +83,7 @@ imcc_globals_destroy(Interp *interp, int ex, void *param)
             mem_sys_free(s);
             s = prev_s;
         }
-	clear_sym_hash(&cs->key_consts);
+        clear_sym_hash(&cs->key_consts);
         prev_cs = cs->prev;
         mem_sys_free(cs);
         cs = prev_cs;
@@ -1311,9 +1311,9 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 ins->opnum == PARROT_OP_get_results_pc ||
                 ins->opnum == PARROT_OP_get_params_pc ||
                 ins->opnum == PARROT_OP_set_returns_pc) {
-	    /* TODO get rid of verify_signature - PIR call sigs are already fixed
-	     *      PASM still needs it
-	     */
+            /* TODO get rid of verify_signature - PIR call sigs are already fixed
+             *      PASM still needs it
+             */
             verify_signature(interpreter, ins, pc);
             /* emit var_args part */
             for (; i < ins->opsize - 1; ++i) {

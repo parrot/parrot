@@ -288,13 +288,13 @@ reg_sort_f(const void *a, const void *b)
     SymReg *ra = *(SymReg**) a;
     SymReg *rb = *(SymReg**) b;
     if (ra->first_ins->index < rb->first_ins->index) {
-	return -1;
+        return -1;
     }
     else if (ra->first_ins->index == rb->first_ins->index) {
         return 0;
     }
     else {
-	return 1;
+        return 1;
     }
 }
 
@@ -692,11 +692,11 @@ map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[],
             continue;
         r = unit->reglist[y];
         if (   r
-    	    && r->color != -1
-	    && r->set == typ) {
+                && r->color != -1
+                && r->set == typ) {
             assert(r->color - already_allocated >= 0);
-    	    avail[r->color - already_allocated] = 0;
-    	}
+            avail[r->color - already_allocated] = 0;
+        }
     }
 }
 

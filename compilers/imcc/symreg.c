@@ -57,8 +57,8 @@ _get_sym_typed(SymHash * hsh, const char * name, int t)
     SymReg * p;
     int i = hash_str(name) % hsh->size;
     for (p = hsh->data[i]; p; p = p->next) {
-	if (!strcmp(name, p->name) && t == p->set)
-	    return p;
+        if (!strcmp(name, p->name) && t == p->set)
+            return p;
     }
     return 0;
 }
@@ -77,13 +77,13 @@ _mk_symreg(SymHash* hsh, char * name, int t)
 {
     SymReg * r;
     if ((r = _get_sym_typed(hsh, name, t))) {
-	free(name);
+        free(name);
         return r;
     }
     r = calloc(1, sizeof(SymReg));
     if (r==NULL) {
-	fprintf(stderr, "Memory error at mk_symreg\n");
-	abort();
+        fprintf(stderr, "Memory error at mk_symreg\n");
+        abort();
     }
     r->name = name;
     r->color = -1;
@@ -243,7 +243,7 @@ mk_pasm_reg(Interp *interp, char * name)
 {
     SymReg * r;
     if ((r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name))) {
-	free(name);
+        free(name);
         return r;
     }
     r = mk_symreg(interp, name, *name);
@@ -747,8 +747,8 @@ _get_sym(SymHash * hsh, const char * name)
 #if IMC_TRACE_HIGH
         printf("   [%s]\n", p->name);
 #endif
-	if (!strcmp(name, p->name))
-	    return p;
+        if (!strcmp(name, p->name))
+            return p;
     }
     return 0;
 }
@@ -800,14 +800,14 @@ clear_sym_hash(SymHash *hsh)
     int i;
     SymReg * p, *next;
     if (!hsh->data) 
-	return;
+        return;
     for (i = 0; i < hsh->size; i++) {
-	for (p = hsh->data[i]; p; ) {
-	    next = p->next;
-	    free_sym(p);
-	    p = next;
-	}
-	hsh->data[i] = NULL;
+        for (p = hsh->data[i]; p; ) {
+            next = p->next;
+            free_sym(p);
+            p = next;
+        }
+        hsh->data[i] = NULL;
     }
     mem_sys_free(hsh->data);
     hsh->data = NULL;
@@ -821,7 +821,7 @@ debug_dump_sym_hash(SymHash *hsh)
     int i;
     SymReg * p;
     for (i = 0; i < hsh->size; i++) {
-	for (p = hsh->data[i]; p; p = p->next) {
+        for (p = hsh->data[i]; p; p = p->next) {
             fprintf(stderr, "%s ", p->name);
         }
     }
@@ -835,14 +835,14 @@ clear_locals(IMC_Unit * unit)
     SymReg * p, *next;
     SymHash *hsh = &unit->hash;
     for (i = 0; i < hsh->size; i++) {
-	for (p = hsh->data[i]; p; ) {
-	    next = p->next;
+        for (p = hsh->data[i]; p; ) {
+            next = p->next;
             if (unit && p->life_info) {
                 free_life_info(unit, p);
             }
-	    free_sym(p);
-	    p = next;
-	}
+            free_sym(p);
+            p = next;
+        }
         hsh->data[i] = NULL;
     }
     hsh->entries = 0;

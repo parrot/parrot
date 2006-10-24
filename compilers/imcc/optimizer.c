@@ -1118,7 +1118,7 @@ unused_label(Interp *interpreter, IMC_Unit * unit)
 
     IMCC_info(interpreter, 2, "\tunused_label\n");
     for (i=1; i < unit->n_basic_blocks; i++) {
-	ins = unit->bb_list[i]->start;
+        ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
             SymReg * lab = ins->r[0];
             used = 0;
@@ -1188,7 +1188,7 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
     /* Unreachable blocks */
 
     for (i=1; i < unit->n_basic_blocks; i++) {
-	bb = unit->bb_list[i];
+        bb = unit->bb_list[i];
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
             continue;
         /* this block isn't entered from anywhere */

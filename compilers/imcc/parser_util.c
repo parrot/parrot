@@ -895,7 +895,7 @@ change_op(Interp *interpreter, IMC_Unit *unit, SymReg **r, int num, int emit)
         /* make a number const */
         c = r[num];
         if (c->type & VT_CONSTP)
-	    c = c->reg;
+            c = c->reg;
         s = mk_const(interpreter, str_dup(c->name), 'N');
         r[num] = s;
         changed = 1;

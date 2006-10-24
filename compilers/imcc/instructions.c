@@ -55,7 +55,7 @@ static int emitter;     /* XXX */
 
 Instruction *
 _mk_instruction(const char *op, const char * fmt, int n,
-	SymReg ** r, int flags)
+        SymReg ** r, int flags)
 {
     int i, reg_space;
     Instruction * ins;
@@ -66,7 +66,7 @@ _mk_instruction(const char *op, const char * fmt, int n,
     ins = calloc(sizeof(Instruction) + reg_space, 1);
     if (ins == NULL) {
         fprintf(stderr, "Memory error at mk_instruction\n");
-	abort();
+        abort();
     }
 
     ins->op = str_dup(op);
@@ -191,7 +191,7 @@ instruction_reads(Instruction* ins, SymReg* r) {
     }
     f = ins->flags;
     for (i = 0; i < ins->n_r; i++) {
-	if (f & (1<<i)) {
+        if (f & (1<<i)) {
             ri = ins->r[i];
             if (ri == r)
                 return 1;
@@ -277,7 +277,7 @@ instruction_writes(Instruction* ins, SymReg* r) {
         return 0;
     }
     for (i = 0; i < ins->n_r; i++)
-	if (f & (1<<(16+i))) {
+        if (f & (1<<(16+i))) {
             if (ins->r[i] == r)
                 return 1;
         }
@@ -438,13 +438,13 @@ emitb(Interp * interp, IMC_Unit * unit, Instruction * i)
 {
 
     if (!unit || !i)
-	return 0;
+        return 0;
     if(!unit->instructions)
         unit->last_ins = unit->instructions = i;
     else {
-	unit->last_ins->next = i;
+        unit->last_ins->next = i;
         i->prev = unit->last_ins;
-	unit->last_ins = i;
+        unit->last_ins = i;
     }
     i->line = IMCC_INFO(interp)->line - 1;         /* lexer is in next line already */
     return i;
@@ -478,8 +478,8 @@ ins_print(Interp *interp, FILE *fd, Instruction * ins)
     PIO_eprintf(NULL, "ins_print\n");
 #endif
 
-    if (!ins->r[0] || !strchr(ins->fmt, '%')) {	/* comments, labels and such */
-	return fprintf(fd, "%s", ins->fmt);
+    if (!ins->r[0] || !strchr(ins->fmt, '%')) { /* comments, labels and such */
+        return fprintf(fd, "%s", ins->fmt);
     }
     for (i = 0; i < ins->n_r; i++) {
         p = ins->r[i];
@@ -487,17 +487,17 @@ ins_print(Interp *interp, FILE *fd, Instruction * ins)
             continue;
         if (p->type & VT_CONSTP)
             p = p->reg;
-	if (p->color >= 0 && (p->type & VTREGISTER)) {
-	    sprintf(regb[i], "%c%d", p->set, (int)p->color);
-	    regstr[i] = regb[i];
-	}
+        if (p->color >= 0 && (p->type & VTREGISTER)) {
+            sprintf(regb[i], "%c%d", p->set, (int)p->color);
+            regstr[i] = regb[i];
+        }
         else if (IMCC_INFO(interp)->allocated &&
                 (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
                 p->set != 'K' &&
                 p->color < 0 && (p->type & VTREGISTER)) {
-	    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - (int)p->color);
-	    regstr[i] = regb[i];
-	}
+                    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - (int)p->color);
+                    regstr[i] = regb[i];
+        }
         else if (p->type & VTREGKEY) {
             SymReg * k = p->nextkey;
             for (*regb[i] = '\0'; k; k = k->nextkey) {
@@ -523,8 +523,8 @@ ins_print(Interp *interp, FILE *fd, Instruction * ins)
             sprintf(regb[i], "\"%s\"", p->name);      /* XXX */
             regstr[i] = regb[i];
         }
-	else
-	    regstr[i] = p->name;
+        else
+            regstr[i] = p->name;
     }
 
     switch (ins->opsize-1) {
@@ -595,9 +595,9 @@ e_file_emit(Interp *interp, void *param, IMC_Unit * unit, Instruction * ins)
     PIO_eprintf(NULL, "e_file_emit\n");
 #endif
     if ((ins->type & ITLABEL) || ! *ins->op)
-	ins_print(interp, stdout, ins);
+        ins_print(interp, stdout, ins);
     else {
-	imcc_fprintf(interp, stdout, "\t%I ",ins);
+        imcc_fprintf(interp, stdout, "\t%I ",ins);
     }
     printf("\n");
     return 0;

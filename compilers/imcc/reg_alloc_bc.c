@@ -300,7 +300,7 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
     int i, j;
     for (i = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
-    	for (; r; r = r->next)
+        for (; r; r = r->next)
             for (j = 0; j < 4; j++)
                 if (r->set == type[j] && (r->type & VTREGISTER)) {
                     sets[j]++;
@@ -359,13 +359,13 @@ reg_sort_f(const void *a, const void *b)
     SymReg *ra = *(SymReg**) a;
     SymReg *rb = *(SymReg**) b;
     if (ra->first_ins->index < rb->first_ins->index) {
-	return -1;
+       return -1;
     }
     else if (ra->first_ins->index == rb->first_ins->index) {
         return 0;
     }
     else {
-	return 1;
+        return 1;
     }
 }
 
@@ -824,51 +824,51 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
     p31 = unit->p31;
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-	needs_store = 0;
-	needs_fetch = 0;
+        needs_store = 0;
+        needs_fetch = 0;
 
-	if (instruction_reads (ins, old_sym) && !(ins->flags & ITSPILL))
-	    needs_fetch = 1;
+        if (instruction_reads (ins, old_sym) && !(ins->flags & ITSPILL))
+            needs_fetch = 1;
 
-	if (instruction_writes (ins, old_sym) && !(ins->flags & ITSPILL))
-	    needs_store = 1;
+        if (instruction_writes (ins, old_sym) && !(ins->flags & ITSPILL))
+            needs_store = 1;
         if (dl)
             ins->index += dl;
 
-	if (needs_fetch) {
-	    regs[0] = new_sym;
+        if (needs_fetch) {
+            regs[0] = new_sym;
             regs[1] = p31;
             sprintf(buf, "%d", unit->n_spilled);
             regs[2] = mk_const(interpreter, str_dup(buf), 'I');
-	    sprintf(buf, "%%s, %%s[%%s]   #FETCH %s", old_sym->name);
-	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 4, 0);
-	    tmp->bbindex = ins->bbindex;
+            sprintf(buf, "%%s, %%s[%%s]   #FETCH %s", old_sym->name);
+            tmp = INS(interpreter, unit, "set", buf, regs, 3, 4, 0);
+            tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             tmp->index = ins->index;
             ins->index++;
             /* insert tmp before actual ins */
             insert_ins(unit, ins->prev, tmp);
             dl++;
-	}
+        }
         /* change all occurance of old_sym to new */
         for (i = 0; old_sym != new_sym && ins->r[i] &&
                 i < IMCC_MAX_REGS; i++)
             if (ins->r[i] == old_sym)
                 ins->r[i] = new_sym;
-	if (needs_store) {
+        if (needs_store) {
             regs[0] = p31;
             sprintf(buf, "%d", unit->n_spilled);
             regs[1] = mk_const(interpreter, str_dup(buf), 'I');
-	    regs[2] = new_sym;
-	    sprintf(buf, "%%s[%%s], %%s   #SPILL %s", old_sym->name);
-	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 2, 0);
-	    tmp->bbindex = ins->bbindex;
+            regs[2] = new_sym;
+            sprintf(buf, "%%s[%%s], %%s   #SPILL %s", old_sym->name);
+            tmp = INS(interpreter, unit, "set", buf, regs, 3, 2, 0);
+            tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             /* insert tmp after ins */
             insert_ins(unit, ins, tmp);
             tmp->index = ins->index + 1;
             dl++;
-	}
+        }
         if (needs_fetch || needs_store) {
             /* update life info of prev sym */
             update_life(interpreter, unit, ins, new_sym, needs_fetch, 
@@ -930,7 +930,7 @@ spill_registers(Parrot_Interp interpreter, IMC_Unit* unit, graph* G)
             IMCC_debug(interpreter, DEBUG_REG,
                     "SPILL_REGISTERS spilled node %d\n", x);
             spilled++;
-	}
+        }
     }
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_instructions(interpreter, unit);
@@ -990,7 +990,7 @@ compute_spill_benefit (Parrot_Interp interpreter, IMC_Unit * unit, graph* G)
             IMCC_debug(interpreter, DEBUG_REG,
                     "SPILL_REGISTERS spilled node %d\n", x);
             spilled++;
-	}
+        }
     }
 
     for (i = 0; i < unit->n_symbols; i++) {
