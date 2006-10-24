@@ -67,8 +67,14 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     void set_string_keyed_int (INTVAL key, STRING* value) {
         STRING **data;
         if (key < 0)
-            real_exception(INTERP, NULL, E_IndexError,
-                "ResizableStringArray: index out of bounds!");
+        {
+            INTVAL size = DYNSELF.elements();
+            if (key < -size)
+                real_exception(INTERP, NULL, E_IndexError,
+                    "ResizableStringArray: index out of bounds!");
+            else
+                key += size;
+        }
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -114,6 +120,57 @@ Removes and returns the last element in the array.
         }
         value = DYNSELF.get_string_keyed_int(size-1);
         DYNSELF.set_integer_native(size - 1);
+        return value;
+    }
+
+/*
+
+=item C<PMC* pop_pmc()>
+
+Removes and returns the last element in the array.
+
+=cut
+
+*/
+
+    PMC* pop_pmc() {
+        STRING *strval = DYNSELF.pop_string();
+        PMC    *value  = pmc_new(INTERP, enum_class_String);
+
+        VTABLE_set_string_native(INTERP, value, strval);
+
+        return value;
+    }
+
+/*
+
+=item C<INTVAL pop_integer()>
+
+Removes and returns the last element in the array.
+
+=cut
+
+*/
+
+    INTVAL pop_integer() {
+        PMC   *pmcval = DYNSELF.pop_pmc();
+        INTVAL value  = VTABLE_get_integer(INTERP, pmcval);
+        return value;
+    }
+
+/*
+
+=item C<FLOATVAL pop_float()>
+
+Removes and returns the last element in the array.
+
+=cut
+
+*/
+
+    FLOATVAL pop_float() {
+        PMC     *pmcval = DYNSELF.pop_pmc();
+        FLOATVAL value  = VTABLE_get_number(INTERP, pmcval);
         return value;
     }
 
@@ -213,6 +270,116 @@ Removes and returns an item from the start of the array.
 
 =item C<PMC* shift_pmc()>
 
+Removes and returns the first element in the array.
+
+=cut
+
+*/
+
+    PMC* shift_pmc() {
+        STRING *strval = DYNSELF.shift_string();
+        PMC    *value  = pmc_new(INTERP, enum_class_String);
+
+        VTABLE_set_string_native(INTERP, value, strval);
+
+        return value;
+    }
+
+/*
+
+=item C<INTVAL shift_integer()>
+
+Removes and returns the first element in the array.
+
+=cut
+
+*/
+
+    INTVAL shift_integer() {
+        PMC   *pmcval = DYNSELF.shift_pmc();
+        INTVAL value  = VTABLE_get_integer(INTERP, pmcval);
+        return value;
+    }
+
+/*
+
+=item C<FLOATVAL shift_float()>
+
+Removes and returns the first element in the array.
+
+=cut
+
+*/
+
+    FLOATVAL shift_float() {
+        PMC     *pmcval = DYNSELF.shift_pmc();
+        FLOATVAL value  = VTABLE_get_number(INTERP, pmcval);
+        return value;
+    }
+
+
+/*
+
+=item C<void push_pmc (PMC *value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    void push_pmc(PMC *value) {
+        STRING *strvalue = VTABLE_get_string(INTERP, value);
+        DYNSELF.push_string(strvalue);
+    }
+
+/*
+
+=item C<void push_integer (INTVAL value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    void push_integer(INTVAL value) {
+        PMC *ret;
+        STRING *val;
+
+        ret = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_integer_native(INTERP, ret, value);
+        val = VTABLE_get_string(INTERP, ret);
+        DYNSELF.push_string(val);
+    }
+
+/*
+
+=item C<void push_float (FLOAT value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    void push_float(FLOATVAL value) {
+        PMC *ret;
+        STRING *val;
+
+        ret = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_number_native(INTERP, ret, value);
+        val = VTABLE_get_string(INTERP, ret);
+        DYNSELF.push_string(val);
+    }
+
+/*
+
+=item C<PMC* shift_pmc()>
+
 Removes and returns a String PMC from the start of the array.
 
 =cut
@@ -259,6 +426,65 @@ of the array.
         for (i = size; i; --i)
             data[i] = data[i - 1];
         DYNSELF.set_string_keyed_int(0, value);
+    }
+
+
+/*
+
+=item C<void unshift_pmc (PMC *value)>
+
+Extends the array by adding an element of value C<*value> to the front of
+the array.
+
+=cut
+
+*/
+
+    void unshift_pmc(PMC *value) {
+        STRING *strvalue = VTABLE_get_string(INTERP, value);
+        DYNSELF.unshift_string(strvalue);
+    }
+
+/*
+
+=item C<void unshift_integer (INTVAL value)>
+
+Extends the array by adding an element of value C<*value> to the front of
+the array.
+
+=cut
+
+*/
+
+    void unshift_integer(INTVAL value) {
+        PMC *ret;
+        STRING *val;
+
+        ret = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_integer_native(INTERP, ret, value);
+        val = VTABLE_get_string(INTERP, ret);
+        DYNSELF.unshift_string(val);
+    }
+
+/*
+
+=item C<void unshift_float (FLOAT value)>
+
+Extends the array by adding an element of value C<*value> to the front of
+the array.
+
+=cut
+
+*/
+
+    void unshift_float(FLOATVAL value) {
+        PMC *ret;
+        STRING *val;
+
+        ret = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_number_native(INTERP, ret, value);
+        val = VTABLE_get_string(INTERP, ret);
+        DYNSELF.unshift_string(val);
     }
 
 /*
