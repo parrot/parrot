@@ -109,26 +109,26 @@ Parrot_dlopen(const char *filename)
             return (void *)header;
 
         /*
-	 * that didn't work either; go ahead and report the orignal error
-	 */
+         * that didn't work either; go ahead and report the orignal error
+         */
 
-	switch(dyld_result) {
+        switch(dyld_result) {
         /* XXX for now, ignore all the known errors */
-	case NSObjectFileImageFailure:
-	case NSObjectFileImageInappropriateFile:
-	case NSObjectFileImageArch:
-	case NSObjectFileImageFormat:
-	case NSObjectFileImageAccess:
-	    break;
+        case NSObjectFileImageFailure:
+        case NSObjectFileImageInappropriateFile:
+        case NSObjectFileImageArch:
+        case NSObjectFileImageFormat:
+        case NSObjectFileImageAccess:
+            break;
 
-	default:
-	    fprintf(stderr,
-		    "open result was unknown (%i) for fullpath [%s]\n",
-		    dyld_result, fullpath);
-	    break;
-	}
+        default:
+            fprintf(stderr,
+                    "open result was unknown (%i) for fullpath [%s]\n",
+                    dyld_result, fullpath);
+            break;
+        }
 
-	return NULL;
+        return NULL;
     }
 }
 
