@@ -2602,14 +2602,14 @@ string_join(Interp *interpreter, STRING *j, PMC *ar)
     int i, ar_len = VTABLE_elements(interpreter, ar);
 
     if (ar_len == 0) {
-	return string_make_empty(interpreter, enum_stringrep_one, 0);
+        return string_make_empty(interpreter, enum_stringrep_one, 0);
     }
     s = VTABLE_get_string_keyed_int(interpreter, ar, 0);
     res = string_copy(interpreter, s);
     for (i = 1; i < ar_len; ++i) {
-	res = string_append(interpreter, res, j, 0);
-	s = VTABLE_get_string_keyed_int(interpreter, ar, i);
-	res = string_append(interpreter, res, s, 0);
+        res = string_append(interpreter, res, j, 0);
+        s = VTABLE_get_string_keyed_int(interpreter, ar, i);
+        res = string_append(interpreter, res, s, 0);
     }
     return res;
 }
@@ -2623,7 +2623,7 @@ string_split(Interp *interpreter, STRING *delim, STRING *str)
     int ps,pe;
 
     if (!slen)
-	return res;
+        return res;
 
     dlen = string_length(interpreter, delim);
     if (dlen == 0) {
@@ -2633,25 +2633,25 @@ string_split(Interp *interpreter, STRING *delim, STRING *str)
            STRING * const p = string_substr(interpreter, str, i, 1, NULL, 0);
            VTABLE_set_string_keyed_int(interpreter, res, i, p);
         }
-	return res;
+        return res;
     }
 
     pe = string_str_index(interpreter,str,delim,0);
     if (pe < 0) {
-	VTABLE_push_string(interpreter,res,str);
-	return res;
+        VTABLE_push_string(interpreter,res,str);
+        return res;
     }
     ps = 0;
     while (ps <= slen) {
         const int pl = pe - ps;
-	STRING * const tstr = string_substr(interpreter, str, ps, pl, NULL, 0);
-	VTABLE_push_string(interpreter,res,tstr);
-	ps = pe + string_length(interpreter,delim);
-	if (ps > slen)
-	    break;
+        STRING * const tstr = string_substr(interpreter, str, ps, pl, NULL, 0);
+        VTABLE_push_string(interpreter,res,tstr);
+        ps = pe + string_length(interpreter,delim);
+        if (ps > slen)
+            break;
         pe = string_str_index(interpreter,str,delim,ps);
-	if (pe < 0)
-	    pe = slen;
+        if (pe < 0)
+            pe = slen;
     }
     return res;
 }

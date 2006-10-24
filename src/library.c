@@ -233,8 +233,8 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
          *      the goal is just to have for sure an invisible 0 at end
          */
         full_name = string_append(interpreter, full_name, nul, 0);
-	full_name->bufused--;
-	full_name->strlen--;
+        full_name->bufused--;
+        full_name->strlen--;
 #ifdef WIN32
         {
             char *p;
@@ -400,7 +400,7 @@ parrot_split_path_ext(Interp* interpreter, STRING *in,
     len = string_length(interpreter, in);
     pos_sl = CHARSET_RINDEX(interpreter, in, slash1, len);
     if (pos_sl == -1)
-	pos_sl = CHARSET_RINDEX(interpreter, in, slash2, len);
+        pos_sl = CHARSET_RINDEX(interpreter, in, slash2, len);
     pos_dot = CHARSET_RINDEX(interpreter, in, dot, len);
     
     /* XXX directory parrot-0.4.1 or such */
@@ -410,25 +410,25 @@ parrot_split_path_ext(Interp* interpreter, STRING *in,
     ++pos_dot;
     ++pos_sl;
     if (pos_sl && pos_dot ) {
-	stem = string_substr(interpreter, in, pos_sl, pos_dot - pos_sl - 1,
-		NULL, 0);
-	*wo_ext = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
-	*ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
+        stem = string_substr(interpreter, in, pos_sl, pos_dot - pos_sl - 1,
+                NULL, 0);
+        *wo_ext = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
+        *ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
     }
     else if (pos_dot) {
-	stem = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
-	*wo_ext = stem;
-	*ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
+        stem = string_substr(interpreter, in, 0, pos_dot - 1, NULL, 0);
+        *wo_ext = stem;
+        *ext = string_substr(interpreter, in, pos_dot, len - pos_dot, NULL, 0);
     }
     else if (pos_sl) {
-	stem = string_substr(interpreter, in, pos_sl, len - pos_sl, NULL, 0);
-	*wo_ext = string_copy(interpreter, in);
-	*ext = 0;
+        stem = string_substr(interpreter, in, pos_sl, len - pos_sl, NULL, 0);
+        *wo_ext = string_copy(interpreter, in);
+        *ext = 0;
     }
     else {
-	stem = string_copy(interpreter, in);
-	*wo_ext = stem;
-	*ext = NULL;
+        stem = string_copy(interpreter, in);
+        *wo_ext = stem;
+        *ext = NULL;
     }
     return stem;
 }

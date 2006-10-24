@@ -392,7 +392,7 @@ Parrot_find_global_op(Interp *interpreter, PMC *ns,
     PMC *res;
 
     if (!globalname)
-	real_exception(interpreter, next, E_NameError,
+        real_exception(interpreter, next, E_NameError,
                        "Tried to get null global");
 
     res = Parrot_find_global_n(interpreter, ns, globalname);

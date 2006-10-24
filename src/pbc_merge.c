@@ -527,7 +527,7 @@ pbc_merge_pic_index(Interp *interpreter, struct pbc_merge_input **inputs,
     /* calc needed size */
     for (i = 0, size = 0; i < num_inputs; i++) {
         in_seg = inputs[i]->pf->cur_cs->pic_index;
-	size += in_seg->size;
+        size += in_seg->size;
     }
     pic_index = PackFile_Segment_new_seg(interpreter,
               &pf->directory, PF_UNKNOWN_SEG, "PIC_idx_MERGED", 1);
@@ -535,18 +535,18 @@ pbc_merge_pic_index(Interp *interpreter, struct pbc_merge_input **inputs,
     pic_index->size = size;
     for (i = 0, size = 0; i < num_inputs; i++) {
         in_seg = inputs[i]->pf->cur_cs->pic_index;
-	/*
-	 * pic_index is 0 or an ever increasing (by 1) number
-	 */
-	for (j = 0; j < in_seg->size; j++) {
-	    k = in_seg->data[j];
-	    if (k) {
-		pic_index->data[cursor] = k + start;
-		last = k;
-	    }
-	    cursor++;
-	}
-	start = last;
+        /*
+         * pic_index is 0 or an ever increasing (by 1) number
+         */
+        for (j = 0; j < in_seg->size; j++) {
+            k = in_seg->data[j];
+            if (k) {
+                pic_index->data[cursor] = k + start;
+                last = k;
+            }
+            cursor++;
+        }
+        start = last;
     }
     bc->pic_index = pic_index;
 }

@@ -1026,9 +1026,9 @@ parrot_gc_gms_pobject_lives(Interp* interpreter, PObj *obj)
     h = PObj_to_GMSH(obj);
     /* unsnap it from white, put it into grey or black */
     if (PObj_is_PMC_TEST(obj) && ((PMC*)obj)->pmc_ext)
-	gc_gms_setto_gray(interpreter, h, priority);
+        gc_gms_setto_gray(interpreter, h, priority);
     else
-	gc_gms_setto_black(interpreter, h, priority);
+        gc_gms_setto_black(interpreter, h, priority);
 }
 
 static int

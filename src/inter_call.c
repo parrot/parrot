@@ -974,7 +974,7 @@ process_args(Interp *interpreter, struct call_state *st,
                 ++st->optionals;
                 Parrot_convert_arg(interpreter, st);
                 opt_flag = 1;
-store_opt:
+              store_opt:
                 idx = st->dest.u.op.pc[st->dest.i];
                 assert(idx >= 0);
                 store_arg(st, idx);

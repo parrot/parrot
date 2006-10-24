@@ -266,7 +266,7 @@ parrot_pic_opcode(Interp *interpreter, INTVAL op)
 
 static int
 pass_int(Interp *interpreter, PMC *sig, char *src_base, void **src, 
-		char *dest_base, void **dest)
+        char *dest_base, void **dest)
 {
     int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
@@ -278,7 +278,7 @@ pass_int(Interp *interpreter, PMC *sig, char *src_base, void **src,
 
 static int
 pass_num(Interp *interpreter, PMC *sig, char *src_base, void **src, 
-		char *dest_base, void **dest)
+        char *dest_base, void **dest)
 {
     int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
@@ -290,7 +290,7 @@ pass_num(Interp *interpreter, PMC *sig, char *src_base, void **src,
 
 static int
 pass_str(Interp *interpreter, PMC *sig, char *src_base, void **src, 
-		char *dest_base, void **dest)
+        char *dest_base, void **dest)
 {
     int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
@@ -302,7 +302,7 @@ pass_str(Interp *interpreter, PMC *sig, char *src_base, void **src,
 
 static int
 pass_pmc(Interp *interpreter, PMC *sig, char *src_base, void **src, 
-		char *dest_base, void **dest)
+        char *dest_base, void **dest)
 {
     int i, n = SIG_ELEMS(sig);
     for (i = 2 ; n; ++i, --n) {
@@ -314,7 +314,7 @@ pass_pmc(Interp *interpreter, PMC *sig, char *src_base, void **src,
 
 static int
 pass_mixed(Interp *interpreter, PMC *sig, char *src_base, void **src, 
-		char *dest_base, void **dest)
+        char *dest_base, void **dest)
 {
     PMC* argP;
     int i, n = SIG_ELEMS(sig);
@@ -431,7 +431,7 @@ is_pic_param(Interp *interpreter, void **pc, Parrot_MIC* mic, opcode_t op)
         ccont = ctx->current_cont;
         if (!PMC_cont(ccont)->address)
             return 0;
-	caller_ctx = PMC_cont(ccont)->to_ctx;
+        caller_ctx = PMC_cont(ccont)->to_ctx;
         args = caller_ctx->current_results;
     }
     else {

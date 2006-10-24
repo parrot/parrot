@@ -37,7 +37,7 @@ Run parrot ops. Set exception handler and/or resume after exception.
 /* #define RUNLOOP_TRACE 1 */
 
 static int
-runloop_id_counter = 0;		/* for synthesizing runloop ids. */
+runloop_id_counter = 0;          /* for synthesizing runloop ids. */
 
 void
 runops(Interp *interpreter, size_t offs)

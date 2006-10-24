@@ -86,12 +86,12 @@ prederef_args(void **pc_prederef, Interp *interpreter,
         opcode_t arg = pc[i];
         int type;
         if (i >= m) {
-	    sig = (PMC*) pc_prederef[1]; 
-	    type = SIG_ITEM(sig, i - m);
+            sig = (PMC*) pc_prederef[1];
+            type = SIG_ITEM(sig, i - m);
             type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);       
         }
-	else
-	    type = opinfo->types[i - 1];
+        else
+            type = opinfo->types[i - 1];
 
         switch (type) {
 
@@ -368,10 +368,10 @@ init_prederef(Interp *interpreter, int which)
         void **temp = (void **)Parrot_memalign_if_possible(256,
                 N * sizeof(void *));
 #endif
-	/*
-	 * calc and remember pred_offset
-	 */
-	CONTEXT(interpreter->ctx)->pred_offset = pc - (opcode_t*)temp;
+        /*
+         * calc and remember pred_offset
+         */
+        CONTEXT(interpreter->ctx)->pred_offset = pc - (opcode_t*)temp;
 
         /* fill with the prederef__ opcode function */
         if (which == PARROT_SWITCH_CORE || which == PARROT_SWITCH_JIT_CORE )
@@ -383,7 +383,7 @@ init_prederef(Interp *interpreter, int which)
             opinfo = &interpreter->op_info_table[*pc];
             temp[i] = pred_func;
             n = opinfo->op_count;
-	    ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
+            ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
             /* count ops that need a PIC */
             if (parrot_PIC_op_is_cached(interpreter, *pc))
                 n_pics++;

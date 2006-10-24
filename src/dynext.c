@@ -111,16 +111,16 @@ Return path and handle of a dynamic lib, setting lib_name to just the filestem
 
 */
 
-static STRING * get_path(Interp *interpreter, STRING *lib, void **handle, 
+static STRING * get_path(Interp *interpreter, STRING *lib, void **handle,
                          STRING *wo_ext, STRING *ext)
 {
     STRING *path, *full_name;
     const char *err = NULL;    /* buffer returned from Parrot_dlerror */
 
     PMC * const iglobals = interpreter->iglobals;
-    PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interpreter, iglobals, 
+    PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
                                                      IGLOBALS_LIB_PATHS);
-    PMC * const share_ext = VTABLE_get_pmc_keyed_int(interpreter, lib_paths, 
+    PMC * const share_ext = VTABLE_get_pmc_keyed_int(interpreter, lib_paths,
                                                      PARROT_LIB_DYN_EXTS);
 
     if ( lib == NULL) {
@@ -139,35 +139,35 @@ static STRING * get_path(Interp *interpreter, STRING *lib, void **handle,
      * first, try to add an extension to the file if it has none.
      */
     if (! ext) {
-	const INTVAL n = VTABLE_elements(interpreter, share_ext);
-	INTVAL i;
+        const INTVAL n = VTABLE_elements(interpreter, share_ext);
+        INTVAL i;
 
-	for (i = 0; i < n; ++i) {
-	    ext = VTABLE_get_string_keyed_int(interpreter, share_ext, i);
-	    full_name = string_concat(interpreter, wo_ext, ext, 0);
-	    path = Parrot_locate_runtime_file_str(interpreter, full_name,
-		    PARROT_RUNTIME_FT_DYNEXT);
-	    if (path) {
-		*handle = Parrot_dlopen(path->strstart);
-		if (*handle) {
-		    return path;
-		}
-		err = Parrot_dlerror();
-		Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG, 
+        for (i = 0; i < n; ++i) {
+            ext = VTABLE_get_string_keyed_int(interpreter, share_ext, i);
+            full_name = string_concat(interpreter, wo_ext, ext, 0);
+            path = Parrot_locate_runtime_file_str(interpreter, full_name,
+                    PARROT_RUNTIME_FT_DYNEXT);
+            if (path) {
+                *handle = Parrot_dlopen(path->strstart);
+                if (*handle) {
+                    return path;
+                }
+                err = Parrot_dlerror();
+                Parrot_warn(interpreter, PARROT_WARNINGS_DYNEXT_FLAG,
                             "Couldn't load '%Ss': %s\n",
-			full_name, err ? err : "unknown reason");
-		return NULL;
-	    }
+                        full_name, err ? err : "unknown reason");
+                return NULL;
+            }
 
-	    /*
-	     * File with extension and prefix was not found, 
-	     * so try file.extension w/o prefix
-	     */
-	    *handle = Parrot_dlopen(full_name->strstart);
-	    if (*handle) {
-		return full_name;
-	    }
-	}
+            /*
+             * File with extension and prefix was not found,
+             * so try file.extension w/o prefix
+             */
+            *handle = Parrot_dlopen(full_name->strstart);
+            if (*handle) {
+                return full_name;
+            }
+        }
     }
     /*
      * finally, try the given file name as is. We still use
@@ -235,7 +235,7 @@ Parrot_init_lib(Interp *interpreter,
                 void (*init_func)(Interp *, PMC *))
 {
     PMC *lib_pmc = NULL;
-    
+
     if (load_func)
         lib_pmc = (*load_func)(interpreter);
 
@@ -258,7 +258,7 @@ Parrot_init_lib(Interp *interpreter,
     return lib_pmc;
 }
 
-static PMC *run_init_lib(Interp *interpreter, void *handle, 
+static PMC *run_init_lib(Interp *interpreter, void *handle,
                          STRING *lib_name, STRING *wo_ext) {
     STRING *load_func_name, *init_func_name, *type;
     PMC *(*load_func)(Interp *);
@@ -286,10 +286,10 @@ static PMC *run_init_lib(Interp *interpreter, void *handle,
         init_func = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(handle,
                     cinit_func_name));
         string_cstring_free(cinit_func_name);
-    } 
+    }
     else {
         load_func = (void *)NULL;
-		init_func = NULL;
+        init_func = NULL;
     }
 
     lib_pmc = Parrot_init_lib(interpreter, load_func, init_func);
@@ -314,7 +314,7 @@ static PMC *run_init_lib(Interp *interpreter, void *handle,
     return lib_pmc;
 }
 
-static 
+static
 STRING *clone_string_into(Interp *d, Interp *s, PMC *value) {
     STRING *orig;
     STRING *ret;
@@ -330,7 +330,7 @@ STRING *clone_string_into(Interp *d, Interp *s, PMC *value) {
 
 static PMC *make_string_pmc(Interp *interp, STRING *string) {
     PMC *ret;
-    ret = VTABLE_new_from_string(interp, 
+    ret = VTABLE_new_from_string(interp,
         interp->vtables[enum_class_String]->class,
         string, PObj_constant_FLAG);
     return ret;
@@ -343,13 +343,13 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
     STRING *type;
     void *handle;
 
-    wo_ext = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc, 
+    wo_ext = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
         const_string(s, "_filename")));
-    lib_name = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc, 
+    lib_name = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
         const_string(s, "_lib_name")));
     handle = PMC_data(lib_pmc);
 
-    type = VTABLE_get_string(s, 
+    type = VTABLE_get_string(s,
         VTABLE_getprop(s, lib_pmc, const_string(s, "_type")));
     if (0 == string_equal(s, type, const_string(s, "Ops"))) {
         PMC *new_lib_pmc;
@@ -357,16 +357,16 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.
-         * Anyways, if we hope to share bytecode at runtime, we need to have 
+         * Anyways, if we hope to share bytecode at runtime, we need to have
          * them have identical opcodes anyways.
          */
         new_lib_pmc = constant_pmc_new(d, enum_class_ParrotLibrary);
         PMC_data(new_lib_pmc) = handle;
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_filename"), 
+        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_filename"),
             make_string_pmc(d, wo_ext));
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_lib_name"), 
+        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_lib_name"),
             make_string_pmc(d, lib_name));
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_type"), 
+        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_type"),
             make_string_pmc(d, const_string(d, "Ops")));
 
         /* fixup d->all_op_libs, if necessary */
@@ -376,7 +376,7 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
                 d->all_op_libs = mem_sys_realloc(d->all_op_libs,
                     sizeof(op_lib_t *) * s->n_libs);
             else
-                d->all_op_libs = mem_sys_allocate(sizeof(op_lib_t *) * 
+                d->all_op_libs = mem_sys_allocate(sizeof(op_lib_t *) *
                     s->n_libs);
             for (i = d->n_libs; i < s->n_libs; ++i)
                 d->all_op_libs[i] = s->all_op_libs[i];
@@ -384,7 +384,7 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
         }
 
         return new_lib_pmc;
-    } 
+    }
     else {
         return run_init_lib(d, handle, lib_name, wo_ext);
     }
@@ -396,7 +396,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     void * handle;
     PMC *lib_pmc;
     STRING *path;
-    STRING *lib_name, *wo_ext, *ext;	/* library stem without path
+    STRING *lib_name, *wo_ext, *ext;    /* library stem without path
                                          * or extension.  */
 
     UNUSED(initializer);
@@ -409,13 +409,13 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     if ( lib == NULL) {
         wo_ext   = string_from_const_cstring(interpreter, "", 0);
         lib_name = NULL;
-    } 
+    }
     else {
         lib_name = parrot_split_path_ext(interpreter, lib, &wo_ext, &ext);
     }
     lib_pmc = is_loaded(interpreter, wo_ext);
     if (lib_pmc) {
-	/* UNLOCK() */
+        /* UNLOCK() */
         return lib_pmc;
     }
     path = get_path(interpreter, lib, &handle, wo_ext, ext);

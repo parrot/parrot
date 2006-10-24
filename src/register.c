@@ -243,7 +243,7 @@ init_context(Interp *interpreter, parrot_context_t *ctx, parrot_context_t *old)
         ctx->warns = old->warns;
         ctx->errors = old->errors;
         ctx->trace_flags = old->trace_flags;
-	ctx->pred_offset = old->pred_offset;
+        ctx->pred_offset = old->pred_offset;
         ctx->current_HLL = old->current_HLL;
         ctx->current_namespace = old->current_namespace;
         /* end COW */
@@ -267,7 +267,7 @@ Parrot_dup_context(Interp *interpreter, struct Parrot_Context *old)
         interpreter->ctx_mem.free_list[slot] = *(void **) ptr;
     }
     else {
-	ptr = mem_sys_allocate(reg_alloc + ALIGNED_CTX_SIZE);
+        ptr = mem_sys_allocate(reg_alloc + ALIGNED_CTX_SIZE);
     }
     CONTEXT(interpreter->ctx) = ctx = ptr;
     ctx->regs_mem_size = reg_alloc;

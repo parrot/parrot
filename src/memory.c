@@ -159,7 +159,7 @@ mem_sys_free(void *from)
     fprintf(stderr, "Freed %p\n", from);
 #endif
     if (from)
-	free(from);
+        free(from);
 }
 
 void

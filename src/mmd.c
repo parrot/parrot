@@ -214,7 +214,7 @@ mmd_ensure_writable(Interp *interpreter, INTVAL function, PMC *pmc) {
 
 =item C<PMC*
 mmd_dispatch_p_ppp(Interp *,
-		 PMC *left, PMC *right, PMC *dest, INTVAL function)>
+        PMC *left, PMC *right, PMC *dest, INTVAL function)>
 
 Dispatch to a multimethod that returns a PMC. C<left>, C<right>, and
 C<dest> are all PMC pointers, while C<func_num> is the MMD table that
@@ -228,19 +228,19 @@ C<right>, and possibly C<dest> like any other binary vtable function.
 
 =item C<PMC*
 mmd_dispatch_p_pip(Interp *,
-		 PMC *left, INTVAL right, PMC *dest, INTVAL function)>
+        PMC *left, INTVAL right, PMC *dest, INTVAL function)>
 
 Like above, right argument is a native INTVAL.
 
 =item C<PMC*
 mmd_dispatch_p_pnp(Interp *,
-		 PMC *left, FLOATVAL right, PMC *dest, INTVAL function)>
+        PMC *left, FLOATVAL right, PMC *dest, INTVAL function)>
 
 Like above, right argument is a native FLOATVAL.
 
 =item C<PMC*
 mmd_dispatch_p_psp(Interp *,
-		 PMC *left, STRING *right, PMC *dest, INTVAL function)>
+        PMC *left, STRING *right, PMC *dest, INTVAL function)>
 
 Like above, right argument is a native STRING *.
 
@@ -264,7 +264,7 @@ Inplace dispatch functions for C<< left <op=> right >>.
 
 PMC*
 mmd_dispatch_p_ppp(Interp *interpreter,
-		 PMC *left, PMC *right, PMC *dest, INTVAL func_nr)
+        PMC *left, PMC *right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_ppp real_function;
     PMC *sub;
@@ -292,7 +292,7 @@ mmd_dispatch_p_ppp(Interp *interpreter,
 
 PMC*
 mmd_dispatch_p_pip(Interp *interpreter,
-		 PMC *left, INTVAL right, PMC *dest, INTVAL func_nr)
+        PMC *left, INTVAL right, PMC *dest, INTVAL func_nr)
 {
     int is_pmc;
 
@@ -324,7 +324,7 @@ mmd_dispatch_p_pip(Interp *interpreter,
 
 PMC*
 mmd_dispatch_p_pnp(Interp *interpreter,
-		 PMC *left, FLOATVAL right, PMC *dest, INTVAL func_nr)
+        PMC *left, FLOATVAL right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_pnp real_function;
     PMC *sub;
@@ -352,7 +352,7 @@ mmd_dispatch_p_pnp(Interp *interpreter,
 
 PMC*
 mmd_dispatch_p_psp(Interp *interpreter,
-		 PMC *left, STRING *right, PMC *dest, INTVAL func_nr)
+        PMC *left, STRING *right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_psp real_function;
     PMC *sub;
@@ -381,7 +381,7 @@ mmd_dispatch_p_psp(Interp *interpreter,
  */
 void
 mmd_dispatch_v_pp(Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL func_nr)
+        PMC *left, PMC *right, INTVAL func_nr)
 {
     mmd_f_v_pp real_function;
     PMC *sub;
@@ -407,7 +407,7 @@ mmd_dispatch_v_pp(Interp *interpreter,
 
 void
 mmd_dispatch_v_pi(Interp *interpreter,
-		 PMC *left, INTVAL right, INTVAL func_nr)
+        PMC *left, INTVAL right, INTVAL func_nr)
 {
     mmd_f_v_pi real_function;
     PMC *sub;
@@ -431,7 +431,7 @@ mmd_dispatch_v_pi(Interp *interpreter,
 
 void
 mmd_dispatch_v_pn(Interp *interpreter,
-		 PMC *left, FLOATVAL right, INTVAL func_nr)
+        PMC *left, FLOATVAL right, INTVAL func_nr)
 {
     mmd_f_v_pn real_function;
     PMC *sub;
@@ -455,7 +455,7 @@ mmd_dispatch_v_pn(Interp *interpreter,
 
 void
 mmd_dispatch_v_ps(Interp *interpreter,
-		 PMC *left, STRING *right, INTVAL func_nr)
+        PMC *left, STRING *right, INTVAL func_nr)
 {
     mmd_f_v_ps real_function;
     PMC *sub;
@@ -481,7 +481,7 @@ mmd_dispatch_v_ps(Interp *interpreter,
 
 =item C<INTVAL
 mmd_dispatch_i_pp(Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL func_nr)>
+        PMC *left, PMC *right, INTVAL func_nr)>
 
 Like C<mmd_dispatch_p_ppp()>, only it returns an C<INTVAL>. This is used
 by MMD compare functions.
@@ -492,7 +492,7 @@ by MMD compare functions.
 
 INTVAL
 mmd_dispatch_i_pp(Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL func_nr)
+        PMC *left, PMC *right, INTVAL func_nr)
 {
     mmd_f_i_pp real_function;
     PMC *sub;
@@ -882,8 +882,8 @@ mmd_destroy(Parrot_Interp interpreter)
         for (i = 0; i <interpreter->n_binop_mmd_funcs; ++i) {
             if (interpreter->binop_mmd_funcs[i].mmd_funcs) {
                 mem_sys_free(interpreter->binop_mmd_funcs[i].mmd_funcs);
-		interpreter->binop_mmd_funcs[i].mmd_funcs = NULL;
-	    }
+                interpreter->binop_mmd_funcs[i].mmd_funcs = NULL;
+            }
         }
     }
     mem_sys_free(interpreter->binop_mmd_funcs);

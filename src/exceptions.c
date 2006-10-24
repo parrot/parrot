@@ -693,11 +693,11 @@ real_exception(Interp *interpreter, void *ret_addr,
      * FIXME classify errors
      */
     if (!the_exception) {
-	PIO_eprintf(interpreter, 
+        PIO_eprintf(interpreter,
                 "real_exception (severity:%d error:%d): %Ss\n"
                 "likely reason: argument count mismatch in main "
-                "(more than 1 param)\n", 
-	    EXCEPT_error, exitcode, msg );
+                "(more than 1 param)\n",
+                EXCEPT_error, exitcode, msg );
         /* [what if exitcode is a multiple of 256?] */
         exit(exitcode);
     }
@@ -706,9 +706,9 @@ real_exception(Interp *interpreter, void *ret_addr,
     the_exception->msg = msg;
     the_exception->resume = ret_addr;
     if (Interp_debug_TEST(interpreter, PARROT_BACKTRACE_DEBUG_FLAG)) {
-	PIO_eprintf(interpreter, "real_exception (severity:%d error:%d): %Ss\n",
-	    EXCEPT_error, exitcode, msg );
-	PDB_backtrace(interpreter);
+        PIO_eprintf(interpreter, "real_exception (severity:%d error:%d): %Ss\n",
+            EXCEPT_error, exitcode, msg );
+        PDB_backtrace(interpreter);
     }
     /*
      * reenter runloop

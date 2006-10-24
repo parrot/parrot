@@ -285,13 +285,13 @@ set_register_usage(Interp *interpreter,
         int arg_type;
         PMC *sig;
         if (argn >= args) {
-	    sig = CONTEXT(interpreter->ctx)->constants[cur_op[1]]->u.key;
-	    arg_type = VTABLE_get_integer_keyed_int(interpreter, 
+            sig = CONTEXT(interpreter->ctx)->constants[cur_op[1]]->u.key;
+            arg_type = VTABLE_get_integer_keyed_int(interpreter, 
                     sig, argn - args);
             arg_type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);       
         }
         else
-	    arg_type = op_info->types[argn - 1];
+            arg_type = op_info->types[argn - 1];
 
         switch (arg_type) {
             case PARROT_ARG_I:
@@ -1311,7 +1311,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
                 sub = PMC_sub(sub_pmc);
                 offs = pc - sub->seg->base.data;
                 if (offs >= sub->start_offs && offs < sub->end_offs) {
-		    CONTEXT(interpreter->ctx)->n_regs_used = sub->n_regs_used;
+                    CONTEXT(interpreter->ctx)->n_regs_used = sub->n_regs_used;
                     return;
                 }
 
@@ -1359,7 +1359,7 @@ parrot_build_asm(Interp *interpreter,
     opcode_t cur_opcode_byte, *cur_op;
     Parrot_jit_optimizer_section_ptr cur_section;
     struct PackFile_Segment *jit_seg;
-    INTVAL *  n_regs_used;	/* INSP in PBC */
+    INTVAL *  n_regs_used;        /* INSP in PBC */
     /* XXX
      * no longer referenced due to disabled code below
     char *name;

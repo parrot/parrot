@@ -75,7 +75,7 @@ intval_mod(INTVAL i2, INTVAL i3)
     INTVAL r;
 
     if (z == 0)
-	return i2;
+        return i2;
 
     y = i2;
 

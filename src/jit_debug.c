@@ -315,7 +315,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     stabsfile = debug_file(interpreter, file, "stabs.s");
     ofile = debug_file(interpreter, file, "o");
     {
-    	char *temp = string_to_cstring(interpreter,stabsfile);
+        char *temp = string_to_cstring(interpreter,stabsfile);
         stabs = fopen(temp, "w");
         free(temp);
     }
@@ -323,7 +323,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
         return;
 
     {
-    	char *temp = string_to_cstring(interpreter, pasmfile);
+        char *temp = string_to_cstring(interpreter, pasmfile);
         /* filename info */
         fprintf(stabs, ".data\n.text\n");       /* darwin wants it */
         fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n",temp);
@@ -368,9 +368,9 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     cmd = Parrot_sprintf_c(interpreter, "as %Ss -o %Ss", stabsfile, ofile);
 
     {
-    	char *temp = string_to_cstring(interpreter, cmd);
-    	system(temp);
-    	free(temp);
+        char *temp = string_to_cstring(interpreter, cmd);
+        system(temp);
+        free(temp);
     }
 }
 

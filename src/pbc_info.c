@@ -38,13 +38,13 @@ the name of each segment in the directory.
 
 static INTVAL
 iter(Interp* interpreter,
-		struct PackFile_Segment *seg, void *user_data)
+                struct PackFile_Segment *seg, void *user_data)
 {
     int ident = (int)user_data;
     printf("%*.0s%s\n", ident, "", seg->name);
     if (seg->type == PF_DIR_SEG)
-	PackFile_map_segments(interpreter, (struct PackFile_Directory*)seg,
-		iter, (void*)(ident+2));
+        PackFile_map_segments(interpreter, (struct PackFile_Directory*)seg,
+                iter, (void*)(ident+2));
     return 0;
 }
 
@@ -74,11 +74,11 @@ main(int argc, char * argv[] )
      * add some more segments
      */
     seg = PackFile_Segment_new_seg(interpreter,
-		    &pf->directory, PF_DIR_SEG, "dir2", 1);
+                    &pf->directory, PF_DIR_SEG, "dir2", 1);
     seg = PackFile_Segment_new_seg(interpreter,
-		    (struct PackFile_Directory*)seg, PF_BYTEC_SEG, "code", 1);
+                    (struct PackFile_Directory*)seg, PF_BYTEC_SEG, "code", 1);
     seg = PackFile_Segment_new_seg(interpreter,
-		    &pf->directory, PF_DIR_SEG, "dir3", 1);
+                    &pf->directory, PF_DIR_SEG, "dir3", 1);
 
     /*
      * show these

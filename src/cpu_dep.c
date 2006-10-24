@@ -53,7 +53,7 @@ trace_system_areas(Interp *interpreter)
 {
 #if defined(__sparc) /* Flush register windows */
     static union {
-	unsigned int insns[4];
+        unsigned int insns[4];
         double align_hack[2];
     } u = { {
 #  ifdef __sparcv9
@@ -62,7 +62,7 @@ trace_system_areas(Interp *interpreter)
                             0x91d02003, /* ta ST_FLUSH_WINDOWS */
 #  endif
                             0x81c3e008, /* retl */
-			    0x01000000  /* nop */
+                            0x01000000  /* nop */
     } };
 
     static void (*fn_ptr)(void) = (void (*)(void))&u.align_hack[0];
@@ -77,7 +77,7 @@ trace_system_areas(Interp *interpreter)
     current_regstore_top = flush_reg_store();
 
     trace_mem_block(interpreter, 0x80000fff80000000,
-				(size_t)current_regstore_top);
+            (size_t)current_regstore_top);
 #else
 
 #  ifdef PARROT_HAS_HEADER_SETJMP
@@ -115,7 +115,7 @@ trace_system_stack(Interp *interpreter)
     size_t lo_var_ptr = (size_t)interpreter->lo_var_ptr;
 
     trace_mem_block(interpreter, (size_t)lo_var_ptr,
-			   (size_t)&lo_var_ptr);
+            (size_t)&lo_var_ptr);
 }
 
 /*

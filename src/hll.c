@@ -39,9 +39,9 @@ C<.loadlib> pragma.
 Return the id of the given HLL name or -1 on error. "parrot" has id 0.
 
 =item C<void Parrot_register_HLL_type(Interp *, INTVAL hll_id,
-	INTVAL core_type, INTVAL hll_type)>
+        INTVAL core_type, INTVAL hll_type)>
 
-Register a type mapping	C<core_type => hll_type> for the given HLL.
+Register a type mapping        C<core_type => hll_type> for the given HLL.
 
 =item C<INTVAL Parrot_get_HLL_type(Interp *, INTVAL hll_id, INTVAL core_type)>
 
@@ -113,7 +113,7 @@ new_hll_entry(Interp *interpreter)
 
 INTVAL
 Parrot_register_HLL(Interp *interpreter,
-	STRING *hll_name, STRING *hll_lib)
+        STRING *hll_name, STRING *hll_lib)
 {
     PMC *entry, *name, *type_hash, *ns_hash, *hll_info;
     INTVAL idx;
@@ -244,7 +244,7 @@ Parrot_get_HLL_name(Interp *interpreter, INTVAL id)
 
 void
 Parrot_register_HLL_type(Interp *interpreter, INTVAL hll_id,
-	INTVAL core_type, INTVAL hll_type)
+        INTVAL core_type, INTVAL hll_type)
 {
     PMC *entry, *type_hash;
     Hash *hash;

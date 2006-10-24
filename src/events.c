@@ -1139,7 +1139,7 @@ Parrot_sleep_on_event(Parrot_Interp interpreter, FLOATVAL t, void* next)
      * we can identify this event in wakeup
      */
     Parrot_new_timer_event(interpreter, (PMC*) next, t,
-			0, 0, NULL, EVENT_TYPE_SLEEP);
+            0, 0, NULL, EVENT_TYPE_SLEEP);
     next = wait_for_wakeup(interpreter, next);
 #else
     /*

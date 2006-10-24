@@ -524,7 +524,7 @@ INTVAL
 Parrot_char_is_graph(Interp *interpreter, UINTVAL character)
 {
 #if PARROT_HAS_ICU
-	return u_isgraph(character);
+    return u_isgraph(character);
 #else
     return isgraph(character);
 #endif
@@ -566,7 +566,7 @@ INTVAL
 Parrot_char_is_print(Interp *interpreter, UINTVAL character)
 {
 #if PARROT_HAS_ICU
-	return u_isprint(character);
+    return u_isprint(character);
 #else
     return isprint(character);
 #endif

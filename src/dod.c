@@ -144,7 +144,7 @@ pobject_lives(Interp *interpreter, PObj *obj)
 #if ! DISABLE_GC_DEBUG
 #  if GC_VERBOSE
     if (CONSERVATIVE_POINTER_CHASING) {
-        fprintf(stderr, "GC Warning! Unanchored %s %p " 
+        fprintf(stderr, "GC Warning! Unanchored %s %p "
                 " found in system areas \n",
                 PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
     }
@@ -581,7 +581,7 @@ Parrot_dod_sweep(Interp *interpreter,
                             THREAD_STATE_SUSPENDED_GC))) {
                         ++total_used;
                         goto next;
-                    } 
+                    }
                 }
                 /* if object is a PMC and needs destroying */
                 if (PObj_is_PMC_TEST(b)) {
@@ -733,7 +733,7 @@ trace_mem_block(Interp *interpreter,
     const size_t pmc_min = get_min_pmc_address(interpreter);
     const size_t pmc_max = get_max_pmc_address(interpreter);
 
-    const size_t mask = 
+    const size_t mask =
         find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
                          buffer_max > pmc_max ? buffer_max : pmc_max);
 
@@ -942,12 +942,12 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
     if (flags & DOD_finish_FLAG) {
         /* XXX */
         Parrot_dod_clear_live_bits(interpreter);
-        clear_live_bits(interpreter, 
+        clear_live_bits(interpreter,
             interpreter->arena_base->constant_pmc_pool);
 
         Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
-        Parrot_dod_sweep(interpreter, 
-		interpreter->arena_base->constant_pmc_pool);
+        Parrot_dod_sweep(interpreter,
+                interpreter->arena_base->constant_pmc_pool);
         return;
     }
     ++arena_base->DOD_block_level;

@@ -32,21 +32,21 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 #ifdef __IBMC__
 
 /* following from /usr/include/dbxstclass.h */
-#define C_GSYM		"0x80" /* global variable */
-#define C_LSYM		"0x81" /* stack variable */
-#define C_PSYM		"0x82" /* parameter */
-#define C_RSYM		"0x83" /* register variable */
-#define C_RPSYM		"0x84"
-#define C_STSYM		"0x85" /* variable in data section */
-#define C_TCSYM		"0x86"
-#define C_BCOMM		"0x87"
-#define C_ECOML		"0x88"
-#define C_ECOMM		"0x89"
-#define C_DECL		"0x8c" /* type declaration */
-#define C_ENTRY		"0x8d"
-#define C_FUN		"0x8e"
-#define C_BSTAT		"0x8f"
-#define C_ESTAT		"0x90"
+#define C_GSYM        "0x80" /* global variable */
+#define C_LSYM        "0x81" /* stack variable */
+#define C_PSYM        "0x82" /* parameter */
+#define C_RSYM        "0x83" /* register variable */
+#define C_RPSYM       "0x84"
+#define C_STSYM       "0x85" /* variable in data section */
+#define C_TCSYM       "0x86"
+#define C_BCOMM       "0x87"
+#define C_ECOML       "0x88"
+#define C_ECOMM       "0x89"
+#define C_DECL        "0x8c" /* type declaration */
+#define C_ENTRY       "0x8d"
+#define C_FUN         "0x8e"
+#define C_BSTAT       "0x8f"
+#define C_ESTAT       "0x90"
 
 void Parrot_jit_debug(Interp* interpreter);
 
@@ -284,7 +284,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     stabsfile = debug_file(interpreter, file, "stabs.s");
     ofile = debug_file(interpreter, file, "o");
     {
-    	char *temp = string_to_cstring(interpreter,stabsfile);
+        char *temp = string_to_cstring(interpreter,stabsfile);
         stabs = fopen(temp, "w");
         free(temp);
     }
@@ -292,7 +292,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
         return;
 
     {
-    	char *temp = string_to_cstring(interpreter, pasmfile);
+        char *temp = string_to_cstring(interpreter, pasmfile);
         /* filename info */
         fprintf(stabs, ".file \"%s\"\n",temp);
         free(temp);
@@ -338,9 +338,9 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     cmd = Parrot_sprintf_c(interpreter, "as %Ss -o %Ss", stabsfile, ofile);
 
     {
-    	char *temp = string_to_cstring(interpreter, cmd);
-    	system(temp);
-    	free(temp);
+        char *temp = string_to_cstring(interpreter, cmd);
+        system(temp);
+        free(temp);
     }
 }
 

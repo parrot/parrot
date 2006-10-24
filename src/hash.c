@@ -373,7 +373,7 @@ free list, we know that it's time to resize the hashtable.
 Algorithm for expansion: We exactly double the size of the hashtable.
 Keys are assigned to buckets with the formula
 
-	bucket_index = hash(key) % parrot_hash_size
+        bucket_index = hash(key) % parrot_hash_size
 
 so when doubling the size of the hashtable, we know that every key is
 either already in the correct bucket, or belongs in the current bucket
@@ -409,10 +409,10 @@ expand_hash(Interp *interpreter, Hash *hash)
        e.g. 3 buckets, 4 pointers:
 
          +---+---+---+-+-+-+-+
-	 | --> bs    | -> bi |
+         | --> bs    | -> bi |
          +---+---+---+-+-+-+-+
-	 ^           ^
-	 | old_mem   | hash->bi
+         ^           ^
+         | old_mem   | hash->bi
     */
     old_nb = N_BUCKETS(old_size);
     old_mem = hash->bs;
@@ -422,10 +422,10 @@ expand_hash(Interp *interpreter, Hash *hash)
     new_mem = mem_sys_realloc(old_mem, HASH_ALLOC_SIZE(new_size));
     /*
          +---+---+---+---+---+---+-+-+-+-+-+-+-+-+
-	 |  bs       | old_bi    |  new_bi       |
+         |  bs       | old_bi    |  new_bi       |
          +---+---+---+---+---+---+-+-+-+-+-+-+-+-+
-  	 ^                       ^
-	 | new_mem	         | hash->bi
+           ^                       ^
+         | new_mem                 | hash->bi
     */
     bs = new_mem;
     old_bi = (HashBucket**) (bs + old_nb);
@@ -449,39 +449,39 @@ expand_hash(Interp *interpreter, Hash *hash)
      * as expand_hash is only called for that case).
      */
     if (offset) {
-	for (i = 0; i < old_size; ++i) {
-	    next_p = new_bi + i;
-	    while (*next_p) {
-		*next_p = (HashBucket *)((char *)*next_p + offset);
-		b = *next_p;
-		next_p = &b->next;
-	    }
-	}
+        for (i = 0; i < old_size; ++i) {
+            next_p = new_bi + i;
+            while (*next_p) {
+                *next_p = (HashBucket *)((char *)*next_p + offset);
+                b = *next_p;
+                next_p = &b->next;
+            }
+        }
     }
     /* recalc bucket index */
     for (i = 0; i < old_size; ++i) {
-	next_p = new_bi + i;
-	while (*next_p) {
-	    b = *next_p;
-	    /* rehash the bucket */
-	    new_loc = (hash->hash_val)(interpreter, b->key, hash->seed) &
-		(new_size - 1);
-	    if (i != new_loc) {
-		*next_p = b->next;
-		b->next = new_bi[new_loc];
-		new_bi[new_loc] = b;
-	    }
-	    else
-		next_p = &b->next;
-	}
+        next_p = new_bi + i;
+        while (*next_p) {
+            b = *next_p;
+            /* rehash the bucket */
+            new_loc = (hash->hash_val)(interpreter, b->key, hash->seed) &
+                (new_size - 1);
+            if (i != new_loc) {
+                *next_p = b->next;
+                b->next = new_bi[new_loc];
+                new_bi[new_loc] = b;
+            }
+            else
+                next_p = &b->next;
+        }
     }
     /* add new buckets to free_list in reverse order
      * lowest bucket is top on free list and will be used first
      */
     for (i = 0, b = (HashBucket*)new_bi - 1; i < old_nb; ++i, --b) {
-	b->next = hash->free_list;
-	b->key = b->value = NULL;
-	hash->free_list = b;
+        b->next = hash->free_list;
+        b->key = b->value = NULL;
+        hash->free_list = b;
     }
 
 }
@@ -612,12 +612,12 @@ init_hash(Interp *interpreter, Hash *hash,
     bp += N_BUCKETS(INITIAL_BUCKETS);
     hash->bi = (HashBucket**) bp;
     for (i = 0, --bp; i < N_BUCKETS(INITIAL_BUCKETS); ++i, --bp) {
-	bp->next = hash->free_list;
-	bp->key = bp->value = NULL;
-	hash->free_list = bp;
+        bp->next = hash->free_list;
+        bp->key = bp->value = NULL;
+        hash->free_list = bp;
     }
     for (i = 0; i < INITIAL_BUCKETS; ++i) {
-	hash->bi[i] = NULL;
+        hash->bi[i] = NULL;
     }
 }
 
@@ -754,9 +754,9 @@ parrot_hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)
     }
     res = NULL;
     for (b = hash->bs + i; i < size ; ++i, ++b) {
-	/* XXX int keys may be zero - use different iterator
-	 */
-	if (b->key) {
+        /* XXX int keys may be zero - use different iterator
+         */
+        if (b->key) {
             if (!res) {
                 res = b->key;
             }
@@ -788,10 +788,10 @@ parrot_hash_get_bucket(Interp *interpreter, Hash *hash, void *key)
     UINTVAL hashval = (hash->hash_val)(interpreter, key, hash->seed);
     HashBucket *bucket = hash->bi[hashval & hash->mask];
     while (bucket) {
-	/* store hash_val or not */
+        /* store hash_val or not */
         if ((hash->compare)(interpreter, key, bucket->key) == 0)
-	    return bucket;
-	bucket = bucket->next;
+            return bucket;
+        bucket = bucket->next;
     }
     return NULL;
 }
@@ -850,10 +850,10 @@ parrot_hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
     UINTVAL hashval = (hash->hash_val)(interpreter, key, hash->seed);
     HashBucket *bucket = hash->bi[hashval & hash->mask];
     while (bucket) {
-	/* store hash_val or not */
+        /* store hash_val or not */
         if ((hash->compare)(interpreter, key, bucket->key) == 0)
-	    break;
-	bucket = bucket->next;
+            break;
+        bucket = bucket->next;
     }
 
     if (bucket) {
@@ -861,24 +861,24 @@ parrot_hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
             DOD_WRITE_BARRIER_KEY(interpreter, hash->container,
                     (PMC*)bucket->value, bucket->key, (PMC*)value, key);
         }
-        bucket->value = value;	/* replace value */
+        bucket->value = value;        /* replace value */
     }
     else {
         if (hash->entry_type == enum_type_PMC && hash->container) {
             DOD_WRITE_BARRIER_KEY(interpreter, hash->container,
                     NULL, NULL, (PMC*)value, key);
         }
-	bucket = hash->free_list;
-	if (!bucket) {
-	    expand_hash(interpreter, hash);
-	    bucket = hash->free_list;
-	}
+        bucket = hash->free_list;
+        if (!bucket) {
+            expand_hash(interpreter, hash);
+            bucket = hash->free_list;
+        }
         hash->entries++;
-	hash->free_list = bucket->next;
+        hash->free_list = bucket->next;
         bucket->key = key;
         bucket->value = value;
-	bucket->next = hash->bi[hashval & hash->mask];
-	hash->bi[hashval & hash->mask] = bucket;
+        bucket->next = hash->bi[hashval & hash->mask];
+        hash->bi[hashval & hash->mask] = bucket;
     }
     return bucket;
 }

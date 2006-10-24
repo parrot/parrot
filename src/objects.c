@@ -1454,8 +1454,8 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
     obj_name = string_substr(interpreter, attr, 0, idx-1, 0, 0);
 
     real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
-	    "No such attribute '%Ss\\0%Ss'",
-	    obj_name, attr_name);
+            "No such attribute '%Ss\\0%Ss'",
+            obj_name, attr_name);
 
     return 0;
 }

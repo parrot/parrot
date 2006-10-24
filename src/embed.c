@@ -433,10 +433,10 @@ Loads the C<PackFile> returned by C<Parrot_readbc()>.
 void
 Parrot_loadbc(Interp *interpreter, struct PackFile *pf)
 {
-	if (pf == NULL) {
-		PIO_eprintf(interpreter, "Invalid packfile\n" );
-		return;
-	}
+    if (pf == NULL) {
+        PIO_eprintf(interpreter, "Invalid packfile\n" );
+        return;
+    }
     interpreter->initial_pf = pf;
     interpreter->code = pf->cur_cs;
 }
@@ -562,7 +562,7 @@ calibrate(Parrot_Interp interpreter)
     opcode_t code[] = { 1 };      /* noop */
     opcode_t *pc = code;
 
-    if (n < 1000000)	/* minimum opcode count for calibration */
+    if (n < 1000000)    /* minimum opcode count for calibration */
         n = 1000000;
     start = Parrot_floatval_time();
     for (empty = 0.0, i = 0; i < n; i++)
@@ -912,7 +912,7 @@ Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
     program_code[1] = 0; /* end */
     pf = PackFile_new(interpreter, 0);
     pf->cur_cs = (struct PackFile_ByteCode *)
-	(pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interpreter, pf, "code", 1);
+        (pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interpreter, pf, "code", 1);
     pf->cur_cs->base.data = program_code;
     pf->cur_cs->base.size = 2;
     Parrot_loadbc(interpreter, pf);

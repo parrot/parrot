@@ -4962,7 +4962,7 @@ static int slwait (int *sl) {
     while (InterlockedCompareExchange ((void **) sl, 
                                        (void *) 1,
                                        (void *) 0) != 0) 
-	    Sleep (0);
+        Sleep (0);
     return 0;
 }
 
@@ -5032,8 +5032,8 @@ static int region_list_remove (region_list_entry **last) {
     return TRUE;
 }
 
-#define CEIL(size,to)	(((size)+(to)-1)&~((to)-1))
-#define FLOOR(size,to)	((size)&~((to)-1))
+#define CEIL(size,to)    (((size)+(to)-1)&~((to)-1))
+#define FLOOR(size,to)    ((size)&~((to)-1))
 
 #define SBRK_SCALE  0
 /* #define SBRK_SCALE  1 */
@@ -5378,7 +5378,7 @@ static void *mmap (void *ptr, long size, long prot, long type,
     assert (size % g_pagesize == 0);
     /* Allocate this */
     ptr = VirtualAlloc (ptr, size,
-					    MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN, PAGE_READWRITE);
+            MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN, PAGE_READWRITE);
     if (! ptr) {
         ptr = (void *) MORECORE_FAILURE;
         goto mmap_exit;

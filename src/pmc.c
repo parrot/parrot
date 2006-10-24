@@ -510,8 +510,8 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
                     Parrot_get_ctx_HLL_type(interpreter, enum_class_NameSpace));
             vtable->_namespace = ns;
             /* anchor at parent, aka current_namespace, that is 'parrot' */
-            VTABLE_set_pmc_keyed_str(interpreter, 
-                    CONTEXT(interpreter->ctx)->current_namespace, 	
+            VTABLE_set_pmc_keyed_str(interpreter,
+                    CONTEXT(interpreter->ctx)->current_namespace,
                     class_name, ns);
         }
         class = vtable->class;

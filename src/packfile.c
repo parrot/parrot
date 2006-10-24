@@ -97,8 +97,8 @@ static struct PackFile_Constant **find_constants(Interp*,
 #define ALIGN_16(st, cursor) \
     do { \
         (cursor) = (opcode_t *) \
-		   ((char *)(cursor) \
-		    + ROUND_16((char *)(cursor) - (char *)(st))); \
+           ((char *)(cursor) \
+            + ROUND_16((char *)(cursor) - (char *)(st))); \
     } while (0)
 
 /*
@@ -391,7 +391,7 @@ find_const_iter(Interp* interpreter,
         struct PackFile_Segment *seg, void *user_data)
 {
     if (seg->type == PF_DIR_SEG) {
-	PackFile_map_segments(interpreter, (struct PackFile_Directory*)seg,
+        PackFile_map_segments(interpreter, (struct PackFile_Directory*)seg,
                 find_const_iter, user_data);
     }
     else if (seg->type == PF_CONST_SEG) {
@@ -2924,7 +2924,7 @@ find_fixup_iter(Interp* interpreter, struct PackFile_Segment *seg,
         void *user_data)
 {
     if (seg->type == PF_DIR_SEG) {
-	if (PackFile_map_segments(interpreter, (struct PackFile_Directory*)seg,
+        if (PackFile_map_segments(interpreter, (struct PackFile_Directory*)seg,
                 find_fixup_iter, user_data))
             return 1;
     }
@@ -3512,38 +3512,38 @@ Parrot_load_bytecode(Interp *interpreter, STRING *file_str)
     parrot_split_path_ext(interpreter, file_str, &wo_ext, &ext);
     /* check if wo_ext is loaded */
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interpreter,
-	interpreter->iglobals, IGLOBALS_PBC_LIBS);
+        interpreter->iglobals, IGLOBALS_PBC_LIBS);
     if (VTABLE_exists_keyed_str(interpreter, is_loaded_hash, wo_ext))
-	return;
+        return;
     pbc = const_string(interpreter, "pbc");
     if (string_equal(interpreter, ext, pbc) == 0)
-	file_type = PARROT_RUNTIME_FT_PBC;
+        file_type = PARROT_RUNTIME_FT_PBC;
     else
-	file_type = PARROT_RUNTIME_FT_SOURCE;
+        file_type = PARROT_RUNTIME_FT_SOURCE;
 
     path = Parrot_locate_runtime_file_str(interpreter, file_str, file_type);
     if (!path) {
-	real_exception(interpreter, NULL, E_LibraryNotLoadedError, 
-		"Couldn't find file '%Ss'", file_str);
-	return;
+        real_exception(interpreter, NULL, E_LibraryNotLoadedError, 
+                "Couldn't find file '%Ss'", file_str);
+        return;
     }
     /* remember wo_ext => full_path mapping */
     VTABLE_set_string_keyed_str(interpreter, is_loaded_hash, 
-	    wo_ext, path);
+            wo_ext, path);
     filename = string_to_cstring(interpreter, path);
     if ( file_type == PARROT_RUNTIME_FT_PBC) {
-	PackFile_append_pbc(interpreter, filename);
+        PackFile_append_pbc(interpreter, filename);
     }
     else {
         STRING *err;
-	struct PackFile_ByteCode * const cs = IMCC_compile_file_s(interpreter, 
+        struct PackFile_ByteCode * const cs = IMCC_compile_file_s(interpreter, 
                 filename, &err);
-	if (cs) {
-	    do_sub_pragmas(interpreter, cs, PBC_LOADED, NULL);
-	}
-	else
-	    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
-		"compiler returned NULL ByteCode '%Ss' - %Ss", file_str, err);
+        if (cs) {
+            do_sub_pragmas(interpreter, cs, PBC_LOADED, NULL);
+        }
+        else
+            real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+                "compiler returned NULL ByteCode '%Ss' - %Ss", file_str, err);
     }
     string_cstring_free(filename);
 }
