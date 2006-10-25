@@ -64,7 +64,7 @@ unescape(char *string)
 /* add constant string to constant_table */
 static int
 add_const_str(Parrot_Interp interpreter,
-	struct PackFile_ConstTable *consts, char *str)
+        struct PackFile_ConstTable *consts, char *str)
 {
     int k, l;
     char *o;
@@ -74,35 +74,35 @@ add_const_str(Parrot_Interp interpreter,
      * TODO strip delimiters in lexer, this needs adjustment in printint strings
      */
     if (*buf == '"') {
-	buf++;
-	l = unescape(buf);
-	if (l)
-	    buf[--l] = '\0';
+        buf++;
+        l = unescape(buf);
+        if (l)
+            buf[--l] = '\0';
     }
     else if (*buf == '\'') {
-	buf++;
-	l = strlen(buf);
-	if (l)
-	    buf[--l] = '\0';
+        buf++;
+        l = strlen(buf);
+        if (l)
+            buf[--l] = '\0';
     }
     else {
-	l = unescape(buf);
+        l = unescape(buf);
     }
 
     /* Update the constant count and reallocate */
     k = ++consts->const_count;
     if (consts->constants == NULL)
-	consts->constants = mem_sys_allocate(
-		k * sizeof(struct PackFile_Constant *));
+        consts->constants = mem_sys_allocate(
+                k * sizeof(struct PackFile_Constant *));
     else
-	consts->constants = mem_sys_realloc(consts->constants,
-		k * sizeof(struct PackFile_Constant *));
+        consts->constants = mem_sys_realloc(consts->constants,
+                k * sizeof(struct PackFile_Constant *));
 
     /* Allocate a new constant */
     consts->constants[--k] = PackFile_Constant_new(interpreter);
     consts->constants[k]->type = PFC_STRING;
     consts->constants[k]->u.string =
-	string_make(interpreter, buf, (UINTVAL) l, "iso-8859-1", 0 );
+        string_make(interpreter, buf, (UINTVAL) l, "iso-8859-1", 0 );
     free(o);
     return k;
 }
@@ -139,34 +139,34 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
      */
     pc = cur_cs->base.data;
     for (p = program; *p; ++p) {
-	switch (*p) {
-	    case 'p':	/* print_sc */
-		*pc++ = interpreter->op_lib->op_code("print_sc", 1);
-		/* const follows */
-		++p;
-		switch (*p) {
-		    case 'J':
-			*pc++ = add_const_str(interpreter, consts, "Just ");
-			break;
-		    case 'a':
-			*pc++ = add_const_str(interpreter, consts, "another ");
-			break;
-		    case 'P':
-			*pc++ = add_const_str(interpreter, consts, "Parrot ");
-			break;
-		    case 'H':
-			*pc++ = add_const_str(interpreter, consts, "Hacker");
-			break;
-		    case 'n':
-			*pc++ = add_const_str(interpreter, consts, "\n");
-			break;
-		}
-		break;
-	    case 'e':	/* end */
-		*pc++ = interpreter->op_lib->op_code("invoke_p", 1);
-		*pc++ = 1;
-		break;
-	}
+        switch (*p) {
+            case 'p':        /* print_sc */
+                *pc++ = interpreter->op_lib->op_code("print_sc", 1);
+                /* const follows */
+                ++p;
+                switch (*p) {
+                    case 'J':
+                        *pc++ = add_const_str(interpreter, consts, "Just ");
+                        break;
+                    case 'a':
+                        *pc++ = add_const_str(interpreter, consts, "another ");
+                        break;
+                    case 'P':
+                        *pc++ = add_const_str(interpreter, consts, "Parrot ");
+                        break;
+                    case 'H':
+                        *pc++ = add_const_str(interpreter, consts, "Hacker");
+                        break;
+                    case 'n':
+                        *pc++ = add_const_str(interpreter, consts, "\n");
+                        break;
+                }
+                break;
+            case 'e':        /* end */
+                *pc++ = interpreter->op_lib->op_code("invoke_p", 1);
+                *pc++ = 1;
+                break;
+        }
     }
     if (old_cs) {
         /* restore old byte_code, */

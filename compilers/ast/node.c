@@ -97,16 +97,16 @@ dump(nodeType *p, int l)
     fprintf(stderr, "\n%*s", l*2, "");
     fprintf(stderr, "%s(", p->description);
     if (p->dump)
-	p->dump(p, l);
+        p->dump(p, l);
     if (show_context)
         dump_context(p);
     if (p->flags & NODE_HAS_CHILD) {
-	child = CHILD(p);
+        child = CHILD(p);
         dump(child, l + 1);
     }
     fprintf(stderr, ")");
     if (p->next )
-	dump(p->next, l);
+        dump(p->next, l);
 }
 
 static nodeType *
@@ -946,32 +946,32 @@ typedef struct {
  */
 
 static node_names ast_list[] = {
-    { "-no-node-", 	NULL, NULL, NULL, NULL, NULL },
-    { "Args", 	        create_1, exp_Args, NULL, NULL, NULL },
-    { "AssName", 	create_Name, NULL, NULL, NULL, ctx_Var },
-    { "Assign", 	create_1, exp_Assign, NULL, NULL, NULL },
-    { "Binary", 	create_1, exp_Binary, NULL, NULL, ctx_Binary },
-    { "Compare", 	create_1, exp_Compare, NULL, NULL, ctx_Compare },
-    { "Const", 		NULL,     exp_Const, NULL, dump_Const, ctx_Const },
-    { "Defaults", 	create_1, exp_Defaults, NULL, NULL, NULL },
-    { "Function", 	create_Func, exp_Function, NULL, NULL, NULL },
-    { "If", 	        create_1, exp_If, NULL, NULL, NULL },
+    { "-no-node-",      NULL, NULL, NULL, NULL, NULL },
+    { "Args",           create_1, exp_Args, NULL, NULL, NULL },
+    { "AssName",        create_Name, NULL, NULL, NULL, ctx_Var },
+    { "Assign",         create_1, exp_Assign, NULL, NULL, NULL },
+    { "Binary",         create_1, exp_Binary, NULL, NULL, ctx_Binary },
+    { "Compare",        create_1, exp_Compare, NULL, NULL, ctx_Compare },
+    { "Const",          NULL, exp_Const, NULL, dump_Const, ctx_Const },
+    { "Defaults",       create_1, exp_Defaults, NULL, NULL, NULL },
+    { "Function",       create_Func, exp_Function, NULL, NULL, NULL },
+    { "If",             create_1, exp_If, NULL, NULL, NULL },
     { "Line_no",        create_1,  NULL, NULL, NULL, NULL },
     { "Name",           create_Name, NULL, NULL, NULL, ctx_Var },
     { "Op",             create_Name, NULL, NULL, NULL, NULL },
-    { "PCC_Sub", 	create_1, exp_PCC_Sub, NULL, NULL, NULL },
-    { "Params", 	create_1, exp_Params, NULL, NULL, NULL },
-    { "Parrot_AST", 	create_1, exp_default, NULL, NULL, NULL },
-    { "Py_Call", 	create_1, exp_Py_Call, NULL, NULL, NULL },
-    { "Py_Local", 	create_Name, exp_Py_Local, NULL, NULL, NULL },
-    { "Py_Module", 	create_1, exp_Py_Module, NULL, NULL, NULL },
-    { "Py_Print" , 	create_1, exp_Py_Print, NULL, NULL, NULL },
-    { "Py_Print_nl",	create_0, exp_Py_Print_nl, NULL, NULL, NULL },
-    { "Src_File",    	create_1, NULL, NULL, NULL, NULL },
-    { "Src_Line",    	create_1, NULL, NULL, NULL, NULL },
+    { "PCC_Sub",        create_1, exp_PCC_Sub, NULL, NULL, NULL },
+    { "Params",         create_1, exp_Params, NULL, NULL, NULL },
+    { "Parrot_AST",     create_1, exp_default, NULL, NULL, NULL },
+    { "Py_Call",        create_1, exp_Py_Call, NULL, NULL, NULL },
+    { "Py_Local",       create_Name, exp_Py_Local, NULL, NULL, NULL },
+    { "Py_Module",      create_1, exp_Py_Module, NULL, NULL, NULL },
+    { "Py_Print" ,      create_1, exp_Py_Print, NULL, NULL, NULL },
+    { "Py_Print_nl",    create_0, exp_Py_Print_nl, NULL, NULL, NULL },
+    { "Src_File",       create_1, NULL, NULL, NULL, NULL },
+    { "Src_Line",       create_1, NULL, NULL, NULL, NULL },
     { "Stmts",          create_1, exp_default, NULL, NULL, NULL },
     { "Tests",          create_1, NULL, NULL, NULL, NULL },
-    { "Unary", 	        create_1, exp_Unary, NULL, NULL, ctx_Unary },
+    { "Unary",          create_1, exp_Unary, NULL, NULL, ctx_Unary },
     { "Void",           create_1, exp_default, NULL, NULL, NULL },
     { "_",              create_0, NULL, NULL, NULL, NULL },
     { "_options",       create_1, NULL, NULL, NULL, NULL },
@@ -1094,13 +1094,13 @@ IMCC_find_node_nr(const char *name)
 
     search.name = name;
     r = bsearch(&search, ast_list, sizeof(ast_list) / sizeof(ast_list[0]),
-		sizeof(ast_list[0]), ast_comp);
+            sizeof(ast_list[0]), ast_comp);
 
 #if 0
     printf("find: '%s' - %d\n", name, r ? r - ast_list : 0);
 #endif
     if (!r) {
-	return 0;
+        return 0;
     }
     return r - ast_list;
 }
@@ -1187,7 +1187,7 @@ IMCC_new_node(Interp* interp, int nr, nodeType *child, YYLTYPE *loc)
 {
     nodeType * n;
     if (nr == CONST_NODE) {
-	return child;
+        return child;
     }
     n = new_node(loc);
     return ast_list[nr].create(interp, nr, n, child);
@@ -1214,7 +1214,7 @@ IMCC_append_node(Interp *interpreter, nodeType *a, nodeType *b, YYLTYPE *loc)
      *      a last pointer in the node structure could be ok
      */
     while (last->next)
-	last = last->next;
+        last = last->next;
     last->next = b;
     return a;
 }

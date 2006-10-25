@@ -26,18 +26,18 @@ typedef struct _basic_block {
 } Basic_block;
 
 EXTERN enum {
-	BB_IS_SUB = 1 << 0
+    BB_IS_SUB = 1 << 0
 } block_enum_flags;
 
 
 typedef struct _loop_info {
-	Set * loop;		/* loop set containg bb's */
-	Set * exits;		/* blocks that exit the loop */
-	int depth;		/* depth of this loop */
-	int n_entries;		/* nr of entries to this loop */
-	int header;		/* header block of loop */
-	int preheader;		/* preheader block of loop, if 1 entry point */
-	int size;		/* no of blocks in loop */
+    Set * loop;     /* loop set containg bb's */
+    Set * exits;    /* blocks that exit the loop */
+    int depth;      /* depth of this loop */
+    int n_entries;  /* nr of entries to this loop */
+    int header;     /* header block of loop */
+    int preheader;  /* preheader block of loop, if 1 entry point */
+    int size;       /* no of blocks in loop */
 } Loop_info;
 
 

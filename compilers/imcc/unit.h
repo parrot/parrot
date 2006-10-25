@@ -8,9 +8,9 @@
  */
 
 typedef enum {
-    IMC_PASM    	= 0x01,
-    IMC_PCCSUB  	= 0x02,
-    IMC_HAS_SELF	= 0x10
+    IMC_PASM        = 0x01,
+    IMC_PCCSUB      = 0x02,
+    IMC_HAS_SELF    = 0x10
 } IMC_Unit_Type;
 
 /*
@@ -56,11 +56,11 @@ typedef struct _IMC_Unit {
     SymReg *namespace;
     int pasm_file;
     const char *file;
-    int n_vars_used[4];	/* INSP in PIR */
-    int n_regs_used[4];	/* INSP in PBC */
-    int first_avail[4];	/* INSP */
+    int n_vars_used[4]; /* INSP in PIR */
+    int n_regs_used[4]; /* INSP in PBC */
+    int first_avail[4]; /* INSP */
     SymReg *outer;
-    PMC *sub_pmc;	/* this sub */
+    PMC *sub_pmc;       /* this sub */
 
     struct imcc_ostat ostat;
 

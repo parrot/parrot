@@ -3,17 +3,17 @@
 
 /* types */
 
-enum VARTYPE {		/* variable type can be */
-    VTCONST 	= 1 << 0,	/* constant */
-    VTREG	= 1 << 1,	/* register */
-    VTIDENTIFIER= 1 << 2,	/* identifier */
-    VTADDRESS	= 1 << 3,	/* address */
-    VTREGKEY	= 1 << 4,	/* parrot [key;key..], including registers */
-    VTPASM	= 1 << 5,	/* parrot register, colored from .emit */
-    VT_CONSTP	= 1 << 6,	/* pointer to constant value */
-    VT_PCC_SUB  = 1 << 7,	/* PCC subroutine call */
-    VT_FLAT     = 1 << 8,	/* var :flat */
-    VT_OPTIONAL = 1 << 9,	/* var :optional */
+enum VARTYPE {              /* variable type can be */
+    VTCONST     = 1 << 0,   /* constant */
+    VTREG       = 1 << 1,   /* register */
+    VTIDENTIFIER= 1 << 2,   /* identifier */
+    VTADDRESS   = 1 << 3,   /* address */
+    VTREGKEY    = 1 << 4,   /* parrot [key;key..], including registers */
+    VTPASM      = 1 << 5,   /* parrot register, colored from .emit */
+    VT_CONSTP   = 1 << 6,   /* pointer to constant value */
+    VT_PCC_SUB  = 1 << 7,   /* PCC subroutine call */
+    VT_FLAT     = 1 << 8,   /* var :flat */
+    VT_OPTIONAL = 1 << 9,   /* var :optional */
     /* include/parrot/packfile.h */
     VT_START_SLICE = PF_VT_START_SLICE ,   /* x .. y slice range */
     VT_END_SLICE   = PF_VT_END_SLICE   ,
@@ -21,10 +21,10 @@ enum VARTYPE {		/* variable type can be */
     VT_END_INF     = PF_VT_END_INF     ,   /* x..  start..inf */
     VT_SLICE_BITS  = PF_VT_SLICE_BITS,
     VT_ENCODED   = 1 << 16,     /* unicode string constant */
-    VT_OPT_FLAG  = 1 << 17,	/* var :opt_flag */
-    VT_NAMED     = 1 << 18,	/* var :named(name) */
+    VT_OPT_FLAG  = 1 << 17, /* var :opt_flag */
+    VT_NAMED     = 1 << 18, /* var :named(name) */
     VT_UNIQUE_REG = 1 << 19,
-    VT_MAYBE_FLAT = 1 << 20,	/* var :maybe_flat */
+    VT_MAYBE_FLAT = 1 << 20, /* var :maybe_flat */
 };
 
 /* this VARTYPE needs register allocation and such */
@@ -49,35 +49,35 @@ typedef struct _Life_range {
 } Life_range;
 
 enum USAGE {
-	U_KEYED		= 1 << 0,	/* array, hash, keyed */
-	U_NEW		= 1 << 1,	/* PMC was inited */
-	U_GLOBAL        = 1 << 3,       /* symbol is global (fixup) */
-	U_LEXICAL       = 1 << 4,       /* symbol is lexical */
-	U_FIXUP         = 1 << 5,       /* maybe not global, force fixup */
-	U_NON_VOLATILE  = 1 << 6        /* needs preserving */
+    U_KEYED         = 1 << 0,       /* array, hash, keyed */
+    U_NEW           = 1 << 1,       /* PMC was inited */
+    U_GLOBAL        = 1 << 3,       /* symbol is global (fixup) */
+    U_LEXICAL       = 1 << 4,       /* symbol is lexical */
+    U_FIXUP         = 1 << 5,       /* maybe not global, force fixup */
+    U_NON_VOLATILE  = 1 << 6        /* needs preserving */
 };
 
 typedef struct _SymReg {
     char * name;
     enum VARTYPE type;       /* Variable type */
-    enum USAGE usage;	     /* s. USAGE above */
+    enum USAGE usage;        /* s. USAGE above */
     int set;                 /* Which register set/file it belongs to */
-    int want_regno;	     /* wanted register number */
+    int want_regno;          /* wanted register number */
     INTVAL color;            /* Color: parrot register number
-    				and parrot const table index of VTCONST */
+                                and parrot const table index of VTCONST */
     int offset;              /* used for label fixup */
-    int use_count;	     /* How often this symbol is used */
-    int lhs_use_count;	     /* How often this symbol is written to */
+    int use_count;           /* How often this symbol is used */
+    int lhs_use_count;       /* How often this symbol is written to */
     Life_range **life_info;  /* Each block has its Life_range status */
     struct _SymReg * next;   /* used in the symbols hash */
-    struct _Instruction * first_ins;	/* first and last instruction */
-    struct _Instruction * last_ins;	/* this symbol is in */
+    struct _Instruction * first_ins; /* first and last instruction */
+    struct _Instruction * last_ins;  /* this symbol is in */
     /* also used by labels as position of label and last reference */
-    struct _SymReg * nextkey;	/* keys */
-    struct _SymReg * reg;	/* key->register for VTREGKEYs */
-    struct pcc_sub_t *pcc_sub;  /* PCC subroutine */
-    struct _SymReg * used;	/* used register in invoke */
-    int pmc_type;               /* class enum */
+    struct _SymReg * nextkey;        /* keys */
+    struct _SymReg * reg;    /* key->register for VTREGKEYs */
+    struct pcc_sub_t *pcc_sub;       /* PCC subroutine */
+    struct _SymReg * used;   /* used register in invoke */
+    int pmc_type;            /* class enum */
 } SymReg;
 
 typedef struct _SymHash {
@@ -135,17 +135,17 @@ void add_pcc_multi(SymReg *r, SymReg * arg);
 void add_namespace(Parrot_Interp interpreter, struct _IMC_Unit *);
 
 typedef enum {
-	P_NONE           = 0x00,
-	P_NEED_LEX       = 0x01,
-	/* P_XXXX           = 0x02, */
-	P_METHOD         = 0x04,
+    P_NONE           = 0x00,
+    P_NEED_LEX       = 0x01,
+    /* P_XXXX           = 0x02, */
+    P_METHOD         = 0x04,
 
-	P_ANON           = SUB_FLAG_PF_ANON,  /* 0x8 - private3 */
+    P_ANON           = SUB_FLAG_PF_ANON,  /* 0x8 - private3 */
 
-	P_MAIN           = SUB_FLAG_PF_MAIN,
-	P_LOAD           = SUB_FLAG_PF_LOAD,
-	P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE,
-	P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP
+    P_MAIN           = SUB_FLAG_PF_MAIN,
+    P_LOAD           = SUB_FLAG_PF_LOAD,
+    P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE,
+    P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP
 } pragma_enum_t;
 
 typedef enum {
@@ -155,28 +155,28 @@ typedef enum {
 
 struct pcc_sub_t {
     SymReg ** args;
-    int *arg_flags;	/* :slurpy, :optional, ... */
+    int *arg_flags;    /* :slurpy, :optional, ... */
     int nargs;
     SymReg *sub;
     SymReg *cc;
     SymReg ** ret;
-    int *ret_flags;	/* :slurpy, :optional, ... */
+    int *ret_flags;    /* :slurpy, :optional, ... */
     int nret;
     SymReg ** multi;
     int nmulti;
     pragma_enum_t pragma;
     int calls_a_sub;
-    int flags;	/* isNCI, isTAIL_CALL */
+    int flags;    /* isNCI, isTAIL_CALL */
     int label;
     SymReg * object;
 };
 
 
 enum uniq_t {
-	U_add_once,
-	U_add_uniq_label,
-	U_add_uniq_sub,
-	U_add_all };
+    U_add_once,
+    U_add_uniq_label,
+    U_add_uniq_sub,
+    U_add_all };
 SymReg * mk_pasm_reg(Interp*, char *);
 
 

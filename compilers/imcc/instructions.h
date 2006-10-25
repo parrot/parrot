@@ -19,21 +19,21 @@ enum INSTYPE {    /*instruction type can be   */
 
 
 typedef struct _Instruction {
-    char * op;		   /* opstring w/o params */
-    char * fmt;            /* printf style format string for params   */
-    unsigned int flags;    /* how the instruction affects each of the values */
-    unsigned int type;	   /* 16 bit register branches, + ITxxx */
-    int keys;		   /* bitmask of keys used in this instruction */
-    int index;             /* index on instructions[] */
-    int bbindex;	   /* number of basic block containing instruction */
+    char * op;          /* opstring w/o params */
+    char * fmt;         /* printf style format string for params   */
+    unsigned int flags; /* how the instruction affects each of the values */
+    unsigned int type;  /* 16 bit register branches, + ITxxx */
+    int keys;           /* bitmask of keys used in this instruction */
+    int index;          /* index on instructions[] */
+    int bbindex;        /* number of basic block containing instruction */
     struct _Instruction * prev;
     struct _Instruction * next;
-    int opnum;		   /* parrot op number */
-    int opsize;		   /* parrot op size   */
-    int line;		   /* source code line number */
-    int n_r;              /* count of regs in **r */
-    SymReg * r[1];         /* instruction is allocated variabled sized
-                              to hold more SymRegs */
+    int opnum;          /* parrot op number */
+    int opsize;         /* parrot op size   */
+    int line;           /* source code line number */
+    int n_r;            /* count of regs in **r */
+    SymReg * r[1];      /* instruction is allocated variabled sized
+                           to hold more SymRegs */
 } Instruction;
 
 
@@ -82,13 +82,13 @@ Instruction * _mk_instruction(const char *,const char *, int n, SymReg **, int);
 #define _mk_instruction(a,b,n,c,d) dont_use(a,b)
 #endif
 Instruction * INS(Interp *, struct _IMC_Unit *, char * name,
-	const char *fmt, SymReg **regs, int nargs, int keyv, int emit);
+        const char *fmt, SymReg **regs, int nargs, int keyv, int emit);
 Instruction * INS_LABEL(Interp * interp, struct _IMC_Unit *, SymReg * r0, int emit);
 
 Instruction * iNEW(Interp *, struct _IMC_Unit *, SymReg * r0, char * type,
-	SymReg *init, int emit);
+        SymReg *init, int emit);
 Instruction * iNEWSUB(Interp *, struct _IMC_Unit *, SymReg * r0, int type,
-	SymReg *init, int emit);
+        SymReg *init, int emit);
 Instruction * emitb(Interp * interp, struct _IMC_Unit *, Instruction *);
 
 int instruction_reads(Instruction *, SymReg *);
