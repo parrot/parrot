@@ -329,7 +329,7 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags)
 
 int
 parrot_pic_is_safe_to_jit(Interp *interpreter, PMC *sub,
-        MC *sig_args, PMC *sig_results, int *flags)
+        PMC *sig_args, PMC *sig_results, int *flags)
 {
     return 0;
 }
