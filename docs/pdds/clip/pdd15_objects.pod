@@ -5,6 +5,99 @@
 
 docs/pdds/pdd15_objects.pod - Object and Class semantics for Parrot
 
+=head1 REQUIREMENTS
+This PDD is due an overhaul. This requirements section is for language
+implementers to list the OO-related needs of their language in so as to aid
+that.
+
+=head2 Classes
+A class is a collection of methods and attributes. It would be desirable, for
+those classes whose definition is fully known at compile time, to have a
+convenient way to have the class along with its attributes and methods stored
+into a PBC file rather than created at runtime. However, creation of new
+classes at runtime will be needed too.
+
+=head2 Attributes
+Attributes are instance data associated with a class (or role, however those
+are supported). They may not always be of a type specified by a PMC, though
+boxing/unboxing is of course an option.
+
+Perl 6: All attributes are opaque (not externally visible, even to any
+subclasses).
+
+.Net: Attributes may be private (not externally visible), public (always
+externally visible), protected (only visible to subclasses) and internal
+(only visible inside the current assembly - the closest correspondnece in
+Parrot is perhaps only visible inside the same PBC file). Additionally, it
+is allowable for a subclass to introduce an attribute of the same name as
+the a parent class has, and they both exist depending on what type an
+instance of the class is currently viewed as being (read: there is a
+difference between the type of the reference and the type of the value).
+
+=head2 Methods
+Perl 6: Methods may be public (anyone can invoke them) or private (only
+invokable by the class they are defined in). Additionally, submethods are
+methods that do not get inherited.
+
+.Net: Like attributes, methods may be public, private, protected or internal.
+
+=head2 Inheritance
+Perl 6: Multiple inheritance.
+
+.Net: Single inheritance.
+
+=head2 Interfaces
+An interface specifies a set of methods that must be implemented by a class
+that inherits (or implements) the interface, but does not provide any form of
+implementation for them.
+
+.Net: Interfaces are pretty much what was just describe above. XXX Need to
+check behaviour of you implement two interfaces with methods of the same name.
+
+=head2 Roles
+A role consists of a set of methods and attributes. It cannot be instantiated
+on its own, but must be composed into a class. When this happens its methods
+and attributes become of that classes methods and attributes. This may happen
+at compile time or runtime, however when a role is composed into a class at
+runtime then what really happens is that a new anonymous class is created with
+the role composed into it and then the namespace entry for the existing class is
+updated to refer to the new one. Note that this means classes must be garbage
+collectable, with all those referred to by a namespace or with objects of that
+class existing being marked live.
+
+Perl 6: Roles pretty much are a Perl 6 thing, so the definition above contains
+all that is needed. An open question is whether Parrot worry about collision
+detection? For compile time composition that's easy to punt to the compiler;
+for runtime composition, that's not so easy though.
+
+=head2 Introspection (aka Reflection)
+Perl 6: Reflection provides access to a list of methods that a class has, its
+parent classes and the roles it does, as well as the name of the class and its
+memory address. For methods, their name, signature, return type and whether
+the method is declared multi are available.
+
+.Net: Reflection provides access to a list of attributes and methods as well as
+the name of the class and its parent. The types of attributes and signatures of
+methods are also available.
+
+=head2 Inner Classes
+An inner class is essentially a class defined within a class. Therefore it has
+access to things private to its outer class.
+
+Perl 6: Inner classes are allowed, and may also be private.
+
+.Net: Inner classes are allowed and may be private, public, protected or
+internal.
+
+=head2 Delegation
+Delegation is where a method call is "forwarded" to another class. Parrot may
+provide support for simple cases of it directly, or could just provide a "no
+method matched" fallback method that the compiler fills out to implement the
+delegation.
+
+Perl 6: Delegation support is highly flexible, even allowing a regex to match
+method names that should be delegated to a particular object. 
+
 =head1 ABSTRACT
 
 This PDD describes the semantics of Parrot's object and class systems. The PDD
