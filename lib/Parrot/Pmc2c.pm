@@ -148,7 +148,7 @@ Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter)
     Parrot_PMC pmc;
 EOC
     while (my ($class, $info) = each %classes) {
-	next if $info->{flags}->{noinit};
+        next if $info->{flags}->{noinit};
         $cout .= <<"EOC";
     Parrot_Int type${class};
 EOC
@@ -169,7 +169,7 @@ EOC
      */
 EOC
     while (my ($class, $info) = each %classes) {
-	my $lhs = $info->{flags}->{noinit} ? "" : "type$class = ";
+        my $lhs = $info->{flags}->{noinit} ? "" : "type$class = ";
         $cout .= <<"EOC";
     whoami = const_string(interpreter, "$class");
     ${lhs}pmc_register(interpreter, whoami);
@@ -181,7 +181,7 @@ EOC
     for (pass = 0; pass <= 1; ++pass) {
 EOC
     while (my ($class, $info) = each %classes) {
-	next if $info->{flags}->{noinit};
+        next if $info->{flags}->{noinit};
         $cout .= <<"EOC";
         Parrot_${class}_class_init(interpreter, type$class, pass);
 EOC
@@ -249,7 +249,7 @@ sub does_write {
 
     return 1 if $attrs->{write};
     return 0 if $attrs->{read};
-    
+
     return $self->{attrs}{$method}{write};
 }
 
@@ -348,7 +348,7 @@ sub make_constlike {
     # copy super
     $const->{super} = { %{ $self->{super} } };
     my $i;
-    # FIXME support getting implementations from central superclass instead 
+    # FIXME support getting implementations from central superclass instead
     # (e.g. some ro_fail pseudoclass that generates an exception)
     foreach my $entry (@{ $self->{vtable}{methods} }) {
         my $meth = $entry->{meth};
@@ -365,7 +365,7 @@ sub make_constlike {
                 $const->{super}{$meth} = $self->{class};
             } else {
                 $const->{super}{$meth} = $self->{super}{$meth};
-            } 
+            }
         }
     }
     # copy parent(s), prepend self as parrent
@@ -427,7 +427,7 @@ sub init {
     $self->get_vtable_section();
     $self->get_vtable_attrs();
     $self->make_const($class) if $self->{flags}{const_too};
-    $self->{flags}{no_ro} = 1 if $self->{flags}{abstract} 
+    $self->{flags}{no_ro} = 1 if $self->{flags}{abstract}
                               or $self->{flags}{singleton}
                               or $self->{flags}{const_too};
     if (!$self->{flags}{no_ro}) {
@@ -436,11 +436,11 @@ sub init {
 
     if ($self->{flags}{singleton}) {
         # Since singletons are shared between interpreters, we need
-        # to make special effort to use the right namespace for 
+        # to make special effort to use the right namespace for
         # method lookups. Note that this trick won't work if the
         # singleton inherits from something else (because the
         # MRO will still be shared).
-        unless ($self->implements('namespace') or 
+        unless ($self->implements('namespace') or
                     $self->{super}{'namespace'} ne 'default') {
             push @{$self->{methods}}, {
                 meth => 'namespace',
@@ -479,15 +479,15 @@ sub decl() {
         $export = $self->{flags}->{dynpmc} ? 'PARROT_DYNEXT_EXPORT ' :
                                              'PARROT_API ';
         $extern = "extern ";
-	    $newl = " ";
-	    $semi = ";";
+        $newl = " ";
+        $semi = ";";
         $interp = $pmc = "";
     }
     else {
-	    $export = "";
-	    $extern = "";
-	    $newl = "\n";
-	    $semi = "";
+        $export = "";
+        $extern = "";
+        $newl = "\n";
+        $semi = "";
         $interp = ' interpreter';
         $pmc = ' pmc';
     }
@@ -513,14 +513,14 @@ sub includes() {
 #include "parrot/dynext.h"
 EOC
     foreach my $parents ($self->{class}, @{ $self->{parents} } ) {
-	my $name = lc $parents;
-	$cout .= <<"EOC";
+    my $name = lc $parents;
+    $cout .= <<"EOC";
 #include "pmc_$name.h"
 EOC
     }
     if (!$self->{flags}{dynpmc}) {
-	    my $name = lc $self->{class};
-	    $cout .= <<"EOC";
+        my $name = lc $self->{class};
+        $cout .= <<"EOC";
 #include "$name.str"
 EOC
     }
@@ -745,7 +745,7 @@ EOH
     $cout .= "{$standard_body\n}\n";
     # We are back to generated code immediately here
     $cout .= $self->line_directive(2 + $line + count_newlines($cout),
-				   $out_name);
+                   $out_name);
     $cout .= $additional_bodies;
     $cout .= "\n\n";
 }
@@ -864,7 +864,7 @@ sub find_mmd_methods {
         my $meth_name;
         if (!$self->implements($meth)) {
             my $class = $self->{super}{$meth};
-            next if $class =~ /^[A-Z]/ 
+            next if $class =~ /^[A-Z]/
                 or $class eq 'default' or $class eq 'delegate';
             $meth_name = "Parrot_${class}_$meth";
         } else {
@@ -937,7 +937,7 @@ sub find_vtable_methods {
 =item C<vtable_decl($name)>
 
 Returns the C code for the declaration of a vtable temporary named
-C<$name> with the functions for this class. 
+C<$name> with the functions for this class.
 =cut
 
 sub vtable_decl {
@@ -947,12 +947,12 @@ sub vtable_decl {
 
     my $cout = "";
     return "" if exists $self->{flags}{noinit};
-    
+
     # TODO gen C line comment
     my $classname = $self->{class};
     my $vtbl_flag =  $self->{flags}{const_too} ?
         'VTABLE_HAS_CONST_TOO' : $self->{flags}{is_const} ?
-	  'VTABLE_IS_CONST_FLAG' : 0;
+      'VTABLE_IS_CONST_FLAG' : 0;
     if (exists $self->{flags}{need_ext}) {
         $vtbl_flag .= '|VTABLE_PMC_NEEDS_EXT';
     }
@@ -1101,12 +1101,12 @@ EOC
         vt_ro_clone->ro_variant_vtable = vt_clone;
 EOC
     }
-        
+
     $cout .= <<"EOC";
         interp->vtables[entry] = vt_clone;
 EOC
     $cout .= <<"EOC";
-    } 
+    }
     else { /* pass */
 EOC
 
@@ -1221,9 +1221,9 @@ sub gen_c {
         $cout .= "#define PARROT_IN_EXTENSION\n";
     }
     $cout .= $self->line_directive(1, $self->{file})
-	. $self->{pre};
+    . $self->{pre};
     $cout .= $self->line_directive_here($cout, $out_name)
-	. $self->includes;
+    . $self->includes;
     my $l = count_newlines($cout);
     $cout .= $self->methods($l, $out_name);
     if ($self->{ro}) {
@@ -1497,7 +1497,7 @@ sub body
     my $cout;
 
     if ($meth eq 'find_method') {
-        my $real_findmethod = 'Parrot_' 
+        my $real_findmethod = 'Parrot_'
             . $self->{super}{find_method} . '_find_method';
         $cout = <<"EOC";
 $decl {
