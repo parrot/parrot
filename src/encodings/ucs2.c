@@ -63,7 +63,7 @@ get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
 
 static void
 set_codepoint(Interp *interpreter, STRING *src,
-	UINTVAL offset, UINTVAL codepoint)
+        UINTVAL offset, UINTVAL codepoint)
 {
 #if PARROT_HAS_ICU
     UChar *s = (UChar*) src->strstart;
@@ -83,14 +83,14 @@ get_byte(Interp *interpreter, const STRING *src, UINTVAL offset)
 
 static void
 set_byte(Interp *interpreter, const STRING *src,
-	UINTVAL offset, UINTVAL byte)
+        UINTVAL offset, UINTVAL byte)
 {
     UNIMPL;
 }
 
 static STRING *
 get_codepoints(Interp *interpreter, STRING *src,
-	UINTVAL offset, UINTVAL count)
+        UINTVAL offset, UINTVAL count)
 {
     STRING *return_string = Parrot_make_COW_reference(interpreter, src);
 #if PARROT_HAS_ICU
@@ -116,7 +116,7 @@ get_codepoints(Interp *interpreter, STRING *src,
 
 static STRING *
 get_bytes(Interp *interpreter, STRING *src,
-	UINTVAL offset, UINTVAL count)
+        UINTVAL offset, UINTVAL count)
 {
     UNIMPL;
     return NULL;
@@ -125,7 +125,7 @@ get_bytes(Interp *interpreter, STRING *src,
 
 static STRING *
 get_codepoints_inplace(Interp *interpreter, STRING *src,
-	UINTVAL offset, UINTVAL count, STRING *dest_string)
+        UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
 
     UNIMPL;
@@ -134,7 +134,7 @@ get_codepoints_inplace(Interp *interpreter, STRING *src,
 
 static STRING *
 get_bytes_inplace(Interp *interpreter, STRING *src,
-	UINTVAL offset, UINTVAL count, STRING *return_string)
+        UINTVAL offset, UINTVAL count, STRING *return_string)
 {
     UNIMPL;
     return NULL;
@@ -142,14 +142,14 @@ get_bytes_inplace(Interp *interpreter, STRING *src,
 
 static void
 set_codepoints(Interp *interpreter, STRING *src,
-	UINTVAL offset, UINTVAL count, STRING *new_codepoints)
+        UINTVAL offset, UINTVAL count, STRING *new_codepoints)
 {
     UNIMPL;
 }
 
 static void
 set_bytes(Interp *interpreter, STRING *src,
-	UINTVAL offset, UINTVAL count, STRING *new_bytes)
+        UINTVAL offset, UINTVAL count, STRING *new_bytes)
 {
     UNIMPL;
 }
@@ -237,22 +237,22 @@ Parrot_encoding_ucs2_init(Interp *interpreter)
     ENCODING *return_encoding = Parrot_new_encoding(interpreter);
 
     static const ENCODING base_encoding = {
-	"ucs2",
-	2, /* Max bytes per codepoint 0 .. 0x10ffff */
-	to_encoding,
-	get_codepoint,
-	set_codepoint,
-	get_byte,
-	set_byte,
-	get_codepoints,
-	get_codepoints_inplace,
-	get_bytes,
-	get_bytes_inplace,
-	set_codepoints,
-	set_bytes,
-	become_encoding,
-	codepoints,
-	bytes,
+        "ucs2",
+        2, /* Max bytes per codepoint 0 .. 0x10ffff */
+        to_encoding,
+        get_codepoint,
+        set_codepoint,
+        get_byte,
+        set_byte,
+        get_codepoints,
+        get_codepoints_inplace,
+        get_bytes,
+        get_bytes_inplace,
+        set_codepoints,
+        set_bytes,
+        become_encoding,
+        codepoints,
+        bytes,
         iter_init
     };
     memcpy(return_encoding, &base_encoding, sizeof(ENCODING));

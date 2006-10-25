@@ -382,7 +382,7 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-	codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
         if ((Parrot_ascii_typetable[codepoint] & flags) != 0) {
             return pos;
         }
@@ -401,7 +401,7 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-	codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
         if ((Parrot_ascii_typetable[codepoint] & flags) == 0) {
             return pos;
         }

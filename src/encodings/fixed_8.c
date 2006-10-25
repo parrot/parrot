@@ -30,7 +30,7 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
 /* codepoints are bytes, so delegate */
 static UINTVAL
 get_codepoint(Interp *interpreter, const STRING *source_string,
-	UINTVAL offset)
+        UINTVAL offset)
 {
     return get_byte(interpreter, source_string, offset);
 }
@@ -38,7 +38,7 @@ get_codepoint(Interp *interpreter, const STRING *source_string,
 /* This is the same as set byte */
 static void
 set_codepoint(Interp *interpreter, STRING *source_string,
-	UINTVAL offset, UINTVAL codepoint)
+        UINTVAL offset, UINTVAL codepoint)
 {
     set_byte(interpreter, source_string, offset, codepoint);
 }
@@ -48,21 +48,21 @@ get_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset)
 {
     unsigned char *contents = source_string->strstart;
     if (offset >= source_string->bufused) {
-/*	internal_exception(0,
-		"get_byte past the end of the buffer (%i of %i)",
-		offset, source_string->bufused);*/
-	return 0;
+/*        internal_exception(0,
+                "get_byte past the end of the buffer (%i of %i)",
+                offset, source_string->bufused);*/
+        return 0;
     }
     return contents[offset];
 }
 
 static void
 set_byte(Interp *interpreter, const STRING *source_string,
-	UINTVAL offset, UINTVAL byte)
+        UINTVAL offset, UINTVAL byte)
 {
     unsigned char *contents;
     if (offset >= source_string->bufused) {
-	internal_exception(0, "set_byte past the end of the buffer");
+        internal_exception(0, "set_byte past the end of the buffer");
     }
     contents = source_string->strstart;
     contents[offset] = (unsigned char)byte;
@@ -71,20 +71,20 @@ set_byte(Interp *interpreter, const STRING *source_string,
 /* Delegate to get_bytes */
 static STRING *
 get_codepoints(Interp *interpreter, STRING *source_string,
-	UINTVAL offset, UINTVAL count)
+        UINTVAL offset, UINTVAL count)
 {
     STRING *return_string = get_bytes(interpreter, source_string,
-	    offset, count);
+            offset, count);
     return_string->charset = source_string->charset;
     return return_string;
 }
 
 static STRING *
 get_bytes(Interp *interpreter, STRING *source_string,
-	UINTVAL offset, UINTVAL count)
+        UINTVAL offset, UINTVAL count)
 {
     STRING *return_string = Parrot_make_COW_reference(interpreter,
-	    source_string);
+            source_string);
     return_string->encoding = source_string->encoding;
     return_string->charset = source_string->charset;
 
@@ -101,16 +101,16 @@ get_bytes(Interp *interpreter, STRING *source_string,
 /* Delegate to get_bytes */
 static STRING *
 get_codepoints_inplace(Interp *interpreter, STRING *source_string,
-	UINTVAL offset, UINTVAL count, STRING *dest_string)
+        UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
 
     return get_bytes_inplace(interpreter, source_string, offset,
-	    count, dest_string);
+            count, dest_string);
 }
 
 static STRING *
 get_bytes_inplace(Interp *interpreter, STRING *source_string,
-	UINTVAL offset, UINTVAL count, STRING *return_string)
+        UINTVAL offset, UINTVAL count, STRING *return_string)
 {
     Parrot_reuse_COW_reference(interpreter, source_string, return_string);
 
@@ -126,14 +126,14 @@ get_bytes_inplace(Interp *interpreter, STRING *source_string,
 /* Delegate to set_bytes */
 static void
 set_codepoints(Interp *interpreter, STRING *source_string,
-	UINTVAL offset, UINTVAL count, STRING *new_codepoints)
+        UINTVAL offset, UINTVAL count, STRING *new_codepoints)
 {
     set_bytes(interpreter, source_string, offset, count, new_codepoints);
 }
 
 static void
 set_bytes(Interp *interpreter, STRING *source_string,
-	UINTVAL offset, UINTVAL count, STRING *new_bytes)
+        UINTVAL offset, UINTVAL count, STRING *new_bytes)
 {
     string_replace(interpreter, source_string, offset, count, new_bytes, NULL);
 }
@@ -202,23 +202,23 @@ Parrot_encoding_fixed_8_init(Interp *interpreter)
     ENCODING *return_encoding = Parrot_new_encoding(interpreter);
 
     ENCODING base_encoding = {
-	"fixed_8",
-	1, /* Max bytes per codepoint */
-	to_encoding,
-	get_codepoint,
-	set_codepoint,
-	get_byte,
-	set_byte,
-	get_codepoints,
-	get_codepoints_inplace,
-	get_bytes,
-	get_bytes_inplace,
-	set_codepoints,
-	set_bytes,
-	become_encoding,
-	codepoints,
-	bytes,
-	iter_init
+        "fixed_8",
+        1, /* Max bytes per codepoint */
+        to_encoding,
+        get_codepoint,
+        set_codepoint,
+        get_byte,
+        set_byte,
+        get_codepoints,
+        get_codepoints_inplace,
+        get_bytes,
+        get_bytes_inplace,
+        set_codepoints,
+        set_bytes,
+        become_encoding,
+        codepoints,
+        bytes,
+        iter_init
 
     };
     memcpy(return_encoding, &base_encoding, sizeof(ENCODING));

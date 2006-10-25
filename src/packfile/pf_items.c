@@ -80,7 +80,7 @@ nul:
     expo += 1023;       /* + bias 8byte */
     if (expo <= 0)       /* underflow */
         goto nul;
-    if (expo > 0x7ff) {	/* inf/nan */
+    if (expo > 0x7ff) {  /* inf/nan */
         dest[7] = 0x7f;
         dest[6] = src[7] == 0xc0 ? 0xf8 : 0xf0 ;
         goto nul;
@@ -412,7 +412,7 @@ PF_fetch_number(struct PackFile *pf, opcode_t **stream) {
     if (!pf || !pf->fetch_nv) {
 #if TRACE_PACKFILE
         PIO_eprintf(NULL, "PF_fetch_number: Native [%d bytes]\n",
-		    sizeof(FLOATVAL));
+                sizeof(FLOATVAL));
 #endif
         memcpy(&f, (char*)*stream, sizeof(FLOATVAL));
         (*stream) += (sizeof(FLOATVAL) + sizeof(opcode_t) - 1)/
@@ -525,7 +525,7 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PF_fetch_string(): string is: ");
-	PIO_putps(interp, PIO_STDERR(interp), s);
+    PIO_putps(interp, PIO_STDERR(interp), s);
     PIO_eprintf(NULL, "\n");
 #endif
 

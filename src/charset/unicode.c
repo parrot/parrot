@@ -484,7 +484,7 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
         if (codepoint >= 256) {
             for (bit = enum_cclass_uppercase;
                     bit <= enum_cclass_word ; bit <<= 1) {
-		if ((bit & flags) && !u_iscclass(interpreter, codepoint, bit))
+                if ((bit & flags) && !u_iscclass(interpreter, codepoint, bit))
                     return pos;
             }
         }

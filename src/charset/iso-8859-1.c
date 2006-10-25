@@ -348,9 +348,9 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
         ascii_cs_index,
         ascii_cs_rindex,
         validate,
-	is_cclass,
-	find_cclass,
-	find_not_cclass,
+        is_cclass,
+        find_cclass,
+        find_not_cclass,
         string_from_codepoint,
         ascii_compute_hash,
         NULL

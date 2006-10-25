@@ -657,33 +657,33 @@ static int setup_wait(Interp *interp, STM_tx_log *log) {
         read = get_read(interp, log, i);
         Parrot_STM_waitlist_add_self(interp, &read->handle->change_waitlist);
         PARROT_ATOMIC_PTR_GET(version, read->handle->owner_or_version);
-	/* the last_version check is in case a conflicting change has
-	 * already been committed. The transaction in progress that holds
-	 * a lock on the current version might abort and thus
-	 * never signal us -- and then be waiting for us causing a deadlock
-	 */
+        /* the last_version check is in case a conflicting change has
+         * already been committed. The transaction in progress that holds
+         * a lock on the current version might abort and thus
+         * never signal us -- and then be waiting for us causing a deadlock
+         */
         if ((version != read->saw_version && is_version(version)) ||
-	    (read->handle->last_version != read->saw_version)) {
+            (read->handle->last_version != read->saw_version)) {
             need_wait = 0;
         }
     }
 
     for (i = 0; need_wait && i <= log->last_write; ++i) {
         STM_write_record *write;
-	void *version;
+        void *version;
         write = get_write(interp, log, i);
         if (!write->handle) {
             continue;
         }
         Parrot_STM_waitlist_add_self(interp, &write->handle->change_waitlist);
-	PARROT_ATOMIC_PTR_GET(version, write->handle->owner_or_version);
-	/* our lock on the write record may have been revoked and then a parallel
-	 * change committed already.
-	 */
-	if ((version != write->saw_version && is_version(version)) ||
-	    (write->handle->last_version != write->saw_version)) {
-	    need_wait = 0;
-	}
+        PARROT_ATOMIC_PTR_GET(version, write->handle->owner_or_version);
+        /* our lock on the write record may have been revoked and then a parallel
+         * change committed already.
+         */
+        if ((version != write->saw_version && is_version(version)) ||
+            (write->handle->last_version != write->saw_version)) {
+            need_wait = 0;
+        }
     }
     
     if (!need_wait) {
@@ -853,7 +853,7 @@ static void *wait_for_version(Interp *interp,
     for (;;) {
         unsigned other_wait_len;
         unsigned our_wait_len;
-	unsigned other_status;
+        unsigned other_status;
         STM_tx_log_sub *other;
         PARROT_ATOMIC_PTR_GET(version, *in_what);
         if (is_version(version)) {
@@ -862,8 +862,8 @@ static void *wait_for_version(Interp *interp,
             break;
         }
 
-	if (start_wait == 0.0)
-	    start_wait = Parrot_floatval_time();
+        if (start_wait == 0.0)
+            start_wait = Parrot_floatval_time();
 
         ++wait_count;
 
@@ -879,11 +879,11 @@ static void *wait_for_version(Interp *interp,
          */
         assert(n_interpreters > 1);
         other = version;
-	assert(other < &log->inner[0] || other > &log->inner[STM_MAX_TX_DEPTH]);
+        assert(other < &log->inner[0] || other > &log->inner[STM_MAX_TX_DEPTH]);
         curlog = get_sublog(log, log->depth);
         PARROT_ATOMIC_INT_GET(other_wait_len, other->wait_length);
         PARROT_ATOMIC_INT_GET(our_wait_len, curlog->wait_length);
-	PARROT_ATOMIC_INT_GET(other_status, other->status);
+        PARROT_ATOMIC_INT_GET(other_status, other->status);
         STM_TRACE("wait_lens: ours = %d /other = %d\n", 
                 our_wait_len, other_wait_len);
         if (our_wait_len < other_wait_len + 1) {
@@ -902,18 +902,18 @@ static void *wait_for_version(Interp *interp,
             PARROT_ATOMIC_INT_CAS(successp, other->status, STM_STATUS_ACTIVE,
                 STM_STATUS_ABORTED);
             if (successp)
-		other_status = STM_STATUS_ABORTED;
+                other_status = STM_STATUS_ABORTED;
         }
 
-	if (other_status == STM_STATUS_ABORTED) {
-	    int successp;
-	    PARROT_ATOMIC_INT_SET(curlog->wait_length, 0);
-	    PARROT_ATOMIC_PTR_CAS(successp, *in_what, other, handle->last_version);
-	    continue;
-	}
+        if (other_status == STM_STATUS_ABORTED) {
+            int successp;
+            PARROT_ATOMIC_INT_SET(curlog->wait_length, 0);
+            PARROT_ATOMIC_PTR_CAS(successp, *in_what, other, handle->last_version);
+                   continue;
+        }
 
-	/* simple heuristic, try to avoid waiting more then ten milliseconds */
-	/* TODO implement a real contention-manager interface for this instead */
+        /* simple heuristic, try to avoid waiting more then ten milliseconds */
+        /* TODO implement a real contention-manager interface for this instead */
         if (wait_count > 2000 || Parrot_floatval_time() > start_wait + 0.01) {
             STM_TRACE("waited too long, aborting...\n");
             PARROT_ATOMIC_INT_SET(curlog->status, STM_STATUS_ABORTED);
@@ -922,15 +922,15 @@ static void *wait_for_version(Interp *interp,
             break;
         }
 
-	if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
-	    pt_suspend_self_for_gc(interp);
-	}
-       
-	if (wait_count > 10) {
-	    /* we only do this when we've waited for a while so we don't make expensive
-	       yield() calls when we only need to wait for a short while. */
-	    YIELD;
-	}
+        if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
+            pt_suspend_self_for_gc(interp);
+        }
+
+        if (wait_count > 10) {
+            /* we only do this when we've waited for a while so we don't make expensive
+               yield() calls when we only need to wait for a short while. */
+            YIELD;
+        }
         /* XXX better spinning */
     }
     PROFILE_WAIT(log, Parrot_floatval_time() - start_wait, wait_count);

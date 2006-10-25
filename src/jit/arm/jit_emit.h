@@ -117,7 +117,7 @@ typedef enum {
     RSC = 0x0E,  /* Reverse Subtract with Carry.  */
     TST = 0x11,  /* TeST                  rn AND op2    (sets flags).  */
     TEQ = 0x13,  /* Test EQuivalence      rn XOR op2    (won't set V flag). */
-    CMP = 0x15,  /* CoMPare		  rn  -  op2    */
+    CMP = 0x15,  /* CoMPare               rn  -  op2    */
     CMN = 0x17,  /* CoMpare Negated       rn  +  op2    */
     ORR = 0x18,
     MOV = 0x1A,  /* MOVe                  rd =   op2 */
@@ -192,14 +192,14 @@ typedef enum {
     is_load       = 0x10,
     is_writeback  = 0x20,
     no_writeback  = 0,
-    is_caret  	  = 0x40, /* assembler syntax is ^ - load sets status flags in
+    is_caret      = 0x40, /* assembler syntax is ^ - load sets status flags in
                              USR mode, or load/store use user bank registers
                              in other mode. IIRC.  */
     no_caret      = 0,
-    is_byte  	  = 0x40,
-    no_byte  	  = 0,	  /* It's a B suffix for a byte load, no suffix for
+    is_byte       = 0x40,
+    no_byte       = 0,    /* It's a B suffix for a byte load, no suffix for
                              word load, so this is more natural than is_word  */
-    is_pre  	  = 0x01, /* pre index addressing.  */
+    is_pre        = 0x01, /* pre index addressing.  */
     is_post       = 0x00  /* post indexed addressing. ie arithmetic for free  */
 } transfer_flags;
 
@@ -257,7 +257,7 @@ emit_ldmstm_x(char *pc,
 /* Is is going to be rare to non existent that anyone needs to use the ^
    syntax on LDM or STM, so make it easy to generate the normal form:  */
 #define emit_ldmstm(pc, cond, l_s, direction, writeback, base, regmask) \
-	emit_ldmstm_x(pc, cond, l_s, direction, 0, writeback, base, regmask)
+    emit_ldmstm_x(pc, cond, l_s, direction, 0, writeback, base, regmask)
 
 /* Load / Store
  *
@@ -403,7 +403,7 @@ typedef enum {
     shift_LSR = 0x20,
     shift_ASR = 0x40,
     shift_ROR = 0x60,
-    shift_ASL = 0x00	/* Synonym - no sign extension (or not) on <<  */
+    shift_ASL = 0x00    /* Synonym - no sign extension (or not) on <<  */
 } barrel_shift_t;
 /* RRX (rotate right with extend - a 1 position 33 bit rotate including the
    carry flag) is encoded as ROR by 0.  */
@@ -555,22 +555,22 @@ constant_not (int value,  struct constant *result)
 
 /* eg add r0, r3, r7  */
 #define emit_arith_reg(pc, cond, op, status, rd, rn, rm) \
-	emit_arith (pc, cond, op, status, rd, rn, 0, rm)
+    emit_arith (pc, cond, op, status, rd, rn, 0, rm)
 
 /* eg sub r0, r3, r7 lsr #3 */
 #define emit_arith_reg_shift_const(pc, cond, op, status, rd, rn, rm, shift, by) \
-	emit_arith (pc, cond, op, status, rd, rn, 0, ((by) << 7) | shift | 0 | (rm))
+    emit_arith (pc, cond, op, status, rd, rn, 0, ((by) << 7) | shift | 0 | (rm))
 
 /* eg orrs r1, r2, r1 rrx */
 #define emit_arith_reg_rrx(pc, cond, op, status, rd, rn, rm) \
-	emit_arith (pc, cond, op, status, rd, rn, 0, shift_ROR | 0 | (rm))
+    emit_arith (pc, cond, op, status, rd, rn, 0, shift_ROR | 0 | (rm))
 
 /* I believe these take 2 cycles (due to having to access a 4th register.  */
 #define emit_arith_reg_shift_reg(pc, cond, op, status, rd, rn, rm, shift, rs) \
-	emit_arith (pc, cond, op, status, rd, rn, 0, ((rs) << 8) | shift | 0x10 | (rm))
+    emit_arith (pc, cond, op, status, rd, rn, 0, ((rs) << 8) | shift | 0x10 | (rm))
 
 #define emit_arith_immediate(pc, cond, op, status, rd, rn, val, rotate) \
-	emit_arith (pc, cond, op, status, rd, rn, 2, ((rotate) << 8) | (val))
+    emit_arith (pc, cond, op, status, rd, rn, 2, ((rotate) << 8) | (val))
 
 /* I'll use mov r0, r0 as my NOP for now.  */
 #define emit_nop(pc) emit_mov (pc, r0, r0)
@@ -615,7 +615,7 @@ emit_load_constant_from_pool (char *pc,
                               arm_register_t hwreg)
 {
     /* can't do it in one.  XXX this should use a constant pool.
-       ldr  rd, [pc]	; pipelining makes this .L1
+       ldr  rd, [pc]    ; pipelining makes this .L1
        b    L2
        .L1 value
        .L2 next
@@ -781,14 +781,14 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
 
 #define Parrot_jit_arith_const_neg(ji, i, cond, plus, minus, dest, src, const_val) \
     Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_neg, \
-				      plus, minus, dest, src, const_val)
+                      plus, minus, dest, src, const_val)
 
 #define Parrot_jit_arith_const_not(ji, i, cond, plus, minus, dest, src, const_val) \
     Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_not, \
-				      plus, minus, dest, src, const_val)
+                      plus, minus, dest, src, const_val)
 #define Parrot_jit_arith_const(ji, i, cond, plus, dest, src, const_val) \
     Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_is, \
-				      plus, plus, dest, src, const_val)
+                      plus, plus, dest, src, const_val)
 
 
 /* branching on if cannot (in future) be conditional (easily), because we
@@ -885,11 +885,11 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     }
 }
 /* My entry code is create a stack frame:
-	mov	ip, sp
-	stmfd	sp!, {r4, fp, ip, lr, pc}
-	sub	fp, ip, #4
+    mov ip, sp
+    stmfd   sp!, {r4, fp, ip, lr, pc}
+    sub fp, ip, #4
    Then store the first parameter (pointer to the interpreter) in r4.
-	mov	r4, r0
+    mov r4, r0
 */
 
 void
@@ -922,16 +922,16 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     .L1:    r0 data
             r1 data
             r2 data
-           <where ever>	; address of function.
+           <where ever> ; address of function.
     .L2:                      ; next instruction - return point from func.
 
     # here I'm going to do
 
-    mov	    r1, r4	; current interpreter is arg 1
+    mov     r1, r4 ; current interpreter is arg 1
     adr     r14,  .L1
     ldmia   r14!,  {r0, pc}
     .L1:    address of current opcode
-           <where ever>	; address of function for op
+           <where ever> ; address of function for op
     .L2:                      ; next instruction - return point from func.
 */
 
@@ -939,7 +939,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 XXX no.
 need to adr beyond:
 
-    mov	    r1, r4	; current interpreter is arg 1
+    mov     r1, r4 ; current interpreter is arg 1
     adr     r14,  .L1
     ldmda   r14!,  {r0, ip}
     mov     pc, ip

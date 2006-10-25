@@ -402,7 +402,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     }
 
     if (*buf == NULL) {
-	*buf = new_string_header(interpreter, 0);
+        *buf = new_string_header(interpreter, 0);
         (*buf)->bufused = len = 2048;
     }
     s = *buf;

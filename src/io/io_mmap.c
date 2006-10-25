@@ -115,7 +115,7 @@ PIO_mmap_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         return PIO_read_down(interpreter, PIO_DOWNLAYER(layer), io, buf);
 
     if (*buf == NULL) {
-	*buf = new_string_header(interpreter, 0);
+        *buf = new_string_header(interpreter, 0);
     }
     s = *buf;
     /* TODO create string_free API for reusing string headers */

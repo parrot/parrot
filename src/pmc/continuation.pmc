@@ -318,7 +318,7 @@ destination to continue execution.
             /* Keep corresponding_target in sync.  If stack_delta is negative,
              * then dynamic_env is still above it; otherwise, we must step
              * corresponding_target backwards as well.
-	     */
+             */
             if (stack_delta < 0) {
                 stack_delta++;
             }

@@ -111,7 +111,7 @@ PIO_make_io_string(Interp *interpreter, STRING **buf, size_t len)
      * when we get a NULL string, we read a default len
      */
     if (*buf == NULL) {
-	*buf = string_make_empty(interpreter, enum_stringrep_one, len);
+        *buf = string_make_empty(interpreter, enum_stringrep_one, len);
         return *buf;
     }
     s = *buf;
@@ -216,7 +216,7 @@ PIO_destroy(theINTERP, PMC *pmc)
         return;
     if (io->b.startb && (io->b.flags & PIO_BF_MALLOC)) {
         mem_sys_free(io->b.startb);
-	io->b.startb = 0;
+        io->b.startb = 0;
     }
 #if 0
     /*
@@ -1488,7 +1488,7 @@ PIO_accept(theINTERP, PMC *pmc)
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data(pmc);
 
-	/* XXX - return NULL or -1 -- c (02 July 2006) */
+    /* XXX - return NULL or -1 -- c (02 July 2006) */
     if(!io)
         return NULL;
 

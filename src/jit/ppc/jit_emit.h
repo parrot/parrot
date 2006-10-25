@@ -1142,12 +1142,12 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         jit_emit_stw(jit_info->native_ptr, r3, 0, ISR2);
         /* fetch pc -> return it */
         jit_emit_lwz(jit_info->native_ptr, r3, 4 + jit_info->n_args * 4, r5);
-	/* return sequence */
-	jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
-	jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
-	jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* opt */
-	jit_emit_mtlr(jit_info->native_ptr, r0);   /* opt */
-	jit_emit_blr(jit_info->native_ptr);
+    /* return sequence */
+    jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
+    jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
+    jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* opt */
+    jit_emit_mtlr(jit_info->native_ptr, r0);   /* opt */
+    jit_emit_blr(jit_info->native_ptr);
         /* re-emit call */
         offs = NATIVECODE - L1;
         _emit_bx(L1, 1, offs); /* bl */
