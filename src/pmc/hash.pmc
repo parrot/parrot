@@ -376,26 +376,26 @@ Return a representation of the hash contents.
                 }
             }
             if (all_digit) {
-                res = string_append(INTERP, res, key, 0);
+                res = string_append(INTERP, res, key);
             }
             else {
                 res = string_append(INTERP, res,
-                        const_string(INTERP, "'"), 0);
-                res = string_append(INTERP, res, key, 0);
+                        const_string(INTERP, "'"));
+                res = string_append(INTERP, res, key);
                 res = string_append(INTERP, res,
-                        const_string(INTERP, "'"), 0);
+                        const_string(INTERP, "'"));
             }
             res = string_append(INTERP, res,
-                    const_string(INTERP, ": "), 0);
+                    const_string(INTERP, ": "));
             val = SELF.get_pmc_keyed_str(key);
             res = string_append(INTERP, res,
-                    VTABLE_get_string(INTERP, val), 0);
+                    VTABLE_get_string(INTERP, val));
             if (j < n - 1)
                 res = string_append(INTERP, res,
-                        const_string(INTERP, ", "), 0);
+                        const_string(INTERP, ", "));
         }
         res = string_append(INTERP, res,
-                const_string(INTERP, "}"), 0);
+                const_string(INTERP, "}"));
         return res;
     }
 

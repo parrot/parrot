@@ -332,11 +332,11 @@ Returns the Parrot string representation C<key>.
         n = VTABLE_elements(INTERP, SELF);
         for (j = 0; j < n; ++j) {
             val = SELF.get_pmc_keyed_int(j);
-            res = string_append(INTERP, res, VTABLE_get_repr(INTERP, val), 0);
+            res = string_append(INTERP, res, VTABLE_get_repr(INTERP, val));
             if (j < n - 1)
-                res = string_append(INTERP, res, const_string(INTERP, ", "), 0);
+                res = string_append(INTERP, res, const_string(INTERP, ", "));
         }
-        res = string_append(INTERP, res, const_string(INTERP, " ]"), 0);
+        res = string_append(INTERP, res, const_string(INTERP, " ]"));
         return res;
     }
 

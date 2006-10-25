@@ -261,22 +261,22 @@ MMD_DEFAULT: {
     void i_add (PMC* value) {
 MMD_WmlsString: {
             STRING* result = string_append(INTERP,
-                DYNSELF.get_string(), VTABLE_get_string(INTERP, value), 1);
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
             DYNSELF.set_string_native(result);
         }
 MMD_WmlsInteger: {
             STRING* result = string_append(INTERP,
-                DYNSELF.get_string(), VTABLE_get_string(INTERP, value), 1);
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
             DYNSELF.set_string_native(result);
         }
 MMD_WmlsBoolean: {
             STRING* result = string_append(INTERP,
-                DYNSELF.get_string(), VTABLE_get_string(INTERP, value), 1);
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
             DYNSELF.set_string_native(result);
         }
 MMD_WmlsFloat: {
             STRING* result = string_append(INTERP,
-                DYNSELF.get_string(), VTABLE_get_string(INTERP, value), 1);
+                DYNSELF.get_string(), VTABLE_get_string(INTERP, value));
             DYNSELF.set_string_native(result);
         }
 MMD_DEFAULT: {

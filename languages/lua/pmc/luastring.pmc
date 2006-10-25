@@ -981,12 +981,12 @@ MMD_DEFAULT: {
 MMD_LuaNumber: {
             STRING* s = DYNSELF.get_string();
             STRING* v = VTABLE_get_string(INTERP, value);
-            DYNSELF.set_string_native(string_append(INTERP, s, v, 1));
+            DYNSELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_LuaString: {
             STRING* s = DYNSELF.get_string();
             STRING* v = VTABLE_get_string(INTERP, value);
-            DYNSELF.set_string_native(string_append(INTERP, s, v, 1));
+            DYNSELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_DEFAULT: {
             PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,

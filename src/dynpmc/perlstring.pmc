@@ -67,8 +67,8 @@ Returns pythons string repr (w/o any escaping, just single quotes around)
         else
             start = q;
         repr = string_copy(INTERP, start);
-        repr = string_append(INTERP, repr, s, 0);
-        repr = string_append(INTERP, repr, q, 0);
+        repr = string_append(INTERP, repr, s);
+        repr = string_append(INTERP, repr, q);
         return repr;
     }
 

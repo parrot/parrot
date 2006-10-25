@@ -113,7 +113,7 @@ the general C<infix> and C<n_infix> syntax.
 =cut
 
 inline op concat(inout STR, in STR) :base_mem {
-  $1 = string_append(interpreter, $1, $2, 1);
+  $1 = string_append(interpreter, $1, $2);
   goto NEXT();
 }
 

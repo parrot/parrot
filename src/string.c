@@ -400,7 +400,7 @@ So make sure to _use_ the return value.
 
 STRING *
 string_append(Interp *interpreter,
-    STRING *a, STRING *b /*NN*/, UINTVAL Uflags)
+    STRING *a, STRING *b)
 {
     UINTVAL a_capacity, b_len;
     UINTVAL total_length;
@@ -408,8 +408,6 @@ string_append(Interp *interpreter,
     ENCODING *enc;
 
     /* XXX should this be a CHARSET method? */
-
-    UNUSED(Uflags);
 
     /* If B isn't real, we just bail */
     b_len = string_length(interpreter, b);
@@ -427,7 +425,7 @@ string_append(Interp *interpreter,
     /* If the destination's constant, or external then just fall back to
        string_concat */
     if (PObj_is_cowed_TESTALL(a)) {
-        return string_concat(interpreter, a, b, Uflags);
+        return string_concat(interpreter, a, b, 0);
     }
 
     cs = string_rep_compatible(interpreter, a, b, &enc);
@@ -873,8 +871,8 @@ string_concat(Interp *interpreter, STRING *a, STRING *b, UINTVAL Uflags)
                         a->bufused + b->bufused,
                         enc, cs, 0);
 
-            result = string_append(interpreter, result, a, Uflags);
-            result = string_append(interpreter, result, b, Uflags);
+            result = string_append(interpreter, result, a);
+            result = string_append(interpreter, result, b);
 
             return result;
         }
@@ -2203,7 +2201,7 @@ string_escape_string_delimited(Interp * interpreter,
             hex = Parrot_sprintf_c(interpreter, "\\x{%x}", c);
         else
             hex = Parrot_sprintf_c(interpreter, "\\u%04x", c);
-        result = string_append(interpreter, result, hex, 0);
+        result = string_append(interpreter, result, hex);
         /* adjust our insert idx */
         i += hex->strlen;
         /* and usable len */
@@ -2607,9 +2605,9 @@ string_join(Interp *interpreter, STRING *j, PMC *ar)
     s = VTABLE_get_string_keyed_int(interpreter, ar, 0);
     res = string_copy(interpreter, s);
     for (i = 1; i < ar_len; ++i) {
-        res = string_append(interpreter, res, j, 0);
+        res = string_append(interpreter, res, j);
         s = VTABLE_get_string_keyed_int(interpreter, ar, i);
-        res = string_append(interpreter, res, s, 0);
+        res = string_append(interpreter, res, s);
     }
     return res;
 }

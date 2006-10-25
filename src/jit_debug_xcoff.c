@@ -229,8 +229,7 @@ debug_file(Interp *interpreter, STRING *file, const char *ext)
     ret = string_copy(interpreter, file);
     ret = string_append(interpreter, ret,
             string_make(interpreter, ext, strlen(ext), NULL,
-                PObj_external_FLAG),
-            0);
+                PObj_external_FLAG));
     return ret;
 }
 
@@ -273,8 +272,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
             file = string_chopn(interpreter, file, 3, 1);
         else if (!ext) /* EVAL_n */
             file = string_append(interpreter, file,
-                    string_make(interpreter, ".", 1, NULL, PObj_external_FLAG),
-                    0);
+                    string_make(interpreter, ".", 1, NULL, PObj_external_FLAG));
     }
     else {
         /* chop pbc */

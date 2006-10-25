@@ -27,7 +27,7 @@ PARROT_API void Parrot_unmake_COW(Interp *, STRING *);
 PARROT_API INTVAL string_compute_strlen(Interp *, STRING *);
 PARROT_API INTVAL string_max_bytes(Interp *, STRING*, INTVAL);
 PARROT_API STRING *string_concat(Interp *, STRING *, STRING *, UINTVAL);
-PARROT_API STRING *string_append(Interp *, STRING *, STRING *, UINTVAL);
+PARROT_API STRING *string_append(Interp *, STRING *, STRING *);
 PARROT_API STRING *string_repeat(Interp *, const STRING *, UINTVAL,
         STRING **);
 PARROT_API STRING *string_chopn(Interp *, STRING *, INTVAL, int in_place);

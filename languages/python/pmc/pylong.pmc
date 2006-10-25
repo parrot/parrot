@@ -42,8 +42,8 @@ Returns the hex representation of C<self>.
 
         STRING *res = string_from_cstring(INTERP, "0x", 0);
         STRING *s = VTABLE_get_string_keyed_int(INTERP, self, 16);
-        res = string_append(INTERP, res, s, 0);
-        res = string_append(INTERP, res, const_string(INTERP, "L"), 0);
+        res = string_append(INTERP, res, s);
+        res = string_append(INTERP, res, const_string(INTERP, "L"));
 
         VTABLE_set_string_native(INTERP, ret, res);
         return ret;

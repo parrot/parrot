@@ -217,7 +217,7 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
         if (string_length(interpreter, prefix) &&
            !is_abs_path(interpreter,path)) {
             full_name = string_concat(interpreter, prefix, slash, 0);
-            full_name = string_append(interpreter, full_name, path, 0);
+            full_name = string_append(interpreter, full_name, path);
         }
         else
             full_name = string_copy(interpreter, path);
@@ -225,14 +225,14 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
         /* make sure this path has a trailing slash before appending the file */
         if (   string_index(interpreter, full_name, full_name->strlen - 1)
             != string_index(interpreter, slash, 0))
-            full_name = string_append(interpreter, full_name, slash, 0);
+            full_name = string_append(interpreter, full_name, slash);
 
-        full_name = string_append(interpreter, full_name, file, 0);
+        full_name = string_append(interpreter, full_name, file);
         /* TODO create a string API that just does that
          *      a lot of ICU lib functions also need 0-terminated strings
          *      the goal is just to have for sure an invisible 0 at end
          */
-        full_name = string_append(interpreter, full_name, nul, 0);
+        full_name = string_append(interpreter, full_name, nul);
         full_name->bufused--;
         full_name->strlen--;
 #ifdef WIN32
@@ -249,7 +249,7 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
         }
     }
     /* finally try as is */
-    full_name = string_append(interpreter, file, nul, 0);
+    full_name = string_append(interpreter, file, nul);
     full_name->bufused--;
     full_name->strlen--;
 #ifdef WIN32

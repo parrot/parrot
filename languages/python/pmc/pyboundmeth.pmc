@@ -75,17 +75,17 @@ Return the representation of this object.
 
         if (PMC_struct_val(SELF)) {
             res = string_from_cstring(INTERP, "<bound method ", 0);
-            res = string_append(INTERP, res, name, 0);
-            res = string_append(INTERP, res, const_string(INTERP, " of "), 0);
+            res = string_append(INTERP, res, name);
+            res = string_append(INTERP, res, const_string(INTERP, " of "));
             res = string_append(INTERP, res,
-                 VTABLE_get_string(INTERP, (PMC*)PMC_struct_val(SELF)), 0);
+                 VTABLE_get_string(INTERP, (PMC*)PMC_struct_val(SELF)));
         }
         else {
             res = string_from_cstring(INTERP, "<unbound method ", 0);
-            res = string_append(INTERP, res, name, 0);
+            res = string_append(INTERP, res, name);
         }
 
-        res = string_append(INTERP, res, const_string(INTERP, ">"), 0);
+        res = string_append(INTERP, res, const_string(INTERP, ">"));
         return res;
     }
 

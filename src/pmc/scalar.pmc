@@ -1163,12 +1163,12 @@ Concatenate the string C<value> in place.
     void i_concatenate (PMC* value) {
         STRING* s = DYNSELF.get_string();
         STRING* v = VTABLE_get_string(INTERP, value);
-        DYNSELF.set_string_native(string_append(INTERP, s, v, 1));
+        DYNSELF.set_string_native(string_append(INTERP, s, v));
     }
 
     void i_concatenate_str (STRING* value) {
         STRING* s = DYNSELF.get_string();
-        DYNSELF.set_string_native( string_append(INTERP, s, value, 1));
+        DYNSELF.set_string_native( string_append(INTERP, s, value));
     }
 
 /*

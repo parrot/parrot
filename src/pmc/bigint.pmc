@@ -713,7 +713,7 @@ appended.
     }
     STRING* get_repr() {
         STRING *s = SELF.get_string();
-        return string_append(INTERP, s, const_string(INTERP, "L"), 0);
+        return string_append(INTERP, s, const_string(INTERP, "L"));
     }
 /*
 

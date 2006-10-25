@@ -310,7 +310,7 @@ Returns pythons string repr (w/o any escaping, just single quotes around)
             repr = string_copy(INTERP, q);
 
         if ((i_q < 0) && (i_bs < 0))
-            repr = string_append(INTERP, repr, s, 0);
+            repr = string_append(INTERP, repr, s);
         else {
            STRING *sub;
            while ((i_q >= 0) || (i_bs >= 0)) {
@@ -325,16 +325,16 @@ Returns pythons string repr (w/o any escaping, just single quotes around)
                    i_q = string_str_index(INTERP, s, q, start+1);
                }
 
-               repr = string_append(INTERP, repr, sub, 0);
-               repr = string_append(INTERP, repr, bs, 0);
+               repr = string_append(INTERP, repr, sub);
+               repr = string_append(INTERP, repr, bs);
            }
 
            i_q = string_length(INTERP, s);
            sub = string_substr(INTERP, s, start, i_q-start, NULL, 0);
-           repr = string_append(INTERP, repr, sub, 0);
+           repr = string_append(INTERP, repr, sub);
         }
 
-        repr = string_append(INTERP, repr, q, 0);
+        repr = string_append(INTERP, repr, q);
         return repr;
     }
 
@@ -508,9 +508,9 @@ character in S, False otherwise.
         else {
            s = VTABLE_shift_string(INTERP, iter);
            while (VTABLE_get_bool(INTERP, iter)) {
-               s = string_append(INTERP, s, PMC_str_val(self), 0);
+               s = string_append(INTERP, s, PMC_str_val(self));
                s = string_append(INTERP, s,
-                   VTABLE_get_string(INTERP, iter), 0);
+                   VTABLE_get_string(INTERP, iter));
            }
         }
 

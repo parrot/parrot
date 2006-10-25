@@ -113,7 +113,7 @@ Returns the number as a Parrot string.
                     const_string(INTERP, "."), 0) == -1 &&
                 string_str_index(INTERP, s,
                     const_string(INTERP, "e"), 0) == -1)
-            s = string_append(INTERP, s, const_string(INTERP, ".0"), 0);
+            s = string_append(INTERP, s, const_string(INTERP, ".0"));
         return s;
     }
 
@@ -140,7 +140,7 @@ Returns the number as a Parrot string.
                     const_string(INTERP, "."), 0) == -1 &&
                 string_str_index(INTERP, s,
                     const_string(INTERP, "e"), 0) == -1)
-            s = string_append(INTERP, s, const_string(INTERP, ".0"), 0);
+            s = string_append(INTERP, s, const_string(INTERP, ".0"));
         return s;
     }
 

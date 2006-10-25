@@ -198,8 +198,8 @@ handle_flags(Interp *interpreter,
                 STRING *temp = NULL;
                 string_substr(interpreter, str, 1, len-1, &temp, 0);
                 string_chopn(interpreter, str, -1, 1);
-                str = string_append(interpreter, str, fill, 0);
-                str = string_append(interpreter, str, temp, 0);
+                str = string_append(interpreter, str, fill);
+                str = string_append(interpreter, str, temp);
             }
             else {
                 str = string_concat(interpreter, fill, str, 0);
@@ -213,7 +213,7 @@ static STRING* str_append_w_flags(Interp *interpreter,
         STRING* dest, SpfInfo info, STRING* src, STRING *prefix)
 {
     src = handle_flags(interpreter, info, src, 1, prefix);
-    dest = string_append(interpreter, dest, src, 0);
+    dest = string_append(interpreter, dest, src);
     return dest;
 }
 
@@ -318,7 +318,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
         if (string_ord(interpreter, pat, i) == '%') {        /* % */
             if (len) {
                 string_substr(interpreter, pat, old, len, &substr, 1);
-                targ = string_append(interpreter, targ, substr, 0);
+                targ = string_append(interpreter, targ, substr);
             }
             len = 0;
             old = i;
@@ -653,7 +653,7 @@ do_sprintf:
                                 string_cstring_free(tempstr);
                             }
                             targ = string_append(interpreter, targ,
-                                                 cstr2pstr(tc), 0);
+                                                 cstr2pstr(tc));
                             break;
 
                         case 'p':
@@ -716,7 +716,7 @@ do_sprintf:
 #endif
 
                             targ = string_append(interpreter, targ,
-                                                 cstr2pstr(tc), 0);
+                                                 cstr2pstr(tc));
                             break;
 
                             /* STRINGS */
@@ -736,7 +736,7 @@ do_sprintf:
                                 ts = handle_flags(interpreter, &info, string,
                                     0, NULL);
 
-                                targ = string_append(interpreter, targ, ts, 0);
+                                targ = string_append(interpreter, targ, ts);
 
                                 break;
                             }
@@ -749,7 +749,7 @@ do_sprintf:
                             ts = handle_flags(interpreter, &info, string,
                                     0, NULL);
 
-                            targ = string_append(interpreter, targ, ts, 0);
+                            targ = string_append(interpreter, targ, ts);
 
                             break;
 
@@ -793,7 +793,7 @@ do_sprintf:
     }
     if (len) {
         string_substr(interpreter, pat, old, len, &substr, 1);
-        targ = string_append(interpreter, targ, substr, 0);
+        targ = string_append(interpreter, targ, substr);
     }
 
     return targ;

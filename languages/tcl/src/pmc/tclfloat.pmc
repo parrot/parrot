@@ -54,7 +54,7 @@ pmclass TclFloat
         if (string_str_index(INTERP,buff,dot,0) == -1
          && string_str_index(INTERP,buff,e,0) == -1) {
             dot_zero = string_from_cstring(INTERP,".0",2);
-            buff = string_append(INTERP, buff, dot_zero,0);
+            buff = string_append(INTERP, buff, dot_zero);
             return buff;
         }
 

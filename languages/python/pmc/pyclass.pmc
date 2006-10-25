@@ -400,13 +400,13 @@ Return the string representation of this instance.
 
         repr = string_from_cstring(INTERP, "<", 0);
         repr = string_append(INTERP, repr,
-            VTABLE_name(INTERP, VTABLE_get_class(INTERP, SELF)), 0);
+            VTABLE_name(INTERP, VTABLE_get_class(INTERP, SELF)));
         repr = string_append(INTERP, repr,
-            const_string(INTERP, " instance at "), 0);
+            const_string(INTERP, " instance at "));
         repr = string_append(INTERP, repr,
-            Parrot_sprintf_c(INTERP, "%#x", (INTVAL) SELF), 0);
+            Parrot_sprintf_c(INTERP, "%#x", (INTVAL) SELF));
         repr = string_append(INTERP, repr,
-            const_string(INTERP, ">"), 0);
+            const_string(INTERP, ">"));
 
         VTABLE_set_string_native(INTERP, res, repr);
         return res;

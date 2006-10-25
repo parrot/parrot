@@ -259,7 +259,7 @@ This does B<not> close the file.
                 part = PIO_reads(INTERP, SELF, 4096);
                 if (string_length(INTERP, part) == 0)
                     break;
-                result = string_append(INTERP, result, part, 0);
+                result = string_append(INTERP, result, part);
             } while (1);
         }
         return result;

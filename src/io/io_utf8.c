@@ -76,7 +76,7 @@ PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 s2->encoding = Parrot_utf8_encoding_ptr;
                 PIO_read_down(interpreter, layer->down, io, &s2);
                 s->strlen = iter.charpos;
-                s = string_append(interpreter, s, s2, 0);
+                s = string_append(interpreter, s, s2);
                 len += len2 + 1;
                 /* check last char */
             }

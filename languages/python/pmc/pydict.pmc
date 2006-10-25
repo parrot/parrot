@@ -312,18 +312,18 @@ Returns a string representation of the dictionary.
             PMC *val = SELF.get_pmc_keyed(key);
 
             res = string_append(INTERP, res,
-                    VTABLE_get_repr(INTERP, key), 0);
+                    VTABLE_get_repr(INTERP, key));
             res = string_append(INTERP, res,
-                    const_string(INTERP, ": "), 0);
+                    const_string(INTERP, ": "));
             res = string_append(INTERP, res,
-                    VTABLE_get_repr(INTERP, val), 0);
+                    VTABLE_get_repr(INTERP, val));
 
             if (j < n - 1)
                 res = string_append(INTERP, res,
-                        const_string(INTERP, ", "), 0);
+                        const_string(INTERP, ", "));
         }
         res = string_append(INTERP, res,
-                    const_string(INTERP, "}"), 0);
+                    const_string(INTERP, "}"));
         return res;
     }
 
