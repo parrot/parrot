@@ -49,7 +49,7 @@ sub runstep
             cc_ldflags => '/link',
 
             make_c     => q{$(PERL) -e "chdir shift @ARGV;}
-                . q{system '$(MAKE) -nologo', @ARGV; exit $$? >> 8;"},
+                . q{system '$(MAKE)', '-nologo', @ARGV; exit $$? >> 8;"},
 
             # ZI messes with __LINE__
             cc_debug             => '-Zi',
