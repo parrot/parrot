@@ -9,7 +9,7 @@ src/inter_cb.c - Parrot Interpreter - Callback Function Handling
 =head1 DESCRIPTION
 
 NCI callback functions may run whenever the C code executes the callback.
-To be prepared for asynchronous callbacks these are converted to callback 
+To be prepared for asynchronous callbacks these are converted to callback
 events.
 
 Often callbacks should run synchronously. This can only happen when
@@ -66,7 +66,7 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
         internal_exception(1, "unhandled signature '%s' in make_cb",
               cb_signature->strstart);
     }
-    
+
     ++sig_str;     /* Skip callback return type */
 
     if (*sig_str == 'U') {
@@ -88,10 +88,10 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
     sc = CONST_STRING(interpreter, "_signature");
     VTABLE_setprop(interpreter, user_data, sc, cb_sig);
     /*
-     * We are going to be passing the user_data PMC to external code, but 
-     * it may go out of scope until the callback is called -- we don't know 
-     * for certain as we don't know when the callback will be called. 
-     * Therefore, to prevent the PMC from being destroyed by a DOD sweep, 
+     * We are going to be passing the user_data PMC to external code, but
+     * it may go out of scope until the callback is called -- we don't know
+     * for certain as we don't know when the callback will be called.
+     * Therefore, to prevent the PMC from being destroyed by a DOD sweep,
      * we need to anchor it.
      *
      */
@@ -147,7 +147,7 @@ verify_CD(void *external_data, PMC *user_data)
 
     /*
      * We don't yet know which interpreter this PMC is from, so run
-     * through all of the existing interpreters and check their PMC 
+     * through all of the existing interpreters and check their PMC
      * pools
      */
     LOCK(interpreter_array_mutex);
@@ -212,7 +212,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *user_data)
 
     sc = CONST_STRING(interpreter, "_synchronous");
     passed_synchronous = VTABLE_getprop(interpreter, user_data, sc);
-    if (!PMC_IS_NULL(passed_synchronous) && 
+    if (!PMC_IS_NULL(passed_synchronous) &&
             VTABLE_get_bool(interpreter, passed_synchronous))
         synchronous = 1;
 
@@ -245,7 +245,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *user_data)
 /*
 
 =item C<void
-Parrot_run_callback(Parrot_Interp interpreter, 
+Parrot_run_callback(Parrot_Interp interpreter,
                     PMC* user_data, void* external_data)>
 
 Run a callback function. The PMC* user_data holds all
@@ -256,7 +256,7 @@ necessary items in its properties.
 */
 
 void
-Parrot_run_callback(Parrot_Interp interpreter, 
+Parrot_run_callback(Parrot_Interp interpreter,
                     PMC* user_data, void* external_data)
 {
     PMC *    signature;
@@ -331,7 +331,7 @@ case_I:
             param = string_from_cstring(interpreter, external_data, 0);
             break;
         default:
-            internal_exception(1, "unhandled signature char '%c' in run_cb", 
+            internal_exception(1, "unhandled signature char '%c' in run_cb",
                                *p);
     }
     pasm_sig[3] = '\0';

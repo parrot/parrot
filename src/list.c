@@ -278,11 +278,11 @@ list_dump(FILE *fp, List *list, INTVAL type)
                     switch (list->item_type) {
                     case enum_type_int:
                     case enum_type_short:
-                        printf("%d", (int)((int *) 
+                        printf("%d", (int)((int *)
                                            PObj_bufstart(&chunk->data))[i]);
                         break;
                     case enum_type_char:
-                        printf("%c", (char)((char *) 
+                        printf("%c", (char)((char *)
                                             PObj_bufstart(&chunk->data))[i]);
                         break;
                     }
@@ -1092,7 +1092,7 @@ list_item(Interp *interpreter, List *list, int type, INTVAL idx)
 
     switch (type) {
     case enum_type_sized:
-        return (void *)&((char *) 
+        return (void *)&((char *)
                          PObj_bufstart(&chunk->data))[idx * list->item_size];
         break;
     case enum_type_char:

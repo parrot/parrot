@@ -47,7 +47,7 @@ enter_nci_method(Parrot_Interp interpreter, int type,
                 NULL, PObj_constant_FLAG|PObj_external_FLAG),
             func);
     /* insert it into namespace */
-    VTABLE_set_pmc_keyed_str(interpreter, 
+    VTABLE_set_pmc_keyed_str(interpreter,
         interpreter->vtables[type]->_namespace,
             string_make(interpreter, name,
                 strlen(name), NULL,
@@ -74,7 +74,7 @@ void Parrot_mark_method_writes(Parrot_Interp interpreter,
     PMC *const method = VTABLE_get_pmc_keyed_str(
         interpreter, interpreter->vtables[type]->_namespace, str_name);
     VTABLE_set_integer_native(interpreter, pmc_true, 1);
-    VTABLE_setprop(interpreter, method, const_string(interpreter, "write"), 
+    VTABLE_setprop(interpreter, method, const_string(interpreter, "write"),
                    pmc_true);
 }
 
@@ -115,7 +115,7 @@ void Parrot_compreg(Parrot_Interp interpreter, STRING *type,
 /*
 
 =item C<PMC *
-Parrot_compile_string(Parrot_Interp interpreter, STRING *type, 
+Parrot_compile_string(Parrot_Interp interpreter, STRING *type,
                       char *code, String **error)>
 
 Compile code string.
@@ -125,27 +125,27 @@ Compile code string.
 */
 
 PMC *
-Parrot_compile_string(Parrot_Interp interpreter, STRING *type, 
+Parrot_compile_string(Parrot_Interp interpreter, STRING *type,
                       char *code, STRING **error)
 {
-    if (!string_compare(interpreter, const_string(interpreter, "PIR"), 
+    if (!string_compare(interpreter, const_string(interpreter, "PIR"),
         type)) {
-        return IMCC_compile_pir_s(interpreter, code, error); 
-    }    
-    else if (!string_compare(interpreter,const_string(interpreter, 
+        return IMCC_compile_pir_s(interpreter, code, error);
+    }
+    else if (!string_compare(interpreter,const_string(interpreter,
         "PASM"), type)) {
         return IMCC_compile_pasm_s(interpreter, code, error);
     }
     else {
         *error=const_string(interpreter, "Invalid interpreter type");
-        return NULL;    
+        return NULL;
     }
 }
 
 /*
 
 =item C<void
-Parrot_compile_file(Parrot_Interp interpreter, const char *fullname, 
+Parrot_compile_file(Parrot_Interp interpreter, const char *fullname,
                     String **error)>
 
 Compile code file.
@@ -155,7 +155,7 @@ Compile code file.
 */
 
 void *
-Parrot_compile_file(Parrot_Interp interpreter, char *fullname, 
+Parrot_compile_file(Parrot_Interp interpreter, char *fullname,
                     String **error)
 {
     return IMCC_compile_file_s(interpreter, fullname, error);
@@ -284,7 +284,7 @@ interpinfo_p(Interp *interpreter, INTVAL what)
             }
         case CURRENT_OBJECT:
             return CONTEXT(interpreter->ctx)->current_object;
-        case NAMESPACE_ROOT: 
+        case NAMESPACE_ROOT:
             return interpreter->root_namespace;
         case CURRENT_LEXPAD:
             return CONTEXT(interpreter->ctx)->lex_pad;

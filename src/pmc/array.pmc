@@ -1255,7 +1255,7 @@ Recursively make the array read-only and shared.
                     /* XXX do we need to clone first? */
                     new_value = VTABLE_share_ro(INTERP, value);
                     if (new_value != value) {
-                        list_assign(INTERP, PMC_data(ret), 
+                        list_assign(INTERP, PMC_data(ret),
                             i, new_value, enum_type_PMC);
                     }
                 }

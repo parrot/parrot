@@ -74,7 +74,7 @@ Parrot_exit(Interp *interp, int status) {
      * we don't allow new exit_handlers being installed inside exit handlers
      * - do we?
      * and: interp->exit_handler_list is gone, after the last exit handler
-     *      (Parrot_really_destroy) has run  
+     *      (Parrot_really_destroy) has run
      */
     while (node) {
         next = node->next;

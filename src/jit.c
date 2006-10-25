@@ -190,7 +190,7 @@ make_branch_list(Interp *interpreter,
         if (op == PARROT_OP_set_args_pc ||
                 op == PARROT_OP_set_returns_pc ||
                 op == PARROT_OP_get_results_pc)
-            goto no_branch;    
+            goto no_branch;
         if (op_info->jump)
             branch[rel_offset] |= JIT_BRANCH_SOURCE;
         for (i = 1; i < n; ++i) {
@@ -277,7 +277,7 @@ set_register_usage(Interp *interpreter,
      *
      * registers are set per their type [IPSN]
      * */
-    args = argt = op_info->op_count; 
+    args = argt = op_info->op_count;
     ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, argt);
     for (argn = argt - 1; argn > 0; argn--) {
         /* TODO check the argn-1 entries */
@@ -286,9 +286,9 @@ set_register_usage(Interp *interpreter,
         PMC *sig;
         if (argn >= args) {
             sig = CONTEXT(interpreter->ctx)->constants[cur_op[1]]->u.key;
-            arg_type = VTABLE_get_integer_keyed_int(interpreter, 
+            arg_type = VTABLE_get_integer_keyed_int(interpreter,
                     sig, argn - args);
-            arg_type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);       
+            arg_type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);
         }
         else
             arg_type = op_info->types[argn - 1];
@@ -379,7 +379,7 @@ set_register_usage(Interp *interpreter,
 
 /*
 
-=item C<static void 
+=item C<static void
 init_regusage(Interp *interpreter,
         Parrot_jit_optimizer_section_ptr cur_section)>
 
@@ -390,17 +390,17 @@ subroutines to registers only
 
 */
 
-static void 
+static void
 init_regusage(Interp *interpreter,
         Parrot_jit_optimizer_section_ptr cur_section)
 {
     int typ, j;
 
-    cur_section->ru[0].registers_used = 
+    cur_section->ru[0].registers_used =
         CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
-    cur_section->ru[3].registers_used = 
+    cur_section->ru[3].registers_used =
         CONTEXT(interpreter->ctx)->n_regs_used[REGNO_NUM];
-    cur_section->ru[1].registers_used = 
+    cur_section->ru[1].registers_used =
         cur_section->ru[2].registers_used = 0;
     for (typ = 0; typ < 4; typ++)
         for (j = 0; j < cur_section->ru[typ].registers_used; j++)
@@ -451,7 +451,7 @@ make_sections(Interp *interpreter,
 
     cur_op = code_start;
     /* set all regs to Parrot's */
-    if (jit_info->code_type == JIT_CODE_SUB_REGS_ONLY) 
+    if (jit_info->code_type == JIT_CODE_SUB_REGS_ONLY)
         init_regusage(interpreter, cur_section);
     while (cur_section) {
         opcode_t op = *cur_op;
@@ -518,7 +518,7 @@ make_sections(Interp *interpreter,
                 /* Make the new section be the current one */
                 cur_section = t_section;
                 /* set all regs to Parrot's */
-                if (jit_info->code_type == JIT_CODE_SUB_REGS_ONLY) 
+                if (jit_info->code_type == JIT_CODE_SUB_REGS_ONLY)
                     init_regusage(interpreter, cur_section);
 
                 /* registers get either allocated per section or
@@ -939,7 +939,7 @@ debug_sections(Interp *interpreter,
 /*
 
 =item C<static Parrot_jit_optimizer_t *
-optimize_jit(Interp *interpreter, 
+optimize_jit(Interp *interpreter,
             Parrot_jit_info_t *jit_info,
              opcode_t *code_start, opcode_t *code_end)>
 
@@ -950,7 +950,7 @@ Called by C<parrot_build_asm()> to run the optimizer.
 */
 
 static void
-optimize_jit(Interp *interpreter, 
+optimize_jit(Interp *interpreter,
             Parrot_jit_info_t *jit_info,
             opcode_t *code_start, opcode_t *code_end)
 {
@@ -988,7 +988,7 @@ optimize_jit(Interp *interpreter,
 /*
 
 =item C<static Parrot_jit_optimizer_t *
-optimize_imcc_jit(Interp *interpreter, 
+optimize_imcc_jit(Interp *interpreter,
             Parrot_jit_info_t *jit_info,
             opcode_t *code_start, opcode_t *code_end,
             struct PackFile_Segment *jit_seg)>
@@ -1000,7 +1000,7 @@ Generate optimizer stuff from the C<_JIT> section in the packfile.
 */
 
 static void
-optimize_imcc_jit(Interp *interpreter, 
+optimize_imcc_jit(Interp *interpreter,
             Parrot_jit_info_t *jit_info,
              opcode_t *code_start, opcode_t *code_end,
              struct PackFile_Segment *jit_seg)
@@ -1128,7 +1128,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     const jit_arch_info *arch_info;
     const jit_arch_regs *reg_info;
 
-    arch_info = jit_info->arch_info;   
+    arch_info = jit_info->arch_info;
     code_type = jit_info->code_type;
     reg_info = arch_info->regs + code_type;
     maps[0]  = reg_info->map_I;
@@ -1151,10 +1151,10 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                     }
                     offs = reg_offs(interpreter, typ, us);
                     if (typ == 3)
-                        (arch_info->mov_RM_n)(jit_info, 
+                        (arch_info->mov_RM_n)(jit_info,
                                               maps[typ][i], base_reg, offs);
                     else
-                        (arch_info->mov_RM_i)(jit_info, 
+                        (arch_info->mov_RM_i)(jit_info,
                                               maps[typ][i], base_reg, offs);
 
                 }
@@ -1199,7 +1199,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     const jit_arch_info *arch_info;
     const jit_arch_regs *reg_info;
 
-    arch_info = jit_info->arch_info;   
+    arch_info = jit_info->arch_info;
     code_type = jit_info->code_type;
     reg_info = arch_info->regs + code_type;
     maps[0]  = reg_info->map_I;
@@ -1223,10 +1223,10 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 
                     offs = reg_offs(interpreter, typ, us);
                     if (typ == 3)
-                        (arch_info->mov_MR_n)(jit_info, 
+                        (arch_info->mov_MR_n)(jit_info,
                                  base_reg, offs, maps[typ][i]);
                     else
-                        (arch_info->mov_MR_i)(jit_info, 
+                        (arch_info->mov_MR_i)(jit_info,
                                  base_reg, offs, maps[typ][i]);
 
                 }
@@ -1322,7 +1322,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<Parrot_jit_info_t *
-parrot_build_asm(Interp *interpreter, 
+parrot_build_asm(Interp *interpreter,
           opcode_t *code_start, opcode_t *code_end,
           void *objfile, enum_jit_code_type)>
 
@@ -1349,7 +1349,7 @@ file.
 */
 
 Parrot_jit_info_t *
-parrot_build_asm(Interp *interpreter, 
+parrot_build_asm(Interp *interpreter,
           opcode_t *code_start, opcode_t *code_end,
           void *objfile, enum_jit_code_type jit_type)
 {

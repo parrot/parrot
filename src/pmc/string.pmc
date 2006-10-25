@@ -643,7 +643,7 @@ Replace every occurrence of C<orig> with C<new>.
         STRING *s = PMC_str_val(SELF);
         INTVAL old_len = string_length(INTERP, orig);
         INTVAL new_len = string_length(INTERP, new);
-        
+
         while (-1 != (i = string_str_index(INTERP, s, orig, i))) {
             (void)string_replace(INTERP, s, i, old_len, new, NULL);
             i += new_len;
@@ -667,7 +667,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 */
 
     METHOD PMC* to_int(INTVAL base) {
-        PMC* result = pmc_new(INTERP, 
+        PMC* result = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(interpreter,
                         enum_class_Integer));
         /* TODO verify encoding */
@@ -700,7 +700,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
             i = i * base + dig;
             ++start;
         }
-        if (start < end) 
+        if (start < end)
             real_exception(INTERP, NULL, E_ValueError,
                     "invalid conversion to int - bad char %c", *start);
         VTABLE_set_integer_native(INTERP, result, i);
@@ -844,7 +844,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
             return;
         if (src->charset != Parrot_ascii_charset_ptr)
             real_exception(interpreter, NULL, INVALID_ENCODING,
-                "Can't translate non-ascii"); 
+                "Can't translate non-ascii");
         p = src->strstart;
         /* TODO verify trans table */
         tr_data = PMC_data(table);    /* XXX */
@@ -875,7 +875,7 @@ Reverse the ascii STRING C<src> in place.
             return;
         if (src->charset != Parrot_ascii_charset_ptr)
             real_exception(interpreter, NULL, INVALID_ENCODING,
-                "Can't reverse non-ascii"); 
+                "Can't reverse non-ascii");
         p = src->strstart;
         for (i = 0, --len; i < len; ++i, --len) {
             ch = p[len];
@@ -905,7 +905,7 @@ Checks if the ascii STRING C<str> is just an integer.
             return (INTVAL)(0);
         if (src->charset != Parrot_ascii_charset_ptr)
             real_exception(interpreter, NULL, INVALID_ENCODING,
-                "Can't is_integer non-ascii"); 
+                "Can't is_integer non-ascii");
 
         i = 0;
         p = src->strstart;

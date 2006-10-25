@@ -695,7 +695,7 @@ everything via the VTABLE api.
                 DYNSELF.push_pmc(element);
             }
         }
-        
+
         while (PMC_int_val(stack)) {
             element = VTABLE_pop_pmc(INTERP, stack);
             DYNSELF.push_pmc(element);

@@ -74,7 +74,7 @@ Returns the current working directory.
 #else
 #ifdef PATH_MAX
         cwd = getcwd(NULL, PATH_MAX+1);
-#else 
+#else
         cwd = getcwd(NULL, 0);
 #endif
 #endif
@@ -106,7 +106,7 @@ Changes the current working directory to the one specified by C<path>.
         char *cpath = string_to_cstring(interpreter, path);
 #ifdef WIN32
         error = _chdir(cpath);
-#else 
+#else
         error = chdir(cpath);
 #endif
         string_cstring_free(cpath);

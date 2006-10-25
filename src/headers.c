@@ -185,7 +185,7 @@ make_bufferlike_pool(Interp *interpreter, size_t buffer_size)
     /* Expand the array of sized resource pools, if necessary */
     if (num_old <= idx) {
         UINTVAL num_new = idx + 1;
-        sized_pools = mem_internal_realloc(sized_pools, 
+        sized_pools = mem_internal_realloc(sized_pools,
                                            num_new * sizeof(void *));
         memset(sized_pools + num_old, 0, sizeof(void *) * (num_new - num_old));
 
@@ -597,7 +597,7 @@ Parrot_initialize_header_pools(Interp *interpreter)
 
 /*
 
-=item C<int Parrot_forall_header_pools(Interp *, int flag, 
+=item C<int Parrot_forall_header_pools(Interp *, int flag,
                                        void *arg, pool_iter_fn)>
 
 Iterate through all header pools by calling the passed function. Returns
@@ -761,7 +761,7 @@ Merge the header pools of C<source_interp> into those of C<dest_interp>.
 =cut
 */
 
-static void fix_pmc_syncs(Interp *dest_interp, 
+static void fix_pmc_syncs(Interp *dest_interp,
         struct Small_Object_Pool *pool) {
     /* XXX largely copied from dod_sweep */
     struct Small_Object_Arena *cur_arena;
@@ -780,9 +780,9 @@ static void fix_pmc_syncs(Interp *dest_interp,
                     PMC *p = (PMC *)b;
                     if (PObj_is_PMC_shared_TEST(p)) {
                         PMC_sync(p)->owner = dest_interp;
-                    } 
+                    }
                     else {
-                        /* fprintf(stderr, "BAD PMC: address=%p, 
+                        /* fprintf(stderr, "BAD PMC: address=%p,
                                    base_type=%d\n",
                                    p, p->vtable->base_type); */
                         assert(0);
@@ -812,7 +812,7 @@ Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp) {
     fix_pmc_syncs(dest_interp, source_arena->pmc_pool);
     Parrot_small_object_pool_merge(dest_interp, dest_arena->pmc_pool,
             source_arena->pmc_pool);
-    Parrot_small_object_pool_merge(dest_interp, 
+    Parrot_small_object_pool_merge(dest_interp,
             dest_arena->constant_string_header_pool,
             source_arena->constant_string_header_pool);
     Parrot_small_object_pool_merge(dest_interp,
@@ -826,7 +826,7 @@ Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp) {
 
         if (i >= dest_arena->num_sized ||
             !dest_arena->sized_header_pools[i]) {
-            make_bufferlike_pool(dest_interp, i * sizeof(void *) 
+            make_bufferlike_pool(dest_interp, i * sizeof(void *)
                 + sizeof(Buffer));
             assert(dest_arena->sized_header_pools[i]);
         }

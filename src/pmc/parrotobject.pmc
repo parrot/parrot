@@ -70,7 +70,7 @@ this step, the stored object is unusable (in best case) or even
 recycled to a new PMC. All access to such a zombie would be really
 interesting.
 
-TODO 
+TODO
 
   - create a tobe_finalized list in the GC
   - don't destroy these objects immediately
@@ -187,8 +187,8 @@ Return the class of this object.
         }
         else {
             /* get the class object for this interpreter */
-            /* XXX this is rather a hack, it is, however, necessary: 
-             * otherwise we will be accessing the wrong interpreter's 
+            /* XXX this is rather a hack, it is, however, necessary:
+             * otherwise we will be accessing the wrong interpreter's
              * namespace
              */
             int type_num = SELF->vtable->base_type;
@@ -365,7 +365,7 @@ use fallback.
         VTABLE_setprop(INTERP, ret, CONST_STRING(interpreter, "_ro"), true);
         PObj_is_PMC_shared_SET(SELF);
 
-        n = PMC_int_val(ret); 
+        n = PMC_int_val(ret);
 
         data = (PMC **) PMC_data(ret);
 

@@ -51,7 +51,7 @@ open_log_file()
         while(--s>cmdline && *s!='/');
         if(*s == '/') s++;
         sprintf(name, LOG_NAME ".%.12s.%d", s, pid);
-    } 
+    }
         else {
         sprintf(name, LOG_NAME ".%d", pid);
     }
@@ -211,7 +211,7 @@ void cfree(void *mem)
 /*
  * Local variables:
  * tab-width: 4
- * compile-command: 
+ * compile-command:
  *    "gcc -Wall -O -fpic -shared -o malloc-trace.so malloc-trace.c"
  * End:
  */

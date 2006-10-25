@@ -53,7 +53,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     struct nlist symlst;
 
     fp = fopen(file, "w");
-    
+
     header.a_midmag = 0x07018600;
     header.a_text = obj->text.size;
     header.a_data = obj->data.size;
@@ -148,7 +148,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #  include <elf.h>
 # endif
 
-/* Add a section to the file 
+/* Add a section to the file
  *
  * n = Name
  * t = Type
@@ -200,7 +200,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     char shst[SHSTRTABSIZE], *shste;
 
     fp = fopen(file, "w");
-    
+
     bzero(&header, sizeof(Elf32_Ehdr));
     header.e_ident[0] = ELFMAG0;
     header.e_ident[1] = ELFMAG1;
@@ -268,7 +268,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     /* Bss */
     sh_add(".bss", SHT_NOBITS, SHF_WRITE | SHF_ALLOC, obj->bss.size,
         0, 0, 4, 0);
-    /* 
+    /*
      * Text rellocation records.
      * Link must be the symtab section header index.
      * Info is the text section header index.
@@ -284,7 +284,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     sh_add(".rela.text", SHT_RELA, 0, obj->text_rellocation_count *
         sizeof(Elf32_Rela), 6, 2, 4, sizeof(Elf32_Rela));
 #  endif
-    /* 
+    /*
      * Symbol table.
      * Link is the strtab section header index.
      * Info is the index of the first symbol in the symbol table.
@@ -467,7 +467,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     int i;
 
     fp = fopen(file, "w");
-    
+
     fprintf(fp, "\xFE\xED\xFA\xCE"); /* Header for Darwin */
     save_int(fp, 0x12);
     save_int(fp, 0);

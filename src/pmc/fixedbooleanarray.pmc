@@ -43,7 +43,7 @@ booleanarray_clone(Interp *interpreter, PMC *self, PMC *dest) {
     PMC_int_val2(dest) = PMC_int_val2(self);
     if (PMC_data(self)) {
         PMC_data(dest) = malloc(PMC_int_val2(self) / BITS_PER_CHAR);
-        mem_sys_memcopy(PMC_data(dest), 
+        mem_sys_memcopy(PMC_data(dest),
                         PMC_data(self), PMC_int_val2(self) / BITS_PER_CHAR);
     }
     else
@@ -317,7 +317,7 @@ Resizes the array to C<size> elements.
 
         PMC_int_val(SELF) = size;
         PMC_int_val2(SELF) = (size / BITS_PER_CHAR + 1) * BITS_PER_CHAR;
-        PMC_data(SELF) = 
+        PMC_data(SELF) =
             mem_sys_allocate_zeroed(PMC_int_val2(SELF) / BITS_PER_CHAR);
     }
 
@@ -497,8 +497,8 @@ Used to archive the string.
         IMAGE_IO *io = info->image_io;
         STRING *s;
         io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
-        s = string_from_cstring(INTERP, 
-                                PMC_data(SELF), 
+        s = string_from_cstring(INTERP,
+                                PMC_data(SELF),
                                 PMC_int_val2(SELF)/BITS_PER_CHAR);
         io->vtable->push_string(INTERP, io, s);
     }

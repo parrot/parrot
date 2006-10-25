@@ -53,7 +53,7 @@ debugging/error reporting.
 
 */
 
-Stack_Chunk_t * register_new_stack(Interp *interpreter, 
+Stack_Chunk_t * register_new_stack(Interp *interpreter,
                                    const char *name /*NN*/, size_t item_size)
 {
     Stack_Chunk_t *chunk;
@@ -81,10 +81,10 @@ Get a new chunk either from the freelist or allocate one.
 
 */
 
-Stack_Chunk_t *cst_new_stack_chunk(Parrot_Interp interpreter, 
+Stack_Chunk_t *cst_new_stack_chunk(Parrot_Interp interpreter,
                                    const Stack_Chunk_t *chunk /*NN*/)
 {
-    struct Small_Object_Pool * const pool = 
+    struct Small_Object_Pool * const pool =
         get_bufferlike_pool(interpreter, chunk->size);
     Stack_Chunk_t * const new_chunk = pool->get_free_object(interpreter, pool);
 

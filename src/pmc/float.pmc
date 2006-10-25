@@ -285,7 +285,7 @@ MMD_Float: {
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
 MMD_DEFAULT: {
-            const FLOATVAL diff = 
+            const FLOATVAL diff =
                 PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }

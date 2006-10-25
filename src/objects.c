@@ -52,9 +52,9 @@ fail_if_exist(Interp *interpreter, PMC *name)
     INTVAL type;
 
     PMC * const classname_hash = interpreter->class_hash;
-    PMC * type_pmc = VTABLE_get_pointer_keyed(interpreter, 
-            classname_hash, name); 
-    if (PMC_IS_NULL(type_pmc) || 
+    PMC * type_pmc = VTABLE_get_pointer_keyed(interpreter,
+            classname_hash, name);
+    if (PMC_IS_NULL(type_pmc) ||
             type_pmc->vtable->base_type == enum_class_NameSpace)
         type = 0;
     else
@@ -78,7 +78,7 @@ fail_if_exist(Interp *interpreter, PMC *name)
 static PMC *
 clone_array(Interp* interpreter, PMC *source_array)
 {
-    PMC * const new_array = pmc_new(interpreter, 
+    PMC * const new_array = pmc_new(interpreter,
                                     source_array->vtable->base_type);
     const INTVAL count = VTABLE_elements(interpreter, source_array);
     INTVAL i;
@@ -152,9 +152,9 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
                     string_from_cstring(interpreter, "\0", 1),
                     0);
             for (offset = 0; offset < attr_count; offset++) {
-                STRING * const attr_name = 
+                STRING * const attr_name =
                     VTABLE_get_string_keyed_int(interpreter, attribs, offset);
-                STRING * const full_name = 
+                STRING * const full_name =
                     string_concat(interpreter, partial_name, attr_name, 0);
                 /*
                  * store this attribute with short and full name
@@ -178,7 +178,7 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
 
 /*
 
-=item C<static void create_deleg_pmc_vtable(Interp *, PMC *class, 
+=item C<static void create_deleg_pmc_vtable(Interp *, PMC *class,
                                             PMC *class_name, int full)>
 
 Create a vtable that dispatches either to the contained PMC in the first
@@ -190,7 +190,7 @@ on the existence of the method for this class.
 */
 
 static void
-create_deleg_pmc_vtable(Interp *interpreter, PMC *class, 
+create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
         PMC *class_name, int full)
 {
     int i;
@@ -198,13 +198,13 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
     STRING meth_str;
     DECL_CONST_CAST;
 
-    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class), 
+    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class),
                                             PCD_OBJECT_VTABLE);
     VTABLE * const vtable           = PMC_struct_val(vtable_pmc);
     VTABLE * const ro_vtable        = vtable->ro_variant_vtable;
-    VTABLE * const deleg_pmc_vtable = 
+    VTABLE * const deleg_pmc_vtable =
         interpreter->vtables[enum_class_deleg_pmc];
-    VTABLE * const object_vtable    = 
+    VTABLE * const object_vtable    =
         interpreter->vtables[enum_class_ParrotObject];
     VTABLE * const ro_object_vtable = object_vtable->ro_variant_vtable;
     VTABLE * const delegate_vtable  = interpreter->vtables[enum_class_delegate];
@@ -240,7 +240,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
                 if (ro_vtable)
                     ((void **)ro_vtable)[i] = ((void**)deleg_pmc_vtable)[i];
                 ((void **)vtable)[i] = ((void**)deleg_pmc_vtable)[i];
-            } 
+            }
             else {
                 ((void **)vtable)[i] = ((void**)object_vtable)[i];
                 if (ro_vtable)
@@ -321,9 +321,9 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
         /* XXX not really threadsafe but good enough for now */
         static int anon_count;
 
-        STRING *child_class_name = Parrot_sprintf_c(interpreter, 
+        STRING *child_class_name = Parrot_sprintf_c(interpreter,
                 "%c%canon_%d", 0, 0, ++anon_count);
-        name = pmc_new(interpreter, enum_class_String); 
+        name = pmc_new(interpreter, enum_class_String);
         VTABLE_set_string_native(interpreter, name, child_class_name );
     }
     /*
@@ -342,7 +342,7 @@ Parrot_single_subclass(Interp* interpreter, PMC *base_class,
     /* We will have five entries in this array */
 
     /* We have the same number of attributes as our parent */
-    CLASS_ATTRIB_COUNT(child_class) = parent_is_class 
+    CLASS_ATTRIB_COUNT(child_class) = parent_is_class
             ? CLASS_ATTRIB_COUNT(base_class) : 0;
 
     /* Our parent class array has a single member in it */
@@ -563,9 +563,9 @@ parrot_class_register(Interp* interpreter, PMC *name,
     new_vtable->mro = mro;
 
     if (parent_vtable->ro_variant_vtable)
-        new_vtable->ro_variant_vtable = 
+        new_vtable->ro_variant_vtable =
             Parrot_clone_vtable(interpreter, parent_vtable->ro_variant_vtable);
-    
+
     /* Reset the init method to our instantiation method */
     new_vtable->init = Parrot_instantiate_object;
     new_vtable->init_pmc = Parrot_instantiate_object_init;
@@ -612,7 +612,7 @@ parrot_class_register(Interp* interpreter, PMC *name,
 
     new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
     if (parent_vtable->ro_variant_vtable)
-        new_vtable->ro_variant_vtable = 
+        new_vtable->ro_variant_vtable =
             Parrot_clone_vtable(interpreter, parent_vtable->ro_variant_vtable);
     new_vtable->base_type = new_type;
     new_vtable->mro = mro;
@@ -794,7 +794,7 @@ instantiate_object(Interp* interpreter, PMC *object, PMC *init)
     /*
      * put in the real vtable
      */
-    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), 
+    PMC * const vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class),
                                             PCD_OBJECT_VTABLE);
     object->vtable = PMC_struct_val(vtable_pmc);
 
@@ -863,7 +863,7 @@ class_mro_merge(Interp* interpreter, PMC *seqs)
     PMC *res, *seq, *cand, *nseqs, *s;
     INTVAL i, j, k;
     cand = NULL; /* silence compiler uninit warning */
-    
+
     res = pmc_new(interpreter, enum_class_ResizablePMCArray);
     while (1) {
         nseqs = not_empty(interpreter, seqs);
@@ -937,7 +937,7 @@ Parrot_add_parent(Interp* interpreter, PMC *class, PMC *parent)
         internal_exception(1, "Class isn't a ParrotClass");
     if (!PObj_is_class_TEST(parent) && parent == parent->vtable->class) {
         /* Permit inserting non-classes so at least thaw'ing classes
-         * is easy. Adding these parents after classes have been 
+         * is easy. Adding these parents after classes have been
          * subclassed is dangerous, however.
          */
         PMC *class_name;
@@ -949,7 +949,7 @@ Parrot_add_parent(Interp* interpreter, PMC *class, PMC *parent)
             CONST_STRING(interpreter, "__value"));
         class_name = pmc_new(interpreter, enum_class_String);
         VTABLE_set_string_native(interpreter, class_name,
-            VTABLE_name(interpreter, class)); 
+            VTABLE_name(interpreter, class));
         create_deleg_pmc_vtable(interpreter, class, class_name, 1);
     } else if (!PObj_is_class_TEST(parent)) {
         internal_exception(1, "Parent isn't a ParrotClass");
@@ -1089,7 +1089,7 @@ mark_object_cache(Interp* interpreter)
 void
 init_object_cache(Interp* interpreter)
 {
-    Caches * const mc = interpreter->caches = 
+    Caches * const mc = interpreter->caches =
         mem_sys_allocate_zeroed(sizeof(*mc));
     SET_NULL(mc->idx);
 }
@@ -1193,7 +1193,7 @@ Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
     if (type >= mc->mc_size) {
         if (mc->idx) {
             mc->idx = mem_sys_realloc(mc->idx, sizeof(UINTVAL*) * (type + 1));
-        } 
+        }
         else {
             mc->idx = mem_sys_allocate(sizeof(UINTVAL*) * (type + 1));
         }
@@ -1255,7 +1255,7 @@ debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)
     }
     else
         result = "no";
-    tracer = interpreter->debugger ? 
+    tracer = interpreter->debugger ?
         interpreter->debugger : interpreter;
     PIO_eprintf(tracer,
             "# find_method class '%Ss' method '%Ss': %s\n",
@@ -1532,7 +1532,7 @@ Parrot_class_offset(Interp* interpreter, PMC *object, STRING *class) {
         attribs = get_attrib_num(PMC_data(class_pmc), PCD_CLASS_ATTRIBUTES);
         attr_count = VTABLE_elements(interpreter, attribs);
         offset -= attr_count;
-        if (!string_equal(interpreter, 
+        if (!string_equal(interpreter,
                     VTABLE_name(interpreter, class_pmc), class))
             return offset;
     }
@@ -1541,7 +1541,7 @@ Parrot_class_offset(Interp* interpreter, PMC *object, STRING *class) {
 
 /*
 
-=item C<PMC *Parrot_find_class_constructor(Interp* interpreter, 
+=item C<PMC *Parrot_find_class_constructor(Interp* interpreter,
                                            STRING *class, INTVAL classtoken)>
 
 Find and return the constructor method PMC for the named sub. The
@@ -1553,35 +1553,35 @@ undefined, is pretty likely
 
 */
 
-PMC *Parrot_find_class_constructor(Interp* interpreter, STRING *class, 
+PMC *Parrot_find_class_constructor(Interp* interpreter, STRING *class,
                               INTVAL classtoken)
 {
     return NULL;
 }
 
-PMC *Parrot_find_class_destructor(Interp* interpreter, STRING *class, 
+PMC *Parrot_find_class_destructor(Interp* interpreter, STRING *class,
                              INTVAL classtoken)
 {
     return NULL;
 }
 
-PMC *Parrot_find_class_fallback(Interp* interpreter, STRING *class, 
+PMC *Parrot_find_class_fallback(Interp* interpreter, STRING *class,
                                 INTVAL classtoken)
 {
     return NULL;
 }
 
-void Parrot_set_class_constructor(Interp* interpreter, STRING *class, 
+void Parrot_set_class_constructor(Interp* interpreter, STRING *class,
                                   INTVAL classtoken, STRING *method)
 {
 }
 
-void Parrot_set_class_destructor(Interp* interpreter, STRING *class, 
+void Parrot_set_class_destructor(Interp* interpreter, STRING *class,
                                  INTVAL classtoken, STRING *method)
 {
 }
 
-void Parrot_set_class_fallback(Interp* interpreter, STRING *class, 
+void Parrot_set_class_fallback(Interp* interpreter, STRING *class,
                                INTVAL classtoken, STRING *method)
 {
 }

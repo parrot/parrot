@@ -68,7 +68,7 @@ Parrot_unmake_COW(Interp *interpreter, STRING *s /*NN*/)
          * independent of the original COW data */
         PObj_constant_CLEAR(s);
         /* constant may have been marked */
-        PObj_live_CLEAR(s);     
+        PObj_live_CLEAR(s);
         /*
          * allocate a dummy strings memory
          * buflen might be bigger and used, so pass this length
@@ -315,7 +315,7 @@ string_make_empty(Interp *interpreter,
     if (representation == enum_stringrep_one) {
         s->charset = PARROT_DEFAULT_CHARSET;
         s->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, s);;
-    } 
+    }
     else {
         internal_exception(INVALID_CHARTYPE, "Unsupported representation");
     }
@@ -2474,7 +2474,7 @@ character classes. Returns 0 otherwise, or if the string is empty or NULL.
 */
 
 INTVAL
-Parrot_string_is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, 
+Parrot_string_is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
                         STRING *s, UINTVAL offset)
 {
     if (!string_length(interpreter, s))
@@ -2594,7 +2594,7 @@ string_compose(Interp * interpreter, STRING *src)
     return CHARSET_COMPOSE(interpreter, src);
 }
 
-STRING* 
+STRING*
 string_join(Interp *interpreter, STRING *j, PMC *ar)
 {
     STRING *res;
@@ -2614,7 +2614,7 @@ string_join(Interp *interpreter, STRING *j, PMC *ar)
     return res;
 }
 
-PMC* 
+PMC*
 string_split(Interp *interpreter, STRING *delim, STRING *str)
 {
     PMC * const res =  pmc_new(interpreter, enum_class_ResizableStringArray);

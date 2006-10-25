@@ -69,7 +69,7 @@ Returns the result of C<get_string_keyed(key)> as a C<PerlString>.
         INTVAL   dynpmc_PerlString;
         PMC     *ret;
         STRING  *string;
-    
+
         dynpmc_PerlString = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlString", 0));
         ret = pmc_new(INTERP, dynpmc_PerlString);

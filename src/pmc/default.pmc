@@ -47,7 +47,7 @@ caller(Interp* interpreter, PMC * pmc)
 
 /*
 
-=item C<static void cant_do_method(Interp* interpreter, PMC * pmc, 
+=item C<static void cant_do_method(Interp* interpreter, PMC * pmc,
                                    const char *methname)>
 
 Throws an exception "$methname() not implemented in class '$class'", used by
@@ -116,7 +116,7 @@ check_set_std_props(Interp* interpreter, PMC *pmc, STRING *key, PMC *value)
         else if (!on && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG)
                 && pmc->vtable->ro_variant_vtable)
             pmc->vtable = pmc->vtable->ro_variant_vtable;
-        else 
+        else
             return 0;
 
         return 1;
@@ -148,7 +148,7 @@ propagate_std_props(Interp *interpreter, PMC *self, PMC *prop_hash) {
 
 /*
 
-=item C<static INTVAL 
+=item C<static INTVAL
 has_pending_std_props(Interp *interpreter, PMC *self)>
 
 Returns true if propagate_std_props() would create a non-empty prophash.
@@ -180,7 +180,7 @@ looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 static PMC*
 check_get_std_props(Interp *interpreter, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-        &&!string_compare(interpreter, key, 
+        &&!string_compare(interpreter, key,
                           string_from_cstring(interpreter, "_ro", 3))
         ) {
         PMC *ret_val;
@@ -198,7 +198,7 @@ check_get_std_props(Interp *interpreter, PMC *self, STRING *key) {
 make_prop_hash(Interp *interpreter, PMC *self)>
 
 Create a property hash for C<self>. Returns the created hash. Inferred
-properties will be added to the hash and it will be set as 
+properties will be added to the hash and it will be set as
 C<PMC_metadata(self)>.
 
 =cut
@@ -216,7 +216,7 @@ make_prop_hash(Interp *interpreter, PMC *self) {
     DOD_WRITE_BARRIER(interpreter, self, NULL, prop);
     VTABLE_init(interpreter, prop);
     propagate_std_props(interpreter, self, prop);
-    return prop; 
+    return prop;
 }
 
 /*
@@ -763,7 +763,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 */
 
     INTVAL is_equal_num (PMC* value) {
-        return (VTABLE_get_number(INTERP, SELF) == 
+        return (VTABLE_get_number(INTERP, SELF) ==
                 VTABLE_get_number(INTERP, value));
     }
 
@@ -943,7 +943,7 @@ Look for NCI methods and properties.
          * XXX do we need that in the default object system?
          */
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
-             b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF), 
+             b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF),
                                         name);
              if (b)
                  p = b->value;

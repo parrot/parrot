@@ -1225,7 +1225,7 @@ Returns C<FUNC>(SELF).
         RE(d) = cos(re) * cosh(im);
         IM(d) = -1.0 * sin(re) * sinh(im);
         return d;
-    }   
+    }
 
     METHOD PMC* tan() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
@@ -1481,7 +1481,7 @@ C<func(a+bi) = c+di>, C<|c|> and C<|d|> will be correct, confusingly enough.
 
 =cut
 
-asinh z = -ln(sqrt(1+zz) - z) 
+asinh z = -ln(sqrt(1+zz) - z)
 asinh z = ln(sqrt(zz + 1) + z)
 
 asinh = i asin(-ix)

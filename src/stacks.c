@@ -182,7 +182,7 @@ element.
 */
 
 void
-rotate_entries(Interp *interpreter, 
+rotate_entries(Interp *interpreter,
                Stack_Chunk_t **stack_p /*NN*/,
                INTVAL num_entries)
 {
@@ -424,7 +424,7 @@ get_entry_type(Interp *interpreter, Stack_Entry_t *entry /*NN*/)
 Parrot_dump_dynamic_environment(Interp *interpreter,
                                 struct Stack_Chunk *dynamic_env)>
 
-Print a representation of the dynamic stack to the standard error (using 
+Print a representation of the dynamic stack to the standard error (using
 C<PIO_eprintf>).  This is used only temporarily for debugging.
 
 =cut

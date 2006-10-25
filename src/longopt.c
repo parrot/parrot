@@ -43,7 +43,7 @@ F<docs/dev/longopt.dev>).
 
 Call it iteratively with the same C<info_buf> until it returns 0 or -1.
 
-0  means you have reached the end of options. 
+0  means you have reached the end of options.
 
 -1 means a parse error, with error put in C<< info_buf->opt_error >>.
 
@@ -94,7 +94,7 @@ longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
                     const struct longopt_opt_decl options[],
                     struct longopt_opt_info* info_buf)>
 
-Find the option identifier of a long option. 
+Find the option identifier of a long option.
 
 Fill C<info_buf> appropriately, and return the option identifier.
 
@@ -132,7 +132,7 @@ longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
                  * not expecting one, it is just ignored.  Bad. */
 
                 if (argv[dex][optlen] == '=') {
-                    if (dptr->opt_flags & 
+                    if (dptr->opt_flags &
                             (OPTION_required_FLAG | OPTION_optional_FLAG)) {
                         info_buf->opt_arg = &argv[dex][optlen+1];
                     }
@@ -161,7 +161,7 @@ longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
                         }
                     }
                     else if (dptr->opt_flags & OPTION_optional_FLAG) {
-                        if (dex+1 < argc && argv[dex+1][0] && 
+                        if (dex+1 < argc && argv[dex+1][0] &&
                                 argv[dex+1][0] != '-') {
                             info_buf->opt_arg = argv[dex+1];
                             ++info_buf->opt_index;
@@ -176,7 +176,7 @@ longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
 
     /* Couldn't find it. */
     info_buf->opt_id = -1;
-    Parrot_snprintf(interp, longopt_error_buffer, 
+    Parrot_snprintf(interp, longopt_error_buffer,
              sizeof(longopt_error_buffer),
              "Option %s not known", argv[dex]);
     info_buf->opt_error = longopt_error_buffer;
@@ -246,7 +246,7 @@ longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
                 if (*(pos + 1)) {
                     info_buf->opt_arg = pos + 1;
                 }
-                else if (dex+2 < argc && argv[dex+1][0] && 
+                else if (dex+2 < argc && argv[dex+1][0] &&
                         argv[dex+1][0] != '-') {
                     info_buf->opt_arg = argv[dex+1];
                     ++info_buf->opt_index;
@@ -270,7 +270,7 @@ longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
 
     /* Couldn't find it in the table */
     info_buf->opt_id = -1;
-    Parrot_snprintf(interp, longopt_error_buffer, 
+    Parrot_snprintf(interp, longopt_error_buffer,
              sizeof(longopt_error_buffer),
              "Option -%c not known", *pos);
     info_buf->opt_error = longopt_error_buffer;

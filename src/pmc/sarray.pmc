@@ -37,7 +37,7 @@ Currently SArray's are used for:
 
 =item Global data per interpreter
 
-=item For implementing lists, see F<src/list.c>. 
+=item For implementing lists, see F<src/list.c>.
 
 =item Base class of the Exception PMC, see F<src/exception.pmc>
 

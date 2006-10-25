@@ -103,7 +103,7 @@ new_hll_entry(Interp *interpreter)
      * ATT: all items that are owned by the HLL_info structure
      *      have to be created as constant objects, because
      *      this structure isn't marked by DOD/GC
-     */ 
+     */
     entry = constant_pmc_new(interpreter, enum_class_FixedPMCArray);
     VTABLE_push_pmc(interpreter, hll_info, entry);
 
@@ -156,12 +156,12 @@ Parrot_register_HLL(Interp *interpreter,
      * ns_hash to another type, if mappings provide one
      * XXX - FIXME
      */
-    ns_hash = Parrot_make_namespace_keyed_str(interpreter, 
-                                              interpreter->root_namespace, 
+    ns_hash = Parrot_make_namespace_keyed_str(interpreter,
+                                              interpreter->root_namespace,
                                               hll_name);
 
     /* cache HLLs toplevel namespace */
-    VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 
+    VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace,
                              idx, ns_hash);
 
     /* register HLL lib */
@@ -200,12 +200,12 @@ Parrot_get_HLL_id(Interp* interpreter, STRING *hll_name)
 
     for (i = 0; i < nelements; ++i) {
         PMC * const entry = VTABLE_get_pmc_keyed_int(interpreter, hll_info, i);
-        PMC * const name_pmc = VTABLE_get_pmc_keyed_int(interpreter, entry, 
+        PMC * const name_pmc = VTABLE_get_pmc_keyed_int(interpreter, entry,
                 e_HLL_name);
         STRING * name;
 
         if (PMC_IS_NULL(name_pmc))
-            continue;   
+            continue;
         name = VTABLE_get_string(interpreter, name_pmc);
         if (!string_equal(interpreter, name, hll_name))
             break;
@@ -225,7 +225,7 @@ Parrot_get_HLL_name(Interp *interpreter, INTVAL id)
     nelements = VTABLE_elements(interpreter, hll_info);
     if (id < 0 || id >= nelements) {
         ret = NULL;
-    } 
+    }
     else {
         PMC *entry;
         PMC *name_pmc;
@@ -384,7 +384,7 @@ Parrot_regenerate_HLL_namespaces(Interp *interpreter)
                                 interpreter->HLL_namespace,
                                 hll_id);
         if (PMC_IS_NULL(ns_hash) ||
-            ns_hash->vtable->base_type == enum_class_Undef) 
+            ns_hash->vtable->base_type == enum_class_Undef)
         {
             STRING *hll_name;
             hll_name = Parrot_get_HLL_name(interpreter, hll_id);
@@ -396,9 +396,9 @@ Parrot_regenerate_HLL_namespaces(Interp *interpreter)
              * easy to do that here since the typemap already exists,
              * but it is not currently done for consistency.
              */
-            ns_hash = Parrot_make_namespace_keyed_str(interpreter, 
+            ns_hash = Parrot_make_namespace_keyed_str(interpreter,
                 interpreter->root_namespace, hll_name);
-            VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace, 
+            VTABLE_set_pmc_keyed_int(interpreter, interpreter->HLL_namespace,
                                      hll_id, ns_hash);
         }
     }

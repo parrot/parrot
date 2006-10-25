@@ -17,7 +17,7 @@ It provides the following methods:
 
 Note that a running thread object becomes invalid when a thread
 finishes while detached or joined. Further operations on the
-object may have unexpected behavior, such as manipulating an 
+object may have unexpected behavior, such as manipulating an
 unrelated thread.
 
 =head2 Methods
@@ -133,7 +133,7 @@ Terminate a running thread.
     METHOD void kill() {
         pt_thread_kill(PMC_int_val(SELF));
     }
-    
+
 }
 
 /*

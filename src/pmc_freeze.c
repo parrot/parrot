@@ -824,7 +824,7 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
         info->last_type = *type = io->vtable->shift_integer(interpreter, io);
         if (*type <= 0)
             internal_exception(1, "Unknown PMC type to thaw %d", (int) *type);
-        if (*type >= interpreter->n_vtable_max || 
+        if (*type >= interpreter->n_vtable_max ||
             !interpreter->vtables[*type]) {
             /* that ought to be a class */
             *type = enum_class_ParrotClass;

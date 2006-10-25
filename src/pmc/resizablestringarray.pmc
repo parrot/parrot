@@ -415,7 +415,7 @@ of the array.
 */
 
     void unshift_string (STRING *value) {
-        STRING **data; 
+        STRING **data;
         INTVAL size, i;
 
         size = PMC_int_val(SELF);
@@ -498,7 +498,7 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 */
 
     void delete_keyed_int (INTVAL key) {
-        STRING **data; 
+        STRING **data;
         INTVAL size, i;
         size = PMC_int_val(SELF);
 
@@ -519,7 +519,7 @@ Removes the element at C<*key>.
 */
 
     void delete_keyed (PMC* key) {
-        STRING **data; 
+        STRING **data;
         INTVAL size, idx, i;
         size = PMC_int_val(SELF);
         idx = key_integer(INTERP, key);

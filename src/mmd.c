@@ -302,10 +302,10 @@ mmd_dispatch_p_pip(Interp *interpreter,
     left = mmd_deref(interpreter, func_nr, left);
 
     left_type = left->vtable->base_type;
-    
+
     real_function =
-        (mmd_f_p_pip)get_mmd_dispatch_type(interpreter, func_nr, 
-                                           left_type, enum_type_INTVAL, 
+        (mmd_f_p_pip)get_mmd_dispatch_type(interpreter, func_nr,
+                                           left_type, enum_type_INTVAL,
                                            &is_pmc);
 
     if (is_pmc) {
@@ -611,7 +611,7 @@ mmd_add_function(Interp *interpreter,
             interpreter->binop_mmd_funcs =
                 mem_sys_realloc(interpreter->binop_mmd_funcs,
                                 (func_nr + 1) * sizeof(MMD_table));
-        } 
+        }
         else {
             interpreter->binop_mmd_funcs =
                 mem_sys_allocate((func_nr + 1) * sizeof(MMD_table));
@@ -905,7 +905,7 @@ wrap it into an NCI function to get the required function arguments passed.
 */
 
 PMC *
-mmd_vtfind(Parrot_Interp interpreter, INTVAL func_nr, 
+mmd_vtfind(Parrot_Interp interpreter, INTVAL func_nr,
            INTVAL left, INTVAL right) {
     int is_pmc;
     PMC *f;
@@ -938,8 +938,8 @@ static void mmd_sort_candidates(Interp *, PMC *arg_tuple, PMC *cl);
 
 /*
 
-=item C<PMC *Parrot_MMD_search_default_inline(Interp *, 
-                                              STRING *meth, 
+=item C<PMC *Parrot_MMD_search_default_inline(Interp *,
+                                              STRING *meth,
                                               STRING *signature, ...)>
 
 Default implementation of MMD lookup. The signature contains the letters
@@ -948,7 +948,7 @@ Default implementation of MMD lookup. The signature contains the letters
 =item C<PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth)>
 
 Default implementation of MMD lookup. The signature contains the letters
-"INSP" for the argument types. B<PMC> arguments are taken from 
+"INSP" for the argument types. B<PMC> arguments are taken from
 the argument tuple.
 
 =cut
@@ -1257,7 +1257,7 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
 
 /*
 
-=item C<static void mmd_search_classes(Interp *, STRING *meth, 
+=item C<static void mmd_search_classes(Interp *, STRING *meth,
                                        PMC *arg_tuple, PMC *cl,
                                        INTVAL start_at_parent)>
 
@@ -1583,7 +1583,7 @@ mmd_is_hidden(Interp *interpreter, PMC *multi, PMC *cl)
 
 /*
 
-=item C<static int mmd_maybe_candidate(Interp *, PMC *pmc, 
+=item C<static int mmd_maybe_candidate(Interp *, PMC *pmc,
                                        PMC *arg_tuple, PMC *cl)>
 
 If the candidate C<pmc> is a Sub PMC, push it on the candidate list and
@@ -1632,7 +1632,7 @@ mmd_maybe_candidate(Interp *interpreter, PMC *pmc, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static int mmd_search_lexical(Interp *, STRING *meth, 
+=item C<static int mmd_search_lexical(Interp *, STRING *meth,
                                       PMC *arg_tuple, PMC *cl)>
 
 Search the current lexical pad for matching candidates. Return TRUE if the
@@ -1676,7 +1676,7 @@ mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static int mmd_search_global(Interp *, STRING *meth, 
+=item C<static int mmd_search_global(Interp *, STRING *meth,
                                      PMC *arg_tuple, PMC *cl)>
 
 Search the global namespace for matching candidates. Return TRUE if
@@ -1701,7 +1701,7 @@ mmd_search_global(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static void mmd_search_builtin(Interp *, STRING *meth, 
+=item C<static void mmd_search_builtin(Interp *, STRING *meth,
                                        PMC *arg_tuple, PMC *cl)>
 
 Search the builtin namespace for matching candidates. This is the last
@@ -1712,25 +1712,25 @@ search in all the namespaces.
 */
 
 static PMC*
-mmd_get_ns(Interp *interpreter) 
+mmd_get_ns(Interp *interpreter)
 {
     STRING *ns_name;
     PMC *ns;
 
     ns_name = CONST_STRING(interpreter, "__parrot_core");
-    ns = Parrot_get_namespace_keyed_str(interpreter, 
+    ns = Parrot_get_namespace_keyed_str(interpreter,
                                         interpreter->root_namespace, ns_name);
     return ns;
 }
 
 static PMC*
-mmd_make_ns(Interp *interpreter) 
+mmd_make_ns(Interp *interpreter)
 {
     STRING *ns_name;
     PMC *ns;
 
     ns_name = CONST_STRING(interpreter, "__parrot_core");
-    ns = Parrot_make_namespace_keyed_str(interpreter, 
+    ns = Parrot_make_namespace_keyed_str(interpreter,
                                          interpreter->root_namespace, ns_name);
     return ns;
 }
@@ -1854,7 +1854,7 @@ static void
 mmd_create_builtin_multi_meth(Interp *interpreter, PMC *ns, INTVAL type,
         const MMD_init *entry)
 {
-    mmd_create_builtin_multi_meth_2(interpreter, ns, 
+    mmd_create_builtin_multi_meth_2(interpreter, ns,
             entry->func_nr, type, entry->right, entry->func_ptr);
 }
 

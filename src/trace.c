@@ -43,7 +43,7 @@ trace_class_name(Interp *interpreter, PMC* pmc)
     STRING *class_name;
     if (PObj_is_class_TEST(pmc)) {
         SLOTTYPE * const class_array = PMC_data(pmc);
-        PMC * const class_name_pmc = get_attrib_num(class_array, 
+        PMC * const class_name_pmc = get_attrib_num(class_array,
                                                     PCD_CLASS_NAME);
         class_name = PMC_str_val(class_name_pmc);
     }
@@ -88,7 +88,7 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
                 PIO_eprintf(debugger, "%S=PMC(%#p Str:\"%Ss\")",
                     VTABLE_name(interpreter, pmc), pmc,
                     escaped);
-            else 
+            else
                 PIO_eprintf(debugger, "%S=PMC(%#p Str:\"(null)\")",
                     VTABLE_name(interpreter, pmc), pmc);
         }
@@ -185,7 +185,7 @@ trace_key_dump(Interp *interpreter, PMC *key)
                 len += PIO_eprintf(debugger, "S%vd=\"%Ss\"", PMC_int_val(key),
                         escaped);
             else
-                len += PIO_eprintf(debugger, "S%vd=\"(null)\"", 
+                len += PIO_eprintf(debugger, "S%vd=\"(null)\"",
                         PMC_int_val(key));
             }
             break;
@@ -243,7 +243,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
     s = 1;
     len = PIO_eprintf(debugger, "%6vu ", (UINTVAL)(pc - code_start));
     if (strcmp(info->name, "infix") == 0) {
-        /* this should rather be MMD_opcode_name, which doesn't 
+        /* this should rather be MMD_opcode_name, which doesn't
          * exit yet
          */
         len += PIO_eprintf(debugger, "%s",
@@ -278,7 +278,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
             if (i < info->op_count)
                 type = info->types[i - 1];
             else
-                type = SIG_ITEM(sig, i - 2) & 
+                type = SIG_ITEM(sig, i - 2) &
                     (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
             if (i > s &&
                     type != PARROT_ARG_KC &&
@@ -305,7 +305,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                 case PARROT_ARG_SC:
                     {
                     STRING* const escaped = string_escape_string_delimited(
-                            interpreter, 
+                            interpreter,
                             PCONST(o)->u.string, 20);
                     if (escaped)
                         len += PIO_eprintf(debugger, "\"%Ss\"", escaped);
@@ -366,7 +366,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
             if (i < info->op_count)
                 type = info->types[i - 1];
             else
-                type = SIG_ITEM(sig, i - 2) & 
+                type = SIG_ITEM(sig, i - 2) &
                     (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
             if (i > s) {
                 PIO_eprintf(debugger, " ");

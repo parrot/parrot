@@ -34,7 +34,7 @@ tdb
 /* flags for internal_ns_keyed */
 #define INTERN_NS_CREAT 1       /* I'm a fan of the classics */
 
-static PMC * internal_ns_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key, 
+static PMC * internal_ns_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key,
                                STRING *str_key, int flags)
 {
     PMC *ns, *sub_ns;
@@ -79,7 +79,7 @@ static PMC * internal_ns_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key,
 
             /* TODO - match HLL of enclosing namespace? */
             sub_ns = pmc_new(interp,
-                             Parrot_get_ctx_HLL_type(interp, 
+                             Parrot_get_ctx_HLL_type(interp,
                                                      enum_class_NameSpace));
             if (PMC_IS_NULL(sub_ns))
                 return PMCNULL;
@@ -271,7 +271,7 @@ Parrot_find_global_k(Interp *interpreter, PMC *pmc_key, STRING *globalname)
 PMC *
 Parrot_find_global_s(Interp *inter, STRING *str_key, STRING *globalname)
 {
-    PMC *const ns = 
+    PMC *const ns =
         Parrot_get_namespace_keyed_str(inter,
                                        Parrot_get_ctx_HLL_namespace(inter),
                                        str_key);
@@ -306,7 +306,7 @@ the HLL root if C<str_key> is NULL, with the name C<globalname>.
 */
 
 void
-Parrot_store_global_n(Interp *interpreter, PMC *ns, 
+Parrot_store_global_n(Interp *interpreter, PMC *ns,
                       STRING *globalname, PMC *val)
 {
 #if DEBUG_GLOBAL
@@ -342,7 +342,7 @@ Parrot_store_global_k(Interp *interpreter, PMC *pmc_key,
      * not good enough but it avoids regressesions for now
      */
     if (pmc_key->vtable->base_type == enum_class_String) {
-        Parrot_store_global_s(interpreter, PMC_str_val(pmc_key), 
+        Parrot_store_global_s(interpreter, PMC_str_val(pmc_key),
                               globalname, val);
         return;
     }
@@ -357,7 +357,7 @@ Parrot_store_global_k(Interp *interpreter, PMC *pmc_key,
 }
 
 void
-Parrot_store_global_s(Interp *inter, STRING *str_key, 
+Parrot_store_global_s(Interp *inter, STRING *str_key,
                       STRING *globalname, PMC *val)
 {
     PMC *ns;
@@ -495,19 +495,19 @@ store_sub(Interp *interpreter, PMC *pmc_key, STRING *str_key,
         ns = Parrot_make_namespace_keyed(interpreter, ns, pmc_key);
     else if (str_key)
         ns = Parrot_make_namespace_keyed_str(interpreter, ns, str_key);
-    
+
     Parrot_store_global_n(interpreter, ns, sub_name, sub_pmc);
 
     /* TEMPORARY HACK - cache invalidation should be a namespace function */
     if (! PMC_IS_NULL(pmc_key)) {
         if (pmc_key->vtable->base_type == enum_class_String)
-            Parrot_invalidate_method_cache(interpreter, 
+            Parrot_invalidate_method_cache(interpreter,
                                            PMC_str_val(pmc_key), sub_name);
     }
     else if (str_key)
         Parrot_invalidate_method_cache(interpreter, str_key, sub_name);
 
-    /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure 
+    /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure
      * MultiSub could also contain subs from various namespaces,
      * so it doesn't make much sense to associate a namespace
      * with a multi.
@@ -517,7 +517,7 @@ store_sub(Interp *interpreter, PMC *pmc_key, STRING *str_key,
 }
 
 static void
-store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc, 
+store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
                        PMC *pmc_key, STRING *sub_name)
 {
     /*
@@ -536,7 +536,7 @@ store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
                 store_sub(interpreter, pmc_key, NULL, sub_name, sub_pmc);
                 break;
             default:
-                internal_exception(1, 
+                internal_exception(1,
                                    "Namespace constant is neither "
                                    "String nor Key");
         }
@@ -582,7 +582,7 @@ store_named_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
     sub_name  = PMC_sub(sub_pmc)->name;
     namespace = PMC_sub(sub_pmc)->namespace;
     multi_sig = PMC_sub(sub_pmc)->multi_signature;
-    
+
     if (PMC_IS_NULL(multi_sig)) {
         store_sub_in_namespace(interpreter, sub_pmc, namespace, sub_name);
     }
@@ -590,7 +590,7 @@ store_named_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
         STRING *long_name;
         PMC *multi_sub;
         PMC *stash;
-        
+
         /* If namespace is NULL, we need to look in the root HLL namespace. But
            since we haven't actually run code yet, the context hasn't been set
            to include the HLL, so we have to do the work ourselves. */
@@ -600,7 +600,7 @@ store_named_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
         multi_sub = PMC_IS_NULL(stash)
             ? PMCNULL
             : VTABLE_get_pmc_keyed_str(interpreter, stash, sub_name);
-        
+
         /* is there an existing MultiSub PMC? or do we need to create one? */
         if (PMC_IS_NULL(multi_sub)) {
             multi_sub = pmc_new(interpreter, enum_class_MultiSub);
@@ -612,7 +612,7 @@ store_named_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
         }
         else
             VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
-        
+
         long_name = Parrot_multi_long_name(interpreter, sub_pmc);
         store_sub_in_namespace(interpreter, sub_pmc, namespace, long_name);
 
@@ -635,15 +635,15 @@ Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC *sub)
         Parrot_block_DOD(interpreter);
         /* store relative to HLL namespace */
         CONTEXT(interpreter->ctx)->current_HLL = PMC_sub(sub)->HLL_id;
-        
+
         store_named_in_namespace(interpreter, sub);
-        
+
         /* restore HLL_id */
         CONTEXT(interpreter->ctx)->current_HLL = cur_id;
         Parrot_unblock_DOD(interpreter);
     }
     else {
-        PMC *stash = 
+        PMC *stash =
             Parrot_get_HLL_namespace(interpreter, PMC_sub(sub)->HLL_id);
         PMC_sub(sub)->namespace_stash = stash;
     }

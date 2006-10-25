@@ -90,7 +90,7 @@ pmclass Undef extends default no_ro {
     }
   }
 
-  PMC* clone() { 
+  PMC* clone() {
       return pmc_new(INTERP, SELF->vtable->base_type);
   }
 }

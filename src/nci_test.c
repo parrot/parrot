@@ -499,7 +499,7 @@ nci_cb_D4(cb_D4_func times_ten, void* user_data) {
     return;
 }
 
-void 
+void
 nci_pip(int count, Rect_Like *rects) {
     int i;
     printf( "Count: %d\n", count);

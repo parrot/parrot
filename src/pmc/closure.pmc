@@ -109,7 +109,7 @@ Invokes the closure.
             while (caller) {
                 if (caller->current_sub == outer_sub) {
                     cont = caller->current_cont;
-                    cont->vtable = 
+                    cont->vtable =
                         interpreter->vtables[enum_class_Continuation];
                     sub->outer_ctx = sub->ctx->outer_ctx = caller;
                     caller->ref_count++;
@@ -153,13 +153,13 @@ Invokes the closure.
          *
          * The only fix (except this ugly and slow code) is to freeze/thaw
          * a code segment as one structure, which will take care of all
-         * refs and self-refs. 
+         * refs and self-refs.
          *
          * TODO - intermediate step:
          *
          * Investigate if we can:
          * - freeze array of subs (instead of the useless fixup seg)
-         * - do we need the Sub constant in the const seg as PMC constant?  
+         * - do we need the Sub constant in the const seg as PMC constant?
          */
 
         if (PMC_IS_NULL(sub->outer_sub))
@@ -182,7 +182,7 @@ Invokes the closure.
                         sub->outer_sub = outer;
                         break;
                     }
-            } 
+            }
         }
     }
 

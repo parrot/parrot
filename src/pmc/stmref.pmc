@@ -116,7 +116,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
 
         SUPER(info);
 
-        Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_struct_val(SELF)); 
+        Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_struct_val(SELF));
     }
 
     void thaw (visit_info *info) {
@@ -124,7 +124,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
 
         SUPER(info);
 
-        PMC_struct_val(SELF) = 
+        PMC_struct_val(SELF) =
             Parrot_thaw_STM_PMC_handle(INTERP, io);
     }
 

@@ -526,15 +526,15 @@ Parrot_make_cpa(Interp *interpreter, PMC *array) {
        to actually have an array, even if the inbound array is
        completely empty
     */
-    char ** const out_array = mem_sys_allocate((sizeof(char *)) 
+    char ** const out_array = mem_sys_allocate((sizeof(char *))
                                                * (arraylen + 1));
     out_array[arraylen] = 0;
 
     /*    printf("String array has %i elements\n", arraylen);*/
     for (cur = 0; cur < arraylen; cur++) {
         out_array[cur] =
-            string_to_cstring(interpreter, 
-                              VTABLE_get_string_keyed_int(interpreter, 
+            string_to_cstring(interpreter,
+                              VTABLE_get_string_keyed_int(interpreter,
                                                           array, cur));
         /*        printf("Offset %i is %s\n", cur, out_array[cur]);*/
     }
@@ -654,7 +654,7 @@ Parrot_byte_rindex(Interp *interpreter, const STRING *base,
 
 =item C<void rec_climb_back_and_mark(int node_index, parrot_prm_context* c)>
 
-Recursive function, used by Parrot_register_move to 
+Recursive function, used by Parrot_register_move to
 climb back the graph of register moves operations.
 
 The node must have a predecessor: it is implicit because if a node has
@@ -672,26 +672,26 @@ case marks it, and set node_index as its backup.
   c           ... the graph and all the needed params : the context
 
 =cut
- 
+
 */
 void
 rec_climb_back_and_mark(int node_index, parrot_prm_context* c) {
     int pred, pred_index, src, node;
-   
+
     node = c->dest_regs[node_index];
     pred = c->src_regs[node_index];
     pred_index = c->reg_to_index[pred];
-    
+
     if ( pred_index < 0 ) { /* pred has no predecessor */
         move_reg(pred, node, c);
-    } 
+    }
     else { /* pred has a predecessor, so may be processed */
         src = c->backup[pred_index];
         if (  src < 0 ) { /* not visited */
             move_reg(pred, node, c);
             c->backup[pred_index] = node; /* marks pred*/
             rec_climb_back_and_mark(pred_index, c);
-        } 
+        }
         else { /* already visited, use backup instead */
             move_reg(src, node, c);
         }
@@ -719,19 +719,19 @@ void
 process_cycle_without_exit(int node_index, parrot_prm_context* c) {
     int pred, pred_index;
     int alt = 0;
- 
+
     pred = c->src_regs[node_index];
     /* pred_index has to be defined cause we are in a cycle so each node has a pred*/
     pred_index = c->reg_to_index[pred];
 
     /* let's try the alternate move function*/
-    if (NULL != c->mov_alt)         
+    if (NULL != c->mov_alt)
         alt = c->mov_alt(c->interpreter, c->dest_regs[node_index], pred, c->info);
 
     if ( 0 == alt ) { /* use temp reg */
         move_reg(c->dest_regs[node_index],c->temp_reg, c);
         c->backup[node_index] = c->temp_reg;
-    } else 
+    } else
         c->backup[node_index] = c->dest_regs[node_index];
 
     rec_climb_back_and_mark(node_index, c);
@@ -741,7 +741,7 @@ process_cycle_without_exit(int node_index, parrot_prm_context* c) {
  should be self-speaking
  */
 
-void 
+void
 move_reg(int from, int dest, parrot_prm_context* c) {
    /* fprintf(stderr,"move %i ==> %i\n",from,dest);*/
     c->mov(c->interpreter, dest, from, c->info);
@@ -755,9 +755,9 @@ move_reg(int from, int dest, parrot_prm_context* c) {
 
 =item C<void Parrot_register_move(Interp *, int n_regs,
         unsigned char *dest_regs, unsigned char *src_regs,
-        unsigned char temp_reg, 
-        reg_move_func mov, 
-        reg_move_func mov_alt, 
+        unsigned char temp_reg,
+        reg_move_func mov,
+        reg_move_func mov_alt,
         void *info)>
 
 Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
@@ -769,11 +769,11 @@ Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
   mov       ... a register move function to be called to move one register
   mov_alt   ... a register move function to be called to move one register
                 which triese fetching from an alternate src (or NULLfunc):
-    
-    (void)  (mov)(interp, dest, src, info);       
+
+    (void)  (mov)(interp, dest, src, info);
     moved = (mov_alt)(interp, dest, src, info);
 
-Some C<dest_regs> might be the same as C<src_regs>, which makes this a bit 
+Some C<dest_regs> might be the same as C<src_regs>, which makes this a bit
 non-trivial, because if the destination is already clobbered, using it
 later as source doesn"t work. E.g.
 
@@ -793,9 +793,9 @@ To handle such cases, we do:
   b) if an alternate move function is available, it may fetch the
      source from a different (non-clobbered) location - call it.
      if the function returns 0 also use c)
-  c) if no alternate move function is available, use the temp reg   
+  c) if no alternate move function is available, use the temp reg
 
-The amount of register moves should of course be minimal.  
+The amount of register moves should of course be minimal.
 
 TODO The current implementation will not work for following cases
 
@@ -806,7 +806,7 @@ Talked to Leo and he said those cases are not likely (Vishal Soni).
 TODO: Add tests for the above conditions.
 
 =cut
-  
+
 */
 void
 Parrot_register_move(Interp * interpreter, int n_regs,
@@ -820,7 +820,7 @@ Parrot_register_move(Interp * interpreter, int n_regs,
     int* backup = NULL;
     int* reg_to_index = NULL;
     parrot_prm_context c;
-      
+
     if (n_regs == 0)
         return;
 
@@ -829,7 +829,7 @@ Parrot_register_move(Interp * interpreter, int n_regs,
             mov(interpreter, dest_regs[0], src_regs[0], info);
         return;
     }
-    
+
     c.interpreter = interpreter;
     c.info = info;
     c.mov = mov;
@@ -837,17 +837,17 @@ Parrot_register_move(Interp * interpreter, int n_regs,
     c.src_regs = src_regs;
     c.dest_regs = dest_regs;
     c.temp_reg = temp_reg;
-    
+
     /* compute max_reg, the max reg number + 1 */
     for (i = 0; i < n_regs; i++) {
-        if (src_regs[i] > max_reg) 
+        if (src_regs[i] > max_reg)
             max_reg = src_regs[i];
-        if (dest_regs[i] > max_reg) 
+        if (dest_regs[i] > max_reg)
             max_reg = dest_regs[i];
     }
     ++max_reg;
 
-    
+
     /* allocate space for data structures */
     /* NOTA: data structures could be kept allocated somewhere waiting to get reused...*/
     c.nb_succ = nb_succ = (int*)mem_sys_allocate_zeroed(sizeof(int) * n_regs);
@@ -855,7 +855,7 @@ Parrot_register_move(Interp * interpreter, int n_regs,
     c.reg_to_index = reg_to_index = (int*)mem_sys_allocate(sizeof(int) * max_reg);
 
     /* init backup array */
-    for (i = 0; i < n_regs; i++) 
+    for (i = 0; i < n_regs; i++)
         backup[i] = -1;
 
     /* fill in the conversion array between a register number and its index */
@@ -876,7 +876,7 @@ Parrot_register_move(Interp * interpreter, int n_regs,
     /* process each well if any */
     for (i = 0; i < n_regs; i++) {
         if ( 0 == nb_succ[i] ) { /* a well */
-            rec_climb_back_and_mark(i, &c); 
+            rec_climb_back_and_mark(i, &c);
         }
     }
 
@@ -887,7 +887,7 @@ Parrot_register_move(Interp * interpreter, int n_regs,
             process_cycle_without_exit(i, &c);
         }
     }
-        
+
     mem_sys_free(nb_succ);
     mem_sys_free(reg_to_index);
     mem_sys_free(backup);

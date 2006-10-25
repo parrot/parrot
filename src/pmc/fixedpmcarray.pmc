@@ -13,7 +13,7 @@ it puts things into Integer, Float, or String PMCs as appropriate
 
 =head2 Note
 
-The flag C<PObj_private0_FLAG> is used in the C<NameSpace> PMC and should 
+The flag C<PObj_private0_FLAG> is used in the C<NameSpace> PMC and should
 never be set for user arrays.
 
 =head2 Functions
@@ -439,12 +439,12 @@ Resizes the array to C<size> elements.
 
         if (SELF == value)
             return;
-        
+
         if (value->vtable->base_type != enum_class_FixedPMCArray &&
                 value->vtable->base_type != enum_class_ResizablePMCArray)
             real_exception(INTERP, NULL, E_TypeError,
                     "Can't set self from this type");
-        
+
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
         size = PMC_int_val(SELF) = PMC_int_val(value);
@@ -466,7 +466,7 @@ Sets the integer value of the element at index C<key> to C<value>.
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC *val;
 
-        val = pmc_new(INTERP, 
+        val = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
         VTABLE_set_integer_native(INTERP, val, value);
@@ -486,7 +486,7 @@ Sets the integer value of the element at index C<key> to C<value>.
     void set_integer_keyed (PMC *key, INTVAL value) {
         PMC *val;
 
-        val = pmc_new(INTERP, 
+        val = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
         VTABLE_set_integer_native(INTERP, val, value);
@@ -508,7 +508,7 @@ C<value>.
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC *val;
 
-        val = pmc_new(INTERP, 
+        val = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
         VTABLE_set_number_native(INTERP, val, value);
@@ -560,7 +560,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     void set_string_keyed_int (INTVAL key, STRING* value) {
         PMC *val;
 
-        val = pmc_new(INTERP, 
+        val = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_String));
         VTABLE_set_string_native(INTERP, val, value);
@@ -581,7 +581,7 @@ C<value>.
     void set_string_keyed(PMC *key, STRING* value) {
         PMC *val;
 
-        val = pmc_new(INTERP, 
+        val = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_String));
         VTABLE_set_string_native(INTERP, val, value);

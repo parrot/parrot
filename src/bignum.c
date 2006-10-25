@@ -69,7 +69,7 @@ Get value of digit at C<pos>.
 #define BN_setd(x, y, z) \
     ( x->buffer[(y) / BN_D_PER_NIB] = \
      ((z) << ( (y) % BN_D_PER_NIB)*4) | \
-     (x->buffer[(y) / BN_D_PER_NIB] & ~(15<< ( (y) % BN_D_PER_NIB)*4))) 
+     (x->buffer[(y) / BN_D_PER_NIB] & ~(15<< ( (y) % BN_D_PER_NIB)*4)))
 #define BN_getd(x,y) \
     ( (x->buffer[(y) / BN_D_PER_NIB] >> \
      ( (y) % BN_D_PER_NIB)*4) & 15 )
@@ -86,7 +86,7 @@ decided by C<elimit>), returns true.
 */
 
 #define CHECK_OVERFLOW(bn, incr, context) \
-    ( (context)->elimit - ((bn)->expn + (bn)->digits -1 ) < (incr) ? 1 : 0) 
+    ( (context)->elimit - ((bn)->expn + (bn)->digits -1 ) < (incr) ? 1 : 0)
 
 /*
 
@@ -189,20 +189,20 @@ int BN_strip_tail_zeros(PINTD_ BIGNUM* victim, BN_CONTEXT*);
 int BN_round_up(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 int BN_round_down(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 int BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context);
-int BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, 
+int BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                    BN_CONTEXT *context, BN_SAVE_PREC* restore);
-int BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, 
+int BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                      BN_CONTEXT *context, BN_SAVE_PREC* restore);
-int BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, 
+int BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context);
-int BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, 
+int BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                  BN_CONTEXT *context);
 int BN_align(PINTD_ BIGNUM* one, BIGNUM* two);
-INTVAL BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, 
+INTVAL BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except,
                    char *msg);
 int BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context);
 
-/* 
+/*
 
 =back
 
@@ -612,7 +612,7 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
         if (context->traps & (BN_F_DIVISION_BY_ZERO) ) {
             BN_EXCEPT(PINT_ except, msg);
         }
-        break; 
+        break;
     case BN_DIVISION_IMPOSSIBLE:
         /* integer result of div-int or rem > precision */
         context->flags |= BN_F_INVALID_OPERATION;
@@ -687,7 +687,7 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
     default:
         BN_EXCEPT(PINT_ BN_INVALID_OPERATION, "An unknown error occurred");
     }
-    
+
 }
 
 /*
@@ -808,14 +808,14 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     }
     else { /* Use exponential notation, different for sci and eng */
         if (bn->sign) *cur++ = '-'; /* We don't prefix '+' */
-    
+
         if (eng) {
             int deficit;
             if (adj_exp < 0) {
                 deficit = (-adj_exp) % 3;
                 if (deficit == 1) {
                     deficit = 2;
-                    adj_exp -= 2; 
+                    adj_exp -= 2;
                 }
                 else if (deficit == 2) {
                     deficit = 1;
@@ -839,7 +839,7 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
             else if (bn->digits == 2) {
                 *cur++ = '0' + BN_getd(bn,bn->digits-2);
                 if (deficit == 1) *cur++ = '.';
-                *cur++ = '0'; 
+                *cur++ = '0';
             }
             else {
                 *cur++ = '0' + BN_getd(bn,bn->digits-2);
@@ -868,7 +868,7 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
                 }
             }
             *cur++ = 'E'; /* Eza Good, Eza Good */
-            sprintf(cur, "%+i", adj_exp);      
+            sprintf(cur, "%+i", adj_exp);
         }
     }
 
@@ -878,7 +878,7 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
 /*
 
 =item C<BIGNUM*
-BN_from_string(PINTD_ char* s2, BN_CONTEXT *context)> 
+BN_from_string(PINTD_ char* s2, BN_CONTEXT *context)>
 
 Convert a scientific string to a BIGNUM.  This function deals entirely
 with common-or-garden C byte strings, so the library can work
@@ -910,7 +910,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
     int in_number = 0;       /* are we reading coeff digits */
     INTVAL exponent = 0;        /* the exponent */
     INTVAL fake_exponent = 0;   /* adjustment for digits after a '.' */
-    INTVAL i = 0;               
+    INTVAL i = 0;
     int non_zero_digits = 0; /* have we seen *any* digits */
     int seen_plus = 0;       /* was number prefixed with '+' */
     int infinity =0;
@@ -918,7 +918,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
     int sNAN = 0;
 
     temp = BN_new(PINT_ 1);     /* We store coeff reversed in temp */
-  
+
     while (*s2) { /* charge through the string */
         if (isdigit(*s2) && !in_exp) {
             /* We're somewhere in the main string of numbers */
@@ -1000,7 +1000,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
                     else {
                         qNAN = 1;
                         break;
-                    }                    
+                    }
                 }
                 qNAN = 1;
                 break;
@@ -1048,13 +1048,13 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
         }
         s2++; /* rinse, lather... */
     }
-  
+
     if (!(qNAN || sNAN || infinity)) {
         if (in_number && !pos) { /* Only got zeros */
             pos = 1;
             BN_setd(temp, 0, 0);
         }
-        
+
         if (pos==0) { /* This includes ".e+20" */
             if (!context->extended) {
                 BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX, "no digits in string");
@@ -1070,11 +1070,11 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
     /* copy reversed string of digits backwards into result */
     if (!(qNAN || sNAN || infinity)) { /* Normal */
         temp->digits = pos;
-         
+
         for (i=0; i< temp->digits; i++) {
             BN_setd(result, i, BN_getd(temp, temp->digits-i-1));
         }
-        
+
         result->sign = negative;
         result->digits = pos;
         if (exp_sign == -1) {
@@ -1118,7 +1118,7 @@ Removes any zeros before the msd and after the lsd.
 int
 BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
     INTVAL msd, i;
-  
+
     if (bn->digits == 0) return 0; /* Cannot "fail" with special nums */
 
     msd = bn->digits-1;
@@ -1152,7 +1152,7 @@ BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
         lsd++;
     }
     if (bn->expn >= 0) {
-        lsd = 0; /* units column */      
+        lsd = 0; /* units column */
     }
     else if (bn->expn + lsd > 0) {
         lsd = -bn->expn;
@@ -1160,7 +1160,7 @@ BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
     for (i=0; i< bn->digits -lsd; i++) {
         BN_setd(bn, i, BN_getd(bn, i+lsd));
     }
-    
+
     if (CHECK_OVERFLOW( bn, lsd, context)) {
         BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow when striping zeros");
     }
@@ -1219,7 +1219,7 @@ BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero) {
     if (bn->digits == 0) return;
     for (i=0; i< bn->digits; i++)
         if (BN_getd(bn, i) != 0) return;
-  
+
     bn->digits = 1;
     bn->expn = 0;
     if (!allow_neg_zero) bn->sign = 0;
@@ -1516,7 +1516,7 @@ BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
 
 =back
 
-=head2  Arithmetic operations 
+=head2  Arithmetic operations
 
 Operations are performed like this:
 
@@ -1647,7 +1647,7 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 /*
 
 =item C<int
-BN_align(PINTD_ BIGNUM* one, BIGNUM* two)> 
+BN_align(PINTD_ BIGNUM* one, BIGNUM* two)>
 
 Adds zero digits so that decimal points of each number are at the same
 place.
@@ -1662,7 +1662,7 @@ BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
     INTVAL diff;
 
     diff = one->expn - two->expn;
-  
+
     if (diff == 0) {
         /* The numbers have the same exponent, we merely need to extend
            the one with a shorter coeff length with zeros */
@@ -1705,7 +1705,7 @@ BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
         /* Add zeros to start of two */
         for (i=two->digits; i<final; i++)
             BN_setd(two, i, 0);
-    
+
         /* Add zeros to start of one */
         for (i=one->digits + diff; i< final; i++)
             BN_setd(one, i, 0);
@@ -1717,7 +1717,7 @@ BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
         /* Set end of one to zeros */
         for (i=0; i< diff; i++)
             BN_setd(one, i, 0);
-    
+
         one->digits = two->digits = final;
         one->expn = two->expn;
     }
@@ -2131,7 +2131,7 @@ BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 /*
 
 =item C<void
-BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)> 
+BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)>
 
 Perform unary C<+> on C<*one>.  Does all the rounding and what have you.
 
@@ -2165,7 +2165,7 @@ BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
 /*
 
 =item C<void
-BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)> 
+BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)>
 
 Perform unary C<-> (minus) on C<*one>.  Does all the rounding and what
 have you.
@@ -2247,11 +2247,11 @@ BN_compare (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
     else {
         BN_arith_setup(PINT_ result, one, two, context, NULL);
-        cmp = BN_comp(PINT_ one, two, context);        
+        cmp = BN_comp(PINT_ one, two, context);
     }
     result->digits = 1;
     result->expn = 0;
-        
+
     if (cmp == 0) {
         BN_setd(result, 0, 0);
         result->sign = 0;
@@ -2269,9 +2269,9 @@ BN_compare (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=item C<void 
+=item C<void
 BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-             BN_CONTEXT *context)> 
+             BN_CONTEXT *context)>
 
 Multiplies C<*one> and C<*two>, storing the result in C<*result>.
 
@@ -2279,7 +2279,7 @@ Multiplies C<*one> and C<*two>, storing the result in C<*result>.
 
 */
 
-void 
+void
 BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
              BN_CONTEXT *context)
 {
@@ -2371,7 +2371,7 @@ BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     else {
         result->digits = one->digits + two->digits - 1;
     }
-  
+
     i = one->expn + two->expn;
     /*XXX: use unsigned here to be sure? */
     if ( i > context->elimit) {
@@ -2381,7 +2381,7 @@ BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in multiplication");
     }
     result->expn = i;
-  
+
     result->sign = 1 & (one->sign ^ two->sign);
     return;
 }
@@ -2527,7 +2527,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_nonfatal(PINT_ context, BN_ROUNDED,
                         "Rounded in divide");
             BN_really_zero(PINT_ rem, context->extended);
-            
+
             if (result->sign) {
                 if (BN_getd(result, 0) != 0 ||
                     !BN_is_zero(PINT_ result, context)) {
@@ -2556,7 +2556,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_nonfatal(PINT_ context, BN_ROUNDED,
                         "Rounded in divide");
             BN_really_zero(PINT_ rem, context->extended);
-            
+
             if (!result->sign) {
                 if (BN_getd(result, 0) != 0 ||
                     !BN_is_zero(PINT_ result, context)) {
@@ -2596,7 +2596,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_nonfatal(PINT_ context, BN_INEXACT,
                         "Loss of precision in divide");
         }
-        
+
         context->traps = save_lost;
         context->flags =  (context->flags & ~(unsigned char)BN_F_LOST_DIGITS)
             | (flags_save & BN_F_LOST_DIGITS);
@@ -2624,7 +2624,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         }
         result->expn += i;
     }
-  
+
     BN_destroy(PINT_ rem);
 }
 
@@ -2700,11 +2700,11 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         result->sign = 1 & (one->sign ^ two->sign);
         return;
     }
-    
+
     rem = BN_new(PINT_ 1);
     BN_arith_setup(PINT_ result, one, two, context, NULL);
     BN_idivide(PINT_ result, one, two, context, BN_DIV_DIVINT, rem);
-  
+
     BN_really_zero(PINT_ rem, context->extended);
     if (result->expn >0 && context->precision > 0 &&
         result->expn + result->digits > context->precision &&
@@ -2819,7 +2819,7 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BN_arith_cleanup(PINT_ result, one, two, context, NULL);
 }
 
-/* 
+/*
 
 =item C<BN_idivide(PINT_ BIGNUM *result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context, BN_DIV_ENUM operation, BIGNUM *rem)>
@@ -2860,7 +2860,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in divide (1)");
     }
     t1->expn = newexpn;
-        
+
     value = 0;
     for (;;) {
         if (!(t2->digits % 10)) BN_grow(PINT_ t2, t2->digits+11);
@@ -2945,7 +2945,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     return; /* phew! */
 }
 
-/* 
+/*
 
 =item C<INTVAL
 BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context)>
@@ -3025,7 +3025,7 @@ BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
 =item C<void
 BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
                 BN_CONTEXT* context)>
-                
+
 Rescales C<*one> to have an exponent of C<*two>.
 
 =cut
@@ -3096,13 +3096,13 @@ BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
             result = result * 10 + BN_getd(bn, i);
         }
         for (i=0; i<bn->expn; i++) result = result * 10;
-    } 
+    }
     else {
         for (i=bn->digits-1; i>-1-bn->expn; i--) {
             result = result * 10 + BN_getd(bn, i);
         }
     }
-  
+
     return bn->sign ? -result : result;
 }
 

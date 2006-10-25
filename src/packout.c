@@ -135,7 +135,7 @@ PackFile_ConstTable_pack_size(Interp *interpreter, struct PackFile_Segment *seg)
 
 /*
 
-=item C<opcode_t *PackFile_ConstTable_pack(Interp *, 
+=item C<opcode_t *PackFile_ConstTable_pack(Interp *,
                                            struct PackFile_Segment *seg,
                                            opcode_t *cursor)>
 
@@ -166,7 +166,7 @@ PackFile_ConstTable_pack(Interp *interpreter,
     *cursor++ = self->const_count;
 
     for (i = 0; i < self->const_count; i++) {
-        cursor = PackFile_Constant_pack(interpreter, 
+        cursor = PackFile_Constant_pack(interpreter,
                                         self->constants[i], cursor);
     }
 
@@ -204,7 +204,7 @@ find_in_const(Interp *interpreter, PMC *key, int type)
 /*
 
 =item C<opcode_t *
-PackFile_Constant_pack(Interp*, struct PackFile_Constant *self, 
+PackFile_Constant_pack(Interp*, struct PackFile_Constant *self,
                        opcode_t *cursor)>
 
 Pack a PackFile Constant into a contiguous region of memory.

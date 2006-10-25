@@ -16,7 +16,7 @@ These are the vtable functions for the namespace PMC.
                            var/sub or a namespace, of a FixedPMCarray
                            of 2 PMCs (namespace, sub/var) slots
   PMC_pmc_val          ... parent namespace
-  PMC_data             ... name STRING of this namespace part 
+  PMC_data             ... name STRING of this namespace part
 
 =head2 Functions
 
@@ -31,13 +31,13 @@ These are the vtable functions for the namespace PMC.
 
 /*
  * Typically a named slot either contains another namespace or a
- * var/sub (not both). 
+ * var/sub (not both).
  * In case that the bucket->value is occupied, a FixedPMCArray is
  * created, and the items are moved over to that extra storage.
  * The array is flagged with FPA_is_ns_ext to distinguish it from a
  * plain array variable.
  *
- * This could easily expanded to a full-fledged typed namespace if needed. 
+ * This could easily expanded to a full-fledged typed namespace if needed.
  */
 
 enum {
@@ -98,12 +98,12 @@ C<value> is stored too.
 If C<key> is a simple key, it works like above. If C<key> is an array
 of strings or a chained key, add all components to the namespace.
 
-=item C<PMC* get_pmc_keyed(PMC *key)> 
+=item C<PMC* get_pmc_keyed(PMC *key)>
 
-Return the given namespace or PMCNULL. C<key> is either an array of 
+Return the given namespace or PMCNULL. C<key> is either an array of
 strings, or a possibly nested key.
 
-=item C<PMC* get_pmc_keyed_str(PMC *key)> 
+=item C<PMC* get_pmc_keyed_str(PMC *key)>
 
 Return the given namespace item or PMCNULL. If the named item is either
 a NameSpace or a var, the NameSpace is returned.
@@ -149,9 +149,9 @@ a NameSpace or a var, the NameSpace is returned.
             PMC_data(value)    = key;   /* and name */
 
             if (new_tuple) {
-                VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns,      
+                VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns,
                                          value);
-                VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub, 
+                VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub,
                                          b->value);
                 b->value = new_tuple;
                 /* distinction from a plain FPA, which doesn't extend the
@@ -228,9 +228,9 @@ a NameSpace or a var, the NameSpace is returned.
 
 /*
 
-=item C<void* get_pointer_keyed_str(STRING *key)> 
+=item C<void* get_pointer_keyed_str(STRING *key)>
 
-=item C<void* get_pointer_keyed(PMC *key)> 
+=item C<void* get_pointer_keyed(PMC *key)>
 
 Return the given namespace item or PMCNULL. If the named item is either
 a NameSpace or a var, the var is returned.
@@ -403,7 +403,7 @@ Return the PMC with the given name.
 =item C<METHOD PMC* get_sym(STRING* name)>
 
 Return the symbol (var or sub) with the given name. This can be used
-to retrieve symbols, if a NameSpace with the same name exists. 
+to retrieve symbols, if a NameSpace with the same name exists.
 
 =cut
 

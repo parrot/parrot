@@ -285,7 +285,7 @@ These methods are silently ignored.
         (void) SELF.shift_pmc();
         return NULL;
     }
-        
+
     void unshift_pmc(PMC* value) {
         /* fprintf(stderr, "don't do that then\n"); XXX */
     }

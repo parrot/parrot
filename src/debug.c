@@ -381,7 +381,7 @@ PDB_run_command(Interp *interpreter, const char *command)
             break;
         case c_p:
         case c_print:
-            PDB_print(interpreter, command); 
+            PDB_print(interpreter, command);
             break;
         case c_n:
         case c_next:
@@ -2043,7 +2043,7 @@ PDB_extend_const_table(Interp *interpreter)
         interpreter->code->const_table->constants =
             mem_sys_realloc(interpreter->code->const_table->constants,
                             k * sizeof(struct PackFile_Constant *));
-    } 
+    }
     else {
         interpreter->code->const_table->constants =
             mem_sys_allocate(k * sizeof(struct PackFile_Constant *));
@@ -2144,7 +2144,7 @@ PDB_print_user_stack(Interp *interpreter, const char *command)
 =item C<void
 PDB_print(Interp *interpreter, const char *command)>
 
-Print interpreter registers. 
+Print interpreter registers.
 
 =cut
 
@@ -2154,7 +2154,7 @@ void
 PDB_print(Interp *interpreter, const char *command)
 {
     const char *s;
-        
+
     s = GDB_P(interpreter->pdb->debugee, command);
     PIO_eprintf(interpreter, "%s\n", s);
 }
@@ -2384,7 +2384,7 @@ PDB_backtrace(Interp *interpreter)
         str = Parrot_Context_infostr(interpreter, sub_cont->to_ctx);
         if (!str)
             break;
-        
+
         /* recursion detection */
         if (!PMC_IS_NULL(old) && PMC_cont(old) &&
             PMC_cont(old)->to_ctx->current_pc ==
@@ -2417,7 +2417,7 @@ PDB_backtrace(Interp *interpreter)
  *
  * GDB_P  gdb> pp $I0   print register I0 value
  *
- * TODO more, more 
+ * TODO more, more
  */
 
 static const char*
@@ -2458,7 +2458,7 @@ static PDB_breakpoint_t *gdb_bps;
 
 /*
  * GDB_pb   gdb> pb 244     # set breakpoint at opcode 244
- * 
+ *
  * XXX We can't remove the breakpoint yet, executing the next ins
  * most likely fails, as the length of the debug-brk stmt doesn't
  * match the old opcode
@@ -2476,7 +2476,7 @@ GDB_B(Interp *interpreter, char *s) {
         unsigned long offs = (unsigned long)s;
         /* TODO check if in bounds */
         pc = interpreter->code->base.data + offs;
-        
+
         if (!gdb_bps) {
             nr = 0;
             newbreak = mem_sys_allocate(sizeof(PDB_breakpoint_t));
@@ -2535,7 +2535,7 @@ Debug commands are mostly run inside the C<debugger>. User code
 runs of course in the C<debugee>.
 
 =back
-    
+
 =cut
 
 */

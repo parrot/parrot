@@ -40,7 +40,7 @@ print_pbc_location(Parrot_Interp interpreter)
         interpreter->debugger ?
             interpreter->debugger : interpreter;
     PIO_eprintf(tracer, "%Ss\n",
-            Parrot_Context_infostr(interpreter, 
+            Parrot_Context_infostr(interpreter,
                 CONTEXT(interpreter->ctx)));
 }
 

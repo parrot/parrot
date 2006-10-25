@@ -55,7 +55,7 @@ Initializes the subroutine.
      * Sub PMC's flags usage:
      * - private0 ... Coroutine flip/flop - C exception handler
      * - private1 ... _IS_OUTER - have to preserve context
-     *                as some other sub has :outer(this) 
+     *                as some other sub has :outer(this)
      * - private2 ... tailcall invoked this Sub
      * - private3 ... pythonic coroutine generator flag
      * - private4 ... :main (nee @MAIN)
@@ -254,11 +254,11 @@ Invokes the subroutine.
          * plain subroutine call
          * create new context, place it in interpreter
          */
-#define PREMATURE_OPT 
-#ifdef PREMATURE_OPT 
+#define PREMATURE_OPT
+#ifdef PREMATURE_OPT
         if (caller_ctx->current_sub == SELF)
             context = Parrot_dup_context(INTERP, caller_ctx);
-        else 
+        else
 #endif
             context = Parrot_alloc_context(INTERP, sub->n_regs_used);
         context->current_sub = SELF;
@@ -431,8 +431,8 @@ Archives the subroutine.
          * TODO change all user visit functions to use
          *    visit_pmc (the todo renamed visit_pm_later)
          *
-         * Therefore the hash must be last during visit for now.   
-         */    
+         * Therefore the hash must be last during visit for now.
+         */
         info->thaw_ptr = &sub->lex_info;
         (info->visit_pmc_now)(INTERP, sub->lex_info, info);
         SUPER(info);
@@ -510,7 +510,7 @@ Unarchives the subroutine.
 
 =item C<METHOD PMC* get_namespace()>
 
-Return the namespace PMC, where the Sub is defined. 
+Return the namespace PMC, where the Sub is defined.
 
 TODO return C<namespace_stash> instead.
 

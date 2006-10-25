@@ -36,7 +36,7 @@ pmclass PerlHash
     maps Hash {
 
     void class_init() {
-        _PerlUndef = pmc_type(INTERP, 
+        _PerlUndef = pmc_type(INTERP,
                 string_from_const_cstring(INTERP, "PerlUndef", 0));
     }
 
@@ -46,7 +46,7 @@ pmclass PerlHash
             return pmc_new(INTERP, _PerlUndef);
         return result;
     }
-    
+
 }
 
 /*

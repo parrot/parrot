@@ -26,7 +26,7 @@ void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
 pmclass PerlInt
     extends Integer
     does integer
-    does scalar 
+    does scalar
     dynpmc
     group perl_group
     hll Perl
@@ -44,7 +44,7 @@ Morphs the integer to a C<PerlNum> and sets the value from C<value>.
 */
     void set_number_native (FLOATVAL value) {
         INTVAL dynpmc_PerlNum;
-    
+
         dynpmc_PerlNum = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlNum", 0));
         DYNSELF.morph(dynpmc_PerlNum);
@@ -63,7 +63,7 @@ Sets the value of the integer to C<*value>.
 */
     void set_string_native (STRING* value) {
         INTVAL dynpmc_PerlString;
-    
+
         dynpmc_PerlString = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlString", 0));
         DYNSELF.morph(dynpmc_PerlString);

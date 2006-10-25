@@ -33,7 +33,7 @@ These are the vtable functions for the ParrotInterpreter base class
 /*
 
 =item C<void
-clone_interpreter(Parrot_Interp dest, const Parrot_Interp source, 
+clone_interpreter(Parrot_Interp dest, const Parrot_Interp source,
     Parrot_clone_flags)>
 
 Clones the interpreter as specified by the flags.
@@ -102,7 +102,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, Parrot_clone_flags flags)
             STRING * const key = VTABLE_shift_string(s, lib_iter);
             PMC * const lib_pmc = VTABLE_get_pmc_keyed_str(s, libs, key);
 
-            (void) Parrot_clone_lib_into(d, s, lib_pmc); 
+            (void) Parrot_clone_lib_into(d, s, lib_pmc);
         }
     }
     if (flags & PARROT_CLONE_CLASSES) {
@@ -113,7 +113,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, Parrot_clone_flags flags)
                  * to be sufficient to instantiate the class.
                  */
                 (void) Parrot_clone(d, s->vtables[i]->class);
-            }  
+            }
         }
     }
     if (flags & PARROT_CLONE_CODE)
@@ -637,7 +637,7 @@ Finish thawing.
                                                     hll_name);
 
                 /* cache HLLs toplevel namespace */
-                VTABLE_set_pmc_keyed_int(INTERP, 
+                VTABLE_set_pmc_keyed_int(INTERP,
                                          INTERP->HLL_namespace, i, ns_hash);
             }
         }

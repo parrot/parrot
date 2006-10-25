@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/parrot.c - 
+src/parrot.c -
 
 =head1 DESCRIPTION
 
-THIS FILE IS NOT USED.  
+THIS FILE IS NOT USED.
 The main function for parrot is found in ../compilers/imcc/main.c.
 
 =cut

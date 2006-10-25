@@ -8,7 +8,7 @@ src/byteorder.c - Byteordering functions
 
 =head1 DESCRIPTION
 
-These are assigned to a vtable when the PBC file is loaded. 
+These are assigned to a vtable when the PBC file is loaded.
 
 If the vtable method for conversion from the native byteorder is called,
 it is a I<no op> and will work, but the caller should know if the

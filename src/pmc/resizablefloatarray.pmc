@@ -4,12 +4,12 @@ $Id$
 
 =head1 NAME
 
-src/pmc/resizablefloatarray.pmc - resizable array for floating point 
+src/pmc/resizablefloatarray.pmc - resizable array for floating point
 numbers only
 
 =head1 DESCRIPTION
 
-This class, C<ResizableFloatArray>, implements an array of resizable size, 
+This class, C<ResizableFloatArray>, implements an array of resizable size,
 which stores FLOATVALs. It uses Float PMCs to do all necessary conversions.
 
 =head2 Functions
@@ -220,7 +220,7 @@ Add and integer to the start of the array.
 */
 
     void unshift_float(FLOATVAL value) {
-        INTVAL size; 
+        INTVAL size;
         FLOATVAL *data;
 
         size = PMC_int_val(SELF);

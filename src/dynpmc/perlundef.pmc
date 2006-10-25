@@ -22,7 +22,7 @@ the Perl C<undef> value.
 #include "parrot/parrot.h"
 
 pmclass PerlUndef
-    extends PerlInt 
+    extends PerlInt
     dynpmc
     group perl_group
     hll Perl
@@ -137,7 +137,7 @@ Morphs to a C<PerlInt> with value C<value>.
 
     void set_integer_native (INTVAL value) {
         INTVAL dynpmc_PerlInt;
-    
+
         dynpmc_PerlInt = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);
@@ -170,7 +170,7 @@ Morphs to a C<PerlString> with the value of C<*value>.
 
     void set_string_native (STRING* value) {
         INTVAL dynpmc_PerlString;
-    
+
         dynpmc_PerlString = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlString", 0));
         DYNSELF.morph(dynpmc_PerlString);
@@ -488,7 +488,7 @@ All these methods simply return undef itself.
     PMC* logical_not (PMC* dest) {
         if (!dest) {
             INTVAL dynpmc_PerlInt;
-        
+
             dynpmc_PerlInt = pmc_type(interpreter,
                 string_from_const_cstring(interpreter, "PerlInt", 0));
             dest = pmc_new(INTERP, dynpmc_PerlInt);
@@ -526,7 +526,7 @@ Morphs to a C<PerlInt> with value C<1>.
 
     void increment () {
         INTVAL dynpmc_PerlInt;
-    
+
         dynpmc_PerlInt = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);
@@ -545,7 +545,7 @@ Morphs to a C<PerlInt> with value C<-1>.
 
     void decrement () {
         INTVAL dynpmc_PerlInt;
-    
+
         dynpmc_PerlInt = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);

@@ -313,7 +313,7 @@ Create the class from the thawed parents and attributes array.
 
         if (nold == parent_not_class) {
             /* non-class parents already have an extra attribute for
-             * delegating, which will have already been created by 
+             * delegating, which will have already been created by
              * Parrot_add_parent() and must be first
              */
             for (i = parent_not_class ? 1 : 0; i < n; ++i) {

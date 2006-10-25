@@ -46,7 +46,7 @@ Morphs the scalar to the specified type.
             return;
 
         switch (type) {
-            case enum_class_Integer: 
+            case enum_class_Integer:
                 type = pmc_type(interpreter,
                     string_from_const_cstring(interpreter, "PerlInt", 0));
                 break;

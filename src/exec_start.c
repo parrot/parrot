@@ -97,7 +97,7 @@ main(int argc, char * argv[])
 #if defined(JIT_CGP)
     exec_init_prederef(interpreter, &exec_prederef_code);
 #endif
-    /* Parrot_set_run_core(interpreter, PARROT_EXEC_CORE); 
+    /* Parrot_set_run_core(interpreter, PARROT_EXEC_CORE);
     interpreter->code->base.data =
         (opcode_t *)&((&program_code)[bytecode_offset]);
     Parrot_exec_run = 0; */

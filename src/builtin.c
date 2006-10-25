@@ -125,7 +125,7 @@ static int find_builtin(Interp *interpreter, const char *func)
     __attribute__nonnull__(2);
 static int find_builtin_s(Interp *interpreter, STRING *func)
     __attribute__nonnull__(2);
-static int check_builtin_sig(Interp *interpreter, size_t i, 
+static int check_builtin_sig(Interp *interpreter, size_t i,
                              const char *sig, int pass)
     __attribute__nonnull__(3);
 
@@ -134,13 +134,13 @@ find_builtin(Interp *interpreter, const char *func /*NN*/)
 {
     int low  = 0;
     int high = N_BUILTINS - 1;
-    
+
     /* binary search */
     while (low <= high)
     {
         int i   = (low + high) / 2;
         int cmp = strcmp(func, builtins[i].c_name);
-        
+
         if (!cmp)
         {
             /* we have to loop here because there is currently more than one
@@ -163,13 +163,13 @@ find_builtin_s(Interp *interpreter, STRING *func /*NN*/)
 {
     int low  = 0;
     int high = N_BUILTINS - 1;
-    
+
     /* binary search */
     while (low <= high)
     {
         int i   = (low + high) / 2;
         int cmp = string_compare(interpreter, func, builtins[i].meth_name);
-        
+
         if (!cmp)
             return i;
         else if (cmp > 0)
@@ -181,7 +181,7 @@ find_builtin_s(Interp *interpreter, STRING *func /*NN*/)
 }
 
 static int
-check_builtin_sig(Interp *interpreter, size_t i, 
+check_builtin_sig(Interp *interpreter, size_t i,
                   const char *sig /*NN*/, int pass)
 {
     const Builtins * const b = builtins + i;
@@ -227,7 +227,7 @@ Parrot_is_builtin(Interp *interpreter, const char *func, const char *sig)
     for (pass = 0; pass <= 1; ++pass) {
         i = bi;
 again:
-        if (check_builtin_sig(interpreter, i, sig, pass)) 
+        if (check_builtin_sig(interpreter, i, sig, pass))
             return i;
         if (i < N_BUILTINS - 1) {
             /* try next with same name */

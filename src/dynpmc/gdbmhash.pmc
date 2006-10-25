@@ -79,7 +79,7 @@ loadable module is created. On Unix-like systems this is a shared library.
 When it is available, the shared library has linked in the library 'gdbm'.
 
 On WIN32 the relevant library seems to be called 'gdbm3'.
-So we do a bit of cheating here, and load it during class initialization.  
+So we do a bit of cheating here, and load it during class initialization.
 
 =cut
 

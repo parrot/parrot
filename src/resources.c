@@ -95,21 +95,21 @@ mem_allocate(Interp *, size_t size, struct Memory_Pool *pool)>
 
 Allocates memory for headers.
 
-Alignment problems history:  
+Alignment problems history:
 
 See L<http://archive.develooper.com/perl6-internals%40perl.org/msg12310.html>
-for details. 
+for details.
 
 - return aligned pointer *if needed*
-- return strings et al at unaligned i.e. void* boundaries 
+- return strings et al at unaligned i.e. void* boundaries
 - remember alignment in a buffer header bit
   use this in compaction code
-- reduce alignment to a reasonable value i.e. MALLOC_ALIGNMENT  
+- reduce alignment to a reasonable value i.e. MALLOC_ALIGNMENT
   aka 2*sizeof(size_t) or just 8 (TODO make a config hint)
 
 Buffer memory layout:
 
-                    +-----------------+  
+                    +-----------------+
                     |  ref_count   |f |    # GC header
   obj->bufstart  -> +-----------------+
                     |  data           |
@@ -119,7 +119,7 @@ Buffer memory layout:
    - a ref_count, {inc,dec}remented by 2 always
    - the lo bit 'f' means 'is being forwarded" - what TAIL_flag was
 
- * if PObj_align_FLAG is set, obj->bufstart is aligned like discussed above  
+ * if PObj_align_FLAG is set, obj->bufstart is aligned like discussed above
  * obj->buflen is the usable length excluding the optional GC part.
 
 =cut
@@ -287,14 +287,14 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
      */
 
     /* total_size -= pool->guaranteed_reclaimable; */
-        
+
     /* this makes for ever increasing allocations but fewer collect runs */
 #if WE_WANT_EVER_GROWING_ALLOCATIONS
     total_size += pool->minimum_block_size;
 #endif
 
     /* Snag a block big enough for everything */
-    new_block = alloc_new_block(interpreter, total_size, pool, 
+    new_block = alloc_new_block(interpreter, total_size, pool,
             "inside compact");
 
     /* Start at the beginning */
@@ -469,7 +469,7 @@ aligned_mem(Buffer *buffer, char *mem)
     if (PObj_is_COWable_TEST(buffer))
         mem += sizeof(void*);
     if (PObj_aligned_TEST(buffer)) {
-        mem = (char*)(((unsigned long)(mem + BUFFER_ALIGN_1)) & 
+        mem = (char*)(((unsigned long)(mem + BUFFER_ALIGN_1)) &
                 BUFFER_ALIGN_MASK);
     }
     else {
@@ -493,7 +493,7 @@ Parrot_in_memory_pool(Interp *interpreter, void *bufstart) {
     struct Memory_Block *cur_block;
     cur_block = pool->top_block;
     while (cur_block) {
-        if ((char *)bufstart >= cur_block->start && 
+        if ((char *)bufstart >= cur_block->start &&
             (char *) bufstart < cur_block->start + cur_block->size) {
             return 1;
         }
@@ -511,11 +511,11 @@ Parrot_in_memory_pool(Interp *interpreter, void *bufstart) {
 
 =over 4
 
-=item C<void 
+=item C<void
 Parrot_reallocate(Interp *interpreter, Buffer *from, size_t tosize)>
 
 Reallocate the Buffer's buffer memory to the given size. The allocated
-buffer will not shrink. If the buffer was allocated with 
+buffer will not shrink. If the buffer was allocated with
 <Parrot_allocate_aligned> the new buffer will also be aligned. As
 with all reallocation, the new buffer might have moved and the additional
 memory is not cleared.
@@ -524,7 +524,7 @@ memory is not cleared.
 
 */
 
-void 
+void
 Parrot_reallocate(Interp *interpreter, Buffer *buffer, size_t tosize)
 {
     size_t copysize;
@@ -578,7 +578,7 @@ Parrot_reallocate(Interp *interpreter, Buffer *buffer, size_t tosize)
 
 /*
 
-=item C<void 
+=item C<void
 Parrot_reallocate_string(Interp *interpreter, STRING *str, size_t tosize)>
 
 Reallocate the STRING's buffer memory to the given size. The allocated
@@ -589,7 +589,7 @@ new buffer location, C<str-E<gt>bufused> is B<not> changed.
 
 */
 
-void 
+void
 Parrot_reallocate_string(Interp *interpreter, STRING *str, size_t tosize)
 {
     size_t copysize;
@@ -648,14 +648,14 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str, size_t tosize)
 
 /*
 
-=item C<void 
+=item C<void
 Parrot_allocate(Interp *interpreter, Buffer *buffer, size_t size)>
 
 Allocate buffer memory for the given Buffer pointer. The C<size>
 has to be a multiple of the word size.
 C<PObj_buflen> will be set to exactly the given C<size>.
 
-=item C<void 
+=item C<void
 Parrot_allocate_aligned(Interp *interpreter, Buffer *buffer, size_t size)>
 
 Like above, except the C<size> will be rounded up and the address of
@@ -666,7 +666,7 @@ malloc(3) suitable to hold e.g. a C<FLOATVAL> array.
 
 */
 
-void 
+void
 Parrot_allocate(Interp *interpreter, Buffer *buffer, size_t size)
 {
 
@@ -679,7 +679,7 @@ Parrot_allocate(Interp *interpreter, Buffer *buffer, size_t size)
 }
 
 
-void 
+void
 Parrot_allocate_aligned(Interp *interpreter, Buffer *buffer, size_t size)
 {
     size_t new_size;
@@ -699,7 +699,7 @@ Parrot_allocate_aligned(Interp *interpreter, Buffer *buffer, size_t size)
 
 /*
 
-=item C<void 
+=item C<void
 Parrot_allocate_string(Interp *interpreter, STRING *str, size_t size)>
 
 Allocate the STRING's buffer memory to the given size. The allocated
@@ -711,7 +711,7 @@ is B<not> changed.
 
 */
 
-void 
+void
 Parrot_allocate_string(Interp *interpreter, STRING *str, size_t size)
 {
     size_t new_size;
@@ -781,9 +781,9 @@ Parrot_initialize_memory_pools(Interp *interpreter)
     alloc_new_block(interpreter, POOL_SIZE, arena_base->memory_pool, "init");
 
     /* Constant strings - not compacted */
-    arena_base->constant_string_pool = 
+    arena_base->constant_string_pool =
         new_memory_pool(POOL_SIZE, (compact_f)NULLfunc);
-    alloc_new_block(interpreter, POOL_SIZE, 
+    alloc_new_block(interpreter, POOL_SIZE,
                     arena_base->constant_string_pool, "init");
 }
 
@@ -841,7 +841,7 @@ static void merge_pools(struct Memory_Pool *dest, struct Memory_Pool *source)
         next_block = cur_block->prev;
         if (cur_block->free == cur_block->size) {
             mem_internal_free(cur_block);
-        } 
+        }
         else {
             cur_block->next = NULL;
             cur_block->prev = dest->top_block;

@@ -364,7 +364,7 @@ Parrot_gc_ms_init(Interp* interpreter)
 /*
 
 =item C<void
-Parrot_small_object_pool_merge(Interp *interpreter, 
+Parrot_small_object_pool_merge(Interp *interpreter,
             struct Small_Object_Pool *dest, struct Small_Object_Pool *source)>
 
 Merge C<source> into C<dest>.
@@ -374,7 +374,7 @@ Merge C<source> into C<dest>.
 */
 
 void
-Parrot_small_object_pool_merge(Interp *interpreter, 
+Parrot_small_object_pool_merge(Interp *interpreter,
         struct Small_Object_Pool *dest, struct Small_Object_Pool *source) {
     struct Small_Object_Arena *cur_arena;
     struct Small_Object_Arena *next_arena;
@@ -391,7 +391,7 @@ Parrot_small_object_pool_merge(Interp *interpreter,
 
     /* assert(source->total_objects); */
     assert(dest->object_size == source->object_size);
-    assert((dest->name == NULL && source->name == NULL) || 
+    assert((dest->name == NULL && source->name == NULL) ||
         0 == strcmp(dest->name, source->name));
 
     dest->total_objects += source->total_objects;
@@ -413,14 +413,14 @@ Parrot_small_object_pool_merge(Interp *interpreter,
 
         total_objects = cur_arena->total_objects;
 
-        Parrot_append_arena_in_pool(interpreter, dest, cur_arena, 
+        Parrot_append_arena_in_pool(interpreter, dest, cur_arena,
             cur_arena->total_objects);
 
         cur_arena->total_objects = total_objects; /* XXX needed? */
 
         cur_arena = next_arena;
     }
-    
+
     /* remove things from source */
     /* XXX is this enough? */
     source->last_Arena = NULL;

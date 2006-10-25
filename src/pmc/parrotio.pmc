@@ -103,15 +103,15 @@ defined, that is, if the readline library is available.  The return values are:
 
 =over
 
-=item * -1 
+=item * -1
 
 readline isn't configured
 
-=item * -2 
+=item * -2
 
 The file is not open/not input or not a tty, if turning on interactive.
 
-=item * 0 / 1 
+=item * 0 / 1
 
 old interactive setting
 
@@ -127,7 +127,7 @@ Interactive mode adds non-empty lines to the readline history.
 Returns the line without the newline or NULL, indicating the end of input (for
 example, after ^D or at the end of the file.)
 
-SYNOPSIS  
+SYNOPSIS
 
       pio = getstdin
       $I0 = pio.'set_readline_interactive'(1)
@@ -150,7 +150,7 @@ SYNOPSIS
 #ifdef PARROT_HAS_READLINE
         INTVAL flag;
 #endif
-        if (!io) 
+        if (!io)
             return -2;
         if (!(io->flags & PIO_F_READ))
             return -2;
@@ -173,7 +173,7 @@ SYNOPSIS
         STRING *res = NULL;
         UINTVAL len;
 
-        if (!io) 
+        if (!io)
             return NULL;
 #ifdef PARROT_HAS_READLINE
         if (io->flags & PIO_F_READLINE) {
@@ -242,7 +242,7 @@ This does B<not> close the file.
             char * const path = string_to_cstring(interpreter, name);
             INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);
             PMC* pio = PIO_open(INTERP, NULL, path, "<");
-            string_cstring_free(path); 
+            string_cstring_free(path);
             /* TODO handle stdin */
             result = PIO_reads(INTERP, pio, size);
             PIO_close(INTERP, pio);

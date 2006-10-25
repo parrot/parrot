@@ -250,7 +250,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
      * destruction.
      * Threaded interpreters are destructed when the thread ends
      */
-    if (!Interp_flags_TEST(interpreter, PARROT_IS_THREAD)) 
+    if (!Interp_flags_TEST(interpreter, PARROT_IS_THREAD))
         Parrot_on_exit(interpreter, Parrot_really_destroy, NULL);
 #endif
 
@@ -362,9 +362,9 @@ Parrot_really_destroy(Interp *interpreter, int exit_code, void *arg)
             Parrot_STM_abort(interpreter);
         }
 #if STM_PROFILE
-        if (interpreter->parent_interpreter 
+        if (interpreter->parent_interpreter
             && interpreter->thread_data->state & THREAD_STATE_JOINED)
-            Parrot_STM_merge_profile(interpreter->parent_interpreter, 
+            Parrot_STM_merge_profile(interpreter->parent_interpreter,
                                      interpreter);
 #endif
         Parrot_STM_destroy(interpreter);

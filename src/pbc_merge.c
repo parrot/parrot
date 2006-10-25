@@ -519,7 +519,7 @@ pbc_merge_pic_index(Interp *interpreter, struct pbc_merge_input **inputs,
                  struct PackFile_ByteCode *bc)
 {
     int i;
-    struct PackFile_Segment * pic_index, *in_seg; 
+    struct PackFile_Segment * pic_index, *in_seg;
     size_t size, j;
     opcode_t k, cursor = 0, start = 0;
     opcode_t last = 0; /* avoid unitialized warning */
@@ -608,7 +608,7 @@ pbc_merge_ctpointers(Interp *interpreter, struct pbc_merge_input **inputs,
             /* Move along the bytecode array. */
             cur_op++;
         }
-        
+
         /* Handle special case variable argument opcodes. */
         if (op_num == PARROT_OP_set_args_pc ||
             op_num == PARROT_OP_get_results_pc ||

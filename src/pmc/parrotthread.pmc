@@ -59,7 +59,7 @@ stop_GC(Interp* parent, Interp *thread)
    coke's]
  */
 
-static INTVAL do_thread_run(Interp *interpreter, PMC *thread, 
+static INTVAL do_thread_run(Interp *interpreter, PMC *thread,
                             INTVAL clone_flags, PMC *sub, PMC *args) {
     INTVAL tid;
 
@@ -67,7 +67,7 @@ static INTVAL do_thread_run(Interp *interpreter, PMC *thread,
     clone_interpreter(PMC_data(thread), interpreter, clone_flags);
     interpreter->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
     pt_thread_run(interpreter, thread, sub, args);
-    
+
     pmc_reuse(interpreter, thread, enum_class_ParrotRunningThread, 0);
     PObj_active_destroy_CLEAR(thread);
     PObj_custom_mark_CLEAR(thread);
@@ -75,7 +75,7 @@ static INTVAL do_thread_run(Interp *interpreter, PMC *thread,
     return tid;
 }
 
-static INTVAL do_thread_run_clone_default(Interp *interpreter, 
+static INTVAL do_thread_run_clone_default(Interp *interpreter,
                                           PMC *thread, PMC *sub, PMC *args) {
     return do_thread_run(interpreter, thread, PARROT_CLONE_DEFAULT, sub, args);
 }
@@ -104,7 +104,7 @@ Equivalent to calling run with PARROT_CLONE_DEFAULT.
 
         if (pass) {
             enter_nci_method(INTERP, typ,
-                    F2DPTR(do_thread_run), "run", "IJOIP@"); 
+                    F2DPTR(do_thread_run), "run", "IJOIP@");
             /* XXX appropriate name given that this won't clone globals? */
             enter_nci_method(INTERP, typ,
                     F2DPTR(do_thread_run_clone_default), "run_clone", "IJOP@");

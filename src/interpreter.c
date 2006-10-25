@@ -80,7 +80,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
     regs_p = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_PMC];
     regs_s = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_STR];
     /* prederef var part too */
-    n = m = opinfo->op_count; 
+    n = m = opinfo->op_count;
     ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
     for (i = 1; i < n; i++) {
         opcode_t arg = pc[i];
@@ -88,7 +88,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
         if (i >= m) {
             sig = (PMC*) pc_prederef[1];
             type = SIG_ITEM(sig, i - m);
-            type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);       
+            type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);
         }
         else
             type = opinfo->types[i - 1];
@@ -491,8 +491,8 @@ init_jit(Interp *interpreter, opcode_t *pc)
 #    endif
 #  endif
 
-    interpreter->code->jit_info = 
-        jit_info = parrot_build_asm(interpreter, code_start, code_end, 
+    interpreter->code->jit_info =
+        jit_info = parrot_build_asm(interpreter, code_start, code_end,
             NULL, JIT_CODE_FILE);
     return jit_info->arena.start;
 #else

@@ -100,7 +100,7 @@ Initializes the integer with a default value of C<0>.
                     init = arg_op[3];
                     break;
                 default:
-                    internal_exception(1, 
+                    internal_exception(1,
                             "Integer.instantiate: unhandled initializer");
                     break;
             }

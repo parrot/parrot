@@ -27,7 +27,7 @@ void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
 pmclass PerlString
     extends String
     does string
-    does scalar 
+    does scalar
     dynpmc
     group perl_group
     hll Perl
@@ -38,7 +38,7 @@ pmclass PerlString
 =item C<INTVAL get_integer()>
 
 Returns the integer representation of the string by converting to float first.
-See t/pmc/perlstring_13    set P0, "1.23e2" ; set I0, P0    
+See t/pmc/perlstring_13    set P0, "1.23e2" ; set I0, P0
 
 =cut
 
@@ -84,7 +84,7 @@ Morphs the string to a C<PerlInt> and sets its value to C<value>.
 
     void set_integer_native (INTVAL value) {
         INTVAL dynpmc_PerlInt;
-    
+
         dynpmc_PerlInt = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);
@@ -103,7 +103,7 @@ Morphs the string to a C<PerlNum> and sets its value to C<value>.
 
     void set_number_native (FLOATVAL value) {
         INTVAL dynpmc_PerlNum;
-    
+
         dynpmc_PerlNum = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlNum", 0));
         DYNSELF.morph(dynpmc_PerlNum);
@@ -162,7 +162,7 @@ Returns the string value for C<SELF[key]>.
         STRING    *s;
         PMC       *ret;
         INTVAL     dynpmc_PerlString;
-    
+
         s = PMC_str_val(SELF);
         dynpmc_PerlString = pmc_type(interpreter,
             string_from_const_cstring(interpreter, "PerlString", 0));

@@ -213,7 +213,7 @@ clear_regs(Interp *interpreter, parrot_context_t *ctx)
         for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
             CTX_REG_NUM(ctx, i) = -99.9;
         }
-    } 
+    }
     else {
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
             CTX_REG_INT(ctx, i) = -888;
@@ -283,7 +283,7 @@ struct Parrot_Context *
 Parrot_push_context(Interp *interpreter, INTVAL *n_regs_used)
 {
     struct Parrot_Context * const old = CONTEXT(interpreter->ctx);
-    struct Parrot_Context * const ctx = 
+    struct Parrot_Context * const ctx =
         Parrot_alloc_context(interpreter, n_regs_used);
 
     ctx->caller_ctx = old;
@@ -386,7 +386,7 @@ Parrot_free_context(Interp *interpreter, parrot_context_t *ctxp, int re_use)
         if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             /* can't probably PIO_eprintf here */
             parrot_sub_t doomed = PMC_sub(ctxp->current_sub);
-            
+
             fprintf(stderr, "[free  ctx %p of sub '%s']\n",
                     ctxp,
                     (doomed->name == (void*)0xdeadbeef

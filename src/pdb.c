@@ -142,9 +142,9 @@ main(int argc, char *argv[])
     pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
     /* attach pdb structure */
     debugger->pdb = pdb;
-    
+
     interpreter = Parrot_new(debugger);
-    interpreter->debugger = debugger; 
+    interpreter->debugger = debugger;
     pdb->debugee = interpreter;
 
     Parrot_block_DOD(interpreter);
@@ -184,7 +184,7 @@ main(int argc, char *argv[])
                     filename);
         }
         pasm_file = 0;
-        if (ext && strcmp (ext, ".pasm") == 0) 
+        if (ext && strcmp (ext, ".pasm") == 0)
             pasm_file = 1;
         emit_open(interpreter, 1, NULL);
         IMCC_INFO(interpreter)->state->pasm_file = pasm_file;

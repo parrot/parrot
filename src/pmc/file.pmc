@@ -208,7 +208,7 @@ free to change or give me hints on how to change it. -- ambs
                     if (bytes_read) {
                         bytes_written = fwrite(buf, 1, bytes_read, target);
                         if (bytes_read != bytes_written) {
-                            real_exception(interpreter, NULL, E_SystemError, 
+                            real_exception(interpreter, NULL, E_SystemError,
                                            "Error writting file");
                             break;
                         }

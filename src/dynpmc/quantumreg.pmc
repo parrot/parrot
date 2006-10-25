@@ -5,8 +5,8 @@
  *     These are the vtable functions for the QuantumReg PMC
  *  Data Structure and Algorithms:
  *  History:
- *    2005-11-13: Get started, start with example in 
- *                http://www.enyo.de/libquantum/api/node12.html 
+ *    2005-11-13: Get started, start with example in
+ *                http://www.enyo.de/libquantum/api/node12.html
  *  Notes:
  *     Please remove unneeded entries.
  *  References:
@@ -77,7 +77,7 @@ Create a new QuantumReg with specified number of registers.
         /* change 1|0> to 0.5*sqrt(2)*|0> + 0.5*sqrt(2)*|1>  for first qubit */
         /* Measuring |0> will give a random value */
         /* TODO: op or method for hadamard */
-        quantum_hadamard(0, reg_p);  
+        quantum_hadamard(0, reg_p);
 
         return;
     }
@@ -95,7 +95,7 @@ Makes a measurement on |0> of the qubit at position key.
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         quantum_reg * reg_p = (quantum_reg *) PMC_struct_val(SELF);
-       
+
         return quantum_bmeasure(key, reg_p);
     }
 

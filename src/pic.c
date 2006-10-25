@@ -105,7 +105,7 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 
 /*
 
-=item C<void parrot_PIC_alloc_store(Interp *, 
+=item C<void parrot_PIC_alloc_store(Interp *,
                                     struct PackFile_ByteCode *, size_t n);>
 
 Initialize the PIC storage for the given code segment with the capacitiy of
@@ -210,7 +210,7 @@ parrot_PIC_alloc_pic(Interp* interpreter)
     Parrot_PIC_store *new_store;
 
     if (store->usable < sizeof(Parrot_PIC)) {
-        size_t size = 
+        size_t size =
             (size_t)(store->n_mics * POLYMORPHIC) * sizeof(Parrot_PIC);
         if (size == 0)
             size = 2 * sizeof(Parrot_PIC);
@@ -235,7 +235,7 @@ parrot_PIC_alloc_pic(Interp* interpreter)
 
 /*
 
-=item C<void parrot_PIC_prederef(Interp *, opcode_t op, 
+=item C<void parrot_PIC_prederef(Interp *, opcode_t op,
                                  void **pc_pred, int type)>
 
 Define either the normal prederef function or the PIC stub, if PIC for
@@ -265,7 +265,7 @@ parrot_pic_opcode(Interp *interpreter, INTVAL op)
 }
 
 static int
-pass_int(Interp *interpreter, PMC *sig, char *src_base, void **src, 
+pass_int(Interp *interpreter, PMC *sig, char *src_base, void **src,
         char *dest_base, void **dest)
 {
     int i, n = SIG_ELEMS(sig);
@@ -277,7 +277,7 @@ pass_int(Interp *interpreter, PMC *sig, char *src_base, void **src,
 }
 
 static int
-pass_num(Interp *interpreter, PMC *sig, char *src_base, void **src, 
+pass_num(Interp *interpreter, PMC *sig, char *src_base, void **src,
         char *dest_base, void **dest)
 {
     int i, n = SIG_ELEMS(sig);
@@ -289,7 +289,7 @@ pass_num(Interp *interpreter, PMC *sig, char *src_base, void **src,
 }
 
 static int
-pass_str(Interp *interpreter, PMC *sig, char *src_base, void **src, 
+pass_str(Interp *interpreter, PMC *sig, char *src_base, void **src,
         char *dest_base, void **dest)
 {
     int i, n = SIG_ELEMS(sig);
@@ -301,7 +301,7 @@ pass_str(Interp *interpreter, PMC *sig, char *src_base, void **src,
 }
 
 static int
-pass_pmc(Interp *interpreter, PMC *sig, char *src_base, void **src, 
+pass_pmc(Interp *interpreter, PMC *sig, char *src_base, void **src,
         char *dest_base, void **dest)
 {
     int i, n = SIG_ELEMS(sig);
@@ -313,7 +313,7 @@ pass_pmc(Interp *interpreter, PMC *sig, char *src_base, void **src,
 }
 
 static int
-pass_mixed(Interp *interpreter, PMC *sig, char *src_base, void **src, 
+pass_mixed(Interp *interpreter, PMC *sig, char *src_base, void **src,
         char *dest_base, void **dest)
 {
     PMC* argP;
@@ -488,7 +488,7 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
     parrot_context_t *ctx;
     opcode_t *op, n;
     int flags;
-    
+
     /*
      * if we have these opcodes
      *
@@ -498,8 +498,8 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
      *   invokecc_p Px
      *
      * and all args are matching the called sub and we don't have
-     * too many args, and only INTVAL or FLOATVAL, the 
-     * whole sequence is replaced by the C<callr> pic opcode.  
+     * too many args, and only INTVAL or FLOATVAL, the
+     * whole sequence is replaced by the C<callr> pic opcode.
      *
      * Oh, I forgot to mention - the to-be-called C function is of
      * course compiled on-the-fly by the JIT compiler ;)
@@ -519,7 +519,7 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
         return 0;
     do_prederef(pc, interpreter, core_type);
     sub = (PMC*)(pc[2]);
-    assert(PObj_is_PMC_TEST(sub)); 
+    assert(PObj_is_PMC_TEST(sub));
     if (sub->vtable->base_type != enum_class_Sub)
         return 0;
     pc += 3;    /* results */
@@ -531,7 +531,7 @@ is_pic_func(Interp *interpreter, void **pc, Parrot_MIC *mic, int core_type)
     ASSERT_SIG_PMC(sig_results);
 
     ctx->current_results = (opcode_t*)pc + ctx->pred_offset;
-    if (!parrot_pic_is_safe_to_jit(interpreter, sub, 
+    if (!parrot_pic_is_safe_to_jit(interpreter, sub,
                 sig_args, sig_results, &flags))
         return 0;
     mic->lru.f.real_function = parrot_pic_JIT_sub(interpreter, sub, flags);

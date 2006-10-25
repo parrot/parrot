@@ -103,7 +103,7 @@ Mark data associated with this transactional variable.
 
         SUPER(info);
 
-        Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_struct_val(SELF)); 
+        Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_struct_val(SELF));
     }
 
     void thaw (visit_info *info) {
@@ -111,7 +111,7 @@ Mark data associated with this transactional variable.
 
         SUPER(info);
 
-        PMC_struct_val(SELF) = 
+        PMC_struct_val(SELF) =
             Parrot_thaw_STM_PMC_handle(INTERP, io);
 
         assert(PObj_is_PMC_shared_TEST(SELF));

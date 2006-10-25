@@ -55,7 +55,7 @@ extern void Parrot_initialize_core_pmcs(Interp *interp);
 =item C<void Parrot_init(Interp *interpreter)>
 
 Initializes the new interpreter. This function only has effect the first
-time it is called. Therefore Parrot_init() doesn't have to be called 
+time it is called. Therefore Parrot_init() doesn't have to be called
 on an interpreter returned from Parrot_new().
 
 Use this function when you intend to enter the run loop,
@@ -594,7 +594,7 @@ print_profile(Interp *interpreter, int status, void *p)
         RunProfile *profile = interpreter->profile;
         FLOATVAL empty = calibrate(interpreter);
 
-        PIO_printf(interpreter, 
+        PIO_printf(interpreter,
                    " Code J Name                         "
                    "Calls  Total/s       Avg/ms\n");
         for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
@@ -834,7 +834,7 @@ Parrot_debug(Interp *debugger, opcode_t * pc)
     interpreter = pdb->debugee;
     interpreter->pdb = pdb;
     debugger->lo_var_ptr = interpreter->lo_var_ptr;
-    
+
     PDB_disassemble(interpreter, NULL);
 
     while (!(pdb->state & PDB_EXIT)) {

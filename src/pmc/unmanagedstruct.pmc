@@ -81,7 +81,7 @@ static INTVAL
 key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)
 {
     int ix;
-    ix = 0; 
+    ix = 0;
 
     if (!PMC_pmc_val(pmc))
         real_exception(interpreter, NULL, E_ValueError,

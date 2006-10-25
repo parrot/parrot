@@ -52,13 +52,13 @@ also F<include/parrot/library.h> for C<enum_lib_paths>.
 =cut
 
 */
-  
+
 void
 parrot_init_library_paths(Interp *interpreter)
 {
     PMC *iglobals, *lib_paths, *paths;
     STRING *entry;
-    
+
     iglobals = interpreter->iglobals;
     /* create the lib_paths array */
     lib_paths = pmc_new(interpreter, enum_class_FixedPMCArray);
@@ -125,11 +125,11 @@ parrot_init_library_paths(Interp *interpreter)
 #endif
 }
 
-static PMC* 
+static PMC*
 get_search_paths(Interp *interpreter, enum_lib_paths which)
 {
     PMC *iglobals, *lib_paths;
-    
+
     iglobals = interpreter->iglobals;
     lib_paths = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_LIB_PATHS);
@@ -145,10 +145,10 @@ is_abs_path(Interp* interpreter, STRING *file)
     if (file->strlen <= 1)
         return 0;
     assert(file->encoding == Parrot_fixed_8_encoding_ptr ||
-            file->encoding == Parrot_utf8_encoding_ptr); 
+            file->encoding == Parrot_utf8_encoding_ptr);
 #ifdef WIN32
     if (file_name[0] == '\\' || file_name[0] == '/' ||
-            (isalpha(file_name[0]) && file->strlen > 2 && 
+            (isalpha(file_name[0]) && file->strlen > 2 &&
              (strncmp(file_name+1, ":\\", 2) == 0 ||
               strncmp(file_name+1, ":/",  2) == 0)))
 #else
@@ -166,7 +166,7 @@ is_abs_path(Interp* interpreter, STRING *file)
         enum_runtime_ft type)>
 
 Locate the full path for C<file_name> and the given file type(s). If
-successful, returns a C-string allocated with C<string_to_cstring> or 
+successful, returns a C-string allocated with C<string_to_cstring> or
 NULL otherwise.
 
 =item C<STRING* Parrot_locate_runtime_file_str(Interp *, STRING  *file_name,
@@ -239,7 +239,7 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
         {
             char *p;
             assert(full_name->encoding == Parrot_fixed_8_encoding_ptr ||
-                   full_name->encoding == Parrot_utf8_encoding_ptr); 
+                   full_name->encoding == Parrot_utf8_encoding_ptr);
             while ( (p = strchr(full_name->strstart, '/')) )
                 *p = '\\';
         }
@@ -256,7 +256,7 @@ Parrot_locate_runtime_file_str(Interp *interpreter, STRING *file,
     {
         char *p;
         assert(full_name->encoding == Parrot_fixed_8_encoding_ptr ||
-                full_name->encoding == Parrot_utf8_encoding_ptr); 
+                full_name->encoding == Parrot_utf8_encoding_ptr);
         while ( (p = strchr(full_name->strstart, '/')) )
             *p = '\\';
     }
@@ -275,7 +275,7 @@ Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
     STRING *result = Parrot_locate_runtime_file_str(interpreter,
             file, type);
     /*
-     * XXX valgrind shows e.g. 
+     * XXX valgrind shows e.g.
      *     invalid read of size 8 inside a string of length 69
      *     at position 64
      *     it seems that dlopen accesses words beyond the string end
@@ -381,7 +381,7 @@ Parrot_autoload_class(Interp *interpreter, STRING *class)
 parrot_split_path_ext(Interp*, STRING *in, STRING **wo_ext, STRING **ext)>
 
 Split the pathstring C<in> into <path><filestem><ext>. Return the
-C<filestem> of the pathstring. Set C<wo_ext> to the part without 
+C<filestem> of the pathstring. Set C<wo_ext> to the part without
 extension and C<ext> to the extension or NULL.
 
 =cut
@@ -389,7 +389,7 @@ extension and C<ext> to the extension or NULL.
 */
 
 STRING *
-parrot_split_path_ext(Interp* interpreter, STRING *in, 
+parrot_split_path_ext(Interp* interpreter, STRING *in,
         STRING **wo_ext, STRING **ext)
 {
     STRING *slash1, *slash2, *dot, *stem;
@@ -402,7 +402,7 @@ parrot_split_path_ext(Interp* interpreter, STRING *in,
     if (pos_sl == -1)
         pos_sl = CHARSET_RINDEX(interpreter, in, slash2, len);
     pos_dot = CHARSET_RINDEX(interpreter, in, dot, len);
-    
+
     /* XXX directory parrot-0.4.1 or such */
     if (pos_dot != -1 && isdigit( ((char*)in->strstart)[pos_dot+1]))
         pos_dot = -1;

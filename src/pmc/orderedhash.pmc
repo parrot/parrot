@@ -10,8 +10,8 @@ src/pmc/orderedhash.pmc - Ordered Hash
 
 C<OrderedHash> extends C<Hash> to provide the interfaces of
 C<array> and C<hash>. To achieve the functionality of an ordered
-hash there are a few restrictions though: C<delete_keyed> never removes 
-items, they are just nulled. 
+hash there are a few restrictions though: C<delete_keyed> never removes
+items, they are just nulled.
 
 Please note that if values are set via integer idx, these indices
 have to be in strict order. Using C<push_xx> simplifies this task.
@@ -149,7 +149,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
-Returns the integer value associated with C<key>. 
+Returns the integer value associated with C<key>.
 
 =cut
 

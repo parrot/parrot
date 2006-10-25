@@ -177,7 +177,7 @@ Removes and returns the last element.
 
 =item C<void unshift_integer(INTVAL size)>
 
-Extends the array by adding an element of value C<value> to the 
+Extends the array by adding an element of value C<value> to the
 beginning.
 
 =cut
@@ -189,11 +189,11 @@ beginning.
         if (PMC_int_val2(SELF) <= 0) {
             Parrot_UInt1 * const sdOld = PMC_data(SELF);
             Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(
-                ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC) 
+                ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC)
                 + PMC_int_val(SELF)
                 + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC)
             );
-            mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF), 
+            mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF),
                 PMC_int_val(SELF));
             mem_sys_free(sdOld);
             PMC_data(SELF) = sdNew;
@@ -236,11 +236,11 @@ Removes and returns the first element.
         if (PMC_int_val2(SELF) >= MIN_ALLOC) {
             Parrot_UInt1 * const sdOld = PMC_data(SELF);
             Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(
-                ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC) 
+                ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC)
                 + PMC_int_val(SELF)
                 + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC)
             );
-            mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF), 
+            mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF),
                 PMC_int_val(SELF));
             mem_sys_free(sdOld);
             PMC_data(SELF) = sdNew;
@@ -348,7 +348,7 @@ Changed allocator to double size - Matt Fowles 2004-06-15
 Added push_integer               - Bernhard Schmalhofer 2004-10-17
 
 Changed allocation code, added   - Dino Morelli 2005-06-10
-  push_, pop_, shift_, 
+  push_, pop_, shift_,
   unshift_integer, freeze, thaw
 
 =cut

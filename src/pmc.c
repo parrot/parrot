@@ -225,7 +225,7 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
         if (vtable->flags & VTABLE_IS_SHARED_FLAG)
             flags |= PObj_is_PMC_shared_FLAG;
     }
- 
+
     pmc = new_pmc_header(interpreter, flags);
     if (!pmc) {
         internal_exception(ALLOCATION_ERROR,
@@ -402,7 +402,7 @@ pmc_type(Interp* interpreter, STRING *name)
     PMC * const classname_hash = interpreter->class_hash;
     PMC *item;
 
-    item = VTABLE_get_pointer_keyed_str(interpreter, classname_hash, name); 
+    item = VTABLE_get_pointer_keyed_str(interpreter, classname_hash, name);
     /* nested namespace with same name */
     if (item->vtable->base_type == enum_class_NameSpace)
         return 0;
@@ -417,7 +417,7 @@ pmc_type_p(Interp* interpreter, PMC *name)
     PMC * const classname_hash = interpreter->class_hash;
     PMC *item;
 
-    item = VTABLE_get_pointer_keyed(interpreter, classname_hash, name); 
+    item = VTABLE_get_pointer_keyed(interpreter, classname_hash, name);
     if (!PMC_IS_NULL(item))
         return PMC_int_val((PMC*) item);
     return 0;
@@ -432,7 +432,7 @@ create_class_pmc(Interp *interpreter, INTVAL type)
      *
      * create a constant PMC
      */
-    PMC * const class = get_new_pmc_header(interpreter, type, 
+    PMC * const class = get_new_pmc_header(interpreter, type,
                                            PObj_constant_FLAG);
     /* If we are a second thread, we may get the same object as the
      * original because we have a singleton. Just set the singleton to

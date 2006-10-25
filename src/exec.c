@@ -74,7 +74,7 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof(char *));
     obj->bytecode_header_size =
         (interpreter->code->base.file_offset + 4) * sizeof(opcode_t);
-    jit_info = parrot_build_asm(interpreter, code_start, code_end, 
+    jit_info = parrot_build_asm(interpreter, code_start, code_end,
             obj, JIT_CODE_FILE);
 
     /* TODO Go zero the calls to jited opcodes. */
@@ -197,7 +197,7 @@ Adds a symbol to the object file.
 */
 
 int
-Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/, 
+Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/,
                        const char *symbol /*NN*/, int stype)
 {
 
@@ -233,8 +233,8 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/,
 }
 
 int *
-Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj /*NN*/, 
-                                     char *nptr, const char *var, int offset, 
+Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj /*NN*/,
+                                     char *nptr, const char *var, int offset,
                                      int disp)
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_COM, var, disp);
@@ -242,7 +242,7 @@ Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj /*NN*/,
 }
 
 void
-Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj /*NN*/, 
+Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj /*NN*/,
                                       char *nptr, const char *func_name)
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_FUNC, func_name, 1);

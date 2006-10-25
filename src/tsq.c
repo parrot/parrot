@@ -82,7 +82,7 @@ nosync_pop_entry(QUEUE *queue)
     if (queue->head == queue->tail) {
         queue->head = NULL;
         queue->tail = NULL;
-    } 
+    }
     else {
         queue->head = queue->head->next;
     }
@@ -135,7 +135,7 @@ push_entry(QUEUE *queue, QUEUE_ENTRY *entry)
     if (queue->tail) {
         queue->tail->next = entry;
         queue->tail = entry;
-    } 
+    }
     else {
         queue->head = entry;
         queue->tail = entry;

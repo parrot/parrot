@@ -1406,7 +1406,7 @@ Sets this PMC as shared and read-only.
         true = pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, true, 1);
 
-        ret = pt_shared_fixup(INTERP, SELF); 
+        ret = pt_shared_fixup(INTERP, SELF);
 
         /* first set readonly */
         VTABLE_setprop(INTERP, ret, const_string(INTERP, "_ro"), true);

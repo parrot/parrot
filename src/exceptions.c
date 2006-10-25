@@ -63,7 +63,7 @@ internal_exception(int exitcode, const char *format, ...)
     va_end(arglist);
 /*
  * XXX TODO get rid of all the internal_exceptions or call them
- *          with an interpreter arg 
+ *          with an interpreter arg
     Parrot_exit(interpreter, exitcode);
  */
     exit(exitcode);

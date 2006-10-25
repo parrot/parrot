@@ -14,7 +14,7 @@ creation the types of key and value as well as appropriate compare and
 hashing functions can be set.
 
 This hash implementation uses just one piece of malloced memory. The
-C<< hash->bs >> bucket store points this regions. 
+C<< hash->bs >> bucket store points this regions.
 
 This hash doesn't move during GC, therefore a lot of the old caveats
 don't apply.

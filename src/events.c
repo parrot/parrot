@@ -103,7 +103,7 @@ static int pipe_fds[2];
 #define PIPE_READ_FD  pipe_fds[0]
 #define PIPE_WRITE_FD pipe_fds[1]
 
-/* 
+/*
  * a structure to communicate with the io_thread
  */
 typedef struct {
@@ -455,7 +455,7 @@ Parrot_del_timer_event(Parrot_Interp interpreter, PMC* timer)
     for (entry = event_queue->head; entry; entry = entry->next) {
         if (entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT) {
             event = entry->data;
-            if (event->interp == interpreter 
+            if (event->interp == interpreter
                     && event->u.timer_event.timer == timer) {
                 event->u.timer_event.interval = 0.0;
                 event->type = EVENT_TYPE_NONE;
@@ -505,8 +505,8 @@ Parrot_new_suspend_for_gc_event(Parrot_Interp interpreter) {
     qe->next = NULL;
     qe->data = ev;
     qe->type = QUEUE_ENTRY_TYPE_EVENT;
-    /* we don't use schedule_event because we must modify its 
-     * task queue immediately 
+    /* we don't use schedule_event because we must modify its
+     * task queue immediately
      */
     Parrot_schedule_interp_qentry(interpreter, qe);
 }
@@ -770,7 +770,7 @@ io_thread(void *data)
                                 case IO_THR_MSG_TERMINATE:
                                     running = 0;
                                     break;
-                                case IO_THR_MSG_ADD_SELECT_RD: 
+                                case IO_THR_MSG_ADD_SELECT_RD:
                                     {
                                         PMC *pio = buf.ev->u.io_event.pio;
                                         int fd = PIO_getfd(NULL, pio);
@@ -793,8 +793,8 @@ io_thread(void *data)
 
                         }
                         else {
-                            /* 
-                             * one of the io_event fds is ready 
+                            /*
+                             * one of the io_event fds is ready
                              * remove from active set, as we don't
                              * want to fire again during io_handler
                              * invocation
@@ -841,7 +841,7 @@ stop_io_thread(void)
 }
 
 void
-Parrot_event_add_io_event(Interp* interpreter, 
+Parrot_event_add_io_event(Interp* interpreter,
         PMC* pio, PMC* sub, PMC* data, INTVAL which)
 {
     parrot_event *event;
@@ -850,7 +850,7 @@ Parrot_event_add_io_event(Interp* interpreter,
     event = mem_sys_allocate(sizeof(parrot_event));
     event->type        = EVENT_TYPE_IO;
     event->interp      = interpreter;
-    /* 
+    /*
      * TODO dod_register these PMCs as long as the event system
      *      owns these 3
      *      unregister, when event is passed to interp again
@@ -1233,7 +1233,7 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             break;
         case EVENT_TYPE_TIMER:
             /* run ops, save registers */
-            Parrot_runops_fromc_args_event(interpreter, 
+            Parrot_runops_fromc_args_event(interpreter,
                     event->u.timer_event.sub, "v");
             break;
         case EVENT_TYPE_CALL_BACK:
@@ -1243,7 +1243,7 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             break;
         case EVENT_TYPE_IO:
             edebug((stderr, "starting io handler\n"));
-            Parrot_runops_fromc_args_event(interpreter, 
+            Parrot_runops_fromc_args_event(interpreter,
                     event->u.io_event.handler,
                     "vPP",
                     event->u.io_event.pio,

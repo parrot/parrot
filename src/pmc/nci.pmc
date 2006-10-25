@@ -152,7 +152,7 @@ shifted down.
          * return continuation here, which gets rid of this frame
          * and returns the real return address
          */
-        if (cont && cont != NEED_CONTINUATION && 
+        if (cont && cont != NEED_CONTINUATION &&
                 (PObj_get_FLAGS(cont) & SUB_FLAG_TAILCALL)) {
             cont = CONTEXT(interpreter->ctx)->current_cont;
             next = VTABLE_invoke(INTERP, cont, next);

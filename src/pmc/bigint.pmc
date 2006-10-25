@@ -133,7 +133,7 @@ bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
     int n = value < 0;
-    if (n) 
+    if (n)
         mpz_add_ui(BN(dest), BN(self), -value);
     else
         mpz_sub_ui(BN(dest), BN(self), value);
@@ -264,13 +264,13 @@ bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
 }
 
 static void
-bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self, 
+bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self,
                               INTVAL value, PMC *dest)
 {
     mpz_mul_2exp(BN(dest), BN(self), value);
 }
 static void
-bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, 
+bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self,
                               INTVAL value, PMC *dest)
 {
     mpz_tdiv_q_2exp(BN(dest), BN(self), value);
@@ -458,7 +458,7 @@ bigint_bitwise_shl_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self, 
+bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self,
                               INTVAL value, PMC *dest)
 {
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
@@ -472,7 +472,7 @@ bigint_bitwise_shr_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self, 
+bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self,
                               INTVAL value, PMC *dest)
 {
     real_exception(interpreter, NULL, E_LibraryNotLoadedError,
@@ -1177,8 +1177,8 @@ MMD_BigInt: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shl_bigint_int(INTERP, SELF, 
-                                          VTABLE_get_integer(INTERP, value), 
+            bigint_bitwise_shl_bigint_int(INTERP, SELF,
+                                          VTABLE_get_integer(INTERP, value),
                                           dest);
             return dest;
         }
@@ -1187,7 +1187,7 @@ MMD_Integer: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value), 
+            bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value),
                                           dest);
             return dest;
          }
@@ -1209,12 +1209,12 @@ MMD_DEFAULT: {
 
     void i_bitwise_shl (PMC* value) {
 MMD_BigInt: {
-            bigint_bitwise_shl_bigint_int(INTERP, SELF, 
-                                          VTABLE_get_integer(INTERP, value), 
+            bigint_bitwise_shl_bigint_int(INTERP, SELF,
+                                          VTABLE_get_integer(INTERP, value),
                                           SELF);
             }
 MMD_Integer: {
-            bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value), 
+            bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value),
                                           SELF);
              }
 MMD_DEFAULT: {
@@ -1250,8 +1250,8 @@ MMD_BigInt: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shr_bigint_int(INTERP, SELF, 
-                                          VTABLE_get_integer(INTERP, value), 
+            bigint_bitwise_shr_bigint_int(INTERP, SELF,
+                                          VTABLE_get_integer(INTERP, value),
                                           dest);
             return dest;
         }
@@ -1260,7 +1260,7 @@ MMD_Integer: {
                 VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), 
+            bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value),
                                           dest);
             return dest;
          }
@@ -1282,12 +1282,12 @@ MMD_DEFAULT: {
 
     void i_bitwise_shr (PMC* value) {
 MMD_BigInt: {
-            bigint_bitwise_shr_bigint_int(INTERP, SELF, 
-                                          VTABLE_get_integer(INTERP, value), 
+            bigint_bitwise_shr_bigint_int(INTERP, SELF,
+                                          VTABLE_get_integer(INTERP, value),
                                           SELF);
             }
 MMD_Integer: {
-            bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value), 
+            bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value),
                                           SELF);
         }
 MMD_DEFAULT: {
@@ -1304,11 +1304,11 @@ MMD_DEFAULT: {
 /*
 
 =back
-  
+
 =cut
 
 */
-   
+
 /*
  * Local variables:
  *   c-file-style: "parrot"

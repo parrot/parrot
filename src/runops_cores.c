@@ -118,7 +118,7 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
     if (!interpreter->debugger) {
         PMC *pio;
 
-        debugger = interpreter->debugger = 
+        debugger = interpreter->debugger =
             /*
              * using a distinct interpreter for tracing should be ok
              * - just in case, make it easy to switch
@@ -138,7 +138,7 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
             PIO_setbuf(debugger, pio, 8192);
         }
     }
-    else 
+    else
         debugger = interpreter->debugger;
     trace_op(interpreter, code_start, code_end, pc);
     while (pc) {

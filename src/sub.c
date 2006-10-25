@@ -135,7 +135,7 @@ to the current context.
 struct Parrot_cont *
 new_continuation(Interp *interp, struct Parrot_cont *to)
 {
-    struct Parrot_cont * const cc = 
+    struct Parrot_cont * const cc =
         mem_sys_allocate(sizeof(struct Parrot_cont));
     struct Parrot_Context * const to_ctx =
         to ? to->to_ctx : CONTEXT(interp->ctx);
@@ -264,7 +264,7 @@ invalidate_retc_context(Interp *interpreter, PMC *cont)
 
 =item C<Parrot_full_sub_name>
 
-Return namespace, name, and location of subroutine. 
+Return namespace, name, and location of subroutine.
 
 =cut
 
@@ -287,7 +287,7 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
     s = PMC_sub(sub);
     if (PMC_IS_NULL(s->namespace_stash)) {
         return s->name;
-    } 
+    }
     else {
         PMC *ns_array;
         STRING *j;
@@ -342,7 +342,7 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
     if (PMC_IS_NULL(sub->namespace)) {
         info->nsname = string_from_cstring(interpreter, "", 0);
         info->fullname = info->subname;
-    } 
+    }
     else {
         info->nsname = VTABLE_get_string(interpreter, sub->namespace);
         info->fullname = Parrot_full_sub_name(interpreter, ctx->current_sub);
@@ -455,7 +455,7 @@ parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
     clos_pmc = VTABLE_clone(interpreter, sub_pmc);
     sub = PMC_sub(sub_pmc);
     clos = PMC_sub(clos_pmc);
-    /* 
+    /*
      * the given sub_pmc has to have an :outer(sub) that is
      * this subroutine
      */

@@ -115,7 +115,7 @@ range_end:
     }
     else {
         if (PObj_get_FLAGS(key) & KEY_inf_slice_FLAG) {
-            internal_exception(1, 
+            internal_exception(1,
                                "unlimited slice range for hash "
                                "not implemented");
         }

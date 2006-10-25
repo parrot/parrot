@@ -40,7 +40,7 @@ uint_to_str(Interp *interpreter,
 
 Returns C<num> converted to a Parrot C<STRING>.
 
-Note that C<base> must be defined, a default of 10 is not assumed. The 
+Note that C<base> must be defined, a default of 10 is not assumed. The
 caller has to verify that C<< base >= 2 && base <= 36 >>
 The buffer C<tc> must be at least C<sizeof(UHUGEINTVAL)*8 + 1> chars big.
 
@@ -168,7 +168,7 @@ handle_flags(Interp *interpreter,
             string_chopn(interpreter, str, len, 1);
             len = 0;
         }
-        else 
+        else
             if (info->flags & FLAG_PREC && info->prec < len) {
                 string_chopn(interpreter, str, -(INTVAL)(info->prec), 1);
                 len = info->prec;
@@ -272,7 +272,7 @@ gen_sprintf_call(Interp *interpreter, char *out,
         i += sprintf(out + i, "%u", (unsigned)info->prec);
     }
     if (thingy == 'd' || thingy == 'i' ||thingy == 'u') {
-        /* theu?int isa HUGEU?INTVAL aka long long 
+        /* theu?int isa HUGEU?INTVAL aka long long
          * the 'll' modifier is specced in susv3 - hopefully all our
          * compilers support it too */
         out[i++] = 'l';
@@ -570,7 +570,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             /* INTEGERS */
                         case 'c':
                             ts = string_chr(interpreter,
-                                 obj->getint(interpreter, info.type, obj)); 
+                                 obj->getint(interpreter, info.type, obj));
                             targ = str_append_w_flags(interpreter, targ,
                                     &info, ts, NULL);
                             break;
@@ -640,7 +640,7 @@ do_sprintf:
                             gen_sprintf_call(interpreter, tc, &info, ch);
                             ts = cstr2pstr(tc);
                             {
-                                char * const tempstr = 
+                                char * const tempstr =
                                     string_to_cstring(interpreter, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
@@ -652,7 +652,7 @@ do_sprintf:
 #endif
                                 string_cstring_free(tempstr);
                             }
-                            targ = string_append(interpreter, targ, 
+                            targ = string_append(interpreter, targ,
                                                  cstr2pstr(tc), 0);
                             break;
 
@@ -681,7 +681,7 @@ do_sprintf:
                             /* XXX lost precision if %Hg or whatever
                                */
                             {
-                                char * const tempstr = 
+                                char * const tempstr =
                                     string_to_cstring(interpreter, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
@@ -715,7 +715,7 @@ do_sprintf:
                             }
 #endif
 
-                            targ = string_append(interpreter, targ, 
+                            targ = string_append(interpreter, targ,
                                                  cstr2pstr(tc), 0);
                             break;
 
@@ -725,7 +725,7 @@ do_sprintf:
                              * to SPRINTF_OBJ, but for now, getstring_pmc  *
                              * is inlined and modified to call get_repr    */
                             if (obj->getstring == pmc_core.getstring) {
-                                PMC * const tmp = 
+                                PMC * const tmp =
                                     VTABLE_get_pmc_keyed_int(interpreter,
                                                              ((PMC *)obj->data),
                                                              (obj->index));

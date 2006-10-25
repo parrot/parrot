@@ -21,7 +21,7 @@ TODO:
   - save jit_info in sub
   - check for multiple calls to the same sub
     either reuse code or create new
-  - handle void calls/returns  
+  - handle void calls/returns
 
 =head2 Functions
 
@@ -92,22 +92,22 @@ jit_can_compile_sub(Interp *interpreter, PMC *sub)
     /* if the Sub is using S regs, we can't JIT it yet */
     if (n_regs_used[REGNO_STR])
         return 0;
-    /* if the Sub is using more than 1 P reg, we can't JIT it yet 
-     * the P reg could be a (recursive) call to a sub 
+    /* if the Sub is using more than 1 P reg, we can't JIT it yet
+     * the P reg could be a (recursive) call to a sub
      */
     if (n_regs_used[REGNO_PMC] > 1)
         return 0;
     return 1;
 }
 
-        
+
 static int
 args_match_params(Interp *interpreter, PMC *sig_args,
         struct PackFile_ByteCode *seg, opcode_t *start)
 {
     PMC *sig_params;
     int n, type;
-    
+
     if (*start != PARROT_OP_get_params_pc)
         return 0;
     sig_params = seg->const_table->constants[start[1]]->u.key;
@@ -167,13 +167,13 @@ call_is_safe(Interp *interpreter, PMC *sub, opcode_t **set_args)
     PMC *called, *sig_results;
 
     opcode_t * pc = *set_args;
-    PMC * const sig_args = 
+    PMC * const sig_args =
         PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
 
     /* ignore the signature for now */
     pc += 2 + SIG_ELEMS(sig_args);
     if (*pc != PARROT_OP_set_p_pc)
-       return 0; 
+       return 0;
     called = PMC_sub(sub)->seg->const_table->constants[pc[2]]->u.key;
     if (called != sub) {
         /* we can JIT just recursive subs for now */
@@ -192,7 +192,7 @@ call_is_safe(Interp *interpreter, PMC *sub, opcode_t **set_args)
 }
 
 static int
-ops_jittable(Interp *interpreter, PMC *sub, PMC *sig_results, 
+ops_jittable(Interp *interpreter, PMC *sub, PMC *sig_results,
         struct PackFile_ByteCode *seg,
         opcode_t *pc, opcode_t *end, int *flags)
 {
@@ -274,7 +274,7 @@ parrot_pic_is_safe_to_jit(Interp *interpreter, PMC *sub,
 
     /* 1) if the JIT system can't JIT_CODE_SUB_REGS_ONLY
      *    or the sub is using too many registers
-     */ 
+     */
     if (!jit_can_compile_sub(interpreter, sub))
         return 0;
     /*
@@ -292,7 +292,7 @@ parrot_pic_is_safe_to_jit(Interp *interpreter, PMC *sub,
      * 3) verify if all opcodes are JITtable, also check set_returns
      *   if it's reached
      */
-    if (!ops_jittable(interpreter, sub, sig_results, 
+    if (!ops_jittable(interpreter, sub, sig_results,
                 PMC_sub(sub)->seg, start, end, flags))
         return 0;
 
@@ -315,8 +315,8 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags)
     opcode_t * const end   = base + PMC_sub(sub)->end_offs;
     /* TODO pass Sub */
 
-    Parrot_jit_info_t * jit_info = 
-        parrot_build_asm(interpreter, 
+    Parrot_jit_info_t * jit_info =
+        parrot_build_asm(interpreter,
                          start, end, NULL,
                          JIT_CODE_SUB_REGS_ONLY | flags);
     if (!jit_info)
@@ -334,7 +334,7 @@ parrot_pic_is_safe_to_jit(Interp *interpreter, PMC *sub,
     return 0;
 }
 
-funcptr_t 
+funcptr_t
 parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags) {
     UNUSED(interpreter);
     UNUSED(sub);
@@ -343,7 +343,7 @@ parrot_pic_JIT_sub(Interp *interpreter, PMC *sub, int flags) {
 }
 
 #endif     /* HAS_JIT */
-   
+
 
 /*
 

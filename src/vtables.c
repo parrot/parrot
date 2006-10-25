@@ -74,7 +74,7 @@ Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable)
     mem_sys_free(vtable);
 }
 
-void 
+void
 parrot_alloc_vtables(Interp *interpreter)
 {
     interpreter->vtables =
@@ -83,7 +83,7 @@ parrot_alloc_vtables(Interp *interpreter)
     interpreter->n_vtable_alloced = PARROT_MAX_CLASSES;
 }
 
-void 
+void
 parrot_realloc_vtables(Interp *interpreter)
 {
     /* 16 bigger seems reasonable, though it's only a pointer
@@ -100,7 +100,7 @@ parrot_realloc_vtables(Interp *interpreter)
     interpreter->n_vtable_alloced = new_max;
 }
 
-void 
+void
 parrot_free_vtables(Interp *interpreter)
 {
     int i;
