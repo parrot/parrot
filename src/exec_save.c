@@ -604,7 +604,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     save_int(fp, TEXT_CODE);
     save_int(fp, TEXT_RELOC);
     save_int(fp, 0);
-    save_short(fp, obj->text_rellocation_count);
+    save_short(fp, (short)obj->text_rellocation_count);
     save_short(fp, 0);
     save_int(fp, 0x20);
 
@@ -615,7 +615,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     save_int(fp, DATA_CODE);
     save_int(fp, DATA_RELOC);
     save_int(fp, 0);
-    save_short(fp, obj->data_rellocation_count);
+    save_short(fp, (short)obj->data_rellocation_count);
     save_short(fp, 0);
     save_int(fp, 0x40);
 
