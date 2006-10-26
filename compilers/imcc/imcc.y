@@ -413,7 +413,7 @@ do_loadlib(Interp *interp, char *lib)
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
-%token <t> MULTI LOADLIB
+%token <t> MULTI VTABLE_METHOD LOADLIB
 %token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -433,6 +433,7 @@ do_loadlib(Interp *interp, char *lib)
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types opt_comma outer
+%type <t> vtable
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign get_results
 %type <i> opt_invocant
@@ -701,6 +702,12 @@ outer: OUTER '(' STRINGC ')'
                      mk_const(interp, $3, 'S'); }
    ;
 
+vtable: VTABLE_METHOD
+                     { $$ = 0; }
+    |   VTABLE_METHOD '(' STRINGC ')'
+                     { $$ = 0; }
+    ;
+
 multi_types:
      /* empty */     { add_pcc_multi(IMCC_INFO(interp)->cur_call, NULL); }
    | multi_types COMMA multi_type { $$ = 0; add_pcc_multi(IMCC_INFO(interp)->cur_call, $3); }
@@ -812,6 +819,7 @@ proto:
    | NEED_LEX       {  $$ = P_NEED_LEX; }
    | multi
    | outer
+   | vtable
    ;
 
 pcc_call:

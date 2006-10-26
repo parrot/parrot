@@ -121,30 +121,31 @@
      OUTER = 347,
      NEED_LEX = 348,
      MULTI = 349,
-     LOADLIB = 350,
-     UNIQUE_REG = 351,
-     LABEL = 352,
-     EMIT = 353,
-     EOM = 354,
-     IREG = 355,
-     NREG = 356,
-     SREG = 357,
-     PREG = 358,
-     IDENTIFIER = 359,
-     REG = 360,
-     MACRO = 361,
-     ENDM = 362,
-     STRINGC = 363,
-     INTC = 364,
-     FLOATC = 365,
-     USTRINGC = 366,
-     PARROT_OP = 367,
-     VAR = 368,
-     LINECOMMENT = 369,
-     FILECOMMENT = 370,
-     DOT = 371,
-     CONCAT = 372,
-     POINTY = 373
+     VTABLE_METHOD = 350,
+     LOADLIB = 351,
+     UNIQUE_REG = 352,
+     LABEL = 353,
+     EMIT = 354,
+     EOM = 355,
+     IREG = 356,
+     NREG = 357,
+     SREG = 358,
+     PREG = 359,
+     IDENTIFIER = 360,
+     REG = 361,
+     MACRO = 362,
+     ENDM = 363,
+     STRINGC = 364,
+     INTC = 365,
+     FLOATC = 366,
+     USTRINGC = 367,
+     PARROT_OP = 368,
+     VAR = 369,
+     LINECOMMENT = 370,
+     FILECOMMENT = 371,
+     DOT = 372,
+     CONCAT = 373,
+     POINTY = 374
    };
 #endif
 /* Tokens.  */
@@ -240,30 +241,31 @@
 #define OUTER 347
 #define NEED_LEX 348
 #define MULTI 349
-#define LOADLIB 350
-#define UNIQUE_REG 351
-#define LABEL 352
-#define EMIT 353
-#define EOM 354
-#define IREG 355
-#define NREG 356
-#define SREG 357
-#define PREG 358
-#define IDENTIFIER 359
-#define REG 360
-#define MACRO 361
-#define ENDM 362
-#define STRINGC 363
-#define INTC 364
-#define FLOATC 365
-#define USTRINGC 366
-#define PARROT_OP 367
-#define VAR 368
-#define LINECOMMENT 369
-#define FILECOMMENT 370
-#define DOT 371
-#define CONCAT 372
-#define POINTY 373
+#define VTABLE_METHOD 350
+#define LOADLIB 351
+#define UNIQUE_REG 352
+#define LABEL 353
+#define EMIT 354
+#define EOM 355
+#define IREG 356
+#define NREG 357
+#define SREG 358
+#define PREG 359
+#define IDENTIFIER 360
+#define REG 361
+#define MACRO 362
+#define ENDM 363
+#define STRINGC 364
+#define INTC 365
+#define FLOATC 366
+#define USTRINGC 367
+#define PARROT_OP 368
+#define VAR 369
+#define LINECOMMENT 370
+#define FILECOMMENT 371
+#define DOT 372
+#define CONCAT 373
+#define POINTY 374
 
 
 
@@ -278,7 +280,7 @@ typedef union YYSTYPE {
     Instruction *i;
 } YYSTYPE;
 /* Line 1447 of yacc.c.  */
-#line 282 "compilers/imcc/imcparser.h"
+#line 284 "compilers/imcc/imcparser.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

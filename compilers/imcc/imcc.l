@@ -281,6 +281,7 @@ SP              [ ]
 <emit,INITIAL>":anon"    return(ANON);
 <emit,INITIAL>":outer"   return(OUTER);
 <emit,INITIAL>":lex"     return(NEED_LEX);
+<emit,INITIAL>":vtable"  return(VTABLE_METHOD);
 ":unique_reg"  return(UNIQUE_REG);
 
 ".result"       return(RESULT);
