@@ -29,8 +29,8 @@ that sets up PAST.
 .sub _slurp_file                                                  
   .param string filename                                          
                                                                   
-  .sym pmc filehandle                                             
-  .sym string content                                             
+  .local pmc filehandle                                             
+  .local string content                                             
   filehandle = open filename, '&lt;'                                 
   unless filehandle goto ERR_NO_FILE                              
   content = read filehandle, 65535                                
@@ -68,6 +68,7 @@ that sets up PAST.
 <xsl:template match="phc:AST_method[phc:AST_signature[phc:Token_method_name[phc:value='%run%']]]">
                                                                   
 .sub plumhead :main                                                     
+
   load_bytecode 'PAST.pbc'                                        
   load_bytecode 'languages/punie/lib/POST.pir'                    
   load_bytecode 'languages/punie/lib/OSTGrammar.pir'              
@@ -76,26 +77,29 @@ that sets up PAST.
   .local pmc enc_sub, dec_sub
   dec_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
     
-  .sym pmc stmts                                                  
+  .local pmc reg_temp                                               
+  .local pmc reg_expression_stmt                                    
+  .local pmc reg_expression_topexp                                  
+  .local pmc reg_print_op                                           
+  .local pmc reg_expression_exp                                     
+                                                                  
+  # The root node of PAST
+  .local pmc stmts                                                  
   stmts = new 'PAST::Stmts'                                       
-                                                                  
-  .sym pmc reg_temp                                               
-                                                                  
-  .sym pmc reg_expression_stmt                                    
-  .sym pmc reg_expression_topexp                                  
-  .sym pmc reg_print_op                                           
-  .sym pmc reg_expression_exp                                     
-                                                                  
-  <xsl:apply-templates select="phc:AST_statement_list" />
+  
+  # Build up the PAST                                                                 
+  <xsl:apply-templates select="phc:AST_statement_list" >
+    <xsl:with-param name="parent" select="'stmts'" />
+  </xsl:apply-templates>
 
   # say 'AST tree dump:'                                          
   # stmts.dump()                                                  
                                                                   
   # Compile the abstract syntax tree                              
   # down to an opcode syntax tree                                 
-  .sym string ost_tg_src                                          
-  .sym pmc tge_compiler                                           
-  .sym pmc ost_grammar, ost_builder, ost                          
+  .local string ost_tg_src                                          
+  .local pmc tge_compiler                                           
+  .local pmc ost_grammar, ost_builder, ost                          
   tge_compiler = new 'TGE::Compiler'                              
   ost_tg_src = _slurp_file('languages/punie/lib/OSTGrammar.tg')   
   ost_grammar = tge_compiler.'compile'(ost_tg_src)                
@@ -104,8 +108,8 @@ that sets up PAST.
   unless ost goto ERR_NO_OST                                      
                                                                   
   # Compile the OST down to PIR                                   
-  .sym string pir_tg_src                                          
-  .sym pmc pir_grammar, pir_builder, pir                          
+  .local string pir_tg_src                                          
+  .local pmc pir_grammar, pir_builder, pir                          
   pir_tg_src = _slurp_file('languages/punie/lib/PIRGrammar.tg')   
   pir_grammar = tge_compiler.'compile'(pir_tg_src)                
   pir_builder = pir_grammar.apply(ost)                            
@@ -113,7 +117,7 @@ that sets up PAST.
   unless pir goto ERR_NO_PIR                                      
                                                                   
   # execute                                                       
-  .sym pmc pir_compiler, pir_compiled                             
+  .local pmc pir_compiler, pir_compiled                             
   pir_compiler = compreg 'PIR'                                    
   pir_compiled = pir_compiler( pir )                              
   pir_compiled()                                                  
@@ -134,30 +138,49 @@ that sets up PAST.
 </xsl:template>
 
 <xsl:template match="phc:AST_statement_list">
-  <xsl:apply-templates select="phc:AST_eval_expr" />
+  <xsl:param name='parent' />
+  <xsl:apply-templates select="phc:AST_eval_expr" >
+    <xsl:with-param name="parent" select="$parent" />
+  </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="phc:AST_eval_expr">
-  <xsl:apply-templates select="phc:AST_method_invocation" />
+  <xsl:param name='parent' />
+  <xsl:apply-templates select="phc:AST_method_invocation" >
+    <xsl:with-param name="parent" select="$parent" />
+  </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="phc:AST_method_invocation">
-  <xsl:apply-templates select="phc:AST_actual_parameter_list" />
+  <xsl:param name='parent' />
+  <xsl:apply-templates select="phc:AST_actual_parameter_list" >
+    <xsl:with-param name="parent" select="$parent" />
+  </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="phc:AST_actual_parameter_list">
-  <xsl:apply-templates select="phc:AST_actual_parameter" />
+  <xsl:param name='parent' />
+  <xsl:apply-templates select="phc:AST_actual_parameter" >
+    <xsl:with-param name="parent" select="$parent" />
+  </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="phc:AST_actual_parameter">
-  <xsl:apply-templates select="phc:Token_string" />
+  <xsl:param name='parent' />
+  <xsl:apply-templates select="phc:Token_string" >
+    <xsl:with-param name="parent" select="$parent" />
+  </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="phc:Token_string">
-  <xsl:apply-templates select="phc:value" />
+  <xsl:param name='parent' />
+  <xsl:apply-templates select="phc:value" >
+    <xsl:with-param name="parent" select="$parent" />
+  </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="phc:value">
+  <xsl:param name='parent' />
                                                                   
   # entering 'PRINT node'                                         
     reg_expression_stmt = new 'PAST::Stmt'                        
@@ -167,7 +190,7 @@ that sets up PAST.
           reg_expression_exp = new 'PAST::Exp'                    
                                                                    
 # entering 'STRING'                                                
-            .sym string decoded
+            .local string decoded
             decoded = dec_sub( "<xsl:value-of select="." />" )
             decoded = escape decoded
             reg_temp = new 'PAST::Val'                             
@@ -180,8 +203,9 @@ that sets up PAST.
       reg_print_op.'add_child'( reg_expression_exp )               
       reg_expression_topexp.'add_child'( reg_print_op      )       
     reg_expression_stmt.'add_child'( reg_expression_topexp )       
-  stmts.'add_child'( reg_expression_stmt )      
+  <xsl:value-of select="$parent" />.'add_child'( reg_expression_stmt )      
   # leaving 'PRINT node'                                           
+
 </xsl:template>
 
 </xsl:stylesheet>
