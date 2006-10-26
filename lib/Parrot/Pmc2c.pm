@@ -303,7 +303,7 @@ sub get_vtable_section {
     #  make a hash of all method names containing vtable section
     my $vt = $self->{vtable};
     foreach my $entry (@{ $vt->{methods} } ) {
-	$self->{all}{$entry->{meth}} = $entry->{section};
+        $self->{all}{$entry->{meth}} = $entry->{section};
     }
 }
 
@@ -446,8 +446,8 @@ sub init {
                 meth => 'namespace',
                 parameters => '',
                 body => '{
-                    return INTERP->vtables[SELF->vtable->base_type]->_namespace;
-                }',
+        return INTERP->vtables[SELF->vtable->base_type]->_namespace;
+}',
                 'loc' => 'vtable',
                 'mmds' => [],
                 'type' => 'PMC*',
@@ -717,6 +717,7 @@ sub body
         die "Empty MMD body near '$total_body'"
             if (!$body_part);
         $body_part = substr($body_part, 1, -1);
+        $body_part =~ s/\n(\s*)$//s;
         if ($right_type eq 'DEFAULT') {
             $standard_body = $body_part
         }
@@ -1153,8 +1154,8 @@ EOC
     # include any class specific init code from the .pmc file
     $cout .= <<"EOC";
         /* class_init */
-    $class_init_code
 EOC
+    $cout .= "    $class_init_code\n" if $class_init_code;
 
     $cout .= <<"EOC";
         {
@@ -1440,8 +1441,8 @@ EOC
     else {
         $cout .= <<EOC;
         internal_exception(WRITE_TO_CONSTCLASS, "$meth() in $classname");
-        $ret
 EOC
+        $cout .= "    $ret\n" if $ret;
     }
     $cout .= <<"EOC";
 }
@@ -1513,7 +1514,9 @@ EOC
 $decl {
     internal_exception(WRITE_TO_CONSTCLASS,
             "$meth() in read-only instance of $classname");
-    $ret
+EOC
+        $cout .= "    $ret\n" if $ret;
+        $cout .= <<"EOC";
 }
 EOC
     }
@@ -1765,14 +1768,18 @@ sub body
     }
     # I think that these will be out by one - NWC
     my $l = $self->line_directive($line, "default.c");
-    return <<EOC;
+    my $cout = <<EOC;
 $l
 ${decl}\{
     cant_do_method(interpreter, pmc, "$meth");
-    ${ret}
+EOC
+
+    $cout .= "    $ret\n" if $ret;
+    $cout .= <<EOC;
 }
 
 EOC
+    return $cout;
 }
 
 =back
@@ -1951,18 +1958,23 @@ sub body
     my $delegate_meth = "PARROT_VTABLE_${umeth}_METHNAME";
     # I think that these will be out by one - NWC
     my $l = $self->line_directive($line, "delegate.c");
-    return <<EOC;
+    my $cout = <<EOC;
 $l
 ${decl} {
-    $ret_def
+EOC
+    $cout .= "    $ret_def\n" if $ret_def;
+    $cout .= <<EOC;
     STRING *meth = CONST_STRING(interpreter, "__$meth");
     PMC *sub = find_or_die(interpreter, pmc, meth);
     ${func_ret}Parrot_run_meth_fromc_args$ret_type(interpreter, sub,
         pmc, meth, "$sig"$arg);
-    $ret
+EOC
+    $cout .= "    $ret\n" if $ret;
+    $cout .= <<EOC;
 }
 
 EOC
+    return $cout;
 }
 
 package Parrot::Pmc2c::deleg_pmc;
