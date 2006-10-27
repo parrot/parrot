@@ -703,9 +703,12 @@ outer: OUTER '(' STRINGC ')'
    ;
 
 vtable: VTABLE_METHOD
-                     { $$ = 0; }
+                     { $$ = 0; 
+                       IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     |   VTABLE_METHOD '(' STRINGC ')'
-                     { $$ = 0; }
+                     { $$ = 0; 
+                       IMCC_INFO(interp)->cur_unit->vtable_name = strdup($3);
+                       IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     ;
 
 multi_types:

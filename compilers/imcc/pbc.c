@@ -648,6 +648,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     char *real_name;
     struct PackFile_ConstTable *ct;
     IMC_Unit *unit;
+    STRING *vtable_name;
 
     unit = globals.cs->subs->unit;
 
@@ -689,6 +690,18 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
 
     r->color = add_const_str(interpreter, r);
     sub->name = ct->constants[r->color]->u.string;
+
+    if (unit->is_vtable_method == 1) {
+        if (unit->vtable_name != NULL)
+            vtable_name = string_from_cstring(interpreter, 
+                unit->vtable_name, 0);
+        else
+            vtable_name = sub->name;
+    }
+    else {
+        vtable_name = string_from_const_cstring(interpreter, "", 0);
+    }
+    sub->vtable_name = vtable_name;
 
     ns_pmc = NULL;
     if (ns_const >= 0 && ns_const < ct->const_count) {

@@ -61,6 +61,8 @@ typedef struct _IMC_Unit {
     int first_avail[4]; /* INSP */
     SymReg *outer;
     PMC *sub_pmc;       /* this sub */
+    int is_vtable_method; /* 1 if a v-table method */
+    char *vtable_name;  /* v-table method name, if any */
 
     struct imcc_ostat ostat;
 
