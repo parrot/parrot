@@ -120,12 +120,13 @@ a NameSpace or a var, the NameSpace is returned.
 
         if (!b)
             SUPER(key, value);
-    else {
-        PMC *old = b->value;
-        if ((old->vtable->base_type == enum_class_NameSpace) == val_is_NS) {
-            /* simple ns or simple var/sub changed */
-            SUPER(key, value);
-        }
+        else {
+            PMC *old = b->value;
+            if ((old->vtable->base_type == enum_class_NameSpace) 
+                == val_is_NS) {
+                /* simple ns or simple var/sub changed */
+                SUPER(key, value);
+            }
             else if ((PObj_get_FLAGS(old) & FPA_is_ns_ext) &&
                     old->vtable->base_type == enum_class_FixedPMCArray) {
                 /* we have a tuple extension already */
