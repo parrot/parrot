@@ -38,30 +38,66 @@ BEGIN { use_ok 'SmartLink' or die };
     my $link= q{L<S05/bar/baz quux>};
 
     eval{ my $l= SmartLink->new; };
-    like( $@, '/^Attribute \(.*? is required/', '->new requires one or more attributes' );
+    like( $@, '/^Attribute \(.*? is required/',
+        '->new requires one or more attributes' );
 
     my $l= SmartLink->new( link => $link );
 
     isa_ok( $l, 'SmartLink' );
     is( $l->link, $link, '->link returns full link text' );
-    is( $l->doc, 'S05', '->doc returns document identifier' );
     is( $l->section, 'bar', '->section returns document section' );
-    is( $l->docprefix, 'S', '->docprefix returns document prefix' );
-    is( $l->docnum, '05', '->docnum returns documnt number' );
-    is_deeply( $l->keyphrases, [qw/baz quux/],
-        '->keyphrases returns array of keyphrases' );
+    ok( $l->has_keyphrases, '->has_keyphrases returns true' );
+
+    diag 'SmartLink->Keyphrase';
+    my $k= $l->keyphrases;
+    ok( $l->has_keyphrases, '->has_keyphrases returns true' );
+    isa_ok( $k, 'Keyphrase' );
+    is( $k->string, 'baz quux', '->string returns keyphrase string' );
+    is_deeply( $k->list, [qw/baz quux/],
+        '->list returns arrayref of keyphrases' );
+    is( $k->regex, '\bbaz\b.+?\bquux\b', '->regex returns regex' );
+
+    diag 'SmartLink->Doc';
+    my $d= $l->doc;
+    isa_ok( $d, 'Doc' );
+    is( $d->id, 'S05', '->id returns document identifier' );
+    is( $d->prefix, 'S', '->prefix returns document prefix' );
+    is( $d->num, '05', '->num returns document number' );
+
+
+    $link= q{L<S05/bar/>};
+    eval{ my $l= SmartLink->new( link => $link ); };
+    like( $@,
+        '/^Attribute \(link\) does not pass the type constraint \(PodLink\)/',
+        '->new fails with malformed smartlink' );
+
 
     $link= q{L<S05/bar/a b 'c d e' f g "h'i j" k>};
     $l= SmartLink->new( link => $link );
 
     isa_ok( $l, 'SmartLink' );
     is( $l->link, $link, '->link returns full link text' );
-    is( $l->doc, 'S05', '->doc returns document identifier' );
     is( $l->section, 'bar', '->section returns document section' );
-    is( $l->docprefix, 'S', '->docprefix returns document prefix' );
-    is( $l->docnum, '05', '->docnum returns documnt number' );
-    is_deeply( $l->keyphrases, ['a', 'b', 'c d e', 'f', 'g', "h'i j", 'k'],
-        '->keyphrases returns array of keyphrases' );
+    ok( $l->has_keyphrases, '->has_keyphrases returns true' );
+
+    diag 'SmartLink->Keyphrase';
+    $k= $l->keyphrases;
+    ok( $l->has_keyphrases, '->has_keyphrases returns true' );
+    isa_ok( $k, 'Keyphrase' );
+    is( $k->string, q{a b 'c d e' f g "h'i j" k},
+        '->string returns keyphrase string' );
+    is_deeply( $k->list, ['a', 'b', 'c d e', 'f', 'g', "h'i j", 'k'],
+        '->list returns arrayref of keyphrases' );
+    is( $k->regex,
+        q{\ba\b.+?\bb\b.+?\bc\ d\ e\b.+?\bf\b.+?\bg\b.+?\bh\'i\ j\b.+?\bk\b},
+        '->regex returns regex' );
+
+    diag 'SmartLink->Doc';
+    $d= $l->doc;
+    isa_ok( $d, 'Doc' );
+    is( $d->id, 'S05', '->doc returns document identifier' );
+    is( $d->prefix, 'S', '->docprefix returns document prefix' );
+    is( $d->num, '05', '->docnum returns document number' );
 }
 
 {
@@ -69,7 +105,8 @@ BEGIN { use_ok 'SmartLink' or die };
     my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
 
     eval{ my $p= PodFile->new; };
-    like( $@, '/^Attribute \(.*?\) is required/', '->new requires one or more attributes' );
+    like( $@, '/^Attribute \(.*?\) is required/',
+        '->new requires one or more attributes' );
 
     my $p= PodFile->new( filename => $fn );
 

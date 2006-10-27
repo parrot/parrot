@@ -5,7 +5,7 @@ use Text::Balanced qw/extract_multiple extract_quotelike/;
 
 ## links are like
 # L<doc> or L<doc/section> or L<doc/section/keyphrases>
-subtype PodLink => as Str => where { m|^L<([^/]+)(\/([^/]*)){0,2}>| };
+subtype PodLink => as Str => where { m|^L<([^/]+)(\/([^/]+)){0,2}>| };
 
 has 'link' => ( is => 'ro', isa => 'PodLink', required => 1, );
 
@@ -30,9 +30,9 @@ has 'section' => (
 
 has 'keyphrases' => (
     is => 'ro', isa => 'Keyphrase',
-    lazy => 1, default => sub{
-        ($_)= shift->link =~ m|^L<.*?/.*?/([^>]+)|;
-        Keyphrase->new( string => $_ );
+    default => sub{
+        ($_)= shift->link =~ m|^L<.*?/.*?/([^>]+)>|;
+        defined $_ ? Keyphrase->new( string => $_ ) : undef;
     },
     predicate => 'has_keyphrases',
 );
@@ -67,15 +67,16 @@ has 'string' => ( is => 'ro', isa => 'Str', required => 1, );
 has 'list' => (
     is => 'ro', isa => 'ArrayRef',
     lazy => 1, default => sub{
+        my $string= shift->string;
         [
-            extract_multiple($_, [
+            extract_multiple($string, [
                 sub{
                     do{
-                        my @a= (extract_quotelike($_[0]))[5,1];
-                        $_[0]= $a[1]; $a[0];
+                        my @a= (extract_quotelike($string))[5,1];
+                        $string= $a[1]; $a[0];
                     } or do{
                         my @a= split ' ', $_[0], 2;
-                        $_[0]= $a[1]; $a[0];
+                        $string= $a[1]; $a[0];
                     }
                 },
             ])
@@ -86,12 +87,13 @@ has 'list' => (
 has 'regex' => (
     is => 'ro', isa => 'Str',
     lazy => 1, default => sub{
+        my $self= shift;
         join '.+?' => map {
             my $key= quotemeta $_;
             $key =~ s/^\w/\\b$&/;
             $key =~ s/\w$/$&\\b/;
             $key;
-        } @{[ shift->list ]};
+        } @{$self->list};
     },
 );
 
@@ -422,7 +424,7 @@ has 'mergetree' =>(
             $specs= $specs->files;
             for my $spec ( @$specs ) {
                 my $linkdoc= $self->linktree->get_doc( $spec->name );
-                warn $spec->name; # XXX: FIXME: TODO:
+                warn $spec->name,$/; # XXX: FIXME: TODO:
                 next unless $linkdoc;
                 $spec->{_sections}++
             }
