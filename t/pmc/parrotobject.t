@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -35,6 +35,57 @@ current instr\.:/
 OUT
 # '
 
+pir_output_is(<<'CODE', <<'OUT', ':vtable override');
+.sub main :main
+   $P0 = newclass [ "Test" ]
+   $P1 = new [ "Test" ]
+   $I1 = $P1[11]
+   print $I1
+   print "\n"
+.end
+
+.namespace [ "Test" ]
+
+.sub get_integer_keyed_int :method :vtable
+   .param int key
+   .return(42)
+.end
+CODE
+42
+OUT
+# '
+
+pir_output_is(<<'CODE', <<'OUT', ':vtable("...") override');
+.sub main :main
+    $P0 = newclass [ "Test" ]
+    $P1 = new [ "Test" ]
+    $S1 = $P1[11]
+    print $S1
+    print "\n"
+.end
+
+.namespace [ "Test" ]
+
+.sub monkey :method :vtable("get_string_keyed_int")
+    .param int key
+    .return("monkey")
+.end
+CODE
+monkey
+OUT
+# '
+
+pir_output_like(<<'CODE', <<'OUT', ':vtable with bad name');
+.namespace [ "Test" ]
+
+.sub monkey :method :vtable("not_in_the_vtable")
+    .param int key
+    .return("monkey")
+.end
+CODE
+/'not_in_the_vtable' is not a v-table method, but was used with :vtable/
+OUT
+# '
 
 
 # Local Variables:
