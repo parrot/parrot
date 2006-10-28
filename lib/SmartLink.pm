@@ -20,7 +20,7 @@ has 'doc' => (
 has 'section' => (
     is => 'ro', isa => 'Str',
     lazy => 1, default => sub{
-        ($_)= shift->link =~ m|^L<.*?/([^/]+)|;
+        ($_)= shift->link =~ m|^L<.*?/([^/]+)[/>]|;
         length $_
             or die qq{'section' can't be empty!\n} ;
         $_

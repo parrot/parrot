@@ -27,14 +27,17 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Parrot::Test 'no_plan'; #tests => 34;
+use Parrot::Test tests => 65;
 use Test::More;
 
 
 BEGIN { use_ok 'SmartLink' or die };
 
+
+sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
+
 {
-    diag 'SmartLink';
+    vdiag 'SmartLink';
     my $link= q{L<S05/bar/baz quux>};
 
     eval{ my $l= SmartLink->new; };
@@ -48,7 +51,7 @@ BEGIN { use_ok 'SmartLink' or die };
     is( $l->section, 'bar', '->section returns document section' );
     ok( $l->has_keyphrases, '->has_keyphrases returns true' );
 
-    diag 'SmartLink->Keyphrase';
+    vdiag 'SmartLink->Keyphrase';
     my $k= $l->keyphrases;
     ok( $l->has_keyphrases, '->has_keyphrases returns true' );
     isa_ok( $k, 'Keyphrase' );
@@ -57,7 +60,7 @@ BEGIN { use_ok 'SmartLink' or die };
         '->list returns arrayref of keyphrases' );
     is( $k->regex, '\bbaz\b.+?\bquux\b', '->regex returns regex' );
 
-    diag 'SmartLink->Doc';
+    vdiag 'SmartLink->Doc';
     my $d= $l->doc;
     isa_ok( $d, 'Doc' );
     is( $d->id, 'S05', '->id returns document identifier' );
@@ -80,7 +83,7 @@ BEGIN { use_ok 'SmartLink' or die };
     is( $l->section, 'bar', '->section returns document section' );
     ok( $l->has_keyphrases, '->has_keyphrases returns true' );
 
-    diag 'SmartLink->Keyphrase';
+    vdiag 'SmartLink->Keyphrase';
     $k= $l->keyphrases;
     ok( $l->has_keyphrases, '->has_keyphrases returns true' );
     isa_ok( $k, 'Keyphrase' );
@@ -92,16 +95,26 @@ BEGIN { use_ok 'SmartLink' or die };
         q{\ba\b.+?\bb\b.+?\bc\ d\ e\b.+?\bf\b.+?\bg\b.+?\bh\'i\ j\b.+?\bk\b},
         '->regex returns regex' );
 
-    diag 'SmartLink->Doc';
+    vdiag 'SmartLink->Doc';
     $d= $l->doc;
     isa_ok( $d, 'Doc' );
     is( $d->id, 'S05', '->doc returns document identifier' );
     is( $d->prefix, 'S', '->docprefix returns document prefix' );
     is( $d->num, '05', '->docnum returns document number' );
+
+
+    $link= q{L<S05/bar>};
+    $l= SmartLink->new( link => $link );
+
+    isa_ok( $l, 'SmartLink' );
+    is( $l->link, $link, '->link returns full link text' );
+    is( $l->section, 'bar', '->section returns document section' );
+    ok( !$l->has_keyphrases, '->has_keyphrases returns false' );
+    is( $l->keyphrases, undef, '->keyphrases returns undef' );
 }
 
 {
-    diag 'PodFile';
+    vdiag 'PodFile';
     my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
 
     eval{ my $p= PodFile->new; };
@@ -119,7 +132,7 @@ BEGIN { use_ok 'SmartLink' or die };
 }
 
 {
-    diag 'SpecFile';
+    vdiag 'SpecFile';
     my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
     my $pre= 'pdd';
 
@@ -146,7 +159,7 @@ BEGIN { use_ok 'SmartLink' or die };
 }
 
 {
-    diag 'SpecFiles';
+    vdiag 'SpecFiles';
     my $root= 'docs/pdds/';
     my $pre= 'pdd';
 
@@ -167,7 +180,7 @@ BEGIN { use_ok 'SmartLink' or die };
 }
 
 {
-    diag 'TestFile';
+    vdiag 'TestFile';
     my $fn= 't/util/smartlinks.t';
 
     eval{ my $t= TestFile->new; };
