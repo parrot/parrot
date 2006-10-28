@@ -691,18 +691,6 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     r->color = add_const_str(interpreter, r);
     sub->name = ct->constants[r->color]->u.string;
 
-    if (unit->is_vtable_method == 1) {
-        if (unit->vtable_name != NULL)
-            vtable_name = string_from_cstring(interpreter, 
-                unit->vtable_name, 0);
-        else
-            vtable_name = sub->name;
-    }
-    else {
-        vtable_name = string_from_const_cstring(interpreter, "", 0);
-    }
-    sub->vtable_name = vtable_name;
-
     ns_pmc = NULL;
     if (ns_const >= 0 && ns_const < ct->const_count) {
         switch (ct->constants[ns_const]->type) {
@@ -735,6 +723,58 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         sub->multi_signature = NULL;
 
     Parrot_store_sub_in_namespace(interpreter, sub_pmc);
+
+    if (unit->is_vtable_method == 1) {
+        /* Work out the name of the vtable method. */
+        if (unit->vtable_name != NULL)
+            vtable_name = string_from_cstring(interpreter, unit->vtable_name,
+                 0);
+        else
+            vtable_name = sub->name;
+
+        /* Need to store it in a v-table namespace.
+           XXX At the moment, we're just creating a name-managled entry in the
+           namespace to hold these, but in the long run we need a good way to
+           do this. */
+        if (ns_pmc != NULL)
+        {
+            STRING* vtable_ns_name_s = string_from_const_cstring(interpreter,
+                "\0VTABLE\0", 8);
+            PMC* vtable_ns_name;
+            PMC* sub_copy = VTABLE_clone(interpreter, sub_pmc);
+            PMC* vtable_ns_pmc = NULL;
+
+            PMC_sub(sub_copy)->name = vtable_name;
+            PObj_get_FLAGS(sub_copy) &= !SUB_FLAG_PF_ANON;
+            
+            switch (ns_pmc->vtable->base_type)
+            {
+                case PFC_KEY:
+                    /* Just add the extra v-table entry to a copy of the
+                       namespace key. */
+                    vtable_ns_pmc = VTABLE_clone(interpreter, ns_pmc);
+                    vtable_ns_name = pmc_new(interpreter, enum_class_String);
+                    VTABLE_set_string_native(interpreter, vtable_ns_name, 
+                        vtable_ns_name_s);
+                    VTABLE_push_pmc(interpreter, vtable_ns_pmc,
+                        vtable_ns_name);
+                    break;
+                case PFC_STRING:
+                    /* Need to create a new key. */
+                    vtable_ns_pmc = pmc_new(interpreter, enum_class_Key);
+                    VTABLE_push_pmc(interpreter, vtable_ns_pmc, ns_pmc);
+                    vtable_ns_name = pmc_new(interpreter, enum_class_String);
+                    VTABLE_set_string_native(interpreter, vtable_ns_name, 
+                        vtable_ns_name_s);
+                    VTABLE_push_pmc(interpreter, vtable_ns_pmc,
+                        vtable_ns_name);
+                    break;
+            }
+            PMC_sub(sub_copy)->namespace = vtable_ns_pmc;
+
+            Parrot_store_sub_in_namespace(interpreter, sub_copy);
+        }
+    }
 
     pfc->type = PFC_PMC;
     pfc->u.key = sub_pmc;

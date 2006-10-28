@@ -74,7 +74,6 @@ typedef struct Parrot_sub {
 
     /* - end common */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
-    STRING *vtable_name;         /* vtable method name, if any */
 } * parrot_sub_t;
 
 #define PMC_sub(pmc) ((parrot_sub_t)PMC_struct_val(pmc))
