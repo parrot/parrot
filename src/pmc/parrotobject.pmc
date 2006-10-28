@@ -35,6 +35,27 @@ find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
     }
     return Parrot_find_method_with_cache(interpreter, class, meth);
 }
+
+static PMC*
+find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
+    PMC *class = pmc;
+    PMC *ns = NULL;
+    if (PObj_is_object_TEST(pmc)) {
+        class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+    }
+    ns = VTABLE_namespace(interpreter, class);
+    if (!PMC_IS_NULL(ns)) {
+        /* Try and locate the vtable namespace and find the method in it. */
+        STRING *vtable_ns_name = string_from_const_cstring(interpreter,
+            "\0VTABLE\0", 8);
+        PMC *vtable_ns = Parrot_get_namespace_keyed_str(interpreter, ns,
+            vtable_ns_name);
+        if (!PMC_IS_NULL(vtable_ns))
+            return VTABLE_get_pmc_keyed_str(interpreter, vtable_ns, meth);
+    }
+    return NULL;
+}
+
 pmclass ParrotObject extends ParrotClass need_ext {
 
 /*
@@ -231,7 +252,10 @@ use fallback.
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         STRING *meth = CONST_STRING(interpreter, "__get_integer_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "get_integer_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             return Parrot_run_meth_fromc_args_reti(interpreter, sub,
                                               pmc, meth, "II", key);
@@ -242,7 +266,10 @@ use fallback.
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
         STRING *meth = CONST_STRING(interpreter, "__get_number_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "get_number_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             return Parrot_run_meth_fromc_args_retf(interpreter, sub,
                                               pmc, meth, "NI", key);
@@ -253,7 +280,10 @@ use fallback.
 
     STRING* get_string_keyed_int (INTVAL key) {
         STRING *meth = CONST_STRING(interpreter, "__get_string_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "get_string_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             return Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "SI", key);
@@ -264,7 +294,10 @@ use fallback.
 
     PMC* get_pmc_keyed_int (INTVAL key) {
         STRING *meth = CONST_STRING(interpreter, "__get_pmc_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "get_pmc_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             return Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "PI", key);
@@ -275,7 +308,10 @@ use fallback.
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         STRING *meth = CONST_STRING(interpreter, "__set_integer_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "set_integer_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vII", key, value);
@@ -286,7 +322,10 @@ use fallback.
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         STRING *meth = CONST_STRING(interpreter, "__set_number_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "set_number_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vIN", key, value);
@@ -297,7 +336,10 @@ use fallback.
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
         STRING *meth = CONST_STRING(interpreter, "__set_string_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "set_string_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vIS", key, value);
@@ -308,7 +350,10 @@ use fallback.
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
         STRING *meth = CONST_STRING(interpreter, "__set_pmc_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "set_pmc_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vIP", key, value);
@@ -319,7 +364,10 @@ use fallback.
 
     void delete_keyed_int (INTVAL key) {
         STRING *meth = CONST_STRING(interpreter, "__delete_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "delete_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vI", key);
@@ -330,7 +378,10 @@ use fallback.
 
     INTVAL defined_keyed_int (INTVAL key) {
         STRING *meth = CONST_STRING(interpreter, "__defined_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "defined_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             return Parrot_run_meth_fromc_args_reti(interpreter, sub,
                                               pmc, meth, "II", key);
@@ -341,7 +392,10 @@ use fallback.
 
     INTVAL exists_keyed_int (INTVAL key) {
         STRING *meth = CONST_STRING(interpreter, "__exists_keyed_int");
-        PMC *sub = find_meth(interpreter, pmc, meth);
+        STRING *meth_v = CONST_STRING(interpreter, "exists_keyed_int");
+        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             return Parrot_run_meth_fromc_args_reti(interpreter, sub,
                                               pmc, meth, "II", key);

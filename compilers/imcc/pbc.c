@@ -727,8 +727,8 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     if (unit->is_vtable_method == 1) {
         /* Work out the name of the vtable method. */
         if (unit->vtable_name != NULL)
-            vtable_name = string_from_cstring(interpreter, unit->vtable_name,
-                 0);
+            vtable_name = string_from_cstring(interpreter, unit->vtable_name + 1,
+                 strlen(unit->vtable_name) - 2);
         else
             vtable_name = sub->name;
 
@@ -736,38 +736,39 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
            XXX At the moment, we're just creating a name-managled entry in the
            namespace to hold these, but in the long run we need a good way to
            do this. */
-        if (ns_pmc != NULL)
+        if (!PMC_IS_NULL(ns_pmc))
         {
             STRING* vtable_ns_name_s = string_from_const_cstring(interpreter,
                 "\0VTABLE\0", 8);
             PMC* vtable_ns_name;
             PMC* sub_copy = VTABLE_clone(interpreter, sub_pmc);
             PMC* vtable_ns_pmc = NULL;
+            PMC* tmp = NULL;
 
             PMC_sub(sub_copy)->name = vtable_name;
             PObj_get_FLAGS(sub_copy) &= !SUB_FLAG_PF_ANON;
             
             switch (ns_pmc->vtable->base_type)
             {
-                case PFC_KEY:
+                case enum_class_Key:
                     /* Just add the extra v-table entry to a copy of the
                        namespace key. */
                     vtable_ns_pmc = VTABLE_clone(interpreter, ns_pmc);
-                    vtable_ns_name = pmc_new(interpreter, enum_class_String);
+                    vtable_ns_name = pmc_new(interpreter, enum_class_Key);
                     VTABLE_set_string_native(interpreter, vtable_ns_name, 
                         vtable_ns_name_s);
                     VTABLE_push_pmc(interpreter, vtable_ns_pmc,
                         vtable_ns_name);
                     break;
-                case PFC_STRING:
+                case enum_class_String:
                     /* Need to create a new key. */
                     vtable_ns_pmc = pmc_new(interpreter, enum_class_Key);
-                    VTABLE_push_pmc(interpreter, vtable_ns_pmc, ns_pmc);
-                    vtable_ns_name = pmc_new(interpreter, enum_class_String);
-                    VTABLE_set_string_native(interpreter, vtable_ns_name, 
+                    VTABLE_set_string_native(interpreter, vtable_ns_pmc,
+                        VTABLE_get_string(interpreter, ns_pmc));
+                    tmp = pmc_new(interpreter, enum_class_Key);
+                    VTABLE_set_string_native(interpreter, tmp, 
                         vtable_ns_name_s);
-                    VTABLE_push_pmc(interpreter, vtable_ns_pmc,
-                        vtable_ns_name);
+                    VTABLE_push_pmc(interpreter, vtable_ns_pmc, tmp);
                     break;
             }
             PMC_sub(sub_copy)->namespace = vtable_ns_pmc;
