@@ -649,6 +649,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     struct PackFile_ConstTable *ct;
     IMC_Unit *unit;
     STRING *vtable_name;
+    char *c_name;
 
     unit = globals.cs->subs->unit;
 
@@ -731,6 +732,23 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
                  strlen(unit->vtable_name) - 2);
         else
             vtable_name = sub->name;
+
+        /* Check this is a valid vtable method to override. */
+        c_name = string_to_cstring(interpreter, vtable_name);
+        if (!(strcmp(c_name, "get_integer_keyed_int") == 0 ||
+              strcmp(c_name, "get_number_keyed_int") == 0 ||
+              strcmp(c_name, "get_string_keyed_int") == 0 ||
+              strcmp(c_name, "get_pmc_keyed_int") == 0 ||
+              strcmp(c_name, "set_integer_keyed_int") == 0 ||
+              strcmp(c_name, "set_number_keyed_int") == 0 ||
+              strcmp(c_name, "set_string_keyed_int") == 0 ||
+              strcmp(c_name, "set_pmc_keyed_int") == 0 ||
+              strcmp(c_name, "delete_keyed_int") == 0 ||
+              strcmp(c_name, "defined_keyed_int") == 0 ||
+              strcmp(c_name, "exists_keyed_int") == 0))
+            IMCC_fatal(interpreter, 1,
+                "'%s' is not a v-table method, but was used with :vtable.\n",
+                c_name);
 
         /* Need to store it in a v-table namespace.
            XXX At the moment, we're just creating a name-managled entry in the
