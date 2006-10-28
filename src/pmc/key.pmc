@@ -227,6 +227,9 @@ Appends C<*value> to the key.
 */
 
     void push_pmc (PMC * value) {
+        if (value->vtable->base_type != enum_class_Key)
+            real_exception(interpreter, NULL, INVALID_OPERATION,
+                "Can only push another Key onto a Key PMC.");
         key_append(INTERP, SELF, value);
     }
 
