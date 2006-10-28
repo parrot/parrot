@@ -115,6 +115,30 @@ The PMC for Parrot's base object type.
 The PMC that represents a reference to another PMC. Delegates all functions to
 the referred-to PMC.
 
+=item AggregateElementRef
+
+This PMC represents a reference to an element contained in an aggregate PMC
+type, such as an array or hash. It is initialized with the key being 
+referenced and the aggregate PMC containing that key. 
+
+Note that assigning to the reference PMC will be equivalent to a keyed set on
+the referenced aggregate PMC - that is, it modifies the element rather than
+doing a v-table call on the element itself. It is important to be aware of
+this when assigning a PMC through this reference; it is not the same behaviour
+as the Ref PMC.
+
+=item WeakRegisterRef
+
+This PMC represents a weak reference to a register. Should the reference live
+beyond the context containing the register that it references, any attempt to
+use the reference will throw an exception.
+
+A weak register reference can only be created by the C<register_ref> opcode.
+Any assignment to the register will behave like a set instruction. That is,
+when assigning a PMC using a WeakRegisterRef PMC, the register will be updated
+to reference that PMC rather than calling the assign v-table call on the PMC
+in that register. This is not the same behaviour as the Ref PMC.
+
 =item Random
 
 A singleton PMC that generates a random number. {{ NOTE: Why do we have
