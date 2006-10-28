@@ -72,13 +72,6 @@ check_spaces:
   # length instead of -1 upon failure.
   if $I0 != chars goto quote
 
-  # {}'d constructs
-check_spaces:
-  $I0 = find_cclass .CCLASS_WHITESPACE, str, 0, chars
-  # Unlike any other 'find a character' opcode, this returns
-  # length instead of -1 upon failure.
-  if $I0 != chars goto quote
-
   goto append_elem
 
 escape:
