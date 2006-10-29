@@ -41,6 +41,13 @@ methods that do not get inherited.
 
 .Net: Like attributes, methods may be public, private, protected or internal.
 
+=head2 Constructors
+A constructor is run when an object is instantiated.
+
+.Net: There may be many constructors for an object (provided they all have
+different signatures), and the correct one is called based upon the passed
+parameters.
+
 =head2 Inheritance
 Perl 6: Multiple inheritance.
 
