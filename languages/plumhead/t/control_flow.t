@@ -22,18 +22,18 @@ use Parrot::Config ();
 use Parrot::Test;
 use Test::More     tests => 1;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED' . q{   }, 'hello' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED' . q{  }, 'hello' );
 <?php
 if (1) {
-   ?>
-    <strong>Dies ist wahr.</strong>
-   <?php
+  ?>
+    <strong>Condition is true.</strong>
+  <?php
 } else {
-   ?>
-    <strong>Dies ist falsch.</strong>
-   <?php
+  ?>
+    <strong>Condition is false.</strong>
+  <?php
 }
 ?>
 END_CODE
-    <strong>Dies ist wahr.</strong>
+    <strong>Condition is true.</strong>
 END_EXPECTED
