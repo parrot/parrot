@@ -753,11 +753,22 @@ do_initcall(Interp* interpreter, PMC* class, PMC *object, PMC *init)
         /* no method found and no BUILD property set? */
         if (!meth && meth_str == NULL) {
             PMC *ns;
+            PMC *vtable_ns;
+            STRING *vtable_ns_name = string_from_const_cstring(interpreter,
+                "\0VTABLE\0", 8);
+            STRING *meth_str_v;
             /* use __init as fallback constructor method, if it exists */
             meth_str = CONST_STRING(interpreter, "__init");
+            meth_str_v = CONST_STRING(interpreter, "init");
             ns = VTABLE_namespace(interpreter, parent_class);
+            vtable_ns = Parrot_get_namespace_keyed_str(interpreter, ns,
+                vtable_ns_name);
             /* can't use find_method, it walks mro */
-            meth = VTABLE_get_pmc_keyed_str(interpreter, ns, meth_str);
+            if (!PMC_IS_NULL(vtable_ns))
+                meth = VTABLE_get_pmc_keyed_str(interpreter, vtable_ns,
+                    meth_str_v);
+            if (PMC_IS_NULL(meth))
+                meth = VTABLE_get_pmc_keyed_str(interpreter, ns, meth_str);
             if (meth == PMCNULL)
                 meth = NULL;
             default_meth = 1;

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -84,6 +84,24 @@ pir_output_like(<<'CODE', <<'OUT', ':vtable with bad name');
 .end
 CODE
 /'not_in_the_vtable' is not a v-table method, but was used with :vtable/
+OUT
+# '
+
+pir_output_is(<<'CODE', <<'OUT', ':vtable and init');
+.sub main :main
+   $P0 = newclass [ "Test" ]
+   $P1 = new [ "Test" ]
+   print "ok\n"
+.end
+
+.namespace [ "Test" ]
+
+.sub init :method :vtable
+   print "init\n"
+.end
+CODE
+init
+ok
 OUT
 # '
 
