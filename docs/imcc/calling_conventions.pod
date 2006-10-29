@@ -117,6 +117,12 @@ B<:load> is ignored, if another subroutine in that file is marked with
 B<:main>. If multiple subs have the B<:load> pragma, the subs are
 run in source code order.
 
+=item :init
+
+Run the subroutine when the program is run directly (that is, not loaded as a
+module). This is different from B<:load>, which runs a subroutine when a
+library is being loaded. To get both behaviours, use B<:init :load>.
+
 =item :anon
 
 Do not install this subroutine in the namespace. Allows the subroutine
@@ -135,6 +141,16 @@ C<BEGIN> in perl5.)
 
 The marked C<.sub> is a method. In the method body, the object PMC
 can be referred to with C<self>.
+
+=item :vtable
+
+The marked C<.sub> overrides a v-table method. By default, a sub with the same
+name as a v-table method does not override the v-table method. To specify that
+there should be no namespace entry (that is, it just overrides the v-table
+method but is callable as a normal method), use B<:vtable :anon>. To give the
+v-table method a different name, use B<:vtable("...")>. For example, to have
+the method B<ToString> also be the v-table method B<get_string>), use
+B<:vtable("get_string")>.
 
 =back
 
