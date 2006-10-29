@@ -34,7 +34,7 @@ opcode.
     .return self.'accessor'('dest', dest, passed_dest)
 .end
 
-.sub __clone :method
+.sub 'clone' :method :anon :vtable
     .local pmc result
     result = new 'POST::Label'
     $P1 = self.'name'()

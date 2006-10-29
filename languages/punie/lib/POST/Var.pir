@@ -101,7 +101,7 @@ loop:
     .return ($P1)
 .end
 
-.sub __clone :method
+.sub 'clone' :method :anon :vtable
     .local pmc result
     result = new 'POST::Var'
     $P1 = self.'varname'()
