@@ -27,6 +27,30 @@ Handles class and object manipulation.
 static void parrot_class_register(Interp * , PMC *name,
         PMC *new_class, PMC *parent, PMC *mro);
 
+/*
+
+=item C<int Parrot_is_vtable_name(Interp *, const char *name)>
+
+Return true if C<name> is a valid vtable slot name.
+
+=cut
+
+*/
+
+int 
+Parrot_is_vtable_name(Interp *interpreter, const char *name)
+{
+    int i;
+    const char *meth;
+    for (i = 0; (meth = Parrot_vtable_slot_names[i]); ++i) {
+        if (!*meth)
+            continue;
+        /* XXX slot_names still have __ in front */
+        if (strcmp(name, meth + 2) == 0)
+            return 1;
+    }
+    return 0;
+}
 
 STRING*
 readable_name(Interp *interpreter, PMC *name)
