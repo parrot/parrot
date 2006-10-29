@@ -43,7 +43,7 @@ find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
 
     if (PObj_is_object_TEST(pmc)) {
-        class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+        class = GET_CLASS(PMC_data(pmc), pmc);
     }
     return Parrot_find_method_with_cache(interpreter, class, meth);
 }
@@ -53,7 +53,7 @@ find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
     PMC *ns = NULL;
     if (PObj_is_object_TEST(pmc)) {
-        class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+        class = GET_CLASS(PMC_data(pmc), pmc);
     }
     ns = VTABLE_namespace(interpreter, class);
     if (!PMC_IS_NULL(ns)) {
@@ -86,7 +86,7 @@ find_or_die(Interp* interpreter, PMC *pmc, STRING *meth) {
     if (PMC_IS_NULL(returnPMC)) {
         PMC *class = pmc;
         if (PObj_is_object_TEST(pmc)) {
-            class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+            class = GET_CLASS(PMC_data(pmc), pmc);
             real_exception(interpreter, NULL, E_LookupError,
                 "Can't find method '%s' for object '%s'",
                 string_to_cstring(interpreter, meth),
