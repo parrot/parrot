@@ -48,6 +48,26 @@ find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
     return Parrot_find_method_with_cache(interpreter, class, meth);
 }
 
+static PMC*
+find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
+    PMC *class = pmc;
+    PMC *ns = NULL;
+    if (PObj_is_object_TEST(pmc)) {
+        class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+    }
+    ns = VTABLE_namespace(interpreter, class);
+    if (!PMC_IS_NULL(ns)) {
+        /* Try and locate the vtable namespace and find the method in it. */
+        STRING *vtable_ns_name = string_from_const_cstring(interpreter,
+            "\0VTABLE\0", 8);
+        PMC *vtable_ns = Parrot_get_namespace_keyed_str(interpreter, ns,
+            vtable_ns_name);
+        if (!PMC_IS_NULL(vtable_ns))
+            return VTABLE_get_pmc_keyed_str(interpreter, vtable_ns, meth);
+    }
+    return NULL;
+}
+
 /*
 
 =item C<static PMC *
@@ -111,8 +131,11 @@ noarg_noreturn(Interp* interpreter, PMC *obj, PMC* class,
         const char *name, int die)
 {
     STRING *meth = const_string(interpreter, name);
-    PMC *method = die ? find_or_die(interpreter, class, meth) :
-        find_meth(interpreter, class, meth);
+    STRING *meth_v = const_string(interpreter, name + 2);
+    PMC *method = find_vtable_meth(interpreter, class, meth);
+    if (PMC_IS_NULL(method))
+        method = die ? find_or_die(interpreter, class, meth) :
+            find_meth(interpreter, class, meth);
     if (PMC_IS_NULL(method)) {
         if (Interp_trace_TEST(interpreter, PARROT_TRACE_FIND_METH_FLAG)) {
             PIO_eprintf(interpreter, "# not found\n");
@@ -167,7 +190,9 @@ useful defaults and don't throw exceptions.
     PMC* instantiate(PMC* sig) {
         STRING *meth = const_string(INTERP,
                 PARROT_VTABLE_INSTANTIATE_METHNAME);
-        PMC *sub = find_meth(INTERP, SELF, meth);
+        PMC *sub = find_vtable_meth(INTERP, SELF, meth);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(INTERP, SELF, meth);
 
         if (PMC_IS_NULL(sub)) {
             /* run default fallback that constructs an empty object */

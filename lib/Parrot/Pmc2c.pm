@@ -1965,7 +1965,10 @@ EOC
     $cout .= "    $ret_def\n" if $ret_def;
     $cout .= <<EOC;
     STRING *meth = CONST_STRING(interpreter, "__$meth");
-    PMC *sub = find_or_die(interpreter, pmc, meth);
+    STRING *meth_v = CONST_STRING(interpreter, "$meth");
+    PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+    if (PMC_IS_NULL(sub))
+        sub = find_or_die(interpreter, pmc, meth);
     ${func_ret}Parrot_run_meth_fromc_args$ret_type(interpreter, sub,
         pmc, meth, "$sig"$arg);
 EOC

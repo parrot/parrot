@@ -735,17 +735,142 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
 
         /* Check this is a valid vtable method to override. */
         c_name = string_to_cstring(interpreter, vtable_name);
-        if (!(strcmp(c_name, "get_integer_keyed_int") == 0 ||
+        if (!(strcmp(c_name, PARROT_VTABLE_INIT_METHNAME) == 0 ||
+              strcmp(c_name, "new_from_string") == 0 ||
+              strcmp(c_name, "instantiate") == 0 ||
+              strcmp(c_name, "morph") == 0 ||
+              strcmp(c_name, "getprop") == 0 ||
+              strcmp(c_name, "setprop") == 0 ||
+              strcmp(c_name, "delprop") == 0 ||
+              strcmp(c_name, "getprops") == 0 ||
+              strcmp(c_name, "type_keyed") == 0 ||
+              strcmp(c_name, "type_keyed_int") == 0 ||
+              strcmp(c_name, "type_keyed_str") == 0 ||
+              strcmp(c_name, "subtype") == 0 ||
+              strcmp(c_name, "clone") == 0 ||
+              strcmp(c_name, "find_method") == 0 ||
+              strcmp(c_name, "hash") == 0 ||
+              strcmp(c_name, "get_integer") == 0 ||
+              strcmp(c_name, "get_integer_keyed") == 0 ||
+              strcmp(c_name, "get_integer_keyed_int") == 0 ||
+              strcmp(c_name, "get_integer_keyed_str") == 0 ||
+              strcmp(c_name, "get_number") == 0 ||
+              strcmp(c_name, "get_number_keyed") == 0 ||
               strcmp(c_name, "get_number_keyed_int") == 0 ||
+              strcmp(c_name, "get_number_keyed_str") == 0 ||
+              strcmp(c_name, "get_bignum") == 0 ||
+              strcmp(c_name, "get_repr") == 0 ||
+              strcmp(c_name, "get_string") == 0 ||
+              strcmp(c_name, "get_string_keyed") == 0 ||
               strcmp(c_name, "get_string_keyed_int") == 0 ||
+              strcmp(c_name, "get_string_keyed_str") == 0 ||
+              strcmp(c_name, "get_bool") == 0 ||
+              strcmp(c_name, "get_pmc") == 0 ||
+              strcmp(c_name, "get_pmc_keyed") == 0 ||
               strcmp(c_name, "get_pmc_keyed_int") == 0 ||
+              strcmp(c_name, "get_pmc_keyed_str") == 0 ||
+              strcmp(c_name, "slice") == 0 ||
+              strcmp(c_name, "get_pointer") == 0 ||
+              strcmp(c_name, "get_pointer_keyed") == 0 ||
+              strcmp(c_name, "get_pointer_keyed_int") == 0 ||
+              strcmp(c_name, "get_pointer_keyed_str") == 0 ||
+              strcmp(c_name, "set_integer_native") == 0 ||
+              strcmp(c_name, "set_integer_same") == 0 ||
+              strcmp(c_name, "set_integer_keyed") == 0 ||
               strcmp(c_name, "set_integer_keyed_int") == 0 ||
+              strcmp(c_name, "set_integer_keyed_str") == 0 ||
+              strcmp(c_name, "set_number_native") == 0 ||
+              strcmp(c_name, "set_number_same") == 0 ||
+              strcmp(c_name, "set_number_keyed") == 0 ||
               strcmp(c_name, "set_number_keyed_int") == 0 ||
+              strcmp(c_name, "set_number_keyed_str") == 0 ||
+              strcmp(c_name, "set_bignum_int") == 0 ||
+              strcmp(c_name, "set_bignum_num") == 0 ||
+              strcmp(c_name, "set_bignum_str") == 0 ||
+              strcmp(c_name, "set_string_native") == 0 ||
+              strcmp(c_name, "assign_string_native") == 0 ||
+              strcmp(c_name, "set_string_same") == 0 ||
+              strcmp(c_name, "set_string_keyed") == 0 ||
               strcmp(c_name, "set_string_keyed_int") == 0 ||
+              strcmp(c_name, "set_string_keyed_str") == 0 ||
+              strcmp(c_name, "set_bool") == 0 ||
+              strcmp(c_name, "set_pmc") == 0 ||
+              strcmp(c_name, "assign_pmc") == 0 ||
+              strcmp(c_name, "set_pmc_keyed") == 0 ||
               strcmp(c_name, "set_pmc_keyed_int") == 0 ||
-              strcmp(c_name, "delete_keyed_int") == 0 ||
+              strcmp(c_name, "set_pmc_keyed_str") == 0 ||
+              strcmp(c_name, "set_pointer") == 0 ||
+              strcmp(c_name, "set_pointer_keyed") == 0 ||
+              strcmp(c_name, "set_pointer_keyed_int") == 0 ||
+              strcmp(c_name, "set_pointer_keyed_str") == 0 ||
+              strcmp(c_name, "elements") == 0 ||
+              strcmp(c_name, "pop_integer") == 0 ||
+              strcmp(c_name, "pop_float") == 0 ||
+              strcmp(c_name, "pop_string") == 0 ||
+              strcmp(c_name, "pop_pmc") == 0 ||
+              strcmp(c_name, "push_integer") == 0 ||
+              strcmp(c_name, "push_float") == 0 ||
+              strcmp(c_name, "push_string") == 0 ||
+              strcmp(c_name, "push_pmc") == 0 ||
+              strcmp(c_name, "shift_integer") == 0 ||
+              strcmp(c_name, "shift_float") == 0 ||
+              strcmp(c_name, "shift_string") == 0 ||
+              strcmp(c_name, "shift_pmc") == 0 ||
+              strcmp(c_name, "unshift_integer") == 0 ||
+              strcmp(c_name, "unshift_float") == 0 ||
+              strcmp(c_name, "unshift_string") == 0 ||
+              strcmp(c_name, "unshift_pmc") == 0 ||
+              strcmp(c_name, "splice") == 0 ||
+              strcmp(c_name, "increment") == 0 ||
+              strcmp(c_name, "decrement") == 0 ||
+              strcmp(c_name, "absolute") == 0 ||
+              strcmp(c_name, "i_absolute") == 0 ||
+              strcmp(c_name, "neg") == 0 ||
+              strcmp(c_name, "i_neg") == 0 ||
+              strcmp(c_name, "bitwise_not") == 0 ||
+              strcmp(c_name, "i_bitwise_not") == 0 ||
+              strcmp(c_name, "bitwise_nots") == 0 ||
+              strcmp(c_name, "i_bitwise_nots") == 0 ||
+              strcmp(c_name, "is_same") == 0 ||
+              strcmp(c_name, "logical_not") == 0 ||
+              strcmp(c_name, "i_logical_not") == 0 ||
+              strcmp(c_name, "substr") == 0 ||
+              strcmp(c_name, "substr_str") == 0 ||
+              strcmp(c_name, "exists_keyed") == 0 ||
+              strcmp(c_name, "exists_keyed_int") == 0 ||
+              strcmp(c_name, "exists_keyed_str") == 0 ||
+              strcmp(c_name, "defined_keyed") == 0 ||
               strcmp(c_name, "defined_keyed_int") == 0 ||
-              strcmp(c_name, "exists_keyed_int") == 0))
+              strcmp(c_name, "defined_keyed_str") == 0 ||
+              strcmp(c_name, "delete_keyed") == 0 ||
+              strcmp(c_name, "delete_keyed_int") == 0 ||
+              strcmp(c_name, "delete_keyed_str") == 0 ||
+              strcmp(c_name, "nextkey_keyed") == 0 ||
+              strcmp(c_name, "nextkey_keyed_int") == 0 ||
+              strcmp(c_name, "nextkey_keyed_str") == 0 ||
+              strcmp(c_name, "get_iter") == 0 ||
+              strcmp(c_name, "invoke") == 0 ||
+              strcmp(c_name, "can") == 0 ||
+              strcmp(c_name, "does") == 0 ||
+              strcmp(c_name, "isa") == 0 ||
+              strcmp(c_name, "subclass") == 0 ||
+              strcmp(c_name, "get_attr") == 0 ||
+              strcmp(c_name, "get_attr_str") == 0 ||
+              strcmp(c_name, "set_attr") == 0 ||
+              strcmp(c_name, "set_attr_str") == 0 ||
+              strcmp(c_name, "get_class") == 0 ||
+              strcmp(c_name, "add_parent") == 0 ||
+              strcmp(c_name, "become_parent") == 0 ||
+              strcmp(c_name, "class_type") == 0 ||
+              strcmp(c_name, "remove_method") == 0 ||
+              strcmp(c_name, "new_singleton") == 0 ||
+              strcmp(c_name, "get_anonymous_subclass") == 0 ||
+              strcmp(c_name, "freeze") == 0 ||
+              strcmp(c_name, "thaw") == 0 ||
+              strcmp(c_name, "thawfinish") == 0 ||
+              strcmp(c_name, "visit") == 0 ||
+              strcmp(c_name, "share") == 0 ||
+              strcmp(c_name, "share_ro") == 0))
             IMCC_fatal(interpreter, 1,
                 "'%s' is not a v-table method, but was used with :vtable.\n",
                 c_name);
