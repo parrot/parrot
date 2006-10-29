@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -101,6 +101,29 @@ pir_output_is(<<'CODE', <<'OUT', ':vtable and init');
 .end
 CODE
 init
+ok
+OUT
+# '
+
+pir_output_is(<<'CODE', <<'OUT', ':vtable inheritance');
+.sub main :main
+   $P0 = newclass [ "Test" ]
+   $P1 = newclass [ "Test2" ]
+   addparent $P1, $P0
+   $P2 = new [ "Test2" ]
+   $P3 = clone $P2
+   print "ok\n"
+.end
+
+.namespace [ "Test" ]
+
+.sub clone :method :vtable
+   print "cloned\n"
+.end
+
+.namespace [ "Test2" ]
+CODE
+cloned
 ok
 OUT
 # '

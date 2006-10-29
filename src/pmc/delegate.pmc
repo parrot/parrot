@@ -52,19 +52,37 @@ static PMC*
 find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
     PMC *ns = NULL;
+    PMC *mro;
+    INTVAL i, n;
+
+    /* Get class. */
     if (PObj_is_object_TEST(pmc)) {
-        class = GET_CLASS(PMC_data(pmc), pmc);
+        class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
     }
-    ns = VTABLE_namespace(interpreter, class);
-    if (!PMC_IS_NULL(ns)) {
-        /* Try and locate the vtable namespace and find the method in it. */
-        STRING *vtable_ns_name = string_from_const_cstring(interpreter,
-            "\0VTABLE\0", 8);
-        PMC *vtable_ns = Parrot_get_namespace_keyed_str(interpreter, ns,
-            vtable_ns_name);
-        if (!PMC_IS_NULL(vtable_ns))
-            return VTABLE_get_pmc_keyed_str(interpreter, vtable_ns, meth);
+
+    /* Get MRO and iterate over it to find method. */
+    mro = class->vtable->mro;
+    n = VTABLE_elements(interpreter, mro);
+    for (i = 0; i < n; ++i) {
+        class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
+        ns = VTABLE_namespace(interpreter, class);
+        if (!PMC_IS_NULL(ns)) {
+            /* Try and locate the vtable namespace and find the method. */
+            STRING *vtable_ns_name = string_from_const_cstring(interpreter,
+                "\0VTABLE\0", 8);
+            PMC *vtable_ns = Parrot_get_namespace_keyed_str(interpreter, ns,
+                vtable_ns_name);
+            if (!PMC_IS_NULL(vtable_ns))
+            {
+                PMC *res = VTABLE_get_pmc_keyed_str(interpreter, vtable_ns,
+                    meth);
+                if (!PMC_IS_NULL(res))
+                    return res;
+            }
+        }
     }
+
+    /* If we get here, not found in the current class. */
     return NULL;
 }
 
