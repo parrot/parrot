@@ -10,12 +10,33 @@ This PDD is due an overhaul. This requirements section is for language
 implementers to list the OO-related needs of their language in so as to aid
 that.
 
+=head2 PMCS
+
+Ruby: Just like small talk, everything is an object.  I'm hoping to be able to 
+implement core Ruby classes(String, Array, Hash, Module, etc)  something like this.
+
+ParrotClass
+    |
+ RubyClass   String
+    |         |
+     \      /
+    RubyString
+
+=head2 Objectspace
+
+Ruby: Objectspace in ruby allows the programmer to iterate through every live object
+in the system.  There is some debate about how to make this play nice with different
+garbage collection schemes.
+
 =head2 Classes
 A class is a collection of methods and attributes. It would be desirable, for
 those classes whose definition is fully known at compile time, to have a
 convenient way to have the class along with its attributes and methods stored
 into a PBC file rather than created at runtime. However, creation of new
 classes at runtime will be needed too.
+
+=head2 Meta-classes
+Ruby: Ruby has meta classes.  It would be nice if classes were objects in Parrots OO model.
 
 =head2 Attributes
 Attributes are instance data associated with a class (or role, however those
@@ -27,12 +48,14 @@ subclasses).
 
 .Net: Attributes may be private (not externally visible), public (always
 externally visible), protected (only visible to subclasses) and internal
-(only visible inside the current assembly - the closest correspondnece in
+(only visible inside the current assembly - the closest correspondence in
 Parrot is perhaps only visible inside the same PBC file). Additionally, it
 is allowable for a subclass to introduce an attribute of the same name as
 the a parent class has, and they both exist depending on what type an
 instance of the class is currently viewed as being (read: there is a
 difference between the type of the reference and the type of the value).
+
+Ruby: Attributes can be dynamically added and removed at runtime.
 
 =head2 Methods
 Perl 6: Methods may be public (anyone can invoke them) or private (only
@@ -40,6 +63,9 @@ invokable by the class they are defined in). Additionally, submethods are
 methods that do not get inherited.
 
 .Net: Like attributes, methods may be public, private, protected or internal.
+
+Ruby: has a method_missing that gets called when method resolution fails to find a method.
+Methods can be dynamically added and removed at runtime.
 
 =head2 Constructors
 A constructor is run when an object is instantiated.
@@ -53,13 +79,15 @@ Perl 6: Multiple inheritance.
 
 .Net: Single inheritance.
 
+Ruby: Single inheritance but support for mixins of ruby modules.
+
 =head2 Interfaces
 An interface specifies a set of methods that must be implemented by a class
 that inherits (or implements) the interface, but does not provide any form of
 implementation for them.
 
 .Net: Interfaces are pretty much what was just describe above. XXX Need to
-check behaviour of you implement two interfaces with methods of the same name.
+check behavior of you implement two interfaces with methods of the same name.
 
 =head2 Roles
 A role consists of a set of methods and attributes. It cannot be instantiated
