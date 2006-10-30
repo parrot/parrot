@@ -7,9 +7,14 @@ use warnings;
 use Lua::opcode;
 use Lua::symbtab;
 
+my %tmp_root = (
+    'pmc'   => '$P',
+    'int'   => '$I',
+);
+
 sub new_tmp {
     my ( $parser, $type, $subtype ) = @_;
-    my $idf = 'tmp_' . $parser->YYData->{idx_tmp}++;
+    my $idf = $tmp_root{$type} . $parser->YYData->{idx_tmp}++;
     return new defn( $idf, 'tmp', $type, $subtype );
 }
 
@@ -67,6 +72,8 @@ sub PushScopeF {
     $parser->YYData->{scope} = [];
     unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{lex_num};
     $parser->YYData->{lex_num} = 0;
+    unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{idx_tmp};
+    $parser->YYData->{idx_tmp} = 0;
 ##    warn "PushScopeF\n";
     return;
 }
@@ -74,6 +81,8 @@ sub PushScopeF {
 sub PopScopeF {
     my ($parser) = @_;
 
+    my $idx_tmp = shift @{ $parser->YYData->{scopef} };
+    $parser->YYData->{idx_tmp} = $idx_tmp;
     my $lex_num = shift @{ $parser->YYData->{scopef} };
     $parser->YYData->{lex_num} = $lex_num;
     my $scope = shift @{ $parser->YYData->{scopef} };
@@ -131,11 +140,10 @@ sub BuildLiteral {
         return [ $defn, [] ];
     }
     else {
-        my $name    = 'cst_' . $parser->YYData->{idx_cst}++;
         my @opcodes = ();
-        $defn = new defn( $name, 'const', 'pmc', $type );
-        $parser->YYData->{symbtab_cst}->Insert( $type . $value, $defn );
         if ( $type eq 'key' ) {
+            my $name = 'k_' . $value;
+            $defn = new defn( $name, 'const', 'pmc', $type );
             push @opcodes, new ConstDir( $parser,
                 'prolog' => 1,
                 'result' => $defn,
@@ -144,6 +152,8 @@ sub BuildLiteral {
             );
         }
         else {
+            my $name = '$P' . $parser->YYData->{idx_tmp}++;
+            $defn = new defn( $name, 'const', 'pmc', $type );
             push @opcodes, new LocalDir( $parser,
                 'prolog' => 1,
                 'result' => $defn,
@@ -183,6 +193,7 @@ sub BuildLiteral {
                 );
             }
         }
+        $parser->YYData->{symbtab_cst}->Insert( $type . $value, $defn );
         return [ $defn, \@opcodes ];
     }
 }

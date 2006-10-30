@@ -164,11 +164,10 @@ package pirVisitor;
     }
 
     sub visitNoOp {
-        my $self = shift;
-        my ($op) = @_;
-        my $FH   = $self->{fh};
-
-        #    print {$FH} "  noop\n";
+        #my $self = shift;
+        #my ($op) = @_;
+        #my $FH   = $self->{fh};
+        #print {$FH} "  noop\n";
         return;
     }
 
@@ -297,7 +296,6 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "\n";
         print {$FH} "$op->{arg1}->{symbol}:\n";
         return;
     }
@@ -306,8 +304,7 @@ package pirVisitor;
         my $self  = shift;
         my ($dir) = @_;
         my $FH    = $self->{fh};
-        print {$FH} "\n";
-        print {$FH} ".sub '$dir->{result}->{symbol}' :anon";
+        print {$FH} ".sub '$dir->{result}->{symbol}' :anon :lex";
         if ( exists $dir->{outer} ) {
             print {$FH} " :outer($dir->{outer})";
         }
@@ -360,6 +357,7 @@ package pirVisitor;
     sub visitLocalDir {
         my $self  = shift;
         my ($dir) = @_;
+        return if ($dir->{result}->{symbol} =~ /^\$/);
         my $FH    = $self->{fh};
         print {$FH}
             "  .local $dir->{result}->{type} $dir->{result}->{symbol}\n";
@@ -380,7 +378,7 @@ package pirVisitor;
         my ($dir) = @_;
         my $FH    = $self->{fh};
         print {$FH}
-            "  .const .$dir->{type} $dir->{result}->{symbol} = \"$dir->{arg1}\"\n";
+            "  .const .$dir->{type} $dir->{result}->{symbol} = '$dir->{arg1}'\n";
         return;
     }
 
