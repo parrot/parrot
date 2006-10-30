@@ -666,6 +666,30 @@ sub Run {
 sub Generate {
     my $parser = shift;
 
+    my %outer;
+    foreach my $fct ( @{ $parser->YYData->{functs} } ) {
+        my $curr;
+        foreach my $op ( @{$fct} ) {
+            if ( ref($op) eq 'SubDir' ) {
+                $curr = $op->{result}->{symbol}; 
+                if ( exists $outer{$curr} ) {
+                    $op->{outer} = $outer{$curr}; 
+                }
+                elsif ( $curr ne '_main' ) {
+                    warn "INTERNAL ERROR: no outer for '$curr'\n";
+                }
+            }
+            if ( ref($op) eq 'NewClosureOp' ) {
+                if ( exists $outer{ $op->{arg1}->{symbol} } ) {
+                    warn "INTERNAL ERROR: duplicate outer for '$op->{arg1}->{symbol}' : '$outer{ $op->{arg1}->{symbol} }' & '$curr'\n";
+                }
+                else {
+                    $outer{ $op->{arg1}->{symbol} } = $curr;
+                }
+            }
+        }
+    }
+
     my $filename = $parser->YYData->{srcname};
     $filename =~ s/\.lua$/\.pir/i;
     open my $FH, '>', $filename

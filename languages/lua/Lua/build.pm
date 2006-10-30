@@ -303,8 +303,7 @@ sub BuildVariable {
                     push @opcodes, new LocalDir( $parser,
                         'result' => $result2,
                     );
-                    push @opcodes, new KeyedGetOp(
-                        $parser,
+                    push @opcodes, new KeyedGetOp( $parser,
                         'result' => $result2,
                         'arg1'   => $result,
                         'arg2'   => $key->[0],
@@ -334,8 +333,9 @@ sub BuildVariable {
                 # upvariable
                 if ( scalar( @{$var} ) ) {
                     my $result = new_tmp( $parser, 'pmc' );
-                    push @opcodes,
-                        new LocalDir( $parser, 'result' => $result, );
+                    push @opcodes, new LocalDir( $parser,
+                        'result' => $result,
+                    );
                     push @opcodes, new FindLexOp( $parser,
                         'result' => $result,
                         'arg1'   => $defn,
@@ -987,8 +987,7 @@ sub BuildForNum {
         }
     }
     push @opcodes, @{$block};
-    push @opcodes, new BinaryOp(
-        $parser,
+    push @opcodes, new BinaryOp( $parser,
         'op'     => 'add',
         'arg1'   => $_var,
         'arg2'   => $_step,
@@ -1248,11 +1247,9 @@ sub BuildFunctionBody {
         $parser->YYData->{self} = undef;
     }
     my $fct = new_fct($parser);
-    push @opcodes2, new SubDir(
-        $parser,
+    push @opcodes2, new SubDir( $parser,
         'prolog' => 1,
         'result' => $fct,
-        'outer'  => '_main',
     );
     for my $param ( @{$params} ) {
         push @opcodes2, @{ $param->[1] };
