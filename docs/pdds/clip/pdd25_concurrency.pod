@@ -3,12 +3,12 @@
 
 =head1 NAME
 
-docs/pdds/clip/pdd25_threads.pod - Parrot Concurrency
+docs/pdds/clip/pdd25_concurrency.pod - Parrot Concurrency
 
 =head1 ABSTRACT
 
 This document defines the requirements and implementation strategy for
-Parrot's concurrency model.
+Parrot's concurrency models.
 
 =head1 VERSION
 
