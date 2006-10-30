@@ -3,12 +3,12 @@
 
 =head1 NAME
 
-docs/pdds/clip/pdd25_threads.pod - Parrot Threads
+docs/pdds/clip/pdd25_threads.pod - Parrot Concurrency
 
 =head1 ABSTRACT
 
 This document defines the requirements and implementation strategy for
-Parrot's threading model.
+Parrot's concurrency model.
 
 =head1 VERSION
 
@@ -155,7 +155,11 @@ that a sequence of events send from one thread to another will always be
 received in the order they are sent? (Obviously no guarantees about
 interleaving of events from other threads). This is usually only important in
 distributed environments where multiple paths exists between a pair of
-endpoints, but it would be nice for user-code to be able to rely on it. }}
+endpoints, but it would be nice for user-code to be able to rely on it. 
+- Dan: Hrm. I suppose we really ought to, so we will. If we prioritize
+events (and I'm still torn) then they'll be in priority then send
+order. 
+}}
 
 =over 4
 
@@ -271,10 +275,29 @@ provide a type-safety guarantee that your type can only be referenced by other
 instances of itself. In which case, your type is necessarily "garbage" and the
 best optimization strategy would be dead-code elimination. :)
 
-I predict the best overall throughput would be with the sweep or copy
-phase run immediately after the mark phase, across the entire process:
-It would be wasteful to do all that marking and yet leave known garbage
-uncollected.
+- Nigel Sandever: If by reference, you mean address, then that is true.
+
+If when a reference is taken, the address of the referent is
+stored in arbitrary other data structures, then all memory
+be scanned by the GC,
+
+However, if references were not addresses, but an index into a
+table of addresses, then only the table need be scanned.
+
+When a reference, or the thing holding it, is deleted, then
+the indexed slot in the address table is blanked and subsequent
+GC passes looking for references to a referent will no longer
+find the reference in the table.
+
+With the addition of a reference count to the table, all references
+to a single entity can share the same index, but now I'm groping
+back in the direction of reference counting, which is not flavour
+of the month:) 
+
+- Gordon Henrikson: I predict the best overall throughput would be with
+the sweep or copy phase run immediately after the mark phase, across the
+entire process: It would be wasteful to do all that marking and yet
+leave known garbage uncollected.
 
 Statistically, multiple pools will individually exhaust themselves
 *MORE* frequently than a global pool. The ideal case for collection
@@ -426,6 +449,25 @@ of the office.
 parrot will have to be able to suspend all threads in the environment.
 Unfortunate, but really quite unavoidable. 
 
+- Dan: I'm not sure that's the case. What we need to do is suspend
+metadata mutation--that is, buffers can't be resized while a gc run is
+in progress. Other than that, if we have guarantees of aligned atomic
+pointer writes (so we don't have word shearing to deal with) we don't
+have to stop the mutation of the contents of the buffers themselves.
+
+The only tricky bit comes in with the examination of the root set of
+other threads--accessing the hardware register contents of another
+running thread may be... interesting. (Which, I suppose, argues for
+some sort of volatile marking of the temp variables) 
+
+- Leo: You'll provide the "interesting" part, that is:
+
+  use Psi::Estimate::CPU_Register_Changes_in_Future_till_mark_is_done; 
+
+- Dan: Nah, no need for that one. I need to go back and recheck the
+stuff that Gordon posted in case I missed something, but if you put a
+lock on the arena allocator this isn't an issue. 
+
 - Gordon Henriksen: Consider this simple object graph:
 
      Root set = { &A, &B }
@@ -467,7 +509,11 @@ transient root set before the DOD traces over to it.
 
 Race condition. Dammit.
 
-Okay, I'd not wrapped my brain around that possibility, which will
+- Gordon Henriksen: (Worse than that. It could come from any untraced
+location--or possibly even be brand new, depending upon memory
+allocation details.) 
+
+- Dan: Okay, I'd not wrapped my brain around that possibility, which will
 make for some interesting DOD tracing, especially on SMP systems. I
 was *really* hoping a single lock on the arena allocation system that
 the DOD held onto while tracing would be sufficient, but I see that
@@ -506,7 +552,6 @@ read or write access that would change the color of an object and update
 the color accordingly. This is e.g. used for incremental GC. As soon as
 we have a thread in the background that runs GC, we have to cope with
 these issues. 
-
 - Dan: Yeah, point. And since we want to be able to have an incremental DOD
 at some point we need to get support for it in now. 
 
@@ -525,6 +570,9 @@ access. This is more expensive then a mutex. During DOD any PMC access
 will halt the interpreter, so we can do that explicitely too and save
 the cost for the rwlock overhead. Albeit I can imagine, that aggregates
 will need a rwlock anyway. 
+- Dan: Well... only the mutating vtable entries need to get the lock, so
+that reduces the expense somewhat. Still, I agree, it may be
+untenably expensive. 
 
 - Leo: An alternative would be real background incremental GC, *when* running
 multiple threads. I estimate the overhead to be in regions of a rwlock (with no
@@ -535,6 +583,11 @@ things interesting, though if the background thread doing the DOD is
 a member of the interpreter pool then it'd work out OK. 
 - Leo: Finalizers and incremental DOD don't play together. The DOD must run to
 end to be sure, that the objects isn't referenced any more.
+- Dan: Finalizers and incremental DOD work just fine together. At some
+point the incremental DOD will figure out that something's dead, just
+as the stop-the-world DOD will. It just may take a bit longer. 
+- Leo: I wanted to say: "Finalizers & destructors of PMCs that need
+timely destruction ...". In the case of dead objects at scope exit. 
 
 
 - Leo: What about temporary PMCs (or strings)? Evaluating a non-trivial
@@ -572,7 +625,57 @@ slower on SMP machines. It would scale better though for more CPUs.
 Deadlocks shouldn't be a problem, if exactly one vtable (like in
 SharedRef) just grabs one and only one lock. 
 
+- Leo: [The Guarantees section] doesn't have anything about user data
+integrity. So when 2 threads access a PerlNum, they could get a
+mixture of the typically 2 involved words.
+- Dan: Potentially, yeah, though it's really unlikely.
+- Leo: But: "The first thing that any vtable function of a shared PMC
+must do is to aquire the mutex of the PMCs in its parameter list..."
+... seems to indicate that even whole ops like add P,P,P are atomic.
+- Dan: Yep. They have to be, because they need to guarantee the integrity of
+the pmc structures and the data hanging off them (which includes
+buffer and string stuff)
+- Leo: But isn't that a contradiction? Or better: When even an opcode
+like above is atomic, that an access to a shared PerlNum should be
+guaranteed being atomic too. 
+- Dan: Sure, but there's a *lot* more to user data integrity than atomic
+access to individual pieces. That's the least of the problem. The
+user data issue is one where you have multiple pieces being updated,
+or one piece being updated multiple times--that's the stuff we're not
+guaranteeing.
 
+So, while we will make sure that storing a single value into a hash
+happens atomically, we won't guarantee that a series of stores into
+the hash, or a combination of loads and stores, or even a combination
+of reads and writes to a scalar, will happen atomically. 
+
+- Leo: And how does user level locking play together with that?
+- Dan: I've not decided -- That was something I thought we might hash out as
+we abused the first half of the design doc. Personally I'm all for
+the user and low-level lock being the same thing, but that doesn't
+have to be the case. There are advantages and disadvantages to either
+way of doing things. 
+
+- Damien Neil: Personally, I think it would be better to use
+corruption-resistant buffer and string structures, and avoid locking
+during basic data access.  While there are substantial differences in VM
+design--PMCs are much more complicated than any JVM data type--the JVM
+does provide a good example that this can be done, and done efficiently.
+
+Failing this, it would be worth investigating what the real-world
+performance difference is between acquiring multiple locks per VM
+operation (current Parrot proposal) vs. having a single lock
+controlling all data access (Python) or jettisoning OS threads
+entirely in favor of VM-level threading (Ruby).  This forfeits the
+ability to take advantage of multiple CPUs--but Leopold's initial
+timing tests of shared PMCs were showing a potential 3-5x slowdown
+from excessive locking.
+
+I've seen software before that was redesigned to take advantage of
+multiple CPUs--and then required no less than four CPUs to match
+the performance of the older, single-CPU version.  The problem was
+largely attributed to excessive locking of mostly-uncontested data
+structures. 
 }}
 
 As the allocation and collection system is a black box to user
@@ -865,7 +968,20 @@ None.
 
 =head1 REFERENCES
 
-None.
+Dec 2003 - (Dan ponders threads based on POSIX and Perl 5 experience)
+<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64b22ab7de0a7a6/889b5d8c4cd267b7?lnk=gst&q=threads&rnum=3#889b5d8c4cd267b7>
+
+Dec. 2003 - "threads and shared interpreter data structures"
+<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64ea4ff287e04fd/b71333e282d3d187?lnk=gst&q=threads&rnum=9#b71333e282d3d187>
+
+Jan. 2004 - "Threads Design. A Win32 perspective."
+<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/3209629b23306029/52ba9d37425ba015?lnk=gst&q=threads&rnum=8#52ba9d37425ba015>
+
+Jan. 2004 - "Start of threads proposal"
+<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/4c7de440da84d5c6/04cfb70b0d81dfba?tvc=1&q=threads#04cfb70b0d81dfba>
+
+Sept. 2005 - "consider using OS threads"
+<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/40b50e3aa9255f8e/036a87b5d2b5ed2c?lnk=gst&q=threads&rnum=2#036a87b5d2b5ed2c>
 
 =cut
 
