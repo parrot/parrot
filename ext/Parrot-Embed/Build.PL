@@ -12,18 +12,16 @@ diag( my $parrot            = get_parrot_path( $in_parrot_tree ) );
 
 my $class = Module::Build->subclass(
 	code => <<"END_HERE",
-	use Cwd;
+	use File::Spec;
 
 	sub ACTION_build
 	{
-		my \$self    = shift;
-		my \$old_dir = cwd();
-		chdir 't';
+		my \$self = shift;
+		my \@cmd  = ( qw( $parrot -o ),
+			map { File::Spec->catfile( 't', "greet.\$_" ) } qw( pbc pir ) );
 
-		system(qw( $parrot -o greet.pbc greet.pir ) ) == 0
-			or die "Cannot compile PBC for test: \$?";
+		system( \@cmd ) == 0 or die "Cannot compile PBC for test: \$?";
 
-		chdir \$old_dir;
 		\$self->SUPER::ACTION_build( \@_ );
 	}
 END_HERE
@@ -49,7 +47,7 @@ $builder->create_build_script();
 sub in_parrot_tree
 {
 	my $cwd     = cwd();
-	return $cwd =~ /\bparrot\b.ext/;
+	return $cwd =~ /\bext\b.Parrot/;
 }
 
 sub get_compiler_flags
@@ -106,7 +104,7 @@ sub get_parrot_path
 sub get_parrot_path_internal
 {
 	my $updir = File::Spec->updir();
-	my $path  = File::Spec->catfile(($updir) x 3, get_parrot_executable_name());
+	my $path  = File::Spec->catfile(($updir) x 2, get_parrot_executable_name());
 
 	die "parrot apparently not built!\n" unless -e $path;
 	return $path;
