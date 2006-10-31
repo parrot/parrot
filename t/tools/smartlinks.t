@@ -27,8 +27,12 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Parrot::Test tests => 65;
+use File::Temp qw( tempdir tempfile );
+use Parrot::Test;
 use Test::More;
+
+eval { require Moose };
+$@ ? plan skip_all => 'Moose not installed' : plan tests => 65;
 
 
 BEGIN { use_ok 'SmartLink' or die };
@@ -37,7 +41,7 @@ BEGIN { use_ok 'SmartLink' or die };
 sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
 
 {
-    vdiag 'SmartLink';
+    vdiag 'SmartLink: multiple keyphrases';
     my $link= q{L<S05/bar/baz quux>};
 
     eval{ my $l= SmartLink->new; };
@@ -68,6 +72,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
     is( $d->num, '05', '->num returns document number' );
 
 
+    vdiag 'SmartLink: invalid format';
     $link= q{L<S05/bar/>};
     eval{ my $l= SmartLink->new( link => $link ); };
     like( $@,
@@ -75,6 +80,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
         '->new fails with malformed smartlink' );
 
 
+    vdiag 'SmartLink: complex keyphrases';
     $link= q{L<S05/bar/a b 'c d e' f g "h'i j" k>};
     $l= SmartLink->new( link => $link );
 
@@ -103,6 +109,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
     is( $d->num, '05', '->docnum returns document number' );
 
 
+    vdiag 'SmartLink: no keyphrases';
     $link= q{L<S05/bar>};
     $l= SmartLink->new( link => $link );
 
@@ -114,6 +121,16 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
 }
 
 {
+    vdiag 'File';
+    my( $fh, $fn )= tempfile();
+    print $fh "i am a file" and close $fh;
+    my $f= File->new( filename => $fn );
+    isa_ok( $f, 'File' );
+    # TODO: many more tests
+}
+
+{
+    # TODO: this should use a tempfile
     vdiag 'PodFile';
     my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
 
@@ -132,6 +149,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
 }
 
 {
+    # TODO: this should use a tempfile
     vdiag 'SpecFile';
     my $fn= 'docs/pdds/pdd03_calling_conventions.pod';
     my $pre= 'pdd';
@@ -159,6 +177,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
 }
 
 {
+    # TODO: this should use a tempfile
     vdiag 'SpecFiles';
     my $root= 'docs/pdds/';
     my $pre= 'pdd';
@@ -180,6 +199,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} };
 }
 
 {
+    # TODO: this should use a tempfile
     vdiag 'TestFile';
     my $fn= 't/util/smartlinks.t';
 
