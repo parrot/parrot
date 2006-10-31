@@ -27,9 +27,7 @@ of the Lua C<Thread> type.
 .namespace ['thread']
 
 .sub '__clone' :method
-    .local pmc ret
-    ret = self  # fixme
-    .return (ret)
+    .return (self)
 .end
 
 .sub '__get_string' :method
@@ -52,11 +50,6 @@ of the Lua C<Thread> type.
     ex = new .Exception
     ex['_message'] = "attempt to index a thread value"
     throw ex
-.end
-
-.sub '__get_pointer' :method
-    $I0 = 0     # fixme
-    .return ($I0) 
 .end
 
 .sub '__set_pmc_keyed' :method

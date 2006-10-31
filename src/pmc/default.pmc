@@ -604,6 +604,20 @@ C<get_pmc_keyed()> with it.
 
 /*
 
+=item C<void *get_pointer()>
+
+Returns the address of the PMC.
+
+=cut
+
+*/
+
+    void* get_pointer () {
+        return SELF;
+    }
+
+/*
+
 =item C<INTVAL is_same(PMC *value)>
 
 Returns whether the PMC is numerically equal to C<value>.
