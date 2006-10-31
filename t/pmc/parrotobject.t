@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -125,6 +125,40 @@ pir_output_is(<<'CODE', <<'OUT', ':vtable inheritance');
 CODE
 cloned
 ok
+OUT
+# '
+
+# :vtable inheritance; RT #40626
+pir_output_is(<<'CODE', <<'OUT', ':vtable inheritance from core classes');
+.sub main :main
+    $P0 = subclass 'Hash', 'Foo'
+    $P0 = subclass 'Hash', 'Bar'
+
+    $P1 = new 'Foo'
+    $S1 = $P1
+    say $S1
+
+    $P1 = new 'Bar'
+    $S1 = $P1
+    say $S1
+.end
+
+
+.namespace [ 'Foo' ]
+
+.sub '__get_string' :method
+    .return('Foo::__get_string')
+.end
+
+
+.namespace [ 'Bar' ]
+
+.sub 'get_string' :method :vtable
+    .return('Bar::get_string')
+.end
+CODE
+Foo::__get_string
+Bar::get_string
 OUT
 # '
 
