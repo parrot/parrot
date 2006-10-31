@@ -53,7 +53,10 @@ sub __get_revision {
             ($revision) = $line =~ / (\d+)$/;
         } elsif (my ($source_line) = grep /^(Copied|Merged) From/, @svk_info) {
             if (my ($source_depot) = $source_line =~ /From: (.*?), Rev\. \d+/) {
-                $source_depot = '/'.$source_depot; # convert /svk/trunk to //svk/trunk
+                # convert /svk/trunk to //svk/trunk or /depot/svk/trunk
+                my ($depot_root) = map { m{Depot Path: (/[^/]*)} } @svk_info;
+                $depot_root ||= '/';
+                $source_depot = $depot_root.$source_depot;
                 if (my @svk_info = qx/svk info $source_depot/ and $? == 0) {
                     if (my ($line) = grep /(?:file|svn|https?)\b/, @svk_info) {
                         ($revision) = $line =~ / (\d+)$/;
