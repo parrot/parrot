@@ -71,9 +71,9 @@ by phc from PHP source. It generates an XML with PAST.
 
 <xsl:template match="phc:value">
   <past:Stmt>
-    <past:Op>
+    <past:Op op='print' >
       <past:Exp>
-        <past:Val>
+        <past:Val valtype="strqq" >
           <xsl:value-of select="." />
         </past:Val>
       </past:Exp>

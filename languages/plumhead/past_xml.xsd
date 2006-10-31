@@ -4,10 +4,11 @@
 $Id$
 
 -->
-<xs:schema
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:past="http://www.parrotcode.org/PAST" version="1.0" >
-  <xs:element name="past:stmts">
-    <xs:any minOccurs="0"/>
-  </xs:element>
-</xs:schema>
+<xsd:schema
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:past="http://www.parrotcode.org/PAST-0.1"
+  targetNamespace="http://www.parrotcode.org/PAST-0.1"
+  version="1.0"
+>
+  <xsd:element name="Stmts" type="xsd:anyType" />
+</xsd:schema>

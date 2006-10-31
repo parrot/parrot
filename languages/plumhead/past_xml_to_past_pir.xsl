@@ -103,11 +103,9 @@ a PAST and runs the PAST with help of the parrot compiler tools.
                                                                   
 .end                                                              
                                                                   
-# end of AST_php_script
-
 </xsl:template>
 
-<xsl:template match="past:Stmts">
+<xsl:template match="past:Stmts" >
   <xsl:param name='parent' />
 
   # start of past:Stmts
@@ -140,8 +138,9 @@ a PAST and runs the PAST with help of the parrot compiler tools.
 
   # end of past:Op
   .local pmc past_op                                           
-  past_op = new 'PAST::Op'                             
-  past_op.'op'( 'print' )                              
+  past_op = new 'PAST::Op'
+  <!-- TODO: check for existence of attribute -->                             
+  past_op.'op'( '<xsl:value-of select="@op" />' )                              
 
   <xsl:apply-templates select="past:Exp" >
     <xsl:with-param name="parent" select="'past_op'" />
@@ -175,8 +174,8 @@ a PAST and runs the PAST with help of the parrot compiler tools.
             .local pmc past_val                                               
             past_val = new 'PAST::Val'                             
             past_val.value( decoded ) 
-            past_val.valtype( 'strqq' )                            
-
+            <!-- TODO: check for existence of attribute --> 
+            past_val.'valtype'( '<xsl:value-of select="@valtype" />' )
             <xsl:value-of select="$parent" />.'add_child'( past_val )      
             # end of past:Val
 
