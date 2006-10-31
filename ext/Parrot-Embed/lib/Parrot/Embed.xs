@@ -23,7 +23,7 @@ typedef struct PMC_struct
 } PMC_struct;
 
 Interpreter_struct*
-make_interp( SV *parent, Parrot_Interp interp )
+make_interp( pTHX_ SV *parent, Parrot_Interp interp )
 {
 	Interpreter_struct *interp_struct;
 	if (interp == NULL)
@@ -39,7 +39,7 @@ make_interp( SV *parent, Parrot_Interp interp )
 }
 
 PMC_struct*
-make_pmc( SV *interp, Parrot_PMC pmc )
+make_pmc( pTHX_ SV *interp, Parrot_PMC pmc )
 {
 	PMC_struct *pmc_struct;
 	if (pmc == NULL)
@@ -86,7 +86,7 @@ CODE:
 
 	/* Can't use RETVAL/OUTPUT here because typemap loses class variable */
 	ST(0)  = sv_newmortal();
-	sv_setref_pv( ST(0), class, (void*) make_interp( parent_sv, interp ) );
+	sv_setref_pv( ST(0), class, (void*)make_interp( aTHX_ parent_sv, interp ) );
 
 bool
 load_file( interp, filename )
@@ -140,7 +140,7 @@ CODE:
 	else
 		pmc         = Parrot_find_global_cur( real_interp, p_global );
 
-	RETVAL = make_pmc( ST(0), pmc );
+	RETVAL = make_pmc( aTHX_ ST(0), pmc );
 OUTPUT:
 	RETVAL
 
@@ -157,7 +157,7 @@ CODE:
 	real_interp = interp->interp;  
 	code_type   = const_string( real_interp, "PIR" );
 	out_pmc     = Parrot_compile_string( real_interp, code_type, code, &error );
-	RETVAL      = make_pmc( ST(0), out_pmc );
+	RETVAL      = make_pmc( aTHX_ ST(0), out_pmc );
 OUTPUT:
 	RETVAL
 
@@ -187,7 +187,7 @@ CODE:
 	interp     = get_interp( pmc->interp );
 	arg_string = const_string( interp, argument );
 	out_pmc    = Parrot_call_sub( interp, pmc_actual, signature, arg_string );
-	RETVAL     = make_pmc( pmc->interp, out_pmc );
+	RETVAL     = make_pmc( aTHX_ pmc->interp, out_pmc );
 OUTPUT:
 	RETVAL
 
