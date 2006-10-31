@@ -8,8 +8,8 @@
 
 $Id$
 
-This transformation takes a XML abstract syntax tree that is generated 
-by phc from a PHP source. It generates an XML with PAST.
+This transformation takes a XML abstract syntax tree as generated 
+by phc from PHP source. It generates an XML with PAST.
 
 -->
 <xsl:output method='xml' indent='yes' />
