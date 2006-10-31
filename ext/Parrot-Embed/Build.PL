@@ -5,9 +5,10 @@ use Cwd;
 use File::Spec;
 use Module::Build;
 
-my $in_parrot_tree    = in_parrot_tree();
-my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree );
-my $parrot            = get_parrot_path( $in_parrot_tree );
+diag( cwd() );
+diag( my $in_parrot_tree    = in_parrot_tree() );
+diag( my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree ) );
+diag( my $parrot            = get_parrot_path( $in_parrot_tree ) );
 
 my $class = Module::Build->subclass(
 	code => <<"END_HERE",
@@ -89,7 +90,8 @@ sub get_flags_from_parrot_src
 		$vars{$var}       =  $value;
 	}
 
-	$vars{Cflags} .= ' -I' . File::Spec->catdir( $updir, $updir, 'include' );
+	$vars{Cflags} .= ' -I' . File::Spec->catdir( ($updir) x 2, 'include' );
+	$vars{Libs}   .= ' -L' . File::Spec->catdir( ($updir) x 2, qw( blib lib ) );
 
 	return @vars{qw( Cflags Libs )};
 }
@@ -128,4 +130,10 @@ sub get_parrot_executable_name
 {
 	return 'parrot' unless $^O =~ /Win32/;
 	return 'parrot.exe';
+}
+
+sub diag
+{
+	return unless $ENV{PE_DEBUG};
+	print STDERR "<$_>\n" for @_;
 }
