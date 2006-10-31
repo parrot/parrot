@@ -983,6 +983,11 @@ Jan. 2004 - "Start of threads proposal"
 Sept. 2005 - "consider using OS threads"
 <http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/40b50e3aa9255f8e/036a87b5d2b5ed2c?lnk=gst&q=threads&rnum=2#036a87b5d2b5ed2c>
 
+Concurrency as Futures -
+<http://www.cincomsmalltalk.com/userblogs/mls/blogView?showComments=true&entry=3336838959>
+
+Io language - <http://www.iolanguage.com/about/>
+
 =cut
 
 __END__
