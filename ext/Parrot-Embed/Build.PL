@@ -2,8 +2,8 @@ use strict;
 use warnings;
 
 use Cwd;
-use File::Spec;
 use Module::Build;
+use File::Spec::Functions qw( rel2abs catdir catfile updir path );
 
 diag( cwd() );
 diag( my $in_parrot_tree    = in_parrot_tree() );
@@ -24,6 +24,7 @@ my $class = Module::Build->subclass(
 
 		\$self->SUPER::ACTION_build( \@_ );
 	}
+
 END_HERE
 );
 
@@ -66,8 +67,8 @@ sub get_flags_from_pkg_config
 
 sub get_flags_from_parrot_src
 {
-	my $updir = File::Spec->updir();
-	my $file  = File::Spec->catfile( $updir, $updir, 'parrot.pc' );
+	my $updir = updir();
+	my $file  = catfile( $updir, $updir, 'parrot.pc' );
 	open( my $fh, '<', $file ) or die "Cannot read $file: $!\n";
 
 	my %vars;
@@ -87,9 +88,10 @@ sub get_flags_from_parrot_src
 		$value            =~ s/\${(\w+)}/$vars{$1}/g;
 		$vars{$var}       =  $value;
 	}
+	my $libp       = rel2abs( catdir( ($updir) x 2, qw( blib lib ) ) );
 
-	$vars{Cflags} .= ' -I' . File::Spec->catdir( ($updir) x 2, 'include' );
-	$vars{Libs}   .= ' -L' . File::Spec->catdir( ($updir) x 2, qw( blib lib ) );
+	$vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
+	$vars{Libs}   .= " -L$libp -Wl,-rpath $libp";
 
 	return @vars{qw( Cflags Libs )};
 }
@@ -103,8 +105,8 @@ sub get_parrot_path
 
 sub get_parrot_path_internal
 {
-	my $updir = File::Spec->updir();
-	my $path  = File::Spec->catfile(($updir) x 2, get_parrot_executable_name());
+	my $updir = updir();
+	my $path  = catfile(($updir) x 2, get_parrot_executable_name());
 
 	die "parrot apparently not built!\n" unless -e $path;
 	return $path;
@@ -114,9 +116,9 @@ sub get_parrot_path_external
 {
 	my $parrot = get_parrot_executable_name();
 
-	for my $path ( File::Spec->path() )
+	for my $path ( path() )
 	{
-		my $file = File::Spec->catfile( $path, $parrot );
+		my $file = catfile( $path, $parrot );
 		next unless -e $file;
 		return $file;
 	}
