@@ -32,15 +32,13 @@ a PAST and runs the PAST with help of the parrot compiler tools.
     
   # The root node of PAST.
   # It will receive another PAST::Stmts node as daughter 
-  .local pmc past_root                                                  
-  past_root = new 'PAST::Stmts'                                       
+  .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
+  past_node_<xsl:value-of select="generate-id(.)" /> = new 'PAST::Stmts'                                       
   
-  <xsl:apply-templates select="past:Stmts" >
-    <xsl:with-param name="parent" select="'past_root'" />
-  </xsl:apply-templates>
+  <xsl:apply-templates />
 
   # say 'AST tree dump:'                                          
-  # past_root.dump()                                                  
+  # past_node_<xsl:value-of select="generate-id(.)" />.dump()                                                  
                                                                   
   # Compile the abstract syntax tree                              
   # down to an opcode syntax tree                                 
@@ -50,7 +48,7 @@ a PAST and runs the PAST with help of the parrot compiler tools.
   tge_compiler = new 'TGE::Compiler'                              
   ost_tg_src = _slurp_file('languages/punie/lib/OSTGrammar.tg')   
   ost_grammar = tge_compiler.'compile'(ost_tg_src)                
-  ost_builder = ost_grammar.apply(past_root)                          
+  ost_builder = ost_grammar.apply(past_node_<xsl:value-of select="generate-id(.)" />)                          
   ost = ost_builder.get('result')                                 
   unless ost goto ERR_NO_OST                                      
                                                                   
@@ -105,80 +103,40 @@ a PAST and runs the PAST with help of the parrot compiler tools.
                                                                   
 </xsl:template>
 
-<xsl:template match="past:Stmts" >
-  <xsl:param name='parent' />
+<xsl:template match="past:Stmts | past:Stmt | past:Op | past:Exp" >
 
-  # start of past:Stmts
-  .local pmc past_stmts                                                  
-  past_stmts = new 'PAST::Stmts'                                       
-  <xsl:apply-templates select="past:Stmt" >
-    <xsl:with-param name="parent" select="'past_stmts'" />
-  </xsl:apply-templates>
-  <xsl:value-of select="$parent" />.'add_child'( past_stmts )      
-  # end of past:Stmts
+  # start of generic node
+  .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
+  past_node_<xsl:value-of select="generate-id(.)" /> = new '<xsl:choose><xsl:when test="name() = 'past:Stmts'" >PAST::Stmts</xsl:when><xsl:when test="name() = 'past:Stmt'" >PAST::Stmt</xsl:when><xsl:when test="name() = 'past:Op'" >PAST::Op</xsl:when><xsl:when test="name() = 'past:Exp'" >PAST::Exp</xsl:when></xsl:choose>'
+  <xsl:apply-templates select="@*"/>
+  <xsl:apply-templates />
+  past_node_<xsl:value-of select="generate-id(..)" />.'add_child'( past_node_<xsl:value-of select="generate-id(.)" /> )      
+  null past_node_<xsl:value-of select="generate-id(.)" />
+  # end of generic node
 
-</xsl:template>
-
-<xsl:template match="past:Stmt">
-  <xsl:param name='parent' />
-
-  # start of past:Stmt
-  .local pmc past_stmt                                                  
-  past_stmt = new 'PAST::Stmt'                                       
-  <xsl:apply-templates select="past:Op" >
-    <xsl:with-param name="parent" select="'past_stmt'" />
-  </xsl:apply-templates>
-  <xsl:value-of select="$parent" />.'add_child'( past_stmt )      
-  # end of past:Stmt
-
-</xsl:template>
-
-<xsl:template match="past:Op">
-  <xsl:param name='parent' />
-
-  # end of past:Op
-  .local pmc past_op                                           
-  past_op = new 'PAST::Op'
-  <!-- TODO: check for existence of attribute -->                             
-  past_op.'op'( '<xsl:value-of select="@op" />' )                              
-
-  <xsl:apply-templates select="past:Exp" >
-    <xsl:with-param name="parent" select="'past_op'" />
-  </xsl:apply-templates>
-  <xsl:value-of select="$parent" />.'add_child'( past_op )      
-  # end of past:Op
-
-</xsl:template>
-
-<xsl:template match="past:Exp">
-  <xsl:param name='parent' />
-
-  # start of past:Exp
-  .local pmc past_exp                                     
-  past_exp = new 'PAST::Exp'                    
-  <xsl:apply-templates select="past:Val" >
-    <xsl:with-param name="parent" select="'past_exp'" />
-  </xsl:apply-templates>
-  <xsl:value-of select="$parent" />.'add_child'( past_exp )      
-  # end of past:Exp
-   
 </xsl:template>
 
 <xsl:template match="past:Val">
-  <xsl:param name='parent' />
 
-            # start of past:Val
-            .local string decoded
-            decoded = dec_sub( "<xsl:value-of select="." />" )
-            decoded = escape decoded
-            .local pmc past_val                                               
-            past_val = new 'PAST::Val'                             
-            past_val.value( decoded ) 
-            <!-- TODO: check for existence of attribute --> 
-            past_val.'valtype'( '<xsl:value-of select="@valtype" />' )
-            <xsl:value-of select="$parent" />.'add_child'( past_val )      
-            # end of past:Val
+  # start of past:Val
+  .local string decoded
+  decoded = dec_sub( "<xsl:value-of select="." />" )
+  decoded = escape decoded
+  .local pmc past_node_<xsl:value-of select="generate-id(.)" />
+  past_node_<xsl:value-of select="generate-id(.)" /> = new 'PAST::Val'                             
+  <xsl:apply-templates select="@*"/>
+  past_node_<xsl:value-of select="generate-id(.)" />.value( decoded ) 
+  past_node_<xsl:value-of select="generate-id(..)" />.'add_child'( past_node_<xsl:value-of select="generate-id(.)" /> )      
+  # end of past:Val
 
+</xsl:template>
+
+<!-- handle attributes -->
+<xsl:template match="@op">
+  past_node_<xsl:value-of select="generate-id(..)" />.'op'( '<xsl:value-of select="." />' )                              
+</xsl:template>
+<xsl:template match="@valtype">
+  past_node_<xsl:value-of select="generate-id(..)" />.'valtype'( '<xsl:value-of select="." />' )
 </xsl:template>
 
 </xsl:stylesheet>
