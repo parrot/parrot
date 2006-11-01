@@ -259,7 +259,7 @@ can_ok('Parrot::Configure', qw(
     my $pc = Parrot::Configure->new();
 
     # send warnings to stdout
-    open *STDERR, '>', "&STDOUT" or die "Can't dup STDOUT: $!";
+    open *STDERR, ">&STDOUT" or die "Can't dup STDOUT: $!";
 
     $pc->add_step('test::step::stepfail');
     my $ret = $pc->runsteps();

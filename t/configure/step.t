@@ -82,7 +82,7 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
     my $redir = File::Spec->devnull;
 
     # copy file descriptors
-    open *OLDERR, '>', "&STDERR";
+    open *OLDERR, ">&STDERR";
     $fromfile->close();
     $tofile->close();
 
@@ -98,7 +98,7 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
 
     # restore STDERR
     close *STDERR;
-    open *STDERR, '>', "&OLDERR";
+    open *STDERR, ">&OLDERR";
     close *OLDERR;
 }
 
