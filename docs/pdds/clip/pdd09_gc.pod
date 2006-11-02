@@ -395,8 +395,8 @@ Started documenting the internal routines
 
 None. First version
 
+=back
+
 =head1 REFERENCES
 
 "A unified theory of garbage collection" <http://portal.acm.org/citation.cfm?id=1028982>
-
-=back
