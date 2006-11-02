@@ -17,7 +17,7 @@ creating an exhaustive test suite for calling conventions.
     u      |      |      |      |      |      |      |      |      |      |
     n----------------------------------------------------------------------
     n  *1,2|      |      |      |      |      |      |      |      |      |
- B  a flat |  P3  |  P3  |  P3  |  P3  |      |      |      |      |  E2  |
+ B  a flat |  P3  |  P3  |  P3  |  P3  |  P4  |  P5  | P4   |  P5  |  E2  |
     m      |      |      |      |      |      |      |      |      |      |
     e----------------------------------------------------------------------
     d    *1|      |      |      |      |      |      |      |      |      |
@@ -58,6 +58,8 @@ creating an exhaustive test suite for calling conventions.
   P1  pass as-is, next state
   P2  pass as-is, next src
   P3  pass contents as array items, next 
+  P4  pass current array item as-is, next src array item
+  P5  pass current array items as pairs (a[0],a[0]) or as (a[0],a[1]) (a.size % 2 = 0)
 
 =item  Expressions
 
@@ -85,5 +87,13 @@ creating an exhaustive test suite for calling conventions.
   *3  pmc or string constant only
 
 =back
+
+=head2 Examples
+
+=item A:5
+  'caller'(1, 2) # caller
+  .param pmc two :named('two') ; .param pmc one :named('one')
+  two = 1 ; one = 2
+
 
 =cut
