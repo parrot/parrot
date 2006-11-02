@@ -202,6 +202,40 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
 
 /*
 
+=item C<static PMC *find_vtable_override_byname(Interp* interpreter,
+                                                PMC *class,
+                                                STRING *method_name)>
+
+Tries to locate a PIR override method for the given v-table method in the
+given class. If one is found, returns the method.
+
+=cut
+
+*/
+
+static PMC* 
+find_vtable_override_byname(Interp* interpreter, PMC *class_name,
+                            STRING *method_name)
+{
+    /* First try it in the :vtable namespace. */
+    STRING* vtable_str = string_from_const_cstring(interpreter,
+        "\0VTABLE\0", 8);
+    PMC *ns = Parrot_find_global_k(interpreter, class_name, vtable_str);
+    if (!PMC_IS_NULL(ns)) {
+        STRING *no_underscores = string_substr(interpreter, method_name,
+            2, method_name->strlen - 2, NULL, 0);
+        PMC *res = VTABLE_get_pmc_keyed_str(interpreter, ns,
+            no_underscores);
+        if (!PMC_IS_NULL(res))
+            return res;
+    }
+
+    /* Otherwise, do lookup in the old way. */
+    return Parrot_find_global_k(interpreter, class_name, method_name);
+}
+
+/*
+
 =item C<static void create_deleg_pmc_vtable(Interp *, PMC *class,
                                             PMC *class_name, int full)>
 
@@ -242,7 +276,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class,
         meth_str.strstart = const_cast(meth);
         meth_str.strlen = meth_str.bufused = strlen(meth);
         meth_str.hashval = 0;
-        if (Parrot_find_global_k(interpreter, class_name, &meth_str)) {
+        if (find_vtable_override_byname(interpreter, class_name, &meth_str)) {
             /*
              * the method exists; keep the ParrotObject aka delegate vtable slot
              */
