@@ -129,7 +129,7 @@ transform result (APL::Grammar::target) :language('PIR') {
 
 transform result (APL::Grammar::array_identifier) :language('PIR') {
     $P0 = node['constant']
-    unless $P0 goto variable_name
+    if null $P0 goto variable_name
     .return tree.get('result', $P0, 'APL::Grammar::constant')
 
   variable_name:
