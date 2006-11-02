@@ -1203,15 +1203,21 @@ tree as a PIR code object that can be compiled.
     if $I0 == 0 goto negated_end
     test = '>='
   negated_end:
+    .local string incpos
+    incpos = 'inc pos'
+    $I0 = self['iszerowidth']
+    if $I0 == 0 goto zerowidth_end
+    incpos = '###   zero width'
+  zerowidth_end:
 
-    code.emit(<<"        CODE", label, charlist, test, next)
+    code.emit(<<"        CODE", label, charlist, test, incpos, next)
         %0: # enumcharlist %1
           if pos >= lastpos goto fail
           $S0 = substr target, pos, 1
           $I0 = index %1, $S0
           if $I0 %2 0 goto fail
-          inc pos
-          goto %3
+          %3
+          goto %4
         CODE
     .return ()
 .end

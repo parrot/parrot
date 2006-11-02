@@ -222,10 +222,11 @@ needed for compiling regexes.
     optable.newtok('term:<?', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:<!', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = get_global 'parse_enumcharlist'
+    $P0 = get_global 'parse_enumcharclass'
     optable.newtok('term:<[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:<-[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:<+[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:<+', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:<-', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:<![', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = get_global 'parse_quoted_literal'
     optable.newtok("term:<'", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
@@ -647,6 +648,38 @@ anchors, and match subscripts.
 .end
 
 
+=item C<parse_subname(STR target, INT pos)>
+
+Scan C<target> starting at C<pos> looking for a subrule name
+(following Perl 6's identifier syntax).  Returns any subrule
+name found, and the ending position of the name.
+
+=cut
+
+
+.sub 'parse_subname'
+    .param string target
+    .param int pos
+    .local int startpos, targetlen
+
+    targetlen = length target
+    startpos = pos
+    $I0 = pos
+  loop:
+    $I1 = find_not_cclass .CCLASS_WORD, target, $I0, targetlen
+    if $I1 == $I0 goto end
+    pos = $I1
+    $S0 = substr target, pos, 2
+    if $S0 != '::' goto end
+    $I0 = pos + 2
+    goto loop
+  end:
+    $I0 = pos - startpos
+    $S0 = substr target, startpos, $I0
+    .return ($S0, pos)
+.end
+
+
 =item C<parse_subrule(PMC mob)>
 
 Parses a subrule token.
@@ -656,38 +689,36 @@ Parses a subrule token.
 .sub 'parse_subrule'
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
+    .local pmc mobsave, mfrom, mpos
     .local int pos, lastpos
     .local string key
     key = mob['KEY']
+    mobsave = mob
     (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::Subrule')
     pos = mfrom
     lastpos = length target
 
+    .local string subname
+    (subname, pos) = 'parse_subname'(target, pos)
+    mob['subname'] = subname
+    $S0 = substr target, pos, 1
+
+    ##   see what type of subrule this is
+    mob['iscapture'] = 1
     if key == '<?' goto nocapture
     if key == '<!' goto negated
-    mob['iscapture'] = 1
-    goto subrule_name
+
+    ##   if the next character is +/-, this is really an enumcharclass
+    $I0 = index '+-', $S0
+    if $I0 == -1 goto subrule_arg
+    .return 'parse_enumcharclass'(mobsave)
+
   negated:
     mob['isnegated'] = 1
   nocapture:
     mob['iscapture'] = 0
-  subrule_name:
-    $I0 = pos
-  subrule_name_1:
-    pos = find_not_cclass .CCLASS_WORD, target, pos, lastpos
-    $S0 = substr target, pos, 2
-    if $S0 != '::' goto subrule_name_2
-    pos += 2
-    goto subrule_name_1
-  subrule_name_2:
-    $I1 = pos - $I0
-    .local string subname
-    subname = substr target, $I0, $I1
-    mob['subname'] = subname
-    $S0 = substr target, pos, 2
-    if $S0 == ': ' goto subrule_text_arg
-    $S0 = substr target, pos, 1
+  subrule_arg:
+    if $S0 == ':' goto subrule_text_arg
     if $S0 != ' ' goto subrule_end
   subrule_pattern_arg:
     inc pos
@@ -725,80 +756,160 @@ Parses a subrule token.
 .end
 
 
-=item C<parse_enumcharlist(PMC mob)>
+=item C<parse_enumcharclass(PMC mob)>
 
 Extract an enumerated character list.
 
 =cut
 
-.sub "parse_enumcharlist"
+.sub 'parse_enumcharclass'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
     .local string target
-    .local pmc mfrom, mpos
+    .local pmc term
+    .local string op
     .local int pos, lastpos
-    .local int isrange
-    .local string charlist
-    .local string key
-    key = mob['KEY']
-    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::EnumCharList')
+
+    $P0 = getattribute mob, '$.target'
+    target = $P0
+    pos = mob.to()
     lastpos = length target
-    charlist = ''
-    pos = mfrom
-    isrange = 0
-    mob['isnegated'] = 0
-    if key != '<-[' goto scan
-    mob['isnegated'] = 1
-  scan:
+    op = mob['KEY']
+
+    ##   handle the case of <[, <+[, <-[, and <![ as the token
+    ##   by converting to <, <+, <-, or <! 
+    $S0 = substr op, -1, 1
+    if $S0 != '[' goto parse_loop
+    chopn op, 1
+    goto enum
+
+  parse_loop: 
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     if pos >= lastpos goto err_close
     $S0 = substr target, pos, 1
-    if $S0 == ']' goto endclass
-    if $S0 == '-' goto err_hyphen
-    if $S0 == '.' goto dotrange
-    if $S0 != "\\" goto addchar
-  backslash:
+    if $S0 != '[' goto subrule
     inc pos
-    $S0 = substr target, pos, 1
-    $I0 = index 'nrtfae0', $S0
-    if $I0 == -1 goto addchar
-    $S0 = substr "\n\r\t\f\a\e\0", $I0, 1
-  addchar:
-    inc pos
-    if isrange goto addrange
-    charlist .= $S0
-    goto scan
-  addrange:
+  
+  enum:
+    .local string charlist
+    .local int isrange
+    charlist = ''
     isrange = 0
-    $I2 = ord charlist, -1
-    $I0 = ord $S0
-  addrange_1:
-    inc $I2
-    if $I2 > $I0 goto scan
-    $S1 = chr $I2
-    $I99 = $I2
-    charlist .= $S1
-    goto addrange_1
-  dotrange:
-    if isrange goto addrange
+
+  enum_loop:
+    ##   skip leading whitespace and get next character
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    if pos >= lastpos goto err_close
+    $S0 = substr target, pos, 1
+    if $S0 == ']' goto enum_close
+    if $S0 == '-' goto err_hyphen
+    if $S0 == '.' goto enum_dotrange
+    if $S0 != "\\" goto enum_addchar
+  enum_backslash:
+    inc pos
+    ##   get escaped character
+    $S0 = substr target, pos, 1
+    ##   handle metas such as \n, \t, \r, etc.
+    $I0 = index 'nrtfae0', $S0
+    if $I0 == -1 goto enum_addchar
+    $S0 = substr "\n\r\t\f\a\e\0", $I0, 1
+  enum_addchar:
+    inc pos
+    if isrange goto enum_addrange
+    charlist .= $S0
+    goto enum_loop
+  enum_dotrange:
+    ##   check if we have a .. range marker
+    if isrange goto enum_addrange
     $S1 = substr target, pos, 2
-    if $S1 != ".." goto addchar
+    if $S1 != '..' goto enum_addchar
     pos += 2
     isrange = 1
-    goto scan
-  endclass:
-    $S0 = substr target, pos, 2
-    if $S0 != "]>" goto err_bracket
-    pos += 2
-    mpos = pos
-    mob.'result_object'(charlist)
+    goto enum_loop
+  enum_addrange:
+    ##   add character range to charlist
+    $I2 = ord charlist, -1
+    $I0 = ord $S0
+  enum_addrange_1:
+    inc $I2
+    if $I2 > $I0 goto enum_loop
+    $S1 = chr $I2
+    charlist .= $S1
+    goto enum_addrange_1
+  enum_close:
+    inc pos
+    ##   create a node for the charlist
+    (term) = mob.'newfrom'(0, 'PGE::Exp::EnumCharList')
+    term.'to'(pos)
+    term.'result_object'(charlist)
+    goto combine
+
+  subrule:
+    $I0 = pos
+    .local string subname
+    (subname, pos) = 'parse_subname'(target, $I0)
+    if pos == $I0 goto err
+    (term) = mob.'newfrom'(0, 'PGE::Exp::Subrule')
+    term.'from'($I0)
+    term.'to'(pos)
+    term['subname'] = subname
+    term['iscapture'] = 0
+
+  combine:
+    ##   find out what operator preceded this term
+    if op == '+' goto combine_plus
+    if op == '-' goto combine_minus
+    if op == '<' goto combine_init
+    if op == '<+' goto combine_init
+    ##   token was '<-' or '<!'
+    term['isnegated'] = 1
+    if op != '<!' goto combine_init
+    term['iszerowidth'] = 1
+
+  combine_init:
+    mob = term
+    goto next_op
+
+  combine_plus:
+    ##   <a+b>  ==>   <a> | <b>
+    ($P0) = mob.'newfrom'(0, 'PGE::Exp::Alt')
+    $P0.'to'(pos)
+    $P0[0] = mob
+    $P0[1] = term
+    mob = $P0
+    goto next_op
+
+  combine_minus:
+    ##   <a-b> ==>   <!b> <a>
+    term['isnegated'] = 1
+    term['iszerowidth'] = 1
+    ($P0) = mob.'newfrom'(0, 'PGE::Exp::Concat')
+    $P0.'to'(pos)
+    $P0[0] = term
+    $P0[1] = mob
+    mob = $P0
+    goto next_op
+
+  next_op:
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    if pos >= lastpos goto err_close
+
+    op = substr target, pos, 1
+    inc pos
+    if op == '+' goto parse_loop
+    if op == '-' goto parse_loop
+    if op != '>' goto err
+    mob.'to'(pos)
     goto end
-  err_bracket:
-    parse_error(mob, pos, "Unescaped ']' in charlist")
+
+  err:
+    parse_error(mob, pos, "Error parsing enumerated character class")
     goto end
   err_hyphen:
     parse_error(mob, pos, "Unescaped '-' in charlist (use '..' or '\-')")
     goto end
   err_close:
-    parse_error(mob, pos, "No closing ']>' for charlist")
+    parse_error(mob, pos, "Missing close '>' or ']>' in enumerated character class")
   end:
     .return (mob)
 .end

@@ -158,11 +158,6 @@ Description of the test.
     todo_info[40] = 1
     todo_tests[test_file] = todo_info
 
-    test_file = 'rx_lookarounds'
-    bsr reset_todo_info
-    todo_info[20] = 1
-    todo_tests[test_file] = todo_info
-
     test_file = 'rx_captures'
     bsr reset_todo_info
     todo_info[14] = 1
