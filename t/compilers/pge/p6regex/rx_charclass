@@ -43,5 +43,7 @@
 <'... --- ...'>		...---...	n	literal match (\')
 <'ab\'>cd'>		ab'>cd		y	literal match with quote
 <'ab\\cd'>		ab\x5ccd	y	literal match with backslash
+<[A..Z0..9]>		abcdef		n	two enumerated ranges
+<[A..Z0..9]>		abcDef		y	two enumerated ranges
 
 ## vim: noexpandtab tabstop=4 shiftwidth=4

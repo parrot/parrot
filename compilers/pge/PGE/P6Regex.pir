@@ -828,6 +828,7 @@ Extract an enumerated character list.
     goto enum_loop
   enum_addrange:
     ##   add character range to charlist
+    isrange = 0
     $I2 = ord charlist, -1
     $I0 = ord $S0
   enum_addrange_1:
