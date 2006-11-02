@@ -17,7 +17,7 @@ creating an exhaustive test suite for calling conventions.
     u      |      |      |      |      |      |      |      |      |      |
     n----------------------------------------------------------------------
     n  *1,2|      |      |      |      |      |      |      |      |      |
- B  a flat |  P3  |  P3  |  P3  |  P3  |  P4  |  P5  | P4   |  P5  |  E2  |
+ B  a flat |  P3  |  P3  |  P3  |  P3  |  P4  |  P5  |  P4  |  P5  |  E2  |
     m      |      |      |      |      |      |      |      |      |      |
     e----------------------------------------------------------------------
     d    *1|      |      |      |      |      |      |      |      |      |
@@ -90,10 +90,14 @@ creating an exhaustive test suite for calling conventions.
 
 =head2 Examples
 
+=over 4
+
 =item A:5
+
   'caller'(1, 2) # caller
   .param pmc two :named('two') ; .param pmc one :named('one')
   two = 1 ; one = 2
 
+=back
 
 =cut
