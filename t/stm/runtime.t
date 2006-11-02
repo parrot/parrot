@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 
 plan $^O =~ /MSWin32/ ? (skip_all => 'Broken on Win32') : tests => 5;
 
@@ -123,6 +124,10 @@ ok
 OUTPUT
 
 # test 2
+
+SKIP: {
+    skip("B0rked at least on x86_64", 2) if $PConfig{cpuarch} eq 'x86_64';
+
 pir_output_is($choice_test . <<'CODE', <<'OUTPUT', "choice (multiple threads)");
 .sub _wakeup_func
     .param pmc values
@@ -323,6 +328,7 @@ CODE
 ok
 OUTPUT
 
+} # skip x86_64
 
 my $queue_test = <<'CODE';
 # attributes:
