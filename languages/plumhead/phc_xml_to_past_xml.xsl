@@ -83,11 +83,9 @@ by phc from PHP source. It generates an XML with PAST.
 
 <xsl:template match="phc:AST_if">
   <past:Stmt>
-    <past:Op>
+    <past:Op op="print" >
       <past:Exp>
-        <past:Val>
-          &lt;strong&gt;Condition is true.&lt;/strong&gt;\n  ' )
-        </past:Val>
+        <past:Val valtype="strqq" >ICAgIDxzdHJvbmc+Q29uZGl0aW9uIGlzIHRydWUuPC9zdHJvbmc+CiAg</past:Val>
       </past:Exp>
     </past:Op>
   </past:Stmt>

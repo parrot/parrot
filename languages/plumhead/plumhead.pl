@@ -41,17 +41,21 @@ $logger->debug( $phc_str );
 my $parser      = XML::LibXML->new();
 my $xslt        = XML::LibXSLT->new();
   
-my $phc_ast     = $parser->parse_string( $phc_str );
-my $phc_to_past = $parser->parse_file( 'languages/plumhead/phc_to_past.xsl' );
-my $transform   = $xslt->parse_stylesheet( $phc_to_past );
-my $past        = $transform->transform( $phc_ast );
+my $phc_xml              = $parser->parse_string( $phc_str );
+my $phc_xml_to_past_xml  = $parser->parse_file( 'languages/plumhead/phc_xml_to_past_xml.xsl' );
+my $to_past_xml          = $xslt->parse_stylesheet( $phc_xml_to_past_xml );
+my $past_xml             = $to_past_xml->transform( $phc_xml );
+
+my $past_xml_to_past_pir = $parser->parse_file( 'languages/plumhead/past_xml_to_past_pir.xsl' );
+my $to_past_pir          = $xslt->parse_stylesheet( $past_xml_to_past_pir );
+my $past_pir             = $to_past_pir->transform( $past_xml );
 
 my $pir_fn = $php_fn;
-$pir_fn =~ s/ \. .* //;
+$pir_fn =~ s/ \. [^.]* \z //xms;
 $pir_fn .= '.pir';
 
 open my $pir_fh, '>', $pir_fn or die "Can't open $pir_fn: $!";
-print {$pir_fh} $transform->output_string( $past );
+print {$pir_fh} $to_past_pir->output_string( $past_pir );
 
 system "./parrot $pir_fn";
 
