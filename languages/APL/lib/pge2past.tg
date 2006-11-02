@@ -142,12 +142,12 @@ transform result (APL::Grammar::constant) :language('PIR') {
     .local pmc result
 
     $P0 = node['numeric_constant']
-    unless $P0 goto char_single
+    if null $P0 goto char_single
     .return tree.get('result', $P0, 'APL::Grammar::numeric_constant')
 
   char_single:
     $P0 = node['character_constant_single']
-    unless $P0 goto char_double
+    if null $P0 goto char_double
     .return tree.get('result', $P0, 'APL::Grammar::character_constant_single')
 
   char_double:
