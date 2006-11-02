@@ -54,7 +54,9 @@ by phc from PHP source. It generates an XML with PAST.
 </xsl:template>
 
 <xsl:template match="phc:AST_method_invocation">
-  <xsl:apply-templates select="phc:AST_actual_parameter_list" />
+  <past:Op op='print' >
+    <xsl:apply-templates select="phc:AST_actual_parameter_list" />
+  </past:Op>
 </xsl:template>
 
 <xsl:template match="phc:AST_actual_parameter_list">
@@ -63,22 +65,27 @@ by phc from PHP source. It generates an XML with PAST.
 
 <xsl:template match="phc:AST_actual_parameter">
   <xsl:apply-templates select="phc:Token_string" />
+  <xsl:apply-templates select="phc:Token_int" />
 </xsl:template>
 
 <xsl:template match="phc:Token_string">
-  <xsl:apply-templates select="phc:value" />
+  <past:Exp >
+    <past:Val valtype="strqq" >
+      <xsl:apply-templates select="phc:value" />
+    </past:Val>
+  </past:Exp >
+</xsl:template>
+
+<xsl:template match="phc:Token_int">
+  <past:Exp >
+    <past:Val valtype="int" >
+      <xsl:apply-templates select="phc:value" />
+    </past:Val>
+  </past:Exp >
 </xsl:template>
 
 <xsl:template match="phc:value">
-  <past:Stmt>
-    <past:Op op='print' >
-      <past:Exp>
-        <past:Val valtype="strqq" >
-          <xsl:value-of select="." />
-        </past:Val>
-      </past:Exp>
-    </past:Op>
-  </past:Stmt>
+  <xsl:value-of select="." />
 </xsl:template>
 
 <xsl:template match="phc:AST_if">

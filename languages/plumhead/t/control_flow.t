@@ -28,10 +28,6 @@ if (1) {
   ?>
     <strong>Condition is true.</strong>
   <?php
-} else {
-  ?>
-    <strong>Condition is false.</strong>
-  <?php
 }
 ?>
 END_CODE

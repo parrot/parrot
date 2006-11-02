@@ -124,13 +124,23 @@ a PAST and runs the PAST with help of the parrot compiler tools.
 <xsl:template match="past:Val">
 
   # start of past:Val
-  .local string decoded
-  decoded = dec_sub( "<xsl:value-of select="." />" )
-  decoded = escape decoded
+  <xsl:choose>
+    <xsl:when test="@valtype = 'strqq'" >
+      .local string val
+      val = dec_sub( "<xsl:value-of select="." />" )
+      val = escape val
+    </xsl:when>
+    <xsl:when test="@valtype = 'int'" >
+      .local int val
+      val = <xsl:value-of select="." />
+    </xsl:when>
+  </xsl:choose>
+
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />
   past_node_<xsl:value-of select="generate-id(.)" /> = new 'PAST::Val'                             
+  past_node_<xsl:value-of select="generate-id(.)" />.value( val ) 
   <xsl:apply-templates select="@*"/>
-  past_node_<xsl:value-of select="generate-id(.)" />.value( decoded ) 
+
   past_node_<xsl:value-of select="generate-id(..)" />.'add_child'( past_node_<xsl:value-of select="generate-id(.)" /> )      
   # end of past:Val
 
