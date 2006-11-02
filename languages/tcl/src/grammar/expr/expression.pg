@@ -9,14 +9,14 @@ token ws { \h* }
 
 token program {
    | $<constant>:=[^$]
-   | <[;\n\r\t ]>* <command> [ <?ws> <[\n;]> <?ws> <command>? ]* 
+   | <[;\n\r\t\ ]>* <command> [ <?ws> <[\n;]> <?ws> <command>? ]* 
 }
 
 token command {
     | \# \N*
-    | [ $<word>:=( <quoted_word> [<before [<[;\n\r\t ]>|$]> | <error: extra characters after close-quote> ]
-                 | <braced_word> [<before [<[;\n\r\t ]>|$]> | <error: extra characters after close-brace> ]
-                 | $<chunk>:=( <substitution> | \$ | <-[[$\\;\n\r\t ]>+ )+
+    | [ $<word>:=( <quoted_word> [<before [<[;\n\r\t\ ]>|$]> | <error: extra characters after close-quote> ]
+                 | <braced_word> [<before [<[;\n\r\t\ ]>|$]> | <error: extra characters after close-brace> ]
+                 | $<chunk>:=( <substitution> | \$ | <-[[$\\;\n\r\t\ ]>+ )+
                  ) \h*
       ]+
 }
@@ -35,14 +35,14 @@ token braced_word { <PGE::Text::bracketed: {}> }
 
 token command_substitution {
     \[ \]
-  | \[ <[;\n\r\t ]>* <subcommand> [ <?ws> <[\n;]> <?ws> <subcommand>? ]* [ \] | <error: missing close-bracket> ]
+  | \[ <[;\n\r\t\ ]>* <subcommand> [ <?ws> <[\n;]> <?ws> <subcommand>? ]* [ \] | <error: missing close-bracket> ]
 }
 
 token subcommand {
     | \# \N*
     | [ $<word>:=( <quoted_word>
                  | <braced_word>
-                 | $<chunk>:=( <substitution> | \$ | <-[[$\]\\;\n\r\t ]>+ )+
+                 | $<chunk>:=( <substitution> | \$ | <-[[$\]\\;\n\r\t\ ]>+ )+
                  ) \h*
       ]+
 }
