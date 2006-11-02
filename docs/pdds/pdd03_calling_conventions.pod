@@ -102,51 +102,68 @@ how to expand them for the caller's use.
 These bits of each flag word have these meanings specific to C<set_args> and
 C<set_returns>:
 
-    4     CONSTANT
-               The value is a literal constant, not a register.
-               (Don't set this bit yourself; the assembler will do it.)
+=over 4
 
-    5     FLAT
-               If this bit is set on a PMC value, then the PMC must be an
-               aggregate or a scalar containing a reference to an aggregate.
-               The contents of the aggregate, rather than the aggregate
-               itself, will be passed.
+=item 4     CONSTANT
 
-               	 If the NAMED bit is also set, the aggregate will be used as a
-                 hash; its contents, as key/value pairs, will be passed as
-                 named parameters.  The PMC must implement the full hash
-               	 interface.  {{ TODO: Limit the required interface. }}
+The value is a literal constant, not a register.  (Don't set this bit
+yourself; the assembler will do it.)
+
+=item 5     FLAT
+
+If this bit is set on a PMC value, then the PMC must be an aggregate or a
+scalar containing a reference to an aggregate.  The contents of the aggregate,
+rather than the aggregate itself, will be passed.
+
+ If the NAMED bit is also set, the aggregate will be used as a
+ hash; its contents, as key/value pairs, will be passed as
+ named parameters.  The PMC must implement the full hash
+ interface.  {{ TODO: Limit the required interface. }}
  
-               	 If the NAMED is not set, the aggregate will be used as as
-                 array; its contents will be used as positional parameters.
- 
-               The meaning of this bit is undefined when applied to integer,
-               number, and string values.
+ array; its contents will be used as positional parameters.
 
-    6     MAYBE_FLAT
-               If this bit is set on a PMC value, and:
-                (a) the PMC is either an aggregate or a scalar containing a
-                    reference to an aggregate, and
-                (b) the target register has the SLURPY bit set,
-               then pass the PMC value as a list of values, in these ways:
-                (a) if the value is an array, pass its elements in the normal
-                    way (FLAT style);
-                (b) if the value is a hash, pass its elements as a list of
-                    key/value pairs contained in HLL-specific 'pair' PMCs.
-               The meaning of this bit is undefined when applied to integer,
-               number, and string values.  It may not be combined with the
-               NAMED bit.
+The meaning of this bit is undefined when applied to integer, number, and
+string values.
 
-    7     (unused)
+=item 6     MAYBE_FLAT
 
-    8     (unused)
+If this bit is set on a PMC value, and:
 
-    9     NAMED (FLAT or string constant only)
-               When the FLAT bit is also set, behavior is as described above
-               in the "FLAT" section.  Otherwise, this bit may only be set on
-               a unique string constant specifying the name of the next
-               argument (or returned value).
+=over 4
 
+=item (a) the PMC is either an aggregate or a scalar containing a reference to
+an aggregate, and
+
+=item  (b) the target register has the SLURPY bit set,
+
+=back
+
+then pass the PMC value as a list of values, in these ways:
+
+=over 4
+
+=item (a) if the value is an array, pass its elements in the normal way (FLAT
+style);
+
+=item (b) if the value is a hash, pass its elements as a list of key/value
+pairs contained in HLL-specific 'pair' PMCs.
+
+=back
+
+The meaning of this bit is undefined when applied to integer, number, and
+string values.  It may not be combined with the NAMED bit.
+
+=item 7     (unused)
+
+=item 8     (unused)
+
+=item 9     NAMED (FLAT or string constant only)
+
+When the FLAT bit is also set, behavior is as described above in the "FLAT"
+section.  Otherwise, this bit may only be set on a unique string constant
+specifying the name of the next argument (or returned value).
+
+=back
 
 =head2 Accepting Parameters, Accepting Return Values
 
@@ -168,57 +185,61 @@ constant.  That would make it a variable.)
 These bits of each flag word have these meanings specific to C<get_params> and
 C<get_results>:
 
-    4     (unused)
+=over 4
 
-    5     SLURPY (P only)
-               If this bit is set on a P register, then it will be populated
-               with an aggregate that will contain all of the remaining values
-               that have not already been stored in other registers.
+=item 4     (unused)
 
-               All such values will be converted to PMCs according to the
-               detailed rules below, and those PMCs will be stored into the
-               new aggregate.
+=item 5     SLURPY (P only)
 
-                 If the NAMED bit is also set, the aggregate will be an
-                 HLL-specific hash type and the contents will be all
-                 unassigned _named_ parameters.
+If this bit is set on a P register, then it will be populated with an
+aggregate that will contain all of the remaining values that have not already
+been stored in other registers.
 
-                 If the NAMED bit is not set, the aggregate will be an
-                 HLL-specific array type and the contents will be all
-                 unassigned positional parameters.
+All such values will be converted to PMCs according to the detailed rules
+below, and those PMCs will be stored into the new aggregate.
 
-    6     (unused)
+ If the NAMED bit is also set, the aggregate will be an
+ HLL-specific hash type and the contents will be all
+ unassigned _named_ parameters.
 
-    7     OPTIONAL
-               If this bit is set on a register for which no value has been
-               passed, no exception will be raised; rather, the register will
-               be set to a default value: a Null PMC for P, an empty string
-               for S, or zero for N or I.
+ If the NAMED bit is not set, the aggregate will be an
+ HLL-specific array type and the contents will be all
+ unassigned positional parameters.
 
-    8     OPT_FLAG (I only)
-               An I register with this bit set is set to one if the
-               immediately preceding B<OPTIONAL> register received a value;
-               otherwise, it is set to zero.
+=item 6     (unused)
 
-    8     READONLY (P only)
-               XXX - PROPOSED ONLY - XXX
-               If this bit is set on a P register that receives a value,
-               Parrot will ensure that the final value in the P register
-               is read-only (i.e. will not permit modification).  If the
-               received value was a mutable PMC, then Parrot will create
-               and set the register to a read-only PMC wrapper around the
-               original PMC.
+=item 7     OPTIONAL
 
-               Parrot's algorithm for deciding what is writable may be pretty
-               simplistic.  In initial implementations, it may assume that any
-               PMC not of a known read-only-wrapper type is mutable.
+If this bit is set on a register for which no value has been passed, no
+exception will be raised; rather, the register will be set to a default value:
+a Null PMC for P, an empty string for S, or zero for N or I.
 
-    9     NAMED (SLURPY or string constant only)
-               When the SLURPY bit is also set, behavior is as described above
-               in the "SLURPY" section.  Otherwise, this bit may only be set
-               on a unique string constant specifying the name of the next
-               argument (or returned value).
+=item 8     OPT_FLAG (I only)
 
+An I register with this bit set is set to one if the immediately preceding
+B<OPTIONAL> register received a value; otherwise, it is set to zero.
+
+=item 8     READONLY (P only)
+
+XXX - PROPOSED ONLY - XXX
+
+If this bit is set on a P register that receives a value, Parrot will ensure
+that the final value in the P register is read-only (i.e. will not permit
+modification).  If the received value was a mutable PMC, then Parrot will
+create and set the register to a read-only PMC wrapper around the original
+PMC.
+
+Parrot's algorithm for deciding what is writable may be pretty simplistic.  In
+initial implementations, it may assume that any PMC not of a known
+read-only-wrapper type is mutable.
+
+=item 9     NAMED (SLURPY or string constant only)
+
+When the SLURPY bit is also set, behavior is as described above in the
+"SLURPY" section.  Otherwise, this bit may only be set on a unique string
+constant specifying the name of the next argument (or returned value).
+
+=back
 
 =head3 Overflow
 
