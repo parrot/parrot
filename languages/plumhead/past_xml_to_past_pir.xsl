@@ -107,7 +107,12 @@ a PAST and runs the PAST with help of the parrot compiler tools.
 
   # start of generic node
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
-  past_node_<xsl:value-of select="generate-id(.)" /> = new '<xsl:choose><xsl:when test="name() = 'past:Stmts'" >PAST::Stmts</xsl:when><xsl:when test="name() = 'past:Stmt'" >PAST::Stmt</xsl:when><xsl:when test="name() = 'past:Op'" >PAST::Op</xsl:when><xsl:when test="name() = 'past:Exp'" >PAST::Exp</xsl:when></xsl:choose>'
+  past_node_<xsl:value-of select="generate-id(.)" /> = new '<xsl:choose>
+    <xsl:when test="name() = 'past:Stmts'" >PAST::Stmts</xsl:when>
+    <xsl:when test="name() = 'past:Stmt'"  >PAST::Stmt</xsl:when>
+    <xsl:when test="name() = 'past:Op'"    >PAST::Op</xsl:when>
+    <xsl:when test="name() = 'past:Exp'"   >PAST::Exp</xsl:when>
+                                                            </xsl:choose>'
   <xsl:apply-templates select="@*"/>
   <xsl:apply-templates />
   past_node_<xsl:value-of select="generate-id(..)" />.'add_child'( past_node_<xsl:value-of select="generate-id(.)" /> )      
