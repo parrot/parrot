@@ -54,5 +54,7 @@ a<!wb>			abc\ndef\n-==\nghi	y	\w\w nonword boundary
 <ident>			2+3 ab2		/mob<ident>: <ab2 @ 4>/		capturing builtin <ident>
 <name>			ab::cd::x3::42	/mob<name>: <ab::cd::x3 @ 0>/	capturing builtin <name>
 <+alnum+[_]>	ident_1				y	union of character classes
+^<-upper>dent	ident_1				y	inverted character class
+^<-upper>dent	Ident_1				n	inverted character class
 
 ## vim: noexpandtab tabstop=4 shiftwidth=4

@@ -863,8 +863,17 @@ Extract an enumerated character list.
     if op == '<+' goto combine_init
     ##   token was '<-' or '<!'
     term['isnegated'] = 1
-    if op != '<!' goto combine_init
     term['iszerowidth'] = 1
+    if op == '<!' goto combine_init
+    ##   token is '<-', we need to match a char by concat dot
+    $P0 = mob.'newfrom'(0, 'PGE::Exp::CCShortcut')
+    $P0.'to'(pos)
+    $P0.'result_object'('.')
+    mob = mob.'newfrom'(0, 'PGE::Exp::Concat')
+    mob.'to'(pos)
+    mob[0] = term
+    mob[1] = $P0
+    goto next_op
 
   combine_init:
     mob = term
