@@ -1,0 +1,462 @@
+/*
+Copyright (C) 2001-2006, The Perl Foundation.
+$Id: capture.pmc 15025 2006-10-25 23:52:52Z jonathan $
+
+=head1 NAME
+
+src/pmc/capture.pmc - Capture PMC
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Capture PMC.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+typedef struct {
+    PMC *array;                /* array component */
+    PMC *hash;                 /* hash component */
+} Capture_data;
+
+#define CAPTURE_DATA_SIZE   2
+#define CAPTURE_array(obj)  (((Capture_data*)PMC_data(obj))->array)
+#define CAPTURE_hash(obj)   (((Capture_data*)PMC_data(obj))->hash)
+#define CAPTURE_array_CREATE(i, obj) \
+    if (!CAPTURE_array(obj)) CAPTURE_array(obj) = pmc_new(i, enum_class_ResizablePMCArray);
+#define CAPTURE_hash_CREATE(i, obj) \
+    if (!CAPTURE_hash(obj)) CAPTURE_hash(obj) = pmc_new(i, enum_class_Hash);
+
+
+pmclass Capture need_ext does array does hash {
+
+/*
+
+=item C<void init()>
+
+Initializes the Capture instance.
+
+=item C<void destroy()>
+
+Free structures.
+
+=cut
+
+*/
+
+    void init () {
+        PMC_data(SELF) = mem_sys_allocate(sizeof(Capture_data));
+        CAPTURE_array(SELF) = NULL;
+        CAPTURE_hash(SELF) = NULL;
+        PMC_int_val(SELF) = CAPTURE_DATA_SIZE;
+        PObj_active_destroy_SET(SELF);
+        PObj_data_is_PMC_array_SET(SELF);
+    }
+
+    void destroy () {
+        if (PMC_data(SELF)) {
+            mem_sys_free(PMC_data(SELF));
+            PMC_data(SELF) = NULL;
+        }
+        PMC_int_val(SELF) = 0;
+    }
+
+/*
+
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
+
+=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
+
+Sets a value in the array component of the Capture.
+
+=cut
+
+*/
+
+    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        VTABLE_set_number_keyed_int(INTERP, CAPTURE_array(SELF), key, value);
+    }
+
+    void set_integer_keyed_int(INTVAL key, INTVAL value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        VTABLE_set_integer_keyed_int(INTERP, CAPTURE_array(SELF), key, value);
+    }
+
+    void set_pmc_keyed_int(INTVAL key, PMC *value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        VTABLE_set_pmc_keyed_int(INTERP, CAPTURE_array(SELF), key, value);
+    }
+
+    void set_string_keyed_int(INTVAL key, STRING *value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        VTABLE_set_string_keyed_int(INTERP, CAPTURE_array(SELF), key, value);
+    }
+
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+=item C<PMC* get_pmc_keyed_int(INTVAL key)>
+
+=item C<STRING* get_string_keyed_int(INTVAL key)>
+
+Retrieves a value in the array component of the Capture.
+
+=cut
+
+*/
+
+    FLOATVAL get_number_keyed_int(INTVAL key) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_get_number_keyed_int(INTERP, CAPTURE_array(SELF), key);
+    }
+
+    INTVAL get_integer_keyed_int(INTVAL key) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_get_integer_keyed_int(INTERP, CAPTURE_array(SELF), key);
+    }
+
+    PMC* get_pmc_keyed_int(INTVAL key) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_get_pmc_keyed_int(INTERP, CAPTURE_array(SELF), key);
+    }
+
+    STRING* get_string_keyed_int(INTVAL key) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_get_string_keyed_int(INTERP, CAPTURE_array(SELF), key);
+    }
+
+/*
+
+=item C<void push_float(FLOATVAL value)>
+
+=item C<void push_integer(INTVAL value)>
+
+=item C<void push_pmc(PMC *value)>
+
+=item C<void push_string(STRING *value)>
+
+Push a value onto the array component of the Capture.
+
+=item C<void unshift_float(FLOATVAL value)>
+
+=item C<void unshift_integer(INTVAL value)>
+
+=item C<void unshift_pmc(PMC *value)>
+
+=item C<void unshift_string(STRING *value)>
+
+Unshift a value onto the array component of the Capture.
+
+=cut
+
+*/
+
+    void push_float(FLOATVAL value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_push_float(INTERP, CAPTURE_array(SELF), value);
+    }
+    
+    void push_integer(INTVAL value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_push_integer(INTERP, CAPTURE_array(SELF), value);
+    }
+
+    void push_pmc(PMC *value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_push_pmc(INTERP, CAPTURE_array(SELF), value);
+    }
+
+    void push_string(STRING *value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_push_string(INTERP, CAPTURE_array(SELF), value);
+    }
+
+    void unshift_float(FLOATVAL value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_unshift_float(INTERP, CAPTURE_array(SELF), value);
+    }
+    
+    void unshift_integer(INTVAL value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_unshift_integer(INTERP, CAPTURE_array(SELF), value);
+    }
+
+    void unshift_pmc(PMC *value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_unshift_pmc(INTERP, CAPTURE_array(SELF), value);
+    }
+
+    void unshift_string(STRING *value) {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_unshift_string(INTERP, CAPTURE_array(SELF), value);
+    }
+
+/*
+
+=item C<FLOATVAL pop_float()>
+
+=item C<INTVAL pop_integer()>
+
+=item C<PMC* pop_pmc()>
+
+=item C<STRING* pop_string()>
+
+Pop a value from the array component of the Capture.
+
+=item C<FLOATVAL shift_float()>
+
+=item C<INTVAL shift_integer()>
+
+=item C<PMC* shift_pmc()>
+
+=item C<STRING* shift_string()>
+
+Shift a value from the array component of the Capture.
+
+=cut
+
+*/
+
+    FLOATVAL pop_float() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_pop_float(INTERP, CAPTURE_array(SELF));
+    }
+
+    INTVAL pop_integer() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_pop_integer(INTERP, CAPTURE_array(SELF));
+    }
+
+    PMC* pop_pmc() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_pop_pmc(INTERP, CAPTURE_array(SELF));
+    }
+
+    STRING* pop_string() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_pop_string(INTERP, CAPTURE_array(SELF));
+    }
+
+    FLOATVAL shift_float() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_shift_float(INTERP, CAPTURE_array(SELF));
+    }
+
+    INTVAL shift_integer() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_shift_integer(INTERP, CAPTURE_array(SELF));
+    }
+
+    PMC* shift_pmc() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_shift_pmc(INTERP, CAPTURE_array(SELF));
+    }
+
+    STRING* shift_string() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return VTABLE_shift_string(INTERP, CAPTURE_array(SELF));
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Return the number of elements in the array component of the Capture.
+
+=item C<INTVAL defined_keyed_int(INTVAL key)>
+
+Return true if element C<key> of the array component is defined.
+
+=item C<INTVAL exists_keyed_int(INTVAL key)>
+
+Return true if element C<key> of the array component exists.
+
+=item C<void delete_keyed_int(INTVAL key)>
+
+Delete the element corresponding to C<key> in the array component.
+
+=cut
+
+*/
+
+    INTVAL elements() {
+        if (!CAPTURE_array(SELF)) return 0;
+        return VTABLE_elements(INTERP, CAPTURE_array(SELF));
+    }
+
+    INTVAL defined_keyed_int(INTVAL key) {
+        if (!CAPTURE_array(SELF)) return 0;
+        return VTABLE_defined_keyed_int(INTERP, CAPTURE_array(SELF), key);
+    }
+
+    INTVAL exists_keyed_int(INTVAL key) {
+        if (!CAPTURE_array(SELF)) return 0;
+        return VTABLE_exists_keyed_int(INTERP, CAPTURE_array(SELF), key);
+    }
+
+    void delete_keyed_int(INTVAL key) {
+        if (CAPTURE_array(SELF)) {
+            VTABLE_delete_keyed_int(INTERP, CAPTURE_array(SELF), key);
+        }
+    }
+
+/*
+
+=item C<void set_number_keyed(PMC *key, FLOATVAL value)>
+
+=item C<void set_integer_keyed(PMC* key, INTVAL value)>
+
+=item C<void set_pmc_keyed(PMC* key, PMC *value)>
+
+=item C<void set_string_keyed(PMC* key, STRING *value)>
+
+Sets a value in the hash component of the Capture.
+
+=cut
+
+*/
+
+    void set_number_keyed(PMC *key, FLOATVAL value) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        VTABLE_set_number_keyed(INTERP, CAPTURE_hash(SELF), key, value);
+    }
+
+    void set_integer_keyed(PMC *key, INTVAL value) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        VTABLE_set_integer_keyed(INTERP, CAPTURE_hash(SELF), key, value);
+    }
+
+    void set_pmc_keyed(PMC *key, PMC *value) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        VTABLE_set_pmc_keyed(INTERP, CAPTURE_hash(SELF), key, value);
+    }
+
+    void set_string_keyed(PMC *key, STRING *value) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        VTABLE_set_string_keyed(INTERP, CAPTURE_hash(SELF), key, value);
+    }
+
+/*
+
+=item C<FLOATVAL get_number_keyed(PMC *key)>
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+=item C<PMC* get_pmc_keyed(PMC *key)>
+
+=item C<STRING* get_string_keyed(PMC *key)>
+
+Retrieves a value from the hash component of the Capture.
+
+=cut
+
+*/
+
+    FLOATVAL get_number_keyed(PMC* key) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        return VTABLE_get_number_keyed(INTERP, CAPTURE_hash(SELF), key);
+    }
+
+    INTVAL get_integer_keyed(PMC* key) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        return VTABLE_get_integer_keyed(INTERP, CAPTURE_hash(SELF), key);
+    }
+
+    PMC* get_pmc_keyed(PMC* key) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        return VTABLE_get_pmc_keyed(INTERP, CAPTURE_hash(SELF), key);
+    }
+
+    STRING* get_string_keyed(PMC* key) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        return VTABLE_get_string_keyed(INTERP, CAPTURE_hash(SELF), key);
+    }
+
+/*
+
+=item C<INTVAL defined_keyed(PMC *key)>
+
+Return true if element C<key> of the hash component is defined.
+
+=item C<INTVAL exists_keyed(PMC *key)>
+
+Return true if element C<key> of the hash component exists.
+
+=item C<void delete_keyed(PMC *key)>
+
+Delete the element corresponding to C<key> in the hash component.
+
+=cut
+
+*/
+
+    INTVAL defined_keyed(PMC *key) {
+        if (!CAPTURE_array(SELF)) return 0;
+        return VTABLE_defined_keyed(INTERP, CAPTURE_hash(SELF), key);
+    }
+
+    INTVAL exists_keyed(PMC *key) {
+        if (!CAPTURE_array(SELF)) return 0;
+        return VTABLE_exists_keyed(INTERP, CAPTURE_hash(SELF), key);
+    }
+
+    void delete_keyed(PMC *key) {
+        if (CAPTURE_array(SELF)) 
+            VTABLE_delete_keyed(INTERP, CAPTURE_hash(SELF), key);
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+*/
+
+    METHOD PMC* get_array() {
+        CAPTURE_array_CREATE(INTERP, SELF);
+        return CAPTURE_array(SELF);
+    }
+
+    METHOD PMC* get_hash() {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        return CAPTURE_hash(SELF);
+    }
+
+}
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial version                  - Patrick Michaud 2006-11-03
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+
