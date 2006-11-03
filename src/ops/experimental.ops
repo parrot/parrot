@@ -469,6 +469,24 @@ op need_finalize(invar PMC) {
     goto NEXT();
 }
 
+
+########################################
+
+=item B<runinterp>(invar PMC, in PMC)
+
+Invokes the PMC $2 using interpreter $1.
+
+=cut
+
+op runinterp(invar PMC, in PMC) {
+    Interp * const new_interp = (Interp *)PMC_data($1);
+    opcode_t *pc;
+    Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
+    pc = VTABLE_invoke(new_interp, $2, NULL);
+    runops(new_interp, pc - new_interp->code->base.data);
+    goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

@@ -148,6 +148,7 @@ create_interp(PMC *self, Parrot_Interp parent)
     PMC_data(self) = new_interp;
     VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
         (INTVAL) IGLOBALS_INTERPRETER, self);
+    new_interp->current_cont = NEED_CONTINUATION;
 }
 
 static int
