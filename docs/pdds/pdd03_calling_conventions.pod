@@ -54,9 +54,9 @@ opcodes.  But for now, certain efficiency hacks are easier with four opcodes.)
 
 The common syntax of these opcodes is:
 
-    <set_opcode> "(flags0, flags1, ..., flagsN)", VAL0, VAL1, ... VALN
-    <get_opcode> "(flags0, flags1, ..., flagsN)", REG0, REG1, ... REGN
-    <get_opcode> "(..., 0x200, flags0, ...)", ..., "name", REG0, ...
+ <set_opcode> "(flags0, flags1, ..., flagsN)", VAL0, VAL1, ... VALN
+ <get_opcode> "(flags0, flags1, ..., flagsN)", REG0, REG1, ... REGN
+ <get_opcode> "(..., 0x200, flags0, ...)", ..., "name", REG0, ...
 
 The flags string is a literal quoted string denoting a list of zero or more
 comma-separated integers.  The list as a whole may be surrounded by
@@ -104,12 +104,12 @@ C<set_returns>:
 
 =over 4
 
-=item 4     CONSTANT
+=item 4     C<CONSTANT>
 
 The value is a literal constant, not a register.  (Don't set this bit
 yourself; the assembler will do it.)
 
-=item 5     FLAT
+=item 5     C<FLAT>
 
 If this bit is set on a PMC value, then the PMC must be an aggregate or a
 scalar containing a reference to an aggregate.  The contents of the aggregate,
@@ -125,16 +125,20 @@ rather than the aggregate itself, will be passed.
 The meaning of this bit is undefined when applied to integer, number, and
 string values.
 
-=item 6     MAYBE_FLAT
+=item 6     C<MAYBE_FLAT>
 
 If this bit is set on a PMC value, and:
 
 =over 4
 
-=item (a) the PMC is either an aggregate or a scalar containing a reference to
+=item a
+
+the PMC is either an aggregate or a scalar containing a reference to
 an aggregate, and
 
-=item  (b) the target register has the SLURPY bit set,
+=item b
+
+the target register has the SLURPY bit set,
 
 =back
 
@@ -142,10 +146,14 @@ then pass the PMC value as a list of values, in these ways:
 
 =over 4
 
-=item (a) if the value is an array, pass its elements in the normal way (FLAT
+=item a
+
+if the value is an array, pass its elements in the normal way (FLAT
 style);
 
-=item (b) if the value is a hash, pass its elements as a list of key/value
+=item b
+
+if the value is a hash, pass its elements as a list of key/value
 pairs contained in HLL-specific 'pair' PMCs.
 
 =back
@@ -153,11 +161,11 @@ pairs contained in HLL-specific 'pair' PMCs.
 The meaning of this bit is undefined when applied to integer, number, and
 string values.  It may not be combined with the NAMED bit.
 
-=item 7     (unused)
+=item 7     C<(unused)>
 
-=item 8     (unused)
+=item 8     C<(unused)>
 
-=item 9     NAMED (FLAT or string constant only)
+=item 9     C<NAMED (FLAT or string constant only)>
 
 When the FLAT bit is also set, behavior is as described above in the "FLAT"
 section.  Otherwise, this bit may only be set on a unique string constant
@@ -187,9 +195,9 @@ C<get_results>:
 
 =over 4
 
-=item 4     (unused)
+=item 4     C<(unused)>
 
-=item 5     SLURPY (P only)
+=item 5     C<SLURPY (P only)>
 
 If this bit is set on a P register, then it will be populated with an
 aggregate that will contain all of the remaining values that have not already
@@ -206,22 +214,22 @@ below, and those PMCs will be stored into the new aggregate.
  HLL-specific array type and the contents will be all
  unassigned positional parameters.
 
-=item 6     (unused)
+=item 6     C<(unused)>
 
-=item 7     OPTIONAL
+=item 7     C<OPTIONAL>
 
 If this bit is set on a register for which no value has been passed, no
 exception will be raised; rather, the register will be set to a default value:
 a Null PMC for P, an empty string for S, or zero for N or I.
 
-=item 8     OPT_FLAG (I only)
+=item 8     C<OPT_FLAG (I only)>
 
 An I register with this bit set is set to one if the immediately preceding
 B<OPTIONAL> register received a value; otherwise, it is set to zero.
 
-=item 8     READONLY (P only)
+=item 8     C<READONLY (P only)>
 
-XXX - PROPOSED ONLY - XXX
+C<XXX - PROPOSED ONLY - XXX>
 
 If this bit is set on a P register that receives a value, Parrot will ensure
 that the final value in the P register is read-only (i.e. will not permit
@@ -233,7 +241,7 @@ Parrot's algorithm for deciding what is writable may be pretty simplistic.  In
 initial implementations, it may assume that any PMC not of a known
 read-only-wrapper type is mutable.
 
-=item 9     NAMED (SLURPY or string constant only)
+=item 9     C<NAMED (SLURPY or string constant only)>
 
 When the SLURPY bit is also set, behavior is as described above in the
 "SLURPY" section.  Otherwise, this bit may only be set on a unique string
