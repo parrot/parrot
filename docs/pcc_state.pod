@@ -57,7 +57,7 @@ creating an exhaustive test suite for calling conventions.
 
   P1  pass as-is, next state
   P2  pass as-is, next src
-  P3  pass contents as array items, next 
+  P3  pass contents as array items, next
   P4  pass current array item as-is, next src array item
   P5  pass current array items as pairs (a[0],a[0]) or as (a[0],a[1]) (a.size % 2 = 0)
 
@@ -65,7 +65,7 @@ creating an exhaustive test suite for calling conventions.
 
   X1  if(src pmc is aggregate or reference to aggregate)
         if dest is array, pass as flat
-        if test is hash, pass as pairs
+        if dest is hash, pass as pairs
 
 =item  Errors
 
