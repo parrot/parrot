@@ -110,6 +110,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'runinterp - works with printing', todo => '
 .end
 CODE
 uno
+y uno es igual a
 dos
 OUTPUT
 
