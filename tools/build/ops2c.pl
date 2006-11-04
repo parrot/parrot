@@ -669,17 +669,17 @@ print $SOURCE <<END_C;
 */
 
 static op_lib_t ${bs}op_lib = {
-  "$base",		/* name */
-  "$suffix",		/* suffix */
-  $core_type,	        /* core_type = PARROT_XX_CORE */
-  0,			/* flags */
-  $major_version,	/* major_version */
-  $minor_version,	/* minor_version */
-  $patch_version,	/* patch_version */
-  $num_ops,		/* op_count */
-  $op_info,		/* op_info_table */
-  $op_func,		/* op_func_table */
-  $getop		/* op_code() */
+  "$base",              /* name */
+  "$suffix",            /* suffix */
+  $core_type,           /* core_type = PARROT_XX_CORE */
+  0,                    /* flags */
+  $major_version,       /* major_version */
+  $minor_version,       /* minor_version */
+  $patch_version,       /* patch_version */
+  $num_ops,             /* op_count */
+  $op_info,             /* op_info_table */
+  $op_func,             /* op_func_table */
+  $getop                /* op_code() */
 };
 
 END_C

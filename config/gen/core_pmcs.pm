@@ -120,7 +120,7 @@ END_C
         foreach (@pmcs[0 .. $#pmcs - 1]);
     print OUT <<"END_C";
         if (!pass) {
-	    parrot_global_setup_2(interp);
+            parrot_global_setup_2(interp);
         }
     }
 }

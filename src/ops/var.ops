@@ -42,8 +42,8 @@ op store_lex(in STR, invar PMC) {
     STRING * const lex_name = $1;
     PMC * const lex_pad = Parrot_find_pad(interpreter, lex_name, ctx);
     if (PMC_IS_NULL(lex_pad)) {
-	real_exception(interpreter, NULL, LEX_NOT_FOUND,
-		"Lexical '%Ss' not found", lex_name);
+        real_exception(interpreter, NULL, LEX_NOT_FOUND,
+                "Lexical '%Ss' not found", lex_name);
     }
     VTABLE_set_pmc_keyed_str(interpreter, lex_pad, lex_name, $2);
     goto NEXT();
@@ -67,10 +67,10 @@ op find_lex(out PMC, in STR) {
     PMC *result = NULL;
 
     if (!PMC_IS_NULL(lex_pad))
-	result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
+        result = VTABLE_get_pmc_keyed_str(interpreter, lex_pad, lex_name);
     if (!result) {
-	real_exception(interpreter, NULL, LEX_NOT_FOUND,
-		"Lexical '%Ss' not found", lex_name);
+        real_exception(interpreter, NULL, LEX_NOT_FOUND,
+                "Lexical '%Ss' not found", lex_name);
     }
     $1 = result;
     goto NEXT();
@@ -413,16 +413,16 @@ op find_global(out PMC, in STR) {
 
 op find_global(out PMC, in STR, in STR) {
     PMC * const ns = Parrot_get_namespace_keyed_str(interpreter,
-						    Parrot_get_ctx_HLL_namespace(interpreter),
-						    $2);
+                                                    Parrot_get_ctx_HLL_namespace(interpreter),
+                                                    $2);
     $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
 
 op find_global(out PMC, in PMC, in STR) {
     PMC * const ns = Parrot_get_namespace_keyed(interpreter,
-						Parrot_get_ctx_HLL_namespace(interpreter),
-						$2);
+                                                Parrot_get_ctx_HLL_namespace(interpreter),
+                                                $2);
     $1 = Parrot_find_global_op(interpreter, ns, $3, expr NEXT());
     goto NEXT();
 }
@@ -438,7 +438,7 @@ errors settings. See B<errorson>.
 
 op find_name(out PMC, in STR) {
     if (!$2)
-	internal_exception(1, "Tried to find null name");
+        internal_exception(1, "Tried to find null name");
 
     $1 = Parrot_find_name_op(interpreter, $2, expr NEXT());
     goto NEXT();

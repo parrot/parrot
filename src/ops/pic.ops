@@ -53,21 +53,21 @@ inline op pic_infix__(inconst INT, invar PMC, invar PMC) :pic {
     lr_types = (left->vtable->base_type << 16) | right->vtable->base_type;
     if (lru->u.type == lr_types) {
 runit_v_pp:
-	((mmd_f_v_pp)lru->f.real_function)(interpreter, left, right);
-	goto NEXT();
+        ((mmd_f_v_pp)lru->f.real_function)(interpreter, left, right);
+        goto NEXT();
     }
     if (mic->pic) {
-	lru = mic->pic->lru;
-	if (lru->u.type == lr_types)
-	    goto runit_v_pp;
-	if (++lru->u.type == lr_types)
-	    goto runit_v_pp;
-	if (++lru->u.type == lr_types)
-	    goto runit_v_pp;
-	mic->pic->miss_count++;
-	/*
-	 * TODO if we got too often here just do a dynamic lookup
-	 */
+        lru = mic->pic->lru;
+        if (lru->u.type == lr_types)
+            goto runit_v_pp;
+        if (++lru->u.type == lr_types)
+            goto runit_v_pp;
+        if (++lru->u.type == lr_types)
+            goto runit_v_pp;
+        mic->pic->miss_count++;
+        /*
+         * TODO if we got too often here just do a dynamic lookup
+         */
     }
     parrot_pic_find_infix_v_pp(interpreter, left, right, mic, cur_opcode);
     /* rerun this opcode */
@@ -94,32 +94,32 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
     rt = right->vtable->base_type;
     lr_types = (lt << 16) | rt;
     if (lru->u.type == lr_types) {
-	INTVAL a = lt == enum_class_Integer ? PMC_int_val(left) :
-	    VTABLE_get_integer(interpreter, left);
-	INTVAL b = rt == enum_class_Integer ? PMC_int_val(right) :
-	    VTABLE_get_integer(interpreter, right);
-	INTVAL c = a - b;
-	if ((c^a) >= 0 || (c^~b) >= 0) {
-	    if (lt == enum_class_Integer)
-		PMC_int_val(left) = c;
-	    else
-		VTABLE_set_integer_native(interpreter, left, c);
-	}
-	else {
-	    if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
-		real_exception(interpreter, NULL, ERR_OVERFLOW,
-			"Integer overflow");
-	    }
-	    /* TODO preserve type system */
-	    VTABLE_morph(interpreter, left, enum_class_BigInt);
-	    VTABLE_set_integer_native(interpreter, left, a);
-	    mmd_dispatch_p_pip(interpreter, left, b, left, MMD_SUBTRACT);
-	}
+        INTVAL a = lt == enum_class_Integer ? PMC_int_val(left) :
+            VTABLE_get_integer(interpreter, left);
+        INTVAL b = rt == enum_class_Integer ? PMC_int_val(right) :
+            VTABLE_get_integer(interpreter, right);
+        INTVAL c = a - b;
+        if ((c^a) >= 0 || (c^~b) >= 0) {
+            if (lt == enum_class_Integer)
+                PMC_int_val(left) = c;
+            else
+                VTABLE_set_integer_native(interpreter, left, c);
+        }
+        else {
+            if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
+                real_exception(interpreter, NULL, ERR_OVERFLOW,
+                        "Integer overflow");
+            }
+            /* TODO preserve type system */
+            VTABLE_morph(interpreter, left, enum_class_BigInt);
+            VTABLE_set_integer_native(interpreter, left, a);
+            mmd_dispatch_p_pip(interpreter, left, b, left, MMD_SUBTRACT);
+        }
     }
     else {
         ((void**)cur_opcode)[0] =
             parrot_pic_opcode(interpreter, PARROT_OP_pic_infix___ic_p_p);
-	goto OFFSET(0);
+        goto OFFSET(0);
     }
     goto NEXT();
 }
@@ -151,36 +151,36 @@ inline op pic_get_params__(inconst PMC) :pic {
     mic = (Parrot_MIC *) cur_opcode[1];
     caller_ctx = ctx->caller_ctx;
     if (src_pc) {
-	src_pred = (void**) src_pc - caller_ctx->pred_offset;
-	sig = (PMC*)(src_pred[1]);
+        src_pred = (void**) src_pc - caller_ctx->pred_offset;
+        sig = (PMC*)(src_pred[1]);
     }
     else {
-	sig = NULL;
-	src_pred = NULL;	/* just for gcc */
+        sig = NULL;
+        src_pred = NULL;        /* just for gcc */
     }
     lru = &mic->lru;
     if (lru->u.signature == sig) {
-	if (sig) {
-	    n = ((arg_pass_f)lru->f.real_function)(interpreter, sig,
-		    (char*)caller_ctx->bp.regs_i, src_pred, 
-		    _reg_base, (void**)cur_opcode);
-	}
+        if (sig) {
+            n = ((arg_pass_f)lru->f.real_function)(interpreter, sig,
+                    (char*)caller_ctx->bp.regs_i, src_pred, 
+                    _reg_base, (void**)cur_opcode);
+        }
         else
             n = 2;
-	ccont = ctx->current_cont;
-	if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
-	    PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
-	    --ctx->recursion_depth;
-	    ctx->caller_ctx = caller_ctx->caller_ctx;
-	    Parrot_free_context(interpreter, caller_ctx, 0);
+        ccont = ctx->current_cont;
+        if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
+            PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
+            --ctx->recursion_depth;
+            ctx->caller_ctx = caller_ctx->caller_ctx;
+            Parrot_free_context(interpreter, caller_ctx, 0);
             interpreter->current_args = NULL;
-	}
+        }
 
-	goto OFFSET(n);
+        goto OFFSET(n);
     }
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
-	parrot_pic_opcode(interpreter, PARROT_OP_get_params_pc);
+        parrot_pic_opcode(interpreter, PARROT_OP_get_params_pc);
     ((void**)cur_opcode)[1] = mic->m.sig;
     goto OFFSET(0);
 }
@@ -200,35 +200,35 @@ inline op pic_set_returns__(inconst PMC) :pic {
     ccont = ctx->current_cont;
     cc = PMC_cont(ccont);
     if (!cc->address) {
-	interpreter->current_returns = CUR_OPCODE;
+        interpreter->current_returns = CUR_OPCODE;
         n = PMC_int_val(mic->m.sig);
-	goto OFFSET(n + 2);
+        goto OFFSET(n + 2);
     }
     caller_ctx = cc->to_ctx;
     interpreter->current_args = NULL;
     dest_pc = caller_ctx->current_results;
     if (dest_pc) {
-	dest_pred = (void**) dest_pc - caller_ctx->pred_offset;
-	sig = (PMC*)(dest_pred[1]);
+        dest_pred = (void**) dest_pc - caller_ctx->pred_offset;
+        sig = (PMC*)(dest_pred[1]);
     }
     else {
-	sig = NULL;
-	dest_pred = NULL;
+        sig = NULL;
+        dest_pred = NULL;
     }
     lru = &mic->lru;
     if (lru->u.signature == sig) {
-	if (sig) {
-	    n = ((arg_pass_f)lru->f.real_function)(interpreter, mic->m.sig,
-		    _reg_base, (void**)cur_opcode, 
-		    (char*)caller_ctx->bp.regs_i, dest_pred);
-	}
+        if (sig) {
+            n = ((arg_pass_f)lru->f.real_function)(interpreter, mic->m.sig,
+                    _reg_base, (void**)cur_opcode, 
+                    (char*)caller_ctx->bp.regs_i, dest_pred);
+        }
         else
             n = 2;
-	goto OFFSET(n);
+        goto OFFSET(n);
     }
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
-	parrot_pic_opcode(interpreter, PARROT_OP_set_returns_pc);
+        parrot_pic_opcode(interpreter, PARROT_OP_set_returns_pc);
     ((void**)cur_opcode)[1] = mic->m.sig;
     goto OFFSET(0);
 }

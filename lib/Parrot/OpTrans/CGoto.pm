@@ -154,8 +154,8 @@ sub goto_address
     }
     else
     {
-  	    return "if ((opcode_t *) $addr == 0)
-	  return 0;
+            return "if ((opcode_t *) $addr == 0)
+          return 0;
     goto *ops_addr[*(cur_opcode = (opcode_t *)$addr)]";
     }
 }
@@ -324,7 +324,7 @@ sub run_core_after_addr_table
     return <<END_C;
 
     if (!${bs}ops_addr)
-	${bs}ops_addr = l_ops_addr;
+        ${bs}ops_addr = l_ops_addr;
     if (cur_opcode == 0) {
         DECL_CONST_CAST;
         return ($t*)const_cast(${bs}ops_addr);
@@ -358,7 +358,7 @@ sub init_func_init1
     my $bs = $base . $self->suffix . '_';
 
     return <<END_C;
- 	if (!${bs}op_lib.op_func_table)
+        if (!${bs}op_lib.op_func_table)
             ${bs}op_lib.op_func_table = (op_func_t *) $cg_func(0, 0);
 END_C
 }

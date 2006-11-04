@@ -130,13 +130,13 @@ PMC.
 =cut
 
 inline op setstdout(invar PMC) :base_io {
-	PIO_STDOUT(interpreter) = $1;
-	goto NEXT();
+        PIO_STDOUT(interpreter) = $1;
+        goto NEXT();
 }
 
 inline op setstderr(invar PMC) :base_io {
-	PIO_STDERR(interpreter) = $1;
-	goto NEXT();
+        PIO_STDERR(interpreter) = $1;
+        goto NEXT();
 }
 
 #########################################
@@ -381,15 +381,15 @@ inline op readline(out STR, invar PMC) :base_io {
      * io stuff are methods
      */
     if (pio->vtable->base_type != enum_class_ParrotIO)
-	real_exception(interpreter, NULL, PIO_ERROR,
-		"Cannot read line from empty filehandle");
+        real_exception(interpreter, NULL, PIO_ERROR,
+                "Cannot read line from empty filehandle");
     io = PMC_data(pio);
     if (!io)
-	real_exception(interpreter, NULL, PIO_ERROR,
-		"Cannot read line from empty filehandle");
+        real_exception(interpreter, NULL, PIO_ERROR,
+                "Cannot read line from empty filehandle");
 
     if (!(io->flags & PIO_F_LINEBUF))
-	PIO_setlinebuf(interpreter, pio);
+        PIO_setlinebuf(interpreter, pio);
     $1 = PIO_reads(interpreter, pio, 0);
     goto NEXT();
 }

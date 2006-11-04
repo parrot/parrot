@@ -286,20 +286,20 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
     INTVAL   e  = $3;
     int s = 1;
     if (e != 0) {
-	if (e < 0) {
-	    s = -1;
-	    e = -e;
-	}
+        if (e < 0) {
+            s = -1;
+            e = -e;
+        }
     }
     while (e) {
-	if (e & 1) {
-	    res *= n2;
-	}
-	n2 *= n2;
-	e >>= 1;
+        if (e & 1) {
+            res *= n2;
+        }
+        n2 *= n2;
+        e >>= 1;
     }
     if (s < 0) {
-	res = 1.0/res;
+        res = 1.0/res;
     }
     $1 = res;
     goto NEXT();
@@ -314,8 +314,8 @@ Return the class PMC of the type $2.
 op getclass(out PMC, in INT) {
     int typ = $2;
     if (typ < 1 || typ >= interpreter->n_vtable_max)
-	real_exception(interpreter, NULL, E_ValueError,
-		"type number out of range");
+        real_exception(interpreter, NULL, E_ValueError,
+                "type number out of range");
     $1 = interpreter->vtables[typ]->class;
     goto NEXT();
 }
@@ -334,7 +334,7 @@ op new(out PMC, in INT, in STR) {
   PMC *class;
   if ($2 <= 0 || $2 >= interpreter->n_vtable_max) {
     real_exception(interpreter, 0, NO_CLASS,
-		   "Illegal PMC enum (%d) in new", (int)$2);
+                   "Illegal PMC enum (%d) in new", (int)$2);
   }
   class = interpreter->vtables[$2]->class;
   $1 = VTABLE_new_from_string(interpreter, class, $3, 0);
@@ -370,21 +370,21 @@ op instantiate(out PMC) {
   }
   switch (SIG_ITEM(sig, 0)) {
       case PARROT_ARG_IC:
-	  typ = arg_op[2];
-	  if (typ <= 1 || typ >= interpreter->n_vtable_max) {
-	      real_exception(interpreter, NULL, E_ValueError,
-		      "Illegal PMC enum (%d) in instantiate", typ);
-	  }
-	  class = interpreter->vtables[typ]->class;
-	  break;
+          typ = arg_op[2];
+          if (typ <= 1 || typ >= interpreter->n_vtable_max) {
+              real_exception(interpreter, NULL, E_ValueError,
+                      "Illegal PMC enum (%d) in instantiate", typ);
+          }
+          class = interpreter->vtables[typ]->class;
+          break;
       case PARROT_ARG_P:
-	  class = REG_PMC(arg_op[2]);
-	  break;
+          class = REG_PMC(arg_op[2]);
+          break;
       default:
-	  internal_exception(UNIMPLEMENTED, 
-		  "uninplement class argument in instantiate");
-	  class = NULL; /* just for cc */
-	  break;
+          internal_exception(UNIMPLEMENTED, 
+                  "uninplement class argument in instantiate");
+          class = NULL; /* just for cc */
+          break;
   }
   $1 = VTABLE_instantiate(interpreter, class, sig);
   interpreter->current_args = NULL;
@@ -423,7 +423,7 @@ inline op new(out PMC, invar PMC) :object_classes {
     INTVAL type;
     switch ($2->vtable->base_type) {
         case enum_class_String:
-	        type = pmc_type(interpreter, PMC_str_val($2));
+                type = pmc_type(interpreter, PMC_str_val($2));
             if (type <= 0)
                 real_exception(interpreter, NULL, NO_CLASS,
                     "Class '%Ss' not found", PMC_str_val($2));
@@ -464,7 +464,7 @@ The ParrotObject $1 needs the __finalize method during GC.
 op need_finalize(invar PMC) {
     PMC* pmc = $1;
     if (PObj_is_object_TEST(pmc)) {
-	PObj_get_FLAGS(pmc) |= PObj_need_finalize_FLAG;
+        PObj_get_FLAGS(pmc) |= PObj_need_finalize_FLAG;
     }
     goto NEXT();
 }

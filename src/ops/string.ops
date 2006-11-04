@@ -557,7 +557,7 @@ op find_charset(out INT, in STR) :base_core {
   INTVAL n = Parrot_charset_number(interpreter, $2);
   if (n < 0)
     real_exception(interpreter, NULL, 1,
-	"charset '%Ss' not found", $2);
+        "charset '%Ss' not found", $2);
   $1 = n;
   goto NEXT();
 }
@@ -612,7 +612,7 @@ op find_encoding(out INT, in STR) :base_core {
   INTVAL n = Parrot_encoding_number(interpreter, $2);
   if (n < 0)
     real_exception(interpreter, NULL, 1,
-	"encoding '%Ss' not found", $2);
+        "encoding '%Ss' not found", $2);
   $1 = n;
   goto NEXT();
 }

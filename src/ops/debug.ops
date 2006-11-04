@@ -120,11 +120,11 @@ Print all the Parrot registers at once.
 op debug_print() :base_debug {
     if (!(interpreter->pdb->state & PDB_BREAK)) {
 #if 1
-	PIO_eprintf(interpreter, "debug_print is disabled\n");
+        PIO_eprintf(interpreter, "debug_print is disabled\n");
 #else
-	/*
-	 * XXX adjust register layout
-	 */
+        /*
+         * XXX adjust register layout
+         */
         PDB_print_int(interpreter, &interpreter->int_reg, -1);
         PDB_print_num(interpreter, &interpreter->num_reg, -1);
         PDB_print_string(interpreter,&interpreter->string_reg, -1);

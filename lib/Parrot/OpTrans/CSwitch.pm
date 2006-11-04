@@ -27,10 +27,10 @@ use base qw( Parrot::OpTrans::CPrederef );
 
 sub new
 {
-	my $class = shift;
-	my $self  = $class->SUPER::new( @_ );
-	$self->{split_count} ||= 0;
-	return $self;
+        my $class = shift;
+        my $self  = $class->SUPER::new( @_ );
+        $self->{split_count} ||= 0;
+        return $self;
 }
 
 =item C<core_type()>
@@ -91,8 +91,8 @@ sub defines
 
 #undef  CHECK_EVENTS
 #define CHECK_EVENTS(i, n)   \\
-	interpreter->task_queue->head ?  \\
-		Parrot_do_check_events(i, n) : n
+        interpreter->task_queue->head ?  \\
+                Parrot_do_check_events(i, n) : n
 END
 }
 
@@ -111,14 +111,14 @@ sub goto_address
 
     if ($addr eq '0')
     {
-  	    return "return (0);"
+            return "return (0);"
     }
     else
     {
-  	    return <<EOC;
-	    {
-	       cur_opcode = opcode_to_prederef(interpreter, $addr);
-	       goto SWITCH_RELOAD;
+            return <<EOC;
+            {
+               cur_opcode = opcode_to_prederef(interpreter, $addr);
+               goto SWITCH_RELOAD;
             }
 EOC
     }
@@ -149,7 +149,7 @@ sub goto_pop
     my ($self) = @_;
     return "{ opcode_t *dest = (opcode_t*)pop_dest(interpreter);
               cur_opcode = opcode_to_prederef(interpreter, dest);
-	      goto SWITCH_AGAIN; }";
+              goto SWITCH_AGAIN; }";
 }
 
 =item C<run_core_func_start()>
@@ -210,22 +210,22 @@ sub run_core_finish
     my ($self, $base) = @_;
     my $bs = $base . $self->suffix . '_';
     my $c = <<END_C;
-	default:
-	    if (*(opcode_t*)cur_opcode >= 0 && 
-	        *(opcode_t*)cur_opcode < (opcode_t)${bs}op_lib.op_count) {
-		*(opcode_t*)cur_opcode = CORE_OPS_wrapper__;
-		continue;
-	    }
-	    internal_exception(1, "illegal opcode in switch core\\n");
-	    break;
-	} /* switch */
+        default:
+            if (*(opcode_t*)cur_opcode >= 0 && 
+                *(opcode_t*)cur_opcode < (opcode_t)${bs}op_lib.op_count) {
+                *(opcode_t*)cur_opcode = CORE_OPS_wrapper__;
+                continue;
+            }
+            internal_exception(1, "illegal opcode in switch core\\n");
+            break;
+        } /* switch */
 END_C
     for (my $i = 0; $i < $self->{split_count}; $i++) {
-	$c .= <<END_C;
+        $c .= <<END_C;
     } /* switch $i */
 END_C
     }
-	$c .= <<END_C;
+        $c .= <<END_C;
     } while (1);
     return NULL;
 }

@@ -171,7 +171,7 @@ sub readjit {
                 # The ->u.(string|float) is unnecessary.
                 $asm =~ s/\)->u\.(\w+)/)/g;
                 $asm =~ s/CONST\((\d)\)\s*([><=!]=?)\s*CONST\((\d)\)/RCONST($1)->u.number $2 RCONST($3)->u.number/ if ($asm =~ /CONST.*CONST/);
-                $asm =~ s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "const_table", 0);/g;
+                $asm =~ s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n        Parrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "const_table", 0);/g;
                 $asm =~ s/jit_emit_end/exec_emit_end/;
             }
             if (($cpuarch eq 'ppc') && ($genfile ne "src/jit_cpu.c")) {
@@ -442,7 +442,7 @@ for ( my $i = 0; $i < $core_numops; $i++) {
         $jit_fn_params . "\n{\n" .
         $body . "}\n";
     }
-    push @jit_funcs, "{ $jit_func, $extern }, \t" .
+    push @jit_funcs, "{ $jit_func, $extern },         " .
             "/* op $i: $core_opfunc[$i] */\n";
 }
 
