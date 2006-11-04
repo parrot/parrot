@@ -27,19 +27,19 @@ C<interpinfo> opcode.
 
 
 SKIP: {
-	skip("we really shouldn't run just a label - use a sub", 1);
+    skip("we really shouldn't run just a label - use a sub", 1);
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
-	new P0, .ParrotInterpreter
-	print "calling\n"
-	# set_addr/invoke ?
-	runinterp P0, foo
-	print "ending\n"
-	end
-	print "bad things!\n"
-foo:
-	print "In 2\n"
-	end
+    new P0, .ParrotInterpreter
+    print "calling\n"
+    # set_addr/invoke ?
+    runinterp P0, foo
+    print "ending\n"
+    end
+    print "bad things!\n"
+  foo:
+    print "In 2\n"
+    end
 CODE
 calling
 In 2
@@ -118,16 +118,16 @@ OUTPUT
 # DOD sweep would occur, causing a bonus "DOD" line in the output, which makes
 # the test fail.
 pasm_output_like(<<'CODE', <<'OUTPUT', "restart trace", todo => "lines are out of order due to buffering");
-	printerr "ok 1\n"
-	sweepoff
-	set I0, 1
-	trace I0
-	printerr "ok 2\n"
-	dec I0
-	trace I0
-	sweepon
-	printerr "ok 3\n"
-	end
+    printerr "ok 1\n"
+    sweepoff
+    set I0, 1
+    trace I0
+    printerr "ok 2\n"
+    dec I0
+    trace I0
+    sweepon
+    printerr "ok 3\n"
+    end
 CODE
 /^ok\s1\n
 (?:\s+8.*)?\n
@@ -140,13 +140,13 @@ OUTPUT
 # This is the behavior as of Parrot 1.4.3
 # XXX Should there be a warning?
 pasm_output_is(<<'CODE', 'nada:', 'interp - warnings');
-	new P0, .Undef
-	set I0, P0
-	printerr "nada:"
-	warningson 1
-	new P1, .Undef
-	set I0, P1
-	end
+    new P0, .Undef
+    set I0, P0
+    printerr "nada:"
+    warningson 1
+    new P1, .Undef
+    set I0, P1
+    end
 CODE
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "getinterp");
@@ -157,7 +157,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "getinterp");
     interpinfo I1, .INTERPINFO_ACTIVE_PMCS
     eq I0, I1, ok2
     print "not "
-ok2:
+  ok2:
     print "ok 2\n"
     end
 CODE
@@ -174,13 +174,13 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "access argv");
     set I1, P2
     eq I0, I1, ok1
     print "not "
-ok1:
+  ok1:
     print "ok 1\n"
     set S0, P5[0]
     set S1, P2[0]
     eq S0, S1, ok2
     print "not "
-ok2:
+  ok2:
     print "ok 2\n"
     end
 CODE
@@ -199,3 +199,10 @@ after
 OUTPUT
 
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
