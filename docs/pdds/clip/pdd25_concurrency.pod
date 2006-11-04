@@ -772,7 +772,8 @@ ie
  if (thork()) {   # fork a thread
     # thread A
     func1($aaa, $bbb, $ccc);
- } else {
+ }
+ else {
     # thread B
     func2($bbb.property);
  }

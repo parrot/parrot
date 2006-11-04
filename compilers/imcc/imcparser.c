@@ -419,7 +419,8 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
         constant[len - 1] = '\0';
         strcpy(name, constant + 1);
         free(constant);
-    } else {
+    }
+    else {
         name = constant;
     }
     switch (type_enum) {
@@ -4471,7 +4472,8 @@ int yyerror(void *yyscanner, Interp *interp, char * s)
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);
         IMCC_INFO(interp)->line++;
-    } else {
+    }
+    else {
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);
     }

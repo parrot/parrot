@@ -103,7 +103,8 @@ of a linked list might look like this:
      $new_head.next.set($old_head);
      if ($old_head) {
          $old_head.prev.set($new_head);
-     } else {
+     }
+     else {
          $list.tail.set($new_head);
      }
      $list.head.set($new_head);
