@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ t/pmc/capture.t - Test the Capture PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/hash.t
+    % prove t/pmc/capture.t
 
 =head1 DESCRIPTION
 
@@ -23,6 +23,28 @@ Tests the C<Capture> PMC. Checks integer and key access using
 a variety of keys and values.
 
 =cut
+
+my $PRE= <<PRE;
+.sub 'test' :main
+    .local pmc capt
+    capt = new .Capture
+PRE
+
+my $POST= <<POST;
+    goto end
+  nok:
+    print 'not '
+  ok:
+    say 'ok'
+  end:
+.end
+POST
+
+
+pir_output_is($PRE.<<'CODE'.$POST, <<'OUT', 'new');
+CODE
+OUT
+
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Basic capture tests");
 .sub main :main
@@ -225,11 +247,7 @@ CODE
 OUTPUT
 
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_hash, get_array");
-.sub main :main
-    .local pmc capt
-    capt = new .Capture
-
+pir_output_is($PRE.<<'CODE'.$POST, <<'OUTPUT', "get_hash, get_array");
     $P0 = capt.'get_array'()
     $P1 = capt.'get_hash'()
 
@@ -238,11 +256,31 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get_hash, get_array");
 
     say $S0
     say $S1
-.end
 CODE
 ResizablePMCArray
 Hash
 OUTPUT
+
+
+pir_output_like($PRE.<<'CODE'.$POST, <<'OUT', 'get_integer not implemented');
+    I0 = capt
+CODE
+/get_integer\(\) not implemented in class 'Capture'/
+OUT
+
+
+pir_output_like($PRE.<<'CODE'.$POST, <<'OUT', 'get_string not implemented');
+    S0 = capt
+CODE
+/get_string\(\) not implemented in class 'Capture'/
+OUT
+
+
+pir_output_like($PRE.<<'CODE'.$POST, <<'OUT', 'get_number not implemented');
+    N0 = capt
+CODE
+/get_number\(\) not implemented in class 'Capture'/
+OUT
 
 
 # Local Variables:
