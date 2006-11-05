@@ -56,11 +56,8 @@ PMC is responsible to mark all contained or referenced active Parrot objects
 
 =item PObj_is_buffer_ptr_FLAG
 
-=item PObj_is_PMC_ptr_FLAG
-
-B<PMC_data> points to a B<PObj> object. This PMC or Buffer gets marked
-automatically. (Since the unification of PMCs and Buffers, these two flags are
-the same).
+B<PMC_data> points to a B<PObj> object.  This PMC gets marked
+automatically.
 
 =item PObj_is_buffer_of_PMCs_ptr_FLAG
 
