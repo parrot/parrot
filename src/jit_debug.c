@@ -200,8 +200,8 @@ write_types(FILE *stabs, Interp *interpreter)
                 "pmc_val:*(0,%d),%d,%d;"
                 ";\""
                 "," N_LSYM ",0,0,0\n", i + 2, BYTE_SIZE(UnionVal),
-                BIT_OFFSET(UnionVal, int_val), BIT_SIZE(INTVAL),
-                i, BIT_OFFSET(UnionVal, pmc_val), BIT_SIZE(void*)
+                BIT_OFFSET(UnionVal, _i._int_val), BIT_SIZE(INTVAL),
+                i, BIT_OFFSET(UnionVal, _ptrs._pmc_val), BIT_SIZE(void*)
                 );
     fprintf(stabs, ".stabs \"VTABLE:T(0,%d)=s%d"
                 "base_type:(0,%d),%d,%d;"

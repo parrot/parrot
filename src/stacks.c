@@ -65,16 +65,12 @@ mark_stack(Interp *interpreter, Stack_Chunk_t *chunk /*NN*/)
         entry = (Stack_Entry_t *)STACK_DATAP(chunk);
         switch (entry->entry_type) {
             case STACK_ENTRY_PMC:
-                if (entry->entry.pmc_val) {
-                    pobject_lives(interpreter,
-                            (PObj *)entry->entry.pmc_val);
-                }
+                if (UVal_pmc(entry->entry))
+                    pobject_lives(interpreter, (PObj *)UVal_pmc(entry->entry));
                 break;
             case STACK_ENTRY_STRING:
-                if (entry->entry.string_val) {
-                    pobject_lives(interpreter,
-                            (PObj *)entry->entry.string_val);
-                }
+                if (UVal_str(entry->entry))
+                    pobject_lives(interpreter, (PObj *)UVal_str(entry->entry));
                 break;
             default:
                 break;

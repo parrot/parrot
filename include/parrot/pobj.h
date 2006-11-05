@@ -39,17 +39,6 @@ typedef union UnionVal {
 #define UVal_num(u)       (u)._num_val
 #define UVal_str(u)       (u)._string_val
 
-/* BEGIN DEPRECATED UVAL ACCESSOR MACROS */
-#define num_val _num_val
-#define int_val _i._int_val
-#define string_val _string_val
-#define struct_val _ptrs._struct_val
-#define pmc_val _ptrs._pmc_val
-
-#define PMC_ptr1v(pmc) PMC_struct_val(pmc)
-#define PMC_ptr2p(pmc) PMC_pmc_val(pmc)
-/* END DEPRECATED UVAL ACCESSOR MACROS */
-
 /* Parrot Object - base class for all others */
 typedef struct pobj_t {
     UnionVal u;
