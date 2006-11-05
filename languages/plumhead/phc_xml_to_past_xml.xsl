@@ -64,24 +64,30 @@ by phc from PHP source. It generates an XML with PAST.
 </xsl:template>
 
 <xsl:template match="phc:AST_actual_parameter">
-  <xsl:apply-templates select="phc:Token_string" />
-  <xsl:apply-templates select="phc:Token_int" />
+  <past:Exp>
+    <xsl:apply-templates select="phc:Token_string" />
+    <xsl:apply-templates select="phc:Token_int" />
+    <xsl:apply-templates select="phc:AST_bin_op" />
+  </past:Exp>
+</xsl:template>
+
+<xsl:template match="phc:AST_bin_op">
+  <past:Op op="infix:+" >
+    <past:Val valtype="int" >1</past:Val>
+    <past:Val valtype="int" >1</past:Val>
+  </past:Op>
 </xsl:template>
 
 <xsl:template match="phc:Token_string">
-  <past:Exp >
-    <past:Val valtype="strqq" >
-      <xsl:apply-templates select="phc:value" />
-    </past:Val>
-  </past:Exp >
+  <past:Val valtype="strqq" >
+    <xsl:apply-templates select="phc:value" />
+  </past:Val>
 </xsl:template>
 
 <xsl:template match="phc:Token_int">
-  <past:Exp >
-    <past:Val valtype="int" >
-      <xsl:apply-templates select="phc:value" />
-    </past:Val>
-  </past:Exp >
+  <past:Val valtype="int" >
+    <xsl:apply-templates select="phc:value" />
+  </past:Val>
 </xsl:template>
 
 <xsl:template match="phc:value">

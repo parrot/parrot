@@ -24,6 +24,7 @@ a PAST and runs the PAST with help of the parrot compiler tools.
 
   load_bytecode 'PAST.pbc'                                        
   load_bytecode 'languages/punie/lib/POST.pir'                    
+  load_bytecode 'languages/punie/lib/PunieOpLookup.pir'
   load_bytecode 'languages/punie/lib/OSTGrammar.pir'              
   load_bytecode 'MIME/Base64.pbc'              
                                                                   
@@ -126,19 +127,19 @@ a PAST and runs the PAST with help of the parrot compiler tools.
   # start of past:Val
   <xsl:choose>
     <xsl:when test="@valtype = 'strqq'" >
-      .local string val
-      val = dec_sub( "<xsl:value-of select="." />" )
-      val = escape val
+      .local string val_<xsl:value-of select="generate-id(.)" />
+      val_<xsl:value-of select="generate-id(.)" /> = dec_sub( "<xsl:value-of select="." />" )
+      val_<xsl:value-of select="generate-id(.)" /> = escape val_<xsl:value-of select="generate-id(.)" />
     </xsl:when>
     <xsl:when test="@valtype = 'int'" >
-      .local int val
-      val = <xsl:value-of select="." />
+      .local int val_<xsl:value-of select="generate-id(.)" />
+      val_<xsl:value-of select="generate-id(.)" /> = <xsl:value-of select="." />
     </xsl:when>
   </xsl:choose>
 
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />
   past_node_<xsl:value-of select="generate-id(.)" /> = new 'PAST::Val'                             
-  past_node_<xsl:value-of select="generate-id(.)" />.value( val ) 
+  past_node_<xsl:value-of select="generate-id(.)" />.value( val_<xsl:value-of select="generate-id(.)" /> ) 
   <xsl:apply-templates select="@*"/>
 
   past_node_<xsl:value-of select="generate-id(..)" />.'add_child'( past_node_<xsl:value-of select="generate-id(.)" /> )      
