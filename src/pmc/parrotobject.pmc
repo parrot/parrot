@@ -24,6 +24,7 @@ F<src/objects.c>, at least for right now.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_deleg_pmc.h"
 
 /* XXX duplicated from delegate.pmc */
 static PMC *
@@ -264,6 +265,9 @@ These methods have default implementations in F<src/pmc/default.pmc>
 which redirect to PMC keys. Test if a specialized method exists, else
 use fallback.
 
+If the parent isa PMC, the fallback is the C<deleg_pmc> method, else
+it's just SUPER aka the default implementation.
+
 =cut
 
 */
@@ -278,8 +282,18 @@ use fallback.
             return Parrot_run_meth_fromc_args_reti(interpreter, sub,
                                               pmc, meth, "II", key);
         }
-        else
-            return SUPER(key);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                return SUPER(key);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    return SUPER(key);
+                else
+                    return deleg_pmc.SUPER(key);
+            }
+        }
     }
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
@@ -292,8 +306,18 @@ use fallback.
             return Parrot_run_meth_fromc_args_retf(interpreter, sub,
                                               pmc, meth, "NI", key);
         }
-        else
-            return SUPER(key);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                return SUPER(key);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    return SUPER(key);
+                else
+                    return deleg_pmc.SUPER(key);
+            }
+        }
     }
 
     STRING* get_string_keyed_int (INTVAL key) {
@@ -306,8 +330,18 @@ use fallback.
             return Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "SI", key);
         }
-        else
-            return SUPER(key);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                return SUPER(key);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    return SUPER(key);
+                else
+                    return deleg_pmc.SUPER(key);
+            }
+        }
     }
 
     PMC* get_pmc_keyed_int (INTVAL key) {
@@ -320,8 +354,18 @@ use fallback.
             return Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "PI", key);
         }
-        else
-            return SUPER(key);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                return SUPER(key);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    return SUPER(key);
+                else
+                    return deleg_pmc.SUPER(key);
+            }
+        }
     }
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
@@ -332,10 +376,20 @@ use fallback.
             sub = find_meth(interpreter, pmc, meth);
         if (sub) {
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
-                                              pmc, meth, "vII", key, value);
+                    pmc, meth, "vII", key, value);
         }
-        else
-            SUPER(key, value);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                SUPER(key, value);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    SUPER(key, value);
+                else
+                    deleg_pmc.SUPER(key, value);
+            }
+        }
     }
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
@@ -348,8 +402,18 @@ use fallback.
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vIN", key, value);
         }
-        else
-            SUPER(key, value);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                SUPER(key, value);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    SUPER(key, value);
+                else
+                    deleg_pmc.SUPER(key, value);
+            }
+        }
     }
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
@@ -362,8 +426,18 @@ use fallback.
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vIS", key, value);
         }
-        else
-            SUPER(key, value);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                SUPER(key, value);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    SUPER(key, value);
+                else
+                    deleg_pmc.SUPER(key, value);
+            }
+        }
     }
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
@@ -376,8 +450,18 @@ use fallback.
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vIP", key, value);
         }
-        else
-            SUPER(key, value);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                SUPER(key, value);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    SUPER(key, value);
+                else
+                    deleg_pmc.SUPER(key, value);
+            }
+        }
     }
 
     void delete_keyed_int (INTVAL key) {
@@ -390,8 +474,18 @@ use fallback.
             (void) Parrot_run_meth_fromc_args(interpreter, sub,
                                               pmc, meth, "vI", key);
         }
-        else
-            SUPER(key);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                SUPER(key);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    SUPER(key);
+                else
+                    deleg_pmc.SUPER(key);
+            }
+        }
     }
 
     INTVAL defined_keyed_int (INTVAL key) {
@@ -404,8 +498,18 @@ use fallback.
             return Parrot_run_meth_fromc_args_reti(interpreter, sub,
                                               pmc, meth, "II", key);
         }
-        else
-            return SUPER(key);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                return SUPER(key);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    return SUPER(key);
+                else
+                    return deleg_pmc.SUPER(key);
+            }
+        }
     }
 
     INTVAL exists_keyed_int (INTVAL key) {
@@ -418,8 +522,18 @@ use fallback.
             return Parrot_run_meth_fromc_args_reti(interpreter, sub,
                                               pmc, meth, "II", key);
         }
-        else
-            return SUPER(key);
+        else {
+            PMC *mro = SELF->vtable->mro;
+            if (VTABLE_elements(INTERP, mro) == 1) 
+                return SUPER(key);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                if (PObj_is_class_TEST(parent))
+                    return SUPER(key);
+                else
+                    return deleg_pmc.SUPER(key);
+            }
+        }
     }
 
     PMC* share_ro () {
