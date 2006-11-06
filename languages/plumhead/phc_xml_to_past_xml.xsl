@@ -65,16 +65,14 @@ by phc from PHP source. It generates an XML with PAST.
 
 <xsl:template match="phc:AST_actual_parameter">
   <past:Exp>
-    <xsl:apply-templates select="phc:Token_string" />
-    <xsl:apply-templates select="phc:Token_int" />
-    <xsl:apply-templates select="phc:AST_bin_op" />
+    <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op" />
   </past:Exp>
 </xsl:template>
 
 <xsl:template match="phc:AST_bin_op">
   <past:Op op="infix:+" >
-    <past:Val valtype="int" >1</past:Val>
-    <past:Val valtype="int" >1</past:Val>
+    <xsl:attribute name="op" >infix:<xsl:value-of select="phc:Token_op/phc:value" /></xsl:attribute>
+    <xsl:apply-templates select="phc:Token_int | phc:Token_real | phc:AST_bin_op" />
   </past:Op>
 </xsl:template>
 
@@ -90,7 +88,14 @@ by phc from PHP source. It generates an XML with PAST.
   </past:Val>
 </xsl:template>
 
-<xsl:template match="phc:value">
+<!-- looks like phc is running into a floating point issue -->
+<xsl:template match="phc:Token_real">
+  <past:Val valtype="num" >
+    <xsl:apply-templates select="phc:source_rep" />
+  </past:Val>
+</xsl:template>
+
+<xsl:template match="phc:value | phc:source_rep" >
   <xsl:value-of select="." />
 </xsl:template>
 

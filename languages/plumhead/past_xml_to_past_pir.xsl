@@ -104,7 +104,7 @@ a PAST and runs the PAST with help of the parrot compiler tools.
                                                                   
 </xsl:template>
 
-<xsl:template match="past:Stmts | past:Stmt | past:Op | past:Exp" >
+<xsl:template match="past:Stmts | past:Stmt | past:Op | past:Exp | past:Val" >
 
   # start of generic node
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
@@ -133,6 +133,10 @@ a PAST and runs the PAST with help of the parrot compiler tools.
     </xsl:when>
     <xsl:when test="@valtype = 'int'" >
       .local int val_<xsl:value-of select="generate-id(.)" />
+      val_<xsl:value-of select="generate-id(.)" /> = <xsl:value-of select="." />
+    </xsl:when>
+    <xsl:when test="@valtype = 'num'" >
+      .local num val_<xsl:value-of select="generate-id(.)" />
       val_<xsl:value-of select="generate-id(.)" /> = <xsl:value-of select="." />
     </xsl:when>
   </xsl:choose>
