@@ -15,4 +15,4 @@ eval_is {gets #parrot} \
   {can not find channel named "#parrot"} \
   {bad channel}
 
-# XXX Need to test actually reading something in. 
+# XXX (#40628): Need to test actually reading something in. 
