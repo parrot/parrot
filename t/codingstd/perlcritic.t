@@ -13,10 +13,11 @@ use File::Find;
 use Test::More;
 
 BEGIN {
-    eval { use Test::Perl::Critic (-verbose => 7); };
+    eval { require Test::Perl::Critic; };
     if ($@) {
         plan skip_all => 'Test::Perl::Critic not installed';
     }
+    Test::Perl::Critic->import(-verbose => 7);
 }
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
