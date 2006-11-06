@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -281,6 +281,37 @@ pir_output_like($PRE.<<'CODE'.$POST, <<'OUT', 'get_number not implemented');
 CODE
 /get_number\(\) not implemented in class 'Capture'/
 OUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', '*_keyed_int delegation');
+.sub main :main
+    $P0 = subclass 'Capture', 'Match'
+    $P1 = new 'Match'
+    $P1[1] = 1
+    $I0 = elements $P1
+    print $I0
+    print "\n"
+.end
+CODE
+2
+OUTPUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_array method delegation');
+.sub main :main
+    $P0 = subclass 'Capture', 'Match'
+    $P1 = new 'Match'
+    $P1[1] = 1
+    $P2 = $P1.'get_array'()
+    $I0 = elements $P2
+    print $I0
+    print "\n"
+.end
+CODE
+2
+OUTPUT
+
+
 
 
 # Local Variables:
