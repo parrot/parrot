@@ -31,7 +31,7 @@ Re-throw the current exception
 
 =head2 get_stacktrace (OUT string message)
 
-(XXX) return the stacktrace for the current exception
+XXX (#40687): return the stacktrace for the current exception
 
 =cut
 
