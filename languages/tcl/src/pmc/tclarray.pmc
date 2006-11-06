@@ -84,7 +84,7 @@ Initializes variables needed by the class.
 
 Returns the PMC value for the element at C<*key>.
 
-XXX - Why is Hash's implementation insufficient here??
+XXX (#40638): - Why is Hash's implementation insufficient here??
 
 =cut
 
