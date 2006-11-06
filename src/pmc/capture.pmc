@@ -430,13 +430,23 @@ Delete the element corresponding to C<key> in the hash component.
 */
 
     METHOD PMC* get_array() {
-        CAPTURE_array_CREATE(INTERP, SELF);
-        return CAPTURE_array(SELF);
+        PMC* capt = SELF;
+        /* XXX:  This workaround is for when we get here as
+                 part of a subclass of Capture */
+        if (PObj_is_object_TEST(SELF))
+            capt = get_attrib_num(PMC_data(SELF), 0);
+        CAPTURE_array_CREATE(INTERP, capt);
+        return CAPTURE_array(capt);
     }
 
     METHOD PMC* get_hash() {
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        return CAPTURE_hash(SELF);
+        PMC* capt = SELF;
+        /* XXX:  This workaround is for when we get here as
+                 part of a subclass of Capture */
+        if (PObj_is_object_TEST(SELF))
+            capt = get_attrib_num(PMC_data(SELF), 0);
+        CAPTURE_hash_CREATE(INTERP, capt);
+        return CAPTURE_hash(capt);
     }
 
 }

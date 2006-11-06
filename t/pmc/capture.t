@@ -300,15 +300,24 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', 'get_array method delegation');
 .sub main :main
     $P0 = subclass 'Capture', 'Match'
+    addattribute $P0, '$.abc'
+    addattribute $P0, '$.xyz'
     $P1 = new 'Match'
     $P1[1] = 1
+
+    $P2 = new .String
+    setattribute $P1, '$.abc', $P2
+    $P2 = new .String
+    setattribute $P1, '$.xyz', $P2
+
     $P2 = $P1.'get_array'()
+    $P2 = 0
     $I0 = elements $P2
     print $I0
     print "\n"
 .end
 CODE
-2
+0
 OUTPUT
 
 
