@@ -1,6 +1,6 @@
 grammar TclExpr::Grammar;
 
-# XXX This began as an [expr] only grammar, and has since grown to
+# XXX (#40688): This began as an [expr] only grammar, and has since grown to
 # encompass the language itself. Either rename the whole thing, or,
 # preferentially, split out the non-expr specific bits into another
 # grammar that this one can then refer to.
