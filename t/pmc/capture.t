@@ -285,14 +285,23 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', '*_keyed_int delegation');
 .sub main :main
-    $P0 = subclass 'Capture', 'Match'
+    $P99 = subclass 'Capture', 'Match'
     $P1 = new 'Match'
     $P1[1] = 1
-    $I0 = elements $P1
-    print $I0
+    $I1 = elements $P1
+    print $I1
     print "\n"
+
+    $P99 = subclass 'Match', 'Exp'
+    $P2 = new 'Exp'
+    $P2[1] = 1
+    $I2 = elements $P2
+    print $I2
+    print "\n"
+
 .end
 CODE
+2
 2
 OUTPUT
 
