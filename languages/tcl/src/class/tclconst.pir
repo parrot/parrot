@@ -25,7 +25,7 @@ Define the attributes required for the class.
   $P0[116] = "\t"
   $P0[118] = "\v"
 
-  # XXX These should probably be moved into a class attribute.
+  # XXX (#40640): These should probably be moved into a class attribute.
   set_root_global ['_tcl'], 'backslashes', $P0
 
   $P0 = new .Hash
