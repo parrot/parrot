@@ -8,11 +8,19 @@ t/codingstd/linelength.t - Test code lines length
 
 =head1 SYNOPSIS
 
- % prove t/codingstd/linelength.t
+    # test all files
+    % prove t/codingstd/linelength.t
+
+    # test specific files
+    % perl t/codingstd/linelength.t src/foo.c include/parrot/bar.h
 
 =head1 DESCRIPTION
 
 Tests all source files for the limit of C<n> columns.
+
+=head1 SEE ALSO
+
+L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
@@ -23,11 +31,9 @@ our $columns = 100;
 
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More;
+use Test::More tests => 1;
 use Parrot::Config;
 use ExtUtils::Manifest qw( maniread );
-
-use vars qw( @files );
 
 diag "finding source files, this may take a while.";
 
@@ -58,56 +64,62 @@ while (<DATA>) {
     $manifest_gen->{$_}++;
 }
 
-foreach my $file ( sort keys(%$manifest) ) {
-    my $ffile = "$build_dir/$file";
+# find the files that we need to check
+my @files = @ARGV ? @ARGV : source_files();
 
-    # skip binary files (including .pbc files)
-    next if -B $ffile;
-
-    # skip missing MANIFEST.generated files
-    next unless -e $ffile;
-    next if exists( $manifest_gen->{$file} );
-
-    # I could make this other way, but this way is more flexible
-    next if ( $ffile =~ m{^$build_dir/languages/([^/]+)/}
-        && !$check_language{$1} );
-
-    push @files, $ffile if $file =~ m{\.c$};
-    push @files, $ffile if $file =~ m{\.pmc$};
-    push @files, $ffile if $file =~ m{\.ops$};
-    push @files, $ffile if $file =~ m{\.pod$};
-
-    # push @files, $ffile if $file =~ m{\.pl$};
+# check all the files and keep a list of those failing
+my @lines_too_long;
+foreach my $file (@files) {
+    if (check($file)) {
+	push @lines_too_long, $file . "\n";
+    }
 }
 
-plan tests => scalar @files;
-check($_) for (@files);
+ok( !scalar(@lines_too_long), 'Line length ok' )
+    or diag( "Lines longer than coding standard limit in " . 
+	scalar @lines_too_long . " files:\n@lines_too_long" );
+
+exit;
+
 
 sub check {
-    my $f = shift;
-    my $l;    # will hold the first line to be corrected
-
-    my $g = $f;    # will hold the file to be corrected with relative path;
-    $g =~ s{^$build_dir/}{};
+    my $file = shift;
 
     my $ok = 1;
 
-    open my $fh, '<', $f or die "Can't open file '$f'";
-    while ( $ok && ( $_ = <$fh> ) ) {
-        chomp;
-        $ok = 0 if length > $columns;
+    open my $fh, '<', $file or die "Can't open file '$file'";
+    while ( $ok && ( my $line = <$fh> ) ) {
+        chomp $line;
+        $ok = 0 if length($line) > $columns;
     }
-    $l = $.;       # save the line number for future reference
     close $fh;
 
-    # if not ok, print the line where the bug was first found, for
-    # easier correction;
-    if ($ok) {
-        return ok( $ok, $g );
+    return !$ok;
+}
+
+
+sub source_files {
+    my @files;
+    foreach my $file ( sort keys(%$manifest) ) {
+	my $full_path = "$build_dir/$file";
+
+	# skip binary files (including .pbc files)
+	next if -B $full_path;
+
+	# skip missing MANIFEST.generated files
+	next unless -e $full_path;
+	next if exists( $manifest_gen->{$file} );
+
+	# I could make this other way, but this way is more flexible
+	next if ( $full_path =~ m{^$build_dir/languages/([^/]+)/}
+	    && !$check_language{$1} );
+
+	push @files, $full_path if $file =~ m{\.c$};
+	push @files, $full_path if $file =~ m{\.pmc$};
+	push @files, $full_path if $file =~ m{\.ops$};
+	push @files, $full_path if $file =~ m{\.pod$};
     }
-    else {
-        return ok( $ok, "$g (line $l)" );
-    }
+    return @files;
 }
 
 # Local Variables:
