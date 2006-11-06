@@ -76,7 +76,7 @@ set j 0001234
 is [expr {$j}] 668 {variable octal}
 
 # simple binary ops - stringified integers
-# XXX any eval_is's in this section are written that way because the 
+# XXX (#40620): any eval_is's in this section are written that way because the 
 # test errors wrongly.
 is [expr {2 * "3"}]    6 {mul "}
 is [expr {"2" * 3}]    6 {mul "}
