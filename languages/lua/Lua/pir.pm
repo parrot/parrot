@@ -12,14 +12,11 @@ package pirVisitor;
         bless $self, $class;
         my ($fh) = @_;
         $self->{fh}       = $fh;
-        $self->{prologue} = q{.namespace [ 'Lua' ]
+        $self->{prologue} = q{
 .HLL 'Lua', 'lua_group'
-
-.include 'languages/lua/lib/luaaux.pir'
 
 .sub '__start' :main
 #  print "start Lua\n"
-  load_bytecode 'languages/lua/lib/thread.pir'
 
   load_bytecode 'languages/lua/lib/luabasic.pbc'
   load_bytecode 'languages/lua/lib/luacoroutine.pbc'

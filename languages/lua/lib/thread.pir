@@ -16,15 +16,14 @@ of the Lua C<Thread> type.
 
 =cut
 
-.namespace [ 'Lua' ]
-.HLL 'Lua', 'lua_group'
+.HLL '', 'lua_group'
 
 .sub 'init_thread' :load :anon
     load_bytecode 'Parrot/Coroutine.pbc'
     $P0 = subclass 'Parrot::Coroutine', 'thread'
 .end
 
-.namespace ['thread']
+.namespace [ 'thread' ]
 
 .sub '__clone' :method
     .return (self)
@@ -46,15 +45,16 @@ of the Lua C<Thread> type.
 
 .sub '__get_pmc_keyed' :method
     .param pmc key
-    .local pmc ex
-    ex = new .Exception
-    ex['_message'] = "attempt to index a thread value"
-    throw ex
+    ex_index()
 .end
 
 .sub '__set_pmc_keyed' :method
     .param pmc key
     .param pmc value
+    ex_index()
+.end
+
+.sub 'ex_index' :anon
     .local pmc ex
     ex = new .Exception
     ex['_message'] = "attempt to index a thread value"
@@ -73,67 +73,67 @@ of the Lua C<Thread> type.
     .return (ret)
 .end
 
-.sub '__add' :method :multi(pmc, pmc)
+.sub '__add' :method :multi(thread, pmc)
     .param pmc value
     .param pmc dummy
     ex_arithmetic()
 .end
 
-.sub '__subtract' :method :multi(pmc, pmc)
+.sub '__subtract' :method :multi(thread, pmc)
     .param pmc value
     .param pmc dummy
     ex_arithmetic()
 .end
 
-.sub '__multiply' :method :multi(pmc, pmc)
+.sub '__multiply' :method :multi(thread, pmc)
     .param pmc value
     .param pmc dummy
     ex_arithmetic()
 .end
 
-.sub '__divide' :method :multi(pmc, pmc)
+.sub '__divide' :method :multi(thread, pmc)
     .param pmc value
     .param pmc dummy
     ex_arithmetic()
 .end
 
-.sub '__modulus' :method :multi(pmc, pmc)
+.sub '__modulus' :method :multi(thread, pmc)
     .param pmc value
     .param pmc dummy
     ex_arithmetic()
 .end
 
-.sub '__pow' :method :multi(pmc, pmc)
+.sub '__pow' :method :multi(thread, pmc)
     .param pmc value
     .param pmc dummy
     ex_arithmetic()
 .end
 
-.sub 'ex_arithmetic'
+.sub 'ex_arithmetic' :anon
     .local pmc ex
     ex = new .Exception
     ex['_message'] = "attempt to perform arithmetic on a thread value"
     throw ex
 .end
 
-.sub '__is_equal' :method :multi(thread)
+.sub '__is_equal' :method :multi(thread, thread)
     .param pmc value
     $I1 = get_addr self
     $I2 = get_addr value
     $I0 = 0
-    if $I1 != I2 goto L1
+    if $I1 != $I2 goto L1
     $I0 = 1
 L1:
     .return ($I0)
 .end
 
-.sub '__is_equal' :method :multi(_)
+.sub '__is_equal' :method :multi(thread, pmc)
     .param pmc value
     $I0 = 0
     .return ($I0)
 .end
 
-.sub '__cmp' :method :multi(thread)
+.sub '__cmp' :method :multi(thread, thread)
     .param pmc value
     .local pmc ex
     ex = new .Exception
@@ -141,18 +141,18 @@ L1:
     throw ex
 .end
 
-.sub '__cmp' :method :multi(_)
+.sub '__cmp' :method :multi(thread, pmc)
     .param pmc value
     .local pmc ex
     ex = new .Exception
     $S0 = "attempt to compare thread with "
-    $S1 = typeof value
+    $S1 = classname value
     $S0 .= $S1
     ex['_message'] = $S0
     throw ex
 .end
 
-.sub '__concatenate' :method :multi(pmc, pmc)
+.sub '__concatenate' :method :multi(thread, pmc)
     .param pmc value
     .param pmc dummy
     .local pmc ex
@@ -188,7 +188,7 @@ L1:
     new ret, .LuaBoolean
     $I1 = get_addr self
     $I2 = get_addr value
-    if $I1 != I2 goto L1
+    if $I1 != $I2 goto L1
     set ret, 1
 L1:
     .return (ret)

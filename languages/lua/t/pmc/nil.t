@@ -25,15 +25,15 @@ use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaNil"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaNil'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = isa pmc1, "LuaBase"
+    bool1 = isa pmc1, 'LuaBase'
     print bool1
     print "\n"
-    bool1 = isa pmc1, "LuaNil"
+    bool1 = isa pmc1, 'LuaNil'
     print bool1
     print "\n"
     end
@@ -45,15 +45,15 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaNil"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaNil'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = does pmc1, "scalar"
+    bool1 = does pmc1, 'scalar'
     print bool1
     print "\n"
-    bool1 = does pmc1, "no_interface"
+    bool1 = does pmc1, 'no_interface'
     print bool1
     print "\n"
     end
@@ -65,8 +65,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaNil"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaNil'
     .local pmc pmc1
     pmc1 = new $I0
     .local string str1
@@ -85,8 +85,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaNil"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaNil'
     .local pmc pmc1
     pmc1 = new $I0
     print pmc1
@@ -99,8 +99,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaNil"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaNil'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
@@ -115,11 +115,11 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaNil"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaNil'
     .local pmc pmc1
     pmc1 = new $I0
-    find_type $I0, "LuaBoolean"
+    find_type $I0, 'LuaBoolean'
     .local pmc pmc2
     pmc2 = new $I0
     pmc2 = not pmc1
@@ -137,14 +137,14 @@ boolean
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL "Lua", "lua_group"
+.HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaNil
     print pmc1
     print "\n"
     .local int bool1
-    bool1 = isa pmc1, "LuaNil"
+    bool1 = isa pmc1, 'LuaNil'
     print bool1
     print "\n"
     end
@@ -155,13 +155,13 @@ nil
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
-.HLL "Lua", "lua_group"
+.HLL 'Lua', 'lua_group'
 .sub _main
-    .const .LuaNil cst1 = "dummy"
+    .const .LuaNil cst1 = 'dummy'
     print cst1
     print "\n"
     .local int bool1
-    bool1 = isa cst1, "LuaNil"
+    bool1 = isa cst1, 'LuaNil'
     print bool1
     print "\n"
 .end
@@ -171,13 +171,13 @@ nil
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL "Lua", "lua_group"
+.HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaNil
     print pmc1
     print "\n"
-    $P0 = pmc1."tostring"()
+    $P0 = pmc1.'tostring'()
     print $P0
     print "\n"
     $S0 = typeof $P0
@@ -191,13 +191,13 @@ string
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL "Lua", "lua_group"
+.HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaNil
     print pmc1
     print "\n"
-    $P0 = pmc1."tonumber"()
+    $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"
     $S0 = typeof $P0

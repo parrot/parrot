@@ -25,21 +25,21 @@ use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaFunction'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = isa pmc1, "scalar"
+    bool1 = isa pmc1, 'scalar'
     print bool1
     print "\n"
-    bool1 = isa pmc1, "Sub"
+    bool1 = isa pmc1, 'Sub'
     print bool1
     print "\n"
-    bool1 = isa pmc1, "Closure"
+    bool1 = isa pmc1, 'Closure'
     print bool1
     print "\n"
-    bool1 = isa pmc1, "LuaFunction"
+    bool1 = isa pmc1, 'LuaFunction'
     print bool1
     print "\n"
     end
@@ -53,8 +53,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaFunction'
     .local pmc pmc1
     pmc1 = new $I0
     .local string str1
@@ -77,8 +77,8 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaFunction'
     .local pmc pmc1
     pmc1 = new $I0
     print pmc1
@@ -91,15 +91,15 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaFunction'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
     bool1 = istrue pmc1
     print bool1
     print "\n"
-    .const .Sub F1 = "f1"
+    .const .Sub F1 = 'f1'
     pmc1 = F1
     bool1 = istrue pmc1
     print bool1
@@ -117,11 +117,11 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
-    loadlib P1, "lua_group"
-    find_type $I0, "LuaFunction"
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaFunction'
     .local pmc pmc1
     pmc1 = new $I0
-    find_type $I0, "LuaBoolean"
+    find_type $I0, 'LuaBoolean'
     .local pmc pmc2
     pmc2 = new $I0
     pmc2 = not pmc1
@@ -139,12 +139,12 @@ boolean
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL "Lua", "lua_group"
+.HLL 'Lua', 'lua_group'
 .sub _main
-#    .const .LuaFunction F1 = "f1"
-    .const .Sub pmc1 = "f1"
+#    .const .LuaFunction F1 = 'f1'
+    .const .Sub pmc1 = 'f1'
     .local int bool1
-    bool1 = isa pmc1, "LuaFunction"
+    bool1 = isa pmc1, 'LuaFunction'
     print bool1
     print "\n"
     pmc1()
@@ -160,17 +160,17 @@ f1()
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
-.HLL "Lua", "lua_group"
+.HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = test()
     .local int bool1
-    bool1 = isa pmc1, "LuaFunction"
+    bool1 = isa pmc1, 'LuaFunction'
     print bool1
     print "\n"
 .end
 .sub test
-    .const .Sub T = "test"
+    .const .Sub T = 'test'
     .return (T)
 .end
 CODE
@@ -178,13 +178,13 @@ CODE
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL "Lua", "lua_group"
+.HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaFunction
     print pmc1
     print "\n"
-    $P0 = pmc1."tostring"()
+    $P0 = pmc1.'tostring'()
     print $P0
     print "\n"
     $S0 = typeof $P0
@@ -196,11 +196,11 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL "Lua", "lua_group"
+.HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = new .LuaFunction
-    $P0 = pmc1."tonumber"()
+    $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"
     $S0 = typeof $P0
@@ -213,21 +213,15 @@ nil
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
-.namespace [ "Lua" ]
-.HLL "Lua", "lua_group"
-
-.include "languages/lua/lib/luaaux.pir"
-
+.HLL 'Lua', 'lua_group'
 .sub __start :main
-#    load_bytecode "languages/lua/lib/luaaux.pbc"
-    load_bytecode "languages/lua/lib/luabasic.pbc"
+    load_bytecode 'languages/lua/lib/luabasic.pbc'
     _main()
 .end
-
 .sub _main :anon
     .local pmc tmp_0
-    tmp_0 = find_global "_G"
-    .const .LuaString cst_1 = "print"
+    tmp_0 = find_global '_G'
+    .const .LuaString cst_1 = 'print'
     .local pmc tmp_1
     tmp_1 = tmp_0[cst_1]
     tmp_1(tmp_1)

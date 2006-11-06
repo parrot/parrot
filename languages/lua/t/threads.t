@@ -43,9 +43,6 @@ CODE
 false
 OUT
 
-TODO: {
-local $TODO = 'pb with MMD function';
-
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co + 10' );
 co = coroutine.create(function () return 1 end)
 print(co + 10)
@@ -183,7 +180,6 @@ print(co >= 0)
 CODE
 /attempt to compare \w+ with \w+/
 OUT
-}
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'get_pmc_keyed' );
 a = coroutine.create(function () return 1 end)

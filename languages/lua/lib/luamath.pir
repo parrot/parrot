@@ -46,14 +46,10 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 
 =cut
 
-.namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
-
-.include 'languages/lua/lib/luaaux.pir'
 
 .sub 'init_math' :load :anon
 
-#    load_bytecode 'languages/lua/lib/luaaux.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Math\n"

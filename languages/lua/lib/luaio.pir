@@ -32,14 +32,10 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
 =cut
 
-.namespace [ 'Lua' ]
 .HLL 'Lua', 'lua_group'
-
-.include 'languages/lua/lib/luaaux.pir'
 
 .sub 'init_io' :load :anon
 
-#    load_bytecode 'languages/lua/lib/luaaux.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua I/O\n"
