@@ -139,10 +139,11 @@ SPLINTFLAGS  = -weak +showscan +showsummary +posixstrictlib -abstract \
     +nestedextern +noeffect +readonlystrings +realcompare +shadow -type
 
 # slightly weaker, more realistic variant.
-SPLINTFLAGS2 = $(SPLINTFLAGS) -ansireserved -retvalother -bitwisesigned
+SPLINTFLAGS2 = $(SPLINTFLAGS) -ansireserved -retvalother -bitwisesigned \
+    -skipposixheaders
 
 # added to splint target to simplify experimentation,
-# ex: make SPLINTOPTS='-posixstrictlibs +posixlibs' splint
+# ex: make SPLINTOPTS='-posixstrictlib +posixlib' splint
 SPLINTOPTS   =
 
 INNO_SETUP = iscc
@@ -1669,11 +1670,11 @@ lint : $(PARROT)
 	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(LINTFLAGS) src/*.c
 
 splint : $(PARROT)
-	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SPLINTFLAGS) $(SPLINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
 	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTOPTS) $(IMCC_DIR)/main.c
 
 splint2 : $(PARROT)
-	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SPLINTFLAGS2) $(SPLINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS2) $(SPLINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
 	$(SPLINT) $(CC_INC) $(SPLINTFLAGS2) $(SPLINTOPTS) $(IMCC_DIR)/main.c
 
 
