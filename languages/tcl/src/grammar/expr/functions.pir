@@ -462,7 +462,7 @@ is_string:
 .end
 
 .sub '&wide'
-    .return (0) # XXX test parsing hack
+    .return (0) # XXX (#40689): test parsing hack
 .end
 
 =head2 Binary Functions
