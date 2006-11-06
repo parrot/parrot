@@ -39,7 +39,7 @@ pmclass TclFloat
         INTVAL* precision = VTABLE_get_integer(INTERP, precision_pmc);
 
         if (precision == 0)
-            precision = 16; /* XXX hack to approximate right output.*/
+            precision = 16; /* XXX (#40639): hack to approximate right output.*/
 
         buff  = Parrot_sprintf_c(INTERP, "%.*vg", precision, PMC_num_val(SELF));
 
