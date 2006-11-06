@@ -41,7 +41,7 @@ TCL
 OUT
 }
 
-# XXX - many of the classes are NOT tested here, and we rely
+# XXX (#40629): - many of the classes are NOT tested here, and we rely
 # on the cvs tests from tcl for that.
 
 my %doubles = qw(
