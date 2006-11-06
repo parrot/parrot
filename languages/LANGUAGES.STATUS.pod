@@ -868,13 +868,19 @@ A toy implementation of PHP. Playing with XSLT.
 
 =item Status
 
-Not in Parrot SVN yet.
+Started.
 
 =item Last verified with parrot version
 
-Unknown
+0.4.6
 
 =item Location
+
+languages/plumhead
+
+=item Wiki
+
+L<http://rakudo.org/parrot/index.cgi?plumhead>
 
 =back
 
