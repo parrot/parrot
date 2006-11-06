@@ -7,7 +7,7 @@ use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 5;
 use Test::More;
 
-# XXX:  Missing channelId tests.
+# XXX (#40618):  Missing channelId tests.
 
 language_output_is( "tcl", <<'TCL', <<OUT, "no args" );
  puts
