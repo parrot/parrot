@@ -60,7 +60,7 @@ pmclass TclString
           return 1;
         }
 
-        return 0; /* XXX Throw exception about invalid boolean type. */
+        return 0; /* XXX (#40637): Throw exception about invalid boolean type. */
     }
 }
 
