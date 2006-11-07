@@ -13,60 +13,60 @@ VERSION = PARROT_VERSION;
 #define MAX_UINT8 18446744073709551615
 #define MAX_INT8 9223372036854775807
 #define MIN_INT8 (-MAX_INT8 -1)
-	
+        
 #define CHECK_ADD_OVERFLOW(a,b) \
-	(Parrot_Int4)(b) >= 0 ? (Parrot_Int4)(MAX_INT4) - (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0	\
-	: (Parrot_Int4)(MIN_INT4) - (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
+        (Parrot_Int4)(b) >= 0 ? (Parrot_Int4)(MAX_INT4) - (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0  \
+        : (Parrot_Int4)(MIN_INT4) - (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
 
 #define CHECK_SUB_OVERFLOW(a,b) \
-	(Parrot_Int4)(b) < 0 ? (Parrot_Int4)(MAX_INT4) + (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0	\
-	: (Parrot_Int4)(MIN_INT4) + (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
+        (Parrot_Int4)(b) < 0 ? (Parrot_Int4)(MAX_INT4) + (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0   \
+        : (Parrot_Int4)(MIN_INT4) + (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
 
 #define CHECK_ADD_OVERFLOW_UN(a,b) \
-	(Parrot_UInt4)(MAX_UINT4) - (Parrot_UInt4)(b) < (Parrot_UInt4)(a) ? -1 : 0
+        (Parrot_UInt4)(MAX_UINT4) - (Parrot_UInt4)(b) < (Parrot_UInt4)(a) ? -1 : 0
 
 #define CHECK_SUB_OVERFLOW_UN(a,b) \
-	(Parrot_UInt4)(a) < (Parrot_UInt4)(b) ? -1 : 0
+        (Parrot_UInt4)(a) < (Parrot_UInt4)(b) ? -1 : 0
 
 #define CHECK_ADD_OVERFLOW64(a,b) \
-	(HUGEINTVAL)(b) >= 0 ? (HUGEINTVAL)(MAX_INT8) - (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0	\
-	: (HUGEINTVAL)(MIN_INT8) - (HUGEINTVAL)(b) > (HUGEINTVAL)(a) ? +1 : 0
+        (HUGEINTVAL)(b) >= 0 ? (HUGEINTVAL)(MAX_INT8) - (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0      \
+        : (HUGEINTVAL)(MIN_INT8) - (HUGEINTVAL)(b) > (HUGEINTVAL)(a) ? +1 : 0
 
 #define CHECK_SUB_OVERFLOW64(a,b) \
-	(HUGEINTVAL)(b) < 0 ? (HUGEINTVAL)(MAX_INT8) + (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0	\
-	: (HUGEINTVAL)(MIN_INT8) + (HUGEINTVAL)(b) > (HUGEINTVAL)(a) ? +1 : 0
+        (HUGEINTVAL)(b) < 0 ? (HUGEINTVAL)(MAX_INT8) + (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0       \
+        : (HUGEINTVAL)(MIN_INT8) + (HUGEINTVAL)(b) > (HUGEINTVAL)(a) ? +1 : 0
 
 #define CHECK_ADD_OVERFLOW64_UN(a,b) \
-	(UHUGEINTVAL)(MAX_UINT8) - (UHUGEINTVAL)(b) < (UHUGEINTVAL)(a) ? -1 : 0
+        (UHUGEINTVAL)(MAX_UINT8) - (UHUGEINTVAL)(b) < (UHUGEINTVAL)(a) ? -1 : 0
 
 #define CHECK_SUB_OVERFLOW64_UN(a,b) \
-	(UHUGEINTVAL)(a) < (UHUGEINTVAL)(b) ? -1 : 0
+        (UHUGEINTVAL)(a) < (UHUGEINTVAL)(b) ? -1 : 0
 
 #define CHECK_MUL_OVERFLOW(a,b) \
-	((Parrot_Int4)(a) == 0) || ((Parrot_Int4)(b) == 0) ? 0 : \
-	(((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) == -1)) ? FALSE : \
-	(((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) == -1)) ? (a == - MAX_INT4) : \
-	(((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) > 0)) ? (Parrot_Int4)(a) > ((MAX_INT4) / (Parrot_Int4)(b)) : \
-	(((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) < 0)) ? (Parrot_Int4)(a) > ((MIN_INT4) / (Parrot_Int4)(b)) : \
-	(((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) > 0)) ? (Parrot_Int4)(a) < ((MIN_INT4) / (Parrot_Int4)(b)) : \
-	(Parrot_Int4)(a) < ((MAX_INT4) / (Parrot_Int4)(b))
+        ((Parrot_Int4)(a) == 0) || ((Parrot_Int4)(b) == 0) ? 0 : \
+        (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) == -1)) ? FALSE : \
+        (((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) == -1)) ? (a == - MAX_INT4) : \
+        (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) > 0)) ? (Parrot_Int4)(a) > ((MAX_INT4) / (Parrot_Int4)(b)) : \
+        (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) < 0)) ? (Parrot_Int4)(a) > ((MIN_INT4) / (Parrot_Int4)(b)) : \
+        (((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) > 0)) ? (Parrot_Int4)(a) < ((MIN_INT4) / (Parrot_Int4)(b)) : \
+        (Parrot_Int4)(a) < ((MAX_INT4) / (Parrot_Int4)(b))
 
 #define CHECK_MUL_OVERFLOW_UN(a,b) \
-	((Parrot_UInt4)(a) == 0) || ((Parrot_UInt4)(b) == 0) ? 0 : \
-	(Parrot_UInt4)(b) > ((MAX_UINT4) / (Parrot_UInt4)(a))
+        ((Parrot_UInt4)(a) == 0) || ((Parrot_UInt4)(b) == 0) ? 0 : \
+        (Parrot_UInt4)(b) > ((MAX_UINT4) / (Parrot_UInt4)(a))
 
 #define CHECK_MUL_OVERFLOW64(a,b) \
-	((HUGEINTVAL)(a) == 0) || ((HUGEINTVAL)(b) == 0) ? 0 : \
-	(((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) == -1)) ? FALSE : \
-	(((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) == -1)) ? (a == - MAX_INT8) : \
-	(((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) > 0)) ? (HUGEINTVAL)(a) > ((MAX_INT8) / (HUGEINTVAL)(b)) : \
-	(((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) < 0)) ? (HUGEINTVAL)(a) > ((MIN_INT8) / (HUGEINTVAL)(b)) : \
-	(((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) > 0)) ? (HUGEINTVAL)(a) < ((MIN_INT8) / (HUGEINTVAL)(b)) : \
-	(HUGEINTVAL)(a) < ((MAX_INT8) / (HUGEINTVAL)(b))
+        ((HUGEINTVAL)(a) == 0) || ((HUGEINTVAL)(b) == 0) ? 0 : \
+        (((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) == -1)) ? FALSE : \
+        (((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) == -1)) ? (a == - MAX_INT8) : \
+        (((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) > 0)) ? (HUGEINTVAL)(a) > ((MAX_INT8) / (HUGEINTVAL)(b)) : \
+        (((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) < 0)) ? (HUGEINTVAL)(a) > ((MIN_INT8) / (HUGEINTVAL)(b)) : \
+        (((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) > 0)) ? (HUGEINTVAL)(a) < ((MIN_INT8) / (HUGEINTVAL)(b)) : \
+        (HUGEINTVAL)(a) < ((MAX_INT8) / (HUGEINTVAL)(b))
 
 #define CHECK_MUL_OVERFLOW64_UN(a,b) \
-	((UHUGEINTVAL)(a) == 0) || ((UHUGEINTVAL)(b) == 0) ? 0 : \
-	(UHUGEINTVAL)(b) > ((MAX_UINT8) / (UHUGEINTVAL)(a))
+        ((UHUGEINTVAL)(a) == 0) || ((UHUGEINTVAL)(b) == 0) ? 0 : \
+        (UHUGEINTVAL)(b) > ((MAX_UINT8) / (UHUGEINTVAL)(a))
 
 
 /* Overflow exception thrower. */
@@ -81,8 +81,8 @@ static opcode_t* dotnet_OverflowException(Parrot_Interp interpreter, opcode_t *r
 
 /* Unsigned arithmetic ops. */
 inline op net_div_un(out INT, in INT, in INT) :base_core {
-	$1 = ((unsigned int) $2) / ((unsigned int) $3);
-	goto NEXT();
+        $1 = ((unsigned int) $2) / ((unsigned int) $3);
+        goto NEXT();
 }
 
 inline op net_div_un(out PMC, invar PMC, invar PMC) :base_core {
@@ -109,8 +109,8 @@ inline op net_div_un(out PMC, invar PMC, invar PMC) :base_core {
 }
 
 inline op net_rem_un(out INT, in INT, in INT) :base_core {
-	$1 = ((unsigned int) $2) % ((unsigned int) $3);
-	goto NEXT();
+        $1 = ((unsigned int) $2) % ((unsigned int) $3);
+        goto NEXT();
 }
 
 inline op net_rem_un(out PMC, invar PMC, invar PMC) :base_core {
@@ -527,25 +527,25 @@ inline op net_clt_un(out INT, invar PMC, invar PMC) :base_core {
 
 /* Unsigned branch ops. */
 inline op net_bge_un(in INT, in INT, labelconst INT) :base_core {
-	if ((unsigned int)$1 >= (unsigned int)$2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ((unsigned int)$1 >= (unsigned int)$2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_bge_un(in NUM, in NUM, labelconst INT) :base_core {
-	if ((unsigned int)$1 >= (unsigned int)$2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ((unsigned int)$1 >= (unsigned int)$2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_bge_un(invar PMC, invar PMC, labelconst INT) :base_core {
@@ -574,25 +574,25 @@ inline op net_bge_un(invar PMC, invar PMC, labelconst INT) :base_core {
 }
 
 inline op net_bgt_un(in INT, in INT, labelconst INT) :base_core {
-	if ((unsigned int)$1 > (unsigned int)$2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ((unsigned int)$1 > (unsigned int)$2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_bgt_un(in NUM, in NUM, labelconst INT) :base_core {
-	if ($1 > $2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ($1 > $2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_bgt_un(invar PMC, invar PMC, labelconst INT) :base_core {
@@ -621,25 +621,25 @@ inline op net_bgt_un(invar PMC, invar PMC, labelconst INT) :base_core {
 }
 
 inline op net_ble_un(in INT, in INT, labelconst INT) :base_core {
-	if ((unsigned int)$1 <= (unsigned int)$2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ((unsigned int)$1 <= (unsigned int)$2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_ble_un(in NUM, in NUM, labelconst INT) :base_core {
-	if ($1 <= $2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ($1 <= $2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_ble_un(invar PMC, invar PMC, labelconst INT) :base_core {
@@ -668,25 +668,25 @@ inline op net_ble_un(invar PMC, invar PMC, labelconst INT) :base_core {
 }
 
 inline op net_blt_un(in INT, in INT, labelconst INT) :base_core {
-	if ((unsigned int)$1 < (unsigned int)$2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ((unsigned int)$1 < (unsigned int)$2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_blt_un(in NUM, in NUM, labelconst INT) :base_core {
-	if ($1 < $2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ($1 < $2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_blt_un(invar PMC, invar PMC, labelconst INT) :base_core {
@@ -715,25 +715,25 @@ inline op net_blt_un(invar PMC, invar PMC, labelconst INT) :base_core {
 }
 
 inline op net_bne_un(in INT, in INT, labelconst INT) :base_core {
-	if ((unsigned int)$1 != (unsigned int)$2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ((unsigned int)$1 != (unsigned int)$2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_bne_un(in NUM, in NUM, labelconst INT) :base_core {
-	if ($1 != $2)
-	{
-		goto OFFSET($3);
-	}
-	else
-	{
-		goto NEXT();
-	}
+        if ($1 != $2)
+        {
+                goto OFFSET($3);
+        }
+        else
+        {
+                goto NEXT();
+        }
 }
 
 inline op net_bne_un(invar PMC, invar PMC, labelconst INT) :base_core {
@@ -762,93 +762,93 @@ inline op net_bne_un(invar PMC, invar PMC, labelconst INT) :base_core {
 
 /* Unchecked conversion ops. */
 inline op net_conv_i1(out INT, in INT) :base_core {
-	$1 = (Parrot_Int1) $2;
-	goto NEXT();
+        $1 = (Parrot_Int1) $2;
+        goto NEXT();
 }
 
 inline op net_conv_i1(out INT, in NUM) :base_core {
-	$1 = (Parrot_Int1) $2;
-	goto NEXT();
+        $1 = (Parrot_Int1) $2;
+        goto NEXT();
 }
 
 inline op net_conv_i1(out INT, invar PMC) :base_core {
-	$1 = (Parrot_Int1) $2->vtable->get_integer(interpreter, $2);
-	goto NEXT();
+        $1 = (Parrot_Int1) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_u1(out INT, in INT) :base_core {
-	$1 = (Parrot_UInt1) $2;
-	goto NEXT();
+        $1 = (Parrot_UInt1) $2;
+        goto NEXT();
 }
 
 inline op net_conv_u1(out INT, in NUM) :base_core {
-	$1 = (Parrot_UInt1) $2;
-	goto NEXT();
+        $1 = (Parrot_UInt1) $2;
+        goto NEXT();
 }
 
 inline op net_conv_u1(out INT, invar PMC) :base_core {
-	$1 = (Parrot_UInt1) $2->vtable->get_integer(interpreter, $2);
-	goto NEXT();
+        $1 = (Parrot_UInt1) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_i2(out INT, in INT) :base_core {
-	$1 = (Parrot_Int2) $2;
-	goto NEXT();
+        $1 = (Parrot_Int2) $2;
+        goto NEXT();
 }
 
 inline op net_conv_i2(out INT, in NUM) :base_core {
-	$1 = (Parrot_Int2) ((Parrot_Int4) $2);
-	goto NEXT();
+        $1 = (Parrot_Int2) ((Parrot_Int4) $2);
+        goto NEXT();
 }
 
 inline op net_conv_i2(out INT, invar PMC) :base_core {
-	$1 = (Parrot_Int2) $2->vtable->get_integer(interpreter, $2);
-	goto NEXT();
+        $1 = (Parrot_Int2) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_u2(out INT, in INT) :base_core {
-	$1 = (Parrot_UInt2) $2;
-	goto NEXT();
+        $1 = (Parrot_UInt2) $2;
+        goto NEXT();
 }
 
 inline op net_conv_u2(out INT, in NUM) :base_core {
-	$1 = (Parrot_UInt2) $2;
-	goto NEXT();
+        $1 = (Parrot_UInt2) $2;
+        goto NEXT();
 }
 
 inline op net_conv_u2(out INT, invar PMC) :base_core {
-	$1 = (Parrot_UInt2) $2->vtable->get_integer(interpreter, $2);
-	goto NEXT();
+        $1 = (Parrot_UInt2) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_i4(out INT, in INT) :base_core {
-	$1 = (Parrot_Int4) $2;
-	goto NEXT();
+        $1 = (Parrot_Int4) $2;
+        goto NEXT();
 }
 
 inline op net_conv_i4(out INT, in NUM) :base_core {
-	$1 = (Parrot_Int4) $2;
-	goto NEXT();
+        $1 = (Parrot_Int4) $2;
+        goto NEXT();
 }
 
 inline op net_conv_i4(out INT, invar PMC) :base_core {
-	$1 = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
-	goto NEXT();
+        $1 = (Parrot_Int4) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_u4(out INT, in INT) :base_core {
-	$1 = (Parrot_UInt4) $2;
-	goto NEXT();
+        $1 = (Parrot_UInt4) $2;
+        goto NEXT();
 }
 
 inline op net_conv_u4(out INT, in NUM) :base_core {
-	$1 = (Parrot_UInt4) $2;
-	goto NEXT();
+        $1 = (Parrot_UInt4) $2;
+        goto NEXT();
 }
 
 inline op net_conv_u4(out INT, invar PMC) :base_core {
-	$1 = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
-	goto NEXT();
+        $1 = (Parrot_UInt4) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_i8(out PMC, in INT) :base_core {
@@ -856,9 +856,9 @@ inline op net_conv_i8(out PMC, in INT) :base_core {
               string_from_const_cstring(interpreter, "Int64", 0)));
     struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
     PMC_struct_val(i8) = i;
-	i->x = $2;
+        i->x = $2;
     $1 = i8;
-	goto NEXT();
+        goto NEXT();
 }
 
 inline op net_conv_i8(out PMC, in NUM) :base_core {
@@ -866,9 +866,9 @@ inline op net_conv_i8(out PMC, in NUM) :base_core {
               string_from_const_cstring(interpreter, "Int64", 0)));
     struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
     PMC_struct_val(i8) = i;
-	i->x = (HUGEINTVAL) $2;
+        i->x = (HUGEINTVAL) $2;
     $1 = i8;
-	goto NEXT();
+        goto NEXT();
 }
 
 inline op net_conv_u8(out PMC, in INT) :base_core {
@@ -876,9 +876,9 @@ inline op net_conv_u8(out PMC, in INT) :base_core {
               string_from_const_cstring(interpreter, "UInt64", 0)));
     struct dotnet_uint64* ui = mem_sys_allocate(sizeof(struct dotnet_uint64));
     PMC_struct_val(u8) = ui;
-	ui->x = $2;
+        ui->x = $2;
     $1 = u8;
-	goto NEXT();
+        goto NEXT();
 }
 
 inline op net_conv_u8(out PMC, in NUM) :base_core {
@@ -886,74 +886,74 @@ inline op net_conv_u8(out PMC, in NUM) :base_core {
               string_from_const_cstring(interpreter, "UInt64", 0)));
     struct dotnet_uint64* ui = mem_sys_allocate(sizeof(struct dotnet_uint64));
     PMC_struct_val(u8) = ui;
-	ui->x = (UHUGEINTVAL) $2;
+        ui->x = (UHUGEINTVAL) $2;
     $1 = u8;
-	goto NEXT();
+        goto NEXT();
 }
 
 inline op net_conv_r4(out NUM, in INT) :base_core {
-	$1 = (Parrot_Float4) $2;
-	goto NEXT();
+        $1 = (Parrot_Float4) $2;
+        goto NEXT();
 }
 
 inline op net_conv_r4(out NUM, in NUM) :base_core {
-	$1 = (Parrot_Float4) $2;
-	goto NEXT();
+        $1 = (Parrot_Float4) $2;
+        goto NEXT();
 }
 
 inline op net_conv_r4(out NUM, invar PMC) :base_core {
-	$1 = (Parrot_Float) $2->vtable->get_number(interpreter, $2);
-	goto NEXT();
+        $1 = (Parrot_Float) $2->vtable->get_number(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_r8(out NUM, in INT) :base_core {
-	$1 = (Parrot_Float8) $2;
-	goto NEXT();
+        $1 = (Parrot_Float8) $2;
+        goto NEXT();
 }
 
 inline op net_conv_r8(out NUM, in NUM) :base_core {
-	$1 = (Parrot_Float8) $2;
-	goto NEXT();
+        $1 = (Parrot_Float8) $2;
+        goto NEXT();
 }
 
 inline op net_conv_r8(out NUM, invar PMC) :base_core {
-	$1 = (Parrot_Float) $2->vtable->get_number(interpreter, $2);
-	goto NEXT();
+        $1 = (Parrot_Float) $2->vtable->get_number(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_i(out INT, in INT) :base_core {
-	$1 = (int) $2;
-	goto NEXT();
+        $1 = (int) $2;
+        goto NEXT();
 }
 
 inline op net_conv_i(out INT, in NUM) :base_core {
-	$1 = (int) $2;
-	goto NEXT();
+        $1 = (int) $2;
+        goto NEXT();
 }
 
 inline op net_conv_i(out INT, invar PMC) :base_core {
-	$1 = (int) $2->vtable->get_integer(interpreter, $2);
-	goto NEXT();
+        $1 = (int) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_u(out INT, in INT) :base_core {
-	$1 = (unsigned int) $2;
-	goto NEXT();
+        $1 = (unsigned int) $2;
+        goto NEXT();
 }
 
 inline op net_conv_u(out INT, in NUM) :base_core {
-	$1 = (unsigned int) $2;
-	goto NEXT();
+        $1 = (unsigned int) $2;
+        goto NEXT();
 }
 
 inline op net_conv_u(out INT, invar PMC) :base_core {
-	$1 = (unsigned int) $2->vtable->get_integer(interpreter, $2);
-	goto NEXT();
+        $1 = (unsigned int) $2->vtable->get_integer(interpreter, $2);
+        goto NEXT();
 }
 
 inline op net_conv_r_un(out NUM, in INT) :base_core {
-	$1 = (Parrot_Float) ((unsigned int) $2);
-	goto NEXT();
+        $1 = (Parrot_Float) ((unsigned int) $2);
+        goto NEXT();
 }
 
 inline op net_conv_r_un(out NUM, invar PMC) :base_core {
@@ -967,7 +967,7 @@ inline op net_conv_r_un(out NUM, invar PMC) :base_core {
     {
         $1 = (Parrot_Float) $2->vtable->get_integer(interpreter, $2);
     }
-	goto NEXT();
+        goto NEXT();
 }
 
 
