@@ -211,7 +211,7 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
                     last->r[reg] = go;
-                    tmp = INS(interpreter, unit, (char*)neg_op, "", 
+                    tmp = INS(interpreter, unit, (char*)neg_op, "",
                               last->r, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
@@ -539,7 +539,7 @@ constant_propagation(Interp *interpreter, IMC_Unit * unit)
                                             " reduced to %I\n", tmp);
                                     ins2 = prev->next;
                                 }
-                            } 
+                            }
                             else {
                                 op = check_op(interpreter, fullname, ins2->op,
                                     ins2->r, ins2->n_r, ins2->keys);
@@ -867,7 +867,7 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
 
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 next = r->first_ins->next;
-/*                if (!next || 
+/*                if (!next ||
                       !strcmp(next->r[0]->name, get_branch_reg(ins)->name))
                     break;*/
                 if (next &&
@@ -917,7 +917,7 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 start = r->first_ins;
                 found = 0;
-                for (edge = unit->bb_list[start->bbindex]->pred_list; 
+                for (edge = unit->bb_list[start->bbindex]->pred_list;
                      edge; edge = edge->pred_next)
                 {
                     if (edge->from->index == start->bbindex - 1) {
@@ -932,7 +932,7 @@ branch_reorg(Interp *interpreter, IMC_Unit * unit)
                      * to follow block with unconditional jump
                      * (this could actually be in another block) */
                     for (end = start; end->next; end = end->next) {
-                        if ((end->type & IF_goto) && 
+                        if ((end->type & IF_goto) &&
                             !strcmp(end->op, "branch")) {
                             break;
                         }
@@ -972,9 +972,9 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
     if (neg_op) {
         char *label;
         int count, size, found;
-        
+
         size = strlen(branch->r[0]->name) + 10; /* + '_post999' */
-        
+
         label = malloc(size);
         found = 0;
         for (count = 1; count != 999; ++count) {
@@ -984,36 +984,36 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
                 break;
             }
         }
-        
+
         if (found) {
             Instruction *tmp;
             SymReg *regs[3], *r;
 
             /* cond_op has 2 or 3 args */
             assert(args <= 3);
-            
+
             r = mk_local_label(interp, str_dup(label));
             tmp = INS_LABEL(interp, unit, r, 0);
             insert_ins(unit, cond, tmp);
-            
-            
+
+
             for (start = start->next; start != cond; start = start->next) {
                 if (!(start->type & ITLABEL)) {
-                    tmp = INS(interp, unit, start->op, "", 
+                    tmp = INS(interp, unit, start->op, "",
                             start->r, start->n_r, start->keys, 0);
                     prepend_ins(unit, branch, tmp);
                 }
             }
-            
+
             for (count = 0; count != args; ++count) {
                 regs[count] = cond->r[count];
             }
 
-            regs[get_branch_regno(cond)] = 
+            regs[get_branch_regno(cond)] =
                 mk_label_address(interp, str_dup(label));
             tmp = INS(interp, unit, (char*)neg_op, "", regs, args, 0, 0);
-            
-            IMCC_debug(interp, DEBUG_OPT1, 
+
+            IMCC_debug(interp, DEBUG_OPT1,
             "loop %s -> %s converted to post-test, added label %s\n",
             branch->r[0]->name, get_branch_reg(cond)->name, label);
 
@@ -1021,7 +1021,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
             unit->ostat.branch_cond_loop++;
             changed = 1;
         }
-        
+
         free(label);
     }
 
@@ -1039,7 +1039,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
  *
  * The basic premise is "branch (A) to conditional (B), where B goes to
  * just after A."
- * 
+ *
  * Returns TRUE if any optimizations were performed. Otherwise, returns
  * FALSE.
  */
@@ -1074,7 +1074,7 @@ branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
                             || cond->type & ITCALL) {
                         break;
                         /* just until we can copy set_args et al */
-                    } else if (cond->type & ITBRANCH && 
+                    } else if (cond->type & ITBRANCH &&
                                get_branch_regno(cond) >= 0) {
                         found = 1;
                         break;
@@ -1091,7 +1091,7 @@ branch_cond_loop(Interp *interpreter, IMC_Unit * unit)
                         prev = ins->prev;
                         if (!prev)
                             continue;
-                        changed |= branch_cond_loop_swap(interpreter, 
+                        changed |= branch_cond_loop_swap(interpreter,
                                 unit, ins, start, cond);
                         ins = prev->next;
                     }
@@ -1208,7 +1208,7 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
 
     /* Unreachable instructions */
 
-    for (last = unit->instructions, ins=last->next; 
+    for (last = unit->instructions, ins=last->next;
          last && ins;
          ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
@@ -1226,7 +1226,7 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch") &&
                 !strcmp(last->r[0]->name, ins->r[0]->name)) {
-            IMCC_debug(interpreter, DEBUG_OPT1, 
+            IMCC_debug(interpreter, DEBUG_OPT1,
                        "dead branch deleted %I\n", ins);
             ins = delete_ins(unit, last, 1);
             unit->ostat.deleted_ins++;
@@ -1254,7 +1254,7 @@ used_once(Parrot_Interp interpreter, IMC_Unit * unit)
         if (!r)
             continue;
         if (r->use_count == 1 && r->lhs_use_count == 1) {
-            IMCC_debug(interpreter, DEBUG_OPT2, 
+            IMCC_debug(interpreter, DEBUG_OPT2,
                        "used once '%I' deleted\n", ins);
             ins = delete_ins(unit, ins, 1);
             ins = ins->prev ? ins->prev : unit->instructions;
@@ -1360,7 +1360,7 @@ _is_ins_save(IMC_Unit * unit, Instruction *check_ins,
 }
 
 static int
-is_ins_save(Parrot_Interp interpreter, IMC_Unit * unit, 
+is_ins_save(Parrot_Interp interpreter, IMC_Unit * unit,
             Instruction *ins, SymReg *r, int what)
 {
     int save;
@@ -1368,7 +1368,7 @@ is_ins_save(Parrot_Interp interpreter, IMC_Unit * unit,
     reason = 0;
     save = _is_ins_save(unit, ins, r, what);
     if (!save && reason)
-        IMCC_debug(interpreter, DEBUG_OPT2, 
+        IMCC_debug(interpreter, DEBUG_OPT2,
                    "ins not save var %s reason %d %I\n",
                 r->name, reason, ins);
     return save;

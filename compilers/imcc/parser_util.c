@@ -39,7 +39,7 @@ static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, char *name,
  * absolutely global to prevent the files from being overwritten.
  *
  * This is not thread safe as is. A mutex needs to be added.
- * 
+ *
  * See RT#40010 for more discussion.
  */
 static INTVAL eval_nr = 0;
@@ -540,7 +540,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         /* TODO use opnum constants */
         if (!strcmp(name, "branch") ||
             !strcmp(name, "tailcall") ||
-            !strcmp(name, "returncc"))    
+            !strcmp(name, "returncc"))
             ins->type |= IF_goto;
         else if (!strcmp(fullname, "jump_i") ||
                 !strcmp(fullname, "jsr_i") ||
@@ -586,7 +586,7 @@ do_yylex_init (Interp* interp, yyscan_t* yyscanner)
 }
 
 PMC *
-imcc_compile(Parrot_Interp interp, const char *s, int pasm_file, 
+imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
              STRING **error_message)
 {
     /* imcc always compiles to interp->code
@@ -644,7 +644,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
      * compile_string NULLifies frames->next, so that yywrap
      * doesn't try to continue compiling the previous buffer
      * This OTOH prevents pop_parser-state ->
-     *  
+     *
      * set next here and pop
      */
     IMCC_INFO(interp)->state->next = next;
@@ -729,7 +729,7 @@ imcc_compile_pasm_ex(Parrot_Interp interp, const char *s)
 {
     STRING *error_message;
     PMC *sub;
-    
+
     sub = imcc_compile(interp, s, 1, &error_message);
     if (sub == NULL ) {
         real_exception(interp, NULL, E_Exception,
@@ -743,7 +743,7 @@ imcc_compile_pir_ex(Parrot_Interp interp, const char *s)
 {
     STRING *error_message;
     PMC *sub;
-    
+
     sub = imcc_compile(interp, s, 0, &error_message);
     if (sub == NULL) {
         real_exception(interp, NULL, E_Exception,
@@ -756,7 +756,7 @@ imcc_compile_pir_ex(Parrot_Interp interp, const char *s)
  * Compile a file by filename (can be either PASM or IMCC code)
  */
 static void *
-imcc_compile_file (Parrot_Interp interp, const char *fullname, 
+imcc_compile_file (Parrot_Interp interp, const char *fullname,
                    STRING **error_message)
 {
     struct PackFile_ByteCode *cs_save = interp->code, *cs=NULL;
@@ -841,7 +841,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
         cs = interp->code;
     }
     else {
-        *error_message = IMCC_INFO(interp)->error_message;    
+        *error_message = IMCC_INFO(interp)->error_message;
     }
 
     if (cs_save)
@@ -859,14 +859,14 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
  * function can go away in future.
  */
 void *
-IMCC_compile_file(Parrot_Interp interp, const char *s) 
+IMCC_compile_file(Parrot_Interp interp, const char *s)
 {
     STRING *error_message;
     return imcc_compile_file(interp, s, &error_message);
 }
 
 void *
-IMCC_compile_file_s(Parrot_Interp interp, const char *s, 
+IMCC_compile_file_s(Parrot_Interp interp, const char *s,
                    STRING **error_message)
 {
         return imcc_compile_file(interp, s , error_message);
@@ -881,7 +881,7 @@ register_compilers(Parrot_Interp interp)
     /* It looks like this isn't used anywhere yet */
     /* TODO: return a Eval PMc, instead of a packfile */
     /* Parrot_compreg(interp,
-                      const_string(interp, "FILE"), 
+                      const_string(interp, "FILE"),
                       imcc_compile_file ); */
 }
 

@@ -578,7 +578,7 @@ link_keys(Interp *interp, int nargs, SymReg * keys[], int force)
     int i, len, any_slice;
     char *key_str;
     /* namespace keys are global consts - no cur_unit */
-    SymHash *h = IMCC_INFO(interp)->cur_unit ? 
+    SymHash *h = IMCC_INFO(interp)->cur_unit ?
         &IMCC_INFO(interp)->cur_unit->hash : &IMCC_INFO(interp)->ghash;
 
     if (nargs == 0)
@@ -799,7 +799,7 @@ clear_sym_hash(SymHash *hsh)
 {
     int i;
     SymReg * p, *next;
-    if (!hsh->data) 
+    if (!hsh->data)
         return;
     for (i = 0; i < hsh->size; i++) {
         for (p = hsh->data[i]; p; ) {

@@ -1,7 +1,7 @@
 /*
  * pcc.c
  *
- * Parrot calling convention implementation. 
+ * Parrot calling convention implementation.
  *
  * see: docs/pdds/pdd03_calling_conventions.pod
  *
@@ -97,7 +97,7 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
             case 'I': break;
             case 'S': flags |= PARROT_ARG_STRING;   break;
             case 'N': flags |= PARROT_ARG_FLOATVAL; break;
-            case 'K':          
+            case 'K':
             case 'P': flags |= PARROT_ARG_PMC;      break;
         }
         sprintf(s, "0x%x", flags);
@@ -188,7 +188,7 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             strcmp(unit->last_ins->op, "end") &&
             strcmp(unit->last_ins->op, "branch") &&
             /* was adding rets multiple times... */
-            strcmp(unit->last_ins->op, "returncc") 
+            strcmp(unit->last_ins->op, "returncc")
        ) {
         if (sub->pcc_sub->pragma & P_MAIN) {
             tmp = INS(interp, unit, "end", NULL, regs, 0, 0, 0);
@@ -245,7 +245,7 @@ struct move_info_t {
     SymReg **src;
 };
 
-static int 
+static int
 pcc_reg_mov(Interp *interpreter, unsigned char d, unsigned char s,
         void *vinfo)
 {
@@ -372,7 +372,7 @@ recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
     if (get_params->opnum != PARROT_OP_get_params_pc)
         return 0;
     buf = malloc(strlen(this_sub->name) + 3);
-    sprintf(buf, "%s@0", this_sub->name); 
+    sprintf(buf, "%s@0", this_sub->name);
     if ( (label = find_sym(interp, buf)) == NULL) {
         label = mk_local_label(interp, str_dup(buf));
         tmp_ins = INS_LABEL(interp, unit, label, 0);
@@ -380,7 +380,7 @@ recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
     }
     free(buf);
 
-    ins = move_regs(interp, unit, ins, sub->pcc_sub->nargs, 
+    ins = move_regs(interp, unit, ins, sub->pcc_sub->nargs,
             this_sub->pcc_sub->args, sub->pcc_sub->args);
 
     regs[0] = label;

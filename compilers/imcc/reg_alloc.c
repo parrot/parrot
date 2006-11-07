@@ -29,7 +29,7 @@ static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
 static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
-static void map_colors(IMC_Unit *, int x, unsigned int * graph, 
+static void map_colors(IMC_Unit *, int x, unsigned int * graph,
                        char colors[], int typ, int);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
 static void allocate_lexicals (Parrot_Interp, IMC_Unit *);
@@ -119,7 +119,7 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
      * all lexicals get a unique register
      */
     allocate_lexicals(interpreter, unit);
-     
+
     /* build CFG and life info, and optimize iteratively */
     do {
         first = 1;
@@ -146,15 +146,15 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_symreg(unit);
-    
+
     rebuild_reglist(interpreter, unit);
-    if (IMCC_INFO(interpreter)->allocator == IMCC_VANILLA_ALLOCATOR) 
+    if (IMCC_INFO(interpreter)->allocator == IMCC_VANILLA_ALLOCATOR)
         vanilla_reg_alloc (interpreter, unit);
-    else 
+    else
         graph_coloring_reg_alloc(interpreter, unit);
 
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_instructions(interpreter, unit); 
+        dump_instructions(interpreter, unit);
 done:
     if (IMCC_INFO(interpreter)->verbose  ||
             (IMCC_INFO(interpreter)->debug & DEBUG_IMC)) {
@@ -263,7 +263,7 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
     IMCC_info(interpreter, 1,
               "\t%d labels, %d lines deleted, "
               "%d if_branch, %d branch_branch\n",
-              unit->ostat.deleted_labels, unit->ostat.deleted_ins, 
+              unit->ostat.deleted_labels, unit->ostat.deleted_ins,
               unit->ostat.if_branch, unit->ostat.branch_branch);
     IMCC_info(interpreter, 1, "\t%d branch_cond_loop\n",
               unit->ostat.branch_cond_loop);
@@ -809,7 +809,7 @@ vanilla_reg_alloc(Parrot_Interp interpreter, IMC_Unit *unit)
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
                     continue;
-                if ((r->type & VTREGISTER) && (r->color == -1 ) 
+                if ((r->type & VTREGISTER) && (r->color == -1 )
                         ) {
                     if (set_contains(avail, first_reg))
                         first_reg = first_avail(unit, reg_set, NULL);

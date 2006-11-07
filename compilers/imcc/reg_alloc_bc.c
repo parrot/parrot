@@ -335,7 +335,7 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
               "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
               ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
               ostat.branch_branch);
-    IMCC_info(interpreter, 1, 
+    IMCC_info(interpreter, 1,
               "\t%d branch_cond_loop\n",
               ostat.branch_cond_loop);
     IMCC_info(interpreter, 1, "\t%d used once deleted\n",
@@ -344,7 +344,7 @@ print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
               ostat.invariants_moved);
     IMCC_info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
               sets[0], sets[1], sets[2], sets[3]);
-    IMCC_info(interpreter, 1, 
+    IMCC_info(interpreter, 1,
               "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
               cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1,
               unit->n_spilled);
@@ -402,7 +402,7 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     if (count == 0)
         return;
     if (count >= HASH_SIZE)
-        IMCC_warning(interpreter, "build_reglist", 
+        IMCC_warning(interpreter, "build_reglist",
                      "probably too small HASH_SIZE (%d symbols)\n", count);
     unit->reglist = mem_sys_allocate_zeroed(count*sizeof(SymReg*));
 
@@ -770,7 +770,7 @@ update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     }
     /* now set life_info */
     free_life_info(unit, r);
-    r->life_info = 
+    r->life_info =
         mem_sys_allocate_zeroed(unit->n_basic_blocks*sizeof(Life_range*));
     for (i=0; i < unit->n_basic_blocks; i++)
         make_life_range(r, i);
@@ -871,7 +871,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
         }
         if (needs_fetch || needs_store) {
             /* update life info of prev sym */
-            update_life(interpreter, unit, ins, new_sym, needs_fetch, 
+            update_life(interpreter, unit, ins, new_sym, needs_fetch,
                         needs_store, old_sym != new_sym);
             /* if all symbols are in one basic_block, we need a new
              * symbol, so that the life_ranges are minimal
@@ -896,7 +896,7 @@ spill_registers(Parrot_Interp interpreter, IMC_Unit* unit, graph* G)
     int spilled=0, j;
     Instruction *spill_ins, *ins;
 
-    IMCC_debug(interpreter, DEBUG_REG, 
+    IMCC_debug(interpreter, DEBUG_REG,
                "spill_registers: spilling at least %d symbols\n",
                G->k-MAX_COLOR);
 
@@ -1050,7 +1050,7 @@ apply_coloring(Interp* interpreter, IMC_Unit* unit, graph* G)
             reglist[x]->color = G->V[j].col - 1;
             IMCC_debug(interpreter, DEBUG_REG2,"APPLY node %d, reg=%ld\n",
                     x, reglist[x]->color);
-        } 
+        }
         else {
             IMCC_fatal(interpreter, 1,"apply_coloring",
                     "wants to use too high reg num");
@@ -1065,12 +1065,12 @@ apply_coloring(Interp* interpreter, IMC_Unit* unit, graph* G)
             assert(reglist[x]->color >= 0);
             assert(reglist[x]->color < MAX_COLOR);
             assert(reglist[x]->color == G->V[j].col-1);
-            IMCC_debug(interpreter, DEBUG_REG,"%d (reg==%ld):", x, 
+            IMCC_debug(interpreter, DEBUG_REG,"%d (reg==%ld):", x,
                        reglist[x]->color);
             for (k = 0; k < G->n; k++) {
                 int y=G->V[k].id;
                 if (ig_test(x, y, G->n, G->E)) {
-                    IMCC_debug(interpreter, DEBUG_REG," %d(c=%ld)",y, 
+                    IMCC_debug(interpreter, DEBUG_REG," %d(c=%ld)",y,
                                reglist[y]->color);
                     assert(reglist[x]->color != reglist[y]->color);
                 }
@@ -1277,7 +1277,7 @@ ig_color_node(Interp* interpreter, IMC_Unit* unit, graph* G, int j)
     if (u->col && avail[u->col]) {
         c = u->col;
         assert(avail[u->col]);   /* verify no conflict */
-    } 
+    }
     else {
         if (u->col)
             IMCC_debug(interpreter, DEBUG_REG,
@@ -1287,7 +1287,7 @@ ig_color_node(Interp* interpreter, IMC_Unit* unit, graph* G, int j)
         u->col = c;
     }
     if (G->k < c) G->k = c;
-    IMCC_debug(interpreter, DEBUG_REG2, 
+    IMCC_debug(interpreter, DEBUG_REG2,
                "ig_color_node:  node %d, receives col=%d\n",
                u->id, u->col);
     return c;

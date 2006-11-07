@@ -229,7 +229,7 @@ instruction_writes(Instruction* ins, SymReg* r) {
 
     f = ins->flags;
 
-    /* 
+    /*
      * a get_results opcode is before the actual sub call
      * but for the register allocator, the effect matters, thus
      * postpone the effect after the invoke
@@ -239,7 +239,7 @@ instruction_writes(Instruction* ins, SymReg* r) {
          * an exception_handler, which doesn't have
          * a call next
          */
-        if (ins->next && (ins->next->type & ITPCCSUB)) 
+        if (ins->next && (ins->next->type & ITPCCSUB))
             return 0;
         for (i = 0; i < ins->n_r; i++) {
             if (ins->r[i] == r)

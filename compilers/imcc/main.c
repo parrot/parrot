@@ -336,7 +336,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 if (strchr(optimizer_opt, '2')) {
                     /* FIXME -O2 is borken */
 #if 1
-                    IMCC_INFO(interp)->optimizer_level |= 
+                    IMCC_INFO(interp)->optimizer_level |=
                         (OPT_PRE | OPT_CFG);
 #else
                     IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
@@ -520,7 +520,7 @@ main(int argc, char * argv[])
 
     imcc_init(interp);
     IMCC_ast_init(interp);
-    IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR; 
+    IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR;
     sourcefile = parseflags(interp, &argc, &argv);
     output_file = interp->output_file;
 
@@ -602,7 +602,7 @@ main(int argc, char * argv[])
 
     if (IMCC_INFO(interp)->verbose) {
         IMCC_info(interp, 1,"debug = 0x%x\n", IMCC_INFO(interp)->debug);
-        IMCC_info(interp, 1,"Reading %s\n", 
+        IMCC_info(interp, 1,"Reading %s\n",
                   imc_yyin_get(yyscanner) == stdin ? "stdin":sourcefile);
     }
 
@@ -637,7 +637,7 @@ main(int argc, char * argv[])
         }
         else {
             IMCC_INFO(interp)->state->pasm_file = pasm_file;
-            IMCC_TRY(IMCC_INFO(interp)->jump_buf, 
+            IMCC_TRY(IMCC_INFO(interp)->jump_buf,
                      IMCC_INFO(interp)->error_code) {
                 int retval;
                 retval = yyparse(yyscanner, (void *) interp);
@@ -650,7 +650,7 @@ main(int argc, char * argv[])
             IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
                 IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
                 fprintf(stderr,"error:imcc:%s",
-                        string_to_cstring(interp, 
+                        string_to_cstring(interp,
                         IMCC_INFO(interp)->error_message));
                 IMCC_print_inc(interp);
                 Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
@@ -658,7 +658,7 @@ main(int argc, char * argv[])
             IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
                 IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
                 fprintf(stderr,"error:imcc:%s",
-                        string_to_cstring(interp, 
+                        string_to_cstring(interp,
                         IMCC_INFO(interp)->error_message));
                 IMCC_print_inc(interp);
                 Parrot_exit(interp, IMCC_FATALY_EXCEPTION);

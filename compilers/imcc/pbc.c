@@ -376,7 +376,7 @@ fixup_globals(Interp *interpreter)
                     op = interpreter->op_lib->op_code("find_name_p_sc", 1);
                     assert(op);
                     interpreter->code->base.data[addr] = op;
-                    nam = mk_const(interpreter, str_dup(fixup->name), 
+                    nam = mk_const(interpreter, str_dup(fixup->name),
                             fixup->type & VT_ENCODED ? 'U' : 'S');
                     if (nam->color >= 0)
                         col = nam->color;
@@ -502,13 +502,13 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
     }
     ct = interpreter->code->const_table;
     for (i = 0; i < n; ++i) {
-        /* multi[i] can be a Key too - 
-         * store PMC constants instead of bare strings 
+        /* multi[i] can be a Key too -
+         * store PMC constants instead of bare strings
          */
         const SymReg *r = pcc_sub->multi[i];
         if (r->set == 'S') {
             sig_pmc = pmc_new(interpreter, enum_class_String);
-            VTABLE_set_string_native(interpreter, sig_pmc, 
+            VTABLE_set_string_native(interpreter, sig_pmc,
                     ct->constants[r->color]->u.string);
         }
         else {
@@ -664,7 +664,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         if (real_name) {
             char *p;
             ++real_name;
-            p = str_dup(real_name); 
+            p = str_dup(real_name);
             free(r->name);
             r->name = p;
         }
@@ -757,7 +757,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
 
             PMC_sub(sub_copy)->name = vtable_name;
             PObj_get_FLAGS(sub_copy) &= !SUB_FLAG_PF_ANON;
-            
+
             switch (ns_pmc->vtable->base_type)
             {
                 case enum_class_Key:
@@ -765,7 +765,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
                        namespace key. */
                     vtable_ns_pmc = VTABLE_clone(interpreter, ns_pmc);
                     vtable_ns_name = pmc_new(interpreter, enum_class_Key);
-                    VTABLE_set_string_native(interpreter, vtable_ns_name, 
+                    VTABLE_set_string_native(interpreter, vtable_ns_name,
                         vtable_ns_name_s);
                     VTABLE_push_pmc(interpreter, vtable_ns_pmc,
                         vtable_ns_name);
@@ -776,7 +776,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
                     VTABLE_set_string_native(interpreter, vtable_ns_pmc,
                         VTABLE_get_string(interpreter, ns_pmc));
                     tmp = pmc_new(interpreter, enum_class_Key);
-                    VTABLE_set_string_native(interpreter, tmp, 
+                    VTABLE_set_string_native(interpreter, tmp,
                         vtable_ns_name_s);
                     VTABLE_push_pmc(interpreter, vtable_ns_pmc, tmp);
                     break;
@@ -830,7 +830,7 @@ add_const_key(Interp *interpreter, opcode_t key[],
     interpreter->code->const_table->constants[k]->type = PFC_KEY;
     interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
     store_key_const(s_key, k);
-    IMCC_debug(interpreter, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n", 
+    IMCC_debug(interpreter, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n",
                s_key, k, size);
     IMCC_debug(interpreter, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
                key[0],key[1],key[2],key[3],key[4]);
@@ -1155,7 +1155,7 @@ verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
     for (i = 0; i < n; ++i) {
         r = ins->r[i + 1];
         sig = VTABLE_get_integer_keyed_int(interpreter, sig_arr, i);
-        if (! (sig & PARROT_ARG_NAME) && 
+        if (! (sig & PARROT_ARG_NAME) &&
                 no_consts && (r->type & VTCONST))
             IMCC_fatal(interpreter, 1, "e_pbc_emit: "
                     "constant argument '%s' in get param/result\n",
@@ -1235,7 +1235,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 mem_sys_realloc(interpreter->code->base.data, bytes);
             interpreter->code->pic_index->data =
                 mem_sys_realloc(interpreter->code->pic_index->data, bytes/2);
-        } 
+        }
         else {
             interpreter->code->base.data = mem_sys_allocate(bytes);
             interpreter->code->pic_index->data = mem_sys_allocate(bytes/2);
@@ -1296,7 +1296,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 IMCC_fatal(interpreter, 1, "e_pbc_emit: "
                         "no label offset defined for '%s'\n", addr->name);
             last_label = addr->color - npc;
-            IMCC_debug(interpreter, DEBUG_PBC_FIXUP, 
+            IMCC_debug(interpreter, DEBUG_PBC_FIXUP,
                     "branch label at pc %d addr %d %s %d\n",
                     npc, addr->color, addr->name, last_label);
         }
@@ -1329,7 +1329,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 case PARROT_ARG_IC:
                     /* branch instruction */
                     if (op_info->labels[i]) {
-                        if (last_label == 1)   
+                        if (last_label == 1)
                             /* we don't have a branch with offset 1 !? */
                             IMCC_fatal(interpreter, 1, "e_pbc_emit: "
                                     "no label offset found\n");
