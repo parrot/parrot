@@ -21,15 +21,15 @@
  * Subroutine flags
  */
 typedef enum {
+     /* runtime usage flags */
     SUB_FLAG_CORO_FF      = PObj_private0_FLAG,
-    SUB_FLAG_C_HANDLER    = PObj_private0_FLAG,
-
-    SUB_FLAG_IS_OUTER     = PObj_private1_FLAG,
-
+    SUB_FLAG_C_HANDLER    = PObj_private0_FLAG, /* C exceptions only */
     SUB_FLAG_TAILCALL     = PObj_private2_FLAG,
-    SUB_FLAG_GENERATOR    = PObj_private3_FLAG,
+    SUB_FLAG_GENERATOR    = PObj_private3_FLAG, /* unused old python pmcs */
 
+    /* compile/loadtime usage flags */
     /* from packfile */
+    SUB_FLAG_IS_OUTER     = PObj_private1_FLAG,
     SUB_FLAG_PF_ANON      = PObj_private3_FLAG,
     SUB_FLAG_PF_MAIN      = PObj_private4_FLAG,
     SUB_FLAG_PF_LOAD      = PObj_private5_FLAG,
@@ -37,8 +37,56 @@ typedef enum {
     SUB_FLAG_PF_POSTCOMP  = PObj_private7_FLAG,
 
     SUB_FLAG_PF_MASK      = 0xfa   /* anon ... postcomp, is_outer*/
-
 } sub_flags_enum;
+
+typedef enum {
+    SUB_COMP_FLAG_BIT_0 = 1 << 0,
+    SUB_COMP_FLAG_BIT_1 = 1 << 1,
+    SUB_COMP_FLAG_BIT_2 = 1 << 2,
+    SUB_COMP_FLAG_BIT_3 = 1 << 3,
+    SUB_COMP_FLAG_BIT_4 = 1 << 4,
+    SUB_COMP_FLAG_BIT_5 = 1 << 5,
+    SUB_COMP_FLAG_BIT_6 = 1 << 6,
+    SUB_COMP_FLAG_BIT_7 = 1 << 7,
+    SUB_COMP_FLAG_BIT_8 = 1 << 8,
+    SUB_COMP_FLAG_BIT_9 = 1 << 9,
+    SUB_COMP_FLAG_PF_INIT = 1 << 10,
+    SUB_COMP_FLAG_BIT_10 = 1 << 10,
+    SUB_COMP_FLAG_BIT_11 = 1 << 11,
+    SUB_COMP_FLAG_BIT_12 = 1 << 12,
+    SUB_COMP_FLAG_BIT_13 = 1 << 13,
+    SUB_COMP_FLAG_BIT_14 = 1 << 14,
+    SUB_COMP_FLAG_BIT_15 = 1 << 15,
+    SUB_COMP_FLAG_BIT_16 = 1 << 16,
+    SUB_COMP_FLAG_BIT_17 = 1 << 17,
+    SUB_COMP_FLAG_BIT_18 = 1 << 18,
+    SUB_COMP_FLAG_BIT_19 = 1 << 19,
+    SUB_COMP_FLAG_BIT_20 = 1 << 20,
+    SUB_COMP_FLAG_BIT_21 = 1 << 21,
+    SUB_COMP_FLAG_BIT_22 = 1 << 22,
+    SUB_COMP_FLAG_BIT_23 = 1 << 23,
+    SUB_COMP_FLAG_BIT_24 = 1 << 24,
+    SUB_COMP_FLAG_BIT_25 = 1 << 25,
+    SUB_COMP_FLAG_BIT_26 = 1 << 26,
+    SUB_COMP_FLAG_BIT_27 = 1 << 27,
+    SUB_COMP_FLAG_BIT_28 = 1 << 28,
+    SUB_COMP_FLAG_BIT_29 = 1 << 29,
+    SUB_COMP_FLAG_BIT_30 = 1 << 30,
+    SUB_COMP_FLAG_BIT_31 = 1 << 31,
+    SUB_COMP_FLAG_MASK   = 0x00000400,
+} sub_comp_flags_enum;
+
+#define Sub_comp_get_FLAGS(o) ((PMC_sub(o))->comp_flags)
+#define Sub_comp_flag_TEST(flag, o) (Sub_comp_get_FLAGS(o) & SUB_COMP_FLAG_ ## flag )
+#define Sub_comp_flag_SET(flag, o) (Sub_comp_get_FLAGS(o) |= SUB_COMP_FLAG_ ## flag )
+#define Sub_comp_flag_CLEAR(flag, o) (Sub_comp_get_FLAGS(o) &= ~(UINTVAL)(SUB_COMP_FLAG_ ## flag ))
+
+#define Sub_comp_flags_SETTO(o, f) Sub_comp_get_FLAGS(o) = (f)
+#define Sub_comp_flags_CLEARALL(o) Sub_comp_flags_SETTO(o, 0)
+
+#define Sub_comp_INIT_TEST(o) Sub_comp_flag_TEST(PF_INIT, o)
+#define Sub_comp_INIT_SET(o) Sub_comp_flag_SET(PF_INIT, o)
+#define Sub_comp_INIT_CLEAR(o) Sub_comp_flag_CLEAR(PF_INIT, o)
 
 union parrot_context_t;
 
@@ -71,6 +119,7 @@ typedef struct Parrot_sub {
     PMC      *outer_sub;         /* :outer for closures */
     PMC      *eval_pmc;          /* eval container / NULL */
     parrot_context_t *ctx;       /* the context this sub is in */
+    UINTVAL  comp_flags;         /* compile time and additional flags */
 
     /* - end common */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
@@ -100,6 +149,7 @@ typedef struct Parrot_coro {
     PMC      *outer_sub;         /* :outer for closures */
     PMC      *eval_pmc;          /* eval container / NULL */
     struct Parrot_Context  *ctx; /* coroutine context */
+    UINTVAL  comp_flags;         /* compile time and additional flags */
 
     /* - end common */
 

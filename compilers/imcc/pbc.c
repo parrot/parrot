@@ -687,6 +687,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     */
     sub_pmc = pmc_new(interpreter, type);
     PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
+    Sub_comp_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
     sub = PMC_sub(sub_pmc);
 
     r->color = add_const_str(interpreter, r);

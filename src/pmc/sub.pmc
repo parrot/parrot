@@ -460,10 +460,10 @@ Archives the subroutine.
 
         io->vtable->push_integer(INTERP, io, (INTVAL) sub->start_offs);
         io->vtable->push_integer(INTERP, io, (INTVAL) sub->end_offs);
-        io->vtable->push_integer(INTERP, io,
-                PObj_get_FLAGS(pmc) & SUB_FLAG_PF_MASK);
+        io->vtable->push_integer(INTERP, io, PObj_get_FLAGS(pmc) & SUB_FLAG_PF_MASK);
         io->vtable->push_string(INTERP, io, sub->name);
         io->vtable->push_integer(INTERP, io, sub->HLL_id);
+        io->vtable->push_integer(INTERP, io, sub->comp_flags);
         for (i = 0; i < 4; ++i)
             io->vtable->push_integer(INTERP, io, sub->n_regs_used[i]);
     }
@@ -495,6 +495,7 @@ Unarchives the subroutine.
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
             sub->name = io->vtable->shift_string(INTERP, io);
             sub->HLL_id  = io->vtable->shift_integer(INTERP, io);
+            sub->comp_flags = io->vtable->shift_integer(INTERP, io);
             for (i = 0; i < 4; ++i)
                 sub->n_regs_used[i] = io->vtable->shift_integer(INTERP, io);
         }

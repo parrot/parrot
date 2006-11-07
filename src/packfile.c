@@ -228,7 +228,7 @@ sub_pragma(Parrot_Interp interpreter, int action, PMC *sub_pmc)
     int todo = 0;
 
     pragmas &= ~SUB_FLAG_IS_OUTER;
-    if (!pragmas)
+    if (!pragmas && !Sub_comp_INIT_TEST(sub_pmc))
         return 0;
     switch (action) {
         case PBC_PBC:
@@ -239,6 +239,9 @@ sub_pragma(Parrot_Interp interpreter, int action, PMC *sub_pmc)
                  */
                 todo = 1;
             }
+            /* :init functions need to be called at MAIN time, so return 1 */
+            if (Sub_comp_INIT_TEST(sub_pmc)) /* symreg.h:P_INIT */
+                todo = 1;
             break;
         case PBC_LOADED:
             if (pragmas & SUB_FLAG_PF_LOAD) /* symreg.h:P_LOAD */
@@ -337,6 +340,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
         case PBC_LOADED:
             if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_LOAD) {
                 PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
+                Sub_comp_INIT_CLEAR(sub_pmc); /* if loaded no need for init */
                 run_sub(interpreter, sub_pmc);
             }
             break;
@@ -359,6 +363,15 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
                                 ":main sub not allowed\n");
                 }
             }
+
+            /* run :init tagged functions */
+            if (action == PBC_MAIN && (Sub_comp_INIT_TEST(sub_pmc))) {
+                Sub_comp_INIT_CLEAR(sub_pmc); /* if loaded no need for init */
+                PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD; /* if inited no need for load */
+                run_sub(interpreter, sub_pmc);
+                interpreter->resume_flag = RESUME_INITIAL;
+            }
+            break;
     }
     return NULL;
 }
@@ -425,7 +438,7 @@ do_sub_pragmas(Interp *interpreter, struct PackFile_Bytecode *self,
    int action, PMC *eval_pmc)>
 
 B<action> is one of
-B<PBC_PBC>, B<PBC_LOADED>, or B<PBC_MAIN>. Also store the C<eval_pmc>
+B<PBC_PBC>, B<PBC_LOADED>, B<PBC_INIT>, or B<PBC_MAIN>. Also store the C<eval_pmc>
 in the sub structure, so that the eval PMC is kept alive be living subs.
 
 =cut
@@ -459,8 +472,9 @@ do_sub_pragmas(Interp *interpreter, struct PackFile_ByteCode *self,
                             "Illegal fixup offset (%d) in enum_fixup_sub");
                 sub_pmc = ct->constants[ci]->u.key;
                 PMC_sub(sub_pmc)->eval_pmc = eval_pmc;
-                if ((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK) &&
-                        sub_pragma(interpreter, action, sub_pmc)) {
+                if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK) 
+                        || (Sub_comp_get_FLAGS(sub_pmc) & SUB_COMP_FLAG_MASK)) 
+                        && sub_pragma(interpreter, action, sub_pmc)) {
                     result = do_1_sub_pragma(interpreter,
                             sub_pmc, action);
                     /*
@@ -3551,7 +3565,7 @@ Parrot_load_bytecode(Interp *interpreter, STRING *file_str)
 /*
 
 =item C<void
-PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t, PMC *eval)>
+PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t what, PMC *eval)>
 
 Run :load or :immediate subroutines for the current code segment.
 If C<eval> is given, set this is the owner of the subroutines.

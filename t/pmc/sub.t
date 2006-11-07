@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 57;
+use Parrot::Test tests => 58;
 use Parrot::Config;
 
 =head1 NAME
@@ -1310,6 +1310,19 @@ pir_output_like(<<'CODE', qr/Null PMC access in invoke()/, 'invoking null pmc');
     $P0()
 .end
 CODE
+
+pir_output_is(<<'CODE', <<'OUTPUT', ":init");
+.sub a :init
+    print "in inited\n"
+.end
+
+.sub main :main
+    print "main\n"
+.end
+CODE
+in inited
+main
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

@@ -276,6 +276,7 @@ SP              [ ]
 <emit,INITIAL>":multi"   return(MULTI);
 <emit,INITIAL>":main"    return(MAIN);
 <emit,INITIAL>":load"    return(LOAD);
+<emit,INITIAL>":init"    return(INIT);
 <emit,INITIAL>":immediate"    return(IMMEDIATE);
 <emit,INITIAL>":postcomp"    return(POSTCOMP);
 <emit,INITIAL>":anon"    return(ANON);

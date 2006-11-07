@@ -96,6 +96,9 @@ e.g.
 B<:load> is ignored, if another subroutine in that file is marked with
 B<:main>.
 
+If a subroutine is marked as B<:init> this subroutine is run, before the
+B<:main> or the first subroutine in the source file runs.
+
 =head2 Invocation i.e. calling the sub
 
   invoke	# call the subroutine in P0 (P1 was created earlier)

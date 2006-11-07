@@ -413,7 +413,7 @@ do_loadlib(Interp *interp, char *lib)
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
-%token <t> MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
+%token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI VTABLE_METHOD LOADLIB
 %token <t> UNIQUE_REG
 %token <s> LABEL
@@ -817,6 +817,7 @@ sub_proto_list:
 
 proto:
      LOAD           {  $$ = P_LOAD; }
+   | INIT           {  $$ = P_INIT; }
    | MAIN           {  $$ = P_MAIN; }
    | IMMEDIATE      {  $$ = P_IMMEDIATE; }
    | POSTCOMP       {  $$ = P_POSTCOMP; }

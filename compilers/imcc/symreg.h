@@ -135,17 +135,16 @@ void add_pcc_multi(SymReg *r, SymReg * arg);
 void add_namespace(Parrot_Interp interpreter, struct _IMC_Unit *);
 
 typedef enum {
-    P_NONE           = 0x00,
-    P_NEED_LEX       = 0x01,
-    /* P_XXXX           = 0x02, */
-    P_METHOD         = 0x04,
-
-    P_ANON           = SUB_FLAG_PF_ANON,  /* 0x8 - private3 */
-
-    P_MAIN           = SUB_FLAG_PF_MAIN,
-    P_LOAD           = SUB_FLAG_PF_LOAD,
-    P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE,
-    P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP
+    P_NONE           = 0x00,                  /* 0<<0 */
+    P_NEED_LEX       = 0x01,                  /* 1<<0 */
+    /* P_XXXX           = 0x02, */                /* 1<<1 */
+    P_METHOD         = 0x04,                  /* 1<<2 */
+    P_ANON           = SUB_FLAG_PF_ANON,      /* 1<<3 0x8 - private3 */
+	  P_MAIN           = SUB_FLAG_PF_MAIN,      /* 1<<4 0x10 - private4 */
+	  P_LOAD           = SUB_FLAG_PF_LOAD,      /* 1<<5 0x20 - private5 */
+  	P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE, /* 1<<6 0x40 - private6 */
+	  P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP,  /* 1<<7 0x80 - private7 */
+	  P_INIT           = SUB_COMP_FLAG_PF_INIT, /* 1<<10 0x400 - 10 */
 } pragma_enum_t;
 
 typedef enum {
