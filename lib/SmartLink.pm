@@ -271,7 +271,7 @@ has 'specmap' => (
             12 assembly     13 bytecode    14 bignum    15 objects
             16 native_call  17 basic_types 18 security  19 pir
             20 lexical_vars 21 namespaces  22 io        23 exceptions
-            24 events       25 threads
+            24 events       25 concurrency
         )},
         'S' => {reverse qw(
             01 Overview 02 Syntax        03 Operator     04 Block
