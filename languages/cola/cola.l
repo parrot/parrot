@@ -85,23 +85,23 @@ RANKSPEC        \[[,]*\]
         Symbol * s;
         s = new_identifier_symbol(yytext);
         s->line = line;
-        yylval.sym = s; 
+        yylval.sym = s;
         return(IDENTIFIER);
     }
 
-{SIGN}?{DIGIT}+"."{DIGIT}+ {    
+{SIGN}?{DIGIT}+"."{DIGIT}+ {
         Symbol * s = new_literal_symbol(yytext);
         s->type = t_float;
         s->typename = t_float->sym;
-        yylval.sym = s; 
+        yylval.sym = s;
         return(LITERAL);
     }
 
-{SIGN}?{DIGIT}+ {    
+{SIGN}?{DIGIT}+ {
         Symbol * s = new_literal_symbol(yytext);
         s->type = t_int32;
-        s->typename = t_int32->sym; 
-        yylval.sym = s; 
+        s->typename = t_int32->sym;
+        yylval.sym = s;
         return(LITERAL);
     }
 
@@ -114,7 +114,7 @@ RANKSPEC        \[[,]*\]
     }
 
 {RANKSPEC}    {
-        /* 
+        /*
          * This might bite me in the butt later, but its easier to offload
          * this to the lexer. [], [,], etc.
          */
