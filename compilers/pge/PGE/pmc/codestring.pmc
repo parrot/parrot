@@ -1,0 +1,235 @@
+/*
+=head1 NAME
+
+CodeString - object to build (PIR) code segments
+
+=head1 SYNOPSIS
+
+    .local pmc code
+    code = new 'CodeString'
+
+    code.emit("   $P0 = %0 * %1", '$P21', '3')
+    code.emit("  %l:", 'l' => 'label')
+
+    print code
+
+=head1 DESCRIPTION
+
+C<CodeString> is a class intended to simplify the process of 
+emitting code strings.  Ideally this will eventually
+become a form of "CodeBuffer" that is more efficient
+than string concatenation, but for now it works well
+enough for me.
+
+The primary method for C<CodeString> objects is C<emit>,
+which appends a line (or lines) of code to the string
+according to a format parameter.  The line can contain
+substitution markers (ala printf) that indicate where
+other parameters to the call should be placed.
+
+Note that C<CodeString> is just a subclass of Parrot's
+native C<String> class, so it's easy to combine CodeString
+objects with other strings outside of the C<emit> method.
+
+=head2 Functions
+
+=over 4
+
+=item C<_onload()>
+
+Initializes the C<CodeString> class.
+
+=cut
+
+*/
+
+/* RubyString.pmc
+ *  Copyright (C) 2006, The Perl Foundation.
+ *  SVN Info
+ *     $Id: /parrot/offline/languages/cardinal/src/pmc/rubystring.pmc 203 2006-10-10T14:07:47.742415Z tewk  $
+ *  Overview:
+ *     These are the vtable functions for the CodeString base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+static STRING *PERCENT;
+static STRING *COMMA;
+static STRING *NEWLINE;
+static STRING *SLASH_U;
+static STRING *SLASH_X;
+
+pmclass CodeString
+        extends String
+        does string
+        dynpmc
+        group pge
+        hll pge
+{
+    void class_init () {
+        if (pass) {
+            Interp *interpreter = interp;
+            PMC *global_serno = pmc_new(interpreter, enum_class_Integer);
+            PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+
+            PERCENT = string_from_const_cstring(interpreter, "%", 0);
+            COMMA   = string_from_const_cstring(interpreter, ",", 0);
+            NEWLINE = string_from_const_cstring(interpreter, "\n", 0);
+            SLASH_U = string_from_const_cstring(interpreter, "\\u", 0);
+            SLASH_X = string_from_const_cstring(interpreter, "\\x", 0);
+            VTABLE_set_integer_native(interpreter, global_serno, 10);
+            Parrot_set_global(interpreter, cur_ns, string_from_const_cstring(interpreter, "$!serno", 0), global_serno);
+        }
+    }
+
+/*
+
+=item C<emit(string fmt [, pmc args ] [, pmc hash ])>
+
+Add a line to a C<CodeString> object according to C<fmt>.
+The C<fmt> string can contain any number of "%-replacements"
+which are replaced by the corresponding values from C<args>
+or C<hash> prior to being appended to the string.  (Here
+C<args> is a slurpy array, and C<hash> is a slurpy hash.)
+
+The currently defined replacements include:
+
+    %0 %1 ... %9     the value from the args array at index 0..9
+    %,               the values of the args array separated by commas
+    %%               a percent sign
+
+A percent-sign followed by any other character that is a hash
+key receives the value of the hash element.
+
+A newline is automatically added to the end of the fmt.
+
+=cut
+
+*/
+
+    METHOD void emit(STRING *orig_format, PMC *args, PMC *named_args) {
+        INTVAL position = 0;
+        STRING *format;
+        STRING *key;
+        STRING *repl;
+
+        format = string_copy(interpreter, orig_format);
+
+        position = string_str_index(interpreter, format, PERCENT, position);
+        while ( position > 0 )
+        {
+            key = string_substr(interpreter, format, position + 1, 1, NULL, 0);
+            /* named substitution  %position */
+            if (VTABLE_exists_keyed_str(interpreter, named_args, key)) {
+                repl = VTABLE_get_string_keyed_str(interpreter, named_args, key);
+            }
+            /* positional substutution  %7 */
+            else if (Parrot_string_is_cclass(interpreter, enum_cclass_numeric, format, position + 1)) {
+                repl = VTABLE_get_string_keyed_int(interpreter, args, string_to_int(interpreter, key));
+            }
+            /* %, */
+            else if (string_equal(interpreter, key, COMMA)) {
+                int i;
+                int size = VTABLE_elements(interpreter, args);
+                repl = string_copy(interpreter, VTABLE_get_string_keyed_int(interpreter, args, 0));
+                for ( i=1; i<size; i++ ) {
+                    repl = Parrot_sprintf_c(interpreter, "%ss, %ss", repl, VTABLE_get_string_keyed_int(interpreter, args, i));
+                }
+            }
+            /* %% */
+            else if (string_equal(interpreter, key, PERCENT)) {
+                repl = PERCENT;
+            }
+            /* unrecognized %_ */
+            else {
+                position += 2;
+                continue;
+            }
+
+            string_replace(interpreter, format, position, 2, repl, NULL);
+            position += string_length(interpreter, repl);
+            position = string_str_index(interpreter, format, PERCENT, position);
+        }
+
+        string_append(interpreter, PMC_str_val(SELF), format);
+        if (!string_equal(interpreter, string_substr(interpreter, format, -1, 0, NULL, 0), NEWLINE)) {
+            string_append(interpreter,  PMC_str_val(SELF), NEWLINE);
+        }
+    }
+
+/*
+
+=item C<unique([string fmt])>
+
+Each call to C<unique> returns a unique number, or if a C<fmt>
+parameter is given it returns a unique string beginning with
+C<fmt>.  (This may eventually be generalized to allow 
+uniqueness anywhere in the string.)  The function starts
+counting at 10 (so that the values 0..9 can be considered "safe").
+
+=cut
+
+*/
+
+    METHOD STRING* unique(STRING *format, INTVAL has_format) {
+        STRING *id;
+        PMC *serno;
+        PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+
+        serno = Parrot_get_global(interpreter, cur_ns, string_from_const_cstring(interpreter, "$!serno", 0));
+        id = VTABLE_get_string(interpreter, serno);
+        VTABLE_increment(interpreter, serno);
+        
+        if (has_format) {
+            id = Parrot_sprintf_c(interpreter, "%ss%ss", format, id);
+        }
+        return id;
+    }
+
+/* 
+
+=item C<escape(string str)>
+
+   Returns an escaped value of C<str> suitable for including in PIR.
+   If the string contains any non-ASCII characters, then it's
+   prefixed with 'unicode:'.
+
+=cut
+
+*/
+    METHOD STRING* escape(STRING *str) {
+        str = string_escape_string(interpreter, str);
+        str = Parrot_sprintf_c(interpreter, "\"%ss\"", str);
+        if (string_str_index(interpreter, str, SLASH_U, 0) >= 0
+                || string_str_index(interpreter, str, SLASH_X, 0) >= 0) {
+        }
+        str = string_concat(interpreter, string_from_const_cstring(interpreter, "unicode:", 0), str, 0);
+        return str;
+    }
+}
+
+
+
+/*
+=back
+
+=head1 AUTHOR
+
+Kevin Tew (tewky@yahoo.com is the author and maintainer of the C PMC version.
+Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
+Patches and suggestions should be sent to the Perl 6 compiler list
+(perl6-compiler@perl.org).
+
+=cut
+*/
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
