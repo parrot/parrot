@@ -483,7 +483,8 @@ block:
             $$ = $3;
             if($$) {
                 $$->vars = pop_scope();
-            } else {
+            }
+	    else {
                 discard_scope();
             }
         }

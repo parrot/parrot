@@ -19,7 +19,8 @@ sub tokenize {
                 push @types, 'CODE';
                 $state = 2;
                 $depth = 1;
-            } else {
+            }
+	    else {
                 if ($c =~ /\d/) {
                     push @tokens, $c;
                     push @types, 'NUM';
@@ -28,7 +29,8 @@ sub tokenize {
                     push @types, 'CHAR';
                 } elsif ($c =~ /\s/) {
                     # Skip whitespace, unless backslashed
-                } else {
+                }
+		else {
                     push @tokens, $c;
                     push @types, $c;
                 }
@@ -37,7 +39,8 @@ sub tokenize {
             push @tokens, $c;
             push @types, 'CHAR';
             $state = 0;
-        } else {
+        }
+	else {
             if ($c eq '{') {
                 ++$depth;
             } elsif ($c eq '}') {

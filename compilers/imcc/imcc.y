@@ -118,7 +118,8 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
         constant[len - 1] = '\0';
         strcpy(name, constant + 1);
         free(constant);
-    } else {
+    }
+    else {
         name = constant;
     }
     switch (type_enum) {
@@ -662,7 +663,8 @@ sub_params:
              add_pcc_named_param(interp,IMCC_INFO(interp)->cur_call,
                                  IMCC_INFO(interp)->adv_named_id,$2);
              IMCC_INFO(interp)->adv_named_id = NULL;
-         } else add_pcc_param(IMCC_INFO(interp)->cur_call, $2);
+         }
+         else add_pcc_param(IMCC_INFO(interp)->cur_call, $2);
    }
    ;
 
@@ -957,7 +959,8 @@ var_returns:
           add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
                                IMCC_INFO(interp)->adv_named_id, $1);
           IMCC_INFO(interp)->adv_named_id = NULL;
-      } else add_pcc_return(IMCC_INFO(interp)->sr_return, $1); }
+      }
+      else add_pcc_return(IMCC_INFO(interp)->sr_return, $1); }
   | STRINGC ADV_ARROW var {
       add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,$1,$3);}
   | var_returns COMMA arg   {  
@@ -965,7 +968,8 @@ var_returns:
           add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
                                IMCC_INFO(interp)->adv_named_id,$3);
            IMCC_INFO(interp)->adv_named_id = NULL;
-      } else add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
+      }
+      else add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
   | var_returns COMMA STRINGC ADV_ARROW var   {  
       add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,$3,$5);}
   ;
@@ -1315,13 +1319,15 @@ arglist:
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $3);
            IMCC_INFO(interp)->adv_named_id = NULL;
-       } else add_pcc_arg(IMCC_INFO(interp)->cur_call, $3); 
+       }
+       else add_pcc_arg(IMCC_INFO(interp)->cur_call, $3); 
    }
    | arg                     {  $$ = 0; 
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$1);
            IMCC_INFO(interp)->adv_named_id = NULL;
-       } else add_pcc_arg(IMCC_INFO(interp)->cur_call, $1);
+       }
+       else add_pcc_arg(IMCC_INFO(interp)->cur_call, $1);
    }
    | arglist COMMA STRINGC ADV_ARROW var { $$ = 0;
                                      add_pcc_named_arg(interp,IMCC_INFO(interp)->cur_call,$3,$5);}
@@ -1353,7 +1359,8 @@ targetlist:
          if (IMCC_INFO(interp)->adv_named_id) {
              add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$3);
              IMCC_INFO(interp)->adv_named_id = NULL;
-         } else add_pcc_result(IMCC_INFO(interp)->cur_call, $3); }
+         }
+         else add_pcc_result(IMCC_INFO(interp)->cur_call, $3); }
    | targetlist COMMA STRINGC ADV_ARROW target { 
         add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,$3,$5); }
    | result                  { 
@@ -1361,7 +1368,8 @@ targetlist:
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$1);
            IMCC_INFO(interp)->adv_named_id = NULL;
-       } else add_pcc_result(IMCC_INFO(interp)->cur_call, $1); }
+       }
+       else add_pcc_result(IMCC_INFO(interp)->cur_call, $1); }
    | STRINGC ADV_ARROW target { add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,$1,$3); }
    | /* empty */             {  $$ = 0; }
    ;
@@ -1544,7 +1552,8 @@ int yyerror(void *yyscanner, Interp *interp, char * s)
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);
         IMCC_INFO(interp)->line++;
-    } else {
+    }
+    else {
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);
     }

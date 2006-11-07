@@ -887,7 +887,8 @@ define_macro(Interp *interp, char *name, struct params_t *params,
     if (m) {
 	mem_sys_free(name);
         mem_sys_free(m->expansion);
-    } else {
+    }
+    else {
         m = mem_sys_allocate(sizeof(struct macro_t));
         memset(m, 0, sizeof(struct macro_t));
 
@@ -992,7 +993,8 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
                     frame->expansion.name[i] = strdup(s);
                     free(current);
                 }
-            } else {
+            }
+            else {
                 len = strlen(current) - 1;
                 if (len >= 0 && current[len] == '$') { /* local label */
                     current[len] = '\0';
