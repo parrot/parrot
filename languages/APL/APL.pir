@@ -61,7 +61,7 @@ Initializes the compiling subsystem.
 
 =cut
 
-.sub __onload :load
+.sub __onload :load :init
     load_bytecode 'PGE.pbc'
     load_bytecode 'TGE.pbc'
     load_bytecode 'PGE/Util.pbc'
@@ -178,15 +178,6 @@ executing program statements.
     $P2[0] = "unable to load APL's dynpmc library"
     throw $P2
 pmcs_ok:
-
-
-    $P0 = find_global 'APL', '__onload'
-    $P0()
-    $P0 = find_global 'PAST', '__onload'
-    $P0()
-    $P0 = find_global 'APL', '__load_pirtable'
-    $P0()
-    $P0 = subclass 'PGE::Grammar', 'APL::Grammar'
 
     load_bytecode 'dumper.pbc'
     load_bytecode 'PGE/Dumper.pbc'

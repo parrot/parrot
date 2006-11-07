@@ -56,7 +56,7 @@ my $template = <<'END_OF_TEMPLATE';
 # to other types required by the various opcodes. XXX This should go away
 # Once PMI ports his lovely new perl6 code back into APL.
 
-.sub "__load_pirtable" :load
+.sub "__load_pirtable" :load :init
     $P0 = new .Hash
     store_global "APL", "%pirtable", $P0
 

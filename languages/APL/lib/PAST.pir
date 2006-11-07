@@ -34,7 +34,7 @@ Creates the C<PAST::*> classes.
 
 =cut
 
-.sub '__onload' :load
+.sub '__onload' :load :init
     .local pmc base
     $P0 = getclass 'Hash'
     base = subclass $P0, 'PAST::Node'
