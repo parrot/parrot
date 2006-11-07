@@ -320,10 +320,7 @@ as the Parrot interpreter itself.
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
- * vim: expandtab shiftwidth=4 ft=c:
-*/
+ * vim: expandtab shiftwidth=4:
+ */

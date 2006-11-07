@@ -1817,3 +1817,10 @@ inline op net_pmc_addr(out INT, invar PMC) :base_core {
     $1 = (int) $2;
     goto NEXT();
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

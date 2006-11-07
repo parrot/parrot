@@ -118,3 +118,10 @@ inline op conv_u2(inout INT) :base_core {
 =cut
 
 # vim: sw=4
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
