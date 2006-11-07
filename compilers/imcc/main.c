@@ -727,8 +727,10 @@ main(int argc, char * argv[])
             IMCC_info(interp, 1, "Writing %s\n", output_file);
         else
             IMCC_info(interp, 1, "Running...\n");
-        if (!load_pbc)
-            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+
+        /* runs :init functions */
+        PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+
         Parrot_runcode(interp, argc, argv);
         /* XXX no return value :-( */
     }
