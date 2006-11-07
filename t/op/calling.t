@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 96;
+use Parrot::Test tests => 95;
 
 
 =head1 NAME
@@ -732,49 +732,6 @@ from_foo
 bar_ret
 OUTPUT
 
-SKIP: {
-  skip("can't get_params twice any more.", 1);
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "get_params twice");
-.pcc_sub main:
-    new P16, .String
-    set P16, "ok 1\n"
-    new P17, .String
-    set P17, "ok 2\n"
-    new P18, .String
-    set P18, "ok 3\n"
-    set_args "(0, 0, 0)", P16, P17, P18
-    find_name P1, "foo"
-    invokecc P1
-    print "back\n"
-    end
-.pcc_sub foo:
-    get_params "(0, 0x20)", P1, P2
-    print P1
-    set I0, P2
-    print I0
-    print "\n"
-    set S0, P2[0]
-    print S0
-    set S0, P2[1]
-    print S0
-    get_params "(0, 0, 0)", P1, P2, P3
-    print P1
-    print P2
-    print P3
-    returncc
-CODE
-ok 1
-2
-ok 2
-ok 3
-ok 1
-ok 2
-ok 3
-back
-OUTPUT
-
-} # end of SKIP.
 
 pir_output_is(<<'CODE', <<'OUTPUT', "empty args");
 .sub main :main
@@ -2427,7 +2384,7 @@ CODE
 OUTPUT
 
 
-pir_output_like(<<'CODE', <<'OUTPUT', "unexpected positional arg");
+pir_output_like(<<'CODE', <<'OUTPUT', "unexpected positional arg", todo => 'unimplemented');
 .sub 'main'
     'foo'('abc', 'def'=>1, 'ghi', 'jkl'=>1)
 .end
@@ -2440,7 +2397,7 @@ CODE
 /positional inside named args at position 3/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments" );
+pir_output_is(<<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments", todo => 'unimplemented');
 .sub 'main' :main
 	.local pmc args
 	args = new .Hash
