@@ -399,7 +399,7 @@ MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
         r[i] = va_arg(ap, SymReg *);
     }
     va_end(ap);
-    return INS(interpreter, unit, opname, fmt, r, n, 
+    return INS(interpreter, unit, opname, fmt, r, n,
                IMCC_INFO(interpreter)->keyvec, 1);
 }
 
@@ -440,7 +440,7 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     case enum_class_Coroutine:
         rhs = mk_const(interp, name, 'p');
         if (!ascii)
-            rhs->type |= VT_ENCODED;  
+            rhs->type |= VT_ENCODED;
         r[1] = rhs;
         rhs->pmc_type = type_enum;
         rhs->usage = U_FIXUP;
@@ -614,7 +614,7 @@ begin_return_or_yield(Interp *interp, int yield)
                     "yield or return directive outside pcc subroutine\n");
     if(yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
-    sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d", 
+    sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
     interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
     i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, interp->imc_info->sr_return);
@@ -685,8 +685,8 @@ adv_named_set(Interp *interp, char *name) {
     IMCC_INFO(interp)->adv_named_id = name;
 }
 
-static void 
-do_loadlib(Interp *interp, char *lib) 
+static void
+do_loadlib(Interp *interp, char *lib)
 {
     STRING *s = string_unescape_cstring(interp, lib + 1, '"', NULL);
     Parrot_load_lib(interp, s, NULL);
@@ -2626,8 +2626,8 @@ yyreduce:
 
   case 8:
 #line 489 "compilers/imcc/imcc.y"
-    { (yyval.i) = (yyvsp[(1) - (1)].i); 
-                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit); 
+    { (yyval.i) = (yyvsp[(1) - (1)].i);
+                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
                      IMCC_INFO(interp)->cur_unit = 0; }
     break;
 
@@ -2690,7 +2690,7 @@ yyreduce:
             STRING *hll_name, *hll_lib;
             hll_name = string_unescape_cstring(interp, (yyvsp[(2) - (4)].s) + 1, '"', NULL);
             hll_lib =  string_unescape_cstring(interp, (yyvsp[(4) - (4)].s) + 1, '"', NULL);
-            CONTEXT(((Interp*)interp)->ctx)->current_HLL = 
+            CONTEXT(((Interp*)interp)->ctx)->current_HLL =
                 Parrot_register_HLL(interp, hll_name, hll_lib);
             (yyval.t) = 0;
          }
@@ -2775,8 +2775,8 @@ yyreduce:
 
   case 38:
 #line 579 "compilers/imcc/imcc.y"
-    { (yyval.i) = INS(interp, IMCC_INFO(interp)->cur_unit, 
-                              (yyvsp[(2) - (3)].s), 0, IMCC_INFO(interp)->regs, 
+    { (yyval.i) = INS(interp, IMCC_INFO(interp)->cur_unit,
+                              (yyvsp[(2) - (3)].s), 0, IMCC_INFO(interp)->regs,
                               IMCC_INFO(interp)->nargs, IMCC_INFO(interp) -> keyvec, 1);
                      free((yyvsp[(2) - (3)].s)); }
     break;
@@ -2892,7 +2892,7 @@ yyreduce:
 
   case 58:
 #line 661 "compilers/imcc/imcc.y"
-    { 
+    {
        if (IMCC_INFO(interp)->adv_named_id) {
              add_pcc_named_param(interp,IMCC_INFO(interp)->cur_call,
                                  IMCC_INFO(interp)->adv_named_id,(yyvsp[(2) - (3)].sr));
@@ -2923,7 +2923,7 @@ yyreduce:
 
   case 62:
 #line 681 "compilers/imcc/imcc.y"
-    { 
+    {
                                          if ((yyvsp[(5) - (5)].t) & VT_UNIQUE_REG)
                                              (yyval.sr) = mk_ident_ur(interp, (yyvsp[(4) - (5)].s), (yyvsp[(1) - (5)].t));
                                          else
@@ -2956,14 +2956,14 @@ yyreduce:
 
   case 68:
 #line 708 "compilers/imcc/imcc.y"
-    { (yyval.t) = 0; 
+    { (yyval.t) = 0;
                        IMCC_INFO(interp)->cur_unit->vtable_name = NULL;
                        IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     break;
 
   case 69:
 #line 712 "compilers/imcc/imcc.y"
-    { (yyval.t) = 0; 
+    { (yyval.t) = 0;
                        IMCC_INFO(interp)->cur_unit->vtable_name = strdup((yyvsp[(3) - (4)].s));
                        IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     break;
@@ -3063,7 +3063,7 @@ yyreduce:
             SymReg * r, *r1;
             Instruction *i;
 
-            sprintf(name, "%cpcc_sub_call_%d", 
+            sprintf(name, "%cpcc_sub_call_%d",
                     IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
             (yyval.sr) = r = mk_pcc_sub(interp, str_dup(name), 0);
             /* this mid rule action has the semantic value of the
@@ -3329,14 +3329,14 @@ yyreduce:
   case 138:
 #line 927 "compilers/imcc/imcc.y"
     {
-       if((yyvsp[(1) - (2)].sr)) add_pcc_return(IMCC_INFO(interp)->sr_return, (yyvsp[(1) - (2)].sr)); 
+       if((yyvsp[(1) - (2)].sr)) add_pcc_return(IMCC_INFO(interp)->sr_return, (yyvsp[(1) - (2)].sr));
    }
     break;
 
   case 139:
 #line 930 "compilers/imcc/imcc.y"
     {
-       if((yyvsp[(2) - (3)].sr)) add_pcc_return(IMCC_INFO(interp)->sr_return, (yyvsp[(2) - (3)].sr)); 
+       if((yyvsp[(2) - (3)].sr)) add_pcc_return(IMCC_INFO(interp)->sr_return, (yyvsp[(2) - (3)].sr));
    }
     break;
 
@@ -3378,7 +3378,7 @@ yyreduce:
 
   case 146:
 #line 958 "compilers/imcc/imcc.y"
-    {  
+    {
       if (IMCC_INFO(interp)->adv_named_id) {
           add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
                                IMCC_INFO(interp)->adv_named_id, (yyvsp[(1) - (1)].sr));
@@ -3395,7 +3395,7 @@ yyreduce:
 
   case 148:
 #line 967 "compilers/imcc/imcc.y"
-    {  
+    {
       if (IMCC_INFO(interp)->adv_named_id) {
           add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
                                IMCC_INFO(interp)->adv_named_id,(yyvsp[(3) - (3)].sr));
@@ -3406,7 +3406,7 @@ yyreduce:
 
   case 149:
 #line 974 "compilers/imcc/imcc.y"
-    {  
+    {
       add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,(yyvsp[(3) - (5)].s),(yyvsp[(5) - (5)].sr));}
     break;
 
@@ -3472,7 +3472,7 @@ yyreduce:
 
   case 165:
 #line 1042 "compilers/imcc/imcc.y"
-    {  
+    {
          IdList* l = (yyvsp[(3) - (3)].idlist);
          l->next = (yyvsp[(1) - (3)].idlist);
          (yyval.idlist) = l;
@@ -3574,9 +3574,9 @@ yyreduce:
 
   case 182:
 #line 1102 "compilers/imcc/imcc.y"
-    { (yyval.i) = INS(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(1) - (2)].s), 0, 
+    { (yyval.i) = INS(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(1) - (2)].s), 0,
                               IMCC_INFO(interp) -> regs,
-                              IMCC_INFO(interp) -> nargs, 
+                              IMCC_INFO(interp) -> nargs,
                               IMCC_INFO(interp) -> keyvec, 1);
                        free((yyvsp[(1) - (2)].s)); }
     break;
@@ -4037,18 +4037,18 @@ yyreduce:
 
   case 272:
 #line 1319 "compilers/imcc/imcc.y"
-    {  (yyval.sr) = 0; 
+    {  (yyval.sr) = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(3) - (3)].sr));
            IMCC_INFO(interp)->adv_named_id = NULL;
        }
-       else add_pcc_arg(IMCC_INFO(interp)->cur_call, (yyvsp[(3) - (3)].sr)); 
+       else add_pcc_arg(IMCC_INFO(interp)->cur_call, (yyvsp[(3) - (3)].sr));
    }
     break;
 
   case 273:
 #line 1326 "compilers/imcc/imcc.y"
-    {  (yyval.sr) = 0; 
+    {  (yyval.sr) = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,(yyvsp[(1) - (1)].sr));
            IMCC_INFO(interp)->adv_named_id = NULL;
@@ -4110,7 +4110,7 @@ yyreduce:
 
   case 284:
 #line 1358 "compilers/imcc/imcc.y"
-    { 
+    {
          (yyval.sr) = 0;
          if (IMCC_INFO(interp)->adv_named_id) {
              add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,(yyvsp[(3) - (3)].sr));
@@ -4121,13 +4121,13 @@ yyreduce:
 
   case 285:
 #line 1365 "compilers/imcc/imcc.y"
-    { 
+    {
         add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,(yyvsp[(3) - (5)].s),(yyvsp[(5) - (5)].sr)); }
     break;
 
   case 286:
 #line 1367 "compilers/imcc/imcc.y"
-    { 
+    {
        (yyval.sr) = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,(yyvsp[(1) - (1)].sr));
@@ -4292,8 +4292,8 @@ yyreduce:
 
   case 324:
 #line 1464 "compilers/imcc/imcc.y"
-    {  (yyval.sr) = link_keys(interp, 
-                                     IMCC_INFO(interp)->nkeys, 
+    {  (yyval.sr) = link_keys(interp,
+                                     IMCC_INFO(interp)->nkeys,
                                      IMCC_INFO(interp)->keys, 0); }
     break;
 
@@ -4306,7 +4306,7 @@ yyreduce:
   case 326:
 #line 1471 "compilers/imcc/imcc.y"
     {  (yyval.sr) = link_keys(interp,
-                                     IMCC_INFO(interp)->nkeys, 
+                                     IMCC_INFO(interp)->nkeys,
                                      IMCC_INFO(interp)->keys, 1); }
     break;
 
@@ -4345,7 +4345,7 @@ yyreduce:
 #line 1493 "compilers/imcc/imcc.y"
     { (yyvsp[(1) - (3)].sr)->type |= VT_START_SLICE;
                      (yyvsp[(3) - (3)].sr)->type |= VT_END_SLICE;
-                     IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = (yyvsp[(1) - (3)].sr); 
+                     IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = (yyvsp[(1) - (3)].sr);
                      (yyval.sr) = (yyvsp[(3) - (3)].sr); }
     break;
 
@@ -4657,7 +4657,7 @@ int yyerror(void *yyscanner, Interp *interp, char * s)
 
     /* Basically, if current token is a newline, it mean the error was
      * before the newline, and thus, line is the line *after* the
-     * error.  
+     * error.
      */
     if (!at_eof(yyscanner) && *chr == '\n') {
         IMCC_INFO(interp)->line--;

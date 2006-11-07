@@ -2937,7 +2937,7 @@ YY_DECL
             BEGIN(emit);
         }
         if (IMCC_INFO(interp)->frames->s.pasm_file && YYSTATE == INITIAL &&
-            !IMCC_INFO(interp)->in_pod) 
+            !IMCC_INFO(interp)->in_pod)
         {
             if (0)
                 yy_top_state(yyscanner); /* silent warning */
@@ -3052,7 +3052,7 @@ YY_RULE_SETUP
             mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
                             strlen(IMCC_INFO(interp)->heredoc_content) +
                             strlen(yytext) + 2);
-        strcpy(IMCC_INFO(interp)->heredoc_content + 
+        strcpy(IMCC_INFO(interp)->heredoc_content +
                strlen(IMCC_INFO(interp)->heredoc_content), yytext);
     }
 	YY_BREAK
@@ -3071,18 +3071,18 @@ YY_RULE_SETUP
             mem_sys_free(IMCC_INFO(interp)->heredoc_end);
             IMCC_INFO(interp)->frames->buffer = YY_CURRENT_BUFFER;
             valp->s = IMCC_INFO(interp)->heredoc_content;
-            yy_pop_state(yyscanner); 
+            yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest,yyscanner);
             return(STRINGC); /* XXX delete quotes, -> emit, pbc */
         }
         else
         {
             /* Part of the heredoc. Realloc and cat the line on. */
-            IMCC_INFO(interp)->heredoc_content = 
+            IMCC_INFO(interp)->heredoc_content =
                 mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
                                 strlen(IMCC_INFO(interp)->heredoc_content) +
                                 strlen(yytext) + 2);
-            strcpy(IMCC_INFO(interp)->heredoc_content + 
+            strcpy(IMCC_INFO(interp)->heredoc_content +
                    strlen(IMCC_INFO(interp)->heredoc_content), yytext);
         }
     }
@@ -3090,7 +3090,7 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 186 "compilers/imcc/imcc.l"
-{  
+{
         yy_push_state(cmt2, yyscanner);
         valp->t = atoi(yytext+6);
         return LINECOMMENT;
@@ -3100,7 +3100,7 @@ case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
 #line 191 "compilers/imcc/imcc.l"
-{      
+{
         yy_pop_state(yyscanner);
         yy_push_state(cmt3, yyscanner);
         valp->s = str_dup(yytext);
@@ -3110,7 +3110,7 @@ YY_RULE_SETUP
 case 6:
 YY_RULE_SETUP
 #line 197 "compilers/imcc/imcc.l"
-{ 
+{
         yy_pop_state(yyscanner);
         yy_push_state(cmt4, yyscanner);
 }
@@ -3139,9 +3139,9 @@ case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
 #line 209 "compilers/imcc/imcc.l"
-{ 
+{
         yy_pop_state(yyscanner);
-        IMCC_INFO(interp)->line++; 
+        IMCC_INFO(interp)->line++;
     }
 	YY_BREAK
 case 11:
@@ -3159,9 +3159,9 @@ YY_RULE_SETUP
 case 12:
 YY_RULE_SETUP
 #line 220 "compilers/imcc/imcc.l"
-{ 
+{
         yy_push_state(cmt5, yyscanner);
-    } 
+    }
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
@@ -3213,7 +3213,7 @@ case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
 #line 250 "compilers/imcc/imcc.l"
-{ IMCC_INFO(interp)->in_pod = 0; 
+{ IMCC_INFO(interp)->in_pod = 0;
                                yy_pop_state(yyscanner); IMCC_INFO(interp)->line++; }
 	YY_BREAK
 case 19:
@@ -3396,7 +3396,7 @@ return(RETURN);
 case 54:
 YY_RULE_SETUP
 #line 292 "compilers/imcc/imcc.l"
-return(LOADLIB); 
+return(LOADLIB);
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
@@ -3796,7 +3796,7 @@ YY_RULE_SETUP
 
             valp->s = label;
         }
-        
+
         return IDENTIFIER;
      }
 	YY_BREAK
@@ -3850,7 +3850,7 @@ YY_RULE_SETUP
         if (IMCC_INFO(interp)->cur_unit &&
             IMCC_INFO(interp)->cur_unit->instructions &&
             (r = IMCC_INFO(interp)->cur_unit->instructions->r[0]) &&
-            r->pcc_sub) 
+            r->pcc_sub)
         {
             if ((r->pcc_sub->pragma & P_METHOD) && !strcmp(yytext, "self")) {
                 valp->sr  = mk_ident(interp, str_dup("self"), 'P');
@@ -4316,7 +4316,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			yyg->yy_n_chars, (size_t) num_to_read );
+			yyg->yy_n_chars, num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars;
 		}
@@ -4829,16 +4829,16 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size , yyscan_t yyscann
 
 /** Setup the input buffer state to scan a string. The next call to yylex() will
  * scan from a @e copy of @a str.
- * @param yystr a NUL-terminated string to scan
+ * @param str a NUL-terminated string to scan
  * @param yyscanner The scanner object.
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       yy_scan_bytes() instead.
  */
-YY_BUFFER_STATE yy_scan_string (yyconst char * yystr , yyscan_t yyscanner)
+YY_BUFFER_STATE yy_scan_string (yyconst char * __yystr , yyscan_t yyscanner)
 {
     
-	return yy_scan_bytes(yystr,strlen(yystr) ,yyscanner);
+	return yy_scan_bytes(__yystr,strlen(__yystr) ,yyscanner);
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
@@ -5316,7 +5316,7 @@ destroy_frame (struct macro_frame_t *frame, void *yyscanner)
     /* FIXME if frame->s.file was allocated free it */
 
     mem_sys_free(frame);
-    
+
     if (buffer != NULL) {
         yy_switch_to_buffer(buffer,yyscanner);
     }
@@ -5460,7 +5460,7 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
     if (c == '(') {
         free(valp->s);
 
-        c = read_params(NULL, interp, &params, 
+        c = read_params(NULL, interp, &params,
                         IMCC_INFO(interp)->cur_macro_name, 1, yyscanner);
 
         c = yylex(valp,yyscanner,interp);
@@ -5469,13 +5469,13 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
     while (c != ENDM) {
         if (c <= 0)
             IMCC_fataly(interp, E_SyntaxError,
-                        "File ended before macro '%s' was complete", 
+                        "File ended before macro '%s' was complete",
                         IMCC_INFO(interp)->cur_macro_name);
 
-        if (strlen(IMCC_INFO(interp)->temp_buffer) + strlen(valp->s) >= 
+        if (strlen(IMCC_INFO(interp)->temp_buffer) + strlen(valp->s) >=
             sizeof(IMCC_INFO(interp)->temp_buffer))
             IMCC_fataly(interp, E_SyntaxError,
-                        "Macro '%s' is too big", 
+                        "Macro '%s' is too big",
                         IMCC_INFO(interp)->cur_macro_name);
 
         strcat(IMCC_INFO(interp)->temp_buffer, valp->s);
@@ -5487,7 +5487,7 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
 
     BEGIN(start_cond);
 
-    define_macro(interp, IMCC_INFO(interp)->cur_macro_name, 
+    define_macro(interp, IMCC_INFO(interp)->cur_macro_name,
                  &params, str_dup(IMCC_INFO(interp)->temp_buffer), start_line);
     IMCC_INFO(interp)->cur_macro_name = NULL;
 
@@ -5515,7 +5515,7 @@ find_macro_param (Interp *interp, const char *name)
 
 static void
 define_macro(Interp *interp, char *name, struct params_t *params,
-             char *expansion, int start_line) 
+             char *expansion, int start_line)
 {
     struct macro_t *m;
 
@@ -5779,7 +5779,7 @@ compile_string(Interp *interp, char *s, void *yyscanner)
 
     yy_scan_string(s,yyscanner);
     emit_open(interp, 1, NULL);
-    
+
     IMCC_TRY(IMCC_INFO(interp)->jump_buf, IMCC_INFO(interp)->error_code) {
         yyparse(yyscanner, (void *) interp);
         imc_compile_all_units(interp);
@@ -5836,7 +5836,7 @@ FILE* imc_yyin_get(void *yyscanner)
 }
 
 /* return true if scanner is at EOF */
-int at_eof(yyscan_t yyscanner) 
+int at_eof(yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     return yyg->yy_hold_char == '\0';
