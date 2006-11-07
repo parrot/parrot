@@ -15,7 +15,7 @@ Parrot_stat_info_pmc(Interp* interpreter, STRING *filename, INTVAL thing)
 }
 
 static INTVAL
-stat_common(Interp *interpreter, struct stat *statbuf, 
+stat_common(Interp *interpreter, struct stat *statbuf,
         INTVAL thing, int status)
 {
     INTVAL result = -1;

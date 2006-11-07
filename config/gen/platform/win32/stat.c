@@ -84,7 +84,7 @@ Parrot_stat_info_intval(Parrot_Interp interpreter, STRING *file, INTVAL thing)
     internal_exception(1, "STAT_PLATFORM_BLOCKS not supported");
     break;
   }
-  
+
   string_cstring_free(filename);
   return result;
 }

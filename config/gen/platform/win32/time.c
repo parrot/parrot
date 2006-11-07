@@ -14,7 +14,7 @@ Parrot_intval_time(void)
 #else
     return _time64(NULL);
 #endif
-#else 
+#else
     return time(NULL);
 #endif
 }
