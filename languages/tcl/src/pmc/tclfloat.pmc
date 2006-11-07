@@ -30,11 +30,11 @@ pmclass TclFloat
         STRING * dot;
         STRING * e;
         STRING * dot_zero;
-        STRING * precision_var = 
+        STRING * precision_var =
             string_from_cstring(INTERP, "$tcl_precision", 14);
 
         PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(INTERP);
-        PMC * precision_pmc = 
+        PMC * precision_pmc =
             Parrot_find_global_op(INTERP, hll_ns, precision_var, NULL);
         INTVAL* precision = VTABLE_get_integer(INTERP, precision_pmc);
 
@@ -43,7 +43,7 @@ pmclass TclFloat
 
         buff  = Parrot_sprintf_c(INTERP, "%.*vg", precision, PMC_num_val(SELF));
 
-        /* 
+        /*
          * this sprintf variant will return something that looks like
          * an int if it can : if we have no decimal point then tack on
          * on and return

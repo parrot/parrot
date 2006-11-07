@@ -23,7 +23,7 @@ pmclass TclInt
 
     /*
      * MMD Override:
-     *   TclInt shouldn't automatically promote division to float. 
+     *   TclInt shouldn't automatically promote division to float.
      */
     PMC* divide (PMC* value, PMC* dest) {
       MMD_TclInt: {
@@ -56,7 +56,7 @@ pmclass TclInt
     METHOD PMC* interpret() {
         return SELF;
     }
-    
+
 }
 
 /*

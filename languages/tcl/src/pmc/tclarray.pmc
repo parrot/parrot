@@ -52,10 +52,10 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 
 
 pmclass TclArray
-    need_ext 
+    need_ext
     dynpmc
     extends Hash
-    does    hash 
+    does    hash
     group   tcl_group
     hll     Tcl
     maps    Hash

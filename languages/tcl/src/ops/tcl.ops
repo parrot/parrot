@@ -9,7 +9,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-tcl.ops 
+tcl.ops
 
 =cut
 
