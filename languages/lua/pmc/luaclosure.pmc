@@ -8,7 +8,7 @@ classes/luaclosure.pmc - Lua Closure
 
 =head1 DESCRIPTION
 
-C<LuaClosure> extends C<Parrot Closure> and C<LuaBase> to provide a class 
+C<LuaClosure> extends C<Parrot Closure> and C<LuaBase> to provide a class
 with the behaviour of the Lua C<Function> type.
 C<LuaClosure> is used by function written in Lua.
 
