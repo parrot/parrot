@@ -15,7 +15,7 @@ t/perl/Parrot_Docs.t - Parrot::Docs unit tests
 
 =head1 SYNOPSIS
 
-	% prove t/perl/Parrot_Docs.t
+    % prove t/perl/Parrot_Docs.t
 
 =head1 DESCRIPTION
 
@@ -155,3 +155,10 @@ sub tmp_file_path
     
     return $file;
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

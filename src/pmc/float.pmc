@@ -81,9 +81,9 @@ Returns an integer representation of the number (by casting).
 
 */
 
-   INTVAL get_integer() {
+    INTVAL get_integer() {
         return (INTVAL) PMC_num_val(SELF);
-   }
+    }
 
 /*
 

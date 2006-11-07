@@ -45,12 +45,12 @@ sub runstep {
     }
 
     $conf->data->set(
-        parrot_is_shared => $parrot_is_shared,  
+        parrot_is_shared => $parrot_is_shared,
 
-        libparrot => $parrot_is_shared         
-            ? '$(LIBPARROT_SHARED)'      
+        libparrot => $parrot_is_shared
+            ? '$(LIBPARROT_SHARED)'
             : '$(LIBPARROT_STATIC)',
-    );                       
+    );
 
     $conf->data->set(
         rpath_blib => ($parrot_is_shared && $conf->data->get('rpath'))

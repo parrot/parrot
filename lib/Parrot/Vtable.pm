@@ -59,7 +59,7 @@ sub parse_attrs {
     my $result = { %$default };
     $result->{$1} = 1 while $attrs =~ /$attr_re/g;
     return $result;
-} 
+}
 
 =item C<parse_vtable($file)>
 

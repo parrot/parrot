@@ -252,9 +252,17 @@ t/perl/Parrot_PIR_Formatter.t - Parrot::PIR::Formatter unit tests
 
 =head1 SYNOPSIS
 
-	% prove t/perl/Parrot_PIR_Formatter.t
+    % prove t/perl/Parrot_PIR_Formatter.t
 
 =head1 DESCRIPTION
 
 =cut
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
 

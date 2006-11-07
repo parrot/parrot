@@ -247,7 +247,7 @@ sub _runstep
     my $step = $step_name->new;
 
     # XXX This works. but is probably not a good design.
-    # Using $step->description() would be nicer   
+    # Using $step->description() would be nicer
     my $description = $step->description();
     $description = "" unless defined $description;
 

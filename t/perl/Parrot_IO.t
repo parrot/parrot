@@ -15,7 +15,7 @@ t/perl/Parrot_IO.t - Parrot::IO unit tests
 
 =head1 SYNOPSIS
 
-	% prove t/perl/Parrot_IO.t
+    % prove t/perl/Parrot_IO.t
 
 =head1 DESCRIPTION
 
@@ -101,20 +101,20 @@ is($d->relative_path($d->path), curdir(), 'relative_path same dir');
 is($d1->relative_path($f1->path), 'file1.txt', 'relative_path same file');
 is($d->relative_path($d1->path), 'one', 'relative_path down to dir');
 is($d->relative_path($f1->path), catfile(qw(one file1.txt)), 
-	'relative_path down to file');
+    'relative_path down to file');
 is($d1->relative_path($d->path), '..', 'relative_path up to dir');
 is($d->relative_path($f->path), catfile(qw(.. file.txt)), 
-	'relative_path up to file');
+    'relative_path up to file');
 is($d1->relative_path($f->path), catfile(qw(.. .. file.txt)), 
-	'relative_path up twice to file');
+    'relative_path up twice to file');
 ok($d->relative_path_is_directory(catdir(qw(one two))), 
-	'relative_path_is_directory');
+    'relative_path_is_directory');
 ok($d->relative_path_is_file(catfile(qw(one two file2.foo))), 
-	'relative_path_is_file');
+    'relative_path_is_file');
 is($d2, $d->directory_with_relative_path(catdir(qw(one/two))),
-	'file_with_relative_path');
+    'file_with_relative_path');
 is($f2, $d->file_with_relative_path(catfile(qw(one two file2.foo))),
-	'file_with_relative_path');
+    'file_with_relative_path');
 
 # Names and paths.
 my @a = $d1->file_and_directory_names;
@@ -132,7 +132,7 @@ is(@a, 1, 'file_paths');
 is('file2.foo file3.bar', join(' ', map {$_->name} @a), 'files');
 @a = $d->files(1);
 is('file1.txt file2.foo file3.bar', join(' ', map {$_->name} @a), 
-	'files recursive');
+    'files recursive');
 @a = $d->files(1, 'two');
 is('file1.txt', join(' ', map {$_->name} @a), 'files recursive ignore');
 
@@ -147,7 +147,7 @@ is('txt', join(' ', @a), 'file_suffixes recursive ignore');
 
 @a = $d->files_with_suffix('txt', 1, 'two');
 is('file1.txt', join(' ', map {$_->name} @a), 
-	'files_with_suffix recursive ignore');
+    'files_with_suffix recursive ignore');
 
 # Status (stat info)
 my $time = time;
@@ -167,7 +167,7 @@ is($a[1], "world", 'array read');
 ok($f3->modified_since($time), 'modified_since');
 
 $f = Parrot::IO::File->new(
-	catfile('lib', 'Parrot', 'IO', 'File.pm'));
+    catfile('lib', 'Parrot', 'IO', 'File.pm'));
 ok($f->has_svn_id(), 'has_svn_id');
 
 # XXX doesn not work aftern switch to svn  
@@ -209,16 +209,23 @@ sub tmp_dir_path
 sub tmp_file_path
 {
     my $file;
-	
+
     if ( @_ == 1 )
     {
-    	$file = catfile(tmp_dir_path(), shift);
+        $file = catfile(tmp_dir_path(), shift);
     }
     else
     {
-    	$file = pop(@_);
-    	$file = catfile(tmp_dir_path(@_), $file);
+        $file = pop(@_);
+        $file = catfile(tmp_dir_path(@_), $file);
     }
     
     return $file;
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

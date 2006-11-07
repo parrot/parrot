@@ -33,7 +33,7 @@ sub __get_revision {
 
     my $revision;
     # code taken from pugs/util/version_h.pl rev 14410
-    my $nul = File::Spec->devnull; 
+    my $nul = File::Spec->devnull;
     if (my @svn_info = qx/svn info 2>$nul/ and $? == 0) {
         if (my ($line) = grep /^Revision:/, @svn_info) {
             ($revision) = $line =~ / (\d+)$/;

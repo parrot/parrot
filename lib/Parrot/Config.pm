@@ -21,7 +21,7 @@ if ($@) {
 
 use strict;
 use Exporter;
- 
+
 use vars qw(@ISA @EXPORT %PConfig);
 
 @ISA=qw(Exporter);

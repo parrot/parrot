@@ -14,7 +14,7 @@ t/perl/Parrot_Distribution.t - Parrot::Distribution unit tests
 
 =head1 SYNOPSIS
 
-	% prove t/perl/Parrot_Distribution.t
+    % prove t/perl/Parrot_Distribution.t
 
 =head1 DESCRIPTION
 
@@ -47,3 +47,10 @@ ok( ! $d->lex_source_file_with_name('moomoo'), 'Lex code file not there');
 
 ok($d->file_for_perl_module('Parrot::Docs::Section::Parrot'), 'Perl module file');
 ok( ! $d->file_for_perl_module('Parrot::Dummy'), 'Perl module file not there');
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -413,7 +413,7 @@ sub source
     if ($self->flags =~ /:pic/ &&
 	!(ref($trans) eq 'Parrot::OpTrans::CGP' ||
 	  ref($trans) eq 'Parrot::OpTrans::CSwitch')) {
-        return qq{PANIC("How did you do that");return 0;\n};   
+        return qq{PANIC("How did you do that");return 0;\n};
     }
 
     return $self->rewrite_body($self->full_body, $trans);

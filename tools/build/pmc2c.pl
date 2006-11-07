@@ -629,7 +629,7 @@ sub gen_super_meths {
             if (exists ($self->{has_parent}{$pname}{$meth} )) {
                 $self->{super}{$meth} = $pname;
                 my $n = $self->{has_parent}{$pname}{$meth};
-                $self->{super_attrs}{$meth} = 
+                $self->{super_attrs}{$meth} =
                     $all->{$pname}{methods}[$n]{attrs};
                 if (exists $self->{has_method}{$meth}) {
                     inherit_attrs(

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::OpTrans - Transform Ops to C Code 
+Parrot::OpTrans - Transform Ops to C Code
 
 =head1 DESCRIPTION
 
@@ -44,8 +44,8 @@ Returns a new instance.
 =cut
 
 sub new
-{ 
-    return bless { }, shift; 
+{
+    return bless { }, shift;
 }
 
 =back
@@ -62,9 +62,9 @@ Used by C<Parrot::Op>'s C<func_name()> to individuate op function names.
 
 =cut
 
-sub prefix 
-{ 
-    return 'Parrot_'; 
+sub prefix
+{
+    return 'Parrot_';
 }
 
 =item C<suffix()>
@@ -74,9 +74,9 @@ variable names. This default implementation returns an empty string.
 
 =cut
 
-sub suffix 
-{ 
-    return ''; 
+sub suffix
+{
+    return '';
 }
 
 =item C<defines()>
@@ -91,9 +91,9 @@ do its clever tricks.
 
 =cut
 
-sub opsarraytype 
-{ 
-    return 'opcode_t' 
+sub opsarraytype
+{
+    return 'opcode_t'
 };
 
 =item C<core_type()>
@@ -105,10 +105,10 @@ F<include/parrot/interpreter.h> for a list of the core types.
 
 =cut
 
-sub core_type 
+sub core_type
 {
     my $self = shift;
-    
+
     die ref($self) . " doesn't have core_type()";
 }
 
@@ -143,7 +143,7 @@ return the C code prior to the run core function.
 =item C<run_core_after_addr_table($base_suffix)>
 
 Optionally implemented in subclasses to return the run core C code for
-section after the address table. C<$base_suffix> is the same as for 
+section after the address table. C<$base_suffix> is the same as for
 C<ops_addr_decl()>.
 
 =item C<run_core_finish($base)>
@@ -183,7 +183,7 @@ value of an C<expr_I<X>> method (implemented in subclass).
 
 =cut
 
-sub gen_goto 
+sub gen_goto
 {
     my ($self, $where_str) = @_;
 
@@ -207,7 +207,7 @@ relevant C code.
 
 =cut
 
-sub goto_address 
+sub goto_address
 {
     my $self = shift;
 
@@ -221,7 +221,7 @@ relevant C code.
 
 =cut
 
-sub goto_offset 
+sub goto_offset
 {
     my $self = shift;
 
@@ -235,7 +235,7 @@ relevant C code.
 
 =cut
 
-sub goto_pop 
+sub goto_pop
 {
     my ($self) = @_;
 
@@ -275,4 +275,5 @@ Called by C<goto_address()>.
 =cut
 
 1;
+
 

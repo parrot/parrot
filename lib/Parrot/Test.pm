@@ -44,17 +44,17 @@ B<Note:> you I<must> use a C<$description> with TODO tests.
 
 =over 4
 
-=item C<language_output_is( $language, $code, $expected, $description)> 
+=item C<language_output_is( $language, $code, $expected, $description)>
 
 Runs a langugage test and passes the test if a string comparison
 of the output with the expected result it true.
 
-=item C<language_output_like( $language, $code, $expected, $description)> 
+=item C<language_output_like( $language, $code, $expected, $description)>
 
 Runs a langugage test and passes the test
 if the  output matches the expected result.
 
-=item C<language_output_isnt( $language, $code, $expected, $description)> 
+=item C<language_output_isnt( $language, $code, $expected, $description)>
 
 Runs a langugage test and passes the test if a string comparison
 if a string comparison of the output with the unexpected result is false.
@@ -358,7 +358,7 @@ sub path_to_parrot {
     return $path;
 }
 
-# 
+#
 # private methods, should not be used by Modules inheriting from Parrot::Test
 #
 
@@ -384,7 +384,7 @@ sub _generate_functions {
         pir_output_is      => 'is_eq',
         pir_output_isnt    => 'isnt_eq',
         pir_output_like    => 'like',
-        pir_output_unlike  => 'unlike', 
+        pir_output_unlike  => 'unlike',
                           );
 
     foreach my $func ( keys %parrot_test_map ) {
@@ -617,7 +617,7 @@ sub _generate_functions {
             my ( $language, @remaining ) = @_;
 
             my $meth = $language_test_map{$func};
-            if ( my $prefix = $builtin_language_prefix{$language} ) { 
+            if ( my $prefix = $builtin_language_prefix{$language} ) {
                 my $level = $builder->level();
                 $builder->level( $level + 2 );
                 my $test_func = "${package}::${prefix}_${meth}";
@@ -666,7 +666,7 @@ sub _generate_functions {
         *{$package.'::'.$func} = sub {
             my ($example_f, $expected, @options) = @_;
 
-            my %lang_for_extension 
+            my %lang_for_extension
                 = ( pasm => 'PASM',
                     past => 'PAST',
                     pir  => 'PIR',
@@ -676,7 +676,7 @@ sub _generate_functions {
                                                  ( pasm | pir | imc | past ) # match and capture the extension
                                                  \z                          # at end of string
                                                }ixms or Usage();
-            if ( defined $extension ) { 
+            if ( defined $extension ) {
                 my $code = slurp_file($example_f);
                 my $test_func = join( '::', $package, $example_test_map{$func} );
                 $test_func->( $lang_for_extension{$extension}, $code, $expected, $example_f, @options );
@@ -706,7 +706,7 @@ sub _generate_functions {
             $expected =~ s/\cM\cJ/\n/g;
             my $source_f = per_test('.c', $test_no);
             my $obj_f = per_test($PConfig{o}, $test_no);
-            my $exe_f = per_test($PConfig{exe}, $test_no);  
+            my $exe_f = per_test($PConfig{exe}, $test_no);
             $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
             my $out_f = per_test('.out', $test_no);
             my $build_f = per_test('.build', $test_no);

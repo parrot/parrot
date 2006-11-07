@@ -16,7 +16,7 @@ t/dynoplibs/dan.t - Test for the ops in src/dynoplibs/dan.ops
 
 =head1 SYNOPSIS
 
-	% prove t/dynoplibs/dan.t
+    % prove t/dynoplibs/dan.t
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_i_nc");
 .loadlib "dan_ops"
 .sub main :main
-	$I2 = 10
+    $I2 = 10
     mul $I1, $I2, 4.2
     print $I1
     print "\n"
@@ -51,7 +51,7 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_ic_n");
 .loadlib "dan_ops"
 .sub main :main
-	$N3 = 4.2
+    $N3 = 4.2
     mul $I1, 10, $N3
     print $I1
     print "\n"
@@ -63,8 +63,8 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_i_n");
 .loadlib "dan_ops"
 .sub main :main
-	$I2 = 10
-	$N3 = 4.2
+    $I2 = 10
+    $N3 = 4.2
     mul $I1, $I2, $N3
     print $I1
     print "\n"
@@ -76,8 +76,8 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "mul pir syntax");
 .loadlib "dan_ops"
 .sub main :main
-	$I2 = 10
-	$N3 = 4.2
+    $I2 = 10
+    $N3 = 4.2
     $I1 = mul $I2, $N3
     print $I1
     print "\n"
@@ -95,3 +95,11 @@ pasm_output_is(<< 'CODE', << 'OUTPUT', "mul pasm syntax");
 CODE
 11
 OUTPUT
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
