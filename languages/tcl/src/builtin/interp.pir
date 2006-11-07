@@ -1,4 +1,4 @@
-# XXX Stub 
+# XXX (#40701): Stub 
 # help shootout compile
 
 .HLL '_Tcl', ''
