@@ -36,7 +36,7 @@ sub runstep
     );
 
     $_ = "\$(INC_DIR)/$_" for @headers;
-    my $TEMP_nongen_headers = join("\\\n	", @headers);
+    my $TEMP_nongen_headers = join("\\\n        ", @headers);
 
     $conf->data->set(
         inc                 => $inc,

@@ -85,9 +85,9 @@ sub runstep
 
     # XXX disable all but i386, ppc
     my %jit_is_working = (
-	i386 => 1,
-	ppc  => 1,	
-	# all others are seriously b0rked
+        i386 => 1,
+        ppc  => 1,      
+        # all others are seriously b0rked
     );
 
     if (-e "$jitbase/$cpuarch/core.jit" && $jit_is_working{$cpuarch}) {

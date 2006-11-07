@@ -42,8 +42,8 @@ sub runstep
         # we should repeat it with a different signal number
         if (
             $test =~ /SIGRTMIN=(\d+)\sSIGRTMAX=(\d+)\n
-		INFO=42\n
-		ok/x
+                INFO=42\n
+                ok/x
             ) {
             print " (yes) " if $verbose;
             $self->set_result('yes');

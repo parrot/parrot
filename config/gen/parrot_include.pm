@@ -61,10 +61,10 @@ sub runstep
         while (<F>) {
             if (
                 m!
-	        &gen_from_(enum|def|template)\((.*?)\)
-		(\s+prefix\((\w+)\))?
-		(\s+subst\((s/.*?/.*?/\w*)\))?
-		!x
+                &gen_from_(enum|def|template)\((.*?)\)
+                (\s+prefix\((\w+)\))?
+                (\s+subst\((s/.*?/.*?/\w*)\))?
+                !x
                 ) {
                 $inc = $2;
                 print "$2 " if $conf->options->get('verbose');
