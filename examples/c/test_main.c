@@ -9,7 +9,7 @@ src/test_main.c - A sample test program
 =head1 DESCRIPTION
 
 C<examples/c/test_main.c> is being retained as an example of a non-trivial, but
-still clean, Parrot embedding. 
+still clean, Parrot embedding.
 
 =head2 Functions
 

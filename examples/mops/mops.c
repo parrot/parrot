@@ -23,11 +23,11 @@ Prints out:
 
 =over 4
 
-=item * the number of look iterations, 
+=item * the number of look iterations,
 
 =item * the estimated number of ops performed,
 
-=item * the elapsed time, and 
+=item * the elapsed time, and
 
 =item * the number of M op/s.
 
