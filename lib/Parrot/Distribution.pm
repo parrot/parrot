@@ -326,6 +326,51 @@ sub lex_source_file_with_name
     return;
 }
 
+=item C<ops_source_file_directories()>
+
+Returns the directories which contain ops source files.
+
+=cut
+
+sub ops_source_file_directories
+{
+    my $self = shift;
+
+    return
+        map $self->directory_with_name($_) =>
+            'src/ops/',
+            'src/dynoplibs/',
+            'languages/tcl/src/ops/',
+            'languages/WMLScript/ops/',
+            'languages/dotnet/ops/',
+    ;
+}
+
+
+=item C<ops_source_file_with_name($name)>
+
+Returns the ops source file with the specified name.
+
+=cut
+
+sub ops_source_file_with_name
+{
+    my $self = shift;
+    my $name = shift || return;
+
+    $name .= '.ops';
+
+    foreach my $dir ($self->ops_source_file_directories)
+    {
+        return $dir->file_with_name($name)
+            if $dir->file_exists_with_name($name);
+    }
+
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+
+    return;
+}
+
 =item C<file_for_perl_module($module)>
 
 Returns the Perl module file for the specified module.
