@@ -57,8 +57,6 @@ L2:
     .return ($I0)
 .end
 
-=back
-
 =head1 AUTHORS
 
 Francois Perrad.
