@@ -52,9 +52,9 @@ set_loc(YYLTYPE *l, char const *tok, size_t len)
 LETTER          [a-zA-Z_@]
 DIGIT           [0-9]
 DIGITS          {DIGIT}+
-HEX		0x[0-9A-Fa-f]+
+HEX             0x[0-9A-Fa-f]+
 BIN             0b[01]+
-DOT		[.]
+DOT             [.]
 SIGN            [-+]
 BIGINT          {SIGN}?{DIGITS}"L"
 FLOATNUM        {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?|{DIGITS}[eE]{SIGN}?{DIGITS})
@@ -68,54 +68,54 @@ ENC             {LETTER}{ENCCHARS}":"
 UNICODE         {ENC}{STRINGCONSTANT}
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
-EOL		\r?\n
+EOL             \r?\n
 WS              [\t\f\r\x1a ]
 SP              [ ]
 
 
 %%
 
-"#".*{EOL}	/* skip comments */ {++line; col=1; }
+"#".*{EOL}      /* skip comments */ {++line; col=1; }
 {EOL}             { ++line; col=1; }
 
-{WS}+		/* eat white space */ ;
+{WS}+           /* eat white space */ ;
 "Py_Module"        {
-			valp->t = IMCC_find_node_nr(yytext);
-			return MODULE;
-		   }
+                        valp->t = IMCC_find_node_nr(yytext);
+                        return MODULE;
+                   }
 "PCC_Sub"          {
-			valp->t = IMCC_find_node_nr(yytext);
-			return PCCSUB;
-		   }
+                        valp->t = IMCC_find_node_nr(yytext);
+                        return PCCSUB;
+                   }
 "Function"         {
-			valp->t = IMCC_find_node_nr(yytext);
-			return FUNCTION;
-		   }
-{ID}		   {
-			valp->t = IMCC_find_node_nr(yytext);
-			if (valp->t)
-			    return IDENTIFIER;
-			DUP_AND_RET(valp, NAME);
-		   }
+                        valp->t = IMCC_find_node_nr(yytext);
+                        return FUNCTION;
+                   }
+{ID}               {
+                        valp->t = IMCC_find_node_nr(yytext);
+                        if (valp->t)
+                            return IDENTIFIER;
+                        DUP_AND_RET(valp, NAME);
+                   }
 {FLOATNUM}         DUP_AND_RET(valp, FLOATC);
 {SIGN}?{DIGIT}+    DUP_AND_RET(valp, INTC);
 {HEX}              DUP_AND_RET(valp, INTC);
 {BIN}              DUP_AND_RET(valp, INTC);
 
 {BIGINT}         {
-	valp->s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
         return(STRINGC); /* no BIGINT native format yet */
     }
 
 {STRINGCONSTANT} {
-	valp->s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
     }
 
 {UNICODE} {
         char *p = strchr(yytext, '"');
-	valp->s = str_dup(p);    /* enc:"..." */
+        valp->s = str_dup(p);    /* enc:"..." */
         /* TODO pass charset */
         return(USTRINGC); /* XXX delete quotes, -> emit, pbc */
     }
@@ -124,7 +124,7 @@ SP              [ ]
         return(STRINGC);
     }
 
-.	return *yytext;
+.       return *yytext;
 
 <<EOF>>           yyterminate();
 

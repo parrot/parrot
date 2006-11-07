@@ -20,7 +20,7 @@ sub tokenize {
                 $state = 2;
                 $depth = 1;
             }
-	    else {
+            else {
                 if ($c =~ /\d/) {
                     push @tokens, $c;
                     push @types, 'NUM';
@@ -30,7 +30,7 @@ sub tokenize {
                 } elsif ($c =~ /\s/) {
                     # Skip whitespace, unless backslashed
                 }
-		else {
+                else {
                     push @tokens, $c;
                     push @types, $c;
                 }
@@ -40,7 +40,7 @@ sub tokenize {
             push @types, 'CHAR';
             $state = 0;
         }
-	else {
+        else {
             if ($c eq '{') {
                 ++$depth;
             } elsif ($c eq '}') {

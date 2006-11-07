@@ -836,35 +836,35 @@ case 4:
 YY_RULE_SETUP
 #line 82 "compilers/ast/ast.l"
 {
-			valp->t = IMCC_find_node_nr(ASTtext);
-			return MODULE;
-		   }
+                        valp->t = IMCC_find_node_nr(ASTtext);
+                        return MODULE;
+                   }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 86 "compilers/ast/ast.l"
 {
-			valp->t = IMCC_find_node_nr(ASTtext);
-			return PCCSUB;
-		   }
+                        valp->t = IMCC_find_node_nr(ASTtext);
+                        return PCCSUB;
+                   }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 90 "compilers/ast/ast.l"
 {
-			valp->t = IMCC_find_node_nr(ASTtext);
-			return FUNCTION;
-		   }
+                        valp->t = IMCC_find_node_nr(ASTtext);
+                        return FUNCTION;
+                   }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 94 "compilers/ast/ast.l"
 {
-			valp->t = IMCC_find_node_nr(ASTtext);
-			if (valp->t)
-			    return IDENTIFIER;
-			DUP_AND_RET(valp, NAME);
-		   }
+                        valp->t = IMCC_find_node_nr(ASTtext);
+                        if (valp->t)
+                            return IDENTIFIER;
+                        DUP_AND_RET(valp, NAME);
+                   }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
@@ -890,7 +890,7 @@ case 12:
 YY_RULE_SETUP
 #line 105 "compilers/ast/ast.l"
 {
-	valp->s = str_dup(ASTtext);
+        valp->s = str_dup(ASTtext);
         valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
         return(STRINGC); /* no BIGINT native format yet */
     }
@@ -899,7 +899,7 @@ case 13:
 YY_RULE_SETUP
 #line 111 "compilers/ast/ast.l"
 {
-	valp->s = str_dup(ASTtext);
+        valp->s = str_dup(ASTtext);
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
     }
 	YY_BREAK
@@ -908,7 +908,7 @@ YY_RULE_SETUP
 #line 116 "compilers/ast/ast.l"
 {
         char *p = strchr(ASTtext, '"');
-	valp->s = str_dup(p);    /* enc:"..." */
+        valp->s = str_dup(p);    /* enc:"..." */
         /* TODO pass charset */
         return(USTRINGC); /* XXX delete quotes, -> emit, pbc */
     }

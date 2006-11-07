@@ -53,7 +53,7 @@ struct macro_frame_t {
 static void pop_parser_state(Interp* interp, void *yyscanner);
 static struct macro_frame_t *new_frame (Interp*);
 static void define_macro(Interp *interp, char *name, struct params_t *params,
-			 char *expansion, int start_line);
+                         char *expansion, int start_line);
 static struct macro_t *find_macro(Interp *interp, const char *name);
 static void scan_string (struct macro_frame_t *frame, const char *expansion, void *yyscanner);
 static void scan_file (Interp* interp, struct macro_frame_t *frame, FILE *, void *yyscanner);
@@ -835,7 +835,7 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
                         "File ended before macro '%s' was complete", 
                         IMCC_INFO(interp)->cur_macro_name);
 
-	if (strlen(IMCC_INFO(interp)->temp_buffer) + strlen(valp->s) >= 
+        if (strlen(IMCC_INFO(interp)->temp_buffer) + strlen(valp->s) >= 
             sizeof(IMCC_INFO(interp)->temp_buffer))
             IMCC_fataly(interp, E_SyntaxError,
                         "Macro '%s' is too big", 
@@ -878,14 +878,14 @@ find_macro_param (Interp *interp, const char *name)
 
 static void
 define_macro(Interp *interp, char *name, struct params_t *params,
-	     char *expansion, int start_line) 
+             char *expansion, int start_line) 
 {
     struct macro_t *m;
 
     m = find_macro(interp, name);
 
     if (m) {
-	mem_sys_free(name);
+        mem_sys_free(name);
         mem_sys_free(m->expansion);
     }
     else {
@@ -893,8 +893,8 @@ define_macro(Interp *interp, char *name, struct params_t *params,
         memset(m, 0, sizeof(struct macro_t));
 
         if (!IMCC_INFO(interp)->macros)
-	    parrot_new_cstring_hash(interp, &IMCC_INFO(interp)->macros);
-	parrot_hash_put(interp, IMCC_INFO(interp)->macros, name, m);
+            parrot_new_cstring_hash(interp, &IMCC_INFO(interp)->macros);
+        parrot_hash_put(interp, IMCC_INFO(interp)->macros, name, m);
     }
 
     if (params)
@@ -911,7 +911,7 @@ find_macro(Interp *interp, const char *name)
     DECL_CONST_CAST_OF(char);
 
     if (!IMCC_INFO(interp)->macros)
-	return NULL;
+        return NULL;
 
     return parrot_hash_get(interp, IMCC_INFO(interp)->macros, const_cast(name));
 }

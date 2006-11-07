@@ -382,19 +382,19 @@ MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
     int i;
 
     for (p = opname, q = fmt; *q && *q != ' '; )
-	*p++ = *q++;
+        *p++ = *q++;
     *p = 0;
     if (!*q)
-	fmt = 0;
+        fmt = 0;
     else
-	fmt = ++q;
+        fmt = ++q;
 #if OPDEBUG
     fprintf(stderr, "op '%s' format '%s' (%d)\n", opname, fmt?:"",n);
 #endif
     va_start(ap, n);
     i = 0;
     for (i = 0; i < n; ++i) {
-	r[i] = va_arg(ap, SymReg *);
+        r[i] = va_arg(ap, SymReg *);
     }
     va_end(ap);
     return INS(interpreter, unit, opname, fmt, r, n, 
@@ -535,7 +535,7 @@ iINDEXSET(Interp *interp, IMC_Unit * unit,
     }
     else if (r0->set == 'P') {
         IMCC_INFO(interp) -> keyvec |= KEY_BIT(1);
-	MK_I(interp, unit, "set %s[%s], %s", 3, r0,r1,r2);
+        MK_I(interp, unit, "set %s[%s], %s", 3, r0,r1,r2);
     }
     else {
         IMCC_fataly(interp, E_SyntaxError,

@@ -61,7 +61,7 @@ program: nodes          { IMCC_INFO(interp)->top_node = $$; }
      ;
 
 nodes0: nodes
-     | /* empty */	{ $$ = 0; }
+     | /* empty */      { $$ = 0; }
      ;
 
 nodes: node
@@ -74,16 +74,16 @@ nodes: node
 node: IDENTIFIER '(' nodes0 ')'   { $$ = IMCC_new_node(interp, $1, $3, &@1); }
     | FUNCTION          { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
                  '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1);
-		                  $$->unit = IMCC_INFO(interp)->cur_unit;
-		                  IMCC_INFO(interp)->cur_unit = IMCC_INFO(interp)->cur_unit->prev; }
+                                  $$->unit = IMCC_INFO(interp)->cur_unit;
+                                  IMCC_INFO(interp)->cur_unit = IMCC_INFO(interp)->cur_unit->prev; }
     | MODULE            { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
                  '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1); }
     | PCCSUB            { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
                  '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1); }
-	;
+        ;
 
 const:
-      STRINGC		{ $$ = IMCC_new_const_node(interp, $1, 'S', &@1); }
+      STRINGC           { $$ = IMCC_new_const_node(interp, $1, 'S', &@1); }
     | INTC              { $$ = IMCC_new_const_node(interp, $1, 'I', &@1); }
     | FLOATC            { $$ = IMCC_new_const_node(interp, $1, 'N', &@1); }
     | USTRINGC          { $$ = IMCC_new_const_node(interp, $1, 'U', &@1); }
@@ -92,7 +92,7 @@ const:
 var: type NAME          { $$ = IMCC_new_var_node(interp, $2, $1, &@2); }
    ;
 
-type: ':' 		{ $$ = 'P'; }
+type: ':'               { $$ = 'P'; }
     ;
 
 opcode:  NAME          { $$ = IMCC_new_const_node(interp, $1, 'o', &@1); }
@@ -104,7 +104,7 @@ static void
 pr_error(YYLTYPE l, const char *s)
 {
     fprintf(stdout, "%s at line %d col %d\n",
-	    s, l.first_line, l.first_column);
+            s, l.first_line, l.first_column);
 }
 
 

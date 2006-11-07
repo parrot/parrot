@@ -1466,8 +1466,8 @@ yyreduce:
   case 13:
 #line 76 "compilers/ast/ast.y"
     { (yyval.n) = IMCC_new_node(interp, (yyvsp[(1) - (5)].t), (yyvsp[(4) - (5)].n), &(yylsp[(1) - (5)]));
-		                  (yyval.n)->unit = IMCC_INFO(interp)->cur_unit;
-		                  IMCC_INFO(interp)->cur_unit = IMCC_INFO(interp)->cur_unit->prev; }
+                                  (yyval.n)->unit = IMCC_INFO(interp)->cur_unit;
+                                  IMCC_INFO(interp)->cur_unit = IMCC_INFO(interp)->cur_unit->prev; }
     break;
 
   case 14:
@@ -1754,7 +1754,7 @@ static void
 pr_error(YYLTYPE l, const char *s)
 {
     fprintf(stdout, "%s at line %d col %d\n",
-	    s, l.first_line, l.first_column);
+            s, l.first_line, l.first_column);
 }
 
 

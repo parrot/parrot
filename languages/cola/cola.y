@@ -484,7 +484,7 @@ block:
             if($$) {
                 $$->vars = pop_scope();
             }
-	    else {
+            else {
                 discard_scope();
             }
         }
