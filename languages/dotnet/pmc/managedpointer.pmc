@@ -108,7 +108,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
                         "Use of unititialized reference!");
                 }
                 break;
-            
+
             case PTR_TYPE_PMC:
                 if (mp->pmc)
                 {
@@ -532,7 +532,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
        to use the managed pointer as it would use an object reference for some
        operations. For these cases we discover if we're holidng onto a PMC,
        and if we are we pass on the call to the PMC we're holding. */
-    
+
     PMC* get_attr(INTVAL idx)
     {
         PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
@@ -541,7 +541,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
         else
             return NULL;
     }
-    
+
     PMC* get_attr_str(STRING* idx)
     {
         PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);

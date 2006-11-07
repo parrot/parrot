@@ -6,7 +6,7 @@
 
 
 pmclass Int64 dynpmc group dotnet_runtime {
-    
+
     /* Instance initialization. We need a custom destroy. */
     void init()
     {

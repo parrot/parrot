@@ -24,7 +24,7 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (c == NULL || c->str_name == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetTypeRefMetadata PMC");
             return NULL;
         }
@@ -68,7 +68,7 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (c == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetTypeRefMetadata PMC");
             return NULL;
         }
@@ -85,7 +85,7 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (c == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetTypeRefMetadata PMC");
             return 0;
         }

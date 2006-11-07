@@ -13,7 +13,7 @@ VERSION = PARROT_VERSION;
 #define MAX_UINT8 18446744073709551615
 #define MAX_INT8 9223372036854775807
 #define MIN_INT8 (-MAX_INT8 -1)
-        
+
 #define CHECK_ADD_OVERFLOW(a,b) \
         (Parrot_Int4)(b) >= 0 ? (Parrot_Int4)(MAX_INT4) - (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0  \
         : (Parrot_Int4)(MIN_INT4) - (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
@@ -73,7 +73,7 @@ VERSION = PARROT_VERSION;
 static opcode_t* dotnet_OverflowException(Parrot_Interp interpreter, opcode_t *ret)
 {
     PMC *ex_pmc = pmc_new(interpreter, enum_class_Exception);
-    VTABLE_set_string_native(interpreter, ex_pmc, 
+    VTABLE_set_string_native(interpreter, ex_pmc,
         string_from_const_cstring(interpreter, "System.OverflowException", 0));
     return (opcode_t *)throw_exception(interpreter, ex_pmc, ret);
 }

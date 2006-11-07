@@ -24,7 +24,7 @@ pmclass DotNetFieldMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (f == NULL || f->str_name == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetFieldMetadata PMC");
             return NULL;
         }
@@ -68,7 +68,7 @@ pmclass DotNetFieldMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (f == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetFieldMetadata PMC");
             return 0;
         }
@@ -85,7 +85,7 @@ pmclass DotNetFieldMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (f == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetFieldMetadata PMC");
             return 0;
         }
@@ -102,7 +102,7 @@ pmclass DotNetFieldMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (f == NULL || f->parent == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetFieldMetadata PMC");
             return NULL;
         }

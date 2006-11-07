@@ -67,7 +67,7 @@ pmclass DotNetSignature dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (sig == NULL || sig->data == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetSignature PMC");
             return 0;
         }
@@ -75,11 +75,11 @@ pmclass DotNetSignature dynpmc group dotnet {
         /* Ensure we won't read past the end. */
         else if (sig->cur_pos >= sig->data_size)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Read past end of signature");
             return 0;
         }
-        
+
         /* Otherwise read the value. */
         else
         {
@@ -89,7 +89,7 @@ pmclass DotNetSignature dynpmc group dotnet {
         }
     }
 
-    
+
     /* Read a compressed integer. */
     METHOD INTVAL read_compressed()
     {
@@ -100,15 +100,15 @@ pmclass DotNetSignature dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (sig == NULL || sig->data == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetSignature PMC");
             return 0;
         }
-        
+
         /* Check first byte read is OK. */
         if (sig->cur_pos >= sig->data_size)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Read past end of signature");
             return 0;
         }
@@ -128,7 +128,7 @@ pmclass DotNetSignature dynpmc group dotnet {
             /* Check we can read 2 bytes. */
             if (sig->cur_pos + 1 >= sig->data_size)
             {
-                real_exception(INTERP, NULL, E_StandardError, 
+                real_exception(INTERP, NULL, E_StandardError,
                     "Read past end of signature");
                 return 0;
             }
@@ -145,7 +145,7 @@ pmclass DotNetSignature dynpmc group dotnet {
             /* Check we can read 4 bytes. */
             if (sig->cur_pos + 3 >= sig->data_size)
             {
-                real_exception(INTERP, NULL, E_StandardError, 
+                real_exception(INTERP, NULL, E_StandardError,
                     "Read past end of signature");
                 return 0;
             }

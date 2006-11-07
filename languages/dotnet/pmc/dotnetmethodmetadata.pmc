@@ -24,7 +24,7 @@ pmclass DotNetMethodMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (m == NULL || m->str_name == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetMethodMetadata PMC");
             return NULL;
         }
@@ -72,7 +72,7 @@ pmclass DotNetMethodMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (m == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetMethodMetadata PMC");
             return 0;
         }
@@ -89,7 +89,7 @@ pmclass DotNetMethodMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (m == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetMethodMetadata PMC");
             return 0;
         }
@@ -106,7 +106,7 @@ pmclass DotNetMethodMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (m == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetMethodMetadata PMC");
             return 0;
         }
@@ -123,7 +123,7 @@ pmclass DotNetMethodMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (m == NULL || m->bytecode == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetMethodMetadata PMC");
             return NULL;
         }
@@ -140,7 +140,7 @@ pmclass DotNetMethodMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (m == NULL || m->params == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetMethodMetadata PMC");
             return NULL;
         }
@@ -157,7 +157,7 @@ pmclass DotNetMethodMetadata dynpmc group dotnet {
         /* Handle cases where we've an invalid PMC. */
         if (m == NULL || m->parent == NULL)
         {
-            real_exception(INTERP, NULL, E_StandardError, 
+            real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetMethodMetadata PMC");
             return NULL;
         }
