@@ -80,12 +80,12 @@ typedef enum {
 
 /* &gen_from_enum(cloneflags.pasm) */
 typedef enum {
-    PARROT_CLONE_CODE = 0x1,        /* active code segments 
-                                     * XXX interaction with lexicals 
+    PARROT_CLONE_CODE = 0x1,        /* active code segments
+                                     * XXX interaction with lexicals
                                      */
     PARROT_CLONE_GLOBALS = 0x2,     /* global stash */
     PARROT_CLONE_RUNOPS = 0x4,      /* runops choice */
-    PARROT_CLONE_INTERP_FLAGS = 0x8,/* bounds checking and 
+    PARROT_CLONE_INTERP_FLAGS = 0x8,/* bounds checking and
                                      * debugging flags */
     PARROT_CLONE_HLL = 0x10,        /* clone HLL setting */
     PARROT_CLONE_CLASSES = 0x20,    /* clone usermade classes */
@@ -235,7 +235,7 @@ typedef struct Parrot_Context {
     opcode_t *current_results;  /* ptr into code with get_results opcode */
     /* deref the constants - we need it all the time */
     struct PackFile_Constant ** constants;
-    /* code->prederefed.code - code->base.data in opcodes 
+    /* code->prederefed.code - code->base.data in opcodes
      * to simplify conversio between code ptrs in e.g. invoke
      */
     size_t pred_offset;
@@ -304,7 +304,7 @@ struct parrot_interp_t {
                                                * arena */
 
     PMC *class_hash;                          /* Hash of classes */
-    VTABLE **vtables;                         /* array of vtable ptrs */ 
+    VTABLE **vtables;                         /* array of vtable ptrs */
     int    n_vtable_max;                      /* highest used type */
     int    n_vtable_alloced;                  /* alloced vtable space */
 
@@ -344,7 +344,7 @@ struct parrot_interp_t {
     const char* output_file;                  /* The file into which output is written */
 
     PDB_t *pdb;                               /* Debug system */
-    Interp * debugger;                        /* trace / debug interpreter */  
+    Interp * debugger;                        /* trace / debug interpreter */
 
     struct Stack_Chunk *dynamic_env;          /* current dynamic environment */
 
@@ -380,7 +380,7 @@ struct parrot_interp_t {
     STRING **const_cstring_table;             /* CONST_STRING(x) items */
 
     struct QUEUE* task_queue;                 /* per interpreter queue */
-    struct _handler_node_t *exit_handler_list;   /* exit.c */ 
+    struct _handler_node_t *exit_handler_list;   /* exit.c */
     int sleeping;                             /* used during sleep in events */
 
     struct parrot_exception_t *exceptions;    /* internal exception stack */
@@ -424,11 +424,11 @@ typedef enum {
     IGLOBALS_COMPREG_HASH,
     IGLOBALS_ARGV_LIST,
     IGLOBALS_NCI_FUNCS,
-    IGLOBALS_INTERPRETER,       /* this interpreter as ParrotInterpreter PMC */   
+    IGLOBALS_INTERPRETER,       /* this interpreter as ParrotInterpreter PMC */
     IGLOBALS_DYN_LIBS,          /* Hash of ParrotLibrary loaded dynamic ext */
     IGLOBALS_CONFIG_HASH,
     IGLOBALS_LIB_PATHS,         /* LoL of search paths and dynamic ext */
-    IGLOBALS_PBC_LIBS,          /* Hash of load_bytecode cde */    
+    IGLOBALS_PBC_LIBS,          /* Hash of load_bytecode cde */
 
     IGLOBALS_SIZE
 } iglobals_enum;
@@ -515,9 +515,9 @@ typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interpreter,
 
 PARROT_API void Parrot_compreg(Interp * interpreter, STRING *, Parrot_compiler_func_t func);
 
-PARROT_API PMC *Parrot_compile_string(Parrot_Interp interpreter, 
+PARROT_API PMC *Parrot_compile_string(Parrot_Interp interpreter,
         STRING *type, char *code, STRING **error);
-PARROT_API void *Parrot_compile_file(Parrot_Interp interpreter, 
+PARROT_API void *Parrot_compile_file(Parrot_Interp interpreter,
         char *fullname, String **error);
 
 INTVAL sysinfo_i(Interp * interpreter, INTVAL info_wanted);

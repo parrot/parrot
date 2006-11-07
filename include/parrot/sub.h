@@ -108,7 +108,7 @@ typedef struct Parrot_sub {
     INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
     PMC      *namespace;         /* where this Sub is in - this is either
                                   * a String or a [Key] and describes
-                                  * the relative path in the NameSpace  
+                                  * the relative path in the NameSpace
                                   */
     PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
     STRING   *name;              /* name of the sub */

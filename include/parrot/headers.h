@@ -21,18 +21,18 @@
  * allocating Buffer items like FLOATVAL (double)
  * This should be either a config hint or tested
  */
-#ifdef MALLOC_ALIGNMENT       
-#  define BUFFER_ALIGNMENT MALLOC_ALIGNMENT       
+#ifdef MALLOC_ALIGNMENT
+#  define BUFFER_ALIGNMENT MALLOC_ALIGNMENT
 #else
 /* or (2 * sizeof(size_t)) */
 #  define BUFFER_ALIGNMENT 8
 #endif
 
 #define BUFFER_ALIGN_1 (BUFFER_ALIGNMENT - 1)
-#define BUFFER_ALIGN_MASK ~BUFFER_ALIGN_1 
+#define BUFFER_ALIGN_MASK ~BUFFER_ALIGN_1
 
 #define WORD_ALIGN_1 (sizeof(void *) - 1)
-#define WORD_ALIGN_MASK ~WORD_ALIGN_1 
+#define WORD_ALIGN_MASK ~WORD_ALIGN_1
 
 /* pool creation and access functions */
 struct Small_Object_Pool *new_pmc_pool(Interp *interpreter);

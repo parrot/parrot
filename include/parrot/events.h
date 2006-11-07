@@ -108,7 +108,7 @@ typedef enum {
 } io_thread_msg_type;
 /* &end_gen */
 
-PARROT_API void Parrot_event_add_io_event(Interp*, 
+PARROT_API void Parrot_event_add_io_event(Interp*,
         PMC* pio, PMC* sub, PMC* data, INTVAL which);
 
 #endif /* PARROT_EVENTS_H_GUARD */

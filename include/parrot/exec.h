@@ -50,7 +50,7 @@
 #     define STYPE_GDATA 0x0F020000   /* Global data */
 #     define STYPE_FUNC  0x0F010000  /* Function */
 #   endif
-#   define STYPE_COM   5   /* Variable */ 
+#   define STYPE_COM   5   /* Variable */
 
 /* Rellocation types */
 #   define RTYPE_DATA  1   /* Data */

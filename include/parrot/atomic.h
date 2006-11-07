@@ -3,7 +3,7 @@
  *  SVN Info
  *     $Id$
  *  Overview:
- *     This header implements portable atomic operations. 
+ *     This header implements portable atomic operations.
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:

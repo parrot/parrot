@@ -161,7 +161,7 @@ typedef struct PDB {
     char                    *last_command;
     opcode_t                *cur_opcode;
     int                     state;
-    Interp                  *debugee;  
+    Interp                  *debugee;
 } PDB_t;
 
 void PDB_run_command(Interp *interpreter, const char *command);

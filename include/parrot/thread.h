@@ -100,7 +100,7 @@ typedef struct _Thread_data {
     Parrot_mutex interp_lock;
 
     /* for waking up the interpreter from various sorts
-     * of sleeping 
+     * of sleeping
      */
     Parrot_cond  interp_cond;
 

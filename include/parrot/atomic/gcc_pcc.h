@@ -32,7 +32,7 @@ inline static void *parrot_ppc_cmpset(void * volatile *ptr,
                             "1:  lwarx %0, 0, %1\n"     /* tmp = *ptr, with reservation */
                             "    cmpw %2, %0\n" /* tmp == old ? */
                             "    bne 2f\n"      /* no, goto flush reservation, end */
-                            /* "    sync\n" -- XXX needed on PPC 405, see 
+                            /* "    sync\n" -- XXX needed on PPC 405, see
                              * http://www.kegel.com/xgcc3/ppc405erratum77.html */
                             "    stwcx. %3, 0, %1\n"    /* store new using reservation */
                             "    bne- 1b\n"     /* spin on failure of reservation; - is branch prediction hint */
