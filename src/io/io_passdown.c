@@ -542,7 +542,7 @@ PIO_send_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *buf)
 /*
 
 =item C<INTVAL
-PIO_connect_down(theINTERP, ParrotIOLayer *layer, 
+PIO_connect_down(theINTERP, ParrotIOLayer *layer,
                  ParrotIO *io, STRING *address)>
 
 Looks for the implementation of C<Connect> and calls it if found,

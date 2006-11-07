@@ -43,7 +43,7 @@
     ++PROFILE(log).failed_commits
 #  define PROFILE_ABORTED(profile) \
     ++PROFILE(log).num_aborts
-        
+
 struct STM_profile_data {
     long attempted_commits;
     long failed_commits;
@@ -58,7 +58,7 @@ struct STM_profile_data {
 
 #else
 
-#  define PROFILE(x) 
+#  define PROFILE(x)
 #  define PROFILE_TRIED_COMMIT(x)
 #  define PROFILE_FAILED_COMMIT(x)
 #  define PROFILE_ABORTED(x)
@@ -133,7 +133,7 @@ struct STM_tx_log {
     int writes_alloced;
     STM_read_record *reads;
     int reads_alloced;
-    
+
     struct waitlist_thread_data *waitlist_data;
 };
 

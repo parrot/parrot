@@ -573,7 +573,7 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             if (s->bufused < l) {
                 if (s->strstart) {
                     Parrot_reallocate_string(interpreter, s, l);
-                } 
+                }
                 else {
                     Parrot_allocate_string(interpreter, s, l);
                 }
@@ -589,7 +589,7 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     if (s->bufused < l) {
         if (s->strstart) {
             Parrot_reallocate_string(interpreter, s, l);
-        } 
+        }
         else {
             Parrot_allocate_string(interpreter, s, l);
         }

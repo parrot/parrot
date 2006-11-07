@@ -79,7 +79,7 @@ compose(Interp *interpreter, STRING *src)
     int src_len, dest_len;
     UErrorCode err;
     /*
-       U_STABLE int32_t U_EXPORT2 
+       U_STABLE int32_t U_EXPORT2
        unorm_normalize(const UChar *source, int32_t sourceLength,
        UNormalizationMode mode, int32_t options,
        UChar *result, int32_t resultLength,
@@ -132,7 +132,7 @@ upcase(Interp *interpreter, STRING *src)
     UErrorCode err;
     int dest_len, src_len, needed;
 
-    if (src->bufused == src->strlen && 
+    if (src->bufused == src->strlen &&
             src->encoding == Parrot_utf8_encoding_ptr) {
         Parrot_ascii_charset_ptr->upcase(interpreter, src);
         return;
@@ -204,7 +204,7 @@ downcase(Interp *interpreter, STRING *src)
     UErrorCode err;
     int dest_len, src_len;
 
-    if (src->bufused == src->strlen && 
+    if (src->bufused == src->strlen &&
             src->encoding == Parrot_utf8_encoding_ptr) {
         Parrot_ascii_charset_ptr->downcase(interpreter, src);
         return;
@@ -251,7 +251,7 @@ titlecase(Interp *interpreter, STRING *src)
     UErrorCode err;
     int dest_len, src_len;
 
-    if (src->bufused == src->strlen && 
+    if (src->bufused == src->strlen &&
             src->encoding == Parrot_utf8_encoding_ptr) {
         Parrot_ascii_charset_ptr->titlecase(interpreter, src);
         return;
@@ -379,7 +379,7 @@ u_iscclass(Interp *interpreter, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
     if ((flags & enum_cclass_blank) && u_isblank(codepoint)) return 1;
     if ((flags & enum_cclass_control) && u_iscntrl(codepoint)) return 1;
     if ((flags & enum_cclass_alphanumeric) && u_isalnum(codepoint)) return 1;
-    if ((flags & enum_cclass_word) && 
+    if ((flags & enum_cclass_word) &&
         (u_isalnum(codepoint) || codepoint == '_')) return 1;
     return 0;
 #else
@@ -421,7 +421,7 @@ u_iscclass(Interp *interpreter, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
         if (codepoint >= 0x1b50 && codepoint <= 0x1b59) return 1;
         if (codepoint >= 0xff10 && codepoint <= 0xff19) return 1;
     }
-    if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric)) 
+    if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric))
         real_exception(interpreter, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
     return 0;

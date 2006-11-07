@@ -737,7 +737,7 @@ PackFile_assign_transforms(struct PackFile *pf)
             pf->fetch_nv = fetch_buf_be_8;
         else if (pf->header->floattype == 1)
             pf->fetch_nv = cvt_num12_num8_be;
-    } 
+    }
     else {
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_le_4;

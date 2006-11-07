@@ -36,7 +36,7 @@ static void iter_init(Interp *, String *src, String_iter *iter);
 static STRING *
 to_encoding(Interp *interpreter, STRING *src, STRING *dest)
 {
-    STRING *result = Parrot_utf16_encoding_ptr->to_encoding(interpreter, 
+    STRING *result = Parrot_utf16_encoding_ptr->to_encoding(interpreter,
                                                             src, dest);
     /*
      * conversion to utf16 downgrads to ucs-2 if possible - check result

@@ -262,7 +262,7 @@ validate(Interp *interpreter, STRING *src)
 }
 
 static INTVAL
-is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, 
+is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
           STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
@@ -270,7 +270,7 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
     if (offset >= source_string->strlen) return 0;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
 
-    if (codepoint >= sizeof(Parrot_ascii_typetable) / 
+    if (codepoint >= sizeof(Parrot_ascii_typetable) /
                      sizeof(Parrot_ascii_typetable[0])) {
         return 0;
     }
@@ -297,7 +297,7 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, 
+find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
                 STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;

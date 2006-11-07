@@ -60,7 +60,7 @@ PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     Parrot_utf8_encoding_ptr->iter_init(interpreter, s, &iter);
     while (iter.bytepos < s->bufused) {
         if (iter.bytepos + 4 > s->bufused) {
-            const utf8_t *u8ptr = (utf8_t *)((char *)s->strstart + 
+            const utf8_t *u8ptr = (utf8_t *)((char *)s->strstart +
                     iter.bytepos);
             UINTVAL c = *u8ptr;
             if (UTF8_IS_START(c)) {

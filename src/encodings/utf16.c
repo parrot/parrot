@@ -110,7 +110,7 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
                 p = mem_sys_realloc(p, dest_len * sizeof(UChar));
             else {
                 result->bufused = dest_len * sizeof(UChar);
-                Parrot_reallocate_string(interpreter, dest, 
+                Parrot_reallocate_string(interpreter, dest,
                                          sizeof(UChar) * dest_len);
                 p = dest->strstart;
             }

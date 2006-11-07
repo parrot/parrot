@@ -472,8 +472,8 @@ do_sub_pragmas(Interp *interpreter, struct PackFile_ByteCode *self,
                             "Illegal fixup offset (%d) in enum_fixup_sub");
                 sub_pmc = ct->constants[ci]->u.key;
                 PMC_sub(sub_pmc)->eval_pmc = eval_pmc;
-                if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK) 
-                        || (Sub_comp_get_FLAGS(sub_pmc) & SUB_COMP_FLAG_MASK)) 
+                if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
+                        || (Sub_comp_get_FLAGS(sub_pmc) & SUB_COMP_FLAG_MASK))
                         && sub_pragma(interpreter, action, sub_pmc)) {
                     result = do_1_sub_pragma(interpreter,
                             sub_pmc, action);

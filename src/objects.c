@@ -37,7 +37,7 @@ Return true if C<name> is a valid vtable slot name.
 
 */
 
-int 
+int
 Parrot_is_vtable_name(Interp *interpreter, const char *name)
 {
     int i;
@@ -213,7 +213,7 @@ given class. If one is found, returns the method.
 
 */
 
-static PMC* 
+static PMC*
 find_vtable_override_byname(Interp* interpreter, PMC *class_name,
                             STRING *method_name)
 {

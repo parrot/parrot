@@ -924,7 +924,7 @@ AGAIN:
          */
         *s = string_make(interpreter, buf, bytesread, "ascii", 0);
         return bytesread;
-    } 
+    }
     else {
         switch (errno) {
             case EINTR:

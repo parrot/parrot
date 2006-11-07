@@ -237,7 +237,7 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     /* Only files for now */
     flags |= PIO_F_FILE;
 
-    fd = CreateFile(spath, fAcc, fShare, NULL, fCreat, 
+    fd = CreateFile(spath, fAcc, fShare, NULL, fCreat,
                     FILE_ATTRIBUTE_NORMAL, NULL);
     if (fd != INVALID_HANDLE_VALUE) {
         io = PIO_new(interpreter, type, flags, 0);
@@ -613,7 +613,7 @@ PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
      *    io->fd, ntohs(io->remote.sin_port));*/
     if ((connect((SOCKET)io->fd, (struct sockaddr*)&io->remote,
                    sizeof(struct sockaddr))) != 0) {
-        PIO_eprintf(interpreter, "PIO_win32_connect: errno = %d\n", 
+        PIO_eprintf(interpreter, "PIO_win32_connect: errno = %d\n",
                     WSAGetLastError());
         return -1;
     }
@@ -659,7 +659,7 @@ AGAIN:
             case EINTR:
                 goto AGAIN;
 #ifdef EWOULDBLOCK
-            case EWOULDBLOCK:  
+            case EWOULDBLOCK:
                 goto AGAIN;
 #else
             case EAGAIN:
@@ -760,7 +760,7 @@ PIO_win32_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
     io->local.sin_port = sa.sin_port;
     io->local.sin_family = AF_INET;
 
-    if ((bind((SOCKET)io->fd, (struct sockaddr *)&io->local, 
+    if ((bind((SOCKET)io->fd, (struct sockaddr *)&io->local,
               sizeof(struct sockaddr))) == -1) {
         PIO_eprintf(interpreter, "PIO_win32_bind: errno = %d\n",
                     WSAGetLastError());

@@ -130,7 +130,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
         *(pc++) = 0x78; \
         } \
     } \
-    while (0)    
+    while (0)
 
 /* Move from/to special purpose register.
  *
@@ -310,14 +310,14 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 /* canonical names */
 
-#define jit_emit_and_rrr_i jit_emit_and_rrr 
-#define jit_emit_add_rrr_i jit_emit_add_rrr 
-#define jit_emit_cmod_rrr_i jit_emit_cmod_rrr 
-#define jit_emit_div_rrr_i jit_emit_div_rrr 
-#define jit_emit_mul_rrr_i jit_emit_mul_rrr 
-#define jit_emit_or_rrr_i  jit_emit_or_rrr 
-#define jit_emit_sub_rrr_i jit_emit_sub_rrr 
-#define jit_emit_xor_rrr_i jit_emit_xor_rrr 
+#define jit_emit_and_rrr_i jit_emit_and_rrr
+#define jit_emit_add_rrr_i jit_emit_add_rrr
+#define jit_emit_cmod_rrr_i jit_emit_cmod_rrr
+#define jit_emit_div_rrr_i jit_emit_div_rrr
+#define jit_emit_mul_rrr_i jit_emit_mul_rrr
+#define jit_emit_or_rrr_i  jit_emit_or_rrr
+#define jit_emit_sub_rrr_i jit_emit_sub_rrr
+#define jit_emit_xor_rrr_i jit_emit_xor_rrr
 
 /* shift ops */
 /* slw */
@@ -713,7 +713,7 @@ div_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     jit_emit_mov_rr(pc, r3, r16); /* interp */
     jit_emit_mov_ri_i(pc, r4, 0);          /* NULL */
     jit_emit_mov_ri_i(pc, r5, E_ZeroDivisionError);          /* type */
-    jit_emit_mov_ri_i(pc, r6, div_by_zero); 
+    jit_emit_mov_ri_i(pc, r6, div_by_zero);
     jit_info->native_ptr = pc;
     jit_emit_call_func(pc, (void*) real_exception);
     pc = jit_info->native_ptr;
@@ -746,7 +746,7 @@ fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     jit_emit_mov_rr(pc, r3, r16); /* interp */
     jit_emit_mov_ri_i(pc, r4, 0);          /* NULL */
     jit_emit_mov_ri_i(pc, r5, E_ZeroDivisionError);          /* type */
-    jit_emit_mov_ri_i(pc, r6, div_by_zero); 
+    jit_emit_mov_ri_i(pc, r6, div_by_zero);
     jit_info->native_ptr = pc;
     jit_emit_call_func(pc, (void*) real_exception);
     pc = jit_info->native_ptr;
@@ -769,9 +769,9 @@ static char *
 cmod_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
 {
     char *pc;
-    pc = div_rrr(jit_info, D, A, B); 
-    jit_emit_mul_rrr(pc, D, D, B); 
-    jit_emit_sub_rrr(pc, D, A, D); 
+    pc = div_rrr(jit_info, D, A, B);
+    jit_emit_mul_rrr(pc, D, D, B);
+    jit_emit_sub_rrr(pc, D, A, D);
     return pc;
 }
 
@@ -895,7 +895,7 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp * interpreter)
 
 #define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 static void
-jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
         int recursive)
 {
     PMC *sig_pmc;
@@ -907,7 +907,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     sig_bits = SIG_ARRAY(sig_pmc);
     sig = sig_bits[0];
     if (!recursive) {
-        /* ISR2 <- args[0] */ 
+        /* ISR2 <- args[0] */
         jit_emit_lwz(jit_info->native_ptr, ISR2, 0, r5);
     }
     switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
@@ -956,7 +956,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
 static int jit_save_regs_call(Parrot_jit_info_t *, Interp * , int skip);
 
 static void
-jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
         int recursive)
 {
     PMC *sig_args, *sig_params, *sig_result;
@@ -980,9 +980,9 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
     sig_params = constants[params[1]]->u.key;
     ASSERT_SIG_PMC(sig_params);
     sig_bits = SIG_ARRAY(sig_args);
-    n = SIG_ELEMS(sig_args);  
+    n = SIG_ELEMS(sig_args);
     /*
-     * preserve registers - need get_results, because we skip the 
+     * preserve registers - need get_results, because we skip the
      * return value
      */
     result = CUR_OPCODE + 2 + n + 3; /* set_args, set_p_pc */
@@ -992,7 +992,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
 
     if (!SIG_ELEMS(sig_result))
         skip = -1;
-    else 
+    else
         skip = MAP(2 + n + 3 + 2);
     used_n = jit_save_regs_call(jit_info, interpreter, skip);
     for (i = 0; i < n; ++i) {
@@ -1016,7 +1016,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
 
 /*
  * preserve registers around a functioncall
- * 
+ *
  * b) all used register around a call (skip >= 0 := return result
  *    TODO save N regs for b) too
  */
@@ -1031,7 +1031,7 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
     jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
     used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
-    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type];
     for (i = 0; i < used_i; ++i) {
         if (reg_info->map_I[i] == skip)
             continue;
@@ -1042,8 +1042,8 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, int skip)
     return 0;  /* TODO N regs */
 }
 
-static void 
-jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter, 
+static void
+jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter,
         int skip)
 {
 
@@ -1051,7 +1051,7 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter,
     const jit_arch_regs *reg_info;
 
     used_i = CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
-    reg_info = &jit_info->arch_info->regs[jit_info->code_type]; 
+    reg_info = &jit_info->arch_info->regs[jit_info->code_type];
     /* note - reversed order of jit_save_regs  */
     for (i = used_i - 1; i >= 0; --i) {
         if (reg_info->map_I[i] == skip)
@@ -1062,8 +1062,8 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp * interpreter,
     /* pop stack frame */
     jit_emit_add_rri_i(jit_info->native_ptr, r1, r1, 64);
     /* restore link reg */
-    jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   
-    jit_emit_mtlr(jit_info->native_ptr, r0);   
+    jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);
+    jit_emit_mtlr(jit_info->native_ptr, r0);
     /* TODO other types */
 }
 
@@ -1123,7 +1123,7 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
     jit_emit_mflr(jit_info->native_ptr, r0);    /* optional */
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
     /* preserve r31 */
-    jit_emit_stw(jit_info->native_ptr, r31, -4, r1); 
+    jit_emit_stw(jit_info->native_ptr, r31, -4, r1);
     /* 24 linkage area, 32 params , 1 word local, roundup => 32 */
     jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
     /* r31 = 0 - needed for load immediate */
@@ -1377,7 +1377,7 @@ static const jit_arch_info arch_info = {
 };
 
 
-const jit_arch_info * 
+const jit_arch_info *
 Parrot_jit_init(Interp *interpreter)
 {
     return &arch_info;

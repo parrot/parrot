@@ -785,7 +785,7 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg, char *mem)
 }
 
 /* XXX Hack to fix the following bug as of 05 Dec 2005:
-    Hack [perl #37819] Sun4 builds fail linking against jit.o 
+    Hack [perl #37819] Sun4 builds fail linking against jit.o
     These dummy definitions blindly copied from jit/mips/jit_emit.h.
     Apparently, they need to be inside a JIT_EMIT section of this
     file.
@@ -876,7 +876,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
             case PARROT_ARG_IC:
                 if (emitm_simm13_const(pi)) {
                     emitm_mov_i(jit_info->native_ptr, pi, emitm_o(rdx));
-                } 
+                }
                 else {
                     emitm_sethi(jit_info->native_ptr, emitm_hi22(pi), emitm_o(rdx));
                     emitm_or_i(jit_info->native_ptr, emitm_o(rdx), emitm_lo10(pi), emitm_o(rdx));
@@ -1119,7 +1119,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     /* PMC* pmc_new_noinit(Interp *interpreter, INTVAL base_type) */
     if (emitm_simm13_const(i2)) {
         emitm_mov_i(jit_info->native_ptr, i2, emitm_o(1));
-    } 
+    }
     else {
         emitm_sethi(jit_info->native_ptr, emitm_hi22(i2), emitm_o(1));
         emitm_or_i(jit_info->native_ptr, emitm_o(1), emitm_lo10(i2), emitm_o(1));
@@ -1167,11 +1167,11 @@ char floatval_map[] =
 
 #endif /* JIT_EMIT */
 
-/* XXX Hack [perl #37819]  Unlike the functions above, this one apparently 
+/* XXX Hack [perl #37819]  Unlike the functions above, this one apparently
     sometimes needs to be defined both in and out of the JIT_EMIT section.
     However, at this point, the Parrot_jit_regbase symbol is not
     defined, so we replace it with the integer 26 (which is what it
-    expands to anyway. 
+    expands to anyway.
 */
 #  define Parrot_jit_emit_get_base_reg_no(pc) 26 /*Parrot_jit_regbase */
 

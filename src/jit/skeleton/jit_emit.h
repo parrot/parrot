@@ -349,7 +349,7 @@ static const jit_arch_info arch_info = {
  * and finally you need an interface function to return above structure
  */
 
-const jit_arch_info * 
+const jit_arch_info *
 Parrot_jit_init(Interp *interpreter)
 {
     return &arch_info;

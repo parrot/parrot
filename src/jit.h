@@ -169,7 +169,7 @@ typedef enum {
 
     /* size */
     JIT_CODE_TYPES,
-    /* special cases */  
+    /* special cases */
     JIT_CODE_RECURSIVE     = 0x10,
     JIT_CODE_SUB_REGS_ONLY_REC = JIT_CODE_SUB_REGS_ONLY|JIT_CODE_RECURSIVE
 } enum_jit_code_type;
@@ -195,7 +195,7 @@ typedef struct {
     Parrot_jit_arena_t               arena;
     Parrot_jit_optimizer_t          *optimizer;
     Parrot_jit_constant_pool_t      *constant_pool;
-    enum_jit_code_type              code_type; 
+    enum_jit_code_type              code_type;
     int                             flags;
     const struct jit_arch_info_t    *arch_info;
     int                              n_args;
@@ -270,7 +270,7 @@ typedef void (*jit_arch_f)(Parrot_jit_info_t *, Interp *);
 
 typedef struct {
     /*
-     * begin function - emit ABI call prologue 
+     * begin function - emit ABI call prologue
      */
     jit_arch_f jit_begin;
 
@@ -282,11 +282,11 @@ typedef struct {
     const char *map_F;
 } jit_arch_regs;
 
-typedef void (*mov_RM_f)(Parrot_jit_info_t *, 
+typedef void (*mov_RM_f)(Parrot_jit_info_t *,
         int cpu_reg, int base_reg, INTVAL offs);
-typedef void (*mov_MR_f)(Parrot_jit_info_t *, 
+typedef void (*mov_MR_f)(Parrot_jit_info_t *,
         int base_reg, INTVAL offs, int cpu_reg);
-        
+
 typedef struct jit_arch_info_t {
     /* CPU <- Parrot reg move functions */
     mov_RM_f mov_RM_i;
@@ -312,7 +312,7 @@ const jit_arch_info * Parrot_jit_init(Interp *);
  * interface to create JIT code
  */
 Parrot_jit_info_t *
-parrot_build_asm(Interp *interpreter, 
+parrot_build_asm(Interp *interpreter,
                 opcode_t *code_start, opcode_t *code_end,
                 void *objfile, enum_jit_code_type);
 /*

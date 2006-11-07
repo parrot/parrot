@@ -169,7 +169,7 @@ Unshift a value onto the array component of the Capture.
         CAPTURE_array_CREATE(INTERP, SELF);
         return VTABLE_push_float(INTERP, CAPTURE_array(SELF), value);
     }
-    
+
     void push_integer(INTVAL value) {
         CAPTURE_array_CREATE(INTERP, SELF);
         return VTABLE_push_integer(INTERP, CAPTURE_array(SELF), value);
@@ -189,7 +189,7 @@ Unshift a value onto the array component of the Capture.
         CAPTURE_array_CREATE(INTERP, SELF);
         return VTABLE_unshift_float(INTERP, CAPTURE_array(SELF), value);
     }
-    
+
     void unshift_integer(INTVAL value) {
         CAPTURE_array_CREATE(INTERP, SELF);
         return VTABLE_unshift_integer(INTERP, CAPTURE_array(SELF), value);
@@ -415,7 +415,7 @@ Delete the element corresponding to C<key> in the hash component.
     }
 
     void delete_keyed(PMC *key) {
-        if (CAPTURE_array(SELF)) 
+        if (CAPTURE_array(SELF))
             VTABLE_delete_keyed(INTERP, CAPTURE_hash(SELF), key);
     }
 

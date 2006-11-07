@@ -372,7 +372,7 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, 
+find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
             STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
