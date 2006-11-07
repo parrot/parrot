@@ -86,7 +86,7 @@ MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
         r[i] = va_arg(ap, SymReg *);
     }
     va_end(ap);
-    return INS(interpreter, unit, opname, fmt, r, n, 
+    return INS(interpreter, unit, opname, fmt, r, n,
                IMCC_INFO(interpreter)->keyvec, 1);
 }
 
@@ -127,7 +127,7 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     case enum_class_Coroutine:
         rhs = mk_const(interp, name, 'p');
         if (!ascii)
-            rhs->type |= VT_ENCODED;  
+            rhs->type |= VT_ENCODED;
         r[1] = rhs;
         rhs->pmc_type = type_enum;
         rhs->usage = U_FIXUP;
@@ -301,7 +301,7 @@ begin_return_or_yield(Interp *interp, int yield)
                     "yield or return directive outside pcc subroutine\n");
     if(yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
-    sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d", 
+    sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
     interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
     i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, interp->imc_info->sr_return);
@@ -372,8 +372,8 @@ adv_named_set(Interp *interp, char *name) {
     IMCC_INFO(interp)->adv_named_id = name;
 }
 
-static void 
-do_loadlib(Interp *interp, char *lib) 
+static void
+do_loadlib(Interp *interp, char *lib)
 {
     STRING *s = string_unescape_cstring(interp, lib + 1, '"', NULL);
     Parrot_load_lib(interp, s, NULL);
@@ -398,7 +398,7 @@ do_loadlib(Interp *interp, char *lib)
 %token <t> PRAGMA N_OPERATORS HLL HLL_MAP
 %token <t> GOTO ARG IF UNLESS PNULL
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
-%token <t> ADV_MAYBE_FLAT 
+%token <t> ADV_MAYBE_FLAT
 %token <t> NEW
 %token <t> NAMESPACE ENDNAMESPACE DOT_METHOD
 %token <t> SUB SYM LOCAL LEXICAL CONST
@@ -486,8 +486,8 @@ compilation_unit:
      class_namespace  { $$ = $1; }
    | constdef      { $$ = $1; }
    | global        { $$ = $1; }
-   | sub           { $$ = $1; 
-                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit); 
+   | sub           { $$ = $1;
+                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
                      IMCC_INFO(interp)->cur_unit = 0; }
    | pcc_sub       { $$ = $1;
                      imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
@@ -518,7 +518,7 @@ hll_def: HLL STRINGC COMMA STRINGC
             STRING *hll_name, *hll_lib;
             hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
             hll_lib =  string_unescape_cstring(interp, $4 + 1, '"', NULL);
-            CONTEXT(((Interp*)interp)->ctx)->current_HLL = 
+            CONTEXT(((Interp*)interp)->ctx)->current_HLL =
                 Parrot_register_HLL(interp, hll_name, hll_lib);
             $$ = 0;
          }
@@ -554,8 +554,8 @@ pmc_const:
      CONST { is_def=1; } INTC var_or_i '=' any_string
                 { $$ = mk_pmc_const(interp, IMCC_INFO(interp)->cur_unit, $3, $4, $6); is_def=0; }
    ;
-any_string: 
-     STRINGC 
+any_string:
+     STRINGC
    | USTRINGC
    ;
 
@@ -576,8 +576,8 @@ pasmline:
 
 pasm_inst:         { clear_state(interp); }
      PARROT_OP pasm_args
-                   { $$ = INS(interp, IMCC_INFO(interp)->cur_unit, 
-                              $2, 0, IMCC_INFO(interp)->regs, 
+                   { $$ = INS(interp, IMCC_INFO(interp)->cur_unit,
+                              $2, 0, IMCC_INFO(interp)->regs,
                               IMCC_INFO(interp)->nargs, IMCC_INFO(interp) -> keyvec, 1);
                      free($2); }
    | PCC_SUB
@@ -658,7 +658,7 @@ sub:
 sub_params:
      /* empty */                        { $$ = 0; } %prec LOW_PREC
    | '\n'                               { $$ = 0; }
-   | sub_params sub_param '\n'          { 
+   | sub_params sub_param '\n'          {
        if (IMCC_INFO(interp)->adv_named_id) {
              add_pcc_named_param(interp,IMCC_INFO(interp)->cur_call,
                                  IMCC_INFO(interp)->adv_named_id,$2);
@@ -678,7 +678,7 @@ sub_param_type_def:
                                          else
                                              $$ = mk_ident(interp, $2, $1);
                                          $$->type |= $3; }
-   | type STRINGC ADV_ARROW IDENTIFIER paramtype_list { 
+   | type STRINGC ADV_ARROW IDENTIFIER paramtype_list {
                                          if ($5 & VT_UNIQUE_REG)
                                              $$ = mk_ident_ur(interp, $4, $1);
                                          else
@@ -705,11 +705,11 @@ outer: OUTER '(' STRINGC ')'
    ;
 
 vtable: VTABLE_METHOD
-                     { $$ = 0; 
+                     { $$ = 0;
                        IMCC_INFO(interp)->cur_unit->vtable_name = NULL;
                        IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     |   VTABLE_METHOD '(' STRINGC ')'
-                     { $$ = 0; 
+                     { $$ = 0;
                        IMCC_INFO(interp)->cur_unit->vtable_name = strdup($3);
                        IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     ;
@@ -768,7 +768,7 @@ pcc_sub_call:
             SymReg * r, *r1;
             Instruction *i;
 
-            sprintf(name, "%cpcc_sub_call_%d", 
+            sprintf(name, "%cpcc_sub_call_%d",
                     IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
             $<sr>$ = r = mk_pcc_sub(interp, str_dup(name), 0);
             /* this mid rule action has the semantic value of the
@@ -874,7 +874,7 @@ pcc_results:
 
 pcc_result:
      RESULT target paramtype_list      {  $$ = $2; $$->type |= $3; }
-   | LOCAL { is_def=1; } type id_list_id           
+   | LOCAL { is_def=1; } type id_list_id
      {
          IdList* l = $4;
          if (l->unique_reg)
@@ -925,10 +925,10 @@ pcc_ret:
 pcc_returns:
      /* empty */   {  $$ = 0; }
    | pcc_returns '\n'      {
-       if($1) add_pcc_return(IMCC_INFO(interp)->sr_return, $1); 
+       if($1) add_pcc_return(IMCC_INFO(interp)->sr_return, $1);
    }
    | pcc_returns pcc_return '\n'      {
-       if($2) add_pcc_return(IMCC_INFO(interp)->sr_return, $2); 
+       if($2) add_pcc_return(IMCC_INFO(interp)->sr_return, $2);
    }
    ;
 
@@ -955,7 +955,7 @@ pcc_return_many:
 
 var_returns:
     /* empty */ { $$ = 0; }
-  | arg                     {  
+  | arg                     {
       if (IMCC_INFO(interp)->adv_named_id) {
           add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
                                IMCC_INFO(interp)->adv_named_id, $1);
@@ -964,14 +964,14 @@ var_returns:
       else add_pcc_return(IMCC_INFO(interp)->sr_return, $1); }
   | STRINGC ADV_ARROW var {
       add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,$1,$3);}
-  | var_returns COMMA arg   {  
+  | var_returns COMMA arg   {
       if (IMCC_INFO(interp)->adv_named_id) {
           add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
                                IMCC_INFO(interp)->adv_named_id,$3);
            IMCC_INFO(interp)->adv_named_id = NULL;
       }
       else add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
-  | var_returns COMMA STRINGC ADV_ARROW var   {  
+  | var_returns COMMA STRINGC ADV_ARROW var   {
       add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,$3,$5);}
   ;
 
@@ -1027,10 +1027,10 @@ instruction:
                            IMCC_warning(interp, "Too many errors. Correct some first.\n");
                            YYABORT;
                        }
-                       yyerrok; } 
+                       yyerrok; }
    ;
 
-id_list : 
+id_list :
      id_list_id
      {
          IdList* l = $1;
@@ -1039,7 +1039,7 @@ id_list :
      }
 
    | id_list COMMA id_list_id
-     {  
+     {
          IdList* l = $3;
          l->next = $1;
          $$ = l;
@@ -1099,9 +1099,9 @@ labeled_inst:
                         }
    | GOTO label_op { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch",1, $2); }
    | PARROT_OP vars
-                   { $$ = INS(interp, IMCC_INFO(interp)->cur_unit, $1, 0, 
+                   { $$ = INS(interp, IMCC_INFO(interp)->cur_unit, $1, 0,
                               IMCC_INFO(interp) -> regs,
-                              IMCC_INFO(interp) -> nargs, 
+                              IMCC_INFO(interp) -> nargs,
                               IMCC_INFO(interp) -> keyvec, 1);
                        free($1); }
    | PNULL var
@@ -1133,7 +1133,7 @@ classname:
    ;
 
 assignment:
-     target '=' var           
+     target '=' var
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set", 2, $1, $3);      }
    | target '=' '!' var
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "not", 2, $1, $4);      }
@@ -1316,14 +1316,14 @@ sub_call:
 
 arglist:
      /* empty */             {  $$ = 0; }
-   | arglist COMMA arg       {  $$ = 0; 
+   | arglist COMMA arg       {  $$ = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $3);
            IMCC_INFO(interp)->adv_named_id = NULL;
        }
-       else add_pcc_arg(IMCC_INFO(interp)->cur_call, $3); 
+       else add_pcc_arg(IMCC_INFO(interp)->cur_call, $3);
    }
-   | arg                     {  $$ = 0; 
+   | arg                     {  $$ = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$1);
            IMCC_INFO(interp)->adv_named_id = NULL;
@@ -1355,16 +1355,16 @@ result: target paramtype_list  { $$ = $1; $$->type |= $2; }
    ;
 
 targetlist:
-     targetlist COMMA result { 
+     targetlist COMMA result {
          $$ = 0;
          if (IMCC_INFO(interp)->adv_named_id) {
              add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$3);
              IMCC_INFO(interp)->adv_named_id = NULL;
          }
          else add_pcc_result(IMCC_INFO(interp)->cur_call, $3); }
-   | targetlist COMMA STRINGC ADV_ARROW target { 
+   | targetlist COMMA STRINGC ADV_ARROW target {
         add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,$3,$5); }
-   | result                  { 
+   | result                  {
        $$ = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
            add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$1);
@@ -1461,15 +1461,15 @@ var:
 
 keylist:           {  IMCC_INFO(interp)->nkeys = 0;
                       IMCC_INFO(interp)->in_slice = 0; }
-     _keylist      {  $$ = link_keys(interp, 
-                                     IMCC_INFO(interp)->nkeys, 
+     _keylist      {  $$ = link_keys(interp,
+                                     IMCC_INFO(interp)->nkeys,
                                      IMCC_INFO(interp)->keys, 0); }
    ;
 
 keylist_force:     {  IMCC_INFO(interp)->nkeys = 0;
                       IMCC_INFO(interp)->in_slice = 0; }
      _keylist      {  $$ = link_keys(interp,
-                                     IMCC_INFO(interp)->nkeys, 
+                                     IMCC_INFO(interp)->nkeys,
                                      IMCC_INFO(interp)->keys, 1); }
    ;
 
@@ -1492,7 +1492,7 @@ key:
    | var DOTDOT var
                    { $1->type |= VT_START_SLICE;
                      $3->type |= VT_END_SLICE;
-                     IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = $1; 
+                     IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = $1;
                      $$ = $3; }
    | DOTDOT var    { $2->type |= VT_START_ZERO | VT_END_SLICE; $$ = $2; }
    | var DOTDOT    { $1->type |= VT_START_SLICE | VT_END_INF; $$ = $1; }
@@ -1546,7 +1546,7 @@ int yyerror(void *yyscanner, Interp *interp, char * s)
 
     /* Basically, if current token is a newline, it mean the error was
      * before the newline, and thus, line is the line *after* the
-     * error.  
+     * error.
      */
     if (!at_eof(yyscanner) && *chr == '\n') {
         IMCC_INFO(interp)->line--;

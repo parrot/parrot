@@ -27,7 +27,7 @@ static char get_data_type_from_cstring(Interp *interp, char *data_type);
 
 pmclass BCG dynpmc need_ext group bcg_group lib bcg {
 
-    void class_init() 
+    void class_init()
     {
         if (pass) {
             dynpmc_BCG = Parrot_PMC_typenum(INTERP,"BCG");
@@ -42,29 +42,29 @@ This method creates a BCG_info PMC instance
 
 =cut
 
-*/   
+*/
     void init ()
     {
         BCG_info *bcg_info;
-        
+
         PMC_struct_val(SELF) = NULL;
         bcg_info=BCG_create();
         PMC_struct_val(SELF) = bcg_info;
     }
 
 /*
-   
+
 =item C<void destroy ()>
 
 This method destroys BCG_info PMC instance.
-    
+
 =cut
 
 */
-    void destroy () 
+    void destroy ()
     {
         if (PMC_struct_val(SELF)) {
-            BCG_destroy( (BCG_info*) PMC_struct_val(SELF));        
+            BCG_destroy( (BCG_info*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -77,11 +77,11 @@ This method starts the code generation phase.
 
 =cut
 
-*/   
+*/
     METHOD void startCodeGen()
     {
         BCG_info *bcg_info;
-    
+
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
             BCG_start_code_gen(bcg_info);
@@ -99,7 +99,7 @@ This method concludes the code generation phase.
 
 =cut
 
-*/   
+*/
     METHOD void endCodeGen()
     {
         BCG_info *bcg_info;
@@ -112,7 +112,7 @@ This method concludes the code generation phase.
              real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
-                
+
     }
 
 /*
@@ -123,14 +123,14 @@ This method is called to generate byte code for start subroutine.
 
 =cut
 
-*/   
+*/
     METHOD void startSub(STRING *subName, STRING *pragma)
     {
         BCG_info *bcg_info;
 
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
-            BCG_start_sub(bcg_info, string_to_cstring(INTERP, subName), 
+            BCG_start_sub(bcg_info, string_to_cstring(INTERP, subName),
                 string_to_cstring(INTERP, pragma));
         }
         BCG_CATCH(BCG_EXCEPTION) {
@@ -143,18 +143,18 @@ This method is called to generate byte code for start subroutine.
 
 =item C<void endSub()>
 
-This method is called to generate bytecode for end subroutine 
+This method is called to generate bytecode for end subroutine
 
 =cut
 
-*/   
+*/
     METHOD void endSub()
     {
         BCG_info *bcg_info;
 
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
-            BCG_end_sub(bcg_info); 
+            BCG_end_sub(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
              real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
@@ -169,7 +169,7 @@ This method generates code for a subroutine call.
 
 =cut
 
-*/   
+*/
     METHOD void startCall(STRING *subName)
     {
         BCG_info *bcg_info;
@@ -215,7 +215,7 @@ This method generates code for an opertion.
 
 =cut
 
-*/   
+*/
     METHOD void startOp(STRING *op)
     {
         BCG_info *bcg_info;
@@ -267,7 +267,7 @@ This method generates bytecode for a variable.
         BCG_info *bcg_info;
         char data_type;
 
-        data_type = get_data_type_from_cstring(INTERP, 
+        data_type = get_data_type_from_cstring(INTERP,
                                             string_to_cstring(INTERP, type));
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
@@ -293,7 +293,7 @@ This method generates bytecode for a constant.
         BCG_info *bcg_info;
         char data_type;
 
-        data_type = get_data_type_from_cstring(INTERP, 
+        data_type = get_data_type_from_cstring(INTERP,
                                             string_to_cstring(INTERP, type));
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
@@ -361,7 +361,7 @@ get_data_type_from_cstring(Interp *interp, char *data_type)
 /*
 
 =back
-   
+
 =head1 LICENSE
 
 Copyright (C) 2006, The Perl Foundation.
