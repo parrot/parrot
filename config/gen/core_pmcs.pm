@@ -56,7 +56,7 @@ END_H
     print OUT "    enum_class_default,\n";
     my $i = 1;
     foreach (@pmcs) {
-        print OUT "    enum_class_$_,\t/*  $i */ \n";
+        print OUT "    enum_class_$_,\t/*  $i */\n";
         $i++;
     }
     print OUT <<"END_H";
