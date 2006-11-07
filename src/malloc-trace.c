@@ -210,14 +210,6 @@ void cfree(void *mem)
 
 /*
  * Local variables:
- * tab-width: 4
- * compile-command:
- *    "gcc -Wall -O -fpic -shared -o malloc-trace.so malloc-trace.c"
- * End:
- */
-
-/*
- * Local variables:
  *   c-file-style: "parrot"
  * End:
  * vim: expandtab shiftwidth=4:
