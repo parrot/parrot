@@ -279,6 +279,17 @@ tag 'all' is allowed for todo tests that should fail on any system
 
     bsr reset_todo_info
     test_file = 'sprintf_tests'
+    # TODOs
+    todo_info[64] = 'undecided perl5 vs. posix behavior'
+    todo_info[153] = '%hf should be rejected'
+    todo_info[187] = '%h alone is invalid'
+    todo_info[191] = '%l alone is invalid'
+    todo_info[223] = '%v alone is invalid, but a valid parrot extension'
+    todo_info[304] = 'undecided'
+    todo_info[305] = 'undecided'
+    todo_info[306] = 'undecided'
+
+    # end TODOs
     todo_tests[test_file] = todo_info
 
     .return (todo_tests)
@@ -325,6 +336,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     bsr set_skip_loop
 
     skip_info[114] = 'harness needs support for * modifier'
+    skip_info[144] = 'perl5 expresssion as test value'
     skip_info[131] = 'harness needs support for * modifier'
     skip_info[141] = 'harness needs support for * modifier'
     skip_info[161] = 'harness needs support for * modifier'
