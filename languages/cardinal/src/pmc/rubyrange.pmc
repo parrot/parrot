@@ -11,12 +11,12 @@
 
 #include "parrot/parrot.h"
 
-pmclass RubyRange 
-        need_ext 
-        extends Slice 
-        dynpmc 
-        group ruby_group 
-        hll Ruby 
+pmclass RubyRange
+        need_ext
+        extends Slice
+        dynpmc
+        group ruby_group
+        hll Ruby
 {
 
     METHOD PMC* interpret() {

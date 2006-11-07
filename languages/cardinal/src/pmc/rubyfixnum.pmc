@@ -11,19 +11,19 @@
 
 #include "parrot/parrot.h"
 
-pmclass RubyFixnum 
-        extends Integer 
+pmclass RubyFixnum
+        extends Integer
         extends RubyObject
         does integer
-        dynpmc 
-        group ruby_group 
-        hll Ruby 
+        dynpmc
+        group ruby_group
+        hll Ruby
         maps Integer {
 
     METHOD PMC* interpret() {
         return SELF;
     }
-    
+
 }
 
 
