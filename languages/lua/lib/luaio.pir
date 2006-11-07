@@ -36,6 +36,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
 .sub 'init_io' :load :anon
 
+    load_bytecode 'languages/lua/type/userdata.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua I/O\n"
@@ -156,9 +157,11 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     _lua__ENVIRON = global '_ENVIRON'
     $P3 = new .LuaNumber
 
+    find_type $I0, 'userdata'
     $P1 = 'stdin'
     $P2 = getstdin
-    $P0 = new .LuaUserdata, $P2
+    $P0 = new $I0
+    setattribute $P0, 0, $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 0
@@ -166,7 +169,8 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     $P1 = 'stdout'
     $P2 = getstdout
-    $P0 = new .LuaUserdata, $P2
+    $P0 = new $I0
+    setattribute $P0, 0, $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 1
@@ -174,7 +178,8 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     $P1 = 'stderr'
     $P2 = getstderr
-    $P0 = new .LuaUserdata, $P2
+    $P0 = new $I0
+    setattribute $P0, 0, $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 2
@@ -236,7 +241,8 @@ L0:
     _lua__REGISTRY = global '_REGISTRY'
     .const .LuaString key = 'file'
     mt = _lua__REGISTRY[key]
-    new file, .LuaUserdata
+    find_type $I0, 'userdata'
+    new file, $I0
     file.'set_metatable'(mt)
     .return (file)
 .end
@@ -306,7 +312,7 @@ L2:
     .local pmc mt
     .local pmc mt_file
     .local pmc ret
-    $I0 = isa file, 'LuaUserdata'
+    $I0 = isa file, 'userdata'
     $S0 = typeof file
     unless $I0 goto L1
     mt = file.'get_metatable'()

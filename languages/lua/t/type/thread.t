@@ -4,16 +4,16 @@
 
 =head1 NAME
 
-t/pmc/thread.t - Lua thread
+t/type/thread.t - Lua thread
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/thread.t
+    % perl -I../../lib t/type/thread.t
 
 =head1 DESCRIPTION
 
 Tests Lua C<thread> type
-(implemented in F<languages/lua/lib/thread.pir>).
+(implemented in F<languages/lua/type/thread.pir>).
 
 =cut
 
@@ -25,7 +25,7 @@ use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/thread.pbc'
+  load_bytecode 'languages/lua/type/thread.pbc'
   _main()
 .end
 .sub '_main'
@@ -35,6 +35,9 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
     pmc1 = new $I0, F1 
     .local int bool1
     bool1 = isa pmc1, 'Parrot::Coroutine'
+    print bool1
+    print "\n"
+    bool1 = isa pmc1, 'base_lua'
     print bool1
     print "\n"
     bool1 = isa pmc1, 'thread'
@@ -49,11 +52,12 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 CODE
 1
 1
+1
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/thread.pbc'
+  load_bytecode 'languages/lua/type/thread.pbc'
   _main()
 .end
 .sub '_main'
@@ -81,7 +85,7 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/thread.pbc'
+  load_bytecode 'languages/lua/type/thread.pbc'
   _main()
 .end
 .sub '_main'
@@ -103,7 +107,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/thread.pbc'
+  load_bytecode 'languages/lua/type/thread.pbc'
   _main()
 .end
 .sub '_main'
@@ -129,7 +133,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/thread.pbc'
+  load_bytecode 'languages/lua/type/thread.pbc'
   _main()
 .end
 .sub '_main'
@@ -159,7 +163,7 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/thread.pbc'
+  load_bytecode 'languages/lua/type/thread.pbc'
   _main()
 .end
 .sub '_main'
@@ -187,7 +191,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/thread.pbc'
+  load_bytecode 'languages/lua/type/thread.pbc'
   _main()
 .end
 .sub '_main'
@@ -216,7 +220,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check __add' );
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  load_bytecode 'languages/lua/lib/thread.pbc'
+  load_bytecode 'languages/lua/type/thread.pbc'
   _main()
 .end
 .sub '_main'

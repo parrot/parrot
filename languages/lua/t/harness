@@ -61,6 +61,7 @@ if ( $opt_files ) {
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
     my @files = glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
+    push @files, glob( File::Spec->catfile( $dir, 'type', '*.t' ) );
     push @files, glob( File::Spec->catfile( $dir, '*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
@@ -86,6 +87,8 @@ else {
         if ($dir) {
             @files = glob( File::Spec->catfile( $dir, '*.t' ) );
             push @files, glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) )
+                unless ($use_orig_lua);
+            push @files, glob( File::Spec->catfile( $dir, 'type', '*.t' ) )
                 unless ($use_orig_lua);
         }
     }

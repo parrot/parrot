@@ -24,7 +24,6 @@ static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 static INTVAL dynpmc_LuaTable;
-static INTVAL dynpmc_LuaUserdata;
 
 
 pmclass LuaBase
@@ -587,11 +586,6 @@ Looks up the method for C<*method_name>.
             if (dynpmc_LuaTable == retval->vtable->base_type)
                 return retval;
         }
-        else if (dynpmc_LuaUserdata == SELF->vtable->base_type) {
-            retval = PMC_struct_val(SELF);
-            if (retval != NULL)
-                return retval;
-        }
         else if (dynpmc_LuaString == SELF->vtable->base_type) {
             retval = Parrot_find_global_cur(INTERP,
                     const_string(INTERP, "mt_string"));
@@ -610,8 +604,6 @@ Looks up the method for C<*method_name>.
               string_from_const_cstring(INTERP, "LuaString", 0));
             dynpmc_LuaTable = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaTable", 0));
-            dynpmc_LuaUserdata = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaUserdata", 0));
     }
 
 }

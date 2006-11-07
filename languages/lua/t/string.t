@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.byte' );
@@ -41,6 +41,12 @@ CODE
 
 65	66	67
 65	66	67
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'metatable' );
+print(getmetatable("ABC"))
+CODE
+/table: [0-9A-Fa-f]{8}/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'method s:byte' );

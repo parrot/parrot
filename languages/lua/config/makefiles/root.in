@@ -6,6 +6,7 @@ PGE      = $(PARROT) ../../compilers/pge/pgc.pir
 TGE      = $(PARROT) ../../compilers/tge/tgc.pir
 
 LIBPATH  = lib
+TYPEPATH = type
 BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
 O        = @o@
 CLASSDIR = pmc
@@ -21,11 +22,14 @@ PMCS = \
  luanil \
  luanumber \
  luastring \
- luatable \
- luauserdata
+ luatable
 
-PBCS = \
- $(LIBPATH)/thread.pbc \
+TYPE_PBCS = \
+ $(TYPEPATH)/base_lua.pbc \
+ $(TYPEPATH)/thread.pbc \
+ $(TYPEPATH)/userdata.pbc
+
+LIB_PBCS = \
  $(LIBPATH)/luaaux.pbc \
  $(LIBPATH)/luabasic.pbc \
  $(LIBPATH)/luacoroutine.pbc \
@@ -47,7 +51,7 @@ GEN_PBC = \
  src/Lua51TestLex.pbc \
  src/LuaDumpLex.pbc
 
-all: pmcs $(PBCS) $(GEN_PBC) Lua/parser.pm
+all: pmcs $(TYPE_PBCS) $(LIB_PBCS) $(GEN_PBC) Lua/parser.pm
 
 src/lua51_grammar_gen.pir: src/lua51.pg
 	$(PGE) --output=src/lua51_grammar_gen.pir src/lua51.pg
@@ -75,8 +79,14 @@ pmcs:
 	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
 	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
-$(LIBPATH)/thread.pbc: $(LIBPATH)/thread.pir
-	$(PARROT) --output=$(LIBPATH)/thread.pbc $(LIBPATH)/thread.pir
+$(TYPEPATH)/base_lua.pbc: $(TYPEPATH)/base_lua.pir
+	$(PARROT) --output=$(TYPEPATH)/base_lua.pbc $(TYPEPATH)/base_lua.pir
+
+$(TYPEPATH)/thread.pbc: $(TYPEPATH)/thread.pir
+	$(PARROT) --output=$(TYPEPATH)/thread.pbc $(TYPEPATH)/thread.pir
+
+$(TYPEPATH)/userdata.pbc: $(TYPEPATH)/userdata.pir
+	$(PARROT) --output=$(TYPEPATH)/userdata.pbc $(TYPEPATH)/userdata.pir
 
 $(LIBPATH)/luaaux.pbc: $(LIBPATH)/luaaux.pir
 	$(PARROT) --output=$(LIBPATH)/luaaux.pbc $(LIBPATH)/luaaux.pir
@@ -135,6 +145,7 @@ test:
 
 TEST_CLEANERS = \
  "t/pmc/*.pir" \
+ "t/type/*.pir" \
  "t/*.pir" \
  "t/*.lua" \
  "t/*.orig_out" \
@@ -151,6 +162,7 @@ BUILD_CLEANERS = \
  "$(CLASSDIR)/*.h" \
  "$(CLASSDIR)/*$(LOAD_EXT)" \
  "$(CLASSDIR)/*$(O)" \
+ "$(TYPEPATH)/*.pbc" \
  "$(LIBPATH)/*.pbc"
 
 clean:

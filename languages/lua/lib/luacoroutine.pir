@@ -22,7 +22,7 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 
 .sub 'init_coroutine' :load :anon
 
-    load_bytecode 'languages/lua/lib/thread.pbc'
+    load_bytecode 'languages/lua/type/thread.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Coroutine\n"

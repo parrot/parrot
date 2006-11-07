@@ -4,36 +4,36 @@
 
 =head1 NAME
 
-t/pmc/userdata.t - LuaUserdata
+t/type/userdata.t - Lua Userdata
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/userdata.t
+    % perl -I../../lib t/type/userdata.t
 
 =head1 DESCRIPTION
 
-Tests C<LuaUserdata> PMC
-(implemented in F<languages/lua/pmc/luauserdata.pmc>).
+Tests C<userdata> type
+(implemented in F<languages/lua/type/userdata.pir>).
 
 =cut
 
 use strict;
 use warnings;
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 8;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaUserdata'
+    load_bytecode 'languages/lua/type/userdata.pbc'
+    find_type $I0, 'userdata'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = isa pmc1, 'LuaBase'
+    bool1 = isa pmc1, 'base_lua'
     print bool1
     print "\n"
-    bool1 = isa pmc1, 'LuaUserdata'
+    bool1 = isa pmc1, 'userdata'
     print bool1
     print "\n"
     end
@@ -45,8 +45,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaUserdata'
+    load_bytecode 'languages/lua/type/userdata.pbc'
+    find_type $I0, 'userdata'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
@@ -65,8 +65,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaUserdata'
+    load_bytecode 'languages/lua/type/userdata.pbc'
+    find_type $I0, 'userdata'
     .local pmc pmc1
     pmc1 = new $I0
     .local string str1
@@ -85,8 +85,8 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaUserdata'
+    load_bytecode 'languages/lua/type/userdata.pbc'
+    find_type $I0, 'userdata'
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
@@ -101,8 +101,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaUserdata'
+    load_bytecode 'languages/lua/type/userdata.pbc'
+    find_type $I0, 'userdata'
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
@@ -119,7 +119,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
     loadlib P1, 'lua_group'
-    find_type $I0, 'LuaUserdata'
+    load_bytecode 'languages/lua/type/userdata.pbc'
+    find_type $I0, 'userdata'
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
@@ -141,30 +142,14 @@ false
 boolean
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL 'Lua', 'lua_group'
-.sub _main
-    .local pmc val1
-    val1 = new .Array
-    .local pmc pmc1
-    pmc1 = new .LuaUserdata, val1
-    .local int bool1
-    bool1 = isa pmc1, 'LuaUserdata'
-    print bool1
-    print "\n"
-    end
-.end
-CODE
-1
-OUTPUT
-
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL 'Lua', 'lua_group'
 .sub _main
+    load_bytecode 'languages/lua/type/userdata.pbc'
+    find_type $I0, 'userdata'
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
-    pmc1 = new .LuaUserdata, val1
+    pmc1 = new $I0, val1
     print pmc1
     print "\n"
     $P0 = pmc1.'tostring'()
@@ -179,12 +164,13 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL 'Lua', 'lua_group'
 .sub _main
+    load_bytecode 'languages/lua/type/userdata.pbc'
+    find_type $I0, 'userdata'
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
-    pmc1 = new .LuaUserdata, val1
+    pmc1 = new $I0, val1
     $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"

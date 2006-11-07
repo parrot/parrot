@@ -89,7 +89,7 @@ Try to use Parse::RecDescent (the original Lua uses a LL parser).
 =head1 Lua PMC
 
 There are eight basic types in Lua, each of them is implemented by a PMC,
-except C<thread>.
+or by a pure PIR class.
 
 =over 4
 
@@ -104,7 +104,7 @@ except C<thread>.
 =item * function F<languages/lua/pmc/luafunction.pmc> 
 & F<languages/lua/pmc/luaclosure.pmc>
 
-=item * userdata F<languages/lua/pmc/luauserdata.pmc>
+=item * userdata F<languages/lua/type/luauserdata.pir>
 
 This type allows OO extension.
 
@@ -120,6 +120,9 @@ The current implementation use the library Parrot::Coroutine.
 This type is I<the> data structure of the language.
 
 =back
+
+F<languages/lua/type/base_lua.pir> provides an abstract base class for some
+Lua types (userdata, thread).
 
 F<languages/lua/pmc/luabase.pmc> provides an abstract base class for some
 Lua types (nil, boolean, number, string, table).
