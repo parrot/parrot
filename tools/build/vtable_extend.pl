@@ -59,7 +59,7 @@ open $OUT, '>', 'src/extend_vtable.c' or die $!;
 print $OUT $header, <<'EOF';
 
 /*
-Copyright (C) 2001-2003, 2005, The Perl Foundation. 
+Copyright (C) 2001-2003, 2005, The Perl Foundation.
 
 =head1 NAME
 

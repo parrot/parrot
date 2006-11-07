@@ -6,7 +6,7 @@
 
 # INPLACE MMD variant must always be normal op + 1
 
-void init() 
+void init()
 # init must be first for JITed vtable meths
 void init_pmc(PMC* initializer)
 PMC* instantiate(PMC* sig)
@@ -71,14 +71,14 @@ void* get_pointer_keyed_str(STRING* key)
 
 [STORE] :write
 void set_integer_native(INTVAL value)
-void set_integer_same(PMC* value) 
-void set_integer_keyed(PMC* key, INTVAL value) 
-void set_integer_keyed_int(INTVAL key, INTVAL value) 
-void set_integer_keyed_str(STRING* key, INTVAL value) 
+void set_integer_same(PMC* value)
+void set_integer_keyed(PMC* key, INTVAL value)
+void set_integer_keyed_int(INTVAL key, INTVAL value)
+void set_integer_keyed_str(STRING* key, INTVAL value)
 
-void set_number_native(FLOATVAL value) 
-void set_number_same(PMC* value) 
-void set_number_keyed(PMC* key, FLOATVAL value) 
+void set_number_native(FLOATVAL value)
+void set_number_same(PMC* value)
+void set_number_keyed(PMC* key, FLOATVAL value)
 void set_number_keyed_int(INTVAL key, FLOATVAL value)
 void set_number_keyed_str(STRING* key, FLOATVAL value)
 
@@ -139,7 +139,7 @@ void unshift_pmc(PMC* value)
 void splice(PMC* value, INTVAL offset, INTVAL count)
 
 # XXX marking writing here?
-[MATH] 
+[MATH]
 PMC* add(PMC* value, PMC* dest)             MMD_ADD
 PMC* add_int(INTVAL value, PMC* dest)       MMD_ADD_INT
 PMC* add_float(FLOATVAL value, PMC* dest)   MMD_ADD_FLOAT
