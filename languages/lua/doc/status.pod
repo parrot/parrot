@@ -121,11 +121,11 @@ This type is I<the> data structure of the language.
 
 =back
 
-F<languages/lua/type/base_lua.pir> provides an abstract base class for some
+F<languages/lua/type/base_lua.pir> provides an abstract base class for 
 Lua types (userdata, thread).
 
-F<languages/lua/pmc/luabase.pmc> provides an abstract base class for some
-Lua types (nil, boolean, number, string, table).
+F<languages/lua/pmc/luabase.pmc> provides an abstract base class for 
+Lua types (nil, boolean, number, string, table, function).
 
 F<languages/lua/pmc/lua.pmc> is a singleton PMC what holds some static methods.
 

@@ -87,6 +87,21 @@ Class method to construct an Boolean from the string representation C<rep>.
 
 /*
 
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
+
+/*
+
 =item C<STRING* name()>
 
 Return the string "boolean".
@@ -96,6 +111,21 @@ Return the string "boolean".
 */
     STRING* name () {
         return luaboolean_name;
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the scalar.
+
+=cut
+
+*/
+    PMC* clone () {
+        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
+        memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof(UnionVal));
+        return dest;
     }
 
 /*

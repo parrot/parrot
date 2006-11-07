@@ -88,6 +88,21 @@ Initializes the instance.
 
 /*
 
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
+
+/*
+
 =item C<void mark()>
 
 Marks the hash as live.

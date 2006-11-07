@@ -8,8 +8,9 @@ classes/luaclosure.pmc - Lua Closure
 
 =head1 DESCRIPTION
 
-C<LuaClosure> extends C<Parrot Closure> to provide a class with the behaviour
-of the Lua C<Function> type. C<LuaClosure> is used by function written in Lua.
+C<LuaClosure> extends C<Parrot Closure> and C<LuaBase> to provide a class 
+with the behaviour of the Lua C<Function> type.
+C<LuaClosure> is used by function written in Lua.
 
 =head2 Overloaded Methods
 
@@ -23,12 +24,11 @@ of the Lua C<Function> type. C<LuaClosure> is used by function written in Lua.
 
 static STRING *luafunction_name;
 static INTVAL dynpmc_LuaBoolean;
-static INTVAL dynpmc_LuaNil;
-static INTVAL dynpmc_LuaString;
 
 
 pmclass LuaClosure
     extends Closure
+    extends LuaBase
     dynpmc
     group lua_group
     hll Lua maps Closure {
@@ -40,10 +40,6 @@ pmclass LuaClosure
             luafunction_name = const_string(INTERP, "function");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaBoolean", 0));
-            dynpmc_LuaNil = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaNil", 0));
-            dynpmc_LuaString = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaString", 0));
         }
     }
 
@@ -69,237 +65,6 @@ Return the string "function".
 */
     STRING* get_string () {
         return Parrot_sprintf_c(INTERP, "function: %08X", SELF);
-    }
-
-/*
-
-=item C<INTVAL get_bool()>
-
-In Lua, both C<nil> and C<false> make a condition false; any other values
-makes it true.
-
-So return always true.
-
-=cut
-
-*/
-    INTVAL get_bool () {
-        return 1;
-    }
-
-/*
-
-=item C<PMC* get_pmc_keyed (PMC* key)>
-
-Throws an exception.
-
-=cut
-
-*/
-    PMC* get_pmc_keyed (PMC* key) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to index a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-/*
-
-=item C<void set_bool(INTVAL value)>
-
-=cut
-
-*/
-    void set_bool (INTVAL value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaBoolean);
-        VTABLE_set_bool(INTERP, SELF, value);
-    }
-
-/*
-
-=item C<void set_pmc_keyed (PMC* key, PMC* value)>
-
-Throws an exception.
-
-=cut
-
-*/
-    void set_pmc_keyed (PMC* key, PMC* value) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to index a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-    }
-
-/*
-
-=item C<PMC* neg (PMC *dest)>
-
-=item C<void i_neg()>
-
-Throws an exception.
-
-=cut
-
-*/
-    PMC* neg (PMC* dest) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-    void i_neg() {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-    }
-
-/*
-
-=item C<PMC* logical_not(PMC *dest)>
-
-Common implementation (use C<get_bool> & C<set_bool>)
-
-=cut
-
-*/
-    PMC* logical_not (PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_bool(INTERP, dest, ! DYNSELF.get_bool());
-        return dest;
-    }
-
-/*
-
-=back
-
-=head2 non-Vtable Methods
-
-=over 4
-
-=item C<void add(PMC *value, PMC *dest)>
-
-=item C<void i_add (PMC *value)>
-
-=item C<void subtract(PMC *value, PMC *dest)>
-
-=item C<void i_substract (PMC *value)>
-
-=item C<void multiply(PMC *value, PMC *dest)>
-
-=item C<void i_multiply (PMC *value)>
-
-=item C<void divide(PMC *value, PMC *dest)>
-
-=item C<void i_divide (PMC *value)>
-
-=item C<PMC* modulus (PMC* value, PMC* dest)>
-
-=item C<void i_modulus (PMC *value)>
-
-=item C<PMC* pow (PMC* value, PMC* dest)>
-
-=item C<void i_pow (PMC *value)>
-
-=item C<PMC* concatenate (PMC *value, PMC *dest)>
-
-=item C<void i_concatenate (PMC *value)>
-
-Throws an exception.
-
-=cut
-
-*/
-    PMC* add (PMC* value, PMC* dest) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-    void i_add (PMC* value) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-    }
-
-    PMC* subtract (PMC* value, PMC* dest) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-    void i_subtract (PMC* value) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-    }
-
-    PMC* multiply (PMC* value, PMC* dest) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-    void i_multiply (PMC* value) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-    }
-
-    PMC* divide (PMC* value, PMC* dest) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-    void i_divide (PMC* value) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-    }
-
-    PMC* modulus (PMC* value, PMC* dest) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-    void i_modulus (PMC* value) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-    }
-
-    PMC* pow (PMC* value, PMC* dest) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-    void i_pow (PMC* value) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to perform arithmetic on a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-    }
-
-    PMC* concatenate (PMC* value,  PMC* dest) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to concatenate a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
-        return NULL;
-    }
-
-    void i_concatenate (PMC* value) {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to concatenate a %s value",
-                string_to_cstring(INTERP, DYNSELF.name()));
     }
 
 /*
@@ -353,31 +118,6 @@ MMD_DEFAULT: {
 
 =over 4
 
-=item C<PMC *get_metatable()>
-
-=cut
-
-*/
-    METHOD PMC* get_metatable() {
-        return pmc_new(INTERP, dynpmc_LuaNil);
-    }
-
-/*
-
-=item C<PMC* len()>
-
-=cut
-
-*/
-    METHOD PMC* len () {
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to get length of a %s value",
-                string_to_cstring(INTERP, VTABLE_name(INTERP, SELF)));
-        return NULL;
-    }
-
-/*
-
 =item C<PMC* rawequal (PMC* value)>
 
 =cut
@@ -393,37 +133,6 @@ MMD_DEFAULT: {
             PMC_int_val(retval) = 1;
         else
             PMC_int_val(retval) = 0;
-        return retval;
-    }
-
-/*
-
-=item C<PMC* tonumber()>
-
-=cut
-
-*/
-    METHOD PMC* tonumber() {
-        PMC *retval;
-
-        retval = pmc_new(INTERP, dynpmc_LuaNil);
-        return retval;
-    }
-
-/*
-
-=item C<PMC* tostring()>
-
-=cut
-
-*/
-    METHOD PMC* tostring() {
-        PMC *retval;
-        STRING *rep;
-
-        retval = pmc_new(INTERP, dynpmc_LuaString);
-        rep = VTABLE_get_string(INTERP, SELF);
-        PMC_str_val(retval) = rep;
         return retval;
     }
 

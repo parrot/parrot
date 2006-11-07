@@ -32,36 +32,6 @@ pmclass LuaBase
     group lua_group {
 /*
 
-=item C<void morph(INTVAL type)>
-
-Morphs the scalar to the specified type.
-
-=cut
-
-*/
-    void morph (INTVAL type) {
-        if (SELF->vtable->base_type == type)
-            return;
-        pmc_reuse(INTERP, SELF, type, 0);
-    }
-
-/*
-
-=item C<PMC *clone()>
-
-Creates and returns a clone of the scalar.
-
-=cut
-
-*/
-    PMC* clone () {
-        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
-        memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof(UnionVal));
-        return dest;
-    }
-
-/*
-
 =item C<INTVAL get_bool()>
 
 Returns C<true>.
