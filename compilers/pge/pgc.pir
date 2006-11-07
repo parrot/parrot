@@ -268,7 +268,7 @@ OPTIONS
     .local pmc out
     out = new 'PGE::CodeString'
     if initpir == '' goto out_rule
-    out.emit("      .sub '__onload' :load")
+    out.emit("      .sub '__onload' :load :init")
     out.emit("          .local pmc optable")
     out .= initpir
     out.emit("          .return ()")
