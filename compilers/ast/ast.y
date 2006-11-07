@@ -107,3 +107,10 @@ pr_error(YYLTYPE l, const char *s)
 	    s, l.first_line, l.first_column);
 }
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

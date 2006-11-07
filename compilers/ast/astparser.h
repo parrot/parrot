@@ -103,4 +103,3 @@ typedef struct YYLTYPE
  * End:
  * vim: expandtab shiftwidth=4:
  */
-

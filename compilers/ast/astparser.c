@@ -1758,7 +1758,6 @@ pr_error(YYLTYPE l, const char *s)
 }
 
 
-
 /*
  * Local variables:
  *   c-file-style: "parrot"

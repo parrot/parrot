@@ -1207,11 +1207,7 @@ int at_eof(yyscan_t yyscanner)
 
 /*
  * Local variables:
- * mode: c
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */
