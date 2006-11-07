@@ -36,7 +36,7 @@ While this seems like a lot of work, lets consider all the cases:
        speeds with no lookaside to see if methods have been
        overridden.
      * explict calls to methods (such as __str__) are relatively
-       rare, but are handled by an NCI method which maps between 
+       rare, but are handled by an NCI method which maps between
        Python and Parrot syntax and semantics.
 
   "pure" Python classes (base class is object):
@@ -156,7 +156,7 @@ need to be filled in.
             PMC *proxy_class = pmc_new(INTERP, PyBuiltin_PyProxyClass);
             VTABLE_setprop(INTERP, proxy_class, PyString_bases, SELF);
             VTABLE_setprop(INTERP, newclass, PyString_bases, proxy_class);
-            VTABLE_setprop(INTERP, newclass, PyString_proxy, 
+            VTABLE_setprop(INTERP, newclass, PyString_proxy,
                 PyBuiltin_PyProxyClass_class);
         }
 

@@ -105,7 +105,7 @@ Invoke a method call on the indicated object.
             int i = REG_INT(3)++;
             while (i--)
                 REG_PMC(6+i)=REG_PMC(5+i);
-            REG_PMC(5) = PMC_struct_val(SELF); 
+            REG_PMC(5) = PMC_struct_val(SELF);
         }
         return VTABLE_invoke(INTERP, PMC_pmc_val(SELF), next);
     }
