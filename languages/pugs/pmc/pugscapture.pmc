@@ -219,7 +219,7 @@ pmclass PugsCapture extends PugsAny
   void init() {
       PObj_custom_mark_SET(SELF);
       siva_set_int(SELF, 0);
-      siva_set_siva(SELF, mem_sys_allocate(sizeof(siva)));    
+      siva_set_siva(SELF, mem_sys_allocate(sizeof(siva)));
       siva_set_ary(SELF, 0);
       siva_set_hash(SELF, 0);
       siva_set_str(SELF, 0);
@@ -520,7 +520,7 @@ pmclass PugsCapture extends PugsAny
 
 
 
-} 
+}
 
 /*
 

@@ -20,7 +20,7 @@ C<PugsModule> extends C<NameSpace> to provide a Perl 6 C<Module>.
 
 #include "parrot/parrot.h"
 
-pmclass PugsModule extends PugsAny need_ext 
+pmclass PugsModule extends PugsAny need_ext
     extends NameSpace
     does hash
     dynpmc

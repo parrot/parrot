@@ -20,7 +20,7 @@ C<PugsMapping> extends C<OrderedHash> to provide a Perl 6 C<Mapping>.
 
 #include "parrot/parrot.h"
 
-pmclass PugsMapping extends PugsAny need_ext 
+pmclass PugsMapping extends PugsAny need_ext
     extends OrderedHash
     does array
     does hash

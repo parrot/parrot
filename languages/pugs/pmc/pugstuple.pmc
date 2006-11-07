@@ -20,7 +20,7 @@ C<PugsTuple> extends C<FixedPMCArray> to provide a Perl 6 C<Tuple>.
 
 #include "parrot/parrot.h"
 
-pmclass PugsTuple extends PugsAny need_ext 
+pmclass PugsTuple extends PugsAny need_ext
     extends FixedPMCArray
     does array
     dynpmc
