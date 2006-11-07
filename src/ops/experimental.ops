@@ -217,11 +217,11 @@ a Key PMC that you can use with "new", for example.
 =cut
 
 op classname(out PMC, invar PMC) :object_base {
-    PMC *ns = Parrot_NameSpace_name(interpreter, 
+    PMC *ns = Parrot_NameSpace_name(interpreter,
                                     VTABLE_namespace(interpreter, $2));
     if (PMC_IS_NULL(ns) || VTABLE_elements(interpreter, ns) < 2)
     {
-        real_exception(interpreter, NULL, NO_CLASS, 
+        real_exception(interpreter, NULL, NO_CLASS,
             "Attempt to get class name of a non-class.");
     }
     else
@@ -242,7 +242,7 @@ op classname(out PMC, invar PMC) :object_base {
             key_append(interpreter, key_tail, key);
             key_tail = key;
         }
-    }    
+    }
     goto NEXT();
 }
 
@@ -356,7 +356,7 @@ op instantiate(out PMC) {
   opcode_t* arg_op;
   PMC *sig, *class;
   int typ;
-  
+
   arg_op = interpreter->current_args;
   if (!arg_op) {
         real_exception(interpreter, NULL, NULL_REG_ACCESS,
@@ -381,7 +381,7 @@ op instantiate(out PMC) {
           class = REG_PMC(arg_op[2]);
           break;
       default:
-          internal_exception(UNIMPLEMENTED, 
+          internal_exception(UNIMPLEMENTED,
                   "uninplement class argument in instantiate");
           class = NULL; /* just for cc */
           break;

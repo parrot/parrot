@@ -208,7 +208,7 @@ stack for later returning.
 =cut
 
 inline op bsr (label INT) :base_core,check_event {
-    stack_push(interpreter, &interpreter->dynamic_env, 
+    stack_push(interpreter, &interpreter->dynamic_env,
              expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
     goto OFFSET($1);
 }
@@ -235,7 +235,7 @@ location onto the call stack for later returning.
 
 inline op jsr(label INT) :base_core,check_event {
     opcode_t * loc;
-    stack_push(interpreter, &interpreter->dynamic_env, 
+    stack_push(interpreter, &interpreter->dynamic_env,
              expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
     loc = INTVAL2PTR(opcode_t *, $1);
     goto ADDRESS(loc);

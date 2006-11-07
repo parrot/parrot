@@ -162,7 +162,7 @@ inline op pic_get_params__(inconst PMC) :pic {
     if (lru->u.signature == sig) {
         if (sig) {
             n = ((arg_pass_f)lru->f.real_function)(interpreter, sig,
-                    (char*)caller_ctx->bp.regs_i, src_pred, 
+                    (char*)caller_ctx->bp.regs_i, src_pred,
                     _reg_base, (void**)cur_opcode);
         }
         else
@@ -219,7 +219,7 @@ inline op pic_set_returns__(inconst PMC) :pic {
     if (lru->u.signature == sig) {
         if (sig) {
             n = ((arg_pass_f)lru->f.real_function)(interpreter, mic->m.sig,
-                    _reg_base, (void**)cur_opcode, 
+                    _reg_base, (void**)cur_opcode,
                     (char*)caller_ctx->bp.regs_i, dest_pred);
         }
         else
@@ -262,7 +262,7 @@ inline op pic_callr__(inconst PMC) :pic {
         sig = (PMC*)(pred_pc[1]);
         ASSERT_SIG_PMC(sig);
         assert(SIG_ELEMS(sig) <= 1);
-        args[0] = SIG_ELEMS(sig) ? 
+        args[0] = SIG_ELEMS(sig) ?
             (_reg_base + ((opcode_t*)pred_pc)[2]) : NULL;
     }
     else
@@ -284,7 +284,7 @@ inline op pic_callr__(inconst PMC) :pic {
                 args[1 + i] = (void**)cur_opcode[2 + i];
                 break;
             case PARROT_ARG_FLOATVAL:
-                args[1 + i] = (_reg_base + 
+                args[1 + i] = (_reg_base +
                         ((opcode_t*)cur_opcode)[2 + i]);
                 break;
             default:
@@ -292,7 +292,7 @@ inline op pic_callr__(inconst PMC) :pic {
         }
     }
     /* set_args (); set_p_pc; get_results (1), x; invokecc_p */
-    pc = CUR_OPCODE + 2 + n_args + 3 + 3 + 2;    
+    pc = CUR_OPCODE + 2 + n_args + 3 + 3 + 2;
     args[1 + n_args] = pc;
     lru = &mic->lru;
     /* TODO verify $1 didn't change */

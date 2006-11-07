@@ -1023,10 +1023,10 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
  INTVAL p = 0;
  INTVAL a = $2 < 0 ? -$2 : $2;
  INTVAL b = $3 < 0 ? -$3 : $3;
- 
+
  if(a==0) { $1=b; goto NEXT(); }
  if(b==0) { $1=a; goto NEXT(); }
- 
+
  while( !((a | b) & 1) ) {
    a>>=1;
    b>>=1;
@@ -1039,11 +1039,11 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
    else if (a<b)      b = (b-a)>>1;
    else               a = (a-b)>>1;
  }
- 
+
  $1 = b<<p;
  goto NEXT();
 }
- 
+
 
 ########################################
 
@@ -1058,10 +1058,10 @@ inline op lcm(out INT, in INT, in INT) :advanced_math {
  INTVAL p = 0;
  INTVAL a = $2 < 0 ? -$2 : $2;
  INTVAL b = $3 < 0 ? -$3 : $3;
- INTVAL saved_var1 = a, saved_var2 = b; 
+ INTVAL saved_var1 = a, saved_var2 = b;
 
  if(a==0 || b==0) { $1=0; goto NEXT(); }
- 
+
  while( !((a | b) & 1) ) {
    a>>=1;
    b>>=1;
@@ -1074,7 +1074,7 @@ inline op lcm(out INT, in INT, in INT) :advanced_math {
    else if (a<b)      b = (b-a)>>1;
    else               a = (a-b)>>1;
  }
- 
+
  gcd = b<<p;
  saved_var1 /= gcd;
  $1 = saved_var1*saved_var2;

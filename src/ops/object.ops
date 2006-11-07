@@ -220,7 +220,7 @@ inline op isa(out INT, invar PMC, in PMC) :object_base {
 =item B<newclass>(out PMC, in STR)
 
 Creates a new Parrot-style class, named $2, and puts the new PMC for it
-into $1. 
+into $1.
 
 =item B<newclass>(out PMC, in PMC)
 
@@ -296,7 +296,7 @@ op subclass(out PMC, inconst PMC) :object_classes {
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
     STRING *name = readable_name(interpreter, $2);
-    real_exception(interpreter, next, NO_CLASS, 
+    real_exception(interpreter, next, NO_CLASS,
                 "Class '%Ss' doesn't exist", name);
   }
   $1 = VTABLE_subclass(interpreter, class, PMCNULL);
@@ -321,7 +321,7 @@ op subclass(out PMC, inconst PMC, in STR) :object_classes {
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
     STRING *name = readable_name(interpreter, $2);
-    real_exception(interpreter, next, NO_CLASS, 
+    real_exception(interpreter, next, NO_CLASS,
                 "Class '%Ss' doesn't exist", name);
   }
   subname_p = pmc_new(interpreter, enum_class_String);
@@ -350,7 +350,7 @@ op subclass(out PMC, inconst PMC, in PMC) :object_classes {
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
     STRING *name = readable_name(interpreter, $2);
-    real_exception(interpreter, next, NO_CLASS, 
+    real_exception(interpreter, next, NO_CLASS,
                 "Class '%Ss' doesn't exist", name);
   }
   $1 = VTABLE_subclass(interpreter, class, $3);
@@ -393,7 +393,7 @@ inline op getclass(out PMC, in PMC) :object_classes {
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
     STRING *name = readable_name(interpreter, $2);
-    real_exception(interpreter, next, NO_CLASS, 
+    real_exception(interpreter, next, NO_CLASS,
          "Class '%Ss' doesn't exist", name);
   }
   else

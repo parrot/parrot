@@ -68,7 +68,7 @@ Does what stm_wait does, but if the outer transaction is invalid after
 waiting or after the inner transaction is aborted, jumps to $1.
 
 (The jump is needed because otherwise the inner transaction may never succeed
-because the outer transaction constrains it to not see new values.) 
+because the outer transaction constrains it to not see new values.)
 
 =cut
 

@@ -107,7 +107,7 @@ MMD operations.
 
 Concatenate the strings $3 to $2 and places the result into $1.
 The C<PMC> versions are MMD operations. The C<n_> variants are
-creating a new result as usual. See also F<src/ops/math.ops> for 
+creating a new result as usual. See also F<src/ops/math.ops> for
 the general C<infix> and C<n_infix> syntax.
 
 =cut
@@ -346,7 +346,7 @@ inline op sprintf(out STR, in STR, invar PMC) :base_core {
 
 inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
     $1->vtable->set_string_native(interpreter, $1,
-        Parrot_psprintf(interpreter, 
+        Parrot_psprintf(interpreter,
                        $2->vtable->get_string(interpreter, $2), $3)
     );
     goto NEXT();
@@ -675,7 +675,7 @@ inline op find_not_cclass(out INT, in INT, in STR, in INT, in INT) {
 Escape all non-ascii chars to backslashed escape sequences. A
 string with charset I<ascii> is created as result.
 
-=item B<compose>(out STR, in STR) 
+=item B<compose>(out STR, in STR)
 
 Compose (normalize) a string.
 
