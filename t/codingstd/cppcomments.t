@@ -37,7 +37,7 @@ if (@ARGV) {
    check_cppcomments( \@ARGV, 'files from commandline' );
 }
 else {
-    plan( tests => 5 );
+    plan( tests => 6 );
 
     my $DIST = Parrot::Distribution->new();
     check_cppcomments(
@@ -59,6 +59,10 @@ else {
     check_cppcomments(
         [ map( $_->files_of_type('Lex file'), $DIST->lex_source_file_directories() ) ],
         'Lex file'
+    );
+    check_cppcomments(
+        [ map( $_->files_of_type('Parrot opcod file'), $DIST->ops_source_file_directories() ) ],
+        'Parrot opcode file'
     );
 }
 
