@@ -4,6 +4,10 @@
 #include "parrot/parrot.h"
 #include "astparser.h"
 
+#ifndef PARROT_HAS_HEADER_UNISTD
+#  define YY_NO_UNISTD_H 1
+#endif
+
 typedef enum {
     CTX_UNK,        /* unknown context */
     CTX_BOOL,
