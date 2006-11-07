@@ -3,6 +3,7 @@
 # $Id$
 
 use strict;
+use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 43;
 use Test::More;
@@ -58,7 +59,7 @@ pir_output_is(<<'CODE', <<'OUT', "karl spot bug 1");
 
     print_newline
     end
-tc:    
+tc:
     .return foo(1, 9, i, j,k)
 .end
 CODE
@@ -84,7 +85,7 @@ pir_output_is(<<'CODE', <<'OUT', "karl tailcall 3 args");
     print_item k
     print_newline
     end
-tc:    
+tc:
     .return foo(1, j, i, i)
 .end
 CODE
@@ -119,7 +120,7 @@ pir_output_is(<<'CODE', <<'OUT', "cycle no exit 1");
 
     print_newline
     end
-tc:    
+tc:
     .return foo(1, m,i,j,k,l)
 .end
 CODE
@@ -153,7 +154,7 @@ pir_output_is(<<'CODE', <<'OUT', "cycle no exit 2");
 
     print_newline
     end
-tc:    
+tc:
     .return foo(1, m,l,j,i,k)
 .end
 CODE
@@ -187,7 +188,7 @@ pir_output_is(<<'CODE', <<'OUT', "2 unconnected cycles no exit ");
 
     print_newline
     end
-tc:    
+tc:
     .return foo(1, k,m,i,j,l)
 .end
 CODE
@@ -221,7 +222,7 @@ pir_output_is(<<'CODE', <<'OUT', "cycle with exit 1");
 
     print_newline
     end
-tc:    
+tc:
     .return foo(1, j,i,j,i,j)
 .end
 CODE
@@ -306,7 +307,7 @@ pir_output_is(<<'CODE', <<'OUT', "tailcall 3 args");
     print_item k
     print_newline
     end
-tc:    
+tc:
     .return foo(1, i, k, j)
 .end
 CODE
@@ -366,10 +367,10 @@ undef @b;
 permute {push @b,"@_"} @array;
 foreach $x (@b)
 {
-	$x=~tr/ /,/;
-	$y=$x;
-	$y=~tr/ijkl/1234/;
-	pir_output_is(<<"CODE", <<"OUT", "tailcall 4 args $x");	
+    $x=~tr/ /,/;
+    $y=$x;
+    $y=~tr/ijkl/1234/;
+    pir_output_is(<<"CODE", <<"OUT", "tailcall 4 args $x");
 .sub _main
     foo(0, 1, 2, 3, 4)
 .end
@@ -387,7 +388,7 @@ foreach $x (@b)
     print k
     print ","
     print l
-	print_newline
+    print_newline
     end
 tc:
     .return foo(1, $x )
@@ -427,4 +428,12 @@ CODE
 $y
 OUT
 }
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
 

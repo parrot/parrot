@@ -3,6 +3,7 @@
 # $Id$
 
 use strict;
+use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 3;
 
@@ -58,3 +59,10 @@ CODE
 _test:
   end
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
