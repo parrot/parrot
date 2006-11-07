@@ -88,6 +88,9 @@ sub source_files {
 
         map( $_->files_of_type('Lex file'),
             $DIST->lex_source_file_directories ),
+
+        map( $_->files_of_type('Parrot opcode file'),
+            $DIST->ops_source_file_directories ),
     );
 }
 
