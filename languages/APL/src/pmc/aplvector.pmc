@@ -31,7 +31,7 @@ size_of_shape(Interp *interpreter, PMC* self, PMC* shape)
     INTVAL length;
     INTVAL pos;
 
-    if (!shape || shape == PMCNULL) { 
+    if (!shape || shape == PMCNULL) {
         /* not set, so a simple 1D */
         return VTABLE_get_integer(interpreter, self);
     }
@@ -41,7 +41,7 @@ size_of_shape(Interp *interpreter, PMC* self, PMC* shape)
     for (pos = 0; pos < dimension; pos++)
     {
         length = VTABLE_get_integer_keyed_int(interpreter, shape, pos);
-        retval *= length; 
+        retval *= length;
     }
     return retval;
 }
@@ -121,11 +121,11 @@ Returns a vector-like PMC containing the shape of this PMC.
             * No shape has been set yet. This means that we are
             * a simple vector
             *
-            * we use our own type here. Perhaps a better way to 
+            * we use our own type here. Perhaps a better way to
             * specify it?
             */
             /*
-            array_t = pmc_type(INTERP, 
+            array_t = pmc_type(INTERP,
                 string_from_const_cstring(INTERP, "APLVector", 0)
             );
             */
