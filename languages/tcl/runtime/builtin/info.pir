@@ -322,5 +322,5 @@ find_level:
   .return(0)
 .end
 
-#XXX default - watch out for return value and default value.
+#XXX (#40745): default - watch out for return value and default value.
 #XXX (#40744): cmdcount - not being tracked. :(
