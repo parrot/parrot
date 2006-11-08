@@ -369,7 +369,7 @@ bad_args:
   .return(0)
 .end
 
-# XXX Stub for test parsing
+# XXX (#40727): Stub for test parsing
 .sub 'copy'
   .param pmc argv
   .return(0)
