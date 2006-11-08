@@ -224,7 +224,7 @@ preferable to write as early a bytecode format as is possible, to allow the
 greatest compatibility with previous Parrots.
 
 These versions will be listed in the PBC_COMPAT file, sorted with the latest
-version first. in the format:
+version first in the format:
 
 MAJOR.MINOR DATE DESCRIPTION
 
@@ -524,6 +524,8 @@ particular HLL source file (an annotation group starting clears all active
 annotations, so they will not spill over between source files; it also
 allows for faster lookup of annotations).
 
+{{ TODO: Does it clear all annotations, or all annotation groups? }}
+
 =item A list of indexes into the bytecode stream and key/value pairings (for
 example, starting at instruction 235, the annotation "line" has value "42").
 
@@ -556,7 +558,7 @@ key. Key entries take the following format.
   +--------+--------+--------------------------------------------------------+
 
 The annotation groups table comes next. This starts with a single integer to
-specify the numbe of entries in the table.
+specify the number of entries in the table.
 
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |
@@ -673,8 +675,12 @@ A packfile will be represented in memory by Parrot as a tree of PMCs. These
 will provide a programatic way to construct and walk packfiles, both for the
 Parrot internals and from programs running on the Parrot VM.
 
-{{ QUESTION: Will the CStruct PMC make it into Parrot? If so, we may want to
-change the interface of these PMCs to take advantage of it. }}
+{{ TODO... QUESTION: Will the CStruct PMC make it into Parrot? If so, we
+may want to change the interface of these PMCs to take advantage of it. 
+ANSWER: Yes it will (most likely with a different name), but it needs to
+be prototyped first. Do you want to hold off on implementing the
+bytecode changes until it's available? I say go ahead and implement now,
+then revise when the new PMC is available. }}
 
 
 =head3 Packfile.pmc
