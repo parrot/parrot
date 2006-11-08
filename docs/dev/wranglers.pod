@@ -17,7 +17,7 @@ filing procedures for end users are documented in F<docs/submissions.pod>.
 =head1 WHAT IS A BUG WRANGLER?
 
 A developer with sufficient permissions to modify the tickets in Parrot's RT
-system.  All Parrot developers are expect to pitch in and help keep the bug
+system.  All Parrot developers are expected to pitch in and help keep the bug
 tracker in a healthy state.  I<This means you!>
 
 =head1 WHERE IS IT?
@@ -79,16 +79,16 @@ This way you will receive further correspondence about the ticket.
 
 =item * make manitest
 
-=item * add the patch author to CREDITS or update the authors entry in CREDITS
+=item * add the patch author to CREDITS or update the author's entry in CREDITS
 
 =item * add correspondence to the bug stating that the patch was applied AND
 the svn revision number.
 
-=item * make sure that the bugs 'Tag' includes 'Patch'
+=item * make sure that the bug's 'Tag' includes 'Patch'
 
-=item * set the bugs 'Patch Status' to 'Applied'
+=item * set the bug's 'Patch Status' to 'Applied'
 
-=item * set the bugs 'Status' to 'resolved'
+=item * set the bug's 'Status' to 'resolved'
 
 =back
 
@@ -101,8 +101,8 @@ If the bug is more then I<1 month> old then it's considered an I<old> bug.
 =item * Ping the requestor
 
 Give the requestor at least I<1 week> to respond.  If no response is received
-then add a comment to the bug saying that the bug is being close because of no
-response from the requestor change the status to C<rejected>.
+then add a comment to the bug saying that the bug is being closed because of no
+response from the requestor.  Change the status to C<rejected>.
 
 If it's a [PATCH] bug it's possible that the patch was applied but the
 bug/patch status was never changed.   Also, not all list traffic regarding a
@@ -157,8 +157,8 @@ think that their bug was unimportant or ignored.
 
     Hi,
 
-    Can you retest for this bug with the latest sources from SVN and confirm
-    that this still an open issue?
+    Can you retest for this bug with the latest sources from SVN
+    and confirm that this still an open issue?
 
     Thanks,
 
@@ -242,7 +242,7 @@ much easier.
 =item Commit file names
 
 You don't need to include the filename in the commit message as that's part
-of the commit itself. However, if your commit affects multiple directoires,
+of the commit itself. However, if your commit affects multiple directories,
 you may mention that, especially if it's part of a group of commits.
 
   [PDD07]: whitespace -- part 5
