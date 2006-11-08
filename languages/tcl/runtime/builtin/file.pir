@@ -375,7 +375,7 @@ bad_args:
   .return(0)
 .end
 
-# XXX Stub for test parsing
+# XXX (#40728): Stub for test parsing
 .sub 'rootname'
   .param pmc argv
   .return(0)
