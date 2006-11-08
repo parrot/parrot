@@ -310,7 +310,7 @@ find_level:
   .return(0)
 .end
 
-# XXX stub
+# XXX (#40741): stub
 .sub 'nameofexecutable'
   .param pmc argv
   .return('parrot tcl.pbc')
