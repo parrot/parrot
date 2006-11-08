@@ -33,6 +33,17 @@ The Parrot issues are in the queue I<parrot>.
 Where I<New> refers to a pre-existing ticket sitting in the Parrot queue with a
 status of C<new>.
 
+=head3 Bug Triage
+
+Involves deciding whether the ticket is a real bug, a feature request, a
+duplicate or spam.
+
+It is especially important that all C<new> bugs which are marked [TODO],
+[PATCH] or [CAGE] be checked that they really are bugs of the given class.
+This is because some bugs, such as [TODO] and [CAGE] get their status set to
+C<open> to indicate that something should be done, rather than something is
+being done.
+
 =over 4
 
 =item Is this spam?
@@ -66,7 +77,14 @@ Make sure that there is actually a patch attached to the ticket. If you've
 applied a patch, be sure to include the revision in your response when closing
 the ticket.
 
-=item Assign the ticket to someone if at all possible.
+=item * Is it a [CAGE] bug?
+
+Is the subject line in the format C<"[CAGE] subsystem - issue>?
+
+C<[CAGE]> bugs should have their status changed to C<open> to prevent them from
+appearing in a listing of C<new> bugs.
+
+=item * Assign the bug to someone if at all possible.
 
 =back
 
