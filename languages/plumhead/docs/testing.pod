@@ -1,0 +1,35 @@
+# $Id$
+
+=head1 NAME
+ 
+Plumhead - Testing
+
+=head1 Testsuite
+
+For testing the test-suite from a current PHP release is used.
+For sanity checking there are also very few tests in
+languages/plumhead/t. These are used by 'make test'. 
+
+=head1 How to run the PHP test suite
+
+A problem are relative paths used by both the PHP test suite and
+by the generated PIR. Something like this worked for me under Linux.
+
+  cd ~/devel/Parrot/trunk
+  perl Configure.pl && make
+  cd languages/punie
+  make
+  cd ~/devel/PHP/php-5.2.0
+  ./configure && make
+  ln -s ../../Parrot/trunk/parrot
+  ln -s ../../Parrot/trunk/languages
+  export TEST_PHP_EXECUTABLE=../../Parrot/languages/plumhead.pl
+  php run-tests.php 
+  
+Good luck.
+
+=head1 Author
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
+
+=cut
