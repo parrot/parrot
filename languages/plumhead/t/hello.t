@@ -20,7 +20,7 @@ use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 2;
+use Test::More     tests => 3;
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
 <?php
@@ -28,6 +28,13 @@ echo "Hello, World!\n";
 ?>
 END_CODE
 Hello, World!
+END_EXPECTED
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'only alphanumic' );
+<?php echo "Hello World"; ?>
+<?php echo "\n"; ?>
+END_CODE
+Hello World
 END_EXPECTED
 
 

@@ -28,8 +28,9 @@ a PAST and runs the PAST with help of the parrot compiler tools.
   load_bytecode 'languages/punie/lib/OSTGrammar.pir'              
   load_bytecode 'MIME/Base64.pbc'              
                                                                   
-  .local pmc dec_sub
-  dec_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
+  # phc encodes most but not all strings in base64
+  .local pmc decode_base64
+  decode_base64 = get_global [ "MIME"; "Base64" ], 'decode_base64'
     
   # The root node of PAST.
   # It will receive another PAST::Stmts node as daughter 
@@ -128,8 +129,15 @@ a PAST and runs the PAST with help of the parrot compiler tools.
   <xsl:choose>
     <xsl:when test="@valtype = 'strqq'" >
       .local string val_<xsl:value-of select="generate-id(.)" />
-      val_<xsl:value-of select="generate-id(.)" /> = dec_sub( "<xsl:value-of select="." />" )
-      val_<xsl:value-of select="generate-id(.)" /> = escape val_<xsl:value-of select="generate-id(.)" />
+      <xsl:choose>
+        <xsl:when test="@encoding = 'base64'" >
+          val_<xsl:value-of select="generate-id(.)" /> = decode_base64( "<xsl:value-of select="." />" )
+          val_<xsl:value-of select="generate-id(.)" /> = escape val_<xsl:value-of select="generate-id(.)" />
+        </xsl:when>
+        <xsl:otherwise>
+          val_<xsl:value-of select="generate-id(.)" /> = "<xsl:value-of select="." />"
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:when>
     <xsl:when test="@valtype = 'int'" >
       .local int val_<xsl:value-of select="generate-id(.)" />
@@ -157,6 +165,8 @@ a PAST and runs the PAST with help of the parrot compiler tools.
 </xsl:template>
 <xsl:template match="@valtype">
   past_node_<xsl:value-of select="generate-id(..)" />.'valtype'( '<xsl:value-of select="." />' )
+</xsl:template>
+<xsl:template match="@encoding">
 </xsl:template>
 
 </xsl:stylesheet>
