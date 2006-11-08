@@ -303,8 +303,8 @@ find_level:
   .return(0)
 .end
 
-#XXX sharedlibextension - should be able to pull this from parrot config.
 # XXX stub
+# sharedlibextension - should be able to pull this from parrot config.
 .sub 'sharedlibextension'
   .param pmc argv
   .return(0)
