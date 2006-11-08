@@ -303,7 +303,7 @@ find_level:
   .return(0)
 .end
 
-# XXX stub
+# XXX (#40740): stub
 # sharedlibextension - should be able to pull this from parrot config.
 .sub 'sharedlibextension'
   .param pmc argv
