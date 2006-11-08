@@ -63,7 +63,7 @@ proc is {value expected {description ""} {special {}}}  {
     }
 }
 
-# XXX Need to handle the case where we expect an exception.
+# XXX (#40714): Need to handle the case where we expect an exception.
 proc eval_is {code expected {description ""} {special {}}}  {
     global very_bad_global_variable_test_num
     # The one case where skip actually means "don't do that"
