@@ -357,7 +357,7 @@ bad_args:
   .return(0)
 .end
 
-# XXX Stub for test parsing
+# XXX (#40725): Stub for test parsing
 .sub 'delete'
   .param pmc argv
   .return(0)
