@@ -23,7 +23,7 @@ tracker in a healthy state.  I<This means you!>
 =head1 WHERE IS IT?
 
 The Parrot ticket tracker is currently the same as the I<Perlbug> system used for
-Perl5 Development.  It is available via HTTP at L<http://rt.perl.org>.
+Perl5 Development.  It is available at L<https://rt.perl.org>.
 The Parrot issues are in the queue I<parrot>.
 
 =head1 TICKET HANDLING PROCEDURES
