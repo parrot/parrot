@@ -132,7 +132,7 @@ proc test {num description code args} {
     if {[llength $args] == 0} {
         pass $full_desc [list SKIP $excuse]
     } elseif {[llength $args] == 1} {
-        # XXX Some of these tests cause harness failures. skip them.
+        # XXX (#40716): Some of these tests cause harness failures. skip them.
         # Put the skip here instead of in the test file to keep all our
         # hacks in one basket.
         if {
