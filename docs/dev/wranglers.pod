@@ -211,6 +211,64 @@ or
 
     -J
 
+=head1 SVN USAGE TIPS
+
+=head2 Commit messages
+
+=over 4
+
+=item Put a subsystem identifier out the front
+
+  [tcl]: commit message
+
+=item If related to an RT ticket, use the ticket title
+
+  [tcl]: #37301: [BUG] 9262: env tests failing on win32
+
+=item Add a "Courtesy of <foo>" if supplied by someone else
+
+  Courtesy of A. U. Thor <author@cpan.org>
+
+=item Detailed commit messages are preferred
+
+Make it clear what your intent is when committing. It makes future maintenance
+much easier.
+
+  [PGE]:
+  * Switched "PGE::Regex" to be "PGE::Grammar", to be more accurate.
+  * Moved default rules from PGE::Regex into PGE::Match.
+  * Updated various languages and tools to match.
+
+=item Commit file names
+
+You don't need to include the filename in the commit message as that's part
+of the commit itself. However, if your commit affects multiple directoires,
+you may mention that, especially if it's part of a group of commits.
+
+  [PDD07]: whitespace -- part 5
+  ~ removed trailing spaces and tabs from t/exit/, t/dynpmc/, t/dynoplibs/
+
+=item Group similar commits by parts
+
+If all commits are much the same and require basically the same commit
+message, it can be useful to number the commit messages. For example:
+
+  [tools]: smartlink functionality -- part 3
+  ~ added regex attribute to Keyphrase class
+  ~ filled in some more SmartLinkServer attribute init code
+  ~ expanded LinkTree class functionality
+  still TODO: merge smartlink and spec info, emit html, improve cmdline option code
+
+You may optionally include items that are still todo, as it helps make your
+intentions clear.
+
+=item More ideas
+
+Look at past commit messages, and L<http://cia.navi.cx/stats/project/parrot>
+for more best practices.
+
+=back
+
 =head1 AUTHOR
 
 Joshua Hoblitt (JHOBLITT) C<jhoblitt@cpan.org>
