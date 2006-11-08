@@ -26,13 +26,13 @@ our @args;
 sub runstep
 {
     my ($self, $conf) = @_;
-   
+
     genfile('config/gen/makefiles/languages.in' => 'languages/Makefile');
 
     my @languages = qw{
         APL amber bc befunge bf cardinal c99 cola ecmascript HQ9plus
-        jako lisp lua m4 ook parrot_compiler perl6 pheme pugs punie regex 
-        scheme tap urm WMLScript Zcode
+        jako lisp lua m4 ook parrot_compiler perl6 pheme plumhead pugs punie
+        regex scheme tap urm WMLScript Zcode
     };
 
     foreach my $language (@languages) {

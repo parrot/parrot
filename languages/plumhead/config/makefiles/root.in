@@ -1,6 +1,6 @@
-# $Id$
+# $Id: Makefile 14888 2006-10-11 02:16:37Z coke $
 
-PERL = /usr/bin/perl
+PERL = @perl@
 
 # default
 all:
@@ -30,23 +30,16 @@ help:
 
 test: test-php test-phc-to-past
 
-test-php: 
-	- pwd ; cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
+test-php:
+	cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
 
 test-phc-to-past:
-	- pwd ; cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc-to-past
+	cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc-to-past
 
 # For smoke testing build only the Implementation in Python
-build: 
+build:
 
 clean: clean-test
 
-clean-test: 
+clean-test:
 	$(RM_F) \
-    "t/*.php" "t/*.pir" "t/*.out"
-
-realclean: clean
-	$(RM_F) \
-    Makefile
-
-distclean: realclean
