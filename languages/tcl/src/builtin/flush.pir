@@ -59,7 +59,7 @@ END_PIR
   pir_code .=<<"END_PIR"  
 do_flush:
   # check whether it was opened for writing
-  # XXX TODO -- Seems like ParrotIO.pmc doesn't have support for this
+  # XXX (#40712): TODO -- Seems like ParrotIO.pmc doesn't have support for this
 
   # everything ok, flush it
   channel."flush"()
