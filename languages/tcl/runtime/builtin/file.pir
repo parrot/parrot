@@ -301,7 +301,7 @@ bad_args:
   $I1 = $P2[8]
   .return ($I1)
 
-# XXX should be more discriminating about the error messages .OS generates
+# XXX (#40736): should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
