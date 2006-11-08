@@ -245,7 +245,7 @@ bad_args:
   $S1 = $P4[$I3]
   .return ($S1)
 
-# XXX should be more discriminating about the error messages .OS generates
+# XXX (#40734): should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
