@@ -86,32 +86,6 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<INTVAL cmp (PMC* value)>
-
-=cut
-
-*/
-    INTVAL cmp (PMC* value) {
-MMD_LuaFunction: {
-            real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare two function values");
-            return (INTVAL)0;
-        }
-MMD_LuaClosure: {
-            real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare two function values");
-            return (INTVAL)0;
-        }
-MMD_DEFAULT: {
-            real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare function with %s",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return (INTVAL)0;
-        }
-    }
-
-/*
-
 =back
 
 =head2 Specific Methods
