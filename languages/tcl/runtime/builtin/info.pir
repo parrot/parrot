@@ -297,7 +297,7 @@ find_level:
   .return(0)
 .end
 
-# XXX stub
+# XXX (#40739): stub
 .sub 'script'
   .param pmc argv
   .return(0)
