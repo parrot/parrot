@@ -316,7 +316,7 @@ find_level:
   .return('parrot tcl.pbc')
 .end
 
-# XXX stub
+# XXX (#40742): stub
 .sub 'loaded'
   .param pmc argv
   .return(0)
