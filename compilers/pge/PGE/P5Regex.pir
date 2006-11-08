@@ -17,9 +17,10 @@
 
     .local string target
     target = adverbs['target']
+    target = downcase target
 
     .local pmc match
-    $P0 = get_hll_global ["PGE::Grammar"], "p5regex"
+    $P0 = get_global "p5regex"
     match = $P0(source)
     if target != 'parse' goto check
     .return (match)
@@ -39,23 +40,9 @@
     pad = new .Hash
     pad['subpats'] = 0
     exp = exp.'p5analyze'(pad)
-    if target != 'exp' goto pir
-    .return (exp)
-
-  pir:
-    .local pmc code
-    code = exp.'root_pir'(adverbs :flat :named)
-    if target != 'PIR' goto bytecode
-    .return (code)
-
-  bytecode:
-    $P0 = compreg 'PIR'
-    $P1 = $P0(code)
-    .return ($P1)
+    .return exp.'compile'(adverbs :flat :named)
 .end
 
-
-.namespace [ "PGE::Grammar" ]
 
 .sub "p5regex"
     .param pmc mob
@@ -69,8 +56,6 @@
 .include "cclass.pasm"
 
 .const int PGE_INF = 2147483647
-
-.namespace [ "PGE::P5Regex" ]
 
 .sub "__onload" :load
     .local pmc optable

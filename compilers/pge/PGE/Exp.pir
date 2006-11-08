@@ -44,6 +44,49 @@ PGE::Exp - base class for expressions
 
 =over 4
 
+=item C<compile(PMC source, PMC adverbs :slurpy :named)>
+
+Compile the C<source> expression into PIR or a subroutine,
+according to the C<target> adverb.  
+
+=cut
+
+.sub 'compile'
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    .local string target
+    target = adverbs['target']
+    target = downcase target
+
+    .local string grammar
+    .local string nsformat
+    nsformat = '.namespace'
+    grammar = adverbs['grammar']
+    if grammar == '' goto pir
+    nsformat = ".namespace [ '%0' ]"
+  pir:
+    .local pmc code
+    code = new 'PGE::CodeString'
+    code.'emit'(nsformat, grammar)
+    $P0 = source.'root_pir'(adverbs :flat :named)
+    code .= $P0
+    if target != 'pir' goto bytecode
+    .return (code)
+
+  bytecode:
+    $P0 = compreg 'PIR'
+    $P1 = $P0(code)
+  make_grammar:
+    if grammar == '' goto end
+    $I0 = find_type grammar
+    if $I0 > 0 goto end
+    $P0 = subclass 'PGE::Grammar', grammar
+  end:
+    .return ($P1)
+.end
+
+
 =item C<root_pir(PMC adverbs)>
 
 Return a CodeString object containing the entire expression
