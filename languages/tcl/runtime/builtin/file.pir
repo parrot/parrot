@@ -339,7 +339,7 @@ bad_args:
   tcl_error 'wrong # args: should be "file mtime name"'
 .end
 
-# XXX Stub for test parsing
+# XXX (#40722): Stub for test parsing
 .sub 'dirname'
   .param pmc argv
   .return(0)
