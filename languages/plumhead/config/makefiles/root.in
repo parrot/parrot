@@ -36,10 +36,10 @@ test-php:
 test-phc-to-past:
 	cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc-to-past
 
-# For smoke testing build only the Implementation in Python
+# Nothing needs to be built
 build:
 
 clean: clean-test
 
+# Leave the generated test files in place
 clean-test:
-	$(RM_F) \
