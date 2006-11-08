@@ -61,18 +61,6 @@ Throws an exception.
 
 /*
 
-=item C<void set_bool(INTVAL value)>
-
-=cut
-
-*/
-    void set_bool (INTVAL value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaBoolean);
-        VTABLE_set_bool(INTERP, SELF, value);
-    }
-
-/*
-
 =item C<void set_pmc_keyed (PMC* key, PMC* value)>
 
 Throws an exception.
@@ -132,14 +120,13 @@ Throws an exception.
 
 =item C<PMC* logical_not(PMC *dest)>
 
-Common implementation (use C<get_bool> & C<set_bool>)
+Common implementation
 
 =cut
 
 */
     PMC* logical_not (PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, dynpmc_LuaBoolean);
         VTABLE_set_bool(INTERP, dest, ! DYNSELF.get_bool());
         return dest;
     }
