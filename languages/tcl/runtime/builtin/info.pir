@@ -290,7 +290,7 @@ find_level:
   .return(level)
 .end
 
-#XXX globals - should be doable. - just walk the "Tcl" namespace.
+#XXX (#40743): globals - should be doable. - just walk the "Tcl" namespace.
 #    this is a stub just to assist parsing.
 .sub 'globals'
   .param pmc argv
