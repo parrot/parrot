@@ -162,7 +162,7 @@ proc test {num description code args} {
     }
 }
 
-# XXX hacks to allow compilation of tests.
+# XXX (#40717): hacks to allow compilation of tests.
 
 # Constraints are like skip conditions that
 # can be specified by a particular invocation to test. Since we're ingoring
