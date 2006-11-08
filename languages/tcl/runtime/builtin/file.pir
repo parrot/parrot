@@ -351,7 +351,7 @@ bad_args:
   .return(0)
 .end
 
-# XXX Stub for test parsing
+# XXX (#40724): Stub for test parsing
 .sub 'readable'
   .param pmc argv
   .return(0)
