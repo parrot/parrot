@@ -33,7 +33,7 @@ few_args:
 .HLL '_Tcl', ''
 .namespace [ 'helpers'; 'file' ]
 
-.sub 'normalize' # XXX Stub for testing
+.sub 'normalize' # XXX (#40721): Stub for testing
   .param pmc argv
   $P0 = argv[0]
   .return ($P0)
