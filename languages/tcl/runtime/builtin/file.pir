@@ -363,7 +363,7 @@ bad_args:
   .return(0)
 .end
 
-# XXX Stub for test parsing
+# XXX (#40726): Stub for test parsing
 .sub 'exists'
   .param pmc argv
   .return(0)
