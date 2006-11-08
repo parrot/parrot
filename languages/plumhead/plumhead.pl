@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 # $Id$
 
 =head1 NAME
@@ -32,7 +34,7 @@ Log::Log4perl->easy_init( { level    => $DEBUG,
 
 my $logger = Log::Log4perl->get_logger();
 
-my ( $php_fn ) = @ARGV;
+my $php_fn = $ARGV[-1];
 
 # Generate the PHP AST as XML
 my $phc_str = `phc --dump-ast-xml $php_fn`;

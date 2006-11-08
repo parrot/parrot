@@ -29,7 +29,7 @@ Test cases taken from base64.t of MIME::Base64.
     is   = get_hll_global ['Test::More'], 'is'
     ok   = get_hll_global ['Test::More'], 'ok'
 
-    plan(552)
+    plan(551)
 ######################
 # ETOOMANYERROS
 #   plan(1)
@@ -326,8 +326,7 @@ END_JSON
   ["YQ","a"],
   ["Y",""],
   ["x==",""],
-  ["",""],
-  [null,""]
+  ["",""]
 ]
 END_JSON
 
