@@ -4,7 +4,7 @@
 # At the moment, this is *much* weaker testing harness than the one that
 # comes with tcl. However, it's very good for partcl in the short term.
 
-# XXX put this in a namespace to avoid global pollution
+# XXX (#40713): put this in a namespace to avoid global pollution
 
 proc skip_all {} {
     puts 1..0
