@@ -145,6 +145,10 @@ delegation.
 Perl 6: Delegation support is highly flexible, even allowing a regex to match
 method names that should be delegated to a particular object. 
 
+=head1 QUESTIONS
+
+Should we have a super or next opcode?
+
 =head1 ABSTRACT
 
 This PDD describes the semantics of Parrot's object and class systems. The PDD
