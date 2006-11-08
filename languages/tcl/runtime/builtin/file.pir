@@ -137,7 +137,7 @@ bad_args:
 
   .return('')
 
-# XXX should be more discriminating about the error messages .OS generates
+# XXX (#40731): should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
