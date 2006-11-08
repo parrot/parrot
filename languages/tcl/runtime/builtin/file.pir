@@ -47,7 +47,7 @@ few_args:
   if argc == 0 goto bad_args
 
   .local string dirsep
-  dirsep = '/' # XXX should pull from parrot config.
+  dirsep = '/' # XXX (#40730): should pull from parrot config.
 
   .local string result
   result = ''
