@@ -5,109 +5,119 @@
 
 =head1 NAME
 
-docs/dev/wranglers.pod - Tips for Bug Wranglers
+docs/dev/wranglers.pod - Tips for Ticket Wranglers
 
 =head1 ABSTRACT
 
 This document attempts to outline a set of "best practices" for dealing with
-bugs in Parrot's RT system.  It is targeted at Parrot developers and "Bug
-Wranglers" and is I<not> intended as advice or instruction for end users.  Bug
+tickets in Parrot's RT system.  It is targeted at Parrot developers and "Ticket
+Wranglers" and is I<not> intended as advice or instruction for end users.  Ticket
 filing procedures for end users are documented in F<docs/submissions.pod>.
 
-=head1 WHAT IS A BUG WRANGLER?
+=head1 WHAT IS A TICKET WRANGLER?
 
 A developer with sufficient permissions to modify the tickets in Parrot's RT
-system.  All Parrot developers are expected to pitch in and help keep the bug
+system.  All Parrot developers are expected to pitch in and help keep the ticket
 tracker in a healthy state.  I<This means you!>
 
 =head1 WHERE IS IT?
 
-The Parrot bug tracker is currently the same as the I<Perlbug> system used for
+The Parrot ticket tracker is currently the same as the I<Perlbug> system used for
 Perl5 Development.  It is available via HTTP at L<http://rt.perl.org>.
 The Parrot issues are in the queue I<parrot>.
 
-=head1 BUG HANDLING PROCEDURES
+=head1 TICKET HANDLING PROCEDURES
 
-=head2 New Bugs
+=head2 New Tickets
 
-Where I<New> refers to a pre-existing bug sitting in the Parrot queue with a
+Where I<New> refers to a pre-existing ticket sitting in the Parrot queue with a
 status of C<new>.
 
 =over 4
 
-=item * Is this spam?
+=item Is this spam?
 
-Assign the issue to the queue I<spam>.
+Assign the issue to the queue I<spam>. Note that if this is successful, you
+will no longer have permissions to view the ticket.
 
-=item * Is this a duplication of an existing bug?
+=item Is this a duplication of an existing ticket?
 
-RT doesn't handle that case in a graceful manner. 
-Set the relationship 'dependent on' to the duplicate issue. 
-Add a comment to the bug along the lines of 
-"Duplicate of Bug #123" and change the Tag field to "duplicate".
+RT doesn't handle that case in a graceful manner. Set the relationship
+'dependent on' to the duplicate issue. Add a comment to the ticket along the
+lines of "Duplicate of Ticket #123" and change the Tag field to "duplicate".
+Also, change the status to "rejected".
 
-=item * Is there enough information?
+=item Is there enough information?
 
-Ask for more input.
+If not, ask for more input.
 
-=item * Is it a [TODO] bug?
+=item Is it a [TODO] ticket?
 
 Is the subject line in the format C<"[TODO] subsystem - issue>?
 
-C<[TODO]> bugs should have their status changed to C<open> to prevent them from
-appearing in a listing of C<new> bugs.
+C<[TODO]> tickets should have their status changed to C<open> to prevent them
+from appearing in a listing of C<new> tickets.
 
-=item * Is it a [PATCH] bug?
+=item Is it a [PATCH] ticket?
 
 Is the subject line in the format C<"[PATCH] subsystem - issue>?
 
-Make sure that there is actually a patch attached to the bug...
+Make sure that there is actually a patch attached to the ticket. If you've
+applied a patch, be sure to include the revision in your response when closing
+the ticket.
 
-=item * Assign the bug to someone if at all possible.
+=item Assign the ticket to someone if at all possible.
 
 =back
 
-=head2 TODO Bugs
+=head2 TODO Tickets
 
 =over 4
 
-=item * Claim ownership or interest ( CC ) of the ticket.
+=item Claim ownership or interest ( CC ) of the ticket.
 
 This way you will receive further correspondence about the ticket.
 
-=item * Run the test suite
+=item Run the test suite
 
-=item * make manitest
+=item make manitest
 
-=item * add the patch author to CREDITS or update the author's entry in CREDITS
+=item add the patch author to CREDITS or update the author's entry
 
-=item * add correspondence to the bug stating that the patch was applied AND
-the svn revision number.
+=item add correspondence to the ticket stating that the patch was applied
+and include the svn revision number in your response.
 
-=item * make sure that the bug's 'Tag' includes 'Patch'
+=item make sure that the ticket's 'Tag' includes 'Patch'
 
-=item * set the bug's 'Patch Status' to 'Applied'
+=item set the ticket's 'Patch Status' to 'Applied'
 
-=item * set the bug's 'Status' to 'resolved'
+=item set the ticket's 'Status' to 'resolved'
 
 =back
 
-=head2 Old Bugs
+=head2 Old Tickets
 
-If the bug is more then I<1 month> old then it's considered an I<old> bug.
+If the ticket is more then I<1 month> old then it's considered I<old>.
 
 =over 4
 
-=item * Ping the requestor
+=item Ping the requestor
 
 Give the requestor at least I<1 week> to respond.  If no response is received
-then add a comment to the bug saying that the bug is being closed because of no
-response from the requestor.  Change the status to C<rejected>.
+then add a comment to the ticket saying that it is stalled because of no
+response from the requestor. Change the status to C<stalled>.
 
-If it's a [PATCH] bug it's possible that the patch was applied but the
-bug/patch status was never changed.   Also, not all list traffic regarding a
-bug ends up in RT.  It's best to look at the SVN repo to attempt to determine if
-the bug was resolved.
+If it's a [PATCH] ticket, it's possible that the patch was applied but the
+ticket/patch status was never changed.   Also, not all list traffic regarding a
+ticket ends up in RT.  It's best to look at the SVN repo to attempt to
+determine if the ticket was resolved.
+
+=item Review of stalled tickets
+
+Sometimes tickets are marked C<stalled> because there's no hope if fixing them
+soon. Sometimes, no response is available from the requestor, or it can't be
+verified. Periodically, these tickets should be reviewed, and when possible,
+moved back to C<open> or C<closed>, as appropriate.
 
 =back
 
@@ -115,9 +125,9 @@ the bug was resolved.
 
 =head2 Don't be a Butthead
 
-Remember that every word you type into the bug tracker is I<On The Record>.
+Remember that every word you type into the ticket tracker is I<On The Record>.
 Try not to say anything that could offend or hurt the feelings of I<anyone>.
-That includes the bug submitter and other developers.  When, as a Parrot
+That includes the ticket submitter and other developers.  When, as a Parrot
 developer with commit rights, you send correspondence you are representing the
 Parrot project and by proxy TPF.  If in doubt, either send the message
 privately or not at all.
@@ -125,7 +135,7 @@ privately or not at all.
 =head2 Say thank you!
 
 Try to add a little token of appreciation to every message you send in response
-to a bug.  Bug requestors are doing labor for free!  The least you can do is
+to a ticket.  Ticket requestors are doing labor for free!  The least you can do is
 let them know that you appreciate their efforts.
 
 Something like:
@@ -139,26 +149,26 @@ Something like:
     Thanks for X!
 
 Can work wonders.  If you can make someone feel good about themselves maybe
-they'll submit another bug/patch/whatever or perhaps some day become a Parrot
-developer.
+they'll submit another ticket/patch/whatever or perhaps some day become a
+Parrot developer.
 
 =head2 Don't say "problem"
 
 Supposedly it's better customer relations to use I<issue(s)> instead of the
 I<problem(s)>.  Don't ask me why...
 
-=head2 Make it clear why the bug status changed
+=head2 Make it clear why the ticket status changed
 
-Always note why the bug is having it's status changed.  Particularly if it is
-being closed or rejected.  Nothing will irritate people more then letting them
-think that their bug was unimportant or ignored.
+Always note why the ticket is having it's status changed.  Particularly if it
+is being closed or rejected.  Nothing will irritate people more then letting
+them think that their ticket was unimportant or ignored.
 
 =head2 Example Correspondence
 
     Hi,
 
-    Can you retest for this bug with the latest sources from SVN
-    and confirm that this still an open issue?
+    Can you retest for this ticket with the latest sources from SVN and confirm
+    that this still an open issue?
 
     Thanks,
 
@@ -192,7 +202,7 @@ or
 
 or
 
-    No response for requestor.  Bug being marked as 'rejected'.
+    No response for requestor.  Ticket being marked as 'rejected'.
     Thanks for reporting.
 
     -J
@@ -206,7 +216,7 @@ or
 
 or
 
-    Marking this bug as 'resolved' because it seems to have fixed itself.
+    Marking this ticket as 'resolved' because it seems to have fixed itself.
     Thanks for following up.
 
     -J
