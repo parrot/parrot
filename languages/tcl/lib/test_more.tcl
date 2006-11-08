@@ -122,8 +122,8 @@ proc diag {diagnostic} {
   puts stderr "# $diagnostic"
 }
 
-# XXX hacks to help avoid translating the actual tcl tests, until we actuall
-# support tcltest.
+# XXX (#40720): hacks to help avoid translating the actual tcl tests, until 
+# we actually support tcltest.
 
 # A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description code args} {
