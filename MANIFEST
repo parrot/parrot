@@ -368,7 +368,6 @@ docs/pdds/clip/pdd09_gc.pod                                 [main]doc
 docs/pdds/clip/pdd10_embedding.pod                          [main]doc
 docs/pdds/clip/pdd11_extending.pod                          [main]doc
 docs/pdds/clip/pdd12_assembly.pod                           [main]doc
-docs/pdds/clip/pdd13_bytecode.pod                           [main]doc
 docs/pdds/clip/pdd14_bignum.pod                             [main]doc
 docs/pdds/clip/pdd15_objects.pod                            [main]doc
 docs/pdds/clip/pdd16_native_call.pod                        [main]doc
@@ -383,6 +382,7 @@ docs/pdds/clip/pddXX_pmc.pod                                [main]doc
 docs/pdds/pdd00_pdd.pod                                     [main]doc
 docs/pdds/pdd03_calling_conventions.pod                     [main]doc
 docs/pdds/pdd07_codingstd.pod                               [main]doc
+docs/pdds/pdd13_bytecode.pod                                [main]doc
 docs/pdds/pdd20_lexical_vars.pod                            [main]doc
 docs/pdds/pdd21_namespaces.pod                              [main]doc
 docs/pdds/pdd23_exceptions.pod                              [main]doc
