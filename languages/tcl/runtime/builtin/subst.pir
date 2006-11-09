@@ -14,7 +14,7 @@
 
   a_string = argv[0]
 
-  # XXX not handling anything. Just a slightly better stub.
+  # XXX (#40779): not handling anything. Just a slightly better stub.
   .return (a_string)
 
 badargs:
