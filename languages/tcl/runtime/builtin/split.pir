@@ -14,7 +14,7 @@
 
   .local string splitchars,splitstring
   splitstring = argv[0]
-  # XXX Make this the default whitespace splitchars.
+  # XXX (#40755): Make this the default whitespace splitchars.
   splitchars = ' '
 
   if argc == 1 goto got_splitchars
