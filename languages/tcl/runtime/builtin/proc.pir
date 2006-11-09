@@ -154,7 +154,7 @@ args_loop_done:
 
 store_info:
   # Save the args for the proc for [info args]
-  # XXX When dealing with defaults, this will have to be updated.
+  # XXX (#40750): When dealing with defaults, this will have to be updated.
   $P1 = get_root_global ['_tcl'], 'proc_args'
   $P1[full_name] = args_info
 
