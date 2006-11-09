@@ -1,4 +1,4 @@
-# Copyright (C) 2004, The Perl Foundation.
+# Copyright (C) 2004-2006, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -59,6 +59,7 @@ sub new
         $self->new_section('Parakeet', 'parakeet.html', '', 'languages/parakeet'),
         $self->new_section('Perl6', 'perl6.html', '', 'languages/perl6'),
         $self->new_section('pheme', 'pheme.html', '', 'languages/pheme'),
+        $self->new_section('Plumhead', 'plumhead.html', '', 'languages/plumhead'),
         $self->new_section('Pugs', 'pugs.html', '', 'languages/pugs'),
         $self->new_section('Punie', 'punie.html', '', 'languages/punie'),
         $self->new_section('Python', 'python.html', '', 'languages/python'),
