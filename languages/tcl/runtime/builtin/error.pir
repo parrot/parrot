@@ -1,7 +1,7 @@
 ###
 # [error]
 
-# XXX only handles the one arg form of error right now.
+# XXX (#40757): only handles the one arg form of error right now.
 # need global vars before setting errorInfo, and stack tracing isn't
 # ready yet.
 # (So, the usage statement lies)
