@@ -70,8 +70,20 @@ or the resulting PIR code (target='PIR').
 .end
 
 
+.sub 'main' :main
+    .param pmc args
+
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
+
+    $P0 = compreg 'PGE::Glob'
+    .return $P0.'command_line'(args)
+.end
+
+
 .sub '__onload' :load :init
     .local pmc optable
+    load_bytecode 'PGE.pbc'
     load_bytecode 'Parrot/HLLCompiler.pbc'
 
     optable = new 'PGE::OPTable'
