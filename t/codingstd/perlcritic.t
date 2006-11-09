@@ -17,7 +17,7 @@ BEGIN {
     if ($@) {
         plan skip_all => 'Test::Perl::Critic not installed';
     }
-    Test::Perl::Critic->import(-verbose => 7);
+    Test::Perl::Critic->import(-verbose => 2);
 }
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
@@ -133,8 +133,10 @@ foreach my $policy ( keys %policies ) {
 }
 
 Test::Perl::Critic->import(
-    -format => '[%p] %m at %l,%c',
-    -config => $config
+#    -format => '[%p] %m at %l,%c',
+    -verbose => 2,
+    -config => $config,
+    -top => 1,
 );
 
 foreach my $file ( sort @files ) {
