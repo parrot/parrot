@@ -214,7 +214,7 @@ out_of_args:
   set = get_root_global ['_tcl'], '__set'
   set(varname, '')
 
-  .return (0) # XXX Hack to avoid parsing errors for tcl tests.
+  .return (0) # XXX (#40763): Hack to avoid parsing errors for tcl tests.
 
 bad_args:
   tcl_error 'wrong # args: should be "binary scan value formatString ?varName varName ...?"'
