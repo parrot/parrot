@@ -239,7 +239,7 @@ END_PIR
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
 
-  # (see note on trans_charset in lib/parser.pir) XXX
+  # (see note on trans_charset in lib/parser.pir) XXX (#40752):
   $S0 = code
   $I0 = find_charset 'ascii'
   $S0 = trans_charset $I0
