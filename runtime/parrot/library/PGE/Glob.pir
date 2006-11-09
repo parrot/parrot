@@ -31,11 +31,12 @@ or the resulting PIR code (target='PIR').
 
     .local string target
     target = adverbs['target']
+    target = downcase target
 
     .local pmc match
     null match
     if source == '' goto analyze
-    $P0 = find_global 'PGE::Grammar', 'glob'
+    $P0 = get_global 'glob'
     match = $P0(source)
     if target != 'parse' goto check
     .return (match)
@@ -64,19 +65,8 @@ or the resulting PIR code (target='PIR').
     $P0 = new 'PGE::Exp::Anchor'
     $P0.'result_object'('$')
     exp[$I0] = $P0
-    if target != 'exp' goto pir
-    .return (exp)
 
-  pir:
-    .local pmc code
-    code = exp.'root_pir'()
-    if target != 'PIR' goto bytecode
-    .return (code)
-
-  bytecode:
-    $P0 = compreg 'PIR'
-    $P1 = $P0(code)
-    .return ($P1)
+    .return exp.'compile'(adverbs :flat :named)
 .end
 
 
@@ -111,14 +101,9 @@ or the resulting PIR code (target='PIR').
 =item C<glob(PMC mob, PMC adverbs :slurpy :named)>
 
 Parses a glob expression, returning the corresponding
-parse C<PGE::Match> object.   This is installed as a
-C<< <glob> >> subrule in C<PGE::Grammar>, so one can call
-it from another regex in order to parse a valid glob
-expression.
+parse C<PGE::Match> object.   
 
 =cut
-
-.namespace [ 'PGE::Grammar' ]
 
 .const int GLOB_INF = 2147483647 
 
@@ -132,8 +117,6 @@ expression.
     .return (match)
 .end
 
-
-.namespace [ 'PGE::Glob' ]
 
 .sub 'scan_literal'
     .param string target
