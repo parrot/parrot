@@ -574,7 +574,7 @@ bad_args:
 .end
 
 
-# XXX doesn't currently respect the -options.
+# XXX (#40770): doesn't currently respect the -options.
 # XXX Mdiep will probably want to change this to a hash-dispatch
 .sub 'is'
   .param pmc argv
