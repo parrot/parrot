@@ -351,7 +351,7 @@ bad_length:
   $I2 = __index($S3,$S1)
 
 range_do:
-###  if index_1 > $I2 goto done   XXX no such label
+###  if index_1 > $I2 goto done   XXX (#40768): no such label
   if index_1 >= 0  goto range_top
   index_1 = 0
 range_top:
