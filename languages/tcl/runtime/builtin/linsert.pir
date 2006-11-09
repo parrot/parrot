@@ -40,7 +40,7 @@ next:
 
   the_index = $I0
 
-  # XXX workaround, splice doesn't work on TclList <-> TclList.
+  # XXX (#40764): workaround, splice doesn't work on TclList <-> TclList.
   # Until that's fixed, splice Arrays, then post-covert to a TclList
   # This is a hideous hack.
 
