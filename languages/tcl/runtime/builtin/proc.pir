@@ -171,7 +171,7 @@ emit_args:
   code .= args_code
   
   # Convert the remaining elements returned by foldup into a TclList
-  # XXX This code lifted from Tcl::&list - eventually factor this out.
+  # XXX (#40751): This code lifted from Tcl::&list - eventually factor this out.
   code.emit(<<"END_PIR")
   unless args goto NO_SLURPY_ARGS
   .local pmc arg_list
