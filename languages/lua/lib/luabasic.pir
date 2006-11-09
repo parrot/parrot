@@ -21,20 +21,22 @@ See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
 
 .sub 'init_basic' :load :anon
 
+    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/lib/luaaux.pbc'
 
 #    print "init Lua Basic\n"
 
+    find_type $I0, 'table'
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = new .LuaTable
+    _lua__REGISTRY = new $I0
     global '_REGISTRY' = _lua__REGISTRY
 
     .local pmc _lua__ENVIRON
-    _lua__ENVIRON = new .LuaTable
+    _lua__ENVIRON = new $I0
     global '_ENVIRON' = _lua__ENVIRON
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = new .LuaTable
+    _lua__GLOBAL = new $I0
     global '_G' = _lua__GLOBAL
     $P1 = new .LuaString
 

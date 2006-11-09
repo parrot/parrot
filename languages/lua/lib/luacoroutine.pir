@@ -22,6 +22,7 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 
 .sub 'init_coroutine' :load :anon
 
+    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/type/thread.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
@@ -31,8 +32,9 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
+    find_type $I0, 'table'
     .local pmc _coroutine
-    _coroutine = new .LuaTable
+    _coroutine = new $I0
     $P1 = 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 

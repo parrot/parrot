@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/pmc/table.t - LuaTable
+t/pmc/table.t - Lua Table
 
 =head1 SYNOPSIS
 
@@ -12,31 +12,31 @@ t/pmc/table.t - LuaTable
 
 =head1 DESCRIPTION
 
-Tests C<LuaTable> PMC
-(implemented in F<languages/lua/pmc/luatable.pmc>).
+Tests C<table> type
+(implemented in F<languages/lua/lib/table.pir>).
 
 =cut
 
 use strict;
 use warnings;
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 11;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
     bool1 = isa pmc1, 'scalar'
     print bool1
     print "\n"
-    bool1 = isa pmc1, 'LuaBase'
+    bool1 = isa pmc1, 'base_lua'
     print bool1
     print "\n"
-    bool1 = isa pmc1, 'LuaTable'
+    bool1 = isa pmc1, 'table'
     print bool1
     print "\n"
     end
@@ -49,12 +49,12 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = does pmc1, 'hash'
+    bool1 = does pmc1, 'scalar'
     print bool1
     print "\n"
     bool1 = does pmc1, 'no_interface'
@@ -69,8 +69,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     .local string str1
@@ -89,8 +89,8 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     print pmc1
@@ -103,8 +103,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
@@ -123,8 +123,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     find_type $I0, 'LuaBoolean'
@@ -146,8 +146,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check key PMC' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     find_type $I0, 'LuaString'
@@ -179,8 +179,8 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check key nil' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     find_type $I0, 'LuaString'
@@ -199,8 +199,8 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check deletion by assignment of nil' );
 .sub _main
-    loadlib P1, 'lua_group'
-    find_type $I0, 'LuaTable'
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
     find_type $I0, 'LuaString'
@@ -238,26 +238,12 @@ CODE
 1
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL 'Lua', 'lua_group'
-.sub _main
-    .local pmc pmc1
-    pmc1 = new .LuaTable
-    .local int bool1
-    bool1 = isa pmc1, 'LuaTable'
-    print bool1
-    print "\n"
-    end
-.end
-CODE
-1
-OUTPUT
-
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL 'Lua', 'lua_group'
 .sub _main
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
-    pmc1 = new .LuaTable
+    pmc1 = new $I0
     print pmc1
     print "\n"
     $P0 = pmc1.'tostring'()
@@ -272,10 +258,11 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL 'Lua', 'lua_group'
 .sub _main
+    load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
     .local pmc pmc1
-    pmc1 = new .LuaTable
+    pmc1 = new $I0
     $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"

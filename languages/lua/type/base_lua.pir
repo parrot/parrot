@@ -23,9 +23,17 @@ C<base_lua> provides an abstract base class for some Lua types.
 
 .namespace [ 'base_lua' ]
 
+=item C<__clone>
+
+=cut
+
 .sub '__clone' :method
     .return (self)
 .end
+
+=item C<__get_string>
+
+=cut
 
 .sub '__get_string' :method
     new $P0, .Array
@@ -38,7 +46,7 @@ C<base_lua> provides an abstract base class for some Lua types.
     .return ($S0)
 .end
 
-=item C<INTVAL get_bool()>
+=item C<__get_bool>
 
 Returns C<true>.
 
@@ -50,7 +58,9 @@ Returns C<true>.
 .end
 
 
-=item C<PMC* get_pmc_keyed (PMC* key)>
+=item C<__get_pmc_keyed>
+
+=item C<__set_pmc_keyed>
 
 Throws an exception.
 
@@ -61,12 +71,6 @@ Throws an exception.
     $S0 = classname self
     ex_index($S0)
 .end
-
-=item C<void set_pmc_keyed (PMC* key, PMC* value)>
-
-Throws an exception.
-
-=cut
 
 .sub '__set_pmc_keyed' :method
     .param pmc key
@@ -86,7 +90,9 @@ Throws an exception.
     throw ex
 .end
 
-=item C<PMC* neg (PMC *dest)>
+=item C<__neg>
+
+=item C<__i_neg>
 
 Throws an exception.
 
@@ -97,29 +103,49 @@ Throws an exception.
     .local pmc meth
     .local pmc ret
     meth = self.'find_metamethod'('__unm')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     ret = meth(self)
+    unless_null ret, L2
+    new ret, .LuaNil
+L2:
     .return (ret)
 L1: 
     $S0 = classname self
     ex_arithmetic($S0)
 .end
 
-=item C<PMC* logical_not(PMC *dest)>
+.sub '__i_neg' :method
+    .local pmc meth
+    meth = self.'find_metamethod'('__unm')
+    if_null meth, L1
+    self = meth(self)
+    unless_null self, L2
+    new self, .LuaNil
+L2:
+    .return (self)
+L1: 
+    $S0 = classname self
+    ex_arithmetic($S0)
+.end
+
+=item C<__logical_not>
+
+Always returns C<false>.
 
 =cut
 
 .sub '__logical_not' :method
     .param pmc dummy
     .local pmc ret
+    $I0 = isfalse self
     new ret, .LuaBoolean
+    set ret, $I0
     .return (ret)
 .end
 
-=item C<INTVAL defined()>
+=item C<__defined>
 
-Always returns true.
+Always returns C<true>.
 
 =cut
 
@@ -128,24 +154,23 @@ Always returns true.
     .return ($I0)
 .end
 
-=item C<void* invoke(void* next)>
+=item C<__invoke>
 
 =cut
 
 .sub '__invoke' :method
     .param pmc next
-    .local pmc ret
-    .local pmc meth
-    meth = self.'find_metamethod'('__call')
-    $I0 = defined meth
-    unless $I0 goto L1
-#    ret = meth(self, next :flat)
-    ret = meth(self)
-    unless_null ret, L2
-    new ret, .LuaNil
-L2:
-    .return (ret)
-L1:
+#    .local pmc ret
+#    .local pmc meth
+#    meth = self.'find_metamethod'('__call')
+#    if_null meth, L1
+##    ret = meth(self, next :flat)
+#    ret = meth(self)
+#    unless_null ret, L2
+#    new ret, .LuaNil
+#L2:
+#    .return (ret)
+#L1:
     .local pmc ex
     ex = new .Exception
     $S0 = "attempt to call a "
@@ -162,33 +187,33 @@ L1:
 
 =over 4
 
-=item C<void add(PMC *value, PMC *dest)>
+=item C<__add>
 
-=item C<void i_add (PMC *value)>
+=item C<__i_add>
 
-=item C<void subtract(PMC *value, PMC *dest)>
+=item C<__subtract>
 
-=item C<void i_substract (PMC *value)>
+=item C<__i_substract>
 
-=item C<void multiply(PMC *value, PMC *dest)>
+=item C<__multiply>
 
-=item C<void i_multiply (PMC *value)>
+=item C<__i_multiply>
 
-=item C<void divide(PMC *value, PMC *dest)>
+=item C<__divide>
 
-=item C<void i_divide (PMC *value)>
+=item C<__i_divide>
 
-=item C<PMC* modulus (PMC* value, PMC* dest)>
+=item C<__modulus>
 
-=item C<void i_modulus (PMC *value)>
+=item C<__i_modulus>
 
-=item C<PMC* pow (PMC* value, PMC* dest)>
+=item C<__pow>
 
-=item C<void i_pow (PMC *value)>
+=item C<__i_pow>
 
-=item C<PMC* concatenate (PMC *value, PMC *dest)>
+=item C<__concatenate>
 
-=item C<void i_concatenate (PMC *value)>
+=item C<__i_concatenate>
 
 Throws an exception.
 
@@ -199,10 +224,27 @@ Throws an exception.
     .param pmc dest
     .local pmc meth
     meth = self.'find_metamethod'('__add')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     dest = meth(self, value)
+    unless_null dest, L2
+    new dest, .LuaNil
+L2:
     .return (dest)
+L1: 
+    $S0 = classname self
+    ex_arithmetic($S0)
+.end
+
+.sub '__i_add' :method :multi(base_lua, pmc)
+    .param pmc value
+    .local pmc meth
+    meth = self.'find_metamethod'('__add')
+    if_null meth, L1
+    self = meth(self, value)
+    unless_null self, L2
+    new self, .LuaNil
+L2:
+    .return (self)
 L1: 
     $S0 = classname self
     ex_arithmetic($S0)
@@ -213,10 +255,27 @@ L1:
     .param pmc dest
     .local pmc meth
     meth = self.'find_metamethod'('__sub')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     dest = meth(self, value)
+    unless_null dest, L2
+    new dest, .LuaNil
+L2:
     .return (dest)
+L1: 
+    $S0 = classname self
+    ex_arithmetic($S0)
+.end
+
+.sub '__i_subtract' :method :multi(base_lua, pmc)
+    .param pmc value
+    .local pmc meth
+    meth = self.'find_metamethod'('__sub')
+    if_null meth, L1
+    self = meth(self, value)
+    unless_null self, L2
+    new self, .LuaNil
+L2:
+    .return (self)
 L1: 
     $S0 = classname self
     ex_arithmetic($S0)
@@ -227,10 +286,27 @@ L1:
     .param pmc dest
     .local pmc meth
     meth = self.'find_metamethod'('__mul')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     dest = meth(self, value)
+    unless_null dest, L2
+    new dest, .LuaNil
+L2:
     .return (dest)
+L1: 
+    $S0 = classname self
+    ex_arithmetic($S0)
+.end
+
+.sub '__i_multiply' :method :multi(base_lua, pmc)
+    .param pmc value
+    .local pmc meth
+    meth = self.'find_metamethod'('__mul')
+    if_null meth, L1
+    self = meth(self, value)
+    unless_null self, L2
+    new self, .LuaNil
+L2:
+    .return (self)
 L1: 
     $S0 = classname self
     ex_arithmetic($S0)
@@ -241,10 +317,27 @@ L1:
     .param pmc dest
     .local pmc meth
     meth = self.'find_metamethod'('__div')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     dest = meth(self, value)
+    unless_null dest, L2
+    new dest, .LuaNil
+L2:
     .return (dest)
+L1: 
+    $S0 = classname self
+    ex_arithmetic($S0)
+.end
+
+.sub '__i_divide' :method :multi(base_lua, pmc)
+    .param pmc value
+    .local pmc meth
+    meth = self.'find_metamethod'('__div')
+    if_null meth, L1
+    self = meth(self, value)
+    unless_null self, L2
+    new self, .LuaNil
+L2:
+    .return (self)
 L1: 
     $S0 = classname self
     ex_arithmetic($S0)
@@ -255,10 +348,27 @@ L1:
     .param pmc dest
     .local pmc meth
     meth = self.'find_metamethod'('__mod')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     dest = meth(self, value)
+    unless_null dest, L2
+    new dest, .LuaNil
+L2:
     .return (dest)
+L1: 
+    $S0 = classname self
+    ex_arithmetic($S0)
+.end
+
+.sub '__i_modulus' :method :multi(base_lua, pmc)
+    .param pmc value
+    .local pmc meth
+    meth = self.'find_metamethod'('__mod')
+    if_null meth, L1
+    self = meth(self, value)
+    unless_null self, L2
+    new self, .LuaNil
+L2:
+    .return (self)
 L1: 
     $S0 = classname self
     ex_arithmetic($S0)
@@ -269,10 +379,27 @@ L1:
     .param pmc dest
     .local pmc meth
     meth = self.'find_metamethod'('__pow')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     dest = meth(self, value)
+    unless_null dest, L2
+    new dest, .LuaNil
+L2:
     .return (dest)
+L1: 
+    $S0 = classname self
+    ex_arithmetic($S0)
+.end
+
+.sub '__i_pow' :method :multi(base_lua, pmc)
+    .param pmc value
+    .local pmc meth
+    meth = self.'find_metamethod'('__pow')
+    if_null meth, L1
+    self = meth(self, value)
+    unless_null self, L2
+    new self, .LuaNil
+L2:
+    .return (self)
 L1: 
     $S0 = classname self
     ex_arithmetic($S0)
@@ -294,13 +421,30 @@ L1:
     .param pmc dest
     .local pmc meth
     meth = self.'find_metamethod'('__concat')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     dest = meth(self, value)
+    unless_null dest, L2
+    new dest, .LuaNil
+L2:
     .return (dest)
 L1: 
     $S0 = classname self
     ex_concat($S0)
+.end
+
+.sub '__i_concatenate' :method :multi(base_lua, pmc)
+    .param pmc value
+    .local pmc meth
+    meth = self.'find_metamethod'('__concat')
+    if_null meth, L1
+    self = meth(self, value)
+    unless_null self, L2
+    new self, .LuaNil
+L2:
+    .return (self)
+L1: 
+    $S0 = classname self
+    ex_arithmetic($S0)
 .end
 
 .sub 'ex_concat' :anon
@@ -314,28 +458,69 @@ L1:
     throw ex
 .end
 
+=item C<__is_equal>
+
+=cut
+
 .sub '__is_equal' :method :multi(base_lua, pmc)
     .param pmc value
     $I0 = 0
     .return ($I0)
 .end
 
+=item C<__cmp>
+
+=cut
+
 .sub '__cmp' :method :multi(base_lua, pmc)
     .param pmc value
+    .local pmc meth_lt
+    .local pmc meth_le
+    .local int ret
+    ret = 0
+    meth_lt = self.'find_metamethod'('__lt')
+    if_null meth_lt, L1
+    $P0 = meth_lt(self, value)
+    if_null $P0, L2
+    $I0 = istrue $P0
+    unless $I0 goto L2
+    ret = -1
+    .return (ret)
+L2:
+    meth_le = self.'find_metamethod'('__le')
+    if_null meth_le, L3
+    $P0 = meth_le(self, value)
+    if_null $P0, L4
+    $I0 = istrue $P0
+    unless $I0 goto L4
+    .return (ret)
+L4:
+    ret = 1
+    .return (ret)
+L3:
+    $P0 = meth_lt(value, self)
+    if_null $P0, L5
+    $I0 = istrue $P0
+    unless $I0 goto L5
+    ret = 1
+    .return (ret)
+L5:
+    .return (ret)
+L1:
     .local pmc ex
     $S1 = classname self
     $S2 = classname value
-    if $S1 == $S2 goto L1
+    if $S1 == $S2 goto L6
     $S0 = "attempt to compare "
     $S0 .= $S1
     $S0 .= " with "
     $S0 .= $S2
-    goto L2
-L1:
+    goto L7
+L6:
     $S0 = "attempt to compare two "
     $S0 .= $S1
     $S0 .= " values"
-L2:
+L7:
     ex = new .Exception
     ex['_message'] = $S0
     throw ex
@@ -347,7 +532,7 @@ L2:
 
 =over 4
 
-=item C<PMC* len()>
+=item C<len>
 
 =cut
 
@@ -355,8 +540,7 @@ L2:
     .local pmc meth
     .local pmc ret
     meth = self.'find_metamethod'('__len')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     ret = meth(self)
     unless_null ret, L2
     new ret, .LuaNil
@@ -389,7 +573,7 @@ L1:
     .return (ret)
 .end
 
-=item C<PMC* tonumber()>
+=item C<tonumber>
 
 =cut
 
@@ -399,7 +583,7 @@ L1:
     .return (ret)
 .end
 
-=item C<PMC* tostring()>
+=item C<tostring>
 
 =cut
 
@@ -407,9 +591,11 @@ L1:
     .local pmc meth
     .local pmc ret
     meth = self.'find_metamethod'('__tostring')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     ret = meth(self)
+    unless_null ret, L2
+    new ret, .LuaNil
+L2:
     .return (ret)
 L1: 
     new ret, .LuaString
@@ -418,7 +604,7 @@ L1:
     .return (ret)
 .end
 
-=item C<void set_metatable(PMC *meta)>
+=item C<set_metatable>
 
 =cut
 
@@ -433,7 +619,7 @@ L1:
 L2:
 .end    
 
-=item C<PMC *get_metatable()>
+=item C<get_metatable>
 
 =cut
 
@@ -442,7 +628,7 @@ L2:
     .local pmc ret
     ret = getprop '__metatable', self
     if_null ret, L1
-    $I0 = isa ret, 'LuaTable'
+    $I0 = isa ret, 'table'
     unless $I0 goto L1
     goto L2
 L1:
@@ -451,7 +637,7 @@ L2:
     .return (ret)
 .end    
 
-=item C<PMC *find_metamethod(STRING *method_name)>
+=item C<find_metamethod>
 
 Looks up the method for C<*method_name>.
 
@@ -462,13 +648,16 @@ Looks up the method for C<*method_name>.
     .local pmc metatable
     .local pmc key
     .local pmc ret
-    metatable = getprop '__metatable', self
-    if_null metatable, L1
-    $I0 = isa metatable, 'LuaTable'
+    null ret
+    metatable = self.'get_metatable'()
+    $I0 = isa metatable, 'table'
     unless $I0 goto L1
     new key, .LuaString
     set key, name
-    ret = metatable[key]
+    $P0 = metatable[key]
+    $I0 = isa $P0, 'LuaNil'
+    if $I0 goto L1
+    ret = $P0
 L1:
     .return (ret)
 .end    

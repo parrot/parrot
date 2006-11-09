@@ -31,6 +31,7 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
 
 .sub 'init_debug' :load :anon
 
+    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Debug\n"
@@ -39,8 +40,9 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
+    find_type $I0, 'table'
     .local pmc _debug
-    _debug = new .LuaTable
+    _debug = new $I0
     $P1 = 'debug'
     _lua__GLOBAL[$P1] = _debug
 
@@ -210,7 +212,7 @@ metatable.
     .param pmc obj :optional
     .local pmc ret
     checkany(obj)
-    ret = obj."get_metatable"()
+    ret = obj.'get_metatable'()
     .return (ret)
 .end
 

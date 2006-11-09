@@ -21,11 +21,11 @@ PMCS = \
  luafunction \
  luanil \
  luanumber \
- luastring \
- luatable
+ luastring
 
 TYPE_PBCS = \
  $(TYPEPATH)/base_lua.pbc \
+ $(TYPEPATH)/table.pbc \
  $(TYPEPATH)/thread.pbc \
  $(TYPEPATH)/userdata.pbc
 
@@ -81,6 +81,9 @@ pmcs:
 
 $(TYPEPATH)/base_lua.pbc: $(TYPEPATH)/base_lua.pir
 	$(PARROT) --output=$(TYPEPATH)/base_lua.pbc $(TYPEPATH)/base_lua.pir
+
+$(TYPEPATH)/table.pbc: $(TYPEPATH)/table.pir
+	$(PARROT) --output=$(TYPEPATH)/table.pbc $(TYPEPATH)/table.pir
 
 $(TYPEPATH)/thread.pbc: $(TYPEPATH)/thread.pir
 	$(PARROT) --output=$(TYPEPATH)/thread.pbc $(TYPEPATH)/thread.pir

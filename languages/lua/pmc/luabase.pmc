@@ -23,7 +23,6 @@ C<LuaBase> provides an abstract base class for some Lua types.
 static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
-static INTVAL dynpmc_LuaTable;
 
 
 pmclass LuaBase
@@ -448,7 +447,7 @@ Throws an exception.
 */
     INTVAL cmp (PMC* value) {
         char * s = string_to_cstring(INTERP, DYNSELF.name());
-        char * v = string_to_cstring(INTERP, VTABLE_name(INTERP, value)); 
+        char * v = string_to_cstring(INTERP, VTABLE_name(INTERP, value));
 
         if (strcmp(s, v) != 0) {
             real_exception(INTERP, NULL, ILL_INHERIT,
@@ -457,7 +456,7 @@ Throws an exception.
         else {
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to compare two %s values", s);
-        } 
+        }
         return (INTVAL)0;
     }
 
@@ -546,7 +545,7 @@ Looks up the method for C<*method_name>.
 */
     METHOD PMC* find_metamethod(STRING* method_name) {
         PMC *metatable = Parrot_LuaBase_get_metatable(INTERP, SELF);
-        if (dynpmc_LuaTable == metatable->vtable->base_type) {
+        if (dynpmc_LuaNil != metatable->vtable->base_type) {
             PMC *method;
             PMC *key;
 
@@ -569,6 +568,8 @@ Looks up the method for C<*method_name>.
 */
     METHOD PMC* get_metatable() {
         PMC *retval;
+        INTVAL dynpmc_LuaTable = pmc_type(INTERP,
+              string_from_const_cstring(INTERP, "table", 0));
 
         if (dynpmc_LuaTable == SELF->vtable->base_type) {
             retval = VTABLE_getprop(INTERP, SELF,
@@ -592,8 +593,6 @@ Looks up the method for C<*method_name>.
               string_from_const_cstring(INTERP, "LuaNil", 0));
             dynpmc_LuaString = pmc_type(INTERP,
               string_from_const_cstring(INTERP, "LuaString", 0));
-            dynpmc_LuaTable = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaTable", 0));
     }
 
 }

@@ -27,8 +27,7 @@ the Lua C<Userdata> type.
     .local pmc meth
     .local pmc ret
     meth = self.'find_metamethod'('__index')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     ret = meth[key]
     .return (ret)
 L1: 
@@ -40,8 +39,7 @@ L1:
     .param pmc value
     .local pmc meth
     meth = self.'find_metamethod'('__eq')
-    $I0 = defined meth
-    unless $I0 goto L1
+    if_null meth, L1
     $P0 = meth(self, value)
     $I0 = 0
     if_null $P0, L2

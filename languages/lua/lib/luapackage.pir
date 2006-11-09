@@ -20,6 +20,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
 
 .sub 'init_package' :load :anon
 
+    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Package\n"
@@ -36,8 +37,9 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $P1 = 'require'
     _lua__GLOBAL[$P1] = _lua_require
 
+    find_type $I0, 'table'
     .local pmc _package
-    _package = new .LuaTable
+    _package = new $I0
     $P1 = 'package'
     _lua__GLOBAL[$P1] = _package
 
@@ -45,7 +47,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $P1 = 'cpath'
     _package[$P1] = $P0
 
-    $P0 = new .LuaTable
+    $P0 = new $I0
     $P1 = 'loaded'
     _package[$P1] = $P0
 
@@ -57,7 +59,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $P1 = 'path'
     _package[$P1] = $P0
 
-    $P0 = new .LuaTable
+    $P0 = new $I0
     $P1 = 'preloaded'
     _package[$P1] = $P0
 

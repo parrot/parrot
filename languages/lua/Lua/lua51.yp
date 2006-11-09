@@ -640,6 +640,7 @@ sub Run {
     $parser->YYData->{symbtab}     = new SymbTabVar($parser);
     $parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
     $parser->YYData->{_G}          = undef;
+    $parser->YYData->{_LuaTable}   = undef;
     $parser->YYData->{self}        = undef;
     $parser->YYData->{idx_tmp}     = 0;
     $parser->YYData->{idx_lbl}     = 0;

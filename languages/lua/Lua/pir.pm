@@ -128,6 +128,15 @@ package pirVisitor;
         return;
     }
 
+    sub visitFindTypeOp {
+        my $self = shift;
+        my ($op) = @_;
+        my $FH   = $self->{fh};
+        print {$FH}
+            "  $op->{result}->{symbol} = find_type '$op->{arg1}'\n";
+        return;
+    }
+
     sub visitCloneOp {
         my $self = shift;
         my ($op) = @_;

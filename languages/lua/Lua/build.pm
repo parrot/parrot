@@ -66,6 +66,8 @@ sub PushScopeF {
     PushScope($parser);
     push @{ $parser->YYData->{scope} }, $parser->YYData->{_G};
     $parser->YYData->{_G} = undef;
+    push @{ $parser->YYData->{scope} }, $parser->YYData->{_LuaTable};
+    $parser->YYData->{_LuaTable} = undef;
     unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{symbtab_cst};
     $parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
     unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{scope};
@@ -89,6 +91,8 @@ sub PopScopeF {
     $parser->YYData->{scope} = $scope;
     my $symbtab = shift @{ $parser->YYData->{scopef} };
     $parser->YYData->{symbtab_cst} = $symbtab;
+    my $t = pop @{ $parser->YYData->{scope} };
+    $parser->YYData->{_LuaTable} = $t;
     my $g = pop @{ $parser->YYData->{scope} };
     $parser->YYData->{_G} = $g;
 ##    warn "PopScopeF\n";
@@ -202,13 +206,26 @@ sub BuildTable {
     my ( $parser, $fields ) = @_;
     my @opcodes1 = ();
     my @opcodes2 = ();
+    unless ($parser->YYData->{_LuaTable}) {
+        my $defn = new defn( '_LuaTable', 'local', 'int' );
+        $parser->YYData->{_LuaTable} = $defn;
+        push @opcodes1, new LocalDir( $parser,
+            'prolog' => 1,
+            'result' => $defn,
+        );
+        push @opcodes1, new FindTypeOp( $parser,
+            'prolog' => 1,
+            'result' => $defn,
+            'arg1'   => 'table',
+        );
+    }
     my $result   = new_tmp( $parser, 'pmc', 'table' );
     push @opcodes1, new LocalDir( $parser,
         'result' => $result,
     );
     push @opcodes1, new NewOp( $parser,
         'result' => $result,
-        'arg1'   => '.LuaTable',
+        'arg1'   => '_LuaTable',
     );
     my $num_key;
     while ( my $field = shift @{$fields} ) {

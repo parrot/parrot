@@ -21,6 +21,7 @@ See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
 
 .sub 'init_os' :load :anon
 
+    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua OS\n"
@@ -29,8 +30,9 @@ See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
+    find_type $I0, 'table'
     .local pmc _os
-    _os = new .LuaTable
+    _os = new $I0
     $P1 = 'os'
     _lua__GLOBAL[$P1] = _os
 
