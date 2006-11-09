@@ -32,7 +32,7 @@ chew_flag:
   if $P0 == '-unique' goto c_uniq
   if $P0 == '-integer' goto c_int
   if $P0 == '-real' goto c_real
-  # XXX dictionary, command etc necessary
+  # XXX (#40749): dictionary, command etc necessary
   branch bad_opt
 
 c_real:
