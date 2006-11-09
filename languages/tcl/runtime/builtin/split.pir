@@ -74,7 +74,7 @@ split_done:
   inc result_key
 
 split_really_done:
-  $P1 = result_key #XXX another TclList hack, truncate the list to the right
+  $P1 = result_key #XXX (#40756): another TclList hack, truncate the list to the right
   # number of elements...
   .return ($P1)
 
