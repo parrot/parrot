@@ -27,7 +27,7 @@ TCL
 wrong # args: should be "exit ?returnCode?"
 OUT
 
-# TODO: should check return value of exit, also
+# TODO (#40777): should check return value of exit, also
 
 # Local Variables:
 #   mode: cperl
