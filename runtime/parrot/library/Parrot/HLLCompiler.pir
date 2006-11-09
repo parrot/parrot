@@ -83,6 +83,7 @@ Generic method for compilers invoked from a shell command line.
     .param pmc adverbs         :slurpy :named
 
     load_bytecode 'Getopt/Obj.pbc'
+    load_bytecode 'dumper.pbc'
 
     ##   perform option processing of command-line args
     .local string arg0
@@ -165,7 +166,6 @@ Generic method for compilers invoked from a shell command line.
     unless stdin goto interactive_end
     code = stdin.'readline'('> ')
     unless code goto interactive_loop
-    code .= "\n"
     bsr evalcode
     goto interactive_loop
   interactive_end:
