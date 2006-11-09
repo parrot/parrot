@@ -58,6 +58,8 @@ according to the C<target> adverb.
     .local string target
     target = adverbs['target']
     target = downcase target
+    if target == 'parse' goto return_exp
+    if target == 'pge::exp' goto return_exp
 
     .local string grammar
     .local string nsformat
@@ -84,6 +86,9 @@ according to the C<target> adverb.
     $P0 = subclass 'PGE::Grammar', grammar
   end:
     .return ($P1)
+
+  return_exp:
+    .return (source)
 .end
 
 
