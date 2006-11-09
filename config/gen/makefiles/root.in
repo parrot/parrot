@@ -306,8 +306,10 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
     $(LIBRARY_DIR)/Parrot/Coroutine.pbc \
+    $(LIBRARY_DIR)/Parrot/HLLCompiler.pbc \
     $(LIBRARY_DIR)/PGE/Dumper.pbc \
     $(LIBRARY_DIR)/PGE/Glob.pbc \
+    $(LIBRARY_DIR)/PGE/P6Grammar.pbc \
     $(LIBRARY_DIR)/PGE/Text.pbc \
     $(LIBRARY_DIR)/PGE/Util.pbc \
     $(LIBRARY_DIR)/Stream/Base.pbc \
@@ -323,7 +325,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/STM.pbc \
     $(LIBRARY_DIR)/libpcre.pbc \
     $(LIBRARY_DIR)/Data/Replace.pbc \
-    $(LIBRARY_DIR)/postgres.pbc \
+    $(LIBRARY_DIR)/postgres.pbc
 
 # the dependencies of $(SRC_DIR)/jit_emit.h are done explicitely
 # including this file in GEN_HEADERS causes unnecessary recompile of all
