@@ -26,35 +26,43 @@ Run the PAST with the help of TGE.
     err_msg = 'Creating XML-AST with phc failed'
     cmd = 'phc --dump-ast-xml '
     concat cmd, php_source_fn
-    concat cmd, '> phc_ast.xml'
+    concat cmd, '> plumhead_phc_ast.xml'
     ret = spawnw cmd
     if ret goto error
 
     err_msg = 'Creating XML-PAST with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/phc_xml_to_past_xml.xsl phc_ast.xml > past.xml'
+    cmd = 'xsltproc languages/plumhead/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
     ret = spawnw cmd
     if ret goto error
 
     err_msg = 'Creating PIR with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/past_xml_to_past_pir.xsl  past.xml  > past.pir'
+    cmd = 'xsltproc languages/plumhead/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
     ret = spawnw cmd
     if ret goto error
 
     err_msg = 'Executing past.pir with parrot failed'
-    cmd = './parrot past.pir'
+    cmd = './parrot plumhead_past.pir'
     ret = spawnw cmd
     if ret goto error
 
-    # TODO: Clean up, with OS PMC
-    # phc_ast.xml
-    # past.xml
-    # past.pir
+    # Clean up temporary files
+    .local pmc os
+    os = new .OS
+    os."rm"('plumhead_phc_ast.xml')
+    os."rm"('plumhead_past.xml')
+    os."rm"('plumhead_past.pir')
 
     exit 0
 
 error:
-   printerr err_msg
-   printerr "\n"
+    printerr err_msg
+    printerr "\n"
+    # Clean up temporary files
+    .local pmc os
+    os = new .OS
+    os."rm"('plumhead_phc_ast.xml')
+    os."rm"('plumhead_past.xml')
+    os."rm"('plumhead_past.pir')
 
    exit ret
 
