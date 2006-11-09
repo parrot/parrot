@@ -695,7 +695,7 @@ xdigit_check:
 
 cclass_check:
   # Loop over the string. Die immediately if we fail.
-  # XXX Tie the index of the string into --failvar
+  # XXX (#40773): Tie the index of the string into --failvar
   .local int len,ii
   len = length the_string
   ii = 0
