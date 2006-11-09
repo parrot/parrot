@@ -17,6 +17,10 @@ Show an example for using XSLT for creating PAST.
 
 Take XML output from PHC. XSLT creates PIR that sets up PAST.
 
+=head Dependencies
+
+xsltproc and ghc need to be in PATH.
+
 =head1 Author
 
 Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
@@ -24,6 +28,8 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =head1 SEE ALSO
 
 =over 4
+
+=item L<http://rakudo.org/parrot/index.cgi?plumhead>
 
 =item L<http://phpcompiler.org/>
 

@@ -1,3 +1,7 @@
 # $Id$
 
-- Rewrite plumhead.pl in PIR
+TODO:
+  - Support for POST and GET
+
+DONE:
+  - Rewrite plumhead.pl in PIR

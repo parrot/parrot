@@ -23,7 +23,7 @@ sub get_test_prog {
     my $lang_fn        = Parrot::Test::per_test( '.php', $count );
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
 
-    return ( "perl languages/plumhead/plumhead.pl ${test_prog_args} languages/${lang_fn}" );
+    return ( "./parrot languages/plumhead/plumhead.pir ${test_prog_args} languages/${lang_fn}" );
 }
  
 # never skip the reference implementation
