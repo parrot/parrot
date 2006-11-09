@@ -86,19 +86,18 @@ format_loop:
 
 get_int_count:
   tempCount = 0
-  ## XXX  countString = 0
+  ## countString = 0
 count_loop:
   if num_pos == formatString_len goto count_loop_done 
   digit = ord formatString, num_pos
   if digit < 48 goto count_loop_done
   if digit > 57 goto count_loop_done
   digit -= 48 # ascii
-  # XXXX
   tempCount = tempCount * 10
   tempCount += digit 
   inc num_pos
   if num_pos == formatString_len goto count_loop_done
-  ## XXX digitString = substr formatString,pos,1
+  ## digitString = substr formatString,pos,1
   if num_pos == formatString_len goto count_loop_done
   goto count_loop
 count_loop_done:
