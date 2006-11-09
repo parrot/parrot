@@ -10,7 +10,7 @@
 
   .local string expression, target, subSpec
  
-  # XXX not handling options. 
+  # XXX (#40758): not handling options. 
 
   expression = argv[0]
   target     = argv[1]
