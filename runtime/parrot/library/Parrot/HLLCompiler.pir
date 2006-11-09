@@ -20,6 +20,8 @@ running compilers from a command line.
 
 =head2 Methods 
 
+=over 4
+
 =item C<register(string name, pmc compsub)>
 
 Registers this compiler object as C<name> and using C<compsub>
@@ -212,3 +214,4 @@ Generic method for compilers invoked from a shell command line.
     .return ()
 .end
 
+=back
