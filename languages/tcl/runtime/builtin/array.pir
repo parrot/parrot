@@ -292,7 +292,7 @@ bad_args:
    tcl_error 'wrong # args: should be "array unset arrayName ?pattern?"'
 
 not_array:
-   tcl_error '' # XXX is this right? -coke
+   tcl_error '' # XXX (#40766): is this right? -coke
 .end
 
 .sub 'names'
