@@ -101,8 +101,6 @@ proc like {value regexp {description ""}} {
    }
 }
 
-# NOTE: This doesn't work in tcl-current, because we can't parse:
-# XXX (#40715): expr {"[eval {set a "aok"}]" ne "bork"}
 proc isnt {code expected {description ""} {special {}}}  {
     set code     "\"\[eval {$code}\]\""
     set expected "\"$expected\""
