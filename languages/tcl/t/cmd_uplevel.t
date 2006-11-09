@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is( "tcl", <<'TCL', <<'OUT', 'upvar $command' );
@@ -88,6 +88,13 @@ language_output_is( 'tcl', <<'TCL', <<'OUT', 'uplevel - reset environent on exec
   puts $a
 TCL
 4
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'uplevel - info level interaction');
+  proc test {} {uplevel {info level}}
+  puts [test]
+TCL
+0
 OUT
 
 # Local Variables:
