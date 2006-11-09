@@ -15,7 +15,7 @@
 
    .local pmc tclARE, rule, match
 
-   # XXX            "tclARE"
+   # XXX (#40774):            "tclARE"
    tclARE = compreg 'PGE::P5Regex'
 
    rule = tclARE(exp)
