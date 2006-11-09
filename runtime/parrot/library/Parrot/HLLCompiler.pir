@@ -131,11 +131,13 @@ Generic method for compilers invoked from a shell command line.
     .local string iname
     .local pmc ifh
     iname = args[0]
-    ifh = new .ParrotIO
+    ifh = open iname, '<'
+    unless ifh goto err_infile
     unless encoding goto single_1
     push ifh, encoding
   single_1:
-    code = ifh.'slurp'(iname)
+    code = ifh.'slurp'('')
+    close ifh
     bsr evalcode
     goto save_output
     
@@ -146,12 +148,14 @@ Generic method for compilers invoked from a shell command line.
   combine_loop:
     unless iter goto combine_end
     iname = shift iter
-    ifh = new .ParrotIO
+    ifh = open iname, '<'
+    unless ifh goto err_infile
     unless encoding goto combine_1
     push ifh, encoding
   combine_1:
-    $S0 = ifh.'slurp'(iname)
+    $S0 = ifh.'slurp'('')
     code .= $S0
+    close ifh
     goto combine_loop
   combine_end:
     bsr evalcode
@@ -202,6 +206,15 @@ Generic method for compilers invoked from a shell command line.
     print ofh, outputbuf
     close ofh
   save_output_end:
+    .return ()
+
+  err_infile:
+    $P0 = new .Exception
+    $S0 = 'Error: file cannot be read: '
+    $S0 .= iname
+    $S0 .= "\n"
+    $P0['_message'] = $S0
+    throw $P0
     .return ()
 
   err_output:
