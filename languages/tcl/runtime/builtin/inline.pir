@@ -26,7 +26,7 @@
   $P0 = $P1(code)
   $P0()
 
-  # XXX Should catch exceptions in the code and return the error message
+  # XXX (#40748): Should catch exceptions in the code and return the error message
   .return ('')
 
 bad_args:
