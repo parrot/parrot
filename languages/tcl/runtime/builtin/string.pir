@@ -624,7 +624,7 @@ alpha_check:
   the_cclass = .CCLASS_ALPHABETIC
   goto cclass_check
 ascii_check:
-  goto bad_args #XXX
+  goto bad_args #XXX (#40772):
 control_check:
   the_cclass = .CCLASS_CONTROL
   goto cclass_check
