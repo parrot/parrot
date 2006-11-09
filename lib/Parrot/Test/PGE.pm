@@ -338,7 +338,7 @@ sub _generate_glob_for {
             .local pmc exp
             target = unicode:"$target"
             pattern = "$pattern"
-            rulesub = glob_compile(pattern)
+            rulesub = glob_compile.'compile'(pattern)
             match = rulesub(target)
             unless match goto match_fail
           match_success:

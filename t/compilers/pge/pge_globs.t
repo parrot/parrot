@@ -61,11 +61,11 @@ pir_output_is(<<'CODE', <<'OUT', "Glob, alternate");
 
 .sub _main
   load_bytecode "library/PGE.pbc"
-  load_bytecode "library/PGE/Glob.pir"
+  load_bytecode "library/PGE/Glob.pbc"
 
-  .local pmc rule
-  $P0 = compreg "PGE::Glob"
-  (rule, $P1, $P2) = $P0("{app,bet,cod}a")
+  .local pmc rule, globc
+  globc = compreg "PGE::Glob"
+  rule = globc.'compile'("{app,bet,cod}a")
 
   $P1 = rule("appa")
   if $P1 goto ok1
@@ -97,7 +97,7 @@ ok4:
 ok5:
   print "ok5\n"
 
-  (rule, $P1, $P2) = $P0("*{1,two,three}")
+  rule = globc.'compile'("*{1,two,three}")
 
   $P1 = rule("1")
   if $P1 goto ok6

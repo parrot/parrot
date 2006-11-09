@@ -273,7 +273,7 @@ bad_args:
   .local pmc glob, pattern
   glob        = compreg 'PGE::Glob'
   pattern     = argv[1]
-  pattern     = glob(pattern)
+  pattern     = glob.'compile'(pattern)
   has_pattern = 1
 
 iterate:

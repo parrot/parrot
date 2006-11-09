@@ -398,7 +398,7 @@ match_continue:
   globber = compreg 'PGE::Glob'
 
   .local pmc rule, match 
-  rule = globber(pattern)
+  rule = globber.'compile'(pattern)
   match = rule(the_string)
 
   .return match.__get_bool()

@@ -109,7 +109,7 @@ bad_args:
   globber = compreg 'PGE::Glob'
   $S1 = argv[0]
   $S1 = '&' . $S1
-  rule = globber($S1)
+  rule = globber.'compile'($S1)
 pattern_loop:
   unless iterator goto pattern_end
   $S0 = shift iterator
@@ -158,7 +158,7 @@ bad_args:
     $S0 = substr pattern, 0, 2, ''
 
   create_glob:
-    matching = $P1(pattern)
+    matching = $P1.'compile'(pattern)
 
   done_setup:
     .local pmc result

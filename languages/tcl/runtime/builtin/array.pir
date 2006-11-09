@@ -202,7 +202,7 @@ no_args:
   .local pmc globber
   globber = compreg 'PGE::Glob'
   .local pmc rule
-  rule = globber(match_str)
+  rule = globber.'compile'(match_str)
 
   iter = new .Iterator, the_array
   iter = .ITERATE_FROM_START
@@ -268,7 +268,7 @@ no_args:
   .local pmc globber
   globber = compreg 'PGE::Glob'
   .local pmc rule
-  (rule, $P0, $P1) = globber(match_str)
+  (rule, $P0, $P1) = globber.'compile'(match_str)
 
   iter = new .Iterator, the_array
   iter = .ITERATE_FROM_START
@@ -353,7 +353,7 @@ not_array:
   .local pmc globber, retval
   globber = compreg 'PGE::Glob'
   .local pmc rule
-  rule = globber(pattern)
+  rule = globber.'compile'(pattern)
 
   iter = new .Iterator, the_array
   iter = .ITERATE_FROM_START

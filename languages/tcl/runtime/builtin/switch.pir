@@ -111,7 +111,7 @@ glob_loop:
   code    = downcase code
 
  glob_do:
-  (rule, $P1, $P2) = globber(pattern)
+  (rule, $P1, $P2) = globber.'compile'(pattern)
   $P0 = rule(subject)
   if $P0 goto body_match
   branch glob_loop

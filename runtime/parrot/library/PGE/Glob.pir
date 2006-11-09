@@ -70,8 +70,10 @@ or the resulting PIR code (target='PIR').
 .end
 
 
-.sub '__onload' :load
+.sub '__onload' :load :init
     .local pmc optable
+    load_bytecode 'Parrot/HLLCompiler.pbc'
+
     optable = new 'PGE::OPTable'
     store_global '$optable', optable
 
@@ -92,8 +94,9 @@ or the resulting PIR code (target='PIR').
 
     optable.newtok('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
-    $P0 = find_global 'compile_glob'
-    compreg 'PGE::Glob', $P0
+    $P0 = get_global 'compile_glob'
+    $P1 = new [ 'HLLCompiler' ]
+    $P1.'register'('PGE::Glob', $P0)
     .return ()
 .end
 
