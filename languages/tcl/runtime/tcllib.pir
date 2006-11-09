@@ -8,7 +8,7 @@ providing a compreg-compatible method.
 
 =cut
 
-# XXX It would be nice to be able to reduce the # of times we call
+# XXX (#40775): It would be nice to be able to reduce the # of times we call
 # .HLL here and in the .included files to a minimum.
 
 .HLL 'parrot', ''
