@@ -1,7 +1,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-# XXX This implementation uses a lot of temp vars that should be named -coke
+# XXX (#40754): This implementation uses a lot of temp vars that should be named -coke
 
 .sub '&split'
   .param pmc argv :slurpy
