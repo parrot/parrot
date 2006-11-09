@@ -121,7 +121,7 @@ which_format:
   if formatChar == 'x' goto format_x
 
   .return (0)  # XXX Hack to avoid blowing up when using binary.
-  tcl_error 'XXX This error should never occur: must be missing a field specifier implementation.'
+  tcl_error 'XXX (#40761): This error should never occur: must be missing a field specifier implementation.'
 
 format_a:
   .getBinaryArg()
