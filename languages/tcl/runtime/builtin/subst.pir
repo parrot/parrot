@@ -10,7 +10,7 @@
 
   .local string a_string
  
-  # XXX not handling options. 
+  # XXX (#40781): not handling options. 
 
   a_string = argv[0]
 
