@@ -60,8 +60,8 @@ pgeglob_isnt('', '[^0]', 'glob empty string');
 pir_output_is(<<'CODE', <<'OUT', "Glob, alternate");
 
 .sub _main
-  load_bytecode "library/PGE.pbc"
-  load_bytecode "library/PGE/Glob.pbc"
+  load_bytecode "PGE.pbc"
+  load_bytecode "PGE/Glob.pbc"
 
   .local pmc rule, globc
   globc = compreg "PGE::Glob"

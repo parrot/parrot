@@ -20,14 +20,14 @@ Test some simple grammars.
     .param string expr
     .local int ok
     .local string result
-    .local pmc p6regex, code, parse, match
+    .local pmc p6grammar, code, parse, match
 
     load_bytecode 'PGE.pbc'
     load_bytecode 'compilers/pge/pgc.pir'
 
     ok = 1
-    p6regex = compreg 'PGE::P6Grammar'
-    code = p6regex(grammar)
+    p6grammar = compreg 'PGE::P6Grammar'
+    code = p6grammar.'compile'(grammar, 'target'=>'PIR')
     $P0 = compreg 'PIR'
     $P1 = $P0(code)
     parse = find_global "Simple::Test", "main"
@@ -44,7 +44,7 @@ Test some simple grammars.
 .sub main :main
     load_bytecode 'Test/Builder.pir'
     load_bytecode 'PGE.pbc'
-    load_bytecode 'compilers/pge/pgc.pir'
+    load_bytecode 'PGE/P6Grammar.pbc'
     .include "iglobals.pasm"
 
     .local pmc test, todo_tests, todo_desc, grammar, expr, description
