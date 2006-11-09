@@ -14,7 +14,7 @@
 
   expression = argv[0]
   target     = argv[1]
-  subSpec    = argv[2] # XXX not respecting any special chars in this yet.
+  subSpec    = argv[2] # XXX (#40759): not respecting any special chars in this yet.
  
    .local pmc tclARE # XXX for now, just use P5 regexen
    tclARE = compreg 'PGE::P5Regex'
