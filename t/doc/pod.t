@@ -31,17 +31,19 @@ use ExtUtils::Manifest qw(maniread);
 use vars qw(@failed);
 
 BEGIN {
-    eval "use Pod::Find";
+    eval 'use Pod::Find';
     if ($@) {
-        print "1..1\nok 1 # skip Pod::Find not installed\n";
+        plan skip_all => 'Pod::Find not installed';
         exit;
     }
-    eval "use Test::Pod";
+    eval 'use Pod::Simple';
     if ($@) {
-        print "1..1\nok 1 # skip Test::Pod not installed\n";
+        plan skip_all => 'Pod::Simple not installed';
         exit;
     }
 }
+
+plan tests => 1;
 
 # XXX this should really be using src_dir insetad of build_dir but it
 # doesn't exist (yet)
