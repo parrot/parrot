@@ -92,7 +92,7 @@ Unimplemented. Calls the C<default> method.
 
     PMC* clone () {
         return SUPER();
-        /* XXX TODO */
+        /* XXX (#40799): TODO */
     }
 
 /*
