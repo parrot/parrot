@@ -13,7 +13,9 @@ t/doc/pod.t - Pod document syntax tests
 =head1 DESCRIPTION
 
 Tests the Pod syntax for all files listed in F<MANIFEST> and
-F<MANIFEST.generated> that appear to contain Pod markup.
+F<MANIFEST.generated> that appear to contain Pod markup. If any files
+contain invalid pod markup, they are reported in the test output.
+Use C<podchecker> to ferret out individual issues.
 
 =cut
 
@@ -22,11 +24,11 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More;
+use Test::More tests => 1;
 use Parrot::Config;
 use ExtUtils::Manifest qw(maniread);
 
-use vars qw(@docs);
+use vars qw(@failed);
 
 BEGIN {
     eval "use Pod::Find";
@@ -55,11 +57,26 @@ foreach my $file (keys(%$manifest), keys(%$manifest_gen)) {
     next if -B $file;
     # skip missing MANIFEST.generated files
     next unless -e $file;
-    push @docs, $file if Pod::Find::contains_pod($file, 0);
+    # skip files without POD
+    next unless Pod::Find::contains_pod( $file, 0 );
+    # skip files with valid POD
+    next if file_pod_ok ( $file );
+    push @failed, $file;
 }
 
-plan tests => scalar @docs;
-Test::Pod::pod_file_ok( $_ ) foreach @docs;
+my $bad_files = join ("\n", @failed);
+is ( $bad_files, q{} ); # only ok if everything passed
+
+# Pulled from Test::Pod
+sub file_pod_ok {
+    my $file = shift;
+    my $checker = Pod::Simple->new;
+
+    $checker->output_string( \my $trash ); # Ignore any output
+    $checker->parse_file( $file );
+
+    return !$checker->any_errata_seen;
+}
 
 # Local Variables:
 #   mode: cperl
