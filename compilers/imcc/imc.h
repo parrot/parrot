@@ -111,9 +111,9 @@ PMC *imcc_compile_pasm_ex(Parrot_Interp interp, const char *s);
 void *IMCC_compile_file(Parrot_Interp interp, const char *s);
 void *IMCC_compile_file_s(Parrot_Interp interp, const char *s,
       STRING **error_message);
-PMC * IMCC_compile_pir_s(Parrot_Interp interp, const char *s, 
+PMC * IMCC_compile_pir_s(Parrot_Interp interp, const char *s,
       STRING **error_message);
-PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s, 
+PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
       STRING **error_message);
 
 /* Call convention independant API */
@@ -202,7 +202,7 @@ typedef struct _imc_info_t {
 
     /* some values that were global... */
     int line;                   /* current line number */
-    int cur_pmc_type;           
+    int cur_pmc_type;
     SymReg *cur_call;
     SymReg *cur_obj;
     char *adv_named_id;

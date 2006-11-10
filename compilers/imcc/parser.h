@@ -1,4 +1,4 @@
-/* 
+/*
  * XXX - We need a description of the file here
  *
  * $Id$
