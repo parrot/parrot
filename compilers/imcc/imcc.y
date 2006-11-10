@@ -398,7 +398,6 @@ do_loadlib(Interp *interp, char *lib)
 %token <t> PRAGMA N_OPERATORS HLL HLL_MAP
 %token <t> GOTO ARG IF UNLESS PNULL
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
-%token <t> ADV_MAYBE_FLAT
 %token <t> NEW
 %token <t> NAMESPACE ENDNAMESPACE DOT_METHOD
 %token <t> SUB SYM LOCAL LEXICAL CONST
@@ -1346,7 +1345,6 @@ argtype_list:
 
 argtype:
      ADV_FLAT                  { $$ = VT_FLAT; }
-   | ADV_MAYBE_FLAT            { $$ = VT_MAYBE_FLAT; }
    | ADV_NAMED                 { $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')' { adv_named_set(interp,$3); $$ = 0; }
    ;

@@ -58,8 +58,7 @@ typedef enum {
     /* bits a user has to define */
     PARROT_ARG_FLATTEN          = 0x020,       /* .flatten_arg */
     PARROT_ARG_SLURPY_ARRAY     = PARROT_ARG_FLATTEN,  /* i.e. foldup  */
-    PARROT_ARG_MAYBE_FLATTEN    = 0x040, /* flatten, if slurping and the
-                                           argument is array */
+    /* unused - 0x040 */
     PARROT_ARG_OPTIONAL         = 0x080,
     PARROT_ARG_OPT_FLAG         = 0x100, /* prev optional was set */
     PARROT_ARG_NAME             = 0x200  /* this String is an arg name */

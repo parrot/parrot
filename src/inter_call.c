@@ -271,12 +271,6 @@ flatten:
         return;
     }
 
-    if ((st->dest.sig & PARROT_ARG_SLURPY_ARRAY) &&
-            (st->src.sig & PARROT_ARG_MAYBE_FLATTEN)) {
-        _array = CONST_STRING(interpreter, "array");
-        if (VTABLE_does(interpreter, p_arg, _array))
-            goto flatten;
-    }
     UVal_pmc(st->val) = p_arg;
     st->src.mode |= CALL_STATE_NEXT_ARG;
 }

@@ -450,19 +450,19 @@ int
 BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
     int massive = 0; /* 0 => inf, 1=> 99999999999 etc...*/
     switch (context->rounding) {
-    case ROUND_HALF_UP :
-    case ROUND_HALF_EVEN :
+      case ROUND_HALF_UP:
+      case ROUND_HALF_EVEN:
         break;
-    case ROUND_FLOOR :
+      case ROUND_FLOOR:
         if (!bn->sign) massive = 1;
         break;
-    case ROUND_CEILING :
+      case ROUND_CEILING:
         if (bn->sign) massive = 1;
         break;
-    case ROUND_DOWN :
+      case ROUND_DOWN:
         massive = 1;
         break;
-    default :
+      default:
         BN_EXCEPT(PINT_ BN_INVALID_OPERATION,
                   "Unknown rounding during overflow");
     }

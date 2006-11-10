@@ -23,8 +23,7 @@ enum VARTYPE {              /* variable type can be */
     VT_ENCODED   = 1 << 16,     /* unicode string constant */
     VT_OPT_FLAG  = 1 << 17, /* var :opt_flag */
     VT_NAMED     = 1 << 18, /* var :named(name) */
-    VT_UNIQUE_REG = 1 << 19,
-    VT_MAYBE_FLAT = 1 << 20, /* var :maybe_flat */
+    VT_UNIQUE_REG = 1 << 19
 };
 
 /* this VARTYPE needs register allocation and such */

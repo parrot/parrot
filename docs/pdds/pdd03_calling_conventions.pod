@@ -59,10 +59,11 @@ The common syntax of these opcodes is:
  <get_opcode> "(..., 0x200, flags0, ...)", ..., "name", REG0, ...
 
 The flags string is a literal quoted string denoting a list of zero or more
-comma-separated integers.  The list as a whole may be surrounded by
-parentheses.  Integers may be specified either in decimal, or if prefixed with
-"0b"/"0x", in binary/hexadecimal.  There must be exactly one integer for each
-value or register given.
+comma-separated integers.  Integers may be specified either in decimal, or if
+prefixed with "0b"/"0x", in binary/hexadecimal.  There must be exactly one
+integer for each value or register given.
+
+(DEPRECATED: The list as a whole may be surrounded by parentheses.)
 
 For documentation purposes we'll number the bits 0 (low) through 30 (high).
 Bit 31 (and higher, where available) will not be used.
@@ -109,63 +110,29 @@ C<set_returns>:
 The value is a literal constant, not a register.  (Don't set this bit
 yourself; the assembler will do it.)
 
-=item 5     C<FLAT>
+=item 5     C<FLAT> (P only)
 
-If this bit is set on a PMC value, then the PMC must be an aggregate or a
-scalar containing a reference to an aggregate.  The contents of the aggregate,
-rather than the aggregate itself, will be passed.
+If this bit is set on a PMC value, then the PMC must be an aggregate.  The
+contents of the aggregate, rather than the aggregate itself, will be passed.
 
- If the NAMED bit is also set, the aggregate will be used as a
- hash; its contents, as key/value pairs, will be passed as
- named parameters.  The PMC must implement the full hash
- interface.  {{ TODO: Limit the required interface. }}
- 
- array; its contents will be used as positional parameters.
+If the C<NAMED> bit is also set, the aggregate will be used as a hash; its
+contents, as key/value pairs, will be passed as named parameters.  The PMC
+must implement the full hash interface.  {{ TODO: Limit the required
+interface. }}
+
+If the C<NAMED> bit is not set, the aggregate will be used as an array; its
+contents will be passed as positional parameters.
 
 The meaning of this bit is undefined when applied to integer, number, and
 string values.
 
-=item 6     C<MAYBE_FLAT>
+=item 6     (unused)
 
-If this bit is set on a PMC value, and:
+=item 7     (unused)
 
-=over 4
+=item 8     (unused)
 
-=item a
-
-the PMC is either an aggregate or a scalar containing a reference to
-an aggregate, and
-
-=item b
-
-the target register has the SLURPY bit set,
-
-=back
-
-then pass the PMC value as a list of values, in these ways:
-
-=over 4
-
-=item a
-
-if the value is an array, pass its elements in the normal way (FLAT
-style);
-
-=item b
-
-if the value is a hash, pass its elements as a list of key/value
-pairs contained in HLL-specific 'pair' PMCs.
-
-=back
-
-The meaning of this bit is undefined when applied to integer, number, and
-string values.  It may not be combined with the NAMED bit.
-
-=item 7     C<(unused)>
-
-=item 8     C<(unused)>
-
-=item 9     C<NAMED (FLAT or string constant only)>
+=item 9     C<NAMED> (C<FLAT> or string constant only)
 
 When the FLAT bit is also set, behavior is as described above in the "FLAT"
 section.  Otherwise, this bit may only be set on a unique string constant
@@ -195,9 +162,9 @@ C<get_results>:
 
 =over 4
 
-=item 4     C<(unused)>
+=item 4     (unused)
 
-=item 5     C<SLURPY (P only)>
+=item 5     C<SLURPY> (P only)
 
 If this bit is set on a P register, then it will be populated with an
 aggregate that will contain all of the remaining values that have not already
@@ -206,15 +173,13 @@ been stored in other registers.
 All such values will be converted to PMCs according to the detailed rules
 below, and those PMCs will be stored into the new aggregate.
 
- If the NAMED bit is also set, the aggregate will be an
- HLL-specific hash type and the contents will be all
- unassigned _named_ parameters.
+If the C<NAMED> bit is also set, the aggregate will be the HLL-specific hash
+type and the contents will be all unassigned _named_ parameters.
 
- If the NAMED bit is not set, the aggregate will be an
- HLL-specific array type and the contents will be all
- unassigned positional parameters.
+If the C<NAMED> bit is not set, the aggregate will be the HLL-specific array
+type and the contents will be all unassigned positional parameters.
 
-=item 6     C<(unused)>
+=item 6     (unused)
 
 =item 7     C<OPTIONAL>
 
@@ -222,26 +187,32 @@ If this bit is set on a register for which no value has been passed, no
 exception will be raised; rather, the register will be set to a default value:
 a Null PMC for P, an empty string for S, or zero for N or I.
 
-=item 8     C<OPT_FLAG (I only)>
+=item 8     C<OPT_FLAG> (I only)
 
 An I register with this bit set is set to one if the immediately preceding
-B<OPTIONAL> register received a value; otherwise, it is set to zero.
+B<OPTIONAL> register received a value; otherwise, it is set to zero.  If the
+preceding register was not marked B<OPTIONAL>, the behavior is undefined; but
+we promise you won't like it.
 
-=item 8     C<READONLY (P only)>
+=item 8     C<READONLY> (P only)
 
-C<XXX - PROPOSED ONLY - XXX>
+I<XXX - PROPOSED ONLY - XXX>
 
 If this bit is set on a P register that receives a value, Parrot will ensure
 that the final value in the P register is read-only (i.e. will not permit
 modification).  If the received value was a mutable PMC, then Parrot will
-create and set the register to a read-only PMC wrapper around the original
-PMC.
+create and set the register to a {not yet invented} read-only PMC wrapper
+around the original PMC.
 
-Parrot's algorithm for deciding what is writable may be pretty simplistic.  In
-initial implementations, it may assume that any PMC not of a known
-read-only-wrapper type is mutable.
+Future Notes: Parrot's algorithm for deciding what is writable may be
+simplistic.  In initial implementations, it may assume that any PMC not of a
+known read-only-wrapper type is mutable.  Later it may allow the HLL to
+provide the test.  But we must beware overdesigning this; any HLL with a truly
+complex notion of read-only probably needs to do this kind of wrapping itself.
 
-=item 9     C<NAMED (SLURPY or string constant only)>
+=item 8     (unused for S and N)
+
+=item 9     C<NAMED> (C<SLURPY> or string constant only)
 
 When the SLURPY bit is also set, behavior is as described above in the
 "SLURPY" section.  Otherwise, this bit may only be set on a unique string
@@ -263,17 +234,18 @@ Oh, wait, that's my job.  Never mind.  --Chip
 If too few values are provided so that some target registers are left unset,
 this too results in an exception.
 
-=head3 Ordering of named values
+=head3 Ordering of named values (outgoing)
 
-Named values (arguments, or values to return) must I<appear> after all the
-unnamed values.  Within the unnamed and named zones, FLAT and non-FLAT values
-may be mixed in any order.
+Named values (arguments, or values to return) must be listed textually after
+all the positional values.  C<FLAT> and non-C<FLAT> values may be mixed in any
+order.
 
-=head3 Ordering of named targets
+=head3 Ordering of named targets (incoming)
 
 Named targets (parameters, or returned values) must appear I<after> all the
-unnamed targets.  Within the unnamed and named zones, SLURPY targets must
-appear last (if they appear at all).
+positional targets.  A C<SLURPY> positional target, if present, must be the
+last positional target; a C<SLURPY> named target, if present, must be the last
+named target.
 
 So the acceptable ordering of targets is:
 
@@ -281,29 +253,29 @@ So the acceptable ordering of targets is:
 
 =item *
 
-unnamed non-SLURPY    (any number)
+positional non-SLURPY    (any number)
 
 =item *
 
-unnamed SLURPY array  (optional)
+positional SLURPY array  (optional)
 
 =item *
 
-NAMED non-SLURPY      (any number)
+NAMED non-SLURPY         (any number)
 
 =item *
 
-NAMED SLURPY hash     (optional)
+NAMED SLURPY hash        (optional)
 
 =back
 
-=head3 Mixing named and unnamed values
+=head3 Mixing named and positional values
 
-Unnamed targets can only be filled with unnamed values.
+Positional targets can only be filled with positional values.
 
-Named targets can be filled with either unnamed or named values.  However, if
-a named target was already filled by an unnamed (positional) value, and then a
-named value is also given, this is an overflow error.
+Named targets can be filled with either positional or named values.  However,
+if a named target was already filled by an positional (positional) value, and
+then a named value is also given, this is an overflow error.
 
 =head3 Type Conversions
 
@@ -339,7 +311,9 @@ to a new .String[1] which has been C<assign>ed the given string.
 
 =back
 
-[1] according the current HLL type mappings.
+[1] or some other type specified by the current HLL type map, which may
+substitute an alternative type for each default low-level Parrot type (array,
+hash, string, number, etc.).
 
 =head1 BUGS
 
@@ -362,6 +336,9 @@ Specific exceptions to throw for specific errors.
   foo(p, 'key' => value)          # named argument
   foo(p, value :named('key'))     # the same
   foo(kw :named :flat)            # a flattening hash
+
+  # all together now: three positional (one flat) with two named (one flat)
+  foo(a, b, c :flat, 'x' => 3, 'y' => 4, z :flat :named('z'))
 
 =head2 Parameters
 
@@ -387,7 +364,7 @@ None.
 
 =head1 REFERENCES
 
-None.
+L<pdd23_exceptions.pod>
 
 =cut
 

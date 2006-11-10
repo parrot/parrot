@@ -51,7 +51,6 @@ creating an exhaustive test suite for calling conventions.
   nrml  no flags   (src: val & 0x03a0 = 0; dest: val & 0x0260 = 0)
   slrp  SLURPY     (val & 0x0020 = 1)
   flat  FLAT       (val & 0x0020 = 1)
-  mayb  MAYBE_FLAT (val & 0x0040 = 1)
 
 =item  Passing
 
@@ -74,7 +73,7 @@ creating an exhaustive test suite for calling conventions.
   E1  overflow
   E2  overflow if aggregate is not empty
   E3  underflow
-  E4  MAYBE_FLAT may not be combined with NAMED
+  E4  [removed]
   E5  named parameter passed, unnamed expected
   E6  unnamed parameter passed, named expected
 
