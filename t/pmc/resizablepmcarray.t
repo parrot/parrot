@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 
 =head1 NAME
 
@@ -1048,6 +1048,20 @@ pir_output_is(<<"CODE", <<'OUTPUT', 'splice, append');
   $splice_postamble
 CODE
 12345ABCDE
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice, insert before last element');
+  $splice_preamble 
+  P2 = new 'ResizablePMCArray'
+  P2[0] = 'A'
+  P2[1] = 'B'
+  P2[2] = 'C'
+  P2[3] = 'D'
+  P2[4] = 'E'
+  splice P1, P2, 3, 0
+  $splice_postamble
+CODE
+1234ABCDE5
 OUTPUT
 
 pir_output_is(<<"CODE", <<'OUTPUT', 'splice, append-in-middle');
