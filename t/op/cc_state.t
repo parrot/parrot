@@ -11,7 +11,7 @@ use Test::More;
 # A  args/params        R  results/returns
 # C: src     D: dest
 # I  IREG    S  SREG    P  PREG    N  NREG
-# m  normal  f  flat    b  maybe_flat
+# m  normal  f  flat
 # u  unnamed n  named   r  required  o  optional
 # m  normal  s  slurpy  E  end
 
@@ -45,12 +45,6 @@ pcc_like({args=>"123", params=>".param pmc x :named('x')"},
 #pcc_like({args=>"x=>['123';'456'] :flat", params=>".param pmc x"},
 #    '/named arg found, required param expected/',
 #    'E2: named found, required slurpy param expected',
-#);
-
-## F -- how do i test MAYBE_FLAT?
-#pcc_like({args=>"x=>'123' :maybe_flat",params=>".param pmc x"},
-#    '/MAYBE_FLAT and NAMED flags may not be combined/'
-#    'F1: MAYBE_FLAT may not be combined with NAMED',
 #);
 
 ## G
