@@ -154,12 +154,20 @@ D: Test for literals
 
 N: David M. Loyd
 
+N: David Romano
+D: PGE tests and fixes
+E: david.romano+p6i@gmail.com
+
 N: Dennis Rieks
 D: Win32 config and build
 
 N: Dino Morelli
 D: PGE tests
 E: dmorelli@reactorweb.net
+
+N: Dmitry Karasik
+D: nci loadlib fixes
+E: dmitry@karasik.eu.org
 
 N: Eirik Berg Hanssen
 D: Use unix98 ps option in signal.t
@@ -285,7 +293,12 @@ N: Josh Wilmes
 N: Juergen Boemmels
 D: Parrot I/O; macro stuff in assembler.
 
+N: Karl Forner
+D: shootout examples testing
+E: karl.forner@gmail.com
+
 N: Kay-Uwe 'kiwi' Hüll
+D: Cage cleaning tasks
 
 N: Kenneth A Graves
 D: yield and other PIR improvements
@@ -416,7 +429,7 @@ N: Ritz Daniel
 N: Robert Spier
 D: Keeps us running
 
-N: Roger Browne 
+N: Roger Browne
 D: Author of Amber; bug fixes and tests
 
 N: Roland Illing
@@ -424,6 +437,10 @@ D: Building Parrot with pkgsrc
 
 N: Ron Blaschke
 D: Win32 patches
+
+N: Ruben Fonseca
+D: opcode test coverage script
+E: fonseka@gmail.com
 
 N: Sam Ruby
 D: Pythonic and OO patches
