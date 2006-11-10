@@ -24,7 +24,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More tests => 1;
+use Test::More;
 use Parrot::Config;
 use ExtUtils::Manifest qw(maniread);
 
