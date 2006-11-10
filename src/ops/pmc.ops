@@ -81,10 +81,8 @@ op new(out PMC, in INT, in PMC) {
 op new(out PMC, inconst STR) {
     STRING *class = $2;
     INTVAL type = pmc_type(interpreter, class);
-    if (!type) {
-        Parrot_autoload_class(interpreter, class);
+    if (!type)
         type = pmc_type(interpreter, class);
-    }
     if (type <= 0)
         real_exception(interpreter, NULL, NO_CLASS,
             "Class '%Ss' not found", class);
@@ -95,10 +93,8 @@ op new(out PMC, inconst STR) {
 op new(out PMC, inconst STR, in PMC) {
     STRING *class = $2;
     INTVAL type = pmc_type(interpreter, class);
-    if (!type) {
-        Parrot_autoload_class(interpreter, class);
+    if (!type)
         type = pmc_type(interpreter, class);
-    }
     if (type <= 0)
         real_exception(interpreter, NULL, NO_CLASS,
             "Class '%Ss' not found", class);

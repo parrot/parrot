@@ -341,42 +341,6 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
 
 /*
 
-=item C<void Parrot_autoload_class(Interp *, STRING *class)>
-
-Try to load a library that holds the PMC class.
-
-XXX Check if this is still needed with HLL type mappings.
-
-=cut
-
-*/
-void
-Parrot_autoload_class(Interp *interpreter, STRING *class)
-{
-    static const struct {
-        const char *prefix;
-        const char *lib;
-    } mappings[] = {
-        { "Py", "python_group" },
-        { "Tcl", "tcl_group" }
-    };
-    size_t i;
-    char *cclass;
-
-    cclass = string_to_cstring(interpreter, class);
-    for (i = 0; i < sizeof(mappings)/sizeof(mappings[0]); ++i) {
-        if (!memcmp(mappings[i].prefix, cclass, strlen(mappings[i].prefix))) {
-            STRING *slib = const_string(interpreter, mappings[i].lib);
-            Parrot_load_lib(interpreter, slib, NULL);
-            break;
-        }
-    }
-    string_cstring_free(cclass);
-
-}
-
-/*
-
 =item C<STRING *
 parrot_split_path_ext(Interp*, STRING *in, STRING **wo_ext, STRING **ext)>
 

@@ -565,10 +565,8 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
                 INTVAL type;
                 class = (STRING *)cur_opcode[2];
                 type = pmc_type(interpreter, class);
-                if (!type) {
-                    Parrot_autoload_class(interpreter, class);
+                if (!type)
                     type = pmc_type(interpreter, class);
-                }
                 if (type <= 0)
                     real_exception(interpreter, NULL, NO_CLASS,
                             "Class '%Ss' not found", class);
