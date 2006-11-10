@@ -1,7 +1,10 @@
 #1 $Id$
 
-2006.11.07		tewk
+2006.11.07	tewk
 	* added :init pragma functionality to subs
+
+2006.10.28	jonathan
+	* added :vtable pragma functionality to subs
 
 2006.09.18    chromatic
 	* added Parrot::Embed under ext/Parrot-Embed
