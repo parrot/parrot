@@ -1,0 +1,187 @@
+# Top Level Stuff
+
+token program  { <compilation_unit>* }
+
+token compilation_unit { <pragma>
+                       | <global>
+                       | <constdef>
+                       | <emit>
+                       | <namespace>
+                       | <sub>
+                       | \n 
+                       }
+
+
+# Pragma
+
+token pragma { <'.pragma'> n_operators (\d+) \n
+             | <'.HLL'> <STRINGC>, <STRINGC> \n
+             | <'.HLL_map'> \d+, \d+ \n
+             | <'.loadlib'> <STRINGC> \n
+             }
+
+
+# Global
+
+token global { <'.global'> <type> <identifier>
+             | <'.global'> <type> <identifier> = <const>
+             }
+
+
+# Constants
+
+token constdef { <'.const'> <type> <identifier> = <const> }
+
+token pmc_const { <'.const'> <INTC> <var_or_i> = <any_string> }
+
+
+# PASM Emit
+
+token pasmcode { <pasmline>+ }
+
+token pasmline { <labels> <pasm_inst> \n
+               | <class_namespace>
+               | <pmc_const>
+               | <pragma>
+               }
+
+token pasm_inst { <PARROT_OP> <pasm_arg>+
+                | <PCC_SUB>
+                | <sub_proto> <LABEL>
+		| <PNULL> <var>
+                | <'.lex'> <STRINGC> , <REG>
+                }
+
+token emit { <'.emit'> \n <pasmcode>? <'.eom'> }
+
+
+# Namespace
+
+token namespace { <'.namespace'> [ \[ <keylist> \] ]? \n }
+
+
+# Sub
+
+token sub { <'.sub'> <sub_label_op_c> <sub_proto_list>
+            <sub_param>*
+            <statement>*
+            <'.end'>
+          }
+
+token sub_proto_list { # Nothing
+                     | <sub_proto>
+                     | <sub_proto> <','> <sub_proto_list>
+                     }
+
+token sub_proto { <':load'>
+                | <':init'>
+                | <':main'>
+                | <':immediate'>
+                | <':postcomp'>
+                | <':anon'>
+                | <':method'>
+                | <':lex'>
+                | <multi>
+                | <outer>
+                | <vtable>
+                }
+
+token multi { <'('> multi_types <')'> }
+
+
+token multi_types { # Nothing
+                  | <multi_type>
+                  | <multi_type> <','> <multi_types>
+                  }
+
+token multi_type { <'int'>
+                 | <'num'>
+                 | <'float'>
+                 | <'string'>
+                 | <'pmc'>
+                 | <IDENTIFIER>
+                 | <STRINGC>
+                 | \[ <keylist> \]
+                 }
+
+token outer { <':outer'> <'('> [ <STRINGC> | <IDENTIFIER> ] <')'> }
+
+token vtable { <':vtable'> [ <'('> <STRINGC> <')'> ]? }
+
+token sub_param { <'.param'> <type> <IDENTIFIER> sub_param_flags
+                | <'.param'> <type> <STRINGC> <'=>'> <IDENTIFIER> sub_param_flags
+                }
+
+token paramtype { <':slurpy'>
+                | <':optional'>
+                | <':opt_flag'>
+                | <':named'>
+                | <':named'> <'('> <STRINGC> <')'>
+                | <':unique_reg'>
+                }
+
+
+# Statements
+
+token statement { <instruction>
+                }
+
+token instruction { <labels> <labeled_inst> }
+
+token labels { <label>* }
+
+token label { \w+<':'> }
+
+token labeled_inst { # Nothing
+                   | <assignment>
+                   | <if_statement>
+                   | <'.local'> <type> <ident_list>
+                   | <'.lex'> <STRINGC> , <target>
+                   | <'.const'> <type> <IDENTIFIER> = <const>
+                   | <pmc_const>
+                   | <'.return'> <sub_call>
+                   | <'goto'> <label>
+                   | <PARROT_OP> <vars>
+                   | <PNULL> <var>
+                   | <sub_call>
+                   }
+
+token ident_list { # Nothing
+                 | <ident>
+                 | <ident> <','> <ident_list>
+                 }
+
+token ident { <IDENTIFIER> 
+            | <IDENTIFIER> <':unique_reg'>
+            }
+
+token assignment { <target> = <var> 
+                 | <target> = <sub_call>
+                 | <'('> <target_list> <')'> = <sub_call>
+                 | <get_results>
+                 | <op_assign>
+                 | <func_assign>
+                 | <target> = <'null'>
+                 } # XXX Lots to do
+
+token get_results { <'.get_results'> <'('> <target_list> <')'> }
+
+token op_assign { <target> += <var> }
+
+
+
+token type { <'int'>
+           | <'num'>
+           | <'float'>
+           | <'string'>
+           | <'pmc'>
+           | <IDENTIFIER>
+           }
+
+
+
+# General
+
+token any_string { <STRINGC>
+                 | <STRINGU>
+                 }
