@@ -45,7 +45,10 @@ foreach my $file (@files) {
 
     while (<$fh>) {
         next unless /(FIXME|XXX|TODO)/;
-        push @fixme, "file '$file', line $.: $1\n";
+     
+        if (! m/\((?:RT)?#+\d+\)/) {
+            push @fixme, "file '$file', line $.: $1\n";
+        }
     }
     close $fh;
 }
@@ -56,7 +59,7 @@ ok( !scalar(@fixme), 'FIXME strings' )
 exit;
 
 sub source_files {
-    return map { $_->path } (
+    return sort map { $_->path } (
         map( $_->files_of_type('C code'),
             $DIST->c_source_file_directories ),
 
