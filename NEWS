@@ -2,8 +2,38 @@
 
 New in 0.4.x
 
-- autoconf compatible install options
-- PIR parser/compiler does not stop on first error
+- New language: PHP ("Plumhead")
+- Updated languages: Ruby ("Cardinal"), Tcl, Lua
+- Compilers:
+   + PGE updated with more expressions, latest changes to S05
+   + new Perl6 grammar compiler
+- Integration:
+   + Perl 5 module "Parrot::Embed" allows easy embedding of a Parrot
+     runtime into a Perl 5 program
+- PIR:
+   + new :init pragma for subs that must run before the main function
+   + new :vtable pragma to identify subs that override PMC vtable methods,
+     eliminating the need for special subroutine names
+   + PIR parser/compiler does not stop on first syntax error
+   + Vanilla register allocator ("register alligator") greatly improves
+     performance compiling large functions
+   + Eliminated limit on number of PIR macros
+- PMCs:
+   + hash lookups return null instead of None for missing keys
+- Design:
+   + PDD13 "Bytecode files: format and manipulation" - new
+   + PDD10 "Embedding" - new
+   + PDD25 "Concurrency" - rewritten
+   + PDD15 "Objects" - new section on redesign requirements
+   + PDD07 "Coding standards" - significant updates and automated tests
+- Test Suite:
+   + Many many more new tests
+- Build Process:
+   + autoconf compatible install options
+- Misc:
+   + Namespace refinements
+   + Coroutine improvements
+   + An impressive swarm of other bugfixes and enhancements
 
 New in 0.4.6
 
