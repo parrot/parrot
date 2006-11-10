@@ -227,13 +227,13 @@ done:
     array = 1
     $P0 = array[2]
     $S0 = typeof $P0
-    is($S0, 'Undef', "get_pmc_keyed_int (out of bounds) - type")
+    is($S0, 'String', "get_pmc_keyed_int (out of bounds) - type")
     is($P0, '',      "get_pmc_keyed_int (out of bounds) - value")
 
     array = 1
     $P0 = array["2"]
     $S0 = typeof $P0
-    is($S0, 'Undef', "get_pmc_keyed (out of bounds) - type")
+    is($S0, 'String', "get_pmc_keyed (out of bounds) - type")
     is($P0, '',      "get_pmc_keyed (out of bounds) - value")
 
     push_eh get_pmc_keyed_int_exception

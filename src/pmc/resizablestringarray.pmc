@@ -202,18 +202,27 @@ Resizes the array to C<size> elements.
             }
         }
         else if (size <= PMC_int_val2(SELF)) {
+            /* zero out anything that was previously allocated
+             * if we're growing the array */
+            INTVAL oldsize = PMC_int_val(SELF);
+            if (size > oldsize) {
+                STRING **data   = (STRING**)PMC_data(SELF);
+                INTVAL i;
+                for (i=oldsize; i<size; i++)
+                    data[i] = NULL;
+            }
+
             PMC_int_val(SELF) = size;
             /* we could shrink here if necessary */
             return;
         }
         else {
-            INTVAL i, cur, needed;
+            INTVAL i, cur;
             i = cur = PMC_int_val2(SELF);
             if (cur < 8192)
                 cur = size < 2 * cur ? 2 * cur : size;
             else {
-                needed = size - cur;
-                cur += needed + 4096;
+                cur = size + 4096;
                 cur &= ~0xfff;
             }
             PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
