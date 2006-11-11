@@ -3171,7 +3171,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
                         &CONST(2 + i)->u.number);
                 break;
             default:
-                internal_exception(1, "set_args_jit - unknown typ");
+                internal_exception(1, "set_args_jit - unknown type");
                 break;
         }
     }

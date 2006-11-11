@@ -8,7 +8,7 @@ Parrot_noop {
     jit_info->native_ptr = emit_nop(jit_info->native_ptr);
 }
 
-; ldmea	fp, {r4, r5, r6, r7, fp, sp, pc
+; ldmea fp, {r4, r5, r6, r7, fp, sp, pc
 ; but K bug Grr if I load pc direct.
 
 Parrot_end {

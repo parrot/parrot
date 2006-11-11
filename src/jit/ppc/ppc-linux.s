@@ -1,6 +1,6 @@
 .text
-	.align	12
-	.globl Parrot_ppc_jit_restore_nonvolatile_registers
+    .align 12
+    .globl Parrot_ppc_jit_restore_nonvolatile_registers
 Parrot_ppc_jit_restore_nonvolatile_registers:
 
     lfd     14,-84(1)

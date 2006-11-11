@@ -11,7 +11,7 @@ Parrot_end {
     jit_emit_lwz(NATIVECODE, r1, 0, r1);
     jit_emit_lwz(NATIVECODE, r0, 8, r1);
 
-	jit_emit_call_func(NATIVECODE, (void *)Parrot_ppc_jit_restore_nonvolatile_registers);
+    jit_emit_call_func(NATIVECODE, (void *)Parrot_ppc_jit_restore_nonvolatile_registers);
 
     jit_emit_mtlr(NATIVECODE, r0);
     jit_emit_lmw(NATIVECODE, r13, -PPC_JIT_GP_REGISTER_SAVE_SPACE, r1);
@@ -36,20 +36,20 @@ Parrot_set_i_ic {
 
 Parrot_set_i_n {
     if (MAP[2]) {
-	jit_emit_fctiwz  (NATIVECODE, FSR2, MAP[2]);
+    jit_emit_fctiwz  (NATIVECODE, FSR2, MAP[2]);
     }
     else {
         jit_emit_mov_rm_n(NATIVECODE, FSR1, ROFFS_NUM(2));
-	jit_emit_fctiwz  (NATIVECODE, FSR2, FSR1);
+    jit_emit_fctiwz  (NATIVECODE, FSR2, FSR1);
     }
     if (MAP[1]) {
-	jit_emit_add_rri_i(NATIVECODE, ISR1, 0, -4);
-	jit_emit_stfiwx   (NATIVECODE, FSR2, ISR1, r1);   /* -> -4(sp) */
-	jit_emit_lwz      (NATIVECODE, MAP[1], -4, r1);
+    jit_emit_add_rri_i(NATIVECODE, ISR1, 0, -4);
+    jit_emit_stfiwx   (NATIVECODE, FSR2, ISR1, r1);   /* -> -4(sp) */
+    jit_emit_lwz      (NATIVECODE, MAP[1], -4, r1);
     }
     else {
-	jit_emit_add_rri_i(NATIVECODE, ISR1, 0, ROFFS_INT(1));
-	jit_emit_stfiwx   (NATIVECODE, FSR2, ISR1, r13);   /* -> offs(base) */
+    jit_emit_add_rri_i(NATIVECODE, ISR1, 0, ROFFS_INT(1));
+    jit_emit_stfiwx   (NATIVECODE, FSR2, ISR1, r13);   /* -> offs(base) */
     }
 }
 
@@ -66,10 +66,10 @@ Parrot_set_n_ic {
     jit_emit_mov_ri_i(NATIVECODE, ISR2, &xx);
     jit_emit_lfd(     NATIVECODE, FSR2, 0, ISR2);
     if (MAP[1]) {
-	jit_emit_fsub_rrr(NATIVECODE, MAP[1], FSR1, FSR2);
+    jit_emit_fsub_rrr(NATIVECODE, MAP[1], FSR1, FSR2);
     }
     else {
-	jit_emit_fsub_rrr(NATIVECODE, FSR1, FSR1, FSR2);
+    jit_emit_fsub_rrr(NATIVECODE, FSR1, FSR1, FSR2);
         jit_emit_mov_mr_n(NATIVECODE, ROFFS_NUM(1), FSR1); 
     }
 }
@@ -77,11 +77,11 @@ Parrot_set_n_ic {
 Parrot_set_n_i {
     static double xx = 4503601774854144.0; /* 0x4330000080000000L; */
     if (MAP[2]) {
-	jit_emit_xoris(   NATIVECODE, ISR1, MAP[2], 0x8000);   
+    jit_emit_xoris(   NATIVECODE, ISR1, MAP[2], 0x8000);   
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(2)); 
-	jit_emit_xoris(   NATIVECODE, ISR1, ISR1, 0x8000);   
+    jit_emit_xoris(   NATIVECODE, ISR1, ISR1, 0x8000);   
     }
     /* use redzone for intermediate */
     jit_emit_stw(     NATIVECODE, ISR1, -4, r1);
@@ -92,10 +92,10 @@ Parrot_set_n_i {
     jit_emit_mov_ri_i(NATIVECODE, ISR2, &xx);
     jit_emit_lfd(     NATIVECODE, FSR2, 0, ISR2);
     if (MAP[1]) {
-	jit_emit_fsub_rrr(NATIVECODE, MAP[1], FSR1, FSR2);
+    jit_emit_fsub_rrr(NATIVECODE, MAP[1], FSR1, FSR2);
     }
     else {
-	jit_emit_fsub_rrr(NATIVECODE, FSR1, FSR1, FSR2);
+    jit_emit_fsub_rrr(NATIVECODE, FSR1, FSR1, FSR2);
         jit_emit_mov_mr_n(NATIVECODE, ROFFS_NUM(1), FSR1); 
     }
 }
@@ -142,13 +142,13 @@ Parrot_set_n_n {
         jit_emit_mov_rr_n(NATIVECODE, MAP[1], MAP[2]);
     }
     else if (MAP[1]) {
-	jit_emit_mov_rm_n(NATIVECODE, MAP[1], ROFFS_NUM(2));
+    jit_emit_mov_rm_n(NATIVECODE, MAP[1], ROFFS_NUM(2));
     }
     else if (MAP[2]) {
         jit_emit_mov_mr_n(NATIVECODE, ROFFS_NUM(1), MAP[2]);
     }
     else {
-	jit_emit_mov_rm_n(NATIVECODE, FSR1, ROFFS_NUM(2));
+    jit_emit_mov_rm_n(NATIVECODE, FSR1, ROFFS_NUM(2));
         jit_emit_mov_mr_n(NATIVECODE, ROFFS_NUM(1), FSR1);
     }
 }
@@ -208,39 +208,39 @@ TEMPLATE binop_x_xc {
     int im;
     if (MAP[1]) {
 #ifdef jit_emit_<op>_rri<_N>
-	im = *INT_CONST[2];
-	/* *if* immediate constant is small and there is a dedicated
-	 * opcode, just use it
-	 * _n variants don't have immediates, only _i
-	 *
-	 * This could be further improved, if there exists also
-	 * a shifted opcode variant like 'oris'. But then this code
-	 * should be factored out into jit_emit.h. This OTOH needs some
-	 * convention about scratch register usage.
-	 */
-	if (!(im >> 16)) {
-	    jit_emit_<op>_rri_i(NATIVECODE, MAP[1], MAP[1], im);
-	}
-	else 
+    im = *INT_CONST[2];
+    /* *if* immediate constant is small and there is a dedicated
+     * opcode, just use it
+     * _n variants don't have immediates, only _i
+     *
+     * This could be further improved, if there exists also
+     * a shifted opcode variant like 'oris'. But then this code
+     * should be factored out into jit_emit.h. This OTOH needs some
+     * convention about scratch register usage.
+     */
+    if (!(im >> 16)) {
+        jit_emit_<op>_rri_i(NATIVECODE, MAP[1], MAP[1], im);
+    }
+    else 
 #endif
-	{
-	    jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[2]); 
-	    jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[1], <s1>);
-	}
+    {
+        jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[2]); 
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[1], <s1>);
+    }
     }
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, <s1>, ROFFS_<t>(1));
 #ifdef jit_emit_<op>_rri<_N>
-	im = *INT_CONST[2];
-	if (!(im >> 16)) {
-	    jit_emit_<op>_rri_i(NATIVECODE, <s1>, <s1>, im);
-	}
-	else 
+    im = *INT_CONST[2];
+    if (!(im >> 16)) {
+        jit_emit_<op>_rri_i(NATIVECODE, <s1>, <s1>, im);
+    }
+    else 
 #endif
-	{
-	    jit_emit_mov_ri<_N>(NATIVECODE, <s2>, <c>_CONST[2]);
-	    jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s1>, <s2>);
-	}
+    {
+        jit_emit_mov_ri<_N>(NATIVECODE, <s2>, <c>_CONST[2]);
+        jit_emit_<op>_rrr<_N>(NATIVECODE, <s1>, <s1>, <s2>);
+    }
         jit_emit_mov_mr<_N>(NATIVECODE, ROFFS_<t>(1), <s1>);
     }
 }
@@ -347,16 +347,16 @@ TEMPLATE binop_x_x_xc {
     if (MAP[1] && MAP[2]) {
 #ifdef jit_emit_<op>_rri<_N>
         /* common case - operands are MAPped */
-	int im = *INT_CONST[3];
-	if (!(im >> 16)) {
-	    jit_emit_<op>_rri_i(NATIVECODE, MAP[1], MAP[2], im);
-	}
-	else 
+    int im = *INT_CONST[3];
+    if (!(im >> 16)) {
+        jit_emit_<op>_rri_i(NATIVECODE, MAP[1], MAP[2], im);
+    }
+    else 
 #endif
-	{
-	    jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[3]); 
-	    jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[2], <s1>);
-	}
+    {
+        jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[3]); 
+        jit_emit_<op>_rrr<_N>(NATIVECODE, MAP[1], MAP[2], <s1>);
+    }
     }
     else if (MAP[1]) {
         jit_emit_mov_ri<_N>(NATIVECODE, <s1>, <c>_CONST[3]);
@@ -676,23 +676,23 @@ Parrot_rot_i_i_ic_ic {
     int rc = *INT_CONST[3];
     int bw = *INT_CONST[4];
     if (rc < 0)
-	rc = bw + rc;
+    rc = bw + rc;
     if (MAP[1] && MAP[2]) {
-	jit_emit_rot_rri(NATIVECODE, MAP[1], MAP[2], rc);
+    jit_emit_rot_rri(NATIVECODE, MAP[1], MAP[2], rc);
     }
     else if (MAP[1]) {
         jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
-	jit_emit_rot_rri(NATIVECODE, MAP[1], ISR2, rc);
+    jit_emit_rot_rri(NATIVECODE, MAP[1], ISR2, rc);
     }
     else if (MAP[2]) {
         jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(1));
-	jit_emit_rot_rri(NATIVECODE, ISR1, MAP[2], rc);
+    jit_emit_rot_rri(NATIVECODE, ISR1, MAP[2], rc);
         jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_INT(1));
         jit_emit_mov_rm_i(NATIVECODE, ISR2, ROFFS_INT(2));
-	jit_emit_rot_rri(NATIVECODE, ISR1, ISR2, rc);
+    jit_emit_rot_rri(NATIVECODE, ISR1, ISR2, rc);
         jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
     }
 
@@ -720,10 +720,10 @@ TEMPLATE iseq_i_x_x {
     /* bits 0 LT, 1 GT, 2 EQ */
     /* see also extrwi */
     if (MAP[1]) {
-	jit_emit_rlwinm(NATIVECODE, MAP[1], ISR1, <b>, 31, 31);
+    jit_emit_rlwinm(NATIVECODE, MAP[1], ISR1, <b>, 31, 31);
     }
     else {
-	jit_emit_rlwinm(NATIVECODE, ISR1, ISR1, <b>, 31, 31);
+    jit_emit_rlwinm(NATIVECODE, ISR1, ISR1, <b>, 31, 31);
         jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
     }
 }
@@ -752,10 +752,10 @@ TEMPLATE isle_i_x_x {
     /* get EQ and or the bits into destination */
     jit_emit_rlwinm(NATIVECODE, ISR1, ISR1, 3, 31, 31);
     if (MAP[1]) {
-	jit_emit_or_rrr(NATIVECODE, MAP[1], ISR1, ISR2);
+    jit_emit_or_rrr(NATIVECODE, MAP[1], ISR1, ISR2);
     }
     else {
-	jit_emit_or_rrr(NATIVECODE, ISR1, ISR1, ISR2);
+    jit_emit_or_rrr(NATIVECODE, ISR1, ISR1, ISR2);
         jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
     }
 }
@@ -788,10 +788,10 @@ TEMPLATE cmp_i_x_x {
     /* get GT  or the bits into destination */
     jit_emit_rlwinm(NATIVECODE, ISR1, ISR1, 2, 31, 31);
     if (MAP[1]) {
-	jit_emit_or_rrr(NATIVECODE, MAP[1], ISR1, ISR2);
+    jit_emit_or_rrr(NATIVECODE, MAP[1], ISR1, ISR2);
     }
     else {
-	jit_emit_or_rrr(NATIVECODE, ISR1, ISR1, ISR2);
+    jit_emit_or_rrr(NATIVECODE, ISR1, ISR1, ISR2);
         jit_emit_mov_mr_i(NATIVECODE, ROFFS_INT(1), ISR1);
     }
 }
@@ -857,7 +857,7 @@ Parrot_inc_n {
         jit_emit_fadd_rrr(NATIVECODE, MAP[1], MAP[1], FSR1);
     }
     else {
-	jit_emit_mov_rm_n(NATIVECODE, FSR2, ROFFS_NUM(1));
+    jit_emit_mov_rm_n(NATIVECODE, FSR2, ROFFS_NUM(1));
         jit_emit_fadd_rrr(NATIVECODE, FSR2, FSR2, FSR1);
         jit_emit_mov_mr_n(NATIVECODE, ROFFS_NUM(1), FSR2);
     }
@@ -871,7 +871,7 @@ Parrot_dec_n {
         jit_emit_fsub_rrr(NATIVECODE, MAP[1], MAP[1], FSR1);
     }
     else {
-	jit_emit_mov_rm_n(NATIVECODE, FSR2, ROFFS_NUM(1));
+    jit_emit_mov_rm_n(NATIVECODE, FSR2, ROFFS_NUM(1));
         jit_emit_fsub_rrr(NATIVECODE, FSR2, FSR2, FSR1);
         jit_emit_mov_mr_n(NATIVECODE, ROFFS_NUM(1), FSR2);
     }
@@ -957,7 +957,7 @@ TEMPLATE Parrot_ifunless_n_ic {
         jit_emit_cmp_rr_n(NATIVECODE, MAP[1], FSR1);
     }
     else {
-	jit_emit_mov_rm_n(NATIVECODE, FSR2, ROFFS_NUM(1));
+    jit_emit_mov_rm_n(NATIVECODE, FSR2, ROFFS_NUM(1));
         jit_emit_cmp_rr_n(NATIVECODE, FSR2, FSR1);
     }
     jit_emit_bc(jit_info, <COND>, *INT_CONST[2]);
@@ -1200,8 +1200,8 @@ Parrot_clone_s_sc {
 }
 
 Parrot_set_s_s {
-	jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_STR(2)); 
-	jit_emit_mov_mr_i(NATIVECODE, ROFFS_STR(1), ISR1); 
+    jit_emit_mov_rm_i(NATIVECODE, ISR1, ROFFS_STR(2)); 
+    jit_emit_mov_mr_i(NATIVECODE, ROFFS_STR(1), ISR1); 
 }
 
 Parrot_clone_s_s {
@@ -1223,8 +1223,8 @@ Parrot_set_p_pc {
 ; or just JIT (TODO)  the 2 easy ones
 Parrot_set_args_pc {
     if (jit_info->code_type == JIT_CODE_FILE) {
-	jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
-	jit_emit_stw(NATIVECODE, ISR1, offsetof(Interp, current_args), r16);
+    jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
+    jit_emit_stw(NATIVECODE, ISR1, offsetof(Interp, current_args), r16);
     }
     else  {
         jit_set_args_pc(jit_info, interpreter, 
@@ -1234,7 +1234,7 @@ Parrot_set_args_pc {
 
 extern Parrot_set_returns_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
-	Parrot_jit_normal_op(jit_info, interpreter);
+    Parrot_jit_normal_op(jit_info, interpreter);
     else {
         jit_set_returns_pc(jit_info, interpreter, 
             jit_info->flags & JIT_CODE_RECURSIVE);
@@ -1243,17 +1243,17 @@ extern Parrot_set_returns_pc {
 
 extern Parrot_returncc {
     if (jit_info->code_type == JIT_CODE_FILE)
-	Parrot_jit_restart_op(jit_info, interpreter);
+    Parrot_jit_restart_op(jit_info, interpreter);
     else {
-	/* fetch args[n+1] -> retval */
+    /* fetch args[n+1] -> retval */
         if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
-	    jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
-	    jit_emit_lwz(jit_info->native_ptr, r3, 4 + jit_info->n_args * 4, r5);
-	    jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
-	    jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* get link reg */
-	    jit_emit_mtlr(jit_info->native_ptr, r0);   /* move to link reg */
-	}
-	jit_emit_blr(jit_info->native_ptr);
+        jit_emit_lwz(jit_info->native_ptr, r1, 0, r1);
+        jit_emit_lwz(jit_info->native_ptr, r3, 4 + jit_info->n_args * 4, r5);
+        jit_emit_lwz(jit_info->native_ptr, r31, -4, r1);
+        jit_emit_lwz(jit_info->native_ptr, r0, 8, r1);   /* get link reg */
+        jit_emit_mtlr(jit_info->native_ptr, r0);   /* move to link reg */
+    }
+    jit_emit_blr(jit_info->native_ptr);
     }
 }
 
@@ -1275,9 +1275,9 @@ Parrot_pic_callr___pc {
     constants = CONTEXT(interpreter->ctx)->constants;
     sig_result = constants[CUR_OPCODE[1]]->u.key;
     if (!SIG_ELEMS(sig_result))
-	skip = -1;
+    skip = -1;
     else 
-	skip = MAP(2);      /* skip result - save rest */
+    skip = MAP(2);      /* skip result - save rest */
 
     here = NATIVECODE - jit_info->arena.start;
     offset -= here;
@@ -1288,7 +1288,7 @@ Parrot_pic_callr___pc {
 
 extern Parrot_get_params_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
-	Parrot_jit_normal_op(jit_info, interpreter);
+    Parrot_jit_normal_op(jit_info, interpreter);
     else if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
         jit_get_params_pc(jit_info, interpreter);
     }
@@ -1296,20 +1296,20 @@ extern Parrot_get_params_pc {
 
 Parrot_get_results_pc {
     if (jit_info->code_type == JIT_CODE_FILE) {
-	jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
-	jit_emit_lwz(NATIVECODE, ISR2, offsetof(Interp, ctx.state), r16);
-	jit_emit_stw(NATIVECODE, ISR1, 
-		offsetof(parrot_context_t, current_results), ISR2);
+    jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
+    jit_emit_lwz(NATIVECODE, ISR2, offsetof(Interp, ctx.state), r16);
+    jit_emit_stw(NATIVECODE, ISR1, 
+        offsetof(parrot_context_t, current_results), ISR2);
     }
     else {
-	struct PackFile_Constant ** constants;
-	PMC *sig_result;
+    struct PackFile_Constant ** constants;
+    PMC *sig_result;
 
-	constants = CONTEXT(interpreter->ctx)->constants;
-	sig_result = constants[CUR_OPCODE[1]]->u.key;
-	if (!SIG_ELEMS(sig_result))
-	    return;
-	/* result is r3 TODO Nums */
-	jit_emit_mov_rr(NATIVECODE, MAP(2), r3);
+    constants = CONTEXT(interpreter->ctx)->constants;
+    sig_result = constants[CUR_OPCODE[1]]->u.key;
+    if (!SIG_ELEMS(sig_result))
+        return;
+    /* result is r3 TODO Nums */
+    jit_emit_mov_rr(NATIVECODE, MAP(2), r3);
     }
 }

@@ -168,7 +168,7 @@ static const struct _cstrings {
 HEADER
     my @all;
     for my $s (@all_strings) {
-        push @all, qq!\t{$s->[0], $s->[1], "$s->[2]"}!;
+        push @all, qq!    {$s->[0], $s->[1], "$s->[2]"}!;
     }
     print $OUT join(",\n", @all);
     print $OUT <<HEADER;

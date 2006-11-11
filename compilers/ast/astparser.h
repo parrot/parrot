@@ -74,7 +74,7 @@ typedef union YYSTYPE
 }
 /* Line 1529 of yacc.c.  */
 #line 77 "compilers/ast/astparser.h"
-	YYSTYPE;
+    YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

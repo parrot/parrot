@@ -290,7 +290,7 @@ for(@{$real_ops->{OPS}}) {
     my $comma = $n < @{$real_ops->{OPS}} -1 ? "," : "";
     $opname = "PARROT_OP_$opname$comma";
 
-    printf $OUT "\t%-30s\t/* %4d */\n", $opname, $n;
+    printf $OUT "    %-30s\t/* %4d */\n", $opname, $n;
 }
 
 print $OUT <<END_C;

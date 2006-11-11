@@ -17,7 +17,7 @@ Parrot_set_i_ic {
         jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1); 
     }
-	NATIVECODE = close_template(NATIVECODE);
+    NATIVECODE = close_template(NATIVECODE);
 }
 
 Parrot_set_i_i {
@@ -34,7 +34,7 @@ Parrot_set_i_i {
         jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[2]); 
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1); 
     }
-	NATIVECODE = close_template(NATIVECODE);
+    NATIVECODE = close_template(NATIVECODE);
 }
 
 TEMPLATE Parrot_binop_i_ic {
@@ -48,7 +48,7 @@ TEMPLATE Parrot_binop_i_ic {
         jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR2, ISR1);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
-	NATIVECODE = close_template(NATIVECODE);
+    NATIVECODE = close_template(NATIVECODE);
 }
 
 TEMPLATE Parrot_binop_x_x {
@@ -70,7 +70,7 @@ TEMPLATE Parrot_binop_x_x {
         jit_emit_<op>_rrr(NATIVECODE, <s1>, <s2>, <s1>);
         jit_emit_mov_mr<_N>(NATIVECODE, &<T>_REG[1], <s1>);
     }
-	NATIVECODE = close_template(NATIVECODE);
+    NATIVECODE = close_template(NATIVECODE);
 }
 
 TEMPLATE Parrot_binop_x_x_x {
@@ -110,7 +110,7 @@ TEMPLATE Parrot_binop_x_x_x {
         jit_emit_<op>_rrr(NATIVECODE, <s1>, <s2>, <s1>);
         jit_emit_mov_mr<_N>(NATIVECODE, &<T>_REG[1], <s1>);
     }
-	NATIVECODE = close_template(NATIVECODE);
+    NATIVECODE = close_template(NATIVECODE);
 }
 
 TEMPLATE Parrot_binop_i_ic_i {
@@ -134,7 +134,7 @@ TEMPLATE Parrot_binop_i_ic_i {
         jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR2, ISR1);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
-	NATIVECODE = close_template(NATIVECODE);
+    NATIVECODE = close_template(NATIVECODE);
 }
 
 TEMPLATE Parrot_binop_i_i_ic {
@@ -158,7 +158,7 @@ TEMPLATE Parrot_binop_i_i_ic {
         jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR2, ISR1);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
-	NATIVECODE = close_template(NATIVECODE);
+    NATIVECODE = close_template(NATIVECODE);
 }
 
 Parrot_band_i_i {
@@ -265,7 +265,7 @@ Parrot_neg_i {
     if (MAP[1]) {
         jit_emit_neg_rr(NATIVECODE, MAP[1], MAP[1]);
     }
-	else {
+    else {
         jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[1]);
         jit_emit_neg_rr(NATIVECODE, ISR1, ISR1);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
@@ -293,13 +293,13 @@ Parrot_neg_i_i {
 
 Parrot_if_i_ic {
     if (MAP[1]) {
-		jit_emit_cmp_r0(NATIVECODE, MAP[1]);
+        jit_emit_cmp_r0(NATIVECODE, MAP[1]);
     }
     else {
-		jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[1]); 
-		jit_emit_cmp_r0(NATIVECODE, ISR1);
-	}
-	jit_emit_bc(jit_info, *INT_CONST[2]);
-	NATIVECODE = close_template(NATIVECODE);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[1]); 
+        jit_emit_cmp_r0(NATIVECODE, ISR1);
+    }
+    jit_emit_bc(jit_info, *INT_CONST[2]);
+    NATIVECODE = close_template(NATIVECODE);
 }
 

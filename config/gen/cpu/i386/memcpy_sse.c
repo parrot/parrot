@@ -71,16 +71,16 @@ int main(int argc, char *argv[]) {
 
     s = (unsigned char *)malloc(n);
     for (i = 0; i < n; ++i)
-	s[i] = i & 0xff;
+    s[i] = i & 0xff;
     d = (unsigned char *)malloc(n);
     for (i = 0; i < n; ++i)
-	d[i] = 0xff;
+    d[i] = 0xff;
     Parrot_memcpy_aligned_sse(d, s, n);
     for (i = 0; i < n; ++i)
-	if (d[i] != (i & 0xff)) {
-	    printf("error s[%d] = %d d = %d\n", i, s[i], d[i]);
-	    exit(1);
-	}
+    if (d[i] != (i & 0xff)) {
+        printf("error s[%d] = %d d = %d\n", i, s[i], d[i]);
+        exit(1);
+    }
     puts("ok");
     return 0;
 }

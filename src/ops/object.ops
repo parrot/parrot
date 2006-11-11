@@ -224,7 +224,7 @@ into $1.
 
 =item B<newclass>(out PMC, in PMC)
 
-Create a new Parrot-style class, with the hierachical name given in $2.
+Create a new Parrot-style class, with the hierarchical name given in $2.
 
 =cut
 
