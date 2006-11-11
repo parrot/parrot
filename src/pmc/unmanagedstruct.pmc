@@ -481,7 +481,7 @@ set_string(char *p, int type, STRING* value)
             *(char **) p = cstr;
             break;
         default:
-            internal_exception(1, "setting unhandled string type in struct");
+            internal_exception(1, "setting unhandled string type in struct (%d)", type);
             break;
     }
 }

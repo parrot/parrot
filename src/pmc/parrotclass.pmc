@@ -56,7 +56,7 @@ pmclass ParrotClass extends delegate need_ext {
 
 Initializes the class flags.
 
-=item C<void init_pms(PMC *init)>
+=item C<void init_pmc(PMC *init)>
 
 The actual class creation code, called from C<newclass> opcode. The C<init>
 argument is not a PMC* but the C<classname> STRING.
@@ -323,6 +323,25 @@ Create the class from the thawed parents and attributes array.
         }
         class_data[PCD_MAX] = NULL;
         class_data[PCD_MAX + 1] = NULL;
+    }
+
+/*
+
+=item C<METHOD PMC* get_parents()>
+
+Returns the array of parents for this class.
+
+=cut
+
+*/
+
+    METHOD PMC* get_parents() {
+        PMC * class;
+        PMC **class_data;
+        
+        class      = SELF;
+        class_data = (PMC**)(PMC_data(class));
+        return class_data[PCD_PARENTS];
     }
 
 }

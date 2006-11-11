@@ -54,7 +54,7 @@ pmclass NameSpace extends Hash need_ext no_ro {
 
 =item C<voit init()>
 
-Initialze a C<NameSpace> PMC by calling C<Hash.init> and clearing
+Initialize a C<NameSpace> PMC by calling C<Hash.init> and clearing
 other fields.
 
 =cut
