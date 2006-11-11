@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Tests the ParrotInterpreter PMC.
 =cut
 
 
-pir_output_is(<<'CODE', <<'OUT', 'new');
+pir_output_is(<<'CODE', <<'OUT', 'create new interpreter');
 .sub 'test' :main
     new P0, .ParrotInterpreter
     print "ok 1\n"
@@ -33,7 +33,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'runinterp_p_p: runs passed code pmc in another interpreter');
+pir_output_is(<<'CODE', <<'OUT', 'run passed code pmc in another interpreter');
 .sub main :main
     $S0 = <<"PIR"
 .sub test :main
@@ -53,8 +53,7 @@ Hello, world
 survived
 OUT
 
-# XXX: this is totally weird, and probably a bug in C<say> but the test remains here until it's looked into
-pir_output_is(<<'CODE', <<'OUT', 'runinterp_p_p: runs passed code pmc in another interpreter (C<say> fails)');
+pir_output_is(<<'CODE', <<'OUT', 'running passed code pmc in another interpreter');
 .sub 'main' :main
      $S0 = <<'PIR'
  .sub 'main' :main
@@ -73,6 +72,28 @@ help, i'm stuck inside an interpreter!
 nobody cares.
 OUT
 
+pir_output_is(<<'CODE', <<'OUT', 'accessing PMCs from nested interp');
+.sub 'main' :main
+     $S0 = <<'PIR'
+ .sub 'main' :main
+ 	$P0 = find_global 'some_string'
+    $P0 = 'Accessing globals from other interpreters.'
+ .end
+PIR
+     $P3 = new .String
+	 store_global 'some_string', $P3
+
+     $P0 = new .ParrotInterpreter
+     $P1 = compreg 'PIR'
+     $P2 = $P1($S0)
+     runinterp $P0, $P2
+	 $S1 = $P3
+	 say $S1
+	 end
+ .end
+CODE
+Accessing globals from other interpreters.
+OUT
 
 # Local Variables:
 #   mode: cperl
