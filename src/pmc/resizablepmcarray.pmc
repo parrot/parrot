@@ -637,9 +637,6 @@ Append the other array to this array.
 Replaces C<count> elements starting at C<offset> with the elements in
 C<value>.
 
-If C<count> is 0 then the elements in C<value> will be inserted after
-C<offset>.
-
 Note that the C<value> PMC can be of any of the various array types.
 
 Note that this implementation can be *VERY* inefficient as it manipulates
@@ -650,14 +647,14 @@ everything via the VTABLE api.
 */
 
     void splice(PMC* value, INTVAL offset, INTVAL count) {
-       INTVAL value_length, length;
-       INTVAL i,j, num_to_save;
-       PMC *element, *stack;
+        INTVAL value_length, length;
+        INTVAL i,j, num_to_save;
+        PMC *element, *stack;
 
-       value_length = VTABLE_elements(INTERP,value);
-             length = VTABLE_elements(INTERP,SELF);
+        value_length = VTABLE_elements(INTERP,value);
+              length = VTABLE_elements(INTERP,SELF);
 
-       /* start from end? */
+        /* start from end? */
         if (offset < 0)
             offset += length;
         if (offset < 0)
@@ -670,7 +667,6 @@ everything via the VTABLE api.
             count = 0;
 
         num_to_save = length-(offset+count);
-        if (!count) num_to_save--;
 
         stack = pmc_new(INTERP, SELF->vtable->base_type);
 

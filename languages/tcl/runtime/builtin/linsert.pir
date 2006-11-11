@@ -19,7 +19,7 @@
   the_list = shift argv
   the_list = __list(the_list)
  
-  .local pmc position
+  .local string position
   position = shift argv
 
   .local pmc __index
@@ -27,6 +27,10 @@
 
   .local int the_index
   the_index = __index(position, the_list)
+
+  $S0 = substr position, 0, 3
+  if $S0 != "end" goto next
+  inc the_index
   
 next:
   $I0 = elements the_list

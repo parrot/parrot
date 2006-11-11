@@ -1044,7 +1044,7 @@ pir_output_is(<<"CODE", <<'OUTPUT', 'splice, append');
   P2[2] = 'C'
   P2[3] = 'D'
   P2[4] = 'E'
-  splice P1, P2, 4, 0
+  splice P1, P2, 5, 0
   $splice_postamble
 CODE
 12345ABCDE
@@ -1058,7 +1058,7 @@ pir_output_is(<<"CODE", <<'OUTPUT', 'splice, insert before last element');
   P2[2] = 'C'
   P2[3] = 'D'
   P2[4] = 'E'
-  splice P1, P2, 3, 0
+  splice P1, P2, 4, 0
   $splice_postamble
 CODE
 1234ABCDE5
@@ -1072,7 +1072,7 @@ pir_output_is(<<"CODE", <<'OUTPUT', 'splice, append-in-middle');
   P2[2] = 'C'
   P2[3] = 'D'
   P2[4] = 'E'
-  splice P1, P2, 2, 0
+  splice P1, P2, 3, 0
   $splice_postamble
 CODE
 123ABCDE45
