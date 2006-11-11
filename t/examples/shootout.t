@@ -16,6 +16,7 @@ BEGIN { # to be run before declaring the number of tests
     @shootouts = grep { -e "$DIR/$_$EXT" } sort grep { /\.pir$/} readdir(DIR);
     closedir DIR;
 }
+
 use Parrot::Test tests => scalar(@shootouts);
 
 =head1 NAME
@@ -54,6 +55,10 @@ L<"http://rt.perl.org/rt3/Public/Bug/Display.html?id=40064">
 my %skips = (
     'pidigits.pir' => 
             [ 'not exists $PConfig{HAS_GMP}', 'needs GMP' ],
+    'recursive.pir' => 
+            [ '$PConfig{cpuarch} !~ /86/', 'float JIT broken on non-x86' ],
+    'recursive-2.pir' => 
+            [ '$PConfig{cpuarch} !~ /86/', 'float JIT broken on non-x86' ],
 );
 my $INPUT_EXT = '.input';
 foreach my $script (@shootouts) {
