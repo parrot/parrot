@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -43,6 +43,27 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)');
 CODE
 world
 hello world
+OUTPUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'push on a Match object');
+.sub main :main
+    .local pmc match, str, arr
+    load_bytecode 'PGE.pbc'
+    match = new 'PGE::Match'
+    str = new .String
+    str = 'foo'
+    push match, str
+    arr = match.'get_array'()
+    $I0 = elements arr
+    print $I0
+    print "\n"
+    $P3 = match[0]
+    say $P3
+.end
+CODE
+1
+foo
 OUTPUT
 
 

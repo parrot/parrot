@@ -434,6 +434,18 @@ objects depending on the rule.
     .return ($I0)
 .end
 
+.sub '__push_pmc' :method
+    .param pmc val
+    .local pmc capt
+    capt = getattribute self, '@!capt'
+    unless null capt goto push_1
+    capt = new .ResizablePMCArray
+    setattribute self, '@!capt', capt
+  push_1:
+    push capt, val
+    .return ()
+.end
+
 
 =item C<get_hash()>
 
