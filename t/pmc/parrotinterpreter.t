@@ -60,12 +60,13 @@ pir_output_is(<<'CODE', <<'OUT', 'runinterp_p_p: runs passed code pmc in another
  .sub 'main' :main
      say "help, i'm stuck inside an interpreter!"
  .end
- PIR
+PIR
      $P0 = new .ParrotInterpreter
      $P1 = compreg 'PIR'
      $P2 = $P1($S0)
      runinterp $P0, $P2
      say "nobody cares."
+	 end
  .end
 CODE
 help, i'm stuck inside an interpreter!

@@ -483,7 +483,7 @@ op runinterp(invar PMC, in PMC) {
     opcode_t *pc;
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
     pc = VTABLE_invoke(new_interp, $2, NULL);
-    runops(new_interp, pc - new_interp->code->base.data);
+    Parrot_runops_fromc_args(new_interp, $2, "P");
     goto NEXT();
 }
 
