@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 ## tests for imcc error messages
 
@@ -52,4 +52,15 @@ $test_3_pir_code .= ".end\n";
 
 pir_output_like($test_3_pir_code, <<'OUT', "check parser recovery patience.");
 /Too many errors. Correct some first.\n$/
+OUT
+
+
+pir_output_like(<<'CODE', <<'OUT', '#line nnn "file"', 'todo' => 'RT #40806');
+.sub main :main
+#line 54 "xyz.pir"
+    say "Hello"
+    say 3
+.end
+CODE
+/in file 'xyz.pir' line 55/
 OUT
