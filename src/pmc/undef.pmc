@@ -35,7 +35,9 @@ pmclass Undef extends default no_ro {
 
   void assign_pmc(PMC* other) {
     VTABLE_morph(INTERP, SELF, other->vtable->base_type);
-    VTABLE_set_pmc(INTERP, SELF, other);
+    /* don't want to call set_pmc if we're assigning an Undef to an Undef */
+    if (other->vtable->base_type != enum_class_Undef)
+        VTABLE_set_pmc(INTERP, SELF, other);
   }
 
   void morph(INTVAL new_type) {
