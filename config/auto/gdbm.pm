@@ -24,13 +24,18 @@ use Parrot::Configure::Step ':auto';
 
 $description = 'Determining if your platform supports gdbm';
 
-@args = qw(verbose);
+@args = qw(verbose without-gmp);
 
 sub runstep
 {
-    my ($self, $conf) = (shift, shift);
+    my ($self, $conf) = @_;
 
-    my $verbose = $conf->options->get('verbose');
+    my $verbose = $conf->options->get(@args);
+
+    if ($without) {
+        $conf->data->set( has_gdbm => 0 );
+        return $self;
+    }
 
     my $cc        = $conf->data->get('cc');
     my $libs      = $conf->data->get('libs');

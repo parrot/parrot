@@ -357,6 +357,11 @@ Parrot Options:
    --gc=(type)          Determine the type of garbage collection
                         type=(gc|libc|malloc|malloc-trace) default is gc
 
+External Library Options:
+
+   --without-gmp        Build parrot without GMP support
+   --without-gdbm       Build parrot without GDBM support
+
 ICU Options:
 
    For using a system ICU, these options can be used:
