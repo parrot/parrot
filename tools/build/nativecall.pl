@@ -90,8 +90,8 @@ my %proto_type =
 my %fix_name =
     ( '@' => 'xAT_' );
 
-my %other_decl = 
-  (p => 
+my %other_decl =
+  (p =>
    "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
    t => "STRING *final_destination;"
    #     b => "Buffer *final_destination =
@@ -271,7 +271,7 @@ sub print_head {
  */
 
 /* nci.c
- *  Copyright (C) 2001-2005, The Perl Foundation.
+ *  Copyright (C) 2001-2006, The Perl Foundation.
  *  SVN Info
  *     \$Id\$
  *  Overview:

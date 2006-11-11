@@ -34,7 +34,8 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 my $DIST = Parrot::Distribution->new;
 
-my @files = @ARGV ? @ARGV : source_files();
+my $skip_files = $DIST->generated_files();
+my @files      = @ARGV ? @ARGV : source_files();
 my @failed_files;
 
 foreach my $file (@files) {
@@ -51,6 +52,8 @@ foreach my $file (@files) {
     else {
         $path = $file->path;
     }
+
+	next if exists $skip_files->{$path};
 
     # slurp in the file
     open( my $fh, '<', $path )

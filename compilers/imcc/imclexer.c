@@ -34,7 +34,7 @@
 #if __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types. 
+ * if you want the limit (max/min) macros for int types.
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -51,7 +51,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t; 
+typedef unsigned char flex_uint8_t;
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 #endif /* ! C99 */
@@ -176,7 +176,7 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
-    
+  
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
     do \
@@ -243,7 +243,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+  
     /* Whether to try to fill the input buffer when we reach the
      * end of it.
      */
@@ -2792,7 +2792,7 @@ extern int yywrap (yyscan_t yyscanner );
 #endif
 
     static void yyunput (int c,char *buf_ptr  ,yyscan_t yyscanner);
-    
+  
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int ,yyscan_t yyscanner);
 #endif
@@ -2812,11 +2812,11 @@ static int input (yyscan_t yyscanner );
 #endif
 
     static void yy_push_state (int new_state ,yyscan_t yyscanner);
-    
+  
     static void yy_pop_state (yyscan_t yyscanner );
-    
+  
     static int yy_top_state (yyscan_t yyscanner );
-    
+  
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
 #define YY_READ_BUF_SIZE 8192
@@ -4587,7 +4587,7 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
     YY_BUFFER_STATE yy_create_buffer  (FILE * file, int  size , yyscan_t yyscanner)
 {
     YY_BUFFER_STATE b;
-    
+  
     b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state ) ,yyscanner );
     if ( ! b )
         YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
@@ -4653,7 +4653,7 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
     }
 
         b->yy_is_interactive = 0;
-    
+  
     errno = oerrno;
 }
 
@@ -4757,9 +4757,9 @@ static void yyensure_buffer_stack (yyscan_t yyscanner)
         yyg->yy_buffer_stack = (struct yy_buffer_state**)yyalloc
                                 (num_to_alloc * sizeof(struct yy_buffer_state*)
                                 , yyscanner);
-        
+      
         memset(yyg->yy_buffer_stack, 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-                
+              
         yyg->yy_buffer_stack_max = num_to_alloc;
         yyg->yy_buffer_stack_top = 0;
         return;
@@ -4786,12 +4786,12 @@ static void yyensure_buffer_stack (yyscan_t yyscanner)
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
  * @param yyscanner The scanner object.
- * @return the newly allocated buffer state object. 
+ * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size , yyscan_t yyscanner)
 {
     YY_BUFFER_STATE b;
-    
+  
     if ( size < 2 ||
          base[size-2] != YY_END_OF_BUFFER_CHAR ||
          base[size-1] != YY_END_OF_BUFFER_CHAR )
@@ -4827,7 +4827,7 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size , yyscan_t yyscann
  */
 YY_BUFFER_STATE yy_scan_string (yyconst char * yystr , yyscan_t yyscanner)
 {
-    
+  
     return yy_scan_bytes(yystr,strlen(yystr) ,yyscanner);
 }
 
@@ -4844,7 +4844,7 @@ YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len , yysc
     char *buf;
     yy_size_t n;
     int i;
-    
+  
     /* Get memory for full buffer, including space for trailing EOB's. */
     n = _yybytes_len + 2;
     buf = (char *) yyalloc(n ,yyscanner );
@@ -4953,10 +4953,10 @@ YY_EXTRA_TYPE yyget_extra  (yyscan_t yyscanner)
 int yyget_lineno  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    
+  
         if (! YY_CURRENT_BUFFER)
             return 0;
-    
+  
     return yylineno;
 }
 
@@ -4966,10 +4966,10 @@ int yyget_lineno  (yyscan_t yyscanner)
 int yyget_column  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    
+  
         if (! YY_CURRENT_BUFFER)
             return 0;
-    
+  
     return yycolumn;
 }
 
@@ -5030,8 +5030,8 @@ void yyset_lineno (int  line_number , yyscan_t yyscanner)
 
         /* lineno is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "yyset_lineno called with no buffer" , yyscanner); 
-    
+           yy_fatal_error( "yyset_lineno called with no buffer" , yyscanner);
+  
     yylineno = line_number;
 }
 
@@ -5045,8 +5045,8 @@ void yyset_column (int  column_no , yyscan_t yyscanner)
 
         /* column is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "yyset_column called with no buffer" , yyscanner); 
-    
+           yy_fatal_error( "yyset_column called with no buffer" , yyscanner);
+  
     yycolumn = column_no;
 }
 

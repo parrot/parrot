@@ -466,7 +466,7 @@ indicates whether the code is for a header or implementation file.
 
 =cut
 
-sub decl() {
+sub decl {
     my ($self, $classname, $method, $for_header) = @_;
 
     my $ret = $method->{type};
@@ -503,7 +503,7 @@ superclasses.
 
 =cut
 
-sub includes() {
+sub includes {
     my $self = shift;
 
     my $cout = "";
@@ -573,7 +573,7 @@ my %calltype = (
   #"BIGNUM*" => "???" # XXX
 );
 
-sub proto ($$) {
+sub proto {
     my ($type, $parameters) = @_;
 
     # reduce to a comma separated set of types
@@ -599,7 +599,7 @@ nci method bodies (see F<tools/build/pmc2c.pl>).
 
 =cut
 
-sub rewrite_nci_method ($$$) {
+sub rewrite_nci_method {
     my ($class, $method) = @_;
 
     local $_ = $_[2];
@@ -617,7 +617,7 @@ vtable method bodies (see F<tools/build/pmc2c.pl>).
 
 =cut
 
-sub rewrite_vtable_method ($$$$$) {
+sub rewrite_vtable_method {
     my ($class, $method, $super, $super_table) = @_;
     local $_ = $_[4];
 
@@ -749,6 +749,9 @@ EOH
                    $out_name);
     $cout .= $additional_bodies;
     $cout .= "\n\n";
+
+	$cout =~ s/^\s+$//mg;
+	return $cout;
 }
 
 =item C<methods($line, $out_name)>
@@ -783,7 +786,8 @@ sub methods {
         $cout .= $ret;
     }
 
-    $cout;
+	$cout =~ s/^\s+$//mg;
+	return $cout;
 }
 
 =item C<lib_load_code()>
@@ -792,7 +796,7 @@ Returns the C code for loading a library.
 
 =cut
 
-sub lib_load_code() {
+sub lib_load_code {
     my $self = shift;
 
     my $classname = $self->{class};
@@ -996,7 +1000,7 @@ string if the PMC has a C<no_init> flag.
 
 =cut
 
-sub init_func() {
+sub init_func {
     my $self = shift;
 
     my $cout = "";
@@ -1248,7 +1252,7 @@ TODO include MMD variants.
 
 =cut
 
-sub hdecls() {
+sub hdecls {
     my $self = shift;
 
     my $hout;
@@ -1320,7 +1324,7 @@ Returns the Parrot C code coda (PDD07)
 
 =cut
 
-sub c_code_coda() {
+sub c_code_coda {
     return <<'EOC';
 /*
  * Local variables:
@@ -1831,15 +1835,15 @@ sub body
     my $ret = gen_ret($method);
     # I think that these will be out by one - NWC
     my $l = $self->line_directive($line, "null.c");
-    return <<EOC;
+	my $output = <<EOC;
 $l
 ${decl} {
     real_exception(interpreter, NULL, NULL_REG_ACCESS,
         "Null PMC access in $meth()");
-        $ret
-}
-
 EOC
+
+	$output .= $ret if $ret;
+	return $output .= "\n}\n";
 }
 
 =back

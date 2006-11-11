@@ -484,10 +484,25 @@ sub gen_manifest_skip {
 }
 
 
+=item C<generated_files>
+
+Returns a hash where the keys are the files in F<MANIFEST.generated> and the
+values are the comments.
+
+=cut
+
+sub generated_files {
+    my $self      = shift;
+	my $generated = ExtUtils::Manifest::maniread( 'MANIFEST.generated' );
+	my $path      = $dist->path();
+
+	return { map { File::Spec->catfile( $path, $_ ) => $generated->{ $_ } }
+	    keys %$generated };
+}
+
+
 =back
 
 =cut
 
 1;
-
-

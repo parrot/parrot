@@ -7,8 +7,8 @@
 
 /*
  * GAS LISTING /home/chip/tmp/ccvNpFsi.s 			page 1
- * 
- * 
+ *
+ *
  *    1              		.file	"memcpy_sse_in.c"
  *    2              		.text
  *    3              		.p2align 4,,15

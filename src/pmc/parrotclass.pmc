@@ -338,7 +338,7 @@ Returns the array of parents for this class.
     METHOD PMC* get_parents() {
         PMC * class;
         PMC **class_data;
-        
+
         class      = SELF;
         class_data = (PMC**)(PMC_data(class));
         return class_data[PCD_PARENTS];

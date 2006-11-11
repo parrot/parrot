@@ -7,6 +7,8 @@ blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.dylib                          [main]lib
 blib/lib/libparrot.so                             [main]lib
 blib/lib/libparrot.so.0.4.6                       [main]lib
+compilers/ast/astlexer.c                          [ast]
+compilers/imcc/imclexer.c                         [main]
 config/gen/cpu/i386/memcpy_mmx.c                  [main]
 config/gen/cpu/i386/memcpy_sse.c                  [main]
 config/gen/platform/ansi/dl.c                     [main]
@@ -212,5 +214,10 @@ runtime/parrot/library/ncurses.pbc                [main]
 runtime/parrot/library/parrotlib.pbc              [main]
 runtime/parrot/library/pcre.pbc                   [main]
 src/jit_emit.h                                    [main]include
+src/nci.c                                         [main]
+src/null_config.c                                 [main]
+src/ops/core_ops_cgp.c                            [main]
+src/ops/core_ops_switch.c                         [main]
+src/parrot_config.c                               [main]
 src/string_private_cstring.h                      [main]include
 tools/build/dynpmc.pl                             [devel]

@@ -211,7 +211,7 @@ sub run_core_finish
     my $bs = $base . $self->suffix . '_';
     my $c = <<END_C;
         default:
-            if (*(opcode_t*)cur_opcode >= 0 && 
+            if (*(opcode_t*)cur_opcode >= 0 &&
                 *(opcode_t*)cur_opcode < (opcode_t)${bs}op_lib.op_count) {
                 *(opcode_t*)cur_opcode = CORE_OPS_wrapper__;
                 continue;

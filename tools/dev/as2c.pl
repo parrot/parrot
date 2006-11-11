@@ -81,6 +81,7 @@ sub parse_s {
             print " " x 26, " /* $1: */\n";
         }
         elsif ($in_comment) {
+			s/\s+//g;
             print " * $_\n";
         }
     }

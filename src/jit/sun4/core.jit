@@ -1,7 +1,7 @@
 ;
 ; sun4/core.jit
 ;
-; $Id$ 
+; $Id$
 ;
 
 Parrot_end {
@@ -111,7 +111,7 @@ Parrot_set_i_nc {
         emitm_fdtoi(NATIVECODE, FSR2, FSR1);
     }
 
-    jit_emit_store_n(jit_info, interpreter, 1, FSR1); 
+    jit_emit_store_n(jit_info, interpreter, 1, FSR1);
 
     if(MAP[1]){
         jit_emit_load_i(jit_info, interpreter, 1, MAP[1]);
@@ -120,7 +120,7 @@ Parrot_set_i_nc {
 
 TEMPLATE Parrot_binop_x_x {
     int arg1, arg2;
-    
+
     if (MAP[1]) {
         arg1 = MAP[1];
     }
@@ -268,7 +268,7 @@ Parrot_div_n_nc {
 
 TEMPLATE Parrot_binop_x_x_x {
     int arg2, arg3;
-    
+
     /* Generate load if needed */
     if(MAP[2]){
         arg2 = MAP[2];
@@ -478,7 +478,7 @@ Parrot_div_n_n_n {
     Parrot_binop_x_x_x s/<op>/fdivd/ s/<_N>/_n/ s/ISR/FSR/
 }
 
-; 
+;
 ;Parrot_neg_n {
 ;    if(MAP[1]){
 ;        emitm_fnegs(NATIVECODE, MAP[1], MAP[1]);
@@ -949,7 +949,7 @@ Parrot_isne_i_ic_ic {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

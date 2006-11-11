@@ -24,7 +24,7 @@ pmclass Iterator no_ro {
 
     void class_init() {
         if (pass) {
-            /* Make the shift_pmc vtable function available as 
+            /* Make the shift_pmc vtable function available as
              * a method named "next" */
             enter_nci_method(INTERP, enum_class_Iterator,
                     F2DPTR(Parrot_Iterator_shift_pmc), "next", "PJO");
@@ -79,7 +79,7 @@ Marks the current idx/key and the aggregate as live.
         /* the KEY */
         if (PMC_struct_val(SELF))
              pobject_lives(INTERP, (PObj *) PMC_struct_val(SELF));
-    
+
         /* the aggregate */
         if (PMC_pmc_val(SELF))
              pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));

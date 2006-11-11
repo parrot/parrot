@@ -72,7 +72,7 @@ sub defines
     return $pred_def . <<END;
 /* defines - $0 -> $type */
 #  define opcode_to_prederef(i, op)   \\
-     (void**) (op   - CONTEXT(i->ctx)->pred_offset) 
+     (void**) (op   - CONTEXT(i->ctx)->pred_offset)
 END
 }
 =item C<goto_address($address)>
