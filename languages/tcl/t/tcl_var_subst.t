@@ -46,14 +46,14 @@ language_output_is( "tcl", <<'TCL', <<OUT, "scalar as array" );
   set a 2
   puts $a(b)
 TCL
-can't read \"a(b)\": variable isn't array
+can't read "a(b)": variable isn't array
 OUT
 
 language_output_is( "tcl", <<'TCL', <<OUT, "array as scalar" );
   set a(b) 2
   puts $a
 TCL
-can't read \"a\": variable is array
+can't read "a": variable is array
 OUT
 
 language_output_is( "tcl", <<'TCL', <<'OUT', '${} substitute an array' );

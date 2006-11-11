@@ -2,7 +2,7 @@
 
 source lib/test_more.tcl
 
-plan 8
+plan 9
 
 eval_is {
   variable
@@ -50,3 +50,12 @@ eval_is {
   }
   list [test] [set x]
 } {5 5} {variable is always about globals}
+
+namespace eval lib {
+  variable foo 7
+}
+proc ::lib::test {} {
+  variable foo
+  set foo
+}
+eval_is {::lib::test} 7 {variable using current namespace}

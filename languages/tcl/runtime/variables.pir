@@ -259,14 +259,14 @@ Gets the actual variable from memory and returns it.
 
 .sub __find_var
   .param string name
+  .param int    isglobal :named('global') :optional
 
   .local pmc value, ns
   ns = new .ResizableStringArray
 
   $I0 = index name, '::'
-  if $I0 != -1 goto coloned
-
-  name = '$' . name
+  if $I0 != -1 goto global_var
+  if isglobal  goto global_var
 
   .local pmc call_chain
   .local int call_level
@@ -274,9 +274,13 @@ Gets the actual variable from memory and returns it.
   call_level = elements call_chain
   if call_level == 0 goto global_var
 
+  name = '$' . name
+
   .local pmc lexpad, variable
   push_eh notfound
     lexpad     = call_chain[-1]
+    print "r"
+    say name
     value      = lexpad[name]
   clear_eh
   if null value goto args_check
@@ -292,15 +296,11 @@ args_check:
   value = lexpad['args']
   .return(value)
 
-coloned:
-  ns = __namespace(name)
+global_var:
+  ns = __namespace(name, 2)
   name = pop ns
   name = '$' . name
-  $I0 = elements ns
-  if $I0 == 0 goto global_var
-  $S0 = shift ns
 
-global_var:
   unshift ns, 'tcl'
   ns = get_root_namespace ns
   if null ns goto notfound
@@ -328,14 +328,14 @@ Sets the actual variable from memory.
 .sub __store_var
   .param string name
   .param pmc    value
+  .param int    isglobal :named('global') :optional
 
   .local pmc value, ns
   ns = new .ResizableStringArray
 
   $I0 = index name, '::'
-  if $I0 != -1 goto coloned
-
-  name = '$' . name
+  if $I0 != -1 goto global_var
+  if isglobal goto global_var
 
   .local pmc call_chain
   .local int call_level
@@ -343,10 +343,13 @@ Sets the actual variable from memory.
   call_level = elements call_chain
   if call_level == 0 goto global_var
 
+  name = '$' . name
 lexical_var:
   .local pmc lexpad
   lexpad       = call_chain[-1]
 
+  print "w"
+  say name
   $P0 = lexpad[name]
   if null $P0 goto lexical_is_null
 
@@ -359,15 +362,11 @@ lexical_is_null:
   lexpad[name] = value
   .return(value)
 
-coloned:
-  ns = __namespace(name)
+global_var:
+  ns = __namespace(name, 2)
   name = pop ns
   name = '$' . name
-  $I0 = elements ns
-  if $I0 == 0 goto global_var
-  $S0 = shift ns
 
-global_var:
   unshift ns, 'tcl'
   ns = get_root_namespace ns
   if null ns goto global_not_undef
