@@ -1,0 +1,34 @@
+# $Id$
+
+PARROT = ../../parrot@exe@
+RM_RF  = @rm_rf@
+
+DEPENDENCIES = \
+    forth.pbc \
+    tokenstream.pbc \
+    variablestack.pbc \
+    virtualstack.pbc
+
+
+all: $(DEPENDENCIES)
+
+prompt: all
+	$(PARROT) forth.pbc
+
+clean:
+	$(RM_RF) $(DEPENDENCIES)
+
+forth.pbc: forth.pir words.pir
+	$(PARROT) -o forth.pbc forth.pir
+
+tokenstream.pbc: tokenstream.pir
+	$(PARROT) -o tokenstream.pbc tokenstream.pir
+
+variablestack.pbc: variablestack.pir
+	$(PARROT) -o variablestack.pbc variablestack.pir
+
+virtualstack.pbc: virtualstack.pir
+	$(PARROT) -o virtualstack.pbc virtualstack.pir
+
+test: all
+	prove t
