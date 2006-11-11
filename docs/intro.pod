@@ -137,7 +137,7 @@ C<dmake>).  This should complete, giving you a working Parrot executable.
 
 Please report any problems that you encounter while building Parrot so the
 developers can fix them. You can do this by sending a message to
-C<bugs-parrot@bugs6.perl.org> containing a description of your problem. Please
+C<parrotbug@parrotcode.org> containing a description of your problem. Please
 include the F<myconfig> file that was generated as part of the build process
 and any errors that you observed.
 
