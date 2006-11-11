@@ -53,7 +53,7 @@ foreach my $file (@files) {
         $path = $file->path;
     }
 
-	next if exists $skip_files->{$path};
+    next if exists $skip_files->{$path};
 
     # slurp in the file
     open( my $fh, '<', $path )

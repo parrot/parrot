@@ -493,11 +493,11 @@ values are the comments.
 
 sub generated_files {
     my $self      = shift;
-	my $generated = ExtUtils::Manifest::maniread( 'MANIFEST.generated' );
-	my $path      = $dist->path();
+    my $generated = ExtUtils::Manifest::maniread( 'MANIFEST.generated' );
+    my $path      = $dist->path();
 
-	return { map { File::Spec->catfile( $path, $_ ) => $generated->{ $_ } }
-	    keys %$generated };
+    return { map { File::Spec->catfile( $path, $_ ) => $generated->{ $_ } }
+        keys %$generated };
 }
 
 

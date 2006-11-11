@@ -750,8 +750,8 @@ EOH
     $cout .= $additional_bodies;
     $cout .= "\n\n";
 
-	$cout =~ s/^\s+$//mg;
-	return $cout;
+    $cout =~ s/^\s+$//mg;
+    return $cout;
 }
 
 =item C<methods($line, $out_name)>
@@ -786,8 +786,8 @@ sub methods {
         $cout .= $ret;
     }
 
-	$cout =~ s/^\s+$//mg;
-	return $cout;
+    $cout =~ s/^\s+$//mg;
+    return $cout;
 }
 
 =item C<lib_load_code()>
@@ -1835,15 +1835,15 @@ sub body
     my $ret = gen_ret($method);
     # I think that these will be out by one - NWC
     my $l = $self->line_directive($line, "null.c");
-	my $output = <<EOC;
+    my $output = <<EOC;
 $l
 ${decl} {
     real_exception(interpreter, NULL, NULL_REG_ACCESS,
         "Null PMC access in $meth()");
 EOC
 
-	$output .= $ret if $ret;
-	return $output .= "\n}\n";
+    $output .= $ret if $ret;
+    return $output .= "\n}\n";
 }
 
 =back
