@@ -15,7 +15,7 @@ CodeString - object to build (PIR) code segments
 
 =head1 DESCRIPTION
 
-C<CodeString> is a class intended to simplify the process of 
+C<CodeString> is a class intended to simplify the process of
 emitting code strings.  Ideally this will eventually
 become a form of "CodeBuffer" that is more efficient
 than string concatenation, but for now it works well
@@ -168,7 +168,7 @@ A newline is automatically added to the end of the fmt.
 
 Each call to C<unique> returns a unique number, or if a C<fmt>
 parameter is given it returns a unique string beginning with
-C<fmt>.  (This may eventually be generalized to allow 
+C<fmt>.  (This may eventually be generalized to allow
 uniqueness anywhere in the string.)  The function starts
 counting at 10 (so that the values 0..9 can be considered "safe").
 
@@ -184,14 +184,14 @@ counting at 10 (so that the values 0..9 can be considered "safe").
         serno = Parrot_get_global(interpreter, cur_ns, string_from_const_cstring(interpreter, "$!serno", 0));
         id = VTABLE_get_string(interpreter, serno);
         VTABLE_increment(interpreter, serno);
-        
+
         if (has_format) {
             id = Parrot_sprintf_c(interpreter, "%ss%ss", format, id);
         }
         return id;
     }
 
-/* 
+/*
 
 =item C<escape(string str)>
 
