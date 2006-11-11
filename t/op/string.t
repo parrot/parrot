@@ -1949,7 +1949,7 @@ CODE
 foo        - bar
 OUTPUT
 
-{ my $output = substr(('f' x ($PConfig{hugeintvalsize} * 2)) . (' ' x 20), 0, 20);
+{ my $output = substr(('f' x ($PConfig{intvalsize} * 2)) . (' ' x 20), 0, 20);
 pir_output_is(<<'CODE', $output, 'Correct precision for %x'); }
 .sub main :main
   $P0 = new .ResizablePMCArray
