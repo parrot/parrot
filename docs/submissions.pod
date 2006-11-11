@@ -54,7 +54,7 @@ for whatever the distribution's parent directory is called on your machine.
 
 =item Single C<diff>
 
-If the change you wish to make is small it will generally effect only one or
+If the change you wish to make is small it will generally affect only one or
 two files, in which case supply a C<diff> for each file. The C<diff> should be
 created in F<parrot>.
 
