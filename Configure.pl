@@ -285,11 +285,24 @@ $OUTPUT_AUTOFLUSH = 1;
 
 
 # Handle options
+
+my @valid_opts = qw(ask bindir cc ccflags ccwarn cgoto cxx datadir debugging define exec-prefix
+                    execcapable floatval gc help icu-config icudatadir icuheaders icushared
+                    includedir infodir inline intval jitcapable ld ldflags lex libdir libexecdir
+                    libs link linkflags localstatedir m maintainer mandir miniparrot nomanicheck
+                    oldincludedir opcode ops optimize parrot_is_shared pmc prefix profile sbindir
+                    sharedstatedir step sysconfdir verbose verbose-step=N version without-gdbm
+                    without-gmp without-icu yacc);
+
 my %args;
 for (@ARGV) {
   my($key, $value) = m/--([-\w]+)(?:=(.*))?/;
   $key   = 'help' unless defined $key;
   $value = 1      unless defined $value;
+
+  unless (grep $key eq $_, @valid_opts) {
+      die qq/Invalid option $key. See "perl Configure.pl --help" for valid options\n/;
+  }
 
   for ($key) {
     m/version/ && do {
