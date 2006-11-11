@@ -570,7 +570,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             /* INTEGERS */
                         case 'c':
                             ts = string_chr(interpreter,
-                                 obj->getint(interpreter, info.type, obj));
+                                 (UINTVAL)obj->getint(interpreter, info.type, obj));
                             targ = str_append_w_flags(interpreter, targ,
                                     &info, ts, NULL);
                             break;
