@@ -73,30 +73,27 @@ getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 
     switch (size) {
     case SIZE_REG:
-        return (HUGEINTVAL)(int)va_arg(*arg, int);
+        return va_arg(*arg, int);
 
     case SIZE_SHORT:
         /* "'short int' is promoted to 'int' when passed through '...'" */
-        return (HUGEINTVAL)(short)va_arg(*arg, int);
+        return (short)va_arg(*arg, int);
 
     case SIZE_LONG:
-        return (HUGEINTVAL)(long)va_arg(*arg, long);
+        return va_arg(*arg, long);
 
     case SIZE_HUGE:
-        return (HUGEINTVAL)(HUGEINTVAL)
-                va_arg(*arg, HUGEINTVAL);
+        return va_arg(*arg, HUGEINTVAL);
 
     case SIZE_XVAL:
-        return (HUGEINTVAL)(INTVAL)va_arg(*arg, INTVAL);
+        return va_arg(*arg, INTVAL);
 
     case SIZE_OPCODE:
-        return (HUGEINTVAL)(opcode_t)va_arg(*arg, opcode_t);
+        return va_arg(*arg, opcode_t);
 
     case SIZE_PMC:{
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
-
-            return (HUGEINTVAL)(INTVAL)
-                    (VTABLE_get_integer(interpreter, pmc));
+            return VTABLE_get_integer(interpreter, pmc);
         }
     default:
         PANIC("Invalid int type!");
@@ -126,33 +123,27 @@ getuint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 
     switch (size) {
     case SIZE_REG:
-        return (UHUGEINTVAL)(unsigned int)
-                va_arg(*arg, unsigned int);
+        return va_arg(*arg, unsigned int);
 
     case SIZE_SHORT:
         /* short int promoted HLAGHLAGHLAGH. See note above */
-        return (UHUGEINTVAL)(unsigned short)
-                va_arg(*arg, unsigned int);
+        return (unsigned short)va_arg(*arg, unsigned int);
 
     case SIZE_LONG:
-        return (UHUGEINTVAL)(unsigned long)
-                va_arg(*arg, unsigned long);
+        return va_arg(*arg, unsigned long);
 
     case SIZE_HUGE:
-        return (UHUGEINTVAL)(UHUGEINTVAL)
-                va_arg(*arg, UHUGEINTVAL);
+        return va_arg(*arg, UHUGEINTVAL);
 
     case SIZE_XVAL:
-        return (UHUGEINTVAL)(UINTVAL)va_arg(*arg, UINTVAL);
+        return va_arg(*arg, UINTVAL);
 
     case SIZE_OPCODE:
-        return (UHUGEINTVAL)(opcode_t)va_arg(*arg, opcode_t);
+        return va_arg(*arg, opcode_t);
 
     case SIZE_PMC:{
-            PMC *pmc = (PMC *)va_arg(*arg, PMC *);
-
-            return (UHUGEINTVAL)(UINTVAL)
-                    (VTABLE_get_integer(interpreter, pmc));
+            PMC *pmc = va_arg(*arg, PMC *);
+            return (UINTVAL)VTABLE_get_integer(interpreter, pmc);
         }
     default:
         PANIC("Invalid uint type!");
@@ -339,16 +330,16 @@ getint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
             (obj->index));
 
     obj->index++;
-    ret = (HUGEINTVAL)(VTABLE_get_integer(interpreter, tmp));
+    ret = VTABLE_get_integer(interpreter, tmp);
 
     switch (size) {
     case SIZE_SHORT:
-        ret = (HUGEINTVAL)(short)ret;
+        ret = (short)ret;
         break;
         /* case SIZE_REG: ret=(HUGEINTVAL)(int)ret; */
         break;
     case SIZE_LONG:
-        ret = (HUGEINTVAL)(long)ret;
+        ret = (long)ret;
     default:
         /* nothing */ ;
     }
@@ -377,15 +368,15 @@ getuint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
             (obj->index));
 
     obj->index++;
-    ret = (UHUGEINTVAL)(VTABLE_get_integer(interpreter, tmp));
+    ret = (UINTVAL)VTABLE_get_integer(interpreter, tmp);
 
     switch (size) {
     case SIZE_SHORT:
-        ret = (UHUGEINTVAL)(unsigned short)ret;
+        ret = (unsigned short)ret;
         break;
         /* case SIZE_REG: * ret=(UHUGEINTVAL)(unsigned int)ret; * break; */
     case SIZE_LONG:
-        ret = (UHUGEINTVAL)(unsigned long)ret;
+        ret = (unsigned long)ret;
     default:
         /* nothing */ ;
     }
