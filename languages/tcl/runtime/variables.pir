@@ -279,8 +279,6 @@ Gets the actual variable from memory and returns it.
   .local pmc lexpad, variable
   push_eh notfound
     lexpad     = call_chain[-1]
-    print "r"
-    say name
     value      = lexpad[name]
   clear_eh
   if null value goto args_check
@@ -348,8 +346,6 @@ lexical_var:
   .local pmc lexpad
   lexpad       = call_chain[-1]
 
-  print "w"
-  say name
   $P0 = lexpad[name]
   if null $P0 goto lexical_is_null
 
