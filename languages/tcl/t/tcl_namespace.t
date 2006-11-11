@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 use vars qw($TODO);
 
@@ -31,6 +31,16 @@ language_output_is( "tcl", <<'TCL', <<'OUT', "command: global explicit (not enou
   :puts ok
 TCL
 invalid command name ":puts"
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', "command: relative namespace");
+  proc test {} {puts ok1}
+  namespace eval lib {test}
+  proc ::lib::test {} {puts ok2}
+  namespace eval lib {test}
+TCL
+ok1
+ok2
 OUT
 
 # Local Variables:

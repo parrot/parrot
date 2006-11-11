@@ -239,7 +239,7 @@ transform pir (PAST::Command) {
 
 dynamic:
     $S0 = join ", ", args
-    $S4 = pir.unique('has_namespace')
+    $S4 = pir.unique('curr_namespace')
     $S5 = pir.unique('root_namespace')
     pir.emit(<<'END_PIR', retval, name, $S0, $S1, $S2, $S3, $S4, $S5)
 %5:
@@ -247,20 +247,24 @@ dynamic:
   $P0 = split(colons, $S0)
   $S0 = ""
   $I0 = elements $P0
-  if $I0 == 0 goto %7
+  if $I0 == 0 goto %6
   $S0 = pop $P0
-  if $I0 == 1 goto %7
+  if $I0 == 1 goto %6
+  $S1 = $P0[0]
+  if $S1 != "" goto %6
   $S1 = shift $P0
-  if $S1 == "" goto %7
-  unshift $P0, $S1
-  %0 = get_namespace $P0
-  goto %6
 %7:
   %0 = get_hll_namespace $P0
-%6:
   $S1 = '&' . $S0
   %0  = %0[$S1]
   if null %0 goto %3
+  %0  = %0(%2)
+  goto %4
+%6:
+  %0 = get_namespace $P0
+  $S1 = '&' . $S0
+  %0  = %0[$S1]
+  if null %0 goto %7 # try the root namespace if it's not in the current
   %0  = %0(%2)
   goto %4
 %3:
