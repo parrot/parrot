@@ -91,7 +91,7 @@ sub get_flags_from_parrot_src
 	my $libp       = rel2abs( catdir( ($updir) x 2, qw( blib lib ) ) );
 
 	$vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
-	$vars{Libs}   .= " -L$libp -Wl,-rpath $libp";
+	$vars{Libs}   .= " -L$libp";
 
 	return @vars{qw( Cflags Libs )};
 }
