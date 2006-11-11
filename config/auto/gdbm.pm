@@ -30,10 +30,11 @@ sub runstep
 {
     my ($self, $conf) = @_;
 
-    my $verbose = $conf->options->get(@args);
+    my ($verbose, $without) = $conf->options->get(@args);
 
     if ($without) {
         $conf->data->set( has_gdbm => 0 );
+        $self->set_result('no');
         return $self;
     }
 

@@ -33,6 +33,7 @@ sub runstep
 
     if ($without) {
         $conf->data->set( has_gmp => 0 );
+        $self->set_result('no');
         return $self;
     }
 
