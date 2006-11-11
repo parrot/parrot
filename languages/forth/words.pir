@@ -1,7 +1,7 @@
 
 .HLL 'Forth', ''
 
-.sub 'VARIABLE'
+.sub 'variable'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -84,7 +84,7 @@ END_PIR
 .end
 
 # print the stack (non-destructive)
-.sub '.S'
+.sub '.s'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -129,7 +129,7 @@ END_PIR
 .end
 
 # clear the stack
-.sub '0SP'
+.sub '0sp'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -165,7 +165,7 @@ END_PIR
 .end
 
 # remove the top element
-.sub 'DROP'
+.sub 'drop'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -181,7 +181,7 @@ compiletime:
 .end
 
 # copy the item below the top
-.sub 'OVER'
+.sub 'over'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -195,7 +195,7 @@ END_PIR
 .end
 
 # swap the top 2 elements
-.sub 'SWAP'
+.sub 'swap'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -211,7 +211,7 @@ END_PIR
 .end
 
 # copy the top element
-.sub 'DUP'
+.sub 'dup'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -232,7 +232,7 @@ compiletime:
 .end
 
 # move top - 2 to top
-.sub 'ROT'
+.sub 'rot'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -258,7 +258,7 @@ END_PIR
     .return()
 .end
 
-.sub 'BEGIN'
+.sub 'begin'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -278,7 +278,7 @@ next_token:
     token = shift stream
 
     $S0 = token
-    if $S0 == "UNTIL" goto until
+    if $S0 == "until" goto until
 
     ' dispatch'(code, stream, stack, token)
 
@@ -301,7 +301,7 @@ error:
     exit 0
 .end
 
-.sub 'IF'
+.sub 'if'
     .param pmc code
     .param pmc stream
     .param pmc stack
@@ -324,8 +324,8 @@ if_loop:
     token = shift stream
 
     $S0 = token
-    if $S0 == "ELSE" goto else
-    if $S0 == "THEN" goto done
+    if $S0 == "else" goto else
+    if $S0 == "then" goto done
     ' dispatch'(code, stream, stack, token)
 
     goto if_loop
@@ -343,7 +343,7 @@ else_loop:
     token = shift stream
 
     $S0 = token
-    if $S0 == "THEN" goto done
+    if $S0 == "then" goto done
     ' dispatch'(code, stream, stack, token)
 
     goto else_loop
@@ -362,7 +362,7 @@ error:
 .end
 
 # print a carriage-return
-.sub 'CR'
+.sub 'cr'
     .param pmc code
     .param pmc stream
     .param pmc stack

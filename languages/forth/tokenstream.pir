@@ -72,6 +72,7 @@ false:
 
     $I2 = $I1 - $I0
     str = substr code, $I0, $I2
+    str = downcase str
     pos = $I1
 
     $I0 = length str
