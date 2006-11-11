@@ -224,12 +224,11 @@ L<http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.cvs.par
 
 =head2 What other ways can I get in contact with the Parrot developers?
 
-The mailing list is the main resource for Parrot development. However, there 
-is an IRC channel which you may find useful if your problem is better solved 
-with real-time discussion. To find this channel, visit the channel #parrot in 
-the following IRC servers (either one will do):
-
-L<irc.rhizomatic.net> or L<irc.pobox.com>
+The mailing list is the main resource for Parrot development. However, there
+is an IRC channel which you may find useful if your problem is better solved
+with real-time discussion.  Visit the channel #parrot on the IRC
+server L<irc.perl.org>.  Alternative IRC servers are
+L<irc.rhizomatic.net> and L<irc.pobox.com>.
 
 
 
@@ -277,22 +276,23 @@ L<http://www.parrotcode.org/resources>
 
 =over 4
 
-=item * Experimental Parrot Wiki
+=item * Parrot Wiki
 
 Located at:
 
-L<http://www.vendian.org/parrot/wiki/>
-
-A collection of various other pieces of useful Parrot information and
-documentation that have yet to make it into the SVN repository. Includes a
-comprehensive guide to getting started with Parrot development (called,
-unsurprisingly, 'Getting Started with Parrot Development').
+L<http://rakudo.org/parrot/>
 
 =back
 
 =head1 VERSION
 
 =over 4
+
+=item Revision 0.2 - 10 November 2006
+
+Remove link to old wiki page (dead since 2004.)
+
+Add irc.perl.ong IRC server.
 
 =item Revision 0.1 - 27 July 2002
 

@@ -424,6 +424,10 @@ W: http://www.bofh.org.uk:8080/
 N: Richard Tibbetts
 D: Divide by zero exceptions in some PMCs
 
+N: Rick Scott
+D: Documentation patch
+E: rick@shadowspar.dyndns.org
+
 N: Ritz Daniel
 
 N: Robert Spier
