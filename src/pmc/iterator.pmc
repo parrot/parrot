@@ -24,6 +24,8 @@ pmclass Iterator no_ro {
 
     void class_init() {
         if (pass) {
+            /* Make the shift_pmc vtable function available as 
+             * a method named "next" */
             enter_nci_method(INTERP, enum_class_Iterator,
                     F2DPTR(Parrot_Iterator_shift_pmc), "next", "PJO");
         }
@@ -39,7 +41,7 @@ Raises an exception. Use C<init_pmc()>.
 
 */
 
-void init () {
+    void init () {
         real_exception(INTERP, NULL, E_Exception,
                 "Iterator init without aggregate");
     }
@@ -55,8 +57,8 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    void init_pmc (PMC* initializer) {
-        PMC_pmc_val(SELF) = initializer; /* the aggregate itself */
+    void init_pmc (PMC* aggregate) {
+        PMC_pmc_val(SELF) = aggregate;
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_SET(SELF);
         /* by default, iterate from start */
@@ -74,9 +76,12 @@ Marks the current idx/key and the aggregate as live.
 */
 
     void mark () {
-        if (PMC_struct_val(SELF)) /* the KEY */
+        /* the KEY */
+        if (PMC_struct_val(SELF))
              pobject_lives(INTERP, (PObj *) PMC_struct_val(SELF));
-        if (PMC_pmc_val(SELF))      /* the aggregate */
+    
+        /* the aggregate */
+        if (PMC_pmc_val(SELF))
              pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
     }
 
