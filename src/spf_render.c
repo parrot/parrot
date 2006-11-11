@@ -576,8 +576,8 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             break;
 
                         case 'o':
-                            theint = obj->getint(interpreter, info.type, obj);
-                            ts = int_to_str(interpreter, tc, theint, 8);
+                            theuint = obj->getuint(interpreter, info.type, obj);
+                            ts = uint_to_str(interpreter, tc, theuint, 8, 0);
                             prefix = CONST_STRING(interpreter, "0");
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
@@ -635,6 +635,10 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             goto do_sprintf;
                         case 'd':
                         case 'i':
+                            /* EVIL: Work around bug in glibc that makes %0lld sometimes output an
+                             * empty string. */
+                            if (!(info.flags & FLAG_WIDTH))
+                                info.flags &= ~FLAG_ZERO;
                             theint = obj->getint(interpreter, info.type, obj);
 do_sprintf:
                             gen_sprintf_call(interpreter, tc, &info, ch);
