@@ -45,6 +45,12 @@ table, which should be created by your sysadmin.
     $I0 = isa con, ['Pg'; 'Conn']
     test.'ok'($I0, 'con isa Pg;Conn')
     $I0 = istrue con
+
+    if $I0 goto have_connected
+	test.'skip'( 39, 'no Pg connection; skipping remaining tests' )
+	.return()
+
+  have_connected:
     test.'ok'($I0, 'con is true after connect')
     $I0 = con.'status'()
     $I1 = iseq $I0, CONNECTION_OK 
@@ -53,6 +59,7 @@ table, which should be created by your sysadmin.
     $P0 = con.'PGconn'()
     $P1 = get_root_global ['parrot';'Pg'], 'PQstatus'
     $I0 = $P1($P0)
+
     $I1 = iseq $I0, CONNECTION_OK 
     test.'ok'($I1, 'status(PGconn) == CONNECTION_OK ')
     # exec
