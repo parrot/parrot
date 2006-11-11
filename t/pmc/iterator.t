@@ -227,11 +227,6 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "Hash iter 2");
 fill:
     chr S0, I0
     set P0[S0], I0
-    # XXX
-    # swapping the next two lines breaks JIT/i386
-    # the reason is the if/unless optimization: When the
-    # previous opcode sets flags, these are used - but
-    # there is no check, that the same register is used in the "if".
     inc I0
     dec I1
     if I1, fill
