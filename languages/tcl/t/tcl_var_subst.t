@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 20;
 use Test::More;
 
 language_output_is( "tcl", <<'TCL', <<OUT, "middle" );
@@ -70,11 +70,26 @@ TCL
 foo
 OUT
 
+language_output_is('tcl', <<'TCL', <<'OUT', 'read absolute namespace var');
+  namespace eval lib { variable version 0.1 }
+  puts $::lib::version
+TCL
+0.1
+OUT
+
 language_output_is( "tcl", <<'TCL', <<'OUT', "write global" );
   set ::x foo
   puts $x
 TCL
 foo
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'write absolute namespace var');
+  namespace eval lib { variable version }
+  set ::lib::version 0.1
+  puts $::lib::version
+TCL
+0.1
 OUT
 
 language_output_is( "tcl", <<'TCL', <<'OUT', 'puts $array($key)' );

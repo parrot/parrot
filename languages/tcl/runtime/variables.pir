@@ -260,12 +260,13 @@ Gets the actual variable from memory and returns it.
 .sub __find_var
   .param string name
 
-  name = '$' . name
-  
-  .local pmc value
+  .local pmc value, ns
+  ns = new .ResizableStringArray
 
-  $S0 = substr name, 1, 2
-  if $S0 == '::'     goto coloned
+  $I0 = index name, '::'
+  if $I0 != -1 goto coloned
+
+  name = '$' . name
 
   .local pmc call_chain
   .local int call_level
@@ -292,10 +293,19 @@ args_check:
   .return(value)
 
 coloned:
-    substr name, 1, 2, ''
+  ns = __namespace(name)
+  name = pop ns
+  name = '$' . name
+  $I0 = elements ns
+  if $I0 == 0 goto global_var
+  $S0 = shift ns
 
 global_var:
-  value = get_root_global ['tcl'], name
+  unshift ns, 'tcl'
+  ns = get_root_namespace ns
+  if null ns goto notfound
+
+  value = ns[name]
   if null value goto found
   $I0 = isa value, 'Undef'
   if $I0 goto notfound
@@ -319,10 +329,13 @@ Sets the actual variable from memory.
   .param string name
   .param pmc    value
 
-  name = '$' . name
+  .local pmc value, ns
+  ns = new .ResizableStringArray
 
-  $S0 = substr name, 1, 2
-  if $S0 == '::'     goto coloned
+  $I0 = index name, '::'
+  if $I0 != -1 goto coloned
+
+  name = '$' . name
 
   .local pmc call_chain
   .local int call_level
@@ -347,9 +360,18 @@ lexical_is_null:
   .return(value)
 
 coloned:
-  substr name, 1, 2, ''
+  ns = __namespace(name)
+  name = pop ns
+  name = '$' . name
+  $I0 = elements ns
+  if $I0 == 0 goto global_var
+  $S0 = shift ns
+
 global_var:
-  $P0 = get_root_global ['tcl'], name
+  unshift ns, 'tcl'
+  ns = get_root_namespace ns
+  if null ns goto global_not_undef
+  $P0 = ns[name]
   if null $P0 goto global_not_undef
 
   $I0 = typeof value
@@ -358,6 +380,6 @@ global_var:
   .return($P0)
 
 global_not_undef:
-  set_root_global ['tcl'], name, value
+  ns[name] = value
   .return(value)
 .end
