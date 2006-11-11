@@ -5,7 +5,8 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More 'tests' => 14;
+use Test::More tests => 27;
+use File::Spec;
 
 
 =head1 NAME
@@ -47,6 +48,28 @@ ok( ! $d->lex_source_file_with_name('moomoo'), 'Lex code file not there');
 
 ok($d->file_for_perl_module('Parrot::Docs::Section::Parrot'), 'Perl module file');
 ok( ! $d->file_for_perl_module('Parrot::Dummy'), 'Perl module file not there');
+
+my %pmc_source_file_directories=map {($_->path => 1)} $d->pmc_source_file_directories;
+
+my @old_directory_list = (
+    'compilers/bcg/src/pmc',
+    'languages/APL/src/pmc',
+    'languages/WMLScript/pmc',
+    'languages/amber/lib/kernel/pmc',
+    'languages/cardinal/src/pmc',
+    'languages/dotnet/pmc',
+    'languages/lua/pmc',
+    'languages/perl6/src/pmc',
+    'languages/pugs/pmc',
+    'languages/python/pmc',
+    'languages/tcl/src/pmc',
+    map { File::Spec->catdir( 'src', $_ ) } qw(dynpmc pmc));
+
+for my $dir (@old_directory_list) {
+    my $path = $d->directory_with_name($dir)->path();
+    ok( exists $pmc_source_file_directories{$path},
+   	    "Directory from hardcoded list $dir found through MANIFEST" );
+}
 
 # Local Variables:
 #   mode: cperl

@@ -196,21 +196,18 @@ sub pmc_source_file_directories
 {
     my $self = shift;
 
-    return
-        map $self->directory_with_name($_) =>
-            'compilers/bcg/src/pmc',
-            'languages/APL/src/pmc',
-            'languages/WMLScript/pmc',
-            'languages/amber/lib/kernel/pmc',
-            'languages/cardinal/src/pmc',
-            'languages/dotnet/pmc',
-            'languages/lua/pmc',
-            'languages/perl6/src/pmc',
-            'languages/pugs/pmc',
-            'languages/python/pmc',
-            'languages/tcl/src/pmc',
-            map("src/$_" => qw<dynpmc pmc>),
-    ;
+    my %pmc_source_dirs =
+        # Make a hash out of the directories of those files
+        map {((File::Spec->splitpath($_))[1] => 1)}
+
+        # Only look at files ending in .pmc
+        grep {m|\.pmc$|}
+
+        keys %{ ExtUtils::Manifest::maniread(
+            File::Spec->catfile($self->path, "MANIFEST")) };
+
+    return map $self->directory_with_name($_) => grep {! m|\.svn/$|}
+        keys %pmc_source_dirs;
 }
 
 
