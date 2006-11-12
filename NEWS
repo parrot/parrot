@@ -4,6 +4,8 @@ New in 0.4.x
 
 - New languages: PHP ("Plumhead"), Forth
 - Updated languages: Ruby ("Cardinal"), Tcl, Lua
+- Remove Python implementation, since it's now hosted at
+  http://pirate.tangentcode.com
 - Compilers:
    + PGE updated with more expressions, latest changes to S05
    + new Perl6 grammar compiler
