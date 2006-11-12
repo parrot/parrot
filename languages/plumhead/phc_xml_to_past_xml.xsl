@@ -77,7 +77,7 @@ by phc from PHP source. It generates an XML with PAST.
 </xsl:template>
 
 <xsl:template match="phc:Token_string">
-  <past:Val valtype="strqq" >
+  <past:Val valtype="strq" >
     <xsl:attribute name="encoding" ><xsl:value-of select="phc:value/@encoding" /></xsl:attribute>
     <xsl:apply-templates select="phc:value" />
   </past:Val>
@@ -104,7 +104,7 @@ by phc from PHP source. It generates an XML with PAST.
   <past:Stmt>
     <past:Op op="print" >
       <past:Exp>
-        <past:Val valtype="strqq" encoding="base64" >ICAgIDxzdHJvbmc+Q29uZGl0aW9uIGlzIHRydWUuPC9zdHJvbmc+CiAg</past:Val>
+        <past:Val valtype="strq" encoding="base64" >ICAgIDxzdHJvbmc+Q29uZGl0aW9uIGlzIHRydWUuPC9zdHJvbmc+CiAg</past:Val>
       </past:Exp>
     </past:Op>
   </past:Stmt>

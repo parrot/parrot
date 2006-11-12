@@ -127,7 +127,7 @@ a PAST and runs the PAST with help of the parrot compiler tools.
 
   # start of past:Val
   <xsl:choose>
-    <xsl:when test="@valtype = 'strqq'" >
+    <xsl:when test="@valtype = 'strq'" >
       .local string val_<xsl:value-of select="generate-id(.)" />
       <xsl:choose>
         <xsl:when test="@encoding = 'base64'" >
@@ -153,6 +153,14 @@ a PAST and runs the PAST with help of the parrot compiler tools.
   past_node_<xsl:value-of select="generate-id(.)" /> = new 'PAST::Val'                             
   past_node_<xsl:value-of select="generate-id(.)" />.value( val_<xsl:value-of select="generate-id(.)" /> ) 
   <xsl:apply-templates select="@*"/>
+
+  <xsl:choose>
+    <xsl:when test="@valtype = 'strq'" >
+      <xsl:comment>Escape the newlines in order to make PIR happy</xsl:comment>
+      val_<xsl:value-of select="generate-id(.)" /> = escape val_<xsl:value-of select="generate-id(.)" />
+      past_node_<xsl:value-of select="generate-id(.)" />.'valtype'( 'strqq' )
+    </xsl:when>
+  </xsl:choose>
 
   past_node_<xsl:value-of select="generate-id(..)" />.'add_child'( past_node_<xsl:value-of select="generate-id(.)" /> )      
   # end of past:Val
