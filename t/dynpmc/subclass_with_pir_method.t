@@ -50,6 +50,10 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .HLL");
 .HLL 'Perl', 'perl_group'
 .sub main :main
+  $P5 = getclass 'PerlString'
+  $P6 = get_global 'printhi'
+  addmethod $P5, 'perl_printhi', $P6
+
   new $P0, 'PerlString'
   $P0.'perl_printhi'()
   getclass $P2, 'PerlString'
@@ -59,11 +63,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .HLL");
   $P1.'perl_printhi'()
 .end
 
-.namespace ['PerlString']
-.sub 'perl_printhi' :method
+.sub 'printhi' :method
     print "HI from PerlString\n"
 .end
-
 CODE
 HI from PerlString
 HI from PerlString
