@@ -298,7 +298,9 @@ sub run_command {
     open  STDOUT, ">&OLDOUT" or die "Can't restore  stdout" if $out;
     open  STDERR, ">&OLDERR" or die "Can't restore  stderr" if $err;
 
-    return ($exit_code & 0xFF) ? "[SIGNAL $exit_code]" : ($? >> 8);
+    return (  ($exit_code < 0)    ? $exit_code
+            : ($exit_code & 0xFF) ? "[SIGNAL $exit_code]"
+            :                       ($? >> 8)             );
 }
 
 
