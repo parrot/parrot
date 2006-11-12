@@ -95,7 +95,7 @@ ok( !scalar(@extra_coda), 'C code coda appears only once' )
 exit;
 
 sub source_files {
-    grep( $_->{PATH} !~ m{ compilers/imcc/imcparser\.h $ }x,
+    grep( $_->{PATH} !~ m{ \b imcparser\.h $ }x,
 
         map( $_->files_of_type('C code'),
             $DIST->c_source_file_directories ),
