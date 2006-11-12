@@ -32,6 +32,10 @@ table, which should be created by your sysadmin.
     test = new 'Test::Builder'
     test.'plan'(N_TESTS)
     push_eh no_pg
+
+    # TODO: fix when exception handling works again
+    loadlib $P0, 'libpq'
+    unless $P0 goto no_pg
     load_bytecode 'postgres.pir'
     clear_eh
     test.'ok'(1, 'load_bytecode')
