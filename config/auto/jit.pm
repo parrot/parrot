@@ -94,6 +94,10 @@ sub runstep
         $jitcapable = 1;
     }
 
+    if ($cpuarch eq 'i386' and $osname eq 'darwin') {
+        $jitcapable = 0;
+    }
+
     if (-e "$jitbase/$cpuarch/$jitarchname.s") {
         copy_if_diff("$jitbase/$cpuarch/$jitarchname.s", "src/asmfun.s");
         $conf->data->set(asmfun_o => 'src/asmfun$(O)');
