@@ -167,42 +167,42 @@ Unshift a value onto the array component of the Capture.
 
     void push_float(FLOATVAL value) {
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_push_float(INTERP, CAPTURE_array(SELF), value);
+        VTABLE_push_float(INTERP, CAPTURE_array(SELF), value);
     }
 
     void push_integer(INTVAL value) {
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_push_integer(INTERP, CAPTURE_array(SELF), value);
+        VTABLE_push_integer(INTERP, CAPTURE_array(SELF), value);
     }
 
     void push_pmc(PMC *value) {
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_push_pmc(INTERP, CAPTURE_array(SELF), value);
+        VTABLE_push_pmc(INTERP, CAPTURE_array(SELF), value);
     }
 
     void push_string(STRING *value) {
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_push_string(INTERP, CAPTURE_array(SELF), value);
+        VTABLE_push_string(INTERP, CAPTURE_array(SELF), value);
     }
 
     void unshift_float(FLOATVAL value) {
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_unshift_float(INTERP, CAPTURE_array(SELF), value);
+        VTABLE_unshift_float(INTERP, CAPTURE_array(SELF), value);
     }
 
     void unshift_integer(INTVAL value) {
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_unshift_integer(INTERP, CAPTURE_array(SELF), value);
+        VTABLE_unshift_integer(INTERP, CAPTURE_array(SELF), value);
     }
 
     void unshift_pmc(PMC *value) {
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_unshift_pmc(INTERP, CAPTURE_array(SELF), value);
+        VTABLE_unshift_pmc(INTERP, CAPTURE_array(SELF), value);
     }
 
     void unshift_string(STRING *value) {
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_unshift_string(INTERP, CAPTURE_array(SELF), value);
+        VTABLE_unshift_string(INTERP, CAPTURE_array(SELF), value);
     }
 
 /*

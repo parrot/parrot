@@ -1026,6 +1026,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "ln of complex numbers");
     c = .val
     c2 = c.ln()
     str = sprintf "%f%+fi", c2
+    str = downcase str
     unless str != .res goto .$ok
     print "\nln("
     print .val
