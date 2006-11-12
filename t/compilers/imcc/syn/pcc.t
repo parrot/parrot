@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 20;
 
 ##############################
 # Parrot Calling Conventions
@@ -364,30 +364,6 @@ ok 4
 ok 5
 last
 OUT
-
-SKIP: {
-  skip("cant do NCI on $^O", 1) unless ($^O =~ /linux|darwin|bsd/);
-pir_output_is(<<'CODE', <<'OUT', "nci");
-.sub test :main
-    .local pmc FABS, LIB
-    .local string NULL
-    null NULL
-    LIB = loadlib NULL
-    dlfunc FABS, LIB, "fabs", "dd"
-    .local float d, r
-    d = -42
-    r = FABS(d)
-    print d
-    print "\n"
-    print r
-    print "\n"
-    end
-.end
-CODE
--42.000000
-42.000000
-OUT
-}
 
 pir_output_is(<<'CODE', <<'OUT', ":main pragma, syntax only");
 .sub _main :main
