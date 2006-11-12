@@ -68,7 +68,8 @@ ok( !scalar(@tabs), "tabs in leading whitespace" )
 exit;
 
 sub source_files {
-    return (
+    grep( $_->{PATH} !~ m{ compilers/imcc/imc(parser|lexer)\.[hc] $ }x,
+
         map( $_->files_of_type('C code'),
             $DIST->c_source_file_directories ),
 
