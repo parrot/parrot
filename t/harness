@@ -146,7 +146,12 @@ push @default_tests, 't/distro/manifest.t';
 # collect the coding standard tests (that we want to run) together and
 # append them to the list of default tests
 my @coding_std_tests = map { "t/codingstd/$_" } qw(
-    c_code_coda.t cppcomments.t cuddled_else.t tabs.t trailing_space.t
+    c_code_coda.t 
+    cppcomments.t 
+    cuddled_else.t 
+    line_endings.t
+    tabs.t 
+    trailing_space.t
 );
 push @default_tests, @coding_std_tests;
 
