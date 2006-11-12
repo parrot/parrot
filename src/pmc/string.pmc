@@ -648,6 +648,7 @@ Replace every occurrence of C<orig> with C<new>.
             (void)string_replace(INTERP, s, i, old_len, new, NULL);
             i += new_len;
         }
+        VTABLE_set_string_native(INTERP, SELF, s);
     }
 /*
 
