@@ -550,7 +550,7 @@ static char * inv_op(char *op) {
 }
 
 Instruction *
-IMCC_create_itcall_label(Interp *interp)
+IMCC_create_itcall_label(Interp* interp)
 {
     char name[128];
     SymReg * r;

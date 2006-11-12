@@ -618,7 +618,7 @@ int yywrap (void* yyscanner) {
 
     /* pop old frame */
     if (IMCC_INFO(interp)->frames->s.next) {
-        pop_parser_state(IMCC_INFO(interp)->frames->s.interpreter, yyscanner);
+        pop_parser_state(IMCC_INFO(interp)->frames->s.interp, yyscanner);
         if (YYSTATE == INITIAL || YYSTATE == emit)
             BEGIN(IMCC_INFO(interp)->frames->s.pasm_file ? emit : INITIAL);
         return 0;
@@ -642,7 +642,7 @@ new_frame (Interp* interp)
         tmp->s.file = IMCC_INFO(interp)->frames->s.file;
         tmp->s.pragmas = IMCC_INFO(interp)->frames->s.pragmas;
     }
-    tmp->s.interpreter = interp;
+    tmp->s.interp = interp;
 
     return tmp;
 }
