@@ -24,8 +24,32 @@ Tests the C<PerlString> PMC. Checks pir method execution in a dynpmc and a subcl
 =cut
 
 # this works
-pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .loadlib");
+pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .loadlib", todo => "PMCs don't obey HLL namespaces");
 .loadlib  'perl_group'
+.sub main :main
+  new $P0, 'PerlString'
+  $P0.'perl_printhi'()
+  getclass $P2, 'PerlString'
+  subclass $P0, $P2, 'NewPerlString'
+  $P0.'perl_printhi'()
+  new $P1, 'NewPerlString'
+  $P1.'perl_printhi'()
+.end
+
+.HLL 'Perl', 'perl_group'
+.namespace ['PerlString']
+.sub 'perl_printhi' :method
+    print "HI from PerlString\n"
+.end
+
+CODE
+HI from PerlString
+HI from PerlString
+HI from PerlString
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .HLL", todo => "PMCs don't obey HLL namespaces");
+.HLL 'Perl', 'perl_group'
 .sub main :main
   new $P0, 'PerlString'
   $P0.'perl_printhi'()
@@ -41,31 +65,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .loadlib");
     print "HI from PerlString\n"
 .end
 
-CODE
-HI from PerlString
-HI from PerlString
-HI from PerlString
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .HLL");
-.HLL 'Perl', 'perl_group'
-.sub main :main
-  $P5 = getclass 'PerlString'
-  $P6 = get_global 'printhi'
-  addmethod $P5, 'perl_printhi', $P6
-
-  new $P0, 'PerlString'
-  $P0.'perl_printhi'()
-  getclass $P2, 'PerlString'
-  subclass $P0, $P2, 'NewPerlString'
-  $P0.'perl_printhi'()
-  new $P1, 'NewPerlString'
-  $P1.'perl_printhi'()
-.end
-
-.sub 'printhi' :method
-    print "HI from PerlString\n"
-.end
 CODE
 HI from PerlString
 HI from PerlString
