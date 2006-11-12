@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
@@ -194,91 +194,6 @@ dynamic
 builtin
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PIR");
-
-.sub main :main
-    .local pmc past_compiler
-    past_compiler = compreg "PAST"
-    .local string past_source
-    past_source = 'Parrot_AST( PCC_Sub( Stmts( Py_Print( Const(7) ) Py_Print_nl() ) ) )'
-    .local pmc past_compiled_sub
-    past_compiled_sub = past_compiler(past_source)
-    print "before\n"
-    past_compiled_sub()
-    print "after\n"
-.end
-CODE
-before
-7
-after
-OUTPUT
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM");
-    compreg P1, "PAST"	# get compiler
-    set_args "(0)", 'Parrot_AST( PCC_Sub( Stmts( Py_Print( Const(8) ) Py_Print_nl() ) ) )'
-    get_results "(0)", P6
-    invokecc P1
-    print "before\n"
-    invokecc P6
-    invokecc P6
-    invokecc P6
-    invokecc P6
-    print "after\n"
-    end
-CODE
-before
-8
-8
-8
-8
-after
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM in PIR");
-
-.sub test :main
-
-    # PIR
-    .local pmc pasm_compiler
-    pasm_compiler = compreg "PASM"
-
-        # PASM
-        .local string pasm_source
-        pasm_source = "compreg P1, 'PAST'\n"
-
-            # PAST
-            pasm_source .= "set S1, 'Parrot_AST( PCC_Sub( Stmts( Py_Print( Const(8) ) Py_Print_nl() ) ) )'\n"
-            pasm_source .= "set_args \"(0)\", S1\n"
-            pasm_source .= "get_results \"(0)\", P6\n"
-            pasm_source .= "invokecc P1\n"
-        # PASM
-        pasm_source .= "print \"PASM: before\\n\"\n"
-        pasm_source .= "invokecc P6\n"
-        pasm_source .= "invokecc P6\n"
-        pasm_source .= "invokecc P6\n"
-        pasm_source .= "invokecc P6\n"
-        pasm_source .= "print \"PASM: after\\n\"\n"
-        pasm_source .= "set_returns \"()\"\n"
-        pasm_source .= "returncc\n"
-
-    # PIR
-    .local pmc pasm_compiled_sub
-    pasm_compiled_sub = pasm_compiler( pasm_source )
-    print "PIR: before\n"
-    pasm_compiled_sub()
-    print "PIR: after\n"
-.end
-CODE
-PIR: before
-PASM: before
-8
-8
-8
-8
-PASM: after
-PIR: after
-OUTPUT
-
 pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PASM");
 .sub main :main
   register_compiler()
@@ -417,16 +332,19 @@ pir_output_is(<<'CODE', <<'OUTPUT', "check loaded lib hash");
   interp = getinterp
   pbc_hash = interp[.IGLOBALS_PBC_LIBS]
   $I0 = elements pbc_hash
-  print_item $I0
+  print $I0
+  print ' '
   $I1 = exists pbc_hash['temp']
-  print_item $I1
+  print $I1
+  print ' '
   $I2 = exists pbc_hash['temp2']
-  print_item $I2
+  print $I2
+  print ' '
   $S0 = pbc_hash['temp2']
-  # print_item $S0          not portable
+  # print $S0          not portable
   $I3 = index $S0, 'temp2.pbc'
   $I4 = isgt $I3, -1
-  print_item $I4
+  print $I4
   print_newline
 .end
 CODE

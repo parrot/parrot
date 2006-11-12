@@ -1520,23 +1520,6 @@ PIO_isatty(theINTERP, PMC *pmc)
     return (io->flags & PIO_F_CONSOLE) ? 1 : 0;
 }
 
-int
-PIO_softspace(theINTERP, PMC *pmc, int new)
-{
-    ParrotIO * const io = PMC_data(pmc);
-    int ret;
-
-    UNUSED(interp);
-    if (!io)
-        return 0;
-    ret = io->flags & PIO_F_SOFT_SP ? 1 : 0;
-    if (new)
-        io->flags |= PIO_F_SOFT_SP;
-    else
-        io->flags &= ~PIO_F_SOFT_SP;
-    return ret;
-}
-
 /*
 
 =back

@@ -825,14 +825,17 @@ pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs");
     .local pmc keytable, klentable
     keytable = getattribute self, "%!key"
     $I0 = keytable['bar']
-    print_item $I0
+    print $I0
+    print ' '
     $I0 = keytable['foobar']
-    print_item $I0
+    print $I0
+    print ' '
     klentable = getattribute self, "%!klen"
     $I0 = klentable['bar']
-    print_item $I0
+    print $I0
+    print ' '
     $I0 = klentable['foobar']
-    print_item $I0
+    print $I0
     print_newline
 .end
 CODE

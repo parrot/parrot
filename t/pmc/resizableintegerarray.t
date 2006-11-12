@@ -401,15 +401,19 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "shift integer");
     ar[0] = 10
     ar[1] = 20
     $I0 = elements ar
-    print_item $I0
+    print $I0
+    print ' '
     $I0 = shift ar
-    print_item $I0
+    print $I0
+    print ' '
     $I0 = elements ar
-    print_item $I0
+    print $I0
+    print ' '
     $I0 = shift ar
-    print_item $I0
+    print $I0
+    print ' '
     $I0 = elements ar
-    print_item $I0
+    print $I0
     print_newline
 .end
 CODE
@@ -423,11 +427,13 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "unshift integer");
     unshift ar, 10
     unshift ar, 20
     $I0 = elements ar
-    print_item $I0
+    print $I0
+    print ' '
     $I0 = ar[0]
-    print_item $I0
+    print $I0
+    print ' '
     $I0 = ar[1]
-    print_item $I0
+    print $I0
     print_newline
 .end
 CODE

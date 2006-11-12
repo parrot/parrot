@@ -19,7 +19,7 @@ use Test::More;
 pir_output_is(<<'CODE', <<'OUT', "karl trivial test");
 .sub _main
     $I1 = foo(10)
-    print_item $I1
+    print $I1
     print_newline
 .end
 .sub foo
@@ -48,14 +48,14 @@ pir_output_is(<<'CODE', <<'OUT', "karl spot bug 1");
     .param int l
 
     unless done goto tc
-    print_item "i"
-    print_item i
-    print_item "j"
-    print_item j
-    print_item "k"
-    print_item k
-    print_item "l"
-    print_item l
+    print "i "
+    print i
+    print " j "
+    print j
+    print " k "
+    print k
+    print " l "
+    print l
 
     print_newline
     end
@@ -77,12 +77,12 @@ pir_output_is(<<'CODE', <<'OUT', "karl tailcall 3 args");
     .param int j
     .param int k
     unless done goto tc
-    print_item "i"
-    print_item i
-    print_item "j"
-    print_item j
-    print_item "k"
-    print_item k
+    print "i "
+    print i
+    print " j "
+    print j
+    print " k "
+    print k
     print_newline
     end
 tc:
@@ -107,16 +107,16 @@ pir_output_is(<<'CODE', <<'OUT', "cycle no exit 1");
 
 
     unless done goto tc
-    print_item "i"
-    print_item i
-    print_item "j"
-    print_item j
-    print_item "k"
-    print_item k
-    print_item "l"
-    print_item l
-    print_item "m"
-    print_item m
+    print "i "
+    print i
+    print " j "
+    print j
+    print " k "
+    print k
+    print " l "
+    print l
+    print " m "
+    print m
 
     print_newline
     end
@@ -141,16 +141,16 @@ pir_output_is(<<'CODE', <<'OUT', "cycle no exit 2");
 
 
     unless done goto tc
-    print_item "i"
-    print_item i
-    print_item "j"
-    print_item j
-    print_item "k"
-    print_item k
-    print_item "l"
-    print_item l
-    print_item "m"
-    print_item m
+    print "i "
+    print i
+    print " j "
+    print j
+    print " k "
+    print k
+    print " l "
+    print l
+    print " m "
+    print m
 
     print_newline
     end
@@ -175,16 +175,16 @@ pir_output_is(<<'CODE', <<'OUT', "2 unconnected cycles no exit ");
 
 
     unless done goto tc
-    print_item "i"
-    print_item i
-    print_item "j"
-    print_item j
-    print_item "k"
-    print_item k
-    print_item "l"
-    print_item l
-    print_item "m"
-    print_item m
+    print "i "
+    print i
+    print " j "
+    print j
+    print " k "
+    print k
+    print " l "
+    print l
+    print " m "
+    print m
 
     print_newline
     end
@@ -209,16 +209,16 @@ pir_output_is(<<'CODE', <<'OUT', "cycle with exit 1");
 
 
     unless done goto tc
-    print_item "i"
-    print_item i
-    print_item "j"
-    print_item j
-    print_item "k"
-    print_item k
-    print_item "l"
-    print_item l
-    print_item "m"
-    print_item m
+    print "i "
+    print i
+    print " j "
+    print j
+    print " k "
+    print k
+    print " l "
+    print l
+    print " m "
+    print m
 
     print_newline
     end
@@ -299,12 +299,12 @@ pir_output_is(<<'CODE', <<'OUT', "tailcall 3 args");
     .param int j
     .param int k
     unless done goto tc
-    print_item "i"
-    print_item i
-    print_item "j"
-    print_item j
-    print_item "k"
-    print_item k
+    print "i "
+    print i
+    print " j "
+    print j
+    print " k "
+    print k
     print_newline
     end
 tc:

@@ -122,9 +122,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_lexinfo');
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1.'get_lexinfo'()
     $S0 = typeof $P2
-    print_item $S0
+    print $S0
+    print ' '
     $I0 = elements $P2
-    print_item $I0
+    print $I0
     print_newline
 .end
 CODE

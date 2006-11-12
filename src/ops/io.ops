@@ -205,8 +205,6 @@ inline op open(out PMC, in STR) :filesys_open {
 
 =item B<print>(in STR)
 
-=item B<write>(invar PMC)
-
 Print $1 to standard output.
 
 =cut
@@ -234,15 +232,6 @@ op print(invar PMC) :base_io {
   STRING * const s = (VTABLE_get_string(interp, p));
   if (s) {
     PIO_putps(interp, PIO_STDOUT(interp), s);
-  }
-  goto NEXT();
-}
-
-op write(invar PMC) :base_io {
-  PMC * const p = $1;
-  STRING * const s = (VTABLE_get_string(interp, p));
-  if (s) {
-    PIO_write(interp, PIO_STDOUT(interp), s->strstart, s->bufused);
   }
   goto NEXT();
 }

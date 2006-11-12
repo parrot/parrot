@@ -573,8 +573,8 @@ pir_output_like(<<'CODE', <<'OUTPUT', "pushaction - throw in main");
 
 .sub exit_handler
     .param int flag
-    print_item "at_exit, flag ="
-    print_item flag
+    print "at_exit, flag = "
+    print flag
     print_newline
 .end
 CODE
@@ -601,8 +601,8 @@ h:
 
 .sub exit_handler :outer(main)
     .param int flag
-    print_item "at_exit, flag ="
-    print_item flag
+    print "at_exit, flag = "
+    print flag
     print_newline
     $P2 = new .Exception
     throw $P2
@@ -627,13 +627,11 @@ handler:
 .end
 
 .sub exit_handler :outer(main)
-    print_item "at_exit"
-    print_newline
+    say "at_exit"
     .local pmc a
     a = find_lex 'a'
-    print_item 'a ='
-    print_item a
-    print_newline
+    print 'a = '
+    say a
 .end
 CODE
 at_exit

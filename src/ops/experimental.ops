@@ -23,6 +23,44 @@ Parrot ops or not. They are included here for testing purposes only!
 
 ###############################################################################
 
+=head2 IO operations
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<print_newline>()
+
+Print a newline char to standard output.
+
+=cut
+
+op print_newline() :base_io {
+  PMC * const io = PIO_STDOUT(interp);
+  PIO_puts(interp, io, "\n");
+  goto NEXT();
+}
+
+=item B<print_newline>(invar PMC)
+
+Print a newline char to IO stream object $1.
+
+=cut
+
+op print_newline(invar PMC) :base_io {
+  PMC * const io = $1;
+  PIO_puts(interp, io, "\n");
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
 =head2 Mathematical operations
 
 Implementations of various mathematical operations
@@ -496,7 +534,7 @@ Copyright (C) 2001-2004, The Perl Foundation.
 =head1 LICENSE
 
 This program is free software. It is subject to the same license
-as the Parrot interpreter itself.
+as the Parrot interp itself.
 
 =cut
 

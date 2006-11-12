@@ -358,11 +358,13 @@ pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - autobox");
 .sub foo
     get_params "(0x20)", $P0
     $S0 = $P0[0]
-    print_item $S0
+    print $S0
+    print ' '
     $S0 = $P0[1]
-    print_item $S0
+    print $S0
+    print ' '
     $S0 = $P0[2]
-    print_item $S0
+    print $S0
     print_newline
 .end
 CODE
@@ -416,15 +418,18 @@ pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - fetch");
 .end
 .sub foo
     get_params "(0,0,0,0)", $P0, $I0, $S0, $N0
-    print_item $P0
-    print_item $I0
-    print_item $S0
-    print_item $N0
+    print $P0
+    print ' '
+    print $I0
+    print ' '
+    print $S0
+    print ' '
+    print $N0
     print_newline
     returncc
 .end
 CODE
-hello 42 again 47.11
+hello 42 again 47.110000
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch, too few");
@@ -746,8 +751,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "pir call evaled code");
     s  = ".sub foo\n"
     s .= ".param int i\n"
     s .= ".param int j\n"
-    s .= "print_item i\n"
-    s .= "print_item j\n"
+    s .= "print i\n"
+    s .= "print ' '\n"
+    s .= "print j\n"
     s .= "print_newline\n"
     s .= ".return(99)\n"
     s .= ".end\n"
@@ -799,28 +805,34 @@ pir_output_is(<<'CODE', <<'OUTPUT', "type conversion - native");
 .end
 .sub foo_int
     get_params "(0,0,0)", $I0, $I1, $I2
-    print_item $I0
-    print_item $I1
-    print_item $I2
+    print $I0
+    print ' '
+    print $I1
+    print ' '
+    print $I2
     print_newline
 .end
 .sub foo_float
     get_params "(0,0,0)", $N0, $N1, $N2
-    print_item $N0
-    print_item $N1
-    print_item $N2
+    print $N0
+    print ' '
+    print $N1
+    print ' '
+    print $N2
     print_newline
 .end
 .sub foo_string
     get_params "(0,0,0)", $S0, $S1, $S2
-    print_item $S0
-    print_item $S1
-    print_item $S2
+    print $S0
+    print ' '
+    print $S1
+    print ' '
+    print $S2
     print_newline
 .end
 CODE
 42 42 42
-42.0 42.0 42.2
+42.000000 42.000000 42.200000
 42 42 42.2
 OUTPUT
 
@@ -886,10 +898,13 @@ pir_output_is(<<'CODE', <<'OUTPUT', "optional multiple :opt_flag");
     print "not "
 ok:
     print "ok 4\n"
-    print_item i1
-    print_item i2
-    print_item i3
-    print_item i4
+    print i1
+    print ' '
+    print i2
+    print ' '
+    print i3
+    print ' '
+    print i4
     print_newline
 .end
 
@@ -1340,13 +1355,15 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcall - optional not set");
     .param int b
     .param int c :optional
     .param int has_c :opt_flag
-    print_item a
-    print_item b
+    print a
+    print ' '
+    print b
+    print ' '
     unless has_c goto no_c
-    print_item c
+    print c
     goto got_c
 no_c:
-    print_item 'no'
+    print 'no'
 got_c:
     print_newline
 .end
@@ -1369,13 +1386,15 @@ pir_output_is(<<'CODE', <<'OUTPUT', "tailcall - optional set");
     .param int b
     .param int c :optional
     .param int has_c :opt_flag
-    print_item a
-    print_item b
+    print a
+    print ' '
+    print b
+    print ' '
     unless has_c goto no_c
-    print_item c
+    print c
     goto got_c
 no_c:
-    print_item 'no'
+    print 'no'
 got_c:
     print_newline
 .end
@@ -1408,10 +1427,12 @@ pir_output_is(<<'CODE', <<'OUTPUT', "clone_key_arg");
 .sub __set_integer_keyed :method
     .param pmc key
     .param int val
-    print_item key        # print first key
+    print key             # print first key
+    print ' '
     key = shift key       # get next key
-    print_item key
-    print_item val
+    print key
+    print ' '
+    print val
     print_newline
 .end
 CODE
@@ -1689,8 +1710,9 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "named - 1");
     end
 .pcc_sub foo:
     get_params "(0x200, 0, 0x200, 0)", "a", I0, "b", I1
-    print_item I1
-    print_item I0
+    print I1
+    print ' '
+    print I0
     print_newline
     returncc
 CODE
@@ -1711,8 +1733,9 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "named - 2 flatten");
     end
 .pcc_sub foo:
     get_params "(0x200, 0, 0x200, 0)", "a", I0, "b", I1
-    print_item I1
-    print_item I0
+    print I1
+    print ' '
+    print I0
     print_newline
     returncc
 CODE
@@ -1730,15 +1753,19 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "named - 3 slurpy hash");
     end
 .pcc_sub foo:
     get_params "(0x200, 0, 0x220)", "a", I0, P0
-    print_item I0
+    print I0
+    print ' '
     elements I1, P0
-    print_item I1
+    print I1
+    print ' '
     typeof S0, P0
-    print_item S0
+    print S0
+    print ' '
     set I2, P0['b']
-    print_item I2
+    print I2
+    print ' '
     set I2, P0['c']
-    print_item I2
+    print I2
     print_newline
     returncc
 
@@ -1757,9 +1784,11 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "named - 4 positional -> named");
     end
 .pcc_sub foo:
     get_params "(0x200, 0, 0x200, 0, 0x200, 0)", "a", I0, "b", I1, 'c', I2
-    print_item I0
-    print_item I1
-    print_item I2
+    print I0
+    print ' '
+    print I1
+    print ' '
+    print I2
     print_newline
     returncc
 CODE
@@ -1777,13 +1806,17 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named");
     end
 .pcc_sub foo:
     get_params "(0, 0x20, 0x200, 0, 0x200, 0)", I0, P0, "b", I1, "a", I2
-    print_item I0
+    print I0
+    print ' '
     set I0, P0[0]
-    print_item I0
+    print I0
+    print ' '
     set I0, P0[1]
-    print_item I0
-    print_item I1
-    print_item I2
+    print I0
+    print ' '
+    print I1
+    print ' '
+    print I2
     print_newline
     returncc
 CODE
@@ -1835,8 +1868,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', ":named(\"...\") syntax for .param and sub c
         .param int c :named("a")
         .param int d :named("b")
 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
         .return()
 .end
@@ -1850,8 +1884,9 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', ":named(\"...\") syntax for the 4 kind");
 .sub main :main
         ($I0 :named("b"), $I1 :named("a")) = foo( 10 :named("b"), 20 :named("a"))
-        print_item $I0
-        print_item $I1
+        print $I0
+        print ' '
+        print $I1
         print_newline
         print "ok\n"
 
@@ -1862,8 +1897,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', ":named(\"...\") syntax for the 4 kind");
         .param int c :named("a")
         .param int d :named("b")
 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 
         .return ( 10 :named("a"), 20 :named("b"))
@@ -1889,8 +1925,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', " 'foo' => 10 syntax for function call");
         .param int c :named("a")
         .param int d :named("b")
 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 
         .return ()
@@ -1914,8 +1951,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', " 'foo' => d syntax for parameters");
         .param int "b" => d
         .param int "a" => c
 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 
         .return ()
@@ -1930,8 +1968,9 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', " 'foo' => d syntax for target list");
 .sub main :main
         ("b" => $I0 , "a" => $I1) = foo( "b" => 10 , "a" => 20)
-        print_item $I0
-        print_item $I1
+        print $I0
+        print ' '
+        print $I1
         print_newline
         print "ok\n"
 
@@ -1942,8 +1981,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', " 'foo' => d syntax for target list");
         .param int "a" => c
         .param int "b" => d
 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 
         .return ( 10 :named("a"), 20 :named("b"))
@@ -1959,8 +1999,9 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', " 'foo' => d syntax for return");
 .sub main :main
         ("b" => $I0 , "a" => $I1) = foo( "b" => 10 , "a" => 20)
-        print_item $I0
-        print_item $I1
+        print $I0
+        print ' '
+        print $I1
         print_newline
         print "ok\n"
 
@@ -1971,8 +2012,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', " 'foo' => d syntax for return");
         .param int "a" => c
         .param int "b" => d
 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 
         .return ( "a" => 10, "b" => 20 )
@@ -2007,8 +2049,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set");
 .sub foo
         .param int d :named('b')
 	.param int c :named('a') :optional
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 .end
 CODE
@@ -2025,8 +2068,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set");
 .sub foo
         .param int 'b' => d
 	.param int 'a' => c  :optional
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 .end
 CODE
@@ -2045,10 +2089,13 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set, :opt_flag");
 	.param int has_d :opt_flag
 	.param int c :named('a') :optional
 	.param int has_c :opt_flag
-        print_item d
-        print_item has_d
-        print_item c
-        print_item has_c
+        print d
+        print ' '
+        print has_d
+        print ' '
+        print c
+        print ' '
+        print has_c
         print_newline
 .end
 CODE
@@ -2070,10 +2117,13 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named optional - mix");
 	.param int has_d :opt_flag
 	.param int c :named('a') :optional
 	.param int has_c :opt_flag
-        print_item d
-        print_item has_d
-        print_item c
-        print_item has_c
+        print d
+        print ' '
+        print has_d
+        print ' '
+        print c
+        print ' '
+        print has_c
         print_newline
 .end
 CODE
@@ -2099,8 +2149,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named flat/slurpy");
         .param pmc h :named :slurpy
         $I0 = h['a']
         $I1 = h['b']
-        print_item $I0
-        print_item $I1
+        print $I0
+        print ' '
+        print $I1
         print_newline
 .end
 CODE
@@ -2166,8 +2217,9 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - missing named");
 .sub foo
         .param int d :named('b') 
 	.param int c :named('a') 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 .end
 CODE
@@ -2185,8 +2237,9 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - missing named");
 .sub foo
         .param int d :named('b') 
 	.param int c :named('a') 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 .end
 CODE
@@ -2204,8 +2257,9 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - too many named");
 .sub foo
         .param int d :named('b') 
 	.param int c :named('a') 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 .end
 CODE
@@ -2223,8 +2277,9 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - duplicate named");
 .sub foo
         .param int d :named('b') 
 	.param int c :named('a') 
-        print_item d
-        print_item c
+        print d
+        print ' '
+        print c
         print_newline
 .end
 CODE

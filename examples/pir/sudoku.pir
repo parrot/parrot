@@ -343,7 +343,8 @@ list_names:
 loop:
     unless it goto fin
     $S0 = shift it
-    print_item $S0
+    print $S0
+    print " "
     goto loop
 fin:
     print_newline
@@ -1406,25 +1407,25 @@ next:
 	    if changed goto chg_ok
 	    $S0 = "noC"
 	chg_ok:
-	    print_item $S0
-	    print_item " Y-WING A "
-	    print_item A
-	    print_item " B "
-	    print_item B
-	    print_item " C "
-	    print_item C
-	    print_item " at x "
-	    print_item x
-	    print_item " y "
-	    print_item y
-	    print_item " cx "
-	    print_item cx
-	    print_item " cy "
-	    print_item cy
-	    print_item " bx "
-	    print_item bx
-	    print_item " by "
-	    print_item by
+	    print $S0
+	    print " Y-WING A "
+	    print A
+	    print " B "
+	    print B
+	    print " C "
+	    print C
+	    print " at x "
+	    print x
+	    print " y "
+	    print y
+	    print " cx "
+	    print cx
+	    print " cy "
+	    print cy
+	    print " bx "
+	    print bx
+	    print " by "
+	    print by
 	    print_newline
 	    self."display"()
 	    goto ex
@@ -1725,16 +1726,16 @@ not_set:
     if b < 3 goto lpb
     $I0 = self."debug"()
     unless $I0 goto nd
-	print_item "inv_dbl"
-	print_item what
-	print_item "n"
-	print_item n
-	print_item "msk"
-	print_item msk
-	print_item "sx"
-	print_item sx
-	print_item "sy"
-	print_item sy
+	print "inv_dbl "
+	print what
+	print " n "
+	print n
+	print " msk "
+	print msk
+	print " sx "
+	print sx
+	print " sy "
+	print sy
 	print_newline
 	self."display"()
 nd:

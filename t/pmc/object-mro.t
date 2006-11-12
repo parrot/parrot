@@ -50,13 +50,15 @@ loop:
     unless it goto ex
     p = shift it
     $S0 = classname p
-    print_item $S0
+    print $S0
+    print ' '
     goto loop
 ex:
+    print 'G'
     print_newline
 .end
 CODE
-F C D A B E
+F C D A B E G
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "print mro 1");
@@ -118,13 +120,15 @@ loop:
     unless it goto ex
     p = shift it
     $S0 = classname p
-    print_item $S0
+    print $S0
+    print ' '
     goto loop
 ex:
+    print 'G'
     print_newline
 .end
 CODE
-A B C D E F O
+A B C D E F O G
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "print mro 2");
@@ -187,13 +191,15 @@ loop:
     unless it goto ex
     p = shift it
     $S0 = classname p
-    print_item $S0
+    print $S0
+    print ' '
     goto loop
 ex:
+    print 'G'
     print_newline
 .end
 CODE
-A B E C D F O
+A B E C D F O G
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "print mro 3");
@@ -223,13 +229,15 @@ loop:
     unless it goto ex
     p = shift it
     $S0 = classname p
-    print_item $S0
+    print $S0
+    print ' '
     goto loop
 ex:
+    print 'G'
     print_newline
 .end
 CODE
-D A B C
+D A B C G
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "print mro 4");
@@ -281,13 +289,15 @@ loop:
     unless it goto ex
     p = shift it
     $S0 = classname p
-    print_item $S0
+    print $S0
+    print ' '
     goto loop
 ex:
+    print 'R'
     print_newline
 .end
 CODE
-Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object
+Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object R
 OUTPUT
 
 # ... now some tests which fail to compose the class

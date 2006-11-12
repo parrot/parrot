@@ -402,25 +402,31 @@ pir_output_is(<<'CODE', <<'OUTPUT', "addattribute subclass - same name");
     o = new 'Bar'
     $I0 = classoffset o, 'Foo'
     $P0 = getattribute o, $I0
-    print_item $P0
+    print $P0
+    print ' '
     inc $I0
     $P0 = getattribute o, $I0
-    print_item $P0
+    print $P0
+    print ' '
     $I0 = classoffset o, 'Bar'
     $P0 = getattribute o, $I0
-    print_item $P0
+    print $P0
+    print ' '
     inc $I0
     $P0 = getattribute o, $I0
-    print_item $P0
+    print $P0
     print_newline
     $P0 = getattribute o, 'i'
-    print_item $P0
+    print $P0
+    print ' '
     $P0 = getattribute o, "Foo\0j"
-    print_item $P0
+    print $P0
+    print ' '
     $P0 = getattribute o, 'j'
-    print_item $P0
+    print $P0
+    print ' '
     $P0 = getattribute o, 'k'
-    print_item $P0
+    print $P0
     print_newline
 .end
 .namespace ['Bar']

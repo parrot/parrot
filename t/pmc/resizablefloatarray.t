@@ -464,19 +464,23 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "shift float");
     ar[0] = 10.1
     ar[1] = 20.2
     $I0 = elements ar
-    print_item $I0
+    print $I0
+    print ' '
     $N0 = shift ar
-    print_item $N0
+    print $N0
+    print ' '
     $I0 = elements ar
-    print_item $I0
+    print $I0
+    print ' '
     $N0 = shift ar
-    print_item $N0
+    print $N0
+    print ' '
     $I0 = elements ar
-    print_item $I0
+    print $I0
     print_newline
 .end
 CODE
-2 10.1 1 20.2 0
+2 10.100000 1 20.200000 0
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "unshift float");
@@ -486,15 +490,17 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "unshift float");
     unshift ar, 10.1
     unshift ar, 20.2
     $I0 = elements ar
-    print_item $I0
+    print $I0
+    print ' '
     $N0 = ar[0]
-    print_item $N0
+    print $N0
+    print ' '
     $N0 = ar[1]
-    print_item $N0
+    print $N0
     print_newline
 .end
 CODE
-2 20.2 10.1
+2 20.200000 10.100000
 OUTPUT
 
 # Local Variables:

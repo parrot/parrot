@@ -381,13 +381,16 @@ inner:
       self."code"($S1)
   no_emit_l:
     unless deb goto no_deb_3
-      print_item $S0
+      print $S0
+      print " "
   no_deb_3:
     # decode opcode at pc
     (ops, type, pc) = self."decode_op"(im, pc)
     unless deb goto no_deb_4
-      print_item ops
-      print_item type
+      print ops
+      print " "
+      print type
+      print " "
   no_deb_4:
     # collect args encoded in opcode
     args = new ResizablePMCArray

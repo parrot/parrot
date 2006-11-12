@@ -582,12 +582,14 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "chopn utf8");
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
     chopn S1, 2
-    print_item S1
+    print S1
+    print ' '
     length I0, S1
-    print_item I0
+    print I0
+    print ' '
     .include "stringinfo.pasm"
     stringinfo I0, S1, .STRINGINFO_BUFUSED
-    print_item I0
+    print I0
     print_newline
     end
 CODE
@@ -602,10 +604,11 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 append");
     trans_encoding S1, S1, I0
     concat S1, " Leo"
     length I0, S1
-    print_item I0
+    print I0
+    print ' '
     .include "stringinfo.pasm"
     stringinfo I0, S1, .STRINGINFO_BUFUSED
-    print_item I0
+    print I0
     print_newline
     find_encoding I0, "utf8"
     trans_encoding S2, S1, I0
@@ -625,10 +628,11 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 concat");
     trans_encoding S1, S1, I0
     concat S2, S1, " Leo"
     length I0, S2
-    print_item I0
+    print I0
+    print ' '
     .include "stringinfo.pasm"
     stringinfo I0, S2, .STRINGINFO_BUFUSED
-    print_item I0
+    print I0
     print_newline
     find_encoding I0, "utf8"
     trans_encoding S2, S2, I0
@@ -790,10 +794,13 @@ pasm_output_is( <<'CODE', <<OUTPUT, "combose combined char" );
     push P0, "utf8"       # push utf8 output layer
     print S1
     print "\n"
-    print_item I0
-    print_item I1
-    print_item I2
-    print_item I3
+    print I0
+    print ' '
+    print I1
+    print ' '
+    print I2
+    print ' '
+    print I3
     print_newline
     end
 CODE

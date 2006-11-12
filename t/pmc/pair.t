@@ -48,16 +48,20 @@ pir_output_is(<<'CODE', <<'OUT', 'methods');
     set p["key"], $P1
 
     $P0 = p."key"()
-    print_item $P0
+    print $P0
+    print ' '
     $P0 = p."value"()
-    print_item $P0
+    print $P0
+    print ' '
     kv = p."kv"()
     $I0 = elements kv
-    print_item $I0
+    print $I0
+    print ' '
     $P0 = kv[0]
-    print_item $P0
+    print $P0
+    print ' '
     $P0 = kv[1]
-    print_item $P0
+    print $P0
     print_newline
 .end
 CODE
@@ -77,15 +81,17 @@ pir_output_is(<<'CODE', <<'OUT', 'instantiate, assign');
     p = cl."instantiate"(k, v)
 
     $P0 = p."key"()
-    print_item $P0
+    print $P0
+    print ' '
     $P0 = p."value"()
-    print_item $P0
+    print $P0
+    print ' '
 
     v = new .Integer
     v = 77
     assign p, v
     $P0 = p."value"()
-    print_item $P0
+    print $P0
 
     print_newline
 .end
