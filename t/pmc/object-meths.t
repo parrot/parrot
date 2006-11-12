@@ -1065,7 +1065,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived");
 
 .namespace ["MyClass"]
 
-.sub __get_integer_keyed_int :method
+.sub get_integer_keyed_int :vtable :method
     .param int key
     print "ikey\n"
     .local pmc ar
@@ -1074,8 +1074,8 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived");
     .return ($I0)
 .end
 
-.sub __set_integer_keyed :method
-    .param pmc key
+.sub set_integer_keyed_int :vtable :method
+    .param int key
     .param int val
     print "pkey\n"
     .local pmc ar
