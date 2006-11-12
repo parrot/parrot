@@ -46,7 +46,7 @@ static size_t
 PIO_string_read(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING **buf)
 {
     UNUSED(io);
-    UNUSED(interpreter);
+    UNUSED(interp);
 
     if (l->self == 0)
         return 0;
@@ -70,8 +70,8 @@ PIO_string_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
         return s->strlen;
     }
 
-    l->self = string_append(interpreter, old_string, s);
-    return string_length(interpreter, l->self);
+    l->self = string_append(interp, old_string, s);
+    return string_length(interp, l->self);
 }
 
 static const ParrotIOLayerAPI pio_string_layer_api = {

@@ -27,7 +27,7 @@ Start a new transaction.
 =cut
 
 inline op stm_start() {
-    Parrot_STM_start_transaction(interpreter);
+    Parrot_STM_start_transaction(interp);
     goto NEXT();
 }
 
@@ -41,7 +41,7 @@ If there is no active transaction, execution continues normally.
 =cut
 
 inline op stm_validate(labelconst INT) {
-    if (!Parrot_STM_validate(interpreter))
+    if (!Parrot_STM_validate(interp))
         goto OFFSET($1);
     goto NEXT();
 }
@@ -57,7 +57,7 @@ If stm_commit jumps to $1, then the transaction will have been aborted.
 =cut
 
 inline op stm_commit(labelconst INT) {
-    if (!Parrot_STM_commit(interpreter))
+    if (!Parrot_STM_commit(interp))
         goto OFFSET($1); /* retry */
     goto NEXT();
 }
@@ -73,8 +73,8 @@ because the outer transaction constrains it to not see new values.)
 =cut
 
 inline op stm_wait(labelconst INT) {
-    Parrot_STM_wait(interpreter);
-    if (!Parrot_STM_validate(interpreter))
+    Parrot_STM_wait(interp);
+    if (!Parrot_STM_validate(interp))
         goto OFFSET($1);
     goto NEXT();
 }
@@ -86,7 +86,7 @@ Aborts the most recently opened transaction.
 =cut
 
 inline op stm_abort() {
-    Parrot_STM_abort(interpreter);
+    Parrot_STM_abort(interp);
     goto NEXT();
 }
 
@@ -97,7 +97,7 @@ Writes the number transactions active in this thread into $1.
 =cut
 
 inline op stm_depth(out INT) {
-    $1 = Parrot_STM_transaction_depth(interpreter);
+    $1 = Parrot_STM_transaction_depth(interp);
     goto NEXT();
 }
 

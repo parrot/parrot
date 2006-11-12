@@ -18,10 +18,10 @@
  */
 
 INTVAL
-ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
+ascii_find_thing(Interp *interp, STRING *string, UINTVAL start,
         PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table);
 INTVAL
-ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
+ascii_find_not_thing(Interp *interp, STRING *string, UINTVAL start,
         PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table);
 STRING *ascii_get_graphemes(Interp *, STRING *source_string,
         UINTVAL offset, UINTVAL count);

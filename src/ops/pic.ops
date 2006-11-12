@@ -53,7 +53,7 @@ inline op pic_infix__(inconst INT, invar PMC, invar PMC) :pic {
     lr_types = (left->vtable->base_type << 16) | right->vtable->base_type;
     if (lru->u.type == lr_types) {
 runit_v_pp:
-        ((mmd_f_v_pp)lru->f.real_function)(interpreter, left, right);
+        ((mmd_f_v_pp)lru->f.real_function)(interp, left, right);
         goto NEXT();
     }
     if (mic->pic) {
@@ -69,7 +69,7 @@ runit_v_pp:
          * TODO if we got too often here just do a dynamic lookup
          */
     }
-    parrot_pic_find_infix_v_pp(interpreter, left, right, mic, cur_opcode);
+    parrot_pic_find_infix_v_pp(interp, left, right, mic, cur_opcode);
     /* rerun this opcode */
     goto OFFSET(0);
 }
@@ -95,30 +95,30 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
     lr_types = (lt << 16) | rt;
     if (lru->u.type == lr_types) {
         INTVAL a = lt == enum_class_Integer ? PMC_int_val(left) :
-            VTABLE_get_integer(interpreter, left);
+            VTABLE_get_integer(interp, left);
         INTVAL b = rt == enum_class_Integer ? PMC_int_val(right) :
-            VTABLE_get_integer(interpreter, right);
+            VTABLE_get_integer(interp, right);
         INTVAL c = a - b;
         if ((c^a) >= 0 || (c^~b) >= 0) {
             if (lt == enum_class_Integer)
                 PMC_int_val(left) = c;
             else
-                VTABLE_set_integer_native(interpreter, left, c);
+                VTABLE_set_integer_native(interp, left, c);
         }
         else {
-            if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
-                real_exception(interpreter, NULL, ERR_OVERFLOW,
+            if (PARROT_ERRORS_test(interp,PARROT_ERRORS_OVERFLOW_FLAG)) {
+                real_exception(interp, NULL, ERR_OVERFLOW,
                         "Integer overflow");
             }
             /* TODO preserve type system */
-            VTABLE_morph(interpreter, left, enum_class_BigInt);
-            VTABLE_set_integer_native(interpreter, left, a);
-            mmd_dispatch_p_pip(interpreter, left, b, left, MMD_SUBTRACT);
+            VTABLE_morph(interp, left, enum_class_BigInt);
+            VTABLE_set_integer_native(interp, left, a);
+            mmd_dispatch_p_pip(interp, left, b, left, MMD_SUBTRACT);
         }
     }
     else {
         ((void**)cur_opcode)[0] =
-            parrot_pic_opcode(interpreter, PARROT_OP_pic_infix___ic_p_p);
+            parrot_pic_opcode(interp, PARROT_OP_pic_infix___ic_p_p);
         goto OFFSET(0);
     }
     goto NEXT();
@@ -146,8 +146,8 @@ inline op pic_get_params__(inconst PMC) :pic {
     /* avoid load dependencies - intermix derefs
      * - yes, confusing but faster
      */
-    ctx = CONTEXT(interpreter->ctx);
-    src_pc = interpreter->current_args;
+    ctx = CONTEXT(interp->ctx);
+    src_pc = interp->current_args;
     mic = (Parrot_MIC *) cur_opcode[1];
     caller_ctx = ctx->caller_ctx;
     if (src_pc) {
@@ -161,7 +161,7 @@ inline op pic_get_params__(inconst PMC) :pic {
     lru = &mic->lru;
     if (lru->u.signature == sig) {
         if (sig) {
-            n = ((arg_pass_f)lru->f.real_function)(interpreter, sig,
+            n = ((arg_pass_f)lru->f.real_function)(interp, sig,
                     (char*)caller_ctx->bp.regs_i, src_pred,
                     _reg_base, (void**)cur_opcode);
         }
@@ -172,15 +172,15 @@ inline op pic_get_params__(inconst PMC) :pic {
             PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
             --ctx->recursion_depth;
             ctx->caller_ctx = caller_ctx->caller_ctx;
-            Parrot_free_context(interpreter, caller_ctx, 0);
-            interpreter->current_args = NULL;
+            Parrot_free_context(interp, caller_ctx, 0);
+            interp->current_args = NULL;
         }
 
         goto OFFSET(n);
     }
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
-        parrot_pic_opcode(interpreter, PARROT_OP_get_params_pc);
+        parrot_pic_opcode(interp, PARROT_OP_get_params_pc);
     ((void**)cur_opcode)[1] = mic->m.sig;
     goto OFFSET(0);
 }
@@ -195,17 +195,17 @@ inline op pic_set_returns__(inconst PMC) :pic {
     parrot_cont_t cc;
     int n;
 
-    ctx = CONTEXT(interpreter->ctx);
+    ctx = CONTEXT(interp->ctx);
     mic = (Parrot_MIC *) cur_opcode[1];
     ccont = ctx->current_cont;
     cc = PMC_cont(ccont);
     if (!cc->address) {
-        interpreter->current_returns = CUR_OPCODE;
+        interp->current_returns = CUR_OPCODE;
         n = PMC_int_val(mic->m.sig);
         goto OFFSET(n + 2);
     }
     caller_ctx = cc->to_ctx;
-    interpreter->current_args = NULL;
+    interp->current_args = NULL;
     dest_pc = caller_ctx->current_results;
     if (dest_pc) {
         dest_pred = (void**) dest_pc - caller_ctx->pred_offset;
@@ -218,7 +218,7 @@ inline op pic_set_returns__(inconst PMC) :pic {
     lru = &mic->lru;
     if (lru->u.signature == sig) {
         if (sig) {
-            n = ((arg_pass_f)lru->f.real_function)(interpreter, mic->m.sig,
+            n = ((arg_pass_f)lru->f.real_function)(interp, mic->m.sig,
                     _reg_base, (void**)cur_opcode,
                     (char*)caller_ctx->bp.regs_i, dest_pred);
         }
@@ -228,7 +228,7 @@ inline op pic_set_returns__(inconst PMC) :pic {
     }
     /* no match redo plain opcode */
     ((void**)cur_opcode)[0] =
-        parrot_pic_opcode(interpreter, PARROT_OP_set_returns_pc);
+        parrot_pic_opcode(interp, PARROT_OP_set_returns_pc);
     ((void**)cur_opcode)[1] = mic->m.sig;
     goto OFFSET(0);
 }
@@ -253,7 +253,7 @@ inline op pic_callr__(inconst PMC) :pic {
     INTVAL i, n_args, *sig_bits;
     PMC *sig;
 
-    ctx = CONTEXT(interpreter->ctx);
+    ctx = CONTEXT(interp->ctx);
     mic = (Parrot_MIC *) cur_opcode[1];
     /* get_results */
     pc = ctx->current_results;
@@ -296,7 +296,7 @@ inline op pic_callr__(inconst PMC) :pic {
     args[1 + n_args] = pc;
     lru = &mic->lru;
     /* TODO verify $1 didn't change */
-    (void) ((interface_f)lru->f.real_function)(interpreter, sig_bits, args);
+    (void) ((interface_f)lru->f.real_function)(interp, sig_bits, args);
     goto ADDRESS(pc);
 }
 

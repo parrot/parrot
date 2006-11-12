@@ -37,7 +37,7 @@ PARROT_API PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
 PARROT_API PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
 PARROT_API void Parrot_instantiate_object(Parrot_Interp, PMC *);
 PARROT_API void Parrot_instantiate_object_init(Parrot_Interp, PMC *, PMC *);
-PARROT_API INTVAL Parrot_object_isa(Parrot_Interp interpreter, PMC *, PMC *);
+PARROT_API INTVAL Parrot_object_isa(Parrot_Interp interp, PMC *, PMC *);
 PARROT_API PMC *Parrot_new_method_cache(Parrot_Interp);
 PARROT_API PMC *Parrot_find_method_with_cache(Parrot_Interp, PMC *, STRING *);
 PARROT_API PMC *Parrot_find_method_direct(Parrot_Interp, PMC *, STRING *);
@@ -69,7 +69,7 @@ PARROT_API int Parrot_is_vtable_name(Interp *, const char *name);
 #define get_attrib_num(x, y)    ((PMC **)x)[y]
 #define set_attrib_num(o, x, y, z) \
     do { \
-        DOD_WRITE_BARRIER(interpreter, o, ((PMC **)x)[y], z); \
+        DOD_WRITE_BARRIER(interp, o, ((PMC **)x)[y], z); \
         ((PMC **)x)[y] = z; \
     } while (0)
 #define get_attrib_count(x)     PMC_int_val2(x)

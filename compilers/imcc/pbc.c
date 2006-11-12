@@ -63,7 +63,7 @@ static struct globals {
 
 static int add_const_str(Interp *, SymReg *r);
 
-static opcode_t build_key(Interp *interpreter, SymReg *reg);
+static opcode_t build_key(Interp *interp, SymReg *reg);
 
 static void
 imcc_globals_destroy(Interp *interp, int ex, void *param)
@@ -93,7 +93,7 @@ imcc_globals_destroy(Interp *interp, int ex, void *param)
 
 
 int
-e_pbc_open(Interp * interpreter, void *param)
+e_pbc_open(Interp *interp, void *param)
 {
     struct cs_t *cs;
 
@@ -102,7 +102,7 @@ e_pbc_open(Interp * interpreter, void *param)
     UNUSED(param);
     if (!globals.cs) {
         /* register cleanup code */
-        Parrot_on_exit(interpreter, imcc_globals_destroy, NULL);
+        Parrot_on_exit(interp, imcc_globals_destroy, NULL);
     }
     cs = mem_sys_allocate_zeroed(sizeof(struct cs_t));
     cs->prev = globals.cs;
@@ -123,24 +123,24 @@ e_pbc_open(Interp * interpreter, void *param)
     /*
      * we need some segments
      */
-    if (!interpreter->code) {
+    if (!interp->code) {
         PMC *self;
         int k;
 
-        cs->seg = interpreter->code =
-            PF_create_default_segs(interpreter,
-                    IMCC_INFO(interpreter)->state->file, 1);
+        cs->seg = interp->code =
+            PF_create_default_segs(interp,
+                    IMCC_INFO(interp)->state->file, 1);
         /*
          * create a PMC constant holding the interpreter state
          *
          * see also ParrotInterpreter.thaw and .thawfinish
          * currently just HLL_info is saved/restored
          */
-        self = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
+        self = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                 IGLOBALS_INTERPRETER);
-        k = PDB_extend_const_table(interpreter);
-        interpreter->code->const_table->constants[k]->type = PFC_PMC;
-        interpreter->code->const_table->constants[k]->u.key = self;
+        k = PDB_extend_const_table(interp);
+        interp->code->const_table->constants[k]->type = PFC_PMC;
+        interp->code->const_table->constants[k]->u.key = self;
     }
     globals.cs = cs;
     return 0;
@@ -162,7 +162,7 @@ old_blocks(void)
 }
 
 opcode_t *
-make_jit_info(Interp *interpreter, IMC_Unit * unit)
+make_jit_info(Interp *interp, IMC_Unit * unit)
 {
     char *name;
     size_t size, old;
@@ -171,8 +171,8 @@ make_jit_info(Interp *interpreter, IMC_Unit * unit)
         name = malloc(strlen(globals.cs->seg->base.name) + 5);
         sprintf(name, "%s_JIT", globals.cs->seg->base.name);
         globals.cs->jit_info =
-            PackFile_Segment_new_seg(interpreter,
-                    interpreter->code->base.dir, PF_UNKNOWN_SEG, name, 1);
+            PackFile_Segment_new_seg(interp,
+                    interp->code->base.dir, PF_UNKNOWN_SEG, name, 1);
         free(name);
     }
     size = unit->n_basic_blocks + (old = old_blocks());
@@ -207,13 +207,13 @@ make_new_sub(IMC_Unit * unit)
 
 /* get size/line of bytecode in ops till now */
 static int
-get_old_size(Interp *interpreter, int *ins_line)
+get_old_size(Interp *interp, int *ins_line)
 {
     size_t size;
     struct subs *s;
 
     size = *ins_line = 0;
-    if (!globals.cs || interpreter->code->base.data == NULL)
+    if (!globals.cs || interp->code->base.data == NULL)
         return 0;
     for (s = globals.cs->subs; s; s = s->prev) {
         size += s->size;
@@ -232,10 +232,10 @@ store_sub_size(size_t size, size_t ins_line)
 
 
 static void
-store_fixup(Interp *interpreter, SymReg * r, int pc, int offset)
+store_fixup(Interp *interp, SymReg * r, int pc, int offset)
 {
     SymReg * fixup;
-    fixup = _mk_address(interpreter, &globals.cs->subs->fixup,
+    fixup = _mk_address(interp, &globals.cs->subs->fixup,
             str_dup(r->name), U_add_all);
     if (r->set == 'p')
         fixup->set = 'p';
@@ -257,7 +257,7 @@ store_key_const(char * str, int idx)
  * return size in ops
  */
 static int
-get_codesize(Interp *interpreter, IMC_Unit * unit, int *src_lines)
+get_codesize(Interp *interp, IMC_Unit * unit, int *src_lines)
 {
     Instruction * ins;
     int code_size;
@@ -277,22 +277,22 @@ get_codesize(Interp *interpreter, IMC_Unit * unit, int *src_lines)
         if (ins->op && *ins->op) {
             (*src_lines)++;
             if (ins->opnum < 0)
-                IMCC_fatal(interpreter, 1, "get_codesize: "
+                IMCC_fatal(interp, 1, "get_codesize: "
                         "no opnum ins#%d %I\n",
                         ins->index, ins);
             if (ins->opnum == PARROT_OP_set_p_pc) {
                 /*
                  * set_p_pc opcode
                  */
-                IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "PMC constant %s\n",
+                IMCC_debug(interp, DEBUG_PBC_FIXUP, "PMC constant %s\n",
                         ins->r[1]->name);
                 if (ins->r[1]->usage & U_FIXUP)
-                    store_fixup(interpreter, ins->r[1], code_size, 2);
+                    store_fixup(interp, ins->r[1], code_size, 2);
             }
             code_size += ins->opsize;
         }
         else if (ins->opsize)
-            IMCC_fatal(interpreter, 1, "get_codesize: "
+            IMCC_fatal(interp, 1, "get_codesize: "
                     "non instruction with size found\n");
     }
 
@@ -329,7 +329,7 @@ find_global_label(char *name, struct subs *sym, int *pc)
 
 /* fix global stuff */
 static void
-fixup_globals(Interp *interpreter)
+fixup_globals(Interp *interp)
 {
     int i, pc, addr;
     SymReg * fixup;
@@ -373,18 +373,18 @@ fixup_globals(Interp *interpreter)
                 if (!s1) {
                     int op, col;
                     SymReg *nam;
-                    op = interpreter->op_lib->op_code("find_name_p_sc", 1);
+                    op = interp->op_lib->op_code("find_name_p_sc", 1);
                     assert(op);
-                    interpreter->code->base.data[addr] = op;
-                    nam = mk_const(interpreter, str_dup(fixup->name),
+                    interp->code->base.data[addr] = op;
+                    nam = mk_const(interp, str_dup(fixup->name),
                             fixup->type & VT_ENCODED ? 'U' : 'S');
                     if (nam->color >= 0)
                         col = nam->color;
                     else {
-                        col = nam->color = add_const_str(interpreter, nam);
+                        col = nam->color = add_const_str(interp, nam);
                     }
-                    interpreter->code->base.data[addr+2] = col;
-                    IMCC_debug(interpreter, DEBUG_PBC_FIXUP,
+                    interp->code->base.data[addr+2] = col;
+                    IMCC_debug(interp, DEBUG_PBC_FIXUP,
                             "fixup const PMC"
                             " find_name sub '%s' const nr: %d\n",
                             fixup->name, col);
@@ -392,13 +392,13 @@ fixup_globals(Interp *interpreter)
                 }
                 pmc_const = s1->pmc_const;
                 if (pmc_const < 0) {
-                    IMCC_fatal(interpreter, 1, "fixup_globals: "
+                    IMCC_fatal(interp, 1, "fixup_globals: "
                             "couldn't find sub 2 '%s'\n",
                             fixup->name);
                 }
-                interpreter->code->base.data[addr+fixup->offset] =
+                interp->code->base.data[addr+fixup->offset] =
                     pmc_const;
-                IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "fixup const PMC"
+                IMCC_debug(interp, DEBUG_PBC_FIXUP, "fixup const PMC"
                         " sub '%s' const nr: %d\n", fixup->name,
                         pmc_const);
                 continue;
@@ -409,7 +409,7 @@ fixup_globals(Interp *interpreter)
 }
 
 STRING *
-IMCC_string_from_reg(Interp *interpreter, SymReg *r)
+IMCC_string_from_reg(Interp *interp, SymReg *r)
 {
     char *buf = r->name;
     STRING *s = NULL;
@@ -426,22 +426,22 @@ IMCC_string_from_reg(Interp *interpreter, SymReg *r)
         p[-1] = 0;
         charset = r->name;
         buf = p + 1;        /* past delim */
-        s = string_unescape_cstring(interpreter, buf, '"', charset);
+        s = string_unescape_cstring(interp, buf, '"', charset);
         /* restore colon, as we may reuse this string */
         p[-1] = ':';
     }
     else if (*buf == '"') {
         buf++;
-        s = string_unescape_cstring(interpreter, buf, '"', charset);
+        s = string_unescape_cstring(interp, buf, '"', charset);
     }
     else if (*buf == '\'') {   /* TODO handle python raw strings */
         buf++;
-        s = string_make(interpreter, buf, strlen(buf) - 1, "ascii",
+        s = string_make(interp, buf, strlen(buf) - 1, "ascii",
                 PObj_constant_FLAG);
     }
     else {
         /* unquoted bare name - ascii only dont't unescape it */
-        s = string_make(interpreter, buf, strlen(buf), "ascii",
+        s = string_make(interp, buf, strlen(buf), "ascii",
                 PObj_constant_FLAG);
     }
     return s;
@@ -449,37 +449,37 @@ IMCC_string_from_reg(Interp *interpreter, SymReg *r)
 
 /* add constant string to constant_table */
 static int
-add_const_str(Interp *interpreter, SymReg *r)
+add_const_str(Interp *interp, SymReg *r)
 {
     int k;
     STRING *s;
 
-    s = IMCC_string_from_reg(interpreter, r);
-    k = PDB_extend_const_table(interpreter);
-    interpreter->code->const_table->constants[k]->type = PFC_STRING;
-    interpreter->code->const_table->constants[k]->u.string = s;
+    s = IMCC_string_from_reg(interp, r);
+    k = PDB_extend_const_table(interp);
+    interp->code->const_table->constants[k]->type = PFC_STRING;
+    interp->code->const_table->constants[k]->u.string = s;
 
     return k;
 }
 
 static int
-add_const_num(Interp *interpreter, char *buf)
+add_const_num(Interp *interp, char *buf)
 {
     int k;
     STRING *s;
 
-    k = PDB_extend_const_table(interpreter);
+    k = PDB_extend_const_table(interp);
 
-    interpreter->code->const_table->constants[k]->type =
+    interp->code->const_table->constants[k]->type =
         PFC_NUMBER;
-    s = string_from_cstring(interpreter, buf, 0);
-    interpreter->code->const_table->constants[k]->u.number =
-        string_to_num(interpreter, s);
+    s = string_from_cstring(interp, buf, 0);
+    interp->code->const_table->constants[k]->u.number =
+        string_to_num(interp, s);
     return k;
 }
 
 static PMC*
-mk_multi_sig(Interp* interpreter, SymReg *r)
+mk_multi_sig(Interp* interp, SymReg *r)
 {
     INTVAL i, n;
     STRING *sig;
@@ -488,40 +488,40 @@ mk_multi_sig(Interp* interpreter, SymReg *r)
     struct PackFile_ConstTable *ct;
 
     pcc_sub = r->pcc_sub;
-    multi_sig = pmc_new(interpreter, enum_class_FixedPMCArray);
+    multi_sig = pmc_new(interp, enum_class_FixedPMCArray);
 
     n = pcc_sub->nmulti;
-    VTABLE_set_integer_native(interpreter, multi_sig, n);
+    VTABLE_set_integer_native(interp, multi_sig, n);
     /* :multi() n = 1, reg = NULL */
     if (!pcc_sub->multi[0]) {
-        sig = string_from_cstring(interpreter, "__VOID", 0);
-        sig_pmc = pmc_new(interpreter, enum_class_String);
-        VTABLE_set_string_native(interpreter, sig_pmc, sig);
-        VTABLE_set_pmc_keyed_int(interpreter, multi_sig, 0, sig_pmc);
+        sig = string_from_cstring(interp, "__VOID", 0);
+        sig_pmc = pmc_new(interp, enum_class_String);
+        VTABLE_set_string_native(interp, sig_pmc, sig);
+        VTABLE_set_pmc_keyed_int(interp, multi_sig, 0, sig_pmc);
         return multi_sig;
     }
-    ct = interpreter->code->const_table;
+    ct = interp->code->const_table;
     for (i = 0; i < n; ++i) {
         /* multi[i] can be a Key too -
          * store PMC constants instead of bare strings
          */
         const SymReg *r = pcc_sub->multi[i];
         if (r->set == 'S') {
-            sig_pmc = pmc_new(interpreter, enum_class_String);
-            VTABLE_set_string_native(interpreter, sig_pmc,
+            sig_pmc = pmc_new(interp, enum_class_String);
+            VTABLE_set_string_native(interp, sig_pmc,
                     ct->constants[r->color]->u.string);
         }
         else {
             assert(r->set == 'K');
             sig_pmc = ct->constants[r->color]->u.key;
         }
-        VTABLE_set_pmc_keyed_int(interpreter, multi_sig, i, sig_pmc);
+        VTABLE_set_pmc_keyed_int(interp, multi_sig, i, sig_pmc);
     }
     return multi_sig;
 }
 
 static PMC*
-create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub, int need_lex)
+create_lexinfo(Interp *interp, IMC_Unit *unit, PMC *sub, int need_lex)
 {
     PMC *lex_info;
     int i, k;
@@ -535,19 +535,19 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub, int need_lex)
     typedef void (*decl_func_t)(Interp *, PMC*, STRING *, INTVAL);
     decl_func_t decl_func;
 
-    constants = interpreter->code->const_table->constants;
+    constants = interp->code->const_table->constants;
     /* TODO use CONST_STRING */
-    decl_lex = const_string(interpreter, "declare_lex_preg");
-    lex_info_id = Parrot_get_ctx_HLL_type(interpreter, enum_class_LexInfo);
-    lex_info_class = interpreter->vtables[lex_info_id]->class;
-    decl_lex_meth = VTABLE_find_method(interpreter,
+    decl_lex = const_string(interp, "declare_lex_preg");
+    lex_info_id = Parrot_get_ctx_HLL_type(interp, enum_class_LexInfo);
+    lex_info_class = interp->vtables[lex_info_id]->class;
+    decl_lex_meth = VTABLE_find_method(interp,
             lex_info_class, decl_lex);
     if (!decl_lex_meth) {
-        real_exception(interpreter, NULL, METH_NOT_FOUND,
+        real_exception(interp, NULL, METH_NOT_FOUND,
                 "Method '%Ss' not found", decl_lex);
     }
     if (decl_lex_meth->vtable->base_type != enum_class_NCI) {
-        real_exception(interpreter, NULL, METH_NOT_FOUND,
+        real_exception(interp, NULL, METH_NOT_FOUND,
                 "Method '%Ss' is not a NCI", decl_lex);
     }
     /*
@@ -562,8 +562,8 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub, int need_lex)
             if (r->set == 'P' && r->usage & U_LEXICAL) {
                 SymReg *n;
                 if (!lex_info) {
-                    lex_info = pmc_new_noinit(interpreter, lex_info_id);
-                    VTABLE_init_pmc(interpreter, lex_info, sub);
+                    lex_info = pmc_new_noinit(interp, lex_info_id);
+                    VTABLE_init_pmc(interp, lex_info, sub);
                 }
                 n = r->reg;
                 assert(n); /* at least one lexical name */
@@ -572,10 +572,10 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub, int need_lex)
                     assert(k >= 0);
                     lex_name = constants[k]->u.string;
                     assert(PObj_is_string_TEST(lex_name));
-                    IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                    IMCC_debug(interp, DEBUG_PBC_CONST,
                             "add lexical '%s' to sub name '%s'\n",
                             n->name, (char*)PMC_sub(sub)->name->strstart);
-                    (decl_func)(interpreter,
+                    (decl_func)(interp,
                                 lex_info, lex_name, r->color);
                     /* next possible name */
                     n = n->reg;
@@ -584,14 +584,14 @@ create_lexinfo(Interp *interpreter, IMC_Unit *unit, PMC *sub, int need_lex)
         }
     }
     if (!lex_info && (unit->outer || need_lex)) {
-        lex_info = pmc_new_noinit(interpreter, lex_info_id);
-        VTABLE_init_pmc(interpreter, lex_info, sub);
+        lex_info = pmc_new_noinit(interp, lex_info_id);
+        VTABLE_init_pmc(interp, lex_info, sub);
     }
     return lex_info;
 }
 
 static PMC*
-find_outer(Interp *interpreter, IMC_Unit *unit)
+find_outer(Interp *interp, IMC_Unit *unit)
 {
     struct subs *s;
     SymReg *sub;
@@ -606,7 +606,7 @@ find_outer(Interp *interpreter, IMC_Unit *unit)
      * because we are freezing the outer Sub PMC along with this
      * one
      */
-    UNUSED(interpreter);
+    UNUSED(interp);
     len = strlen(unit->outer->name);
     if (!len)
         return NULL;
@@ -620,9 +620,9 @@ find_outer(Interp *interpreter, IMC_Unit *unit)
     /*
      * could be eval too - look, if :outer is the currentsub
      */
-    current = CONTEXT(interpreter->ctx)->current_sub;
+    current = CONTEXT(interp->ctx)->current_sub;
     if (! current)
-        IMCC_fatal(interpreter, 1,
+        IMCC_fatal(interp, 1,
                    "Undefined :outer sub '%s'.\n",
                    unit->outer->name);
     cur_name = PMC_sub(current)->name;
@@ -634,7 +634,7 @@ find_outer(Interp *interpreter, IMC_Unit *unit)
 }
 
 static int
-add_const_pmc_sub(Interp *interpreter, SymReg *r,
+add_const_pmc_sub(Interp *interp, SymReg *r,
         int offs, int end)
 {
     int i, k;
@@ -655,7 +655,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
 
     if (unit->namespace) {
         ns = unit->namespace->reg;
-        IMCC_debug(interpreter, DEBUG_PBC_CONST,
+        IMCC_debug(interp, DEBUG_PBC_CONST,
                 "name space const = %d ns name '%s'\n",
                 ns->color, ns->name);
         ns_const = ns->color;
@@ -670,8 +670,8 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         }
     }
 
-    ct = interpreter->code->const_table;
-    k = PDB_extend_const_table(interpreter);
+    ct = interp->code->const_table;
+    k = PDB_extend_const_table(interp);
     pfc = ct->constants[k];
     globals.cs->subs->pmc_const = k;
 
@@ -682,15 +682,15 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     /*
      * use a possible type mapping for the Sub PMCs
      */
-    type = Parrot_get_ctx_HLL_type(interpreter, type);
+    type = Parrot_get_ctx_HLL_type(interp, type);
     /* TODO create constant - see also src/packfile.c
     */
-    sub_pmc = pmc_new(interpreter, type);
+    sub_pmc = pmc_new(interp, type);
     PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
     Sub_comp_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
     sub = PMC_sub(sub_pmc);
 
-    r->color = add_const_str(interpreter, r);
+    r->color = add_const_str(interp, r);
     sub->name = ct->constants[r->color]->u.string;
 
     ns_pmc = NULL;
@@ -700,7 +700,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
                 ns_pmc = ct->constants[ns_const]->u.key;
                 break;
             case PFC_STRING:
-                ns_pmc = constant_pmc_new(interpreter,
+                ns_pmc = constant_pmc_new(interp,
                         enum_class_String);
                 PMC_str_val(ns_pmc) =
                     ct->constants[ns_const]->u.string;
@@ -710,34 +710,34 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     sub->namespace = ns_pmc;
     sub->start_offs = offs;
     sub->end_offs = end;
-    sub->HLL_id = CONTEXT(interpreter->ctx)->current_HLL;
+    sub->HLL_id = CONTEXT(interp->ctx)->current_HLL;
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];
-    sub->lex_info = create_lexinfo(interpreter, unit, sub_pmc,
+    sub->lex_info = create_lexinfo(interp, unit, sub_pmc,
             r->pcc_sub->pragma & P_NEED_LEX);
-    sub->outer_sub = find_outer(interpreter, unit);
+    sub->outer_sub = find_outer(interp, unit);
     /*
      * check if it's declared multi
      */
     if (r->pcc_sub->nmulti)
-        sub->multi_signature = mk_multi_sig(interpreter, r);
+        sub->multi_signature = mk_multi_sig(interp, r);
     else
         sub->multi_signature = NULL;
 
-    Parrot_store_sub_in_namespace(interpreter, sub_pmc);
+    Parrot_store_sub_in_namespace(interp, sub_pmc);
 
     if (unit->is_vtable_method == 1) {
         /* Work out the name of the vtable method. */
         if (unit->vtable_name != NULL)
-            vtable_name = string_from_cstring(interpreter, unit->vtable_name + 1,
+            vtable_name = string_from_cstring(interp, unit->vtable_name + 1,
                  strlen(unit->vtable_name) - 2);
         else
             vtable_name = sub->name;
 
         /* Check this is a valid vtable method to override. */
-        c_name = string_to_cstring(interpreter, vtable_name);
-        if (!Parrot_is_vtable_name(interpreter, c_name)) {
-            IMCC_fatal(interpreter, 1,
+        c_name = string_to_cstring(interp, vtable_name);
+        if (!Parrot_is_vtable_name(interp, c_name)) {
+            IMCC_fatal(interp, 1,
                 "'%s' is not a v-table method, but was used with :vtable.\n",
                 c_name);
         }
@@ -748,10 +748,10 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
            do this. */
         if (!PMC_IS_NULL(ns_pmc))
         {
-            STRING* vtable_ns_name_s = string_from_const_cstring(interpreter,
+            STRING* vtable_ns_name_s = string_from_const_cstring(interp,
                 "\0VTABLE\0", 8);
             PMC* vtable_ns_name;
-            PMC* sub_copy = VTABLE_clone(interpreter, sub_pmc);
+            PMC* sub_copy = VTABLE_clone(interp, sub_pmc);
             PMC* vtable_ns_pmc = NULL;
             PMC* tmp = NULL;
 
@@ -763,34 +763,34 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
                 case enum_class_Key:
                     /* Just add the extra v-table entry to a copy of the
                        namespace key. */
-                    vtable_ns_pmc = VTABLE_clone(interpreter, ns_pmc);
-                    vtable_ns_name = pmc_new(interpreter, enum_class_Key);
-                    VTABLE_set_string_native(interpreter, vtable_ns_name,
+                    vtable_ns_pmc = VTABLE_clone(interp, ns_pmc);
+                    vtable_ns_name = pmc_new(interp, enum_class_Key);
+                    VTABLE_set_string_native(interp, vtable_ns_name,
                         vtable_ns_name_s);
-                    VTABLE_push_pmc(interpreter, vtable_ns_pmc,
+                    VTABLE_push_pmc(interp, vtable_ns_pmc,
                         vtable_ns_name);
                     break;
                 case enum_class_String:
                     /* Need to create a new key. */
-                    vtable_ns_pmc = pmc_new(interpreter, enum_class_Key);
-                    VTABLE_set_string_native(interpreter, vtable_ns_pmc,
-                        VTABLE_get_string(interpreter, ns_pmc));
-                    tmp = pmc_new(interpreter, enum_class_Key);
-                    VTABLE_set_string_native(interpreter, tmp,
+                    vtable_ns_pmc = pmc_new(interp, enum_class_Key);
+                    VTABLE_set_string_native(interp, vtable_ns_pmc,
+                        VTABLE_get_string(interp, ns_pmc));
+                    tmp = pmc_new(interp, enum_class_Key);
+                    VTABLE_set_string_native(interp, tmp,
                         vtable_ns_name_s);
-                    VTABLE_push_pmc(interpreter, vtable_ns_pmc, tmp);
+                    VTABLE_push_pmc(interp, vtable_ns_pmc, tmp);
                     break;
             }
             PMC_sub(sub_copy)->namespace = vtable_ns_pmc;
 
-            Parrot_store_sub_in_namespace(interpreter, sub_copy);
+            Parrot_store_sub_in_namespace(interp, sub_copy);
         }
     }
 
     pfc->type = PFC_PMC;
     pfc->u.key = sub_pmc;
     unit->sub_pmc = sub_pmc;
-    IMCC_debug(interpreter, DEBUG_PBC_CONST,
+    IMCC_debug(interp, DEBUG_PBC_CONST,
             "add_const_pmc_sub '%s' flags %d color %d (%s) "
             "lex_info %s :outer(%s)\n",
             r->name, r->pcc_sub->pragma, k,
@@ -804,13 +804,13 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
      * create entry in our fixup (=symbol) table
      * the offset is the index in the constant table of this Sub
      */
-    PackFile_FixupTable_new_entry(interpreter, r->name, enum_fixup_sub, k);
+    PackFile_FixupTable_new_entry(interp, r->name, enum_fixup_sub, k);
     return k;
 }
 
 /* add constant key to constant_table */
 static int
-add_const_key(Interp *interpreter, opcode_t key[],
+add_const_key(Interp *interp, opcode_t key[],
         int size, char *s_key)
 {
     int k;
@@ -821,18 +821,18 @@ add_const_key(Interp *interpreter, opcode_t key[],
     if ( (r = _get_sym(&globals.cs->key_consts, s_key)) != 0)
         return r->color;
     pfc = malloc(sizeof(struct PackFile_Constant));
-    rc = PackFile_Constant_unpack_key(interpreter,
-            interpreter->code->const_table, pfc, key);
+    rc = PackFile_Constant_unpack_key(interp,
+            interp->code->const_table, pfc, key);
     if (!rc)
-        IMCC_fatal(interpreter, 1,
+        IMCC_fatal(interp, 1,
             "add_const_key: PackFile_Constant error\n");
-    k = PDB_extend_const_table(interpreter);
-    interpreter->code->const_table->constants[k]->type = PFC_KEY;
-    interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
+    k = PDB_extend_const_table(interp);
+    interp->code->const_table->constants[k]->type = PFC_KEY;
+    interp->code->const_table->constants[k]->u.key = pfc->u.key;
     store_key_const(s_key, k);
-    IMCC_debug(interpreter, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n",
+    IMCC_debug(interp, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n",
                s_key, k, size);
-    IMCC_debug(interpreter, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
+    IMCC_debug(interp, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
                key[0],key[1],key[2],key[3],key[4]);
     return k;
 }
@@ -863,7 +863,7 @@ slice_deb(int bits) {
  */
 
 static opcode_t
-build_key(Interp *interpreter, SymReg *key_reg)
+build_key(Interp *interp, SymReg *key_reg)
 {
 #define KEYLEN 21
     opcode_t key[KEYLEN], *pc, size;
@@ -881,7 +881,7 @@ build_key(Interp *interpreter, SymReg *key_reg)
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         if ((pc - key - 2) >= KEYLEN)
-            IMCC_fatal(interpreter, 1, "build_key:"
+            IMCC_fatal(interp, 1, "build_key:"
                     "key too complex increase KEYLEN\n");
         r = reg;
         /* if key is a register, the original sym is in r->reg */
@@ -899,7 +899,7 @@ build_key(Interp *interpreter, SymReg *key_reg)
                 else if (r->set == 'S')
                     *pc++ = PARROT_ARG_S | slice_bits;
                 else
-                    IMCC_fatal(interpreter, 1, "build_key: "
+                    IMCC_fatal(interp, 1, "build_key: "
                             "wrong register set\n");
                 /* don't emit mapped regs in key parts */
                 if (r->color < 0)
@@ -907,7 +907,7 @@ build_key(Interp *interpreter, SymReg *key_reg)
                 else
                     *pc++ = r->color;
                 sprintf(s+strlen(s), "%c%d", r->set, (int)r->color);
-                IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                IMCC_debug(interp, DEBUG_PBC_CONST,
                         " keypart reg %s %c%d slice %s\n",
                         r->name, r->set, (int)r->color,
                         slice_deb(slice_bits));
@@ -919,7 +919,7 @@ build_key(Interp *interpreter, SymReg *key_reg)
                     case 'S':                       /* P["key"] */
                         *pc++ = PARROT_ARG_SC | slice_bits;  /* str constant */
                         *pc++ = r->color;       /* constant idx */
-                        IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                        IMCC_debug(interp, DEBUG_PBC_CONST,
                                 " keypart SC %s #%d slice %s\n",
                                 r->name, r->color,
                                 slice_deb(slice_bits));
@@ -927,19 +927,19 @@ build_key(Interp *interpreter, SymReg *key_reg)
                     case 'I':                       /* P[;42;..] */
                         *pc++ = PARROT_ARG_IC | slice_bits;  /* int constant */
                         *pc++ = r->color = atol(r->name);   /* value */
-                        IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                        IMCC_debug(interp, DEBUG_PBC_CONST,
                                 " keypart IC %s #%d slice %s\n",
                                 r->name, r->color,
                                 slice_deb(slice_bits));
                         break;
                     default:
-                        IMCC_fatal(interpreter, 1,"build_key: "
+                        IMCC_fatal(interp, 1,"build_key: "
                                 "unknown set\n");
                 }
                 sprintf(s+strlen(s), "%cc" INTVAL_FMT, r->set, r->color);
                 break;
             default:
-                IMCC_fatal(interpreter, 1,"build_key: "
+                IMCC_fatal(interp, 1,"build_key: "
                     "unknown type 0x%x on %s\n", var_type, r->name);
         }
     }
@@ -948,7 +948,7 @@ build_key(Interp *interpreter, SymReg *key_reg)
     /* now we have a packed key, which packfile can work on */
     /* XXX endianess? probably no, we pack/unpack on the very
      * same computer */
-    k =  add_const_key(interpreter, key, size, s_key);
+    k =  add_const_key(interp, key, size, s_key);
     /* single 'S' keys already have their color assigned */
     if (key_reg->set == 'K')
         key_reg->color = k;
@@ -956,11 +956,11 @@ build_key(Interp *interpreter, SymReg *key_reg)
 }
 
 INTVAL
-IMCC_int_from_reg(Interp *interpreter, SymReg *r)
+IMCC_int_from_reg(Interp *interp, SymReg *r)
 {
     INTVAL i;
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     errno = 0;
     if (r->type & VT_CONSTP)
         r = r->reg;
@@ -979,36 +979,36 @@ IMCC_int_from_reg(Interp *interpreter, SymReg *r)
      * - there are some more atol()s in this file
      */
     if (errno == ERANGE)
-        IMCC_fatal(interpreter, 1, "add_1_const:"
+        IMCC_fatal(interp, 1, "add_1_const:"
                 "Integer overflow '%s'", r->name);
     return i;
 }
 
 static void
-make_pmc_const(Interp *interpreter, SymReg *r)
+make_pmc_const(Interp *interp, SymReg *r)
 {
     STRING *s;
     PMC *p, *class;
     int k;
 
     if (*r->name == '"')
-        s = string_unescape_cstring(interpreter, r->name + 1, '"', NULL);
+        s = string_unescape_cstring(interp, r->name + 1, '"', NULL);
     else
     if (*r->name == '\'')
-        s = string_unescape_cstring(interpreter, r->name + 1, '\'', NULL);
+        s = string_unescape_cstring(interp, r->name + 1, '\'', NULL);
     else
-        s = string_unescape_cstring(interpreter, r->name, 0, NULL);
-    class = interpreter->vtables[r->pmc_type]->class;
-    p = VTABLE_new_from_string(interpreter, class, s, PObj_constant_FLAG);
+        s = string_unescape_cstring(interp, r->name, 0, NULL);
+    class = interp->vtables[r->pmc_type]->class;
+    p = VTABLE_new_from_string(interp, class, s, PObj_constant_FLAG);
     /* append PMC constant */
-    k = PDB_extend_const_table(interpreter);
-    interpreter->code->const_table->constants[k]->type = PFC_PMC;
-    interpreter->code->const_table->constants[k]->u.key = p;
+    k = PDB_extend_const_table(interp);
+    interp->code->const_table->constants[k]->type = PFC_PMC;
+    interp->code->const_table->constants[k]->u.key = p;
     r->color = k;
 }
 
 static void
-add_1_const(Interp *interpreter, SymReg *r)
+add_1_const(Interp *interp, SymReg *r)
 {
     SymReg *key;
     if (r->color >= 0)
@@ -1017,26 +1017,26 @@ add_1_const(Interp *interpreter, SymReg *r)
         return;
     switch (r->set) {
         case 'I':
-            r->color = IMCC_int_from_reg(interpreter, r);
+            r->color = IMCC_int_from_reg(interp, r);
             break;
         case 'S':
             if (r->type & VT_CONSTP)
                 r = r->reg;
-            r->color = add_const_str(interpreter, r);
+            r->color = add_const_str(interp, r);
             break;
         case 'N':
-            r->color = add_const_num(interpreter, r->name);
+            r->color = add_const_num(interp, r->name);
             break;
         case 'K':
             key = r;
             for (r = r->nextkey; r; r = r->nextkey)
                 if (r->type & VTCONST)
-                    add_1_const(interpreter, r);
-            build_key(interpreter, key);
+                    add_1_const(interp, r);
+            build_key(interp, key);
             break;
         case 'P':
-            make_pmc_const(interpreter, r);
-            IMCC_debug(interpreter, DEBUG_PBC_CONST,
+            make_pmc_const(interp, r);
+            IMCC_debug(interp, DEBUG_PBC_CONST,
                     "PMC const %s\tcolor %d\n",
                     r->name, r->color);
             break;
@@ -1044,7 +1044,7 @@ add_1_const(Interp *interpreter, SymReg *r)
             break;
     }
     if (r)
-        IMCC_debug(interpreter, DEBUG_PBC_CONST,
+        IMCC_debug(interp, DEBUG_PBC_CONST,
                 "const %s\tcolor %d use_count %d\n",
                 r->name, r->color, r->use_count);
 
@@ -1052,25 +1052,25 @@ add_1_const(Interp *interpreter, SymReg *r)
 
 /* store a constants idx for later reuse */
 static void
-constant_folding(Interp *interpreter, IMC_Unit * unit)
+constant_folding(Interp *interp, IMC_Unit * unit)
 {
     SymReg * r;
     int i;
     SymHash *hsh;
 
     /* go through all consts of current sub */
-    hsh = &IMCC_INFO(interpreter)->ghash;
+    hsh = &IMCC_INFO(interp)->ghash;
     for (i = 0; i < hsh->size; i++) {
         /* normally constants are in ghash ... */
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->type & (VTCONST|VT_CONSTP)) {
-                add_1_const(interpreter, r);
+                add_1_const(interp, r);
             }
             if (r->usage & U_LEXICAL) {
                 SymReg *n = r->reg;
                 /* r->reg is a chain of names for the same lex sym */
                 while (n) {
-                    add_1_const(interpreter, n); /* lex_name */
+                    add_1_const(interp, n); /* lex_name */
                     n = n->reg;
                 }
             }
@@ -1084,7 +1084,7 @@ constant_folding(Interp *interpreter, IMC_Unit * unit)
         /* normally constants are in ghash ... */
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->type & VTCONST) {
-                add_1_const(interpreter, r);
+                add_1_const(interp, r);
             }
         }
     }
@@ -1092,14 +1092,14 @@ constant_folding(Interp *interpreter, IMC_Unit * unit)
      * and finally, there may be an outer Sub
      */
     if (unit->outer)
-        add_1_const(interpreter, unit->outer);
+        add_1_const(interp, unit->outer);
 }
 
 int
-e_pbc_new_sub(Interp *interpreter, void *param, IMC_Unit * unit)
+e_pbc_new_sub(Interp *interp, void *param, IMC_Unit * unit)
 {
     UNUSED(param);
-    UNUSED(interpreter);
+    UNUSED(interp);
     if (!unit->instructions)
         return 0;
     make_new_sub(unit);     /* we start a new compilation unit */
@@ -1107,7 +1107,7 @@ e_pbc_new_sub(Interp *interpreter, void *param, IMC_Unit * unit)
 }
 
 int
-e_pbc_end_sub(Interp *interpreter, void *param, IMC_Unit * unit)
+e_pbc_end_sub(Interp *interp, void *param, IMC_Unit * unit)
 {
     Instruction *ins;
     int pragma;
@@ -1126,9 +1126,9 @@ e_pbc_end_sub(Interp *interpreter, void *param, IMC_Unit * unit)
         return 0;
     pragma = ins->r[0]->pcc_sub->pragma;
     if (pragma & P_IMMEDIATE) {
-        IMCC_debug(interpreter, DEBUG_PBC, "immediate sub '%s'",
+        IMCC_debug(interp, DEBUG_PBC, "immediate sub '%s'",
                 ins->r[0]->name);
-        PackFile_fixup_subs(interpreter, PBC_IMMEDIATE, NULL);
+        PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
     }
     return 0;
 }
@@ -1139,9 +1139,9 @@ e_pbc_end_sub(Interp *interpreter, void *param, IMC_Unit * unit)
  */
 
 static void
-verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
+verify_signature(Interp *interp, Instruction *ins, opcode_t *pc)
 {
-    PMC *sig_arr = interpreter->code->const_table->constants[pc[-1]]->u.key;
+    PMC *sig_arr = interp->code->const_table->constants[pc[-1]]->u.key;
     INTVAL i, n, sig;
     SymReg *r;
     int no_consts, needed=0;
@@ -1151,20 +1151,20 @@ verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
     assert(sig_arr->vtable->base_type == enum_class_FixedIntegerArray);
     no_consts = (ins->opnum == PARROT_OP_get_results_pc ||
         ins->opnum == PARROT_OP_get_params_pc);
-    n = VTABLE_elements(interpreter, sig_arr);
+    n = VTABLE_elements(interp, sig_arr);
     for (i = 0; i < n; ++i) {
         r = ins->r[i + 1];
-        sig = VTABLE_get_integer_keyed_int(interpreter, sig_arr, i);
+        sig = VTABLE_get_integer_keyed_int(interp, sig_arr, i);
         if (! (sig & PARROT_ARG_NAME) &&
                 no_consts && (r->type & VTCONST))
-            IMCC_fatal(interpreter, 1, "e_pbc_emit: "
+            IMCC_fatal(interp, 1, "e_pbc_emit: "
                     "constant argument '%s' in get param/result\n",
                     r->name);
         if ((r->type & VTCONST) && !(sig & PARROT_ARG_CONSTANT)) {
             if (!changed_sig)
-                changed_sig = VTABLE_clone(interpreter, sig_arr);
+                changed_sig = VTABLE_clone(interp, sig_arr);
             sig |= PARROT_ARG_CONSTANT;
-            VTABLE_set_integer_keyed_int(interpreter, changed_sig, i, sig);
+            VTABLE_set_integer_keyed_int(interp, changed_sig, i, sig);
         }
         switch (r->set) {
             case 'I': needed = PARROT_ARG_INTVAL; break;
@@ -1174,17 +1174,17 @@ verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
         }
         if (needed != (sig & PARROT_ARG_TYPE_MASK)) {
             if (!changed_sig)
-                changed_sig = VTABLE_clone(interpreter, sig_arr);
+                changed_sig = VTABLE_clone(interp, sig_arr);
             sig &= ~PARROT_ARG_TYPE_MASK;
             sig |= needed;
-            VTABLE_set_integer_keyed_int(interpreter, changed_sig, i, sig);
+            VTABLE_set_integer_keyed_int(interp, changed_sig, i, sig);
         }
     }
     if (changed_sig) {
         /* append PMC constant */
-        int k = PDB_extend_const_table(interpreter);
-        interpreter->code->const_table->constants[k]->type = PFC_PMC;
-        interpreter->code->const_table->constants[k]->u.key = changed_sig;
+        int k = PDB_extend_const_table(interp);
+        interp->code->const_table->constants[k]->type = PFC_PMC;
+        interp->code->const_table->constants[k]->u.key = changed_sig;
         pc[-1] = k;
     }
 }
@@ -1194,7 +1194,7 @@ verify_signature(Interp *interpreter, Instruction *ins, opcode_t *pc)
  */
 
 int
-e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
+e_pbc_emit(Interp *interp, void *param, IMC_Unit * unit, Instruction * ins)
 {
     int ok = 0;
     op_info_t *op_info;
@@ -1216,11 +1216,11 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         int oldsize;
         int bytes;
 
-        oldsize = get_old_size(interpreter, &ins_line);
-        code_size = get_codesize(interpreter, unit, &ins_size);
-        IMCC_debug(interpreter, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
+        oldsize = get_old_size(interp, &ins_line);
+        code_size = get_codesize(interp, unit, &ins_size);
+        IMCC_debug(interp, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
                 code_size, oldsize);
-        constant_folding(interpreter, unit);
+        constant_folding(interp, unit);
         store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
         /*
@@ -1230,29 +1230,29 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
          * is at least two opcodes wide - see below how to further decrease
          * this storage
          */
-        if (interpreter->code->base.data) {
-            interpreter->code->base.data =
-                mem_sys_realloc(interpreter->code->base.data, bytes);
-            interpreter->code->pic_index->data =
-                mem_sys_realloc(interpreter->code->pic_index->data, bytes/2);
+        if (interp->code->base.data) {
+            interp->code->base.data =
+                mem_sys_realloc(interp->code->base.data, bytes);
+            interp->code->pic_index->data =
+                mem_sys_realloc(interp->code->pic_index->data, bytes/2);
         }
         else {
-            interpreter->code->base.data = mem_sys_allocate(bytes);
-            interpreter->code->pic_index->data = mem_sys_allocate(bytes/2);
+            interp->code->base.data = mem_sys_allocate(bytes);
+            interp->code->pic_index->data = mem_sys_allocate(bytes/2);
         }
-        interpreter->code->base.size = oldsize + code_size;
-        interpreter->code->pic_index->size = (oldsize + code_size)/2;
-        pc = (opcode_t*) interpreter->code->base.data + oldsize;
+        interp->code->base.size = oldsize + code_size;
+        interp->code->pic_index->size = (oldsize + code_size)/2;
+        pc = (opcode_t*) interp->code->base.data + oldsize;
         npc = 0;
         /* add debug if necessary */
-        if (!IMCC_INFO(interpreter)->optimizer_level ||
-            IMCC_INFO(interpreter)->optimizer_level == OPT_PASM) {
+        if (!IMCC_INFO(interp)->optimizer_level ||
+            IMCC_INFO(interp)->optimizer_level == OPT_PASM) {
             const char *sourcefile = unit->file;
             /* FIXME length and multiple subs */
-            debug_seg = Parrot_new_debug_seg(interpreter,
-                    interpreter->code,
+            debug_seg = Parrot_new_debug_seg(interp,
+                    interp->code,
                     (size_t) ins_line + ins_size + 1);
-            Parrot_debug_add_mapping(interpreter, debug_seg, ins_line,
+            Parrot_debug_add_mapping(interp, debug_seg, ins_line,
                      PF_DEBUGMAPPINGTYPE_FILENAME, sourcefile, 0);
         }
         else
@@ -1263,15 +1263,15 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
             PIO_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n",
                         ins->r[0]->name);
 #endif
-            add_const_pmc_sub(interpreter, ins->r[0], oldsize,
+            add_const_pmc_sub(interp, ins->r[0], oldsize,
                     oldsize+code_size);
         }
         else {
             /* need a dummy to hold register usage */
-            SymReg *r = mk_sub_label(interpreter, str_dup("(null)"));
+            SymReg *r = mk_sub_label(interp, str_dup("(null)"));
             r->type = VT_PCC_SUB;
             r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
-            add_const_pmc_sub(interpreter, r, oldsize,
+            add_const_pmc_sub(interp, r, oldsize,
                     oldsize+code_size);
         }
     }
@@ -1280,7 +1280,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
      */
     if (npc && unit->pasm_file && ins->r[0] && ins->r[0]->pcc_sub) {
         /* we can only set the offset for PASM code */
-        add_const_pmc_sub(interpreter, ins->r[0], npc, npc);
+        add_const_pmc_sub(interp, ins->r[0], npc, npc);
     }
     if (ins->op && *ins->op) {
         SymReg *addr, *r;
@@ -1293,10 +1293,10 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                 !(addr->type & VTREGISTER)) {
             /* fixup local jumps - calc offset */
             if (addr->color == -1)
-                IMCC_fatal(interpreter, 1, "e_pbc_emit: "
+                IMCC_fatal(interp, 1, "e_pbc_emit: "
                         "no label offset defined for '%s'\n", addr->name);
             last_label = addr->color - npc;
-            IMCC_debug(interpreter, DEBUG_PBC_FIXUP,
+            IMCC_debug(interp, DEBUG_PBC_FIXUP,
                     "branch label at pc %d addr %d %s %d\n",
                     npc, addr->color, addr->name, last_label);
         }
@@ -1306,8 +1306,8 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         }
         op = (opcode_t)ins->opnum;
         /* add PIC idx */
-        if (parrot_PIC_op_is_cached(interpreter, op)) {
-            size_t offs = pc - interpreter->code->base.data;
+        if (parrot_PIC_op_is_cached(interp, op)) {
+            size_t offs = pc - interp->code->base.data;
             /*
              * for pic_idx fitting into a short, we could
              * further reduce the size by storing shorts
@@ -1316,14 +1316,14 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
              *
              * drawback: if we reach 0xffff, we'd have to resize again
              */
-            interpreter->code->pic_index->data[offs / 2] =
+            interp->code->pic_index->data[offs / 2] =
                 ++globals.cs->pic_idx;
         }
         /* Start generating the bytecode */
         *pc++ = op;
         /* Get the info for that opcode */
-        op_info = &interpreter->op_info_table[op];
-        IMCC_debug(interpreter, DEBUG_PBC, "%d %s", npc, op_info->full_name);
+        op_info = &interp->op_info_table[op];
+        IMCC_debug(interp, DEBUG_PBC, "%d %s", npc, op_info->full_name);
         for (i = 0; i < op_info->op_count-1; i++) {
             switch (op_info->types[i]) {
                 case PARROT_ARG_IC:
@@ -1331,7 +1331,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                     if (op_info->labels[i]) {
                         if (last_label == 1)
                             /* we don't have a branch with offset 1 !? */
-                            IMCC_fatal(interpreter, 1, "e_pbc_emit: "
+                            IMCC_fatal(interp, 1, "e_pbc_emit: "
                                     "no label offset found\n");
                         *pc++ = last_label;
                         last_label = 1;
@@ -1352,7 +1352,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                     if (r->type & VT_CONSTP)
                         r = r->reg;
                     *pc++ = (opcode_t) r->color;
-                    IMCC_debug(interpreter, DEBUG_PBC," %d", r->color);
+                    IMCC_debug(interp, DEBUG_PBC," %d", r->color);
                     break;
                 case PARROT_ARG_KC:
                     r = ins->r[i];
@@ -1361,12 +1361,12 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
                         *pc++ = r->color;
                     }
                     else {
-                        *pc++ = build_key(interpreter, r);
+                        *pc++ = build_key(interp, r);
                     }
-                    IMCC_debug(interpreter, DEBUG_PBC," %d", pc[-1]);
+                    IMCC_debug(interp, DEBUG_PBC," %d", pc[-1]);
                     break;
                 default:
-                    IMCC_fatal(interpreter, 1, "e_pbc_emit:"
+                    IMCC_fatal(interp, 1, "e_pbc_emit:"
                             "unknown argtype in parrot op\n");
                     break;
             }
@@ -1378,27 +1378,27 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
             /* TODO get rid of verify_signature - PIR call sigs are already fixed
              *      PASM still needs it
              */
-            verify_signature(interpreter, ins, pc);
+            verify_signature(interp, ins, pc);
             /* emit var_args part */
             for (; i < ins->opsize - 1; ++i) {
                 r = ins->r[i];
                 if (r->type & VT_CONSTP)
                     r = r->reg;
                 *pc++ = (opcode_t) r->color;
-                IMCC_debug(interpreter, DEBUG_PBC," %d", r->color);
+                IMCC_debug(interp, DEBUG_PBC," %d", r->color);
             }
         }
-        IMCC_debug(interpreter, DEBUG_PBC, "\t%I\n", ins);
+        IMCC_debug(interp, DEBUG_PBC, "\t%I\n", ins);
         npc += ins->opsize;
     }
     return ok;
 }
 
 int
-e_pbc_close(Interp *interpreter, void *param)
+e_pbc_close(Interp *interp, void *param)
 {
     UNUSED(param);
-    fixup_globals(interpreter);
+    fixup_globals(interp);
 
     return 0;
 }

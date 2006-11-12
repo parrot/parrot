@@ -126,7 +126,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         HashBucket *b = parrot_hash_get_bucket(INTERP, hash, name);
         INTVAL regno;
         if (!b)
-            real_exception(interpreter, NULL, LEX_NOT_FOUND,
+            real_exception(interp, NULL, LEX_NOT_FOUND,
                     "Lexical '%Ss' not found", name);
         regno = (INTVAL) b->value;
         CTX_REG_PMC(ctx, regno) = value;

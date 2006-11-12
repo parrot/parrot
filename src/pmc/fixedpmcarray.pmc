@@ -37,19 +37,19 @@ swap(void **x, void **y)
 typedef INTVAL (*sort_func_t)(Interp *, void*, void*);
 
 static INTVAL
-COMPARE(Interp *interpreter, void *a, void *b, PMC *cmp)
+COMPARE(Interp *interp, void *a, void *b, PMC *cmp)
 {
     if (!cmp)
-        return mmd_dispatch_i_pp(interpreter, a, b, MMD_CMP);
+        return mmd_dispatch_i_pp(interp, a, b, MMD_CMP);
     if (cmp->vtable->base_type == enum_class_NCI) {
         sort_func_t f = (sort_func_t)D2FPTR(PMC_struct_val(cmp));
-        return f(interpreter, a, b);
+        return f(interp, a, b);
     }
-    return Parrot_runops_fromc_args_reti(interpreter, cmp, "IPP", a, b);
+    return Parrot_runops_fromc_args_reti(interp, cmp, "IPP", a, b);
 }
 
 static void
-quicksort(Interp *interpreter, void **data, UINTVAL n, PMC *cmp)
+quicksort(Interp *interp, void **data, UINTVAL n, PMC *cmp)
 {
     UINTVAL i, j, ln, rn;
 
@@ -58,10 +58,10 @@ quicksort(Interp *interpreter, void **data, UINTVAL n, PMC *cmp)
         for (i = 0, j = n; ; ) {
             do
                 --j;
-            while (COMPARE(interpreter, data[j], data[0], cmp) > 0);
+            while (COMPARE(interp, data[j], data[0], cmp) > 0);
             do
                 ++i;
-            while (i < j && COMPARE(interpreter, data[i], data[0], cmp) < 0);
+            while (i < j && COMPARE(interp, data[i], data[0], cmp) < 0);
             if (i >= j)
                 break;
             swap(&data[i], &data[j]);
@@ -70,12 +70,12 @@ quicksort(Interp *interpreter, void **data, UINTVAL n, PMC *cmp)
         ln = j;
         rn = n - ++j;
         if (ln < rn) {
-            quicksort(interpreter, data, ln, cmp);
+            quicksort(interp, data, ln, cmp);
             data += j;
             n = rn;
         }
         else {
-            quicksort(interpreter, data + j, rn, cmp);
+            quicksort(interp, data + j, rn, cmp);
             n = ln;
         }
     }
@@ -102,7 +102,7 @@ METHOD void sort(PMC *cmp_func) {
         return;
     if (PMC_IS_NULL(cmp_func))
         cmp_func = NULL;
-    quicksort(interpreter, PMC_data(SELF), n, cmp_func);
+    quicksort(interp, PMC_data(SELF), n, cmp_func);
 }
 
 /*

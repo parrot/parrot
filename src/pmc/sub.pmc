@@ -24,15 +24,15 @@ These are the vtable functions for the Sub (subroutine) base class
 #include <assert.h>
 
 static void
-print_sub_name(Interp* interpreter, PMC* sub)
+print_sub_name(Interp* interp, PMC* sub)
 {
     Interp * const tracer =
-        interpreter->debugger ? interpreter->debugger : interpreter;
+        interp->debugger ? interp->debugger : interp;
 
         /* sub was located via globals */
     PIO_eprintf(tracer, "# Calling sub '%Ss'\n# ",
-        Parrot_full_sub_name(interpreter, sub));
-    print_pbc_location(interpreter);
+        Parrot_full_sub_name(interp, sub));
+    print_pbc_location(interp);
 }
 
 /*
@@ -246,7 +246,7 @@ Invokes the subroutine.
         ccont = INTERP->current_cont;
         INTERP->current_cont = NULL;
         if (ccont == NEED_CONTINUATION) {
-            ccont = new_ret_continuation_pmc(interpreter, next);
+            ccont = new_ret_continuation_pmc(interp, next);
         }
 
         assert (!PMC_IS_NULL(ccont));
@@ -281,7 +281,7 @@ Invokes the subroutine.
         sub->ctx = context;
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             /* don't destroy context */
-            ccont->vtable = interpreter->vtables[enum_class_Continuation];
+            ccont->vtable = interp->vtables[enum_class_Continuation];
             context->ref_count++;
         }
 
@@ -300,7 +300,7 @@ Invokes the subroutine.
          */
         if (!PMC_IS_NULL(sub->lex_info)) {
             context->lex_pad = pmc_new_init(INTERP,
-                    Parrot_get_ctx_HLL_type(interpreter,
+                    Parrot_get_ctx_HLL_type(interp,
                         enum_class_LexPad),
                     sub->lex_info);
             VTABLE_set_pointer(INTERP, context->lex_pad, context);

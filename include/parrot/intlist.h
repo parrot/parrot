@@ -38,17 +38,17 @@ struct IntList_chunk_t {
 
 typedef IntList_Chunk IntList;
 
-void intlist_mark(Interp*, IntList*);
+void intlist_mark(Interp *, IntList*);
 
-IntList *intlist_clone(Interp*i, IntList *list);
+IntList *intlist_clone(Interp *i, IntList *list);
 
-IntList *intlist_new(Interp*);
+IntList *intlist_new(Interp *);
 
-INTVAL intlist_length(Interp* interpreter, IntList* list);
+INTVAL intlist_length(Interp *interp, IntList* list);
 
-void intlist_assign(Interp*, IntList*, INTVAL idx, INTVAL val);
+void intlist_assign(Interp *, IntList*, INTVAL idx, INTVAL val);
 
-void intlist_push(Interp*, IntList*, INTVAL);
+void intlist_push(Interp *, IntList*, INTVAL);
 
 INTVAL intlist_pop(Interp*, IntList*);
 

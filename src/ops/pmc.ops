@@ -56,69 +56,69 @@ to do with the intializer.  See PDD02 for more.
 =cut
 
 op new(out PMC, in INT) {
-  if ($2 <= 0 || $2 >= interpreter->n_vtable_max) {
-    real_exception(interpreter, 0, NO_CLASS,
+  if ($2 <= 0 || $2 >= interp->n_vtable_max) {
+    real_exception(interp, 0, NO_CLASS,
                    "Illegal PMC enum (%d) in new", (int)$2);
   }
 
   /* Why?? If we're creating a continuation, the continuation PMC
    * needs to be in the destination register before its init method
    * copies the registers. */
-  $1 = pmc_new_noinit(interpreter, $2);
-  $1->vtable->init(interpreter, $1);
+  $1 = pmc_new_noinit(interp, $2);
+  $1->vtable->init(interp, $1);
   goto NEXT();
 }
 
 op new(out PMC, in INT, in PMC) {
-  if ($2 <= 0 || $2 >= interpreter->n_vtable_max) {
-    real_exception(interpreter, 0, NO_CLASS,
+  if ($2 <= 0 || $2 >= interp->n_vtable_max) {
+    real_exception(interp, 0, NO_CLASS,
                    "Illegal PMC enum (%d) in new", (int)$2);
   }
-  $1 = pmc_new_init(interpreter, $2, $3);
+  $1 = pmc_new_init(interp, $2, $3);
   goto NEXT();
 }
 
 op new(out PMC, inconst STR) {
     STRING *class = $2;
-    INTVAL type = pmc_type(interpreter, class);
+    INTVAL type = pmc_type(interp, class);
     if (!type)
-        type = pmc_type(interpreter, class);
+        type = pmc_type(interp, class);
     if (type <= 0)
-        real_exception(interpreter, NULL, NO_CLASS,
+        real_exception(interp, NULL, NO_CLASS,
             "Class '%Ss' not found", class);
-  $1 = pmc_new(interpreter, type);
+  $1 = pmc_new(interp, type);
   goto NEXT();
 }
 
 op new(out PMC, inconst STR, in PMC) {
     STRING *class = $2;
-    INTVAL type = pmc_type(interpreter, class);
+    INTVAL type = pmc_type(interp, class);
     if (!type)
-        type = pmc_type(interpreter, class);
+        type = pmc_type(interp, class);
     if (type <= 0)
-        real_exception(interpreter, NULL, NO_CLASS,
+        real_exception(interp, NULL, NO_CLASS,
             "Class '%Ss' not found", class);
-    $1 = pmc_new_init(interpreter, type, $3);
+    $1 = pmc_new_init(interp, type, $3);
     goto NEXT();
 }
 
 inline op new(out PMC, inconst PMC) :object_classes {
     PMC *class = $2;
-    INTVAL type = pmc_type_p(interpreter, class);
+    INTVAL type = pmc_type_p(interp, class);
     if (type <= 0)
-        real_exception(interpreter, NULL, NO_CLASS,
-            "Class '%Ss' not found", readable_name(interpreter, class));
-    $1 = pmc_new(interpreter, type);
+        real_exception(interp, NULL, NO_CLASS,
+            "Class '%Ss' not found", readable_name(interp, class));
+    $1 = pmc_new(interp, type);
     goto NEXT();
 }
 
 op new(out PMC, inconst PMC, in PMC) {
     PMC *class = $2;
-    INTVAL type = pmc_type_p(interpreter, class);
+    INTVAL type = pmc_type_p(interp, class);
     if (type <= 0)
-        real_exception(interpreter, NULL, NO_CLASS,
-            "Class '%Ss' not found", readable_name(interpreter, class));
-    $1 = pmc_new_init(interpreter, type, $3);
+        real_exception(interp, NULL, NO_CLASS,
+            "Class '%Ss' not found", readable_name(interp, class));
+    $1 = pmc_new_init(interp, type, $3);
     goto NEXT();
 }
 
@@ -139,22 +139,22 @@ Return the type of the entry in aggregate PMC in $2 at key $3.
 =cut
 
 inline op typeof (out STR, invar PMC) {
-  $1 = VTABLE_name(interpreter, $2);
+  $1 = VTABLE_name(interp, $2);
   goto NEXT();
 }
 
 inline op typeof (out INT, invar PMC) {
-  $1 = $2->vtable->type(interpreter, $2);
+  $1 = $2->vtable->type(interp, $2);
   goto NEXT();
 }
 
 inline op typeof (out INT, invar PMC, in KEY) {
-  $1 = $2->vtable->type_keyed(interpreter, $2, $3);
+  $1 = $2->vtable->type_keyed(interp, $2, $3);
   goto NEXT();
 }
 
 inline op typeof (out INT, invar PMC, in INTKEY) {
-  $1 = $2->vtable->type_keyed_int(interpreter, $2, $3);
+  $1 = $2->vtable->type_keyed_int(interp, $2, $3);
   goto NEXT();
 }
 ########################################
@@ -166,10 +166,10 @@ Return the (native) Parrot type of datatype $2.
 =cut
 
 inline op typeof(out STR, in INT) {
-    if ($2 > 0 && $2 < interpreter->n_vtable_max)
-                $1 = interpreter->vtables[$2]->whoami;
+    if ($2 > 0 && $2 < interp->n_vtable_max)
+                $1 = interp->vtables[$2]->whoami;
     else
-                $1 = Parrot_get_datatype_name(interpreter, $2);
+                $1 = Parrot_get_datatype_name(interp, $2);
     goto NEXT();
 }
 
@@ -184,7 +184,7 @@ Find the PMC type or Parrot datatype by name.
 =cut
 
 op find_type(out INT, in STR) {
-    $1 = pmc_type(interpreter, $2);
+    $1 = pmc_type(interp, $2);
     goto NEXT();
 }
 
@@ -195,17 +195,17 @@ op find_type(out INT, in PMC) {
     INTVAL n;
 
     if ($2->vtable->base_type == enum_class_String)
-        $1 = pmc_type(interpreter, VTABLE_get_string(interpreter, $2));
+        $1 = pmc_type(interp, VTABLE_get_string(interp, $2));
     else if ($2->vtable->base_type == enum_class_Key)
-        $1 = pmc_type_p(interpreter, $2);
-    else if ((n = VTABLE_elements(interpreter, $2)) <= 0)
+        $1 = pmc_type_p(interp, $2);
+    else if ((n = VTABLE_elements(interp, $2)) <= 0)
         $1 = 0;
     else {
-        PMC *class = interpreter->class_hash;
+        PMC *class = interp->class_hash;
         INTVAL i;
         for (i = 0; i < n; ++i) {
-            STRING *part = VTABLE_get_string_keyed_int(interpreter, $2, i);
-            class = VTABLE_get_pmc_keyed_str(interpreter, class, part);
+            STRING *part = VTABLE_get_string_keyed_int(interp, $2, i);
+            class = VTABLE_get_pmc_keyed_str(interp, class, part);
             if (PMC_IS_NULL(class))
                 break;
         }
@@ -223,7 +223,7 @@ Check if the PMC type or Parrot datatype $2 is valid.
 =cut
 
 op valid_type(out INT, in INT) {
-    if ($2 > 0 && $2 < interpreter->n_vtable_max)
+    if ($2 > 0 && $2 < interp->n_vtable_max)
         $1 = 1;
     else if ($2 >= enum_first_type && $2 < enum_last_type)
         $1 = 1;
@@ -240,7 +240,7 @@ Set $1 to a string representation of $2
 =cut
 
 op get_repr(out STR, invar PMC) {
-    $1 = $2->vtable->get_repr(interpreter, $2);
+    $1 = $2->vtable->get_repr(interp, $2);
     goto NEXT();
 }
 
@@ -269,10 +269,10 @@ PMC in $1.
 
 op find_method(out PMC, invar PMC, in STR) {
     opcode_t * resume = expr NEXT();
-    $1 = $2->vtable->find_method(interpreter, $2, $3);
-    if (!$1 || !VTABLE_defined(interpreter, $1))
-        real_exception(interpreter, resume, METH_NOT_FOUND,
-            "Method '%s' not found", string_to_cstring(interpreter, $3));
+    $1 = $2->vtable->find_method(interp, $2, $3);
+    if (!$1 || !VTABLE_defined(interp, $1))
+        real_exception(interp, resume, METH_NOT_FOUND,
+            "Method '%s' not found", string_to_cstring(interp, $3));
     restart ADDRESS(resume);
 }
 
@@ -295,27 +295,27 @@ Test for key existence.
 =cut
 
 inline op defined(out INT, invar PMC) {
-  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined(interpreter, $2);
+  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined(interp, $2);
   goto NEXT();
 }
 
 inline op defined(out INT, invar PMC, in INTKEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed_int(interpreter, $2, $3);
+  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed_int(interp, $2, $3);
   goto NEXT();
 }
 
 inline op defined(out INT, invar PMC, in KEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed(interpreter, $2, $3);
+  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed(interp, $2, $3);
   goto NEXT();
 }
 
 inline op exists(out INT, invar PMC, in INTKEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->exists_keyed_int(interpreter, $2, $3);
+  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->exists_keyed_int(interp, $2, $3);
   goto NEXT();
 }
 
 inline op exists(out INT, invar PMC, in KEY) {
-  $1 = PMC_IS_NULL($2) ? 0: $2->vtable->exists_keyed(interpreter, $2, $3);
+  $1 = PMC_IS_NULL($2) ? 0: $2->vtable->exists_keyed(interp, $2, $3);
   goto NEXT();
 }
 
@@ -330,12 +330,12 @@ Delete the specified entry $2 from aggregate $1.
 =cut
 
 inline op delete(invar PMC, in KEY) {
-  $1->vtable->delete_keyed(interpreter, $1, $2);
+  $1->vtable->delete_keyed(interp, $1, $2);
   goto NEXT();
 }
 
 inline op delete(invar PMC, in INTKEY) {
-  $1->vtable->delete_keyed_int(interpreter, $1, $2);
+  $1->vtable->delete_keyed_int(interp, $1, $2);
   goto NEXT();
 }
 
@@ -348,7 +348,7 @@ Returns the number of items in aggregate $2
 =cut
 
 inline op elements(out INT, invar PMC) {
-  $1 = VTABLE_elements(interpreter, $2);
+  $1 = VTABLE_elements(interp, $2);
   goto NEXT();
 }
 
@@ -381,22 +381,22 @@ Push $2 onto the end of the aggregate PMC $1, if that operation is defined.
 =cut
 
 inline op push (invar PMC, in INT) {
-    $1->vtable->push_integer(interpreter, $1, $2);
+    $1->vtable->push_integer(interp, $1, $2);
     goto NEXT();
 }
 
 inline op push (invar PMC, in NUM) {
-    $1->vtable->push_float(interpreter, $1, $2);
+    $1->vtable->push_float(interp, $1, $2);
     goto NEXT();
 }
 
 inline op push (invar PMC, in STR) {
-    $1->vtable->push_string(interpreter, $1, $2);
+    $1->vtable->push_string(interp, $1, $2);
     goto NEXT();
 }
 
 inline op push (invar PMC, invar PMC) {
-    $1->vtable->push_pmc(interpreter, $1, $2);
+    $1->vtable->push_pmc(interp, $1, $2);
     goto NEXT();
 }
 
@@ -415,22 +415,22 @@ Pop off last entry in the aggregate $2, placing the result in $1.
 =cut
 
 inline op pop (out INT, invar PMC) {
-    $1 = $2->vtable->pop_integer(interpreter, $2);
+    $1 = $2->vtable->pop_integer(interp, $2);
     goto NEXT();
 }
 
 inline op pop (out NUM, invar PMC) {
-    $1 = $2->vtable->pop_float(interpreter, $2);
+    $1 = $2->vtable->pop_float(interp, $2);
     goto NEXT();
 }
 
 inline op pop (out STR, invar PMC) {
-    $1 = $2->vtable->pop_string(interpreter, $2);
+    $1 = $2->vtable->pop_string(interp, $2);
     goto NEXT();
 }
 
 inline op pop (out PMC, invar PMC) {
-    $1 = $2->vtable->pop_pmc(interpreter, $2);
+    $1 = $2->vtable->pop_pmc(interp, $2);
     goto NEXT();
 }
 
@@ -449,22 +449,22 @@ Unshift $2 onto the end of the aggregate PMC $1, if that operation is defined.
 =cut
 
 inline op unshift (invar PMC, in INT) {
-    $1->vtable->unshift_integer(interpreter, $1, $2);
+    $1->vtable->unshift_integer(interp, $1, $2);
     goto NEXT();
 }
 
 inline op unshift (invar PMC, in NUM) {
-    $1->vtable->unshift_float(interpreter, $1, $2);
+    $1->vtable->unshift_float(interp, $1, $2);
     goto NEXT();
 }
 
 inline op unshift (invar PMC, in STR) {
-    $1->vtable->unshift_string(interpreter, $1, $2);
+    $1->vtable->unshift_string(interp, $1, $2);
     goto NEXT();
 }
 
 inline op unshift (invar PMC, invar PMC) {
-    $1->vtable->unshift_pmc(interpreter, $1, $2);
+    $1->vtable->unshift_pmc(interp, $1, $2);
     goto NEXT();
 }
 
@@ -483,22 +483,22 @@ Shift off last entry in the aggregate $2, placing the result in $1.
 =cut
 
 inline op shift (out INT, invar PMC) {
-    $1 = $2->vtable->shift_integer(interpreter, $2);
+    $1 = $2->vtable->shift_integer(interp, $2);
     goto NEXT();
 }
 
 inline op shift (out NUM, invar PMC) {
-    $1 = $2->vtable->shift_float(interpreter, $2);
+    $1 = $2->vtable->shift_float(interp, $2);
     goto NEXT();
 }
 
 inline op shift (out STR, invar PMC) {
-    $1 = $2->vtable->shift_string(interpreter, $2);
+    $1 = $2->vtable->shift_string(interp, $2);
     goto NEXT();
 }
 
 inline op shift (out PMC, invar PMC) {
-    $1 = $2->vtable->shift_pmc(interpreter, $2);
+    $1 = $2->vtable->shift_pmc(interp, $2);
     goto NEXT();
 }
 
@@ -526,7 +526,7 @@ Set property $2 to value $3 for PMC $1.
 =cut
 
 op setprop(invar PMC, in STR, invar PMC) {
-      $1->vtable->setprop(interpreter, $1, $2, $3);
+      $1->vtable->setprop(interp, $1, $2, $3);
       goto NEXT();
 }
 
@@ -539,7 +539,7 @@ Get property $2 of PMC $3 and put it in $1.
 =cut
 
 op getprop(out PMC, in STR, invar PMC) {
-   $1 = $3->vtable->getprop(interpreter, $3, $2);
+   $1 = $3->vtable->getprop(interp, $3, $2);
    goto NEXT();
 }
 
@@ -552,7 +552,7 @@ Delete property $2 from PMC $1.
 =cut
 
 op delprop(invar PMC, in STR) {
-   $1->vtable->delprop(interpreter, $1, $2);
+   $1->vtable->delprop(interp, $1, $2);
    goto NEXT();
 }
 
@@ -566,7 +566,7 @@ hash doesn't exist, the C<Null> PMC is returned.
 =cut
 
 op prophash(out PMC, invar PMC) {
-   $1 = $2->vtable->getprops(interpreter, $2);
+   $1 = $2->vtable->getprops(interp, $2);
    goto NEXT();
 }
 
@@ -597,12 +597,12 @@ Set $1 to a newly created PMC from the image $2.
 =cut
 
 op freeze(out STR, invar PMC) {
-   $1 = Parrot_freeze(interpreter, $2);
+   $1 = Parrot_freeze(interp, $2);
    goto NEXT();
 }
 
 op thaw(out PMC, in STR) {
-   $1 = Parrot_thaw(interpreter, $2);
+   $1 = Parrot_thaw(interp, $2);
    goto NEXT();
 }
 
@@ -635,7 +635,7 @@ $2 and $3.
 =cut
 
 inline op mmdvtregister(in INT, in INT, in INT, invar PMC) {
-  mmd_register_sub(interpreter, $1, $2, $3, $4);
+  mmd_register_sub(interp, $1, $2, $3, $4);
   goto NEXT();
 }
 
@@ -646,7 +646,7 @@ Find the sub that would be called for vtable entry $2 for types $3 and $4.
 =cut
 
 inline op mmdvtfind(out PMC, in INT, in INT, in INT) {
-  $1 = mmd_vtfind(interpreter, $2, $3, $4);
+  $1 = mmd_vtfind(interp, $2, $3, $4);
   goto NEXT();
 }
 
@@ -680,12 +680,12 @@ Remove one reference of $1.
 =cut
 
 op register(invar PMC) {
-  dod_register_pmc(interpreter, $1);
+  dod_register_pmc(interp, $1);
   goto NEXT();
 }
 
 op unregister(invar PMC) {
-  dod_unregister_pmc(interpreter, $1);
+  dod_unregister_pmc(interp, $1);
   goto NEXT();
 }
 
@@ -696,7 +696,7 @@ Set $1 to the hash value of $2.
 =cut
 
 op hash(out INT, invar PMC) {
-  $1 = VTABLE_hash(interpreter, $2, 0);   /* XXX */
+  $1 = VTABLE_hash(interp, $2, 0);   /* XXX */
   goto NEXT();
 }
 

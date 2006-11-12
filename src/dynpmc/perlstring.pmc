@@ -85,8 +85,8 @@ Morphs the string to a C<PerlInt> and sets its value to C<value>.
     void set_integer_native (INTVAL value) {
         INTVAL dynpmc_PerlInt;
 
-        dynpmc_PerlInt = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlInt", 0));
+        dynpmc_PerlInt = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);
         DYNSELF.set_integer_native(value);
     }
@@ -104,8 +104,8 @@ Morphs the string to a C<PerlNum> and sets its value to C<value>.
     void set_number_native (FLOATVAL value) {
         INTVAL dynpmc_PerlNum;
 
-        dynpmc_PerlNum = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlNum", 0));
+        dynpmc_PerlNum = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlNum", 0));
         DYNSELF.morph(dynpmc_PerlNum);
         DYNSELF.set_number_native(value);
     }
@@ -164,8 +164,8 @@ Returns the string value for C<SELF[key]>.
         INTVAL     dynpmc_PerlString;
 
         s = PMC_str_val(SELF);
-        dynpmc_PerlString = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlString", 0));
+        dynpmc_PerlString = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlString", 0));
         ret = pmc_new_noinit(INTERP, dynpmc_PerlString);
         PMC_str_val(ret) = string_substr(INTERP, s,
                 key_integer(INTERP,key), 1, NULL, 0);

@@ -23,7 +23,7 @@ These are the vtable functions for the lexinfo PMC.
 #include "pmc_hash.h"
 
 static size_t
-key_hash_STRING(Interp *interpreter, void *value, size_t seed)
+key_hash_STRING(Interp *interp, void *value, size_t seed)
 {
     STRING *s = value;
 
@@ -31,7 +31,7 @@ key_hash_STRING(Interp *interpreter, void *value, size_t seed)
         return s->hashval;
     }
 
-    return string_hash(interpreter, s, seed);
+    return string_hash(interp, s, seed);
 }
 /*
  * LexInfo contains a constant Hash with constant string

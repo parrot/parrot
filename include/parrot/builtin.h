@@ -15,15 +15,15 @@
 
 #include "parrot/compiler.h"
 
-void Parrot_init_builtins(Interp *interpreter);
-int  Parrot_is_builtin(Interp *interpreter, const char *func, const char *sig)
+void Parrot_init_builtins(Interp *interp);
+int  Parrot_is_builtin(Interp *interp, const char *func, const char *sig)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-PMC* Parrot_find_builtin(Interp *interpreter, STRING *func)
+PMC* Parrot_find_builtin(Interp *interp, STRING *func)
         __attribute__nonnull__(2);
-const char * Parrot_builtin_get_c_namespace(Interp *interpreter, int bi);
-int Parrot_builtin_is_class_method(Interp *interpreter, int bi);
-int Parrot_builtin_is_void(Interp *interpreter, int bi);
+const char * Parrot_builtin_get_c_namespace(Interp *interp, int bi);
+int Parrot_builtin_is_class_method(Interp *interp, int bi);
+int Parrot_builtin_is_void(Interp *interp, int bi);
 
 #endif /* PARROT_BUILTIN_H_GUARD */
 

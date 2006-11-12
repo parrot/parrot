@@ -41,16 +41,16 @@ struct Memory_Pool {
 void Parrot_allocate(Interp *, Buffer *, size_t size);
 void Parrot_allocate_aligned(Interp *, Buffer *, size_t size);
 void Parrot_allocate_string(Interp *, STRING *, size_t size);
-void Parrot_reallocate(Interp *interpreter, Buffer *from, size_t tosize);
-void Parrot_reallocate_string(Interp *interpreter, STRING *, size_t tosize);
+void Parrot_reallocate(Interp *interp, Buffer *from, size_t tosize);
+void Parrot_reallocate_string(Interp *interp, STRING *, size_t tosize);
 
 void Parrot_initialize_memory_pools(Interp *);
-void Parrot_destroy_memory_pools(Interp *interpreter);
+void Parrot_destroy_memory_pools(Interp *interp);
 
 void Parrot_merge_memory_pools(Interp *dest, Interp *source);
 
 /* XXX FIXME */
-int Parrot_in_memory_pool(Interp *interpreter, void *bufstart);
+int Parrot_in_memory_pool(Interp *interp, void *bufstart);
 
 void Parrot_go_collect(Interp *);
 

@@ -195,11 +195,11 @@ PMC * new_ret_continuation_pmc(Interp *, opcode_t * address);
 
 void mark_context(Interp *, parrot_context_t *);
 
-void invalidate_retc_context(Interp *interpreter, PMC *cont);
+void invalidate_retc_context(Interp *interp, PMC *cont);
 
-STRING* Parrot_full_sub_name(Interp* interpreter, PMC* sub);
-int Parrot_Context_info(Interp *interpreter, parrot_context_t *, struct Parrot_Context_info *);
-STRING* Parrot_Context_infostr(Interp *interpreter, parrot_context_t *);
+STRING* Parrot_full_sub_name(Interp *interp, PMC* sub);
+int Parrot_Context_info(Interp *interp, parrot_context_t *, struct Parrot_Context_info *);
+STRING* Parrot_Context_infostr(Interp *interp, parrot_context_t *);
 
 PMC* Parrot_find_pad(Interp*, STRING *lex_name, parrot_context_t *);
 PMC* parrot_new_closure(Interp*, PMC*);

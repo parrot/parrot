@@ -30,7 +30,7 @@ debugger, and the C<debug> ops.
 #include "parrot/oplib/ops.h"
 
 
-static const char* GDB_P(Interp *interpreter, const char *s);
+static const char* GDB_P(Interp *interp, const char *s);
 
 /* na(c) [Next Argument (Char pointer)]
  *
@@ -128,7 +128,7 @@ parse_int(const char* str, int* intP)
 /*
 
 =item C<static const char*
-parse_string(Interp *interpreter,
+parse_string(Interp *interp,
              const char* str, STRING** strP)>
 
 Parse a double-quoted string out of a C string and return a pointer to
@@ -140,7 +140,7 @@ C<STRING>.
 */
 
 static const char*
-parse_string(Interp *interpreter,
+parse_string(Interp *interp,
              const char* str, STRING** strP)
 {
     const char* string;
@@ -156,7 +156,7 @@ parse_string(Interp *interpreter,
             str++;
     }
 
-    *strP = string_make(interpreter, string, str - string, NULL, 0);
+    *strP = string_make(interp, string, str - string, NULL, 0);
 
     if (*str)
         str++;
@@ -166,7 +166,7 @@ parse_string(Interp *interpreter,
 /*
 
 =item C<static const char*
-parse_key(Interp *interpreter, const char* str, PMC** keyP)>
+parse_key(Interp *interp, const char* str, PMC** keyP)>
 
 Parse an aggregate key out of a string and return a pointer to just
 after the key. Currently only string and integer keys are allowed.
@@ -176,7 +176,7 @@ after the key. Currently only string and integer keys are allowed.
 */
 
 static const char*
-parse_key(Interp *interpreter, const char* str, PMC** keyP)
+parse_key(Interp *interp, const char* str, PMC** keyP)
 {
     *keyP = NULL;
     if (*str != '[')
@@ -184,13 +184,13 @@ parse_key(Interp *interpreter, const char* str, PMC** keyP)
     str++; /* Skip [ */
     if (*str == '"') {
         STRING* string;
-        str = parse_string(interpreter, str, &string);
-        *keyP = key_new_string(interpreter, string);
+        str = parse_string(interp, str, &string);
+        *keyP = key_new_string(interp, string);
     }
     else if (isdigit((int) *str)) {
         int value;
         str = parse_int(str, &value);
-        *keyP = key_new_integer(interpreter, (INTVAL) value);
+        *keyP = key_new_integer(interp, (INTVAL) value);
     }
     else {
         return NULL;
@@ -238,7 +238,7 @@ parse_command(const char* command, unsigned long* cmdP)
 
 /*
 
-=item C<void PDB_get_command(Interp *interpreter)>
+=item C<void PDB_get_command(Interp *interp)>
 
 Get a command from the user input to execute.
 
@@ -256,11 +256,11 @@ The input is saved in C<< pdb->cur_command >>.
 */
 
 void
-PDB_get_command(Interp *interpreter)
+PDB_get_command(Interp *interp)
 {
     unsigned int i;
     char *c;
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     PDB_line_t *line;
     int ch;
 
@@ -284,17 +284,17 @@ PDB_get_command(Interp *interpreter)
         while (pdb->cur_opcode != line->opcode)
             line = line->next;
 
-        PIO_eprintf(interpreter, "%li  ", line->number);
+        PIO_eprintf(interp, "%li  ", line->number);
         c = pdb->file->source + line->source_offset;
         while (*c != '\n'  && c)
-            PIO_eprintf(interpreter, "%c", *(c++));
+            PIO_eprintf(interp, "%c", *(c++));
     }
 
     i = 0;
 
     c = (char *)mem_sys_allocate(255);  /* XXX who frees that */
 
-    PIO_eprintf(interpreter, "\n(pdb) ");
+    PIO_eprintf(interp, "\n(pdb) ");
 
     /* skip leading whitespace */
     do {
@@ -316,7 +316,7 @@ PDB_get_command(Interp *interpreter)
 /*
 
 =item C<void
-PDB_run_command(Interp *interpreter, const char *command)>
+PDB_run_command(Interp *interp, const char *command)>
 
 Run a command.
 
@@ -327,9 +327,9 @@ Hash the command to make a simple switch calling the correct handler.
 */
 
 void
-PDB_run_command(Interp *interpreter, const char *command)
+PDB_run_command(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     unsigned long c;
     const char* temp;
 
@@ -343,64 +343,64 @@ PDB_run_command(Interp *interpreter, const char *command)
 
     switch (c) {
         case c_disassemble:
-            PDB_disassemble(interpreter, command);
+            PDB_disassemble(interp, command);
             break;
         case c_load:
-            PDB_load_source(interpreter, command);
+            PDB_load_source(interp, command);
             break;
         case c_l:
         case c_list:
-            PDB_list(interpreter, command);
+            PDB_list(interp, command);
             break;
         case c_b:
         case c_break:
-            PDB_set_break(interpreter, command);
+            PDB_set_break(interp, command);
             break;
         case c_w:
         case c_watch:
-            PDB_watchpoint(interpreter, command);
+            PDB_watchpoint(interp, command);
             break;
         case c_d:
         case c_delete:
-            PDB_delete_breakpoint(interpreter, command);
+            PDB_delete_breakpoint(interp, command);
             break;
         case c_disable:
-            PDB_disable_breakpoint(interpreter, command);
+            PDB_disable_breakpoint(interp, command);
             break;
         case c_enable:
-            PDB_enable_breakpoint(interpreter, command);
+            PDB_enable_breakpoint(interp, command);
             break;
         case c_r:
         case c_run:
-            PDB_init(interpreter, command);
-            PDB_continue(interpreter, NULL);
+            PDB_init(interp, command);
+            PDB_continue(interp, NULL);
             break;
         case c_c:
         case c_continue:
-            PDB_continue(interpreter, command);
+            PDB_continue(interp, command);
             break;
         case c_p:
         case c_print:
-            PDB_print(interpreter, command);
+            PDB_print(interp, command);
             break;
         case c_n:
         case c_next:
-            PDB_next(interpreter, command);
+            PDB_next(interp, command);
             break;
         case c_t:
         case c_trace:
-            PDB_trace(interpreter, command);
+            PDB_trace(interp, command);
             break;
         case c_e:
         case c_eval:
-            PDB_eval(interpreter, command);
+            PDB_eval(interp, command);
             break;
         case c_info:
-            PDB_info(interpreter);
+            PDB_info(interp);
             break;
         case c_h:
         case c_help:
-            PDB_help(interpreter, command);
+            PDB_help(interp, command);
             break;
         case c_q:
         case c_quit:
@@ -408,10 +408,10 @@ PDB_run_command(Interp *interpreter, const char *command)
             break;
         case 0:
             if (pdb->last_command)
-                PDB_run_command(interpreter,pdb->last_command);
+                PDB_run_command(interp,pdb->last_command);
             break;
         default:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
                         "Undefined command: \"%s\".  Try \"help\".",
                         temp);
             break;
@@ -421,7 +421,7 @@ PDB_run_command(Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_next(Interp *interpreter, const char *command)>
+PDB_next(Interp *interp, const char *command)>
 
 Execute the next N operation(s).
 
@@ -432,14 +432,14 @@ Inits the program if needed, runs the next N >= 1 operations and stops.
 */
 
 void
-PDB_next(Interp *interpreter, const char *command)
+PDB_next(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     unsigned long n = 1;
 
     /* Init the program if it's not running */
     if (!(pdb->state & PDB_RUNNING))
-        PDB_init(interpreter, command);
+        PDB_init(interp, command);
 
     /* Get the number of operations to execute if any */
     if (command && isdigit((int) *command))
@@ -461,13 +461,13 @@ PDB_next(Interp *interpreter, const char *command)
      * FIXME this doesn't handle resume opcodes
      */
     if (!pdb->cur_opcode)
-        (void)PDB_program_end(interpreter);
+        (void)PDB_program_end(interp);
 }
 
 /*
 
 =item C<void
-PDB_trace(Interp *interpreter,
+PDB_trace(Interp *interp,
           const char *command)>
 
 Execute the next N operations; if no number is specified, it defaults to
@@ -478,16 +478,16 @@ Execute the next N operations; if no number is specified, it defaults to
 */
 
 void
-PDB_trace(Interp *interpreter,
+PDB_trace(Interp *interp,
           const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     unsigned long n = 1;
     Interp *debugee;
 
     if (!(pdb->state & PDB_RUNNING))
     {
-        PDB_init(interpreter, command);
+        PDB_init(interp, command);
     }
 
     if (command && isdigit((int) *command))
@@ -509,13 +509,13 @@ PDB_trace(Interp *interpreter,
 
     /* If program ended */
     if (!pdb->cur_opcode)
-        (void)PDB_program_end(interpreter);
+        (void)PDB_program_end(interp);
 }
 
 /*
 
 =item C<PDB_condition_t *
-PDB_cond(Interp *interpreter, const char *command)>
+PDB_cond(Interp *interp, const char *command)>
 
 Analyzes a condition from the user input.
 
@@ -524,7 +524,7 @@ Analyzes a condition from the user input.
 */
 
 PDB_condition_t *
-PDB_cond(Interp *interpreter, const char *command)
+PDB_cond(Interp *interp, const char *command)
 {
     PDB_condition_t *condition;
     int i, reg_number;
@@ -532,7 +532,7 @@ PDB_cond(Interp *interpreter, const char *command)
 
     /* Return if no more arguments */
     if (!(command && *command)) {
-        PIO_eprintf(interpreter, "No condition specified\n");
+        PIO_eprintf(interp, "No condition specified\n");
         return NULL;
     }
 
@@ -557,7 +557,7 @@ PDB_cond(Interp *interpreter, const char *command)
             condition->type = PDB_cond_pmc;
             break;
         default:
-            PIO_eprintf(interpreter, "First argument must be a register\n");
+            PIO_eprintf(interp, "First argument must be a register\n");
             mem_sys_free(condition);
             return NULL;
     }
@@ -606,7 +606,7 @@ PDB_cond(Interp *interpreter, const char *command)
                 goto INV_COND;
             break;
         default:
-INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
+INV_COND:   PIO_eprintf(interp, "Invalid condition\n");
             mem_sys_free(condition);
             return NULL;
     }
@@ -621,7 +621,7 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
 
     /* return if no more arguments */
     if (!(command && *command)) {
-        PIO_eprintf(interpreter, "Can't compare a register with nothing\n");
+        PIO_eprintf(interp, "Can't compare a register with nothing\n");
         mem_sys_free(condition);
         return NULL;
     }
@@ -650,14 +650,14 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
                     goto WRONG_REG;
                 break;
             default:
-WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
+WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
                 mem_sys_free(condition);
                 return NULL;
         }
         /* Now we check and store the register number */
         reg_number = (int)atoi(++command);
         if (reg_number < 0) {
-            PIO_eprintf(interpreter, "Out-of-bounds register\n");
+            PIO_eprintf(interp, "Out-of-bounds register\n");
             mem_sys_free(condition);
             return NULL;
         }
@@ -680,14 +680,14 @@ WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
         for (i = 1; ((command[i] != '"') && (i < 255)); i++)
             str[i - 1] = command[i];
         str[i - 1] = '\0';
-        condition->value = string_make(interpreter,
+        condition->value = string_make(interp,
             str, i - 1, NULL, PObj_external_FLAG);
         condition->type |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_pmc) {
         /* XXX Need to figure out what to do in this case.
          * For the time being, we just bail. */
-        PIO_eprintf(interpreter, "Can't compare PMC with constant\n");
+        PIO_eprintf(interp, "Can't compare PMC with constant\n");
         mem_sys_free(condition);
         return NULL;
     }
@@ -701,7 +701,7 @@ WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
 /*
 
 =item C<void
-PDB_watchpoint(Interp *interpreter, const char *command)>
+PDB_watchpoint(Interp *interp, const char *command)>
 
 Set a watchpoint.
 
@@ -710,12 +710,12 @@ Set a watchpoint.
 */
 
 void
-PDB_watchpoint(Interp *interpreter, const char *command)
+PDB_watchpoint(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     PDB_condition_t *condition;
 
-    if (!(condition = PDB_cond(interpreter, command)))
+    if (!(condition = PDB_cond(interp, command)))
         return;
 
     /* Add it to the head of the list */
@@ -728,7 +728,7 @@ PDB_watchpoint(Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_set_break(Interp *interpreter, const char *command)>
+PDB_set_break(Interp *interp, const char *command)>
 
 Set a break point, the source code file must be loaded.
 
@@ -737,9 +737,9 @@ Set a break point, the source code file must be loaded.
 */
 
 void
-PDB_set_break(Interp *interpreter, const char *command)
+PDB_set_break(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     PDB_breakpoint_t *newbreak = NULL, *sbreak;
     PDB_condition_t *condition;
     PDB_line_t *line;
@@ -756,7 +756,7 @@ PDB_set_break(Interp *interpreter, const char *command)
 
         /* Abort if the line number provided doesn't exist */
         if (!line->next) {
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
                         "Can't set a breakpoint at line number %li\n",ln);
             return;
         }
@@ -767,7 +767,7 @@ PDB_set_break(Interp *interpreter, const char *command)
         while (line->opcode != pdb->cur_opcode) {
             line = line->next;
             if (!line) {
-                PIO_eprintf(interpreter,
+                PIO_eprintf(interp,
                    "No current line found and no line number specified\n");
                 return;
             }
@@ -788,7 +788,7 @@ PDB_set_break(Interp *interpreter, const char *command)
      * it should be an 'if', so we call another handler. */
     if (command && *command) {
         na(command);
-        if ((condition = PDB_cond(interpreter, command))) {
+        if ((condition = PDB_cond(interp, command))) {
             newbreak->condition = condition;
         }
     }
@@ -823,13 +823,13 @@ PDB_set_break(Interp *interpreter, const char *command)
         i = pdb->breakpoint->id = 0;
     }
 
-    PIO_eprintf(interpreter, "Breakpoint %li at line %li\n",i,line->number);
+    PIO_eprintf(interp, "Breakpoint %li at line %li\n",i,line->number);
 }
 
 /*
 
 =item C<void
-PDB_init(Interp *interpreter, const char *command)>
+PDB_init(Interp *interp, const char *command)>
 
 Init the program.
 
@@ -837,17 +837,17 @@ Init the program.
 
 */
 
-extern void imcc_init(Parrot_Interp interpreter);
+extern void imcc_init(Parrot_Interp interp);
 
 void
-PDB_init(Interp *interpreter, const char *command)
+PDB_init(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
 
     UNUSED(command);
     /* Restart if we are already running */
     if (pdb->state & PDB_RUNNING)
-        PIO_eprintf(interpreter, "Restarting\n");
+        PIO_eprintf(interp, "Restarting\n");
 
     /* Add the RUNNING state */
     pdb->state |= PDB_RUNNING;
@@ -856,7 +856,7 @@ PDB_init(Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_continue(Interp *interpreter,
+PDB_continue(Interp *interp,
              const char *command)>
 
 Continue running the program. If a number is specified, skip that many
@@ -867,23 +867,23 @@ breakpoints.
 */
 
 void
-PDB_continue(Interp *interpreter,
+PDB_continue(Interp *interp,
              const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     long ln;
 
     /* Skip any breakpoint? */
     if (command && *command) {
         if (!pdb->breakpoint) {
-            PIO_eprintf(interpreter, "No breakpoints to skip\n");
+            PIO_eprintf(interp, "No breakpoints to skip\n");
             return;
         }
         ln = atol(command);
-        PDB_skip_breakpoint(interpreter,ln);
+        PDB_skip_breakpoint(interp,ln);
     }
     /* Run while no break point is reached */
-    while (!PDB_break(interpreter))
+    while (!PDB_break(interp))
         DO_OP(pdb->cur_opcode, pdb->debugee);
 }
 
@@ -897,7 +897,7 @@ PDB_continue(Interp *interpreter,
 /*
 
 =item C<PDB_breakpoint_t *
-PDB_find_breakpoint(Interp *interpreter,
+PDB_find_breakpoint(Interp *interp,
                       const char *command)>
 
 Find breakpoint number N; returns C<NULL> if the breakpoint doesn't
@@ -908,7 +908,7 @@ exist or if no breakpoint was specified.
 */
 
 PDB_breakpoint_t *
-PDB_find_breakpoint(Interp *interpreter,
+PDB_find_breakpoint(Interp *interp,
                       const char *command)
 {
     PDB_breakpoint_t *breakpoint;
@@ -916,11 +916,11 @@ PDB_find_breakpoint(Interp *interpreter,
 
     if (isdigit((int) *command)) {
         n = atol(command);
-        breakpoint = interpreter->pdb->breakpoint;
+        breakpoint = interp->pdb->breakpoint;
         while (breakpoint && breakpoint->id != n)
             breakpoint = breakpoint->next;
         if (!breakpoint) {
-            PIO_eprintf(interpreter, "No breakpoint number %ld", n);
+            PIO_eprintf(interp, "No breakpoint number %ld", n);
             return NULL;
         }
         return breakpoint;
@@ -928,10 +928,10 @@ PDB_find_breakpoint(Interp *interpreter,
     else {
         /* Report an appropriate error */
         if (*command) {
-            PIO_eprintf(interpreter, "Not a valid breakpoint");
+            PIO_eprintf(interp, "Not a valid breakpoint");
         }
         else {
-            PIO_eprintf(interpreter, "No breakpoint specified");
+            PIO_eprintf(interp, "No breakpoint specified");
         }
         return NULL;
     }
@@ -940,7 +940,7 @@ PDB_find_breakpoint(Interp *interpreter,
 /*
 
 =item C<void
-PDB_disable_breakpoint(Interp *interpreter,
+PDB_disable_breakpoint(Interp *interp,
                        const char *command)>
 
 Disable a breakpoint; it can be reenabled with the enable command.
@@ -950,12 +950,12 @@ Disable a breakpoint; it can be reenabled with the enable command.
 */
 
 void
-PDB_disable_breakpoint(Interp *interpreter,
+PDB_disable_breakpoint(Interp *interp,
                        const char *command)
 {
     PDB_breakpoint_t *breakpoint;
 
-    breakpoint = PDB_find_breakpoint(interpreter, command);
+    breakpoint = PDB_find_breakpoint(interp, command);
 
     if (breakpoint) {
         breakpoint->skip = -1;
@@ -967,7 +967,7 @@ PDB_disable_breakpoint(Interp *interpreter,
 /*
 
 =item C<void
-PDB_enable_breakpoint(Interp *interpreter,
+PDB_enable_breakpoint(Interp *interp,
                       const char *command)>
 
 Reenable a disabled breakpoint; if the breakpoint was not disabled, has
@@ -978,12 +978,12 @@ no effect.
 */
 
 void
-PDB_enable_breakpoint(Interp *interpreter,
+PDB_enable_breakpoint(Interp *interp,
                       const char *command)
 {
     PDB_breakpoint_t *breakpoint;
 
-    breakpoint = PDB_find_breakpoint(interpreter, command);
+    breakpoint = PDB_find_breakpoint(interp, command);
     if (breakpoint && breakpoint->skip == -1) {
         breakpoint->skip = 0;
     }
@@ -993,7 +993,7 @@ PDB_enable_breakpoint(Interp *interpreter,
 /*
 
 =item C<void
-PDB_delete_breakpoint(Interp *interpreter,
+PDB_delete_breakpoint(Interp *interp,
                       const char *command)>
 
 Delete a breakpoint.
@@ -1003,21 +1003,21 @@ Delete a breakpoint.
 */
 
 void
-PDB_delete_breakpoint(Interp *interpreter,
+PDB_delete_breakpoint(Interp *interp,
                       const char *command)
 {
     PDB_breakpoint_t *breakpoint;
     PDB_line_t *line;
 
-    breakpoint = PDB_find_breakpoint(interpreter, command);
+    breakpoint = PDB_find_breakpoint(interp, command);
     if (breakpoint) {
-        line = interpreter->pdb->file->line;
+        line = interp->pdb->file->line;
         while (line->opcode != breakpoint->pc)
             line = line->next;
 
         /* Delete the condition structure, if there is one */
         if (breakpoint->condition) {
-            PDB_delete_condition(interpreter, breakpoint);
+            PDB_delete_condition(interp, breakpoint);
             breakpoint->condition = NULL;
         }
 
@@ -1031,10 +1031,10 @@ PDB_delete_breakpoint(Interp *interpreter,
         }
         else if (!breakpoint->prev && breakpoint->next) {
             breakpoint->next->prev = NULL;
-            interpreter->pdb->breakpoint = breakpoint->next;
+            interp->pdb->breakpoint = breakpoint->next;
         }
         else {
-            interpreter->pdb->breakpoint = NULL;
+            interp->pdb->breakpoint = NULL;
         }
         /* Kill the breakpoint */
         mem_sys_free(breakpoint);
@@ -1044,7 +1044,7 @@ PDB_delete_breakpoint(Interp *interpreter,
 /*
 
 =item C<void
-PDB_delete_condition(Interp *interpreter,
+PDB_delete_condition(Interp *interp,
                      PDB_breakpoint_t *breakpoint)>
 
 Delete a condition associated with a breakpoint.
@@ -1054,7 +1054,7 @@ Delete a condition associated with a breakpoint.
 */
 
 void
-PDB_delete_condition(Interp *interpreter,
+PDB_delete_condition(Interp *interp,
                      PDB_breakpoint_t *breakpoint)
 {
     if (breakpoint->condition->value) {
@@ -1078,7 +1078,7 @@ PDB_delete_condition(Interp *interpreter,
 /*
 
 =item C<void
-PDB_skip_breakpoint(Interp *interpreter, long i)>
+PDB_skip_breakpoint(Interp *interp, long i)>
 
 Skip C<i> times all breakpoints.
 
@@ -1087,20 +1087,20 @@ Skip C<i> times all breakpoints.
 */
 
 void
-PDB_skip_breakpoint(Interp *interpreter, long i)
+PDB_skip_breakpoint(Interp *interp, long i)
 {
     if (i == 0) {
-        interpreter->pdb->breakpoint_skip = i;
+        interp->pdb->breakpoint_skip = i;
     }
     else {
-        interpreter->pdb->breakpoint_skip = i - 1;
+        interp->pdb->breakpoint_skip = i - 1;
     }
 }
 
 /*
 
 =item C<char
-PDB_program_end(Interp *interpreter)>
+PDB_program_end(Interp *interp)>
 
 End the program.
 
@@ -1109,20 +1109,20 @@ End the program.
 */
 
 char
-PDB_program_end(Interp *interpreter)
+PDB_program_end(Interp *interp)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
 
     /* Remove the RUNNING state */
     pdb->state &= ~PDB_RUNNING;
-    PIO_eprintf(interpreter, "Program exited.\n");
+    PIO_eprintf(interp, "Program exited.\n");
     return 1;
 }
 
 /*
 
 =item C<char
-PDB_check_condition(Interp *interpreter,
+PDB_check_condition(Interp *interp,
     PDB_condition_t *condition)>
 
 Returns true if the condition was met.
@@ -1132,7 +1132,7 @@ Returns true if the condition was met.
 */
 
 char
-PDB_check_condition(Interp *interpreter,
+PDB_check_condition(Interp *interp,
     PDB_condition_t *condition)
 {
     INTVAL i,j;
@@ -1179,17 +1179,17 @@ PDB_check_condition(Interp *interpreter,
         else
             n = REG_STR(*(int *)condition->value);
         if (((condition->type & PDB_cond_gt) &&
-                (string_compare(interpreter, m, n) >  0)) ||
+                (string_compare(interp, m, n) >  0)) ||
             ((condition->type & PDB_cond_ge) &&
-                (string_compare(interpreter, m, n) >= 0)) ||
+                (string_compare(interp, m, n) >= 0)) ||
             ((condition->type & PDB_cond_eq) &&
-                (string_compare(interpreter, m, n) == 0)) ||
+                (string_compare(interp, m, n) == 0)) ||
             ((condition->type & PDB_cond_ne) &&
-                (string_compare(interpreter, m, n) != 0)) ||
+                (string_compare(interp, m, n) != 0)) ||
             ((condition->type & PDB_cond_le) &&
-                (string_compare(interpreter, m, n) <= 0)) ||
+                (string_compare(interp, m, n) <= 0)) ||
             ((condition->type & PDB_cond_lt) &&
-                (string_compare(interpreter, m, n) <  0)))
+                (string_compare(interp, m, n) <  0)))
                     return 1;
         return 0;
     }
@@ -1198,7 +1198,7 @@ PDB_check_condition(Interp *interpreter,
 
 /*
 
-=item C<char PDB_break(Interp *interpreter)>
+=item C<char PDB_break(Interp *interp)>
 
 Returns true if we have to stop running.
 
@@ -1207,15 +1207,15 @@ Returns true if we have to stop running.
 */
 
 char
-PDB_break(Interp *interpreter)
+PDB_break(Interp *interp)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     PDB_breakpoint_t *breakpoint = pdb->breakpoint;
     PDB_condition_t *watchpoint = pdb->watchpoint;
 
     /* Check the watchpoints first. */
     while (watchpoint) {
-        if (PDB_check_condition(interpreter, watchpoint)) {
+        if (PDB_check_condition(interp, watchpoint)) {
             pdb->state |= PDB_STOPPED;
             return 1;
         }
@@ -1224,7 +1224,7 @@ PDB_break(Interp *interpreter)
 
     /* If program ended */
     if (!pdb->cur_opcode)
-        return PDB_program_end(interpreter);
+        return PDB_program_end(interp);
 
     /* If the program is STOPPED allow it to continue */
     if (pdb->state & PDB_STOPPED) {
@@ -1246,7 +1246,7 @@ PDB_break(Interp *interpreter)
 
             /* Check if there is a condition for this breakpoint */
             if ((breakpoint->condition) &&
-                (!PDB_check_condition(interpreter, breakpoint->condition)))
+                (!PDB_check_condition(interp, breakpoint->condition)))
                     return 0;
 
             /* Add the STOPPED state and stop */
@@ -1373,7 +1373,7 @@ PDB_unescape(char *string)
 /*
 
 =item C<size_t
-PDB_disassemble_op(Interp *interpreter, char* dest, int space,
+PDB_disassemble_op(Interp *interp, char* dest, int space,
                    op_info_t* info, opcode_t* op,
                    PDB_file_t *file, opcode_t* code_start, int full_name)>
 
@@ -1384,7 +1384,7 @@ Disassembles C<op>.
 */
 
 size_t
-PDB_disassemble_op(Interp *interpreter, char* dest, int space,
+PDB_disassemble_op(Interp *interp, char* dest, int space,
                    op_info_t* info, opcode_t* op,
                    PDB_file_t *file, opcode_t* code_start, int full_name)
 {
@@ -1450,19 +1450,19 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_NC:
             /* Convert the float to a string */
-            f = interpreter->code->const_table->constants[op[j]]->u.number;
-            Parrot_snprintf(interpreter, buf, sizeof(buf), FLOATVAL_FMT, f);
+            f = interp->code->const_table->constants[op[j]]->u.number;
+            Parrot_snprintf(interp, buf, sizeof(buf), FLOATVAL_FMT, f);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             break;
         case PARROT_ARG_SC:
             dest[size++] = '"';
-            if (interpreter->code->const_table->constants[op[j]]->
+            if (interp->code->const_table->constants[op[j]]->
                     u.string->strlen)
             {
-                char* escaped = PDB_escape(interpreter->code->const_table->
+                char* escaped = PDB_escape(interp->code->const_table->
                            constants[op[j]]->u.string->strstart,
-                           interpreter->code->const_table->
+                           interp->code->const_table->
                            constants[op[j]]->u.string->strlen);
                 if (escaped) {
                     strcpy(&dest[size],escaped);
@@ -1473,7 +1473,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             dest[size++] = '"';
             break;
         case PARROT_ARG_PC:
-            Parrot_snprintf(interpreter, buf, sizeof(buf),
+            Parrot_snprintf(interp, buf, sizeof(buf),
                             "PMC_CONST(%d)", op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1481,7 +1481,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
 
         case PARROT_ARG_K:
             dest[size-1] = '[';
-            Parrot_snprintf(interpreter, buf, sizeof(buf),
+            Parrot_snprintf(interp, buf, sizeof(buf),
                             "P" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1489,19 +1489,19 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_KC:
             dest[size-1] = '[';
-            k = interpreter->code->const_table->constants[op[j]]->u.key;
+            k = interp->code->const_table->constants[op[j]]->u.key;
             while (k) {
                 switch (PObj_get_FLAGS(k)) {
                 case 0:
                     break;
                 case KEY_integer_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof(buf),
                                     INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof(buf),
                                     FLOATVAL_FMT, PMC_num_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
@@ -1509,34 +1509,34 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
                 case KEY_string_FLAG:
                     dest[size++] = '"';
                     {
-                        char *temp = string_to_cstring(interpreter,
+                        char *temp = string_to_cstring(interp,
                                                        PMC_str_val(k));
                         strcpy(&dest[size], temp);
                         string_cstring_free(temp);
                     }
-                    size += string_length(interpreter, PMC_str_val(k));
+                    size += string_length(interp, PMC_str_val(k));
                     dest[size++] = '"';
                     break;
                 case KEY_integer_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof(buf),
                                     "I" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof(buf),
                                     "N" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_string_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof(buf),
                                     "S" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_pmc_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof(buf),
                                     "P" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
@@ -1552,7 +1552,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_KI:
             dest[size - 1] = '[';
-            Parrot_snprintf(interpreter, buf, sizeof(buf),
+            Parrot_snprintf(interp, buf, sizeof(buf),
                             "I" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1560,7 +1560,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_KIC:
             dest[size - 1] = '[';
-            Parrot_snprintf(interpreter, buf, sizeof(buf),
+            Parrot_snprintf(interp, buf, sizeof(buf),
                             INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1581,7 +1581,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
 /*
 
 =item C<void
-PDB_disassemble(Interp *interpreter, const char *command)>
+PDB_disassemble(Interp *interp, const char *command)>
 
 Disassemble the bytecode.
 
@@ -1590,13 +1590,13 @@ Disassemble the bytecode.
 */
 
 void
-PDB_disassemble(Interp *interpreter, const char *command)
+PDB_disassemble(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     PDB_file_t *pfile;
     PDB_line_t *pline,*newline;
     PDB_label_t *label;
-    opcode_t *code_end,*pc = interpreter->code->base.data;
+    opcode_t *code_end,*pc = interp->code->base.data;
 
     const unsigned int default_size = 32768;
     size_t space;  /* How much space do we have? */
@@ -1607,7 +1607,7 @@ PDB_disassemble(Interp *interpreter, const char *command)
 
     /* If we already got a source, free it */
     if (pdb->file)
-        PDB_free_file(interpreter);
+        PDB_free_file(interp);
 
     pfile->source = (char *)mem_sys_allocate(default_size);
     alloced = space = default_size;
@@ -1618,7 +1618,7 @@ PDB_disassemble(Interp *interpreter, const char *command)
     pline->source_offset = 0;
     pline->label = NULL;
 
-    code_end = pc + interpreter->code->base.size;
+    code_end = pc + interp->code->base.size;
     while (pc != code_end) {
         /* Grow it early*/
         if (space < default_size) {
@@ -1627,16 +1627,16 @@ PDB_disassemble(Interp *interpreter, const char *command)
             pfile->source = mem_sys_realloc(pfile->source, alloced);
         }
 
-        size = PDB_disassemble_op(interpreter, pfile->source + pfile->size,
-                space, &interpreter->op_info_table[*pc], pc, pfile, NULL, 1);
+        size = PDB_disassemble_op(interp, pfile->source + pfile->size,
+                space, &interp->op_info_table[*pc], pc, pfile, NULL, 1);
         space -= size;
         pfile->size += size;
         pfile->source[pfile->size - 1] = '\n';
 
         /* Store the opcode of this line */
         pline->opcode = pc;
-        n = interpreter->op_info_table[*pc].op_count;
-        ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
+        n = interp->op_info_table[*pc].op_count;
+        ADD_OP_VAR_PART(interp, interp->code, pc, n);
         pc += n;
         /* Prepare for next line */
         newline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
@@ -1657,7 +1657,7 @@ PDB_disassemble(Interp *interpreter, const char *command)
             pline = pline->next;
 
         if (!(pline)) {
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
                         "Label number %li out of bounds.\n", label->number);
             return;
         }
@@ -1713,7 +1713,7 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
 
 /*
 
-=item C<void PDB_free_file(Interp *interpreter)>
+=item C<void PDB_free_file(Interp *interp)>
 
 Frees any allocated source files.
 
@@ -1722,11 +1722,11 @@ Frees any allocated source files.
 */
 
 void
-PDB_free_file(Interp *interpreter)
+PDB_free_file(Interp *interp)
 {
     PDB_line_t *nline, *line;
     PDB_label_t *nlabel, *label;
-    PDB_file_t *nfile, *file = interpreter->pdb->file;
+    PDB_file_t *nfile, *file = interp->pdb->file;
 
     while (file) {
         /* Free all of the allocated line structures */
@@ -1756,13 +1756,13 @@ PDB_free_file(Interp *interpreter)
     }
 
     /* Make sure we don't end up pointing at garbage memory */
-    interpreter->pdb->file = NULL;
+    interp->pdb->file = NULL;
 }
 
 /*
 
 =item C<void
-PDB_load_source(Interp *interpreter, const char *command)>
+PDB_load_source(Interp *interp, const char *command)>
 
 Load a source code file.
 
@@ -1771,13 +1771,13 @@ Load a source code file.
 */
 
 void
-PDB_load_source(Interp *interpreter, const char *command)
+PDB_load_source(Interp *interp, const char *command)
 {
     FILE *file;
     char f[255];
     int i, c;
     unsigned long size = 0;
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     PDB_file_t *pfile;
     PDB_line_t *pline,*newline;
     opcode_t *pc = pdb->cur_opcode;
@@ -1785,7 +1785,7 @@ PDB_load_source(Interp *interpreter, const char *command)
     /* If there was a file already loaded or the bytecode was
        disassembled, free it */
     if (pdb->file)
-        PDB_free_file(interpreter);
+        PDB_free_file(interp);
     /* Get the name of the file */
     for (i = 0; command[i]; i++)
         f[i] = command[i];
@@ -1796,7 +1796,7 @@ PDB_load_source(Interp *interpreter, const char *command)
 
     /* abort if fopen failed */
     if (!file) {
-        PIO_eprintf(interpreter, "Unable to load %s\n", f);
+        PIO_eprintf(interp, "Unable to load %s\n", f);
         return;
     }
 
@@ -1824,8 +1824,8 @@ PDB_load_source(Interp *interpreter, const char *command)
             if (PDB_hasinstruction(pfile->source + pline->source_offset)) {
                 size_t n;
                 pline->opcode = pc;
-                n = interpreter->op_info_table[*pc].op_count;
-                ADD_OP_VAR_PART(interpreter, interpreter->code, pc, n);
+                n = interp->op_info_table[*pc].op_count;
+                ADD_OP_VAR_PART(interp, interp->code, pc, n);
                 pc += n;
             }
             newline =
@@ -1883,7 +1883,7 @@ PDB_hasinstruction(char *c)
 /*
 
 =item C<void
-PDB_list(Interp *interpreter, const char *command)>
+PDB_list(Interp *interp, const char *command)>
 
 Show lines from the source code file.
 
@@ -1892,16 +1892,16 @@ Show lines from the source code file.
 */
 
 void
-PDB_list(Interp *interpreter, const char *command)
+PDB_list(Interp *interp, const char *command)
 {
     char *c;
     long line_number;
     unsigned long i,n = 10;
-    PDB_t *pdb = interpreter->pdb;
+    PDB_t *pdb = interp->pdb;
     PDB_line_t *line;
 
     if (!pdb->file) {
-        PIO_eprintf(interpreter, "No source file loaded\n");
+        PIO_eprintf(interp, "No source file loaded\n");
         return;
     }
 
@@ -1936,14 +1936,14 @@ PDB_list(Interp *interpreter, const char *command)
 
     i = 1;
     while (line->next) {
-        PIO_eprintf(interpreter, "%li  ",pdb->file->list_line + i);
+        PIO_eprintf(interp, "%li  ",pdb->file->list_line + i);
         /* If it has a label print it */
         if (line->label)
-            PIO_eprintf(interpreter, "L%li:\t",line->label->number);
+            PIO_eprintf(interp, "L%li:\t",line->label->number);
         c = pdb->file->source + line->source_offset;
         while (*c != '\n')
-            PIO_eprintf(interpreter, "%c",*(c++));
-        PIO_eprintf(interpreter, "\n");
+            PIO_eprintf(interp, "%c",*(c++));
+        PIO_eprintf(interp, "\n");
         line = line->next;
         if (i++ == n)
             break;
@@ -1958,7 +1958,7 @@ PDB_list(Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_eval(Interp *interpreter, const char *command)>
+PDB_eval(Interp *interp, const char *command)>
 
 C<eval>s an instruction.
 
@@ -1967,19 +1967,19 @@ C<eval>s an instruction.
 */
 
 void
-PDB_eval(Interp *interpreter, const char *command)
+PDB_eval(Interp *interp, const char *command)
 {
     opcode_t *run;
     struct PackFile *eval_pf;
     struct PackFile_ByteCode *old_cs;
 
-    eval_pf = PDB_compile(interpreter, command);
+    eval_pf = PDB_compile(interp, command);
 
     if (eval_pf) {
-        old_cs = Parrot_switch_to_cs(interpreter, eval_pf->cur_cs, 1);
+        old_cs = Parrot_switch_to_cs(interp, eval_pf->cur_cs, 1);
         run = eval_pf->cur_cs->base.data;
-        DO_OP(run,interpreter);
-        Parrot_switch_to_cs(interpreter, old_cs, 1);
+        DO_OP(run,interp);
+        Parrot_switch_to_cs(interp, old_cs, 1);
        /* TODO destroy packfile */
     }
 }
@@ -1987,7 +1987,7 @@ PDB_eval(Interp *interpreter, const char *command)
 /*
 
 =item C<struct PackFile *
-PDB_compile(Interp *interpreter, const char *command)>
+PDB_compile(Interp *interp, const char *command)>
 
 Compiles instructions with the PASM compiler.
 
@@ -2001,30 +2001,30 @@ which generates a malloced string.
 */
 
 struct PackFile *
-PDB_compile(Interp *interpreter, const char *command)
+PDB_compile(Interp *interp, const char *command)
 {
     STRING *buf;
     const char *end = "\nend\n";
     PMC * compiler, *code;
-    STRING *key = const_string(interpreter, "PASM");
-    PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
-            interpreter->iglobals, IGLOBALS_COMPREG_HASH);
+    STRING *key = const_string(interp, "PASM");
+    PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interp,
+            interp->iglobals, IGLOBALS_COMPREG_HASH);
 
-    compiler = VTABLE_get_pmc_keyed_str(interpreter, compreg_hash, key);
-    if (!VTABLE_defined(interpreter, compiler)) {
+    compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, key);
+    if (!VTABLE_defined(interp, compiler)) {
         fprintf(stderr, "Couldn't find PASM compiler");
         return NULL;
     }
-    buf = Parrot_sprintf_c(interpreter, "%s%s", command, end);
+    buf = Parrot_sprintf_c(interp, "%s%s", command, end);
 
-    code = VTABLE_invoke(interpreter, compiler, buf);
+    code = VTABLE_invoke(interp, compiler, buf);
     return PMC_struct_val(code);
 }
 
 /*
 
 =item C<int
-PDB_extend_const_table(Interp *interpreter)>
+PDB_extend_const_table(Interp *interp)>
 
 Extend the constant table.
 
@@ -2033,25 +2033,25 @@ Extend the constant table.
 */
 
 int
-PDB_extend_const_table(Interp *interpreter)
+PDB_extend_const_table(Interp *interp)
 {
     int k;
 
     /* Update the constant count and reallocate */
-    k = ++interpreter->code->const_table->const_count;
-    if (interpreter->code->const_table->constants) {
-        interpreter->code->const_table->constants =
-            mem_sys_realloc(interpreter->code->const_table->constants,
+    k = ++interp->code->const_table->const_count;
+    if (interp->code->const_table->constants) {
+        interp->code->const_table->constants =
+            mem_sys_realloc(interp->code->const_table->constants,
                             k * sizeof(struct PackFile_Constant *));
     }
     else {
-        interpreter->code->const_table->constants =
+        interp->code->const_table->constants =
             mem_sys_allocate(k * sizeof(struct PackFile_Constant *));
     }
 
     /* Allocate a new constant */
-    interpreter->code->const_table->constants[--k] =
-        PackFile_Constant_new(interpreter);
+    interp->code->const_table->constants[--k] =
+        PackFile_Constant_new(interp);
     return k;
 }
 
@@ -2059,7 +2059,7 @@ PDB_extend_const_table(Interp *interpreter)
 /*
 
 =item C<static void
-dump_string(Interp *interpreter, STRING* s)>
+dump_string(Interp *interp, STRING* s)>
 
 Dumps the buflen, flags, bufused, strlen, offset associated
 with a string and the string itself.
@@ -2069,23 +2069,23 @@ with a string and the string itself.
 */
 
 static void
-dump_string(Interp *interpreter, STRING* s)
+dump_string(Interp *interp, STRING* s)
 {
     if (s) {
-        PIO_eprintf(interpreter, "\tBuflen  =\t%12ld\n",PObj_buflen(s));
-        PIO_eprintf(interpreter, "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
-        PIO_eprintf(interpreter, "\tBufused =\t%12ld\n",s->bufused);
-        PIO_eprintf(interpreter, "\tStrlen  =\t%12ld\n",s->strlen);
-        PIO_eprintf(interpreter, "\tOffset  =\t%12d\n",
+        PIO_eprintf(interp, "\tBuflen  =\t%12ld\n",PObj_buflen(s));
+        PIO_eprintf(interp, "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
+        PIO_eprintf(interp, "\tBufused =\t%12ld\n",s->bufused);
+        PIO_eprintf(interp, "\tStrlen  =\t%12ld\n",s->strlen);
+        PIO_eprintf(interp, "\tOffset  =\t%12d\n",
                     (char*) s->strstart - (char*) PObj_bufstart(s));
-        PIO_eprintf(interpreter, "\tString  =\t%S\n", s);
+        PIO_eprintf(interp, "\tString  =\t%S\n", s);
     }
 }
 
 /*
 
 =item C<void
-PDB_print_user_stack(Interp *interpreter, const char *command)>
+PDB_print_user_stack(Interp *interp, const char *command)>
 
 Print an entry from the user stack.
 
@@ -2094,47 +2094,47 @@ Print an entry from the user stack.
 */
 
 void
-PDB_print_user_stack(Interp *interpreter, const char *command)
+PDB_print_user_stack(Interp *interp, const char *command)
 {
     long depth = 0;
-    Stack_Chunk_t *chunk = CONTEXT(interpreter->ctx)->user_stack;
+    Stack_Chunk_t *chunk = CONTEXT(interp->ctx)->user_stack;
     Stack_Entry_t *entry;
 
     if (*command) {
         depth = atol(command);
     }
 
-    entry = stack_entry(interpreter, chunk, (INTVAL)depth);
+    entry = stack_entry(interp, chunk, (INTVAL)depth);
 
     if (!entry) {
-        PIO_eprintf(interpreter, "No such entry on stack\n");
+        PIO_eprintf(interp, "No such entry on stack\n");
         return;
     }
 
     switch (entry->entry_type) {
         case STACK_ENTRY_INT:
-            PIO_eprintf(interpreter, "Integer\t=\t%8vi\n",
+            PIO_eprintf(interp, "Integer\t=\t%8vi\n",
                         UVal_int(entry->entry));
             break;
         case STACK_ENTRY_FLOAT:
-            PIO_eprintf(interpreter, "Float\t=\t%8.4vf\n",
+            PIO_eprintf(interp, "Float\t=\t%8.4vf\n",
                         UVal_num(entry->entry));
             break;
         case STACK_ENTRY_STRING:
-            PIO_eprintf(interpreter, "String =\n");
-            dump_string(interpreter, UVal_str(entry->entry));
+            PIO_eprintf(interp, "String =\n");
+            dump_string(interp, UVal_str(entry->entry));
             break;
         case STACK_ENTRY_PMC:
-            PIO_eprintf(interpreter, "PMC =\n%PS\n", UVal_ptr(entry->entry));
+            PIO_eprintf(interp, "PMC =\n%PS\n", UVal_ptr(entry->entry));
             break;
         case STACK_ENTRY_POINTER:
-            PIO_eprintf(interpreter, "POINTER\n");
+            PIO_eprintf(interp, "POINTER\n");
             break;
         case STACK_ENTRY_DESTINATION:
-            PIO_eprintf(interpreter, "DESTINATION\n");
+            PIO_eprintf(interp, "DESTINATION\n");
             break;
         default:
-            PIO_eprintf(interpreter, "Invalid stack_entry_type!\n");
+            PIO_eprintf(interp, "Invalid stack_entry_type!\n");
             break;
     }
 }
@@ -2142,27 +2142,27 @@ PDB_print_user_stack(Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_print(Interp *interpreter, const char *command)>
+PDB_print(Interp *interp, const char *command)>
 
-Print interpreter registers.
+Print interp registers.
 
 =cut
 
 */
 
 void
-PDB_print(Interp *interpreter, const char *command)
+PDB_print(Interp *interp, const char *command)
 {
     const char *s;
 
-    s = GDB_P(interpreter->pdb->debugee, command);
-    PIO_eprintf(interpreter, "%s\n", s);
+    s = GDB_P(interp->pdb->debugee, command);
+    PIO_eprintf(interp, "%s\n", s);
 }
 
 
 /*
 
-=item C<void PDB_info(Interp *interpreter)>
+=item C<void PDB_info(Interp *interp)>
 
 Print the interpreter info.
 
@@ -2171,40 +2171,40 @@ Print the interpreter info.
 */
 
 void
-PDB_info(Interp *interpreter)
+PDB_info(Interp *interp)
 {
-    PIO_eprintf(interpreter, "Total memory allocated = %d\n",
-            interpinfo(interpreter, TOTAL_MEM_ALLOC));
-    PIO_eprintf(interpreter, "DOD runs = %d\n",
-            interpinfo(interpreter, DOD_RUNS));
-    PIO_eprintf(interpreter, "Lazy DOD runs = %d\n",
-            interpinfo(interpreter, LAZY_DOD_RUNS));
-    PIO_eprintf(interpreter, "Collect runs = %d\n",
-            interpinfo(interpreter, COLLECT_RUNS));
-    PIO_eprintf(interpreter, "Collect memory = %d\n",
-            interpinfo(interpreter, TOTAL_COPIED));
-    PIO_eprintf(interpreter, "Active PMCs = %d\n",
-            interpinfo(interpreter, ACTIVE_PMCS));
-    PIO_eprintf(interpreter, "Extended PMCs = %d\n",
-            interpinfo(interpreter, EXTENDED_PMCS));
-    PIO_eprintf(interpreter, "Timely DOD PMCs = %d\n",
-            interpinfo(interpreter, IMPATIENT_PMCS));
-    PIO_eprintf(interpreter, "Total PMCs = %d\n",
-            interpinfo(interpreter, TOTAL_PMCS));
-    PIO_eprintf(interpreter, "Active buffers = %d\n",
-            interpinfo(interpreter, ACTIVE_BUFFERS));
-    PIO_eprintf(interpreter, "Total buffers = %d\n",
-            interpinfo(interpreter, TOTAL_BUFFERS));
-    PIO_eprintf(interpreter, "Header allocations since last collect = %d\n",
-            interpinfo(interpreter, HEADER_ALLOCS_SINCE_COLLECT));
-    PIO_eprintf(interpreter, "Memory allocations since last collect = %d\n",
-            interpinfo(interpreter, MEM_ALLOCS_SINCE_COLLECT));
+    PIO_eprintf(interp, "Total memory allocated = %d\n",
+            interpinfo(interp, TOTAL_MEM_ALLOC));
+    PIO_eprintf(interp, "DOD runs = %d\n",
+            interpinfo(interp, DOD_RUNS));
+    PIO_eprintf(interp, "Lazy DOD runs = %d\n",
+            interpinfo(interp, LAZY_DOD_RUNS));
+    PIO_eprintf(interp, "Collect runs = %d\n",
+            interpinfo(interp, COLLECT_RUNS));
+    PIO_eprintf(interp, "Collect memory = %d\n",
+            interpinfo(interp, TOTAL_COPIED));
+    PIO_eprintf(interp, "Active PMCs = %d\n",
+            interpinfo(interp, ACTIVE_PMCS));
+    PIO_eprintf(interp, "Extended PMCs = %d\n",
+            interpinfo(interp, EXTENDED_PMCS));
+    PIO_eprintf(interp, "Timely DOD PMCs = %d\n",
+            interpinfo(interp, IMPATIENT_PMCS));
+    PIO_eprintf(interp, "Total PMCs = %d\n",
+            interpinfo(interp, TOTAL_PMCS));
+    PIO_eprintf(interp, "Active buffers = %d\n",
+            interpinfo(interp, ACTIVE_BUFFERS));
+    PIO_eprintf(interp, "Total buffers = %d\n",
+            interpinfo(interp, TOTAL_BUFFERS));
+    PIO_eprintf(interp, "Header allocations since last collect = %d\n",
+            interpinfo(interp, HEADER_ALLOCS_SINCE_COLLECT));
+    PIO_eprintf(interp, "Memory allocations since last collect = %d\n",
+            interpinfo(interp, MEM_ALLOCS_SINCE_COLLECT));
 }
 
 /*
 
 =item C<void
-PDB_help(Interp *interpreter, const char *command)>
+PDB_help(Interp *interp, const char *command)>
 
 Print the help text. "Help" with no arguments prints a list of commands.
 "Help xxx" prints information on command xxx.
@@ -2214,7 +2214,7 @@ Print the help text. "Help" with no arguments prints a list of commands.
 */
 
 void
-PDB_help(Interp *interpreter, const char *command)
+PDB_help(Interp *interp, const char *command)
 {
     unsigned long c;
     const char* temp;
@@ -2224,25 +2224,25 @@ PDB_help(Interp *interpreter, const char *command)
 
     switch (c) {
         case c_disassemble:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interp,"No documentation yet");
             break;
         case c_load:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interp,"No documentation yet");
             break;
         case c_list:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
             "List the source code.\n\n\
 Optionally specify the line number to begin the listing from and the number\n\
 of lines to display.\n");
             break;
         case c_run:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
             "Run (or restart) the program being debugged.\n\n\
 Arguments specified after \"run\" are passed as command line arguments to\n\
 the program.\n");
             break;
         case c_break:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
 "Set a breakpoint at a given line number (which must be specified).\n\n\
 Optionally, specify a condition, in which case the breakpoint will only\n\
 activate if the condition is met. Conditions take the form:\n\n\
@@ -2254,27 +2254,27 @@ For example:\n\n\
 The command returns a number which is the breakpoint identifier.");
             break;
         case c_watch:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interp,"No documentation yet");
             break;
         case c_delete:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
 "Delete a breakpoint.\n\n\
 The breakpoint to delete must be specified by its breakpoint number.\n\
 Deleted breakpoints are gone completely. If instead you want to\n\
 temporarily disable a breakpoint, use \"disable\".\n");
             break;
         case c_disable:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
 "Disable a breakpoint.\n\n\
 The breakpoint to disable must be specified by its breakpoint number.\n\
 Disabled breakpoints are not forgotten, but have no effect until re-enabled\n\
 with the \"enable\" command.\n");
             break;
         case c_enable:
-            PIO_eprintf(interpreter,"Re-enable a disabled breakpoint.\n");
+            PIO_eprintf(interp,"Re-enable a disabled breakpoint.\n");
             break;
         case c_continue:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
 "Continue the program execution.\n\n\
 Without arguments, the program runs until a breakpoint is found\n\
 (or until the program terminates for some other reason).\n\n\
@@ -2283,7 +2283,7 @@ If the program has terminated, then \"continue\" will do nothing;\n\
 use \"run\" to re-run the program.\n");
             break;
         case c_next:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
 "Execute a specified number of instructions.\n\n\
 If a number is specified with the command (e.g. \"next 5\"), then\n\
 execute that number of instructions, unless the program reaches a\n\
@@ -2291,30 +2291,30 @@ breakpoint, or stops for some other reason.\n\n\
 If no number is specified, it defaults to 1.\n");
             break;
         case c_eval:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interp,"No documentation yet");
             break;
         case c_trace:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
 "Similar to \"next\", but prints additional trace information.\n\
 This is the same as the information you get when running Parrot with\n\
 the -t option.\n");
             break;
         case c_print:
-            PIO_eprintf(interpreter,"Print register: e.g. p I2\n");
+            PIO_eprintf(interp,"Print register: e.g. p I2\n");
             break;
         case c_info:
-            PIO_eprintf(interpreter,
+            PIO_eprintf(interp,
                     "Print information about the current interpreter\n");
             break;
         case c_quit:
-            PIO_eprintf(interpreter, "Exit the debugger.\n");
+            PIO_eprintf(interp, "Exit the debugger.\n");
             break;
         case c_help:
-            PIO_eprintf(interpreter, "Print a list of available commands.\n");
+            PIO_eprintf(interp, "Print a list of available commands.\n");
             break;
         case 0:
             /* C89: strings need to be 509 chars or less */
-            PIO_eprintf(interpreter, "\
+            PIO_eprintf(interp, "\
 List of commands:\n\
     disassemble -- disassemble the bytecode\n\
     load -- load a source code file\n\
@@ -2326,7 +2326,7 @@ List of commands:\n\
     disable -- disable a breakpoint\n\
     enable  -- reenable a disabled breakpoint\n\
     continue (c) -- continue the program execution\n");
-            PIO_eprintf(interpreter, "\
+            PIO_eprintf(interp, "\
     next (n) -- run the next instruction\n\
     eval (e) -- run an instruction\n\
     trace (t) -- trace the next instruction\n\
@@ -2338,7 +2338,7 @@ List of commands:\n\
 Type \"help\" followed by a command name for full documentation.\n\n");
             break;
         default:
-            PIO_eprintf(interpreter, "Unknown command: \"%s\".", temp);
+            PIO_eprintf(interp, "Unknown command: \"%s\".", temp);
             break;
     }
 }
@@ -2346,16 +2346,16 @@ Type \"help\" followed by a command name for full documentation.\n\n");
 /*
 
 =item C<void
-PDB_backtrace(Interp *interpreter)>
+PDB_backtrace(Interp *interp)>
 
-Prints a backtrace of the interpreter's call chain.
+Prints a backtrace of the interp's call chain.
 
 =cut
 
 */
 
 void
-PDB_backtrace(Interp *interpreter)
+PDB_backtrace(Interp *interp)
 {
     STRING *str;
     PMC *sub;
@@ -2364,12 +2364,12 @@ PDB_backtrace(Interp *interpreter)
     parrot_context_t *ctx;
 
     /* information about the current sub */
-    sub = interpinfo_p(interpreter, CURRENT_SUB);
-    ctx = CONTEXT(interpreter->ctx);
+    sub = interpinfo_p(interp, CURRENT_SUB);
+    ctx = CONTEXT(interp->ctx);
     if (!PMC_IS_NULL(sub)) {
-        str = Parrot_Context_infostr(interpreter, ctx);
+        str = Parrot_Context_infostr(interp, ctx);
         if (str)
-            PIO_eprintf(interpreter, "%Ss\n", str);
+            PIO_eprintf(interp, "%Ss\n", str);
     }
 
     /* backtrace: follow the continuation chain */
@@ -2381,7 +2381,7 @@ PDB_backtrace(Interp *interpreter)
         sub_cont = PMC_cont(sub);
         if (!sub_cont)
             break;
-        str = Parrot_Context_infostr(interpreter, sub_cont->to_ctx);
+        str = Parrot_Context_infostr(interp, sub_cont->to_ctx);
         if (!str)
             break;
 
@@ -2393,13 +2393,13 @@ PDB_backtrace(Interp *interpreter)
             PMC_cont(sub)->to_ctx->current_sub) {
                 ++rec_level;
         } else if (rec_level != 0) {
-            PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);
+            PIO_eprintf(interp, "... call repeated %d times\n", rec_level);
             rec_level = 0;
         }
 
         /* print the context description */
         if (rec_level == 0)
-            PIO_eprintf(interpreter, "%Ss\n", str);
+            PIO_eprintf(interp, "%Ss\n", str);
 
         /* get the next Continuation */
         ctx = PMC_cont(sub)->to_ctx;
@@ -2408,7 +2408,7 @@ PDB_backtrace(Interp *interpreter)
             break;
     }
     if (rec_level != 0) {
-        PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);
+        PIO_eprintf(interp, "... call repeated %d times\n", rec_level);
     }
 }
 
@@ -2421,7 +2421,7 @@ PDB_backtrace(Interp *interpreter)
  */
 
 static const char*
-GDB_P(Interp *interpreter, const char *s) {
+GDB_P(Interp *interp, const char *s) {
     int t, n;
     switch (*s) {
         case 'I': t = REGNO_INT; break;
@@ -2435,17 +2435,17 @@ GDB_P(Interp *interpreter, const char *s) {
     else
         return "no such reg";
 
-    if (n >= 0 && n < CONTEXT(interpreter->ctx)->n_regs_used[t]) {
+    if (n >= 0 && n < CONTEXT(interp->ctx)->n_regs_used[t]) {
         switch (t) {
             case REGNO_INT:
-                return string_from_int(interpreter, REG_INT(n))->strstart;
+                return string_from_int(interp, REG_INT(n))->strstart;
             case REGNO_NUM:
-                return string_from_num(interpreter, REG_NUM(n))->strstart;
+                return string_from_num(interp, REG_NUM(n))->strstart;
             case REGNO_STR:
                 return REG_STR(n)->strstart;
             case REGNO_PMC:
                 /* prints directly */
-                trace_pmc_dump(interpreter, REG_PMC(n));
+                trace_pmc_dump(interp, REG_PMC(n));
                 return "";
         }
     }
@@ -2466,7 +2466,7 @@ static PDB_breakpoint_t *gdb_bps;
  *
  */
 static int
-GDB_B(Interp *interpreter, char *s) {
+GDB_B(Interp *interp, char *s) {
     PDB_breakpoint_t *bp, *newbreak;
     int nr;
     opcode_t *pc;
@@ -2475,7 +2475,7 @@ GDB_B(Interp *interpreter, char *s) {
         /* HACK alarm  pb 45 is passed as the integer not a string */
         unsigned long offs = (unsigned long)s;
         /* TODO check if in bounds */
-        pc = interpreter->code->base.data + offs;
+        pc = interp->code->base.data + offs;
 
         if (!gdb_bps) {
             nr = 0;

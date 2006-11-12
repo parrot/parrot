@@ -22,7 +22,7 @@ These are the vtable functions for the Array base class.
 
 /*
 
-=item C<static PMC* undef(Interp* interpreter)>
+=item C<static PMC* undef(Interp* interp)>
 
 Returns a C<Undef> PMC.
 
@@ -30,9 +30,9 @@ Returns a C<Undef> PMC.
 
 */
 
-static PMC* undef(Interp* interpreter)
+static PMC* undef(Interp* interp)
 {
-    return pmc_new(interpreter, enum_class_Undef);
+    return pmc_new(interp, enum_class_Undef);
 }
 
 /*

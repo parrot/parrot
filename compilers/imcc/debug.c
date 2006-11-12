@@ -101,7 +101,7 @@ IMCC_debug(Parrot_Interp interp, int level, const char *fmt, ...)
 }
 
 void
-dump_instructions(Interp *interpreter, IMC_Unit * unit)
+dump_instructions(Interp *interp, IMC_Unit * unit)
 {
     Instruction *ins;
     Basic_block *bb;
@@ -125,7 +125,7 @@ dump_instructions(Interp *interpreter, IMC_Unit * unit)
              fprintf(stderr, "\t");
         }
 
-        imcc_fprintf(interpreter, stderr, "%I\n", ins);
+        imcc_fprintf(interp, stderr, "%I\n", ins);
         pc += ins->opsize;
     }
     fprintf(stderr, "\n");

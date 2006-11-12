@@ -42,7 +42,7 @@ class method.
 */
 
     METHOD INTVAL say(STRING *s) {
-        PMC *out = SELF == interpreter->vtables[enum_class_ParrotIO]->class ?
+        PMC *out = SELF == interp->vtables[enum_class_ParrotIO]->class ?
             PIO_STDOUT(INTERP) : SELF;
         INTVAL r = PIO_putps(INTERP, out, s);
         r  += PIO_puts(INTERP, out, "\n");
@@ -77,7 +77,7 @@ Opens the file with the given mode, using the given IO layer.
              * XXX move this into the layer
              */
             if ((is_mmap && (io->b.flags & PIO_BF_MMAP)) || !is_mmap) {
-                l = interpreter->piodata->default_stack;
+                l = interp->piodata->default_stack;
                 if (!strcmp(l->name, "buf"))
                     l = l->down;
                 /* XXX layer is stored twice - which is used when */
@@ -86,7 +86,7 @@ Opens the file with the given mode, using the given IO layer.
                 PIO_push_layer_str(INTERP, pio, layer);
             }
             else {
-                l = interpreter->piodata->default_stack;
+                l = interp->piodata->default_stack;
                 io->stack = PMC_struct_val(pio) = l;
             }
         }
@@ -192,8 +192,8 @@ SYNOPSIS
 #endif
         {
             if (!(io->flags & PIO_F_LINEBUF))
-                PIO_setlinebuf(interpreter, SELF);
-            res = PIO_reads(interpreter, SELF, 0);
+                PIO_setlinebuf(interp, SELF);
+            res = PIO_reads(interp, SELF, 0);
             if (!res)
                 return res;
             /* readline should better return the string w/o NL */
@@ -239,7 +239,7 @@ This does B<not> close the file.
         STRING* result;
         if (!PMC_data0(SELF)) {
             /* called as class method - open, slurp, close file */
-            char * const path = string_to_cstring(interpreter, name);
+            char * const path = string_to_cstring(interp, name);
             INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);
             PMC* pio = PIO_open(INTERP, NULL, path, "<");
             string_cstring_free(path);
@@ -252,7 +252,7 @@ This does B<not> close the file.
             /* slurp open file */
             STRING *part;
             if (!PMC_data(SELF))
-                real_exception(interpreter, NULL, PIO_ERROR,
+                real_exception(interp, NULL, PIO_ERROR,
                         "Cannot slurp from empty filehandle");
             result = NULL;
             do {

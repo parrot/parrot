@@ -204,7 +204,7 @@ for C<add_free_object>, C<get_free_object>, C<alloc_objects>, and
 C<more_objects>.
 
 
-=item C<void Parrot_gc_gms_init(Interp* interpreter)>
+=item C<void Parrot_gc_gms_init(Interp* interp)>
 
 Initialize the state structures of the gc system. Called immediately before
 creation of memory pools.
@@ -214,11 +214,11 @@ creation of memory pools.
 */
 
 static void
-parrot_gc_gms_deinit(Interp* interpreter)
+parrot_gc_gms_deinit(Interp* interp)
 {
     struct Arenas *arena_base;
 
-    arena_base = interpreter->arena_base;
+    arena_base = interp->arena_base;
     /*
      * TODO free generations
      */
@@ -227,7 +227,7 @@ parrot_gc_gms_deinit(Interp* interpreter)
 }
 
 static void
-gc_gms_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
+gc_gms_pool_init(Interp *interp, struct Small_Object_Pool *pool)
 {
     pool->add_free_object = gc_gms_add_free_object;
     pool->get_free_object = gc_gms_get_free_object;
@@ -235,19 +235,19 @@ gc_gms_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
     pool->more_objects    = gc_gms_more_objects;
 
     /* initialize generations */
-    gc_gms_init_gen(interpreter, pool);
+    gc_gms_init_gen(interp, pool);
     pool->white = pool->white_fin = pool->free_list = &pool->marker;
 
     pool->object_size += sizeof(Gc_gms_hdr);
 }
 
 void
-Parrot_gc_gms_init(Interp* interpreter)
+Parrot_gc_gms_init(Interp* interp)
 {
     struct Arenas *arena_base;
     struct Small_Object_Pool *pool;
 
-    arena_base = interpreter->arena_base;
+    arena_base = interp->arena_base;
     arena_base->gc_private = mem_sys_allocate_zeroed(sizeof(Gc_gms_private));
 
     /*
@@ -293,7 +293,7 @@ Run a GC cycle or allocate new objects for the given pool.
 */
 
 static void
-gc_gms_add_free_object(Interp *interpreter,
+gc_gms_add_free_object(Interp *interp,
         struct Small_Object_Pool *pool, void *to_add)
 {
     internal_exception(1, "gms abuse");
@@ -337,7 +337,7 @@ gc_gms_add_free_object(Interp *interpreter,
  */
 
 static void
-gc_gms_chain_objects(Interp *interpreter,
+gc_gms_chain_objects(Interp *interp,
         struct Small_Object_Pool *pool,
         struct Small_Object_Arena *new_arena,
         size_t real_size)
@@ -386,7 +386,7 @@ gc_gms_chain_objects(Interp *interpreter,
 }
 
 static void
-gc_gms_alloc_objects(Interp *interpreter,
+gc_gms_alloc_objects(Interp *interp,
         struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
@@ -398,9 +398,9 @@ gc_gms_alloc_objects(Interp *interpreter,
     size = real_size * pool->objects_per_alloc;
     new_arena->start_objects = mem_internal_allocate(size);
     /* insert arena in list */
-    Parrot_append_arena_in_pool(interpreter, pool, new_arena, size);
+    Parrot_append_arena_in_pool(interp, pool, new_arena, size);
     /* create chain of objects, set free pointer */
-    gc_gms_chain_objects(interpreter, pool, new_arena, real_size);
+    gc_gms_chain_objects(interp, pool, new_arena, real_size);
 
     /* allocate more next time */
     pool->objects_per_alloc = (UINTVAL) pool->objects_per_alloc *
@@ -412,20 +412,20 @@ gc_gms_alloc_objects(Interp *interpreter,
 }
 
 static void
-gc_gms_more_objects(Interp *interpreter,
+gc_gms_more_objects(Interp *interp,
         struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *arena;
     if (pool->skip)
         pool->skip = 0;
     else if (pool->last_Arena) {
-        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+        Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
         if (pool->num_free_objects <= pool->replenish_level)
             pool->skip = 1;
     }
 
     if (pool->free_list == &pool->marker) {
-        (*pool->alloc_objects) (interpreter, pool);
+        (*pool->alloc_objects) (interp, pool);
     }
 }
 
@@ -435,7 +435,7 @@ gc_gms_more_objects(Interp *interpreter,
  */
 
 static void *
-gc_gms_get_free_object(Interp *interpreter,
+gc_gms_get_free_object(Interp *interp,
         struct Small_Object_Pool *pool)
 {
     PObj *ptr;
@@ -443,7 +443,7 @@ gc_gms_get_free_object(Interp *interpreter,
 
     hdr = pool->free_list;
     if (hdr == &pool->marker)
-        (pool->more_objects)(interpreter, pool);
+        (pool->more_objects)(interp, pool);
 
     hdr = pool->free_list;
     pool->free_list = hdr->next;
@@ -495,7 +495,7 @@ Initalize the generation system by creating the first two generations.
  */
 
 static Gc_gms_gen *
-gc_gms_create_gen(Interp *interpreter,
+gc_gms_create_gen(Interp *interp,
         struct Small_Object_Pool *pool, size_t gen_no)
 {
     Gc_gms_gen *gen;
@@ -512,7 +512,7 @@ gc_gms_create_gen(Interp *interpreter,
 }
 
 static void
-gc_gms_init_gen(Interp *interpreter,
+gc_gms_init_gen(Interp *interp,
         struct Small_Object_Pool *pool)
 {
     Gc_gms_private *gmsp;
@@ -525,9 +525,9 @@ gc_gms_init_gen(Interp *interpreter,
      * items, these items can be placed in the constant generation 0
      * XXX: OTOH this would work only for this GC subsystem.
      */
-    pool->first_gen = gc_gms_create_gen(interpreter, pool, 0);
+    pool->first_gen = gc_gms_create_gen(interp, pool, 0);
     pool->last_gen = pool->first_gen;
-    gmsp = interpreter->arena_base->gc_private;
+    gmsp = interp->arena_base->gc_private;
     gmsp->current_gen_no = 0;
 }
 
@@ -545,7 +545,7 @@ to other items, and promote it to the old generation.
 */
 
 static Gc_gms_gen *
-gc_gms_find_gen(Interp *interpreter, Gc_gms_hdr *h, UINTVAL gen_no)
+gc_gms_find_gen(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
     struct Small_Object_Pool *pool;
@@ -572,7 +572,7 @@ gc_gms_find_gen(Interp *interpreter, Gc_gms_hdr *h, UINTVAL gen_no)
 }
 
 static void
-gc_gms_promote(Interp *interpreter, Gc_gms_hdr *h, UINTVAL gen_no)
+gc_gms_promote(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
     Gc_gms_hdr *prev, *next;
@@ -589,7 +589,7 @@ gc_gms_promote(Interp *interpreter, Gc_gms_hdr *h, UINTVAL gen_no)
     next->prev = prev;
 
     /* locate generation pointer */
-    gen = gc_gms_find_gen(interpreter, h, gen_no);
+    gen = gc_gms_find_gen(interp, h, gen_no);
     assert(gen->last);
     assert(gen->first);
 
@@ -605,12 +605,12 @@ gc_gms_promote(Interp *interpreter, Gc_gms_hdr *h, UINTVAL gen_no)
     prev->next = h;
     next->prev = h;
 #if GC_GMS_DEBUG
-    gms_debug_verify(interpreter, pool, "promote");
+    gms_debug_verify(interp, pool, "promote");
 #endif
 }
 
 static void
-gc_gms_store_hdr_list(Interp *interpreter, Gc_gms_hdr_list *l, Gc_gms_hdr *h)
+gc_gms_store_hdr_list(Interp *interp, Gc_gms_hdr_list *l, Gc_gms_hdr *h)
 {
     Gc_gms_hdr_store *s = l->last;
 
@@ -633,7 +633,7 @@ gc_gms_store_hdr_list(Interp *interpreter, Gc_gms_hdr_list *l, Gc_gms_hdr *h)
 }
 
 static void
-gc_gms_clear_hdr_list(Interp *interpreter, Gc_gms_hdr_list *l)
+gc_gms_clear_hdr_list(Interp *interp, Gc_gms_hdr_list *l)
 {
     Gc_gms_hdr_store *s, *next;
 
@@ -645,27 +645,27 @@ gc_gms_clear_hdr_list(Interp *interpreter, Gc_gms_hdr_list *l)
 }
 
 static void
-gc_gms_store_igp(Interp *interpreter, Gc_gms_hdr *h)
+gc_gms_store_igp(Interp *interp, Gc_gms_hdr *h)
 {
     Gc_gms_gen *gen;
     Gc_gms_hdr_list *igp;
 
     gen = h->gen;
     igp = &gen->igp;
-    gc_gms_store_hdr_list(interpreter, igp, h);
+    gc_gms_store_hdr_list(interp, igp, h);
 }
 
 static void
-gc_gms_clear_igp(Interp *interpreter, Gc_gms_gen *gen)
+gc_gms_clear_igp(Interp *interp, Gc_gms_gen *gen)
 {
     Gc_gms_hdr_list *igp;
 
     igp = &gen->igp;
-    gc_gms_clear_hdr_list(interpreter, igp);
+    gc_gms_clear_hdr_list(interp, igp);
 }
 
 void
-parrot_gc_gms_wb(Interp *interpreter, PMC *agg, void *old, void *new)
+parrot_gc_gms_wb(Interp *interp, PMC *agg, void *old, void *new)
 {
     Gc_gms_hdr *nh, *ah;
 
@@ -676,10 +676,10 @@ parrot_gc_gms_wb(Interp *interpreter, PMC *agg, void *old, void *new)
      * it a possible root for this generation
      */
     if (PObj_is_PMC_TEST((PObj*)new) && ((PMC*)new)->pmc_ext)
-        gc_gms_store_igp(interpreter, nh);
+        gc_gms_store_igp(interp, nh);
 
     /* promote RHS to old generation of aggregate */
-    gc_gms_promote(interpreter, nh, ah->gen->gen_no);
+    gc_gms_promote(interp, nh, ah->gen->gen_no);
 
     /*
      * TODO check old - its overwritten, increment overwrite count,
@@ -689,13 +689,13 @@ parrot_gc_gms_wb(Interp *interpreter, PMC *agg, void *old, void *new)
 }
 
 void
-parrot_gc_gms_wb_key(Interp *interpreter, PMC *agg,
+parrot_gc_gms_wb_key(Interp *interp, PMC *agg,
         void *old, void *old_key, void *new, void *new_key)
 {
     Gc_gms_hdr *nh, *ah;
 
     /* handle hash values */
-    parrot_gc_gms_wb(interpreter, agg, old, new);
+    parrot_gc_gms_wb(interp, agg, old, new);
 
     /* if hash keys are PObj* then promote new key too */
 
@@ -705,7 +705,7 @@ parrot_gc_gms_wb_key(Interp *interpreter, PMC *agg,
     ah = PObj_to_GMSH(agg);
 
     /* promote new key to old generation of aggregate */
-    gc_gms_promote(interpreter, nh, ah->gen->gen_no);
+    gc_gms_promote(interp, nh, ah->gen->gen_no);
 }
 
 typedef struct {
@@ -714,7 +714,7 @@ typedef struct {
 } Gc_gms_plan;
 
 static void
-gc_gms_merge_gen(Interp *interpreter, struct Small_Object_Pool *pool,
+gc_gms_merge_gen(Interp *interp, struct Small_Object_Pool *pool,
         int flag, Gc_gms_plan *plan)
 {
     Gc_gms_gen *gen, *prev;
@@ -735,11 +735,11 @@ gc_gms_merge_gen(Interp *interpreter, struct Small_Object_Pool *pool,
     /*
      * clear IGP for gen
      */
-    gc_gms_clear_igp(interpreter, gen);
+    gc_gms_clear_igp(interp, gen);
 }
 
 static void
-gc_gms_use_gen(Interp *interpreter, struct Small_Object_Pool *pool,
+gc_gms_use_gen(Interp *interp, struct Small_Object_Pool *pool,
         int flag, Gc_gms_plan *plan)
 {
     Gc_gms_gen *gen, *prev;
@@ -753,32 +753,32 @@ gc_gms_use_gen(Interp *interpreter, struct Small_Object_Pool *pool,
 
     /* create and append a new generation */
     next_gen = plan->gen_no + 1;
-    gen = gc_gms_create_gen(interpreter, pool, next_gen);
+    gen = gc_gms_create_gen(interp, pool, next_gen);
     prev = pool->last_gen;
     pool->last_gen = gen;
     prev->next = gen;
     gen->prev = prev;
 
     /* set generation in interpreter */
-    interpreter->gc_generation = next_gen;
+    interp->gc_generation = next_gen;
 
 }
 
 static int
-set_gen_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+set_gen_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
     Gc_gms_plan *plan = (Gc_gms_plan *)arg;
 
     if (plan->merge_gen)
-        gc_gms_merge_gen(interpreter, pool, flag, plan);
+        gc_gms_merge_gen(interp, pool, flag, plan);
     else
-        gc_gms_use_gen(interpreter, pool, flag, plan);
+        gc_gms_use_gen(interp, pool, flag, plan);
     return 0;
 }
 
 static void
-gc_gms_set_gen(Interp *interpreter)
+gc_gms_set_gen(Interp *interp)
 {
     Gc_gms_plan plan;
     Gc_gms_private *gmsp;
@@ -800,14 +800,14 @@ gc_gms_set_gen(Interp *interpreter)
      *      3) and 4) need to reset live flags of the previous generation(s)
      *      or better use the per-generation black_color for marking
      */
-    gmsp = interpreter->arena_base->gc_private;
+    gmsp = interp->arena_base->gc_private;
     plan.merge_gen = 0;
     plan.gen_no = gmsp->current_gen_no;
     if (gmsp->current_gen_no > 0)
         plan.merge_gen = 1;
     else
         gmsp->current_gen_no = 1;
-    Parrot_forall_header_pools(interpreter, POOL_ALL, &plan, set_gen_cb);
+    Parrot_forall_header_pools(interp, POOL_ALL, &plan, set_gen_cb);
 }
 
 /*
@@ -871,7 +871,7 @@ Set the white header C<h> to black.
 
 
 static void
-gc_gms_setto_gray(Interp *interpreter, Gc_gms_hdr *h, int priority)
+gc_gms_setto_gray(Interp *interp, Gc_gms_hdr *h, int priority)
 {
     struct Small_Object_Pool *pool;
     Gc_gms_hdr *next, *prev;
@@ -919,7 +919,7 @@ gc_gms_setto_gray(Interp *interpreter, Gc_gms_hdr *h, int priority)
     assert(h != pool->white);
     /* verify all these pointer moves */
 #if GC_GMS_DEBUG
-    gms_debug_verify(interpreter, pool, "to_gray");
+    gms_debug_verify(interp, pool, "to_gray");
 #endif
 }
 
@@ -938,7 +938,7 @@ gc_gms_setto_gray(Interp *interpreter, Gc_gms_hdr *h, int priority)
 */
 
 static void
-gc_gms_setto_black(Interp *interpreter, Gc_gms_hdr *h, int priority)
+gc_gms_setto_black(Interp *interp, Gc_gms_hdr *h, int priority)
 {
     struct Small_Object_Pool *pool;
     Gc_gms_hdr *next, *prev;
@@ -982,7 +982,7 @@ gc_gms_setto_black(Interp *interpreter, Gc_gms_hdr *h, int priority)
     assert(h != pool->white);
     assert(h != pool->gray);
 #if GC_GMS_DEBUG
-    gms_debug_verify(interpreter, pool, "to_black");
+    gms_debug_verify(interp, pool, "to_black");
 #endif
 }
 
@@ -1014,7 +1014,7 @@ Free unused resources, put white objects onto free_list.
 */
 
 void
-parrot_gc_gms_pobject_lives(Interp* interpreter, PObj *obj)
+parrot_gc_gms_pobject_lives(Interp* interp, PObj *obj)
 {
     Gc_gms_hdr *h;
     int priority;
@@ -1022,41 +1022,41 @@ parrot_gc_gms_pobject_lives(Interp* interpreter, PObj *obj)
     PObj_live_SET(obj);
     priority =  PObj_needs_early_DOD_TEST(obj);
     if (priority)
-        ++interpreter->arena_base->num_early_PMCs_seen;
+        ++interp->arena_base->num_early_PMCs_seen;
     h = PObj_to_GMSH(obj);
     /* unsnap it from white, put it into grey or black */
     if (PObj_is_PMC_TEST(obj) && ((PMC*)obj)->pmc_ext)
-        gc_gms_setto_gray(interpreter, h, priority);
+        gc_gms_setto_gray(interp, h, priority);
     else
-        gc_gms_setto_black(interpreter, h, priority);
+        gc_gms_setto_black(interp, h, priority);
 }
 
 static int
-init_mark_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+init_mark_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
     pool->gray = pool->black = pool->black_fin = pool->white;
 #if GC_GMS_DEBUG
-    gms_debug_verify(interpreter, pool, "init_mark");
+    gms_debug_verify(interp, pool, "init_mark");
 #endif
     return 0;
 }
 
 static void
-gc_gms_init_mark(Interp *interpreter)
+gc_gms_init_mark(Interp *interp)
 {
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
 
     arena_base->dod_trace_ptr = NULL;
     arena_base->dod_mark_start = NULL;
     arena_base->num_early_PMCs_seen = 0;
     arena_base->num_extended_PMCs = 0;
 
-    Parrot_forall_header_pools(interpreter, POOL_ALL, 0, init_mark_cb);
+    Parrot_forall_header_pools(interp, POOL_ALL, 0, init_mark_cb);
 }
 
 static int
-trace_igp_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+trace_igp_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
     Gc_gms_gen *gen;
@@ -1070,21 +1070,21 @@ trace_igp_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
     for (s = igp->first; s; s = s->next) {
         for (p = s->store; p < s->ptr; ++p) {
             h = *p;
-            pobject_lives(interpreter, GMSH_to_PObj(h));
+            pobject_lives(interp, GMSH_to_PObj(h));
         }
     }
     return 0;
 }
 
 static int
-gc_gms_trace_root(Interp *interpreter, int trace_stack)
+gc_gms_trace_root(Interp *interp, int trace_stack)
 {
     int ret;
 
-    ret = Parrot_dod_trace_root(interpreter, trace_stack);
+    ret = Parrot_dod_trace_root(interp, trace_stack);
     if (ret == 0)
         return 0;
-    Parrot_forall_header_pools(interpreter, POOL_ALL, 0, trace_igp_cb);
+    Parrot_forall_header_pools(interp, POOL_ALL, 0, trace_igp_cb);
     return ret;
 }
 
@@ -1110,10 +1110,10 @@ gc_gms_trace_root(Interp *interpreter, int trace_stack)
 */
 
 static int
-trace_children_cb(Interp *interpreter, struct Small_Object_Pool *pool,
+trace_children_cb(Interp *interp, struct Small_Object_Pool *pool,
         int flag, void *arg)
 {
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
     int lazy_dod = arena_base->lazy_dod;
     UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
     Gc_gms_hdr *h;
@@ -1141,14 +1141,14 @@ trace_children_cb(Interp *interpreter, struct Small_Object_Pool *pool,
                 if (data) {
                     for (i = 0; i < PMC_int_val(current); i++) {
                         if (data[i]) {
-                            pobject_lives(interpreter, (PObj *)data[i]);
+                            pobject_lives(interp, (PObj *)data[i]);
                         }
                     }
                 }
             }
             else {
                 /* All that's left is the custom */
-                VTABLE_mark(interpreter, current);
+                VTABLE_mark(interp, current);
             }
         }
         if (h != pool->gray) {
@@ -1164,9 +1164,9 @@ trace_children_cb(Interp *interpreter, struct Small_Object_Pool *pool,
 }
 
 static int
-gc_gms_trace_children(Interp *interpreter)
+gc_gms_trace_children(Interp *interp)
 {
-    return !Parrot_forall_header_pools(interpreter, POOL_PMC, 0,
+    return !Parrot_forall_header_pools(interp, POOL_PMC, 0,
             trace_children_cb);
 }
 
@@ -1176,11 +1176,11 @@ gc_gms_trace_children(Interp *interpreter)
  * TODO put these in front of the pool at pool->white_fin
  */
 static int
-sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool,
+sweep_cb_pmc(Interp *interp, struct Small_Object_Pool *pool,
         int flag, void *arg)
 {
     Gc_gms_hdr *h;
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
 
     /* TODO object stats */
 
@@ -1189,13 +1189,13 @@ sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool,
         if (PObj_needs_early_DOD_TEST(obj))
             --arena_base->num_early_DOD_PMCs;
         if (PObj_active_destroy_TEST(obj))
-            VTABLE_destroy(interpreter, (PMC *)obj);
+            VTABLE_destroy(interp, (PMC *)obj);
         if (PObj_is_PMC_EXT_TEST(obj) && obj->pmc_ext) {
             /* if the PMC has a PMC_EXT structure,
              * return it to the pool
              */
             struct Small_Object_Pool *ext_pool = arena_base->pmc_ext_pool;
-            ext_pool->add_free_object(interpreter, ext_pool, obj->pmc_ext);
+            ext_pool->add_free_object(interp, ext_pool, obj->pmc_ext);
         }
 
     }
@@ -1204,7 +1204,7 @@ sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool,
 }
 
 static int
-sweep_cb_buf(Interp *interpreter, struct Small_Object_Pool *pool,
+sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool,
         int flag, void *arg)
 {
     Gc_gms_hdr *h;
@@ -1262,14 +1262,14 @@ sweep_cb_buf(Interp *interpreter, struct Small_Object_Pool *pool,
 }
 
 static void
-gc_gms_sweep(Interp *interpreter)
+gc_gms_sweep(Interp *interp)
 {
-    Parrot_forall_header_pools(interpreter, POOL_PMC, 0, sweep_cb_pmc);
-    Parrot_forall_header_pools(interpreter, POOL_BUFFER, 0, sweep_cb_buf);
+    Parrot_forall_header_pools(interp, POOL_PMC, 0, sweep_cb_pmc);
+    Parrot_forall_header_pools(interp, POOL_BUFFER, 0, sweep_cb_buf);
 }
 
 static int
-end_cycle_cb(Interp *interpreter, struct Small_Object_Pool *pool,
+end_cycle_cb(Interp *interp, struct Small_Object_Pool *pool,
         int flag, void *arg)
 {
     Gc_gms_hdr *h;
@@ -1286,9 +1286,9 @@ end_cycle_cb(Interp *interpreter, struct Small_Object_Pool *pool,
 }
 
 static void
-gc_gms_end_cycle(Interp *interpreter)
+gc_gms_end_cycle(Interp *interp)
 {
-    Parrot_forall_header_pools(interpreter, POOL_ALL, 0, end_cycle_cb);
+    Parrot_forall_header_pools(interp, POOL_ALL, 0, end_cycle_cb);
 }
 /*
 
@@ -1311,10 +1311,10 @@ Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 */
 
 static void
-parrot_gc_gms_run(Interp *interpreter, int flags)
+parrot_gc_gms_run(Interp *interp, int flags)
 {
     int lazy;
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
     Gc_gms_private *g_gms;
 
     if (arena_base->DOD_block_level) {
@@ -1328,8 +1328,8 @@ parrot_gc_gms_run(Interp *interpreter, int flags)
         pool = arena_base->pmc_pool;
         pool->white = pool->marker.next;
         /* XXX need to sweep over objects that have finalizers only */
-        Parrot_forall_header_pools(interpreter, POOL_PMC, 0, sweep_cb_pmc);
-        gc_gms_end_cycle(interpreter);
+        Parrot_forall_header_pools(interp, POOL_PMC, 0, sweep_cb_pmc);
+        gc_gms_end_cycle(interp);
         --arena_base->DOD_block_level;
         return;
     }
@@ -1337,11 +1337,11 @@ parrot_gc_gms_run(Interp *interpreter, int flags)
     /* normal or lazy DOD run */
     arena_base->dod_runs++;
     arena_base->lazy_dod = (flags & DOD_lazy_FLAG);
-    gc_gms_init_mark(interpreter);
-    if (gc_gms_trace_root(interpreter, !arena_base->lazy_dod) &&
-            gc_gms_trace_children(interpreter)) {
-        gc_gms_sweep(interpreter);
-        gc_gms_set_gen(interpreter);
+    gc_gms_init_mark(interp);
+    if (gc_gms_trace_root(interp, !arena_base->lazy_dod) &&
+            gc_gms_trace_children(interp)) {
+        gc_gms_sweep(interp);
+        gc_gms_set_gen(interp);
     }
     else {
         /*
@@ -1349,13 +1349,13 @@ parrot_gc_gms_run(Interp *interpreter, int flags)
          */
         ++arena_base->lazy_dod_runs;
     }
-    gc_gms_end_cycle(interpreter);
+    gc_gms_end_cycle(interp);
     --arena_base->DOD_block_level;
 }
 
 #if GC_GMS_DEBUG
 static void
-gms_debug_verify(Interp *interpreter, struct Small_Object_Pool *pool,
+gms_debug_verify(Interp *interp, struct Small_Object_Pool *pool,
         const char *action)
 {
     Gc_gms_hdr *h, *next;

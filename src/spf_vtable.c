@@ -29,7 +29,7 @@ retrieve arguments.
 /*
 
 =item C<static STRING *
-getchr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getchr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets a C<char> out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -41,20 +41,20 @@ C<size> is unused.
 */
 
 static STRING *
-getchr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getchr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list *arg = (va_list *)(obj->data);
 
     /* char promoted to int */
     char ch = (char)va_arg(*arg, int);
 
-    return string_make(interpreter, &ch, 1, "iso-8859-1", 0);
+    return string_make(interp, &ch, 1, "iso-8859-1", 0);
 }
 
 /*
 
 =item C<static HUGEINTVAL
-getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets an integer out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -67,7 +67,7 @@ of the integer.
 */
 
 static HUGEINTVAL
-getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -93,7 +93,7 @@ getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 
     case SIZE_PMC:{
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
-            return VTABLE_get_integer(interpreter, pmc);
+            return VTABLE_get_integer(interp, pmc);
         }
     default:
         PANIC("Invalid int type!");
@@ -104,7 +104,7 @@ getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static UHUGEINTVAL
-getuint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getuint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets an unsigned integer out of the C<va_list> in C<obj> and returns it
 as a Parrot C<STRING>.
@@ -117,7 +117,7 @@ of the integer.
 */
 
 static UHUGEINTVAL
-getuint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getuint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -143,7 +143,7 @@ getuint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 
     case SIZE_PMC:{
             PMC *pmc = va_arg(*arg, PMC *);
-            return (UINTVAL)VTABLE_get_integer(interpreter, pmc);
+            return (UINTVAL)VTABLE_get_integer(interp, pmc);
         }
     default:
         PANIC("Invalid uint type!");
@@ -154,7 +154,7 @@ getuint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static HUGEFLOATVAL
-getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getfloat_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets an floating-point number out of the C<va_list> in C<obj> and
 returns it as a Parrot C<STRING>.
@@ -167,7 +167,7 @@ the number.
 */
 
 static HUGEFLOATVAL
-getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getfloat_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -190,7 +190,7 @@ getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     case SIZE_PMC:{
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
 
-            return (HUGEFLOATVAL)(VTABLE_get_number(interpreter, pmc));
+            return (HUGEFLOATVAL)(VTABLE_get_number(interp, pmc));
         }
     default:
         internal_exception(INVALID_CHARACTER,
@@ -203,7 +203,7 @@ getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static STRING *
-getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getstring_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets an string out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -216,7 +216,7 @@ of the string.
 */
 
 static STRING *
-getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getstring_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -231,14 +231,14 @@ getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     case SIZE_PSTR:
         {
             STRING * const s = (STRING *)va_arg(*arg, STRING *);
-            return s ? s : CONST_STRING(interpreter, "(null)");
+            return s ? s : CONST_STRING(interp, "(null)");
 
         }
 
     case SIZE_PMC:
         {
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
-            STRING * const s = VTABLE_get_string(interpreter, pmc);
+            STRING * const s = VTABLE_get_string(interp, pmc);
 
             return s;
         }
@@ -254,7 +254,7 @@ getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static void *
-getptr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getptr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets a C<void *> out of the C<va_list> in C<obj> and returns it.
 
@@ -265,7 +265,7 @@ C<size> is unused.
 */
 
 static void *
-getptr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getptr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -286,7 +286,7 @@ SPRINTF_OBJ va_core = {
 =over 4
 
 =item C<static STRING *
-getchr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getchr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getchr_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -296,23 +296,23 @@ from C<obj>.
 */
 
 static STRING *
-getchr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getchr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     STRING *s;
-    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
             (obj->index));
 
     obj->index++;
-    s = VTABLE_get_string(interpreter, tmp);
+    s = VTABLE_get_string(interp, tmp);
     /* XXX string_copy like below? + adjusting bufused */
-    return string_substr(interpreter, s, 0, 1, NULL, 0);
+    return string_substr(interp, s, 0, 1, NULL, 0);
 }
 
 /*
 
 =item C<static HUGEINTVAL
-getint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getint_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -322,15 +322,15 @@ from C<obj>.
 */
 
 static HUGEINTVAL
-getint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     HUGEINTVAL ret;
-    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
             (obj->index));
 
     obj->index++;
-    ret = VTABLE_get_integer(interpreter, tmp);
+    ret = VTABLE_get_integer(interp, tmp);
 
     switch (size) {
     case SIZE_SHORT:
@@ -350,7 +350,7 @@ getint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static UHUGEINTVAL
-getuint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getuint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getuint_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -360,15 +360,15 @@ from C<obj>.
 */
 
 static UHUGEINTVAL
-getuint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getuint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     UHUGEINTVAL ret;
-    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
             (obj->index));
 
     obj->index++;
-    ret = (UINTVAL)VTABLE_get_integer(interpreter, tmp);
+    ret = (UINTVAL)VTABLE_get_integer(interp, tmp);
 
     switch (size) {
     case SIZE_SHORT:
@@ -387,7 +387,7 @@ getuint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static HUGEFLOATVAL
-getfloat_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getfloat_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getfloat_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -397,15 +397,15 @@ from C<obj>.
 */
 
 static HUGEFLOATVAL
-getfloat_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getfloat_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     HUGEFLOATVAL ret;
-    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
             (obj->index));
 
     obj->index++;
-    ret = (HUGEFLOATVAL)(VTABLE_get_number(interpreter, tmp));
+    ret = (HUGEFLOATVAL)(VTABLE_get_number(interp, tmp));
 
     switch (size) {
     case SIZE_SHORT:
@@ -422,7 +422,7 @@ getfloat_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static STRING *
-getstring_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getstring_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getstring_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -432,22 +432,22 @@ from C<obj>.
 */
 
 static STRING *
-getstring_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getstring_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
     STRING *s;
-    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
             (obj->index));
 
     obj->index++;
-    s = (STRING *)(VTABLE_get_string(interpreter, tmp));
+    s = (STRING *)(VTABLE_get_string(interp, tmp));
     return s;
 }
 
 /*
 
 =item C<static void *
-getptr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getptr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getptr_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -457,15 +457,15 @@ from C<obj>.
 */
 
 static void *
-getptr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getptr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 {
-    PMC * const tmp = VTABLE_get_pmc_keyed_int(interpreter,
+    PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
             (obj->index));
 
     obj->index++;
     /* XXX correct? */
-    return (void *)(VTABLE_get_integer(interpreter, tmp));
+    return (void *)(VTABLE_get_integer(interp, tmp));
 }
 
 SPRINTF_OBJ pmc_core = {

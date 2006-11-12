@@ -53,7 +53,7 @@ Returns the integer value of the element at index C<key>.
 
             /* If it's still negative, we have a problem */
             if (key < 0)
-                real_exception(interpreter, NULL, E_IndexError,
+                real_exception(interp, NULL, E_IndexError,
                     "ResizableBooleanArray: index out of bounds!");
         }
 
@@ -83,7 +83,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
             /* If it's still negative, we have a problem */
             if (key < 0)
-                real_exception(interpreter, NULL, E_IndexError,
+                real_exception(interp, NULL, E_IndexError,
                     "ResizableBooleanArray: index out of bounds!");
         }
 
@@ -115,7 +115,7 @@ Resizes the array to C<size> elements.
             return;
 
         if (size < 0)
-            real_exception(interpreter, NULL, E_IndexError,
+            real_exception(interp, NULL, E_IndexError,
                 "ResizableBooleanArray: Can't resize!");
 
         newASize = (size / MIN_ALLOC + 1) * MIN_ALLOC;
@@ -163,7 +163,7 @@ Removes and returns the last element.
         INTVAL size, value;
 
         if (DYNSELF.elements() < 1)
-            real_exception(interpreter, NULL, E_IndexError,
+            real_exception(interp, NULL, E_IndexError,
                 "ResizableBooleanArray: Can't pop from an empty array!");
 
         size = PMC_int_val(SELF) - PMC_int_val2(SELF);
@@ -222,7 +222,7 @@ Removes and returns the first element.
         INTVAL value;
 
         if (DYNSELF.elements() < 1)
-            real_exception(interpreter, NULL, E_IndexError,
+            real_exception(interp, NULL, E_IndexError,
                 "ResizableBooleanArray: Can't shift from an empty array!");
 
         /* Get head value */

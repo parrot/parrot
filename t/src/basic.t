@@ -62,31 +62,31 @@ static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 int
 main(int argc, char* argv[])
 {
-    Interp *     interpreter;
+    Interp *interp;
 
-    interpreter = Parrot_new(NULL);
-    if (!interpreter) {
+    interp = Parrot_new(NULL);
+    if (!interp) {
         return 1;
     }
 
-    PIO_eprintf(interpreter, "main\n");
+    PIO_eprintf(interp, "main\n");
 
-    Parrot_run_native(interpreter, the_test);
+    Parrot_run_native(interp, the_test);
 
-    PIO_eprintf(interpreter, "back\n");
-    Parrot_exit(interpreter, 0);
+    PIO_eprintf(interp, "back\n");
+    Parrot_exit(interp, 0);
     return 0;
 }
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     UNUSED(cur_op);
     UNUSED(start);
 
     /* tests go here */
-    PIO_eprintf(interpreter, "ok\n");
+    PIO_eprintf(interp, "ok\n");
 
     return NULL; /* always return 0 or bad things may happen */
 }

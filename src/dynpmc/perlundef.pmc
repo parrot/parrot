@@ -138,8 +138,8 @@ Morphs to a C<PerlInt> with value C<value>.
     void set_integer_native (INTVAL value) {
         INTVAL dynpmc_PerlInt;
 
-        dynpmc_PerlInt = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlInt", 0));
+        dynpmc_PerlInt = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);
         DYNSELF.set_integer_native(value);
     }
@@ -171,8 +171,8 @@ Morphs to a C<PerlString> with the value of C<*value>.
     void set_string_native (STRING* value) {
         INTVAL dynpmc_PerlString;
 
-        dynpmc_PerlString = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlString", 0));
+        dynpmc_PerlString = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlString", 0));
         DYNSELF.morph(dynpmc_PerlString);
         DYNSELF.set_string_native(value);
     }
@@ -489,8 +489,8 @@ All these methods simply return undef itself.
         if (!dest) {
             INTVAL dynpmc_PerlInt;
 
-            dynpmc_PerlInt = pmc_type(interpreter,
-                string_from_const_cstring(interpreter, "PerlInt", 0));
+            dynpmc_PerlInt = pmc_type(interp,
+                string_from_const_cstring(interp, "PerlInt", 0));
             dest = pmc_new(INTERP, dynpmc_PerlInt);
         }
         VTABLE_set_integer_native(INTERP, dest, 1);
@@ -527,8 +527,8 @@ Morphs to a C<PerlInt> with value C<1>.
     void increment () {
         INTVAL dynpmc_PerlInt;
 
-        dynpmc_PerlInt = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlInt", 0));
+        dynpmc_PerlInt = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);
         PMC_int_val(SELF) = 1;
     }
@@ -546,8 +546,8 @@ Morphs to a C<PerlInt> with value C<-1>.
     void decrement () {
         INTVAL dynpmc_PerlInt;
 
-        dynpmc_PerlInt = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlInt", 0));
+        dynpmc_PerlInt = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);
         PMC_int_val(SELF) = -1;
     }

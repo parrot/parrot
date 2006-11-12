@@ -154,7 +154,7 @@ shifted down.
          */
         if (cont && cont != NEED_CONTINUATION &&
                 (PObj_get_FLAGS(cont) & SUB_FLAG_TAILCALL)) {
-            cont = CONTEXT(interpreter->ctx)->current_cont;
+            cont = CONTEXT(interp->ctx)->current_cont;
             next = VTABLE_invoke(INTERP, cont, next);
         }
         return next;

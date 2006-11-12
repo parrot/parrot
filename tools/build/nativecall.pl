@@ -92,12 +92,12 @@ my %fix_name =
 
 my %other_decl =
   (p =>
-   "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
+   "PMC *final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
    t => "STRING *final_destination;"
    #     b => "Buffer *final_destination =
-   #     new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
+   #     new_buffer_header(interp);\nPObj_external_SET(final_destination)",
    #     B => "Buffer *final_destination =
-   #     new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
+   #     new_buffer_header(interp);\nPObj_external_SET(final_destination)",
   );
 
 my %ret_type_decl =
@@ -122,24 +122,24 @@ my %ret_type_decl =
      );
 
 my %ret_assign =
-     ( p => "PMC_data(final_destination) = return_data;    set_nci_P(interpreter, &st, final_destination);",
-       i => "set_nci_I(interpreter, &st, return_data);",
-       I => "set_nci_I(interpreter, &st, return_data);",
-       l => "set_nci_I(interpreter, &st, return_data);",
-       s => "set_nci_I(interpreter, &st, return_data);",
-       c => "set_nci_I(interpreter, &st, return_data);",
-       4 => "set_nci_I(interpreter, &st, *return_data);",
-       3 => "set_nci_I(interpreter, &st, *return_data);",
-       2 => "set_nci_I(interpreter, &st, *return_data);",
-       f => "set_nci_N(interpreter, &st, return_data);",
-       d => "set_nci_N(interpreter, &st, return_data);",
-       N => "set_nci_N(interpreter, &st, return_data);",
-       P => "set_nci_P(interpreter, &st, return_data);",
-       S => "set_nci_S(interpreter, &st, return_data);",
+     ( p => "PMC_data(final_destination) = return_data;    set_nci_P(interp, &st, final_destination);",
+       i => "set_nci_I(interp, &st, return_data);",
+       I => "set_nci_I(interp, &st, return_data);",
+       l => "set_nci_I(interp, &st, return_data);",
+       s => "set_nci_I(interp, &st, return_data);",
+       c => "set_nci_I(interp, &st, return_data);",
+       4 => "set_nci_I(interp, &st, *return_data);",
+       3 => "set_nci_I(interp, &st, *return_data);",
+       2 => "set_nci_I(interp, &st, *return_data);",
+       f => "set_nci_N(interp, &st, return_data);",
+       d => "set_nci_N(interp, &st, return_data);",
+       N => "set_nci_N(interp, &st, return_data);",
+       P => "set_nci_P(interp, &st, return_data);",
+       S => "set_nci_S(interp, &st, return_data);",
        v => "",
-       t => "final_destination = string_from_cstring(interpreter, return_data, 0);\n    set_nci_S(interpreter, &st, final_destination);",
-#      b => "PObj_bufstart(final_destination) = return_data;\n    set_nci_S(interpreter, &st, final_destination);",
-#      B => "PObj_bufstart(final_destination) = *return_data;\n    set_nci_S(interpreter, &st, final_destination);",
+       t => "final_destination = string_from_cstring(interp, return_data, 0);\n    set_nci_S(interp, &st, final_destination);",
+#      b => "PObj_bufstart(final_destination) = return_data;\n    set_nci_S(interp, &st, final_destination);",
+#      B => "PObj_bufstart(final_destination) = *return_data;\n    set_nci_S(interp, &st, final_destination);",
      );
 
 my %func_call_assign =
@@ -303,89 +303,89 @@ sub print_head {
  * helper funcs - get argument n
  */
 static INTVAL
-get_nci_I(Interp *interpreter, struct call_state *st, int n)
+get_nci_I(Interp *interp, struct call_state *st, int n)
 {
     assert(n < st->src.n);
-    Parrot_fetch_arg_nci(interpreter, st);
+    Parrot_fetch_arg_nci(interp, st);
 
     return UVal_int(st->val);
 }
 
 static FLOATVAL
-get_nci_N(Interp *interpreter, struct call_state *st, int n)
+get_nci_N(Interp *interp, struct call_state *st, int n)
 {
     assert(n < st->src.n);
-    Parrot_fetch_arg_nci(interpreter, st);
+    Parrot_fetch_arg_nci(interp, st);
 
     return UVal_num(st->val);
 }
 
 static STRING*
-get_nci_S(Interp *interpreter, struct call_state *st, int n)
+get_nci_S(Interp *interp, struct call_state *st, int n)
 {
     assert(n < st->src.n);
-    Parrot_fetch_arg_nci(interpreter, st);
+    Parrot_fetch_arg_nci(interp, st);
 
     return UVal_str(st->val);
 }
 
 static PMC*
-get_nci_P(Interp *interpreter, struct call_state *st, int n)
+get_nci_P(Interp *interp, struct call_state *st, int n)
 {
     /*
      * exessive args are passed as NULL
      * used by e.g. MMD infix like __add
      */
     if (n < st->src.n)
-        Parrot_fetch_arg_nci(interpreter, st);
+        Parrot_fetch_arg_nci(interp, st);
     else
         UVal_pmc(st->val) = NULL;
 
     return UVal_pmc(st->val);
 }
 
-#define GET_NCI_I(n) get_nci_I(interpreter, &st, n)
-#define GET_NCI_S(n) get_nci_S(interpreter, &st, n)
-#define GET_NCI_N(n) get_nci_N(interpreter, &st, n)
-#define GET_NCI_P(n) get_nci_P(interpreter, &st, n)
+#define GET_NCI_I(n) get_nci_I(interp, &st, n)
+#define GET_NCI_S(n) get_nci_S(interp, &st, n)
+#define GET_NCI_N(n) get_nci_N(interp, &st, n)
+#define GET_NCI_P(n) get_nci_P(interp, &st, n)
 
 /*
  * set return value
  */
 static void
-set_nci_I(Interp *interpreter, struct call_state *st, INTVAL val)
+set_nci_I(Interp *interp, struct call_state *st, INTVAL val)
 {
-    Parrot_init_ret_nci(interpreter, st, "I");
+    Parrot_init_ret_nci(interp, st, "I");
     UVal_int(st->val) = val;
-    Parrot_convert_arg(interpreter, st);
-    Parrot_store_arg(interpreter, st);
+    Parrot_convert_arg(interp, st);
+    Parrot_store_arg(interp, st);
 }
 
 static void
-set_nci_N(Interp *interpreter, struct call_state *st, FLOATVAL val)
+set_nci_N(Interp *interp, struct call_state *st, FLOATVAL val)
 {
-    Parrot_init_ret_nci(interpreter, st, "N");
+    Parrot_init_ret_nci(interp, st, "N");
     UVal_num(st->val) = val;
-    Parrot_convert_arg(interpreter, st);
-    Parrot_store_arg(interpreter, st);
+    Parrot_convert_arg(interp, st);
+    Parrot_store_arg(interp, st);
 }
 
 static void
-set_nci_S(Interp *interpreter, struct call_state *st, STRING *val)
+set_nci_S(Interp *interp, struct call_state *st, STRING *val)
 {
-    Parrot_init_ret_nci(interpreter, st, "S");
+    Parrot_init_ret_nci(interp, st, "S");
     UVal_str(st->val) = val;
-    Parrot_convert_arg(interpreter, st);
-    Parrot_store_arg(interpreter, st);
+    Parrot_convert_arg(interp, st);
+    Parrot_store_arg(interp, st);
 }
 
 static void
-set_nci_P(Interp *interpreter, struct call_state *st, PMC* val)
+set_nci_P(Interp *interp, struct call_state *st, PMC* val)
 {
-    Parrot_init_ret_nci(interpreter, st, "P");
+    Parrot_init_ret_nci(interp, st, "P");
     UVal_pmc(st->val) = val;
-    Parrot_convert_arg(interpreter, st);
-    Parrot_store_arg(interpreter, st);
+    Parrot_convert_arg(interp, st);
+    Parrot_store_arg(interp, st);
 }
 
 /* All our static functions that call in various ways. Yes, terribly
@@ -480,7 +480,7 @@ sub make_arg {
     /t/ && do {
         push @{$temps_ref}, "char *t_$temp_num;";
         push @{$extra_preamble_ref},
-        "t_$temp_num = string_to_cstring(interpreter, GET_NCI_S($reg_num));";
+        "t_$temp_num = string_to_cstring(interp, GET_NCI_S($reg_num));";
         push @{$extra_postamble_ref}, "string_cstring_free(t_$temp_num);";
         return "t_$temp_num";
     };
@@ -497,7 +497,7 @@ sub make_arg {
         return "&PObj_bufstart(t_$temp_num)";
     };
     /J/ && do {
-        return "interpreter";
+        return "interp";
     };
     /[OP\@]/ && do {
         push @{$temps_ref}, "PMC *t_$temp_num;";
@@ -560,7 +560,7 @@ sub print_function {
 
         print $NCI <<"HEADER";
 static void
-pcf_${return}_$fix_params(Interp *interpreter, PMC *self)
+pcf_${return}_$fix_params(Interp *interp, PMC *self)
 {
     typedef $ret_type (*func_t)($proto);
     func_t pointer;
@@ -568,7 +568,7 @@ pcf_${return}_$fix_params(Interp *interpreter, PMC *self)
     $return_data
     $temp_decl
     $other_decl
-    Parrot_init_arg_nci(interpreter, &st, \"$sig\");
+    Parrot_init_arg_nci(interp, &st, \"$sig\");
     $extra_preamble
 
     pointer =  (func_t)D2FPTR(PMC_struct_val(self));
@@ -586,7 +586,7 @@ HEADER
         $call_state = '' if 'v' eq $return;
         print $NCI <<"HEADER";
 static void
-pcf_${return}_(Interp *interpreter, PMC *self)
+pcf_${return}_(Interp *interp, PMC *self)
 {
     $ret_type (*pointer)(void);
     $return_data
@@ -607,11 +607,11 @@ HEADER
         ( "$return", "pcf_${return}" ));
 
     push @{$put_pointer_ref}, <<"PUT_POINTER";
-        temp_pmc = pmc_new(interpreter, enum_class_UnManagedStruct);
+        temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
         PMC_data(temp_pmc) = (void*)$value;
-        VTABLE_set_pmc_keyed_str(interpreter, HashPointer, string_from_cstring(interpreter, "$key", 0), temp_pmc);
+        VTABLE_set_pmc_keyed_str(interp, HashPointer, string_from_cstring(interp, "$key", 0), temp_pmc);
 PUT_POINTER
-#        qq|        parrot_hash_put( interpreter, known_frames, const_cast("$key"), $value );|;
+#        qq|        parrot_hash_put( interp, known_frames, const_cast("$key"), $value );|;
     return;
 }
 
@@ -627,7 +627,7 @@ sub print_tail {
    signature for a C function we want to call and returns a pointer
    to a function that can call it. */
 void *
-build_call_func(Interp *interpreter, PMC *pmc_nci,
+build_call_func(Interp *interp, PMC *pmc_nci,
                 STRING *signature)
 {
     char       *c;
@@ -647,7 +647,7 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
      * if yes, we are done
      */
 
-     result = Parrot_jit_build_call_func(interpreter, pmc_nci, signature);
+     result = Parrot_jit_build_call_func(interp, pmc_nci, signature);
 
 #endif
     if (result)
@@ -656,32 +656,32 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
     UNUSED(pmc_nci);
-    signature_len = string_length(interpreter, signature);
+    signature_len = string_length(interp, signature);
     if (0 == signature_len) return F2DPTR(pcf_v_);
     /* remove deprecated void argument 'v' character */
-    if (2 == signature_len && 'v' == string_index(interpreter, signature, 1)) {
-       Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG, "function signature argument character 'v' ignored");
-       signature = string_chopn(interpreter, signature, 1, 1);
-       signature_len = string_length(interpreter, signature);
+    if (2 == signature_len && 'v' == string_index(interp, signature, 1)) {
+       Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "function signature argument character 'v' ignored");
+       signature = string_chopn(interp, signature, 1, 1);
+       signature_len = string_length(interp, signature);
     }
 
-    iglobals = interpreter->iglobals;
+    iglobals = interp->iglobals;
 
     if (PMC_IS_NULL(iglobals))
         PANIC("iglobals isnÄt created yet");
-    HashPointer = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
+    HashPointer = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_NCI_FUNCS);
 
     if (!HashPointer) {
-        HashPointer = pmc_new(interpreter, enum_class_Hash);
-        VTABLE_set_pmc_keyed_int(interpreter, iglobals, IGLOBALS_NCI_FUNCS,
+        HashPointer = pmc_new(interp, enum_class_Hash);
+        VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS,
                 HashPointer);
 
 $put_pointer
 
     }
 
-    b = VTABLE_get_pmc_keyed_str(interpreter, HashPointer, signature);
+    b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
 
     if (b && b->vtable->base_type == enum_class_UnManagedStruct)
         return F2DPTR(PMC_data(b));
@@ -691,21 +691,21 @@ $put_pointer
       see which signature has an unknown type. I am sure someone can come up
       with a neater way to do this.
      */
-    ns = string_make(interpreter, " is an unknown signature type", 29, "ascii", 0);
-    message = string_concat(interpreter, signature, ns, 0);
+    ns = string_make(interp, " is an unknown signature type", 29, "ascii", 0);
+    message = string_concat(interp, signature, ns, 0);
 
 #if defined(CAN_BUILD_CALL_FRAMES)
-    ns = string_make(interpreter, ".\\nCAN_BUILD_CALL_FRAMES is enabled, this should not happen", 58, "ascii", 0);
+    ns = string_make(interp, ".\\nCAN_BUILD_CALL_FRAMES is enabled, this should not happen", 58, "ascii", 0);
 #else
-    ns = string_make(interpreter, ".\\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/call_list.txt", 75, "ascii", 0);
+    ns = string_make(interp, ".\\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/call_list.txt", 75, "ascii", 0);
 #endif
-    message = string_concat(interpreter, message, ns, 0);
+    message = string_concat(interp, message, ns, 0);
 
     /*
      * I think there may be memory issues with this but if we get to here we are
      * aborting.
      */
-    c = string_to_cstring(interpreter, message);
+    c = string_to_cstring(interp, message);
     PANIC(c);
     return NULL;
 }
@@ -718,7 +718,7 @@ TAIL
 
 This is the template thing
 
-static void pcf_$funcname(Interp *interpreter, PMC *self) {
+static void pcf_$funcname(Interp *interp, PMC *self) {
     $ret_type (*pointer)();
     $ret_type return_data;
 

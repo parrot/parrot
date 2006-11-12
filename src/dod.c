@@ -43,7 +43,7 @@ static size_t find_common_mask(size_t val1, size_t val2);
 /*
 
 =item C<static void
-mark_special(Parrot_Interp interpreter, PMC* obj)>
+mark_special(Parrot_Interp interp, PMC* obj)>
 
 Mark a special PMC. If it has a C<PMC_EXT> structure, append or prepend
 the C<next_for_GC> pointer; otherwise, do the custom mark directly.
@@ -56,7 +56,7 @@ be better if it was a macro.
 */
 
 static void
-mark_special(Parrot_Interp interpreter, PMC* obj)
+mark_special(Parrot_Interp interp, PMC* obj)
 {
     int hi_prio;
     struct Arenas *arena_base;
@@ -74,13 +74,13 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
      * the object.
      */
     if (PObj_is_PMC_shared_TEST(obj)) {
-        interpreter = PMC_sync(obj)->owner;
-        assert(interpreter);
+        interp = PMC_sync(obj)->owner;
+        assert(interp);
         /* XXX FIXME hack */
-        if (!interpreter->arena_base->dod_mark_ptr)
-            interpreter->arena_base->dod_mark_ptr = obj;
+        if (!interp->arena_base->dod_mark_ptr)
+            interp->arena_base->dod_mark_ptr = obj;
     }
-    arena_base = interpreter->arena_base;
+    arena_base = interp->arena_base;
 
     if (PObj_needs_early_DOD_TEST(obj))
         ++arena_base->num_early_PMCs_seen;
@@ -127,7 +127,7 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
     }
     else if (PObj_custom_mark_TEST(obj)) {
         PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
-        VTABLE_mark(interpreter, obj);
+        VTABLE_mark(interp, obj);
     }
 }
 
@@ -135,7 +135,7 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
 
 /* XXX This should really use the same header, with different guts #ifdeffed */
 void
-pobject_lives(Interp *interpreter, PObj *obj)
+pobject_lives(Interp *interp, PObj *obj)
 {
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
@@ -157,7 +157,7 @@ pobject_lives(Interp *interpreter, PObj *obj)
      * the PMC to the chained mark list.
      */
     if (PObj_is_special_PMC_TEST(obj)) {
-        mark_special(interpreter, (PMC*) obj);
+        mark_special(interp, (PMC*) obj);
     }
 #ifndef NDEBUG
     else {
@@ -172,7 +172,7 @@ pobject_lives(Interp *interpreter, PObj *obj)
 #endif
 #if GC_VERBOSE
     /* buffer GC_DEBUG stuff */
-    if (! GC_DEBUG(interpreter))
+    if (! GC_DEBUG(interp))
         return;
 
     if (PObj_report_TEST(obj)) {
@@ -187,14 +187,14 @@ pobject_lives(Interp *interpreter, PObj *obj)
 /*
 
 =item C<static int
-trace_active_PMCs(Interp *interpreter, int trace_stack)>
+trace_active_PMCs(Interp *interp, int trace_stack)>
 
 Do a full trace run and mark all the PMCs as active if they are. Returns
 whether the run wasn't aborted; i.e. whether it's safe to proceed with
 GC.
 
 =item C<int
-Parrot_dod_trace_root(Interp *interpreter, int trace_stack)>
+Parrot_dod_trace_root(Interp *interp, int trace_stack)>
 
 Trace the root set. Returns 0 if its a lazy DOD run and all objects
 that need timely destruction were found.
@@ -210,10 +210,10 @@ C<trace_stack> can have these values:
 */
 
 int
-Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
+Parrot_dod_trace_root(Interp *interp, int trace_stack)
 {
 
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
     parrot_context_t *ctx;
 
     /*
@@ -222,26 +222,26 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     unsigned int i = 0;
 
     if (trace_stack == 2) {
-        trace_system_areas(interpreter);
+        trace_system_areas(interp);
         return 0;
     }
-    if (interpreter->profile)
-        Parrot_dod_profile_start(interpreter);
+    if (interp->profile)
+        Parrot_dod_profile_start(interp);
     /* We have to start somewhere, the interpreter globals is a good place */
     if (!arena_base->dod_mark_start) {
         arena_base->dod_mark_start = arena_base->dod_mark_ptr =
-            interpreter->iglobals;
+            interp->iglobals;
     }
 
     /* mark it as used  */
-    pobject_lives(interpreter, (PObj *)interpreter->iglobals);
+    pobject_lives(interp, (PObj *)interp->iglobals);
 
     /* mark the current context. */
-    ctx = CONTEXT(interpreter->ctx);
-    mark_context(interpreter, ctx);
+    ctx = CONTEXT(interp->ctx);
+    mark_context(interp, ctx);
 
     /* mark the dynamic environment. */
-    mark_stack(interpreter, interpreter->dynamic_env);
+    mark_stack(interp, interp->dynamic_env);
 
     /*
      * mark vtable->data
@@ -252,48 +252,48 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
      * It seems that the Class PMC gets DODed - these should
      * get created as constant PMCs.
      */
-    for (i = 1; i < (unsigned int)interpreter->n_vtable_max; i++) {
+    for (i = 1; i < (unsigned int)interp->n_vtable_max; i++) {
         VTABLE *vtable;
         /*
          * XXX dynpmc groups have empty slots for abstract objects
          */
-        if ( (vtable = interpreter->vtables[i])) {
+        if ( (vtable = interp->vtables[i])) {
 #if 0
             if (vtable->class)
-                pobject_lives(interpreter, (PObj *)vtable->class);
+                pobject_lives(interp, (PObj *)vtable->class);
 #endif
             if (vtable->mro)
-                pobject_lives(interpreter, (PObj *)vtable->mro);
-            pobject_lives(interpreter, (PObj *)vtable->_namespace);
+                pobject_lives(interp, (PObj *)vtable->mro);
+            pobject_lives(interp, (PObj *)vtable->_namespace);
         }
     }
 
     /* mark exception list */
     for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
-        pobject_lives(interpreter, (PObj*)interpreter->exception_list[i]);
+        pobject_lives(interp, (PObj*)interp->exception_list[i]);
     }
     /* mark the root_namespace */
-    pobject_lives(interpreter, (PObj *)interpreter->root_namespace);
+    pobject_lives(interp, (PObj *)interp->root_namespace);
     /* s. packfile.c */
-    mark_const_subs(interpreter);
+    mark_const_subs(interp);
 
     /* mark caches and freelists */
-    mark_object_cache(interpreter);
+    mark_object_cache(interp);
 
     /* Now mark the class hash */
-    pobject_lives(interpreter, (PObj *)interpreter->class_hash);
+    pobject_lives(interp, (PObj *)interp->class_hash);
 
     /* Mark the registry if any */
-    if (interpreter->DOD_registry)
-        pobject_lives(interpreter, (PObj *)interpreter->DOD_registry);
+    if (interp->DOD_registry)
+        pobject_lives(interp, (PObj *)interp->DOD_registry);
 
     /* Mark the transaction log */
     /* XXX do this more generically? */
-    if (interpreter->thread_data && interpreter->thread_data->stm_log)
-        Parrot_STM_mark_transaction(interpreter);
+    if (interp->thread_data && interp->thread_data->stm_log)
+        Parrot_STM_mark_transaction(interp);
 
     /* Walk the iodata */
-    Parrot_IOData_mark(interpreter, interpreter->piodata);
+    Parrot_IOData_mark(interp, interp->piodata);
 
     /* quick check, if we can already bail out */
     if (arena_base->lazy_dod && arena_base->num_early_PMCs_seen >=
@@ -303,27 +303,27 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 
     /* Find important stuff on the system stack */
     if (trace_stack)
-        trace_system_areas(interpreter);
+        trace_system_areas(interp);
 
-    if (interpreter->profile)
-        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_p1);
+    if (interp->profile)
+        Parrot_dod_profile_end(interp, PARROT_PROF_DOD_p1);
     return 1;
 }
 
 static int
-trace_active_PMCs(Interp *interpreter, int trace_stack)
+trace_active_PMCs(Interp *interp, int trace_stack)
 {
-    if (!Parrot_dod_trace_root(interpreter, trace_stack))
+    if (!Parrot_dod_trace_root(interp, trace_stack))
         return 0;
     /* Okay, we've marked the whole root set, and should have a good-sized
      * list of things to look at. Run through it */
-    return Parrot_dod_trace_children(interpreter, (size_t) -1);
+    return Parrot_dod_trace_children(interp, (size_t) -1);
 }
 
 /*
 
 =item C<int
-Parrot_dod_trace_children(Interp *interpreter, size_t how_many)>
+Parrot_dod_trace_children(Interp *interp, size_t how_many)>
 
 Returns whether the tracing process wasn't aborted.
 
@@ -332,10 +332,10 @@ Returns whether the tracing process wasn't aborted.
 */
 
 int
-Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
+Parrot_dod_trace_children(Interp *interp, size_t how_many)
 {
     PMC *next;
-    struct Arenas * const arena_base = interpreter->arena_base;
+    struct Arenas * const arena_base = interp->arena_base;
     INTVAL i = 0;
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
     PMC *current = arena_base->dod_mark_start;
@@ -351,9 +351,9 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
      * If there is a count of shared PMCs and we have already seen
      * all these, we could skip that.
      */
-    if (interpreter->profile)
-        Parrot_dod_profile_start(interpreter);
-    pt_DOD_mark_root_finished(interpreter);
+    if (interp->profile)
+        Parrot_dod_profile_start(interp);
+    pt_DOD_mark_root_finished(interp);
 
     for (; ; current = next) {
         const UINTVAL bits = PObj_get_FLAGS(current) & mask;
@@ -375,7 +375,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
 
         /* mark properties */
         if (PMC_metadata(current)) {
-            pobject_lives(interpreter, (PObj *)PMC_metadata(current));
+            pobject_lives(interp, (PObj *)PMC_metadata(current));
         }
         /* Start by checking if there's anything at all. This assumes that the
          * largest percentage of PMCs won't have anything in their data
@@ -388,7 +388,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
                 if (data) {
                     for (i = 0; i < PMC_int_val(current); i++) {
                         if (data[i]) {
-                            pobject_lives(interpreter, (PObj *)data[i]);
+                            pobject_lives(interp, (PObj *)data[i]);
                         }
                     }
                 }
@@ -396,7 +396,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
             else {
                 /* All that's left is the custom */
                 assert(!PObj_on_free_list_TEST(current));
-                VTABLE_mark(interpreter, current);
+                VTABLE_mark(interp, current);
             }
         }
 
@@ -410,8 +410,8 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
     }
     arena_base->dod_mark_start = current;
     arena_base->dod_trace_ptr = NULL;
-    if (interpreter->profile)
-        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_p2);
+    if (interp->profile)
+        Parrot_dod_profile_end(interp, PARROT_PROF_DOD_p2);
     return 1;
 }
 
@@ -421,7 +421,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
 /*
 
 =item C<void
-clear_cow(Interp *interpreter, struct Small_Object_Pool *pool,
+clear_cow(Interp *interp, struct Small_Object_Pool *pool,
         int cleanup)>
 
 Clear the COW ref count.
@@ -431,7 +431,7 @@ Clear the COW ref count.
 */
 
 void
-clear_cow(Interp *interpreter, struct Small_Object_Pool *pool,
+clear_cow(Interp *interp, struct Small_Object_Pool *pool,
         int cleanup)
 {
     const UINTVAL object_size = pool->object_size;
@@ -469,7 +469,7 @@ clear_cow(Interp *interpreter, struct Small_Object_Pool *pool,
 /*
 
 =item C<void
-used_cow(Interp *interpreter, struct Small_Object_Pool *pool,
+used_cow(Interp *interp, struct Small_Object_Pool *pool,
         int cleanup)>
 
 Find other users of COW's C<bufstart>.
@@ -479,7 +479,7 @@ Find other users of COW's C<bufstart>.
 */
 
 void
-used_cow(Interp *interpreter, struct Small_Object_Pool *pool, int cleanup)
+used_cow(Interp *interp, struct Small_Object_Pool *pool, int cleanup)
 {
     UINTVAL object_size = pool->object_size;
     struct Small_Object_Arena *cur_arena;
@@ -510,7 +510,7 @@ used_cow(Interp *interpreter, struct Small_Object_Pool *pool, int cleanup)
 /*
 
 =item C<void
-Parrot_dod_sweep(Interp *interpreter,
+Parrot_dod_sweep(Interp *interp,
         struct Small_Object_Pool *pool)>
 
 Put any buffers/PMCs that are now unused onto the pool's free list. If
@@ -522,10 +522,10 @@ are immune from collection (i.e. constant).
 */
 
 void
-Parrot_dod_sweep(Interp *interpreter,
+Parrot_dod_sweep(Interp *interp,
         struct Small_Object_Pool *pool)
 {
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
     struct Small_Object_Arena *cur_arena;
     UINTVAL i, total_used = 0;
     UINTVAL object_size = pool->object_size;
@@ -535,10 +535,10 @@ Parrot_dod_sweep(Interp *interpreter,
 #endif
 
 #if 0
-                if (Interp_trace_TEST(interpreter, 1)) {
-                    Interp *tracer = interpreter->debugger;
-                    PMC *pio = PIO_STDERR(interpreter);
-                    PIO_flush(interpreter, pio);
+                if (Interp_trace_TEST(interp, 1)) {
+                    Interp *tracer = interp->debugger;
+                    PMC *pio = PIO_STDERR(interp);
+                    PIO_flush(interp, pio);
                     if (tracer) {
                         pio = PIO_STDERR(tracer);
                         PIO_flush(tracer, pio);
@@ -562,7 +562,7 @@ Parrot_dod_sweep(Interp *interpreter,
             else {
                 /* it must be dead */
 #if 0
-                if (Interp_trace_TEST(interpreter, 1)) {
+                if (Interp_trace_TEST(interp, 1)) {
                     fprintf(stderr, "Freeing pobject %p\n", b);
                     if (PObj_is_PMC_TEST(b)) {
                         fprintf(stderr, "\t = PMC type %s\n",
@@ -576,8 +576,8 @@ Parrot_dod_sweep(Interp *interpreter,
                      * a GC run.
                      * XXX wrong thing to do with "other" GCs
                      */
-                    if (!(interpreter->thread_data &&
-                            (interpreter->thread_data->state &
+                    if (!(interp->thread_data &&
+                            (interp->thread_data->state &
                             THREAD_STATE_SUSPENDED_GC))) {
                         ++total_used;
                         goto next;
@@ -594,7 +594,7 @@ Parrot_dod_sweep(Interp *interpreter,
                     if (PObj_needs_early_DOD_TEST(p))
                         --arena_base->num_early_DOD_PMCs;
                     if (PObj_active_destroy_TEST(p))
-                        VTABLE_destroy(interpreter, p);
+                        VTABLE_destroy(interp, p);
 
                     if (PObj_is_PMC_EXT_TEST(p) && p->pmc_ext != NULL) {
                         /* if the PMC has a PMC_EXT structure,
@@ -607,7 +607,7 @@ Parrot_dod_sweep(Interp *interpreter,
                             mem_internal_free(PMC_sync(p));
                             PMC_sync(p) = NULL;
                         }
-                        ext_pool->add_free_object(interpreter, ext_pool,
+                        ext_pool->add_free_object(interp, ext_pool,
                                 p->pmc_ext);
                     }
 #ifndef NDEBUG
@@ -661,7 +661,7 @@ Parrot_dod_sweep(Interp *interpreter,
                     PObj_buflen(b) = 0;
                 }
                 PObj_flags_SETTO((PObj *)b, PObj_on_free_list_FLAG);
-                pool->add_free_object(interpreter, pool, b);
+                pool->add_free_object(interp, pool, b);
             }
 next:
             b = (Buffer *)((char *)b + object_size);
@@ -712,7 +712,7 @@ find_common_mask(size_t val1, size_t val2)
 /*
 
 =item C<void
-trace_mem_block(Interp *interpreter,
+trace_mem_block(Interp *interp,
                 size_t lo_var_ptr, size_t hi_var_ptr)>
 
 Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
@@ -722,16 +722,16 @@ Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
 */
 
 void
-trace_mem_block(Interp *interpreter,
+trace_mem_block(Interp *interp,
                 size_t lo_var_ptr, size_t hi_var_ptr)
 {
     size_t prefix;
     ptrdiff_t cur_var_ptr;
 
-    const size_t buffer_min = get_min_buffer_address(interpreter);
-    const size_t buffer_max = get_max_buffer_address(interpreter);
-    const size_t pmc_min = get_min_pmc_address(interpreter);
-    const size_t pmc_max = get_max_pmc_address(interpreter);
+    const size_t buffer_min = get_min_buffer_address(interp);
+    const size_t buffer_max = get_max_buffer_address(interp);
+    const size_t pmc_min = get_min_pmc_address(interp);
+    const size_t pmc_max = get_max_pmc_address(interp);
 
     const size_t mask =
         find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
@@ -761,17 +761,17 @@ trace_mem_block(Interp *interpreter,
              * had their bufstart/vtable destroyed due to the linked list of
              * free headers... */
             if (pmc_min <= ptr && ptr < pmc_max &&
-                    is_pmc_ptr(interpreter, (void *)ptr)) {
+                    is_pmc_ptr(interp, (void *)ptr)) {
                 /* ...so ensure that pobject_lives checks PObj_on_free_list_FLAG
                  * before adding it to the next_for_GC list, to have
                  * vtable->mark() called. */
-                pobject_lives(interpreter, (PObj *)ptr);
+                pobject_lives(interp, (PObj *)ptr);
             }
             else if (buffer_min <= ptr && ptr < buffer_max &&
-                    is_buffer_ptr(interpreter, (void *)ptr)) {
+                    is_buffer_ptr(interp, (void *)ptr)) {
                 /* ...and since pobject_lives doesn't care about bufstart, it
                  * doesn't really matter if it sets a flag */
-                pobject_lives(interpreter, (PObj *)ptr);
+                pobject_lives(interp, (PObj *)ptr);
             }
         }
     }
@@ -787,7 +787,7 @@ Run through all PMC arenas and clear live bits.
 */
 
 static void
-clear_live_bits(Parrot_Interp interpreter,
+clear_live_bits(Parrot_Interp interp,
         struct Small_Object_Pool * const pool) {
     struct Small_Object_Arena *arena;
     UINTVAL i;
@@ -804,16 +804,16 @@ clear_live_bits(Parrot_Interp interpreter,
 }
 
 void
-Parrot_dod_clear_live_bits(Parrot_Interp interpreter)
+Parrot_dod_clear_live_bits(Parrot_Interp interp)
 {
-    struct Small_Object_Pool * const pool = interpreter->arena_base->pmc_pool;
-    clear_live_bits(interpreter, pool);
+    struct Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
+    clear_live_bits(interp, pool);
 }
 
 /*
 
 =item C<void
-Parrot_dod_profile_start(Parrot_Interp interpreter)>
+Parrot_dod_profile_start(Parrot_Interp interp)>
 
 Records the start time of a DOD run when profiling is enabled.
 
@@ -822,17 +822,17 @@ Records the start time of a DOD run when profiling is enabled.
 */
 
 void
-Parrot_dod_profile_start(Parrot_Interp interpreter)
+Parrot_dod_profile_start(Parrot_Interp interp)
 {
-    if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        interpreter->profile->dod_time = Parrot_floatval_time();
+    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
+        interp->profile->dod_time = Parrot_floatval_time();
     }
 }
 
 /*
 
 =item C<void
-Parrot_dod_profile_end(Parrot_Interp interpreter, int what)>
+Parrot_dod_profile_end(Parrot_Interp interp, int what)>
 
 Records the end time of the DOD part C<what> run when profiling is enabled.
 Also record start time of next part.
@@ -842,10 +842,10 @@ Also record start time of next part.
 */
 
 void
-Parrot_dod_profile_end(Parrot_Interp interpreter, int what)
+Parrot_dod_profile_end(Parrot_Interp interp, int what)
 {
-    if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        RunProfile * const profile = interpreter->profile;
+    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
+        RunProfile * const profile = interp->profile;
         const FLOATVAL now = Parrot_floatval_time();
 
         profile->data[what].numcalls++;
@@ -865,18 +865,18 @@ Parrot_dod_profile_end(Parrot_Interp interpreter, int what)
 /*
 
 =item C<void
-Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)>
+Parrot_do_dod_run(Interp *interp, UINTVAL flags)>
 
 Call the configured garbage collector to reclaim unused headers.
 
 =item C<void
-Parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)>
+Parrot_dod_ms_run(Interp *interp, UINTVAL flags)>
 
 Run the stop-the-world mark & sweep collector.
 
 
 =item C<void
-Parrot_dod_ms_run_init(Interp *interpreter, UINTVAL flags)>
+Parrot_dod_ms_run_init(Interp *interp, UINTVAL flags)>
 
 Prepare for a mark & sweep DOD run.
 
@@ -885,9 +885,9 @@ Prepare for a mark & sweep DOD run.
 */
 
 void
-Parrot_dod_ms_run_init(Interp *interpreter)
+Parrot_dod_ms_run_init(Interp *interp)
 {
-    struct Arenas * const arena_base = interpreter->arena_base;
+    struct Arenas * const arena_base = interp->arena_base;
 
     arena_base->dod_trace_ptr = NULL;
     arena_base->dod_mark_start = NULL;
@@ -896,36 +896,36 @@ Parrot_dod_ms_run_init(Interp *interpreter)
 }
 
 static int
-sweep_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+sweep_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
     int * const total_free = (int *) arg;
 #ifdef GC_IS_MALLOC
     if (flag & POOL_BUFFER)
-        used_cow(interpreter, pool, 0);
+        used_cow(interp, pool, 0);
 #endif
-    Parrot_dod_sweep(interpreter, pool);
+    Parrot_dod_sweep(interp, pool);
 #ifdef GC_IS_MALLOC
     if (flag & POOL_BUFFER)
-        clear_cow(interpreter, pool, 0);
+        clear_cow(interp, pool, 0);
 #endif
-    if (interpreter->profile && (flag & POOL_PMC))
-        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cp);
+    if (interp->profile && (flag & POOL_PMC))
+        Parrot_dod_profile_end(interp, PARROT_PROF_DOD_cp);
     *total_free += pool->num_free_objects;
     return 0;
 }
 
 void
-Parrot_dod_ms_run(Interp *interpreter, int flags)
+Parrot_dod_ms_run(Interp *interp, int flags)
 {
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
     /* XXX these should go into the interpreter */
     int total_free = 0;
 
     if (arena_base->DOD_block_level) {
         return;
     }
-    if (interpreter->debugger) {
+    if (interp->debugger) {
         /*
          * if the other interpreter did a DOD run, it can set
          * life bits of shared objects, but these aren't reset, because
@@ -933,7 +933,7 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
          * other non-shared object, these wouldn't be marked amd hence
          * collected.
          */
-        Parrot_dod_clear_live_bits(interpreter);
+        Parrot_dod_clear_live_bits(interp);
     }
     /*
      * the sync sweep is always at the end, so that
@@ -941,13 +941,13 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
      */
     if (flags & DOD_finish_FLAG) {
         /* XXX */
-        Parrot_dod_clear_live_bits(interpreter);
-        clear_live_bits(interpreter,
-            interpreter->arena_base->constant_pmc_pool);
+        Parrot_dod_clear_live_bits(interp);
+        clear_live_bits(interp,
+            interp->arena_base->constant_pmc_pool);
 
-        Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
-        Parrot_dod_sweep(interpreter,
-                interpreter->arena_base->constant_pmc_pool);
+        Parrot_dod_sweep(interp, interp->arena_base->pmc_pool);
+        Parrot_dod_sweep(interp,
+                interp->arena_base->constant_pmc_pool);
         return;
     }
     ++arena_base->DOD_block_level;
@@ -955,27 +955,27 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
     /*
      * tell the threading system that we gonna DOD mark
      */
-    pt_DOD_start_mark(interpreter);
-    Parrot_dod_ms_run_init(interpreter);
+    pt_DOD_start_mark(interp);
+    Parrot_dod_ms_run_init(interp);
 
     /* Now go trace the PMCs */
-    if (trace_active_PMCs(interpreter, flags & DOD_trace_stack_FLAG)) {
+    if (trace_active_PMCs(interp, flags & DOD_trace_stack_FLAG)) {
 
         arena_base->dod_trace_ptr = NULL;
         arena_base->dod_mark_ptr = NULL;
         /*
          * mark is now finished
          */
-        pt_DOD_stop_mark(interpreter);
+        pt_DOD_stop_mark(interp);
 
         /* Now put unused PMCs and Buffers on the free list */
-        Parrot_forall_header_pools(interpreter, POOL_BUFFER | POOL_PMC,
+        Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
             (void*)&total_free, sweep_cb);
-        if (interpreter->profile)
-            Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cb);
+        if (interp->profile)
+            Parrot_dod_profile_end(interp, PARROT_PROF_DOD_cb);
     }
     else {
-        pt_DOD_stop_mark(interpreter); /* XXX */
+        pt_DOD_stop_mark(interp); /* XXX */
         /*
          * successful lazy DOD count
          */
@@ -984,10 +984,10 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
          * the live bits, but e.g. t/pmc/timer_7 succeeds w/o this
          */
 #if 1
-        Parrot_dod_clear_live_bits(interpreter);
+        Parrot_dod_clear_live_bits(interp);
 #endif
-        if (interpreter->profile)
-            Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_p2);
+        if (interp->profile)
+            Parrot_dod_profile_end(interp, PARROT_PROF_DOD_p2);
     }
     /* Note it */
     arena_base->dod_runs++;
@@ -996,10 +996,10 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
 }
 
 void
-Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
+Parrot_do_dod_run(Interp *interp, UINTVAL flags)
 {
-    interpreter->arena_base->do_dod_run(interpreter, flags);
-    parrot_gc_context(interpreter);
+    interp->arena_base->do_dod_run(interp, flags);
+    parrot_gc_context(interp);
 }
 
 /*

@@ -140,7 +140,7 @@ Return the classname.
 
         if (class_data) {
             name = class_data[PCD_CLASS_NAME];
-            return readable_name(interpreter, name);
+            return readable_name(interp, name);
         }
         return SELF->vtable->whoami;
     }
@@ -246,9 +246,9 @@ Create the class from the thawed parents and attributes array.
                 info->extra_flags = EXTRA_CLASS_EXISTS;
             }
             else {
-                PMC *name = pmc_new(interpreter, enum_class_String);
+                PMC *name = pmc_new(interp, enum_class_String);
                 real_class = SELF;
-                VTABLE_set_string_native(interpreter, name, class_name);
+                VTABLE_set_string_native(interp, name, class_name);
                 SELF.init_pmc(name);
             }
             /* make room for thawed arrays */

@@ -73,17 +73,16 @@ pmclass CodeString
 {
     void class_init () {
         if (pass) {
-            Interp *interpreter = interp;
-            PMC *global_serno = pmc_new(interpreter, enum_class_Integer);
-            PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+            PMC *global_serno = pmc_new(INTERP, enum_class_Integer);
+            PMC * const cur_ns = CONTEXT(INTERP->ctx)->current_namespace;
 
-            PERCENT = string_from_const_cstring(interpreter, "%", 0);
-            COMMA   = string_from_const_cstring(interpreter, ",", 0);
-            NEWLINE = string_from_const_cstring(interpreter, "\n", 0);
-            SLASH_U = string_from_const_cstring(interpreter, "\\u", 0);
-            SLASH_X = string_from_const_cstring(interpreter, "\\x", 0);
-            VTABLE_set_integer_native(interpreter, global_serno, 10);
-            Parrot_set_global(interpreter, cur_ns, string_from_const_cstring(interpreter, "$!serno", 0), global_serno);
+            PERCENT = string_from_const_cstring(INTERP, "%", 0);
+            COMMA   = string_from_const_cstring(INTERP, ",", 0);
+            NEWLINE = string_from_const_cstring(INTERP, "\n", 0);
+            SLASH_U = string_from_const_cstring(INTERP, "\\u", 0);
+            SLASH_X = string_from_const_cstring(INTERP, "\\x", 0);
+            VTABLE_set_integer_native(INTERP, global_serno, 10);
+            Parrot_set_global(INTERP, cur_ns, string_from_const_cstring(INTERP, "$!serno", 0), global_serno);
         }
     }
 
@@ -118,31 +117,31 @@ A newline is automatically added to the end of the fmt.
         STRING *key;
         STRING *repl;
 
-        format = string_copy(interpreter, orig_format);
+        format = string_copy(interp, orig_format);
 
-        position = string_str_index(interpreter, format, PERCENT, position);
+        position = string_str_index(interp, format, PERCENT, position);
         while ( position > 0 )
         {
-            key = string_substr(interpreter, format, position + 1, 1, NULL, 0);
+            key = string_substr(interp, format, position + 1, 1, NULL, 0);
             /* named substitution  %position */
-            if (VTABLE_exists_keyed_str(interpreter, named_args, key)) {
-                repl = VTABLE_get_string_keyed_str(interpreter, named_args, key);
+            if (VTABLE_exists_keyed_str(interp, named_args, key)) {
+                repl = VTABLE_get_string_keyed_str(interp, named_args, key);
             }
             /* positional substutution  %7 */
-            else if (Parrot_string_is_cclass(interpreter, enum_cclass_numeric, format, position + 1)) {
-                repl = VTABLE_get_string_keyed_int(interpreter, args, string_to_int(interpreter, key));
+            else if (Parrot_string_is_cclass(interp, enum_cclass_numeric, format, position + 1)) {
+                repl = VTABLE_get_string_keyed_int(interp, args, string_to_int(interp, key));
             }
             /* %, */
-            else if (string_equal(interpreter, key, COMMA)) {
+            else if (string_equal(interp, key, COMMA)) {
                 int i;
-                int size = VTABLE_elements(interpreter, args);
-                repl = string_copy(interpreter, VTABLE_get_string_keyed_int(interpreter, args, 0));
+                int size = VTABLE_elements(interp, args);
+                repl = string_copy(interp, VTABLE_get_string_keyed_int(interp, args, 0));
                 for ( i=1; i<size; i++ ) {
-                    repl = Parrot_sprintf_c(interpreter, "%ss, %ss", repl, VTABLE_get_string_keyed_int(interpreter, args, i));
+                    repl = Parrot_sprintf_c(interp, "%ss, %ss", repl, VTABLE_get_string_keyed_int(interp, args, i));
                 }
             }
             /* %% */
-            else if (string_equal(interpreter, key, PERCENT)) {
+            else if (string_equal(interp, key, PERCENT)) {
                 repl = PERCENT;
             }
             /* unrecognized %_ */
@@ -151,14 +150,14 @@ A newline is automatically added to the end of the fmt.
                 continue;
             }
 
-            string_replace(interpreter, format, position, 2, repl, NULL);
-            position += string_length(interpreter, repl);
-            position = string_str_index(interpreter, format, PERCENT, position);
+            string_replace(interp, format, position, 2, repl, NULL);
+            position += string_length(interp, repl);
+            position = string_str_index(interp, format, PERCENT, position);
         }
 
-        string_append(interpreter, PMC_str_val(SELF), format);
-        if (!string_equal(interpreter, string_substr(interpreter, format, -1, 0, NULL, 0), NEWLINE)) {
-            string_append(interpreter,  PMC_str_val(SELF), NEWLINE);
+        string_append(interp, PMC_str_val(SELF), format);
+        if (!string_equal(interp, string_substr(interp, format, -1, 0, NULL, 0), NEWLINE)) {
+            string_append(interp,  PMC_str_val(SELF), NEWLINE);
         }
     }
 
@@ -179,14 +178,14 @@ counting at 10 (so that the values 0..9 can be considered "safe").
     METHOD STRING* unique(STRING *format, INTVAL has_format) {
         STRING *id;
         PMC *serno;
-        PMC * const cur_ns = CONTEXT(interpreter->ctx)->current_namespace;
+        PMC * const cur_ns = CONTEXT(interp->ctx)->current_namespace;
 
-        serno = Parrot_get_global(interpreter, cur_ns, string_from_const_cstring(interpreter, "$!serno", 0));
-        id = VTABLE_get_string(interpreter, serno);
-        VTABLE_increment(interpreter, serno);
+        serno = Parrot_get_global(interp, cur_ns, string_from_const_cstring(interp, "$!serno", 0));
+        id = VTABLE_get_string(interp, serno);
+        VTABLE_increment(interp, serno);
 
         if (has_format) {
-            id = Parrot_sprintf_c(interpreter, "%ss%ss", format, id);
+            id = Parrot_sprintf_c(interp, "%ss%ss", format, id);
         }
         return id;
     }
@@ -203,12 +202,12 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 */
     METHOD STRING* escape(STRING *str) {
-        str = string_escape_string(interpreter, str);
-        str = Parrot_sprintf_c(interpreter, "\"%ss\"", str);
-        if (string_str_index(interpreter, str, SLASH_U, 0) >= 0
-                || string_str_index(interpreter, str, SLASH_X, 0) >= 0) {
+        str = string_escape_string(interp, str);
+        str = Parrot_sprintf_c(interp, "\"%ss\"", str);
+        if (string_str_index(interp, str, SLASH_U, 0) >= 0
+                || string_str_index(interp, str, SLASH_X, 0) >= 0) {
         }
-        str = string_concat(interpreter, string_from_const_cstring(interpreter, "unicode:", 0), str, 0);
+        str = string_concat(interp, string_from_const_cstring(interp, "unicode:", 0), str, 0);
         return str;
     }
 }

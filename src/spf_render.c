@@ -35,7 +35,7 @@ and its utility functions.
 /*
 
 =item C<static STRING*
-uint_to_str(Interp *interpreter,
+uint_to_str(Interp *interp,
             char *tc, UHUGEINTVAL num, char base, int minus)>
 
 Returns C<num> converted to a Parrot C<STRING>.
@@ -51,7 +51,7 @@ If C<minus> is true then C<-> is prepended to the string representation.
 */
 
 static STRING*
-uint_to_str(Interp *interpreter,
+uint_to_str(Interp *interp,
             char *tc, UHUGEINTVAL num, char base, int minus)
 {
     /* the buffer must be at least as long as this */
@@ -70,13 +70,13 @@ uint_to_str(Interp *interpreter,
     } while (num /= base);
     if (minus)
         *--p = '-';
-    return string_make(interpreter, p, tail - p, "ascii", 0);
+    return string_make(interp, p, tail - p, "ascii", 0);
 }
 
 /*
 
 =item C<STRING *
-int_to_str(Interp *interpreter,
+int_to_str(Interp *interp,
            char *tc, HUGEINTVAL num, char base)>
 
 Returns C<num> converted to a Parrot C<STRING>.
@@ -90,7 +90,7 @@ If C<num < 0> then C<-> is prepended to the string representation.
 */
 
 STRING *
-int_to_str(Interp *interpreter,
+int_to_str(Interp *interp,
            char *tc, HUGEINTVAL num, char base)
 {
     int minus = 0;
@@ -99,13 +99,13 @@ int_to_str(Interp *interpreter,
         minus = 1;
         num = -num;
     }
-    return uint_to_str(interpreter, tc, (UHUGEINTVAL) num, base, minus);
+    return uint_to_str(interp, tc, (UHUGEINTVAL) num, base, minus);
 }
 
 /*
 
 =item C<static STRING *
-handle_flags(Interp *interpreter,
+handle_flags(Interp *interp,
              SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)>
 
 Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
@@ -115,36 +115,36 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 */
 
 static STRING *
-handle_flags(Interp *interpreter,
+handle_flags(Interp *interp,
              SpfInfo info, STRING *str, INTVAL is_int_type, STRING* prefix)
 {
-    UINTVAL len = string_length(interpreter, str);
+    UINTVAL len = string_length(interp, str);
 
     if (is_int_type) {
         if (info->flags & FLAG_PREC && info->prec == 0 &&
                 len == 1 &&
-                string_ord(interpreter, str, 0) == '0') {
-            string_chopn(interpreter, str, len, 1);
+                string_ord(interp, str, 0) == '0') {
+            string_chopn(interp, str, len, 1);
             len = 0;
         }
         /* +, space */
-        if (!len || string_ord(interpreter, str, 0) != '-') {
+        if (!len || string_ord(interp, str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
-                STRING * const cs = CONST_STRING(interpreter, "+");
-                str = string_concat(interpreter, cs , str, 0);
+                STRING * const cs = CONST_STRING(interp, "+");
+                str = string_concat(interp, cs , str, 0);
                 len++;
             }
             else if (info->flags & FLAG_SPACE) {
-                STRING * const cs = CONST_STRING(interpreter, " ");
-                str = string_concat(interpreter, cs , str, 0);
+                STRING * const cs = CONST_STRING(interp, " ");
+                str = string_concat(interp, cs , str, 0);
                 len++;
             }
         }
 
         /* # 0x ... */
         if ((info->flags & FLAG_SHARP) && prefix) {
-            str = string_concat(interpreter, prefix, str, 0);
-            len += string_length(interpreter, prefix);
+            str = string_concat(interp, prefix, str, 0);
+            len += string_length(interp, prefix);
         }
         /* XXX sharp + fill ??? */
 
@@ -152,8 +152,8 @@ handle_flags(Interp *interpreter,
         /* precision - only for floats, which is handled elsewhere */
         if (info->flags & FLAG_PREC) {
             info->flags |= FLAG_WIDTH;
-            if (string_ord(interpreter, str, 0) == '-' ||
-                    string_ord(interpreter, str, 0) == '+') {
+            if (string_ord(interp, str, 0) == '-' ||
+                    string_ord(interp, str, 0) == '+') {
                 info->width = info->prec + 1;
             }
             else {
@@ -165,12 +165,12 @@ handle_flags(Interp *interpreter,
     else {
         /* string precision */
         if (info->flags & FLAG_PREC && info->prec == 0) {
-            string_chopn(interpreter, str, len, 1);
+            string_chopn(interp, str, len, 1);
             len = 0;
         }
         else
             if (info->flags & FLAG_PREC && info->prec < len) {
-                string_chopn(interpreter, str, -(INTVAL)(info->prec), 1);
+                string_chopn(interp, str, -(INTVAL)(info->prec), 1);
                 len = info->prec;
             }
     }
@@ -179,48 +179,48 @@ handle_flags(Interp *interpreter,
         STRING *fill;
 
         if ((info->flags & FLAG_ZERO) && !(info->flags & FLAG_MINUS)) {
-            fill = CONST_STRING(interpreter, "0");
+            fill = CONST_STRING(interp, "0");
         }
         else {
-            fill = CONST_STRING(interpreter, " ");
+            fill = CONST_STRING(interp, " ");
         }
 
-        fill = string_repeat(interpreter, fill, info->width - len, NULL);
+        fill = string_repeat(interp, fill, info->width - len, NULL);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
-            str = string_concat(interpreter, str, fill, 0);
+            str = string_concat(interp, str, fill, 0);
         }
         else {                  /* right-align */
             /* signed and zero padded */
             if (info->flags & FLAG_ZERO
-                && (string_ord(interpreter, str,0) == '-' ||
-                    string_ord(interpreter, str,0) == '+')) {
+                && (string_ord(interp, str,0) == '-' ||
+                    string_ord(interp, str,0) == '+')) {
                 STRING *temp = NULL;
-                string_substr(interpreter, str, 1, len-1, &temp, 0);
-                string_chopn(interpreter, str, -1, 1);
-                str = string_append(interpreter, str, fill);
-                str = string_append(interpreter, str, temp);
+                string_substr(interp, str, 1, len-1, &temp, 0);
+                string_chopn(interp, str, -1, 1);
+                str = string_append(interp, str, fill);
+                str = string_append(interp, str, temp);
             }
             else {
-                str = string_concat(interpreter, fill, str, 0);
+                str = string_concat(interp, fill, str, 0);
             }
         }
     }
     return str;
 }
 
-static STRING* str_append_w_flags(Interp *interpreter,
+static STRING* str_append_w_flags(Interp *interp,
         STRING* dest, SpfInfo info, STRING* src, STRING *prefix)
 {
-    src = handle_flags(interpreter, info, src, 1, prefix);
-    dest = string_append(interpreter, dest, src);
+    src = handle_flags(interp, info, src, 1, prefix);
+    dest = string_append(interp, dest, src);
     return dest;
 }
 
 /*
 
 =item C<static void
-gen_sprintf_call(Interp *interpreter, char *out,
+gen_sprintf_call(Interp *interp, char *out,
                  SpfInfo info, int thingy)>
 
 Turn the info structure back into an sprintf format. Far from being
@@ -232,7 +232,7 @@ a float.
 */
 
 static void
-gen_sprintf_call(Interp *interpreter, char *out,
+gen_sprintf_call(Interp *interp, char *out,
                  SpfInfo info, int thingy)
 {
     int i = 0;
@@ -285,7 +285,7 @@ gen_sprintf_call(Interp *interpreter, char *out,
 /*
 
 =item C<STRING *
-Parrot_sprintf_format(Interp *interpreter, STRING *pat,
+Parrot_sprintf_format(Interp *interp, STRING *pat,
                       SPRINTF_OBJ * obj)>
 
 This is the engine that does all the formatting.
@@ -295,7 +295,7 @@ This is the engine that does all the formatting.
 */
 
 STRING *
-Parrot_sprintf_format(Interp *interpreter, STRING *pat,
+Parrot_sprintf_format(Interp *interp, STRING *pat,
                       SPRINTF_OBJ * obj)
 {
     INTVAL i, len, old;
@@ -303,7 +303,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
      * start with some allocated buffer
      * this speeds up tracing mandel.pasm by a factor of 3
      */
-    STRING *targ = string_make_empty(interpreter, enum_stringrep_one, 128);
+    STRING *targ = string_make_empty(interp, enum_stringrep_one, 128);
 
     /* ts is used almost universally as an intermediate target;
      * tc is used as a temporary buffer by uint_to_string and
@@ -314,15 +314,15 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
 
-    for (i = old = len = 0; i < (INTVAL) string_length(interpreter, pat); i++) {
-        if (string_ord(interpreter, pat, i) == '%') {        /* % */
+    for (i = old = len = 0; i < (INTVAL) string_length(interp, pat); i++) {
+        if (string_ord(interp, pat, i) == '%') {        /* % */
             if (len) {
-                string_substr(interpreter, pat, old, len, &substr, 1);
-                targ = string_append(interpreter, targ, substr);
+                string_substr(interp, pat, old, len, &substr, 1);
+                targ = string_append(interp, targ, substr);
             }
             len = 0;
             old = i;
-            if (string_ord(interpreter, pat, i + 1) == '%') {
+            if (string_ord(interp, pat, i + 1) == '%') {
                 /* skip this one, make next the first char
                  * of literal sequence, starting at old */
                 i++;
@@ -437,9 +437,9 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
  *  set flags--the last does all the work.
  */
 
-                for (i++; i < (INTVAL) string_length(interpreter, pat)
+                for (i++; i < (INTVAL) string_length(interp, pat)
                      && info.phase != PHASE_DONE; i++) {
-                    const INTVAL ch = string_ord(interpreter, pat, i);
+                    const INTVAL ch = string_ord(interp, pat, i);
 
                     switch (info.phase) {
                     /*@fallthrough@ */ case PHASE_FLAGS:
@@ -488,7 +488,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
 
                         case '*':
                             info.flags |= FLAG_WIDTH;
-                            info.width = (UINTVAL)obj->getint(interpreter,
+                            info.width = (UINTVAL)obj->getint(interp,
                                                       SIZE_XVAL, obj);
                             /* fall through */
 
@@ -520,7 +520,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
 
                         case '*':
                             info.flags |= FLAG_PREC;
-                            info.prec = (UINTVAL)obj->getint(interpreter,
+                            info.prec = (UINTVAL)obj->getint(interp,
                                                      SIZE_XVAL, obj);
                             info.phase = PHASE_TYPE;
                             continue;
@@ -569,68 +569,68 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                         switch (ch) {
                             /* INTEGERS */
                         case 'c':
-                            ts = string_chr(interpreter,
-                                 (UINTVAL)obj->getint(interpreter, info.type, obj));
-                            targ = str_append_w_flags(interpreter, targ,
+                            ts = string_chr(interp,
+                                 (UINTVAL)obj->getint(interp, info.type, obj));
+                            targ = str_append_w_flags(interp, targ,
                                     &info, ts, NULL);
                             break;
 
                         case 'o':
-                            theuint = obj->getuint(interpreter, info.type, obj);
-                            ts = uint_to_str(interpreter, tc, theuint, 8, 0);
-                            prefix = CONST_STRING(interpreter, "0");
+                            theuint = obj->getuint(interp, info.type, obj);
+                            ts = uint_to_str(interp, tc, theuint, 8, 0);
+                            prefix = CONST_STRING(interp, "0");
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ = str_append_w_flags(interpreter, targ,
+                            targ = str_append_w_flags(interp, targ,
                                     &info, ts, prefix);
                             break;
 
                         case 'x':
-                            theuint = obj->getuint(interpreter, info.type, obj);
-                            ts = uint_to_str(interpreter, tc, theuint, 16, 0);
-                            prefix = CONST_STRING(interpreter, "0x");
+                            theuint = obj->getuint(interp, info.type, obj);
+                            ts = uint_to_str(interp, tc, theuint, 16, 0);
+                            prefix = CONST_STRING(interp, "0x");
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ = str_append_w_flags(interpreter, targ,
+                            targ = str_append_w_flags(interp, targ,
                                     &info, ts, prefix);
                             break;
 
                         case 'X':
                             theuint =
-                                obj->getuint(interpreter, info.type, obj);
-                            ts = uint_to_str(interpreter, tc, theuint, 16, 0);
-                            ts = string_upcase(interpreter, ts);
-                            prefix = CONST_STRING(interpreter, "0X");
+                                obj->getuint(interp, info.type, obj);
+                            ts = uint_to_str(interp, tc, theuint, 16, 0);
+                            ts = string_upcase(interp, ts);
+                            prefix = CONST_STRING(interp, "0X");
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ = str_append_w_flags(interpreter, targ,
+                            targ = str_append_w_flags(interp, targ,
                                     &info, ts, prefix);
                             break;
 
                         case 'b':
                             theuint =
-                                obj->getuint(interpreter, info.type, obj);
-                            ts = uint_to_str(interpreter, tc, theuint, 2, 0);
-                            prefix = CONST_STRING(interpreter, "0b");
+                                obj->getuint(interp, info.type, obj);
+                            ts = uint_to_str(interp, tc, theuint, 2, 0);
+                            prefix = CONST_STRING(interp, "0b");
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ = str_append_w_flags(interpreter, targ,
+                            targ = str_append_w_flags(interp, targ,
                                     &info, ts, prefix);
                             break;
 
                         case 'B':
-                            theint = obj->getint(interpreter, info.type, obj);
-                            ts = int_to_str(interpreter, tc, theint, 2);
-                            prefix = CONST_STRING(interpreter, "0B");
+                            theint = obj->getint(interp, info.type, obj);
+                            ts = int_to_str(interp, tc, theint, 2);
+                            prefix = CONST_STRING(interp, "0B");
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ = str_append_w_flags(interpreter, targ,
+                            targ = str_append_w_flags(interp, targ,
                                     &info, ts, prefix);
                             break;
 
                         case 'u':
                             theuint =
-                                obj->getuint(interpreter, info.type, obj);
+                                obj->getuint(interp, info.type, obj);
                             theint = theuint;
                             goto do_sprintf;
                         case 'd':
@@ -639,13 +639,13 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                              * empty string. */
                             if (!(info.flags & FLAG_WIDTH))
                                 info.flags &= ~FLAG_ZERO;
-                            theint = obj->getint(interpreter, info.type, obj);
+                            theint = obj->getint(interp, info.type, obj);
 do_sprintf:
-                            gen_sprintf_call(interpreter, tc, &info, ch);
+                            gen_sprintf_call(interp, tc, &info, ch);
                             ts = cstr2pstr(tc);
                             {
                                 char * const tempstr =
-                                    string_to_cstring(interpreter, ts);
+                                    string_to_cstring(interp, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
@@ -656,17 +656,17 @@ do_sprintf:
 #endif
                                 string_cstring_free(tempstr);
                             }
-                            targ = string_append(interpreter, targ,
+                            targ = string_append(interp, targ,
                                                  cstr2pstr(tc));
                             break;
 
                         case 'p':
-                            ptr = obj->getptr(interpreter, info.type, obj);
-                            ts = uint_to_str(interpreter, tc,
+                            ptr = obj->getptr(interp, info.type, obj);
+                            ts = uint_to_str(interp, tc,
                                        (HUGEINTVAL) (size_t) ptr, 16, 0);
 
-                            prefix = CONST_STRING(interpreter, "0x");
-                            targ = str_append_w_flags(interpreter, targ,
+                            prefix = CONST_STRING(interp, "0x");
+                            targ = str_append_w_flags(interp, targ,
                                     &info, ts, prefix);
                             break;
 
@@ -677,16 +677,16 @@ do_sprintf:
                         case 'g':
                         case 'G':
                             thefloat = obj->getfloat
-                                (interpreter, info.type, obj);
+                                (interp, info.type, obj);
                             /* turn -0.0 into 0.0 */
                             /* WTF if( thefloat == 0.0 ) { thefloat = 0.0; } */
-                            gen_sprintf_call(interpreter, tc, &info, ch);
+                            gen_sprintf_call(interp, tc, &info, ch);
                             ts = cstr2pstr(tc);
                             /* XXX lost precision if %Hg or whatever
                                */
                             {
                                 char * const tempstr =
-                                    string_to_cstring(interpreter, ts);
+                                    string_to_cstring(interp, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
@@ -710,16 +710,17 @@ do_sprintf:
                             if(tolower(ch) == 'g') {
                                 UINTVAL j;
                                 for(j=0; j < strlen(tc); j++) {
-                                    if(tolower(tc[j]) == 'e' &&
-                                        (tc[j+1] == '+' || tc[j+1] == '-')) {
-                                        tc[j+2]='\0';
-                                        strcat(tc, &(tc[j+3]));
+                                    if(tolower(tc[j]) == 'e'
+                                       && (tc[j+1] == '+' || tc[j+1] == '-')
+                                       && tc[j+2] == '0')
+                                    {
+                                        mem_sys_memmove(&tc[j+2], &tc[j+3], strlen(&tc[j+2]));
                                     }
                                 }
                             }
 #endif
 
-                            targ = string_append(interpreter, targ,
+                            targ = string_append(interp, targ,
                                                  cstr2pstr(tc));
                             break;
 
@@ -730,17 +731,17 @@ do_sprintf:
                              * is inlined and modified to call get_repr    */
                             if (obj->getstring == pmc_core.getstring) {
                                 PMC * const tmp =
-                                    VTABLE_get_pmc_keyed_int(interpreter,
+                                    VTABLE_get_pmc_keyed_int(interp,
                                                              ((PMC *)obj->data),
                                                              (obj->index));
 
                                 obj->index++;
-                                string = (VTABLE_get_repr(interpreter, tmp));
+                                string = (VTABLE_get_repr(interp, tmp));
 
-                                ts = handle_flags(interpreter, &info, string,
+                                ts = handle_flags(interp, &info, string,
                                     0, NULL);
 
-                                targ = string_append(interpreter, targ, ts);
+                                targ = string_append(interp, targ, ts);
 
                                 break;
                             }
@@ -748,12 +749,12 @@ do_sprintf:
                         case 's':
                           CASE_s:
                             string = obj->getstring
-                                (interpreter, info.type, obj);
+                                (interp, info.type, obj);
 
-                            ts = handle_flags(interpreter, &info, string,
+                            ts = handle_flags(interp, &info, string,
                                     0, NULL);
 
-                            targ = string_append(interpreter, targ, ts);
+                            targ = string_append(interp, targ, ts);
 
                             break;
 
@@ -769,7 +770,7 @@ do_sprintf:
                                  */
                             }
                             else {
-                                real_exception(interpreter, NULL, INVALID_CHARACTER,
+                                real_exception(interp, NULL, INVALID_CHARACTER,
                                                    "'%c' is not a valid "
                                                    "sprintf format",
                                                    ch);
@@ -796,8 +797,8 @@ do_sprintf:
         }
     }
     if (len) {
-        string_substr(interpreter, pat, old, len, &substr, 1);
-        targ = string_append(interpreter, targ, substr);
+        string_substr(interp, pat, old, len, &substr, 1);
+        targ = string_append(interp, targ, substr);
     }
 
     return targ;

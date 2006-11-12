@@ -92,7 +92,7 @@ static int r_special[5];
 static int w_special[1+4*3];
 
 void
-imcc_init_tables(Interp * interpreter)
+imcc_init_tables(Interp *interp)
 {
     size_t i;
     const char *reads[] = {
@@ -105,12 +105,12 @@ imcc_init_tables(Interp * interpreter)
     /* init opnums */
     if (!r_special[0]) {
         for (i = 0; i < sizeof(reads)/sizeof(reads[0]); i++) {
-            int n = interpreter->op_lib->op_code(reads[i], 1);
+            int n = interp->op_lib->op_code(reads[i], 1);
             assert(n);
             r_special[i] = n;
         }
         for (i = 0; i < sizeof(writes)/sizeof(writes[0]); i++) {
-            int n = interpreter->op_lib->op_code(writes[i], 1);
+            int n = interp->op_lib->op_code(writes[i], 1);
             assert(n);
             w_special[i] = n;
         }
@@ -577,12 +577,12 @@ e_file_open(Interp *interp, void *param)
 }
 
 static int
-e_file_close(Interp *interpreter, void *param)
+e_file_close(Interp *interp, void *param)
 {
     UNUSED(param);
     printf("\n\n");
     fclose(stdout);
-    IMCC_info(interpreter, 1, "assembly module %s written.\n", output);
+    IMCC_info(interp, 1, "assembly module %s written.\n", output);
     return 0;
 }
 

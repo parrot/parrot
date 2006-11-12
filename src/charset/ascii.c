@@ -28,16 +28,16 @@ charset functionality for similar charsets like iso-8859-1.
  */
 
 #define EXCEPTION(err, str) \
-    real_exception(interpreter, NULL, err, str)
+    real_exception(interp, NULL, err, str)
 
 #include "tables.h"
 
 INTVAL
-ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
+ascii_find_thing(Interp *interp, STRING *string, UINTVAL start,
         PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table)
 {
     for (; start < string->strlen; start++) {
-        if (table[ENCODING_GET_BYTE(interpreter, string, start)] & type) {
+        if (table[ENCODING_GET_BYTE(interp, string, start)] & type) {
             return start;
         }
     }
@@ -45,11 +45,11 @@ ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
 }
 
 INTVAL
-ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
+ascii_find_not_thing(Interp *interp, STRING *string, UINTVAL start,
         PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table)
 {
     for (; start < string->strlen; start++) {
-        if (!(table[ENCODING_GET_BYTE(interpreter, string, start)] & type)) {
+        if (!(table[ENCODING_GET_BYTE(interp, string, start)] & type)) {
             return start;
         }
     }
@@ -57,31 +57,31 @@ ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
 }
 
 STRING *
-ascii_get_graphemes(Interp *interpreter, STRING *source_string,
+ascii_get_graphemes(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count)
 {
-    return ENCODING_GET_BYTES(interpreter, source_string, offset, count);
+    return ENCODING_GET_BYTES(interp, source_string, offset, count);
 }
 
 static void
-set_graphemes(Interp *interpreter, STRING *source_string,
+set_graphemes(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
 {
-    ENCODING_SET_BYTES(interpreter, source_string, offset,
+    ENCODING_SET_BYTES(interp, source_string, offset,
             replace_count, insert_string);
 
 }
 
 STRING *
-ascii_get_graphemes_inplace(Interp *interpreter, STRING *source_string,
+ascii_get_graphemes_inplace(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
-    return ENCODING_GET_BYTES_INPLACE(interpreter, source_string,
+    return ENCODING_GET_BYTES_INPLACE(interp, source_string,
             offset, count, dest_string);
 }
 
 static STRING *
-to_ascii(Interp *interpreter, STRING *src, STRING *dest)
+to_ascii(Interp *interp, STRING *src, STRING *dest)
 {
     String_iter iter;
     UINTVAL c, len, offs;
@@ -89,73 +89,73 @@ to_ascii(Interp *interpreter, STRING *src, STRING *dest)
 
     len = src->strlen;
     if (dest) {
-        Parrot_reallocate_string(interpreter, dest, len);
+        Parrot_reallocate_string(interp, dest, len);
     }
     else {
         /* the string can't grow - replace inplace */
         dest = src;
     }
     p = dest->strstart;
-    ENCODING_ITER_INIT(interpreter, src, &iter);
+    ENCODING_ITER_INIT(interp, src, &iter);
     for (offs = 0; offs < len; ++offs) {
-        c = iter.get_and_advance(interpreter, &iter);
+        c = iter.get_and_advance(interp, &iter);
         if (c >= 128)
-            real_exception(interpreter, NULL, LOSSY_CONVERSION,
+            real_exception(interp, NULL, LOSSY_CONVERSION,
                     "can't convert unicode string to ascii");
         *p++ = (unsigned char)c;
     }
     dest->bufused = dest->strlen = len;
     dest->charset = Parrot_ascii_charset_ptr;
-    dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, dest);
+    dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, dest);
     return dest;
 }
 
 static STRING *
-to_unicode(Interp *interpreter, STRING *src, STRING *dest)
+to_unicode(Interp *interp, STRING *src, STRING *dest)
 {
     if (dest) {
         dest->charset = Parrot_unicode_charset_ptr;
-        dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, dest);
-        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, dest);
+        Parrot_reallocate_string(interp, dest, src->strlen);
         return dest;
     }
     else {
         src->charset = Parrot_unicode_charset_ptr;
-        src->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, src);
+        src->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, src);
         return src;
     }
 }
 
 static STRING *
-to_charset(Interp *interpreter, STRING *src, STRING *dest)
+to_charset(Interp *interp, STRING *src, STRING *dest)
 {
     charset_converter_t conversion_func;
 
-    if ((conversion_func = Parrot_find_charset_converter(interpreter,
+    if ((conversion_func = Parrot_find_charset_converter(interp,
                     src->charset, Parrot_ascii_charset_ptr))) {
-         return conversion_func(interpreter, src, dest);
+         return conversion_func(interp, src, dest);
     }
     else {
-        return to_ascii(interpreter, src, dest);
+        return to_ascii(interp, src, dest);
     }
 }
 
 /* A noop. can't compose ascii */
 static STRING*
-compose(Interp *interpreter, STRING *src)
+compose(Interp *interp, STRING *src)
 {
-    return string_copy(interpreter, src);
+    return string_copy(interp, src);
 }
 
 /* A noop. can't decompose ascii */
 static STRING*
-decompose(Interp *interpreter, STRING *src)
+decompose(Interp *interp, STRING *src)
 {
-    return string_copy(interpreter, src);
+    return string_copy(interp, src);
 }
 
 static void
-upcase(Interp *interpreter, STRING *source_string)
+upcase(Interp *interp, STRING *source_string)
 {
     char *buffer;
     UINTVAL offset = 0;
@@ -171,7 +171,7 @@ upcase(Interp *interpreter, STRING *source_string)
 }
 
 static void
-downcase(Interp *interpreter, STRING *source_string)
+downcase(Interp *interp, STRING *source_string)
 {
     UINTVAL offset = 0;
     char *buffer;
@@ -185,7 +185,7 @@ downcase(Interp *interpreter, STRING *source_string)
 }
 
 static void
-titlecase(Interp *interpreter, STRING *source_string)
+titlecase(Interp *interp, STRING *source_string)
 {
     char *buffer;
     UINTVAL offset = 0;
@@ -200,7 +200,7 @@ titlecase(Interp *interpreter, STRING *source_string)
 }
 
 static void
-upcase_first(Interp *interpreter, STRING *source_string)
+upcase_first(Interp *interp, STRING *source_string)
 {
     char *buffer;
     if (!source_string->strlen) {
@@ -211,7 +211,7 @@ upcase_first(Interp *interpreter, STRING *source_string)
 }
 
 static void
-downcase_first(Interp *interpreter, STRING *source_string)
+downcase_first(Interp *interp, STRING *source_string)
 {
     char *buffer;
     if (!source_string->strlen) {
@@ -222,7 +222,7 @@ downcase_first(Interp *interpreter, STRING *source_string)
 }
 
 static void
-titlecase_first(Interp *interpreter, STRING *source_string)
+titlecase_first(Interp *interp, STRING *source_string)
 {
     char *buffer;
     if (!source_string->strlen) {
@@ -234,7 +234,7 @@ titlecase_first(Interp *interpreter, STRING *source_string)
 }
 
 INTVAL
-ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
+ascii_compare(Interp *interp, STRING *lhs, STRING *rhs)
 {
     UINTVAL offs, l_len, r_len, min_len;
     String_iter iter;
@@ -251,10 +251,10 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
     }
     else {
         UINTVAL cl, cr;
-        ENCODING_ITER_INIT(interpreter, rhs, &iter);
+        ENCODING_ITER_INIT(interp, rhs, &iter);
         for (offs = 0; offs < min_len; ++offs) {
-            cl = ENCODING_GET_BYTE(interpreter, lhs, offs);
-            cr = iter.get_and_advance(interpreter, &iter);
+            cl = ENCODING_GET_BYTE(interp, lhs, offs);
+            cr = iter.get_and_advance(interp, &iter);
             if (cl != cr)
                 return cl < cr ? -1 : 1;
         }
@@ -269,21 +269,21 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 }
 
 INTVAL
-mixed_cs_index(Interp *interpreter, STRING *src, STRING *search, UINTVAL offs)
+mixed_cs_index(Interp *interp, STRING *src, STRING *search, UINTVAL offs)
 {
     String_iter src_iter, search_iter;
     UINTVAL c1, c2, len;
     INTVAL start;
 
-    ENCODING_ITER_INIT(interpreter, src, &src_iter);
-    src_iter.set_position(interpreter, &src_iter, offs);
-    ENCODING_ITER_INIT(interpreter, search, &search_iter);
+    ENCODING_ITER_INIT(interp, src, &src_iter);
+    src_iter.set_position(interp, &src_iter, offs);
+    ENCODING_ITER_INIT(interp, search, &search_iter);
     len = search->strlen;
 
     start = -1;
     for (; len && offs < src->strlen; ++offs) {
-        c1 = src_iter.get_and_advance(interpreter, &src_iter);
-        c2 = search_iter.get_and_advance(interpreter, &search_iter);
+        c1 = src_iter.get_and_advance(interp, &src_iter);
+        c2 = search_iter.get_and_advance(interp, &search_iter);
         if (c1 == c2) {
             --len;
             if (start == -1)
@@ -292,7 +292,7 @@ mixed_cs_index(Interp *interpreter, STRING *src, STRING *search, UINTVAL offs)
         else {
             len = search->strlen;
             start = -1;
-            search_iter.set_position(interpreter, &search_iter, 0);
+            search_iter.set_position(interp, &search_iter, 0);
         }
     }
     if (len == 0)
@@ -301,23 +301,23 @@ mixed_cs_index(Interp *interpreter, STRING *src, STRING *search, UINTVAL offs)
 }
 
 INTVAL
-ascii_cs_index(Interp *interpreter, STRING *source_string,
+ascii_cs_index(Interp *interp, STRING *source_string,
         STRING *search_string, UINTVAL offset)
 {
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
-        return mixed_cs_index(interpreter, source_string, search_string,
+        return mixed_cs_index(interp, source_string, search_string,
                 offset);
     }
 
     assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    retval = Parrot_byte_index(interpreter, source_string,
+    retval = Parrot_byte_index(interp, source_string,
             search_string, offset);
     return retval;
 }
 
 INTVAL
-ascii_cs_rindex(Interp *interpreter, STRING *source_string,
+ascii_cs_rindex(Interp *interp, STRING *source_string,
         STRING *search_string, UINTVAL offset) {
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
@@ -325,20 +325,20 @@ ascii_cs_rindex(Interp *interpreter, STRING *source_string,
     }
 
     assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    retval = Parrot_byte_rindex(interpreter, source_string,
+    retval = Parrot_byte_rindex(interp, source_string,
             search_string, offset);
     return retval;
 }
 
 static UINTVAL
-validate(Interp *interpreter, STRING *src)
+validate(Interp *interp, STRING *src)
 {
     UINTVAL codepoint, offset;
     String_iter iter;
 
-    ENCODING_ITER_INIT(interpreter, src, &iter);
-    for (offset = 0; offset < string_length(interpreter, src); ++offset) {
-        codepoint = iter.get_and_advance(interpreter, &iter);
+    ENCODING_ITER_INIT(interp, src, &iter);
+    for (offset = 0; offset < string_length(interp, src); ++offset) {
+        codepoint = iter.get_and_advance(interp, &iter);
         if (codepoint >= 0x80)
             return 0;
     }
@@ -346,23 +346,23 @@ validate(Interp *interpreter, STRING *src)
 }
 
 static STRING *
-string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
+string_from_codepoint(Interp *interp, UINTVAL codepoint)
 {
     STRING *return_string = NULL;
     char real_codepoint = (char)codepoint;
-    return_string = string_make(interpreter, &real_codepoint, 1, "ascii", 0);
+    return_string = string_make(interp, &real_codepoint, 1, "ascii", 0);
     return return_string;
 }
 
 static INTVAL
-is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
         STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
 
     if (offset >= source_string->strlen)
         return 0;
-    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+    codepoint = ENCODING_GET_CODEPOINT(interp, source_string, offset);
 
     if (codepoint >= sizeof(Parrot_ascii_typetable) /
             sizeof(Parrot_ascii_typetable[0])) {
@@ -372,7 +372,7 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
             STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -382,7 +382,7 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-        codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
         if ((Parrot_ascii_typetable[codepoint] & flags) != 0) {
             return pos;
         }
@@ -391,7 +391,7 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+find_not_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
                 STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -401,7 +401,7 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-        codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
         if ((Parrot_ascii_typetable[codepoint] & flags) == 0) {
             return pos;
         }
@@ -413,7 +413,7 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
  * TODO pass in the Hash's seed value as initial hashval
  */
 size_t
-ascii_compute_hash(Interp *interpreter, STRING *source_string, size_t seed)
+ascii_compute_hash(Interp *interp, STRING *source_string, size_t seed)
 {
     size_t hashval = seed;
 
@@ -429,9 +429,9 @@ ascii_compute_hash(Interp *interpreter, STRING *source_string, size_t seed)
 }
 
 CHARSET *
-Parrot_charset_ascii_init(Interp *interpreter)
+Parrot_charset_ascii_init(Interp *interp)
 {
-    CHARSET *return_set = Parrot_new_charset(interpreter);
+    CHARSET *return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "ascii",
         ascii_get_graphemes,
@@ -460,21 +460,21 @@ Parrot_charset_ascii_init(Interp *interpreter)
 
     memcpy(return_set, &base_set, sizeof(CHARSET));
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
-    Parrot_register_charset(interpreter, "ascii", return_set);
+    Parrot_register_charset(interp, "ascii", return_set);
     return return_set;
 }
 
 STRING *
-charset_cvt_ascii_to_binary(Interp *interpreter, STRING *src, STRING *dest)
+charset_cvt_ascii_to_binary(Interp *interp, STRING *src, STRING *dest)
 {
     UINTVAL offs, c;
     if (dest) {
-        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        Parrot_reallocate_string(interp, dest, src->strlen);
         dest->bufused = src->bufused;
         dest->strlen  = src->strlen;
         for (offs = 0; offs < src->strlen; ++offs) {
-            c = ENCODING_GET_BYTE(interpreter, src, offs);
-            ENCODING_SET_BYTE(interpreter, dest, offs, c);
+            c = ENCODING_GET_BYTE(interp, src, offs);
+            ENCODING_SET_BYTE(interp, dest, offs, c);
         }
         return dest;
     }
@@ -483,16 +483,16 @@ charset_cvt_ascii_to_binary(Interp *interpreter, STRING *src, STRING *dest)
 }
 
 STRING *
-charset_cvt_ascii_to_iso_8859_1(Interp *interpreter, STRING *src, STRING *dest)
+charset_cvt_ascii_to_iso_8859_1(Interp *interp, STRING *src, STRING *dest)
 {
     UINTVAL offs, c;
     if (dest) {
-        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        Parrot_reallocate_string(interp, dest, src->strlen);
         dest->bufused = src->bufused;
         dest->strlen  = src->strlen;
         for (offs = 0; offs < src->strlen; ++offs) {
-            c = ENCODING_GET_BYTE(interpreter, src, offs);
-            ENCODING_SET_BYTE(interpreter, dest, offs, c);
+            c = ENCODING_GET_BYTE(interp, src, offs);
+            ENCODING_SET_BYTE(interp, dest, offs, c);
         }
         return dest;
     }

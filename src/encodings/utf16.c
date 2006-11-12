@@ -45,7 +45,7 @@ fill it with the converted result, else operate inplace.
 */
 
 static STRING *
-to_encoding(Interp *interpreter, STRING *src, STRING *dest)
+to_encoding(Interp *interp, STRING *src, STRING *dest)
 {
 #if PARROT_HAS_ICU
     UErrorCode err;
@@ -58,7 +58,7 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
 
     if (src->encoding == Parrot_utf16_encoding_ptr ||
             src->encoding == Parrot_ucs2_encoding_ptr)
-        return in_place ? src : string_copy(interpreter, src);
+        return in_place ? src : string_copy(interp, src);
     /*
      * TODO adapt string creation functions
      */
@@ -89,7 +89,7 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
         p = mem_sys_allocate(src_len * sizeof(UChar));
     }
     else {
-        Parrot_reallocate_string(interpreter, dest, sizeof(UChar) * src_len);
+        Parrot_reallocate_string(interp, dest, sizeof(UChar) * src_len);
         p = dest->strstart;
     }
     if (src->charset == Parrot_iso_8859_1_charset_ptr ||
@@ -110,7 +110,7 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
                 p = mem_sys_realloc(p, dest_len * sizeof(UChar));
             else {
                 result->bufused = dest_len * sizeof(UChar);
-                Parrot_reallocate_string(interpreter, dest,
+                Parrot_reallocate_string(interp, dest,
                                          sizeof(UChar) * dest_len);
                 p = dest->strstart;
             }
@@ -121,7 +121,7 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
     }
     result->bufused = dest_len * sizeof(UChar);
     if (in_place) {
-        Parrot_reallocate_string(interpreter, src, src->bufused);
+        Parrot_reallocate_string(interp, src, src->bufused);
         memcpy(src->strstart, p, src->bufused);
         mem_sys_free(p);
     }
@@ -133,14 +133,14 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
     if (dest_len == (int)src->strlen)
         result->encoding = Parrot_ucs2_encoding_ptr;
 #else
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
     return result;
 }
 
 static UINTVAL
-get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
+get_codepoint(Interp *interp, const STRING *src, UINTVAL offset)
 {
 #if PARROT_HAS_ICU
     UChar *s = (UChar*) src->strstart;
@@ -151,21 +151,21 @@ get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
     U16_GET_UNSAFE(s, pos, c);
     return c;
 #else
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
     return 0;
 #endif
 }
 
 static void
-set_codepoint(Interp *interpreter, STRING *src,
+set_codepoint(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL codepoint)
 {
     UNIMPL;
 }
 
 static UINTVAL
-get_byte(Interp *interpreter, const STRING *src, UINTVAL offset)
+get_byte(Interp *interp, const STRING *src, UINTVAL offset)
 {
     unsigned char *contents = src->strstart;
     if (offset >= src->bufused) {
@@ -178,7 +178,7 @@ get_byte(Interp *interpreter, const STRING *src, UINTVAL offset)
 }
 
 static void
-set_byte(Interp *interpreter, const STRING *src,
+set_byte(Interp *interp, const STRING *src,
         UINTVAL offset, UINTVAL byte)
 {
     unsigned char *contents;
@@ -190,18 +190,18 @@ set_byte(Interp *interpreter, const STRING *src,
 }
 
 static STRING *
-get_codepoints(Interp *interpreter, STRING *src,
+get_codepoints(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count)
 {
     String_iter iter;
     UINTVAL start;
-    STRING *return_string = Parrot_make_COW_reference(interpreter,
+    STRING *return_string = Parrot_make_COW_reference(interp,
             src);
-    iter_init(interpreter, src, &iter);
-    iter.set_position(interpreter, &iter, offset);
+    iter_init(interp, src, &iter);
+    iter.set_position(interp, &iter, offset);
     start = iter.bytepos;
     return_string->strstart = (char *)return_string->strstart + start ;
-    iter.set_position(interpreter, &iter, offset + count);
+    iter.set_position(interp, &iter, offset + count);
     return_string->bufused = iter.bytepos - start;
     return_string->strlen = count;
     return_string->hashval = 0;
@@ -210,17 +210,17 @@ get_codepoints(Interp *interpreter, STRING *src,
 
 
 static STRING *
-get_codepoints_inplace(Interp *interpreter, STRING *src,
+get_codepoints_inplace(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *return_string)
 {
     String_iter iter;
     UINTVAL start;
-    Parrot_reuse_COW_reference(interpreter, src, return_string);
-    iter_init(interpreter, src, &iter);
-    iter.set_position(interpreter, &iter, offset);
+    Parrot_reuse_COW_reference(interp, src, return_string);
+    iter_init(interp, src, &iter);
+    iter.set_position(interp, &iter, offset);
     start = iter.bytepos;
     return_string->strstart = (char *)return_string->strstart + start ;
-    iter.set_position(interpreter, &iter, offset + count);
+    iter.set_position(interp, &iter, offset + count);
     return_string->bufused = iter.bytepos - start;
     return_string->strlen = count;
     return_string->hashval = 0;
@@ -228,7 +228,7 @@ get_codepoints_inplace(Interp *interpreter, STRING *src,
 }
 
 static STRING *
-get_bytes(Interp *interpreter, STRING *src,
+get_bytes(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count)
 {
     UNIMPL;
@@ -236,7 +236,7 @@ get_bytes(Interp *interpreter, STRING *src,
 }
 
 static STRING *
-get_bytes_inplace(Interp *interpreter, STRING *src,
+get_bytes_inplace(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *return_string)
 {
     UNIMPL;
@@ -244,14 +244,14 @@ get_bytes_inplace(Interp *interpreter, STRING *src,
 }
 
 static void
-set_codepoints(Interp *interpreter, STRING *src,
+set_codepoints(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *new_codepoints)
 {
     UNIMPL;
 }
 
 static void
-set_bytes(Interp *interpreter, STRING *src,
+set_bytes(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *new_bytes)
 {
     UNIMPL;
@@ -260,35 +260,35 @@ set_bytes(Interp *interpreter, STRING *src,
 /* Unconditionally makes the string be in this encoding, if that's
    valid */
 static void
-become_encoding(Interp *interpreter, STRING *src)
+become_encoding(Interp *interp, STRING *src)
 {
     UNIMPL;
 }
 
 
 static UINTVAL
-codepoints(Interp *interpreter, STRING *src)
+codepoints(Interp *interp, STRING *src)
 {
     String_iter iter;
     /*
      * this is used to initially calculate src->strlen,
      * therefore we must scan the whole string
      */
-    iter_init(interpreter, src, &iter);
+    iter_init(interp, src, &iter);
     while (iter.bytepos < src->bufused)
-        iter.get_and_advance(interpreter, &iter);
+        iter.get_and_advance(interp, &iter);
     return iter.charpos;
 }
 
 static UINTVAL
-bytes(Interp *interpreter, STRING *src)
+bytes(Interp *interp, STRING *src)
 {
     return src->bufused;
 }
 
 #if PARROT_HAS_ICU
 static UINTVAL
-utf16_decode_and_advance(Interp *interpreter, String_iter *i)
+utf16_decode_and_advance(Interp *interp, String_iter *i)
 {
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL c, pos;
@@ -303,7 +303,7 @@ utf16_decode_and_advance(Interp *interpreter, String_iter *i)
 }
 
 static void
-utf16_encode_and_advance(Interp *interpreter, String_iter *i, UINTVAL c)
+utf16_encode_and_advance(Interp *interp, String_iter *i, UINTVAL c)
 {
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL pos;
@@ -314,7 +314,7 @@ utf16_encode_and_advance(Interp *interpreter, String_iter *i, UINTVAL c)
 }
 
 static void
-utf16_set_position(Interp *interpreter, String_iter *i, UINTVAL n)
+utf16_set_position(Interp *interp, String_iter *i, UINTVAL n)
 {
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL pos;
@@ -326,7 +326,7 @@ utf16_set_position(Interp *interpreter, String_iter *i, UINTVAL n)
 
 #endif
 static void
-iter_init(Interp *interpreter, String *src, String_iter *iter)
+iter_init(Interp *interp, String *src, String_iter *iter)
 {
     iter->str = src;
     iter->bytepos = iter->charpos = 0;
@@ -335,15 +335,15 @@ iter_init(Interp *interpreter, String *src, String_iter *iter)
     iter->set_and_advance = utf16_encode_and_advance;
     iter->set_position =    utf16_set_position;
 #else
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
 }
 
 ENCODING *
-Parrot_encoding_utf16_init(Interp *interpreter)
+Parrot_encoding_utf16_init(Interp *interp)
 {
-    ENCODING *return_encoding = Parrot_new_encoding(interpreter);
+    ENCODING *return_encoding = Parrot_new_encoding(interp);
 
     static const ENCODING base_encoding = {
         "utf16",
@@ -365,7 +365,7 @@ Parrot_encoding_utf16_init(Interp *interpreter)
         iter_init
     };
     memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
-    Parrot_register_encoding(interpreter, "utf16", return_encoding);
+    Parrot_register_encoding(interp, "utf16", return_encoding);
     return return_encoding;
 }
 

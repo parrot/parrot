@@ -101,7 +101,7 @@ Return the NCI PMC of the builtin or NULL.
 */
 
 void
-Parrot_init_builtins(Interp *interpreter)
+Parrot_init_builtins(Interp *interp)
 {
     size_t i;
     char buffer[128];
@@ -111,26 +111,26 @@ Parrot_init_builtins(Interp *interpreter)
         /* XXX mangle yes or no */
 #ifdef MANGLE_BUILTINS
         strcpy(buffer + 2, builtins[i].c_name);
-        builtins[i].meth_name = const_string(interpreter, buffer);
+        builtins[i].meth_name = const_string(interp, buffer);
 #else
-        builtins[i].meth_name = const_string(interpreter,
+        builtins[i].meth_name = const_string(interp,
                 builtins[i].c_name);
 #endif
-        builtins[i].namespace = const_string(interpreter,
+        builtins[i].namespace = const_string(interp,
                 builtins[i].c_ns);
     }
 }
 
-static int find_builtin(Interp *interpreter, const char *func)
+static int find_builtin(Interp *interp, const char *func)
     __attribute__nonnull__(2);
-static int find_builtin_s(Interp *interpreter, STRING *func)
+static int find_builtin_s(Interp *interp, STRING *func)
     __attribute__nonnull__(2);
-static int check_builtin_sig(Interp *interpreter, size_t i,
+static int check_builtin_sig(Interp *interp, size_t i,
                              const char *sig, int pass)
     __attribute__nonnull__(3);
 
 static int
-find_builtin(Interp *interpreter, const char *func /*NN*/)
+find_builtin(Interp *interp, const char *func /*NN*/)
 {
     int low  = 0;
     int high = N_BUILTINS - 1;
@@ -159,7 +159,7 @@ find_builtin(Interp *interpreter, const char *func /*NN*/)
 }
 
 static int
-find_builtin_s(Interp *interpreter, STRING *func /*NN*/)
+find_builtin_s(Interp *interp, STRING *func /*NN*/)
 {
     int low  = 0;
     int high = N_BUILTINS - 1;
@@ -168,7 +168,7 @@ find_builtin_s(Interp *interpreter, STRING *func /*NN*/)
     while (low <= high)
     {
         int i   = (low + high) / 2;
-        int cmp = string_compare(interpreter, func, builtins[i].meth_name);
+        int cmp = string_compare(interp, func, builtins[i].meth_name);
 
         if (!cmp)
             return i;
@@ -181,7 +181,7 @@ find_builtin_s(Interp *interpreter, STRING *func /*NN*/)
 }
 
 static int
-check_builtin_sig(Interp *interpreter, size_t i,
+check_builtin_sig(Interp *interp, size_t i,
                   const char *sig /*NN*/, int pass)
 {
     const Builtins * const b = builtins + i;
@@ -214,11 +214,11 @@ check_builtin_sig(Interp *interpreter, size_t i,
 }
 
 int
-Parrot_is_builtin(Interp *interpreter, const char *func, const char *sig)
+Parrot_is_builtin(Interp *interp, const char *func, const char *sig)
 {
     int bi, i, pass;
 
-    i = find_builtin(interpreter, func);
+    i = find_builtin(interp, func);
     if (i < 0)
         return -1;
     if (!sig)
@@ -227,7 +227,7 @@ Parrot_is_builtin(Interp *interpreter, const char *func, const char *sig)
     for (pass = 0; pass <= 1; ++pass) {
         i = bi;
 again:
-        if (check_builtin_sig(interpreter, i, sig, pass))
+        if (check_builtin_sig(interp, i, sig, pass))
             return i;
         if (i < N_BUILTINS - 1) {
             /* try next with same name */
@@ -241,35 +241,35 @@ again:
 }
 
 PMC*
-Parrot_find_builtin(Interp *interpreter, STRING *func)
+Parrot_find_builtin(Interp *interp, STRING *func)
 {
-    const int i = find_builtin_s(interpreter, func);
+    const int i = find_builtin_s(interp, func);
     if (i < 0)
-        return Parrot_find_global_s(interpreter,
-                                    CONST_STRING(interpreter, "__parrot_core"),
+        return Parrot_find_global_s(interp,
+                                    CONST_STRING(interp, "__parrot_core"),
                                     func);
     else
-        return Parrot_find_global_s(interpreter,
+        return Parrot_find_global_s(interp,
                                     builtins[i].namespace,
                                     builtins[i].meth_name);
 }
 
 const char *
-Parrot_builtin_get_c_namespace(Interp *interpreter, int bi)
+Parrot_builtin_get_c_namespace(Interp *interp, int bi)
 {
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].c_ns;
 }
 
 int
-Parrot_builtin_is_class_method(Interp *interpreter, int bi)
+Parrot_builtin_is_class_method(Interp *interp, int bi)
 {
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].signature[2] != 'O';
 }
 
 int
-Parrot_builtin_is_void(Interp *interpreter, int bi)
+Parrot_builtin_is_void(Interp *interp, int bi)
 {
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].signature[0] == 'v';

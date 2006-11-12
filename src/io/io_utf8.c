@@ -52,12 +52,12 @@ PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     STRING *s, *s2;
     String_iter iter;
 
-    len = PIO_read_down(interpreter, layer->down, io, buf);
+    len = PIO_read_down(interp, layer->down, io, buf);
     s = *buf;
     s->charset  = Parrot_unicode_charset_ptr;
     s->encoding = Parrot_utf8_encoding_ptr;
     /* count chars, verify utf8 */
-    Parrot_utf8_encoding_ptr->iter_init(interpreter, s, &iter);
+    Parrot_utf8_encoding_ptr->iter_init(interp, s, &iter);
     while (iter.bytepos < s->bufused) {
         if (iter.bytepos + 4 > s->bufused) {
             const utf8_t *u8ptr = (utf8_t *)((char *)s->strstart +
@@ -70,19 +70,19 @@ PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 /* need len-1 more chars */
                 len2--;
                 s2 = NULL;
-                s2 = PIO_make_io_string(interpreter, &s2, len2);
+                s2 = PIO_make_io_string(interp, &s2, len2);
                 s2->bufused = len2;
                 s2->charset  = Parrot_unicode_charset_ptr;
                 s2->encoding = Parrot_utf8_encoding_ptr;
-                PIO_read_down(interpreter, layer->down, io, &s2);
+                PIO_read_down(interp, layer->down, io, &s2);
                 s->strlen = iter.charpos;
-                s = string_append(interpreter, s, s2);
+                s = string_append(interp, s, s2);
                 len += len2 + 1;
                 /* check last char */
             }
         }
 ok:
-        iter.get_and_advance(interpreter, &iter);
+        iter.get_and_advance(interp, &iter);
     }
     s->strlen = iter.charpos;
     return len;
@@ -94,11 +94,11 @@ PIO_utf8_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
     STRING *dest;
 
     if (s->encoding == Parrot_utf8_encoding_ptr)
-        return PIO_write_down(interpreter, l->down, io, s);
+        return PIO_write_down(interp, l->down, io, s);
 
-    dest = Parrot_utf8_encoding_ptr->to_encoding(interpreter, s,
-            new_string_header(interpreter, 0));
-    return PIO_write_down(interpreter, l->down, io, dest);
+    dest = Parrot_utf8_encoding_ptr->to_encoding(interp, s,
+            new_string_header(interp, 0));
+    return PIO_write_down(interp, l->down, io, dest);
 }
 
 static const ParrotIOLayerAPI pio_utf8_layer_api = {

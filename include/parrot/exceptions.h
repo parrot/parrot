@@ -16,23 +16,23 @@
 #include "parrot/compiler.h"
 
 /* Prototypes */
-void Parrot_init_exceptions(Interp *interpreter);
+void Parrot_init_exceptions(Interp *interp);
 
 PARROT_API void internal_exception(int exitcode, const char *format, ...)
         __attribute__nonnull__(2)
         __attribute__noreturn__;
-PARROT_API void real_exception(Interp *interpreter,
+PARROT_API void real_exception(Interp *interp,
         void *ret_addr, int exitcode, const char *format, ...)
         __attribute__nonnull__(4)
         __attribute__noreturn__;
-PARROT_API void do_panic(Interp *interpreter, const char *message,
+PARROT_API void do_panic(Interp *interp, const char *message,
         const char *file, int line)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__noreturn__;
 
 #define PANIC(message)\
-        do_panic(interpreter, message, __FILE__, __LINE__)
+        do_panic(interp, message, __FILE__, __LINE__)
 
 /* Exception Types
  * the first types are real exceptions and have Python exception
@@ -175,7 +175,7 @@ PARROT_API size_t handle_exception(Parrot_Interp);
 
 PARROT_API PMC* new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
 PARROT_API void push_new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
-PARROT_API void rethrow_c_exception(Parrot_Interp interpreter);
+PARROT_API void rethrow_c_exception(Parrot_Interp interp);
 
 /*
  * internal exception handling

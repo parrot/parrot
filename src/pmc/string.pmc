@@ -668,7 +668,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 
     METHOD PMC* to_int(INTVAL base) {
         PMC* result = pmc_new(INTERP,
-                Parrot_get_ctx_HLL_type(interpreter,
+                Parrot_get_ctx_HLL_type(interp,
                         enum_class_Integer));
         /* TODO verify encoding */
         const STRING* me = VTABLE_get_string(INTERP, SELF);
@@ -839,11 +839,11 @@ Translate ascii string C<src> with entries from C<trans_table>.
         unsigned char *p, ch;
         INTVAL *tr_data;
 
-        len = string_length(interpreter, src);
+        len = string_length(interp, src);
         if (!len)
             return;
         if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interpreter, NULL, INVALID_ENCODING,
+            real_exception(interp, NULL, INVALID_ENCODING,
                 "Can't translate non-ascii");
         p = src->strstart;
         /* TODO verify trans table */
@@ -870,11 +870,11 @@ Reverse the ascii STRING C<src> in place.
         INTVAL i, len;
         unsigned char *p, ch;
 
-        len = string_length(interpreter, src);
+        len = string_length(interp, src);
         if (!len)
             return;
         if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interpreter, NULL, INVALID_ENCODING,
+            real_exception(interp, NULL, INVALID_ENCODING,
                 "Can't reverse non-ascii");
         p = src->strstart;
         for (i = 0, --len; i < len; ++i, --len) {
@@ -900,11 +900,11 @@ Checks if the ascii STRING C<str> is just an integer.
         INTVAL i, len;
         unsigned char *p;
 
-        len = string_length(interpreter, src);
+        len = string_length(interp, src);
         if (!len)
             return (INTVAL)(0);
         if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interpreter, NULL, INVALID_ENCODING,
+            real_exception(interp, NULL, INVALID_ENCODING,
                 "Can't is_integer non-ascii");
 
         i = 0;

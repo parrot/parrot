@@ -141,8 +141,8 @@ sub dynext_load_code {
 EOC
     $cout .= <<"EOC";
 
-PARROT_DYNEXT_EXPORT extern Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter); /* don't warn */
-Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter)
+PARROT_DYNEXT_EXPORT extern Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interp); /* don't warn */
+Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interp)
 {
     Parrot_STRING whoami;
     Parrot_PMC pmc;
@@ -159,7 +159,7 @@ EOC
     /*
      * create a library PMC
      */
-    pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
+    pmc = pmc_new(interp, enum_class_ParrotLibrary);
     /*
      * TODO stuff some info into this PMCs props
      */
@@ -171,8 +171,8 @@ EOC
     while (my ($class, $info) = each %classes) {
         my $lhs = $info->{flags}->{noinit} ? "" : "type$class = ";
         $cout .= <<"EOC";
-    whoami = const_string(interpreter, "$class");
-    ${lhs}pmc_register(interpreter, whoami);
+    whoami = const_string(interp, "$class");
+    ${lhs}pmc_register(interp, whoami);
 EOC
     }
     $cout .= <<"EOC";
@@ -183,7 +183,7 @@ EOC
     while (my ($class, $info) = each %classes) {
         next if $info->{flags}->{noinit};
         $cout .= <<"EOC";
-        Parrot_${class}_class_init(interpreter, type$class, pass);
+        Parrot_${class}_class_init(interp, type$class, pass);
 EOC
     }
     $cout .= <<"EOC";
@@ -488,11 +488,11 @@ sub decl {
         $extern = "";
         $newl = "\n";
         $semi = "";
-        $interp = ' interpreter';
+        $interp = 'interp';
         $pmc = ' pmc';
     }
     return <<"EOC";
-$export$extern$ret${newl}Parrot_${classname}${variant}_$meth(Interp*$interp, PMC*$pmc$args)$semi
+$export$extern$ret${newl}Parrot_${classname}${variant}_$meth(Interp *$interp, PMC*$pmc$args)$semi
 EOC
 }
 
@@ -580,7 +580,7 @@ sub proto {
     $parameters =~ s/\w+(,|$)/,/g;
     $parameters =~ s/ //g;
 
-    # type method(interpreter, self, parameters...)
+    # type method(interp, self, parameters...)
     my $ret = $calltype{$type or "void"};
     $ret .= "JO";
     $ret .= join('', map {$calltype{$_} or "?"} split(/,/, $parameters));
@@ -603,9 +603,9 @@ sub rewrite_nci_method {
     my ($class, $method) = @_;
 
     local $_ = $_[2];
-    # Rewrite SELF -> pmc, INTERP -> interpreter
+    # Rewrite SELF -> pmc, INTERP -> interp
     s/\bSELF\b/pmc/g;
-    s/\bINTERP\b/interpreter/g;
+    s/\bINTERP\b/interp/g;
 
     return $_;
 }
@@ -630,7 +630,7 @@ sub rewrite_vtable_method {
     # Rewrite DYNSUPER(args)
     s/\bDYNSUPER\b          # Macro: DYNSUPER
       \(\s*(.*?)\)      # capture argument list
-     /"interpreter->vtables[$supertype].$method(" . full_arguments($1) . ')'/xeg;
+     /"interp->vtables[$supertype].$method(" . full_arguments($1) . ')'/xeg;
 
     # Rewrite OtherClass.SUPER(args...)
     s/(\w+)             # capture OtherClass
@@ -667,9 +667,9 @@ sub rewrite_vtable_method {
       \(\s*(.*?)\)      # capture argument list
      /"Parrot_${class}_$1(".full_arguments($2).")"/xeg;
 
-    # Rewrite SELF -> pmc, INTERP -> interpreter
+    # Rewrite SELF -> pmc, INTERP -> interp
     s/\bSELF\b/pmc/g;
-    s/\bINTERP\b/interpreter/g;
+    s/\bINTERP\b/interp/g;
 
     # now use macros for all rewritten stuff
     s/\b(?:\w+)->vtable->(\w+)\(/ VTABLE_$1(/g;
@@ -1436,10 +1436,10 @@ $decl {
 EOC
     if ($meth eq 'morph') {
         $cout .= <<EOC;
-    if (1 || Parrot_is_const_pmc(interpreter, pmc))
+    if (1 || Parrot_is_const_pmc(interp, pmc))
         internal_exception(WRITE_TO_CONSTCLASS, "$meth() in $classname");
     else
-        Parrot_${parentname}_$meth(interpreter, pmc, type);
+        Parrot_${parentname}_$meth(interp, pmc, type);
 EOC
     }
     else {
@@ -1506,8 +1506,8 @@ sub body
             . $self->{super}{find_method} . '_find_method';
         $cout = <<"EOC";
 $decl {
-    PMC *const method = $real_findmethod(interpreter, pmc, method_name);
-    if (!PMC_IS_NULL(VTABLE_getprop(interpreter, method, const_string(interpreter, "write"))))
+    PMC *const method = $real_findmethod(interp, pmc, method_name);
+    if (!PMC_IS_NULL(VTABLE_getprop(interp, method, const_string(interp, "write"))))
         return PMCNULL;
     else
         return method;
@@ -1629,7 +1629,7 @@ sub body
     }
     $body = <<EOC;
     $pre
-    $ret_assign VTABLE_$meth(interpreter, $deref$arg);
+    $ret_assign VTABLE_$meth(interp, $deref$arg);
     $post
 EOC
     my $decl = $self->decl($self->{class}, $method, 0);
@@ -1673,11 +1673,11 @@ sub prederef {
 EOC
     if ($self->does_write($name)) { # XXX is this good enough?
         $code .= <<'EOC';
-    real_pmc = Parrot_STM_begin_update(interpreter, handle);
+    real_pmc = Parrot_STM_begin_update(interp, handle);
 EOC
     } else {
         $code .= <<'EOC';
-    real_pmc = Parrot_STM_read(interpreter, handle);
+    real_pmc = Parrot_STM_read(interp, handle);
 EOC
     }
 }
@@ -1706,7 +1706,7 @@ implementation of $method.
 
 sub prederef {
     my ($self, $method) = @_;
-    return 'LOCK_PMC(interpreter, pmc);'
+    return 'LOCK_PMC(interp, pmc);'
 }
 
 =item C<postderef($method)>
@@ -1717,7 +1717,7 @@ Returns the unlocking code.
 
 sub postderef {
     my ($self, $method) = @_;
-    return 'UNLOCK_PMC(interpreter, pmc);'
+    return 'UNLOCK_PMC(interp, pmc);'
 }
 
 =back
@@ -1775,7 +1775,7 @@ sub body
     my $cout = <<EOC;
 $l
 ${decl}\{
-    cant_do_method(interpreter, pmc, "$meth");
+    cant_do_method(interp, pmc, "$meth");
 EOC
 
     $cout .= "    $ret\n" if $ret;
@@ -1838,7 +1838,7 @@ sub body
     my $output = <<EOC;
 $l
 ${decl} {
-    real_exception(interpreter, NULL, NULL_REG_ACCESS,
+    real_exception(interp, NULL, NULL_REG_ACCESS,
         "Null PMC access in $meth()");
 EOC
 
@@ -1968,12 +1968,12 @@ ${decl} {
 EOC
     $cout .= "    $ret_def\n" if $ret_def;
     $cout .= <<EOC;
-    STRING *meth = CONST_STRING(interpreter, "__$meth");
-    STRING *meth_v = CONST_STRING(interpreter, "$meth");
-    PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+    STRING *meth = CONST_STRING(interp, "__$meth");
+    STRING *meth_v = CONST_STRING(interp, "$meth");
+    PMC *sub = find_vtable_meth(interp, pmc, meth_v);
     if (PMC_IS_NULL(sub))
-        sub = find_or_die(interpreter, pmc, meth);
-    ${func_ret}Parrot_run_meth_fromc_args$ret_type(interpreter, sub,
+        sub = find_or_die(interp, pmc, meth);
+    ${func_ret}Parrot_run_meth_fromc_args$ret_type(interp, sub,
         pmc, meth, "$sig"$arg);
 EOC
     $cout .= "    $ret\n" if $ret;
@@ -2027,7 +2027,7 @@ sub body
     my $arg = '';
     $arg = ", ". join(' ', @args) if @args;
     $parameters = ", $parameters" if $parameters;
-    my $body = "VTABLE_$meth(interpreter, attr$arg)";
+    my $body = "VTABLE_$meth(interp, attr$arg)";
     my $ret = gen_ret($method, $body);
     my $decl = $self->decl($self->{class}, $method, 0);
     # I think that these will be out by one - NWC

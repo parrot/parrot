@@ -25,42 +25,42 @@ Sub PMCs with the same short name, but different long names.
 pmclass MultiSub extends ResizablePMCArray need_ext does array {
 
     void push_pmc(PMC* value) {
-        STRING *_sub = CONST_STRING(interpreter, "Sub");
-        STRING *_nci = CONST_STRING(interpreter, "NCI");
-        if (!VTABLE_isa(interpreter, value, _sub) &&
-            !VTABLE_isa(interpreter, value, _nci))
-            real_exception(interpreter, NULL, E_TypeError,
+        STRING *_sub = CONST_STRING(interp, "Sub");
+        STRING *_nci = CONST_STRING(interp, "NCI");
+        if (!VTABLE_isa(interp, value, _sub) &&
+            !VTABLE_isa(interp, value, _nci))
+            real_exception(interp, NULL, E_TypeError,
                     "attempt to push non Sub PMC");
         SUPER(value);
     }
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
-        STRING *_sub = CONST_STRING(interpreter, "Sub");
-        if (!VTABLE_isa(interpreter, value, _sub))
-            real_exception(interpreter, NULL, E_TypeError,
+        STRING *_sub = CONST_STRING(interp, "Sub");
+        if (!VTABLE_isa(interp, value, _sub))
+            real_exception(interp, NULL, E_TypeError,
                     "attempt to set non Sub PMC");
         SUPER(key, value);
     }
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        real_exception(interpreter, NULL, E_TypeError,
+        real_exception(interp, NULL, E_TypeError,
                 "attempt to set non Sub PMC");
     }
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
-        real_exception(interpreter, NULL, E_TypeError,
+        real_exception(interp, NULL, E_TypeError,
                 "attempt to set non Sub PMC");
     }
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
-        real_exception(interpreter, NULL, E_TypeError,
+        real_exception(interp, NULL, E_TypeError,
                 "attempt to set non Sub PMC");
     }
 
     void* invoke(void *next) {
         PMC *func = Parrot_MMD_dispatch_func(INTERP, SELF, NULL);
         if (! func) {
-            real_exception(interpreter, NULL, METH_NOT_FOUND,
+            real_exception(interp, NULL, METH_NOT_FOUND,
                            "Method not found.");
         }
         return VTABLE_invoke(INTERP, func, next);

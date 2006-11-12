@@ -68,13 +68,13 @@ sub defines
 {
     return <<END;
 #undef CONST
-#define REL_PC     ((size_t)(cur_opcode - interpreter->code->base.data))
+#define REL_PC     ((size_t)(cur_opcode - interp->code->base.data))
 #define CUR_OPCODE cur_opcode
 #define IREG(i) REG_INT(cur_opcode[i])
 #define NREG(i) REG_NUM(cur_opcode[i])
 #define PREG(i) REG_PMC(cur_opcode[i])
 #define SREG(i) REG_STR(cur_opcode[i])
-#define CONST(i) CONTEXT(interpreter->ctx)->constants[cur_opcode[i]]
+#define CONST(i) CONTEXT(interp->ctx)->constants[cur_opcode[i]]
 END
 }
 
@@ -199,7 +199,7 @@ sub goto_pop
 {
     my ($self) = @_;
 
-    return "opcode_t* pop_addr = (opcode_t*)pop_dest(interpreter);\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
+    return "opcode_t* pop_addr = (opcode_t*)pop_dest(interp);\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
 }
 
 my %arg_maps = (
@@ -248,7 +248,7 @@ sub restart_address
 {
     my ($self, $addr) = @_;
 
-    return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
+    return "interp->resume_offset = $addr; interp->resume_flag = 1";
 }
 
 =item C<restart_offset($offset)>
@@ -261,7 +261,7 @@ sub restart_offset
 {
     my ($self, $offset) = @_;
 
-    return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
+    return "interp->resume_offset = REL_PC + $offset; interp->resume_flag = 1";
 }
 
 =item C<run_core_func_decl($core)>
@@ -276,7 +276,7 @@ sub run_core_func_decl
 
     return "opcode_t * " .
         $self->core_prefix .
-        "$core(opcode_t *cur_op, Parrot_Interp interpreter)";
+        "$core(opcode_t *cur_op, Parrot_Interp interp)";
 }
 
 =item C<ops_addr_decl($base_suffix)>

@@ -128,7 +128,7 @@ extern void imcc_init(Parrot_Interp interp);
 int
 main(int argc, char *argv[])
 {
-    Parrot_Interp interpreter, debugger;
+    Parrot_Interp interp, debugger;
     char *filename;
     Parrot_PackFile pf;
     char *ext;
@@ -143,66 +143,66 @@ main(int argc, char *argv[])
     /* attach pdb structure */
     debugger->pdb = pdb;
 
-    interpreter = Parrot_new(debugger);
-    interpreter->debugger = debugger;
-    pdb->debugee = interpreter;
+    interp = Parrot_new(debugger);
+    interp->debugger = debugger;
+    pdb->debugee = interp;
 
-    Parrot_block_DOD(interpreter);
-    Parrot_block_GC(interpreter);
-    imcc_init(interpreter);
-    IMCC_ast_init(interpreter);
+    Parrot_block_DOD(interp);
+    Parrot_block_GC(interp);
+    imcc_init(interp);
+    IMCC_ast_init(interp);
 
-    do_yylex_init ( interpreter, &yyscanner );
+    do_yylex_init ( interp, &yyscanner );
 
     if (argc < 2) {
         fprintf(stderr, "Usage: pdb programfile [program-options]\n");
-        Parrot_exit(interpreter, 1);
+        Parrot_exit(interp, 1);
     }
 
     filename = argv[1];
     ext = strrchr(filename, '.');
     if (ext && strcmp (ext, ".pbc") == 0) {
 
-        pf = Parrot_readbc(interpreter, filename);
+        pf = Parrot_readbc(interp, filename);
 
         if (!pf) {
             return 1;
         }
 
-        Parrot_loadbc(interpreter, pf);
+        Parrot_loadbc(interp, pf);
     }
     else {
-        pf = PackFile_new(interpreter, 0);
-        Parrot_loadbc(interpreter, pf);
+        pf = PackFile_new(interp, 0);
+        Parrot_loadbc(interp, pf);
 
-        IMCC_push_parser_state(interpreter);
-        IMCC_INFO(interpreter)->state->file = filename;
+        IMCC_push_parser_state(interp);
+        IMCC_INFO(interp)->state->file = filename;
 
         if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
-            IMCC_fatal(interpreter, E_IOError,
+            IMCC_fatal(interp, E_IOError,
                     "Error reading source file %s.\n",
                     filename);
         }
         pasm_file = 0;
         if (ext && strcmp (ext, ".pasm") == 0)
             pasm_file = 1;
-        emit_open(interpreter, 1, NULL);
-        IMCC_INFO(interpreter)->state->pasm_file = pasm_file;
-        yyparse(yyscanner, (void *) interpreter);
-        imc_compile_all_units(interpreter);
+        emit_open(interp, 1, NULL);
+        IMCC_INFO(interp)->state->pasm_file = pasm_file;
+        yyparse(yyscanner, (void *) interp);
+        imc_compile_all_units(interp);
 
-        imc_cleanup(interpreter);
+        imc_cleanup(interp);
 
         fclose(imc_yyin_get(yyscanner));
-        PackFile_fixup_subs(interpreter, PBC_POSTCOMP, NULL);
+        PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     }
-    Parrot_unblock_DOD(interpreter);
-    Parrot_unblock_GC(interpreter);
+    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC(interp);
 
     PDB_printwelcome();
 
-    Parrot_runcode(interpreter, argc - 1, argv + 1);
-    Parrot_exit(interpreter, 0);
+    Parrot_runcode(interp, argc - 1, argv + 1);
+    Parrot_exit(interp, 0);
 
     return 0;
 }

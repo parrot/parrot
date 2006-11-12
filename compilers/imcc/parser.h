@@ -59,7 +59,7 @@ void register_compilers(Parrot_Interp);
 void *imcc_eval_pasm(Parrot_Interp, const char *s);
 void *imcc_eval_pir (Parrot_Interp, const char *s);
 int try_find_op(Parrot_Interp, IMC_Unit *, char *, SymReg **, int, int, int);
-Instruction * multi_keyed(Interp *interpreter, IMC_Unit *, char *name,
+Instruction * multi_keyed(Interp *interp, IMC_Unit *, char *name,
     SymReg ** r, int nr, int keyvec, int emit);
 
 extern void compile_file(Interp *interp, FILE *file, void *);

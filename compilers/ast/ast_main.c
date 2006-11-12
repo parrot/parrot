@@ -115,29 +115,29 @@ Compile AST source file to bytecode
 
 
 void
-IMCC_ast_compile(Interp *interpreter, FILE *fp)
+IMCC_ast_compile(Interp *interp, FILE *fp)
 {
     nodeType *top_node;
 
     ASTin = fp;
-    ASTparse(interpreter);
+    ASTparse(interp);
 
-    top_node = interpreter->imc_info->top_node;
+    top_node = interp->imc_info->top_node;
     if (top_node) {
-        SymReg * const sym = IMCC_expand_nodes(interpreter, top_node);
-        if (interpreter->imc_info->debug & DEBUG_AST) {
-            IMCC_dump_nodes(interpreter, top_node);
+        SymReg * const sym = IMCC_expand_nodes(interp, top_node);
+        if (interp->imc_info->debug & DEBUG_AST) {
+            IMCC_dump_nodes(interp, top_node);
         }
-        IMCC_free_nodes(interpreter, top_node);
+        IMCC_free_nodes(interp, top_node);
     }
-    interpreter->imc_info->top_node = NULL;
+    interp->imc_info->top_node = NULL;
 }
 
 static void
-register_ast_compiler(Interp* interpreter)
+register_ast_compiler(Interp *interp)
 {
-    STRING * const past = const_string(interpreter, "PAST");
-    Parrot_compreg(interpreter, past, ast_compile_past);
+    STRING * const past = const_string(interp, "PAST");
+    Parrot_compreg(interp, past, ast_compile_past);
 }
 /*
 
@@ -150,9 +150,9 @@ Initialize the AST compiler
 */
 
 void
-IMCC_ast_init(Interp* interpreter)
+IMCC_ast_init(Interp *interp)
 {
-    register_ast_compiler(interpreter);
+    register_ast_compiler(interp);
 }
 
 /*

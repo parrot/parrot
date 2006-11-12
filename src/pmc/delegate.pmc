@@ -29,7 +29,7 @@ Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
 /*
 
 =item C<static PMC *
-find_meth(Interp* interpreter, PMC *pmc, STRING *name)>
+find_meth(Interp *interp, PMC *pmc, STRING *name)>
 
 Finds and returns the delegated method with string C<name>.
 
@@ -39,17 +39,17 @@ Finds and returns the delegated method with string C<name>.
 
 
 static PMC *
-find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
+find_meth(Interp *interp, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
 
     if (PObj_is_object_TEST(pmc)) {
         class = GET_CLASS(PMC_data(pmc), pmc);
     }
-    return Parrot_find_method_with_cache(interpreter, class, meth);
+    return Parrot_find_method_with_cache(interp, class, meth);
 }
 
 static PMC*
-find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
+find_vtable_meth(Interp *interp, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
     PMC *ns = NULL;
     PMC *mro;
@@ -62,19 +62,19 @@ find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
 
     /* Get MRO and iterate over it to find method. */
     mro = class->vtable->mro;
-    n = VTABLE_elements(interpreter, mro);
+    n = VTABLE_elements(interp, mro);
     for (i = 0; i < n; ++i) {
-        class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
-        ns = VTABLE_namespace(interpreter, class);
+        class = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        ns = VTABLE_namespace(interp, class);
         if (!PMC_IS_NULL(ns)) {
             /* Try and locate the vtable namespace and find the method. */
-            STRING *vtable_ns_name = string_from_const_cstring(interpreter,
+            STRING *vtable_ns_name = string_from_const_cstring(interp,
                 "\0VTABLE\0", 8);
-            PMC *vtable_ns = Parrot_get_namespace_keyed_str(interpreter, ns,
+            PMC *vtable_ns = Parrot_get_namespace_keyed_str(interp, ns,
                 vtable_ns_name);
             if (!PMC_IS_NULL(vtable_ns))
             {
-                PMC *res = VTABLE_get_pmc_keyed_str(interpreter, vtable_ns,
+                PMC *res = VTABLE_get_pmc_keyed_str(interp, vtable_ns,
                     meth);
                 if (!PMC_IS_NULL(res))
                     return res;
@@ -89,7 +89,7 @@ find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
 /*
 
 =item C<static PMC *
-find_or_die(Interp* interpreter, PMC *pmc, STRING *name)>
+find_or_die(Interp *interp, PMC *pmc, STRING *name)>
 
 Returns the result of calling C<find_meth()> with the arguments, raising
 an exception if no method is found.
@@ -99,24 +99,24 @@ an exception if no method is found.
 */
 
 static PMC *
-find_or_die(Interp* interpreter, PMC *pmc, STRING *meth) {
-    PMC *returnPMC = find_meth(interpreter, pmc, meth);
+find_or_die(Interp *interp, PMC *pmc, STRING *meth) {
+    PMC *returnPMC = find_meth(interp, pmc, meth);
     if (PMC_IS_NULL(returnPMC)) {
         PMC *class = pmc;
         if (PObj_is_object_TEST(pmc)) {
             class = GET_CLASS(PMC_data(pmc), pmc);
-            real_exception(interpreter, NULL, E_LookupError,
+            real_exception(interp, NULL, E_LookupError,
                 "Can't find method '%s' for object '%s'",
-                string_to_cstring(interpreter, meth),
-                string_to_cstring(interpreter, PMC_str_val(
+                string_to_cstring(interp, meth),
+                string_to_cstring(interp, PMC_str_val(
                         get_attrib_num((SLOTTYPE *)PMC_data(class),
                             PCD_CLASS_NAME)))
                 );
         }
         else {
-            real_exception(interpreter, NULL, E_LookupError,
+            real_exception(interp, NULL, E_LookupError,
                 "Can't find method '%s' - erroneous PMC",
-                string_to_cstring(interpreter, meth)
+                string_to_cstring(interp, meth)
                 );
         }
     }
@@ -135,7 +135,7 @@ let flow through.
 =over 4
 
 =item C<PARROT_INLINE static void
-noarg_noreturn(Interp* interpreter, PMC *obj, const char *meth, int die)>
+noarg_noreturn(Interp *interp, PMC *obj, const char *meth, int die)>
 
 Calls the delegated method with no arguments or return value. If C<die>
 is true then an exception will be raised if the method is not found.
@@ -145,22 +145,22 @@ is true then an exception will be raised if the method is not found.
 */
 
 static void
-noarg_noreturn(Interp* interpreter, PMC *obj, PMC* class,
+noarg_noreturn(Interp *interp, PMC *obj, PMC* class,
         const char *name, int die)
 {
-    STRING *meth = const_string(interpreter, name);
-    STRING *meth_v = const_string(interpreter, name + 2);
-    PMC *method = find_vtable_meth(interpreter, class, meth);
+    STRING *meth = const_string(interp, name);
+    STRING *meth_v = const_string(interp, name + 2);
+    PMC *method = find_vtable_meth(interp, class, meth);
     if (PMC_IS_NULL(method))
-        method = die ? find_or_die(interpreter, class, meth) :
-            find_meth(interpreter, class, meth);
+        method = die ? find_or_die(interp, class, meth) :
+            find_meth(interp, class, meth);
     if (PMC_IS_NULL(method)) {
-        if (Interp_trace_TEST(interpreter, PARROT_TRACE_FIND_METH_FLAG)) {
-            PIO_eprintf(interpreter, "# not found\n");
+        if (Interp_trace_TEST(interp, PARROT_TRACE_FIND_METH_FLAG)) {
+            PIO_eprintf(interp, "# not found\n");
         }
         return;
     }
-    Parrot_run_meth_fromc(interpreter, method, obj, meth);
+    Parrot_run_meth_fromc(interp, method, obj, meth);
 }
 
 pmclass delegate {

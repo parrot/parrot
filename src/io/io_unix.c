@@ -121,21 +121,21 @@ success and C<-1> on error.
 static INTVAL
 PIO_unix_init(theINTERP, ParrotIOLayer *layer)
 {
-    ParrotIOData *d = interpreter->piodata;
+    ParrotIOData *d = interp->piodata;
     if (d != NULL && d->table != NULL) {
         ParrotIO *io;
 
-        io = PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, PIO_F_READ);
+        io = PIO_unix_fdopen(interp, layer, STDIN_FILENO, PIO_F_READ);
         if (!io) return -1;
-        PIO_STDIN(interpreter) = new_io_pmc(interpreter, io);
+        PIO_STDIN(interp) = new_io_pmc(interp, io);
 
-        io = PIO_unix_fdopen(interpreter, layer, STDOUT_FILENO, PIO_F_WRITE);
+        io = PIO_unix_fdopen(interp, layer, STDOUT_FILENO, PIO_F_WRITE);
         if (!io) return -1;
-        PIO_STDOUT(interpreter) = new_io_pmc(interpreter, io);
+        PIO_STDOUT(interp) = new_io_pmc(interp, io);
 
-        io = PIO_unix_fdopen(interpreter, layer, STDERR_FILENO, PIO_F_WRITE);
+        io = PIO_unix_fdopen(interp, layer, STDERR_FILENO, PIO_F_WRITE);
         if (!io) return -1;
-        PIO_STDERR(interpreter) = new_io_pmc(interpreter, io);
+        PIO_STDERR(interp) = new_io_pmc(interp, io);
 
         return 0;
     }
@@ -170,7 +170,7 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
     mode = DEFAULT_OPEN_MODE;
 
     if (flags & PIO_F_PIPE)
-        return PIO_unix_pipe(interpreter, layer, spath, flags);
+        return PIO_unix_pipe(interp, layer, spath, flags);
 
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
         return NULL;
@@ -232,7 +232,7 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
          */
         if (PIO_unix_isatty(fd))
             flags |= PIO_F_CONSOLE;
-        io = PIO_new(interpreter, type, flags, mode);
+        io = PIO_new(interp, type, flags, mode);
         io->fd = fd;
         return io;
     }
@@ -331,7 +331,7 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
     /* fdopened files are always shared */
     flags |= PIO_F_SHARED;
 
-    io = PIO_new(interpreter, PIO_F_FILE, flags, mode);
+    io = PIO_new(interp, PIO_F_FILE, flags, mode);
     io->fd = fd;
     return io;
 }
@@ -350,7 +350,7 @@ Closes C<*io>'s file descriptor.
 static INTVAL
 PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer);
 
     if (io->fd >= 0)
@@ -439,7 +439,7 @@ XXX: Is it necessary to C<sync()> here?
 static INTVAL
 PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer);
 
     return fsync(io->fd);
@@ -469,7 +469,7 @@ PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
     UNUSED(layer);
 
-    s = PIO_make_io_string(interpreter, buf, 2048);
+    s = PIO_make_io_string(interp, buf, 2048);
     len = s->bufused;
     buffer = s->strstart;
 
@@ -522,7 +522,7 @@ PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
     void *buffer = s->strstart;
     size_t len = s->bufused;
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer);
 
     ptr = buffer;
@@ -573,7 +573,7 @@ PIO_unix_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 {
     PIOOFF_T pos;
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer);
 
     if ((pos = lseek(io->fd, offset, whence)) >= 0) {
@@ -601,7 +601,7 @@ PIO_unix_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     PIOOFF_T pos;
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer);
 
     pos = lseek(io->fd, (PIOOFF_T)0, SEEK_CUR);
@@ -642,7 +642,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     /* Hard coded to IPv4 for now */
     int family = AF_INET;
 
-    char * s = string_to_cstring(interpreter, addr);
+    char * s = string_to_cstring(interp, addr);
     /*
      * due to a bug in OS/X, we've to zero the struct
      * else bind is failing erratically
@@ -675,7 +675,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     sa.sin_family = family;
     sa.sin_port = htons(port);
 
-    return string_make(interpreter, &sa, sizeof(struct sockaddr_in),
+    return string_make(interp, &sa, sizeof(struct sockaddr_in),
             "binary", 0);
 }
 
@@ -702,7 +702,7 @@ PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
 
     UNUSED(layer);
     if ((sock = socket(fam, type, proto)) >= 0) {
-        io = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
+        io = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = sock;
         memset(&io->local, 0, sizeof(struct sockaddr_in));
         memset(&io->remote, 0, sizeof(struct sockaddr_in));
@@ -727,7 +727,7 @@ static INTVAL
 PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
 {
     UNUSED(layer);
-    UNUSED(interpreter);
+    UNUSED(interp);
 
     if (r) {
         memcpy(&io->remote, PObj_bufstart(r), sizeof(struct sockaddr_in));
@@ -765,7 +765,7 @@ static INTVAL
 PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 {
     UNUSED(layer);
-    UNUSED(interpreter);
+    UNUSED(interp);
     if (!l)
         return -1;
 
@@ -795,7 +795,7 @@ static INTVAL
 PIO_unix_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)
 {
     UNUSED(layer);
-    UNUSED(interpreter);
+    UNUSED(interp);
     if ((listen(io->fd, sec)) == -1) {
         return -1;
     }
@@ -821,7 +821,7 @@ PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     ParrotIO *newio;
 
     UNUSED(layer);
-    newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
+    newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
     addrlen = sizeof(struct sockaddr_in);
     if ((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
@@ -860,7 +860,7 @@ PIO_unix_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)
     int error, bytes, byteswrote;
 
     UNUSED(layer);
-    UNUSED(interpreter);
+    UNUSED(interp);
     bytes = s->bufused;
     byteswrote = 0;
 AGAIN:
@@ -922,7 +922,7 @@ AGAIN:
         /* The charset should probably be 'binary', but right now httpd.imc
          * only works with 'ascii'
          */
-        *s = string_make(interpreter, buf, bytesread, "ascii", 0);
+        *s = string_make(interp, buf, bytesread, "ascii", 0);
         return bytesread;
     }
     else {
@@ -939,11 +939,11 @@ AGAIN:
             case ECONNRESET:
                 /* XXX why close it on err return result is -1 anyway */
                 close(io->fd);
-                *s = string_make_empty(interpreter, enum_stringrep_one, 0);
+                *s = string_make_empty(interp, enum_stringrep_one, 0);
                 return -1;
             default:
                 close(io->fd);
-                *s = string_make_empty(interpreter, enum_stringrep_one, 0);
+                *s = string_make_empty(interp, enum_stringrep_one, 0);
                 return -1;
         }
     }
@@ -980,7 +980,7 @@ PIO_unix_poll(theINTERP, ParrotIOLayer *l, ParrotIO *io, int which,
     struct timeval t;
 
     UNUSED(l);
-    UNUSED(interpreter);
+    UNUSED(interp);
     t.tv_sec = sec;
     t.tv_usec = usec;
     FD_ZERO(&r); FD_ZERO(&w); FD_ZERO(&e);
@@ -1030,7 +1030,7 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
     ParrotIO *io;
     int pid, err, fds[2];
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(l);
     UNUSED(flags);
 
@@ -1040,7 +1040,7 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
 
     /* Parent - return IO stream */
     if ((pid = fork()) > 0) {
-        io = PIO_new(interpreter, PIO_F_PIPE, 0,
+        io = PIO_new(interp, PIO_F_PIPE, 0,
                 flags & (PIO_F_READ|PIO_F_WRITE));
         if (flags & PIO_F_READ) {
             /* close this writer's end of pipe */

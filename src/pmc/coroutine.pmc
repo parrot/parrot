@@ -63,25 +63,25 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
     } while(0)
 
 static void
-print_sub_name(Interp* interpreter, PMC* sub)
+print_sub_name(Interp* interp, PMC* sub)
 {
     struct Parrot_coro * co = PMC_coro(sub);
     Interp *tracer;
 
-    tracer = interpreter->debugger ?
-        interpreter->debugger : interpreter;
+    tracer = interp->debugger ?
+        interp->debugger : interp;
     PIO_eprintf(tracer, "# %s coro '%Ss'",
         !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ?
         "Calling" : "yielding from",
-        Parrot_full_sub_name(interpreter, sub));
+        Parrot_full_sub_name(interp, sub));
     if (co->ctx &&
         (PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF)) {
         PIO_eprintf(tracer, " to '%Ss'",
-                Parrot_full_sub_name(interpreter,
+                Parrot_full_sub_name(interp,
                     co->ctx->caller_ctx->current_sub));
     }
     PIO_eprintf(tracer, "\n# ");
-    print_pbc_location(interpreter);
+    print_pbc_location(interp);
 }
 
 pmclass Coroutine extends Sub need_ext {
@@ -146,7 +146,7 @@ Swaps the "context".
              */
             ccont = INTERP->current_cont;
             if (ccont == NEED_CONTINUATION) {
-                ccont = new_ret_continuation_pmc(interpreter, next);
+                ccont = new_ret_continuation_pmc(interp, next);
             }
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
                 real_exception(INTERP, NULL, E_Exception,
@@ -158,7 +158,7 @@ Swaps the "context".
              */
             Parrot_alloc_context(INTERP, co->n_regs_used);
             co->ctx = ctx = CONTEXT(INTERP->ctx);
-            co->dynamic_state = interpreter->dynamic_env;
+            co->dynamic_state = interp->dynamic_env;
             ctx->caller_ctx = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
             ctx->current_sub = SELF;
@@ -172,7 +172,7 @@ Swaps the "context".
             /* create pad if needed */
             if (!PMC_IS_NULL(co->lex_info)) {
                 ctx->lex_pad = pmc_new_init(INTERP,
-                        Parrot_get_ctx_HLL_type(interpreter,
+                        Parrot_get_ctx_HLL_type(interp,
                             enum_class_LexPad),
                         co->lex_info);
                 VTABLE_set_pointer(INTERP, ctx->lex_pad, ctx);
@@ -194,8 +194,8 @@ Swaps the "context".
             ccont = ctx->current_cont;
             ctx->caller_ctx = PMC_cont(ccont)->to_ctx = CONTEXT(INTERP->ctx);
             /* set context to coro context */
-            state = interpreter->dynamic_env;
-            interpreter->dynamic_env = co->dynamic_state;
+            state = interp->dynamic_env;
+            interp->dynamic_env = co->dynamic_state;
             co->dynamic_state = state;
             CONTEXT(INTERP->ctx) = ctx;
             INTERP->ctx.bp = ctx->bp;
@@ -216,8 +216,8 @@ Swaps the "context".
                 real_exception(INTERP, NULL, E_Exception,
                                "Cannot resume dead coroutine.");
             }
-            state = interpreter->dynamic_env;
-            interpreter->dynamic_env = co->dynamic_state;
+            state = interp->dynamic_env;
+            interp->dynamic_env = co->dynamic_state;
             co->dynamic_state = state;
             CONTEXT(INTERP->ctx) = ctx;
             INTERP->ctx.bp = ctx->bp;

@@ -40,52 +40,52 @@ command-line and disassembles it.
 int
 main(int argc, char *argv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     char *filename;
     Parrot_PackFile pf;
 
-    interpreter = Parrot_new(NULL);
+    interp = Parrot_new(NULL);
 
-    if (!interpreter) {
+    if (!interp) {
         return 1;
     }
 
-    interpreter->lo_var_ptr = &interpreter;
+    interp->lo_var_ptr = &interp;
 
     if (argc != 2) {
         fprintf(stderr, "Usage: disassemble programfile \n");
-        Parrot_exit(interpreter, 1);
+        Parrot_exit(interp, 1);
     }
 
     filename = argv[1];
 
-    pf = Parrot_readbc(interpreter, filename);
+    pf = Parrot_readbc(interp, filename);
 
     if (!pf) {
         return 1;
     }
 
-    Parrot_loadbc(interpreter, pf);
+    Parrot_loadbc(interp, pf);
 
-    do_dis(interpreter);
+    do_dis(interp);
 
-    Parrot_exit(interpreter, 0);
+    Parrot_exit(interp, 0);
 
     return 0;
 }
 
 /*
 
-static void do_dis(Parrot_Interp interpreter)
+static void do_dis(Parrot_Interp interp)
 
 Do the disassembling.
 
 */
 
 static void
-do_dis(Parrot_Interp interpreter)
+do_dis(Parrot_Interp interp)
 {
-    Parrot_disassemble(interpreter);
+    Parrot_disassemble(interp);
 }
 
 /*

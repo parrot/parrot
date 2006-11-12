@@ -36,11 +36,11 @@ extern void *flush_reg_store(void);
 
 #endif
 
-static void trace_system_stack(Interp *interpreter);
+static void trace_system_stack(Interp *interp);
 
 /*
 
-=item C<void trace_system_areas(Interp *interpreter)>
+=item C<void trace_system_areas(Interp *interp)>
 
 Traces the system stack and any additional CPU-specific areas.
 
@@ -49,7 +49,7 @@ Traces the system stack and any additional CPU-specific areas.
 */
 
 void
-trace_system_areas(Interp *interpreter)
+trace_system_areas(Interp *interp)
 {
 #if defined(__sparc) /* Flush register windows */
     static union {
@@ -76,7 +76,7 @@ trace_system_areas(Interp *interpreter)
     getcontext(&ucp);
     current_regstore_top = flush_reg_store();
 
-    trace_mem_block(interpreter, 0x80000fff80000000,
+    trace_mem_block(interp, 0x80000fff80000000,
             (size_t)current_regstore_top);
 #else
 
@@ -95,26 +95,26 @@ trace_system_areas(Interp *interpreter)
 #endif
 
 
-    trace_system_stack(interpreter);
+    trace_system_stack(interp);
 }
 
 /*
 
 =item C<static void
-trace_system_stack(Interp *interpreter)>
+trace_system_stack(Interp *interp)>
 
-Traces the memory block starting at C<< interpreter->lo_var_ptr >>.
+Traces the memory block starting at C<< interp->lo_var_ptr >>.
 
 =cut
 
 */
 
 static void
-trace_system_stack(Interp *interpreter)
+trace_system_stack(Interp *interp)
 {
-    size_t lo_var_ptr = (size_t)interpreter->lo_var_ptr;
+    size_t lo_var_ptr = (size_t)interp->lo_var_ptr;
 
-    trace_mem_block(interpreter, (size_t)lo_var_ptr,
+    trace_mem_block(interp, (size_t)lo_var_ptr,
             (size_t)&lo_var_ptr);
 }
 

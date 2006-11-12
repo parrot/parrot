@@ -35,19 +35,19 @@ static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 int
 main( int argc, char* argv[] )
 {
-    Interp *     interpreter;
+    Interp *interp;
 
-    interpreter = Parrot_new(NULL);
-    if (!interpreter) {
+    interp = Parrot_new(NULL);
+    if (!interp) {
         return 1;
     }
 
-    PIO_eprintf(interpreter, "calling the_test() in main()\n");
+    PIO_eprintf(interp, "calling the_test() in main()\n");
 
-    Parrot_run_native(interpreter, the_test );
+    Parrot_run_native(interp, the_test );
 
-    PIO_eprintf(interpreter, "back in main()\n");
-    Parrot_exit(interpreter, 0);
+    PIO_eprintf(interp, "back in main()\n");
+    Parrot_exit(interp, 0);
 
     return 0;
 }
@@ -61,7 +61,7 @@ SKIP:
    c_output_is($main . <<'CODE', <<'OUTPUT', 'string_make() with charset "shift_jis"');
 
 static opcode_t*
-the_test(Interp *interpreter, opcode_t *cur_op, opcode_t *start)
+the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)
 {
     STRING   *s;
     UINTVAL  length;
@@ -70,13 +70,13 @@ the_test(Interp *interpreter, opcode_t *cur_op, opcode_t *start)
     UNUSED(cur_op);
     UNUSED(start);
 
-    s = string_make(interpreter, string_data, sizeof(string_data), "shift_jis", 0);
-    length = string_length(interpreter, s);
+    s = string_make(interp, string_data, sizeof(string_data), "shift_jis", 0);
+    length = string_length(interp, s);
 
     /* tests go here */
-    PIO_eprintf(interpreter, "length = %d\n", (int)length);
-    PIO_eprintf(interpreter, "character 1 = %d\n", (int)string_ord(interpreter, s, 0));
-    PIO_eprintf(interpreter, "character 2 = %d\n", (int)string_ord(interpreter, s, 1));
+    PIO_eprintf(interp, "length = %d\n", (int)length);
+    PIO_eprintf(interp, "character 1 = %d\n", (int)string_ord(interp, s, 0));
+    PIO_eprintf(interp, "character 2 = %d\n", (int)string_ord(interp, s, 1));
 
     return NULL; /* always return 0 or bad things may happen */
 }
@@ -95,7 +95,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT',  'string_make() with charset "ascii"');
 
 static opcode_t*
-the_test(Interp *interpreter, opcode_t *cur_op, opcode_t *start)
+the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)
 {
     STRING   *s;
     UINTVAL  length;
@@ -104,15 +104,15 @@ the_test(Interp *interpreter, opcode_t *cur_op, opcode_t *start)
     UNUSED(cur_op);
     UNUSED(start);
 
-    s = string_make(interpreter, string_data, sizeof(string_data), "ascii", 0);
-    length = string_length(interpreter, s);
+    s = string_make(interp, string_data, sizeof(string_data), "ascii", 0);
+    length = string_length(interp, s);
 
     /* tests go here */
-    PIO_eprintf(interpreter, "length = %d\n", (int)length);
-    PIO_eprintf(interpreter, "character 1 = %d\n", (int)string_ord(interpreter, s, 0));
-    PIO_eprintf(interpreter, "character 2 = %d\n", (int)string_ord(interpreter, s, 1));
-    PIO_eprintf(interpreter, "character 3 = %d\n", (int)string_ord(interpreter, s, 2));
-    PIO_eprintf(interpreter, "character 4 = %d\n", (int)string_ord(interpreter, s, 3));
+    PIO_eprintf(interp, "length = %d\n", (int)length);
+    PIO_eprintf(interp, "character 1 = %d\n", (int)string_ord(interp, s, 0));
+    PIO_eprintf(interp, "character 2 = %d\n", (int)string_ord(interp, s, 1));
+    PIO_eprintf(interp, "character 3 = %d\n", (int)string_ord(interp, s, 2));
+    PIO_eprintf(interp, "character 4 = %d\n", (int)string_ord(interp, s, 3));
 
     return NULL; /* always return 0 or bad things may happen */
 }
@@ -130,7 +130,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT',  'string_bitwise_or()');
 
 static opcode_t*
-the_test(Interp *interpreter, opcode_t *cur_op, opcode_t *start)
+the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)
 {
     STRING   *string_a, *string_b, *string_c;
     UINTVAL  length;
@@ -139,16 +139,16 @@ the_test(Interp *interpreter, opcode_t *cur_op, opcode_t *start)
     UNUSED(cur_op);
     UNUSED(start);
 
-    string_a = string_make(interpreter, string_data, 1, "ascii", 0);
-    string_b = string_make(interpreter, string_data+1, 1, "ascii", 0);
+    string_a = string_make(interp, string_data, 1, "ascii", 0);
+    string_b = string_make(interp, string_data+1, 1, "ascii", 0);
     string_c = NULL;
-    string_bitwise_or(interpreter, string_a, string_b, &string_c);
+    string_bitwise_or(interp, string_a, string_b, &string_c);
 
     /* tests go here */
-    PIO_eprintf(interpreter, "%d | %d = %d\n",
-            (int)string_ord(interpreter, string_a, 0),
-            (int)string_ord(interpreter, string_b, 0),
-            (int)string_ord(interpreter, string_c, 0));
+    PIO_eprintf(interp, "%d | %d = %d\n",
+            (int)string_ord(interp, string_a, 0),
+            (int)string_ord(interp, string_b, 0),
+            (int)string_ord(interp, string_c, 0));
 
     return NULL; /* always return 0 or bad things may happen */
 }

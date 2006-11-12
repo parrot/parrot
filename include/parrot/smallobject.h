@@ -132,9 +132,9 @@ struct Small_Object_Pool {
 
 INTVAL contained_in_pool(Interp *,
                          struct Small_Object_Pool *, void *);
-size_t get_max_pool_address(Interp *interpreter,
+size_t get_max_pool_address(Interp *interp,
                             struct Small_Object_Pool *pool);
-size_t get_min_pool_address(Interp *interpreter,
+size_t get_min_pool_address(Interp *interp,
                             struct Small_Object_Pool *pool);
 
 struct Small_Object_Pool * new_small_object_pool(Interp *,

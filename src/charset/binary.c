@@ -23,23 +23,23 @@ This file implements the charset functions for binary data
 #endif
 
 #define EXCEPTION(err, str) \
-    real_exception(interpreter, NULL, err, str)
+    real_exception(interp, NULL, err, str)
 
 static void
-set_graphemes(Interp *interpreter, STRING *source_string,
+set_graphemes(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
 {
-    ENCODING_SET_BYTES(interpreter, source_string, offset,
+    ENCODING_SET_BYTES(interp, source_string, offset,
             replace_count, insert_string);
 }
 
 static STRING*
-to_charset(Interp *interpreter, STRING *src, STRING *dest)
+to_charset(Interp *interp, STRING *src, STRING *dest)
 {
     charset_converter_t conversion_func;
-    if ((conversion_func = Parrot_find_charset_converter(interpreter,
+    if ((conversion_func = Parrot_find_charset_converter(interp,
                     src->charset, Parrot_binary_charset_ptr))) {
-         return conversion_func(interpreter, src, dest);
+         return conversion_func(interp, src, dest);
     }
     internal_exception(UNIMPLEMENTED, "to_charset for binary not implemented");
     return NULL;
@@ -47,7 +47,7 @@ to_charset(Interp *interpreter, STRING *src, STRING *dest)
 
 /* A err. can't compose binary */
 static STRING*
-compose(Interp *interpreter, STRING *source_string)
+compose(Interp *interp, STRING *source_string)
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't compose binary data");
     return NULL;
@@ -55,63 +55,63 @@ compose(Interp *interpreter, STRING *source_string)
 
 /* A err. can't decompose binary */
 static STRING*
-decompose(Interp *interpreter, STRING *source_string)
+decompose(Interp *interp, STRING *source_string)
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't decompose binary data");
     return NULL;
 }
 
 static void
-upcase(Interp *interpreter, STRING *source_string)
+upcase(Interp *interp, STRING *source_string)
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
 static void
-downcase(Interp *interpreter, STRING *source_string)
+downcase(Interp *interp, STRING *source_string)
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
 static void
-titlecase(Interp *interpreter, STRING *source_string)
+titlecase(Interp *interp, STRING *source_string)
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
 static void
-upcase_first(Interp *interpreter, STRING *source_string)
+upcase_first(Interp *interp, STRING *source_string)
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
 static void
-downcase_first(Interp *interpreter, STRING *source_string)
+downcase_first(Interp *interp, STRING *source_string)
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
 static void
-titlecase_first(Interp *interpreter, STRING *source_string)
+titlecase_first(Interp *interp, STRING *source_string)
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
 static INTVAL
-compare(Interp *interpreter, STRING *lhs, STRING *rhs)
+compare(Interp *interp, STRING *lhs, STRING *rhs)
 {
   return 0;
 }
 
 static INTVAL
-cs_index(Interp *interpreter, STRING *source_string,
+cs_index(Interp *interp, STRING *source_string,
         STRING *search_string, UINTVAL offset)
 {
     return -1;
 }
 
 static INTVAL
-cs_rindex(Interp *interpreter, STRING *source_string,
+cs_rindex(Interp *interp, STRING *source_string,
         STRING *search_string, UINTVAL offset)
 {
     return -1;
@@ -119,46 +119,46 @@ cs_rindex(Interp *interpreter, STRING *source_string,
 
 /* Binary's always valid */
 static UINTVAL
-validate(Interp *interpreter, STRING *source_string)
+validate(Interp *interp, STRING *source_string)
 {
     return 1;
 }
 
 static INTVAL
-is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
           STRING *source_string, UINTVAL offset)
 {
     return 0;
 }
 
 static INTVAL
-find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
             STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }
 
 static INTVAL
-find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+find_not_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
                 STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }
 
 static STRING *
-string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
+string_from_codepoint(Interp *interp, UINTVAL codepoint)
 {
     STRING *return_string = NULL;
     char real_codepoint = (char)codepoint;
-    return_string = string_make(interpreter, &real_codepoint, 1, "binary", 0);
+    return_string = string_make(interp, &real_codepoint, 1, "binary", 0);
     return return_string;
 }
 
 
 CHARSET *
-Parrot_charset_binary_init(Interp *interpreter)
+Parrot_charset_binary_init(Interp *interp)
 {
-    CHARSET *return_set = Parrot_new_charset(interpreter);
+    CHARSET *return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "binary",
         ascii_get_graphemes,
@@ -187,7 +187,7 @@ Parrot_charset_binary_init(Interp *interpreter)
 
     memcpy(return_set, &base_set, sizeof(CHARSET));
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
-    Parrot_register_charset(interpreter, "binary", return_set);
+    Parrot_register_charset(interp, "binary", return_set);
     return return_set;
 
 }

@@ -37,9 +37,9 @@ sub defines
     my $type = __PACKAGE__;
     return <<END;
 /* defines - $0 -> $type */
-#define REL_PC ((size_t)(cur_opcode - interpreter->code->prederef.code))
+#define REL_PC ((size_t)(cur_opcode - interp->code->prederef.code))
 #define CUR_OPCODE \\
-    ((opcode_t*)cur_opcode + CONTEXT(interpreter->ctx)->pred_offset)
+    ((opcode_t*)cur_opcode + CONTEXT(interp->ctx)->pred_offset)
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
 
 END
@@ -68,7 +68,7 @@ Create various address parts.
 
 sub expr_address {
     my ($self, $addr) = @_;
-    return "opcode_to_prederef(interpreter, $addr)";
+    return "opcode_to_prederef(interp, $addr)";
 }
 sub expr_offset {
     my ($self, $offset) = @_;
@@ -76,7 +76,7 @@ sub expr_offset {
 }
 sub expr_pop {
     my ($self) = @_;
-    return "opcode_to_prederef(interpreter, pop_dest(interpreter))";
+    return "opcode_to_prederef(interp, pop_dest(interp))";
 }
 
 sub run_core_func_decl
@@ -87,7 +87,7 @@ sub run_core_func_decl
     my $prefix = $self->core_prefix;
     return <<END;
 /* run_core_func_decl - $0 -> $type */
-void ** $prefix$core(void **cur_op, Parrot_Interp interpreter)
+void ** $prefix$core(void **cur_op, Parrot_Interp interp)
 END
 }
 

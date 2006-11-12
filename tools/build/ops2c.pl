@@ -330,7 +330,7 @@ foreach my $op ($ops->ops) {
     my $func_name  = $op->func_name($trans);
     my $arg_types  = "$opsarraytype *, Interp *";
     my $prototype  = "$sym_export $opsarraytype * $func_name ($arg_types)";
-    my $args       = "$opsarraytype *cur_opcode, Interp * interpreter";
+    my $args       = "$opsarraytype *cur_opcode, Interp *interp";
     my $definition;
     my $comment    = '';
     my $one_op     = "";
@@ -391,7 +391,7 @@ if ($suffix =~ /cgp/) {
     asm ("jmp *4(%ebp)");  /* jump to ret addr, used by JIT */
 # endif
 #endif
-    _reg_base = (char*)interpreter->ctx.bp.regs_i;
+    _reg_base = (char*)interp->ctx.bp.regs_i;
     goto **cur_opcode;
 
 END_C
@@ -724,11 +724,11 @@ if ($dynamic_flag) {
  */
 
 $sym_export PMC*
-$load_func(Parrot_Interp interpreter)
+$load_func(Parrot_Interp interp)
 {
-    PMC *lib = pmc_new(interpreter, enum_class_ParrotLibrary);
+    PMC *lib = pmc_new(interp, enum_class_ParrotLibrary);
     PMC_struct_val(lib) = (void *) $init_func;
-    dynop_register(interpreter, lib);
+    dynop_register(interp, lib);
     return lib;
 }
 END_C

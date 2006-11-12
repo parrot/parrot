@@ -28,17 +28,17 @@ F<src/objects.c>, at least for right now.
 
 /* XXX duplicated from delegate.pmc */
 static PMC *
-find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
+find_meth(Interp* interp, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
 
     if (PObj_is_object_TEST(pmc)) {
         class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
     }
-    return Parrot_find_method_with_cache(interpreter, class, meth);
+    return Parrot_find_method_with_cache(interp, class, meth);
 }
 
 static PMC*
-find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
+find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
     PMC *ns = NULL;
     PMC *mro;
@@ -51,19 +51,19 @@ find_vtable_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
 
     /* Get MRO and iterate over it to find method. */
     mro = class->vtable->mro;
-    n = VTABLE_elements(interpreter, mro);
+    n = VTABLE_elements(interp, mro);
     for (i = 0; i < n; ++i) {
-        class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
-        ns = VTABLE_namespace(interpreter, class);
+        class = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        ns = VTABLE_namespace(interp, class);
         if (!PMC_IS_NULL(ns)) {
             /* Try and locate the vtable namespace and find the method. */
-            STRING *vtable_ns_name = string_from_const_cstring(interpreter,
+            STRING *vtable_ns_name = string_from_const_cstring(interp,
                 "\0VTABLE\0", 8);
-            PMC *vtable_ns = Parrot_get_namespace_keyed_str(interpreter, ns,
+            PMC *vtable_ns = Parrot_get_namespace_keyed_str(interp, ns,
                 vtable_ns_name);
             if (!PMC_IS_NULL(vtable_ns))
             {
-                PMC *res = VTABLE_get_pmc_keyed_str(interpreter, vtable_ns,
+                PMC *res = VTABLE_get_pmc_keyed_str(interp, vtable_ns,
                     meth);
                 if (!PMC_IS_NULL(res))
                     return res;
@@ -92,7 +92,7 @@ C<Parrot_instantiate_object()>.
 */
 
     void init() {
-        real_exception(interpreter, NULL, E_NotImplementedError,
+        real_exception(interp, NULL, E_NotImplementedError,
                 "Can't create new ParrotObjects - "
             "use the registered class instead");
     }
@@ -137,8 +137,8 @@ TODO
             return;
         if (PObj_get_FLAGS(SELF) & PObj_need_finalize_FLAG) {
             fin = CONST_STRING(INTERP, "__finalize");
-            ns = VTABLE_namespace(interpreter, class);
-            meth = VTABLE_get_pmc_keyed_str(interpreter, ns, fin);
+            ns = VTABLE_namespace(interp, class);
+            meth = VTABLE_get_pmc_keyed_str(interp, ns, fin);
             if (!PMC_IS_NULL(meth)) {
                 /*
                    TODO
@@ -146,7 +146,7 @@ TODO
                    - run some safe mode
                    - run all finalizers in mro order?
                  */
-                Parrot_runops_fromc_args_event(interpreter, meth, "vP", SELF);
+                Parrot_runops_fromc_args_event(interp, meth, "vP", SELF);
             }
         }
         SUPER();
@@ -273,13 +273,13 @@ it's just SUPER aka the default implementation.
 */
 
     INTVAL get_integer_keyed_int (INTVAL key) {
-        STRING *meth = CONST_STRING(interpreter, "__get_integer_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "get_integer_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__get_integer_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "get_integer_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            return Parrot_run_meth_fromc_args_reti(interpreter, sub,
+            return Parrot_run_meth_fromc_args_reti(interp, sub,
                                               pmc, meth, "II", key);
         }
         else {
@@ -297,13 +297,13 @@ it's just SUPER aka the default implementation.
     }
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
-        STRING *meth = CONST_STRING(interpreter, "__get_number_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "get_number_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__get_number_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "get_number_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            return Parrot_run_meth_fromc_args_retf(interpreter, sub,
+            return Parrot_run_meth_fromc_args_retf(interp, sub,
                                               pmc, meth, "NI", key);
         }
         else {
@@ -321,13 +321,13 @@ it's just SUPER aka the default implementation.
     }
 
     STRING* get_string_keyed_int (INTVAL key) {
-        STRING *meth = CONST_STRING(interpreter, "__get_string_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "get_string_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__get_string_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "get_string_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            return Parrot_run_meth_fromc_args(interpreter, sub,
+            return Parrot_run_meth_fromc_args(interp, sub,
                                               pmc, meth, "SI", key);
         }
         else {
@@ -345,13 +345,13 @@ it's just SUPER aka the default implementation.
     }
 
     PMC* get_pmc_keyed_int (INTVAL key) {
-        STRING *meth = CONST_STRING(interpreter, "__get_pmc_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "get_pmc_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__get_pmc_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "get_pmc_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            return Parrot_run_meth_fromc_args(interpreter, sub,
+            return Parrot_run_meth_fromc_args(interp, sub,
                                               pmc, meth, "PI", key);
         }
         else {
@@ -369,13 +369,13 @@ it's just SUPER aka the default implementation.
     }
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        STRING *meth = CONST_STRING(interpreter, "__set_integer_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "set_integer_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__set_integer_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "set_integer_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+            (void) Parrot_run_meth_fromc_args(interp, sub,
                     pmc, meth, "vII", key, value);
         }
         else {
@@ -393,13 +393,13 @@ it's just SUPER aka the default implementation.
     }
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
-        STRING *meth = CONST_STRING(interpreter, "__set_number_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "set_number_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__set_number_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "set_number_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+            (void) Parrot_run_meth_fromc_args(interp, sub,
                                               pmc, meth, "vIN", key, value);
         }
         else {
@@ -417,13 +417,13 @@ it's just SUPER aka the default implementation.
     }
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
-        STRING *meth = CONST_STRING(interpreter, "__set_string_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "set_string_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__set_string_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "set_string_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+            (void) Parrot_run_meth_fromc_args(interp, sub,
                                               pmc, meth, "vIS", key, value);
         }
         else {
@@ -441,13 +441,13 @@ it's just SUPER aka the default implementation.
     }
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
-        STRING *meth = CONST_STRING(interpreter, "__set_pmc_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "set_pmc_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__set_pmc_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "set_pmc_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+            (void) Parrot_run_meth_fromc_args(interp, sub,
                                               pmc, meth, "vIP", key, value);
         }
         else {
@@ -465,13 +465,13 @@ it's just SUPER aka the default implementation.
     }
 
     void delete_keyed_int (INTVAL key) {
-        STRING *meth = CONST_STRING(interpreter, "__delete_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "delete_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__delete_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "delete_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            (void) Parrot_run_meth_fromc_args(interpreter, sub,
+            (void) Parrot_run_meth_fromc_args(interp, sub,
                                               pmc, meth, "vI", key);
         }
         else {
@@ -489,13 +489,13 @@ it's just SUPER aka the default implementation.
     }
 
     INTVAL defined_keyed_int (INTVAL key) {
-        STRING *meth = CONST_STRING(interpreter, "__defined_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "defined_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__defined_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "defined_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            return Parrot_run_meth_fromc_args_reti(interpreter, sub,
+            return Parrot_run_meth_fromc_args_reti(interp, sub,
                                               pmc, meth, "II", key);
         }
         else {
@@ -513,13 +513,13 @@ it's just SUPER aka the default implementation.
     }
 
     INTVAL exists_keyed_int (INTVAL key) {
-        STRING *meth = CONST_STRING(interpreter, "__exists_keyed_int");
-        STRING *meth_v = CONST_STRING(interpreter, "exists_keyed_int");
-        PMC *sub = find_vtable_meth(interpreter, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "__exists_keyed_int");
+        STRING *meth_v = CONST_STRING(interp, "exists_keyed_int");
+        PMC *sub = find_vtable_meth(interp, pmc, meth_v);
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interpreter, pmc, meth);
+            sub = find_meth(interp, pmc, meth);
         if (sub) {
-            return Parrot_run_meth_fromc_args_reti(interpreter, sub,
+            return Parrot_run_meth_fromc_args_reti(interp, sub,
                                               pmc, meth, "II", key);
         }
         else {
@@ -548,7 +548,7 @@ it's just SUPER aka the default implementation.
         ret = pt_shared_fixup(INTERP, SELF);
         true = pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, true, 1);
-        VTABLE_setprop(INTERP, ret, CONST_STRING(interpreter, "_ro"), true);
+        VTABLE_setprop(INTERP, ret, CONST_STRING(interp, "_ro"), true);
         PObj_is_PMC_shared_SET(SELF);
 
         n = PMC_int_val(ret);

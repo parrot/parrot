@@ -10,11 +10,11 @@
 
 
 /* dynamic lib/oplib/PMC loading */
-PARROT_API PMC *Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer);
+PARROT_API PMC *Parrot_load_lib(Interp *interp, STRING *lib, PMC *initializer);
 
 /* dynamic lib/oplib/PMC init */
 PARROT_API PMC *
-Parrot_init_lib(Interp *interpreter,
+Parrot_init_lib(Interp *interp,
                 PMC *(*load_func)(Interp *),
                 void (*init_func)(Interp *, PMC *));
 

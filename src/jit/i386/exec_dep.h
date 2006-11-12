@@ -18,7 +18,7 @@
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
+                     Interp *interp)
 {
     Parrot_jit_optimizer_section_ptr cur_section =
         jit_info->optimizer->cur_section;
@@ -34,7 +34,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
         return;
     /* check, where section ends
      */
-    if (interpreter->op_info_table[*cur_section->end].jump)
+    if (interp->op_info_table[*cur_section->end].jump)
         last_is_branch = 1;
     else if (cur_section->next && !cur_section->next->isjit)
         last_is_branch = 1;
@@ -44,7 +44,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
             (INTVAL)cur_section->op_count >= 2 + last_is_branch) {
         int saved = 0;
         offset = (void **)((int)jit_info->cur_op -
-            (int)interpreter->code->base.data);
+            (int)interp->code->base.data);
 
         jit_emit_mov_ri_i(jit_info->native_ptr, emit_ESI, offset);
         Parrot_exec_add_text_rellocation(jit_info->objfile,
@@ -54,8 +54,8 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
          * prederefed (non JIT) section
          */
         if (last_is_branch) {
-            offset = (cur_section->end - interpreter->code->base.data) +
-                interpreter->code->prederef.code;
+            offset = (cur_section->end - interp->code->base.data) +
+                interp->code->prederef.code;
             cur_section->done = -1;
             /* ins to skip */
             cur_section->ins_count = cur_section->op_count - 1;
@@ -65,11 +65,11 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
              * or a JITed branch,
              * when the branch is non JIT, we are in the above case
              */
-            offset = (cur_section->next->begin - interpreter->code->base.data)
-                + interpreter->code->prederef.code;
+            offset = (cur_section->next->begin - interp->code->base.data)
+                + interp->code->prederef.code;
             cur_section->done = 1;
         }
-        i = (int)(((op_func_t*)interpreter->op_lib->op_func_table)[2]);
+        i = (int)(((op_func_t*)interp->op_lib->op_func_table)[2]);
         j = (int)cgp_core;
         *offset = (void *)(i - j);
     }
@@ -87,7 +87,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
         Parrot_exec_add_text_rellocation_func(jit_info->objfile,
             jit_info->native_ptr,
-                interpreter->op_info_table[*jit_info->cur_op].func_name);
+                interp->op_info_table[*jit_info->cur_op].func_name);
         emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
         emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
         /* when this was a branch, then EAX is now the offset
@@ -101,7 +101,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
+                     Interp *interp)
 {
     emitm_pushl_i(jit_info->native_ptr,
         jit_info->objfile->bytecode_header_size +
@@ -111,7 +111,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
     Parrot_exec_add_text_rellocation_func(jit_info->objfile,
         jit_info->native_ptr,
-            interpreter->op_info_table[*jit_info->cur_op].func_name);
+            interp->op_info_table[*jit_info->cur_op].func_name);
     emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
@@ -120,19 +120,19 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
-                   Interp * interpreter)
+                   Interp *interp)
 {
-    Parrot_exec_normal_op(jit_info, interpreter);
-    Parrot_emit_jump_to_eax(jit_info, interpreter);
+    Parrot_exec_normal_op(jit_info, interp);
+    Parrot_emit_jump_to_eax(jit_info, interp);
 }
 
 void
 Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
-                   Interp * interpreter)
+                   Interp *interp)
 {
     char *jmp_ptr, *sav_ptr;
 
-    Parrot_exec_normal_op(jit_info, interpreter);
+    Parrot_exec_normal_op(jit_info, interp);
     /* test eax, if zero (e.g after trace), return from JIT */
     jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
     /* remember PC */
@@ -147,7 +147,7 @@ Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
     emitm_jxs(jit_info->native_ptr, emitm_jnz, (long)(sav_ptr - jmp_ptr) - 2);
     /* restore PC */
     jit_info->native_ptr = sav_ptr;
-    Parrot_emit_jump_to_eax(jit_info, interpreter);
+    Parrot_emit_jump_to_eax(jit_info, interp);
 }
 
 /* Assign the offset of the progra_code */

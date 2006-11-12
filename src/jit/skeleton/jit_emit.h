@@ -175,7 +175,7 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp)
  */
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
+                     Interp *interp)
 {
 }
 
@@ -186,9 +186,9 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
  */
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                   Interp * interpreter)
+                   Interp *interp)
 {
-    Parrot_jit_normal_op(jit_info, interpreter);
+    Parrot_jit_normal_op(jit_info, interp);
 
     /* fix our reserved registers,
      * in case we are branching to a new segment
@@ -212,7 +212,7 @@ static void Parrot_end_jit(Parrot_jit_info_t *, Interp * );
  */
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                      Interp * interpreter)
+                      Interp *interp)
 {
 }
 
@@ -233,7 +233,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
  */
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp * interpreter)
+                 Interp *interp)
 {
     ...
 }
@@ -243,7 +243,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
  */
 static void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                   Interp * interpreter)
+                   Interp *interp)
 {
 }
 
@@ -350,7 +350,7 @@ static const jit_arch_info arch_info = {
  */
 
 const jit_arch_info *
-Parrot_jit_init(Interp *interpreter)
+Parrot_jit_init(Interp *interp)
 {
     return &arch_info;
 }

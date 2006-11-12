@@ -118,7 +118,7 @@ sub gen_h {
     my $lc_libname = lc $self->{opt}{library};
 
     $hout .= <<"EOH";
-Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter);
+Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interp);
 EOH
     $hout .= $self->c_code_coda;
 

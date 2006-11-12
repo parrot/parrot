@@ -85,11 +85,11 @@ The buffer layer's C<Init> function. Initializes buffering.
 static INTVAL
 PIO_buf_init(theINTERP, ParrotIOLayer *layer)
 {
-    if (PIO_STDOUT(interpreter))
-        PIO_buf_setlinebuf(interpreter, layer,
-                           PMC_data(PIO_STDOUT(interpreter)));
-    if (PIO_STDIN(interpreter))
-        PIO_buf_setbuf(interpreter, layer, PMC_data(PIO_STDIN(interpreter)),
+    if (PIO_STDOUT(interp))
+        PIO_buf_setlinebuf(interp, layer,
+                           PMC_data(PIO_STDOUT(interp)));
+    if (PIO_STDIN(interp))
+        PIO_buf_setbuf(interp, layer, PMC_data(PIO_STDIN(interp)),
                          PIO_UNBOUND);
     return 0;
 }
@@ -111,7 +111,7 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
                const char *path, INTVAL flags)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
-    ParrotIO * const io = PIO_open_down(interpreter, l, path, flags);
+    ParrotIO * const io = PIO_open_down(interp, l, path, flags);
     if (!io) {
         /* error creating IO stream */
         return NULL;
@@ -121,8 +121,8 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
      * for our layer before returning it.
      * XXX: Make default behaviour linebuffered?
      */
-    /*PIO_buf_setlinebuf(interpreter, l, io);*/
-    PIO_buf_setbuf(interpreter, l, io, PIO_UNBOUND);
+    /*PIO_buf_setlinebuf(interp, l, io);*/
+    PIO_buf_setbuf(interp, l, io, PIO_UNBOUND);
     return io;
 }
 
@@ -152,7 +152,7 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
      * dinking around with the buffer.
      */
     if (b->startb)
-        PIO_buf_flush(interpreter, l, io);
+        PIO_buf_flush(interp, l, io);
 
     /* Choose an appropriate buffer size for caller */
     switch (bufsize) {
@@ -211,7 +211,7 @@ PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
         return 0;
 
     /* Reuse setbuf call */
-    if ((err = PIO_buf_setbuf(interpreter, l, io, PIO_LINEBUFSIZE)) >= 0) {
+    if ((err = PIO_buf_setbuf(interp, l, io, PIO_LINEBUFSIZE)) >= 0) {
         /* Then switch to linebuf */
         io->flags &= ~PIO_F_BLKBUF;
         io->flags |= PIO_F_LINEBUF;
@@ -236,7 +236,7 @@ static ParrotIO *
 PIO_buf_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
-    ParrotIO * const io = PIO_fdopen_down(interpreter, l, fd, flags);
+    ParrotIO * const io = PIO_fdopen_down(interp, l, fd, flags);
 
     if (!io) {
         /* error creating IO stream */
@@ -244,9 +244,9 @@ PIO_buf_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
     }
 
     if (io->flags & PIO_F_CONSOLE)
-        PIO_buf_setlinebuf(interpreter, l, io);
+        PIO_buf_setlinebuf(interp, l, io);
     else
-        PIO_buf_setbuf(interpreter, l, io, PIO_UNBOUND);
+        PIO_buf_setbuf(interp, l, io, PIO_UNBOUND);
 
     return io;
 }
@@ -266,9 +266,9 @@ static INTVAL
 PIO_buf_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
-    PIO_buf_flush(interpreter, layer, io);
+    PIO_buf_flush(interp, layer, io);
 
-    return PIO_close_down (interpreter, l, io);
+    return PIO_close_down (interp, l, io);
 }
 
 /*
@@ -305,7 +305,7 @@ PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
         /* Flush to next layer */
         fake.strstart = io->b.startb;
         fake.bufused = to_write;
-        wrote = PIO_write_down(interpreter, PIO_DOWNLAYER(l), io, &fake);
+        wrote = PIO_write_down(interp, PIO_DOWNLAYER(l), io, &fake);
         if (wrote == (long)to_write) {
             io->b.next = io->b.startb;
             /* Release buffer */
@@ -349,7 +349,7 @@ PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     fake.bufused  = b->size;
     s = &fake;
 
-    got = PIO_read_down(interpreter, PIO_DOWNLAYER(layer),
+    got = PIO_read_down(interp, PIO_DOWNLAYER(layer),
                         io, &s);
     /* buffer-filling does not change fileposition */
     io->fpos = pos;
@@ -391,24 +391,24 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
     /* write buffer flush */
     if (io->b.flags & PIO_BF_WRITEBUF) {
-        PIO_buf_flush(interpreter, layer, io);
+        PIO_buf_flush(interp, layer, io);
     }
 
     b = &io->b;
 
     /* line buffered read */
     if (io->flags & PIO_F_LINEBUF) {
-        return PIO_buf_readline(interpreter, layer, io, buf);
+        return PIO_buf_readline(interp, layer, io, buf);
     }
 
     if (*buf == NULL) {
-        *buf = new_string_header(interpreter, 0);
+        *buf = new_string_header(interp, 0);
         (*buf)->bufused = len = 2048;
     }
     s = *buf;
     len = s->bufused;
     if (!s->strstart) {
-        Parrot_allocate_string(interpreter, s, len);
+        Parrot_allocate_string(interp, s, len);
     }
     out_buf = s->strstart;
     /* read Data from buffer */
@@ -448,13 +448,13 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
             fake.strstart = out_buf;
             fake.bufused  = len;
-            got = PIO_read_down(interpreter, PIO_DOWNLAYER(l), io, &sf);
+            got = PIO_read_down(interp, PIO_DOWNLAYER(l), io, &sf);
             s->strlen = s->bufused = current + got;
             io->fpos += got;
             return current + got;
         }
 
-        got = PIO_buf_fill_readbuf(interpreter, l, io, b);
+        got = PIO_buf_fill_readbuf(interp, l, io, b);
 
         len = len < got ? len : got;
     }
@@ -482,11 +482,11 @@ PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
     ParrotIOBuf *b;
     size_t len = 1;
 
-    STRING * const s = PIO_make_io_string(interpreter, buf, 1);
+    STRING * const s = PIO_make_io_string(interp, buf, 1);
 
     /* write buffer flush */
     if (io->b.flags & PIO_BF_WRITEBUF) {
-        PIO_buf_flush(interpreter, layer, io);
+        PIO_buf_flush(interp, layer, io);
     }
 
     b = &io->b;
@@ -511,7 +511,7 @@ ret_string:
         if (io->b.size == 0)
             internal_exception(PIO_ERROR, "Can't peek at unbuffered PIO");
 
-        got = PIO_buf_fill_readbuf(interpreter, l, io, b);
+        got = PIO_buf_fill_readbuf(interp, l, io, b);
         len = (len < got) ? len : got;
     }
 
@@ -545,14 +545,14 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     STRING *s;
 
     if (*buf == NULL) {
-        *buf = new_string_header(interpreter, 0);
+        *buf = new_string_header(interp, 0);
     }
     s = *buf;
     s->strlen = 0;
 
     /* fill empty buffer */
     if (!(b->flags & PIO_BF_READBUF)) {
-        if (PIO_buf_fill_readbuf(interpreter, layer, io, b) == 0)
+        if (PIO_buf_fill_readbuf(interp, layer, io, b) == 0)
             return 0;
     }
 
@@ -572,26 +572,26 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             len = b->endb - buf_start;
             if (s->bufused < l) {
                 if (s->strstart) {
-                    Parrot_reallocate_string(interpreter, s, l);
+                    Parrot_reallocate_string(interp, s, l);
                 }
                 else {
-                    Parrot_allocate_string(interpreter, s, l);
+                    Parrot_allocate_string(interp, s, l);
                 }
             }
             out_buf = (unsigned char*)s->strstart + s->strlen;
             memcpy(out_buf, buf_start, len);
             s->strlen = s->bufused = l;
-            if (PIO_buf_fill_readbuf(interpreter, layer, io, b) == 0)
+            if (PIO_buf_fill_readbuf(interp, layer, io, b) == 0)
                 return l;
             buf_start = b->startb;
         }
     }
     if (s->bufused < l) {
         if (s->strstart) {
-            Parrot_reallocate_string(interpreter, s, l);
+            Parrot_reallocate_string(interp, s, l);
         }
         else {
-            Parrot_allocate_string(interpreter, s, l);
+            Parrot_allocate_string(interp, s, l);
         }
     }
     out_buf = (unsigned char*)s->strstart + s->strlen;
@@ -665,8 +665,8 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
      */
     if (need_flush || len >= io->b.size) {
         /* Write through, skip buffer. */
-        PIO_buf_flush(interpreter, layer, io);
-        wrote = PIO_write_down(interpreter, PIO_DOWNLAYER(layer), io, s);
+        PIO_buf_flush(interp, layer, io);
+        wrote = PIO_write_down(interp, PIO_DOWNLAYER(layer), io, s);
         if (wrote == (long)len) {
             io->fpos += wrote;
             return wrote;
@@ -690,7 +690,7 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
         memcpy(io->b.next, buffer, avail);
         io->b.next += avail;
         io->fpos += avail;
-        PIO_buf_flush(interpreter, layer, io);
+        PIO_buf_flush(interp, layer, io);
         memcpy(io->b.startb, ((const char *)buffer + avail), diff);
         io->b.next += diff;
         io->fpos += diff;
@@ -725,7 +725,7 @@ PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
         newpos = io->fpos + offset;
         break;
     case SEEK_END:
-        newpos = PIO_seek_down(interpreter, PIO_DOWNLAYER(l), io, offset,
+        newpos = PIO_seek_down(interp, PIO_DOWNLAYER(l), io, offset,
                                whence);
         if (newpos == -1)
             return -1;
@@ -738,8 +738,8 @@ PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 
     if ((newpos < io->fpos - (io->b.next - io->b.startb))
         || (newpos >= io->fpos + (io->b.endb - io->b.next))) {
-        PIO_buf_flush(interpreter, l, io);
-        PIO_seek_down(interpreter, PIO_DOWNLAYER(l), io, newpos, SEEK_SET);
+        PIO_buf_flush(interp, l, io);
+        PIO_seek_down(interp, PIO_DOWNLAYER(l), io, newpos, SEEK_SET);
     }
     else {
         io->b.next += newpos - io->fpos;
@@ -765,7 +765,7 @@ The buffer layer's C<Tell> function.
 static PIOOFF_T
 PIO_buf_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer)
 
     return io->fpos;

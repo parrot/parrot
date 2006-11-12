@@ -73,7 +73,7 @@ typedef enum {
 /*
 
 =item C<static void
-add_timer(Interp* interpreter, PMC *pmc)>
+add_timer(Interp* interp, PMC *pmc)>
 
 Adds a new timer event to the event queue.
 
@@ -82,18 +82,18 @@ Adds a new timer event to the event queue.
 */
 
 static void
-add_timer(Interp* interpreter, PMC *pmc)
+add_timer(Interp* interp, PMC *pmc)
 {
     parrot_timer_event *t = PMC_struct_val(pmc);
     if (!PMC_IS_NULL(t->sub))
-        Parrot_new_timer_event(interpreter, pmc, t->abs_time,
+        Parrot_new_timer_event(interp, pmc, t->abs_time,
             t->interval, t->repeat, t->sub, EVENT_TYPE_TIMER);
 }
 
 /*
 
 =item C<static void
-del_timer(Interp* interpreter, PMC *pmc)>
+del_timer(Interp* interp, PMC *pmc)>
 
 Deletes the timer event.
 
@@ -102,9 +102,9 @@ Deletes the timer event.
 */
 
 static void
-del_timer(Interp* interpreter, PMC *pmc)
+del_timer(Interp* interp, PMC *pmc)
 {
-   Parrot_del_timer_event(interpreter, pmc);
+   Parrot_del_timer_event(interp, pmc);
 }
 
 

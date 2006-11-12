@@ -597,12 +597,12 @@ we have to preserver key/value order.
                     key = b->key;
                     if (!key)
                         continue;
-                    io->vtable->push_string(interpreter, io, key);
-                    (info->visit_pmc_now)(interpreter, b->value, info);
+                    io->vtable->push_string(interp, io, key);
+                    (info->visit_pmc_now)(interp, b->value, info);
                 }
                 break;
             default:
-                real_exception(interpreter, NULL, E_Exception,
+                real_exception(interp, NULL, E_Exception,
                         "unhandled visit action (%d)",
                         info->what);
         }

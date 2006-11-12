@@ -284,13 +284,13 @@ if ($jit_cpu) {
 #define NREG(i) REG_NUM(jit_info->cur_op[i])
 #define PREG(i) REG_PMC(jit_info->cur_op[i])
 #define SREG(i) REG_STR(jit_info->cur_op[i])
-#define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
+#define CONST(i) interp->code->const_table->constants[jit_info->cur_op[i]]
 END_C
 }
 else {
     print $JITCPU <<'END_C';
 #define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + offsetof(struct PackFile_Constant, u))
-#define RCONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
+#define RCONST(i) interp->code->const_table->constants[jit_info->cur_op[i]]
 #define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \
     emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 
@@ -308,7 +308,7 @@ print $JITCPU $header if ($header);
 my $njit = scalar keys(%core_ops);
 
 my $jit_fn_retn = 'void';
-my $jit_fn_params = '(Parrot_jit_info_t *jit_info, Interp * interpreter)';
+my $jit_fn_params = '(Parrot_jit_info_t *jit_info, Interp *interp)';
 
 for ( my $i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]}[0];
@@ -326,9 +326,9 @@ for ( my $i = 0; $i < $core_numops; $i++) {
         $opbody =~ s/
             \bVTABLE_(\w+)
             \s*\(
-            interpreter,\s*
+            interp,\s*
             {{\@(\d)}}/
-            {{\@$2}}->vtable->$1(interpreter, {{\@$2}}/x;
+            {{\@$2}}->vtable->$1(interp, {{\@$2}}/x;
 
         if ($op->full_name eq 'new_p_ic') {
             $jit_func = "Parrot_jit_vtable_newp_ic_op";
@@ -342,7 +342,7 @@ for ( my $i = 0; $i < $core_numops; $i++) {
         ^(?:.*\.ops")\s+
         {{\@1}}->vtable->
         (\w+)
-        \(interpreter,
+        \(interp,
         \s*
         {{\@1}}
         \);
@@ -357,7 +357,7 @@ for ( my $i = 0; $i < $core_numops; $i++) {
         {{\@1}}\s*=\s*
         {{\@2}}->vtable->
         (\w+)
-        \(interpreter,
+        \(interp,
         \s*
         {{\@2}}
         \);
@@ -371,7 +371,7 @@ for ( my $i = 0; $i < $core_numops; $i++) {
         ^(?:.*\.ops")\s+
         {{\@(\d)}}->vtable->
         (\w+)
-        \(interpreter,
+        \(interp,
         \s*
         {{\@(\d)}},\s*{{\@(\d)}}
         \);
@@ -386,7 +386,7 @@ for ( my $i = 0; $i < $core_numops; $i++) {
         {{\@(\d)}}\s*=\s*
         {{\@(\d)}}->vtable->
         (\w+)
-        \(interpreter,
+        \(interp,
         \s*
         {{\@(\d)}},\s*{{\@(\d)}}
         \);
@@ -400,7 +400,7 @@ for ( my $i = 0; $i < $core_numops; $i++) {
         ^(?:.*\.ops")\s+
         {{\@(\d)}}->vtable->
         (\w+)
-        \(interpreter,
+        \(interp,
         \s*
         {{\@(\d)}},\s*{{\@(\d)}},\s*{{\@(\d)}}
         \);

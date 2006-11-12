@@ -18,14 +18,14 @@ TEMPLATE Parrot_set_x_x {
     jit_emit_mov_rr<_N>(NATIVECODE, MAP[1], MAP[2]);
     }
     else if(MAP[1]){
-        jit_emit_load<_N>(jit_info, interpreter, 2, MAP[1]);
+        jit_emit_load<_N>(jit_info, interp, 2, MAP[1]);
     }
     else if(MAP[2]){
-        jit_emit_store<_N>(jit_info, interpreter, 1, MAP[2]);
+        jit_emit_store<_N>(jit_info, interp, 1, MAP[2]);
     }
     else {
-    jit_emit_load<_N>(jit_info, interpreter, 2, ISR1);
-    jit_emit_store<_N>(jit_info, interpreter, 1, ISR1);
+        jit_emit_load<_N>(jit_info, interp, 2, ISR1);
+        jit_emit_store<_N>(jit_info, interp, 1, ISR1);
     }
 }
 
@@ -51,13 +51,13 @@ Parrot_set_i_ic {
 
 Parrot_set_n_ic {
     if(MAP[1]){
-    jit_emit_load_n(jit_info, interpreter, 2, MAP[1]);
+        jit_emit_load_n(jit_info, interp, 2, MAP[1]);
         emitm_fitod(NATIVECODE, MAP[1], MAP[1]);
     }
     else {
-    jit_emit_load_n(jit_info, interpreter, 2, FSR1);
+        jit_emit_load_n(jit_info, interp, 2, FSR1);
         emitm_fitod(NATIVECODE, FSR1, FSR1);
-    jit_emit_store_n(jit_info, interpreter, 1, FSR1);
+        jit_emit_store_n(jit_info, interp, 1, FSR1);
     }
 }
 
@@ -70,35 +70,35 @@ Parrot_set_n_i {
      * point registers so the mapped integer register must be written to memory
      */
     if(MAP[2]){
-    jit_emit_store_i(jit_info, interpreter, 2, MAP[2]);
+        jit_emit_store_i(jit_info, interp, 2, MAP[2]);
     }
 
-    jit_emit_load_n(jit_info, interpreter, 2, FSR1);
+    jit_emit_load_n(jit_info, interp, 2, FSR1);
 
     /* If result register is mapped convert directly into the register */
     if(MAP[1]){
     emitm_fitod(NATIVECODE, FSR1, MAP[1]);
     }
     else {
-    emitm_fitod(NATIVECODE, FSR1, FSR2);
-    jit_emit_store_n(jit_info, interpreter, 1, FSR2);
+        emitm_fitod(NATIVECODE, FSR1, FSR2);
+        jit_emit_store_n(jit_info, interp, 1, FSR2);
     }
 }
 
 Parrot_set_i_n {
     if(MAP[2]){
-    emitm_fdtoi(NATIVECODE, MAP[2], FSR2);
+        emitm_fdtoi(NATIVECODE, MAP[2], FSR2);
     }
     else {
-    jit_emit_load_n(jit_info, interpreter, 2, FSR1);
-    emitm_fdtoi(NATIVECODE, FSR1, FSR2);
+        jit_emit_load_n(jit_info, interp, 2, FSR1);
+        emitm_fdtoi(NATIVECODE, FSR1, FSR2);
     }
 
-    jit_emit_store_n(jit_info, interpreter, 1, FSR2);
+    jit_emit_store_n(jit_info, interp, 1, FSR2);
 
     /* No float reg to integer reg move instruction available */
     if(MAP[1]){
-    jit_emit_load_i(jit_info, interpreter, 1, MAP[1]);
+        jit_emit_load_i(jit_info, interp, 1, MAP[1]);
     }
 }
 
@@ -107,14 +107,14 @@ Parrot_set_i_nc {
         emitm_fdtoi(NATIVECODE, MAP[2], FSR1);
     }
     else {
-        jit_emit_load_n(jit_info, interpreter, 2, FSR2);
+        jit_emit_load_n(jit_info, interp, 2, FSR2);
         emitm_fdtoi(NATIVECODE, FSR2, FSR1);
     }
 
-    jit_emit_store_n(jit_info, interpreter, 1, FSR1);
+    jit_emit_store_n(jit_info, interp, 1, FSR1);
 
     if(MAP[1]){
-        jit_emit_load_i(jit_info, interpreter, 1, MAP[1]);
+        jit_emit_load_i(jit_info, interp, 1, MAP[1]);
     }
 }
 
@@ -126,7 +126,7 @@ TEMPLATE Parrot_binop_x_x {
     }
     else {
         arg1 = ISR1;
-        jit_emit_load<_N>(jit_info, interpreter, 1, ISR1);
+        jit_emit_load<_N>(jit_info, interp, 1, ISR1);
     }
 
     if (MAP[2]) {
@@ -134,13 +134,13 @@ TEMPLATE Parrot_binop_x_x {
     }
     else {
         arg2 = ISR2;
-        jit_emit_load<_N>(jit_info, interpreter, 2, arg2);
+        jit_emit_load<_N>(jit_info, interp, 2, arg2);
     }
 
     emitm_<op>(NATIVECODE, arg1, arg2, arg1);
 
     if(!MAP[1]){
-        jit_emit_store<_N>(jit_info, interpreter, 1, arg1);
+        jit_emit_store<_N>(jit_info, interp, 1, arg1);
     }
 }
 
@@ -188,13 +188,13 @@ TEMPLATE Parrot_incdec_i {
     }
     else {
         arg1 = ISR1;
-        jit_emit_load_i(jit_info, interpreter, 1, arg1);
+        jit_emit_load_i(jit_info, interp, 1, arg1);
     }
 
     emitm_<op>_i(NATIVECODE, arg1, 1, arg1);
 
     if(!MAP[1]){
-        jit_emit_store_i(jit_info, interpreter, 1, arg1);
+        jit_emit_store_i(jit_info, interp, 1, arg1);
     }
 }
 
@@ -214,19 +214,19 @@ TEMPLATE Parrot_binop_i_xc {
     }
     else {
         arg1 = ISR1;
-        jit_emit_load_i(jit_info, interpreter, 1, arg1);
+        jit_emit_load_i(jit_info, interp, 1, arg1);
     }
 
     if(emitm_simm13_const(*INT_CONST[2])){
         emitm_<op>_i(NATIVECODE, arg1, *INT_CONST[2], arg1);
     }
     else {
-        jit_emit_load_i(jit_info, interpreter, 2, ISR1);
+        jit_emit_load_i(jit_info, interp, 2, ISR1);
         emitm_<op>_r(NATIVECODE, arg1, ISR1, arg1);
     }
 
     if(!MAP[1]){
-        jit_emit_store_i(jit_info, interpreter, 1, arg1);
+        jit_emit_store_i(jit_info, interp, 1, arg1);
     }
 }
 
@@ -275,7 +275,7 @@ TEMPLATE Parrot_binop_x_x_x {
     }
     else {
         arg2 = ISR1;
-        jit_emit_load<_N>(jit_info, interpreter, 2, arg2);
+        jit_emit_load<_N>(jit_info, interp, 2, arg2);
     }
 
     /* Generate load if needed */
@@ -284,7 +284,7 @@ TEMPLATE Parrot_binop_x_x_x {
     }
     else {
         arg3 = ISR2;
-        jit_emit_load<_N>(jit_info, interpreter, 3, arg3);
+        jit_emit_load<_N>(jit_info, interp, 3, arg3);
     }
 
     /* Destination is a register */
@@ -294,7 +294,7 @@ TEMPLATE Parrot_binop_x_x_x {
     /* Destination is memory */
     else {
         emitm_<op>(NATIVECODE, arg2, arg3, ISR1);
-        jit_emit_store<_N>(jit_info, interpreter, 1, ISR1);
+        jit_emit_store<_N>(jit_info, interp, 1, ISR1);
     }
 }
 
@@ -484,9 +484,9 @@ Parrot_div_n_n_n {
 ;        emitm_fnegs(NATIVECODE, MAP[1], MAP[1]);
 ;    }
 ;    else {
-;        jit_emit_load_n(jit_info, interpreter, 1, FSR1);
+;        jit_emit_load_n(jit_info, interp, 1, FSR1);
 ;        emitm_fnegs(NATIVECODE, FSR1, FSR1);
-;        jit_emit_store_n(jit_info, interpreter, 1, FSR1);
+;        jit_emit_store_n(jit_info, interp, 1, FSR1);
 ;    }
 ;}
 
@@ -495,13 +495,13 @@ TEMPLATE Parrot_unop_x_x {
         emitm_<op>(NATIVECODE, MAP[2], MAP[1]);
     }
     else if(MAP[1]){
-        jit_emit_load<_N>(jit_info, interpreter, 2, MAP[1]);
+        jit_emit_load<_N>(jit_info, interp, 2, MAP[1]);
         emitm_<op>(NATIVECODE, MAP[1], MAP[1]);
     }
     else {
-        jit_emit_load<_N>(jit_info, interpreter, 2, ISR1);
+        jit_emit_load<_N>(jit_info, interp, 2, ISR1);
         emitm_<op>(NATIVECODE, ISR1, ISR1);
-        jit_emit_store<_N>(jit_info, interpreter, 1, ISR1);
+        jit_emit_store<_N>(jit_info, interp, 1, ISR1);
     }
 }
 
@@ -510,13 +510,13 @@ TEMPLATE Parrot_unop_x_nc {
         emitm_<op>(NATIVECODE, MAP[2], MAP[1]);
     }
     else if(MAP[1]){
-        jit_emit_load<_N>(jit_info, interpreter, 2, MAP[1]);
+        jit_emit_load<_N>(jit_info, interp, 2, MAP[1]);
         emitm_<op>(NATIVECODE, MAP[1], MAP[1]);
     }
     else {
-        jit_emit_load<_N>(jit_info, interpreter, 2, ISR1);
+        jit_emit_load<_N>(jit_info, interp, 2, ISR1);
         emitm_<op>(NATIVECODE, ISR1, ISR1);
-        jit_emit_store<_N>(jit_info, interpreter, 1, ISR1);
+        jit_emit_store<_N>(jit_info, interp, 1, ISR1);
     }
 }
 
@@ -534,13 +534,13 @@ TEMPLATE Parrot_abs_nx_nx {
         emitm_fmovs(NATIVECODE, MAP[2] + 1, MAP[1] + 1);
     }
     else if(MAP[1]){
-        jit_emit_load_n(jit_info, interpreter, 2, MAP[1]);
+        jit_emit_load_n(jit_info, interp, 2, MAP[1]);
         emitm_fabss(NATIVECODE, MAP[1], MAP[1]);
     }
     else {
-        jit_emit_load_n(jit_info, interpreter, 2, FSR1);
+        jit_emit_load_n(jit_info, interp, 2, FSR1);
         emitm_fabss(NATIVECODE, FSR1, FSR1);
-        jit_emit_store_n(jit_info, interpreter, 1, FSR1);
+        jit_emit_store_n(jit_info, interp, 1, FSR1);
     }
 }
 
@@ -557,13 +557,13 @@ TEMPLATE Parrot_sqrt_nx_nx {
         emitm_fsqrtd(NATIVECODE, MAP[2], MAP[1]);
     }
     else if(MAP[1]){
-        jit_emit_load_n(jit_info, interpreter, 2, MAP[1]);
+        jit_emit_load_n(jit_info, interp, 2, MAP[1]);
         emitm_fsqrtd(NATIVECODE, MAP[1], MAP[1]);
     }
     else {
-        jit_emit_load_n(jit_info, interpreter, 2, FSR1);
+        jit_emit_load_n(jit_info, interp, 2, FSR1);
         emitm_fsqrtd(NATIVECODE, FSR1, FSR1);
-        jit_emit_store_n(jit_info, interpreter, 1, FSR1);
+        jit_emit_store_n(jit_info, interp, 1, FSR1);
     }
 }
 
@@ -578,11 +578,11 @@ Parrot_sqrt_n_nc {
 
 TEMPLATE Parrot_if_ix_x {
     if(MAP[1]){
-    emitm_subcc_r(NATIVECODE, MAP[1], emitm_g(0), emitm_g(0));
+        emitm_subcc_r(NATIVECODE, MAP[1], emitm_g(0), emitm_g(0));
     }
     else {
-    jit_emit_load_i(jit_info, interpreter, 1, ISR1);
-    emitm_subcc_r(NATIVECODE, ISR1, emitm_g(0), emitm_g(0));
+        jit_emit_load_i(jit_info, interp, 1, ISR1);
+        emitm_subcc_r(NATIVECODE, ISR1, emitm_g(0), emitm_g(0));
     }
 
     Parrot_jit_bicc(jit_info, emitm_<a>, 0, *INT_CONST[2]);
@@ -611,16 +611,16 @@ TEMPLATE Parrot_cmp_x_x_ic {
         emitm_<op>(NATIVECODE, MAP[1], MAP[2] <nill>);
     }
     else if (MAP[1]) {
-        jit_emit_load<_N>(jit_info, interpreter, 2, ISR2);
+        jit_emit_load<_N>(jit_info, interp, 2, ISR2);
         emitm_<op>(NATIVECODE, MAP[1], ISR2 <nill>);
     }
     else if (MAP[2]) {
-        jit_emit_load<_N>(jit_info, interpreter, 1, ISR1);
+        jit_emit_load<_N>(jit_info, interp, 1, ISR1);
         emitm_<op>(NATIVECODE, ISR1, MAP[2] <nill>);
     }
     else {
-        jit_emit_load<_N>(jit_info, interpreter, 1, ISR1);
-        jit_emit_load<_N>(jit_info, interpreter, 2, ISR2);
+        jit_emit_load<_N>(jit_info, interp, 1, ISR1);
+        jit_emit_load<_N>(jit_info, interp, 2, ISR2);
         emitm_<op>(NATIVECODE, ISR1, ISR2 <nill>);
     }
 
@@ -825,16 +825,16 @@ TEMPLATE Parrot_iscmp_ix_ix_ix {
         emitm_subcc_r(NATIVECODE, MAP[2], MAP[3], emitm_g(0));
     }
     else if (MAP[2]) {
-        jit_emit_load_i(jit_info, interpreter, 3, ISR2);
+        jit_emit_load_i(jit_info, interp, 3, ISR2);
         emitm_subcc_r(NATIVECODE, MAP[2], ISR2, emitm_g(0));
     }
     else if (MAP[3]) {
-        jit_emit_load_i(jit_info, interpreter, 2, ISR1);
+        jit_emit_load_i(jit_info, interp, 2, ISR1);
         emitm_subcc_r(NATIVECODE, ISR1, MAP[3], emitm_g(0));
     }
     else {
-        jit_emit_load_i(jit_info, interpreter, 2, ISR1);
-        jit_emit_load_i(jit_info, interpreter, 3, ISR2);
+        jit_emit_load_i(jit_info, interp, 2, ISR1);
+        jit_emit_load_i(jit_info, interp, 3, ISR2);
         emitm_subcc_r(NATIVECODE, ISR1, ISR2, emitm_g(0));
     }
 
@@ -844,8 +844,8 @@ TEMPLATE Parrot_iscmp_ix_ix_ix {
         emitm_mov_i(NATIVECODE, 1, MAP[1]);
         emitm_or_r(NATIVECODE, emitm_g(0), emitm_g(0), MAP[1]);
     } else {
-        jit_emit_store_i(jit_info, interpreter, 1, 1);
-        jit_emit_store_i(jit_info, interpreter, 1, 0);
+        jit_emit_store_i(jit_info, interp, 1, 1);
+        jit_emit_store_i(jit_info, interp, 1, 0);
     }
 }
 

@@ -68,7 +68,7 @@ string_set_data_directory(const char *dir)
 /*
 
 =item C<void
-string_fill_from_buffer(Interp *interpreter, const void *buffer,
+string_fill_from_buffer(Interp *interp, const void *buffer,
             UINTVAL len, const char *encoding_name, STRING *s)>
 
 Creates a Parrot string from an "external" buffer, converting from any
@@ -79,7 +79,7 @@ supported encoding into Parrot string's internal format.
 */
 
 void
-string_fill_from_buffer(Interp *interpreter, const void *buffer,
+string_fill_from_buffer(Interp *interp, const void *buffer,
             UINTVAL len, const char *encoding_name, STRING *s)
 {
 #if PARROT_HAS_ICU
@@ -101,7 +101,7 @@ string_fill_from_buffer(Interp *interpreter, const void *buffer,
 
     /* big guess--allocate same space for string as buffer needed.
        may be able to make a more educated guess based on the encoding. */
-    Parrot_allocate_string(interpreter, s, len);
+    Parrot_allocate_string(interp, s, len);
 
     conv = ucnv_open(encoding_name, &icuError);
 
@@ -127,7 +127,7 @@ string_fill_from_buffer(Interp *interpreter, const void *buffer,
         const size_t consumed_length = (char *)target - (char *)(s->strstart);
 
         /* double size, at least */
-        Parrot_reallocate_string(interpreter, s, 2 * PObj_buflen(s));
+        Parrot_reallocate_string(interp, s, 2 * PObj_buflen(s));
 
         target = (UChar *)((char *)s->strstart + consumed_length);
         target_limit = (UChar *)((char *)PObj_bufstart(s) + PObj_buflen(s) - 1);
@@ -149,7 +149,7 @@ string_fill_from_buffer(Interp *interpreter, const void *buffer,
 
     /* temporary; need to promote to rep 4 if has non-BMP characters*/
     s->bufused = (char *)target - (char *)s->strstart;
-    string_compute_strlen(interpreter, s);
+    string_compute_strlen(interp, s);
 #else
     internal_exception(ICU_ERROR,
         "string_fill_from_buffer: parrot compiled without ICU support" );
@@ -160,18 +160,18 @@ string_fill_from_buffer(Interp *interpreter, const void *buffer,
 /* Unescape a single character. We assume that we're at the start of a
    sequence, right after the \ */
 Parrot_UInt4
-string_unescape_one(Interp *interpreter, UINTVAL *offset,
+string_unescape_one(Interp *interp, UINTVAL *offset,
         STRING *string)
 {
     UINTVAL workchar = 0;
     UINTVAL charcount = 0;
-    const UINTVAL len = string_length(interpreter, string);
+    const UINTVAL len = string_length(interp, string);
     /* Well, not right now */
-    UINTVAL codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+    UINTVAL codepoint = CHARSET_GET_BYTE(interp, string, *offset);
     ++*offset;
     switch (codepoint) {
         case 'x':
-            codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+            codepoint = CHARSET_GET_BYTE(interp, string, *offset);
             if (codepoint >= '0' && codepoint <= '9') {
                 workchar = codepoint - '0';
             } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -183,7 +183,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                 ++*offset;
                 workchar = 0;
                 for (i = 0; i < 8 && *offset < len; ++i, ++*offset) {
-                    codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                    codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                     if (codepoint == '}') {
                         ++*offset;
                         return workchar;
@@ -211,7 +211,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             ++*offset;
             if (*offset < len) {
                 workchar *= 16;
-                codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                 if (codepoint >= '0' && codepoint <= '9') {
                     workchar += codepoint - '0';
                 } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -229,7 +229,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             ++*offset;
             return workchar;
         case 'c':
-            codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+            codepoint = CHARSET_GET_BYTE(interp, string, *offset);
             if (codepoint >= 'A' && codepoint <= 'Z') {
                 workchar = codepoint - 'A' + 1;
             }
@@ -243,7 +243,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             for (charcount = 0; charcount < 4; charcount++) {
                 if (*offset < len) {
                     workchar *= 16;
-                    codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                    codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                     if (codepoint >= '0' && codepoint <= '9') {
                         workchar += codepoint - '0';
                     } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -268,7 +268,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             for (charcount = 0; charcount < 8; charcount++) {
                 if (*offset < len) {
                     workchar *= 16;
-                    codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                    codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                     if (codepoint >= '0' && codepoint <= '9') {
                         workchar += codepoint - '0';
                     } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -299,7 +299,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             workchar = codepoint - '0';
             if (*offset < len) {
                 workchar *= 8;
-                codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                 if (codepoint >= '0' && codepoint <= '7') {
                     workchar += codepoint - '0';
                 }
@@ -313,7 +313,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
             ++*offset;
             if (*offset < len) {
                 workchar *= 8;
-                codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                 if (codepoint >= '0' && codepoint <= '7') {
                     workchar += codepoint - '0';
                 }
@@ -360,7 +360,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
 =over
 
 =item C<UINTVAL
-Parrot_char_digit_value(Interp *interpreter, UINTVAL character)>
+Parrot_char_digit_value(Interp *interp, UINTVAL character)>
 
 Returns the decimal digit value of the specified character if it is a decimal
 digit character. If not, then -1 is returned.
@@ -374,7 +374,7 @@ C<Parrot_char_is_digit()> returns false.
 */
 
 UINTVAL
-Parrot_char_digit_value(Interp *interpreter, UINTVAL character)
+Parrot_char_digit_value(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_charDigitValue(character);
@@ -388,7 +388,7 @@ Parrot_char_digit_value(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_alnum(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_alnum(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is an alphanumeric character.
 
@@ -397,7 +397,7 @@ Returns whether the specified character is an alphanumeric character.
 */
 
 INTVAL
-Parrot_char_is_alnum(Interp *interpreter, UINTVAL character)
+Parrot_char_is_alnum(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isalnum(character);
@@ -409,7 +409,7 @@ Parrot_char_is_alnum(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_alpha(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_alpha(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is an letter character.
 
@@ -418,7 +418,7 @@ Returns whether the specified character is an letter character.
 */
 
 INTVAL
-Parrot_char_is_alpha(Interp *interpreter, UINTVAL character)
+Parrot_char_is_alpha(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isalpha(character);
@@ -430,7 +430,7 @@ Parrot_char_is_alpha(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_ascii(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_ascii(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is an ASCII character.
 
@@ -439,7 +439,7 @@ Returns whether the specified character is an ASCII character.
 */
 
 INTVAL
-Parrot_char_is_ascii(Interp *interpreter, UINTVAL character)
+Parrot_char_is_ascii(Interp *interp, UINTVAL character)
 {
     return character < 128;
 }
@@ -447,7 +447,7 @@ Parrot_char_is_ascii(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_blank(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_blank(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a "blank" or "horizontal
 space", a character that visibly separates words on a line.
@@ -457,7 +457,7 @@ space", a character that visibly separates words on a line.
 */
 
 INTVAL
-Parrot_char_is_blank(Interp *interpreter, UINTVAL character)
+Parrot_char_is_blank(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isblank(character);
@@ -469,7 +469,7 @@ Parrot_char_is_blank(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_cntrl(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_cntrl(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a control character.
 
@@ -478,7 +478,7 @@ Returns whether the specified character is a control character.
 */
 
 INTVAL
-Parrot_char_is_cntrl(Interp *interpreter, UINTVAL character)
+Parrot_char_is_cntrl(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_iscntrl(character);
@@ -490,7 +490,7 @@ Parrot_char_is_cntrl(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_digit(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_digit(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a digit character.
 
@@ -499,7 +499,7 @@ Returns whether the specified character is a digit character.
 */
 
 INTVAL
-Parrot_char_is_digit(Interp *interpreter, UINTVAL character)
+Parrot_char_is_digit(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isdigit(character);
@@ -511,7 +511,7 @@ Parrot_char_is_digit(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_graph(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_graph(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a a "graphic" character
 (printable, excluding spaces).
@@ -521,7 +521,7 @@ Returns whether the specified character is a a "graphic" character
 */
 
 INTVAL
-Parrot_char_is_graph(Interp *interpreter, UINTVAL character)
+Parrot_char_is_graph(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isgraph(character);
@@ -533,7 +533,7 @@ Parrot_char_is_graph(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_lower(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_lower(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a lowercase letter.
 
@@ -542,7 +542,7 @@ Returns whether the specified character is a lowercase letter.
 */
 
 INTVAL
-Parrot_char_is_lower(Interp *interpreter, UINTVAL character)
+Parrot_char_is_lower(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_islower(character);
@@ -554,7 +554,7 @@ Parrot_char_is_lower(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_print(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_print(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a printable character.
 
@@ -563,7 +563,7 @@ Returns whether the specified character is a printable character.
 */
 
 INTVAL
-Parrot_char_is_print(Interp *interpreter, UINTVAL character)
+Parrot_char_is_print(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isprint(character);
@@ -575,7 +575,7 @@ Parrot_char_is_print(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_punct(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_punct(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a punctuation character.
 
@@ -584,7 +584,7 @@ Returns whether the specified character is a punctuation character.
 */
 
 INTVAL
-Parrot_char_is_punct(Interp *interpreter, UINTVAL character)
+Parrot_char_is_punct(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_ispunct(character);
@@ -596,16 +596,16 @@ Parrot_char_is_punct(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_space(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_space(Interp *interp, UINTVAL character)>
 
 =item C<INTVAL
-Parrot_char_is_UWhiteSpace(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_UWhiteSpace(Interp *interp, UINTVAL character)>
 
 =item C<INTVAL
-Parrot_char_is_Whitespace(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_Whitespace(Interp *interp, UINTVAL character)>
 
 =item C<INTVAL
-Parrot_char_is_JavaSpaceChar(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_JavaSpaceChar(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a space character.
 
@@ -614,7 +614,7 @@ Returns whether the specified character is a space character.
 */
 
 INTVAL
-Parrot_char_is_space(Interp *interpreter, UINTVAL character)
+Parrot_char_is_space(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isspace(character);
@@ -624,7 +624,7 @@ Parrot_char_is_space(Interp *interpreter, UINTVAL character)
 }
 
 INTVAL
-Parrot_char_is_UWhiteSpace(Interp *interpreter, UINTVAL character)
+Parrot_char_is_UWhiteSpace(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isUWhiteSpace(character);
@@ -634,7 +634,7 @@ Parrot_char_is_UWhiteSpace(Interp *interpreter, UINTVAL character)
 }
 
 INTVAL
-Parrot_char_is_Whitespace(Interp *interpreter, UINTVAL character)
+Parrot_char_is_Whitespace(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isWhitespace(character);
@@ -644,7 +644,7 @@ Parrot_char_is_Whitespace(Interp *interpreter, UINTVAL character)
 }
 
 INTVAL
-Parrot_char_is_JavaSpaceChar(Interp *interpreter, UINTVAL character)
+Parrot_char_is_JavaSpaceChar(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isJavaSpaceChar(character);
@@ -656,7 +656,7 @@ Parrot_char_is_JavaSpaceChar(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_upper(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_upper(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is an uppercase character.
 
@@ -665,7 +665,7 @@ Returns whether the specified character is an uppercase character.
 */
 
 INTVAL
-Parrot_char_is_upper(Interp *interpreter, UINTVAL character)
+Parrot_char_is_upper(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isupper(character);
@@ -677,7 +677,7 @@ Parrot_char_is_upper(Interp *interpreter, UINTVAL character)
 /*
 
 =item C<INTVAL
-Parrot_char_is_xdigit(Interp *interpreter, UINTVAL character)>
+Parrot_char_is_xdigit(Interp *interp, UINTVAL character)>
 
 Returns whether the specified character is a hexadecimal digit character.
 
@@ -686,7 +686,7 @@ Returns whether the specified character is a hexadecimal digit character.
 */
 
 INTVAL
-Parrot_char_is_xdigit(Interp *interpreter, UINTVAL character)
+Parrot_char_is_xdigit(Interp *interp, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isxdigit(character);

@@ -38,7 +38,7 @@ typedef struct {
 static All_encodings *all_encodings;
 
 void
-parrot_init_encodings_2(Interp *interpreter)
+parrot_init_encodings_2(Interp *interp)
 {
     int i, n;
 
@@ -49,7 +49,7 @@ parrot_init_encodings_2(Interp *interpreter)
 }
 
 void
-parrot_deinit_encodings(Interp *interpreter)
+parrot_deinit_encodings(Interp *interp)
 {
     int i, n;
 
@@ -63,13 +63,13 @@ parrot_deinit_encodings(Interp *interpreter)
 }
 
 ENCODING *
-Parrot_new_encoding(Interp *interpreter)
+Parrot_new_encoding(Interp *interp)
 {
     return mem_sys_allocate(sizeof(ENCODING));
 }
 
 ENCODING *
-Parrot_find_encoding(Interp *interpreter, const char *encodingname)
+Parrot_find_encoding(Interp *interp, const char *encodingname)
 {
     int i, n;
 
@@ -87,7 +87,7 @@ Parrot_find_encoding(Interp *interpreter, const char *encodingname)
    info set up to actually build strings... */
 
 ENCODING *
-Parrot_load_encoding(Interp *interpreter, const char *encodingname)
+Parrot_load_encoding(Interp *interp, const char *encodingname)
 {
     internal_exception(UNIMPLEMENTED, "Can't load encodings yet");
     return NULL;
@@ -108,13 +108,13 @@ Return the number of the encoding of the given string or -1 if not found.
 */
 
 INTVAL
-Parrot_encoding_number(Interp *interpreter, STRING *encodingname)
+Parrot_encoding_number(Interp *interp, STRING *encodingname)
 {
     int i, n;
 
     n = all_encodings->n_encodings;
     for (i = 0; i < n; ++i) {
-        if (!string_equal(interpreter, all_encodings->enc[i].name,
+        if (!string_equal(interp, all_encodings->enc[i].name,
                           encodingname))
             return i;
     }
@@ -122,7 +122,7 @@ Parrot_encoding_number(Interp *interpreter, STRING *encodingname)
 }
 
 INTVAL
-Parrot_encoding_number_of_str(Interp *interpreter, STRING *src)
+Parrot_encoding_number_of_str(Interp *interp, STRING *src)
 {
     int i, n;
 
@@ -135,7 +135,7 @@ Parrot_encoding_number_of_str(Interp *interpreter, STRING *src)
 }
 
 STRING*
-Parrot_encoding_name(Interp *interpreter, INTVAL number_of_encoding)
+Parrot_encoding_name(Interp *interp, INTVAL number_of_encoding)
 {
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
@@ -143,7 +143,7 @@ Parrot_encoding_name(Interp *interpreter, INTVAL number_of_encoding)
 }
 
 ENCODING*
-Parrot_get_encoding(Interp *interpreter, INTVAL number_of_encoding)
+Parrot_get_encoding(Interp *interp, INTVAL number_of_encoding)
 {
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
@@ -151,7 +151,7 @@ Parrot_get_encoding(Interp *interpreter, INTVAL number_of_encoding)
 }
 
 const char *
-Parrot_encoding_c_name(Interp *interpreter, INTVAL number_of_encoding)
+Parrot_encoding_c_name(Interp *interp, INTVAL number_of_encoding)
 {
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
@@ -159,7 +159,7 @@ Parrot_encoding_c_name(Interp *interpreter, INTVAL number_of_encoding)
 }
 
 static INTVAL
-register_encoding(Interp *interpreter, const char *encodingname,
+register_encoding(Interp *interp, const char *encodingname,
         ENCODING *encoding)
 {
     int i, n;
@@ -181,13 +181,13 @@ register_encoding(Interp *interpreter, const char *encodingname,
                 sizeof(One_encoding));
     all_encodings->n_encodings++;
     all_encodings->enc[n].encoding = encoding;
-    all_encodings->enc[n].name = const_string(interpreter, encodingname);
+    all_encodings->enc[n].name = const_string(interp, encodingname);
 
     return 1;
 }
 
 INTVAL
-Parrot_register_encoding(Interp *interpreter, const char *encodingname,
+Parrot_register_encoding(Interp *interp, const char *encodingname,
         ENCODING *encoding)
 {
     if (!all_encodings) {
@@ -201,25 +201,25 @@ Parrot_register_encoding(Interp *interpreter, const char *encodingname,
             Parrot_default_encoding_ptr = encoding;
 
         }
-        return register_encoding(interpreter, encodingname, encoding);
+        return register_encoding(interp, encodingname, encoding);
     }
     if (!strcmp("utf8", encodingname)) {
         Parrot_utf8_encoding_ptr = encoding;
-        return register_encoding(interpreter, encodingname, encoding);
+        return register_encoding(interp, encodingname, encoding);
     }
     if (!strcmp("utf16", encodingname)) {
         Parrot_utf16_encoding_ptr = encoding;
-        return register_encoding(interpreter, encodingname, encoding);
+        return register_encoding(interp, encodingname, encoding);
     }
     if (!strcmp("ucs2", encodingname)) {
         Parrot_ucs2_encoding_ptr = encoding;
-        return register_encoding(interpreter, encodingname, encoding);
+        return register_encoding(interp, encodingname, encoding);
     }
     return 0;
 }
 
 INTVAL
-Parrot_make_default_encoding(Interp *interpreter, const char *encodingname,
+Parrot_make_default_encoding(Interp *interp, const char *encodingname,
         ENCODING *encoding)
 {
     Parrot_default_encoding_ptr = encoding;
@@ -227,13 +227,13 @@ Parrot_make_default_encoding(Interp *interpreter, const char *encodingname,
 }
 
 ENCODING *
-Parrot_default_encoding(Interp *interpreter)
+Parrot_default_encoding(Interp *interp)
 {
     return Parrot_default_encoding_ptr;
 }
 
 encoding_converter_t
-Parrot_find_encoding_converter(Interp *interpreter, ENCODING *lhs,
+Parrot_find_encoding_converter(Interp *interp, ENCODING *lhs,
         ENCODING *rhs)
 {
     return NULL;

@@ -30,7 +30,7 @@ typedef struct {
     int* nb_succ;
     int* backup;
     int* reg_to_index;
-    Interp * interpreter;
+    Interp *interp;
     reg_move_func mov;
     reg_move_func mov_alt;
     void *info;
@@ -453,7 +453,7 @@ Parrot_srand(INTVAL seed)
 =over
 
 =item C<void *
-Parrot_make_la(Interp *interpreter, PMC *array)>
+Parrot_make_la(Interp *interp, PMC *array)>
 
 Creates a C array of C<long>s with one more element than the number of
 elements in C<*array>. The elements are then copied from C<*array> to
@@ -466,8 +466,8 @@ Used in C<src/nci.c>.
 */
 
 void *
-Parrot_make_la(Interp *interpreter, PMC *array) {
-    const INTVAL arraylen = VTABLE_elements(interpreter, array);
+Parrot_make_la(Interp *interp, PMC *array) {
+    const INTVAL arraylen = VTABLE_elements(interp, array);
     INTVAL cur;
 
     /* Allocate the array and set the last element to 0. Since we
@@ -479,7 +479,7 @@ Parrot_make_la(Interp *interpreter, PMC *array) {
     out_array[arraylen] = 0;
     /*    printf("Long array has %i elements\n", arraylen);*/
     for (cur = 0; cur < arraylen; cur++) {
-        out_array[cur] = VTABLE_get_integer_keyed_int(interpreter, array, cur);
+        out_array[cur] = VTABLE_get_integer_keyed_int(interp, array, cur);
     }
 
     return out_array;
@@ -504,7 +504,7 @@ Parrot_destroy_la(long *array) {
 /*
 
 =item C<void *
-Parrot_make_cpa(Interp *interpreter, PMC *array)>
+Parrot_make_cpa(Interp *interp, PMC *array)>
 
 Creates a C array of C<char *>s with one more element than the number of
 elements in C<*array>. The elements are then copied from C<*array> to
@@ -517,8 +517,8 @@ Currently unused.
 */
 
 void *
-Parrot_make_cpa(Interp *interpreter, PMC *array) {
-    const INTVAL arraylen = VTABLE_elements(interpreter, array);
+Parrot_make_cpa(Interp *interp, PMC *array) {
+    const INTVAL arraylen = VTABLE_elements(interp, array);
     INTVAL cur;
 
     /* Allocate the array and set the last element to 0. Since we
@@ -533,8 +533,8 @@ Parrot_make_cpa(Interp *interpreter, PMC *array) {
     /*    printf("String array has %i elements\n", arraylen);*/
     for (cur = 0; cur < arraylen; cur++) {
         out_array[cur] =
-            string_to_cstring(interpreter,
-                              VTABLE_get_string_keyed_int(interpreter,
+            string_to_cstring(interp,
+                              VTABLE_get_string_keyed_int(interp,
                                                           array, cur));
         /*        printf("Offset %i is %s\n", cur, out_array[cur]);*/
     }
@@ -588,24 +588,24 @@ typedef enum {
 /* &end_gen */
 
 PMC*
-tm_to_array(Parrot_Interp interpreter, const struct tm *tm)
+tm_to_array(Parrot_Interp interp, const struct tm *tm)
 {
-  PMC * const Array = pmc_new(interpreter, enum_class_Array);
-  VTABLE_set_integer_native(interpreter, Array, 9);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 0, tm->tm_sec);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 1, tm->tm_min);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 2, tm->tm_hour);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 3, tm->tm_mday);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 4, tm->tm_mon + 1);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 5, tm->tm_year + 1900);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 6, tm->tm_wday);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 7, tm->tm_yday);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 8, tm->tm_isdst);
+  PMC * const Array = pmc_new(interp, enum_class_Array);
+  VTABLE_set_integer_native(interp, Array, 9);
+  VTABLE_set_integer_keyed_int(interp, Array, 0, tm->tm_sec);
+  VTABLE_set_integer_keyed_int(interp, Array, 1, tm->tm_min);
+  VTABLE_set_integer_keyed_int(interp, Array, 2, tm->tm_hour);
+  VTABLE_set_integer_keyed_int(interp, Array, 3, tm->tm_mday);
+  VTABLE_set_integer_keyed_int(interp, Array, 4, tm->tm_mon + 1);
+  VTABLE_set_integer_keyed_int(interp, Array, 5, tm->tm_year + 1900);
+  VTABLE_set_integer_keyed_int(interp, Array, 6, tm->tm_wday);
+  VTABLE_set_integer_keyed_int(interp, Array, 7, tm->tm_yday);
+  VTABLE_set_integer_keyed_int(interp, Array, 8, tm->tm_isdst);
   return Array;
 }
 
 INTVAL
-Parrot_byte_index(Interp *interpreter, const STRING *base,
+Parrot_byte_index(Interp *interp, const STRING *base,
         const STRING *search, UINTVAL start_offset)
 {
     char *base_start, *search_start;
@@ -627,7 +627,7 @@ Parrot_byte_index(Interp *interpreter, const STRING *base,
 }
 
 INTVAL
-Parrot_byte_rindex(Interp *interpreter, const STRING *base,
+Parrot_byte_rindex(Interp *interp, const STRING *base,
         const STRING *search, UINTVAL start_offset)
 {
     char *base_start, *search_start;
@@ -726,7 +726,7 @@ process_cycle_without_exit(int node_index, parrot_prm_context* c) {
 
     /* let's try the alternate move function*/
     if (NULL != c->mov_alt)
-        alt = c->mov_alt(c->interpreter, c->dest_regs[node_index], pred, c->info);
+        alt = c->mov_alt(c->interp, c->dest_regs[node_index], pred, c->info);
 
     if ( 0 == alt ) { /* use temp reg */
         move_reg(c->dest_regs[node_index],c->temp_reg, c);
@@ -744,7 +744,7 @@ process_cycle_without_exit(int node_index, parrot_prm_context* c) {
 void
 move_reg(int from, int dest, parrot_prm_context* c) {
    /* fprintf(stderr,"move %i ==> %i\n",from,dest);*/
-    c->mov(c->interpreter, dest, from, c->info);
+    c->mov(c->interp, dest, from, c->info);
 }
 
 
@@ -809,7 +809,7 @@ TODO: Add tests for the above conditions.
 
 */
 void
-Parrot_register_move(Interp * interpreter, int n_regs,
+Parrot_register_move(Interp *interp, int n_regs,
                      unsigned char *dest_regs, unsigned char *src_regs,
                      unsigned char temp_reg,
                      reg_move_func mov, reg_move_func mov_alt, void *info)
@@ -826,11 +826,11 @@ Parrot_register_move(Interp * interpreter, int n_regs,
 
     if (n_regs == 1) {
         if (src_regs[0] != dest_regs[0])
-            mov(interpreter, dest_regs[0], src_regs[0], info);
+            mov(interp, dest_regs[0], src_regs[0], info);
         return;
     }
 
-    c.interpreter = interpreter;
+    c.interp = interp;
     c.info = info;
     c.mov = mov;
     c.mov_alt = mov_alt;

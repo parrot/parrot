@@ -60,13 +60,13 @@ static All_charsets *all_charsets;
 
 
 CHARSET *
-Parrot_new_charset(Interp *interpreter)
+Parrot_new_charset(Interp *interp)
 {
     return mem_sys_allocate(sizeof(CHARSET));
 }
 
 void
-Parrot_charsets_encodings_deinit(Interp *interpreter)
+Parrot_charsets_encodings_deinit(Interp *interp)
 {
     int i, n;
 
@@ -79,11 +79,11 @@ Parrot_charsets_encodings_deinit(Interp *interpreter)
     mem_sys_free(all_charsets->set);
     mem_sys_free(all_charsets);
     all_charsets = NULL;
-    parrot_deinit_encodings(interpreter);
+    parrot_deinit_encodings(interp);
 }
 
 CHARSET *
-Parrot_find_charset(Interp *interpreter, const char *charsetname)
+Parrot_find_charset(Interp *interp, const char *charsetname)
 {
     int i, n;
 
@@ -97,7 +97,7 @@ Parrot_find_charset(Interp *interpreter, const char *charsetname)
 }
 
 CHARSET *
-Parrot_load_charset(Interp *interpreter, const char *charsetname)
+Parrot_load_charset(Interp *interp, const char *charsetname)
 {
     internal_exception(UNIMPLEMENTED, "Can't load charsets yet");
     return NULL;
@@ -118,20 +118,20 @@ Return the number of the charset of the given string or -1 if not found.
 */
 
 INTVAL
-Parrot_charset_number(Interp *interpreter, STRING *charsetname)
+Parrot_charset_number(Interp *interp, STRING *charsetname)
 {
     int i, n;
 
     n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
-        if (!string_equal(interpreter, all_charsets->set[i].name, charsetname))
+        if (!string_equal(interp, all_charsets->set[i].name, charsetname))
             return i;
     }
     return -1;
 }
 
 INTVAL
-Parrot_charset_number_of_str(Interp *interpreter, STRING *src)
+Parrot_charset_number_of_str(Interp *interp, STRING *src)
 {
     int i, n;
 
@@ -144,7 +144,7 @@ Parrot_charset_number_of_str(Interp *interpreter, STRING *src)
 }
 
 STRING*
-Parrot_charset_name(Interp *interpreter, INTVAL number_of_charset)
+Parrot_charset_name(Interp *interp, INTVAL number_of_charset)
 {
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
@@ -152,7 +152,7 @@ Parrot_charset_name(Interp *interpreter, INTVAL number_of_charset)
 }
 
 CHARSET*
-Parrot_get_charset(Interp *interpreter, INTVAL number_of_charset)
+Parrot_get_charset(Interp *interp, INTVAL number_of_charset)
 {
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
@@ -160,7 +160,7 @@ Parrot_get_charset(Interp *interpreter, INTVAL number_of_charset)
 }
 
 const char *
-Parrot_charset_c_name(Interp *interpreter, INTVAL number_of_charset)
+Parrot_charset_c_name(Interp *interp, INTVAL number_of_charset)
 {
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
@@ -168,7 +168,7 @@ Parrot_charset_c_name(Interp *interpreter, INTVAL number_of_charset)
 }
 
 static INTVAL
-register_charset(Interp *interpreter, const char *charsetname,
+register_charset(Interp *interp, const char *charsetname,
         CHARSET *charset)
 {
     int i, n;
@@ -190,32 +190,32 @@ register_charset(Interp *interpreter, const char *charsetname,
                 sizeof(One_charset));
     all_charsets->n_charsets++;
     all_charsets->set[n].charset = charset;
-    all_charsets->set[n].name = const_string(interpreter, charsetname);
+    all_charsets->set[n].name = const_string(interp, charsetname);
     all_charsets->set[n].n_converters = 0;
 
     return 1;
 }
 
 static void
-register_static_converters(Interp *interpreter)
+register_static_converters(Interp *interp)
 {
-    Parrot_register_charset_converter(interpreter,
+    Parrot_register_charset_converter(interp,
             Parrot_iso_8859_1_charset_ptr, Parrot_ascii_charset_ptr,
             charset_cvt_iso_8859_1_to_ascii);
-    Parrot_register_charset_converter(interpreter,
+    Parrot_register_charset_converter(interp,
             Parrot_iso_8859_1_charset_ptr, Parrot_binary_charset_ptr,
             charset_cvt_ascii_to_binary);
 
-    Parrot_register_charset_converter(interpreter,
+    Parrot_register_charset_converter(interp,
             Parrot_ascii_charset_ptr, Parrot_binary_charset_ptr,
             charset_cvt_ascii_to_binary);
-    Parrot_register_charset_converter(interpreter,
+    Parrot_register_charset_converter(interp,
             Parrot_ascii_charset_ptr, Parrot_iso_8859_1_charset_ptr,
             charset_cvt_ascii_to_iso_8859_1);
 }
 
 INTVAL
-Parrot_register_charset(Interp *interpreter, const char *charsetname,
+Parrot_register_charset(Interp *interp, const char *charsetname,
         CHARSET *charset)
 {
     if (!all_charsets) {
@@ -225,55 +225,55 @@ Parrot_register_charset(Interp *interpreter, const char *charsetname,
     }
     if (!strcmp("binary", charsetname)) {
         Parrot_binary_charset_ptr = charset;
-        return register_charset(interpreter, charsetname, charset);
+        return register_charset(interp, charsetname, charset);
     }
     if (!strcmp("iso-8859-1", charsetname)) {
         Parrot_iso_8859_1_charset_ptr = charset;
-        return register_charset(interpreter, charsetname, charset);
+        return register_charset(interp, charsetname, charset);
     }
     if (!strcmp("unicode", charsetname)) {
         Parrot_unicode_charset_ptr = charset;
-        return register_charset(interpreter, charsetname, charset);
+        return register_charset(interp, charsetname, charset);
     }
     if (!strcmp("ascii", charsetname)) {
         if (!Parrot_default_charset_ptr) {
             Parrot_default_charset_ptr = charset;
         }
         Parrot_ascii_charset_ptr = charset;
-        return register_charset(interpreter, charsetname, charset);
+        return register_charset(interp, charsetname, charset);
     }
     return 0;
 }
 
 void
-Parrot_charsets_encodings_init(Interp *interpreter)
+Parrot_charsets_encodings_init(Interp *interp)
 {
     /* the order is crucial here:
      * 1) encodings, default = fixed_8
      * 2) charsets   default = ascii
      */
-    Parrot_encoding_fixed_8_init(interpreter);
-    Parrot_encoding_utf8_init(interpreter);
-    Parrot_encoding_ucs2_init(interpreter);
-    Parrot_encoding_utf16_init(interpreter);
+    Parrot_encoding_fixed_8_init(interp);
+    Parrot_encoding_utf8_init(interp);
+    Parrot_encoding_ucs2_init(interp);
+    Parrot_encoding_utf16_init(interp);
 
-    Parrot_charset_ascii_init(interpreter);
-    Parrot_charset_iso_8859_1_init(interpreter);
-    Parrot_charset_binary_init(interpreter);
-    Parrot_charset_unicode_init(interpreter);
+    Parrot_charset_ascii_init(interp);
+    Parrot_charset_iso_8859_1_init(interp);
+    Parrot_charset_binary_init(interp);
+    Parrot_charset_unicode_init(interp);
 
     /*
      * now encoding strings don't have a charset yet - set default
      */
-    parrot_init_encodings_2(interpreter);
+    parrot_init_encodings_2(interp);
     /*
      * now install charset converters
      */
-    register_static_converters(interpreter);
+    register_static_converters(interp);
 }
 
 INTVAL
-Parrot_make_default_charset(Interp *interpreter, const char *charsetname,
+Parrot_make_default_charset(Interp *interp, const char *charsetname,
         CHARSET *charset)
 {
     Parrot_default_charset_ptr = charset;
@@ -281,14 +281,14 @@ Parrot_make_default_charset(Interp *interpreter, const char *charsetname,
 }
 
 CHARSET *
-Parrot_default_charset(Interp *interpreter)
+Parrot_default_charset(Interp *interp)
 {
     return Parrot_default_charset_ptr;
 }
 
 
 charset_converter_t
-Parrot_find_charset_converter(Interp *interpreter, CHARSET *lhs, CHARSET *rhs)
+Parrot_find_charset_converter(Interp *interp, CHARSET *lhs, CHARSET *rhs)
 {
     int i, j, n, nc;
 
@@ -308,7 +308,7 @@ Parrot_find_charset_converter(Interp *interpreter, CHARSET *lhs, CHARSET *rhs)
 }
 
 void
-Parrot_register_charset_converter(Interp *interpreter,
+Parrot_register_charset_converter(Interp *interp,
         CHARSET *lhs, CHARSET *rhs, charset_converter_t func)
 {
     int i, n, nc;

@@ -56,7 +56,7 @@ section. And emits the executable.
 */
 
 void
-Parrot_exec(Interp *interpreter, opcode_t *pc,
+Parrot_exec(Interp *interp, opcode_t *pc,
         opcode_t *code_start, opcode_t *code_end)
 {
 #ifdef JIT_CGP
@@ -73,32 +73,32 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     exec_init(obj);
     Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof(char *));
     obj->bytecode_header_size =
-        (interpreter->code->base.file_offset + 4) * sizeof(opcode_t);
-    jit_info = parrot_build_asm(interpreter, code_start, code_end,
+        (interp->code->base.file_offset + 4) * sizeof(opcode_t);
+    jit_info = parrot_build_asm(interp, code_start, code_end,
             obj, JIT_CODE_FILE);
 
     /* TODO Go zero the calls to jited opcodes. */
     /* Place the program code in the data section. */
     /* program_code */
-    add_data_member(obj, interpreter->code->base.pf->src,
-            interpreter->code->base.pf->size);
+    add_data_member(obj, interp->code->base.pf->src,
+            interp->code->base.pf->size);
     /* opcode_map */
     add_data_member(obj, jit_info->arena.op_map, (jit_info->arena.map_size+1) *
         sizeof(opcode_t *));
     /* const_table */
-    add_data_member(obj, NULL, interpreter->code->const_table->const_count *
+    add_data_member(obj, NULL, interp->code->const_table->const_count *
         sizeof(struct PackFile_Constant));
 #ifdef JIT_CGP
     /* prederef_code */
     j = (int)cgp_core;
-    j = (int)((op_func_t*)interpreter->op_lib->op_func_table)[2] - j;
-    k = (int *)interpreter->code->prederef.code;
-    for (i = 0; i < (int)interpreter->code->base.size; i++) {
+    j = (int)((op_func_t*)interp->op_lib->op_func_table)[2] - j;
+    k = (int *)interp->code->prederef.code;
+    for (i = 0; i < (int)interp->code->base.size; i++) {
         if (k[i] != j)
             k[i] = 0;
     }
-    add_data_member(obj, interpreter->code->prederef.code,
-        interpreter->code->base.size * sizeof(void *));
+    add_data_member(obj, interp->code->prederef.code,
+        interp->code->base.size * sizeof(void *));
 #endif /* JIT_CGP */
     /* bytecode_offset */
     bhs = obj->bytecode_header_size / sizeof(opcode_t);
@@ -111,8 +111,8 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     obj->text.size += (4 - obj->text.size % 4);
     obj->data.size += (4 - obj->data.size % 4);
     offset_fixup(obj);
-    output = interpreter->output_file ?
-        interpreter->output_file : "exec_output.o";
+    output = interp->output_file ?
+        interp->output_file : "exec_output.o";
     Parrot_exec_save(obj, output);
 }
 

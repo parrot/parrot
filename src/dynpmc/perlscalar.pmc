@@ -47,20 +47,20 @@ Morphs the scalar to the specified type.
 
         switch (type) {
             case enum_class_Integer:
-                type = pmc_type(interpreter,
-                    string_from_const_cstring(interpreter, "PerlInt", 0));
+                type = pmc_type(interp,
+                    string_from_const_cstring(interp, "PerlInt", 0));
                 break;
             case enum_class_Float:
-                type = pmc_type(interpreter,
-                    string_from_const_cstring(interpreter, "PerlNum", 0));
+                type = pmc_type(interp,
+                    string_from_const_cstring(interp, "PerlNum", 0));
                 break;
             case enum_class_String:
-                type = pmc_type(interpreter,
-                    string_from_const_cstring(interpreter, "PerlString", 0));
+                type = pmc_type(interp,
+                    string_from_const_cstring(interp, "PerlString", 0));
                 break;
             case enum_class_Undef:
-                type = pmc_type(interpreter,
-                    string_from_const_cstring(interpreter, "PerlUndef", 0));
+                type = pmc_type(interp,
+                    string_from_const_cstring(interp, "PerlUndef", 0));
                 break;
         }
         pmc_reuse(INTERP, SELF, type, 0);

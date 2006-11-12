@@ -20,7 +20,7 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl fixed_8")
 
 static STRING *
-to_encoding(Interp *interpreter, STRING *src, STRING *dest)
+to_encoding(Interp *interp, STRING *src, STRING *dest)
 {
     UNIMPL;
     return NULL;
@@ -29,22 +29,22 @@ to_encoding(Interp *interpreter, STRING *src, STRING *dest)
 
 /* codepoints are bytes, so delegate */
 static UINTVAL
-get_codepoint(Interp *interpreter, const STRING *source_string,
+get_codepoint(Interp *interp, const STRING *source_string,
         UINTVAL offset)
 {
-    return get_byte(interpreter, source_string, offset);
+    return get_byte(interp, source_string, offset);
 }
 
 /* This is the same as set byte */
 static void
-set_codepoint(Interp *interpreter, STRING *source_string,
+set_codepoint(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL codepoint)
 {
-    set_byte(interpreter, source_string, offset, codepoint);
+    set_byte(interp, source_string, offset, codepoint);
 }
 
 static UINTVAL
-get_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset)
+get_byte(Interp *interp, const STRING *source_string, UINTVAL offset)
 {
     unsigned char *contents = source_string->strstart;
     if (offset >= source_string->bufused) {
@@ -57,7 +57,7 @@ get_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset)
 }
 
 static void
-set_byte(Interp *interpreter, const STRING *source_string,
+set_byte(Interp *interp, const STRING *source_string,
         UINTVAL offset, UINTVAL byte)
 {
     unsigned char *contents;
@@ -70,20 +70,20 @@ set_byte(Interp *interpreter, const STRING *source_string,
 
 /* Delegate to get_bytes */
 static STRING *
-get_codepoints(Interp *interpreter, STRING *source_string,
+get_codepoints(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count)
 {
-    STRING *return_string = get_bytes(interpreter, source_string,
+    STRING *return_string = get_bytes(interp, source_string,
             offset, count);
     return_string->charset = source_string->charset;
     return return_string;
 }
 
 static STRING *
-get_bytes(Interp *interpreter, STRING *source_string,
+get_bytes(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count)
 {
-    STRING *return_string = Parrot_make_COW_reference(interpreter,
+    STRING *return_string = Parrot_make_COW_reference(interp,
             source_string);
     return_string->encoding = source_string->encoding;
     return_string->charset = source_string->charset;
@@ -100,19 +100,19 @@ get_bytes(Interp *interpreter, STRING *source_string,
 
 /* Delegate to get_bytes */
 static STRING *
-get_codepoints_inplace(Interp *interpreter, STRING *source_string,
+get_codepoints_inplace(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
 
-    return get_bytes_inplace(interpreter, source_string, offset,
+    return get_bytes_inplace(interp, source_string, offset,
             count, dest_string);
 }
 
 static STRING *
-get_bytes_inplace(Interp *interpreter, STRING *source_string,
+get_bytes_inplace(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *return_string)
 {
-    Parrot_reuse_COW_reference(interpreter, source_string, return_string);
+    Parrot_reuse_COW_reference(interp, source_string, return_string);
 
     return_string->strstart = (char *)return_string->strstart + offset ;
     return_string->bufused = count;
@@ -125,36 +125,36 @@ get_bytes_inplace(Interp *interpreter, STRING *source_string,
 
 /* Delegate to set_bytes */
 static void
-set_codepoints(Interp *interpreter, STRING *source_string,
+set_codepoints(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *new_codepoints)
 {
-    set_bytes(interpreter, source_string, offset, count, new_codepoints);
+    set_bytes(interp, source_string, offset, count, new_codepoints);
 }
 
 static void
-set_bytes(Interp *interpreter, STRING *source_string,
+set_bytes(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *new_bytes)
 {
-    string_replace(interpreter, source_string, offset, count, new_bytes, NULL);
+    string_replace(interp, source_string, offset, count, new_bytes, NULL);
 }
 
 /* Unconditionally makes the string be in this encoding, if that's
    valid */
 static void
-become_encoding(Interp *interpreter, STRING *source_string)
+become_encoding(Interp *interp, STRING *source_string)
 {
     UNIMPL;
 }
 
 
 static UINTVAL
-codepoints(Interp *interpreter, STRING *source_string)
+codepoints(Interp *interp, STRING *source_string)
 {
-    return bytes(interpreter, source_string);
+    return bytes(interp, source_string);
 }
 
 static UINTVAL
-bytes(Interp *interpreter, STRING *source_string)
+bytes(Interp *interp, STRING *source_string)
 {
     return source_string->bufused;
 }
@@ -164,22 +164,22 @@ bytes(Interp *interpreter, STRING *source_string)
  */
 
 static UINTVAL
-fixed8_get_next(Interp *interpreter, String_iter *iter)
+fixed8_get_next(Interp *interp, String_iter *iter)
 {
-    UINTVAL c = get_byte(interpreter, iter->str, iter->charpos++);
+    UINTVAL c = get_byte(interp, iter->str, iter->charpos++);
     iter->bytepos++;
     return c;
 }
 
 static void
-fixed8_set_next(Interp *interpreter, String_iter *iter, UINTVAL c)
+fixed8_set_next(Interp *interp, String_iter *iter, UINTVAL c)
 {
-    set_byte(interpreter, iter->str, iter->charpos++, c);
+    set_byte(interp, iter->str, iter->charpos++, c);
     iter->bytepos++;
 }
 
 static void
-fixed8_set_position(Interp *interpreter, String_iter *iter, UINTVAL pos)
+fixed8_set_position(Interp *interp, String_iter *iter, UINTVAL pos)
 {
     iter->bytepos = iter->charpos = pos;
     assert(pos <= PObj_buflen(iter->str));
@@ -187,7 +187,7 @@ fixed8_set_position(Interp *interpreter, String_iter *iter, UINTVAL pos)
 
 
 static void
-iter_init(Interp *interpreter, String *src, String_iter *iter)
+iter_init(Interp *interp, String *src, String_iter *iter)
 {
     iter->str = src;
     iter->bytepos = iter->charpos = 0;
@@ -197,9 +197,9 @@ iter_init(Interp *interpreter, String *src, String_iter *iter)
 }
 
 ENCODING *
-Parrot_encoding_fixed_8_init(Interp *interpreter)
+Parrot_encoding_fixed_8_init(Interp *interp)
 {
-    ENCODING *return_encoding = Parrot_new_encoding(interpreter);
+    ENCODING *return_encoding = Parrot_new_encoding(interp);
 
     ENCODING base_encoding = {
         "fixed_8",
@@ -222,7 +222,7 @@ Parrot_encoding_fixed_8_init(Interp *interpreter)
 
     };
     memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
-    Parrot_register_encoding(interpreter, "fixed_8", return_encoding);
+    Parrot_register_encoding(interp, "fixed_8", return_encoding);
     return return_encoding;
 }
 

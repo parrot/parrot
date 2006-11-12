@@ -35,17 +35,17 @@ c_output_is(<<'CODE', <<'OUTPUT', "creation");
         int x;
         IntList* list;
 
-        Interp* interpreter = Parrot_new(NULL);
-        if (interpreter == NULL) return 1;
+        Interp* interp = Parrot_new(NULL);
+        if (interp == NULL) return 1;
 
-        list = intlist_new(interpreter);
+        list = intlist_new(interp);
         if (list == NULL) return 1;
 
-        intlist_push(interpreter, list, 42);
-        x = (int) intlist_get(interpreter, list, 0);
+        intlist_push(interp, list, 42);
+        x = (int) intlist_get(interp, list, 0);
 
         printf("The answer is %d.\n", x);
-        Parrot_exit(interpreter, 0);
+        Parrot_exit(interp, 0);
         return 0;
     }
 CODE
@@ -64,53 +64,53 @@ c_output_is(<<'CODE', <<'OUTPUT', "list aerobics");
         int i;
         IntList* list;
 
-        Interp* interpreter = Parrot_new(NULL);
-        if (interpreter == NULL) return "create interpreter";
+        Interp *interp = Parrot_new(NULL);
+        if (interp == NULL) return "create interpreter";
 
-        list = intlist_new(interpreter);
+        list = intlist_new(interp);
         if (list == NULL) return "create list";
 
         /* Push 3, then pop 2. Repeat N times. */
         for (i = 0; i < N; i++) {
-            intlist_push(interpreter, list, x++);
-            intlist_push(interpreter, list, x++);
-            intlist_push(interpreter, list, x++);
-            if (intlist_pop(interpreter, list) != i * 3 + 2)
+            intlist_push(interp, list, x++);
+            intlist_push(interp, list, x++);
+            intlist_push(interp, list, x++);
+            if (intlist_pop(interp, list) != i * 3 + 2)
                 return "build-up first pop";
-            if (intlist_pop(interpreter, list) != i * 3 + 1)
+            if (intlist_pop(interp, list) != i * 3 + 1)
                 return "build-up second pop";
-            if (intlist_length(interpreter, list) != i + 1)
+            if (intlist_length(interp, list) != i + 1)
                 return "build-up length";
         }
 
         /* Check list_get for all values */
         for (i = 0; i < N; i++) {
-            if (intlist_get(interpreter, list, i) != i * 3)
+            if (intlist_get(interp, list, i) != i * 3)
                 return "get from left";
         }
 
         /* Check list_get for all values, from the right */
         for (i = -N; i < 0; i++) {
-            if (intlist_get(interpreter, list, i) != (i + N) * 3)
+            if (intlist_get(interp, list, i) != (i + N) * 3)
                 return "get from right";
         }
 
         /* Set up the receding run */
-        intlist_push(interpreter, list, N * 3 * 10);
+        intlist_push(interp, list, N * 3 * 10);
 
         /* Pop 2, then push 1. Repeat N times. */
         for (i = N; i > 0; i--) {
-            if (intlist_pop(interpreter, list) != i * 3 * 10)
+            if (intlist_pop(interp, list) != i * 3 * 10)
                 return "tear down cap";
-            if (intlist_pop(interpreter, list) != (i - 1) * 3)
+            if (intlist_pop(interp, list) != (i - 1) * 3)
                 return "tear down inner";
-            intlist_push(interpreter, list, (i - 1) * 3 * 10);
-            if (intlist_length(interpreter, list) != i)
+            intlist_push(interp, list, (i - 1) * 3 * 10);
+            if (intlist_length(interp, list) != i)
                 return "tear down length";
         }
 
         /* And the final element is... */
-        if (intlist_pop(interpreter, list) != 0)
+        if (intlist_pop(interp, list) != 0)
             return "last survivor";
 
         printf("I need a shower.\n");
@@ -135,7 +135,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "step aerobics");
     #include "parrot/embed.h"
 
     const char*
-    aerobics(Interp* interpreter, IntList* list, int ground)
+    aerobics(Interp *interp, IntList* list, int ground)
     {
         int x = 0;
         int N = 1000; /* Number of iterations */
@@ -144,48 +144,48 @@ c_output_is(<<'CODE', <<'OUTPUT', "step aerobics");
 
         /* Push 3, then pop 2. Repeat N times. */
         for (i = 0; i < N; i++) {
-            intlist_push(interpreter, list, x++);
-            intlist_push(interpreter, list, x++);
-            intlist_push(interpreter, list, x++);
-            if (intlist_pop(interpreter, list) != i * 3 + 2)
+            intlist_push(interp, list, x++);
+            intlist_push(interp, list, x++);
+            intlist_push(interp, list, x++);
+            if (intlist_pop(interp, list) != i * 3 + 2)
                 return "build-up first pop";
-            if (intlist_pop(interpreter, list) != i * 3 + 1)
+            if (intlist_pop(interp, list) != i * 3 + 1)
                 return "build-up second pop";
-            if (intlist_length(interpreter, list)-ground != i + 1)
+            if (intlist_length(interp, list)-ground != i + 1)
                 return "build-up length";
         }
 
         /* Check list_get for all values */
         for (i = 0; i < N; i++) {
-            if (intlist_get(interpreter, list, i+ground) != i * 3) {
+            if (intlist_get(interp, list, i+ground) != i * 3) {
                 sprintf(msg, "get from left: wanted %d, got %d",
-                        i * 3, intlist_get(interpreter, list, i+ground));
+                        i * 3, intlist_get(interp, list, i+ground));
                 return msg;
             }
         }
 
         /* Check list_get for all values, from the right */
         for (i = -N; i < 0; i++) {
-            if (intlist_get(interpreter, list, i) != (i + N) * 3)
+            if (intlist_get(interp, list, i) != (i + N) * 3)
                 return "get from right";
         }
 
         /* Set up the receding run */
-        intlist_push(interpreter, list, N * 3 * 10);
+        intlist_push(interp, list, N * 3 * 10);
 
         /* Pop 2, then push 1. Repeat N times. */
         for (i = N; i > 0; i--) {
-            if (intlist_pop(interpreter, list) != i * 3 * 10)
+            if (intlist_pop(interp, list) != i * 3 * 10)
                 return "tear down cap";
-            if (intlist_pop(interpreter, list) != (i - 1) * 3)
+            if (intlist_pop(interp, list) != (i - 1) * 3)
                 return "tear down inner";
-            intlist_push(interpreter, list, (i - 1) * 3 * 10);
-            if (intlist_length(interpreter, list)-ground != i)
+            intlist_push(interp, list, (i - 1) * 3 * 10);
+            if (intlist_length(interp, list)-ground != i)
                 return "tear down length";
         }
 
         /* And the final element is... */
-        if (intlist_pop(interpreter, list) != 0)
+        if (intlist_pop(interp, list) != 0)
             return "last survivor";
 
         return NULL;
@@ -197,51 +197,51 @@ c_output_is(<<'CODE', <<'OUTPUT', "step aerobics");
         const char* failure;
 
         IntList* list;
-        Interp* interpreter;
+        Interp* interp;
 
-        interpreter = Parrot_new(NULL);
-        if (interpreter == NULL) return 1;
+        interp = Parrot_new(NULL);
+        if (interp == NULL) return 1;
 
-        list = intlist_new(interpreter);
+        list = intlist_new(interp);
         if (list == NULL) return 1;
 
         printf("Step 1: 0\n");
-        if ((failure = aerobics(interpreter, list, 0)) != NULL) {
+        if ((failure = aerobics(interp, list, 0)) != NULL) {
             printf("Failed: %s\n", failure);
             return 1;
         }
 
         printf("Step 2: 1\n");
-        intlist_push(interpreter, list, 42);
-        if ((failure = aerobics(interpreter, list, 1)) != NULL) {
+        intlist_push(interp, list, 42);
+        if ((failure = aerobics(interp, list, 1)) != NULL) {
             printf("Failed: %s\n", failure);
             return 1;
         }
 
         printf("Step 3: 2\n");
-        intlist_unshift(interpreter, &list, -42);
-        if ((failure = aerobics(interpreter, list, 2)) != NULL) {
+        intlist_unshift(interp, &list, -42);
+        if ((failure = aerobics(interp, list, 2)) != NULL) {
             printf("Failed: %s\n", failure);
             return 1;
         }
 
         printf("Step 4: 255\n");
-        intlist_assign(interpreter, list, 254, -1);
-        if ((failure = aerobics(interpreter, list, 255)) != NULL) {
+        intlist_assign(interp, list, 254, -1);
+        if ((failure = aerobics(interp, list, 255)) != NULL) {
             printf("Failed: %s\n", failure);
             return 1;
         }
 
         printf("Step 5: 256\n");
-        intlist_unshift(interpreter, &list, -3);
-        if ((failure = aerobics(interpreter, list, 256)) != NULL) {
+        intlist_unshift(interp, &list, -3);
+        if ((failure = aerobics(interp, list, 256)) != NULL) {
             printf("Failed: %s\n", failure);
             return 1;
         }
 
         printf("Step 6: 257\n");
-        intlist_unshift(interpreter, &list, -2);
-        if ((failure = aerobics(interpreter, list, 257)) != NULL) {
+        intlist_unshift(interp, &list, -2);
+        if ((failure = aerobics(interp, list, 257)) != NULL) {
             printf("Failed: %s\n", failure);
             return 1;
         }
@@ -265,7 +265,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "yoyo");
     #include "parrot/embed.h"
 
     void
-    yoyo(Interp* interpreter, IntList** listP, int size)
+    yoyo(Interp* interp, IntList** listP, int size)
     {
         int i;
         int x = 0;
@@ -273,27 +273,27 @@ c_output_is(<<'CODE', <<'OUTPUT', "yoyo");
 
         /* Set up the yoyo */
         for (i = 0; i < size; i++) {
-            intlist_push(interpreter, *listP, x++);
+            intlist_push(interp, *listP, x++);
         }
 
         /* Flick it out */
         for (i = 0; i < distance; i++) {
-            intlist_push(interpreter, *listP, x++);
-            if (intlist_get(interpreter, *listP, -1) != i + size)
+            intlist_push(interp, *listP, x++);
+            if (intlist_get(interp, *listP, -1) != i + size)
                 printf("Out get failed on i=%d\n", i);
-            if (intlist_shift(interpreter, listP) != i)
+            if (intlist_shift(interp, listP) != i)
                 printf("Out shift failed on i=%d\n", i);
         }
 
         /* Suck it back */
         for (i = 0; i < distance + 10; i++) {
-            intlist_unshift(interpreter, listP, x++);
-            intlist_pop(interpreter, *listP);
+            intlist_unshift(interp, listP, x++);
+            intlist_pop(interp, *listP);
         }
 
         /* Clean up the yoyo */
         for (i = 0; i < size; i++) {
-            intlist_pop(interpreter, *listP);
+            intlist_pop(interp, *listP);
         }
     }
 
@@ -303,16 +303,16 @@ c_output_is(<<'CODE', <<'OUTPUT', "yoyo");
         const char* failure;
 
         IntList* list;
-        Interp* interpreter;
+        Interp* interp;
 
-        interpreter = Parrot_new(NULL);
-        if (interpreter == NULL) return 1;
+        interp = Parrot_new(NULL);
+        if (interp == NULL) return 1;
 
-        list = intlist_new(interpreter);
+        list = intlist_new(interp);
         if (list == NULL) return 1;
 
         for (i = 0; i < INTLIST_CHUNK_SIZE * 2.5; i++) {
-            yoyo(interpreter, &list, i);
+            yoyo(interp, &list, i);
         }
 
         printf("Done.\n");

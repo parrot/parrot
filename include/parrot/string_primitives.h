@@ -20,34 +20,34 @@
 void string_set_data_directory(const char *dir);
 
 /* Convert from any supported encoding, into our internal format */
-void string_fill_from_buffer(Interp *interpreter,
+void string_fill_from_buffer(Interp *interp,
         const void *buffer, UINTVAL len, const char *encoding_name, STRING *s);
 
 /* Utility method which knows how to uwind a single escape sequence */
 typedef Parrot_UInt2 (*Parrot_unescape_cb)(Parrot_Int4 offset, void *context);
 Parrot_UInt4
-string_unescape_one(Interp *interpreter, UINTVAL *offset, STRING *string);
+string_unescape_one(Interp *interp, UINTVAL *offset, STRING *string);
 
 UINTVAL
-Parrot_char_digit_value(Interp *interpreter, UINTVAL character);
+Parrot_char_digit_value(Interp *interp, UINTVAL character);
 
 /* Character properties */
-INTVAL Parrot_char_is_alnum(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_alpha(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_ascii(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_blank(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_cntrl(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_digit(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_graph(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_lower(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_print(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_punct(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_space(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_UWhiteSpace(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_Whitespace(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_upper(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_JavaSpaceChar(Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_xdigit(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_alnum(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_alpha(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_ascii(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_blank(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_cntrl(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_digit(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_graph(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_lower(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_print(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_punct(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_space(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_UWhiteSpace(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_Whitespace(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_upper(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_JavaSpaceChar(Interp *interp, UINTVAL character);
+INTVAL Parrot_char_is_xdigit(Interp *interp, UINTVAL character);
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_PRIMITIVES_H_GUARD */

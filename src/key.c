@@ -23,7 +23,7 @@ The base vtable calling functions.
 /*
 
 =item C<PMC *
-key_new(Interp *interpreter)>
+key_new(Interp *interp)>
 
 Returns a new C<Key> PMC.
 
@@ -32,9 +32,9 @@ Returns a new C<Key> PMC.
 */
 
 PMC *
-key_new(Interp *interpreter)
+key_new(Interp *interp)
 {
-    PMC *key = pmc_new(interpreter, enum_class_Key);
+    PMC *key = pmc_new(interp, enum_class_Key);
 
     return key;
 }
@@ -42,7 +42,7 @@ key_new(Interp *interpreter)
 /*
 
 =item C<PMC *
-key_new_integer(Interp *interpreter, INTVAL value)>
+key_new_integer(Interp *interp, INTVAL value)>
 
 Returns a new integer C<Key> PMC with value C<value>.
 
@@ -51,9 +51,9 @@ Returns a new integer C<Key> PMC with value C<value>.
 */
 
 PMC *
-key_new_integer(Interp *interpreter, INTVAL value)
+key_new_integer(Interp *interp, INTVAL value)
 {
-    PMC *key = pmc_new(interpreter, enum_class_Key);
+    PMC *key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
     PMC_int_val(key) = value;
@@ -64,7 +64,7 @@ key_new_integer(Interp *interpreter, INTVAL value)
 /*
 
 =item C<PMC *
-key_new_number(Interp *interpreter, FLOATVAL value)>
+key_new_number(Interp *interp, FLOATVAL value)>
 
 Returns a new number C<Key> PMC with value C<value>.
 
@@ -73,9 +73,9 @@ Returns a new number C<Key> PMC with value C<value>.
 */
 
 PMC *
-key_new_number(Interp *interpreter, FLOATVAL value)
+key_new_number(Interp *interp, FLOATVAL value)
 {
-    PMC *key = pmc_new(interpreter, enum_class_Key);
+    PMC *key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
     PMC_num_val(key) = value;
@@ -86,7 +86,7 @@ key_new_number(Interp *interpreter, FLOATVAL value)
 /*
 
 =item C<PMC *
-key_new_string(Interp *interpreter, STRING *value)>
+key_new_string(Interp *interp, STRING *value)>
 
 Returns a new string C<Key> PMC with value C<value>.
 
@@ -95,9 +95,9 @@ Returns a new string C<Key> PMC with value C<value>.
 */
 
 PMC *
-key_new_string(Interp *interpreter, STRING *value)
+key_new_string(Interp *interp, STRING *value)
 {
-    PMC *key = pmc_new(interpreter, enum_class_Key);
+    PMC *key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
     PMC_str_val(key) = value;
@@ -108,7 +108,7 @@ key_new_string(Interp *interpreter, STRING *value)
 /*
 
 =item C<PMC *
-key_new_cstring(Interp *interpreter, const char *value)>
+key_new_cstring(Interp *interp, const char *value)>
 
 Returns a new string C<Key> PMC with value C<value> converted to a
 C<STRING>.
@@ -118,16 +118,16 @@ C<STRING>.
 */
 
 PMC *
-key_new_cstring(Interp *interpreter, const char *value)
+key_new_cstring(Interp *interp, const char *value)
 {
-    return key_new_string(interpreter,
-            string_from_cstring(interpreter, value, 0));
+    return key_new_string(interp,
+            string_from_cstring(interp, value, 0));
 }
 
 /*
 
 =item C<PMC *
-key_new_pmc(Interp *interpreter, PMC *value)>
+key_new_pmc(Interp *interp, PMC *value)>
 
 Returns a new PMC C<Key> PMC with value C<value>.
 
@@ -136,9 +136,9 @@ Returns a new PMC C<Key> PMC with value C<value>.
 */
 
 PMC *
-key_new_pmc(Interp *interpreter, PMC *value)
+key_new_pmc(Interp *interp, PMC *value)
 {
-    PMC *key = pmc_new(interpreter, enum_class_Key);
+    PMC *key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
     internal_exception(1, "this is broken - see slice.pmc");
@@ -150,7 +150,7 @@ key_new_pmc(Interp *interpreter, PMC *value)
 /*
 
 =item C<void
-key_set_integer(Interp *interpreter, PMC *key, INTVAL value)>
+key_set_integer(Interp *interp, PMC *key, INTVAL value)>
 
 Set the integer C<value> in C<key>.
 
@@ -159,7 +159,7 @@ Set the integer C<value> in C<key>.
 */
 
 void
-key_set_integer(Interp *interpreter, PMC *key, INTVAL value)
+key_set_integer(Interp *interp, PMC *key, INTVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -171,7 +171,7 @@ key_set_integer(Interp *interpreter, PMC *key, INTVAL value)
 /*
 
 =item C<void
-key_set_register(Interp *interpreter, PMC *key, INTVAL value,
+key_set_register(Interp *interp, PMC *key, INTVAL value,
                  INTVAL flag)>
 
 Set the register C<value> in C<key>.
@@ -181,7 +181,7 @@ Set the register C<value> in C<key>.
 */
 
 void
-key_set_register(Interp *interpreter, PMC *key, INTVAL value,
+key_set_register(Interp *interp, PMC *key, INTVAL value,
                  INTVAL flag)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
@@ -194,7 +194,7 @@ key_set_register(Interp *interpreter, PMC *key, INTVAL value,
 /*
 
 =item C<void
-key_set_number(Interp *interpreter, PMC *key, FLOATVAL value)>
+key_set_number(Interp *interp, PMC *key, FLOATVAL value)>
 
 Set the number C<value> in C<key>.
 
@@ -203,7 +203,7 @@ Set the number C<value> in C<key>.
 */
 
 void
-key_set_number(Interp *interpreter, PMC *key, FLOATVAL value)
+key_set_number(Interp *interp, PMC *key, FLOATVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
@@ -215,7 +215,7 @@ key_set_number(Interp *interpreter, PMC *key, FLOATVAL value)
 /*
 
 =item C<void
-key_set_string(Interp *interpreter, PMC *key, STRING *value)>
+key_set_string(Interp *interp, PMC *key, STRING *value)>
 
 Set the string C<value> in C<key>.
 
@@ -224,7 +224,7 @@ Set the string C<value> in C<key>.
 */
 
 void
-key_set_string(Interp *interpreter, PMC *key, STRING *value)
+key_set_string(Interp *interp, PMC *key, STRING *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
@@ -236,7 +236,7 @@ key_set_string(Interp *interpreter, PMC *key, STRING *value)
 /*
 
 =item C<void
-key_set_pmc(Interp *interpreter, PMC *key, PMC *value)>
+key_set_pmc(Interp *interp, PMC *key, PMC *value)>
 
 Set the PMC C<value> in C<key>.
 
@@ -245,7 +245,7 @@ Set the PMC C<value> in C<key>.
 */
 
 void
-key_set_pmc(Interp *interpreter, PMC *key, PMC *value)
+key_set_pmc(Interp *interp, PMC *key, PMC *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
@@ -262,7 +262,7 @@ key_set_pmc(Interp *interpreter, PMC *key, PMC *value)
 /*
 
 =item C<INTVAL
-key_type(Interp *interpreter, PMC *key)>
+key_type(Interp *interp, PMC *key)>
 
 Returns the type of C<key>.
 
@@ -271,7 +271,7 @@ Returns the type of C<key>.
 */
 
 INTVAL
-key_type(Interp *interpreter, PMC *key)
+key_type(Interp *interp, PMC *key)
 {
     return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }
@@ -279,14 +279,14 @@ key_type(Interp *interpreter, PMC *key)
 /*
 
 =item C<INTVAL
-key_integer(Interp *interpreter, PMC *key)>
+key_integer(Interp *interp, PMC *key)>
 
 =cut
 
 */
 
 INTVAL
-key_integer(Interp *interpreter, PMC *key)
+key_integer(Interp *interp, PMC *key)
 {
     PMC *reg;
     STRING *s_reg;
@@ -299,29 +299,29 @@ key_integer(Interp *interpreter, PMC *key)
         return REG_INT(PMC_int_val(key));
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = REG_PMC(PMC_int_val(key));
-        return VTABLE_get_integer(interpreter, reg);
+        return VTABLE_get_integer(interp, reg);
     case KEY_string_FLAG:
-        return string_to_int(interpreter, PMC_str_val(key));
+        return string_to_int(interp, PMC_str_val(key));
     case KEY_string_FLAG | KEY_register_FLAG:
         s_reg = REG_STR(PMC_int_val(key));
-        return string_to_int(interpreter, s_reg);
+        return string_to_int(interp, s_reg);
     default:
         /* TODO check for slice_FLAGs */
-        return VTABLE_get_integer(interpreter, key);
+        return VTABLE_get_integer(interp, key);
     }
 }
 
 /*
 
 =item C<FLOATVAL
-key_number(Interp *interpreter, PMC *key)>
+key_number(Interp *interp, PMC *key)>
 
 =cut
 
 */
 
 FLOATVAL
-key_number(Interp *interpreter, PMC *key)
+key_number(Interp *interp, PMC *key)
 {
     PMC *reg;
 
@@ -331,11 +331,11 @@ key_number(Interp *interpreter, PMC *key)
     case KEY_number_FLAG | KEY_register_FLAG:
         return REG_NUM(PMC_int_val(key));
     case KEY_pmc_FLAG:
-        return VTABLE_get_number(interpreter, key);
+        return VTABLE_get_number(interp, key);
                                                  /*  PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = REG_PMC(PMC_int_val(key));
-        return VTABLE_get_number(interpreter, reg);
+        return VTABLE_get_number(interp, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not a number!\n");
         return 0;
@@ -345,14 +345,14 @@ key_number(Interp *interpreter, PMC *key)
 /*
 
 =item C<STRING *
-key_string(Interp *interpreter, PMC *key)>
+key_string(Interp *interp, PMC *key)>
 
 =cut
 
 */
 
 STRING *
-key_string(Interp *interpreter, PMC *key)
+key_string(Interp *interp, PMC *key)
 {
     PMC *reg;
 
@@ -364,21 +364,21 @@ key_string(Interp *interpreter, PMC *key)
                                                    /*   PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = REG_PMC(PMC_int_val(key));
-        return VTABLE_get_string(interpreter, reg);
+        return VTABLE_get_string(interp, reg);
     case KEY_integer_FLAG:
-        return string_from_int(interpreter, PMC_int_val(key));
+        return string_from_int(interp, PMC_int_val(key));
     case KEY_integer_FLAG | KEY_register_FLAG:
-        return string_from_int(interpreter, REG_INT(PMC_int_val(key)));
+        return string_from_int(interp, REG_INT(PMC_int_val(key)));
     default:
     case KEY_pmc_FLAG:
-        return VTABLE_get_string(interpreter, key);
+        return VTABLE_get_string(interp, key);
     }
 }
 
 /*
 
 =item C<PMC *
-key_pmc(Interp *interpreter, PMC *key)>
+key_pmc(Interp *interp, PMC *key)>
 
 These functions return the integer/number/string/PMC values of C<key> if
 possible. Otherwise they throws an exceptions.
@@ -388,7 +388,7 @@ possible. Otherwise they throws an exceptions.
 */
 
 PMC *
-key_pmc(Interp *interpreter, PMC *key)
+key_pmc(Interp *interp, PMC *key)
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG | KEY_register_FLAG:
@@ -401,7 +401,7 @@ key_pmc(Interp *interpreter, PMC *key)
 /*
 
 =item C<PMC *
-key_next(Interp *interpreter, PMC *key)>
+key_next(Interp *interp, PMC *key)>
 
 Returns the next key if C<key> is in a sequence of linked keys.
 
@@ -410,7 +410,7 @@ Returns the next key if C<key> is in a sequence of linked keys.
 */
 
 PMC *
-key_next(Interp *interpreter, PMC *key)
+key_next(Interp *interp, PMC *key)
 {
     if (!key->pmc_ext)
         return NULL;
@@ -420,7 +420,7 @@ key_next(Interp *interpreter, PMC *key)
 /*
 
 =item C<PMC *
-key_append(Interp *interpreter, PMC *key1, PMC *key2)>
+key_append(Interp *interp, PMC *key1, PMC *key2)>
 
 Appends C<key2> to C<key1>.
 
@@ -434,7 +434,7 @@ Returns C<key1>.
 */
 
 PMC *
-key_append(Interp *interpreter, PMC *key1, PMC *key2)
+key_append(Interp *interp, PMC *key1, PMC *key2)
 {
     PMC *tail = key1;
 
@@ -450,7 +450,7 @@ key_append(Interp *interpreter, PMC *key1, PMC *key2)
 /*
 
 =item C<void
-key_mark(Interp *interpreter, PMC *key)>
+key_mark(Interp *interp, PMC *key)>
 
 Marks C<key> as live.
 
@@ -459,13 +459,13 @@ Marks C<key> as live.
 */
 
 void
-key_mark(Interp *interpreter, PMC *key)
+key_mark(Interp *interp, PMC *key)
 {
     UINTVAL flags;
 
     flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
     if (flags == KEY_string_FLAG)
-        pobject_lives(interpreter, (PObj *)PMC_str_val(key));
+        pobject_lives(interp, (PObj *)PMC_str_val(key));
     /*
      * KEY_hash_iterator_FLAGS denote a hash key iteration, PMC_data() is
      * the bucket_index and not the next key component
@@ -475,7 +475,7 @@ key_mark(Interp *interpreter, PMC *key)
 
     /* if iteration hasn't started, above flag isn't set yet */
     if (PMC_data(key) && PMC_data(key) != (void *)INITBucketIndex)
-        pobject_lives(interpreter, (PObj *)PMC_data(key));
+        pobject_lives(interp, (PObj *)PMC_data(key));
 
 }
 

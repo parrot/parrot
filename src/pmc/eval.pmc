@@ -22,7 +22,7 @@ evaluation and execution.
 #include "parrot/parrot.h"
 
 static void
-clear_fixups(Interp* interpreter, parrot_sub_t sub_data)
+clear_fixups(Interp *interp, parrot_sub_t sub_data)
 {
     opcode_t i, ci;
     struct PackFile_ByteCode *seg;
@@ -55,7 +55,7 @@ clear_fixups(Interp* interpreter, parrot_sub_t sub_data)
 }
 
 static PMC*
-get_sub(Interp* interpreter, PMC* self, int idx)
+get_sub(Interp *interp, PMC* self, int idx)
 {
     opcode_t i, n, ci;
     struct PackFile_ByteCode *seg;
@@ -86,7 +86,7 @@ get_sub(Interp* interpreter, PMC* self, int idx)
 }
 
 static void
-mark_subs(Interp* interpreter, PMC* self)
+mark_subs(Interp *interp, PMC* self)
 {
     opcode_t i, ci;
     struct PackFile_ByteCode *seg;
@@ -108,7 +108,7 @@ mark_subs(Interp* interpreter, PMC* self)
             case enum_fixup_sub:
                 ci = ft->fixups[i]->offset;
                 sub = ct->constants[ci]->u.key;
-                pobject_lives(interpreter, (PObj*)sub);
+                pobject_lives(interp, (PObj*)sub);
         }
     }
 }
@@ -323,7 +323,7 @@ Unarchives the code.
         pf->directory.num_segments = 0;
         /*
          * XXX this isn't ok - it seems that the packfile
-         *     gets attached to interpreter->code and is
+         *     gets attached to interp->code and is
          *     destroyed again during interpreter destruction
          */
         /* PackFile_destroy(INTERP, pf); */

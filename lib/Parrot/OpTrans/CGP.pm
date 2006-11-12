@@ -96,8 +96,8 @@ sub goto_address
     {
         return "if ($addr == 0)
           return 0;
-   _reg_base = (char*)interpreter->ctx.bp.regs_i;
-   goto **(cur_opcode = opcode_to_prederef(interpreter, $addr))";
+   _reg_base = (char*)interp->ctx.bp.regs_i;
+   goto **(cur_opcode = opcode_to_prederef(interp, $addr))";
   }
 }
 
@@ -126,8 +126,8 @@ sub goto_pop
 {
     my ($self) = @_;
 
-    return "goto **(cur_opcode = opcode_to_prederef(interpreter,
-        (opcode_t*)pop_dest(interpreter)))";
+    return "goto **(cur_opcode = opcode_to_prederef(interp,
+        (opcode_t*)pop_dest(interp)))";
 }
 
 sub run_core_func_start

@@ -41,13 +41,13 @@ can.
    To deal with this there are two macros that are defined to handle
    the problem.
 
-   PARROT_CALLIN_START(interpreter) will figure out if the stack
+   PARROT_CALLIN_START(interp) will figure out if the stack
    anchor needs setting and, if so, will set it. It must *always*
    come immediately after the last variable declared in the block
    making the calls into the interpreter, as it declares a variable
    and has some code.
 
-   PARROT_CALLIN_END(interpreter) will put the stack anchor back to
+   PARROT_CALLIN_END(interp) will put the stack anchor back to
    the way it was, and should always be the last statement before a
    return. (If you have multiple returns have it in multiple times)
 
@@ -710,7 +710,7 @@ Parrot_free_cstring(char *string) {
 /*
 
 =item C<void*
-Parrot_call_sub(Parrot_INTERP interpreter, Parrot_PMC sub,
+Parrot_call_sub(Parrot_INTERP interp, Parrot_PMC sub,
             const char *signature, ...)>
 
 Call a parrot subroutine with the given function signature. The first char in
@@ -727,11 +727,11 @@ Signature chars are:
     P ... Parrot_PMC
 
 =item C<Parrot_Int>
-Parrot_call_sub_ret_int(Parrot_INTERP interpreter, Parrot_PMC sub,
+Parrot_call_sub_ret_int(Parrot_INTERP interp, Parrot_PMC sub,
             const char *signature, ...)>
 
 =item C<Parrot_Float>
-Parrot_call_sub_ret_float(Parrot_INTERP interpreter, Parrot_PMC sub,
+Parrot_call_sub_ret_float(Parrot_INTERP interp, Parrot_PMC sub,
             const char *signature, ...)>
 
 Like above, with Parrot_Int or Parrot_Float return result.
@@ -741,55 +741,55 @@ Like above, with Parrot_Int or Parrot_Float return result.
 */
 
 void*
-Parrot_call_sub(Parrot_INTERP interpreter, Parrot_PMC sub,
+Parrot_call_sub(Parrot_INTERP interp, Parrot_PMC sub,
                  const char *signature, ...)
 {
     va_list ap;
     void *result;
 
-    PARROT_CALLIN_START(interpreter);
+    PARROT_CALLIN_START(interp);
 
     va_start(ap, signature);
-    CONTEXT(interpreter->ctx)->constants =
+    CONTEXT(interp->ctx)->constants =
         PMC_sub(sub)->seg->const_table->constants;
-    result = Parrot_runops_fromc_arglist(interpreter, sub, signature, ap);
+    result = Parrot_runops_fromc_arglist(interp, sub, signature, ap);
     va_end(ap);
 
-    PARROT_CALLIN_END(interpreter);
+    PARROT_CALLIN_END(interp);
     return result;
 }
 
 Parrot_Int
-Parrot_call_sub_ret_int(Parrot_INTERP interpreter, Parrot_PMC sub,
+Parrot_call_sub_ret_int(Parrot_INTERP interp, Parrot_PMC sub,
                  const char *signature, ...)
 {
     va_list ap;
     Parrot_Int result;
 
-    PARROT_CALLIN_START(interpreter);
+    PARROT_CALLIN_START(interp);
 
     va_start(ap, signature);
-    result = Parrot_runops_fromc_arglist_reti(interpreter, sub, signature, ap);
+    result = Parrot_runops_fromc_arglist_reti(interp, sub, signature, ap);
     va_end(ap);
 
-    PARROT_CALLIN_END(interpreter);
+    PARROT_CALLIN_END(interp);
     return result;
 }
 
 Parrot_Float
-Parrot_call_sub_ret_float(Parrot_INTERP interpreter, Parrot_PMC sub,
+Parrot_call_sub_ret_float(Parrot_INTERP interp, Parrot_PMC sub,
                  const char *signature, ...)
 {
     va_list ap;
     Parrot_Float result;
 
-    PARROT_CALLIN_START(interpreter);
+    PARROT_CALLIN_START(interp);
 
     va_start(ap, signature);
-    result = Parrot_runops_fromc_arglist_retf(interpreter, sub, signature, ap);
+    result = Parrot_runops_fromc_arglist_retf(interp, sub, signature, ap);
     va_end(ap);
 
-    PARROT_CALLIN_END(interpreter);
+    PARROT_CALLIN_END(interp);
     return result;
 }
 
@@ -813,57 +813,57 @@ Call a parrot method for the given object.
 */
 
 void *
-Parrot_call_method(Parrot_INTERP interpreter, Parrot_PMC sub, Parrot_PMC obj,
+Parrot_call_method(Parrot_INTERP interp, Parrot_PMC sub, Parrot_PMC obj,
                         Parrot_STRING method, const char *signature, ...)
 {
     void *result;
     va_list ap;
 
-    PARROT_CALLIN_START(interpreter);
+    PARROT_CALLIN_START(interp);
     va_start(ap, signature);
-    result = Parrot_run_meth_fromc_arglist(interpreter, sub,
+    result = Parrot_run_meth_fromc_arglist(interp, sub,
             obj, method, signature, ap);
     va_end(ap);
-    PARROT_CALLIN_END(interpreter);
+    PARROT_CALLIN_END(interp);
     return result;
 }
 
 Parrot_Int
-Parrot_call_method_ret_int(Parrot_INTERP interpreter, Parrot_PMC sub,
+Parrot_call_method_ret_int(Parrot_INTERP interp, Parrot_PMC sub,
         Parrot_PMC obj, Parrot_STRING method, const char *signature, ...)
 {
     Parrot_Int result;
     va_list ap;
 
-    PARROT_CALLIN_START(interpreter);
+    PARROT_CALLIN_START(interp);
     va_start(ap, signature);
-    result = Parrot_run_meth_fromc_arglist_reti(interpreter, sub,
+    result = Parrot_run_meth_fromc_arglist_reti(interp, sub,
             obj, method, signature, ap);
     va_end(ap);
-    PARROT_CALLIN_END(interpreter);
+    PARROT_CALLIN_END(interp);
     return result;
 }
 
 Parrot_Float
-Parrot_call_method_ret_float(Parrot_INTERP interpreter, Parrot_PMC sub,
+Parrot_call_method_ret_float(Parrot_INTERP interp, Parrot_PMC sub,
         Parrot_PMC obj, Parrot_STRING method, const char *signature, ...)
 {
     Parrot_Float result;
     va_list ap;
 
-    PARROT_CALLIN_START(interpreter);
+    PARROT_CALLIN_START(interp);
     va_start(ap, signature);
-    result = Parrot_run_meth_fromc_arglist_retf(interpreter, sub,
+    result = Parrot_run_meth_fromc_arglist_retf(interp, sub,
             obj, method, signature, ap);
     va_end(ap);
-    PARROT_CALLIN_END(interpreter);
+    PARROT_CALLIN_END(interp);
     return result;
 }
 
 /*
 
 =item C<Parrot_Int
-Parrot_get_intreg(Parrot_INTERP interpreter, Parrot_Int regnum)>
+Parrot_get_intreg(Parrot_INTERP interp, Parrot_Int regnum)>
 
 Return the value of an integer register.
 
@@ -872,7 +872,7 @@ Return the value of an integer register.
 */
 
 Parrot_Int
-Parrot_get_intreg(Parrot_INTERP interpreter, Parrot_Int regnum)
+Parrot_get_intreg(Parrot_INTERP interp, Parrot_Int regnum)
 {
     return REG_INT(regnum);
 }
@@ -880,7 +880,7 @@ Parrot_get_intreg(Parrot_INTERP interpreter, Parrot_Int regnum)
 /*
 
 =item C<Parrot_Float
-Parrot_get_numreg(Parrot_INTERP interpreter, Parrot_Int regnum)>
+Parrot_get_numreg(Parrot_INTERP interp, Parrot_Int regnum)>
 
 Return the value of a numeric register.
 
@@ -889,7 +889,7 @@ Return the value of a numeric register.
 */
 
 Parrot_Float
-Parrot_get_numreg(Parrot_INTERP interpreter, Parrot_Int regnum)
+Parrot_get_numreg(Parrot_INTERP interp, Parrot_Int regnum)
 {
     return REG_NUM(regnum);
 }
@@ -897,7 +897,7 @@ Parrot_get_numreg(Parrot_INTERP interpreter, Parrot_Int regnum)
 /*
 
 =item C<Parrot_STRING
-Parrot_get_strreg(Parrot_INTERP interpreter, Parrot_Int regnum)>
+Parrot_get_strreg(Parrot_INTERP interp, Parrot_Int regnum)>
 
 Return the value of a string register.
 
@@ -906,7 +906,7 @@ Return the value of a string register.
 */
 
 Parrot_STRING
-Parrot_get_strreg(Parrot_INTERP interpreter, Parrot_Int regnum)
+Parrot_get_strreg(Parrot_INTERP interp, Parrot_Int regnum)
 {
     return REG_STR(regnum);
 }
@@ -914,7 +914,7 @@ Parrot_get_strreg(Parrot_INTERP interpreter, Parrot_Int regnum)
 /*
 
 =item C<Parrot_PMC
-Parrot_get_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum)>
+Parrot_get_pmcreg(Parrot_INTERP interp, Parrot_Int regnum)>
 
 Return the value of a PMC register.
 
@@ -923,7 +923,7 @@ Return the value of a PMC register.
 */
 
 Parrot_PMC
-Parrot_get_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum)
+Parrot_get_pmcreg(Parrot_INTERP interp, Parrot_Int regnum)
 {
     return REG_PMC(regnum);
 }
@@ -931,7 +931,7 @@ Parrot_get_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum)
 /*
 
 =item C<void
-Parrot_set_intreg(Parrot_INTERP interpreter, Parrot_Int regnum,
+Parrot_set_intreg(Parrot_INTERP interp, Parrot_Int regnum,
                   Parrot_Int value)>
 
 Set the value of an I register.
@@ -941,7 +941,7 @@ Set the value of an I register.
 */
 
 void
-Parrot_set_intreg(Parrot_INTERP interpreter, Parrot_Int regnum,
+Parrot_set_intreg(Parrot_INTERP interp, Parrot_Int regnum,
                   Parrot_Int value)
 {
     REG_INT(regnum) = value;
@@ -950,7 +950,7 @@ Parrot_set_intreg(Parrot_INTERP interpreter, Parrot_Int regnum,
 /*
 
 =item C<void
-Parrot_set_numreg(Parrot_INTERP interpreter, Parrot_Int regnum,
+Parrot_set_numreg(Parrot_INTERP interp, Parrot_Int regnum,
                   Parrot_Float value)>
 
 Set the value of an N register.
@@ -960,7 +960,7 @@ Set the value of an N register.
 */
 
 void
-Parrot_set_numreg(Parrot_INTERP interpreter, Parrot_Int regnum,
+Parrot_set_numreg(Parrot_INTERP interp, Parrot_Int regnum,
                   Parrot_Float value)
 {
     REG_NUM(regnum) = value;
@@ -969,7 +969,7 @@ Parrot_set_numreg(Parrot_INTERP interpreter, Parrot_Int regnum,
 /*
 
 =item C<void
-Parrot_set_strreg(Parrot_INTERP interpreter, Parrot_Int regnum,
+Parrot_set_strreg(Parrot_INTERP interp, Parrot_Int regnum,
                   Parrot_STRING value)>
 
 Set the value of an S register.
@@ -979,7 +979,7 @@ Set the value of an S register.
 */
 
 void
-Parrot_set_strreg(Parrot_INTERP interpreter, Parrot_Int regnum,
+Parrot_set_strreg(Parrot_INTERP interp, Parrot_Int regnum,
                   Parrot_STRING value)
 {
     REG_STR(regnum) = value;
@@ -988,7 +988,7 @@ Parrot_set_strreg(Parrot_INTERP interpreter, Parrot_Int regnum,
 /*
 
 =item C<void
-Parrot_set_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum,
+Parrot_set_pmcreg(Parrot_INTERP interp, Parrot_Int regnum,
                   Parrot_PMC value) >
 
 Set the value of a P register.
@@ -998,7 +998,7 @@ Set the value of a P register.
 */
 
 void
-Parrot_set_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum,
+Parrot_set_pmcreg(Parrot_INTERP interp, Parrot_Int regnum,
                   Parrot_PMC value)
 {
     REG_PMC(regnum) = value;
@@ -1009,7 +1009,7 @@ Parrot_set_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum,
  */
 /*
 
-=item C<Parrot_STRING Parrot_new_string(Parrot_INTERP interpreter,
+=item C<Parrot_STRING Parrot_new_string(Parrot_INTERP interp,
                                 char *buffer, int length,
                                 const char * const encoding_name,
                                 Parrot_Int flags)>
@@ -1024,22 +1024,22 @@ A copy of the buffer is made.
 */
 
 Parrot_STRING
-Parrot_new_string(Parrot_INTERP interpreter,
+Parrot_new_string(Parrot_INTERP interp,
                                 char *buffer, int length,
                                 const char * const encoding_name,
                                 Parrot_Int flags)
 {
     Parrot_STRING retval;
-    PARROT_CALLIN_START(interpreter);
-    retval = string_make(interpreter, buffer, length, encoding_name, flags);
-    PARROT_CALLIN_END(interpreter);
+    PARROT_CALLIN_START(interp);
+    retval = string_make(interp, buffer, length, encoding_name, flags);
+    PARROT_CALLIN_END(interp);
     return retval;
 }
 
 /*
 
 =item C<Parrot_Const_Encoding
-Parrot_find_encoding(Parrot_INTERP interpreter, char *encoding_name)>
+Parrot_find_encoding(Parrot_INTERP interp, char *encoding_name)>
 
 Find the magic token for an encoding, by name.
 
@@ -1047,7 +1047,7 @@ Find the magic token for an encoding, by name.
 
 */
 /*
-Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP interpreter,
+Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP interp,
                                            char *encoding_name) {
     return Parrot_encoding_lookup(encoding_name);
 }
@@ -1055,7 +1055,7 @@ Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP interpreter,
 /*
 
 =item C<Parrot_Language
-Parrot_find_language(Parrot_INTERP interpreter, char *language)>
+Parrot_find_language(Parrot_INTERP interp, char *language)>
 
 Find the magic language token for a language, by language name.
 
@@ -1064,7 +1064,7 @@ Find the magic language token for a language, by language name.
 */
 
 Parrot_Language
-Parrot_find_language(Parrot_INTERP interpreter, char *language)
+Parrot_find_language(Parrot_INTERP interp, char *language)
 {
     return 0;
 }
@@ -1072,7 +1072,7 @@ Parrot_find_language(Parrot_INTERP interpreter, char *language)
 /*
 
 =item C<void
-Parrot_register_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)>
+Parrot_register_pmc(Parrot_INTERP interp, Parrot_PMC pmc)>
 
 Add a reference of the PMC to the interpreters DOD registry. This
 prevents PMCs only known to extension from getting destroyed during DOD
@@ -1093,7 +1093,7 @@ Parrot_register_pmc(Parrot_INTERP interp, Parrot_PMC pmc)
 /*
 
 =item C<void
-Parrot_unregister_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)>
+Parrot_unregister_pmc(Parrot_INTERP interp, Parrot_PMC pmc)>
 
 Remove a reference of the PMC from the interpreters DOD registry. If the
 reference count reaches zero, the PMC will be destroyed during the next
@@ -1132,7 +1132,7 @@ Parrot_get_dod_registry(Parrot_INTERP interp)
 /*
 
 =item C<void
-Parrot_pmc_set_vtable(Parrot_INTERP interpreter, Parrot_PMC pmc,
+Parrot_pmc_set_vtable(Parrot_INTERP interp, Parrot_PMC pmc,
                       Parrot_VTABLE vtable)>
 
 Replaces the vtable of the PMC.
@@ -1142,7 +1142,7 @@ Replaces the vtable of the PMC.
 */
 
 void
-Parrot_PMC_set_vtable(Parrot_INTERP interpreter, Parrot_PMC pmc,
+Parrot_PMC_set_vtable(Parrot_INTERP interp, Parrot_PMC pmc,
                       Parrot_VTABLE vtable)
 {
     pmc->vtable = vtable;
@@ -1151,7 +1151,7 @@ Parrot_PMC_set_vtable(Parrot_INTERP interpreter, Parrot_PMC pmc,
 /*
 
 =item C<Parrot_VTABLE
-Parrot_get_vtable(Parrot_INTERP interpreter, Parrot_Int id)>
+Parrot_get_vtable(Parrot_INTERP interp, Parrot_Int id)>
 
 Returns the vtable corresponding to the given PMC ID.
 
@@ -1160,9 +1160,9 @@ Returns the vtable corresponding to the given PMC ID.
 */
 
 Parrot_VTABLE
-Parrot_get_vtable(Parrot_INTERP interpreter, Parrot_Int id)
+Parrot_get_vtable(Parrot_INTERP interp, Parrot_Int id)
 {
-    return interpreter->vtables[id];
+    return interp->vtables[id];
 }
 
 /*

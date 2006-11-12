@@ -121,7 +121,7 @@ sub vtbl_defs {
 
     for $entry (@{$vtable}) {
     next if ($entry->[4] =~ /MMD_/);
-        my $args = join(", ", 'Interp* interpreter', 'PMC* pmc', split(/\s*,\s*/, $entry->[2]));
+        my $args = join(", ", 'Interp *interp', 'PMC* pmc', split(/\s*,\s*/, $entry->[2]));
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
     }
 

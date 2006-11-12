@@ -2,7 +2,7 @@
 ** experimental.ops
 */
 
-extern PMC* Parrot_NameSpace_name(Interp* interpreter, PMC* pmc);
+extern PMC* Parrot_NameSpace_name(Interp* interp, PMC* pmc);
 
 VERSION = PARROT_VERSION;
 
@@ -144,7 +144,7 @@ be reused, they have to be B<clone>d.
 =cut
 
 inline op splice(invar PMC, invar PMC, in INT, in INT) {
-    $1->vtable->splice(interpreter, $1, $2, $3, $4);
+    $1->vtable->splice(interp, $1, $2, $3, $4);
     goto NEXT();
 }
 
@@ -167,17 +167,17 @@ Return a new Iterator PMC $1 for aggregate $2.
 =cut
 
 inline op slice (out PMC, invar PMC, in KEY) :base_core {
-    $1 = $2->vtable->slice(interpreter, $2, $3, 0);
+    $1 = $2->vtable->slice(interp, $2, $3, 0);
     goto NEXT();
 }
 
 inline op slice (out PMC, invar PMC, in KEY, inconst INT) :python {
-    $1 = $2->vtable->slice(interpreter, $2, $3, $4);
+    $1 = $2->vtable->slice(interp, $2, $3, $4);
     goto NEXT();
 }
 
 inline op iter (out PMC, invar PMC) :base_core {
-    $1 = $2->vtable->get_iter(interpreter, $2);
+    $1 = $2->vtable->get_iter(interp, $2);
     goto NEXT();
 }
 
@@ -190,7 +190,7 @@ Have $1 turn itself into a PMC of type $2.
 =cut
 
 inline op morph(invar PMC, in INT) {
-  VTABLE_morph(interpreter, $1, $2);
+  VTABLE_morph(interp, $1, $2);
   goto NEXT();
 }
 
@@ -204,7 +204,7 @@ wrong.
 =cut
 
 inline op exec(in STR) {
-  Parrot_Exec_OS_Command(interpreter, $1);
+  Parrot_Exec_OS_Command(interp, $1);
   goto NEXT();
 }
 
@@ -217,11 +217,11 @@ a Key PMC that you can use with "new", for example.
 =cut
 
 op classname(out PMC, invar PMC) :object_base {
-    PMC *ns = Parrot_NameSpace_name(interpreter,
-                                    VTABLE_namespace(interpreter, $2));
-    if (PMC_IS_NULL(ns) || VTABLE_elements(interpreter, ns) < 2)
+    PMC *ns = Parrot_NameSpace_name(interp,
+                                    VTABLE_namespace(interp, $2));
+    if (PMC_IS_NULL(ns) || VTABLE_elements(interp, ns) < 2)
     {
-        real_exception(interpreter, NULL, NO_CLASS,
+        real_exception(interp, NULL, NO_CLASS,
             "Attempt to get class name of a non-class.");
     }
     else
@@ -232,14 +232,14 @@ op classname(out PMC, invar PMC) :object_base {
 
         /* Need to turn list of strings into a key. Note that we are not
            including the first item in the array, since that is the HLL. */
-        tmp = VTABLE_get_string_keyed_int(interpreter, ns, 1);
-        $1 = key_tail = key_new_string(interpreter, tmp);
-        max = VTABLE_elements(interpreter, ns);
+        tmp = VTABLE_get_string_keyed_int(interp, ns, 1);
+        $1 = key_tail = key_new_string(interp, tmp);
+        max = VTABLE_elements(interp, ns);
         for (i = 2; i < max; i++)
         {
-            tmp = VTABLE_get_string_keyed_int(interpreter, ns, i);
-            key = key_new_string(interpreter, tmp);
-            key_append(interpreter, key_tail, key);
+            tmp = VTABLE_get_string_keyed_int(interp, ns, i);
+            key = key_new_string(interp, tmp);
+            key_append(interp, key_tail, key);
             key_tail = key;
         }
     }
@@ -313,10 +313,10 @@ Return the class PMC of the type $2.
 
 op getclass(out PMC, in INT) {
     int typ = $2;
-    if (typ < 1 || typ >= interpreter->n_vtable_max)
-        real_exception(interpreter, NULL, E_ValueError,
+    if (typ < 1 || typ >= interp->n_vtable_max)
+        real_exception(interp, NULL, E_ValueError,
                 "type number out of range");
-    $1 = interpreter->vtables[typ]->class;
+    $1 = interp->vtables[typ]->class;
     goto NEXT();
 }
 
@@ -332,12 +332,12 @@ OR IF YOU NEED THIS (OR INSTANTIATE), TELL CHIP
 
 op new(out PMC, in INT, in STR) {
   PMC *class;
-  if ($2 <= 0 || $2 >= interpreter->n_vtable_max) {
-    real_exception(interpreter, 0, NO_CLASS,
+  if ($2 <= 0 || $2 >= interp->n_vtable_max) {
+    real_exception(interp, 0, NO_CLASS,
                    "Illegal PMC enum (%d) in new", (int)$2);
   }
-  class = interpreter->vtables[$2]->class;
-  $1 = VTABLE_new_from_string(interpreter, class, $3, 0);
+  class = interp->vtables[$2]->class;
+  $1 = VTABLE_new_from_string(interp, class, $3, 0);
   goto NEXT();
 }
 
@@ -357,25 +357,25 @@ op instantiate(out PMC) {
   PMC *sig, *class;
   int typ;
 
-  arg_op = interpreter->current_args;
+  arg_op = interp->current_args;
   if (!arg_op) {
-        real_exception(interpreter, NULL, NULL_REG_ACCESS,
+        real_exception(interp, NULL, NULL_REG_ACCESS,
             "No set_args with instantiate");
   }
-  sig = CONTEXT(interpreter->ctx)->constants[arg_op[1]]->u.key;
+  sig = CONTEXT(interp->ctx)->constants[arg_op[1]]->u.key;
   ASSERT_SIG_PMC(sig);
   if (!SIG_ELEMS(sig)) {
-        real_exception(interpreter, NULL, E_ValueError,
+        real_exception(interp, NULL, E_ValueError,
             "Empty signature with instantiate");
   }
   switch (SIG_ITEM(sig, 0)) {
       case PARROT_ARG_IC:
           typ = arg_op[2];
-          if (typ <= 1 || typ >= interpreter->n_vtable_max) {
-              real_exception(interpreter, NULL, E_ValueError,
+          if (typ <= 1 || typ >= interp->n_vtable_max) {
+              real_exception(interp, NULL, E_ValueError,
                       "Illegal PMC enum (%d) in instantiate", typ);
           }
-          class = interpreter->vtables[typ]->class;
+          class = interp->vtables[typ]->class;
           break;
       case PARROT_ARG_P:
           class = REG_PMC(arg_op[2]);
@@ -386,8 +386,8 @@ op instantiate(out PMC) {
           class = NULL; /* just for cc */
           break;
   }
-  $1 = VTABLE_instantiate(interpreter, class, sig);
-  interpreter->current_args = NULL;
+  $1 = VTABLE_instantiate(interp, class, sig);
+  interp->current_args = NULL;
   goto NEXT();
 }
 
@@ -423,21 +423,21 @@ inline op new(out PMC, invar PMC) :object_classes {
     INTVAL type;
     switch ($2->vtable->base_type) {
         case enum_class_String:
-                type = pmc_type(interpreter, PMC_str_val($2));
+                type = pmc_type(interp, PMC_str_val($2));
             if (type <= 0)
-                real_exception(interpreter, NULL, NO_CLASS,
+                real_exception(interp, NULL, NO_CLASS,
                     "Class '%Ss' not found", PMC_str_val($2));
-            $1 = pmc_new(interpreter, type);
+            $1 = pmc_new(interp, type);
             break;
         case enum_class_Key:
-            type = pmc_type_p(interpreter, $2);
+            type = pmc_type_p(interp, $2);
             if (type <= 0)
-                real_exception(interpreter, NULL, NO_CLASS,
-                    "Class '%Ss' not found", readable_name(interpreter, $2));
-            $1 = pmc_new(interpreter, type);
+                real_exception(interp, NULL, NO_CLASS,
+                    "Class '%Ss' not found", readable_name(interp, $2));
+            $1 = pmc_new(interp, type);
             break;
         default:
-            real_exception(interpreter, NULL, NO_CLASS,
+            real_exception(interp, NULL, NO_CLASS,
                 "Can only use a Key or String PMC with new");
     }
     goto NEXT();
@@ -451,7 +451,7 @@ only handled $4 = IO_THR_MSG_ADD_SELECT_RD aka 2 for now.
 =cut
 
 op add_io_event(invar PMC, invar PMC, invar PMC, inconst INT) {
-    Parrot_event_add_io_event(interpreter, $1, $2, $3, $4);
+    Parrot_event_add_io_event(interp, $1, $2, $3, $4);
     goto NEXT();
 }
 
@@ -474,7 +474,7 @@ op need_finalize(invar PMC) {
 
 =item B<runinterp>(invar PMC, in PMC)
 
-Invokes the PMC $2 using interpreter $1.
+Invokes the PMC $2 using interp $1.
 
 =cut
 

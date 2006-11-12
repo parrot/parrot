@@ -45,8 +45,8 @@ Morphs the integer to a C<PerlNum> and sets the value from C<value>.
     void set_number_native (FLOATVAL value) {
         INTVAL dynpmc_PerlNum;
 
-        dynpmc_PerlNum = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlNum", 0));
+        dynpmc_PerlNum = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlNum", 0));
         DYNSELF.morph(dynpmc_PerlNum);
         DYNSELF.set_number_native(value);
     }
@@ -64,8 +64,8 @@ Sets the value of the integer to C<*value>.
     void set_string_native (STRING* value) {
         INTVAL dynpmc_PerlString;
 
-        dynpmc_PerlString = pmc_type(interpreter,
-            string_from_const_cstring(interpreter, "PerlString", 0));
+        dynpmc_PerlString = pmc_type(interp,
+            string_from_const_cstring(interp, "PerlString", 0));
         DYNSELF.morph(dynpmc_PerlString);
         DYNSELF.set_string_native(value);
     }

@@ -243,7 +243,7 @@ struct move_info_t {
 };
 
 static int
-pcc_reg_mov(Interp *interpreter, unsigned char d, unsigned char s,
+pcc_reg_mov(Interp *interp, unsigned char d, unsigned char s,
         void *vinfo)
 {
     struct move_info_t *info = vinfo;
@@ -263,7 +263,7 @@ pcc_reg_mov(Interp *interpreter, unsigned char d, unsigned char s,
                 if (temps[t])
                     dest = temps[t];
                 else {
-                    dest = temps[t] = mk_temp_reg(interpreter, src->set);
+                    dest = temps[t] = mk_temp_reg(interp, src->set);
                 }
                 break;
             }
@@ -279,7 +279,7 @@ pcc_reg_mov(Interp *interpreter, unsigned char d, unsigned char s,
                 if (temps[t])
                     src = temps[t];
                 else {
-                    src = temps[t] = mk_temp_reg(interpreter, dest->set);
+                    src = temps[t] = mk_temp_reg(interp, dest->set);
                 }
                 break;
             }
@@ -292,7 +292,7 @@ pcc_reg_mov(Interp *interpreter, unsigned char d, unsigned char s,
         src = s < info->n ? info->dest[(int)s] : info->src[(int)s - info->n];
     regs[0] = dest;
     regs[1] = src;
-    info->ins = insINS(interpreter, info->unit, info->ins, "set", regs, 2);
+    info->ins = insINS(interp, info->unit, info->ins, "set", regs, 2);
     return 1;
 }
 

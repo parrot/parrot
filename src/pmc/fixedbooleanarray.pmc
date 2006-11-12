@@ -31,14 +31,14 @@ PMC>.
 #define BITS_PER_CHAR 8
 
 static void
-booleanarray_init(Interp *interpreter, PMC *self) {
+booleanarray_init(Interp *interp, PMC *self) {
     PMC_int_val(self) = 0;
     PMC_int_val2(self) = 0;
     PMC_data(self) = NULL;
 }
 
 static void
-booleanarray_clone(Interp *interpreter, PMC *self, PMC *dest) {
+booleanarray_clone(Interp *interp, PMC *self, PMC *dest) {
     PMC_int_val(dest)  = PMC_int_val(self);
     PMC_int_val2(dest) = PMC_int_val2(self);
     if (PMC_data(self)) {
@@ -51,7 +51,7 @@ booleanarray_clone(Interp *interpreter, PMC *self, PMC *dest) {
 }
 
 static void
-booleanarray_clear(Interp *interpreter, PMC *self) {
+booleanarray_clear(Interp *interp, PMC *self) {
     PMC_int_val(self) = 0;
     PMC_int_val2(self) = 0;
     if (PMC_data(self)) {

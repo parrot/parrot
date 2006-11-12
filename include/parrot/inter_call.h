@@ -104,7 +104,7 @@ opcode_t * parrot_pass_args(Interp *, parrot_context_t *src_ctx,
 opcode_t * parrot_pass_args_fromc(Interp *, const char *sig,
         opcode_t *dest, parrot_context_t * ctx, va_list ap);
 opcode_t *
-parrot_pass_args_to_result(Interp *interpreter, const char *sig,
+parrot_pass_args_to_result(Interp *interp, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctxp, va_list ap);
 
 FLOATVAL set_retval_f(Interp*, int sig_ret, parrot_context_t *ctx);
@@ -118,7 +118,7 @@ INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
 #define SIG_ELEMS(sig) PMC_int_val(sig)
 #define SIG_ARRAY(sig) (INTVAL*)PMC_data(sig)
 #define SIG_ITEM(sig, idx) (SIG_ARRAY(sig))[idx]
-#define ADD_OP_VAR_PART(interpreter, seg, pc, n) do { \
+#define ADD_OP_VAR_PART(interp, seg, pc, n) do { \
     if (*pc == PARROT_OP_set_args_pc || \
             *pc == PARROT_OP_get_results_pc || \
             *pc == PARROT_OP_get_params_pc || \

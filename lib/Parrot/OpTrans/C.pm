@@ -55,13 +55,13 @@ sub defines
 {
     return <<END;
 #undef CONST
-#define REL_PC     ((size_t)(cur_opcode - interpreter->code->base.data))
+#define REL_PC     ((size_t)(cur_opcode - interp->code->base.data))
 #define CUR_OPCODE cur_opcode
 #define IREG(i) REG_INT(cur_opcode[i])
 #define NREG(i) REG_NUM(cur_opcode[i])
 #define PREG(i) REG_PMC(cur_opcode[i])
 #define SREG(i) REG_STR(cur_opcode[i])
-#define CONST(i) CONTEXT(interpreter->ctx)->constants[cur_opcode[i]]
+#define CONST(i) CONTEXT(interp->ctx)->constants[cur_opcode[i]]
 END
 }
 
@@ -114,7 +114,7 @@ sub expr_pop
 {
     my ($self) = @_;
 
-    return "pop_dest(interpreter)";
+    return "pop_dest(interp)";
 }
 
 our %arg_maps = (
@@ -162,7 +162,7 @@ sub restart_offset
 {
     my ($self, $offset) = @_;
 
-    return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
+    return "interp->resume_offset = REL_PC + $offset; interp->resume_flag = 1";
 }
 
 =item C<restart_address($address)>
@@ -175,7 +175,7 @@ sub restart_address
 {
     my ($self, $addr) = @_;
 
-    return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
+    return "interp->resume_offset = $addr; interp->resume_flag = 1";
 }
 
 =back

@@ -61,7 +61,7 @@
  *        code.
  */
 static Instruction *
-MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
+MK_I(Interp *interp, IMC_Unit * unit, const char * fmt, int n, ...)
 {
     char opname[64];
     char *p;
@@ -86,8 +86,8 @@ MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
         r[i] = va_arg(ap, SymReg *);
     }
     va_end(ap);
-    return INS(interpreter, unit, opname, fmt, r, n,
-               IMCC_INFO(interpreter)->keyvec, 1);
+    return INS(interp, unit, opname, fmt, r, n,
+               IMCC_INFO(interp)->keyvec, 1);
 }
 
 static Instruction*
@@ -239,16 +239,16 @@ static char * inv_op(char *op) {
 }
 
 Instruction *
-IMCC_create_itcall_label(Interp* interpreter)
+IMCC_create_itcall_label(Interp* interp)
 {
     char name[128];
     SymReg * r;
     Instruction *i;
 
-    sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, IMCC_INFO(interpreter)->cnr++);
-    r = mk_pcc_sub(interpreter, str_dup(name), 0);
-    i = iLABEL(interpreter, IMCC_INFO(interpreter)->cur_unit, r);
-    IMCC_INFO(interpreter)->cur_call = r;
+    sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
+    r = mk_pcc_sub(interp, str_dup(name), 0);
+    i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, r);
+    IMCC_INFO(interp)->cur_call = r;
     i->type = ITCALL | ITPCCSUB;
     return i;
 }

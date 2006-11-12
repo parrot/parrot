@@ -39,7 +39,7 @@ inline op fortytwo(out INT) {
 }
 
 inline op what_do_you_get_if_you_multiply_six_by_nine(out STR) {
-    $1 = string_from_cstring(interpreter, "fortytwo", 0);
+    $1 = string_from_cstring(interp, "fortytwo", 0);
     goto NEXT();
 }
 
@@ -63,7 +63,7 @@ Support for writing a very short quine.
 =cut
 
 op q() {
-    PIO_printf(interpreter, ".loadlib \"myops_ops\"\nq\n" );
+    PIO_printf(interp, ".loadlib \"myops_ops\"\nq\n" );
     HALT();
 }
 
@@ -90,13 +90,13 @@ Call alarm handler sub $3 after $1 time has elapsed, repeat after $2.
 =cut
 
 op alarm(in NUM, in PMC) {
-     Parrot_new_timer_event(interpreter, NULL, $1, 0.0, 0, $2,
+     Parrot_new_timer_event(interp, NULL, $1, 0.0, 0, $2,
      EVENT_TYPE_TIMER);
     goto NEXT();
 }
 
 op alarm(in NUM, in NUM, in PMC) {
-     Parrot_new_timer_event(interpreter, NULL, $1, $2, -1, $3,
+     Parrot_new_timer_event(interp, NULL, $1, $2, -1, $3,
      EVENT_TYPE_TIMER);
     goto NEXT();
 }

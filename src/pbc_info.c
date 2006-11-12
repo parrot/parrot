@@ -37,13 +37,13 @@ the name of each segment in the directory.
 */
 
 static INTVAL
-iter(Interp* interpreter,
+iter(Interp* interp,
                 struct PackFile_Segment *seg, void *user_data)
 {
     int ident = (int)user_data;
     printf("%*.0s%s\n", ident, "", seg->name);
     if (seg->type == PF_DIR_SEG)
-        PackFile_map_segments(interpreter, (struct PackFile_Directory*)seg,
+        PackFile_map_segments(interp, (struct PackFile_Directory*)seg,
                 iter, (void*)(ident+2));
     return 0;
 }
@@ -63,30 +63,30 @@ int
 main(int argc, char * argv[] )
 {
     struct PackFile *pf;
-    Interp *interpreter;
+    Interp *interp;
     struct PackFile_Segment *seg;
 
-    interpreter = Parrot_new(NULL);
+    interp = Parrot_new(NULL);
 
-    pf = Parrot_readbc(interpreter, argv[1]);
+    pf = Parrot_readbc(interp, argv[1]);
 
     /*
      * add some more segments
      */
-    seg = PackFile_Segment_new_seg(interpreter,
+    seg = PackFile_Segment_new_seg(interp,
                     &pf->directory, PF_DIR_SEG, "dir2", 1);
-    seg = PackFile_Segment_new_seg(interpreter,
+    seg = PackFile_Segment_new_seg(interp,
                     (struct PackFile_Directory*)seg, PF_BYTEC_SEG, "code", 1);
-    seg = PackFile_Segment_new_seg(interpreter,
+    seg = PackFile_Segment_new_seg(interp,
                     &pf->directory, PF_DIR_SEG, "dir3", 1);
 
     /*
      * show these
      */
     printf("%s\n", pf->directory.base.name);
-    PackFile_map_segments(interpreter, &pf->directory, iter, (void*)2);
+    PackFile_map_segments(interp, &pf->directory, iter, (void*)2);
 
-    Parrot_exit(interpreter, 0);
+    Parrot_exit(interp, 0);
     return 0;
 }
 

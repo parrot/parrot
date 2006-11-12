@@ -35,12 +35,12 @@ int exit_value = 0;
 
 int main(int argc, char* argv[])
 {
-    Parrot_Interp interpreter = Parrot_new(NULL);
-    Parrot_init_stacktop(interpreter, &interpreter);
+    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_init_stacktop(interp, &interp);
 
-    Parrot_run_native(interpreter, the_test);
+    Parrot_run_native(interp, the_test);
 
-    Parrot_exit(interpreter, exit_value);
+    Parrot_exit(interp, exit_value);
     return exit_value;
 }
 
@@ -49,7 +49,7 @@ CODE
 c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_new_hash");
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -59,15 +59,15 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    parrot_new_hash(interpreter, &hash);
+    parrot_new_hash(interp, &hash);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
 
-    PIO_eprintf(interpreter, "ok\n");
+    PIO_eprintf(interp, "ok\n");
 
     return NULL;
 }
@@ -79,7 +79,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_put");
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -92,20 +92,20 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    parrot_new_hash(interpreter, &hash);
+    parrot_new_hash(interp, &hash);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", 0);
+    key = string_from_cstring(interp, "fortytwo", 0);
     value.type = enum_hash_int;
     UVal_int(value.val) = 42;
-    parrot_hash_put(interpreter, hash, key, &value);
+    parrot_hash_put(interp, hash, key, &value);
 
-    PIO_eprintf(interpreter, "ok\n");
+    PIO_eprintf(interp, "ok\n");
 
     return NULL;
 }
@@ -117,7 +117,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get");
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -128,21 +128,21 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    parrot_new_hash(interpreter, &hash);
+    parrot_new_hash(interp, &hash);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", 0);
+    key = string_from_cstring(interp, "fortytwo", 0);
     value->type = enum_hash_int;
     UVal_int(value->val) = 42;
-    parrot_hash_put(interpreter, hash, key, value);
-    value = parrot_hash_get(interpreter, hash, key);
+    parrot_hash_put(interp, hash, key, value);
+    value = parrot_hash_get(interp, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", (int) UVal_int(value->val));
+    PIO_eprintf(interp, "%i\n", (int) UVal_int(value->val));
 
     return NULL;
 }
@@ -154,7 +154,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with NULL key");
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -165,10 +165,10 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    parrot_new_hash(interpreter, &hash);
+    parrot_new_hash(interp, &hash);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
@@ -181,13 +181,13 @@ the_test(Interp *interpreter,
      * it works now exactly as the next (empty key) case
      */
 
-    key = string_from_cstring(interpreter, NULL, 0);
+    key = string_from_cstring(interp, NULL, 0);
     value->type = enum_hash_int;
     UVal_int(value->val) = 42;
-    parrot_hash_put(interpreter, hash, key, value);
-    value = parrot_hash_get(interpreter, hash, key);
+    parrot_hash_put(interp, hash, key, value);
+    value = parrot_hash_get(interp, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", (int) UVal_int(value->val));
+    PIO_eprintf(interp, "%i\n", (int) UVal_int(value->val));
 
     return NULL;
 }
@@ -199,7 +199,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with empty string key");
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -210,21 +210,21 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    parrot_new_hash(interpreter, &hash);
+    parrot_new_hash(interp, &hash);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
 
-    key = string_from_cstring(interpreter, "", 0);
+    key = string_from_cstring(interp, "", 0);
     value->type = enum_hash_int;
     UVal_int(value->val) = 42;
-    parrot_hash_put(interpreter, hash, key, value);
-    value = parrot_hash_get(interpreter, hash, key);
+    parrot_hash_put(interp, hash, key, value);
+    value = parrot_hash_get(interp, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", UVal_int(value->val));
+    PIO_eprintf(interp, "%i\n", UVal_int(value->val));
 
     return NULL;
 }
@@ -238,7 +238,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with big key");
 #define BIGLEN 999999
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -250,12 +250,12 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    h = pmc_new(interpreter, enum_class_Hash);
+    h = pmc_new(interp, enum_class_Hash);
     hash = PMC_struct_val(h);
-    i = pmc_new(interpreter, enum_class_Integer);
+    i = pmc_new(interp, enum_class_Integer);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
@@ -263,13 +263,13 @@ the_test(Interp *interpreter,
     big = calloc(BIGLEN, sizeof(char));
     big = memset(big, 'x', BIGLEN - 1);
 
-    key = string_from_cstring(interpreter, big, 0);
+    key = string_from_cstring(interp, big, 0);
 
-    VTABLE_set_integer_native(interpreter, i, 42);
-    parrot_hash_put(interpreter, hash, key, i);
-    j = parrot_hash_get(interpreter, hash, key);
+    VTABLE_set_integer_native(interp, i, 42);
+    parrot_hash_put(interp, hash, key, i);
+    j = parrot_hash_get(interp, hash, key);
 
-    PIO_eprintf(interpreter, "%Pi\n", j);
+    PIO_eprintf(interp, "%Pi\n", j);
 
     return NULL;
 }
@@ -281,7 +281,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_size");
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -291,30 +291,30 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    parrot_new_hash(interpreter, &hash);
+    parrot_new_hash(interp, &hash);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", 0);
+    key = string_from_cstring(interp, "fortytwo", 0);
     value.type = enum_hash_int;
     UVal_int(value.val) = 42;
-    parrot_hash_put(interpreter, hash, key, &value);
+    parrot_hash_put(interp, hash, key, &value);
 
-    key = string_from_cstring(interpreter, "twocents", 0);
+    key = string_from_cstring(interp, "twocents", 0);
     value.type = enum_hash_num;
     UVal_num(value.val) = 0.02;
-    parrot_hash_put(interpreter, hash, key, &value);
+    parrot_hash_put(interp, hash, key, &value);
 
-    key = string_from_cstring(interpreter, "blurb", 0);
+    key = string_from_cstring(interp, "blurb", 0);
     value.type = enum_hash_string;
     UVal_str(value.val) = key;
-    parrot_hash_put(interpreter, hash, key, &value);
+    parrot_hash_put(interp, hash, key, &value);
 
-    PIO_eprintf(interpreter, "%i\n", parrot_hash_size(interpreter, hash));
+    PIO_eprintf(interp, "%i\n", parrot_hash_size(interp, hash));
 
     return NULL;
 }
@@ -326,7 +326,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_delete");
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -336,34 +336,34 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    parrot_new_hash(interpreter, &hash);
+    parrot_new_hash(interp, &hash);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", 0);
-    value = pmc_new(interpreter, enum_class_Integer);
-    VTABLE_set_integer_native(interpreter, value, 42);
-    parrot_hash_put(interpreter, hash, key, value);
+    key = string_from_cstring(interp, "fortytwo", 0);
+    value = pmc_new(interp, enum_class_Integer);
+    VTABLE_set_integer_native(interp, value, 42);
+    parrot_hash_put(interp, hash, key, value);
 
-    key = string_from_cstring(interpreter, "twocents", 0);
-    value = pmc_new(interpreter, enum_class_Float);
-    VTABLE_set_number_native(interpreter, value, 0.02);
-    parrot_hash_put(interpreter, hash, key, value);
+    key = string_from_cstring(interp, "twocents", 0);
+    value = pmc_new(interp, enum_class_Float);
+    VTABLE_set_number_native(interp, value, 0.02);
+    parrot_hash_put(interp, hash, key, value);
 
-    key = string_from_cstring(interpreter, "blurb", 0);
-    value = pmc_new(interpreter, enum_class_String);
-    VTABLE_set_string_native(interpreter, value, key);
-    parrot_hash_put(interpreter, hash, key, value);
+    key = string_from_cstring(interp, "blurb", 0);
+    value = pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, value, key);
+    parrot_hash_put(interp, hash, key, value);
 
-    PIO_eprintf(interpreter, "%i\n", parrot_hash_size(interpreter, hash));
+    PIO_eprintf(interp, "%i\n", parrot_hash_size(interp, hash));
 
-    parrot_hash_delete(interpreter, hash, key);
+    parrot_hash_delete(interp, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", parrot_hash_size(interpreter, hash));
+    PIO_eprintf(interp, "%i\n", parrot_hash_size(interp, hash));
 
     return NULL;
 }
@@ -376,7 +376,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_clone");
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -387,28 +387,28 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    parrot_new_hash(interpreter, &hash);
+    parrot_new_hash(interp, &hash);
 
     if ( hash == NULL ) {
-        PIO_eprintf(interpreter, "hash creation failed\n");
+        PIO_eprintf(interp, "hash creation failed\n");
         exit_value = 1;
         return NULL;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", 0);
-    value = pmc_new(interpreter, enum_class_Integer);
-    VTABLE_set_integer_native(interpreter, value, 42);
-    parrot_hash_put(interpreter, hash, key, value);
+    key = string_from_cstring(interp, "fortytwo", 0);
+    value = pmc_new(interp, enum_class_Integer);
+    VTABLE_set_integer_native(interp, value, 42);
+    parrot_hash_put(interp, hash, key, value);
 
-    value = parrot_hash_get(interpreter, hash, key);
+    value = parrot_hash_get(interp, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", (int)VTABLE_get_integer(interpreter, value));
+    PIO_eprintf(interp, "%i\n", (int)VTABLE_get_integer(interp, value));
 
-    parrot_hash_clone(interpreter, hash, &hash2);
+    parrot_hash_clone(interp, hash, &hash2);
 
-    value = parrot_hash_get(interpreter, hash2, key);
+    value = parrot_hash_get(interp, hash2, key);
 
-    PIO_eprintf(interpreter, "%i\n", (int)VTABLE_get_integer(interpreter, value));
+    PIO_eprintf(interp, "%i\n", (int)VTABLE_get_integer(interp, value));
 
     return NULL;
 }
@@ -421,7 +421,7 @@ OUTPUT
 my $code_setup = <<'CODE';
 
 static opcode_t*
-the_test(Interp *interpreter,
+the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
 {
     PMC *hash, *iter;
@@ -431,20 +431,20 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    hash = pmc_new(interpreter, enum_class_Hash);
+    hash = pmc_new(interp, enum_class_Hash);
 
 CODE
 
 my $code_loop_top = <<'CODE';
 
-    iter = VTABLE_get_iter(interpreter, hash);
+    iter = VTABLE_get_iter(interp, hash);
 
     for (;;) {
-        b = VTABLE_get_bool(interpreter, iter);
+        b = VTABLE_get_bool(interp, iter);
         if (!b)
             break;
-        k = VTABLE_shift_string(interpreter, iter);
-        v = VTABLE_get_integer_keyed_str(interpreter, hash, k);
+        k = VTABLE_shift_string(interp, iter);
+        v = VTABLE_get_integer_keyed_str(interp, hash, k);
         /* a few keys are in add order */
 
 CODE
@@ -452,7 +452,7 @@ CODE
 my $code_loop_end = <<'CODE';
 
     }
-    PIO_eprintf(interpreter, "\nok\n");
+    PIO_eprintf(interp, "\nok\n");
     return NULL;
 }
 
@@ -460,24 +460,24 @@ CODE
 
 c_output_is($main . $code_setup . <<'CODE1' . $code_loop_top . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration");
 
-    k    = const_string(interpreter, "a");
-    VTABLE_set_integer_keyed_str(interpreter, hash, k, 10);
+    k    = const_string(interp, "a");
+    VTABLE_set_integer_keyed_str(interp, hash, k, 10);
 
-    k    = const_string(interpreter, "b");
-    VTABLE_set_integer_keyed_str(interpreter, hash, k, 20);
+    k    = const_string(interp, "b");
+    VTABLE_set_integer_keyed_str(interp, hash, k, 20);
 
-    k    = const_string(interpreter, "c");
-    VTABLE_set_integer_keyed_str(interpreter, hash, k, 30);
+    k    = const_string(interp, "c");
+    VTABLE_set_integer_keyed_str(interp, hash, k, 30);
 
 CODE1
-        PIO_eprintf(interpreter, "%vd", v);
+        PIO_eprintf(interp, "%vd", v);
 CODE2
 102030
 ok
 OUTPUT
 
 c_output_is($main . $code_setup . $code_loop_top . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration on empty hash");
-        PIO_eprintf(interpreter, "%p,%vd", k, v);
+        PIO_eprintf(interp, "%p,%vd", k, v);
 CODE2
 
 ok

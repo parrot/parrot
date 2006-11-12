@@ -105,14 +105,14 @@ Destroys the continuation.
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
 #if CTX_LEAK_DEBUG
-            if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+            if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
                 fprintf(stderr,
                         "[destroy cont    %p, to_ctx %p, from_ctx %p]\n",
                         SELF, cc->to_ctx, cc->from_ctx);
             }
 #endif
             if (cc->from_ctx)
-                Parrot_free_context(interpreter, cc->from_ctx, 0);
+                Parrot_free_context(interp, cc->from_ctx, 0);
             mem_sys_free(cc);
             PMC_struct_val(SELF) = NULL;
         }
@@ -240,7 +240,7 @@ destination to continue execution.
         int ret_continuation_p
             = SELF->vtable->base_type == enum_class_RetContinuation;
 
-        if (interpreter->current_runloop_id != cc->runloop_id
+        if (interp->current_runloop_id != cc->runloop_id
             /* it's ok if we are exiting to "runloop 0"; there is no such
                runloop, but the only continuation that thinks it came from
                runloop 0 is for the return from the initial sub call. */
@@ -252,32 +252,32 @@ destination to continue execution.
             fprintf(stderr, "[oops; continuation %p of type %d "
                     "is trying to jump from runloop %d to runloop %d]\n",
                     SELF, (int) SELF->vtable->base_type,
-                    interpreter->current_runloop_id, cc->runloop_id);
+                    interp->current_runloop_id, cc->runloop_id);
         }
 #if CTX_LEAK_DEBUG
-        if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+        if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             fprintf(stderr,
                     "[invoke cont    %p, to_ctx %p, from_ctx %p (refs %d)]\n",
                     SELF, to_ctx, from_ctx, (int) from_ctx->ref_count);
         }
 #endif
         if (! to_ctx) {
-            real_exception(interpreter, NULL, INVALID_OPERATION,
+            real_exception(interp, NULL, INVALID_OPERATION,
                            "Continuation invoked after deactivation.");
         }
 
         /*
          * Rewind the dynamic environment.
          */
-        if (interpreter->dynamic_env != stack_target) {
+        if (interp->dynamic_env != stack_target) {
             /* compute the "stack delta", which is a measure of how much
                unwinding we have to do.  if negative, we have to pop that many
                entries; if positive, we are going back up the stack.
                [bug: this is not true rewinding.  -- rgr, 30-Sep-06.]
             */
             stack_delta
-                = ((int) stack_height(interpreter, stack_target)
-                   - (int) stack_height(interpreter, interpreter->dynamic_env));
+                = ((int) stack_height(interp, stack_target)
+                   - (int) stack_height(interp, interp->dynamic_env));
         }
         /* descend down the target stack until we get to the same depth. */
         corresponding_target = stack_target;
@@ -287,13 +287,13 @@ destination to continue execution.
         }
         /* both stacks are now at the same depth.  pop from both until we reach
            their common ancestor. */
-        while (interpreter->dynamic_env != corresponding_target) {
+        while (interp->dynamic_env != corresponding_target) {
             PMC *cleanup_sub = NULL;
             Stack_Entry_t *e;
 
-            if (! interpreter->dynamic_env)
+            if (! interp->dynamic_env)
                 internal_exception(1, "Control stack damaged");
-            e = stack_entry(interpreter, interpreter->dynamic_env, 0);
+            e = stack_entry(interp, interp->dynamic_env, 0);
             if (! e)
                 internal_exception(1, "Control stack damaged");
             if (e->entry_type == STACK_ENTRY_ACTION) {
@@ -307,11 +307,11 @@ destination to continue execution.
                 cleanup_sub = UVal_pmc(e->entry);
                 e->cleanup = STACK_CLEANUP_NULL;
             }
-            (void)stack_pop(INTERP, &interpreter->dynamic_env,
+            (void)stack_pop(INTERP, &interp->dynamic_env,
                             NULL, NO_STACK_ENTRY_TYPE);
             if (cleanup_sub) {
                 /* Now it's safe to run. */
-                Parrot_runops_fromc_args(interpreter, cleanup_sub,
+                Parrot_runops_fromc_args(interp, cleanup_sub,
                                          "vI", exception_continuation_p);
             }
 
@@ -329,7 +329,7 @@ destination to continue execution.
         /* run back up the target stack to our destination.  [when we support
            dynamic binding (e.g.), we will have to traverse back up, and will
            therefore need to keep track on the way down.  -- rgr, 30-Sep-06.] */
-        interpreter->dynamic_env = stack_target;
+        interp->dynamic_env = stack_target;
 
         /* debug print before context is switched */
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
@@ -337,7 +337,7 @@ destination to continue execution.
 
             PIO_eprintf(INTERP, "# Back in sub '%Ss', env %p\n",
                         Parrot_full_sub_name(INTERP, sub),
-                        interpreter->dynamic_env);
+                        interp->dynamic_env);
         }
 
         /*

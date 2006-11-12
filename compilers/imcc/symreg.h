@@ -131,7 +131,7 @@ void add_pcc_result(SymReg *r, SymReg * arg);
 void add_pcc_param(SymReg *r, SymReg * arg);
 void add_pcc_return(SymReg *r, SymReg * arg);
 void add_pcc_multi(SymReg *r, SymReg * arg);
-void add_namespace(Parrot_Interp interpreter, struct _IMC_Unit *);
+void add_namespace(Parrot_Interp interp, struct _IMC_Unit *);
 
 typedef enum {
     P_NONE           = 0x00,                  /* 0<<0 */
@@ -179,11 +179,11 @@ SymReg * mk_pasm_reg(Interp*, char *);
 
 
 void free_sym(SymReg *r);
-void store_symreg(Interp* interpreter, SymReg * r);
+void store_symreg(Interp *interp, SymReg * r);
 SymReg * find_sym(Interp *, const char * name);
-SymReg * get_sym(Interp* interpreter, const char * name);
-SymReg* get_pasm_reg(Interp* interpreter, char *name);
-SymReg* get_const(Interp *interpreter, const char *name, int type);
+SymReg * get_sym(Interp *interp, const char * name);
+SymReg* get_pasm_reg(Interp *interp, char *name);
+SymReg* get_const(Interp *interp, const char *name, int type);
 SymReg * _get_sym(SymHash *hash, const char * name);
 SymReg * _mk_symreg(SymHash *hash,char * name, int t);
 void   create_symhash(SymHash *hash);

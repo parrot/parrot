@@ -32,7 +32,7 @@ Handles the accessing of small object pools (header pools).
 /*
 
 =item C<INTVAL
-contained_in_pool(Interp *interpreter,
+contained_in_pool(Interp *interp,
         struct Small_Object_Pool *pool, void *ptr)>
 
 Returns whether C<pool> contains C<*ptr>.
@@ -42,7 +42,7 @@ Returns whether C<pool> contains C<*ptr>.
 */
 
 INTVAL
-contained_in_pool(Interp *interpreter,
+contained_in_pool(Interp *interp,
         struct Small_Object_Pool *pool, void *ptr)
 {
     struct Small_Object_Arena *arena;
@@ -65,7 +65,7 @@ contained_in_pool(Interp *interpreter,
 /*
 
 =item C<int
-Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)>
+Parrot_is_const_pmc(Parrot_Interp interp, PMC *pmc)>
 
 Returns whether C<*pmc> is a constant PMC.
 
@@ -74,12 +74,12 @@ Returns whether C<*pmc> is a constant PMC.
 */
 
 int
-Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)
+Parrot_is_const_pmc(Parrot_Interp interp, PMC *pmc)
 {
     struct Small_Object_Pool * const pool
-        = interpreter->arena_base->constant_pmc_pool;
+        = interp->arena_base->constant_pmc_pool;
     int c;
-    c = contained_in_pool(interpreter, pool, pmc);
+    c = contained_in_pool(interp, pool, pmc);
 
     /* some paranoia first */
     assert(!!PObj_constant_TEST(pmc) == !!c);
@@ -90,7 +90,7 @@ Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)
 /*
 
 =item C<void
-more_traceable_objects(Interp *interpreter,
+more_traceable_objects(Interp *interp,
         struct Small_Object_Pool *pool)>
 
 We're out of traceable objects. Try a DOD, then get some more if needed.
@@ -100,7 +100,7 @@ We're out of traceable objects. Try a DOD, then get some more if needed.
 */
 
 static void
-more_traceable_objects(Interp *interpreter,
+more_traceable_objects(Interp *interp,
         struct Small_Object_Pool *pool)
 {
     if (pool->skip)
@@ -109,7 +109,7 @@ more_traceable_objects(Interp *interpreter,
         struct Small_Object_Arena * const arena = pool->last_Arena;
         if (arena) {
             if (arena->used == arena->total_objects)
-                Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+                Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
             if (pool->num_free_objects <= pool->replenish_level)
                 pool->skip = 1;
         }
@@ -118,7 +118,7 @@ more_traceable_objects(Interp *interpreter,
     /* requires that num_free_objects be updated in Parrot_do_dod_run. If dod
      * is disabled, then we must check the free list directly. */
     if (!pool->free_list) {
-        (*pool->alloc_objects) (interpreter, pool);
+        (*pool->alloc_objects) (interp, pool);
     }
 }
 
@@ -126,13 +126,13 @@ more_traceable_objects(Interp *interpreter,
 /*
 
 =item C<static void
-gc_ms_add_free_object(Interp *interpreter,
+gc_ms_add_free_object(Interp *interp,
         struct Small_Object_Pool *pool, void *to_add)>
 
 Add an unused object back to the free pool for later reuse.
 
 =item C<static void *
-gc_ms_get_free_object(Interp *interpreter,
+gc_ms_get_free_object(Interp *interp,
         struct Small_Object_Pool *pool)>
 
 Get a new object from the free pool and return it.
@@ -142,7 +142,7 @@ Get a new object from the free pool and return it.
 */
 
 static void
-gc_ms_add_free_object(Interp *interpreter,
+gc_ms_add_free_object(Interp *interp,
         struct Small_Object_Pool *pool, void *to_add)
 {
     *(void **)to_add = pool->free_list;
@@ -151,14 +151,14 @@ gc_ms_add_free_object(Interp *interpreter,
 
 
 static void *
-gc_ms_get_free_object(Interp *interpreter,
+gc_ms_get_free_object(Interp *interp,
         struct Small_Object_Pool *pool)
 {
     void *ptr;
 
     /* if we don't have any objects */
     if (!pool->free_list)
-        (*pool->more_objects) (interpreter, pool);
+        (*pool->more_objects) (interp, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
     PObj_flags_SETTO( (PObj*) ptr, 0);
@@ -169,7 +169,7 @@ gc_ms_get_free_object(Interp *interpreter,
 /*
 
 =item C< void
-Parrot_add_to_free_list(Interp *interpreter,
+Parrot_add_to_free_list(Interp *interp,
         struct Small_Object_Pool *pool,
         struct Small_Object_Arena *arena,
         UINTVAL start,
@@ -182,7 +182,7 @@ Adds the memory between C<start> and C<end> to the free list.
 */
 
 void
-Parrot_add_to_free_list(Interp *interpreter,
+Parrot_add_to_free_list(Interp *interp,
         struct Small_Object_Pool *pool,
         struct Small_Object_Arena *arena,
         UINTVAL start,
@@ -204,7 +204,7 @@ Parrot_add_to_free_list(Interp *interpreter,
          * free_list
          */
         PObj_buflen((PObj*)object) = 0;
-        pool->add_free_object (interpreter, pool, object);
+        pool->add_free_object (interp, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }
     pool->num_free_objects += end - start;
@@ -214,7 +214,7 @@ Parrot_add_to_free_list(Interp *interpreter,
  * insert the new arena into the pool's structure, update stats
  */
 void
-Parrot_append_arena_in_pool(Interp *interpreter, struct Small_Object_Pool *pool,
+Parrot_append_arena_in_pool(Interp *interp, struct Small_Object_Pool *pool,
     struct Small_Object_Arena *new_arena, size_t size)
 {
 
@@ -234,13 +234,13 @@ Parrot_append_arena_in_pool(Interp *interpreter, struct Small_Object_Pool *pool,
         new_arena->prev->next = new_arena;
     }
     pool->last_Arena = new_arena;
-    interpreter->arena_base->header_allocs_since_last_collect++;
+    interp->arena_base->header_allocs_since_last_collect++;
 }
 
 /*
 
 =item C<static void
-gc_ms_alloc_objects(Interp *interpreter,
+gc_ms_alloc_objects(Interp *interp,
         struct Small_Object_Pool *pool)>
 
 We have no more headers on the free header pool. Go allocate more
@@ -251,7 +251,7 @@ and put them on.
 */
 
 static void
-gc_ms_alloc_objects(Interp *interpreter, struct Small_Object_Pool *pool)
+gc_ms_alloc_objects(Interp *interp, struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
     size_t size;
@@ -265,14 +265,14 @@ gc_ms_alloc_objects(Interp *interpreter, struct Small_Object_Pool *pool)
     /* could be mem_internal_allocate too, but calloc is fast */
     new_arena->start_objects = mem_internal_allocate_zeroed(size);
 
-    Parrot_append_arena_in_pool(interpreter, pool, new_arena, size);
+    Parrot_append_arena_in_pool(interp, pool, new_arena, size);
 
     start = 0;
     end = pool->objects_per_alloc;
-    Parrot_add_to_free_list(interpreter, pool, new_arena, start, end);
+    Parrot_add_to_free_list(interp, pool, new_arena, start, end);
 
     /* Allocate more next time */
-    if (GC_DEBUG(interpreter)) {
+    if (GC_DEBUG(interp)) {
         pool->objects_per_alloc *= GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR;
         pool->replenish_level =
                 (size_t)(pool->total_objects *
@@ -295,7 +295,7 @@ gc_ms_alloc_objects(Interp *interpreter, struct Small_Object_Pool *pool)
 /*
 
 =item C<struct Small_Object_Pool *
-new_small_object_pool(Interp *interpreter,
+new_small_object_pool(Interp *interp,
         size_t object_size, size_t objects_per_alloc)>
 
 Creates a new C<Small_Object_Pool> and returns a pointer to it.
@@ -306,7 +306,7 @@ Creates a new C<Small_Object_Pool> and returns a pointer to it.
 
 
 struct Small_Object_Pool *
-new_small_object_pool(Interp *interpreter,
+new_small_object_pool(Interp *interp,
         size_t object_size, size_t objects_per_alloc)
 {
     struct Small_Object_Pool * const pool =
@@ -321,7 +321,7 @@ new_small_object_pool(Interp *interpreter,
 }
 
 void
-gc_pmc_ext_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
+gc_pmc_ext_pool_init(Interp *interp, struct Small_Object_Pool *pool)
 {
     pool->add_free_object = gc_ms_add_free_object;
     pool->get_free_object = gc_ms_get_free_object;
@@ -330,7 +330,7 @@ gc_pmc_ext_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
 }
 
 static void
-gc_ms_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
+gc_ms_pool_init(Interp *interp, struct Small_Object_Pool *pool)
 {
     pool->add_free_object = gc_ms_add_free_object;
     pool->get_free_object = gc_ms_get_free_object;
@@ -340,7 +340,7 @@ gc_ms_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
 
 /*
 
-=item C<void Parrot_gc_ms_init(Interp* interpreter)>
+=item C<void Parrot_gc_ms_init(Interp *interp)>
 
 Initialize the state structures of the gc system. Called immediately before
 creation of memory pools. This function must set the function pointers
@@ -352,9 +352,9 @@ C<more_object_fn>.
 */
 
 void
-Parrot_gc_ms_init(Interp* interpreter)
+Parrot_gc_ms_init(Interp *interp)
 {
-    struct Arenas * const arena_base = interpreter->arena_base;
+    struct Arenas * const arena_base = interp->arena_base;
 
     arena_base->do_dod_run = Parrot_dod_ms_run;
     arena_base->de_init_gc_system = (void (*)(Interp*)) NULLfunc;
@@ -364,7 +364,7 @@ Parrot_gc_ms_init(Interp* interpreter)
 /*
 
 =item C<void
-Parrot_small_object_pool_merge(Interp *interpreter,
+Parrot_small_object_pool_merge(Interp *interp,
             struct Small_Object_Pool *dest, struct Small_Object_Pool *source)>
 
 Merge C<source> into C<dest>.
@@ -374,7 +374,7 @@ Merge C<source> into C<dest>.
 */
 
 void
-Parrot_small_object_pool_merge(Interp *interpreter,
+Parrot_small_object_pool_merge(Interp *interp,
         struct Small_Object_Pool *dest, struct Small_Object_Pool *source) {
     struct Small_Object_Arena *cur_arena;
     struct Small_Object_Arena *next_arena;
@@ -413,7 +413,7 @@ Parrot_small_object_pool_merge(Interp *interpreter,
 
         total_objects = cur_arena->total_objects;
 
-        Parrot_append_arena_in_pool(interpreter, dest, cur_arena,
+        Parrot_append_arena_in_pool(interp, dest, cur_arena,
             cur_arena->total_objects);
 
         cur_arena->total_objects = total_objects; /* XXX needed? */

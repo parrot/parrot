@@ -39,7 +39,7 @@ sub defines
 #define NREG(i) REG_NUM(i)
 #define PREG(i) REG_PMC(i)
 #define SREG(i) REG_STR(i)
-#define CONST(i) interpreter->code->const_table->constants[i]
+#define CONST(i) interp->code->const_table->constants[i]
 END
 }
 
@@ -166,7 +166,7 @@ sub goto_pop
 {
     my ($self) = @_;
 
-    return "cur_opcode = pop_dest(interpreter);\ngoto switch_label";
+    return "cur_opcode = pop_dest(interp);\ngoto switch_label";
 }
 
 my %arg_maps = (

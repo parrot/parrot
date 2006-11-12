@@ -31,7 +31,7 @@
 /*
  * and a set of macros to access a register by offset, used
  * in JIT emit prederef code
- * The offsets are relative to interpreter->ctx.bp.
+ * The offsets are relative to interp->ctx.bp.
  *
  * Reg order in imcc/reg_alloc.c is "INSP"   TODO make defines
  */
@@ -41,7 +41,7 @@
 #define REGNO_STR 2
 #define REGNO_PMC 3
 
-#  define __CTX interpreter->ctx.state
+#  define __CTX interp->ctx.state
 #  define _SIZEOF_INTS    (sizeof(INTVAL) * __CTX->n_regs_used[REGNO_INT])
 #  define _SIZEOF_NUMS    (sizeof(FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
 #  define _SIZEOF_PMCS    (sizeof(PMC*) * __CTX->n_regs_used[REGNO_PMC])
@@ -57,10 +57,10 @@
 /*
  * same with the default name interpreter
  */
-#define REG_INT(x) INTERP_REG_INT(interpreter, x)
-#define REG_NUM(x) INTERP_REG_NUM(interpreter, x)
-#define REG_STR(x) INTERP_REG_STR(interpreter, x)
-#define REG_PMC(x) INTERP_REG_PMC(interpreter, x)
+#define REG_INT(x) INTERP_REG_INT(interp, x)
+#define REG_NUM(x) INTERP_REG_NUM(interp, x)
+#define REG_STR(x) INTERP_REG_STR(interp, x)
+#define REG_PMC(x) INTERP_REG_PMC(interp, x)
 
 
 struct Stack_Chunk;
@@ -87,7 +87,7 @@ void create_initial_context(Interp *);
 void destroy_context(Interp *);
 
 void setup_register_stacks(Interp*);
-void mark_register_stack(Interp* interpreter,
+void mark_register_stack(Interp* interp,
                              struct Stack_Chunk* stack);
 
 #endif /* PARROT_REGISTER_H_GUARD */

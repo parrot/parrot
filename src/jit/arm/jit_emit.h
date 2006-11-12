@@ -609,7 +609,7 @@ static void emit_jump_to_op(Parrot_jit_info_t *jit_info, arm_cond_t cond,
 
 static char *
 emit_load_constant_from_pool (char *pc,
-                              Interp *interpreter,
+                              Interp *interp,
                               arm_cond_t cond,
                               int value,
                               arm_register_t hwreg)
@@ -635,7 +635,7 @@ emit_load_constant_from_pool (char *pc,
 
 static char *
 emit_load_constant (char *pc,
-                    Interp *interpreter,
+                    Interp *interp,
                     arm_cond_t cond,
                     int value,
                     arm_register_t hwreg)
@@ -653,27 +653,27 @@ emit_load_constant (char *pc,
                                    immediate.value, immediate.rotation);
     }
     else {
-        pc = emit_load_constant_from_pool (pc, interpreter, cond, value, hwreg);
+        pc = emit_load_constant_from_pool (pc, interp, cond, value, hwreg);
     }
     return pc;
 }
 
 static void
 Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
-                    Interp *interpreter,
+                    Interp *interp,
                     arm_cond_t cond,
                     int param,
                     arm_register_t hwreg)
 {
     opcode_t op_type
-        = interpreter->op_info_table[*jit_info->cur_op].types[param];
+        = interp->op_info_table[*jit_info->cur_op].types[param];
     int val = jit_info->cur_op[param];
     int offset;
 
     switch(op_type){
         case PARROT_ARG_I:
-            offset = ((char *)&interpreter->int_reg.registers[val])
-                - (char *)interpreter;
+            offset = ((char *)&interp->int_reg.registers[val])
+                - (char *)interp;
             if (offset > 4095) {
                 internal_exception(JIT_ERROR,
                                    "integer load register %d generates offset %d, larger than 4095\n",
@@ -690,7 +690,7 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
             break;
         case PARROT_ARG_IC:
             jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
-                                                       interpreter,
+                                                       interp,
                                                        cond,
                                                        val,
                                                        hwreg);
@@ -704,20 +704,20 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
-                     Interp *interpreter,
+                     Interp *interp,
                      arm_cond_t cond,
                      int param,
                      arm_register_t hwreg)
 {
     opcode_t op_type
-         = interpreter->op_info_table[*jit_info->cur_op].types[param];
+         = interp->op_info_table[*jit_info->cur_op].types[param];
     int val = jit_info->cur_op[param];
     int offset;
 
     switch(op_type){
         case PARROT_ARG_I:
-            offset = ((char *)&interpreter->int_reg.registers[val])
-                - (char *)interpreter;
+            offset = ((char *)&interp->int_reg.registers[val])
+                - (char *)interp;
             if (offset > 4095) {
                 internal_exception(JIT_ERROR,
                                    "integer store register %d generates offset %d, larger than 4095\n",
@@ -743,7 +743,7 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
-                                  Interp *interpreter,
+                                  Interp *interp,
                                   arm_cond_t cond,
                                   enum constant_state alternate_on,
                                   alu_op_t normal, alu_op_t alternative,
@@ -751,7 +751,7 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
 {
     struct constant val;
 
-    Parrot_jit_int_load(jit_info, interpreter, cond, src, r0);
+    Parrot_jit_int_load(jit_info, interp, cond, src, r0);
 
     constant_neg (const_val, &val);
 
@@ -770,13 +770,13 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
     else {
         /* Else we load it into a reg the slow way. */
         jit_info->native_ptr
-            = emit_load_constant_from_pool (jit_info->native_ptr, interpreter,
+            = emit_load_constant_from_pool (jit_info->native_ptr, interp,
                                             cond, const_val, r1);
         jit_info->native_ptr
             = emit_arith_reg (jit_info->native_ptr, cond, normal, 0,
                               r0, r0, r1);
     }
-    Parrot_jit_int_store(jit_info, interpreter, cond, dest, r0);
+    Parrot_jit_int_store(jit_info, interp, cond, dest, r0);
 }
 
 #define Parrot_jit_arith_const_neg(ji, i, cond, plus, minus, dest, src, const_val) \
@@ -804,13 +804,13 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
 */
 static void
 Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
-                         Interp *interpreter,
+                         Interp *interp,
                          int src, int const_val, int where_to,
                          arm_cond_t when)
 {
     struct constant val;
 
-    Parrot_jit_int_load(jit_info, interpreter, cond_AL, src, r0);
+    Parrot_jit_int_load(jit_info, interp, cond_AL, src, r0);
 
     constant_neg (const_val, &val);
 
@@ -824,7 +824,7 @@ Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
     else {
         /* Else we load it into a reg the slow way. */
         jit_info->native_ptr
-            = emit_load_constant_from_pool (jit_info->native_ptr, interpreter,
+            = emit_load_constant_from_pool (jit_info->native_ptr, interp,
                                             cond_AL, const_val, r1);
         jit_info->native_ptr
             = emit_arith_reg (jit_info->native_ptr, cond_AL, CMP, 0, 0, r0, r1);
@@ -834,7 +834,7 @@ Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
-                         Interp * interpreter,
+                         Interp * interp,
                          arm_register_t reg)
 {
     /* This is effectively the pseudo-opcode ldr - ie load relative to PC.
@@ -852,14 +852,14 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr,
                      ((int) jit_info->arena.op_map) -
-                     ((int) interpreter->code->base.code));
+                     ((int) interp->code->base.code));
 }
 
 #endif /* JIT_EMIT */
 #if JIT_EMIT == 2
 
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                        Interp * interpreter)
+                        Interp *interp)
 {
     Parrot_jit_fixup_t *fixup = jit_info->arena.fixups;
 
@@ -894,7 +894,7 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp * interpreter)
+                 Interp *interp)
 {
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG12_ip, REG13_sp);
     jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
@@ -912,7 +912,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     /* TODO emit restart code s. i386
      *
      * emit get r0 from stack
-     * Parrot_jump_to_op_in_reg(jit_info, interpreter, r0);
+     * Parrot_jump_to_op_in_reg(jit_info, interp, r0);
      */
 }
 
@@ -949,7 +949,7 @@ need to adr beyond:
 */
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
+                     Interp *interp)
 {
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, r1, r4);
 #ifndef ARM_K_BUG
@@ -974,40 +974,40 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         = emit_word (jit_info->native_ptr, (int) jit_info->cur_op);
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr,
-                     (int) interpreter->op_func_table[*(jit_info->cur_op)]);
+                     (int) interp->op_func_table[*(jit_info->cur_op)]);
 }
 
 /* We get back address of opcode in bytecode.
    We want address of equivalent bit of jit code, which is stored as an
    address at the same offset in a jit table. */
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                        Interp * interpreter)
+                        Interp *interp)
 {
-    Parrot_jit_normal_op(jit_info, interpreter);
-    Parrot_jump_to_op_in_reg(jit_info, interpreter, r0);
+    Parrot_jit_normal_op(jit_info, interp);
+    Parrot_jump_to_op_in_reg(jit_info, interp, r0);
 }
 
 /* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr(Interp *interp, char *mem, int reg)
 {
 }
 
 /* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm(Interp *interp, int reg, char *mem)
 {
 }
 
 /* move reg to mem (i.e. numreg) */
 void
-Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr_n(Interp *interp, char *mem, int reg)
 {
 }
 
 /* move mem (i.e. numreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm_n(Interp *interp, int reg, char *mem)
 {
 }
 

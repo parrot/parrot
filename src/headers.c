@@ -37,7 +37,7 @@ Handles getting of various headers, and pool creation.
 =over 4
 
 =item C<static void *
-get_free_buffer(Interp *interpreter,
+get_free_buffer(Interp *interp,
         struct Small_Object_Pool *pool)>
 
 Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
@@ -47,10 +47,10 @@ Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 */
 
 static void *
-get_free_buffer(Interp *interpreter,
+get_free_buffer(Interp *interp,
         struct Small_Object_Pool *pool)
 {
-    PObj *buffer = pool->get_free_object(interpreter, pool);
+    PObj *buffer = pool->get_free_object(interp, pool);
 
     /* don't mess around with flags */
     PObj_bufstart(buffer) = NULL;
@@ -71,7 +71,7 @@ get_free_buffer(Interp *interpreter,
 =over 4
 
 =item C<struct Small_Object_Pool *
-new_pmc_pool(Interp *interpreter)>
+new_pmc_pool(Interp *interp)>
 
 Creates an new pool for PMCs and returns it.
 
@@ -80,21 +80,21 @@ Creates an new pool for PMCs and returns it.
 */
 
 struct Small_Object_Pool *
-new_pmc_pool(Interp *interpreter)
+new_pmc_pool(Interp *interp)
 {
     int num_headers = PMC_HEADERS_PER_ALLOC;
     struct Small_Object_Pool *pmc_pool =
-        new_small_object_pool(interpreter, sizeof(PMC), num_headers);
+        new_small_object_pool(interp, sizeof(PMC), num_headers);
 
     pmc_pool->mem_pool = NULL;
-    (interpreter->arena_base->init_pool)(interpreter, pmc_pool);
+    (interp->arena_base->init_pool)(interp, pmc_pool);
     return pmc_pool;
 }
 
 /*
 
 =item C<struct Small_Object_Pool *
-new_bufferlike_pool(Interp *interpreter,
+new_bufferlike_pool(Interp *interp,
         size_t actual_buffer_size)>
 
 Creates a new pool for buffer-like structures. Usually you would need
@@ -105,24 +105,24 @@ C<make_bufferlike_pool()>.
 */
 
 struct Small_Object_Pool *
-new_bufferlike_pool(Interp *interpreter,
+new_bufferlike_pool(Interp *interp,
         size_t actual_buffer_size)
 {
     int num_headers = BUFFER_HEADERS_PER_ALLOC;
     size_t buffer_size =
             (actual_buffer_size + sizeof(void *) - 1) & ~(sizeof(void *) - 1);
     struct Small_Object_Pool *pool =
-            new_small_object_pool(interpreter, buffer_size, num_headers);
+            new_small_object_pool(interp, buffer_size, num_headers);
 
-    pool->mem_pool = interpreter->arena_base->memory_pool;
-    (interpreter->arena_base->init_pool)(interpreter, pool);
+    pool->mem_pool = interp->arena_base->memory_pool;
+    (interp->arena_base->init_pool)(interp, pool);
     return pool;
 }
 
 /*
 
 =item C<struct Small_Object_Pool *
-new_buffer_pool(Interp *interpreter)>
+new_buffer_pool(Interp *interp)>
 
 Non-constant strings and plain Buffers are in the sized header pools.
 
@@ -131,15 +131,15 @@ Non-constant strings and plain Buffers are in the sized header pools.
 */
 
 struct Small_Object_Pool *
-new_buffer_pool(Interp *interpreter)
+new_buffer_pool(Interp *interp)
 {
-    return make_bufferlike_pool(interpreter, sizeof(Buffer));
+    return make_bufferlike_pool(interp, sizeof(Buffer));
 }
 
 /*
 
 =item C<struct Small_Object_Pool *
-new_string_pool(Interp *interpreter, INTVAL constant)>
+new_string_pool(Interp *interp, INTVAL constant)>
 
 Creates a new pool for C<STRINGS> and returns it.
 
@@ -148,15 +148,15 @@ Creates a new pool for C<STRINGS> and returns it.
 */
 
 struct Small_Object_Pool *
-new_string_pool(Interp *interpreter, INTVAL constant)
+new_string_pool(Interp *interp, INTVAL constant)
 {
     struct Small_Object_Pool *pool;
     if (constant) {
-        pool = new_bufferlike_pool(interpreter, sizeof(STRING));
-        pool->mem_pool = interpreter->arena_base->constant_string_pool;
+        pool = new_bufferlike_pool(interp, sizeof(STRING));
+        pool->mem_pool = interp->arena_base->constant_string_pool;
     }
     else
-        pool = make_bufferlike_pool(interpreter, sizeof(STRING));
+        pool = make_bufferlike_pool(interp, sizeof(STRING));
     pool->objects_per_alloc = STRING_HEADERS_PER_ALLOC;
     return pool;
 }
@@ -164,7 +164,7 @@ new_string_pool(Interp *interpreter, INTVAL constant)
 /*
 
 =item C<struct Small_Object_Pool *
-make_bufferlike_pool(Interp *interpreter, size_t buffer_size)>
+make_bufferlike_pool(Interp *interp, size_t buffer_size)>
 
 Make and return a bufferlike header pool.
 
@@ -173,12 +173,12 @@ Make and return a bufferlike header pool.
 */
 
 struct Small_Object_Pool *
-make_bufferlike_pool(Interp *interpreter, size_t buffer_size)
+make_bufferlike_pool(Interp *interp, size_t buffer_size)
 {
     UINTVAL idx;
-    UINTVAL num_old = interpreter->arena_base->num_sized;
+    UINTVAL num_old = interp->arena_base->num_sized;
     struct Small_Object_Pool **sized_pools =
-            interpreter->arena_base->sized_header_pools;
+            interp->arena_base->sized_header_pools;
 
     idx = (buffer_size - sizeof(Buffer)) / sizeof(void *);
 
@@ -189,12 +189,12 @@ make_bufferlike_pool(Interp *interpreter, size_t buffer_size)
                                            num_new * sizeof(void *));
         memset(sized_pools + num_old, 0, sizeof(void *) * (num_new - num_old));
 
-        interpreter->arena_base->sized_header_pools = sized_pools;
-        interpreter->arena_base->num_sized = num_new;
+        interp->arena_base->sized_header_pools = sized_pools;
+        interp->arena_base->num_sized = num_new;
     }
 
     if (sized_pools[idx] == NULL) {
-        sized_pools[idx] = new_bufferlike_pool(interpreter, buffer_size);
+        sized_pools[idx] = new_bufferlike_pool(interp, buffer_size);
     }
 
     return sized_pools[idx];
@@ -203,7 +203,7 @@ make_bufferlike_pool(Interp *interpreter, size_t buffer_size)
 /*
 
 =item C<struct Small_Object_Pool *
-get_bufferlike_pool(Interp *interpreter, size_t buffer_size)>
+get_bufferlike_pool(Interp *interp, size_t buffer_size)>
 
 Return a bufferlike header pool, it must exist.
 
@@ -212,10 +212,10 @@ Return a bufferlike header pool, it must exist.
 */
 
 struct Small_Object_Pool *
-get_bufferlike_pool(Interp *interpreter, size_t buffer_size)
+get_bufferlike_pool(Interp *interp, size_t buffer_size)
 {
     struct Small_Object_Pool **sized_pools =
-            interpreter->arena_base->sized_header_pools;
+            interp->arena_base->sized_header_pools;
 
     return sized_pools[ (buffer_size - sizeof(Buffer)) / sizeof(void *) ];
 }
@@ -223,7 +223,7 @@ get_bufferlike_pool(Interp *interpreter, size_t buffer_size)
 /*
 
 =item C<PMC *
-new_pmc_header(Interp *interpreter)>
+new_pmc_header(Interp *interp)>
 
 Get a header.
 
@@ -234,21 +234,21 @@ Get a header.
 static PMC_EXT * new_pmc_ext(Parrot_Interp);
 
 PMC *
-new_pmc_header(Interp *interpreter, UINTVAL flags)
+new_pmc_header(Interp *interp, UINTVAL flags)
 {
     struct Small_Object_Pool *pool;
     PMC *pmc;
 
     pool = flags & PObj_constant_FLAG ?
-        interpreter->arena_base->constant_pmc_pool :
-        interpreter->arena_base->pmc_pool;
-    pmc = pool->get_free_object(interpreter, pool);
+        interp->arena_base->constant_pmc_pool :
+        interp->arena_base->pmc_pool;
+    pmc = pool->get_free_object(interp, pool);
     /* clear flags, set is_PMC_FLAG */
     if (flags & PObj_is_PMC_EXT_FLAG) {
         flags |= PObj_is_special_PMC_FLAG;
-        pmc->pmc_ext = new_pmc_ext(interpreter);
+        pmc->pmc_ext = new_pmc_ext(interp);
         if (flags & PObj_is_PMC_shared_FLAG) {
-            add_pmc_sync(interpreter, pmc);
+            add_pmc_sync(interp, pmc);
         }
     }
     else
@@ -264,7 +264,7 @@ new_pmc_header(Interp *interpreter, UINTVAL flags)
 /*
 
 =item C<PMC_EXT *
-new_pmc_ext(Interp *interpreter)>
+new_pmc_ext(Interp *interp)>
 
 Creates a new C<PMC_EXT> and returns it.
 
@@ -273,16 +273,16 @@ Creates a new C<PMC_EXT> and returns it.
 */
 
 static PMC_EXT *
-new_pmc_ext(Interp *interpreter)
+new_pmc_ext(Interp *interp)
 {
-    struct Small_Object_Pool *pool = interpreter->arena_base->pmc_ext_pool;
+    struct Small_Object_Pool *pool = interp->arena_base->pmc_ext_pool;
     void *ptr;
     /*
      * can't use normal get_free_object--PMC_EXT doesn't have flags
      * it isn't a Buffer
      */
     if (!pool->free_list)
-        (*pool->more_objects) (interpreter, pool);
+        (*pool->more_objects) (interp, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
     memset(ptr, 0, sizeof(PMC_EXT));
@@ -292,7 +292,7 @@ new_pmc_ext(Interp *interpreter)
 /*
 
 =item C<void
-add_pmc_ext(Interp *interpreter, PMC *pmc)>
+add_pmc_ext(Interp *interp, PMC *pmc)>
 
 Adds a new C<PMC_EXT> to C<pmc>.
 
@@ -301,9 +301,9 @@ Adds a new C<PMC_EXT> to C<pmc>.
 */
 
 void
-add_pmc_ext(Interp *interpreter, PMC *pmc)
+add_pmc_ext(Interp *interp, PMC *pmc)
 {
-    pmc->pmc_ext = new_pmc_ext(interpreter);
+    pmc->pmc_ext = new_pmc_ext(interp);
     PObj_is_PMC_EXT_SET(pmc);
 #ifdef PARROT_GC_IMS
     /*
@@ -319,7 +319,7 @@ add_pmc_ext(Interp *interpreter, PMC *pmc)
 /*
 
 =item C<PMC *
-add_pmc_sync(Interp *interpreter, PMC *pmc)>
+add_pmc_sync(Interp *interp, PMC *pmc)>
 
 Adds a PMC_sync field to C<pmc>.
 
@@ -328,20 +328,20 @@ Adds a PMC_sync field to C<pmc>.
 */
 
 void
-add_pmc_sync(Interp *interpreter, PMC *pmc)
+add_pmc_sync(Interp *interp, PMC *pmc)
 {
     if (!PObj_is_PMC_EXT_TEST(pmc)) {
-        add_pmc_ext(interpreter, pmc);
+        add_pmc_ext(interp, pmc);
     }
     PMC_sync(pmc) = mem_internal_allocate(sizeof(*PMC_sync(pmc)));
-    PMC_sync(pmc)->owner = interpreter;
+    PMC_sync(pmc)->owner = interp;
     MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
 }
 
 /*
 
 =item C<STRING *
-new_string_header(Interp *interpreter, UINTVAL flags)>
+new_string_header(Interp *interp, UINTVAL flags)>
 
 Returns a new C<STRING> header.
 
@@ -350,13 +350,12 @@ Returns a new C<STRING> header.
 */
 
 STRING *
-new_string_header(Interp *interpreter, UINTVAL flags)
+new_string_header(Interp *interp, UINTVAL flags)
 {
     STRING *string;
-    string = get_free_buffer(interpreter, (flags & PObj_constant_FLAG)
-            ? interpreter->
-            arena_base->constant_string_header_pool :
-            interpreter->arena_base->string_header_pool);
+    string = get_free_buffer(interp, (flags & PObj_constant_FLAG)
+            ? interp->arena_base->constant_string_header_pool :
+            interp->arena_base->string_header_pool);
     PObj_get_FLAGS(string) |= flags | PObj_is_string_FLAG|PObj_is_COWable_FLAG;
     SET_NULL(string->strstart);
     return string;
@@ -365,7 +364,7 @@ new_string_header(Interp *interpreter, UINTVAL flags)
 /*
 
 =item C<Buffer *
-new_buffer_header(Interp *interpreter)>
+new_buffer_header(Interp *interp)>
 
 Creates and returns a new C<Buffer>.
 
@@ -374,17 +373,17 @@ Creates and returns a new C<Buffer>.
 */
 
 Buffer *
-new_buffer_header(Interp *interpreter)
+new_buffer_header(Interp *interp)
 {
-    return get_free_buffer(interpreter,
-            interpreter->arena_base->buffer_header_pool);
+    return get_free_buffer(interp,
+            interp->arena_base->buffer_header_pool);
 }
 
 
 /*
 
 =item C<void *
-new_bufferlike_header(Interp *interpreter, size_t size)>
+new_bufferlike_header(Interp *interp, size_t size)>
 
 Creates and returns a new buffer-like header.
 
@@ -393,19 +392,19 @@ Creates and returns a new buffer-like header.
 */
 
 void *
-new_bufferlike_header(Interp *interpreter, size_t size)
+new_bufferlike_header(Interp *interp, size_t size)
 {
     struct Small_Object_Pool *pool;
 
-    pool = get_bufferlike_pool(interpreter, size);
+    pool = get_bufferlike_pool(interp, size);
 
-    return get_free_buffer(interpreter, pool);
+    return get_free_buffer(interp, pool);
 }
 
 /*
 
 =item C<size_t
-get_max_buffer_address(Interp *interpreter)>
+get_max_buffer_address(Interp *interp)>
 
 Calculates the maximum buffer address and returns it.
 
@@ -414,11 +413,11 @@ Calculates the maximum buffer address and returns it.
 */
 
 size_t
-get_max_buffer_address(Interp *interpreter)
+get_max_buffer_address(Interp *interp)
 {
     UINTVAL i;
     size_t max = 0;
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i]) {
@@ -433,7 +432,7 @@ get_max_buffer_address(Interp *interpreter)
 /*
 
 =item C<size_t
-get_min_buffer_address(Interp *interpreter)>
+get_min_buffer_address(Interp *interp)>
 
 Calculates the minimum buffer address and returns it.
 
@@ -442,10 +441,10 @@ Calculates the minimum buffer address and returns it.
 */
 
 size_t
-get_min_buffer_address(Interp *interpreter)
+get_min_buffer_address(Interp *interp)
 {
     UINTVAL i;
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
     size_t min = (size_t) -1;
 
     for (i = 0; i < arena_base->num_sized; i++) {
@@ -461,7 +460,7 @@ get_min_buffer_address(Interp *interpreter)
 /*
 
 =item C<size_t
-get_max_pmc_address(Interp *interpreter)>
+get_max_pmc_address(Interp *interp)>
 
 Calculates the maximum PMC address and returns it.
 
@@ -470,15 +469,15 @@ Calculates the maximum PMC address and returns it.
 */
 
 size_t
-get_max_pmc_address(Interp *interpreter)
+get_max_pmc_address(Interp *interp)
 {
-    return interpreter->arena_base->pmc_pool->end_arena_memory;
+    return interp->arena_base->pmc_pool->end_arena_memory;
 }
 
 /*
 
 =item C<size_t
-get_min_pmc_address(Interp *interpreter)>
+get_min_pmc_address(Interp *interp)>
 
 Calculates the maximum PMC address and returns it.
 
@@ -487,15 +486,15 @@ Calculates the maximum PMC address and returns it.
 */
 
 size_t
-get_min_pmc_address(Interp *interpreter)
+get_min_pmc_address(Interp *interp)
 {
-    return interpreter->arena_base->pmc_pool->start_arena_memory;
+    return interp->arena_base->pmc_pool->start_arena_memory;
 }
 
 /*
 
 =item C<int
-is_buffer_ptr(Interp *interpreter, void *ptr)>
+is_buffer_ptr(Interp *interp, void *ptr)>
 
 Checks that C<ptr> is actually a C<Buffer>.
 
@@ -504,14 +503,14 @@ Checks that C<ptr> is actually a C<Buffer>.
 */
 
 int
-is_buffer_ptr(Interp *interpreter, void *ptr)
+is_buffer_ptr(Interp *interp, void *ptr)
 {
     UINTVAL i;
-    struct Arenas *arena_base = interpreter->arena_base;;
+    struct Arenas *arena_base = interp->arena_base;;
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i] &&
-                contained_in_pool(interpreter,
+                contained_in_pool(interp,
                         arena_base->sized_header_pools[i], ptr))
             return 1;
     }
@@ -522,7 +521,7 @@ is_buffer_ptr(Interp *interpreter, void *ptr)
 /*
 
 =item C<int
-is_pmc_ptr(Interp *interpreter, void *ptr)>
+is_pmc_ptr(Interp *interp, void *ptr)>
 
 Checks that C<ptr> is actually a PMC.
 
@@ -531,17 +530,17 @@ Checks that C<ptr> is actually a PMC.
 */
 
 int
-is_pmc_ptr(Interp *interpreter, void *ptr)
+is_pmc_ptr(Interp *interp, void *ptr)
 {
-    return contained_in_pool(interpreter,
-            interpreter->arena_base->pmc_pool, ptr);
+    return contained_in_pool(interp,
+            interp->arena_base->pmc_pool, ptr);
 }
 
 
 /*
 
 =item C<void
-Parrot_initialize_header_pools(Interp *interpreter)>
+Parrot_initialize_header_pools(Interp *interp)>
 
 Initialize the pools for the tracked resources.
 
@@ -550,13 +549,13 @@ Initialize the pools for the tracked resources.
 */
 
 void
-Parrot_initialize_header_pools(Interp *interpreter)
+Parrot_initialize_header_pools(Interp *interp)
 {
     struct Arenas *arena_base;
 
-    arena_base = interpreter->arena_base;
+    arena_base = interp->arena_base;
     /* Init the constant string header pool */
-    arena_base->constant_string_header_pool = new_string_pool(interpreter, 1);
+    arena_base->constant_string_header_pool = new_string_pool(interp, 1);
     arena_base->constant_string_header_pool->name = "constant_string_header";
 
     /* Init the buffer header pool
@@ -565,31 +564,31 @@ Parrot_initialize_header_pools(Interp *interpreter)
      * living in the sized_header_pools, this pool pointers are only
      * here for faster access in new_*_header
      */
-    arena_base->buffer_header_pool = new_buffer_pool(interpreter);
+    arena_base->buffer_header_pool = new_buffer_pool(interp);
     arena_base->buffer_header_pool->name = "buffer_header";
 
     /* Init the string header pool */
-    arena_base->string_header_pool = new_string_pool(interpreter, 0);
+    arena_base->string_header_pool = new_string_pool(interp, 0);
     arena_base->string_header_pool->name = "string_header";
 
     /* Init the PMC header pool */
-    arena_base->pmc_pool = new_pmc_pool(interpreter);
+    arena_base->pmc_pool = new_pmc_pool(interp);
     arena_base->pmc_pool->name = "pmc";
 
     /* pmc extension buffer */
     arena_base->pmc_ext_pool =
-        new_small_object_pool(interpreter, sizeof(struct PMC_EXT), 1024);
+        new_small_object_pool(interp, sizeof(struct PMC_EXT), 1024);
     /*
      * pmc_ext isn't a managed item. If a PMC has a pmc_ext structure
      * it is returned to the pool instantly - the structure is never
      * marked.
      * Use GS MS pool functions
      */
-    gc_pmc_ext_pool_init(interpreter, arena_base->pmc_ext_pool);
+    gc_pmc_ext_pool_init(interp, arena_base->pmc_ext_pool);
     arena_base->pmc_ext_pool->name = "pmc_ext";
 
     /* constant PMCs */
-    arena_base->constant_pmc_pool = new_pmc_pool(interpreter);
+    arena_base->constant_pmc_pool = new_pmc_pool(interp);
     arena_base->constant_pmc_pool->name = "constant_pmc";
     arena_base->constant_pmc_pool->objects_per_alloc =
        CONSTANT_PMC_HEADERS_PER_ALLOC;
@@ -631,39 +630,39 @@ If the function returns a non-zero value iteration will stop.
 */
 
 int
-Parrot_forall_header_pools(Interp *interpreter, int flag, void *arg,
+Parrot_forall_header_pools(Interp *interp, int flag, void *arg,
         pool_iter_fn func)
 {
     struct Small_Object_Pool *pool;
     struct Arenas *arena_base;
     int ret_val, i;
 
-    arena_base = interpreter->arena_base;
+    arena_base = interp->arena_base;
 
     if ((flag & (POOL_PMC | POOL_CONST)) == (POOL_PMC | POOL_CONST)) {
-        ret_val = (func)(interpreter, arena_base->constant_pmc_pool,
+        ret_val = (func)(interp, arena_base->constant_pmc_pool,
                 POOL_PMC | POOL_CONST, arg);
         if (ret_val)
             return ret_val;
     }
     if (flag & POOL_PMC) {
-        ret_val = (func)(interpreter, arena_base->pmc_pool, POOL_PMC, arg);
+        ret_val = (func)(interp, arena_base->pmc_pool, POOL_PMC, arg);
         if (ret_val)
             return ret_val;
     }
     if ((flag & (POOL_BUFFER | POOL_CONST)) == (POOL_BUFFER | POOL_CONST)) {
-        ret_val = (func)(interpreter, arena_base->constant_string_header_pool,
+        ret_val = (func)(interp, arena_base->constant_string_header_pool,
                 POOL_BUFFER | POOL_CONST, arg);
         if (ret_val)
             return ret_val;
     }
     if (!(flag & POOL_BUFFER))
         return 0;
-    for (i = 0; i < (INTVAL)interpreter->arena_base->num_sized; i++) {
+    for (i = 0; i < (INTVAL)interp->arena_base->num_sized; i++) {
         pool = arena_base->sized_header_pools[i];
         if (!pool)
             continue;
-        ret_val = (func)(interpreter, pool, POOL_BUFFER, arg);
+        ret_val = (func)(interp, pool, POOL_BUFFER, arg);
         if (ret_val)
             return ret_val;
     }
@@ -673,7 +672,7 @@ Parrot_forall_header_pools(Interp *interpreter, int flag, void *arg,
 /*
 
 =item C<void
-Parrot_destroy_header_pools(Interp *interpreter)>
+Parrot_destroy_header_pools(Interp *interp)>
 
 Destroys the header pools.
 
@@ -682,7 +681,7 @@ Destroys the header pools.
 */
 
 static void
-free_pool(Interp *interpreter, struct Small_Object_Pool *pool)
+free_pool(Interp *interp, struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *cur_arena, *next;
     for (cur_arena = pool->last_Arena; cur_arena;) {
@@ -695,37 +694,37 @@ free_pool(Interp *interpreter, struct Small_Object_Pool *pool)
 }
 
 static int
-sweep_cb_buf(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
     int pass = (int)(INTVAL)arg;
 
 #ifdef GC_IS_MALLOC
     if (pass == 0)
-        clear_cow(interpreter, pool, 1);
+        clear_cow(interp, pool, 1);
     else if (pass == 1)
-        used_cow(interpreter, pool, 1);
+        used_cow(interp, pool, 1);
     else
 #endif
     {
-        Parrot_dod_sweep(interpreter, pool);
-        free_pool(interpreter, pool);
+        Parrot_dod_sweep(interp, pool);
+        free_pool(interp, pool);
     }
     return 0;
 
 }
 
 static int
-sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+sweep_cb_pmc(Interp *interp, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
-    Parrot_dod_sweep(interpreter, pool);
-    free_pool(interpreter, pool);
+    Parrot_dod_sweep(interp, pool);
+    free_pool(interp, pool);
     return 0;
 }
 
 void
-Parrot_destroy_header_pools(Interp *interpreter)
+Parrot_destroy_header_pools(Interp *interp)
 {
     INTVAL pass, start;
 
@@ -739,16 +738,16 @@ Parrot_destroy_header_pools(Interp *interpreter)
 #else
     start = 2;
 #endif
-    Parrot_forall_header_pools(interpreter, POOL_PMC | POOL_CONST, 0,
+    Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, 0,
             sweep_cb_pmc);
 
     for (pass = start; pass <= 2; pass++) {
-        Parrot_forall_header_pools(interpreter, POOL_BUFFER | POOL_CONST,
+        Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_CONST,
                 (void *)pass, sweep_cb_buf);
 
     }
-    free_pool(interpreter, interpreter->arena_base->pmc_ext_pool);
-    mem_internal_free(interpreter->arena_base->sized_header_pools);
+    free_pool(interp, interp->arena_base->pmc_ext_pool);
+    mem_internal_free(interp->arena_base->sized_header_pools);
 }
 
 /*
@@ -842,7 +841,7 @@ Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp) {
 /*
 
 =item C<void
-Parrot_initialize_header_pool_names(Interp *interpreter)>
+Parrot_initialize_header_pool_names(Interp *interp)>
 
 If we want these names, they must be added in DOD.
 
@@ -851,23 +850,23 @@ If we want these names, they must be added in DOD.
 */
 
 void
-Parrot_initialize_header_pool_names(Interp *interpreter)
+Parrot_initialize_header_pool_names(Interp *interp)
 {
-    interpreter->arena_base->string_header_pool->name
-            = string_make(interpreter, "String Pool", strlen("String Pool"),
+    interp->arena_base->string_header_pool->name
+            = string_make(interp, "String Pool", strlen("String Pool"),
             0, PObj_constant_FLAG, 0);
-    interpreter->arena_base->pmc_pool->name
-            = string_make(interpreter, "PMC Pool", strlen("PMC Pool"),
+    interp->arena_base->pmc_pool->name
+            = string_make(interp, "PMC Pool", strlen("PMC Pool"),
             0, PObj_constant_FLAG, 0);
     /* Set up names for each header pool, * now that we have a constant string
      *
      * * pool available to us */
-    interpreter->arena_base->constant_string_header_pool->name
+    interp->arena_base->constant_string_header_pool->name
             =
-            string_make(interpreter, "Constant String Pool",
+            string_make(interp, "Constant String Pool",
             strlen("Constant String Pool"), 0, PObj_constant_FLAG, 0);
-    interpreter->arena_base->buffer_header_pool->name =
-            string_make(interpreter, "Generic Header Pool",
+    interp->arena_base->buffer_header_pool->name =
+            string_make(interp, "Generic Header Pool",
             strlen("Generic Header Pool"), 0, PObj_constant_FLAG, 0);
 }
 

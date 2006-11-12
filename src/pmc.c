@@ -28,7 +28,7 @@ PMC * PMCNULL;
 /*
 
 =item C<PMC *
-pmc_new(Interp *interpreter, INTVAL base_type)>
+pmc_new(Interp *interp, INTVAL base_type)>
 
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<vtables> in
@@ -41,17 +41,17 @@ any other necessary initialization.
 */
 
 PMC *
-pmc_new(Interp *interpreter, INTVAL base_type)
+pmc_new(Interp *interp, INTVAL base_type)
 {
-    PMC * const pmc = pmc_new_noinit(interpreter, base_type);
-    VTABLE_init(interpreter, pmc);
+    PMC * const pmc = pmc_new_noinit(interp, base_type);
+    VTABLE_init(interp, pmc);
     return pmc;
 }
 
 /*
 
 =item C<PMC *
-pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
+pmc_reuse(Interp *interp, PMC *pmc, INTVAL new_type,
           UINTVAL flags)>
 
 Reuse an existing PMC, turning it into an empty PMC of the new
@@ -66,7 +66,7 @@ type.
 */
 
 PMC*
-pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
+pmc_reuse(Interp *interp, PMC *pmc, INTVAL new_type,
           UINTVAL flags)
 {
     INTVAL has_ext, new_flags;
@@ -75,7 +75,7 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
     if (pmc->vtable->base_type == new_type)
         return pmc;
 
-    new_vtable = interpreter->vtables[new_type];
+    new_vtable = interp->vtables[new_type];
 
     /* Singleton/const PMCs/types are not eligible */
 
@@ -118,7 +118,7 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
     if (new_vtable->flags & VTABLE_PMC_NEEDS_EXT) {
         if (!has_ext) {
             /* If we need an ext area, go allocate one */
-            add_pmc_ext(interpreter, pmc);
+            add_pmc_ext(interp, pmc);
         }
         new_flags = PObj_is_PMC_EXT_FLAG;
     }
@@ -128,13 +128,13 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
              * return it to the pool/arena
              */
             struct Small_Object_Pool * const ext_pool =
-                interpreter->arena_base->pmc_ext_pool;
+                interp->arena_base->pmc_ext_pool;
             if (PObj_is_PMC_shared_TEST(pmc) && PMC_sync(pmc)) {
                 MUTEX_DESTROY(PMC_sync(pmc)->pmc_lock);
                 mem_internal_free(PMC_sync(pmc));
                 PMC_sync(pmc) = NULL;
             }
-            ext_pool->add_free_object(interpreter, ext_pool, pmc->pmc_ext);
+            ext_pool->add_free_object(interp, ext_pool, pmc->pmc_ext);
         }
         pmc->pmc_ext = NULL;
 #if ! PMC_DATA_IN_EXT
@@ -150,7 +150,7 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
     pmc->vtable = new_vtable;
 
     /* Call the base init for the redone pmc */
-    VTABLE_init(interpreter, pmc);
+    VTABLE_init(interp, pmc);
 
     return pmc;
 }
@@ -158,7 +158,7 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
 /*
 
 =item C<static PMC*
-get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)>
+get_new_pmc_header(Interp *interp, INTVAL base_type, UINTVAL flags)>
 
 Gets a new PMC header.
 
@@ -167,10 +167,10 @@ Gets a new PMC header.
 */
 
 static PMC*
-get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
+get_new_pmc_header(Interp *interp, INTVAL base_type, UINTVAL flags)
 {
     PMC *pmc;
-    VTABLE *vtable = interpreter->vtables[base_type];
+    VTABLE *vtable = interp->vtables[base_type];
 
     if (!vtable) {
         /* This is usually because you either didn't call init_world early
@@ -179,7 +179,7 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
         PANIC("Null vtable used");
     }
 
-    /* we only have one global Env object, living in the interpreter */
+    /* we only have one global Env object, living in the interp */
     if (vtable->flags & VTABLE_PMC_IS_SINGLETON) {
         /*
          * singletons (monadic objects) exist only once, the interface
@@ -189,12 +189,12 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
          *
          * - singletons are created in the constant pmc pool
          */
-        pmc = (vtable->get_pointer)(interpreter, NULL);
+        pmc = (vtable->get_pointer)(interp, NULL);
         /* LOCK */
         if (!pmc) {
-            pmc = new_pmc_header(interpreter, PObj_constant_FLAG);
+            pmc = new_pmc_header(interp, PObj_constant_FLAG);
             pmc->vtable = vtable;
-            VTABLE_set_pointer(interpreter, pmc, pmc);
+            VTABLE_set_pointer(interp, pmc, pmc);
         }
         return pmc;
     }
@@ -218,7 +218,7 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
         flags = PObj_constant_FLAG;
 #endif
         --base_type;
-        vtable = interpreter->vtables[base_type];
+        vtable = interp->vtables[base_type];
     }
     if (vtable->flags & VTABLE_PMC_NEEDS_EXT) {
         flags |= PObj_is_PMC_EXT_FLAG;
@@ -226,7 +226,7 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
             flags |= PObj_is_PMC_shared_FLAG;
     }
 
-    pmc = new_pmc_header(interpreter, flags);
+    pmc = new_pmc_header(interp, flags);
     if (!pmc) {
         internal_exception(ALLOCATION_ERROR,
                 "Parrot VM: PMC allocation failed!\n");
@@ -236,7 +236,7 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
     pmc->vtable = vtable;
 
 #if GC_VERBOSE
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+    if (Interp_flags_TEST(interp, PARROT_TRACE_FLAG)) {
         /* XXX make a more verbose trace flag */
         fprintf(stderr, "\t=> new %p type %d\n", pmc, (int)base_type);
     }
@@ -248,7 +248,7 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type, UINTVAL flags)
 /*
 
 =item C<PMC *
-pmc_new_noinit(Interp *interpreter, INTVAL base_type)>
+pmc_new_noinit(Interp *interp, INTVAL base_type)>
 
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<vtables> in
@@ -261,9 +261,9 @@ initialization for continuations.
 */
 
 PMC *
-pmc_new_noinit(Interp *interpreter, INTVAL base_type)
+pmc_new_noinit(Interp *interp, INTVAL base_type)
 {
-    PMC * const pmc = get_new_pmc_header(interpreter, base_type, 0);
+    PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
 
     return pmc;
 }
@@ -271,7 +271,7 @@ pmc_new_noinit(Interp *interpreter, INTVAL base_type)
 /*
 
 =item C<PMC *
-constant_pmc_new_noinit(Interp *interpreter, INTVAL base_type)>
+constant_pmc_new_noinit(Interp *interp, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>.
 
@@ -280,9 +280,9 @@ Creates a new constant PMC of type C<base_type>.
 */
 
 PMC *
-constant_pmc_new_noinit(Interp *interpreter, INTVAL base_type)
+constant_pmc_new_noinit(Interp *interp, INTVAL base_type)
 {
-    PMC * const pmc = get_new_pmc_header(interpreter, base_type,
+    PMC * const pmc = get_new_pmc_header(interp, base_type,
             PObj_constant_FLAG);
     return pmc;
 }
@@ -290,7 +290,7 @@ constant_pmc_new_noinit(Interp *interpreter, INTVAL base_type)
 /*
 
 =item C<PMC *
-constant_pmc_new(Interp *interpreter, INTVAL base_type)>
+constant_pmc_new(Interp *interp, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>, the call C<init>.
 
@@ -299,18 +299,18 @@ Creates a new constant PMC of type C<base_type>, the call C<init>.
 */
 
 PMC *
-constant_pmc_new(Interp *interpreter, INTVAL base_type)
+constant_pmc_new(Interp *interp, INTVAL base_type)
 {
-    PMC * const pmc = get_new_pmc_header(interpreter, base_type,
+    PMC * const pmc = get_new_pmc_header(interp, base_type,
             PObj_constant_FLAG);
-    VTABLE_init(interpreter, pmc);
+    VTABLE_init(interp, pmc);
     return pmc;
 }
 
 /*
 
 =item C<PMC *
-pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *init)>
+pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)>
 
 As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 
@@ -319,11 +319,11 @@ As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 */
 
 PMC *
-pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *init)
+pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)
 {
-    PMC * const pmc = pmc_new_noinit(interpreter, base_type);
+    PMC * const pmc = pmc_new_noinit(interp, base_type);
 
-    VTABLE_init_pmc(interpreter, pmc, init);
+    VTABLE_init_pmc(interp, pmc, init);
 
     return pmc;
 }
@@ -331,7 +331,7 @@ pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *init)
 /*
 
 =item C<PMC *
-constant_pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *init)>
+constant_pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)>
 
 As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 
@@ -340,17 +340,17 @@ As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 */
 
 PMC *
-constant_pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *init)
+constant_pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)
 {
-    PMC * const pmc = get_new_pmc_header(interpreter, base_type, 1);
-    VTABLE_init_pmc(interpreter, pmc, init);
+    PMC * const pmc = get_new_pmc_header(interp, base_type, 1);
+    VTABLE_init_pmc(interp, pmc, init);
     return pmc;
 }
 
 /*
 
 =item C<INTVAL
-pmc_register(Interp* interpreter, STRING *name)>
+pmc_register(Interp* interp, STRING *name)>
 
 This segment handles PMC registration and such.
 
@@ -359,13 +359,13 @@ This segment handles PMC registration and such.
 */
 
 INTVAL
-pmc_register(Interp* interpreter, STRING *name)
+pmc_register(Interp* interp, STRING *name)
 {
     INTVAL type;
     PMC *classname_hash;
     /* If they're looking to register an existing class, return that
        class' type number */
-    if ((type = pmc_type(interpreter, name)) > enum_type_undef) {
+    if ((type = pmc_type(interp, name)) > enum_type_undef) {
         return type;
     }
     if (type < enum_type_undef) {
@@ -374,21 +374,21 @@ pmc_register(Interp* interpreter, STRING *name)
         return 0;
     }
 
-    classname_hash = interpreter->class_hash;
-    type = interpreter->n_vtable_max++;
+    classname_hash = interp->class_hash;
+    type = interp->n_vtable_max++;
     /* Have we overflowed the table? */
-    if (type >= interpreter->n_vtable_alloced) {
-        parrot_realloc_vtables(interpreter);
+    if (type >= interp->n_vtable_alloced) {
+        parrot_realloc_vtables(interp);
     }
     /* set entry in name->type hash */
-    VTABLE_set_integer_keyed_str(interpreter, classname_hash, name, type);
+    VTABLE_set_integer_keyed_str(interp, classname_hash, name, type);
     return type;
 }
 
 /*
 
 =item C<INTVAL
-pmc_type(Interp* interpreter, STRING *name)>
+pmc_type(Interp* interp, STRING *name)>
 
 Returns the PMC type for C<name>.
 
@@ -397,34 +397,34 @@ Returns the PMC type for C<name>.
 */
 
 INTVAL
-pmc_type(Interp* interpreter, STRING *name)
+pmc_type(Interp* interp, STRING *name)
 {
-    PMC * const classname_hash = interpreter->class_hash;
+    PMC * const classname_hash = interp->class_hash;
     PMC *item;
 
-    item = VTABLE_get_pointer_keyed_str(interpreter, classname_hash, name);
+    item = VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
     /* nested namespace with same name */
     if (item->vtable->base_type == enum_class_NameSpace)
         return 0;
     if (!PMC_IS_NULL(item))
         return PMC_int_val((PMC*) item);
-    return Parrot_get_datatype_enum(interpreter, name);
+    return Parrot_get_datatype_enum(interp, name);
 }
 
 INTVAL
-pmc_type_p(Interp* interpreter, PMC *name)
+pmc_type_p(Interp* interp, PMC *name)
 {
-    PMC * const classname_hash = interpreter->class_hash;
+    PMC * const classname_hash = interp->class_hash;
     PMC *item;
 
-    item = VTABLE_get_pointer_keyed(interpreter, classname_hash, name);
+    item = VTABLE_get_pointer_keyed(interp, classname_hash, name);
     if (!PMC_IS_NULL(item))
         return PMC_int_val((PMC*) item);
     return 0;
 }
 
 static PMC*
-create_class_pmc(Interp *interpreter, INTVAL type)
+create_class_pmc(Interp *interp, INTVAL type)
 {
     /*
      * class interface - a PMC is its own class
@@ -432,15 +432,15 @@ create_class_pmc(Interp *interpreter, INTVAL type)
      *
      * create a constant PMC
      */
-    PMC * const class = get_new_pmc_header(interpreter, type,
+    PMC * const class = get_new_pmc_header(interp, type,
                                            PObj_constant_FLAG);
     /* If we are a second thread, we may get the same object as the
      * original because we have a singleton. Just set the singleton to
      * be our class object, but don't mess with its vtable.
      */
-    if ((interpreter->vtables[type]->flags & VTABLE_PMC_IS_SINGLETON)
+    if ((interp->vtables[type]->flags & VTABLE_PMC_IS_SINGLETON)
         && (class == class->vtable->class)) {
-        interpreter->vtables[type]->class = class;
+        interp->vtables[type]->class = class;
         return class;
     }
     if (PObj_is_PMC_EXT_TEST(class)) {
@@ -449,10 +449,10 @@ create_class_pmc(Interp *interpreter, INTVAL type)
          * we don't need it - basically only the vtable is important
          */
         struct Small_Object_Pool * const ext_pool =
-            interpreter->arena_base->pmc_ext_pool;
+            interp->arena_base->pmc_ext_pool;
         if (PMC_sync(class))
             mem_internal_free(PMC_sync(class));
-        ext_pool->add_free_object(interpreter, ext_pool, class->pmc_ext);
+        ext_pool->add_free_object(interp, ext_pool, class->pmc_ext);
     }
     class->pmc_ext = NULL;
     DOD_flag_CLEAR(is_special_PMC, class);
@@ -461,14 +461,14 @@ create_class_pmc(Interp *interpreter, INTVAL type)
 
     PObj_is_PMC_shared_CLEAR(class);
 
-    interpreter->vtables[type]->class = class;
+    interp->vtables[type]->class = class;
 
     return class;
 }
 
 /*
 
-=item C<void Parrot_create_mro(Interp *interpreter, INTVAL type)>
+=item C<void Parrot_create_mro(Interp *interp, INTVAL type)>
 
 Create the MRO (method resolution order) array for this type.
 
@@ -477,7 +477,7 @@ Create the MRO (method resolution order) array for this type.
 */
 
 void
-Parrot_create_mro(Interp *interpreter, INTVAL type)
+Parrot_create_mro(Interp *interp, INTVAL type)
 {
     VTABLE *vtable;
     STRING *class_name, *isa;
@@ -485,47 +485,47 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
     PMC *class, *mro;
     PMC *ns;
 
-    vtable = interpreter->vtables[type];
+    vtable = interp->vtables[type];
     /* multithreaded: has already mro */
     if (vtable->mro)
         return;
-    mro = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    mro = pmc_new(interp, enum_class_ResizablePMCArray);
     vtable->mro = mro;
     if (vtable->ro_variant_vtable) {
         vtable->ro_variant_vtable->mro = mro;
     }
     class_name = vtable->whoami;
     isa = vtable->isa_str;
-    total = (INTVAL)string_length(interpreter, isa);
+    total = (INTVAL)string_length(interp, isa);
     for (pos = 0; ;) {
-        INTVAL len = string_length(interpreter, class_name);
+        INTVAL len = string_length(interp, class_name);
         pos += len + 1;
-        parent_type = pmc_type(interpreter, class_name);
+        parent_type = pmc_type(interp, class_name);
         if (!parent_type)   /* abstract classes don't have a vtable */
             break;
-        vtable = interpreter->vtables[parent_type];
+        vtable = interp->vtables[parent_type];
         if (!vtable->_namespace) {
             /* need a namespace Hash, anchor at parent, name it */
-            ns = pmc_new(interpreter,
-                    Parrot_get_ctx_HLL_type(interpreter, enum_class_NameSpace));
+            ns = pmc_new(interp,
+                    Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
             vtable->_namespace = ns;
             /* anchor at parent, aka current_namespace, that is 'parrot' */
-            VTABLE_set_pmc_keyed_str(interpreter,
-                    CONTEXT(interpreter->ctx)->current_namespace,
+            VTABLE_set_pmc_keyed_str(interp,
+                    CONTEXT(interp->ctx)->current_namespace,
                     class_name, ns);
         }
         class = vtable->class;
         if (!class) {
-            class = create_class_pmc(interpreter, parent_type);
+            class = create_class_pmc(interp, parent_type);
         }
-        VTABLE_push_pmc(interpreter, mro, class);
+        VTABLE_push_pmc(interp, mro, class);
         if (pos >= total)
             break;
-        len = string_str_index(interpreter, isa,
-                CONST_STRING(interpreter, " "), pos);
+        len = string_str_index(interp, isa,
+                CONST_STRING(interp, " "), pos);
         if (len == -1)
             len = total;
-        class_name = string_substr(interpreter, isa, pos,
+        class_name = string_substr(interp, isa, pos,
                 len - pos, NULL, 0);
     }
 }
@@ -539,7 +539,7 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
 =over 4
 
 =item C<void
-dod_register_pmc(Interp* interpreter, PMC* pmc)>
+dod_register_pmc(Interp* interp, PMC* pmc)>
 
 Registers the PMC with the interpreter's DOD registery.
 
@@ -548,27 +548,27 @@ Registers the PMC with the interpreter's DOD registery.
 */
 
 void
-dod_register_pmc(Interp* interpreter, PMC* pmc)
+dod_register_pmc(Interp* interp, PMC* pmc)
 {
     PMC *registry;
     /* Better not trigger a DOD run with a potentially unanchored PMC */
-    Parrot_block_DOD(interpreter);
+    Parrot_block_DOD(interp);
 
-    if (!interpreter->DOD_registry) {
-        registry = interpreter->DOD_registry =
-            pmc_new(interpreter, enum_class_AddrRegistry);
+    if (!interp->DOD_registry) {
+        registry = interp->DOD_registry =
+            pmc_new(interp, enum_class_AddrRegistry);
     }
     else
-        registry = interpreter->DOD_registry;
-    VTABLE_set_pmc_keyed(interpreter, registry, pmc, NULL);
-    Parrot_unblock_DOD(interpreter);
+        registry = interp->DOD_registry;
+    VTABLE_set_pmc_keyed(interp, registry, pmc, NULL);
+    Parrot_unblock_DOD(interp);
 
 }
 
 /*
 
 =item C<void
-dod_unregister_pmc(Interp* interpreter, PMC* pmc)>
+dod_unregister_pmc(Interp* interp, PMC* pmc)>
 
 Unregisters the PMC from the interpreter's DOD registery.
 
@@ -577,11 +577,11 @@ Unregisters the PMC from the interpreter's DOD registery.
 */
 
 void
-dod_unregister_pmc(Interp* interpreter, PMC* pmc)
+dod_unregister_pmc(Interp* interp, PMC* pmc)
 {
-    if (!interpreter->DOD_registry)
+    if (!interp->DOD_registry)
         return; /* XXX or signal exception? */
-    VTABLE_delete_keyed(interpreter, interpreter->DOD_registry, pmc);
+    VTABLE_delete_keyed(interp, interp->DOD_registry, pmc);
 }
 
 /*

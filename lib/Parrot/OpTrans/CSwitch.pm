@@ -91,7 +91,7 @@ sub defines
 
 #undef  CHECK_EVENTS
 #define CHECK_EVENTS(i, n)   \\
-        interpreter->task_queue->head ?  \\
+        interp->task_queue->head ?  \\
                 Parrot_do_check_events(i, n) : n
 END
 }
@@ -117,7 +117,7 @@ sub goto_address
     {
             return <<EOC;
             {
-               cur_opcode = opcode_to_prederef(interpreter, $addr);
+               cur_opcode = opcode_to_prederef(interp, $addr);
                goto SWITCH_RELOAD;
             }
 EOC
@@ -147,8 +147,8 @@ code.
 sub goto_pop
 {
     my ($self) = @_;
-    return "{ opcode_t *dest = (opcode_t*)pop_dest(interpreter);
-              cur_opcode = opcode_to_prederef(interpreter, dest);
+    return "{ opcode_t *dest = (opcode_t*)pop_dest(interp);
+              cur_opcode = opcode_to_prederef(interp, dest);
               goto SWITCH_AGAIN; }";
 }
 
@@ -172,10 +172,10 @@ sub run_core_func_start
 #endif
 
 SWITCH_RELOAD:
-    _reg_base = (char*)interpreter->ctx.bp.regs_i;
+    _reg_base = (char*)interp->ctx.bp.regs_i;
     do {
 SWITCH_AGAIN:
-    cur_opcode = CHECK_EVENTS(interpreter, cur_opcode);
+    cur_opcode = CHECK_EVENTS(interp, cur_opcode);
     if (!cur_opcode)
         break;
     switch (*(opcode_t*)cur_opcode) {

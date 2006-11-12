@@ -53,7 +53,7 @@ int natural_preheader (struct _IMC_Unit *, Loop_info*);
 void find_loops(Parrot_Interp, struct _IMC_Unit *);
 void search_predecessors_not_in(Basic_block*, Set*);
 
-void life_analysis(Parrot_Interp interpreter, struct _IMC_Unit *);
+void life_analysis(Parrot_Interp interp, struct _IMC_Unit *);
 void add_life_interval(Life_range*, int, int);
 void free_life_info(struct _IMC_Unit *, SymReg *r);
 

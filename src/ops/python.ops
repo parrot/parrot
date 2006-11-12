@@ -47,59 +47,59 @@ Print a newline char to standard output.
 =cut
 
 inline op print_item(in INT) :base_io {
-  PMC * const io = PIO_STDOUT(interpreter);
-  if (PIO_softspace(interpreter, io, 0))
-    PIO_puts(interpreter, io, " ");
-  PIO_printf(interpreter, INTVAL_FMT, (INTVAL)$1);
-  PIO_softspace(interpreter, io, 1);
+  PMC * const io = PIO_STDOUT(interp);
+  if (PIO_softspace(interp, io, 0))
+    PIO_puts(interp, io, " ");
+  PIO_printf(interp, INTVAL_FMT, (INTVAL)$1);
+  PIO_softspace(interp, io, 1);
   goto NEXT();
 }
 
 inline op print_item(in NUM) :base_io {
-  PMC * const io = PIO_STDOUT(interpreter);
+  PMC * const io = PIO_STDOUT(interp);
   STRING *s;
-  if (PIO_softspace(interpreter, io, 0))
-    PIO_puts(interpreter, io, " ");
-  s = Parrot_sprintf_c(interpreter, "%.12g", (double)$1);
-  PIO_putps(interpreter, io, s);
-  if (string_str_index(interpreter, s,
-        const_string(interpreter, "."), 0) == -1 &&
-      string_str_index(interpreter, s,
-        const_string(interpreter, "e"), 0) == -1)
-    PIO_puts(interpreter, io, ".0");
-  PIO_softspace(interpreter, io, 1);
+  if (PIO_softspace(interp, io, 0))
+    PIO_puts(interp, io, " ");
+  s = Parrot_sprintf_c(interp, "%.12g", (double)$1);
+  PIO_putps(interp, io, s);
+  if (string_str_index(interp, s,
+        const_string(interp, "."), 0) == -1 &&
+      string_str_index(interp, s,
+        const_string(interp, "e"), 0) == -1)
+    PIO_puts(interp, io, ".0");
+  PIO_softspace(interp, io, 1);
   goto NEXT();
 }
 
 op print_item(in STR) :base_io {
   STRING * const s = $1;
-  PMC * const io = PIO_STDOUT(interpreter);
-  if (s && string_length(interpreter, s)) {
-    if (PIO_softspace(interpreter, io, 0))
-      PIO_puts(interpreter, io, " ");
-    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
-    PIO_softspace(interpreter, io, 1);
+  PMC * const io = PIO_STDOUT(interp);
+  if (s && string_length(interp, s)) {
+    if (PIO_softspace(interp, io, 0))
+      PIO_puts(interp, io, " ");
+    PIO_putps(interp, PIO_STDOUT(interp), s);
+    PIO_softspace(interp, io, 1);
   }
   goto NEXT();
 }
 
 op print_item(invar PMC) :base_io {
   PMC * const p = $1;
-  PMC * const io = PIO_STDOUT(interpreter);
-  STRING * const s = (VTABLE_get_string(interpreter, p));
+  PMC * const io = PIO_STDOUT(interp);
+  STRING * const s = (VTABLE_get_string(interp, p));
   if (s) {
-    if (PIO_softspace(interpreter, io, 0))
-      PIO_puts(interpreter, io, " ");
-    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
-    PIO_softspace(interpreter, io, 1);
+    if (PIO_softspace(interp, io, 0))
+      PIO_puts(interp, io, " ");
+    PIO_putps(interp, PIO_STDOUT(interp), s);
+    PIO_softspace(interp, io, 1);
   }
   goto NEXT();
 }
 
 op print_newline() :base_io {
-  PMC * const io = PIO_STDOUT(interpreter);
-  PIO_puts(interpreter, io, "\n");
-  PIO_softspace(interpreter, io, 0);
+  PMC * const io = PIO_STDOUT(interp);
+  PIO_puts(interp, io, "\n");
+  PIO_softspace(interp, io, 0);
   goto NEXT();
 }
 
@@ -122,37 +122,37 @@ Print a newline char to IO stream object $1.
 
 inline op print_item(invar PMC, in INT) :base_io {
   PMC * const io = $1;
-  if (PIO_softspace(interpreter, io, 0))
-    PIO_puts(interpreter, io, " ");
-  PIO_fprintf(interpreter, io, INTVAL_FMT, (INTVAL)$2);
-  PIO_softspace(interpreter, io, 1);
+  if (PIO_softspace(interp, io, 0))
+    PIO_puts(interp, io, " ");
+  PIO_fprintf(interp, io, INTVAL_FMT, (INTVAL)$2);
+  PIO_softspace(interp, io, 1);
   goto NEXT();
 }
 
 inline op print_item(invar PMC, in NUM) :base_io {
   PMC * const io = $1;
   STRING *s;
-  if (PIO_softspace(interpreter, io, 0))
-    PIO_puts(interpreter, io, " ");
-  s = Parrot_sprintf_c(interpreter, "%.12g", (double)$2);
-  PIO_putps(interpreter, io, s);
-  if (string_str_index(interpreter, s,
-        const_string(interpreter, "."), 0) == -1 &&
-      string_str_index(interpreter, s,
-        const_string(interpreter, "e"), 0) == -1)
-    PIO_puts(interpreter, io, ".0");
-  PIO_softspace(interpreter, io, 1);
+  if (PIO_softspace(interp, io, 0))
+    PIO_puts(interp, io, " ");
+  s = Parrot_sprintf_c(interp, "%.12g", (double)$2);
+  PIO_putps(interp, io, s);
+  if (string_str_index(interp, s,
+        const_string(interp, "."), 0) == -1 &&
+      string_str_index(interp, s,
+        const_string(interp, "e"), 0) == -1)
+    PIO_puts(interp, io, ".0");
+  PIO_softspace(interp, io, 1);
   goto NEXT();
 }
 
 op print_item(invar PMC, in STR) :base_io {
   STRING * const s = $2;
   PMC * const io = $1; /* TODO Can this be localized? */
-  if (s && string_length(interpreter, s)) {
-    if (PIO_softspace(interpreter, io, 0))
-      PIO_puts(interpreter, io, " ");
-    PIO_putps(interpreter, io, s);
-    PIO_softspace(interpreter, io, 1);
+  if (s && string_length(interp, s)) {
+    if (PIO_softspace(interp, io, 0))
+      PIO_puts(interp, io, " ");
+    PIO_putps(interp, io, s);
+    PIO_softspace(interp, io, 1);
   }
   goto NEXT();
 }
@@ -160,20 +160,20 @@ op print_item(invar PMC, in STR) :base_io {
 op print_item(invar PMC, invar PMC) :base_io {
   PMC * const p = $2;
   PMC * const io = $1; /* TODO Can this be localized? */
-  STRING *s = (VTABLE_get_string(interpreter, p));
+  STRING *s = (VTABLE_get_string(interp, p));
   if (s) {
-    if (PIO_softspace(interpreter, io, 0))
-      PIO_puts(interpreter, io, " ");
-    PIO_putps(interpreter, io, s);
-    PIO_softspace(interpreter, io, 1);
+    if (PIO_softspace(interp, io, 0))
+      PIO_puts(interp, io, " ");
+    PIO_putps(interp, io, s);
+    PIO_softspace(interp, io, 1);
   }
   goto NEXT();
 }
 
 op print_newline(invar PMC) :base_io {
   PMC * const io = $1;
-  PIO_puts(interpreter, io, "\n");
-  PIO_softspace(interpreter, io, 0);
+  PIO_puts(interp, io, "\n");
+  PIO_softspace(interp, io, 0);
   goto NEXT();
 }
 

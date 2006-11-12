@@ -137,7 +137,7 @@ PIO_push_layer(theINTERP,  PMC *pmc, ParrotIOLayer *layer)
     }
     else {
         ParrotIOLayer *t;
-        ParrotIOData * const d = interpreter->piodata;
+        ParrotIOData * const d = interp->piodata;
         if (d->default_stack == NULL && (layer->flags & PIO_L_TERMINAL) == 0) {
             /* Error( 1st layer must be terminal) */
             return -1;
@@ -157,11 +157,11 @@ PIO_push_layer(theINTERP,  PMC *pmc, ParrotIOLayer *layer)
     return -1;
 }
 ParrotIOLayer *
-PIO_get_layer(Interp *interpreter, const char *name)
+PIO_get_layer(Interp *interp, const char *name)
 {
     ParrotIOLayer **t;
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     for (t = pio_registered_layers; *t; ++t)
         if (strcmp(name, (*t)->name) == 0)
             return *t;
@@ -169,10 +169,10 @@ PIO_get_layer(Interp *interpreter, const char *name)
 }
 
 void
-PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls)
+PIO_push_layer_str(Interp *interp, PMC *pmc, STRING *ls)
 {
-    char * const cls = string_to_cstring(interpreter, ls);
-    ParrotIOLayer * const l = PIO_get_layer(interpreter, cls);
+    char * const cls = string_to_cstring(interp, ls);
+    ParrotIOLayer * const l = PIO_get_layer(interp, cls);
     ParrotIOLayer * newlayer;
 
     string_cstring_free(cls);
@@ -182,7 +182,7 @@ PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls)
     /* make private copy */
     newlayer = PIO_base_new_layer(l);
     newlayer->flags |= PIO_L_LAYER_COPIED;
-    PIO_push_layer(interpreter, pmc, newlayer);
+    PIO_push_layer(interp, pmc, newlayer);
 }
 
 /*
@@ -232,7 +232,7 @@ PIO_pop_layer(theINTERP, PMC *pmc)
     }
     /* Null io object - use default stack */
     else {
-        ParrotIOData * const d = interpreter->piodata;
+        ParrotIOData * const d = interp->piodata;
         ParrotIOLayer * const layer = d->default_stack;
         if (layer) {
             d->default_stack = layer->down;
@@ -247,10 +247,10 @@ PIO_pop_layer(theINTERP, PMC *pmc)
 }
 
 STRING *
-PIO_pop_layer_str(Interp *interpreter, PMC *pmc)
+PIO_pop_layer_str(Interp *interp, PMC *pmc)
 {
-    ParrotIOLayer * const layer = PIO_pop_layer(interpreter, pmc);
-    STRING * const ls = string_make(interpreter, layer->name,
+    ParrotIOLayer * const layer = PIO_pop_layer(interp, pmc);
+    STRING * const ls = string_make(interp, layer->name,
                                     strlen(layer->name), "iso-8859-1", 0);
     mem_sys_free(layer);
     return ls;

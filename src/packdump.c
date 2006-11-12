@@ -38,7 +38,7 @@ void PackFile_Fixup_dump(Interp *,
 /*
 
 =item C<void
-PackFile_ConstTable_dump(Interp *interpreter,
+PackFile_ConstTable_dump(Interp *interp,
                          struct PackFile_ConstTable *self)>
 
 Dumps the constant table C<self>.
@@ -48,21 +48,21 @@ Dumps the constant table C<self>.
 */
 
 void
-PackFile_ConstTable_dump(Interp *interpreter,
+PackFile_ConstTable_dump(Interp *interp,
                          struct PackFile_ConstTable *self)
 {
     opcode_t i;
 
     for (i = 0; i < self->const_count; i++) {
-        PIO_printf(interpreter, "    # %ld:\n", (long)i);
-        PackFile_Constant_dump(interpreter, self->constants[i]);
+        PIO_printf(interp, "    # %ld:\n", (long)i);
+        PackFile_Constant_dump(interp, self->constants[i]);
     }
 }
 
 /*
 
 =item C<void
-PackFile_Constant_dump(Interp *interpreter,
+PackFile_Constant_dump(Interp *interp,
                        struct PackFile_Constant *self)>
 
 Dumps the constant C<self>.
@@ -72,49 +72,49 @@ Dumps the constant C<self>.
 */
 
 void
-PackFile_Constant_dump(Interp *interpreter,
+PackFile_Constant_dump(Interp *interp,
                        struct PackFile_Constant *self)
 {
     switch (self->type) {
 
     case PFC_NUMBER:
-        PIO_printf(interpreter, "    [ 'PFC_NUMBER', %g ],\n", self->u.number);
+        PIO_printf(interp, "    [ 'PFC_NUMBER', %g ],\n", self->u.number);
         break;
 
     case PFC_STRING:
-        PIO_printf(interpreter, "    [ 'PFC_STRING', {\n");
-        PIO_printf(interpreter, "        FLAGS    => 0x%04lx,\n",
+        PIO_printf(interp, "    [ 'PFC_STRING', {\n");
+        PIO_printf(interp, "        FLAGS    => 0x%04lx,\n",
                    (long)PObj_get_FLAGS(self->u.string));
-        PIO_printf(interpreter, "        CHARSET  => %ld,\n",
+        PIO_printf(interp, "        CHARSET  => %ld,\n",
                    self->u.string->charset);
-        PIO_printf(interpreter, "        SIZE     => %ld,\n",
+        PIO_printf(interp, "        SIZE     => %ld,\n",
                    (long)self->u.string->bufused);
         /* TODO: Won't do anything reasonable for most encodings */
-        PIO_printf(interpreter, "        DATA     => '%.*s'\n",
+        PIO_printf(interp, "        DATA     => '%.*s'\n",
                    (int)self->u.string->bufused,
                    (char *)self->u.string->strstart);
-        PIO_printf(interpreter, "    } ],\n");
+        PIO_printf(interp, "    } ],\n");
         break;
 
     case PFC_KEY:
-        PIO_printf(interpreter, "    [ 'PFC_KEY', {\n");
-        PIO_printf(interpreter, "    ??? TODO \n");
-        PIO_printf(interpreter, "    } ],\n");
+        PIO_printf(interp, "    [ 'PFC_KEY', {\n");
+        PIO_printf(interp, "    ??? TODO \n");
+        PIO_printf(interp, "    } ],\n");
         break;
     case PFC_PMC:
-        PIO_printf(interpreter, "    [ 'PFC_PMC', {\n");
+        PIO_printf(interp, "    [ 'PFC_PMC', {\n");
         {
             PMC *pmc = self->u.key;
             parrot_sub_t sub;
-            STRING *a_key = const_string(interpreter, "(keyed)");
-            STRING *null = const_string(interpreter, "(null)");
+            STRING *a_key = const_string(interp, "(keyed)");
+            STRING *null = const_string(interp, "(null)");
             opcode_t *code_start =
-                interpreter->code->base.data;
+                interp->code->base.data;
             switch (pmc->vtable->base_type) {
                 case enum_class_Sub:
                 case enum_class_Coroutine:
                     sub = PMC_sub(pmc);
-                    PIO_printf(interpreter,
+                    PIO_printf(interp,
                             "\tclass => %Ss,\n"
                             "\tstart_offs => %d,\n"
                             "\tend_offs => %d,\n"
@@ -132,13 +132,13 @@ PackFile_Constant_dump(Interp *interpreter,
                             );
                     break;
                 default:
-                    PIO_printf(interpreter, "\tunknown PMC\n");
+                    PIO_printf(interp, "\tunknown PMC\n");
             }
         }
-        PIO_printf(interpreter, "    } ],\n");
+        PIO_printf(interp, "    } ],\n");
         break;
     default:
-        PIO_printf(interpreter, "    [ 'PFC_\?\?\?', type '0x%x' ],\n",
+        PIO_printf(interp, "    [ 'PFC_\?\?\?', type '0x%x' ],\n",
                 self->type);
         break;
     }
@@ -147,7 +147,7 @@ PackFile_Constant_dump(Interp *interpreter,
 /*
 
 =item C<void
-PackFile_Fixup_dump(Interp *interpreter,
+PackFile_Fixup_dump(Interp *interp,
                     struct PackFile_FixupTable *ft)>
 
 Dumps the fix-up table C<ft>.
@@ -157,24 +157,24 @@ Dumps the fix-up table C<ft>.
 */
 
 void
-PackFile_Fixup_dump(Interp *interpreter,
+PackFile_Fixup_dump(Interp *interp,
                     struct PackFile_FixupTable *ft)
 {
     opcode_t i;
 
     for (i = 0; i < ft->fixup_count; i++) {
-        PIO_printf(interpreter,"\t#%d\n", (int) i);
+        PIO_printf(interp,"\t#%d\n", (int) i);
         switch (ft->fixups[i]->type) {
             case enum_fixup_label:
             case enum_fixup_sub:
-                PIO_printf(interpreter,
+                PIO_printf(interp,
                         "\ttype => %d offs => %8d name => '%s',\n",
                         (int)ft->fixups[i]->type,
                         (int)ft->fixups[i]->offset,
                         ft->fixups[i]->name);
                     break;
             default:
-                PIO_printf(interpreter,"\ttype => %d ???,\n",
+                PIO_printf(interp,"\ttype => %d ???,\n",
                         (int) ft->fixups[i]->type);
                 break;
         }

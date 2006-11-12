@@ -26,7 +26,7 @@ $1. Removes the constant flag on the copy, if there was one.
 =cut
 
 inline op clone(out STR, in STR) :base_mem {
-  $1 = string_copy(interpreter, $2);
+  $1 = string_copy(interp, $2);
   goto NEXT();
 }
 
@@ -131,7 +131,7 @@ inline op set(out INT, in NUM) :base_core {
 }
 
 inline op set(out INT, in STR) :base_core {
-  $1 = string_to_int(interpreter, $2);
+  $1 = string_to_int(interp, $2);
   goto NEXT();
 }
 
@@ -146,17 +146,17 @@ inline op set(out NUM, in INT) :base_core {
 }
 
 inline op set(out NUM, in STR) :base_core {
-  $1 = string_to_num(interpreter, $2);
+  $1 = string_to_num(interp, $2);
   goto NEXT();
 }
 
 inline op set(out NUM, invar PMC) :base_core {
-  $1 = $2->vtable->get_number(interpreter, $2);
+  $1 = $2->vtable->get_number(interp, $2);
   goto NEXT();
 }
 
 inline op set(out STR, invar PMC) :base_core {
-  $1 = $2->vtable->get_string(interpreter, $2);
+  $1 = $2->vtable->get_string(interp, $2);
   goto NEXT();
 }
 
@@ -166,17 +166,17 @@ inline op set(out STR, invar STR) :base_core {
 }
 
 inline op set(out STR, inconst STR) :base_core {
-  $1 = string_copy(interpreter, $2);
+  $1 = string_copy(interp, $2);
   goto NEXT();
 }
 
 inline op set(out STR, in INT) :base_core {
-  $1 = string_from_int(interpreter, $2);
+  $1 = string_from_int(interp, $2);
   goto NEXT();
 }
 
 inline op set(out STR, in NUM) :base_core {
-  $1 = string_from_num(interpreter, $2);
+  $1 = string_from_num(interp, $2);
   goto NEXT();
 }
 
@@ -191,27 +191,27 @@ inline op set(out PMC, invar PMC) :base_core {
 }
 
 inline op set(invar PMC, in INT) :base_core {
-  $1->vtable->set_integer_native(interpreter, $1, $2);
+  $1->vtable->set_integer_native(interp, $1, $2);
   goto NEXT();
 }
 
 inline op set(invar PMC, in NUM) :base_core {
-  $1->vtable->set_number_native(interpreter, $1, $2);
+  $1->vtable->set_number_native(interp, $1, $2);
   goto NEXT();
 }
 
 inline op set(invar PMC, invar STR) :base_core {
-  $1->vtable->set_string_native(interpreter, $1, $2);
+  $1->vtable->set_string_native(interp, $1, $2);
   goto NEXT();
 }
 
 inline op set(invar PMC, inconst STR) :base_core {
-  $1->vtable->set_string_native(interpreter, $1,
-    string_copy(interpreter, $2));
+  $1->vtable->set_string_native(interp, $1,
+    string_copy(interp, $2));
   goto NEXT();
 }
 inline op set(out INT, invar PMC) :base_core {
-  $1 = $2->vtable->get_integer(interpreter, $2);
+  $1 = $2->vtable->get_integer(interp, $2);
   goto NEXT();
 }
 
@@ -253,37 +253,37 @@ reference PMC $2 refers to.
 =cut
 
 inline op assign(invar PMC, invar PMC) :base_core {
-  $1->vtable->assign_pmc(interpreter, $1, $2);
+  $1->vtable->assign_pmc(interp, $1, $2);
   goto NEXT();
 }
 
 inline op assign(invar PMC, in INT) :base_core {
-  $1->vtable->set_integer_native(interpreter, $1, $2);
+  $1->vtable->set_integer_native(interp, $1, $2);
   goto NEXT();
 }
 
 inline op assign(invar PMC, in NUM) :base_core {
-  $1->vtable->set_number_native(interpreter, $1, $2);
+  $1->vtable->set_number_native(interp, $1, $2);
   goto NEXT();
 }
 
 inline op assign(invar PMC, in STR) :base_core {
-  $1->vtable->assign_string_native(interpreter, $1, $2);
+  $1->vtable->assign_string_native(interp, $1, $2);
   goto NEXT();
 }
 
 inline op assign(out STR, in STR) :base_core {
-  $1 = string_set(interpreter, $1, $2);
+  $1 = string_set(interp, $1, $2);
   goto NEXT();
 }
 
 inline op setref(invar PMC, invar PMC) :base_core {
-  $1->vtable->set_pmc(interpreter, $1, $2);
+  $1->vtable->set_pmc(interp, $1, $2);
   goto NEXT();
 }
 
 inline op deref(out PMC, invar PMC) :base_ref {
-  $1 = $2->vtable->get_pmc(interpreter, $2);
+  $1 = $2->vtable->get_pmc(interp, $2);
   goto NEXT();
 }
 
@@ -374,22 +374,22 @@ inline op seti_ind(in INT, in INT) :base_ref {
 =cut
 
 inline op set (invar PMC, in INTKEY, in INT) :base_core {
-    $1->vtable->set_integer_keyed_int(interpreter, $1, $2, $3);
+    $1->vtable->set_integer_keyed_int(interp, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (invar PMC, in INTKEY, in NUM) :base_core {
-    $1->vtable->set_number_keyed_int(interpreter, $1, $2, $3);
+    $1->vtable->set_number_keyed_int(interp, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (invar PMC, in INTKEY, in STR) :base_core {
-    $1->vtable->set_string_keyed_int(interpreter, $1, $2, $3);
+    $1->vtable->set_string_keyed_int(interp, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (invar PMC, in INTKEY, invar PMC) :base_core {
-    $1->vtable->set_pmc_keyed_int(interpreter, $1, $2, $3);
+    $1->vtable->set_pmc_keyed_int(interp, $1, $2, $3);
     goto NEXT();
 }
 
@@ -414,22 +414,22 @@ inline op set (invar PMC, in INTKEY, invar PMC) :base_core {
 =cut
 
 inline op set (out INT, invar PMC, in INTKEY) :base_core {
-    $1 = $2->vtable->get_integer_keyed_int(interpreter, $2, $3);
+    $1 = $2->vtable->get_integer_keyed_int(interp, $2, $3);
     goto NEXT();
 }
 
 inline op set (out NUM, invar PMC, in INTKEY) :base_core {
-    $1 = $2->vtable->get_number_keyed_int(interpreter, $2, $3);
+    $1 = $2->vtable->get_number_keyed_int(interp, $2, $3);
     goto NEXT();
 }
 
 inline op set (out STR, invar PMC, in INTKEY) :base_core {
-    $1 = $2->vtable->get_string_keyed_int(interpreter, $2, $3);
+    $1 = $2->vtable->get_string_keyed_int(interp, $2, $3);
     goto NEXT();
 }
 
 inline op set (out PMC, invar PMC, in INTKEY) :base_core {
-    $1 = $2->vtable->get_pmc_keyed_int(interpreter, $2, $3);
+    $1 = $2->vtable->get_pmc_keyed_int(interp, $2, $3);
     goto NEXT();
 }
 
@@ -454,22 +454,22 @@ inline op set (out PMC, invar PMC, in INTKEY) :base_core {
 =cut
 
 inline op set (invar PMC, in KEY, in INT) :base_core {
-    $1->vtable->set_integer_keyed(interpreter, $1, $2, $3);
+    $1->vtable->set_integer_keyed(interp, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (invar PMC, in KEY, in NUM) :base_core {
-    $1->vtable->set_number_keyed(interpreter, $1, $2, $3);
+    $1->vtable->set_number_keyed(interp, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (invar PMC, in KEY, in STR) :base_core {
-    $1->vtable->set_string_keyed(interpreter, $1, $2, $3);
+    $1->vtable->set_string_keyed(interp, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (invar PMC, in KEY, invar PMC) :base_core {
-    $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3);
+    $1->vtable->set_pmc_keyed(interp, $1, $2, $3);
     goto NEXT();
 }
 
@@ -494,22 +494,22 @@ inline op set (invar PMC, in KEY, invar PMC) :base_core {
 =cut
 
 inline op set (out INT, invar PMC, in KEY) :base_core {
-    $1 = $2->vtable->get_integer_keyed(interpreter, $2, $3);
+    $1 = $2->vtable->get_integer_keyed(interp, $2, $3);
     goto NEXT();
 }
 
 inline op set (out NUM, invar PMC, in KEY) :base_core {
-    $1 = $2->vtable->get_number_keyed(interpreter, $2, $3);
+    $1 = $2->vtable->get_number_keyed(interp, $2, $3);
     goto NEXT();
 }
 
 inline op set (out STR, invar PMC, in KEY) :base_core {
-    $1 = $2->vtable->get_string_keyed(interpreter, $2, $3);
+    $1 = $2->vtable->get_string_keyed(interp, $2, $3);
     goto NEXT();
 }
 
 inline op set (out PMC, invar PMC, in KEY) :base_core {
-    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, $3);
+    $1 = $2->vtable->get_pmc_keyed(interp, $2, $3);
     goto NEXT();
 }
 
@@ -521,7 +521,7 @@ Makes a copy of the PMC in $2 and puts it in $1.
 =cut
 
 inline op clone(out PMC, invar PMC) :base_mem {
-  $1 = VTABLE_clone(interpreter, $2);
+  $1 = VTABLE_clone(interp, $2);
   goto NEXT();
 }
 
@@ -592,22 +592,22 @@ PMC ('p') and STRING ('s') registers clear to NULL.
 =cut
 
 inline op cleari() :base_core {
-  Parrot_clear_i(interpreter);
+  Parrot_clear_i(interp);
   goto NEXT();
 }
 
 inline op clearn() :base_core {
-  Parrot_clear_n(interpreter);
+  Parrot_clear_n(interp);
   goto NEXT();
 }
 
 inline op clears() :base_core {
-  Parrot_clear_s(interpreter);
+  Parrot_clear_s(interp);
   goto NEXT();
 }
 
 inline op clearp() :base_core {
-  Parrot_clear_p(interpreter);
+  Parrot_clear_p(interp);
   goto NEXT();
 }
 

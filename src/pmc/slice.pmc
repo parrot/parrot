@@ -50,7 +50,7 @@ structures.
  *
  */
 static void
-set_slice_start(Interp *interpreter, PMC *self, PMC *key, PMC *agg)
+set_slice_start(Interp *interp, PMC *self, PMC *key, PMC *agg)
 {
     parrot_range_t *range = mem_sys_allocate(sizeof *range);
 
@@ -59,7 +59,7 @@ next_range:
     range->next = NULL;
     RVal_int(range->step) = 1;
 
-    if (key_type(interpreter, key) & KEY_integer_FLAG) {
+    if (key_type(interp, key) & KEY_integer_FLAG) {
         range->type = enum_type_INTVAL;
         /* integer key */
         if ((PObj_get_FLAGS(key) &
@@ -67,7 +67,7 @@ next_range:
                 (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
             /* start == end */
             RVal_int(range->start) =
-                RVal_int(range->end) = key_integer(interpreter, key);
+                RVal_int(range->end) = key_integer(interp, key);
         }
         else if ((PObj_get_FLAGS(key) &
                     (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) ==
@@ -77,18 +77,18 @@ next_range:
              * start at index 0
              * */
             RVal_int(range->start) = 0;
-            RVal_int(range->end) = key_integer(interpreter, key);
+            RVal_int(range->end) = key_integer(interp, key);
         }
         else {
             /*
              * else start at range value
              */
-            RVal_int(range->start) = key_integer(interpreter, key);
+            RVal_int(range->start) = key_integer(interp, key);
             if ((PObj_get_FLAGS(key) &
                     (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
                 (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) {
                 /* last range "start .." */
-                RVal_int(range->end) = VTABLE_elements(interpreter, agg) - 1;
+                RVal_int(range->end) = VTABLE_elements(interp, agg) - 1;
                 if (PMC_data(key))
                     internal_exception(1, "Illegal range after start..");
             }
@@ -97,7 +97,7 @@ next_range:
                 key = PMC_data(key);
                 if (!key)
                     internal_exception(1, "no end range specified");
-                RVal_int(range->end) = key_integer(interpreter, key);
+                RVal_int(range->end) = key_integer(interp, key);
             }
         }
         if (agg->vtable->base_type == enum_class_Slice)
@@ -126,7 +126,7 @@ range_end:
          */
         RVal_str(range->start) =
             RVal_str(range->cur) =
-            key_string(interpreter, key);
+            key_string(interp, key);
         if ((PObj_get_FLAGS(key) &
                     (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
                 (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
@@ -138,7 +138,7 @@ range_end:
             key = PMC_data(key);
             if (!key)
                 internal_exception(1, "no end range specified");
-            RVal_str(range->end) = key_string(interpreter, key);
+            RVal_str(range->end) = key_string(interp, key);
         }
         goto range_end;
     }
@@ -149,11 +149,11 @@ range_end:
  * next range PMC in Key chain
  */
 static void
-set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
+set_slice_next(Interp *interp, PMC *self, PMC *agg)
 {
     parrot_range_t *r = PMC_struct_val(self);
     if (!r || (INTVAL) r == -1)
-        real_exception(interpreter, NULL, E_StopIteration, "StopIteration");
+        real_exception(interp, NULL, E_StopIteration, "StopIteration");
     if (r->type == enum_type_INTVAL) {
         RVal_int(r->cur) += RVal_int(r->step);
         if (RVal_int(r->step) > 0) {
@@ -176,8 +176,8 @@ next_range:
     else {
         STRING *cur = RVal_str(r->cur);
         STRING *end = RVal_str(r->end);
-        if (string_compare(interpreter, cur, end) < 0)
-            RVal_str(r->cur) = string_increment(interpreter, cur);
+        if (string_compare(interp, cur, end) < 0)
+            RVal_str(r->cur) = string_increment(interp, cur);
         else
             goto next_range;
     }

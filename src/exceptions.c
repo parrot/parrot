@@ -64,7 +64,7 @@ internal_exception(int exitcode, const char *format, ...)
 /*
  * XXX TODO get rid of all the internal_exceptions or call them
  *          with an interpreter arg
-    Parrot_exit(interpreter, exitcode);
+    Parrot_exit(interp, exitcode);
  */
     exit(exitcode);
 }
@@ -81,7 +81,7 @@ internal_exception(int exitcode, const char *format, ...)
 /*
 
 =item C<void
-do_panic(Interp *interpreter, const char *message,
+do_panic(Interp *interp, const char *message,
          const char *file, int line)>
 
 Panic handler.
@@ -91,7 +91,7 @@ Panic handler.
 */
 
 void
-do_panic(Interp *interpreter, const char *message,
+do_panic(Interp *interp, const char *message,
          const char *file, int line)
 {
     /* Note: we can't format any floats in here--Parrot_sprintf
@@ -120,8 +120,8 @@ describe them as well.\n\n");
     fprintf(stderr, "Configured  : %s\n", PARROT_CONFIG_DATE);
     fprintf(stderr, "Architecture: %s\n", PARROT_ARCHNAME);
     fprintf(stderr, "JIT Capable : %s\n", JIT_CAPABLE ? "Yes" : "No");
-    if (interpreter)
-        fprintf(stderr, "Interp Flags: %#x\n", interpreter->flags);
+    if (interp)
+        fprintf(stderr, "Interp Flags: %#x\n", interp->flags);
     else
         fprintf(stderr, "Interp Flags: (no interpreter)\n");
     fprintf(stderr, "Exceptions  : %s\n", "(missing from core)");
@@ -132,19 +132,19 @@ describe them as well.\n\n");
 
 /*
 
-=item C<void push_exception(Interp * interpreter, PMC *handler)>
+=item C<void push_exception(Interp * interp, PMC *handler)>
 
 Add the exception handler on the stack.
 
-=item C<void Parrot_push_action(Interp * interpreter, PMC *sub)>
+=item C<void Parrot_push_action(Interp * interp, PMC *sub)>
 
 Push an action handler onto the dynamic environment.
 
-=item C<void Parrot_push_mark(Interp * interpreter, INTVAL mark)>
+=item C<void Parrot_push_mark(Interp * interp, INTVAL mark)>
 
 Push a cleanup mark onto the dynamic environment.
 
-=item C<void Parrot_pop_mark(Interp * interpreter, INTVAL mark)>
+=item C<void Parrot_pop_mark(Interp * interp, INTVAL mark)>
 
 Pop items off the dynamic environment up to the mark.
 
@@ -153,52 +153,52 @@ Pop items off the dynamic environment up to the mark.
 */
 
 void
-push_exception(Interp * interpreter, PMC *handler)
+push_exception(Interp *interp, PMC *handler)
 {
     if (handler->vtable->base_type != enum_class_Exception_Handler)
         PANIC("Tried to set_eh a non Exception_Handler");
-    stack_push(interpreter, &interpreter->dynamic_env, handler,
+    stack_push(interp, &interp->dynamic_env, handler,
                STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
 
 static void
-run_cleanup_action(Interp *interpreter, Stack_Entry_t *e)
+run_cleanup_action(Interp *interp, Stack_Entry_t *e)
 {
     /*
      * this is called during normal stack_pop of the control
      * stack - run the action subroutine with an INTVAL arg of 0
      */
     PMC * const sub = UVal_pmc(e->entry);
-    Parrot_runops_fromc_args(interpreter, sub, "vI", 0);
+    Parrot_runops_fromc_args(interp, sub, "vI", 0);
 }
 
 void
-Parrot_push_action(Interp * interpreter, PMC *sub)
+Parrot_push_action(Interp *interp, PMC *sub)
 {
-    if (!VTABLE_isa(interpreter, sub,
-                const_string(interpreter, "Sub"))) {
+    if (!VTABLE_isa(interp, sub,
+                const_string(interp, "Sub"))) {
         internal_exception(1, "Tried to push a non Sub PMC action");
     }
-    stack_push(interpreter, &interpreter->dynamic_env, sub,
+    stack_push(interp, &interp->dynamic_env, sub,
                STACK_ENTRY_ACTION, run_cleanup_action);
 }
 
 void
-Parrot_push_mark(Interp * interpreter, INTVAL mark)
+Parrot_push_mark(Interp *interp, INTVAL mark)
 {
-    stack_push(interpreter, &interpreter->dynamic_env, &mark,
+    stack_push(interp, &interp->dynamic_env, &mark,
                STACK_ENTRY_MARK, STACK_CLEANUP_NULL);
 }
 
 void
-Parrot_pop_mark(Interp * interpreter, INTVAL mark)
+Parrot_pop_mark(Interp *interp, INTVAL mark)
 {
     do {
         const Stack_Entry_t * const e
-            = stack_entry(interpreter, interpreter->dynamic_env, 0);
+            = stack_entry(interp, interp->dynamic_env, 0);
         if (!e)
             internal_exception(1, "mark not found");
-        (void)stack_pop(interpreter, &interpreter->dynamic_env,
+        (void)stack_pop(interp, &interp->dynamic_env,
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_MARK) {
             if (UVal_int(e->entry) == mark)
@@ -210,7 +210,7 @@ Parrot_pop_mark(Interp * interpreter, INTVAL mark)
 /*
 
 =item C<static PMC *
-find_exception_handler(Interp * interpreter, PMC *exception)>
+find_exception_handler(Interp * interp, PMC *exception)>
 
 Find the exception handler for C<exception>.
 
@@ -219,7 +219,7 @@ Find the exception handler for C<exception>.
 */
 
 static PMC *
-find_exception_handler(Interp * interpreter, PMC *exception)
+find_exception_handler(Interp *interp, PMC *exception)
 {
     PMC *handler;
     STRING *message;
@@ -231,10 +231,10 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     /* for now, we don't check the exception class and we don't
      * look for matching handlers.  [this is being redesigned anyway.]
      */
-    message = VTABLE_get_string_keyed_int(interpreter, exception, 0);
+    message = VTABLE_get_string_keyed_int(interp, exception, 0);
     /* [TODO: replace quadratic search with something linear, hopefully without
        trashing abstraction layers.  -- rgr, 17-Sep-06.] */
-    while ((e = stack_entry(interpreter, interpreter->dynamic_env, depth))) {
+    while ((e = stack_entry(interp, interp->dynamic_env, depth))) {
         if (e->entry_type == STACK_ENTRY_PMC) {
             handler = UVal_pmc(e->entry);
             if (handler && handler->vtable->base_type ==
@@ -246,14 +246,14 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     }
 
     /* flush interpreter output to get things printed in order */
-    PIO_flush(interpreter, PIO_STDOUT(interpreter));
-    PIO_flush(interpreter, PIO_STDERR(interpreter));
-    if (interpreter->debugger) {
-        PIO_flush(interpreter->debugger, PIO_STDOUT(interpreter->debugger));
-        PIO_flush(interpreter->debugger, PIO_STDERR(interpreter->debugger));
+    PIO_flush(interp, PIO_STDOUT(interp));
+    PIO_flush(interp, PIO_STDERR(interp));
+    if (interp->debugger) {
+        PIO_flush(interp->debugger, PIO_STDOUT(interp->debugger));
+        PIO_flush(interp->debugger, PIO_STDERR(interp->debugger));
     }
 
-    m = string_to_cstring(interpreter, message);
+    m = string_to_cstring(interp, message);
     exit_status = print_location = 1;
     if (m && *m) {
         fputs(m, stderr);
@@ -262,11 +262,11 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     }
     else {
         const INTVAL severity =
-            VTABLE_get_integer_keyed_int(interpreter, exception, 2);
+            VTABLE_get_integer_keyed_int(interp, exception, 2);
         if (severity == EXCEPT_exit) {
             print_location = 0;
             exit_status =
-                (int)VTABLE_get_integer_keyed_int(interpreter, exception, 1);
+                (int)VTABLE_get_integer_keyed_int(interp, exception, 1);
         }
         else
             fprintf(stderr, "No exception handler and no message\n");
@@ -276,14 +276,14 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     /* caution against output swap (with PDB_backtrace) */
     fflush(stderr);
     if (print_location)
-        PDB_backtrace(interpreter);
+        PDB_backtrace(interp);
     /*
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally
      *
      * XXX this check should better be in Parrot_exit
      */
-    if (interpreter->thread_data && interpreter->thread_data->tid) {
+    if (interp->thread_data && interp->thread_data->tid) {
         /*
          * we should probably detach the thread here
          */
@@ -293,7 +293,7 @@ find_exception_handler(Interp * interpreter, PMC *exception)
      * only main should run the destroy functions - exit handler chain
      * is freed during Parrot_exit
      */
-    Parrot_exit(interpreter, exit_status);
+    Parrot_exit(interp, exit_status);
 
     return NULL;
 }
@@ -301,7 +301,7 @@ find_exception_handler(Interp * interpreter, PMC *exception)
 /*
 
 =item C<void
-pop_exception(Interp * interpreter)>
+pop_exception(Interp * interp)>
 
 Pops the topmost exception handler off the stack.
 
@@ -310,33 +310,33 @@ Pops the topmost exception handler off the stack.
 */
 
 void
-pop_exception(Interp * interpreter)
+pop_exception(Interp *interp)
 {
     Stack_entry_type type;
     struct Parrot_cont * cc;
 
     PMC * const handler
-        = stack_peek(interpreter, interpreter->dynamic_env, &type);
+        = stack_peek(interp, interp->dynamic_env, &type);
 
     if (! handler
             || type != STACK_ENTRY_PMC
             || handler->vtable->base_type != enum_class_Exception_Handler) {
-        real_exception(interpreter, NULL, E_RuntimeError,
+        real_exception(interp, NULL, E_RuntimeError,
                 "No exception to pop.");
     }
     cc = PMC_cont(handler);
-    if (cc->to_ctx != CONTEXT(interpreter->ctx)) {
-        real_exception(interpreter, NULL, E_RuntimeError,
+    if (cc->to_ctx != CONTEXT(interp->ctx)) {
+        real_exception(interp, NULL, E_RuntimeError,
                 "No exception to pop.");
     }
-    (void)stack_pop(interpreter, &interpreter->dynamic_env,
+    (void)stack_pop(interp, &interp->dynamic_env,
                     NULL, STACK_ENTRY_PMC);
 }
 
 /*
 
 =item C<PMC*
-new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)>
+new_c_exception_handler(Interp *interp, Parrot_exception *jb)>
 
 Generate an exception handler, that catches PASM level exceptions inside
 a C function. This could be a separate class too, for now just a private
@@ -347,21 +347,21 @@ flag bit is set.
 */
 
 PMC*
-new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)
+new_c_exception_handler(Interp *interp, Parrot_exception *jb)
 {
-    PMC * const handler = pmc_new(interpreter, enum_class_Exception_Handler);
+    PMC * const handler = pmc_new(interp, enum_class_Exception_Handler);
     /*
      * this flag denotes a C exception handler
      */
     PObj_get_FLAGS(handler) |= SUB_FLAG_C_HANDLER;
-    VTABLE_set_pointer(interpreter, handler, jb);
+    VTABLE_set_pointer(interp, handler, jb);
     return handler;
 }
 
 /*
 
 =item C<void
-push_new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)>
+push_new_c_exception_handler(Interp *interp, Parrot_exception *jb)>
 
 Pushes an new C exception handler onto the stack.
 
@@ -370,15 +370,15 @@ Pushes an new C exception handler onto the stack.
 */
 
 void
-push_new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)
+push_new_c_exception_handler(Interp *interp, Parrot_exception *jb)
 {
-    push_exception(interpreter, new_c_exception_handler(interpreter, jb));
+    push_exception(interp, new_c_exception_handler(interp, jb));
 }
 
 /*
 
 =item C<void *
-throw_exception(Interp * interpreter, PMC *exception, void *dest)>
+throw_exception(Interp *interp, PMC *exception, void *dest)>
 
 Throw the exception.
 
@@ -387,16 +387,16 @@ Throw the exception.
 */
 
 void *
-throw_exception(Interp * interpreter, PMC *exception, void *dest)
+throw_exception(Interp *interp, PMC *exception, void *dest)
 {
     void *address;
 
-    PMC * const handler = find_exception_handler(interpreter, exception);
+    PMC * const handler = find_exception_handler(interp, exception);
     if (!handler)
         return NULL;
     /* put the handler aka continuation ctx in the interpreter */
-    address = VTABLE_invoke(interpreter, handler, exception);
-    /* address = VTABLE_get_pointer(interpreter, handler); */
+    address = VTABLE_invoke(interp, handler, exception);
+    /* address = VTABLE_get_pointer(interp, handler); */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         /* its a C exception handler */
         Parrot_exception *jb = (Parrot_exception *) address;
@@ -409,7 +409,7 @@ throw_exception(Interp * interpreter, PMC *exception, void *dest)
 /*
 
 =item C<void *
-rethrow_exception(Interp * interpreter, PMC *exception)>
+rethrow_exception(Interp *interp, PMC *exception)>
 
 Rethrow the exception.
 
@@ -418,15 +418,15 @@ Rethrow the exception.
 */
 
 void *
-rethrow_exception(Interp * interpreter, PMC *exception)
+rethrow_exception(Interp *interp, PMC *exception)
 {
     PMC *handler;
     void *address;
 
     if (exception->vtable->base_type != enum_class_Exception)
         PANIC("Illegal rethrow");
-    handler = find_exception_handler(interpreter, exception);
-    address = VTABLE_invoke(interpreter, handler, exception);
+    handler = find_exception_handler(interp, exception);
+    address = VTABLE_invoke(interp, handler, exception);
     /* return the address of the handler */
     return address;
 }
@@ -434,7 +434,7 @@ rethrow_exception(Interp * interpreter, PMC *exception)
 /*
 
 =item C<void
-rethrow_c_exception(Interp * interpreter)>
+rethrow_c_exception(Interp *interp)>
 
 Return back to runloop, assumes exception is still in C<TODO> and
 that this is called from within a handler setup with C<new_c_exception>.
@@ -444,31 +444,31 @@ that this is called from within a handler setup with C<new_c_exception>.
 */
 
 void
-rethrow_c_exception(Interp * interpreter)
+rethrow_c_exception(Interp *interp)
 {
-    Parrot_exception * const the_exception = interpreter->exceptions;
+    Parrot_exception * const the_exception = interp->exceptions;
 
     PMC * const exception = NULL;   /* TODO */
-    PMC * const handler = find_exception_handler(interpreter, exception);
+    PMC * const handler = find_exception_handler(interp, exception);
 
     /* XXX we should only peek for the next handler */
-    push_exception(interpreter, handler);
+    push_exception(interp, handler);
     /*
      * if there was no user handler, interpreter is already shutdown
      */
-    the_exception->resume = VTABLE_get_pointer(interpreter, handler);
-    the_exception->error = VTABLE_get_integer_keyed_int(interpreter,
+    the_exception->resume = VTABLE_get_pointer(interp, handler);
+    the_exception->error = VTABLE_get_integer_keyed_int(interp,
             exception, 1);
-    the_exception->severity = VTABLE_get_integer_keyed_int(interpreter,
+    the_exception->severity = VTABLE_get_integer_keyed_int(interp,
             exception, 2);
-    the_exception->msg = VTABLE_get_string_keyed_int(interpreter, exception, 0);
+    the_exception->msg = VTABLE_get_string_keyed_int(interp, exception, 0);
     longjmp(the_exception->destination, 1);
 }
 
 /*
 
 =item C<static size_t
-dest2offset(Interp * interpreter, const opcode_t *dest)>
+dest2offset(Interp *interp, const opcode_t *dest)>
 
 Translate an absolute bytecode location to an offset used for resuming
 after an exception had occurred.
@@ -478,20 +478,20 @@ after an exception had occurred.
 */
 
 static size_t
-dest2offset(Interp * interpreter, const opcode_t *dest)
+dest2offset(Interp *interp, const opcode_t *dest)
 {
     size_t offset;
     /* translate an absolute location in byte_code to an offset
      * used for resuming after an exception had occurred
      */
-    switch (interpreter->run_core) {
+    switch (interp->run_core) {
         case PARROT_SWITCH_CORE:
         case PARROT_SWITCH_JIT_CORE:
         case PARROT_CGP_CORE:
         case PARROT_CGP_JIT_CORE:
-            offset = dest - (const opcode_t *)interpreter->code->prederef.code;
+            offset = dest - (const opcode_t *)interp->code->prederef.code;
         default:
-            offset = dest - interpreter->code->base.data;
+            offset = dest - interp->code->base.data;
     }
     return offset;
 }
@@ -499,7 +499,7 @@ dest2offset(Interp * interpreter, const opcode_t *dest)
 /*
 
 =item C<static opcode_t *
-create_exception(Interp * interpreter)>
+create_exception(Interp *interp)>
 
 Create an exception.
 
@@ -508,11 +508,11 @@ Create an exception.
 */
 
 static opcode_t *
-create_exception(Interp * interpreter)
+create_exception(Interp *interp)
 {
     PMC *exception;     /* exception object */
     opcode_t *dest;     /* absolute address of handler */
-    Parrot_exception * const the_exception = interpreter->exceptions;
+    Parrot_exception * const the_exception = interp->exceptions;
 
     /*
      * if the exception number is in the range of our known exceptions
@@ -520,32 +520,32 @@ create_exception(Interp * interpreter)
      */
     if (the_exception->error <= E_LAST_PYTHON_E &&
             the_exception->error >= 0) {
-        exception = interpreter->exception_list[the_exception->error];
+        exception = interp->exception_list[the_exception->error];
     }
     else {
         /* create an exception object */
-        exception = pmc_new(interpreter, enum_class_Exception);
+        exception = pmc_new(interp, enum_class_Exception);
         /* exception type */
-        VTABLE_set_integer_keyed_int(interpreter, exception, 1,
+        VTABLE_set_integer_keyed_int(interp, exception, 1,
                 the_exception->error);
     }
     /* exception severity */
-    VTABLE_set_integer_keyed_int(interpreter, exception, 2,
+    VTABLE_set_integer_keyed_int(interp, exception, 2,
             (INTVAL)the_exception->severity);
     if (the_exception->msg) {
-        VTABLE_set_string_keyed_int(interpreter, exception, 0,
+        VTABLE_set_string_keyed_int(interp, exception, 0,
                 the_exception->msg);
     }
     /* now fill rest of exception, locate handler and get
      * destination of handler
      */
-    dest = throw_exception(interpreter, exception, the_exception->resume);
+    dest = throw_exception(interp, exception, the_exception->resume);
     return dest;
 }
 
 /*
 
-=item C<size_t handle_exception(Interp * interpreter)>
+=item C<size_t handle_exception(Interp *interp)>
 
 Handle an exception.
 
@@ -554,18 +554,18 @@ Handle an exception.
 */
 
 size_t
-handle_exception(Interp * interpreter)
+handle_exception(Interp *interp)
 {
     /* absolute address of handler */
-    const opcode_t * const dest = create_exception(interpreter);
+    const opcode_t * const dest = create_exception(interp);
 
-    return dest2offset(interpreter, dest);
+    return dest2offset(interp, dest);
 }
 
 /*
 
 =item C<void
-new_internal_exception(Interp * interpreter)>
+new_internal_exception(Interp *interp)>
 
 Create a new internal exception buffer, either by allocating it or by
 getting one from the free list.
@@ -575,26 +575,26 @@ getting one from the free list.
 */
 
 void
-new_internal_exception(Interp * interpreter)
+new_internal_exception(Interp *interp)
 {
     Parrot_exception *the_exception;
 
-    if (interpreter->exc_free_list) {
-        the_exception = interpreter->exc_free_list;
-        interpreter->exc_free_list = the_exception->prev;
+    if (interp->exc_free_list) {
+        the_exception = interp->exc_free_list;
+        interp->exc_free_list = the_exception->prev;
     }
     else
         the_exception = mem_sys_allocate(sizeof(*the_exception));
-    the_exception->prev = interpreter->exceptions;
+    the_exception->prev = interp->exceptions;
     the_exception->resume = NULL;
     the_exception->msg = NULL;
-    interpreter->exceptions = the_exception;
+    interp->exceptions = the_exception;
 }
 
 /*
 
 =item C<void
-free_internal_exception(Interp * interpreter)>
+free_internal_exception(Interp *interp)>
 
 Place internal exception buffer back on the free list.
 
@@ -603,18 +603,18 @@ Place internal exception buffer back on the free list.
 */
 
 void
-free_internal_exception(Interp * interpreter)
+free_internal_exception(Interp *interp)
 {
-    Parrot_exception * const e = interpreter->exceptions;
-    interpreter->exceptions = e->prev;
-    e->prev = interpreter->exc_free_list;
-    interpreter->exc_free_list = e;
+    Parrot_exception * const e = interp->exceptions;
+    interp->exceptions = e->prev;
+    e->prev = interp->exc_free_list;
+    interp->exc_free_list = e;
 }
 
 /*
 
 =item C<void
-do_exception(Interp * interpreter,
+do_exception(Interp *interp,
         exception_severity severity, long error)>
 
 Called from interrupt code. Does a C<longjmp> in front of the runloop,
@@ -625,10 +625,10 @@ execution then resumes.
 
 */
 void
-do_exception(Interp * interpreter,
+do_exception(Interp *interp,
         exception_severity severity, long error)
 {
-    Parrot_exception * const the_exception = interpreter->exceptions;
+    Parrot_exception * const the_exception = interp->exceptions;
 
     the_exception->error = error;
     the_exception->severity = severity;
@@ -640,7 +640,7 @@ do_exception(Interp * interpreter,
 /*
 
 =item C<void
-real_exception(Interp *interpreter, void *ret_addr,
+real_exception(Interp *interp, void *ret_addr,
         int exitcode, const char *format, ...)>
 
 Throws a real exception, with an error message constructed from the format
@@ -656,19 +656,19 @@ C<throw_exception>, which calls the handler.
 */
 
 void
-real_exception(Interp *interpreter, void *ret_addr,
+real_exception(Interp *interp, void *ret_addr,
         int exitcode,  const char *format, ...)
 {
     STRING *msg;
-    Parrot_exception * const the_exception = interpreter->exceptions;
+    Parrot_exception * const the_exception = interp->exceptions;
 
     /*
      * if profiling remember end time of lastop and
      * generate entry for exception
      */
-    if (interpreter->profile &&
-            Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        RunProfile * const profile = interpreter->profile;
+    if (interp->profile &&
+            Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
+        RunProfile * const profile = interp->profile;
         const FLOATVAL now = Parrot_floatval_time();
         profile->data[profile->cur_op].time += now - profile->starttime;
         profile->cur_op = PARROT_PROF_EXCEPTION;
@@ -682,18 +682,18 @@ real_exception(Interp *interpreter, void *ret_addr,
     if (strchr(format, '%')) {
         va_list arglist;
         va_start(arglist, format);
-        msg = Parrot_vsprintf_c(interpreter, format, arglist);
+        msg = Parrot_vsprintf_c(interp, format, arglist);
         va_end(arglist);
     }
     else
-        msg = string_make(interpreter, format, strlen(format),
+        msg = string_make(interp, format, strlen(format),
                 NULL, PObj_external_FLAG);
-    /* string_from_cstring(interpreter, format, strlen(format)); */
+    /* string_from_cstring(interp, format, strlen(format)); */
     /*
      * FIXME classify errors
      */
     if (!the_exception) {
-        PIO_eprintf(interpreter,
+        PIO_eprintf(interp,
                 "real_exception (severity:%d error:%d): %Ss\n"
                 "likely reason: argument count mismatch in main "
                 "(more than 1 param)\n",
@@ -705,10 +705,10 @@ real_exception(Interp *interpreter, void *ret_addr,
     the_exception->error = exitcode;
     the_exception->msg = msg;
     the_exception->resume = ret_addr;
-    if (Interp_debug_TEST(interpreter, PARROT_BACKTRACE_DEBUG_FLAG)) {
-        PIO_eprintf(interpreter, "real_exception (severity:%d error:%d): %Ss\n",
+    if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
+        PIO_eprintf(interp, "real_exception (severity:%d error:%d): %Ss\n",
             EXCEPT_error, exitcode, msg );
-        PDB_backtrace(interpreter);
+        PDB_backtrace(interp);
     }
     /*
      * reenter runloop
@@ -718,22 +718,22 @@ real_exception(Interp *interpreter, void *ret_addr,
 
 /*
 
-=item C<void Parrot_init_exceptions(Interp *interpreter)>
+=item C<void Parrot_init_exceptions(Interp *interp)>
 
 Create exception objects.
 
 */
 
 void
-Parrot_init_exceptions(Interp *interpreter) {
+Parrot_init_exceptions(Interp *interp) {
     int i;
 
-    interpreter->exception_list = mem_sys_allocate(
+    interp->exception_list = mem_sys_allocate(
             sizeof(PMC*) * (E_LAST_PYTHON_E + 1));
     for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
-        PMC * const ex = pmc_new(interpreter, enum_class_Exception);
-        interpreter->exception_list[i] = ex;
-        VTABLE_set_integer_keyed_int(interpreter, ex, 1, i);
+        PMC * const ex = pmc_new(interp, enum_class_Exception);
+        interp->exception_list[i] = ex;
+        VTABLE_set_integer_keyed_int(interp, ex, 1, i);
     }
 }
 

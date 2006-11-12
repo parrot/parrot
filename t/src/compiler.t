@@ -35,7 +35,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "compreg/compile");
 extern void imcc_init(Parrot_Interp interp);
 
 static opcode_t *
-run(Parrot_Interp interpreter, int argc, char *argv[])
+run(Parrot_Interp interp, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
@@ -45,43 +45,43 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interpreter,
-                                       interpreter->iglobals,
+    compreg = VTABLE_get_pmc_keyed_int(interp,
+                                       interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interpreter, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interpreter, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interpreter, comp)) {
-        PIO_eprintf(interpreter, "Pir compiler not loaded");
+    pir = const_string(interp, "PIR");
+    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+        PIO_eprintf(interp, "Pir compiler not loaded");
         exit(1);
     }
     /*
      * compile source
      */
-    prog = imcc_compile_pir(interpreter, c_src);
+    prog = imcc_compile_pir(interp, c_src);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interpreter, prog)) {
-        PIO_eprintf(interpreter, "Pir compiler returned no prog");
+    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+        PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(1);
     }
     /* keep eval PMC alive */
-    dod_register_pmc(interpreter, prog);
+    dod_register_pmc(interp, prog);
     /* locate function to run */
-    smain = const_string(interpreter, "main");
-    entry = Parrot_find_global_cur(interpreter, smain);
+    smain = const_string(interp, "main");
+    entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
-    interpreter->current_cont = new_ret_continuation_pmc(interpreter, NULL);
-    dest = VTABLE_invoke(interpreter, entry, NULL);
+    interp->current_cont = new_ret_continuation_pmc(interp, NULL);
+    dest = VTABLE_invoke(interp, entry, NULL);
     /* where to start */
-    interpreter->resume_offset = dest -interpreter->code->base.data;
+    interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interpreter, argc, argv);
+    Parrot_runcode(interp, argc, argv);
     return NULL;
 }
 
 int
 main(int margc, char *margv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     struct PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
@@ -89,18 +89,18 @@ main(int margc, char *margv[])
     struct PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new(NULL);
-    if (interpreter == NULL)
+    interp = Parrot_new(NULL);
+    if (interp == NULL)
         return 1;
 
     /* this registers the PIR compiler */
-    imcc_init(interpreter);
+    imcc_init(interp);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new_dummy(interpreter, "test_code");
+    pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
-    run(interpreter, argc, argv);
-    Parrot_exit(interpreter, 0);
+    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    run(interp, argc, argv);
+    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
@@ -115,7 +115,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Single call");
 extern void imcc_init(Parrot_Interp interp);
 
 static opcode_t *
-run(Parrot_Interp interpreter, int argc, char *argv[])
+run(Parrot_Interp interp, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
@@ -126,44 +126,44 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interpreter,
-                                       interpreter->iglobals,
+    compreg = VTABLE_get_pmc_keyed_int(interp,
+                                       interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interpreter, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interpreter, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interpreter, comp)) {
-        PIO_eprintf(interpreter, "Pir compiler not loaded");
+    pir = const_string(interp, "PIR");
+    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+        PIO_eprintf(interp, "Pir compiler not loaded");
         exit(1);
     }
 
     /*
      * compile source
      */
-    prog = Parrot_compile_string(interpreter, pir, c_src, &error);
+    prog = Parrot_compile_string(interp, pir, c_src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interpreter, prog)) {
-        PIO_eprintf(interpreter, "Pir compiler returned no prog");
+    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+        PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(1);
     }
     /* keep eval PMC alive */
-    dod_register_pmc(interpreter, prog);
+    dod_register_pmc(interp, prog);
     /* locate function to run */
-    smain = const_string(interpreter, "main");
-    entry = Parrot_find_global_cur(interpreter, smain);
+    smain = const_string(interp, "main");
+    entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
-    interpreter->current_cont = new_ret_continuation_pmc(interpreter, NULL);
-    dest = VTABLE_invoke(interpreter, entry, NULL);
+    interp->current_cont = new_ret_continuation_pmc(interp, NULL);
+    dest = VTABLE_invoke(interp, entry, NULL);
     /* where to start */
-    interpreter->resume_offset = dest -interpreter->code->base.data;
+    interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interpreter, argc, argv);
+    Parrot_runcode(interp, argc, argv);
     return NULL;
 }
 
 int
 main(int margc, char *margv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     struct PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
@@ -171,18 +171,18 @@ main(int margc, char *margv[])
     struct PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new(NULL);
-    if (interpreter == NULL)
+    interp = Parrot_new(NULL);
+    if (interp == NULL)
         return 1;
 
     /* this registers the PIR compiler */
-    imcc_init(interpreter);
+    imcc_init(interp);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new_dummy(interpreter, "test_code");
+    pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
-    run(interpreter, argc, argv);
-    Parrot_exit(interpreter, 0);
+    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    run(interp, argc, argv);
+    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
@@ -197,36 +197,36 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Multiple Calls");
 extern void imcc_init(Parrot_Interp interp);
 
 static void
-compile_run(Parrot_Interp interpreter, const char *src, STRING *type, int argc,
+compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
     String *smain;
     PMC *prog, *entry;
     String *error;
     opcode_t *dest;
-    prog = Parrot_compile_string(interpreter, type, src, &error);
+    prog = Parrot_compile_string(interp, type, src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interpreter, prog)) {
-        PIO_eprintf(interpreter, "Pir compiler returned no prog");
+    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+        PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(1);
     }
     /* keep eval PMC alive */
-    dod_register_pmc(interpreter, prog);
+    dod_register_pmc(interp, prog);
     /* locate function to run */
-    smain = const_string(interpreter, "main");
-    entry = Parrot_find_global_cur(interpreter, smain);
+    smain = const_string(interp, "main");
+    entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
-    interpreter->current_cont = new_ret_continuation_pmc(interpreter, NULL);
-    dest = VTABLE_invoke(interpreter, entry, NULL);
+    interp->current_cont = new_ret_continuation_pmc(interp, NULL);
+    dest = VTABLE_invoke(interp, entry, NULL);
     /* where to start */
-    interpreter->resume_offset = dest -interpreter->code->base.data;
+    interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interpreter, argc, argv);
+    Parrot_runcode(interp, argc, argv);
     return NULL;
 }
 
 static opcode_t *
-run(Parrot_Interp interpreter, int argc, char *argv[])
+run(Parrot_Interp interp, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
@@ -238,23 +238,23 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interpreter,
-                                       interpreter->iglobals,
+    compreg = VTABLE_get_pmc_keyed_int(interp,
+                                       interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interpreter, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interpreter, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interpreter, comp)) {
-        PIO_eprintf(interpreter, "Pir compiler not loaded");
+    pir = const_string(interp, "PIR");
+    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+        PIO_eprintf(interp, "Pir compiler not loaded");
         exit(1);
     }
-    compile_run(interpreter, c_src, pir, argc, argv);
-    compile_run(interpreter, c2_src, pir, argc, argv);
+    compile_run(interp, c_src, pir, argc, argv);
+    compile_run(interp, c2_src, pir, argc, argv);
 }
 
 int
 main(int margc, char *margv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     struct PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
@@ -262,18 +262,18 @@ main(int margc, char *margv[])
     struct PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new(NULL);
-    if (interpreter == NULL)
+    interp = Parrot_new(NULL);
+    if (interp == NULL)
         return 1;
 
     /* this registers the PIR compiler */
-    imcc_init(interpreter);
+    imcc_init(interp);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new_dummy(interpreter, "test_code");
+    pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
-    run(interpreter, argc, argv);
-    Parrot_exit(interpreter, 0);
+    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    run(interp, argc, argv);
+    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
@@ -289,35 +289,35 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Multiple 1st bad PIR");
 extern void imcc_init(Parrot_Interp interp);
 
 static void
-compile_run(Parrot_Interp interpreter, const char *src, STRING *type, int argc,
+compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
     STRING *smain;
     PMC *prog, *entry;
     STRING *error;
     opcode_t *dest;
-    prog = Parrot_compile_string(interpreter, type, src, &error);
+    prog = Parrot_compile_string(interp, type, src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interpreter, prog)) {
-        PIO_eprintf(interpreter, "Pir compiler returned no prog\n");
+    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+        PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
     /* keep eval PMC alive */
-    dod_register_pmc(interpreter, prog);
+    dod_register_pmc(interp, prog);
     /* locate function to run */
-    smain = const_string(interpreter, "main");
-    entry = Parrot_find_global_cur(interpreter, smain);
+    smain = const_string(interp, "main");
+    entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
-    interpreter->current_cont = new_ret_continuation_pmc(interpreter, NULL);
-    dest = VTABLE_invoke(interpreter, entry, NULL);
+    interp->current_cont = new_ret_continuation_pmc(interp, NULL);
+    dest = VTABLE_invoke(interp, entry, NULL);
     /* where to start */
-    interpreter->resume_offset = dest -interpreter->code->base.data;
+    interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interpreter, argc, argv);
+    Parrot_runcode(interp, argc, argv);
 }
 
 static opcode_t *
-run(Parrot_Interp interpreter, int argc, char *argv[])
+run(Parrot_Interp interp, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
@@ -329,23 +329,23 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interpreter,
-                                       interpreter->iglobals,
+    compreg = VTABLE_get_pmc_keyed_int(interp,
+                                       interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interpreter, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interpreter, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interpreter, comp)) {
-        PIO_eprintf(interpreter, "Pir compiler not loaded");
+    pir = const_string(interp, "PIR");
+    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+        PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
-    compile_run(interpreter, c_src, pir, argc, argv);
-    compile_run(interpreter, c2_src, pir, argc, argv);
+    compile_run(interp, c_src, pir, argc, argv);
+    compile_run(interp, c2_src, pir, argc, argv);
 }
 
 int
 main(int margc, char *margv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     struct PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
@@ -353,18 +353,18 @@ main(int margc, char *margv[])
     struct PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new(NULL);
-    if (interpreter == NULL)
+    interp = Parrot_new(NULL);
+    if (interp == NULL)
         return 1;
 
     /* this registers the PIR compiler */
-    imcc_init(interpreter);
+    imcc_init(interp);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new_dummy(interpreter, "test_code");
+    pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
-    run(interpreter, argc, argv);
-    Parrot_exit(interpreter, 0);
+    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    run(interp, argc, argv);
+    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
@@ -380,35 +380,35 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Multiple 2nd bad PIR");
 extern void imcc_init(Parrot_Interp interp);
 
 static void
-compile_run(Parrot_Interp interpreter, const char *src, STRING *type, int argc,
+compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
     STRING *smain;
     PMC *prog, *entry;
     STRING *error;
     opcode_t *dest;
-    prog = Parrot_compile_string(interpreter, type, src, &error);
+    prog = Parrot_compile_string(interp, type, src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interpreter, prog)) {
-        PIO_eprintf(interpreter, "Pir compiler returned no prog\n");
+    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+        PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
     /* keep eval PMC alive */
-    dod_register_pmc(interpreter, prog);
+    dod_register_pmc(interp, prog);
     /* locate function to run */
-    smain = const_string(interpreter, "main");
-    entry = Parrot_find_global_cur(interpreter, smain);
+    smain = const_string(interp, "main");
+    entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
-    interpreter->current_cont = new_ret_continuation_pmc(interpreter, NULL);
-    dest = VTABLE_invoke(interpreter, entry, NULL);
+    interp->current_cont = new_ret_continuation_pmc(interp, NULL);
+    dest = VTABLE_invoke(interp, entry, NULL);
     /* where to start */
-    interpreter->resume_offset = dest -interpreter->code->base.data;
+    interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interpreter, argc, argv);
+    Parrot_runcode(interp, argc, argv);
 }
 
 static opcode_t *
-run(Parrot_Interp interpreter, int argc, char *argv[])
+run(Parrot_Interp interp, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
@@ -420,23 +420,23 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interpreter,
-                                       interpreter->iglobals,
+    compreg = VTABLE_get_pmc_keyed_int(interp,
+                                       interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interpreter, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interpreter, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interpreter, comp)) {
-        PIO_eprintf(interpreter, "Pir compiler not loaded");
+    pir = const_string(interp, "PIR");
+    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+        PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
-    compile_run(interpreter, c2_src, pir, argc, argv);
-    compile_run(interpreter, c_src, pir, argc, argv);
+    compile_run(interp, c2_src, pir, argc, argv);
+    compile_run(interp, c_src, pir, argc, argv);
 }
 
 int
 main(int margc, char *margv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     struct PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
@@ -444,18 +444,18 @@ main(int margc, char *margv[])
     struct PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new(NULL);
-    if (interpreter == NULL)
+    interp = Parrot_new(NULL);
+    if (interp == NULL)
         return 1;
 
     /* this registers the PIR compiler */
-    imcc_init(interpreter);
+    imcc_init(interp);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new_dummy(interpreter, "test_code");
+    pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
-    run(interpreter, argc, argv);
-    Parrot_exit(interpreter, 0);
+    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    run(interp, argc, argv);
+    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
@@ -471,35 +471,35 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Multiple bad PIR");
 extern void imcc_init(Parrot_Interp interp);
 
 static void
-compile_run(Parrot_Interp interpreter, const char *src, STRING *type, int argc,
+compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
     STRING *smain;
     PMC *prog, *entry;
     STRING *error;
     opcode_t *dest;
-    prog = Parrot_compile_string(interpreter, type, src, &error);
+    prog = Parrot_compile_string(interp, type, src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interpreter, prog)) {
-        PIO_eprintf(interpreter, "Pir compiler returned no prog\n");
+    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+        PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
     /* keep eval PMC alive */
-    dod_register_pmc(interpreter, prog);
+    dod_register_pmc(interp, prog);
     /* locate function to run */
-    smain = const_string(interpreter, "main");
-    entry = Parrot_find_global_cur(interpreter, smain);
+    smain = const_string(interp, "main");
+    entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
-    interpreter->current_cont = new_ret_continuation_pmc(interpreter, NULL);
-    dest = VTABLE_invoke(interpreter, entry, NULL);
+    interp->current_cont = new_ret_continuation_pmc(interp, NULL);
+    dest = VTABLE_invoke(interp, entry, NULL);
     /* where to start */
-    interpreter->resume_offset = dest -interpreter->code->base.data;
+    interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interpreter, argc, argv);
+    Parrot_runcode(interp, argc, argv);
 }
 
 static opcode_t *
-run(Parrot_Interp interpreter, int argc, char *argv[])
+run(Parrot_Interp interp, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
@@ -510,23 +510,23 @@ run(Parrot_Interp interpreter, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interpreter,
-                                       interpreter->iglobals,
+    compreg = VTABLE_get_pmc_keyed_int(interp,
+                                       interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interpreter, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interpreter, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interpreter, comp)) {
-        PIO_eprintf(interpreter, "Pir compiler not loaded");
+    pir = const_string(interp, "PIR");
+    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+        PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
-    compile_run(interpreter, c_src, pir, argc, argv);
-    compile_run(interpreter, c2_src, pir, argc, argv);
+    compile_run(interp, c_src, pir, argc, argv);
+    compile_run(interp, c2_src, pir, argc, argv);
 }
 
 int
 main(int margc, char *margv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     struct PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
@@ -534,17 +534,17 @@ main(int margc, char *margv[])
     struct PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new(NULL);
-    if (interpreter == NULL)
+    interp = Parrot_new(NULL);
+    if (interp == NULL)
         return 1;
 
     /* this registers the PIR compiler */
-    imcc_init(interpreter);
+    imcc_init(interp);
     /* dummy pf and segment to get things started */
-    pf = PackFile_new_dummy(interpreter, "test_code");
-    /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
-    run(interpreter, argc, argv);
-    Parrot_exit(interpreter, 0);
+    pf = PackFile_new_dummy(interp, "test_code");
+    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    run(interp, argc, argv);
+    Parrot_exit(interp, 0);
     return 0;
 }
 CODE

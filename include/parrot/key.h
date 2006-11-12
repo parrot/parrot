@@ -36,30 +36,30 @@ typedef enum {
 
 } KEY_flags;
 
-PARROT_API PMC *key_new(Interp *interpreter);
-PARROT_API PMC *key_new_integer(Interp *interpreter, INTVAL value);
-PARROT_API PMC *key_new_number(Interp *interpreter, FLOATVAL value);
-PARROT_API PMC *key_new_string(Interp *interpreter, STRING *value);
-PARROT_API PMC *key_new_cstring(Interp *interpreter, const char *value);
-PARROT_API PMC *key_new_pmc(Interp *interpreter, PMC *value);
+PARROT_API PMC *key_new(Interp *interp);
+PARROT_API PMC *key_new_integer(Interp *interp, INTVAL value);
+PARROT_API PMC *key_new_number(Interp *interp, FLOATVAL value);
+PARROT_API PMC *key_new_string(Interp *interp, STRING *value);
+PARROT_API PMC *key_new_cstring(Interp *interp, const char *value);
+PARROT_API PMC *key_new_pmc(Interp *interp, PMC *value);
 
-PARROT_API void key_set_integer(Interp *interpreter, PMC *key, INTVAL value);
-PARROT_API void key_set_number(Interp *interpreter, PMC *key, FLOATVAL value);
-PARROT_API void key_set_register(Interp *interpreter, PMC *key, INTVAL value,
+PARROT_API void key_set_integer(Interp *interp, PMC *key, INTVAL value);
+PARROT_API void key_set_number(Interp *interp, PMC *key, FLOATVAL value);
+PARROT_API void key_set_register(Interp *interp, PMC *key, INTVAL value,
         INTVAL flag);
-PARROT_API void key_set_string(Interp *interpreter, PMC *key, STRING *value);
-PARROT_API void key_set_pmc(Interp *interpreter, PMC *key, PMC *value);
+PARROT_API void key_set_string(Interp *interp, PMC *key, STRING *value);
+PARROT_API void key_set_pmc(Interp *interp, PMC *key, PMC *value);
 
-PARROT_API INTVAL key_type(Interp *interpreter, PMC *key);
-PARROT_API INTVAL key_integer(Interp *interpreter, PMC *key);
-PARROT_API FLOATVAL key_number(Interp *interpreter, PMC *key);
-PARROT_API STRING *key_string(Interp *interpreter, PMC *key);
-PARROT_API PMC *key_pmc(Interp *interpreter, PMC *key);
-PARROT_API PMC *key_next(Interp *interpreter, PMC *key);
+PARROT_API INTVAL key_type(Interp *interp, PMC *key);
+PARROT_API INTVAL key_integer(Interp *interp, PMC *key);
+PARROT_API FLOATVAL key_number(Interp *interp, PMC *key);
+PARROT_API STRING *key_string(Interp *interp, PMC *key);
+PARROT_API PMC *key_pmc(Interp *interp, PMC *key);
+PARROT_API PMC *key_next(Interp *interp, PMC *key);
 
-PARROT_API PMC *key_append(Interp *interpreter, PMC *key1, PMC *key2);
+PARROT_API PMC *key_append(Interp *interp, PMC *key1, PMC *key2);
 
-PARROT_API void key_mark(Interp *interpreter, PMC *key);
+PARROT_API void key_mark(Interp *interp, PMC *key);
 
 #endif /* PARROT_KEY_H_GUARD */
 

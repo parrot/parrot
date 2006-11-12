@@ -44,7 +44,7 @@ PIO_open_down(theINTERP, ParrotIOLayer * layer, const char * name,
 {
     while (layer) {
         if (layer->api->Open) {
-            return layer->api->Open(interpreter, layer, name, flags);
+            return layer->api->Open(interp, layer, name, flags);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -73,7 +73,7 @@ PIO_open_async_down(theINTERP, ParrotIOLayer * layer, const char * name,
 {
     while (layer) {
         if (layer->api->Open_ASync) {
-            return layer->api->Open_ASync(interpreter, layer, name, mode,
+            return layer->api->Open_ASync(interp, layer, name, mode,
                                           dummy);
         }
         layer = PIO_DOWNLAYER(layer);
@@ -101,7 +101,7 @@ PIO_fdopen_down(theINTERP, ParrotIOLayer * layer, PIOHANDLE fd, INTVAL flags)
 {
     while (layer) {
         if (layer->api->FDOpen) {
-            return layer->api->FDOpen(interpreter, layer, fd, flags);
+            return layer->api->FDOpen(interp, layer, fd, flags);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -128,7 +128,7 @@ PIO_peek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, STRING ** buf)
 {
     while (layer) {
         if (layer->api->Peek) {
-            return layer->api->Peek(interpreter, layer, io, buf);
+            return layer->api->Peek(interp, layer, io, buf);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -143,7 +143,7 @@ PIO_close_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 {
     while (layer) {
         if (layer->api->Close) {
-            return layer->api->Close(interpreter, layer, io);
+            return layer->api->Close(interp, layer, io);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -170,7 +170,7 @@ PIO_write_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, STRING *s)
 {
     while (layer) {
         if (layer->api->Write) {
-            return layer->api->Write(interpreter, layer, io, s);
+            return layer->api->Write(interp, layer, io, s);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -199,7 +199,7 @@ PIO_write_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 {
     while (layer) {
         if (layer->api->Write_ASync) {
-            return layer->api->Write_ASync(interpreter, layer, io, s, dummy);
+            return layer->api->Write_ASync(interp, layer, io, s, dummy);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -227,7 +227,7 @@ PIO_read_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, STRING ** buf)
 {
     while (layer) {
         if (layer->api->Read) {
-            return layer->api->Read(interpreter, layer, io, buf);
+            return layer->api->Read(interp, layer, io, buf);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -256,7 +256,7 @@ PIO_read_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 {
     while (layer) {
         if (layer->api->Read_ASync) {
-            return layer->api->Read_ASync(interpreter, layer, io, buf, dummy);
+            return layer->api->Read_ASync(interp, layer, io, buf, dummy);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -283,7 +283,7 @@ PIO_flush_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 {
     while (layer) {
         if (layer->api->Flush) {
-            layer->api->Flush(interpreter, layer, io);
+            layer->api->Flush(interp, layer, io);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -312,7 +312,7 @@ PIO_seek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, PIOOFF_T offset,
 {
     while (layer) {
         if (layer->api->Seek) {
-            return layer->api->Seek(interpreter, layer, io, offset, whence);
+            return layer->api->Seek(interp, layer, io, offset, whence);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -339,7 +339,7 @@ PIO_tell_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 {
     while (layer) {
         if (layer->api->Tell) {
-            return layer->api->Tell(interpreter, layer, io);
+            return layer->api->Tell(interp, layer, io);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -368,7 +368,7 @@ PIO_setbuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 {
     while (layer) {
         if (layer->api->SetBuf) {
-            return layer->api->SetBuf(interpreter, layer, io, bufsize);
+            return layer->api->SetBuf(interp, layer, io, bufsize);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -395,7 +395,7 @@ PIO_setlinebuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 {
     while (layer) {
         if (layer->api->SetLineBuf) {
-            return layer->api->SetLineBuf(interpreter, layer, io);
+            return layer->api->SetLineBuf(interp, layer, io);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -422,7 +422,7 @@ PIO_eof_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 {
     while (layer) {
         if (layer->api->Eof) {
-            return layer->api->Eof(interpreter, layer, io);
+            return layer->api->Eof(interp, layer, io);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -451,7 +451,7 @@ PIO_poll_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 {
     while (layer) {
         if (layer->api->Poll) {
-            return layer->api->Poll(interpreter, layer, io, which, sec, usec);
+            return layer->api->Poll(interp, layer, io, which, sec, usec);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -479,7 +479,7 @@ PIO_socket_down(theINTERP, ParrotIOLayer *layer, INTVAL fam, INTVAL type,
 {
     while (layer) {
         if (layer->api->Socket) {
-            return layer->api->Socket(interpreter, layer, fam, type, proto);
+            return layer->api->Socket(interp, layer, fam, type, proto);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -505,7 +505,7 @@ PIO_recv_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 {
     while (layer) {
         if (layer->api->Recv) {
-            return layer->api->Recv(interpreter, layer, io, buf);
+            return layer->api->Recv(interp, layer, io, buf);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -532,7 +532,7 @@ PIO_send_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *buf)
 {
     while (layer) {
         if (layer->api->Send) {
-            return layer->api->Send(interpreter, layer, io, buf);
+            return layer->api->Send(interp, layer, io, buf);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -560,7 +560,7 @@ PIO_connect_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
 {
     while (layer) {
         if (layer->api->Connect) {
-            return layer->api->Connect(interpreter, layer, io, address);
+            return layer->api->Connect(interp, layer, io, address);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -587,7 +587,7 @@ PIO_bind_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
 {
     while (layer) {
         if (layer->api->Bind) {
-            return layer->api->Bind(interpreter, layer, io, address);
+            return layer->api->Bind(interp, layer, io, address);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -614,7 +614,7 @@ PIO_listen_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
 {
     while (layer) {
         if (layer->api->Listen) {
-            return layer->api->Listen(interpreter, layer, io, backlog);
+            return layer->api->Listen(interp, layer, io, backlog);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -642,7 +642,7 @@ PIO_accept_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     while (layer) {
         if (layer->api->Accept) {
-            return layer->api->Accept(interpreter, layer, io);
+            return layer->api->Accept(interp, layer, io);
         }
         layer = PIO_DOWNLAYER(layer);
     }

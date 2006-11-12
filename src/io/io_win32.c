@@ -143,22 +143,22 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 #endif
 
     if ((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-        PIO_STDIN(interpreter) = new_io_pmc(interpreter,
-            PIO_win32_fdopen(interpreter, layer, h, PIO_F_READ));
+        PIO_STDIN(interp) = new_io_pmc(interp,
+            PIO_win32_fdopen(interp, layer, h, PIO_F_READ));
     }
     else {
         return -1;
     }
     if ((h = GetStdHandle(STD_OUTPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-        PIO_STDOUT(interpreter) = new_io_pmc(interpreter,
-            PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE));
+        PIO_STDOUT(interp) = new_io_pmc(interp,
+            PIO_win32_fdopen(interp, layer, h, PIO_F_WRITE));
     }
     else {
         return -2;
     }
     if ((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE) {
-        PIO_STDERR(interpreter) = new_io_pmc(interpreter,
-            PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE));
+        PIO_STDERR(interp) = new_io_pmc(interp,
+            PIO_win32_fdopen(interp, layer, h, PIO_F_WRITE));
     }
     else {
         return -3;
@@ -222,7 +222,7 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
 
     type = PIO_TYPE_FILE;
 #  if 0
-    if ((Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) != 0) {
+    if ((Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) != 0) {
         fprintf(stderr, "PIO_win32_open: %s\n", spath);
     }
 #  endif
@@ -240,7 +240,7 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     fd = CreateFile(spath, fAcc, fShare, NULL, fCreat,
                     FILE_ATTRIBUTE_NORMAL, NULL);
     if (fd != INVALID_HANDLE_VALUE) {
-        io = PIO_new(interpreter, type, flags, 0);
+        io = PIO_new(interp, type, flags, 0);
         io->fd = fd;
         return io;
     }
@@ -280,7 +280,7 @@ PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
     /* fdopened files are always shared */
     flags |= PIO_F_SHARED;
 
-    io = PIO_new(interpreter, PIO_F_FILE, flags, mode);
+    io = PIO_new(interp, PIO_F_FILE, flags, mode);
     io->fd = fd;
     return io;
 }
@@ -299,7 +299,7 @@ Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 static INTVAL
 PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer);
 
     if (io && io->fd != INVALID_HANDLE_VALUE) {
@@ -343,7 +343,7 @@ Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 static INTVAL
 PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer);
     /*
      * FlushFileBuffers won't work for console handles. From the MS help file:
@@ -383,7 +383,7 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 
     UNUSED(layer);
 
-    s = PIO_make_io_string(interpreter, buf, 2048);
+    s = PIO_make_io_string(interp, buf, 2048);
     len = s->bufused;
     buffer = s->strstart;
 
@@ -424,7 +424,7 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
     void *buffer = s->strstart;
     size_t len = s->bufused;
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(layer);
 
     /* do it by hand, Win32 hasn't any specific flag */
@@ -470,7 +470,7 @@ PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 {
     LARGE_INTEGER offset;
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(l);
 
     offset.QuadPart = off;
@@ -501,7 +501,7 @@ PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
     LARGE_INTEGER p;
 
-    UNUSED(interpreter);
+    UNUSED(interp);
     UNUSED(l);
 
     p.QuadPart = piooffsetzero;
@@ -534,7 +534,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     /* Hard coded to IPv4 for now */
     int family = AF_INET;
 
-    char * s = string_to_cstring(interpreter, addr);
+    char * s = string_to_cstring(interp, addr);
     sa.sin_addr.s_addr = inet_addr (s);
     /* Maybe it is a hostname, try to lookup */
     /* XXX Check PIO option before doing a name lookup,
@@ -553,7 +553,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 
     sa.sin_port = htons(port);
 
-    return string_make(interpreter, &sa, sizeof(struct sockaddr), "binary", 0);
+    return string_make(interp, &sa, sizeof(struct sockaddr), "binary", 0);
 }
 
 
@@ -579,7 +579,7 @@ PIO_win32_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
     int sock;
     ParrotIO * io;
     if ((sock = socket(fam, type, proto)) >= 0) {
-        io = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
+        io = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = (PIOHANDLE) sock;
         io->remote.sin_family = fam;
         return io;
@@ -609,11 +609,11 @@ PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
         io->remote.sin_port = sa.sin_port;
     }
 
-    /*    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n",
+    /*    PIO_eprintf(interp, "connect: fd = %d port = %d\n",
      *    io->fd, ntohs(io->remote.sin_port));*/
     if ((connect((SOCKET)io->fd, (struct sockaddr*)&io->remote,
                    sizeof(struct sockaddr))) != 0) {
-        PIO_eprintf(interpreter, "PIO_win32_connect: errno = %d\n",
+        PIO_eprintf(interp, "PIO_win32_connect: errno = %d\n",
                     WSAGetLastError());
         return -1;
     }
@@ -705,12 +705,12 @@ AGAIN:
         /* The charset should probably be 'binary', but right now httpd.imc
          * only works with 'ascii'
          */
-        *s = string_make(interpreter, buf, bytesread, "ascii", 0);
+        *s = string_make(interp, buf, bytesread, "ascii", 0);
         if (!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }
 #if PIO_TRACE
-        PIO_eprintf(interpreter, "PIO_win32_recv: %d bytes\n", bytesread);
+        PIO_eprintf(interp, "PIO_win32_recv: %d bytes\n", bytesread);
 #endif
         return bytesread;
     }
@@ -723,13 +723,13 @@ AGAIN:
             case WSAECONNRESET:
                 _close((SOCKET)io->fd);
 #if PIO_TRACE
-                PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
+                PIO_eprintf(interp, "recv: Connection reset by peer\n");
 #endif
                 return -1;
             default:
                 _close((SOCKET)io->fd);
 #if PIO_TRACE
-                PIO_eprintf(interpreter, "recv: errno = %d\n", err);
+                PIO_eprintf(interp, "recv: errno = %d\n", err);
 #endif
                 return -1;
         }
@@ -762,7 +762,7 @@ PIO_win32_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 
     if ((bind((SOCKET)io->fd, (struct sockaddr *)&io->local,
               sizeof(struct sockaddr))) == -1) {
-        PIO_eprintf(interpreter, "PIO_win32_bind: errno = %d\n",
+        PIO_eprintf(interp, "PIO_win32_bind: errno = %d\n",
                     WSAGetLastError());
         return -1;
     }
@@ -811,7 +811,7 @@ PIO_win32_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     int newsize;
     int err_code;
     ParrotIO *newio;
-    newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
+    newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
     newsize = sizeof (struct sockaddr);
 
     newsock = accept((SOCKET)io->fd, (struct sockaddr *)&(newio->remote),

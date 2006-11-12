@@ -1436,27 +1436,27 @@ Parrot_set_args_pc {
                 offsetof(Interp, current_args));
     }
     else  {
-        jit_set_args_pc(jit_info, interpreter,
+        jit_set_args_pc(jit_info, interp,
             jit_info->flags & JIT_CODE_RECURSIVE);
     }
 }
 
 extern Parrot_set_returns_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
-        Parrot_jit_normal_op(jit_info, interpreter);
+        Parrot_jit_normal_op(jit_info, interp);
     else  {
-        jit_set_returns_pc(jit_info, interpreter,
+        jit_set_returns_pc(jit_info, interp,
             jit_info->flags & JIT_CODE_RECURSIVE);
     }
 }
 
 extern Parrot_returncc {
     if (jit_info->code_type == JIT_CODE_FILE)
-        Parrot_jit_restart_op(jit_info, interpreter);
+        Parrot_jit_restart_op(jit_info, interp);
     else {
         /* restore pushed regs if any */
         if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
-            jit_restore_regs(jit_info, interpreter);
+            jit_restore_regs(jit_info, interp);
             /* no branch ret 0 */
             jit_emit_bxor_rr_i(NATIVECODE, emit_EAX, emit_EAX);
             jit_emit_stack_frame_leave(NATIVECODE);
@@ -1472,7 +1472,7 @@ Parrot_pic_callr___pc {
     opcode_t *params;
     int skip;
 
-    constants = CONTEXT(interpreter->ctx)->constants;
+    constants = CONTEXT(interp->ctx)->constants;
     params = jit_info->optimizer->sections->begin;
     sig_params = constants[params[1]]->u.key;
     op_i = 2 + SIG_ELEMS(sig_params);
@@ -1480,7 +1480,7 @@ Parrot_pic_callr___pc {
     offset = jit_info->arena.op_map[op_i].offset;
     /* TODO preserve necessary regs */
     assert(*CUR_OPCODE == PARROT_OP_get_results_pc);
-    constants = CONTEXT(interpreter->ctx)->constants;
+    constants = CONTEXT(interp->ctx)->constants;
     sig_result = constants[CUR_OPCODE[1]]->u.key;
     if (!SIG_ELEMS(sig_result))
         skip = -1;
@@ -1491,14 +1491,14 @@ Parrot_pic_callr___pc {
     here = NATIVECODE - jit_info->arena.start;
     emitm_calll(NATIVECODE, offset - here - 5);
 
-    jit_restore_regs_call(jit_info, interpreter, skip);
+    jit_restore_regs_call(jit_info, interp, skip);
 }
 
 extern Parrot_get_params_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
-        Parrot_jit_normal_op(jit_info, interpreter);
+        Parrot_jit_normal_op(jit_info, interp);
     else if (!(jit_info->flags & JIT_CODE_RECURSIVE)) {
-        jit_get_params_pc(jit_info, interpreter);
+        jit_get_params_pc(jit_info, interp);
     }
 }
 
@@ -1514,7 +1514,7 @@ Parrot_get_results_pc {
         struct PackFile_Constant ** constants;
         PMC *sig_result;
 
-        constants = CONTEXT(interpreter->ctx)->constants;
+        constants = CONTEXT(interp->ctx)->constants;
         sig_result = constants[CUR_OPCODE[1]]->u.key;
         if (!SIG_ELEMS(sig_result))
             return;

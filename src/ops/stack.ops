@@ -37,7 +37,7 @@ Restore all the registers from the register stack.
 =cut
 
 inline op saveall() :base_core {
-  Parrot_push_regs(interpreter);
+  Parrot_push_regs(interp);
   /* these 2 opcodes change the register base pointer
    * restart NEXT() reloads cached base pointers, and works with
    * arbitrary branch opcodes too. While it's a bit of overkill,
@@ -48,7 +48,7 @@ inline op saveall() :base_core {
 }
 
 inline op restoreall() :base_core {
-  Parrot_pop_regs(interpreter);
+  Parrot_pop_regs(interp);
   restart NEXT();
 }
 
@@ -77,12 +77,12 @@ Gets the type of entry $2 of the user stack and puts it in $1.
 
 op entrytype(out INT, in INT) :base_core {
   Stack_Entry_t * const entry =
-    stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
+    stack_entry(interp, CONTEXT(interp->ctx)->user_stack, $2);
 
   if (!entry) {
     internal_exception(99, "Stack Depth wrong");
   }
-  $1 = get_entry_type(interpreter, entry);
+  $1 = get_entry_type(interp, entry);
   goto NEXT();
 }
 
@@ -95,7 +95,7 @@ Puts the depth of the user stack in $1.
 =cut
 
 inline op depth(out INT) :base_core {
-  $1 = stack_height(interpreter, CONTEXT(interpreter->ctx)->user_stack);
+  $1 = stack_height(interp, CONTEXT(interp->ctx)->user_stack);
   goto NEXT();
 }
 
@@ -118,7 +118,7 @@ is the bottom-most)
 
 op lookback(out INT, in INT) :base_core {
   Stack_Entry_t * const entry =
-        stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
+        stack_entry(interp, CONTEXT(interp->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_INT) {
@@ -131,7 +131,7 @@ op lookback(out INT, in INT) :base_core {
 
 op lookback(out STR, in INT) :base_core {
   Stack_Entry_t * const entry =
-        stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
+        stack_entry(interp, CONTEXT(interp->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_STRING) {
@@ -144,7 +144,7 @@ op lookback(out STR, in INT) :base_core {
 
 op lookback(out NUM, in INT) :base_core {
   Stack_Entry_t * const entry =
-        stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
+        stack_entry(interp, CONTEXT(interp->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_FLOAT) {
@@ -157,7 +157,7 @@ op lookback(out NUM, in INT) :base_core {
 
 op lookback(out PMC, in INT) :base_core {
   Stack_Entry_t * const entry =
-        stack_entry(interpreter, CONTEXT(interpreter->ctx)->user_stack, $2);
+        stack_entry(interp, CONTEXT(interp->ctx)->user_stack, $2);
   if (!entry)
       internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_PMC) {
@@ -184,26 +184,26 @@ Save register or constant $1 onto the user stack.
 
 inline op save(in INT) :base_core {
   INTVAL i = $1;
-  stack_push(interpreter,
-             &CONTEXT(interpreter->ctx)->user_stack, &i,
+  stack_push(interp,
+             &CONTEXT(interp->ctx)->user_stack, &i,
              STACK_ENTRY_INT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in NUM) :base_core {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack,
+  stack_push(interp, &CONTEXT(interp->ctx)->user_stack,
              &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(invar PMC) :base_core {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack,
+  stack_push(interp, &CONTEXT(interp->ctx)->user_stack,
               $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in STR) :base_core {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack,
+  stack_push(interp, &CONTEXT(interp->ctx)->user_stack,
              $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
@@ -217,8 +217,8 @@ Save a clone of register or constant $1 onto the user stack.
 =cut
 
 inline op savec(in STR) :base_core {
-  stack_push(interpreter, &CONTEXT(interpreter->ctx)->user_stack,
-             string_copy(interpreter, $1),
+  stack_push(interp, &CONTEXT(interp->ctx)->user_stack,
+             string_copy(interp, $1),
              STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
@@ -238,25 +238,25 @@ Restore register $1 from the user stack.
 =cut
 
 inline op restore(out INT) :base_core {
-  (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1),
+  (void)stack_pop(interp, &CONTEXT(interp->ctx)->user_stack, &($1),
                   STACK_ENTRY_INT);
   goto NEXT();
 }
 
 inline op restore(out NUM) :base_core {
-  (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1),
+  (void)stack_pop(interp, &CONTEXT(interp->ctx)->user_stack, &($1),
                   STACK_ENTRY_FLOAT);
   goto NEXT();
 }
 
 inline op restore(out PMC) :base_core {
-  (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1),
+  (void)stack_pop(interp, &CONTEXT(interp->ctx)->user_stack, &($1),
                   STACK_ENTRY_PMC);
   goto NEXT();
 }
 
 inline op restore(out STR) :base_core {
-  (void)stack_pop(interpreter, &CONTEXT(interpreter->ctx)->user_stack, &($1),
+  (void)stack_pop(interp, &CONTEXT(interp->ctx)->user_stack, &($1),
                   STACK_ENTRY_STRING);
   goto NEXT();
 }
@@ -276,7 +276,7 @@ the second entry, the second becomes the third etc., while the former
 =cut
 
 inline op rotate_up(in INT) :base_core {
-  rotate_entries(interpreter, &CONTEXT(interpreter->ctx)->user_stack, $1);
+  rotate_entries(interp, &CONTEXT(interp->ctx)->user_stack, $1);
   goto NEXT();
 }
 

@@ -58,7 +58,7 @@ typedef struct _MMD_init {
 PARROT_API void Parrot_mmd_register_table(Interp*, INTVAL, const MMD_init *, INTVAL);
 PARROT_API void Parrot_mmd_rebuild_table(Interp*, INTVAL class_enum, INTVAL func_nr);
 
-PARROT_API funcptr_t get_mmd_dispatch_type(Interp *interpreter,
+PARROT_API funcptr_t get_mmd_dispatch_type(Interp *interp,
         INTVAL function, INTVAL left_type, INTVAL right_type, int *is_pmc);
 
 typedef struct _MMD_table {
@@ -82,7 +82,7 @@ PARROT_API int Parrot_run_maybe_mmd_func(Interp*, STRING *meth);
  * in src/objects.c :
  */
 PARROT_API const char* Parrot_MMD_method_name(Interp* i, INTVAL idx);
-PARROT_API INTVAL Parrot_MMD_method_idx(Interp* interpreter, char *name);
+PARROT_API INTVAL Parrot_MMD_method_idx(Interp *interp, char *name);
 
 #endif /* PARROT_MMD_H_GUARD */
 

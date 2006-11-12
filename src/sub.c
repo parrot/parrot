@@ -24,7 +24,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 /*
 
 =item C<void
-mark_context(Interp* interpreter, parrot_context_t* ctx)>
+mark_context(Interp *interp, parrot_context_t* ctx)>
 
 Marks the context C<*ctx>.
 
@@ -33,48 +33,48 @@ Marks the context C<*ctx>.
 */
 
 void
-mark_context(Interp* interpreter, parrot_context_t* ctx)
+mark_context(Interp *interp, parrot_context_t* ctx)
 {
     PObj *obj;
     int i;
 
-    mark_stack(interpreter, ctx->user_stack);
-    mark_register_stack(interpreter, ctx->reg_stack);
+    mark_stack(interp, ctx->user_stack);
+    mark_register_stack(interp, ctx->reg_stack);
     obj = (PObj*)ctx->current_sub;
     if (obj)
-        pobject_lives(interpreter, obj);
+        pobject_lives(interp, obj);
     obj = (PObj*)ctx->current_object;
     if (obj)
-        pobject_lives(interpreter, obj);
+        pobject_lives(interp, obj);
     /* the current continuation in the interpreter has
      * to be marked too in the call sequence currently
      * as e.g. a MMD search could need resources
      * and GC the continuation
      */
-    obj = (PObj*)interpreter->current_cont;
+    obj = (PObj*)interp->current_cont;
     if (obj && obj != NEED_CONTINUATION)
-        pobject_lives(interpreter, obj);
+        pobject_lives(interp, obj);
     obj = (PObj*)ctx->current_cont;
     if (obj && !PObj_live_TEST(obj))
-        pobject_lives(interpreter, obj);
+        pobject_lives(interp, obj);
     obj = (PObj*)ctx->current_method;
     if (obj)
-        pobject_lives(interpreter, obj);
+        pobject_lives(interp, obj);
     obj = (PObj*)ctx->current_namespace;
     if (obj)
-        pobject_lives(interpreter, obj);
+        pobject_lives(interp, obj);
     obj = (PObj*)ctx->lex_pad;
     if (obj)
-        pobject_lives(interpreter, obj);
+        pobject_lives(interp, obj);
     for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
         obj = (PObj*) CTX_REG_PMC(ctx, i);
         if (obj)
-            pobject_lives(interpreter, obj);
+            pobject_lives(interp, obj);
     }
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         obj = (PObj*) CTX_REG_STR(ctx, i);
         if (obj)
-            pobject_lives(interpreter, obj);
+            pobject_lives(interp, obj);
     }
 }
 
@@ -221,10 +221,10 @@ if possible; otherwise, creates a new one.
 */
 
 PMC *
-new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
+new_ret_continuation_pmc(Interp *interp, opcode_t * address)
 {
-    PMC* const continuation = pmc_new(interpreter, enum_class_RetContinuation);
-    VTABLE_set_pointer(interpreter, continuation, address);
+    PMC* const continuation = pmc_new(interp, enum_class_RetContinuation);
+    VTABLE_set_pointer(interp, continuation, address);
     return continuation;
 }
 
@@ -239,20 +239,20 @@ Make true Continuation from all RetContinuations up the call chain.
 */
 
 void
-invalidate_retc_context(Interp *interpreter, PMC *cont)
+invalidate_retc_context(Interp *interp, PMC *cont)
 {
     struct Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
 
-    Parrot_set_context_threshold(interpreter, ctx);
+    Parrot_set_context_threshold(interp, ctx);
     while (1) {
         /*
          * We  stop if we encounter a true continuation, because
          * if one were created, everything up the chain would have been
          * invalidated earlier.
          */
-        if (cont->vtable != interpreter->vtables[enum_class_RetContinuation])
+        if (cont->vtable != interp->vtables[enum_class_RetContinuation])
             break;
-        cont->vtable = interpreter->vtables[enum_class_Continuation];
+        cont->vtable = interp->vtables[enum_class_Continuation];
         ctx->ref_count++;
         cont = ctx->current_cont;
         ctx = PMC_cont(cont)->from_ctx;
@@ -273,16 +273,16 @@ Return namespace, name, and location of subroutine.
 /* XXX use method lookup - create interface
  *                         see also pbc.c
  */
-extern PMC* Parrot_NameSpace_name(Interp* interpreter, PMC* pmc);
+extern PMC* Parrot_NameSpace_name(Interp *interp, PMC* pmc);
 
 STRING*
-Parrot_full_sub_name(Interp* interpreter, PMC* sub)
+Parrot_full_sub_name(Interp *interp, PMC* sub)
 {
     struct Parrot_sub * s;
     STRING *res;
 
 
-    if (!sub || !VTABLE_defined(interpreter, sub))
+    if (!sub || !VTABLE_defined(interp, sub))
         return NULL;
     s = PMC_sub(sub);
     if (PMC_IS_NULL(s->namespace_stash)) {
@@ -292,22 +292,22 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
         PMC *ns_array;
         STRING *j;
 
-        Parrot_block_DOD(interpreter);
-        ns_array = Parrot_NameSpace_name(interpreter, s->namespace_stash);
+        Parrot_block_DOD(interp);
+        ns_array = Parrot_NameSpace_name(interp, s->namespace_stash);
         if (s->name) {
-            VTABLE_push_string(interpreter, ns_array, s->name);
+            VTABLE_push_string(interp, ns_array, s->name);
         }
-        j = const_string(interpreter, ";");
+        j = const_string(interp, ";");
 
-        res =  string_join(interpreter, j, ns_array);
-        Parrot_unblock_DOD(interpreter);
+        res =  string_join(interp, j, ns_array);
+        Parrot_unblock_DOD(interp);
         return res;
     }
     return NULL;
 }
 
 int
-Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
+Parrot_Context_info(Interp *interp, parrot_context_t *ctx,
                     struct Parrot_Context_info *info)
 {
     struct Parrot_sub *sub;
@@ -322,16 +322,16 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
 
     /* is the current sub of the specified context valid? */
     if (PMC_IS_NULL(ctx->current_sub)) {
-        info->subname = string_from_cstring(interpreter, "???", 3);
+        info->subname = string_from_cstring(interp, "???", 3);
         info->nsname = info->subname;
-        info->fullname = string_from_cstring(interpreter, "??? :: ???", 10);
+        info->fullname = string_from_cstring(interp, "??? :: ???", 10);
         info->pc = -1;
         return 0;
     }
 
     /* fetch struct Parrot_sub of the current sub in the given context */
-    if (!VTABLE_isa(interpreter, ctx->current_sub,
-                    const_string(interpreter, "Sub")))
+    if (!VTABLE_isa(interp, ctx->current_sub,
+                    const_string(interp, "Sub")))
         return 1;
 
     sub = PMC_sub(ctx->current_sub);
@@ -340,12 +340,12 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
 
     /* set the namespace name and fullname of the sub */
     if (PMC_IS_NULL(sub->namespace)) {
-        info->nsname = string_from_cstring(interpreter, "", 0);
+        info->nsname = string_from_cstring(interp, "", 0);
         info->fullname = info->subname;
     }
     else {
-        info->nsname = VTABLE_get_string(interpreter, sub->namespace);
-        info->fullname = Parrot_full_sub_name(interpreter, ctx->current_sub);
+        info->nsname = VTABLE_get_string(interp, sub->namespace);
+        info->fullname = Parrot_full_sub_name(interp, ctx->current_sub);
     }
 
     /* return here if there is no current pc */
@@ -364,18 +364,18 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
         if (!debug)
             return 0;
         for (i = n = 0; n < sub->seg->base.size; i++) {
-            op_info_t *op_info = &interpreter->op_info_table[*pc];
+            op_info_t *op_info = &interp->op_info_table[*pc];
             opcode_t var_args = 0;
             if (i >= debug->base.size)
                 return 0;
             if (n >= offs) {
                 /* set source line and file */
                 info->line = debug->base.data[i];
-                info->file = string_to_cstring(interpreter,
-                Parrot_debug_pc_to_filename(interpreter, debug, i));
+                info->file = string_to_cstring(interp,
+                Parrot_debug_pc_to_filename(interp, debug, i));
                 break;
             }
-            ADD_OP_VAR_PART(interpreter, sub->seg, pc, var_args);
+            ADD_OP_VAR_PART(interp, sub->seg, pc, var_args);
             n += op_info->op_count + var_args;
             pc += op_info->op_count + var_args;
         }
@@ -384,23 +384,23 @@ Parrot_Context_info(Interp *interpreter, parrot_context_t *ctx,
 }
 
 STRING*
-Parrot_Context_infostr(Interp *interpreter, parrot_context_t *ctx)
+Parrot_Context_infostr(Interp *interp, parrot_context_t *ctx)
 {
     struct Parrot_Context_info info;
-    const char* const msg = (CONTEXT(interpreter->ctx) == ctx) ?
+    const char* const msg = (CONTEXT(interp->ctx) == ctx) ?
         "current instr.:":
         "called from Sub";
     STRING *res;
 
-    Parrot_block_DOD(interpreter);
-    if (Parrot_Context_info(interpreter, ctx, &info)) {
-        res = Parrot_sprintf_c(interpreter,
+    Parrot_block_DOD(interp);
+    if (Parrot_Context_info(interp, ctx, &info)) {
+        res = Parrot_sprintf_c(interp,
             "%s '%Ss' pc %d (%s:%d)", msg,
             info.fullname, info.pc, info.file, info.line);
     }
     else
         res = NULL;
-    Parrot_unblock_DOD(interpreter);
+    Parrot_unblock_DOD(interp);
     return res;
 }
 
@@ -415,7 +415,7 @@ Locate the LexPad containing the given name. Return NULL on failure.
 */
 
 PMC*
-Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
+Parrot_find_pad(Interp *interp, STRING *lex_name, parrot_context_t *ctx)
 {
     while (1) {
         PMC * const lex_pad = ctx->lex_pad;
@@ -424,7 +424,7 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
         if (!outer)
             return lex_pad;
         if (!PMC_IS_NULL(lex_pad)) {
-            if (VTABLE_exists_keyed_str(interpreter, lex_pad, lex_name))
+            if (VTABLE_exists_keyed_str(interp, lex_pad, lex_name))
                 return lex_pad;
         }
 #if CTX_LEAK_DEBUG
@@ -434,7 +434,7 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
              * debug, though we'd rather not pay the cost of detection in a
              * production release.
              */
-            real_exception(interpreter, NULL, INVALID_OPERATION,
+            real_exception(interp, NULL, INVALID_OPERATION,
                            "Bug:  Context %p :outer points back to itself.",
                            ctx);
         }
@@ -445,45 +445,45 @@ Parrot_find_pad(Interp* interpreter, STRING *lex_name, parrot_context_t *ctx)
 }
 
 PMC*
-parrot_new_closure(Interp *interpreter, PMC *sub_pmc)
+parrot_new_closure(Interp *interp, PMC *sub_pmc)
 {
     PMC *clos_pmc;
     struct Parrot_sub *clos, *sub;
     PMC *cont;
     parrot_context_t *ctx;
 
-    clos_pmc = VTABLE_clone(interpreter, sub_pmc);
+    clos_pmc = VTABLE_clone(interp, sub_pmc);
     sub = PMC_sub(sub_pmc);
     clos = PMC_sub(clos_pmc);
     /*
      * the given sub_pmc has to have an :outer(sub) that is
      * this subroutine
      */
-    ctx = CONTEXT(interpreter->ctx);
+    ctx = CONTEXT(interp->ctx);
     if (PMC_IS_NULL(sub->outer_sub)) {
-        real_exception(interpreter, NULL, INVALID_OPERATION,
+        real_exception(interp, NULL, INVALID_OPERATION,
                 "'%Ss' isn't a closure (no :outer)", sub->name);
     }
     /* if (sub->outer_sub != ctx->current_sub) - fails if outer
      * is a closure too e.g. test 'closure 4'
      */
-    if (0 == string_equal(interpreter,
+    if (0 == string_equal(interp,
                 (PMC_sub(ctx->current_sub))->name,
                 sub->name)) {
-        real_exception(interpreter, NULL, INVALID_OPERATION,
+        real_exception(interp, NULL, INVALID_OPERATION,
                 "'%Ss' isn't the :outer of '%Ss')",
                 (PMC_sub(ctx->current_sub))->name,
                 sub->name);
     }
     cont = ctx->current_cont;
     /* preserve this frame by converting the continuation */
-    cont->vtable = interpreter->vtables[enum_class_Continuation];
+    cont->vtable = interp->vtables[enum_class_Continuation];
     /* remember this (the :outer) ctx in the closure */
     clos->outer_ctx = ctx;
     /* the closure refs now this context too */
     ctx->ref_count++;
 #if CTX_LEAK_DEBUG
-    if (Interp_debug_TEST(interpreter, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
         fprintf(stderr, "[alloc closure  %p, outer_ctx %p, ref_count=%d]\n",
                 clos_pmc, ctx, (int) ctx->ref_count);
     }

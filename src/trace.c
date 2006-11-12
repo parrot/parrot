@@ -29,7 +29,7 @@ src/test_main.c
 /*
 
 =item C<void
-trace_pmc_dump(Interp *interpreter, PMC* pmc)>
+trace_pmc_dump(Interp *interp, PMC* pmc)>
 
 Prints a PMC to C<stderr>.
 
@@ -38,7 +38,7 @@ Prints a PMC to C<stderr>.
 */
 
 static STRING*
-trace_class_name(Interp *interpreter, PMC* pmc)
+trace_class_name(Interp *interp, PMC* pmc)
 {
     STRING *class_name;
     if (PObj_is_class_TEST(pmc)) {
@@ -53,9 +53,9 @@ trace_class_name(Interp *interpreter, PMC* pmc)
 }
 
 void
-trace_pmc_dump(Interp *interpreter, PMC* pmc)
+trace_pmc_dump(Interp *interp, PMC* pmc)
 {
-    Interp * const debugger = interpreter->debugger;
+    Interp * const debugger = interp->debugger;
 
     if (!pmc) {
         PIO_eprintf(debugger, "(null)");
@@ -73,24 +73,24 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         PIO_eprintf(debugger, "**************** PMC is on free list *****\n");
     }
     if (pmc->vtable->class == pmc) {
-        STRING * const name = trace_class_name(interpreter, pmc);
+        STRING * const name = trace_class_name(interp, pmc);
         PIO_eprintf(debugger, "Class=%Ss:PMC(%#p)", name, pmc);
     }
     else if ( pmc->vtable->base_type == enum_class_String) {
-        STRING * const s = VTABLE_get_string(interpreter, pmc);
+        STRING * const s = VTABLE_get_string(interp, pmc);
         if (!s)
             PIO_eprintf(debugger, "%S=PMC(%#p Str:(NULL))",
-                    VTABLE_name(interpreter, pmc), pmc);
+                    VTABLE_name(interp, pmc), pmc);
         else {
             STRING* const escaped = string_escape_string_delimited(
-                            interpreter, s, 20);
+                            interp, s, 20);
             if (escaped)
                 PIO_eprintf(debugger, "%S=PMC(%#p Str:\"%Ss\")",
-                    VTABLE_name(interpreter, pmc), pmc,
+                    VTABLE_name(interp, pmc), pmc,
                     escaped);
             else
                 PIO_eprintf(debugger, "%S=PMC(%#p Str:\"(null)\")",
-                    VTABLE_name(interpreter, pmc), pmc);
+                    VTABLE_name(interp, pmc), pmc);
         }
     }
     else if (pmc->vtable->base_type == enum_class_Boolean) {
@@ -102,12 +102,12 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
                 pmc, PMC_int_val(pmc));
     }
     else if (pmc->vtable->base_type == enum_class_BigInt) {
-        STRING *s = VTABLE_get_string(interpreter, pmc);
+        STRING *s = VTABLE_get_string(interp, pmc);
         PIO_eprintf(debugger, "BigInt=PMC(%#p: %Ss)",
                 pmc, s);
     }
     else if (pmc->vtable->base_type == enum_class_Complex) {
-        STRING *s = VTABLE_get_string(interpreter, pmc);
+        STRING *s = VTABLE_get_string(interp, pmc);
         PIO_eprintf(debugger, "Complex=PMC(%#p: %Ss)",
                 pmc, s);
     }
@@ -115,26 +115,26 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
             ||  pmc->vtable->base_type == enum_class_Continuation
             ||  pmc->vtable->base_type == enum_class_Sub) {
         PIO_eprintf(debugger, "%S=PMC(%#p pc:%d)",
-                VTABLE_name(interpreter, pmc), pmc,
+                VTABLE_name(interp, pmc), pmc,
                 PMC_sub(pmc)->start_offs);
     }
     else if (PObj_is_object_TEST(pmc)) {
         PIO_eprintf(debugger, "Object(%Ss)=PMC(%#p)",
-                VTABLE_name(interpreter, pmc), pmc);
+                VTABLE_name(interp, pmc), pmc);
     }
     else if (pmc->vtable->base_type == enum_class_delegate) {
         PIO_eprintf(debugger, "delegate=PMC(%#p)", pmc);
     }
     else {
         PIO_eprintf(debugger, "%S=PMC(%#p)",
-                VTABLE_name(interpreter, pmc), pmc);
+                VTABLE_name(interp, pmc), pmc);
     }
 }
 
 /*
 
 =item C<int
-trace_key_dump(Interp *interpreter, PMC *key)>
+trace_key_dump(Interp *interp, PMC *key)>
 
 Prints a key to C<stderr>, returns the length of the output.
 
@@ -143,9 +143,9 @@ Prints a key to C<stderr>, returns the length of the output.
 */
 
 int
-trace_key_dump(Interp *interpreter, PMC *key)
+trace_key_dump(Interp *interp, PMC *key)
 {
-    Interp * const debugger = interpreter->debugger;
+    Interp * const debugger = interp->debugger;
 
     int len = PIO_eprintf(debugger, "[");
 
@@ -161,7 +161,7 @@ trace_key_dump(Interp *interpreter, PMC *key)
             {
             STRING * const s = PMC_str_val(key);
             STRING* const escaped = string_escape_string_delimited(
-                            interpreter, s, 20);
+                            interp, s, 20);
             if (escaped)
                 len += PIO_eprintf(debugger, "\"%Ss\"", escaped);
             else
@@ -180,7 +180,7 @@ trace_key_dump(Interp *interpreter, PMC *key)
             {
             STRING * const s = REG_STR(PMC_int_val(key));
             STRING* const escaped = string_escape_string_delimited(
-                            interpreter, s, 20);
+                            interp, s, 20);
             if (escaped)
                 len += PIO_eprintf(debugger, "S%vd=\"%Ss\"", PMC_int_val(key),
                         escaped);
@@ -213,7 +213,7 @@ trace_key_dump(Interp *interpreter, PMC *key)
 /*
 
 =item C<void
-trace_op_dump(Interp *interpreter, opcode_t *code_start,
+trace_op_dump(Interp *interp, opcode_t *code_start,
               opcode_t *pc)>
 
 TODO: This isn't really part of the API, but here's its documentation.
@@ -225,13 +225,13 @@ Prints the PC, OP and ARGS. Used by C<trace_op()>.
 */
 
 void
-trace_op_dump(Interp *interpreter, opcode_t *code_start,
+trace_op_dump(Interp *interp, opcode_t *code_start,
               opcode_t *pc)
 {
     INTVAL i, s, n;
     int more = 0, var_args;
-    Interp *debugger = interpreter->debugger;
-    op_info_t *info = &interpreter->op_info_table[*pc];
+    Interp *debugger = interp->debugger;
+    op_info_t *info = &interp->op_info_table[*pc];
     PMC *sig;
     int type;
     int len;
@@ -247,12 +247,12 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
          * exit yet
          */
         len += PIO_eprintf(debugger, "%s",
-                Parrot_MMD_method_name(interpreter, pc[1]) + 2);
+                Parrot_MMD_method_name(interp, pc[1]) + 2);
         s = 2;
     }
     else if (strcmp(info->name, "n_infix") == 0) {
         len += PIO_eprintf(debugger, "n_%s",
-                Parrot_MMD_method_name(interpreter, pc[1]) + 2);
+                Parrot_MMD_method_name(interp, pc[1]) + 2);
         s = 2;
     }
     else
@@ -265,8 +265,8 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
             *pc == PARROT_OP_get_results_pc ||
             *pc == PARROT_OP_get_params_pc ||
             *pc == PARROT_OP_set_returns_pc) {
-        sig = interpreter->code->const_table->constants[pc[1]]->u.key;
-        var_args = VTABLE_elements(interpreter, sig);
+        sig = interp->code->const_table->constants[pc[1]]->u.key;
+        var_args = VTABLE_elements(interp, sig);
         n += var_args;
     }
 
@@ -305,7 +305,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                 case PARROT_ARG_SC:
                     {
                     STRING* const escaped = string_escape_string_delimited(
-                            interpreter,
+                            interp,
                             PCONST(o)->u.string, 20);
                     if (escaped)
                         len += PIO_eprintf(debugger, "\"%Ss\"", escaped);
@@ -314,7 +314,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     }
                     break;
                 case PARROT_ARG_KC:
-                    len += trace_key_dump(interpreter, PCONST(o)->u.key);
+                    len += trace_key_dump(interp, PCONST(o)->u.key);
                     break;
                 case PARROT_ARG_KIC:
                     len += PIO_eprintf(debugger, "[%vd]", o);
@@ -380,16 +380,16 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     break;
                 case PARROT_ARG_PC:
                     PIO_eprintf(debugger, "PC%vd=", o);
-                    trace_pmc_dump(interpreter, PCONST(o)->u.key);
+                    trace_pmc_dump(interp, PCONST(o)->u.key);
                     break;
                 case PARROT_ARG_P:
                     PIO_eprintf(debugger, "P%vd=", o);
-                    trace_pmc_dump(interpreter, REG_PMC(o));
+                    trace_pmc_dump(interp, REG_PMC(o));
                     break;
                 case PARROT_ARG_S:
                     if (REG_STR(o)) {
                         STRING* const escaped = string_escape_string_delimited(
-                                interpreter, REG_STR(o), 20);
+                                interp, REG_STR(o), 20);
                         PIO_eprintf(debugger, "S%vd=\"%Ss\"", o,
                                 escaped);
                     }
@@ -398,7 +398,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     break;
                 case PARROT_ARG_K:
                     PIO_eprintf(debugger, "P%vd=", o);
-                    trace_key_dump(interpreter, REG_PMC(*(pc + i)));
+                    trace_key_dump(interp, REG_PMC(*(pc + i)));
                     break;
                 case PARROT_ARG_KI:
                     PIO_eprintf(debugger, "I%vd=[%vd]", o, REG_INT(o));
@@ -415,7 +415,7 @@ done:
 /*
 
 =item C<void
-trace_op(Interp *interpreter, opcode_t *code_start,
+trace_op(Interp *interp, opcode_t *code_start,
          opcode_t *code_end, opcode_t *pc)>
 
 TODO: This isn't really part of the API, but here's its documentation.
@@ -428,7 +428,7 @@ checking.
 */
 
 void
-trace_op(Interp *interpreter, opcode_t *code_start,
+trace_op(Interp *interp, opcode_t *code_start,
          opcode_t *code_end, opcode_t *pc)
 {
     if (!pc) {
@@ -436,10 +436,10 @@ trace_op(Interp *interpreter, opcode_t *code_start,
     }
 
     if (pc >= code_start && pc < code_end) {
-        trace_op_dump(interpreter, code_start, pc);
+        trace_op_dump(interp, code_start, pc);
     }
     else if (pc) {
-        PIO_eprintf(interpreter, "PC=%ld; OP=<err>\n", (long)(pc - code_start));
+        PIO_eprintf(interp, "PC=%ld; OP=<err>\n", (long)(pc - code_start));
     }
 }
 

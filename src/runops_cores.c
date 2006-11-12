@@ -33,7 +33,7 @@ the faster dispatch of operations.
 /*
 
 =item C<opcode_t *
-runops_fast_core(Interp *interpreter, opcode_t *pc)>
+runops_fast_core(Interp *interp, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations.
@@ -45,10 +45,10 @@ No bounds checking, profiling or tracing is performed.
 */
 
 opcode_t *
-runops_fast_core(Interp *interpreter, opcode_t *pc)
+runops_fast_core(Interp *interp, opcode_t *pc)
 {
     while (pc) {
-        DO_OP(pc, interpreter);
+        DO_OP(pc, interp);
     }
     return pc;
 }
@@ -56,7 +56,7 @@ runops_fast_core(Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_cgoto_core(Interp *interpreter, opcode_t *pc)>
+runops_cgoto_core(Interp *interp, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, using the computed C<goto> core.
@@ -70,15 +70,15 @@ If computed C<goto> is not available then Parrot exits with exit code 1.
 */
 
 opcode_t *
-runops_cgoto_core(Interp *interpreter, opcode_t *pc)
+runops_cgoto_core(Interp *interp, opcode_t *pc)
 {
 #ifdef HAVE_COMPUTED_GOTO
-    pc = cg_core(pc, interpreter);
+    pc = cg_core(pc, interp);
     return pc;
 #else
-    PIO_eprintf(interpreter,
+    PIO_eprintf(interp,
             "Computed goto unavailable in this configuration.\n");
-    Parrot_exit(interpreter, 1);
+    Parrot_exit(interp, 1);
     return NULL;
 #endif
 }
@@ -86,7 +86,7 @@ runops_cgoto_core(Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_slow_core(Interp *interpreter, opcode_t *pc)>
+runops_slow_core(Interp *interp, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing and bounds checking enabled.
@@ -102,33 +102,33 @@ operations, with tracing and bounds checking enabled.
 #  undef code_end
 #endif
 
-#define  code_start interpreter->code->base.data
-#define  code_end   (interpreter->code->base.data + \
-        interpreter->code->base.size)
+#define  code_start interp->code->base.data
+#define  code_end   (interp->code->base.data + \
+        interp->code->base.size)
 static opcode_t *
-runops_trace_core(Interp *interpreter, opcode_t *pc)
+runops_trace_core(Interp *interp, opcode_t *pc)
 {
     static size_t dod, gc;
-    struct Arenas *arena_base = interpreter->arena_base;
+    struct Arenas *arena_base = interp->arena_base;
     Interp *debugger;
     PMC* pio;
 
     dod = arena_base->dod_runs;
     gc = arena_base->collect_runs;
-    if (!interpreter->debugger) {
+    if (!interp->debugger) {
         PMC *pio;
 
-        debugger = interpreter->debugger =
+        debugger = interp->debugger =
             /*
              * using a distinct interpreter for tracing should be ok
              * - just in case, make it easy to switch
              */
 #if 1
-            make_interpreter(interpreter, 0);
+            make_interpreter(interp, 0);
 #else
-            interpreter;
+            interp;
 #endif
-        debugger->lo_var_ptr = interpreter->lo_var_ptr;
+        debugger->lo_var_ptr = interp->lo_var_ptr;
         pio = PIO_STDERR(debugger);
         if (PIO_isatty(debugger, pio))
             PIO_setlinebuf(debugger, pio);
@@ -139,17 +139,17 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
         }
     }
     else
-        debugger = interpreter->debugger;
-    trace_op(interpreter, code_start, code_end, pc);
+        debugger = interp->debugger;
+    trace_op(interp, code_start, code_end, pc);
     while (pc) {
         if ( pc < code_start || pc >= code_end) {
             internal_exception(1,
                     "attempt to access code outside of current code segment");
         }
-        CONTEXT(interpreter->ctx)->current_pc = pc;
+        CONTEXT(interp->ctx)->current_pc = pc;
 
-        DO_OP(pc, interpreter);
-        trace_op(interpreter, code_start, code_end, pc);
+        DO_OP(pc, interp);
+        trace_op(interp, code_start, code_end, pc);
         if (dod != arena_base->dod_runs) {
             dod = arena_base->dod_runs;
             PIO_eprintf(debugger, "       DOD\n");
@@ -165,23 +165,23 @@ runops_trace_core(Interp *interpreter, opcode_t *pc)
 }
 
 opcode_t *
-runops_slow_core(Interp *interpreter, opcode_t *pc)
+runops_slow_core(Interp *interp, opcode_t *pc)
 {
 
-    if (Interp_trace_TEST(interpreter, PARROT_TRACE_OPS_FLAG)) {
-        return runops_trace_core(interpreter, pc);
+    if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG)) {
+        return runops_trace_core(interp, pc);
     }
-    else if (interpreter->debugger && interpreter->debugger->pdb) {
-        return Parrot_debug(interpreter->debugger, pc);
+    else if (interp->debugger && interp->debugger->pdb) {
+        return Parrot_debug(interp->debugger, pc);
     }
     while (pc) {
         if ( pc < code_start || pc >= code_end) {
             internal_exception(1,
                     "attempt to access code outside of current code segment");
         }
-        CONTEXT(interpreter->ctx)->current_pc = pc;
+        CONTEXT(interp->ctx)->current_pc = pc;
 
-        DO_OP(pc, interpreter);
+        DO_OP(pc, interp);
 
     }
 #undef code_start
@@ -192,7 +192,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_profile_core(Interp *interpreter, opcode_t *pc)>
+runops_profile_core(Interp *interp, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing, bounds checking and profiling enabled.
@@ -202,10 +202,10 @@ operations, with tracing, bounds checking and profiling enabled.
 */
 
 opcode_t *
-runops_profile_core(Interp *interpreter, opcode_t *pc)
+runops_profile_core(Interp *interp, opcode_t *pc)
 {
     opcode_t cur_op;
-    RunProfile * const profile = interpreter->profile;
+    RunProfile * const profile = interp->profile;
 
     const opcode_t old_op = profile->cur_op;
     /*
@@ -218,12 +218,12 @@ runops_profile_core(Interp *interpreter, opcode_t *pc)
     }
 
     while (pc) {/* && pc >= code_start && pc < code_end) */
-        CONTEXT(interpreter->ctx)->current_pc = pc;
+        CONTEXT(interp->ctx)->current_pc = pc;
         profile->cur_op = cur_op = *pc + PARROT_PROF_EXTRA;
         profile->data[cur_op].numcalls++;
         profile->starttime = Parrot_floatval_time();
 
-        DO_OP(pc, interpreter);
+        DO_OP(pc, interp);
 
         /* profile->cur_op may be different, if exception was thrown */
         profile->data[profile->cur_op].time +=

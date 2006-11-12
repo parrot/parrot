@@ -31,7 +31,7 @@ executables.
 #include "jit_emit.h"
 #include "parrot/embed.h"
 
-opcode_t* run_compiled(Interp *interpreter,
+opcode_t* run_compiled(Interp *interp,
     opcode_t *cur_opcode, opcode_t *code_start);
 
 /*
@@ -48,7 +48,7 @@ int
 main(int argc, char * argv[])
 {
     /* long *             opp; */
-    Interp *           interpreter;
+    Interp *           interp;
     struct PackFile *  pf;
     opcode_t *         code_start;
     extern char *      program_code;
@@ -66,23 +66,23 @@ main(int argc, char * argv[])
     /* Parrot_exec_run = 1; */
     /* s. packfile.c (PackFile_ConstTable_unpack()) */
     /* exec_const_table = &const_table; */
-    interpreter = Parrot_new(NULL);
-    if (!interpreter) {
+    interp = Parrot_new(NULL);
+    if (!interp) {
         return 1;
     }
 
     /* run_native = run_compiled; */
     /* TODO make also a shared variant of PackFile_new */
-    pf = PackFile_new(interpreter, 0);
+    pf = PackFile_new(interp, 0);
 
-    if (!PackFile_unpack(interpreter, pf, (opcode_t *)(&program_code),
+    if (!PackFile_unpack(interp, pf, (opcode_t *)(&program_code),
         sizeof(&program_code)))
     {
         printf( "Can't unpack.\n" );
         return 1;
     }
-    Parrot_loadbc(interpreter, pf);
-    PackFile_fixup_subs(interpreter, PBC_PBC, NULL);
+    Parrot_loadbc(interp, pf);
+    PackFile_fixup_subs(interp, PBC_PBC, NULL);
 
     /* opcode_map has the offset of each opcode in the compiled code
      * this modifies it to be address of the opcode.
@@ -95,18 +95,18 @@ main(int argc, char * argv[])
     */
 
 #if defined(JIT_CGP)
-    exec_init_prederef(interpreter, &exec_prederef_code);
+    exec_init_prederef(interp, &exec_prederef_code);
 #endif
-    /* Parrot_set_run_core(interpreter, PARROT_EXEC_CORE);
-    interpreter->code->base.data =
+    /* Parrot_set_run_core(interp, PARROT_EXEC_CORE);
+    interp->code->base.data =
         (opcode_t *)&((&program_code)[bytecode_offset]);
     Parrot_exec_run = 0; */
-    Parrot_runcode(interpreter, argc, argv);
+    Parrot_runcode(interp, argc, argv);
     /*
-        run_compiled(interpreter,
+        run_compiled(interp,
             (opcode_t *)&((&program_code)[bytecode_offset]));
      */
-    Parrot_exit(interpreter, 0);
+    Parrot_exit(interp, 0);
 }
 
 /*

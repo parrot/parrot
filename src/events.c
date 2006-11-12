@@ -219,7 +219,7 @@ Parrot_init_signals(void)
 
 =over 4
 
-=item C<static void init_events_first(Parrot_Interp interpreter)>
+=item C<static void init_events_first(Parrot_Interp interp)>
 
 Init event system for first interpreter.
 
@@ -228,7 +228,7 @@ Init event system for first interpreter.
 */
 
 static void
-init_events_first(Parrot_Interp interpreter)
+init_events_first(Parrot_Interp interp)
 {
     Parrot_thread    ev_handle;
 #ifndef WIN32
@@ -278,7 +278,7 @@ init_events_first(Parrot_Interp interpreter)
 
 /*
 
-=item C<static void init_events_all(Parrot_Interp interpreter)>
+=item C<static void init_events_all(Parrot_Interp interp)>
 
 Init events for all interpreters.
 
@@ -287,17 +287,17 @@ Init events for all interpreters.
 */
 
 static void
-init_events_all(Parrot_Interp interpreter)
+init_events_all(Parrot_Interp interp)
 {
     /*
      * create per interpreter task queue
      */
-    interpreter->task_queue = queue_init(0);
+    interp->task_queue = queue_init(0);
 }
 
 /*
 
-=item C<void Parrot_init_events(Parrot_Interp interpreter)>
+=item C<void Parrot_init_events(Parrot_Interp interp)>
 
 Initialize the event system.
 
@@ -306,14 +306,14 @@ Initialize the event system.
 */
 
 void
-Parrot_init_events(Parrot_Interp interpreter)
+Parrot_init_events(Parrot_Interp interp)
 {
-    if (!interpreter->parent_interpreter) {
+    if (!interp->parent_interpreter) {
         /* add the very first interpreter to the list of interps. */
-        pt_add_to_interpreters(interpreter, NULL);
-        init_events_first(interpreter);
+        pt_add_to_interpreters(interp, NULL);
+        init_events_first(interp);
     }
-    init_events_all(interpreter);
+    init_events_all(interp);
 }
 
 /*
@@ -333,11 +333,11 @@ Create queue entry and insert event into task queue.
 */
 
 void
-Parrot_schedule_event(Parrot_Interp interpreter, parrot_event* ev)
+Parrot_schedule_event(Parrot_Interp interp, parrot_event* ev)
 {
     QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
     entry->next = NULL;
-    ev->interp = interpreter;
+    ev->interp = interp;
     entry->data = ev;
     switch (ev->type) {
         case EVENT_TYPE_TIMER:
@@ -382,7 +382,7 @@ schedule_signal_event(int signum)
 /*
 
 =item C<void
-Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
+Parrot_new_timer_event(Parrot_Interp interp, PMC* timer, FLOATVAL diff,
         FLOATVAL interval, int repeat, PMC* sub, parrot_event_type_enum typ)>
 
 Create a new timer event due at C<diff> from now, repeated at C<interval>
@@ -393,7 +393,7 @@ and running the passed C<sub>.
 */
 
 void
-Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
+Parrot_new_timer_event(Parrot_Interp interp, PMC* timer, FLOATVAL diff,
         FLOATVAL interval, int repeat, PMC* sub, parrot_event_type_enum typ)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
@@ -406,7 +406,7 @@ Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
     if (repeat && !interval)
         ev->u.timer_event.interval = diff;
     ev->u.timer_event.sub = sub;
-    Parrot_schedule_event(interpreter, ev);
+    Parrot_schedule_event(interp, ev);
 }
 
 /*
@@ -421,23 +421,23 @@ Prepare and schedule a callback event.
 */
 
 void
-Parrot_new_cb_event(Parrot_Interp interpreter, PMC* cbi, void* ext)
+Parrot_new_cb_event(Parrot_Interp interp, PMC* cbi, void* ext)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
     entry->next = NULL;
     entry->data = ev;
-    ev->interp = interpreter;
+    ev->interp = interp;
     ev->type = EVENT_TYPE_CALL_BACK;
     ev->u.call_back.cbi = cbi;
     ev->u.call_back.external_data = ext;
-    Parrot_schedule_interp_qentry(interpreter, entry);
+    Parrot_schedule_interp_qentry(interp, entry);
 }
 
 /*
 
 =item C<void
-Parrot_del_timer_event(Parrot_Interp interpreter, PMC* timer)>
+Parrot_del_timer_event(Parrot_Interp interp, PMC* timer)>
 
 Deactivate the timer identified by C<timer>.
 
@@ -446,7 +446,7 @@ Deactivate the timer identified by C<timer>.
 */
 
 void
-Parrot_del_timer_event(Parrot_Interp interpreter, PMC* timer)
+Parrot_del_timer_event(Parrot_Interp interp, PMC* timer)
 {
     QUEUE_ENTRY *entry;
     parrot_event* event;
@@ -455,7 +455,7 @@ Parrot_del_timer_event(Parrot_Interp interpreter, PMC* timer)
     for (entry = event_queue->head; entry; entry = entry->next) {
         if (entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT) {
             event = entry->data;
-            if (event->interp == interpreter
+            if (event->interp == interp
                     && event->u.timer_event.timer == timer) {
                 event->u.timer_event.interval = 0.0;
                 event->type = EVENT_TYPE_NONE;
@@ -468,7 +468,7 @@ Parrot_del_timer_event(Parrot_Interp interpreter, PMC* timer)
 
 /*
 
-=item C<void Parrot_new_terminate_event(Parrot_Interp interpreter)>
+=item C<void Parrot_new_terminate_event(Parrot_Interp interp)>
 
 Create a terminate event, interpreter will leave the run-loop when this
 event arrives.
@@ -478,16 +478,16 @@ event arrives.
 */
 
 void
-Parrot_new_terminate_event(Parrot_Interp interpreter)
+Parrot_new_terminate_event(Parrot_Interp interp)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     ev->type = EVENT_TYPE_TERMINATE;
-    Parrot_schedule_event(interpreter, ev);
+    Parrot_schedule_event(interp, ev);
 }
 
 /*
 
-=item C<void Parrot_new_suspend_for_gc_event(Parrot_Interp interpreter)>
+=item C<void Parrot_new_suspend_for_gc_event(Parrot_Interp interp)>
 
 Create a suspend-for-GC event, interpreter will wait on a condition
 variable for GC to finish when the event arrives.
@@ -497,7 +497,7 @@ variable for GC to finish when the event arrives.
 */
 
 void
-Parrot_new_suspend_for_gc_event(Parrot_Interp interpreter) {
+Parrot_new_suspend_for_gc_event(Parrot_Interp interp) {
     QUEUE_ENTRY *qe;
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     ev->type = EVENT_TYPE_SUSPEND_FOR_GC;
@@ -508,7 +508,7 @@ Parrot_new_suspend_for_gc_event(Parrot_Interp interpreter) {
     /* we don't use schedule_event because we must modify its
      * task queue immediately
      */
-    Parrot_schedule_interp_qentry(interpreter, qe);
+    Parrot_schedule_interp_qentry(interp, qe);
 }
 
 /*
@@ -532,7 +532,7 @@ Parrot_kill_event_loop(void)
 /*
 
 =item C<void
-Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)>
+Parrot_schedule_interp_qentry(Parrot_Interp interp, QUEUE_ENTRY* entry)>
 
 Put a queue entry into the interpreters task queue and enable event
 checking for the interpreter.
@@ -542,7 +542,7 @@ checking for the interpreter.
 */
 
 void
-Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
+Parrot_schedule_interp_qentry(Parrot_Interp interp, QUEUE_ENTRY* entry)
 {
     parrot_event* event;
     event = entry->data;
@@ -551,7 +551,7 @@ Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
      */
     edebug((stderr, "got entry - schedule_inter_qentry %s\n", et(event)));
     if (event->type != EVENT_TYPE_SLEEP)
-        enable_event_checking(interpreter);
+        enable_event_checking(interp);
     /*
      * do push_entry last - this signales the queue condition so the
      * interpreter might starting process that event immediately
@@ -562,10 +562,10 @@ Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
     switch (event->type) {
         case EVENT_TYPE_CALL_BACK:
         case EVENT_TYPE_SIGNAL:
-            unshift_entry(interpreter->task_queue, entry);
+            unshift_entry(interp->task_queue, entry);
             break;
         default:
-            push_entry(interpreter->task_queue, entry);
+            push_entry(interp->task_queue, entry);
             break;
     }
 }
@@ -841,7 +841,7 @@ stop_io_thread(void)
 }
 
 void
-Parrot_event_add_io_event(Interp* interpreter,
+Parrot_event_add_io_event(Interp* interp,
         PMC* pio, PMC* sub, PMC* data, INTVAL which)
 {
     parrot_event *event;
@@ -849,7 +849,7 @@ Parrot_event_add_io_event(Interp* interpreter,
 
     event = mem_sys_allocate(sizeof(parrot_event));
     event->type        = EVENT_TYPE_IO;
-    event->interp      = interpreter;
+    event->interp      = interp;
     /*
      * TODO dod_register these PMCs as long as the event system
      *      owns these 3
@@ -1075,7 +1075,7 @@ event_thread(void *data)
 =over 4
 
 =item C<static void*
-wait_for_wakeup(Parrot_Interp interpreter, void *next)>
+wait_for_wakeup(Parrot_Interp interp, void *next)>
 
 Sleep on the event queue condition. If an event arrives, the event
 is processed. Terminate the loop if sleeping is finished.
@@ -1085,12 +1085,12 @@ is processed. Terminate the loop if sleeping is finished.
 */
 
 static void*
-wait_for_wakeup(Parrot_Interp interpreter, void *next)
+wait_for_wakeup(Parrot_Interp interp, void *next)
 {
     QUEUE_ENTRY *entry;
     parrot_event* event;
-    QUEUE * tq = interpreter->task_queue;
-    interpreter->sleeping = 1;
+    QUEUE * tq = interp->task_queue;
+    interp->sleeping = 1;
     /*
      * event handler likes callbacks or timers are run as normal code
      * so inside such an even handler function another event might get
@@ -1105,12 +1105,12 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
      *
      */
 
-    while (interpreter->sleeping) {
+    while (interp->sleeping) {
         entry = wait_for_entry(tq);
         event = (parrot_event* )entry->data;
         mem_sys_free(entry);
         edebug((stderr, "got ev %s head : %p\n", et(event), tq->head));
-        next = do_event(interpreter, event, next);
+        next = do_event(interp, event, next);
     }
     edebug((stderr, "woke up\n"));
     return next;
@@ -1119,7 +1119,7 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
 /*
 
 =item C<void*
-Parrot_sleep_on_event(Parrot_Interp interpreter, FLOATVAL t, void* next)>
+Parrot_sleep_on_event(Parrot_Interp interp, FLOATVAL t, void* next)>
 
 Go to sleep. This is called from the C<sleep> opcode.
 
@@ -1128,19 +1128,19 @@ Go to sleep. This is called from the C<sleep> opcode.
 */
 
 void*
-Parrot_sleep_on_event(Parrot_Interp interpreter, FLOATVAL t, void* next)
+Parrot_sleep_on_event(Parrot_Interp interp, FLOATVAL t, void* next)
 {
 #if PARROT_HAS_THREADS
 
-    if (interpreter->sleeping)
+    if (interp->sleeping)
         fprintf(stderr, "nested sleep might not work\n");
     /*
      * place the opcode_t* next arg in the event data, so that
      * we can identify this event in wakeup
      */
-    Parrot_new_timer_event(interpreter, (PMC*) next, t,
+    Parrot_new_timer_event(interp, (PMC*) next, t,
             0, 0, NULL, EVENT_TYPE_SLEEP);
-    next = wait_for_wakeup(interpreter, next);
+    next = wait_for_wakeup(interp, next);
 #else
     /*
      * TODO check for nanosleep or such
@@ -1159,7 +1159,7 @@ Parrot_sleep_on_event(Parrot_Interp interpreter, FLOATVAL t, void* next)
 =over 4
 
 =item C<void*
-Parrot_do_check_events(Parrot_Interp interpreter, void *next)>
+Parrot_do_check_events(Parrot_Interp interp, void *next)>
 
 Explicitly C<sync> called by the check_event opcode from run loops.
 
@@ -1168,17 +1168,17 @@ Explicitly C<sync> called by the check_event opcode from run loops.
 */
 
 void*
-Parrot_do_check_events(Parrot_Interp interpreter, void *next)
+Parrot_do_check_events(Parrot_Interp interp, void *next)
 {
-    if (peek_entry(interpreter->task_queue))
-        return Parrot_do_handle_events(interpreter, 0, next);
+    if (peek_entry(interp->task_queue))
+        return Parrot_do_handle_events(interp, 0, next);
     return next;
 }
 
 /*
 
 =item C<static void
-event_to_exception(Parrot_Interp interpreter, parrot_event* event)>
+event_to_exception(Parrot_Interp interp, parrot_event* event)>
 
 Convert event to exception and throw it.
 
@@ -1187,7 +1187,7 @@ Convert event to exception and throw it.
 */
 
 static void
-event_to_exception(Parrot_Interp interpreter, parrot_event* event)
+event_to_exception(Parrot_Interp interp, parrot_event* event)
 {
     int exit_code = -event->u.signal;
 
@@ -1198,10 +1198,10 @@ event_to_exception(Parrot_Interp interpreter, parrot_event* event)
              * SIGINT is silent, if no exception handler is
              * installed: set severity to EXCEPT_exit
              */
-            do_exception(interpreter, EXCEPT_exit, exit_code);
+            do_exception(interp, EXCEPT_exit, exit_code);
             break;
         default:
-            do_exception(interpreter, EXCEPT_error, exit_code);
+            do_exception(interp, EXCEPT_error, exit_code);
             break;
     }
 }
@@ -1209,7 +1209,7 @@ event_to_exception(Parrot_Interp interpreter, parrot_event* event)
 /*
 
 =item C<static void*
-do_event(Parrot_Interp interpreter, parrot_event* event, void *next)>
+do_event(Parrot_Interp interp, parrot_event* event, void *next)>
 
 Run user code or such.
 
@@ -1218,7 +1218,7 @@ Run user code or such.
 */
 
 static void*
-do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
+do_event(Parrot_Interp interp, parrot_event* event, void *next)
 {
     edebug((stderr, "do_event %s\n", et(event)));
     switch (event->type) {
@@ -1226,24 +1226,24 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             next = NULL;        /* this will terminate the run loop */
             break;
         case EVENT_TYPE_SIGNAL:
-            interpreter->sleeping = 0;
+            interp->sleeping = 0;
             /* generate exception */
-            event_to_exception(interpreter, event);
+            event_to_exception(interp, event);
             /* not reached - will longjmp */
             break;
         case EVENT_TYPE_TIMER:
             /* run ops, save registers */
-            Parrot_runops_fromc_args_event(interpreter,
+            Parrot_runops_fromc_args_event(interp,
                     event->u.timer_event.sub, "v");
             break;
         case EVENT_TYPE_CALL_BACK:
             edebug((stderr, "starting user cb\n"));
-            Parrot_run_callback(interpreter, event->u.call_back.cbi,
+            Parrot_run_callback(interp, event->u.call_back.cbi,
                     event->u.call_back.external_data);
             break;
         case EVENT_TYPE_IO:
             edebug((stderr, "starting io handler\n"));
-            Parrot_runops_fromc_args_event(interpreter,
+            Parrot_runops_fromc_args_event(interp,
                     event->u.io_event.handler,
                     "vPP",
                     event->u.io_event.pio,
@@ -1251,11 +1251,11 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
                     );
             break;
         case EVENT_TYPE_SLEEP:
-            interpreter->sleeping = 0;
+            interp->sleeping = 0;
             break;
         case EVENT_TYPE_SUSPEND_FOR_GC:
             edebug((stderr, "suspend for gc\n"));
-            pt_suspend_self_for_gc(interpreter);
+            pt_suspend_self_for_gc(interp);
             break;
         default:
             fprintf(stderr, "Unhandled event type %d\n", event->type);
@@ -1268,7 +1268,7 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
 /*
 
 =item C<void *
-Parrot_do_handle_events(Parrot_Interp interpreter, int restore, void *next)>
+Parrot_do_handle_events(Parrot_Interp interp, int restore, void *next)>
 
 Called by the C<check_event__> opcode from run loops or from above. When
 called from the C<check_events__> opcode, we have to restore the
@@ -1279,21 +1279,21 @@ C<op_func_table>.
 */
 
 void *
-Parrot_do_handle_events(Parrot_Interp interpreter, int restore, void *next)
+Parrot_do_handle_events(Parrot_Interp interp, int restore, void *next)
 {
     QUEUE_ENTRY *entry;
     parrot_event* event;
-    QUEUE * tq = interpreter->task_queue;
+    QUEUE * tq = interp->task_queue;
 
     if (restore)
-        disable_event_checking(interpreter);
+        disable_event_checking(interp);
     if (!peek_entry(tq))
         return next;
     while (peek_entry(tq)) {
         entry = pop_entry(tq);
         event = (parrot_event* )entry->data;
         mem_sys_free(entry);
-        next = do_event(interpreter, event, next);
+        next = do_event(interp, event, next);
     }
     return next;
 }

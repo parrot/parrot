@@ -63,7 +63,7 @@ Returns a true value (1) if the supplied file or directory exists.
 
     METHOD INTVAL exists(STRING *path) {
         struct stat info;
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
 #ifdef WIN32
         int error = stat(cpath, &info);
 #else
@@ -89,7 +89,7 @@ Returns a true value (1) if the supplied path is a directory.
 
     METHOD INTVAL is_dir(STRING *path) {
         struct stat info;
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
 #ifdef WIN32
         int error = stat(cpath, &info);
 #else
@@ -98,7 +98,7 @@ Returns a true value (1) if the supplied path is a directory.
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
 
         if (S_ISDIR(info.st_mode)) {
@@ -121,7 +121,7 @@ Returns a true value (1) if the supplied path is a plain file.
 
     METHOD INTVAL is_file(STRING *path) {
         struct stat info;
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
 #ifdef WIN32
         int error = stat(cpath, &info);
 #else
@@ -130,7 +130,7 @@ Returns a true value (1) if the supplied path is a plain file.
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
 
         if (S_ISREG(info.st_mode)) {
@@ -157,12 +157,12 @@ Returns a true value (1) if the supplied path is a link.
         return 0;
 #else
         struct stat info;
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
         int error = lstat(cpath, &info);
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
 
         if (S_ISLNK(info.st_mode)) {
@@ -195,8 +195,8 @@ free to change or give me hints on how to change it. -- ambs
         FILE *source = NULL;
         FILE *target = NULL;
 
-        char *cfrom = string_to_cstring(interpreter, from);
-        char *cto = string_to_cstring(interpreter, to);
+        char *cfrom = string_to_cstring(interp, from);
+        char *cto = string_to_cstring(interp, to);
         source = fopen(cfrom, "rb");
         if (source) {
             target = fopen(cto, "w+b");
@@ -208,7 +208,7 @@ free to change or give me hints on how to change it. -- ambs
                     if (bytes_read) {
                         bytes_written = fwrite(buf, 1, bytes_read, target);
                         if (bytes_read != bytes_written) {
-                            real_exception(interpreter, NULL, E_SystemError,
+                            real_exception(interp, NULL, E_SystemError,
                                            "Error writting file");
                             break;
                         }
@@ -218,13 +218,13 @@ free to change or give me hints on how to change it. -- ambs
             }
             else {
                 char *errmsg = strerror(errno);
-                real_exception(interpreter, NULL, E_SystemError, errmsg);
+                real_exception(interp, NULL, E_SystemError, errmsg);
             }
             fclose(source);
         }
         else {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
         string_cstring_free(cfrom);
         string_cstring_free(cto);
@@ -242,14 +242,14 @@ Rename a file C<from> to the path C<to>.
 */
 
     METHOD void rename(STRING *from, STRING *to) {
-        char *cfrom = string_to_cstring(interpreter, from);
-        char *cto = string_to_cstring(interpreter, to);
+        char *cfrom = string_to_cstring(interp, from);
+        char *cto = string_to_cstring(interp, to);
         int error = rename(cfrom, cto);
         string_cstring_free(cfrom);
         string_cstring_free(cto);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
     }
 }

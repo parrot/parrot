@@ -152,10 +152,10 @@ create_interp(PMC *self, Parrot_Interp parent)
 }
 
 static int
-recursion_limit(Parrot_Interp interpreter, PMC *self, int l)
+recursion_limit(Parrot_Interp interp, PMC *self, int l)
 {
-    int ret = interpreter->recursion_limit;
-    interpreter->recursion_limit = l;
+    int ret = interp->recursion_limit;
+    interp->recursion_limit = l;
     return ret;
 }
 
@@ -298,9 +298,9 @@ Runs the interpreter's byte code.
         /*
          * setup code
          */
-        pt_thread_prepare_for_run(new_interp, interpreter);
+        pt_thread_prepare_for_run(new_interp, interp);
         /*
-         * TODO pass arguments fro parent (interpreter)
+         * TODO pass arguments fro parent (interp)
          *      to child (new_interp)
          *      by possibly clone of share the arguments
          *      r/o args can be passed as is
@@ -308,7 +308,7 @@ Runs the interpreter's byte code.
 
         /* calculate offset and run */
         runops(new_interp, (opcode_t *)PMC_struct_val(SELF) -
-            (opcode_t *)interpreter->code->base.data);
+            (opcode_t *)interp->code->base.data);
         return next;
     }
 
@@ -362,34 +362,34 @@ Introspection interface. C<key> can be:
         parrot_context_t *ctx;
         PMC *cont;
 
-        item =  key_string(interpreter, key);
-        s = CONST_STRING(interpreter, "globals");
-        if (string_equal(interpreter, item, s) == 0)
-            return interpreter->root_namespace;
+        item =  key_string(interp, key);
+        s = CONST_STRING(interp, "globals");
+        if (string_equal(interp, item, s) == 0)
+            return interp->root_namespace;
         outer = NULL;
-        s = CONST_STRING(interpreter, "outer");
-        if (string_equal(interpreter, item, s) == 0) {
+        s = CONST_STRING(interp, "outer");
+        if (string_equal(interp, item, s) == 0) {
             outer = item;
             nextkey = key_next(INTERP, key);
             if (nextkey && (PObj_get_FLAGS(nextkey) & KEY_string_FLAG)) {
                 key = nextkey;
-                item = key_string(interpreter, key);
+                item = key_string(interp, key);
             }
         }
         nextkey = key_next(INTERP, key);
         if (nextkey)
-            level = key_integer(interpreter, nextkey);
+            level = key_integer(interp, nextkey);
         else if (outer)
             level = 1;
         if (level < 0)
-            real_exception(interpreter, NULL, E_ValueError,
+            real_exception(interp, NULL, E_ValueError,
                     "No such caller depth");
-        ctx = CONTEXT(interpreter->ctx);
+        ctx = CONTEXT(interp->ctx);
         if (outer) {
             for (; level; --level) {
                 ctx = ctx->outer_ctx;
                 if (!ctx)
-                    real_exception(interpreter, NULL, E_ValueError,
+                    real_exception(interp, NULL, E_ValueError,
                             "No such outer depth");
             }
         }
@@ -397,30 +397,30 @@ Introspection interface. C<key> can be:
             for (; level; --level) {
                 cont = ctx->current_cont;
                 if (PMC_IS_NULL(cont) || !PMC_cont(cont)->seg)
-                    real_exception(interpreter, NULL, E_ValueError,
+                    real_exception(interp, NULL, E_ValueError,
                             "No such caller depth");
                 ctx = PMC_cont(cont)->to_ctx;
                 if (!ctx->current_sub)
-                    real_exception(interpreter, NULL, E_ValueError,
+                    real_exception(interp, NULL, E_ValueError,
                             "No such caller depth");
 
             }
         }
         if (item == outer)
             return ctx->current_sub;
-        s = CONST_STRING(interpreter, "sub");
-        if (string_equal(interpreter, item, s) == 0)
+        s = CONST_STRING(interp, "sub");
+        if (string_equal(interp, item, s) == 0)
             return ctx->current_sub;
-        s = CONST_STRING(interpreter, "lexpad");
-        if (string_equal(interpreter, item, s) == 0)
+        s = CONST_STRING(interp, "lexpad");
+        if (string_equal(interp, item, s) == 0)
             return ctx->lex_pad;
-        s = CONST_STRING(interpreter, "namespace");
-        if (string_equal(interpreter, item, s) == 0)
+        s = CONST_STRING(interp, "namespace");
+        if (string_equal(interp, item, s) == 0)
             return ctx->current_namespace;
-        s = CONST_STRING(interpreter, "continuation");
-        if (string_equal(interpreter, item, s) == 0)
-            return VTABLE_clone(interpreter, ctx->current_cont);
-        real_exception(interpreter, NULL, E_ValueError,
+        s = CONST_STRING(interp, "continuation");
+        if (string_equal(interp, item, s) == 0)
+            return VTABLE_clone(interp, ctx->current_cont);
+        real_exception(interp, NULL, E_ValueError,
                 "No such item %Ss", item);
         return PMCNULL;
     }
@@ -633,8 +633,8 @@ Finish thawing.
                  * XXX - FIXME
                  */
                 ns_hash =
-                    Parrot_make_namespace_keyed_str(interpreter,
-                                                    interpreter->root_namespace,
+                    Parrot_make_namespace_keyed_str(interp,
+                                                    interp->root_namespace,
                                                     hll_name);
 
                 /* cache HLLs toplevel namespace */

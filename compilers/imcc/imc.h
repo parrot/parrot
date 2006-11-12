@@ -90,7 +90,7 @@ void free_reglist(IMC_Unit *);
 /*
  * parser_util.c
  */
-PARROT_API void imcc_init(Parrot_Interp interpreter);
+PARROT_API void imcc_init(Parrot_Interp interp);
 int check_op(Interp *, char * fullname, char *op, SymReg *r[],
   int narg, int keyvec);
 int is_op(Interp *, char *);
@@ -121,9 +121,9 @@ PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
 /*
  * pcc.c
  */
-void expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
-void expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
-void expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void expand_pcc_sub(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
+void expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
+void expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
 
 /* pragmas avialable: */
 typedef enum {
@@ -150,7 +150,7 @@ struct nodeType_t;
  */
 struct parser_state_t {
     struct parser_state_t *next;
-    Interp *interpreter;
+    Interp *interp;
     const char *file;
     FILE *handle;
     int line;
@@ -249,13 +249,13 @@ typedef struct _imc_info_t {
  * ast interface
  */
 
-PARROT_API void IMCC_ast_init(Interp* interpreter);
-PARROT_API void IMCC_ast_compile(Interp *interpreter, FILE *fp);
+PARROT_API void IMCC_ast_init(Interp* interp);
+PARROT_API void IMCC_ast_compile(Interp *interp, FILE *fp);
 PARROT_API Instruction * IMCC_create_itcall_label(Interp *);
-PARROT_API void IMCC_itcall_sub(Interp* interpreter, SymReg* sub);
+PARROT_API void IMCC_itcall_sub(Interp* interp, SymReg* sub);
 
-STRING * IMCC_string_from_reg(Interp *interpreter, SymReg *r);
-INTVAL   IMCC_int_from_reg(Interp *interpreter, SymReg *r);
+STRING * IMCC_string_from_reg(Interp *interp, SymReg *r);
+INTVAL   IMCC_int_from_reg(Interp *interp, SymReg *r);
 Instruction * IMCC_subst_constants_umix(Interp *, IMC_Unit * unit, char *name,
         SymReg **r, int n);
 Instruction * IMCC_subst_constants(Interp *, IMC_Unit * unit, char *name,

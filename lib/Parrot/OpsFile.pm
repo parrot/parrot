@@ -142,7 +142,7 @@ Note that, for ease of parsing, if the argument to one of the above
 notations in a ops file contains parentheses, then double the enclosing
 parentheses and add a space around the argument, like so:
 
-    goto OFFSET(( (void*)interpreter->happy_place ))
+    goto OFFSET(( (void*)interp->happy_place ))
 
 =head2 Class Methods
 
@@ -510,7 +510,7 @@ sub make_op
         # enclosing parentheses and add a space around the argument,
         # like so:
         #
-        #    goto OFFSET(( (void*)interpreter->happy_place ))
+        #    goto OFFSET(( (void*)interp->happy_place ))
         #
         # Later transformations turn the Op body notations into C code, based
         # on the mode of operation (function calls, switch statements, gotos

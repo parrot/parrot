@@ -50,16 +50,16 @@ ex3(Parrot_Interp interp, int x, void*p)
 int
 main(int argc, char* argv[])
 {
-    Interp *     interpreter;
+    Interp *interp;
 
-    interpreter = Parrot_new(NULL);
-    if (!interpreter) {
+    interp = Parrot_new(NULL);
+    if (!interp) {
         return 1;
     }
-    Parrot_on_exit(interpreter, ex1, 0);
-    Parrot_on_exit(interpreter, ex2, 0);
-    Parrot_on_exit(interpreter, ex3, 0);
-    Parrot_exit(interpreter, 0);
+    Parrot_on_exit(interp, ex1, 0);
+    Parrot_on_exit(interp, ex2, 0);
+    Parrot_on_exit(interp, ex3, 0);
+    Parrot_exit(interp, 0);
     exit(0);
 }
 CODE

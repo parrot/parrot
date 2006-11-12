@@ -43,7 +43,7 @@ extern int jit_op_count(void);
 #endif
 
 #if defined __GNUC__ || defined __IBMC__
-void Parrot_jit_debug(Interp* interpreter);
+void Parrot_jit_debug(Interp* interp);
 #endif
 
 PARROT_API char **Parrot_exec_rel_addr;
@@ -52,7 +52,7 @@ PARROT_API int Parrot_exec_rel_count;
 /*
 
 =item C<static void
-insert_fixup_targets(Interp* interpreter, char *branch,
+insert_fixup_targets(Interp* interp, char *branch,
         size_t limit)>
 
 Look at fixups, mark all fixup entries as branch target.
@@ -66,10 +66,10 @@ inserted.
 */
 
 static void
-insert_fixup_targets(Interp* interpreter, char *branch,
+insert_fixup_targets(Interp* interp, char *branch,
         size_t limit)
 {
-    struct PackFile_FixupTable *ft = interpreter->code->fixups;
+    struct PackFile_FixupTable *ft = interp->code->fixups;
     int i;
 
     if (!ft)
@@ -87,7 +87,7 @@ insert_fixup_targets(Interp* interpreter, char *branch,
 /*
 
 =item C<static void
-make_branch_list(Interp *interpreter,
+make_branch_list(Interp *interp,
         Parrot_jit_optimizer_t * optimizer,
         opcode_t *code_start, opcode_t *code_end)>
 
@@ -112,7 +112,7 @@ got mapped
 */
 
 static void
-make_branch_list(Interp *interpreter,
+make_branch_list(Interp *interp,
         Parrot_jit_optimizer_t * optimizer,
          opcode_t *code_start, opcode_t *code_end)
 {
@@ -179,7 +179,7 @@ make_branch_list(Interp *interpreter,
 
         /* Predereference the opcode information table for this opcode
          * early since it's going to be used many times */
-        op_info = &interpreter->op_info_table[op];
+        op_info = &interp->op_info_table[op];
 
         /* if op_info->jump is not 0 this opcode may jump,
          * so mark this opcode as a branch source */
@@ -239,16 +239,16 @@ make_branch_list(Interp *interpreter,
         }
 no_branch:
         /* Move to the next opcode */
-        ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
+        ADD_OP_VAR_PART(interp, interp->code, cur_op, n);
         cur_op += n;
     }
-    insert_fixup_targets(interpreter, branch, code_end - code_start);
+    insert_fixup_targets(interp, branch, code_end - code_start);
 }
 
 /*
 
 =item C<static void
-set_register_usage(Interp *interpreter,
+set_register_usage(Interp *interp,
         Parrot_jit_info_t *jit_info,
         Parrot_jit_optimizer_section_ptr cur_section,
         op_info_t *op_info, opcode_t *cur_op, opcode_t *code_start)>
@@ -260,7 +260,7 @@ Sets the register usage counts.
 */
 
 static void
-set_register_usage(Interp *interpreter,
+set_register_usage(Interp *interp,
         Parrot_jit_info_t *jit_info,
         Parrot_jit_optimizer_section_ptr cur_section,
         op_info_t *op_info, opcode_t *cur_op, opcode_t *code_start)
@@ -278,15 +278,15 @@ set_register_usage(Interp *interpreter,
      * registers are set per their type [IPSN]
      * */
     args = argt = op_info->op_count;
-    ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, argt);
+    ADD_OP_VAR_PART(interp, interp->code, cur_op, argt);
     for (argn = argt - 1; argn > 0; argn--) {
         /* TODO check the argn-1 entries */
         int idx = *(cur_op + argn);
         int arg_type;
         PMC *sig;
         if (argn >= args) {
-            sig = CONTEXT(interpreter->ctx)->constants[cur_op[1]]->u.key;
-            arg_type = VTABLE_get_integer_keyed_int(interpreter,
+            sig = CONTEXT(interp->ctx)->constants[cur_op[1]]->u.key;
+            arg_type = VTABLE_get_integer_keyed_int(interp,
                     sig, argn - args);
             arg_type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);
         }
@@ -351,7 +351,7 @@ set_register_usage(Interp *interpreter,
         }
         /* key constants may have register keys */
         else if (arg_type == PARROT_ARG_KC) {
-            PMC *key = interpreter->code->const_table->constants[idx]->u.key;
+            PMC *key = interp->code->const_table->constants[idx]->u.key;
             while (key) {
                 UINTVAL flags = PObj_get_FLAGS(key);
                 if (flags & KEY_register_FLAG) {
@@ -371,7 +371,7 @@ set_register_usage(Interp *interpreter,
                             ru[typ].reg_dir[n] |= PARROT_ARGDIR_IN;
                     }
                 }
-                key = key_next(interpreter, key);
+                key = key_next(interp, key);
             }
         }
     }
@@ -380,7 +380,7 @@ set_register_usage(Interp *interpreter,
 /*
 
 =item C<static void
-init_regusage(Interp *interpreter,
+init_regusage(Interp *interp,
         Parrot_jit_optimizer_section_ptr cur_section)>
 
 Init all register usage to Parrot register usage. Used when JITting
@@ -391,15 +391,15 @@ subroutines to registers only
 */
 
 static void
-init_regusage(Interp *interpreter,
+init_regusage(Interp *interp,
         Parrot_jit_optimizer_section_ptr cur_section)
 {
     int typ, j;
 
     cur_section->ru[0].registers_used =
-        CONTEXT(interpreter->ctx)->n_regs_used[REGNO_INT];
+        CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
     cur_section->ru[3].registers_used =
-        CONTEXT(interpreter->ctx)->n_regs_used[REGNO_NUM];
+        CONTEXT(interp->ctx)->n_regs_used[REGNO_NUM];
     cur_section->ru[1].registers_used =
         cur_section->ru[2].registers_used = 0;
     for (typ = 0; typ < 4; typ++)
@@ -410,7 +410,7 @@ init_regusage(Interp *interpreter,
 /*
 
 =item C<static void
-make_sections(Interp *interpreter,
+make_sections(Interp *interp,
         Parrot_jit_info_t *jit_info,
         opcode_t *code_start, opcode_t *code_end)>
 
@@ -428,7 +428,7 @@ This C<Parrot_jit_vtable_n_op()> does use register mappings.
 #endif
 
 static void
-make_sections(Interp *interpreter,
+make_sections(Interp *interp,
         Parrot_jit_info_t *jit_info,
          opcode_t *code_start, opcode_t *code_end)
 {
@@ -452,23 +452,23 @@ make_sections(Interp *interpreter,
     cur_op = code_start;
     /* set all regs to Parrot's */
     if (jit_info->code_type == JIT_CODE_SUB_REGS_ONLY)
-        init_regusage(interpreter, cur_section);
+        init_regusage(interp, cur_section);
     while (cur_section) {
         opcode_t op = *cur_op;
         branched = start_new = 0;
         /* Predereference the opcode information for this opcode
          * early since it's going to be used many times */
-        op_info = &interpreter->op_info_table[op];
+        op_info = &interp->op_info_table[op];
 
         /* Calculate the next pc */
         next_op = cur_op + op_info->op_count;
-        ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, next_op);
+        ADD_OP_VAR_PART(interp, interp->code, cur_op, next_op);
 
         /* Update op_count */
         cur_section->op_count++;
 
         /* set register usage for this section */
-        set_register_usage(interpreter, jit_info, cur_section,
+        set_register_usage(interp, jit_info, cur_section,
                 op_info, cur_op, code_start);
 
         /*
@@ -519,7 +519,7 @@ make_sections(Interp *interpreter,
                 cur_section = t_section;
                 /* set all regs to Parrot's */
                 if (jit_info->code_type == JIT_CODE_SUB_REGS_ONLY)
-                    init_regusage(interpreter, cur_section);
+                    init_regusage(interp, cur_section);
 
                 /* registers get either allocated per section or
                  * per basic block (i.e. one or more sections divided
@@ -548,7 +548,7 @@ make_sections(Interp *interpreter,
 /*
 
 =item C<static void
-make_branch_targets(Interp *interpreter,
+make_branch_targets(Interp *interp,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)>
 
 Makes the branch targets.
@@ -558,7 +558,7 @@ Makes the branch targets.
 */
 
 static void
-make_branch_targets(Interp *interpreter,
+make_branch_targets(Interp *interp,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)
 {
     Parrot_jit_optimizer_section_ptr cur_section, t_section;
@@ -596,7 +596,7 @@ make_branch_targets(Interp *interpreter,
 /*
 
 =item C<static void
-sort_registers(Interp *interpreter,
+sort_registers(Interp *interp,
         Parrot_jit_info_t *jit_info,
         opcode_t * code_start)>
 
@@ -607,7 +607,7 @@ Sorts the Parrot registers prior to mapping them to actual hardware registers.
 */
 
 static void
-sort_registers(Interp *interpreter,
+sort_registers(Interp *interp,
         Parrot_jit_info_t *jit_info,
         opcode_t * code_start)
 {
@@ -704,7 +704,7 @@ sort_registers(Interp *interpreter,
 /*
 
 =item C<static void
-assign_registers(Interp *interpreter,
+assign_registers(Interp *interp,
         Parrot_jit_info_t *jit_info,
         Parrot_jit_optimizer_section_ptr cur_section,
         opcode_t * code_start, int from_imcc)>
@@ -751,7 +751,7 @@ complicate the allocation code a bit.
 */
 
 static void
-assign_registers(Interp *interpreter,
+assign_registers(Interp *interp,
         Parrot_jit_info_t *jit_info,
         Parrot_jit_optimizer_section_ptr cur_section,
         opcode_t * code_start, int from_imcc)
@@ -773,10 +773,10 @@ assign_registers(Interp *interpreter,
     cur_op = cur_section->begin;
     while (cur_op <= cur_section->end) {
         opcode_t op = *cur_op;
-        op_info = &interpreter->op_info_table[op];
+        op_info = &interp->op_info_table[op];
         /* For each argument of the current opcode */
         n = op_info->op_count;
-        ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
+        ADD_OP_VAR_PART(interp, interp->code, cur_op, n);
         for (op_arg = 1; op_arg < n; op_arg++) {
             /* get the register typ */
             typ = map[cur_op + op_arg - code_start];
@@ -811,7 +811,7 @@ assign_registers(Interp *interpreter,
 /*
 
 =item C<static void
-map_registers(Interp *interpreter,
+map_registers(Interp *interp,
         Parrot_jit_info_t *jit_info, opcode_t * code_start)>
 
 Maps the most used Parrot registers to hardware registers.
@@ -821,7 +821,7 @@ Maps the most used Parrot registers to hardware registers.
 */
 
 static void
-map_registers(Interp *interpreter,
+map_registers(Interp *interp,
         Parrot_jit_info_t *jit_info,
          opcode_t * code_start)
 {
@@ -835,7 +835,7 @@ map_registers(Interp *interpreter,
     /* While there is section */
     while (cur_section) {
 
-        assign_registers(interpreter, jit_info, cur_section, code_start, 0);
+        assign_registers(interp, jit_info, cur_section, code_start, 0);
 
         /* Move to the next section */
         cur_section = cur_section->next;
@@ -849,7 +849,7 @@ map_registers(Interp *interpreter,
 /*
 
 =item C<static void
-debug_sections(Interp *interpreter,
+debug_sections(Interp *interp,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)>
 
 Prints out debugging info.
@@ -859,7 +859,7 @@ Prints out debugging info.
 */
 
 static void
-debug_sections(Interp *interpreter,
+debug_sections(Interp *interp,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)
 {
     Parrot_jit_optimizer_section_ptr cur_section;
@@ -877,58 +877,58 @@ debug_sections(Interp *interpreter,
     while (cur_section) {
         Parrot_jit_register_usage_t *ru = cur_section->ru;
 
-        PIO_eprintf(interpreter, "\nSection:\n");
-        PIO_eprintf(interpreter, "%s block %d\n",
+        PIO_eprintf(interp, "\nSection:\n");
+        PIO_eprintf(interp, "%s block %d\n",
                 (cur_section->isjit) ? "JITTED" : "NOT JITTED",
                 cur_section->block);
         for (cur_op = cur_section->begin; cur_op <= cur_section->end;) {
             char instr[256];
             opcode_t op = *cur_op;
-            op_info = &interpreter->op_info_table[op];
-            PDB_disassemble_op(interpreter, instr, sizeof(instr),
+            op_info = &interp->op_info_table[op];
+            PDB_disassemble_op(interp, instr, sizeof(instr),
                     op_info, cur_op, NULL, code_start, 0);
-            PIO_eprintf(interpreter, "\t\tOP%vu: ext %3d\t%s\n",
+            PIO_eprintf(interp, "\t\tOP%vu: ext %3d\t%s\n",
                     cur_op - code_start, op_jit[*cur_op].extcall, instr);
             n = op_info->op_count;
-            ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
+            ADD_OP_VAR_PART(interp, interp->code, cur_op, n);
 #  if JIT_DEBUG > 1
-            PIO_eprintf(interpreter, "\t\t\tmap_branch: ");
+            PIO_eprintf(interp, "\t\t\tmap_branch: ");
             for (i = 0; i < n; i++)
-                PIO_eprintf(interpreter, "%02x ", map[cur_op-code_start+i]);
-            PIO_eprintf(interpreter, "\n");
+                PIO_eprintf(interp, "%02x ", map[cur_op-code_start+i]);
+            PIO_eprintf(interp, "\n");
 #  endif
             cur_op += n;
         }
-        PIO_eprintf(interpreter, "\tbegin:\t%#p\t(%Ou)\n",
+        PIO_eprintf(interp, "\tbegin:\t%#p\t(%Ou)\n",
                 cur_section->begin, *cur_section->begin);
-        PIO_eprintf(interpreter, "\tend:\t%#p\t(%Ou)\n",
+        PIO_eprintf(interp, "\tend:\t%#p\t(%Ou)\n",
                 cur_section->end, *cur_section->end);
 
         for (j = 0; j < sizeof(types_to_list)/sizeof(int); j++) {
             char t;
             typ = types_to_list[j];
             t = types[typ];
-            PIO_eprintf(interpreter, "\t%c registers used:\t%i\n",
+            PIO_eprintf(interp, "\t%c registers used:\t%i\n",
                     t, ru[typ].registers_used);
             if (ru[typ].registers_used) {
-                PIO_eprintf(interpreter, "\t%c register count:\t", t);
+                PIO_eprintf(interp, "\t%c register count:\t", t);
                 for (i = 0; i < NUM_REGISTERS; i++)
-                    PIO_eprintf(interpreter, "%i ", ru[typ].reg_count[i]);
-                PIO_eprintf(interpreter, "\n\t%c register usage:\t", t);
+                    PIO_eprintf(interp, "%i ", ru[typ].reg_count[i]);
+                PIO_eprintf(interp, "\n\t%c register usage:\t", t);
                 for (i = 0; i < NUM_REGISTERS; i++)
-                    PIO_eprintf(interpreter, "%i ", ru[typ].reg_usage[i]);
-                PIO_eprintf(interpreter, "\n\t%c register direction:\t", t);
+                    PIO_eprintf(interp, "%i ", ru[typ].reg_usage[i]);
+                PIO_eprintf(interp, "\n\t%c register direction:\t", t);
                 for (i = 0; i < NUM_REGISTERS; i++)
-                    PIO_eprintf(interpreter, "%i ", (int)ru[typ].reg_dir[i]);
-                PIO_eprintf(interpreter, "\n");
+                    PIO_eprintf(interp, "%i ", (int)ru[typ].reg_dir[i]);
+                PIO_eprintf(interp, "\n");
             }
         }
-        PIO_eprintf(interpreter, "\tJit opcodes:\t%u\n",
+        PIO_eprintf(interp, "\tJit opcodes:\t%u\n",
                 cur_section->jit_op_count);
-        PIO_eprintf(interpreter, "\tTotal opcodes:\t%u\n",
+        PIO_eprintf(interp, "\tTotal opcodes:\t%u\n",
                 cur_section->op_count);
         if (cur_section->branch_target)
-            PIO_eprintf(interpreter, "\tBranch target:\tOP%u\n",
+            PIO_eprintf(interp, "\tBranch target:\tOP%u\n",
                     cur_section->branch_target->begin - code_start);
 
         cur_section = cur_section->next;
@@ -939,7 +939,7 @@ debug_sections(Interp *interpreter,
 /*
 
 =item C<static Parrot_jit_optimizer_t *
-optimize_jit(Interp *interpreter,
+optimize_jit(Interp *interp,
             Parrot_jit_info_t *jit_info,
              opcode_t *code_start, opcode_t *code_end)>
 
@@ -950,7 +950,7 @@ Called by C<parrot_build_asm()> to run the optimizer.
 */
 
 static void
-optimize_jit(Interp *interpreter,
+optimize_jit(Interp *interp,
             Parrot_jit_info_t *jit_info,
             opcode_t *code_start, opcode_t *code_end)
 {
@@ -962,33 +962,33 @@ optimize_jit(Interp *interpreter,
             mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
 
     /* Look, which opcodes might branch */
-    make_branch_list(interpreter, optimizer, code_start, code_end);
+    make_branch_list(interp, optimizer, code_start, code_end);
 
     /* ok, let's loop again and generate the sections */
-    make_sections(interpreter, jit_info, code_start, code_end);
+    make_sections(interp, jit_info, code_start, code_end);
 
     /* look where a section jumps to */
-    make_branch_targets(interpreter, optimizer, code_start);
+    make_branch_targets(interp, optimizer, code_start);
 
     /* This is where we start deciding which Parrot registers get
      * mapped to a hardware one in each different section. */
 
 #if JIT_DEBUG > 2
-    debug_sections(interpreter, optimizer, code_start);
+    debug_sections(interp, optimizer, code_start);
 #endif
     if (jit_info->code_type != JIT_CODE_SUB_REGS_ONLY)
-        sort_registers(interpreter, jit_info, code_start);
-    map_registers(interpreter, jit_info, code_start);
+        sort_registers(interp, jit_info, code_start);
+    map_registers(interp, jit_info, code_start);
 
 #if JIT_DEBUG
-    debug_sections(interpreter, optimizer, code_start);
+    debug_sections(interp, optimizer, code_start);
 #endif
 }
 
 /*
 
 =item C<static Parrot_jit_optimizer_t *
-optimize_imcc_jit(Interp *interpreter,
+optimize_imcc_jit(Interp *interp,
             Parrot_jit_info_t *jit_info,
             opcode_t *code_start, opcode_t *code_end,
             struct PackFile_Segment *jit_seg)>
@@ -1000,7 +1000,7 @@ Generate optimizer stuff from the C<_JIT> section in the packfile.
 */
 
 static void
-optimize_imcc_jit(Interp *interpreter,
+optimize_imcc_jit(Interp *interp,
             Parrot_jit_info_t *jit_info,
              opcode_t *code_start, opcode_t *code_end,
              struct PackFile_Segment *jit_seg)
@@ -1054,26 +1054,26 @@ optimize_imcc_jit(Interp *interpreter,
         }
         while (cur_op <= section->end) {
             opcode_t op = *cur_op;
-            op_info = &interpreter->op_info_table[op];
-            set_register_usage(interpreter, jit_info, section,
+            op_info = &interp->op_info_table[op];
+            set_register_usage(interp, jit_info, section,
                     op_info, cur_op, code_start);
             section->op_count++;
             n = op_info->op_count;
-            ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
+            ADD_OP_VAR_PART(interp, interp->code, cur_op, n);
             cur_op += n;
         }
-        assign_registers(interpreter, jit_info, section, code_start, 1);
+        assign_registers(interp, jit_info, section, code_start, 1);
     }
-    insert_fixup_targets(interpreter, branch, code_end - code_start);
+    insert_fixup_targets(interp, branch, code_end - code_start);
 #if JIT_DEBUG
-    debug_sections(interpreter, optimizer, code_start);
+    debug_sections(interp, optimizer, code_start);
 #endif
 }
 
 /*
 
 =item C<size_t
-reg_offs(Interp * interpreter, int typ, int i)>
+reg_offs(Interp *interp, int typ, int i)>
 
 Returns the offset of register C<typ[i]>.
 
@@ -1087,7 +1087,7 @@ F<src/jit/arch/jit_emit.h> has to define C<Parrot_jit_emit_get_base_reg_no(pc)>
 
 
 static size_t
-reg_offs(Interp * interpreter, int typ, int i)
+reg_offs(Interp *interp, int typ, int i)
 {
     switch (typ) {
         case 0:
@@ -1102,7 +1102,7 @@ reg_offs(Interp * interpreter, int typ, int i)
 
 =item C<static void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter, int volatiles)>
+                          Interp *interp, int volatiles)>
 
 Load registers for the current section from parrot to processor registers.
 If C<volatiles> is true, this code is used to restore these registers in
@@ -1114,7 +1114,7 @@ JITted code that calls out to Parrot.
 
 static void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter, int volatiles)
+                          Interp *interp, int volatiles)
 {
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
@@ -1149,7 +1149,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                                 jit_info->native_ptr);
                         first = 0;
                     }
-                    offs = reg_offs(interpreter, typ, us);
+                    offs = reg_offs(interp, typ, us);
                     if (typ == 3)
                         (arch_info->mov_RM_n)(jit_info,
                                               maps[typ][i], base_reg, offs);
@@ -1173,7 +1173,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 
 =item C<static void
 Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter, int volatiles)>
+                          Interp *interp, int volatiles)>
 
 Save registers for the current section.
 If C<volatiles> is true, this code is used to preserve these registers in
@@ -1185,7 +1185,7 @@ JITted code that calls out to Parrot.
 
 static void
 Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter, int volatiles)
+                          Interp *interp, int volatiles)
 {
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
@@ -1221,7 +1221,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                         first = 0;
                     }
 
-                    offs = reg_offs(interpreter, typ, us);
+                    offs = reg_offs(interp, typ, us);
                     if (typ == 3)
                         (arch_info->mov_MR_n)(jit_info,
                                  base_reg, offs, maps[typ][i]);
@@ -1286,7 +1286,7 @@ Parrot_destroy_jit(void *ptr)
  * - set register usage in context
  */
 static void
-set_reg_usage(Interp *interpreter, opcode_t *pc)
+set_reg_usage(Interp *interp, opcode_t *pc)
 {
     struct PackFile_ByteCode *seg;
     struct PackFile_FixupTable *ft;
@@ -1296,7 +1296,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
     int i, ci;
     size_t offs;
 
-    seg = interpreter->code;
+    seg = interp->code;
     ft = seg->fixups;
     if (!ft)
         return;
@@ -1311,7 +1311,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
                 sub = PMC_sub(sub_pmc);
                 offs = pc - sub->seg->base.data;
                 if (offs >= sub->start_offs && offs < sub->end_offs) {
-                    CONTEXT(interpreter->ctx)->n_regs_used = sub->n_regs_used;
+                    CONTEXT(interp->ctx)->n_regs_used = sub->n_regs_used;
                     return;
                 }
 
@@ -1322,7 +1322,7 @@ set_reg_usage(Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<Parrot_jit_info_t *
-parrot_build_asm(Interp *interpreter,
+parrot_build_asm(Interp *interp,
           opcode_t *code_start, opcode_t *code_end,
           void *objfile, enum_jit_code_type)>
 
@@ -1349,7 +1349,7 @@ file.
 */
 
 Parrot_jit_info_t *
-parrot_build_asm(Interp *interpreter,
+parrot_build_asm(Interp *interp,
           opcode_t *code_start, opcode_t *code_end,
           void *objfile, enum_jit_code_type jit_type)
 {
@@ -1374,7 +1374,7 @@ parrot_build_asm(Interp *interpreter,
     const jit_arch_info *arch_info;
     int needs_fs;       /* fetch/store */
 
-    jit_info = interpreter->code->jit_info =
+    jit_info = interp->code->jit_info =
             mem_sys_allocate(sizeof(Parrot_jit_info_t));
 
     jit_info->flags     = jit_type & JIT_CODE_RECURSIVE;
@@ -1403,7 +1403,7 @@ parrot_build_asm(Interp *interpreter,
         op_func[PARROT_OP_invokecc_p].extcall = 0;
     }
     /* get register mappings and such */
-    arch_info = jit_info->arch_info = Parrot_jit_init(interpreter);
+    arch_info = jit_info->arch_info = Parrot_jit_init(interp);
 
     /*
      * check if IMCC did all he work. If yes, we got a PF segment with
@@ -1417,10 +1417,10 @@ parrot_build_asm(Interp *interpreter,
      * maybe something not initialized correctly
      * - disabled --leo
      */
-    name = mem_sys_allocate(strlen(interpreter->code->base.name) + 5);
-    sprintf(name, "%s_JIT", interpreter->code->base.name);
-    jit_seg = PackFile_find_segment(interpreter,
-            interpreter->code->base.dir, name, 0);
+    name = mem_sys_allocate(strlen(interp->code->base.name) + 5);
+    sprintf(name, "%s_JIT", interp->code->base.name);
+    jit_seg = PackFile_find_segment(interp,
+            interp->code->base.dir, name, 0);
     mem_sys_free(name);
 #else
     jit_seg = NULL;
@@ -1428,13 +1428,13 @@ parrot_build_asm(Interp *interpreter,
     /*
      * remember register usage
      */
-    n_regs_used = CONTEXT(interpreter->ctx)->n_regs_used;
-    set_reg_usage(interpreter, code_start);
+    n_regs_used = CONTEXT(interp->ctx)->n_regs_used;
+    set_reg_usage(interp, code_start);
 
     if (jit_seg)
-        optimize_imcc_jit(interpreter, jit_info, code_start, code_end, jit_seg);
+        optimize_imcc_jit(interp, jit_info, code_start, code_end, jit_seg);
     else
-        optimize_jit(interpreter, jit_info, code_start, code_end);
+        optimize_jit(interp, jit_info, code_start, code_end);
 
     /* Byte code size in opcode_t's */
     jit_info->arena.map_size = (code_end - code_start) + 1;
@@ -1473,7 +1473,7 @@ parrot_build_asm(Interp *interpreter,
      * prologue, that makes all this look like a normal function ;)
      */
     jit_info->cur_op = cur_section->begin;
-    (arch_info->regs[jit_type].jit_begin)(jit_info, interpreter);
+    (arch_info->regs[jit_type].jit_begin)(jit_info, interp);
     /*
      *   op_map holds the offset from arena.start
      *   of the parrot op at the given opcode index
@@ -1509,11 +1509,11 @@ parrot_build_asm(Interp *interpreter,
         /* The first opcode for this section */
         cur_op = jit_info->cur_op = cur_section->begin;
 
-        set_reg_usage(interpreter, cur_op);
+        set_reg_usage(interp, cur_op);
 
         /* Load mapped registers for this section, if JIT */
         if (!jit_seg && cur_section->isjit && needs_fs) {
-            Parrot_jit_load_registers(jit_info, interpreter, 0);
+            Parrot_jit_load_registers(jit_info, interp, 0);
         }
 
         /* The first opcode of each section doesn't have a previous one since
@@ -1563,7 +1563,7 @@ parrot_build_asm(Interp *interpreter,
                             !cur_opcode_byte) &&
                         cur_section->isjit &&
                         !jit_seg) {
-                    Parrot_jit_save_registers(jit_info, interpreter, 0);
+                    Parrot_jit_save_registers(jit_info, interp, 0);
                 }
                 else if (CALLS_C_CODE(cur_opcode_byte)) {
                     /*
@@ -1572,7 +1572,7 @@ parrot_build_asm(Interp *interpreter,
                      * TODO not if the previous opcode was also one
                      *      that called C code
                      */
-                    Parrot_jit_save_registers(jit_info, interpreter, 1);
+                    Parrot_jit_save_registers(jit_info, interp, 1);
                 }
             }
 
@@ -1585,21 +1585,21 @@ parrot_build_asm(Interp *interpreter,
             if (cur_opcode_byte >= jit_op_count()) {
                 cur_opcode_byte = CORE_OPS_wrapper__;
             }
-            (op_func[cur_opcode_byte].fn) (jit_info, interpreter);
+            (op_func[cur_opcode_byte].fn) (jit_info, interp);
 
             if (CALLS_C_CODE(cur_opcode_byte) && needs_fs) {
                 /*
                  * restore volatiles only - and TODO only if next
                  *      wouldn't load registers anyway
                  */
-                Parrot_jit_load_registers(jit_info, interpreter, 1);
+                Parrot_jit_load_registers(jit_info, interp, 1);
             }
             /* Update the previous opcode */
             jit_info->prev_op = cur_op;
 
-            op_info = &interpreter->op_info_table[*cur_op];
+            op_info = &interp->op_info_table[*cur_op];
             n = op_info->op_count;
-            ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
+            ADD_OP_VAR_PART(interp, interp->code, cur_op, n);
             cur_op += n;
             /* update op_i and cur_op accordingly */
             jit_info->op_i += n;
@@ -1615,12 +1615,12 @@ parrot_build_asm(Interp *interpreter,
                     jit_info->native_ptr - jit_info->arena.start;
                 assert(*cur_op == PARROT_OP_get_results_pc);
                 /* now emit the call - use special op for this */
-                (op_func[PARROT_OP_pic_callr___pc].fn)(jit_info, interpreter);
+                (op_func[PARROT_OP_pic_callr___pc].fn)(jit_info, interp);
                 /* and the get_results */
-                (op_func[*cur_op].fn)(jit_info, interpreter);
-                op_info = &interpreter->op_info_table[*cur_op];
+                (op_func[*cur_op].fn)(jit_info, interp);
+                op_info = &interp->op_info_table[*cur_op];
                 n = op_info->op_count;
-                ADD_OP_VAR_PART(interpreter, interpreter->code, cur_op, n);
+                ADD_OP_VAR_PART(interp, interp->code, cur_op, n);
                 cur_op += n;
                 /* update op_i and cur_op accordingly */
                 jit_info->op_i += n;
@@ -1652,7 +1652,7 @@ parrot_build_asm(Interp *interpreter,
 
         /* Save mapped registers back to the Parrot registers */
         if (!jit_seg && cur_section->isjit && needs_fs)
-            Parrot_jit_save_registers(jit_info, interpreter, 0);
+            Parrot_jit_save_registers(jit_info, interp, 0);
         /* update the offset for saved registers */
         jit_info->arena.op_map[jit_info->op_i].offset =
             jit_info->native_ptr - jit_info->arena.start;
@@ -1665,9 +1665,9 @@ parrot_build_asm(Interp *interpreter,
     /*
      * restore register usage
      */
-    CONTEXT(interpreter->ctx)->n_regs_used = n_regs_used;
+    CONTEXT(interp->ctx)->n_regs_used = n_regs_used;
     /* Do fixups before converting offsets */
-    (arch_info->jit_dofixup)(jit_info, interpreter);
+    (arch_info->jit_dofixup)(jit_info, interp);
 
     /* Convert offsets to pointers */
     if (!objfile)
@@ -1685,7 +1685,7 @@ parrot_build_asm(Interp *interpreter,
     jit_info->arena.size =
         (ptrdiff_t)(jit_info->native_ptr - jit_info->arena.start);
 #if JIT_DEBUG
-    PIO_eprintf(interpreter, "\nTotal size %u bytes\n",
+    PIO_eprintf(interp, "\nTotal size %u bytes\n",
             (unsigned int)(jit_info->native_ptr - jit_info->arena.start));
 #endif
 
@@ -1693,18 +1693,18 @@ parrot_build_asm(Interp *interpreter,
      * sync data cache if needed - we are executing it as code in some usecs
      */
     if (arch_info->jit_flush_cache)
-        (arch_info->jit_flush_cache)(jit_info, interpreter);
+        (arch_info->jit_flush_cache)(jit_info, interp);
 
     /* assume gdb is available: generate symbol information  */
 #if defined __GNUC__ || defined __IBMC__
-    if (Interp_debug_TEST(interpreter, PARROT_JIT_DEBUG_FLAG)) {
+    if (Interp_debug_TEST(interp, PARROT_JIT_DEBUG_FLAG)) {
         /*
          * TODO same like above here e.g. create ASM listing of code
          *      if real debug support isn't available
          */
         if (jit_type == JIT_CODE_FILE) {
-            interpreter->code->jit_info = jit_info;
-            Parrot_jit_debug(interpreter);
+            interp->code->jit_info = jit_info;
+            Parrot_jit_debug(interp);
         }
     }
 #endif

@@ -228,7 +228,7 @@ Appends C<*value> to the key.
 
     void push_pmc (PMC * value) {
         if (value->vtable->base_type != enum_class_Key)
-            real_exception(interpreter, NULL, INVALID_OPERATION,
+            real_exception(interp, NULL, INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
         key_append(INTERP, SELF, value);
     }
@@ -307,7 +307,7 @@ PMC_int_val(-1) means end of iteration.
                  * KEY_integer_FLAG alone is an indexed hash lookup
                  * with an Integer KEY
                  */
-                 _hash = CONST_STRING(interpreter, "Hash");
+                 _hash = CONST_STRING(interp, "Hash");
                 if (VTABLE_isa(INTERP, agg, _hash) &&
                      agg->vtable->base_type != enum_class_OrderedHash)
                     PObj_get_FLAGS(ret) |= KEY_hash_iterator_FLAGS;

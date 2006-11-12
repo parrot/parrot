@@ -62,11 +62,11 @@ PIO_mmap_open(theINTERP, ParrotIOLayer *layer,
     ParrotIOLayer *l = PIO_DOWNLAYER(layer);
 
     if (!l) {
-        l = interpreter->piodata->default_stack;
+        l = interp->piodata->default_stack;
         if (!strcmp(l->name, "buf"))
             l = PIO_DOWNLAYER(l);
     }
-    io = PIO_open_down(interpreter, l, path, flags);
+    io = PIO_open_down(interp, l, path, flags);
     if (!io) {
         /* error creating IO stream */
         return NULL;
@@ -112,10 +112,10 @@ PIO_mmap_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     UINTVAL len;
 
     if (!(io->b.flags & PIO_BF_MMAP))
-        return PIO_read_down(interpreter, PIO_DOWNLAYER(layer), io, buf);
+        return PIO_read_down(interp, PIO_DOWNLAYER(layer), io, buf);
 
     if (*buf == NULL) {
-        *buf = new_string_header(interpreter, 0);
+        *buf = new_string_header(interp, 0);
     }
     s = *buf;
     /* TODO create string_free API for reusing string headers */
@@ -146,7 +146,7 @@ PIO_mmap_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     INTVAL ret = -1;
 
     if (io->fd >= 0) {
-        ret = PIO_close_down(interpreter, PIO_DOWNLAYER(layer), io);
+        ret = PIO_close_down(interp, PIO_DOWNLAYER(layer), io);
     }
     return ret;
 }

@@ -141,7 +141,7 @@ extern ParrotIOLayer pio_string_layer;
 
 
 #ifndef theINTERP
-#  define theINTERP      Interp * interpreter
+#  define theINTERP      Interp *interp
 #endif
 
 extern INTVAL pio_errno;

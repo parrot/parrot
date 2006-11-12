@@ -7,7 +7,7 @@
 #if !defined(PARROT_JIT_H_GUARD)
 #define PARROT_JIT_H_GUARD
 
-typedef void (*jit_f)(Interp *interpreter, opcode_t *pc);
+typedef void (*jit_f)(Interp *interp, opcode_t *pc);
 
 
 void Parrot_destroy_jit(void *);
@@ -210,7 +210,7 @@ typedef struct {
     ((jit_info)->arena.start + (fixup)->native_offset)
 
 typedef void (*jit_fn_t)(Parrot_jit_info_t *jit_info,
-                         Interp *interpreter);
+                         Interp *interp);
 
 /*  Parrot_jit_fn_info_t
  *      The table of opcodes.
@@ -232,22 +232,22 @@ extern Parrot_jit_fn_info_t op_exec[];
 PARROT_API void Parrot_jit_newfixup(Parrot_jit_info_t *jit_info);
 
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                        Interp *interpreter);
+                        Interp *interp);
 
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                          Interp *interpreter);
+                          Interp *interp);
 
 void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                          Interp *interpreter);
+                          Interp *interp);
 
 void Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
-                        Interp *interpreter);
+                        Interp *interp);
 
 void Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                          Interp *interpreter);
+                          Interp *interp);
 
 void Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
-                          Interp *interpreter);
+                          Interp *interp);
 
 /*
  * interface functions for the register save/restore code
@@ -312,7 +312,7 @@ const jit_arch_info * Parrot_jit_init(Interp *);
  * interface to create JIT code
  */
 Parrot_jit_info_t *
-parrot_build_asm(Interp *interpreter,
+parrot_build_asm(Interp *interp,
                 opcode_t *code_start, opcode_t *code_end,
                 void *objfile, enum_jit_code_type);
 /*

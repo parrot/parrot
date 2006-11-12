@@ -29,7 +29,7 @@ implementation found in F<src/malloc.c>.
 /*
 
 =item C<void
-Parrot_go_collect(Interp *interpreter)>
+Parrot_go_collect(Interp *interp)>
 
 Does nothing other than increment the interpreter's C<collect_runs>
 count.
@@ -39,12 +39,12 @@ count.
 */
 
 void
-Parrot_go_collect(Interp *interpreter)
+Parrot_go_collect(Interp *interp)
 {
-    if (interpreter->arena_base->GC_block_level) {
+    if (interp->arena_base->GC_block_level) {
         return;
     }
-    interpreter->arena_base->collect_runs++;        /* fake it */
+    interp->arena_base->collect_runs++;        /* fake it */
 }
 
 /*
@@ -113,7 +113,7 @@ xrealloc(void *p, size_t size)
 /*
 
 =item C<void *
-Parrot_reallocate(Interp *interpreter, void *from, size_t size)>
+Parrot_reallocate(Interp *interp, void *from, size_t size)>
 
 COWable objects (strings or Buffers) use an INTVAL at C<bufstart> for
 refcounting in DOD. C<bufstart> is incremented by that C<INTVAL>.
@@ -123,7 +123,7 @@ refcounting in DOD. C<bufstart> is incremented by that C<INTVAL>.
 */
 
 void *
-Parrot_reallocate(Interp *interpreter, void *from, size_t size)
+Parrot_reallocate(Interp *interp, void *from, size_t size)
 {
     Buffer * const buffer = from;
     const size_t oldlen = PObj_buflen(buffer);
@@ -149,7 +149,7 @@ Parrot_reallocate(Interp *interpreter, void *from, size_t size)
 /*
 
 =item C<void *
-Parrot_allocate(Interp *interpreter, void *buffer, size_t size)>
+Parrot_allocate(Interp *interp, void *buffer, size_t size)>
 
 Allocates and returns the required memory. C<size> is the number of
 bytes of memory required.
@@ -159,7 +159,7 @@ bytes of memory required.
 */
 
 void *
-Parrot_allocate(Interp *interpreter, void *buffer, size_t size)
+Parrot_allocate(Interp *interp, void *buffer, size_t size)
 {
     Buffer * const b = buffer;
     void * const p = xmalloc(sizeof(INTVAL) + size);
@@ -173,7 +173,7 @@ Parrot_allocate(Interp *interpreter, void *buffer, size_t size)
 /*
 
 =item C<void *
-Parrot_allocate_zeroed(Interp *interpreter, void *buffer, size_t size)>
+Parrot_allocate_zeroed(Interp *interp, void *buffer, size_t size)>
 
 Allocates, zeros and returns the required memory. C<size> is the number
 in bytes of memory required.
@@ -183,7 +183,7 @@ in bytes of memory required.
 */
 
 void *
-Parrot_allocate_zeroed(Interp *interpreter, void *buffer, size_t size)
+Parrot_allocate_zeroed(Interp *interp, void *buffer, size_t size)
 {
     Buffer * const b = buffer;
 
@@ -195,7 +195,7 @@ Parrot_allocate_zeroed(Interp *interpreter, void *buffer, size_t size)
 /*
 
 =item C<void *
-Parrot_reallocate_string(Interp *interpreter, STRING *str, size_t size)>
+Parrot_reallocate_string(Interp *interp, STRING *str, size_t size)>
 
 Reallocates the string buffer in C<*str> and returns it. C<size> is the
 number of bytes memory required.
@@ -205,10 +205,10 @@ number of bytes memory required.
 */
 
 void *
-Parrot_reallocate_string(Interp *interpreter, STRING *str, size_t size)
+Parrot_reallocate_string(Interp *interp, STRING *str, size_t size)
 {
     if (!PObj_bufstart(str))
-        Parrot_allocate_string(interpreter, str, size);
+        Parrot_allocate_string(interp, str, size);
     else if (size) {
         const size_t pad = STRING_ALIGNMENT - 1;
         void *p;
@@ -224,7 +224,7 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str, size_t size)
 /*
 
 =item C<void *
-Parrot_allocate_string(Interp *interpreter, STRING *str, size_t size)>
+Parrot_allocate_string(Interp *interp, STRING *str, size_t size)>
 
 Allocates the string buffer in C<*str> and returns it. C<size> is the
 number bytes of memory required.
@@ -234,7 +234,7 @@ number bytes of memory required.
 */
 
 void *
-Parrot_allocate_string(Interp *interpreter, STRING *str, size_t size)
+Parrot_allocate_string(Interp *interp, STRING *str, size_t size)
 {
     void *p;
     const size_t pad = STRING_ALIGNMENT - 1;
@@ -250,7 +250,7 @@ Parrot_allocate_string(Interp *interpreter, STRING *str, size_t size)
 /*
 
 =item C<void
-Parrot_initialize_memory_pools(Interp *interpreter)>
+Parrot_initialize_memory_pools(Interp *interp)>
 
 Does nothing.
 
@@ -259,14 +259,14 @@ Does nothing.
 */
 
 void
-Parrot_initialize_memory_pools(Interp *interpreter)
+Parrot_initialize_memory_pools(Interp *interp)
 {
 }
 
 /*
 
 =item C<void
-Parrot_destroy_memory_pools(Interp *interpreter)>
+Parrot_destroy_memory_pools(Interp *interp)>
 
 Does nothing.
 
@@ -275,7 +275,7 @@ Does nothing.
 */
 
 void
-Parrot_destroy_memory_pools(Interp *interpreter)
+Parrot_destroy_memory_pools(Interp *interp)
 {
 }
 

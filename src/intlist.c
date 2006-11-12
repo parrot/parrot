@@ -190,7 +190,7 @@ intlist_new(Interp *i)
 /*
 
 =item C<INTVAL
-intlist_length(Interp *interpreter, IntList *list)>
+intlist_length(Interp *interp, IntList *list)>
 
 Returns the length of the list.
 
@@ -199,9 +199,9 @@ Returns the length of the list.
 */
 
 INTVAL
-intlist_length(Interp *interpreter, IntList *list)
+intlist_length(Interp *interp, IntList *list)
 {
-    UNUSED(interpreter);
+    UNUSED(interp);
     return ((List *)list)->length;
 }
 

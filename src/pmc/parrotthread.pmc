@@ -59,25 +59,25 @@ stop_GC(Interp* parent, Interp *thread)
    coke's]
  */
 
-static INTVAL do_thread_run(Interp *interpreter, PMC *thread,
+static INTVAL do_thread_run(Interp *interp, PMC *thread,
                             INTVAL clone_flags, PMC *sub, PMC *args) {
     INTVAL tid;
 
-    tid = VTABLE_get_integer(interpreter, thread);
-    clone_interpreter(PMC_data(thread), interpreter, clone_flags);
-    interpreter->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
-    pt_thread_run(interpreter, thread, sub, args);
+    tid = VTABLE_get_integer(interp, thread);
+    clone_interpreter(PMC_data(thread), interp, clone_flags);
+    interp->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
+    pt_thread_run(interp, thread, sub, args);
 
-    pmc_reuse(interpreter, thread, enum_class_ParrotRunningThread, 0);
+    pmc_reuse(interp, thread, enum_class_ParrotRunningThread, 0);
     PObj_active_destroy_CLEAR(thread);
     PObj_custom_mark_CLEAR(thread);
     PMC_int_val(thread) = tid;
     return tid;
 }
 
-static INTVAL do_thread_run_clone_default(Interp *interpreter,
+static INTVAL do_thread_run_clone_default(Interp *interp,
                                           PMC *thread, PMC *sub, PMC *args) {
-    return do_thread_run(interpreter, thread, PARROT_CLONE_DEFAULT, sub, args);
+    return do_thread_run(interp, thread, PARROT_CLONE_DEFAULT, sub, args);
 }
 
 

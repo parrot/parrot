@@ -80,13 +80,13 @@ Returns the current working directory.
 #endif
         if (cwd) {
             STRING *scwd;
-            scwd = string_from_cstring(interpreter, cwd, strlen(cwd));
+            scwd = string_from_cstring(interp, cwd, strlen(cwd));
             mem_sys_free(cwd);
             return scwd;
         }
         else {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
             return NULL;
         }
     }
@@ -103,7 +103,7 @@ Changes the current working directory to the one specified by C<path>.
 
     METHOD void chdir(STRING *path) {
         int error;
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
 #ifdef WIN32
         error = _chdir(cpath);
 #else
@@ -112,7 +112,7 @@ Changes the current working directory to the one specified by C<path>.
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
     }
 
@@ -129,11 +129,11 @@ C<path>.
 
     METHOD void rm(STRING *path) {
         struct stat info;
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
         int error = stat(cpath, &info);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
 
         if (S_ISDIR(info.st_mode)) {
@@ -145,7 +145,7 @@ C<path>.
             string_cstring_free(cpath);
             if (error) {
                 char *errmsg = strerror(errno);
-                real_exception(interpreter, NULL, E_SystemError, errmsg);
+                real_exception(interp, NULL, E_SystemError, errmsg);
             }
         }
         else {
@@ -153,7 +153,7 @@ C<path>.
             string_cstring_free(cpath);
             if (error) {
                 char *errmsg = strerror(errno);
-                real_exception(interpreter, NULL, E_SystemError, errmsg);
+                real_exception(interp, NULL, E_SystemError, errmsg);
             }
         }
     }
@@ -170,7 +170,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 
     METHOD void mkdir(STRING *path, INTVAL mode) {
         int error;
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
         /* should we validate mode? */
 #ifdef WIN32
         error = _mkdir(cpath);
@@ -180,7 +180,7 @@ Creates a directory specified by C<path> with mode C<mode>.
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
     }
 
@@ -214,45 +214,45 @@ Stats a file, and returns a 13 position array as in Perl:
         struct stat info;
         PMC *array;
 
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
         int error = stat(cpath, &info);
         string_cstring_free(cpath);
 
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
             return NULL;
         }
         else {
-            array = pmc_new(interpreter, enum_class_FixedPMCArray);
-            VTABLE_set_integer_native(interpreter, array, 13);
+            array = pmc_new(interp, enum_class_FixedPMCArray);
+            VTABLE_set_integer_native(interp, array, 13);
 
-            VTABLE_set_integer_keyed_int(interpreter, array, 0,
+            VTABLE_set_integer_keyed_int(interp, array, 0,
                                          info.st_dev);
-            VTABLE_set_integer_keyed_int(interpreter, array, 1,
+            VTABLE_set_integer_keyed_int(interp, array, 1,
                                          info.st_ino);
-            VTABLE_set_integer_keyed_int(interpreter, array, 2,
+            VTABLE_set_integer_keyed_int(interp, array, 2,
                                          info.st_mode);
-            VTABLE_set_integer_keyed_int(interpreter, array, 3,
+            VTABLE_set_integer_keyed_int(interp, array, 3,
                                          info.st_nlink);
-            VTABLE_set_integer_keyed_int(interpreter, array, 4,
+            VTABLE_set_integer_keyed_int(interp, array, 4,
                                          info.st_uid);
-            VTABLE_set_integer_keyed_int(interpreter, array, 5,
+            VTABLE_set_integer_keyed_int(interp, array, 5,
                                          info.st_gid);
-            VTABLE_set_integer_keyed_int(interpreter, array, 6,
+            VTABLE_set_integer_keyed_int(interp, array, 6,
                                          info.st_rdev);
-            VTABLE_set_integer_keyed_int(interpreter, array, 7,
+            VTABLE_set_integer_keyed_int(interp, array, 7,
                                          info.st_size);
-            VTABLE_set_integer_keyed_int(interpreter, array, 8,
+            VTABLE_set_integer_keyed_int(interp, array, 8,
                                          info.st_atime);
-            VTABLE_set_integer_keyed_int(interpreter, array, 9,
+            VTABLE_set_integer_keyed_int(interp, array, 9,
                                          info.st_mtime);
-            VTABLE_set_integer_keyed_int(interpreter, array,10,
+            VTABLE_set_integer_keyed_int(interp, array,10,
                                          info.st_ctime);
 #ifndef WIN32
-            VTABLE_set_integer_keyed_int(interpreter, array,11,
+            VTABLE_set_integer_keyed_int(interp, array,11,
                                          info.st_blksize);
-            VTABLE_set_integer_keyed_int(interpreter, array,12,
+            VTABLE_set_integer_keyed_int(interp, array,12,
                                          info.st_blocks);
 #endif
             return array;
@@ -289,7 +289,7 @@ Stats a file, and returns a 13 position array as in Perl:
         struct stat info;
         PMC *array;
 
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
 #ifdef WIN32
         int error = stat(cpath, &info);
 #else
@@ -299,39 +299,39 @@ Stats a file, and returns a 13 position array as in Perl:
 
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
             return NULL;
         }
         else {
-            array = pmc_new(interpreter, enum_class_FixedPMCArray);
-            VTABLE_set_integer_native(interpreter, array, 13);
+            array = pmc_new(interp, enum_class_FixedPMCArray);
+            VTABLE_set_integer_native(interp, array, 13);
 
-            VTABLE_set_integer_keyed_int(interpreter, array, 0,
+            VTABLE_set_integer_keyed_int(interp, array, 0,
                                          info.st_dev);
-            VTABLE_set_integer_keyed_int(interpreter, array, 1,
+            VTABLE_set_integer_keyed_int(interp, array, 1,
                                          info.st_ino);
-            VTABLE_set_integer_keyed_int(interpreter, array, 2,
+            VTABLE_set_integer_keyed_int(interp, array, 2,
                                          info.st_mode);
-            VTABLE_set_integer_keyed_int(interpreter, array, 3,
+            VTABLE_set_integer_keyed_int(interp, array, 3,
                                          info.st_nlink);
-            VTABLE_set_integer_keyed_int(interpreter, array, 4,
+            VTABLE_set_integer_keyed_int(interp, array, 4,
                                          info.st_uid);
-            VTABLE_set_integer_keyed_int(interpreter, array, 5,
+            VTABLE_set_integer_keyed_int(interp, array, 5,
                                          info.st_gid);
-            VTABLE_set_integer_keyed_int(interpreter, array, 6,
+            VTABLE_set_integer_keyed_int(interp, array, 6,
                                          info.st_rdev);
-            VTABLE_set_integer_keyed_int(interpreter, array, 7,
+            VTABLE_set_integer_keyed_int(interp, array, 7,
                                          info.st_size);
-            VTABLE_set_integer_keyed_int(interpreter, array, 8,
+            VTABLE_set_integer_keyed_int(interp, array, 8,
                                          info.st_atime);
-            VTABLE_set_integer_keyed_int(interpreter, array, 9,
+            VTABLE_set_integer_keyed_int(interp, array, 9,
                                          info.st_mtime);
-            VTABLE_set_integer_keyed_int(interpreter, array,10,
+            VTABLE_set_integer_keyed_int(interp, array,10,
                                          info.st_ctime);
 #ifndef WIN32
-            VTABLE_set_integer_keyed_int(interpreter, array,11,
+            VTABLE_set_integer_keyed_int(interp, array,11,
                                          info.st_blksize);
-            VTABLE_set_integer_keyed_int(interpreter, array,12,
+            VTABLE_set_integer_keyed_int(interp, array,12,
                                          info.st_blocks);
 #endif
             return array;
@@ -350,17 +350,17 @@ Creates a symlink, where available
 
     METHOD void symlink(STRING *from, STRING *to) {
 #ifndef WIN32
-        char *cfrom = string_to_cstring(interpreter, from);
-        char *cto = string_to_cstring(interpreter, to);
+        char *cfrom = string_to_cstring(interp, from);
+        char *cto = string_to_cstring(interp, to);
         int error = symlink(cfrom, cto);
         string_cstring_free(cfrom);
         string_cstring_free(cto);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
 #else
-        real_exception(interpreter, NULL, E_NotImplementedError,
+        real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 does not support symlinks!");
 #endif
     }
@@ -377,17 +377,17 @@ Creates a hard link, where available(?)
 
     METHOD void link(STRING *from, STRING *to) {
 #ifndef WIN32
-        char *cfrom = string_to_cstring(interpreter, from);
-        char *cto = string_to_cstring(interpreter, to);
+        char *cfrom = string_to_cstring(interp, from);
+        char *cto = string_to_cstring(interp, to);
         int error = link(cfrom, cto);
         string_cstring_free(cfrom);
         string_cstring_free(cto);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
 #else
-        real_exception(interpreter, NULL, E_NotImplementedError,
+        real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
@@ -408,7 +408,7 @@ previous one).
         INTVAL old = umask(mask);
         return old;
 #else
-        real_exception(interpreter, NULL, E_NotImplementedError,
+        real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need win32 developer!");
         return 0;
 #endif
@@ -430,15 +430,15 @@ idea to do the same with parrot.
 
     METHOD void chroot(STRING* path) {
 #ifndef WIN32
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
         int error = chroot(cpath);
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
 #else
-        real_exception(interpreter, NULL, E_NotImplementedError,
+        real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
@@ -458,7 +458,7 @@ reads entries from a directory.
         DIR *dir ;
         struct dirent *dirent;
         PMC *array;
-        char *cpath = string_to_cstring(interpreter, path);
+        char *cpath = string_to_cstring(interp, path);
         STRING *retval ;
 
         dir = opendir(cpath);
@@ -466,21 +466,21 @@ reads entries from a directory.
         if (dir == NULL)
         {
             char *errmsg = strerror(errno);
-            real_exception(interpreter, NULL, E_SystemError, errmsg);
+            real_exception(interp, NULL, E_SystemError, errmsg);
         }
 
-        array = pmc_new(interpreter, enum_class_ResizableStringArray);
+        array = pmc_new(interp, enum_class_ResizableStringArray);
         while ((dirent = readdir(dir)) != NULL)
         {
-            retval = string_from_cstring(interpreter, dirent->d_name, 0) ;
-            VTABLE_push_string(interpreter, array, retval);
+            retval = string_from_cstring(interp, dirent->d_name, 0) ;
+            VTABLE_push_string(interp, array, retval);
         }
 
         closedir(dir);
 
         return array ;
 #else
-        real_exception(interpreter, NULL, E_NotImplementedError,
+        real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need win32 developer!");
         return NULL;
 #endif

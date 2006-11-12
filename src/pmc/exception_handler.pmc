@@ -24,13 +24,13 @@ exception object's C<_P5> attribute.
 #include "parrot/oplib/ops.h"
 
 static opcode_t *
-pass_exception_args(Interp *interpreter, const char *sig,
+pass_exception_args(Interp *interp, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctx, ...)
 {
     va_list ap;
     void *next;
     va_start(ap, old_ctx);
-    next = parrot_pass_args_to_result(interpreter, sig, dest, old_ctx, ap);
+    next = parrot_pass_args_to_result(interp, sig, dest, old_ctx, ap);
     va_end(ap);
     return next;
 }
@@ -102,7 +102,7 @@ Initializes the exception handler.
             STRING *message = VTABLE_get_string_keyed_int(INTERP,
                     exception, 0);
             assert(next == results);
-            next = pass_exception_args(interpreter, "PS", next,
+            next = pass_exception_args(interp, "PS", next,
                     ex_ctx, exception, message);
         }
         return next;

@@ -44,7 +44,7 @@ Description.
 */
 
 opcode_t
-PackFile_pack_size(Interp* interpreter, struct PackFile *self)
+PackFile_pack_size(Interp *interp, struct PackFile *self)
 {
     opcode_t size;
     struct PackFile_Directory * const dir = &self->directory;
@@ -54,7 +54,7 @@ PackFile_pack_size(Interp* interpreter, struct PackFile *self)
     size += 4; /* magic + opcode type + directory type + pad */
 
     dir->base.file_offset = size;
-    size += PackFile_Segment_packed_size(interpreter,
+    size += PackFile_Segment_packed_size(interp,
             (struct PackFile_Segment *) dir);
 
     return size;
@@ -80,7 +80,7 @@ Other pack routines are in F<src/packfile.c>.
 */
 
 void
-PackFile_pack(Interp* interpreter, struct PackFile *self, opcode_t *cursor)
+PackFile_pack(Interp *interp, struct PackFile *self, opcode_t *cursor)
 {
     opcode_t *ret;
 
@@ -102,7 +102,7 @@ PackFile_pack(Interp* interpreter, struct PackFile *self, opcode_t *cursor)
     seg = (struct PackFile_Segment *) dir;
     /* dir size */
     size = seg->op_count;
-    ret = PackFile_Segment_pack (interpreter, seg, cursor);
+    ret = PackFile_Segment_pack (interp, seg, cursor);
     if ((size_t)(ret - cursor) != size) {
         fprintf(stderr, "PackFile_pack segment '%s' used size %d "
                 "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);
@@ -122,14 +122,14 @@ constant table into a contiguous region of memory.
 */
 
 size_t
-PackFile_ConstTable_pack_size(Interp *interpreter, struct PackFile_Segment *seg)
+PackFile_ConstTable_pack_size(Interp *interp, struct PackFile_Segment *seg)
 {
     opcode_t i;
     struct PackFile_ConstTable* const self = (struct PackFile_ConstTable *) seg;
     size_t size = 1;    /* const_count */
 
     for (i = 0; i < self->const_count; i++)
-        size += PackFile_Constant_pack_size(interpreter, self->constants[i]);
+        size += PackFile_Constant_pack_size(interp, self->constants[i]);
     return size;
 }
 
@@ -154,7 +154,7 @@ C<PackFile_ConstTable_pack()>
 static struct PackFile_ConstTable *ct;
 
 opcode_t *
-PackFile_ConstTable_pack(Interp *interpreter,
+PackFile_ConstTable_pack(Interp *interp,
         struct PackFile_Segment *seg, opcode_t *cursor)
 {
     struct PackFile_ConstTable * const self = (struct PackFile_ConstTable *)seg;
@@ -166,7 +166,7 @@ PackFile_ConstTable_pack(Interp *interpreter,
     *cursor++ = self->const_count;
 
     for (i = 0; i < self->const_count; i++) {
-        cursor = PackFile_Constant_pack(interpreter,
+        cursor = PackFile_Constant_pack(interp,
                                         self->constants[i], cursor);
     }
 
@@ -176,7 +176,7 @@ PackFile_ConstTable_pack(Interp *interpreter,
 /*
 
 =item C<static int
-find_in_const(Interp *interpreter, PMC *key, int type)>
+find_in_const(Interp *interp, PMC *key, int type)>
 
 This is really ugly, we don't know where our C<PARROT_ARG_SC> key
 constant is in constant table, so we have to search for it.
@@ -186,7 +186,7 @@ constant is in constant table, so we have to search for it.
 */
 
 static int
-find_in_const(Interp *interpreter, PMC *key, int type)
+find_in_const(Interp *interp, PMC *key, int type)
 {
     int i;
     for (i = 0; i < ct->const_count; i++)
@@ -197,7 +197,7 @@ find_in_const(Interp *interpreter, PMC *key, int type)
                  PMC_num_val(key))
             return i;
     PIO_eprintf(NULL, "find_in_const: couldn't find const for key\n");
-    Parrot_exit(interpreter, 1);
+    Parrot_exit(interp, 1);
     return 0;
 }
 
@@ -223,7 +223,7 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 */
 
 opcode_t *
-PackFile_Constant_pack(Interp* interpreter,
+PackFile_Constant_pack(Interp* interp,
         struct PackFile_Constant *self, opcode_t *cursor)
 {
     struct PMC *key;
@@ -245,7 +245,7 @@ PackFile_Constant_pack(Interp* interpreter,
 
     case PFC_PMC:
         key = self->u.key;      /* the (Sub) PMC */
-        image = Parrot_freeze(interpreter, key);
+        image = Parrot_freeze(interp, key);
         cursor = PF_store_string(cursor, image);
         break;
 
@@ -278,12 +278,12 @@ PackFile_Constant_pack(Interp* interpreter,
                 case KEY_number_FLAG:
                     *cursor++ = PARROT_ARG_NC | slice_bits;
                     /* Argh */
-                    *cursor++ = find_in_const(interpreter, key, PFC_NUMBER);
+                    *cursor++ = find_in_const(interp, key, PFC_NUMBER);
                     break;
                 case KEY_string_FLAG:
                     *cursor++ = PARROT_ARG_SC | slice_bits;
                     /* Argh */
-                    *cursor++ = find_in_const(interpreter, key, PFC_STRING);
+                    *cursor++ = find_in_const(interp, key, PFC_STRING);
                     break;
 
                 case KEY_integer_FLAG | KEY_register_FLAG:
@@ -305,7 +305,7 @@ PackFile_Constant_pack(Interp* interpreter,
                 default:
                     PIO_eprintf(NULL, "PackFile_Constant_pack: "
                             "unsupported constant type\n");
-                    Parrot_exit(interpreter, 1);
+                    Parrot_exit(interp, 1);
             }
         }
 
@@ -313,7 +313,7 @@ PackFile_Constant_pack(Interp* interpreter,
 
     default:
         PIO_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
-        Parrot_exit(interpreter, 1);
+        Parrot_exit(interp, 1);
         break;
     }
     return cursor;

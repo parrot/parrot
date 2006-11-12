@@ -379,19 +379,19 @@ emit_if(Parrot_jit_info_t *jit_info, char opcode, mips_register_t rs,
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp * interpreter)
+                 Interp *interp)
 {
     emit_addiu(jit_info->native_ptr, sp, sp, -40);
     emit_sw(jit_info->native_ptr, ra, 32, sp);
     emit_sw(jit_info->native_ptr, fp, 28, sp);
     emit_mov(jit_info->native_ptr, s0, a0);
     emit_imm32(jit_info->native_ptr, s1, jit_info->arena.op_map);
-    emit_imm32(jit_info->native_ptr, s2, interpreter->code->base.data);
+    emit_imm32(jit_info->native_ptr, s2, interp->code->base.data);
 }
 
 void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-    Interp * interpreter)
+    Interp * interp)
 {
     Parrot_jit_fixup_t *fixup;
     char *fixup_ptr;
@@ -420,39 +420,39 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 }
 
 void
-Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, Interp * interpreter)
+Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, Interp *interp)
 {
 }
 
 void
-Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info, Interp * interpreter)
+Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info, Interp *interp)
 {
 }
 
 /*void
-Parrot_jit_restart_op(Parrot_jit_info_t *jit_info, Interp * interpreter)
+Parrot_jit_restart_op(Parrot_jit_info_t *jit_info, Interp *interp)
 {
 }*/
 
 /* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_emit_mov_mr_offs(Interp * interpreter, int base, size_t offs, int reg)
+Parrot_jit_emit_mov_mr_offs(Interp *interp, int base, size_t offs, int reg)
 {
 }
 
 /* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_emit_mov_rm_offs(Interp * interpreter, int reg, int base, size_t offs)
+Parrot_jit_emit_mov_rm_offs(Interp *interp, int reg, int base, size_t offs)
 {
 }
 
 void
-Parrot_jit_emit_mov_mr_n_offs(Interp * interpreter, int base, size_t offs, int reg)
+Parrot_jit_emit_mov_mr_n_offs(Interp *interp, int base, size_t offs, int reg)
 {
 }
 
 void
-Parrot_jit_emit_mov_rm_n_offs(Interp * interpreter, int reg, int base, size_t offs)
+Parrot_jit_emit_mov_rm_n_offs(Interp *interp, int reg, int base, size_t offs)
 {
 }
 

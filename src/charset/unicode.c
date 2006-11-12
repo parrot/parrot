@@ -31,48 +31,48 @@ This file implements the charset functions for unicode data
 #include <unicode/unorm.h>
 #endif
 #define EXCEPTION(err, str) \
-    real_exception(interpreter, NULL, err, str)
+    real_exception(interp, NULL, err, str)
 
 #define UNIMPL EXCEPTION(UNIMPLEMENTED, "unimplemented unicode")
 
 static void
-set_graphemes(Interp *interpreter, STRING *source_string,
+set_graphemes(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
 {
-    ENCODING_SET_CODEPOINTS(interpreter, source_string, offset,
+    ENCODING_SET_CODEPOINTS(interp, source_string, offset,
             replace_count, insert_string);
 }
 
 static STRING *
-get_graphemes(Interp *interpreter, STRING *source_string,
+get_graphemes(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count)
 {
-    return ENCODING_GET_CODEPOINTS(interpreter, source_string, offset, count);
+    return ENCODING_GET_CODEPOINTS(interp, source_string, offset, count);
 }
 
 static STRING *
-get_graphemes_inplace(Interp *interpreter, STRING *source_string,
+get_graphemes_inplace(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
-    return ENCODING_GET_CODEPOINTS_INPLACE(interpreter, source_string,
+    return ENCODING_GET_CODEPOINTS_INPLACE(interp, source_string,
             offset, count, dest_string);
 }
 
 static STRING*
-to_charset(Interp *interpreter, STRING *src, STRING *dest)
+to_charset(Interp *interp, STRING *src, STRING *dest)
 {
     charset_converter_t conversion_func;
 
-    if ((conversion_func = Parrot_find_charset_converter(interpreter,
+    if ((conversion_func = Parrot_find_charset_converter(interp,
                     src->charset, Parrot_unicode_charset_ptr))) {
-         return conversion_func(interpreter, src, dest);
+         return conversion_func(interp, src, dest);
     }
-    return Parrot_utf8_encoding_ptr->to_encoding(interpreter, src, dest);
+    return Parrot_utf8_encoding_ptr->to_encoding(interp, src, dest);
 }
 
 
 static STRING*
-compose(Interp *interpreter, STRING *src)
+compose(Interp *interp, STRING *src)
 {
 #if PARROT_HAS_ICU
     STRING *dest;
@@ -86,7 +86,7 @@ compose(Interp *interpreter, STRING *src)
        UErrorCode *status);
        */
     dest_len = src_len = src->strlen;
-    dest = string_make_direct(interpreter, NULL, src_len * sizeof(UChar),
+    dest = string_make_direct(interp, NULL, src_len * sizeof(UChar),
             src->encoding, src->charset, 0);
     err = U_ZERO_ERROR;
     dest_len = unorm_normalize(src->strstart, src_len,
@@ -98,7 +98,7 @@ compose(Interp *interpreter, STRING *src)
     dest->bufused = dest_len * sizeof(UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interpreter, dest, dest->bufused);
+        Parrot_reallocate_string(interp, dest, dest->bufused);
         dest_len = unorm_normalize(src->strstart, src_len,
                 UNORM_DEFAULT,      /* default is NFC */
                 0,                  /* options 0 default - no specific
@@ -111,21 +111,21 @@ compose(Interp *interpreter, STRING *src)
     dest->strlen = dest_len;
     return dest;
 #else
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
     return NULL;
 #endif
 }
 
 static STRING*
-decompose(Interp *interpreter, STRING *src)
+decompose(Interp *interp, STRING *src)
 {
     UNIMPL;
     return NULL;
 }
 
 static void
-upcase(Interp *interpreter, STRING *src)
+upcase(Interp *interp, STRING *src)
 {
 #if PARROT_HAS_ICU
 
@@ -134,10 +134,10 @@ upcase(Interp *interpreter, STRING *src)
 
     if (src->bufused == src->strlen &&
             src->encoding == Parrot_utf8_encoding_ptr) {
-        Parrot_ascii_charset_ptr->upcase(interpreter, src);
+        Parrot_ascii_charset_ptr->upcase(interp, src);
         return;
     }
-    src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
     /*
        U_CAPI int32_t U_EXPORT2
        u_strToUpper(UChar *dest, int32_t destCapacity,
@@ -171,7 +171,7 @@ upcase(Interp *interpreter, STRING *src)
             NULL,       /* locale = default */
             &err);
     if (needed > dest_len) {
-        Parrot_reallocate_string(interpreter, src, needed * sizeof(UChar));
+        Parrot_reallocate_string(interp, src, needed * sizeof(UChar));
         dest_len = needed;
     }
     err = U_ZERO_ERROR;
@@ -191,13 +191,13 @@ upcase(Interp *interpreter, STRING *src)
         src->strlen = dest_len;
     }
 #else
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
 }
 
 static void
-downcase(Interp *interpreter, STRING *src)
+downcase(Interp *interp, STRING *src)
 {
 #if PARROT_HAS_ICU
 
@@ -206,11 +206,11 @@ downcase(Interp *interpreter, STRING *src)
 
     if (src->bufused == src->strlen &&
             src->encoding == Parrot_utf8_encoding_ptr) {
-        Parrot_ascii_charset_ptr->downcase(interpreter, src);
+        Parrot_ascii_charset_ptr->downcase(interp, src);
         return;
     }
 
-    src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
 u_strToLower(UChar *dest, int32_t destCapacity,
@@ -227,7 +227,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
     src->bufused = dest_len * sizeof(UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interpreter, src, src->bufused);
+        Parrot_reallocate_string(interp, src, src->bufused);
         dest_len = u_strToLower(src->strstart, dest_len,
                 src->strstart, src_len,
                 NULL,       /* locale = default */
@@ -238,13 +238,13 @@ u_strToLower(UChar *dest, int32_t destCapacity,
     if (dest_len == (int)src->strlen)
         src->encoding = Parrot_ucs2_encoding_ptr;
 #else
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
 }
 
 static void
-titlecase(Interp *interpreter, STRING *src)
+titlecase(Interp *interp, STRING *src)
 {
 #if PARROT_HAS_ICU
 
@@ -253,10 +253,10 @@ titlecase(Interp *interpreter, STRING *src)
 
     if (src->bufused == src->strlen &&
             src->encoding == Parrot_utf8_encoding_ptr) {
-        Parrot_ascii_charset_ptr->titlecase(interpreter, src);
+        Parrot_ascii_charset_ptr->titlecase(interp, src);
         return;
     }
-    src = Parrot_utf16_encoding_ptr->to_encoding(interpreter, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
 u_strToTitle(UChar *dest, int32_t destCapacity,
@@ -275,7 +275,7 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
     src->bufused = dest_len * sizeof(UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interpreter, src, src->bufused);
+        Parrot_reallocate_string(interp, src, src->bufused);
         dest_len = u_strToTitle(src->strstart, dest_len,
                 src->strstart, src_len,
                 NULL, NULL,
@@ -286,44 +286,44 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
     if (dest_len == (int)src->strlen)
         src->encoding = Parrot_ucs2_encoding_ptr;
 #else
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
 }
 
 static void
-upcase_first(Interp *interpreter, STRING *source_string)
+upcase_first(Interp *interp, STRING *source_string)
 {
     UNIMPL;
 }
 
 static void
-downcase_first(Interp *interpreter, STRING *source_string)
+downcase_first(Interp *interp, STRING *source_string)
 {
     UNIMPL;
 }
 
 static void
-titlecase_first(Interp *interpreter, STRING *source_string)
+titlecase_first(Interp *interp, STRING *source_string)
 {
     UNIMPL;
 }
 
 static INTVAL
-compare(Interp *interpreter, STRING *lhs, STRING *rhs)
+compare(Interp *interp, STRING *lhs, STRING *rhs)
 {
     String_iter l_iter, r_iter;
     UINTVAL offs, cl, cr, min_len, l_len, r_len;
 
     /* TODO make optimized equal - strings are equal length then already */
-    ENCODING_ITER_INIT(interpreter, lhs, &l_iter);
-    ENCODING_ITER_INIT(interpreter, rhs, &r_iter);
+    ENCODING_ITER_INIT(interp, lhs, &l_iter);
+    ENCODING_ITER_INIT(interp, rhs, &r_iter);
     l_len = lhs->strlen;
     r_len = rhs->strlen;
     min_len = l_len > r_len ? r_len : l_len;
     for (offs = 0; offs < min_len; ++offs) {
-        cl = l_iter.get_and_advance(interpreter, &l_iter);
-        cr = r_iter.get_and_advance(interpreter, &r_iter);
+        cl = l_iter.get_and_advance(interp, &l_iter);
+        cr = r_iter.get_and_advance(interp, &r_iter);
         if (cl != cr)
             return cl < cr ? -1 : 1;
     }
@@ -338,7 +338,7 @@ compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 
 
 static INTVAL
-cs_rindex(Interp *interpreter, STRING *source_string,
+cs_rindex(Interp *interp, STRING *source_string,
         STRING *search_string, UINTVAL offset)
 {
     UNIMPL;
@@ -346,12 +346,12 @@ cs_rindex(Interp *interpreter, STRING *source_string,
 }
 
 static UINTVAL
-validate(Interp *interpreter, STRING *src)
+validate(Interp *interp, STRING *src)
 {
     UINTVAL codepoint, offset;
 
-    for (offset = 0; offset < string_length(interpreter, src); ++offset) {
-        codepoint = ENCODING_GET_CODEPOINT(interpreter, src, offset);
+    for (offset = 0; offset < string_length(interp, src); ++offset) {
+        codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
         /* Check for Unicode non-characters */
         if (codepoint >= 0xfdd0 &&
             (codepoint <= 0xfdef || (codepoint & 0xfffe) == 0xfffe) &&
@@ -362,7 +362,7 @@ validate(Interp *interpreter, STRING *src)
 }
 
 static int
-u_iscclass(Interp *interpreter, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
+u_iscclass(Interp *interp, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
 {
 #if PARROT_HAS_ICU
             /* XXX which one
@@ -422,29 +422,29 @@ u_iscclass(Interp *interpreter, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
         if (codepoint >= 0xff10 && codepoint <= 0xff19) return 1;
     }
     if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric))
-        real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+        real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
     return 0;
 #endif
 }
 
 static INTVAL
-is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
           STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
 
     if (offset >= source_string->strlen)
         return 0;
-    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+    codepoint = ENCODING_GET_CODEPOINT(interp, source_string, offset);
     if (codepoint >= 256) {
-        return u_iscclass(interpreter, codepoint, flags) != 0;
+        return u_iscclass(interp, codepoint, flags) != 0;
     }
     return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
 }
 
 static INTVAL
-find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
             STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -454,9 +454,9 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-        codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
         if (codepoint >= 256) {
-            if (u_iscclass(interpreter, codepoint, flags))
+            if (u_iscclass(interp, codepoint, flags))
                     return pos;
         }
         else {
@@ -469,7 +469,7 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
+find_not_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
                 STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -480,11 +480,11 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-        codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
         if (codepoint >= 256) {
             for (bit = enum_cclass_uppercase;
                     bit <= enum_cclass_word ; bit <<= 1) {
-                if ((bit & flags) && !u_iscclass(interpreter, codepoint, bit))
+                if ((bit & flags) && !u_iscclass(interp, codepoint, bit))
                     return pos;
             }
         }
@@ -498,30 +498,30 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags,
 }
 
 static STRING *
-string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
+string_from_codepoint(Interp *interp, UINTVAL codepoint)
 {
     STRING *dest;
     String_iter iter;
 
-    dest = string_make(interpreter, "", 1, "unicode", 0);
+    dest = string_make(interp, "", 1, "unicode", 0);
     dest->strlen = 1;
-    ENCODING_ITER_INIT(interpreter, dest, &iter);
-    iter.set_and_advance(interpreter, &iter, codepoint);
+    ENCODING_ITER_INIT(interp, dest, &iter);
+    iter.set_and_advance(interp, &iter, codepoint);
     dest->bufused = iter.bytepos;
 
     return dest;
 }
 
 static size_t
-compute_hash(Interp *interpreter, STRING *src, size_t seed)
+compute_hash(Interp *interp, STRING *src, size_t seed)
 {
     String_iter iter;
     size_t hashval = seed;
     UINTVAL offs, c;
 
-    ENCODING_ITER_INIT(interpreter, src, &iter);
+    ENCODING_ITER_INIT(interp, src, &iter);
     for (offs = 0; offs < src->strlen; ++offs) {
-        c = iter.get_and_advance(interpreter, &iter);
+        c = iter.get_and_advance(interp, &iter);
         hashval += hashval << 5;
         hashval += c;
     }
@@ -529,9 +529,9 @@ compute_hash(Interp *interpreter, STRING *src, size_t seed)
 }
 
 CHARSET *
-Parrot_charset_unicode_init(Interp *interpreter)
+Parrot_charset_unicode_init(Interp *interp)
 {
-    CHARSET *return_set = Parrot_new_charset(interpreter);
+    CHARSET *return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "unicode",
         get_graphemes,
@@ -566,7 +566,7 @@ Parrot_charset_unicode_init(Interp *interpreter)
      *          still takes "utf8" when fed "unicode" as charset!
      */
     return_set->preferred_encoding = Parrot_utf8_encoding_ptr;
-    Parrot_register_charset(interpreter, "unicode", return_set);
+    Parrot_register_charset(interp, "unicode", return_set);
     return return_set;
 }
 

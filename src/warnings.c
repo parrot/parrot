@@ -25,7 +25,7 @@ messages.
 /*
 
 =item C<void
-print_pbc_location(Parrot_Interp interpreter)>
+print_pbc_location(Parrot_Interp interp)>
 
 Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 
@@ -34,20 +34,20 @@ Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 */
 
 void
-print_pbc_location(Parrot_Interp interpreter)
+print_pbc_location(Parrot_Interp interp)
 {
     Interp * const tracer =
-        interpreter->debugger ?
-            interpreter->debugger : interpreter;
+        interp->debugger ?
+            interp->debugger : interp;
     PIO_eprintf(tracer, "%Ss\n",
-            Parrot_Context_infostr(interpreter,
-                CONTEXT(interpreter->ctx)));
+            Parrot_Context_infostr(interp,
+                CONTEXT(interp->ctx)));
 }
 
 /*
 
 =item C<static INTVAL
-print_warning(Interp *interpreter, STRING *msg)>
+print_warning(Interp *interp, STRING *msg)>
 
 Prints the warning message and the bytecode location.
 
@@ -56,17 +56,17 @@ Prints the warning message and the bytecode location.
 */
 
 static INTVAL
-print_warning(Interp *interpreter, STRING *msg)
+print_warning(Interp *interp, STRING *msg)
 {
 
     if (!msg)
-        PIO_puts(interpreter, PIO_STDERR(interpreter), "Unknown warning\n");
+        PIO_puts(interp, PIO_STDERR(interp), "Unknown warning\n");
     else {
-        PIO_putps(interpreter, PIO_STDERR(interpreter), msg);
-        if (string_ord(interpreter, msg, -1) != '\n')
-            PIO_eprintf(interpreter, "%c", '\n');
+        PIO_putps(interp, PIO_STDERR(interp), msg);
+        if (string_ord(interp, msg, -1) != '\n')
+            PIO_eprintf(interp, "%c", '\n');
     }
-    print_pbc_location(interpreter);
+    print_pbc_location(interp);
     return 1;
 }
 
@@ -79,7 +79,7 @@ print_warning(Interp *interpreter, STRING *msg)
 =over
 
 =item C<INTVAL
-Parrot_warn(Interp *interpreter, INTVAL warnclass,
+Parrot_warn(Interp *interp, INTVAL warnclass,
             const char *message, ...)>
 
 The Parrot C string warning/error reporter.
@@ -93,28 +93,28 @@ C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 */
 
 INTVAL
-Parrot_warn(Interp *interpreter, INTVAL warnclass,
+Parrot_warn(Interp *interp, INTVAL warnclass,
             const char *message, ...)
 {
     STRING *targ;
 
     va_list args;
 
-    assert(interpreter);
-    if (!PARROT_WARNINGS_test(interpreter, warnclass))
+    assert(interp);
+    if (!PARROT_WARNINGS_test(interp, warnclass))
         return 2;
 
     va_start(args, message);
-    targ = Parrot_vsprintf_c(interpreter, message, args);
+    targ = Parrot_vsprintf_c(interp, message, args);
     va_end(args);
-    return print_warning(interpreter, targ);
+    return print_warning(interp, targ);
 
 }
 
 /*
 
 =item C<INTVAL
-Parrot_warn_s(Interp *interpreter, INTVAL warnclass,
+Parrot_warn_s(Interp *interp, INTVAL warnclass,
               STRING *message, ...)>
 
 The Parrot C<STRING> warning/error reporter.
@@ -128,21 +128,21 @@ C<message, ..> can be a C<Parrot_vsprintf_s()> format with arguments.
 */
 
 INTVAL
-Parrot_warn_s(Interp *interpreter, INTVAL warnclass,
+Parrot_warn_s(Interp *interp, INTVAL warnclass,
               STRING *message, ...)
 {
     STRING *targ;
 
     va_list args;
 
-    if (!interpreter || !PARROT_WARNINGS_test(interpreter, warnclass))
+    if (!interp || !PARROT_WARNINGS_test(interp, warnclass))
         return 2;
 
     va_start(args, message);
-    targ = Parrot_vsprintf_s(interpreter, message, args);
+    targ = Parrot_vsprintf_s(interp, message, args);
     va_end(args);
 
-    return print_warning(interpreter, targ);
+    return print_warning(interp, targ);
 }
 
 /*

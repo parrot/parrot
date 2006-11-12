@@ -18,7 +18,7 @@
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
+                     Interp *interp)
 {
 }
 
@@ -26,7 +26,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
+                     Interp *interp)
 {
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, r1, r4);
 #   ifndef ARM_K_BUG
@@ -51,11 +51,11 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
         jit_info->native_ptr, RTYPE_DATA, "program_code", 0);
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr, ((int)jit_info->cur_op) -
-            ((int)interpreter->code->base.data) +
+            ((int)interp->code->base.data) +
                 (jit_info->objfile->bytecode_header_size));
     Parrot_exec_add_text_rellocation(jit_info->objfile,
         jit_info->native_ptr, RTYPE_FUNC,
-            interpreter->op_info_table[*jit_info->cur_op].func_name, 0);
+            interp->op_info_table[*jit_info->cur_op].func_name, 0);
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr, 0);
 }
@@ -64,15 +64,15 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
-                   Interp * interpreter)
+                   Interp *interp)
 {
-    Parrot_exec_normal_op(jit_info, interpreter);
-    Parrot_jump_to_op_in_reg(jit_info, interpreter, r0);
+    Parrot_exec_normal_op(jit_info, interp);
+    Parrot_jump_to_op_in_reg(jit_info, interp, r0);
 }
 
 void
 Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
-                       Interp * interpreter)
+                       Interp *interp)
 {
 }
 

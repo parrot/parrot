@@ -24,7 +24,7 @@ setup function to initialize the memory pools.
 #include "parrot/parrot.h"
 
 /* for PANIC */
-#define interpreter NULL
+#define interp NULL
 
 /*
 
@@ -139,7 +139,7 @@ mem__internal_realloc(void *from, size_t size, const char *file, int line)
         PANIC("Out of mem");
     return ptr;
 }
-#undef interpreter
+#undef interp
 
 /*
 
@@ -174,7 +174,7 @@ mem__internal_free(void *from, const char *file, int line)
 /*
 
 =item C<void
-mem_setup_allocator(Interp *interpreter)>
+mem_setup_allocator(Interp *interp)>
 
 Initializes the allocator.
 
@@ -183,23 +183,23 @@ Initializes the allocator.
 */
 
 void
-mem_setup_allocator(Interp *interpreter)
+mem_setup_allocator(Interp *interp)
 {
-    interpreter->arena_base = mem_sys_allocate_zeroed(sizeof(struct Arenas));
-    SET_NULL(interpreter->arena_base->sized_header_pools);
+    interp->arena_base = mem_sys_allocate_zeroed(sizeof(struct Arenas));
+    SET_NULL(interp->arena_base->sized_header_pools);
 
 #if PARROT_GC_MS
-    Parrot_gc_ms_init(interpreter);
+    Parrot_gc_ms_init(interp);
 #endif
 #if PARROT_GC_IMS
-    Parrot_gc_ims_init(interpreter);
+    Parrot_gc_ims_init(interp);
 #endif
 #if PARROT_GC_GMS
-    Parrot_gc_gms_init(interpreter);
+    Parrot_gc_gms_init(interp);
 #endif
 
-    Parrot_initialize_memory_pools(interpreter);
-    Parrot_initialize_header_pools(interpreter);
+    Parrot_initialize_memory_pools(interp);
+    Parrot_initialize_header_pools(interp);
 
 }
 

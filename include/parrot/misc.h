@@ -39,14 +39,14 @@ PARROT_API void *Parrot_make_la(Interp *, PMC *);
 PARROT_API void *Parrot_make_cpa(Interp *, PMC *);
 PARROT_API void Parrot_destroy_la(long *);
 PARROT_API void Parrot_destroy_cpa(char **);
-PMC* tm_to_array(Parrot_Interp interpreter, const struct tm *tm);
-PARROT_API INTVAL Parrot_byte_index(Interp *interpreter, const STRING *base,
+PMC* tm_to_array(Parrot_Interp interp, const struct tm *tm);
+PARROT_API INTVAL Parrot_byte_index(Interp *interp, const STRING *base,
         const STRING *search, UINTVAL start_offset);
-PARROT_API INTVAL Parrot_byte_rindex(Interp *interpreter, const STRING *base,
+PARROT_API INTVAL Parrot_byte_rindex(Interp *interp, const STRING *base,
         const STRING *search, UINTVAL start_offset);
 typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
 
-PARROT_API void Parrot_register_move(Interp *interpreter, int n_regs,
+PARROT_API void Parrot_register_move(Interp *interp, int n_regs,
         unsigned char *dest_regs, unsigned char *src_regs,
         unsigned char temp_reg,
         reg_move_func mov,
@@ -87,7 +87,7 @@ PARROT_API void Parrot_sprintf(Interp *, char *targ, const char *pat, ...);
 PARROT_API void Parrot_snprintf(Interp *, char *targ, size_t len,
                      const char *pat, ...);
 
-PARROT_API STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
+PARROT_API STRING *Parrot_psprintf(Interp *interp, STRING *pat,
                         PMC * ary);
 
 
@@ -103,8 +103,8 @@ PARROT_API STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
      */
 #  define PARROT_SPRINTF_MAX_PREC 3 * PARROT_SPRINTF_BUFFER_SIZE / 4
 
-#  define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), "ascii", 0)
-#  define char2pstr(ch)   string_make(interpreter, &ch , 1, "ascii", 0)
+#  define cstr2pstr(cstr) string_make(interp, cstr, strlen(cstr), "ascii", 0)
+#  define char2pstr(ch)   string_make(interp, &ch , 1, "ascii", 0)
 
     /* SPRINTF DATA STRUCTURE AND FLAGS */
 
@@ -178,7 +178,7 @@ PARROT_API STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
     extern SPRINTF_OBJ pmc_core;
     extern SPRINTF_OBJ va_core;
 
-    STRING *Parrot_sprintf_format(Interp *interpreter,
+    STRING *Parrot_sprintf_format(Interp *interp,
                                   STRING *pat, SPRINTF_OBJ * obj);
 
 #endif /* IN_SPF_SYSTEM */

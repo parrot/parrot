@@ -110,7 +110,7 @@ Invokes the closure.
                 if (caller->current_sub == outer_sub) {
                     cont = caller->current_cont;
                     cont->vtable =
-                        interpreter->vtables[enum_class_Continuation];
+                        interp->vtables[enum_class_Continuation];
                     sub->outer_ctx = sub->ctx->outer_ctx = caller;
                     caller->ref_count++;
                     return next;
@@ -127,7 +127,7 @@ Invokes the closure.
                 (void)VTABLE_invoke(INTERP, sub->outer_sub, next);
                 caller = CONTEXT(INTERP->ctx);
                 cont = caller->current_cont;
-                cont->vtable = interpreter->vtables[enum_class_Continuation];
+                cont->vtable = interp->vtables[enum_class_Continuation];
                 sub->outer_ctx = sub->ctx->outer_ctx = caller;
                 caller->ref_count++;
                 (void)VTABLE_invoke(INTERP, cont, next);
@@ -206,7 +206,7 @@ Destroys the closure.  This is necessary in order to reclaim the context.
         }
 #endif
         if (sub->outer_ctx) {
-            Parrot_free_context(interpreter, sub->outer_ctx, 0);
+            Parrot_free_context(interp, sub->outer_ctx, 0);
             sub->outer_ctx = NULL;
         }
         SUPER();

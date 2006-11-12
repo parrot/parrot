@@ -434,8 +434,8 @@ typedef enum {
 } iglobals_enum;
 /* &end_gen */
 
-#define PCONST(i) PF_CONST(interpreter->code, (i))
-#define PNCONST   PF_NCONST(interpreter->code)
+#define PCONST(i) PF_CONST(interp->code, (i))
+#define PNCONST   PF_NCONST(interp->code)
 
 /* TODO - Make this a config option */
 #define PARROT_CATCH_NULL 1
@@ -467,9 +467,9 @@ PARROT_API void Parrot_destroy(Interp *);
 
 PARROT_API void Parrot_set_config_hash_internal(const unsigned char*, unsigned int);
 
-PARROT_API INTVAL interpinfo(Interp *interpreter, INTVAL what);
-PARROT_API PMC*   interpinfo_p(Interp *interpreter, INTVAL what);
-PARROT_API STRING*interpinfo_s(Interp *interpreter, INTVAL what);
+PARROT_API INTVAL interpinfo(Interp *interp, INTVAL what);
+PARROT_API PMC*   interpinfo_p(Interp *interp, INTVAL what);
+PARROT_API STRING*interpinfo_s(Interp *interp, INTVAL what);
 
 void runops(Interp *, size_t offset);
 void runops_int(Interp *, size_t offset);
@@ -501,34 +501,34 @@ PARROT_API FLOATVAL Parrot_run_meth_fromc_arglist_retf(Interp *, PMC *sub,
 
 PARROT_API void Parrot_callback_C(void *external_data, PMC *callback_info);
 PARROT_API void Parrot_callback_D(PMC *callback_info, void *external_data);
-PARROT_API PMC* Parrot_make_cb(Interp * interpreter, PMC* sub, PMC* user_data,
+PARROT_API PMC* Parrot_make_cb(Interp *interp, PMC* sub, PMC* user_data,
         STRING* cb_signature);
 
-typedef opcode_t *(*native_func_t)(Interp * interpreter,
+typedef opcode_t *(*native_func_t)(Interp *interp,
                                    opcode_t * cur_opcode,
                                    opcode_t * start_code);
 
 VAR_SCOPE native_func_t run_native;
 
-typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interpreter,
+typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interp,
                                        const char * program );
 
-PARROT_API void Parrot_compreg(Interp * interpreter, STRING *, Parrot_compiler_func_t func);
+PARROT_API void Parrot_compreg(Interp *interp, STRING *, Parrot_compiler_func_t func);
 
-PARROT_API PMC *Parrot_compile_string(Parrot_Interp interpreter,
+PARROT_API PMC *Parrot_compile_string(Parrot_Interp interp,
         STRING *type, char *code, STRING **error);
-PARROT_API void *Parrot_compile_file(Parrot_Interp interpreter,
+PARROT_API void *Parrot_compile_file(Parrot_Interp interp,
         char *fullname, String **error);
 
-INTVAL sysinfo_i(Interp * interpreter, INTVAL info_wanted);
-STRING *sysinfo_s(Interp * interpreter, INTVAL info_wanted);
-void exec_init_prederef(Interp *interpreter,
+INTVAL sysinfo_i(Interp *interp, INTVAL info_wanted);
+STRING *sysinfo_s(Interp *interp, INTVAL info_wanted);
+void exec_init_prederef(Interp *interp,
     void *prederef_arena);
 
-void prepare_for_run(Interp * interpreter);
-void *init_jit(Interp * interpreter, opcode_t *pc);
-PARROT_API void dynop_register(Interp * interpreter, PMC* op_lib);
-void do_prederef(void **pc_prederef, Interp * interpreter, int type);
+void prepare_for_run(Interp *interp);
+void *init_jit(Interp *interp, opcode_t *pc);
+PARROT_API void dynop_register(Interp *interp, PMC* op_lib);
+void do_prederef(void **pc_prederef, Interp *interp, int type);
 
 void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, Parrot_clone_flags flags);
 
@@ -536,11 +536,11 @@ PARROT_API void enter_nci_method(Interp *, int type,
         void *func, const char *name, const char *proto);
 PARROT_API void Parrot_mark_method_writes(Interp *, int type, const char *name);
 
-void Parrot_setup_event_func_ptrs(Parrot_Interp interpreter);
+void Parrot_setup_event_func_ptrs(Parrot_Interp interp);
 
 #else
 
-typedef void * *(*native_func_t)(Parrot_Interp interpreter,
+typedef void * *(*native_func_t)(Parrot_Interp interp,
                                  void *cur_opcode,
                                  void *start_code);
 

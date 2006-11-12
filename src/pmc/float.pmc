@@ -449,7 +449,7 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD PMC* cos() {
         PMC * const d = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
-        PMC_num_val(d) = cos(VTABLE_get_number(interpreter, SELF));
+        PMC_num_val(d) = cos(VTABLE_get_number(interp, SELF));
         return d;
     }
     METHOD PMC* asec() {

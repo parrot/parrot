@@ -18,7 +18,7 @@
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
+                     Interp *interp)
 {
 }
 
@@ -26,15 +26,15 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
+                     Interp *interp)
 {
     add_disp(jit_info->native_ptr, r3,
-        ((long)jit_info->cur_op - (long)interpreter->code->base.data));
+        ((long)jit_info->cur_op - (long)interp->code->base.data));
     jit_emit_mov_rr(jit_info->native_ptr, r4, r13);
 
     Parrot_exec_add_text_rellocation(jit_info->objfile,
         jit_info->native_ptr, RTYPE_FUNC,
-            interpreter->op_info_table[*jit_info->cur_op].func_name, 0);
+            interp->op_info_table[*jit_info->cur_op].func_name, 0);
     _emit_bx(jit_info->native_ptr, 1, 0);
 }
 
@@ -42,9 +42,9 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
-                   Interp * interpreter)
+                   Interp *interp)
 {
-    Parrot_exec_normal_op(jit_info, interpreter);
+    Parrot_exec_normal_op(jit_info, interp);
     jit_emit_sub_rrr(jit_info->native_ptr, r3, r3, r15);
     jit_emit_add_rrr(jit_info->native_ptr, r3, r14, r3);
     jit_emit_lwz(jit_info->native_ptr, r3, 0, r3);
@@ -54,7 +54,7 @@ Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
-                       Interp * interpreter)
+                       Interp *interp)
 {
 }
 

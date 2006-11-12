@@ -245,7 +245,7 @@ PARROT_API opcode_t PackFile_pack_size(Interp *, struct PackFile *self);
 
 PARROT_API void PackFile_pack(Interp *, struct PackFile * self, opcode_t * packed);
 
-PARROT_API opcode_t PackFile_unpack(Interp *interpreter,
+PARROT_API opcode_t PackFile_unpack(Interp *interp,
                          struct PackFile *self, opcode_t *packed,
                          size_t packed_size);
 
@@ -290,7 +290,7 @@ PARROT_API void Parrot_load_bytecode(Interp *, STRING *filename);
 PARROT_API void PackFile_Segment_destroy(Interp *, struct PackFile_Segment * self);
 PARROT_API size_t PackFile_Segment_packed_size(Interp *, struct PackFile_Segment * self);
 PARROT_API opcode_t * PackFile_Segment_pack(Interp *, struct PackFile_Segment *, opcode_t *);
-PARROT_API opcode_t * PackFile_Segment_unpack(Interp *interpreter,
+PARROT_API opcode_t * PackFile_Segment_unpack(Interp *interp,
         struct PackFile_Segment * self, opcode_t *cursor);
 PARROT_API void PackFile_Segment_dump(Interp *, struct PackFile_Segment *);
 void default_dump_header (Interp *, struct PackFile_Segment *);
@@ -343,9 +343,9 @@ PARROT_API void Parrot_destroy_constants(Interp *);
 */
 PARROT_API struct PackFile_Debug * Parrot_new_debug_seg(Interp *,
         struct PackFile_ByteCode *cs, size_t size);
-PARROT_API STRING * Parrot_debug_pc_to_filename(Interp *interpreter,
+PARROT_API STRING * Parrot_debug_pc_to_filename(Interp *interp,
         struct PackFile_Debug *debug, opcode_t pc);
-PARROT_API void Parrot_debug_add_mapping(Interp *interpreter,
+PARROT_API void Parrot_debug_add_mapping(Interp *interp,
                          struct PackFile_Debug *debug,
                          opcode_t offset, int mapping_type,
                          const char *filename, int source_seg);
@@ -354,7 +354,7 @@ PARROT_API void Parrot_debug_add_mapping(Interp *interpreter,
 ** PackFile_ConstTable Functions:
 */
 
-void mark_const_subs(Interp* interpreter);
+void mark_const_subs(Interp *interp);
 PARROT_API void PackFile_ConstTable_clear(Interp *, struct PackFile_ConstTable * self);
 
 PARROT_API void PackFile_ConstTable_dump(Interp *,
@@ -363,7 +363,7 @@ PARROT_API size_t PackFile_ConstTable_pack_size(Interp *, struct PackFile_Segmen
 
 PARROT_API opcode_t * PackFile_ConstTable_pack(Interp *, struct PackFile_Segment *, opcode_t *);
 
-PARROT_API opcode_t * PackFile_ConstTable_unpack(Interp *interpreter,
+PARROT_API opcode_t * PackFile_ConstTable_unpack(Interp *interp,
                                    struct PackFile_Segment * self,
                                    opcode_t * packed);
 
@@ -379,13 +379,13 @@ PARROT_API opcode_t * PackFile_Constant_pack(Interp *, struct PackFile_Constant 
 
 PARROT_API void PackFile_Constant_destroy(Interp *, struct PackFile_Constant * self);
 
-PARROT_API opcode_t * PackFile_Constant_unpack(Interp *interpreter,
+PARROT_API opcode_t * PackFile_Constant_unpack(Interp *interp,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
-PARROT_API opcode_t * PackFile_Constant_unpack_key(Interp *interpreter,
+PARROT_API opcode_t * PackFile_Constant_unpack_key(Interp *interp,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
-PARROT_API opcode_t * PackFile_Constant_unpack_pmc(Interp *interpreter,
+PARROT_API opcode_t * PackFile_Constant_unpack_pmc(Interp *interp,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
 /*

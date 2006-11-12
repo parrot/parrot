@@ -37,55 +37,55 @@ typedef struct {
 #define BN(x) ((BIGINT*)PMC_struct_val(x))->b
 
 static void
-bigint_init(Interp *interpreter, PMC *self) {
+bigint_init(Interp *interp, PMC *self) {
     PMC_struct_val(self) = malloc(sizeof(BIGINT));
     mpz_init(BN(self));
 }
 static void
-bigint_clear(Interp *interpreter, PMC *self) {
+bigint_clear(Interp *interp, PMC *self) {
     mpz_clear(BN(self));
 }
 
 static void
-bigint_set(Interp *interpreter, PMC *dest, PMC *src) {
+bigint_set(Interp *interp, PMC *dest, PMC *src) {
     mpz_set(BN(dest), BN(src));
 }
 
 static void
-bigint_set_long(Interp *interpreter, PMC *self, long value) {
+bigint_set_long(Interp *interp, PMC *self, long value) {
     mpz_set_si(BN(self), value);
 }
 
 static void
-bigint_set_double(Interp *interpreter, PMC *self, double value) {
+bigint_set_double(Interp *interp, PMC *self, double value) {
     mpz_set_d(BN(self), value);
 }
 
 static void
-bigint_set_str(Interp *interpreter, PMC *self, char* value, int base) {
+bigint_set_str(Interp *interp, PMC *self, char* value, int base) {
     mpz_set_str(BN(self), value, base);
 }
 
 static BIGNUM*
-bigint_get_self(Interp *interpreter, PMC *self) {
+bigint_get_self(Interp *interp, PMC *self) {
     return PMC_struct_val(self);
 }
 
 static void
-bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
+bigint_set_self(Interp *interp, PMC *self, BIGNUM *value) {
     mpz_set(BN(self), value);
 }
 
 static long
-bigint_get_long(Interp *interpreter, PMC *self) {
+bigint_get_long(Interp *interp, PMC *self) {
     if (mpz_fits_slong_p(BN(self)))
         return mpz_get_si(BN(self));
-    real_exception(interpreter, NULL, 1, "bigint_get_long: number too big");
+    real_exception(interp, NULL, 1, "bigint_get_long: number too big");
     return 0;
 }
 
 static int
-bigint_get_bool(Interp *interpreter, PMC *self) {
+bigint_get_bool(Interp *interp, PMC *self) {
     if (mpz_sgn(BN(self)) != 0) {
         return 1;
     }
@@ -94,25 +94,25 @@ bigint_get_bool(Interp *interpreter, PMC *self) {
     }
 }
 static char *
-bigint_get_string(Interp *interpreter, PMC *self, int base) {
+bigint_get_string(Interp *interp, PMC *self, int base) {
     size_t n = mpz_sizeinbase(BN(self), base) + 2;
     char *s = mem_sys_allocate(n);
     return mpz_get_str(s, base, BN(self));
 }
 
 static double
-bigint_get_double(Interp *interpreter, PMC *self) {
+bigint_get_double(Interp *interp, PMC *self) {
     return mpz_get_d( BN(self));
 }
 
 static void
-bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_add_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
     mpz_add(BN(dest), BN(self), BN(value));
 }
 
 static void
-bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+bigint_add_bigint_int(Interp *interp, PMC* self, INTVAL value,
         PMC *dest)
 {
     int n = value < 0;
@@ -123,13 +123,13 @@ bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         mpz_add_ui(BN(dest), BN(self), value);
 }
 static void
-bigint_sub_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_sub_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
     mpz_sub(BN(dest), BN(self), BN(value));
 }
 
 static void
-bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+bigint_sub_bigint_int(Interp *interp, PMC* self, INTVAL value,
         PMC *dest)
 {
     int n = value < 0;
@@ -139,56 +139,56 @@ bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         mpz_sub_ui(BN(dest), BN(self), value);
 }
 static void
-bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_mul_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
     mpz_mul(BN(dest), BN(self), BN(value));
 }
 
 static void
-bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+bigint_mul_bigint_int(Interp *interp, PMC* self, INTVAL value,
         PMC *dest)
 {
     mpz_mul_si(BN(dest), BN(self), value);
 }
 
 static void
-bigint_pow_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+bigint_pow_bigint_int(Interp *interp, PMC* self, INTVAL value,
         PMC *dest)
 {
     mpz_pow_ui(BN(dest), BN(self), value);
 }
 
 static void
-int_check_divide_zero(Interp *interpreter, INTVAL value)
+int_check_divide_zero(Interp *interp, INTVAL value)
 {
     if (value == 0) {
-        real_exception(interpreter, NULL, E_ZeroDivisionError,
+        real_exception(interp, NULL, E_ZeroDivisionError,
                        "Divide by zero");
     }
 }
 
 static void
-bigint_check_divide_zero(Interp *interpreter, PMC *value)
+bigint_check_divide_zero(Interp *interp, PMC *value)
 {
     /* Throw an exception if we are dividing by zero. */
     if (mpz_cmp_si(BN(value), 0) == 0) {
-        real_exception(interpreter, NULL, E_ZeroDivisionError,
+        real_exception(interp, NULL, E_ZeroDivisionError,
                        "Divide by zero");
     }
 }
 
 static void
-bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_div_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    bigint_check_divide_zero(interpreter, value);
+    bigint_check_divide_zero(interp, value);
     /* this is mpz_fdiv_q */
     mpz_div(BN(dest), BN(self), BN(value));
 }
 static void
-bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_div_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 {
     int n;
-    int_check_divide_zero(interpreter, value);
+    int_check_divide_zero(interp, value);
     /* this is mpz_fdiv_q */
     n = value < 0;
     if (n) {
@@ -199,16 +199,16 @@ bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
         mpz_div_ui(BN(dest), BN(self), value);
 }
 static void
-bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_fdiv_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    bigint_check_divide_zero(interpreter, value);
+    bigint_check_divide_zero(interp, value);
     mpz_fdiv_q(BN(dest), BN(self), BN(value));
 }
 static void
-bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_fdiv_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 {
     int n;
-    int_check_divide_zero(interpreter, value);
+    int_check_divide_zero(interp, value);
     n = value < 0;
     if (n) {
         mpz_fdiv_q_ui(BN(dest), BN(self), -value);
@@ -219,17 +219,17 @@ bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 }
 
 static void
-bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_mod_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    bigint_check_divide_zero(interpreter, value);
+    bigint_check_divide_zero(interp, value);
     mpz_mod(BN(dest), BN(self), BN(value));
 }
 
 static void
-bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_mod_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 {
     int n;
-    int_check_divide_zero(interpreter, value);
+    int_check_divide_zero(interp, value);
     n = value < 0;
     if (n) {
         mpz_mod_ui(BN(dest), BN(self), -value);
@@ -238,39 +238,39 @@ bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
         mpz_mod_ui(BN(dest), BN(self), value);
 }
 static INTVAL
-bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
+bigint_cmp(Interp *interp, PMC* self, PMC *value)
 {
     return mpz_cmp(BN(self), BN(value));
 }
 
 static INTVAL
-bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
+bigint_cmp_int(Interp *interp, PMC* self, INTVAL value)
 {
     return mpz_cmp_si(BN(self), value);
 }
 
 static void
-bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
+bigint_abs(Interp *interp, PMC* self, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    VTABLE_morph(interp, dest, enum_class_BigInt);
     mpz_abs(BN(dest), BN(self));
 }
 
 static void
-bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
+bigint_neg(Interp *interp, PMC* self, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    VTABLE_morph(interp, dest, enum_class_BigInt);
     mpz_neg(BN(dest), BN(self));
 }
 
 static void
-bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self,
+bigint_bitwise_shl_bigint_int(Interp *interp, PMC* self,
                               INTVAL value, PMC *dest)
 {
     mpz_mul_2exp(BN(dest), BN(self), value);
 }
 static void
-bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self,
+bigint_bitwise_shr_bigint_int(Interp *interp, PMC* self,
                               INTVAL value, PMC *dest)
 {
     mpz_tdiv_q_2exp(BN(dest), BN(self), value);
@@ -279,203 +279,203 @@ bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self,
 #else /* ifdef PARROT_HAS_GMP */
 
 static void
-bigint_init(Interp *interpreter, PMC *self) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_init(Interp *interp, PMC *self) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_clear(Interp *interpreter, PMC *self) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_clear(Interp *interp, PMC *self) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set_long(Interp *interpreter, PMC *self, long value) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_set_long(Interp *interp, PMC *self, long value) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set(Interp *interpreter, PMC *dest, PMC *src) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_set(Interp *interp, PMC *dest, PMC *src) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set_double(Interp *interpreter, PMC *self, double value) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_set_double(Interp *interp, PMC *self, double value) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set_str(Interp *interpreter, PMC *self, char* value, int base) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_set_str(Interp *interp, PMC *self, char* value, int base) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_set_self(Interp *interp, PMC *self, BIGNUM *value) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static BIGNUM*
-bigint_get_self(Interp *interpreter, PMC *self) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_get_self(Interp *interp, PMC *self) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return NULL;
 }
 
 static char *
-bigint_get_string(Interp *interpreter, PMC *self, int base) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_get_string(Interp *interp, PMC *self, int base) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return NULL;
 }
 
 static long
-bigint_get_long(Interp *interpreter, PMC *self) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_get_long(Interp *interp, PMC *self) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0L;
 }
 static long
-bigint_get_bool(Interp *interpreter, PMC *self) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_get_bool(Interp *interp, PMC *self) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0L;
 }
 static double
-bigint_get_double(Interp *interpreter, PMC *self) {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+bigint_get_double(Interp *interp, PMC *self) {
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0.0;
 }
 static void
-bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_add_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_add_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_sub_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_sub_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_sub_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_mul_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+bigint_mul_bigint_int(Interp *interp, PMC* self, INTVAL value,
         PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_pow_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+bigint_pow_bigint_int(Interp *interp, PMC* self, INTVAL value,
         PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_div_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_div_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_fdiv_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_fdiv_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_mod_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+bigint_mod_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static INTVAL
-bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
+bigint_cmp(Interp *interp, PMC* self, PMC *value)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0;
 }
 static INTVAL
-bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
+bigint_cmp_int(Interp *interp, PMC* self, INTVAL value)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0;
 }
 static void
-bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
+bigint_abs(Interp *interp, PMC* self, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
+bigint_neg(Interp *interp, PMC* self, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shl_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_bitwise_shl_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shl_bigint_int(Interp *interpreter, PMC* self,
+bigint_bitwise_shl_bigint_int(Interp *interp, PMC* self,
                               INTVAL value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 
 static void
-bigint_bitwise_shr_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+bigint_bitwise_shr_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shr_bigint_int(Interp *interpreter, PMC* self,
+bigint_bitwise_shr_bigint_int(Interp *interp, PMC* self,
                               INTVAL value, PMC *dest)
 {
-    real_exception(interpreter, NULL, E_LibraryNotLoadedError,
+    real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 #endif /* ifdef PARROT_HAS_GMP */
@@ -746,7 +746,7 @@ Decrements the integer.
     PMC* add(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 if (dest)
-                    VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                    VTABLE_morph(interp, dest, SELF->vtable->base_type);
                 else
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
                 bigint_add_bigint(INTERP, SELF, value, dest);
@@ -754,7 +754,7 @@ MMD_BigInt: {
             }
 MMD_Integer: {
                 if (dest)
-                    VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                    VTABLE_morph(interp, dest, SELF->vtable->base_type);
                 else
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
                 bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
@@ -768,7 +768,7 @@ MMD_DEFAULT: {
 
     PMC* add_int(INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_add_bigint_int(INTERP, SELF, value, dest);
@@ -799,7 +799,7 @@ MMD_DEFAULT: {
     PMC* subtract(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 if (dest)
-                    VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                    VTABLE_morph(interp, dest, SELF->vtable->base_type);
                 else
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
                 bigint_sub_bigint(INTERP, SELF, value, dest);
@@ -807,7 +807,7 @@ MMD_BigInt: {
             }
 MMD_Integer: {
                 if (dest)
-                    VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                    VTABLE_morph(interp, dest, SELF->vtable->base_type);
                 else
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
                 bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
@@ -821,7 +821,7 @@ MMD_DEFAULT: {
 
     PMC* subtract_int(INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_sub_bigint_int(INTERP, SELF, value, dest);
@@ -852,7 +852,7 @@ MMD_DEFAULT: {
     PMC* multiply(PMC* value, PMC* dest) {
 MMD_BigInt: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_mul_bigint(INTERP, SELF, value, dest);
@@ -860,7 +860,7 @@ MMD_BigInt: {
         }
 MMD_Integer: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
@@ -874,7 +874,7 @@ MMD_DEFAULT: {
 
     PMC* multiply_int(INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_mul_bigint_int(INTERP, SELF, value, dest);
@@ -903,7 +903,7 @@ MMD_DEFAULT: {
 
     PMC* pow_int(INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_pow_bigint_int(INTERP, SELF, value, dest);
@@ -919,7 +919,7 @@ MMD_DEFAULT: {
     PMC* divide(PMC* value, PMC* dest) {
 MMD_BigInt: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_div_bigint(INTERP, SELF, value, dest);
@@ -927,15 +927,15 @@ MMD_BigInt: {
             /* to downgrade or not that's the question */
             if (mpz_fits_slong_p(BN(dest))) {
                 long iresult = mpz_get_si(BN(dest));
-                VTABLE_morph(interpreter, dest, enum_class_Integer);
-                VTABLE_set_integer_native(interpreter, dest, iresult);
+                VTABLE_morph(interp, dest, enum_class_Integer);
+                VTABLE_set_integer_native(interp, dest, iresult);
             }
 #endif
             return dest;
         }
 MMD_Integer: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
@@ -949,7 +949,7 @@ MMD_DEFAULT: {
 
     PMC* divide_int(INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_div_bigint_int(INTERP, SELF, value, dest);
@@ -975,7 +975,7 @@ MMD_DEFAULT: {
     PMC* floor_divide(PMC* value, PMC* dest) {
 MMD_BigInt: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_fdiv_bigint(INTERP, SELF, value, dest);
@@ -983,7 +983,7 @@ MMD_BigInt: {
         }
 MMD_Integer: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
@@ -997,7 +997,7 @@ MMD_DEFAULT: {
 
     PMC* floor_divide_int(INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_fdiv_bigint_int(INTERP, SELF, value, dest);
@@ -1023,7 +1023,7 @@ MMD_DEFAULT: {
     PMC* modulus(PMC* value, PMC* dest) {
 MMD_BigInt: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_mod_bigint(INTERP, SELF, value, dest);
@@ -1031,7 +1031,7 @@ MMD_BigInt: {
         }
 MMD_Integer: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_mod_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
@@ -1174,7 +1174,7 @@ Inplace shift left.
     PMC* bitwise_shl (PMC* value, PMC* dest) {
 MMD_BigInt: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_bitwise_shl_bigint_int(INTERP, SELF,
@@ -1184,7 +1184,7 @@ MMD_BigInt: {
         }
 MMD_Integer: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_bitwise_shl_bigint_int(INTERP, SELF, PMC_int_val(value),
@@ -1199,7 +1199,7 @@ MMD_DEFAULT: {
 
     PMC* bitwise_shl_int (INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_bitwise_shl_bigint_int(INTERP, SELF, value, dest);
@@ -1247,7 +1247,7 @@ Inplace shift left.
     PMC* bitwise_shr (PMC* value, PMC* dest) {
 MMD_BigInt: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_bitwise_shr_bigint_int(INTERP, SELF,
@@ -1257,7 +1257,7 @@ MMD_BigInt: {
         }
 MMD_Integer: {
             if (dest)
-                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                VTABLE_morph(interp, dest, SELF->vtable->base_type);
             else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             bigint_bitwise_shr_bigint_int(INTERP, SELF, PMC_int_val(value),
@@ -1272,7 +1272,7 @@ MMD_DEFAULT: {
 
     PMC* bitwise_shr_int (INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_bitwise_shr_bigint_int(INTERP, SELF, value, dest);

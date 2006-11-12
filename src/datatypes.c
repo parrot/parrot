@@ -26,7 +26,7 @@ F<include/parrot/datatypes.h>.
 /*
 
 =item C<INTVAL
-Parrot_get_datatype_enum(Interp *interpreter, STRING *typename)>
+Parrot_get_datatype_enum(Interp *interp, STRING *typename)>
 
 Return datatype C<enum> for C<STRING*> typename.
 
@@ -35,9 +35,9 @@ Return datatype C<enum> for C<STRING*> typename.
 */
 
 INTVAL
-Parrot_get_datatype_enum(Interp *interpreter, STRING *typename)
+Parrot_get_datatype_enum(Interp *interp, STRING *typename)
 {
-    char *type = string_to_cstring(interpreter, typename);
+    char *type = string_to_cstring(interp, typename);
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {
@@ -55,7 +55,7 @@ Parrot_get_datatype_enum(Interp *interpreter, STRING *typename)
 /*
 
 =item C<STRING *
-Parrot_get_datatype_name(Interp *interpreter, INTVAL type)>
+Parrot_get_datatype_name(Interp *interp, INTVAL type)>
 
 Return datatype name for C<type>.
 
@@ -64,14 +64,14 @@ Return datatype name for C<type>.
 */
 
 STRING *
-Parrot_get_datatype_name(Interp *interpreter, INTVAL type)
+Parrot_get_datatype_name(Interp *interp, INTVAL type)
 {
     const char *s;
     if (type < enum_first_type || type >= enum_last_type)
         s = "illegal";
     else
         s = data_types[type - enum_first_type].name;
-    return string_make(interpreter, s, strlen(s), NULL, PObj_external_FLAG);
+    return string_make(interp, s, strlen(s), NULL, PObj_external_FLAG);
 }
 
 /*

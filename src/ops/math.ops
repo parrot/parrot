@@ -61,62 +61,62 @@ These opcodes return a new result PMC $2.
 =cut
 
 inline op infix(inconst INT, invar PMC, in INT) :base_core {
-  mmd_dispatch_v_pi(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pi(interp, $2, $3, $1);
   goto NEXT();
 }
 
 inline op infix(inconst INT, invar PMC, in NUM) :base_core {
-  mmd_dispatch_v_pn(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pn(interp, $2, $3, $1);
   goto NEXT();
 }
 
 inline op infix(inconst INT, invar PMC, in STR) :base_core {
-  mmd_dispatch_v_ps(interpreter, $2, $3, $1);
+  mmd_dispatch_v_ps(interp, $2, $3, $1);
   goto NEXT();
 }
 
 inline op infix(inconst INT, invar PMC, invar PMC) :base_core {
-  mmd_dispatch_v_pp(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pp(interp, $2, $3, $1);
   goto NEXT();
 }
 
 inline op infix(inconst INT, out PMC, invar PMC, in INT) :base_core {
-  $2 = mmd_dispatch_p_pip(interpreter, $3, $4, $2, $1);
+  $2 = mmd_dispatch_p_pip(interp, $3, $4, $2, $1);
   goto NEXT();
 }
 
 inline op infix(inconst INT, out PMC, invar PMC, in NUM) :base_core {
-  $2 = mmd_dispatch_p_pnp(interpreter, $3, $4, $2, $1);
+  $2 = mmd_dispatch_p_pnp(interp, $3, $4, $2, $1);
   goto NEXT();
 }
 
 inline op infix(inconst INT, out PMC, invar PMC, in STR) :base_core {
-  $2 = mmd_dispatch_p_psp(interpreter, $3, $4, $2, $1);
+  $2 = mmd_dispatch_p_psp(interp, $3, $4, $2, $1);
   goto NEXT();
 }
 
 inline op infix(inconst INT, out PMC, invar PMC, invar PMC) :base_core {
-  $2 = mmd_dispatch_p_ppp(interpreter, $3, $4, $2, $1);
+  $2 = mmd_dispatch_p_ppp(interp, $3, $4, $2, $1);
   goto NEXT();
 }
 
 inline op n_infix(inconst INT, out PMC, invar PMC, in INT) :base_core {
-  $2 = mmd_dispatch_p_pip(interpreter, $3, $4, NULL, $1);
+  $2 = mmd_dispatch_p_pip(interp, $3, $4, NULL, $1);
   goto NEXT();
 }
 
 inline op n_infix(inconst INT, out PMC, invar PMC, in NUM) :base_core {
-  $2 = mmd_dispatch_p_pnp(interpreter, $3, $4, NULL, $1);
+  $2 = mmd_dispatch_p_pnp(interp, $3, $4, NULL, $1);
   goto NEXT();
 }
 
 inline op n_infix(inconst INT, out PMC, invar PMC, in STR) :base_core {
-  $2 = mmd_dispatch_p_psp(interpreter, $3, $4, NULL, $1);
+  $2 = mmd_dispatch_p_psp(interp, $3, $4, NULL, $1);
   goto NEXT();
 }
 
 inline op n_infix(inconst INT, out PMC, invar PMC, invar PMC) :base_core {
-  $2 = mmd_dispatch_p_ppp(interpreter, $3, $4, NULL, $1);
+  $2 = mmd_dispatch_p_ppp(interp, $3, $4, NULL, $1);
   goto NEXT();
 }
 ###############################################################################
@@ -187,17 +187,17 @@ inline op abs(out NUM, in NUM) :base_core {
 }
 
 inline op abs(invar PMC) :base_core {
-  $1->vtable->i_absolute(interpreter, $1);
+  $1->vtable->i_absolute(interp, $1);
   goto NEXT();
 }
 
 inline op abs(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->absolute(interpreter, $2, $1);
+  $1 = $2->vtable->absolute(interp, $2, $1);
   goto NEXT();
 }
 
 inline op n_abs(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->absolute(interpreter, $2, NULL);
+  $1 = $2->vtable->absolute(interp, $2, NULL);
   goto NEXT();
 }
 
@@ -281,7 +281,7 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 inline op cmod(out INT, in INT, in INT) :base_core {
   INTVAL den = $3;
   if ($3 == 0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = $2 % den;
   goto NEXT();
@@ -321,7 +321,7 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 inline op cmod(out NUM, in NUM, in NUM) :base_core {
   FLOATVAL den = $3;
   if ($3 == 0.0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = fmod($2, den);
   goto NEXT();
@@ -350,7 +350,7 @@ inline op dec(inout NUM) :base_core {
 }
 
 inline op dec(invar PMC) :base_core {
-  $1->vtable->decrement(interpreter, $1);
+  $1->vtable->decrement(interp, $1);
   goto NEXT();
 }
 
@@ -375,7 +375,7 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 inline op div(inout INT, in INT) :base_core {
   INTVAL den = $2;
   if ($2 == 0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 /= den;
   goto NEXT();
@@ -384,7 +384,7 @@ inline op div(inout INT, in INT) :base_core {
 inline op div(inout NUM, in NUM) :base_core {
   FLOATVAL den = $2;
   if ($2 == 0.0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 /= den;
   goto NEXT();
@@ -393,7 +393,7 @@ inline op div(inout NUM, in NUM) :base_core {
 inline op div(out INT, in INT, in INT) :base_core {
   INTVAL den = $3;
   if ($3 == 0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = $2 / den;
   goto NEXT();
@@ -402,7 +402,7 @@ inline op div(out INT, in INT, in INT) :base_core {
 inline op div(out NUM, in NUM, in NUM) :base_core {
   FLOATVAL den = $3;
   if ($3 == 0.0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = $2 / den;
   goto NEXT();
@@ -427,7 +427,7 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 inline op fdiv(inout INT, in INT) :base_core {
   INTVAL den = $2;
   if ($2 == 0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = (INTVAL)floor($1 / den);
   goto NEXT();
@@ -436,7 +436,7 @@ inline op fdiv(inout INT, in INT) :base_core {
 inline op fdiv(inout NUM, in NUM) :base_core {
   FLOATVAL den = $2;
   if ($2 == 0.0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = floor($1 / den);
   goto NEXT();
@@ -445,7 +445,7 @@ inline op fdiv(inout NUM, in NUM) :base_core {
 inline op fdiv(out INT, in INT, in INT) :base_core {
   INTVAL den = $3;
   if ($3 == 0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = (INTVAL)floor($2 / den);
   goto NEXT();
@@ -454,7 +454,7 @@ inline op fdiv(out INT, in INT, in INT) :base_core {
 inline op fdiv(out NUM, in NUM, in NUM) :base_core {
   FLOATVAL den = $3;
   if ($3 == 0.0)
-    real_exception(interpreter, NULL, E_ZeroDivisionError,
+    real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = floor($2 / den);
   goto NEXT();
@@ -541,7 +541,7 @@ inline op inc(inout NUM) :base_core {
 }
 
 inline op inc(invar PMC) :base_core {
-  $1->vtable->increment(interpreter, $1);
+  $1->vtable->increment(interp, $1);
   goto NEXT();
 }
 
@@ -672,7 +672,7 @@ inline op neg(inout NUM) :base_core {
 }
 
 inline op neg(invar PMC) :base_core {
-  $1->vtable->i_neg(interpreter, $1);
+  $1->vtable->i_neg(interp, $1);
   goto NEXT();
 }
 
@@ -687,12 +687,12 @@ inline op neg(out NUM, in NUM) :base_core {
 }
 
 inline op neg(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->neg(interpreter, $2, $1);
+  $1 = $2->vtable->neg(interp, $2, $1);
   goto NEXT();
 }
 
 inline op n_neg(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->neg(interpreter, $2, NULL);
+  $1 = $2->vtable->neg(interp, $2, NULL);
   goto NEXT();
 }
 
