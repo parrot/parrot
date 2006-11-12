@@ -1227,7 +1227,7 @@ Parrot_set_args_pc {
     jit_emit_stw(NATIVECODE, ISR1, offsetof(Interp, current_args), r16);
     }
     else  {
-        jit_set_args_pc(jit_info, interp, 
+        jit_set_args_pc(jit_info, interp,
             jit_info->flags & JIT_CODE_RECURSIVE);
     }
 }
@@ -1236,7 +1236,7 @@ extern Parrot_set_returns_pc {
     if (jit_info->code_type == JIT_CODE_FILE)
     Parrot_jit_normal_op(jit_info, interp);
     else {
-        jit_set_returns_pc(jit_info, interp, 
+        jit_set_returns_pc(jit_info, interp,
             jit_info->flags & JIT_CODE_RECURSIVE);
     }
 }
