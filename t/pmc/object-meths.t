@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 
 =head1 NAME
 
@@ -1132,6 +1132,20 @@ pir_output_is(<<'CODE', <<'OUTPUT', "addmethod op");
 .end
 CODE
 Foo!
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "inherit a PMC METHOD");
+.sub main :main
+    .local pmc cl, o
+    cl = subclass 'Integer', 'MyInt'
+    o = new 'MyInt'
+    o = 10
+    $S0 = o.'get_as_base'(16)
+    print $S0
+    print "\n"
+.end
+CODE
+a
 OUTPUT
 
 # Local Variables:
