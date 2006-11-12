@@ -1008,7 +1008,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
                 jit_emit_mov_ri_i(NATIVECODE, params_map, CUR_OPCODE[2 + i]);
                 break;
             default:
-                internal_exception(1, "set_args_jit - unknown typ");
+                internal_exception(1, "set_args_jit - unknown type");
                 break;
         }
     }
