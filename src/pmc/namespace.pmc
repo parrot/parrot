@@ -122,8 +122,7 @@ a NameSpace or a var, the NameSpace is returned.
             SUPER(key, value);
         else {
             PMC *old = b->value;
-            if ((old->vtable->base_type == enum_class_NameSpace) 
-                == val_is_NS) {
+            if ((old->vtable->base_type == enum_class_NameSpace) == val_is_NS) {
                 /* simple ns or simple var/sub changed */
                 SUPER(key, value);
             }
