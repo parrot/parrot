@@ -499,10 +499,9 @@ Store the method as a global in the namespace of this class.
     }
 
     void add_method(STRING *method_name, PMC *sub_pmc) {
-        /* XXX - multi-level namespaces not supported? */
-        /* Why aren't we using SELF->vtable->_namespace? */
-        STRING *ns_name = DYNSELF.name();
-        Parrot_store_global_s(INTERP, ns_name, method_name, sub_pmc);
+        VTABLE_set_pmc_keyed_str(INTERP,
+                                 SELF->vtable->_namespace,
+                                 method_name, sub_pmc);
     }
 /*
 
