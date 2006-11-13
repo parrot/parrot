@@ -151,7 +151,6 @@ transform past (operator) {
     unless iter goto iter_end
     $P0 = shift iter
     $S0 = $P0
-    if $S0 == '' goto iter_loop # XXX (#40691): needed?
     $P1 = tree.'get'('dispatch', $P0, 'TclExpr::Grammar')
     past.'add_child'($P1)
     goto iter_loop
