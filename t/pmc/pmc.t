@@ -113,19 +113,10 @@ OUTPUT
 
 my $checkTypes;
 while (my ($type, $id) = each %pmc_types) {
-    next if $type eq "Null";
-    next if $type eq "Iterator";   # these need an initializer
-    next if $type eq "Enumerate";
-    next if $type eq "Ref";
-    next if $type eq "STMRef";
-    next if $type eq "SharedRef";
-    next if $type eq "ParrotObject";
-    next if $type eq "ParrotThread";
-    next if $type eq "deleg_pmc";
-    next if $type eq "BigInt";
-    next if $type eq "LexInfo";
-    next if $type eq "LexPad";
-    next if $type eq "Slice";
+    next if grep { $type eq $_ } qw/
+        Null Iterator Enumerate Ref STMRef SharedRef ParrotObject ParrotThread
+        deleg_pmc BigInt LexInfo LexPad Slice
+    /; # these need an initializer
     my $set_ro = ($type =~ /^Const\w+/) ? <<EOPASM : '';
     new P10, .Integer
     set P10, 1
@@ -143,7 +134,7 @@ EOPASM
 CHECK
 }
 
-pasm_output_is(<<"CODE", <<OUTPUT, "PMC type check");
+pasm_output_like(<<"CODE", <<OUTPUT, "PMC type check");
     new P10, .Hash # Type id hash
     new P11, .Hash # Type name hash
 $checkTypes
@@ -175,7 +166,7 @@ L_BadId:
    set_returns '(0)', I5
    returncc
 CODE
-All names and ids ok.
+/All names and ids ok/
 OUTPUT
 
 pasm_output_like(<<'CODE', <<'OUTPUT', 'find_method');

@@ -1021,7 +1021,10 @@ OUTPUT
 #    print STDERR $code;
 #}
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "ln of complex numbers");
+SKIP: {
+    skip 'inf is not platform-independent', 1 if $^O eq 'MSWin32';
+
+    pir_output_is(<< 'CODE', << 'OUTPUT', "ln of complex numbers");
 .macro DoIt(val, res)
     c = .val
     c2 = c.ln()
@@ -1064,6 +1067,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "ln of complex numbers");
 CODE
 done
 OUTPUT
+}
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "exp of complex numbers");
 .macro DoIt(val, res)

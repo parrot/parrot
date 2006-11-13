@@ -165,8 +165,10 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer()");
+SKIP: {
+    skip 'not changing environment on windows', 2 if $^O eq 'MSWin32';
 
+    pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer()");
 .sub main
     .local pmc env
     .local int num_before, num_after, num_diff
@@ -188,8 +190,7 @@ CODE
 OUTPUT
 
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "get_number()");
-
+    pir_output_is(<< 'CODE', << 'OUTPUT', "get_number()");
 .sub main
     .local pmc env
     .local num num_before, num_after, num_diff
@@ -209,6 +210,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "get_number()");
 CODE
 3.000000
 OUTPUT
+}
 
 pasm_output_is(<<'CODE', <<OUT, "getenv - null key");
     new P0, .Env

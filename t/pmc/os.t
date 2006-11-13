@@ -194,8 +194,9 @@ CODE
 }
 
 # test readdir
-unless ($MSWin32)
-{
+SKIP: {
+    skip 'broken on windows', 1 if ($MSWin32);
+
    opendir IN, '.' ;
    my @entries = readdir IN ;
    closedir IN ;
@@ -204,7 +205,7 @@ unless ($MSWin32)
 .sub main :main
     $P1 = new .OS
     $P2 = $P1.readdir('.')
-    
+
     $S0 = join ' ', $P2
     print $S0
     print "\n"

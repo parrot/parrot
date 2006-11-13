@@ -781,7 +781,10 @@ ok
 OUTPUT
 unlink("temp.file");
 
-pir_output_like(<<'CODE', <<"OUTPUT", "stat failed");
+SKIP: {
+    skip 'broken on windows', 1 if $^O eq 'MSWin32';
+
+    pir_output_like(<<'CODE', <<"OUTPUT", "stat failed");
 .sub main :main
     .local pmc pio
     .local int len
@@ -794,7 +797,7 @@ pir_output_like(<<'CODE', <<"OUTPUT", "stat failed");
 CODE
 /stat failed:/
 OUTPUT
-
+}
 
 # Local Variables:
 #   mode: cperl

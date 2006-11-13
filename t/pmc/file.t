@@ -209,7 +209,10 @@ ok
 OUT
 
 # test rename
-pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
+SKIP: {
+    skip 'file exists', 1 if $MSWin32;
+
+    pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
 .sub main :main
        \$S1 = '$otpx'
        \$S2 = '$otpxcopy'
@@ -237,6 +240,7 @@ CODE
 ok
 ok
 OUT
+}
 
 my $bad_file = catfile( $xpto, 'not a file' );
 # test exists
