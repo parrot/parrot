@@ -339,11 +339,24 @@ transform past (integer) {
     $P0 = node['hex']
     unless null $P0 goto hex
 
+    # XXX (40863): This is a bad hack to make bignums compile
+    $S0 = node['decimal']
+    $I0 = length $S0
+    if $I0 < 10 goto decimal
+    if $I0 > 10 goto bignum_hack
+
+    if $S0 >= "2147483647" goto bignum_hack
+
   decimal:
     $S0 = node
     past['value'] = $S0
     past['class'] = "TclInt"
     .return (past)
+
+  bignum_hack:
+    past['value'] = 0
+    past['class'] = "TclInt"
+    .return(past)
  
   octal: 
      $S0 = node
