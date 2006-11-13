@@ -75,6 +75,28 @@ A METHOD defined in a PMC won't work unless it's been specifically coded to work
 
 B<Recommendation>: All direct data access should go through accessors, except for within the accessors themselves. This involves a code review of all core and custom PMCs, which has been recommended above as well. This may require further discussion, as Patrick did not seem confident that this statement was sufficient to resolve the situation.
 
+Patrick's after-meeting response:  The unresolved issue I'm seeing is that
+every PMC has to be aware of the possibility that SELF is a ParrotObject
+instead of the PMC type.  For example, src/pmc/capture.pmc currently
+has its methods as
+
+    METHOD PMC* get_array() {
+        PMC* capt = SELF;
+        /* XXX:  This workaround is for when we get here as
+                 part of a subclass of Capture */
+        if (PObj_is_object_TEST(SELF))
+            capt = get_attrib_num(PMC_data(SELF), 0);
+        CAPTURE_array_CREATE(INTERP, capt);
+        return CAPTURE_array(capt);
+    }
+
+It's the "if (PObj_is_object_TEST(SELF))" clause that bugs me --
+does every PMC METHOD have to have something like this in order 
+for subclassing to work properly?  That feels wrong.  And I don't
+see how the solution of "all direct data access goes through
+accessors" applies to this particular situation... although I
+could just be reading it wrong.  --Pm
+
 
 =item getattribute/setattribute efficiency
 
