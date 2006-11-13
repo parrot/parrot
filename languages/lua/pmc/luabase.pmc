@@ -24,6 +24,14 @@ static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
+static PMC *
+find_meth(Interp* interpreter, PMC *pmc, const char *name) {
+extern PMC* Parrot_LuaBase_find_metamethod(Interp*, PMC*, STRING* method_name);
+
+    return Parrot_LuaBase_find_metamethod(interpreter, pmc,
+                                          const_string(interpreter, "__unm"));
+}
+
 
 pmclass LuaBase
     abstract
@@ -85,8 +93,7 @@ Throws an exception.
 
 */
     PMC* neg (PMC* dest) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__unm", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__unm");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
             if (NULL == dest) {
@@ -101,8 +108,7 @@ Throws an exception.
     }
 
     void i_neg() {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__unm", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__unm");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
             if (NULL == SELF) {
@@ -153,8 +159,7 @@ Throws an exception.
 
 */
     void* invoke(void* next) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__call", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__call");
         if (meth != NULL) {
             /* fix me */
             PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
@@ -211,8 +216,7 @@ Throws an exception.
 
 */
     PMC* add (PMC* value, PMC* dest) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__add", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__add");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == dest) {
@@ -227,8 +231,7 @@ Throws an exception.
     }
 
     void i_add (PMC* value) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__add", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__add");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == SELF) {
@@ -242,8 +245,7 @@ Throws an exception.
     }
 
     PMC* subtract (PMC* value, PMC* dest) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__sub", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__sub");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == dest) {
@@ -258,8 +260,7 @@ Throws an exception.
     }
 
     void i_subtract (PMC* value) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__sub", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__sub");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == SELF) {
@@ -273,8 +274,7 @@ Throws an exception.
     }
 
     PMC* multiply (PMC* value, PMC* dest) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__mul", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__mul");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == dest) {
@@ -289,8 +289,7 @@ Throws an exception.
     }
 
     void i_multiply (PMC* value) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__mul", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__mul");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == SELF) {
@@ -304,8 +303,7 @@ Throws an exception.
     }
 
     PMC* divide (PMC* value, PMC* dest) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__div", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__div");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == dest) {
@@ -320,8 +318,7 @@ Throws an exception.
     }
 
     void i_divide (PMC* value) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__div", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__div");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == SELF) {
@@ -335,8 +332,7 @@ Throws an exception.
     }
 
     PMC* modulus (PMC* value, PMC* dest) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__mod", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__mod");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == dest) {
@@ -351,8 +347,7 @@ Throws an exception.
     }
 
     void i_modulus (PMC* value) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__mod", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__mod");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == SELF) {
@@ -366,8 +361,7 @@ Throws an exception.
     }
 
     PMC* pow (PMC* value, PMC* dest) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__pow", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__pow");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == dest) {
@@ -382,8 +376,7 @@ Throws an exception.
     }
 
     void i_pow (PMC* value) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__pow", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__pow");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == SELF) {
@@ -397,8 +390,7 @@ Throws an exception.
     }
 
     PMC* concatenate (PMC* value,  PMC* dest) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__concat", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__concat");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == dest) {
@@ -413,8 +405,7 @@ Throws an exception.
     }
 
     void i_concatenate (PMC* value) {
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__concat", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__concat");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (NULL == SELF) {
@@ -477,8 +468,7 @@ Throws an exception.
     METHOD PMC* len () {
         PMC *retval;
 
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__len", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__len");
         if (meth != NULL) {
             PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
             if (NULL == retval) {
@@ -519,8 +509,7 @@ Common implementation (use C<__tostring> or C<get_string>).
     METHOD PMC* tostring () {
         PMC *retval;
 
-        PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, SELF,
-                string_from_const_cstring(INTERP, "__tostring", 0));
+        PMC *meth = find_meth(INTERP, SELF, "__tostring");
         if (meth != NULL) {
             retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
             if (NULL == retval) {
@@ -569,11 +558,11 @@ Looks up the method for C<*method_name>.
     METHOD PMC* get_metatable() {
         PMC *retval;
         INTVAL dynpmc_LuaTable = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "table", 0));
+              const_string(INTERP, "table"));
 
         if (dynpmc_LuaTable == SELF->vtable->base_type) {
             retval = VTABLE_getprop(INTERP, SELF,
-                    string_from_const_cstring(INTERP, "__metatable", 0));
+                    const_string(INTERP, "__metatable"));
             if (dynpmc_LuaTable == retval->vtable->base_type)
                 return retval;
         }
@@ -588,11 +577,11 @@ Looks up the method for C<*method_name>.
 
     METHOD void super_init () {
             dynpmc_LuaBoolean = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaBoolean", 0));
+              const_string(INTERP, "LuaBoolean"));
             dynpmc_LuaNil = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaNil", 0));
+              const_string(INTERP, "LuaNil"));
             dynpmc_LuaString = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaString", 0));
+              const_string(INTERP, "LuaString"));
     }
 
 }

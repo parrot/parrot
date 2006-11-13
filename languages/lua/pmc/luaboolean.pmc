@@ -46,7 +46,7 @@ pmclass LuaBoolean
             true_string = const_string(INTERP, "true");
             luaboolean_name = const_string(INTERP, "boolean");
             dynpmc_LuaBoolean = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaBoolean", 0));
+              const_string(INTERP, "LuaBoolean"));
         }
     }
 

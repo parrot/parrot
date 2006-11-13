@@ -40,7 +40,7 @@ pmclass LuaFunction
         if (pass) {
             luafunction_name = const_string(INTERP, "function");
             dynpmc_LuaBoolean = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaBoolean", 0));
+              const_string(INTERP, "LuaBoolean"));
         }
     }
 

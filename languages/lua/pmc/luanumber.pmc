@@ -29,6 +29,15 @@ static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaString;
 
+static PMC *
+find_meth(Interp* interpreter, PMC *pmc, const char *name) {
+extern PMC* Parrot_LuaBase_find_metamethod(Interp*, PMC*, STRING* method_name);
+
+    return Parrot_LuaBase_find_metamethod(interpreter, pmc,
+                                          const_string(interpreter, name));
+}
+
+
 pmclass LuaNumber
     extends LuaBase
     does scalar
@@ -44,11 +53,11 @@ pmclass LuaNumber
             Parrot_LuaBase_super_init(INTERP, NULL);
             luanumber_name = const_string(INTERP, "number");
             dynpmc_LuaBoolean = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaBoolean", 0));
+              const_string(INTERP, "LuaBoolean"));
             dynpmc_LuaNil = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaNil", 0));
+              const_string(INTERP, "LuaNil"));
             dynpmc_LuaString = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaString", 0));
+              const_string(INTERP, "LuaString"));
         }
     }
 
@@ -297,8 +306,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__add", 0));
+            PMC *meth = find_meth(INTERP, value, "__add");
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -338,8 +346,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__add", 0));
+            PMC *meth = find_meth(INTERP, value, "__add");
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -383,8 +390,7 @@ MMD_LuaString: {
             return NULL;
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__sub", 0));
+            PMC *meth = find_meth(INTERP, value, "__sub");
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -424,8 +430,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__sub", 0));
+            PMC *meth = find_meth(INTERP, value, "__sub");
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -469,8 +474,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__mul", 0));
+            PMC *meth = find_meth(INTERP, value, "__mul");
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -510,8 +514,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__mul", 0));
+            PMC *meth = find_meth(INTERP, value, "__mul");
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -555,8 +558,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__div", 0));
+            PMC *meth = find_meth(INTERP, value, "__div");
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -596,8 +598,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__div", 0));
+            PMC *meth = find_meth(INTERP, value, "__div");
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -643,8 +644,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__mod", 0));
+            PMC *meth = find_meth(INTERP, value, "__mod");
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -686,8 +686,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__mod", 0));
+            PMC *meth = find_meth(INTERP, value, "__mod");
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -730,8 +729,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__pow", 0));
+            PMC *meth = find_meth(INTERP, value, "__pow");
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -771,8 +769,7 @@ MMD_LuaString: {
             }
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__pow", 0));
+            PMC *meth = find_meth(INTERP, value, "__pow");
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -851,8 +848,7 @@ MMD_LuaString: {
             return dest;
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__concat", 0));
+            PMC *meth = find_meth(INTERP, value, "__concat");
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
@@ -887,8 +883,7 @@ MMD_LuaString: {
             DYNSELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_DEFAULT: {
-            PMC *meth = Parrot_LuaBase_find_metamethod(INTERP, value,
-                    string_from_const_cstring(INTERP, "__concat", 0));
+            PMC *meth = find_meth(INTERP, value, "__concat");
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);

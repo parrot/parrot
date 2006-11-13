@@ -48,7 +48,7 @@ pmclass LuaNil
             Parrot_LuaBase_super_init(INTERP, NULL);
             string_representation = const_string(INTERP, "nil");
             dynpmc_LuaBoolean = pmc_type(INTERP,
-              string_from_const_cstring(INTERP, "LuaBoolean", 0));
+              const_string(INTERP, "LuaBoolean"));
         }
     }
 
