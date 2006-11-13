@@ -18,7 +18,7 @@ TGE_DIR  = ../../compilers/tge
 
 OPSLIBS   = tcl
 
-# can't use $(wildcard) and friends for PMCS,, as these have to be in 
+# can't use $(wildcard) and friends for PMCS, as these have to be in 
 # dependency order; with no duplicates. 
 PMCS = \
  tclobject \
@@ -136,13 +136,17 @@ test:	tcl.pbc
 
 RUNNABLE_TCL_TESTS = \
   t_tcl/append.t \
+  t_tcl/appendComp.t \
   t_tcl/apply.t \
+  t_tcl/binary.t \
+  t_tcl/compExpr.t \
   t_tcl/concat.t \
   t_tcl/eval.t \
   t_tcl/error.t \
   t_tcl/for.t \
   t_tcl/for_old.t \
   t_tcl/foreach.t \
+  t_tcl/format.t \
   t_tcl/get.t \
   t_tcl/if.t \
   t_tcl/if_old.t \
@@ -156,35 +160,38 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lrange.t \
   t_tcl/lrepeat.t \
   t_tcl/lreplace.t \
+  t_tcl/lsearch.t \
   t_tcl/lsetComp.t \
   t_tcl/misc.t \
   t_tcl/namespace_old.t \
   t_tcl/package.t \
   t_tcl/platform.t \
   t_tcl/proc.t \
+  t_tcl/proc_old.t \
   t_tcl/pwd.t \
   t_tcl/regexp.t \
   t_tcl/rename.t \
+  t_tcl/scan.t \
   t_tcl/security.t \
   t_tcl/set.t \
+  t_tcl/set_old.t \
   t_tcl/split.t \
   t_tcl/subst.t \
+  t_tcl/stringComp.t \
   t_tcl/switch.t \
   t_tcl/unknown.t \
-  t_tcl/uplevel.t \
   t_tcl/upvar.t \
-  t_tcl/utf.t \
+  t_tcl/util.t \
+  t_tcl/while.t \
   t_tcl/while_old.t
 
 # These tests segfault or exit before any tests results are shown
 SEGFAULTING_TCL_TESTS = \
-  t_tcl/appendComp.t \
-  t_tcl/proc_old.t \
-  t_tcl/set_old.t \
-  t_tcl/while.t \
+  t_tcl/utf.t
 
-# These are test that don't parse, but we couldn't possibly pass any anyway:
+# Tests we couldn't possibly pass any anyway:
 UNIMPLEMENTED_TCL_TESTS = \
+  t_tcl/clock.t \
   t_tcl/dict.t
 
 # These tests parse but fail (or skip) every test.
@@ -223,23 +230,21 @@ SKIPPED_TCL_TESTS = \
 
 # These test files die for various reasons.
 #
-# too slow:
-#t_tcl/clock.t            t_tcl/expr.t 
+# attempt to access code outside of current code segment
+#t_tcl/expr.t 
 #
 # invalid command name "package"
 #t_tcl/safe.t             t_tcl/winPipe.t         t_tcl/unixInit.t
+#t_tcl/tm.t
+#
+# invalid command name "set"
+#t_tcl/uplevel.t
 #
 # invalid command name "update"
 #t_tcl/event.t
 #
 # invalid command name "cleanupTests" ( namespace import/tcltest combo issue)
 #t_tcl/parse.t            t_tcl/source.t
-#
-# src/string.c:420: failed assertion `a->encoding && a->charset && !PObj_on_free_list_TEST(a)'
-#t_tcl/compExpr.t         t_tcl/stringComp.t
-#
-# bad option "-dictionary": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index,
-#t_tcl/lsearch.t
 #
 # bad option "command": must be args, body, cmdcount, commands, complete, 
 #t_tcl/interp.t
@@ -254,25 +259,22 @@ SKIPPED_TCL_TESTS = \
 #Name 'prefix:!' not found
 #t_tcl/io.t
 #
-#[oops; continuation 0x34cbe18 of type 25 is trying to jump from runloop 59279 to runloop 1]
-#t_tcl/ioCmd.t
+#[oops; continuation <foo> of type <bar> is trying to jump from runloop <baz> to runloop 1]
+#t_tcl/ioCmd.t           t_tcl/main.t             t_tcl/expr_old.t
+#t_tcl/compExpr_old.t    
 #
-# extra switch pattern with no body
-#t_tcl/binary.t          t_tcl/parseExpr.t        t_tcl/expr_old.t
-#t_tcl/util.t            t_tcl/scan.t             t_tcl/compExpr_old.t    
+# src/string.c:972: failed assertion `src->encoding == Parrot_fixed_8_encoding_ptr'
+#t_tcl/parseExpr.t        
 #
 # No such file or directory
 #t_tcl/fileSystem.t      t_tcl/tcltest.t          t_tcl/fCmd.t
 #t_tcl/fileName.t
 #
-# can't read "actual": variable is array
+# invalid command name "testobj"
 #t_tcl/execute.t
 #
 # can't delete "run": command doesn't exist
 #t_tcl/basic.t
-#
-# '-' is not a valid sprintf format
-#t_tcl/format.t
 #
 # The opcode 'tcl_error' (tcl_error<0>) was not found
 #t_tcl/async.t
@@ -280,27 +282,18 @@ SKIPPED_TCL_TESTS = \
 # bad option "exist": must be args, body, cmdcount, commands, complete ...
 #t_tcl/unixNotfy.t
 #
-# syntax error in expression "[testConstraint nt] && $::tcl_platform(osVersion) >= 5.0": extra tokens at end of expression
-#t_tcl/winFile.t
-#
 # invalid command name "close"
-#t_tcl/exec.t
+#t_tcl/exec.t            t_tcl/winFile.t
 #
-# syntax error in expression "[info exists auto_mkindex_parser::initCommands]": premature end of expression
+# invalid command name "auto_load"
 #t_tcl/autoMkindex.t
 #
-# missing close-bracket
-#t_tcl/main.t 
-#
-# Null PMC access in invoke()
-#t_tcl/var.t             t_tcl/winDde.t          t_tcl/reg.t
+# Null PMC access in type()
+#tcl/var.t             t_tcl/winDde.t          t_tcl/reg.t
 #
 # extra characters after close-brace (These tests require {expand}[list])
 #t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
 #t_tcl/pkgMkIndex.t     t_tcl/trace.t
-#
-# can't read "major": no such variable {{ [foreach] bug }}
-#t_tcl/tm.t
 #
 # can't read "result": no such variable
 #t_tcl/regexComp.t
