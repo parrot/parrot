@@ -14,6 +14,7 @@ LANGUAGES = \
     HQ9plus \
     WMLScript \
     Zcode \
+    abc \
     bc \
     befunge \
     bf \
@@ -84,6 +85,7 @@ clean: \
     HQ9plus.clean \
     WMLScript.clean \
     Zcode.clean \
+    abc.clean \
     bc.clean \
     befunge.clean \
     bf.clean \
@@ -146,6 +148,14 @@ Zcode.test:
 	- $(MAKE) Zcode test
 Zcode.clean:
 	- $(MAKE) Zcode clean
+
+abc : abc.dummy
+abc.dummy:
+	- $(MAKE) abc
+abc.test:
+	- $(MAKE) abc test
+abc.clean:
+	- $(MAKE) abc clean
 
 bc : bc.dummy
 bc.dummy:

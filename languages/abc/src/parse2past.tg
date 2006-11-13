@@ -1,0 +1,64 @@
+transform root (ROOT) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Block'
+    past.'init'('node'=>node, 'name'=>'anon')
+    .local pmc cpast
+    cpast = tree.'get'('past', node, 'ABC::Grammar::statement')
+    past.'push'(cpast)
+    .return (past)
+}
+
+
+transform past (ABC::Grammar::statement) :language('PIR') {
+    $P0 = node['expression']
+    $P0 = $P0['expr']
+    .local pmc past, cpast
+    cpast = tree.'get'('past', $P0, 'ABC::Grammar::expr')
+    past = cpast.'new'('PAST::Op', cpast, 'node'=>node, 'pirop'=>'say')
+    .return (past)
+}
+
+
+transform past (ABC::Grammar::expr) :language('PIR') {
+    .local string type
+    type = node['type']
+    if type == 'term:' goto past_term
+
+    .local pmc optable, optok
+    .local string pasttype, pirop
+    optable = get_hll_global [ 'ABC::Grammar' ], '$optable'
+    optok = optable[type]
+    pasttype = optok['past']
+    pirop = optok['pirop']
+
+    .local pmc past, iter
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'name'=>type, 'pasttype'=>pasttype, 'pirop'=>pirop)
+
+    $P0 = node.'get_array'()
+    if null $P0 goto iter_end
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'ABC::Grammar::expr')
+    if null cpast goto iter_loop
+    past.'push'(cpast)
+    goto iter_loop
+  iter_end:
+    .return (past)
+
+  past_term:
+    .return tree.'get'('past_term', node, 'ABC::Grammar::expr')
+}
+
+
+transform past_term (ABC::Grammar::expr) :language('PIR') {
+    .local pmc past
+    $I0 = node
+    past = new 'PAST::Val'
+    past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'n')
+    .return (past)
+}
+
