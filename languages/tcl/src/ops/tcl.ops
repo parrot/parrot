@@ -45,13 +45,13 @@ inline op tcl_error(in PMC) {
   opcode_t * ret;
   opcode_t * dest;
   INTVAL TCL_ERROR = 1;
-  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+  PMC* exception = pmc_new(interp, enum_class_Exception);
 
-  VTABLE_set_pmc_keyed_int(interpreter, exception, (INTVAL)0, $1);
-  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_ERROR);
+  VTABLE_set_pmc_keyed_int(interp, exception, (INTVAL)0, $1);
+  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_ERROR);
   ret = expr NEXT();
   dest = (opcode_t *)
-      throw_exception(interpreter, exception, ret);
+      throw_exception(interp, exception, ret);
   goto ADDRESS(dest);
 }
 
@@ -59,26 +59,26 @@ inline op tcl_error(in STR) {
   opcode_t * ret;
   opcode_t * dest;
   INTVAL TCL_ERROR = 1;
-  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+  PMC* exception = pmc_new(interp, enum_class_Exception);
 
-  VTABLE_set_string_keyed_int(interpreter, exception, 0, $1);
-  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_ERROR);
+  VTABLE_set_string_keyed_int(interp, exception, 0, $1);
+  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_ERROR);
   ret = expr NEXT();
   dest = (opcode_t *)
-      throw_exception(interpreter, exception, ret);
+      throw_exception(interp, exception, ret);
   goto ADDRESS(dest);
 }
 
 inline op tcl_error(in INT, in PMC) {
   opcode_t * ret;
   opcode_t * dest;
-  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+  PMC* exception = pmc_new(interp, enum_class_Exception);
 
-  VTABLE_set_pmc_keyed_int(interpreter, exception, 0, $2);
-  VTABLE_set_integer_keyed_int(interpreter, exception, 9, $1);
+  VTABLE_set_pmc_keyed_int(interp, exception, 0, $2);
+  VTABLE_set_integer_keyed_int(interp, exception, 9, $1);
   ret = expr NEXT();
   dest = (opcode_t *)
-      throw_exception(interpreter, exception, ret);
+      throw_exception(interp, exception, ret);
   goto ADDRESS(dest);
 }
 
@@ -94,13 +94,13 @@ inline op tcl_return(in PMC) {
   opcode_t * ret;
   opcode_t * dest;
   INTVAL TCL_RETURN = 2;
-  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+  PMC* exception = pmc_new(interp, enum_class_Exception);
 
-  VTABLE_set_pmc_keyed_int(interpreter, exception, 0, $1);
-  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_RETURN);
+  VTABLE_set_pmc_keyed_int(interp, exception, 0, $1);
+  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_RETURN);
   ret = expr NEXT();
   dest = (opcode_t *)
-      throw_exception(interpreter, exception, ret);
+      throw_exception(interp, exception, ret);
   goto ADDRESS(dest);
 }
 
@@ -108,13 +108,13 @@ inline op tcl_return(in STR) {
   opcode_t * ret;
   opcode_t * dest;
   INTVAL TCL_RETURN = 2;
-  PMC* exception = pmc_new(interpreter, enum_class_Exception);
+  PMC* exception = pmc_new(interp, enum_class_Exception);
 
-  VTABLE_set_string_keyed_int(interpreter, exception, 0, $1);
-  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_RETURN);
+  VTABLE_set_string_keyed_int(interp, exception, 0, $1);
+  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_RETURN);
   ret = expr NEXT();
   dest = (opcode_t *)
-      throw_exception(interpreter, exception, ret);
+      throw_exception(interp, exception, ret);
   goto ADDRESS(dest);
 }
 
@@ -128,14 +128,14 @@ inline op tcl_break() {
   opcode_t * ret;
   opcode_t * dest;
   INTVAL TCL_BREAK = 3;
-  PMC* exception = pmc_new(interpreter, enum_class_Exception);
-  STRING* empty = string_make_empty(interpreter, enum_stringrep_one, 0);
+  PMC* exception = pmc_new(interp, enum_class_Exception);
+  STRING* empty = string_make_empty(interp, enum_stringrep_one, 0);
 
-  VTABLE_set_string_keyed_int(interpreter, exception, 0, empty);
-  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_BREAK);
+  VTABLE_set_string_keyed_int(interp, exception, 0, empty);
+  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_BREAK);
   ret = expr NEXT();
   dest = (opcode_t *)
-      throw_exception(interpreter, exception, ret);
+      throw_exception(interp, exception, ret);
   goto ADDRESS(dest);
 }
 
@@ -149,14 +149,14 @@ inline op tcl_continue() {
   opcode_t * ret;
   opcode_t * dest;
   INTVAL TCL_CONTINUE = 4;
-  PMC* exception = pmc_new(interpreter, enum_class_Exception);
-  STRING* empty = string_make_empty(interpreter, enum_stringrep_one, 0);
+  PMC* exception = pmc_new(interp, enum_class_Exception);
+  STRING* empty = string_make_empty(interp, enum_stringrep_one, 0);
 
-  VTABLE_set_string_keyed_int(interpreter, exception, 0, empty);
-  VTABLE_set_integer_keyed_int(interpreter, exception, 9, TCL_CONTINUE);
+  VTABLE_set_string_keyed_int(interp, exception, 0, empty);
+  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_CONTINUE);
   ret = expr NEXT();
   dest = (opcode_t *)
-      throw_exception(interpreter, exception, ret);
+      throw_exception(interp, exception, ret);
   goto ADDRESS(dest);
 }
 
