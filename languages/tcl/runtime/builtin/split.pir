@@ -43,10 +43,7 @@ done_hash_loop:
   $P1 = new .TclList
   $I1 = length splitstring
 
-  .local int begin,len
-  # XXX (#40782): Shouldn't have to do this with TclList (and this is too much padding)
-  $P1 = $I1 
-  .local int last_match,result_key
+  .local int begin,len,last_match,result_key
   last_match = -1
   $I2 = 0
   result_key = 0
