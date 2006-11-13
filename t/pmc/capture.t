@@ -283,7 +283,7 @@ CODE
 OUT
 
 
-pir_output_is(<<'CODE', <<'OUTPUT', '*_keyed_int delegation');
+pir_output_is(<<'CODE', <<'OUTPUT', '*_keyed_int delegation', todo => "Fix objects vs. vtables");
 .sub main :main
     $P99 = subclass 'Capture', 'Match'
     $P1 = new 'Match'
