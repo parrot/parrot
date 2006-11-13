@@ -29,8 +29,7 @@ The DYNSELF macro is closer to the true OO concept of 'self'; if anything is wor
 
 B<Recommendation>: Throughout the source, rename SELF to STATIC_SELF, and rename DYNSELF to SELF. Additionally, direct access to VTABLE methods should be reviewed, and SELF should be used for where possible to increase clarity and maintainability (this is a good CAGE task.) Also, this should become a coding standard for PMCs.
 
-B<Att:> SELF ist just a synonym for I<pmc> - the object - above is talking about SELF.method() and alikes.
-UTSL please - F<lib/Parrot/Pmc2c.pm>.
+B<Att:> SELF ist just a synonym for I<pmc> - the object - above is talking about SELF.method() and alikes. See F<lib/Parrot/Pmc2c.pm>.
 
 
 =item composition is almost non-existent (roles would be nice)
@@ -74,7 +73,7 @@ B<Recommendation>: Inherit from default.pmc unless you have a parent. Always che
 
 =item PMC methods aren't inherited by ParrotObject pmcs
 
-A METHOD defined in a PMC won't work unless it's been specifically coded to work in a PIR-based subclass. See L<http://rt.perl.org/rt3/Public/Bug/Display.html?id=39329>.
+A METHOD defined in a PMC won't work unless it's been specifically coded to work in a PIR-based subclass. See L<http://xrl.us/s7ns>.
 
 B<Recommendation>: All direct data access should go through accessors, except for within the accessors themselves. This involves a code review of all core and custom PMCs, which has been recommended above as well. This may require further discussion, as Patrick did not seem confident that this statement was sufficient to resolve the situation.
 
