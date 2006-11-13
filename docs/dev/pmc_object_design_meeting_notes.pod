@@ -29,6 +29,9 @@ The DYNSELF macro is closer to the true OO concept of 'self'; if anything is wor
 
 B<Recommendation>: Throughout the source, rename SELF to STATIC_SELF, and rename DYNSELF to SELF. Additionally, direct access to VTABLE methods should be reviewed, and SELF should be used for where possible to increase clarity and maintainability (this is a good CAGE task.) Also, this should become a coding standard for PMCs.
 
+B<Att:> SELF ist just a synonym for I<pmc> - the object - above is talking about SELF.method() and alikes.
+UTSL please - F<lib/Parrot/Pmc2c.pm>.
+
 
 =item composition is almost non-existent (roles would be nice)
 
