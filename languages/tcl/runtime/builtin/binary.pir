@@ -119,8 +119,7 @@ which_format:
   if formatChar == 'A' goto format_A
   if formatChar == 'x' goto format_x
 
-  .return (0)  # XXX (#40762): Hack to avoid blowing up when using binary.
-  tcl_error 'XXX (#40761): This error should never occur: must be missing a field specifier implementation.'
+  .return (0)  # XXX (#40762) Implement the rest of the [binary] format chars.
 
 format_a:
   .getBinaryArg()
