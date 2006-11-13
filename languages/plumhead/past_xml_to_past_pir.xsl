@@ -105,15 +105,16 @@ a PAST and runs the PAST with help of the parrot compiler tools.
                                                                   
 </xsl:template>
 
-<xsl:template match="past:Stmts | past:Stmt | past:Op | past:Exp | past:Val" >
+<xsl:template match="past:Stmts | past:Stmt | past:Op | past:Exp | past:Val | past:Var" >
 
   # start of generic node
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
   past_node_<xsl:value-of select="generate-id(.)" /> = new '<xsl:choose>
-    <xsl:when test="name() = 'past:Stmts'" >PAST::Stmts</xsl:when>
-    <xsl:when test="name() = 'past:Stmt'"  >PAST::Stmt</xsl:when>
-    <xsl:when test="name() = 'past:Op'"    >PAST::Op</xsl:when>
     <xsl:when test="name() = 'past:Exp'"   >PAST::Exp</xsl:when>
+    <xsl:when test="name() = 'past:Op'"    >PAST::Op</xsl:when>
+    <xsl:when test="name() = 'past:Stmt'"  >PAST::Stmt</xsl:when>
+    <xsl:when test="name() = 'past:Stmts'" >PAST::Stmts</xsl:when>
+    <xsl:when test="name() = 'past:Var'"   >PAST::Var</xsl:when>
                                                             </xsl:choose>'
   <xsl:apply-templates select="@*"/>
   <xsl:apply-templates />
@@ -174,7 +175,17 @@ a PAST and runs the PAST with help of the parrot compiler tools.
 <xsl:template match="@valtype">
   past_node_<xsl:value-of select="generate-id(..)" />.'valtype'( '<xsl:value-of select="." />' )
 </xsl:template>
+<xsl:template match="@vartype">
+  past_node_<xsl:value-of select="generate-id(..)" />.'vartype'( '<xsl:value-of select="." />' )
+</xsl:template>
+<xsl:template match="@scope">
+  past_node_<xsl:value-of select="generate-id(..)" />.'scope'( '<xsl:value-of select="." />' )
+</xsl:template>
+<xsl:template match="@varname">
+  past_node_<xsl:value-of select="generate-id(..)" />.'varname'( '<xsl:value-of select="." />' )
+</xsl:template>
 <xsl:template match="@encoding">
+   <xsl:comment>The attribute encoding is handled in PIR generation</xsl:comment>
 </xsl:template>
 
 </xsl:stylesheet>

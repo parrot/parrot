@@ -13,14 +13,14 @@ Hello World test.
 # pragmata
 use strict;
 use warnings;
-use 5.006_001;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 3;
+use Test::More     tests => 4;
+
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
 <?php
@@ -29,6 +29,7 @@ echo "Hello, World!\n";
 END_CODE
 Hello, World!
 END_EXPECTED
+
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'only alphanumic' );
 <?php echo "Hello World"; ?>
@@ -38,7 +39,7 @@ Hello World
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello with some HTML' );
 <html>
 <head>
   <title>Servus</title>
@@ -62,5 +63,15 @@ Hello, World!
 </pre>
 </body>
 </html>
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello in a var' );
+<?php
+$h = "Hello, World!\n";
+echo $h;
+?>
+END_CODE
+Hello, World!
 END_EXPECTED
 
