@@ -7,7 +7,7 @@ Plumhead - Introduction
 =head1 What is Plumhead?
 
 An incomplete implementation of PHP on Parrot.
-Plumead is short for Plum-headed Parakeet.
+Plumhead is short for Plum-headed Parakeet.
 
 =head1 Goals
 
