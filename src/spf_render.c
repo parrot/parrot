@@ -714,6 +714,16 @@ do_sprintf:
                                        && tc[j+2] == '0')
                                     {
                                         mem_sys_memmove(&tc[j+2], &tc[j+3], strlen(&tc[j+2]));
+
+                                        /* now fix the length if we just broke it */
+                                        if ((info.flags & FLAG_WIDTH) && strlen(tc) < info.width) {
+                                            if (info.flags & FLAG_MINUS)
+                                                strcat(tc, " ");
+                                            else {
+                                                mem_sys_memmove(&tc[1], &tc[0], strlen(tc) + 1);
+                                                tc[0] = ' ';
+                                            }
+                                        }
                                     }
                                 }
                             }
