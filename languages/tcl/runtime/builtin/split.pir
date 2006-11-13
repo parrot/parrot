@@ -78,7 +78,6 @@ split_really_done:
 split_empty:
   $P1 = new .TclList
   $I1 = length splitstring
-  $P1 = $I1 # XXX (#40782): Shouldn't have to do this with TclList...
   $I2 = 0
 split_empty_loop:
   if $I2 == $I1 goto empty_done
