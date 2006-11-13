@@ -123,9 +123,9 @@ Oh well, and classoffset does of course not work for Hash-like or other objects.
 
 B<Recommendation>: Best practice is to use named attribute access. Optimizations, if necessary, will be addressed closer to 1.0. Issues with classoffset and hash-like objects will be addressed in the future as necessary.
 
+=back
 
 =head1 AUTHOR
 
-Jerry Gay E<jerry.gay@gmail.com>
+Jerry Gay L<mailto:jerry.gay@gmail.com>
 
-=back
