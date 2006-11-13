@@ -144,6 +144,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/concat.t \
   t_tcl/error.t \
   t_tcl/eval.t \
+  t_tcl/expr.t \
   t_tcl/expr_old.t \
   t_tcl/for.t \
   t_tcl/for_old.t \
@@ -232,9 +233,6 @@ SKIPPED_TCL_TESTS = \
   t_tcl/winTime.t
 
 # These test files die for various reasons.
-#
-# attempt to access code outside of current code segment
-#t_tcl/expr.t 
 #
 # invalid command name "package"
 #t_tcl/safe.t             t_tcl/winPipe.t         t_tcl/unixInit.t
