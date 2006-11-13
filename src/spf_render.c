@@ -699,17 +699,16 @@ do_sprintf:
                                 string_cstring_free(tempstr);
                             }
 
-#if _WIN32
+#ifdef WIN32
                             /* Microsoft uses a retarded, broken, nonstandard
                              * behavior with regards to signs, exponents and
                              * precision: it doesn't count the + as part of the
                              * precision.  We'll fix it ourselves if need be.
-                             * XXX this bug might also apply to %e and %E
                              */
 
-                            if(tolower(ch) == 'g') {
+                            if (ch == 'g' || ch == 'G' || ch == 'e' || ch == 'E') {
                                 UINTVAL j;
-                                for(j=0; j < strlen(tc); j++) {
+                                for (j=0; j < strlen(tc); j++) {
                                     if(tolower(tc[j]) == 'e'
                                        && (tc[j+1] == '+' || tc[j+1] == '-')
                                        && tc[j+2] == '0')
@@ -718,7 +717,7 @@ do_sprintf:
                                     }
                                 }
                             }
-#endif
+#endif /* WIN32 */
 
                             targ = string_append(interp, targ,
                                                  cstr2pstr(tc));
