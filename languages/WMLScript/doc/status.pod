@@ -51,7 +51,7 @@ Jonathan Worthington's work (see F<languages/dotnet/doc/contents.pod>).
 =head2 TODO
 
 Find optimization (like Register or OptRegister) compatible with opcodes
-SCAND & SCOR. These 2 opcodes pop one value and push one or two values.
+SCAND & SCOR. These 2 opcodes pop one value, and push one I<or> two values.
 
 =head1 WMLScript PMC
 

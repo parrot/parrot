@@ -26,11 +26,11 @@ implements C<ISVALID> WMLScript opcode.
 =cut
 
 inline op defined(out PMC, invar PMC) :base_core {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
 
-    INTVAL result = PMC_IS_NULL($2) ? 0 : VTABLE_defined(interpreter, $2);
-    $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+    INTVAL result = PMC_IS_NULL($2) ? 0 : VTABLE_defined(interp, $2);
+    $1 = pmc_new(interp, dynpmc_WmlsBoolean);
     PMC_int_val($1) = result;
     goto NEXT();
 }
@@ -43,18 +43,18 @@ implements C<TOBOOL> WMLScript opcode.
 =cut
 
 inline op istrue(out PMC, invar PMC) :base_core {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInvalid"));
-    INTVAL type = VTABLE_type(interpreter, $2);
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
+        const_string(interp, "WmlsInvalid"));
+    INTVAL type = VTABLE_type(interp, $2);
 
     if (type == dynpmc_WmlsInvalid) {
-        $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
+        $1 = pmc_new(interp, dynpmc_WmlsInvalid);
     }
     else {
-        INTVAL result = VTABLE_get_bool(interpreter, $2);
-        $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+        INTVAL result = VTABLE_get_bool(interp, $2);
+        $1 = pmc_new(interp, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result;
     }
     goto NEXT();
@@ -68,17 +68,17 @@ implements C<TYPEOF> WMLScript opcode.
 =cut
 
 inline op typeof(out PMC, invar PMC) :base_core {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsFloat = pmc_type(interpreter,
-        const_string(interpreter, "WmlsFloat"));
-    INTVAL dynpmc_WmlsInteger = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInteger"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInvalid"));
-    INTVAL dynpmc_WmlsString = pmc_type(interpreter,
-        const_string(interpreter, "WmlsString"));
-    INTVAL type = VTABLE_type(interpreter, $2);
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsFloat = pmc_type(interp,
+        const_string(interp, "WmlsFloat"));
+    INTVAL dynpmc_WmlsInteger = pmc_type(interp,
+        const_string(interp, "WmlsInteger"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
+        const_string(interp, "WmlsInvalid"));
+    INTVAL dynpmc_WmlsString = pmc_type(interp,
+        const_string(interp, "WmlsString"));
+    INTVAL type = VTABLE_type(interp, $2);
     INTVAL result;
 
     if      (type == dynpmc_WmlsInteger) {
@@ -97,10 +97,10 @@ inline op typeof(out PMC, invar PMC) :base_core {
         result = 4;
     }
     else {
-        real_exception(interpreter, NULL, NO_CLASS,
+        real_exception(interp, NULL, NO_CLASS,
             "Attempt to typeof of a non-wmls type.");
     }
-    $1 = pmc_new(interpreter, dynpmc_WmlsInteger);
+    $1 = pmc_new(interp, dynpmc_WmlsInteger);
     PMC_int_val($1) = result;
     goto NEXT();
 }
@@ -113,17 +113,17 @@ implements C<GT> WMLScript opcode.
 =cut
 
 inline op isgt(out PMC, invar PMC, invar PMC) {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP);
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
+        const_string(interp, "WmlsInvalid"));
+    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
 
     if (4 == result) {
-        $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
+        $1 = pmc_new(interp, dynpmc_WmlsInvalid);
     }
     else {
-        $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+        $1 = pmc_new(interp, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result > 0;
     }
     goto NEXT();
@@ -137,17 +137,17 @@ implements C<GE> WMLScript opcode.
 =cut
 
 inline op isge(out PMC, invar PMC, invar PMC) {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP);
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
+        const_string(interp, "WmlsInvalid"));
+    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
 
     if (4 == result) {
-        $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
+        $1 = pmc_new(interp, dynpmc_WmlsInvalid);
     }
     else {
-        $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+        $1 = pmc_new(interp, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result >= 0;
     }
     goto NEXT();
@@ -161,17 +161,17 @@ implements C<LE> WMLScript opcode.
 =cut
 
 inline op isle(out PMC, invar PMC, invar PMC) {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP);
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
+        const_string(interp, "WmlsInvalid"));
+    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
 
     if (4 == result) {
-        $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
+        $1 = pmc_new(interp, dynpmc_WmlsInvalid);
     }
     else {
-        $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+        $1 = pmc_new(interp, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result <= 0;
     }
     goto NEXT();
@@ -185,17 +185,17 @@ implements C<LT> WMLScript opcode.
 =cut
 
 inline op islt(out PMC, invar PMC, invar PMC) {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP);
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
+        const_string(interp, "WmlsInvalid"));
+    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
 
     if (4 == result) {
-        $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
+        $1 = pmc_new(interp, dynpmc_WmlsInvalid);
     }
     else {
-        $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+        $1 = pmc_new(interp, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result < 0;
     }
     goto NEXT();
@@ -208,17 +208,17 @@ implements C<EQ> WMLScript opcode.
 =cut
 
 inline op iseq(out PMC, invar PMC, invar PMC) {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
+        const_string(interp, "WmlsInvalid"));
+    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_EQ);
 
     if (4 == result) {
-        $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
+        $1 = pmc_new(interp, dynpmc_WmlsInvalid);
     }
     else {
-        $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+        $1 = pmc_new(interp, dynpmc_WmlsBoolean);
         PMC_int_val($1) = result;
     }
     goto NEXT();
@@ -232,17 +232,17 @@ implements C<NE> WMLScript opcode.
 =cut
 
 inline op isne(out PMC, invar PMC, invar PMC) {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interpreter,
-        const_string(interpreter, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interpreter,
-        const_string(interpreter, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
+    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
+        const_string(interp, "WmlsBoolean"));
+    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
+        const_string(interp, "WmlsInvalid"));
+    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_EQ);
 
     if (4 == result) {
-        $1 = pmc_new(interpreter, dynpmc_WmlsInvalid);
+        $1 = pmc_new(interp, dynpmc_WmlsInvalid);
     }
     else {
-        $1 = pmc_new(interpreter, dynpmc_WmlsBoolean);
+        $1 = pmc_new(interp, dynpmc_WmlsBoolean);
         PMC_int_val($1) = !result;
     }
     goto NEXT();
