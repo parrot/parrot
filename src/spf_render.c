@@ -700,18 +700,20 @@ do_sprintf:
                             }
 
 #ifdef WIN32
-                            /* Microsoft uses a retarded, broken, nonstandard
-                             * behavior with regards to signs, exponents and
-                             * precision: it doesn't count the + as part of the
-                             * precision.  We'll fix it ourselves if need be.
+                            /* Microsoft defaults to three digits for exponents,
+                             * even when fewer digits would suffice.  For the sake
+                             * of portability, we will here attempt to hide that.
                              */
 
                             if (ch == 'g' || ch == 'G' || ch == 'e' || ch == 'E') {
-                                UINTVAL j;
-                                for (j=0; j < strlen(tc); j++) {
-                                    if(tolower(tc[j]) == 'e'
-                                       && (tc[j+1] == '+' || tc[j+1] == '-')
-                                       && tc[j+2] == '0')
+                                size_t tclen = strlen(tc);
+                                size_t j;
+                                for (j = 0; j < tclen; j++) {
+                                    if (   (tc[j] == 'e' || tc[j] == 'E')
+                                        && (tc[j+1] == '+' || tc[j+1] == '-')
+                                        && tc[j+2] == '0'
+                                        && isdigit((unsigned char)tc[j+3])
+                                        && isdigit((unsigned char)tc[j+4]))
                                     {
                                         mem_sys_memmove(&tc[j+2], &tc[j+3], strlen(&tc[j+2]));
 
@@ -724,6 +726,9 @@ do_sprintf:
                                                 tc[0] = ' ';
                                             }
                                         }
+
+                                        /* only one fix required per string */
+                                        break;
                                     }
                                 }
                             }
