@@ -1,3 +1,5 @@
+#!./parrot
+
 # $Id$
 
 =head1 NAME

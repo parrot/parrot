@@ -23,7 +23,8 @@ by the generated PIR. Something like this worked for me under Linux.
   ./configure && make
   ln -s ../../Parrot/trunk/parrot
   ln -s ../../Parrot/trunk/languages
-  export TEST_PHP_EXECUTABLE=../../Parrot/languages/plumhead.pl
+  export PATH=.:$PATH
+  export TEST_PHP_EXECUTABLE=languages/plumhead.pir
   php run-tests.php 
   
 Good luck.
