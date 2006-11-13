@@ -167,6 +167,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/misc.t \
   t_tcl/namespace_old.t \
   t_tcl/package.t \
+  t_tcl/parseOld.t \
   t_tcl/platform.t \
   t_tcl/proc.t \
   t_tcl/proc_old.t \
@@ -298,10 +299,6 @@ SKIPPED_TCL_TESTS = \
 #
 # can't read "result": no such variable
 #t_tcl/regexComp.t
-#
-# Cannot get character of empty string -
-#   {test 5.11? something cumulative, as the test runs fine by itself}
-#t_tcl/parseOld.t
 #
 # invalid command name "x"
 #t_tcl/timer.t
