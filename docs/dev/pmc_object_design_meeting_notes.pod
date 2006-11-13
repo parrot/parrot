@@ -1,0 +1,109 @@
+=head1 Parrot PMC/Object Design Meeting Notes
+
+During the Chicago Hackathon 2006, Jerry Gay, Matt Diephouse, chromatic, Leo Toetch, Jonathan Worthington and Chip Salzenberg (arriving late) met to discuss problems and proposed solutions for Parrot PMCs and objects. Previous to the meeting, wiki pages were set up to gather a list of problems, they can be found at L<http://rakudo.org/hackathon-chicago/index.cgi?object> and L<http://rakudo.org/hackathon-chicago/index.cgi?pmc>. A log of the discussion that took place can be found at L<http://www.parrotcode.org/misc/parrotsketch-logs/irclog.parrotsketch-200611/irclog.parrotsketch.20061112>.
+
+This summary has been compiled from these sources, and from conversations not recorded.
+
+
+=head2 List of problems and proposed solutions for PMCs:
+
+=over 4
+
+=item Not all PMCs properly serialize properties by calling the default implementation
+
+This is one of many troubles with properties. Also, properties were invented at a time when it looked like Perl 6 needed them, however this suspected use case has so far proven incorrect. A general property system means every PMC might get properties at runtime, so all PMCs share the burden all the time of an uncommonly-used "feature". Furthermore, a property as currently implemented is one full-blown hash per object, typically to store a single value. The same effect can easily be achieved by using one AddrRegistry Hash to store values in it. Finally, if some class system needs properties, it can implement it itself.
+
+B<Recommendation>: Deprecate property support in PMCs. We may put them back in later, but if we do, it will be for a good reason.
+
+
+=item Attributes use external data slot (pmc_ext)
+
+When attributes are used on a PMC, they are stored in the single external data segment associated with a PMC. This prevents the use of attributes and storage of non-attribute data in the PMC external data segment, limiting their usefulness to all but the most simple PMC types.
+
+B<Recommendation>: Implement differently-sized PMCs. The proposed pddXX_pmc.pod has been reviewed, and the implementation of a prototype solution has been requested. Work on this prototype is targeted to begin in trunk after the 0.4.7 release.
+
+
+=item DYNSELF is the common case, but the common case should be SELF
+
+The DYNSELF macro is closer to the true OO concept of 'self'; if anything is worthy of the name SELF, it is DYNSELF. DYNSELF does dispatching, while SELF statically calls the method in the current class.
+
+B<Recommendation>: Throughout the source, rename SELF to STATIC_SELF, and rename DYNSELF to SELF. Additionally, direct access to VTABLE methods should be reviewed, and SELF should be used for where possible to increase clarity and maintainability (this is a good CAGE task.) Also, this should become a coding standard for PMCs.
+
+
+=item composition is almost non-existent (roles would be nice)
+
+The current class composition uses interfaces, which seems inadequate. Roles may make better composition units, but may not make supporting Perl 5 OO easier. Leo, chromatic, Matt, and Jonathan traded ideas on the subject. It seems more investigation and discussion is in order.
+
+B<Recommendation>: Leo, chromatic, Matt, and Jonathan should exchange ideas on the subject in a meeting within the next two weeks. Hopefully this exchange of ideas will lead to clarity on a proposed solution to a class composition model.
+
+=item split VTABLE functions into related categories
+
+Someone had mentioned the idea of splitting the PMC vtable functions into groups of related functions that you could choose to implement or not implement. All keyed vtable functions would go in one group, for example.
+
+Leo pointed to a p2 thread on the topic: L<http://groups.google.at/group/perl.perl6.internals/browse_thread/thread/9ea5d132cb6a328b/4b83e54a13116d7c?lnk=st&q=interface+vtable+Toetsch&rnum=2#4b83e54a13116d7c>
+
+Others thought this idea sounded intriguing, and that it was worth pursuing.
+
+B<Recommendation>: Elaboration on this idea is required in order to focus thought on design considerations. No timeframe has been set.
+
+=back
+
+
+=head2 List of problems and proposed solutions for objects:
+
+=over 4
+
+=item Class namespace is global
+
+At present it is not possible for a HLL to define a classname that has already been used by another HLL. (Example: PGE/Perl 6 cannot define a class named 'Closure' because Parrot already has one.) Chip and chromatic discussed this before the meeting, and Chip has a solution 'almost ready.'
+
+Discussion moved into class/namespace relationships, and metaclasses as it relates to method dispatch order, and the potential to incorporate roles instead of metaclasses, which brought the tangent back to previous discussion on class composition, before the discussion was tabled.)
+
+B<Recommendation>: Chip, based on prior thought, as well as this discussion, will detail his plan. We know it includes a registry of class names for each HLL, but more will be revealed soon.
+
+
+=item PMC vtable entries don't work in subclasses (or subsubclasses)
+
+Currently things are handled by deleg_pmc.pmc and default.pmc. Unfortunately, it appears that calls to vtable entries in default.pmc take place before delegation to a superclass. Patrick proposes that this be switched somehow; e.g, inheritance should be preferred over default vtable entries. See L<http://rt.perl.org/rt3//Ticket/Display.html?id=39329>.
+
+B<Recommendation>: Inherit from default.pmc unless you have a parent. Always check inheritance when dispatching, if necessary. Chip will look specifically at Capture PMCs and attempt to provide a solution without architectural changes, enabling Patrick's work to continue.
+
+
+=item PMC methods aren't inherited by ParrotObject pmcs
+
+A METHOD defined in a PMC won't work unless it's been specifically coded to work in a PIR-based subclass. See L<http://rt.perl.org/rt3/Public/Bug/Display.html?id=39329>.
+
+B<Recommendation>: All direct data access should go through accessors, except for within the accessors themselves. This involves a code review of all core and custom PMCs, which has been recommended above as well. This may require further discussion, as Patrick did not seem confident that this statement was sufficient to resolve the situation.
+
+
+=item getattribute/setattribute efficiency
+
+Dan used to often remark that sequences like the following were "very slow":
+
+ $P0 = getattribute obj, "foo"
+ $P1 = getattribute obj, "bar"
+ $P2 = getattribute obj, "baz"
+
+Instead, Dan suggested always using classoffset to obtain attributes:
+
+ $I0 = classoffset obj, "FooClass"
+ $P0 = getattribute obj, $I0 # which attr is this?
+ inc $I0
+ $P0 = getattribute obj, $I0 # and that?
+ inc $I0
+ $P0 = getattribute obj, $I0
+
+Unfortunately, this doesn't seem to be very practical in many respects.  Can we at least get a declaration from the designers about the appropriate style to use for object attributes? I much prefer the former to the latter, and if it's a question of efficiency we should make the former more efficient somehow.
+
+The latter takes 2 opcodes, which is per se suboptimal, The former is much more readable, just one opcode and optimizable and never subject of any caching effects of the offset (e.g. what happens, if the getattribute has some nasty side-effects like adding new attributes?)
+
+Oh well, and classoffset does of course not work for Hash-like or other objects.
+
+B<Recommendation>: Best practice is to use named attribute access. Optimizations, if necessary, will be addressed closer to 1.0. Issues with classoffset and hash-like objects will be addressed in the future as necessary.
+
+
+=head1 AUTHOR
+
+Jerry Gay E<jerry.gay@gmail.com>
+
+=back
