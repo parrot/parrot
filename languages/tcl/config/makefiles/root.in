@@ -238,7 +238,7 @@ SKIPPED_TCL_TESTS = \
 #
 # invalid command name "package"
 #t_tcl/safe.t             t_tcl/winPipe.t         t_tcl/unixInit.t
-#t_tcl/tm.t
+#t_tcl/tm.t               t_tcl/opt.t
 #
 # invalid command name "set"
 #t_tcl/uplevel.t
@@ -311,9 +311,6 @@ SKIPPED_TCL_TESTS = \
 #
 # can't read "actual": no such variable
 #t_tcl/listObj.t
-#
-# can't read "::tcl::OptDescN": no such variable
-#t_tcl/opt.t
 #
 # syntax error, unexpected LABEL (the compiled PIR is truncated. memory issue?)
 #t_tcl/stringObj.t

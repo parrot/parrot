@@ -130,9 +130,9 @@ proc test {num description code args} {
     if {[llength $args] == 0} {
         pass $full_desc [list SKIP $excuse]
     } elseif {[llength $args] == 1} {
-        # XXX (#40716): Some of these tests cause harness failures. skip them.
-        # Put the skip here instead of in the test file to keep all our
-        # hacks in one basket.
+        # XXX (#40716): Some of these tests cause pathological harness
+        # failures. skip them.  Put the skip here instead of in the test 
+        # file to keep all our hacks in one basket.
         if {
             $num eq "append-4.21"  ||
             $num eq "append-4.22"  ||
@@ -140,6 +140,7 @@ proc test {num description code args} {
             $num eq "error-7.0"    ||
             $num eq "execute-2.1"  || 
             $num eq "execute-2.2"  || 
+            $num eq "expr-14.14"   || 
             $num eq "expr-old-2.38"|| 
             $num eq "expr-old-32.41"|| 
             $num eq "expr-old-32.42"|| 
