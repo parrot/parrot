@@ -117,7 +117,7 @@ L4:
 
 =over 4
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<is_equal (value)>
 
 The C<==> operation. Compares reference (not in depth).
 
@@ -149,7 +149,7 @@ L2:
 
 =over 4
 
-=item C<PMC* len()>
+=item C<len ()>
 
 =cut
 
@@ -185,7 +185,7 @@ L4:
     .return (ret)
 .end
 
-=item C<PMC* rawget (PMC* key)>
+=item C<rawget (key)>
 
 =cut
 
@@ -204,7 +204,7 @@ L1:
     .return (ret)
 .end
 
-=item C<void rawset (PMC* key, PMC* value)>
+=item C<rawset (key, value)>
 
 =cut
 
@@ -229,15 +229,6 @@ L2:
     $P0[$S0] = $P1
 L3:
 .end
-
-=back
-
-=head2 Specific Methods
-
-=over 4
-
-=cut
-
 
 =back
 

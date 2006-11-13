@@ -538,7 +538,7 @@ Looks up the method for C<*method_name>.
             PMC *method;
             PMC *key;
 
-            key = pmc_new(interpreter, dynpmc_LuaString);
+            key = pmc_new(INTERP, dynpmc_LuaString);
             PMC_str_val(key) = method_name;
             method = VTABLE_get_pmc_keyed(INTERP, metatable, key);
             if (dynpmc_LuaNil != method->vtable->base_type) {
