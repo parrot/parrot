@@ -136,6 +136,7 @@ proc test {num description code args} {
         if {
             $num eq "append-4.21"  ||
             $num eq "append-4.22"  ||
+            $num eq "compExpr-old-14.14" ||
             $num eq "error-7.0"    ||
             $num eq "execute-2.1"  || 
             $num eq "execute-2.2"  || 

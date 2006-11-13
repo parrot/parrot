@@ -140,6 +140,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/apply.t \
   t_tcl/binary.t \
   t_tcl/compExpr.t \
+  t_tcl/compExpr_old.t \
   t_tcl/concat.t \
   t_tcl/error.t \
   t_tcl/eval.t \
@@ -262,7 +263,6 @@ SKIPPED_TCL_TESTS = \
 #
 #[oops; continuation <foo> of type <bar> is trying to jump from runloop <baz> to runloop 1]
 #t_tcl/ioCmd.t           t_tcl/main.t             
-#t_tcl/compExpr_old.t    
 #
 # src/string.c:972: failed assertion `src->encoding == Parrot_fixed_8_encoding_ptr'
 #t_tcl/parseExpr.t        
