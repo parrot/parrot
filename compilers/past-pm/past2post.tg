@@ -1,0 +1,167 @@
+transform root (PAST::Block) :language('PIR') {
+    .return tree.'get'('post', node)
+}
+
+
+transform post (PAST::Block) :language('PIR') {
+    .local pmc name
+    name = node.'name'()
+    unless null name goto with_name
+    name = node.unique('_block')
+  with_name:
+    .local pmc post
+    post = new 'POST::Sub'
+    post.'init'('node'=>node, 'name'=>name)
+    .local pmc iter
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cpast, cpost
+    cpast = shift iter
+    cpost = tree.'get'('post', cpast)
+    post.'push'(cpost)
+    goto iter_loop
+  iter_end:
+    post.'result'(cpost)
+    .return (post)
+}
+
+
+transform post (PAST::Stmts) :language('PIR') {
+    .local pmc ops
+    ops =  new 'POST::Ops'
+    ops.'init'('node'=>node)
+    .local pmc iter
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cpast, cpost
+    cpast = shift iter
+    cpost = tree.'get'('post', cpast)
+    ops.'push'(cpost)
+  iter_end:
+    ops.'result'(cpost)
+    .return (ops)
+}
+
+
+transform post (PAST::Op) :language('PIR') {
+    .local pmc pasttype
+    pasttype = node.'pasttype'()
+    if null pasttype goto post_pirop
+    if pasttype == '' goto post_pirop
+    .return tree.'get'(pasttype, node)
+
+  post_pirop:
+    .local pmc pirop
+    pirop = node.'pirop'()
+    if null pirop goto post_call
+    if pirop == '' goto post_call
+    .return tree.'get'('pirop', node)
+
+  post_call:
+    .return tree.'get'('call', node)
+}
+
+
+transform call (PAST::Op) :language('PIR') {
+    .local pmc post, name
+    post = new 'POST::Op'
+    post.'init'('node'=>node, 'pirop'=>'call')
+    .local pmc iter, arglist
+    arglist = new .ResizablePMCArray
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cpast, cpost
+    cpast = shift iter
+    cpast.'atype'('*')
+    cpost = tree.'get'('post', cpast)
+    post.'push'(cpost)
+    push arglist, cpost
+    goto iter_loop
+  iter_end:
+    .local pmc name, result
+    name = node.'name'()
+    name = node.'escape'(name)
+    post.'arglist'(name, arglist :flat)
+    .return (post)
+}
+
+
+transform pirop (PAST::Op) :language('PIR') {
+    .local pmc pirop
+    pirop = node.'pirop'()
+    .local pmc post
+    post = new 'POST::Op'
+    post.'init'('node'=>node, 'pirop'=>pirop)
+    .local pmc pirtable
+    .local string atypes
+    pirtable = get_hll_global ['POST'], '%pirtable'
+    atypes =  pirtable[pirop]
+    if atypes > '' goto atypes_done
+    atypes = 'PPPPPP'
+  atypes_done:
+    .local pmc arglist, iter
+    .local int aindex
+    aindex = 1
+    arglist = new .ResizablePMCArray
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cpast, cpost
+    cpast = shift iter
+    $S0 = substr atypes, aindex, 1
+    cpast.'atype'($S0)
+    cpost = tree.'get'('post', cpast)
+    post.'push'(cpost)
+    push arglist, cpost
+    inc aindex
+    goto iter_loop
+  iter_end:
+    $S0 = substr atypes, 0, 1
+    if $S0 == 'v' goto pirop_void
+    if $S0 == 'r' goto pirop_reg
+    $P0 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'new')
+    $P0.'arglist'($P0, '.Undef')
+    post.'result'($P0)
+  pirop_reg:
+    unshift arglist, post
+  pirop_void:
+    post.'arglist'(arglist :flat)
+    .return(post)
+}
+    
+
+transform post (PAST::Val) :language('PIR') {
+    .local pmc vtype, ctype, name
+    vtype = node.'vtype'()
+    ctype = node.'ctype'()
+    name = node.'name'()
+
+    if ctype != 's' goto skip_escape
+    name = node.'escape'(name)
+  skip_escape:
+
+    .local pmc post
+    post = new 'POST::Ops'
+    post.'init'('node'=>node)
+
+    .local pmc atype
+    atype = node.'atype'()
+    if null atype goto return_pmc
+    if atype == '*' goto return_native
+    if atype == ctype goto return_native
+
+  return_pmc:
+    $P0 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'new')
+    $P0.'arglist'($P0, vtype)
+    $P1 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'assign', 'result'=>$P0)
+    $P1.'arglist'($P0, name)
+    post.'result'($P1)
+    .return (post)
+
+  return_native:
+    post.'result'(name)
+    .return (post)
+}

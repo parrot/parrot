@@ -65,6 +65,7 @@ sub makefiles
     genfile('config/gen/makefiles/root.in'      => 'Makefile');
 
     genfile('config/gen/makefiles/past.in'      => 'compilers/past/Makefile');
+    genfile('config/gen/makefiles/past-pm.in'   => 'compilers/past-pm/Makefile');
     genfile('config/gen/makefiles/pge.in'       => 'compilers/pge/Makefile');
     genfile('config/gen/makefiles/tge.in'       => 'compilers/tge/Makefile');
     genfile('config/gen/makefiles/bcg.in'       => 'compilers/bcg/Makefile');
