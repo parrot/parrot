@@ -1,4 +1,4 @@
-#!./parrot 
+#!./parrot
 # Copyright (C) 2006, The Perl Foundation.
 
 =head1 NAME
@@ -11,7 +11,7 @@ t/library/mime_base64.t - test MIME::Base64
 
 =head1 DESCRIPTION
 
-Test MIME::Base64. 
+Test MIME::Base64.
 Test cases taken from base64.t of MIME::Base64.
 
 =cut
@@ -378,10 +378,10 @@ END_JSON
 
     .local pmc enc_sub
     enc_sub = get_global [ "MIME"; "Base64" ], 'encode_base64'
-    
+
     .local pmc is
     is   = get_hll_global ['Test::More'], 'is'
-    
+
     .local string result_encode
     result_encode = enc_sub( plain )
     is( result_encode, base64, comment )
@@ -395,13 +395,13 @@ END_JSON
 
     .local pmc dec_sub
     dec_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
-    
+
     .local pmc eight_to_six
     eight_to_six = get_global 'eight_to_six'
 
     .local pmc is
     is   = get_hll_global ['Test::More'], 'is'
-    
+
     .local string result_decode
     result_decode = dec_sub( base64 )
     is( result_decode, plain, comment )
