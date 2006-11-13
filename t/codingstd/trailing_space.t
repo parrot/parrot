@@ -35,7 +35,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 my $DIST = Parrot::Distribution->new;
 
 my $skip_files = $DIST->generated_files();
-my @files      = @ARGV ? @ARGV : source_files();
+my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @failed_files;
 
 foreach my $file (@files) {
@@ -72,30 +72,6 @@ foreach my $file (@files) {
 ok( !scalar(@failed_files), 'No trailing spaces or tabs' )
     or diag( join $/ => "Trailing space or tab char found in " .
         scalar @failed_files .  " files:", @failed_files );
-
-exit;
-
-sub source_files {
-    return (
-        map( $_->files_of_type('C code'),
-            $DIST->c_source_file_directories ),
-
-        map( $_->files_of_type('C header'),
-            $DIST->c_header_file_directories ),
-
-        map( $_->files_of_type('PMC code'),
-            $DIST->pmc_source_file_directories ),
-
-        map( $_->files_of_type('Yacc file'),
-            $DIST->yacc_source_file_directories ),
-
-        map( $_->files_of_type('Lex file'),
-            $DIST->lex_source_file_directories ),
-
-        map( $_->files_of_type('Parrot opcode file'),
-            $DIST->ops_source_file_directories ),
-    );
-}
 
 # Local Variables:
 #   mode: cperl

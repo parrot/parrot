@@ -31,15 +31,27 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : source_files();
+my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @else;
 
 foreach my $file (@files) {
-    open my $fh, '<', $file
-        or die "Cannot open '$file' for reading: $!\n";
+    my $path;
+
+    ## get the full path of the file
+    # if we have command line arguments, the file is the full path
+    if (@ARGV) {
+        $path = $file;
+    }
+    # otherwise, use the relevant Parrot:: path method
+    else {
+        $path = $file->path;
+    }
+
+    open my $fh, '<', $path
+        or die "Cannot open '$path' for reading: $!\n";
 
     my $tabcount;
-    my $message = qq<  $file:>;
+    my $message = qq<  $path:>;
     while (<$fh>) {
         next unless /}\s*else\s*{/;
         $message .= " $.";
@@ -52,30 +64,6 @@ foreach my $file (@files) {
 
 ok( !scalar(@else), "cuddled else" )
     or diag( "cuddled else found in " . scalar @else . " files:\n@else" );
-
-exit;
-
-sub source_files {
-    return map { $_->path } (
-        map( $_->files_of_type('C code'),
-            $DIST->c_source_file_directories ),
-
-        map( $_->files_of_type('C header'),
-            $DIST->c_header_file_directories ),
-
-        map( $_->files_of_type('PMC code'),
-            $DIST->pmc_source_file_directories ),
-
-        map( $_->files_of_type('Yacc file'),
-            $DIST->yacc_source_file_directories ),
-
-        map( $_->files_of_type('Lex file'),
-            $DIST->lex_source_file_directories ),
-
-        map( $_->files_of_type('Parrot opcode file'),
-            $DIST->ops_source_file_directories ),
-    );
-}
 
 # Local Variables:
 #   mode: cperl

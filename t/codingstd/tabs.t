@@ -31,7 +31,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : source_files();
+my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @tabs;
 
 foreach my $file (@files) {
@@ -64,31 +64,6 @@ foreach my $file (@files) {
 ok( !scalar(@tabs), "tabs in leading whitespace" )
     or diag("Found tab in leading whitespace in " . scalar(@tabs)
         . " files.  Files affected:\n@tabs");
-
-exit;
-
-sub source_files {
-    grep( $_->{PATH} !~ m{ \b imc(parser|lexer)\.[hc] $ }x,
-
-        map( $_->files_of_type('C code'),
-            $DIST->c_source_file_directories ),
-
-        map( $_->files_of_type('C header'),
-            $DIST->c_header_file_directories ),
-
-        map( $_->files_of_type('PMC code'),
-            $DIST->pmc_source_file_directories ),
-
-        map( $_->files_of_type('Yacc file'),
-            $DIST->yacc_source_file_directories ),
-
-        map( $_->files_of_type('Lex file'),
-            $DIST->lex_source_file_directories ),
-
-        map( $_->files_of_type('Parrot opcode file'),
-            $DIST->ops_source_file_directories ),
-    );
-}
 
 # Local Variables:
 #   mode: cperl

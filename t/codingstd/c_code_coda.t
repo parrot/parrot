@@ -44,7 +44,7 @@ my $coda = <<'CODA';
 CODA
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : source_files();
+my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @no_coda;
 my @extra_coda;
 
@@ -91,31 +91,6 @@ ok( !scalar(@no_coda), 'C code coda present' )
 
 ok( !scalar(@extra_coda), 'C code coda appears only once' )
     or diag( "C code coda repeating in " . scalar @extra_coda . " files:\n@extra_coda" );
-
-exit;
-
-sub source_files {
-    grep( $_->{PATH} !~ m{ \b imcparser\.h $ }x,
-
-        map( $_->files_of_type('C code'),
-            $DIST->c_source_file_directories ),
-
-        map( $_->files_of_type('C header'),
-            $DIST->c_header_file_directories ),
-
-        map( $_->files_of_type('PMC code'),
-            $DIST->pmc_source_file_directories ),
-
-        map( $_->files_of_type('Yacc file'),
-            $DIST->yacc_source_file_directories ),
-
-        map( $_->files_of_type('Lex file'),
-            $DIST->lex_source_file_directories ),
-
-        map( $_->files_of_type('Parrot opcode file'),
-            $DIST->ops_source_file_directories ),
-    );
-}
 
 # Local Variables:
 #   mode: cperl
