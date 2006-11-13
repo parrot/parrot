@@ -368,6 +368,53 @@ sub ops_source_file_with_name
     return;
 }
 
+=item C<get_c_language_files()>
+
+Returns the C language source files within Parrot.  Namely:
+
+=over 4
+
+=item C source files C<*.c>
+
+=item C header files C<*.h>
+
+=item (f)lex files C<*.lex>
+
+=item yacc/bison files C<*.y>
+
+=item pmc files C<*.pmc>
+
+=item ops files C<*.ops>
+
+=back
+
+=cut
+
+sub get_c_language_files
+{
+    my $self = shift;
+    grep( $_->{PATH} !~ m{ \b imc(parser|lexer)\.[hc] $ }x,
+
+        map( $_->files_of_type('C code'),
+            $self->c_source_file_directories ),
+
+        map( $_->files_of_type('C header'),
+            $self->c_header_file_directories ),
+
+        map( $_->files_of_type('PMC code'),
+            $self->pmc_source_file_directories ),
+
+        map( $_->files_of_type('Yacc file'),
+            $self->yacc_source_file_directories ),
+
+        map( $_->files_of_type('Lex file'),
+            $self->lex_source_file_directories ),
+
+        map( $_->files_of_type('Parrot opcode file'),
+            $self->ops_source_file_directories ),
+    );
+}
+
 =item C<file_for_perl_module($module)>
 
 Returns the Perl module file for the specified module.
