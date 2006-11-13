@@ -22,6 +22,7 @@ LANGUAGES = \
     cola \
     dotnet \
     ecmascript \
+    forth \
     jako \
     lisp \
     lua \
@@ -91,6 +92,7 @@ clean: \
     cola.clean \
     dotnet.clean \
     ecmascript.clean \
+    forth.clean \
     jako.clean \
     lisp.clean \
     lua.clean \
@@ -209,6 +211,14 @@ ecmascript.test:
 	- $(MAKE) ecmascript test
 ecmascript.clean:
 	- $(MAKE) ecmascript clean
+
+forth : forth.dummy
+forth.dummy:
+	- $(MAKE) forth
+forth.test:
+	- $(MAKE) forth test
+forth.clean:
+	- $(MAKE) forth clean
 
 HQ9plus: HQ9plus.dummy
 HQ9plus.dummy:
