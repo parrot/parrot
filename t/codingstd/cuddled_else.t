@@ -35,17 +35,9 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @else;
 
 foreach my $file (@files) {
-    my $path;
-
-    ## get the full path of the file
     # if we have command line arguments, the file is the full path
-    if (@ARGV) {
-        $path = $file;
-    }
     # otherwise, use the relevant Parrot:: path method
-    else {
-        $path = $file->path;
-    }
+    my $path = @ARGV ? $file : $file->path;
 
     open my $fh, '<', $path
         or die "Cannot open '$path' for reading: $!\n";

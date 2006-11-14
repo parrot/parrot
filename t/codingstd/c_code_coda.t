@@ -50,18 +50,9 @@ my @extra_coda;
 
 foreach my $file (@files) {
     my $buf;
-    my $path;
-
-    ## get the full path of the file
     # if we have command line arguments, the file is the full path
-    if (@ARGV) {
-        $path = $file;
-    }
-
     # otherwise, use the relevant Parrot:: path method
-    else {
-        $path = $file->path;
-    }
+    my $path = @ARGV ? $file : $file->path;
 
     # slurp in the file
     open( my $fh, '<', $path )
