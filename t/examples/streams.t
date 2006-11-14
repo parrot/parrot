@@ -267,9 +267,16 @@ EXP_PARROTIO
 #        },
 #=cut
 
-for my $io ( keys %expected ) {
+for my $io ( sort keys %expected ) {
     while ( my ( $example, $expected ) = each %{$expected{$io}} ) {
-        example_output_is( "examples/streams/$example", $expected );
+    if( $^O eq 'MSWin32' ) {
+        if( grep { $_ eq $example } qw/ParrotIO.pir FileLines.pir/ ) {
+            local $TODO = 'not testable on windows yet';
+            fail( $example );
+            next;
+        }
+    }
+       example_output_is( "examples/streams/$example", $expected );
     }
 }
 
