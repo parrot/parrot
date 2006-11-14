@@ -1712,11 +1712,11 @@ directory_pack (Interp* interp, struct PackFile_Segment *self,
         const size_t size = seg->op_count;
         opcode_t * const ret = PackFile_Segment_pack(interp, seg, cursor);
 
-        if ((size_t)(ret - cursor) != size) {
+        if (!PackFile_check_segment_size(size, seg->name)) {
             internal_exception(1, "directory_pack segment '%s' used size %d "
                 "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);
         }
-        cursor = ret;
+        cursor += size;
     }
 
     return cursor;
