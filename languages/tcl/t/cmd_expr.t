@@ -312,6 +312,7 @@ is [set tcl_precision 7; expr 1/3.] 0.3333333 { precision 7}
 is [set tcl_precision 12; expr 1/3.] 0.333333333333 { precision 12}
 
 # blocker bugs for t_tcl/expr.t parsing.
-eval_is {expr (1<<63)-1} 2147483647 {expr-32.4}
-eval_is {expr -2147483648} -2147483648 {expr-46.17}
-eval_is {expr 9223372036854775808} 9223372036854775808 {expr-46.19}
+set TODO {TODO "awaiting real bigint support"}
+eval_is {expr (1<<63)-1} 2147483647 {expr-32.4} $TODO
+eval_is {expr -2147483648} -2147483648 {expr-46.17} $TODO
+eval_is {expr 9223372036854775808} 9223372036854775808 {expr-46.19} $TODO
