@@ -723,7 +723,7 @@ do_sprintf:
                                                 strcat(tc, " ");
                                             else {
                                                 mem_sys_memmove(&tc[1], &tc[0], strlen(tc) + 1);
-                                                tc[0] = ' ';
+                                                tc[0] = (info.flags & FLAG_ZERO) ? '0' : ' ';
                                             }
                                         }
 
