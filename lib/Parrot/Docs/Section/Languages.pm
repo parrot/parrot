@@ -40,6 +40,7 @@ sub new
         'Language Implementations', 'languages.html', '',
         $self->new_item('', 'languages/LANGUAGES.STATUS.pod'),
         $self->new_item('', 'languages/t/harness'),
+        $self->new_section('abc', 'abc.html', '', 'languages/abc'),
         $self->new_section('amber', 'amber.html', '', 'languages/amber'),
         $self->new_section('APL', 'apl.html', '', 'languages/APL'),
         $self->new_section('BASIC', 'basic.html', '', 'languages/BASIC'),

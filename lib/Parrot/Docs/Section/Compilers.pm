@@ -49,6 +49,8 @@ sub new
             'compilers/tge' ),
         $self->new_group( 'PAST', 'the Parrot/Punie Abstract Syntax Tree',
             'compilers/past' ),
+        $self->new_group( 'PAST-pm', 'the Parrot/Punie Abstract Syntax Tree (new implementation)',
+            'compilers/past-pm' ),
         $self->new_group( 'POST', 'the Parrot/Punie Opcode Syntax Tree',
             'compilers/post' ),
         $self->new_group( 'BCG', 'Byte Code Generation',
