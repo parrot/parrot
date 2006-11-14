@@ -9,7 +9,7 @@ rule list_item { <quoted_string> | <atom> | <list> | <empty_list> }
 
 token empty_list { <quote>? \(\) }
 
-token atom { [ <symbol_tag> | <quote> ]? <-[ \n\r\(\)]>+ }
+token atom { [ <symbol_tag> | <quote> ]? <-[\ \n\r\(\)]>+ }
 
 token quoted_string { <PGE::Text::bracketed: "> }
 
