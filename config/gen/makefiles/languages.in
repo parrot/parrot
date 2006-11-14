@@ -31,6 +31,7 @@ LANGUAGES = \
     ook \
     parrot_compiler \
     perl6 \
+    pheme \
     punie \
     regex \
     scheme \
@@ -102,6 +103,7 @@ clean: \
     ook.clean \
     parrot_compiler.clean \
     perl6.clean \
+    pheme.clean \
     punie.clean \
     regex.clean \
     scheme.clean \
@@ -293,6 +295,14 @@ perl6.test:
 	- $(MAKE) perl6 test
 perl6.clean:
 	- $(MAKE) perl6 clean
+
+pheme : pheme.dummy
+pheme.dummy:
+	- $(MAKE) pheme
+pheme.test:
+	- $(MAKE) pheme test
+pheme.clean:
+	- $(MAKE) pheme clean
 
 punie : punie.dummy
 punie.dummy:
