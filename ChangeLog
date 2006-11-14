@@ -1,5 +1,9 @@
 #1 $Id$
 
+2006.11.14    chip
+	* Released 0.4.7
+	See NEWS for more.
+
 2006.11.07	tewk
 	* added :init pragma functionality to subs
 
