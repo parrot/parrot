@@ -39,9 +39,6 @@ To add a new test, you do not have to modify this script:
  4. put the expected output as a file : toto.pir.output
  5. if you need an input file (to be read from stdin), call it toto.pir.input
 
-
-
-
 See the explanation of benchmarks and sample data for reduced N benches at
 http://shootout.alioth.debian.org/sandbox/
 
@@ -52,13 +49,14 @@ http://shootout.alioth.debian.org/sandbox/
 L<"http://rt.perl.org/rt3/Public/Bug/Display.html?id=40064">
 
 =cut
+
 my %skips = (
-    'pidigits.pir' => 
-            [ 'not exists $PConfig{HAS_GMP}', 'needs GMP' ],
-    'recursive.pir' => 
-            [ '$PConfig{cpuarch} !~ /86/', 'float JIT broken on non-x86' ],
-    'recursive-2.pir' => 
-            [ '$PConfig{cpuarch} !~ /86/', 'float JIT broken on non-x86' ],
+    'pidigits.pir' =>
+        [ 'not exists $PConfig{HAS_GMP}', 'needs GMP' ],
+    'recursive.pir' =>
+        [ '$PConfig{cpuarch} !~ /86/', 'float JIT broken on non-x86' ],
+    'recursive-2.pir' =>
+        [ '$PConfig{cpuarch} !~ /86/', 'float JIT broken on non-x86' ],
 );
 my $INPUT_EXT = '.input';
 foreach my $script (@shootouts) {
@@ -86,8 +84,11 @@ foreach my $script (@shootouts) {
         $args =~ s/-Cj/-C/;
     }
     unless ($PConfig{cg_flag} =~ /HAVE/) {
-        $args =~ s/-C//;
+        $args =~ s/-Cj/-j/;
+        $args =~ s/C//;
     }
+
+    $args eq '-' and $args = '';
 
     # look for input files
     my $input = "$file$INPUT_EXT";
