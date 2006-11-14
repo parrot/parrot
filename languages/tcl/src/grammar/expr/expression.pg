@@ -8,7 +8,7 @@ grammar TclExpr::Grammar;
 token ws { \h* }
 
 token program {
-   | $<constant>:=[^$]
+   | $<constant>:=[^\s*$]
    | <[;\n\r\t\ ]>* <command> [ <?ws> <[\n;]> <?ws> <command>? ]* 
 }
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Test::More;
 
 language_output_is( 'tcl', <<'TCL', <<'OUT', 'multiple foreaches. seems to need puts to trigger.' );
@@ -220,6 +220,12 @@ language_output_is( 'tcl',
   puts $value
 TCL
 2
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', '{\n}');
+proc new {} {
+}
+TCL
 OUT
 
 # Local Variables:
