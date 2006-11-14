@@ -20,7 +20,6 @@ To prepare a release:
         a.  Increment the version number in:
             - VERSION
             - parrot.spec,
-            - compilers/imcc/main.c
             - MANIFEST.generated
             - META.yml
 
