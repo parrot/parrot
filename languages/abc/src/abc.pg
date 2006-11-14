@@ -93,7 +93,7 @@ proto 'infix:>'     is equiv('infix:==') { ... }
 proto 'infix:>='    is equiv('infix:==') { ... }
 
 ## boolean
-proto 'prefix:!'    is looser('infix:==') is assoc('non')  { ... }
+proto 'prefix:!'    is looser('infix:==') is pirop('not') is returns('.Integer') { ... }
 proto 'infix:&&'    is looser('prefix:!') is assoc('left') { ... }
 proto 'infix:||'    is looser('infix:&&') is assoc('left') { ... }
 

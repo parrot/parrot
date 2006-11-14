@@ -25,15 +25,16 @@ transform past (ABC::Grammar::expr) :language('PIR') {
     if type == 'term:' goto past_term
 
     .local pmc optable, optok
-    .local string pasttype, pirop
+    .local string pasttype, pirop, returns
     optable = get_hll_global [ 'ABC::Grammar' ], '$optable'
     optok = optable[type]
     pasttype = optok['past']
     pirop = optok['pirop']
+    returns = optok['returns']
 
     .local pmc past, iter
     past = new 'PAST::Op'
-    past.'init'('node'=>node, 'name'=>type, 'pasttype'=>pasttype, 'pirop'=>pirop)
+    past.'init'('node'=>node, 'name'=>type, 'pasttype'=>pasttype, 'pirop'=>pirop, 'returns'=>returns)
 
     $P0 = node.'get_array'()
     if null $P0 goto iter_end

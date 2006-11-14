@@ -122,8 +122,15 @@ transform pirop (PAST::Op) :language('PIR') {
     $S0 = substr atypes, 0, 1
     if $S0 == 'v' goto pirop_void
     if $S0 == 'r' goto pirop_reg
+    .local string returns
+    returns = '.Undef'
+    $P0 = node.'returns'()
+    if null $P0 goto pirop_returns
+    if $P0 == '' goto pirop_returns
+    returns = $P0
+  pirop_returns:
     $P0 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'new')
-    $P0.'arglist'($P0, '.Undef')
+    $P0.'arglist'($P0, returns)
     post.'result'($P0)
   pirop_reg:
     unshift arglist, post

@@ -229,6 +229,12 @@ for compiling programs in Parrot.
     .return self.'attr'('pirop', value, has_value)
 .end
 
+.sub 'returns' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('returns', value, has_value)
+.end
+
 .include 'POST.pir'
 
 .namespace [ 'POST::Grammar' ]
