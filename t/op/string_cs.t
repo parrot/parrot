@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 51;
+use Parrot::Test tests => 50;
 use Parrot::Config;
 
 
@@ -249,25 +249,6 @@ CODE
 0 2 5 7 ok
 OUTPUT
 
-SKIP: {
-  skip('TODO wordboundary has no cclass', 1);
-pasm_output_is( <<'CODE', <<OUTPUT, "find a word_boundary");
-    set S0, "_ab 09z"
-    set I0, 0
-lp:
-    find_cclass I0, .CCLASS_???, S0, I0, I1
-    print I0
-    print " "
-    eq I0, -1, done
-    inc I0
-    branch lp
-done:
-    print "ok\n"
-    end
-CODE
-0 2 3 6 7 ok
-OUTPUT
-}
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i");
     set S0, "abc"

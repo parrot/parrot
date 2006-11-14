@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 17;
 
 =head1 NAME
 
@@ -79,50 +79,6 @@ back
 bar
 fin
 OUTPUT
-
-SKIP: {
-  skip("too much old calling conventions", 1);
-pasm_output_is(<<'CODE', <<'OUTPUT', "nano forth sub");
-_main:
-    load_bytecode "examples/assembly/nanoforth2.pasm"
-    print "ok 1\n"
-    find_global P0, "_nano_forth_compiler"
-    defined I0, P0
-    if I0, ok2
-    print "not "
-ok2:
-    print "ok 2\n"
-    set S5, "1 7 + . 2 3 - .\n"
-    set I0, 1
-    set I1, 0
-    set I2, 1
-    set I3, 0
-    set I4, 0
-    invokecc
-    set S5, ": i 1 + ; 5 i .\n"
-    set I0, 1
-    set I1, 0
-    set I2, 1
-    set I3, 0
-    set I4, 0
-    invokecc
-    set S5, ": i 1 + ; : j i i ; 9 j .\n"
-    set I0, 1
-    set I1, 0
-    set I2, 1
-    set I3, 0
-    set I4, 0
-    # XXX fails with -S
-    # invokecc
-    end
-CODE
-ok 1
-ok 2
-8
--1
-6
-OUTPUT
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
 
