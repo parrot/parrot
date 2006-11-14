@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 35;
 
 =head1 NAME
 
@@ -1133,6 +1133,25 @@ pir_output_is(<<"CODE", <<'OUTPUT', 'splice with another type');
   $splice_postamble
 CODE
 123ABCDE
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice with empty replacement');
+  $splice_preamble
+  P2 = new .ResizablePMCArray
+  splice P1, P2, 2, 2
+  $splice_postamble
+CODE
+125
+OUTPUT
+
+pir_output_is(<<"CODE", <<'OUTPUT', 'splice with equal size replacement');
+  $splice_preamble
+  P2 = new .ResizablePMCArray
+  P2[0] = 'A'
+  splice P1, P2, 2, 1
+  $splice_postamble
+CODE
+12A45
 OUTPUT
 
 # don't forget to change the number of tests
