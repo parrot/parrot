@@ -9,8 +9,6 @@ for compiling programs in Parrot.
 
 =head1 METHODS
 
-=over 4
-
 =cut
 
 .namespace [ 'POST' ]
@@ -40,7 +38,7 @@ for compiling programs in Parrot.
     set_hll_global ['POST'], '%pirtable', pirtable
     .return ()
 .end
-    
+
 
 .namespace [ 'POST::Node' ]
 
@@ -152,8 +150,8 @@ for compiling programs in Parrot.
     self['arglist'] = arglist
     .return (arglist)
 .end
-   
- 
+
+
 .sub 'pir' :method
     .local pmc code, arglist
     code = self.'cpir'()
@@ -171,7 +169,7 @@ for compiling programs in Parrot.
     code.'emit'('    %r = %n(%,)', arglist :flat, 'r'=>result, 'n'=>name)
     .return (code)
 .end
-    
+
 
 .namespace [ 'POST::Sub' ]
 
@@ -197,4 +195,4 @@ for compiling programs in Parrot.
     code .= $P0
     set_hll_global ['POST'], '$!subpir', code
 .end
-    
+

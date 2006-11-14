@@ -9,8 +9,6 @@ for compiling programs in Parrot.
 
 =head1 METHODS
 
-=over 4
-
 =cut
 
 .namespace [ 'PAST' ]
@@ -19,10 +17,10 @@ for compiling programs in Parrot.
     load_bytecode 'TGE.pbc'
     $P0 = getclass 'TGE::Grammar'
     $P1 = subclass $P0, 'POST::Grammar'
-  
+
     ##   create the PAST::Node base class
     ##   XXX: Eventually we want this to be a subclass of
-    ##   Capture, but as of now Capture isn't working.  
+    ##   Capture, but as of now Capture isn't working.
     ##   So, we'll simulate it for now.
     .local pmc base
     load_bytecode 'Parrot/Capture_PIR.pir'
@@ -40,7 +38,7 @@ for compiling programs in Parrot.
 
     .return ()
 .end
-    
+
 
 .namespace [ 'PAST::Node' ]
 
@@ -125,7 +123,7 @@ for compiling programs in Parrot.
     self['pos'] = $P1
     .return ()
 .end
-  
+
 
 .sub 'attr' :method
     .param string attrname
