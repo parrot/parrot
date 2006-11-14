@@ -21,6 +21,7 @@ for compiling programs in Parrot.
     $P0 = subclass base, 'POST::Op'
     $P0 = subclass base, 'POST::Ops'
     $P0 = subclass base, 'POST::Sub'
+    $P0 = subclass base, 'POST::Label'
 
     .local pmc pirtable
     pirtable = new .Hash
@@ -196,3 +197,31 @@ for compiling programs in Parrot.
     set_hll_global ['POST'], '$!subpir', code
 .end
 
+
+.namespace [ 'POST::Label' ]
+
+.sub 'result' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    if has_value goto set_value
+    value = self['value']
+    unless null value goto end
+    .local string name
+    name = self.'name'()
+    value = self.'unique'(name)
+  set_value:
+    self['value'] = value
+  end:
+    .return(value)
+.end
+
+
+.sub 'pir' :method
+    .local string code
+    .local string value
+    value = self.'result'()
+    code = '  '
+    code .= value
+    code .= ":\n"
+    .return (code)
+.end

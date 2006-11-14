@@ -131,6 +131,59 @@ transform pirop (PAST::Op) :language('PIR') {
     post.'arglist'(arglist :flat)
     .return(post)
 }
+
+
+transform if (PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local pmc exprpast, thenpast, elsepast
+    .local pmc exprpost, thenpost, elsepost
+    exprpast = node[0]
+    thenpast = node[1]
+    elsepast = node[2]
+
+    .local pmc thenlabel, endlabel
+    .local string n
+    n = node.'unique'()
+    $S0 = concat 'then_', n
+    thenlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = concat 'end_', n
+    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+
+    exprpost = tree.'get'('post', exprpast)
+    ops.'push'(exprpost)
+    .local pmc pasttype
+    pasttype = node.'pasttype'()
+    $P0 = ops.'push_new'('POST::Op', 'pirop'=>pasttype)
+    $P0.'arglist'(exprpost, thenlabel)
+    elsepost = exprpost
+    $I0 = defined elsepast
+    if $I0 == 0 goto else_done
+    elsepost = tree.'get'('post', elsepast)
+    ops.'push'(elsepost)
+  else_done:
+    $P0 = ops.'push_new'('POST::Op', 'pirop'=>'set')
+    $P0.'arglist'(ops, elsepost)
+    ops.'push_new'('POST::Op', 'pirop'=>'goto', 'arglist'=>endlabel)
+    ops.'push'(thenlabel)
+    thenpost = exprpost
+    $I0 = defined thenpast
+    if $I0 == 0 goto then_done
+    thenpost = tree.'get'('post', thenpast)
+    ops.'push'(thenpost)
+  then_done:
+    $P0 = ops.'push_new'('POST::Op', 'pirop'=>'set')
+    $P0.'arglist'(ops, thenpost)
+    ops.'push'(endlabel)
+    .return (ops)
+}
+
+
+transform unless (PAST::Op) :language('PIR') {
+    .return tree.'get'('if', node)
+}
     
 
 transform post (PAST::Val) :language('PIR') {
