@@ -56,7 +56,7 @@
  *
  *
  *  NOTE: Most usage of this function is with
- *        IMCC_INFO(interpreter)->cur_unit, but there are some
+ *        IMCC_INFO(interp)->cur_unit, but there are some
  *        exceptions. Thus, we can't easily factorize that piece of
  *        code.
  */
