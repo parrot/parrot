@@ -8,7 +8,11 @@ t/doc/pod.t - Pod document syntax tests
 
 =head1 SYNOPSIS
 
+    # test all files
     % prove t/doc/pod.t
+
+    # test specific files
+    % perl t/doc/pod.t perl_module.pm perl_file.pl
 
 =head1 DESCRIPTION
 
@@ -51,9 +55,17 @@ my $build_dir = $PConfig{build_dir};
 my $manifest     = maniread("$build_dir/MANIFEST");
 my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
 
-diag "finding files with pod, this may take a minute.";
+# if we have files passed in at the command line, use them
+my @files;
+if (@ARGV) {
+    @files = @ARGV;
+}
+else {
+    diag "finding files with pod, this may take a minute.";
+    @files = (keys(%$manifest), keys(%$manifest_gen));
+}
 
-foreach my $file (keys(%$manifest), keys(%$manifest_gen)) {
+foreach my $file (@files) {
     $file = "$build_dir/$file";
     # skip binary files (including .pbc files)
     next if -B $file;
