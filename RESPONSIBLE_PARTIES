@@ -15,5 +15,6 @@ Garbage Collector               ? <volunteer?>
 IMCC & PIR                      Leopold Toetsch, Vishal Soni
 Debian packaging                Florian Ragwitz
 Test suite                      Jerry Gay
+Bytecode format and loader      Jonathan Worthington
 
 See also languages/LANGUAGES.STATUS.pod for language authors/maintainers.
