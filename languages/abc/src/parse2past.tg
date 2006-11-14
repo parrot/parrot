@@ -10,12 +10,46 @@ transform root (ROOT) :language('PIR') {
 
 
 transform past (ABC::Grammar::statement) :language('PIR') {
+  if_statement:
+    $P0 = node['if_statement']
+    if null $P0 goto expression
+    .return tree.'get'('past', $P0, 'ABC::Grammar::if_statement')
+  expression:
     $P0 = node['expression']
-    $P0 = $P0['expr']
-    .local pmc past, cpast
-    cpast = tree.'get'('past', $P0, 'ABC::Grammar::expr')
+    .local pmc cpast, past
+    cpast = tree.'get'('past', $P0, 'ABC::Grammar::expression')
     past = cpast.'new'('PAST::Op', cpast, 'node'=>node, 'pirop'=>'say')
     .return (past)
+}
+
+
+transform past (ABC::Grammar::if_statement) :language('PIR') {
+    .local pmc exprnode, thennode, elsenode
+    exprnode = node['expression']
+    $P0 = node['statement']
+    thennode = $P0[0]
+    elsenode = $P0[1]
+
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'if')
+    .local pmc exprpast, thenpast, elsepast
+    exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
+    past.'push'(exprpast)
+    thenpast = tree.'get'('past', thennode, 'ABC::Grammar::statement')
+    past.'push'(thenpast)
+    $I0 = defined elsenode
+    if $I0 == 0 goto done_else
+    elsepast = tree.'get'('past', elsenode, 'ABC::Grammar::statement')
+    past.'push'(elsepast)
+  done_else:
+    .return (past)
+}
+
+
+transform past (ABC::Grammar::expression) :language('PIR') {
+    $P0 = node['expr']
+    .return tree.'get'('past', $P0, 'ABC::Grammar::expr')
 }
 
 
