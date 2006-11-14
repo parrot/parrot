@@ -145,6 +145,11 @@ the same line as the return type.
 
 =item *
 
+Pointer types should be written with separation between the star and the base
+type, e.g. C<Interp *foo>, but not e.g. <Interp* foo>.
+
+=item *
+
 There should be one space between C keywords and following open parentheses,
 e.g. C<return (x+y)*2>.
 
@@ -232,9 +237,13 @@ compilers handle C++-style comments.)
 
 =item *
 
-All functions must have prototypes in scope at the point of use.  Prototypes
-for extern functions must appear only in header files.  If static functions
-are defined before use, their definitions serve as prototypes.
+Structure types must have tags.
+
+=item *
+
+Functions must have prototypes in scope at the point of use.  Prototypes for
+extern functions must appear only in header files.  If static functions are
+defined before use, their definitions serve as prototypes.
 
 =item *
 
@@ -255,6 +264,14 @@ The following I<should> apply
 
 =item *
 
+Structure types should have typedefs with the same name as their tags, e.g.:
+
+    typedef struct Foo {
+        ...
+    } Foo;
+
+=item *
+
 Avoid double negatives, e.g. C<#ifndef NO_FEATURE_FOO>.
 
 =item *
@@ -262,7 +279,7 @@ Avoid double negatives, e.g. C<#ifndef NO_FEATURE_FOO>.
 Do not compare directly against NULL, 0, or FALSE.  Instead, write a boolean
 test, e.g. C<if (!foo) ...>.
 
-(Note: C<PMC*> values should be checked for nullity with the C<PMC_IS_NULL>
+(Note: C<PMC *> values should be checked for nullity with the C<PMC_IS_NULL>
 macro, unfortunately leading to violations of the double-negative rule.)
 
 =item *
@@ -311,6 +328,110 @@ Perl source files must end with this coda:
 {{ XXX - Proper formatting and syntax coloring of C code under Emacs requires
 that Emacs know about typedefs.  We should provide a simple script to update a
 list of typedefs, and parrot.el should read it or contain it. }}
+
+
+=head2 Portability
+
+Parrot runs on many, many platforms, and will no doubt be ported to ever more
+bizarre and obscure ones over time.  You should never assume an operating
+system, processor architecture, endian-ness, size of standard type, or
+anything else that varies from system to system.
+
+Since most of Parrot's development uses GNU C, you might accidentally depend
+on a GNU feature without noticing.  To avoid this, know what features of gcc
+are GNU extensions, and use them only when they're protected by #ifdefs.
+
+
+=head2 Defensive Programming
+
+=head3 Use Parrot data structures instead of C strings and arrays
+
+C arrays, including strings, are very sharp tools without safety guards, and
+Parrot is a large program maintained by many people.  Therefore:
+
+Don't use a C<char *> when a Parrot STRING would suffice.  Don't use a C array
+when a Parrot array PMC would suffice.  If do use a C<char *> or C array,
+check and recheck your code for even the slightest possibility of buffer
+overflow or memory leak.
+
+Note that efficiency of some low-level operations may be a reason to break
+this rule.  Be prepared to justify your choices to a jury of your peers.
+
+=head3 Pass only C<unsigned char> to C<isxxx()> and C<toxxx()>
+
+Pass only values in the range of C<unsigend char> (and the special value -1,
+a.k.a. C<EOF>) to the isxxx() and toxxx() library functions.  Passing signed
+characters to these functions is a very common error and leads to incorrect
+behavior at best and crashes at worst.  And under most of the compilers Parrot
+targets, C<char> I<is> signed.
+
+=head3 The C<const> keyword on arguments
+
+Use the C<const> keyword as often as possible on pointers.  It lets
+the compiler know when you intend to modify the contents of something.
+For example, take this definition:
+
+    int strlen(const char *p);
+
+The C<const> qualifier tells the compiler that the argument will not be
+modified.  The compiler can then tell you that this is an uninitialized
+variable:
+
+    char *p;
+    int n = strlen(p);
+
+Without the C<const>, the compiler has to assume that C<strlen()> is
+actually initializing the contents of C<p>.
+
+=head3 The C<const> keyword on variables
+
+If you're declaring a temporary pointer, declare it C<const>, with the
+const to the right of the C<*>, to indicate that the pointer should not
+be modified.
+
+    Wango * const w = get_current_wango();
+    w->min = 0;
+    w->max = 14;
+    w->name = "Ted";
+
+This prevents you from modifying C<w> inadvertantly.
+
+    new_wango = w++; /* Error */
+
+If you're not going to modify the target of the pointer, put a C<const>
+to the left of the type, as in:
+
+    const Wango * const w = get_current_wango();
+    if (n < wango->min || n > wango->max) {
+        /* do something */
+    }
+
+=head3 Localizing variables
+
+Declare variables in the innermost scope possible.
+
+    if (foo) {
+        int i;
+        for (i = 0; i < n; i++)
+            do_something(i);
+    }
+
+Don't reuse unrelated variables.  Localize as much as possible, even if
+the variables happen to have the same names.
+
+    if (foo) {
+        int i;
+        for (i = 0; i < n; i++)
+            do_something(i);
+    }
+    else {
+        int i;
+        for (i = 14; i > 0; i--)
+            do_something_else(i * i);
+    }
+
+You could hoist the C<int i;> outside the test, but then you'd have an
+C<i> that's visible after it's used, which is confusing at best.
 
 
 
@@ -728,103 +849,10 @@ single field:
     FOO_valid_value_SETALL(foo);
 
 Similarly, avoid using a char* (or {char*,length}) if it is feasible to later
-use a PMC* at the same point: cf UTF-8 hash keys in Perl 5.
+use a C<PMC *> at the same point: cf UTF-8 hash keys in Perl 5.
 
 Of course, private code hidden behind an API can play more fast and loose than
 code which gets exposed.
-
-
-=head2 Portability
-
-Related to extensibility is portability. Perl runs on many, many platforms, and
-will no doubt be ported to ever more bizarre and obscure ones over time.  You
-should never assume an operating system, processor architecture, endian-ness,
-word size, or whatever. In particular, don't fall into any of the following
-common traps:
-
-Internal data types and their utility functions (especially for strings) should
-be used over a bare char * whenever possible. Ideally there should be no char *
-in the source anywhere, and no use of C's standard string library.
-
-Don't assume GNU C, and don't use any GNU extensions unless protected by
-#ifdefs for non-GNU-C builds.
-
-
-TBC ... Any contributions welcome !!!
-
-
-=head2 Defensive programming
-
-=head3 The C<const> keyword on arguments
-
-Use the C<const> keyword as often as possible on pointers.  It lets
-the compiler know when you intend to modify the contents of something.
-For example, take this definition:
-
-    int strlen( const char *p );
-
-The C<const> qualifier tells the compiler that the argument will not be
-modified.  The compiler can then tell you that this is an uninitialized
-variable:
-
-    char *p;
-    int n = strlen(p);
-
-Without the C<const>, the compiler has to assume that C<strlen()> is
-actually initializing the contents of C<p>.
-
-=head3 The C<const> keyword on variables
-
-If you're declaring a temporary pointer, declare it C<const>, with the
-const to the right of the C<*>, to indicate that the pointer should not
-be modified.
-
-    Wango * const w = get_current_wango();
-    w->min = 0;
-    w->max = 14;
-    w->name = "Ted";
-
-This prevents you from modifying C<w> inadvertantly.
-
-    new_wango = w++; /* Error */
-
-If you're not going to modify the target of the pointer, put a C<const>
-to the left of the type, as in:
-
-    const Wango * const w = get_current_wango();
-    if ( n < wango->min || n > wango->max ) {
-        /* do something */
-    }
-
-=head3 Localizing variables
-
-Declare variables in the innermost scope possible.
-
-    if ( foo ) {
-        int i;
-        for ( i=0; i<n; i++ ) {
-            do_something(i);
-        }
-    }
-
-Don't reuse unrelated variables.  Localize as much as possible, even if
-the variables happen to have the same names.
-
-    if ( foo ) {
-        int i;
-        for ( i=0; i<n; i++ ) {
-            do_something(i);
-        }
-    }
-    else {
-        int i;
-        for ( i=14; i>0; i-- ) {
-            do_something_else(i*i);
-        }
-    }
-
-You could hoist the C<int i;> outside the test, but now you'll have an
-C<i> that's visible after it's used, which is confusing at best.
 
 =head2 Performance
 
