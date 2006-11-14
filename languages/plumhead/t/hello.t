@@ -19,7 +19,7 @@ use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 4;
+use Test::More     tests => 5;
 
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
@@ -66,10 +66,20 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello in a var' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello in a scalar' );
 <?php
 $h = "Hello, World!\n";
 echo $h;
+?>
+END_CODE
+Hello, World!
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello in a hash' );
+<?php
+$h["e"] = "Hello, World!\n";
+echo $h["e"];
 ?>
 END_CODE
 Hello, World!

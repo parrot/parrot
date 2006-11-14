@@ -56,7 +56,7 @@ that is used by punie.
 </xsl:template>
 
 <xsl:template match="phc:AST_method_invocation" >
-  <past:Op op='print' >
+  <past:Op name='print' >
     <xsl:apply-templates select="phc:AST_actual_parameter_list" />
   </past:Op>
 </xsl:template>
@@ -66,9 +66,7 @@ that is used by punie.
 </xsl:template>
 
 <xsl:template match="phc:AST_actual_parameter" >
-  <past:Exp>
-    <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_variable" />
-  </past:Exp>
+  <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_variable" />
 </xsl:template>
 
 <xsl:template match="phc:AST_bin_op" >
@@ -92,9 +90,9 @@ that is used by punie.
 </xsl:template>
 
 <xsl:template match="phc:Token_string" >
-  <past:Val valtype="strq" >
+  <past:Val ctype="s" >
     <xsl:attribute name="encoding" ><xsl:value-of select="phc:value/@encoding" /></xsl:attribute>
-    <xsl:apply-templates select="phc:value" />
+    <xsl:attribute name="name" ><xsl:value-of select="phc:value" /></xsl:attribute>
   </past:Val>
 </xsl:template>
 
@@ -118,9 +116,7 @@ that is used by punie.
 <xsl:template match="phc:AST_if" >
   <past:Stmt>
     <past:Op op="print" >
-      <past:Exp>
-        <past:Val valtype="strq" encoding="base64" >ICAgIDxzdHJvbmc+Q29uZGl0aW9uIGlzIHRydWUuPC9zdHJvbmc+CiAg</past:Val>
-      </past:Exp>
+      <past:Val valtype="strq" encoding="base64" >ICAgIDxzdHJvbmc+Q29uZGl0aW9uIGlzIHRydWUuPC9zdHJvbmc+CiAg</past:Val>
     </past:Op>
   </past:Stmt>
 </xsl:template>

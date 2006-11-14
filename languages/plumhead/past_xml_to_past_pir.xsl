@@ -10,7 +10,7 @@ $Id$
 
 This transformation takes an abstract syntax tree as generated 
 by phc_xml_to_past_xml.xsl. It generates a script in PIR that creates
-a PAST and runs the PAST with help of the parrot compiler tools.
+a Patrick Michaud PAST and runs the PAST.
 
 -->
 <xsl:output method='text' />
@@ -22,64 +22,30 @@ a PAST and runs the PAST with help of the parrot compiler tools.
                                                                   
 .sub plumhead :main                                                     
 
-  load_bytecode 'PAST.pbc'                                        
-  load_bytecode 'languages/punie/lib/POST.pir'                    
-  load_bytecode 'languages/punie/lib/PunieOpLookup.pir'
-  load_bytecode 'languages/punie/lib/OSTGrammar.pir'              
+  load_bytecode 'PAST-pm.pbc'                                        
   load_bytecode 'MIME/Base64.pbc'              
+  load_bytecode 'dumper.pbc'
                                                                   
   # phc encodes most but not all strings in base64
   .local pmc decode_base64
   decode_base64 = get_global [ "MIME"; "Base64" ], 'decode_base64'
     
   # The root node of PAST.
-  # It will receive another PAST::Stmts node as daughter 
+  .local pmc past
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
-  past_node_<xsl:value-of select="generate-id(.)" /> = new 'PAST::Stmts'                                       
-  
+  past_node_<xsl:value-of select="generate-id(.)" />  = new 'PAST::Block'
+  past_node_<xsl:value-of select="generate-id(.)" />.init('name' => 'anon')
+
   <xsl:apply-templates />
 
-  # say 'AST tree dump:'                                          
-  # past_node_<xsl:value-of select="generate-id(.)" />.dump()                                                  
+  '_dumper'(past_node_<xsl:value-of select="generate-id(.)" />, 'past')
+
+  .local pmc compiled
+  compiled = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'post' )
+  '_dumper'(compiled, 'compiled')
+  compiled()
+
                                                                   
-  # Compile the abstract syntax tree                              
-  # down to an opcode syntax tree                                 
-  .local string ost_tg_src                                          
-  .local pmc tge_compiler                                           
-  .local pmc ost_grammar, ost_builder, ost                          
-  tge_compiler = new 'TGE::Compiler'                              
-  ost_tg_src = _slurp_file('languages/punie/lib/OSTGrammar.tg')   
-  ost_grammar = tge_compiler.'compile'(ost_tg_src)                
-  ost_builder = ost_grammar.apply(past_node_<xsl:value-of select="generate-id(.)" />)                          
-  ost = ost_builder.get('result')                                 
-  unless ost goto ERR_NO_OST                                      
-                                                                  
-  # Compile the OST down to PIR                                   
-  .local string pir_tg_src                                          
-  .local pmc pir_grammar, pir_builder, pir                          
-  pir_tg_src = _slurp_file('languages/punie/lib/PIRGrammar.tg')   
-  pir_grammar = tge_compiler.'compile'(pir_tg_src)                
-  pir_builder = pir_grammar.apply(ost)                            
-  pir = pir_builder.get('result')                                 
-  unless pir goto ERR_NO_PIR                                      
-                                                                  
-  # execute                                                       
-  .local pmc pir_compiler, pir_compiled                             
-  pir_compiler = compreg 'PIR'                                    
-  pir_compiled = pir_compiler( pir )                              
-  pir_compiled()                                                  
-  say ''                                                          
-  goto CLEANUP                                                    
-                                                                  
-  ERR_NO_OST:                                                     
-    say 'Unable to construct OST.'                                
-    goto CLEANUP                                                  
-                                                                  
-  ERR_NO_PIR:                                                     
-    say 'Unable to construct PIR.'                                
-    goto CLEANUP                                                  
-                                                                  
-  CLEANUP:                                                        
 .end                                                              
                                                                   
 # helpers
@@ -105,7 +71,7 @@ a PAST and runs the PAST with help of the parrot compiler tools.
                                                                   
 </xsl:template>
 
-<xsl:template match="past:Stmts | past:Stmt | past:Op | past:Exp | past:Val | past:Var" >
+<xsl:template match="past:Stmts | past:Op | past:Val | past:Var" >
 
   # start of generic node
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
@@ -118,7 +84,7 @@ a PAST and runs the PAST with help of the parrot compiler tools.
                                                             </xsl:choose>'
   <xsl:apply-templates select="@*"/>
   <xsl:apply-templates />
-  past_node_<xsl:value-of select="generate-id(..)" />.'add_child'( past_node_<xsl:value-of select="generate-id(.)" /> )      
+  past_node_<xsl:value-of select="generate-id(..)" />.'push'( past_node_<xsl:value-of select="generate-id(.)" /> )      
   null past_node_<xsl:value-of select="generate-id(.)" />
   # end of generic node
 
@@ -152,37 +118,15 @@ a PAST and runs the PAST with help of the parrot compiler tools.
 
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />
   past_node_<xsl:value-of select="generate-id(.)" /> = new 'PAST::Val'                             
-  past_node_<xsl:value-of select="generate-id(.)" />.value( val_<xsl:value-of select="generate-id(.)" /> ) 
   <xsl:apply-templates select="@*"/>
-
-  <xsl:choose>
-    <xsl:when test="@valtype = 'strq'" >
-      <xsl:comment>Escape the newlines in order to make PIR happy</xsl:comment>
-      val_<xsl:value-of select="generate-id(.)" /> = escape val_<xsl:value-of select="generate-id(.)" />
-      past_node_<xsl:value-of select="generate-id(.)" />.'valtype'( 'strqq' )
-    </xsl:when>
-  </xsl:choose>
-
-  past_node_<xsl:value-of select="generate-id(..)" />.'add_child'( past_node_<xsl:value-of select="generate-id(.)" /> )      
+  past_node_<xsl:value-of select="generate-id(..)" />.'push'( past_node_<xsl:value-of select="generate-id(.)" /> )      
   # end of past:Val
 
 </xsl:template>
 
 <!-- handle attributes -->
-<xsl:template match="@op">
-  past_node_<xsl:value-of select="generate-id(..)" />.'op'( '<xsl:value-of select="." />' )                              
-</xsl:template>
-<xsl:template match="@valtype">
-  past_node_<xsl:value-of select="generate-id(..)" />.'valtype'( '<xsl:value-of select="." />' )
-</xsl:template>
-<xsl:template match="@vartype">
-  past_node_<xsl:value-of select="generate-id(..)" />.'vartype'( '<xsl:value-of select="." />' )
-</xsl:template>
-<xsl:template match="@scope">
-  past_node_<xsl:value-of select="generate-id(..)" />.'scope'( '<xsl:value-of select="." />' )
-</xsl:template>
-<xsl:template match="@varname">
-  past_node_<xsl:value-of select="generate-id(..)" />.'varname'( '<xsl:value-of select="." />' )
+<xsl:template match="@*">
+  past_node_<xsl:value-of select="generate-id(..)" />.'attr'( '<xsl:value-of select="name()" />', '<xsl:value-of select="." />', 1 )                              
 </xsl:template>
 <xsl:template match="@encoding">
    <xsl:comment>The attribute encoding is handled in PIR generation</xsl:comment>
