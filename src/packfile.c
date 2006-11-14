@@ -1710,12 +1710,16 @@ directory_pack (Interp* interp, struct PackFile_Segment *self,
     for (i = 0; i < dir->num_segments; i++) {
         struct PackFile_Segment * const seg = dir->segments[i];
         const size_t size = seg->op_count;
-        opcode_t * const ret = PackFile_Segment_pack(interp, seg, cursor);
 
-        if (!PackFile_check_segment_size(size, seg->name)) {
-            internal_exception(1, "directory_pack segment '%s' used size %d "
-                "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);
-        }
+        PackFile_Segment_pack(interp, seg, cursor);
+        /*
+         * XXX somehow it's smelling fishy here:
+         * - either cursor is unaligned
+         * - or the return result of _pack doesn't match
+         *   expected size
+         *
+         * likely in combination with pbc_merge
+         */
         cursor += size;
     }
 
