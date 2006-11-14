@@ -1719,7 +1719,8 @@ release : MANIFEST MANIFEST.generated
 	@$(RM_F) MANIFEST.real
 	mv MANIFEST MANIFEST.real
 	grep -v DEVELOPING MANIFEST.real > MANIFEST
-	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST)
+	perl -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST | \
+	  tar -zcv -T - -f parrot-$(VERSION).tar.gz
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 
