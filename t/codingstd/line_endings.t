@@ -17,16 +17,19 @@ BEGIN {
     }
 }
 
-# skip the tests if this is an svk working directory
+# are we using svk?
+my $use_svk = 0;
+our ($svk, $output);
 {
     eval {
         my $client = SVN::Client->new();
         my $prop_ref = $client->propget("svn:mime-type", "MANIFEST", "WORKING", 0);
     };
     if ($@) {
-        plan skip_all => 'svn not working in this directory';
+        $use_svk = is_svk_working_dir();
     }
 }
+
 
 # set up how many tests to run
 plan tests => 1;
@@ -76,6 +79,9 @@ foreach my $file (@files) {
 ok( !scalar(@dos_files), 'Line endings correct' )
     or diag( "DOS line ending found in " . scalar @dos_files . " files:\n@dos_files" );
 
+exit;
+
+
 sub source_files
 {
     my $client = SVN::Client->new();
@@ -84,13 +90,31 @@ sub source_files
     # grab names of files to test (except binary files)
     foreach my $filename ( sort keys %$manifest ) {
         # try to read the svn:mime-type property of the file
-        my $prop_ref = $client->propget("svn:mime-type", $filename, "WORKING", 0);
+        my $prop;
+        # using svk if available
+        if ($use_svk) {
+            my @svk_cmd_args = ( 'svn:mime-type', $filename );
+            my $ret_val = $svk->propget(@svk_cmd_args);
+            if ($ret_val != 0) {
+                die "Unable to run 'svk propget' command\n";
+            }
+            chomp $output;
+            $prop = $output;
+        }
+        # or using svn
+        else {
+            my $prop_ref = $client->propget("svn:mime-type", 
+                                         $filename, 
+                                         "WORKING", 
+                                         0);
+            $prop = $prop_ref->{$filename};
+        }
 
         # if we have no mime-type property set or the mime-type is text/*
         # then the file is text (this is the assumption used by subversion)
-        my $prop = $prop_ref->{$filename};
-        # of the mime-type property is undefined, append to the file list
-        if (!defined $prop) {
+
+        # if the mime-type property is undefined or empty, append to file list
+        if (!defined $prop || $prop eq '') {
             push @test_files, $filename;
         }
         else {
@@ -103,7 +127,36 @@ sub source_files
     return @test_files;
 }
 
-exit;
+sub is_svk_working_dir
+{
+    use SVK;
+    use SVK::XD;
+    use SVK::Util qw(catfile);
+
+    # set up svk so that we can use it
+    my $svkpath = $ENV{SVKROOT} || catfile($ENV{HOME}, ".svk");
+    my $xd = SVK::XD->new( 
+        giantlock => catfile($svkpath, 'lock'),
+        statefile => catfile($svkpath, 'config'),
+        svkpath   => $svkpath,
+        );
+
+    $xd->load();
+
+    unless ($ENV{SVKNOSVNCONFIG}) {
+        SVN::Core::config_ensure(undef);
+        $xd->{svnconfig} = SVN::Core::config_get_config(undef);
+    }
+
+    $svk = SVK->new( xd => $xd, output => \$output );
+
+    # we know that the MANIFEST should be there, so let's make sure we can
+    # run the svk command
+    my @svk_cmd_args = qw( svn:mime-type MANIFEST );
+    my $ret_val = $svk->propget(@svk_cmd_args);
+
+    return !$ret_val;
+}
 
 # Local Variables:
 #   mode: cperl
