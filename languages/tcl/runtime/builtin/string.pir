@@ -44,6 +44,7 @@
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name)
 
+
   .local pmc subcommand_proc
   null subcommand_proc
 
@@ -618,6 +619,31 @@ bad_args:
   .local string class,the_string
   class = argv[0]
   the_string = argv[1]
+
+  .local pmc options
+  options = new .ResizablePMCArray
+  options[0] = 'alnum'
+  options[1] = 'alpha'
+  options[2] = 'ascii'
+  options[3] = 'control'
+  options[4] = 'boolean'
+  options[5] = 'digit'
+  options[6] = 'double'
+  options[7] = 'false'
+  options[8] = 'graph'
+  options[9] = 'integer'
+  options[10] = 'lower'
+  options[11] = 'print'
+  options[12] = 'punct'
+  options[13] = 'space'
+  options[14] = 'true'
+  options[15] = 'upper'
+  options[16] = 'wordchar'
+  options[17] = 'xdigit'
+
+  .local pmc select_option
+  select_option  = get_root_global ['_tcl'], 'select_option'
+  class = select_option(options, class, 'class')
 
   if class == 'alnum' goto alnum_check
   if class == 'alpha' goto alpha_check
