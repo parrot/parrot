@@ -39,6 +39,7 @@ transform post (PAST::Stmts) :language('PIR') {
     cpast = shift iter
     cpost = tree.'get'('post', cpast)
     ops.'push'(cpost)
+    goto iter_loop
   iter_end:
     ops.'result'(cpost)
     .return (ops)
