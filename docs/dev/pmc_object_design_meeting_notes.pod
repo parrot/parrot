@@ -15,6 +15,11 @@ This is one of many troubles with properties. Also, properties were invented at 
 
 B<Recommendation>: Deprecate property support in PMCs. We may put them back in later, but if we do, it will be for a good reason.
 
+Allison: What is the proposed alternate strategy for altering the
+attribute structure of an object at runtime?  I'm still not in favor of
+removing properties. The distinction isn't a high-level one, it's a
+low-level implementation distinction. Would it help if we call them
+"static attributes" and "dynamic attributes"?
 
 =item Attributes use external data slot (pmc_ext)
 
@@ -22,14 +27,19 @@ When attributes are used on a PMC, they are stored in the single external data s
 
 B<Recommendation>: Implement differently-sized PMCs. The proposed pddXX_pmc.pod has been reviewed, and the implementation of a prototype solution has been requested. Work on this prototype is targeted to begin in trunk after the 0.4.7 release.
 
+Allison: Agreed.
 
 =item DYNSELF is the common case, but the common case should be SELF
 
 The DYNSELF macro is closer to the true OO concept of 'self'; if anything is worthy of the name SELF, it is DYNSELF. DYNSELF does dispatching, while SELF statically calls the method in the current class.
 
-B<Recommendation>: Throughout the source, rename SELF to STATIC_SELF, and rename DYNSELF to SELF. Additionally, direct access to VTABLE methods should be reviewed, and SELF should be used for where possible to increase clarity and maintainability (this is a good CAGE task.) Also, this should become a coding standard for PMCs.
+B<Recommendation>: Throughout the source, rename SELF to STATIC_SELF, and rename DYNSELF to SELF. Additionally, direct access to VTABLE methods should be reviewed, and SELF should be used where possible to increase clarity and maintainability (this is a good CAGE task.) Also, this should become a coding standard for PMCs.
 
-B<Att:> SELF ist just a synonym for I<pmc> - the object - above is talking about SELF.method() and alikes. See F<lib/Parrot/Pmc2c.pm>.
+Allison: OK on the rename of DYNSELF to SELF, but we need a better name
+than STATIC_SELF. Where is the non-dispatching version likely to be used
+and why?
+
+B<Att:> SELF is just a synonym for I<pmc> - the object - above is talking about SELF.method() and alikes. See F<lib/Parrot/Pmc2c.pm>.
 
 
 =item composition is almost non-existent (roles would be nice)
@@ -37,6 +47,8 @@ B<Att:> SELF ist just a synonym for I<pmc> - the object - above is talking about
 The current class composition uses interfaces, which seems inadequate. Roles may make better composition units, but may not make supporting Perl 5 OO easier. Leo, chromatic, Matt, and Jonathan traded ideas on the subject. It seems more investigation and discussion is in order.
 
 B<Recommendation>: Leo, chromatic, Matt, and Jonathan should exchange ideas on the subject in a meeting within the next two weeks. Hopefully this exchange of ideas will lead to clarity on a proposed solution to a class composition model.
+
+Allison: Definitely in favor of a composition model.
 
 =item split VTABLE functions into related categories
 
@@ -47,6 +59,8 @@ Leo pointed to a p2 thread on the topic: L<http://groups.google.at/group/perl.pe
 Others thought this idea sounded intriguing, and that it was worth pursuing.
 
 B<Recommendation>: Elaboration on this idea is required in order to focus thought on design considerations. No timeframe has been set.
+
+Allison: Yes, needs a more complete proposal.
 
 =back
 
@@ -63,6 +77,7 @@ Discussion moved into class/namespace relationships, and metaclasses as it relat
 
 B<Recommendation>: Chip, based on prior thought, as well as this discussion, will detail his plan. We know it includes a registry of class names for each HLL, but more will be revealed soon.
 
+Allison: das ist gut.
 
 =item PMC vtable entries don't work in subclasses (or subsubclasses)
 
@@ -70,6 +85,8 @@ Currently things are handled by deleg_pmc.pmc and default.pmc. Unfortunately, it
 
 B<Recommendation>: Inherit from default.pmc unless you have a parent. Always check inheritance when dispatching, if necessary. Chip will look specifically at Capture PMCs and attempt to provide a solution without architectural changes, enabling Patrick's work to continue.
 
+Allison: das ist gut. Also looks like a good point for potential
+architectural changes in the updated objects PDD.
 
 =item PMC methods aren't inherited by ParrotObject pmcs
 
@@ -99,6 +116,12 @@ see how the solution of "all direct data access goes through
 accessors" applies to this particular situation... although I
 could just be reading it wrong.  --Pm
 
+Allison: ParrotObjects and PMCs were intended to be completely
+substitutable. Clearly they aren't yet, but the solution to the problem
+is not to add more and more checks for whether a particular PMC is an
+Object, but to give ParrotObjects and low-level PMCs the ability to be
+subclassed through a single standard interface (even if each has
+completely different code behind the interface making it work).
 
 =item getattribute/setattribute efficiency
 
@@ -124,6 +147,8 @@ The latter takes 2 opcodes, which is per se suboptimal, The former is much more 
 Oh well, and classoffset does of course not work for Hash-like or other objects.
 
 B<Recommendation>: Best practice is to use named attribute access. Optimizations, if necessary, will be addressed closer to 1.0. Issues with classoffset and hash-like objects will be addressed in the future as necessary.
+
+Allison: Agreed.
 
 =back
 
