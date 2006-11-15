@@ -1,6 +1,7 @@
 # $Id$
 
 PARROT = ../../parrot@exe@
+PERL   = @perl@
 RM_RF  = @rm_rf@
 
 DEPENDENCIES = \
