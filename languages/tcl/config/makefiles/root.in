@@ -65,6 +65,7 @@ runtime/conversions.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \
 runtime/variables.pir \
+runtime/options.pir \
 src/macros.pir \
 src/returncodes.pir \
 src/grammar/expr/expression.pir \

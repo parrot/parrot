@@ -14,18 +14,45 @@
 
   .local string subcommand_name
   subcommand_name = shift argv
+
+  .local pmc options
+  options = new .ResizablePMCArray
+  options[0] = 'bytelength'
+  options[1] = 'compare'
+  options[2] = 'equal'
+  options[3] = 'first'
+  options[4] = 'index'
+  options[5] = 'is'
+  options[6] = 'last'
+  options[7] = 'length'
+  options[8] = 'map'
+  options[9] = 'match'
+  options[10] = 'range'
+  options[11] = 'repeat'
+  options[12] = 'replace'
+  options[13] = 'tolower'
+  options[14] = 'toupper'
+  options[15] = 'totitle'
+  options[16] = 'trim'
+  options[17] = 'trimleft'
+  options[18] = 'trimright'
+  options[19] = 'wordend'
+  options[20] = 'wordstart'
+
+  .local pmc select_option
+  select_option  = get_root_global ['_tcl'], 'select_option'
+  .local string canonical_subcommand
+  canonical_subcommand = select_option(options, subcommand_name)
+
   .local pmc subcommand_proc
   null subcommand_proc
 
-  subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'string'], subcommand_name
+  subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'string'], canonical_subcommand
   if_null subcommand_proc, bad_args 
   .return subcommand_proc(argv)
 
 bad_args:
-  $S0 = 'bad option "'
-  $S0 .= subcommand_name
-  $S0 .= '": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart'
-  tcl_error $S0
+  .return ('') # once all commands are implemented, remove this...
 
 no_args:
   tcl_error 'wrong # args: should be "string option arg ?arg ...?"'
