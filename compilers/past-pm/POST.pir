@@ -63,6 +63,22 @@ for compiling programs in Parrot.
 .end
 
 
+.sub 'push_pirop' :method
+    .param pmc pirop
+    .param pmc arglist         :slurpy
+    .param pmc adverbs         :slurpy :named
+    if null adverbs goto no_adverbs
+    adverbs['pirop'] = pirop
+    $P0 = self.'push_new'('POST::Op', adverbs :flat :named)
+    goto end
+  no_adverbs:
+    $P0 = self.'push_new'('POST::Op', 'pirop'=>pirop)
+  end:
+    $P0.'arglist'(arglist :flat)
+    .return ($P0)
+.end
+
+
 .sub 'compile'
     .param pmc post
     .param pmc adverbs         :slurpy :named

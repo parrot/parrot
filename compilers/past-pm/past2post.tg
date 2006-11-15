@@ -164,17 +164,15 @@ transform if (PAST::Op) :language('PIR') {
     ops.'push'(exprpost)
     .local pmc pasttype
     pasttype = node.'pasttype'()
-    $P0 = ops.'push_new'('POST::Op', 'pirop'=>pasttype)
-    $P0.'arglist'(exprpost, thenlabel)
+    ops.'push_pirop'(pasttype, exprpost, thenlabel)
     elsepost = exprpost
     $I0 = defined elsepast
     if $I0 == 0 goto else_done
     elsepost = tree.'get'('post', elsepast)
     ops.'push'(elsepost)
   else_done:
-    $P0 = ops.'push_new'('POST::Op', 'pirop'=>'set')
-    $P0.'arglist'(ops, elsepost)
-    ops.'push_new'('POST::Op', 'pirop'=>'goto', 'arglist'=>endlabel)
+    ops.'push_pirop'('set', ops, elsepost)
+    ops.'push_pirop'('goto', endlabel)
     ops.'push'(thenlabel)
     thenpost = exprpost
     $I0 = defined thenpast
@@ -182,8 +180,7 @@ transform if (PAST::Op) :language('PIR') {
     thenpost = tree.'get'('post', thenpast)
     ops.'push'(thenpost)
   then_done:
-    $P0 = ops.'push_new'('POST::Op', 'pirop'=>'set')
-    $P0.'arglist'(ops, thenpost)
+    ops.'push_pirop'('set', ops, thenpost)
     ops.'push'(endlabel)
     .return (ops)
 }
@@ -192,7 +189,53 @@ transform if (PAST::Op) :language('PIR') {
 transform unless (PAST::Op) :language('PIR') {
     .return tree.'get'('if', node)
 }
-    
+
+
+transform xor (PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local pmc endlabel, falselabel
+    falselabel = ops.'new'('POST::Label', 'name'=>'xor_false')
+    endlabel = ops.'new'('POST::Label', 'name'=>'xor_end')
+
+    .local pmc iter, apast, apost, i, t, u
+    i = ops.unique('$I')
+    t = ops.unique('$I')
+    u = ops.unique('$I')
+    iter = node.'iterator'()
+    apast = shift iter
+    apost = tree.'get'('post', apast)
+    ops.'push'(apost)
+    ops.'push_pirop'('set', ops, apost)
+    ops.'push_pirop'('istrue', t, apost)
+  middle_child:
+    .local pmc bpast, bpost
+    bpast = shift iter
+    bpost = tree.'get'('post', bpast)
+    ops.'push'(bpost)
+    ops.'push_pirop'('istrue', u, bpost)
+    ops.'push_pirop'('and', i, t, u)
+    ops.'push_pirop'('if', i, falselabel)
+    unless iter goto last_child
+    .local pmc s
+    s = ops.'new'('POST::Label', 'name'=>'xor_skip')
+    ops.'push_pirop'('if', t, s)
+    ops.'push_pirop'('set', ops, bpost)
+    ops.'push_pirop'('set', t, u)
+    ops.'push'(s)
+    goto middle_child
+  last_child:
+    ops.'push_pirop'('if', t, endlabel)
+    ops.'push_pirop'('set', ops, bpost)
+    ops.'push_pirop'('goto', endlabel)
+    ops.'push'(falselabel)
+    ops.'push_pirop'('new', ops, '.Undef')
+    ops.'push'(endlabel)
+    .return (ops)
+}
+
 
 transform post (PAST::Val) :language('PIR') {
     .local pmc vtype, ctype, name
@@ -215,10 +258,9 @@ transform post (PAST::Val) :language('PIR') {
     if atype == ctype goto return_native
 
   return_pmc:
-    $P0 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'new')
+    $P0 = post.'push_new'('POST::Op', 'pirop'=>'new')
     $P0.'arglist'($P0, vtype)
-    $P1 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'assign', 'result'=>$P0)
-    $P1.'arglist'($P0, name)
+    $P1 = post.'push_pirop'('assign', $P0, name, 'result'=>$P0)
     post.'result'($P1)
     .return (post)
 
