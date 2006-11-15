@@ -225,7 +225,9 @@ OUT
 language_output_is('tcl', <<'TCL', <<'OUT', '{\n}');
 proc new {} {
 }
+puts [new]
 TCL
+
 OUT
 
 # Local Variables:

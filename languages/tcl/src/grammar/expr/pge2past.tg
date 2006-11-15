@@ -31,8 +31,8 @@ transform dispatch (TclExpr::Grammar) {
 dispatch:
     $P0 = node['backslash_substitution']
     unless null $P0 goto constant
-    $P0 = node['constant']
-    unless null $P0 goto constant
+    $P0 = node['empty']
+    unless null $P0 goto empty
     $P0 = node['chunk']
     unless null $P0 goto chunks
     $P0 = node['substitution']
@@ -72,6 +72,12 @@ dispatch:
 
 program:
     .return tree.get('past', $P0, 'program')
+
+empty:
+    $P0 = new 'PAST::Val'
+    $P0['value'] = ''
+    $P0['class'] = 'TclString'
+    .return($P0)
 
 chunks:
     .return tree.get('past', $P0, 'array')
