@@ -661,7 +661,7 @@ everything via the VTABLE api.
         /* shrink the array */
         if (shift < 0) {
             /* start at offset so we don't overwrite values we'll need */
-            for (i=offset+count; i<length; i++)
+            for (i=offset+count+elems; i<length; i++)
                 VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
 
@@ -676,18 +676,12 @@ everything via the VTABLE api.
             for (i=length-1; i>=offset; i--)
                 VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
+        }
 
-            /* copy the new values */
-            for (i=0; i<elems; i++)
-                VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
-                    VTABLE_get_pmc_keyed_int(INTERP, value, i));
-        }
-        /* stay the same size -- possibly overwrite values */
-        else {
-            for (i=0; i<elems; i++)
-                VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
-                    VTABLE_get_pmc_keyed_int(INTERP, value, i));
-        }
+        /* copy the new values */
+        for (i=0; i<elems; i++)
+            VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
+                VTABLE_get_pmc_keyed_int(INTERP, value, i));
     }
 }
 
