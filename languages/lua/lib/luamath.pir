@@ -59,9 +59,8 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
-    find_type $I0, 'table'
     .local pmc _math
-    _math = new $I0
+    _math = new [ 'table' ]
     $P1 = 'math'
     _lua__GLOBAL[$P1] = _math
 

@@ -32,9 +32,8 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
-    find_type $I0, 'table'
     .local pmc _coroutine
-    _coroutine = new $I0
+    _coroutine = new [ 'table' ]
     $P1 = 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 

@@ -41,9 +41,8 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
-    find_type $I0, 'table'
     .local pmc _string
-    _string = new $I0
+    _string = new [ 'table' ]
     $P1 = 'string'
     _lua__GLOBAL[$P1] = _string
 
@@ -105,7 +104,7 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
 
     .local pmc _lua_mt_string
-    _lua_mt_string = new $I0
+    _lua_mt_string = new [ 'table' ]
     global 'mt_string' = _lua_mt_string
     $P1 = '__index'
     _lua_mt_string[$P1] = _string

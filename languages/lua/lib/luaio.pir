@@ -46,9 +46,8 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
-    find_type $I0, 'table'
     .local pmc _io
-    _io = new $I0
+    _io = new [ 'table' ]
     $P1 = 'io'
     _lua__GLOBAL[$P1] = _io
 
@@ -101,7 +100,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     #
 
     .local pmc _file
-    _file = new $I0
+    _file = new [ 'table' ]
 
     .const .Sub _file_close = '_io_close'
     $P1 = 'close'
@@ -136,7 +135,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 #    _file[$P1] = _file__tostring
 
     .local pmc _lua_mt_file
-    _lua_mt_file = new $I0
+    _lua_mt_file = new [ 'table' ]
     $P1 = '__index'
     _lua_mt_file[$P1] = _file
 
@@ -159,10 +158,9 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     _lua__ENVIRON = global '_ENVIRON'
     $P3 = new .LuaNumber
 
-    find_type $I0, 'userdata'
     $P1 = 'stdin'
     $P2 = getstdin
-    $P0 = new $I0
+    $P0 = new [ 'userdata' ]
     setattribute $P0, 0, $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
@@ -171,7 +169,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     $P1 = 'stdout'
     $P2 = getstdout
-    $P0 = new $I0
+    $P0 = new [ 'userdata' ]
     setattribute $P0, 0, $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
@@ -180,7 +178,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     $P1 = 'stderr'
     $P2 = getstderr
-    $P0 = new $I0
+    $P0 = new [ 'userdata' ]
     setattribute $P0, 0, $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
@@ -243,8 +241,7 @@ L0:
     _lua__REGISTRY = global '_REGISTRY'
     .const .LuaString key = 'file'
     mt = _lua__REGISTRY[key]
-    find_type $I0, 'userdata'
-    new file, $I0
+    file = new [ 'userdata' ]
     file.'set_metatable'(mt)
     .return (file)
 .end

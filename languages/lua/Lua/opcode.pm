@@ -80,9 +80,6 @@ use base qw(Lua::opcode);
 package StoreLexOp;
 use base qw(Lua::opcode);
 
-package FindTypeOp;
-use base qw(Lua::opcode);
-
 package NewOp;
 use base qw(Lua::opcode);
 

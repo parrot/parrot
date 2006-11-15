@@ -128,15 +128,6 @@ package pirVisitor;
         return;
     }
 
-    sub visitFindTypeOp {
-        my $self = shift;
-        my ($op) = @_;
-        my $FH   = $self->{fh};
-        print {$FH}
-            "  $op->{result}->{symbol} = find_type '$op->{arg1}'\n";
-        return;
-    }
-
     sub visitCloneOp {
         my $self = shift;
         my ($op) = @_;
@@ -150,13 +141,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        if ( exists $op->{arg2} ) {
-            print {$FH}
-                "  new $op->{result}->{symbol}, $op->{arg1}, $op->{arg2}\n";
-        }
-        else {
-            print {$FH} "  new $op->{result}->{symbol}, $op->{arg1}\n";
-        }
+        print {$FH} "  $op->{result}->{symbol} = new $op->{arg1}\n";
         return;
     }
 

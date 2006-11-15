@@ -35,9 +35,8 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
-    find_type $I0, 'table'
     .local pmc _table
-    _table = new $I0
+    _table = new [ 'table' ]
     $P1 = 'table'
     _lua__GLOBAL[$P1] = _table
 

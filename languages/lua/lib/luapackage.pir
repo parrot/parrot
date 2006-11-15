@@ -37,9 +37,8 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $P1 = 'require'
     _lua__GLOBAL[$P1] = _lua_require
 
-    find_type $I0, 'table'
     .local pmc _package
-    _package = new $I0
+    _package = new [ 'table' ]
     $P1 = 'package'
     _lua__GLOBAL[$P1] = _package
 
@@ -47,7 +46,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $P1 = 'cpath'
     _package[$P1] = $P0
 
-    $P0 = new $I0
+    $P0 = new [ 'table' ]
     $P1 = 'loaded'
     _package[$P1] = $P0
 
@@ -59,7 +58,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $P1 = 'path'
     _package[$P1] = $P0
 
-    $P0 = new $I0
+    $P0 = new [ 'table' ]
     $P1 = 'preloaded'
     _package[$P1] = $P0
 

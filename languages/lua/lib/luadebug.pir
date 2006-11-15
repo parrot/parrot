@@ -40,9 +40,8 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
     _lua__GLOBAL = global '_G'
     $P1 = new .LuaString
 
-    find_type $I0, 'table'
     .local pmc _debug
-    _debug = new $I0
+    _debug = new [ 'table' ]
     $P1 = 'debug'
     _lua__GLOBAL[$P1] = _debug
 
