@@ -11,19 +11,26 @@
 
   .local string subcommand_name
   subcommand_name = shift argv
+
+  .local pmc options
+  options = new .ResizablePMCArray
+  options[0] = 'format'
+  options[1] = 'scan'
+
+  .local pmc select_option
+  select_option  = get_root_global ['_tcl'], 'select_option'
+  .local string canonical_subcommand
+  canonical_subcommand = select_option(options, subcommand_name)
+
   .local pmc subcommand_proc
   null subcommand_proc
 
-  subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'binary'], subcommand_name
+  subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'binary'], canonical_subcommand
   if_null subcommand_proc, bad_args
   .return subcommand_proc(argv)
 
 bad_args:
-  $S0 = 'bad option "'
-  $S0 .= subcommand_name
-  $S0 .= '": must be format or scan'
-
-  tcl_error $S0
+  .return ('') # once all commands are implemented, remove this...
 
 no_args:
   tcl_error 'wrong # args: should be "binary option ?arg ...?"'

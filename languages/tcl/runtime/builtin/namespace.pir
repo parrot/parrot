@@ -22,19 +22,40 @@ real top level namespace.
 
   .local string subcommand_name
   subcommand_name = shift argv
+
+  .local pmc options
+  options = new .ResizablePMCArray
+  options[0] = 'children'
+  options[1] = 'code'
+  options[2] = 'current'
+  options[3] = 'delete'
+  options[4] = 'eval'
+  options[5] = 'exists'
+  options[6] = 'export'
+  options[7] = 'forget'
+  options[8] = 'import'
+  options[9] = 'inscope'
+  options[10] = 'origin'
+  options[11] = 'parent'
+  options[12] = 'qualifiers'
+  options[13] = 'tail'
+  options[14] = 'which'
+
+  .local pmc select_option
+  select_option  = get_root_global ['_tcl'], 'select_option'
+  .local string canonical_subcommand
+  canonical_subcommand = select_option(options, subcommand_name)
+  
   .local pmc subcommand_proc
   null subcommand_proc
 
-  subcommand_proc = get_root_global ['_tcl';'helpers';'namespace'], subcommand_name
+  subcommand_proc = get_root_global ['_tcl';'helpers';'namespace'], canonical_subcommand
   if null subcommand_proc goto bad_args
 
   .return subcommand_proc(argv)
 
 bad_args:
-  $S0 = 'bad option "'
-  $S0 .= subcommand_name
-  $S0 .= '": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which'
-  tcl_error $S0
+  .return ('') # once all commands are implemented, remove this...
 
 no_args:
   tcl_error 'wrong # args: should be "namespace subcommand ?arg ...?"'

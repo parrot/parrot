@@ -16,22 +16,48 @@
 
   .local string subcommand_name
   subcommand_name = shift argv
+
+  .local pmc options
+  options = new .ResizablePMCArray
+  options[0] = 'args'
+  options[1] = 'body'
+  options[2] = 'cmdcount'
+  options[3] = 'commands'
+  options[4] = 'complete'
+  options[5] = 'default'
+  options[6] = 'exists'
+  options[7] = 'functions'
+  options[8] = 'globals'
+  options[9] = 'hostname'
+  options[10] = 'level'
+  options[11] = 'library'
+  options[12] = 'loaded'
+  options[13] = 'locals'
+  options[14] = 'nameofexecutable'
+  options[15] = 'patchlevel'
+  options[16] = 'procs'
+  options[17] = 'script'
+  options[18] = 'sharedlibextension'
+  options[19] = 'tclversion'
+  options[20] = 'vars'
+
+  .local pmc select_option
+  select_option  = get_root_global ['_tcl'], 'select_option'
+  .local string canonical_subcommand
+  canonical_subcommand = select_option(options, subcommand_name)
+
   .local pmc subcommand_proc
   null subcommand_proc
 
-  subcommand_proc = get_root_global ['_tcl';'helpers';'info'], subcommand_name
+  subcommand_proc = get_root_global ['_tcl';'helpers';'info'], canonical_subcommand
   if null subcommand_proc goto bad_subcommand
 
   .return subcommand_proc(argv)
 
 bad_subcommand:
-  $S0  = 'bad option "'
-  $S0 .= subcommand_name
-  $S0 .= '": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars'
+  .return ('') # once all commands are implemented, remove this...
 
-  tcl_error $S0
-
-bad_args:
+ bad_args:
   tcl_error 'wrong # args: should be "info option ?arg arg ...?"'
 .end
 

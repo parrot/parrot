@@ -19,10 +19,30 @@
 
   .local string subcommand_name
   subcommand_name = shift argv
+
+  .local pmc options
+  options = new .ResizablePMCArray
+  options[0] = 'anymore'
+  options[1] = 'donesearch'
+  options[2] = 'exists'
+  options[3] = 'get'
+  options[4] = 'names'
+  options[5] = 'nextelement'
+  options[6] = 'set'
+  options[7] = 'size'
+  options[8] = 'startsearch'
+  options[9] = 'statistics'
+  options[10] = 'unset'
+
+  .local pmc select_option
+  select_option  = get_root_global ['_tcl'], 'select_option'
+  .local string canonical_subcommand
+  canonical_subcommand = select_option(options, subcommand_name)
+
   .local pmc subcommand_proc
   null subcommand_proc
 
-  subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'array'], subcommand_name
+  subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'array'], canonical_subcommand
   if null subcommand_proc goto bad_args
 
   .local int is_array
@@ -52,10 +72,7 @@ scommand:
   .return subcommand_proc(is_array,the_array,array_name,argv)
 
 bad_args:
-  $S0  = 'bad option "'
-  $S0 .= subcommand_name
-  $S0 .= '": must be anymore, donesearch, exists, get, names, nextelement, set, size, startsearch, statistics, or unset'
-  tcl_error $S0
+  .return ('') # once all commands are implemented, remove this...
 
 few_args:
   tcl_error 'wrong # args: should be "array option arrayName ?arg ...?"'

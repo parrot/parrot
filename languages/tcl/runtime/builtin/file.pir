@@ -11,20 +11,57 @@
 
   .local string subcommand_name
   subcommand_name = shift argv
+
+  .local pmc options
+  options = new .ResizablePMCArray
+  options[0] = 'atime'
+  options[1] = 'attributes'
+  options[2] = 'channels'
+  options[3] = 'copy'
+  options[4] = 'delete'
+  options[5] = 'dirname'
+  options[6] = 'executable'
+  options[7] = 'exists'
+  options[8] = 'extension'
+  options[9] = 'isdirectory'
+  options[10] = 'isfile'
+  options[11] = 'join'
+  options[12] = 'link'
+  options[13] = 'lstat'
+  options[14] = 'mtime'
+  options[15] = 'mkdir'
+  options[16] = 'nativename'
+  options[17] = 'normalize'
+  options[18] = 'pathtype'
+  options[19] = 'readable'
+  options[20] = 'readlink'
+  options[21] = 'rename'
+  options[22] = 'rootname'
+  options[23] = 'separator'
+  options[24] = 'size'
+  options[25] = 'split'
+  options[26] = 'stat'
+  options[27] = 'system'
+  options[28] = 'tail'
+  options[29] = 'type'
+  options[30] = 'volumes'
+  options[31] = 'writable'
+
+  .local pmc select_option
+  select_option  = get_root_global ['_tcl'], 'select_option'
+  .local string canonical_subcommand
+  canonical_subcommand = select_option(options, subcommand_name)
+
   .local pmc subcommand_proc
 
-  push_eh bad_args
-    subcommand_proc = get_root_global ['_tcl';'helpers';'file'], subcommand_name
-  clear_eh
+  subcommand_proc = get_root_global ['_tcl';'helpers';'file'], canonical_subcommand
   if_null subcommand_proc, bad_args
 
   .return subcommand_proc(argv)
 
 bad_args:
-  $S0  = 'bad option "'
-  $S0 .= subcommand_name
-  $S0 .= '": must be atime, attributes, channels, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, link, lstat, mtime, mkdir, nativename, normalize, owned, pathtype, readable, readlink, rename, rootname, separator, size, split, stat, system, tail, type, volumes, or writable'
-  tcl_error $S0
+  .return ('') # once all commands are implemented, remove this...
+
 few_args:
   tcl_error 'wrong # args: should be "file option ?arg ...?"'
 
