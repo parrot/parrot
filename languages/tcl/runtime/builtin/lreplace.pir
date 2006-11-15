@@ -25,24 +25,30 @@
     $S0  = shift argv
     last = __index($S0,list)
 
-    if last < size goto last_2
+    if last < size goto first_1
     last = size
     dec last
-  last_2:
-    if last >= 0 goto first_1
-    last = 0
-  first_1:
+first_1:
     if first >= 0 goto ok
     first = 0
 
-  ok:
+ok:
+    if first >= size goto doesnt_contain_elem
+
     count = last - first
     inc count
+    if count < 0 goto done
 
     splice list, argv, first, count
 
+done:
     .return (list)
 
-  bad_args:
+bad_args:
     tcl_error 'wrong # args: should be "lreplace list first last ?element element ...?"'
+
+doesnt_contain_elem:
+    $S0 = first
+    $S0 = "list doesn't contain element " . $S0
+    tcl_error $S0
 .end
