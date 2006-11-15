@@ -1719,6 +1719,10 @@ directory_pack (Interp* interp, struct PackFile_Segment *self,
          *   expected size
          *
          * likely in combination with pbc_merge
+         *
+         * the relevant code with size check is visible in:
+         *
+         * svn diff -r15516:15517
          */
         cursor += size;
     }
