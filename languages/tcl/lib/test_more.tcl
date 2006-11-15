@@ -165,7 +165,14 @@ proc test {num description code args} {
             $num eq "lsetComp-3.7" ||
             $num eq "obj-32.1"     ||
             $num eq "set-1.14"     ||
-            $num eq "set-3.14"
+            $num eq "set-3.14"     ||
+            $num eq "string-13.6"  ||
+            $num eq "string-13.8"  ||
+            $num eq "string-14.11" ||
+            $num eq "string-18.7"  ||
+            $num eq "string-18.9"  ||
+            $num eq "string-20.4"  ||
+            $num eq "string-20.5"
            } {
             pass $full_desc [list SKIP "skip exploding test"]
         } else {

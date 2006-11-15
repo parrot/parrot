@@ -181,6 +181,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/set_old.t \
   t_tcl/split.t \
   t_tcl/subst.t \
+  t_tcl/string.t \
   t_tcl/stringComp.t \
   t_tcl/switch.t \
   t_tcl/unknown.t \
