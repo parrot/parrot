@@ -39,10 +39,6 @@
     count = last - first
     inc count
 
-    print first
-    say ""
-    print count
-    say ""
     splice list, argv, first, count
 
     .return (list)
