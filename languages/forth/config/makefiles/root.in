@@ -32,4 +32,4 @@ virtualstack.pbc: virtualstack.pir
 	$(PARROT) -o virtualstack.pbc virtualstack.pir
 
 test: all
-	prove t
+	$(PERL) t/harness
