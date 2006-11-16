@@ -97,12 +97,7 @@ empty_var:
     __set(varname, value)
   clear_eh
   goto next_variable
- 
-  # Loop until all elements are consumed. If any of the lists that were
-  # provided are already consumed, then simply assign the empty string.
-  # create a new pad in which our variables will run.
-  # XXX (#40767): This should probably not create a new pad, exactly
-  # Handle [break] and [continue]
+
 execute_command:
   push_eh handle_continue
     command()
