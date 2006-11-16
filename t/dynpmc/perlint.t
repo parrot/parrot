@@ -79,10 +79,10 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'new pmc');
-	print "starting\n"
-	new P0, I24
-	print "ending\n"
-	end
+        print "starting\n"
+        new P0, I24
+        print "ending\n"
+        end
 CODE
 starting
 ending
@@ -2179,17 +2179,17 @@ OUT
 {
     my ($a, $b, $c, $d, $e);
     if ($PConfig{intvalsize} == 8) {
-        $a = '9223372036854775806';	# 2**63-2
+        $a = '9223372036854775806';     # 2**63-2
         $b =                   '1';
         $c = '9223372036854775807'; # still Integer
         $d = '9223372036854775808'; # no more Integer
         $e = '9223372036854775809'; # still no more Integer
     } elsif ($PConfig{intvalsize} == 4) {
-        $a = '2147483646';		# 2**31-2
+        $a = '2147483646';              # 2**31-2
         $b =          '1';
-        $c = '2147483647';		# still Integer
-        $d = '2147483648';		# no more Integer
-        $e = '2147483649';		# still no more Integer
+        $c = '2147483647';              # still Integer
+        $d = '2147483648';              # no more Integer
+        $e = '2147483649';              # still no more Integer
     } else {
         die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
     }

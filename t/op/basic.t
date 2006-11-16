@@ -15,7 +15,7 @@ t/op/basic.t - Basic Ops
 
 =head1 SYNOPSIS
 
-	% prove t/op/basic.t
+        % prove t/op/basic.t
 
 =head1 DESCRIPTION
 
@@ -26,18 +26,18 @@ Tests basic string and branching operations.
 
 # It would be very embarrassing if these didnt work...
 pasm_output_is(<<'CODE', '', "noop, end");
-	noop
-	end
+        noop
+        end
 CODE
 
 pasm_output_is(<<'CODE', '1', "print 1");
-	print	1
-	end
+        print   1
+        end
 CODE
 
 pasm_output_is(<<'CODE', 'Parrot flies', "print string");
-	print 'Parrot flies'
-	end
+        print 'Parrot flies'
+        end
 CODE
 
 pasm_output_is(<<'CODE', 'Parrot flies', "print double-quoted string");
@@ -45,7 +45,7 @@ pasm_output_is(<<'CODE', 'Parrot flies', "print double-quoted string");
        end
 CODE
 
-pasm_output_is(<<'CODE', 'Parrot	flies', "print double-quoted string, tabs");
+pasm_output_is(<<'CODE', 'Parrot        flies', "print double-quoted string, tabs");
        print "Parrot\tflies"
        end
 CODE
@@ -78,39 +78,39 @@ Parrot flies
 OUTPUT
 
 pasm_output_is( <<'CODE', '42', "branch_ic" );
-	set	I4, 42
-	branch	HERE
-	set	I4, 1234
+        set     I4, 42
+        branch  HERE
+        set     I4, 1234
 HERE:
-	print	I4
-	end
+        print   I4
+        end
 CODE
 
 
 pasm_output_is( <<'CODE', '42', "branch_ic (backward)" );
-	set	I4, 42
-	branch	one
-two:	branch	three
-	set	I4, 1234
-	add	I4, I4, I4
+        set     I4, 42
+        branch  one
+two:    branch  three
+        set     I4, 1234
+        add     I4, I4, I4
 one:
-	branch	two
+        branch  two
 three:
-	print	I4
-	end
+        print   I4
+        end
 CODE
 
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "bsr_i");
-	print	"start\n"
+        print   "start\n"
 
-	bsr	LAB1
+        bsr     LAB1
 
-	print	"done\n"
-	end
+        print   "done\n"
+        end
 
-LAB1:	print	"lab 1\n"
-	ret
+LAB1:   print   "lab 1\n"
+        ret
 CODE
 start
 lab 1

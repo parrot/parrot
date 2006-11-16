@@ -16,7 +16,7 @@ t/op/cclass.t - character class tests
 
 =head1 SYNOPSIS
 
-	% prove t/op/cclass.t
+        % prove t/op/cclass.t
 
 =head1 DESCRIPTION
 
@@ -283,29 +283,29 @@ OUT
 ## see http://www.unicode.org/Public/UNIDATA/PropList.txt for White_Space list
 ## see also t/p6rules/metachars.t
 my $ws= {
-	horizontal_ascii => [qw/ \u0009 \u0020 \u00a0 /],
-	horizontal_unicode => [qw/
-		\u1680 \u180e \u2000 \u2001 \u2002 \u2003 \u2004 \u2005
-		\u2006 \u2007 \u2008 \u2009 \u200a \u202f \u205f \u3000
-	/],
-	vertical_ascii => [qw/ \u000a \u000b \u000c \u000d \u0085 /],
-	vertical_unicode => [qw/ \u2028 \u2029 /],
+        horizontal_ascii => [qw/ \u0009 \u0020 \u00a0 /],
+        horizontal_unicode => [qw/
+                \u1680 \u180e \u2000 \u2001 \u2002 \u2003 \u2004 \u2005
+                \u2006 \u2007 \u2008 \u2009 \u200a \u202f \u205f \u3000
+        /],
+        vertical_ascii => [qw/ \u000a \u000b \u000c \u000d \u0085 /],
+        vertical_unicode => [qw/ \u2028 \u2029 /],
 };
 
 push @{ $ws->{horizontal} } =>
-	@{ $ws->{horizontal_ascii} }, @{ $ws->{horizontal_unicode} };
+        @{ $ws->{horizontal_ascii} }, @{ $ws->{horizontal_unicode} };
 
 push @{ $ws->{vertical} } =>
-	@{ $ws->{vertical_ascii} }, @{ $ws->{vertical_unicode} };
+        @{ $ws->{vertical_ascii} }, @{ $ws->{vertical_unicode} };
 
 push @{ $ws->{whitespace_ascii} } =>
-	@{ $ws->{horizontal_ascii} }, @{ $ws->{vertical_ascii} };
+        @{ $ws->{horizontal_ascii} }, @{ $ws->{vertical_ascii} };
 
 push @{ $ws->{whitespace_unicode} } =>
-	@{ $ws->{horizontal_unicode} }, @{ $ws->{vertical_unicode} };
+        @{ $ws->{horizontal_unicode} }, @{ $ws->{vertical_unicode} };
 
 push @{ $ws->{whitespace} } =>
-	@{ $ws->{whitespace_ascii} }, @{ $ws->{whitespace_unicode} };
+        @{ $ws->{whitespace_ascii} }, @{ $ws->{whitespace_unicode} };
 
 sub string {
     my $which = shift;
@@ -315,8 +315,8 @@ sub string {
 my $all_ws = string('whitespace');
 
 SKIP: {
-	skip 'unicode support unavailable' => 3
-		unless $PConfig{has_icu};
+        skip 'unicode support unavailable' => 3
+                unless $PConfig{has_icu};
 pir_output_is(<<"CODE", <<'OUT', "unicode is_cclass whitespace");
 .sub main :main
 .include "cclass.pasm"
