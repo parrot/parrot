@@ -90,21 +90,21 @@ that is used by punie.
 </xsl:template>
 
 <xsl:template match="phc:Token_string" >
-  <past:Val ctype="s" vtype=".Perl6Str" >
+  <past:Val ctype="s" >
     <xsl:attribute name="encoding" ><xsl:value-of select="phc:value/@encoding" /></xsl:attribute>
     <xsl:attribute name="name" ><xsl:value-of select="phc:value" /></xsl:attribute>
   </past:Val>
 </xsl:template>
 
 <xsl:template match="phc:Token_int" >
-  <past:Val valtype="int" >
+  <past:Val ctype="int" >
     <xsl:apply-templates select="phc:value" />
   </past:Val>
 </xsl:template>
 
 <!-- looks like phc is running into a floating point issue -->
 <xsl:template match="phc:Token_real" >
-  <past:Val valtype="num" >
+  <past:Val ctype="num" >
     <xsl:apply-templates select="phc:source_rep" />
   </past:Val>
 </xsl:template>
@@ -116,7 +116,7 @@ that is used by punie.
 <xsl:template match="phc:AST_if" >
   <past:Stmt>
     <past:Op op="print" >
-      <past:Val valtype="strq" encoding="base64" >ICAgIDxzdHJvbmc+Q29uZGl0aW9uIGlzIHRydWUuPC9zdHJvbmc+CiAg</past:Val>
+      <past:Val ctype="s" encoding="base64" name="ICAgIDxzdHJvbmc+Q29uZGl0aW9uIGlzIHRydWUuPC9zdHJvbmc+CiAg" />
     </past:Op>
   </past:Stmt>
 </xsl:template>
