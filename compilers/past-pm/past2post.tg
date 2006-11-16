@@ -38,15 +38,16 @@ transform post (PAST::Stmts) :language('PIR') {
     ops.'init'('node'=>node)
     .local pmc iter
     iter = node.'iterator'()
+    unless iter goto end
   iter_loop:
-    unless iter goto iter_end
     .local pmc cpast, cpost
     cpast = shift iter
     cpost = tree.'get'('post', cpast)
     ops.'push'(cpost)
-    goto iter_loop
+    if iter goto iter_loop
   iter_end:
     ops.'result'(cpost)
+  end:
     .return (ops)
 }
 
