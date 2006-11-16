@@ -1,6 +1,6 @@
 #! perl -w
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: threads.t 14891 2006-10-11 10:24:50Z fperrad $
+# $Id$
 
 =head1 NAME
 

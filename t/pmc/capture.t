@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: capture.t 14969 2006-10-18 20:37:34Z particle $
+# $Id$
 
 use strict;
 use warnings;

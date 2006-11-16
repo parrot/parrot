@@ -1,5 +1,5 @@
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: thread.pir 14985 2006-10-20 14:59:05Z fperrad $
+# $Id$
 
 =head1 NAME
 

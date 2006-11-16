@@ -46,7 +46,7 @@ Initializes the C<CodeString> class.
 /* RubyString.pmc
  *  Copyright (C) 2006, The Perl Foundation.
  *  SVN Info
- *     $Id: /parrot/offline/languages/cardinal/src/pmc/rubystring.pmc 203 2006-10-10T14:07:47.742415Z tewk  $
+ *     $Id$
  *  Overview:
  *     These are the vtable functions for the CodeString base class
  *  Data Structure and Algorithms:

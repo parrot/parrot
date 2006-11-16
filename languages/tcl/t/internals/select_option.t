@@ -1,6 +1,6 @@
 #!../../parrot
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: /parrot/offline/t/compilers/pge/p6regex/01-regex.t 1716 2006-11-02T13:46:07.645128Z coke  $
+# $Id$
 
 =head1 NAME
 

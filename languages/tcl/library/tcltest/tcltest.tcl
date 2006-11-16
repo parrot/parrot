@@ -16,7 +16,7 @@
 # Contributions from Don Porter, NIST, 2002.  (not subject to US copyright)
 # All rights reserved.
 #
-# RCS: @(#) $Id: tcltest.tcl,v 1.82.2.7 2006/10/23 21:01:36 dgp Exp $
+# RCS: @(#) $Id$
 
 package require Tcl 8.5		;# To provide an alpha version
 package require Tcl 8.3		;# uses [glob -directory]
