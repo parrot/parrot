@@ -344,7 +344,7 @@ i      JOP@
 I      JOP@
 I      JOIP@
 # other ParrotThread
-P      JO 
+P      JO
 
 # --- start mysqlclient library ---
 # Created from mysql.h using the following manual method:
