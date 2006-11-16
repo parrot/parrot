@@ -64,7 +64,6 @@
  * imc.c
  */
 PARROT_API void imc_compile_all_units(Interp *);
-PARROT_API void imc_compile_all_units_for_ast(Interp *);
 PARROT_API void imc_compile_unit(Interp *, IMC_Unit * unit);
 PARROT_API void imc_cleanup(Interp *);
 PARROT_API void imc_pragma(char * str);
@@ -245,12 +244,6 @@ typedef struct _imc_info_t {
 #define IMC_TRACE 0
 #define IMC_TRACE_HIGH 0
 
-/*
- * ast interface
- */
-
-PARROT_API void IMCC_ast_init(Interp* interp);
-PARROT_API void IMCC_ast_compile(Interp *interp, FILE *fp);
 PARROT_API Instruction * IMCC_create_itcall_label(Interp *);
 PARROT_API void IMCC_itcall_sub(Interp* interp, SymReg* sub);
 

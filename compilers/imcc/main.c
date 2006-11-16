@@ -503,7 +503,7 @@ int
 main(int argc, char * argv[])
 {
     struct PackFile *pf;
-    int obj_file, ast_file = 0;
+    int obj_file;
     char *sourcefile;
     const char *output_file;
     Interp *interp;
@@ -519,7 +519,6 @@ main(int argc, char * argv[])
     Parrot_block_GC(interp);
 
     imcc_init(interp);
-    IMCC_ast_init(interp);
     IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR;
     sourcefile = parseflags(interp, &argc, &argv);
     output_file = interp->output_file;
@@ -561,9 +560,6 @@ main(int argc, char * argv[])
             }
             if (ext && strcmp (ext, ".pasm") == 0) {
                 pasm_file = 1;
-            }
-            else if (ext && strcmp (ext, ".past") == 0) {
-                ast_file = 1;
             }
         }
     }
@@ -630,41 +626,34 @@ main(int argc, char * argv[])
 
         IMCC_info(interp, 1, "Starting parse...\n");
 
-        if (ast_file) {
-            IMCC_ast_compile(interp, imc_yyin_get(yyscanner));
+        IMCC_INFO(interp)->state->pasm_file = pasm_file;
+        IMCC_TRY(IMCC_INFO(interp)->jump_buf,
+                 IMCC_INFO(interp)->error_code) {
+            int retval;
+            retval = yyparse(yyscanner, (void *) interp);
+            if (retval) {
+                /* fprintf(stderr, "** Parsing failed **\n"); */
+                exit(1);
+            }
             imc_compile_all_units(interp);
-            imc_compile_all_units_for_ast(interp);
         }
-        else {
-            IMCC_INFO(interp)->state->pasm_file = pasm_file;
-            IMCC_TRY(IMCC_INFO(interp)->jump_buf,
-                     IMCC_INFO(interp)->error_code) {
-                int retval;
-                retval = yyparse(yyscanner, (void *) interp);
-                if (retval) {
-                    /* fprintf(stderr, "** Parsing failed **\n"); */
-                    exit(1);
-                }
-                imc_compile_all_units(interp);
-            }
-            IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
-                IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
-                fprintf(stderr,"error:imcc:%s",
-                        string_to_cstring(interp,
-                        IMCC_INFO(interp)->error_message));
-                IMCC_print_inc(interp);
-                Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
-            }
-            IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
-                IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
-                fprintf(stderr,"error:imcc:%s",
-                        string_to_cstring(interp,
-                        IMCC_INFO(interp)->error_message));
-                IMCC_print_inc(interp);
-                Parrot_exit(interp, IMCC_FATALY_EXCEPTION);
-            }
-            IMCC_END_TRY;
+        IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
+            IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
+            fprintf(stderr,"error:imcc:%s",
+                    string_to_cstring(interp,
+                    IMCC_INFO(interp)->error_message));
+            IMCC_print_inc(interp);
+            Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
         }
+        IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
+            IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
+            fprintf(stderr,"error:imcc:%s",
+                    string_to_cstring(interp,
+                    IMCC_INFO(interp)->error_message));
+            IMCC_print_inc(interp);
+            Parrot_exit(interp, IMCC_FATALY_EXCEPTION);
+        }
+        IMCC_END_TRY;
 
         imc_cleanup(interp);
 

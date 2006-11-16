@@ -819,9 +819,6 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
 
         yylex_destroy ( yyscanner );
     }
-    else if (ext && strcmp (ext, ".past") == 0) {
-        IMCC_ast_compile(interp, fp);
-    }
     else {
         void *yyscanner;
         do_yylex_init ( interp, &yyscanner );

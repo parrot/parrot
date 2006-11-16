@@ -37,15 +37,6 @@ apps/p3/parrot.small.png                                    [apps/p3]
 apps/p3/slides.js                                           [apps/p3]
 cage/consting.pod                                           []
 cage/todo.pod                                               []
-compilers/ast/README                                        []
-compilers/ast/ast.h                                         []
-compilers/ast/ast.l                                         []
-compilers/ast/ast.y                                         []
-compilers/ast/ast_main.c                                    []
-compilers/ast/astlexer.c                                    []
-compilers/ast/astparser.c                                   []
-compilers/ast/astparser.h                                   []
-compilers/ast/node.c                                        []
 compilers/bcg/include/bcg.h                                 []
 compilers/bcg/src/bcg.c                                     []
 compilers/bcg/src/bcg_emitter.h                             []
@@ -575,7 +566,6 @@ examples/pasm/small.xml                                     [main]doc
 examples/pasm/stack.pasm                                    [main]doc
 examples/pasm/trace.pasm                                    [main]doc
 examples/pasm/xml_parser.pasm                               [main]doc
-examples/past/hello.past                                    [main]doc
 examples/pge/README                                         [main]doc
 examples/pge/all.pir                                        [main]doc
 examples/pge/benchmarks/ambs1/Makefile                      [main]doc
@@ -2543,7 +2533,6 @@ t/examples/japh.t                                           []
 t/examples/library.t                                        []
 t/examples/namespace.t                                      []
 t/examples/pasm.t                                           []
-t/examples/past.t                                           []
 t/examples/pir.t                                            []
 t/examples/shootout.t                                       []
 t/examples/streams.t                                        []

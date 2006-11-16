@@ -50,9 +50,6 @@ typedef struct _IMC_Unit {
     struct _IMC_Unit * prev;
     struct _IMC_Unit * next;
 
-    /* a comment in ast/node claims this field has a purpose */
-    /* int local_count; */
-
     SymReg *namespace;
     int pasm_file;
     const char *file;
