@@ -12,7 +12,7 @@ use Regex::Driver;
 # Can't locate object method "new" via package "Regex::CodeGen::IMCC"
 use 5.006;
 
-use File::Spec::Functions;	# In perl core only for >= 5.6.
+use File::Spec::Functions;      # In perl core only for >= 5.6.
 
 # FIXME: This is still probably unix-only, because the parrot binary
 # will have different names
