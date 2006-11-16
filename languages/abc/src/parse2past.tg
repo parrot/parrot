@@ -16,9 +16,16 @@ transform past (ABC::Grammar::statement) :language('PIR') {
     .return tree.'get'('past', $P0, 'ABC::Grammar::if_statement')
   expression:
     $P0 = node['expression']
-    .local pmc cpast, past
-    cpast = tree.'get'('past', $P0, 'ABC::Grammar::expression')
-    past = cpast.'new'('PAST::Op', cpast, 'node'=>node, 'pirop'=>'say')
+    .local pmc past
+    past = tree.'get'('past', $P0, 'ABC::Grammar::expression')
+    ##   if the statement isn't an assignment, we print the resulting value
+    $I0 = isa past, 'PAST::Op'
+    if $I0 == 0 goto say_result
+    $S0 = past.'pasttype'()
+    if $S0 == 'assign' goto end
+  say_result:
+    past = past.'new'('PAST::Op', past, 'node'=>node, 'pirop'=>'say')
+  end:
     .return (past)
 }
 
@@ -91,9 +98,19 @@ transform past (ABC::Grammar::expr) :language('PIR') {
 
 transform past_term (ABC::Grammar::expr) :language('PIR') {
     .local pmc past
+    $P0 = node['ident']
+    unless null $P0 goto term_ident
+
+  term_integer:
     $I0 = node
     past = new 'PAST::Val'
     past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'n')
+    .return (past)
+
+  term_ident:
+    $S0 = node['ident']
+    past = new 'PAST::Var'
+    past.'init'('node'=>node, 'name'=>$S0)
     .return (past)
 }
 
