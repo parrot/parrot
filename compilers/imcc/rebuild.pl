@@ -41,14 +41,14 @@ my ($command, $input, @outputs) = @ARGV;
 my $checksum;
 {
     local $/;
-    open(INPUT, $input) or die "open $input: $!";
+    open(INPUT, '<', $input) or die "open $input: $!";
     $checksum = unpack("%32C*", <INPUT>);
     close INPUT;
 }
 
 my $up_to_date = 1;
 foreach my $output (@outputs) {
-    if (! open(OUTPUT, $output)) {
+    if (! open(OUTPUT, '<', $output)) {
         print "$output does not exist; remaking\n" if $Verbose;
         $up_to_date = 0;
         last;
@@ -77,7 +77,7 @@ exit 1 if (! defined $status);
 exit($status >> 8) if $status != 0;
 
 foreach my $output (@outputs) {
-    open(OUTPUT, ">>$output") or die "open $output for append: $!";
+    open(OUTPUT, ">>", "$output") or die "open $output for append: $!";
     print OUTPUT "/* CHECKSUM: $checksum */\n";
     close OUTPUT;
 }
