@@ -1016,20 +1016,20 @@ WARNING
 
         _carp sprintf $msg, scalar @_;
 
-	return $Test->ok(0);
+        return $Test->ok(0);
     }
 
     my($this, $that, $name) = @_;
 
     my $ok;
-    if( !ref $this and !ref $that ) {  		# neither is a reference
+    if( !ref $this and !ref $that ) {           # neither is a reference
         $ok = $Test->is_eq($this, $that, $name);
     }
-    elsif( !ref $this xor !ref $that ) {  	# one's a reference, one isn't
+    elsif( !ref $this xor !ref $that ) {        # one's a reference, one isn't
         $ok = $Test->ok(0, $name);
-	$Test->diag( _format_stack({ vals => [ $this, $that ] }) );
+        $Test->diag( _format_stack({ vals => [ $this, $that ] }) );
     }
-    else {			       		# both references
+    else {                                      # both references
         local @Data_Stack = ();
         if( _deep_check($this, $that) ) {
             $ok = $Test->ok(1, $name);
@@ -1074,7 +1074,7 @@ sub _format_stack {
         my $val = $vals[$idx];
         $vals[$idx] = !defined $val ? 'undef'          :
                       $val eq $DNE  ? "Does not exist" :
-	              ref $val      ? "$val"           :
+                      ref $val      ? "$val"           :
                                       "'$val'";
     }
 
@@ -1177,7 +1177,7 @@ sub _deep_check {
 
         # Either they're both references or both not.
         my $same_ref = !(!ref $e1 xor !ref $e2);
-	my $not_ref  = (!ref $e1 and !ref $e2);
+        my $not_ref  = (!ref $e1 and !ref $e2);
 
         if( defined $e1 xor defined $e2 ) {
             $ok = 0;
@@ -1188,10 +1188,10 @@ sub _deep_check {
         elsif ( $same_ref and ($e1 eq $e2) ) {
             $ok = 1;
         }
-	elsif ( $not_ref ) {
-	    push @Data_Stack, { type => '', vals => [$e1, $e2] };
-	    $ok = 0;
-	}
+        elsif ( $not_ref ) {
+            push @Data_Stack, { type => '', vals => [$e1, $e2] };
+            $ok = 0;
+        }
         else {
             if( $Refs_Seen{$e1} ) {
                 return $Refs_Seen{$e1} eq $e2;
@@ -1223,9 +1223,9 @@ sub _deep_check {
                 $ok = _deep_check($$e1, $$e2);
                 pop @Data_Stack if $ok;
             }
-	    else {
-		_whoa(1, "No type in _deep_check");
-	    }
+            else {
+                _whoa(1, "No type in _deep_check");
+            }
         }
     }
 

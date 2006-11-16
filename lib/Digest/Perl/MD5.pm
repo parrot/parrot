@@ -31,56 +31,56 @@ sub padding($) {
 
 
 sub rotate_left($$) {
-	#$_[0] << $_[1] | $_[0] >> (32 - $_[1]);
-	#my $right = $_[0] >> (32 - $_[1]);
-	#my $rmask = (1 << $_[1]) - 1;
-	($_[0] << $_[1]) | (( $_[0] >> (32 - $_[1])  )  & ((1 << $_[1]) - 1));
-	#$_[0] << $_[1] | (($_[0]>> (32 - $_[1])) & (1 << (32 - $_[1])) - 1);
+        #$_[0] << $_[1] | $_[0] >> (32 - $_[1]);
+        #my $right = $_[0] >> (32 - $_[1]);
+        #my $rmask = (1 << $_[1]) - 1;
+        ($_[0] << $_[1]) | (( $_[0] >> (32 - $_[1])  )  & ((1 << $_[1]) - 1));
+        #$_[0] << $_[1] | (($_[0]>> (32 - $_[1])) & (1 << (32 - $_[1])) - 1);
 }
 
 sub gen_code {
   # Discard upper 32 bits on 64 bit archs.
   my $MSK = ((1 << 16) << 16) ? ' & ' . MAX : '';
-#	FF => "X0=rotate_left(((X1&X2)|(~X1&X3))+X0+X4+X6$MSK,X5)+X1$MSK;",
-#	GG => "X0=rotate_left(((X1&X3)|(X2&(~X3)))+X0+X4+X6$MSK,X5)+X1$MSK;",
+#       FF => "X0=rotate_left(((X1&X2)|(~X1&X3))+X0+X4+X6$MSK,X5)+X1$MSK;",
+#       GG => "X0=rotate_left(((X1&X3)|(X2&(~X3)))+X0+X4+X6$MSK,X5)+X1$MSK;",
   my %f = (
-	FF => "X0=rotate_left((X3^(X1&(X2^X3)))+X0+X4+X6$MSK,X5)+X1$MSK;",
-	GG => "X0=rotate_left((X2^(X3&(X1^X2)))+X0+X4+X6$MSK,X5)+X1$MSK;",
-	HH => "X0=rotate_left((X1^X2^X3)+X0+X4+X6$MSK,X5)+X1$MSK;",
-	II => "X0=rotate_left((X2^(X1|(~X3)))+X0+X4+X6$MSK,X5)+X1$MSK;",
+        FF => "X0=rotate_left((X3^(X1&(X2^X3)))+X0+X4+X6$MSK,X5)+X1$MSK;",
+        GG => "X0=rotate_left((X2^(X3&(X1^X2)))+X0+X4+X6$MSK,X5)+X1$MSK;",
+        HH => "X0=rotate_left((X1^X2^X3)+X0+X4+X6$MSK,X5)+X1$MSK;",
+        II => "X0=rotate_left((X2^(X1|(~X3)))+X0+X4+X6$MSK,X5)+X1$MSK;",
   );
   #unless ( (1 << 16) << 16) { %f = %{$CODES{'32bit'}} }
   #else { %f = %{$CODES{'64bit'}} }
 
   my %s = (  # shift lengths
-	S11 => 7, S12 => 12, S13 => 17, S14 => 22, S21 => 5, S22 => 9, S23 => 14,
-	S24 => 20, S31 => 4, S32 => 11, S33 => 16, S34 => 23, S41 => 6, S42 => 10,
-	S43 => 15, S44 => 21
+        S11 => 7, S12 => 12, S13 => 17, S14 => 22, S21 => 5, S22 => 9, S23 => 14,
+        S24 => 20, S31 => 4, S32 => 11, S33 => 16, S34 => 23, S41 => 6, S42 => 10,
+        S43 => 15, S44 => 21
   );
 
   my $insert = "";
   while(<DATA>) {
-	chomp;
-	next unless /^[FGHI]/;
-	my ($func,@x) = split /,/;
-	my $c = $f{$func};
-	$c =~ s/X(\d)/$x[$1]/g;
-	$c =~ s/(S\d{2})/$s{$1}/;
+        chomp;
+        next unless /^[FGHI]/;
+        my ($func,@x) = split /,/;
+        my $c = $f{$func};
+        $c =~ s/X(\d)/$x[$1]/g;
+        $c =~ s/(S\d{2})/$s{$1}/;
         $c =~ s/^(.*)=rotate_left\((.*),(.*)\)\+(.*)$//;
 
-	#my $rotate = "(($2 << $3) || (($2 >> (32 - $3)) & (1 << $2) - 1)))"; 
-	$c = "\$r = $2;
+        #my $rotate = "(($2 << $3) || (($2 >> (32 - $3)) & (1 << $2) - 1)))"; 
+        $c = "\$r = $2;
         $1 = ((\$r << $3) | ((\$r >> (32 - $3))  & ((1 << $3) - 1))) + $4";
-	$insert .= "\t$c\n";
+        $insert .= "\t$c\n";
   }
   
   my $dump = '
   sub round {
-	my ($a,$b,$c,$d) = @_[0 .. 3];
-	my $r;
+        my ($a,$b,$c,$d) = @_[0 .. 3];
+        my $r;
 
-	' . $insert . '
-	$_[0]+$a' . $MSK . ', $_[1]+$b ' . $MSK . 
+        ' . $insert . '
+        $_[0]+$a' . $MSK . ', $_[1]+$b ' . $MSK . 
         ', $_[2]+$c' . $MSK . ', $_[3]+$d' . $MSK . ';
   }';
   eval $dump;
@@ -93,53 +93,53 @@ gen_code();
 
 # object part of this module
 sub new {
-	my $class = shift;
-	bless {}, ref($class) || $class;
+        my $class = shift;
+        bless {}, ref($class) || $class;
 }
 
 sub reset {
-	my $self = shift;
-	delete $self->{data};
-	$self
+        my $self = shift;
+        delete $self->{data};
+        $self
 }
 
 sub add(@) {
-	my $self = shift;
-	$self->{data} .= join'', @_;
-	$self
+        my $self = shift;
+        $self->{data} .= join'', @_;
+        $self
 }
 
 sub addfile {
-  	my ($self,$fh) = @_;
-	if (!ref($fh) && ref(\$fh) ne "GLOB") {
-	    require Symbol;
-	    $fh = Symbol::qualify($fh, scalar caller);
-	}
-	$self->{data} .= do{local$/;<$fh>};
-	$self
+        my ($self,$fh) = @_;
+        if (!ref($fh) && ref(\$fh) ne "GLOB") {
+            require Symbol;
+            $fh = Symbol::qualify($fh, scalar caller);
+        }
+        $self->{data} .= do{local$/;<$fh>};
+        $self
 }
 
 sub digest {
-	md5(shift->{data})
+        md5(shift->{data})
 }
 
 sub hexdigest {
-	md5_hex(shift->{data})
+        md5_hex(shift->{data})
 }
 
 sub b64digest {
-	md5_base64(shift->{data})
+        md5_base64(shift->{data})
 }
 
 sub md5(@) {
-	my $message = padding(join'',@_);
-	my ($a,$b,$c,$d) = (A,B,C,D);
-	my $i;
-	for $i (0 .. (length $message)/64-1) {
-		my @X = unpack 'V16', substr $message,$i*64,64;	
-		($a,$b,$c,$d) = round($a,$b,$c,$d,@X);
-	}
-	pack 'V4',$a,$b,$c,$d;
+        my $message = padding(join'',@_);
+        my ($a,$b,$c,$d) = (A,B,C,D);
+        my $i;
+        for $i (0 .. (length $message)/64-1) {
+                my @X = unpack 'V16', substr $message,$i*64,64; 
+                ($a,$b,$c,$d) = round($a,$b,$c,$d,@X);
+        }
+        pack 'V4',$a,$b,$c,$d;
 }
 
 
@@ -155,8 +155,8 @@ sub md5_base64(@) {
 sub encode_base64 ($) {
     my $res;
     while ($_[0] =~ /(.{1,45})/gs) {
-	$res .= substr pack('u', $1), 1;
-	chop $res;
+        $res .= substr pack('u', $1), 1;
+        chop $res;
     }
     $res =~ tr|` -_|AA-Za-z0-9+/|;#`
     chop $res;chop $res;
@@ -220,16 +220,16 @@ educational purposes
 This modules has the same interface as the much faster C<Digest::MD5>. So you can
 easily exchange them, e.g.
 
-	BEGIN {
-	  eval {
-	    require Digest::MD5;
-	    import Digest::MD5 'md5_hex'
-	  };
-	  if ($@) { # ups, no Digest::MD5
-	    require Digest::Perl::MD5;
-	    import Digest::Perl::MD5 'md5_hex'
-	  }		
-	}
+        BEGIN {
+          eval {
+            require Digest::MD5;
+            import Digest::MD5 'md5_hex'
+          };
+          if ($@) { # ups, no Digest::MD5
+            require Digest::Perl::MD5;
+            import Digest::Perl::MD5 'md5_hex'
+          }             
+        }
 
 If the C<Digest::MD5> module is available it is used and if not you take
 C<Digest::Perl::MD5>.

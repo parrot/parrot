@@ -194,8 +194,8 @@ sub new
 
     # FILE holds a space separated list of opsfile name
     if ($self->{FILE}) {
-	$self->{FILE}=~s/, $//;
-	$self->{FILE}=~s/, $//;
+        $self->{FILE}=~s/, $//;
+        $self->{FILE}=~s/, $//;
     }
 
     return $self;
@@ -333,7 +333,7 @@ sub read_ops
             @labels     = ();
             $body       = '';
             $seen_op    = 1;
-            $line	      = $.+1;
+            $line             = $.+1;
 
             my @temp = ();
 
@@ -665,7 +665,7 @@ sub preamble
     if ($trans)
     {
         s/goto\s+OFFSET\((.*)\)/{{+=$1}}/mg;
-        #s/goto\s+NEXT\(\)/{{+=$op_size}}/mg;	#not supported--dependent on op size
+        #s/goto\s+NEXT\(\)/{{+=$op_size}}/mg;   #not supported--dependent on op size
         s/goto\s+ADDRESS\((.*)\)/{{=$1}}/mg;
         s/goto\s+POP\(\)/{{=*}}/mg;
         s/HALT\(\)/{{=0}}/mg;
