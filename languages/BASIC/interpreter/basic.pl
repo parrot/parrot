@@ -27,7 +27,7 @@
 use strict;
 use warnings;
 
-open(T, ">merged_basic.pasm") || die;
+open(T, ">", "merged_basic.pasm") || die;
 
 print T <<'EOF';
 	branch MAIN

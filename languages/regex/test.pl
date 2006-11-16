@@ -96,7 +96,7 @@ usage "not enough args: testfile required"
   if ! defined $testfile && ! defined $pattern;
 
 if (defined $testfile) {
-    open(SPEC, $testfile) or die "open $testfile: $!";
+    open(SPEC, '<', $testfile) or die "open $testfile: $!";
     $pattern = <SPEC>;
     chomp($pattern);
 }
@@ -137,7 +137,7 @@ exit ($status ? 0 : 1);
 
 sub generate_regular_pir {
     my ($filename, $pattern) = @_;
-    open(PIR, ">$filename") or die "create $filename: $!";
+    open(PIR, ">", "$filename") or die "create $filename: $!";
 
     my $ctx = { };
     my $trees = Regex::expr_to_tree($pattern, $ctx, DEBUG => $DEBUG);
@@ -176,7 +176,7 @@ sub generate_regular {
 
 sub process {
     my ($input, $output, $testnum) = @_;
-    open(TEST, "$PARROT_EXE test.pbc '$input' |");
+    open(TEST, '<', "$PARROT_EXE test.pbc '$input' |");
 
     local $/;
     my $actual_output = <TEST>;

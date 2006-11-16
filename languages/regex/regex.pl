@@ -56,7 +56,7 @@ if (! defined $expr && ! defined $expr_file) {
 if (defined $expr_file) {
     local *IN;
     local $/;
-    open(IN, "<$expr_file")
+    open(IN, "<", "$expr_file")
       or die "open $expr_file: $!";
     $expr = <IN>;
     close IN;
@@ -92,9 +92,9 @@ if ($operation eq 'unparse' || $operation eq 'render') {
 
 local *OUTPUT;
 if (! defined $output || $output eq '-') {
-    open(OUTPUT, ">&STDOUT");
+    open(OUTPUT, ">", "&STDOUT");
 } else {
-    open(OUTPUT, ">$output") or die "create $output: $!";
+    open(OUTPUT, ">", "$output") or die "create $output: $!";
 }
 
 my $driver = Regex::Driver->new($language, %options);

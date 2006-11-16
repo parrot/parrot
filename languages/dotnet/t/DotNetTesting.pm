@@ -28,7 +28,7 @@ sub compile_cs {
 	
 	# Write file.
 	my $fh;
-	open $fh, "> $file_name.cs" or die "$!\n";
+	open $fh, ">", "$file_name.cs" or die "$!\n";
 	print $fh $cs_code;
 	close $fh;
 	
@@ -73,7 +73,7 @@ sub run_pir($) {
 	
 	# Write.
 	my $fh;
-	open $fh, "> __temp__.pir" or die "$!\n";
+	open $fh, ">", "__temp__.pir" or die "$!\n";
 	print $fh $pir_code;
 	close $fh;
 

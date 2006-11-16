@@ -62,7 +62,7 @@ my $csubs = $srm->subs();
 $pir .= sub_meta($csubs, {}, 'custom subs');
 
 # Finally, write generated PIR to output file.
-open my $fh, "> $output_file";
+open my $fh, ">", "$output_file";
 print $fh $pir;
 close $fh;
 
@@ -79,7 +79,7 @@ print "Currently able to translate " . scalar(@rules) . " out of 213 instruction
 sub parse_rules {
     # Get filename and open the file.
     my $filename = shift;
-    open my $fh, "< $filename" or die "Unable to open $filename: $!\n";
+    open my $fh, "<", "$filename" or die "Unable to open $filename: $!\n";
     
     # We'll store an array of hashes containing the data.
     my @rules = ();

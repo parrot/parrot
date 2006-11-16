@@ -97,7 +97,7 @@ my $file = $ARGV[0];
 my @lines;
 my @rules;
 
-open FILE,$file or die "Couldn't open '$file': $!";
+open FILE, '<', $file or die "Couldn't open '$file': $!";
 @lines = <FILE>;
 close FILE;
 

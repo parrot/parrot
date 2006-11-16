@@ -10,7 +10,7 @@ use Data::Dumper;
 my @program;
 my %register;
 my $outreg;
-open PROGRAM, $ARGV[0] or die "Couldn't get file";
+open PROGRAM, '<', $ARGV[0] or die "Couldn't get file";
 foreach my $line (<PROGRAM>) {
     chomp $line;
     next if ($line =~ /^ *\#/);

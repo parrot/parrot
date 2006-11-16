@@ -15,7 +15,7 @@ sub tokenize {
   my $tokref;
   my $token = '';
 
-  open SOURCE,"<$file";
+  open SOURCE, "<", "$file";
   while(<SOURCE>) {
     next if /^\s*;/;
     s/;.*$//;

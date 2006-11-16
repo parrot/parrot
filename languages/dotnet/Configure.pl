@@ -61,7 +61,8 @@ sub generate_makefile(%) {
     
     # Read in makefile template.
     my $fh;
-    open $fh, "< config/Makefile.in" or die "Unable to open config/Makefile.in\n";
+    open $fh, "<", "config/Makefile.in" 
+        or die "Unable to open config/Makefile.in\n";
     my $makefile = join('', <$fh>);
     close $fh;
     
@@ -74,7 +75,7 @@ sub generate_makefile(%) {
     $makefile =~ s/\$\{trans_class_library\}/$class_lib_make/g;
     
     # Write makefile.
-    open $fh, "> Makefile" or die "Unable to open Makefile\n";
+    open $fh, ">", "Makefile" or die "Unable to open Makefile\n";
     print $fh $makefile;
     close $fh;
 }
@@ -87,7 +88,8 @@ sub generate_config_pm(%) {
     
     # Read in template.
     my $fh;
-    open $fh, "< config/N2PConfig.pm.in" or die "Unable to open config/N2PConfig.pm.in\n";
+    open $fh, "<", "config/N2PConfig.pm.in" 
+        or die "Unable to open config/N2PConfig.pm.in\n";
     my $config_pm = join('', <$fh>);
     close $fh;
     
@@ -97,7 +99,8 @@ sub generate_config_pm(%) {
     }
     
     # Write.
-    open $fh, "> config/N2PConfig.pm" or die "Unable to open config/N2PConfig.pm\n";
+    open $fh, ">", "config/N2PConfig.pm" 
+        or die "Unable to open config/N2PConfig.pm\n";
     print $fh $config_pm;
     close $fh;
 }

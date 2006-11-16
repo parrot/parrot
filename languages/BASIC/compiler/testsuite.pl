@@ -22,12 +22,12 @@ while(1) {
 	@c=m/^'\s*(.*)/gm;
 	print join("\n", @c), "\n====================== $tn\n" if @c;
 	$tn++;
-	open(OF, ">_testsuite.bas") || die;
+	open(OF, ">", "_testsuite.bas") || die;
 	print OF $_;
 	close(OF);
 	if ( ! system("perl compile.pl _testsuite.bas")) {
 		system("perl testrun.pl > _output2");
-		open(O, "_output2") || die;
+		open(O, '>', "_output2") || die;
 		print <O>;
 		close(O);
 		print "\n";

@@ -221,7 +221,8 @@ sub _DBLoad {
         }
         my($fname)=__FILE__;
         my(@drv);
-        open(DRV,"<$fname") or die "Report this as a BUG: Cannot open $fname";
+        open(DRV, "<", "$fname") 
+            or die "Report this as a BUG: Cannot open $fname";
         while(<DRV>) {
                         /^\s*sub\s+_Parse\s*{\s*$/ .. /^\s*}\s*#\s*_Parse\s*$/
                 and     do {

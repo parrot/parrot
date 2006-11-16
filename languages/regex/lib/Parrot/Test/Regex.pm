@@ -113,7 +113,7 @@ sub process {
     my ($input, $output) = @_;
 
     my $TEST;
-    open($TEST, "$PARROT_EXE test_regex.pbc '$input' |");
+    open($TEST, '<', "$PARROT_EXE test_regex.pbc '$input' |");
 
     local $/;
     my $actual_output = <$TEST>;

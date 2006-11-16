@@ -35,7 +35,7 @@ foreach my $meth ( qw(is isnt like) ) {
         } ( qw(scheme pasm pbc out) ); # JMG
 
         # STDERR is written into same output file
-        open LANG, "> $lang_f" or die "Unable to open '$lang_f'"; # JMG
+        open LANG, ">", "$lang_f" or die "Unable to open '$lang_f'"; # JMG
         binmode LANG; # JMG
         print LANG $lang_code; # JMG
         close LANG; # JMG

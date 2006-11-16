@@ -31,12 +31,12 @@ getopts('d', \%options);
 $debug=1 if $options{d};
 
 if (@ARGV) {
-        open(D, $ARGV[0]) || die;
+        open(D, '<', $ARGV[0]) || die;
         @basic=<D>;
         chomp(@basic);
         seek D, 0, 0 or warn "Cannot reseek: $!";
 } else {
-        open(D, "<&DATA") || die;
+        open(D, "<", "&DATA") || die;
 }
 shift(@ARGV);
 
@@ -44,7 +44,7 @@ tokenize();
 #push(@ARGV);
 parse(@ARGV);
 
-open(CODE, ">TARG_test.pir") || die;
+open(CODE, ">", "TARG_test.pir") || die;
 
 foreach my $seg ("_main", "_basicmain", keys %code) {
         next unless exists $code{$seg};

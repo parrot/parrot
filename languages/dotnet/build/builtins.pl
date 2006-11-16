@@ -17,7 +17,7 @@ usage() if !$input_file || @ARGV;
 
 # Parse the file to get the methods.
 my $fh;
-open $fh, "< $input_file" or die "Could not open $input_file: $!\n";
+open $fh, "<", "$input_file" or die "Could not open $input_file: $!\n";
 my $input = join('', <$fh>);
 close $fh;
 my @methods = parse($input);
@@ -63,7 +63,7 @@ END:
 PIR_OUT
 
 # Write output.
-open $fh, "> $output_file" or die "Cannot open $output_file: $!\n";
+open $fh, ">", "$output_file" or die "Cannot open $output_file: $!\n";
 print $fh $output;
 close $fh;
 
