@@ -31,12 +31,9 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'only alphanumic' );
+language_output_is( 'Plumhead', <<'END_CODE', 'Hello World', 'only alphanumic' );
 <?php echo "Hello World"; ?>
-<?php echo "\n"; ?>
 END_CODE
-Hello World
-END_EXPECTED
 
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello with some HTML' );

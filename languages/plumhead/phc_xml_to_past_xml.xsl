@@ -90,7 +90,7 @@ that is used by punie.
 </xsl:template>
 
 <xsl:template match="phc:Token_string" >
-  <past:Val ctype="s" >
+  <past:Val ctype="s" vtype=".Perl6Str" >
     <xsl:attribute name="encoding" ><xsl:value-of select="phc:value/@encoding" /></xsl:attribute>
     <xsl:attribute name="name" ><xsl:value-of select="phc:value" /></xsl:attribute>
   </past:Val>

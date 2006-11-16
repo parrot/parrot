@@ -1,7 +1,14 @@
 # $Id$
 
 TODO:
+  - pge implementation
+  - ANTLR3 implementation
   - Support for POST and GET
+  - map values
+  - scalar values
+  - Start a builtins library
+  - Call 'php' from plumhead.pir, make testing more simple
+  - Migrate to Patrick Michauds PAST
 
 DONE:
   - Rewrite plumhead.pl in PIR
