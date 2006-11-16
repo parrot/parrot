@@ -15,7 +15,7 @@ rule print {
     print [ <string> | <expression> ] [ , [ <string> | <expression> ] ]*
 }
 
-rule compound_statement { \{ <statement> [ ; <statement> ]* \} }
+rule compound_statement { \{ <statement>? [ ; <statement>? ]* \} }
 rule if_statement { if \( <expression> \) <statement> [ else <statement> ]? }
 rule while_statement { while \( <expression> \) <statement> }
 rule for_statement {

@@ -85,6 +85,7 @@ transform past (ABC::Grammar::compound_statement) :language('PIR') {
 
     .local pmc iter
     $P0 = node['statement']
+    if null $P0 goto iter_end
     iter = new .Iterator, $P0
   iter_loop:
     unless iter goto iter_end
