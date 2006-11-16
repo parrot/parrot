@@ -2,16 +2,15 @@
 
 source lib/test_more.tcl
 
-plan 7
-
-set TODO {TODO "[lreplace] is broken"}
+plan 8
 
 eval_is {lreplace list first} \
   {wrong # args: should be "lreplace list first last ?element element ...?"} \
   {too few args}
 
-is [lreplace {a b c} 1 1]   {a c}   {delete 1}
-is [lreplace {a b c} 1 1 d] {a d c} {replace 1}
+is [lreplace {a b c} 1 1]   {a c}     {delete 1}
+is [lreplace {a b c} 1 1 d] {a d c}   {replace 1}
+is [lreplace {a b c} 1 0 d] {a d b c} {insert 1}
 
 eval_is {lreplace list 1 0} \
   {list doesn't contain element 1} \

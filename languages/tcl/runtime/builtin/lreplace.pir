@@ -37,12 +37,14 @@ ok:
 
     count = last - first
     inc count
-    if count < 0 goto done
+    if count < 0 goto insert
 
     splice list, argv, first, count
+    .return(list)
 
-done:
-    .return (list)
+insert:
+    splice list, argv, first, 0
+    .return(list)
 
 bad_args:
     tcl_error 'wrong # args: should be "lreplace list first last ?element element ...?"'
