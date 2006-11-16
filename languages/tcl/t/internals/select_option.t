@@ -8,7 +8,7 @@ languages/tcl/t/internal/select_option.t
 
 =head1 DESCRIPTION
 
-Excercize select_options() - the feature that lets us specify, for example
+Excercise select_options() - the feature that lets us specify, for example
 [string triml] instead of [string trimleft].
 
 =head1 SYNOPSIS
@@ -31,10 +31,6 @@ Excercize select_options() - the feature that lets us specify, for example
     is        = find_global 'Test::More', 'is'
 
     load_bytecode 'languages/tcl/runtime/tcllib.pir'
-
-    # Variable declarations, initializations
-    .local pmc test       # the test harness object.
-               test = new 'Test::Builder'
 
     plan(6)
     .local string message
