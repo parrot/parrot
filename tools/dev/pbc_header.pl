@@ -56,40 +56,40 @@ sub update_fp {
     my $fp = get_fp;
     my ($major, $minor)  = get_version;
     for my $f (@ARGV) {
-	open F, "+<$f" or die "Can't open $f: $!";
-	seek F, 2, 0;	# pos 2: major, minor
-	print F pack "cc", $major, $minor;
-	seek F, 6, 0;	# pos 6: pad = finger_print
-	print F $fp;
-	close F;
+        open F, "+<$f" or die "Can't open $f: $!";
+        seek F, 2, 0;   # pos 2: major, minor
+        print F pack "cc", $major, $minor;
+        seek F, 6, 0;   # pos 6: pad = finger_print
+        print F $fp;
+        close F;
     }
 }
 
 sub pbc_info {
     for my $f (@ARGV) {
-	open F, "<$f" or die "Can't open $f: $!";
-	my $header;
-	read F, $header, 16;
-	my (@fields) = qw( wordsize byteorder major minor
-	    intvalsize floattype );
-	print "$f\n";
-	for my $i (0..5) {
-	    my $c = substr $header, $i, 1;
-	    $c = unpack 'c', $c;
-	    printf "\t%-12s= %s\n", $fields[$i],$c;
-	}
+        open F, "<$f" or die "Can't open $f: $!";
+        my $header;
+        read F, $header, 16;
+        my (@fields) = qw( wordsize byteorder major minor
+            intvalsize floattype );
+        print "$f\n";
+        for my $i (0..5) {
+            my $c = substr $header, $i, 1;
+            $c = unpack 'c', $c;
+            printf "\t%-12s= %s\n", $fields[$i],$c;
+        }
     }
 }
 
 sub main {
     my ($result, $upd_fp);
     $result = GetOptions(
-	"update-fingerprint"     => \$upd_fp,
+        "update-fingerprint"     => \$upd_fp,
     );
 
     $upd_fp and do {
-	update_fp;
-	exit;
+        update_fp;
+        exit;
     };
 
     pbc_info;

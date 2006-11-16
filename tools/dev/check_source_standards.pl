@@ -61,7 +61,7 @@ if ($files[0] eq "all_source") {
     @files = ();
     File::Find::find({wanted => sub {
         if ( $File::Find::dir =~ m:(languages|examples)$: ) {
-            $File::Find::prune = 1;	
+            $File::Find::prune = 1;     
             return;
         }
         return if /malloc/;

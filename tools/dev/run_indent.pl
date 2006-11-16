@@ -78,7 +78,7 @@ foreach my $file (@ARGV) {
         next unless ($fdecl =~ /\n/);
         my ($firstline,$secondline) = split /\n/, $fdecl;
         if ($firstline !~ /\(/) {
-	    $bad_fdecls{$fdecl} = $secondline;
+            $bad_fdecls{$fdecl} = $secondline;
         }
     }
     
@@ -88,15 +88,15 @@ foreach my $file (@ARGV) {
         local $/=undef;
         my $contents = <F>;
     
-	foreach (keys %$typedefs) {
-            delete $typedefs->{$_} unless ($contents =~ /\Q$_\E/);	    
-	}
-	
-	foreach (keys %bad_fdecls) {
-	    my ($function_maybe) = ($bad_fdecls{$_} =~ /^\s*(\S+)\(/);
-	    delete $bad_fdecls{$_} unless ($contents =~ /\Q$function_maybe\E/);
+        foreach (keys %$typedefs) {
+            delete $typedefs->{$_} unless ($contents =~ /\Q$_\E/);          
         }
-	
+        
+        foreach (keys %bad_fdecls) {
+            my ($function_maybe) = ($bad_fdecls{$_} =~ /^\s*(\S+)\(/);
+            delete $bad_fdecls{$_} unless ($contents =~ /\Q$function_maybe\E/);
+        }
+        
     }
     close(F);
 
@@ -104,8 +104,8 @@ foreach my $file (@ARGV) {
     print STDERR "Found " . scalar(keys %$typedefs) . " typedefs.\n";
     my $cmd = "indent -kr -nce -sc -cp0 -l79 -lc79 -psl -nut -cdw -ncs -lps";
     if ($file =~ /\.h$/) {
-	# for function declarations, put the return type on the same line.
-        $cmd =~ s/-psl/-npsl/g;	
+        # for function declarations, put the return type on the same line.
+        $cmd =~ s/-psl/-npsl/g; 
     }
     foreach (sort keys %$typedefs) {
         $cmd .= " -T $_";
