@@ -36,7 +36,7 @@ if (@ARGV) {
         chomp(@basic);
         seek D, 0, 0 or warn "Cannot reseek: $!";
 } else {
-        open(D, "<", "&DATA") || die;
+        open(D, "<&", "DATA") || die;
 }
 shift(@ARGV);
 

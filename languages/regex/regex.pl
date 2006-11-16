@@ -92,7 +92,7 @@ if ($operation eq 'unparse' || $operation eq 'render') {
 
 local *OUTPUT;
 if (! defined $output || $output eq '-') {
-    open(OUTPUT, ">", "&STDOUT");
+    open(OUTPUT, ">&", "STDOUT");
 } else {
     open(OUTPUT, ">", "$output") or die "create $output: $!";
 }
