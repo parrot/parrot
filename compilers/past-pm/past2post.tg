@@ -6,7 +6,7 @@ transform root (PAST::Block) :language('PIR') {
 transform post (PAST::Block) :language('PIR') {
     .local pmc name
     name = node.'name'()
-    unless null name goto with_name
+    if name != '' goto with_name
     name = node.unique('_block')
   with_name:
     .local pmc post
@@ -23,6 +23,11 @@ transform post (PAST::Block) :language('PIR') {
     goto iter_loop
   iter_end:
     post.'result'(cpost)
+
+    $S0 = node.'blocktype'()
+    if $S0 != 'immediate' goto end
+    post = post.'new'('POST::Op', post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
+  end:
     .return (post)
 }
 
@@ -47,16 +52,14 @@ transform post (PAST::Stmts) :language('PIR') {
 
 
 transform post (PAST::Op) :language('PIR') {
-    .local pmc pasttype
+    .local string pasttype
     pasttype = node.'pasttype'()
-    if null pasttype goto post_pirop
     if pasttype == '' goto post_pirop
     .return tree.'get'(pasttype, node)
 
   post_pirop:
-    .local pmc pirop
+    .local string pirop
     pirop = node.'pirop'()
-    if null pirop goto post_call
     if pirop == '' goto post_call
     .return tree.'get'('pirop', node)
 
@@ -125,9 +128,8 @@ transform pirop (PAST::Op) :language('PIR') {
     if $S0 == 'r' goto pirop_reg
     .local string returns
     returns = '.Undef'
-    $P0 = node.'returns'()
-    if null $P0 goto pirop_returns
-    if $P0 == '' goto pirop_returns
+    $S0 = node.'returns'()
+    if $S0 == '' goto pirop_returns
     returns = $P0
   pirop_returns:
     $P0 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'new')
@@ -237,8 +239,28 @@ transform xor (PAST::Op) :language('PIR') {
 }
 
 
+transform assign (PAST::Op) :language('PIR') {
+    .local pmc post, lpast, lpost, rpast, rpost, pasttype
+    post = new 'POST::Ops'
+    post.'init'('node'=>node)
+    lpast = node[0]
+    rpast = node[1]
+    rpost = tree.'get'('post', rpast)
+    post.'push'(rpost)
+    pasttype = node.'pasttype'()
+    if pasttype == 'bind' goto bind_variable
+    rpost = post.'push_pirop'('clone', rpost, rpost, 'result'=>rpost)
+  bind_variable:
+    lpast.'bindvalue'(rpost)
+    lpost = tree.'get'('bindvar', lpast)
+    post.'push'(lpost)
+    post.'result'(lpost)
+    .return (post)
+}
+
+
 transform post (PAST::Val) :language('PIR') {
-    .local pmc vtype, ctype, name
+    .local string vtype, ctype, name
     vtype = node.'vtype'()
     ctype = node.'ctype'()
     name = node.'name'()
@@ -251,9 +273,8 @@ transform post (PAST::Val) :language('PIR') {
     post = new 'POST::Ops'
     post.'init'('node'=>node)
 
-    .local pmc atype
+    .local string atype
     atype = node.'atype'()
-    if null atype goto return_pmc
     if atype == '*' goto return_native
     if atype == ctype goto return_native
 
@@ -266,5 +287,29 @@ transform post (PAST::Val) :language('PIR') {
 
   return_native:
     post.'result'(name)
+    .return (post)
+}
+
+
+transform post (PAST::Var) :language('PIR') {
+    .local pmc name, post
+    name = node.'name'()
+    name = node.'escape'(name)
+    post = new 'POST::Op'
+    post.'init'('node'=>node, 'pirop'=>'get_global')
+    post.'arglist'(post, name)
+    .return (post)
+}
+
+
+transform bindvar (PAST::Var) :language('PIR') {
+    .local pmc name, bindvalue, post
+    name = node.'name'()
+    name = node.'escape'(name)
+    bindvalue = node.'bindvalue'()
+    post = new 'POST::Op'
+    post.'init'('node'=>node, 'pirop'=>'set_global')
+    post.'arglist'(name, bindvalue)
+    post.'result'(bindvalue)
     .return (post)
 }

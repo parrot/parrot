@@ -211,6 +211,10 @@ for compiling programs in Parrot.
     $P0 = get_hll_global ['POST'], '$!subpir'
     code .= $P0
     set_hll_global ['POST'], '$!subpir', code
+
+    code = new 'PGE::CodeString'
+    code.'emit'("    %0 = find_name '%1'", value, name)
+    .return (code)
 .end
 
 

@@ -131,6 +131,9 @@ for compiling programs in Parrot.
     .param int has_value
     if has_value goto setattr
     value = self[attrname]
+    unless null value goto getattr
+    value = new .Undef
+  getattr:
     .return (value)
   setattr:
     self[attrname] = value
@@ -215,6 +218,16 @@ for compiling programs in Parrot.
     .return self.'attr'('ctype', value, has_value)
 .end
 
+
+.namespace [ 'PAST::Var' ]
+
+.sub 'bindvalue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('bindvalue', value, has_value)
+.end
+
+
 .namespace [ 'PAST::Op' ]
 
 .sub 'pasttype' :method
@@ -234,6 +247,15 @@ for compiling programs in Parrot.
     .param int has_value       :opt_flag
     .return self.'attr'('returns', value, has_value)
 .end
+
+.namespace [ 'PAST::Block' ]
+
+.sub 'blocktype' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('blocktype', value, has_value)
+.end
+
 
 .include 'POST.pir'
 
