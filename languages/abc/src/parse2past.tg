@@ -155,7 +155,7 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
   term_ident:
     $S0 = node['ident']
     past = new 'PAST::Var'
-    past.'init'('node'=>node, 'name'=>$S0)
+    past.'init'('node'=>node, 'name'=>$S0, 'vivicode'=>'.Integer')
     .return (past)
 }
 
