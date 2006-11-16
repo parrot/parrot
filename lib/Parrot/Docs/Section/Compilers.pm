@@ -41,7 +41,6 @@ sub new
     return $self->SUPER::new(
         'Compilers', 'compilers.html', '',
         $self->new_group( 'IMCC', 'the Intermediate Code Compiler for Parrot',
-            'compilers/ast',
             'compilers/imcc' ),
         $self->new_group( 'PGE', 'the Parrot Grammar Engine',
             'compilers/pge' ),
