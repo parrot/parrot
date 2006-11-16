@@ -46,7 +46,7 @@ sub runstep
     );
 
     my $hh = "include/parrot/has_header.h";
-    open(HH, ">$hh.tmp")
+    open(HH, ">", "$hh.tmp")
         or die "Can't open has_header.h: $!";
 
     print HH <<EOF;

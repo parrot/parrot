@@ -37,7 +37,7 @@ sub runstep
             $version = 1;
             $self->set_result('yes, old version');
         } else {
-            if (open FH, "< c99da7c4.tmp") {
+            if (open FH, "<", "c99da7c4.tmp") {
                 local $/;
                 $a = <FH>;
                 close FH;

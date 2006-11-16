@@ -70,7 +70,7 @@ CODA
         threads.h
         /;
 
-    open PLATFORM_H, "> include/parrot/platform.h"
+    open PLATFORM_H, ">", "include/parrot/platform.h"
         or die "Can't open include/parrot/platform.h: $!";
 
     print PLATFORM_H <<"END_HERE";
@@ -96,7 +96,8 @@ END_HERE
         if (-e $header_file) {
             local $/ = undef;
             print("\t$header_file\n") if defined $verbose && $verbose == 2;
-            open IN_H, "< $header_file" or die "Can't open $header_file: $!";
+            open IN_H, "<", "$header_file" 
+                or die "Can't open $header_file: $!";
 
 	    # slurp in the header file
 	    my $in_h = <IN_H>;
@@ -127,7 +128,7 @@ END_HERE
         if (-e $_) {
             local $/ = undef;
             print("\t$_\n") if defined $verbose && $verbose == 2;
-            open IN_H, "< $_" or die "Can't open $_: $!";
+            open IN_H, "<", "$_" or die "Can't open $_: $!";
             print PLATFORM_H <<"END_HERE";
 /*
 ** $_
@@ -165,7 +166,8 @@ END_HERE
         misc.c
         /;
 
-    open PLATFORM_C, "> src/platform.c" or die "Can't open src/platform.c: $!";
+    open PLATFORM_C, ">", "src/platform.c" 
+        or die "Can't open src/platform.c: $!";
 
     print PLATFORM_C <<"END_HERE";
 /*
@@ -180,7 +182,7 @@ END_HERE
     # We need to put things from begin.c before the parrot.h include.
     if (-e "config/gen/platform/$platform/begin.c") {
         local $/ = undef;
-        open IN_C, "< config/gen/platform/$platform/begin.c" or die "Can't open begin.c: $!";
+        open IN_C, "<", "config/gen/platform/$platform/begin.c" or die "Can't open begin.c: $!";
 
 	# slurp in the C file
 	my $in_c = <IN_C>;
@@ -213,7 +215,7 @@ END_HERE
         if (-e $impl_file) {
             local $/ = undef;
             print("\t$impl_file\n") if defined $verbose && $verbose == 2;
-            open IN_C, "< $impl_file" or die "Can't open $impl_file: $!";
+            open IN_C, "<", "$impl_file" or die "Can't open $impl_file: $!";
 
 	    # slurp in the C file
 	    my $in_c = <IN_C>;
@@ -238,7 +240,7 @@ END_HERE
         if (-e $_) {
             local $/ = undef;
             print("\t$_\n") if defined $verbose && $verbose == 2;
-            open IN_C, "< $_" or die "Can't open $_: $!";
+            open IN_C, "<", "$_" or die "Can't open $_: $!";
             print PLATFORM_C <<"END_HERE";
 /*
 ** $_:

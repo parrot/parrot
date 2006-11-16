@@ -34,7 +34,7 @@ sub pmc_parent
     return $PMC_PARENTS{$pmc} if defined $PMC_PARENTS{$pmc};
 
     local $/;
-    open(PMC, "src/pmc/$pmc.pmc")
+    open(PMC, "<", "src/pmc/$pmc.pmc")
         or die "open src/pmc/$pmc.pmc failed: $!";
     local $_ = <PMC>;
     close PMC;
@@ -61,7 +61,7 @@ sub pmc_parents
 
 sub get_pmc_order
 {
-    open IN, 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
+    open IN, '<', 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
     my %order;
     while (<IN>) {
         next if (/^#/);
@@ -176,7 +176,8 @@ END
     PMC: foreach my $pmc_file (split(/\s+/, $pmc_list)) {
         next if ($pmc_file =~ /^const/);
         my $name;
-        open(PMC, "src/pmc/$pmc_file") or die "open src/pmc/$pmc_file: $!";
+        open PMC, "<", "src/pmc/$pmc_file"
+            or die "open src/pmc/$pmc_file: $!";
         my $const;
         while (<PMC>) {
             if (/^pmclass (\w+)(.*)/) {
