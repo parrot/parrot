@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 
 =head1 NAME
 
@@ -1154,7 +1154,7 @@ CODE
 12A45
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', '');
+pir_output_is(<<'CODE', <<'OUTPUT', 'splice replace');
 .sub main :main
     $P1 = new .ResizablePMCArray
     $P1 = 3
@@ -1170,6 +1170,24 @@ pir_output_is(<<'CODE', <<'OUTPUT', '');
 .end
 CODE
 1A
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'splice replace');
+.sub main :main
+    $P1 = new .ResizablePMCArray
+    $P1 = 3
+    $P1[0] = '1'
+    $P1[1] = '2'
+    $P1[2] = '3'
+    $P2 = new .ResizablePMCArray
+    $P2 = 1
+    $P2[0] = 'A'
+    splice $P1, $P2, 0, 2
+    $S0 = join "", $P1
+    say $S0
+.end
+CODE
+A3
 OUTPUT
 
 # don't forget to change the number of tests
