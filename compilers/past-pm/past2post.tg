@@ -155,17 +155,16 @@ transform if (PAST::Op) :language('PIR') {
     elsepast = node[2]
 
     .local pmc thenlabel, endlabel
-    .local string n
-    n = node.'unique'()
-    $S0 = concat 'then_', n
+    .local string pasttype, n
+    pasttype = node.'pasttype'()
+    n = node.'unique'('_')
+    $S0 = concat pasttype, n
     thenlabel = ops.'new'('POST::Label', 'result'=>$S0)
-    $S0 = concat 'end_', n
+    $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
 
     exprpost = tree.'get'('post', exprpast)
     ops.'push'(exprpost)
-    .local pmc pasttype
-    pasttype = node.'pasttype'()
     ops.'push_pirop'(pasttype, exprpost, thenlabel)
     elsepost = exprpost
     $I0 = defined elsepast
@@ -192,6 +191,51 @@ transform unless (PAST::Op) :language('PIR') {
     .return tree.'get'('if', node)
 }
 
+
+transform while (PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local pmc exprpast, blockpast
+    .local pmc exprpost, blockpost
+    exprpast = node[0]
+    blockpast = node[1]
+
+    .local pmc looplabel, endlabel
+    .local string pasttype, n
+    pasttype = node.'pasttype'()
+    n = node.'unique'('_')
+    $S0 = concat pasttype, n
+    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = concat $S0, '_end'
+    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+
+    ##   determine if we need an 'if' or an 'unless' on
+    ##   the conditional (while => if, until => unless)
+    .local string iftype
+    iftype = 'if'
+    if $S0 == 'until' goto done_iftype
+    iftype = 'unless'
+  done_iftype:
+
+    ops.'push'(looplabel)
+    exprpost = tree.'get'('post', exprpast)
+    ops.'push'(exprpost)
+    ops.'push_pirop'(iftype, exprpost, endlabel)
+    blockpost = tree.'get'('post', blockpast)
+    ops.'push'(blockpost)
+    ops.'push_pirop'('goto', looplabel)
+    ops.'push'(endlabel)
+    ops.'result'(exprpost)
+    .return (ops)
+}
+
+
+transform until (PAST::Op) :language('PIR') {
+    .return tree.'get'('while', node)
+}
+    
 
 transform xor (PAST::Op) :language('PIR') {
     .local pmc ops
