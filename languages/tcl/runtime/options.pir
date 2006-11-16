@@ -94,9 +94,9 @@ ambiguous:
   penultimate = num_options - 2
   ultimate = num_options - 1
   loop_out:
+    if ii >= num_options goto invalid_done
     $S1 = options[ii]
     error .= $S1
-    if ii >= num_options goto invalid_done
     if ii == penultimate goto add_or
     if ii == ultimate goto loop_out_next
     error .= ', '

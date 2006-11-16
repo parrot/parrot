@@ -126,7 +126,7 @@ tclsh: $(PARROT) tcl.pbc
 	$(PARROT) --gc-debug tcl.pbc
 
 test:	tcl.pbc
-	prove t
+	prove -r t
 
 # Can only run a few of these cleanly with test_more at the moment.
 # eventually, as the list of commented out tests is smaller, just
