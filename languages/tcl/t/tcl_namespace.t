@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 use vars qw($TODO);
 
@@ -31,6 +31,12 @@ language_output_is( "tcl", <<'TCL', <<'OUT', "command: global explicit (not enou
   :puts ok
 TCL
 invalid command name ":puts"
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'command: invalid command in ns');
+  foo::bar
+TCL
+invalid command name "foo::bar"
 OUT
 
 language_output_is('tcl', <<'TCL', <<'OUT', "command: relative namespace");

@@ -255,6 +255,7 @@ dynamic:
   $S1 = shift $P0
 %7:
   %0 = get_hll_namespace $P0
+  if null %0 goto %3
   $S1 = '&' . $S0
   %0  = %0[$S1]
   if null %0 goto %3
@@ -262,12 +263,14 @@ dynamic:
   goto %4
 %6:
   %0 = get_namespace $P0
+  if null %0 goto %7
   $S1 = '&' . $S0
   %0  = %0[$S1]
   if null %0 goto %7 # try the root namespace if it's not in the current
   %0  = %0(%2)
   goto %4
 %3:
+  $S0 = %1
   $S0 = 'invalid command name "' . $S0
   $S0 .= '"'
   tcl_error $S0
