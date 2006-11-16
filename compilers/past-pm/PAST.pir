@@ -228,6 +228,13 @@ for compiling programs in Parrot.
 .end
 
 
+.sub 'vivicode' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('vivicode', value, has_value)
+.end
+
+
 .namespace [ 'PAST::Op' ]
 
 .sub 'pasttype' :method

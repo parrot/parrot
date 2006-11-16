@@ -340,9 +340,19 @@ transform post (PAST::Var) :language('PIR') {
     .local pmc name, post
     name = node.'name'()
     name = node.'escape'(name)
-    post = new 'POST::Op'
-    post.'init'('node'=>node, 'pirop'=>'get_global')
-    post.'arglist'(post, name)
+    post = new 'POST::Ops'
+    post.'init'('node'=>node)
+    post.'push_pirop'('get_global', post, name)
+    .local pmc vivicode
+    vivicode = node.'vivicode'()
+    unless vivicode goto end
+  vivify:
+    .local pmc varlabel
+    varlabel = post.'new'('POST::Label', 'name'=>'var_')
+    post.'push_pirop'('unless_null', post, varlabel)
+    post.'push_pirop'('new', post, vivicode)
+    post.'push'(varlabel)
+  end:
     .return (post)
 }
 
