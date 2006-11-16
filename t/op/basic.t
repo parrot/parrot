@@ -229,4 +229,9 @@ pir_output_like( $CODE, <<'OUTPUT', "end of line handling");
 OUTPUT
 
 
-
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
