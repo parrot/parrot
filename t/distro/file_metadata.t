@@ -116,7 +116,7 @@ COPYRIGHT: {
 =cut
 
 BEGIN {
-    unless ( $Parrot::Revision::svn_entries or `svk ls .` ) {
+    unless ( $Parrot::Revision::current or `svk ls .` ) {
         plan skip_all => 'not a working copy';
     }
     else { plan 'no_plan' }
