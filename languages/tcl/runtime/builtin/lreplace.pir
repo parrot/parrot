@@ -18,13 +18,16 @@
     list = __list($P0)
     list = clone list
 
-    .local int first,last, count, size
-    size = list
+    .local int size
+    size = elements list
+
+    .local int first, last, count
     $S0 = shift argv
     first = __index($S0,list)
     $S0  = shift argv
     last = __index($S0,list)
 
+    if size == 0   goto empty
     if last < size goto first_1
     last = size
     dec last
@@ -44,6 +47,10 @@ ok:
 
 insert:
     splice list, argv, first, 0
+    .return(list)
+
+empty:
+    splice list, argv, 0, 0
     .return(list)
 
 bad_args:
