@@ -68,7 +68,7 @@ print <<END;
 END
 
 for my $ops_file (@ops_files) {
-    open OPS, "<$ops_file" or die "Can't read $ops_file!";
+    open OPS, "<", "$ops_file" or die "Can't read $ops_file!";
     while (<OPS>) {
         next unless (/^(inline\s+)?op\s+([a-zA-Z]\w*)/);
         my $op = $2;
@@ -100,7 +100,7 @@ for my $type (@imcc_basic_types) {
     $types{$type} = 1;
 }
 
-open TYPES, "<$parrot/$parrot_pmcsh_file" or
+open TYPES, "<", "$parrot/$parrot_pmcsh_file" or
   die "Can't read $parrot/$parrot_pmcsh_file!";
 while (<TYPES>) {
     next unless (/^\s+enum_class_(\w+)\,/);
