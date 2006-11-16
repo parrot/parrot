@@ -8,12 +8,12 @@ Opcode functions
 Assembly language             jg    jg    jg                    jg     jg     jg   jg    jg    jg
 Index aggregate PMCs           
 Garbage collection            jg    jg    jg
-Embedding
-Extension system
+Embedding                            c
+Extension system                     c
 Bytecode                      jg    jg    jg                    jg     jg     jg   jg    jg    jg
 Big numbers
 Objects and classes
-NCI
+NCI                            c     c     c                     c                  c
 Basic PMC types
 Security infrastr.
 PIR                     jg    jg    jg    jg                    jg     jg     jg   jg    jg    jg
