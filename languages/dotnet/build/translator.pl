@@ -47,7 +47,7 @@ $pir .= generate_dispatch_table($srm, \@rules, $metavars);
 
 # Generate instruction translation code from rules.
 foreach (@rules) {
-	$pir .= generate_rule_code($srm, $_, $metavars);
+        $pir .= generate_rule_code($srm, $_, $metavars);
 }
 
 # Generate final translator code.
@@ -171,7 +171,7 @@ sub validate_rule {
     
     # Flags we'll set as we go through key/value pairs.
     my ($has_code, $has_class, $has_push, $has_pop, $has_args, $has_trans,
-	    $has_typeinfo);
+            $has_typeinfo);
 
     # Iterate over keys and do validation.
     for (keys %$rule) {
@@ -257,7 +257,7 @@ sub validate_rule {
             }
         }
 
-		# typeinfo
+                # typeinfo
         elsif (/^typeinfo$/) {
             if ($has_typeinfo) {
                 die "Duplicate value for typeinfo in rule $rule->{'name'}\n";
@@ -265,7 +265,7 @@ sub validate_rule {
                 $has_typeinfo = 1;
             }
         }
-		
+                
         # Unknown key.
         else {
             die "Unknown key $_ in rule $rule->{'name'}\n";
@@ -284,28 +284,28 @@ sub validate_rule {
             "$rule->{'name'}\n";
     }
 
-	# typeinfo must be supplied with op, load and calling, but not with
+        # typeinfo must be supplied with op, load and calling, but not with
     # anything else.
-	if ($has_typeinfo && $rule->{'class'} ne 'op' && $rule->{'class'} ne 'store' &&
-	    $rule->{'class'} ne 'load' && $rule->{'class'} ne 'calling') {
-		die "typeinfo only valid for rules of class op, calling or load in " . 
-		    "$rule->{'name'}\n";
-	} elsif (!$has_typeinfo && ($rule->{'class'} eq 'op' ||
-	         $rule->{'class'} eq 'load' || $rule->{'class'} eq 'calling')) {
-		die "typeinfo must be supplied for rule $rule->{'name'}\n";
-	}
+        if ($has_typeinfo && $rule->{'class'} ne 'op' && $rule->{'class'} ne 'store' &&
+            $rule->{'class'} ne 'load' && $rule->{'class'} ne 'calling') {
+                die "typeinfo only valid for rules of class op, calling or load in " . 
+                    "$rule->{'name'}\n";
+        } elsif (!$has_typeinfo && ($rule->{'class'} eq 'op' ||
+                 $rule->{'class'} eq 'load' || $rule->{'class'} eq 'calling')) {
+                die "typeinfo must be supplied for rule $rule->{'name'}\n";
+        }
 
     # pop and push forbidden for calling
     if ($rule->{'class'} eq 'calling' && ($has_pop || $has_push)) {
         die "pop and push not allowed for class calling in rule $rule->{'name'}\n";
     }
 
-	# Set default values.
-	$rule->{'pop'} ||= 0;
-	$rule->{'push'} ||= 0;
-	$rule->{'instruction'} ||= "";
-	$rule->{'pir'} ||= "";
-	$rule->{'arguments'} = "" unless $has_args;
+        # Set default values.
+        $rule->{'pop'} ||= 0;
+        $rule->{'push'} ||= 0;
+        $rule->{'instruction'} ||= "";
+        $rule->{'pir'} ||= "";
+        $rule->{'arguments'} = "" unless $has_args;
 }
 
 
@@ -313,32 +313,32 @@ sub validate_rule {
 # ############################################
 sub generate_initial_pir {
     my $srm = shift;
-	my $rules = shift;
-	my $mv = shift;
+        my $rules = shift;
+        my $mv = shift;
 
-	# Get number of locals we need for ${STACKn} and ${DESTm} and set up
-	# their meta-variables.
-	my ($max_pop, $max_push) = (0, 0);
-	foreach (@$rules) {
-		if ($_->{'pop'} > $max_pop) {
-			$max_pop = $_->{'pop'};
-		}
-		if ($_->{'push'} > $max_push) {
-			$max_push = $_->{'push'};
-		}
-	}
-	my $stack_locals = "";
-	for (0..$max_pop - 1) {
-		$stack_locals .= $stack_locals ? ', ' : '.local string ';
-		$stack_locals .= "stack$_";
-		$mv->{"STACK$_"} = "stack$_";
-	}
-	my $dest_locals = "";
-	for (0..$max_push - 1) {
-		$dest_locals .= $dest_locals ? ', ' : '.local string ';
-		$dest_locals .= "dest$_";
-		$mv->{"DEST$_"} = "dest$_";
-	}
+        # Get number of locals we need for ${STACKn} and ${DESTm} and set up
+        # their meta-variables.
+        my ($max_pop, $max_push) = (0, 0);
+        foreach (@$rules) {
+                if ($_->{'pop'} > $max_pop) {
+                        $max_pop = $_->{'pop'};
+                }
+                if ($_->{'push'} > $max_push) {
+                        $max_push = $_->{'push'};
+                }
+        }
+        my $stack_locals = "";
+        for (0..$max_pop - 1) {
+                $stack_locals .= $stack_locals ? ', ' : '.local string ';
+                $stack_locals .= "stack$_";
+                $mv->{"STACK$_"} = "stack$_";
+        }
+        my $dest_locals = "";
+        for (0..$max_push - 1) {
+                $dest_locals .= $dest_locals ? ', ' : '.local string ';
+                $dest_locals .= "dest$_";
+                $mv->{"DEST$_"} = "dest$_";
+        }
 
     # Emit the translator PIR.
     my $pir = <<TRANSPIR;
@@ -360,37 +360,37 @@ sub generate_initial_pir {
     .local int pc, next_pc, bc_length, cur_ic, pop_count, label_num, sp_dest
     .local int i, j, type, try_offset, try_length, try_end, handler_offset, eh_flags
     .local int class_type, class_id
-	$stack_locals
-	$dest_locals
-	\${AUTO_MAGICALS}
+        $stack_locals
+        $dest_locals
+        \${AUTO_MAGICALS}
 
-	# Type constants.
-	.const int ELEMENT_TYPE_VOID = 0x01
-	.const int ELEMENT_TYPE_BOOLEAN = 0x02
-	.const int ELEMENT_TYPE_CHAR = 0x03
-	.const int ELEMENT_TYPE_I1 = 0x04
-	.const int ELEMENT_TYPE_U1 = 0x05
-	.const int ELEMENT_TYPE_I2 = 0x06
-	.const int ELEMENT_TYPE_U2 = 0x07
-	.const int ELEMENT_TYPE_I4 = 0x08
-	.const int ELEMENT_TYPE_U4 = 0x09
-	.const int ELEMENT_TYPE_I8 = 0x0A
-	.const int ELEMENT_TYPE_U8 = 0x0B
-	.const int ELEMENT_TYPE_R4 = 0x0C
-	.const int ELEMENT_TYPE_R8 = 0x0D
-	.const int ELEMENT_TYPE_STRING = 0x0E
-	.const int ELEMENT_TYPE_PTR = 0x0F
-	.const int ELEMENT_TYPE_BYREF = 0x10
-	.const int ELEMENT_TYPE_VALUETYPE = 0x11
-	.const int ELEMENT_TYPE_CLASS = 0x12
-	.const int ELEMENT_TYPE_ARRAY= 0x14
-	.const int ELEMENT_TYPE_TYPEDBYREF = 0x16
-	.const int ELEMENT_TYPE_I = 0x18
-	.const int ELEMENT_TYPE_U = 0x19
-	.const int ELEMENT_TYPE_FNPTR = 0x1B
-	.const int ELEMENT_TYPE_OBJECT = 0x1C
-	.const int ELEMENT_TYPE_SZARRAY = 0x1D
-	.const int ELEMENT_TYPE_INTERNAL = 0x21
+        # Type constants.
+        .const int ELEMENT_TYPE_VOID = 0x01
+        .const int ELEMENT_TYPE_BOOLEAN = 0x02
+        .const int ELEMENT_TYPE_CHAR = 0x03
+        .const int ELEMENT_TYPE_I1 = 0x04
+        .const int ELEMENT_TYPE_U1 = 0x05
+        .const int ELEMENT_TYPE_I2 = 0x06
+        .const int ELEMENT_TYPE_U2 = 0x07
+        .const int ELEMENT_TYPE_I4 = 0x08
+        .const int ELEMENT_TYPE_U4 = 0x09
+        .const int ELEMENT_TYPE_I8 = 0x0A
+        .const int ELEMENT_TYPE_U8 = 0x0B
+        .const int ELEMENT_TYPE_R4 = 0x0C
+        .const int ELEMENT_TYPE_R8 = 0x0D
+        .const int ELEMENT_TYPE_STRING = 0x0E
+        .const int ELEMENT_TYPE_PTR = 0x0F
+        .const int ELEMENT_TYPE_BYREF = 0x10
+        .const int ELEMENT_TYPE_VALUETYPE = 0x11
+        .const int ELEMENT_TYPE_CLASS = 0x12
+        .const int ELEMENT_TYPE_ARRAY= 0x14
+        .const int ELEMENT_TYPE_TYPEDBYREF = 0x16
+        .const int ELEMENT_TYPE_I = 0x18
+        .const int ELEMENT_TYPE_U = 0x19
+        .const int ELEMENT_TYPE_FNPTR = 0x1B
+        .const int ELEMENT_TYPE_OBJECT = 0x1C
+        .const int ELEMENT_TYPE_SZARRAY = 0x1D
+        .const int ELEMENT_TYPE_INTERNAL = 0x21
     
     # Trace info - param and local types.
     if trace != 2 goto NO_IN_TRACE
@@ -427,8 +427,8 @@ NO_IN_TRACE:
     bc_length = bc.get_length()
     pc = 0
 
-	# Initialize stack types array.
-	stypes = new ResizablePMCArray
+        # Initialize stack types array.
+        stypes = new ResizablePMCArray
 
     # Instantiate a bytecode escaper.
     escaper = find_global "Data::Escape", "String"
@@ -442,12 +442,12 @@ TRANSPIR
     $mv->{'BC'} = 'bc';
     $mv->{'INS'} = 'gen_pir';
     $mv->{'PC'} = 'pc';
-	$mv->{'NEXTPC'} = 'next_pc';
-	$mv->{'PTYPES'} = 'ptypes';
-	$mv->{'LTYPES'} = 'ltypes';
-	$mv->{'STYPES'} = 'stypes';
-	$mv->{'DTYPES'} = 'dtypes';
-	$mv->{'LOADTYPE'} = 'loadtype';
+        $mv->{'NEXTPC'} = 'next_pc';
+        $mv->{'PTYPES'} = 'ptypes';
+        $mv->{'LTYPES'} = 'ltypes';
+        $mv->{'STYPES'} = 'stypes';
+        $mv->{'DTYPES'} = 'dtypes';
+        $mv->{'LOADTYPE'} = 'loadtype';
     $mv->{'RETTYPE'} = 'rettype';
     $mv->{'LABELNUM'} = 'label_num';
     $mv->{'EHANDLERS'} = 'ehs';
@@ -477,7 +477,7 @@ NO_EH_HEADER:
     ss_propogate = new .Hash
 TRANS_LOOP:
     pc = bc.get_pos()
-	next_pc = pc
+        next_pc = pc
     if pc >= bc_length goto COMPLETE
     
     # If we have a stack type state propogated here, put it in place.
@@ -486,11 +486,11 @@ TRANS_LOOP:
     stypes = ss
 NO_SS_PROP:
 
-	# Generate label.
+        # Generate label.
 PIRCODE
 
-	# Emit label generation code.
-	$pir .= "### gen_label\n";
+        # Emit label generation code.
+        $pir .= "### gen_label\n";
     my $srm_label = $srm->gen_label();
     $pir .= sub_meta($srm_label, $mv, 'gen_label');
     $pir .= "### end gen_label\n\n";
@@ -557,19 +557,19 @@ NOT_TRY_START:
 PIRCODE
     my $pop_all = $srm->pop_all();
     $pir .= "### pop_all (typed eh)\n";
-	$pir .= sub_meta($pop_all, $mv, "pop_all for typed exception handler");
-	$pir .= "### end pop_all (typed eh)\n";
+        $pir .= sub_meta($pop_all, $mv, "pop_all for typed exception handler");
+        $pir .= "### end pop_all (typed eh)\n";
     my $pre_load = $srm->pre_load(0);
-	$pir .= "### pre_load (typed eh)\n";
-	$pir .= sub_meta($pre_load, { %$mv, LOADREG => 'loadreg' }, "pre_load for typed exception handler");
-	$pir .= "### end pre_load (typed eh)\n";
+        $pir .= "### pre_load (typed eh)\n";
+        $pir .= sub_meta($pre_load, { %$mv, LOADREG => 'loadreg' }, "pre_load for typed exception handler");
+        $pir .= "### end pre_load (typed eh)\n";
     $pir .= <<'PIRCODE';
     loadreg = "$P1000001"
 PIRCODE
     my $post_load = $srm->post_load(0);
-	$pir .= "### post_load (typed eh)\n";
-	$pir .= sub_meta($post_load, { %$mv, LOADREG => 'loadreg' }, "post_load for typed exception handler");
-	$pir .= "### end post_load (typed eh)\n";
+        $pir .= "### post_load (typed eh)\n";
+        $pir .= sub_meta($post_load, { %$mv, LOADREG => 'loadreg' }, "post_load for typed exception handler");
+        $pir .= "### end post_load (typed eh)\n";
     $pir .= <<'PIRCODE';
 NOT_TYPED_EH_START:
 
@@ -642,10 +642,10 @@ sub generate_dispatch_table {
     # We'll use recursion to build up a binary search style tree to dispatch
     # to the translation code for an instruction in something like O(log(n))
     # rather than O(n).
-	my $pir = <<PIRCODE;
-	# Translation code dispatch table.
-	cur_ic = bc.read_uint8()
-	next_pc += 1
+        my $pir = <<PIRCODE;
+        # Translation code dispatch table.
+        cur_ic = bc.read_uint8()
+        next_pc += 1
 PIRCODE
     $pir .= binary_dispatch_table('', @rules_grouped);
 
@@ -653,10 +653,10 @@ PIRCODE
     $pir .= <<PIRCODE;
 INS_NOT_FOUND_ERROR:
     ex = new Exception
-	err = "Attempt to translate unknown instruction (code "
-	str_ic = cur_ic
-	err = concat str_ic
-	err = concat ")"
+        err = "Attempt to translate unknown instruction (code "
+        str_ic = cur_ic
+        err = concat str_ic
+        err = concat ")"
     ex["_message"] = err 
     throw ex
 
@@ -746,21 +746,21 @@ sub binary_dispatch_table {
 # Generate translation code relating to a rule.
 # #############################################
 sub generate_rule_code {
-	my $srm = shift;
-	my $rule = shift;
-	my $mv = shift;
-	my @localmv = ();
-	my $pir = "";
-	
-	# Make current instruction code meta-variable.
-	$mv->{'CURIC'} = $rule->{'code'};
-	push @localmv, 'CURIC';
+        my $srm = shift;
+        my $rule = shift;
+        my $mv = shift;
+        my @localmv = ();
+        my $pir = "";
+        
+        # Make current instruction code meta-variable.
+        $mv->{'CURIC'} = $rule->{'code'};
+        push @localmv, 'CURIC';
 
-	# Emit dispatch label.
-	my $name = $rule->{'name'};
-	$pir .= "    # Translation code for $name\n";
-	$name =~ s/\./_/g;
-	$pir .= "INS_TRANS_$name:\n";
+        # Emit dispatch label.
+        my $name = $rule->{'name'};
+        $pir .= "    # Translation code for $name\n";
+        $name =~ s/\./_/g;
+        $pir .= "INS_TRANS_$name:\n";
 
     # Emit trace code.
     $pir .= <<PIR;
@@ -780,98 +780,98 @@ STS_LOOP_END_$name:
 printerr "\\n"
 NO_TRACE_$name:
 PIR
-	
-	# Emit code to read arguments for the op and set argument meta-variables.
-	# There is something slightly curious going on here. sub_meta will create
-	# the .local declarations for arguments, but it needs to know the argument
-	# type. Thus we assign to meta-variable I_ARG_0, I_ARG_1 etc, let sub_meta
-	# do what it needs to, then set ARG0 in the meta-variables table to whatever
-	# I_ARG_0 turns out to me. We also keep track of the fact that ARG0 should
-	# only exist inside this rule.
-	my @args = split(/,\s*/, $rule->{'arguments'});
+        
+        # Emit code to read arguments for the op and set argument meta-variables.
+        # There is something slightly curious going on here. sub_meta will create
+        # the .local declarations for arguments, but it needs to know the argument
+        # type. Thus we assign to meta-variable I_ARG_0, I_ARG_1 etc, let sub_meta
+        # do what it needs to, then set ARG0 in the meta-variables table to whatever
+        # I_ARG_0 turns out to me. We also keep track of the fact that ARG0 should
+        # only exist inside this rule.
+        my @args = split(/,\s*/, $rule->{'arguments'});
     $mv->{'ARGCOUNT'} = scalar @args;
     push @localmv, 'ARGCOUNT';
-	my $arg_num = 0;
-	my $arg_size = 0;
-	foreach (@args) {
-		my $out;
-		my $arg_name;
+        my $arg_num = 0;
+        my $arg_size = 0;
+        foreach (@args) {
+                my $out;
+                my $arg_name;
 
-		# uint8
-		if (/^uint8$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_uint8()\n    next_pc += 1\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                # uint8
+                if (/^uint8$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_uint8()\n    next_pc += 1\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
-		# int8
-		elsif (/^int8$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_int8()\n    next_pc += 1\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                # int8
+                elsif (/^int8$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_int8()\n    next_pc += 1\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
-		# uint16
-		elsif (/^uint16$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_uint16()\n    next_pc += 2\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                # uint16
+                elsif (/^uint16$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_uint16()\n    next_pc += 2\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
-		# int16
-		elsif (/^int16$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_int16()\n    next_pc += 2\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                # int16
+                elsif (/^int16$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_int16()\n    next_pc += 2\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
-		# uint32
-		elsif (/^uint32$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_uint32()\n    next_pc += 4\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                # uint32
+                elsif (/^uint32$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_uint32()\n    next_pc += 4\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
-		# int32
-		elsif (/^int32$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_int32()\n    next_pc += 4\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                # int32
+                elsif (/^int32$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_int32()\n    next_pc += 4\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
-		# float32
-		elsif (/^float32$/) {
-			$out =  "    \${N_ARG_$arg_num} = bc.read_float32()\n    next_pc += 4\n";
-			$arg_name = "N_ARG_$arg_num";
-		}
+                # float32
+                elsif (/^float32$/) {
+                        $out =  "    \${N_ARG_$arg_num} = bc.read_float32()\n    next_pc += 4\n";
+                        $arg_name = "N_ARG_$arg_num";
+                }
 
-		# float64
-		elsif (/^float64$/) {
-			$out =  "    \${N_ARG_$arg_num} = bc.read_float64()\n    next_pc += 8\n";
-			$arg_name = "N_ARG_$arg_num";
-		}
+                # float64
+                elsif (/^float64$/) {
+                        $out =  "    \${N_ARG_$arg_num} = bc.read_float64()\n    next_pc += 8\n";
+                        $arg_name = "N_ARG_$arg_num";
+                }
 
         # tfield
-		elsif (/^tfield$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_tfield()\n    next_pc += 4\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                elsif (/^tfield$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_tfield()\n    next_pc += 4\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
         # tmethod
-		elsif (/^tmethod$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_tmethod()\n    next_pc += 4\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                elsif (/^tmethod$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_tmethod()\n    next_pc += 4\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
         # ttype
-		elsif (/^ttype$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_ttype()\n    next_pc += 4\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                elsif (/^ttype$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_ttype()\n    next_pc += 4\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
         # tstring
-		elsif (/^tstring$/) {
-			$out =  "    \${I_ARG_$arg_num} = bc.read_tstring()\n    next_pc += 4\n";
-			$arg_name = "I_ARG_$arg_num";
-		}
+                elsif (/^tstring$/) {
+                        $out =  "    \${I_ARG_$arg_num} = bc.read_tstring()\n    next_pc += 4\n";
+                        $arg_name = "I_ARG_$arg_num";
+                }
 
         # jumptable
-		elsif (/^jumptable$/) {
-			$out = <<"PIR";
+                elsif (/^jumptable$/) {
+                        $out = <<"PIR";
     \${P_ARG_$arg_num} = new FixedPMCArray
     i = bc.read_uint32()
     next_pc += 4
@@ -886,20 +886,20 @@ JT_LOOP_$name:
     goto JT_LOOP_$name
 JT_LOOP_END_$name:
 PIR
-			$arg_name = "P_ARG_$arg_num";
-		}
+                        $arg_name = "P_ARG_$arg_num";
+                }
 
-		# Unknown.
-		else {
-			die "Known argument type $_ not implemented yet.\n";
-		}
+                # Unknown.
+                else {
+                        die "Known argument type $_ not implemented yet.\n";
+                }
 
-		# Generate PIR.
-		$pir .= sub_meta($out, $mv, "argument read");
-		$mv->{"ARG$arg_num"} = $mv->{$arg_name};
-		push @localmv, "ARG$arg_num";
+                # Generate PIR.
+                $pir .= sub_meta($out, $mv, "argument read");
+                $mv->{"ARG$arg_num"} = $mv->{$arg_name};
+                push @localmv, "ARG$arg_num";
         $arg_num++;
-	}
+        }
 
     # Generate code that we need to insert to handle enum fixups if this is
     # an instruction that needs it.
@@ -910,116 +910,116 @@ PIR
 ${INS} = concat ${STEMP0}
 PIR
     }
-	
-	# Now we split based upon the class.
-	# Operations (op class).
-	$rule->{'pop'} ||= 0;
-	$rule->{'push'} ||= 0;
-	if ($rule->{'class'} eq 'op') {
-		# Init destination types array.
-		$pir .= "    dtypes = new ResizablePMCArray\n";
+        
+        # Now we split based upon the class.
+        # Operations (op class).
+        $rule->{'pop'} ||= 0;
+        $rule->{'push'} ||= 0;
+        if ($rule->{'class'} eq 'op') {
+                # Init destination types array.
+                $pir .= "    dtypes = new ResizablePMCArray\n";
 
-		# Insert typeinfo code (sets up dtypes).
-		$pir .= "### typeinfo\n";
-		$pir .= sub_meta($rule->{'typeinfo'}, $mv, 
-			"typeinfo for rule $rule->{'name'}");
-		$pir .= "\n" if $pir !~ /\n$/;
-		$pir .= "### end typeinfo\n";
+                # Insert typeinfo code (sets up dtypes).
+                $pir .= "### typeinfo\n";
+                $pir .= sub_meta($rule->{'typeinfo'}, $mv, 
+                        "typeinfo for rule $rule->{'name'}");
+                $pir .= "\n" if $pir !~ /\n$/;
+                $pir .= "### end typeinfo\n";
 
-		# Now call pre_op and append code that it generates.
-		my $pre_op = $srm->pre_op($rule->{'pop'}, $rule->{'push'});
-		$pir .= "### pre_op\n";
-		$pir .= sub_meta($pre_op, $mv, "pre_op for rule $rule->{'name'}");
-		$pir .= "### end pre_op\n";
+                # Now call pre_op and append code that it generates.
+                my $pre_op = $srm->pre_op($rule->{'pop'}, $rule->{'push'});
+                $pir .= "### pre_op\n";
+                $pir .= sub_meta($pre_op, $mv, "pre_op for rule $rule->{'name'}");
+                $pir .= "### end pre_op\n";
 
         # Add pre-translate code, if any.
         $pir .= sub_meta($pre_translate_code, $mv, "pre-translate for $rule->{'name'}");
 
-		# If we have PIR for the instruction, just take that. If not, we need
-		# to generate it from the "to generate" instruction directive.
-		$pir .= "### translation\n";
-		if ($rule->{'pir'}) {
-			$pir .= sub_meta($rule->{'pir'}, $mv, 
-				"pir for rule $rule->{'name'}");
-		} else {
-			$pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
-				"pir for rule $rule->{'name'}");
-		}
-		$pir .= "\n" unless $pir =~ /\n$/;
-		$pir .= "### end translation\n";
+                # If we have PIR for the instruction, just take that. If not, we need
+                # to generate it from the "to generate" instruction directive.
+                $pir .= "### translation\n";
+                if ($rule->{'pir'}) {
+                        $pir .= sub_meta($rule->{'pir'}, $mv, 
+                                "pir for rule $rule->{'name'}");
+                } else {
+                        $pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
+                                "pir for rule $rule->{'name'}");
+                }
+                $pir .= "\n" unless $pir =~ /\n$/;
+                $pir .= "### end translation\n";
 
-		# Emit code to fix up the stack type array.
-		for (1..$rule->{'pop'}) {
-			$pir .= "    type_trans = pop stypes\n";
-		}
-		for (1..$rule->{'push'}) {
-			$pir .= "    type_trans = pop dtypes\n";
-			$pir .= "    stypes = push type_trans\n";
-		}
+                # Emit code to fix up the stack type array.
+                for (1..$rule->{'pop'}) {
+                        $pir .= "    type_trans = pop stypes\n";
+                }
+                for (1..$rule->{'push'}) {
+                        $pir .= "    type_trans = pop dtypes\n";
+                        $pir .= "    stypes = push type_trans\n";
+                }
 
-		# Finally, call post_op and append code it generates.
-		my $post_op = $srm->post_op($rule->{'pop'}, $rule->{'push'});
-		$pir .= "### post_op\n";
-		$pir .= sub_meta($post_op, $mv, "post_op for rule $rule->{'name'}");
-		$pir .= "### end post_op\n";
-	}
+                # Finally, call post_op and append code it generates.
+                my $post_op = $srm->post_op($rule->{'pop'}, $rule->{'push'});
+                $pir .= "### post_op\n";
+                $pir .= sub_meta($post_op, $mv, "post_op for rule $rule->{'name'}");
+                $pir .= "### end post_op\n";
+        }
 
-	# Loads (load class).
-	elsif ($rule->{'class'} eq 'load') {
-		# Undef the loadtype so we can detect case where typeinfo fails to set
-		# it.
-		$pir .= "    loadtype = null\n";
+        # Loads (load class).
+        elsif ($rule->{'class'} eq 'load') {
+                # Undef the loadtype so we can detect case where typeinfo fails to set
+                # it.
+                $pir .= "    loadtype = null\n";
 
-		# Insert typeinfo code.
-		$pir .= "### typeinfo\n";
-		$pir .= sub_meta($rule->{'typeinfo'}, $mv, 
-			"typeinfo for rule $rule->{'name'}");
-		$pir .= "\n" if $pir !~ /\n$/;
-		$pir .= "### end typeinfo\n";
+                # Insert typeinfo code.
+                $pir .= "### typeinfo\n";
+                $pir .= sub_meta($rule->{'typeinfo'}, $mv, 
+                        "typeinfo for rule $rule->{'name'}");
+                $pir .= "\n" if $pir !~ /\n$/;
+                $pir .= "### end typeinfo\n";
 
-		# Does the translator code actually load a value or just give back a
-		# register name?
-		my $need_dest;
-		if ($rule->{'pir'} =~ /\$\{DEST0\}/ &&
-		    $rule->{'pir'} =~ /\$\{LOADREG\}/) {
-			die "pir must use one of \${DEST0} or \${LOADREG} in rule " .
-				"$rule->{'name'}\n";
+                # Does the translator code actually load a value or just give back a
+                # register name?
+                my $need_dest;
+                if ($rule->{'pir'} =~ /\$\{DEST0\}/ &&
+                    $rule->{'pir'} =~ /\$\{LOADREG\}/) {
+                        die "pir must use one of \${DEST0} or \${LOADREG} in rule " .
+                                "$rule->{'name'}\n";
         } elsif ($rule->{'instruction'} =~ /\$\{DEST0\}/ &&
-		         $rule->{'instruction'} =~ /\$\{LOADREG\}/) {
-			die "pir must use one of \${DEST0} or \${LOADREG} in rule " .
-				"$rule->{'name'}\n";
-		} elsif ($rule->{'pir'} =~ /\$\{DEST0\}/ || $rule->{'instruction'} =~ /\$\{DEST0\}/) {
-			$need_dest = 1;
-		} elsif ($rule->{'pir'} =~ /\$\{LOADREG\}/ || $rule->{'instruction'} =~ /\$\{LOADREG\}/) {
-			$need_dest = 0;
-			$mv->{'LOADREG'} = 'loadreg';
-			push @localmv, 'LOADREG';
-		} else {
-			die "pir or instruction must use one of \${DEST0} or \${LOADREG} in rule " .
-				"$rule->{'name'}\n";
-		}
+                         $rule->{'instruction'} =~ /\$\{LOADREG\}/) {
+                        die "pir must use one of \${DEST0} or \${LOADREG} in rule " .
+                                "$rule->{'name'}\n";
+                } elsif ($rule->{'pir'} =~ /\$\{DEST0\}/ || $rule->{'instruction'} =~ /\$\{DEST0\}/) {
+                        $need_dest = 1;
+                } elsif ($rule->{'pir'} =~ /\$\{LOADREG\}/ || $rule->{'instruction'} =~ /\$\{LOADREG\}/) {
+                        $need_dest = 0;
+                        $mv->{'LOADREG'} = 'loadreg';
+                        push @localmv, 'LOADREG';
+                } else {
+                        die "pir or instruction must use one of \${DEST0} or \${LOADREG} in rule " .
+                                "$rule->{'name'}\n";
+                }
 
-		# Now call pre_load and append code that it generates.
-		my $pre_load = $srm->pre_load($need_dest);
-		$pir .= "### pre_load\n";
-		$pir .= sub_meta($pre_load, $mv, "pre_load for rule $rule->{'name'}");
-		$pir .= "### end pre_load\n";
+                # Now call pre_load and append code that it generates.
+                my $pre_load = $srm->pre_load($need_dest);
+                $pir .= "### pre_load\n";
+                $pir .= sub_meta($pre_load, $mv, "pre_load for rule $rule->{'name'}");
+                $pir .= "### end pre_load\n";
 
-		# If we have PIR for the instruction, just take that. If not, we need
-		# to generate it from the "to generate" instruction directive.
-		$pir .= "### translation\n";
-		if ($rule->{'pir'}) {
-			$pir .= sub_meta($rule->{'pir'}, $mv, 
-				"pir for rule $rule->{'name'}");
-		} else {
-			$pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
-				"pir for rule $rule->{'name'}");
-		}
-		$pir .= "\n" unless $pir =~ /\n$/;
-		$pir .= "### end translation\n";
+                # If we have PIR for the instruction, just take that. If not, we need
+                # to generate it from the "to generate" instruction directive.
+                $pir .= "### translation\n";
+                if ($rule->{'pir'}) {
+                        $pir .= sub_meta($rule->{'pir'}, $mv, 
+                                "pir for rule $rule->{'name'}");
+                } else {
+                        $pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
+                                "pir for rule $rule->{'name'}");
+                }
+                $pir .= "\n" unless $pir =~ /\n$/;
+                $pir .= "### end translation\n";
 
-		# Push load type onto the stack types array.
-		$pir .= "    stypes = push loadtype\n";
+                # Push load type onto the stack types array.
+                $pir .= "    stypes = push loadtype\n";
 
         # Emit code to clone value types for the need_dest set case.
         if ($need_dest) {
@@ -1035,19 +1035,19 @@ $label:
 PIR
         }
 
-		# Finally, call post_load and append code it generates.
-		my $post_load = $srm->post_load($need_dest);
-		$pir .= "### post_load\n";
-		$pir .= sub_meta($post_load, $mv, "post_load for rule $rule->{'name'}");
-		$pir .= "### end post_load\n";
+                # Finally, call post_load and append code it generates.
+                my $post_load = $srm->post_load($need_dest);
+                $pir .= "### post_load\n";
+                $pir .= sub_meta($post_load, $mv, "post_load for rule $rule->{'name'}");
+                $pir .= "### end post_load\n";
 
         # Emit code to clone value types for the need_dest not set case.
         if (!$need_dest) {
             my $label = "LD_VALTYPE_$name";
             my $pre_op = $srm->pre_op(1, 1);
-		    $pre_op = sub_meta($pre_op, $mv, "pre_op for rule $rule->{'name'} value type clone");
+                    $pre_op = sub_meta($pre_op, $mv, "pre_op for rule $rule->{'name'} value type clone");
             my $post_op = $srm->post_op(1, 1);
-		    $post_op = sub_meta($post_op, $mv, "post_op for rule $rule->{'name'} value type clone");
+                    $post_op = sub_meta($post_op, $mv, "post_op for rule $rule->{'name'} value type clone");
             $pir .= <<PIR
 \$I1000000 = loadtype["type"]
 if \$I1000000 != ELEMENT_TYPE_VALUETYPE goto $label
@@ -1062,97 +1062,97 @@ $post_op
 $label:
 PIR
         }
-	}
-	
-	# Stores (store class).
-	elsif ($rule->{'class'} eq 'store') {
-		# Does the translator code actually store a value or just give back a
-		# register name where the value would be stored in?
-		my $dest_reg;
-		if ($rule->{'pir'} =~ /\$\{STACK0\}/ &&
-		    $rule->{'pir'} =~ /\$\{STOREREG\}/) {
-			die "pir must use one of \${STACK0} or \${STOREREG} in rule " .
-				"$rule->{'name'}\n";
+        }
+        
+        # Stores (store class).
+        elsif ($rule->{'class'} eq 'store') {
+                # Does the translator code actually store a value or just give back a
+                # register name where the value would be stored in?
+                my $dest_reg;
+                if ($rule->{'pir'} =~ /\$\{STACK0\}/ &&
+                    $rule->{'pir'} =~ /\$\{STOREREG\}/) {
+                        die "pir must use one of \${STACK0} or \${STOREREG} in rule " .
+                                "$rule->{'name'}\n";
         } elsif ($rule->{'instruction'} =~ /\$\{STACK0\}/ &&
-		    $rule->{'instruction'} =~ /\$\{STOREREG\}/) {
-			die "instruction must use one of \${STACK0} or \${STOREREG} in rule " .
-				"$rule->{'name'}\n";
-		} elsif ("$rule->{'pir'}$rule->{'instruction'}" =~ /\$\{STACK0\}/) {
-			$dest_reg = 0;
-		} elsif ("$rule->{'pir'}$rule->{'instruction'}" =~ /\$\{STOREREG\}/) {
-			$dest_reg = 1;
-			$mv->{'STOREREG'} = 'storereg';
-			push @localmv, 'STOREREG';
-		} else {
-			die "pir or instruction must use one of \${STACK0} or \${STOREREG} in rule " .
-				"$rule->{'name'}\n";
-		}
+                    $rule->{'instruction'} =~ /\$\{STOREREG\}/) {
+                        die "instruction must use one of \${STACK0} or \${STOREREG} in rule " .
+                                "$rule->{'name'}\n";
+                } elsif ("$rule->{'pir'}$rule->{'instruction'}" =~ /\$\{STACK0\}/) {
+                        $dest_reg = 0;
+                } elsif ("$rule->{'pir'}$rule->{'instruction'}" =~ /\$\{STOREREG\}/) {
+                        $dest_reg = 1;
+                        $mv->{'STOREREG'} = 'storereg';
+                        push @localmv, 'STOREREG';
+                } else {
+                        die "pir or instruction must use one of \${STACK0} or \${STOREREG} in rule " .
+                                "$rule->{'name'}\n";
+                }
 
         # Insert typeinfo code if we have any. Note that it has no obligations.
         if ($rule->{'typeinfo'}) {
-		    $pir .= "### typeinfo\n";
-		    $pir .= sub_meta($rule->{'typeinfo'}, $mv, 
-			    "typeinfo for rule $rule->{'name'}");
-		    $pir .= "\n" if $pir !~ /\n$/;
-		    $pir .= "### end typeinfo\n";
+                    $pir .= "### typeinfo\n";
+                    $pir .= sub_meta($rule->{'typeinfo'}, $mv, 
+                            "typeinfo for rule $rule->{'name'}");
+                    $pir .= "\n" if $pir !~ /\n$/;
+                    $pir .= "### end typeinfo\n";
         }
 
-		# Now call pre_store and append code that it generates.
-		my $pre_store = $srm->pre_store($dest_reg);
-		$pir .= "### pre_store\n";
-		$pir .= sub_meta($pre_store, $mv, "pre_store for rule $rule->{'name'}");
-		$pir .= "### end pre_store\n";
+                # Now call pre_store and append code that it generates.
+                my $pre_store = $srm->pre_store($dest_reg);
+                $pir .= "### pre_store\n";
+                $pir .= sub_meta($pre_store, $mv, "pre_store for rule $rule->{'name'}");
+                $pir .= "### end pre_store\n";
 
-		# If we have PIR for the instruction, just take that. If not, we need
-		# to generate it from the "to generate" instruction directive.
-		$pir .= "### translation\n";
-		if ($rule->{'pir'}) {
-			$pir .= sub_meta($rule->{'pir'}, $mv, 
-				"pir for rule $rule->{'name'}");
-		} else {
-			$pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
-				"pir for rule $rule->{'name'}");
-		}
-		$pir .= "\n" unless $pir =~ /\n$/;
-		$pir .= "### end translation\n";
+                # If we have PIR for the instruction, just take that. If not, we need
+                # to generate it from the "to generate" instruction directive.
+                $pir .= "### translation\n";
+                if ($rule->{'pir'}) {
+                        $pir .= sub_meta($rule->{'pir'}, $mv, 
+                                "pir for rule $rule->{'name'}");
+                } else {
+                        $pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
+                                "pir for rule $rule->{'name'}");
+                }
+                $pir .= "\n" unless $pir =~ /\n$/;
+                $pir .= "### end translation\n";
 
-		# Finally, call post_store and append code it generates.
-		my $post_store = $srm->post_store($dest_reg);
-		$pir .= "### post_store\n";
-		$pir .= sub_meta($post_store, $mv, "post_store for rule $rule->{'name'}");
-		$pir .= "### end post_store\n";
+                # Finally, call post_store and append code it generates.
+                my $post_store = $srm->post_store($dest_reg);
+                $pir .= "### post_store\n";
+                $pir .= sub_meta($post_store, $mv, "post_store for rule $rule->{'name'}");
+                $pir .= "### end post_store\n";
 
         # Now pop type off the stack types array.
-		$pir .= "    type_trans = pop stypes\n";
-	}
+                $pir .= "    type_trans = pop stypes\n";
+        }
 
-	# Branches (branch class).
-	elsif ($rule->{'class'} eq 'branch') {
-		# Call pre_branch and append code that it generates.
-		my $pre_branch = $srm->pre_branch($rule->{'pop'});
-		$pir .= "### pre_branch\n";
-		$pir .= sub_meta($pre_branch, $mv, "pre_branch for rule $rule->{'name'}");
-		$pir .= "### end pre_branch\n";
+        # Branches (branch class).
+        elsif ($rule->{'class'} eq 'branch') {
+                # Call pre_branch and append code that it generates.
+                my $pre_branch = $srm->pre_branch($rule->{'pop'});
+                $pir .= "### pre_branch\n";
+                $pir .= sub_meta($pre_branch, $mv, "pre_branch for rule $rule->{'name'}");
+                $pir .= "### end pre_branch\n";
 
         # Add pre-translate code, if any.
         $pir .= sub_meta($pre_translate_code, $mv, "pre-translate for $rule->{'name'}");
 
-		# If we have PIR for the instruction, just take that. If not, we need
-		# to generate it from the "to generate" instruction directive.
-		$pir .= "### translation\n";
-		if ($rule->{'pir'}) {
-			$pir .= sub_meta($rule->{'pir'}, $mv, 
-				"pir for rule $rule->{'name'}");
-		} else {
-			$pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
-				"pir for rule $rule->{'name'}");
-		}
-		$pir .= "### end translation\n";
+                # If we have PIR for the instruction, just take that. If not, we need
+                # to generate it from the "to generate" instruction directive.
+                $pir .= "### translation\n";
+                if ($rule->{'pir'}) {
+                        $pir .= sub_meta($rule->{'pir'}, $mv, 
+                                "pir for rule $rule->{'name'}");
+                } else {
+                        $pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
+                                "pir for rule $rule->{'name'}");
+                }
+                $pir .= "### end translation\n";
 
-		# Now emit code to fix up the stack type array and propogate it.
-		for (1..$rule->{'pop'}) {
-			$pir .= "    type_trans = pop stypes\n";
-		}
+                # Now emit code to fix up the stack type array and propogate it.
+                for (1..$rule->{'pop'}) {
+                        $pir .= "    type_trans = pop stypes\n";
+                }
         if ($rule->{'code'} eq '45') {
             $pir .= <<'PIRCODE';
 i = elements P_arg_0
@@ -1174,17 +1174,17 @@ ss_propogate[sp_dest] = ss
 PIRCODE
         }
 
-		# Finally, call post_branch and append code it generates.
-		my $post_branch = $srm->post_branch($rule->{'pop'});
-		$pir .= "### post_branch\n";
-		$pir .= sub_meta($post_branch, $mv, "post_branch for rule $rule->{'name'}");
-		$pir .= "### end post_branch\n";
-	}
+                # Finally, call post_branch and append code it generates.
+                my $post_branch = $srm->post_branch($rule->{'pop'});
+                $pir .= "### post_branch\n";
+                $pir .= sub_meta($post_branch, $mv, "post_branch for rule $rule->{'name'}");
+                $pir .= "### end post_branch\n";
+        }
 
     # Calls/returns (calling class)
     elsif ($rule->{'class'} eq 'calling') {
-		# Init destination types array and params array and set meta-variable.
-		$pir .= "    dtypes = new ResizablePMCArray\n";
+                # Init destination types array and params array and set meta-variable.
+                $pir .= "    dtypes = new ResizablePMCArray\n";
         $pir .= "    c_params = new ResizableStringArray\n";
         $mv->{'PARAMS'} = 'c_params';
         push @localmv, 'PARAMS';
@@ -1197,34 +1197,34 @@ PIRCODE
             push @localmv, 'ARG0';
         }
 
-		# Insert typeinfo code (sets up dtypes as needed).
-		$pir .= "### typeinfo\n";
-		$pir .= sub_meta($rule->{'typeinfo'}, $mv, 
-			"typeinfo for rule $rule->{'name'}");
-		$pir .= "\n" if $pir !~ /\n$/;
-		$pir .= "### end typeinfo\n";
+                # Insert typeinfo code (sets up dtypes as needed).
+                $pir .= "### typeinfo\n";
+                $pir .= sub_meta($rule->{'typeinfo'}, $mv, 
+                        "typeinfo for rule $rule->{'name'}");
+                $pir .= "\n" if $pir !~ /\n$/;
+                $pir .= "### end typeinfo\n";
 
-		# Now call pre_call and append code that it generates.
-		my $pre_call = $srm->pre_call();
-		$pir .= "### pre_call\n";
-		$pir .= sub_meta($pre_call, $mv, "pre_call for rule $rule->{'name'}");
-		$pir .= "### end pre_call\n";
+                # Now call pre_call and append code that it generates.
+                my $pre_call = $srm->pre_call();
+                $pir .= "### pre_call\n";
+                $pir .= sub_meta($pre_call, $mv, "pre_call for rule $rule->{'name'}");
+                $pir .= "### end pre_call\n";
 
-		# If we have PIR for the instruction, just take that. If not, we need
-		# to generate it from the "to generate" instruction directive.
-		$pir .= "### translation\n";
-		if ($rule->{'pir'}) {
-			$pir .= sub_meta($rule->{'pir'}, $mv, 
-				"pir for rule $rule->{'name'}");
-		} else {
-			$pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
-				"pir for rule $rule->{'name'}");
-		}
-		$pir .= "\n" unless $pir =~ /\n$/;
-		$pir .= "### end translation\n";
+                # If we have PIR for the instruction, just take that. If not, we need
+                # to generate it from the "to generate" instruction directive.
+                $pir .= "### translation\n";
+                if ($rule->{'pir'}) {
+                        $pir .= sub_meta($rule->{'pir'}, $mv, 
+                                "pir for rule $rule->{'name'}");
+                } else {
+                        $pir .= sub_meta(ins_to_pir($rule->{'instruction'}), $mv, 
+                                "pir for rule $rule->{'name'}");
+                }
+                $pir .= "\n" unless $pir =~ /\n$/;
+                $pir .= "### end translation\n";
 
-		# Emit code to fix up the stack type array.
-		$pir .= <<PIR;
+                # Emit code to fix up the stack type array.
+                $pir .= <<PIR;
 pop_count = elements c_params
 goto INS_TRANS_CP_LOOP_CHK_$name
 INS_TRANS_CP_LOOP_$name:
@@ -1239,55 +1239,55 @@ push stypes, type_trans
 INS_TRANS_PUSH_LOOP_$name:
 PIR
 
-		# Finally, call post_call and append code it generates.
-		my $post_call = $srm->post_call();
-		$pir .= "### post_call\n";
-		$pir .= sub_meta($post_call, $mv, "post_call for rule $rule->{'name'}");
-		$pir .= "### end post_call\n";
-	}
+                # Finally, call post_call and append code it generates.
+                my $post_call = $srm->post_call();
+                $pir .= "### post_call\n";
+                $pir .= sub_meta($post_call, $mv, "post_call for rule $rule->{'name'}");
+                $pir .= "### end post_call\n";
+        }
 
-	# Unsupported class.
-	else {
-		die "Do not know how to handle class $rule->{'class'}\n";
-	}
+        # Unsupported class.
+        else {
+                die "Do not know how to handle class $rule->{'class'}\n";
+        }
 
-	# Finally, emit code to go to translate next instruction.
-	$pir .= "    goto TRANS_LOOP\n\n";
+        # Finally, emit code to go to translate next instruction.
+        $pir .= "    goto TRANS_LOOP\n\n";
 
-	# Clean up meta-variables hash.
-	foreach (@localmv) {
-		delete $mv->{$_};
-	}
+        # Clean up meta-variables hash.
+        foreach (@localmv) {
+                delete $mv->{$_};
+        }
 
-	# Return generated code.
-	return $pir;
+        # Return generated code.
+        return $pir;
 }
 
 
 # Instruction to PIR routine.
 # ###########################
 sub ins_to_pir {
-	my $ins = shift;
-	my $mv = shift;
-	my $output;
+        my $ins = shift;
+        my $mv = shift;
+        my $output;
 
-	# Ensure we have a newline at the end.
-	$ins .= "\n" unless $ins =~ /\n$/;
+        # Ensure we have a newline at the end.
+        $ins .= "\n" unless $ins =~ /\n$/;
 
-	# Escape some characters that will go into the output.
-	$ins =~ s/\\/\\\\/g;
-	$ins =~ s/\n/\\n/g;
-	$ins =~ s/"/\\"/g;
+        # Escape some characters that will go into the output.
+        $ins =~ s/\\/\\\\/g;
+        $ins =~ s/\n/\\n/g;
+        $ins =~ s/"/\\"/g;
 
-	# Substitute in meta-variables. Yes, this really is the least evil way I
-	# can think of to do it.
-	$ins =~ s/(\$\{\w+\})/
-		"\"\n\${INS} = concat $1\n\${INS} = concat \""
-	/ge;
-	$ins = "\${INS} = concat \"$ins\"\n";
-		
-	# Return PIR.
-	return $ins;
+        # Substitute in meta-variables. Yes, this really is the least evil way I
+        # can think of to do it.
+        $ins =~ s/(\$\{\w+\})/
+                "\"\n\${INS} = concat $1\n\${INS} = concat \""
+        /ge;
+        $ins = "\${INS} = concat \"$ins\"\n";
+                
+        # Return PIR.
+        return $ins;
 }
 
 
@@ -1320,23 +1320,23 @@ TRANSPIR
 # Inserts auto-magically instantiated meta-variable locals.
 # #########################################################
 sub insert_automagicals {
-	my $pir = shift;
-	my $mv = shift;
+        my $pir = shift;
+        my $mv = shift;
 
-	# Loop over keys to look for automagicals and build up declaration list.
-	my $decls = "";
-	for (keys %$mv) {
-		if (/^([INSP])_ARG_(\d+)$/ || /^([INSP])TEMP(\d+)$/) {
-			my $type = $1 eq 'I' ? 'int' :
-			           $1 eq 'N' ? 'num' :
-					   $1 eq 'S' ? 'string' : 'pmc';
-			$decls .= "    .local $type $mv->{$_}\n";
-		}
-	}
+        # Loop over keys to look for automagicals and build up declaration list.
+        my $decls = "";
+        for (keys %$mv) {
+                if (/^([INSP])_ARG_(\d+)$/ || /^([INSP])TEMP(\d+)$/) {
+                        my $type = $1 eq 'I' ? 'int' :
+                                   $1 eq 'N' ? 'num' :
+                                           $1 eq 'S' ? 'string' : 'pmc';
+                        $decls .= "    .local $type $mv->{$_}\n";
+                }
+        }
 
-	# Insert 'em.
-	$pir =~ s/[ \t]*\$\{AUTO_MAGICALS\}/$decls/;
-	return $pir;
+        # Insert 'em.
+        $pir =~ s/[ \t]*\$\{AUTO_MAGICALS\}/$decls/;
+        return $pir;
 }
 
 
@@ -1346,26 +1346,26 @@ sub sub_meta {
     my $pir = shift;
     my $mv = shift;
     my $code_source = shift;
-	$code_source ||= "(unknown)";
+        $code_source ||= "(unknown)";
 
     # Substiture in known meta-variables.
     for (keys %$mv) {
         $pir =~ s/\${$_}/$mv->{$_}/g;
     }
 
-	# We need to automagically instantiate [INSP]_ARG_\d+ and [INSP]TEMP\d+.
-	while ($pir =~ /\$\{([INSP])_ARG_(\d+)\}/g) {
-		my $key = "${1}_ARG_$2";
-		my $value = "${1}_arg_$2";
-		$mv->{$key} = $value;
-		$pir =~ s/\$\{$key\}/$value/g;
-	}
-	while ($pir =~ /\$\{([INSP])TEMP(\d+)\}/g) {
-		my $key = "${1}TEMP$2";
-		my $value = "${1}_temp_$2";
-		$mv->{$key} = $value;
-		$pir =~ s/\$\{$key\}/$value/g;
-	}
+        # We need to automagically instantiate [INSP]_ARG_\d+ and [INSP]TEMP\d+.
+        while ($pir =~ /\$\{([INSP])_ARG_(\d+)\}/g) {
+                my $key = "${1}_ARG_$2";
+                my $value = "${1}_arg_$2";
+                $mv->{$key} = $value;
+                $pir =~ s/\$\{$key\}/$value/g;
+        }
+        while ($pir =~ /\$\{([INSP])TEMP(\d+)\}/g) {
+                my $key = "${1}TEMP$2";
+                my $value = "${1}_temp_$2";
+                $mv->{$key} = $value;
+                $pir =~ s/\$\{$key\}/$value/g;
+        }
 
     # If we have any unsubstituted variables, error.
     if ($pir =~ /\$\{([^}]*)}/) {
