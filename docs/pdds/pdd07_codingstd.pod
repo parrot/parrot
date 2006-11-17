@@ -150,11 +150,10 @@ type, e.g. C<Interp *foo>, but not e.g. <Interp* foo>.
 
 =item *
 
-There should be one space between C keywords and following open parenthesis,
-e.g. C<return (x+y)*2>.
-
-There should be no space between function names and following open parenthesis,
-e.g. C<z = foo(x+y)*2>
+To distinguish keywords from function calls visually, there should be at least
+one space between a C keyword and any subsequent open parenthesis, e.g.
+C<return (x+y)*2>.  There should be no space between a function name and the
+following open parenthesis, e.g. C<z = foo(x+y)*2>
 
 =item *
 
