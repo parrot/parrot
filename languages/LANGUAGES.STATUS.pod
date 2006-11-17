@@ -610,7 +610,7 @@ state is currently broken. Far from complete. Revision 0.0.14
 
 Part of languages smoke testing.
 
-Development is stalled. Takers are welcome. 
+Development is stalled. Takers are welcome.
 
 =item Last verified with parrot version
 
@@ -806,14 +806,14 @@ chromatic
 =item Description
 
 It's not Scheme, it's Pheme!  Pheme is a cleaned-up, partially implemented
-Lisp-2 compiler inspired by Scheme and built with TGE and PGE. 
+Lisp-2 compiler inspired by Scheme and built with TGE and PGE.
 
 =item Status
 
 Pheme handles function calls, a few built-in-PIR primitives, and atoms and
 lists.  It also runs its tests written in pure Pheme.  It is nearly to the
 point of being able to define the rest of the standard library in terms of its
-builtins. 
+builtins.
 
 =item Last verified with Parrot version
 
@@ -924,7 +924,7 @@ Allison Randal
 =item Description
 
 Perl1 implemented in PIR with the help of
-TGE, Tree Grammar Engine, and PGE, Parrot Grammar Engine. 
+TGE, Tree Grammar Engine, and PGE, Parrot Grammar Engine.
 
 =item Status
 
@@ -957,7 +957,7 @@ python
 
 =item Status
 
-Mostly working except for classes/exec/import. For licensing reasons, not in 
+Mostly working except for classes/exec/import. For licensing reasons, not in
 parrot's svn tree.
 
 =item Last verified with parrot version
@@ -1100,13 +1100,19 @@ A from scratch implementation of a Tcl 8.5 compiler in parrot.
 
 =item Status
 
-[break],[continue],[rename] - some tests failing.
-Passes about 5.5% of tcl's (converted) test suite
-Part of languages smoke testing.
+Passes over 12% of tcl's (lightly converted) test suite, using a
+Test::More like harness. (Don't run enough of tcl yet to simply
+use tcltest.tcl)
+
+Part of languages smoke testing: running tests this way shows
+failures: to get a better picture:
+
+ cd languages/tcl
+ make test
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
